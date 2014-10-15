@@ -293,16 +293,15 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
 
     /* Handle simultaneous control mode enter. */
     connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoChanged,  this, [this](const QnPeerRuntimeInfo &info) {
+        /* Ignore own info change. */
+        if (info.uuid == qnCommon->moduleGUID())
+            return;
 
         if (info.data.videoWallControlSession.isNull()) {
             setItemControlledBy(info.data.videoWallControlSession, info.uuid, false);
         } else {
             setItemControlledBy(info.data.videoWallControlSession, info.uuid, true);
         }
-
-        /* Ignore own info change. */
-        if (info.uuid == qnCommon->moduleGUID())
-            return;
 
         /* Skip if we are not controlling videowall now. */
         if (!m_controlMode.active)
@@ -951,6 +950,8 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active) {
         QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
         localInfo.data.videoWallControlSession = workbench()->currentLayout()->resource()->getId();
         QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
+
+        setItemControlledBy(localInfo.data.videoWallControlSession, localInfo.uuid, true);
     } else {
         disconnect(action(Qn::RadassAutoAction),           NULL,        this,   NULL);
         disconnect(action(Qn::RadassLowAction),            NULL,        this,   NULL);
@@ -973,6 +974,8 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active) {
         QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
         localInfo.data.videoWallControlSession = QnUuid();
         QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
+
+        setItemControlledBy(localInfo.data.videoWallControlSession, localInfo.uuid, false);
     }
 }
 
@@ -985,7 +988,7 @@ void QnWorkbenchVideoWallHandler::updateMode() {
         QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(itemUuid);
         if (!index.isNull() 
             && index.item().runtimeStatus.online 
-            && index.item().runtimeStatus.controlledBy.isNull()
+            && (index.item().runtimeStatus.controlledBy.isNull() || index.item().runtimeStatus.controlledBy == qnCommon->moduleGUID())
             && index.item().layout == layout->resource()->getId()
             )
             control = true;
@@ -1831,17 +1834,18 @@ void QnWorkbenchVideoWallHandler::at_videoWall_itemAdded(const QnVideoWallResour
             updatedItem.runtimeStatus.online = true;
         }
 
-        if (info.data.videoWallControlSession == item.layout) {
+        if (info.data.videoWallControlSession == item.layout && !info.data.videoWallControlSession.isNull()) {
             hasChanges |= updatedItem.runtimeStatus.controlledBy != info.uuid;
             updatedItem.runtimeStatus.controlledBy = info.uuid;
         }
     }
 
-    if (hasChanges)
-        videoWall->items()->updateItem(updatedItem);
-    
-
     updateReviewLayout(videoWall, item, ItemAction::Added);
+
+    if (hasChanges) {
+        videoWall->items()->updateItem(updatedItem);
+        updateMode();
+    }
 }
 
 void QnWorkbenchVideoWallHandler::at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
@@ -1858,10 +1862,6 @@ void QnWorkbenchVideoWallHandler::at_videoWall_itemChanged(const QnVideoWallReso
 
     updateControlLayout(videoWall, item, ItemAction::Changed);
     updateReviewLayout(videoWall, item, ItemAction::Changed);
-
-    // check if item become online or offline
-    if (item.uuid == workbench()->currentLayout()->data(Qn::VideoWallItemGuidRole).value<QnUuid>())
-        updateMode();
 }
 
 void QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
@@ -2348,6 +2348,9 @@ void QnWorkbenchVideoWallHandler::setItemOnline(const QnUuid &instanceGuid, bool
     QnVideoWallItem item = index.item();
     item.runtimeStatus.online = online;
     index.videowall()->items()->updateItem(item);
+
+    if (item.uuid == workbench()->currentLayout()->data(Qn::VideoWallItemGuidRole).value<QnUuid>())
+        updateMode();
 }
 
 void QnWorkbenchVideoWallHandler::setItemControlledBy(const QnUuid &layoutId, const QnUuid &controllerId, bool on) {
@@ -2357,7 +2360,7 @@ void QnWorkbenchVideoWallHandler::setItemControlledBy(const QnUuid &layoutId, co
                 QnVideoWallItem updated(item);
                 updated.runtimeStatus.controlledBy = QnUuid();
                 videoWall->items()->updateItem(updated);
-            } else if (!on && item.layout == layoutId) {
+            } else if (on && item.layout == layoutId) {
                 QnVideoWallItem updated(item);
                 updated.runtimeStatus.controlledBy = controllerId;
                 videoWall->items()->updateItem(updated);
