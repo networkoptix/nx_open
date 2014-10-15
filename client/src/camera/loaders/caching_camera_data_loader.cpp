@@ -19,7 +19,7 @@ namespace {
 }
 
 QnCachingCameraDataLoader::QnCachingCameraDataLoader(const QnResourcePtr &resource, QObject *parent):
-    QObject(parent),
+    base_type(parent),
     m_resource(resource)
 {
     init();
@@ -36,7 +36,7 @@ QnCachingCameraDataLoader::QnCachingCameraDataLoader(const QnResourcePtr &resour
 }
 
 QnCachingCameraDataLoader::QnCachingCameraDataLoader(QnAbstractCameraDataLoader **loaders, QObject *parent):
-    QObject(parent),
+    base_type(parent),
     m_resource(loaders[0]->resource())
 {
     init();
@@ -57,8 +57,10 @@ void QnCachingCameraDataLoader::init() {
         m_loaders[i] = NULL;
     }
 
-    if(!m_resourceIsLocal)
-        connect(qnSyncTime, SIGNAL(timeChanged()), this, SLOT(at_syncTime_timeChanged()));
+    if(!m_resourceIsLocal) {
+        connect(qnSyncTime, &QnSyncTime::timeChanged,       this, &QnCachingCameraDataLoader::discardCachedData);
+        connect(m_resource, &QnResource::parentIdChanged,   this, &QnCachingCameraDataLoader::discardCachedData);
+    }
 }
 
 void QnCachingCameraDataLoader::initLoaders(QnAbstractCameraDataLoader **loaders) {
@@ -385,7 +387,7 @@ void QnCachingCameraDataLoader::at_loader_failed(int /*status*/, int handle) {
     }
 }
 
-void QnCachingCameraDataLoader::at_syncTime_timeChanged() {
+void QnCachingCameraDataLoader::discardCachedData() {
     for (int i = 0; i < Qn::CameraDataTypeCount; i++) {
         if (m_loaders[i])
             m_loaders[i]->discardCachedData();

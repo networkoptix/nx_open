@@ -70,7 +70,7 @@ private:
     nxpt::ScopedRef<HttpLinkPlugin> m_pluginRef;
     nxcip::CameraInfo m_info;
     unsigned int m_capabilities;
-    std::auto_ptr<MediaEncoder> m_encoder;
+    std::unique_ptr<MediaEncoder> m_encoder;
 };
 
 #endif  //ILP_CAMERA_MANAGER_H

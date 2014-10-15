@@ -56,6 +56,8 @@ public:
     //!Implementation of nxcip::CameraMediaEncoder2::getAudioFormat
     virtual int getAudioFormat( nxcip::AudioFormat* audioFormat ) const override;
 
+    void updateCameraInfo( const nxcip::CameraInfo& info );
+
 private:
     nxpt::CommonRefManager m_refManager;
     CameraManager* m_cameraManager;
