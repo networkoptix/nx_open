@@ -14,7 +14,7 @@ QnLicenseDetailsDialog::QnLicenseDetailsDialog(const QnLicensePtr &license, QWid
 
     ui->licenseTypeLabel->setText(license->displayName());
     ui->licenseKeyLabel->setText(QLatin1String(license->key()));
-    ui->licenseHwidLabel->setText(QLatin1String(qnLicensePool->currentHardwareId()));
+    ui->licenseHwidLabel->setText(QLatin1String(license->hardwareId()));
 
     QString feature = (license->type() == Qn::LC_VideoWall)
         ? tr("Screens and Control Sessions Allowed:")
@@ -49,7 +49,7 @@ QString QnLicenseDetailsDialog::licenseDescription(const QnLicensePtr &license) 
         "Features:\n")
                 .arg(license->displayName())
                 .arg(QLatin1String(license->key()))
-                .arg(QLatin1String(qnLicensePool->currentHardwareId()))
+                .arg(QLatin1String(license->hardwareId()))
                 ;
      return details + features;
 }
