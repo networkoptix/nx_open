@@ -239,9 +239,7 @@ public:
         error_code_(SystemError::noError),
         ssl_(ssl)
     {}
-    ~AsyncSSLOperation() {
-        Q_ASSERT( pending_io_count_ == 0 );
-    }
+    virtual ~AsyncSSLOperation() {}
 protected:
     virtual void InvokeUserCallback() = 0;
     void Reset() {
@@ -461,25 +459,45 @@ private:
     bool is_server_;
     int handshake_stage_;
     AbstractStreamSocket* underly_socket_;
-    // A deletion flag must be used to protect the read/write
+    // This class is used to notify the caller that the user has deleted the 
+    // object. Since it is very likely that the invocation will spawn a chain
+    // of member function in AsyncSSL, eg: OnUnderlySocketRecv --> sendAsync
+    // --> OnUnderlySocketSend --> delete the object, for each function , there
+    // will be a such class on the stack, however , the inner most nested class
+    // will get notification, since this class set the deletion_flag at last. 
+    // This will result in the outer caller not get any notification afterwards.
+    // A simpler and elegant way should use std::shared_ptr/std::weak_ptr, however
+    // since our code has performance issue, we'd like to invent some easier way
+    // to do so. This class will cascade the deletion information to the out most
+    // callee until no more DeletionFlag is used then. The mechanism is simple,it
+    // will check the AsyncSSL's deletion_flag_ pointer, if it is not NULL, which
+    // means a DelegionFlag on stack is watching for the deletion operations, so
+    // it will cache this pointer and set it to the corresponding value, by this
+    // means we are able to cascade the deletion operation internally. 
     class DeletionFlag {
     public:
-        DeletionFlag( AsyncSSL* ssl ) : flag_( false ) , ssl_(ssl) {
+        DeletionFlag( AsyncSSL* ssl ) : 
+            flag_( false ) , 
+            ssl_(ssl) 
+        {
+            previous_flag_ = ssl->deletion_flag_;
             ssl->deletion_flag_ = &flag_;
         }
         ~DeletionFlag() {
-            if( flag_ != true ) {
-                ssl_->deletion_flag_ = NULL;
+            if( !flag_ ) {
+                // Restoring the previous flag of this objects
+                ssl_->deletion_flag_ = previous_flag_;
+            } else {
+                if(previous_flag_ != NULL)
+                    *previous_flag_ = true;
             }
         }
         operator bool () const {
             return flag_;
         }
-        void Reset() {
-            flag_ = false;
-        }
     private:
         bool flag_;
+        bool* previous_flag_;
         AsyncSSL* ssl_;
     };
     bool* deletion_flag_;
@@ -600,8 +618,8 @@ void AsyncSSL::OnUnderlySocketRecv( SystemError::ErrorCode error_code , std::siz
         if( bytes_transferred == 0 ) {
             eof_ = true;
         }
-        // Since we are gonna invoke user's callback here, so a deletion flag will
-        // help us to avoid reuse member object once the user deleted such object 
+        // Since we gonna invoke user's callback here, a deletion flag will us 
+        // to avoid reuse member object once the user deleted such object 
         DeletionFlag deleted(this);
         // Set up the flag to let the user runs into the read operation's returned buffer
         allow_bio_read_ = true;
@@ -894,7 +912,7 @@ private:
             if( bytes_transferred == 0 ) {
                 data.ssl_cb(ec,0);
                 return;
-            } else if( sniffer_buffer_.size() < 2 ) {
+            } else if( sniffer_buffer_.size() < kSnifferDataHeaderLength ) {
                 socket()->readSomeAsync(
                     &sniffer_buffer_,
                     std::bind(
@@ -1048,7 +1066,7 @@ public:
     // the call for sync is undefined. This is for purpose since it heavily reduce
     // the pain of 
     std::atomic<int> mode;
-    std::shared_ptr<AsyncSSL> async_ssl_ptr;
+    std::unique_ptr<AsyncSSL> async_ssl_ptr;
 
     QnSSLSocketPrivate()
     :
@@ -1583,7 +1601,7 @@ bool QnMixedSSLSocket::recvAsyncImpl( nx::Buffer* const buffer, std::function<vo
         return d->wrappedSocket->readSomeAsync( buffer, handler );
     } else {
         return d->wrappedSocket->post(
-            [this,&buffer,handler]() {
+            [this,buffer,handler]() {
                 Q_D(QnMixedSSLSocket);
                 d->mode.store(QnSSLSocket::ASYNC,std::memory_order_release);
                 MixedAsyncSSL* ssl_ptr = 
