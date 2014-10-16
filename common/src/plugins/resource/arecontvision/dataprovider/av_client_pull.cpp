@@ -8,7 +8,8 @@
 
 QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(const QnResourcePtr& res):
     QnClientPullMediaStreamProvider(res),
-    m_videoFrameBuff(CL_MEDIA_ALIGNMENT, 1024*1024)
+    m_videoFrameBuff(CL_MEDIA_ALIGNMENT, 1024*1024),
+    m_needUpdateParams(true)
 {
     const QnSecurityCamResource* ceqResource = dynamic_cast<const QnSecurityCamResource*>(res.data());
 
@@ -33,8 +34,22 @@ QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(const QnResourcePtr& 
     m_streamParam.insert("Quality", QLatin1String("11"));
 
     /**/
+    connect(res.data(), &QnResource::initializedChanged, this, &QnPlAVClinetPullStreamReader::at_resourceInitDone, Qt::DirectConnection);
+    //setQuality(getQuality());  // to update stream params
+}
 
-    setQuality(getQuality());  // to update stream params
+void QnPlAVClinetPullStreamReader::at_resourceInitDone(const QnResourcePtr &resource)
+{
+    if (resource->isInitialized())
+        m_needUpdateParams = true;
+}
+
+void QnPlAVClinetPullStreamReader::updateCameraParams()
+{
+    if (m_needUpdateParams) {
+        m_needUpdateParams = false;
+        updateStreamParamsBasedOnQuality();  // to update stream params
+    }
 }
 
 QnPlAVClinetPullStreamReader::~QnPlAVClinetPullStreamReader()
