@@ -32,24 +32,8 @@ QnAbstractStreamDataProvider* QnPlIqResource::createLiveDataProvider()
 {
     
     //return new MJPEGStreamReader(toSharedPointer(), "mjpg/video.mjpg");
-    
-    QString name = getName();
-    if (name == QLatin1String("IQA35") ||
-        name == QLatin1String("IQA33N") ||
-        //name == QLatin1String("IQA32N") ||
-        name == QLatin1String("IQA31") ||
-        name == QLatin1String("IQ732N") ||
-        name == QLatin1String("IQ732S") ||
-        name == QLatin1String("IQ832N") ||
-        name == QLatin1String("IQ832S") ||
-        name == QLatin1String("IQD30S") ||
-        name == QLatin1String("IQD31S") ||
-        name == QLatin1String("IQD32S") ||
-        name == QLatin1String("IQM30S") ||
-        name == QLatin1String("IQM31S") ||
-        name == QLatin1String("IQM32N") ||
-        //name == QLatin1String("IQ765N") ||
-        name == QLatin1String("IQM32S"))
+
+    if (isRtp())
         return new QnRtpStreamReader(toSharedPointer());
         /**/
 
@@ -140,9 +124,9 @@ QSize QnPlIqResource::getMaxResolution() const
 
 bool QnPlIqResource::isRtp() const
 {
-    const QString& name = getName();
+    QString name = getModel().toUpper();
     return 
-        name == QLatin1String("IQA35") ||
+		name == QLatin1String("IQA35") ||
         name == QLatin1String("IQA33N") ||
         //name == QLatin1String("IQA32N") ||
         name == QLatin1String("IQA31") ||
