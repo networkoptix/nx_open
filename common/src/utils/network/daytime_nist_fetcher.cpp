@@ -8,6 +8,8 @@
 #include <sys/timeb.h>
 #include <sys/types.h>
 
+#include <QtCore/QMutexLocker>
+
 #include "utils/common/log.h"
 #include "utils/network/socket_factory.h"
 #include "utils/tz/tz.h"
@@ -29,15 +31,22 @@ DaytimeNISTFetcher::DaytimeNISTFetcher()
 
 DaytimeNISTFetcher::~DaytimeNISTFetcher()
 {
+    pleaseStop();
+    join();
 }
 
 void DaytimeNISTFetcher::pleaseStop()
 {
-    std::shared_ptr<AbstractStreamSocket> tcpSock = m_tcpSock;
-    if( !tcpSock )
-        return;
-
+    std::shared_ptr<AbstractStreamSocket> tcpSock;
+    {
+        QMutexLocker lk( &m_mutex );
+        tcpSock = m_tcpSock;
+        if( !tcpSock )
+            return;
+    }
     tcpSock->terminateAsyncIO( true );
+
+    QMutexLocker lk( &m_mutex );
     m_tcpSock.reset();
 }
 
@@ -47,27 +56,28 @@ void DaytimeNISTFetcher::join()
 
 bool DaytimeNISTFetcher::getTimeAsync( std::function<void(qint64, SystemError::ErrorCode)> handlerFunc )
 {
-    NX_LOG( lit( "NIST time_sync. Starting time synchronization with NIST server %1:%2" ).arg( QLatin1String( DEFAULT_NIST_SERVER ) ).arg( DAYTIME_PROTOCOL_DEFAULT_PORT ), cl_logDEBUG2 );
+    NX_LOG( lit( "NIST time_sync. Starting time synchronization with NIST server %1:%2" ).
+        arg( QLatin1String( DEFAULT_NIST_SERVER ) ).arg( DAYTIME_PROTOCOL_DEFAULT_PORT ), cl_logDEBUG2 );
 
-    assert( !m_tcpSock.get() );
-
-    m_tcpSock.reset( SocketFactory::createStreamSocket( false, SocketFactory::nttDisabled ) );
-    if( !m_tcpSock )
-        return false;
+    {
+        QMutexLocker lk( &m_mutex );
+        m_tcpSock.reset( SocketFactory::createStreamSocket( false, SocketFactory::nttDisabled ) );
+        if( !m_tcpSock )
+            return false;
+    }
 
     if( !m_tcpSock->setNonBlockingMode( true ) ||
         !m_tcpSock->setRecvTimeout(SOCKET_READ_TIMEOUT) ||
         !m_tcpSock->setSendTimeout(SOCKET_READ_TIMEOUT) )
     {
-        m_tcpSock.reset();
+        m_tcpSock->terminateAsyncIO( true );
         return false;
     }
 
     m_handlerFunc = [this, handlerFunc]( qint64 timestamp, SystemError::ErrorCode error )
     {
-        m_tcpSock.reset();
+        m_tcpSock->terminateAsyncIO( true );
         handlerFunc( timestamp, error );
-        m_handlerFunc = std::function<void( qint64, SystemError::ErrorCode )>();
     };
 
     using namespace std::placeholders;
@@ -79,7 +89,7 @@ bool DaytimeNISTFetcher::getTimeAsync( std::function<void(qint64, SystemError::E
         NX_LOG( lit( "NIST time_sync. Failed to start async connect (2) from %1:%2. %3" ).
             arg( QLatin1String( DEFAULT_NIST_SERVER ) ).arg( DAYTIME_PROTOCOL_DEFAULT_PORT ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG2 );
         m_handlerFunc = std::function<void( qint64, SystemError::ErrorCode )>();
-        m_tcpSock.reset();
+        m_tcpSock->terminateAsyncIO( true );
         SystemError::setLastErrorCode( errorCode );
         return false;
     }
@@ -197,7 +207,6 @@ void DaytimeNISTFetcher::onSomeBytesRead( SystemError::ErrorCode errorCode, size
             arg( QLatin1String( DEFAULT_NIST_SERVER ) ).arg( DAYTIME_PROTOCOL_DEFAULT_PORT ).arg( QLatin1String( m_timeStr.trimmed() ) ), cl_logDEBUG1 );
 
         //max data size has been read, ignoring futher data
-        m_tcpSock.reset();
         m_handlerFunc( actsTimeToUTCMillis( m_timeStr.constData() ), SystemError::noError );
         return;
     }
