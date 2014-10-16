@@ -82,6 +82,8 @@ public:
     void setAuthKey(const QString& value);
 
     static bool isEdgeServer(const QnResourcePtr &resource);
+    static bool isHiddenServer(const QnResourcePtr &resource);
+
     virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode = false) override;
     qint64 currentStatusTime() const;
 private slots:
@@ -94,6 +96,7 @@ signals:
     void auxUrlsChanged(const QnResourcePtr &resource);
     void versionChanged(const QnResourcePtr &resource);
     void systemNameChanged(const QnResourcePtr &resource);
+    void redundancyChanged(const QnResourcePtr &resource);
 
 private:
     QnMediaServerConnectionPtr m_restConnection;

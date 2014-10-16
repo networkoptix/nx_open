@@ -152,7 +152,7 @@ namespace ec2
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraBookmarkTagDataList& tags);
 
         //getUserList
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserDataList& userList);
+        ErrorCode doQueryNoLock(const QnUuid& userId, ApiUserDataList& userList);
 
         //getVideowallList
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiVideowallDataList& videowallList);
@@ -404,6 +404,7 @@ namespace ec2
         QMap<int, QnUuid> getGuidList(const QString& request, GuidConversionMethod method, const QByteArray& intHashPostfix = QByteArray());
 
         bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnUuid>& guids);
+        bool updateResourceTypeGuids();
         bool updateGuids();
         QnUuid getType(const QString& typeName);
         bool resyncTransactionLog();
@@ -436,6 +437,7 @@ namespace ec2
         QnDbTransaction m_tranStatic;
         mutable QReadWriteLock m_mutexStatic;
         bool m_needResyncLog;
+        bool m_needResyncLicenses;
     };
 };
 

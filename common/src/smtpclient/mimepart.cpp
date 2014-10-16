@@ -28,11 +28,6 @@ MimePart::MimePart()
     cBoundary = lit("");
 }
 
-MimePart::~MimePart()
-{
-    return;
-}
-
 /* [1] --- */
 
 

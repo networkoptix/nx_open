@@ -138,7 +138,7 @@ QnResourcePoolModelNode *QnResourcePoolModel::node(const QnResourcePtr &resource
     QHash<QnResourcePtr, QnResourcePoolModelNode *>::iterator pos = m_resourceNodeByResource.find(resource);
     if(pos == m_resourceNodeByResource.end()) {
         Qn::NodeType nodeType = Qn::ResourceNode;
-        if (QnMediaServerResource::isEdgeServer(resource->getParentResource()))
+        if (QnMediaServerResource::isHiddenServer(resource->getParentResource()))
             nodeType = Qn::EdgeNode;
 
         pos = m_resourceNodeByResource.insert(resource, new QnResourcePoolModelNode(this, resource, nodeType));
@@ -196,7 +196,7 @@ QnResourcePoolModelNode *QnResourcePoolModel::systemNode(const QString &systemNa
 
     node = new QnResourcePoolModelNode(this, Qn::SystemNode, systemName);
     if (m_scope == FullScope)
-    node->setParent(m_rootNodes[Qn::OtherSystemsNode]);
+        node->setParent(m_rootNodes[Qn::OtherSystemsNode]);
     else
         node->setParent(m_rootNodes[Qn::BastardNode]);
     m_systemNodeBySystemName[systemName] = node;
@@ -575,12 +575,23 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
 
     if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>()) {
         connect(camera,     &QnVirtualCameraResource::groupNameChanged, this,   &QnResourcePoolModel::at_camera_groupNameChanged);
+        connect(camera,     &QnResource::nameChanged,                   this,   [this](const QnResourcePtr &resource) {
+            /* Automatically update display name of the EDGE server if its camera was renamed. */
+            QnResourcePtr parent = resource->getParentResource();
+            if (QnMediaServerResource::isEdgeServer(parent))
+                at_resource_resourceChanged(parent);
+        });
     }
 
+
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (server && server->getStatus() == Qn::Incompatible) {
-        connect(server,     &QnMediaServerResource::systemNameChanged,  this,   &QnResourcePoolModel::at_server_systemNameChanged);
-        m_rootNodes[Qn::OtherSystemsNode]->update();
+    if (server) {
+        connect(server,     &QnMediaServerResource::redundancyChanged,  this,   &QnResourcePoolModel::at_server_redundancyChanged);
+
+        if (server->getStatus() == Qn::Incompatible) {
+            connect(server, &QnMediaServerResource::systemNameChanged,  this,   &QnResourcePoolModel::at_server_systemNameChanged);
+            m_rootNodes[Qn::OtherSystemsNode]->update();
+        }
     }
 
     QnResourcePoolModelNode *node = this->node(resource);
@@ -646,6 +657,23 @@ void QnResourcePoolModel::at_accessController_permissionsChanged(const QnResourc
 
 void QnResourcePoolModel::at_resource_parentIdChanged(const QnResourcePtr &resource) {
     QnResourcePoolModelNode *node = this->node(resource);
+
+    /* update edge resource */
+    if (resource.dynamicCast<QnVirtualCameraResource>()) {
+        bool wasEdge = (node->type() == Qn::EdgeNode);
+        bool mustBeEdge = QnMediaServerResource::isHiddenServer(resource->getParentResource());
+        if (wasEdge != mustBeEdge) {
+            QnResourcePoolModelNode *parent = node->parent();
+
+            m_resourceNodeByResource.remove(resource);
+            deleteNode(node);
+
+            if (parent)
+                parent->update();
+
+            node = this->node(resource);
+        }
+    }
 
     node->setParent(expectedParent(node));
 }
@@ -731,6 +759,21 @@ void QnResourcePoolModel::at_server_systemNameChanged(const QnResourcePtr &resou
 
     QnResourcePoolModelNode *node = this->node(resource);
     node->setParent(expectedParent(node));
+}
+
+void QnResourcePoolModel::at_server_redundancyChanged(const QnResourcePtr &resource) {
+    QnResourcePoolModelNode *node = this->node(resource);
+    bool isHidden = QnMediaServerResource::isHiddenServer(resource);
+    QnResourcePoolModelNode *camerasParentNode = isHidden ? m_rootNodes[Qn::ServersNode] : node;
+
+    foreach (const QnResourcePtr &cameraResource, qnResPool->getAllCameras(resource, true)) {
+        if (!cameraResource.dynamicCast<QnVirtualCameraResource>())
+            continue;
+
+        this->node(cameraResource)->setParent(camerasParentNode);
+    }
+
+    node->update();
 }
 
 void QnResourcePoolModel::at_commonModule_systemNameChanged() {

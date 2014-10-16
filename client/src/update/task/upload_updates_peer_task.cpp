@@ -9,7 +9,6 @@ QnUploadUpdatesPeerTask::QnUploadUpdatesPeerTask(QObject *parent) :
     m_uploader(new QnUpdateUploader(this))
 {
     connect(m_uploader,     &QnUpdateUploader::finished,            this,   &QnUploadUpdatesPeerTask::at_uploader_finished);
-    connect(m_uploader,     &QnUpdateUploader::failed,              this,   &QnUploadUpdatesPeerTask::at_uploader_failed);
     connect(m_uploader,     &QnUpdateUploader::progressChanged,     this,   &QnUploadUpdatesPeerTask::at_uploader_progressChanged);
     connect(m_uploader,     &QnUpdateUploader::peerProgressChanged, this,   &QnUploadUpdatesPeerTask::peerProgressChanged);
 }
@@ -67,18 +66,25 @@ void QnUploadUpdatesPeerTask::uploadNextUpdate() {
     }
 }
 
-void QnUploadUpdatesPeerTask::at_uploader_finished() {
-    foreach (const QnUuid &id, m_uploader->peers()) {
-        emit peerFinished(id);
-        m_finishedPeers.insert(id);
+void QnUploadUpdatesPeerTask::at_uploader_finished(int errorCode) {
+    switch (errorCode) {
+    case QnUpdateUploader::NoError:
+        foreach (const QnUuid &id, m_uploader->peers()) {
+            emit peerFinished(id);
+            m_finishedPeers.insert(id);
+        }
+
+        m_pendingUploads.removeFirst();
+        uploadNextUpdate();
+
+        break;
+    case QnUpdateUploader::NoFreeSpace:
+        finish(NoFreeSpaceError);
+        break;
+    default:
+        finish(UploadError);
+        break;
     }
-
-    m_pendingUploads.removeFirst();
-    uploadNextUpdate();
-}
-
-void QnUploadUpdatesPeerTask::at_uploader_failed() {
-    finish(UploadError);
 }
 
 void QnUploadUpdatesPeerTask::at_uploader_progressChanged(int progress) {

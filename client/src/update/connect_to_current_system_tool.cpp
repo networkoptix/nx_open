@@ -20,6 +20,7 @@
 namespace {
     static const int configureProgress = 25;
     static const int waitProgress = 50;
+    static const int completeProgress = 100;
 
     enum UpdateToolState {
         CheckingForUpdates,
@@ -78,7 +79,8 @@ void QnConnectToCurrentSystemTool::cancel() {
     if (m_updateTool)
         m_updateTool->cancelUpdate();
 
-    emit finished(Canceled);
+    if (m_currentTask || m_updateTool)
+        emit finished(Canceled);
 }
 
 void QnConnectToCurrentSystemTool::finish(ErrorCode errorCode) {
@@ -135,6 +137,7 @@ void QnConnectToCurrentSystemTool::updatePeers() {
     }
 
     emit stateChanged(tr("Updating server(s)"));
+    emit progressChanged(waitProgress);
     at_updateTool_progressChanged(0);
 
     m_updateTool = new QnMediaServerUpdateTool(this);
@@ -172,10 +175,13 @@ void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, cons
         if (!server)
             continue;
 
-        if (!isCompatible(server->getVersion(), qnCommon->engineVersion()))
+        if (!isCompatible(server->getVersion(), qnCommon->engineVersion())) {
             m_updateTargets.insert(server->getId());
-        else
-            m_waitTargets.insert(server->getId(), QnUuid(server->getProperty(lit("guid"))));
+        } else {
+            QnUuid originalId = QnUuid(server->getProperty(lit("guid")));
+            if (!originalId.isNull())
+                m_waitTargets.insert(server->getId(), originalId);
+        }
     }
 
     waitPeers();
@@ -195,7 +201,12 @@ void QnConnectToCurrentSystemTool::at_waitTask_finished(int errorCode) {
 void QnConnectToCurrentSystemTool::at_updateTool_finished(const QnUpdateResult &result) {
     m_updateTool = 0;
 
-    finish(result.result == QnUpdateResult::Successful ? NoError : UpdateFailed);
+    if (result.result == QnUpdateResult::Successful) {
+        emit progressChanged(completeProgress);
+        finish(NoError);
+    } else {
+        finish(UpdateFailed);
+    }
 }
 
 void QnConnectToCurrentSystemTool::at_updateTool_progressChanged(int progress) {

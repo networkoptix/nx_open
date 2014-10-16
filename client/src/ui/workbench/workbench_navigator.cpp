@@ -22,10 +22,11 @@ extern "C"
 #include <client/client_settings.h>
 
 #include <camera/resource_display.h>
+#include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/camera_bookmark.h>
 
 #include <camera/loaders/caching_camera_data_loader.h>
 #include <camera/cam_display.h>
@@ -634,11 +635,18 @@ void QnWorkbenchNavigator::jumpForward() {
 
         qint64 currentTime = m_currentMediaWidget->display()->camera()->getCurrentTime() / 1000;
         QnTimePeriodList::const_iterator itr = periods.findNearestPeriod(currentTime, true);
-        if (itr != periods.constEnd() && (itr+1) != periods.constEnd())
+        if (itr != periods.constEnd())
             ++itr;
         
-        if (itr == periods.end() || (reader->isReverseMode() && itr->durationMs == -1)) {
-            pos = DATETIME_NOW;
+        if (itr == periods.constEnd()) {
+            /* Do not make step forward to live if we are playing backward. */
+            if (reader->isReverseMode())
+                return;
+            pos = DATETIME_NOW; 
+        } else if (reader->isReverseMode() && itr->durationMs == -1) {
+            /* Do not make step forward to live if we are playing backward. */
+            --itr;
+            pos = itr->startTimeMs * 1000;
         } else {
             pos = (itr->startTimeMs + (reader->isReverseMode() ? itr->durationMs : 0)) * 1000;
         }

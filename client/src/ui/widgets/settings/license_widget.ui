@@ -62,7 +62,7 @@
          <item>
           <widget class="QLineEdit" name="onlineKeyEdit">
            <property name="inputMask">
-            <string notr="true">&gt;NNNN-NNNN-NNNN-NNNN</string>
+            <string notr="true">&gt;NNNN-NNNN-NNNN-NNNN;_</string>
            </property>
            <property name="text">
             <string notr="true">---</string>

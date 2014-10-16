@@ -92,10 +92,10 @@ void QnAacRtpParser::setSDPInfo(QList<QByteArray> lines)
 
 }
 
-bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result)
+bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, const RtspStatistic& statistics, bool& gotData)
 {
+    gotData = false;
     const quint8* rtpBuffer = rtpBufferBase + bufferOffset;
-    result.clear();
     QVector<int> auSize;
     QVector<int> auIndex;
     QVector<int> auCtsDelta;
@@ -200,8 +200,8 @@ bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bu
         //m_aacHelper.buildADTSHeader(adtsHeaderBuff, unitSize);
         //audioData->data.write((const char*) adtsHeaderBuff, AAC_HEADER_LEN);
         audioData->m_data.write((const char*)curPtr, unitSize);
-        result << audioData;
-
+        m_audioData.push_back(audioData);
+        gotData = true;
         curPtr += unitSize;
     }
 

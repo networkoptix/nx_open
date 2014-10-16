@@ -7,6 +7,7 @@
 
 #include <smtpclient/smtpclient.h>
 #include <smtpclient/QnSmtpMime>
+#include <utils/common/log.h>
 
 #include "nx_ec/data/api_email_data.h"
 
@@ -49,24 +50,17 @@ bool EmailManagerImpl::sendEmail(const ec2::ApiEmailData& data) {
 
     MimeMessage message;
     QString sender = QString(lit("%1@%2")).arg(settings.user).arg(settings.server);
-    message.setSender(new EmailAddress(sender));
+    message.setSender(EmailAddress(sender));
     foreach (const QString &recipient, data.to) {
-        message.addRecipient(new EmailAddress(recipient));
+        message.addRecipient(EmailAddress(recipient));
     }
     
     message.setSubject(data.subject);
-
-    MimeHtml text(data.body);
-    message.addPart(&text);
+    message.addPart(new MimeHtml(data.body));
 
     // Need to store all attachments as smtp client operates on attachment pointers
-    typedef std::shared_ptr<MimeInlineFile> MimeInlineFilePtr; 
-    std::vector<MimeInlineFilePtr> attachments;
-    foreach (QnEmailAttachmentPtr attachment, data.attachments) {
-        MimeInlineFilePtr att(new MimeInlineFile(attachment->content, attachment->filename, attachment->mimetype));
-        attachments.push_back(att);
-        message.addPart(att.get());
-    }
+    foreach (QnEmailAttachmentPtr attachment, data.attachments)
+        message.addPart(new MimeInlineFile(attachment->content, attachment->filename, attachment->mimetype));
 
     // Actually send
     int port = settings.port ? settings.port : QnEmail::defaultPort(settings.connectionType);
@@ -76,12 +70,27 @@ bool EmailManagerImpl::sendEmail(const ec2::ApiEmailData& data) {
     smtp.setUser(settings.user);
     smtp.setPassword(settings.password);
 
-    if (!smtp.connectToHost()) return false;
-    bool result = smtp.login();
-    if (result)
-        result = smtp.sendMail(message);
-
+    if( !smtp.connectToHost() )
+    {
+        const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
+        NX_LOG( lit("SMTP. Failed to connect to %1:%2 with %3. %4").arg(settings.server).arg(port)
+            .arg(SmtpClient::toString(connectionType)).arg(SystemError::toString(errorCode)), cl_logWARNING );
+        return false;
+    }
+    if( !smtp.login() )
+    {
+        NX_LOG( lit("SMTP. Failed to login to %1:%2").arg(settings.server).arg(port), cl_logWARNING );
+        smtp.quit();
+        return false;
+    }
+    if( !smtp.sendMail(message) )
+    {
+        const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
+        NX_LOG( lit("SMTP. Failed to send mail to %1:%2. %3").arg(settings.server).arg(port).arg(SystemError::toString(errorCode)), cl_logWARNING );
+        smtp.quit();
+        return false;
+    }
     smtp.quit();
 
-    return result;
+    return true;
 }

@@ -36,6 +36,8 @@ public:
         MotionSelectionChanged,
         MediaDewarpingParamsChanged,
 
+        RadassModeChanged,
+
         Count
     };
 

@@ -9,6 +9,7 @@
 
 #include "utils/common/id.h"
 #include "utils/network/http/httptypes.h"
+#include "utils/common/uuid.h"
 
 
 namespace AuthMethod
@@ -61,6 +62,24 @@ private:
     std::map<QString, unsigned int> m_denied;
 };
 
+class HttpAuthenticationClientContext
+{
+public:
+    boost::optional<nx_http::header::WWWAuthenticate> authenticateHeader;
+    int responseStatusCode;
+
+    HttpAuthenticationClientContext()
+    :
+        responseStatusCode( nx_http::StatusCode::ok )
+    {
+    }
+
+    void clear()
+    {
+        std::move( authenticateHeader );
+    }
+};
+
 class QnAuthHelper: public QObject
 {
     Q_OBJECT
@@ -73,7 +92,7 @@ public:
     static QnAuthHelper* instance();
 
     //!Authenticates request on server side
-    bool authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy = false);
+    bool authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy = false, QnUuid* authUserId = 0);
     //!Authenticates request on client side
     /*!
         Usage:\n
@@ -82,7 +101,16 @@ public:
         - client calls this method supplying received response. This method adds necessary headers to request
         - client sends request to server
     */
-    bool authenticate(const QAuthenticator& auth, const nx_http::Response& response, nx_http::Request* request);
+    bool authenticate(
+        const QAuthenticator& auth,
+        const nx_http::Response& response,
+        nx_http::Request* const request,
+        HttpAuthenticationClientContext* const authenticationCtx );
+    //!Same as above, but uses cached authentication info
+    bool authenticate(
+        const QAuthenticator& auth,
+        nx_http::Request* const request,
+        HttpAuthenticationClientContext* const authenticationCtx );
     bool authenticate(const QString& login, const QByteArray& digest) const;
 
     QnAuthMethodRestrictionList* restrictionList();
@@ -103,8 +131,8 @@ private:
     void addAuthHeader(nx_http::Response& responseHeaders, bool isProxy);
     QByteArray getNonce();
     bool isNonceValid(const QByteArray& nonce) const;
-    bool doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy);
-    bool doBasicAuth(const QByteArray& authData, nx_http::Response& responseHeaders);
+    bool doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy, QnUuid* authUserId);
+    bool doBasicAuth(const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
     bool doCustomAuthorization(const QByteArray& authData, nx_http::Response& response, const QByteArray& sesionKey);
 
     mutable QMutex m_mutex;

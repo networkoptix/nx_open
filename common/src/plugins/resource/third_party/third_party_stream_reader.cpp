@@ -134,6 +134,8 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
     }
     nxcip_qt::CameraMediaEncoder cameraEncoder( intf );
 
+    m_camManager.setCredentials( m_thirdPartyRes->getAuth().user(), m_thirdPartyRes->getAuth().password() );
+
     if( m_camManager.setAudioEnabled( m_thirdPartyRes->isAudioEnabled() ) != nxcip::NX_NO_ERROR )
         return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("audio"));
 
@@ -563,6 +565,11 @@ void ThirdPartyStreamReader::initializeAudioContext( const nxcip::AudioFormat& a
     m_audioContext->ctx()->bits_per_coded_sample = audioFormat.bitsPerCodedSample;
 
     m_audioLayout->addAudioTrack( QnResourceAudioLayout::AudioTrack(m_audioContext, QString()) );
+}
+
+QnConstResourceVideoLayoutPtr ThirdPartyStreamReader::getVideoLayout() const
+{
+    return m_builtinStreamReader ? m_builtinStreamReader->getVideoLayout() : QnConstResourceVideoLayoutPtr();
 }
 
 #endif // ENABLE_THIRD_PARTY

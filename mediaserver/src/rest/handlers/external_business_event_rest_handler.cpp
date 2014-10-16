@@ -2,6 +2,8 @@
 
 #include <QtCore/QFileInfo>
 
+#include <core/resource/resource.h>
+
 #include "utils/network/tcp_connection_priv.h"
 #include "core/resource_management/resource_pool.h"
 #include "utils/common/util.h"
@@ -15,7 +17,7 @@ QnExternalBusinessEventRestHandler::QnExternalBusinessEventRestHandler()
     connect(this, &QnExternalBusinessEventRestHandler::mserverFailure, connector, &QnBusinessEventConnector::at_mserverFailure);
 }
 
-int QnExternalBusinessEventRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+int QnExternalBusinessEventRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path)
     Q_UNUSED(contentType)
@@ -73,7 +75,8 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString& path, const Qn
     return CODE_OK;
 }
 
-int QnExternalBusinessEventRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, QByteArray& contentType)
+int QnExternalBusinessEventRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, 
+                                                    QByteArray& contentType, const QnRestConnectionProcessor* owner)
 {
-    return executeGet(path, params, result, contentType);
+    return executeGet(path, params, result, contentType, owner);
 }

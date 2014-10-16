@@ -7,8 +7,11 @@
 #include <QtWidgets/QStyle>
 #include <QtWidgets/QMenu>
 
+#include <common/common_module.h>
+
 #include <client/client_settings.h>
 
+#include <core/resource/layout_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item_index.h>
 #include <core/resource_management/resource_pool.h>
@@ -127,11 +130,15 @@ QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout *layout) const {
     QnUuid videoWallInstanceGuid = layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>();
     if (!videoWallInstanceGuid.isNull()) {
         QnVideoWallItemIndex idx = qnResPool->getVideoWallItemByUuid(videoWallInstanceGuid);
-        bool online = idx.isNull()
-            ? false
-            : idx.item().online;
-        if (online)
-            return qnResIconCache->icon(QnResourceIconCache::VideoWallItem);
+        if (idx.isNull())
+            return QIcon();
+
+        if (idx.item().runtimeStatus.online) {
+            if (idx.item().runtimeStatus.controlledBy.isNull() ||
+                idx.item().runtimeStatus.controlledBy == qnCommon->moduleGUID())
+                return qnResIconCache->icon(QnResourceIconCache::VideoWallItem);
+            return qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Unauthorized);
+        }
         return qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Offline);
     }
 

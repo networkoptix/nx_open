@@ -7,6 +7,7 @@
 #include <utils/serialization/lexical.h>
 
 #include "resource_media_layout.h"
+#include "core/dataprovider/abstract_streamdataprovider.h"
 
 class QnStreamQualityStrings {
     Q_DECLARE_TR_FUNCTIONS(QnStreamQualityStrings);
@@ -85,6 +86,14 @@ QImage QnMediaResource::getImage(int /*channel*/, QDateTime /*time*/, Qn::Stream
 static QSharedPointer<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
 QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
+    QMutexLocker lock(&m_layoutMutex);
+
+    if (dataProvider) {
+        QnConstResourceVideoLayoutPtr providerLayout = dataProvider->getVideoLayout();
+        if (providerLayout)
+            return providerLayout;
+    }
+
     QVariant val;
     toResource()->getParam(QLatin1String("VideoLayout"), val, QnDomainMemory);
     QString strVal = val.toString();
@@ -93,17 +102,17 @@ QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractSt
         return defaultVideoLayout;
     }
     else {
-        if (!m_customVideoLayout)
+        if (m_cachedLayout != strVal || !m_customVideoLayout) {
             m_customVideoLayout = QnCustomResourceVideoLayout::fromString(strVal);
+            m_cachedLayout = strVal;
+        }
         return m_customVideoLayout;
     }
 }
 
 void QnMediaResource::setCustomVideoLayout(QnCustomResourceVideoLayoutPtr newLayout)
 {
-    //if (!m_customVideoLayout)
-        //m_customVideoLayout.reset( new QnCustomResourceVideoLayout(newLayout->size()) );
-
+    QMutexLocker lock(&m_layoutMutex);
     m_customVideoLayout = newLayout;
     toResource()->setParam(QLatin1String("VideoLayout"), newLayout->toString(), QnDomainMemory);
 }
@@ -140,7 +149,6 @@ void QnMediaResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>&m
             m_dewarpingParams = other_casted->m_dewarpingParams;
             modifiedFields << "mediaDewarpingParamsChanged";
         }
-        m_customVideoLayout = other_casted->m_customVideoLayout;
     }
 }
 
@@ -158,6 +166,10 @@ QString QnMediaResource::dontRecordSecondaryStreamKey() {
 
 QString QnMediaResource::rtpTransportKey() {
     return lit("rtpTransport");
+}
+
+QString QnMediaResource::dynamicVideoLayoutKey() {
+    return lit("dynamicVideoLayout");
 }
 
 QString QnMediaResource::motionStreamKey() {

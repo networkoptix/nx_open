@@ -159,12 +159,21 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( bo
     MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), m_onvifRes->getTimeDrift());
     CameraInfoParams info;
 
+    if (QnResource::isStopping())
+        return CameraDiagnostics::ServerTerminatedResult();
+
     CameraDiagnostics::Result result = fetchUpdateVideoEncoder(soapWrapper, info, isPrimary);
     if( !result  )
         return result;
     info.videoSourceId = m_onvifRes->getVideoSourceId();
 
+    if (QnResource::isStopping())
+        return CameraDiagnostics::ServerTerminatedResult();
+
     fetchUpdateAudioEncoder(soapWrapper, info, isPrimary);
+
+    if (QnResource::isStopping())
+        return CameraDiagnostics::ServerTerminatedResult();
 
     result = fetchUpdateProfile(soapWrapper, info, isPrimary);
     if( !result ) {
@@ -173,6 +182,9 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateCameraAndFetchStreamUrl( bo
 #endif
         return result;
     }
+
+    if (QnResource::isStopping())
+        return CameraDiagnostics::ServerTerminatedResult();
 
     ////Printing chosen profile
     //if (cl_log.logLevel() >= cl_logDEBUG1) {
@@ -842,6 +854,11 @@ void QnOnvifStreamReader::pleaseStop()
 bool QnOnvifStreamReader::secondaryResolutionIsLarge() const
 {
     return m_onvifRes->secondaryResolutionIsLarge();
+}
+
+QnConstResourceVideoLayoutPtr QnOnvifStreamReader::getVideoLayout() const
+{
+    return m_multiCodec.getVideoLayout();
 }
 
 #endif //ENABLE_ONVIF

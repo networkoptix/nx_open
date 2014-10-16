@@ -2,10 +2,17 @@
 
 angular.module('webadminApp')
     .controller('NavigationCtrl', function ($scope, $location, mediaserver) {
+        $scope.user = {
+            isAdmin:true
+        };
 
-        $scope.settings = mediaserver.getSettings();
+        mediaserver.getCurrentUser().success(function(result){
+            $scope.user = {
+                isAdmin:result.reply.isAdmin
+            }
+        });
 
-        $scope.settings.then(function (r) {
+        mediaserver.getSettings().then(function (r) {
             $scope.settings = {
                 name:r.data.reply.name,
                 remoteAddresses:r.data.reply.remoteAddresses.join("\n")

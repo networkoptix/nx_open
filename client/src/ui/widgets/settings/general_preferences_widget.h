@@ -28,9 +28,10 @@ public:
 private:
     void initTranslations();
 
-    QColor defaultBackgroundColor() const;
     QColor backgroundColor() const;
     void updateBackgroundColor();
+
+    void selectBackgroundImage();
 
 private slots:
     void at_browseMainMediaFolderButton_clicked();
@@ -40,6 +41,7 @@ private slots:
     void at_timeModeComboBox_activated();
 
     void at_browseLogsButton_clicked();
+    void at_clearCacheButton_clicked();
 
 private:
     QScopedPointer<Ui::GeneralPreferencesWidget> ui;
@@ -50,7 +52,13 @@ private:
     bool m_oldDoubleBuffering;
     int m_oldLanguage;
     int m_oldSkin;
-    QColor m_oldBackgroundColor;
+
+    Qn::ClientBackground m_oldBackgroundMode;
+    QColor m_oldCustomBackgroundColor;
+
+    QString m_oldBackgroundImage;
+    qreal m_oldBackgroundImageOpacity;
+    Qn::ImageBehaviour m_oldBackgroundImageMode;
 };
 
 #endif // GENERAL_PREFERENCES_WIDGET_H

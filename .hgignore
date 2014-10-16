@@ -1,4 +1,5 @@
 syntax: glob
+syntax: glob
 ecs.db-shm
 ecs.db-wal
 *.cache
@@ -302,10 +303,12 @@ android-client/android-main/AndroidManifest.xml
 android-client/android-main/res/**
 
 android-client/android-main/libs/**
+android-client/android-main/res/**
 html
 
 webadmin/node_modules
 webadmin/dist
 webadmin/.tmp
+webadmin/.idea
 webadmin/.sass-cache
 app/bower_components

@@ -7,13 +7,18 @@
 #include <common/common_module.h>
 
 #include <utils/common/warnings.h>
+
 #include <core/resource_management/resource_criterion.h>
 #include <core/resource_management/resource_pool.h>
+
+#include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item_index.h>
+
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/abstract_ptz_controller.h>
 #include <recording/time_period_list.h>
@@ -507,6 +512,10 @@ Qn::ActionVisibility QnPreviewActionCondition::check(const QnActionParameters &p
     if (isImage)
         return Qn::InvisibleAction;
 
+    bool isPanoramic = media->getVideoLayout(0)->channelCount() > 1;
+    if (isPanoramic)
+        return Qn::InvisibleAction;
+
     if (context()->workbench()->currentLayout()->data().contains(Qn::LayoutSearchStateRole))
         return Qn::EnabledAction;
 
@@ -834,7 +843,7 @@ Qn::ActionVisibility QnStartVideowallActionCondition::check(const QnResourceList
             if (item.pcUuid != pcUuid)
                 continue;
 
-            if (!item.online)
+            if (!item.runtimeStatus.online)
                return Qn::EnabledAction;
 
             hasAttachedItems = true;
@@ -853,7 +862,7 @@ Qn::ActionVisibility QnIdentifyVideoWallActionCondition::check(const QnActionPar
         foreach (const QnVideoWallItemIndex &index, parameters.videoWallItems()) {
             if (!index.isValid())
                 continue;
-            if (index.item().online)
+            if (index.item().runtimeStatus.online)
                 return Qn::EnabledAction;
         }
         return Qn::DisabledAction;
@@ -903,9 +912,6 @@ Qn::ActionVisibility QnStartVideoWallControlActionCondition::check(const QnActio
         if (!index.isValid())
             continue;
 
-        if (index.item().layout.isNull())
-            continue;
-
         return Qn::EnabledAction;
     }
     return Qn::InvisibleAction;
@@ -931,7 +937,7 @@ Qn::ActionVisibility QnLightModeCondition::check(const QnActionParameters &param
 
 Qn::ActionVisibility QnEdgeServerCondition::check(const QnResourceList &resources) {
     foreach (const QnResourcePtr &resource, resources)
-        if (m_isEdgeServer ^ QnMediaServerResource::isEdgeServer(resource))
+        if (m_isEdgeServer ^ QnMediaServerResource::isHiddenServer(resource))
             return Qn::InvisibleAction;
     return Qn::EnabledAction;
 }

@@ -6,13 +6,15 @@
 #include <QtGui/QIntValidator>
 
 #include <ui/workbench/workbench_context_aware.h>
-#include <utils/common/email.h>
 #include <ui/widgets/settings/abstract_preferences_widget.h>
-#include "api/model/test_email_settings_reply.h"
+
+#include <utils/common/email.h>
 
 namespace Ui {
     class SmtpSettingsWidget;
 }
+
+struct QnTestEmailSettingsReply;
 
 class QnSmtpSettingsWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
 {

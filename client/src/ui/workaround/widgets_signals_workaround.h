@@ -6,4 +6,6 @@
 
 #define QnSpinboxIntValueChanged static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged)
 
+#define QnButtonGroupIdToggled static_cast<void (QButtonGroup::*)(int, bool)>(&QButtonGroup::buttonToggled)
+
 #endif //QN_WIDGETS_SIGNALS_WORKAROUND

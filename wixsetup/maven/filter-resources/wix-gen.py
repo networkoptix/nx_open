@@ -5,7 +5,7 @@ from os.path import dirname, join, exists, isfile
 bin_source_dir = '${libdir}/${arch}/bin/${build.configuration}'
 
 for wxs in ('dbsync', 'help', 'vox', 'bg'):
-    p = subprocess.Popen('${python.dir}/python generate-%s-wxs.py' % wxs, shell=True, stdout=PIPE)
+    p = subprocess.Popen('${init.python.dir}/python generate-%s-wxs.py' % wxs, shell=True, stdout=PIPE)
     out, err = p.communicate()
     print ('\n++++++++++++++++++++++Applying heat to generate-%s-wxs.py++++++++++++++++++++++' % wxs)
     print out

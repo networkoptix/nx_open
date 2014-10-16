@@ -28,6 +28,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
@@ -35,6 +36,7 @@
 #include <core/resource/file_processor.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
+#include <core/resource/user_resource.h>
 
 #include <nx_ec/dummy_handler.h>
 
@@ -271,22 +273,23 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ThumbnailsSearchAction),                 SIGNAL(triggered()),    this,   SLOT(at_thumbnailsSearchAction_triggered()));
     connect(action(Qn::SetCurrentLayoutAspectRatio4x3Action),   SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio4x3Action_triggered()));
     connect(action(Qn::SetCurrentLayoutAspectRatio16x9Action),  SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio16x9Action_triggered()));
+    connect(action(Qn::SetCurrentLayoutAspectRatio3x4Action),   SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio3x4Action_triggered()));
+    connect(action(Qn::SetCurrentLayoutAspectRatio9x16Action),  SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio9x16Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing0Action),     SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing0Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing10Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing10Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing20Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing20Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing30Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing30Action_triggered()));
     connect(action(Qn::CreateZoomWindowAction),                 SIGNAL(triggered()),    this,   SLOT(at_createZoomWindowAction_triggered()));
-    connect(action(Qn::Rotate0Action),                          SIGNAL(triggered()),    this,   SLOT(at_rotate0Action_triggered()));
-    connect(action(Qn::Rotate90Action),                         SIGNAL(triggered()),    this,   SLOT(at_rotate90Action_triggered()));
-    connect(action(Qn::Rotate180Action),                        SIGNAL(triggered()),    this,   SLOT(at_rotate180Action_triggered()));
-    connect(action(Qn::Rotate270Action),                        SIGNAL(triggered()),    this,   SLOT(at_rotate270Action_triggered()));
-    connect(action(Qn::RadassAutoAction),                       SIGNAL(triggered()),    this,   SLOT(at_radassAutoAction_triggered()));
-    connect(action(Qn::RadassLowAction),                        SIGNAL(triggered()),    this,   SLOT(at_radassLowAction_triggered()));
-    connect(action(Qn::RadassHighAction),                       SIGNAL(triggered()),    this,   SLOT(at_radassHighAction_triggered()));
+    connect(action(Qn::Rotate0Action),                          &QAction::triggered,    this,   [this] { rotateItems(0); });
+    connect(action(Qn::Rotate90Action),                         &QAction::triggered,    this,   [this] { rotateItems(90); });
+    connect(action(Qn::Rotate180Action),                        &QAction::triggered,    this,   [this] { rotateItems(180); });
+    connect(action(Qn::Rotate270Action),                        &QAction::triggered,    this,   [this] { rotateItems(270); });
+    connect(action(Qn::RadassAutoAction),                       &QAction::triggered,    this,   [this] { setResolutionMode(Qn::AutoResolution); });
+    connect(action(Qn::RadassLowAction),                        &QAction::triggered,    this,   [this] { setResolutionMode(Qn::LowResolution); });
+    connect(action(Qn::RadassHighAction),                       &QAction::triggered,    this,   [this] { setResolutionMode(Qn::HighResolution); });
     connect(action(Qn::SetAsBackgroundAction),                  SIGNAL(triggered()),    this,   SLOT(at_setAsBackgroundAction_triggered()));
     connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
     connect(action(Qn::EscapeHotkeyAction),                     SIGNAL(triggered()),    this,   SLOT(at_escapeHotkeyAction_triggered()));
-    connect(action(Qn::ClearCacheAction),                       SIGNAL(triggered()),    this,   SLOT(at_clearCacheAction_triggered()));
     connect(action(Qn::MessageBoxAction),                       SIGNAL(triggered()),    this,   SLOT(at_messageBoxAction_triggered()));
     connect(action(Qn::BrowseUrlAction),                        SIGNAL(triggered()),    this,   SLOT(at_browseUrlAction_triggered()));
     connect(action(Qn::VersionMismatchMessageAction),           SIGNAL(triggered()),    this,   SLOT(at_versionMismatchMessageAction_triggered()));
@@ -303,7 +306,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ExitActionDelayed), &QAction::triggered, action(Qn::ExitAction), &QAction::trigger, Qt::QueuedConnection);
     connect(action(Qn::BeforeExitAction),  &QAction::triggered, this, &QnWorkbenchActionHandler::at_beforeExitAction_triggered);
 
-    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::initialResourcesReceived,    this,   &QnWorkbenchActionHandler::checkVersionMismatches);
 
     /* Run handlers that update state. */
     at_panicWatcher_panicModeChanged();
@@ -859,7 +861,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
             modifiedResources,
             Qn::MainWindow_Tree_DragCameras_Help,
             tr("Error"),
-            tr("Can't move camera(s) to other server. Media server %1 doesn't answer to request. These camera list will stay unchanged").arg(server->getName()), // TODO: #Elric need saner error message
+            tr("Can't move camera(s) to other server. Server %1 doesn't answer to request.", NULL, modifiedResources.size()).arg(server->getName()),
             QDialogButtonBox::Ok
             );
         return;
@@ -886,7 +888,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
             errorResources,
             Qn::MainWindow_Tree_DragCameras_Help,
             tr("Error"),
-            tr("Camera(s) cannot be moved to server '%1'. It might have been offline since the server is up.").arg(server->getName()), // TODO: #Elric need saner error message
+            tr("Camera(s) cannot be moved to server '%1' because the server cannot discover it.", NULL, errorResources.size()).arg(server->getName()),
             QDialogButtonBox::Ok
             );
     }
@@ -1108,10 +1110,6 @@ void QnWorkbenchActionHandler::notifyAboutUpdate() {
     } else {
         qnSettings->setIgnoredUpdateVersion(messageBox.isChecked() ? version : QnSoftwareVersion());
     }
-}
-
-void QnWorkbenchActionHandler::checkVersionMismatches() {
-    menu()->trigger(Qn::VersionMismatchMessageAction);
 }
 
 void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePtr &layout) {
@@ -1822,7 +1820,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
 
         // if we are deleting an edge camera, also delete its server
         QnUuid parentToDelete = resource.dynamicCast<QnVirtualCameraResource>() && //check for camera to avoid unnecessary parent lookup
-            QnMediaServerResource::isEdgeServer(resource->getParentResource())
+            QnMediaServerResource::isHiddenServer(resource->getParentResource())
             ? resource->getParentId()
             : QnUuid();
 
@@ -2069,6 +2067,16 @@ void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio16x9Action_triggere
     action(Qn::SetCurrentLayoutAspectRatio16x9Action)->setChecked(true);
 }
 
+void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio3x4Action_triggered() {
+    workbench()->currentLayout()->resource()->setCellAspectRatio(3.0 / 4.0);
+    action(Qn::SetCurrentLayoutAspectRatio3x4Action)->setChecked(true);
+}
+
+void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio9x16Action_triggered() {
+    workbench()->currentLayout()->resource()->setCellAspectRatio(9.0 / 16.0);
+    action(Qn::SetCurrentLayoutAspectRatio9x16Action)->setChecked(true);
+}
+
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing0Action_triggered() {
     workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.0, 0.0));
     action(Qn::SetCurrentLayoutItemSpacing0Action)->setChecked(true);
@@ -2107,34 +2115,6 @@ void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
     addParams.rotation = widget->item()->rotation();
 
     addToLayout(workbench()->currentLayout()->resource(), widget->resource()->toResourcePtr(), addParams);
-}
-
-void QnWorkbenchActionHandler::at_rotate0Action_triggered(){
-    rotateItems(0);
-}
-
-void QnWorkbenchActionHandler::at_rotate90Action_triggered(){
-    rotateItems(90);
-}
-
-void QnWorkbenchActionHandler::at_rotate180Action_triggered(){
-    rotateItems(180);
-}
-
-void QnWorkbenchActionHandler::at_rotate270Action_triggered(){
-    rotateItems(270);
-}
-
-void QnWorkbenchActionHandler::at_radassAutoAction_triggered() {
-    setResolutionMode(Qn::AutoResolution);
-}
-
-void QnWorkbenchActionHandler::at_radassLowAction_triggered() {
-    setResolutionMode(Qn::LowResolution);
-}
-
-void QnWorkbenchActionHandler::at_radassHighAction_triggered() {
-    setResolutionMode(Qn::HighResolution);
 }
 
 void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
@@ -2376,10 +2356,6 @@ void QnWorkbenchActionHandler::at_escapeHotkeyAction_triggered() {
         menu()->trigger(Qn::ToggleTourModeAction);
 }
 
-void QnWorkbenchActionHandler::at_clearCacheAction_triggered() {
-    QnAppServerFileCache::clearLocalCache();
-}
-
 void QnWorkbenchActionHandler::at_messageBoxAction_triggered() {
     QString title = menu()->currentParameters(sender()).argument<QString>(Qn::TitleRole);
     QString text = menu()->currentParameters(sender()).argument<QString>(Qn::TextRole);
@@ -2455,7 +2431,12 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
         "Please upgrade all components to the latest version %2."
     ).arg(components).arg(latestMsVersion.toString());
 
-    QScopedPointer<QMessageBox> messageBox(new QMessageBox(QMessageBox::Warning, tr("Version Mismatch"), message, QMessageBox::StandardButtons(QMessageBox::Cancel), mainWindow()));
+    QScopedPointer<QnWorkbenchStateDependentDialog<QMessageBox> > messageBox(
+        new QnWorkbenchStateDependentDialog<QMessageBox>(mainWindow()));
+    messageBox->setIcon(QMessageBox::Warning);
+    messageBox->setWindowTitle(tr("Version Mismatch"));
+    messageBox->setText(message);
+    messageBox->setStandardButtons(QMessageBox::Cancel);
     setHelpTopic(messageBox.data(), Qn::VersionMismatch_Help);
 
     QPushButton *updateButton = messageBox->addButton(tr("Upgrade..."), QMessageBox::HelpRole);

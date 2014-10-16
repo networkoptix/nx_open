@@ -51,7 +51,8 @@ namespace ec2
             const QString& path,
             const QnRequestParamList& params,
             QByteArray& result,
-            QByteArray& contentType )
+            QByteArray& contentType,
+            const QnRestConnectionProcessor*) override
         {
             InputData inputData;
             QString command = path.split(L'/').last();
@@ -111,7 +112,8 @@ namespace ec2
             const QByteArray& /*body*/,
             const QByteArray& /*srcBodyContentType*/,
             QByteArray& /*result*/,
-            QByteArray& /*contentType*/ )
+            QByteArray&, /*contentType*/ 
+            const QnRestConnectionProcessor*) override
         {
             return nx_http::StatusCode::badRequest;
         }

@@ -19,7 +19,9 @@ class QMimeData;
  */
 class QnVideoWallItem {
 public:
-    QnVideoWallItem(): online(false) {}
+    QnVideoWallItem() {
+        runtimeStatus.online = false;
+    }
 
     /**
      * @brief layout                        Id of this item's layout resource (if any).
@@ -44,8 +46,10 @@ public:
     QnScreenSnaps screenSnaps;
 
     /** Status of the running videowall instance bound to this item. Runtime status, should not be serialized or saved. */
-    bool online;
-
+    struct {
+        bool online;
+        QnUuid controlledBy;
+    } runtimeStatus;
 
     static QString mimeType();
 
@@ -54,12 +58,14 @@ public:
     static QList<QnUuid> deserializeUuids(const QMimeData *mimeData);
 
     friend bool operator==(const QnVideoWallItem &l, const QnVideoWallItem &r) {
-        return (l.layout == r.layout &&
-                l.uuid == r.uuid &&
-                l.pcUuid == r.pcUuid &&
-                l.name == r.name &&
-                l.online == r.online &&
-                l.screenSnaps == r.screenSnaps);
+        return (l.layout == r.layout 
+            && l.uuid == r.uuid
+            && l.pcUuid == r.pcUuid
+            && l.name == r.name
+            && l.screenSnaps == r.screenSnaps
+            && l.runtimeStatus.online == r.runtimeStatus.online
+            && l.runtimeStatus.controlledBy == r.runtimeStatus.controlledBy 
+            );
     }
 };
 

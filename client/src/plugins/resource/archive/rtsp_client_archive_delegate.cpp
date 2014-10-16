@@ -222,7 +222,9 @@ bool QnRtspClientArchiveDelegate::openInternal() {
             endTime = m_forcedEndTime;
 
         m_rtspSession.play(m_position, endTime, m_rtspSession.getScale());
-        m_rtpData = m_rtspSession.getTrackIoByType(RTPSession::TT_VIDEO);
+        RTPSession::TrackMap trackInfo =  m_rtspSession.getTrackInfo();
+        if (!trackInfo.isEmpty())
+            m_rtpData = trackInfo[0]->ioDevice;
         if (!m_rtpData)
             m_rtspSession.stop();
     }
@@ -625,10 +627,14 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(qui
     if (itr == m_parsers.end())
         itr = m_parsers.insert(channelNum, QnFfmpegRtpParserPtr(new QnFfmpegRtpParser()));
     QnFfmpegRtpParserPtr parser = itr.value();
-    parser->processData(data, 0, dataSize, RtspStatistic(), result);
+    bool gotData = false;
+    parser->processData(data, 0, dataSize, RtspStatistic(), gotData);
     m_position = parser->position();
-    if (result)
-        result->channelNumber = channelNum;
+    if (gotData) {
+        result = parser->nextData();
+        if (result)
+            result->channelNumber = channelNum;
+    }
     return result;
 }
 

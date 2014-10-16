@@ -38,7 +38,8 @@ namespace {
     }
 
     QDir getUpdateDir(const QString &updateId) {
-        QString id = updateId.mid(1, updateId.length() - 2);
+        QUuid uuid(updateId);
+        QString id = uuid.isNull() ? updateId : updateId.mid(1, updateId.length() - 2);
         QDir dir = getUpdatesDir();
         if (!dir.exists(id))
             dir.mkdir(id);
@@ -95,7 +96,7 @@ bool QnServerUpdateTool::processUpdate(const QString &updateId, QIODevice *ioDev
         m_zipExtractor->extractZip();
         bool ok = m_zipExtractor->error() == QnZipExtractor::Ok;
         if (ok) {
-            NX_LOG(lit("Update package has been extracted to %1").arg(getUpdateDir(m_updateId).path()), cl_logINFO);
+            NX_LOG(lit("Update package has been extracted to %1").arg(getUpdateDir(updateId).path()), cl_logINFO);
         } else {
             NX_LOG(lit("Could not extract update package. Error message: %1").arg(QnZipExtractor::errorToString(static_cast<QnZipExtractor::Error>(m_zipExtractor->error()))), cl_logWARNING);
         }
@@ -109,8 +110,8 @@ bool QnServerUpdateTool::processUpdate(const QString &updateId, QIODevice *ioDev
 }
 
 void QnServerUpdateTool::sendReply(int code) {
-    connection2()->getUpdatesManager()->sendUpdateUploadResponce(m_updateId, qnCommon->moduleGUID(), code == 0 ? m_chunks.size() : code,
-                                                                 this, [this](int, ec2::ErrorCode) {});
+    connection2()->getUpdatesManager()->sendUpdateUploadResponce(
+                m_updateId, qnCommon->moduleGUID(), code, this, [this](int, ec2::ErrorCode) {});
 }
 
 bool QnServerUpdateTool::addUpdateFile(const QString &updateId, const QByteArray &data) {
@@ -152,7 +153,7 @@ void QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByte
         m_file->seek(offset);
         m_file->write(data);
         m_chunks.insert(offset, data.size());
-        sendReply();
+        sendReply(m_chunks.size());
     }
 
     if (isComplete()) {
@@ -278,14 +279,19 @@ void QnServerUpdateTool::at_zipExtractor_extractionFinished(int error) {
 
     m_file->close();
 
-    bool ok = (error == QnZipExtractor::Ok);
+    ec2::AbstractUpdatesManager::ReplyCode code = ec2::AbstractUpdatesManager::NoError;
 
-    if (ok) {
+    if (error == QnZipExtractor::Ok) {
         NX_LOG(lit("Update package has been extracted to %1").arg(m_zipExtractor->dir().absolutePath()), cl_logINFO);
     } else {
+        if (error == QnZipExtractor::NoFreeSpace)
+            code = ec2::AbstractUpdatesManager::NoFreeSpace;
+        else
+            code = ec2::AbstractUpdatesManager::UnknownError;
+
         NX_LOG(lit("Could not extract update package. Error message: %1").arg(QnZipExtractor::errorToString(static_cast<QnZipExtractor::Error>(error))), cl_logWARNING);
     }
 
     m_zipExtractor.reset();
-    sendReply(ok ? ec2::AbstractUpdatesManager::Finished : ec2::AbstractUpdatesManager::Failed);
+    sendReply(code);
 }

@@ -136,7 +136,7 @@ inline qint64 toInt64(const QByteArray& ba)
     return result;
 }
 
-QnBusinessEventParameters QnBusinessEventParameters::deserialize(const QByteArray& value)
+QnBusinessEventParameters QnBusinessEventParameters::unpack(const QByteArray& value)
 {
     QnBusinessEventParameters result;
 
@@ -235,7 +235,7 @@ void serializeStringListParam(QByteArray& result, const QStringList& value)
     result += DELIMITER;
 }
 
-QByteArray QnBusinessEventParameters::serialize() const
+QByteArray QnBusinessEventParameters::pack() const
 {
     QByteArray result;
 
@@ -256,16 +256,7 @@ QByteArray QnBusinessEventParameters::serialize() const
 
     return result.left(resLen);
 }
-/*
-static QList<QByteArray> baFromStringList(const QStringList& values)
-{
-    QList<QByteArray> result;
-    for (int i = 0; i < values.size(); ++i)
-        result << values[i].toUtf8();
 
-    return result;
-}
-*/
 QnBusinessParams QnBusinessEventParameters::toBusinessParams() const
 {
     static QnBusinessEventParameters m_defaultParams;
@@ -297,14 +288,6 @@ QnBusinessParams QnBusinessEventParameters::toBusinessParams() const
 
     if (m_conflicts != m_defaultParams.m_conflicts)
         result.insert(PARAM_NAMES[ConflictsParam], m_conflicts);
-
-    /*
-    for (int i = 0; i < (int) CountParam; ++i)
-    {
-        if (m_params[i] != empty.m_params[i])
-            result.insert(PARAM_NAMES[i], m_params[i]);
-    }
-    */
 
     return result;
 }
@@ -422,11 +405,17 @@ QString QnBusinessEventParameters::getParamsKey() const
             if (getReasonCode() == QnBusiness::StorageIoErrorReason || getReasonCode() == QnBusiness::StorageTooSlowReason || getReasonCode() == QnBusiness::StorageFullReason || getReasonCode() == QnBusiness::LicenseRemoved)
                 paramKey += QLatin1String("_") + getReasonParamsEncoded();
             break;
+
         case QnBusiness::CameraInputEvent:
             paramKey += QLatin1String("_") + getInputPortId();
             break;
-    default:
-        break;
+
+        case QnBusiness::CameraDisconnectEvent:
+            paramKey += QLatin1String("_") + getEventResourceId().toString();
+            break;
+
+        default:
+            break;
     }
 
     return paramKey;

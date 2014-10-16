@@ -253,7 +253,7 @@ void QnBusinessRulesViewModel::at_soundModel_itemChanged(const QString &filename
         if (m_rules[i]->actionType() != QnBusiness::PlaySoundAction &&
                 m_rules[i]->actionType() != QnBusiness::PlaySoundOnceAction)
             continue;
-        if (m_rules[i]->actionParams().getSoundUrl() != filename)
+        if (m_rules[i]->actionParams().soundUrl != filename)
             continue;
         QModelIndex index = this->index(i, QnBusiness::TargetColumn, QModelIndex());
         emit dataChanged(index, index);

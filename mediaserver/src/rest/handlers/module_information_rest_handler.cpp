@@ -4,7 +4,8 @@
 #include <utils/network/module_information.h>
 #include <common/common_module.h>
 
-int QnModuleInformationRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) {
+int QnModuleInformationRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
+{
     Q_UNUSED(path)
     Q_UNUSED(params)
 

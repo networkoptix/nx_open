@@ -1,6 +1,13 @@
 #include "recording_manager.h"
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/security_cam_resource.h"
+
+#include <core/resource/resource.h>
+#include <core/resource/storage_resource.h>
+#include <core/resource/security_cam_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/camera_history.h>
+#include <core/resource_management/resource_pool.h>
+
 #include "recording/stream_recorder.h"
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "camera/camera_pool.h"
@@ -11,10 +18,6 @@
 #include "server_stream_recorder.h"
 #include <utils/common/log.h>
 #include "utils/common/synctime.h"
-#include "core/resource/media_server_resource.h"
-#include "core/resource/resource_fwd.h"
-#include "core/resource/camera_resource.h"
-#include "core/resource/camera_history.h"
 #include "api/app_server_connection.h"
 #include "plugins/storage/dts/abstract_dts_reader_factory.h"
 #include <business/business_event_rule.h>
@@ -27,9 +30,10 @@
 #include "common/common_module.h"
 #include "api/runtime_info_manager.h"
 #include "utils/license_usage_helper.h"
+#include "media_server/settings.h"
 
 
-static const qint64 LICENSE_RECORDING_STOP_TIME = 1000 * 3600 * 24 * 7;
+static const qint64 LICENSE_RECORDING_STOP_TIME = 60 * 24 * 7;
 static const QString LICENSE_OVERFLOW_LOCK_NAME(lit("__LICENSE_OVERFLOW__"));
 
 QnRecordingManager::QnRecordingManager(): m_mutex(QMutex::Recursive)
@@ -37,6 +41,8 @@ QnRecordingManager::QnRecordingManager(): m_mutex(QMutex::Recursive)
     m_tooManyRecordingCnt = 0;
     m_licenseMutex = 0;
     connect(this, &QnRecordingManager::recordingDisabled, qnBusinessRuleConnector, &QnBusinessEventConnector::at_licenseIssueEvent);
+    m_recordingStopTime = qMin(LICENSE_RECORDING_STOP_TIME, MSSettings::roSettings()->value("forceStopRecordingTime", LICENSE_RECORDING_STOP_TIME).toLongLong());
+    m_recordingStopTime *= 1000 * 60;
 }
 
 QnRecordingManager::~QnRecordingManager()
@@ -63,6 +69,14 @@ void QnRecordingManager::beforeDeleteRecorder(const Recorders& recorders)
         recorders.recorderHiRes->pleaseStop();
     if (recorders.recorderLowRes)
         recorders.recorderLowRes->pleaseStop();
+}
+
+void QnRecordingManager::stopRecorder(const Recorders& recorders)
+{
+    if( recorders.recorderHiRes )
+        recorders.recorderHiRes->stop();
+    if (recorders.recorderLowRes)
+        recorders.recorderLowRes->stop();
 }
 
 void QnRecordingManager::deleteRecorder(const Recorders& recorders, const QnResourcePtr& /*resource*/)
@@ -481,9 +495,10 @@ void QnRecordingManager::onRemoveResource(const QnResourcePtr &resource)
         recorders = itr.value();
         m_recordMap.remove(resource);
     }
-    qnCameraPool->removeVideoCamera(resource);
 
     beforeDeleteRecorder(recorders);
+    stopRecorder(recorders);
+    qnCameraPool->removeVideoCamera(resource);
     deleteRecorder(recorders, resource);
 
     m_onlineCameras.remove(resource);
@@ -572,7 +587,7 @@ void QnRecordingManager::at_checkLicenses()
             licenseOverflowTime = qnSyncTime->currentMSecsSinceEpoch();
             QnAppServerConnectionFactory::getConnection2()->getMiscManager()->markLicenseOverflowSync(true, licenseOverflowTime);
         }
-        if (qnSyncTime->currentMSecsSinceEpoch() - licenseOverflowTime < LICENSE_RECORDING_STOP_TIME) {
+        if (qnSyncTime->currentMSecsSinceEpoch() - licenseOverflowTime < m_recordingStopTime) {
             return; // not enough license, but timeout not reached yet
         }
 
@@ -611,7 +626,7 @@ void QnRecordingManager::at_licenseMutexLocked()
     const QnResourceList& ownCameras = getLocalControlledCameras();
     foreach(QnResourcePtr camRes, ownCameras)
     {
-        if (!helper.isValid())
+        if (helper.isValid())
             break;
 
         QnVirtualCameraResourcePtr camera = camRes.dynamicCast<QnVirtualCameraResource>();

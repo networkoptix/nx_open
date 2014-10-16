@@ -61,7 +61,9 @@ QnAbstractMediaDataPtr PlDroidStreamReader::getNextData()
         rtpBuffer.reserve(rtpBuffer.size() + MAX_RTP_PACKET_SIZE);
         int readed = m_videoIoDevice->read( (char*) rtpBuffer.data() + rtpBuffer.size(), MAX_RTP_PACKET_SIZE);
         if (readed > 0) {
-            m_h264Parser->processData((quint8*)rtpBuffer.data(), rtpBuffer.size(), readed, m_videoIoDevice->getStatistic(), result );
+            bool gotData = false;
+            m_h264Parser->processData((quint8*)rtpBuffer.data(), rtpBuffer.size(), readed, m_videoIoDevice->getStatistic(), gotData);
+            result  = m_h264Parser->nextData();
             rtpBuffer.finishWriting(readed);
         }
     }

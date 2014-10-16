@@ -23,6 +23,7 @@
 #include <common/common_meta_types.h>
 
 #include <core/resource/layout_resource.h>
+#include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <camera/resource_display.h>
 #include <camera/client_video_camera.h>
@@ -444,8 +445,7 @@ void QnWorkbenchDisplay::initSceneView() {
     } else {
         /* Never set QObject* parent in the QScopedPointer-stored objects if not sure in the descruction order. */
         m_backgroundPainter = new QnGradientBackgroundPainter(qnSettings->radialBackgroundCycle(), NULL, context());
-        if (action(Qn::ToggleBackgroundAnimationAction)->isChecked())
-            m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
+        m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
     }
 
     /* Connect to context. */
@@ -485,10 +485,7 @@ void QnWorkbenchDisplay::toggleBackgroundAnimation(bool enabled) {
     if (!m_scene || !m_view || !m_backgroundPainter)
         return;
 
-    if(enabled) 
-        m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
-    else 
-        m_view->uninstallLayerPainter(m_backgroundPainter.data());
+    m_backgroundPainter->setEnabled(enabled);
 }
 
 
@@ -897,6 +894,10 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     if(frameColor.isValid())
         widget->setFrameDistinctionColor(frameColor);
 
+    QnResourceWidget::Options options = item->data(Qn::ItemWidgetOptions).value<QnResourceWidget::Options>();
+    if (options)
+        widget->setOptions(widget->options() | options);
+
     emit widgetAdded(widget);
 
     for(int i = 0; i < Qn::ItemRoleCount; i++)
@@ -1160,6 +1161,22 @@ QRectF QnWorkbenchDisplay::itemEnclosingGeometry(QnWorkbenchItem *item) const {
         result.height() + delta.height() * step.height()
     );
 
+    /* Calculate bounds of the rotated item */
+    qreal rotation = qAbs(item->rotation());
+    if (!qFuzzyIsNull(rotation) && !qFuzzyEquals(rotation, 180)) {
+        QnResourceWidget *widget = this->widget(item);
+        if (widget) {
+            QRectF bound = result;
+            if (widget->hasAspectRatio())
+                bound = expanded(widget->aspectRatio(), result, Qt::KeepAspectRatio);
+            bound = rotated(bound, item->rotation());
+            qreal scale = scaleFactor(bound.size(), result.size(), Qt::KeepAspectRatio);
+            qreal xdiff = result.width() / 2.0 * (1.0 - scale);
+            qreal ydiff = result.height() / 2.0 * (1.0 - scale);
+            result.adjust(xdiff, ydiff, -xdiff, -ydiff);
+        }
+    }
+
     return result;
 }
 
@@ -1202,11 +1219,7 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const {
             ? layoutBoundingRect
             : layoutBoundingRect.united(backgroundBoundingRect);
 
-    if (qnSettings->isVideoWallMode())
-        return workbench()->mapper()->mapFromGridF(QRectF(sceneBoundingRect));
-
-    const qreal adjust = 0.05; // half of minimal cell spacing
-    return workbench()->mapper()->mapFromGridF(QRectF(sceneBoundingRect).adjusted(-adjust, -adjust, adjust, adjust));
+    return workbench()->mapper()->mapFromGridF(QRectF(sceneBoundingRect));
 }
 
 QRectF QnWorkbenchDisplay::viewportGeometry() const {
@@ -1485,7 +1498,9 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
 
     /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
     QnConstResourceVideoLayoutPtr videoLayout = widget->channelLayout();
-    const qreal estimatedAspectRatio = aspectRatio(videoLayout->size()) * (item->zoomRect().isNull() ? 1.0 : aspectRatio(item->zoomRect())) * (4.0 / 3.0);
+    qreal estimatedAspectRatio = aspectRatio(videoLayout->size()) * (item->zoomRect().isNull() ? 1.0 : aspectRatio(item->zoomRect())) * (4.0 / 3.0);
+    if (qAbs(qAbs(item->rotation()) - 90) < 45)
+        estimatedAspectRatio = 1 / estimatedAspectRatio;
     const Qt::Orientation orientation = estimatedAspectRatio > 1.0 ? Qt::Vertical : Qt::Horizontal;
     const QSize size = bestSingleBoundedSize(workbench()->mapper(), 1, orientation, estimatedAspectRatio);
 

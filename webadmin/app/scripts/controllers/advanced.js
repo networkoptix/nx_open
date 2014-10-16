@@ -3,13 +3,26 @@
 angular.module('webadminApp')
     .controller('AdvancedCtrl', function ($scope, $modal, $log, mediaserver) {
 
-        $scope.storages = mediaserver.getStorages();
 
-        $scope.storages.then(function (r) {
+        mediaserver.getCurrentUser().success(function(result){
+            if(!result.reply.isAdmin){
+                $location.path("/info"); //no admin rights - redirect
+            }
+        });
 
-            $scope.storages = r.data.reply.storages;
+        function formatUrl(url){
+            return decodeURIComponent(url.replace(/file:\/\/.+?:.+?\//gi,""));
+        };
+
+        mediaserver.getStorages().then(function (r) {
+            $scope.storages = _.sortBy(r.data.reply.storages,function(storage){
+                return formatUrl(storage.url);
+            });
+
             for(var i in $scope.storages){
                 $scope.storages[i].reservedSpaceGb = Math.round(1.*$scope.storages[i].reservedSpace / (1024*1024*1024));
+                $scope.storages[i].url = formatUrl($scope.storages[i].url);
+
             }
 
             $scope.$watch(function(){
@@ -34,7 +47,12 @@ angular.module('webadminApp')
         };
         $scope.toGBs = function(total){
             return    Math.floor(total / (1024*1024*1024));
-        }
+        };
+
+        $scope.update = function(){
+
+        };
+
         $scope.save = function(){
             var needConfirm = false;
             var hasStorageForWriting;
@@ -66,6 +84,7 @@ angular.module('webadminApp')
                         }
                     });
 
+                    //mediaserver.saveStorages(info.storages).error(function(saveMediaServerReply){
                     mediaserver.saveMediaServer(info).error(function(saveMediaServerReply){
                         alert("Error: Couldn't save settings");
                     }).then(function(saveMediaServerReply){

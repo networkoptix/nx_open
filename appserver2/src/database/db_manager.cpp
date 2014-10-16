@@ -180,7 +180,8 @@ QnDbManager::QnDbManager()
     m_licenseOverflowMarked(false),
     m_initialized(false),
     m_tranStatic(m_sdbStatic, m_mutexStatic),
-    m_needResyncLog(false)
+    m_needResyncLog(false),
+    m_needResyncLicenses(false)
 {
 	Q_ASSERT(!globalInstance);
 	globalInstance = this;
@@ -353,8 +354,14 @@ bool QnDbManager::init(
     if( QnTransactionLog::instance() )
         QnTransactionLog::instance()->init();
 
-    if( m_needResyncLog )
-        resyncTransactionLog();
+    if( m_needResyncLog ) {
+        if (!resyncTransactionLog())
+		    return false;
+    }
+    else if (m_needResyncLicenses) {
+        if (!fillTransactionLogInternal<ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
+            return false;
+    }
 
     // Set admin user's password
     ApiUserDataList users;
@@ -467,6 +474,9 @@ bool QnDbManager::resyncTransactionLog()
     if (!addTransactionForGeneralSettings())
         return false;
 
+    if (!fillTransactionLogInternal<ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
+        return false;
+
     return true;
 }
 
@@ -549,6 +559,13 @@ bool QnDbManager::updateTableGuids(const QString& tableName, const QString& fiel
     return true;
 }
 
+bool QnDbManager::updateResourceTypeGuids()
+{
+    QMap<int, QnUuid> guids = 
+        getGuidList("SELECT rt.id, rt.name || coalesce(m.name,'-') as guid from vms_resourcetype rt LEFT JOIN vms_manufacture m on m.id = rt.manufacture_id WHERE rt.guid is null", CM_MakeHash);
+    return updateTableGuids("vms_resourcetype", "guid", guids);
+}
+
 bool QnDbManager::updateGuids()
 {
     QMap<int, QnUuid> guids = getGuidList("SELECT id, guid from vms_resource_tmp order by id", CM_Default, QnUuid::createUuid().toByteArray());
@@ -563,8 +580,7 @@ bool QnDbManager::updateGuids()
     if (!updateTableGuids("vms_layoutitem", "resource_guid", guids))
         return false;
 
-    guids = getGuidList("SELECT rt.id, rt.name || coalesce(m.name,'-') as guid from vms_resourcetype rt LEFT JOIN vms_manufacture m on m.id = rt.manufacture_id", CM_MakeHash);
-    if (!updateTableGuids("vms_resourcetype", "guid", guids))
+    if (!updateResourceTypeGuids())
         return false;
 
     guids = getGuidList("SELECT r.id, r2.guid from vms_resource_tmp r JOIN vms_resource r2 on r2.id = r.parent_id order by r.id", CM_Binary);
@@ -575,7 +591,13 @@ bool QnDbManager::updateGuids()
     if (!updateTableGuids("vms_resource", "xtype_guid", guids))
         return false;
 
-    guids = getGuidList("SELECT id, id from vms_businessrule ORDER BY id", CM_INT, QnUuid::createUuid().toByteArray());
+    // update default rules
+    guids = getGuidList("SELECT id, id from vms_businessrule WHERE (id between 1 and 19) or (id between 10020 and 10023) ORDER BY id", CM_INT, "DEFAULT_BUSINESS_RULES");
+    if (!updateTableGuids("vms_businessrule", "guid", guids))
+        return false;
+
+    // update user's rules
+    guids = getGuidList("SELECT id, id from vms_businessrule WHERE guid is null ORDER BY id", CM_INT, QnUuid::createUuid().toByteArray());
     if (!updateTableGuids("vms_businessrule", "guid", guids))
         return false;
 
@@ -756,6 +778,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         if (!updateTableGuids("vms_resourcetype", "guid", guids))
             return false;
     }
+    else if (updateName == lit(":/updates/17_add_isd_cam.sql")) {
+        updateResourceTypeGuids();
+    }
 
     return true;
 }
@@ -776,13 +801,8 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
         if (!execSQLFile(lit(":/01_createdb.sql"), m_sdb))
             return false;
 
-        //#ifdef EDGE_SERVER
-        //        if (!execSQLFile(lit(":/02_insert_3thparty_vendor.sql")))
-        //            return false;
-        //#else
         if (!execSQLFile(lit(":/02_insert_all_vendors.sql"), m_sdb))
             return false;
-        //#endif
     }
 
     if (!isObjectExists(lit("table"), lit("transaction_log"), m_sdb))
@@ -830,6 +850,9 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
         }
         //if (!execSQLQuery("drop table vms_license", m_sdb))
         //    return false;
+    }
+    else if (*dbJustCreated) {
+        m_needResyncLicenses = true;
     }
 
     if (!applyUpdates())
@@ -2263,8 +2286,12 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraBookma
 }
 
 //getUsers
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList& userList)
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& userId, ApiUserDataList& userList)
 {
+    QString filterStr;
+    if (!userId.isNull())
+        filterStr = QString("WHERE r.guid = %1").arg(guidToSqlString(userId));
+
     //digest = md5('%s:%s:%s' % (self.user.username.lower(), 'NetworkOptix', password)).hexdigest()
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -2273,7 +2300,8 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList
                           from vms_resource r \
                           join auth_user u  on u.id = r.id\
                           join vms_userprofile p on p.user_id = u.id\
-                          order by r.guid"));
+                          %1\
+                          order by r.guid").arg(filterStr));
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::dbError;

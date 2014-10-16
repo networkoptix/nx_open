@@ -62,7 +62,7 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
 //        return;
 
     //TODO: #GDM #Business check if camera is visible to us
-    QnBusinessActionParameters::UserGroup userGroup = businessAction->getParams().getUserGroup();
+    QnBusinessActionParameters::UserGroup userGroup = businessAction->getParams().userGroup;
     if (userGroup == QnBusinessActionParameters::AdminOnly
             && !(accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
         return;
@@ -253,7 +253,7 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(const QnAbs
     }
     case QnBusiness::PlaySoundOnceAction:
     {
-        QString filename = businessAction->getParams().getSoundUrl();
+        QString filename = businessAction->getParams().soundUrl;
         QString filePath = context()->instance<QnAppServerNotificationCache>()->getFullPath(filename);
         // if file is not exists then it is already deleted or just not downloaded yet
         // I think it should not be played when downloaded
@@ -276,7 +276,7 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(const QnAbs
     }
     case QnBusiness::SayTextAction:
     {
-        AudioPlayer::sayTextAsync(businessAction->getParams().getSayText());
+        AudioPlayer::sayTextAsync(businessAction->getParams().sayText);
         break;
     }
     default:

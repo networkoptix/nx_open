@@ -6,7 +6,7 @@
 class QnBackupDbRestHandler : public QnJsonRestHandler {
     Q_OBJECT
 public:
-    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result);
+    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*);
 };
 
 #endif // BACKUP_DB_REST_HANDLER_H

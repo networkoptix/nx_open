@@ -14,21 +14,15 @@
 #include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
 
+#include <api/global_settings.h>
 #include <api/model/storage_space_reply.h>
 
-#include <utils/common/counter.h>
-#include <utils/common/string.h>
-#include <utils/common/variant.h>
-#include <utils/common/event_processors.h>
-#include <utils/math/interpolator.h>
-#include <utils/math/color_transformations.h>
+#include <client/client_model_types.h>
+#include <client/client_settings.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_server_resource.h>
-
-#include <client/client_model_types.h>
-#include <client/client_settings.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/dialogs/storage_url_dialog.h>
@@ -40,6 +34,13 @@
 #include <ui/widgets/storage_space_slider.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/workbench_context.h>
+
+#include <utils/common/counter.h>
+#include <utils/common/string.h>
+#include <utils/common/variant.h>
+#include <utils/common/event_processors.h>
+#include <utils/math/interpolator.h>
+#include <utils/math/color_transformations.h>
 
 //#define QN_SHOW_ARCHIVE_SPACE_COLUMN
 
@@ -305,13 +306,16 @@ void QnServerSettingsDialog::updateFromResources()
     setTableItems(QList<QnStorageSpaceData>());
     setBottomLabelText(tr("Loading..."));
 
-    bool edge = QnMediaServerResource::isEdgeServer(m_server);
+    //bool edge = QnMediaServerResource::isEdgeServer(m_server);
     ui->nameLineEdit->setText(m_server->getName());
-    ui->nameLineEdit->setEnabled(!edge);
+    //ui->nameLineEdit->setEnabled(!edge);
     ui->maxCamerasSpinBox->setValue(m_server->getMaxCameras());
     ui->failoverCheckBox->setChecked(m_server->isRedundancy());
-    ui->failoverCheckBox->setEnabled(!edge);
-    ui->maxCamerasWidget->setEnabled(!edge && m_server->isRedundancy());
+    //ui->failoverCheckBox->setEnabled(!edge);
+    ui->maxCamerasWidget->setEnabled(m_server->isRedundancy());
+
+    int maxCameras = (m_server->getServerFlags() & Qn::SF_Edge) ? 1 : 128;
+    ui->maxCamerasSpinBox->setMaximum(maxCameras);
 
     ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
     ui->portLineEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
@@ -352,12 +356,9 @@ void QnServerSettingsDialog::submitToResources() {
         qnSettings->setServerStorageStates(serverStorageStates);
     }
 
-    bool edge = QnMediaServerResource::isEdgeServer(m_server);
-    if (!edge) {
-        m_server->setName(ui->nameLineEdit->text());
-        m_server->setMaxCameras(ui->maxCamerasSpinBox->value());
-        m_server->setRedundancy(ui->failoverCheckBox->isChecked());
-    }
+    m_server->setName(ui->nameLineEdit->text());
+    m_server->setMaxCameras(ui->maxCamerasSpinBox->value());
+    m_server->setRedundancy(ui->failoverCheckBox->isChecked());
 }
 
 void QnServerSettingsDialog::setBottomLabelText(const QString &text) {
@@ -523,6 +524,9 @@ void QnServerSettingsDialog::updateRebuildUi(RebuildState newState, int progress
 void QnServerSettingsDialog::updateFailoverLabel() {
 
     auto getErrorText = [this] {
+        if (QnGlobalSettings::instance()->disabledVendorsSet().contains(lit("all")))
+            return tr("Cameras autodiscovery should be enabled for this feature.");
+
         if (qnResPool->getResources<QnMediaServerResource>().size() < 2)
             return tr("At least two servers are required for this feature.");
 

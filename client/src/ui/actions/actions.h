@@ -128,11 +128,6 @@ namespace Qn {
         WhatsThisAction,
 
         /**
-         * Clears application cache folders (layout backgrounds, sounds)
-         */
-        ClearCacheAction,
-
-        /**
          * Cancels Tour Mode if it is started, otherwise works as FullScreenAction.
          */
         EscapeHotkeyAction,
@@ -838,6 +833,16 @@ namespace Qn {
          * Sets aspect ratio of current layout's cells to 4x3.
          */
         SetCurrentLayoutAspectRatio4x3Action,
+
+        /**
+         * Sets aspect ratio of current layout's cells to 9x16.
+         */
+        SetCurrentLayoutAspectRatio9x16Action,
+
+        /**
+         * Sets aspect ratio of current layout's cells to 3x4.
+         */
+        SetCurrentLayoutAspectRatio3x4Action,
 
         /**
          * Sets spacing of current layout's cells to 0%.

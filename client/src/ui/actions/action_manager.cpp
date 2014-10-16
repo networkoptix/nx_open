@@ -6,9 +6,14 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QGraphicsItem>
 
-#include <utils/common/warnings.h>
-#include <utils/common/checked_cast.h>
-#include <utils/common/scoped_value_rollback.h>
+#include "action.h"
+#include "action_factories.h"
+#include "action_conditions.h"
+#include "action_target_provider.h"
+#include "action_parameter_types.h"
+
+#include <client/client_settings.h>
+
 #include <core/resource_management/resource_criterion.h>
 #include <core/resource/resource.h>
 
@@ -18,11 +23,9 @@
 #include <ui/style/globals.h>
 #include <ui/screen_recording/screen_recorder.h>
 
-#include "action.h"
-#include "action_factories.h"
-#include "action_conditions.h"
-#include "action_target_provider.h"
-#include "action_parameter_types.h"
+#include <utils/common/warnings.h>
+#include <utils/common/checked_cast.h>
+#include <utils/common/scoped_value_rollback.h>
 
 namespace {
     void copyIconPixmap(const QIcon &src, QIcon::Mode mode, QIcon::State state, QIcon *dst) {
@@ -431,10 +434,6 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Help")).
         icon(qnSkin->icon("titlebar/whats_this.png"));
 
-    factory(Qn::ClearCacheAction).
-        flags(Qn::NoTarget).
-        text(tr("Clear cache"));
-
     factory(Qn::CameraDiagnosticsAction).
         flags(Qn::ResourceTarget | Qn::SingleTarget).
         text(tr("Check Camera Issues...")).
@@ -742,6 +741,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main | Qn::Tree).
         text(tr("Open Web Client...")).
         autoRepeat(false).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalViewLivePermission).
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 
     factory().
@@ -1338,10 +1338,13 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::ConnectToCurrentSystem).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
         text(tr("Connect to the Current System...")).
-        condition(new QnDisjunctionActionCondition(
+        condition(new QnConjunctionActionCondition(
+            new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::Any, this),
+            new QnDisjunctionActionCondition(
                       new QnResourceStatusActionCondition(Qn::Incompatible, false, this),
                       new QnResourceStatusActionCondition(Qn::Unauthorized, false, this),
-                      this));
+                      this),
+            this));
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).
@@ -1364,6 +1367,20 @@ QnActionManager::QnActionManager(QObject *parent):
             text(tr("16:9")).
             checkable().
             checked(qnGlobals->defaultLayoutCellAspectRatio() == 16.0/9.0);
+
+        factory(Qn::SetCurrentLayoutAspectRatio3x4Action).
+            flags(Qn::Scene | Qn::NoTarget).
+            requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
+            text(tr("3:4")).
+            checkable().
+            checked(qnGlobals->defaultLayoutCellAspectRatio() == 3.0/4.0);
+
+        factory(Qn::SetCurrentLayoutAspectRatio9x16Action).
+            flags(Qn::Scene | Qn::NoTarget).
+            requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
+            text(tr("9:16")).
+            checkable().
+            checked(qnGlobals->defaultLayoutCellAspectRatio() == 9.0/16.0);
 
         factory.endGroup();
     } factory.endSubMenu();
@@ -1776,7 +1793,11 @@ QMenu* QnActionManager::integrateMenu(QMenu *menu, const QnActionParameters &par
     Q_ASSERT(!m_parametersByMenu.contains(menu));
     m_parametersByMenu[menu] = parameters;
     menu->installEventFilter(this);
+
+    connect(menu, &QMenu::aboutToShow,  this, [this, menu] { emit menuAboutToShow(menu); });
+    connect(menu, &QMenu::aboutToHide,  this, [this, menu] { emit menuAboutToHide(menu); });
     connect(menu, &QObject::destroyed, this, &QnActionManager::at_menu_destroyed);
+
     return menu;
 }
 

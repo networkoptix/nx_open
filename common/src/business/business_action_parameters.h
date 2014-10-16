@@ -5,9 +5,7 @@
 
 //TODO: #rvasilenko adding new parameter is TOO complex. Structure can be simplified --gdm
 
-class QnBusinessActionParameters 
-{
-public:
+struct QnBusinessActionParameters {
     enum Param {
         SoundUrlParam,
         EmailAddressParam,
@@ -15,10 +13,10 @@ public:
         FpsParam,
         QualityParam,
         DurationParam,
-        BeforeParam,
-        AfterParam,
+        RecordBeforeParam,
+        RecordAfterParam,
         RelayOutputIdParam,
-        EelayAutoResetTimeoutParam,
+        RelayAutoResetTimeoutParam,
         InputPortIdParam,
         KeyParam,
         SayTextParam,
@@ -34,60 +32,36 @@ public:
     QnBusinessActionParameters();
 
     // Play Sound
-
-    QString getSoundUrl() const;
-    void setSoundUrl(const QString &value);
+    QString soundUrl;
 
     // Email
-
-    QString getEmailAddress() const;
-    void setEmailAddress(const QString &value);
-
+    QString emailAddress;
+ 
     // Popups and System Health
 
-    UserGroup getUserGroup() const;
-    void setUserGroup(const UserGroup value);
+    UserGroup userGroup;
 
     // Recording
-
-    int getFps() const;
-    void setFps(int value);
-
-    Qn::StreamQuality getStreamQuality() const;
-    void setStreamQuality(Qn::StreamQuality value);
-
-    int getRecordDuration() const;
-    void setRecordDuration(int value);
-
-    int getRecordBefore() const;
-    void setRecordBefore(int value);
-
-    int getRecordAfter() const;
-    void setRecordAfter(int value);
+    int fps;
+    Qn::StreamQuality streamQuality;
+    int recordingDuration;
+    int recordAfter;
 
     // Camera Output
-
-    QString getRelayOutputId() const;
-    void setRelayOutputId(const QString &value);
-
-    int getRelayAutoResetTimeout() const;
-    void setRelayAutoResetTimeout(int value);
-
-    // TODO: #GDM #Business this one seems not to be used anywhere. Why? Can it be removed? Ask Roma/Andrey.
-    QString getParamsKey() const;
-    void setParamsKey(QString value);
-
-    QString getInputPortId() const;
-    void setInputPortId(const QString &value);
-
+    QString relayOutputId;
+    int relayAutoResetTimeout;
+    QString inputPortId;
+    
     // Say Text
-    QString getSayText() const;
-    void setSayText(const QString &value);
+    QString sayText;
+
+    // Aggregation
+    QString keyParam;
 
     // convert/serialize/deserialize functions
 
-    static QnBusinessActionParameters deserialize(const QByteArray& value);
-    QByteArray serialize() const;
+    static QnBusinessActionParameters unpack(const QByteArray& value);
+    QByteArray pack() const;
 
     QnBusinessParams toBusinessParams() const;
     static QnBusinessActionParameters fromBusinessParams(const QnBusinessParams& bParams);
@@ -100,21 +74,6 @@ public:
 
 private:
     static int getParamIndex(const QString& key);
-
-private:
-    QString m_soundUrl;
-    QString m_emailAddress;
-    int m_userGroup;
-    int m_fps;
-    int m_streamQuality;
-    int m_recordingDuration;
-    int m_before;
-    int m_after;
-    QString m_relayOutputID;
-    int m_relayAutoResetTimeout;
-    QString m_inputPortId;
-    QString m_keyParam;
-    QString m_sayText;
 };
 
 QByteArray serializeBusinessParams(const QnBusinessParams& value);

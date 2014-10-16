@@ -11,6 +11,7 @@
 #include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
 
+#include <ui/common/palette.h>
 #include <ui/models/sorted_server_updates_model.h>
 #include <ui/dialogs/file_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
@@ -22,8 +23,8 @@
 #include <update/media_server_update_tool.h>
 
 #include <utils/applauncher_utils.h>
-
 #include <utils/common/app_info.h>
+
 
 namespace {
     const int longInstallWarningTimeout = 2 * 60 * 1000; // 2 minutes
@@ -41,10 +42,10 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     ui(new Ui::QnServerUpdatesWidget),
     m_latestVersion(qnCommon->engineVersion()),
     m_checkingInternet(false),
-    m_checkingLocal(false)
+    m_checkingLocal(false),
+    m_longUpdateWarningTimer(new QTimer(this))
 {
     ui->setupUi(this);
-    setWarningStyle(ui->dayWarningLabel);
 
     m_updateTool = new QnMediaServerUpdateTool(this);
     m_updatesModel = new QnServerUpdatesModel(m_updateTool, this);
@@ -59,6 +60,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::NameColumn, QHeaderView::Stretch);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::VersionColumn, QHeaderView::ResizeToContents);   
     ui->tableView->horizontalHeader()->setSectionsClickable(false);
+    setPaletteColor(ui->tableView, QPalette::Highlight, Qt::transparent);
 
     connect(ui->cancelButton,           &QPushButton::clicked,      m_updateTool, &QnMediaServerUpdateTool::cancelUpdate);
     connect(ui->internetUpdateButton,   &QPushButton::clicked,      this, [this] {
@@ -99,11 +101,15 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     connect(m_updateTool,       &QnMediaServerUpdateTool::updateFinished,           this,           &QnServerUpdatesWidget::at_updateFinished);
 
     setWarningStyle(ui->dayWarningLabel);
+    ui->dayWarningLabel->setText(tr("As a general rule for the sake of better support, we do not recommend to make system updates at the end of the week."));
+
     setWarningStyle(ui->connectionProblemLabel);
+    setWarningStyle(ui->longUpdateWarning);
 
     static_assert(tooLateDayOfWeek <= Qt::Sunday, "In case of future days order change.");
     ui->dayWarningLabel->setVisible(false);
     ui->connectionProblemLabel->setVisible(false);
+    ui->longUpdateWarning->setVisible(false);
 
     QTimer* updateTimer = new QTimer(this);
     updateTimer->setSingleShot(false);
@@ -120,6 +126,10 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
         checkForUpdatesInternet();
     });
     updateTimer->start();
+
+    m_longUpdateWarningTimer->setInterval(longInstallWarningTimeout);
+    m_longUpdateWarningTimer->setSingleShot(true);
+    connect(m_longUpdateWarningTimer, &QTimer::timeout, ui->longUpdateWarning, &QLabel::show);
 
     at_tool_stageChanged(QnFullUpdateStage::Init);
 }
@@ -178,47 +188,13 @@ void QnServerUpdatesWidget::initLinkButtons() {
         qApp->clipboard()->setText(ui->linkLineEdit->text());
         QMessageBox::information(this, tr("Success"), tr("URL copied to clipboard."));
     });
-
-    connect(ui->saveLinkButton, &QPushButton::clicked, this, [this] {
-        QString fileName = QnFileDialog::getSaveFileName(this, tr("Save to file..."), QString(), tr("Url Files (*.url)"), 0, QnCustomFileDialog::fileDialogOptions());
-        if (fileName.isEmpty())
-            return;
-        QString selectedExtension = lit(".url");
-        if (!fileName.toLower().endsWith(selectedExtension)) {
-            fileName += selectedExtension;
-            if (QFile::exists(fileName)) {
-                QMessageBox::StandardButton button = QMessageBox::information(
-                    this,
-                    tr("Save to file..."),
-                    tr("File '%1' already exists. Do you want to overwrite it?").arg(QFileInfo(fileName).completeBaseName()),
-                    QMessageBox::Ok | QMessageBox::Cancel
-                    );
-                if(button == QMessageBox::Cancel)
-                    return;
-            }
-        }
-
-        QFile data(fileName);
-        if (!data.open(QFile::WriteOnly | QFile::Truncate)) {
-            QMessageBox::critical(this, tr("Error"), tr("Could not save url to file %1").arg(fileName));
-            return;
-        }
-
-        QString package = ui->linkLineEdit->text();
-        QTextStream out(&data);
-        out << lit("[InternetShortcut]") << endl << package << endl;
-
-        data.close();
-    });
-    
+ 
     connect(ui->linkLineEdit,           &QLineEdit::textChanged,    this, [this](const QString &text){
         ui->copyLinkButton->setEnabled(!text.isEmpty());
-        ui->saveLinkButton->setEnabled(!text.isEmpty());
         ui->linkLineEdit->setCursorPosition(0);
     });
 
     ui->copyLinkButton->setEnabled(false);
-    ui->saveLinkButton->setEnabled(false);
 
     connect(ui->releaseNotesLabel,  &QLabel::linkActivated, this, [this] {
         if (!m_releaseNotesUrl.isEmpty())
@@ -340,8 +316,14 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
     case QnUpdateResult::DownloadingFailed:
         QMessageBox::critical(this, tr("Update failed"), tr("Could not download updates."));
         break;
+    case QnUpdateResult::DownloadingFailed_NoFreeSpace:
+        QMessageBox::critical(this, tr("Update failed"), tr("Could not download updates.") + lit("\n") + tr("No free space left on the disk."));
+        break;
     case QnUpdateResult::UploadingFailed:
         QMessageBox::critical(this, tr("Update failed"), tr("Could not push updates to servers."));
+        break;
+    case QnUpdateResult::UploadingFailed_NoFreeSpace:
+        QMessageBox::critical(this, tr("Update failed"), tr("Could not push updates to servers.") + lit("\n") + tr("No free space left on the server."));
         break;
     case QnUpdateResult::ClientInstallationFailed:
         QMessageBox::critical(this, tr("Update failed"), tr("Could not install an update to the client."));
@@ -484,7 +466,11 @@ void QnServerUpdatesWidget::checkForUpdatesLocal() {
             setWarningStyle(&detailPalette);
             break;
         case QnCheckForUpdateResult::BadUpdateFile:
-            detail = tr("Cannot update from this file");
+            detail = tr("Cannot update from this file.");
+            setWarningStyle(&detailPalette);
+            break;
+        case QnCheckForUpdateResult::NoFreeSpace:
+            detail = tr("Cannot extract the update file.") + lit("\n") + tr("No free space left on the disk.");
             setWarningStyle(&detailPalette);
             break;
         default:
@@ -513,6 +499,8 @@ void QnServerUpdatesWidget::at_tool_stageChanged(QnFullUpdateStage stage) {
         ui->internetUpdateButton->setEnabled(false);
         ui->localUpdateButton->setEnabled(false);
     } else { /* Stage returned to idle, update finished. */
+        ui->longUpdateWarning->hide();
+        m_longUpdateWarningTimer->stop();
     }
 
     ui->dayWarningLabel->setVisible(QDateTime::currentDateTime().date().dayOfWeek() >= tooLateDayOfWeek);
@@ -531,6 +519,9 @@ void QnServerUpdatesWidget::at_tool_stageChanged(QnFullUpdateStage stage) {
     case QnFullUpdateStage::Incompatible:
     case QnFullUpdateStage::Push:
         cancellable = true;
+        break;
+    case QnFullUpdateStage::Servers:
+        m_longUpdateWarningTimer->start();
         break;
     default:
         break;
@@ -583,4 +574,3 @@ void QnServerUpdatesWidget::at_tool_stageProgressChanged(QnFullUpdateStage stage
     ui->updateProgessBar->setValue(value);
     ui->updateProgessBar->setFormat(status.arg(value));
 }
-

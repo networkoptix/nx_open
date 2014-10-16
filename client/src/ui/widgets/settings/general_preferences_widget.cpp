@@ -21,6 +21,7 @@
 #include <ui/actions/action_parameters.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/file_dialog.h>
+#include <ui/dialogs/progress_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/warning_style.h>
@@ -31,10 +32,7 @@
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/math/color_transformations.h>
-
-namespace {
-    const int defaultAlpha = 40;
-}
+#include <utils/local_file_cache.h>
 
 QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     base_type(parent),
@@ -45,7 +43,10 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     m_oldDownmix(false),
     m_oldDoubleBuffering(false),
     m_oldLanguage(0),
-    m_oldSkin(0)
+    m_oldSkin(0),
+    m_oldBackgroundMode(Qn::DefaultBackground),
+    m_oldBackgroundImageOpacity(0.5),
+    m_oldBackgroundImageMode(Qn::StretchImage)
 {
     ui->setupUi(this);
 
@@ -82,8 +83,6 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     ui->idleTimeoutWidget->setEnabled(false);
     ui->doubleBufferRestartLabel->setVisible(false);
 
-    m_colorDialog->setCurrentColor(defaultBackgroundColor());
-
     connect(ui->browseMainMediaFolderButton,            &QPushButton::clicked,          this,   &QnGeneralPreferencesWidget::at_browseMainMediaFolderButton_clicked);
     connect(ui->addExtraMediaFolderButton,              &QPushButton::clicked,          this,   &QnGeneralPreferencesWidget::at_addExtraMediaFolderButton_clicked);
     connect(ui->removeExtraMediaFolderButton,           &QPushButton::clicked,          this,   &QnGeneralPreferencesWidget::at_removeExtraMediaFolderButton_clicked);
@@ -91,7 +90,7 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
                                                                                         this,   &QnGeneralPreferencesWidget::at_extraMediaFoldersList_selectionChanged);
     connect(ui->timeModeComboBox,                       QnComboboxActivated,            this,   &QnGeneralPreferencesWidget::at_timeModeComboBox_activated);
     connect(ui->browseLogsButton,                       &QPushButton::clicked,          this,   &QnGeneralPreferencesWidget::at_browseLogsButton_clicked);
-    connect(ui->clearCacheButton,                       &QPushButton::clicked,          action(Qn::ClearCacheAction),   &QAction::trigger);
+    connect(ui->clearCacheButton,                       &QPushButton::clicked,          this,   &QnGeneralPreferencesWidget::at_clearCacheButton_clicked);
     connect(ui->pauseOnInactivityCheckBox,              &QCheckBox::toggled,            ui->idleTimeoutWidget,          &QWidget::setEnabled);
     connect(ui->downmixAudioCheckBox,                   &QCheckBox::toggled,            this,   [this](bool toggled) {
         ui->downmixWarningLabel->setVisible(m_oldDownmix != toggled);
@@ -107,14 +106,42 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
         ui->doubleBufferRestartLabel->setVisible(toggled != m_oldDoubleBuffering);
     });
 
+    QButtonGroup* buttonGroup = new QButtonGroup(this);
+    buttonGroup->addButton(ui->backgroundEmptyRadioButton,      Qn::NoBackground);
+    buttonGroup->addButton(ui->backgroundDefaultRadioButton,    Qn::DefaultBackground);
+    buttonGroup->addButton(ui->backgroundRainbowRadioButton,    Qn::RainbowBackground);
+    buttonGroup->addButton(ui->backgroundCustomRadioButton,     Qn::CustomColorBackground);
+    buttonGroup->addButton(ui->backgroundImageRadioButton,      Qn::ImageBackground);
+
+    connect(buttonGroup,    QnButtonGroupIdToggled, this, [this](int id, bool toggled) {
+        if (!toggled)
+            return;
+
+        action(Qn::ToggleBackgroundAnimationAction)->setChecked(id != Qn::NoBackground && id != Qn::ImageBackground);
+        qnSettings->setBackgroundMode(static_cast<Qn::ClientBackground>(id));
+    });
+
     connect(ui->selectColorButton,                      &QPushButton::clicked,          this,   [this] {
         if (m_colorDialog->exec())
             updateBackgroundColor();
     });
 
-    connect(ui->defaultBackgroundCheckBox,  &QCheckBox::stateChanged,   this, [this](int state) {
-        ui->selectColorButton->setEnabled(state != Qt::Checked);
-        updateBackgroundColor();
+    connect(ui->backgroundColorOpacitySpinBox,          QnSpinboxIntValueChanged,       this,   &QnGeneralPreferencesWidget::updateBackgroundColor);
+
+    connect(ui->selectImageButton,                      &QPushButton::clicked,          this,   &QnGeneralPreferencesWidget::selectBackgroundImage);
+    connect(ui->backgroundImageOpacitySpinBox,          QnSpinboxIntValueChanged,       this,   [this](int value) {
+        if (!m_updating)
+            qnSettings->setBackgroundImageOpacity(0.01 * value);
+    });
+
+    ui->backgroundImageModeComboBox->addItem(tr("Stretch"), qVariantFromValue(Qn::StretchImage));
+    ui->backgroundImageModeComboBox->addItem(tr("Fit"),     qVariantFromValue(Qn::FitImage));
+    ui->backgroundImageModeComboBox->addItem(tr("Crop"),    qVariantFromValue(Qn::CropImage));
+
+    connect(ui->backgroundImageModeComboBox,            QnComboboxCurrentIndexChanged,  this,   [this] {
+        if (m_updating)
+            return;
+        qnSettings->setBackgroundImageMode(ui->backgroundImageModeComboBox->currentData().value<Qn::ImageBehaviour>());
     });
 }
 
@@ -150,11 +177,6 @@ void QnGeneralPreferencesWidget::submitToSettings() {
                 qnSettings->setTranslationPath(translation.filePaths()[0]);
         }
     }
-
-    if (ui->defaultBackgroundCheckBox->isChecked())
-        qnSettings->setBackgroundColor(QColor());
-    else
-        qnSettings->setBackgroundColor(backgroundColor());
 }
 
 void QnGeneralPreferencesWidget::updateFromSettings() {
@@ -196,11 +218,46 @@ void QnGeneralPreferencesWidget::updateFromSettings() {
     }
     ui->languageComboBox->setCurrentIndex(m_oldLanguage);
 
-    m_oldBackgroundColor = qnSettings->backgroundColor();
-    ui->defaultBackgroundCheckBox->setChecked(!qnSettings->backgroundColor().isValid());
-    m_colorDialog->setCurrentColor(qnSettings->backgroundColor().isValid() 
-        ? withAlpha(qnSettings->backgroundColor(), 255)
-        : defaultBackgroundColor());
+    bool backgroundAllowed = !(qnSettings->lightMode() & Qn::LightModeNoSceneBackground);
+    ui->backgroundGroupBox->setEnabled(backgroundAllowed);
+    m_oldBackgroundMode = qnSettings->backgroundMode();
+    m_oldCustomBackgroundColor = qnSettings->customBackgroundColor();
+    m_oldBackgroundImage = qnSettings->backgroundImage();
+    m_oldBackgroundImageOpacity = qnSettings->backgroundImageOpacity();
+    m_oldBackgroundImageMode = qnSettings->backgroundImageMode();
+
+    if (!backgroundAllowed) {
+        ui->backgroundEmptyRadioButton->setChecked(true);
+    } else {
+        switch (qnSettings->backgroundMode()) {
+        case Qn::NoBackground:
+            ui->backgroundEmptyRadioButton->setChecked(true);
+            break;
+        case Qn::RainbowBackground:
+            ui->backgroundRainbowRadioButton->setChecked(true);
+            break;
+        case Qn::CustomColorBackground:
+            ui->backgroundCustomRadioButton->setChecked(true);
+            break;
+        case Qn::ImageBackground:
+            ui->backgroundImageRadioButton->setChecked(true);
+            break;
+        default:
+            ui->backgroundDefaultRadioButton->setChecked(true);
+            break;
+        }
+    }
+
+    QColor customColor = qnSettings->customBackgroundColor();
+    if (!customColor.isValid())
+        customColor = withAlpha(Qt::darkBlue, 64);
+
+    m_colorDialog->setCurrentColor(withAlpha(customColor, 255));
+    ui->backgroundColorOpacitySpinBox->setValue(qRound(customColor.alphaF() * 100));
+    ui->backgroundImageOpacitySpinBox->setValue(qRound(qnSettings->backgroundImageOpacity() * 100));
+
+    ui->backgroundImageModeComboBox->setCurrentIndex(ui->backgroundImageModeComboBox->findData(qVariantFromValue(qnSettings->backgroundImageMode())));
+
     updateBackgroundColor();
 }
 
@@ -236,7 +293,14 @@ bool QnGeneralPreferencesWidget::confirm() {
 }
 
 bool QnGeneralPreferencesWidget::discard() {
-    qnSettings->setBackgroundColor(m_oldBackgroundColor);
+    bool backgroundAllowed = !(qnSettings->lightMode() & Qn::LightModeNoSceneBackground);
+    if (backgroundAllowed) {
+        qnSettings->setBackgroundMode(m_oldBackgroundMode);
+        qnSettings->setCustomBackgroundColor(m_oldCustomBackgroundColor);
+        qnSettings->setBackgroundImage(m_oldBackgroundImage);
+        qnSettings->setBackgroundImageOpacity(m_oldBackgroundImageOpacity);
+        qnSettings->setBackgroundImageMode(m_oldBackgroundImageMode);
+    }
     return true;
 }
 
@@ -247,17 +311,10 @@ void QnGeneralPreferencesWidget::initTranslations() {
     ui->languageComboBox->setModel(model);
 }
 
-QColor QnGeneralPreferencesWidget::defaultBackgroundColor() const {
-    return qnSettings->defaultBackgroundColor();
-}
-
 QColor QnGeneralPreferencesWidget::backgroundColor() const {
-    if (ui->defaultBackgroundCheckBox->isChecked())
-        return defaultBackgroundColor();
-    QColor opaque = m_colorDialog->currentColor();
-    return withAlpha(opaque, defaultBackgroundColor().isValid() 
-        ? defaultBackgroundColor().alpha()
-        : defaultAlpha);
+    QColor color = m_colorDialog->currentColor();
+    color.setAlphaF(0.01* ui->backgroundColorOpacitySpinBox->value());
+    return color;
 }
 
 void QnGeneralPreferencesWidget::updateBackgroundColor() {
@@ -266,9 +323,59 @@ void QnGeneralPreferencesWidget::updateBackgroundColor() {
     ui->selectColorButton->setIcon(pixmap);
 
     if (!m_updating)
-        qnSettings->setBackgroundColor(backgroundColor());
+        qnSettings->setCustomBackgroundColor(backgroundColor());
 }
 
+void QnGeneralPreferencesWidget::selectBackgroundImage() {
+    QString nameFilter;
+    foreach (const QByteArray &format, QImageReader::supportedImageFormats()) {
+        if (!nameFilter.isEmpty())
+            nameFilter += QLatin1Char(' ');
+        nameFilter += QLatin1String("*.") + QLatin1String(format);
+    }
+    nameFilter = QLatin1Char('(') + nameFilter + QLatin1Char(')');
+
+    QScopedPointer<QnCustomFileDialog> dialog(
+        new QnCustomFileDialog (
+        this, tr("Select file..."),
+        qnSettings->backgroundsFolder(),
+        tr("Pictures %1").arg(nameFilter)
+        )
+        );
+    dialog->setFileMode(QFileDialog::ExistingFile);
+
+    if(!dialog->exec())
+        return;
+
+    QString fileName = dialog->selectedFile();
+    if (fileName.isEmpty())
+        return;
+
+    qnSettings->setBackgroundsFolder(QFileInfo(fileName).absolutePath());
+
+
+    QString cachedName = QnAppServerImageCache::cachedImageFilename(fileName);
+    if (qnSettings->backgroundImage() == cachedName)
+        return;
+
+    QnProgressDialog* progressDialog = new QnProgressDialog(this);
+    progressDialog->setWindowTitle(tr("Preparing Image..."));
+    progressDialog->setLabelText(tr("Please wait while image is being prepared..."));
+    progressDialog->setInfiniteProgress();
+    progressDialog->setModal(true);
+
+    QnLocalFileCache* imgCache = new QnLocalFileCache(this);
+    connect(imgCache, &QnAppServerFileCache::fileUploaded, this, [this, imgCache, progressDialog](const QString &filename) {
+        if (!progressDialog->wasCanceled())
+            qnSettings->setBackgroundImage(filename);
+        imgCache->deleteLater();
+        progressDialog->hide();
+        progressDialog->deleteLater();
+    });
+ 
+    imgCache->storeImage(fileName);
+    progressDialog->exec();
+}
 
 #include "ui/workaround/mac_utils.h"
 // -------------------------------------------------------------------------- //
@@ -327,4 +434,18 @@ void QnGeneralPreferencesWidget::at_browseLogsButton_clicked() {
         return;
     }
     QDesktopServices::openUrl(QLatin1String("file:///") + logsLocation);
+}
+
+void QnGeneralPreferencesWidget::at_clearCacheButton_clicked() {
+    QString backgroundImage = qnSettings->backgroundImage();
+    if (!backgroundImage.isEmpty()) {
+        QnLocalFileCache cache;
+        QString path = cache.getFullPath(backgroundImage);
+        QFile lock(path);
+        lock.open(QFile::ReadWrite);
+        QnAppServerFileCache::clearLocalCache();
+        lock.close();
+    } else {
+        QnAppServerFileCache::clearLocalCache();
+    }
 }

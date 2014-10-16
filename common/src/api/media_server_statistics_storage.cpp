@@ -3,6 +3,7 @@
 #include <QtCore/QTimer>
 
 #include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <utils/common/synctime.h>
 
@@ -22,8 +23,9 @@ namespace {
     }
 }
 
-QnMediaServerStatisticsStorage::QnMediaServerStatisticsStorage(const QnMediaServerResourcePtr &server, int pointsLimit, QObject *parent):
+QnMediaServerStatisticsStorage::QnMediaServerStatisticsStorage(const QnUuid &serverId, int pointsLimit, QObject *parent):
     QObject(parent),
+    m_serverId(serverId),
     m_updateRequests(0),
     m_updateRequestHandle(0),
     m_lastId(-1),
@@ -32,7 +34,6 @@ QnMediaServerStatisticsStorage::QnMediaServerStatisticsStorage(const QnMediaServ
     m_pointsLimit(pointsLimit),
     m_updatePeriod(defaultUpdatePeriod),
     m_uptimeMs(0),
-    m_server(server),
     m_timer(new QTimer())
 {
     connect(m_timer, SIGNAL(timeout()), this, SLOT(update()));
@@ -73,7 +74,10 @@ void QnMediaServerStatisticsStorage::setFlagsFilter(Qn::StatisticsDeviceType dev
 }
 
 void QnMediaServerStatisticsStorage::update() {
-    if (!m_listeners || m_updateRequests > 0 || m_server->getStatus() != Qn::Online) {
+    QnMediaServerResourcePtr server = qnResPool->getResourceById(m_serverId).dynamicCast<QnMediaServerResource>();
+    bool canRequest = server && server->getStatus() == Qn::Online;
+
+    if (!m_listeners || m_updateRequests > 0 || !canRequest) {
         m_timeStamp = qnSyncTime->currentMSecsSinceEpoch();
         m_lastId++;
 
@@ -86,12 +90,12 @@ void QnMediaServerStatisticsStorage::update() {
 
     emit statisticsChanged();
 
-    if (!m_listeners)
+    if (!m_listeners || !canRequest)
         return;
 
     if (m_updateRequests == 0 ||
             m_updateRequests * m_updatePeriod > retryTimeoutMs) {
-        m_updateRequestHandle = m_server->apiConnection()->getStatisticsAsync(this, SLOT(at_statisticsReceived(int, const QnStatisticsReply &, int)));
+        m_updateRequestHandle = server->apiConnection()->getStatisticsAsync(this, SLOT(at_statisticsReceived(int, const QnStatisticsReply &, int)));
         m_updateRequests = 0;
     }
     m_updateRequests++;

@@ -6,7 +6,8 @@
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 
-int QnTimeRestHandler::executeGet(const QString &, const QnRequestParams &, QnJsonRestResult &result) {
+int QnTimeRestHandler::executeGet(const QString &, const QnRequestParams &, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
+{
     QnTimeReply reply;
     reply.timeZoneOffset = currentTimeZone() * 1000ll;
     reply.utcTime = qnSyncTime->currentMSecsSinceEpoch();

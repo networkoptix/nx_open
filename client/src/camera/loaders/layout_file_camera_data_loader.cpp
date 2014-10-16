@@ -106,8 +106,9 @@ int QnLayoutFileCameraDataLoader::loadMotion(const QnTimePeriod &period, const Q
     return handle;
 }
 
-int QnLayoutFileCameraDataLoader::load(const QnTimePeriod &period, const QString &filter, const qint64 resolutionMs)
-{
+int QnLayoutFileCameraDataLoader::load(const QnTimePeriod &period, const QString &filter, const qint64 resolutionMs) {
+    Q_UNUSED(resolutionMs)
+
     switch (m_dataType) {
     case Qn::RecordedTimePeriod:
         return loadChunks(period);
@@ -124,7 +125,7 @@ int QnLayoutFileCameraDataLoader::load(const QnTimePeriod &period, const QString
         }
         //TODO: #GDM #Bookmarks intended fall-through to get assert, implement saving and loading bookmarks in layouts and files
     default:
-        assert(false);
+        Q_ASSERT(false);
     }
-    return 0; //should never get here
+    return -1; //should never get here
 }

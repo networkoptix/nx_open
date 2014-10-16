@@ -7,6 +7,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QMutex>
 #include <QtCore/QTimer>
+#include <QtCore/QTime>
 
 #include <server/server_globals.h>
 
@@ -22,6 +23,7 @@
 class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
 class RebuildAsyncTask;
+class QnUuid;
 
 class QnStorageManager: public QObject
 {
@@ -111,6 +113,7 @@ public:
     bool updateBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark);
     bool deleteBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark);
     bool getBookmarks(const QByteArray &cameraGuid, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);
+    void initDone();
 signals:
     void noStoragesAvailable();
     void storageFailure(const QnResourcePtr &storageRes, QnBusiness::EventReason reason);
@@ -148,6 +151,7 @@ private:
     //void minTimeByCamera(const FileCatalogMap &catalogMap, QMap<QString, qint64>& minTimes);
     void updateRecordedMonths(const FileCatalogMap &catalogMap, UsedMonthsMap& usedMonths);
     void findTotalMinTime(const bool useMinArchiveDays, const FileCatalogMap& catalogMap, qint64& minTime, DeviceFileCatalogPtr& catalog);
+    void addDataFromDatabase(const QnStorageResourcePtr &storage);
 private:
     StorageMap m_storageRoots;
     FileCatalogMap m_devFileCatalog[QnServer::ChunksCatalogCount];
@@ -177,6 +181,7 @@ private:
     RebuildAsyncTask* m_asyncRebuildTask;
 
     QMap<QString, QnStorageDbPtr> m_chunksDB;
+    bool m_initInProgress;
 };
 
 #define qnStorageMan QnStorageManager::instance()

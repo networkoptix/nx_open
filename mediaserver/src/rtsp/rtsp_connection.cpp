@@ -595,7 +595,7 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(QnAbstractM
     if (archive.getAudioLayout()->channelCount() == 0 && dataType == QnAbstractMediaData::AUDIO)
         return rez;
 
-    for (int i = 0; i < 20; ++i)
+    for (int i = 0; i < 40; ++i)
     {
         QnConstAbstractMediaDataPtr media = archive.getNextData();
         if (!media)
@@ -1012,6 +1012,16 @@ int QnRtspConnectionProcessor::composePlay()
     if (d->mediaRes == 0)
         return CODE_NOT_FOUND;
 
+    if (!nx_http::getHeaderValue(d->request.headers, "x-media-step").isEmpty())
+        d->liveMode = Mode_ThumbNails;
+    else if (d->rtspScale >= 0 && d->startTime == DATETIME_NOW)
+        d->liveMode = Mode_Live;
+    else
+        d->liveMode = Mode_Archive;
+
+    createDataProvider();
+    checkQuality();
+
     if (d->trackInfo.isEmpty())
     {
         if (nx_http::getHeaderValue(d->request.headers, "x-play-now").isEmpty())
@@ -1029,16 +1039,6 @@ int QnRtspConnectionProcessor::composePlay()
                 d->response.headers.insert( std::make_pair(nx_http::StringType("x-video-layout"), layoutStr.toLatin1()) );
         }
     }
-
-    if (!nx_http::getHeaderValue(d->request.headers, "x-media-step").isEmpty())
-        d->liveMode = Mode_ThumbNails;
-    else if (d->rtspScale >= 0 && d->startTime == DATETIME_NOW)
-        d->liveMode = Mode_Live;
-    else
-        d->liveMode = Mode_Archive;
-
-    createDataProvider();
-    checkQuality();
 
     d->lastPlayCSeq = nx_http::getHeaderValue(d->request.headers, "CSeq").toInt();
 

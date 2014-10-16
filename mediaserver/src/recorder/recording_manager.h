@@ -7,7 +7,10 @@
 
 #include <server/server_globals.h>
 
-#include "core/resource/security_cam_resource.h"
+#include <core/resource/resource_fwd.h>
+
+#include <core/dataprovider/data_provider_factory.h>
+
 #include "core/misc/schedule_task.h"
 #include "mutex/distributed_mutex.h"
 #include "business/business_fwd.h"
@@ -67,6 +70,7 @@ private:
     QnResourceList getLocalControlledCameras();
 
     void beforeDeleteRecorder(const Recorders& recorders);
+    void stopRecorder(const Recorders& recorders);
     void deleteRecorder(const Recorders& recorders, const QnResourcePtr& resource);
     bool updateCameraHistory(const QnResourcePtr& res);
 
@@ -81,6 +85,7 @@ private:
     QMap<QnSecurityCamResourcePtr, qint64> m_delayedStop;
     ec2::QnDistributedMutex* m_licenseMutex;
     int m_tooManyRecordingCnt;
+    qint64 m_recordingStopTime;
 };
 
 class QnServerDataProviderFactory: public QnDataProviderFactory

@@ -1,16 +1,16 @@
 #ifndef BUILD_NUMBER_DIALOG_H
 #define BUILD_NUMBER_DIALOG_H
 
-#include <QDialog>
+#include <ui/dialogs/button_box_dialog.h>
 
 namespace Ui {
 class QnBuildNumberDialog;
 }
 
-class QnBuildNumberDialog : public QDialog {
+class QnBuildNumberDialog : public QnButtonBoxDialog {
     Q_OBJECT
 
-    typedef QDialog base_type;
+    typedef QnButtonBoxDialog base_type;
 public:
     explicit QnBuildNumberDialog(QWidget *parent = 0);
     ~QnBuildNumberDialog();

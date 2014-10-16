@@ -18,6 +18,7 @@ extern "C"
 #include <QtCore/QUrl>
 #include "../common/threadqueue.h"
 #include "utils/camera/camera_diagnostics.h"
+#include <network/authenticate_helper.h>
 
 //#define DEBUG_TIMINGS
 
@@ -215,6 +216,7 @@ public:
     TransportType getTransport() const { return m_transport; }
     QString getTrackFormatByRtpChannelNum(int channelNum);
     TrackType getTrackTypeByRtpChannelNum(int channelNum);
+    int getChannelNum(int rtpChannelNum);
 
     qint64 startTime() const;
     qint64 endTime() const;
@@ -244,13 +246,9 @@ public:
 
     void setProxyAddr(const QString& addr, int port);
 
-    /*
-    * Find track by type ('video', 'audio' e t.c.) and returns track IO device. Returns 0 if track not found.
-    */
-    RTPIODevice* getTrackIoByType(TrackType trackType);
-
-    QString getCodecNameByType(TrackType trackType);
+    QList<QByteArray> getSdpByTrackNum(int trackNum) const;
     QList<QByteArray> getSdpByType(TrackType trackType) const;
+    int getTrackCount(TrackType trackType) const;
 
     int getLastResponseCode() const;
 
@@ -285,21 +283,23 @@ public:
     bool setTCPReadBufferSize(int value);
 
     QString getVideoLayout() const;
+    TrackMap getTrackInfo() const;
+
 signals:
     void gotTextResponse(QByteArray text);
 private:
-    void addRangeHeader(QByteArray& request, qint64 startPos, qint64 endPos);
+    void addRangeHeader( nx_http::Request* const request, qint64 startPos, qint64 endPos );
     QString getTrackFormat(int trackNum) const;
     TrackType getTrackType(int trackNum) const;
     //int readRAWData();
-    QByteArray createDescribeRequest();
+    nx_http::Request createDescribeRequest();
     bool sendDescribe();
     bool sendOptions();
     bool sendSetup();
     bool sendKeepAlive();
 
     bool readTextResponce(QByteArray &responce);
-    void addAuth(QByteArray& request);
+    void addAuth( nx_http::Request* const request );
 
 
     QString extractRTSPParam(const QString &buffer, const QString &paramName);
@@ -307,17 +307,15 @@ private:
 
     void parseSDP();
     void updateTrackNum();
-    void addAdditionAttrs(QByteArray& request);
+    void addAdditionAttrs( nx_http::Request* const request );
     void updateResponseStatus(const QByteArray& response);
 
-    // in case of error return false
-    bool isDigestAuthRequired(const QByteArray& response);
     void usePredefinedTracks();
     bool processTextResponseInsideBinData();
     static QByteArray getGuid();
     void registerRTPChannel(int rtpNum, QSharedPointer<SDPTrackInfo> trackInfo);
     QByteArray calcDefaultNonce() const;
-    QByteArray createPlayRequest( qint64 startPos, qint64 endPos );
+    nx_http::Request createPlayRequest( qint64 startPos, qint64 endPos );
     bool sendPlayInternal(qint64 startPos, qint64 endPos);
 private:
     enum { RTSP_BUFFER_LEN = 1024 * 65 };
@@ -376,6 +374,7 @@ private:
     char* m_additionalReadBuffer;
     int m_additionalReadBufferPos;
     int m_additionalReadBufferSize;
+    HttpAuthenticationClientContext m_rtspAuthCtx;
 
     /*!
         \param readSome if \a true, returns as soon as some data has been read. Otherwise, blocks till all \a bufSize bytes has been read
@@ -387,7 +386,7 @@ private:
         Updates \a m_responseCode member.
         \return error description
     */
-    bool sendRequestAndReceiveResponse( const QByteArray& request, QByteArray& responce );
+    bool sendRequestAndReceiveResponse( nx_http::Request&& request, QByteArray& responce );
 };
 
 #endif //rtp_session_h_1935_h

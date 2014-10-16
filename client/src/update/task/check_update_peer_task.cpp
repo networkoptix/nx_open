@@ -114,11 +114,11 @@ void QnCheckForUpdatesPeerTask::checkUpdateCoverage() {
 }
 
 void QnCheckForUpdatesPeerTask::checkBuildOnline() {
-    QUrl url(m_updateLocationPrefix + QString::number(m_target.version.build()) + lit("/") + buildInformationSuffix);
+    QUrl url(m_updateLocationPrefix + lit("/") + QString::number(m_target.version.build()) + lit("/") + buildInformationSuffix);
 
     nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
     httpClient->setResponseReadTimeoutMs(httpResponseTimeoutMs);
-    QnAsyncHttpClientReply *reply = new QnAsyncHttpClientReply(httpClient, this);
+    QnAsyncHttpClientReply *reply = new QnAsyncHttpClientReply(httpClient);
     connect(reply, &QnAsyncHttpClientReply::finished, this, &QnCheckForUpdatesPeerTask::at_buildReply_finished);
     if (!httpClient->doGet(url))
         finishTask(QnCheckForUpdateResult::InternetProblem);
@@ -143,7 +143,7 @@ void QnCheckForUpdatesPeerTask::checkOnlineUpdates() {
 
     nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
     httpClient->setResponseReadTimeoutMs(httpResponseTimeoutMs);
-    QnAsyncHttpClientReply *reply = new QnAsyncHttpClientReply(httpClient, this);
+    QnAsyncHttpClientReply *reply = new QnAsyncHttpClientReply(httpClient);
     connect(reply, &QnAsyncHttpClientReply::finished, this, &QnCheckForUpdatesPeerTask::at_updateReply_finished);
     if (!httpClient->doGet(m_updatesUrl))
         finishTask(QnCheckForUpdateResult::InternetProblem);
@@ -226,7 +226,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply *r
         return;
     }
 
-    QString urlPrefix = m_updateLocationPrefix + QString::number(m_target.version.build()) + lit("/");
+    QString urlPrefix = m_updateLocationPrefix + lit("/") + QString::number(m_target.version.build()) + lit("/");
 
     QVariantMap packages = map.value(lit("packages")).toMap();
     for (auto platform = packages.begin(); platform != packages.end(); ++platform) {
@@ -284,7 +284,7 @@ void QnCheckForUpdatesPeerTask::at_zipExtractor_finished(int error) {
     zipExtractor->deleteLater();
 
     if (error != QnZipExtractor::Ok) {
-        finishTask(QnCheckForUpdateResult::BadUpdateFile);
+        finishTask(error == QnZipExtractor::NoFreeSpace ? QnCheckForUpdateResult::NoFreeSpace : QnCheckForUpdateResult::BadUpdateFile);
         return;
     }
 

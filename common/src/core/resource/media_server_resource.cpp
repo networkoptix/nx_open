@@ -85,8 +85,10 @@ const QList<QHostAddress>& QnMediaServerResource::getNetAddrList() const
 
 void QnMediaServerResource::setAdditionalUrls(const QList<QUrl> &urls)
 {
-    QMutexLocker lock(&m_mutex);
-    m_additionalUrls = urls;
+    {
+        QMutexLocker lock(&m_mutex);
+        m_additionalUrls = urls;
+    }
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
@@ -98,8 +100,10 @@ QList<QUrl> QnMediaServerResource::getAdditionalUrls() const
 
 void QnMediaServerResource::setIgnoredUrls(const QList<QUrl> &urls)
 {
-    QMutexLocker lock(&m_mutex);
-    m_ignoredUrls = urls;
+    {
+        QMutexLocker lock(&m_mutex);
+        m_ignoredUrls = urls;
+    }
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
@@ -285,6 +289,8 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
             modifiedFields << "panicModeChanged";
         if (m_version != localOther->m_version)
             modifiedFields << "versionChanged";
+        if (m_redundancy != localOther->m_redundancy)
+            modifiedFields << "redundancyChanged";
 
         m_panicMode = localOther->m_panicMode;
 
@@ -336,8 +342,13 @@ int QnMediaServerResource::getMaxCameras() const
 
 void QnMediaServerResource::setRedundancy(bool value)
 {
-    QMutexLocker lock(&m_mutex);
-    m_redundancy = value;
+    {
+        QMutexLocker lock(&m_mutex);
+        if (m_redundancy == value)
+            return;
+        m_redundancy = value;
+    }
+    emit redundancyChanged(::toSharedPointer(this));
 }
 
 int QnMediaServerResource::isRedundancy() const
@@ -412,8 +423,14 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
 }
 
 bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {
-    if (QnMediaServerResource* server = dynamic_cast<QnMediaServerResource*>(resource.data())) 
+    if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
         return (server->getServerFlags() & Qn::SF_Edge);
+    return false;
+}
+
+bool QnMediaServerResource::isHiddenServer(const QnResourcePtr &resource) {
+    if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
+        return (server->getServerFlags() & Qn::SF_Edge) && !server->isRedundancy();
     return false;
 }
 

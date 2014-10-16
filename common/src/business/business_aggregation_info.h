@@ -4,11 +4,29 @@
 #include <business/business_fwd.h>
 #include "business_event_parameters.h"
 
-struct QnInfoDetail {
-    QnInfoDetail(): count(0) {}
 
-    QnBusinessEventParameters runtimeParams;
-    int count;
+class QnBusinessAggregationInfo;
+
+class QnInfoDetail {
+public:
+    QnInfoDetail();
+    QnInfoDetail( const QnInfoDetail& right );
+    QnInfoDetail( const QnBusinessEventParameters& _runtimeParams, int _count );
+    ~QnInfoDetail();
+
+    const QnBusinessEventParameters& runtimeParams() const;
+    void setRuntimeParams( const QnBusinessEventParameters& value );
+    int count() const;
+    void setCount( int value );
+    void setSubAggregationData( const QnBusinessAggregationInfo& value );
+    const QnBusinessAggregationInfo& subAggregationData() const;
+
+    QnInfoDetail& operator=( const QnInfoDetail& right );
+
+private:
+    QnBusinessEventParameters m_runtimeParams;
+    int m_count;
+    QnBusinessAggregationInfo* m_subAggregationData;
 };
 
 class QnBusinessAggregationInfo
@@ -16,7 +34,7 @@ class QnBusinessAggregationInfo
 public:
     QnBusinessAggregationInfo();
 
-    void append(const QnBusinessEventParameters& runtimeParams);
+    void append(const QnBusinessEventParameters& runtimeParams, const QnBusinessAggregationInfo& subAggregationData = QnBusinessAggregationInfo());
     bool isEmpty() const;
     int totalCount() const;
     void clear();

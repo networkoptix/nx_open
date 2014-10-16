@@ -116,6 +116,10 @@ public:
     bool getLastError( SystemError::ErrorCode* errorCode );
     //!Implementation of AbstractSocket::handle
     AbstractSocket::SOCKET_HANDLE handle() const;
+    //!Implementation of AbstractSocket::postImpl
+    bool postImpl( std::function<void()>&& handler );
+    //!Implementation of AbstractSocket::dispatchImpl
+    bool dispatchImpl( std::function<void()>&& handler );
 
 
     /**
@@ -352,6 +356,10 @@ public:
     virtual bool getLastError( SystemError::ErrorCode* errorCode ) override { return m_implDelegate.getLastError( errorCode ); }
     //!Implementation of AbstractSocket::handle
     virtual AbstractSocket::SOCKET_HANDLE handle() const override { return m_implDelegate.handle(); }
+    //!Implementation of AbstractSocket::postImpl
+    virtual bool postImpl( std::function<void()>&& handler ) override { return m_implDelegate.postImpl( std::move(handler) ); }
+    //!Implementation of AbstractSocket::dispatchImpl
+    virtual bool dispatchImpl( std::function<void()>&& handler ) override { return m_implDelegate.dispatchImpl( std::move(handler) ); }
 
     AbstractSocketMethodsImplementorType* implementationDelegate() { return &m_implDelegate; }
     const AbstractSocketMethodsImplementorType* implementationDelegate() const { return &m_implDelegate; }
@@ -513,7 +521,7 @@ public:
 
 protected:
     //!Implementation of AbstractStreamServerSocket::acceptAsyncImpl
-    virtual bool acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )> handler ) override;
+    virtual bool acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) override;
 
 private:
     bool setListen(int queueLen) ;

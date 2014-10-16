@@ -26,6 +26,24 @@
 
 /* [1] Constructors and destructors */
 
+QString SmtpClient::toString( ConnectionType connectionType )
+{
+    switch( connectionType )
+    {
+        case TcpConnection:
+            return lit("TcpConnection");
+        case SslConnection:
+            return lit("SslConnection");
+        case TlsConnection:
+            return lit("TlsConnection");
+        default:
+            assert(false);
+            return lit("unknown");
+    }
+}
+
+
+
 SmtpClient::SmtpClient(const QString & host, int port, ConnectionType connectionType)
 :
     m_socket(nullptr),
@@ -33,7 +51,8 @@ SmtpClient::SmtpClient(const QString & host, int port, ConnectionType connection
     authMethod(AuthPlain),
     connectionTimeout(5000),
     responseTimeout(5000),
-    sendMessageTimeout(60000)
+    sendMessageTimeout(60000),
+    responseCode(0)
 {
     setConnectionType(connectionType);
 
@@ -343,7 +362,7 @@ bool SmtpClient::login(const QString &user, const QString &password, AuthMethod 
     return true;
 }
 
-bool SmtpClient::sendMail(MimeMessage& email)
+bool SmtpClient::sendMail(const MimeMessage& email)
 {
     try
     {
@@ -355,12 +374,12 @@ bool SmtpClient::sendMail(MimeMessage& email)
         if (responseCode != 250) return false;
 
         // Send RCPT command for each recipient
-        QList<EmailAddress*>::const_iterator it, itEnd;
+        QList<EmailAddress>::const_iterator it, itEnd;
         // To (primary recipients)
         for (it = email.getRecipients().begin(), itEnd = email.getRecipients().end();
              it != itEnd; ++it)
         {
-            sendMessage(lit("RCPT TO: <") + (*it)->getAddress() + lit(">"));
+            sendMessage(lit("RCPT TO: <") + it->getAddress() + lit(">"));
             waitForResponse();
 
             if (responseCode != 250) return false;
@@ -370,7 +389,7 @@ bool SmtpClient::sendMail(MimeMessage& email)
         for (it = email.getRecipients(MimeMessage::Cc).begin(), itEnd = email.getRecipients(MimeMessage::Cc).end();
              it != itEnd; ++it)
         {
-            sendMessage(lit("RCPT TO: <") + (*it)->getAddress() + lit(">"));
+            sendMessage(lit("RCPT TO: <") + it->getAddress() + lit(">"));
             waitForResponse();
 
             if (responseCode != 250) return false;
@@ -380,7 +399,7 @@ bool SmtpClient::sendMail(MimeMessage& email)
         for (it = email.getRecipients(MimeMessage::Bcc).begin(), itEnd = email.getRecipients(MimeMessage::Bcc).end();
              it != itEnd; ++it)
         {
-            sendMessage(lit("RCPT TO: <") + (*it)->getAddress() + lit(">"));
+            sendMessage(lit("RCPT TO: <") + it->getAddress() + lit(">"));
             waitForResponse();
 
             if (responseCode != 250) return false;

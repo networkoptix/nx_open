@@ -14,6 +14,7 @@
 #include "utils/network/rtpsession.h"
 
 #include <business/business_fwd.h>
+#include "rtp_stream_parser.h"
 
 
 namespace RtpTransport
@@ -67,41 +68,51 @@ public:
 
     static void setDefaultTransport( const RtpTransport::Value& defaultTransportToUse );
 
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout() const override;
 signals:
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonParamsEncoded);
 
 private:
+
+    struct TrackInfo
+    {
+        TrackInfo(): ioDevice(0), parser(0) {}
+        ~TrackInfo() { delete parser; }
+        RTPIODevice* ioDevice; // external reference. do not delete
+        QnRtpStreamParser* parser;
+    };
+
     QnRtpStreamParser* createParser(const QString& codecName);
-    void initIO(RTPIODevice** ioDevice, QnRtpStreamParser* parser, RTPSession::TrackType mediaType);
-    void setNeedKeyData();
-    void checkIfNeedKeyData();
+    bool gotKeyData(const QnAbstractMediaDataPtr& mediaData);
+    void clearKeyData(int channelNum);
     QnAbstractMediaDataPtr getNextDataUDP();
     QnAbstractMediaDataPtr getNextDataTCP();
     void processTcpRtcp(RTPIODevice* ioDevice, quint8* buffer, int bufferSize, int bufferCapacity);
     void buildClientRTCPReport(quint8 chNumber);
-
+    QnAbstractMediaDataPtr getNextDataInternal();
 private slots:
     void at_packetLost(quint32 prev, quint32 next);
     void at_propertyChanged(const QnResourcePtr & res, const QString & key);
 private:
     RTPSession m_RtpSession;
-    RTPIODevice* m_videoIO;
-    RTPIODevice* m_audioIO;
-    QnRtpVideoStreamParser* m_videoParser;
-    QnRtpAudioStreamParser* m_audioParser;
+    QVector<bool> m_gotKeyDataInfo;
+    QVector<TrackInfo> m_tracks;
 
     QString m_request;
 
     std::vector<QnByteArray*> m_demuxedData;
-    QnAbstractMediaDataPtr m_lastVideoData;
-    QList<QnAbstractMediaDataPtr> m_lastAudioData;
     int m_numberOfVideoChannels;
     QnRtspTimeHelper m_timeHelper;
-    QVector<int> m_gotKeyData;
     bool m_pleaseStop;
     QElapsedTimer m_rtcpReportTimer;
     bool m_gotSomeFrame;
     Qn::ConnectionRole m_role;
+
+    QnCustomResourceVideoLayoutPtr m_customVideoLayout;
+    mutable QMutex m_layoutMutex;
+    QnConstResourceAudioLayoutPtr m_audioLayout;
+    bool m_gotData;
+    QElapsedTimer m_dataTimer;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

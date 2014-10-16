@@ -245,21 +245,14 @@ protected slots:
 
     void at_setCurrentLayoutAspectRatio4x3Action_triggered();
     void at_setCurrentLayoutAspectRatio16x9Action_triggered();
+    void at_setCurrentLayoutAspectRatio3x4Action_triggered();
+    void at_setCurrentLayoutAspectRatio9x16Action_triggered();
     void at_setCurrentLayoutItemSpacing0Action_triggered();
     void at_setCurrentLayoutItemSpacing10Action_triggered();
     void at_setCurrentLayoutItemSpacing20Action_triggered();
     void at_setCurrentLayoutItemSpacing30Action_triggered();
 
     void at_createZoomWindowAction_triggered();
-
-    void at_rotate0Action_triggered();
-    void at_rotate90Action_triggered();
-    void at_rotate180Action_triggered();
-    void at_rotate270Action_triggered();
-
-    void at_radassAutoAction_triggered();
-    void at_radassLowAction_triggered();
-    void at_radassHighAction_triggered();
 
     void at_setAsBackgroundAction_triggered();
     void at_backgroundImageStored(const QString &filename, bool success);
@@ -283,8 +276,6 @@ protected slots:
 
     void at_escapeHotkeyAction_triggered();
 
-    void at_clearCacheAction_triggered();
-
     void at_messageBoxAction_triggered();
 
     void at_browseUrlAction_triggered();
@@ -298,7 +289,6 @@ protected slots:
     void at_cameraListChecked(int status, const QnCameraListReply& reply, int handle);
 private:
     void notifyAboutUpdate();
-    void checkVersionMismatches();
 
     void openLayoutSettingsDialog(const QnLayoutResourcePtr &layout);
 

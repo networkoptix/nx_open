@@ -424,6 +424,8 @@ public:
         ItemHealthMonitoringButtonsRole,            /**< Role for buttons that are checked on each line of Health Monitoring widget. Value of type QnServerResourceWidget::HealthMonitoringButtons. */
         ItemVideowallReviewButtonsRole,             /**< Role for buttons that are checked on each sub-item of the videowall screen widget. Value of type QnVideowallScreenWidget::ReviewButtons. */
 
+        ItemWidgetOptions,                          /**< Role for widget-specific options that should be set before the widget is placed on the scene. */
+
         /* Ptz-based. */
         PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */
         PtzTourRole,                                /**< Role for PTZ tour. Value of type QnPtzTour. */

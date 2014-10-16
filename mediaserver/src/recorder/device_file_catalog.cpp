@@ -1,8 +1,13 @@
+#include "device_file_catalog.h"
 
 #include <QtCore/QDir>
 #include <QtCore/QElapsedTimer>
 
-#include "device_file_catalog.h"
+#include <core/resource/resource.h>
+#include <core/resource/network_resource.h>
+#include <core/resource/storage_resource.h>
+#include <core/resource_management/resource_pool.h>
+
 #include "storage_manager.h"
 #include "utils/common/util.h"
 #include <utils/fs/file.h>
@@ -16,9 +21,7 @@
 #include <QtCore/QDebug>
 #include "recording_manager.h"
 #include <media_server/serverutil.h>
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/resource.h"
-#include <core/resource/storage_resource.h>
+
 #include "utils/common/synctime.h"
 
 #include <recording/time_period.h>
@@ -773,7 +776,19 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endT
 
     QMutexLocker lock(&m_mutex);
     QnTimePeriodList result;
+    if (m_chunks.empty())
+        return result;
+
     ChunkMap::const_iterator itr = qLowerBound(m_chunks.begin(), m_chunks.end(), startTime);
+    /* Checking if we should include a chunk, containing startTime. */
+    if (itr != m_chunks.begin()) {
+        --itr;
+
+        /* Case if previous chunk does not contain startTime. */
+        if (itr->endTimeMs() < startTime)
+            ++itr;
+    }
+
     if (itr == m_chunks.end())
         return result;
 

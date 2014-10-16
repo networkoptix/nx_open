@@ -257,14 +257,33 @@ namespace Qn {
         LightSkin
     };
 
+    enum ClientBackground {
+        NoBackground,
+        DefaultBackground,
+        RainbowBackground,
+        CustomColorBackground,
+        ImageBackground
+    };
+
+    enum ImageBehaviour {
+        StretchImage,
+        CropImage,
+        FitImage,
+        TileImage
+    };
+
 
 } // namespace Qn
 
 Q_DECLARE_METATYPE(Qn::ItemRole)
 Q_DECLARE_METATYPE(Qn::TimeMode)
 Q_DECLARE_METATYPE(Qn::ClientSkin)
+Q_DECLARE_METATYPE(Qn::ClientBackground)
+Q_DECLARE_METATYPE(Qn::ImageBehaviour)
 Q_DECLARE_METATYPE(Qn::NodeType)
 
 QN_FUSION_DECLARE_FUNCTIONS(Qn::ClientSkin, (lexical))
+QN_FUSION_DECLARE_FUNCTIONS(Qn::ClientBackground, (lexical))
+QN_FUSION_DECLARE_FUNCTIONS(Qn::ImageBehaviour, (lexical))
 
 #endif // QN_CLIENT_GLOBALS_H

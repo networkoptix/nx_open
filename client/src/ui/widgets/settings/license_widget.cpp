@@ -201,4 +201,6 @@ void QnLicenseWidget::at_browseLicenseFileButton_clicked() {
     if (m_activationKey.isEmpty()) {
         setWarningStyle(ui->fileLineEdit);
     }
+
+    updateControls();
 }

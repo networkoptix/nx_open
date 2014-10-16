@@ -45,12 +45,12 @@ void QnEventSerializer::deserialize(QnBusinessActionDataListPtr& eventsPtr, cons
         action.setAggregationCount(readInt(curPtr));
         int runTimeParamsLen = readInt(curPtr);
         QByteArray ba = QByteArray::fromRawData((const char*)curPtr, runTimeParamsLen);
-        action.setRuntimeParams(QnBusinessEventParameters::deserialize(ba));
+        action.setRuntimeParams(QnBusinessEventParameters::unpack(ba));
         curPtr += runTimeParamsLen;
 
         int actionParamsLen = readInt(curPtr);
         ba = QByteArray::fromRawData((const char*)curPtr, actionParamsLen);
-        action.setParams(QnBusinessActionParameters::deserialize(ba));
+        action.setParams(QnBusinessActionParameters::unpack(ba));
         curPtr += actionParamsLen;
 
     }

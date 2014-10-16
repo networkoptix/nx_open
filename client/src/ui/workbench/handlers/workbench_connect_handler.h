@@ -43,6 +43,9 @@ private:
     QnGraphicsMessageBox* m_connectingMessageBox;
     QPointer<QnLoginDialog> m_loginDialog;
     int m_connectingHandle;
+
+    /** Flag that we should handle new connection. */
+    bool m_readyForConnection;
 };
 
 #endif // WORKBENCH_CONNECT_HANDLER_H

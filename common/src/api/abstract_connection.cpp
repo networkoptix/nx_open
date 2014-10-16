@@ -76,7 +76,7 @@ QString QnAbstractConnection::objectName(int object) const {
 }
 
 int QnAbstractConnection::sendAsyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, const char *replyTypeName, QObject *target, const char *slot) {
-    QnAbstractReplyProcessor *processor = newReplyProcessor(object);
+    QnAbstractReplyProcessor *processor = nullptr;
 
     if (target && slot) {
         QByteArray signal;
@@ -85,6 +85,7 @@ int QnAbstractConnection::sendAsyncRequest(int operation, int object, const QnRe
         } else {
             signal = lit("%1finished(int, const %2 &, int, const QString &)").arg(QSIGNAL_CODE).arg(QLatin1String(replyTypeName)).toLatin1();
         }
+        processor = newReplyProcessor(object);
         processor->connect(signal.constData(), target, slot, Qt::QueuedConnection);
     }
 
@@ -101,7 +102,7 @@ int QnAbstractConnection::sendAsyncRequest(int operation, int object, const QnRe
     return QnSessionManager::instance()->sendAsyncRequest(
         operation,
         url,
-        objectName(processor->object()), 
+        objectName(object), 
         actualHeaders, 
         params, 
         data,

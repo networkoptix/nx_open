@@ -552,10 +552,7 @@ void QnVideowallManageWidgetPrivate::submitToResource(const QnVideoWallResourceP
     QnVideoWallPcData pcData;
     pcData.uuid = pcUuid;
     pcData.screens = localScreens;
-    if (!videowall->pcs()->hasItem(pcUuid))
-        videowall->pcs()->addItem(pcData);
-    else
-        videowall->pcs()->updateItem(pcUuid, pcData);
+    videowall->pcs()->addOrUpdateItem(pcData);
 
     /* Form list of items currently attached to this PC. */
     QSet<QnUuid> existingIds;
@@ -581,11 +578,7 @@ void QnVideowallManageWidgetPrivate::submitToResource(const QnVideoWallResourceP
             item = videowall->items()->getItem(modelItem.id);
         }
         item.screenSnaps = modelItem.snaps;
-
-        if (videowall->items()->hasItem(modelItem.id))
-            videowall->items()->updateItem(modelItem.id, item);
-        else
-            videowall->items()->addItem(item);
+        videowall->items()->addOrUpdateItem(item);
     }
 
     /* Delete other items. */ 

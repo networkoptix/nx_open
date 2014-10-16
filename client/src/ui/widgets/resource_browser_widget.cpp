@@ -227,6 +227,9 @@ QnResourceBrowserWidget::~QnResourceBrowserWidget() {
 
     ui->searchTreeWidget->setWorkbench(NULL);
     ui->resourceTreeWidget->setWorkbench(NULL);
+
+    /* Workaround against #3797 */
+    ui->typeComboBox->setEnabled(false);
 }
 
 QComboBox *QnResourceBrowserWidget::typeComboBox() const {

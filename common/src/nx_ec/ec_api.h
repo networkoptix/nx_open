@@ -501,17 +501,16 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode, const QnUserResourceList&)
         */
-        template<class TargetType, class HandlerType> int getUsers( TargetType* target, HandlerType handler ) {
-            return getUsers( std::static_pointer_cast<impl::GetUsersHandler>(
+        template<class TargetType, class HandlerType> int getUsers(const QnUuid& userId, TargetType* target, HandlerType handler ) {
+            return getUsers(userId, std::static_pointer_cast<impl::GetUsersHandler>(
                 std::make_shared<impl::CustomGetUsersHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-        ErrorCode getUsersSync(QnUserResourceList* const userList ) {
+        ErrorCode getUsersSync(const QnUuid& userId, QnUserResourceList* const userList ) {
             using namespace std::placeholders;
-            int(AbstractUserManager::*fn)(impl::GetUsersHandlerPtr) = &AbstractUserManager::getUsers;
-            return impl::doSyncCall<impl::GetUsersHandler>( std::bind(fn, this, _1), userList );
+            int(AbstractUserManager::*fn)(const QnUuid&, impl::GetUsersHandlerPtr) = &AbstractUserManager::getUsers;
+            return impl::doSyncCall<impl::GetUsersHandler>(std::bind(fn, this, userId, _1), userList );
         }
-
 
         /*!
             \param handler Functor with params: (ErrorCode)
@@ -533,7 +532,7 @@ namespace ec2
         void removed( QnUuid id );
 
     private:
-        virtual int getUsers( impl::GetUsersHandlerPtr handler ) = 0;
+        virtual int getUsers(const QnUuid& userId, impl::GetUsersHandlerPtr handler ) = 0;
         virtual int save( const QnUserResourcePtr& resource, impl::AddUserHandlerPtr handler ) = 0;
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) = 0;
     };
@@ -708,8 +707,9 @@ namespace ec2
         Q_OBJECT
     public:
         enum ReplyCode {
-            Finished = -1,
-            Failed = -2
+            NoError = -1,
+            UnknownError = -2,
+            NoFreeSpace = -3
         };
 
         virtual ~AbstractUpdatesManager() {}

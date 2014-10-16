@@ -22,7 +22,7 @@ namespace ec2 {
         QList<QnUuid> discoverers;
     };
 
-#define ApiModuleData_Fields (type)(customization)(id)(systemName)(version)(systemInformation)(addresses)(port)(name)(sslAllowed)(authHash)(isAlive)(discoverers)
+#define ApiModuleData_Fields (type)(id)(systemName)(version)(systemInformation)(addresses)(port)(isAlive)(discoverers)(customization)(name)(sslAllowed)(authHash)
 
 } // namespace ec2
 

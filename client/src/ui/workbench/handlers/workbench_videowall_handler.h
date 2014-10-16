@@ -79,12 +79,16 @@ private:
     bool deleteShortcut(const QnVideoWallResourcePtr &videowall);
 
     void setItemOnline(const QnUuid &instanceGuid, bool online);
+    void setItemControlledBy(const QnUuid &layoutId, const QnUuid &controllerId, bool on);
     void updateMainWindowGeometry(const QnScreenSnaps &screenSnaps);
 
     void updateControlLayout(const QnVideoWallResourcePtr &videowall, const QnVideoWallItem &item, ItemAction action);
     void updateReviewLayout(const QnVideoWallResourcePtr &videowall, const QnVideoWallItem &item, ItemAction action);
 
     bool validateLicenses(const QString &detail) const;
+
+    /** Returns id of the running client that is currently controlling provided layout. */
+    QnUuid getLayoutController(const QnUuid &layoutId);
 private slots:
 
     void at_newVideoWallAction_triggered();
@@ -150,6 +154,9 @@ private slots:
     void at_controlModeCacheTimer_timeout();
 
     void submitDelayedItemOpen();
+
+    /** Handle RADASS resolution change if in control mode. */
+    void controlResolutionMode(Qn::ResolutionMode resolutionMode);
 
     void saveVideowall(const QnVideoWallResourcePtr& videowall, bool saveLayout = false);
     void saveVideowalls(const QSet<QnVideoWallResourcePtr> &videowalls, bool saveLayout = false);

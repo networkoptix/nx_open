@@ -125,6 +125,7 @@ QnMetaDataV1Ptr AVPanoramicClientPullSSTFTPStreamreader::getCameraMetadata()
 
 QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 {
+    updateCameraParams();
 
     if (m_motionData > 0)
     {

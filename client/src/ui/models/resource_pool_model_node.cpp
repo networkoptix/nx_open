@@ -4,6 +4,8 @@
 #include <common/common_module.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/resource.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/videowall_resource.h>
@@ -193,9 +195,14 @@ void QnResourcePoolModelNode::update() {
         if (!index.isNull()) {
             QnVideoWallItem item = index.item();
 
-            if (item.online) {
-                m_status = Qn::Online;
-                m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallItem);              
+            if (item.runtimeStatus.online) {
+                if (item.runtimeStatus.controlledBy.isNull() || item.runtimeStatus.controlledBy == qnCommon->moduleGUID()){
+                    m_status = Qn::Online;
+                    m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallItem);              
+                } else {
+                    m_status = Qn::Unauthorized;
+                    m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Unauthorized);
+                }
             }
 
             if(m_resource.isNull()) {
@@ -325,7 +332,7 @@ bool QnResourcePoolModelNode::calculateBastard() const {
                 return true;
             
             /* Hide edge servers, camera will be displayed instead. */
-            if (QnMediaServerResource::isEdgeServer(m_resource))
+            if (QnMediaServerResource::isHiddenServer(m_resource))
                 return true;
         }
         return false;

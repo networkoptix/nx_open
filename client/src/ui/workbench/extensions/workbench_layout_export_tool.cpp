@@ -196,7 +196,7 @@ bool QnLayoutExportTool::start() {
             background.save(imageFile.data(), "png");
 
             QnLocalFileCache localCache;
-            localCache.storeImage(m_layout->backgroundImageFilename(), background);
+            localCache.storeImageData(m_layout->backgroundImageFilename(), background);
         }
     }
 

@@ -200,6 +200,7 @@ public:
     QnKvPairList getProperties() const;
 
     static QnInitResPool* initAsyncPoolInstance();
+    static bool isStopping() { return m_appStopping; }
 
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param) const;

@@ -44,6 +44,7 @@ protected:
 private slots:
     void updateGeometry();
     void updateDisplay();
+    void updateDefaultBackground(int settingsId);
 
     void at_context_userChanged();
     void at_imageLoaded(const QString& filename, bool ok);

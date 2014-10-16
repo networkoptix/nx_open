@@ -124,12 +124,12 @@ namespace aio
                     //    ++m_nextWriteSocketIndex;
                     //}
                 }
-                else if( m_nextReadSocketIndex != pollSetImpl->readSockets.end() )
+                else if( m_nextReadSocketIndex != pollSetImpl->readSockets.cend() )
                 {
                     currentSocket = *m_nextReadSocketIndex;
                     ++m_nextReadSocketIndex;
                 }
-                else if( m_nextWriteSocketIndex != pollSetImpl->writeSockets.end() )
+                else if( m_nextWriteSocketIndex != pollSetImpl->writeSockets.cend() )
                 {
                     currentSocket = *m_nextWriteSocketIndex;
                     ++m_nextWriteSocketIndex;

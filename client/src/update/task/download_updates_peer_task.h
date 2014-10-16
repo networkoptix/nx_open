@@ -13,6 +13,7 @@ public:
     enum ErrorCode {
         NoError = 0,
         DownloadError,
+        NoFreeSpaceError,
         FileError
     };
 

@@ -114,7 +114,7 @@ bool QnActiStreamReader::isStreamOpened() const
 
 void QnActiStreamReader::pleaseStop()
 {
-    QnLongRunnable::pleaseStop();
+    CLServerPushStreamReader::pleaseStop();
     m_multiCodec.pleaseStop();
 }
 
