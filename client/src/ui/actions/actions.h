@@ -835,6 +835,16 @@ namespace Qn {
         SetCurrentLayoutAspectRatio4x3Action,
 
         /**
+         * Sets aspect ratio of current layout's cells to 9x16.
+         */
+        SetCurrentLayoutAspectRatio9x16Action,
+
+        /**
+         * Sets aspect ratio of current layout's cells to 3x4.
+         */
+        SetCurrentLayoutAspectRatio3x4Action,
+
+        /**
          * Sets spacing of current layout's cells to 0%.
          */
         SetCurrentLayoutItemSpacing0Action,
