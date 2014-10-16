@@ -1,6 +1,7 @@
 #include "mobile_client_message_processor.h"
 
 #include "core/resource/resource.h"
+#include "core/resource_management/resource_pool.h"
 #include "api/app_server_connection.h"
 #include "common/common_module.h"
 
@@ -33,7 +34,12 @@ void QnMobileClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &co
 }
 
 void QnMobileClientMessageProcessor::updateResource(const QnResourcePtr &resource) {
-    qDebug() << "resource update " << resource->getName() << resource->getUrl();
+    QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId());
+
+    if (ownResource)
+        ownResource->update(resource);
+    else
+        qnResPool->addResource(resource);
 }
 
 void QnMobileClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) {

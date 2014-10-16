@@ -48,6 +48,7 @@ Item {
             id: address
             placeholderText: qsTr("Server address")
             width: parent.width
+            text: "127.0.0.1"
         }
         QnTextField {
             id: port
@@ -73,12 +74,14 @@ Item {
             id: login
             placeholderText: qsTr("User name")
             width: parent.width
+            text: "admin"
         }
         QnTextField {
             id: password
             placeholderText: qsTr("Password")
             echoMode: TextInput.Password
             width: parent.width
+            text: "123"
         }
 
     }
