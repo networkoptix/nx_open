@@ -40,16 +40,23 @@ QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(const QnResourcePtr& 
 
 void QnPlAVClinetPullStreamReader::at_resourceInitDone(const QnResourcePtr &resource)
 {
-    if (resource->isInitialized())
+    if (resource->isInitialized()) {
+        QMutexLocker lock (&m_needUpdateMtx);
         m_needUpdateParams = true;
+    }
 }
 
 void QnPlAVClinetPullStreamReader::updateCameraParams()
 {
-    if (m_needUpdateParams) {
+    bool needUpdate;
+    {
+        QMutexLocker lock (&m_needUpdateMtx);
+        needUpdate = m_needUpdateParams;
         m_needUpdateParams = false;
-        updateStreamParamsBasedOnQuality();  // to update stream params
     }
+
+    if (needUpdate)
+        updateStreamParamsBasedOnQuality();  // to update stream params
 }
 
 QnPlAVClinetPullStreamReader::~QnPlAVClinetPullStreamReader()

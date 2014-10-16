@@ -36,6 +36,7 @@ protected:
     // but will slow down a bit coz of extra memcpy ( I think not much )
     QnByteArray m_videoFrameBuff; 
     bool m_needUpdateParams;
+    mutable QMutex m_needUpdateMtx;
 };
 
 #endif
