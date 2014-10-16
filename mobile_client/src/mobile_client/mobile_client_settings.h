@@ -11,6 +11,7 @@ class QnMobileClientSettings : public QnPropertyStorage, public Singleton<QnMobi
 
 public:
     enum Variable {
+        SavedSessions,
         VariableCount
     };
 
@@ -18,6 +19,25 @@ public:
 
     void load();
     void save();
+
+    bool isWritable() const;
+
+protected:
+    virtual void updateValuesFromSettings(QSettings *settings, const QList<int> &ids) override;
+
+    virtual QVariant readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) override;
+    virtual void writeValueToSettings(QSettings *settings, int id, const QVariant &value) const override;
+
+    virtual UpdateStatus updateValue(int id, const QVariant &value) override;
+
+private:
+    QN_BEGIN_PROPERTY_STORAGE(VariableCount)
+        QN_DECLARE_RW_PROPERTY(QVariantList,            savedSessions,      setSavedSessions,       SavedSessions,        QVariantList())
+    QN_END_PROPERTY_STORAGE()
+
+private:
+    QSettings *m_settings;
+    bool m_loading;
 };
 
 #define qnSettings (QnMobileClientSettings::instance())

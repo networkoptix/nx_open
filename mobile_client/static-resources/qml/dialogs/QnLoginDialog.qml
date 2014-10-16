@@ -17,6 +17,12 @@ Item {
         colorGroup: SystemPalette.Active
     }
 
+    property int __currentIndex: -1
+
+    QnContextSettings {
+        id: settings
+    }
+
     /* backgorund */
     Rectangle {
         anchors.fill: parent
@@ -36,66 +42,158 @@ Item {
         sourceSize.height: parent.height / 2
     }
 
-    Column {
-        id: fieldsColumn
+    Item {
+        id: savedSessions
 
-        y: parent.height / 2
-        anchors.horizontalCenter: parent.horizontalCenter
-        width: parent.width * 2 / 3
-        spacing: CommonFunctions.dp(8)
+        anchors.top: logo.bottom
+        anchors.bottom: parent.bottom
+        width: parent.width
 
-        QnTextField {
-            id: address
-            placeholderText: qsTr("Server address")
-            width: parent.width
-            text: "127.0.0.1"
+        ListView {
+            id: savedSessionsList
+
+            anchors.centerIn: parent
+            width: parent.width * 2 / 3
+            height: parent.height / 3
+
+            delegate: Item {
+                width: savedSessionsList.width
+                height: label.height + CommonFunctions.dp(8)
+
+                Text {
+                    id: label
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: modelData.name
+                    renderType: Text.NativeRendering
+                    color: __syspal.windowText
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        __currentIndex = index
+                        LoginDialogFunctions.updateUi(modelData)
+                        loginDialog.state = "EDIT"
+                    }
+                }
+            }
         }
-        QnTextField {
-            id: port
-            leftPadding: portLabel.width + CommonFunctions.dp(8)
-            width: parent.width
+    }
 
-            Text {
-                id: portLabel
-                anchors.verticalCenter: parent.verticalCenter
-                x: port.textPadding
-                text: qsTr("Port")
-                color: colorTheme.color("inputPlaceholderText")
-                renderType: Text.NativeRendering
+    Item {
+        id: newSession
+
+        anchors.top: logo.bottom
+        anchors.bottom: parent.bottom
+        anchors.left: savedSessions.right
+        width: parent.width
+
+        Column {
+            id: fieldsColumn
+
+
+            anchors.centerIn: parent
+            width: parent.width * 2 / 3
+            spacing: CommonFunctions.dp(8)
+
+            QnTextField {
+                id: name
+                placeholderText: qsTr("Session name")
+                width: parent.width
             }
 
-            validator: IntValidator {
-                bottom: 1
-                top: 65535
+            QnTextField {
+                id: address
+                placeholderText: qsTr("Server address")
+                width: parent.width
             }
-            text: "7001"
-        }
-        QnTextField {
-            id: login
-            placeholderText: qsTr("User name")
-            width: parent.width
-            text: "admin"
-        }
-        QnTextField {
-            id: password
-            placeholderText: qsTr("Password")
-            echoMode: TextInput.Password
-            width: parent.width
-            text: "123"
-        }
 
+            QnTextField {
+                id: port
+                leftPadding: portLabel.width + CommonFunctions.dp(8)
+                width: parent.width
+
+                Text {
+                    id: portLabel
+                    anchors.verticalCenter: parent.verticalCenter
+                    x: port.textPadding
+                    text: qsTr("Port")
+                    color: colorTheme.color("inputPlaceholderText")
+                    renderType: Text.NativeRendering
+                }
+
+                validator: IntValidator {
+                    bottom: 1
+                    top: 65535
+                }
+                text: "7001"
+            }
+
+            QnTextField {
+                id: login
+                placeholderText: qsTr("User name")
+                width: parent.width
+            }
+
+            QnTextField {
+                id: password
+                placeholderText: qsTr("Password")
+                echoMode: TextInput.Password
+                width: parent.width
+            }
+
+        }
     }
 
     QnRoundButton {
         id: loginButton
         anchors {
             bottom: parent.bottom
-            right: fieldsColumn.right
+            right: parent.right
             bottomMargin: parent.width - (x + width)
+            rightMargin: parent.width / 6
         }
         color: "#0096ff"
 
         icon: "/images/right.png"
-        onClicked: connectionManager.connectToServer(LoginDialogFunctions.makeUrl(address.text, port.text, login.text, password.text))
+        onClicked: {
+            LoginDialogFunctions.saveCurrentSession()
+            connectionManager.connectToServer(LoginDialogFunctions.makeUrl(address.text, port.text, login.text, password.text))
+        }
+    }
+
+    states: [
+        State {
+            name: "CHOOSE"
+            PropertyChanges {
+                target: savedSessions
+                x: 0
+            }
+        },
+        State {
+            name: "EDIT"
+            PropertyChanges {
+                target: savedSessions
+                x: -loginDialog.width
+            }
+        }
+    ]
+
+    transitions: [
+        Transition {
+            from: "CHOOSE"
+            to: "EDIT"
+            NumberAnimation {
+                target: savedSessions
+                property: "x"
+                easing.type: Easing.OutQuad
+                duration: 200
+            }
+        }
+    ]
+
+    Component.onCompleted: {
+        savedSessionsList.model = settings.savedSessions()
+        state = savedSessionsList.count > 0 ? "CHOOSE" : "EDIT"
     }
 }
