@@ -412,7 +412,7 @@ namespace aio
             for( typename PollSetType::const_iterator
                 it = pollSet.begin();
                 it != pollSet.end();
-                ++it )
+                 )
             {
                 //no need to lock aioServiceMutex, since data is removed in this thread only
                 std::shared_ptr<AIOEventHandlingData<SocketType>> handlingData = static_cast<AIOEventHandlingDataHolder<SocketType>*>(it.userData())->data;
@@ -421,9 +421,14 @@ namespace aio
                 if( handlingData->markedForRemoval.load() > 0 ) //socket has been removed from watch
                 {
                     handlingData->beingProcessed.deref();
+                    ++it;
                     continue;
                 }
-                handlingData->eventHandler->eventTriggered( it.socket(), it.eventType() );
+                SocketType* const socket = it.socket();
+                aio::EventType sockEventType = it.eventType();
+                ++it;
+                //eventTriggered is allowed to call removeFromWatch which can remove socket from pollset
+                handlingData->eventHandler->eventTriggered( socket, sockEventType );
                 if( handlingData->timeout > 0 )
                     handlingData->updatedPeriodicTaskClock = curClock + handlingData->timeout;      //updating socket's periodic task (it's garanteed that there is periodic task for socket)
                 handlingData->beingProcessed.deref();
@@ -514,8 +519,9 @@ namespace aio
         {
             while( !postedCalls.empty() )
             {
-                postedCalls.begin()->postHandler();
+                auto postHandler = std::move( postedCalls.begin()->postHandler );
                 postedCalls.erase( postedCalls.begin() );
+                postHandler();
             }
         }
 
