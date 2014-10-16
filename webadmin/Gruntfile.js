@@ -186,7 +186,7 @@ module.exports = function (grunt) {
                 {
                     context: '/api/',
                     host: '192.168.56.101',
-                    port: 7001,
+                    port: 7002,
                     headers: {
                         "Authorization": "Basic YWRtaW46MTIz" //admin:123
                     }
@@ -194,7 +194,7 @@ module.exports = function (grunt) {
                 {
                     context: '/ec2/',
                     host: '192.168.56.101',
-                    port: 7001,
+                    port: 7002,
                     headers: {
                         "Authorization": "Basic YWRtaW46MTIz" //admin:123
                     }
