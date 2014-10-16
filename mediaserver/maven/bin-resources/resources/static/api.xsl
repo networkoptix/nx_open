@@ -77,7 +77,7 @@
                         </nav> <div class="col-xs-8">
                             <xsl:for-each select="apidoc/groups/group">
                                 <xsl:variable name="groupName"
-                                    select="translate(groupName, ' ', '_')"/>
+                                    select="translate(groupName, ' ()', '___')"/>
                                 <xsl:variable name="urlPrefix" select="urlPrefix"/>
                                 <section style="padding-top: 40px; margin-top: -40px;">
                                     <xsl:attribute name="id">group_<xsl:value-of select="$groupName"
