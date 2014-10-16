@@ -43,7 +43,7 @@ QVariant QnPlainResourceModelNode::data(int role) const {
     case Qn::NodeTypeRole:
         return type();
     case Qn::UuidRole:
-        return id().getQUuid();
+        return id().toString();
     case Qn::ServerResourceRole:
         return QVariant::fromValue(server());
     case Qn::ServerNameRole:

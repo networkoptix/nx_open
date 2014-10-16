@@ -41,6 +41,7 @@ Item {
                 delegate: QnResourceItemDelegate {
                     name: display
                     type: nodeType
+                    resourceId: uuid
 
                     width: {
                         if (nodeType == 0)

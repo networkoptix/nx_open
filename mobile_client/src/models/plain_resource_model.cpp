@@ -38,6 +38,7 @@ QHash<int, QByteArray> QnPlainResourceModel::roleNames() const {
 
     roleNames[Qn::NodeTypeRole] = Qn::roleName(Qn::NodeTypeRole);
     roleNames[Qn::ThumbnailRole] = Qn::roleName(Qn::ThumbnailRole);
+    roleNames[Qn::UuidRole] = Qn::roleName(Qn::UuidRole);
 
     return roleNames;
 }
