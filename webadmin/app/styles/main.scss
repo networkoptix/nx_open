@@ -327,6 +327,17 @@ body {
   padding: 0 15px;
   white-space: nowrap;
   overflow:hidden;
-  max-width: 270px;
   text-overflow: ellipsis;
+}
+
+@media (min-width: 786px) {
+  .navbar-brand {
+    max-width: 270px;
+  }
+}
+@media (min-width: 992px) {
+
+  .navbar-brand {
+    max-width: 320px;
+  }
 }
