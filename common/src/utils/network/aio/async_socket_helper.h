@@ -83,7 +83,7 @@ public:
         , m_asyncSendIssued( false )
 #endif
     {
-        assert( m_socket );
+        assert( this->m_socket );
         assert( m_abstractSocketPtr );
     }
 
@@ -104,8 +104,7 @@ public:
 
     void terminate()
     {
-        terminateAsyncIO();
-
+        this->terminateAsyncIO();
         //TODO #ak what's the difference of this method from cancelAsyncIO( aio::etNone ) ?
 
         //cancel ongoing async I/O. Doing this only if AsyncSocketImplHelper::eventTriggered is down the stack
@@ -113,19 +112,19 @@ public:
         if( m_threadHandlerIsRunningIn.load(std::memory_order_relaxed) == QThread::currentThreadId() )
         {
             if( m_connectSendHandlerTerminatedFlag )
-                aio::AIOService::instance()->removeFromWatch( m_socket, aio::etWrite );
+                aio::AIOService::instance()->removeFromWatch( this->m_socket, aio::etWrite );
             if( m_recvHandlerTerminatedFlag )
-                aio::AIOService::instance()->removeFromWatch( m_socket, aio::etRead );
+                aio::AIOService::instance()->removeFromWatch( this->m_socket, aio::etRead );
             if( m_timerHandlerTerminatedFlag )
-                aio::AIOService::instance()->removeFromWatch( m_socket, aio::etTimedOut );
+                aio::AIOService::instance()->removeFromWatch( this->m_socket, aio::etTimedOut );
             //TODO #ak not sure whether this call always necessary
-            aio::AIOService::instance()->cancelPostedCalls( m_socket );
+            aio::AIOService::instance()->cancelPostedCalls( this->m_socket );
         }
         else
         {
             //checking that socket is not registered in aio
             Q_ASSERT_X(
-                !aio::AIOService::instance()->isSocketBeingWatched( m_socket ),
+                !aio::AIOService::instance()->isSocketBeingWatched( this->m_socket ),
                 Q_FUNC_INFO,
                 "You MUST cancel running async socket operation before deleting socket if you delete socket from non-aio thread" );
         }
@@ -133,7 +132,7 @@ public:
 
     bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )
     {
-        if( m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
+        if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
         {
             //socket has been terminated, no async call possible. 
             //Returning true to trick calling party: let it think everything OK and
@@ -163,12 +162,12 @@ public:
 
         QMutexLocker lk( aio::AIOService::instance()->mutex() );
         ++m_connectSendAsyncCallCounter;
-        return aio::AIOService::instance()->watchSocketNonSafe( m_socket, aio::etWrite, this );
+        return aio::AIOService::instance()->watchSocketNonSafe( this->m_socket, aio::etWrite, this );
     }
 
     bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
     {
-        if( m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
+        if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
             return true;
 
         static const int DEFAULT_RESERVE_SIZE = 4 * 1024;
@@ -182,12 +181,12 @@ public:
 
         QMutexLocker lk( aio::AIOService::instance()->mutex() );
         ++m_recvAsyncCallCounter;
-        return aio::AIOService::instance()->watchSocketNonSafe( m_socket, aio::etRead, this );
+        return aio::AIOService::instance()->watchSocketNonSafe( this->m_socket, aio::etRead, this );
     }
 
     bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
     {
-        if( m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
+        if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
             return true;
 
         assert( buf.size() > 0 );
@@ -205,19 +204,19 @@ public:
 
         QMutexLocker lk( aio::AIOService::instance()->mutex() );
         ++m_connectSendAsyncCallCounter;
-        return aio::AIOService::instance()->watchSocketNonSafe( m_socket, aio::etWrite, this );
+        return aio::AIOService::instance()->watchSocketNonSafe( this->m_socket, aio::etWrite, this );
     }
 
     bool registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler )
     {
-        if( m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
+        if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
             return true;
 
         m_timerHandler = std::move( handler );
 
         QMutexLocker lk( aio::AIOService::instance()->mutex() );
         ++m_registerTimerCallCounter;
-        return aio::AIOService::instance()->watchSocketNonSafe( m_socket, aio::etTimedOut, this, timeoutMs );
+        return aio::AIOService::instance()->watchSocketNonSafe( this->m_socket, aio::etTimedOut, this, timeoutMs );
     }
 
     void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion )
@@ -227,11 +226,11 @@ public:
             cancelAsyncIO( aio::etRead, waitForRunningHandlerCompletion );
             cancelAsyncIO( aio::etWrite, waitForRunningHandlerCompletion );
             cancelAsyncIO( aio::etTimedOut, waitForRunningHandlerCompletion );
-            aio::AIOService::instance()->cancelPostedCalls( m_socket, waitForRunningHandlerCompletion );
+            aio::AIOService::instance()->cancelPostedCalls( this->m_socket, waitForRunningHandlerCompletion );
             return;
         }
 
-        aio::AIOService::instance()->removeFromWatch( m_socket, eventType, waitForRunningHandlerCompletion );
+        aio::AIOService::instance()->removeFromWatch( this->m_socket, eventType, waitForRunningHandlerCompletion );
         std::atomic_thread_fence( std::memory_order_acquire );
         if( m_threadHandlerIsRunningIn.load( std::memory_order_relaxed ) == QThread::currentThreadId() )
         {

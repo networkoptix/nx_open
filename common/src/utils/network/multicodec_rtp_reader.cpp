@@ -369,7 +369,7 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
     return result;
 }
 
-void QnMulticodecRtpReader::at_propertyChanged(const QnResourcePtr & res, const QString & key)
+void QnMulticodecRtpReader::at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key)
 {
     if (key == QnMediaResource::rtpTransportKey())
         closeStream();
