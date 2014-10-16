@@ -45,7 +45,7 @@
                             <ul class="nav nav-stacked fixed" id="sidebar">
                                 <xsl:for-each select="/apidoc/groups/group">
                                     <xsl:variable name="groupName"
-                                        select="translate(groupName, ' ', '_')"/>
+                                        select="translate(groupName, ' ()', '___')"/>
                                     <xsl:variable name="urlPrefix" select="urlPrefix"/>
                                     <li>
                                         <a>
