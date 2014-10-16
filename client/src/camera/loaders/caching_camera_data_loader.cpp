@@ -74,10 +74,6 @@ void QnCachingCameraDataLoader::initLoaders(QnAbstractCameraDataLoader **loaders
                 at_loader_ready(data, dataType);
             });
 
-            connect(loader, &QnAbstractCameraDataLoader::intermediate,  this,  [this, dataType](const QnAbstractCameraDataPtr &data){ 
-                at_loader_ready(data, dataType);
-            });
-
             connect(loader, &QnAbstractCameraDataLoader::failed,        this,  [this, dataType] {
                 at_loader_failed(dataType);
             });

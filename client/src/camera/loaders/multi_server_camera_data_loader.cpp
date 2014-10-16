@@ -56,14 +56,17 @@ void QnMultiServerCameraDataLoader::discardCachedData(const qint64 resolutionMs)
         loader->discardCachedData(resolutionMs);
 }
 
-int QnMultiServerCameraDataLoader::loadInternal(const QnMediaServerResourcePtr &mServer, const QnNetworkResourcePtr &networkResource, const QnTimePeriod &period, const QString &filter, const qint64 resolutionMs) {
+int QnMultiServerCameraDataLoader::loadInternal(const QnMediaServerResourcePtr &server, const QnNetworkResourcePtr &camera, const QnTimePeriod &period, const QString &filter, const qint64 resolutionMs) {
+    if (!server || server->getStatus() != Qn::Online)
+        return -1;
+
     QnAbstractCameraDataLoader *loader;
-    QString cacheKey = mServer->getId().toString() + networkResource->getId().toString();
+    QString cacheKey = server->getId().toString() + camera->getId().toString();
     auto itr = m_cache.find(cacheKey);
     if (itr != m_cache.end()) {
         loader = itr.value();
     } else {
-        loader = QnGenericCameraDataLoader::newInstance(mServer, networkResource, m_dataType, this);
+        loader = QnGenericCameraDataLoader::newInstance(server, camera, m_dataType, this);
         if (!loader)
             return -1;
         
@@ -91,7 +94,6 @@ void QnMultiServerCameraDataLoader::onDataLoaded(const QnAbstractCameraDataPtr &
             emit ready(result, multiHandle);
         } else { // ... else just store temporary result
             m_multiLoadData[multiHandle] << data;
-            emit intermediate(data, multiHandle);
         }
         break;
     }

@@ -19,27 +19,26 @@ namespace {
     QAtomicInt qn_fakeHandle(INT_MAX / 2);
 }
 
-QnGenericCameraDataLoader::QnGenericCameraDataLoader(const QnMediaServerConnectionPtr &connection, const QnNetworkResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent):
-    QnAbstractCameraDataLoader(resource, dataType, parent),
+QnGenericCameraDataLoader::QnGenericCameraDataLoader(const QnMediaServerConnectionPtr &connection, const QnNetworkResourcePtr &camera, Qn::CameraDataType dataType, QObject *parent):
+    QnAbstractCameraDataLoader(camera, dataType, parent),
     m_connection(connection)
 {
     if(!connection)
         qnNullWarning(connection);
 
-    if(!resource)
-        qnNullWarning(resource);
+    if(!camera)
+        qnNullWarning(camera);
 }
 
-QnGenericCameraDataLoader *QnGenericCameraDataLoader::newInstance(const QnMediaServerResourcePtr &serverResource, const QnResourcePtr &resource,  Qn::CameraDataType dataType, QObject *parent) {
-    QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
-    if (!networkResource || !serverResource)
+QnGenericCameraDataLoader *QnGenericCameraDataLoader::newInstance(const QnMediaServerResourcePtr &server, const QnNetworkResourcePtr &camera,  Qn::CameraDataType dataType, QObject *parent) {
+    if (!server || !camera)
         return NULL;
     
-    QnMediaServerConnectionPtr serverConnection = serverResource->apiConnection();
+    QnMediaServerConnectionPtr serverConnection = server->apiConnection();
     if (!serverConnection)
         return NULL;
 
-    return new QnGenericCameraDataLoader(serverConnection, networkResource, dataType, parent);
+    return new QnGenericCameraDataLoader(serverConnection, camera, dataType, parent);
 }
 
 int QnGenericCameraDataLoader::load(const QnTimePeriod &timePeriod, const QString &filter, const qint64 resolutionMs) {
