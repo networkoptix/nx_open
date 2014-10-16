@@ -15,6 +15,12 @@ QnTimePeriodCameraData::QnTimePeriodCameraData(const QnTimePeriodList &data):
 {
 }
 
+
+QnAbstractCameraDataPtr QnTimePeriodCameraData::clone() const {
+    QnAbstractCameraDataPtr result(new QnTimePeriodCameraData(m_data));
+    return result;
+}
+
 bool QnTimePeriodCameraData::isEmpty() const {
     return m_data.isEmpty();
 }
@@ -42,10 +48,11 @@ void QnTimePeriodCameraData::append(const QnTimePeriodList &other) {
     if (other.isEmpty())
         return;
 
+    /* Check if the current last piece marked as Live. */ 
     QVector<QnTimePeriodList> allPeriods;
     if (!m_data.isEmpty() && m_data.last().durationMs == -1) 
-        if (other.last().startTimeMs >= m_data.last().startTimeMs)
-            m_data.removeLast();    //cut "recording" piece
+                if (other.last().startTimeMs >= m_data.last().startTimeMs)
+        m_data.removeLast();    //cut "recording" piece
     allPeriods << m_data << other;
     m_data = QnTimePeriodList::mergeTimePeriods(allPeriods); // union data
 }

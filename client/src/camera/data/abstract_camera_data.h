@@ -15,6 +15,12 @@ public:
     virtual ~QnAbstractCameraData() {}
 
     /**
+     * @brief clone                                 Deep copy of the object.
+     * @return                                      Shared pointer to the new data object.
+     */
+    virtual QnAbstractCameraDataPtr clone() const = 0;
+
+    /**
      * @brief isEmpty                               Check that there is some data in the struct.
      * @return                                      True if there is at least one piece of data.
      */

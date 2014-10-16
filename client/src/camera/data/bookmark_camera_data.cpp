@@ -58,6 +58,13 @@ QnBookmarkCameraData::QnBookmarkCameraData(const QnCameraBookmarkList &data):
     updateDataSource();
 }
 
+
+QnAbstractCameraDataPtr QnBookmarkCameraData::clone() const {
+    QnAbstractCameraDataPtr result(new QnBookmarkCameraData(m_data));
+    return result;
+}
+
+
 bool QnBookmarkCameraData::isEmpty() const {
     return m_data.isEmpty();
 }
@@ -187,5 +194,4 @@ void QnBookmarkCameraData::updateDataSource() {
         periods.append(QnTimePeriodList(QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs)));
     m_dataSource = QnTimePeriodList::mergeTimePeriods(periods); //TODO: #GDM #Bookmarks need an analogue for the single periods
 }
-
 
