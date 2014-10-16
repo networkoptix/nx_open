@@ -34,7 +34,8 @@ void QnVideoWallResource::updateInner(const QnResourcePtr &other, QSet<QByteArra
         foreach(const auto &item, m_items->getItems()) {
             if(newItems->hasItem(item.uuid)) {
                 QnVideoWallItem newItem = newItems->getItem(item.uuid);
-                newItem.online = item.online;
+                newItem.runtimeStatus.online = item.runtimeStatus.online;
+                newItem.runtimeStatus.controlledBy = item.runtimeStatus.controlledBy;
                 newItems->updateItem(newItem);
             }
         }
@@ -124,7 +125,7 @@ void QnVideoWallResource::storedItemChanged(const QnVideoWallMatrix &item) {
 QList<QnUuid> QnVideoWallResource::onlineItems() const {
     QList<QnUuid> result;
     foreach (const QnVideoWallItem &item, m_items->getItems()) {
-        if (!item.online)
+        if (!item.runtimeStatus.online)
             continue;
         result << item.uuid;
     }

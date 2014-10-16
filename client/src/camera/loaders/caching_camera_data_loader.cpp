@@ -59,7 +59,6 @@ void QnCachingCameraDataLoader::init() {
 
     if(!m_resourceIsLocal) {
         connect(qnSyncTime, &QnSyncTime::timeChanged,       this, &QnCachingCameraDataLoader::discardCachedData);
-        connect(m_resource, &QnResource::parentIdChanged,   this, &QnCachingCameraDataLoader::discardCachedData);
     }
 }
 

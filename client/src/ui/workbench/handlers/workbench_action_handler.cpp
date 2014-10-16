@@ -859,7 +859,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
             modifiedResources,
             Qn::MainWindow_Tree_DragCameras_Help,
             tr("Error"),
-            tr("Can't move camera(s) to other server. Media server %1 doesn't answer to request. These camera list will stay unchanged").arg(server->getName()), // TODO: #Elric need saner error message
+            tr("Can't move camera(s) to other server. Server %1 doesn't answer to request.", NULL, modifiedResources.size()).arg(server->getName()),
             QDialogButtonBox::Ok
             );
         return;
@@ -886,7 +886,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
             errorResources,
             Qn::MainWindow_Tree_DragCameras_Help,
             tr("Error"),
-            tr("Camera(s) cannot be moved to server '%1'. It might have been offline since the server is up.").arg(server->getName()), // TODO: #Elric need saner error message
+            tr("Camera(s) cannot be moved to server '%1' because the server cannot discover it.", NULL, errorResources.size()).arg(server->getName()),
             QDialogButtonBox::Ok
             );
     }
