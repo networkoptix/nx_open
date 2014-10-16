@@ -37,16 +37,17 @@ DaytimeNISTFetcher::~DaytimeNISTFetcher()
 
 void DaytimeNISTFetcher::pleaseStop()
 {
+    //assuming that user stopped using object and DaytimeNISTFetcher::getTimeAsync will never be called,
+        //so we can safely use m_tcpSock
     std::shared_ptr<AbstractStreamSocket> tcpSock;
     {
         QMutexLocker lk( &m_mutex );
-        tcpSock = m_tcpSock;
-        if( !tcpSock )
+        if( !m_tcpSock )
             return;
+        tcpSock = m_tcpSock;
     }
-    tcpSock->terminateAsyncIO( true );
 
-    QMutexLocker lk( &m_mutex );
+    tcpSock->terminateAsyncIO( true );
     m_tcpSock.reset();
 }
 
@@ -77,6 +78,10 @@ bool DaytimeNISTFetcher::getTimeAsync( std::function<void(qint64, SystemError::E
     m_handlerFunc = [this, handlerFunc]( qint64 timestamp, SystemError::ErrorCode error )
     {
         m_tcpSock->terminateAsyncIO( true );
+        {
+            QMutexLocker lk( &m_mutex );
+            m_tcpSock.reset();
+        }
         handlerFunc( timestamp, error );
     };
 
