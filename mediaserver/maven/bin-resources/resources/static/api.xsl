@@ -21,7 +21,7 @@
                 <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
                 <link rel="stylesheet" href="styles/29403685.vendor.css"/>
 
-                <link rel="stylesheet" href="styles/6c807c9e.main.css"/>
+                <link rel="stylesheet" href="styles/2926882b.main.css"/>
 
                 <link rel="stylesheet" href="customization/styles.css"/>
             </head>
@@ -29,7 +29,10 @@
                 <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
                     <div class="container">
                         <div class="navbar-header">
-                            <a class="navbar-brand" data-toggle="tooltip" data-placement="bottom" >API Reference</a>
+                            <a class="navbar-brand" data-toggle="tooltip" data-placement="bottom" >
+                                <img src="customization/hdw_logo.png" height="48"/>
+                                API Reference
+                            </a>
                         </div>
                         <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
                             <ul class="nav navbar-nav navbar-right">
