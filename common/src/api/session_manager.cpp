@@ -101,10 +101,11 @@ void QnSessionManager::at_replyReceived(QNetworkReply * reply)
     m_handleInProgress.remove(reply);
     //emit requestFinished(QnHTTPRawResponse(reply->error(), reply->rawHeaderPairs(), reply->readAll(), errorString.toLatin1()), handle);
     QnHTTPRawResponse httpResponse(reply->error(), reply->rawHeaderPairs(), reply->readAll(), errorString.toLatin1());
-    QMetaObject::invokeMethod(reqInfo.object, reqInfo.slot, reqInfo.connectionType,
-                              QGenericReturnArgument(), 
-                              QGenericArgument("QnHTTPRawResponse", &httpResponse),
-                              QGenericArgument("int", &reqInfo.handle));
+    if( if( reqInfo.object ) )
+        QMetaObject::invokeMethod(reqInfo.object, reqInfo.slot, reqInfo.connectionType,
+                                  QGenericReturnArgument(), 
+                                  QGenericArgument("QnHTTPRawResponse", &httpResponse),
+                                  QGenericArgument("int", &reqInfo.handle));
     qnDeleteLater(reply);
 }
 
@@ -211,6 +212,16 @@ int QnSessionManager::sendSyncPostRequest(const QUrl& url, const QString &object
 // -------------------------------------------------------------------------- //
 int QnSessionManager::sendAsyncRequest(int operation, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot, Qt::ConnectionType connectionType) 
 {
+    //if you want receive response make sure you have event loop in calling thread
+    Q_ASSERT( qnHasEventLoop(QThread::currentThread()) || (!target) );
+    if( !qnHasEventLoop(QThread::currentThread()) && target )
+    {
+        NX_LOG( QLatin1String("QnSessionManager::sendAsyncRequest. No event loop in current thread, "
+            "but response is awaited. target %1, slot %2").arg(target->objectName()).arg(QLatin1String(slot)), cl_logERROR );
+        std::cout<<"QnSessionManager::sendAsyncRequest. No event loop in current thread, "
+            "but response is awaited. target "<<target<<", slot "<<slot<<std::endl;
+    }
+
     AsyncRequestInfo reqInfo;
     reqInfo.handle = s_handle.fetchAndAddAcquire(1);
     reqInfo.object = target;
