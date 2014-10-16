@@ -245,6 +245,8 @@ protected slots:
 
     void at_setCurrentLayoutAspectRatio4x3Action_triggered();
     void at_setCurrentLayoutAspectRatio16x9Action_triggered();
+    void at_setCurrentLayoutAspectRatio3x4Action_triggered();
+    void at_setCurrentLayoutAspectRatio9x16Action_triggered();
     void at_setCurrentLayoutItemSpacing0Action_triggered();
     void at_setCurrentLayoutItemSpacing10Action_triggered();
     void at_setCurrentLayoutItemSpacing20Action_triggered();

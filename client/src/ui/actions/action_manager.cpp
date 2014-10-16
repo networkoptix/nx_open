@@ -1368,6 +1368,20 @@ QnActionManager::QnActionManager(QObject *parent):
             checkable().
             checked(qnGlobals->defaultLayoutCellAspectRatio() == 16.0/9.0);
 
+        factory(Qn::SetCurrentLayoutAspectRatio3x4Action).
+            flags(Qn::Scene | Qn::NoTarget).
+            requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
+            text(tr("3:4")).
+            checkable().
+            checked(qnGlobals->defaultLayoutCellAspectRatio() == 3.0/4.0);
+
+        factory(Qn::SetCurrentLayoutAspectRatio9x16Action).
+            flags(Qn::Scene | Qn::NoTarget).
+            requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
+            text(tr("9:16")).
+            checkable().
+            checked(qnGlobals->defaultLayoutCellAspectRatio() == 9.0/16.0);
+
         factory.endGroup();
     } factory.endSubMenu();
 
