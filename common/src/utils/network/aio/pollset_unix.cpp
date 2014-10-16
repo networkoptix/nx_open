@@ -313,7 +313,6 @@ namespace aio
         return (m_impl->epollSetFD > 0) && (m_impl->eventFD > 0);
     }
 
-
     //!Interrupts \a poll method, blocked in other thread
     /*!
         This is the only method which is allowed to be called from different thread
@@ -392,6 +391,16 @@ namespace aio
             _event.events = eventsBesidesRemovedOne | EPOLLRDHUP | EPOLLERR | EPOLLHUP;
             epoll_ctl( m_impl->epollSetFD, EPOLL_CTL_MOD, sock->handle(), &_event );
             it->second.eventsMask &= ~epollEventType;   //resetting disabled event bit
+            //TODO #ak better remove following linear run
+            for( int i = 0; i < m_impl->signalledSockCount; ++i )
+            {
+                if( m_impl->epollEventsArray[i].data.ptr != NULL &&
+                    static_cast<PollSetImpl::MonitoredEventMap::const_pointer>(m_impl->epollEventsArray[i].data.ptr)->first == sock )
+                {
+                    m_impl->epollEventsArray[i].events &= ~epollEventType;  //ignoring event which has just been removed
+                    break;
+                }
+            }
             void* userData = it->second.userData(eventType);
             it->second.userData(eventType) = NULL;
             return userData;
@@ -401,6 +410,7 @@ namespace aio
             //socket is being listened for epollEventType only, removing socket...
             epoll_ctl( m_impl->epollSetFD, EPOLL_CTL_DEL, sock->handle(), NULL );
             it->second.markedForRemoval = true;
+            //TODO #ak better remove following linear run
             for( int i = 0; i < m_impl->signalledSockCount; ++i )
             {
                 if( m_impl->epollEventsArray[i].data.ptr != NULL &&
@@ -419,16 +429,6 @@ namespace aio
     size_t PollSet::size() const
     {
         return m_impl->monitoredEvents.size();
-    }
-
-    void* PollSet::getUserData( Socket* const sock, EventType eventType ) const
-    {
-        const int epollEventType = eventType == etRead ? EPOLLIN : EPOLLOUT;
-        PollSetImpl::MonitoredEventMap::iterator it = m_impl->monitoredEvents.find( sock );
-        if( (it == m_impl->monitoredEvents.end()) || !(it->second.eventsMask & epollEventType) )
-            return NULL;
-
-        return it->second.userData(eventType);
     }
 
     static const int INTERRUPT_CHECK_TIMEOUT_MS = 100;

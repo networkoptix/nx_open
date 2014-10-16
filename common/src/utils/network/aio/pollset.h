@@ -112,10 +112,6 @@ namespace aio
         */
         size_t size() const;
         /*!
-            \return NULL if \a sock is not listnened for \a eventType
-        */
-        void* getUserData( Socket* const sock, EventType eventType ) const;
-        /*!
             \param millisToWait if 0, method returns immediatly. If > 0, returns on event or after \a millisToWait milliseconds.
                 If < 0, method blocks till event
             \return -1 on error, 0 if \a millisToWait timeout has expired, > 0 - number of socket whose state has been changed

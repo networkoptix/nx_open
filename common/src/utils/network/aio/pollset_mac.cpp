@@ -264,11 +264,6 @@ namespace aio
         return m_impl->monitoredEvents.size();
     }
 
-    void* PollSet::getUserData( Socket* const sock, EventType eventType ) const
-    {
-        return dynamic_cast<Socket*>(sock)->impl()->getUserData(eventType);
-    }
-
     static const int INTERRUPT_CHECK_TIMEOUT_MS = 100;
     static const int MILLIS_IN_SEC = 1000;
     static const int NSEC_IN_MS = 1000000;
