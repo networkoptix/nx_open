@@ -297,7 +297,6 @@ void QnCachingCameraDataLoader::load(Qn::CameraDataType type, const QnTimePeriod
 
     switch (type) {
     case Qn::RecordedTimePeriod:
-        qDebug() << "prepare to load";
         loader->load(targetPeriod);
         break;
 #ifdef QN_ENABLE_BOOKMARKS
