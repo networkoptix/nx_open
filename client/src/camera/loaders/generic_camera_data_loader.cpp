@@ -202,7 +202,7 @@ void QnGenericCameraDataLoader::updateLoadedPeriods(const QnTimePeriod &loadedPe
 
 }
 
-#define CHUNKS_LOADER_DEBUG
+//#define CHUNKS_LOADER_DEBUG
 
 void QnGenericCameraDataLoader::handleDataLoaded(int status, const QnAbstractCameraDataPtr &data, int requstHandle) {
     for (int i = 0; i < m_loading.size(); ++i) {
