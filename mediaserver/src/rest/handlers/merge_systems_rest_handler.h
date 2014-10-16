@@ -6,7 +6,7 @@
 class QnMergeSystemsRestHandler : public QnJsonRestHandler {
     Q_OBJECT
 public:
-    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
+    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner) override;
 private:
     bool changeSystemName(const QString &systemName);
     bool changeAdminPassword(const QString &password);

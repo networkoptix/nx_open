@@ -47,7 +47,7 @@ int QnGenericCameraDataLoader::load(const QnTimePeriod &timePeriod, const QStrin
         discardCachedData(resolutionMs);
     m_filter = filter;
 
-    QnTimePeriodList &loadedPeriodList = m_loadedPeriods[resolutionMs];
+    const QnTimePeriodList &loadedPeriodList = m_loadedPeriods[resolutionMs];
 
     /* Check whether the requested data is already loaded. */
     foreach(const QnTimePeriod &loadedPeriod, loadedPeriodList) {
@@ -79,8 +79,8 @@ int QnGenericCameraDataLoader::load(const QnTimePeriod &timePeriod, const QStrin
     QnTimePeriod periodToLoad = timePeriod;
     if (!loadedPeriodList.isEmpty())
     {
-        QnTimePeriodList::iterator itr = qUpperBound(loadedPeriodList.begin(), loadedPeriodList.end(), periodToLoad.startTimeMs);
-        if (itr != loadedPeriodList.begin())
+        QnTimePeriodList::const_iterator itr = qUpperBound(loadedPeriodList.cbegin(), loadedPeriodList.cend(), periodToLoad.startTimeMs);
+        if (itr != loadedPeriodList.cbegin())
             itr--;
 
         if (qBetween(itr->startTimeMs, periodToLoad.startTimeMs, itr->startTimeMs + itr->durationMs))
@@ -89,7 +89,7 @@ int QnGenericCameraDataLoader::load(const QnTimePeriod &timePeriod, const QStrin
             periodToLoad.startTimeMs = itr->startTimeMs + itr->durationMs - 40*1000; // add addition 40 sec (may server does not flush data e.t.c)
             periodToLoad.durationMs = endPoint - periodToLoad.startTimeMs;
             ++itr;
-            if (itr != loadedPeriodList.end()) {
+            if (itr != loadedPeriodList.cend()) {
                 if (itr->startTimeMs < periodToLoad.startTimeMs + periodToLoad.durationMs)
                     periodToLoad.durationMs = itr->startTimeMs - periodToLoad.startTimeMs;
             }
@@ -167,7 +167,7 @@ void QnGenericCameraDataLoader::at_bookmarksReceived(int status, const QnCameraB
 
 void QnGenericCameraDataLoader::updateLoadedPeriods(const QnTimePeriod &loadedPeriod, const qint64 resolutionMs) {
     QnTimePeriod newPeriod(loadedPeriod);
-    QnAbstractCameraDataPtr &loadedData = m_loadedData[resolutionMs];
+    const QnAbstractCameraDataPtr &loadedData = m_loadedData[resolutionMs];
     QnTimePeriodList &loadedPeriods = m_loadedPeriods[resolutionMs];
 
     /* Cut off the last one minute as it may not contain the valid data yet. */ // TODO: #Elric cut off near live only
@@ -199,22 +199,45 @@ void QnGenericCameraDataLoader::updateLoadedPeriods(const QnTimePeriod &loadedPe
             lastPeriod.durationMs = qMin(lastPeriod.durationMs, lastDataTime - lastPeriod.startTimeMs);
         }
     }
+
 }
+
+#define CHUNKS_LOADER_DEBUG
 
 void QnGenericCameraDataLoader::handleDataLoaded(int status, const QnAbstractCameraDataPtr &data, int requstHandle) {
     for (int i = 0; i < m_loading.size(); ++i) {
         if (m_loading[i].handle != requstHandle)
             continue;
-        
+#ifdef CHUNKS_LOADER_DEBUG
+        QString debugName = m_connection->url().host();
+#endif
+
         qint64 resolutionMs = m_loading[i].resolutionMs;
         if (status == 0) {
+
+#ifdef CHUNKS_LOADER_DEBUG
+            if (!data->dataSource().isEmpty()) {
+                qDebug() << "---------------------------------------------------------------------";
+                qDebug() << debugName << "CHUNK request" << m_loading[i].period;
+                qDebug() << debugName << "CHUNK data" << data->dataSource();
+                if (m_loadedData[resolutionMs])
+                    qDebug() << debugName << "CHUNK total before" << m_loadedData[resolutionMs]->dataSource(); 
+            }
+#endif
+
             if (!m_loadedData[resolutionMs] && data) {
                 m_loadedData[resolutionMs] = data;
+#ifdef CHUNKS_LOADER_DEBUG
+                qDebug() << debugName << "CHUNK total after" << m_loadedData[resolutionMs]->dataSource(); 
+#endif
                 updateLoadedPeriods(m_loading[i].period, resolutionMs);
             }
             else
             if (data && !data->isEmpty()) {
                 m_loadedData[resolutionMs]->append(data);
+#ifdef CHUNKS_LOADER_DEBUG
+                qDebug() << debugName << "CHUNK total after" << m_loadedData[resolutionMs]->dataSource(); 
+#endif
                 updateLoadedPeriods(m_loading[i].period, resolutionMs);
             }
 

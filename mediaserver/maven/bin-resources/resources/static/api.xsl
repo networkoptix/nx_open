@@ -21,7 +21,7 @@
                 <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
                 <link rel="stylesheet" href="styles/29403685.vendor.css"/>
 
-                <link rel="stylesheet" href="styles/662b3b67.main.css"/>
+                <link rel="stylesheet" href="styles/6c807c9e.main.css"/>
 
                 <link rel="stylesheet" href="customization/styles.css"/>
             </head>

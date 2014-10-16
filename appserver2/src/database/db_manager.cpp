@@ -232,7 +232,8 @@ QnDbManager::QnDbManager()
     m_licenseOverflowMarked(false),
     m_initialized(false),
     m_tranStatic(m_sdbStatic, m_mutexStatic),
-    m_needResyncLog(false)
+    m_needResyncLog(false),
+    m_needResyncLicenses(false)
 {
 	Q_ASSERT(!globalInstance);
 	globalInstance = this;
@@ -405,8 +406,14 @@ bool QnDbManager::init(
     if( QnTransactionLog::instance() )
         QnTransactionLog::instance()->init();
 
-    if( m_needResyncLog )
-        resyncTransactionLog();
+    if( m_needResyncLog ) {
+        if (!resyncTransactionLog())
+		    return false;
+    }
+    else if (m_needResyncLicenses) {
+        if (!fillTransactionLogInternal<ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
+            return false;
+    }
 
     // Set admin user's password
     ApiUserDataList users;
@@ -506,6 +513,9 @@ bool QnDbManager::resyncTransactionLog()
     if (!fillTransactionLogInternal<ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveBusinessRule))
         return false;
     if (!fillTransactionLogInternal<ApiResourceParamWithRefData, ApiResourceParamWithRefDataList>(ApiCommand::setResourceParam))
+        return false;
+
+    if (!fillTransactionLogInternal<ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
         return false;
 
     return true;
@@ -881,6 +891,9 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
         }
         //if (!execSQLQuery("drop table vms_license", m_sdb))
         //    return false;
+    }
+    else if (*dbJustCreated) {
+        m_needResyncLicenses = true;
     }
 
     if (!applyUpdates())

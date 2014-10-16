@@ -167,37 +167,58 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
     return false;   //failed to authorise request with any method
 }
 
-bool QnAuthHelper::authenticate( const QAuthenticator& auth, const nx_http::Response& response, nx_http::Request* const request )
+bool QnAuthHelper::authenticate(
+    const QAuthenticator& auth,
+    const nx_http::Response& response,
+    nx_http::Request* const request,
+    HttpAuthenticationClientContext* const authenticationCtx )
 {
     const nx_http::BufferType& authHeaderBuf = nx_http::getHeaderValue(
         response.headers,
-        response.statusLine.statusCode == nx_http::StatusCode::proxyAuthenticationRequired ? "Proxy-Authenticate" : "WWW-Authenticate" );
-    nx_http::header::WWWAuthenticate authenticateHeader;
-    if( !authenticateHeader.parse( authHeaderBuf ) )
-        return false;
-    switch( authenticateHeader.authScheme )
+        response.statusLine.statusCode == nx_http::StatusCode::proxyAuthenticationRequired
+            ? "Proxy-Authenticate"
+            : "WWW-Authenticate" );
+    if( !authHeaderBuf.isEmpty() )
     {
-        case nx_http::header::AuthScheme::digest:
-            nx_http::insertOrReplaceHeader(
-                &request->headers,
-                nx_http::parseHeader( CLSimpleHTTPClient::digestAccess(
-                    auth,
-                    QLatin1String(authenticateHeader.params["realm"]),
-                    QLatin1String(authenticateHeader.params["nonce"]),
-                    QLatin1String(request->requestLine.method),
-                    request->requestLine.url.toString(),
-                    response.statusLine.statusCode == nx_http::StatusCode::proxyAuthenticationRequired ).toLatin1() ) );
-            return true;
-
-        case nx_http::header::AuthScheme::basic:
-            nx_http::insertOrReplaceHeader(
-                &request->headers,
-                nx_http::parseHeader( CLSimpleHTTPClient::basicAuth(auth) ) );
-            return true;
-
-        default:
+        nx_http::header::WWWAuthenticate authenticateHeader;
+        if( !authenticateHeader.parse( authHeaderBuf ) )
             return false;
+        authenticationCtx->authenticateHeader = std::move( authenticateHeader );
     }
+    authenticationCtx->responseStatusCode = response.statusLine.statusCode;
+
+    return authenticate(
+        auth,
+        request,
+        authenticationCtx );
+}
+
+bool QnAuthHelper::authenticate(
+    const QAuthenticator& auth,
+    nx_http::Request* const request,
+    HttpAuthenticationClientContext* const authenticationCtx )
+{
+    if( authenticationCtx->authenticateHeader &&
+        authenticationCtx->authenticateHeader.get().authScheme == nx_http::header::AuthScheme::digest )
+    {
+        nx_http::insertOrReplaceHeader(
+            &request->headers,
+            nx_http::parseHeader( CLSimpleHTTPClient::digestAccess(
+                auth,
+                QLatin1String(authenticationCtx->authenticateHeader.get().params["realm"]),
+                QLatin1String(authenticationCtx->authenticateHeader.get().params["nonce"]),
+                QLatin1String(request->requestLine.method),
+                request->requestLine.url.toString(),
+                authenticationCtx->responseStatusCode == nx_http::StatusCode::proxyAuthenticationRequired ).toLatin1() ) );
+    }
+    else if( !auth.user().isEmpty() )   //basic authorization or no authorization specified
+    {
+        nx_http::insertOrReplaceHeader(
+            &request->headers,
+            nx_http::parseHeader( CLSimpleHTTPClient::basicAuth(auth) ) );
+    }
+    
+    return true;
 }
 
 bool QnAuthHelper::authenticate( const QString& login, const QByteArray& digest ) const

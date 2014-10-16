@@ -249,7 +249,7 @@
                 <dependency>
                     <groupId>com.microsoft</groupId>
                     <artifactId>redistributable</artifactId>
-                    <version>vs2008-SNAPSHOT</version>
+                    <version>vs2012-SNAPSHOT</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}</classifier>
                 </dependency>       

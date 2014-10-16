@@ -434,10 +434,6 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Help")).
         icon(qnSkin->icon("titlebar/whats_this.png"));
 
-    factory(Qn::ClearCacheAction).
-        flags(Qn::NoTarget).
-        text(tr("Clear cache"));
-
     factory(Qn::CameraDiagnosticsAction).
         flags(Qn::ResourceTarget | Qn::SingleTarget).
         text(tr("Check Camera Issues...")).
@@ -745,6 +741,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main | Qn::Tree).
         text(tr("Open Web Client...")).
         autoRepeat(false).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalViewLivePermission).
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 
     factory().

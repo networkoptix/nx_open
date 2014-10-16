@@ -290,7 +290,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::SetAsBackgroundAction),                  SIGNAL(triggered()),    this,   SLOT(at_setAsBackgroundAction_triggered()));
     connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
     connect(action(Qn::EscapeHotkeyAction),                     SIGNAL(triggered()),    this,   SLOT(at_escapeHotkeyAction_triggered()));
-    connect(action(Qn::ClearCacheAction),                       SIGNAL(triggered()),    this,   SLOT(at_clearCacheAction_triggered()));
     connect(action(Qn::MessageBoxAction),                       SIGNAL(triggered()),    this,   SLOT(at_messageBoxAction_triggered()));
     connect(action(Qn::BrowseUrlAction),                        SIGNAL(triggered()),    this,   SLOT(at_browseUrlAction_triggered()));
     connect(action(Qn::VersionMismatchMessageAction),           SIGNAL(triggered()),    this,   SLOT(at_versionMismatchMessageAction_triggered()));
@@ -862,7 +861,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
             modifiedResources,
             Qn::MainWindow_Tree_DragCameras_Help,
             tr("Error"),
-            tr("Can't move camera(s) to other server. Media server %1 doesn't answer to request. These camera list will stay unchanged").arg(server->getName()), // TODO: #Elric need saner error message
+            tr("Can't move camera(s) to other server. Server %1 doesn't answer to request.", NULL, modifiedResources.size()).arg(server->getName()),
             QDialogButtonBox::Ok
             );
         return;
@@ -889,7 +888,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
             errorResources,
             Qn::MainWindow_Tree_DragCameras_Help,
             tr("Error"),
-            tr("Camera(s) cannot be moved to server '%1'. It might have been offline since the server is up.").arg(server->getName()), // TODO: #Elric need saner error message
+            tr("Camera(s) cannot be moved to server '%1' because the server cannot discover it.", NULL, errorResources.size()).arg(server->getName()),
             QDialogButtonBox::Ok
             );
     }
@@ -2371,10 +2370,6 @@ void QnWorkbenchActionHandler::at_escapeHotkeyAction_triggered() {
         menu()->trigger(Qn::ToggleTourModeAction);
 }
 
-void QnWorkbenchActionHandler::at_clearCacheAction_triggered() {
-    QnAppServerFileCache::clearLocalCache();
-}
-
 void QnWorkbenchActionHandler::at_messageBoxAction_triggered() {
     QString title = menu()->currentParameters(sender()).argument<QString>(Qn::TitleRole);
     QString text = menu()->currentParameters(sender()).argument<QString>(Qn::TextRole);
@@ -2450,7 +2445,12 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
         "Please upgrade all components to the latest version %2."
     ).arg(components).arg(latestMsVersion.toString());
 
-    QScopedPointer<QMessageBox> messageBox(new QMessageBox(QMessageBox::Warning, tr("Version Mismatch"), message, QMessageBox::StandardButtons(QMessageBox::Cancel), mainWindow()));
+    QScopedPointer<QnWorkbenchStateDependentDialog<QMessageBox> > messageBox(
+        new QnWorkbenchStateDependentDialog<QMessageBox>(mainWindow()));
+    messageBox->setIcon(QMessageBox::Warning);
+    messageBox->setWindowTitle(tr("Version Mismatch"));
+    messageBox->setText(message);
+    messageBox->setStandardButtons(QMessageBox::Cancel);
     setHelpTopic(messageBox.data(), Qn::VersionMismatch_Help);
 
     QPushButton *updateButton = messageBox->addButton(tr("Upgrade..."), QMessageBox::HelpRole);

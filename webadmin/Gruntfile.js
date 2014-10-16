@@ -183,7 +183,7 @@ module.exports = function (grunt) {
                  }*/
 
                 //Evgeniy
-                /*{
+                {
                     context: '/api/',
                     host: '192.168.56.101',
                     port: 7001,
@@ -198,10 +198,10 @@ module.exports = function (grunt) {
                     headers: {
                         "Authorization": "Basic YWRtaW46MTIz" //admin:123
                     }
-                }*/
+                }
 
                 //Denis
-                {
+                /*{
                     context: '/api/',
                     host: '10.0.2.182',
                     port: 7001,
@@ -216,7 +216,7 @@ module.exports = function (grunt) {
                      headers: {
                          "Authorization": "Basic YWRtaW46MTIz" //admin:123
                      }
-                }
+                }*/
             ],
             livereload: {
                 options: {
