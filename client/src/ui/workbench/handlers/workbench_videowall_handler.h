@@ -79,12 +79,16 @@ private:
     bool deleteShortcut(const QnVideoWallResourcePtr &videowall);
 
     void setItemOnline(const QnUuid &instanceGuid, bool online);
+    void setItemControlledBy(const QnUuid &layoutId, const QnUuid &controllerId, bool on);
     void updateMainWindowGeometry(const QnScreenSnaps &screenSnaps);
 
     void updateControlLayout(const QnVideoWallResourcePtr &videowall, const QnVideoWallItem &item, ItemAction action);
     void updateReviewLayout(const QnVideoWallResourcePtr &videowall, const QnVideoWallItem &item, ItemAction action);
 
     bool validateLicenses(const QString &detail) const;
+
+    /** Returns id of the running client that is currently controlling provided layout. */
+    QnUuid getLayoutController(const QnUuid &layoutId);
 private slots:
 
     void at_newVideoWallAction_triggered();

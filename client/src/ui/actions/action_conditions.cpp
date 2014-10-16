@@ -843,7 +843,7 @@ Qn::ActionVisibility QnStartVideowallActionCondition::check(const QnResourceList
             if (item.pcUuid != pcUuid)
                 continue;
 
-            if (!item.online)
+            if (!item.runtimeStatus.online)
                return Qn::EnabledAction;
 
             hasAttachedItems = true;
@@ -862,7 +862,7 @@ Qn::ActionVisibility QnIdentifyVideoWallActionCondition::check(const QnActionPar
         foreach (const QnVideoWallItemIndex &index, parameters.videoWallItems()) {
             if (!index.isValid())
                 continue;
-            if (index.item().online)
+            if (index.item().runtimeStatus.online)
                 return Qn::EnabledAction;
         }
         return Qn::DisabledAction;
