@@ -91,6 +91,7 @@ void QnMultiServerCameraDataLoader::onDataLoaded(const QnAbstractCameraDataPtr &
             emit ready(result, multiHandle);
         } else { // ... else just store temporary result
             m_multiLoadData[multiHandle] << data;
+            emit intermediate(data, multiHandle);
         }
         break;
     }
@@ -116,7 +117,7 @@ void QnMultiServerCameraDataLoader::onLoadingFailed(int status, int handle) {
             }
             m_multiLoadData.remove(multiHandle);
             m_multiLoadProgress.erase(itr);
-        }
+        } 
         break;
 
     }

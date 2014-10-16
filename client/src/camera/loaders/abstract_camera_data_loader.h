@@ -43,6 +43,14 @@ public:
 
 signals:
     /**
+     * This signal is emitted whenever motion periods were partly loaded.
+     *
+     * \param timePeriods               Loaded motion periods.
+     * \param handle                    Request handle.
+     */
+    void intermediate(const QnAbstractCameraDataPtr &data, int handle);
+
+    /**
      * This signal is emitted whenever motion periods were successfully loaded.
      *
      * \param timePeriods               Loaded motion periods.
