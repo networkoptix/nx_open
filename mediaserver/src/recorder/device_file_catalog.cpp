@@ -776,7 +776,19 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endT
 
     QMutexLocker lock(&m_mutex);
     QnTimePeriodList result;
+    if (m_chunks.empty())
+        return result;
+
     ChunkMap::const_iterator itr = qLowerBound(m_chunks.begin(), m_chunks.end(), startTime);
+    /* Checking if we should include a chunk, containing startTime. */
+    if (itr != m_chunks.begin()) {
+        --itr;
+
+        /* Case if previous chunk does not contain startTime. */
+        if (itr->endTimeMs() < startTime)
+            ++itr;
+    }
+
     if (itr == m_chunks.end())
         return result;
 
