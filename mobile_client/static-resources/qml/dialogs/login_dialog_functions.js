@@ -26,4 +26,6 @@ function saveCurrentSession() {
         login: login.text,
         password: password.text
     }, __currentIndex)
+    savedSessionsList.model = settings.savedSessions()
+    __currentIndex = 0
 }

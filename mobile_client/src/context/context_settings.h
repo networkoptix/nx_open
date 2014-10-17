@@ -11,6 +11,7 @@ public:
 public slots:
     QVariantList savedSessions() const;
     void saveSession(const QVariantMap &session, int index);
+    void removeSession(int index);
 };
 
 #endif // CONTEXT_SETTINGS_H

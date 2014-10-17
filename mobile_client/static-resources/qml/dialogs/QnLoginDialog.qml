@@ -67,6 +67,9 @@ Item {
                 icon: "/images/delete.png"
 
                 onClicked: {
+                    settings.removeSession(__currentIndex)
+                    savedSessionsList.model = settings.savedSessions()
+                    loginDialog.state = "CHOOSE"
                 }
             }
         }
@@ -215,8 +218,10 @@ Item {
         onClicked: {
             if (loginDialog.state == "CHOOSE") {
                 LoginDialogFunctions.updateUi(null)
+                __currentIndex = savedSessionsList.count
                 loginDialog.state = "EDIT"
             } else {
+                __currentIndex = -1
                 loginDialog.state = "CHOOSE"
             }
         }

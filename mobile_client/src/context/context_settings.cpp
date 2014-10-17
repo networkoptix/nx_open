@@ -14,10 +14,18 @@ QVariantList QnContextSettings::savedSessions() const {
 void QnContextSettings::saveSession(const QVariantMap &session, int index) {
     QVariantList sessions = qnSettings->savedSessions();
     if (index < 0 || index >= sessions.size()) {
-        sessions.append(session);
+        sessions.prepend(session);
     } else {
         sessions.removeAt(index);
         sessions.prepend(session);
     }
+    qnSettings->setSavedSessions(sessions);
+}
+
+void QnContextSettings::removeSession(int index) {
+    QVariantList sessions = qnSettings->savedSessions();
+    if (index < 0 || index >= sessions.size())
+        return;
+    sessions.removeAt(index);
     qnSettings->setSavedSessions(sessions);
 }
