@@ -38,6 +38,7 @@ public:
         Online          = 3 << 8,
         Locked          = 4 << 8,
         Incompatible    = 5 << 8,
+        Control         = 6 << 8,
         StatusMask      = 0xFF00
     };
     Q_DECLARE_FLAGS(Key, KeyPart)

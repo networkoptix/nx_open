@@ -134,10 +134,11 @@ QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout *layout) const {
             return QIcon();
 
         if (idx.item().runtimeStatus.online) {
-            if (idx.item().runtimeStatus.controlledBy.isNull() ||
-                idx.item().runtimeStatus.controlledBy == qnCommon->moduleGUID())
+            if (idx.item().runtimeStatus.controlledBy.isNull())
                 return qnResIconCache->icon(QnResourceIconCache::VideoWallItem);
-            return qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Unauthorized);
+            if (idx.item().runtimeStatus.controlledBy == qnCommon->moduleGUID())
+                return qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Control);
+            return qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Locked);
         }
         return qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Offline);
     }
