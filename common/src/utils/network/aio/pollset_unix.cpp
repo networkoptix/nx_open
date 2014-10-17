@@ -34,12 +34,14 @@ namespace aio
             //!bit 'or' of listened events (EPOLLIN, EPOLLOUT, etc..)
             int eventsMask;
             bool markedForRemoval;
+            std::array<void*, aio::etMax> eventTypeToUserData;
 
             SockData()
             :
                 eventsMask( 0 ),
                 markedForRemoval( false )
             {
+                eventTypeToUserData.fill( nullptr );
             }
 
             SockData(
@@ -49,22 +51,8 @@ namespace aio
                 eventsMask( _eventsMask ),
                 markedForRemoval( _markedForRemoval )
             {
+                eventTypeToUserData.fill( nullptr );
             }
-
-            const void* userData( aio::EventType eventType ) const
-            {
-                //TODO #ak: get rid of m_userData map, since there can be only two(!) elements in it
-                std::map<aio::EventType, void*>::const_iterator it = m_userData.find(eventType);
-                return it != m_userData.end() ? it->second : NULL;
-            }
-
-            void*& userData( aio::EventType eventType )
-            {
-                return m_userData[eventType];
-            }
-
-        private:
-            std::map<aio::EventType, void*> m_userData;
         };
 
         //!map<fd, pair<events mask, user data> >
@@ -253,7 +241,9 @@ namespace aio
 
     void* PollSet::const_iterator::userData()
     {
-        return static_cast<PollSetImpl::MonitoredEventMap::pointer>(m_impl->pollSetImpl->epollEventsArray[m_impl->currentIndex].data.ptr)->second.userData( m_impl->handlerToUse );
+        return static_cast<PollSetImpl::MonitoredEventMap::pointer>(
+                m_impl->pollSetImpl->epollEventsArray[m_impl->currentIndex].data.ptr
+            )->second.eventTypeToUserData[m_impl->handlerToUse];
     }
 
     bool PollSet::const_iterator::operator==( const const_iterator& right ) const
@@ -342,7 +332,7 @@ namespace aio
             if( epoll_ctl( m_impl->epollSetFD, EPOLL_CTL_ADD, sock->handle(), &_event ) == 0 )
             {
                 p.first->second.eventsMask = epollEventType;
-                p.first->second.userData(eventType) = userData;
+                p.first->second.eventTypeToUserData[eventType] = userData;
                 return true;
             }
             else
@@ -363,7 +353,7 @@ namespace aio
             if( epoll_ctl( m_impl->epollSetFD, EPOLL_CTL_MOD, sock->handle(), &_event ) == 0 )
             {
                 p.first->second.eventsMask |= epollEventType;
-                p.first->second.userData(eventType) = userData;
+                p.first->second.eventTypeToUserData[eventType] = userData;
                 return true;
             }
             else
@@ -374,12 +364,12 @@ namespace aio
     }
 
     //!Remove socket from set
-    void* PollSet::remove( Socket* const sock, EventType eventType )
+    void PollSet::remove( Socket* const sock, EventType eventType )
     {
         const int epollEventType = eventType == etRead ? EPOLLIN : EPOLLOUT;
         PollSetImpl::MonitoredEventMap::iterator it = m_impl->monitoredEvents.find( sock );
         if( (it == m_impl->monitoredEvents.end()) || !(it->second.eventsMask & epollEventType) )
-            return NULL;
+            return;
 
         const int eventsBesidesRemovedOne = (it->second.eventsMask & (EPOLLIN | EPOLLOUT)) & (~epollEventType);
         if( eventsBesidesRemovedOne )
@@ -401,9 +391,7 @@ namespace aio
                     break;
                 }
             }
-            void* userData = it->second.userData(eventType);
-            it->second.userData(eventType) = NULL;
-            return userData;
+            it->second.eventTypeToUserData[eventType] = NULL;
         }
         else
         {
@@ -420,9 +408,7 @@ namespace aio
                     break;
                 }
             }
-            void* userData = it->second.userData(eventType);
             m_impl->monitoredEvents.erase( it );
-            return userData;
         }
     }
 
@@ -475,9 +461,8 @@ namespace aio
 
     unsigned int PollSet::maxPollSetSize()
     {
-        //TODO #ak: choose proper limit:
-            //epoll can accept unlimited descriptors, but total number of available descriptors is limited by system
-        return 16*1024;
+        //epoll can accept unlimited descriptors, but total number of available descriptors is limited by system
+        return std::numeric_limits<unsigned int>::max();
     }
 }
 

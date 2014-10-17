@@ -4,7 +4,7 @@
 * PollSet class implementation for win32
 ***********************************************************/
 
-#if 1
+#if 0
 
 #ifdef _WIN32
 
@@ -306,7 +306,7 @@ namespace aio
     }
 
     //!Remove socket from set
-    void* PollSet::remove( Socket* const sock, aio::EventType eventType )
+    void PollSet::remove( Socket* const sock, aio::EventType eventType )
     {
 #ifdef _DEBUG
         sock->handle(); //checking that socket object is still alive, since linux and mac implementation use socket in PollSet::remove
@@ -318,10 +318,7 @@ namespace aio
         {
             void* userData = it->second;
             setToUse->erase( it );
-            return userData;
         }
-
-        return nullptr;
     }
 
     size_t PollSet::size() const

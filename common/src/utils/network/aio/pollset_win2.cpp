@@ -4,7 +4,7 @@
 * PollSet class implementation for win32
 ***********************************************************/
 
-#if 0
+#if 1
 
 #ifdef _WIN32
 
@@ -30,18 +30,32 @@ namespace aio
 
     static my_fd_set* allocFDSet( size_t setSize )
     {
-        //SOCKET is a pointer
+        //NOTE: SOCKET is a pointer
         return (my_fd_set*)malloc( sizeof(my_fd_set) + sizeof(SOCKET)*(setSize-INITIAL_FDSET_SIZE) );
-    }
-
-    static void reallocFDSet( my_fd_set* /*fdSet*/, size_t /*newSize*/ )
-    {
-        assert( false );
     }
 
     static void freeFDSet( my_fd_set* fdSet )
     {
         ::free( fdSet );
+    }
+
+    //!Reallocs \a fdSet to be of size \a newSize while preseving existing data
+    /*!
+        in case of allocation error \a *fdSet is freed and set to NULL
+    */
+    static void reallocFDSet( my_fd_set** fdSet, size_t newSize )
+    {
+        my_fd_set* newSet = allocFDSet( newSize );
+
+        //copying existing data
+        if( *fdSet && newSet )
+        {
+            newSet->fd_count = (*fdSet)->fd_count;
+            memcpy( newSet->fd_array, (*fdSet)->fd_array, (*fdSet)->fd_count*sizeof(*((*fdSet)->fd_array)) );
+        }
+
+        freeFDSet( *fdSet );
+        *fdSet = newSet;
     }
 
     class PollSetImpl
@@ -112,8 +126,15 @@ namespace aio
             writefds->fd_count = 0;
             exceptfds->fd_count = 0;
 
-            //TODO #ak expand arrays if necessary
-            assert( fdSetSize >= sockets.size() );
+            //expanding arrays if necessary
+            if( fdSetSize < sockets.size() )
+            {
+                while( fdSetSize < sockets.size() )
+                    fdSetSize += FDSET_INCREASE_STEP;
+                reallocFDSet( &readfds, fdSetSize );
+                reallocFDSet( &writefds, fdSetSize );
+                reallocFDSet( &exceptfds, fdSetSize );
+            }
 
             for( const std::pair<SOCKET, SockCtx>& val: sockets )
             {
@@ -151,6 +172,17 @@ namespace aio
 
         void findNextSignalledSocket()
         {
+            //moving to the next socket
+            if( curFdSet == nullptr )
+            {
+                curFdSet = pollSetImpl->readfds;
+                fdIndex = 0;
+            }
+            else
+            {
+                ++fdIndex;
+            }
+
             //win32 select moves signaled sokcet handles to beginning of fd_array and 
                 //sets fd_count properly, so it does like epoll
 
@@ -182,7 +214,7 @@ namespace aio
                 ++fdIndex;
             }
 
-            //curFdSet->fd_array[fdIndex] is a valid socket handler
+            //NOTE curFdSet->fd_array[fdIndex] is a valid socket handler
 
             auto sockIter = pollSetImpl->sockets.find( curFdSet->fd_array[fdIndex] );
             assert( sockIter != pollSetImpl->sockets.end() );
@@ -193,15 +225,10 @@ namespace aio
             else if( curFdSet == pollSetImpl->writefds )
                 currentSocketREvent = aio::etWrite;
             else if( curFdSet == pollSetImpl->exceptfds )
-            {
                 currentSocketREvent = aio::etError;
-                assert( false );    //not implemented yet
-            }
 
-            //TODO #ak in case of etError should use some other user data
+            //TODO #ak which user data report in case of etError?
             userData = sockIter->second.userData[currentSocketREvent];
-
-            ++fdIndex;    //moving to the next socket
         }
     };
 
@@ -334,7 +361,7 @@ namespace aio
     }
 
     //!Remove socket from set
-    void* PollSet::remove( Socket* const sock, aio::EventType eventType )
+    void PollSet::remove( Socket* const sock, aio::EventType eventType )
     {
 #ifdef _DEBUG
         sock->handle(); //checking that socket object is still alive, since linux and mac implementation use socket in PollSet::remove
@@ -345,16 +372,29 @@ namespace aio
             && (sockIter->second.polledEventsMask & eventType) > 0 );    //minor optimization
         if( sockIter == m_impl->sockets.end()
             || (sockIter->second.polledEventsMask & eventType) == 0 )
-            return nullptr;
+        {
+            //socket is not polled for eventType
+            return;
+        }
+
+        //removing socket from already occured events list
+        if( eventType == aio::etRead )
+            std::replace(
+                m_impl->readfds->fd_array, m_impl->readfds->fd_array + m_impl->readfds->fd_count,
+                sock->handle(), INVALID_SOCKET );
+        else if( eventType == aio::etWrite )
+            std::replace(
+                m_impl->writefds->fd_array, m_impl->writefds->fd_array + m_impl->writefds->fd_count,
+                sock->handle(), INVALID_SOCKET );
+        std::replace(
+            m_impl->exceptfds->fd_array, m_impl->exceptfds->fd_array + m_impl->exceptfds->fd_count,
+            sock->handle(), INVALID_SOCKET );
 
         sockIter->second.polledEventsMask &= ~eventType;
-        void* userDataToReturn = sockIter->second.userData[eventType];
-        sockIter->second.userData[eventType] = nullptr;
-
         if( sockIter->second.polledEventsMask == 0 )
             m_impl->sockets.erase( sockIter );
-
-        return userDataToReturn;
+        else
+            sockIter->second.userData[eventType] = nullptr;
     }
 
     size_t PollSet::size() const
@@ -409,7 +449,7 @@ namespace aio
     {
         const_iterator _begin;
         _begin.m_impl->pollSetImpl = m_impl;
-        _begin.m_impl->curFdSet = m_impl->readfds;
+        _begin.m_impl->curFdSet = nullptr;
         _begin.m_impl->findNextSignalledSocket();
         return _begin;
     }
@@ -426,7 +466,7 @@ namespace aio
 
     unsigned int PollSet::maxPollSetSize()
     {
-        return std::numeric_limits<size_t>::max();
+        return std::numeric_limits<unsigned int>::max();
     }
 }
 

@@ -40,6 +40,7 @@ namespace aio
         Every socket is always monitored for error and all errors are reported.
         \note This class is not thread-safe
         \note If multiple event occured on same socket each event will be presented separately
+        \note Polling same socket with two \a PollSet instances results in undefined behavior
     */
     class PollSet
     {
@@ -102,10 +103,9 @@ namespace aio
         bool add( Socket* const sock, EventType eventType, void* userData = NULL );
         //!Do not monitor event \a eventType on socket \a sock anymore
         /*!
-            \return User data, associated with \a sock and \a eventType. NULL, if \a sock was not found
             \note Ivalidates all iterators to the left of removed element. So, it is ok to iterate signalled sockets and remove current element
         */
-        void* remove( Socket* const sock, EventType eventType );
+        void remove( Socket* const sock, EventType eventType );
         //!Returns number of sockets in pollset
         /*!
             Returned value should only be used for compare with \a maxPollSetSize()

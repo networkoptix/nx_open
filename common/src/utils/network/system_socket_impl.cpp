@@ -11,4 +11,5 @@ SocketImpl::SocketImpl()
     aioThread( nullptr ),
     terminated( false )
 {
+    eventTypeToUserData.fill( nullptr );
 }
