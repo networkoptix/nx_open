@@ -18,6 +18,7 @@ Item {
     }
 
     property int __currentIndex: -1
+    property bool __animated: false
 
     QnContextSettings {
         id: settings
@@ -49,19 +50,42 @@ Item {
         anchors.bottom: parent.bottom
         width: parent.width
 
+        Text {
+            anchors {
+                bottom: savedSessionsList.top
+                left: savedSessionsList.left
+                right: savedSessionsList.right
+                margins: CommonFunctions.dp(16)
+            }
+
+            color: __syspal.windowText
+            text: qsTr("Saved sessions")
+            renderType: Text.NativeRendering
+            font.pointSize: 36
+        }
+
         ListView {
             id: savedSessionsList
 
             anchors.centerIn: parent
             width: parent.width * 2 / 3
             height: parent.height / 3
+            spacing: CommonFunctions.dp(8)
 
             delegate: Item {
                 width: savedSessionsList.width
-                height: label.height + CommonFunctions.dp(8)
+                height: label.height + CommonFunctions.dp(16)
+
+                Rectangle {
+                    anchors.fill: parent
+
+                    color: "#303030"
+                    radius: CommonFunctions.dp(2)
+                }
 
                 Text {
                     id: label
+                    x: CommonFunctions.dp(8)
                     anchors.verticalCenter: parent.verticalCenter
                     text: modelData.name
                     renderType: Text.NativeRendering
@@ -146,16 +170,39 @@ Item {
     }
 
     QnRoundButton {
+        id: addCancelButton
+        anchors {
+            bottom: parent.bottom
+            bottomMargin: parent.width / 6
+        }
+
+        x: parent.width * 5 / 6 - width
+        rotation: loginDialog.state == "CHOOSE" ? 0 : 45
+        color: "#0096ff"
+        icon: "/images/plus.png"
+
+        Behavior on rotation { enabled: __animated; NumberAnimation { duration: 200 } }
+
+        onClicked: {
+            if (loginDialog.state == "CHOOSE") {
+                LoginDialogFunctions.updateUi(null)
+                loginDialog.state = "EDIT"
+            } else {
+                loginDialog.state = "CHOOSE"
+            }
+        }
+    }
+
+    QnRoundButton {
         id: loginButton
         anchors {
             bottom: parent.bottom
-            right: parent.right
-            bottomMargin: parent.width - (x + width)
-            rightMargin: parent.width / 6
+            bottomMargin: parent.width / 6
         }
+        x: parent.width
         color: "#0096ff"
-
         icon: "/images/right.png"
+
         onClicked: {
             LoginDialogFunctions.saveCurrentSession()
             connectionManager.connectToServer(LoginDialogFunctions.makeUrl(address.text, port.text, login.text, password.text))
@@ -169,12 +216,28 @@ Item {
                 target: savedSessions
                 x: 0
             }
+            PropertyChanges {
+                target: loginButton
+                x: loginDialog.width
+            }
+            PropertyChanges {
+                target: addCancelButton
+                x: loginDialog.width * 5 / 6 - addCancelButton.width
+            }
         },
         State {
             name: "EDIT"
             PropertyChanges {
                 target: savedSessions
                 x: -loginDialog.width
+            }
+            PropertyChanges {
+                target: loginButton
+                x: loginDialog.width * 5 / 6 - loginButton.width
+            }
+            PropertyChanges {
+                target: addCancelButton
+                x: loginDialog.width / 6
             }
         }
     ]
@@ -183,9 +246,33 @@ Item {
         Transition {
             from: "CHOOSE"
             to: "EDIT"
+            enabled: __animated
             NumberAnimation {
                 target: savedSessions
                 property: "x"
+                easing.type: Easing.OutQuad
+                duration: 200
+            }
+            NumberAnimation {
+                targets: [loginButton, addCancelButton]
+                properties: "x"
+                easing.type: Easing.OutQuad
+                duration: 200
+            }
+        },
+        Transition {
+            from: "EDIT"
+            to: "CHOOSE"
+            enabled: __animated
+            NumberAnimation {
+                target: savedSessions
+                property: "x"
+                easing.type: Easing.OutQuad
+                duration: 200
+            }
+            NumberAnimation {
+                targets: [loginButton, addCancelButton]
+                properties: "x"
                 easing.type: Easing.OutQuad
                 duration: 200
             }
@@ -195,5 +282,6 @@ Item {
     Component.onCompleted: {
         savedSessionsList.model = settings.savedSessions()
         state = savedSessionsList.count > 0 ? "CHOOSE" : "EDIT"
+        __animated = true
     }
 }

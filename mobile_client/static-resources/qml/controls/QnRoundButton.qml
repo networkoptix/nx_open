@@ -24,60 +24,23 @@ Button {
         background: Item {
             id: background
 
-            Item {
-                id: bg
-                anchors.centerIn: parent
-                width: control.width + shadow.radius * 2
-                height: control.height + shadow.radius * 2
-
-                Rectangle {
-                    id: rectangle
-                    anchors.fill: parent
-                    anchors.margins: shadow.radius
-                    width: control.width
-                    height: control.height
-                    radius: height / 2
-                    color: {
-                        if (control.pressed)
-                            return pressColor
-                        else if (control.hovered)
-                            return hoverColor
-                        else
-                            return control.color
-                    }
-
-                    Behavior on color { ColorAnimation { duration: 100 } }
+            Rectangle {
+                id: rectangle
+                anchors.fill: parent
+                anchors.margins: shadow.radius
+                width: control.width
+                height: control.height
+                radius: height / 2
+                color: {
+                    if (control.pressed)
+                        return pressColor
+                    else if (control.hovered)
+                        return hoverColor
+                    else
+                        return control.color
                 }
 
-                visible: false
-            }
-
-            DropShadow {
-                id: shadow
-                anchors.fill: bg
-                cached: true
-                samples: Math.max(32, Math.round(radius * 2))
-                source: bg
-
-                spread: 0
-                horizontalOffset: 0
-                verticalOffset: CommonFunctions.dp(CommonFunctions.interpolate(1.5, 8, CommonFunctions.perc(1, 5, Math.min(zdepth, 5))))
-                radius: CommonFunctions.dp(CommonFunctions.interpolate(1.5, 19, CommonFunctions.perc(1, 5, Math.min(zdepth, 5))))
-                color: Qt.rgba(0, 0, 0, CommonFunctions.interpolate(0.12, 0.30, CommonFunctions.perc(1, 5, Math.min(zdepth, 5))))
-            }
-
-            DropShadow {
-                id: bottomShadow
-                anchors.fill: bg
-                cached: true
-                samples: Math.max(32, Math.round(radius * 2))
-                source: bg
-
-                spread: 0
-                horizontalOffset: 0
-                verticalOffset: CommonFunctions.dp(CommonFunctions.interpolate(1, 6, CommonFunctions.perc(1, 5, Math.min(zdepth, 5))))
-                radius: CommonFunctions.dp(CommonFunctions.interpolate(1.2, 6, CommonFunctions.perc(1, 5, Math.min(zdepth, 5))))
-                color: Qt.rgba(0, 0, 0, 0.12)
+                Behavior on color { ColorAnimation { duration: 100 } }
             }
         }
         label: Item {
@@ -88,13 +51,6 @@ Button {
                 sourceSize.height: control.iconSize > 0 ? control.iconSize : undefined
                 source: control.icon
                 fillMode: Qt.KeepAspectRatio
-            }
-
-            ColorOverlay {
-                anchors.fill: image
-                source: image
-                cached: true
-                color: control.iconColor
             }
         }
     }

@@ -3,11 +3,19 @@ function makeUrl(address, port, user, password) {
 }
 
 function updateUi(modelData) {
-    name.text = modelData.name
-    address.text = modelData.address
-    port.text = modelData.port
-    login.text = modelData.login
-    password.text = modelData.password
+    if (modelData) {
+        name.text = modelData.name
+        address.text = modelData.address
+        port.text = modelData.port
+        login.text = modelData.login
+        password.text = modelData.password
+    } else {
+        name.text = ""
+        address.text = ""
+        port.text = ""
+        login.text = ""
+        password.text = ""
+    }
 }
 
 function saveCurrentSession() {
