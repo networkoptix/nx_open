@@ -118,13 +118,6 @@ namespace aio
             \note If multiple event occured on same socket each event will be present as a single element
         */
         int poll( int millisToWait = INFINITE_TIMEOUT );
-        //!Returns true, if can accept socket \a sock for monitoring
-        /*!
-            It is garanteed that, if socket is already present in pollset it will always be accepted for monitoring other events
-            \note This method is required only because \a select is used on win32. On linux and mac this method always returns \a true
-            \todo remove this method after moving windows implementation to IO Completion Ports
-        */
-        bool canAcceptSocket( Socket* const sock ) const;
 
         //!Returns iterator pointing to first socket, which state has been changed in previous \a poll call
         const_iterator begin() const;

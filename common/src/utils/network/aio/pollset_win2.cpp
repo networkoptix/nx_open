@@ -439,11 +439,6 @@ namespace aio
         return result;
     }
 
-    bool PollSet::canAcceptSocket( Socket* const /*sock*/ ) const
-    {
-        return true;
-    }
-
     //!Returns iterator pointing to first socket, which state has been changed in previous \a poll call
     PollSet::const_iterator PollSet::begin() const
     {

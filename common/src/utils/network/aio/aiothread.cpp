@@ -632,9 +632,6 @@ namespace aio
         if( m_impl->removeReverseTask( sock, eventToWatch, TaskType::tAdding, eventHandler, timeoutMs ) )
             return true;    //ignoring task
 
-        if( !canAcceptSocket( sock ) )
-            return false;
-
         m_impl->pollSetModificationQueue.push_back( typename AIOThreadImplType::SocketAddRemoveTask(
             TaskType::tAdding,
             sock,
@@ -661,8 +658,6 @@ namespace aio
         //TODO #ak looks like copy-paste of previous method. Remove copy-paste!!!
 
         //NOTE m_impl->aioServiceMutex is locked up the stack
-        if( !canAcceptSocket( sock ) )
-            return false;
 
         //checking queue for reverse task for \a sock
         if( m_impl->removeReverseTask( sock, eventToWatch, TaskType::tAdding, eventHandler, timeoutMs ) )
@@ -824,13 +819,6 @@ namespace aio
     size_t AIOThread<SocketType>::socketsHandled() const
     {
         return m_impl->pollSet.size() + m_impl->newReadMonitorTaskCount + m_impl->newWriteMonitorTaskCount;
-    }
-
-    //!Returns true, if can monitor one more socket for \a eventToWatch
-    template<class SocketType>
-    bool AIOThread<SocketType>::canAcceptSocket( SocketType* const sock ) const
-    {
-        return m_impl->pollSet.canAcceptSocket( sock );
     }
 
     static const int ERROR_RESET_TIMEOUT = 1000;

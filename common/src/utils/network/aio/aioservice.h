@@ -296,8 +296,6 @@ namespace aio
                 threadIter != aioHandlingContext.aioThreadPool.cend();
                 ++threadIter )
             {
-                if( !(*threadIter)->canAcceptSocket( sock ) )
-                    continue;
                 if( threadToUse && threadToUse->socketsHandled() < (*threadIter)->socketsHandled() )
                     continue;
                 threadToUse = *threadIter;
