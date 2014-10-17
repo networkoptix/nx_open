@@ -63,8 +63,8 @@ signals:
     void loadingFailed();
 
 private slots:
-    void at_loader_ready(const QnAbstractCameraDataPtr &timePeriods, int handle);
-    void at_loader_failed(int status, int handle);
+    void at_loader_ready(const QnAbstractCameraDataPtr &timePeriods, Qn::CameraDataType dataType);
+    void at_loader_failed(Qn::CameraDataType dataType);
     void discardCachedData();
 
 protected:
@@ -100,7 +100,6 @@ private:
     QnBookmarkCameraData m_bookmarkCameraData;
 
     QnAbstractCameraDataLoader *m_loaders[Qn::CameraDataTypeCount];
-    int m_handles[Qn::CameraDataTypeCount];
 
     QList<QRegion> m_motionRegions;
     QString m_bookmarksTextFilter;

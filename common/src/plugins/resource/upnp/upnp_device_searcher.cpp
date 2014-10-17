@@ -122,7 +122,7 @@ void UPNPDeviceSearcher::pleaseStop()
         it != m_socketList.end();
         ++it )
     {
-        it->second.sock->cancelAsyncIO( aio::etRead );
+        it->second.sock->terminateAsyncIO( true );
     }
     m_socketList.clear();
 
@@ -220,13 +220,13 @@ void UPNPDeviceSearcher::onSomeBytesRead(
             {
                 if( it->second.sock.get() == sock )
                 {
-                    udpSock = it->second.sock;
+                    udpSock = std::move(it->second.sock);
                     m_socketList.erase( it );
                     break;
                 }
             }
         }
-        udpSock->cancelAsyncIO( aio::etRead );
+        udpSock->terminateAsyncIO( true );
         return;
     }
 

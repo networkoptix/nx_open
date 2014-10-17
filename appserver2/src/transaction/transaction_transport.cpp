@@ -79,7 +79,7 @@ int QnTransactionTransport::readChunkHeader(const quint8* data, int dataLen, nx_
 void QnTransactionTransport::closeSocket()
 {
     if (m_socket) {
-        m_socket->cancelAsyncIO();
+        m_socket->terminateAsyncIO( true );
         m_socket->close();
         m_socket.reset();
     }
@@ -108,9 +108,11 @@ void QnTransactionTransport::startListening()
         m_socket->setNonBlockingMode(true);
         m_chunkHeaderLen = 0;
         using namespace std::placeholders;
-        m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) );
+        if( !m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) ) )
+            setState( Error );
         if( m_remotePeer.isServer() )
-            m_socket->registerTimer( TCP_KEEPALIVE_TIMEOUT, std::bind(&QnTransactionTransport::sendHttpKeepAlive, this) );
+            if( !m_socket->registerTimer( TCP_KEEPALIVE_TIMEOUT, std::bind(&QnTransactionTransport::sendHttpKeepAlive, this) ) )
+                setState( Error );
     }
 }
 
@@ -388,7 +390,8 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
     }
 
     using namespace std::placeholders;
-    m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) );
+    if( !m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) ) )
+        setStateNoLock( State::Error );
 }
 
 bool QnTransactionTransport::hasUnsendData() const
@@ -406,7 +409,8 @@ void QnTransactionTransport::sendHttpKeepAlive()
         m_dataToSend.front().encodedSourceData = m_emptyChunkData;
         serializeAndSendNextDataBuffer();
     }
-    m_socket->registerTimer( TCP_KEEPALIVE_TIMEOUT, std::bind(&QnTransactionTransport::sendHttpKeepAlive, this) );
+    if( !m_socket->registerTimer( TCP_KEEPALIVE_TIMEOUT, std::bind(&QnTransactionTransport::sendHttpKeepAlive, this) ) )
+        setStateNoLock( State::Error );
 }
 
 bool QnTransactionTransport::isHttpKeepAliveTimeout() const
