@@ -230,7 +230,7 @@ Item {
         }
         x: parent.width
         color: "#0096ff"
-        icon: "/images/right.png"
+        icon: "/images/forward.png"
 
         onClicked: {
             LoginDialogFunctions.saveCurrentSession()

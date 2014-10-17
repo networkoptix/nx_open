@@ -15,7 +15,7 @@ Button {
     property bool shadowEnabled: true
     property real zdepth: 1.0
     property string icon
-    property int iconSize: -1
+    property int iconSize: 0
 
     width: CommonFunctions.dp(56)
     height: CommonFunctions.dp(56)
@@ -46,8 +46,8 @@ Button {
             Image {
                 id: image
                 anchors.centerIn: parent
-                sourceSize.width: control.iconSize > 0 ? control.iconSize : undefined
-                sourceSize.height: control.iconSize > 0 ? control.iconSize : undefined
+                sourceSize.width: control.iconSize
+                sourceSize.height: control.iconSize
                 source: control.icon
                 fillMode: Qt.KeepAspectRatio
             }
