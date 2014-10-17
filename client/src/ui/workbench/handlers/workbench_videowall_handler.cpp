@@ -889,7 +889,7 @@ bool QnWorkbenchVideoWallHandler::canStartControlMode() const {
         return false;
     }
 
-    QnVideoWallLicenseUsageProposer proposer(m_licensesHelper.data(), 1);
+    QnVideoWallLicenseUsageProposer proposer(m_licensesHelper.data(), 0, 1);
     if (!validateLicenses(tr("Could not start Video Wall control session.")))
         return false;
     
@@ -914,8 +914,6 @@ bool QnWorkbenchVideoWallHandler::canStartControlMode() const {
 
 void QnWorkbenchVideoWallHandler::setControlMode(bool active) {
     if (active && !canStartControlMode()) {
-        workbench()->currentLayout()->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(QnUuid()));
-        workbench()->currentLayout()->notifyTitleChanged();
         return;
     }
 

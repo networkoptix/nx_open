@@ -103,6 +103,8 @@ public:
     /** Propose to use some more or less licenses directly (e.g. to start control session). */
     void propose(int count);
 
+    /** Calculate how many licenses are required for the given screens count. */
+    static int licensesForScreens(int screens);
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
     virtual int calculateUsedLicenses(Qn::LicenseType licenseType) const override;
@@ -111,7 +113,7 @@ protected:
 /** Utility RAAA class to propose some licenses usage. */
 class QnVideoWallLicenseUsageProposer {
 public:
-    QnVideoWallLicenseUsageProposer(QnVideoWallLicenseUsageHelper* helper, int count);
+    QnVideoWallLicenseUsageProposer(QnVideoWallLicenseUsageHelper* helper, int screenCount, int controlSessionsCount);
     ~QnVideoWallLicenseUsageProposer();
 private:
     QPointer<QnVideoWallLicenseUsageHelper> m_helper;
