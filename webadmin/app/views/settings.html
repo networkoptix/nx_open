@@ -85,7 +85,7 @@
 <ul>
     <li ng-repeat="server in mediaServers">
         <icon for="server.status!='Online'" on-true="warning-sign" title-true="Unavailable" />
-        <a href="{{server.apiUrl}}" target="_blank">{{server.name}} ({{server.apiUrl.replace('http://','').replace('https://','')}})</a>
+        <a ng-href="{{server.apiUrl}}" target="_blank">{{server.name}} ({{server.apiUrl.replace('http://','').replace('https://','')}})</a>
         {{settings.id == server.id.replace('{','').replace('}','')?'(current)':''}}
     </li>
 </ul>

@@ -285,16 +285,19 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
         {
             QString message = tr("Update has been successfully finished.");
 
-            message += lit("\n");
-            if (result.clientInstallerRequired)
-                message += tr("Now you have to update the client using an installer.");
-            else
-                message += tr("The client will be restarted to the updated version.");
+            bool clientUpdated = (result.targetVersion != qnCommon->engineVersion());
 
+            if (clientUpdated) {
+                message += lit("\n");
+                if (result.clientInstallerRequired)
+                    message += tr("Now you have to update the client using an installer.");
+                else
+                    message += tr("The client will be restarted to the updated version.");
+            }
 
             QMessageBox::information(this, tr("Update is successful"), message);
 
-            if (!result.clientInstallerRequired) {
+            if (clientUpdated && !result.clientInstallerRequired) {
                 if (!applauncher::restartClient(result.targetVersion) == applauncher::api::ResultType::ok) {
                     QMessageBox::critical(this,
                         tr("Launcher process is not found"),
