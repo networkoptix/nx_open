@@ -81,7 +81,13 @@ int runApplication(QGuiApplication *application) {
     qmlFileSelector.setSelector(&fileSelector);
 
     engine.rootContext()->setContextObject(&context);
-    engine.rootContext()->setContextProperty(lit("screenPixelMultiplier"), QnResolutionUtil::densityMultiplier(densityClass));
+    qreal multiplier = QnResolutionUtil::densityMultiplier(densityClass);
+
+#if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
+    multiplier = 1;
+#endif
+
+    engine.rootContext()->setContextProperty(lit("screenPixelMultiplier"), multiplier);
 
     QQmlComponent mainComponent(&engine, QUrl(lit("qrc:///qml/main.qml")));
     QObject *mainWindow = mainComponent.create();
