@@ -297,26 +297,6 @@ int QnVideoWallLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType license
     foreach (const QnVideoWallResourcePtr &videowall, qnResPool->getResources<QnVideoWallResource>()) {
         /* Calculating total screens. */
         result += videowall->items()->getItems().size();
-
-        /* Calculating "PushMyScreen" items. */
-        foreach(const QnVideoWallItem &item, videowall->items()->getItems()) {
-            if (item.layout.isNull())
-                continue;
-
-            QnLayoutResourcePtr layout = qnResPool->getResourceById(item.layout).dynamicCast<QnLayoutResource>();
-            if (!layout)
-                continue;
-            
-            foreach (const QnLayoutItemData &data, layout->getItems()) {
-                QnResourcePtr resource = (!data.resource.id.isNull())
-                    ? qnResPool->getResourceById(data.resource.id)
-                    : qnResPool->getResourceByUniqId(data.resource.path); //TODO: #EC2
-                if (!resource || !resource->hasFlags(Qn::desktop_camera))
-                    continue;
-
-                result++;   //desktop camera found
-            }
-        }
     }
 
     return result;
