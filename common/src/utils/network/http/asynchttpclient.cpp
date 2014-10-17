@@ -484,13 +484,21 @@ namespace nx_http
     void AsyncHttpClient::resetDataBeforeNewRequest()
     {
         //stopping client, if it is running
-        terminate();
+        {
+            QMutexLocker lk( &m_mutex );
+            m_terminated = true;
+        }
+        //after we set m_terminated to true with m_mutex locked socket event processing is stopped and m_socket cannot change its value
+        if( m_socket )
+            m_socket->cancelAsyncIO();
+
         {
             QMutexLocker lk( &m_mutex );
             m_terminated = false;
         }
 
         m_authorizationTried = false;
+        m_request = nx_http::Request();
     }
 
     bool AsyncHttpClient::initiateHttpMessageDelivery( const QUrl& url )
@@ -514,7 +522,7 @@ namespace nx_http
         else {
             m_state = sInit;
 
-            m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(url.scheme() == lit("https")));
+            m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(/*url.scheme() == lit("https")*/));
             if( !m_socket->setNonBlockingMode( true ) ||
                 !m_socket->setSendTimeout( DEFAULT_CONNECT_TIMEOUT ) ||
                 !m_socket->setRecvTimeout( m_responseReadTimeoutMs ) )
