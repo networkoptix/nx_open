@@ -27,7 +27,6 @@ Button {
             Rectangle {
                 id: rectangle
                 anchors.fill: parent
-                anchors.margins: shadow.radius
                 width: control.width
                 height: control.height
                 radius: height / 2

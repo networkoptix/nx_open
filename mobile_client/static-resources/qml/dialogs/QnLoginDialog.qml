@@ -44,6 +44,35 @@ Item {
     }
 
     Item {
+        id: actionBar
+
+        width: parent.width
+        height: CommonFunctions.dp(56)
+
+        QnIconButton {
+            id: backButton
+            icon: "/images/back.png"
+
+            onClicked: {
+                loginDialog.state = "CHOOSE"
+            }
+        }
+
+        Row {
+            anchors.right: parent.right
+            height: parent.height
+
+            QnIconButton {
+                id: deleteButton
+                icon: "/images/delete.png"
+
+                onClicked: {
+                }
+            }
+        }
+    }
+
+    Item {
         id: savedSessions
 
         anchors.top: logo.bottom
@@ -53,15 +82,14 @@ Item {
         Text {
             anchors {
                 bottom: savedSessionsList.top
-                left: savedSessionsList.left
-                right: savedSessionsList.right
-                margins: CommonFunctions.dp(16)
+                horizontalCenter: parent.horizontalCenter
+                bottomMargin: CommonFunctions.dp(16)
             }
 
             color: __syspal.windowText
             text: qsTr("Saved sessions")
             renderType: Text.NativeRendering
-            font.pointSize: 36
+            font.pixelSize: CommonFunctions.dp(40)
         }
 
         ListView {
@@ -71,6 +99,7 @@ Item {
             width: parent.width * 2 / 3
             height: parent.height / 3
             spacing: CommonFunctions.dp(8)
+            boundsBehavior: ListView.StopAtBounds
 
             delegate: Item {
                 width: savedSessionsList.width
@@ -278,6 +307,15 @@ Item {
             }
         }
     ]
+
+    Keys.onReleased: {
+        if (event.key == Qt.Key_Back) {
+            if (loginDialog.state == "CHOOSE")
+                Qt.quit()
+            else
+                loginDialog.state = "CHOOSE"
+        }
+    }
 
     Component.onCompleted: {
         savedSessionsList.model = settings.savedSessions()
