@@ -2,9 +2,19 @@
 
 angular.module('webadminApp')
     .factory('mediaserver', function ($http, $resource) {
+
+        var cacheModuleInfo = null;
+
         return {
             getSettings: function(url) {
                 url = url || "";
+
+                if(url==""){// Кешируем данные о сервере, чтобы не запрашивать 10 раз
+                    if(cacheModuleInfo == null){
+                        cacheModuleInfo = $http.get(url + '/api/moduleInformation')
+                    }
+                    return cacheModuleInfo;
+                }
                 return $http.get(url + '/api/moduleInformation');
             },
             saveSettings: function(systemName,port) { return $http.post('/api/configure?systemName=' + systemName + '&port=' + port); },
