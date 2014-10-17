@@ -380,6 +380,11 @@ public:
     bool AsyncRecv( nx::Buffer* buffer , std::function<void(SystemError::ErrorCode,std::size_t)>&& handler );
     void WaitForAllPendingIOFinish() {
         underly_socket_->terminateAsyncIO( true );
+        Clear();
+    }
+    void Clear() {
+        read_queue_.clear();
+        write_queue_.clear();
     }
 private:
     void AsyncPerform( AsyncSSLOperation* operation );
@@ -533,11 +538,6 @@ void AsyncSSL::Perform( AsyncSSLOperation* operation ) {
     operation->Perform(&ssl_return,&ssl_error);
     // Check the EOF/SHUTDOWN status of the ssl 
     CheckShutdown(ssl_return,ssl_error);
-    // Handle each ssl error accordingly here
-    if( eof() ) {
-        operation->SetExitStatus(AsyncSSLOperation::END_OF_STREAM,SystemError::noError);
-        return;
-    }
     // Handle existed write here
     if( current_write_.NeedWrite() ) {
         EnqueueWrite();
@@ -553,8 +553,13 @@ void AsyncSSL::Perform( AsyncSSLOperation* operation ) {
     case SSL_ERROR_WANT_WRITE:
         break;
     default:
-        HandleSSLError(ssl_return,ssl_error);
-        operation->SetExitStatus(AsyncSSLOperation::EXCEPTION,kSSLInternalError);
+        if( eof() && ssl_error == SSL_ERROR_SYSCALL ) {
+            // For end of the file , we just tell them that we are done here
+            operation->SetExitStatus(AsyncSSLOperation::END_OF_STREAM,0);
+        } else {
+            HandleSSLError(ssl_return,ssl_error);
+            operation->SetExitStatus(AsyncSSLOperation::EXCEPTION,kSSLInternalError);
+        }
         break;
     }
 }
@@ -599,6 +604,7 @@ void AsyncSSL::HandleSSLError( int ssl_return , int ssl_error ) {
             lit("SSL error stack:%1\n").arg(QLatin1String(err_str)),cl_logDEBUG1);
         qDebug()<<QLatin1String(err_str);
     }
+    qDebug()<<"Unknown peer address:"<<underly_socket_->getForeignAddress().toString();
     NX_LOG(
         lit("System error code:%1\n").arg(SystemError::getLastOSErrorCode()),cl_logDEBUG1);
 
@@ -819,12 +825,22 @@ void AsyncSSL::AsyncPerform( AsyncSSLOperation* operation ) {
 }
 
 bool AsyncSSL::AsyncSend( const nx::Buffer& buffer , std::function<void(SystemError::ErrorCode,std::size_t)>&& handler ) {
+#ifndef NDEBUG
+    if( !write_queue_.empty() ) {
+        Q_ASSERT( write_queue_.front().operation != write_.get() );
+    }
+#endif
     write_->Reset(&buffer,std::move(handler));
     AsyncPerform(write_.get());
     return true;
 }
 
 bool AsyncSSL::AsyncRecv( nx::Buffer* buffer , std::function<void(SystemError::ErrorCode,std::size_t)>&& handler ) {
+#ifndef NDEBUG
+    if( !read_queue_.empty() ) {
+        Q_ASSERT( read_queue_.front() != read_.get() );
+    }
+#endif 
     read_->Reset(buffer,std::move(handler));
     AsyncPerform(read_.get());
     return true;
@@ -1184,10 +1200,11 @@ int QnSSLSocket::recvInternal(void* buffer, unsigned int bufferLen, int /*flags*
 int QnSSLSocket::recv( void* buffer, unsigned int bufferLen, int flags)
 {
     Q_D(QnSSLSocket);
+    Q_ASSERT( d->mode == QnSSLSocket::SYNC );
+
     if( !d->ecnryptionEnabled )
         return d->wrappedSocket->recv( buffer, bufferLen, flags );
 
-    d->mode.store(QnSSLSocket::SYNC,std::memory_order_release);
     if (!SSL_is_init_finished(d->ssl)) {
         if (d->isServerSide)
             doServerHandshake();
@@ -1206,11 +1223,11 @@ int QnSSLSocket::sendInternal( const void* buffer, unsigned int bufferLen )
 int QnSSLSocket::send( const void* buffer, unsigned int bufferLen )
 {
     Q_D(QnSSLSocket);
+    Q_ASSERT( d->mode == QnSSLSocket::SYNC );
 
     if( !d->ecnryptionEnabled )
         return d->wrappedSocket->send( buffer, bufferLen );
 
-    d->mode.store(QnSSLSocket::SYNC,std::memory_order_release);
     if (!SSL_is_init_finished(d->ssl)) {
         if (d->isServerSide)
             doServerHandshake();
@@ -1438,7 +1455,7 @@ bool QnSSLSocket::enableClientEncryption()
 void QnSSLSocket::cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion )
 {
     Q_D( const QnSSLSocket );
-    return d->wrappedSocket->cancelAsyncIO( eventType, waitForRunningHandlerCompletion );
+    d->wrappedSocket->cancelAsyncIO( eventType, waitForRunningHandlerCompletion );
 }
 
 bool QnSSLSocket::connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )
@@ -1525,7 +1542,7 @@ QnMixedSSLSocket::QnMixedSSLSocket(AbstractStreamSocket* wrappedSocket):
 int QnMixedSSLSocket::recv( void* buffer, unsigned int bufferLen, int flags)
 {
     Q_D(QnMixedSSLSocket);
-    d->mode = QnSSLSocket::SYNC;
+    Q_ASSERT( d->mode == QnSSLSocket::SYNC );
     // check for SSL pattern 0x80 (v2) or 0x16 03 (v3)
     if (d->initState) 
     {
@@ -1567,7 +1584,7 @@ int QnMixedSSLSocket::recv( void* buffer, unsigned int bufferLen, int flags)
 int QnMixedSSLSocket::send( const void* buffer, unsigned int bufferLen )
 {
     Q_D(QnMixedSSLSocket);
-    d->mode = QnSSLSocket::SYNC;
+    Q_ASSERT( d->mode == QnSSLSocket::SYNC );
     if (d->useSSL)
         return QnSSLSocket::send((char*) buffer, bufferLen);
     else 
