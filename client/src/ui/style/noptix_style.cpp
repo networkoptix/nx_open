@@ -218,7 +218,8 @@ void QnNoptixStyle::polish(QApplication *application) {
     font.setStyle(QFont::StyleNormal);
     font.setWeight(QFont::Normal);
 #ifdef Q_OS_LINUX
-    font.setFamily(lit("Ubuntu")); // TODO: #Elric implement properly
+    if (!QFont::substitutes(lit("ubuntu")).isEmpty())
+        font.setFamily(lit("ubuntu")); // TODO: #Elric implement properly
 #endif
     application->setFont(font);
 

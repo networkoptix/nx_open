@@ -196,12 +196,15 @@ void QnResourcePoolModelNode::update() {
             QnVideoWallItem item = index.item();
 
             if (item.runtimeStatus.online) {
-                if (item.runtimeStatus.controlledBy.isNull() || item.runtimeStatus.controlledBy == qnCommon->moduleGUID()){
+                if (item.runtimeStatus.controlledBy.isNull()){
                     m_status = Qn::Online;
-                    m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallItem);              
+                    m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallItem);
+                } else if (item.runtimeStatus.controlledBy == qnCommon->moduleGUID()){
+                    m_status = Qn::Online;
+                    m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Control);
                 } else {
                     m_status = Qn::Unauthorized;
-                    m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Unauthorized);
+                    m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Locked);
                 }
             }
 
