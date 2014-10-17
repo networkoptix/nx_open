@@ -123,8 +123,5 @@ angular.module('webadminApp')
                 return (server.status=='Online'?'0':'1') + server.Name + server.id;
                 // Сортировка: online->name->id
             });
-
-            ;
-            console.log(data);
         });
     });
