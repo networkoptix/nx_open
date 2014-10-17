@@ -117,11 +117,34 @@ angular.module('webadminApp')
             }
         };
 
+        function checkServersIp(server,i){
+            var ips = server.networkAddresses.split(';');
+            var port = server.apiUrl.substring(server.apiUrl.lastIndexOf(":"));
+            var url = "http://" + ips[i] + port;
+
+
+            //console.log("checkServersIp", url, server);
+            mediaserver.getSettings(url).then(function(){
+                server.apiUrl = url;
+            }).catch(function(){
+            //    console.log("fail again " + url);
+                if(i < ips.length-1)
+                    checkServersIp (server,i+1);
+                else
+                    server.status = "Unavailable";
+                return false;
+            });
+        }
 
         mediaserver.getMediaServers().success(function(data){
             $scope.mediaServers = _.sortBy(data,function(server){
                 return (server.status=='Online'?'0':'1') + server.Name + server.id;
                 // Сортировка: online->name->id
+            });
+
+            _.each($scope.mediaServers,function(server){
+                var i=0;//1. Опрашиваем айпишники подряд
+                checkServersIp (server,i);
             });
         });
     });
