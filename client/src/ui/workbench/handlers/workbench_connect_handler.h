@@ -30,6 +30,8 @@ protected:
 
     void hideMessageBox();
     void showLoginDialog();
+
+    void tryToRestoreConnection(const QString &systemName);
 private:
     void at_messageProcessor_connectionOpened();
     void at_messageProcessor_connectionClosed();

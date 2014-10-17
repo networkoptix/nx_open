@@ -41,8 +41,11 @@
 #include <utils/app_server_notification_cache.h>
 #include <utils/connection_diagnostics_helper.h>
 #include <utils/common/synctime.h>
+#include <utils/network/module_finder.h>
 #include <utils/network/global_module_finder.h>
 #include <utils/network/router.h>
+
+#include "compatibility.h"
 
 namespace {
     const int videowallReconnectTimeoutMSec = 5000;
@@ -174,17 +177,8 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
     context()->instance<QnAppServerNotificationCache>()->clear();
 
     /* If we were not disconnected intentionally show corresponding message. */
-    if (!qnCommon->remoteGUID().isNull()) {
-        m_connectingMessageBox = QnGraphicsMessageBox::informationTicking(
-            tr("Connection failed. Trying to restore connection... %1"),
-            maxReconnectTimeout);
-
-        connect(m_connectingMessageBox, &QnGraphicsMessageBox::finished, this, [this]{
-            menu()->trigger(Qn::DisconnectAction, QnActionParameters().withArgument(Qn::ForceRole, true));
-            menu()->trigger(Qn::OpenLoginDialogAction);
-            m_connectingMessageBox = NULL;
-        });
-    }
+    if (!qnCommon->remoteGUID().isNull())
+        tryToRestoreConnection(qnCommon->localSystemName());
 
     qnCommon->setLocalSystemName(QString());
 }
@@ -348,8 +342,54 @@ void QnWorkbenchConnectHandler::hideMessageBox() {
 void QnWorkbenchConnectHandler::showLoginDialog() {
     QnNonModalDialogConstructor<QnLoginDialog> dialogConstructor(m_loginDialog, mainWindow());
     dialogConstructor.resetGeometry();
-    //just show dialog   
+
+    //TODO: #GDM reconnect process should be aborted if user opens login dialog
 }
+
+void QnWorkbenchConnectHandler::tryToRestoreConnection(const QString &systemName) {
+    /* Check against recursive enter. */
+    if (!connected())
+        return;
+
+    QUrl currentUrl = QnAppServerConnectionFactory::url();
+    QString userName = currentUrl.userName();
+    QString password = currentUrl.password();
+
+    //TODO: #GDM process should be aborted if user opens login dialog
+
+    m_connectingMessageBox = QnGraphicsMessageBox::informationTicking(
+        tr("Connection failed. Trying to restore connection... %1"),
+        maxReconnectTimeout);
+
+    connect(m_connectingMessageBox, &QnGraphicsMessageBox::finished, this, [this, systemName, userName, password] {
+        m_connectingMessageBox = NULL;
+        disconnectFromServer(true);
+
+        QnCompatibilityChecker checker(localCompatibilityItems());
+        foreach (const QnModuleInformation &info, QnModuleFinder::instance()->foundModules()) {
+            if (info.systemName != systemName)
+                continue;
+
+            if (info.remoteAddresses.isEmpty())
+                continue;
+
+            if (!checker.isCompatible(lit("Client"), qnCommon->engineVersion(), lit("ECS"), info.version))
+                continue;
+
+            QUrl targetUrl;
+            targetUrl.setScheme(lit("http"));
+            targetUrl.setHost(*info.remoteAddresses.cbegin());
+            targetUrl.setPort(info.port);
+            targetUrl.setUserName(userName);
+            targetUrl.setPassword(password);
+            if (connectToServer(targetUrl))
+                return;
+        }        
+        menu()->trigger(Qn::OpenLoginDialogAction);
+    });
+   
+}
+
 
 void QnWorkbenchConnectHandler::at_beforeExitAction_triggered() {
     disconnectFromServer(true);
