@@ -3,6 +3,10 @@
 #include <QtGui/QGuiApplication>
 #include <QtGui/QScreen>
 
+#ifdef Q_OS_ANDROID
+#include <QtAndroidExtras/QAndroidJniObject>
+#endif
+
 namespace {
     const qreal referencePpi = 160.0;
 }
@@ -18,7 +22,15 @@ QnResolutionUtil::DensityClass QnResolutionUtil::currentDensityClass() {
                             << densityMultiplier(Xxxhdpi);
     }
 
+#ifdef Q_OS_ANDROID
+    QAndroidJniObject qtActivity = QAndroidJniObject::callStaticObjectMethod("org/qtproject/qt5/android/QtNative", "activity", "()Landroid/app/Activity;");
+    QAndroidJniObject resources = qtActivity.callObjectMethod("getResources", "()Landroid/content/res/Resources;");
+    QAndroidJniObject displayMetrics = resources.callObjectMethod("getDisplayMetrics", "()Landroid/util/DisplayMetrics;");
+    qreal ppi = displayMetrics.getField<int>("densityDpi");
+#else
     qreal ppi = QGuiApplication::primaryScreen()->physicalDotsPerInch() * QGuiApplication::primaryScreen()->devicePixelRatio();
+#endif
+
     qreal multiplier = ppi / referencePpi;
 
     auto it = qLowerBound(standardMultipliers, multiplier);
