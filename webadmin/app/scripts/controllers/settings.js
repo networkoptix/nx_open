@@ -14,7 +14,8 @@ angular.module('webadminApp')
         mediaserver.getSettings().then(function (r) {
             $scope.settings = {
                 systemName: r.data.reply.systemName,
-                port: r.data.reply.port
+                port: r.data.reply.port,
+                id: r.data.reply.id
             };
         });
 
@@ -115,4 +116,12 @@ angular.module('webadminApp')
                 restartServer(false);
             }
         };
+
+
+        mediaserver.getMediaServers().success(function(data){
+            $scope.mediaServers = _.sortBy(data,function(server){
+                return (server.status=='Online'?'0':'1') + server.Name + server.id;
+                // Сортировка: online->name->id
+            });
+        });
     });

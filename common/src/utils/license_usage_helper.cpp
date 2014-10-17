@@ -249,6 +249,29 @@ int QnCamLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType licenseType) 
 QnVideoWallLicenseUsageHelper::QnVideoWallLicenseUsageHelper(QObject *parent):
     QnLicenseUsageHelper(parent)
 {
+    auto updateIfNeeded = [this](const QnResourcePtr &resource) {
+        if (!resource.dynamicCast<QnVideoWallResource>())
+            return;
+        update();
+    };
+
+    auto connectTo = [this](const QnVideoWallResourcePtr &videowall) {
+        connect(videowall, &QnVideoWallResource::itemAdded,     this, &QnVideoWallLicenseUsageHelper::update);
+        connect(videowall, &QnVideoWallResource::itemChanged,   this, &QnVideoWallLicenseUsageHelper::update);
+        connect(videowall, &QnVideoWallResource::itemRemoved,   this, &QnVideoWallLicenseUsageHelper::update);
+    };
+
+    auto connectIfNeeded = [this, connectTo](const QnResourcePtr &resource) {
+        if (QnVideoWallResourcePtr videowall = resource.dynamicCast<QnVideoWallResource>())
+            connectTo(videowall);
+    };
+
+    connect(qnResPool, &QnResourcePool::resourceAdded,   this,   connectIfNeeded);
+    connect(qnResPool, &QnResourcePool::resourceAdded,   this,   updateIfNeeded);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this,   updateIfNeeded);
+    foreach (const QnVideoWallResourcePtr &videowall, qnResPool->getResources<QnVideoWallResource>())
+        connectTo(videowall);
+
     connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoAdded,    this, &QnVideoWallLicenseUsageHelper::update);
     connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoChanged,  this, &QnVideoWallLicenseUsageHelper::update);
     connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoRemoved,  this, &QnVideoWallLicenseUsageHelper::update);
@@ -269,6 +292,11 @@ int QnVideoWallLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType license
         if (info.data.videoWallControlSession.isNull())
             continue;
         ++result;
+    }
+
+    foreach (const QnVideoWallResourcePtr &videowall, qnResPool->getResources<QnVideoWallResource>()) {
+        /* Calculating total screens. */
+        result += videowall->items()->getItems().size();
     }
 
     return result;

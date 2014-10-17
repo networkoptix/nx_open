@@ -2,9 +2,19 @@
 
 angular.module('webadminApp')
     .factory('mediaserver', function ($http, $resource) {
+
+        var cacheModuleInfo = null;
+
         return {
             getSettings: function(url) {
                 url = url || "";
+
+                if(url==""){// Кешируем данные о сервере, чтобы не запрашивать 10 раз
+                    if(cacheModuleInfo == null){
+                        cacheModuleInfo = $http.get(url + '/api/moduleInformation')
+                    }
+                    return cacheModuleInfo;
+                }
                 return $http.get(url + '/api/moduleInformation');
             },
             saveSettings: function(systemName,port) { return $http.post('/api/configure?systemName=' + systemName + '&port=' + port); },
@@ -15,6 +25,7 @@ angular.module('webadminApp')
             getStorages: function(){ return $http.get('/api/storageSpace'); },
             discoveredPeers:function(){return $http.get('/api/discoveredPeers'); },
             getMediaServer: function(id){return $http.get('/ec2/getMediaServersEx?id=' + id); },
+            getMediaServers: function(){return $http.get('/ec2/getMediaServersEx'); },
             saveStorages:function(info){return $http.post('/ec2/saveStorages',info); },
             saveMediaServer: function(info){return $http.post('/ec2/saveMediaServer',info); },
             statistics:function(url){
@@ -22,7 +33,5 @@ angular.module('webadminApp')
                 return $http.get(url + '/api/statistics');
             },
             getCurrentUser:function(){return $http.post('/api/getCurrentUser');}
-
-
         };
     });
