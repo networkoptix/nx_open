@@ -891,7 +891,6 @@ bool QnWorkbenchVideoWallHandler::canStartControlMode() const {
             tr("To enable the feature please activate Video Wall starter license."));
         return false;
     }
-
     QnVideoWallLicenseUsageProposer proposer(m_licensesHelper.data(), 1);
     if (!validateLicenses(tr("Could not start Video Wall control session.")))
         return false;
@@ -1188,6 +1187,7 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
 /*------------------------------------ HANDLERS ------------------------------------------*/
 
 void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
+
     QnLicenseListHelper licenseList(qnLicensePool->getLicenses());
     if (licenseList.totalLicenseByType(Qn::LC_VideoWall) < videowallStarterPackAmount) {
         QMessageBox::warning(mainWindow(),
@@ -1195,7 +1195,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
             tr("To enable the feature please activate Video Wall starter license"));
         return;
     }
-
+	
 	QStringList usedNames;
     foreach(const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::videowall))
         usedNames << resource->getName().trimmed().toLower();
@@ -1339,6 +1339,9 @@ void QnWorkbenchVideoWallHandler::at_startVideoWallAction_triggered() {
     if(videoWall.isNull())
         return;
     
+    if (!validateLicenses(tr("Could not start Video Wall.")))
+        return;
+
     startVideowallAndExit(videoWall);
 }
 
@@ -1568,6 +1571,10 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered() {
 
 void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered() {
     if (!context()->user())
+        return;
+
+    QnVideoWallLicenseUsageProposer proposer(m_licensesHelper.data(), 1);
+    if (!validateLicenses(tr("Could not push my screen.")))
         return;
 
     QnVirtualCameraResourcePtr desktopCamera;
