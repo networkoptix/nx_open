@@ -2,6 +2,8 @@
 
 #include <api/runtime_info_manager.h>
 
+#include <boost/range/algorithm/count_if.hpp>
+
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
@@ -176,6 +178,28 @@ QList<Qn::LicenseType> QnLicenseUsageHelper::licenseTypes() const {
     return m_licenseTypes;
 }
 
+QString QnLicenseUsageHelper::activationMessage(const QJsonObject& errorMessage)
+{
+    QString messageId = errorMessage.value(lit("messageId")).toString();
+    QString message = errorMessage.value(lit("message")).toString();
+    QVariantMap arguments = errorMessage.value(lit("arguments")).toObject().toVariantMap();
+
+    if(messageId == lit("DatabaseError")) {
+        message = tr("There was a problem activating your license key. Database error has occurred.");  //TODO: Feature #3629 case J
+    } else if(messageId == lit("InvalidData")) {
+        message = tr("There was a problem activating your license key. Invalid data received. Please contact support team to report issue.");
+    } else if(messageId == lit("InvalidKey")) {
+        message = tr("The license key you have entered is invalid. Please check that license key is entered correctly. "
+            "If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.");
+    } else if(messageId == lit("InvalidBrand")) {
+        message = tr("You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.");
+    } else if(messageId == lit("AlreadyActivated")) {
+        message = tr("This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to get a valid license key.");
+    }
+
+    return Mustache::renderTemplate(message, arguments);
+}
+
 /************************************************************************/
 /* QnCamLicenseUsageHelper                                              */
 /************************************************************************/
@@ -294,24 +318,28 @@ int QnVideoWallLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType license
         ++result;
     }
 
-    foreach (const QnVideoWallResourcePtr &videowall, qnResPool->getResources<QnVideoWallResource>()) {
-        /* Calculating total screens. */
-        result += videowall->items()->getItems().size();
-    }
+    /* Calculating total screens. */
+    int usedScreens = 0;
+    foreach (const QnVideoWallResourcePtr &videowall, qnResPool->getResources<QnVideoWallResource>())
+        usedScreens += videowall->items()->getItems().size();
+    result += (usedScreens + 1) / 2;
 
     return result;
 }
 
 void QnVideoWallLicenseUsageHelper::propose(const QnVideoWallResourcePtr &videowall, const QnUuid &pcUuid, int itemsCount) {
-    int used = 0;
-    if (!pcUuid.isNull()) {
-        foreach(const QnVideoWallItem &item, videowall->items()->getItems()) {
-            if (item.pcUuid != pcUuid)
-                continue;
-            used++;
-        }
-    }
-    m_proposedLicenses[Qn::LC_VideoWall] = itemsCount - used;
+    /* Calculate how many screens are proposed to be added or removed on local PC. */
+    int used = pcUuid.isNull()
+        ? 0
+        : boost::count_if(videowall->items()->getItems(), [pcUuid](const QnVideoWallItem &item){return item.pcUuid == pcUuid;});
+    int localScreensChange = itemsCount - used;
+
+    /* Calculating total screens. */
+    int total = 0;
+    foreach (const QnVideoWallResourcePtr &videowall, qnResPool->getResources<QnVideoWallResource>())
+        total += videowall->items()->getItems().size();
+
+    m_proposedLicenses[Qn::LC_VideoWall] = licensesForScreens(total + localScreensChange) - licensesForScreens(total);
     update();
 }
 
@@ -320,37 +348,41 @@ void QnVideoWallLicenseUsageHelper::propose(int count) {
     update();
 }
 
-QnVideoWallLicenseUsageProposer::QnVideoWallLicenseUsageProposer(QnVideoWallLicenseUsageHelper* helper, int count):
+int QnVideoWallLicenseUsageHelper::licensesForScreens(int screens) {
+    return (screens + 1) / 2;
+}
+
+QnVideoWallLicenseUsageProposer::QnVideoWallLicenseUsageProposer(QnVideoWallLicenseUsageHelper* helper, int screenCount, int controlSessionsCount):
     m_helper(helper),
-    m_count(count)
+    m_count(0)
 {
-    if (m_helper)
-        m_helper->propose(m_count);
+    if (!m_helper)
+        return;
+
+    if (screenCount != 0) {
+        /* Calculating total screens. */
+        int totalScreens = 0;
+        foreach (const QnVideoWallResourcePtr &videowall, qnResPool->getResources<QnVideoWallResource>())
+            totalScreens += videowall->items()->getItems().size();
+
+        /* Value for screens is calculated. */
+        int screensValue = QnVideoWallLicenseUsageHelper::licensesForScreens(totalScreens + screenCount) 
+            - QnVideoWallLicenseUsageHelper::licensesForScreens(totalScreens);
+
+        /* Select which requirement is higher. */
+        m_count = qMax(controlSessionsCount, screensValue);
+
+    } else {
+
+        /* Each control session requires an additional license. */
+        m_count = controlSessionsCount;
+    }
+    m_helper->propose(m_count);
+
 }
 
 QnVideoWallLicenseUsageProposer::~QnVideoWallLicenseUsageProposer() {
-    if (m_helper)
-        m_helper->propose(-m_count);
-}
-
-QString QnLicenseUsageHelper::activationMessage(const QJsonObject& errorMessage)
-{
-    QString messageId = errorMessage.value(lit("messageId")).toString();
-    QString message = errorMessage.value(lit("message")).toString();
-    QVariantMap arguments = errorMessage.value(lit("arguments")).toObject().toVariantMap();
-
-    if(messageId == lit("DatabaseError")) {
-        message = tr("There was a problem activating your license key. Database error has occurred.");  //TODO: Feature #3629 case J
-    } else if(messageId == lit("InvalidData")) {
-        message = tr("There was a problem activating your license key. Invalid data received. Please contact support team to report issue.");
-    } else if(messageId == lit("InvalidKey")) {
-        message = tr("The license key you have entered is invalid. Please check that license key is entered correctly. "
-            "If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.");
-    } else if(messageId == lit("InvalidBrand")) {
-        message = tr("You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.");
-    } else if(messageId == lit("AlreadyActivated")) {
-        message = tr("This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to get a valid license key.");
-    }
-
-    return Mustache::renderTemplate(message, arguments);
+    if (!m_helper)
+        return;
+    m_helper->propose(-m_count);
 }
