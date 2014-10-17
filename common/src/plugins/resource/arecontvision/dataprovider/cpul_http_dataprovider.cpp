@@ -27,6 +27,8 @@ QnPlAVClinetPullStreamReader(res)
 
 QnAbstractMediaDataPtr  AVClientPullSSHTTPStreamreader::getNextData()
 {
+    updateCameraParams();
+
 
     QString request;
 
