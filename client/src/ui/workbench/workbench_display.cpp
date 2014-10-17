@@ -1219,7 +1219,15 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const {
             ? layoutBoundingRect
             : layoutBoundingRect.united(backgroundBoundingRect);
 
-    return workbench()->mapper()->mapFromGridF(QRectF(sceneBoundingRect));
+    /* Do not add additional spacing in following cases: */
+    bool noAdjust = qnSettings->isVideoWallMode()                           /*< Videowall client. */
+        || !backgroundBoundingRect.isNull();                                /*< There is a layout background. */
+
+    if (noAdjust)
+        return workbench()->mapper()->mapFromGridF(QRectF(sceneBoundingRect));
+    
+    const qreal minAdjust = 0.015;
+    return workbench()->mapper()->mapFromGridF(QRectF(sceneBoundingRect).adjusted(-minAdjust, -minAdjust, minAdjust, minAdjust));
 }
 
 QRectF QnWorkbenchDisplay::viewportGeometry() const {

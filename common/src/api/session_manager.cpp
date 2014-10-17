@@ -18,6 +18,8 @@
 #include "common/common_module.h"
 #include "app_server_connection.h"
 
+#include <iostream>
+
 int QnSessionManagerSyncReply::wait(QnHTTPRawResponse& response) {
     QMutexLocker locker(&m_mutex);
     while (!m_finished)

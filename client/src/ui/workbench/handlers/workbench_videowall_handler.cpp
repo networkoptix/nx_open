@@ -196,9 +196,6 @@ namespace {
     const int cacheMessagesTimeoutMs = 500;
 
     const qreal defaultReviewAR = 1920.0 / 1080.0;
-
-    /** Minimal amount of licenses to allow videowall creating. */
-    const int videowallStarterPackAmount = 5;
 }
 
 class QnVideowallAutoStarter: public QnWorkbenchAutoStarter {
@@ -885,14 +882,14 @@ void QnWorkbenchVideoWallHandler::restoreMessages(const QnUuid &controllerUuid, 
 
 bool QnWorkbenchVideoWallHandler::canStartControlMode() const {
     QnLicenseListHelper licenseList(qnLicensePool->getLicenses());
-    if (licenseList.totalLicenseByType(Qn::LC_VideoWall) < videowallStarterPackAmount) {
+    if (licenseList.totalLicenseByType(Qn::LC_VideoWall) == 0) {
         QMessageBox::warning(mainWindow(),
             tr("More licenses required"),
-            tr("To enable the feature please activate Video Wall starter license."));
+            tr("To enable the feature please activate at least one Video Wall license."));
         return false;
     }
 
-    QnVideoWallLicenseUsageProposer proposer(m_licensesHelper.data(), 1);
+    QnVideoWallLicenseUsageProposer proposer(m_licensesHelper.data(), 0, 1);
     if (!validateLicenses(tr("Could not start Video Wall control session.")))
         return false;
     
@@ -917,8 +914,6 @@ bool QnWorkbenchVideoWallHandler::canStartControlMode() const {
 
 void QnWorkbenchVideoWallHandler::setControlMode(bool active) {
     if (active && !canStartControlMode()) {
-        workbench()->currentLayout()->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(QnUuid()));
-        workbench()->currentLayout()->notifyTitleChanged();
         return;
     }
 
@@ -1189,13 +1184,13 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
 
 void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
     QnLicenseListHelper licenseList(qnLicensePool->getLicenses());
-    if (licenseList.totalLicenseByType(Qn::LC_VideoWall) < videowallStarterPackAmount) {
+    if (licenseList.totalLicenseByType(Qn::LC_VideoWall) == 0) {
         QMessageBox::warning(mainWindow(),
             tr("More licenses required"),
-            tr("To enable the feature please activate Video Wall starter license"));
+            tr("To enable the feature please activate at least one Video Wall license"));
         return;
-    }
-
+    } //TODO: #GDM add "Licenses" button
+	
 	QStringList usedNames;
     foreach(const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::videowall))
         usedNames << resource->getName().trimmed().toLower();
@@ -1339,6 +1334,9 @@ void QnWorkbenchVideoWallHandler::at_startVideoWallAction_triggered() {
     if(videoWall.isNull())
         return;
     
+    if (!validateLicenses(tr("Could not start Video Wall.")))
+        return;
+
     startVideowallAndExit(videoWall);
 }
 
@@ -1571,7 +1569,6 @@ void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered() {
         return;
 
     QnVirtualCameraResourcePtr desktopCamera;
-
     foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::desktop_camera)) {
         if (resource->getUniqueId() != QnAppServerConnectionFactory::clientGuid())
             continue;
