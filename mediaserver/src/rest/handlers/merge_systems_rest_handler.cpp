@@ -90,7 +90,10 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
         return CODE_OK;
     }
 
-    if (!isCompatible(qnCommon->engineVersion(), moduleInformation.version) || moduleInformation.customization != QnAppInfo::customizationName()) {
+    bool customizationOK = moduleInformation.customization == QnAppInfo::customizationName();
+    if (QnModuleFinder::instance()->isCompatibilityMode())
+        customizationOK = true;
+    if (!isCompatible(qnCommon->engineVersion(), moduleInformation.version) || !customizationOK) {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("INCOMPATIBLE"));
         return CODE_OK;
     }
