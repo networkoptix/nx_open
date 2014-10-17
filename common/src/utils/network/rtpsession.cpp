@@ -950,9 +950,9 @@ bool RTPSession::sendSetup()
         }   
         else
         {
-            QUrl mediaUrl = mUrl;
-            mediaUrl.setPath( mediaUrl.path() + lit("/") + trackInfo->setupURL );
-            request.requestLine.url = std::move(mediaUrl);
+            request.requestLine.url = mUrl;
+            // SETUP postfix should be writen after url query params. It's invalid url, but it's required according to RTSP standard
+            request.requestLine.urlPostfix = QString(lit("/")) + trackInfo->setupURL;
         }
         request.requestLine.version = nx_rtsp::rtsp_1_0;
         request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
