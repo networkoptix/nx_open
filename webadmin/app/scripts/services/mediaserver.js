@@ -15,6 +15,7 @@ angular.module('webadminApp')
             getStorages: function(){ return $http.get('/api/storageSpace'); },
             discoveredPeers:function(){return $http.get('/api/discoveredPeers'); },
             getMediaServer: function(id){return $http.get('/ec2/getMediaServersEx?id=' + id); },
+            getMediaServers: function(){return $http.get('/ec2/getMediaServersEx'); },
             saveStorages:function(info){return $http.post('/ec2/saveStorages',info); },
             saveMediaServer: function(info){return $http.post('/ec2/saveMediaServer',info); },
             statistics:function(url){
@@ -22,7 +23,5 @@ angular.module('webadminApp')
                 return $http.get(url + '/api/statistics');
             },
             getCurrentUser:function(){return $http.post('/api/getCurrentUser');}
-
-
         };
     });
