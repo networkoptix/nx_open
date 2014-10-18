@@ -52,6 +52,7 @@ namespace ec2
         QnCameraHistoryList cameraHistory;
         QnLicenseList licenses;
         ec2::ApiResourceParamWithRefDataList allProperties;
+        ec2::ApiResourceStatusDataList resStatusList;
     };
 
     struct QnPeerTimeInfo {
@@ -127,6 +128,23 @@ namespace ec2
         }
 
         /*!
+            \param handler Functor with params: (ErrorCode, const ApiResourceStatusDataList&)
+        */
+        template<class TargetType, class HandlerType> 
+        int getStatusList( const QnUuid& resourceId, TargetType* target, HandlerType handler ) {
+            return getStatusList( resourceId, std::static_pointer_cast<impl::GetStatusListHandler>(std::make_shared<impl::CustomGetStatusListHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+
+        ErrorCode getStatusListSync(const QnUuid& resourceId, ApiResourceStatusDataList* const outData) {
+            return impl::doSyncCall<impl::GetStatusListHandler>( 
+                [=](const impl::GetStatusListHandlerPtr &handler) {
+                    return this->getStatusList(resourceId, handler);
+                },
+                outData 
+            );
+        }
+
+        /*!
         template<class TargetType, class HandlerType> int setResourceDisabled( const QnUuid& resourceId, bool disabled, TargetType* target, HandlerType handler ) {
             return setResourceDisabled( resourceId, disabled, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
@@ -172,6 +190,7 @@ namespace ec2
         virtual int setResourceStatus( const QnUuid& resourceId, Qn::ResourceStatus status, impl::SetResourceStatusHandlerPtr handler ) = 0;
         //virtual int setResourceDisabled( const QnUuid& resourceId, bool disabled, impl::SetResourceDisabledHandlerPtr handler ) = 0;
         virtual int getKvPairs( const QnUuid &resourceId, impl::GetKvPairsHandlerPtr handler ) = 0;
+        virtual int getStatusList( const QnUuid &resourceId, impl::GetStatusListHandlerPtr handler ) = 0;
         //virtual int save( const QnResourcePtr &resource, impl::SaveResourceHandlerPtr handler ) = 0;
         virtual int save(const ec2::ApiResourceParamWithRefDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) = 0;
         virtual int removeParams(const ec2::ApiResourceParamWithRefDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) = 0;

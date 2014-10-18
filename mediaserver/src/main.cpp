@@ -170,6 +170,7 @@
 
 #include "version.h"
 #include "core/resource_management/resource_properties.h"
+#include "core/resource_management/status_dictionary.h"
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -941,6 +942,17 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
             }
         }
         QnResourceDiscoveryManager::instance()->registerManualCameras(manualCameras);
+
+        // read resource status
+        ec2::ApiResourceStatusDataList statusList;
+        while ((rez = ec2Connection->getResourceManager()->getStatusListSync(QnUuid(), &statusList)) != ec2::ErrorCode::ok)
+        {
+            NX_LOG( lit("QnMain::run(): Can't get properties dictionary. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
+        }
+        messageProcessor->processStatusList( statusList );
     }
 
     {
@@ -1409,6 +1421,7 @@ void QnMain::run()
     QnCompatibilityChecker remoteChecker(connectInfo.compatibilityItems);
     QnCompatibilityChecker localChecker(localCompatibilityItems());
     QnResourcePropertyDictionary dictionary;
+    QnResourceStatusDiscionary statusDict;
 
     QnCompatibilityChecker* compatibilityChecker;
     if (remoteChecker.size() > localChecker.size())

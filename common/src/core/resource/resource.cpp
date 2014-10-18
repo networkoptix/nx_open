@@ -26,6 +26,7 @@
 #include "resource_command.h"
 #include "nx_ec/data/api_resource_data.h"
 #include "../resource_management/resource_properties.h"
+#include "../resource_management/status_dictionary.h"
 
 bool QnResource::m_appStopping = false;
 QnInitResPool QnResource::m_initAsyncPool;
@@ -109,7 +110,6 @@ QnResource::QnResource():
     m_initMutex(QMutex::Recursive),
     m_resourcePool(NULL),
     m_flags(0),
-    m_status(Qn::NotDefined),
     m_initialized(false),
     m_lastInitTime(0),
     m_prevInitializationResult(CameraDiagnostics::ErrorCode::unknown),
@@ -202,7 +202,7 @@ void QnResource::update(const QnResourcePtr& other, bool silenceMode)
     }
 
     silenceMode |= other->hasFlags(Qn::foreigner);
-    setStatus(other->m_status, silenceMode);
+    //setStatus(other->m_status, silenceMode);
     afterUpdateInner(modifiedFields);
 
     //silently ignoring missing properties because of removeProperty method lack
@@ -399,8 +399,31 @@ void QnResource::setTypeByName(const QString& resTypeName)
 
 Qn::ResourceStatus QnResource::getStatus() const
 {
+    return qnStatusDictionary->value(getId());
+}
+
+void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus)
+{
+#ifdef QN_RESOURCE_DEBUG
+    qDebug() << "Change status. oldValue=" << oldStatus << " new value=" << newStatus << " id=" << m_id << " name=" << getName();
+#endif
+
+    if (newStatus == Qn::Offline || newStatus == Qn::Unauthorized) 
+    {
+        if(m_initialized) {
+            m_initialized = false;
+            emit initializedChanged(toSharedPointer(this));
+        }
+    }
+
+    if ((oldStatus == Qn::Offline || oldStatus == Qn::NotDefined) && newStatus == Qn::Online && !hasFlags(Qn::foreigner))
+        init();
+
+    emit statusChanged(toSharedPointer(this));
+
+    QDateTime dt = qnSyncTime->currentDateTime();
     QMutexLocker mutexLocker(&m_mutex);
-    return m_status;
+    m_lastStatusUpdateTime = dt;
 }
 
 void QnResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
@@ -408,49 +431,13 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
     if (newStatus == Qn::NotDefined)
         return;
 
-    Qn::ResourceStatus oldStatus;
-    {
-        QMutexLocker mutexLocker(&m_mutex);
-        oldStatus = m_status;
-
-        //if (oldStatus == Unauthorized && newStatus == Offline)
-        //    return; 
-
-        m_status = newStatus;
-
-        if (silenceMode)
-            return;
-    }
-
+    QnUuid id = getId();
+    Qn::ResourceStatus oldStatus = qnStatusDictionary->value(id);
     if (oldStatus == newStatus)
         return;
-
-#ifdef QN_RESOURCE_DEBUG
-    qDebug() << "Change status. oldValue=" << oldStatus << " new value=" << newStatus << " id=" << m_id << " name=" << getName();
-#endif
-
-    if (newStatus == Qn::Offline || newStatus == Qn::Unauthorized) {
-        if(m_initialized) {
-            m_initialized = false;
-            emit initializedChanged(toSharedPointer(this));
-        }
-    }
-
-    if (oldStatus == Qn::Offline && newStatus == Qn::Online && !hasFlags(Qn::foreigner))
-        init();
-
-
-    //if (hasFlags(foreigner)) {
-    //    qWarning() << "Status changed for foreign resource!";
-    //}
-
-    //Q_ASSERT_X(!hasFlags(foreigner), Q_FUNC_INFO, "Status changed for foreign resource!");
-
-    emit statusChanged(toSharedPointer(this));
-
-    QDateTime dt = qnSyncTime->currentDateTime();
-    QMutexLocker mutexLocker(&m_mutex);
-    m_lastStatusUpdateTime = dt;
+    qnStatusDictionary->setValue(id, newStatus);
+    if (!silenceMode)
+        doStatusChanged(oldStatus, newStatus);
 }
 
 QDateTime QnResource::getLastStatusUpdateTime() const

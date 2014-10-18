@@ -435,7 +435,7 @@ void QnResourceDiscoveryManager::onInitAsyncFinished(const QnResourcePtr& res, b
     QnNetworkResource* rpNetRes = dynamic_cast<QnNetworkResource*>(res.data());
     if (initialized && rpNetRes && !rpNetRes->hasFlags(Qn::desktop_camera))
     {
-        if (rpNetRes->getStatus() == Qn::Offline || rpNetRes->getStatus() == Qn::Unauthorized)
+        if (rpNetRes->getStatus() == Qn::Offline || rpNetRes->getStatus() == Qn::Unauthorized || rpNetRes->getStatus() == Qn::NotDefined)
             rpNetRes->setStatus(Qn::Online);
     }
 }

@@ -40,7 +40,7 @@ namespace ec2
             /* Common resource */
             saveResource                = 200,  /*< ApiResourceData */
             removeResource              = 201,  /*< ApiIdData */
-            setResourceStatus           = 202,  /*< ApiSetResourceStatusData */
+            setResourceStatus           = 202,  /*< ApiResourceStatusData */
             getResourceParams           = 203,  /*< ApiResourceParamDataList */
             setResourceParams           = 204,  /*< ApiResourceParamWithRefDataList */
             getResourceTypes            = 205,  /*< ApiResourceTypeDataList*/
@@ -49,6 +49,7 @@ namespace ec2
             setResourceParam            = 208,   /*< ApiResourceParamWithRefData */
             removeResourceParam         = 209,   /*< ApiResourceParamWithRefData */
             removeResourceParams        = 210,   /*< ApiResourceParamWithRefDataList */
+            getStatusList               = 211,  /*< ApiResourceStatusDataList */
 
             /* Camera resource */
             getCameras                  = 300,  /*< ApiCameraDataList */

@@ -39,12 +39,12 @@ namespace ec2
     };
 #define ApiResourceData_Fields (id)(parentId)(status)(name)(url)(typeId)
 
-    struct ApiSetResourceStatusData: ApiData
+    struct ApiResourceStatusData: ApiData
     {
         QnUuid id;
         Qn::ResourceStatus status;
     };
-#define ApiSetResourceStatusData_Fields (id)(status)
+#define ApiResourceStatusData_Fields (id)(status)
 
 } // namespace ec2
 

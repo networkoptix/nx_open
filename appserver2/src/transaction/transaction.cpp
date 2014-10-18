@@ -42,6 +42,7 @@ namespace ec2
             REGISTER_COMMAND(removeResourceParam),
             REGISTER_COMMAND(removeResourceParams),
             REGISTER_COMMAND(getResourceParams),
+            REGISTER_COMMAND(getStatusList),
             REGISTER_COMMAND(saveResource),
             REGISTER_COMMAND(removeResource),
             REGISTER_COMMAND(setPanicMode),
