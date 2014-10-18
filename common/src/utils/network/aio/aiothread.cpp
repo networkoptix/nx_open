@@ -666,7 +666,7 @@ namespace aio
         //    return true;    //ignoring task
 
         //if socket is marked for removal, not adding task
-        void* userData = sock->impl()->getUserData(eventToWatch);
+        void* userData = sock->impl()->eventTypeToUserData[eventToWatch];
         assert( userData != nullptr );  //socket is not polled, but someone wants to change timeout
         if( static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData)->data->markedForRemoval.load(std::memory_order_relaxed) > 0 )
             return true;   //socket marked for removal, ignoring timeout change (like, cancelling it right now)
