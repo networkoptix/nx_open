@@ -363,7 +363,9 @@ bool QnDbManager::init(
     queryServers.bindValue(1, m_serverTypeId.toRfc4122());
     if( !queryServers.exec() )
     {
+        qWarning() << Q_FUNC_INFO << __LINE__ << queryServers.lastError();
         Q_ASSERT( false );
+        return false;
     }
 
     // read license overflow time
