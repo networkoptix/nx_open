@@ -2297,7 +2297,6 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiCameraDataList&
     }
     queryCameras.setForwardOnly(true);
     queryCameras.prepare(QString("SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
-                                 coalesce(rs.status, 0) as status, \
         c.vendor, c.manually_added as manuallyAdded, \
         c.group_name as groupName, c.group_id as groupId, c.mac, c.model, \
 		c.status_flags as statusFlags, c.physical_id as physicalId \
@@ -2544,7 +2543,6 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerData
     }
 
     query.prepare(QString("select r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
-                          coalesce(rs.status, 0) as status, \
                           s.api_url as apiUrl, s.auth_key as authKey, s.version, s.net_addr_list as networkAddresses, s.system_info as systemInfo, \
                           s.flags, s.panic_mode as panicMode, s.system_name as systemName \
                           from vms_resource r \
@@ -2621,8 +2619,29 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerData
     }
     ApiResourceParamWithRefDataList params;
     QnSql::fetch_many(queryParams, &params);
-
     mergeObjectListData<ApiMediaServerDataEx>(serverExList, params, &ApiMediaServerDataEx::addParams, &ApiResourceParamWithRefData::resourceId);
+
+    //reading status info
+    QSqlQuery queryStatus(m_sdb);
+    queryStatus.setForwardOnly(true);
+    QString filterStr3;
+    if (!mServerId.isNull())
+        filterStr3 = QString("WHERE guid = %1").arg(guidToSqlString(mServerId));
+    queryStatus.prepare(QString("SELECT guid as id, status from vms_resource_status %1 order by guid").arg(filterStr2));
+    if( !queryStatus.exec() ) {
+        NX_LOG( lit("DB Error at %1: %2").arg(Q_FUNC_INFO).arg(queryParams.lastError().text()), cl_logWARNING );
+        return ErrorCode::dbError;
+    }
+    ApiResourceStatusDataList statusList;
+    QnSql::fetch_many(queryStatus, &statusList);
+    
+    mergeObjectListData(
+        serverExList,
+        statusList,
+        &ApiMediaServerDataEx::id,
+        &ApiResourceStatusData::id,
+        []( ApiMediaServerDataEx& server, ApiResourceStatusData& statusData ) { server.status = statusData.status; } );
+
 
     return ErrorCode::ok;
 }

@@ -28,16 +28,15 @@ namespace ec2
 
 
     struct ApiResourceData: ApiData {
-        ApiResourceData(): status(Qn::Offline) {}
+        ApiResourceData() {}
 
         QnUuid          id;
         QnUuid          parentId;
-        Qn::ResourceStatus    status;
         QString       name;
         QString       url;
         QnUuid          typeId;
     };
-#define ApiResourceData_Fields (id)(parentId)(status)(name)(url)(typeId)
+#define ApiResourceData_Fields (id)(parentId)(name)(url)(typeId)
 
     struct ApiResourceStatusData: ApiData
     {

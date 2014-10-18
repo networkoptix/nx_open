@@ -708,8 +708,7 @@ void fromResourceToApi(const QnResourcePtr &src, ApiResourceData &dst) {
     dst.name = src->getName();
     dst.url = src->getUrl();
     //dst.status = src->getStatus();
-    dst.status = Qn::NotDefined; // status field MUST be modified via setStatus call only
-
+    //dst.status = Qn::NotDefined; // status field MUST be modified via setStatus call only
 }
 
 
