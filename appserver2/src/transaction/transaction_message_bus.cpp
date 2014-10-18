@@ -1152,7 +1152,6 @@ void QnTransactionMessageBus::dropConnections()
         qWarning() << "Disconnected from peer" << transport->remoteAddr();
         transport->setState(QnTransactionTransport::Error);
     }
-    runtimeTransactionLog->clearRuntimeData();
 }
 
 QnTransactionMessageBus::AlivePeersMap QnTransactionMessageBus::alivePeers() const

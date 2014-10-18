@@ -14,6 +14,8 @@ public:
     QnBookmarkCameraData();
     QnBookmarkCameraData(const QnCameraBookmarkList &data);
 
+    QnAbstractCameraDataPtr clone() const override;
+
     /**
      * @brief isEmpty                               Check that the list is not empty.
      * @return                                      True if there is at least one bookmark.
