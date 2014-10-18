@@ -109,6 +109,16 @@ void QnResourcePropertyDictionary::clear()
     m_requestInProgress.clear();
 }
 
+void QnResourcePropertyDictionary::clear(const QVector<QnUuid>& idList)
+{
+    QMutexLocker lock(&m_mutex);
+    foreach(const QnUuid& id, idList) {
+        m_items.remove(id);
+        m_modifiedItems.remove(id);
+    }
+    m_requestInProgress.clear();
+}
+
 bool QnResourcePropertyDictionary::setValue(const QnUuid& resourceId, const QString& key, const QString& value, bool markDirty)
 {
     QMutexLocker lock(&m_mutex);

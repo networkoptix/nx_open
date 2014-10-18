@@ -72,6 +72,12 @@ public:
         return *lk;
     }
 
+    void clear()
+    {
+        QMutexLocker lk( &m_mutex );
+        m_elements.clear();
+    }
+
 private:
     class DataCtx
     {

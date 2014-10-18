@@ -23,6 +23,7 @@ public:
     bool hasProperty(const QnUuid& resourceId, const QString& key) const;
     ec2::ApiResourceParamDataList allProperties(const QnUuid& resourceId) const;
     void clear();
+    void clear(const QVector<QnUuid>& idList);
 signals:
     void asyncSaveDone(int recId, ec2::ErrorCode);
 private:

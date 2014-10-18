@@ -44,6 +44,9 @@
 #include <utils/network/global_module_finder.h>
 #include <utils/network/router.h>
 #include "core/resource_management/resource_properties.h"
+#include "core/resource_management/status_dictionary.h"
+#include "core/resource/camera_user_attribute_pool.h"
+#include "core/resource/media_server_user_attributes.h"
 
 namespace {
     const int videowallReconnectTimeoutMSec = 5000;
@@ -159,8 +162,17 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
 
     /* Remove all remote resources. */
     const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(Qn::remote);
+    QVector<QnUuid> idList;
+    foreach(const QnResourcePtr& res, remoteResources)
+        idList.push_back(res->getId());
     resourcePool()->removeResources(remoteResources);
     resourcePool()->removeResources(resourcePool()->getAllIncompatibleResources());
+    QnCameraUserAttributePool::instance()->clear();
+    QnMediaServerUserAttributesPool::instance()->clear();
+
+    propertyDictionary->clear(idList);
+    qnStatusDictionary->clear(idList);
+
 
     /* Also remove layouts that were just added and have no 'remote' flag set. */
     foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources<QnLayoutResource>()) {
@@ -326,7 +338,6 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
     QnAppServerConnectionFactory::setUrl(QUrl());
     QnAppServerConnectionFactory::setEc2Connection(NULL);
     QnAppServerConnectionFactory::setCurrentVersion(QnSoftwareVersion());
-    propertyDictionary->clear();
     QnSessionManager::instance()->stop();
     QnResource::stopCommandProc();
 

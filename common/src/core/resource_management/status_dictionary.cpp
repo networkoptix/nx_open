@@ -18,3 +18,10 @@ void QnResourceStatusDiscionary::clear()
     QMutexLocker lock(&m_mutex);
     m_items.clear();
 }
+
+void QnResourceStatusDiscionary::clear(const QVector<QnUuid>& idList)
+{
+    QMutexLocker lock(&m_mutex);
+    foreach(const QnUuid& id, idList)
+        m_items.remove(id);
+}
