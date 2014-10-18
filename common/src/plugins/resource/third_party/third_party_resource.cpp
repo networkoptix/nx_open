@@ -309,6 +309,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
 
     if( !m_camManager )
     {
+        //restoring camera parameters
         if( strlen(m_camInfo.uid) == 0 )
         {
             memset( m_camInfo.uid, 0, sizeof(m_camInfo.uid) );
@@ -336,6 +337,16 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
                 const QByteArray& auxData = auxDataStr.toLatin1();
                 strncpy( m_camInfo.auxiliaryData, auxData.constData(), std::min<size_t>(auxData.size(), sizeof(m_camInfo.auxiliaryData)-1) );
             }
+        }
+        if( strlen(m_camInfo.defaultLogin) == 0 )
+        {
+            const QByteArray userName = getAuth().user().toLatin1();
+            strncpy( m_camInfo.defaultLogin, userName.constData(), std::min<size_t>(userName.size(), sizeof(m_camInfo.defaultLogin)-1) );
+        }
+        if( strlen(m_camInfo.defaultPassword) == 0 )
+        {
+            const QByteArray userPassword = getAuth().password().toLatin1();
+            strncpy( m_camInfo.defaultPassword, userPassword.constData(), std::min<size_t>(userPassword.size(), sizeof(m_camInfo.defaultPassword)-1) );
         }
 
         nxcip::BaseCameraManager* cameraIntf = m_discoveryManager.createCameraManager( m_camInfo );

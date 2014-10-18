@@ -5,6 +5,7 @@
 
 #include <atomic>
 
+#include <platform/win32_syscall_resolver.h>
 #include <utils/common/systemerror.h>
 #include <utils/common/warnings.h>
 #include <utils/network/ssl_socket.h>
@@ -1028,6 +1029,16 @@ bool TCPSocket::getNoDelay( bool* value )
 bool TCPSocket::toggleStatisticsCollection( bool val )
 {
 #ifdef _WIN32
+    //dynamically resolving functions that require win >= vista we want to use here
+    typedef decltype(&SetPerTcpConnectionEStats) SetPerTcpConnectionEStatsType;
+    static SetPerTcpConnectionEStatsType SetPerTcpConnectionEStatsAddr =
+        Win32FuncResolver::instance()->resolveFunction<SetPerTcpConnectionEStatsType>
+            ( L"Iphlpapi.dll", "SetPerTcpConnectionEStats" );
+
+    if( SetPerTcpConnectionEStatsAddr == NULL )
+        return false;
+
+
     Win32TcpSocketImpl* d = static_cast<Win32TcpSocketImpl*>(m_implDelegate.impl());
 
     if( GetTcpRow(
@@ -1051,7 +1062,7 @@ bool TCPSocket::toggleStatisticsCollection( bool val )
     memset( pathRW.get(), 0, sizeof(*pathRW) ); // zero the buffer
     pathRW->EnableCollection = val ? TRUE : FALSE;
     //enabling statistics collection
-    if( SetPerTcpConnectionEStats(
+    if( SetPerTcpConnectionEStatsAddr(
             &d->win32TcpTableRow,
             TcpConnectionEstatsPath,
             (UCHAR*)pathRW.get(), 0, sizeof(*pathRW),
