@@ -631,6 +631,15 @@ bool QnResource::hasProperty(const QString &key) const {
 QString QnResource::getProperty(const QString &key) const {
     //QMutexLocker mutexLocker(&m_mutex);
     //return m_propertyByKey.value(key, defaultValue);
+
+    {
+        QMutexLocker lk( &m_mutex );
+        if( m_id.isNull() ) {
+            auto itr =  m_locallySavedProperties.find(key);
+            return itr != m_locallySavedProperties.end() ? itr->second.first : QString();
+        }
+    }
+
     QString value = propertyDictionary->value(getId(), key);
     if (value.isNull()) {
         // find default value in resourceType
