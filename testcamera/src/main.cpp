@@ -8,6 +8,7 @@
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
 #include "common/common_module.h"
 #include "utils/common/synctime.h"
+#include "core/resource_management/status_dictionary.h"
 
 
 QString doUnquote(const QString& fileName)
@@ -87,7 +88,7 @@ int main(int argc, char *argv[])
 
     QnCameraPool::initGlobalInstance( new QnCameraPool( localInterfacesToListen ) );
     QnCameraPool::instance()->start();
-
+    QnResourceStatusDiscionary statusDictionary;
     for (int i = 1; i < argc; ++i)
     {
         QString param = argv[i];
