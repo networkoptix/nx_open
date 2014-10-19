@@ -43,8 +43,8 @@ namespace ec2
         bool            allowAutoRedundancy; // Server can take cameras from offline server automatically
     };
 
-#define ApiMediaServerUserAttributesData_Fields_Short (serverName)(maxCameras)(allowAutoRedundancy)
-#define ApiMediaServerUserAttributesData_Fields (serverID) ApiMediaServerUserAttributesData_Fields_Short
+#define ApiMediaServerUserAttributesData_Fields_Short (maxCameras)(allowAutoRedundancy)
+#define ApiMediaServerUserAttributesData_Fields (serverID) (serverName) ApiMediaServerUserAttributesData_Fields_Short
 
 
     struct ApiMediaServerDataEx
