@@ -365,7 +365,7 @@ int QnMediaServerConnection::getTimePeriodsAsync(const QnNetworkResourceList &li
 {
     QnRequestParamList params;
 
-    foreach(QnNetworkResourcePtr netResource, list)
+    foreach(const QnNetworkResourcePtr& netResource, list)
         params << QnRequestParam("physicalId", netResource->getPhysicalId());
     params << QnRequestParam("startTime", QString::number(startTimeMs));
     params << QnRequestParam("endTime", QString::number(endTimeMs));
@@ -712,7 +712,7 @@ int QnMediaServerConnection::getEventLogAsync(
     params << QnRequestParam( "from", dateFrom);
     if (dateTo != DATETIME_NOW)
         params << QnRequestParam( "to", dateTo);
-    foreach(QnResourcePtr res, camList) {
+    foreach(const QnResourcePtr& res, camList) {
         QnNetworkResourcePtr camera = res.dynamicCast<QnNetworkResource>();
         if (camera)
             params << QnRequestParam( "res_id", camera->getPhysicalId() );

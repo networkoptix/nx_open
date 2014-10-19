@@ -180,7 +180,7 @@ QString QnEventsDB::getRequestStr(const QnTimePeriod& period,
         request += QString(lit(" and event_resource_guid = %1 ")).arg(guidToSqlString(resList[0]->getId()));
     else if (resList.size() > 1) {
         QString idList;
-        foreach(QnResourcePtr res, resList) {
+        foreach(const QnResourcePtr& res, resList) {
             if (!idList.isEmpty())
                 idList += QLatin1Char(',');
             idList += guidToSqlString(res->getId());

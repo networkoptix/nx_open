@@ -408,7 +408,7 @@ static QStringList listRecordFolders()
     //QString maxFreeSpaceDrive;
     //int maxFreeSpace = 0;
 
-    foreach (QFileInfo drive, QDir::drives()) {
+    foreach (const QFileInfo& drive, QDir::drives()) {
         if (!drive.isWritable())
             continue;
 
@@ -453,7 +453,7 @@ QnAbstractStorageResourceList createStorages(const QnMediaServerResourcePtr mSer
     QnAbstractStorageResourceList storages;
     //bool isBigStorageExist = false;
     qint64 bigStorageThreshold = 0;
-    foreach(QString folderPath, listRecordFolders()) 
+    foreach(const QString& folderPath, listRecordFolders()) 
     {
         if (!mServer->getStorageByUrl(folderPath).isNull())
             continue;
@@ -479,7 +479,7 @@ QnAbstractStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
 {
     QMap<QnUuid, QnAbstractStorageResourcePtr> result;
     // I've switched all patches to native separator to fix network patches like \\computer\share
-    foreach(QnAbstractStorageResourcePtr abstractStorage, mServer->getStorages())
+    foreach(const QnAbstractStorageResourcePtr& abstractStorage, mServer->getStorages())
     {
         QnStorageResourcePtr storage = abstractStorage.dynamicCast<QnStorageResource>();
         if (!storage)
@@ -496,7 +496,7 @@ QnAbstractStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
     }
 
     qint64 bigStorageThreshold = 0;
-    foreach(QnAbstractStorageResourcePtr abstractStorage, mServer->getStorages()) {
+    foreach(const QnAbstractStorageResourcePtr& abstractStorage, mServer->getStorages()) {
         QnStorageResourcePtr storage = abstractStorage.dynamicCast<QnStorageResource>();
         if (!storage)
             continue;
@@ -505,7 +505,7 @@ QnAbstractStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
     }
     bigStorageThreshold /= QnStorageManager::BIG_STORAGE_THRESHOLD_COEFF;
 
-    foreach(QnAbstractStorageResourcePtr abstractStorage, mServer->getStorages()) {
+    foreach(const QnAbstractStorageResourcePtr& abstractStorage, mServer->getStorages()) {
         QnStorageResourcePtr storage = abstractStorage.dynamicCast<QnStorageResource>();
         if (!storage)
             continue;
@@ -545,7 +545,7 @@ QnMediaServerResourcePtr QnMain::findServer(ec2::AbstractECConnectionPtr ec2Conn
         QnSleep::msleep(1000);
     }
 
-    foreach(QnMediaServerResourcePtr server, servers)
+    foreach(const QnMediaServerResourcePtr& server, servers)
     {
         *pm = server->getPanicMode();
         if (server->getId() == serverGuid())
@@ -1104,7 +1104,7 @@ void QnMain::at_timer()
 {
     MSSettings::runTimeSettings()->setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
     QnResourcePtr mServer = qnResPool->getResourceById(qnCommon->moduleGUID());
-    foreach(QnResourcePtr res, qnResPool->getAllCameras(mServer))
+    foreach(const QnResourcePtr& res, qnResPool->getAllCameras(mServer))
     {
         QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
         if (cam)

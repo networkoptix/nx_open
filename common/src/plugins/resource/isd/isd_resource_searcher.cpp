@@ -202,7 +202,7 @@ QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(
 
     smac = smac.toUpper();
 
-    foreach(QnResourcePtr res, result)
+    foreach(const QnResourcePtr& res, result)
     {
         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
     

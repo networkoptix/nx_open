@@ -203,7 +203,7 @@ QnTimePeriodList QnThirdPartyResource::getDtsTimePeriodsByMotionRegion(
         }
 
         const QVector<QRect>& rects = unitedRegion.rects();
-        foreach( QRect r, rects )
+        foreach(const  QRect& r, rects )
         {
             for( int y = r.top(); y < std::min<int>(motionDataPicture->height(), r.bottom()); ++y )
                 for( int x = r.left(); x < std::min<int>(motionDataPicture->width(), r.right()); ++x )
@@ -611,7 +611,7 @@ nxcip::Resolution QnThirdPartyResource::getNearestResolution( int encoderNumber,
 {
     const QList<nxcip::Resolution>& resolutionList = getEncoderResolutionList( encoderNumber );
     nxcip::Resolution foundResolution;
-    foreach( nxcip::Resolution resolution, resolutionList )
+    foreach(const  nxcip::Resolution& resolution, resolutionList )
     {
         if( resolution.width*resolution.height <= desiredResolution.width*desiredResolution.height &&
             resolution.width*resolution.height > foundResolution.width*foundResolution.height )

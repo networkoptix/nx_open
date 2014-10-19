@@ -194,7 +194,7 @@ bool QnPlWatchDogResource::getParamPhysical(const QString &param, QVariant &val)
     //to camera. All values can be get by one request, but our framework do getParamPhysical for every single param.
     QDateTime currTime = QDateTime::currentDateTime();
     if (m_advSettingsLastUpdated.isNull() || m_advSettingsLastUpdated.secsTo(currTime) > ADVANCED_SETTINGS_VALID_TIME) {
-        foreach (QnPlWatchDogResourceAdditionalSettingsPtr setting, m_additionalSettings)
+        foreach (const QnPlWatchDogResourceAdditionalSettingsPtr& setting, m_additionalSettings)
         {
             if (!setting->refreshValsFromCamera())
             {
@@ -204,7 +204,7 @@ bool QnPlWatchDogResource::getParamPhysical(const QString &param, QVariant &val)
         m_advSettingsLastUpdated = currTime;
     }
 
-    foreach (QnPlWatchDogResourceAdditionalSettingsPtr setting, m_additionalSettings)
+    foreach (const QnPlWatchDogResourceAdditionalSettingsPtr& setting, m_additionalSettings)
     {
         //If param is not in list of child, it will return false. Then will try to find it in parent.
         if (setting->getParamPhysicalFromBuffer(param, val))
@@ -221,7 +221,7 @@ bool QnPlWatchDogResource::setParamPhysical(const QString &param, const QVariant
 {
     QMutexLocker lock(&m_physicalParamsMutex);
 
-    foreach (QnPlWatchDogResourceAdditionalSettingsPtr setting, m_additionalSettings)
+    foreach (const QnPlWatchDogResourceAdditionalSettingsPtr& setting, m_additionalSettings)
     {
         //If param is not in list of child, it will return false. Then will try to find it in parent.
 

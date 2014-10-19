@@ -352,7 +352,7 @@ void QnSessionManager::at_asyncRequestQueued(int operation, AsyncRequestInfo req
     //qDebug() << "api url" << request.url();
 
     bool skipContentType = false;
-    foreach (QnRequestHeader header, headers) {
+    foreach (const QnRequestHeader& header, headers) {
         if (header.first == QLatin1String("Content-Type"))
             skipContentType = true;
         request.setRawHeader(header.first.toLatin1(), header.second.toUtf8());

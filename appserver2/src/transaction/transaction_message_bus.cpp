@@ -1011,7 +1011,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
     // send HTTP level keep alive (empty chunk) for server <---> server connections
     if (!m_localPeer.isClient()) 
     {
-        foreach(QSharedPointer<QnTransactionTransport> transport, m_connections.values()) 
+        foreach(const QnTransactionTransportPtr& transport, m_connections.values()) 
         {
             if (transport->getState() == QnTransactionTransport::ReadyForStreaming && !transport->remotePeer().isClient()) 
             {
@@ -1071,7 +1071,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
         if (itr.value().lastActivity.elapsed() > ALIVE_UPDATE_INTERVAL * 2)
         {
             itr.value().lastActivity.restart();
-            foreach(QSharedPointer<QnTransactionTransport> transport, m_connectingConnections) {
+            foreach(const QnTransactionTransportPtr& transport, m_connectingConnections) {
                 if (transport->getState() == QnTransactionTransport::Closed)
                     continue; // it's going to close soon
                 if (transport->remotePeer().id == itr.key()) {
@@ -1080,7 +1080,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
                 }
             }
 
-            foreach(QSharedPointer<QnTransactionTransport> transport, m_connections.values()) {
+            foreach(const QnTransactionTransportPtr& transport, m_connections.values()) {
                 if (transport->getState() == QnTransactionTransport::Closed)
                     continue; // it's going to close soon
                 if (transport->remotePeer().id == itr.key() && transport->remotePeer().peerType == Qn::PT_Server) {
@@ -1135,7 +1135,7 @@ void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& url)
     QMutexLocker lock(&m_mutex);
     m_remoteUrls.remove(url);
     QString urlStr = getUrlAddr(url);
-    foreach(QnTransactionTransportPtr transport, m_connections.values())
+    foreach(const QnTransactionTransportPtr& transport, m_connections.values())
     {
         if (getUrlAddr(transport->remoteAddr()) == urlStr) {
             qWarning() << "Disconnected from peer" << url;

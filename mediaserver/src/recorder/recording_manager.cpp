@@ -582,7 +582,7 @@ void QnRecordingManager::at_checkLicenses()
 
         // Too many licenses. check if server has own recording cameras and force to disable recording
         QnResourceList ownCameras = getLocalControlledCameras();
-        foreach(QnResourcePtr camRes, ownCameras)
+        foreach(const QnResourcePtr& camRes, ownCameras)
         {
             QnVirtualCameraResourcePtr camera = camRes.dynamicCast<QnVirtualCameraResource>();
             if (helper.isOverflowForCamera(camera))
@@ -613,7 +613,7 @@ void QnRecordingManager::at_licenseMutexLocked()
     
     // Too many licenses. check if server has own recording cameras and force to disable recording
     const QnResourceList& ownCameras = getLocalControlledCameras();
-    foreach(QnResourcePtr camRes, ownCameras)
+    foreach(const QnResourcePtr& camRes, ownCameras)
     {
         if (helper.isValid())
             break;

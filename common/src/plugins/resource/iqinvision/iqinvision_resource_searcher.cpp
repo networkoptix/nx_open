@@ -133,7 +133,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
 
     smac = smac.toUpper();
 
-    foreach(QnResourcePtr res, result)
+    foreach(const QnResourcePtr& res, result)
     {
         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
     
@@ -193,7 +193,7 @@ void QnPlIqResourceSearcher::processNativePacket(QnResourceList& result, const Q
 
     QByteArray name(responseData.data() + iqpos); // construct from null terminated char*
 
-    foreach(QnResourcePtr res, result)
+    foreach(const QnResourcePtr& res, result)
     {
         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
 

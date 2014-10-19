@@ -141,7 +141,7 @@ void QnCommonMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data)
         res->setStatus(Qn::Offline);
         if (data.peer.peerType != Qn::PT_Server) {
             // This server hasn't own DB
-            foreach(QnResourcePtr camera, qnResPool->getAllCameras(res))
+            foreach(const QnResourcePtr& camera, qnResPool->getAllCameras(res))
                 camera->setStatus(Qn::Offline);
         }
     }
@@ -238,7 +238,7 @@ void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )
         if (QnResourcePtr ownResource = qnResPool->getResourceById(resourceId)) 
         {
             // delete dependent objects
-            foreach(QnResourcePtr subRes, qnResPool->getResourcesByParentId(resourceId))
+            foreach(const QnResourcePtr& subRes, qnResPool->getResourcesByParentId(resourceId))
                 qnResPool->removeResource(subRes);
             qnResPool->removeResource(ownResource);
         }
@@ -352,7 +352,7 @@ void QnCommonMessageProcessor::on_execBusinessAction( const QnAbstractBusinessAc
 
 void QnCommonMessageProcessor::on_panicModeChanged(Qn::PanicMode mode) {
     QnResourceList resList = qnResPool->getAllResourceByTypeName(lit("Server"));
-    foreach(QnResourcePtr res, resList) {
+    foreach(const QnResourcePtr& res, resList) {
         QnMediaServerResourcePtr mServer = res.dynamicCast<QnMediaServerResource>();
         if (mServer)
             mServer->setPanicMode(mode);
@@ -361,7 +361,7 @@ void QnCommonMessageProcessor::on_panicModeChanged(Qn::PanicMode mode) {
 
 // todo: ec2 relate logic. remove from this class
 void QnCommonMessageProcessor::afterRemovingResource(const QnUuid& id) {
-    foreach(QnBusinessEventRulePtr bRule, m_rules.values())
+    foreach(const QnBusinessEventRulePtr& bRule, m_rules.values())
     {
         if (bRule->eventResources().contains(id) || bRule->actionResources().contains(id))
         {
@@ -388,7 +388,7 @@ void QnCommonMessageProcessor::processLicenses(const QnLicenseList& licenses)
 
 void QnCommonMessageProcessor::processCameraServerItems(const QnCameraHistoryList& cameraHistoryList)
 {
-    foreach(QnCameraHistoryPtr history, cameraHistoryList)
+    foreach(const QnCameraHistoryPtr& history, cameraHistoryList)
         QnCameraHistoryPool::instance()->addCameraHistory(history);
 }
 

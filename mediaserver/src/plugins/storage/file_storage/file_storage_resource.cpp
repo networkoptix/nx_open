@@ -308,7 +308,7 @@ bool QnFileStorageResource::isStorageDirMounted()
 
     //checking if storage dir is to be mounted
     QString storageMountPoint;
-    foreach( QString mountPoint, mountPoints )
+    foreach(const QString& mountPoint, mountPoints )
     {
         const QString& mountPointCanonical = QDir(closeDirPath(mountPoint)).canonicalPath();
         if( storagePath.startsWith(mountPointCanonical) )

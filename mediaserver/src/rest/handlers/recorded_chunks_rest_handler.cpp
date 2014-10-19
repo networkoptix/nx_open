@@ -141,13 +141,13 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
             break;
         case ChunkFormat_XML:
             result.append("<recordedTimePeriods xmlns=\"http://www.networkoptix.com/xsd/api/recordedTimePeriods\">\n");
-            foreach(QnTimePeriod period, periods)
+            foreach(const QnTimePeriod& period, periods)
                 result.append(QString("<timePeriod startTime=\"%1\" duration=\"%2\" />\n").arg(period.startTimeMs).arg(period.durationMs));
             result.append("</recordedTimePeriods>\n");
             break;
         case ChunkFormat_Text:
             result.append("<root>\n");
-            foreach(QnTimePeriod period, periods) {
+            foreach(const QnTimePeriod& period, periods) {
                 result.append("<chunk>");
                 result.append(QDateTime::fromMSecsSinceEpoch(period.startTimeMs).toString(QLatin1String("dd-MM-yyyy hh:mm:ss.zzz")));
                 result.append("    ");

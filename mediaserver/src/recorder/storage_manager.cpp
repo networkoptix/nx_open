@@ -131,7 +131,7 @@ std::deque<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaDat
 void QnStorageManager::initDone()
 {
     m_initInProgress = false;
-    foreach(QnStorageResourcePtr storage, getStorages())
+    foreach(const QnStorageResourcePtr& storage, getStorages())
         addDataFromDatabase(storage);
     disconnect(qnResPool);
     connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
@@ -208,7 +208,7 @@ void QnStorageManager::addDataFromDatabase(const QnStorageResourcePtr &storage)
     QnStorageDbPtr sdb = m_chunksDB[storage->getPath()];
 
     // load from database
-    foreach(DeviceFileCatalogPtr c, sdb->loadFullFileCatalog())
+    foreach(const DeviceFileCatalogPtr& c, sdb->loadFullFileCatalog())
     {
         DeviceFileCatalogPtr fileCatalog = getFileCatalogInternal(c->cameraUniqueId(), c->getCatalog());
         fileCatalog->addChunks(correctChunksFromMediaData(fileCatalog, storage, c->m_chunks));
@@ -228,9 +228,9 @@ void QnStorageManager::rebuildCatalogIndexInternal()
         //m_catalogLoaded = false;
         m_rebuildCancelled = false;
         /*
-        foreach(DeviceFileCatalogPtr catalog,  m_devFileCatalogHi)
+        foreach(const DeviceFileCatalogPtr& catalog,  m_devFileCatalogHi)
             catalog->beforeRebuildArchive();
-        foreach(DeviceFileCatalogPtr catalog,  m_devFileCatalogLow)
+        foreach(const DeviceFileCatalogPtr& catalog,  m_devFileCatalogLow)
             catalog->beforeRebuildArchive();
         m_devFileCatalogHi.clear();
         m_devFileCatalogLow.clear();
@@ -238,7 +238,7 @@ void QnStorageManager::rebuildCatalogIndexInternal()
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_All);
     }
 
-    foreach (QnStorageResourcePtr storage, m_storageRoots.values())
+    foreach (const QnStorageResourcePtr& storage, m_storageRoots.values())
         loadFullFileCatalog(storage, true, 1.0 / m_storageRoots.size());
 
     m_rebuildState = RebuildState_None;
@@ -296,7 +296,7 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
 {
     QDir dir(closeDirPath(storage->getPath()) + DeviceFileCatalog::prefixByCatalog(catalog));
     QFileInfoList list = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
-    foreach(QFileInfo fi, list)
+    foreach(const QFileInfo& fi, list)
     {
         if (m_rebuildState != RebuildState_Started)
             return; // cancel rebuild
@@ -530,7 +530,7 @@ void QnStorageManager::clearSpace()
     if (!m_catalogLoaded)
         return;
 
-    foreach(QnStorageDbPtr sdb, m_chunksDB)
+    foreach(const QnStorageDbPtr& sdb, m_chunksDB)
         sdb->beforeDelete();
 
     // 1. delete old data if cameras have max duration limit
@@ -538,12 +538,12 @@ void QnStorageManager::clearSpace()
 
     // 2. free storage space
     const QSet<QnStorageResourcePtr> storages = getWritableStorages();
-    foreach(QnStorageResourcePtr storage, storages)
+    foreach(const QnStorageResourcePtr& storage, storages)
         clearOldestSpace(storage, true);
-    foreach(QnStorageResourcePtr storage, storages)
+    foreach(const QnStorageResourcePtr& storage, storages)
         clearOldestSpace(storage, false);
 
-    foreach(QnStorageDbPtr sdb, m_chunksDB)
+    foreach(const QnStorageDbPtr& sdb, m_chunksDB)
         sdb->afterDelete();
 
     clearUnusedMotion();
@@ -592,7 +592,7 @@ void QnStorageManager::clearMaxDaysData()
 void QnStorageManager::clearMaxDaysData(const FileCatalogMap &catalogMap)
 {
     QMutexLocker lock(&m_mutexCatalog);
-    foreach(const DeviceFileCatalogPtr catalog, catalogMap.values()) {
+    foreach(const DeviceFileCatalogPtr& catalog, catalogMap.values()) {
         QnSecurityCamResourcePtr camera = qnResPool->getResourceByUniqId(catalog->cameraUniqueId()).dynamicCast<QnSecurityCamResource>();
         if (camera && camera->maxDays() > 0) {
             qint64 timeToDelete = qnSyncTime->currentMSecsSinceEpoch() - MSECS_PER_DAY * camera->maxDays();
@@ -610,7 +610,7 @@ void QnStorageManager::clearUnusedMotion()
     updateRecordedMonths(m_devFileCatalog[QnServer::HiQualityCatalog], usedMonths);
     updateRecordedMonths(m_devFileCatalog[QnServer::LowQualityCatalog], usedMonths);
 
-    foreach(const DeviceFileCatalogPtr catalog, m_devFileCatalog[QnServer::HiQualityCatalog].values())
+    foreach(const DeviceFileCatalogPtr& catalog, m_devFileCatalog[QnServer::HiQualityCatalog].values())
         QnMotionHelper::instance()->deleteUnusedFiles(usedMonths[catalog->cameraUniqueId()].toList(), catalog->cameraUniqueId());
 }
 
@@ -659,7 +659,7 @@ void QnStorageManager::minTimeByCamera(const FileCatalogMap &catalogMap, QMap<QS
 
 void QnStorageManager::updateRecordedMonths(const FileCatalogMap &catalogMap, UsedMonthsMap& usedMonths)
 {
-    foreach(const DeviceFileCatalogPtr catalog, catalogMap.values())
+    foreach(const DeviceFileCatalogPtr& catalog, catalogMap.values())
         usedMonths[catalog->cameraUniqueId()] += catalog->recordedMonthList();
 }
 
@@ -757,10 +757,10 @@ void QnStorageManager::at_archiveRangeChanged(const QnAbstractStorageResourcePtr
     Q_UNUSED(newEndTimeMs)
     int storageIndex = detectStorageIndex(resource->getUrl());
 
-    foreach(DeviceFileCatalogPtr catalogHi, m_devFileCatalog[QnServer::HiQualityCatalog])
+    foreach(const DeviceFileCatalogPtr& catalogHi, m_devFileCatalog[QnServer::HiQualityCatalog])
         catalogHi->deleteRecordsByStorage(storageIndex, newStartTimeMs);
     
-    foreach(DeviceFileCatalogPtr catalogLow, m_devFileCatalog[QnServer::LowQualityCatalog])
+    foreach(const DeviceFileCatalogPtr& catalogLow, m_devFileCatalog[QnServer::LowQualityCatalog])
         catalogLow->deleteRecordsByStorage(storageIndex, newStartTimeMs);
 
     //TODO: #vasilenko should we delete bookmarks here too?
@@ -1156,7 +1156,7 @@ void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalog)
                     sdb->addRecord(mac, catalog, chunk);
                 }
             }
-            foreach(QnStorageDbPtr sdb, m_chunksDB.values())
+            foreach(const QnStorageDbPtr& sdb, m_chunksDB.values())
                 sdb->flushRecords();
             QFile::remove(catalogName);
             QDir dir;

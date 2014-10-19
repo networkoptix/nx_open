@@ -202,7 +202,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
         result += tr("Conflict address: %1").arg(params.getSource());
 
         int n = 0;
-        foreach (QString mac, params.getConflicts()) {
+        foreach (const QString& mac, params.getConflicts()) {
             result += delimiter;
             result += tr("Camera #%1 MAC: %2").arg(++n).arg(mac);
         }
@@ -276,7 +276,7 @@ QVariantHash QnBusinessStringsHelper::eventDetailsMap(
         detailsMap[lit("cameraConflictAddress")] = params.getSource();
         QVariantList conflicts;
         int n = 0;
-        foreach (QString mac, params.getConflicts()) {
+        foreach (const QString& mac, params.getConflicts()) {
             QVariantHash conflict;
             conflict[lit("number")] = ++n;
             conflict[lit("mac")] = mac;
@@ -419,7 +419,7 @@ QString QnBusinessStringsHelper::aggregatedEventDetails(const QnAbstractBusiness
         result += eventDetailsWithTimestamp(action->getRuntimeParams(), action->getAggregationCount(), delimiter);
     }
 
-    foreach (QnInfoDetail detail, aggregationInfo.toList()) {
+    foreach (const QnInfoDetail& detail, aggregationInfo.toList()) {
         if (!result.isEmpty())
             result += delimiter;
         result += eventDetailsWithTimestamp(detail.runtimeParams(), detail.count(), delimiter);
@@ -435,7 +435,7 @@ QVariantList QnBusinessStringsHelper::aggregatedEventDetailsMap(const QnAbstract
         result << eventDetailsMap(action, QnInfoDetail(action->getRuntimeParams(), action->getAggregationCount()), useIp);
     }
 
-    foreach (QnInfoDetail detail, aggregationInfo.toList()) {
+    foreach (const QnInfoDetail& detail, aggregationInfo.toList()) {
         result << eventDetailsMap(action, detail, useIp);
     }
     return result;

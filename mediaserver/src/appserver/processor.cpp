@@ -30,7 +30,7 @@ QnAppserverResourceProcessor::~QnAppserverResourceProcessor()
 
 void QnAppserverResourceProcessor::processResources(const QnResourceList &resources)
 {
-    foreach (QnResourcePtr resource, resources)
+    foreach (const QnResourcePtr& resource, resources)
     {
         QnVirtualCameraResource* cameraResource = dynamic_cast<QnVirtualCameraResource*>(resource.data());
         if (cameraResource == nullptr)
@@ -47,7 +47,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
     // we've got two loops to avoid double call of double sending addCamera
 
-    foreach (QnResourcePtr resource, resources)
+    foreach (const QnResourcePtr& resource, resources)
     {
         QnVirtualCameraResourcePtr cameraResource = resource.dynamicCast<QnVirtualCameraResource>();
         if (cameraResource.isNull())

@@ -56,7 +56,7 @@ QnResourcePtr QnMServerResourceDiscoveryManager::createResource(const QnUuid &re
 
 static void printInLogNetResources(const QnResourceList& resources)
 {
-    foreach(QnResourcePtr res, resources)
+    foreach(const QnResourcePtr& res, resources)
     {
         const QnNetworkResource* netRes = dynamic_cast<const QnNetworkResource*>(res.data());
         if (!netRes)
@@ -211,7 +211,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         {
             QHostAddress hostAddr(itr.key());
             QStringList conflicts;
-            foreach(QnNetworkResourcePtr camRes, itr.value()) 
+            foreach(const QnNetworkResourcePtr& camRes, itr.value()) 
             {
                 conflicts << camRes->getPhysicalId();
                 QnVirtualCameraResource* cam = dynamic_cast<QnVirtualCameraResource*>(camRes.data());
@@ -270,7 +270,7 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
 {
     const QnResourceList& resources = qnResPool->getResources();
 
-    foreach(QnResourcePtr res, resources)
+    foreach(const QnResourcePtr& res, resources)
     {
         QnNetworkResource* netRes = dynamic_cast<QnNetworkResource*>(res.data());
         if (!netRes)
