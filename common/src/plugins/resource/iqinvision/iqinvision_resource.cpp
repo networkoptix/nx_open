@@ -136,7 +136,6 @@ bool QnPlIqResource::isRtp() const
         name == QLatin1String("IQM31S") ||
         name == QLatin1String("IQM32N") ||
         //name == QLatin1String("IQ765N") ||
-        name == QLatin1String("IQEYE753") ||
         name == QLatin1String("IQM32S");
 }
 
