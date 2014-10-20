@@ -17,7 +17,7 @@
         <product.title>${mobile_client.name}</product.title>
         <!--Global libs-->
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
-        <qt.libs>core qml quick concurrent network sql multimedia xml</qt.libs>
+        <qt.libs>core qml quick concurrent network sql multimedia xml androidextras</qt.libs>
         <global.libs>-lappserver2 -lcommon -lquazip -lssl -lcrypto</global.libs>
         <!--Specific os libs used-->
         <linux.oslibs>${ffmpeg.libs} -lFestival -lestools -leststring -lestbase -lmp3lame -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac</linux.oslibs>
