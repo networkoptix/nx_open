@@ -24,7 +24,7 @@
         <appserver.name>Enterprise Controller</appserver.name>
         <appserver2.name>${company.name} New Enterprise Controller</appserver2.name>
         <client.name>${company.name} ${product.name} Client</client.name>
-        <mobile_client.name>${company.name} ${product.name} Client</mobile_client.name>
+        <mobile_client.name>${company.name} ${product.name} Mobile Client</mobile_client.name>
         <client.mediafolder.name>${product.name} Media</client.mediafolder.name>
         <applauncher.name>${company.name} Launcher</applauncher.name>
         <axiscamplugin.name>${company.name} AXIS camera integration plugin</axiscamplugin.name>
