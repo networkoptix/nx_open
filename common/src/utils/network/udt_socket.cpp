@@ -727,6 +727,11 @@ void UdtStreamSocket::cancelAsyncIO( aio::EventType eventType, bool waitForRunni
     return m_aioHelper->cancelAsyncIO(eventType, waitForRunningHandlerCompletion);
 }
 
+void UdtStreamSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion ) {
+    m_aioHelper->terminateAsyncIO();
+    m_aioHelper->cancelAsyncIO( aio::etNone, waitForRunningHandlerCompletion );
+}
+
 bool UdtStreamSocket::postImpl( std::function<void()>&& handler )
 {
     return aio::AIOService::instance()->post( static_cast<UdtSocket*>(this), std::move(handler) );
@@ -795,6 +800,12 @@ AbstractStreamSocket* UdtStreamServerSocket::accept()  {
 void UdtStreamServerSocket::cancelAsyncIO(bool waitForRunningHandlerCompletion)
 {
     m_aioHelper->cancelAsyncIO(waitForRunningHandlerCompletion);
+}
+
+void UdtStreamServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
+{
+    impl()->terminated.store( true, std::memory_order_relaxed );
+    m_aioHelper->cancelAsyncIO( waitForRunningHandlerCompletion );
 }
 
 bool UdtStreamServerSocket::bind( const SocketAddress& localAddress ) {

@@ -73,53 +73,57 @@ protected:
 class UdtStreamSocket : public UdtSocket , public AbstractStreamSocket {
 public:
     // AbstractSocket --------------- interface
-    virtual bool bind( const SocketAddress& localAddress );
-    virtual SocketAddress getLocalAddress() const;
-    virtual SocketAddress getPeerAddress() const;
-    virtual void close();
-    virtual bool isClosed() const;
-    virtual bool setReuseAddrFlag( bool reuseAddr );
-    virtual bool getReuseAddrFlag( bool* val ) const;
-    virtual bool setNonBlockingMode( bool val );
-    virtual bool getNonBlockingMode( bool* val ) const;
-    virtual bool getMtu( unsigned int* mtuValue ) const;
-    virtual bool setSendBufferSize( unsigned int buffSize );
-    virtual bool getSendBufferSize( unsigned int* buffSize ) const;
-    virtual bool setRecvBufferSize( unsigned int buffSize );
-    virtual bool getRecvBufferSize( unsigned int* buffSize ) const;
-    virtual bool setRecvTimeout( unsigned int millis );
-    virtual bool getRecvTimeout( unsigned int* millis ) const;
-    virtual bool setSendTimeout( unsigned int ms ) ;
-    virtual bool getSendTimeout( unsigned int* millis ) const;
-    virtual bool getLastError( SystemError::ErrorCode* errorCode ) const;
-    virtual AbstractSocket::SOCKET_HANDLE handle() const;
+    virtual bool bind( const SocketAddress& localAddress ) override;
+    virtual SocketAddress getLocalAddress() const override;
+    virtual SocketAddress getPeerAddress() const override;
+    virtual void close() override;
+    virtual bool isClosed() const override;
+    virtual bool setReuseAddrFlag( bool reuseAddr ) override;
+    virtual bool getReuseAddrFlag( bool* val ) const override;
+    virtual bool setNonBlockingMode( bool val ) override;
+    virtual bool getNonBlockingMode( bool* val ) const override;
+    virtual bool getMtu( unsigned int* mtuValue ) const override;
+    virtual bool setSendBufferSize( unsigned int buffSize ) override;
+    virtual bool getSendBufferSize( unsigned int* buffSize ) const override;
+    virtual bool setRecvBufferSize( unsigned int buffSize ) override;
+    virtual bool getRecvBufferSize( unsigned int* buffSize ) const override;
+    virtual bool setRecvTimeout( unsigned int millis ) override;
+    virtual bool getRecvTimeout( unsigned int* millis ) const override;
+    virtual bool setSendTimeout( unsigned int ms ) override;
+    virtual bool getSendTimeout( unsigned int* millis ) const override;
+    virtual bool getLastError( SystemError::ErrorCode* errorCode ) const override;
+    virtual AbstractSocket::SOCKET_HANDLE handle() const override;
     // AbstractCommunicatingSocket ------- interface
     virtual bool connect(
         const QString& foreignAddress,
         unsigned short foreignPort,
-        unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS );
-    virtual int recv( void* buffer, unsigned int bufferLen, int flags = 0 );
-    virtual int send( const void* buffer, unsigned int bufferLen );
+        unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS ) override;
+    virtual int recv( void* buffer, unsigned int bufferLen, int flags = 0 ) override;
+    virtual int send( const void* buffer, unsigned int bufferLen ) override;
     //  What's difference between foreign address with peer address 
-    virtual SocketAddress getForeignAddress() const {
+    virtual SocketAddress getForeignAddress() const override {
         return getPeerAddress();
     }
-    virtual bool isConnected() const;
-    virtual void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion = true ) ;
+    virtual bool isConnected() const override;
+    virtual void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion = true ) override;
+    //!Implementation of AbstractSocket::terminateAsyncIO
+    virtual void terminateAsyncIO( bool waitForRunningHandlerCompletion ) override;
+
+
     // AbstractStreamSocket ------ interface
-    virtual bool reopen();
-    virtual bool setNoDelay( bool value ) {
+    virtual bool reopen() override;
+    virtual bool setNoDelay( bool value ) override {
         Q_UNUSED(value);
         return false;
     }
-    virtual bool getNoDelay( bool* /*value*/ ) const {
+    virtual bool getNoDelay( bool* /*value*/ ) const override {
         return false;
     }
-    virtual bool toggleStatisticsCollection( bool val ) {
+    virtual bool toggleStatisticsCollection( bool val ) override {
         Q_UNUSED(val);
         return false;
     }
-    virtual bool getConnectionStatistics( StreamSocketInfo* info ) {
+    virtual bool getConnectionStatistics( StreamSocketInfo* info ) override {
         // Haven't found any way to get RTT sample from UDT
         Q_UNUSED(info);
         return false;
@@ -140,10 +144,10 @@ protected:
 private:
     std::unique_ptr<AsyncSocketImplHelper<UdtSocket>> m_aioHelper;
 
-    virtual bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler );
-    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler );
-    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler );
-    virtual bool registerTimerImpl( unsigned int timeoutMillis, std::function<void()>&& handler );
+    virtual bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) override;
+    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
+    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
+    virtual bool registerTimerImpl( unsigned int timeoutMillis, std::function<void()>&& handler ) override;
 
 private:
     Q_DISABLE_COPY(UdtStreamSocket)
@@ -155,6 +159,8 @@ public:
     virtual bool listen( int queueLen = 128 ) ;
     virtual AbstractStreamSocket* accept() ;
     virtual void cancelAsyncIO(bool waitForRunningHandlerCompletion) override;
+    //!Implementation of AbstractSocket::terminateAsyncIO
+    virtual void terminateAsyncIO( bool waitForRunningHandlerCompletion ) override;
 
     virtual bool bind(const SocketAddress& localAddress);
     virtual SocketAddress getLocalAddress() const;

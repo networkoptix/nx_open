@@ -212,6 +212,12 @@ void MixedTcpUdtServerSocket::cancelAsyncIO(bool waitForRunningHandlerCompletion
         m_acceptingFlags[i] = false;
 }
 
+void MixedTcpUdtServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
+{
+    //TODO #ak
+    assert( false );
+}
+
 bool MixedTcpUdtServerSocket::postImpl( std::function<void()>&& handler )
 {
     return m_socketDelegates[0]->post( std::move(handler) );

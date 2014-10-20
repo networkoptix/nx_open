@@ -1226,6 +1226,12 @@ int QnSSLSocket::send( const void* buffer, unsigned int bufferLen )
     return SSL_write(d->ssl, buffer, bufferLen);
 }
 
+void QnSSLSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
+{
+    Q_D(QnSSLSocket); 
+    d->wrappedSocket->terminateAsyncIO( waitForRunningHandlerCompletion );
+}
+
 bool QnSSLSocket::reopen()
 {
     Q_D(QnSSLSocket);
@@ -1277,12 +1283,6 @@ bool QnSSLSocket::isConnected() const
 {
     Q_D(const QnSSLSocket);
     return d->wrappedSocket->isConnected();
-}
-
-void QnSSLSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
-{
-    Q_D(const QnSSLSocket);
-    return d->wrappedSocket->terminateAsyncIO( waitForRunningHandlerCompletion );
 }
 
 bool QnSSLSocket::connectWithoutEncryption(
@@ -1526,6 +1526,11 @@ SSLServerSocket::SSLServerSocket(AbstractStreamServerSocket* delegateSocket, boo
     m_delegateSocket( delegateSocket )
 {
     InitOpenSSLGlobalLock();
+}
+
+void SSLServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
+{
+    return m_delegateSocket->terminateAsyncIO( waitForRunningHandlerCompletion );
 }
 
 bool SSLServerSocket::listen(int queueLen)

@@ -18,21 +18,16 @@ class CommonSocketImpl
 {
 public:
     std::atomic<aio::AIOThread<SocketType>*> aioThread;
+    std::array<void*, aio::etMax> eventTypeToUserData;
+    std::atomic<bool> terminated;
 
+    CommonSocketImpl()
+    :
+        aioThread( nullptr ),
+        terminated( false )
+    {
+    }
     virtual ~CommonSocketImpl() {}
-
-    void*& getUserData( aio::EventType eventType )
-    {
-        return m_eventTypeToUserData[eventType];
-    }
-
-    void* const& getUserData( aio::EventType eventType ) const
-    {
-        return m_eventTypeToUserData[eventType];
-    }
-
-private:
-    std::array<void*, aio::etMax> m_eventTypeToUserData;
 };
 
 #endif  //COMMON_SOCKET_IMPL_H

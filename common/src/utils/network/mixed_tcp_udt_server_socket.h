@@ -76,6 +76,8 @@ public:
     virtual AbstractStreamSocket* accept() override;
     //!Implementation of SSLServerSocket::cancelAsyncIO
     virtual void cancelAsyncIO(bool waitForRunningHandlerCompletion) override;
+    //!Implementation of AbstractSocket::terminateAsyncIO
+    virtual void terminateAsyncIO( bool waitForRunningHandlerCompletion ) override;
 
 protected:
     //!Implementation of AbstractSocket::postImpl

@@ -31,6 +31,9 @@ public:
     static void initSSLEngine(const QByteArray& certData);
     static void releaseSSLEngine();
 
+    //!Implementation of AbstractSocket::terminateAsyncIO
+    virtual void terminateAsyncIO( bool waitForRunningHandlerCompletion ) override;
+
     virtual bool reopen() override;
     virtual bool setNoDelay( bool value ) override;
     virtual bool getNoDelay( bool* value ) const override;
@@ -140,6 +143,9 @@ public:
         \param delegateSocket Ownership is passed to this class
     */
     SSLServerSocket( AbstractStreamServerSocket* delegateSocket, bool allowNonSecureConnect );
+
+    //!Implementation of AbstractSocket::terminateAsyncIO
+    virtual void terminateAsyncIO( bool waitForRunningHandlerCompletion ) override;
 
     //////////////////////////////////////////////////////////////////////
     ///////// Implementation of AbstractStreamServerSocket methods

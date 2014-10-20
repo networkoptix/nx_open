@@ -160,6 +160,12 @@ public:
     {
     }
 
+
+    //!Implementation of AbstractSocket::terminateAsyncIO
+    virtual void terminateAsyncIO( bool waitForRunningHandlerCompletion ) override {
+        this->m_implDelegate.terminateAsyncIO( waitForRunningHandlerCompletion );
+    }
+
     //////////////////////////////////////////////////////////////////////
     ///////// Implementation of AbstractCommunicatingSocket methods
     //////////////////////////////////////////////////////////////////////
