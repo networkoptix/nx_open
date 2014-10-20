@@ -95,6 +95,8 @@ namespace ec2
         {
         case ApiCommand::removeStorages:
             return m_mediaServerManager->triggerNotification( tran );
+        case ApiCommand::removeResources:
+            return m_resourceManager->triggerNotification( tran );
         default:
             assert( false );
         }

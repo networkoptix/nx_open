@@ -178,6 +178,11 @@ namespace ec2
             return remove( id, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
+        template<class TargetType, class HandlerType> 
+        int remove( const QVector<QnUuid>& idList, TargetType* target, HandlerType handler ) {
+            return remove( idList, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+
     signals:
         void statusChanged( const QnUuid& resourceId, Qn::ResourceStatus status );
         //void disabledChanged( const QnUuid& resourceId, bool disabled );
@@ -195,6 +200,7 @@ namespace ec2
         virtual int save(const ec2::ApiResourceParamWithRefDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) = 0;
         virtual int removeParams(const ec2::ApiResourceParamWithRefDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) = 0;
         virtual int remove( const QnUuid& resource, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int remove( const QVector<QnUuid>& resourceList, impl::SimpleHandlerPtr handler ) = 0;
     };
 
 
@@ -244,6 +250,10 @@ namespace ec2
         */
         template<class TargetType, class HandlerType> int remove( const QnUuid& id, TargetType* target, HandlerType handler ) {
             return remove( id, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+
+        template<class TargetType, class HandlerType> int remove( const QVector<QnUuid>& idList, TargetType* target, HandlerType handler ) {
+            return remove( idList, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
         /*!

@@ -43,6 +43,7 @@ namespace ec2
             REGISTER_COMMAND(removeResourceParams),
             REGISTER_COMMAND(getResourceParams),
             REGISTER_COMMAND(getStatusList),
+            REGISTER_COMMAND(removeResources),
             REGISTER_COMMAND(saveResource),
             REGISTER_COMMAND(removeResource),
             REGISTER_COMMAND(setPanicMode),
@@ -178,6 +179,7 @@ namespace ec2
         {
             return  val == saveResource   ||
                 val == removeResource  ||
+                val == removeResources  ||
                 val == setResourceStatus ||
                 val == setResourceParams ||
                 val == setResourceParam ||
