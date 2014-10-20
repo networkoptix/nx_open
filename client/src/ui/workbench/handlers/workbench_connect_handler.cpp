@@ -15,6 +15,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -23,6 +24,7 @@
 #include <ui/actions/action_parameter_types.h>
 
 #include <ui/dialogs/login_dialog.h>
+#include <ui/dialogs/progress_dialog.h>
 #include <ui/dialogs/non_modal_dialog_constructor.h>
 
 #include <ui/graphics/items/generic/graphics_message_box.h>
@@ -132,55 +134,22 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
         disconnect( QnAppServerConnectionFactory::getConnection2().get(), nullptr, QnSyncTime::instance(), nullptr );
     }
 
+    disconnect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoChanged,  this, NULL);
+
     /* Don't do anything if we are closing client. */
     if (!mainWindow())
         return;
 
-    context()->instance<QnWorkbenchStateManager>()->tryClose(true);
+    /* If we were not disconnected intentionally try to restore connection. */
+    if (connected()) {
+        if (tryToRestoreConnection())
+            return;
 
-    /* Get ready for the next connection. */
-    m_readyForConnection = true;
-
-    disconnect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoChanged,  this, NULL);
-
-    if (qnSettings->isVideoWallMode()) {
-        m_connectingMessageBox = QnGraphicsMessageBox::information(
-            tr("Connection failed. Trying to restore connection..."),
-            maxVideowallReconnectTimeout);   
-
-        connect(m_connectingMessageBox, &QnGraphicsMessageBox::finished, this, [this] {
-            m_connectingMessageBox = NULL;
-            menu()->trigger(Qn::DisconnectAction, QnActionParameters().withArgument(Qn::ForceRole, true));
-            menu()->trigger(Qn::ExitActionDelayed);
-        });
-        return;
+        /* Otherwise, disconnect fully. */    
+        disconnectFromServer(true);
     }
-
-    action(Qn::OpenLoginDialogAction)->setIcon(qnSkin->icon("titlebar/disconnected.png"));
-    action(Qn::OpenLoginDialogAction)->setText(tr("Connect to Server..."));
-
-    /* Remove all remote resources. */
-    const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(Qn::remote);
-    resourcePool()->removeResources(remoteResources);
-    resourcePool()->removeResources(resourcePool()->getAllIncompatibleResources());
-
-    /* Also remove layouts that were just added and have no 'remote' flag set. */
-    foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources<QnLayoutResource>()) {
-        bool isLocal = snapshotManager()->isLocal(layout);
-        bool isFile = snapshotManager()->isFile(layout);
-        if(isLocal && isFile)  //do not remove exported layouts
-            continue;
-        resourcePool()->removeResource(layout);
-    }
-
-    qnLicensePool->reset();
-    context()->instance<QnAppServerNotificationCache>()->clear();
-
-    /* If we were not disconnected intentionally show corresponding message. */
-    if (!qnCommon->remoteGUID().isNull())
-        tryToRestoreConnection(qnCommon->localSystemName());
-
-    qnCommon->setLocalSystemName(QString());
+        
+    clearConnection();
 }
 
 void QnWorkbenchConnectHandler::at_connectAction_triggered() {
@@ -346,18 +315,64 @@ void QnWorkbenchConnectHandler::showLoginDialog() {
     //TODO: #GDM reconnect process should be aborted if user opens login dialog
 }
 
-void QnWorkbenchConnectHandler::tryToRestoreConnection(const QString &systemName) {
-    /* Check against recursive enter. */
-    if (!connected())
-        return;
+
+void QnWorkbenchConnectHandler::clearConnection() {
+
+    context()->instance<QnWorkbenchStateManager>()->tryClose(true);
+
+    /* Get ready for the next connection. */
+    m_readyForConnection = true;
+
+    action(Qn::OpenLoginDialogAction)->setIcon(qnSkin->icon("titlebar/disconnected.png"));
+    action(Qn::OpenLoginDialogAction)->setText(tr("Connect to Server..."));
+
+    /* Remove all remote resources. */
+    const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(Qn::remote);
+    resourcePool()->removeResources(remoteResources);
+    resourcePool()->removeResources(resourcePool()->getAllIncompatibleResources());
+
+    /* Also remove layouts that were just added and have no 'remote' flag set. */
+    foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources<QnLayoutResource>()) {
+        bool isLocal = snapshotManager()->isLocal(layout);
+        bool isFile = snapshotManager()->isFile(layout);
+        if(isLocal && isFile)  //do not remove exported layouts
+            continue;
+        resourcePool()->removeResource(layout);
+    }
+
+    qnLicensePool->reset();
+    context()->instance<QnAppServerNotificationCache>()->clear();
+    qnCommon->setLocalSystemName(QString());
+}
+
+bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
+    //TODO: #GDM /* Check against recursive enter. */
 
     QUrl currentUrl = QnAppServerConnectionFactory::url();
     QString userName = currentUrl.userName();
     QString password = currentUrl.password();
+    QString systemName = qnCommon->localSystemName();
 
-    //TODO: #GDM process should be aborted if user opens login dialog
+    QnProgressDialog* progressDialog = new QnProgressDialog(mainWindow());
+    progressDialog->setWindowTitle(tr("Reconnecting..."));
+    progressDialog->setLabelText(tr("Please wait while connection is being restored..."));
+    progressDialog->setInfiniteProgress();
+    progressDialog->setModal(true);
 
-    m_connectingMessageBox = QnGraphicsMessageBox::informationTicking(
+    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    progressDialog,   &QnProgressDialog::hide);
+    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    progressDialog,   &QnProgressDialog::deleteLater);
+
+    // here we will wait for the reconnect or cancel
+    progressDialog->exec();
+    disconnect(QnClientMessageProcessor::instance(), NULL, progressDialog, NULL);
+
+    progressDialog->deleteLater();
+    if (progressDialog->wasCanceled())
+        return false;
+    return true;
+
+
+  /*  m_connectingMessageBox = QnGraphicsMessageBox::informationTicking(
         tr("Connection failed. Trying to restore connection... %1"),
         maxReconnectTimeout);
 
@@ -386,7 +401,7 @@ void QnWorkbenchConnectHandler::tryToRestoreConnection(const QString &systemName
                 return;
         }        
         menu()->trigger(Qn::OpenLoginDialogAction);
-    });
+    });*/
    
 }
 

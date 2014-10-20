@@ -31,7 +31,10 @@ protected:
     void hideMessageBox();
     void showLoginDialog();
 
-    void tryToRestoreConnection(const QString &systemName);
+    bool tryToRestoreConnection();
+
+    /** Clear all local data structures. */
+    void clearConnection();
 private:
     void at_messageProcessor_connectionOpened();
     void at_messageProcessor_connectionClosed();
