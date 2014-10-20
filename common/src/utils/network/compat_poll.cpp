@@ -5,6 +5,8 @@
 
 #include "compat_poll.h"
 
+#include <platform/win32_syscall_resolver.h>
+
 
 #ifdef _WIN32
 
@@ -26,6 +28,9 @@ int pollOverSelectWin32(
     ULONG nfds,
     INT timeout )
 {
+    //TODO #ak modify implementation taking into account undocumented win32 select features (its epoll-like resulting array)
+        //this will make implementation much more efficient
+
     if( nfds > FD_SETSIZE )
     {
         WSASetLastError( WSAENOBUFS );
@@ -90,50 +95,15 @@ int pollOverSelectWin32(
 }
 
 
-class FuncAddressFinder
-{
-public:
-    FuncAddressFinder()
-    :
-        m_poll( pollOverSelectWin32 )
-    {
-        HMODULE hLib = LoadLibrary( L"Ws2_32.dll" );
-        if( hLib == NULL )
-            return;
-
-        PollFuncType wsaPollAddr = (PollFuncType)GetProcAddress( hLib, "WSAPoll" );
-        if( wsaPollAddr == NULL )
-        {
-            FreeLibrary( hLib );
-            return;
-        }
-
-        m_poll = wsaPollAddr;
-        m_loadedLibraries.push_back( hLib );
-    }
-
-    ~FuncAddressFinder()
-    {
-        for( HMODULE hLib: m_loadedLibraries )
-            FreeLibrary( hLib );
-        m_loadedLibraries.clear();
-    }
-
-    PollFuncType getPollFuncAddress() const
-    {
-        return m_poll;
-    }
-
-private:
-    PollFuncType m_poll;
-    std::list<HMODULE> m_loadedLibraries;
-};
 
 
 PollFuncType getPollFuncAddress()
 {
-    static FuncAddressFinder funcAddressFinder;
-    return funcAddressFinder.getPollFuncAddress();
+    static PollFuncType pollAddress = Win32FuncResolver::instance()->resolveFunction<PollFuncType>(
+        L"Ws2_32.dll",
+        "WSAPoll",
+        pollOverSelectWin32 );
+    return pollAddress;
 }
 
 #endif
