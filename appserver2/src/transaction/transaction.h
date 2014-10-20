@@ -50,6 +50,7 @@ namespace ec2
             removeResourceParam         = 209,   /*< ApiResourceParamWithRefData */
             removeResourceParams        = 210,   /*< ApiResourceParamWithRefDataList */
             getStatusList               = 211,  /*< ApiResourceStatusDataList */
+            removeResources             = 212,  /*< ApiIdDataList */
 
             /* Camera resource */
             getCameras                  = 300,  /*< ApiCameraDataList */

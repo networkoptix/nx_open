@@ -133,6 +133,18 @@ namespace ec2
         m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
         return reqID;
     }
+    
+    template<class T>
+    int QnResourceManager<T>::remove( const QVector<QnUuid>& idList, impl::SimpleHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+        QnTransaction<ApiIdDataList> tran(ApiCommand::removeResources);
+        foreach(const QnUuid& id, idList)
+            tran.params.push_back(id);
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
+        return reqID;
+    }
 
     template<class QueryProcessorType>
     QnTransaction<ApiResourceStatusData> QnResourceManager<QueryProcessorType>::prepareTransaction(

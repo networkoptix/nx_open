@@ -252,8 +252,9 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_needUpdateOnvifUrl(false),
     m_timeDrift(0),
     m_prevSoapCallResult(0),
-    m_eventMonitorType( emtNone ),
-    m_timerID( 0 ),
+    m_inputMonitored(false),
+    m_eventMonitorType(emtNone),
+    m_timerID(0),
     m_renewSubscriptionTaskID(0),
     m_maxChannels(1),
     m_streamConfCounter(0),
@@ -266,7 +267,7 @@ QnPlOnvifResource::QnPlOnvifResource()
 QnPlOnvifResource::~QnPlOnvifResource()
 {
     {
-        QMutexLocker lk( &m_subscriptionMutex );
+        QMutexLocker lk( &m_ioPortMutex );
         while( !m_triggerOutputTasks.empty() )
         {
             const quint64 timerID = m_triggerOutputTasks.begin()->first;
@@ -566,6 +567,10 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
         setProperty(QnMediaResource::customAspectRatioKey(), QString::number(ar));
     }
     saveParams();
+
+#ifdef _DEBUG
+    startInputPortMonitoring();
+#endif
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -1294,7 +1299,7 @@ bool QnPlOnvifResource::setRelayOutputState(
     bool active,
     unsigned int autoResetTimeoutMS )
 {
-    QMutexLocker lk( &m_subscriptionMutex );
+    QMutexLocker lk( &m_ioPortMutex );
 
     using namespace std::placeholders;
     const quint64 timerID = TimerManager::instance()->addTimer(
@@ -1363,7 +1368,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     if (m_appStopping)
         return false;
 
-    QMutexLocker lk( &m_subscriptionMutex );
+    QMutexLocker lk( &m_ioPortMutex );
 
     //determining local address, accessible by onvif device
     QUrl eventServiceURL( QString::fromStdString(m_eventCapabilities->XAddr) );
@@ -2349,7 +2354,7 @@ CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncod
 
 void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 /*timerID*/)
 {
-    QMutexLocker lk( &m_subscriptionMutex );
+    QMutexLocker lk( &m_ioPortMutex );
 
     if( !m_eventCapabilities.get() )
         return;
@@ -2490,6 +2495,11 @@ bool QnPlOnvifResource::startInputPortMonitoring()
     if( !m_eventCapabilities.get() )
         return false;
 
+    {
+        QMutexLocker lk(&m_ioPortMutex);
+        m_inputMonitored = true;
+    }
+
     if( m_eventCapabilities->WSPullPointSupport )
         return createPullPointSubscription();
     else if( QnSoapServer::instance()->initialized() )
@@ -2503,7 +2513,8 @@ void QnPlOnvifResource::stopInputPortMonitoring()
     quint64 localTimerID = 0;
     quint64 localRenewSubscriptionTaskID = 0;
     {
-        QMutexLocker lk(&m_subscriptionMutex);
+        QMutexLocker lk(&m_ioPortMutex);
+        m_inputMonitored = false;
         localTimerID = m_timerID;
         localRenewSubscriptionTaskID = m_renewSubscriptionTaskID;
     }
@@ -2524,7 +2535,7 @@ void QnPlOnvifResource::stopInputPortMonitoring()
 
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> asyncPullMessagesCallWrapper;
     {
-        QMutexLocker lk(&m_subscriptionMutex);
+        QMutexLocker lk(&m_ioPortMutex);
         asyncPullMessagesCallWrapper = m_asyncPullMessagesCallWrapper;
     }
 
@@ -2727,7 +2738,10 @@ bool QnPlOnvifResource::createPullPointSubscription()
     //adding task to refresh subscription
     unsigned int renewSubsciptionTimeoutSec = response.oasisWsnB2__TerminationTime - response.oasisWsnB2__CurrentTime;
 
-    QMutexLocker lk(&m_subscriptionMutex);
+    QMutexLocker lk(&m_ioPortMutex);
+
+    if( !m_inputMonitored )
+        return true;
 
     using namespace std::placeholders;
     m_renewSubscriptionTaskID = TimerManager::instance()->addTimer(
@@ -2747,8 +2761,8 @@ bool QnPlOnvifResource::createPullPointSubscription()
 
 bool QnPlOnvifResource::isInputPortMonitored() const
 {
-    QMutexLocker lk(&m_subscriptionMutex);
-    return (m_timerID != 0) || (m_renewSubscriptionTaskID != 0);
+    QMutexLocker lk(&m_ioPortMutex);
+    return m_inputMonitored;
 }
 
 template<class _NumericInt>
@@ -2761,6 +2775,11 @@ _NumericInt roundUp( _NumericInt val, _NumericInt step, typename std::enable_if<
 
 void QnPlOnvifResource::pullMessages(quint64 /*timerID*/)
 {
+    QMutexLocker lk(&m_ioPortMutex);
+
+    if( !m_inputMonitored )
+        return;
+
     if( m_asyncPullMessagesCallWrapper )
     {
         //previous request is still running
@@ -2772,6 +2791,7 @@ void QnPlOnvifResource::pullMessages(quint64 /*timerID*/)
     }
 
     const QAuthenticator& auth = getAuth();
+
     std::unique_ptr<PullPointSubscriptionWrapper> soapWrapper(
         new PullPointSubscriptionWrapper(
             m_eventCapabilities->XAddr,
@@ -2796,23 +2816,24 @@ void QnPlOnvifResource::pullMessages(quint64 /*timerID*/)
 
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> asyncPullMessagesCallWrapper(
         new GSoapAsyncPullMessagesCallWrapper(
-            soapWrapper.release(),
+            std::move(soapWrapper),
             &PullPointSubscriptionWrapper::pullMessages ),
         [buf, header](GSoapAsyncPullMessagesCallWrapper* ptr){
             ::free(buf); ::free(header); delete ptr;
         }
     );
+
     using namespace std::placeholders;
-    QMutexLocker lk(&m_subscriptionMutex);
     if( asyncPullMessagesCallWrapper->callAsync(
             request,
             std::bind(&QnPlOnvifResource::onPullMessagesDone, this, asyncPullMessagesCallWrapper.data(), _1)) )
     {
-        m_asyncPullMessagesCallWrapper = asyncPullMessagesCallWrapper;
+        m_asyncPullMessagesCallWrapper = std::move(asyncPullMessagesCallWrapper);
     }
     else
     {
         using namespace std::placeholders;
+        //will try later
         m_timerID = TimerManager::instance()->addTimer(
             std::bind(&QnPlOnvifResource::pullMessages, this, _1),
             PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND);
@@ -2823,7 +2844,7 @@ void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* as
 {
     onPullMessagesResponseReceived(asyncWrapper->syncWrapper(), resultCode, asyncWrapper->response());
 
-    QMutexLocker lk(&m_subscriptionMutex);
+    QMutexLocker lk(&m_ioPortMutex);
     m_asyncPullMessagesCallWrapper.clear();
 }
 
@@ -2837,7 +2858,10 @@ void QnPlOnvifResource::onPullMessagesResponseReceived(
     const qint64 currentRequestSendClock = m_monotonicClock.elapsed();
 
     {
-        QMutexLocker lk(&m_subscriptionMutex);
+        QMutexLocker lk(&m_ioPortMutex);
+        if( !m_inputMonitored )
+            return;
+
         using namespace std::placeholders;
         m_timerID = TimerManager::instance()->addTimer(
             std::bind(&QnPlOnvifResource::pullMessages, this, _1),
@@ -2976,7 +3000,7 @@ void QnPlOnvifResource::setRelayOutputStateNonSafe(
     unsigned int autoResetTimeoutMS )
 {
     {
-        QMutexLocker lk(&m_subscriptionMutex);
+        QMutexLocker lk(&m_ioPortMutex);
         m_triggerOutputTasks.erase( timerID );
     }
 

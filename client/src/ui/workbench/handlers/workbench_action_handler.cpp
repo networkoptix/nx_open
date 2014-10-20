@@ -1834,33 +1834,43 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
         return snapshotManager()->flags(layoutResource) == Qn::ResourceIsLocal; /* Local, not changed and not being saved. */
     };
 
-    auto deleteResource = [this](const QnResourcePtr &resource) {
-        if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
-            if(snapshotManager()->isLocal(layout)) {
-                resourcePool()->removeResource(resource); /* This one can be simply deleted from resource pool. */
-                return;
+    auto deleteResources = [this](const QnResourceList& resources)
+    {
+        QVector<QnUuid> idToDelete;
+        foreach(const QnResourcePtr& resource, resources) 
+        {
+            if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) 
+            {
+                if(snapshotManager()->isLocal(layout)) {
+                    resourcePool()->removeResource(resource); /* This one can be simply deleted from resource pool. */
+                    return;
+                }
             }
+            QnUuid parentToDelete = resource.dynamicCast<QnVirtualCameraResource>() && //check for camera to avoid unnecessary parent lookup
+                QnMediaServerResource::isHiddenServer(resource->getParentResource())
+                ? resource->getParentId()
+                : QnUuid();
+            if (!parentToDelete.isNull())
+                idToDelete << parentToDelete;
+            idToDelete << resource->getId();
         }
 
         // if we are deleting an edge camera, also delete its server
-        QnUuid parentToDelete = resource.dynamicCast<QnVirtualCameraResource>() && //check for camera to avoid unnecessary parent lookup
-            QnMediaServerResource::isHiddenServer(resource->getParentResource())
-            ? resource->getParentId()
-            : QnUuid();
-
-        connection2()->getResourceManager()->remove( resource->getId(), this, &QnWorkbenchActionHandler::at_resource_deleted );
-        if (!parentToDelete.isNull())
-            connection2()->getResourceManager()->remove(parentToDelete, this, &QnWorkbenchActionHandler::at_resource_deleted );
+        connection2()->getResourceManager()->remove( idToDelete, this, &QnWorkbenchActionHandler::at_resource_deleted );
     };
 
     /* Check if it's OK to delete something without asking. */
     QnResourceList autoDeleting;
+    QnResourceList moreResourceToDelete;
     foreach(const QnResourcePtr &resource, resources) {
-        if(!canAutoDelete(resource))
-            continue;
-        autoDeleting << resource;
-        deleteResource(resource);
+        if(canAutoDelete(resource))
+            autoDeleting << resource;
+        else
+            moreResourceToDelete << resource;
     }
+    if (!autoDeleting.isEmpty())
+        deleteResources(autoDeleting);
+
     foreach (const QnResourcePtr &resource, autoDeleting)
         resources.removeOne(resource);
 
@@ -1897,6 +1907,8 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
         question = tr("Do you really want to delete the following %n item(s)?",
             "", resources.size());
     
+    if (moreResourceToDelete.isEmpty())
+        return;
     
     QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
         mainWindow(),
@@ -1908,8 +1920,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     if (button != QDialogButtonBox::Yes)
         return; /* User does not want it deleted. */
 
-    foreach(const QnResourcePtr &resource, resources)
-        deleteResource(resource);   
+    deleteResources(moreResourceToDelete);
 }
 
 void QnWorkbenchActionHandler::at_newUserAction_triggered() {
