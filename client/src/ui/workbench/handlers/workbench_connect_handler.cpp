@@ -28,7 +28,7 @@
 #include <ui/actions/action_parameter_types.h>
 
 #include <ui/dialogs/login_dialog.h>
-#include <ui/dialogs/progress_dialog.h>
+#include <ui/dialogs/reconnect_info_dialog.h>
 #include <ui/dialogs/non_modal_dialog_constructor.h>
 
 #include <ui/graphics/items/generic/graphics_message_box.h>
@@ -319,12 +319,13 @@ void QnWorkbenchConnectHandler::showLoginDialog() {
     QnNonModalDialogConstructor<QnLoginDialog> dialogConstructor(m_loginDialog, mainWindow());
     dialogConstructor.resetGeometry();
 
-    //TODO: #GDM reconnect process should be aborted if user opens login dialog
+    /* Abort current connect. */
+    m_connectingHandle = 0;
+    hideMessageBox();
 }
 
 
 void QnWorkbenchConnectHandler::clearConnection() {
-
     context()->instance<QnWorkbenchStateManager>()->tryClose(true);
 
     /* Get ready for the next connection. */
@@ -337,6 +338,7 @@ void QnWorkbenchConnectHandler::clearConnection() {
     const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(Qn::remote);
 
     QVector<QnUuid> idList;
+    idList.reserve(remoteResources.size());
     foreach(const QnResourcePtr& res, remoteResources)
         idList.push_back(res->getId());
 
@@ -364,8 +366,6 @@ void QnWorkbenchConnectHandler::clearConnection() {
 }
 
 bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
-    //TODO: #GDM /* Check against recursive enter. */
-
     QUrl currentUrl = QnAppServerConnectionFactory::url();
     QString userName = currentUrl.userName();
     QString password = currentUrl.password();
@@ -374,14 +374,9 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
     foreach (const QnMediaServerResourcePtr &server, qnResPool->getResources<QnMediaServerResource>())
         allServers << server->getId();
 
-    struct ServerInfo {
-        QnUuid id;              /**< Id of the server. */
-        QUrl url;               /**< Random interface */        //TODO: #GDM select the best by ping time
-        //quint64 pingTime;                                       //TODO: #GDM select the best by ping time
-    };
-    QList<ServerInfo> availableServers;
+    QList<QUrl> availableServers;
+    QMap<QString, int> hostsCount; // count duplicated hosts to display port in their url
 
-    QnCompatibilityChecker checker(localCompatibilityItems());
     foreach (const QnModuleInformation &info, QnModuleFinder::instance()->foundModules()) {
         if (!allServers.contains(info.id))
             continue;
@@ -389,43 +384,55 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
         if (info.remoteAddresses.isEmpty())
             continue;
 
-        ServerInfo server;
-        server.id = info.id;
-        server.url.setScheme(lit("http"));
-        server.url.setHost(*info.remoteAddresses.cbegin());
-        server.url.setPort(info.port);
-        server.url.setUserName(userName);
-        server.url.setPassword(password);
-        availableServers << server;
+        //TODO: #GDM select best interface
+        QUrl serverUrl;
+        serverUrl.setScheme(lit("http"));
+        serverUrl.setHost(*info.remoteAddresses.cbegin());
+        serverUrl.setPort(info.port);
+        serverUrl.setUserName(userName);
+        serverUrl.setPassword(password);
+        availableServers << serverUrl;
+
+        ++hostsCount[serverUrl.host()];
     }    
 
     if (availableServers.isEmpty())
         return false;
 
-    QnProgressDialog* progressDialog = new QnProgressDialog(mainWindow());
-    progressDialog->setWindowTitle(tr("Reconnecting..."));
-    progressDialog->setLabelText(tr("Please wait while connection is being restored..."));
-    progressDialog->setInfiniteProgress();
-    progressDialog->setModal(true);
+    auto getInfo = [availableServers, hostsCount](const QUrl &url) {
+        QStringList result;
+        foreach (const QUrl &serverUrl, availableServers) {
+            QString info = serverUrl.host();
+            if (hostsCount[info] > 1)
+                info = lit("%1:%2").arg(info).arg(serverUrl.port());
+            if (url.host() == serverUrl.host() && url.port() == serverUrl.port())
+                info = lit("<b>%1</b>").arg(info);
+            result << info;
+        }
+        return result.join(lit("<br>"));
+    };
 
-    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    progressDialog,   &QnProgressDialog::hide);
-    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    progressDialog,   &QnProgressDialog::deleteLater);
+    QnReconnectInfoDialog* reconnectInfoDialog = new QnReconnectInfoDialog(mainWindow());
+    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    reconnectInfoDialog,   &QDialog::hide);
+    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    reconnectInfoDialog,   &QObject::deleteLater);
 
-    progressDialog->show();
+    reconnectInfoDialog->setText(getInfo(QUrl()));
+    reconnectInfoDialog->show();
 
     /* Here we will wait for the reconnect or cancel. */
     auto iter = availableServers.cbegin();
-    while (!progressDialog->wasCanceled()) {
-        if (connectToServer(iter->url, true))   /* Here inner event loop will be started. */
+    while (!reconnectInfoDialog->wasCanceled()) {
+        reconnectInfoDialog->setText(getInfo(*iter));
+        if (connectToServer(*iter, true))   /* Here inner event loop will be started. */
             break;
         ++iter;
         if (iter == availableServers.cend())
             iter = availableServers.cbegin();   //loop
     }
 
-    disconnect(QnClientMessageProcessor::instance(), NULL, progressDialog, NULL);
-    progressDialog->deleteLater();
-    if (progressDialog->wasCanceled())
+    disconnect(QnClientMessageProcessor::instance(), NULL, reconnectInfoDialog, NULL);
+    reconnectInfoDialog->deleteLater();
+    if (reconnectInfoDialog->wasCanceled())
         return false;
     return true;
 }
