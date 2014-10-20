@@ -14,12 +14,12 @@ Button {
     height: iconSize
 
     style: ButtonStyle {
-        background: Item {
-        }
+        background: Item {}
 
         label: Item {
             Image {
                 id: image
+                anchors.centerIn: parent
                 source: control.icon
                 sourceSize.height: control.iconSize
                 sourceSize.width: control.iconSize

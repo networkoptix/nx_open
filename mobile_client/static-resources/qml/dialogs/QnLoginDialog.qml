@@ -10,7 +10,7 @@ import "../controls"
 import "login_dialog_functions.js" as LoginDialogFunctions
 import "../common_functions.js" as CommonFunctions
 
-Item {
+FocusScope {
     id: loginDialog
 
     property var __syspal: SystemPalette {
@@ -52,6 +52,8 @@ Item {
         QnIconButton {
             id: backButton
             icon: "/images/back.png"
+            x: CommonFunctions.dp(16)
+            anchors.verticalCenter: parent.verticalCenter
 
             onClicked: {
                 loginDialog.state = "CHOOSE"
@@ -59,8 +61,11 @@ Item {
         }
 
         Row {
-            anchors.right: parent.right
-            height: parent.height
+            anchors {
+                right: parent.right
+                rightMargin: CommonFunctions.dp(16)
+                verticalCenter: parent.verticalCenter
+            }
 
             QnIconButton {
                 id: deleteButton
@@ -73,6 +78,30 @@ Item {
                 }
             }
         }
+
+        states: [
+            State {
+                name: "HIDDEN"
+                PropertyChanges {
+                    target: actionBar
+                    y: -actionBar.height
+                }
+            },
+            State {
+                name: "SELECT"
+                PropertyChanges {
+                    target: actionBar
+                    y: 0
+                }
+            },
+            State {
+                name: "EDIT"
+                PropertyChanges {
+                    target: actionBar
+                    y: 0
+                }
+            }
+        ]
     }
 
     Item {
@@ -105,6 +134,8 @@ Item {
             boundsBehavior: ListView.StopAtBounds
 
             delegate: Item {
+                property bool selected: false
+
                 width: savedSessionsList.width
                 height: label.height + CommonFunctions.dp(16)
 
@@ -131,6 +162,9 @@ Item {
                         LoginDialogFunctions.updateUi(modelData)
                         loginDialog.state = "EDIT"
                     }
+                    onPressAndHold: {
+
+                    }
                 }
             }
         }
@@ -156,12 +190,14 @@ Item {
                 id: name
                 placeholderText: qsTr("Session name")
                 width: parent.width
+                onAccepted: address.focus = true
             }
 
             QnTextField {
                 id: address
                 placeholderText: qsTr("Server address")
                 width: parent.width
+                onAccepted: port.focus = true
             }
 
             QnTextField {
@@ -183,12 +219,15 @@ Item {
                     top: 65535
                 }
                 text: "7001"
+
+                onAccepted: login.focus = true
             }
 
             QnTextField {
                 id: login
                 placeholderText: qsTr("User name")
                 width: parent.width
+                onAccepted: password.focus = true
             }
 
             QnTextField {
@@ -196,6 +235,7 @@ Item {
                 placeholderText: qsTr("Password")
                 echoMode: TextInput.Password
                 width: parent.width
+                onAccepted: LoginDialogFunctions.connectToServer()
             }
 
         }
@@ -237,10 +277,7 @@ Item {
         color: "#0096ff"
         icon: "/images/forward.png"
 
-        onClicked: {
-            LoginDialogFunctions.saveCurrentSession()
-            connectionManager.connectToServer(LoginDialogFunctions.makeUrl(address.text, port.text, login.text, password.text))
-        }
+        onClicked: LoginDialogFunctions.connectToServer()
     }
 
     states: [
@@ -258,6 +295,10 @@ Item {
                 target: addCancelButton
                 x: loginDialog.width * 5 / 6 - addCancelButton.width
             }
+            PropertyChanges {
+                target: actionBar
+                state: "HIDDEN"
+            }
         },
         State {
             name: "EDIT"
@@ -272,6 +313,10 @@ Item {
             PropertyChanges {
                 target: addCancelButton
                 x: loginDialog.width / 6
+            }
+            PropertyChanges {
+                target: actionBar
+                state: "EDIT"
             }
         }
     ]

@@ -2,6 +2,11 @@ function makeUrl(address, port, user, password) {
     return "http://" + user + ":" + password + "@" + address + ":" + port
 }
 
+function connectToServer() {
+    saveCurrentSession()
+    connectionManager.connectToServer(makeUrl(address.text, port.text, login.text, password.text))
+}
+
 function updateUi(modelData) {
     if (modelData) {
         name.text = modelData.name
