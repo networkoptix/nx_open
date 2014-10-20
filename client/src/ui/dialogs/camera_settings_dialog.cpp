@@ -263,6 +263,9 @@ void QnCameraSettingsDialog::saveCameras(const QnVirtualCameraResourceList &came
     if (cameras.isEmpty())
         return;
     QList<QnUuid> idList = idListFromResList(cameras);
+    for( const QnVirtualCameraResourcePtr& camera: cameras )
+        if( camera->preferedServerId().isNull() )
+            camera->setPreferedServerId( camera->getParentId() );
     QnAppServerConnectionFactory::getConnection2()->getCameraManager()->saveUserAttributes(
         QnCameraUserAttributePool::instance()->getAttributesList(idList),
         this,
