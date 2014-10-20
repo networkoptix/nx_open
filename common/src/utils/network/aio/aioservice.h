@@ -8,6 +8,7 @@
 
 #include <atomic>
 #include <memory>
+#include <atomic>
 
 #include <boost/optional.hpp>
 
