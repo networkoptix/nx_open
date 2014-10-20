@@ -370,6 +370,39 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
     QString userName = currentUrl.userName();
     QString password = currentUrl.password();
 
+    //TODO: #GDM possibly we should resolve host names
+    QHostAddress addr(currentUrl.host());
+    quint32 localIp = addr.toIPv4Address();
+
+    auto matchIpMetric = [](quint32 ip1, quint32 ip2) {
+        int i = 31;
+        while (i >= 0 && (ip1 >> i == ip2 >> i))
+            --i;
+        return 31 - i;
+    };
+
+    auto findBestInterface = [localIp, matchIpMetric](const QSet<QString> &addresses) {
+        QString best = *addresses.cbegin();
+        if (localIp == 0)
+            return best;
+
+        int bestMatch = 0;
+        foreach (const QString &address, addresses) {
+            QHostAddress addr(address);
+            if (addr.isNull())
+                continue;
+
+            quint32 remoteIp = addr.toIPv4Address();
+            int metric = matchIpMetric(localIp, remoteIp);
+            if (metric <= bestMatch) 
+                continue;
+            bestMatch = metric;
+            best = address;
+        }
+
+        return best;
+    };
+
     QList<QnUuid> allServers;
     foreach (const QnMediaServerResourcePtr &server, qnResPool->getResources<QnMediaServerResource>())
         allServers << server->getId();
@@ -387,7 +420,7 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
         //TODO: #GDM select best interface
         QUrl serverUrl;
         serverUrl.setScheme(lit("http"));
-        serverUrl.setHost(*info.remoteAddresses.cbegin());
+        serverUrl.setHost(findBestInterface(info.remoteAddresses));
         serverUrl.setPort(info.port);
         serverUrl.setUserName(userName);
         serverUrl.setPassword(password);
