@@ -66,7 +66,10 @@ FocusScope {
             x: CommonFunctions.dp(16)
             anchors.verticalCenter: parent.verticalCenter
 
-            onClicked: LoginDialogFunctions.clearSelection()
+            onClicked: {
+                LoginDialogFunctions.clearSelection()
+                actionBar.state = "HIDDEN"
+            }
         }
 
         Row {
@@ -152,6 +155,28 @@ FocusScope {
                     target: checkButton
                     __clipped: true
                     visible: false
+                }
+            }
+        ]
+
+        transitions: [
+            Transition {
+                from: "HIDDEN"
+                to: "SELECT"
+                SequentialAnimation {
+                    PropertyAction { target: checkButton; property: "__clipped" }
+                    PauseAnimation { duration: 50 }
+                    PropertyAction { target: deleteButton; property: "__clipped" }
+                }
+            },
+            Transition {
+                from: "HIDDEN"
+                to: "EDIT"
+                SequentialAnimation {
+                    PauseAnimation { duration: 150 }
+                    PropertyAction { target: backButton; property: "__clipped" }
+                    PauseAnimation { duration: 50 }
+                    PropertyAction { target: deleteButton; property: "__clipped" }
                 }
             }
         ]
@@ -299,41 +324,35 @@ FocusScope {
     }
 
     QnRoundButton {
-        id: addCancelButton
+        id: addButton
         anchors {
             bottom: parent.bottom
             bottomMargin: parent.width / 6
         }
 
-        x: parent.width * 5 / 6 - width
-        rotation: loginDialog.state == "CHOOSE" ? 0 : 45
+        x: (parent.width - width) / 2
         color: "#0096ff"
         icon: "/images/plus.png"
 
-        Behavior on rotation { enabled: __animated; NumberAnimation { duration: 200 } }
-
         onClicked: {
-            if (loginDialog.state == "CHOOSE") {
-                LoginDialogFunctions.updateUi(null)
-                __currentIndex = savedSessionsList.count
-                LoginDialogFunctions.clearSelection()
-                loginDialog.state = "EDIT"
-            } else {
-                __currentIndex = -1
-                loginDialog.state = "CHOOSE"
-            }
+            LoginDialogFunctions.updateUi(null)
+            __currentIndex = savedSessionsList.count
+            LoginDialogFunctions.clearSelection()
+            loginDialog.state = "EDIT"
         }
     }
 
     QnRoundButton {
         id: loginButton
-        anchors {
-            bottom: parent.bottom
-            bottomMargin: parent.width / 6
-        }
-        x: parent.width
+
+        x: addButton.x
+        y:addButton.y
+
         color: "#0096ff"
         icon: "/images/forward.png"
+        opacity: 0.0
+
+        Behavior on opacity { NumberAnimation { duration: 200 } }
 
         onClicked: LoginDialogFunctions.connectToServer()
     }
@@ -346,12 +365,12 @@ FocusScope {
                 x: 0
             }
             PropertyChanges {
-                target: loginButton
-                x: loginDialog.width
+                target: addButton
+                x: (loginDialog.width - addButton.width) / 2
             }
             PropertyChanges {
-                target: addCancelButton
-                x: loginDialog.width * 5 / 6 - addCancelButton.width
+                target: addButton
+                opacity: 0.0
             }
             PropertyChanges {
                 target: actionBar
@@ -365,12 +384,12 @@ FocusScope {
                 x: -loginDialog.width
             }
             PropertyChanges {
-                target: loginButton
-                x: loginDialog.width * 5 / 6 - loginButton.width
+                target: addButton
+                x: loginDialog.width * 5 / 6 - addButton.width
             }
             PropertyChanges {
-                target: addCancelButton
-                x: loginDialog.width / 6
+                target: addButton
+                opacity: 1.0
             }
             PropertyChanges {
                 target: actionBar
@@ -391,7 +410,7 @@ FocusScope {
                 duration: 200
             }
             NumberAnimation {
-                targets: [loginButton, addCancelButton]
+                targets: [loginButton, addButton]
                 properties: "x"
                 easing.type: Easing.OutQuad
                 duration: 200
@@ -408,7 +427,7 @@ FocusScope {
                 duration: 200
             }
             NumberAnimation {
-                targets: [loginButton, addCancelButton]
+                targets: [loginButton, addButton]
                 properties: "x"
                 easing.type: Easing.OutQuad
                 duration: 200

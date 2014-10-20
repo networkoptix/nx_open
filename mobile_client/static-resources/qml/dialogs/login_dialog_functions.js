@@ -44,7 +44,6 @@ function select(index) {
 
 function clearSelection() {
     savedSessionsList.selection = []
-    actionBar.state = "HIDDEN"
 }
 
 function isSelected(index) {
