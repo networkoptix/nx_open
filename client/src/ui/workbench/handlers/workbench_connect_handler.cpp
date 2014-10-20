@@ -46,6 +46,10 @@
 #include <utils/network/module_finder.h>
 #include <utils/network/global_module_finder.h>
 #include <utils/network/router.h>
+#include "core/resource_management/resource_properties.h"
+#include "core/resource_management/status_dictionary.h"
+#include "core/resource/camera_user_attribute_pool.h"
+#include "core/resource/media_server_user_attributes.h"
 
 #include "compatibility.h"
 
@@ -144,6 +148,15 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
     if (connected()) {
         if (tryToRestoreConnection())
             return;
+    QVector<QnUuid> idList;
+    foreach(const QnResourcePtr& res, remoteResources)
+        idList.push_back(res->getId());
+    QnCameraUserAttributePool::instance()->clear();
+    QnMediaServerUserAttributesPool::instance()->clear();
+
+    propertyDictionary->clear(idList);
+    qnStatusDictionary->clear(idList);
+
 
         /* Otherwise, disconnect fully. */    
         disconnectFromServer(true);
@@ -294,7 +307,6 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
     QnAppServerConnectionFactory::setUrl(QUrl());
     QnAppServerConnectionFactory::setEc2Connection(NULL);
     QnAppServerConnectionFactory::setCurrentVersion(QnSoftwareVersion());
-
     QnSessionManager::instance()->stop();
     QnResource::stopCommandProc();
 

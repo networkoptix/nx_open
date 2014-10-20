@@ -53,7 +53,7 @@ QString QnNetworkResource::getHostAddress() const
         return QUrl(url).host();
 }
 
-bool QnNetworkResource::setHostAddress(const QString &ip, QnDomain domain)
+void QnNetworkResource::setHostAddress(const QString &ip)
 {
     //QMutexLocker mutex(&m_mutex);
     //m_hostAddr = ip;
@@ -65,7 +65,6 @@ bool QnNetworkResource::setHostAddress(const QString &ip, QnDomain domain)
         currentValue.setHost(ip);
         setUrl(currentValue.toString());
     }
-    return (domain == QnDomainMemory);
 }
 
 QnMacAddress QnNetworkResource::getMAC() const
@@ -74,7 +73,7 @@ QnMacAddress QnNetworkResource::getMAC() const
     return m_macAddress;
 }
 
-void  QnNetworkResource::setMAC(const QnMacAddress &mac)
+void QnNetworkResource::setMAC(const QnMacAddress &mac)
 {
     QMutexLocker mutexLocker(&m_mutex);
     m_macAddress = mac;
@@ -97,14 +96,18 @@ void QnNetworkResource::setPhysicalId(const QString &physicalId)
 
 void QnNetworkResource::setAuth(const QAuthenticator &auth)
 {
-    QMutexLocker mutexLocker(&m_mutex);
-    m_auth = auth;
+    setProperty( Qn::CAMERA_CREDENTIALS_PARAM_NAME, lit("%1:%2").arg(auth.user()).arg(auth.password()) );
 }
 
 QAuthenticator QnNetworkResource::getAuth() const
 {
-    QMutexLocker mutexLocker(&m_mutex);
-    return m_auth;
+    const QStringList& credentialsList = getProperty(Qn::CAMERA_CREDENTIALS_PARAM_NAME).split(lit(":"));
+    QAuthenticator auth;
+    if( credentialsList.size() >= 1 )
+        auth.setUser( credentialsList[0] );
+    if( credentialsList.size() >= 2 )
+        auth.setPassword( credentialsList[1] );
+    return auth;
 }
 
 bool QnNetworkResource::isAuthenticated() const
@@ -207,7 +210,7 @@ void QnNetworkResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>
     QnNetworkResourcePtr other_casted = qSharedPointerDynamicCast<QnNetworkResource>(other);
     if (other_casted)
     {
-        m_auth = other_casted->m_auth;
+        //m_auth = other_casted->m_auth;    //auth moved to resource properties
         m_macAddress = other_casted->m_macAddress;
     }
 }
@@ -253,7 +256,7 @@ void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
 
 
     QList<QnResourcePtr> local_list;
-    foreach (QnResourcePtr res, lst.values())
+    foreach (const QnResourcePtr& res, lst.values())
     {
         QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
         if (netRes && !(netRes->checkNetworkStatus(QnNetworkResource::HasConflicts)))
@@ -270,7 +273,7 @@ void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
     {
         NX_LOG(QLatin1String("Done. Time elapsed: "), time.elapsed(), cl_logDEBUG1);
 
-        foreach(QnResourcePtr res, lst)
+        foreach(const QnResourcePtr& res, lst)
             NX_LOG(res->toString(), cl_logDEBUG1);
 
     }

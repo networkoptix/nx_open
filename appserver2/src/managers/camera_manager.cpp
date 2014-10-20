@@ -33,8 +33,6 @@ namespace ec2
             resource->getId() == QnVirtualCameraResource::uniqueIdToId( resource->getUniqueId() ),
             Q_FUNC_INFO,
             "You must fill camera ID as md5 hash of unique id" );
-        if( resource->getId().isNull() )
-            resource->setId(QnUuid::createUuid());
         cameraList.push_back( resource );
 
         //performing request
@@ -126,6 +124,36 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
+    int QnCameraManager<QueryProcessorType>::saveUserAttributes( const QnCameraUserAttributesList& cameraAttributes, impl::SimpleHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+
+        //performing request
+        auto tran = prepareTransaction( ApiCommand::saveCameraUserAttributesList, cameraAttributes );
+
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
+
+        return reqID;
+    }
+
+    template<class QueryProcessorType>
+    int QnCameraManager<QueryProcessorType>::getUserAttributes( const QnUuid& cameraId, impl::GetCameraUserAttributesHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+
+        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiCameraAttributesDataList& cameraUserAttributesList ) {
+            QnCameraUserAttributesList outData;
+            if( errorCode == ErrorCode::ok )
+                fromApiToResourceList(cameraUserAttributesList, outData);
+            handler->done( reqID, errorCode, outData );
+        };
+        m_queryProcessor->template processQueryAsync<QnUuid, ApiCameraAttributesDataList, decltype(queryDoneHandler)>
+            ( ApiCommand::getCameraUserAttributes, cameraId, queryDoneHandler );
+        return reqID;
+    }
+
+    template<class QueryProcessorType>
     int QnCameraManager<QueryProcessorType>::remove( const QnUuid& id, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
@@ -190,6 +218,16 @@ namespace ec2
     {
         QnTransaction<ApiCameraDataList> tran(command);
         fromResourceListToApi(cameras, tran.params);
+        return tran;
+    }
+
+    template<class QueryProcessorType>
+    QnTransaction<ApiCameraAttributesDataList> QnCameraManager<QueryProcessorType>::prepareTransaction(
+        ApiCommand::Value command,
+        const QnCameraUserAttributesList& cameraAttributesList )
+    {
+        QnTransaction<ApiCameraAttributesDataList> tran(command);
+        fromResourceListToApi(cameraAttributesList, tran.params);
         return tran;
     }
 

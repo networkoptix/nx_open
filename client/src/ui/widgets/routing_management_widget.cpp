@@ -163,7 +163,7 @@ void QnRoutingManagementWidget::at_addButton_clicked() {
 
     urls.append(url);
 
-    connection2()->getDiscoveryManager()->addDiscoveryInformation(m_server->getId(), QList<QUrl>() << url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    connection2()->getDiscoveryManager()->addDiscoveryInformation(m_server->getId(), url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     m_server->setAdditionalUrls(urls);
 }
 
@@ -182,7 +182,7 @@ void QnRoutingManagementWidget::at_removeButton_clicked() {
     if (!urls.removeOne(url))
         return;
 
-    connection2()->getDiscoveryManager()->removeDiscoveryInformation(m_server->getId(), QList<QUrl>() << url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    connection2()->getDiscoveryManager()->removeDiscoveryInformation(m_server->getId(), url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     m_server->setAdditionalUrls(urls);
 
     if (m_sortedServerAddressesModel->rowCount() > 0) {
@@ -255,8 +255,8 @@ void QnRoutingManagementWidget::at_addressesView_doubleClicked(const QModelIndex
     urls.append(url);
     m_server->setAdditionalUrls(urls);
 
-    connection2()->getDiscoveryManager()->removeDiscoveryInformation(m_server->getId(), QList<QUrl>() << oldUrl, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-    connection2()->getDiscoveryManager()->addDiscoveryInformation(m_server->getId(), QList<QUrl>() << url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    connection2()->getDiscoveryManager()->removeDiscoveryInformation(m_server->getId(), oldUrl, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    connection2()->getDiscoveryManager()->addDiscoveryInformation(m_server->getId(), url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
 void QnRoutingManagementWidget::at_serverAddressesModel_ignoreChangeRequested(const QString &address, bool ignore) {
@@ -277,7 +277,7 @@ void QnRoutingManagementWidget::at_serverAddressesModel_ignoreChangeRequested(co
         if (ignoredUrls.contains(url))
             return;
         ignoredUrls.append(url);
-        connection2()->getDiscoveryManager()->addDiscoveryInformation(m_server->getId(), QList<QUrl>() << url, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        connection2()->getDiscoveryManager()->addDiscoveryInformation(m_server->getId(), url, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
         if (url.port() == -1)
             ui->warningLabel->show();
     } else {
@@ -285,9 +285,9 @@ void QnRoutingManagementWidget::at_serverAddressesModel_ignoreChangeRequested(co
             return;
 
         if (url.port() == -1)
-            connection2()->getDiscoveryManager()->removeDiscoveryInformation(m_server->getId(), QList<QUrl>() << url, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+            connection2()->getDiscoveryManager()->removeDiscoveryInformation(m_server->getId(), url, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
         else
-            connection2()->getDiscoveryManager()->addDiscoveryInformation(m_server->getId(), QList<QUrl>() << url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+            connection2()->getDiscoveryManager()->addDiscoveryInformation(m_server->getId(), url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     }
     m_server->setIgnoredUrls(ignoredUrls);
 }

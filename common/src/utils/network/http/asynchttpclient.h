@@ -26,7 +26,7 @@ namespace nx_http
 
     //!Http client. All operations are done asynchronously
     /*!
-        It is strongly recommended to connect to signals using Qt::DirectConnection and slot should not use blocking calls.
+        It is strongly recommended to connect to signals using Qt::DirectConnection and slot MUST NOT use blocking calls.
         
         \warning Instance of \a AsyncHttpClient MUST be used as shared pointer (std::shared_ptr)
 

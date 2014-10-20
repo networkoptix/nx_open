@@ -6,14 +6,19 @@
 
 #include "../resource/av_resource.h"
 
+QSize QnPlAVClinetPullStreamReader::getMaxSensorSize(const QnResourcePtr& res) const 
+{
+    int val_w = res->getProperty(lit("MaxSensorWidth")).toInt();
+    int val_h = res->getProperty(lit("MaxSensorHeight")).toInt();
+    return (val_w && val_h) ? QSize(val_w, val_h) : QSize(0, 0);
+}
+
 QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(const QnResourcePtr& res):
     QnClientPullMediaStreamProvider(res),
     m_videoFrameBuff(CL_MEDIA_ALIGNMENT, 1024*1024),
     m_needUpdateParams(true)
 {
-    const QnSecurityCamResource* ceqResource = dynamic_cast<const QnSecurityCamResource*>(res.data());
-
-    QSize maxResolution = ceqResource->getMaxSensorSize();
+    QSize maxResolution = getMaxSensorSize(res);
 
     //========this is due to bug in AV firmware;
     // you cannot set up maxSensorWidth with HTTP. ( you can do it in tftp if you are really want to ).
@@ -80,48 +85,48 @@ void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
     {
     case Qn::QualityHighest:
         if (avRes->isPanoramic())
-            avRes->setParamAsync(QLatin1String("resolution"), resolution, QnDomainPhysical);
+            avRes->setParamPhysicalAsync(lit("resolution"), resolution);
         else
             m_streamParam.insert("resolution", QLatin1String("full"));
 
         if (avRes->isPanoramic())
-            avRes->setParamAsync(QLatin1String("Quality"), QLatin1String("19"), QnDomainPhysical); // panoramic
+            avRes->setParamPhysicalAsync(lit("Quality"), 19); // panoramic
         else
             m_streamParam.insert("Quality", 19);
         break;
 
     case Qn::QualityHigh:
         if (avRes->isPanoramic())
-            avRes->setParamAsync(QLatin1String("resolution"), resolution, QnDomainPhysical);
+            avRes->setParamPhysicalAsync(lit("resolution"), resolution);
         else
             m_streamParam.insert("resolution", QLatin1String("full"));
 
         if (avRes->isPanoramic())
-            avRes->setParamAsync(QLatin1String("Quality"), QLatin1String("16"), QnDomainPhysical); // panoramic
+            avRes->setParamPhysicalAsync(lit("Quality"), 16); // panoramic
         else
             m_streamParam.insert("Quality", 16);
         break;
 
     case Qn::QualityNormal:
         if (avRes->isPanoramic())
-            avRes->setParamAsync(QLatin1String("resolution"), resolution, QnDomainPhysical);
+            avRes->setParamPhysicalAsync(lit("resolution"), resolution);
         else
             m_streamParam.insert("resolution", QLatin1String("full"));
 
         if (avRes->isPanoramic())
-            avRes->setParamAsync(QLatin1String("Quality"), QLatin1String("13"), QnDomainPhysical); // panoramic
+            avRes->setParamPhysicalAsync(lit("Quality"), 13); // panoramic
         else
             m_streamParam.insert("Quality", 13);
         break;
 
     case Qn::QualityLow:
         if (avRes->isPanoramic())
-            avRes->setParamAsync(QLatin1String("resolution"), resolution, QnDomainPhysical);
+            avRes->setParamPhysicalAsync(lit("resolution"), resolution);
         else
             m_streamParam.insert("resolution", QLatin1String("half"));
 
         if (avRes->isPanoramic())
-            avRes->setParamAsync(QLatin1String("Quality"), QLatin1String("15"), QnDomainPhysical); // panoramic
+            avRes->setParamPhysicalAsync(lit("Quality"), 15); // panoramic
         else
             m_streamParam.insert("Quality", 10);
         break;
@@ -129,12 +134,12 @@ void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
 
     case Qn::QualityLowest:
         if (avRes->isPanoramic())
-            avRes->setParamAsync(QLatin1String("resolution"), resolution, QnDomainPhysical);
+            avRes->setParamPhysicalAsync(lit("resolution"), resolution);
         else
             m_streamParam.insert("resolution", QLatin1String("half"));
 
         if (avRes->isPanoramic())
-            avRes->setParamAsync(QLatin1String("Quality"), QLatin1String("1"), QnDomainPhysical); // panoramic
+            avRes->setParamPhysicalAsync(lit("Quality"), 1); // panoramic
         else
             m_streamParam.insert("Quality", 1);
         break;
@@ -147,22 +152,12 @@ void QnPlAVClinetPullStreamReader::updateStreamParamsBasedOnQuality()
 
 int QnPlAVClinetPullStreamReader::getBitrate() const
 {
-    if (!getResource()->hasParam(QLatin1String("Bitrate")))
-        return 0;
-
-    QVariant val;
-    getResource()->getParam(QLatin1String("Bitrate"), val, QnDomainMemory);
-    return val.toInt();
+    return getResource()->getProperty(lit("Bitrate")).toInt();
 }
 
 bool QnPlAVClinetPullStreamReader::isH264() const
 {
-    if (!getResource()->hasParam(QLatin1String("Codec")))
-        return false;
-
-    QVariant val;
-    getResource()->getParam(QLatin1String("Codec"), val, QnDomainMemory);
-    return val==QLatin1String("H.264");
+    return getResource()->getProperty(lit("Codec")) == lit("H.264");
 }
 
 #endif

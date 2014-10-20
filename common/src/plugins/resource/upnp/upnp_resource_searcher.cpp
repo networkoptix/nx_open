@@ -98,7 +98,7 @@ AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndA
         udpSock->setReuseAddrFlag(true);
         udpSock->bind( SocketAddress( HostAddress::anyHost, GROUP_PORT ) );
         
-        foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces()) {
+        foreach (const QnInterfaceAndAddr& iface, getAllIPv4Interfaces()) {
             udpSock->joinGroup(groupAddress.toString(), iface.address.toString());
         }
         m_receiveSocket = udpSock;
@@ -161,7 +161,7 @@ QHostAddress QnUpnpResourceSearcher::findBestIface(const QString& host)
 {
     QString oldAddress;
     QString result;
-    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
+    foreach (const QnInterfaceAndAddr& iface, getAllIPv4Interfaces())
     {
         QString newAddress = iface.address.toString();
         if (isNewDiscoveryAddressBetter(host, newAddress, oldAddress))
@@ -243,7 +243,7 @@ QnResourceList QnUpnpResourceSearcher::findResources(void)
     QnResourceList result;
     QSet<QByteArray> processedUuid;
 
-    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
+    foreach (const QnInterfaceAndAddr& iface, getAllIPv4Interfaces())
     {
         AbstractDatagramSocket* sock = sockByName(iface);
         if (!sock)

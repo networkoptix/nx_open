@@ -101,6 +101,9 @@ namespace ec2
                 case ApiObject_Camera:
                     updatedTran.command = ApiCommand::removeCamera;
                     break;
+                case ApiObject_Storage:
+                    updatedTran.command = ApiCommand::removeStorage;
+                    break;
                 case ApiObject_User:
                     updatedTran.command = ApiCommand::removeUser;
                     break;
@@ -144,6 +147,50 @@ namespace ec2
             return processMultiUpdateAsync<ApiCameraDataList, ApiCameraData>(tran, handler, ApiCommand::saveCamera);
         }
 
+        template<class HandlerType>
+        void processUpdateAsync(QnTransaction<ApiIdDataList>& tran, HandlerType handler )
+        {
+            if (tran.command == ApiCommand::removeStorages) 
+            {
+                return processMultiUpdateAsync<ApiIdDataList, ApiIdData>(tran, handler, ApiCommand::removeStorage);
+            }
+            else {
+                Q_ASSERT_X(0, "Not implemented", Q_FUNC_INFO);
+            }
+        }
+
+        template<class HandlerType>
+        void processUpdateAsync(QnTransaction<ApiStorageDataList>& tran, HandlerType handler )
+        {
+            Q_ASSERT(tran.command == ApiCommand::saveStorages);
+            return processMultiUpdateAsync<ApiStorageDataList, ApiStorageData>(tran, handler, ApiCommand::saveStorage);
+        }
+
+        template<class HandlerType>
+        void processUpdateAsync(QnTransaction<ApiCameraAttributesDataList>& tran, HandlerType handler )
+        {
+            Q_ASSERT(tran.command == ApiCommand::saveCameraUserAttributesList);
+            return processMultiUpdateAsync<ApiCameraAttributesDataList, ApiCameraAttributesData>(tran, handler, ApiCommand::saveCameraUserAttributes);
+        }
+
+        template<class HandlerType>
+        void processUpdateAsync(QnTransaction<ApiMediaServerUserAttributesDataList>& tran, HandlerType handler )
+        {
+            Q_ASSERT(tran.command == ApiCommand::saveServerUserAttributesList);
+            return processMultiUpdateAsync<ApiMediaServerUserAttributesDataList, ApiMediaServerUserAttributesData>(tran, handler, ApiCommand::saveServerUserAttributes);
+        }
+
+        template<class HandlerType>
+        void processUpdateAsync(QnTransaction<ApiResourceParamWithRefDataList>& tran, HandlerType handler )
+        {
+            if(tran.command == ApiCommand::setResourceParams)
+                return processMultiUpdateAsync<ApiResourceParamWithRefDataList, ApiResourceParamWithRefData>(tran, handler, ApiCommand::setResourceParam);
+            else if(tran.command == ApiCommand::removeResourceParams)
+                return processMultiUpdateAsync<ApiResourceParamWithRefDataList, ApiResourceParamWithRefData>(tran, handler, ApiCommand::removeResourceParam);
+            else
+                Q_ASSERT_X(0, "Not implemented!", Q_FUNC_INFO);
+        }
+
         template<class QueryDataType, class SubDataType, class HandlerType>
         void processMultiUpdateAsync(QnTransaction<QueryDataType>& multiTran, HandlerType handler, ApiCommand::Value command)
         {
@@ -154,13 +201,12 @@ namespace ec2
         template<class QueryDataType, class SubDataType, class HandlerType>
         void processMultiUpdateAsync(QnTransaction<QueryDataType>& multiTran, HandlerType handler, ApiCommand::Value command, const std::vector<SubDataType>& nestedList, bool isParentObjectTran)
         {
-
             QMutexLocker lock(&m_updateDataMutex);
 
             Q_ASSERT(ApiCommand::isPersistent(multiTran.command));
 
             ErrorCode errorCode = ErrorCode::ok;
-            QList< QnTransaction<SubDataType> > processedTransactions;
+            std::vector< QnTransaction<SubDataType> > processedTransactions;
             processedTransactions.reserve(static_cast<int>(nestedList.size()));
 
             bool processMultiTran = false;
@@ -185,7 +231,7 @@ namespace ec2
                 assert(errorCode != ErrorCode::containsBecauseSequence && errorCode != ErrorCode::containsBecauseTimestamp);
                 if (errorCode != ErrorCode::ok)
                     return;
-                processedTransactions << tran;
+                processedTransactions.push_back( std::move(tran) );
             }
             
             // delete master object if need (server->cameras required to delete master object, layoutList->layout doesn't)

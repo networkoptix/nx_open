@@ -6,9 +6,7 @@
 #include <QMap>
 #include <QMutex>
 
-#include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
-#include "core/datapacket/media_data_packet.h"
 
 class QnDesktopCameraResource
 :
@@ -34,8 +32,6 @@ public:
     virtual bool setRelayOutputState(const QString& outputID, bool activate, unsigned int autoResetTimeoutMS = 0) override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
-
-    virtual bool isResourceAccessible() override;
 
     QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider);
 

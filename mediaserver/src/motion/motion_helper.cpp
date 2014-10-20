@@ -66,7 +66,7 @@ QnTimePeriodList QnMotionHelper::matchImage(const QList<QRegion>& regions, const
 QnTimePeriodList QnMotionHelper::matchImage(const QList<QRegion>& regions, const QnResourceList& resList, qint64 msStartTime, qint64 msEndTime, int detailLevel)
 {
     QVector<QnTimePeriodList> data;
-    foreach(QnResourcePtr res, resList)
+    foreach(const QnResourcePtr& res, resList)
         matchImage( regions, res, msStartTime, msEndTime, detailLevel, &data );
     //NOTE could just call prev method instead of private one, but that will result in multiple QnTimePeriodList::mergeTimePeriods calls, which could worsen performance
     return QnTimePeriodList::mergeTimePeriods(data);

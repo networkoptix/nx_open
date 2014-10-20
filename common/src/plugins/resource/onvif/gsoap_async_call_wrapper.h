@@ -100,10 +100,7 @@ public:
             socket = std::move(m_socket);
         }
         if( socket )
-        {
-            socket->cancelAsyncIO(aio::etRead);
-            socket->cancelAsyncIO(aio::etWrite);
-        }
+            socket->terminateAsyncIO( true );
     }
 
     template<class GSoapAsyncCallWrapperType>

@@ -20,12 +20,16 @@ ALTER TABLE "vms_resource" RENAME TO vms_resource_tmp;
 
 CREATE TABLE "vms_resource" (id INTEGER PRIMARY KEY AUTOINCREMENT,
                              guid BLOB(16) NULL UNIQUE,
-                 parent_guid BLOB(16),
-                             status SMALLINT NOT NULL, 
+                 	     parent_guid BLOB(16),
                              name VARCHAR(200) NOT NULL, 
-                 url VARCHAR(200), 
-                 xtype_guid BLOB(16));
-INSERT INTO "vms_resource" (id, status,name,url) SELECT id, status,name,url FROM vms_resource_tmp;
+                 	     url VARCHAR(200), 
+                 	    xtype_guid BLOB(16));
+INSERT INTO "vms_resource" (id, name,url) SELECT id, name,url FROM vms_resource_tmp;
+
+CREATE TABLE vms_resource_status (
+	guid guid BLOB(16) NOT NULL UNIQUE, 
+        status SMALLINT NOT NULL
+);
 
 ALTER TABLE "vms_layoutitem" RENAME TO vms_layoutitem_tmp;
 CREATE TABLE "vms_layoutitem" (
@@ -99,9 +103,6 @@ CREATE UNIQUE INDEX idx_transaction_hash  ON transaction_log(tran_guid);
 CREATE INDEX idx_transaction_time  ON transaction_log(timestamp);
 
 CREATE TABLE "vms_storedFiles" (path VARCHAR PRIMARY KEY, data BLOB);
-CREATE UNIQUE INDEX idx_kvpair_name ON vms_kvpair (resource_id, name);
-ALTER TABLE vms_kvpair ADD isResTypeParam BOOL;
-update vms_kvpair set isResTypeParam = 0;
 
 
 INSERT INTO "vms_propertytype" ("resource_type_id",name,type,min,max,step,"values","ui_values","default_value",netHelper,"group","sub_group",description,ui,readonly ) VALUES ('624','DeviceID','1',NULL,NULL,NULL,'','','','','','','','0','0' );

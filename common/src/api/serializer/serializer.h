@@ -5,7 +5,7 @@
 #include <QtCore/QList>
 #include <QtGui/QRegion>
 
-#include <core/resource/motion_window.h>
+class QnMotionRegion;
 
 //TODO: #GDM #Common rename/move this module to something sane or get rid of it
 

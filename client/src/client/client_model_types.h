@@ -75,9 +75,6 @@ struct QnServerStorageKey {
     QString storagePath;
 };
 
-typedef QHash<QnServerStorageKey, qint64> QnServerStorageStateHash;
-
-Q_DECLARE_METATYPE(QnServerStorageStateHash);
 QN_FUSION_DECLARE_FUNCTIONS(QnServerStorageKey, (datastream)(eq)(hash)(metatype));
 
 

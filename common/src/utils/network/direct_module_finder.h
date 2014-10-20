@@ -17,6 +17,7 @@ public:
     explicit QnDirectModuleFinder(QObject *parent = 0);
 
     void setCompatibilityMode(bool compatibilityMode);
+    bool isCompatibilityMode() const;
 
     void addUrl(const QUrl &url, const QnUuid &id);
     void removeUrl(const QUrl &url, const QnUuid &id);
