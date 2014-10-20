@@ -1,5 +1,7 @@
 #include "workbench_connect_handler.h"
 
+#include <QtNetwork/QHostInfo>
+
 #include <api/abstract_connection.h>
 #include <api/app_server_connection.h>
 #include <api/runtime_info_manager.h>
@@ -366,13 +368,30 @@ void QnWorkbenchConnectHandler::clearConnection() {
 }
 
 bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
+
+    QnReconnectInfoDialog* reconnectInfoDialog = new QnReconnectInfoDialog(mainWindow());
+    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    reconnectInfoDialog,   &QDialog::hide);
+    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    reconnectInfoDialog,   &QObject::deleteLater);
+
+    reconnectInfoDialog->setText(tr("Resolving servers..."));
+    reconnectInfoDialog->show();
+
     QUrl currentUrl = QnAppServerConnectionFactory::url();
     QString userName = currentUrl.userName();
     QString password = currentUrl.password();
 
-    //TODO: #GDM possibly we should resolve host names
-    QHostAddress addr(currentUrl.host());
-    quint32 localIp = addr.toIPv4Address();
+    QHostAddress currentAddr(currentUrl.host());
+    quint32 currentIp = currentAddr.toIPv4Address();
+    if (currentAddr.isNull()) {
+        QHostInfo currentInfo = QHostInfo::fromName(currentUrl.host());
+        foreach (const QHostAddress &addr, currentInfo.addresses()) {
+            currentIp = addr.toIPv4Address();
+            if (currentIp > 0) {
+                qDebug() << "selected local ip" << addr;
+                break;
+            }
+        }
+    }
 
     auto matchIpMetric = [](quint32 ip1, quint32 ip2) {
         int i = 31;
@@ -381,26 +400,16 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
         return 31 - i;
     };
 
-    auto findBestInterface = [localIp, matchIpMetric](const QSet<QString> &addresses) {
-        QString best = *addresses.cbegin();
-        if (localIp == 0)
-            return best;
+    auto hostLessThan = [currentIp, matchIpMetric](const QUrl &left, const QUrl &right) {
+        QHostAddress laddr(left.host());
+        QHostAddress raddr(right.host());
+        if (laddr.isNull() || raddr.isNull())
+            return laddr.isNull();
 
-        int bestMatch = 0;
-        foreach (const QString &address, addresses) {
-            QHostAddress addr(address);
-            if (addr.isNull())
-                continue;
-
-            quint32 remoteIp = addr.toIPv4Address();
-            int metric = matchIpMetric(localIp, remoteIp);
-            if (metric <= bestMatch) 
-                continue;
-            bestMatch = metric;
-            best = address;
-        }
-
-        return best;
+        int metricDiff = matchIpMetric(currentIp, laddr.toIPv4Address()) - matchIpMetric(currentIp, raddr.toIPv4Address());
+        return metricDiff != 0
+            ? metricDiff > 0
+            : laddr.toIPv4Address() < raddr.toIPv4Address();
     };
 
     QList<QnUuid> allServers;
@@ -414,23 +423,22 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
         if (!allServers.contains(info.id))
             continue;
 
-        if (info.remoteAddresses.isEmpty())
-            continue;
-
-        //TODO: #GDM select best interface
-        QUrl serverUrl;
-        serverUrl.setScheme(lit("http"));
-        serverUrl.setHost(findBestInterface(info.remoteAddresses));
-        serverUrl.setPort(info.port);
-        serverUrl.setUserName(userName);
-        serverUrl.setPassword(password);
-        availableServers << serverUrl;
-
-        ++hostsCount[serverUrl.host()];
+        foreach (const QString &remoteAddr, info.remoteAddresses) {
+            QUrl serverUrl;
+            serverUrl.setScheme(lit("http"));
+            serverUrl.setHost(remoteAddr);
+            serverUrl.setPort(info.port);
+            serverUrl.setUserName(userName);
+            serverUrl.setPassword(password);
+            availableServers << serverUrl;
+            ++hostsCount[serverUrl.host()];
+        }
     }    
 
     if (availableServers.isEmpty())
         return false;
+
+    qSort(availableServers.begin(), availableServers.end(), hostLessThan);
 
     auto getInfo = [availableServers, hostsCount](const QUrl &url) {
         QStringList result;
@@ -445,16 +453,12 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
         return result.join(lit("<br>"));
     };
 
-    QnReconnectInfoDialog* reconnectInfoDialog = new QnReconnectInfoDialog(mainWindow());
-    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    reconnectInfoDialog,   &QDialog::hide);
-    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    reconnectInfoDialog,   &QObject::deleteLater);
-
-    reconnectInfoDialog->setText(getInfo(QUrl()));
-    reconnectInfoDialog->show();
+    /* Main window can be closed in the event loop so the dialog will be freed. */
+    QPointer<QnReconnectInfoDialog> dialogGuard(reconnectInfoDialog);
 
     /* Here we will wait for the reconnect or cancel. */
     auto iter = availableServers.cbegin();
-    while (!reconnectInfoDialog->wasCanceled()) {
+    while (dialogGuard && !reconnectInfoDialog->wasCanceled()) {
         reconnectInfoDialog->setText(getInfo(*iter));
         if (connectToServer(*iter, true))   /* Here inner event loop will be started. */
             break;
@@ -462,6 +466,9 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
         if (iter == availableServers.cend())
             iter = availableServers.cbegin();   //loop
     }
+
+    if (!dialogGuard)
+        return true;
 
     disconnect(QnClientMessageProcessor::instance(), NULL, reconnectInfoDialog, NULL);
     reconnectInfoDialog->deleteLater();
