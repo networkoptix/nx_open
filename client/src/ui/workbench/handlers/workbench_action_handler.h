@@ -1,6 +1,8 @@
 #ifndef QN_WORKBENCH_ACTION_HANDLER_H
 #define QN_WORKBENCH_ACTION_HANDLER_H
 
+#include <atomic>
+
 #include <QtCore/QBuffer>
 #include <QtCore/QObject>
 
@@ -52,6 +54,8 @@ namespace detail {
     class QnResourceStatusReplyProcessor: public QObject {
         Q_OBJECT
     public:
+        std::atomic<int> awaitedResponseCount;
+
         QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnVirtualCameraResourceList &resources);
 
     public slots:

@@ -21,7 +21,7 @@
 #include <licensing/license.h>
 
 
-//!Defining multiple handler macro because vs2012 does not support variadic templates. Will move to single variadic template after move to vs2013
+//TODO #ak Defining multiple handler macro because vs2012 does not support variadic templates. Will move to single variadic template after move to vs2013
 
 #define DEFINE_ONE_ARG_HANDLER( REQUEST_NAME, FIRST_ARG_TYPE )                          \
     typedef OneParamHandler<FIRST_ARG_TYPE> REQUEST_NAME##Handler;                      \
@@ -158,14 +158,18 @@ namespace ec2
             //void emitSetResourceDisabledDone( int reqID, const ErrorCode p1, const QnUuid& p2 ) { emit onSetResourceDisabledDone( reqID, p1, p2 ); }
             void emitGetResourcesDone( int reqID, const ErrorCode p1, const QnResourceList& p2 ) { emit onGetResourcesDone( reqID, p1, p2 ); }
             void emitGetResourceDone( int reqID, const ErrorCode p1, const QnResourcePtr& p2 ) { emit onGetResourceDone( reqID, p1, p2 ); }
-            void emitGetKvPairsDone( int reqID, const ErrorCode p1, const QnKvPairListsById& p2 ) { emit onGetKvPairsDone( reqID, p1, p2 ); }
-            void emitSaveKvPairsDone( int reqID, const ErrorCode p1, const QnKvPairListsById& p2 ) { emit onSaveKvPairsDone( reqID, p1, p2 ); }
+            void emitGetKvPairsDone( int reqID, const ErrorCode p1, const ApiResourceParamWithRefDataList& p2 ) { emit onGetKvPairsDone( reqID, p1, p2 ); }
+            void emitGetStatusListDone( int reqID, const ErrorCode p1, const ApiResourceStatusDataList& p2 ) { emit onGetStatusListDone( reqID, p1, p2 ); }
+            void emitSaveKvPairsDone( int reqID, const ErrorCode p1, const ApiResourceParamWithRefDataList& p2 ) { emit onSaveKvPairsDone( reqID, p1, p2 ); }
             void emitSaveServerDone( int reqID, const ErrorCode p1, const QnMediaServerResourcePtr& p2) { emit onSaveServerDone( reqID, p1, p2 ); }
             void emitSaveBusinessRuleDone( int reqID, const ErrorCode p1, const QnBusinessEventRulePtr& p2) { emit onSaveBusinessRuleDone( reqID, p1, p2 ); }
             void emitGetServersDone( int reqID, const ErrorCode p1, const QnMediaServerResourceList& p2 ) { emit onGetServersDone( reqID, p1, p2 ); }
+            void emitGetServerUserAttributesDone( int reqID, const ErrorCode p1, const QnMediaServerUserAttributesList& p2 ) { emit onGetServerUserAttributesDone( reqID, p1, p2 ); }
+            void emitGetStoragesDone( int reqID, const ErrorCode p1, const QnResourceList& p2 ) { emit onGetStoragesDone( reqID, p1, p2 ); }
             void emitAddCameraDone( int reqID, const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onAddCameraDone( reqID, p1, p2 ); }
             void emitAddUserDone( int reqID, const ErrorCode p1, const QnUserResourceList& p2 ) { emit onAddUserDone( reqID, p1, p2 ); }
             void emitGetCamerasDone( int reqID, const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onGetCamerasDone( reqID, p1, p2 ); }
+            void emitGetCameraUserAttributesDone( int reqID, const ErrorCode p1, const QnCameraUserAttributesList& p2 ) { emit onGetCameraUserAttributesDone( reqID, p1, p2 ); }
             void emitGetCamerasHistoryDone( int reqID, const ErrorCode p1, const QnCameraHistoryList& p2 ) { emit onGetCamerasHistoryDone( reqID, p1, p2 ); }
             void emitGetCameraBookmarkTagsDone( int reqID, const ErrorCode p1, const QnCameraBookmarkTags& p2 ) { emit onGetCameraBookmarkTagsDone( reqID, p1, p2 ); }
             void emitGetUsersDone( int reqID, const ErrorCode p1, const QnUserResourceList& p2 ) { emit onGetUsersDone( reqID, p1, p2 ); }
@@ -189,14 +193,18 @@ namespace ec2
             //void onSetResourceDisabledDone( int reqID, const ErrorCode, const QnUuid& );
             void onGetResourcesDone( int reqID, const ErrorCode, const QnResourceList& );
             void onGetResourceDone( int reqID, const ErrorCode, const QnResourcePtr& );
-            void onGetKvPairsDone( int reqID, const ErrorCode, const QnKvPairListsById& );
-            void onSaveKvPairsDone( int reqID, const ErrorCode, const QnKvPairListsById& );
+            void onGetKvPairsDone( int reqID, const ErrorCode, const ApiResourceParamWithRefDataList& );
+            void onGetStatusListDone( int reqID, const ErrorCode, const ApiResourceStatusDataList& );
+            void onSaveKvPairsDone( int reqID, const ErrorCode, const ApiResourceParamWithRefDataList& );
             void onSaveServerDone( int reqID, const ErrorCode, const QnMediaServerResourcePtr&);
             void onSaveBusinessRuleDone( int reqID, const ErrorCode, const QnBusinessEventRulePtr&);
             void onGetServersDone( int reqID, const ErrorCode, const QnMediaServerResourceList& );
+            void onGetServerUserAttributesDone( int reqID, const ErrorCode, const QnMediaServerUserAttributesList& );
+            void onGetStoragesDone( int reqID, const ErrorCode, const QnResourceList& );
             void onAddCameraDone( int reqID, const ErrorCode, const QnVirtualCameraResourceList& );
             void onAddUserDone( int reqID, const ErrorCode, const QnUserResourceList& );
             void onGetCamerasDone( int reqID, const ErrorCode, const QnVirtualCameraResourceList& );
+            void onGetCameraUserAttributesDone( int reqID, const ErrorCode, const QnCameraUserAttributesList& );
             void onGetCamerasHistoryDone( int reqID, const ErrorCode, const QnCameraHistoryList& );
             void onGetCameraBookmarkTagsDone(int reqID, const ErrorCode, const QnCameraBookmarkTags& );
             void onGetUsersDone( int reqID, const ErrorCode, const QnUserResourceList& );
@@ -230,8 +238,9 @@ namespace ec2
         DEFINE_TWO_ARG_HANDLER( GetResourceTypes, ErrorCode, QnResourceTypeList )
         DEFINE_TWO_ARG_HANDLER( GetResources, ErrorCode, QnResourceList )
         DEFINE_TWO_ARG_HANDLER( GetResource, ErrorCode, QnResourcePtr )
-        DEFINE_TWO_ARG_HANDLER( GetKvPairs, ErrorCode, QnKvPairListsById )
-        DEFINE_TWO_ARG_HANDLER( SaveKvPairs, ErrorCode, QnKvPairListsById )
+        DEFINE_TWO_ARG_HANDLER( GetKvPairs, ErrorCode, ApiResourceParamWithRefDataList )
+        DEFINE_TWO_ARG_HANDLER( GetStatusList, ErrorCode, ApiResourceStatusDataList )
+        DEFINE_TWO_ARG_HANDLER( SaveKvPairs, ErrorCode, ApiResourceParamWithRefDataList )
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractMediaServerManager
@@ -239,6 +248,8 @@ namespace ec2
         DEFINE_TWO_ARG_HANDLER( SaveServer, ErrorCode, QnMediaServerResourcePtr)
         DEFINE_TWO_ARG_HANDLER( SaveResource, ErrorCode, QnResourcePtr)
         DEFINE_TWO_ARG_HANDLER( GetServers, ErrorCode, QnMediaServerResourceList )
+        DEFINE_TWO_ARG_HANDLER( GetServerUserAttributes, ErrorCode, QnMediaServerUserAttributesList )
+        DEFINE_TWO_ARG_HANDLER( GetStorages, ErrorCode, QnResourceList )
 
 
         //////////////////////////////////////////////////////////
@@ -246,8 +257,10 @@ namespace ec2
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER( AddCamera, ErrorCode, QnVirtualCameraResourceList )
         DEFINE_TWO_ARG_HANDLER( GetCameras, ErrorCode, QnVirtualCameraResourceList )
+        DEFINE_TWO_ARG_HANDLER( GetCameraUserAttributes, ErrorCode, QnCameraUserAttributesList )
         DEFINE_TWO_ARG_HANDLER( GetCamerasHistory, ErrorCode, QnCameraHistoryList )
         DEFINE_TWO_ARG_HANDLER( GetCameraBookmarkTags, ErrorCode, QnCameraBookmarkTags )
+
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractUserManager

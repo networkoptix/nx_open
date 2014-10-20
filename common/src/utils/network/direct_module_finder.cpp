@@ -55,6 +55,11 @@ void QnDirectModuleFinder::setCompatibilityMode(bool compatibilityMode) {
     m_compatibilityMode = compatibilityMode;
 }
 
+bool QnDirectModuleFinder::isCompatibilityMode() const
+{
+    return m_compatibilityMode;
+}
+
 void QnDirectModuleFinder::addUrl(const QUrl &url, const QnUuid &id) {
     Q_ASSERT(id != qnCommon->moduleGUID());
 

@@ -5,11 +5,7 @@
 
 #ifndef QN_NO_QT
 #include <QtCore/QString>
-
 #include "nx_ec/ec_api.h"
-#include "nx_ec/data/api_license_data.h"
-#include "nx_ec/data/api_email_data.h"
-#include "nx_ec/data/api_discovery_data.h"
 #endif
 
 #include "utils/serialization/binary.h"
@@ -44,12 +40,16 @@ namespace ec2
             /* Common resource */
             saveResource                = 200,  /*< ApiResourceData */
             removeResource              = 201,  /*< ApiIdData */
-            setResourceStatus           = 202,  /*< ApiSetResourceStatusData */
+            setResourceStatus           = 202,  /*< ApiResourceStatusData */
             getResourceParams           = 203,  /*< ApiResourceParamDataList */
-            setResourceParams           = 204,  /*< ApiResourceParamsData */
+            setResourceParams           = 204,  /*< ApiResourceParamWithRefDataList */
             getResourceTypes            = 205,  /*< ApiResourceTypeDataList*/
             getFullInfo                 = 206,  /*< ApiFullInfoData */
             setPanicMode                = 207,  /*< ApiPanicModeData */
+            setResourceParam            = 208,   /*< ApiResourceParamWithRefData */
+            removeResourceParam         = 209,   /*< ApiResourceParamWithRefData */
+            removeResourceParams        = 210,   /*< ApiResourceParamWithRefDataList */
+            getStatusList               = 211,  /*< ApiResourceStatusDataList */
 
             /* Camera resource */
             getCameras                  = 300,  /*< ApiCameraDataList */
@@ -62,12 +62,26 @@ namespace ec2
             getCameraBookmarkTags       = 307,  /*< ApiCameraBookmarkTagDataList */
             removeCameraBookmarkTags    = 308,
             removeCameraHistoryItem     = 309,  /*< ApiCameraServerItemData */
+            saveCameraUserAttributes    = 310,  /*< ApiCameraAttributesData */
+            saveCameraUserAttributesList= 311,  /*< ApiCameraAttributesDataList */
+            getCameraUserAttributes     = 312,  /*< ApiCameraAttributesDataList */
+            getCamerasEx                = 313,  /*< ApiCameraDataExList */
             
           
             /* MediaServer resource */
             getMediaServers             = 400,  /*< ApiMediaServerDataList */
             saveMediaServer             = 401,  /*< ApiMediaServerData */
             removeMediaServer           = 402,  /*< ApiIdData */
+            saveServerUserAttributes    = 403,  /*< QnMediaServerUserAttributesList */
+            saveServerUserAttributesList= 404,  /*< QnMediaServerUserAttributesList */
+            getServerUserAttributes     = 405,  /*< ApiIdData, QnMediaServerUserAttributesList */
+            removeServerUserAttributes  = 406,  /*< ApiIdData */
+            saveStorage                 = 407,  /*< ApiStorageData */
+            saveStorages                = 408,  /*< ApiStorageDataList */
+            removeStorage               = 409,  /*< ApiIdData */
+            removeStorages              = 410,  /*< QList<ApiIdData> */
+            getMediaServersEx           = 411,  /*< ApiMediaServerDataExList */
+            getStorages                 = 412,  /*< ApiStorageDataList */
 
             /* User resource */
             getUsers                    = 500,  /*< ApiUserDataList */
@@ -122,8 +136,8 @@ namespace ec2
 
             /* Discovery */
             discoverPeer                = 1401, /*< ApiDiscoveryData */
-            addDiscoveryInformation     = 1402, /*< ApiDiscoveryDataList*/
-            removeDiscoveryInformation  = 1403, /*< ApiDiscoveryDataList*/
+            addDiscoveryInformation     = 1402, /*< ApiDiscoveryData*/
+            removeDiscoveryInformation  = 1403, /*< ApiDiscoveryData*/
 
             /* Misc */
             forcePrimaryTimeServer      = 2001,  /*< ApiIdData */

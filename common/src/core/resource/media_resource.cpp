@@ -6,8 +6,10 @@
 #include <utils/common/warnings.h>
 #include <utils/serialization/lexical.h>
 
+#include "camera_user_attribute_pool.h"
 #include "resource_media_layout.h"
 #include "core/dataprovider/abstract_streamdataprovider.h"
+
 
 class QnStreamQualityStrings {
     Q_DECLARE_TR_FUNCTIONS(QnStreamQualityStrings);
@@ -94,9 +96,7 @@ QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractSt
             return providerLayout;
     }
 
-    QVariant val;
-    toResource()->getParam(QLatin1String("VideoLayout"), val, QnDomainMemory);
-    QString strVal = val.toString();
+    QString strVal = toResource()->getProperty(Qn::VIDEO_LAYOUT_PARAM_NAME);
     if (strVal.isEmpty())
     {
         return defaultVideoLayout;
@@ -114,7 +114,7 @@ void QnMediaResource::setCustomVideoLayout(QnCustomResourceVideoLayoutPtr newLay
 {
     QMutexLocker lock(&m_layoutMutex);
     m_customVideoLayout = newLayout;
-    toResource()->setParam(QLatin1String("VideoLayout"), newLayout->toString(), QnDomainMemory);
+    toResource()->setProperty(Qn::VIDEO_LAYOUT_PARAM_NAME, newLayout->toString());
 }
 
 static QSharedPointer<QnEmptyResourceAudioLayout> audioLayout( new QnEmptyResourceAudioLayout() );
@@ -129,26 +129,32 @@ void QnMediaResource::initMediaResource()
 }
 
 QnMediaDewarpingParams QnMediaResource::getDewarpingParams() const {
-    return m_dewarpingParams;
+    QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), toResource()->getId() );
+    return (*userAttributesLock)->dewarpingParams;
 }
 
 
-void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params) {
-    if (m_dewarpingParams == params)
-        return;
+void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params) 
+{
+    {
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), toResource()->getId() );
+        if ((*userAttributesLock)->dewarpingParams == params)
+            return;
 
-    m_dewarpingParams = params;
+        (*userAttributesLock)->dewarpingParams = params;
+    }
     emit toResource()->mediaDewarpingParamsChanged(this->toResourcePtr());
 }
 
 void QnMediaResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>&modifiedFields)
 {
+    Q_UNUSED(modifiedFields)
     QnMediaResourcePtr other_casted = qSharedPointerDynamicCast<QnMediaResource>(other);
     if (other_casted) {
-        if (m_dewarpingParams != other_casted->m_dewarpingParams) {
-            m_dewarpingParams = other_casted->m_dewarpingParams;
-            modifiedFields << "mediaDewarpingParamsChanged";
-        }
+        //if (m_dewarpingParams != other_casted->m_dewarpingParams) {   //moved to QnCameraUserAttributePool
+        //    m_dewarpingParams = other_casted->m_dewarpingParams;
+        //    modifiedFields << "mediaDewarpingParamsChanged";
+        //}
     }
 }
 

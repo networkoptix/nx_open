@@ -2,7 +2,6 @@
 #define QN_FAKE_CAMERA_H
 
 #include "core/resource/camera_resource.h"
-#include "core/resource/media_resource.h"
 
 class QnFakeCamera: public QnVirtualCameraResource
 {

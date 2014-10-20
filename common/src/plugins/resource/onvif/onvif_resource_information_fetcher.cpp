@@ -271,7 +271,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
 
     resource->setTypeId(getOnvifResourceType(manufacturer, model));
 
-    resource->setHostAddress(QHostAddress(sender).toString(), QnDomainMemory);
+    resource->setHostAddress(QHostAddress(sender).toString());
     resource->setDiscoveryAddr(discoveryIp);
     resource->setModel(model);
     if (isModelContainVendor(manufacturer, model))
@@ -296,7 +296,7 @@ bool OnvifResourceInformationFetcher::isMacAlreadyExists(const QString& mac, con
 {
     if (!mac.isEmpty()) {
 
-        foreach(QnResourcePtr res, resList) {
+        foreach(const QnResourcePtr& res, resList) {
             QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
 
             if (netRes->getMAC().toString() == mac) {

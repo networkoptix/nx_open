@@ -19,6 +19,7 @@
 #include "business/business_fwd.h"
 #include "utils/db/db_helper.h"
 #include "storage_db.h"
+#include "utils/common/uuid.h"
 
 class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
@@ -120,6 +121,8 @@ signals:
     void rebuildFinished();
 public slots:
     void at_archiveRangeChanged(const QnAbstractStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
+    void onNewResource(const QnResourcePtr &resource);
+    void onDelResource(const QnResourcePtr &resource);
 private:
     friend class TestStorageThread;
 

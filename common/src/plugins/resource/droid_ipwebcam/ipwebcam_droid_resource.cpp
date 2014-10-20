@@ -9,12 +9,6 @@ const QString QnPlDriodIpWebCamResource::MANUFACTURE(lit("NetworkOptixDroid"));
 
 QnPlDriodIpWebCamResource::QnPlDriodIpWebCamResource()
 {
-    setAuth(QString(), QString());
-}
-
-bool QnPlDriodIpWebCamResource::isResourceAccessible()
-{
-    return updateMACAddress();
 }
 
 QString QnPlDriodIpWebCamResource::getDriverName() const

@@ -226,12 +226,12 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
 
         if (overrideAr)
             camera->setProperty(QnMediaResource::customAspectRatioKey(), QString::number(ui->arComboBox->currentData().toDouble()));
-        else if (clearAr)
+        else if (clearAr && camera->hasProperty(QnMediaResource::customAspectRatioKey()))
             camera->setProperty(QnMediaResource::customAspectRatioKey(), QString());
 
         if(overrideRotation) 
             camera->setProperty(QnMediaResource::rotationKey(), QString::number(ui->rotComboBox->currentData().toInt()));
-        else if (clearRotation)
+        else if (clearRotation && camera->hasProperty(QnMediaResource::rotationKey()))
             camera->setProperty(QnMediaResource::rotationKey(), QString());
 
     }

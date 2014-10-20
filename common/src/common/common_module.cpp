@@ -103,7 +103,7 @@ QnModuleInformation QnCommonModule::moduleInformation() const
             if (user->getName() == lit("admin")) {
                 QCryptographicHash md5(QCryptographicHash::Md5);
                 md5.addData(user->getHash());
-                md5.addData(moduleInformationCopy.id.toByteArray());
+                md5.addData(moduleInformationCopy.systemName.toUtf8());
                 moduleInformationCopy.authHash = md5.result();
             }
         }

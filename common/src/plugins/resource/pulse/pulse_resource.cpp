@@ -13,11 +13,6 @@ QnPlPulseResource::QnPlPulseResource()
     setAuth(QLatin1String("admin"), QLatin1String("admin"));
 }
 
-bool QnPlPulseResource::isResourceAccessible()
-{
-    return updateMACAddress();
-}
-
 QString QnPlPulseResource::getDriverName() const
 {
     return MANUFACTURE;

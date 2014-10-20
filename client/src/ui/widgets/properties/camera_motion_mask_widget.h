@@ -62,7 +62,7 @@ protected slots:
 
 private:
     void init();
-    void showTooManyWindowsMessage(const QnMotionRegion &region, const QnMotionRegion::RegionValid kind);
+    void showTooManyWindowsMessage(const QnMotionRegion &region, const QnMotionRegion::ErrorCode errCode);
 
 private:
     QnVirtualCameraResourcePtr m_camera;

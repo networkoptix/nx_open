@@ -47,7 +47,6 @@ public:
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
-    virtual bool isResourceAccessible() override;
     virtual void setMotionMaskPhysical(int channel) override;
 private:
     QSize extractResolution(const QByteArray& resolutionStr) const;

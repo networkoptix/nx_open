@@ -340,6 +340,8 @@
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
                 <init.python.dir>${environment.dir}/python/${arch}</init.python.dir>
                 <python.dir>${libdir}/${arch}/python/scripts</python.dir>                
+                <python.executable>python.exe</python.executable>
+                <python.virtualenv>virtualenv.exe</python.virtualenv>
                 <buildenv.script>get_buildenv.bat</buildenv.script>
                 <platform>windows</platform>
                 <compiler>msvc2012u3</compiler>
@@ -387,6 +389,8 @@
                 <environment.dir>${env.environment}</environment.dir>
                 <init.python.dir>/usr/bin</init.python.dir>                
                 <python.dir>${libdir}/${arch}/python/bin</python.dir>
+                <python.executable>python2</python.executable>
+                <python.virtualenv>virtualenv2</python.virtualenv>
                 <buildenv.script>get_buildenv.sh</buildenv.script>                
                 <qt.dir>${libdir}</qt.dir>
                 <common.platform>unix</common.platform>
@@ -427,6 +431,8 @@
                 <arch>x64</arch>
                 <qt.spec>macx-clang-libc++</qt.spec>
                 <qt.classifier>${platform}-${arch}</qt.classifier>
+                <python.executable>python</python.executable>
+                <python.virtualenv>virtualenv</python.virtualenv>
             </properties>
             <modules>
                 <module>macsetup/client-dmg</module>

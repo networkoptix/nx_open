@@ -41,7 +41,7 @@ bool QnDwZoomPtzController::continuousMove(const QVector3D &speed) {
         setting.setCurrent(setting.getMax());
     }
 
-    m_resource->setParam(setting.getId(), setting.serializeToStr(), QnDomainPhysical);
+    m_resource->setParamPhysical(setting.getId(), setting.serializeToStr());
 
     return true;
 }

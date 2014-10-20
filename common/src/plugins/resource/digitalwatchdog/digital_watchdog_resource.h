@@ -27,11 +27,11 @@ public:
 
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
 
+    virtual bool getParamPhysical(const QString &param, QVariant &val) override;
+    virtual bool setParamPhysical(const QString &param, const QVariant& val) override;
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
     virtual void fetchAndSetCameraSettings() override;
-    virtual bool getParamPhysical(const QnParam &param, QVariant &val) override;
-    virtual bool setParamPhysical(const QnParam &param, const QVariant& val) override;
 
 private:
     bool isDualStreamingEnabled(bool& unauth);
@@ -59,8 +59,8 @@ public:
     ~QnPlWatchDogResourceAdditionalSettings();
 
     bool refreshValsFromCamera();
-    bool getParamPhysicalFromBuffer(const QnParam &param, QVariant &val);
-    bool setParamPhysical(const QnParam &param, const QVariant& val);
+    bool getParamPhysicalFromBuffer(const QString &param, QVariant &val);
+    bool setParamPhysical(const QString &param, const QVariant& val);
 
 private:
     DWCameraProxy* m_cameraProxy;

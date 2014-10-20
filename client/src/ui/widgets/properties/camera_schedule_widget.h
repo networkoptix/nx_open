@@ -4,7 +4,6 @@
 #include <QtWidgets/QWidget>
 
 #include <core/misc/schedule_task.h>
-#include "core/resource/media_resource.h"
 
 class QnWorkbenchContext;
 
