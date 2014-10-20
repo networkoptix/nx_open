@@ -95,6 +95,8 @@ namespace ec2
         {
         case ApiCommand::removeStorages:
             return m_mediaServerManager->triggerNotification( tran );
+        case ApiCommand::removeResources:
+            return m_resourceManager->triggerNotification( tran );
         default:
             assert( false );
         }
@@ -161,7 +163,7 @@ namespace ec2
         m_resourceManager->triggerNotification( tran );
     }
 
-    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiSetResourceStatusData>& tran ) {
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiResourceStatusData>& tran ) {
         m_resourceManager->triggerNotification( tran );
     }
 

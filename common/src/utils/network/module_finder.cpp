@@ -41,6 +41,11 @@ void QnModuleFinder::setCompatibilityMode(bool compatibilityMode) {
     m_directModuleFinder->setCompatibilityMode(compatibilityMode);
 }
 
+bool QnModuleFinder::isCompatibilityMode() const
+{
+    return m_directModuleFinder->isCompatibilityMode();
+}
+
 QList<QnModuleInformation> QnModuleFinder::foundModules() const {
     return m_foundModules.values();
 }

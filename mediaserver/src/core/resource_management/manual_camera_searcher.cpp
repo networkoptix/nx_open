@@ -43,7 +43,7 @@ namespace {
             QnNetworkResourcePtr netRes = resource.dynamicCast<QnNetworkResource>();
             if (netRes) {
                 QnNetworkResourceList existResList = qnResPool->getAllNetResourceByHostAddress(netRes->getHostAddress());
-                foreach(QnNetworkResourcePtr existRes, existResList) 
+                foreach(const QnNetworkResourcePtr& existRes, existResList) 
                 {
                     QnVirtualCameraResourcePtr existCam = existRes.dynamicCast<QnVirtualCameraResource>();
                     if (!existCam)

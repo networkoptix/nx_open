@@ -356,7 +356,6 @@ void QnProxyConnectionProcessor::doRawProxy()
     {
         //TODO #ak replace poll with async socket operations here or it will not work for UDT
 
-        //int rez = d->pollSet.poll( IO_TIMEOUT );
         struct pollfd fds[2];
         memset( fds, 0, sizeof( fds ) );
         fds[0].fd = d->socket->handle();
@@ -411,7 +410,6 @@ void QnProxyConnectionProcessor::doSmartProxy()
         fds[1].fd = d->dstSocket->handle();
         fds[1].events = POLLIN;
 
-        //int rez = d->pollSet.poll( IO_TIMEOUT );
         int rez = poll( fds, sizeof( fds ) / sizeof( *fds ), IO_TIMEOUT );
         if( rez == -1 && SystemError::getLastOSErrorCode() == SystemError::interrupted )
             continue;

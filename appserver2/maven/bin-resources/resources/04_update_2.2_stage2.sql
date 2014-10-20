@@ -10,6 +10,11 @@ INSERT INTO "vms_businessrule_event_resources" (businessrule_guid,resource_guid)
   JOIN vms_businessrule br on br.id = t.businessrule_id
   JOIN vms_resource r on r.id = t.resource_id;
 
+INSERT INTO vms_resource_status (guid, status) 
+SELECT r.guid, rt.status
+ FROM vms_resource r
+ JOIN vms_resource_tmp rt on rt.id = r.id;
+
 drop table vms_resource_tmp;
 drop table vms_businessrule_action_resources_tmp;
 drop table vms_businessrule_event_resources_tmp;

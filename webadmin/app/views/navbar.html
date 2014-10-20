@@ -1,9 +1,22 @@
-<header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
+<header class="navbar navbar-static-top bs-docs-nav navbar-default" id="top" role="banner">
     <div class="container">
         <div class="navbar-header">
-            <a class="navbar-brand" title="IP: {{settings.remoteAddresses}}" data-toggle="tooltip" data-placement="bottom" >Administration: {{settings.name}}</a>
+
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+
+            <a class="navbar-brand" title="Server name:{{settings.name}}&#10;IP: {{settings.remoteAddresses}}" data-toggle="tooltip" data-placement="bottom" >
+                <img src="customization/hdw_logo.png" height="48"/>
+                {{settings.name}}
+            </a>
         </div>
-        <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+        <nav class="collapse navbar-collapse bs-navbar-collapse" id="bs-example-navbar-collapse" role="navigation">
 
             <ul class="nav navbar-nav navbar-right">
 

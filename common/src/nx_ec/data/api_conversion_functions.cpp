@@ -411,6 +411,7 @@ void fromApiToResourceList(const ApiFullInfoData &src, QnFullResourceData &dst, 
     fromApiToResourceList(src.cameraHistory, dst.cameraHistory);
     dst.allProperties = src.allProperties;
     fromApiToResourceList(src.storages, dst.resources, ctx);
+    dst.resStatusList = src.resStatusList;
 }
 
 
@@ -707,8 +708,7 @@ void fromResourceToApi(const QnResourcePtr &src, ApiResourceData &dst) {
     dst.name = src->getName();
     dst.url = src->getUrl();
     //dst.status = src->getStatus();
-    dst.status = Qn::NotDefined; // status field MUST be modified via setStatus call only
-
+    //dst.status = Qn::NotDefined; // status field MUST be modified via setStatus call only
 }
 
 
@@ -719,8 +719,7 @@ void fromApiToResource(const ApiResourceData &src, QnResource* dst) {
     dst->setTypeId(src.typeId);
     dst->setParentId(src.parentId);
     dst->setUrl(src.url);
-    dst->setStatus(src.status, true);
-
+    //dst->setStatus(src.status, true);
 }
 
 void fromApiToResourceList(const ApiResourceDataList &src, QnResourceList &dst, QnResourceFactory *factory) {

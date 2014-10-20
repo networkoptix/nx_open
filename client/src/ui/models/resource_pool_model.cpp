@@ -575,16 +575,21 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
 
     if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>()) {
         connect(camera,     &QnVirtualCameraResource::groupNameChanged, this,   &QnResourcePoolModel::at_camera_groupNameChanged);
+        connect(camera,     &QnResource::nameChanged,                   this,   [this](const QnResourcePtr &resource) {
+            /* Automatically update display name of the EDGE server if its camera was renamed. */
+            QnResourcePtr parent = resource->getParentResource();
+            if (QnMediaServerResource::isEdgeServer(parent))
+                at_resource_resourceChanged(parent);
+        });
     }
+
 
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (server) {
         connect(server,     &QnMediaServerResource::redundancyChanged,  this,   &QnResourcePoolModel::at_server_redundancyChanged);
 
-        if (server->getStatus() == Qn::Incompatible) {
+        if (server->getStatus() == Qn::Incompatible)
             connect(server, &QnMediaServerResource::systemNameChanged,  this,   &QnResourcePoolModel::at_server_systemNameChanged);
-            m_rootNodes[Qn::OtherSystemsNode]->update();
-        }
     }
 
     QnResourcePoolModelNode *node = this->node(resource);
@@ -592,6 +597,9 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
 
     at_resource_parentIdChanged(resource);
     at_resource_resourceChanged(resource);
+
+    if (server)
+        m_rootNodes[Qn::OtherSystemsNode]->update();
 
     if(layout)
         foreach(const QnLayoutItemData &item, layout->getItems())
@@ -752,6 +760,7 @@ void QnResourcePoolModel::at_server_systemNameChanged(const QnResourcePtr &resou
 
     QnResourcePoolModelNode *node = this->node(resource);
     node->setParent(expectedParent(node));
+    m_rootNodes[Qn::OtherSystemsNode]->update();
 }
 
 void QnResourcePoolModel::at_server_redundancyChanged(const QnResourcePtr &resource) {

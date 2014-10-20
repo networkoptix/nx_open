@@ -65,6 +65,22 @@ namespace ec2
         return reqID;
     }
 
+    template<class T>
+    int QnResourceManager<T>::getStatusList( const QnUuid &resourceId, impl::GetStatusListHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+
+        auto queryDoneHandler = [reqID, handler, resourceId]( ErrorCode errorCode, const ApiResourceStatusDataList& params) {
+            ApiResourceStatusDataList outData;
+            if( errorCode == ErrorCode::ok )
+                outData = params;
+            handler->done( reqID, errorCode, outData);
+        };
+        m_queryProcessor->template processQueryAsync<QnUuid, ApiResourceStatusDataList, decltype(queryDoneHandler)>
+            ( ApiCommand::getStatusList, resourceId, queryDoneHandler );
+        return reqID;
+    }
+
     /*
     template<class T>
     int QnResourceManager<T>::setResourceDisabled( const QnUuid& resourceId, bool disabled, impl::SetResourceDisabledHandlerPtr handler )
@@ -117,13 +133,25 @@ namespace ec2
         m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
         return reqID;
     }
+    
+    template<class T>
+    int QnResourceManager<T>::remove( const QVector<QnUuid>& idList, impl::SimpleHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+        QnTransaction<ApiIdDataList> tran(ApiCommand::removeResources);
+        foreach(const QnUuid& id, idList)
+            tran.params.push_back(id);
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
+        return reqID;
+    }
 
     template<class QueryProcessorType>
-    QnTransaction<ApiSetResourceStatusData> QnResourceManager<QueryProcessorType>::prepareTransaction(
+    QnTransaction<ApiResourceStatusData> QnResourceManager<QueryProcessorType>::prepareTransaction(
         ApiCommand::Value command,
         const QnUuid& id, Qn::ResourceStatus status)
     {
-        QnTransaction<ApiSetResourceStatusData> tran(command);
+        QnTransaction<ApiResourceStatusData> tran(command);
         tran.params.id = id;
         tran.params.status = status;
         return tran;

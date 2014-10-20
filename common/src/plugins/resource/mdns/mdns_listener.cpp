@@ -138,7 +138,7 @@ void QnMdnsListener::readSocketInternal(AbstractDatagramSocket* socket, QString 
 void QnMdnsListener::updateSocketList()
 {
     deleteSocketList();
-    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
+    foreach (const QnInterfaceAndAddr& iface, getAllIPv4Interfaces())
     {
         std::unique_ptr<UDPSocket> sock( new UDPSocket() );
         QString localAddress = iface.address.toString();

@@ -203,7 +203,7 @@ QnTimePeriodList QnThirdPartyResource::getDtsTimePeriodsByMotionRegion(
         }
 
         const QVector<QRect>& rects = unitedRegion.rects();
-        foreach( QRect r, rects )
+        foreach(const  QRect& r, rects )
         {
             for( int y = r.top(); y < std::min<int>(motionDataPicture->height(), r.bottom()); ++y )
                 for( int x = r.left(); x < std::min<int>(motionDataPicture->width(), r.right()); ++x )
@@ -309,6 +309,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
 
     if( !m_camManager )
     {
+        //restoring camera parameters
         if( strlen(m_camInfo.uid) == 0 )
         {
             memset( m_camInfo.uid, 0, sizeof(m_camInfo.uid) );
@@ -336,6 +337,16 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
                 const QByteArray& auxData = auxDataStr.toLatin1();
                 strncpy( m_camInfo.auxiliaryData, auxData.constData(), std::min<size_t>(auxData.size(), sizeof(m_camInfo.auxiliaryData)-1) );
             }
+        }
+        if( strlen(m_camInfo.defaultLogin) == 0 )
+        {
+            const QByteArray userName = getAuth().user().toLatin1();
+            strncpy( m_camInfo.defaultLogin, userName.constData(), std::min<size_t>(userName.size(), sizeof(m_camInfo.defaultLogin)-1) );
+        }
+        if( strlen(m_camInfo.defaultPassword) == 0 )
+        {
+            const QByteArray userPassword = getAuth().password().toLatin1();
+            strncpy( m_camInfo.defaultPassword, userPassword.constData(), std::min<size_t>(userPassword.size(), sizeof(m_camInfo.defaultPassword)-1) );
         }
 
         nxcip::BaseCameraManager* cameraIntf = m_discoveryManager.createCameraManager( m_camInfo );
@@ -600,7 +611,7 @@ nxcip::Resolution QnThirdPartyResource::getNearestResolution( int encoderNumber,
 {
     const QList<nxcip::Resolution>& resolutionList = getEncoderResolutionList( encoderNumber );
     nxcip::Resolution foundResolution;
-    foreach( nxcip::Resolution resolution, resolutionList )
+    foreach(const  nxcip::Resolution& resolution, resolutionList )
     {
         if( resolution.width*resolution.height <= desiredResolution.width*desiredResolution.height &&
             resolution.width*resolution.height > foundResolution.width*foundResolution.height )

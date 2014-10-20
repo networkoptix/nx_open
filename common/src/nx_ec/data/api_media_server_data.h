@@ -43,7 +43,8 @@ namespace ec2
         bool            allowAutoRedundancy; // Server can take cameras from offline server automatically
     };
 
-#define ApiMediaServerUserAttributesData_Fields (serverID)(serverName)(maxCameras)(allowAutoRedundancy)
+#define ApiMediaServerUserAttributesData_Fields_Short (maxCameras)(allowAutoRedundancy)
+#define ApiMediaServerUserAttributesData_Fields (serverID) (serverName) ApiMediaServerUserAttributesData_Fields_Short
 
 
     struct ApiMediaServerDataEx
@@ -51,6 +52,7 @@ namespace ec2
         ApiMediaServerData,
         ApiMediaServerUserAttributesData
     {
+        Qn::ResourceStatus status;
         std::vector<ApiResourceParamData> addParams;
         ApiStorageDataList storages;
 
@@ -63,7 +65,7 @@ namespace ec2
         {
         }
     };
-#define ApiMediaServerDataEx_Fields ApiMediaServerData_Fields ApiMediaServerUserAttributesData_Fields (addParams) (storages)
+#define ApiMediaServerDataEx_Fields ApiMediaServerData_Fields ApiMediaServerUserAttributesData_Fields_Short (status)(addParams) (storages)
 
 
     struct ApiPanicModeData: public ApiData

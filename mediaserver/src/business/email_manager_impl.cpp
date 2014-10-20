@@ -59,7 +59,7 @@ bool EmailManagerImpl::sendEmail(const ec2::ApiEmailData& data) {
     message.addPart(new MimeHtml(data.body));
 
     // Need to store all attachments as smtp client operates on attachment pointers
-    foreach (QnEmailAttachmentPtr attachment, data.attachments)
+    foreach (const QnEmailAttachmentPtr& attachment, data.attachments)
         message.addPart(new MimeInlineFile(attachment->content, attachment->filename, attachment->mimetype));
 
     // Actually send

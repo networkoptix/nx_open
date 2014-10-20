@@ -29,6 +29,8 @@
 #include <utils/common/checked_cast.h>
 #include "utils/common/warnings.h"
 
+#define TRANSACTION_MESSAGE_BUS_DEBUG
+
 namespace ec2
 {
 
@@ -93,7 +95,7 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
 
     switch (transaction.command) {
     case ApiCommand::getFullInfo:           return handleTransactionParams<ApiFullInfoData>         (serializedTransaction, &stream, transaction, function, fastFunction);
-    case ApiCommand::setResourceStatus:     return handleTransactionParams<ApiSetResourceStatusData>(serializedTransaction, &stream, transaction, function, fastFunction);
+    case ApiCommand::setResourceStatus:     return handleTransactionParams<ApiResourceStatusData>(serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::setResourceParam:      return handleTransactionParams<ApiResourceParamWithRefData>   (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::saveResource:          return handleTransactionParams<ApiResourceData>         (serializedTransaction, &stream, transaction, function, fastFunction);
     case ApiCommand::setPanicMode:          return handleTransactionParams<ApiPanicModeData>        (serializedTransaction, &stream, transaction, function, fastFunction);
@@ -1009,7 +1011,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
     // send HTTP level keep alive (empty chunk) for server <---> server connections
     if (!m_localPeer.isClient()) 
     {
-        foreach(QSharedPointer<QnTransactionTransport> transport, m_connections.values()) 
+        foreach(const QnTransactionTransportPtr& transport, m_connections.values()) 
         {
             if (transport->getState() == QnTransactionTransport::ReadyForStreaming && !transport->remotePeer().isClient()) 
             {
@@ -1069,7 +1071,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
         if (itr.value().lastActivity.elapsed() > ALIVE_UPDATE_INTERVAL * 2)
         {
             itr.value().lastActivity.restart();
-            foreach(QSharedPointer<QnTransactionTransport> transport, m_connectingConnections) {
+            foreach(const QnTransactionTransportPtr& transport, m_connectingConnections) {
                 if (transport->getState() == QnTransactionTransport::Closed)
                     continue; // it's going to close soon
                 if (transport->remotePeer().id == itr.key()) {
@@ -1078,7 +1080,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
                 }
             }
 
-            foreach(QSharedPointer<QnTransactionTransport> transport, m_connections.values()) {
+            foreach(const QnTransactionTransportPtr& transport, m_connections.values()) {
                 if (transport->getState() == QnTransactionTransport::Closed)
                     continue; // it's going to close soon
                 if (transport->remotePeer().id == itr.key() && transport->remotePeer().peerType == Qn::PT_Server) {
@@ -1133,7 +1135,7 @@ void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& url)
     QMutexLocker lock(&m_mutex);
     m_remoteUrls.remove(url);
     QString urlStr = getUrlAddr(url);
-    foreach(QnTransactionTransportPtr transport, m_connections.values())
+    foreach(const QnTransactionTransportPtr& transport, m_connections.values())
     {
         if (getUrlAddr(transport->remoteAddr()) == urlStr) {
             qWarning() << "Disconnected from peer" << url;
@@ -1150,7 +1152,6 @@ void QnTransactionMessageBus::dropConnections()
         qWarning() << "Disconnected from peer" << transport->remoteAddr();
         transport->setState(QnTransactionTransport::Error);
     }
-    runtimeTransactionLog->clearRuntimeData();
 }
 
 QnTransactionMessageBus::AlivePeersMap QnTransactionMessageBus::alivePeers() const

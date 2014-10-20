@@ -40,7 +40,7 @@ bool QnResourceType::isCamera() const
         return m_isCamera;
     }
 
-    foreach (QnUuid parentId, allParentList())
+    foreach (const QnUuid& parentId, allParentList())
     {
         if (!parentId.isNull())
         {
@@ -109,7 +109,7 @@ const ParamTypeMap& QnResourceType::paramTypeList() const
         QSharedPointer<ParamTypeMap> allParamTypeListCache(new ParamTypeMap());
         *allParamTypeListCache = m_paramTypeList;
 
-        foreach (QnUuid parentId, allParentList()) {
+        foreach (const QnUuid& parentId, allParentList()) {
             if (parentId.isNull()) {
                 continue;
             }
@@ -178,7 +178,7 @@ void QnResourceTypePool::addResourceType(QnResourceTypePtr resourceType)
 QnUuid QnResourceTypePool::getResourceTypeId(const QString& manufacture, const QString& name, bool showWarning) const
 {
     QMutexLocker lock(&m_mutex);
-    foreach(QnResourceTypePtr rt, m_resourceTypeMap)
+    foreach(const QnResourceTypePtr& rt, m_resourceTypeMap)
     {
         //NX_LOG(rt->getName(), cl_logALWAYS); //debug
 
@@ -210,7 +210,7 @@ QnUuid QnResourceTypePool::getLikeResourceTypeId(const QString& manufacture, con
     QMutexLocker lock(&m_mutex);
     QnUuid result;
     int bestLen = -1;
-    foreach(QnResourceTypePtr rt, m_resourceTypeMap)
+    foreach(const QnResourceTypePtr& rt, m_resourceTypeMap)
     {
         if (rt->getManufacture() == manufacture)
         {

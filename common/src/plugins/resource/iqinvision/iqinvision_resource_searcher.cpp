@@ -21,6 +21,8 @@ static const char* requests[] =
     "\x01\x01\x00\x00\xc0\xff\x00\x00"
 };
 
+QString DEFAULT_RESOURCE_TYPE(lit("IQA32N"));
+
 
 QnPlIqResourceSearcher::QnPlIqResourceSearcher()
 {
@@ -131,7 +133,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
 
     smac = smac.toUpper();
 
-    foreach(QnResourcePtr res, result)
+    foreach(const QnResourcePtr& res, result)
     {
         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
     
@@ -150,9 +152,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
     if (rt.isNull())
     {
         // try with default camera name
-        name = QLatin1String("IQA32N");
-        rt = qnResTypePool->getResourceTypeId(manufacture(), name);
-
+        rt = qnResTypePool->getResourceTypeId(manufacture(), DEFAULT_RESOURCE_TYPE);
         if (rt.isNull())
             return local_results;
     }
@@ -193,7 +193,7 @@ void QnPlIqResourceSearcher::processNativePacket(QnResourceList& result, const Q
 
     QByteArray name(responseData.data() + iqpos); // construct from null terminated char*
 
-    foreach(QnResourcePtr res, result)
+    foreach(const QnResourcePtr& res, result)
     {
         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
 
@@ -208,8 +208,9 @@ void QnPlIqResourceSearcher::processNativePacket(QnResourceList& result, const Q
     QString nameStr = QString::fromLatin1(name);
     QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), nameStr);
     if (rt.isNull()) {
-        qWarning() << "Unregistered IQvision camera type:" << name;
-        return;
+        rt = qnResTypePool->getResourceTypeId(manufacture(), DEFAULT_RESOURCE_TYPE);
+        if (rt.isNull())
+            return;
     }
 
     QnPlIqResourcePtr resource ( new QnPlIqResource() );

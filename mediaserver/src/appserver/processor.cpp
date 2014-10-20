@@ -30,7 +30,7 @@ QnAppserverResourceProcessor::~QnAppserverResourceProcessor()
 
 void QnAppserverResourceProcessor::processResources(const QnResourceList &resources)
 {
-    foreach (QnResourcePtr resource, resources)
+    foreach (const QnResourcePtr& resource, resources)
     {
         QnVirtualCameraResource* cameraResource = dynamic_cast<QnVirtualCameraResource*>(resource.data());
         if (cameraResource == nullptr)
@@ -47,7 +47,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
     // we've got two loops to avoid double call of double sending addCamera
 
-    foreach (QnResourcePtr resource, resources)
+    foreach (const QnResourcePtr& resource, resources)
     {
         QnVirtualCameraResourcePtr cameraResource = resource.dynamicCast<QnVirtualCameraResource>();
         if (cameraResource.isNull())
@@ -140,19 +140,30 @@ void QnAppserverResourceProcessor::at_mutexLocked()
 void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource)
 {
     cameraResource->setFlags(cameraResource->flags() & ~Qn::parent_change);
+    cameraResource->setStatus(Qn::Offline);
     Q_ASSERT(!cameraResource->getId().isNull());
     QnVirtualCameraResourceList cameras;
     ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
-    const ec2::ErrorCode errorCode = connect->getCameraManager()->addCameraSync( cameraResource, &cameras );
-    propertyDictionary->saveParams( cameraResource->getId() );
-    if( errorCode == ec2::ErrorCode::ok ) {
-        QnResourcePtr existCamRes = qnResPool->getResourceById(cameraResource->getId());
-        if (existCamRes && existCamRes->getTypeId() != cameraResource->getTypeId()) 
-            qnResPool->removeResource(existCamRes);
-        QnCommonMessageProcessor::instance()->updateResource(cameraResource);
+
+    ec2::ErrorCode errorCode = connect->getCameraManager()->addCameraSync( cameraResource, &cameras );
+    if( errorCode != ec2::ErrorCode::ok ) {
+        NX_LOG( QString::fromLatin1("Can't add camera to ec2 (insCamera query error). %1").arg(ec2::toString(errorCode)), cl_logWARNING );
+        return;
     }
-    else
-        NX_LOG( QString::fromLatin1("Can't add camera to ec2. %1").arg(ec2::toString(errorCode)), cl_logWARNING );
+    
+    errorCode = connect->getResourceManager()->setResourceStatusSync( cameraResource->getId(), cameraResource->getStatus());
+    if( errorCode != ec2::ErrorCode::ok ) {
+        NX_LOG( QString::fromLatin1("Can't add camera to ec2 (set status query error). %1").arg(ec2::toString(errorCode)), cl_logWARNING );
+        return;
+    }
+
+    propertyDictionary->saveParams( cameraResource->getId() );
+    QnResourcePtr existCamRes = qnResPool->getResourceById(cameraResource->getId());
+    if (existCamRes && existCamRes->getTypeId() != cameraResource->getTypeId()) 
+        qnResPool->removeResource(existCamRes);
+    QnCommonMessageProcessor::instance()->updateResource(cameraResource);
+    QnResourcePtr rpRes = qnResPool->getResourceById(cameraResource->getId());
+    rpRes->initAsync(true);
 }
 
 void QnAppserverResourceProcessor::at_mutexTimeout()

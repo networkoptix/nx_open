@@ -302,7 +302,7 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
 
     if (isEdgeBox && type() == Qn::LC_Edge) 
     {
-        foreach(QnLicensePtr license, qnLicensePool->getLicenses()) {
+        foreach(const QnLicensePtr& license, qnLicensePool->getLicenses()) {
             if (license->hardwareId() == hardwareId() && license->type() == type()) 
             {
                 if (mode == VM_CheckInfo && license->key() != key())
@@ -473,7 +473,7 @@ int QnLicenseListHelper::totalLicenseByType(Qn::LicenseType licenseType) const
 {
     int result = 0;
 
-    foreach (QnLicensePtr license, m_licenseDict.values()) 
+    foreach (const QnLicensePtr& license, m_licenseDict.values()) 
     {
         if (license->type() == licenseType && license->isValid())
             result += license->cameraCount();
@@ -483,7 +483,7 @@ int QnLicenseListHelper::totalLicenseByType(Qn::LicenseType licenseType) const
 
 void QnLicenseListHelper::update(const QnLicenseList& licenseList) {
     m_licenseDict.clear();
-    foreach (QnLicensePtr license, licenseList) {
+    foreach (const QnLicensePtr& license, licenseList) {
         m_licenseDict[license->key()] = license;
     }
 }
@@ -503,7 +503,7 @@ QnLicensePool::QnLicensePool():
 
 void QnLicensePool::at_timer()
 {
-    foreach(const QnLicensePtr license, m_licenseDict)
+    foreach(const QnLicensePtr& license, m_licenseDict)
     {
         QnLicense::ErrorCode errCode;
         license->isValid(&errCode);
@@ -567,7 +567,7 @@ bool QnLicensePool::addLicenses_i(const QnLicenseList &licenses)
 {
     bool atLeastOneAdded = false;
 
-    foreach(QnLicensePtr license, licenses) {
+    foreach(const QnLicensePtr& license, licenses) {
         if (addLicense_i(license))
             atLeastOneAdded = true;
     }

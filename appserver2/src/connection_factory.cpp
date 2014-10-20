@@ -109,7 +109,7 @@ namespace ec2
         //AbstractResourceManager::getResource
         //registerGetFuncHandler<std::nullptr_t, ApiResourceData>( restProcessorPool, ApiCommand::getResource );
         //AbstractResourceManager::setResourceStatus
-        registerUpdateFuncHandler<ApiSetResourceStatusData>( restProcessorPool, ApiCommand::setResourceStatus );
+        registerUpdateFuncHandler<ApiResourceStatusData>( restProcessorPool, ApiCommand::setResourceStatus );
         //AbstractResourceManager::getKvPairs
         registerGetFuncHandler<QnUuid, ApiResourceParamWithRefDataList>( restProcessorPool, ApiCommand::getResourceParams );
         //AbstractResourceManager::save
@@ -138,6 +138,7 @@ namespace ec2
         registerUpdateFuncHandler<ApiStorageData>( restProcessorPool, ApiCommand::saveStorage);
         registerUpdateFuncHandler<ApiIdDataList>( restProcessorPool, ApiCommand::removeStorages);
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeStorage);
+        registerUpdateFuncHandler<ApiIdDataList>( restProcessorPool, ApiCommand::removeResources);
 
         //AbstractCameraManager::addCamera
         registerUpdateFuncHandler<ApiCameraData>( restProcessorPool, ApiCommand::saveCamera );

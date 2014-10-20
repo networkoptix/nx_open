@@ -195,7 +195,7 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
 
     m_camInfo.clear();
 
-    foreach(QString line, lines)
+    foreach(const QString& line, lines)
     {
         if (line.contains(QLatin1String("videos=")))
         {
@@ -235,7 +235,7 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
         else if (line.contains(QLatin1String("vbitrates=")))
         {
             QStringList vals = getValues(line);
-            foreach(QString bs, vals)
+            foreach(const QString& bs, vals)
             {
                 bool m = bs.toLower().contains(QLatin1Char('m'));
                 bool k = bs.toLower().contains(QLatin1Char('k'));

@@ -28,7 +28,8 @@ static const char* IGNORE_VENDORS[][2] =
 {
     {"*networkcamera*", "IP*"}, // DLINK
     {"*", "*spartan-6*"},       // ArecontVision
-    {"acti*", "*"}              // ACTi. Current ONVIF implementation quite unstable. Vendor name is not filled by camera!
+    {"acti*", "*"},              // ACTi. Current ONVIF implementation quite unstable. Vendor name is not filled by camera!
+    {"*", "KCM*"}              // ACTi. Current ONVIF implementation quite unstable. Vendor name is not filled by camera!
 };
 
 bool OnvifResourceInformationFetcher::isAnalogOnvifResource(const QString& vendor, const QString& model)
@@ -295,7 +296,7 @@ bool OnvifResourceInformationFetcher::isMacAlreadyExists(const QString& mac, con
 {
     if (!mac.isEmpty()) {
 
-        foreach(QnResourcePtr res, resList) {
+        foreach(const QnResourcePtr& res, resList) {
             QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
 
             if (netRes->getMAC().toString() == mac) {

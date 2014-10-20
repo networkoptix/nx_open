@@ -146,6 +146,9 @@ namespace ec2
         //getStorages
         ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList& cameraList);
 
+        //get resource status
+        ErrorCode doQueryNoLock(const QnUuid& resId, ApiResourceStatusDataList& statusList);
+
         //getCameraUserAttributes
         ErrorCode doQueryNoLock(const QnUuid& cameraId, ApiCameraAttributesDataList& cameraUserAttributesList);
 
@@ -208,6 +211,21 @@ namespace ec2
         void initialized();
 
     private:
+        enum FilterType
+        {
+            RES_ID_FIELD,
+            RES_TYPE_FIELD
+        };
+
+        //!query filter
+        class QnQueryFilter
+        {
+        public:
+            //filtered field, 
+            QMap<int, QVariant> fields;
+        };
+
+
         friend class QnTransactionLog;
         QSqlDatabase& getDB() { return m_sdb; }
         QReadWriteLock& getMutex() { return m_mutex; }
@@ -222,7 +240,7 @@ namespace ec2
         ErrorCode executeTransactionInternal(const QnTransaction<ApiMediaServerUserAttributesData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutDataList>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiSetResourceStatusData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceStatusData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceParamWithRefData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraServerItemData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiPanicModeData>& tran);
@@ -391,6 +409,7 @@ namespace ec2
         ErrorCode removeObject(const ApiObjectInfo& apiObject);
 
         ErrorCode insertAddParam(const ApiResourceParamWithRefData& param);
+        ErrorCode fetchResourceParams( const QnQueryFilter& filter, ApiResourceParamWithRefDataList& params );
         //ErrorCode deleteAddParams(qint32 resourceId);
 
         ErrorCode saveCamera(const ApiCameraData& params);
@@ -496,6 +515,7 @@ namespace ec2
         QnDbTransaction m_tranStatic;
         mutable QReadWriteLock m_mutexStatic;
         bool m_needResyncLog;
+        bool m_needResyncLicenses;
     };
 };
 

@@ -34,6 +34,7 @@ public:
     void processServerUserAttributesList( const QnMediaServerUserAttributesList& serverUserAttributesList );
     void processCameraUserAttributesList( const QnCameraUserAttributesList& cameraUserAttributesList );
     void processPropertyList(const ec2::ApiResourceParamWithRefDataList& params);
+    void processStatusList(const ec2::ApiResourceStatusDataList& params);
 signals:
     void connectionOpened();
     void connectionClosed();

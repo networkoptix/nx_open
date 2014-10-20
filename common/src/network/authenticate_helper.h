@@ -62,6 +62,24 @@ private:
     std::map<QString, unsigned int> m_denied;
 };
 
+class HttpAuthenticationClientContext
+{
+public:
+    boost::optional<nx_http::header::WWWAuthenticate> authenticateHeader;
+    int responseStatusCode;
+
+    HttpAuthenticationClientContext()
+    :
+        responseStatusCode( nx_http::StatusCode::ok )
+    {
+    }
+
+    void clear()
+    {
+        std::move( authenticateHeader );
+    }
+};
+
 class QnAuthHelper: public QObject
 {
     Q_OBJECT
@@ -83,7 +101,16 @@ public:
         - client calls this method supplying received response. This method adds necessary headers to request
         - client sends request to server
     */
-    bool authenticate(const QAuthenticator& auth, const nx_http::Response& response, nx_http::Request* request);
+    bool authenticate(
+        const QAuthenticator& auth,
+        const nx_http::Response& response,
+        nx_http::Request* const request,
+        HttpAuthenticationClientContext* const authenticationCtx );
+    //!Same as above, but uses cached authentication info
+    bool authenticate(
+        const QAuthenticator& auth,
+        nx_http::Request* const request,
+        HttpAuthenticationClientContext* const authenticationCtx );
     bool authenticate(const QString& login, const QByteArray& digest) const;
 
     QnAuthMethodRestrictionList* restrictionList();

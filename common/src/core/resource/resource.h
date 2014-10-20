@@ -44,7 +44,6 @@ class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResourc
     Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(QString searchString READ toSearchString)
     Q_PROPERTY(QnUuid parentId READ getParentId WRITE setParentId)
-    Q_PROPERTY(Qn::ResourceStatus status READ getStatus WRITE setStatus)
     Q_PROPERTY(Qn::ResourceFlags flags READ flags WRITE setFlags)
     Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged)
     Q_PROPERTY(QDateTime lastDiscoveredTime READ getLastDiscoveredTime WRITE setLastDiscoveredTime)
@@ -286,6 +285,7 @@ private:
     bool emitDynamicSignal(const char *signal, void **arguments);
     void afterUpdateInner(const QSet<QByteArray>& modifiedFields);
     void emitPropertyChanged(const QString& key);
+    void doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus);
 
     friend class InitAsyncTask;
 
@@ -323,10 +323,6 @@ private:
     /** Flags of this resource that determine its type. */
     Qn::ResourceFlags m_flags;
     
-
-    /** Status of this resource. */
-    Qn::ResourceStatus m_status;
-
     QDateTime m_lastDiscoveredTime;
     QDateTime m_lastStatusUpdateTime;
 

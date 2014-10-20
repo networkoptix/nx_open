@@ -49,7 +49,7 @@ namespace ec2 {
     struct ApiSyncRequestData;
     struct ApiTranSyncDoneData;
     struct ApiPeerAliveData;
-    struct ApiSetResourceStatusData;
+    struct ApiResourceStatusData;
     struct ApiStorageData;
     struct ApiStoredFileData;
     struct ApiStoredFilePath;
@@ -109,6 +109,7 @@ namespace ec2 {
     typedef std::vector<ApiResourceParamWithRefData> ApiResourceParamWithRefDataList;
     typedef std::vector<ApiStorageData> ApiStorageDataList;
     typedef std::vector<ApiIdData> ApiIdDataList;
+    typedef std::vector<ApiResourceStatusData> ApiResourceStatusDataList;
 
 #define QN_EC2_API_DATA_TYPES \
     (ApiBusinessActionData)\
@@ -148,7 +149,7 @@ namespace ec2 {
     (QnTranStateResponse)\
     (ApiTranSyncDoneData)\
     (ApiPeerAliveData)\
-    (ApiSetResourceStatusData)\
+    (ApiResourceStatusData)\
     (ApiStoredFilePath)\
     (ApiStorageData)\
     (ApiStoredFileData)\

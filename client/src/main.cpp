@@ -125,6 +125,7 @@ extern "C"
 #endif
 #include "api/runtime_info_manager.h"
 #include "core/resource_management/resource_properties.h"
+#include "core/resource_management/status_dictionary.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -435,6 +436,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 #endif
 
     QnResourcePropertyDictionary dictionary;
+    QnResourceStatusDiscionary statusDictionary;
     QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
     QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
     QScopedPointer<QnClientPtzControllerPool> clientPtzPool(new QnClientPtzControllerPool());

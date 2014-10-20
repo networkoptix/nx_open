@@ -7,6 +7,8 @@
 #include <QtWidgets/QStyle>
 #include <QtWidgets/QMenu>
 
+#include <common/common_module.h>
+
 #include <client/client_settings.h>
 
 #include <core/resource/layout_resource.h>
@@ -128,11 +130,16 @@ QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout *layout) const {
     QnUuid videoWallInstanceGuid = layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>();
     if (!videoWallInstanceGuid.isNull()) {
         QnVideoWallItemIndex idx = qnResPool->getVideoWallItemByUuid(videoWallInstanceGuid);
-        bool online = idx.isNull()
-            ? false
-            : idx.item().online;
-        if (online)
-            return qnResIconCache->icon(QnResourceIconCache::VideoWallItem);
+        if (idx.isNull())
+            return QIcon();
+
+        if (idx.item().runtimeStatus.online) {
+            if (idx.item().runtimeStatus.controlledBy.isNull())
+                return qnResIconCache->icon(QnResourceIconCache::VideoWallItem);
+            if (idx.item().runtimeStatus.controlledBy == qnCommon->moduleGUID())
+                return qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Control);
+            return qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Locked);
+        }
         return qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Offline);
     }
 

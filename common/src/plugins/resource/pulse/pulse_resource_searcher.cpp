@@ -23,7 +23,7 @@ QnResourceList QnPlPulseSearcher::findResources()
     QnPlPulseSearcherHelper helper;
     QList<QnPlPulseSearcherHelper::WSResult> onnvifResponses = helper.findResources();
 
-    foreach(QnPlPulseSearcherHelper::WSResult r, onnvifResponses)
+    foreach(const QnPlPulseSearcherHelper::WSResult& r, onnvifResponses)
     {
         QnNetworkResourcePtr res = createResource(r.manufacture, r.name);
         if (!res)

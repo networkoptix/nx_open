@@ -29,7 +29,7 @@ QnResourceList QnStardotResourceSearcher::findResources()
 {
     QnResourceList result;
 
-    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
+    foreach (const QnInterfaceAndAddr& iface, getAllIPv4Interfaces())
     {
         if (shouldStop())
             return QnResourceList();
@@ -122,7 +122,7 @@ QnResourceList QnStardotResourceSearcher::findResources()
 
 
                 bool need_to_continue = false;
-                foreach(QnResourcePtr res, result)
+                foreach(const QnResourcePtr& res, result)
                 {
                     if (res->getUniqueId() == resource->getUniqueId())
                     {

@@ -275,6 +275,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ThumbnailsSearchAction),                 SIGNAL(triggered()),    this,   SLOT(at_thumbnailsSearchAction_triggered()));
     connect(action(Qn::SetCurrentLayoutAspectRatio4x3Action),   SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio4x3Action_triggered()));
     connect(action(Qn::SetCurrentLayoutAspectRatio16x9Action),  SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio16x9Action_triggered()));
+    connect(action(Qn::SetCurrentLayoutAspectRatio3x4Action),   SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio3x4Action_triggered()));
+    connect(action(Qn::SetCurrentLayoutAspectRatio9x16Action),  SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio9x16Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing0Action),     SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing0Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing10Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing10Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing20Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing20Action_triggered()));
@@ -290,7 +292,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::SetAsBackgroundAction),                  SIGNAL(triggered()),    this,   SLOT(at_setAsBackgroundAction_triggered()));
     connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
     connect(action(Qn::EscapeHotkeyAction),                     SIGNAL(triggered()),    this,   SLOT(at_escapeHotkeyAction_triggered()));
-    connect(action(Qn::ClearCacheAction),                       SIGNAL(triggered()),    this,   SLOT(at_clearCacheAction_triggered()));
     connect(action(Qn::MessageBoxAction),                       SIGNAL(triggered()),    this,   SLOT(at_messageBoxAction_triggered()));
     connect(action(Qn::BrowseUrlAction),                        SIGNAL(triggered()),    this,   SLOT(at_browseUrlAction_triggered()));
     connect(action(Qn::VersionMismatchMessageAction),           SIGNAL(triggered()),    this,   SLOT(at_versionMismatchMessageAction_triggered()));
@@ -862,7 +863,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
             modifiedResources,
             Qn::MainWindow_Tree_DragCameras_Help,
             tr("Error"),
-            tr("Can't move camera(s) to other server. Media server %1 doesn't answer to request. These camera list will stay unchanged").arg(server->getName()), // TODO: #Elric need saner error message
+            tr("Can't move camera(s) to other server. Server %1 doesn't answer to request.", NULL, modifiedResources.size()).arg(server->getName()),
             QDialogButtonBox::Ok
             );
         return;
@@ -889,7 +890,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
             errorResources,
             Qn::MainWindow_Tree_DragCameras_Help,
             tr("Error"),
-            tr("Camera(s) cannot be moved to server '%1'. It might have been offline since the server is up.").arg(server->getName()), // TODO: #Elric need saner error message
+            tr("Camera(s) cannot be moved to server '%1' because the server cannot discover it.", NULL, errorResources.size()).arg(server->getName()),
             QDialogButtonBox::Ok
             );
     }
@@ -1833,33 +1834,43 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
         return snapshotManager()->flags(layoutResource) == Qn::ResourceIsLocal; /* Local, not changed and not being saved. */
     };
 
-    auto deleteResource = [this](const QnResourcePtr &resource) {
-        if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
-            if(snapshotManager()->isLocal(layout)) {
-                resourcePool()->removeResource(resource); /* This one can be simply deleted from resource pool. */
-                return;
+    auto deleteResources = [this](const QnResourceList& resources)
+    {
+        QVector<QnUuid> idToDelete;
+        foreach(const QnResourcePtr& resource, resources) 
+        {
+            if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) 
+            {
+                if(snapshotManager()->isLocal(layout)) {
+                    resourcePool()->removeResource(resource); /* This one can be simply deleted from resource pool. */
+                    return;
+                }
             }
+            QnUuid parentToDelete = resource.dynamicCast<QnVirtualCameraResource>() && //check for camera to avoid unnecessary parent lookup
+                QnMediaServerResource::isHiddenServer(resource->getParentResource())
+                ? resource->getParentId()
+                : QnUuid();
+            if (!parentToDelete.isNull())
+                idToDelete << parentToDelete;
+            idToDelete << resource->getId();
         }
 
         // if we are deleting an edge camera, also delete its server
-        QnUuid parentToDelete = resource.dynamicCast<QnVirtualCameraResource>() && //check for camera to avoid unnecessary parent lookup
-            QnMediaServerResource::isHiddenServer(resource->getParentResource())
-            ? resource->getParentId()
-            : QnUuid();
-
-        connection2()->getResourceManager()->remove( resource->getId(), this, &QnWorkbenchActionHandler::at_resource_deleted );
-        if (!parentToDelete.isNull())
-            connection2()->getResourceManager()->remove(parentToDelete, this, &QnWorkbenchActionHandler::at_resource_deleted );
+        connection2()->getResourceManager()->remove( idToDelete, this, &QnWorkbenchActionHandler::at_resource_deleted );
     };
 
     /* Check if it's OK to delete something without asking. */
     QnResourceList autoDeleting;
+    QnResourceList moreResourceToDelete;
     foreach(const QnResourcePtr &resource, resources) {
-        if(!canAutoDelete(resource))
-            continue;
-        autoDeleting << resource;
-        deleteResource(resource);
+        if(canAutoDelete(resource))
+            autoDeleting << resource;
+        else
+            moreResourceToDelete << resource;
     }
+    if (!autoDeleting.isEmpty())
+        deleteResources(autoDeleting);
+
     foreach (const QnResourcePtr &resource, autoDeleting)
         resources.removeOne(resource);
 
@@ -1896,6 +1907,8 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
         question = tr("Do you really want to delete the following %n item(s)?",
             "", resources.size());
     
+    if (moreResourceToDelete.isEmpty())
+        return;
     
     QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
         mainWindow(),
@@ -1907,8 +1920,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     if (button != QDialogButtonBox::Yes)
         return; /* User does not want it deleted. */
 
-    foreach(const QnResourcePtr &resource, resources)
-        deleteResource(resource);   
+    deleteResources(moreResourceToDelete);
 }
 
 void QnWorkbenchActionHandler::at_newUserAction_triggered() {
@@ -2088,6 +2100,16 @@ void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio4x3Action_triggered
 void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio16x9Action_triggered() {
     workbench()->currentLayout()->resource()->setCellAspectRatio(16.0 / 9.0);
     action(Qn::SetCurrentLayoutAspectRatio16x9Action)->setChecked(true);
+}
+
+void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio3x4Action_triggered() {
+    workbench()->currentLayout()->resource()->setCellAspectRatio(3.0 / 4.0);
+    action(Qn::SetCurrentLayoutAspectRatio3x4Action)->setChecked(true);
+}
+
+void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio9x16Action_triggered() {
+    workbench()->currentLayout()->resource()->setCellAspectRatio(9.0 / 16.0);
+    action(Qn::SetCurrentLayoutAspectRatio9x16Action)->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing0Action_triggered() {
@@ -2371,10 +2393,6 @@ void QnWorkbenchActionHandler::at_escapeHotkeyAction_triggered() {
         menu()->trigger(Qn::ToggleTourModeAction);
 }
 
-void QnWorkbenchActionHandler::at_clearCacheAction_triggered() {
-    QnAppServerFileCache::clearLocalCache();
-}
-
 void QnWorkbenchActionHandler::at_messageBoxAction_triggered() {
     QString title = menu()->currentParameters(sender()).argument<QString>(Qn::TitleRole);
     QString text = menu()->currentParameters(sender()).argument<QString>(Qn::TextRole);
@@ -2450,7 +2468,12 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
         "Please upgrade all components to the latest version %2."
     ).arg(components).arg(latestMsVersion.toString());
 
-    QScopedPointer<QMessageBox> messageBox(new QMessageBox(QMessageBox::Warning, tr("Version Mismatch"), message, QMessageBox::StandardButtons(QMessageBox::Cancel), mainWindow()));
+    QScopedPointer<QnWorkbenchStateDependentDialog<QMessageBox> > messageBox(
+        new QnWorkbenchStateDependentDialog<QMessageBox>(mainWindow()));
+    messageBox->setIcon(QMessageBox::Warning);
+    messageBox->setWindowTitle(tr("Version Mismatch"));
+    messageBox->setText(message);
+    messageBox->setStandardButtons(QMessageBox::Cancel);
     setHelpTopic(messageBox.data(), Qn::VersionMismatch_Help);
 
     QPushButton *updateButton = messageBox->addButton(tr("Upgrade..."), QMessageBox::HelpRole);

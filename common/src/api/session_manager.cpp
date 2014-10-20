@@ -11,11 +11,14 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkAccessManager>
 
+#include "utils/common/log.h"
 #include "utils/common/warnings.h"
 #include "utils/common/delete_later.h"
 #include "utils/common/object_thread_puller.h"
 #include "common/common_module.h"
 #include "app_server_connection.h"
+
+#include <iostream>
 
 int QnSessionManagerSyncReply::wait(QnHTTPRawResponse& response) {
     QMutexLocker locker(&m_mutex);
@@ -102,10 +105,11 @@ void QnSessionManager::at_replyReceived(QNetworkReply * reply)
     m_handleInProgress.remove(reply);
     //emit requestFinished(QnHTTPRawResponse(reply->error(), reply->rawHeaderPairs(), reply->readAll(), errorString.toLatin1()), handle);
     QnHTTPRawResponse httpResponse(reply->error(), reply->rawHeaderPairs(), reply->readAll(), errorString.toLatin1());
-    QMetaObject::invokeMethod(reqInfo.object, reqInfo.slot, reqInfo.connectionType,
-                              QGenericReturnArgument(), 
-                              QGenericArgument("QnHTTPRawResponse", &httpResponse),
-                              QGenericArgument("int", &reqInfo.handle));
+    if( reqInfo.object )
+        QMetaObject::invokeMethod(reqInfo.object, reqInfo.slot, reqInfo.connectionType,
+                                  QGenericReturnArgument(), 
+                                  QGenericArgument("QnHTTPRawResponse", &httpResponse),
+                                  QGenericArgument("int", &reqInfo.handle));
     qnDeleteLater(reply);
 }
 
@@ -212,12 +216,22 @@ int QnSessionManager::sendSyncPostRequest(const QUrl& url, const QString &object
 // -------------------------------------------------------------------------- //
 int QnSessionManager::sendAsyncRequest(int operation, const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, QObject *target, const char *slot, Qt::ConnectionType connectionType) 
 {
+    //if you want receive response make sure you have event loop in calling thread
+    Q_ASSERT( qnHasEventLoop(QThread::currentThread()) || (!target) );
+    if( !qnHasEventLoop(QThread::currentThread()) && target )
+    {
+        NX_LOG( QString::fromLatin1("QnSessionManager::sendAsyncRequest. No event loop in current thread, "
+            "but response is awaited. target %1, slot %2").arg(target->objectName()).arg(QLatin1String(slot)), cl_logERROR );
+        std::cout<<"QnSessionManager::sendAsyncRequest. No event loop in current thread, "
+            "but response is awaited. target "<<target<<", slot "<<slot<<std::endl;
+    }
+
     AsyncRequestInfo reqInfo;
     reqInfo.handle = s_handle.fetchAndAddAcquire(1);
     reqInfo.object = target;
     reqInfo.slot = slot;
     reqInfo.connectionType = connectionType;
-    qDebug() << "send async request to" << url << data << params;
+   // qDebug() << "send async request to" << url << data << params;
     emit asyncRequestQueued(operation, reqInfo, url, objectName, headers, params, data);
     return reqInfo.handle;
 }
@@ -335,10 +349,10 @@ void QnSessionManager::at_asyncRequestQueued(int operation, AsyncRequestInfo req
     QNetworkRequest request;
     request.setUrl(createApiUrl(url, objectName, params));
 
-    qDebug() << "api url" << request.url();
+    //qDebug() << "api url" << request.url();
 
     bool skipContentType = false;
-    foreach (QnRequestHeader header, headers) {
+    foreach (const QnRequestHeader& header, headers) {
         if (header.first == QLatin1String("Content-Type"))
             skipContentType = true;
         request.setRawHeader(header.first.toLatin1(), header.second.toUtf8());

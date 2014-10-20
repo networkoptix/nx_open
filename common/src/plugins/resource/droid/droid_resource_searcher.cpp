@@ -96,7 +96,7 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
     }
 
     QnResourceList resList;
-    foreach(QnResourcePtr resPtr, result)
+    foreach(const QnResourcePtr& resPtr, result)
         resList << resPtr;
     return resList;
 }

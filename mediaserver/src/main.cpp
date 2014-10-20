@@ -170,6 +170,7 @@
 
 #include "version.h"
 #include "core/resource_management/resource_properties.h"
+#include "core/resource_management/status_dictionary.h"
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -225,7 +226,7 @@ public:
 #ifdef _DEBUG
             lit("DEBUG")
 #else
-            lit("WARNING")
+            lit("INFO")
 #endif
         ),
         msgLogLevel( lit("none") )
@@ -407,7 +408,7 @@ static QStringList listRecordFolders()
     //QString maxFreeSpaceDrive;
     //int maxFreeSpace = 0;
 
-    foreach (QFileInfo drive, QDir::drives()) {
+    foreach (const QFileInfo& drive, QDir::drives()) {
         if (!drive.isWritable())
             continue;
 
@@ -452,7 +453,7 @@ QnAbstractStorageResourceList createStorages(const QnMediaServerResourcePtr mSer
     QnAbstractStorageResourceList storages;
     //bool isBigStorageExist = false;
     qint64 bigStorageThreshold = 0;
-    foreach(QString folderPath, listRecordFolders()) 
+    foreach(const QString& folderPath, listRecordFolders()) 
     {
         if (!mServer->getStorageByUrl(folderPath).isNull())
             continue;
@@ -478,7 +479,7 @@ QnAbstractStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
 {
     QMap<QnUuid, QnAbstractStorageResourcePtr> result;
     // I've switched all patches to native separator to fix network patches like \\computer\share
-    foreach(QnAbstractStorageResourcePtr abstractStorage, mServer->getStorages())
+    foreach(const QnAbstractStorageResourcePtr& abstractStorage, mServer->getStorages())
     {
         QnStorageResourcePtr storage = abstractStorage.dynamicCast<QnStorageResource>();
         if (!storage)
@@ -495,7 +496,7 @@ QnAbstractStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
     }
 
     qint64 bigStorageThreshold = 0;
-    foreach(QnAbstractStorageResourcePtr abstractStorage, mServer->getStorages()) {
+    foreach(const QnAbstractStorageResourcePtr& abstractStorage, mServer->getStorages()) {
         QnStorageResourcePtr storage = abstractStorage.dynamicCast<QnStorageResource>();
         if (!storage)
             continue;
@@ -504,7 +505,7 @@ QnAbstractStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
     }
     bigStorageThreshold /= QnStorageManager::BIG_STORAGE_THRESHOLD_COEFF;
 
-    foreach(QnAbstractStorageResourcePtr abstractStorage, mServer->getStorages()) {
+    foreach(const QnAbstractStorageResourcePtr& abstractStorage, mServer->getStorages()) {
         QnStorageResourcePtr storage = abstractStorage.dynamicCast<QnStorageResource>();
         if (!storage)
             continue;
@@ -544,7 +545,7 @@ QnMediaServerResourcePtr QnMain::findServer(ec2::AbstractECConnectionPtr ec2Conn
         QnSleep::msleep(1000);
     }
 
-    foreach(QnMediaServerResourcePtr server, servers)
+    foreach(const QnMediaServerResourcePtr& server, servers)
     {
         *pm = server->getPanicMode();
         if (server->getId() == serverGuid())
@@ -941,6 +942,17 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
             }
         }
         QnResourceDiscoveryManager::instance()->registerManualCameras(manualCameras);
+
+        // read resource status
+        ec2::ApiResourceStatusDataList statusList;
+        while ((rez = ec2Connection->getResourceManager()->getStatusListSync(QnUuid(), &statusList)) != ec2::ErrorCode::ok)
+        {
+            NX_LOG( lit("QnMain::run(): Can't get properties dictionary. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
+        }
+        messageProcessor->processStatusList( statusList );
     }
 
     {
@@ -1092,7 +1104,7 @@ void QnMain::at_timer()
 {
     MSSettings::runTimeSettings()->setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
     QnResourcePtr mServer = qnResPool->getResourceById(qnCommon->moduleGUID());
-    foreach(QnResourcePtr res, qnResPool->getAllCameras(mServer))
+    foreach(const QnResourcePtr& res, qnResPool->getAllCameras(mServer))
     {
         QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
         if (cam)
@@ -1343,6 +1355,9 @@ void QnMain::run()
     ec2ConnectionFactory->setContext(resCtx);
     ec2::AbstractECConnectionPtr ec2Connection;
     QnConnectionInfo connectInfo;
+    QnResourcePropertyDictionary dictionary;
+    QnResourceStatusDiscionary statusDict;
+
     while (!needToStop())
     {
         const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync( QnAppServerConnectionFactory::url(), &ec2Connection );
@@ -1408,7 +1423,6 @@ void QnMain::run()
 
     QnCompatibilityChecker remoteChecker(connectInfo.compatibilityItems);
     QnCompatibilityChecker localChecker(localCompatibilityItems());
-    QnResourcePropertyDictionary dictionary;
 
     QnCompatibilityChecker* compatibilityChecker;
     if (remoteChecker.size() > localChecker.size())

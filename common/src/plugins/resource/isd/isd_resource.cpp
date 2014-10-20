@@ -165,7 +165,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
     vals = getValues(QLatin1String(fpses));
 
     QList<int> fpsList;
-    foreach(QString fpsS, vals)
+    foreach(const QString& fpsS, vals)
     {
         fpsList.push_back(fpsS.trimmed().toInt());
     }

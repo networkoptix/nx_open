@@ -183,7 +183,7 @@ void QnMServerResourceSearcher::run()
 void QnMServerResourceSearcher::updateSocketList()
 {
     deleteSocketList();
-    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
+    foreach (const QnInterfaceAndAddr& iface, getAllIPv4Interfaces())
     {
         UDPSocket* socket = new UDPSocket();
         QString localAddress = iface.address.toString();

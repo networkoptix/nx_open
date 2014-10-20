@@ -140,7 +140,7 @@ namespace aio
                     0,
                     nullptr )
             {
-                postHandler = std::move(_postHandler);
+                this->postHandler = std::move(_postHandler);
             }
         };
 
@@ -244,8 +244,7 @@ namespace aio
 
                     case TaskType::tChangingTimeout:
                     {
-                        void* userData = task.socket->impl()->getUserData(task.eventType);
-                        assert( userData );
+                        void* userData = task.socket->impl()->eventTypeToUserData[task.eventType];
                         AIOEventHandlingDataHolder<SocketType>* handlingData = reinterpret_cast<AIOEventHandlingDataHolder<SocketType>*>( userData );
                         //NOTE we are in aio thread currently
                         if( task.timeout > 0 )
@@ -267,15 +266,8 @@ namespace aio
                     }
 
                     case TaskType::tRemoving:
-                    {
-                        if( task.eventType == aio::etRead || task.eventType == aio::etWrite )
-                            pollSet.remove( task.socket, task.eventType );
-                        void*& userData = task.socket->impl()->getUserData(task.eventType);
-                        if( userData )
-                            delete static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData);
-                        userData = nullptr;
+                        removeSocketFromPollSet( task.socket, task.eventType );
                         break;
-                    }
 
                     case TaskType::tCallFunc:
                     {
@@ -313,7 +305,7 @@ namespace aio
                     NX_LOG(lit("Failed to add socket to pollset. %1").arg(SystemError::toString(errorCode)), cl_logWARNING);
                     return false;
                 }
-            socket->impl()->getUserData(eventType) = handlingData.get();
+            socket->impl()->eventTypeToUserData[eventType] = handlingData.get();
 
             if( timeout > 0 )
             {
@@ -328,6 +320,16 @@ namespace aio
             handlingData.release();
 
             return true;
+        }
+
+        void removeSocketFromPollSet( SocketType* sock, aio::EventType eventType )
+        {
+            void*& userData = sock->impl()->eventTypeToUserData[eventType];
+            if( userData )
+                delete static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData);
+            userData = nullptr;
+            if( eventType == aio::etRead || eventType == aio::etWrite )
+                pollSet.remove( sock, eventType );
         }
 
         void removeSocketsFromPollSet()
@@ -364,7 +366,7 @@ namespace aio
                     if( eventHandler != it->eventHandler )
                         continue;   //event handler changed, cannot ignore task
                     //cancelling remove task
-                    void* userData = sock->impl()->getUserData(eventType);
+                    void* userData = sock->impl()->eventTypeToUserData[eventType];
                     Q_ASSERT( userData );
                     static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData)->data->timeout = newTimeoutMS;
                     static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData)->data->markedForRemoval.store( 0 );
@@ -409,21 +411,41 @@ namespace aio
             for( typename PollSetType::const_iterator
                 it = pollSet.begin();
                 it != pollSet.end();
-                ++it )
+                 )
             {
+                SocketType* const socket = it.socket();
+                const aio::EventType sockEventType = it.eventType();
+                const aio::EventType handlerToInvokeType =
+                    socket->impl()->eventTypeToUserData[aio::etRead]
+                        ? aio::etRead
+                        : aio::etWrite;
+
+                //NOTE in case of error pollSet reports etError once, 
+                    //but two handlers may be registered for socket.
+                    //So, we must notify both
+
+                //TODO #ak notify second handler (if any) and if it not removed by first handler
+
                 //no need to lock aioServiceMutex, since data is removed in this thread only
-                std::shared_ptr<AIOEventHandlingData<SocketType>> handlingData = static_cast<AIOEventHandlingDataHolder<SocketType>*>(it.userData())->data;
+                std::shared_ptr<AIOEventHandlingData<SocketType>> handlingData = 
+                    static_cast<AIOEventHandlingDataHolder<SocketType>*>(
+                        socket->impl()->eventTypeToUserData[handlerToInvokeType])->data;
+
                 QMutexLocker lk( &mutex );
                 ++handlingData->beingProcessed;
                 //TODO #ak possibly some atomic fence is required here
                 if( handlingData->markedForRemoval.load(std::memory_order_relaxed) > 0 ) //socket has been removed from watch
                 {
                     --handlingData->beingProcessed;
+                    ++it;
                     continue;
                 }
-                handlingData->eventHandler->eventTriggered( it.socket(), it.eventType() );
+                ++it;
+                //eventTriggered is allowed to call removeFromWatch which can remove socket from pollset
+                handlingData->eventHandler->eventTriggered( socket, sockEventType );
+                //updating socket's periodic task (it's garanteed that there is periodic task for socket)
                 if( handlingData->timeout > 0 )
-                    handlingData->updatedPeriodicTaskClock = curClock + handlingData->timeout;      //updating socket's periodic task (it's garanteed that there is periodic task for socket)
+                    handlingData->updatedPeriodicTaskClock = curClock + handlingData->timeout;
                 --handlingData->beingProcessed;
             }
         }
@@ -513,8 +535,9 @@ namespace aio
         {
             while( !postedCalls.empty() )
             {
-                postedCalls.begin()->postHandler();
+                auto postHandler = std::move( postedCalls.begin()->postHandler );
                 postedCalls.erase( postedCalls.begin() );
+                postHandler();
             }
         }
 
@@ -547,7 +570,7 @@ namespace aio
                  )
             {
                 if( it->socket == sock && it->type == TaskType::tCallFunc )
-                    pollSetModificationQueue.erase( it++ );
+                    it = pollSetModificationQueue.erase( it );
                 else
                     ++it;
             }
@@ -560,7 +583,7 @@ namespace aio
                  )
             {
                 if( it->socket == sock )
-                    postedCalls.erase( it++ );
+                    it = postedCalls.erase( it );
                 else
                     ++it;
             }
@@ -610,15 +633,6 @@ namespace aio
         if( m_impl->removeReverseTask( sock, eventToWatch, TaskType::tAdding, eventHandler, timeoutMs ) )
             return true;    //ignoring task
 
-        if( !canAcceptSocket( sock ) )
-            return false;
-
-        //if( currentThreadSystemId() == systemThreadId() )
-        //{
-        //    //adding socket to pollset right away
-        //    return m_impl->addSockToPollset( sock, eventToWatch, timeoutMs, eventHandler );
-        //}
-
         m_impl->pollSetModificationQueue.push_back( typename AIOThreadImplType::SocketAddRemoveTask(
             TaskType::tAdding,
             sock,
@@ -652,16 +666,10 @@ namespace aio
         //    return true;    //ignoring task
 
         //if socket is marked for removal, not adding task
-        void* userData = sock->impl()->getUserData(eventToWatch);
+        void* userData = sock->impl()->eventTypeToUserData[eventToWatch];
         assert( userData != nullptr );  //socket is not polled, but someone wants to change timeout
         if( static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData)->data->markedForRemoval.load(std::memory_order_relaxed) > 0 )
             return true;   //socket marked for removal, ignoring timeout change (like, cancelling it right now)
-
-        //if( currentThreadSystemId() == systemThreadId() )
-        //{
-        //    //adding socket to pollset right away
-        //    return m_impl->addSockToPollset( sock, eventToWatch, timeoutMs, eventHandler );
-        //}
 
         m_impl->pollSetModificationQueue.push_back( typename AIOThreadImplType::SocketAddRemoveTask(
             TaskType::tChangingTimeout,
@@ -687,7 +695,7 @@ namespace aio
         if( m_impl->removeReverseTask( sock, eventType, TaskType::tRemoving, NULL, 0 ) )
             return true;    //ignoring task
 
-        void*& userData = sock->impl()->getUserData(eventType);
+        void*& userData = sock->impl()->eventTypeToUserData[eventType];
         if( userData == NULL )
             return false;   //socket is not polled. assert?
         std::shared_ptr<AIOEventHandlingData<SocketType>> handlingData = static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData)->data;
@@ -701,9 +709,7 @@ namespace aio
         if( inAIOThread )
         {
             //removing socket from pollset does not invalidate iterators (iterating pollset may be higher the stack)
-            m_impl->pollSet.remove( sock, eventType );
-            if( userData )
-                delete static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData);
+            m_impl->removeSocketFromPollSet( sock, eventType );
             userData = nullptr;
         }
         else if( waitForRunningHandlerCompletion )
@@ -774,7 +780,9 @@ namespace aio
     {
         if( currentThreadSystemId() == systemThreadId() )  //if called from this aio thread
         {
+            m_impl->aioServiceMutex->unlock();
             functor();
+            m_impl->aioServiceMutex->lock();
             return true;
         }
         //otherwise posting functor
@@ -824,13 +832,6 @@ namespace aio
         return m_impl->pollSet.size() + m_impl->newReadMonitorTaskCount + m_impl->newWriteMonitorTaskCount;
     }
 
-    //!Returns true, if can monitor one more socket for \a eventToWatch
-    template<class SocketType>
-    bool AIOThread<SocketType>::canAcceptSocket( SocketType* const sock ) const
-    {
-        return m_impl->pollSet.canAcceptSocket( sock );
-    }
-
     static const int ERROR_RESET_TIMEOUT = 1000;
 
     template<class SocketType>
@@ -846,6 +847,9 @@ namespace aio
             //making calls posted with post and dispatch
             m_impl->processPostedCalls();
 
+            //processing tasks that have been added from within \a processPostedCalls() call
+            m_impl->processPollSetModificationQueue( TaskType::tAll );
+
             qint64 curClock = getSystemTimerVal();
             //taking clock of the next periodic task
             qint64 nextPeriodicEventClock = 0;
@@ -859,7 +863,9 @@ namespace aio
                 ? aio::INFINITE_TIMEOUT    //no periodic task
                 : (nextPeriodicEventClock < curClock ? 0 : nextPeriodicEventClock - curClock);
 
-            const int triggeredSocketCount = m_impl->pollSet.poll( millisToTheNextPeriodicEvent );
+            //if there are posted calls, just checking sockets state in non-blocking mode
+            const int triggeredSocketCount = m_impl->pollSet.poll(
+                m_impl->postedCalls.empty() ? millisToTheNextPeriodicEvent : 0 );
 
             if( needToStop() )
                 break;

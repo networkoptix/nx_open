@@ -37,7 +37,7 @@ QnResourceList QnMdnsResourceSearcher::findResources()
             QHostAddress(localAddress),
             QHostAddress(remoteAddress) );
 
-        foreach(QnNetworkResourcePtr nresource, nresourceLst)
+        foreach(const QnNetworkResourcePtr& nresource, nresourceLst)
         {
             nresource->setHostAddress(remoteAddress);
             nresource->setDiscoveryAddr(QHostAddress(localAddress));

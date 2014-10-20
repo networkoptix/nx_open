@@ -30,8 +30,10 @@ namespace {
     }
 }
 
-int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) {
+int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner) 
+{
     Q_UNUSED(path)
+    Q_UNUSED(owner)
 
     QUrl url = params.value(lit("url"));
     QString password = params.value(lit("password"));
@@ -88,7 +90,10 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
         return CODE_OK;
     }
 
-    if (!isCompatible(qnCommon->engineVersion(), moduleInformation.version) || moduleInformation.customization != QnAppInfo::customizationName()) {
+    bool customizationOK = moduleInformation.customization == QnAppInfo::customizationName();
+    if (QnModuleFinder::instance()->isCompatibilityMode())
+        customizationOK = true;
+    if (!isCompatible(qnCommon->engineVersion(), moduleInformation.version) || !customizationOK) {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("INCOMPATIBLE"));
         return CODE_OK;
     }
