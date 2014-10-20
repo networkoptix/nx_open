@@ -121,12 +121,6 @@ QnPlDlinkResource::QnPlDlinkResource()
     setAuth(QLatin1String("admin"), QLatin1String(""));
 }
 
-
-bool QnPlDlinkResource::isResourceAccessible()
-{
-    return true;
-}
-
 QString QnPlDlinkResource::getDriverName() const
 {
     return MANUFACTURE;
@@ -201,7 +195,7 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
 
     m_camInfo.clear();
 
-    foreach(QString line, lines)
+    foreach(const QString& line, lines)
     {
         if (line.contains(QLatin1String("videos=")))
         {
@@ -241,7 +235,7 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
         else if (line.contains(QLatin1String("vbitrates=")))
         {
             QStringList vals = getValues(line);
-            foreach(QString bs, vals)
+            foreach(const QString& bs, vals)
             {
                 bool m = bs.toLower().contains(QLatin1Char('m'));
                 bool k = bs.toLower().contains(QLatin1Char('k'));
@@ -371,7 +365,7 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
     };
 
     int sensitivity = 50;
-    QnMotionRegion region = m_motionMaskList[0];
+    QnMotionRegion region = getMotionRegion(0);
     for (int sens = QnMotionRegion::MIN_SENSITIVITY+1; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
     {
 

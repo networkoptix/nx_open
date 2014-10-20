@@ -30,7 +30,7 @@ public:
     QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
 
     static CodecID toFFmpegCodecID( nxcip::CompressionType compressionType );
-    static QnAbstractMediaDataPtr readStreamReader( nxcip::StreamReader* streamReader );
+    static QnAbstractMediaDataPtr readStreamReader( nxcip::StreamReader* streamReader, int* errorCode = nullptr );
 
     //!Overrides QnLiveStreamProvider::onGotVideoFrame()
     virtual void onGotVideoFrame(const QnCompressedVideoDataPtr& videoData) override;

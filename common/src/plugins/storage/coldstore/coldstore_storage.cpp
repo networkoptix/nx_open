@@ -277,13 +277,13 @@ QFileInfoList QnPlColdStoreStorage::getFileList(const QString& dirName)
     QMutexLocker lock(&m_mutex);
     // also add files still open files 
     QFileInfoList result;
-    foreach(QString fn, m_listOfWritingFiles)
+    foreach(const QString& fn, m_listOfWritingFiles)
     {
         if (fileName2csFileName(fn) == csFileName) // check if open file belongs to this hour 
             result.push_back(QFileInfo(fn));
     }
 
-    //foreach(QString fn, m_listOfExistingFiles)
+    //foreach(const QString& fn, m_listOfExistingFiles)
     //    openlst.push_back(QFileInfo(fn));
 
 
@@ -293,7 +293,7 @@ QFileInfoList QnPlColdStoreStorage::getFileList(const QString& dirName)
     }
 
     /*
-    foreach(QFileInfo fi, result)
+    foreach(const QFileInfo& fi, result)
     {
         qWarning() << fi.absoluteFilePath();
     }
@@ -380,7 +380,7 @@ QnCSFileInfo QnPlColdStoreStorage::getFileInfo(const QString& fn)
 bool QnPlColdStoreStorage::hasOpenFilesFor(const QString& csFile) const
 {
     QMutexLocker lock(&m_mutex);
-    foreach(QString fn, m_listOfWritingFiles)
+    foreach(const QString& fn, m_listOfWritingFiles)
     {
         if (fileName2csFileName(fn) == csFile)
             return true;

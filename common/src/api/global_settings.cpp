@@ -8,6 +8,8 @@
 #include "resource_property_adaptor.h"
 
 #include <utils/common/app_info.h>
+#include <nx_ec/data/api_resource_data.h>
+
 
 namespace {
     QSet<QString> parseDisabledVendors(QString disabledVendors) {
@@ -145,9 +147,9 @@ void QnGlobalSettings::at_resourcePool_resourceRemoved(const QnResourcePtr &reso
         adaptor->setResource(QnResourcePtr());
 }
 
-QnKvPairList QnGlobalSettings::allSettings() const {
+ec2::ApiResourceParamDataList QnGlobalSettings::allSettings() const {
     if (!m_admin)
-        return QnKvPairList();
+        return ec2::ApiResourceParamDataList();
 
     return m_admin->getProperties();
 }

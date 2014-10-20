@@ -16,16 +16,14 @@
 #include <utils/common/model_functions_fwd.h>
 #include <utils/common/id.h>
 
-#include <core/datapacket/abstract_data_packet.h>
 #include <core/ptz/ptz_fwd.h>
 
 #include <common/common_globals.h>
-
+#include "resource_command_processor.h"
 #include "shared_resource_pointer.h"
 #include "resource_fwd.h"
 #include "resource_type.h"
 #include "param.h"
-#include "resource_command_processor.h"
 
 class QnAbstractStreamDataProvider;
 class QnResourceConsumer;
@@ -46,7 +44,6 @@ class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResourc
     Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(QString searchString READ toSearchString)
     Q_PROPERTY(QnUuid parentId READ getParentId WRITE setParentId)
-    Q_PROPERTY(Qn::ResourceStatus status READ getStatus WRITE setStatus)
     Q_PROPERTY(Qn::ResourceFlags flags READ flags WRITE setFlags)
     Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged)
     Q_PROPERTY(QDateTime lastDiscoveredTime READ getLastDiscoveredTime WRITE setLastDiscoveredTime)
@@ -106,7 +103,7 @@ public:
 
     //just a simple resource name
     virtual QString getName() const;
-    void setName(const QString& name);
+    virtual void setName(const QString& name);
 
 
     // this value is updated by discovery process
@@ -127,27 +124,26 @@ public:
 
     // ==================================================
 
-    QnParamList getResourceParamList() const; // returns params that can be changed on device level
+    //QnParamList getResourceParamList() const; // returns params that can be changed on device level
 
     bool hasParam(const QString &name) const;
 
     // return true if no error
-    bool getParam(const QString &name, QVariant &val, QnDomain domain) const;
+    //bool getParam(const QString &name, QVariant &val, QnDomain domain) const;
 
 #ifdef ENABLE_DATA_PROVIDERS
     // same as getParam is invoked in separate thread.
     // as soon as param changed parameterValueChanged() signal is emitted
-    void getParamAsync(const QString &name, QnDomain domain);
 #endif 
 
 
     // return true if no error
-    virtual bool setParam(const QString &name, const QVariant &val, QnDomain domain);
+    //virtual bool setParam(const QString &name, const QVariant &val, QnDomain domain);
 
 #ifdef ENABLE_DATA_PROVIDERS
     // same as setParam but but returns immediately;
     // this function leads setParam invoke in separate thread. so no need to make it virtual
-    void setParamAsync(const QString &name, const QVariant &val, QnDomain domain);
+    //void setParamAsync(const QString &name, const QVariant &val, QnDomain domain);
 #endif 
 
     // some time we can find resource, but cannot request additional information from it ( resource has bad ip for example )
@@ -195,15 +191,19 @@ public:
      * because of threading issues. */
 
     bool hasProperty(const QString &key) const;
-    QString getProperty(const QString &key, const QString &defaultValue = QString()) const;
-    void setProperty(const QString &key, const QString &value);
-    QnKvPairList getProperties() const;
+    QString getProperty(const QString &key) const;
+    void setProperty(const QString &key, const QString &value, bool markDirty = true);
+    void setProperty(const QString &key, const QVariant& value);
+    ec2::ApiResourceParamDataList getProperties() const;
+
+    //!Call this with proper field names to emit corresponding *changed signals. Signal can be defined in a derived class
+    void emitModificationSignals( const QSet<QByteArray>& modifiedFields );
 
     static QnInitResPool* initAsyncPoolInstance();
     static bool isStopping() { return m_appStopping; }
 
 signals:
-    void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param) const;
+    void parameterValueChanged(const QnResourcePtr &resource, const QString &param) const;
     void statusChanged(const QnResourcePtr &resource);
     void nameChanged(const QnResourcePtr &resource);
     void parentIdChanged(const QnResourcePtr &resource);
@@ -238,7 +238,7 @@ public:
     // this is thread to process commands like setparam
     static void startCommandProc();
     static void stopCommandProc();
-    static void addCommandToProc(const QnResourceCommandPtr &command);
+    static void addCommandToProc(const QSharedPointer<QnResourceCommand> &command);
     static int commandProcQueueSize();
 #endif
 
@@ -251,14 +251,13 @@ public:
 
     QnResourcePtr toSharedPointer() const;
 
+    virtual bool getParamPhysical(const QString &name, QVariant &val);
+    virtual bool setParamPhysical(const QString& name, const QVariant& value);
+    // should just do physical job ( network or so ) do not care about memory domain
+    void setParamPhysicalAsync(const QString &name, const QVariant &val);
+    void getParamPhysicalAsync(const QString &name);
 protected:
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields);
-
-    // should just do physical job ( network or so ) do not care about memory domain
-    virtual bool getParamPhysical(const QnParam &param, QVariant &val);
-    virtual bool setParamPhysical(const QnParam &param, const QVariant &val);
-
-    virtual bool setSpecialParam(const QString& name, const QVariant& val, QnDomain domain);
 
 #ifdef ENABLE_DATA_PROVIDERS
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role);
@@ -272,8 +271,6 @@ protected:
         Inherited class implementation MUST call base class method first
     */
     virtual void initializationDone();
-
-    virtual void parameterValueChangedNotify(const QnParam &param);
 private:
     /* The following consumer-related API is private as it is supposed to be used from QnResourceConsumer instances only.
      * Using it from other places may break invariants. */
@@ -286,7 +283,9 @@ private:
 
     void updateUrlName(const QString &oldUrl, const QString &newUrl);
     bool emitDynamicSignal(const char *signal, void **arguments);
-    void afterUpdateInner(QSet<QByteArray>& modifiedFields);
+    void afterUpdateInner(const QSet<QByteArray>& modifiedFields);
+    void emitPropertyChanged(const QString& key);
+    void doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus);
 
     friend class InitAsyncTask;
 
@@ -300,8 +299,6 @@ protected:
     /** Mutex that is to be used when accessing resource fields. */
     mutable QMutex m_mutex;
     QMutex m_initMutex;
-
-    mutable QnParamList m_resourceParamList;
 
     static bool m_appStopping;
 
@@ -326,17 +323,10 @@ private:
     /** Flags of this resource that determine its type. */
     Qn::ResourceFlags m_flags;
     
-
-    /** Status of this resource. */
-    Qn::ResourceStatus m_status;
-
     QDateTime m_lastDiscoveredTime;
     QDateTime m_lastStatusUpdateTime;
 
     QStringList m_tags;
-
-    /** Additional values aka kvPairs. */
-    QHash<QString, QString> m_propertyByKey;
 
     bool m_initialized;    
     QMutex m_initAsyncMutex;
@@ -346,6 +336,8 @@ private:
     CameraDiagnostics::Result m_prevInitializationResult;
     CameraDiagnostics::Result m_lastMediaIssue;
     QAtomicInt m_initializationAttemptCount;
+    //!map<key, <value, isDirty>>
+    std::map<QString, std::pair<QString, bool> > m_locallySavedProperties;
 };
 
 template<class Resource>

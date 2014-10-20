@@ -467,6 +467,7 @@ qint64 QnLayoutFileStorageResource::getFileOffset(const QString& fileName, qint6
 
 void QnLayoutFileStorageResource::setUrl(const QString& value)
 {
+    setId(QnUuid::createUuid());
     QnStorageResource::setUrl(value);
     if (value.endsWith(QLatin1String(".exe")) || value.endsWith(QLatin1String(".exe.tmp")))
     {

@@ -80,12 +80,6 @@ namespace aio
         void cancelPostedCalls( SocketType* const sock, bool waitForRunningHandlerCompletion );
         //!Returns number of sockets handled by this object
         size_t socketsHandled() const;
-        //!Returns true, if can accept socket \a sock for monitoring
-        /*!
-            \note This method is required only because \a select is used on win32. On linux and mac this method always returns \a true
-            \todo remove this method after moving windows implementation to IO Completion Ports
-        */
-        bool canAcceptSocket( SocketType* const sock ) const;
 
     protected:
         //!Implementation of QThread::run

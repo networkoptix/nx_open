@@ -112,10 +112,6 @@ public:
      * \returns                         Size of the file, or 0 if the file does not exist.
      */
     virtual qint64 getFileSize(const QString& url) const = 0;
-
-public:
-    virtual void setUrl(const QString& value);
-
 protected:
     //qint64 m_writedSpace;
 

@@ -119,7 +119,7 @@ void QnMediaServerStatisticsStorage::at_statisticsReceived(int status, const QnS
     }
 
     QSet<QString> notUpdated;
-    foreach(QString key, m_history.keys())
+    foreach(const QString& key, m_history.keys())
         notUpdated << key;
 
     m_uptimeMs = reply.uptimeMs;
@@ -141,7 +141,7 @@ void QnMediaServerStatisticsStorage::at_statisticsReceived(int status, const QnS
         normalizeValuesList(stats.values, m_pointsLimit);
     }
 
-    foreach(QString id, notUpdated) {
+    foreach(const QString& id, notUpdated) {
         QnStatisticsData &stats = m_history[id];
         stats.values.append(noDataValue);
         normalizeValuesList(stats.values, m_pointsLimit);

@@ -155,7 +155,7 @@ void QnFileDeletor::processPostponedFiles()
     QFile tmpFile(m_mediaRoot + QLatin1String("tmp.csv"));
     if (!tmpFile.open(QFile::WriteOnly | QFile::Truncate))
         return;
-    foreach(QString fileName, newList)
+    foreach(const QString& fileName, newList)
     {
         tmpFile.write(fileName.toUtf8());
         tmpFile.write("\n");

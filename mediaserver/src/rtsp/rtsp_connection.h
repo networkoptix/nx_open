@@ -5,11 +5,12 @@
 #include <QtCore/QMutex>
 #include "utils/network/ffmpeg_sdp.h"
 #include "utils/network/tcp_connection_processor.h"
-#include "core/resource/media_resource.h"
+#include <core/resource/resource_fwd.h>
 #include "core/datapacket/media_data_packet.h"
 #include "rtsp/rtsp_encoder.h"
 
 class QnAbstractStreamDataProvider;
+class QnResourceVideoLayout;
 
 struct RtspServerTrackInfo
 {
@@ -101,11 +102,11 @@ private:
     void connectToLiveDataProviders();
     //QnAbstractMediaStreamDataProvider* getLiveDp();
     void setQualityInternal(MediaQuality quality);
-    QnRtspEncoderPtr createEncoderByMediaData(QnConstAbstractMediaDataPtr media, QSize resolution, QnConstResourceVideoLayoutPtr vLayout);
+    QnRtspEncoderPtr createEncoderByMediaData(QnConstAbstractMediaDataPtr media, QSize resolution, QSharedPointer<const QnResourceVideoLayout> vLayout);
     QnConstAbstractMediaDataPtr getCameraData(QnAbstractMediaData::DataType dataType);
     static int isFullBinaryMessage(const QByteArray& data);
     void processBinaryRequest();
-    void createPredefinedTracks(QnConstResourceVideoLayoutPtr videoLayout);
+    void createPredefinedTracks(QSharedPointer<const QnResourceVideoLayout> videoLayout);
 
 private:
     Q_DECLARE_PRIVATE(QnRtspConnectionProcessor);

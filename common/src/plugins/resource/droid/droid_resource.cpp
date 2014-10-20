@@ -16,11 +16,6 @@ int QnDroidResource::getMaxFps() const
     return 30;
 }
 
-bool QnDroidResource::isResourceAccessible()
-{
-    return true;
-}
-
 QString QnDroidResource::getDriverName() const
 {
     return MANUFACTURE;
@@ -47,9 +42,8 @@ QString QnDroidResource::getHostAddress() const
         return QString();
 }
 
-bool QnDroidResource::setHostAddress(const QString &/*ip*/, QnDomain /*domain*/)
+void QnDroidResource::setHostAddress(const QString &/*ip*/)
 {
-    return false;
 }
 
 #endif //#ifdef ENABLE_DROID

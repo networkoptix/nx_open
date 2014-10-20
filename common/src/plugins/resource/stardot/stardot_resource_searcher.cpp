@@ -29,7 +29,7 @@ QnResourceList QnStardotResourceSearcher::findResources()
 {
     QnResourceList result;
 
-    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
+    foreach (const QnInterfaceAndAddr& iface, getAllIPv4Interfaces())
     {
         if (shouldStop())
             return QnResourceList();
@@ -103,7 +103,7 @@ QnResourceList QnStardotResourceSearcher::findResources()
                     continue;
                 resource->setTypeId(typeId);
 
-                resource->setHostAddress(sender, QnDomainMemory);
+                resource->setHostAddress(sender);
                 resource->setMAC(QnMacAddress(mac));
                 resource->setDiscoveryAddr(iface.address);
                 resource->setModel(QLatin1String(model));
@@ -122,7 +122,7 @@ QnResourceList QnStardotResourceSearcher::findResources()
 
 
                 bool need_to_continue = false;
-                foreach(QnResourcePtr res, result)
+                foreach(const QnResourcePtr& res, result)
                 {
                     if (res->getUniqueId() == resource->getUniqueId())
                     {
@@ -241,7 +241,7 @@ QList<QnResourcePtr> QnStardotResourceSearcher::checkHostAddr(const QUrl& url, c
     res->setName(model);
     res->setModel(model);
     res->setMAC(QnMacAddress(mac));
-    res->setHostAddress(host, QnDomainMemory);
+    res->setHostAddress(host);
     res->setAuth(auth);
 
     QList<QnResourcePtr> resList;

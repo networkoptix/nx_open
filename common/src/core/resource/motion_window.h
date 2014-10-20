@@ -9,7 +9,7 @@
 
 
 /*!
-    Copy-constructor and assingment operator perform deep-copy of object 
+    Copy-constructor and assignment operator perform deep-copy of object 
     Problem with QRegion is that cannot be used with object's shallow copies safely in multiple threads simultaneously 
     because \a QRegion::rects() const method is not thread-safe (due to call to \a QRegionPrivate::vectorize function)
 */
@@ -56,7 +56,12 @@ class QnMotionRegion
 {
 public:
     // TODO: #Elric #enum btw, associated API is also totally evil
-    enum RegionValid{VALID, WINDOWS, MASKS, SENS};
+    enum class ErrorCode {
+        Ok,
+        Windows,
+        Masks,
+        Sens
+    };
 
     QnMotionRegion();
     QnMotionRegion( const QnMotionRegion& );
@@ -68,12 +73,12 @@ public:
     static const int MAX_SENSITIVITY = 9; // max motion sensitivity
 
     /** 
-    * \returns WINDOWS if sum of rects in all regions in range [1..MAX] greater than maxRectCount
-    * \returns MASKS if sum of rects in motionMask region (index 0) greater than maxMaskRects OR
-    * \returns SENS number of regions with at least 1 rect is greater than maxMotionSens
-    * \returns VALID otherwise
+    * \returns Windows if sum of rects in all regions in range [1..MAX] greater than maxRectCount
+    * \returns Masks if sum of rects in motionMask region (index 0) greater than maxMaskRects OR
+    * \returns Sens number of regions with at least 1 rect is greater than maxMotionSens
+    * \returns Ok otherwise
      */
-    RegionValid isValid(int maxMotionRects, int maxMaskRects, int maxMotionSens) const;
+    ErrorCode isValid(int maxMotionRects, int maxMaskRects, int maxMotionSens) const;
 
     bool operator==(const QnMotionRegion& other) const;
     bool operator!=(const QnMotionRegion& other) const;

@@ -37,11 +37,6 @@ int QnPlVmax480Resource::getMaxFps() const
     return 30;
 }
 
-bool QnPlVmax480Resource::isResourceAccessible() 
-{
-    return true;
-}
-
 QString QnPlVmax480Resource::getDriverName() const 
 {
     return MANUFACTURE;
@@ -53,15 +48,14 @@ void QnPlVmax480Resource::setIframeDistance(int frames, int timems)
     Q_UNUSED(timems)
 }
 
-bool QnPlVmax480Resource::setHostAddress(const QString &ip, QnDomain domain) 
+void QnPlVmax480Resource::setHostAddress(const QString &ip) 
 {
     QString oldHostAddr = getHostAddress();
 
-    Q_UNUSED(domain)
     QUrl url(getUrl());
 
     if (url.host() == ip)
-        return true;
+        return;
 
     url.setHost(ip);
     setUrl(url.toString());
@@ -73,8 +67,6 @@ bool QnPlVmax480Resource::setHostAddress(const QString &ip, QnDomain domain)
             m_chunkReaderMap.insert(getHostAddress(), m_chunkReader);
         }
     }
-
-    return true;
 }
 
 int QnPlVmax480Resource::channelNum() const

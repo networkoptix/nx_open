@@ -235,6 +235,7 @@ void QnMulticastModuleFinder::run() {
     if (!searchRequest.serialize(&searchPacketBufStart, searchPacket + sizeof(searchPacket)))
         Q_ASSERT(false);
 
+    //TODO #ak currently PollSet is designed for internal usage in aio, that's why we have to use socket->implementationDelegate()
     foreach (UDPSocket *socket, m_clientSockets) {
         if( !m_pollSet.add( socket->implementationDelegate(), aio::etRead, socket ) )
             Q_ASSERT(false);

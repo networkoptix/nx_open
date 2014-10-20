@@ -51,14 +51,20 @@ void QnServerConnector::at_moduleFinder_moduleUrlLost(const QnModuleInformation 
 }
 
 void QnServerConnector::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation) {
-    if (moduleInformation.isCompatibleToCurrentSystem())
-        return;
-
-    foreach (const QString &address, moduleInformation.remoteAddresses) {
-        QUrl url;
-        url.setHost(address);
-        url.setPort(moduleInformation.port);
-        removeConnection(moduleInformation, url);
+    if (moduleInformation.isCompatibleToCurrentSystem()) {
+        foreach (const QString &address, moduleInformation.remoteAddresses) {
+            QUrl url;
+            url.setHost(address);
+            url.setPort(moduleInformation.port);
+            addConnection(moduleInformation, url);
+        }
+    } else {
+        foreach (const QString &address, moduleInformation.remoteAddresses) {
+            QUrl url;
+            url.setHost(address);
+            url.setPort(moduleInformation.port);
+            removeConnection(moduleInformation, url);
+        }
     }
 }
 

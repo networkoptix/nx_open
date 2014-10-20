@@ -8,6 +8,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/user_resource.h>
 
 #include <ui/actions/actions.h>
@@ -23,6 +24,7 @@
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/license_usage_helper.h>
+#include "core/resource_management/resource_properties.h"
 
 QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     base_type(parent),
@@ -52,22 +54,24 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     layout->addWidget(m_settingsWidget);
     layout->addWidget(m_buttonBox);
 
-    connect(m_buttonBox,        SIGNAL(accepted()),                 this,   SLOT(acceptIfSafe()));
+    //connect(m_buttonBox,        &QDialogButtonBox::accepted,        this,   &QnCameraSettingsDialog::acceptIfSafe);
 
-    connect(m_settingsWidget,   SIGNAL(hasChangesChanged()),        this,   SLOT(at_settingsWidget_hasChangesChanged()));
-    connect(m_settingsWidget,   SIGNAL(modeChanged()),              this,   SLOT(at_settingsWidget_modeChanged()));
-    connect(m_settingsWidget,   SIGNAL(advancedSettingChanged()),   this,   SLOT(at_advancedSettingChanged()));
+    connect(m_settingsWidget,   &QnCameraSettingsWidget::hasChangesChanged,         this,   &QnCameraSettingsDialog::at_settingsWidget_hasChangesChanged);
+    connect(m_settingsWidget,   &QnCameraSettingsWidget::modeChanged,               this,   &QnCameraSettingsDialog::at_settingsWidget_modeChanged);
+    connect(m_settingsWidget,   &QnCameraSettingsWidget::advancedSettingChanged,    this,   &QnCameraSettingsDialog::at_advancedSettingChanged);
     
     connect(m_openButton,       &QPushButton::clicked,              this,   &QnCameraSettingsDialog::at_openButton_clicked);
     connect(m_diagnoseButton,   &QPushButton::clicked,              this,   &QnCameraSettingsDialog::at_diagnoseButton_clicked);
     connect(m_rulesButton,      &QPushButton::clicked,              this,   &QnCameraSettingsDialog::at_rulesButton_clicked);
 
     connect(m_settingsWidget,   &QnCameraSettingsWidget::scheduleExported, this,    &QnCameraSettingsDialog::saveCameras);
-    connect(m_settingsWidget,   &QnCameraSettingsWidget::resourcesChanged,  this,   &QnCameraSettingsDialog::updateReadOnly);
+    connect(m_settingsWidget,   &QnCameraSettingsWidget::resourcesChanged, this,   &QnCameraSettingsDialog::updateReadOnly);
     
-    connect(context(),          &QnWorkbenchContext::userChanged,           this,   &QnCameraSettingsDialog::updateReadOnly);
+    connect(context(),          &QnWorkbenchContext::userChanged,          this,   &QnCameraSettingsDialog::updateReadOnly);
 
     connect(action(Qn::SelectionChangeAction),  &QAction::triggered,    this,   &QnCameraSettingsDialog::at_selectionChangeAction_triggered);
+
+    connect(propertyDictionary, &QnResourcePropertyDictionary::asyncSaveDone, this, &QnCameraSettingsDialog::at_cameras_properties_saved);
 
     at_settingsWidget_hasChangesChanged();
 }
@@ -249,15 +253,24 @@ void QnCameraSettingsDialog::at_cameras_saved(ec2::ErrorCode errorCode, const Qn
         QDialogButtonBox::Ok);
 }
 
+void QnCameraSettingsDialog::at_cameras_properties_saved(int requestId, ec2::ErrorCode errorCode) 
+{
+    if( errorCode == ec2::ErrorCode::ok )
+        return;
+}
+
 void QnCameraSettingsDialog::saveCameras(const QnVirtualCameraResourceList &cameras) {
     if (cameras.isEmpty())
         return;
-
-    QnAppServerConnectionFactory::getConnection2()->getCameraManager()->save( cameras, this,
+    QList<QnUuid> idList = idListFromResList(cameras);
+    QnAppServerConnectionFactory::getConnection2()->getCameraManager()->saveUserAttributes(
+        QnCameraUserAttributePool::instance()->getAttributesList(idList),
+        this,
         [this, cameras]( int reqID, ec2::ErrorCode errorCode ) {
             Q_UNUSED(reqID);
             at_cameras_saved(errorCode, cameras); 
     } );
+    propertyDictionary->saveParamsAsync(idList);
 }
 
 void QnCameraSettingsDialog::saveAdvancedCameraSettingsAsync(const QnVirtualCameraResourceList &cameras) {
