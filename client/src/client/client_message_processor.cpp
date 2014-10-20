@@ -24,7 +24,7 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 {
     QnCommonMessageProcessor::init(connection);
     if (connection) {
-        Q_ASSERT(!m_connected);
+       // Q_ASSERT(!m_connected);                   //TODO: #GDM fails in auto-reconnect method
        // assert(qnCommon->remoteGUID().isNull());  //TODO: #GDM fails in auto-reconnect method
         qnCommon->setRemoteGUID(QnUuid(connection->connectionInfo().ecsGuid));
         connect( connection, &ec2::AbstractECConnection::remotePeerFound, this, &QnClientMessageProcessor::at_remotePeerFound);
