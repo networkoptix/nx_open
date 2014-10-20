@@ -554,6 +554,7 @@ QnConstResourceAudioLayoutPtr QnMulticodecRtpReader::getAudioLayout() const
 void QnMulticodecRtpReader::pleaseStop()
 {
     m_pleaseStop = true;
+    m_RtpSession.stop();
 }
 
 void QnMulticodecRtpReader::setDefaultTransport( const RtpTransport::Value& _defaultTransportToUse )

@@ -20,24 +20,35 @@
                 <meta name="viewport" content="width=device-width"/>
                 <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
                 <link rel="stylesheet" href="styles/29403685.vendor.css"/>
-                <!-- build:css({.tmp,app}) styles/main.css -->
-                <link rel="stylesheet" href="styles/2ffdb355.main.css"/>
+
+                <link rel="stylesheet" href="styles/319f00fb.main.css"/>
+
+                <link rel="stylesheet" href="customization/styles.css"/>
             </head>
             <body>
-                <div class="container">
-                    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-                        <div class="container">
-                            <div class="navbar-header">
-                                <h1>HD Witness <small>API Reference</small>
-                                </h1>
-                            </div>
+                <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
+                    <div class="container">
+                        <div class="navbar-header">
+                            <a class="navbar-brand" data-toggle="tooltip" data-placement="bottom" >
+                                <img src="customization/hdw_logo.png" height="48"/>
+                                API Reference
+                            </a>
                         </div>
-                    </nav> <div class="row">
+                        <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+                            <ul class="nav navbar-nav navbar-right">
+                                <li ><a href="index.html">Web. administration</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </header>
+
+                <div class="container">
+                    <div class="row">
                         <nav class="col-xs-4 bs-docs-sidebar">
                             <ul class="nav nav-stacked fixed" id="sidebar">
                                 <xsl:for-each select="/apidoc/groups/group">
                                     <xsl:variable name="groupName"
-                                        select="translate(groupName, ' ', '_')"/>
+                                        select="translate(groupName, ' ()', '___')"/>
                                     <xsl:variable name="urlPrefix" select="urlPrefix"/>
                                     <li>
                                         <a>
@@ -66,7 +77,7 @@
                         </nav> <div class="col-xs-8">
                             <xsl:for-each select="apidoc/groups/group">
                                 <xsl:variable name="groupName"
-                                    select="translate(groupName, ' ', '_')"/>
+                                    select="translate(groupName, ' ()', '___')"/>
                                 <xsl:variable name="urlPrefix" select="urlPrefix"/>
                                 <section style="padding-top: 40px; margin-top: -40px;">
                                     <xsl:attribute name="id">group_<xsl:value-of select="$groupName"
@@ -148,12 +159,14 @@
                                     </xsl:for-each> </section> </xsl:for-each>
                         </div>
                     </div> </div>
-            </body> <script src="bower_components/jquery/jquery.js"/>
-            <script src="bower_components/sass-bootstrap/dist/js/bootstrap.js"/>
-            <script src="bower_components/jquery-scrollspy-thesmart/scrollspy.js"/>
+            </body>
+
+
+            <script src="scripts/5ed9c348.api_documentation.js"></script>
+
             <script>
-                $(function () { 
-                    $("[data-toggle='tooltip']").tooltip(); 
+                $(function () {
+                    //$("[data-toggle='tooltip']").tooltip();
 
                     $('body').scrollspy({
                         target: '.bs-docs-sidebar',

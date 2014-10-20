@@ -90,7 +90,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>${init.python.dir}/python</executable>
+                            <executable>${init.python.dir}/${python.executable}</executable>
                             <arguments>
                                 <argument>${project.build.directory}/gen_resources.py</argument>
                             </arguments>
@@ -104,7 +104,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>${init.python.dir}/python</executable>
+                            <executable>${init.python.dir}/${python.executable}</executable>
                             <arguments>
                                 <argument>build-prepare.py</argument>
                             </arguments>
@@ -118,7 +118,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>${init.python.dir}/python</executable>
+                            <executable>${init.python.dir}/${python.executable}</executable>
                             <arguments>
                                 <argument>${project.build.directory}/build.py</argument>
                             </arguments>                                    

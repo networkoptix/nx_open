@@ -38,7 +38,8 @@ namespace {
     }
 
     QDir getUpdateDir(const QString &updateId) {
-        QString id = updateId.mid(1, updateId.length() - 2);
+        QUuid uuid(updateId);
+        QString id = uuid.isNull() ? updateId : updateId.mid(1, updateId.length() - 2);
         QDir dir = getUpdatesDir();
         if (!dir.exists(id))
             dir.mkdir(id);
@@ -95,7 +96,7 @@ bool QnServerUpdateTool::processUpdate(const QString &updateId, QIODevice *ioDev
         m_zipExtractor->extractZip();
         bool ok = m_zipExtractor->error() == QnZipExtractor::Ok;
         if (ok) {
-            NX_LOG(lit("Update package has been extracted to %1").arg(getUpdateDir(m_updateId).path()), cl_logINFO);
+            NX_LOG(lit("Update package has been extracted to %1").arg(getUpdateDir(updateId).path()), cl_logINFO);
         } else {
             NX_LOG(lit("Could not extract update package. Error message: %1").arg(QnZipExtractor::errorToString(static_cast<QnZipExtractor::Error>(m_zipExtractor->error()))), cl_logWARNING);
         }

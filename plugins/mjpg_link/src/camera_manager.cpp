@@ -93,6 +93,8 @@ void CameraManager::setCredentials( const char* username, const char* password )
 {
     strncpy( m_info.defaultLogin, username, sizeof(m_info.defaultLogin)-1 );
     strncpy( m_info.defaultPassword, password, sizeof(m_info.defaultPassword)-1 );
+    if( m_encoder )
+        m_encoder->updateCameraInfo( m_info );
 }
 
 //!Implementation of nxcip::BaseCameraManager::setAudioEnabled

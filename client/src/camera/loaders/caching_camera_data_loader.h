@@ -14,12 +14,15 @@
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
 
+#include <utils/common/connective.h>
+
 class QnAbstractCameraDataLoader;
 
-class QnCachingCameraDataLoader: public QObject {
+class QnCachingCameraDataLoader: public Connective<QObject> {
     Q_OBJECT;
     Q_PROPERTY(qreal loadingMargin READ loadingMargin WRITE setLoadingMargin);
-
+    
+    typedef Connective<QObject> base_type;
 public:
     QnCachingCameraDataLoader(const QnResourcePtr &networkResource, QObject *parent = NULL);
     virtual ~QnCachingCameraDataLoader();
@@ -60,9 +63,9 @@ signals:
     void loadingFailed();
 
 private slots:
-    void at_loader_ready(const QnAbstractCameraDataPtr &timePeriods, int handle);
-    void at_loader_failed(int status, int handle);
-    void at_syncTime_timeChanged();
+    void at_loader_ready(const QnAbstractCameraDataPtr &timePeriods, Qn::CameraDataType dataType);
+    void at_loader_failed(Qn::CameraDataType dataType);
+    void discardCachedData();
 
 protected:
     void load(Qn::CameraDataType type, const QnTimePeriod &targetPeriod, const qint64 resolutionMs = 1);
@@ -97,7 +100,6 @@ private:
     QnBookmarkCameraData m_bookmarkCameraData;
 
     QnAbstractCameraDataLoader *m_loaders[Qn::CameraDataTypeCount];
-    int m_handles[Qn::CameraDataTypeCount];
 
     QList<QRegion> m_motionRegions;
     QString m_bookmarksTextFilter;

@@ -433,7 +433,7 @@ bool QnResourceDiscoveryManager::registerManualCameras(const QnManualCameraInfoM
 void QnResourceDiscoveryManager::onInitAsyncFinished(const QnResourcePtr& res, bool initialized)
 {
     QnNetworkResource* rpNetRes = dynamic_cast<QnNetworkResource*>(res.data());
-    if (initialized && rpNetRes)
+    if (initialized && rpNetRes && !rpNetRes->hasFlags(Qn::desktop_camera))
     {
         if (rpNetRes->getStatus() == Qn::Offline || rpNetRes->getStatus() == Qn::Unauthorized)
             rpNetRes->setStatus(Qn::Online);

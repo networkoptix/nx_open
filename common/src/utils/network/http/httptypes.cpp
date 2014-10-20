@@ -182,8 +182,8 @@ namespace nx_http
             return true;
         }
 
-        //skipping whitespaces after headerValue
-        const size_t headerValueEnd = find_last_not_of( data, " ", headerValueStart );
+        //skipping separators after headerValue
+        const size_t headerValueEnd = find_last_not_of( data, " \n\r", headerValueStart );
         if( headerValueEnd == BufferNpos )
             return false;
 
@@ -323,6 +323,7 @@ namespace nx_http
         *dstBuffer += method;
         *dstBuffer += " ";
         *dstBuffer += url.toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters).toLatin1();
+        *dstBuffer += urlPostfix;
         *dstBuffer += " ";
         version.serialize( dstBuffer );
         *dstBuffer += "\r\n";

@@ -339,6 +339,14 @@
 
     "QnShadowItem": {
         "color": "#00000000"
+    },
+    
+    "QnServerUpdatesModel": {
+        "colors": {
+            "latest": "#006600",
+            "target": "#FF9966",
+            "error": "#CC0000"
+        }    
     }
 
 }

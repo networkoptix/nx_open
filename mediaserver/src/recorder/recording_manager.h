@@ -85,6 +85,7 @@ private:
     QMap<QnSecurityCamResourcePtr, qint64> m_delayedStop;
     ec2::QnDistributedMutex* m_licenseMutex;
     int m_tooManyRecordingCnt;
+    qint64 m_recordingStopTime;
 };
 
 class QnServerDataProviderFactory: public QnDataProviderFactory

@@ -64,7 +64,8 @@ public:
         ControlPtz                  = 0x0100,   /**< Whether PTZ state can be controlled with mouse. */
         ControlZoomWindow           = 0x0200,   /**< Whether zoom windows can be created by dragging the mouse. */
 
-        WindowRotationForbidden     = 0x1000
+        WindowRotationForbidden     = 0x1000,
+        SyncPlayForbidden           = 0x2000,   /**< Whether SyncPlay is forbidden for this widget. */
     };
     Q_DECLARE_FLAGS(Options, Option)
 
@@ -438,6 +439,7 @@ typedef QList<QnResourceWidget *> QnResourceWidgetList;
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Options)
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Buttons)
+Q_DECLARE_METATYPE(QnResourceWidget::Options)
 Q_DECLARE_METATYPE(QnResourceWidget *)
 Q_DECLARE_METATYPE(QnResourceWidgetList);
 

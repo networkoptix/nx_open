@@ -5,6 +5,7 @@
 
 #include <atomic>
 
+#include <platform/win32_syscall_resolver.h>
 #include <utils/common/systemerror.h>
 #include <utils/common/warnings.h>
 #include <utils/network/ssl_socket.h>
@@ -19,8 +20,9 @@
 
 #include <QtCore/QElapsedTimer>
 
-#include "utils/common/log.h"
 #include "aio/async_socket_helper.h"
+#include "compat_poll.h"
+#include "utils/common/log.h"
 
 
 #ifdef Q_OS_WIN
@@ -29,8 +31,6 @@ static_assert(boost::is_same<AbstractSocket::SOCKET_HANDLE, SOCKET>::value, "Inv
 typedef int socklen_t;
 typedef char raw_type;       // Type used for raw data on this platform
 #else
-#include <poll.h>
-//#include <sys/select.h>
 #include <sys/types.h>       // For data types
 #include <sys/socket.h>      // For socket(), connect(), send(), and recv()
 #include <netdb.h>           // For getaddrinfo()
@@ -346,6 +346,16 @@ bool Socket::getLastError( SystemError::ErrorCode* errorCode )
 AbstractSocket::SOCKET_HANDLE Socket::handle() const
 {
     return m_socketHandle;
+}
+
+bool Socket::postImpl( std::function<void()>&& handler )
+{
+    return aio::AIOService::instance()->post( this, std::move(handler) );
+}
+
+bool Socket::dispatchImpl( std::function<void()>&& handler )
+{
+    return aio::AIOService::instance()->dispatch( this, std::move(handler) );
 }
 
 
@@ -959,6 +969,16 @@ bool TCPSocket::getNoDelay( bool* value )
 bool TCPSocket::toggleStatisticsCollection( bool val )
 {
 #ifdef _WIN32
+    //dynamically resolving functions that require win >= vista we want to use here
+    typedef decltype(&SetPerTcpConnectionEStats) SetPerTcpConnectionEStatsType;
+    static SetPerTcpConnectionEStatsType SetPerTcpConnectionEStatsAddr =
+        Win32FuncResolver::instance()->resolveFunction<SetPerTcpConnectionEStatsType>
+            ( L"Iphlpapi.dll", "SetPerTcpConnectionEStats" );
+
+    if( SetPerTcpConnectionEStatsAddr == NULL )
+        return false;
+
+
     Win32TcpSocketImpl* d = static_cast<Win32TcpSocketImpl*>(m_implDelegate.impl());
 
     if( GetTcpRow(
@@ -982,7 +1002,7 @@ bool TCPSocket::toggleStatisticsCollection( bool val )
     memset( pathRW.get(), 0, sizeof(*pathRW) ); // zero the buffer
     pathRW->EnableCollection = val ? TRUE : FALSE;
     //enabling statistics collection
-    if( SetPerTcpConnectionEStats(
+    if( SetPerTcpConnectionEStatsAddr(
             &d->win32TcpTableRow,
             TcpConnectionEstatsPath,
             (UCHAR*)pathRW.get(), 0, sizeof(*pathRW),
@@ -1044,19 +1064,11 @@ static int acceptWithTimeout( int m_socketHandle, int timeoutMillis = DEFAULT_AC
     int result = 0;
 
 #ifdef _WIN32
-    fd_set read_set;
-    FD_ZERO( &read_set );
-    FD_SET( m_socketHandle, &read_set );
-
-    fd_set except_set;
-    FD_ZERO( &except_set );
-    FD_SET( m_socketHandle, &except_set );
-
-    struct timeval timeout;
-    timeout.tv_sec = 0;
-    timeout.tv_usec = timeoutMillis * 1000;
-
-    result = ::select( m_socketHandle + 1, &read_set, NULL, &except_set, &timeout );
+    struct pollfd fds[1];
+    memset( fds, 0, sizeof(fds) );
+    fds[0].fd = m_socketHandle;
+    fds[0].events |= POLLIN;
+    result = poll( fds, sizeof(fds)/sizeof(*fds), timeoutMillis );
     if( result < 0 )
         return result;
     if( result == 0 )   //timeout
@@ -1064,7 +1076,7 @@ static int acceptWithTimeout( int m_socketHandle, int timeoutMillis = DEFAULT_AC
         ::SetLastError( SystemError::timedOut );
         return -1;
     }
-    if( FD_ISSET( m_socketHandle, &except_set ) )
+    if( fds[0].revents & POLLERR )
     {
         int errorCode = 0;
         int errorCodeLen = sizeof( errorCode );
@@ -1215,7 +1227,7 @@ int TCPServerSocket::accept(int sockDesc)
     return acceptWithTimeout( sockDesc );
 }
 
-bool TCPServerSocket::acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )> handler )
+bool TCPServerSocket::acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler )
 {
     TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(m_implDelegate.impl());
 

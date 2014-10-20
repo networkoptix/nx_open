@@ -3,13 +3,16 @@
 
 angular.module('webadminApp')
     .controller('InfoCtrl', function ($scope, mediaserver) {
-        $scope.storages = mediaserver.getStorages();
+        mediaserver.getSettings().then(function (r) {
+            $scope.settings = r.data.reply;
+        });
+
 
         function formatUrl(url){
             return decodeURIComponent(url.replace(/file:\/\/.+?:.+?\//gi,""));
         }
 
-        $scope.storages.then(function (r) {
+        mediaserver.getStorages().then(function (r) {
             $scope.storages = _.sortBy(r.data.reply.storages,function(storage){
                 return formatUrl(storage.url);
             });

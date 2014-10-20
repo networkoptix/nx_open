@@ -30,6 +30,7 @@ namespace {
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode)
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ClientSkin)
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ClientBackground)
+QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ImageBehaviour)
 
 void QnClientMetaTypes::initialize() {
     /* Note that running the code twice is perfectly OK, 
@@ -66,6 +67,8 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaTypeStreamOperators<Qn::ClientSkin>();
     qRegisterMetaType<Qn::ClientBackground>();
     qRegisterMetaTypeStreamOperators<Qn::ClientBackground>();
+    qRegisterMetaType<Qn::ImageBehaviour>();
+    qRegisterMetaTypeStreamOperators<Qn::ImageBehaviour>();
     qRegisterMetaType<ImageCorrectionParams>();
     qRegisterMetaType<Qn::ActionId>();
     qRegisterMetaType<QnActionParameters>();
@@ -89,6 +92,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnLicensesListModelColors>();
     qRegisterMetaType<QnRoutingManagementColors>();
     qRegisterMetaType<QnVideowallManageWidgetColors>();
+    qRegisterMetaType<QnServerUpdatesColors>();
 
     qRegisterMetaType<QnAbstractCameraDataPtr>();
 
@@ -110,9 +114,11 @@ void QnClientMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnLicensesListModelColors>();
     QnJsonSerializer::registerSerializer<QnRoutingManagementColors>();
     QnJsonSerializer::registerSerializer<QnVideowallManageWidgetColors>();
+    QnJsonSerializer::registerSerializer<QnServerUpdatesColors>();
 
     QnJsonSerializer::registerSerializer<Qn::ClientSkin>();
     QnJsonSerializer::registerSerializer<Qn::ClientBackground>();
+    QnJsonSerializer::registerSerializer<Qn::ImageBehaviour>();
     QnJsonSerializer::registerSerializer<QnPaletteData>();
     QnJsonSerializer::registerSerializer<QnPenData>();
     QnJsonSerializer::registerSerializer<QVector<QColor> >(); // TODO: #Elric integrate with QVariant iteration?

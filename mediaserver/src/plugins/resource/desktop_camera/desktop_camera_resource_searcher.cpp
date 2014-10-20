@@ -6,8 +6,10 @@
 #include <core/resource/network_resource.h>
 
 namespace {
-    const int keepAliveInterval = 30 * 1000;
+    const int keepAliveInterval = 5 * 1000;
 }
+
+//#define DESKTOP_CAMERA_DEBUG
 
 QnDesktopCameraResourceSearcher::QnDesktopCameraResourceSearcher():
     base_type()
@@ -29,6 +31,9 @@ void QnDesktopCameraResourceSearcher::registerCamera(const QSharedPointer<Abstra
     connection->setSendTimeout(1);
     QMutexLocker lock(&m_mutex);
     m_connections << ClientConnectionInfo(connection, userName, userId);
+#ifdef DESKTOP_CAMERA_DEBUG
+    qDebug() << "register camera" << userName << userId;
+#endif
 }
 
 QList<QnResourcePtr> QnDesktopCameraResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
@@ -59,7 +64,16 @@ QnResourceList QnDesktopCameraResourceSearcher::findResources(void)
         cam->setTypeId(rt->getId());
         cam->setPhysicalId(itr->userId);
         result << cam;
+
+#ifdef DESKTOP_CAMERA_DEBUG
+        qDebug() << "found desktop camera" << itr->userName << itr->userId;
+#endif
     }
+
+#ifdef DESKTOP_CAMERA_DEBUG
+    if (!m_connections.isEmpty())
+        qDebug() << "total connections count" << m_connections.size();
+#endif
     return result;
 }
 
@@ -98,15 +112,26 @@ void QnDesktopCameraResourceSearcher::cleanupConnections()
     while(itr != m_connections.end())
     {
         if (!itr->socket->isConnected()) {
+#ifdef DESKTOP_CAMERA_DEBUG
+            qDebug() << "cleanup disconnected socked desktop camera" << itr->userName << itr->userId;
+#endif
             itr = m_connections.erase(itr);
         } 
         else {
             ClientConnectionInfo& conn = *itr;
+#ifdef DESKTOP_CAMERA_DEBUG
+            qDebug() << "cleanup useCount" << conn.useCount << "timer elapsed" << conn.timer.elapsed();
+#endif
             if (conn.useCount == 0 && conn.timer.elapsed() >= keepAliveInterval)
             {
                 conn.timer.restart();                
                 QString request = QString(lit("KEEP-ALIVE %1 RTSP/1.0\r\ncSeq: %2\r\n\r\n")).arg("*").arg(++conn.cSeq);
                 if (conn.socket->send(request.toLatin1()) < 1) {
+
+#ifdef DESKTOP_CAMERA_DEBUG
+                    qDebug() << "cleanup camera connection could not send" << conn.userName << conn.userId;
+#endif
+
                     conn.socket->close();
                     itr = m_connections.erase(itr);
                     continue;
@@ -125,6 +150,11 @@ TCPSocketPtr QnDesktopCameraResourceSearcher::getConnection(const QString& userN
         ClientConnectionInfo& conn = m_connections[i];
         if (conn.useCount == 0 && conn.userName == userName) {
             conn.useCount++;
+
+#ifdef DESKTOP_CAMERA_DEBUG
+            qDebug() << "acquiring desktop camera connection" << conn.userName << conn.userId << conn.useCount;
+#endif
+
             return conn.socket;
         }
     }
@@ -155,6 +185,11 @@ void QnDesktopCameraResourceSearcher::releaseConnection(const TCPSocketPtr& sock
         if (conn.socket == socket) {
             conn.useCount--;
             conn.timer.restart();
+
+#ifdef DESKTOP_CAMERA_DEBUG
+            qDebug() << "releasing desktop camera connection" << conn.userName << conn.userId << conn.useCount;
+#endif
+
             break;
         }
     }

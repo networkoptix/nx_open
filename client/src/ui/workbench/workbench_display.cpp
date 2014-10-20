@@ -894,6 +894,10 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     if(frameColor.isValid())
         widget->setFrameDistinctionColor(frameColor);
 
+    QnResourceWidget::Options options = item->data(Qn::ItemWidgetOptions).value<QnResourceWidget::Options>();
+    if (options)
+        widget->setOptions(widget->options() | options);
+
     emit widgetAdded(widget);
 
     for(int i = 0; i < Qn::ItemRoleCount; i++)
@@ -1157,6 +1161,22 @@ QRectF QnWorkbenchDisplay::itemEnclosingGeometry(QnWorkbenchItem *item) const {
         result.height() + delta.height() * step.height()
     );
 
+    /* Calculate bounds of the rotated item */
+    qreal rotation = qAbs(item->rotation());
+    if (!qFuzzyIsNull(rotation) && !qFuzzyEquals(rotation, 180)) {
+        QnResourceWidget *widget = this->widget(item);
+        if (widget) {
+            QRectF bound = result;
+            if (widget->hasAspectRatio())
+                bound = expanded(widget->aspectRatio(), result, Qt::KeepAspectRatio);
+            bound = rotated(bound, item->rotation());
+            qreal scale = scaleFactor(bound.size(), result.size(), Qt::KeepAspectRatio);
+            qreal xdiff = result.width() / 2.0 * (1.0 - scale);
+            qreal ydiff = result.height() / 2.0 * (1.0 - scale);
+            result.adjust(xdiff, ydiff, -xdiff, -ydiff);
+        }
+    }
+
     return result;
 }
 
@@ -1199,11 +1219,15 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const {
             ? layoutBoundingRect
             : layoutBoundingRect.united(backgroundBoundingRect);
 
-    if (qnSettings->isVideoWallMode())
-        return workbench()->mapper()->mapFromGridF(QRectF(sceneBoundingRect));
+    /* Do not add additional spacing in following cases: */
+    bool noAdjust = qnSettings->isVideoWallMode()                           /*< Videowall client. */
+        || !backgroundBoundingRect.isNull();                                /*< There is a layout background. */
 
-    const qreal adjust = 0.05; // half of minimal cell spacing
-    return workbench()->mapper()->mapFromGridF(QRectF(sceneBoundingRect).adjusted(-adjust, -adjust, adjust, adjust));
+    if (noAdjust)
+        return workbench()->mapper()->mapFromGridF(QRectF(sceneBoundingRect));
+    
+    const qreal minAdjust = 0.015;
+    return workbench()->mapper()->mapFromGridF(QRectF(sceneBoundingRect).adjusted(-minAdjust, -minAdjust, minAdjust, minAdjust));
 }
 
 QRectF QnWorkbenchDisplay::viewportGeometry() const {
@@ -1482,7 +1506,9 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
 
     /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
     QnConstResourceVideoLayoutPtr videoLayout = widget->channelLayout();
-    const qreal estimatedAspectRatio = aspectRatio(videoLayout->size()) * (item->zoomRect().isNull() ? 1.0 : aspectRatio(item->zoomRect())) * (4.0 / 3.0);
+    qreal estimatedAspectRatio = aspectRatio(videoLayout->size()) * (item->zoomRect().isNull() ? 1.0 : aspectRatio(item->zoomRect())) * (4.0 / 3.0);
+    if (qAbs(qAbs(item->rotation()) - 90) < 45)
+        estimatedAspectRatio = 1 / estimatedAspectRatio;
     const Qt::Orientation orientation = estimatedAspectRatio > 1.0 ? Qt::Vertical : Qt::Horizontal;
     const QSize size = bestSingleBoundedSize(workbench()->mapper(), 1, orientation, estimatedAspectRatio);
 

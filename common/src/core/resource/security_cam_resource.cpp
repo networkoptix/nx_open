@@ -272,8 +272,7 @@ bool QnSecurityCamResource::isAnalogEncoder() const {
 }
 
 bool QnSecurityCamResource::isEdge() const {
-    QnMediaServerResourcePtr mServer = qnResPool->getResourceById(getParentId()).dynamicCast<QnMediaServerResource>();
-    return mServer && (mServer->getServerFlags() & Qn::SF_Edge);
+    return QnMediaServerResource::isEdgeServer(qnResPool->getResourceById(getParentId()));
 }
 
 Qn::LicenseType QnSecurityCamResource::licenseType() const 

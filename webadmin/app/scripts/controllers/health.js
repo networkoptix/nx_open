@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('HealthCtrl', function ($scope, $modal, $log, mediaserver) {
+    .controller('HealthCtrl', function ($scope, $modal, $log, mediaserver,$timeout) {
         $scope.healthLength = 100;//сколько точек сохраняем
         $scope.interval = 1000;// 1 секунда
         $scope.serverIsOnline = true;
@@ -160,17 +160,18 @@ angular.module('webadminApp')
             }
         }
 
-        var statisticInterval = 0;
+        var statisticTimer = null;
         function updateStatistics() {
             mediaserver.statistics().then(function (r) {
-                if(statisticInterval == 0){
+                if(statisticTimer == null){
                     // Подготовить легенды
                     prepaireDataSets(r.data.reply.statistics);
                 }
                 $scope.serverIsOnline = true;
 
                 updateStatisticsDataSets((r.status==200 && r.data.error == 0) ? r.data.reply.statistics:[]);
-                statisticInterval = setTimeout(updateStatistics,$scope.interval);
+
+                statisticTimer = $timeout(updateStatistics,$scope.interval);
                 return false;
             },function(r){
                 //some connection error
@@ -178,9 +179,17 @@ angular.module('webadminApp')
                 $scope.serverIsOnline = false;
 
                 //show message "server is offline"
-                statisticInterval = setTimeout(updateStatistics,$scope.interval);
+                statisticTimer = $timeout(updateStatistics,$scope.interval);
             });
         }
+
+        $scope.$on(
+            "$destroy",
+            function( event ) {
+                $timeout.cancel(statisticTimer);
+            }
+        );
+
 
         updateStatistics();
     });

@@ -221,7 +221,7 @@ public:
 #ifdef _DEBUG
             lit("DEBUG")
 #else
-            lit("WARNING")
+            lit("INFO")
 #endif
         ),
         msgLogLevel( lit("none") )

@@ -25,7 +25,7 @@ public:
     void addConnection(QnMediaServerResourcePtr mServer);
     void removeConnection(QnMediaServerResourcePtr mServer);
 
-    QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/);
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/) const override;
 
     static QnUuid getDesktopResourceUuid();
 protected:

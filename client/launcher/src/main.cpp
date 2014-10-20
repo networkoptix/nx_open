@@ -6,7 +6,7 @@
 #include <Windows.h>
 #include <Msi.h>
 #include "version.h"
-
+#include <iostream>
 
 
 
@@ -249,14 +249,14 @@ int launchFile(const wstring& executePath)
         // check if MSVC MSI exists
         INSTALLSTATE state;
         if (sizeof(char*) == 4)
-            state = MsiQueryProductState(L"{9A25302D-30C0-39D9-BD6F-21E6EC160475}");
+            state = MsiQueryProductState(L"{BD95A8CD-1D9F-35AD-981A-3E7925026EBB}");
         else
-            state = MsiQueryProductState(L"{8220EEFE-38CD-377E-8595-13398D740ACE}");
+            state = MsiQueryProductState(L"{CF2BEA3C-26EA-32F8-AA9B-331F7E34BA97}");
         if (state != INSTALLSTATE_DEFAULT)
         {
             wchar_t buffer[MAX_PATH + 16];
-            wchar_t* arch = sizeof(int) == 4 ? L"x86" : L"x64";
-            wsprintf(buffer, L"\"%s\\vcredist_%3.exe\" /q", toNativeSeparator(dstDir).c_str(), arch);
+            wchar_t* arch = sizeof(char*) == 4 ? L"x86" : L"x64";
+            wsprintf(buffer, L"\"%s\\vcredist_%s.exe\" /q", toNativeSeparator(dstDir).c_str(), arch);
             int result = _wsystem(buffer);
         }
 
