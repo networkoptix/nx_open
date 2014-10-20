@@ -404,7 +404,7 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
         QHostAddress laddr(left.host());
         QHostAddress raddr(right.host());
         if (laddr.isNull() || raddr.isNull())
-            return laddr.isNull();
+            return raddr.isNull();
 
         int metricDiff = matchIpMetric(currentIp, laddr.toIPv4Address()) - matchIpMetric(currentIp, raddr.toIPv4Address());
         return metricDiff != 0
