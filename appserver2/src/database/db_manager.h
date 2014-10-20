@@ -23,6 +23,7 @@ namespace ec2
         ApiObject_Layout,
         ApiObject_Videowall,
         ApiObject_BusinessRule,
+        ApiObject_Storage,
         ApiObject_Dummy
     };
     struct ApiObjectInfo
@@ -142,8 +143,23 @@ namespace ec2
         //getCameras
         ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiCameraDataList& cameraList);
 
+        //getStorages
+        ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList& cameraList);
+
+        //get resource status
+        ErrorCode doQueryNoLock(const QnUuid& resId, ApiResourceStatusDataList& statusList);
+
+        //getCameraUserAttributes
+        ErrorCode doQueryNoLock(const QnUuid& cameraId, ApiCameraAttributesDataList& cameraUserAttributesList);
+
+        //getCamerasEx
+        ErrorCode doQueryNoLock(const QnUuid& cameraId, ApiCameraDataExList& cameraList);
+
         //getServers
         ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiMediaServerDataList& serverList);
+
+        //getServersEx
+        ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiMediaServerDataExList& cameraList);
 
         //getCameraServerItems
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraServerItemDataList& historyList);
@@ -164,7 +180,7 @@ namespace ec2
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiLayoutDataList& layoutList);
 
         //getResourceParams
-        ErrorCode doQueryNoLock(const QnUuid& resourceId, ApiResourceParamsData& params);
+        ErrorCode doQueryNoLock(const QnUuid& resourceId, ApiResourceParamWithRefDataList& params);
 
         // ApiFullInfo
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiFullInfoData& data);
@@ -177,6 +193,9 @@ namespace ec2
 
         // ApiDiscoveryDataList
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiDiscoveryDataList& data);
+
+        //getServerUserAttributes
+        ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiMediaServerUserAttributesDataList& serverAttrsList);
 
 		// --------- misc -----------------------------
         QnUuid getID() const;
@@ -192,6 +211,21 @@ namespace ec2
         void initialized();
 
     private:
+        enum FilterType
+        {
+            RES_ID_FIELD,
+            RES_TYPE_FIELD
+        };
+
+        //!query filter
+        class QnQueryFilter
+        {
+        public:
+            //filtered field, 
+            QMap<int, QVariant> fields;
+        };
+
+
         friend class QnTransactionLog;
         QSqlDatabase& getDB() { return m_sdb; }
         QReadWriteLock& getMutex() { return m_mutex; }
@@ -199,12 +233,15 @@ namespace ec2
         // ------------ transactions --------------------------------------
 
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraDataList>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraAttributesData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraAttributesDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiMediaServerData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiStorageData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiMediaServerUserAttributesData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutDataList>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiSetResourceStatusData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceParamsData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceStatusData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceParamWithRefData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraServerItemData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiPanicModeData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiStoredFileData>& tran);
@@ -213,11 +250,10 @@ namespace ec2
         ErrorCode executeTransactionInternal(const QnTransaction<ApiBusinessRuleData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUserData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResetBusinessRuleData>& tran); //reset business rules
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceParamDataList>& tran); // save settings
         ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateUploadResponceData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallDataList>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveryDataList> &tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveryData> &tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiDatabaseDumpData>& tran);
 
         // delete camera, server, layout, any resource, etc.
@@ -228,6 +264,42 @@ namespace ec2
 
         /* Add or remove camera bookmark tags */
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraBookmarkTagDataList>& tran);
+
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiIdDataList>& /*tran*/)
+        {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiMediaServerUserAttributesDataList>& /*tran*/)
+        {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraDataList>& /*tran*/)
+        {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiStorageDataList>& /*tran*/)
+        {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceParamDataList>& /*tran*/)
+        {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceParamWithRefDataList>& /*tran*/)
+        {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
 
         ErrorCode executeTransactionInternal(const QnTransaction<ApiEmailSettingsData>&) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
@@ -331,27 +403,31 @@ namespace ec2
         ErrorCode deleteTableRecord(const QnUuid& id, const QString& tableName, const QString& fieldName);
         ErrorCode deleteTableRecord(const qint32& internalId, const QString& tableName, const QString& fieldName);
 
-        ErrorCode updateResource(const ApiResourceData& data, qint32 internalId);
-        ErrorCode insertResource(const ApiResourceData& data, qint32* internalId);
         ErrorCode insertOrReplaceResource(const ApiResourceData& data, qint32* internalId);
         //ErrorCode insertOrReplaceResource(const ApiResourceData& data);
         ErrorCode deleteRecordFromResourceTable(const qint32 id);
         ErrorCode removeObject(const ApiObjectInfo& apiObject);
 
-        ErrorCode insertAddParams(const std::vector<ApiResourceParamData>& params, qint32 internalId);
-        ErrorCode deleteAddParams(qint32 resourceId);
+        ErrorCode insertAddParam(const ApiResourceParamWithRefData& param);
+        ErrorCode fetchResourceParams( const QnQueryFilter& filter, ApiResourceParamWithRefDataList& params );
+        //ErrorCode deleteAddParams(qint32 resourceId);
 
         ErrorCode saveCamera(const ApiCameraData& params);
         ErrorCode insertOrReplaceCamera(const ApiCameraData& data, qint32 internalId);
-        ErrorCode updateCameraSchedule(const ApiCameraData& data, qint32 internalId);
+        ErrorCode saveCameraUserAttributes( const ApiCameraAttributesData& attrs );
+        ErrorCode insertOrReplaceCameraAttributes(const ApiCameraAttributesData& data, qint32* const internalId);
+        ErrorCode updateCameraSchedule(const std::vector<ApiScheduleTaskData>& scheduleTasks, qint32 internalId);
         ErrorCode removeCameraSchedule(qint32 internalId);
         ErrorCode removeCamera(const QnUuid& guid);
+        ErrorCode removeStorage(const QnUuid& guid);
         ErrorCode deleteCameraServerItemTable(qint32 id);
 
         ErrorCode insertOrReplaceMediaServer(const ApiMediaServerData& data, qint32 internalId);
-        ErrorCode updateStorages(const ApiMediaServerData&);
+        ErrorCode insertOrReplaceMediaServerUserAttributes(const ApiMediaServerUserAttributesData& attrs);
+        //ErrorCode updateStorages(const ApiMediaServerData&);
         ErrorCode removeServer(const QnUuid& guid);
-        ErrorCode removeStoragesByServer(const QnUuid& serverGUID);
+        ErrorCode removeMediaServerUserAttributes(const QnUuid& guid);
+        //ErrorCode removeStoragesByServer(const QnUuid& serverGUID);
 
         ErrorCode removeLayout(const QnUuid& id);
         ErrorCode removeLayoutInternal(const QnUuid& id, const qint32 &internalId);
@@ -411,13 +487,15 @@ namespace ec2
 
         template <class ObjectType, class ObjectListType> 
         bool fillTransactionLogInternal(ApiCommand::Value command);
-        bool addTransactionForGeneralSettings();
         bool applyUpdates();
 
         bool beforeInstallUpdate(const QString& updateName);
         bool afterInstallUpdate(const QString& updateName);
         ErrorCode addCameraHistory(const ApiCameraServerItemData& params);
         ErrorCode removeCameraHistory(const ApiCameraServerItemData& params);
+        ErrorCode getScheduleTasks(const QnUuid& cameraId, std::vector<ApiScheduleTaskWithRefData>& scheduleTaskList);
+        void addResourceTypesFromXML(ApiResourceTypeDataList& data);
+        void loadResourceTypeXML(const QString& fileName, ApiResourceTypeDataList& data);
     private:
         QnResourceFactory* m_resourceFactory;
         QnUuid m_storageTypeId;
@@ -437,6 +515,7 @@ namespace ec2
         QnDbTransaction m_tranStatic;
         mutable QReadWriteLock m_mutexStatic;
         bool m_needResyncLog;
+        bool m_needResyncLicenses;
     };
 };
 

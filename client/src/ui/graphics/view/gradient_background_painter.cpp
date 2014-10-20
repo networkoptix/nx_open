@@ -126,7 +126,7 @@ void QnGradientBackgroundPainter::updateBackgroundColor(bool animate) {
     case Qn::RainbowBackground:
         backgroundColor = toTransparent(m_rainbow->currentColor(), 0.5);
         break;
-    case Qn::CustomBackground:
+    case Qn::CustomColorBackground:
         backgroundColor = qnSettings->customBackgroundColor();
         break;
     }

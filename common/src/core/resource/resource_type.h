@@ -8,8 +8,11 @@
 
 #include "param.h"
 #include "utils/common/id.h"
+#include "core/resource/resource_fwd.h"
 
-class QN_EXPORT QnResourceType
+typedef QMap<QString, QString> ParamTypeMap;
+
+class QnResourceType
 {
 public:
     QnResourceType();
@@ -33,10 +36,12 @@ public:
     void addAdditionalParent(QnUuid parent);
     QList<QnUuid> allParentList() const;
 
-    void addParamType(QnParamTypePtr param);
+    void addParamType(const QString& name, const QString& defaultValue);
+    bool hasParam(const QString& name) const;
 
-    const QList<QnParamTypePtr>& paramTypeList() const;
+    const ParamTypeMap& paramTypeList() const;
 
+    QString defaultValue(const QString& key) const;
 private:
     QnUuid m_id;
     QnUuid m_parentId;
@@ -44,11 +49,10 @@ private:
     QString m_manufacture;
     QList<QnUuid> m_additionalParentList;
 
-    typedef QList<QnParamTypePtr> ParamTypeList;
-    ParamTypeList m_paramTypeList;
+    ParamTypeMap m_paramTypeList;
 
     mutable QMutex m_allParamTypeListCacheMutex;
-    mutable QSharedPointer<ParamTypeList> m_allParamTypeListCache;
+    mutable QSharedPointer<ParamTypeMap> m_allParamTypeListCache;
 
     mutable bool m_isCamera;
     mutable bool m_isCameraSet;
@@ -66,8 +70,7 @@ public:
     QnResourceTypePtr getResourceTypeByName(const QString& name) const;
     QnResourceTypePtr getResourceType(QnUuid id) const;
     void addResourceType(QnResourceTypePtr resourceType);
-    void addResourceTypeList(const QList<QnResourceTypePtr>& resourceType);
-    void replaceResourceTypeList(const QList<QnResourceTypePtr>& resourceType);
+    void replaceResourceTypeList(const QnResourceTypeList& resourceType);
 
     /* exact match name */
     QnUuid getResourceTypeId(const QString& manufacture, const QString& name, bool showWarning = true) const;
@@ -86,6 +89,7 @@ public:
 private:
     mutable QMutex m_mutex;
     QnResourceTypeMap m_resourceTypeMap;
+    mutable QnResourceTypePtr m_desktopCamResourceType;
 };
 
 #define qnResTypePool QnResourceTypePool::instance()

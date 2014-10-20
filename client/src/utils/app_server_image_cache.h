@@ -16,6 +16,8 @@ public:
 
     QSize getMaxImageSize() const;
 
+    static QString cachedImageFilename(const QString &sourcePath);
+
     void storeImage(const QString &filePath, const qreal targetAspectRatio = 0.0);
 private slots:
     void at_imageConverted(const QString &filePath);

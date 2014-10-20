@@ -5,10 +5,12 @@
 #include <QtCore/QFile>
 #include <QtCore/QVector>
 #include <QtCore/QMap>
+#include <QtCore/QMutex>
 #include <QtCore/QFileInfo>
 #include <QtCore/QMutex>
 
 #include <deque>
+#include <QtCore/QFileInfo>
 
 #include <server/server_globals.h>
 

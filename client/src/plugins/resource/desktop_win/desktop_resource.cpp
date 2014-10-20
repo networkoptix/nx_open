@@ -115,7 +115,7 @@ void QnDesktopResource::removeConnection(QnMediaServerResourcePtr mServer)
 }
 
 static QSharedPointer<QnEmptyResourceAudioLayout> emptyAudioLayout( new QnEmptyResourceAudioLayout() );
-QnConstResourceAudioLayoutPtr QnDesktopResource::getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/)
+QnConstResourceAudioLayoutPtr QnDesktopResource::getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/) const
 {
     if (!m_desktopDataProvider)
         return emptyAudioLayout;

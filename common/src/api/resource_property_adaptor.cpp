@@ -1,8 +1,8 @@
 #include "resource_property_adaptor.h"
 
 #include <core/resource/resource.h>
-
 #include "app_server_connection.h"
+#include "nx_ec/data/api_resource_data.h"
 
 // TODO: #Elric
 // Right now we have a problem in case resource property is changed very often.
@@ -203,7 +203,9 @@ void QnAbstractResourcePropertyAdaptor::processSaveRequestsNoLock(const QnResour
     ec2::AbstractECConnectionPtr connection = QnAppServerConnectionFactory::getConnection2();
     if (!connection)
         return;
-    connection->getResourceManager()->save(resource->getId(), QnKvPairList() << QnKvPair(m_key, serializedValue), false, this, &QnAbstractResourcePropertyAdaptor::at_connection_propertiesSaved);
+    ec2::ApiResourceParamWithRefDataList params;
+    params.push_back(ec2::ApiResourceParamWithRefData(resource->getId(), m_key, serializedValue));
+    connection->getResourceManager()->save(params, this, &QnAbstractResourcePropertyAdaptor::at_connection_propertiesSaved);
 }
 
 void QnAbstractResourcePropertyAdaptor::enqueueSaveRequest() {

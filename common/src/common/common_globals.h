@@ -32,7 +32,8 @@ namespace Qn
     Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace CameraDataType
             PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole 
             ConnectionRole ResourceStatus
-            StreamQuality SecondStreamQuality PanicMode RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType)
+            StreamQuality SecondStreamQuality PanicMode RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
+            ServerFlag CameraStatusFlag)
     Q_FLAGS(Borders Corners
             ResourceFlags
             CameraCapabilities 
@@ -326,8 +327,7 @@ public:
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerFlag)
 
     Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(ServerFlags);
-
+    Q_DECLARE_OPERATORS_FOR_FLAGS(ServerFlags)
 
     enum TimePeriodType {
         NullTimePeriod      = 0x1,  /**< No period. */
@@ -643,12 +643,12 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::PtzCapabilities),
+    (Qn::PtzCapabilities)(Qn::ServerFlags)(Qn::CameraStatusFlags),
     (metatype)(numeric)(lexical)
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::ServerFlags)(Qn::PtzDataFields)(Qn::CameraStatusFlags),
+    (Qn::PtzDataFields),
     (metatype)(numeric)
 )
 

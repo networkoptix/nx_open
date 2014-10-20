@@ -177,7 +177,6 @@ namespace {
             else
                 setCursor(QCursor());
         }
-
     private:
         Qt::Orientation m_orientation;
     };
@@ -1090,7 +1089,7 @@ void QnWorkbenchUi::createTreeWidget() {
     m_treeResizerWidget->setProperty(Qn::NoHandScrollOver, true);
     m_treeResizerWidget->stackBefore(m_treeShowButton);
     m_treeItem->stackBefore(m_treeResizerWidget);
-
+    
     m_treeOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_treeOpacityProcessor->addTargetItem(m_treeItem);
     m_treeOpacityProcessor->addTargetItem(m_treeShowButton);
@@ -1098,6 +1097,7 @@ void QnWorkbenchUi::createTreeWidget() {
     m_treeHidingProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_treeHidingProcessor->addTargetItem(m_treeItem);
     m_treeHidingProcessor->addTargetItem(m_treeShowButton);
+    m_treeHidingProcessor->addTargetItem(m_treeResizerWidget);
     m_treeHidingProcessor->setHoverLeaveDelay(closeConstrolsTimeoutMSec);
     m_treeHidingProcessor->setFocusLeaveDelay(closeConstrolsTimeoutMSec);
 
@@ -1123,7 +1123,10 @@ void QnWorkbenchUi::createTreeWidget() {
     {
         /* Do not auto-hide tree if we have opened context menu. */
         auto connectTreeHidingProcessor = [this] {
-            connect(m_treeHidingProcessor, &HoverFocusProcessor::hoverFocusLeft, this, [this](){ if(!isTreePinned()) setTreeOpened(false);});
+            connect(m_treeHidingProcessor, &HoverFocusProcessor::hoverFocusLeft, this, [this](){
+                if(!isTreePinned())
+                    setTreeOpened(false);
+            });
         };
 
         QnSingleEventSignalizer *treeMenuSignalizer = new QnSingleEventSignalizer(this);

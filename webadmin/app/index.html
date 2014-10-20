@@ -26,6 +26,15 @@
             /*padding-top: 20px;*/
             padding-bottom: 20px;
         }
+
+        @font-face {
+            font-family: 'Glyphicons Halflings';
+            src: url('../fonts/glyphicons-halflings-regular.eot');
+            src: url('../fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'),
+            url('../fonts/glyphicons-halflings-regular.woff') format('woff'),
+            url('../fonts/glyphicons-halflings-regular.ttf') format('truetype'),
+            url('../fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
+        }
     </style>
 </head>
 <body ng-app="webadminApp">
@@ -69,6 +78,14 @@
 <script src="bower_components/tc-angular-chartjs/dist/tc-angular-chartjs.js"></script>
 <!-- endbower -->
 
+
+
+<script src="scripts/vendor/jquery-file-upload/jquery.ui.widget.js"></script>
+<script src="scripts/vendor/jquery-file-upload/jquery.iframe-transport.js"></script>
+<script src="scripts/vendor/jquery-file-upload/jquery.fileupload.js"></script>
+<script src="scripts/vendor/jquery-file-upload/jquery.fileupload-process.js"></script>
+
+
 <!-- endbuild -->
 
 <!-- build:js({.tmp,app}) scripts/scripts.js -->
@@ -85,6 +102,7 @@
 <script src="scripts/controllers/login.js"></script>
 <script src="scripts/services/auth.js"></script>
 <script src="scripts/directives/icon.js"></script>
+<script src="scripts/directives/fileupload.js"></script>
 <script src="scripts/directives/inplace-edit.js"></script>
 <script src="scripts/controllers/advanced.js"></script>
 <script src="scripts/controllers/info.js"></script>

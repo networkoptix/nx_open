@@ -518,7 +518,7 @@ QnMetaDataV1Ptr PlDlinkStreamReader::getCameraMetadata()
 
     bool empty = true;
 
-    foreach(QString line, lines)
+    foreach(const QString& line, lines)
     {
         QString line_low = line.toLower();
 

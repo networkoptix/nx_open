@@ -290,8 +290,7 @@ bool QnAxisPtzController::query(const QString &request, int retries, QnAxisParam
 }
 
 int QnAxisPtzController::channel() {
-    QVariant channelCount;
-    m_resource->getParam(QLatin1String("channelsAmount"), channelCount, QnDomainMemory);
+    QString channelCount = m_resource->getProperty(lit("channelsAmount"));
     if (channelCount.toInt() > 1) {
         return m_resource->getChannelNumAxis();
     } else {

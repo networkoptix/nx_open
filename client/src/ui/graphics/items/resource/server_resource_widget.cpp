@@ -7,7 +7,9 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <client/client_settings.h>
+
 #include <core/resource/media_server_resource.h>
+#include <core/resource/resource_name.h>
 
 #include <api/media_server_statistics_manager.h>
 
@@ -741,18 +743,16 @@ void QnServerResourceWidget::tick(int deltaMSecs) {
 }
 
 QString QnServerResourceWidget::calculateTitleText() const {
-    QString name = m_resource->getName();
-    QString host = QUrl(m_resource->getUrl()).host();
+    QString name = getFullResourceName(m_resource, true);
 
     qint64 uptimeMs = m_manager->uptimeMs(m_resource);
     if (uptimeMs > 0) {
         int msInDay = 24 * 3600 * 1000;
-        return tr("%1 %2 (up %n days, %3)", "", uptimeMs / msInDay)
+        return tr("%1 (up %n days, %2)", "", uptimeMs / msInDay)
             .arg(name)
-            .arg(host)
             .arg(QTime(0, 0).addMSecs(uptimeMs % msInDay).toString(lit("hh:mm"))); // TODO: #TR #Elric this hh:mm is bad even in English...
     } else {
-        return tr("%1 %2").arg(name).arg(host);
+        return tr("%1").arg(name);
     }
 }
 
@@ -765,6 +765,9 @@ QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() c
 }
 
 Qn::ResourceStatusOverlay QnServerResourceWidget::calculateStatusOverlay() const {
+    if (qnSettings->isVideoWallMode() && !QnVideoWallLicenseUsageHelper().isValid()) 
+        return Qn::VideowallWithoutLicenseOverlay;
+
     if (m_resource->getStatus() == Qn::Offline)
         return Qn::ServerOfflineOverlay;
     return base_type::calculateStatusOverlay();

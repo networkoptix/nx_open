@@ -79,3 +79,13 @@
         </div>
     </div>
 </form>
+
+<h2>All servers in the system</h2>
+<p>You can switch to administration interface of another server</p>
+<ul>
+    <li ng-repeat="server in mediaServers">
+        <icon for="server.status!='Online'" on-true="warning-sign" title-true="Unavailable" ></icon>
+        <a ng-href="{{server.apiUrl}}" target="_blank">{{server.name}} ({{server.apiUrl.replace('http://','').replace('https://','')}})</a>
+        {{settings.id == server.id.replace('{','').replace('}','')?'(current)':''}}
+    </li>
+</ul>

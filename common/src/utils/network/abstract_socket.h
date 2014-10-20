@@ -156,6 +156,11 @@ public:
     */
     template<class HandlerType>
     bool dispatch( HandlerType&& handler ) { return dispatchImpl( std::forward<HandlerType>(handler) ); }
+    //!Terminates socket operations. This means that no operations can be executed on socket after this call
+    /*!
+        \param waitForRunningHandlerCompletion If \a true, it is garanteed that after return of this method no async handler is running
+    */
+    virtual void terminateAsyncIO( bool waitForRunningHandlerCompletion ) = 0;
 
 protected:
     virtual bool postImpl( std::function<void()>&& handler ) = 0;

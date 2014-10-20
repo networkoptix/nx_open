@@ -34,7 +34,7 @@ del /Q /F %TARGET_DIR%\sample\%PLUGIN_NAME%\src\compatibility_info.cpp
 @rem Generating documentation
 set CUR_DIR_BAK=%~dp0
 cd %TARGET_DIR%\sample\%PLUGIN_NAME%\
-doxygen
+%environment%\bin\doxygen
 cd %CUR_DIR_BAK%
 del /F /Q %TARGET_DIR%\sample\%PLUGIN_NAME%\Doxyfile
 

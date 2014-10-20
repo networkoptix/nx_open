@@ -147,21 +147,21 @@ module.exports = function (grunt) {
                 }*/
 
                 //Roman Vasilenko
-                /*{
+                {
                     context: '/api/',
                     host: '10.0.2.231',
-                    port: 7006,//7004,7005,2006
+                    port: 7003,//7004,7005,2006
                     headers: {
                         "Authorization": "Basic YWRtaW46MTIz" //admin:123
                     }
                 }, {
                     context: '/ec2/',
                     host: '10.0.2.231',
-                    port: 7001,//7004,7005,2006
+                    port: 7003,//7004,7005,2006
                     headers: {
                         "Authorization": "Basic YWRtaW46MTIz" //admin:123
                     }
-                }*/
+                }
 
 
                 //Daria
@@ -183,10 +183,10 @@ module.exports = function (grunt) {
                  }*/
 
                 //Evgeniy
-                {
+                /*{
                     context: '/api/',
                     host: '192.168.56.101',
-                    port: 7001,
+                    port: 7002,
                     headers: {
                         "Authorization": "Basic YWRtaW46MTIz" //admin:123
                     }
@@ -194,11 +194,11 @@ module.exports = function (grunt) {
                 {
                     context: '/ec2/',
                     host: '192.168.56.101',
-                    port: 7001,
+                    port: 7002,
                     headers: {
                         "Authorization": "Basic YWRtaW46MTIz" //admin:123
                     }
-                }
+                }*/
 
                 //Denis
                 /*{

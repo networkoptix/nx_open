@@ -60,6 +60,7 @@ private:
 
 
 //class SystemSocketImpl;
+template<class SocketType> class BaseAsyncSocketImplHelper;
 
 /**
  *   Base class representing basic communication endpoint
@@ -67,8 +68,23 @@ private:
 class Socket
 {
 public:
-    Socket( int type, int protocol, SystemSocketImpl* impl = nullptr );
-    Socket( int sockDesc, SystemSocketImpl* impl = nullptr );
+    Socket(
+        std::unique_ptr<BaseAsyncSocketImplHelper<Socket>> asyncHelper,
+        int type,
+        int protocol,
+        SystemSocketImpl* impl = nullptr );
+    Socket(
+        std::unique_ptr<BaseAsyncSocketImplHelper<Socket>> asyncHelper,
+        int sockDesc,
+        SystemSocketImpl* impl = nullptr );
+    //TODO #ak remove following two constructors
+    Socket(
+        int type,
+        int protocol,
+        SystemSocketImpl* impl = nullptr );
+    Socket(
+        int sockDesc,
+        SystemSocketImpl* impl = nullptr );
 
     /**
      *   Close and deallocate this socket
@@ -203,6 +219,7 @@ public:
 protected:
     int m_socketHandle;              // Socket descriptor
     SystemSocketImpl* m_impl;
+    std::unique_ptr<BaseAsyncSocketImplHelper<Socket>> m_baseAsyncHelper;
 
 private:
     bool m_nonBlockingMode;
@@ -228,6 +245,9 @@ public:
     CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr, int newConnSD, SystemSocketImpl* sockImpl = nullptr );
 
     virtual ~CommunicatingSocket();
+
+    //!Implementation of AbstractSocket::terminateAsyncIO
+    void terminateAsyncIO( bool waitForRunningHandlerCompletion );
 
     //!Implementation of AbstractCommunicatingSocket::connect
     bool connect(
@@ -273,7 +293,7 @@ public:
     unsigned short getForeignPort() const;
 
 private:
-    std::unique_ptr<AsyncSocketImplHelper<Socket>> m_aioHelper;
+    AsyncSocketImplHelper<Socket>* m_aioHelper;
     bool m_connected;
 };
 
@@ -346,6 +366,8 @@ public:
      */
     static int accept(int sockDesc);
 
+    //!Implementation of AbstractSocket::terminateAsyncIO
+    virtual void terminateAsyncIO( bool waitForRunningHandlerCompletion ) override;
 
     //!Implementation of AbstractStreamServerSocket::listen
     virtual bool listen( int queueLen ) override;

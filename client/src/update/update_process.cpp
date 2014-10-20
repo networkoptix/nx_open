@@ -134,7 +134,7 @@ void QnUpdateProcess::downloadUpdates() {
         }
     }
 
-    if (!m_clientRequiresInstaller) {
+    if (qnCommon->engineVersion() != m_target.version && !m_clientRequiresInstaller) {
         QString fileName = m_clientUpdateFile->fileName;
         if (fileName.isEmpty())
             fileName = updateFilePath(m_clientUpdateFile->baseFileName);

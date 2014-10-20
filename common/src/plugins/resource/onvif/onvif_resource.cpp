@@ -252,8 +252,9 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_needUpdateOnvifUrl(false),
     m_timeDrift(0),
     m_prevSoapCallResult(0),
-    m_eventMonitorType( emtNone ),
-    m_timerID( 0 ),
+    m_inputMonitored(false),
+    m_eventMonitorType(emtNone),
+    m_timerID(0),
     m_renewSubscriptionTaskID(0),
     m_maxChannels(1),
     m_streamConfCounter(0),
@@ -266,7 +267,7 @@ QnPlOnvifResource::QnPlOnvifResource()
 QnPlOnvifResource::~QnPlOnvifResource()
 {
     {
-        QMutexLocker lk( &m_subscriptionMutex );
+        QMutexLocker lk( &m_ioPortMutex );
         while( !m_triggerOutputTasks.empty() )
         {
             const quint64 timerID = m_triggerOutputTasks.begin()->first;
@@ -343,7 +344,7 @@ const QString QnPlOnvifResource::fetchMacAddress(
     return someMacAddress.toUpper().replace(QLatin1Char(':'), QLatin1Char('-'));
 }
 
-bool QnPlOnvifResource::setHostAddress(const QString &ip, QnDomain domain)
+void QnPlOnvifResource::setHostAddress(const QString &ip)
 {
     //QnPhysicalCameraResource::se
     {
@@ -366,29 +367,16 @@ bool QnPlOnvifResource::setHostAddress(const QString &ip, QnDomain domain)
         }
     }
 
-    return QnPhysicalCameraResource::setHostAddress(ip, domain);
+    QnPhysicalCameraResource::setHostAddress(ip);
 }
 
 const QString QnPlOnvifResource::createOnvifEndpointUrl(const QString& ipAddress) {
     return QLatin1String(ONVIF_PROTOCOL_PREFIX) + ipAddress + QLatin1String(ONVIF_URL_SUFFIX);
 }
 
-bool QnPlOnvifResource::isResourceAccessible()
-{
-    return updateMACAddress();
-}
-
 QString QnPlOnvifResource::getDriverName() const
 {
     return MANUFACTURE;
-}
-
-bool QnPlOnvifResource::hasDualStreaming() const
-{
-    QVariant mediaVariant;
-    QnSecurityCamResource* this_casted = const_cast<QnPlOnvifResource*>(this);
-    this_casted->getParam(Qn::HAS_DUAL_STREAMING_PARAM_NAME, mediaVariant, QnDomainMemory);
-    return mediaVariant.toBool();
 }
 
 const QSize QnPlOnvifResource::getVideoSourceSize() const
@@ -520,7 +508,8 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     if (m_primaryResolution.width() * m_primaryResolution.height() <= MAX_PRIMARY_RES_FOR_SOFT_MOTION)
         addFlags |= Qn::PrimaryStreamSoftMotionCapability;
     else if (!hasDualStreaming2())
-        setMotionType(Qn::MT_NoMotion);
+    //    setMotionType(Qn::MT_NoMotion);
+        setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QString() );   //no motion supported by camera
 
     
     if (addFlags != Qn::NoCapabilities)
@@ -569,8 +558,6 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     if( m_secondaryResolution.width() > 0 )
         mediaStreams.streams.push_back( CameraMediaStreamInfo( m_secondaryResolution, m_secondaryCodec == H264 ? CODEC_ID_H264 : CODEC_ID_MJPEG ) );
     saveResolutionList( mediaStreams );
-
-    saveParams();
     
     QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
     bool forcedAR = resourceData.value<bool>(lit("forceArFromPrimaryStream"), false);
@@ -578,10 +565,12 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     {
         qreal ar = m_primaryResolution.width() / (qreal) m_primaryResolution.height();
         setProperty(QnMediaResource::customAspectRatioKey(), QString::number(ar));
-        ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
-        QnKvPairListsById  outData;
-        conn->getResourceManager()->saveSync(getId(), getProperties(), false, &outData);
     }
+    saveParams();
+
+#ifdef _DEBUG
+    startInputPortMonitoring();
+#endif
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -659,7 +648,7 @@ void QnPlOnvifResource::fetchAndSetPrimarySecondaryResolution()
 
     double maxSquare = m_primaryResolution.width() * m_primaryResolution.height();
 
-    foreach (QSize resolution, m_resolutionList) {
+    foreach (const QSize& resolution, m_resolutionList) {
         float aspect = getResolutionAspectRatio(resolution);
         if (abs(aspect - currentAspect) < MAX_EPS) {
             continue;
@@ -710,21 +699,7 @@ int QnPlOnvifResource::getSecondaryH264Profile() const
 
 void QnPlOnvifResource::setMaxFps(int f)
 {
-    setParam(Qn::MAX_FPS_PARAM_NAME, f, QnDomainDatabase);
-}
-
-int QnPlOnvifResource::getMaxFps() const
-{
-    QVariant mediaVariant;
-    QnSecurityCamResource* this_casted = const_cast<QnPlOnvifResource*>(this);
-
-    if (!hasParam(Qn::MAX_FPS_PARAM_NAME))
-    {
-        return QnPhysicalCameraResource::getMaxFps();
-    }
-
-    this_casted->getParam(Qn::MAX_FPS_PARAM_NAME, mediaVariant, QnDomainMemory);
-    return mediaVariant.toInt();
+    setProperty(Qn::MAX_FPS_PARAM_NAME, f);
 }
 
 const QString QnPlOnvifResource::getPrimaryVideoEncoderId() const
@@ -759,15 +734,12 @@ const QString QnPlOnvifResource::getAudioSourceId() const
 
 QString QnPlOnvifResource::getDeviceOnvifUrl() const 
 { 
-    QVariant mediaVariant;
-    QnSecurityCamResource* this_casted = const_cast<QnPlOnvifResource*>(this);
-    this_casted->getParam(ONVIF_URL_PARAM_NAME, mediaVariant, QnDomainMemory);
-    return mediaVariant.toString();
+    return getProperty(ONVIF_URL_PARAM_NAME);
 }
 
 void QnPlOnvifResource::setDeviceOnvifUrl(const QString& src) 
 { 
-    setParam(ONVIF_URL_PARAM_NAME, src, QnDomainDatabase);
+    setProperty(ONVIF_URL_PARAM_NAME, src);
 }
 QString QnPlOnvifResource::fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort)
 {
@@ -966,9 +938,9 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetResourceOptions()
     fetchAndSetDualStreaming(soapWrapper);
 
     if (fetchAndSetAudioEncoder(soapWrapper) && fetchAndSetAudioEncoderOptions(soapWrapper))
-        setParam(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, 1, QnDomainDatabase);
+        setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, 1);
     else
-        setParam(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, 0, QnDomainDatabase);
+        setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, QString(lit("0")));
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -1039,7 +1011,7 @@ void QnPlOnvifResource::setVideoEncoderOptionsH264(const VideoOptionsLocal& opts
     //Printing fetched resolutions
     if (cl_log.logLevel() > cl_logDEBUG1) {
         NX_LOG(QString(lit("ONVIF resolutions:")), cl_logDEBUG1);
-        foreach (QSize resolution, m_resolutionList) {
+        foreach (const QSize& resolution, m_resolutionList) {
             NX_LOG(QString(lit("%1x%2")).arg(resolution.width()).arg(resolution.height()), cl_logDEBUG1);
         }
     }
@@ -1071,7 +1043,7 @@ void QnPlOnvifResource::setVideoEncoderOptionsJpeg(const VideoOptionsLocal& opts
     //Printing fetched resolutions
     if (cl_log.logLevel() > cl_logDEBUG1) {
         NX_LOG(QString(lit("ONVIF resolutions:")), cl_logDEBUG1);
-        foreach (QSize resolution, m_resolutionList) {
+        foreach (const QSize& resolution, m_resolutionList) {
             NX_LOG(QString(lit("%1x%2")).arg(resolution.width()).arg(resolution.height()), cl_logDEBUG1);
         }
     }
@@ -1155,15 +1127,12 @@ int QnPlOnvifResource::calcTimeDrift(const QString& deviceUrl)
 
 QString QnPlOnvifResource::getMediaUrl() const 
 { 
-    QVariant mediaVariant;
-    QnSecurityCamResource* this_casted = const_cast<QnPlOnvifResource*>(this);
-    this_casted->getParam(MEDIA_URL_PARAM_NAME, mediaVariant, QnDomainMemory);
-    return mediaVariant.toString();
+    return getProperty(MEDIA_URL_PARAM_NAME);
 }
 
 void QnPlOnvifResource::setMediaUrl(const QString& src) 
 {
-    setParam(MEDIA_URL_PARAM_NAME, src, QnDomainDatabase);
+    setProperty(MEDIA_URL_PARAM_NAME, src);
 }
 
 QString QnPlOnvifResource::getImagingUrl() const 
@@ -1330,7 +1299,7 @@ bool QnPlOnvifResource::setRelayOutputState(
     bool active,
     unsigned int autoResetTimeoutMS )
 {
-    QMutexLocker lk( &m_subscriptionMutex );
+    QMutexLocker lk( &m_ioPortMutex );
 
     using namespace std::placeholders;
     const quint64 timerID = TimerManager::instance()->addTimer(
@@ -1399,7 +1368,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     if (m_appStopping)
         return false;
 
-    QMutexLocker lk( &m_subscriptionMutex );
+    QMutexLocker lk( &m_ioPortMutex );
 
     //determining local address, accessible by onvif device
     QUrl eventServiceURL( QString::fromStdString(m_eventCapabilities->XAddr) );
@@ -1714,7 +1683,7 @@ bool QnPlOnvifResource::fetchAndSetDualStreaming(MediaSoapWrapper& /*soapWrapper
         NX_LOG(QString(lit("ONVIF debug: disable dualstreaming for camera %1 reason: %2")).arg(getHostAddress()).arg(reason), cl_logDEBUG1);
     }
 
-    setParam(Qn::HAS_DUAL_STREAMING_PARAM_NAME, dualStreaming ? 1 : 0, QnDomainDatabase);
+    setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, dualStreaming ? 1 : 0);
     return true;
 }
 
@@ -2233,7 +2202,7 @@ QnConstResourceAudioLayoutPtr QnPlOnvifResource::getAudioLayout(const QnAbstract
         return QnPhysicalCameraResource::getAudioLayout(dataProvider);
 }
 
-bool QnPlOnvifResource::getParamPhysical(const QnParam &param, QVariant &val)
+bool QnPlOnvifResource::getParamPhysical(const QString &param, QVariant &val)
 {
     m_prevOnvifResultCode = CameraDiagnostics::NoErrorResult();
 
@@ -2244,7 +2213,7 @@ bool QnPlOnvifResource::getParamPhysical(const QnParam &param, QVariant &val)
     }
 
     CameraSettings& settings = m_onvifAdditionalSettings->getCameraSettings();
-    CameraSettings::Iterator it = settings.find(param.name());
+    CameraSettings::Iterator it = settings.find(param);
 
     if (it == settings.end()) {
         //This is the case when camera doesn't contain Media Service, but the client doesn't know about it and
@@ -2274,7 +2243,7 @@ bool QnPlOnvifResource::getParamPhysical(const QnParam &param, QVariant &val)
     return true;
 }
 
-bool QnPlOnvifResource::setParamPhysical(const QnParam &param, const QVariant& val )
+bool QnPlOnvifResource::setParamPhysical(const QString &param, const QVariant& val )
 {
     QMutexLocker lock(&m_physicalParamsMutex);
     if (!m_onvifAdditionalSettings)
@@ -2284,7 +2253,7 @@ bool QnPlOnvifResource::setParamPhysical(const QnParam &param, const QVariant& v
     tmp.deserializeFromStr(val.toString());
 
     CameraSettings& settings = m_onvifAdditionalSettings->getCameraSettings();
-    CameraSettings::Iterator it = settings.find(param.name());
+    CameraSettings::Iterator it = settings.find(param);
 
     if (it == settings.end())
     {
@@ -2295,7 +2264,7 @@ bool QnPlOnvifResource::setParamPhysical(const QnParam &param, const QVariant& v
 
         //For Button - only operation object is required
         QHash<QString, QSharedPointer<OnvifCameraSettingOperationAbstract> >::ConstIterator opIt =
-            OnvifCameraSettingOperationAbstract::operations.find(param.name());
+            OnvifCameraSettingOperationAbstract::operations.find(param);
 
         if (opIt == OnvifCameraSettingOperationAbstract::operations.end()) {
             return false;
@@ -2344,7 +2313,7 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
     CameraSettings::ConstIterator it = onvifSettings.begin();
 
     for (; it != onvifSettings.end(); ++it) {
-        setParam(it.key(), it.value().serializeToStr(), QnDomainPhysical);
+        setParamPhysical(it.key(), it.value().serializeToStr());
         if (m_appStopping)
             return;
     }
@@ -2385,7 +2354,7 @@ CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncod
 
 void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 /*timerID*/)
 {
-    QMutexLocker lk( &m_subscriptionMutex );
+    QMutexLocker lk( &m_ioPortMutex );
 
     if( !m_eventCapabilities.get() )
         return;
@@ -2526,6 +2495,11 @@ bool QnPlOnvifResource::startInputPortMonitoring()
     if( !m_eventCapabilities.get() )
         return false;
 
+    {
+        QMutexLocker lk(&m_ioPortMutex);
+        m_inputMonitored = true;
+    }
+
     if( m_eventCapabilities->WSPullPointSupport )
         return createPullPointSubscription();
     else if( QnSoapServer::instance()->initialized() )
@@ -2539,7 +2513,8 @@ void QnPlOnvifResource::stopInputPortMonitoring()
     quint64 localTimerID = 0;
     quint64 localRenewSubscriptionTaskID = 0;
     {
-        QMutexLocker lk(&m_subscriptionMutex);
+        QMutexLocker lk(&m_ioPortMutex);
+        m_inputMonitored = false;
         localTimerID = m_timerID;
         localRenewSubscriptionTaskID = m_renewSubscriptionTaskID;
     }
@@ -2560,7 +2535,7 @@ void QnPlOnvifResource::stopInputPortMonitoring()
 
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> asyncPullMessagesCallWrapper;
     {
-        QMutexLocker lk(&m_subscriptionMutex);
+        QMutexLocker lk(&m_ioPortMutex);
         asyncPullMessagesCallWrapper = m_asyncPullMessagesCallWrapper;
     }
 
@@ -2763,7 +2738,10 @@ bool QnPlOnvifResource::createPullPointSubscription()
     //adding task to refresh subscription
     unsigned int renewSubsciptionTimeoutSec = response.oasisWsnB2__TerminationTime - response.oasisWsnB2__CurrentTime;
 
-    QMutexLocker lk(&m_subscriptionMutex);
+    QMutexLocker lk(&m_ioPortMutex);
+
+    if( !m_inputMonitored )
+        return true;
 
     using namespace std::placeholders;
     m_renewSubscriptionTaskID = TimerManager::instance()->addTimer(
@@ -2783,8 +2761,8 @@ bool QnPlOnvifResource::createPullPointSubscription()
 
 bool QnPlOnvifResource::isInputPortMonitored() const
 {
-    QMutexLocker lk(&m_subscriptionMutex);
-    return (m_timerID != 0) || (m_renewSubscriptionTaskID != 0);
+    QMutexLocker lk(&m_ioPortMutex);
+    return m_inputMonitored;
 }
 
 template<class _NumericInt>
@@ -2797,6 +2775,11 @@ _NumericInt roundUp( _NumericInt val, _NumericInt step, typename std::enable_if<
 
 void QnPlOnvifResource::pullMessages(quint64 /*timerID*/)
 {
+    QMutexLocker lk(&m_ioPortMutex);
+
+    if( !m_inputMonitored )
+        return;
+
     if( m_asyncPullMessagesCallWrapper )
     {
         //previous request is still running
@@ -2808,6 +2791,7 @@ void QnPlOnvifResource::pullMessages(quint64 /*timerID*/)
     }
 
     const QAuthenticator& auth = getAuth();
+
     std::unique_ptr<PullPointSubscriptionWrapper> soapWrapper(
         new PullPointSubscriptionWrapper(
             m_eventCapabilities->XAddr,
@@ -2832,23 +2816,24 @@ void QnPlOnvifResource::pullMessages(quint64 /*timerID*/)
 
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> asyncPullMessagesCallWrapper(
         new GSoapAsyncPullMessagesCallWrapper(
-            soapWrapper.release(),
+            std::move(soapWrapper),
             &PullPointSubscriptionWrapper::pullMessages ),
         [buf, header](GSoapAsyncPullMessagesCallWrapper* ptr){
             ::free(buf); ::free(header); delete ptr;
         }
     );
+
     using namespace std::placeholders;
-    QMutexLocker lk(&m_subscriptionMutex);
     if( asyncPullMessagesCallWrapper->callAsync(
             request,
             std::bind(&QnPlOnvifResource::onPullMessagesDone, this, asyncPullMessagesCallWrapper.data(), _1)) )
     {
-        m_asyncPullMessagesCallWrapper = asyncPullMessagesCallWrapper;
+        m_asyncPullMessagesCallWrapper = std::move(asyncPullMessagesCallWrapper);
     }
     else
     {
         using namespace std::placeholders;
+        //will try later
         m_timerID = TimerManager::instance()->addTimer(
             std::bind(&QnPlOnvifResource::pullMessages, this, _1),
             PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND);
@@ -2859,7 +2844,7 @@ void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* as
 {
     onPullMessagesResponseReceived(asyncWrapper->syncWrapper(), resultCode, asyncWrapper->response());
 
-    QMutexLocker lk(&m_subscriptionMutex);
+    QMutexLocker lk(&m_ioPortMutex);
     m_asyncPullMessagesCallWrapper.clear();
 }
 
@@ -2873,7 +2858,10 @@ void QnPlOnvifResource::onPullMessagesResponseReceived(
     const qint64 currentRequestSendClock = m_monotonicClock.elapsed();
 
     {
-        QMutexLocker lk(&m_subscriptionMutex);
+        QMutexLocker lk(&m_ioPortMutex);
+        if( !m_inputMonitored )
+            return;
+
         using namespace std::placeholders;
         m_timerID = TimerManager::instance()->addTimer(
             std::bind(&QnPlOnvifResource::pullMessages, this, _1),
@@ -3012,7 +3000,7 @@ void QnPlOnvifResource::setRelayOutputStateNonSafe(
     unsigned int autoResetTimeoutMS )
 {
     {
-        QMutexLocker lk(&m_subscriptionMutex);
+        QMutexLocker lk(&m_ioPortMutex);
         m_triggerOutputTasks.erase( timerID );
     }
 

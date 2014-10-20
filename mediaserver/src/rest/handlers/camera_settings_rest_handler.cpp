@@ -131,9 +131,9 @@ int QnCameraSettingsRestHandler::executeGet( const QString& path, const QnReques
         if( it == camIDIter )
             continue;
         if( cmdType == ctSetParam )
-            res->setParamAsync( it->first, it->second, QnDomainPhysical );
+            res->setParamPhysicalAsync( it->first, it->second);
         else if( cmdType == ctGetParam )
-            res->getParamAsync( it->first, QnDomainPhysical );
+            res->getParamPhysicalAsync( it->first);
         awaitedParams.paramsToWaitFor.insert( it->first );
     }
 

@@ -27,6 +27,15 @@ public:
 
     virtual QString getUniqueId() const;
 
+    //!Overrides \a QnResource::getName. Returns camera name (from \a QnCameraUserAttributes) of
+    virtual QString getName() const override;
+    //!Overrides \a QnResource::setName. Just calls \a QnSecurityCamResource::setCameraName
+    /*!
+        TODO get rid of this override, since mediaserver and client must call different methods (setName and setCameraName respectively)
+    */
+    virtual void setName( const QString& name ) override;
+    void setServerName( const QString& name );
+
     void setApiUrl(const QString& restUrl);
     QString getApiUrl() const;
 
@@ -42,7 +51,8 @@ public:
     QnMediaServerConnectionPtr apiConnection();
 
     QnAbstractStorageResourceList getStorages() const;
-    void setStorages(const QnAbstractStorageResourceList& storages);
+    QnAbstractStorageResourcePtr getStorageByUrl(const QString& url) const;
+    //void setStorages(const QnAbstractStorageResourceList& storages);
 
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
@@ -65,7 +75,7 @@ public:
     void setMaxCameras(int value);
 
     void setRedundancy(bool value);
-    int isRedundancy() const;
+    bool isRedundancy() const;
 
     QnSoftwareVersion getVersion() const;
     void setVersion(const QnSoftwareVersion& version);
@@ -86,9 +96,15 @@ public:
 
     virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode = false) override;
     qint64 currentStatusTime() const;
+    void setStorageDataToUpdate(const QnAbstractStorageResourceList& storagesToUpdate, const ec2::ApiIdDataList& storageUrlToRemove);
+    /*
+    * Return pair of handles of saving requests. first: handle for saving storages, second: handle for remove storages
+    */
+    QPair<int, int> saveUpdatedStorages();
 private slots:
     void at_pingResponse(QnHTTPRawResponse, int);
-
+private:
+    void onRequestDone( int reqID, ec2::ErrorCode errorCode );
 signals:
     void serverIfFound(const QnMediaServerResourcePtr &resource, const QString &, const QString& );
     void panicModeChanged(const QnResourcePtr &resource);
@@ -97,7 +113,7 @@ signals:
     void versionChanged(const QnResourcePtr &resource);
     void systemNameChanged(const QnResourcePtr &resource);
     void redundancyChanged(const QnResourcePtr &resource);
-
+    void storageSavingDone(int reqID, ec2::ErrorCode errCode);
 private:
     QnMediaServerConnectionPtr m_restConnection;
     QString m_apiUrl;
@@ -106,7 +122,7 @@ private:
     QList<QHostAddress> m_prevNetAddrList;
     QList<QUrl> m_additionalUrls;
     QList<QUrl> m_ignoredUrls;
-    QnAbstractStorageResourceList m_storages;
+    //QnAbstractStorageResourceList m_storages;
     bool m_primaryIFSelected;
     Qn::ServerFlags m_serverFlags;
     Qn::PanicMode m_panicMode;
@@ -115,10 +131,12 @@ private:
     QString m_systemName;
     QMap<int, QString> m_runningIfRequests;
     QObject *m_guard; // TODO: #Elric evil hack. Remove once roma's direct connection hell is refactored out.
-    int m_maxCameras;
-    bool m_redundancy;
     QElapsedTimer m_statusTimer;
     QString m_authKey;
+
+    // used for client purpose only. Can be moved to separete class
+    QnAbstractStorageResourceList m_storagesToUpdate;
+    ec2::ApiIdDataList m_storagesToRemove;
 };
 
 class QnMediaServerResourceFactory : public QnResourceFactory

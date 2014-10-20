@@ -18,10 +18,10 @@ public:
     /**
      * Constructor
      *
-     * \param server            Server resource to use.
+     * \param serverId          Id of server resource to use.
      * \param parent            Parent object.
      */
-    QnMediaServerStatisticsStorage(const QnMediaServerResourcePtr &server, int pointsLimit, QObject *parent);
+    QnMediaServerStatisticsStorage(const QnUuid &serverId, int pointsLimit, QObject *parent);
 
     /**
      *  Register the consumer object.
@@ -68,6 +68,8 @@ private slots:
     void at_statisticsReceived(int status, const QnStatisticsReply &reply, int handle);
 
 private:
+    QnUuid m_serverId;
+
     /** Number of update requests. Increased with every update period. */
     int m_updateRequests;
 
@@ -81,7 +83,6 @@ private:
     int m_updatePeriod;
     qint64 m_uptimeMs;
 
-    QnMediaServerResourcePtr m_server;
     QnStatisticsHistory m_history;
     QTimer *m_timer;
     QHash<Qn::StatisticsDeviceType, int> m_flagsFilter;

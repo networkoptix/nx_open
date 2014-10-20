@@ -1,6 +1,8 @@
 #ifndef QN_WORKBENCH_ACTION_HANDLER_H
 #define QN_WORKBENCH_ACTION_HANDLER_H
 
+#include <atomic>
+
 #include <QtCore/QBuffer>
 #include <QtCore/QObject>
 
@@ -52,6 +54,8 @@ namespace detail {
     class QnResourceStatusReplyProcessor: public QObject {
         Q_OBJECT
     public:
+        std::atomic<int> awaitedResponseCount;
+
         QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnVirtualCameraResourceList &resources);
 
     public slots:
@@ -245,6 +249,8 @@ protected slots:
 
     void at_setCurrentLayoutAspectRatio4x3Action_triggered();
     void at_setCurrentLayoutAspectRatio16x9Action_triggered();
+    void at_setCurrentLayoutAspectRatio3x4Action_triggered();
+    void at_setCurrentLayoutAspectRatio9x16Action_triggered();
     void at_setCurrentLayoutItemSpacing0Action_triggered();
     void at_setCurrentLayoutItemSpacing10Action_triggered();
     void at_setCurrentLayoutItemSpacing20Action_triggered();
@@ -273,8 +279,6 @@ protected slots:
     void at_whatsThisAction_triggered();
 
     void at_escapeHotkeyAction_triggered();
-
-    void at_clearCacheAction_triggered();
 
     void at_messageBoxAction_triggered();
 

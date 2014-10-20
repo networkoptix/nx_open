@@ -110,6 +110,12 @@
         },
         {
             "keys": [
+                "General|IP Camera"
+            ],
+            "ptzTraits": "FourWayPtz"
+        },
+        {
+            "keys": [
                 "VISTA|VK2-ENCODER",
                 "VISTA|VK2-1080PTZ",
                 "*|DW-CP04"

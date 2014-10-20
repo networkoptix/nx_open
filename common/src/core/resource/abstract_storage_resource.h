@@ -28,6 +28,8 @@ public:
     bool isUsedForWriting() const;
     QString getPath() const;
     static QString urlToPath(const QString& url);
+
+    static QnUuid fillID(const QnUuid& mserverId, const QString& url);
 #ifdef ENABLE_DATA_PROVIDERS
     virtual float bitrate() const;
     virtual float getStorageBitrateCoeff() const { return 1.0; }
@@ -41,6 +43,7 @@ public:
      */
     void setIndex(quint16 value);
     quint16 getIndex() const;
+    virtual void setUrl(const QString& value) override;
 
     /*
      * Returns storage usage in range [0..1]
@@ -57,7 +60,7 @@ public:
     };
 
     static ProtocolDescription protocolDescription(const QString &protocol);
-
+    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 signals:
     /*
      * Storage may emit archiveRangeChanged signal to inform server what some data in archive already deleted
@@ -65,7 +68,6 @@ signals:
      * @param newEndTime - Not used now, reserved for future use
      */
     void archiveRangeChanged(const QnAbstractStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
-
 private:
     qint64 m_spaceLimit;
     int m_maxStoreTime; // in seconds

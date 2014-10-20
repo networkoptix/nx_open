@@ -10,7 +10,6 @@
 
 #include "media_data_packet.h"
 
-
 class QnCodecAudioFormat
 :
     public QnAudioFormat

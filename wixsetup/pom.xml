@@ -152,7 +152,7 @@
 						<configuration>
 							<executable>${init.python.dir}/python</executable>
 							<arguments>
-								<argument>wix-compile.py</argument>
+                                <argument>wix-compile-${install.type}.py</argument>
 							</arguments>
 							<workingDirectory>${project.build.directory}</workingDirectory>
 						</configuration>                    

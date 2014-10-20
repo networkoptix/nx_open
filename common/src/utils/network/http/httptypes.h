@@ -254,7 +254,6 @@ namespace nx_http
 
     static const MimeProtoVersion http_1_0 = { "HTTP", "1.0" };
     static const MimeProtoVersion http_1_1 = { "HTTP", "1.1" };
-    static const MimeProtoVersion rtsp_1_0 = { "RTSP", "1.0" };
 
     class RequestLine
     {
@@ -262,6 +261,7 @@ namespace nx_http
         StringType method;
         QUrl url;
         MimeProtoVersion version;
+        QString urlPostfix;
 
         bool parse( const ConstBufferRefType& data );
         //!Appends serialized data to \a dstBuffer

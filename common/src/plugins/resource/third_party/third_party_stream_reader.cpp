@@ -134,6 +134,8 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
     }
     nxcip_qt::CameraMediaEncoder cameraEncoder( intf );
 
+    m_camManager.setCredentials( m_thirdPartyRes->getAuth().user(), m_thirdPartyRes->getAuth().password() );
+
     if( m_camManager.setAudioEnabled( m_thirdPartyRes->isAudioEnabled() ) != nxcip::NX_NO_ERROR )
         return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("audio"));
 
@@ -312,7 +314,8 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
             }
             else
             {
-                rez = readStreamReader( m_liveStreamReader );
+                int errorCode = 0;
+                rez = readStreamReader( m_liveStreamReader, &errorCode );
                 if( rez )
                 {
                     rez->flags |= QnAbstractMediaData::MediaFlags_LIVE;
@@ -333,6 +336,11 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
                         }
                         static_cast<QnCompressedAudioData*>(rez.data())->context = m_audioContext;
                     }
+                }
+                else
+                {
+                    if( errorCode == nxcip::NX_NOT_AUTHORIZED )
+                        m_thirdPartyRes->setStatus( Qn::Unauthorized );
                 }
             }
         }
@@ -427,10 +435,13 @@ CodecID ThirdPartyStreamReader::toFFmpegCodecID( nxcip::CompressionType compress
     }
 }
 
-QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamReader* streamReader )
+QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamReader* streamReader, int* outErrorCode )
 {
     nxcip::MediaDataPacket* packet = NULL;
-    if( streamReader->getNextData( &packet ) != nxcip::NX_NO_ERROR || !packet)
+    const int errorCode = streamReader->getNextData( &packet );
+    if( outErrorCode )
+        *outErrorCode = errorCode;
+    if( errorCode != nxcip::NX_NO_ERROR || !packet)
         return QnAbstractMediaDataPtr();    //error reading data
 
     nxpt::ScopedRef<nxcip::MediaDataPacket> packetAp( packet, false );

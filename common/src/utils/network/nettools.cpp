@@ -76,7 +76,7 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
 
     QList<QnInterfaceAndAddr> result;
 
-    foreach(QNetworkInterface iface, QNetworkInterface::allInterfaces())
+    foreach(const QNetworkInterface& iface, QNetworkInterface::allInterfaces())
     {
         if (!(iface.flags() & QNetworkInterface::IsUp))
             continue;
@@ -97,7 +97,7 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
                             arg = arg.mid(1);
                         if (arg.startsWith(QLatin1String("if="))) {
                             QStringList tmp = arg.split(QLatin1Char('='))[1].split(QLatin1Char(';'));
-                            foreach(QString s, tmp)
+                            foreach(const QString& s, tmp)
                                 allowedInterfaces << QHostAddress(s);
                         }
                     }
@@ -107,7 +107,7 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
                     {
                         QSettings settings;
                         QStringList tmp = settings.value(QLatin1String("if")).toString().split(QLatin1Char(';'));
-                        foreach(QString s, tmp) {
+                        foreach(const QString& s, tmp) {
                             if (!s.isEmpty())
                                 allowedInterfaces << QHostAddress(s);
                         }
@@ -364,7 +364,7 @@ QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHost
 
     QList<QHostAddress> result;
 
-    foreach(PinagableT addr, hostslist)
+    foreach(const PinagableT& addr, hostslist)
     {
         if (addr.online)
             result.push_back(QHostAddress(addr.addr));
@@ -375,7 +375,7 @@ QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHost
     CL_LOG(cl_logDEBUG1)
     {
         NX_LOG(lit("ping results..."), cl_logDEBUG1);
-        foreach(QHostAddress addr, result)
+        foreach(const QHostAddress& addr, result)
             NX_LOG(addr.toString(), cl_logDEBUG1);
     }
 
