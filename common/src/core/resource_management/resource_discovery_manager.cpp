@@ -150,7 +150,7 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(const QnUuid &resourceT
 
         foreach (QnAbstractResourceSearcher *searcher, searchersList)
         {
-            result = searcher->createResource(resourceTypeId, QnResourceParams(params.url, params.vendor));
+            result = searcher->createResource(resourceTypeId, params);
             if (!result.isNull())
                 break;
         }
@@ -435,7 +435,7 @@ void QnResourceDiscoveryManager::onInitAsyncFinished(const QnResourcePtr& res, b
     QnNetworkResource* rpNetRes = dynamic_cast<QnNetworkResource*>(res.data());
     if (initialized && rpNetRes && !rpNetRes->hasFlags(Qn::desktop_camera))
     {
-        if (rpNetRes->getStatus() == Qn::Offline || rpNetRes->getStatus() == Qn::Unauthorized)
+        if (rpNetRes->getStatus() == Qn::Offline || rpNetRes->getStatus() == Qn::Unauthorized || rpNetRes->getStatus() == Qn::NotDefined)
             rpNetRes->setStatus(Qn::Online);
     }
 }
@@ -490,7 +490,7 @@ void QnResourceDiscoveryManager::dtsAssignment()
         //QList<QnDtsUnit> unitsLst =  QnColdStoreDTSSearcher::instance().findDtsUnits();
         QList<QnDtsUnit> unitsLst =  m_dstList[i]->findDtsUnits();
 
-        foreach(QnDtsUnit unit, unitsLst)
+        foreach(const QnDtsUnit& unit, unitsLst)
         {
             QnResourcePtr res = qnResPool->getResourceByUniqId(unit.resourceID);
             if (!res)

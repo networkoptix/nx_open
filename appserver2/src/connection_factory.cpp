@@ -18,6 +18,7 @@
 #include "ec2_connection.h"
 #include "ec2_thread_pool.h"
 #include "nx_ec/data/api_resource_type_data.h"
+#include "nx_ec/data/api_camera_data_ex.h"
 #include "remote_ec_connection.h"
 #include "rest/ec2_base_query_http_handler.h"
 #include "rest/ec2_update_http_handler.h"
@@ -108,11 +109,11 @@ namespace ec2
         //AbstractResourceManager::getResource
         //registerGetFuncHandler<std::nullptr_t, ApiResourceData>( restProcessorPool, ApiCommand::getResource );
         //AbstractResourceManager::setResourceStatus
-        registerUpdateFuncHandler<ApiSetResourceStatusData>( restProcessorPool, ApiCommand::setResourceStatus );
+        registerUpdateFuncHandler<ApiResourceStatusData>( restProcessorPool, ApiCommand::setResourceStatus );
         //AbstractResourceManager::getKvPairs
-        registerGetFuncHandler<QnUuid, ApiResourceParamsData>( restProcessorPool, ApiCommand::getResourceParams );
+        registerGetFuncHandler<QnUuid, ApiResourceParamWithRefDataList>( restProcessorPool, ApiCommand::getResourceParams );
         //AbstractResourceManager::save
-        registerUpdateFuncHandler<ApiResourceParamsData>( restProcessorPool, ApiCommand::setResourceParams );
+        registerUpdateFuncHandler<ApiResourceParamWithRefDataList>( restProcessorPool, ApiCommand::setResourceParams );
         //AbstractResourceManager::save
         registerUpdateFuncHandler<ApiResourceData>( restProcessorPool, ApiCommand::saveResource );
         //AbstractResourceManager::remove
@@ -123,9 +124,21 @@ namespace ec2
         registerGetFuncHandler<QnUuid, ApiMediaServerDataList>( restProcessorPool, ApiCommand::getMediaServers );
         //AbstractMediaServerManager::save
         registerUpdateFuncHandler<ApiMediaServerData>( restProcessorPool, ApiCommand::saveMediaServer );
+        //AbstractCameraManager::saveUserAttributes
+        registerUpdateFuncHandler<ApiMediaServerUserAttributesDataList>( restProcessorPool, ApiCommand::saveServerUserAttributesList );
+        //AbstractCameraManager::getUserAttributes
+        registerGetFuncHandler<QnUuid, ApiMediaServerUserAttributesDataList>( restProcessorPool, ApiCommand::getServerUserAttributes );
         //AbstractMediaServerManager::remove
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeMediaServer );
 
+        //AbstractMediaServerManager::getServersEx
+        registerGetFuncHandler<QnUuid, ApiMediaServerDataExList>( restProcessorPool, ApiCommand::getMediaServersEx );
+
+        registerUpdateFuncHandler<ApiStorageDataList>( restProcessorPool, ApiCommand::saveStorages);
+        registerUpdateFuncHandler<ApiStorageData>( restProcessorPool, ApiCommand::saveStorage);
+        registerUpdateFuncHandler<ApiIdDataList>( restProcessorPool, ApiCommand::removeStorages);
+        registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeStorage);
+        registerUpdateFuncHandler<ApiIdDataList>( restProcessorPool, ApiCommand::removeResources);
 
         //AbstractCameraManager::addCamera
         registerUpdateFuncHandler<ApiCameraData>( restProcessorPool, ApiCommand::saveCamera );
@@ -133,6 +146,10 @@ namespace ec2
         registerUpdateFuncHandler<ApiCameraDataList>( restProcessorPool, ApiCommand::saveCameras );
         //AbstractCameraManager::getCameras
         registerGetFuncHandler<QnUuid, ApiCameraDataList>( restProcessorPool, ApiCommand::getCameras );
+        //AbstractCameraManager::saveUserAttributes
+        registerUpdateFuncHandler<ApiCameraAttributesDataList>( restProcessorPool, ApiCommand::saveCameraUserAttributesList );
+        //AbstractCameraManager::getUserAttributes
+        registerGetFuncHandler<QnUuid, ApiCameraAttributesDataList>( restProcessorPool, ApiCommand::getCameraUserAttributes );
         //AbstractCameraManager::addCameraHistoryItem
         registerUpdateFuncHandler<ApiCameraServerItemData>( restProcessorPool, ApiCommand::addCameraHistoryItem );
         //AbstractCameraManager::removeCameraHistoryItem
@@ -141,6 +158,10 @@ namespace ec2
         registerGetFuncHandler<std::nullptr_t, ApiCameraServerItemDataList>( restProcessorPool, ApiCommand::getCameraHistoryItems );
         //AbstractCameraManager::getBookmarkTags
         registerGetFuncHandler<std::nullptr_t, ApiCameraBookmarkTagDataList>( restProcessorPool, ApiCommand::getCameraBookmarkTags );
+        //AbstractCameraManager::getCamerasEx
+        registerGetFuncHandler<QnUuid, ApiCameraDataExList>( restProcessorPool, ApiCommand::getCamerasEx );
+
+        registerGetFuncHandler<QnUuid, ApiStorageDataList>( restProcessorPool, ApiCommand::getStorages );
 
         //AbstractCameraManager::getBookmarkTags
 
@@ -208,9 +229,9 @@ namespace ec2
         //AbstractMiscManager::discoverPeer
         registerUpdateFuncHandler<ApiDiscoverPeerData>(restProcessorPool, ApiCommand::discoverPeer);
         //AbstractMiscManager::addDiscoveryInformation
-        registerUpdateFuncHandler<ApiDiscoveryDataList>(restProcessorPool, ApiCommand::addDiscoveryInformation);
+        registerUpdateFuncHandler<ApiDiscoveryData>(restProcessorPool, ApiCommand::addDiscoveryInformation);
         //AbstractMiscManager::removeDiscoveryInformation
-        registerUpdateFuncHandler<ApiDiscoveryDataList>(restProcessorPool, ApiCommand::removeDiscoveryInformation);
+        registerUpdateFuncHandler<ApiDiscoveryData>(restProcessorPool, ApiCommand::removeDiscoveryInformation);
         //AbstractMiscManager::changeSystemName
         registerUpdateFuncHandler<ApiSystemNameData>(restProcessorPool, ApiCommand::changeSystemName);
 

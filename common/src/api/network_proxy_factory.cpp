@@ -18,6 +18,7 @@ QnNetworkProxyFactory::QnNetworkProxyFactory() {}
 QnNetworkProxyFactory::~QnNetworkProxyFactory() {}
 
 QUrl QnNetworkProxyFactory::urlToResource(const QUrl &baseUrl, const QnResourcePtr &resource, QnNetworkProxyFactory::WhereToPlaceProxyCredentials credentialsBehavior) {
+    Q_UNUSED(credentialsBehavior)
     const QNetworkProxy &proxy = proxyToResource(resource);
 
     switch (proxy.type()) {

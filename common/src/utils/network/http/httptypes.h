@@ -261,6 +261,7 @@ namespace nx_http
         StringType method;
         QUrl url;
         MimeProtoVersion version;
+        QString urlPostfix;
 
         bool parse( const ConstBufferRefType& data );
         //!Appends serialized data to \a dstBuffer

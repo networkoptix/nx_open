@@ -15,11 +15,6 @@ int QnTestCameraResource::getMaxFps() const
     return 30;
 }
 
-bool QnTestCameraResource::isResourceAccessible()
-{
-    return true;
-}
-
 QString QnTestCameraResource::getDriverName() const
 {
     return MANUFACTURE;
@@ -46,12 +41,11 @@ QString QnTestCameraResource::getHostAddress() const
         return QString();
 }
 
-bool QnTestCameraResource::setHostAddress(const QString &ip, QnDomain /*domain*/)
+void QnTestCameraResource::setHostAddress(const QString &ip)
 {
     QUrl url(getUrl());
     url.setHost(ip);
     setUrl(url.toString());
-    return true;
 }
 
 #endif // #ifdef ENABLE_TEST_CAMERA

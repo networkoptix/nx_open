@@ -1,5 +1,7 @@
 #include "serializer.h"
 
+#include <core/resource/motion_window.h>
+
 void parseRegion(QRegion& region, const QString& regionString)
 {
     foreach (QString rectString, regionString.split(QLatin1Char(';')))

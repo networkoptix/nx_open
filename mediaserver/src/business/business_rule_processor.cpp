@@ -97,7 +97,7 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(const QnAbstrac
         const QnMediaServerResource* mServer = dynamic_cast<const QnMediaServerResource*>(mServerRes.data());
         if (!mServer || (mServer->getServerFlags() & Qn::SF_HasPublicIP))
             return QnMediaServerResourcePtr(); // do not proxy
-        foreach (QnMediaServerResourcePtr mServer, qnResPool->getAllServers())
+        foreach (const QnMediaServerResourcePtr& mServer, qnResPool->getAllServers())
         {
             if ((mServer->getServerFlags() & Qn::SF_HasPublicIP) && mServer->getStatus() == Qn::Online)
                 return mServer;
@@ -156,7 +156,7 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
         executeAction(action, QnResourcePtr());
     }
     else {
-        foreach(QnResourcePtr res, resList)
+        foreach(const QnResourcePtr& res, resList)
             executeAction(action, res);
     }
 }
@@ -245,7 +245,7 @@ void QnBusinessRuleProcessor::processBusinessEvent(const QnAbstractBusinessEvent
     QMutexLocker lock(&m_mutex);
 
     QnAbstractBusinessActionList actions = matchActions(bEvent);
-    foreach(QnAbstractBusinessActionPtr action, actions)
+    foreach(const QnAbstractBusinessActionPtr& action, actions)
     {
         executeAction(action);
     }
@@ -412,7 +412,7 @@ bool QnBusinessRuleProcessor::checkEventCondition(const QnAbstractBusinessEventP
 QnAbstractBusinessActionList QnBusinessRuleProcessor::matchActions(const QnAbstractBusinessEventPtr& bEvent)
 {
     QnAbstractBusinessActionList result;
-    foreach(QnBusinessEventRulePtr rule, m_rules)    
+    foreach(const QnBusinessEventRulePtr& rule, m_rules)    
     {
         if (rule->isDisabled() || rule->eventType() != bEvent->getEventType())
             continue;
@@ -666,7 +666,7 @@ void QnBusinessRuleProcessor::at_businessRuleReset(const QnBusinessEventRuleList
     }
     m_rules.clear();
 
-    foreach(QnBusinessEventRulePtr rule, rules) {
+    foreach(const QnBusinessEventRulePtr& rule, rules) {
         at_businessRuleChanged_i(rule);
     }
 }

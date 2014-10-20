@@ -5,6 +5,7 @@
 #include "utils/network/simple_http_client.h"
 #include "utils/network/tcp_connection_priv.h"
 #include <utils/common/app_info.h>
+#include "utils/network/module_finder.h"
 
 int QnPingSystemRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
 {
@@ -62,7 +63,10 @@ int QnPingSystemRestHandler::executeGet(const QString &path, const QnRequestPara
 
     result.setReply(moduleInformation);
 
-    if (!isCompatible(qnCommon->engineVersion(), moduleInformation.version) || moduleInformation.customization != QnAppInfo::customizationName()) {
+    bool customizationOK = moduleInformation.customization == QnAppInfo::customizationName();
+    if (QnModuleFinder::instance()->isCompatibilityMode())
+        customizationOK = true;
+    if (!isCompatible(qnCommon->engineVersion(), moduleInformation.version) || !customizationOK) {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("INCOMPATIBLE"));
         return CODE_OK;
     }

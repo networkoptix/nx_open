@@ -398,10 +398,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
         return CameraDiagnostics::NoErrorResult();
     //m_timeHelper.reset();
     m_gotSomeFrame = false;
-    QString transport;
-    QVariant val;
-    m_resource->getParam(QnMediaResource::rtpTransportKey(), val, QnDomainMemory);
-    transport = val.toString();
+    QString transport = m_resource->getProperty(QnMediaResource::rtpTransportKey());
     if (transport.isEmpty())
         transport = m_resource->getProperty(QnMediaResource::rtpTransportKey());
 
@@ -466,11 +463,9 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
 
         QnVirtualCameraResourcePtr camRes = m_resource.dynamicCast<QnVirtualCameraResource>();
         if (camRes && m_role == Qn::CR_LiveVideo) {
-            QVariant val;
-            camRes->getParam(lit("VideoLayout"), val, QnDomainMemory);
-            QString oldVideoLayout = val.toString();
+            QString oldVideoLayout = camRes->getProperty(Qn::VIDEO_LAYOUT_PARAM_NAME);
             if (newVideoLayout != oldVideoLayout) {
-                camRes->setParam(lit("VideoLayout"), newVideoLayout, QnDomainDatabase);
+                camRes->setProperty(Qn::VIDEO_LAYOUT_PARAM_NAME, newVideoLayout);
                 camRes->saveParams();
             }
         }

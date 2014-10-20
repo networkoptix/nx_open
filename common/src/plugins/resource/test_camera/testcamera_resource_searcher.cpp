@@ -31,7 +31,7 @@ bool QnTestCameraResourceSearcher::updateSocketList()
     if (curretTime - m_sockUpdateTime > SOCK_UPDATE_INTERVAL)
     {
         clearSocketList();
-        foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
+        foreach (const QnInterfaceAndAddr& iface, getAllIPv4Interfaces())
         {
             DiscoveryInfo info(SocketFactory::createDatagramSocket(), iface.address);
             if (info.sock->bind(iface.address.toString(), 0))
@@ -109,7 +109,7 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
         }
     }
     QnResourceList rez;
-    foreach(QnResourcePtr res, resources.values())
+    foreach(const QnResourcePtr& res, resources.values())
         rez << res;
 
     sendBroadcast();

@@ -74,7 +74,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>${init.python.dir}/python</executable>
+                            <executable>${init.python.dir}/${python.executable}</executable>
                             <arguments>
                                 <argument>configure.py</argument>
                                 <argument>--cst</argument>

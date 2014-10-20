@@ -23,7 +23,7 @@ public:
     QnGlobalSettings(QObject *parent = NULL);
     virtual ~QnGlobalSettings();
 
-    QnKvPairList allSettings() const;
+    ec2::ApiResourceParamDataList allSettings() const;
 
     QSet<QString> disabledVendorsSet() const;
     QString disabledVendors() const;

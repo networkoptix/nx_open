@@ -7,6 +7,7 @@
 #define GSOAP_ASYNC_CALL_WRAPPER_H
 
 #include <functional>
+#include <memory>
 #include <type_traits>
 
 #include <QtCore/QMutex>
@@ -36,6 +37,10 @@ public:
 };
 
 //!Async wrapper for gsoap call
+/*!
+    \note Class methods are not thread-safe. All calls MUST be serialized by caller
+    \note Request interleaving is not supported. Issueing new request with previous still running causes undefined behavior
+*/
 template<typename SyncWrapper, typename Request, typename Response>
 class GSoapAsyncCallWrapper
 :
@@ -50,12 +55,12 @@ public:
     typedef int(SyncWrapper::*GSoapCallFuncType)(Request&, Response&);
 
     /*!
-        \param syncWrapper 
+        \param syncWrapper Ownership is passed to this class
         \param syncFunc Synchronous function to call
     */
-    GSoapAsyncCallWrapper(SyncWrapper* syncWrapper, GSoapCallFuncType syncFunc)
+    GSoapAsyncCallWrapper( std::unique_ptr<SyncWrapper> syncWrapper, GSoapCallFuncType syncFunc )
     :
-        m_syncWrapper(syncWrapper),
+        m_syncWrapper(std::move(syncWrapper)),
         m_syncFunc(syncFunc),
         m_state(init),
         m_responseDataPos(0),
@@ -74,8 +79,7 @@ public:
         m_syncWrapper->getProxy()->soap->master = SOAP_INVALID_SOCKET;
         soap_destroy(m_syncWrapper->getProxy()->soap);
         soap_end(m_syncWrapper->getProxy()->soap);
-        delete m_syncWrapper;
-        m_syncWrapper = nullptr;
+        m_syncWrapper.reset();
 
         //if we are here, it is garanteed that 
             //- completion handler is down the stack
@@ -121,6 +125,7 @@ public:
     /*!
         \param resultHandler Called on async call completion, receives GSoap result code or \a SOAP_INTERRUPTED
         \return \a true if async call has been started successfully
+        \note Request interleaving is not supported. Issueing new request with previous still running causes undefined behavior
     */
     template<class ResultHandler>
     bool callAsync(const Request& request, ResultHandler resultHandler)
@@ -128,18 +133,16 @@ public:
         m_state = init;
         m_extCompletionHandler = std::move(resultHandler);
         m_resultHandler = [this](int resultCode) {
-            bool terminated = false;
-            m_terminatedFlagPtr = &terminated;
+            QMutexLocker lk(&m_mutex);
+            m_socket.reset();
+            lk.unlock();
             m_extCompletionHandler(resultCode);
-            if( !terminated )
-            {
-                QMutexLocker lk(&m_mutex);
-                m_socket.reset();
-                m_terminatedFlagPtr = nullptr;
-            }
         };
 
+        //NOTE not locking mutex because all public method calls are synchronized
+            //by caller and no request interleaving is allowed
         m_socket.reset( SocketFactory::createStreamSocket( false, SocketFactory::nttDisabled ) );
+
         m_syncWrapper->getProxy()->soap->user = this;
         m_syncWrapper->getProxy()->soap->fconnect = [](struct soap*, const char*, const char*, int) -> int { return SOAP_OK; };
         m_syncWrapper->getProxy()->soap->fdisconnect = [](struct soap*) -> int { return SOAP_OK; };
@@ -157,6 +160,7 @@ public:
         m_request = request;
 
         const QUrl endpoint(QLatin1String(m_syncWrapper->endpoint()));
+
         using namespace std::placeholders;
         if( !m_socket->setNonBlockingMode( true ) ||
             !m_socket->connectAsync(
@@ -172,7 +176,7 @@ public:
 
     SyncWrapper* syncWrapper() const
     {
-        return m_syncWrapper;
+        return m_syncWrapper.get();
     }
 
     const Response& response() const
@@ -217,7 +221,7 @@ private:
 
         //serializing request
         m_state = sendingRequest;
-        (m_syncWrapper->*m_syncFunc)(m_request, m_response);
+        (m_syncWrapper.get()->*m_syncFunc)(m_request, m_response);
         assert( !m_serializedRequest.isEmpty() );
         m_syncWrapper->getProxy()->soap->socket = SOAP_INVALID_SOCKET;
         m_syncWrapper->getProxy()->soap->master = SOAP_INVALID_SOCKET;
@@ -226,9 +230,13 @@ private:
 
         {
             QMutexLocker lk(&m_mutex);
+            if( !m_socket )
+                return;
             //sending request
             using namespace std::placeholders;
-            if( !m_socket->sendAsync(m_serializedRequest, std::bind(&GSoapAsyncCallWrapper::onRequestSent, this, _1, _2)) )
+            if( !m_socket->sendAsync(
+                    m_serializedRequest,
+                    std::bind(&GSoapAsyncCallWrapper::onRequestSent, this, _1, _2)) )
             {
                 m_state = done;
                 lk.unlock();
@@ -252,8 +260,12 @@ private:
         m_responseBuffer.resize(0);
         {
             QMutexLocker lk(&m_mutex);
+            if( !m_socket )
+                return;
             using namespace std::placeholders;
-            if( !m_socket->readSomeAsync(&m_responseBuffer, std::bind(&GSoapAsyncCallWrapper::onSomeBytesRead, this, _1, _2)) )
+            if( !m_socket->readSomeAsync(
+                    &m_responseBuffer,
+                    std::bind(&GSoapAsyncCallWrapper::onSomeBytesRead, this, _1, _2)) )
             {
                 m_state = done;
                 lk.unlock();
@@ -287,8 +299,12 @@ private:
 
         {
             QMutexLocker lk(&m_mutex);
+            if( !m_socket )
+                return;
             using namespace std::placeholders;
-            if( !m_socket->readSomeAsync(&m_responseBuffer, std::bind(&GSoapAsyncCallWrapper::onSomeBytesRead, this, _1, _2)) )
+            if( !m_socket->readSomeAsync(
+                    &m_responseBuffer,
+                    std::bind(&GSoapAsyncCallWrapper::onSomeBytesRead, this, _1, _2)) )
             {
                 m_state = done;
                 lk.unlock();
@@ -300,7 +316,7 @@ private:
     int deserializeResponse()
     {
         m_responseDataPos = 0;
-        const int resultCode = (m_syncWrapper->*m_syncFunc)(m_request, m_response);
+        const int resultCode = (m_syncWrapper.get()->*m_syncFunc)(m_request, m_response);
         m_syncWrapper->getProxy()->soap->socket = SOAP_INVALID_SOCKET;
         m_syncWrapper->getProxy()->soap->master = SOAP_INVALID_SOCKET;
         m_state = done;
@@ -310,7 +326,7 @@ private:
 private:
     Request m_request;
     Response m_response;
-    SyncWrapper* m_syncWrapper;
+    std::unique_ptr<SyncWrapper> m_syncWrapper;
     GSoapCallFuncType m_syncFunc;
     State m_state;
     QByteArray m_serializedRequest;
