@@ -211,6 +211,21 @@ namespace ec2
         void initialized();
 
     private:
+        enum FilterType
+        {
+            RES_ID_FIELD,
+            RES_TYPE_FIELD
+        };
+
+        //!query filter
+        class QnQueryFilter
+        {
+        public:
+            //filtered field, 
+            QMap<int, QVariant> fields;
+        };
+
+
         friend class QnTransactionLog;
         QSqlDatabase& getDB() { return m_sdb; }
         QReadWriteLock& getMutex() { return m_mutex; }
@@ -394,6 +409,7 @@ namespace ec2
         ErrorCode removeObject(const ApiObjectInfo& apiObject);
 
         ErrorCode insertAddParam(const ApiResourceParamWithRefData& param);
+        ErrorCode fetchResourceParams( const QnQueryFilter& filter, ApiResourceParamWithRefDataList& params );
         //ErrorCode deleteAddParams(qint32 resourceId);
 
         ErrorCode saveCamera(const ApiCameraData& params);

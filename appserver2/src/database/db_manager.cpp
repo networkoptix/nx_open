@@ -39,6 +39,9 @@
 
 using std::nullptr_t;
 
+static const QString RES_TYPE_MSERVER = "mediaserver";
+static const QString RES_TYPE_CAMERA = "camera";
+
 namespace ec2
 {
 
@@ -936,6 +939,52 @@ ErrorCode QnDbManager::insertAddParam(const ApiResourceParamWithRefData& param)
         qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
         return ErrorCode::dbError;
     }        
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::fetchResourceParams( const QnQueryFilter& filter, ApiResourceParamWithRefDataList& params )
+{
+    const QnUuid resID = filter.fields.value( RES_ID_FIELD ).value<QnUuid>();
+    const QByteArray resType = filter.fields.value( RES_TYPE_FIELD ).toByteArray();
+
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    QString queryStr = "\
+            SELECT kv.resource_guid as resourceId, kv.value, kv.name \
+            FROM vms_kvpair kv ";
+    if( !resType.isEmpty() )
+    {
+        queryStr += 
+           "JOIN vms_resource r on r.guid = kv.resource_guid ";
+        if( resType == RES_TYPE_MSERVER )
+            queryStr += 
+           "JOIN vms_server s on s.resource_ptr_id = r.id ";
+        else if( resType == RES_TYPE_CAMERA )
+            queryStr += 
+           "JOIN vms_camera c on c.resource_ptr_id = r.id ";
+    }
+    if( !resID.isNull() )
+        queryStr += "\
+            WHERE kv.resource_guid = :guid ";
+    queryStr += 
+           "ORDER BY kv.resource_guid ";
+
+    if( !query.prepare( queryStr ) )
+    {
+        NX_LOG( lit("Could not prepare query %1: %2").arg(queryStr).arg(query.lastError().text()), cl_logWARNING );
+        return ErrorCode::dbError;
+    }
+
+    if( !resID.isNull() )
+        query.bindValue(QLatin1String(":guid"), resID.toRfc4122());
+    if (!query.exec())
+    {
+        NX_LOG( lit("DB error at %1: %2").arg(Q_FUNC_INFO).arg(query.lastError().text()), cl_logWARNING );
+        return ErrorCode::dbError;
+    }
+
+    QnSql::fetch_many(query, &params);
+
     return ErrorCode::ok;
 }
 
@@ -2520,27 +2569,15 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& cameraId, ApiCameraDataExList
     }
     QnSql::fetch_many(queryCameras, &cameraExList);
 
-    QSqlQuery queryParams(m_sdb);
-    queryParams.setForwardOnly(true);
-    QString filterStr2;
-    if (!cameraId.isNull())
-        filterStr2 = QString("WHERE r.parent_guid = %1").arg(guidToSqlString(cameraId));
-    queryParams.prepare(QString("\
-        SELECT kv.resource_guid as resourceId, kv.value, kv.name \
-        FROM vms_kvpair kv \
-        JOIN vms_resource r on r.guid = kv.resource_guid \
-        JOIN vms_camera c on c.resource_ptr_id = r.id \
-        %1 \
-        ORDER BY r.guid\
-    ").arg(filterStr2));
-
-    if (!queryParams.exec()) {
-        qWarning() << Q_FUNC_INFO << queryParams.lastError().text();
-        return ErrorCode::dbError;
-    }
+    //reading resource properties
+    QnQueryFilter filter;
+    if( !cameraId.isNull() )
+        filter.fields.insert( RES_ID_FIELD, QVariant::fromValue(cameraId) );
+    filter.fields.insert( RES_TYPE_FIELD, RES_TYPE_CAMERA );
     ApiResourceParamWithRefDataList params;
-    QnSql::fetch_many(queryParams, &params);
-
+    ErrorCode result = fetchResourceParams( filter, params );
+    if( result != ErrorCode::ok )
+        return result;
     mergeObjectListData<ApiCameraDataEx>(cameraExList, params, &ApiCameraDataEx::addParams, &ApiResourceParamWithRefData::resourceId);
 
     std::vector<ApiScheduleTaskWithRefData> scheduleTaskList;
@@ -2638,41 +2675,21 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerData
     mergeObjectListData( serverExList, storages, &ApiMediaServerDataEx::storages, &ApiMediaServerDataEx::id, &ApiStorageData::parentId );
 
     //reading properties
-    QSqlQuery queryParams(m_sdb);
-    queryParams.setForwardOnly(true);
-    QString filterStr2;
-    if (!mServerId.isNull())
-        filterStr2 = QString("WHERE r.parent_guid = %1").arg(guidToSqlString(mServerId));
-    queryParams.prepare(QString("\
-        SELECT kv.resource_guid as resourceId, kv.value, kv.name    \
-        FROM vms_kvpair kv                                          \
-        JOIN vms_resource r on r.guid = kv.resource_guid            \
-        JOIN vms_server s on s.resource_ptr_id = r.id               \
-        %1                                                          \
-        ORDER BY r.guid                                             \
-    ").arg(filterStr2));
-
-    if( !queryParams.exec() ) {
-        NX_LOG( lit("DB Error at %1: %2").arg(Q_FUNC_INFO).arg(queryParams.lastError().text()), cl_logWARNING );
-        return ErrorCode::dbError;
-    }
+    QnQueryFilter filter;
+    if( !mServerId.isNull() )
+        filter.fields.insert( RES_ID_FIELD, QVariant::fromValue(mServerId) );
+    filter.fields.insert( RES_TYPE_FIELD, RES_TYPE_MSERVER );
     ApiResourceParamWithRefDataList params;
-    QnSql::fetch_many(queryParams, &params);
+    result = fetchResourceParams( filter, params );
+    if( result != ErrorCode::ok )
+        return result;
     mergeObjectListData<ApiMediaServerDataEx>(serverExList, params, &ApiMediaServerDataEx::addParams, &ApiResourceParamWithRefData::resourceId);
 
     //reading status info
-    QSqlQuery queryStatus(m_sdb);
-    queryStatus.setForwardOnly(true);
-    QString filterStr3;
-    if (!mServerId.isNull())
-        filterStr3 = QString("WHERE guid = %1").arg(guidToSqlString(mServerId));
-    queryStatus.prepare(QString("SELECT guid as id, status FROM vms_resource_status %1 ORDER BY guid").arg(filterStr2));
-    if( !queryStatus.exec() ) {
-        NX_LOG( lit("DB Error at %1: %2").arg(Q_FUNC_INFO).arg(queryParams.lastError().text()), cl_logWARNING );
-        return ErrorCode::dbError;
-    }
     ApiResourceStatusDataList statusList;
-    QnSql::fetch_many(queryStatus, &statusList);
+    result = doQueryNoLock( mServerId, statusList );
+    if( result != ErrorCode::ok )
+        return result;
     
     mergeObjectListData(
         serverExList,
@@ -2909,27 +2926,10 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRule
 // getKVPairs
 ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resourceId, ApiResourceParamWithRefDataList& params)
 {
-    QSqlQuery query(m_sdb);
-    query.setForwardOnly(true);
-    if (resourceId.isNull()) {
-        query.prepare(QString("SELECT resource_guid as resourceId, value, name FROM vms_kvpair"));
-    }
-    else {
-        query.prepare(QString("\
-            SELECT resource_guid as resourceId, value, name \
-            FROM vms_kvpair\
-            WHERE resource_guid = :guid\
-        "));
-        query.bindValue(QLatin1String(":guid"), resourceId.toRfc4122());
-    }
-    if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text() << query.lastQuery();
-        return ErrorCode::dbError;
-    }
-
-    QnSql::fetch_many(query, &params);
-
-    return ErrorCode::ok;
+    QnQueryFilter filter;
+    if( !resourceId.isNull() )
+        filter.fields.insert( RES_ID_FIELD, QVariant::fromValue(resourceId) );
+    return fetchResourceParams( filter, params );
 }
 
 // getCurrentTime
