@@ -1355,6 +1355,9 @@ void QnMain::run()
     ec2ConnectionFactory->setContext(resCtx);
     ec2::AbstractECConnectionPtr ec2Connection;
     QnConnectionInfo connectInfo;
+    QnResourcePropertyDictionary dictionary;
+    QnResourceStatusDiscionary statusDict;
+
     while (!needToStop())
     {
         const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync( QnAppServerConnectionFactory::url(), &ec2Connection );
@@ -1420,8 +1423,6 @@ void QnMain::run()
 
     QnCompatibilityChecker remoteChecker(connectInfo.compatibilityItems);
     QnCompatibilityChecker localChecker(localCompatibilityItems());
-    QnResourcePropertyDictionary dictionary;
-    QnResourceStatusDiscionary statusDict;
 
     QnCompatibilityChecker* compatibilityChecker;
     if (remoteChecker.size() > localChecker.size())
