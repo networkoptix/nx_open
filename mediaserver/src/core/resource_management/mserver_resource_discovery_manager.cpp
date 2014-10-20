@@ -199,8 +199,9 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
         discoveredResources.insert(rpNetRes->getUniqueId());
         rpNetRes->setLastDiscoveredTime(qnSyncTime->currentDateTime());
+#ifndef EDGE_SERVER
         pingResources(rpNetRes);
-
+#endif
         it = resources.erase(it); // do not need to investigate OK resources
     }
 
