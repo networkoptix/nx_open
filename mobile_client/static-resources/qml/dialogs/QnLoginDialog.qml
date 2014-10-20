@@ -60,6 +60,15 @@ FocusScope {
             }
         }
 
+        QnIconButton {
+            id: checkButton
+            icon: "/images/check.png"
+            x: CommonFunctions.dp(16)
+            anchors.verticalCenter: parent.verticalCenter
+
+            onClicked: LoginDialogFunctions.clearSelection()
+        }
+
         Row {
             anchors {
                 right: parent.right
@@ -72,9 +81,13 @@ FocusScope {
                 icon: "/images/delete.png"
 
                 onClicked: {
-                    settings.removeSession(__currentIndex)
-                    savedSessionsList.model = settings.savedSessions()
-                    loginDialog.state = "CHOOSE"
+                    if (loginDialog.state == "CHOOSE") {
+                        LoginDialogFunctions.deleteSelected()
+                    } else {
+                        settings.removeSession(__currentIndex)
+                        savedSessionsList.model = settings.savedSessions()
+                        loginDialog.state = "CHOOSE"
+                    }
                 }
             }
         }
@@ -86,6 +99,18 @@ FocusScope {
                     target: actionBar
                     y: -actionBar.height
                 }
+                PropertyChanges {
+                    target: deleteButton
+                    __clipped: true
+                }
+                PropertyChanges {
+                    target: backButton
+                    __clipped: true
+                }
+                PropertyChanges {
+                    target: checkButton
+                    __clipped: true
+                }
             },
             State {
                 name: "SELECT"
@@ -93,12 +118,40 @@ FocusScope {
                     target: actionBar
                     y: 0
                 }
+                PropertyChanges {
+                    target: deleteButton
+                    __clipped: false
+                }
+                PropertyChanges {
+                    target: backButton
+                    __clipped: true
+                    visible: false
+                }
+                PropertyChanges {
+                    target: checkButton
+                    __clipped: false
+                    visible: true
+                }
             },
             State {
                 name: "EDIT"
                 PropertyChanges {
                     target: actionBar
                     y: 0
+                }
+                PropertyChanges {
+                    target: deleteButton
+                    __clipped: false
+                }
+                PropertyChanges {
+                    target: backButton
+                    __clipped: false
+                    visible: true
+                }
+                PropertyChanges {
+                    target: checkButton
+                    __clipped: true
+                    visible: false
                 }
             }
         ]
@@ -127,6 +180,8 @@ FocusScope {
         ListView {
             id: savedSessionsList
 
+            property var selection: []
+
             anchors.centerIn: parent
             width: parent.width * 2 / 3
             height: parent.height / 3
@@ -134,7 +189,7 @@ FocusScope {
             boundsBehavior: ListView.StopAtBounds
 
             delegate: Item {
-                property bool selected: false
+                id: sessionItem
 
                 width: savedSessionsList.width
                 height: label.height + CommonFunctions.dp(16)
@@ -142,7 +197,7 @@ FocusScope {
                 Rectangle {
                     anchors.fill: parent
 
-                    color: "#303030"
+                    color: savedSessionsList.selection.indexOf(index) != -1 ? "#4a4a4a" : "#2d2d2d"
                     radius: CommonFunctions.dp(2)
                 }
 
@@ -158,13 +213,15 @@ FocusScope {
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        __currentIndex = index
-                        LoginDialogFunctions.updateUi(modelData)
-                        loginDialog.state = "EDIT"
+                        if (savedSessionsList.selection.length) {
+                            LoginDialogFunctions.select(index)
+                        } else {
+                            __currentIndex = index
+                            LoginDialogFunctions.updateUi(modelData)
+                            loginDialog.state = "EDIT"
+                        }
                     }
-                    onPressAndHold: {
-
-                    }
+                    onPressAndHold: LoginDialogFunctions.select(index)
                 }
             }
         }
@@ -259,6 +316,7 @@ FocusScope {
             if (loginDialog.state == "CHOOSE") {
                 LoginDialogFunctions.updateUi(null)
                 __currentIndex = savedSessionsList.count
+                LoginDialogFunctions.clearSelection()
                 loginDialog.state = "EDIT"
             } else {
                 __currentIndex = -1

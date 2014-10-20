@@ -34,3 +34,28 @@ function saveCurrentSession() {
     savedSessionsList.model = settings.savedSessions()
     __currentIndex = 0
 }
+
+function select(index) {
+    if (savedSessionsList.selection.indexOf(index) == -1) {
+        savedSessionsList.selection = savedSessionsList.selection.concat([index])
+        actionBar.state = "SELECT"
+    }
+}
+
+function clearSelection() {
+    savedSessionsList.selection = []
+    actionBar.state = "HIDDEN"
+}
+
+function isSelected(index) {
+    return savedSessionsList.selection.indexOf(index) != -1
+}
+
+function deleteSelected() {
+    var selection = savedSessionsList.selection.sort()
+    savedSessionsList.selection = []
+    for (var i = selection.length - 1; i >= 0; i--)
+        settings.removeSession(selection[i])
+    savedSessionsList.model = settings.savedSessions()
+    actionBar.state = "HIDDEN"
+}
