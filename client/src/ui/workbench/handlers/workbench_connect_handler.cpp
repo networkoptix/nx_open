@@ -17,7 +17,11 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/camera_user_attribute_pool.h>
+#include <core/resource/media_server_user_attributes.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_properties.h>
+#include <core/resource_management/status_dictionary.h>
 
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
@@ -36,8 +40,6 @@
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_state_manager.h>
 
-#include <ui/workbench/handlers/workbench_layouts_handler.h>            //TODO: #GDM dependencies
-
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 
 #include <utils/app_server_notification_cache.h>
@@ -46,10 +48,7 @@
 #include <utils/network/module_finder.h>
 #include <utils/network/global_module_finder.h>
 #include <utils/network/router.h>
-#include "core/resource_management/resource_properties.h"
-#include "core/resource_management/status_dictionary.h"
-#include "core/resource/camera_user_attribute_pool.h"
-#include "core/resource/media_server_user_attributes.h"
+
 
 #include "compatibility.h"
 
@@ -148,16 +147,6 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
     if (connected()) {
         if (tryToRestoreConnection())
             return;
-    QVector<QnUuid> idList;
-    foreach(const QnResourcePtr& res, remoteResources)
-        idList.push_back(res->getId());
-    QnCameraUserAttributePool::instance()->clear();
-    QnMediaServerUserAttributesPool::instance()->clear();
-
-    propertyDictionary->clear(idList);
-    qnStatusDictionary->clear(idList);
-
-
         /* Otherwise, disconnect fully. */    
         disconnectFromServer(true);
         showLoginDialog();
@@ -346,8 +335,19 @@ void QnWorkbenchConnectHandler::clearConnection() {
 
     /* Remove all remote resources. */
     const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(Qn::remote);
+
+    QVector<QnUuid> idList;
+    foreach(const QnResourcePtr& res, remoteResources)
+        idList.push_back(res->getId());
+
     resourcePool()->removeResources(remoteResources);
     resourcePool()->removeResources(resourcePool()->getAllIncompatibleResources());
+
+    QnCameraUserAttributePool::instance()->clear();
+    QnMediaServerUserAttributesPool::instance()->clear();
+
+    propertyDictionary->clear(idList);
+    qnStatusDictionary->clear(idList);
 
     /* Also remove layouts that were just added and have no 'remote' flag set. */
     foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources<QnLayoutResource>()) {
