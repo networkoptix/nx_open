@@ -448,7 +448,8 @@ private:
     std::map<QString, bool> m_relayInputStates;
     std::string m_deviceIOUrl;
     QString m_onvifNotificationSubscriptionID;
-    mutable QMutex m_subscriptionMutex;
+    mutable QMutex m_ioPortMutex;
+    bool m_inputMonitored;
     EventMonitorType m_eventMonitorType;
     quint64 m_timerID;
     quint64 m_renewSubscriptionTaskID;
