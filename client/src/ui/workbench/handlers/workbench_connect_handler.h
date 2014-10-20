@@ -25,7 +25,7 @@ protected:
 
     bool connected() const;
 
-    bool connectToServer(const QUrl &appServerUrl);
+    bool connectToServer(const QUrl &appServerUrl, bool silent = false);
     bool disconnectFromServer(bool force);
 
     void hideMessageBox();

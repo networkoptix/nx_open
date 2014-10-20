@@ -147,6 +147,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
 
         /* Otherwise, disconnect fully. */    
         disconnectFromServer(true);
+        showLoginDialog();
     }
         
     clearConnection();
@@ -220,17 +221,20 @@ bool QnWorkbenchConnectHandler::connected() const {
     return !qnCommon->remoteGUID().isNull();
 }
 
-bool QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerUrl) {
-    Q_ASSERT(!connected());
-    if (connected())
-        return true;
+bool QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerUrl, bool silent) {
+    if (!silent) {
+        Q_ASSERT(!connected());
+        if (connected())
+            return true;
+    }
     
     /* Hiding message box from previous connect. */
     hideMessageBox();
 
     QnEc2ConnectionRequestResult result;
     m_connectingHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(appServerUrl, &result, &QnEc2ConnectionRequestResult::processEc2Reply );
-    m_connectingMessageBox = QnGraphicsMessageBox::information(tr("Connecting..."), INT_MAX);
+    if (!silent)
+        m_connectingMessageBox = QnGraphicsMessageBox::information(tr("Connecting..."), INT_MAX);
 
     //here we are going to inner event loop
     ec2::ErrorCode errCode = static_cast<ec2::ErrorCode>(result.exec());
@@ -244,7 +248,9 @@ bool QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerUrl) {
     hideMessageBox();
 
     QnConnectionInfo connectionInfo = result.reply<QnConnectionInfo>();
-    QnConnectionDiagnosticsHelper::Result status = QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errCode, appServerUrl, mainWindow());
+    QnConnectionDiagnosticsHelper::Result status = silent
+        ? QnConnectionDiagnosticsHelper::validateConnectionLight(connectionInfo, errCode)
+        : QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errCode, appServerUrl, mainWindow());
     
     switch (status) {
     case QnConnectionDiagnosticsHelper::Result::Failure:
@@ -351,7 +357,38 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
     QUrl currentUrl = QnAppServerConnectionFactory::url();
     QString userName = currentUrl.userName();
     QString password = currentUrl.password();
-    QString systemName = qnCommon->localSystemName();
+
+    QList<QnUuid> allServers;
+    foreach (const QnMediaServerResourcePtr &server, qnResPool->getResources<QnMediaServerResource>())
+        allServers << server->getId();
+
+    struct ServerInfo {
+        QnUuid id;              /**< Id of the server. */
+        QUrl url;               /**< Random interface */        //TODO: #GDM select the best by ping time
+        //quint64 pingTime;                                       //TODO: #GDM select the best by ping time
+    };
+    QList<ServerInfo> availableServers;
+
+    QnCompatibilityChecker checker(localCompatibilityItems());
+    foreach (const QnModuleInformation &info, QnModuleFinder::instance()->foundModules()) {
+        if (!allServers.contains(info.id))
+            continue;
+
+        if (info.remoteAddresses.isEmpty())
+            continue;
+
+        ServerInfo server;
+        server.id = info.id;
+        server.url.setScheme(lit("http"));
+        server.url.setHost(*info.remoteAddresses.cbegin());
+        server.url.setPort(info.port);
+        server.url.setUserName(userName);
+        server.url.setPassword(password);
+        availableServers << server;
+    }    
+
+    if (availableServers.isEmpty())
+        return false;
 
     QnProgressDialog* progressDialog = new QnProgressDialog(mainWindow());
     progressDialog->setWindowTitle(tr("Reconnecting..."));
@@ -362,47 +399,23 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    progressDialog,   &QnProgressDialog::hide);
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    progressDialog,   &QnProgressDialog::deleteLater);
 
-    // here we will wait for the reconnect or cancel
-    progressDialog->exec();
-    disconnect(QnClientMessageProcessor::instance(), NULL, progressDialog, NULL);
+    progressDialog->show();
 
+    /* Here we will wait for the reconnect or cancel. */
+    auto iter = availableServers.cbegin();
+    while (!progressDialog->wasCanceled()) {
+        if (connectToServer(iter->url, true))   /* Here inner event loop will be started. */
+            break;
+        ++iter;
+        if (iter == availableServers.cend())
+            iter = availableServers.cbegin();   //loop
+    }
+
+    disconnect(QnClientMessageProcessor::instance(), NULL, progressDialog, NULL);
     progressDialog->deleteLater();
     if (progressDialog->wasCanceled())
         return false;
     return true;
-
-
-  /*  m_connectingMessageBox = QnGraphicsMessageBox::informationTicking(
-        tr("Connection failed. Trying to restore connection... %1"),
-        maxReconnectTimeout);
-
-    connect(m_connectingMessageBox, &QnGraphicsMessageBox::finished, this, [this, systemName, userName, password] {
-        m_connectingMessageBox = NULL;
-        disconnectFromServer(true);
-
-        QnCompatibilityChecker checker(localCompatibilityItems());
-        foreach (const QnModuleInformation &info, QnModuleFinder::instance()->foundModules()) {
-            if (info.systemName != systemName)
-                continue;
-
-            if (info.remoteAddresses.isEmpty())
-                continue;
-
-            if (!checker.isCompatible(lit("Client"), qnCommon->engineVersion(), lit("ECS"), info.version))
-                continue;
-
-            QUrl targetUrl;
-            targetUrl.setScheme(lit("http"));
-            targetUrl.setHost(*info.remoteAddresses.cbegin());
-            targetUrl.setPort(info.port);
-            targetUrl.setUserName(userName);
-            targetUrl.setPassword(password);
-            if (connectToServer(targetUrl))
-                return;
-        }        
-        menu()->trigger(Qn::OpenLoginDialogAction);
-    });*/
-   
 }
 
 
