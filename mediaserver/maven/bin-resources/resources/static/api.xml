@@ -1017,7 +1017,7 @@
                     </result>
                 </function>
                 <function>
-                    <name>getMediaServersEx</name>
+                    <name>getMediaServers</name>
                     <description>Return media server list</description>
                     <method>GET</method>
                     <params>
@@ -1051,7 +1051,7 @@
                     </result>
                 </function>
                 <function>
-                    <name>getCamerasEx</name>
+                    <name>getCameras</name>
                     <description>Read camera list</description>
                     <method>GET</method>
                     <params>
