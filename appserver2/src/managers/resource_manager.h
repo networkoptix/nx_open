@@ -50,6 +50,11 @@ namespace ec2
             emit resourceRemoved( tran.params.id );
         }
 
+        void triggerNotification( const QnTransaction<ApiIdDataList>& tran ) {
+            foreach(const ApiIdData& id, tran.params)
+                emit resourceRemoved( id.id );
+        }
+
     protected:
         ResourceContext m_resCtx;
     };
@@ -84,7 +89,8 @@ namespace ec2
         virtual int removeParams(const ec2::ApiResourceParamWithRefDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::remove
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) override;
-
+        virtual int remove( const QVector<QnUuid>& idList, impl::SimpleHandlerPtr handler ) override;
+        
     private:
         QueryProcessorType* const m_queryProcessor;
 

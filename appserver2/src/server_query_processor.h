@@ -150,9 +150,12 @@ namespace ec2
         template<class HandlerType>
         void processUpdateAsync(QnTransaction<ApiIdDataList>& tran, HandlerType handler )
         {
-            if (tran.command == ApiCommand::removeStorages) 
-            {
+            if (tran.command == ApiCommand::removeStorages)             {
                 return processMultiUpdateAsync<ApiIdDataList, ApiIdData>(tran, handler, ApiCommand::removeStorage);
+            }
+            else if (tran.command == ApiCommand::removeResources) 
+            {
+                return processMultiUpdateAsync<ApiIdDataList, ApiIdData>(tran, handler, ApiCommand::removeResource);
             }
             else {
                 Q_ASSERT_X(0, "Not implemented", Q_FUNC_INFO);
