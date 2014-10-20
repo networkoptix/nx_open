@@ -13,6 +13,7 @@ public:
     void readFromFile(const QString &fileName);
 
     Q_INVOKABLE QColor color(const QString &key) const;
+    QPalette palette() const;
 
 private:
     QHash<QString, QColor> m_colors;
