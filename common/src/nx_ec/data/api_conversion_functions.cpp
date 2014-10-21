@@ -53,7 +53,7 @@ void fromApiToResource(const ApiBusinessRuleData &src, QnBusinessEventRulePtr &d
 
     dst->setEventResources(QVector<QnUuid>::fromStdVector(src.eventResourceIds));
 
-    dst->setEventParams(QnBusinessEventParameters::fromBusinessParams(deserializeBusinessParams(src.eventCondition)));
+    dst->setEventParams(QJson::deserialized<QnBusinessEventParameters>(src.eventCondition));
 
     dst->setEventState(src.eventState);
     dst->setActionType(src.actionType);
@@ -76,7 +76,7 @@ void fromResourceToApi(const QnBusinessEventRulePtr &src, ApiBusinessRuleData &d
     dst.eventResourceIds = src->eventResources().toStdVector();
     dst.actionResourceIds = src->actionResources().toStdVector();
 
-    dst.eventCondition = serializeBusinessParams(src->eventParams().toBusinessParams());
+    dst.eventCondition = QJson::serialized(src->eventParams());
     dst.actionParams = QJson::serialized(src->actionParams());
 
     dst.eventState = src->eventState();
@@ -111,14 +111,14 @@ void fromResourceToApi(const QnAbstractBusinessActionPtr &src, ApiBusinessAction
     dst.resourceIds = src->getResources().toStdVector();
 
     dst.params = QJson::serialized(src->getParams());
-    dst.runtimeParams = serializeBusinessParams(src->getRuntimeParams().toBusinessParams());
+    dst.runtimeParams = QJson::serialized(src->getRuntimeParams());
 
     dst.ruleId = src->getBusinessRuleId();
     dst.aggregationCount = src->getAggregationCount();
 }
 
 void fromApiToResource(const ApiBusinessActionData &src, QnAbstractBusinessActionPtr &dst, QnResourcePool *) {
-    dst = QnBusinessActionFactory::createAction(static_cast<QnBusiness::ActionType>(src.actionType), QnBusinessEventParameters::fromBusinessParams(deserializeBusinessParams(src.runtimeParams)));
+    dst = QnBusinessActionFactory::createAction(src.actionType, QJson::deserialized<QnBusinessEventParameters>(src.runtimeParams));
 
     dst->setToggleState(src.toggleState);
     dst->setReceivedFromRemoteHost(src.receivedFromRemoteHost);

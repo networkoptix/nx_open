@@ -3,19 +3,23 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QtEndian>
 
+#include <business/actions/abstract_business_action.h>
+#include <business/events/abstract_business_event.h>
+#include <business/business_action_factory.h>
+
 #include <core/resource/network_resource.h>
+#include <core/resource_management/resource_pool.h>
 
-#include "business/events/abstract_business_event.h"
-#include "utils/common/synctime.h"
-#include "utils/common/util.h"
 #include <media_server/serverutil.h>
-#include "business/business_action_factory.h"
-#include "core/resource_management/resource_pool.h"
-#include "recorder/storage_manager.h"
-#include <recording/time_period.h>
-#include <media_server/settings.h>
-#include "core/resource/network_resource.h"
 
+#include <recorder/storage_manager.h>
+#include <recording/time_period.h>
+
+#include <media_server/settings.h>
+
+#include <utils/common/synctime.h>
+#include <utils/common/util.h>
+#include <utils/common/model_functions.h>
 
 static const qint64 EVENTS_CLEANUP_INTERVAL = 1000000ll * 3600;
 static const qint64 DEFAULT_EVENT_KEEP_PERIOD = 1000000ll * 3600 * 24 * 30; // 30 days
@@ -345,71 +349,11 @@ void QnEventsDB::getAndSerializeActions(
     qDebug() << Q_FUNC_INFO << "query time=" << t.elapsed() << "msec";
 }
 
-
-void QnEventsDB::migrate()
-{
-    QList<QnAbstractBusinessActionPtr> result;
-
-    QString request(lit("SELECT * FROM runtime_actions"));
-
-    QSqlQuery query(request);
-    //query.prepare(request);
-    if (!query.exec())
-        return;
-
-    QSqlRecord rec = query.record();
-    int idIdx = rec.indexOf("id");
-    int actionTypeIdx = rec.indexOf("action_type");
-    int actionParamIdx = rec.indexOf("action_params");
-    int runtimeParamIdx = rec.indexOf("runtime_params");
-    int businessRuleIdx = rec.indexOf("business_rule_guid");
-    int toggleStateIdx = rec.indexOf("toggle_state");
-    int aggregationCntIdx = rec.indexOf("aggregation_count");
-
-    QList<int> idList;
-
-    while (query.next()) 
-    {
-        QnBusiness::ActionType actionType = (QnBusiness::ActionType) query.value(actionTypeIdx).toInt();
-        
-        QByteArray data = query.value(actionParamIdx).toByteArray();
-
-        QnBusinessActionParameters actionParams = QnBusinessActionParameters::unpack(data);
-
-        QnBusinessParams bParams = deserializeBusinessParams(query.value(runtimeParamIdx).toByteArray());
-        QnBusinessEventParameters runtimeParams = QnBusinessEventParameters::fromBusinessParams(bParams);
-
-        QnAbstractBusinessActionPtr action = QnBusinessActionFactory::createAction(actionType, runtimeParams);
-        action->setParams(actionParams);
-        action->setBusinessRuleId(QnUuid(query.value(businessRuleIdx).toString()));
-        action->setToggleState( (QnBusiness::EventState) query.value(toggleStateIdx).toInt());
-        action->setAggregationCount(query.value(aggregationCntIdx).toInt());
-
-        result << action;
-        idList << query.value(idIdx).toInt();
-    }
-
-    query.finish();
-
-    for (int i = 0; i < result.size(); ++i)
-    {
-        QSqlQuery query2;
-        query2.prepare("UPDATE runtime_actions set runtime_params=:runtime_params WHERE id =:id");
-        query2.bindValue(":runtime_params", result[i]->getRuntimeParams().pack());
-        query2.bindValue(":id", idList[i]);
-        query2.exec();
-    }
-
-}
-
-
 void QnEventsDB::init()
 {
     // this call is not thread safe! You should init from main thread e.t.c
     Q_ASSERT_X(!m_instance, Q_FUNC_INFO, "QnEventsDB::init must be called once!");
     m_instance = new QnEventsDB();
-
-    //migrate();
 }
 
 void QnEventsDB::fini()

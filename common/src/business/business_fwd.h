@@ -60,6 +60,7 @@ public:
         StorageFullReason,
         LicenseRemoved
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventReason)
 
     enum EventState {
         InactiveState = 0,

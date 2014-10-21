@@ -4,12 +4,11 @@
 #include <QtCore/QStringList>
 
 #include <business/business_fwd.h>
-#include <utils/common/id.h>
 
+#include <utils/common/model_functions_fwd.h>
+#include <utils/common/uuid.h>
 
-class QnBusinessEventParameters
-{
-public:
+struct QnBusinessEventParameters {
     enum Param 
     {
         // base for any event type
@@ -48,17 +47,17 @@ public:
     static QnBusinessEventParameters unpack(const QByteArray& value);
     QByteArray pack() const;
 
-    QnBusinessParams toBusinessParams() const;
-    static QnBusinessEventParameters fromBusinessParams(const QnBusinessParams& bParams);
-
-    bool operator==(const QnBusinessEventParameters& other) const;
-
     /** Hash for events aggregation. */
     QnUuid getParamsHash() const;
 
 private:
     static int getParamIndex(const QString& key);
 };
+
+#define QnBusinessEventParameters_Fields (eventType)(eventTimestamp)(eventResourceId)(actionResourceId)\
+    (reasonCode)(reasonParamsEncoded)(source)(conflicts)(inputPortId)
+
+QN_FUSION_DECLARE_FUNCTIONS(QnBusinessEventParameters, (ubjson)(json)(eq));
 
 
 #endif // BUSINESS_EVENT_PARAMETERS_H

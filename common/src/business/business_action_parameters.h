@@ -4,8 +4,6 @@
 #include <business/business_fwd.h>
 #include <utils/common/model_functions_fwd.h>
 
-//TODO: #rvasilenko adding new parameter is TOO complex. Structure can be simplified --gdm
-
 struct QnBusinessActionParameters {
     enum Param {
         SoundUrlParam,
@@ -68,8 +66,5 @@ struct QnBusinessActionParameters {
     (relayOutputId)(relayAutoResetTimeout)(inputPortId)(sayText)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnBusinessActionParameters, (ubjson)(json)(eq));
-
-QByteArray serializeBusinessParams(const QnBusinessParams& value);
-QnBusinessParams deserializeBusinessParams(const QByteArray& value);
 
 #endif // BUSINESS_ACTION_PARAMETERS_H

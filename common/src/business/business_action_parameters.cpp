@@ -2,8 +2,6 @@
 
 #include <utils/common/model_functions.h>
 
-// TODO: #Elric #enum use QN_DEFINE_EXPLICIT_ENULEXICAL_FUNCTIONS
-
 static QLatin1String PARANAMES[] =
 {
     QLatin1String("soundUrl"),
@@ -153,18 +151,6 @@ QByteArray QnBusinessActionParameters::pack() const
     serializeStringParam(result, sayText, defaultParams.sayText);
 
     return result;
-}
-
-QByteArray serializeBusinessParams(const QnBusinessParams& value) {
-     QByteArray result;
-     QJson::serialize(QJsonObject::fromVariantMap(value), &result); // TODO: #Elric unuse variants
-     return result;
-}
-
-QnBusinessParams deserializeBusinessParams(const QByteArray& value) {
-     QJsonValue result;
-     QJson::deserialize(value, &result); // TODO: #Elric unuse variants
-     return result.toObject().toVariantMap(); /* Returns empty map in case of deserialization error. */
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnBusinessActionParameters, (ubjson)(json)(eq), QnBusinessActionParameters_Fields, (optional, true) )

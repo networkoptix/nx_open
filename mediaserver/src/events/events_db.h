@@ -2,9 +2,13 @@
 #define __EVENTS_DB_H_
 
 #include <QtSql/QtSql>
-#include "business/actions/abstract_business_action.h"
-#include "business/events/abstract_business_event.h"
+
+#include <core/resource/resource_fwd.h>
+#include <business/business_fwd.h>
+
 #include "utils/db/db_helper.h"
+
+#include <utils/common/uuid.h>
 
 class QnTimePeriod;
 
@@ -40,7 +44,6 @@ public:
     static void fini();
 
     bool createDatabase();
-    static void migrate();
 protected:
     QnEventsDB();
 private:
