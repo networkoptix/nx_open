@@ -130,13 +130,13 @@ bool QnEventsDB::saveActionToDB(const QnAbstractBusinessActionPtr& action, const
         "event_resource_guid, action_resource_guid) "
         "VALUES (:timestamp, :action_type, :action_params, :runtime_params, :business_rule_guid, :toggle_state, :aggregation_count, :event_type, :event_resource_guid, :action_resource_guid);");
 
-    qint64 timestampUsec = action->getRuntimeParams().getEventTimestamp();
-    QnUuid eventResId = action->getRuntimeParams().getEventResourceId();
+    qint64 timestampUsec = action->getRuntimeParams().eventTimestamp;
+    QnUuid eventResId = action->getRuntimeParams().eventResourceId;
     
     QnBusinessEventParameters actionRuntime = action->getRuntimeParams();
     if (actionRes)
-        actionRuntime.setActionResourceId(actionRes->getId());
-    int eventType = (int) actionRuntime.getEventType();
+        actionRuntime.actionResourceId = actionRes->getId();
+    int eventType = (int) actionRuntime.eventType;
 
     insQuery.bindValue(":timestamp", timestampUsec/1000000);
     insQuery.bindValue(":action_type", (int) action->actionType());

@@ -245,7 +245,7 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationWidget 
 
 void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
-    QnUuid resourceId = params.getEventResourceId();
+    QnUuid resourceId = params.eventResourceId;
     QnResourcePtr resource = qnResPool->getResourceById(resourceId);
     if (!resource)
         return;
@@ -255,7 +255,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
     QnNotificationWidget *item = new QnNotificationWidget(m_list);
 
-    QnBusiness::EventType eventType = params.getEventType();
+    QnBusiness::EventType eventType = params.eventType;
 
     item->setText(QnBusinessStringsHelper::eventAtResource(params, qnSettings->isIpShownInTree()));
     item->setTooltipText(QnBusinessStringsHelper::eventDescription(businessAction, QnBusinessAggregationInfo(), qnSettings->isIpShownInTree(), false));
@@ -279,9 +279,9 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             icon,
             tr("Browse Archive"),
             Qn::OpenInNewLayoutAction,
-            QnActionParameters(resource).withArgument(Qn::ItemTimeRole, params.getEventTimestamp()/1000)
+            QnActionParameters(resource).withArgument(Qn::ItemTimeRole, params.eventTimestamp/1000)
         );
-        loadThumbnailForItem(item, resource, params.getEventTimestamp());
+        loadThumbnailForItem(item, resource, params.eventTimestamp);
         break;
     }
     case QnBusiness::CameraInputEvent: {
@@ -325,7 +325,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case QnBusiness::CameraIpConflictEvent: {
-        QString webPageAddress = params.getSource();
+        QString webPageAddress = params.source;
 
         item->addActionButton(
             qnSkin->icon("events/camera.png"),
@@ -378,7 +378,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
 void QnNotificationsCollectionWidget::hideBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
     QnUuid ruleId = businessAction->getBusinessRuleId();
-    QnResourcePtr resource = qnResPool->getResourceById(businessAction->getRuntimeParams().getEventResourceId());
+    QnResourcePtr resource = qnResPool->getResourceById(businessAction->getRuntimeParams().eventResourceId);
     if (!resource)
         return;
 
@@ -539,6 +539,7 @@ void QnNotificationsCollectionWidget::updateBlinker() {
 }
 
 void QnNotificationsCollectionWidget::at_debugButton_clicked() {
+#ifdef _DEBUG
     QnResourceList servers = qnResPool->getResources<QnMediaServerResource>();
     QnResourcePtr sampleServer = servers.isEmpty() ? QnResourcePtr() : servers.first();
 
@@ -572,54 +573,54 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
     for (QnBusiness::EventType eventType: QnBusiness::allEvents()) {
 
         QnBusinessEventParameters params;
-        params.setEventType(eventType);
-        params.setEventTimestamp((quint64)QDateTime::currentMSecsSinceEpoch() * 1000ull);
+        params.eventType = eventType;
+        params.eventTimestamp = (quint64)QDateTime::currentMSecsSinceEpoch() * 1000ull;
         switch(eventType) {
         case QnBusiness::CameraMotionEvent: {
                 if (!sampleCamera)
                     continue;
-                params.setEventResourceId(sampleCamera->getId());
+                params.eventResourceId = sampleCamera->getId();
                 break;
             }
 
         case QnBusiness::CameraInputEvent: {
                 if (!sampleCamera)
                     continue;
-                params.setEventResourceId(sampleCamera->getId());
-                params.setInputPortId(lit("01"));
+               params.eventResourceId = sampleCamera->getId();
+                params.inputPortId = lit("01");
                 break;
             }
 
         case QnBusiness::CameraDisconnectEvent: {
                 if (!sampleCamera)
                     continue;
-                params.setEventResourceId(sampleCamera->getId());
+                params.eventResourceId = sampleCamera->getId();
                 break;
             }
 
         case QnBusiness::NetworkIssueEvent: {
                 if (!sampleCamera)
                     continue;
-                params.setEventResourceId(sampleCamera->getId());
-                params.setReasonCode(QnBusiness::NetworkNoFrameReason);
-                params.setReasonParamsEncoded(lit("15000"));
+                params.eventResourceId = sampleCamera->getId();
+                params.reasonCode = QnBusiness::NetworkNoFrameReason;
+                params.reasonParamsEncoded = lit("15000");
                 break;
             }
 
         case QnBusiness::StorageFailureEvent: {
                 if (!sampleServer)
                     continue;
-                params.setEventResourceId(sampleServer->getId());
-                params.setReasonCode(QnBusiness::StorageTooSlowReason);
-                params.setReasonParamsEncoded(lit("C: E:"));
+                params.eventResourceId = sampleCamera->getId();
+                params.reasonCode = QnBusiness::StorageTooSlowReason;
+                params.reasonParamsEncoded = lit("C: E:");
                 break;
             }
 
         case QnBusiness::CameraIpConflictEvent: {
                 if (!sampleServer)
                     continue;
-                params.setEventResourceId(sampleServer->getId());
-                params.setSource(lit("192.168.0.5"));
+                params.eventResourceId = sampleCamera->getId();
+                params.source = lit("192.168.0.5");
 
                 QStringList conflicts;
                 conflicts << lit("50:e5:49:43:b2:59");
@@ -628,22 +629,22 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
                 conflicts << lit("50:e5:49:43:b2:62");
                 conflicts << lit("50:e5:49:43:b2:63");
                 conflicts << lit("50:e5:49:43:b2:64");
-                params.setConflicts(conflicts);
+                params.conflicts = conflicts;
                 break;
             }
         case QnBusiness::ServerFailureEvent: {
                 if (!sampleServer)
                     continue;
-                params.setEventResourceId(sampleServer->getId());
-                params.setReasonCode(QnBusiness::ServerTerminatedReason);
+                params.eventResourceId = sampleCamera->getId();
+                params.reasonCode = QnBusiness::ServerTerminatedReason;
                 break;
             }
 
         case QnBusiness::ServerConflictEvent: {
                 if (!sampleServer)
                     continue;
-                params.setEventResourceId(sampleServer->getId());
-                params.setSource(lit("10.0.2.187"));
+                params.eventResourceId = sampleServer->getId();
+                params.source = lit("10.0.2.187");
 
                 QStringList conflicts;
                 conflicts << lit("10.0.2.108");
@@ -656,7 +657,7 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
                 conflicts << lit("50:e5:49:43:b2:62");
                 conflicts << lit("50:e5:49:43:b2:63");
                 conflicts << lit("50:e5:49:43:b2:64");
-                params.setConflicts(conflicts);
+                params.conflicts = conflicts;
                 break;
             }
         default:
@@ -668,6 +669,7 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
         baction->setAggregationCount(random(1, 5));
         showBusinessAction(baction);
     }
+#endif
 }
 
 void QnNotificationsCollectionWidget::at_list_itemRemoved(QnNotificationWidget *item) {

@@ -465,8 +465,8 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
     //QMutexLocker lk( &m_mutex );  m_mutex is locked down the stack
 
     //aggregating by recipients and eventtype
-    if( action->getRuntimeParams().getEventType() != QnBusiness::CameraDisconnectEvent &&
-        action->getRuntimeParams().getEventType() != QnBusiness::NetworkIssueEvent )
+    if( action->getRuntimeParams().eventType != QnBusiness::CameraDisconnectEvent &&
+        action->getRuntimeParams().eventType != QnBusiness::NetworkIssueEvent )
     {
         return sendMailInternal( action, 1 );  //currently, aggregating only cameraDisconnected and networkIssue events
     }
@@ -478,7 +478,7 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
             recipients << email;
     }
 
-    SendEmailAggregationKey aggregationKey( action->getRuntimeParams().getEventType(), recipients.join(';') );
+    SendEmailAggregationKey aggregationKey( action->getRuntimeParams().eventType, recipients.join(';') );
     SendEmailAggregationData& aggregatedData = m_aggregatedEmails[aggregationKey];
     if( !aggregatedData.action )
     {
@@ -550,7 +550,7 @@ bool QnBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPt
 
 
     QVariantHash contextMap = QnBusinessStringsHelper::eventDescriptionMap(action, action->aggregationInfo(), true);
-    QnPartialInfo partialInfo(action->getRuntimeParams().getEventType());
+    QnPartialInfo partialInfo(action->getRuntimeParams().eventType);
 
     assert(!partialInfo.attrName.isEmpty());
 //    contextMap[partialInfo.attrName] = lit("true");

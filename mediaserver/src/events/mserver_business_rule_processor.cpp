@@ -188,10 +188,10 @@ QImage QnMServerBusinessRuleProcessor::getEventScreenshot(const QnBusinessEventP
     QImage result;
 
     // By now only motion screenshot is supported
-    if (params.getEventType() != QnBusiness::CameraMotionEvent)
+    if (params.eventType != QnBusiness::CameraMotionEvent)
         return result;
 
-    const QnResourcePtr& cameraRes = QnResourcePool::instance()->getResourceById(params.getEventResourceId());
+    const QnResourcePtr& cameraRes = QnResourcePool::instance()->getResourceById(params.eventResourceId);
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(cameraRes);
     const QnVirtualCameraResource* res = dynamic_cast<const QnVirtualCameraResource*>(cameraRes.data());
 
