@@ -299,8 +299,8 @@ void QnLoginDialog::resetAutoFoundConnectionsModel() {
             QUrl url = data.url;
 
             QnSoftwareVersion ecVersion(data.version);
-            bool isCompatible = checker.isCompatible(QLatin1String("Client"), qnCommon->engineVersion(),
-                                                     QLatin1String("ECS"),    ecVersion);
+            bool isCompatible = checker.isCompatible(lit("Client"), qnCommon->engineVersion(),
+                                                     lit("ECS"),    ecVersion);
 
 
             QString title;
@@ -507,7 +507,7 @@ void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &mod
     /* prefer localhost */
     QHostAddress address(QHostAddress::LocalHost);
     if (!moduleInformation.remoteAddresses.contains(address.toString()))
-        address = *moduleInformation.remoteAddresses.begin();
+        address = *moduleInformation.remoteAddresses.cbegin();
 
     data.url.setScheme(lit("http"));
     data.url.setHost(address.toString());
