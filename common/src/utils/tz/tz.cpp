@@ -70,7 +70,7 @@ namespace nx_tz
         std::map<QByteArray, ISOTimezoneData> m_tzNameToTzData;
     };
 
-    std::atomic<TZIndex*> TZIndex::tzIndexInstance = 0;
+    std::atomic<TZIndex*> TZIndex::tzIndexInstance( 0 );
     std::mutex TZIndex::tzIndexInstanciationMutex;
 
 
