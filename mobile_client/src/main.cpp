@@ -86,6 +86,9 @@ int runApplication(QGuiApplication *application) {
     QQmlComponent mainComponent(&engine, QUrl(lit("qrc:///qml/main.qml")));
     QObject *mainWindow = mainComponent.create();
 
+    if (!mainComponent.errors().isEmpty())
+        qWarning() << mainComponent.errorString();
+
     QObject::connect(&engine, &QQmlEngine::quit, application, &QGuiApplication::quit);
 
     int result = application->exec();
