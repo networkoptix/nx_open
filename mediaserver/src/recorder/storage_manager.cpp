@@ -62,9 +62,13 @@ public:
             m_data.insert(catalog, catalog->lastChunkStartTime());
         m_storagesToScan = m_owner->getStorages();
         m_endScanTime = qnSyncTime->currentMSecsSinceEpoch();
+
+        m_owner->m_rebuildProgress = 0;
+        m_owner->m_rebuildState = QnStorageManager::RebuildState_Initial;
     }
     virtual void run() override
     {
+        int steps = m_data.size() * m_storagesToScan.size();
         foreach(const QnStorageResourcePtr& storage, m_storagesToScan)
         {
             for(auto itr = m_data.begin(); itr != m_data.end(); ++itr) 
@@ -73,10 +77,14 @@ public:
                 filter.scanPeriod.startTimeMs = itr.value();
                 filter.scanPeriod.durationMs = qMax(1ll, m_endScanTime - filter.scanPeriod.startTimeMs);
                 m_owner->partialMediaScan(itr.key(), storage, filter);
+                m_owner->m_rebuildProgress += 1.0 / steps;
                 if (needToStop())
                     return;
             }
         }
+        
+        m_owner->m_rebuildProgress = 1.0;
+        m_owner->m_rebuildState = QnStorageManager::RebuildState_None;
     }
 };
 

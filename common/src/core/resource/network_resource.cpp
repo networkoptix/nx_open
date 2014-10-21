@@ -94,9 +94,9 @@ void QnNetworkResource::setPhysicalId(const QString &physicalId)
     m_physicalId = physicalId;
 }
 
-void QnNetworkResource::setAuth(const QAuthenticator &auth)
+void QnNetworkResource::setAuth(const QAuthenticator &auth, bool replaceIfExists)
 {
-    setProperty( Qn::CAMERA_CREDENTIALS_PARAM_NAME, lit("%1:%2").arg(auth.user()).arg(auth.password()) );
+    setProperty( Qn::CAMERA_CREDENTIALS_PARAM_NAME, lit("%1:%2").arg(auth.user()).arg(auth.password()), true, replaceIfExists );
 }
 
 QAuthenticator QnNetworkResource::getAuth() const

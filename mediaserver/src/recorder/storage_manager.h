@@ -35,7 +35,8 @@ public:
     enum RebuildState {
         RebuildState_None,
         RebuildState_WaitForRecordersStopped,
-        RebuildState_Started
+        RebuildState_Started,
+        RebuildState_Initial
     };
 
     typedef QMap<int, QnStorageResourcePtr> StorageMap;
