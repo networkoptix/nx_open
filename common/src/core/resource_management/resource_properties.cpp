@@ -119,7 +119,7 @@ void QnResourcePropertyDictionary::clear(const QVector<QnUuid>& idList)
     m_requestInProgress.clear();
 }
 
-bool QnResourcePropertyDictionary::setValue(const QnUuid& resourceId, const QString& key, const QString& value, bool markDirty)
+bool QnResourcePropertyDictionary::setValue(const QnUuid& resourceId, const QString& key, const QString& value, bool markDirty, bool replaceIfExists)
 {
     QMutexLocker lock(&m_mutex);
     auto itr = m_items.find(resourceId);
@@ -130,7 +130,7 @@ bool QnResourcePropertyDictionary::setValue(const QnUuid& resourceId, const QStr
     auto itrValue = properties.find(key);
     if (itrValue == properties.end())
         properties.insert(key, value);
-    else if (itrValue.value() != value)
+    else if (replaceIfExists && (itrValue.value() != value))
         itrValue.value() = value;
     else
         return false; // nothing to change
