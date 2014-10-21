@@ -1,6 +1,6 @@
 #include "business_action_parameters.h"
 
-#include <utils/serialization/json_functions.h>
+#include <utils/common/model_functions.h>
 
 // TODO: #Elric #enum use QN_DEFINE_EXPLICIT_ENULEXICAL_FUNCTIONS
 

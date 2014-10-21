@@ -60,4 +60,5 @@ private:
     static int getParamIndex(const QString& key);
 };
 
+
 #endif // BUSINESS_EVENT_PARAMETERS_H

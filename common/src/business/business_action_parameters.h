@@ -2,6 +2,7 @@
 #define BUSINESS_ACTION_PARAMETERS_H
 
 #include <business/business_fwd.h>
+#include <utils/common/model_functions_fwd.h>
 
 //TODO: #rvasilenko adding new parameter is TOO complex. Structure can be simplified --gdm
 
@@ -75,6 +76,11 @@ struct QnBusinessActionParameters {
 private:
     static int getParamIndex(const QString& key);
 };
+
+#define QnBusinessActionParameters_Fields (soundUrl)(emailAddress)(userGroup)(fps)(streamQuality)(recordingDuration)(recordAfter)\
+    (relayOutputId)(relayAutoResetTimeout)(inputPortId)(sayText)(keyParam)
+
+QN_FUSION_DECLARE_FUNCTIONS(QnBusinessActionParameters, (ubjson)(json)(eq));
 
 QByteArray serializeBusinessParams(const QnBusinessParams& value);
 QnBusinessParams deserializeBusinessParams(const QByteArray& value);
