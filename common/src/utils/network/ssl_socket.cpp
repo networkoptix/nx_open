@@ -611,6 +611,7 @@ void AsyncSSL::HandleSSLError( int ssl_return , int ssl_error ) {
 }
 
 void AsyncSSL::OnUnderlySocketRecv( SystemError::ErrorCode error_code , std::size_t bytes_transferred ) {
+    if( read_queue_.empty() ) return;
     if( error_code != SystemError::noError ) {
         DeletionFlag deleted(this);
         outstanding_read_->SetExitStatus(AsyncSSLOperation::EXCEPTION,error_code);
@@ -649,6 +650,7 @@ void AsyncSSL::EnqueueRead( AsyncSSLOperation* operation ) {
 }
 
 void AsyncSSL::ContinueRead() {
+    if( read_queue_.empty() ) return;
     read_queue_.pop_front();
     if( !read_queue_.empty() ) {
         outstanding_read_ = read_queue_.front();
@@ -687,6 +689,7 @@ void AsyncSSL::DoRead() {
 }
 
 void AsyncSSL::OnUnderlySocketSend( SystemError::ErrorCode error_code , std::size_t bytes_transferred ) {
+    if( write_queue_.empty() ) return;
     Q_UNUSED(bytes_transferred);
     if( error_code != SystemError::noError ) {
         DeletionFlag deleted(this);
@@ -734,6 +737,7 @@ void AsyncSSL::EnqueueWrite() {
 }
 
 void AsyncSSL::ContinueWrite() {
+    if( write_queue_.empty() ) return;
     write_queue_.pop_front();
     if( !write_queue_.empty() ) {
         outstanding_write_ = &(write_queue_.front());
@@ -1456,6 +1460,8 @@ void QnSSLSocket::cancelAsyncIO( aio::EventType eventType, bool waitForRunningHa
 {
     Q_D( const QnSSLSocket );
     d->wrappedSocket->cancelAsyncIO( eventType, waitForRunningHandlerCompletion );
+    if( waitForRunningHandlerCompletion )
+        d->async_ssl_ptr->Clear();
 }
 
 bool QnSSLSocket::connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )
