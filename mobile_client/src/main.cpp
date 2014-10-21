@@ -75,6 +75,7 @@ int runApplication(QGuiApplication *application) {
     QnContext context;
 
     context.colorTheme()->readFromFile(fileSelector.select(lit(":/color_theme.json")));
+    qApp->setPalette(context.colorTheme()->palette());
 
     QQmlEngine engine;
     QQmlFileSelector qmlFileSelector(&engine);

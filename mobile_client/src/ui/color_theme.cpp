@@ -174,3 +174,7 @@ QColor QnColorTheme::color(const QString &key) const {
 
     return color;
 }
+
+QPalette QnColorTheme::palette() const {
+    return m_palette;
+}
