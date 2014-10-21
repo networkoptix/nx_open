@@ -42,6 +42,14 @@ public:
         std::atomic<int> sequence;
         //!MUST be incremented for accessing picture data
         std::atomic<int> usageCounter;
+
+        SynchronizationContext()
+        :   
+            externalRefCounter(0),
+            sequence(0),
+            usageCounter(0)
+        {
+        }
     };
 
     // TODO: #Elric #enum
