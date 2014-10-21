@@ -192,8 +192,8 @@ public:
 
     bool hasProperty(const QString &key) const;
     QString getProperty(const QString &key) const;
-    void setProperty(const QString &key, const QString &value, bool markDirty = true);
-    void setProperty(const QString &key, const QVariant& value);
+    void setProperty(const QString &key, const QString &value, bool markDirty = true, bool replaceIfExists = true);
+    void setProperty(const QString &key, const QVariant& value, bool markDirty = true, bool replaceIfExists = true );
     ec2::ApiResourceParamDataList getProperties() const;
 
     //!Call this with proper field names to emit corresponding *changed signals. Signal can be defined in a derived class
@@ -311,6 +311,31 @@ protected:
     /** Url of this resource, if any. */
     QString m_url; 
 private:
+    struct LocalPropertyValue
+    {
+        QString value;
+        bool markDirty;
+        bool replaceIfExists;
+
+        LocalPropertyValue()
+        :
+            markDirty( false ),
+            replaceIfExists( false )
+        {
+        }
+
+        LocalPropertyValue(
+            const QString& _value,
+            bool _markDirty,
+            bool _replaceIfExists )
+        :
+            value( _value ),
+            markDirty( _markDirty ),
+            replaceIfExists( _replaceIfExists )
+        {
+        }
+    };
+
     /** Resource pool this this resource belongs to. */
     QnResourcePool *m_resourcePool;
 
@@ -337,7 +362,7 @@ private:
     CameraDiagnostics::Result m_lastMediaIssue;
     QAtomicInt m_initializationAttemptCount;
     //!map<key, <value, isDirty>>
-    std::map<QString, std::pair<QString, bool> > m_locallySavedProperties;
+    std::map<QString, LocalPropertyValue> m_locallySavedProperties;
 };
 
 template<class Resource>
