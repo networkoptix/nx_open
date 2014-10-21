@@ -349,7 +349,7 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnBusinessActionD
                 }
             }
             else if (actionType == QnBusiness::ShowPopupAction) {
-                if (action.getParams().userGroup == QnBusinessActionParameters::AdminOnly)
+                if (action.getParams().userGroup == QnBusiness::AdminOnly)
                     return qnResIconCache->icon(QnResourceIconCache::User);
                 else
                     return qnResIconCache->icon(QnResourceIconCache::Users);
@@ -363,15 +363,15 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnBusinessActionD
     return qnResIconCache->icon(getResourceById(resId));
 }
 
-QString QnEventLogModel::getResourceNameString(QnUuid id) {
+QString QnEventLogModel::getResourceNameString(const QnUuid &id) {
     return getResourceName(getResourceById(id));
 }
 
-QString QnEventLogModel::getUserGroupString(QnBusinessActionParameters::UserGroup value) {
+QString QnEventLogModel::getUserGroupString(QnBusiness::UserGroup value) {
     switch (value) {
-    case QnBusinessActionParameters::EveryOne:
+    case QnBusiness::EveryOne:
         return tr("All users");
-    case QnBusinessActionParameters::AdminOnly:
+    case QnBusiness::AdminOnly:
         return tr("Administrators Only");
     default:
         return QString();

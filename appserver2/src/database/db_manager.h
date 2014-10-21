@@ -482,6 +482,7 @@ namespace ec2
         bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnUuid>& guids);
         bool updateResourceTypeGuids();
         bool updateGuids();
+        bool updateBusinessActionParameters();
         QnUuid getType(const QString& typeName);
         bool resyncTransactionLog();
 

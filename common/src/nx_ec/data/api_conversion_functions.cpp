@@ -60,7 +60,7 @@ void fromApiToResource(const ApiBusinessRuleData &src, QnBusinessEventRulePtr &d
 
     dst->setActionResources(QVector<QnUuid>::fromStdVector(src.actionResourceIds));
 
-    dst->setActionParams(QnBusinessActionParameters::fromBusinessParams(deserializeBusinessParams(src.actionParams)));
+    dst->setActionParams(QJson::deserialized<QnBusinessActionParameters>(src.actionParams));
 
     dst->setAggregationPeriod(src.aggregationPeriod);
     dst->setDisabled(src.disabled);
@@ -77,7 +77,7 @@ void fromResourceToApi(const QnBusinessEventRulePtr &src, ApiBusinessRuleData &d
     dst.actionResourceIds = src->actionResources().toStdVector();
 
     dst.eventCondition = serializeBusinessParams(src->eventParams().toBusinessParams());
-    dst.actionParams = serializeBusinessParams(src->actionParams().toBusinessParams());
+    dst.actionParams = QJson::serialized(src->actionParams());
 
     dst.eventState = src->eventState();
     dst.actionType = src->actionType();
@@ -110,7 +110,7 @@ void fromResourceToApi(const QnAbstractBusinessActionPtr &src, ApiBusinessAction
     dst.receivedFromRemoteHost = src->isReceivedFromRemoteHost();
     dst.resourceIds = src->getResources().toStdVector();
 
-    dst.params = serializeBusinessParams(src->getParams().toBusinessParams());
+    dst.params = QJson::serialized(src->getParams());
     dst.runtimeParams = serializeBusinessParams(src->getRuntimeParams().toBusinessParams());
 
     dst.ruleId = src->getBusinessRuleId();
@@ -125,7 +125,7 @@ void fromApiToResource(const ApiBusinessActionData &src, QnAbstractBusinessActio
 
     dst->setResources(QVector<QnUuid>::fromStdVector(src.resourceIds));
 
-    dst->setParams(QnBusinessActionParameters::fromBusinessParams(deserializeBusinessParams(src.params)));
+    dst->setParams(QJson::deserialized<QnBusinessActionParameters>(src.params));
 
     dst->setBusinessRuleId(src.ruleId);
     dst->setAggregationCount(src.aggregationCount);
@@ -268,7 +268,7 @@ void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributes
     dst.audioEnabled = src->audioEnabled;
     dst.secondaryStreamQuality = src->secondaryQuality;
     dst.controlEnabled = !src->cameraControlDisabled;
-    dst.dewarpingParams = QJson::serialized<QnMediaDewarpingParams>(src->dewarpingParams);
+    dst.dewarpingParams = QJson::serialized(src->dewarpingParams);
     dst.minArchiveDays = src->minDays;
     dst.maxArchiveDays = src->maxDays;
     dst.preferedServerId = src->preferedServerId;

@@ -62,8 +62,8 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
 //        return;
 
     //TODO: #GDM #Business check if camera is visible to us
-    QnBusinessActionParameters::UserGroup userGroup = businessAction->getParams().userGroup;
-    if (userGroup == QnBusinessActionParameters::AdminOnly
+    QnBusiness::UserGroup userGroup = businessAction->getParams().userGroup;
+    if (userGroup == QnBusiness::AdminOnly
             && !(accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
         return;
     }

@@ -25,11 +25,6 @@ struct QnBusinessActionParameters {
         ParamCount
     };
 
-    enum UserGroup {
-        EveryOne  = 0,
-        AdminOnly = 1
-    };
-
     QnBusinessActionParameters();
 
     // Play Sound
@@ -39,8 +34,7 @@ struct QnBusinessActionParameters {
     QString emailAddress;
  
     // Popups and System Health
-
-    UserGroup userGroup;
+    QnBusiness::UserGroup userGroup;
 
     // Recording
     int fps;
@@ -57,28 +51,21 @@ struct QnBusinessActionParameters {
     QString sayText;
 
     // Aggregation
-    QString keyParam;
+    //QString keyParam;
 
     // convert/serialize/deserialize functions
 
     static QnBusinessActionParameters unpack(const QByteArray& value);
     QByteArray pack() const;
 
-    QnBusinessParams toBusinessParams() const;
-    static QnBusinessActionParameters fromBusinessParams(const QnBusinessParams& bParams);
-
     /** 
      * \returns                        Whether all parameters have default values. 
      */
     bool isDefault() const;
-    bool equalTo(const QnBusinessActionParameters& other) const;
-
-private:
-    static int getParamIndex(const QString& key);
 };
 
 #define QnBusinessActionParameters_Fields (soundUrl)(emailAddress)(userGroup)(fps)(streamQuality)(recordingDuration)(recordAfter)\
-    (relayOutputId)(relayAutoResetTimeout)(inputPortId)(sayText)(keyParam)
+    (relayOutputId)(relayAutoResetTimeout)(inputPortId)(sayText)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnBusinessActionParameters, (ubjson)(json)(eq));
 
