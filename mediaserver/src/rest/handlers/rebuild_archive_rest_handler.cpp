@@ -24,6 +24,7 @@ int QnRebuildArchiveRestHandler::executeGet(const QString& path, const QnRequest
     QString messageStr;
     QString stateStr(lit("unknown"));
 
+    QnStorageManager::RebuildState state = QnStorageManager::instance()->rebuildState();
 
     if (method == "start") {
         if (QnStorageManager::instance()->rebuildState() == QnStorageManager::RebuildState_None) {
@@ -38,11 +39,16 @@ int QnRebuildArchiveRestHandler::executeGet(const QString& path, const QnRequest
     }
     else if (method == "stop") {
         progress = 100;
-        if (QnStorageManager::instance()->rebuildState() != QnStorageManager::RebuildState_None)
-            messageStr = lit("Rebuild archive canceled");
-        else
-            messageStr = lit("Rebuild is not running. nothing to do");
-        QnStorageManager::instance()->cancelRebuildCatalogAsync();
+        if (state == QnStorageManager::RebuildState_Initial) {
+            messageStr = lit("Fast initial scan can't be canceled");
+        }
+        else { 
+            if (QnStorageManager::instance()->rebuildState() != QnStorageManager::RebuildState_None)
+                messageStr = lit("Rebuild archive canceled");
+            else
+                messageStr = lit("Rebuild is not running. nothing to do");
+            QnStorageManager::instance()->cancelRebuildCatalogAsync();
+        }
     }
     else {
         progress = QnStorageManager::instance()->rebuildProgress()*100 + 0.5;
@@ -54,7 +60,6 @@ int QnRebuildArchiveRestHandler::executeGet(const QString& path, const QnRequest
         }
     }
 
-    QnStorageManager::RebuildState state = QnStorageManager::instance()->rebuildState();
     switch(state)
     {
     case QnStorageManager::RebuildState_None:
@@ -65,6 +70,9 @@ int QnRebuildArchiveRestHandler::executeGet(const QString& path, const QnRequest
         break;
     case QnStorageManager::RebuildState_Started:
         stateStr = "started";
+        break;
+    case QnStorageManager::RebuildState_Initial:
+        stateStr = "Fast scan";
         break;
     }
 

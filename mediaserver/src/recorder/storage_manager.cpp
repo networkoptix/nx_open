@@ -64,7 +64,7 @@ public:
         m_endScanTime = qnSyncTime->currentMSecsSinceEpoch();
 
         m_owner->m_rebuildProgress = 0;
-        m_owner->m_rebuildState = QnStorageManager::RebuildState_Started;
+        m_owner->m_rebuildState = QnStorageManager::RebuildState_Initial;
     }
     virtual void run() override
     {
