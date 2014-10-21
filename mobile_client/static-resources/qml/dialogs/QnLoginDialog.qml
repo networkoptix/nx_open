@@ -33,8 +33,11 @@ FocusScope {
     Image {
         id: logo
 
-        anchors.horizontalCenter: parent.horizontalCenter
-        y: (parent.height / 2 - height) / 2
+        anchors {
+            horizontalCenter: parent.horizontalCenter
+            top: parent.top
+            topMargin: parent.width / 6
+        }
 
         source: "/images/logo.png"
         fillMode: Image.PreserveAspectFit
@@ -82,6 +85,8 @@ FocusScope {
             QnIconButton {
                 id: deleteButton
                 icon: "/images/delete.png"
+
+                visible: savedSessionsList.selection.length || __currentIndex < savedSessionsList.count
 
                 onClicked: {
                     if (loginDialog.state == "CHOOSE") {
@@ -185,17 +190,16 @@ FocusScope {
     Item {
         id: savedSessions
 
-        anchors.top: logo.bottom
-        anchors.bottom: parent.bottom
+        anchors {
+            top: newSession.top
+            bottom: newSession.bottom
+            topMargin: parent.width / 6
+        }
         width: parent.width
 
         Text {
-            anchors {
-                bottom: savedSessionsList.top
-                horizontalCenter: parent.horizontalCenter
-                bottomMargin: CommonFunctions.dp(16)
-            }
-
+            id: savedSessionsLabel
+            anchors.horizontalCenter: parent.horizontalCenter
             color: __syspal.windowText
             text: qsTr("Saved sessions")
             renderType: Text.NativeRendering
@@ -207,11 +211,16 @@ FocusScope {
 
             property var selection: []
 
-            anchors.centerIn: parent
+            anchors {
+                top: savedSessionsLabel.bottom
+                topMargin: CommonFunctions.dp(8)
+                bottom: parent.bottom
+                horizontalCenter: parent.horizontalCenter
+            }
             width: parent.width * 2 / 3
-            height: parent.height / 3
             spacing: CommonFunctions.dp(8)
             boundsBehavior: ListView.StopAtBounds
+            clip: true
 
             delegate: Item {
                 id: sessionItem
@@ -255,14 +264,16 @@ FocusScope {
     Item {
         id: newSession
 
-        anchors.top: logo.bottom
-        anchors.bottom: parent.bottom
-        anchors.left: savedSessions.right
+        anchors {
+            top: logo.bottom
+            bottom: fab.top
+            bottomMargin: CommonFunctions.dp(32)
+            left: savedSessions.right
+        }
         width: parent.width
 
         Column {
             id: fieldsColumn
-
 
             anchors.centerIn: parent
             width: parent.width * 2 / 3
@@ -323,38 +334,45 @@ FocusScope {
         }
     }
 
-    QnRoundButton {
-        id: addButton
+    Item {
+        id: fab
+
+        width: addButton.width
+        height: addButton.height
+
         anchors {
             bottom: parent.bottom
             bottomMargin: parent.width / 6
+            rightMargin: parent.width / 6
+            horizontalCenter: loginDialog.horizontalCenter
         }
 
-        x: (parent.width - width) / 2
-        color: "#0096ff"
-        icon: "/images/plus.png"
+        QnRoundButton {
+            id: addButton
 
-        onClicked: {
-            LoginDialogFunctions.updateUi(null)
-            __currentIndex = savedSessionsList.count
-            LoginDialogFunctions.clearSelection()
-            loginDialog.state = "EDIT"
+            color: "#0096ff"
+            icon: "/images/plus.png"
+
+            onClicked: {
+                LoginDialogFunctions.updateUi(null)
+                __currentIndex = savedSessionsList.count
+                LoginDialogFunctions.clearSelection()
+                loginDialog.state = "EDIT"
+            }
         }
-    }
 
-    QnRoundButton {
-        id: loginButton
+        QnRoundButton {
+            id: loginButton
 
-        x: addButton.x
-        y:addButton.y
+            color: "#0096ff"
+            icon: "/images/forward.png"
+            opacity: visible ? 1.0 : 0.0
+            visible: loginDialog.state == "EDIT"
 
-        color: "#0096ff"
-        icon: "/images/forward.png"
-        opacity: 0.0
+            Behavior on opacity { NumberAnimation { duration: 200 } }
 
-        Behavior on opacity { NumberAnimation { duration: 200 } }
-
-        onClicked: LoginDialogFunctions.connectToServer()
+            onClicked: LoginDialogFunctions.connectToServer()
+        }
     }
 
     states: [
@@ -364,13 +382,10 @@ FocusScope {
                 target: savedSessions
                 x: 0
             }
-            PropertyChanges {
-                target: addButton
-                x: (loginDialog.width - addButton.width) / 2
-            }
-            PropertyChanges {
-                target: addButton
-                opacity: 0.0
+            AnchorChanges {
+                target: fab
+                anchors.horizontalCenter: loginDialog.horizontalCenter
+                anchors.right: undefined
             }
             PropertyChanges {
                 target: actionBar
@@ -383,13 +398,10 @@ FocusScope {
                 target: savedSessions
                 x: -loginDialog.width
             }
-            PropertyChanges {
-                target: addButton
-                x: loginDialog.width * 5 / 6 - addButton.width
-            }
-            PropertyChanges {
-                target: addButton
-                opacity: 1.0
+            AnchorChanges {
+                target: fab
+                anchors.horizontalCenter: undefined
+                anchors.right: loginDialog.right
             }
             PropertyChanges {
                 target: actionBar
@@ -409,9 +421,7 @@ FocusScope {
                 easing.type: Easing.OutQuad
                 duration: 200
             }
-            NumberAnimation {
-                targets: [loginButton, addButton]
-                properties: "x"
+            AnchorAnimation {
                 easing.type: Easing.OutQuad
                 duration: 200
             }
@@ -426,9 +436,7 @@ FocusScope {
                 easing.type: Easing.OutQuad
                 duration: 200
             }
-            NumberAnimation {
-                targets: [loginButton, addButton]
-                properties: "x"
+            AnchorAnimation {
                 easing.type: Easing.OutQuad
                 duration: 200
             }
