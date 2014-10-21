@@ -1199,6 +1199,7 @@ public:
     TCPServerSocketPrivate( TCPServerSocket* _sock )
     :
         socketHandle( -1 ),
+        acceptAsyncCallCount( 0 ),
         m_sock( _sock )
     {
     }
