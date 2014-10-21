@@ -49,7 +49,7 @@ signals:
 
 private:
     void updateFromServer(const QByteArray &licenseKey, bool infoMode, const QUrl &url);
-    void processReply(QNetworkReply *reply, const QByteArray& licenseKey, const QUrl &url);
+    void processReply(QNetworkReply *reply, const QByteArray& licenseKey, const QUrl &url, bool infoMode);
     void validateLicenses(const QByteArray& licenseKey, const QList<QnLicensePtr> &licenses);
     void showLicenseDetails(const QnLicensePtr &license);
 

@@ -234,10 +234,10 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
     connect(reply, &QNetworkReply::finished, this, [this, licenseKey, infoMode, url, reply] {
         QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).value<QUrl>();
         if (!redirectUrl.isEmpty()) {
-            updateFromServer(licenseKey, infoMode, redirectUrl);
+            updateFromServer(licenseKey, infoMode, redirectUrl);    //TODO: #GDM add possible redirect loop check
             return;
         }
-        processReply(reply, licenseKey, url);
+        processReply(reply, licenseKey, url, infoMode);
     });
 }
 
@@ -348,7 +348,7 @@ void QnLicenseManagerWidget::at_downloadError() {
     ui->licenseWidget->setState(QnLicenseWidget::Normal);
 }
 
-void QnLicenseManagerWidget::processReply(QNetworkReply *reply, const QByteArray& licenseKey, const QUrl &url) {
+void QnLicenseManagerWidget::processReply(QNetworkReply *reply, const QByteArray& licenseKey, const QUrl &url, bool infoMode) {
     QList<QnLicensePtr> licenses;
 
     QByteArray replyData = reply->readAll();
@@ -378,7 +378,7 @@ void QnLicenseManagerWidget::processReply(QNetworkReply *reply, const QByteArray
 
         QnLicense::ErrorCode errCode = QnLicense::NoError;
 
-        if (license->isInfoMode()) {
+        if (infoMode) {
             if (!license->isValid(&errCode, QnLicense::VM_CheckInfo) && errCode != QnLicense::Expired) {
                 emit showMessageLater(tr("License activation"), tr("Can't activate license:  %1").arg(QnLicense::errorMessage(errCode)), true);
                 ui->licenseWidget->setState(QnLicenseWidget::Normal);

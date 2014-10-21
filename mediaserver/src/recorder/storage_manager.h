@@ -24,6 +24,7 @@
 class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
 class RebuildAsyncTask;
+class ScanMediaFilesTask;
 class QnUuid;
 
 class QnStorageManager: public QObject
@@ -77,8 +78,7 @@ public:
 
     void doMigrateCSVCatalog();
     bool loadFullFileCatalog(const QnStorageResourcePtr &storage, bool isRebuild = false, qreal progressCoeff = 1.0);
-    std::deque<DeviceFileCatalog::Chunk> correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const std::deque<DeviceFileCatalog::Chunk>& chunks);
-
+    void partialMediaScan(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const DeviceFileCatalog::ScanFilter& filter);
 
     QnStorageResourcePtr getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider);
 
@@ -181,7 +181,10 @@ private:
     bool m_rebuildCancelled;
 
     friend class RebuildAsyncTask;
+    friend class ScanMediaFilesTask;
+
     RebuildAsyncTask* m_asyncRebuildTask;
+    ScanMediaFilesTask* m_asyncPartialScan;
 
     QMap<QString, QnStorageDbPtr> m_chunksDB;
     bool m_initInProgress;
