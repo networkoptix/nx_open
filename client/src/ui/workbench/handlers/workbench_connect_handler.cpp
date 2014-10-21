@@ -368,6 +368,9 @@ void QnWorkbenchConnectHandler::clearConnection() {
 }
 
 bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
+    QUrl currentUrl = QnAppServerConnectionFactory::url();
+    if (currentUrl.isEmpty())
+        return false;
 
     QnReconnectInfoDialog* reconnectInfoDialog = new QnReconnectInfoDialog(mainWindow());
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    reconnectInfoDialog,   &QDialog::hide);
@@ -376,7 +379,6 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
     reconnectInfoDialog->setText(tr("Resolving servers..."));
     reconnectInfoDialog->show();
 
-    QUrl currentUrl = QnAppServerConnectionFactory::url();
     QString userName = currentUrl.userName();
     QString password = currentUrl.password();
 
@@ -386,10 +388,8 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
         QHostInfo currentInfo = QHostInfo::fromName(currentUrl.host());
         foreach (const QHostAddress &addr, currentInfo.addresses()) {
             currentIp = addr.toIPv4Address();
-            if (currentIp > 0) {
-                qDebug() << "selected local ip" << addr;
+            if (currentIp > 0)
                 break;
-            }
         }
     }
 
@@ -435,8 +435,10 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
         }
     }    
 
-    if (availableServers.isEmpty())
-        return false;
+    if (availableServers.isEmpty()) {
+        qWarning() << "No servers are available for reconnect" << allServers << "modules:" << QnModuleFinder::instance()->foundModules().size();
+        availableServers << currentUrl;
+    }
 
     qSort(availableServers.begin(), availableServers.end(), hostLessThan);
 
