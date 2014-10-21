@@ -24,6 +24,7 @@
 class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
 class RebuildAsyncTask;
+class ScanMediaFilesTask;
 class QnUuid;
 
 class QnStorageManager: public QObject
