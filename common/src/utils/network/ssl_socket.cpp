@@ -933,7 +933,7 @@ private:
                 data.completionHandler(ec,0);
                 return;
             } else if( sniffer_buffer_.size() < kSnifferDataHeaderLength ) {
-                socket()->readSomeAsync(
+                bool ret = socket()->readSomeAsync(
                     &sniffer_buffer_,
                     std::bind(
                     &MixedAsyncSSL::Sniffer,
@@ -941,6 +941,9 @@ private:
                     std::placeholders::_1,
                     std::placeholders::_2,
                     data));
+                if( !ret ) {
+                    data.completionHandler(SystemError::getLastOSErrorCode(),std::numeric_limits<std::size_t>::max());
+                }
                 //TODO MUST NOT ignore readSomeAsync result code!!
                 return;
             }
@@ -963,7 +966,10 @@ private:
                 AsyncSSL::AsyncRecv(data.buffer, std::move(data.completionHandler));
             } else {
                 // request a common async recv
-                socket()->readSomeAsync(data.buffer, std::move(data.completionHandler));
+                bool ret = socket()->readSomeAsync(data.buffer, std::move(data.completionHandler));
+                if( !ret ) {
+                    data.completionHandler(SystemError::getLastOSErrorCode(),std::numeric_limits<std::size_t>::max());
+                }
             }
         }
     }
