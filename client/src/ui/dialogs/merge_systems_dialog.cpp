@@ -151,8 +151,9 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(const QnModuleInformation &m
     ui->buttonBox->hideProgress();
 
     switch (errorCode) {
-    case QnMergeSystemsTool::NoError:
-        if (qnResPool->getResourceById(moduleInformation.id)) {
+    case QnMergeSystemsTool::NoError: {
+        QnMediaServerResourcePtr server = qnResPool->getResourceById(moduleInformation.id).dynamicCast<QnMediaServerResource>();
+        if (server && server->getStatus() == Qn::Online && moduleInformation.systemName == qnCommon->localSystemName()) {
             if (m_url.host() == lit("localhost") || m_url.host() == lit("127.0.0.1"))
                 updateErrorLabel(tr("Use a specific hostname or IP address rather than %1.").arg(m_url.host()));
             else
@@ -166,6 +167,7 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(const QnModuleInformation &m
         ui->remoteSystemRadioButton->setText(moduleInformation.systemName);
         updateErrorLabel(QString());
         break;
+    }
     case QnMergeSystemsTool::AuthentificationError:
         updateErrorLabel(tr("The password is invalid."));
         break;
