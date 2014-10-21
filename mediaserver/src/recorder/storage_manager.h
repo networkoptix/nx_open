@@ -156,6 +156,7 @@ private:
     void updateRecordedMonths(const FileCatalogMap &catalogMap, UsedMonthsMap& usedMonths);
     void findTotalMinTime(const bool useMinArchiveDays, const FileCatalogMap& catalogMap, qint64& minTime, DeviceFileCatalogPtr& catalog);
     void addDataFromDatabase(const QnStorageResourcePtr &storage);
+    QnStorageDbPtr getSDB(const QnStorageResourcePtr &storage);
 private:
     StorageMap m_storageRoots;
     FileCatalogMap m_devFileCatalog[QnServer::ChunksCatalogCount];
@@ -189,6 +190,7 @@ private:
 
     QMap<QString, QnStorageDbPtr> m_chunksDB;
     bool m_initInProgress;
+    mutable QMutex m_sdbMutex;
 };
 
 #define qnStorageMan QnStorageManager::instance()
