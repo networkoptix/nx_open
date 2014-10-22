@@ -474,6 +474,9 @@ namespace ec2
         //void beginTran();
         //void commit();
         //void rollback();
+    protected: 
+        virtual bool afterInstallUpdate(const QString& updateName) override;
+
     private:
         enum GuidConversionMethod {CM_Default, CM_Binary, CM_MakeHash, CM_INT};
 
@@ -488,10 +491,7 @@ namespace ec2
 
         template <class ObjectType, class ObjectListType> 
         bool fillTransactionLogInternal(ApiCommand::Value command);
-        bool applyUpdates();
 
-        bool beforeInstallUpdate(const QString& updateName);
-        bool afterInstallUpdate(const QString& updateName);
         ErrorCode addCameraHistory(const ApiCameraServerItemData& params);
         ErrorCode removeCameraHistory(const ApiCameraServerItemData& params);
         ErrorCode getScheduleTasks(const QnUuid& cameraId, std::vector<ApiScheduleTaskWithRefData>& scheduleTaskList);

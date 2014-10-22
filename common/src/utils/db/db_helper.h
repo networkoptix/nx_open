@@ -45,6 +45,10 @@ public:
     QnDbTransaction* getTransaction();
     const QnDbTransaction* getTransaction() const;
 
+    bool applyUpdates(const QString &dirName);
+    virtual bool beforeInstallUpdate(const QString& updateName);
+    virtual bool afterInstallUpdate(const QString& updateName);
+
 protected:
     bool isObjectExists(const QString& objectType, const QString& objectName, QSqlDatabase& database);
     void addDatabase(const QString& fileName, const QString& dbname);

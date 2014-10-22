@@ -831,50 +831,6 @@ bool QnDbManager::migrateBusinessEvents()
     return true;
 }
 
-bool QnDbManager::applyUpdates()
-{
-    QSqlQuery existsUpdatesQuery(m_sdb);
-    existsUpdatesQuery.prepare("SELECT migration from south_migrationhistory");
-    if (!existsUpdatesQuery.exec())
-        return false;
-    QStringList existUpdates;
-    while (existsUpdatesQuery.next())
-        existUpdates << existsUpdatesQuery.value(0).toString();
-
-
-    QDir dir(":/updates");
-    foreach(const QFileInfo& entry, dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::Name))
-    {
-        QString fileName = entry.absoluteFilePath();
-        if (!existUpdates.contains(fileName)) 
-        {
-            if (!beforeInstallUpdate(fileName))
-                return false;
-            if (!execSQLFile(fileName, m_sdb))
-                return false;
-            if (!afterInstallUpdate(fileName))
-                return false;
-
-            QSqlQuery insQuery(m_sdb);
-            insQuery.prepare("INSERT INTO south_migrationhistory (app_name, migration, applied) values(?, ?, ?)");
-            insQuery.addBindValue(qApp->applicationName());
-            insQuery.addBindValue(fileName);
-            insQuery.addBindValue(QDateTime::currentDateTime());
-            if (!insQuery.exec()) {
-                qWarning() << Q_FUNC_INFO << __LINE__ << insQuery.lastError();
-                return false;
-                }
-        }
-    }
-
-    return true;
-}
-
-bool QnDbManager::beforeInstallUpdate(const QString& /*updateName*/)
-{
-    return true;
-}
-
 bool QnDbManager::afterInstallUpdate(const QString& updateName)
 {
     if (updateName == lit(":/updates/07_videowall.sql")) 
@@ -963,7 +919,7 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
         m_needResyncLicenses = true;
     }
 
-    if (!applyUpdates())
+    if (!applyUpdates(":/updates"))
         return false;
 
     lockStatic.commit();

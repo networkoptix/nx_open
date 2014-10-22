@@ -46,8 +46,11 @@ public:
     bool createDatabase();
 protected:
     QnEventsDB();
+
+    virtual bool afterInstallUpdate(const QString& updateName) override;
 private:
     bool cleanupEvents();
+    bool migrateBusinessParams();
     QString toSQLDate(qint64 timeMs) const;
     QString getRequestStr(const QnTimePeriod& period,
         const QnResourceList& resList,

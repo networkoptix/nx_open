@@ -48,7 +48,7 @@ void QnEventsDB::setEventLogPeriod(qint64 periodUsec)
 
 bool QnEventsDB::createDatabase()
 {
-    QSqlQuery versionQuery;
+    QSqlQuery versionQuery(m_sdb);
     versionQuery.prepare("SELECT sql from sqlite_master where name = 'runtime_actions'");
     if (versionQuery.exec() && versionQuery.next())
     {
@@ -85,6 +85,22 @@ bool QnEventsDB::createDatabase()
             return false;
     }
 
+    if (!isObjectExists(lit("table"), lit("south_migrationhistory"), m_sdb)) {
+        QSqlQuery ddlQuery(m_sdb);
+        ddlQuery.prepare(
+            "CREATE TABLE \"south_migrationhistory\" (\
+            \"id\" integer NOT NULL PRIMARY KEY autoincrement,\
+            \"app_name\" varchar(255) NOT NULL,\
+            \"migration\" varchar(255) NOT NULL,\
+            \"applied\" datetime NOT NULL);"
+            );
+        if (!ddlQuery.exec())
+            return false;
+    }
+
+    if (!applyUpdates(":/mserver_updates"))
+        return false;
+
     return true;
 }
 
@@ -104,6 +120,62 @@ bool QnEventsDB::cleanupEvents()
     }
     return rez;
 }
+
+bool QnEventsDB::migrateBusinessParams() {
+    struct RowParams {
+        QByteArray actionParams;
+        QByteArray runtimeParams;
+    };
+
+    auto convertAction = [](const QByteArray &packed) {
+        QnBusinessActionParameters ap = QnBusinessActionParameters::unpack(packed);
+        return QnUbjson::serialized(ap);
+    };
+
+    auto convertRuntime = [](const QByteArray &packed) {
+        QnBusinessEventParameters rp = QnBusinessEventParameters::unpack(packed);
+        return QnUbjson::serialized(rp);
+    };
+
+    QMap<int, RowParams> remapData;
+
+    { /* Reading data from the table. */
+        QSqlQuery query(m_sdb);
+        query.setForwardOnly(true);
+        query.prepare(QString("SELECT rowid, action_params, runtime_params FROM runtime_actions order by rowid"));
+        if (!query.exec()) {
+            qWarning() << Q_FUNC_INFO << query.lastError().text();
+            return false;
+        }
+
+        while (query.next()) {
+            qint32 id = query.value(0).toInt();
+            QByteArray actionData = query.value(1).toByteArray();
+            QByteArray runtimeData = query.value(2).toByteArray();
+
+            RowParams remappedData;
+            remappedData.actionParams = convertAction(actionData);
+            remappedData.runtimeParams = convertRuntime(runtimeData);
+            remapData[id] = remappedData;
+        }
+    }
+
+
+    for(auto iter = remapData.cbegin(); iter != remapData.cend(); ++iter) {
+        QSqlQuery query(m_sdb);
+        query.prepare("UPDATE runtime_actions SET action_params = :action, runtime_params = :runtime WHERE rowid = :rowid");
+        query.bindValue(":rowid", iter.key());
+        query.bindValue(":action", iter->actionParams);
+        query.bindValue(":runtime", iter->runtimeParams);
+        if (!query.exec()) {
+            qWarning() << Q_FUNC_INFO << query.lastError().text();
+            return false;
+        }
+    }
+
+    return true;
+}
+
 
 bool QnEventsDB::removeLogForRes(QnUuid resId)
 {
@@ -232,7 +304,8 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
 
     QReadLocker lock(&m_mutex);
 
-    QSqlQuery query(request);
+    QSqlQuery query(m_sdb);
+    query.prepare(request);
     if (!query.exec())
         return result;
 
@@ -290,7 +363,8 @@ void QnEventsDB::getAndSerializeActions(
 
     QReadLocker lock(&m_mutex);
 
-    QSqlQuery actionsQuery(request);
+    QSqlQuery actionsQuery(m_sdb);
+    actionsQuery.prepare(request);
     if (!actionsQuery.exec())
         return;
 
@@ -299,7 +373,6 @@ void QnEventsDB::getAndSerializeActions(
     int actionParamIdx = rec.indexOf(lit("action_params"));
     int runtimeParamIdx = rec.indexOf(lit("runtime_params"));
     int businessRuleIdx = rec.indexOf(lit("business_rule_guid"));
-//    int toggleStateIdx = rec.indexOf(lit("toggle_state"));
     int aggregationCntIdx = rec.indexOf(lit("aggregation_count"));
     int eventTypeIdx = rec.indexOf(lit("event_type"));
     int eventResIdx = rec.indexOf(lit("event_resource_guid"));
@@ -329,7 +402,7 @@ void QnEventsDB::getAndSerializeActions(
         appendIntToBA(result, actionsQuery.value(actionTypeIdx).toInt());
         result.append(actionsQuery.value(businessRuleIdx).toByteArray());
         appendIntToBA(result, actionsQuery.value(aggregationCntIdx).toInt());
-        //appendIntToBA(result, actionsQuery.value(toggleStateIdx).toInt());
+
         QByteArray runtimeParams = actionsQuery.value(runtimeParamIdx).toByteArray();
         appendIntToBA(result, runtimeParams.size());
         result.append(runtimeParams);
@@ -339,9 +412,6 @@ void QnEventsDB::getAndSerializeActions(
         result.append(actionParams);
 
         ++sizeField;
-
-        //ba->set_actionparams(actionsQuery.value(actionParamIdx).toByteArray());
-        //ba->set_runtimeparams(actionsQuery.value(runtimeParamIdx).toByteArray());
     }
     sizeField = qToBigEndian(sizeField);
     memcpy(result.data(), &sizeField, sizeof(int));
@@ -367,4 +437,13 @@ QnEventsDB* QnEventsDB::instance()
     // this call is not thread safe! You should init from main thread e.t.c
     Q_ASSERT_X(m_instance, Q_FUNC_INFO, "QnEventsDB::init must be called first!");
     return m_instance;
+}
+
+bool QnEventsDB::afterInstallUpdate(const QString& updateName) {
+
+    if (updateName == lit(":/mserver_updates/01_business_params.sql")) {
+        migrateBusinessParams();
+    }
+
+    return true;
 }

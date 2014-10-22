@@ -48,9 +48,6 @@ struct QnBusinessActionParameters {
     // Say Text
     QString sayText;
 
-    // Aggregation
-    //QString keyParam;
-
     // convert/serialize/deserialize functions
 
     static QnBusinessActionParameters unpack(const QByteArray& value);
