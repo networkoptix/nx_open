@@ -229,8 +229,6 @@ bool QnStorageManager::loadFullFileCatalog(const QnStorageResourcePtr &storage, 
         for (int i = 0; i < QnServer::ChunksCatalogCount; ++i) {
             loadFullFileCatalogFromMedia(storage, static_cast<QnServer::ChunksCatalog> (i), progressCoeff / QnServer::ChunksCatalogCount);
         }
-        m_catalogLoaded = true;
-        m_rebuildProgress = 1.0;
     }
 
     return true;
