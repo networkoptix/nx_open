@@ -23,7 +23,7 @@ class SocketImpl
 {
 public:
     std::atomic<aio::AIOThread<Socket>*> aioThread;
-    std::atomic<bool> terminated;
+    std::atomic<int> terminated;
     std::array<void*, aio::etMax> eventTypeToUserData;
 
     SocketImpl();

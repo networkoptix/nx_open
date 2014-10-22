@@ -9,7 +9,7 @@
 SocketImpl::SocketImpl()
 :
     aioThread( nullptr ),
-    terminated( false )
+    terminated( 0 )
 {
     eventTypeToUserData.fill( nullptr );
 }
