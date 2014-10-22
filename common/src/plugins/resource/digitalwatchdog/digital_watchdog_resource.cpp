@@ -4,6 +4,9 @@
 #include "onvif/soapDeviceBindingProxy.h"
 #include "dw_ptz_controller.h"
 #include "dw_zoom_ptz_controller.h"
+#include "common/common_module.h"
+#include "core/resource_management/resource_data_pool.h"
+#include "newdw_ptz_controller.h"
 
 const QString CAMERA_SETTINGS_ID_PARAM = lit("cameraSettingsId");
 static const int HTTP_PORT = 80;
@@ -121,12 +124,22 @@ int QnPlWatchDogResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resoluti
     return qMax(1024,result);
 }
 
-QnAbstractPtzController *QnPlWatchDogResource::createPtzControllerInternal() {
-    QScopedPointer<QnAbstractPtzController> result(new QnDwPtzController(toSharedPointer(this)));
-    if(result->getCapabilities() == Qn::NoPtzCapabilities) {
-        result.reset();
-        if(m_hasZoom)
-            result.reset(new QnDwZoomPtzController(toSharedPointer(this)));
+QnAbstractPtzController *QnPlWatchDogResource::createPtzControllerInternal() 
+{
+    QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+    bool useHttpPtz = resourceData.value<bool>(lit("dw-http-ptz"), false);
+    QScopedPointer<QnAbstractPtzController> result;
+    if (useHttpPtz)
+    {
+        result.reset(new QnNewDWPtzController(toSharedPointer(this)));
+    }
+    else {
+        result.reset(new QnDwPtzController(toSharedPointer(this)));
+        if(result->getCapabilities() == Qn::NoPtzCapabilities) {
+            result.reset();
+            if(m_hasZoom)
+                result.reset(new QnDwZoomPtzController(toSharedPointer(this)));
+        }
     }
     return result.take();
 }

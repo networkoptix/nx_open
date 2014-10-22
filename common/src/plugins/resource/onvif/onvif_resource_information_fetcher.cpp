@@ -324,6 +324,8 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
     QnPlOnvifResourcePtr resource;
     if (manufacture.toLower().contains(QLatin1String("digital watchdog")))
         resource = QnPlOnvifResourcePtr(new QnPlWatchDogResource());
+    else if (manufacture.toLower() == QLatin1String("panoramic"))
+        resource = QnPlOnvifResourcePtr(new QnPlWatchDogResource());
     else if (manufacture.toLower().contains(QLatin1String("sony")))
         resource = QnPlOnvifResourcePtr(new QnPlSonyResource());
     else if (manufacture.toLower().contains(QLatin1String("seyeon tech")))

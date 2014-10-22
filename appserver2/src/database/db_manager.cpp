@@ -831,6 +831,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     else if (updateName == lit(":/updates/17_add_isd_cam.sql")) {
         updateResourceTypeGuids();
     }
+    else if (updateName == lit(":/updates/21_new_dw_cam.sql")) {
+        updateResourceTypeGuids();
+    }
 
     return true;
 }

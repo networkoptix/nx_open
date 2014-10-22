@@ -29,6 +29,7 @@ QnResourceDataPool::QnResourceDataPool(QObject *parent):
     QObject(parent) 
 {
     m_shortVendorByName.insert(lit("digital watchdog"), lit("dw"));
+    m_shortVendorByName.insert(lit("panoramic"), lit("dw"));
 }
 
 QnResourceDataPool::~QnResourceDataPool() {
