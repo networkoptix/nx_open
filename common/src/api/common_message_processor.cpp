@@ -435,12 +435,12 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
 {
     //QnAppServerConnectionFactory::setBox(fullData.serverInfo.platform);
 
+    processPropertyList(fullData.allProperties);
     processResources(fullData.resources);
     processServerUserAttributesList( fullData.serverUserAttributesList );
     processCameraUserAttributesList( fullData.cameraUserAttributesList );
     processLicenses(fullData.licenses);
     processCameraServerItems(fullData.cameraHistory);
-    processPropertyList(fullData.allProperties);
     processStatusList(fullData.resStatusList);
 
     //on_runtimeInfoChanged(fullData.serverInfo);

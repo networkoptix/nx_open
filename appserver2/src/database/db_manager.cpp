@@ -845,6 +845,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     else if (updateName == lit(":/updates/21_business_action_parameters.sql")) {
         updateBusinessActionParameters();
     }
+    else if (updateName == lit(":/updates/21_new_dw_cam.sql")) {
+        updateResourceTypeGuids();
+    }
 
     return true;
 }

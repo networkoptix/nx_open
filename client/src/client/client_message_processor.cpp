@@ -191,5 +191,6 @@ void QnClientMessageProcessor::at_systemNameChangeRequested(const QString &syste
 void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
 {
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
+    m_incompatibleServerWatcher.reset();
     m_incompatibleServerWatcher.reset(new QnIncompatibleServerWatcher(this));
 }

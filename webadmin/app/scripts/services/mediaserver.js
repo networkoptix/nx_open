@@ -15,7 +15,7 @@ angular.module('webadminApp')
                     }
                     return cacheModuleInfo;
                 }
-                return $http.get(url + '/api/moduleInformation');
+                return $http.get({url: url + '/api/moduleInformation', timout: 3*1000});
             },
             saveSettings: function(systemName,port) { return $http.post('/api/configure?systemName=' + systemName + '&port=' + port); },
             changePassword: function(password,oldPassword) { return $http.post('/api/configure?password=' + password  + '&oldPassword=' + oldPassword); },

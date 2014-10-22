@@ -183,13 +183,13 @@ angular.module('webadminApp')
             });
         }
 
+        var timeout = setTimeout(updateStatistics,$scope.interval);
         $scope.$on(
             "$destroy",
             function( event ) {
                 $timeout.cancel(statisticTimer);
+                clearTimeout(timeout);
             }
         );
 
-
-        updateStatistics();
     });

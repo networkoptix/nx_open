@@ -144,11 +144,17 @@
             ],
             "vistaFocusDevices": ["EncoderVistaPTZ"]
         },
-		{
+	{
             "keys": [
                 "DW|DWC-MD421D","Win4NET Co., Ltd.|Clebo-FD20"
             ],
             "ptzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability"
+        },
+	{
+            "keys": [
+                "DW|DWC-PV2M4TIR","DW|DWC-PB2M4TIR"
+            ],
+	    "dw-http-ptz": true
         },
         {
             "keys": [
