@@ -24,6 +24,8 @@
     "grunt-karma": "^0.8.3",
     "grunt-newer": "~0.5.4",
     "grunt-ngmin": "~0.0.2",
+    "grunt-protractor-runner": "^1.1.4",
+    "grunt-protractor-webdriver": "^0.1.9",
     "grunt-rev": "~0.1.0",
     "grunt-svgmin": "~0.2.0",
     "grunt-usemin": "~2.0.0",

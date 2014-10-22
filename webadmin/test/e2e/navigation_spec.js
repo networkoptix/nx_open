@@ -4,22 +4,21 @@ describe('Navigation Menu', function() {
   it('changes active link depending on route', function() {
     browser.get('/');
 
-    // We expect that initially Settings link is active
-    var activeListItem = element(by.css('.active'));
-    var text = activeListItem.findElement(by.tagName('a')).getText();
+    expect(element(by.css('.active')).getText()).toEqual('Settings');
 
-    expect(text).toEqual('Settings');
-
-    var linkTexts = ['Information', 'For Developers', 'Support', 'Help'];
+    var linkTexts = ['Information', 'Web client', 'For Developers', 'Help'];
     for (var i = 0; i < linkTexts.length; i++) {
       var linkText = linkTexts[i];
 
       var link = element(by.linkText(linkText));
       link.click();
-      activeListItem = element(by.css('.active'));
-      text = activeListItem.findElement(by.tagName('a')).getText();
 
-      expect(text).toEqual(linkText);
+      expect(element(by.css('.active')).getText()).toEqual(linkText);
     }
   });
+
+
+    it('shows essential server info in title', function() {
+        expect("test").toBe("written");
+    });
 });
