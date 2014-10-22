@@ -207,7 +207,7 @@ void QnResourceDiscoveryManager::doResourceDiscoverIteration()
         case InitialSearch:
             foreach (QnAbstractResourceSearcher *searcher, searchersList)
             {
-                if (searcher->shouldBeUsed() && searcher->isLocal())
+                if ((searcher->discoveryMode() != DiscoveryMode::disabled) && searcher->isLocal())
                 {
                     QnResourceList lst = searcher->search();
                     m_resourceProcessor->processResources(lst);
@@ -309,7 +309,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
 
     foreach (QnAbstractResourceSearcher *searcher, searchersList)
     {
-        if (searcher->shouldBeUsed() && !needToStop())
+        if ((searcher->discoveryMode() != DiscoveryMode::disabled) && !needToStop())
         {
             QnResourceList lst = searcher->search();
 
@@ -345,6 +345,18 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
                     (*it)->addFlags(Qn::local);
 
                 ++it;
+            }
+
+            if( searcher->discoveryMode() == DiscoveryMode::partiallyEnabled )
+            {
+                //in partial discovery mode ignoring new resources
+                for( auto it = lst.begin(); it != lst.end(); )
+                {
+                    if( !qnResPool->getResourceByUniqId((*it)->getUniqueId()) )
+                        it = lst.erase( it );
+                    else
+                        ++it;
+                }
             }
 
             resources.append(lst);
@@ -518,15 +530,32 @@ void QnResourceDiscoveryManager::updateSearcherUsage(QnAbstractResourceSearcher 
     // TODO: #Elric strictly speaking, we must do this under lock.
 
     QSet<QString> disabledVendorsForAutoSearch;
+    //TODO #ak edge server MUST always discover edge camera despite disabledVendors setting,
+        //but MUST check disabledVendors for all other vendors (if they enabled on edge server)
 #ifndef EDGE_SERVER
     disabledVendorsForAutoSearch = QnGlobalSettings::instance()->disabledVendorsSet();
 #endif
 
-    searcher->setShouldBeUsed(
-        searcher->isLocal() ||                  // local resources should always be found
-        searcher->isVirtualResource() ||        // virtual resources should always be found
-        (!disabledVendorsForAutoSearch.contains(searcher->manufacture()) && !disabledVendorsForAutoSearch.contains(lit("all")))
-    );
+    DiscoveryMode discoveryMode = DiscoveryMode::fullyEnabled;
+    if( searcher->isLocal() ||                  // local resources should always be found
+        searcher->isVirtualResource() )         // virtual resources should always be found
+    {
+        discoveryMode = DiscoveryMode::fullyEnabled;
+    }
+    else
+    {
+        //no lower_bound, since QSet is built on top of hash
+        if( disabledVendorsForAutoSearch.contains(searcher->manufacture()+lit("=partial")) )
+            discoveryMode = DiscoveryMode::partiallyEnabled;
+        else if( disabledVendorsForAutoSearch.contains(searcher->manufacture()) )
+            discoveryMode = DiscoveryMode::disabled;
+        else if( disabledVendorsForAutoSearch.contains(lit("all=partial")) )
+            discoveryMode = DiscoveryMode::partiallyEnabled;
+        else if( disabledVendorsForAutoSearch.contains(lit("all")) )
+            discoveryMode = DiscoveryMode::disabled;
+    }
+
+    searcher->setDiscoveryMode( discoveryMode );
 }
 
 void QnResourceDiscoveryManager::updateSearchersUsage() {

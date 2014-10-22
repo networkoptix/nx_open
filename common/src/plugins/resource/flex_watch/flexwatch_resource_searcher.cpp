@@ -118,7 +118,7 @@ QnResourceList QnFlexWatchResourceSearcher::findResources()
             info.discoveryIp = sender;
 
             OnvifResourceInformationFetcher onfivFetcher;
-            onfivFetcher.findResources(QString(QLatin1String("http://%1/onvif/device_service")).arg(info.discoveryIp), info, result);
+            onfivFetcher.findResources(QString(QLatin1String("http://%1/onvif/device_service")).arg(info.discoveryIp), info, result, discoveryMode());
 
         }
 
