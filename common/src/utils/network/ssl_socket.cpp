@@ -553,11 +553,11 @@ void AsyncSSL::Perform( AsyncSSLOperation* operation ) {
     case SSL_ERROR_WANT_WRITE:
         break;
     default:
+        HandleSSLError(ssl_return,ssl_error);
         if( eof() && ssl_error == SSL_ERROR_SYSCALL ) {
             // For end of the file , we just tell them that we are done here
             operation->SetExitStatus(AsyncSSLOperation::END_OF_STREAM,0);
         } else {
-            HandleSSLError(ssl_return,ssl_error);
             operation->SetExitStatus(AsyncSSLOperation::EXCEPTION,kSSLInternalError);
         }
         break;
@@ -689,8 +689,8 @@ void AsyncSSL::DoRead() {
 }
 
 void AsyncSSL::OnUnderlySocketSend( SystemError::ErrorCode error_code , std::size_t bytes_transferred ) {
-    if( write_queue_.empty() ) return;
     Q_UNUSED(bytes_transferred);
+    if( write_queue_.empty() ) return;
     if( error_code != SystemError::noError ) {
         DeletionFlag deleted(this);
         outstanding_write_->operation->SetExitStatus(AsyncSSLOperation::EXCEPTION,error_code);
@@ -775,6 +775,7 @@ std::size_t AsyncSSL::BIOWrite( const void* data , std::size_t size ) {
 
 void AsyncSSL::OnUnderlySocketConn( SystemError::ErrorCode error_code ) {
     if( error_code != SystemError::noError ) {
+        handshake_stage_ = HANDSHAKE_NOT_YET;
         // No, we cannot connect to the peer sides, so we just tell our user
         // that we have expired whatever we've got currently 
         for( auto op : handshake_queue_ ) {
@@ -784,8 +785,8 @@ void AsyncSSL::OnUnderlySocketConn( SystemError::ErrorCode error_code ) {
                 return;
         }
         handshake_queue_.clear();
-        handshake_stage_ = HANDSHAKE_NOT_YET;
     } else {
+        handshake_stage_ = HANDSHAKE_DONE;
         for( auto op : handshake_queue_ ) {
             DeletionFlag deleted(this);
             Perform(op);
@@ -793,7 +794,6 @@ void AsyncSSL::OnUnderlySocketConn( SystemError::ErrorCode error_code ) {
                 return;
         }
         handshake_queue_.clear();
-        handshake_stage_ = HANDSHAKE_DONE;
     }
 }
 
@@ -829,22 +829,12 @@ void AsyncSSL::AsyncPerform( AsyncSSLOperation* operation ) {
 }
 
 bool AsyncSSL::AsyncSend( const nx::Buffer& buffer , std::function<void(SystemError::ErrorCode,std::size_t)>&& handler ) {
-#ifndef NDEBUG
-    if( !write_queue_.empty() ) {
-        Q_ASSERT( write_queue_.front().operation != write_.get() );
-    }
-#endif
     write_->Reset(&buffer,std::move(handler));
     AsyncPerform(write_.get());
     return true;
 }
 
 bool AsyncSSL::AsyncRecv( nx::Buffer* buffer , std::function<void(SystemError::ErrorCode,std::size_t)>&& handler ) {
-#ifndef NDEBUG
-    if( !read_queue_.empty() ) {
-        Q_ASSERT( read_queue_.front() != read_.get() );
-    }
-#endif 
     read_->Reset(buffer,std::move(handler));
     AsyncPerform(read_.get());
     return true;
@@ -892,14 +882,17 @@ public:
         if( !is_initialized_ ) {
             // We need to sniffer the buffer here
             sniffer_buffer_.reserve(kSnifferDataHeaderLength);
-            socket()->readSomeAsync(
+            if( !socket()->readSomeAsync(
                 &sniffer_buffer_,
                 std::bind(
                     &MixedAsyncSSL::Sniffer,
                     this,
                     std::placeholders::_1,
                     std::placeholders::_2,
-                    SnifferData(std::move(completionHandler),buffer)));
+                    SnifferData(std::move(completionHandler),buffer))) ) {
+                        completionHandler(SystemError::getLastOSErrorCode(),std::numeric_limits<std::size_t>::max());
+                        return;
+            }
         } else {
             Q_ASSERT(is_ssl_);
             AsyncSSL::AsyncRecv(buffer,std::move(completionHandler));
@@ -912,7 +905,6 @@ public:
         is_ssl_ = ssl;
         AsyncSSL::SetHandshakeStage( AsyncSSL::HANDSHAKE_DONE );
     }
-
 
     bool is_initialized() const {
         return is_initialized_;
@@ -1629,16 +1621,25 @@ bool QnMixedSSLSocket::recvAsyncImpl( nx::Buffer* const buffer, std::function<vo
     if( !d->initState && !d->useSSL ) {
         return d->wrappedSocket->readSomeAsync( buffer, std::move(handler) );
     } else {
+        d->mode.store(QnSSLSocket::ASYNC,std::memory_order_release);
+        MixedAsyncSSL* ssl_ptr = 
+            static_cast< MixedAsyncSSL* >( d->async_ssl_ptr.get() );
+        if( ssl_ptr->is_initialized() && !ssl_ptr->is_ssl() )
+            return d->wrappedSocket->readSomeAsync(buffer,std::move(handler));
+
         return d->wrappedSocket->dispatch(
             [this,buffer,handler]() mutable {
                 Q_D(QnMixedSSLSocket);
-                d->mode.store(QnSSLSocket::ASYNC,std::memory_order_release);
                 MixedAsyncSSL* ssl_ptr = 
                     static_cast< MixedAsyncSSL* >( d->async_ssl_ptr.get() );
                 if( !d->initState )
-                    ssl_ptr->set_ssl(d->useSSL);
+                    ssl_ptr->set_ssl( d->useSSL );
                 if( ssl_ptr->is_initialized() && !ssl_ptr->is_ssl() ) {
-                    d->wrappedSocket->readSomeAsync( buffer, std::move(handler) );
+                    bool ret = d->wrappedSocket->readSomeAsync( buffer, std::move(handler) );
+                    if( !ret ) {
+                        handler(SystemError::getLastOSErrorCode(),std::numeric_limits<std::size_t>::max());
+                        return;
+                    }
                 } else {
                     ssl_ptr->AsyncRecv(buffer, std::move(handler));
                 }
@@ -1653,18 +1654,28 @@ bool QnMixedSSLSocket::sendAsyncImpl( const nx::Buffer& buffer, std::function<vo
     if( !d->initState && !d->useSSL ) {
         return d->wrappedSocket->sendAsync(buffer, std::move(handler) );
     } else {
+        d->mode.store(QnSSLSocket::ASYNC,std::memory_order_release);
+        MixedAsyncSSL* ssl_ptr = 
+            static_cast< MixedAsyncSSL* >( d->async_ssl_ptr.get() );
+        if( ssl_ptr->is_initialized() && !ssl_ptr->is_ssl() )
+            return d->wrappedSocket->sendAsync(buffer,std::move(handler));
+
         return d->wrappedSocket->dispatch(
             [this,&buffer,handler]() mutable {
                 Q_D(QnMixedSSLSocket);
-                d->mode.store(QnSSLSocket::ASYNC,std::memory_order_release);
                 MixedAsyncSSL* ssl_ptr = 
                     static_cast< MixedAsyncSSL* >( d->async_ssl_ptr.get() );
                 if( !d->initState )
-                    ssl_ptr->set_ssl(d->useSSL);
-                if( ssl_ptr->is_initialized() && !ssl_ptr->is_ssl() ) 
-                    d->wrappedSocket->sendAsync(buffer, std::move(handler) );
-                else
+                    ssl_ptr->set_ssl( d->useSSL );
+                if( ssl_ptr->is_initialized() && !ssl_ptr->is_ssl() ) {
+                    bool ret = d->wrappedSocket->sendAsync(buffer, std::move(handler) );
+                    if( !ret ) {
+                        handler(SystemError::getLastOSErrorCode(),std::numeric_limits<std::size_t>::max());
+                        return;
+                    }
+                } else {
                     ssl_ptr->AsyncSend( buffer, std::move(handler) );
+                }
         });
     }
 }
