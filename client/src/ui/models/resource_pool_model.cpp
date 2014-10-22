@@ -598,8 +598,16 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     at_resource_parentIdChanged(resource);
     at_resource_resourceChanged(resource);
 
-    if (server)
+    if (server) {
         m_rootNodes[Qn::OtherSystemsNode]->update();
+
+        QnUuid serverId = server->getId();
+        foreach (QnResourcePoolModelNode *node, m_rootNodes[Qn::BastardNode]->children()) {
+            QnResourcePtr resource = node->resource();
+            if (resource && resource->getParentId() == serverId)
+                at_resource_parentIdChanged(resource);
+        }
+    }
 
     if(layout)
         foreach(const QnLayoutItemData &item, layout->getItems())

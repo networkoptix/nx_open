@@ -37,7 +37,7 @@ QnStardotResource::QnStardotResource():
     m_motionMaskBinData(0)
 {
     setVendor(lit("Stardot"));
-    setAuth(lit("admin"), lit("admin"));
+    setAuth(lit("admin"), lit("admin"), false);
 }
 
 QnStardotResource::~QnStardotResource()

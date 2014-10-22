@@ -16,6 +16,9 @@ void QnResourcePropertyDictionary::saveParams(const QnUuid& resourceId)
         m_modifiedItems.erase(itr);
     }
 
+    if( params.empty() )
+        return;
+
     ec2::ApiResourceParamWithRefDataList outData;
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
     ec2::ErrorCode rez = conn->getResourceManager()->saveSync(params, &outData);
@@ -119,7 +122,7 @@ void QnResourcePropertyDictionary::clear(const QVector<QnUuid>& idList)
     m_requestInProgress.clear();
 }
 
-bool QnResourcePropertyDictionary::setValue(const QnUuid& resourceId, const QString& key, const QString& value, bool markDirty)
+bool QnResourcePropertyDictionary::setValue(const QnUuid& resourceId, const QString& key, const QString& value, bool markDirty, bool replaceIfExists)
 {
     QMutexLocker lock(&m_mutex);
     auto itr = m_items.find(resourceId);
@@ -130,12 +133,22 @@ bool QnResourcePropertyDictionary::setValue(const QnUuid& resourceId, const QStr
     auto itrValue = properties.find(key);
     if (itrValue == properties.end())
         properties.insert(key, value);
-    else if (itrValue.value() != value)
+    else if (replaceIfExists && (itrValue.value() != value))
         itrValue.value() = value;
     else
         return false; // nothing to change
     if (markDirty)
+    {
         m_modifiedItems[resourceId][key] = value;
+    }
+    else
+    {
+        //if parameter marked as modified, removing mark. I.e. parameter value has been reset to already saved value
+        QnResourcePropertyList& modifiedProperties = m_modifiedItems[resourceId];
+        auto propertyIter = modifiedProperties.find( key );
+        if( propertyIter != modifiedProperties.end() )
+            modifiedProperties.erase( propertyIter );
+    }
     return true;
 }
 

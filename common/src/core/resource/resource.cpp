@@ -476,11 +476,17 @@ void QnResource::setId(const QnUuid& id) {
     auto locallySavedProperties = std::move( m_locallySavedProperties );
     mutexLocker.unlock();
 
-    //<key, <value, isDirty>>
-    for( std::pair<QString, std::pair<QString, bool> > prop: locallySavedProperties )
+    for( auto prop: locallySavedProperties )
     {
-        if( propertyDictionary->setValue(id, prop.first, prop.second.first, prop.second.second) )   //isModified?
+        if( propertyDictionary->setValue(
+                id,
+                prop.first,
+                prop.second.value,
+                prop.second.markDirty,
+                prop.second.replaceIfExists) )   //isModified?
+        {
             emitPropertyChanged(prop.first);
+        }
     }
 }
 
@@ -636,7 +642,7 @@ QString QnResource::getProperty(const QString &key) const {
         QMutexLocker lk( &m_mutex );
         if( m_id.isNull() ) {
             auto itr =  m_locallySavedProperties.find(key);
-            return itr != m_locallySavedProperties.end() ? itr->second.first : QString();
+            return itr != m_locallySavedProperties.end() ? itr->second.value : QString();
         }
     }
 
@@ -650,20 +656,20 @@ QString QnResource::getProperty(const QString &key) const {
     return value;
 }
 
-void QnResource::setProperty(const QString &key, const QString &value, bool markDirty) 
+void QnResource::setProperty(const QString &key, const QString &value, bool markDirty, bool replaceIfExists) 
 {
     {
         QMutexLocker lk( &m_mutex );
         if( m_id.isNull() )
         {
             //saving property to some internal dictionary. Will apply to global dictionary when id is known
-            m_locallySavedProperties[key] = std::make_pair( value, markDirty );
+            m_locallySavedProperties[key] = LocalPropertyValue( value, markDirty, replaceIfExists );
             return;
         }
     }
 
     Q_ASSERT(!getId().isNull());
-    bool isModified = propertyDictionary->setValue(getId(), key, value, markDirty);
+    bool isModified = propertyDictionary->setValue(getId(), key, value, markDirty, replaceIfExists);
     if (isModified)
         emitPropertyChanged(key);
 }
@@ -678,9 +684,9 @@ void QnResource::emitPropertyChanged(const QString& key)
     emit propertyChanged(toSharedPointer(this), key);
 }
 
-void QnResource::setProperty(const QString &key, const QVariant& value)
+void QnResource::setProperty(const QString &key, const QVariant& value, bool markDirty, bool replaceIfExists)
 {
-    return setProperty(key, value.toString());
+    return setProperty(key, value.toString(), markDirty, replaceIfExists);
 }
 
 ec2::ApiResourceParamDataList QnResource::getProperties() const {
