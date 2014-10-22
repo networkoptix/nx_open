@@ -944,7 +944,6 @@ private:
                 if( !ret ) {
                     data.completionHandler(SystemError::getLastOSErrorCode(),std::numeric_limits<std::size_t>::max());
                 }
-                //TODO MUST NOT ignore readSomeAsync result code!!
                 return;
             }
             // Fix for the bug that always false in terms of comparison of 0x80
@@ -1480,7 +1479,7 @@ bool QnSSLSocket::connectAsyncImpl( const SocketAddress& addr, std::function<voi
 bool QnSSLSocket::recvAsyncImpl( nx::Buffer* const buffer , std::function<void( SystemError::ErrorCode, std::size_t )>&& handler )
 {
     Q_D(QnSSLSocket);
-    return d->wrappedSocket->post(
+    return d->wrappedSocket->dispatch(
         [this,buffer,handler]() mutable {
             Q_D(QnSSLSocket);
             d->mode.store(QnSSLSocket::ASYNC,std::memory_order_release);
@@ -1491,7 +1490,7 @@ bool QnSSLSocket::recvAsyncImpl( nx::Buffer* const buffer , std::function<void( 
 bool QnSSLSocket::sendAsyncImpl( const nx::Buffer& buffer , std::function<void( SystemError::ErrorCode, std::size_t )>&& handler )
 {
     Q_D(QnSSLSocket);
-    return d->wrappedSocket->post(
+    return d->wrappedSocket->dispatch(
         [this,&buffer,handler]() mutable {
             Q_D(QnSSLSocket);
             d->mode.store(QnSSLSocket::ASYNC,std::memory_order_release);
@@ -1630,7 +1629,7 @@ bool QnMixedSSLSocket::recvAsyncImpl( nx::Buffer* const buffer, std::function<vo
     if( !d->initState && !d->useSSL ) {
         return d->wrappedSocket->readSomeAsync( buffer, std::move(handler) );
     } else {
-        return d->wrappedSocket->post(
+        return d->wrappedSocket->dispatch(
             [this,buffer,handler]() mutable {
                 Q_D(QnMixedSSLSocket);
                 d->mode.store(QnSSLSocket::ASYNC,std::memory_order_release);
@@ -1654,7 +1653,7 @@ bool QnMixedSSLSocket::sendAsyncImpl( const nx::Buffer& buffer, std::function<vo
     if( !d->initState && !d->useSSL ) {
         return d->wrappedSocket->sendAsync(buffer, std::move(handler) );
     } else {
-        return d->wrappedSocket->post(
+        return d->wrappedSocket->dispatch(
             [this,&buffer,handler]() mutable {
                 Q_D(QnMixedSSLSocket);
                 d->mode.store(QnSSLSocket::ASYNC,std::memory_order_release);
