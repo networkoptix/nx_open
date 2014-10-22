@@ -16,6 +16,9 @@ void QnResourcePropertyDictionary::saveParams(const QnUuid& resourceId)
         m_modifiedItems.erase(itr);
     }
 
+    if( params.empty() )
+        return;
+
     ec2::ApiResourceParamWithRefDataList outData;
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
     ec2::ErrorCode rez = conn->getResourceManager()->saveSync(params, &outData);
@@ -135,7 +138,17 @@ bool QnResourcePropertyDictionary::setValue(const QnUuid& resourceId, const QStr
     else
         return false; // nothing to change
     if (markDirty)
+    {
         m_modifiedItems[resourceId][key] = value;
+    }
+    else
+    {
+        //if parameter marked as modified, removing mark. I.e. parameter value has been reset to already saved value
+        QnResourcePropertyList& modifiedProperties = m_modifiedItems[resourceId];
+        auto propertyIter = modifiedProperties.find( key );
+        if( propertyIter != modifiedProperties.end() )
+            modifiedProperties.erase( propertyIter );
+    }
     return true;
 }
 

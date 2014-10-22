@@ -364,13 +364,6 @@ bool DeviceFileCatalog::needRebuildPause()
 
 void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageResourcePtr &storage, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& filter)
 {
-    QString filteredChunkFile;
-    if (!filter.isEmpty()) {
-        Chunk chunk(filter.scanPeriod.startTimeMs, storage->getIndex(), 0, filter.scanPeriod.durationMs, currentTimeZone()/60);
-        filteredChunkFile = fullFileName(chunk);
-    }
-
-
     QDir dir(folder);
     foreach(const QFileInfo& fi, dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name))
     {
@@ -389,11 +382,11 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
         else 
         {
             QString fileName = QDir::toNativeSeparators(fi.absoluteFilePath());
-            if (!filter.isEmpty() && fileName <= filteredChunkFile)
-                continue;
 
             Chunk chunk = chunkFromFile(storage, fileName);
             chunk.setFileSize(fi.size());
+            if (!filter.isEmpty() && chunk.startTimeMs > filter.scanPeriod.endTimeMs())
+                continue;
 
             if (chunk.durationMs > 0 && chunk.startTimeMs > 0) {
                 QMap<qint64, Chunk>::iterator itr = allChunks.insert(chunk.startTimeMs, chunk);

@@ -24,8 +24,6 @@ int QnRebuildArchiveRestHandler::executeGet(const QString& path, const QnRequest
     QString messageStr;
     QString stateStr(lit("unknown"));
 
-    QnStorageManager::RebuildState state = QnStorageManager::instance()->rebuildState();
-
     if (method == "start") {
         if (QnStorageManager::instance()->rebuildState() == QnStorageManager::RebuildState_None) {
             QnStorageManager::instance()->rebuildCatalogAsync();
@@ -39,7 +37,7 @@ int QnRebuildArchiveRestHandler::executeGet(const QString& path, const QnRequest
     }
     else if (method == "stop") {
         progress = 100;
-        if (state == QnStorageManager::RebuildState_Initial) {
+        if (QnStorageManager::instance()->rebuildState() == QnStorageManager::RebuildState_Initial) {
             messageStr = lit("Fast initial scan can't be canceled");
         }
         else { 
@@ -60,6 +58,7 @@ int QnRebuildArchiveRestHandler::executeGet(const QString& path, const QnRequest
         }
     }
 
+    QnStorageManager::RebuildState state = QnStorageManager::instance()->rebuildState();
     switch(state)
     {
     case QnStorageManager::RebuildState_None:
