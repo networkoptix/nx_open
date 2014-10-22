@@ -663,6 +663,7 @@ void QnRtspDataConsumer::setLiveMarker(int marker)
 
 void QnRtspDataConsumer::clearUnprocessedData()
 {
+    QMutexLocker lock(&m_dataQueueMtx);
     QnAbstractDataConsumer::clearUnprocessedData();
     m_newLiveQuality = MEDIA_Quality_None;
     m_dataQueue.setMaxSize(MAX_QUEUE_SIZE);

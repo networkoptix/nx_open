@@ -157,6 +157,7 @@ static const quint32 PROCESS_TERMINATE_TIMEOUT = 15000;
 // QnResourceStatusReplyProcessor
 // -------------------------------------------------------------------------- //
 detail::QnResourceStatusReplyProcessor::QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnVirtualCameraResourceList &resources):
+    awaitedResponseCount(0),
     m_handler(handler),
     m_resources(resources)
 {}

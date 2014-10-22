@@ -229,7 +229,7 @@ namespace ec2
 
     int generateRequestID()
     {
-        static std::atomic<int> requestID;
+        static std::atomic<int> requestID( 0 );
         return ++requestID;
     }
 

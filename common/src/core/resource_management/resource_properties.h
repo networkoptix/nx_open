@@ -19,7 +19,7 @@ public:
     int saveParamsAsync(const QList<QnUuid>& resourceId);
     
     QString value(const QnUuid& resourceId, const QString& key) const;
-    bool setValue(const QnUuid& resourceId, const QString& key, const QString& value, bool markDirty = true);
+    bool setValue(const QnUuid& resourceId, const QString& key, const QString& value, bool markDirty = true, bool replaceIfExists = true);
     bool hasProperty(const QnUuid& resourceId, const QString& key) const;
     ec2::ApiResourceParamDataList allProperties(const QnUuid& resourceId) const;
     void clear();

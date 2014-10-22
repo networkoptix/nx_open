@@ -24,6 +24,7 @@
 class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
 class RebuildAsyncTask;
+class ScanMediaFilesTask;
 class QnUuid;
 
 class QnStorageManager: public QObject
@@ -34,7 +35,8 @@ public:
     enum RebuildState {
         RebuildState_None,
         RebuildState_WaitForRecordersStopped,
-        RebuildState_Started
+        RebuildState_Started,
+        RebuildState_Initial
     };
 
     typedef QMap<int, QnStorageResourcePtr> StorageMap;
@@ -77,8 +79,7 @@ public:
 
     void doMigrateCSVCatalog();
     bool loadFullFileCatalog(const QnStorageResourcePtr &storage, bool isRebuild = false, qreal progressCoeff = 1.0);
-    std::deque<DeviceFileCatalog::Chunk> correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const std::deque<DeviceFileCatalog::Chunk>& chunks);
-
+    void partialMediaScan(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const DeviceFileCatalog::ScanFilter& filter);
 
     QnStorageResourcePtr getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider);
 
@@ -155,6 +156,7 @@ private:
     void updateRecordedMonths(const FileCatalogMap &catalogMap, UsedMonthsMap& usedMonths);
     void findTotalMinTime(const bool useMinArchiveDays, const FileCatalogMap& catalogMap, qint64& minTime, DeviceFileCatalogPtr& catalog);
     void addDataFromDatabase(const QnStorageResourcePtr &storage);
+    QnStorageDbPtr getSDB(const QnStorageResourcePtr &storage);
 private:
     StorageMap m_storageRoots;
     FileCatalogMap m_devFileCatalog[QnServer::ChunksCatalogCount];
@@ -181,10 +183,14 @@ private:
     bool m_rebuildCancelled;
 
     friend class RebuildAsyncTask;
+    friend class ScanMediaFilesTask;
+
     RebuildAsyncTask* m_asyncRebuildTask;
+    ScanMediaFilesTask* m_asyncPartialScan;
 
     QMap<QString, QnStorageDbPtr> m_chunksDB;
     bool m_initInProgress;
+    mutable QMutex m_sdbMutex;
 };
 
 #define qnStorageMan QnStorageManager::instance()
