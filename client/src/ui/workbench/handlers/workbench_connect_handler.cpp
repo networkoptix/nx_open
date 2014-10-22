@@ -168,8 +168,8 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
     if (url.isValid()) {
         /* Videowall item */
         if (qnSettings->isVideoWallMode()) {
-            if (!connectToServer(url)) {
-                QnGraphicsMessageBox* incompatibleMessageBox = QnGraphicsMessageBox::informationTicking(tr("Incompatible server. Closing in %1..."), videowallCloseTimeoutMSec);
+            if (!connectToServer(url, true)) {
+                QnGraphicsMessageBox* incompatibleMessageBox = QnGraphicsMessageBox::informationTicking(tr("Could not connect to server. Closing in %1..."), videowallCloseTimeoutMSec);
                 connect(incompatibleMessageBox, &QnGraphicsMessageBox::finished, action(Qn::ExitAction), &QAction::trigger);
             }
         } 

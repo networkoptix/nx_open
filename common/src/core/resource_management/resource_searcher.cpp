@@ -3,7 +3,7 @@
 #include <core/resource/resource_type.h>
 
 QnAbstractResourceSearcher::QnAbstractResourceSearcher():
-    m_shouldbeUsed(true),
+    m_discoveryMode(DiscoveryMode::fullyEnabled),
     m_localResources(false),
     m_shouldStop(false)
 {}
@@ -19,14 +19,14 @@ QnResourceList QnAbstractResourceSearcher::search() {
     return findResources();
 }
 
-void QnAbstractResourceSearcher::setShouldBeUsed(bool use)
+void QnAbstractResourceSearcher::setDiscoveryMode( DiscoveryMode mode )
 {
-    m_shouldbeUsed = use;
+    m_discoveryMode = mode;
 }
 
-bool QnAbstractResourceSearcher::shouldBeUsed() const
+DiscoveryMode QnAbstractResourceSearcher::discoveryMode() const
 {
-    return m_shouldbeUsed;
+    return m_discoveryMode;
 }
 
 void QnAbstractResourceSearcher::pleaseStop()

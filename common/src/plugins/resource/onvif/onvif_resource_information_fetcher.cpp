@@ -80,12 +80,12 @@ OnvifResourceInformationFetcher& OnvifResourceInformationFetcher::instance()
     return inst;
 }
 
-void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result) const
+void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result, DiscoveryMode discoveryMode) const
 {
     EndpointInfoHash::ConstIterator iter = endpointInfo.begin();
 
     while(iter != endpointInfo.end() && !m_shouldStop) {
-        findResources(iter.key(), iter.value(), result);
+        findResources(iter.key(), iter.value(), result, discoveryMode);
 
         ++iter;
     }
@@ -109,7 +109,7 @@ bool OnvifResourceInformationFetcher::isModelSupported(const QString& manufactur
     return NameHelper::instance().isManufacturerSupported(manufacturer) && NameHelper::instance().isSupported(modelName);
 }
 
-void OnvifResourceInformationFetcher::findResources(const QString& endpoint, const EndpointAdditionalInfo& info, QnResourceList& result) const
+void OnvifResourceInformationFetcher::findResources(const QString& endpoint, const EndpointAdditionalInfo& info, QnResourceList& result, DiscoveryMode discoveryMode) const
 {
     if (endpoint.isEmpty()) {
         qDebug() << "OnvifResourceInformationFetcher::findResources: response packet was received, but appropriate URL was not found.";
@@ -151,6 +151,9 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     }
     else
         soapWrapper.fetchLoginPassword(info.manufacturer);
+
+    if( !existResource && discoveryMode == DiscoveryMode::partiallyEnabled )
+        return; //ignoring unknown cameras
 
     if (m_shouldStop)
         return;

@@ -1861,6 +1861,10 @@ void QnMain::run()
     QnResourcePool::initStaticInstance( NULL );
 }
 
+void QnMain::changePort(quint16 port) {
+    m_universalTcpListener->updatePort(port);
+}
+
 void QnMain::at_appStarted()
 {
     QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2()); // start receiving notifications
@@ -2058,6 +2062,12 @@ void restartServer()
         qWarning() << "restart requested!";
         serviceMainInstance->stopAsync();
     }
+}
+
+void changePort(quint16 port)
+{
+    if (serviceMainInstance)
+        serviceMainInstance->changePort(port);
 }
 
 static void printVersion();
