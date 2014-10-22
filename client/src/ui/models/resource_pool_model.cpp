@@ -601,10 +601,10 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     if (server) {
         m_rootNodes[Qn::OtherSystemsNode]->update();
 
-        QSet<QnResourcePtr> resources = QSet<QnResourcePtr>::fromList(qnResPool->getResourcesByParentId(server->getId()));
+        QnUuid serverId = server->getId();
         foreach (QnResourcePoolModelNode *node, m_rootNodes[Qn::BastardNode]->children()) {
             QnResourcePtr resource = node->resource();
-            if (resource && resources.contains(resource))
+            if (resource && resource->getParentId() == serverId)
                 at_resource_parentIdChanged(resource);
         }
     }
