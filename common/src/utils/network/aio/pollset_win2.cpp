@@ -237,7 +237,7 @@ namespace aio
                 ++fdIndex;
             }
 
-            //win32 select moves signaled sokcet handles to beginning of fd_array and 
+            //win32 select moves signaled socket handlers to the beginning of fd_array and 
                 //sets fd_count properly, so it does like epoll
 
             //NOTE fdIndex points to current next fd. It does not correspond to \a currentSocket and \a currentSocketREvent
