@@ -163,8 +163,17 @@ void QnLicenseManagerWidget::updateLicenses() {
 }
 
 void QnLicenseManagerWidget::showMessage(const QString &title, const QString &message, bool warning) {
-    if (warning)
-        QMessageBox::warning(this, title, message);
+    if (warning) {
+        QScopedPointer<QMessageBox> messageBox(new QMessageBox(this));
+        messageBox->setIcon(QMessageBox::Warning);
+        messageBox->setWindowTitle(title);
+        messageBox->setText(message);
+        QPushButton* copyButton = messageBox->addButton(tr("Copy to Clipboard"), QMessageBox::HelpRole);
+        connect(copyButton, &QPushButton::clicked, this, [this, message]{
+            qApp->clipboard()->setText(message);
+        });
+        messageBox->exec();
+    }
     else
         QMessageBox::information(this, title, message);
 }
