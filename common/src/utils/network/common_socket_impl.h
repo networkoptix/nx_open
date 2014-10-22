@@ -26,7 +26,9 @@ public:
         aioThread( nullptr ),
         terminated( false )
     {
+        eventTypeToUserData.fill( nullptr );
     }
+
     virtual ~CommonSocketImpl() {}
 };
 

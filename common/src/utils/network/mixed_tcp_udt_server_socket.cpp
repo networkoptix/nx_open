@@ -32,6 +32,8 @@
 //TODO #ak looks like this class needs to be re-written using aio::AIOService
 
 MixedTcpUdtServerSocket::MixedTcpUdtServerSocket()
+:
+    m_inSyncAccept( false )
 {
     m_socketDelegates.push_back(new TCPServerSocket());
     m_socketDelegates.push_back(new UdtStreamServerSocket());

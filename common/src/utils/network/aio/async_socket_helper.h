@@ -545,6 +545,8 @@ public:
     :
         m_sock(_sock),
         m_abstractServerSocket(_abstractServerSocket),
+        m_threadHandlerIsRunningIn(NULL),
+        m_acceptAsyncCallCount(0),
         m_terminatedFlagPtr(nullptr)
     {
     }
