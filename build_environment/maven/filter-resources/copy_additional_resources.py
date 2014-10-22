@@ -116,13 +116,9 @@ if __name__ == '__main__':
                 #shutil.copytree(join('${project.build.directory}/bin', config, 'vox'), target_vox)                        z
 			
             for file in os.listdir(lib_source_dir):
-                if os.path.isfile(join(lib_source_dir, file)) and not fnmatch.fnmatch(file, '*.exe') and not fnmatch.fnmatch(file, '*.dll'):
+                if fnmatch.fnmatch(file, '*.pdb') or fnmatch.fnmatch(file, '*d.dll'):
                     print ('++++++ DELETING %s +++++++++++' % join(lib_source_dir, file))                    
-                    os.unlink(join(lib_source_dir, file))
-                if os.path.isfile(join(lib_source_dir, file)) and fnmatch.fnmatch(file, '*d.dll'):    
-                    print ('++++++ DELETING %s +++++++++++' % join(lib_source_dir, file))                    
-                    os.unlink(join(lib_source_dir, file))
-			
+                    os.unlink(join(lib_source_dir, file))			
     else:     
         lib_source_dir = '${qt.dir}/lib'
         lib_target_dir = join('${project.build.directory}', 'lib')
