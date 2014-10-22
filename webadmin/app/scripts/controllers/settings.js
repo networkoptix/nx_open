@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,$location) {
+    .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,$location,$timeout) {
 
         mediaserver.getCurrentUser().success(function(result){
             if(!result.reply.isAdmin){
@@ -141,10 +141,11 @@ angular.module('webadminApp')
                 return (server.status=='Online'?'0':'1') + server.Name + server.id;
                 // Сортировка: online->name->id
             });
-
-            _.each($scope.mediaServers,function(server){
-                var i=0;//1. Опрашиваем айпишники подряд
-                checkServersIp (server,i);
-            });
+            $timeout(function() {
+                _.each($scope.mediaServers, function (server) {
+                    var i = 0;//1. Опрашиваем айпишники подряд
+                    checkServersIp(server, i);
+                });
+            },1000);
         });
     });
