@@ -9,25 +9,6 @@
 #include <utils/common/uuid.h>
 
 struct QnBusinessEventParameters {
-    enum Param 
-    {
-        // base for any event type
-        EventTypeParam,
-        EventTimestampParam,
-        EventResourceParam,
-        ActionResourceParam,
-        
-        // event specific params.
-        InputPortIdParam,
-
-        ReasonCodeParam,
-        ReasonParamsEncodedParam,
-        
-        SourceParam,
-        ConflictsParam,
-
-        ParamCount
-    };
 
     QnBusinessEventParameters();
 
@@ -42,16 +23,8 @@ struct QnBusinessEventParameters {
     QStringList conflicts;
     QString inputPortId;
 
-    // convert/serialize/deserialize functions
-
-    static QnBusinessEventParameters unpack(const QByteArray& value);
-    QByteArray pack() const;
-
     /** Hash for events aggregation. */
     QnUuid getParamsHash() const;
-
-private:
-    static int getParamIndex(const QString& key);
 };
 
 #define QnBusinessEventParameters_Fields (eventType)(eventTimestamp)(eventResourceId)(actionResourceId)\

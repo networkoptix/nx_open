@@ -5,24 +5,6 @@
 #include <utils/common/model_functions_fwd.h>
 
 struct QnBusinessActionParameters {
-    enum Param {
-        SoundUrlParam,
-        EmailAddressParam,
-        UserGroupParam,
-        FpsParam,
-        QualityParam,
-        DurationParam,
-        RecordBeforeParam,
-        RecordAfterParam,
-        RelayOutputIdParam,
-        RelayAutoResetTimeoutParam,
-        InputPortIdParam,
-        KeyParam,
-        SayTextParam,
-
-        ParamCount
-    };
-
     QnBusinessActionParameters();
 
     // Play Sound
@@ -47,11 +29,6 @@ struct QnBusinessActionParameters {
     
     // Say Text
     QString sayText;
-
-    // convert/serialize/deserialize functions
-
-    static QnBusinessActionParameters unpack(const QByteArray& value);
-    QByteArray pack() const;
 
     /** 
      * \returns                        Whether all parameters have default values. 
