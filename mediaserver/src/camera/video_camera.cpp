@@ -209,8 +209,14 @@ QnConstCompressedAudioDataPtr QnVideoCameraGopKeeper::getLastAudioFrame() const
 void QnVideoCameraGopKeeper::updateCameraActivity()
 {
     qint64 usecTime = getUsecTimer();
+    qint64 lastKeyTime = AV_NOPTS_VALUE;
+    {
+        QMutexLocker lock(&m_queueMtx);
+        if (m_lastKeyFrame)
+            lastKeyTime = m_lastKeyFrame->timestamp;
+    }
     if (!m_resource->hasFlags(Qn::foreigner) && m_resource->isInitialized() &&
-       (!m_lastKeyFrame || qnSyncTime->currentUSecsSinceEpoch() - m_lastKeyFrame->timestamp > CAMERA_UPDATE_INTERNVAL))
+       (lastKeyTime == AV_NOPTS_VALUE || qnSyncTime->currentUSecsSinceEpoch() - lastKeyTime > CAMERA_UPDATE_INTERNVAL))
     {
         if (!m_activityStarted && usecTime > m_nextMinTryTime) {
             m_activityStarted = true;

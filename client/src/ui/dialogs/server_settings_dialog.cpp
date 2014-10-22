@@ -521,6 +521,10 @@ void QnServerSettingsDialog::updateRebuildUi(RebuildState newState, int progress
      m_rebuildState = newState;
 
      ui->rebuildGroupBox->setEnabled(newState != RebuildState::Invalid);
+     if (newState != RebuildState::InProgressFastScan)
+        ui->rebuildGroupBox->setTitle(tr("Rebuild archive index"));
+     else
+         ui->rebuildGroupBox->setTitle(tr("Fast initial scan in progress"));
      if (progress >= 0)
         ui->rebuildProgressBar->setValue(progress);
      ui->rebuildStartButton->setEnabled(newState == RebuildState::Ready);
@@ -531,7 +535,7 @@ void QnServerSettingsDialog::updateRebuildUi(RebuildState newState, int progress
          tr("Finished"),
          tr("Rebuilding archive index is completed."));
 
-     ui->stackedWidget->setCurrentIndex(newState == RebuildState::InProgress 
+     ui->stackedWidget->setCurrentIndex(newState == RebuildState::InProgress || newState == RebuildState::InProgressFastScan
          ? ui->stackedWidget->indexOf(ui->rebuildProgressPage)
          : ui->stackedWidget->indexOf(ui->rebuildPreparePage));
 }
@@ -572,6 +576,9 @@ void QnServerSettingsDialog::at_archiveRebuildReply(int status, const QnRebuildA
         case QnRebuildArchiveReply::Started:
             state = RebuildState::InProgress;
             break;
+        case QnRebuildArchiveReply::FastScan:
+            state = RebuildState::InProgressFastScan;
+            break;
         case QnRebuildArchiveReply::Stopped:
             state = RebuildState::Ready;
             break;
@@ -581,7 +588,7 @@ void QnServerSettingsDialog::at_archiveRebuildReply(int status, const QnRebuildA
     }
     updateRebuildUi(state, reply.progress());
 
-    if (reply.state() == QnRebuildArchiveReply::Started)
+    if (reply.state() == QnRebuildArchiveReply::Started || reply.state() == QnRebuildArchiveReply::FastScan)
         QTimer::singleShot(500, this, SLOT(sendNextArchiveRequest()));
 }
 

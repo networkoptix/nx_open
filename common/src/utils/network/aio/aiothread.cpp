@@ -58,6 +58,8 @@ namespace aio
 
         AIOEventHandlingData( AIOEventHandler<SocketType>* _eventHandler )
         :
+            beingProcessed( 0 ),
+            markedForRemoval( 0 ),
             eventHandler( _eventHandler ),
             timeout( 0 ),
             updatedPeriodicTaskClock( 0 )

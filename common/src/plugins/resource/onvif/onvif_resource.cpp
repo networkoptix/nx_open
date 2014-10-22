@@ -535,10 +535,6 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
         }
     }
 
-#ifdef _DEBUG
-    startInputPortMonitoring();
-#endif
-
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
 
@@ -568,9 +564,9 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     }
     saveParams();
 
-#ifdef _DEBUG
-    startInputPortMonitoring();
-#endif
+//#ifdef _DEBUG
+//    startInputPortMonitoring();
+//#endif
 
     return CameraDiagnostics::NoErrorResult();
 }

@@ -79,7 +79,8 @@ public:
         m_registerTimerCallCounter( 0 ),
         m_connectSendHandlerTerminatedFlag( nullptr ),
         m_recvHandlerTerminatedFlag( nullptr ),
-        m_timerHandlerTerminatedFlag( nullptr )
+        m_timerHandlerTerminatedFlag( nullptr ),
+        m_threadHandlerIsRunningIn( NULL )
 #ifdef _DEBUG
         , m_asyncSendIssued( false )
 #endif

@@ -9,6 +9,7 @@ struct QnRebuildArchiveReply
     {
         Unknown,
         Started,
+        FastScan,
         Stopped
     };
 
@@ -32,7 +33,9 @@ struct QnRebuildArchiveReply
         if (idx1 >= 0 && idx2 >= 0 && idx2 > idx1) {
             idx1 += QByteArray("<state>").length();
             QByteArray stateStr = data.mid(idx1, idx2 - idx1);
-            if (stateStr == "none")
+            if (stateStr == "Fast scan")
+                m_state = FastScan;
+            else if (stateStr == "none")
                 m_state = Stopped;
             else
                 m_state = Started;
