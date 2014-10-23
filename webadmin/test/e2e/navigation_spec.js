@@ -3,12 +3,10 @@
 describe('Navigation Menu', function() {
 
 
-    it("Merge: should show clickable button",function(){
-        expect("other test").toBe("uncommented");
-    });
-    return;
+    //it("should stop test",function(){expect("other test").toBe("uncommented");});return;
 
-  it('changes active link depending on route', function() {
+
+    it('changes active link depending on route', function() {
     browser.get('/');
 
     expect(element(by.css('.active')).getText()).toEqual('Settings');

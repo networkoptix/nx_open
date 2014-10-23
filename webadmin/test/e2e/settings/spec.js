@@ -3,15 +3,11 @@
 var SettingsPage = require('./po.js');
 describe('Settings Page', function () {
 
+    //it("should stop test",function(){expect("other test").toBe("uncommented");});return;
+
     var p = new SettingsPage();
     var ptor = protractor.getInstance();
 
-
-
-    it("Merge: should show clickable button",function(){
-        expect("other test").toBe("uncommented");
-    });
-    return;
 
     it('Change password: should check oldpassword and newpassword and show some info', function () {
         p.get();
@@ -151,6 +147,7 @@ describe('Settings Page', function () {
 
 
     it("Change system name: should allow change name",function() {
+
         p.get();
         var oldSystemName = '';
         var temporarySystemName = 'some good name';
