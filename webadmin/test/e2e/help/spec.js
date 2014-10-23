@@ -4,32 +4,33 @@ var Page = require('./po.js');
 var protractor = require('protractor');
 describe('Help Page', function () {
 
+    it("Merge: should show clickable button",function(){
+        expect("other test").toBe("uncommented");
+    });
+    return;
+
     var p = new Page();
-    var ptor = protractor.getInstance();
 
     it("Should show link for api documentation",function(){
         p.get();
         expect(p.apiLink.isDisplayed()).toBe(true);
         expect(p.apiLink.getText()).toMatch("API");
-        expect(p.apiLink.getAttribute("href")).toEqual("api.xmp");
+        expect(p.apiLink.getAttribute("href")).toMatch("api.xml");
     });
 
-    it("Should show sdk",function(){
-        expect("all tests").toBe("written");
-
+    it("Should show sdk link",function(){
         expect(p.sdkLink.isDisplayed()).toBe(true);
         expect(p.sdkLink.getText()).toMatch("SDK");
-        p.sdkLink.click();
-        expect(ptor.currentUrl()).toContain('#/sdkeula');
-
     });
 
     it("Should show require sdk eula to be accepted",function(){
-        expect(this.sdkDownloadButton.isEnabled()).toBe(false);
-        expect(this.acceptEulaCheckbox.isSelected()).toBe(false);
-        this.acceptEulaCheckbox.click();
-        expect(this.acceptEulaCheckbox.isSelected()).toBe(true);
-        expect(this.sdkDownloadButton.isEnabled()).toBe(true);
+
+        p.sdkLink.click();
+        expect(p.sdkDownloadButton.isEnabled()).toBe(false);
+        expect(p.acceptEulaCheckbox.isSelected()).toBe(false);
+        p.acceptEulaCheckbox.click();
+        expect(p.acceptEulaCheckbox.isSelected()).toBe(true);
+        expect(p.sdkDownloadButton.isEnabled()).toBe(true);
     });
 
 });
