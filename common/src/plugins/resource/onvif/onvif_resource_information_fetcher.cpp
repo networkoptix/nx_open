@@ -149,7 +149,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         soapWrapper.setLogin(info.defaultLogin);
         soapWrapper.setPassword(info.defaultPassword);
     }
-    else
+    else if (discoveryMode != DiscoveryMode::partiallyEnabled)
         soapWrapper.fetchLoginPassword(info.manufacturer);
 
     if( !existResource && discoveryMode == DiscoveryMode::partiallyEnabled )

@@ -138,7 +138,7 @@ AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndA
 
 QByteArray QnUpnpResourceSearcher::getDeviceDescription(const QByteArray& uuidStr, const QUrl& url)
 {
-    if (m_cacheLivetime.elapsed() > CACHE_TIME_TIME) {
+    if (m_cacheLivetime.elapsed() > UPNPDeviceSearcher::cacheTimeout()) {
         m_cacheLivetime.restart();
         m_deviceXmlCache.clear();
     }

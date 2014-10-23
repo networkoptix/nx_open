@@ -415,12 +415,8 @@ QHostAddress UPNPDeviceSearcher::findBestIface( const QString& host )
     return QHostAddress(oldAddress);
 }
 
-const UPNPDeviceSearcher::UPNPDescriptionCacheItem* UPNPDeviceSearcher::findDevDescriptionInCache( const QByteArray& uuid )
+int UPNPDeviceSearcher::cacheTimeout()
 {
-    std::map<QByteArray, UPNPDescriptionCacheItem>::iterator it = m_upnpDescCache.find( uuid );
-    if( it == m_upnpDescCache.end() )
-        return NULL;
-
     int xmlDescriptionLiveTimeout = XML_DESCRIPTION_LIVE_TIME_MS;
     QSet<QString> disabledVendorsForAutoSearch = QnGlobalSettings::instance()->disabledVendorsSet();
     if( disabledVendorsForAutoSearch.size() == 1 &&
@@ -428,8 +424,16 @@ const UPNPDeviceSearcher::UPNPDescriptionCacheItem* UPNPDeviceSearcher::findDevD
     {
         xmlDescriptionLiveTimeout = PARTIAL_DISCOVERY_XML_DESCRIPTION_LIVE_TIME_MS;
     }
+    return xmlDescriptionLiveTimeout;
+}
 
-    if( m_cacheTimer.elapsed() - it->second.creationTimestamp > xmlDescriptionLiveTimeout )
+const UPNPDeviceSearcher::UPNPDescriptionCacheItem* UPNPDeviceSearcher::findDevDescriptionInCache( const QByteArray& uuid )
+{
+    std::map<QByteArray, UPNPDescriptionCacheItem>::iterator it = m_upnpDescCache.find( uuid );
+    if( it == m_upnpDescCache.end() )
+        return NULL;
+
+    if( m_cacheTimer.elapsed() - it->second.creationTimestamp > cacheTimeout() )
     {
         //item has expired
         m_upnpDescCache.erase( it );
