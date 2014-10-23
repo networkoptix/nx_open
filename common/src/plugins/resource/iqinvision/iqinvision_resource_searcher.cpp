@@ -148,7 +148,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
 
     QnPlIqResourcePtr resource ( new QnPlIqResource() );
 
-    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name, false);
     if (rt.isNull())
     {
         // try with default camera name
@@ -206,7 +206,7 @@ void QnPlIqResourceSearcher::processNativePacket(QnResourceList& result, const Q
     }
 
     QString nameStr = QString::fromLatin1(name);
-    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), nameStr);
+    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), nameStr, false);
     if (rt.isNull()) {
         rt = qnResTypePool->getResourceTypeId(manufacture(), DEFAULT_RESOURCE_TYPE);
         if (rt.isNull())
