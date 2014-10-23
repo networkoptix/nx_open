@@ -146,7 +146,7 @@ int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue, 
     QMutexLocker lock(&m_queueMtx);
     for (int i = 0; i < m_dataQueue.size(); ++i)
     {
-        QnConstAbstractDataPacketPtr data = m_dataQueue.at(i);
+        const QnConstAbstractDataPacketPtr& data = m_dataQueue.atUnsafe(i);
         const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(data.data());
         if (video)
         {
