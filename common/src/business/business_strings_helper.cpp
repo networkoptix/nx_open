@@ -268,7 +268,9 @@ QVariantHash QnBusinessStringsHelper::eventDetailsMap(
     }
     case StorageFailureEvent:
     case NetworkIssueEvent:
-    case ServerFailureEvent: {
+    case ServerFailureEvent: 
+    case LicenseIssueEvent:
+    {
         detailsMap[tpReason] = eventReason(params);
         break;
     }
@@ -401,7 +403,8 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
     }
     case LicenseRemoved: {
         QString disabledCameras = reasonParamsEncoded;
-        result = tr("Recording on %n camera(s) is disabled. The number of active licenses is less than the number of recorded cameras.", NULL, disabledCameras.toInt());
+        result = tr("Recording on %n camera(s) is disabled. Cameras: ", NULL, disabledCameras.split(L',').size());
+        result += disabledCameras;
         break;
     }
     default:
