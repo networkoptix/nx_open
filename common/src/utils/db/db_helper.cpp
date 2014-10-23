@@ -25,11 +25,14 @@ void QnDbHelper::QnDbTransaction::rollback()
     m_mutex.unlock();
 }
 
-void QnDbHelper::QnDbTransaction::commit()
+bool QnDbHelper::QnDbTransaction::commit()
 {
     QSqlQuery query(m_database);
-    query.exec(lit("COMMIT"));
+    bool rez = query.exec(lit("COMMIT"));
+    if (!rez)
+        qWarning() << "Commit failed:" << query.lastError();
     m_mutex.unlock();
+    return rez;
 }
 
 QnDbHelper::QnDbTransactionLocker::QnDbTransactionLocker(QnDbTransaction* tran): 
@@ -45,10 +48,10 @@ QnDbHelper::QnDbTransactionLocker::~QnDbTransactionLocker()
         m_tran->rollback();
 }
 
-void QnDbHelper::QnDbTransactionLocker::commit()
+bool QnDbHelper::QnDbTransactionLocker::commit()
 {
-    m_tran->commit();
     m_committed = true;
+    return m_tran->commit();
 }
 
 

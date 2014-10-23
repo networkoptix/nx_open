@@ -131,8 +131,8 @@ namespace ec2
                 errorCode = syncFunction( tran, &transactionsToSend );
                 if( errorCode != ErrorCode::ok )
                     return;
-                //TODO #ak commit MUST return error code !!! it can really fail
-                dbTran->commit();
+                if (!dbTran->commit())
+                    return;
             }
             else if( !tran.isLocal )
             {

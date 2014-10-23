@@ -66,7 +66,7 @@ namespace ec2
         public:
             Locker(QnDbManager* db);
             ~Locker();
-            void commit();
+            bool commit();
 
         private:
             QnDbManager* m_db;

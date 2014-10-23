@@ -207,9 +207,9 @@ QnDbManager::Locker::~Locker()
 {
 }
 
-void QnDbManager::Locker::commit()
+bool QnDbManager::Locker::commit()
 {
-    m_scopedTran.commit();
+    return m_scopedTran.commit();
 }
 
 
@@ -911,13 +911,12 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
     if (!applyUpdates())
         return false;
 
-    lockStatic.commit();
-    lock.commit();
+    if (!lockStatic.commit())
+        return false;
 #ifdef DB_DEBUG
     qDebug() << "database created successfully";
 #endif // DB_DEBUG
-
-    return true;
+    return lock.commit();
 }
 
 QnDbManager::~QnDbManager()
