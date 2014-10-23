@@ -17,7 +17,7 @@ function updateUi(modelData) {
     } else {
         name.text = ""
         address.text = ""
-        port.text = ""
+        port.text = "7001"
         login.text = ""
         password.text = ""
     }
