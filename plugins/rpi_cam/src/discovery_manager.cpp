@@ -59,7 +59,7 @@ namespace rpi_cam
         strcpy(buf, VENDOR_NAME);
     }
 
-    int DiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* localInterfaceIPAddr )
+    int DiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* /*localInterfaceIPAddr*/ )
     {
         static const unsigned MAX_CAMERAS_NUM = 1; // TODO: up to 2
 

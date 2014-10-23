@@ -26,27 +26,30 @@ namespace rpi_cam
         if (rpiCamera_->isOK() && rpiCamera_->startCapture())
             isOK_ = true;
 
-        VideoMode m(VideoMode::VM_1080p30);
         encoderHQ_ = std::make_shared<MediaEncoder>(this, 0, rpiCamera_->maxBitrate());
-        for (unsigned i=0; rpiCamera_->resolutionHQ(i, m); ++i)
+        for (unsigned i=0; VideoMode::num2mode(i) != VideoMode::VM_NONE; ++i)
         {
+            VideoMode mode = VideoMode::num2mode(i);
+
             nxcip::ResolutionInfo res;
-            res.maxFps = m.framerate;
-            res.resolution.width = m.width;
-            res.resolution.height = m.height;
+            res.maxFps = mode.framerate;
+            res.resolution.width = mode.width;
+            res.resolution.height = mode.height;
             encoderHQ_->addResolution(res);
         }
-#if 0
-        encoderLQ_ = std::make_shared<MediaEncoder>(this, 1);
-        for (unsigned i=0; rpiCamera_->resolutionLQ(i, m); ++i)
+
+        if (ENCODERS_COUNT > 1)
         {
+            VideoMode mode(VideoMode::modeLQ());
+
+            encoderLQ_ = std::make_shared<MediaEncoder>(this, 1);
             nxcip::ResolutionInfo res;
-            res.maxFps = m.framerate;
-            res.resolution.width = m.width;
-            res.resolution.height = m.height;
+            res.maxFps = mode.framerate;
+            res.resolution.width = mode.width;
+            res.resolution.height = mode.height;
             encoderLQ_->addResolution(res);
         }
-#endif
+
         // TODO
         std::string strId = "RaspberryPi";
 
@@ -174,11 +177,6 @@ namespace rpi_cam
 
     //
 
-    bool CameraManager::setResolution(unsigned width, unsigned height)
-    {
-        return rpiCamera_->setResolution(width, height);
-    }
-
     nxcip::MediaDataPacket * CameraManager::nextFrame(unsigned encoderNumber)
     {
         if (encoderNumber >= ENCODERS_COUNT)
@@ -197,17 +195,19 @@ namespace rpi_cam
         {
             if (encoderNumber)
             {
-#if 0
+                std::lock_guard<std::mutex> lock( mutex_ ); // LOCK
+
                 if (rpiCamera_->nextFrameLQ(data))
                 {
                     VideoPacket * packet = new VideoPacket(nxcip::CODEC_ID_MJPEG, &data[0], data.size());
                     packet->setLowQualityFlag();
                     return packet;
                 }
-#endif
             }
             else
             {
+                std::lock_guard<std::mutex> lock( mutex_ ); // LOCK
+
                 if (rpiCamera_->nextFrame(data, pts, isKey))
                 {
                     VideoPacket * packet = new VideoPacket(nxcip::CODEC_ID_H264, &data[0], data.size());
@@ -222,5 +222,98 @@ namespace rpi_cam
         }
 
         return nullptr;
+    }
+
+    unsigned CameraManager::setBitrate(unsigned encoderNumber, unsigned bitrateKbps)
+    {
+        vcos_log_error("CameraManager::setBitrate");
+#if 0
+        if (encoderNumber > 0)
+            return RaspberryPiCamera::maxBitrate();
+
+        if (bitrateKbps > RaspberryPiCamera::maxBitrate())
+            bitrateKbps = RaspberryPiCamera::maxBitrate();
+
+        {
+            std::lock_guard<std::mutex> lock( mutex_ ); // LOCK
+
+            unsigned cameraNum = rpiCamera_->cameraNumber();
+            VideoMode mode = rpiCamera_->mode();
+            rpiCamera_.reset();
+            rpiCamera_ = std::make_shared<RaspberryPiCamera>(cameraNum, bitrateKbps, mode);
+
+            bitrateKbps = rpiCamera_->bitrate();
+        }
+#endif
+        return bitrateKbps;
+    }
+
+    float CameraManager::setFps(unsigned encoderNumber, float fps)
+    {
+        vcos_log_error("CameraManager::setFps");
+#if 0
+        if (encoderNumber > 0)
+            return RaspberryPiCamera::resolutionLQ().framerate;
+
+        {
+            std::lock_guard<std::mutex> lock( mutex_ ); // LOCK
+
+            VideoMode mode = rpiCamera_->mode();
+
+            if (fps < mode.framerate && fps >= 0.0f)
+            {
+                mode.framerate = fps;
+                unsigned cameraNum = rpiCamera_->cameraNumber();
+                unsigned bitrateKbps = rpiCamera_->bitrate();
+
+                rpiCamera_.reset();
+                rpiCamera_ = std::make_shared<RaspberryPiCamera>(cameraNum, bitrateKbps, mode);
+            }
+
+            fps = rpiCamera_->mode().framerate;
+        }
+#endif
+        return fps;
+    }
+
+    bool CameraManager::setResolution(unsigned encoderNumber, unsigned width, unsigned height)
+    {
+        vcos_log_error("CameraManager::setResolution");
+#if 0
+        if (encoderNumber > 0)
+            return false;
+
+        VideoMode mode;
+        bool found = false;
+        for (unsigned i=0; VideoMode::num2mode(i) != VideoMode::VM_NONE; ++i)
+        {
+            mode = VideoMode::num2mode(i);
+            if (mode.width == width && mode.height == height) {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+            return false;
+
+        {
+            std::lock_guard<std::mutex> lock( mutex_ ); // LOCK
+
+            if (mode == rpiCamera_->mode())
+                return true;
+
+            unsigned cameraNum = rpiCamera_->cameraNumber();
+            unsigned bitrateKbps = rpiCamera_->bitrate();
+
+            rpiCamera_.reset();
+            rpiCamera_ = std::make_shared<RaspberryPiCamera>(cameraNum, bitrateKbps, mode);
+            return true;
+        }
+
+        return false;
+#else
+        return true;
+#endif
     }
 }

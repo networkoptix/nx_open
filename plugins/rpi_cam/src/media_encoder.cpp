@@ -61,34 +61,24 @@ namespace rpi_cam
         return nxcip::NX_NO_ERROR;
     }
 
-    // TODO
     int MediaEncoder::setResolution( const nxcip::Resolution& res )
     {
-        unsigned num = 0;
-        for (; num < resolutions_.size(); ++num)
-        {
-            if (res.width == resolutions_[num].resolution.width &&
-                res.height == resolutions_[num].resolution.height)
-                break;
-        }
-
-        if (num == resolutions_.size())
-            return nxcip::NX_UNSUPPORTED_RESOLUTION;
-
-        if (cameraManager_->setResolution(res.width, res.height))
+        if (cameraManager_->setResolution(encoderNumber_, res.width, res.height))
             return nxcip::NX_NO_ERROR;
-        return nxcip::NX_OTHER_ERROR;
+        return nxcip::NX_UNSUPPORTED_RESOLUTION;
     }
 
-    // TODO
-    int MediaEncoder::setFps( const float& /*fps*/, float* selectedFps )
+    int MediaEncoder::setFps( const float& fps, float* selectedFps )
     {
-        *selectedFps = resolutions_[0].maxFps;
+        if (cameraManager_)
+            *selectedFps = cameraManager_->setFps(encoderNumber_, fps);
         return nxcip::NX_NO_ERROR;
     }
 
-    int MediaEncoder::setBitrate( int /*bitrateKbps*/, int* /*selectedBitrateKbps*/ )
+    int MediaEncoder::setBitrate( int bitrateKbps, int* selectedBitrateKbps )
     {
+        if (cameraManager_)
+            *selectedBitrateKbps = cameraManager_->setBitrate(encoderNumber_, bitrateKbps);
         return nxcip::NX_NO_ERROR;
     }
 

@@ -2,6 +2,7 @@
 #define RPI_CAMERA_MANAGER_H
 
 #include <memory>
+#include <mutex>
 
 #include <plugins/camera_plugin.h>
 
@@ -44,11 +45,14 @@ namespace rpi_cam
 
         const nxcip::CameraInfo& info() const { return info_; }
         bool isOK() const { return isOK_; }
-        bool setResolution(unsigned width, unsigned height);
 
         nxcip::MediaDataPacket * nextFrame(unsigned encoderNumber);
+        bool setResolution(unsigned encoderNumber,unsigned width, unsigned height);
+        unsigned setBitrate(unsigned encoderNumber, unsigned bitrateKbps);
+        float setFps(unsigned encoderNumber, float fps);
 
     private:
+        mutable std::mutex mutex_;
         std::shared_ptr<RaspberryPiCamera> rpiCamera_;
         std::shared_ptr<MediaEncoder> encoderHQ_;
         std::shared_ptr<MediaEncoder> encoderLQ_;
