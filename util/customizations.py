@@ -28,10 +28,10 @@ def err(message):
     print colorer.Style.BRIGHT + colorer.Fore.RED + message
 
 class Customization():
-    def __init__(self, name, path):
+    def __init__(self, name, path, project):
         self.name = name
         self.path = path
-        skinPath = os.path.join(self.path, 'client/resources')
+        skinPath = os.path.join(self.path, project + '/resources')
         self.basePath = os.path.join(skinPath, 'skin')
         self.darkPath = os.path.join(skinPath, 'skin_dark')
         self.lightPath = os.path.join(skinPath, 'skin_light')
@@ -118,12 +118,15 @@ class Customization():
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--color', action='store_true', help="colorized output")
+    parser.add_argument('-p', '--project', default='client', help="target project, default is client")
     args = parser.parse_args()
     if args.color:
         from colorama import Fore, Back, Style, init
         init(autoreset=True) # use Colorama to make Termcolor work on Windows too
         global colorer
         import colorama as colorer
+    
+    project = args.project
 
     scriptDir = os.path.dirname(os.path.abspath(__file__))
     rootDir = os.path.join(scriptDir, '../customization')
@@ -136,7 +139,7 @@ def main():
         path = os.path.join(rootDir, entry)
         if (not os.path.isdir(path)):
             continue
-        c = Customization(entry, path)
+        c = Customization(entry, path, project)
         if c.isRoot():
             c.populateFileList()
             invalidInner += c.validateInner()

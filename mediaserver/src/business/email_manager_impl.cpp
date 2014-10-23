@@ -49,7 +49,11 @@ bool EmailManagerImpl::sendEmail(const ec2::ApiEmailData& data) {
         return true;    // empty settings should not give us an error while trying to send email, should them?
 
     MimeMessage message;
-    QString sender = QString(lit("%1@%2")).arg(settings.user).arg(settings.server);
+    QString sender;
+    if (settings.user.contains(L'@'))
+        sender = settings.user;
+    else
+        sender = QString(lit("%1@%2")).arg(settings.user).arg(settings.server);
     message.setSender(EmailAddress(sender));
     foreach (const QString &recipient, data.to) {
         message.addRecipient(EmailAddress(recipient));

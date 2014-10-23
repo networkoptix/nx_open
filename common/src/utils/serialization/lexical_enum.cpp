@@ -112,7 +112,7 @@ bool QnEnumLexicalSerializerData::deserializeEnumInternal(const QHash<QString, i
 }
 
 void QnEnumLexicalSerializerData::serializeFlags(int value, QString *target) const {
-    if(m_numeric) {
+    if(m_nameByValue.isEmpty()) {
         QnLexical::serialize(value, target);
         return;
     }

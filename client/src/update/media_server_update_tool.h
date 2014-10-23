@@ -74,7 +74,7 @@ private:
 
     QnMediaServerResourceList m_targets;
     
-    bool m_disableClientUpdates;
+    bool m_enableClientUpdates;
 };
 
 #endif // QN_MEDIA_SERVER_UPDATE_TOOL_H
