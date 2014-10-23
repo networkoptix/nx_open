@@ -37,14 +37,12 @@ namespace ec2
     class ApiObjectInfoList: public std::vector<ApiObjectInfo>
     {
     public:
-        std::vector<ApiIdData> toIdList() 
+        std::vector<ApiIdData> toIdList() const
         {
             std::vector<ApiIdData> result;
-            for (size_t i = 0; i < size(); ++i) {
-                ApiIdData data;
-                data.id = at(i).id;
-                result.push_back(data);
-            }
+            result.reserve(size());
+            for (size_t i = 0; i < size(); ++i)
+                result.push_back(ApiIdData(at(i).id));
             return result;
         }
     };
