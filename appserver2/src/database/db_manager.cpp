@@ -2066,7 +2066,7 @@ ApiOjectType QnDbManager::getObjectType(const QnUuid& objectId)
         SELECT \
         (CASE WHEN c.resource_ptr_id is null then rt.name else 'Camera' end) as name\
         FROM vms_resource r\
-        JOIN vms_resourcetype rt on rt.guid = r.xtype_guid\
+        LEFT JOIN vms_resourcetype rt on rt.guid = r.xtype_guid\
         LEFT JOIN vms_camera c on c.resource_ptr_id = r.id\
         WHERE r.guid = :guid\
     ");
@@ -2105,18 +2105,23 @@ ApiObjectInfoList QnDbManager::getNestedObjects(const ApiObjectInfo& parentObjec
     switch(parentObject.type)
     {
         case ApiObject_Server:
-            query.prepare("SELECT ?, r.guid from vms_camera c JOIN vms_resource r on r.id = c.resource_ptr_id WHERE r.parent_guid = ?");
-            query.addBindValue((int) ApiObject_Camera);
+            query.prepare("\
+                SELECT :cameraObjType, r.guid from vms_camera c JOIN vms_resource r on r.id = c.resource_ptr_id WHERE r.parent_guid = :guid \
+                UNION \
+                SELECT :storageObjType, r.guid from vms_storage s JOIN vms_resource r on r.id = s.resource_ptr_id WHERE r.parent_guid = :guid \
+            ");
+            query.bindValue(":cameraObjType", (int)ApiObject_Camera);
+            query.bindValue(":storageObjType", (int)ApiObject_Storage);
             break;
         case ApiObject_User:
-            query.prepare( "SELECT ?, r.guid FROM vms_resource r, vms_layout WHERE r.parent_guid = ? AND r.id = vms_layout.resource_ptr_id" );
-            query.addBindValue((int) ApiObject_Layout);
+            query.prepare( "SELECT :objType, r.guid FROM vms_resource r, vms_layout WHERE r.parent_guid = :guid AND r.id = vms_layout.resource_ptr_id" );
+            query.bindValue(":objType", (int)ApiObject_Layout);
             break;
         default:
             //Q_ASSERT_X(0, "Not implemented!", Q_FUNC_INFO);
             return result;
     }
-    query.addBindValue(parentObject.id.toRfc4122());
+    query.bindValue(":guid", parentObject.id.toRfc4122());
 
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
