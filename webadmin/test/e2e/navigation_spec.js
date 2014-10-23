@@ -22,8 +22,8 @@ describe('Navigation Menu', function() {
     }
   });
 
-
     it('shows essential server info in title', function() {
-        expect("test").toBe("written");
+        var servertitle = element(by.css(".navbar-brand"));
+        expect(servertitle.getAttribute("title")).toMatch(/Server\sname\:[\d\w\s*]+\nIP\:\s(\d+\.\d+\.\d+\.\d+\s*)+/);
     });
 });
