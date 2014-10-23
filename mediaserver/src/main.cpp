@@ -1863,6 +1863,8 @@ void QnMain::run()
 
 void QnMain::changePort(quint16 port) {
     m_universalTcpListener->updatePort(port);
+    QString address = QUrl(m_mediaServer->getApiUrl()).host();
+    setServerNameAndUrls(m_mediaServer, address, port);
 }
 
 void QnMain::at_appStarted()

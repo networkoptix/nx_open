@@ -2,52 +2,66 @@
 var Page = require('./po.js');
 describe('Information Page', function () {
 
-    var p = new Page();
-
-    it("Module",function(){
-        expect("all tests").toBe("written");
+    it("Merge: should show clickable button",function(){
+        expect("other test").toBe("uncommented");
     });
     return;
 
+    var p = new Page();
+
+    browser.ignoreSynchronization = true;
+
     it("should show software info",function(){
 
-        expect("test").toBe("written");
+        p.get();
+
+        browser.ignoreSynchronization = true;
+        expect(p.versionNode.getText()).toMatch(/\d+\.\d+\.\d+.\d+/);//2.3.0.1234
+        expect(p.archNode.getText()).toMatch(/[\w\d]+/);;//x86,arm,x64
+        expect(p.platformNode.getText()).toMatch(/\w+/); //linux,mac,windows
+        expect(p.osNode.getText()).toMatch(/\w+/); // ubuntu
     });
+
 
     it("should show storage info",function(){
 
-        expect("test").toBe("written");
+        browser.ignoreSynchronization = true;
+        expect(p.storagesNodes.count()).toBeGreaterThan(0); // storages exist
+        expect(p.storagesNodes.first().element(by.css(".storage-url")).getText()).toMatch(/[\w\d/\\]+/); // Except one good url
+        expect(p.storagesNodes.first().element(by.css(".storage-total-space")).getText()).toMatch(/[\d+\.?\d*\s*\wB]+/);// GB,  TB  - it's size
+        expect(p.storagesNodes.first().element(by.css(".storage-indicators")).element(by.css(".glyphicon")).isDisplayed()).toBe(true); // At least one indicator
     });
 
     it("health monitoring: should display legend",function(){
-
-        expect("test").toBe("written");
-    });
-    it("health monitoring: should update graphics ",function(){
-
-        expect("test").toBe("written");
-    });
-    it("health monitoring: should show message when server is offline",function(){
-
-        expect("test").toBe("written");
-    });
-    it("health monitoring: should enable-disable indicators using checkboxes",function(){
-
-        expect("test").toBe("written");
+        browser.ignoreSynchronization = true;
+        expect(p.hmLegentNodes.count()).toBeGreaterThan(1); //legend exists, except 2+ elements
     });
 
-    it("log: should show iframe with not-empty date",function(){
-
-        expect("test").toBe("written");
+    it("health monitoring: should update graphics, should show message when server is offline, should enable-disable indicators using checkboxes",function(){
+        expect("health monitoring").toBe("tested manually");
     });
 
-    it("log: should refresh iframe on click on some button",function(){
-
-        expect("test").toBe("written");
+    it("log: should show iframe",function(){
+        browser.ignoreSynchronization = true;
+        expect(p.logIframe.isDisplayed()).toBe(true);
+        expect(p.logIframe.getAttribute("src")).toMatch("/api/showLog");
     });
 
-    it("log: should show new window on click on some button",function(){
-
-        expect("test").toBe("written");
+    it("log: should show refresh link to update iframe",function(){
+        browser.ignoreSynchronization = true;
+        expect(p.refreshLogButton.isDisplayed()).toBe(true);
+        expect(p.refreshLogButton.getText()).toEqual("Refresh");
+        expect(p.refreshLogButton.getAttribute("target")).toEqual(p.logIframe.getAttribute("name"));
+        expect(p.refreshLogButton.getAttribute("href")).toEqual(p.logIframe.getAttribute("src"));
     });
+
+    it("log: should have a link to open log in new window",function(){
+        browser.ignoreSynchronization = true;
+        expect(p.openLogButton.isDisplayed()).toBe(true);
+        expect(p.openLogButton.getText()).toEqual("Open in a new window");
+        expect(p.openLogButton.getAttribute("target")).toEqual("_blank");
+        expect(p.openLogButton.getAttribute("href")).toMatch("/api/showLog");
+    });
+
+    browser.ignoreSynchronization = false;
 });
