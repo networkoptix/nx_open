@@ -438,7 +438,7 @@ QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint) const {
     if(!hasAspectRatio())
         return constraint;
 
-    return expanded(m_aspectRatio, constraint, Qt::KeepAspectRatio);
+    return expanded(m_aspectRatio, constraint, Qt::KeepAspectRatioByExpanding);
 }
 
 void QnResourceWidget::updateCheckedButtons() {
