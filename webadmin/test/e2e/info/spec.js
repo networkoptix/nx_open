@@ -19,7 +19,6 @@ describe('Information Page', function () {
         expect(p.versionNode.getText()).toMatch(/\d+\.\d+\.\d+.\d+/);//2.3.0.1234
         expect(p.archNode.getText()).toMatch(/[\w\d]+/);;//x86,arm,x64
         expect(p.platformNode.getText()).toMatch(/\w+/); //linux,mac,windows
-        expect(p.osNode.getText()).toMatch(/\w+/); // ubuntu
     });
 
 
