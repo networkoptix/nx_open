@@ -11,6 +11,7 @@ FocusScope {
     property alias text: textInput.text
     property alias validator: textInput.validator
     property alias echoMode: textInput.echoMode
+    property alias inputMethodHints: textInput.inputMethodHints
     property int leftPadding
     property int rightPadding
 

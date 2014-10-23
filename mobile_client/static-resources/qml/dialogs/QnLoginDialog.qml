@@ -297,6 +297,7 @@ FocusScope {
                 id: port
                 leftPadding: portLabel.width + CommonFunctions.dp(8)
                 width: parent.width
+                inputMethodHints: Qt.ImhDigitsOnly
 
                 Text {
                     id: portLabel
@@ -320,6 +321,7 @@ FocusScope {
                 id: login
                 placeholderText: qsTr("User name")
                 width: parent.width
+                inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText
                 onAccepted: password.focus = true
             }
 
