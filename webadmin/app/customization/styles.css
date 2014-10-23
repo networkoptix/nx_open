@@ -8,6 +8,7 @@ For fast compilation - you can use http://sasstocss.appspot.com/ and use constru
 
 
 $brand-primary:         rgba(0,174,239,1) !default;
+$btn-primary-color:             $brand-primary;
 $btn-primary-border:             darken($brand-primary, 5%) !default;
 
 #top{
@@ -18,7 +19,6 @@ $btn-primary-border:             darken($brand-primary, 5%) !default;
     color:white;
 }
 
-
 #top a:hover{
     background-color: darken($brand-primary, 5%)
 }
@@ -28,9 +28,11 @@ $btn-primary-border:             darken($brand-primary, 5%) !default;
     background-color: transparent;
 }
 
+
+
 .btn-primary {
     color: rgb(255, 255, 255);
-    background-color: $brand-primary;
+    background-color: $btn-primary-color;
     border-color: $btn-primary-border
 }
 
@@ -56,7 +58,7 @@ fieldset[disabled] .btn-primary:hover,
 fieldset[disabled] .btn-primary:focus,
 fieldset[disabled] .btn-primary:active,
 fieldset[disabled] .btn-primary.active {
-    background-color: $brand-primary;
+    background-color: $btn-primary-color;
     border-color: $btn-primary-border;
     opacity:0.65
 }
@@ -67,7 +69,7 @@ fieldset[disabled] .btn-primary.active {
 #top .navbar-default .navbar-nav > .active > a,
 #top .navbar-default .navbar-nav > .active > a:hover,
 #top .navbar-default .navbar-nav > .active > a:focus {
-  background-color:  darken($brand-primary, 6.5%) ;
+  background-color:  darken($btn-primary-color, 6.5%) ;
 }
 
 

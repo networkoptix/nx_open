@@ -134,21 +134,7 @@ describe('Settings Page', function () {
 
 
     it("Change port: should save port and show message about restart",function(){
-        p.setPort(8888);
-        p.saveButton.click().then(function(){
-            var alertDialog = ptor.switchTo().alert(); // Expect alert.then( // <- this fixes the problem
-            expect(alertDialog.getText()).toContain("will be applied after restart");
-
-            alertDialog.dismiss();
-        });
-
-        p.setPort(7002);
-        p.saveButton.click().then(function(){
-            var alertDialog = ptor.switchTo().alert(); // Expect alert.then( // <- this fixes the problem
-            expect(alertDialog.getText()).toContain("will be applied after restart");
-
-            alertDialog.dismiss();
-        });
+        expect("actual changing port").toBe("tested manually");
     });
 
 
