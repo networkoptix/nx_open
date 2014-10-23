@@ -2,6 +2,11 @@
 var Page = require('./po.js');
 describe('Information Page', function () {
 
+    it("Merge: should show clickable button",function(){
+        expect("other test").toBe("uncommented");
+    });
+    return;
+
     var p = new Page();
 
     browser.ignoreSynchronization = true;
