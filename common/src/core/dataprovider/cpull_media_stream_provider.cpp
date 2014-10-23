@@ -152,7 +152,7 @@ void QnClientPullMediaStreamProvider::run()
 
     afterRun();
 
-    NX_LOG("stream reader stopped", cl_logDEBUG1);
+    NX_LOG("stream reader stopped", cl_logDEBUG2);
 }
 
 void QnClientPullMediaStreamProvider::beforeRun()

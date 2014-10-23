@@ -1480,7 +1480,7 @@ bool RTPSession::readTextResponce(QByteArray& response)
                     NX_LOG( lit("RTSP connection to %1 has been unexpectedly closed").
                         arg(m_tcpSock->getForeignAddress().toString()), cl_logINFO );
                 }
-                else
+                else if (!m_tcpSock->isClosed())
                 {
                     NX_LOG( lit("Error reading RTSP response from %1. %2").
                         arg(m_tcpSock->getForeignAddress().toString()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
