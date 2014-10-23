@@ -103,8 +103,6 @@ namespace ec2
                 } );
         }
 
-
-
         /*!
             \param syncFunction ErrorCode( QnTransaction<QueryDataType>& , std::list<std::function<void()>>* )
         */
@@ -154,7 +152,6 @@ namespace ec2
             //handler is invoked asynchronously
         }
 
-
         template<class HandlerType>
         void removeResourceAsync(
             QnTransaction<ApiIdData>& tran,
@@ -186,7 +183,6 @@ namespace ec2
             return processUpdateSync( tran, transactionsToSend, 0 );
         }
 
-
         template<class QueryDataType>
         ErrorCode processUpdateSync(
             QnTransaction<QueryDataType>& tran,
@@ -207,7 +203,6 @@ namespace ec2
 
             return errorCode;
         }
-
 
         ErrorCode processUpdateSync(
             QnTransaction<ApiIdData>& tran,
@@ -255,8 +250,6 @@ namespace ec2
             }
         }
 
-
-
         template<class SubDataType>
         ErrorCode processMultiUpdateSync(
             ApiCommand::Value command,
@@ -277,15 +270,12 @@ namespace ec2
             return ErrorCode::ok;
         }
 
-
-
         template<class QueryDataType, class SubDataType, class HandlerType>
         void processMultiUpdateAsync(
             QnTransaction<QueryDataType>& multiTran,
             HandlerType handler,
             ApiCommand::Value subCommand )
         {
-#if 1
             using namespace std::placeholders;
             doAsyncExecuteTranCall(
                 multiTran,
@@ -293,84 +283,7 @@ namespace ec2
                 [this, subCommand]( QnTransaction<QueryDataType>& multiTran, std::list<std::function<void()>>* const transactionsToSend ) -> ErrorCode {
                     return processMultiUpdateSync( subCommand, multiTran.isLocal, multiTran.params, transactionsToSend );
                 } );
-#else
-            QMutexLocker lock(&m_updateDataMutex);
-
-            Q_ASSERT(ApiCommand::isPersistent(multiTran.command));
-
-            auto SCOPED_GUARD_FUNC = [&errorCode, &handler]( ServerQueryProcessor* ){
-                QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
-                QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, errorCode ) );
-            };
-            std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
-
-            QnDbManager::Locker dbTran(dbManager);
-
-            std::list<std::function<void()>> transactionsToSend;
-            ErrorCode errorCode = processMultiUpdateSync( subCommand, multiTran.params, &transactionsToSend );
-            if( errorCode != ErrorCode::ok )
-                return;
-
-            //TODO #ak commit MUST return error code !!! it can really fail
-            dbTran.commit();
-
-            for( auto& sendCommand: transactionsToSend )
-                sendCommand();
-
-            //async completion handler is invoked on return
-#endif
         }
-
-
-
-#if 0
-        // old function processMultiUpdateAsync can be modified to look like this: but it is not needed anymore
-        template<class QueryDataType, class SubDataType, class HandlerType>
-        void processMultiUpdateAsync(
-            QnTransaction<QueryDataType>& multiTran,
-            HandlerType handler,
-            ApiCommand::Value command,
-            const std::vector<SubDataType>& nestedList,
-            bool isParentObjectTran )
-        {
-            QMutexLocker lock(&m_updateDataMutex);
-
-            Q_ASSERT(ApiCommand::isPersistent(multiTran.command));
-
-            std::list<std::function<void()>> transactionsToSend;
-            ErrorCode errorCode = ErrorCode::ok;
-
-            bool processMultiTran = false;
-
-            auto SCOPED_GUARD_FUNC = [&errorCode, &handler]( ServerQueryProcessor* ){
-                QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
-                QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, errorCode ) );
-            };
-            std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
-
-            QnDbManager::Locker locker(dbManager);
-
-            errorCode = processMultiUpdateSync( command, nestedList, &transactionsToSend );
-            if (errorCode != ErrorCode::ok)
-                return;
-            
-            // delete master object if need (server->cameras required to delete master object, layoutList->layout doesn't)
-            if( isParentObjectTran )
-            {
-                errorCode = processUpdateSync( multiTran, &transactionsToSend );
-                if( errorCode != ErrorCode::ok )
-                    return;
-                processMultiTran = true;
-            }
-
-            locker.commit();
-
-            for( auto& sendCommand: transactionsToSend )
-                sendCommand();
-        }
-#endif
-
-
 
         template<class HandlerType>
         void processUpdateAsync(QnTransaction<ApiIdDataList>& tran, HandlerType handler )
