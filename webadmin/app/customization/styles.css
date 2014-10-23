@@ -9,7 +9,7 @@ For fast compilation - you can use http://sasstocss.appspot.com/ and use constru
 
 $brand-primary:         rgba(0,174,239,1) !default;
 $btn-primary-color:             $brand-primary;
-$btn-primary-border:             darken($brand-primary, 5%) !default;
+$btn-primary-border:             darken($brand-primary-color, 5%) !default;
 
 #top{
     background-color: $brand-primary;
@@ -66,36 +66,36 @@ fieldset[disabled] .btn-primary.active {
 
 
 
-#top .navbar-default .navbar-nav > .active > a,
-#top .navbar-default .navbar-nav > .active > a:hover,
-#top .navbar-default .navbar-nav > .active > a:focus {
+#top.navbar-default .navbar-nav > .active > a,
+#top.navbar-default .navbar-nav > .active > a:hover,
+#top.navbar-default .navbar-nav > .active > a:focus {
   background-color:  darken($btn-primary-color, 6.5%) ;
 }
 
 
-#top .navbar-default .navbar-toggle:hover,
-#top .navbar-default .navbar-toggle:focus {
+#top.navbar-default .navbar-toggle:hover,
+#top.navbar-default .navbar-toggle:focus {
     background-color: $btn-primary-border;
 }
 
 
-#top .navbar-default .navbar-toggle {
+#top.navbar-default .navbar-toggle {
     border-color: $btn-primary-border;
 }
 
 
 
-#top .navbar-default .navbar-toggle:hover,
-#top .navbar-default .navbar-toggle:focus {
+#top.navbar-default .navbar-toggle:hover,
+#top.navbar-default .navbar-toggle:focus {
     background-color: $btn-primary-border;
 }
 
 
-#top .navbar-default .navbar-toggle {
+#top.navbar-default .navbar-toggle {
     border-color: $btn-primary-border;
 }
 
-.navbar-default .navbar-toggle .icon-bar {
+#top.navbar-default .navbar-toggle .icon-bar {
     background-color: $btn-primary-border;
 }
 
@@ -112,6 +112,7 @@ rgba(243,111,33,1)  - DW
 rgba(166,206,57,1)  - Vista
 
 */
+
 
 #top {
     background-color: #00aeef; }
@@ -154,13 +155,10 @@ fieldset[disabled] .btn-primary.active {
     border-color: #009bd5;
     opacity: 0.65; }
 
-
 #top.navbar-default .navbar-nav > .active > a,
 #top.navbar-default .navbar-nav > .active > a:hover,
 #top.navbar-default .navbar-nav > .active > a:focus {
     background-color: #0096ce; }
-
-
 
 #top.navbar-default .navbar-toggle:hover,
 #top.navbar-default .navbar-toggle:focus {
@@ -169,9 +167,14 @@ fieldset[disabled] .btn-primary.active {
 #top.navbar-default .navbar-toggle {
     border-color: #009bd5; }
 
+#top.navbar-default .navbar-toggle:hover,
+#top.navbar-default .navbar-toggle:focus {
+    background-color: #009bd5; }
 
-.navbar-default .navbar-toggle .icon-bar {
-    background-color: #009bd5;
-}
+#top.navbar-default .navbar-toggle {
+    border-color: #009bd5; }
+
+#top.navbar-default .navbar-toggle .icon-bar {
+    background-color: #009bd5; }
 
 
