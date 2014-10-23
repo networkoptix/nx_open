@@ -1,6 +1,13 @@
 'use strict';
 
 describe('Navigation Menu', function() {
+
+
+    it("Merge: should show clickable button",function(){
+        expect("other test").toBe("uncommented");
+    });
+    return;
+
   it('changes active link depending on route', function() {
     browser.get('/');
 
