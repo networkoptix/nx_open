@@ -225,7 +225,7 @@ QnResourceList OnvifResourceSearcher::findResources()
     if (shouldStop())
          return QnResourceList();
 
-    m_wsddSearcher.findResources(result);
+    m_wsddSearcher.findResources( result, discoveryMode() );
 
     return result;
 }

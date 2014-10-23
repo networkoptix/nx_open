@@ -374,7 +374,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result)
     }
 }
 
-void OnvifResourceSearcherWsdd::findResources(QnResourceList& result)
+void OnvifResourceSearcherWsdd::findResources(QnResourceList& result, DiscoveryMode discoveryMode)
 {
     EndpointInfoHash endpoints;
 
@@ -386,7 +386,7 @@ void OnvifResourceSearcherWsdd::findResources(QnResourceList& result)
     if (m_shouldStop)
         return;
 
-    m_onvifFetcher.findResources(endpoints, result);
+    m_onvifFetcher.findResources(endpoints, result, discoveryMode);
 }
 
 QStringList OnvifResourceSearcherWsdd::getAddrPrefixes(const QString& host) const

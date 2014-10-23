@@ -152,7 +152,7 @@ void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data)
     if (data.peer.id != qnCommon->remoteGUID())
         return;
 
-    Q_ASSERT(!m_connected);
+    //Q_ASSERT(!m_connected);
     
     m_connected = true;
     emit connectionOpened();
