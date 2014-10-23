@@ -1,0 +1,15 @@
+<div class="content">
+    <div class="callout">
+        <h4>Camera recording was forcibly stopped because of not enough license for recording</h4>
+        <table class="details">
+            <tr>
+                <th>Cameras</th>
+                <th>Time</th>
+            </tr>
+            {{#aggregated}}
+                <tr><td>{{reason}}</td>
+                    <td><i>{{timestamp}}</i></td></tr>
+            {{/aggregated}}
+        </table>
+    </div>
+</div>
