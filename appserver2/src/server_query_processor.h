@@ -21,6 +21,8 @@
 #include <transaction/binary_transaction_serializer.h>
 
 
+#define REFACTOR
+
 namespace ec2
 {
     class CommonRequestsProcessor
@@ -39,6 +41,7 @@ namespace ec2
     public:
         virtual ~ServerQueryProcessor() {}
 
+#ifndef REFACTOR
         //!Asynchronously executes update query
         /*!
             \param handler Functor ( ErrorCode )
@@ -80,16 +83,339 @@ namespace ec2
             if (!tran.isLocal)
                 QnTransactionMessageBus::instance()->sendTransaction(tran);
         }
+#endif
+
+
+#ifdef REFACTOR
+        /////////////////////////////
+        /////// new functions
+        /////////////////////////////
+
+        template<class QueryDataType, class HandlerType>
+        void processUpdateAsync( QnTransaction<QueryDataType>& tran, HandlerType handler, void* /*dummy*/ = 0 )
+        {
+            using namespace std::placeholders;
+            doAsyncExecuteTranCall(
+                tran,
+                handler,
+                [this]( QnTransaction<QueryDataType>& tran, std::list<std::function<void()>>* const transactionsToSend ) -> ErrorCode {
+                    return processUpdateSync( tran, transactionsToSend );
+                } );
+        }
+
+
+
+        /*!
+            \param syncFunction ErrorCode( QnTransaction<QueryDataType>& , std::list<std::function<void()>>* )
+        */
+        template<class QueryDataType, class CompletionHandlerType, class SyncFunctionType>
+        void doAsyncExecuteTranCall(
+                QnTransaction<QueryDataType>& tran,
+                CompletionHandlerType completionHandler,
+                SyncFunctionType syncFunction )
+        {
+            ErrorCode errorCode = ErrorCode::ok;
+            auto SCOPED_GUARD_FUNC = [&errorCode, &completionHandler]( ServerQueryProcessor* ){
+                QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
+                QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( completionHandler, errorCode ) );
+            };
+            std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
+
+            QMutexLocker lock(&m_updateDataMutex);
+
+            //starting transaction
+            std::unique_ptr<QnDbManager::Locker> dbTran;
+            std::list<std::function<void()>> transactionsToSend;
+
+            if( ApiCommand::isPersistent(tran.command) )
+            {
+                dbTran.reset(new QnDbManager::Locker(dbManager));
+                errorCode = syncFunction( tran, &transactionsToSend );
+                if( errorCode != ErrorCode::ok )
+                    return;
+                //TODO #ak commit MUST return error code !!! it can really fail
+                dbTran->commit();
+            }
+            else if( !tran.isLocal )
+            {
+                //TODO #ak tran is copied here. Probably it is possible to do move here or just take reference
+                transactionsToSend.push_back( [tran](){ QnTransactionMessageBus::instance()->sendTransaction( tran ); } );
+                //TODO #ak why std::bind does not work here?
+                //transactionsToSend.push_back( std::bind(
+                //    &QnTransactionMessageBus::sendTransaction<QueryDataType>,
+                //    QnTransactionMessageBus::instance(),
+                //    tran ) );
+            }
+
+            //sending transactions
+            for( auto& sendCommand: transactionsToSend )
+                sendCommand();
+                
+            //handler is invoked asynchronously
+        }
+
 
         template<class HandlerType>
-        void processUpdateAsync( QnTransaction<ApiIdData>& tran, HandlerType handler )
+        void removeResourceAsync(
+            QnTransaction<ApiIdData>& tran,
+            ApiOjectType resourceType,
+            HandlerType handler )
+        {
+            using namespace std::placeholders;
+            doAsyncExecuteTranCall(
+                tran,
+                handler,
+                std::bind( &ServerQueryProcessor::removeResourceSync, this, _1, resourceType, _2 ) );
+        }
+            
+        ErrorCode removeResourceSync(
+            QnTransaction<ApiIdData>& tran,
+            ApiOjectType resourceType,
+            std::list<std::function<void()>>* const transactionsToSend )
+        {
+            ErrorCode errorCode = ErrorCode::ok;
+
+            errorCode = processMultiUpdateSync(
+                ApiCommand::removeResource,
+                tran.isLocal,
+                dbManager->getNestedObjects(ApiObjectInfo(resourceType, tran.params.id)).toIdList(),
+                transactionsToSend );
+            if( errorCode != ErrorCode::ok )
+                return errorCode;
+
+            return processUpdateSync( tran, transactionsToSend, 0 );
+        }
+
+
+        template<class QueryDataType>
+        ErrorCode processUpdateSync(
+            QnTransaction<QueryDataType>& tran,
+            std::list<std::function<void()>>* const transactionsToSend,
+            int /*dummy*/ = 0 )
+        {
+            Q_ASSERT( ApiCommand::isPersistent(tran.command) );
+
+            transactionLog->fillPersistentInfo(tran);
+            QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
+            ErrorCode errorCode = dbManager->executeTransactionNoLock( tran, serializedTran );
+            assert(errorCode != ErrorCode::containsBecauseSequence && errorCode != ErrorCode::containsBecauseTimestamp);
+            if (errorCode != ErrorCode::ok)
+                return errorCode;
+
+            if( !tran.isLocal )
+                transactionsToSend->push_back( [tran](){ QnTransactionMessageBus::instance()->sendTransaction( tran ); } );
+
+            return errorCode;
+        }
+
+
+        ErrorCode processUpdateSync(
+            QnTransaction<ApiIdData>& tran,
+            std::list<std::function<void()>>* const transactionsToSend )
         {
             switch (tran.command)
             {
             case ApiCommand::removeMediaServer:
-                return processMultiUpdateAsync<ApiIdData, ApiIdData>(tran, handler, ApiCommand::removeCamera, dbManager->getNestedObjects(ApiObjectInfo(ApiObject_Server, tran.params.id)).toIdList(), true);
+                return removeResourceSync( tran, ApiObject_Server, transactionsToSend );
             case ApiCommand::removeUser:
+                return removeResourceSync( tran, ApiObject_User, transactionsToSend );
+            case ApiCommand::removeResource:
+            {
+                QnTransaction<ApiIdData> updatedTran = tran;
+                switch(dbManager->getObjectType(tran.params.id))
+                {
+                case ApiObject_Server:
+                    updatedTran.command = ApiCommand::removeMediaServer;
+                    break;
+                case ApiObject_Camera:
+                    updatedTran.command = ApiCommand::removeCamera;
+                    break;
+                case ApiObject_Storage:
+                    updatedTran.command = ApiCommand::removeStorage;
+                    break;
+                case ApiObject_User:
+                    updatedTran.command = ApiCommand::removeUser;
+                    break;
+                case ApiObject_Layout:
+                    updatedTran.command = ApiCommand::removeLayout;
+                    break;
+                case ApiObject_Videowall:
+                    updatedTran.command = ApiCommand::removeVideowall;
+                    break;
+                case ApiObject_BusinessRule:
+                    updatedTran.command = ApiCommand::removeBusinessRule;
+                    break;
+                default:
+                    return processUpdateSync( tran, transactionsToSend, 0 );
+                }
+                return processUpdateSync( updatedTran, transactionsToSend );    //calling recursively
+            }
+            default:
+                return processUpdateSync( tran, transactionsToSend, 0 );
+            }
+        }
+
+
+
+        template<class SubDataType>
+        ErrorCode processMultiUpdateSync(
+            ApiCommand::Value command,
+            bool isLocal,
+            const std::vector<SubDataType>& nestedList,
+            std::list<std::function<void()>>* const transactionsToSend )
+        {
+            foreach(const SubDataType& data, nestedList)
+            {
+                QnTransaction<SubDataType> subTran(command);
+                subTran.params = data;
+                subTran.isLocal = isLocal;
+                ErrorCode errorCode = processUpdateSync( subTran, transactionsToSend );
+                if (errorCode != ErrorCode::ok)
+                    return errorCode;
+            }
+
+            return ErrorCode::ok;
+        }
+
+
+
+        template<class QueryDataType, class SubDataType, class HandlerType>
+        void processMultiUpdateAsync(
+            QnTransaction<QueryDataType>& multiTran,
+            HandlerType handler,
+            ApiCommand::Value subCommand )
+        {
+#if 1
+            using namespace std::placeholders;
+            doAsyncExecuteTranCall(
+                multiTran,
+                handler,
+                [this, subCommand]( QnTransaction<QueryDataType>& multiTran, std::list<std::function<void()>>* const transactionsToSend ) -> ErrorCode {
+                    return processMultiUpdateSync( subCommand, multiTran.isLocal, multiTran.params, transactionsToSend );
+                } );
+#else
+            QMutexLocker lock(&m_updateDataMutex);
+
+            Q_ASSERT(ApiCommand::isPersistent(multiTran.command));
+
+            auto SCOPED_GUARD_FUNC = [&errorCode, &handler]( ServerQueryProcessor* ){
+                QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
+                QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, errorCode ) );
+            };
+            std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
+
+            QnDbManager::Locker dbTran(dbManager);
+
+            std::list<std::function<void()>> transactionsToSend;
+            ErrorCode errorCode = processMultiUpdateSync( subCommand, multiTran.params, &transactionsToSend );
+            if( errorCode != ErrorCode::ok )
+                return;
+
+            //TODO #ak commit MUST return error code !!! it can really fail
+            dbTran.commit();
+
+            for( auto& sendCommand: transactionsToSend )
+                sendCommand();
+
+            //async completion handler is invoked on return
+#endif
+        }
+
+
+
+#if 0
+        // old function processMultiUpdateAsync can be modified to look like this: but it is not needed anymore
+        template<class QueryDataType, class SubDataType, class HandlerType>
+        void processMultiUpdateAsync(
+            QnTransaction<QueryDataType>& multiTran,
+            HandlerType handler,
+            ApiCommand::Value command,
+            const std::vector<SubDataType>& nestedList,
+            bool isParentObjectTran )
+        {
+            QMutexLocker lock(&m_updateDataMutex);
+
+            Q_ASSERT(ApiCommand::isPersistent(multiTran.command));
+
+            std::list<std::function<void()>> transactionsToSend;
+            ErrorCode errorCode = ErrorCode::ok;
+
+            bool processMultiTran = false;
+
+            auto SCOPED_GUARD_FUNC = [&errorCode, &handler]( ServerQueryProcessor* ){
+                QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
+                QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, errorCode ) );
+            };
+            std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
+
+            QnDbManager::Locker locker(dbManager);
+
+            errorCode = processMultiUpdateSync( command, nestedList, &transactionsToSend );
+            if (errorCode != ErrorCode::ok)
+                return;
+            
+            // delete master object if need (server->cameras required to delete master object, layoutList->layout doesn't)
+            if( isParentObjectTran )
+            {
+                errorCode = processUpdateSync( multiTran, &transactionsToSend );
+                if( errorCode != ErrorCode::ok )
+                    return;
+                processMultiTran = true;
+            }
+
+            locker.commit();
+
+            for( auto& sendCommand: transactionsToSend )
+                sendCommand();
+        }
+#endif
+
+
+
+        template<class HandlerType>
+        void processUpdateAsync(QnTransaction<ApiIdDataList>& tran, HandlerType handler )
+        {
+            if (tran.command == ApiCommand::removeStorages)             {
+                return processMultiUpdateAsync<ApiIdDataList, ApiIdData>(tran, handler, ApiCommand::removeStorage);
+            }
+            else if (tran.command == ApiCommand::removeResources) 
+            {
+                return processMultiUpdateAsync<ApiIdDataList, ApiIdData>(tran, handler, ApiCommand::removeResource);
+            }
+            else {
+                Q_ASSERT_X(0, "Not implemented", Q_FUNC_INFO);
+            }
+        }
+
+
+
+        /////////////////////////////
+        /////// new functions (end)
+        /////////////////////////////
+
+#endif  //REFACTOR
+
+
+
+        template<class HandlerType>
+        void processUpdateAsync( QnTransaction<ApiIdData>& tran, HandlerType handler )
+        {
+            //TODO #ak there is processUpdateSync with same switch. Remove switch from here!
+
+            switch (tran.command)
+            {
+            case ApiCommand::removeMediaServer:
+#ifdef REFACTOR
+                return removeResourceAsync( tran, ApiObject_Server, handler );
+#else
+                return processMultiUpdateAsync<ApiIdData, ApiIdData>(tran, handler, ApiCommand::removeCamera, dbManager->getNestedObjects(ApiObjectInfo(ApiObject_Server, tran.params.id)).toIdList(), true);
+#endif
+            case ApiCommand::removeUser:
+#ifdef REFACTOR
+                return removeResourceAsync( tran, ApiObject_User, handler );
+#else
                 return processMultiUpdateAsync<ApiIdData, ApiIdData>(tran, handler, ApiCommand::removeLayout, dbManager->getNestedObjects(ApiObjectInfo(ApiObject_User, tran.params.id)).toIdList(), true);
+#endif
             case ApiCommand::removeResource:
             {
                 QnTransaction<ApiIdData> updatedTran = tran;
@@ -147,6 +473,7 @@ namespace ec2
             return processMultiUpdateAsync<ApiCameraDataList, ApiCameraData>(tran, handler, ApiCommand::saveCamera);
         }
 
+#ifndef REFACTOR
         template<class HandlerType>
         void processUpdateAsync(QnTransaction<ApiIdDataList>& tran, HandlerType handler )
         {
@@ -161,6 +488,7 @@ namespace ec2
                 Q_ASSERT_X(0, "Not implemented", Q_FUNC_INFO);
             }
         }
+#endif
 
         template<class HandlerType>
         void processUpdateAsync(QnTransaction<ApiStorageDataList>& tran, HandlerType handler )
@@ -194,6 +522,7 @@ namespace ec2
                 Q_ASSERT_X(0, "Not implemented!", Q_FUNC_INFO);
         }
 
+#ifndef REFACTOR
         template<class QueryDataType, class SubDataType, class HandlerType>
         void processMultiUpdateAsync(QnTransaction<QueryDataType>& multiTran, HandlerType handler, ApiCommand::Value command)
         {
@@ -266,6 +595,7 @@ namespace ec2
             errorCode = ErrorCode::ok;
         }
 
+#endif
 
         /*!
             \param handler Functor ( ErrorCode, OutputData )
