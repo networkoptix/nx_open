@@ -48,7 +48,7 @@ void CLServerPushStreamReader::run()
 {
     initSystemThreadId();
     setPriority(QThread::HighPriority);
-    NX_LOG("stream reader started", cl_logDEBUG1);
+    NX_LOG("stream reader started", cl_logDEBUG2);
 
     beforeRun();
 
