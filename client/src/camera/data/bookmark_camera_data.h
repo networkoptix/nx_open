@@ -53,6 +53,13 @@ public:
     virtual QnTimePeriodList dataSource() const override;
 
     /**
+     * @brief trim                                  Trim the last time period if it is not finished.
+     * @param trimTime                              Value to be set as the end time of the last time period.
+     * @return                                      True if the list was modified, false otherwise.
+     */
+    virtual bool trim(qint64 trimTime) override;
+
+    /**
      * @brief find                                  Find the longest bookmark covering the certain moment of time.
      * @param position                              Time in milliseconds since epoch.
      * @return                                      Longest bookmark found at that time; empty bookmark if nothing is found.
