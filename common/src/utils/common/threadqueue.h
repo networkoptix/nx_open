@@ -66,10 +66,16 @@ public:
         QMutexLocker mutex(&m_cs);
         return m_buffer[m_headIndex];
     }
-
-    T at(int i) const
+    
+    const T& at(int i) const
     {
         QMutexLocker mutex(&m_cs);
+        int index = m_headIndex + i;
+        return m_buffer[index % m_buffer.size()];
+    }
+
+    const T& atUnsafe(int i) const
+    {
         int index = m_headIndex + i;
         return m_buffer[index % m_buffer.size()];
     }
@@ -98,8 +104,7 @@ public:
 
         if (m_bufferLen > 0)
         {
-            val = std::move(m_buffer[m_headIndex]); //m_queue.dequeue();
-            m_buffer[m_headIndex] = T();
+            val = std::move(m_buffer[m_headIndex]);
             m_headIndex++;
             if ((uint)m_headIndex >= m_buffer.size())
                 m_headIndex = 0;
@@ -258,7 +263,7 @@ public:
         return m_buffer[m_headIndex];
     }
 
-    T at(int i) const
+    const T& at(int i) const
     {
         int index = m_headIndex + i;
         return m_buffer[index % m_buffer.size()];
@@ -275,8 +280,7 @@ public:
     {
         if (m_bufferLen > 0)
         {
-            val = m_buffer[m_headIndex]; //m_queue.dequeue();
-            m_buffer[m_headIndex] = T();
+            val = std::move(m_buffer[m_headIndex]);
             m_headIndex++;
             if ((uint)m_headIndex >= m_buffer.size())
                 m_headIndex = 0;

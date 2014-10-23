@@ -92,7 +92,7 @@ public:
             qint64 firstTime = lastTime - tmpQueue.size() * timeResolution;
             for (int i = 0; i < tmpQueue.size(); ++i)
             {
-                QnAbstractMediaDataPtr srcMedia = qSharedPointerDynamicCast<QnAbstractMediaData>(tmpQueue.at(i));
+                const QnAbstractMediaDataPtr& srcMedia = qSharedPointerDynamicCast<QnAbstractMediaData>(tmpQueue.atUnsafe(i));
                 QnAbstractMediaDataPtr media = QnAbstractMediaDataPtr(srcMedia->clone());
                 media->timestamp = firstTime + i*timeResolution;
                 m_dataQueue.push(media);
