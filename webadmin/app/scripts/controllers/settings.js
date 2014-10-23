@@ -94,6 +94,7 @@ angular.module('webadminApp')
                 }
             } else {
                 alert("Settings saved");
+                window.location.href =  window.location.protocol + "//" + window.location.hostname + ":" + $scope.settings.port;
             }
         }
 
