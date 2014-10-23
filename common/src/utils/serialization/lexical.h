@@ -48,7 +48,7 @@ namespace QnLexical {
     }
 
     template<class T>
-    T deserialized(const QString &value, const T &defaultValue, bool *success = NULL) {
+    T deserialized(const QString &value, const T &defaultValue = T(), bool *success = NULL) {
         T target;
         bool result = QnLexical::deserialize(value, &target);
         if (success)
