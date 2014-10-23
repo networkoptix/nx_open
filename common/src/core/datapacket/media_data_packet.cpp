@@ -151,11 +151,9 @@ QnEmptyMediaData* QnEmptyMediaData::clone( QnAbstractAllocator* allocator ) cons
 
 QnMetaDataV1::QnMetaDataV1(int initialValue)
 :   //TODO #ak delegate constructor
+    QnAbstractMediaData(META_V1),
     m_data(CL_MEDIA_ALIGNMENT, MD_WIDTH*MD_HEIGHT/8)
 {
-    dataType = META_V1;
-    //useTwice = false;
-
     flags = 0;
     m_input = 0;
     m_duration = 0;
@@ -171,11 +169,9 @@ QnMetaDataV1::QnMetaDataV1(
     QnAbstractAllocator* allocator,
     int initialValue)
 :
+    QnAbstractMediaData(META_V1),
     m_data(allocator, CL_MEDIA_ALIGNMENT, MD_WIDTH*MD_HEIGHT/8)
 {
-    dataType = META_V1;
-    //useTwice = false;
-
     flags = 0;
     m_input = 0;
     m_duration = 0;

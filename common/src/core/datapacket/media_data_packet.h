@@ -104,7 +104,7 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
     };
 
     //QnAbstractMediaData(unsigned int alignment, unsigned int capacity): 
-    QnAbstractMediaData( DataType _dataType = EMPTY_DATA );
+    QnAbstractMediaData( DataType _dataType);
     virtual ~QnAbstractMediaData();
 
     bool isLQ() const { return flags & MediaFlags_LowQuality; }
@@ -134,16 +134,17 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(QnAbstractMediaData::MediaFlags)
 
 struct QnEmptyMediaData : public QnAbstractMediaData
 {
-    QnEmptyMediaData(): m_data(16,0)
+    QnEmptyMediaData(): 
+        QnAbstractMediaData(EMPTY_DATA),
+        m_data(16,0)
     {
-        dataType = EMPTY_DATA;
     }
 
     QnEmptyMediaData( QnAbstractAllocator* allocator )
     :
+        QnAbstractMediaData(EMPTY_DATA),
         m_data(allocator, 16, 0)
     {
-        dataType = EMPTY_DATA;
     }
 
     virtual QnEmptyMediaData* clone( QnAbstractAllocator* allocator = QnSystemAllocator::instance() ) const override;
