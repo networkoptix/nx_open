@@ -493,9 +493,8 @@ bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command)
 
     foreach(const ObjectType& object, objects)
     {
-        QnTransaction<ObjectType> transaction(command);
+        QnTransaction<ObjectType> transaction(command, object);
         transactionLog->fillPersistentInfo(transaction);
-        transaction.params = object;
         if (transactionLog->saveTransaction(transaction) != ErrorCode::ok)
             return false;
     }

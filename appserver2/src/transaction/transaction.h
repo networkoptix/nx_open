@@ -209,7 +209,7 @@ namespace ec2
     public:
         QnTransaction(): QnAbstractTransaction() {}
         QnTransaction(const QnAbstractTransaction& abstractTran): QnAbstractTransaction(abstractTran) {}
-        QnTransaction(ApiCommand::Value command): QnAbstractTransaction(command) {}
+        QnTransaction(ApiCommand::Value command, const T& params = T()): QnAbstractTransaction(command), params(params) {}
         
         T params;
     };

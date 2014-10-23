@@ -162,8 +162,7 @@ namespace ec2
         ApiCommand::Value command,
         const ec2::ApiResourceParamWithRefDataList& kvPairs)
     {
-        QnTransaction<ApiResourceParamWithRefDataList> tran(command);
-        tran.params = kvPairs;
+        QnTransaction<ApiResourceParamWithRefDataList> tran(command, kvPairs);
         return tran;
     }
 

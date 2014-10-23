@@ -77,8 +77,7 @@ namespace ec2
     template<class QueryProcessorType>
     QnTransaction<ApiStoredFilePath> QnStoredFileManager<QueryProcessorType>::prepareTransaction( const QString& filename )
     {
-        QnTransaction<ApiStoredFilePath> tran(ApiCommand::removeStoredFile);
-        tran.params = filename;
+        QnTransaction<ApiStoredFilePath> tran(ApiCommand::removeStoredFile, filename);
         return tran;
     }
 

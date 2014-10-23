@@ -259,8 +259,7 @@ namespace ec2
         {
             foreach(const SubDataType& data, nestedList)
             {
-                QnTransaction<SubDataType> subTran(command);
-                subTran.params = data;
+                QnTransaction<SubDataType> subTran(command, data);
                 subTran.isLocal = isLocal;
                 ErrorCode errorCode = processUpdateSync( subTran, transactionsToSend );
                 if (errorCode != ErrorCode::ok)
