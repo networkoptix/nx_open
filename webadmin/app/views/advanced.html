@@ -29,9 +29,8 @@
     </thead>
     <tbody>
         <tr ng-repeat="storage in storages">
-            <td><span class="read-container url-column" title="{{storage.url}}">{{storage.url}}</span></td>
+            <td><span class="read-container storage-url" title="{{storage.url}}" class="storage-url">{{storage.url}}</span></td>
             <td>
-
                 <div class="progress" style="margin-top:5px"
                      title="Reserved: {{formatSpace(storage.reservedSpace)}}, &#013;Free: {{formatSpace(storage.freeSpace)}}, &#013;Occupied: {{formatSpace(storage.totalSpace-storage.freeSpace)}}, &#013;Total: {{formatSpace(storage.totalSpace)}}">
 
@@ -51,7 +50,6 @@
                     </div>
 
                 </div>
-
             </td>
             <td>
                 <div class="input-group {{storage.warning?'has-error':''}}">
@@ -60,7 +58,6 @@
                            min="1"
                            max="{{toGBs(storage.totalSpace)}}"
                            placeholder="Reserved space"/>
-
                     <div class="input-group-addon">GB</div>
                 </div>
             </td>
@@ -73,16 +70,16 @@
                            ng-disabled="!storage.isWritable"
                            placeholder="Use for writing"/>
 
-                        <icon for="storage.isUsedForWriting" on-true="pencil" title-true="Used for writing"/>
-                        <icon for="storage.isWritable && !storage.isUsedForWriting" on-true="pencil" title-true="Writable" class="icon-inactive"/>
+                        <icon for="storage.isUsedForWriting" on-true="pencil" title-true="Used for writing"></icon>
+                        <icon for="storage.isWritable && !storage.isUsedForWriting" on-true="pencil" title-true="Writable" class="icon-inactive"></icon>
 
                    </label>
             </td>
 
             <td>
                 <span class="read-container">
-                    <icon for="storage.isExternal" on-true="globe" on-false="hdd" title-true="External" title-false="Internal" />
-                    <icon for="storage.warning || form.$invalid" on-true="warning-sign" title-true="Writable" class="icon-warning"/>
+                    <icon for="storage.isExternal" on-true="globe" on-false="hdd" title-true="External" title-false="Internal" ></icon>
+                    <icon for="storage.warning || form.$invalid" on-true="warning-sign" title-true="Writable" class="icon-warning"></icon>
                 </span>
             </td>
         </tr>
