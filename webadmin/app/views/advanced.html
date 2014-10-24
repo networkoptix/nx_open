@@ -1,6 +1,6 @@
 <h1>Advanced settings</h1>
 
-<div class="alert alert-danger" role="alert">
+<div class="alert alert-danger" id="alert-danger-page" role="alert">
     <b>Warning!</b> Any changes on this page may cause server failure. Please, use carefully.
 </div>
 
@@ -48,7 +48,6 @@
                     <div class="progress-bar progress-bar-danger"
                          style="width: {{100-storage.freeSpace*100/storage.totalSpace}}%">
                     </div>
-
                 </div>
             </td>
             <td>
@@ -61,8 +60,6 @@
                     <div class="input-group-addon">GB</div>
                 </div>
             </td>
-
-
             <td>
                    <label class="read-container">
                         <input type="checkbox"
@@ -94,7 +91,7 @@
 <h2>Manual update</h2>
 <form class="form-horizontal" enctype="multipart/form-data" target="_blank" action="/api/installUpdate" method="post">
     <div class="form-group">
-        <label class="col-sm-4" for="installerFile">Select installer</label>
+        <label class="col-sm-4">Upload installer</label>
         <div class="col-sm-8">
             <fileupload text="Select server update archive (zip)"></fileupload>
             <p class="help-block">Ensure you are using correct configuration.</p>

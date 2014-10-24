@@ -4,6 +4,7 @@ describe('Advanced Page', function () {
 
     var p = new Page();
 
+
     it("should allow user to see storages: free space, limit, totalspace, enabled, some indicator",function(){
         p.get();
         expect(p.storagesRows.count()).toBeGreaterThan(0);
@@ -13,11 +14,65 @@ describe('Advanced Page', function () {
         expect(storage.element(by.css(".glyphicon")).isDisplayed()).toBe(true);
     });
 
+    it("should show warning tip",function(){
+        expect(p.dangerAlert.isDisplayed()).toBe(true);
+    });
+
     it("should allow user to change settings: limit, enabled",function(){
+        var storage = p.storagesRows.first();
+        expect(storage.element(by.model("storage.reservedSpaceGb")).isEnabled()).toBe(true);
+        expect(storage.element(by.model("storage.isUsedForWriting")).isDisplayed()).toBe(true);
+    });
+
+    it("should validate GB value",function(){
+        p.setStorageLimit('');
+        expect(p.saveButton.isEnabled()).toBe(false);
+        expect(p.storageLimitInput.element(by.xpath("..")).getAttribute("class")).toMatch("has-error");
+
+        p.setStorageLimit(5);
+        expect(p.saveButton.isEnabled()).toBe(true);
+        expect(p.storageLimitInput.element(by.xpath("..")).getAttribute("class")).toNotMatch("has-error");
+
+        p.setStorageLimit('bad value');
+        expect(p.saveButton.isEnabled()).toBe(false);
+        expect(p.storageLimitInput.element(by.xpath("..")).getAttribute("class")).toMatch("has-error");
+
+        p.setStorageLimit(5);
+        expect(p.saveButton.isEnabled()).toBe(true);
+        expect(p.storageLimitInput.element(by.xpath("..")).getAttribute("class")).toNotMatch("has-error");
+
+        p.setStorageLimit(1000000);
+        expect(p.saveButton.isEnabled()).toBe(false);
+        expect(p.storageLimitInput.element(by.xpath("..")).getAttribute("class")).toMatch("has-error");
+
+        p.setStorageLimit(5);
+        expect(p.saveButton.isEnabled()).toBe(true);
+        expect(p.storageLimitInput.element(by.xpath("..")).getAttribute("class")).toNotMatch("has-error");
+
+    });
+
+    it("should forbid disabling all storages",function(){
+        var total = p.storagesRows.count();
+        for(var i=0;i<total;i++){
+            var row = p.storagesRows.get(i);
+            var checkbox = row.element(by.model("storage.isUsedForWriting"));
+
+            var isSelected  = false;
+            checkbox.isSelected().then(function(val){ isSelected = val; });
+            if(isSelected)
+                checkbox.click();
+
+            expect(checkbox.isSelected()).toBe(false);
+        }
+        expect(p.saveButton.isEnabled()).toBe(false);
+        expect("some warning").toBe("showed");
+    });
+
+    it("should show warning, then limit is more than free space",function(){
         expect("test").toBe("written");
     });
 
-    it("should show warnings in some cases",function(){
+    it("should show error, then server returns error",function(){
         expect("test").toBe("written");
     });
 
@@ -41,10 +96,4 @@ describe('Advanced Page', function () {
     it("should upload some file and display an error",function(){
         expect("test").toBe("written");
     });
-
-
-    it("Module",function(){
-        expect("all tests").toBe("written");
-    });
-
 });
