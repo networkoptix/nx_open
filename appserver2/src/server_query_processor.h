@@ -25,6 +25,14 @@
 
 namespace ec2
 {
+    struct SendTransactionFunction
+    {
+        template<class T> 
+        void operator()(const QnTransaction<T> &tran) const {
+            qnTransactionBus->sendTransaction( tran );
+        }
+    };
+
     class CommonRequestsProcessor
     {
     public:
@@ -136,13 +144,7 @@ namespace ec2
             }
             else if( !tran.isLocal )
             {
-                //TODO #ak tran is copied here. Probably it is possible to do move here or just take reference
-                transactionsToSend.push_back( [tran](){ QnTransactionMessageBus::instance()->sendTransaction( tran ); } );
-                //TODO #ak why std::bind does not work here?
-                //transactionsToSend.push_back( std::bind(
-                //    &QnTransactionMessageBus::sendTransaction<QueryDataType>,
-                //    QnTransactionMessageBus::instance(),
-                //    tran ) );
+                transactionsToSend.push_back( std::bind(SendTransactionFunction(), tran ) );
             }
 
             //sending transactions
@@ -199,7 +201,7 @@ namespace ec2
                 return errorCode;
 
             if( !tran.isLocal )
-                transactionsToSend->push_back( [tran](){ QnTransactionMessageBus::instance()->sendTransaction( tran ); } );
+                transactionsToSend->push_back( std::bind(SendTransactionFunction(), tran ) );
 
             return errorCode;
         }
@@ -257,7 +259,7 @@ namespace ec2
             const std::vector<SubDataType>& nestedList,
             std::list<std::function<void()>>* const transactionsToSend )
         {
-            foreach(const SubDataType& data, nestedList)
+            for(const SubDataType& data: nestedList)
             {
                 QnTransaction<SubDataType> subTran(command);
                 subTran.params = data;
