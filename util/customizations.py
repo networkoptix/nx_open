@@ -31,10 +31,10 @@ class Customization():
     def __init__(self, name, path, project):
         self.name = name
         self.path = path
-        skinPath = os.path.join(self.path, project + '/resources')
-        self.basePath = os.path.join(skinPath, 'skin')
-        self.darkPath = os.path.join(skinPath, 'skin_dark')
-        self.lightPath = os.path.join(skinPath, 'skin_light')
+        self.skinPath = os.path.join(self.path, project + '/resources')
+        self.basePath = os.path.join(self.skinPath, 'skin')
+        self.darkPath = os.path.join(self.skinPath, 'skin_dark')
+        self.lightPath = os.path.join(self.skinPath, 'skin_light')
         self.base = []
         self.dark = []
         self.light = []
@@ -52,6 +52,9 @@ class Customization():
         err('Invalid build.properties file: ' + os.path.join(self.path, 'build.properties'))
         return False
         
+    def relativePath(self, path, entry):
+        return os.path.relpath(os.path.join(path, entry), self.skinPath)
+       
     def populateFileList(self):
     
         for dirname, dirnames, filenames in os.walk(self.basePath):
@@ -84,19 +87,19 @@ class Customization():
             if not entry in self.light:
                 clean = False
                 if entry in self.base:
-                    warn('File ' + os.path.join(self.lightPath, entry) + ' missing, using base version')
+                    warn('File ' + self.relativePath(self.lightPath, entry) + ' missing, using base version')
                 else:
                     error = True
-                    err('File ' + os.path.join(self.darkPath, entry) + ' missing in light skin')
+                    err('File ' + self.relativePath(self.darkPath, entry) + ' missing in light skin')
                 
         for entry in self.light:
             if not entry in self.dark:
                 clean = False
                 if entry in self.base:
-                    warn('File ' + os.path.join(self.darkPath, entry) + ' missing, using base version')
+                    warn('File ' + self.relativePath(self.darkPath, entry) + ' missing, using base version')
                 else:
                     error = True
-                    err('File ' + os.path.join(self.lightPath, entry) + ' missing in dark skin')
+                    err('File ' + self.relativePath(self.lightPath, entry) + ' missing in dark skin')
         if clean:
             green('Success')
         if error:
@@ -109,7 +112,7 @@ class Customization():
         for entry in self.total:
             if not entry in other.total:
                 clean = False
-                err('File ' + os.path.join(self.basePath, entry) + ' missing in ' + other.name)
+                err('File ' + self.relativePath(self.basePath, entry) + ' missing in ' + other.name)
         if clean:
             green('Success')
             return 0
