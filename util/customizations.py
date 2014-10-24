@@ -33,6 +33,7 @@ class Customization():
     def __init__(self, name, path, project):
         self.name = name
         self.path = path
+        self.project = project
         self.skinPath = os.path.join(self.path, project + '/resources')
         self.basePath = os.path.join(self.skinPath, 'skin')
         self.darkPath = os.path.join(self.skinPath, 'skin_dark')
@@ -81,15 +82,16 @@ class Customization():
         clean = True
         error = False
         
-        hasIntro = False
-        for intro in introNames:
-            if intro in self.total:
-                hasIntro = True
-        
-        if not hasIntro:
-            clean = False
-            error = True
-            err('Intro is missing in ' + self.name)
+        if self.project == 'client':
+            hasIntro = False
+            for intro in introNames:
+                if intro in self.total:
+                    hasIntro = True
+            
+            if not hasIntro:
+                clean = False
+                error = True
+                err('Intro is missing in ' + self.name)
         
         for entry in self.base:
             if entry in self.dark and entry in self.light:
@@ -172,7 +174,7 @@ def main():
     for c1, c2 in combinations(roots, 2):
         invalidCross += c1.validateCross(c2)
         invalidCross += c2.validateCross(c1)
-    print colorer.Style.BRIGHT + 'Validation finished'
+    info('Validation finished')
     if invalidInner > 0:
         sys.exit(1)
     if invalidCross > 0:
