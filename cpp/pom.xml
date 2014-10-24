@@ -149,7 +149,8 @@
                         <version>1.5.2</version>
                         <executions>
                             <execution>
-                                <phase>process-resources</phase>
+                                <id>fix-arch-x64-QMAKE-SUCKS!!!!!!!!!!</id>
+								<phase>process-resources</phase>
                                 <goals>
                                     <goal>replace</goal>
                                 </goals>
@@ -170,7 +171,31 @@
                                             <value>Name="VCLibrarianTool" \n                AdditionalOptions="/MACHINE:${arch}"</value>
                                         </replacement>         
                                     </replacements>
-                                    <skip>${force_x86}</skip>
+                                </configuration>                                
+                            </execution>
+                            <execution>
+                                <id>fix-arch-x86-QMAKE-SUCKS!!!!!!!!!!</id>
+								<phase>process-resources</phase>
+                                <goals>
+                                    <goal>replace</goal>
+                                </goals>
+                                <configuration>
+                                    <encoding>utf-8</encoding>
+                                    <file>${project.build.sourceDirectory}/${project.artifactId}-x86.vcxproj</file>
+                                    <!-- <excludes>
+                                        <exclude>**/vmaxproxy-x64.vcproj</exclude>
+                                    </excludes> --> 
+                                    <ignoreMissingFile>true</ignoreMissingFile>                                    
+                                    <replacements>
+                                        <replacement>
+                                            <token>x64</token>
+                                            <value>Win32</value>
+                                        </replacement>         
+                                        <replacement>
+                                            <token>Name="VCLibrarianTool"</token>
+                                            <value>Name="VCLibrarianTool" \n                AdditionalOptions="/MACHINE:${arch}"</value>
+                                        </replacement>         
+                                    </replacements>
                                 </configuration>                                
                             </execution>
 
@@ -287,7 +312,7 @@
                                             <value><![CDATA[
     </Link>
     <PreBuildEvent>
-      <Command>\$\(ProjectDir\)../\$\(Platform\)/build_moc.bat \$\(ProjectDir\)../\$\(Platform\) \$\(Configuration\)</Command>
+      <Command>\$\(ProjectDir\)../${arch}/build_moc.bat \$\(ProjectDir\)../${arch} \$\(Configuration\)</Command>
     </PreBuildEvent>
                                             ]]></value>
                                         </replacement>
@@ -299,7 +324,7 @@
                                             <value><![CDATA[
   <Target Name="BeforeClean">
     <Message Text="Cleaning moc generated files"/>
-    <Exec Command="del \$\(ProjectDir\)..\\\$\(Platform\)\\build\\\$\(Configuration\)\\generated\\moc_*.* /F /Q" />
+    <Exec Command="del \$\(ProjectDir\)..\\\$\(Platform\)\\build\\${arch}\\generated\\moc_*.* /F /Q" />
   </Target>
   <ItemDefinitionGroup>
                                             ]]></value>
