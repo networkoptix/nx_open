@@ -100,8 +100,7 @@ namespace ec2
     int QnMediaServerManager<T>::removeStorages( const ApiIdDataList& storages, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        QnTransaction<ApiIdDataList> tran(ApiCommand::removeStorages);
-        tran.params = storages;
+        QnTransaction<ApiIdDataList> tran(ApiCommand::removeStorages, storages);
         using namespace std::placeholders;
         m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
         return reqID;
