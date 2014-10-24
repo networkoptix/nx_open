@@ -28,10 +28,10 @@ int QnCanAcceptCameraRestHandler::executePost(const QString &path, const QnReque
     QnManualCameraInfoMap manualCamList;
     QJson::deserialize(body, &inCameras);
 
-    foreach(const QnResourcePtr& cam, QnResourceDiscoveryManager::instance()->lastDiscoveredResources())
+    for(const QnResourcePtr& cam: QnResourceDiscoveryManager::instance()->lastDiscoveredResources())
         discoveredCameras.uniqueIdList << cam->getUniqueId();
 
-    foreach(const QString& uniqueID, inCameras.uniqueIdList) {
+    for(const QString& uniqueID: inCameras.uniqueIdList) {
         if (discoveredCameras.uniqueIdList.contains(uniqueID)) {
             outCameras.uniqueIdList << uniqueID;
         }

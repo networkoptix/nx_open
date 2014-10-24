@@ -214,7 +214,7 @@ namespace ec2
         QnFullResourceData fullResData;
         fromApiToResourceList(tran.params, fullResData, m_resCtx);
         emit m_ecConnection->initNotification(fullResData);
-        foreach(const ApiDiscoveryData& data, tran.params.discoveryData)
+        for(const ApiDiscoveryData& data: tran.params.discoveryData)
             m_discoveryManager->triggerNotification(data);
     }
 

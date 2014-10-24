@@ -16,7 +16,7 @@ namespace ec2
         QnLicenseList licenseList;
         fromApiToResourceList(tran.params, licenseList);
 
-        foreach (const QnLicensePtr& license, licenseList) {
+        for (const QnLicensePtr& license: licenseList) {
             emit licenseChanged(license);
         }
     }

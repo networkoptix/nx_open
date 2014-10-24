@@ -101,8 +101,8 @@ bool QnResourceDataPool::loadInternal(const QString &fileName) {
     if(!QJson::deserialize(map, lit("data"), &chunks))
         return false;
 
-    foreach(const QnResourceDataPoolChunk &chunk, chunks)
-        foreach(const QString &key, chunk.keys)
+    for(const QnResourceDataPoolChunk &chunk: chunks)
+        for(const QString &key: chunk.keys)
             m_dataByKey[key.toLower()].add(chunk.data);
 
     return true;

@@ -91,7 +91,7 @@ void ThirdPartyStreamReader::updateSoftwareMotion()
     //converting region
     for( int sens = QnMotionRegion::MIN_SENSITIVITY; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens )
     {
-        foreach( const QRect& rect, region.getRectsBySens(sens) )
+        for( const QRect& rect: region.getRectsBySens(sens) )
         {
             //std::cout<<"Motion mask: sens "<<sens<<", rect ("<<rect.left()<<", "<<rect.top()<<", "<<rect.width()<<", "<<rect.height()<<"\n";
 

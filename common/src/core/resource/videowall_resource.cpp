@@ -31,7 +31,7 @@ void QnVideoWallResource::updateInner(const QnResourcePtr &other, QSet<QByteArra
 
         // copy online status to the updated items
         auto newItems = localOther->items();
-        foreach(const auto &item, m_items->getItems()) {
+        for(const auto &item: m_items->getItems()) {
             if(newItems->hasItem(item.uuid)) {
                 QnVideoWallItem newItem = newItems->getItem(item.uuid);
                 newItem.runtimeStatus.online = item.runtimeStatus.online;
@@ -75,7 +75,7 @@ void QnVideoWallResource::storedItemRemoved(const QnVideoWallItem &item) {
 
     // removing item from the matrices and removing empty matrices (if any)
     QnVideoWallMatrixMap matrices = m_matrices->getItems();
-    foreach (QnVideoWallMatrix matrix, matrices) {
+    for (QnVideoWallMatrix matrix: matrices) {
         if (!matrix.layoutByItem.contains(item.uuid))
             continue;
         matrix.layoutByItem.remove(item.uuid);
@@ -86,7 +86,7 @@ void QnVideoWallResource::storedItemRemoved(const QnVideoWallItem &item) {
     }
 
     QnUuid pcUuid = item.pcUuid;
-    foreach(const QnVideoWallItem &item, m_items->getItems())
+    for(const QnVideoWallItem &item: m_items->getItems())
         if (item.pcUuid == pcUuid)
             return;
 
@@ -124,7 +124,7 @@ void QnVideoWallResource::storedItemChanged(const QnVideoWallMatrix &item) {
 
 QList<QnUuid> QnVideoWallResource::onlineItems() const {
     QList<QnUuid> result;
-    foreach (const QnVideoWallItem &item, m_items->getItems()) {
+    for (const QnVideoWallItem &item: m_items->getItems()) {
         if (!item.runtimeStatus.online)
             continue;
         result << item.uuid;

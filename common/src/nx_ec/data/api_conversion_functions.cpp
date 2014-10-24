@@ -578,7 +578,7 @@ void fromResourceToApi(const QnAbstractStorageResourcePtr &src, ApiStorageData &
 
 void fromResourceToApi(const QnAbstractStorageResourceList &src, ApiStorageDataList &dst)
 {
-    foreach(const QnAbstractStorageResourcePtr& storage, src) 
+    for(const QnAbstractStorageResourcePtr& storage: src) 
     {
         ApiStorageData dstStorage;
         fromResourceToApi(storage, dstStorage);

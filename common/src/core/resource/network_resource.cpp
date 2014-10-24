@@ -256,7 +256,7 @@ void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
 
 
     QList<QnResourcePtr> local_list;
-    foreach (const QnResourcePtr& res, lst.values())
+    for (const QnResourcePtr& res: lst.values())
     {
         QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
         if (netRes && !(netRes->checkNetworkStatus(QnNetworkResource::HasConflicts)))
@@ -273,7 +273,7 @@ void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
     {
         NX_LOG(QLatin1String("Done. Time elapsed: "), time.elapsed(), cl_logDEBUG1);
 
-        foreach(const QnResourcePtr& res, lst)
+        for(const QnResourcePtr& res: lst)
             NX_LOG(res->toString(), cl_logDEBUG1);
 
     }

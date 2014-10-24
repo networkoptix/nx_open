@@ -150,7 +150,7 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(const QnUuid &resourceT
             searchersList = m_searchersList;
         }
 
-        foreach (QnAbstractResourceSearcher *searcher, searchersList)
+        for (QnAbstractResourceSearcher *searcher: searchersList)
         {
             result = searcher->createResource(resourceTypeId, params);
             if (!result.isNull())
@@ -166,7 +166,7 @@ void QnResourceDiscoveryManager::pleaseStop()
     if (isRunning())
     {
         QMutexLocker locker(&m_searchersListMutex);
-        foreach (QnAbstractResourceSearcher *searcher, m_searchersList)
+        for (QnAbstractResourceSearcher *searcher: m_searchersList)
             searcher->pleaseStop();
     }
 
@@ -207,7 +207,7 @@ void QnResourceDiscoveryManager::doResourceDiscoverIteration()
     switch( m_state )
     {
         case InitialSearch:
-            foreach (QnAbstractResourceSearcher *searcher, searchersList)
+            for (QnAbstractResourceSearcher *searcher: searchersList)
             {
                 if ((searcher->discoveryMode() != DiscoveryMode::disabled) && searcher->isLocal())
                 {
@@ -255,7 +255,7 @@ QnResourceList QnResourceDiscoveryManager::lastDiscoveredResources() const
     int sz = sizeof(m_lastDiscoveredResources) / sizeof(QnResourceList);
     QSet<QnResourcePtr> allResources;
     for (int i = 0; i < sz; ++i) {
-        foreach(const QnResourcePtr& res, m_lastDiscoveredResources[i])
+        for(const QnResourcePtr& res: m_lastDiscoveredResources[i])
             allResources << res;
     }
     return allResources.toList();
@@ -309,7 +309,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     ResourceSearcherList searchersList = m_searchersList;
     m_searchersListMutex.unlock();
 
-    foreach (QnAbstractResourceSearcher *searcher, searchersList)
+    for (QnAbstractResourceSearcher *searcher: searchersList)
     {
         if ((searcher->discoveryMode() != DiscoveryMode::disabled) && !needToStop())
         {
@@ -515,7 +515,7 @@ void QnResourceDiscoveryManager::dtsAssignment()
         //QList<QnDtsUnit> unitsLst =  QnColdStoreDTSSearcher::instance().findDtsUnits();
         QList<QnDtsUnit> unitsLst =  m_dstList[i]->findDtsUnits();
 
-        foreach(const QnDtsUnit& unit, unitsLst)
+        for(const QnDtsUnit& unit: unitsLst)
         {
             QnResourcePtr res = qnResPool->getResourceByUniqId(unit.resourceID);
             if (!res)
@@ -578,6 +578,6 @@ void QnResourceDiscoveryManager::updateSearchersUsage() {
         searchers = m_searchersList;
     }
 
-    foreach(QnAbstractResourceSearcher *searcher, searchers)
+    for(QnAbstractResourceSearcher *searcher: searchers)
         updateSearcherUsage(searcher);
 }

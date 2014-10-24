@@ -143,7 +143,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case GetParamsObject: {
         QnStringVariantPairList reply;
 
-        foreach(const QByteArray &line, response.data.split('\n')) {
+        for(const QByteArray &line: response.data.split('\n')) {
             int sepPos = line.indexOf('=');
             if(sepPos == -1) {
                 reply.push_back(qMakePair(QString::fromUtf8(line.constData(), line.size()), QVariant())); /* No value. */
@@ -163,7 +163,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case SetParamsObject: {
         QnStringBoolPairList reply;
 
-        foreach(const QByteArray &line, response.data.split('\n')) {
+        for(const QByteArray &line: response.data.split('\n')) {
             int sepPos = line.indexOf(':');
             if(sepPos == -1)
                 continue; /* Invalid format. */
@@ -345,7 +345,7 @@ int QnMediaServerConnection::getThumbnailAsync(const QnNetworkResourcePtr &camer
 int QnMediaServerConnection::checkCameraList(const QnNetworkResourceList &cameras, QObject *target, const char *slot)
 {
     QnCameraListReply camList;
-    foreach(const QnResourcePtr& c, cameras)
+    for(const QnResourcePtr& c: cameras)
         camList.uniqueIdList << c->getUniqueId();
 
     QnRequestHeaderList headers;
@@ -365,7 +365,7 @@ int QnMediaServerConnection::getTimePeriodsAsync(const QnNetworkResourceList &li
 {
     QnRequestParamList params;
 
-    foreach(const QnNetworkResourcePtr& netResource, list)
+    for(const QnNetworkResourcePtr& netResource: list)
         params << QnRequestParam("physicalId", netResource->getPhysicalId());
     params << QnRequestParam("startTime", QString::number(startTimeMs));
     params << QnRequestParam("endTime", QString::number(endTimeMs));
@@ -385,7 +385,7 @@ int QnMediaServerConnection::getTimePeriodsAsync(const QnNetworkResourceList &li
 QnRequestParamList QnMediaServerConnection::createGetParamsRequest(const QnNetworkResourcePtr &camera, const QStringList &params) {
     QnRequestParamList result;
     result << QnRequestParam("res_id", camera->getPhysicalId());
-    foreach(QString param, params)
+    for(QString param: params)
         result << QnRequestParam(param, QString());
     return result;
 }
@@ -712,7 +712,7 @@ int QnMediaServerConnection::getEventLogAsync(
     params << QnRequestParam( "from", dateFrom);
     if (dateTo != DATETIME_NOW)
         params << QnRequestParam( "to", dateTo);
-    foreach(const QnResourcePtr& res, camList) {
+    for(const QnResourcePtr& res: camList) {
         QnNetworkResourcePtr camera = res.dynamicCast<QnNetworkResource>();
         if (camera)
             params << QnRequestParam( "res_id", camera->getPhysicalId() );

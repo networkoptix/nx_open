@@ -67,7 +67,7 @@ public:
         header.fillSequence();
 #ifdef _DEBUG
 
-        foreach (const QnUuid& peer, header.dstPeers) {
+        for (const QnUuid& peer: header.dstPeers) {
             Q_ASSERT(!peer.isNull());
             //Q_ASSERT(peer != qnCommon->moduleGUID());
         }

@@ -33,13 +33,13 @@ int QnStatisticsRestHandler::executeGet(const QString &path, const QnRequestPara
     reply.statistics << memory;
 
     QnStatisticsDataList storages;
-    foreach(const QnPlatformMonitor::HddLoad &hddLoad, m_monitor->totalHddLoad()) {
+    for(const QnPlatformMonitor::HddLoad &hddLoad: m_monitor->totalHddLoad()) {
         storages.append(QnStatisticsDataItem(hddLoad.hdd.partitions, hddLoad.load, Qn::StatisticsHDD));
     }
     reply.statistics << storages;
 
     QnStatisticsDataList network;
-    foreach(const QnPlatformMonitor::NetworkLoad &networkLoad, m_monitor->totalNetworkLoad()) 
+    for(const QnPlatformMonitor::NetworkLoad &networkLoad: m_monitor->totalNetworkLoad()) 
     {
         qint64 bytesIn = networkLoad.bytesPerSecIn;
         qint64 bytesOut = networkLoad.bytesPerSecOut;

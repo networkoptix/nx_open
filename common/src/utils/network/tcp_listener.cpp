@@ -131,7 +131,7 @@ void QnTcpListener::removeDisconnectedConnections()
         }
     }
 
-    foreach(QnLongRunnable* processor, toDeleteList)
+    for(QnLongRunnable* processor: toDeleteList)
         delete processor;
 }
 

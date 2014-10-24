@@ -299,7 +299,7 @@ bool OnvifResourceInformationFetcher::isMacAlreadyExists(const QString& mac, con
 {
     if (!mac.isEmpty()) {
 
-        foreach(const QnResourcePtr& res, resList) {
+        for(const QnResourcePtr& res: resList) {
             QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
 
             if (netRes->getMAC().toString() == mac) {

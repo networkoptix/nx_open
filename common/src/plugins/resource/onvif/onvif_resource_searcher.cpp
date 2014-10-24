@@ -18,7 +18,7 @@ bool hasRunningLiveProvider(QnNetworkResourcePtr netRes)
 {
     bool rez = false;
     netRes->lockConsumers();
-    foreach(QnResourceConsumer* consumer, netRes->getAllConsumers())
+    for(QnResourceConsumer* consumer: netRes->getAllConsumers())
     {
         QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
         if (lp)

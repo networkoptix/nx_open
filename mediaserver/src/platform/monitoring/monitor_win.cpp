@@ -376,7 +376,7 @@ QList<QnPlatformMonitor::HddLoad> QnWindowsMonitor::totalHddLoad() {
     d->collectQuery();
 
     QList<QnPlatformMonitor::HddLoad> result;
-    foreach(const QnWindowsMonitorPrivate::HddItem &item, d->itemByDiskId) {
+    for(const QnWindowsMonitorPrivate::HddItem &item: d->itemByDiskId) {
         qreal load = 0.0;
         if(d->lastItemByDiskId.contains(item.hdd.id)) 
             load = d->diskCounterValue(d->diskCounter, d->lastItemByDiskId[item.hdd.id].counter, item.counter);

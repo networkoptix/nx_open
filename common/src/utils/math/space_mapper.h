@@ -57,7 +57,7 @@ public:
 private:
     void init(const QVector<QPair<qreal, qreal> > &sourceToTarget, Qn::ExtrapolationMode extrapolationMode) {
         QVector<QPair<qreal, qreal> > targetToSource;
-        foreach(const auto &point, sourceToTarget)
+        for(const auto &point: sourceToTarget)
             targetToSource.push_back(qMakePair(point.second, point.first));
 
         m_sourceToTarget.setPoints(sourceToTarget);

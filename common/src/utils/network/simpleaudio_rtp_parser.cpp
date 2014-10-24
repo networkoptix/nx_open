@@ -46,7 +46,7 @@ void QnSimpleAudioRtpParser::setSDPInfo(QList<QByteArray> lines)
         else if (lines[i].startsWith("a=fmtp"))
         {
             QList<QByteArray> params = lines[i].mid(lines[i].indexOf(' ')+1).split(';');
-            foreach(QByteArray param, params) 
+            for(QByteArray param: params) 
             {
                 param = param.trimmed();
                 //processStringParam("mode-set", m_mode, param);

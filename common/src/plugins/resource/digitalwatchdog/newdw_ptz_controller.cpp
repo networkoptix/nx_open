@@ -98,13 +98,13 @@ bool QnNewDWPtzController::getPresets(QnPtzPresetList *presets)
         if (!rez)
             return rez;
         QMutexLocker lock(&m_mutex);
-        foreach(QByteArray line, body.split(L'\n'))
+        for(QByteArray line: body.split(L'\n'))
         {
             line = line.trimmed();
             if (line.startsWith("list="))
             {
                 QList<QByteArray> presetTokens = line.split(L'=')[1].split(L' ');
-                foreach(const QByteArray& token, presetTokens) 
+                for(const QByteArray& token: presetTokens) 
                 {
                     if (token.isEmpty())
                         continue;

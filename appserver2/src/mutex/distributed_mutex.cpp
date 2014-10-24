@@ -35,7 +35,7 @@ QnDistributedMutex::~QnDistributedMutex()
 
 bool QnDistributedMutex::isAllPeersReady() const
 {
-    foreach(const QnUuid& peer, qnTransactionBus->aliveServerPeers().keys())
+    for(const QnUuid& peer: qnTransactionBus->aliveServerPeers().keys())
     {
         if (!m_proccesedPeers.contains(peer))
             return false;
@@ -127,7 +127,7 @@ void QnDistributedMutex::unlockInternal()
     data.timestamp = NO_MUTEX_LOCK;
     */
 
-    foreach(ApiLockData lockData, m_delayedResponse) {
+    for(ApiLockData lockData: m_delayedResponse) {
         QnUuid srcPeer = lockData.peer;
         lockData.peer = qnCommon->moduleGUID();
         sendTransaction(lockData, ApiCommand::lockResponse, srcPeer);
@@ -200,7 +200,7 @@ bool QnDistributedMutex::checkUserData() const
     if (!m_owner->m_userDataHandler)
         return true;
 
-    foreach(const LockRuntimeInfo& info, m_peerLockInfo.keys())
+    for(const LockRuntimeInfo& info: m_peerLockInfo.keys())
     {
         if (!m_owner->m_userDataHandler->checkUserData(info.name, info.userData))
             return false;

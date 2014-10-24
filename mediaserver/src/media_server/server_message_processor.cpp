@@ -129,7 +129,7 @@ bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
     if (m_mServer) 
     {
         QHostAddress hostAddr(addr);
-        foreach(const QHostAddress& serverAddr, m_mServer->getNetAddrList())
+        for(const QHostAddress& serverAddr: m_mServer->getNetAddrList())
         {
             if (hostAddr == serverAddr)
                 return true;

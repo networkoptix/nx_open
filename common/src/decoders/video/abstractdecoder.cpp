@@ -44,7 +44,7 @@ QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(
                 //searching for a video decoder with hardware acceleration, supporting codec type data->compressionType
                 QnAbstractVideoDecoderPlugin* videoDecoderPlugin = NULL;
                 const QList<QnAbstractVideoDecoderPlugin*>& plugins = PluginManager::instance()->findPlugins<QnAbstractVideoDecoderPlugin>();
-                foreach( QnAbstractVideoDecoderPlugin* plugin, plugins )
+                for( QnAbstractVideoDecoderPlugin* plugin: plugins )
                 {
                     if( !plugin->isHardwareAccelerated() || plugin->supportedCodecTypes().indexOf(data->compressionType) == -1 )
                         continue;

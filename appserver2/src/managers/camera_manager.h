@@ -37,7 +37,7 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiCameraDataList>& tran )
         {
             assert( tran.command == ApiCommand::saveCameras );
-            foreach(const ApiCameraData& camera, tran.params) 
+            for(const ApiCameraData& camera: tran.params) 
             {
                 QnVirtualCameraResourcePtr cameraRes = m_resCtx.resFactory->createResource(
                     camera.typeId,
@@ -56,7 +56,7 @@ namespace ec2
 
         void triggerNotification( const QnTransaction<ApiCameraAttributesDataList>& tran ) {
             assert( tran.command == ApiCommand::saveCameraUserAttributesList );
-            foreach(const ApiCameraAttributesData& attrs, tran.params) 
+            for(const ApiCameraAttributesData& attrs: tran.params) 
             {
                 QnCameraUserAttributesPtr cameraAttrs( new QnCameraUserAttributes() );
                 fromApiToResource( attrs, cameraAttrs );

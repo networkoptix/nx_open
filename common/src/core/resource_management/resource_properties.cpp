@@ -66,7 +66,7 @@ int QnResourcePropertyDictionary::saveParamsAsync(const QList<QnUuid>& idList)
     ec2::ApiResourceParamWithRefDataList data;
     QMutexLocker lock(&m_mutex);
 
-    foreach(const QnUuid& resourceId, idList) 
+    for(const QnUuid& resourceId: idList) 
         fromModifiedDataToSavedData(resourceId, data);
     return saveData(std::move(data));
 }
@@ -85,7 +85,7 @@ void QnResourcePropertyDictionary::onRequestDone( int reqID, ec2::ErrorCode erro
 
 void QnResourcePropertyDictionary::addToUnsavedParams(const ec2::ApiResourceParamWithRefDataList& params)
 {
-    foreach(const ec2::ApiResourceParamWithRefData& param, params) 
+    for(const ec2::ApiResourceParamWithRefData& param: params) 
     {
         auto itr = m_modifiedItems.find(param.resourceId);
         if (itr == m_modifiedItems.end())
@@ -115,7 +115,7 @@ void QnResourcePropertyDictionary::clear()
 void QnResourcePropertyDictionary::clear(const QVector<QnUuid>& idList)
 {
     QMutexLocker lock(&m_mutex);
-    foreach(const QnUuid& id, idList) {
+    for(const QnUuid& id: idList) {
         m_items.remove(id);
         m_modifiedItems.remove(id);
     }

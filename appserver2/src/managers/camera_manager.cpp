@@ -105,7 +105,7 @@ namespace ec2
 
         //preparing output data
         QnVirtualCameraResourceList cameraList;
-        foreach(const QnVirtualCameraResourcePtr& camera, cameras)
+        for(const QnVirtualCameraResourcePtr& camera: cameras)
         {
             if (camera->getId().isNull()) {
                 Q_ASSERT_X(0, "Only update operation is supported", Q_FUNC_INFO);

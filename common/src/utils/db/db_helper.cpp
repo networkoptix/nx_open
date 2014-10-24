@@ -108,7 +108,7 @@ bool QnDbHelper::execSQLFile(const QString& fileName, QSqlDatabase& database)
     qDebug() << "creating db" << n << "commands queued";
     int i = 0;
 #endif // DB_DEBUG
-    foreach(const QByteArray& singleCommand, commands)
+    for(const QByteArray& singleCommand: commands)
     {
 #ifdef DB_DEBUG
         qDebug() << QString(QLatin1String("processing command %1 of %2")).arg(++i).arg(n);

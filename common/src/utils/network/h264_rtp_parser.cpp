@@ -82,7 +82,7 @@ void CLH264RtpParser::setSDPInfo(QList<QByteArray> lines)
                     {
                         QByteArray h264SpsPps = h264Parma.mid(pos+1);
                         QList<QByteArray> nalUnits = h264SpsPps.split(',');
-                        foreach(QByteArray nal, nalUnits)
+                        for(QByteArray nal: nalUnits)
                         {
                             nal = QByteArray::fromBase64(nal);
 

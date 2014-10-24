@@ -491,7 +491,7 @@ void RTPSession::parseSDP()
     QString codecType;
     QString setupURL;
 
-    foreach(QByteArray line, lines)
+    for(QByteArray line: lines)
     {
         line = line.trimmed();
         QByteArray lineLower = line.toLower();

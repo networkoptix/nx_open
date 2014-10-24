@@ -36,7 +36,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
 {
     QnResourceList result;
 
-    foreach (const QnInterfaceAndAddr& iface, getAllIPv4Interfaces())
+    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
     {
         if (shouldStop())
             return QnResourceList();
@@ -128,7 +128,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
 
 
                 bool need_to_continue = false;
-                foreach(const QnResourcePtr& res, result)
+                for(const QnResourcePtr& res: result)
                 {
                     if (res->getUniqueId() == resource->getUniqueId())
                     {

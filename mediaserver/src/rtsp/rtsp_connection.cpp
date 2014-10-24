@@ -764,7 +764,7 @@ int QnRtspConnectionProcessor::composeSetup()
     if (trackId >= 0)
     {
         QList<QByteArray> transportInfo = transport.split(';');
-        foreach(const QByteArray& data, transportInfo)
+        for(const QByteArray& data: transportInfo)
         {
             /*
             if (data.startsWith("interleaved="))
@@ -1205,7 +1205,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
     createDataProvider();
 
     QList<QByteArray> parameters = d->requestBody.split('\n');
-    foreach(const QByteArray& parameter, parameters)
+    for(const QByteArray& parameter: parameters)
     {
         QByteArray normParam = parameter.trimmed().toLower();
         QList<QByteArray> vals = parameter.split(':');
@@ -1255,7 +1255,7 @@ int QnRtspConnectionProcessor::composeGetParameter()
 {
     Q_D(QnRtspConnectionProcessor);
     QList<QByteArray> parameters = d->requestBody.split('\n');
-    foreach(const QByteArray& parameter, parameters)
+    for(const QByteArray& parameter: parameters)
     {
         QByteArray normParamName = parameter.trimmed().toLower();
         if (normParamName == "position" || normParamName.isEmpty())

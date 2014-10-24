@@ -83,12 +83,12 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);
     connect(m_cameraSettingsOptimizationAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraSettingsOptimizationChanged,   Qt::QueuedConnection);
 
-    foreach(QnAbstractResourcePropertyAdaptor* adaptor, emailAdaptors)
+    for(QnAbstractResourcePropertyAdaptor* adaptor: emailAdaptors)
         connect(adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::emailSettingsChanged, Qt::QueuedConnection);
 
     connect(qnResPool,                              &QnResourcePool::resourceAdded,                     this,   &QnGlobalSettings::at_resourcePool_resourceAdded);
     connect(qnResPool,                              &QnResourcePool::resourceRemoved,                   this,   &QnGlobalSettings::at_resourcePool_resourceRemoved);
-    foreach(const QnResourcePtr &resource, qnResPool->getResources())
+    for(const QnResourcePtr &resource: qnResPool->getResources())
         at_resourcePool_resourceAdded(resource);
 }
 
@@ -132,7 +132,7 @@ void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resour
     QMutexLocker locker(&m_mutex);
 
     m_admin = user;
-    foreach (QnAbstractResourcePropertyAdaptor* adaptor, m_allAdaptors)
+    for (QnAbstractResourcePropertyAdaptor* adaptor: m_allAdaptors)
         adaptor->setResource(user);
 }
 
@@ -143,7 +143,7 @@ void QnGlobalSettings::at_resourcePool_resourceRemoved(const QnResourcePtr &reso
     QMutexLocker locker(&m_mutex);
     m_admin.reset();
 
-    foreach (QnAbstractResourcePropertyAdaptor* adaptor, m_allAdaptors)
+    for (QnAbstractResourcePropertyAdaptor* adaptor: m_allAdaptors)
         adaptor->setResource(QnResourcePtr());
 }
 
@@ -181,7 +181,7 @@ void QnGlobalSettings::setEmailSettings(const QnEmail::Settings &settings) {
 }
 
 void QnGlobalSettings::synchronizeNow() {
-    foreach (QnAbstractResourcePropertyAdaptor* adaptor, m_allAdaptors)
+    for (QnAbstractResourcePropertyAdaptor* adaptor: m_allAdaptors)
         adaptor->synchronizeNow();
 }
 

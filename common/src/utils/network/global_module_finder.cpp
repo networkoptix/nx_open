@@ -17,7 +17,7 @@ QnGlobalModuleFinder::QnGlobalModuleFinder(QnModuleFinder *moduleFinder, QObject
     connect(qnResPool,      &QnResourcePool::resourceRemoved,       this,       &QnGlobalModuleFinder::at_resourcePool_resourceRemoved);
 
     if (moduleFinder) {
-        foreach (const QnModuleInformation &moduleInformation, moduleFinder->foundModules())
+        for (const QnModuleInformation &moduleInformation: moduleFinder->foundModules())
             addModule(moduleInformation, qnCommon->moduleGUID());
 
         connect(moduleFinder,               &QnModuleFinder::moduleChanged, this,   &QnGlobalModuleFinder::at_moduleFinder_moduleChanged);
@@ -32,12 +32,12 @@ void QnGlobalModuleFinder::setConnection(const ec2::AbstractECConnectionPtr &con
         oldConnection->getMiscManager()->disconnect(this);
 
         QSet<QnUuid> discoverers;
-        foreach (const QSet<QnUuid> &moduleDiscoverer, m_discovererIdByServerId)
+        for (const QSet<QnUuid> &moduleDiscoverer: m_discovererIdByServerId)
             discoverers.unite(moduleDiscoverer);
 
         discoverers.remove(qnCommon->moduleGUID());
 
-        foreach (const QnUuid &id, discoverers)
+        for (const QnUuid &id: discoverers)
             removeAllModulesDiscoveredBy(id);
     }
 
@@ -203,7 +203,7 @@ void QnGlobalModuleFinder::removeAllModulesDiscoveredBy(const QnUuid &discoverer
 QSet<QString> QnGlobalModuleFinder::getModuleAddresses(const QnUuid &id) const {
     QSet<QString> result;
 
-    foreach (const QSet<QString> &addresses, m_discoveredAddresses.value(id))
+    for (const QSet<QString> &addresses: m_discoveredAddresses.value(id))
         result.unite(addresses);
 
     return result;
