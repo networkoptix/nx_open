@@ -645,13 +645,20 @@ namespace nxcip
         virtual int getParamCount() const = 0;
         //!Returns parameter \a paramID description and flags
         /*!
+            \param paramGroup Group name this parameter belongs to. Nested groups must be delimitered with /.
+                E.g., vms/nx/hdw. Heading and trailing / are ignored.
+                This memory MUST be valid and not changed for whole life time of \a BaseCameraManager3 instance
             \param description \a *description set to human-readable \0-terminated utf8 string.
                 This memory MUST be valid and not changed for whole life time of \a BaseCameraManager3 instance
             \return\n
                 - \a NX_NO_ERROR
                 - \a NX_INVALID_PARAM_INDEX if paramID is >= \a BaseCameraManager3::getParamCount
         */
-        virtual int getParamDescription( int paramID, const char** description, ParamFlags* flags ) const = 0;
+        virtual int getParamDescription(
+            int paramID,
+            const char** paramGroup,
+            const char** description,
+            ParamFlags* flags ) const = 0;
         //!Reads value of parameter \a paramID
         /*!
             \param valueBufSize IN: Length of \a valueBuf, OUT: length of string value
