@@ -5,6 +5,8 @@ import argparse
 import os
 from itertools import combinations
 
+introNames = ["intro.mkv", "intro.avi", "intro.png", "intro.jpg", "intro.jpeg"]
+
 class ColorDummy():
     class Empty(object):
         def __getattribute__(self, name):
@@ -78,6 +80,17 @@ class Customization():
         info('Validating ' + self.name + '...')
         clean = True
         error = False
+        
+        hasIntro = False
+        for intro in introNames:
+            if intro in self.total:
+                hasIntro = True
+        
+        if not hasIntro:
+            clean = False
+            error = True
+            err('Intro is missing in ' + self.name)
+        
         for entry in self.base:
             if entry in self.dark and entry in self.light:
                 clean = False
@@ -109,10 +122,16 @@ class Customization():
     def validateCross(self, other):
         info('Validating ' + self.name + ' vs ' + other.name + '...')
         clean = True
+       
         for entry in self.total:
+            #Intro files are checked an inner way
+            if entry in introNames:
+                continue
+                
             if not entry in other.total:
                 clean = False
                 err('File ' + self.relativePath(self.basePath, entry) + ' missing in ' + other.name)
+                
         if clean:
             green('Success')
             return 0
