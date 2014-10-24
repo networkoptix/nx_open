@@ -46,6 +46,9 @@ namespace nxcip
     static const int NX_TRY_AGAIN = -26;
     //!Blocking call has been interrupted (e.g., by \a StreamReader::interrupt)
     static const int NX_INTERRUPTED = -27;
+    static const int NX_PARAM_READ_ONLY = -40;
+    static const int NX_INVALID_PARAM_INDEX = -41;
+    static const int NX_INVALID_PARAM_VALUE = -42;
     static const int NX_OTHER_ERROR = -100;
 
 
@@ -614,6 +617,67 @@ namespace nxcip
             \return \b NX_NO_ERROR on success, otherwise - error code
         */
         virtual int setMotionMask( Picture* motionMask ) = 0;
+    };
+
+
+    // {840DEECD-2F9B-4859-9081-9592D17177F8}
+    static const nxpl::NX_GUID IID_BaseCameraManager3 = { { 0x84, 0x0d, 0xee, 0xcd, 0x2f, 0x9b, 0x48, 0x59, 0x90, 0x81, 0x95, 0x92, 0xd1, 0x71, 0x77, 0xf8 } };
+
+    //!Extends \a BaseCameraManager2 by adding editable parameters
+    /*!
+        - all parameters have type string
+        - parameter ids always start with 0
+    */
+    class BaseCameraManager3
+    :
+        public BaseCameraManager2
+    {
+    public:
+        enum ParamFlags
+        {
+            pfReadOnly = 0x01
+        };
+
+        //!Returns number of parameters defined for this camera
+        /*!
+            \return number of parameters defined for this camera
+        */
+        virtual int getParamCount() const = 0;
+        //!Returns parameter \a paramID description and flags
+        /*!
+            \param paramGroup Group name this parameter belongs to. Nested groups must be delimitered with /.
+                E.g., vms/nx/hdw. Heading and trailing / are ignored.
+                This memory MUST be valid and not changed for whole life time of \a BaseCameraManager3 instance
+            \param description \a *description set to human-readable \0-terminated utf8 string.
+                This memory MUST be valid and not changed for whole life time of \a BaseCameraManager3 instance
+            \return\n
+                - \a NX_NO_ERROR
+                - \a NX_INVALID_PARAM_INDEX if paramID is >= \a BaseCameraManager3::getParamCount
+        */
+        virtual int getParamDescription(
+            int paramID,
+            const char** paramGroup,
+            const char** description,
+            ParamFlags* flags ) const = 0;
+        //!Reads value of parameter \a paramID
+        /*!
+            \param valueBufSize IN: Length of \a valueBuf, OUT: length of string value
+            \return\n
+                - \a NX_NO_ERROR if value loaded to value buf. Value is always \0-terminated utf8 string
+                - \a NX_INVALID_PARAM_INDEX if paramID is >= \a BaseCameraManager3::getParamCount
+                - \a NX_NO_DATA if \a valueBuf has not enough space
+        */
+        virtual int getParamValue( int paramID, char* valueBuf, int* valueBufSize ) const = 0;
+        //!Set value of parameter \a paramID to \a value
+        /*!
+            \param value \0-terminated utf8 string
+            \return\n
+                - \a NX_NO_ERROR if value successfully applied
+                - \a NX_INVALID_PARAM_INDEX if paramID is >= \a BaseCameraManager3::getParamCount
+                - \a NX_PARAM_READ_ONLY if parameter is read only (check \a pfReadOnly flag)
+                - \a NX_INVALID_PARAM_VALUE if parameter value does not pass validity check
+        */
+        virtual int setParamValue( int paramID, const char* value ) = 0;
     };
 
 

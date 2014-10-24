@@ -405,7 +405,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
     }
     case LicenseRemoved: {
         QString disabledCameras = reasonParamsEncoded;
-        result = tr("Recording on %n camera(s) is disabled. Cameras: ", NULL, disabledCameras.split(L',').size());
+        result = tr("Recording on %n camera(s) is disabled: ", NULL, disabledCameras.split(L',').size());
         result += disabledCameras;
         break;
     }

@@ -609,7 +609,7 @@ void QnRecordingManager::at_licenseMutexLocked()
 {
     QnCamLicenseUsageHelper helper;
 
-    int disabledCameras = 0;
+    QString disabledCameras;
     
     // Too many licenses. check if server has own recording cameras and force to disable recording
     const QnResourceList& ownCameras = getLocalControlledCameras();
@@ -632,7 +632,7 @@ void QnRecordingManager::at_licenseMutexLocked()
                 continue;
             }
             propertyDictionary->saveParams( camera->getId() );
-            disabledCameras++;
+            disabledCameras += QString(lit("%1 (%2)")).arg(camera->getName()).arg(camera->getHostAddress());
             helper.update();
         }
     }
@@ -640,9 +640,9 @@ void QnRecordingManager::at_licenseMutexLocked()
     m_licenseMutex->deleteLater();
     m_licenseMutex = 0;
 
-    if (disabledCameras > 0) {
+    if (!disabledCameras.isEmpty()) {
         QnResourcePtr resource = qnResPool->getResourceById(qnCommon->moduleGUID());
-        emit recordingDisabled(resource, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::LicenseRemoved, QString::number(disabledCameras));
+        emit recordingDisabled(resource, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::LicenseRemoved, disabledCameras);
     }
 }
 
