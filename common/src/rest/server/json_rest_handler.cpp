@@ -41,7 +41,7 @@ int QnJsonRestHandler::executeGet(const QString &path, const QnRequestParams &pa
 
 QnRequestParams QnJsonRestHandler::processParams(const QnRequestParamList &params) const {
     QnRequestParams result;
-    foreach(const QnRequestParam &param, params)
+    for(const QnRequestParam &param: params)
         result.insertMulti(param.first, param.second);
     return result;
 }

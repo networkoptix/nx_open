@@ -224,7 +224,7 @@ bool QnAuthHelper::authenticate(
 bool QnAuthHelper::authenticate( const QString& login, const QByteArray& digest ) const
 {
     QMutexLocker lock(&m_mutex);
-    foreach(const QnUserResourcePtr& user, m_users)
+    for(const QnUserResourcePtr& user: m_users)
     {
         if (user->getName().toLower() == login.toLower())
             return user->getDigest() == digest;
@@ -332,7 +332,7 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
     if (isNonceValid(nonce)) 
     {
         QMutexLocker lock(&m_mutex);
-        foreach(const QnUserResourcePtr& user, m_users)
+        for(const QnUserResourcePtr& user: m_users)
         {
             if (user->getName().toUtf8().toLower() == userName)
             {
@@ -355,7 +355,7 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
         }
 
         // authenticate by media server auth_key
-        foreach(const QnMediaServerResourcePtr& server, m_servers)
+        for(const QnMediaServerResourcePtr& server: m_servers)
         {
             if (server->getId().toString().toUtf8().toLower() == userName)
             {
@@ -387,7 +387,7 @@ bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Response& /*
     QByteArray userName = digest.left(pos).toLower();
     QByteArray password = digest.mid(pos+1);
 
-    foreach(const QnUserResourcePtr& user, m_users)
+    for(const QnUserResourcePtr& user: m_users)
     {
         if (user->getName().toUtf8().toLower() == userName)
         {
@@ -403,7 +403,7 @@ bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Response& /*
     }
 
     // authenticate by media server auth_key
-    foreach(const QnMediaServerResourcePtr& server, m_servers)
+    for(const QnMediaServerResourcePtr& server: m_servers)
     {
         if (server->getId().toString().toUtf8().toLower() == userName)
         {
@@ -424,7 +424,7 @@ bool QnAuthHelper::doCustomAuthorization(const QByteArray& authData, nx_http::Re
         digestBin[i] = digestBin[i] ^ sessionKeyBin[i];
     QByteArray digest = digestBin.toHex();
 
-    foreach(const QnUserResourcePtr& user, m_users)
+    for(const QnUserResourcePtr& user: m_users)
     {
         if (user->getDigest() == digest)
             return true;

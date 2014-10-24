@@ -48,7 +48,7 @@ bool ResTypeXmlParser::processResource(const QString& localName, const QXmlAttri
             return false;
     }
     else {
-        foreach(const QString& parentName, attrs.value("public").split(L',')) 
+        for(const QString& parentName: attrs.value("public").split(L',')) 
         {
             if (!addParentType(newData, parentName.trimmed()))
                 return false;

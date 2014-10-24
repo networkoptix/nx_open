@@ -644,7 +644,7 @@ void QnPlOnvifResource::fetchAndSetPrimarySecondaryResolution()
 
     double maxSquare = m_primaryResolution.width() * m_primaryResolution.height();
 
-    foreach (const QSize& resolution, m_resolutionList) {
+    for (const QSize& resolution: m_resolutionList) {
         float aspect = getResolutionAspectRatio(resolution);
         if (abs(aspect - currentAspect) < MAX_EPS) {
             continue;
@@ -1007,7 +1007,7 @@ void QnPlOnvifResource::setVideoEncoderOptionsH264(const VideoOptionsLocal& opts
     //Printing fetched resolutions
     if (cl_log.logLevel() > cl_logDEBUG1) {
         NX_LOG(QString(lit("ONVIF resolutions:")), cl_logDEBUG1);
-        foreach (const QSize& resolution, m_resolutionList) {
+        for (const QSize& resolution: m_resolutionList) {
             NX_LOG(QString(lit("%1x%2")).arg(resolution.width()).arg(resolution.height()), cl_logDEBUG1);
         }
     }
@@ -1039,7 +1039,7 @@ void QnPlOnvifResource::setVideoEncoderOptionsJpeg(const VideoOptionsLocal& opts
     //Printing fetched resolutions
     if (cl_log.logLevel() > cl_logDEBUG1) {
         NX_LOG(QString(lit("ONVIF resolutions:")), cl_logDEBUG1);
-        foreach (const QSize& resolution, m_resolutionList) {
+        for (const QSize& resolution: m_resolutionList) {
             NX_LOG(QString(lit("%1x%2")).arg(resolution.width()).arg(resolution.height()), cl_logDEBUG1);
         }
     }

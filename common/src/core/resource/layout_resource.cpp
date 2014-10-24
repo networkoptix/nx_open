@@ -53,7 +53,7 @@ QnLayoutResourcePtr QnLayoutResource::clone() const {
 
 void QnLayoutResource::setItems(const QnLayoutItemDataList& items) {
     QnLayoutItemDataMap map;
-    foreach(const QnLayoutItemData &item, items)
+    for(const QnLayoutItemData &item: items)
         map[item.uuid] = item;
     setItems(map);
 }

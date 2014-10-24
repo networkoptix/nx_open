@@ -47,7 +47,7 @@ QSize QnDlink_cam_info::resolutionCloseTo(int width) const
     QSize result = resolutions.at(0);
 
 
-    foreach(const QSize& size, resolutions)
+    for(const QSize& size: resolutions)
     {
         if (size.width() <= width)
             return size;
@@ -85,7 +85,7 @@ int QnDlink_cam_info::frameRateCloseTo(int fr)
 
     int result = possibleFps.at(0);
 
-    foreach(int fps, possibleFps)
+    for(int fps: possibleFps)
     {
         if (fps <= fr)
         {
@@ -195,7 +195,7 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
 
     m_camInfo.clear();
 
-    foreach(const QString& line, lines)
+    for(const QString& line: lines)
     {
         if (line.contains(QLatin1String("videos=")))
         {
@@ -213,7 +213,7 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
         else if (line.contains(QLatin1String("resolutions=")))
         {
             QStringList vals = getValues(line);
-            foreach(const QString& val,  vals)
+            for(const QString& val:  vals)
             {
                 QStringList wh_s = val.split(QLatin1Char('x'));
                 if (wh_s.size()<2)
@@ -226,7 +226,7 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
         else if (line.contains(QLatin1String("framerates=")))
         {
             QStringList vals = getValues(line);
-            foreach(const QString& val,  vals)
+            for(const QString& val:  vals)
             {
                 m_camInfo.possibleFps.push_back( val.toInt() );
 
@@ -235,7 +235,7 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
         else if (line.contains(QLatin1String("vbitrates=")))
         {
             QStringList vals = getValues(line);
-            foreach(const QString& bs, vals)
+            for(const QString& bs: vals)
             {
                 bool m = bs.toLower().contains(QLatin1Char('m'));
                 bool k = bs.toLower().contains(QLatin1Char('k'));

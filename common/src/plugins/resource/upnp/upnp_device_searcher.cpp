@@ -272,7 +272,7 @@ void UPNPDeviceSearcher::onSomeBytesRead(
 
 void UPNPDeviceSearcher::dispatchDiscoverPackets()
 {
-    foreach(const  QnInterfaceAndAddr& iface, getAllIPv4Interfaces() )
+    for(const  QnInterfaceAndAddr& iface: getAllIPv4Interfaces() )
     {
         const std::shared_ptr<AbstractDatagramSocket>& sock = getSockByIntf(iface);
         if( !sock )
@@ -406,7 +406,7 @@ void UPNPDeviceSearcher::processDeviceXml(
 QHostAddress UPNPDeviceSearcher::findBestIface( const QString& host )
 {
     QString oldAddress;
-    foreach(const  QnInterfaceAndAddr& iface, getAllIPv4Interfaces() )
+    for(const  QnInterfaceAndAddr& iface: getAllIPv4Interfaces() )
     {
         const QString& newAddress = iface.address.toString();
         if( isNewDiscoveryAddressBetter(host, newAddress, oldAddress) )

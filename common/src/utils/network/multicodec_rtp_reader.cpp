@@ -236,7 +236,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         }
 
         if (m_rtcpReportTimer.elapsed() >= RTCP_REPORT_TIMEOUT) {
-            foreach(const TrackInfo& track, m_tracks) {
+            for(const TrackInfo& track: m_tracks) {
                 if (track.ioDevice)
                     buildClientRTCPReport(track.ioDevice->getRtcpTrackNum());
             }
@@ -273,7 +273,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
         }
 
         int nfds = 0;
-        foreach(const TrackInfo& track, m_tracks) {
+        for(const TrackInfo& track: m_tracks) {
             if(track.ioDevice) {
                 mediaSockPollArray[nfds].fd = track.ioDevice->getMediaSocket()->handle();
                 mediaSockPollArray[nfds++].events = POLLIN;

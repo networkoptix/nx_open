@@ -44,7 +44,7 @@ namespace ec2
             QnResourceTypePtr resType = m_resCtx.resTypePool->getResourceTypeByName(lit("Storage"));
             if (!resType)
                 return;
-            foreach(const ec2::ApiStorageData& apiStorageData, tran.params) {
+            for(const ec2::ApiStorageData& apiStorageData: tran.params) {
                 QnAbstractStorageResourcePtr storage = m_resCtx.resFactory->createResource(resType->getId(), 
                     QnResourceParams(apiStorageData.id, apiStorageData.url, QString())).dynamicCast<QnAbstractStorageResource>();
                 fromApiToResource(apiStorageData, storage);
@@ -65,7 +65,7 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiIdDataList>& tran )
         {
             if( tran.command == ApiCommand::removeStorages) {
-                foreach(const ApiIdData& idData, tran.params)
+                for(const ApiIdData& idData: tran.params)
                     emit storageRemoved( idData.id );
             }
             else
@@ -83,7 +83,7 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiMediaServerUserAttributesDataList>& tran )
         {
             assert( tran.command == ApiCommand::saveServerUserAttributesList );
-            foreach(const ApiMediaServerUserAttributesData& attrs, tran.params) 
+            for(const ApiMediaServerUserAttributesData& attrs: tran.params) 
             {
                 QnMediaServerUserAttributesPtr serverAttrs( new QnMediaServerUserAttributes() );
                 fromApiToResource( attrs, serverAttrs );

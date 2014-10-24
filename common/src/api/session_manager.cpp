@@ -76,7 +76,7 @@ QnSessionManager::~QnSessionManager() {
 
     {
         QMutexLocker lock(&m_syncReplyMutex);
-        foreach(QnSessionManagerSyncReply* syncReply, m_syncReplyInProgress)
+        for(QnSessionManagerSyncReply* syncReply: m_syncReplyInProgress)
             syncReply->terminate();
     }
 
@@ -352,7 +352,7 @@ void QnSessionManager::at_asyncRequestQueued(int operation, AsyncRequestInfo req
     //qDebug() << "api url" << request.url();
 
     bool skipContentType = false;
-    foreach (const QnRequestHeader& header, headers) {
+    for (const QnRequestHeader& header: headers) {
         if (header.first == QLatin1String("Content-Type"))
             skipContentType = true;
         request.setRawHeader(header.first.toLatin1(), header.second.toUtf8());

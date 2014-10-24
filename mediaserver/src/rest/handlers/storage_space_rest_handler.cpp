@@ -40,11 +40,11 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
         partitions[i].path = toNativeDirPath(partitions[i].path);
 
     QList<QString> storagePaths;
-    foreach(const QnStorageResourcePtr &storage, qnStorageMan->getStorages()) {
+    for(const QnStorageResourcePtr &storage: qnStorageMan->getStorages()) {
         QString path = toNativeDirPath(storage->getPath());
         
         bool isExternal = true;
-        foreach(const QnPlatformMonitor::PartitionSpace &partition, partitions) {
+        for(const QnPlatformMonitor::PartitionSpace &partition: partitions) {
             if(path.startsWith(partition.path)) {
                 isExternal = partition.type == QnPlatformMonitor::NetworkPartition;
                 break;
@@ -77,9 +77,9 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
         storagePaths.push_back(path);
     }
 
-    foreach(const QnPlatformMonitor::PartitionSpace &partition, partitions) {
+    for(const QnPlatformMonitor::PartitionSpace &partition: partitions) {
         bool hasStorage = false;
-        foreach(const QString &storagePath, storagePaths) {
+        for(const QString &storagePath: storagePaths) {
             if(storagePath.startsWith(partition.path)) {
                 hasStorage = true;
                 break;

@@ -271,7 +271,7 @@ void QnTransactionMessageBus::removeAlivePeer(const QnUuid& id, bool sendTran, b
             }
         }
     }
-    foreach(const QnUuid& p, morePeersToRemove)
+    for(const QnUuid& p: morePeersToRemove)
         removeAlivePeer(p, true, true);
 }
 
@@ -336,10 +336,13 @@ void QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
         if (!aliveData.persistentState.values.empty() && transactionLog) 
         {
             // check current persistent state
-            if (!transactionLog->contains(aliveData.persistentState)) {
-                qWarning() << "DETECT transaction GAP via update message. Resync with peer" << transport->remotePeer().id;
-                qWarning() << "peer state:";
+            if (!transactionLog->contains(aliveData.persistentState)) 
+            {
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+                qDebug() << "DETECT transaction GAP via update message. Resync with peer" << transport->remotePeer().id;
+                qDebug() << "peer state:";
                 printTranState(aliveData.persistentState);
+#endif
                 if (!transport->remotePeer().isClient() && !m_localPeer.isClient())
                     queueSyncRequest(transport);
                 else
@@ -706,7 +709,7 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
         sendRuntimeInfo(sender, ttBroadcast, tran.params.runtimeState); // send as broadcast
 
         using namespace std::placeholders;
-        foreach(const QByteArray& serializedTran, serializedTransactions)
+        for(const QByteArray& serializedTran: serializedTransactions)
             if(!handleTransaction(serializedTran, 
                                   std::bind(SendTransactionToTransportFuction(), this, _1, sender, ttBroadcast), 
                                   std::bind(SendTransactionToTransportFastFuction(), this, _1, _2, sender, ttBroadcast)))
@@ -888,7 +891,7 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
 QnTransaction<ApiModuleDataList> QnTransactionMessageBus::prepareModulesDataTransaction() const {
     QnTransaction<ApiModuleDataList> transaction(ApiCommand::moduleInfoList);
 
-    foreach (const QnModuleInformation &moduleInformation, QnGlobalModuleFinder::instance()->foundModules()) {
+    for(const QnModuleInformation &moduleInformation: QnGlobalModuleFinder::instance()->foundModules()) {
         ApiModuleData data;
         QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &data);
         data.isAlive = true;
@@ -1011,7 +1014,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
     // send HTTP level keep alive (empty chunk) for server <---> server connections
     if (!m_localPeer.isClient()) 
     {
-        foreach(const QnTransactionTransportPtr& transport, m_connections.values()) 
+        for(const QnTransactionTransportPtr& transport: m_connections.values()) 
         {
             if (transport->getState() == QnTransactionTransport::ReadyForStreaming && !transport->remotePeer().isClient()) 
             {
@@ -1071,7 +1074,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
         if (itr.value().lastActivity.elapsed() > ALIVE_UPDATE_INTERVAL * 2)
         {
             itr.value().lastActivity.restart();
-            foreach(const QnTransactionTransportPtr& transport, m_connectingConnections) {
+            for(const QnTransactionTransportPtr& transport: m_connectingConnections) {
                 if (transport->getState() == QnTransactionTransport::Closed)
                     continue; // it's going to close soon
                 if (transport->remotePeer().id == itr.key()) {
@@ -1080,7 +1083,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
                 }
             }
 
-            foreach(const QnTransactionTransportPtr& transport, m_connections.values()) {
+            for(const QnTransactionTransportPtr& transport: m_connections.values()) {
                 if (transport->getState() == QnTransactionTransport::Closed)
                     continue; // it's going to close soon
                 if (transport->remotePeer().id == itr.key() && transport->remotePeer().peerType == Qn::PT_Server) {
@@ -1096,7 +1099,7 @@ void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
 {
     QList<QnTransaction<ApiRuntimeData>> result;
     runtimeTransactionLog->getTransactionsAfter(runtimeState, result);
-    foreach (const QnTransaction<ApiRuntimeData> &tran, result)
+    for(const QnTransaction<ApiRuntimeData> &tran: result)
         transport->sendTransaction(tran, transportHeader);
     transport->sendTransaction(prepareModulesDataTransaction(), transportHeader);
 }
@@ -1135,7 +1138,7 @@ void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& url)
     QMutexLocker lock(&m_mutex);
     m_remoteUrls.remove(url);
     QString urlStr = getUrlAddr(url);
-    foreach(const QnTransactionTransportPtr& transport, m_connections.values())
+    for(const QnTransactionTransportPtr& transport: m_connections.values())
     {
         if (getUrlAddr(transport->remoteAddr()) == urlStr) {
             qWarning() << "Disconnected from peer" << url;
@@ -1148,7 +1151,7 @@ void QnTransactionMessageBus::dropConnections()
 {
     QMutexLocker lock(&m_mutex);
     m_remoteUrls.clear();
-    foreach(const QnTransactionTransportPtr &transport, m_connections) {
+    for(const QnTransactionTransportPtr &transport: m_connections) {
         qWarning() << "Disconnected from peer" << transport->remoteAddr();
         transport->setState(QnTransactionTransport::Error);
     }

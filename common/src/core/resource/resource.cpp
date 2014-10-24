@@ -189,7 +189,7 @@ void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modif
 
 void QnResource::update(const QnResourcePtr& other, bool silenceMode)
 {
-    foreach (QnResourceConsumer *consumer, m_consumers)
+    for (QnResourceConsumer *consumer: m_consumers)
         consumer->beforeUpdate();
     QSet<QByteArray> modifiedFields;
     {
@@ -209,7 +209,7 @@ void QnResource::update(const QnResourcePtr& other, bool silenceMode)
     for (const ec2::ApiResourceParamData &param: other->getProperties())
         emitPropertyChanged(param.name);   //here "propertyChanged" will be called
     
-    foreach (QnResourceConsumer *consumer, m_consumers)
+    for (QnResourceConsumer *consumer: m_consumers)
         consumer->afterUpdate();
 }
 
@@ -567,7 +567,7 @@ bool QnResource::hasConsumer(QnResourceConsumer *consumer) const
 bool QnResource::hasUnprocessedCommands() const
 {
     QMutexLocker locker(&m_consumersMtx);
-    foreach(QnResourceConsumer* consumer, m_consumers)
+    for(QnResourceConsumer* consumer: m_consumers)
     {
         if (dynamic_cast<QnResourceCommand*>(consumer))
             return true;
@@ -581,10 +581,10 @@ void QnResource::disconnectAllConsumers()
 {
     QMutexLocker locker(&m_consumersMtx);
 
-    foreach (QnResourceConsumer *consumer, m_consumers)
+    for (QnResourceConsumer *consumer: m_consumers)
         consumer->beforeDisconnectFromResource();
 
-    foreach (QnResourceConsumer *consumer, m_consumers)
+    for (QnResourceConsumer *consumer: m_consumers)
         consumer->disconnectFromResource();
 
     m_consumers.clear();
@@ -700,7 +700,7 @@ void QnResource::emitModificationSignals( const QSet<QByteArray>& modifiedFields
 
     const QnResourcePtr & _t1 = toSharedPointer(this);
     void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
-    foreach(const QByteArray& signalName, modifiedFields)
+    for(const QByteArray& signalName: modifiedFields)
         emitDynamicSignal((signalName + QByteArray("(QnResourcePtr)")).data(), _a);
 }
 

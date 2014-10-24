@@ -19,7 +19,7 @@ namespace {
         result.append(target.toByteArray());
         result.append("</b><br/>\r\n");
 
-        foreach (const QnRoutePoint &point, route.points) {
+        for (const QnRoutePoint &point: route.points) {
             result.append(point.peerId.toByteArray());
             result.append(" ");
             result.append(point.host.toUtf8());
@@ -102,8 +102,8 @@ int QnRoutingInformationRestHandler::executeGet(const QString &path, const QnReq
         result.append("<html><body>\r\n");
 
         QList<QnUuid> targets = target.isNull() ? routes.uniqueKeys() : (QList<QnUuid>() << target);
-        foreach (const QnUuid &id, targets) {
-            foreach (const QnRoute &route, routes.value(id)) {
+        for (const QnUuid &id: targets) {
+            for (const QnRoute &route: routes.value(id)) {
                 result.append(routeToHtml(id, route));
                 result.append("<br/>\r\n");
             }

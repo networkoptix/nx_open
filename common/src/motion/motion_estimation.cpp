@@ -1248,7 +1248,7 @@ void QnMotionEstimation::setMotionMask(const QnMotionRegion& region)
     memset(m_motionMask, 255, MD_WIDTH * MD_HEIGHT);
     for (int sens = QnMotionRegion::MIN_SENSITIVITY; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
     {
-        foreach(const QRect& rect, region.getRectsBySens(sens))
+        for(const QRect& rect: region.getRectsBySens(sens))
         {
             for (int y = rect.top(); y <= rect.bottom(); ++y)
             {

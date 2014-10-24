@@ -53,7 +53,7 @@ class DiscoveryPacket
     {
         bool rez = false;
         netRes->lockConsumers();
-        foreach(QnResourceConsumer* consumer, netRes->getAllConsumers())
+        for(QnResourceConsumer* consumer: netRes->getAllConsumers())
         {
             QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
             if (lp)
@@ -126,7 +126,7 @@ public:
         result << appServerGuid;
         result << localAppServerHost();
         QStringList cameras = getLocalUsingCameras();
-        foreach (const QString &camera, cameras)
+        for (const QString &camera: cameras)
             result.append(camera.toUtf8());
         return listToByteArray(result);
     }
@@ -136,7 +136,7 @@ public:
         if (localCameras.isEmpty())
             return;
 
-        foreach (const QByteArray &camera, m_cameras) {
+        for (const QByteArray &camera: m_cameras) {
             QString cam = QString::fromUtf8(camera);
             if (localCameras.contains(cam) && !result.contains(cam))
                 result << cam;
@@ -183,7 +183,7 @@ void QnMServerResourceSearcher::run()
 void QnMServerResourceSearcher::updateSocketList()
 {
     deleteSocketList();
-    foreach (const QnInterfaceAndAddr& iface, getAllIPv4Interfaces())
+    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
     {
         UDPSocket* socket = new UDPSocket();
         QString localAddress = iface.address.toString();

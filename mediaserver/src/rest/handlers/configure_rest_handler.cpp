@@ -96,7 +96,7 @@ int QnConfigureRestHandler::changeAdminPassword(const QString &password, const Q
     if (password.isEmpty() && (passwordHash.isEmpty() || passwordDigest.isEmpty()))
         return ResultSkip;
 
-    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::user)) {
+    for (const QnResourcePtr &resource: qnResPool->getResourcesWithFlag(Qn::user)) {
         QnUserResourcePtr user = resource.staticCast<QnUserResource>();
         if (user->getName() != lit("admin"))
             continue;

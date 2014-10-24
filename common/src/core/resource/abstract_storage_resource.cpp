@@ -73,7 +73,7 @@ float QnAbstractStorageResource::bitrate() const
 {
     float rez = 0;
     QMutexLocker lock(&m_bitrateMtx);
-    foreach(const QnAbstractMediaStreamDataProvider* provider, m_providers)
+    for(const QnAbstractMediaStreamDataProvider* provider: m_providers)
         rez += provider->getBitrate();
     return rez;
 }

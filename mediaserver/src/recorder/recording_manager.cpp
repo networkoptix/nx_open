@@ -124,7 +124,7 @@ void QnRecordingManager::stop()
 
     QMutexLocker lock(&m_mutex);
 
-    foreach(const Recorders& recorders, m_recordMap.values())
+    for(const Recorders& recorders: m_recordMap.values())
     {
         beforeDeleteRecorder(recorders);
     }
@@ -546,7 +546,7 @@ QnResourceList QnRecordingManager::getLocalControlledCameras()
     // return own cameras + cameras from servers without DB (remote connected servers)
     QnResourceList cameras = qnResPool->getAllCameras(QnResourcePtr());
     QnResourceList result;
-    foreach(const QnResourcePtr &camRes, cameras)
+    for(const QnResourcePtr &camRes: cameras)
     {
         const QnResourcePtr& parentRes = camRes->getParentResource();
         const QnMediaServerResource* mServer = dynamic_cast<const QnMediaServerResource*>(parentRes.data());
@@ -582,7 +582,7 @@ void QnRecordingManager::at_checkLicenses()
 
         // Too many licenses. check if server has own recording cameras and force to disable recording
         QnResourceList ownCameras = getLocalControlledCameras();
-        foreach(const QnResourcePtr& camRes, ownCameras)
+        for(const QnResourcePtr& camRes: ownCameras)
         {
             QnVirtualCameraResourcePtr camera = camRes.dynamicCast<QnVirtualCameraResource>();
             if (helper.isOverflowForCamera(camera))
@@ -613,7 +613,7 @@ void QnRecordingManager::at_licenseMutexLocked()
     
     // Too many licenses. check if server has own recording cameras and force to disable recording
     const QnResourceList& ownCameras = getLocalControlledCameras();
-    foreach(const QnResourcePtr& camRes, ownCameras)
+    for(const QnResourcePtr& camRes: ownCameras)
     {
         if (helper.isValid())
             break;

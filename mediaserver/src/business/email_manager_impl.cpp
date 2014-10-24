@@ -55,7 +55,7 @@ bool EmailManagerImpl::sendEmail(const ec2::ApiEmailData& data) {
     else
         sender = QString(lit("%1@%2")).arg(settings.user).arg(settings.server);
     message.setSender(EmailAddress(sender));
-    foreach (const QString &recipient, data.to) {
+    for (const QString &recipient: data.to) {
         message.addRecipient(EmailAddress(recipient));
     }
     
@@ -63,7 +63,7 @@ bool EmailManagerImpl::sendEmail(const ec2::ApiEmailData& data) {
     message.addPart(new MimeHtml(data.body));
 
     // Need to store all attachments as smtp client operates on attachment pointers
-    foreach (const QnEmailAttachmentPtr& attachment, data.attachments)
+    for (const QnEmailAttachmentPtr& attachment: data.attachments)
         message.addPart(new MimeInlineFile(attachment->content, attachment->filename, attachment->mimetype));
 
     // Actually send

@@ -131,7 +131,7 @@ QList<QSize> QnActiResource::parseResolutionStr(const QByteArray& resolutions)
 {
     QList<QSize> result;
     QList<QSize> availResolutions;
-    foreach(const QByteArray& r, resolutions.split(','))
+    for(const QByteArray& r: resolutions.split(','))
         result << extractResolution(r);
     qSort(result.begin(), result.end(), resolutionGreaterThan);
     return result;
@@ -141,7 +141,7 @@ QMap<QByteArray, QByteArray> QnActiResource::parseSystemInfo(const QByteArray& r
 {
     QMap<QByteArray, QByteArray> result;
     QList<QByteArray> lines = report.split('\n');
-    foreach(const QByteArray& line, lines) {
+    for(const QByteArray& line: lines) {
         QList<QByteArray> tmp = line.split('=');
         result.insert(tmp[0].trimmed().toLower(), tmp.size() >= 2 ? tmp[1].trimmed() : "");
     }
@@ -188,7 +188,7 @@ void QnActiResource::cameraMessageReceived( const QString& path, const QnRequest
 QList<int> QnActiResource::parseVideoBitrateCap(const QByteArray& bitrateCap) const
 {
     QList<int> result;
-    foreach(QByteArray bitrate, bitrateCap.split(','))
+    for(QByteArray bitrate: bitrateCap.split(','))
     {
         bitrate = bitrate.trimmed().toUpper();
         int coeff = 1;
@@ -288,7 +288,7 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     
     for (int i = 0; i < MAX_STREAMS && i < fpsList.size(); ++i) {
         QList<QByteArray> fps = fpsList[i].split(',');
-        foreach(const QByteArray& data, fps)
+        for(const QByteArray& data: fps)
             m_availFps[i] << data.toInt();
         qSort(m_availFps[i]);
     }

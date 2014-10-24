@@ -77,7 +77,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     QString name;
     QString mac;
 
-    foreach(QString line, lines)
+    for(QString line: lines)
     {
         if (line.contains(QLatin1String("root.Network.Bonjour.FriendlyName")))
         {
@@ -194,7 +194,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
 
     smac = smac.toUpper();
 
-    foreach(const QnResourcePtr& res, result)
+    for(const QnResourcePtr& res: result)
     {
         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
     

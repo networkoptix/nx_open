@@ -10,7 +10,7 @@ bool QnRoute::isEqual(const QnRoute &other) const {
 
 bool QnRoute::addPoint(const QnRoutePoint &point, int weight) {
     // prevent loops in routes
-    foreach (const QnRoutePoint &p, points) {
+    for (const QnRoutePoint &p: points) {
         if (p.peerId == point.peerId)
             return false;
     }

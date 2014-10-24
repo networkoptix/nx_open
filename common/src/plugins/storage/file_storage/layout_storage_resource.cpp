@@ -284,7 +284,7 @@ bool QnLayoutFileStorageResource::removeDir(const QString& url)
 {
     QDir dir(removeProtocolPrefix(url));
     QList<QFileInfo> list = dir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
-    foreach(const QFileInfo& fi, list)
+    for(const QFileInfo& fi: list)
         removeFile(fi.absoluteFilePath());
     return true;
 }

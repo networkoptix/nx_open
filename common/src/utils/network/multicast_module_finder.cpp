@@ -42,7 +42,7 @@ QnMulticastModuleFinder::QnMulticastModuleFinder(
         m_serverSocket->bind(SocketAddress(HostAddress::anyHost, multicastGroupPort));
     }
 
-    foreach (const QHostAddress &address, QNetworkInterface::allAddresses()) {
+    for (const QHostAddress &address: QNetworkInterface::allAddresses()) {
         if (address.protocol() != QAbstractSocket::IPv4Protocol)
             continue;
 
@@ -236,7 +236,7 @@ void QnMulticastModuleFinder::run() {
         Q_ASSERT(false);
 
     //TODO #ak currently PollSet is designed for internal usage in aio, that's why we have to use socket->implementationDelegate()
-    foreach (UDPSocket *socket, m_clientSockets) {
+    for (UDPSocket *socket: m_clientSockets) {
         if( !m_pollSet.add( socket->implementationDelegate(), aio::etRead, socket ) )
             Q_ASSERT(false);
     }
@@ -249,7 +249,7 @@ void QnMulticastModuleFinder::run() {
         quint64 currentClock = QDateTime::currentMSecsSinceEpoch();
         if (currentClock - m_prevPingClock >= m_pingTimeoutMillis) {
             //sending request via each socket
-            foreach (UDPSocket *socket, m_clientSockets) {
+            for (UDPSocket *socket: m_clientSockets) {
                 if (!socket->send(searchPacket, searchPacketBufStart - searchPacket)) {
                     //failed to send packet ???
                     SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();

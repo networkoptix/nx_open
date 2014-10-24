@@ -101,7 +101,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
 void QnClientMessageProcessor::processResources(const QnResourceList& resources)
 {
     QnCommonMessageProcessor::processResources(resources);
-    foreach(const QnResourcePtr& resource, resources)
+    for(const QnResourcePtr& resource: resources)
         checkForTmpStatus(resource);
 }
 
@@ -135,7 +135,7 @@ void QnClientMessageProcessor::updateServerTmpStatus(const QnUuid& id, Qn::Resou
     QnResourcePtr server = qnResPool->getResourceById(id);
     if (!server)
         return;
-    foreach(QnResourcePtr res, qnResPool->getAllCameras(server)) {
+    for(QnResourcePtr res: qnResPool->getAllCameras(server)) {
         QnServerCameraPtr serverCamera = res.dynamicCast<QnServerCamera>();
         if (serverCamera)
             serverCamera->setTmpStatus(status);

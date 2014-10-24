@@ -322,7 +322,7 @@ void QnMediaServerResource::determineOptimalNetIF()
 
 QnAbstractStorageResourcePtr QnMediaServerResource::getStorageByUrl(const QString& url) const
 {
-   foreach(const QnAbstractStorageResourcePtr& storage, getStorages()) {
+   for(const QnAbstractStorageResourcePtr& storage: getStorages()) {
        if (storage->getUrl() == url)
            return storage;
    }
@@ -354,9 +354,9 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         QnAbstractStorageResourceList otherStorages = localOther->getStorages();
         
         // Keep indices unchanged (Server does not provide this info).
-        foreach(const QnAbstractStorageResourcePtr &storage, m_storages)
+        for(const QnAbstractStorageResourcePtr &storage: m_storages)
         {
-            foreach(const QnAbstractStorageResourcePtr &otherStorage, otherStorages)
+            for(const QnAbstractStorageResourcePtr &otherStorage: otherStorages)
             {
                 if (otherStorage->getId() == storage->getId()) {
                     otherStorage->setIndex(storage->getIndex());
@@ -464,7 +464,7 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     moduleInformation.systemName = m_systemName;
     moduleInformation.name = getName();
     moduleInformation.port = QUrl(m_apiUrl).port();
-    foreach (const QHostAddress &address, m_netAddrList)
+    for (const QHostAddress &address: m_netAddrList)
         moduleInformation.remoteAddresses.insert(address.toString());
     moduleInformation.id = getId();
     moduleInformation.sslAllowed = false;

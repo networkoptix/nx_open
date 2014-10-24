@@ -133,7 +133,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
 
     smac = smac.toUpper();
 
-    foreach(const QnResourcePtr& res, result)
+    for(const QnResourcePtr& res: result)
     {
         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
     
@@ -193,7 +193,7 @@ void QnPlIqResourceSearcher::processNativePacket(QnResourceList& result, const Q
 
     QByteArray name(responseData.data() + iqpos); // construct from null terminated char*
 
-    foreach(const QnResourcePtr& res, result)
+    for(const QnResourcePtr& res: result)
     {
         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
 
@@ -231,7 +231,7 @@ QnResourceList QnPlIqResourceSearcher::findResources()
 {
     QnResourceList result = QnMdnsResourceSearcher::findResources();
 
-    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
+    for (QnInterfaceAndAddr iface: getAllIPv4Interfaces())
     {
         std::unique_ptr<AbstractDatagramSocket> sendSock( SocketFactory::createDatagramSocket() );
         std::unique_ptr<AbstractDatagramSocket> receiveSock( SocketFactory::createDatagramSocket() );

@@ -15,13 +15,13 @@ QMutex QnVideoCameraPool::m_staticMtx;
 
 void QnVideoCameraPool::stop()
 {
-    foreach(QnVideoCamera* camera, m_cameras.values())
+    for(QnVideoCamera* camera: m_cameras.values())
         camera->beforeStop();
 
 #if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
         VMaxStreamFetcher::pleaseStopAll(); // increase stop time
 #endif
-    foreach(QnVideoCamera* camera, m_cameras.values())
+    for(QnVideoCamera* camera: m_cameras.values())
         delete camera;
 
     m_cameras.clear();
