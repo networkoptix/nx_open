@@ -336,10 +336,13 @@ void QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
         if (!aliveData.persistentState.values.empty() && transactionLog) 
         {
             // check current persistent state
-            if (!transactionLog->contains(aliveData.persistentState)) {
-                qWarning() << "DETECT transaction GAP via update message. Resync with peer" << transport->remotePeer().id;
-                qWarning() << "peer state:";
+            if (!transactionLog->contains(aliveData.persistentState)) 
+            {
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+                qDebug() << "DETECT transaction GAP via update message. Resync with peer" << transport->remotePeer().id;
+                qDebug() << "peer state:";
                 printTranState(aliveData.persistentState);
+#endif
                 if (!transport->remotePeer().isClient() && !m_localPeer.isClient())
                     queueSyncRequest(transport);
                 else
