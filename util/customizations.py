@@ -5,7 +5,9 @@ import argparse
 import os
 from itertools import combinations
 
-introNames = ["intro.mkv", "intro.avi", "intro.png", "intro.jpg", "intro.jpeg"]
+class Project:
+    CLIENT = 'client'
+    INTRO = ["intro.mkv", "intro.avi", "intro.png", "intro.jpg", "intro.jpeg"]
 
 class ColorDummy():
     class Empty(object):
@@ -34,10 +36,15 @@ class Customization():
         self.name = name
         self.path = path
         self.project = project
-        self.skinPath = os.path.join(self.path, project + '/resources')
-        self.basePath = os.path.join(self.skinPath, 'skin')
-        self.darkPath = os.path.join(self.skinPath, 'skin_dark')
-        self.lightPath = os.path.join(self.skinPath, 'skin_light')
+        self.rootPath = os.path.join(self.path, project)
+        if project == Project.CLIENT:
+            self.basePath = os.path.join(self.rootPath, 'resources', 'skin')
+            self.darkPath = os.path.join(self.rootPath, 'resources', 'skin_dark')
+            self.lightPath = os.path.join(self.rootPath, 'resources', 'skin_light')
+        else:
+            self.basePath = self.rootPath
+            #self.darkPath = os.path.join(self.rootPath, 'resources', 'skin_dark')
+            #self.lightPath = os.path.join(self.rootPath, 'resources', 'skin_light')
         self.base = []
         self.dark = []
         self.light = []
@@ -56,7 +63,7 @@ class Customization():
         return False
         
     def relativePath(self, path, entry):
-        return os.path.relpath(os.path.join(path, entry), self.skinPath)
+        return os.path.relpath(os.path.join(path, entry), self.rootPath)
        
     def populateFileList(self):
     
@@ -65,15 +72,17 @@ class Customization():
             for filename in filenames:
                 self.base.append(os.path.join(dirname, filename)[cut:])
         
-        for dirname, dirnames, filenames in os.walk(self.darkPath):
-            cut = len(self.darkPath) + 1
-            for filename in filenames:
-                self.dark.append(os.path.join(dirname, filename)[cut:])
-                
-        for dirname, dirnames, filenames in os.walk(self.lightPath):
-            cut = len(self.lightPath) + 1
-            for filename in filenames:
-                self.light.append(os.path.join(dirname, filename)[cut:])
+        if hasattr(self, 'darkPath'):
+            for dirname, dirnames, filenames in os.walk(self.darkPath):
+                cut = len(self.darkPath) + 1
+                for filename in filenames:
+                    self.dark.append(os.path.join(dirname, filename)[cut:])
+        
+        if hasattr(self, 'lightPath'):
+            for dirname, dirnames, filenames in os.walk(self.lightPath):
+                cut = len(self.lightPath) + 1
+                for filename in filenames:
+                    self.light.append(os.path.join(dirname, filename)[cut:])
                 
         self.total = sorted(list(set(self.base + self.dark + self.light)))
         
@@ -82,9 +91,9 @@ class Customization():
         clean = True
         error = False
         
-        if self.project == 'client':
+        if self.project == Project.CLIENT:
             hasIntro = False
-            for intro in introNames:
+            for intro in Project.INTRO:
                 if intro in self.total:
                     hasIntro = True
             
@@ -127,8 +136,9 @@ class Customization():
        
         for entry in self.total:
             #Intro files are checked an inner way
-            if entry in introNames:
-                continue
+            if self.project == Project.CLIENT:
+                if entry in Project.INTRO:
+                    continue
                 
             if not entry in other.total:
                 clean = False
