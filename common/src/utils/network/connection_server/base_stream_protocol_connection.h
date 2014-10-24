@@ -102,7 +102,8 @@ namespace nx_api
 
         void readyToSendData()
         {
-            m_writeBuffer.clear();
+            // Using clear will clear the reserved buffer in QByteArray --dpeng
+            m_writeBuffer.resize(0);
 
             if( m_serializerState != SerializerState::needMoreBufferSpace )
             {

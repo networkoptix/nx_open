@@ -66,8 +66,7 @@ private:
     }
 
 private:
-    // I guess I need to cache it to get the peer side address
-    AbstractCommunicatingSocket* socket_;
+    SocketAddress peer_address_;
 };
 
 #endif  //STUN_SERVER_CONNECTION_H

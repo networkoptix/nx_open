@@ -11,12 +11,12 @@ namespace nx_stun
     StunClientConnection::StunClientConnection(
         const SocketAddress& stunServerEndpoint,
         bool useSsl,
-        SocketFactory::NatTraversalType natTraversalType )
-    :
+        SocketFactory::NatTraversalType natTraversalType ) :
         m_stunServerEndpoint( stunServerEndpoint ),
         m_state(NOT_CONNECTED)
     {
         m_socket.reset( SocketFactory::createStreamSocket( useSsl, natTraversalType ) );
+        m_socket->setNonBlockingMode(true);
         m_baseConnection.reset( new BaseConnectionType( this, m_socket.get() ) );
         using namespace std::placeholders;
         m_baseConnection->setMessageHandler( [this]( nx_stun::Message&& msg ) { processMessage( std::move(msg) ); } );
@@ -54,7 +54,13 @@ namespace nx_stun
         const std::function<void(SystemError::ErrorCode)>& completion_handler ) {
         if( completion_handler )
             completion_handler(ec);
-
+        if( ec ) {
+            m_state.store(NOT_CONNECTED,std::memory_order_release);
+            return;
+        } else {
+            m_state.store(CONNECTED,std::memory_order_release);
+        }
+        SocketAddress addr = m_socket->getLocalAddress();
         // Set up the read connection. If this cannot be setup we treat it
         // as cannot finish the connection .
         if( ec == SystemError::noError && !m_baseConnection->startReadingConnection() ) {
@@ -62,15 +68,11 @@ namespace nx_stun
         }
         bool ret = dispatchPendingRequest(ec);
         if( !ret ) {
-            m_outstandingRequest->completion_handler(
-                SystemError::getLastOSErrorCode(),nx_stun::Message());
-            resetOutstandingRequest();
-        }
-        if( ec ) {
-            m_state.store(NOT_CONNECTED,std::memory_order_release);
-            return;
-        } else {
-            m_state.store(CONNECTED,std::memory_order_release);
+            if( m_outstandingRequest ) {
+                m_outstandingRequest->completion_handler(
+                    SystemError::getLastOSErrorCode(),nx_stun::Message());
+                resetOutstandingRequest();
+            }
         }
     }
 
@@ -145,6 +147,8 @@ namespace nx_stun
                 return ret;
             }
         case CONNECTING:
+            enqueuePendingRequest( std::move(request),std::move(completionHandler) );
+            return true;
         case CONNECTED:
             {
                 enqueuePendingRequest( std::move(request),std::move(completionHandler) );

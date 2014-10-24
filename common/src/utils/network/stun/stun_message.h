@@ -32,13 +32,22 @@ namespace nx_stun
     struct TransactionID
     {
         static const std::size_t TRANSACTION_ID_LENGTH = 12;
-        union {
-            char bytes[TRANSACTION_ID_LENGTH];
-            struct {
-                uint32_t high;
-                uint64_t lo;
-            } value;
-        };
+        char bytes[TRANSACTION_ID_LENGTH];
+        // Using union to pack struct is behavior undefined
+        // here, since we cannot rely on 1) layout of structure,
+        // 2) alignment cross complier. Default behavior is 
+        // layout to 8 which doesn't work with our case for 12 bytes.
+        // If user want to use high/low to get the transaction ID,
+        // using this function to explicitly grab the representational
+        // numeric value. 
+        void get( std::uint32_t* high , std::uint64_t* low ) const {
+            *high = *reinterpret_cast<const std::uint32_t*>(bytes + sizeof(*low));
+            *low = *reinterpret_cast<const std::uint64_t*>(bytes);
+        }
+        void set( std::uint32_t high , std::uint64_t low ) {
+            memcpy(bytes,&low,sizeof(low));
+            memcpy(bytes+sizeof(low),&high,sizeof(high));
+        }
     };
 
     enum class MessageClass
@@ -191,6 +200,7 @@ namespace nx_stun
 
         typedef std::string StringAttributeType;
         bool parse( const UnknownAttribute& unknownAttr, StringAttributeType* val );
+        bool serialize( UnknownAttribute* unknownAttr, const StringAttributeType& val , int user_type );
     }
 
 } // namespace nx_stun

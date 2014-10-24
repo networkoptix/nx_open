@@ -17,6 +17,7 @@ StunServerConnection::StunServerConnection(
 :
     BaseType( socketServer, sock )
 {
+    peer_address_ = sock->getForeignAddress();
     // No way to detect error here
     bool ret = startReadingConnection();
     Q_ASSERT(ret);
@@ -121,12 +122,14 @@ void StunServerConnection::sendSuccessReply( const nx_stun::TransactionID& trans
     std::unique_ptr<nx_stun::attr::XorMappedAddress> addr( new nx_stun::attr::XorMappedAddress() );
     addr->type = nx_stun::attr::AttributeType::xorMappedAddress;
     addr->family = nx_stun::attr::XorMappedAddress::IPV4;
-    SocketAddress peer_addr( socket_->getPeerAddress() );
+    SocketAddress peer_addr( peer_address_ );
     addr->address.ipv4 = peer_addr.address.ipv4(); // The endian is in host order 
     addr->port = peer_addr.port;
     message.attributes.insert(
         std::make_pair(addr->type,
-        std::unique_ptr<nx_stun::attr::Attribute>(addr.release())));
+        std::unique_ptr<nx_stun::attr::Attribute>(addr.get())));
+    addr.release();
+
     bool ret = sendMessage(std::move(message),
         std::bind(
         &StunServerConnection::onSendComplete,
@@ -167,16 +170,16 @@ void StunServerConnection::sendErrorReply( const nx_stun::TransactionID& transac
 
 bool StunServerConnection::verifyAuthroization( const nx_stun::attr::StringAttributeType& name ) {
     Q_UNUSED(name);
-    return false;
+    return true;
 }
 
 bool StunServerConnection::verifyServerId( const nx_stun::attr::StringAttributeType& name ) {
     Q_UNUSED(name);
-    return false;
+    return true;
 }
 
 bool StunServerConnection::verifyServerName( const nx_stun::attr::StringAttributeType& name ) {
     Q_UNUSED(name);
-    return false;
+    return true;
 }
 
