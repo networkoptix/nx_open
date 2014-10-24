@@ -74,7 +74,7 @@ class Customization():
             for filename in filenames:
                 self.light.append(os.path.join(dirname, filename)[cut:])
                 
-        self.total = list(set(self.base + self.dark + self.light))
+        self.total = sorted(list(set(self.base + self.dark + self.light)))
         
     def validateInner(self):
         info('Validating ' + self.name + '...')
