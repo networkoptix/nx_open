@@ -139,8 +139,8 @@ namespace ec2
                 errorCode = syncFunction( tran, &transactionsToSend );
                 if( errorCode != ErrorCode::ok )
                     return;
-                //TODO #ak commit MUST return error code !!! it can really fail
-                dbTran->commit();
+                if (!dbTran->commit())
+                    return;
             }
             else if( !tran.isLocal )
             {
@@ -261,8 +261,7 @@ namespace ec2
         {
             for(const SubDataType& data: nestedList)
             {
-                QnTransaction<SubDataType> subTran(command);
-                subTran.params = data;
+                QnTransaction<SubDataType> subTran(command, data);
                 subTran.isLocal = isLocal;
                 ErrorCode errorCode = processUpdateSync( subTran, transactionsToSend );
                 if (errorCode != ErrorCode::ok)
