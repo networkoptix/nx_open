@@ -92,7 +92,7 @@ QString QnCameraRecordingPolicy::getText(const QnResourceList &resources, const 
 }
 
 bool QnUserEmailPolicy::isResourceValid(const QnUserResourcePtr &resource) {
-    return QnEmail::isValid(resource->getEmail());
+    return QnEmailAddress::isValid(resource->getEmail());
 }
 
 QString QnUserEmailPolicy::getText(const QnResourceList &resources, const bool detailed, const QStringList &additional) {
@@ -119,7 +119,7 @@ QString QnUserEmailPolicy::getText(const QnResourceList &resources, const bool d
 
     invalid = 0;
     foreach(const QString &email, additional) {
-        if (QnEmail::isValid(email))
+        if (QnEmailAddress::isValid(email))
             receivers << email;
         else
             invalid++;

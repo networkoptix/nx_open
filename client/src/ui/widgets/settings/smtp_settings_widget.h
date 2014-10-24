@@ -8,7 +8,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/widgets/settings/abstract_preferences_widget.h>
 
-#include <utils/common/email.h>
+#include <utils/common/email_fwd.h>
 
 namespace Ui {
     class SmtpSettingsWidget;
@@ -33,7 +33,7 @@ public:
     virtual bool confirm() override;
     virtual bool discard() override;
 private:
-    QnEmail::Settings settings() const;
+    QnEmailSettings settings() const;
     void stopTesting(const QString &result = QString());
     void finishTesting();
     void loadSettings(const QString &server, QnEmail::ConnectionType connectionType, int port = 0);

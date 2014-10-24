@@ -11,7 +11,6 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <nx_ec/ec_api.h>
 
-#include <utils/common/email.h>
 #include <utils/common/connective.h>
 
 class QnWorkbenchUserEmailWatcher;

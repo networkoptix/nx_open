@@ -184,7 +184,7 @@ void QnAboutDialog::retranslateUi()
 
     QString supportAddress = QnGlobalSettings::instance()->emailSettings().supportEmail;
     QString supportLink = supportAddress;
-    if (QnEmail::isValid(supportAddress))
+    if (QnEmailAddress::isValid(supportAddress))
         supportLink = lit("<a href=mailto:%1>%1</a>").arg(supportAddress);
     else if (!supportAddress.isEmpty())
         supportLink = lit("<a href=%1>%1</a>").arg(supportAddress);

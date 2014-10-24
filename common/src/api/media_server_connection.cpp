@@ -656,7 +656,7 @@ int QnMediaServerConnection::getSystemNameAsync( QObject* target, const char* sl
     return sendAsyncGetRequest(GetSystemNameObject, QnRequestParamList(), QN_STRINGIZE_TYPE(QString), target, slot);
 }
 
-int QnMediaServerConnection::testEmailSettingsAsync(const QnEmail::Settings &settings, QObject *target, const char *slot) 
+int QnMediaServerConnection::testEmailSettingsAsync(const QnEmailSettings &settings, QObject *target, const char *slot) 
 {
     QnRequestHeaderList headers;
     headers << QnRequestParam("content-type",   "application/json");

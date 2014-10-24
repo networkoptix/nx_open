@@ -43,6 +43,8 @@
 #include "api_peer_data.h"
 #include "api_runtime_data.h"
 
+#include <utils/common/email.h>
+
 namespace ec2 {
 
 struct overload_tag {};
@@ -377,18 +379,20 @@ void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHisto
 }
 
 
-void fromResourceToApi(const QnEmail::Settings &src, ApiEmailSettingsData &dst) {
+void fromResourceToApi(const QnEmailSettings &src, ApiEmailSettingsData &dst) {
     dst.host = src.server;
     dst.port = src.port;
     dst.user = src.user;
+    dst.from = src.email;
     dst.password = src.password;
     dst.connectionType = src.connectionType;
 }
 
-void fromApiToResource(const ApiEmailSettingsData &src, QnEmail::Settings &dst) {
+void fromApiToResource(const ApiEmailSettingsData &src, QnEmailSettings &dst) {
     dst.server = src.host;
     dst.port = src.port;
     dst.user = src.user;
+    dst.email = src.from;
     dst.password = src.password;
     dst.connectionType = src.connectionType;
 }

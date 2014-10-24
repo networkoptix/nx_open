@@ -474,7 +474,7 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
     QStringList recipients;
     for (const QnUserResourcePtr &user: action->getResourceObjects().filtered<QnUserResource>()) {
         QString email = user->getEmail();
-        if (!email.isEmpty() && QnEmail::isValid(email))
+        if (!email.isEmpty() && QnEmailAddress::isValid(email))
             recipients << email;
     }
 
@@ -524,7 +524,7 @@ bool QnBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPt
     for (const QnUserResourcePtr &user: action->getResourceObjects().filtered<QnUserResource>()) {
         QString email = user->getEmail();
         log << QString(QLatin1String("%1 <%2>")).arg(user->getName()).arg(user->getEmail());
-        if (!email.isEmpty() && QnEmail::isValid(email))
+        if (!email.isEmpty() && QnEmailAddress::isValid(email))
             recipients << email;
     }
 
@@ -534,7 +534,7 @@ bool QnBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPt
         QString trimmed = email.trimmed();
         if (trimmed.isEmpty())
             continue;
-        if (QnEmail::isValid(trimmed))
+        if (QnEmailAddress::isValid(trimmed))
             recipients << email;
     }
 
@@ -555,7 +555,7 @@ bool QnBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPt
     assert(!partialInfo.attrName.isEmpty());
 //    contextMap[partialInfo.attrName] = lit("true");
 
-    QnEmail::Settings emailSettings = QnGlobalSettings::instance()->emailSettings();
+    QnEmailSettings emailSettings = QnGlobalSettings::instance()->emailSettings();
 
     QnEmailAttachmentList attachments;
     attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));

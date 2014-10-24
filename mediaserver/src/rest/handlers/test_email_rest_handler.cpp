@@ -13,7 +13,7 @@ int QnTestEmailSettingsHandler::executePost(const QString &path, const QnRequest
     Q_UNUSED(path)
     QnTestEmailSettingsReply reply;
     ec2::ApiEmailSettingsData apiData = QJson::deserialized(body, ec2::ApiEmailSettingsData());
-    QnEmail::Settings settings;
+    QnEmailSettings settings;
     fromApiToResource(apiData, settings);
     EmailManagerImpl emailManagerImpl;
 

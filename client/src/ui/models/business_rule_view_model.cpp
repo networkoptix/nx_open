@@ -723,7 +723,7 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
             bool any = false;
             foreach (const QnUserResourcePtr &user, m_actionResources.filtered<QnUserResource>()) {
                 QString email = user->getEmail();
-                if (email.isEmpty() || !QnEmail::isValid(email))
+                if (email.isEmpty() || !QnEmailAddress::isValid(email))
                     return false;
                 any = true;
             }
@@ -732,7 +732,7 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
             foreach(const QString &email, additional) {
                 if (email.trimmed().isEmpty())
                     continue;
-                if (!QnEmail::isValid(email))
+                if (!QnEmailAddress::isValid(email))
                     return false;
                 any = true;
             }
