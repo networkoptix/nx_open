@@ -236,9 +236,6 @@ protected:
     static QnRequestParamList createGetParamsRequest(const QnNetworkResourcePtr &camera, const QStringList &params);
     static QnRequestParamList createSetParamsRequest(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params);
 
-private slots:
-    void at_mediaServer_apiUrlChanged(const QnResourcePtr &resource);
-
 private:
     QString m_proxyAddr;
     int m_proxyPort;

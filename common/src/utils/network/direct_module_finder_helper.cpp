@@ -52,7 +52,7 @@ void QnModuleFinderHelper::at_resourceAdded(const QnResourcePtr &resource) {
     QnUuid serverId = server->getId();
 
     QnHostAddressSet addresses = QnHostAddressSet::fromList(server->getNetAddrList());
-    quint16 port = QUrl(server->getApiUrl()).port();
+    quint16 port = server->getPort();
 
     if (addresses.isEmpty() || port == 0)
         return;
@@ -95,7 +95,7 @@ void QnModuleFinderHelper::at_resourceChanged(const QnResourcePtr &resource) {
     QnHostAddressSet newAddresses = QnHostAddressSet::fromList(server->getNetAddrList());
 
     quint16 oldPort = m_portByServer.value(server->getId());
-    quint16 newPort = QUrl(server->getApiUrl()).port();
+    quint16 newPort = server->getPort();
 
     if (oldAddresses == newAddresses && oldPort == newPort)
         return;

@@ -1064,7 +1064,7 @@ void QnMain::at_localInterfacesChanged()
     m_mediaServer->setNetAddrList(intfList);
 
     QString defaultAddress = QUrl(m_mediaServer->getApiUrl()).host();
-    int port = QUrl(m_mediaServer->getApiUrl()).port();
+    int port = m_mediaServer->getPort();
     bool found = false;
     for(const QHostAddress& addr: intfList) {
         if (addr.toString() == defaultAddress) {
@@ -1513,7 +1513,7 @@ void QnMain::run()
         }
 
         bool isModified = false;
-        if (m_universalTcpListener->getPort() != QUrl(server->getApiUrl()).port())
+        if (m_universalTcpListener->getPort() != server->getPort())
             isModified = true;
 
         setServerNameAndUrls(server, defaultLocalAddress(appserverHost), m_universalTcpListener->getPort());
