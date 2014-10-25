@@ -21,6 +21,7 @@
 #include "ui/graphics/instruments/resizing_instrument.h"
 #include "ui/graphics/instruments/forwarding_instrument.h"
 #include "ui/graphics/instruments/rubber_band_instrument.h"
+#include "ui/graphics/instruments/hand_scroll_instrument.h"
 #include "ui/graphics/items/resource/media_resource_widget.h"
 #include "ui/workbench/workbench_item.h"
 #include "ui/workbench/workbench.h"
@@ -68,6 +69,7 @@ void QnCameraMotionMaskWidget::init() {
     m_controller->resizingInstrument()->disable();
     m_controller->rubberBandInstrument()->disable();
     m_controller->itemLeftClickInstrument()->disable();
+    m_controller->handScrollInstrument()->disable();
     m_controller->setMenuEnabled(false);
 
     /* We need to listen to viewport resize events to make sure that our widget is always positioned at viewport's center. */
