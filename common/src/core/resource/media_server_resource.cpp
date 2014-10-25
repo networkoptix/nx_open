@@ -83,6 +83,7 @@ void QnMediaServerResource::setApiUrl(const QString& restUrl)
         m_apiUrl = restUrl;
         m_restConnection.clear();
     }
+    emit apiUrlChanged(::toSharedPointer(this));
 }
 
 QString QnMediaServerResource::getApiUrl() const
@@ -131,6 +132,11 @@ QList<QUrl> QnMediaServerResource::getIgnoredUrls() const
 {
     QMutexLocker lock(&m_mutex);
     return m_ignoredUrls;
+}
+
+quint16 QnMediaServerResource::getPort() const {
+    QUrl url(getApiUrl());
+    return url.port();
 }
 
 QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
@@ -368,8 +374,9 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         setStorages(otherStorages);
         */
     }
-    if (netAddrListChanged) {
+    if (netAddrListChanged || getPort() != localOther->getPort()) {
         m_apiUrl = localOther->m_apiUrl;    // do not update autodetected value with side changes
+        modifiedFields.insert("apiUrlChanged");
         determineOptimalNetIF();
     } else {
         m_url = oldUrl; //rollback changed value to autodetected

@@ -311,6 +311,8 @@ QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver,
     if (!videowallGuid.isNull())
         extraHeaders.insert(lit("X-NetworkOptix-VideoWall"), videowallGuid.toString());
     setExtraHeaders(extraHeaders);
+
+    connect(mserver, &QnMediaServerResource::apiUrlChanged, this, &QnMediaServerConnection::at_mediaServer_apiUrlChanged);
 }
 
 QnMediaServerConnection::~QnMediaServerConnection() {
@@ -404,6 +406,13 @@ QnRequestParamList QnMediaServerConnection::createSetParamsRequest(const QnNetwo
     for(QnStringVariantPairList::const_iterator i = params.begin(); i != params.end(); ++i)
         result << QnRequestParam(i->first, i->second.toString());
     return result;
+}
+
+void QnMediaServerConnection::at_mediaServer_apiUrlChanged(const QnResourcePtr &resource) {
+    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    if (!server)
+        return;
+    setUrl(server->getApiUrl());
 }
 
 int QnMediaServerConnection::setParamsAsync(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params, QObject *target, const char *slot) {

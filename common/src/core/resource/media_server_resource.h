@@ -48,6 +48,8 @@ public:
     void setIgnoredUrls(const QList<QUrl> &urls);
     QList<QUrl> getIgnoredUrls() const;
 
+    quint16 getPort() const;
+
     QnMediaServerConnectionPtr apiConnection();
 
     QnAbstractStorageResourceList getStorages() const;
@@ -106,6 +108,7 @@ private slots:
 private:
     void onRequestDone( int reqID, ec2::ErrorCode errorCode );
 signals:
+    void apiUrlChanged(const QnResourcePtr &resource);
     void serverIfFound(const QnMediaServerResourcePtr &resource, const QString &, const QString& );
     void panicModeChanged(const QnResourcePtr &resource);
     //! This signal is emmited when the set of additional URLs or ignored URLs has been changed.
