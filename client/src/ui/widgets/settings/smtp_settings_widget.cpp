@@ -133,7 +133,6 @@ void QnSmtpSettingsWidget::updateFromSettings() {
     ui->stackedWidget->setCurrentIndex(ui->advancedCheckBox->isChecked()
         ? AdvancedPage
         : SimplePage);
-    updateFocusedElement();
 }
 
 void QnSmtpSettingsWidget::submitToSettings() {
@@ -148,19 +147,6 @@ bool QnSmtpSettingsWidget::confirm() {
 bool QnSmtpSettingsWidget::discard() {
     finishTesting();
     return base_type::discard();
-}
-
-void QnSmtpSettingsWidget::updateFocusedElement() {
-    switch (ui->stackedWidget->currentIndex()) {
-    case SimplePage:
-        ui->simpleEmailLineEdit->setFocus();
-        break;
-    case AdvancedPage:
-        ui->serverLineEdit->setFocus();
-        break;
-    default:
-        break;
-    }
 }
 
 QnEmailSettings QnSmtpSettingsWidget::settings() const {
