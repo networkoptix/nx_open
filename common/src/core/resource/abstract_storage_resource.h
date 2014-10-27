@@ -30,6 +30,7 @@ public:
     static QString urlToPath(const QString& url);
 
     static QnUuid fillID(const QnUuid& mserverId, const QString& url);
+    bool isExternal() const;
 #ifdef ENABLE_DATA_PROVIDERS
     virtual float bitrate() const;
     virtual float getStorageBitrateCoeff() const { return 1.0; }

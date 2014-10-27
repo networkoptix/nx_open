@@ -37,7 +37,7 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
     reply.storage.freeSpace = storage ? storage->getFreeSpace() : -1;
     reply.storage.reservedSpace = storage ? storage->getSpaceLimit() : -1;
     reply.storage.totalSpace = storage ? storage->getTotalSpace() : -1;
-    reply.storage.isExternal = storageUrl.trimmed().startsWith(lit("\\\\")) || QUrl(storageUrl).path().mid(1).startsWith(lit("\\\\"));  // TODO: #Elric not consistent with space_handler
+    reply.storage.isExternal = storage && storage->isExternal();
 #ifdef WIN32
     if (!reply.storage.isExternal) {
         reply.storage.isWritable = false;

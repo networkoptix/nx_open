@@ -156,3 +156,9 @@ QnUuid QnAbstractStorageResource::fillID(const QnUuid& mserverId, const QString&
     QByteArray data2 = url.toUtf8();
     return guidFromArbitraryData(data1.append(data2));
 }
+
+bool QnAbstractStorageResource::isExternal() const
+{
+    QString storageUrl = getUrl();
+    return storageUrl.trimmed().startsWith(lit("\\\\")) || QUrl(storageUrl).path().mid(1).startsWith(lit("\\\\"));
+}
