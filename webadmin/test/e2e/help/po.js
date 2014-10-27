@@ -2,15 +2,11 @@
 
 var Page = function () {
 
-    this.apiLink = element(by.id("api-doc"));
-    this.sdkLink = element(by.id("sdk-download"));
-
-    this.sdkDownloadButton = element(by.buttonText("Next"));
-    this.acceptEulaCheckbox = element(by.model("agree"));
-
     this.get = function () {
-        browser.get('/#/developers');
+        browser.get('/#/help');
     };
+
+    this.links = element.all(by.repeater("(key, link) in config.helpLinks"));
 };
 
 module.exports = Page;
