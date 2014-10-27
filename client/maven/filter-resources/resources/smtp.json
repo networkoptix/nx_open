@@ -1,37 +1,30 @@
 {
     "1and1.com": {
         "connectionType": "Tls",
-        "port": 0,
         "server": "smtp.1and1.com"
     },
     "1und1.de": {
         "connectionType": "Tls",
-        "port": 0,
         "server": "smtp.1und1.de"
     },
     "5ballov.ru": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.qip.ru"
     },
     "aeterna.ru": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.qip.ru"
     },
     "aol.com": {
         "connectionType": "Tls",
-        "port": 0,
         "server": "smtp.aol.com"
     },
     "att.yahoo.com": {
         "connectionType": "Ssl",
-        "port": 0,
         "server": "smtp.att.yahoo.com"
     },
     "autorambler.com": {
         "connectionType": "Tls",
-        "port": 0,
         "server": "mail.rambler.ru"
     },
     "bell.net": {
@@ -41,42 +34,34 @@
     },
     "bk.ru": {
         "connectionType": "Ssl",
-        "port": 0,
         "server": "smtp.mail.ru"
     },
     "bossmail.com": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.km.ru"
     },
     "boymail.ru": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.km.ru"
     },
     "btconnect.com": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "mail.btconnect.com"
     },
     "btinternet.com": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "mail.btinternet.com"
     },
     "btopenworld.com": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "mail.btopenworld.com"
     },
     "cogeco.ca": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.telus.net"
     },
     "comcast.net": {
         "connectionType": "Tls",
-        "port": 0,
         "server": "smtp.comcast.net"
     },
     "dwcc.tv": {
@@ -86,287 +71,230 @@
     },
     "fotoplenka.ru": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.qip.ru"
     },
     "freemail.ru": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.km.ru"
     },
     "fromru.com": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.qip.ru"
     },
     "front.ru": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.qip.ru"
     },
     "girlmail.ru": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.km.ru"
     },
     "gmail.com": {
         "connectionType": "Tls",
-        "port": 0,
         "server": "smtp.gmail.com"
     },
     "gmx.com": {
         "connectionType": "Ssl",
-        "port": 0,
         "server": "mail.gmx.com"
     },
     "hotbox.ru": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.qip.ru"
     },
     "hotmail.co.uk": {
         "connectionType": "Tls",
-        "port": 0,
         "server": "smtp.live.com"
     },
     "hotmail.com": {
         "connectionType": "Tls",
-        "port": 0,
         "server": "smtp.live.com"
     },
     "hotmail.ru": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.qip.ru"
     },
     "inbox.com": {
         "connectionType": "Tls",
-        "port": 0,
         "server": "my.inbox.com"
     },
     "inbox.ru": {
         "connectionType": "Ssl",
-        "port": 0,
         "server": "smtp.mail.ru"
     },
     "km.ru": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.km.ru"
     },
     "krovatka.su": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.qip.ru"
     },
     "land.ru": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.qip.ru"
     },
     "lavabit.com": {
         "connectionType": "Ssl",
-        "port": 0,
         "server": "lavabit.com"
     },
     "lenta.ru": {
         "connectionType": "Tls",
-        "port": 0,
         "server": "mail.rambler.ru"
     },
     "li.ru": {
         "connectionType": "Ssl",
-        "port": 0,
         "server": "smtp.li.ru"
     },
     "list.ru": {
         "connectionType": "Ssl",
-        "port": 0,
         "server": "smtp.mail.ru"
     },
     "lycos.com": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.mail.lycos.com"
     },
     "mail.ru": {
         "connectionType": "Ssl",
-        "port": 0,
         "server": "smtp.mail.ru"
     },
     "mail15.com": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.qip.ru"
     },
     "mail333.com": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.qip.ru"
     },
     "megabox.ru": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.km.ru"
     },
     "memori.ru": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.qip.ru"
     },
     "msn.com": {
         "connectionType": "Tls",
-        "port": 0,
         "server": "smtp.live.com"
     },
     "myrambler.ru": {
         "connectionType": "Tls",
-        "port": 0,
         "server": "mail.rambler.ru"
     },
     "narod.ru": {
         "connectionType": "Ssl",
-        "port": 0,
         "server": "smtp.yandex.ru"
     },
     "netscape.com": {
         "connectionType": "Tls",
-        "port": 0,
         "server": "mail.netscape.ca"
     },
     "newmail.ru": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.qip.ru"
     },
     "nic.ru": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "mail.nic.ru"
     },
     "nightmail.ru": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.qip.ru"
     },
     "nm.ru": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.qip.ru"
     },
     "ntlworld.com": {
         "connectionType": "Ssl",
-        "port": 0,
         "server": "smtp.ntlworld.com"
     },
     "o2.co.uk": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.o2.co.uk"
     },
     "o2.ie": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.o2.ie"
     },
     "o2online.de": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "mail.o2online.de"
     },
     "orange.co.uk": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.orange.co.uk"
     },
     "orange.net": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.orange.net"
     },
     "outlook.com": {
         "connectionType": "Tls",
-        "port": 0,
         "server": "smtp.live.com"
     },
     "photofile.ru": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.qip.ru"
     },
     "pisem.net": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.qip.ru"
     },
     "pochta.ru": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.qip.ru"
     },
     "pochtamt.ru": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.qip.ru"
     },
     "pop3.ru": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.qip.ru"
     },
     "qip.ru": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.qip.ru"
     },
     "r0.ru": {
         "connectionType": "Tls",
-        "port": 0,
         "server": "mail.rambler.ru"
     },
     "rambler.ru": {
         "connectionType": "Tls",
-        "port": 0,
         "server": "mail.rambler.ru"
     },
     "rbcmail.ru": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.qip.ru"
     },
     "ro.ru": {
         "connectionType": "Tls",
-        "port": 0,
         "server": "mail.rambler.ru"
     },
     "rogers.com": {
         "connectionType": "Tls",
-        "port": 0,
         "server": "smtp.broadband.rogers.com"
     },
     "safebox.ru": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.km.ru"
     },
     "shaw.ca": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.telus.net"
     },
     "shortmail.com": {
         "connectionType": "Tls",
-        "port": 0,
         "server": "smtp.shortmail.com"
     },
     "shortmail.me": {
         "connectionType": "Tls",
-        "port": 0,
         "server": "smtp.shortmail.com"
     },
     "smtp.ru": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.qip.ru"
     },
     "sympatico.ca": {
@@ -376,72 +304,58 @@
     },
     "t-online.de": {
         "connectionType": "Ssl",
-        "port": 0,
         "server": "securesmtp.t-online.de"
     },
     "telus.net": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.telus.net"
     },
     "verizon.net": {
         "connectionType": "Ssl",
-        "port": 0,
         "server": "outgoing.verizon.net"
     },
     "videotron.ca": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.telus.net"
     },
     "wanadoo.co.uk": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.wanadoo.co.uk"
     },
     "yahoo.co.uk": {
         "connectionType": "Ssl",
-        "port": 0,
         "server": "smtp.mail.yahoo.co.uk"
     },
     "yahoo.com": {
         "connectionType": "Ssl",
-        "port": 0,
         "server": "smtp.mail.yahoo.com"
     },
     "yahoo.com.au": {
         "connectionType": "Ssl",
-        "port": 0,
         "server": "smtp.mail.yahoo.com.au"
     },
     "yahoo.de": {
         "connectionType": "Ssl",
-        "port": 0,
         "server": "smtp.mail.yahoo.de"
     },
     "yahoo.verizon.net": {
         "connectionType": "Ssl",
-        "port": 0,
         "server": "outgoing.yahoo.verizon.net"
     },
     "ya.ru": {
         "connectionType": "Ssl",
-        "port": 0,
         "server": "smtp.yandex.ru"
     },    
     "yandex.ru": {
         "connectionType": "Ssl",
-        "port": 0,
         "server": "smtp.yandex.ru"
     },
     "ziza.ru": {
         "connectionType": "Unsecure",
-        "port": 0,
         "server": "smtp.qip.ru"
     },
     "zoho.com": {
         "connectionType": "Ssl",
-        "port": 0,
         "server": "smtp.zoho.com"
     }
 }

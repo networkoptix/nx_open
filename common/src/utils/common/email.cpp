@@ -12,7 +12,7 @@
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(QnEmail, ConnectionType);
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnEmailSmtpServerPreset)(QnEmailSettings), (json)(eq), _Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnEmailSmtpServerPreset)(QnEmailSettings), (json)(eq), _Fields, (optional, true))
 
 namespace {
     typedef QHash<QString, QnEmailSmtpServerPreset> QnSmtpPresets;
