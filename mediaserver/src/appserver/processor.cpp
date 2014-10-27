@@ -140,20 +140,20 @@ void QnAppserverResourceProcessor::at_mutexLocked()
 void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource)
 {
     cameraResource->setFlags(cameraResource->flags() & ~Qn::parent_change);
-    cameraResource->setStatus(Qn::Offline);
     Q_ASSERT(!cameraResource->getId().isNull());
     QnVirtualCameraResourceList cameras;
     ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
 
-    ec2::ErrorCode errorCode = connect->getCameraManager()->addCameraSync( cameraResource, &cameras );
-    if( errorCode != ec2::ErrorCode::ok ) {
-        NX_LOG( QString::fromLatin1("Can't add camera to ec2 (insCamera query error). %1").arg(ec2::toString(errorCode)), cl_logWARNING );
-        return;
-    }
-    
-    errorCode = connect->getResourceManager()->setResourceStatusSync( cameraResource->getId(), cameraResource->getStatus());
+    cameraResource->setStatus(Qn::Offline);
+    ec2::ErrorCode errorCode = connect->getResourceManager()->setResourceStatusSync( cameraResource->getId(), cameraResource->getStatus());
     if( errorCode != ec2::ErrorCode::ok ) {
         NX_LOG( QString::fromLatin1("Can't add camera to ec2 (set status query error). %1").arg(ec2::toString(errorCode)), cl_logWARNING );
+        return;
+    }
+
+    errorCode = connect->getCameraManager()->addCameraSync( cameraResource, &cameras );
+    if( errorCode != ec2::ErrorCode::ok ) {
+        NX_LOG( QString::fromLatin1("Can't add camera to ec2 (insCamera query error). %1").arg(ec2::toString(errorCode)), cl_logWARNING );
         return;
     }
 

@@ -185,7 +185,7 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
     {
         if (!resource)
             continue;
-
+        resource->setRemovedFromPool(true);
         if(resource->resourcePool() != this)
             qnWarning("Given resource '%1' is not in the pool", resource->metaObject()->className());
 
