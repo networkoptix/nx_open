@@ -424,6 +424,11 @@
         "port": 0,
         "server": "outgoing.yahoo.verizon.net"
     },
+    "ya.ru": {
+        "connectionType": "Ssl",
+        "port": 0,
+        "server": "smtp.yandex.ru"
+    },    
     "yandex.ru": {
         "connectionType": "Ssl",
         "port": 0,
