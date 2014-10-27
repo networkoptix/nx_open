@@ -124,16 +124,9 @@ angular.module('webadminApp')
             var port = server.apiUrl.substring(server.apiUrl.lastIndexOf(":"));
             var url = "http://" + ips[i] + port;
 
-
-            console.log("checkServersIp", url, server);
-
             mediaserver.getSettings(url).then(function(){
                 server.apiUrl = url;
-
-                console.log("checkServersIp success", url, server);
-
             }).catch(function(){
-                console.log("fail again " + url);
                 if(i < ips.length-1)
                     checkServersIp (server,i+1);
                 else
