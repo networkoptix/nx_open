@@ -454,17 +454,6 @@ bool QnResourceDiscoveryManager::registerManualCameras(const QnManualCameraInfoM
     return true;
 }
 
-
-void QnResourceDiscoveryManager::onInitAsyncFinished(const QnResourcePtr& res, bool initialized)
-{
-    QnNetworkResource* rpNetRes = dynamic_cast<QnNetworkResource*>(res.data());
-    if (initialized && rpNetRes && !rpNetRes->hasFlags(Qn::desktop_camera))
-    {
-        if (rpNetRes->getStatus() == Qn::Offline || rpNetRes->getStatus() == Qn::Unauthorized || rpNetRes->getStatus() == Qn::NotDefined)
-            rpNetRes->setStatus(Qn::Online);
-    }
-}
-
 void QnResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& resource)
 {
     QMutexLocker lock(&m_searchersListMutex);

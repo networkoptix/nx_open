@@ -322,9 +322,6 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
 
 void QnMServerResourceDiscoveryManager::updateResourceStatus(const QnNetworkResourcePtr& rpNetRes)
 {
-    // seems like resource is in the pool and has OK ip
-    disconnect(rpNetRes.data(), &QnResource::initAsyncFinished, this, &QnMServerResourceDiscoveryManager::onInitAsyncFinished);
-    connect(rpNetRes.data(), &QnResource::initAsyncFinished, this, &QnMServerResourceDiscoveryManager::onInitAsyncFinished);
     if (rpNetRes->hasFlags(Qn::foreigner))
         return;
     
