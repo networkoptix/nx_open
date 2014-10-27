@@ -840,6 +840,9 @@ void QnResource::initAsync(bool optional)
     if (m_appStopping)
         return;
 
+    if (hasFlags(Qn::foreigner))
+        return; // removed to other server
+
     InitAsyncTask *task = new InitAsyncTask(toSharedPointer(this));
     if (optional) {
         if (m_initAsyncPool.tryStart(task))
