@@ -1,6 +1,6 @@
 $icon-font-path: "../fonts/";
 
-@import 'sass-bootstrap/lib/bootstrap';
+//@import 'sass-bootstrap/lib/bootstrap';
 
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
 
@@ -13,8 +13,7 @@ $icon-font-path: "../fonts/";
 
 /* Space out content a bit */
 body {
-    /*padding-top: 60px;
-    padding-bottom: 60px;*/
+    padding-bottom: 20px;
 }
 
 /* Everything but the jumbotron gets side spacing for mobile first views */
@@ -345,3 +344,4 @@ body {
 .serversList .active{
   font-weight: bold;
 }
+
