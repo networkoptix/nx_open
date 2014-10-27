@@ -2347,7 +2347,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resId, ApiResourceStatusDataL
 {
     QString filterStr;
     if (!resId.isNull())
-        filterStr = QString("WHERE rs.guid = %1").arg(guidToSqlString(resId));
+        filterStr = QString("WHERE guid = %1").arg(guidToSqlString(resId));
 
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -2626,7 +2626,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerData
     //reading properties
     QnQueryFilter filter;
     if( !mServerId.isNull() )
-        filter.fields.insert( RES_ID_FIELD, QVariant::fromValue(mServerId) );
+        filter.fields.insert( RES_ID_FIELD, mServerId.toString() );
     filter.fields.insert( RES_TYPE_FIELD, RES_TYPE_MSERVER );
     ApiResourceParamWithRefDataList params;
     result = fetchResourceParams( filter, params );
