@@ -10,14 +10,19 @@ QnServerCamera::QnServerCamera(const QnUuid& resourceTypeId): QnVirtualCameraRes
 {
     setTypeId(resourceTypeId);
     addFlags(Qn::server_live_cam);
-    if (!isDtsBased() && supportedMotionType() != Qn::MT_NoMotion)
-        addFlags(Qn::motion);
     m_tmpStatus = Qn::NotDefined;
 }
 
 QString QnServerCamera::getDriverName() const
 {
     return QLatin1String("Server camera"); //all other manufacture are also untranslated and should not be translated
+}
+
+Qn::ResourceFlags QnServerCamera::flags() const {
+    Qn::ResourceFlags result = base_type::flags();
+    if (!isDtsBased() && supportedMotionType() != Qn::MT_NoMotion)
+        result |= Qn::motion;
+    return result;
 }
 
 void QnServerCamera::setIframeDistance(int frames, int timems)

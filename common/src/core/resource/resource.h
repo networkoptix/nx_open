@@ -94,7 +94,7 @@ public:
     int initializationAttemptCount() const;
     
     // flags like network media and so on
-    Qn::ResourceFlags flags() const;
+    virtual Qn::ResourceFlags flags() const;
     inline bool hasFlags(Qn::ResourceFlags flags) const { return (this->flags() & flags) == flags; }
     void setFlags(Qn::ResourceFlags flags);
     void addFlags(Qn::ResourceFlags flags);
