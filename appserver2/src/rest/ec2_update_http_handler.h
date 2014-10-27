@@ -19,6 +19,7 @@
 #include <transaction/transaction.h>
 
 #include "server_query_processor.h"
+#include "rest/server/json_rest_result.h"
 
 
 namespace ec2
@@ -58,8 +59,8 @@ namespace ec2
             const QnRequestParamList& /*params*/,
             const QByteArray& body,
             const QByteArray& srcBodyContentType,
-            QByteArray& /*result*/,
-            QByteArray&, /*contentType*/ 
+            QByteArray& resultBody,
+            QByteArray& contentType,
             const QnRestConnectionProcessor*) override
         {
             QnTransaction<RequestDataType> tran;
@@ -73,6 +74,7 @@ namespace ec2
                 //    break;
                 case Qn::JsonFormat:
                 {
+                    contentType = "application/json";
                     tran.params = QJson::deserialized<RequestDataType>(body, RequestDataType(), &success);
                     QStringList tmp = path.split('/');
                     while (!tmp.isEmpty() && tmp.last().isEmpty())
@@ -95,9 +97,18 @@ namespace ec2
                 default:
                     assert(false);
             }
-
-            if (!success)
-                return nx_http::StatusCode::internalServerError;
+            if (!success) {
+                if (format == Qn::JsonFormat)
+                {
+                    QnJsonRestResult jsonResult;
+                    jsonResult.setError(QnJsonRestResult::InvalidParameter, "Can't deserialize input Json data to destination object.");
+                    resultBody = QJson::serialized(jsonResult);
+                    return nx_http::StatusCode::ok;
+                }
+                else {
+                    return nx_http::StatusCode::internalServerError;
+                }
+            }
 
             // replace client GUID to own GUID (take transaction ownership).
             tran.peerID = qnCommon->moduleGUID();
