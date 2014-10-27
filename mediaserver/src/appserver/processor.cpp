@@ -144,14 +144,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
     QnVirtualCameraResourceList cameras;
     ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
 
-    cameraResource->setStatus(Qn::Offline);
-    ec2::ErrorCode errorCode = connect->getResourceManager()->setResourceStatusSync( cameraResource->getId(), cameraResource->getStatus());
-    if( errorCode != ec2::ErrorCode::ok ) {
-        NX_LOG( QString::fromLatin1("Can't add camera to ec2 (set status query error). %1").arg(ec2::toString(errorCode)), cl_logWARNING );
-        return;
-    }
-
-    errorCode = connect->getCameraManager()->addCameraSync( cameraResource, &cameras );
+    ec2::ErrorCode errorCode = connect->getCameraManager()->addCameraSync( cameraResource, &cameras );
     if( errorCode != ec2::ErrorCode::ok ) {
         NX_LOG( QString::fromLatin1("Can't add camera to ec2 (insCamera query error). %1").arg(ec2::toString(errorCode)), cl_logWARNING );
         return;
@@ -163,6 +156,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
         qnResPool->removeResource(existCamRes);
     QnCommonMessageProcessor::instance()->updateResource(cameraResource);
     QnResourcePtr rpRes = qnResPool->getResourceById(cameraResource->getId());
+    rpRes->setStatus(Qn::Offline);
     rpRes->initAsync(true);
 }
 
