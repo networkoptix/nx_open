@@ -16,6 +16,8 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_item.h>
 
+#include <common/common_module.h>
+
 QnResourceTreeItemDelegate::QnResourceTreeItemDelegate(QObject *parent):
     base_type(parent)
 {
@@ -59,6 +61,9 @@ void QnResourceTreeItemDelegate::paint(QPainter *painter, const QStyleOptionView
 
         optionV4.font.setBold(bold);
     }
+
+    if (!resource.isNull() && resource->hasFlags(Qn::server) && resource->getId() == qnCommon->remoteGUID())
+        optionV4.font.setBold(true);
 
     QStyle *style = optionV4.widget ? optionV4.widget->style() : QApplication::style();
 
