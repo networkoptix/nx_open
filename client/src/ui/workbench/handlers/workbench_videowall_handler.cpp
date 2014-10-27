@@ -154,7 +154,7 @@ namespace {
             return;
 
         QnVideoWallPcData pc = firstIdx.videowall()->pcs()->getItem(firstIdx.item().pcUuid);
-        if (pc.screens.size() < screens.first())
+        if (pc.screens.size() <= screens.first())
             return;
 
         QnLayoutItemData itemData;
