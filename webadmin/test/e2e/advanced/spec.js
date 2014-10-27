@@ -69,6 +69,22 @@ describe('Advanced Page', function () {
     });
 
     it("should show warning, then limit is more than free space",function(){
+        var max = 0;
+        p.storageLimitInput.getAttribute("max").then(function(val){max=val;});
+
+        p.setStorageLimit(max.toFixed(0)-1);
+
+        console.log("set max");
+        console.log(max.toFixed(0)-1);
+
+        expect(p.saveButton.isEnabled()).toBe(true);
+        expect(p.storageLimitInput.element(by.xpath("..")).getAttribute("class")).toNotMatch("has-warning");
+
+        // click
+        // handle confirm
+        // check it's text
+        // decline
+
         expect("test").toBe("written");
     });
 
