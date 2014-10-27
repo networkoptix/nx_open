@@ -60,7 +60,6 @@ namespace nx_stun
         } else {
             m_state.store(CONNECTED,std::memory_order_release);
         }
-        SocketAddress addr = m_socket->getLocalAddress();
         // Set up the read connection. If this cannot be setup we treat it
         // as cannot finish the connection .
         if( ec == SystemError::noError && !m_baseConnection->startReadingConnection() ) {
@@ -128,6 +127,8 @@ namespace nx_stun
         nx_stun::Message&& request,
         std::function<void(SystemError::ErrorCode, nx_stun::Message&&)>&& completionHandler )
     {
+        Q_ASSERT( request.header.messageClass == nx_stun::MessageClass::request );
+
         switch(m_state.load(std::memory_order_acquire)) {
         case NOT_CONNECTED:
             {

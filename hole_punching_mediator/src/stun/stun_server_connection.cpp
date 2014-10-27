@@ -117,7 +117,7 @@ void StunServerConnection::processGetIPAddressRequest( nx_stun::Message&& reques
 void StunServerConnection::sendSuccessReply( const nx_stun::TransactionID& transaction_id ) {
     nx_stun::Message message;
     message.header.messageClass = nx_stun::MessageClass::successResponse;
-    message.header.method = nx_hpm::StunMethods::listen;
+    message.header.method = static_cast<int>(nx_stun::MethodType::binding);
     message.header.transactionID = transaction_id;
     std::unique_ptr<nx_stun::attr::XorMappedAddress> addr( new nx_stun::attr::XorMappedAddress() );
     addr->type = nx_stun::attr::AttributeType::xorMappedAddress;
