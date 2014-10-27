@@ -37,8 +37,9 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource)
     const bool isCamera = dynamic_cast<const QnVirtualCameraResource*>(resource.data()) != nullptr;
     const bool isUser = dynamic_cast<const QnUserResource*>(resource.data()) != nullptr;
     const bool isVideowall = dynamic_cast<const QnVideoWallResource*>(resource.data()) != nullptr;
+    const bool isStorage = dynamic_cast<const QnAbstractStorageResource*>(resource.data()) != nullptr;
 
-    if (!isServer && !isCamera && !isUser && !isVideowall)
+    if (!isServer && !isCamera && !isUser && !isVideowall && !isStorage)
         return;
 
     //storing all servers' cameras too
@@ -128,7 +129,7 @@ bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
     if (m_mServer) 
     {
         QHostAddress hostAddr(addr);
-        foreach(const QHostAddress& serverAddr, m_mServer->getNetAddrList())
+        for(const QHostAddress& serverAddr: m_mServer->getNetAddrList())
         {
             if (hostAddr == serverAddr)
                 return true;

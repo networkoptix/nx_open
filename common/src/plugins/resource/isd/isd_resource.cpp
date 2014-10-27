@@ -34,12 +34,7 @@ static bool sizeCompare(const QSize &s1, const QSize &s2)
 QnPlIsdResource::QnPlIsdResource()
 {
     setVendor(lit("ISD"));
-    setAuth(QLatin1String("root"), QLatin1String("admin"));
-}
-
-bool QnPlIsdResource::isResourceAccessible()
-{
-    return updateMACAddress();
+    setAuth(QLatin1String("root"), QLatin1String("admin"), false);
 }
 
 QString QnPlIsdResource::getDriverName() const
@@ -69,7 +64,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
 
     QList<QSize> resolutions;
 
-    foreach(const QString& val,  vals)
+    for(const QString& val:  vals)
     {
         QStringList wh_s = val.split(QLatin1Char('x'));
         if (wh_s.size()<2)
@@ -170,7 +165,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
     vals = getValues(QLatin1String(fpses));
 
     QList<int> fpsList;
-    foreach(QString fpsS, vals)
+    for(const QString& fpsS: vals)
     {
         fpsList.push_back(fpsS.trimmed().toInt());
     }
@@ -188,8 +183,8 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
         mediaStreams.streams.push_back( CameraMediaStreamInfo( m_resolution2, CODEC_ID_H264 ) );
     saveResolutionList( mediaStreams );
 
-    setParam(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, 1, QnDomainDatabase );
-    setMotionType( Qn::MT_SoftwareGrid );
+    setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, 1);
+    //setMotionType( Qn::MT_SoftwareGrid );
     saveParams();
 
     return CameraDiagnostics::NoErrorResult();
@@ -233,21 +228,7 @@ QnConstResourceAudioLayoutPtr QnPlIsdResource::getAudioLayout(const QnAbstractSt
 
 void QnPlIsdResource::setMaxFps(int f)
 {
-    setParam(MAX_FPS_PARAM_NAME, f, QnDomainDatabase);
-}
-
-int QnPlIsdResource::getMaxFps() const
-{
-    QVariant mediaVariant;
-    QnSecurityCamResource* this_casted = const_cast<QnPlIsdResource*>(this);
-
-    if (!hasParam(MAX_FPS_PARAM_NAME))
-    {
-        return QnPhysicalCameraResource::getMaxFps();
-    }
-
-    this_casted->getParam(MAX_FPS_PARAM_NAME, mediaVariant, QnDomainMemory);
-    return mediaVariant.toInt();
+    setProperty(MAX_FPS_PARAM_NAME, f);
 }
 
 #endif // #ifdef ENABLE_ISD

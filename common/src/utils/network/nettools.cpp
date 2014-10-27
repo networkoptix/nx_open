@@ -78,13 +78,13 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
 
     QList<QnInterfaceAndAddr> result;
 
-    foreach(QNetworkInterface iface, QNetworkInterface::allInterfaces())
+    for(const QNetworkInterface& iface: QNetworkInterface::allInterfaces())
     {
         if (!(iface.flags() & QNetworkInterface::IsUp))
             continue;
 
         QList<QNetworkAddressEntry> addresses = iface.addressEntries();
-        foreach (const QNetworkAddressEntry& address, addresses)
+        for (const QNetworkAddressEntry& address: addresses)
         {
             if (address.ip().protocol() == QAbstractSocket::IPv4Protocol && address.ip() != QHostAddress::LocalHost)
             {
@@ -92,14 +92,14 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
                 static QList<QHostAddress> allowedInterfaces;
                 if (!allowedInterfaceReady)
                 {
-                    foreach(QString arg, qApp->arguments()) // TODO: #Elric totally evil! This is NOT a place to access application arguments
+                    for(QString arg: qApp->arguments()) // TODO: #Elric totally evil! This is NOT a place to access application arguments
                     {
                         arg = arg.toLower();
                         while (arg.startsWith(QLatin1Char('-')))
                             arg = arg.mid(1);
                         if (arg.startsWith(QLatin1String("if="))) {
                             QStringList tmp = arg.split(QLatin1Char('='))[1].split(QLatin1Char(';'));
-                            foreach(QString s, tmp)
+                            for(const QString& s: tmp)
                                 allowedInterfaces << QHostAddress(s);
                         }
                     }
@@ -109,7 +109,7 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
                     {
                         QSettings settings;
                         QStringList tmp = settings.value(QLatin1String("if")).toString().split(QLatin1Char(';'));
-                        foreach(QString s, tmp) {
+                        for(const QString& s: tmp) {
                             if (!s.isEmpty())
                                 allowedInterfaces << QHostAddress(s);
                         }
@@ -140,7 +140,7 @@ QList<QHostAddress> allLocalAddresses()
     QList<QHostAddress> rez;
 
     // if nothing else works use first enabled hostaddr
-    foreach(const QnInterfaceAndAddr& iface, getAllIPv4Interfaces())
+    for(const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
     {
         if (!(iface.netIf.flags() & QNetworkInterface::IsUp))
             continue;
@@ -366,7 +366,7 @@ QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHost
 
     QList<QHostAddress> result;
 
-    foreach(PinagableT addr, hostslist)
+    for(const PinagableT& addr: hostslist)
     {
         if (addr.online)
             result.push_back(QHostAddress(addr.addr));
@@ -377,7 +377,7 @@ QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHost
     CL_LOG(cl_logDEBUG1)
     {
         NX_LOG(lit("ping results..."), cl_logDEBUG1);
-        foreach(QHostAddress addr, result)
+        for(const QHostAddress& addr: result)
             NX_LOG(addr.toString(), cl_logDEBUG1);
     }
 
@@ -575,7 +575,7 @@ QHostAddress resolveAddress(const QString& addrString)
 
     QHostInfo hi = QHostInfo::fromName(addrString);
     if (!hi.addresses().isEmpty()) {
-        foreach (const QHostAddress& addr, hi.addresses()) {
+        for (const QHostAddress& addr: hi.addresses()) {
             if (addr.protocol() == QAbstractSocket::IPv4Protocol)
                 return addr;
         }

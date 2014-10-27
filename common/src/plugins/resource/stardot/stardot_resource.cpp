@@ -37,7 +37,7 @@ QnStardotResource::QnStardotResource():
     m_motionMaskBinData(0)
 {
     setVendor(lit("Stardot"));
-    setAuth(lit("admin"), lit("admin"));
+    setAuth(lit("admin"), lit("admin"), false);
 }
 
 QnStardotResource::~QnStardotResource()
@@ -100,7 +100,7 @@ void QnStardotResource::detectMaxResolutionAndFps(const QByteArray& resList)
     m_resolutionNum = -1;
     m_resolution = QSize();
     m_maxFps = 0;
-    foreach(const QByteArray& line, resList.split('\n'))
+    for(const QByteArray& line: resList.split('\n'))
     {
         QList<QByteArray> fields = line.split(',');
         if (fields.size() < 4)
@@ -118,7 +118,7 @@ void QnStardotResource::detectMaxResolutionAndFps(const QByteArray& resList)
 void QnStardotResource::parseInfo(const QByteArray& info)
 {
     m_rtspPort = 0;
-    foreach(const QByteArray& line, info.split('\n'))
+    for(const QByteArray& line: info.split('\n'))
     {
         if (line.startsWith("h264_rtsp=")) {
             QByteArray portInfo = line.split('=')[1];
@@ -154,9 +154,7 @@ CameraDiagnostics::Result QnStardotResource::initInternal()
         return CameraDiagnostics::UnknownErrorResult();
     }
 
-    //setParam(AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0, QnDomainDatabase);
-    setParam(MAX_FPS_PARAM_NAME, m_maxFps, QnDomainDatabase);
-    //setParam(DUAL_STREAMING_PARAM_NAME, !m_resolution[1].isEmpty() ? 1 : 0, QnDomainDatabase);
+    setProperty(MAX_FPS_PARAM_NAME, m_maxFps);
 
     //detecting and saving selected resolutions
     CameraMediaStreams mediaStreams;
@@ -167,11 +165,6 @@ CameraDiagnostics::Result QnStardotResource::initInternal()
 
     setMotionMaskPhysical(0);
     return CameraDiagnostics::NoErrorResult();
-}
-
-bool QnStardotResource::isResourceAccessible()
-{
-    return updateMACAddress();
 }
 
 QnConstResourceAudioLayoutPtr QnStardotResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
@@ -222,7 +215,7 @@ void QnStardotResource::setMotionMaskPhysical(int channel)
     if (channel != 0)
         return;
 
-    QnMotionRegion region = m_motionMaskList[0];
+    QnMotionRegion region = getMotionRegion(0);
     for (int sens = QnMotionRegion::MIN_SENSITIVITY+1; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
     {
 

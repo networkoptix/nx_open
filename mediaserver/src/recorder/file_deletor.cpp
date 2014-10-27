@@ -74,7 +74,7 @@ void QnFileDeletor::deleteDir(const QString& dirName)
 {
     QDir dir(dirName);
     QList<QFileInfo> list = dir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
-    foreach(const QFileInfo& fi, list)
+    for(const QFileInfo& fi: list)
         deleteFile(fi.absoluteFilePath());
 }
 
@@ -155,7 +155,7 @@ void QnFileDeletor::processPostponedFiles()
     QFile tmpFile(m_mediaRoot + QLatin1String("tmp.csv"));
     if (!tmpFile.open(QFile::WriteOnly | QFile::Truncate))
         return;
-    foreach(QString fileName, newList)
+    for(const QString& fileName: newList)
     {
         tmpFile.write(fileName.toUtf8());
         tmpFile.write("\n");

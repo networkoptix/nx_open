@@ -1,1 +1,0 @@
-INSERT INTO "vms_propertytype" VALUES ( '17239','6','VideoLayout','1',NULL,NULL,NULL,'','','','','','','',0,0);

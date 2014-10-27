@@ -21,6 +21,7 @@ public:
     virtual ~QnModuleFinder();
 
     void setCompatibilityMode(bool compatibilityMode);
+    bool isCompatibilityMode() const;
 
     QList<QnModuleInformation> foundModules() const;
 

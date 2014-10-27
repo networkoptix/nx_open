@@ -55,6 +55,11 @@ void QnDirectModuleFinder::setCompatibilityMode(bool compatibilityMode) {
     m_compatibilityMode = compatibilityMode;
 }
 
+bool QnDirectModuleFinder::isCompatibilityMode() const
+{
+    return m_compatibilityMode;
+}
+
 void QnDirectModuleFinder::addUrl(const QUrl &url, const QnUuid &id) {
     Q_ASSERT(id != qnCommon->moduleGUID());
 
@@ -260,11 +265,11 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
 void QnDirectModuleFinder::at_discoveryCheckTimer_timeout() {
     QSet<QUrl> urls = QSet<QUrl>::fromList(m_urls.keys()) - m_ignoredUrls - QSet<QUrl>::fromList(m_lastPingByUrl.keys());
 
-    foreach (const QUrl &url, urls)
+    for (const QUrl &url: urls)
         enqueRequest(url);
 }
 
 void QnDirectModuleFinder::at_aliveCheckTimer_timeout() {
-    foreach (const QUrl &url, m_lastPingByUrl.keys())
+    for (const QUrl &url: m_lastPingByUrl.keys())
         enqueRequest(url);
 }

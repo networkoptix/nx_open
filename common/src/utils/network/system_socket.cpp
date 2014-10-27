@@ -350,12 +350,12 @@ AbstractSocket::SOCKET_HANDLE Socket::handle() const
 
 bool Socket::postImpl( std::function<void()>&& handler )
 {
-    return aio::AIOService::instance()->post( this, std::move(handler) );
+    return m_baseAsyncHelper->post( std::move(handler) );
 }
 
 bool Socket::dispatchImpl( std::function<void()>&& handler )
 {
-    return aio::AIOService::instance()->dispatch( this, std::move(handler) );
+    return m_baseAsyncHelper->dispatch( std::move(handler) );
 }
 
 
@@ -457,12 +457,14 @@ const SocketImpl* Socket::impl() const
 }
 
 Socket::Socket(
+    std::unique_ptr<BaseAsyncSocketImplHelper<Socket>> asyncHelper,
     int type,
     int protocol,
     SocketImpl* impl )
 :
     m_socketHandle( -1 ),
     m_impl( impl ),
+    m_baseAsyncHelper( std::move(asyncHelper) ),
     m_nonBlockingMode( false ),
     m_readTimeoutMS( 0 ),
     m_writeTimeoutMS( 0 )
@@ -473,10 +475,48 @@ Socket::Socket(
         m_impl = new SocketImpl();
 }
 
-Socket::Socket( int _sockDesc, SocketImpl* impl )
+Socket::Socket(
+    std::unique_ptr<BaseAsyncSocketImplHelper<Socket>> asyncHelper,
+    int _sockDesc,
+    SocketImpl* impl )
 :
     m_socketHandle( -1 ),
     m_impl( impl ),
+    m_baseAsyncHelper( std::move(asyncHelper) ),
+    m_nonBlockingMode( false ),
+    m_readTimeoutMS( 0 ),
+    m_writeTimeoutMS( 0 )
+{
+    this->m_socketHandle = _sockDesc;
+    if( !m_impl )
+        m_impl = new SocketImpl();
+}
+
+Socket::Socket(
+    int type,
+    int protocol,
+    SocketImpl* impl )
+:
+    m_socketHandle( -1 ),
+    m_impl( impl ),
+    m_baseAsyncHelper( new BaseAsyncSocketImplHelper<Socket>(this) ),
+    m_nonBlockingMode( false ),
+    m_readTimeoutMS( 0 ),
+    m_writeTimeoutMS( 0 )
+{
+    createSocket( type, protocol );
+
+    if( !m_impl )
+        m_impl = new SocketImpl();
+}
+
+Socket::Socket(
+    int _sockDesc,
+    SocketImpl* impl )
+:
+    m_socketHandle( -1 ),
+    m_impl( impl ),
+    m_baseAsyncHelper( new BaseAsyncSocketImplHelper<Socket>(this) ),
     m_nonBlockingMode( false ),
     m_readTimeoutMS( 0 ),
     m_writeTimeoutMS( 0 )
@@ -600,25 +640,49 @@ namespace
 }
 #endif
 
-CommunicatingSocket::CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr, int type, int protocol, SocketImpl* sockImpl )
+CommunicatingSocket::CommunicatingSocket(
+    AbstractCommunicatingSocket* abstractSocketPtr,
+    int type,
+    int protocol,
+    SocketImpl* sockImpl )
 :
-    Socket( type, protocol, sockImpl ),
-    m_aioHelper( new AsyncSocketImplHelper<Socket>( this, abstractSocketPtr ) ),
-    m_connected(false)
+    Socket(
+        std::unique_ptr<BaseAsyncSocketImplHelper<Socket>>(
+            new AsyncSocketImplHelper<Socket>( this, abstractSocketPtr ) ),
+        type,
+        protocol,
+        sockImpl ),
+    m_aioHelper( nullptr ),
+    m_connected( false )
 {
+    m_aioHelper = static_cast<AsyncSocketImplHelper<Socket>*>(this->m_baseAsyncHelper.get());
 }
 
-CommunicatingSocket::CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr, int newConnSD, SocketImpl* sockImpl )
+CommunicatingSocket::CommunicatingSocket(
+    AbstractCommunicatingSocket* abstractSocketPtr,
+    int newConnSD,
+    SocketImpl* sockImpl )
 :
-    Socket( newConnSD, sockImpl ),
-    m_aioHelper( new AsyncSocketImplHelper<Socket>( this, abstractSocketPtr ) ),
+    Socket(
+        std::unique_ptr<BaseAsyncSocketImplHelper<Socket>>(
+            new AsyncSocketImplHelper<Socket>( this, abstractSocketPtr ) ),
+        newConnSD,
+        sockImpl ),
+    m_aioHelper( nullptr ),
     m_connected( true )   //this constructor is used
 {
+    m_aioHelper = static_cast<AsyncSocketImplHelper<Socket>*>(this->m_baseAsyncHelper.get());
 }
 
 CommunicatingSocket::~CommunicatingSocket()
 {
     m_aioHelper->terminate();
+}
+
+void CommunicatingSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
+{
+    m_aioHelper->terminateAsyncIO();
+    m_aioHelper->cancelAsyncIO( aio::etNone, waitForRunningHandlerCompletion );
 }
 
 //!Implementation of AbstractCommunicatingSocket::connect
@@ -1139,6 +1203,7 @@ public:
     TCPServerSocketPrivate( TCPServerSocket* _sock )
     :
         socketHandle( -1 ),
+        acceptAsyncCallCount( 0 ),
         m_sock( _sock )
     {
     }
@@ -1216,7 +1281,10 @@ private:
 
 TCPServerSocket::TCPServerSocket()
 :
-    base_type( SOCK_STREAM, IPPROTO_TCP, new TCPServerSocketPrivate( this ) )
+    base_type(
+        SOCK_STREAM,
+        IPPROTO_TCP,
+        new TCPServerSocketPrivate( this ) )
 {
     static_cast<TCPServerSocketPrivate*>(m_implDelegate.impl())->socketHandle = m_implDelegate.handle();
     setRecvTimeout( DEFAULT_ACCEPT_TIMEOUT_MSEC );
@@ -1242,6 +1310,12 @@ bool TCPServerSocket::acceptAsyncImpl( std::function<void( SystemError::ErrorCod
 bool TCPServerSocket::listen( int queueLen )
 {
     return ::listen( m_implDelegate.handle(), queueLen ) == 0;
+}
+
+void TCPServerSocket::terminateAsyncIO( bool /*waitForRunningHandlerCompletion*/ )
+{
+    //m_implDelegate.m_baseAsyncHelper->terminateAsyncIO();
+    m_implDelegate.impl()->terminated.store( true, std::memory_order_relaxed );
 }
 
 //!Implementation of AbstractStreamServerSocket::accept

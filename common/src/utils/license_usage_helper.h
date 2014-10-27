@@ -8,7 +8,7 @@
 
 #include <utils/common/connective.h>
 
-static const QString QN_LICENSE_URL(lit("http://networkoptix.com/nolicensed_vms/activate.php"));
+static const QString QN_LICENSE_URL(lit("http://licensing.networkoptix.com/nxlicensed/activate.php"));
 
 class QnLicenseUsageHelper: public Connective<QObject>
 {

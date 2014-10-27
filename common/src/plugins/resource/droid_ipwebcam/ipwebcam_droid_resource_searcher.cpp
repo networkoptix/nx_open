@@ -154,7 +154,7 @@ QnResourceList QnPlIpWebCamResourceSearcher::findResources()
 
         QString name = QLatin1String("DroidLive");
 
-        foreach(AnDroidDev ad, alist)
+        for(AnDroidDev ad: alist)
         {
             if (ad.android)
             {
@@ -178,7 +178,7 @@ QnResourceList QnPlIpWebCamResourceSearcher::findResources()
                 resource->setTypeId(rt);
                 resource->setName(name);
                 resource->setMAC(QnMacAddress(smac));
-                resource->setHostAddress(QHostAddress(ad.ip).toString(), QnDomainMemory);
+                resource->setHostAddress(QHostAddress(ad.ip).toString());
                 
                 resource->setDiscoveryAddr(QHostAddress(ad.localAddr));
 

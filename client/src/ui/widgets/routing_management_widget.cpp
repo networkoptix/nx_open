@@ -91,9 +91,7 @@ void QnRoutingManagementWidget::updateModel() {
         return;
     }
 
-    int port = QUrl(m_server->getApiUrl()).port();
-    if (port == -1)
-        port = defaultRtspPort;
+    quint16 port = m_server->getPort();
 
     QList<QUrl> addresses;
     foreach (const QHostAddress &address, m_server->getNetAddrList()) {
@@ -156,14 +154,14 @@ void QnRoutingManagementWidget::at_addButton_clicked() {
         url.setPort(defaultRtspPort);
 
     QList<QUrl> urls = m_server->getAdditionalUrls();
-    if ((m_server->getNetAddrList().contains(QHostAddress(url.host())) && url.port() == QUrl(m_server->getApiUrl()).port()) || urls.contains(url)) {
+    if ((m_server->getNetAddrList().contains(QHostAddress(url.host())) && url.port() == m_server->getPort()) || urls.contains(url)) {
         QMessageBox::warning(this, tr("Warning"), tr("This URL is already in the address list."));
         return;
     }
 
     urls.append(url);
 
-    connection2()->getDiscoveryManager()->addDiscoveryInformation(m_server->getId(), QList<QUrl>() << url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    connection2()->getDiscoveryManager()->addDiscoveryInformation(m_server->getId(), url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     m_server->setAdditionalUrls(urls);
 }
 
@@ -182,7 +180,7 @@ void QnRoutingManagementWidget::at_removeButton_clicked() {
     if (!urls.removeOne(url))
         return;
 
-    connection2()->getDiscoveryManager()->removeDiscoveryInformation(m_server->getId(), QList<QUrl>() << url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    connection2()->getDiscoveryManager()->removeDiscoveryInformation(m_server->getId(), url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     m_server->setAdditionalUrls(urls);
 
     if (m_sortedServerAddressesModel->rowCount() > 0) {
@@ -245,7 +243,7 @@ void QnRoutingManagementWidget::at_addressesView_doubleClicked(const QModelIndex
     if (oldUrl == url)
         return;
 
-    if (m_server->getNetAddrList().contains(QHostAddress(url.host())) && url.port() == QUrl(m_server->getApiUrl()).port()) {
+    if (m_server->getNetAddrList().contains(QHostAddress(url.host())) && url.port() == m_server->getPort()) {
         QMessageBox::warning(this, tr("Warning"), tr("This URL is already in the address list."));
         return;
     }
@@ -255,8 +253,8 @@ void QnRoutingManagementWidget::at_addressesView_doubleClicked(const QModelIndex
     urls.append(url);
     m_server->setAdditionalUrls(urls);
 
-    connection2()->getDiscoveryManager()->removeDiscoveryInformation(m_server->getId(), QList<QUrl>() << oldUrl, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-    connection2()->getDiscoveryManager()->addDiscoveryInformation(m_server->getId(), QList<QUrl>() << url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    connection2()->getDiscoveryManager()->removeDiscoveryInformation(m_server->getId(), oldUrl, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    connection2()->getDiscoveryManager()->addDiscoveryInformation(m_server->getId(), url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
 void QnRoutingManagementWidget::at_serverAddressesModel_ignoreChangeRequested(const QString &address, bool ignore) {
@@ -277,7 +275,7 @@ void QnRoutingManagementWidget::at_serverAddressesModel_ignoreChangeRequested(co
         if (ignoredUrls.contains(url))
             return;
         ignoredUrls.append(url);
-        connection2()->getDiscoveryManager()->addDiscoveryInformation(m_server->getId(), QList<QUrl>() << url, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        connection2()->getDiscoveryManager()->addDiscoveryInformation(m_server->getId(), url, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
         if (url.port() == -1)
             ui->warningLabel->show();
     } else {
@@ -285,9 +283,9 @@ void QnRoutingManagementWidget::at_serverAddressesModel_ignoreChangeRequested(co
             return;
 
         if (url.port() == -1)
-            connection2()->getDiscoveryManager()->removeDiscoveryInformation(m_server->getId(), QList<QUrl>() << url, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+            connection2()->getDiscoveryManager()->removeDiscoveryInformation(m_server->getId(), url, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
         else
-            connection2()->getDiscoveryManager()->addDiscoveryInformation(m_server->getId(), QList<QUrl>() << url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+            connection2()->getDiscoveryManager()->addDiscoveryInformation(m_server->getId(), url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     }
     m_server->setIgnoredUrls(ignoredUrls);
 }

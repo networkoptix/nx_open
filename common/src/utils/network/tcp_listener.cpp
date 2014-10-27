@@ -131,7 +131,7 @@ void QnTcpListener::removeDisconnectedConnections()
         }
     }
 
-    foreach(QnLongRunnable* processor, toDeleteList)
+    for(QnLongRunnable* processor: toDeleteList)
         delete processor;
 }
 
@@ -225,15 +225,15 @@ void QnTcpListener::run()
                 NX_LOG( lit("TCPListener (%1:%2). Switching port to: %3").arg(d->serverAddress.toString()).arg(d->localPort).arg(d->newPort), cl_logWARNING );
                 removeAllConnections();
                 delete d->serverSocket;
+                int oldPort = d->localPort;
+                d->localPort = d->newPort;
+                d->newPort = 0;
                 if( !bindToLocalAddress() )
                 {
                     QThread::msleep(1000);
                     continue;
                 }
-                NX_LOG( lit("TCPListener (%1:%2). Switched to port %3").arg(d->serverAddress.toString()).arg(d->localPort).arg(d->newPort), cl_logWARNING );
-
-                d->localPort = d->newPort;
-                d->newPort = 0;
+                NX_LOG( lit("TCPListener (%1:%2). Switched to port %3").arg(d->serverAddress.toString()).arg(oldPort).arg(d->localPort), cl_logWARNING );
             }
 
             AbstractStreamSocket* clientSocket = d->serverSocket->accept();

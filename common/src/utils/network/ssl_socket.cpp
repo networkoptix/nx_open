@@ -1759,6 +1759,12 @@ bool QnSSLSocket::dispatchImpl( std::function<void()>&& handler )
     return d->wrappedSocket->dispatch( std::move(handler) );
 }
 
+void QnSSLSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
+{
+    Q_D(const QnSSLSocket);
+    return d->wrappedSocket->terminateAsyncIO( waitForRunningHandlerCompletion );
+}
+
 bool QnSSLSocket::connectWithoutEncryption(
     const QString& foreignAddress,
     unsigned short foreignPort,

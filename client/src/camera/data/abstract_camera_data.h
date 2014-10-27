@@ -39,6 +39,13 @@ public:
     virtual void append(const QList<QnAbstractCameraDataPtr> &other) = 0;
 
     /**
+     * @brief trim                                  Trim the last data source period if it is not finished.
+     * @param trimTime                              Value to be set as the end time of the last time period.
+     * @return                                      True if the data source was modified, false otherwise.
+     */
+    virtual bool trim(qint64 trimTime) = 0;
+
+    /**
      * @brief clear                                 Remove all data from the struct.
      */
     virtual void clear() = 0;

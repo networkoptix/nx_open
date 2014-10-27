@@ -4,6 +4,8 @@
 * PollSet class implementation for win32
 ***********************************************************/
 
+#if 0
+
 #ifdef _WIN32
 
 #include "pollset.h"
@@ -304,7 +306,7 @@ namespace aio
     }
 
     //!Remove socket from set
-    void* PollSet::remove( Socket* const sock, aio::EventType eventType )
+    void PollSet::remove( Socket* const sock, aio::EventType eventType )
     {
 #ifdef _DEBUG
         sock->handle(); //checking that socket object is still alive, since linux and mac implementation use socket in PollSet::remove
@@ -316,22 +318,12 @@ namespace aio
         {
             void* userData = it->second;
             setToUse->erase( it );
-            return userData;
         }
-
-        return nullptr;
     }
 
     size_t PollSet::size() const
     {
         return std::max<size_t>( m_impl->readSockets.size(), m_impl->writeSockets.size() );
-    }
-
-    void* PollSet::getUserData( Socket* const sock, EventType eventType ) const
-    {
-        PolledSockets* setToUse = NULL;
-        PolledSockets::iterator it = m_impl->findSocketContextIter( sock, eventType, &setToUse );
-        return it != setToUse->end() ? it->second : NULL;
     }
 
     /*!
@@ -354,6 +346,8 @@ namespace aio
             timeout.tv_usec = (millisToWait % 1000) * 1000;
         }
         int result = select( 0, &m_impl->readfds, &m_impl->writefds, &m_impl->exceptfds, millisToWait >= 0 ? &timeout : NULL );
+        if( result > 0 )
+            int x = 0;
         if( (result > 0) && FD_ISSET( m_impl->dummySocket->handle(), &m_impl->readfds ) )
         {
             //reading dummy socket
@@ -394,5 +388,7 @@ namespace aio
         return FD_SETSIZE / 2 - 1;  //1 - for dummy socket, /2 is required to be able to add any socket already present (we MUST always handle every socket in single thread)
     }
 }
+
+#endif
 
 #endif

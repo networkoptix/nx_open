@@ -19,6 +19,24 @@ class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource {
     Q_OBJECT
 
 public:
+    QnSecurityCamResource();
+    virtual ~QnSecurityCamResource();
+
+    //!Overrides \a QnResource::getName. Returns camera name (from \a QnCameraUserAttributes) of
+    virtual QString getName() const override;
+    //!Overrides \a QnResource::setName. Just calls \a QnSecurityCamResource::setCameraName
+    /*!
+        TODO get rid of this override, since mediaserver and client must call different methods (setName and setCameraName respectively)
+    */
+    virtual void setName( const QString& name ) override;
+    //!Set camera name (the one is show to the user in client)
+    /*!
+        This name is set by user.
+        Resource name is generally set automatically (e.g., by server)
+        Can differ from resource name
+    */
+    void setCameraName( const QString& newCameraName );
+
     Qn::MotionTypes supportedMotionType() const;
     bool isAudioSupported() const;
     Qn::MotionType getCameraBasedMotionType() const;
@@ -30,11 +48,7 @@ public:
 
     bool hasMotion() const;
     Qn::MotionType getMotionType() const;
-    Qn::MotionType getMotionTypeRaw() const;
     void setMotionType(Qn::MotionType value);
-
-    QnSecurityCamResource();
-    virtual ~QnSecurityCamResource();
 
     //!Returns driver (built-in or external) name, used to manage camera
     /*!
@@ -46,22 +60,26 @@ public:
 
     virtual int reservedSecondStreamFps() const;
 
-    virtual QSize getMaxSensorSize() const;
-
     virtual void setIframeDistance(int frames, int timems) = 0; // sets the distance between I frames
 
     void setDataProviderFactory(QnDataProviderFactory* dpFactory);
 
     QList<QnMotionRegion> getMotionRegionList() const;
-    void setMotionRegionList(const QList<QnMotionRegion>& maskList, QnDomain domain);
+    void setMotionRegionList(const QList<QnMotionRegion>& maskList);
 
     QnMotionRegion getMotionRegion(int channel) const;
-    void setMotionRegion(const QnMotionRegion& mask, QnDomain domain, int channel);
+    void setMotionRegion(const QnMotionRegion& mask, int channel);
 
     QRegion getMotionMask(int channel) const;
 
+    ////!Get camera settings, which are generally modified by user
+    ///*!
+    //    E.g., recording schedule, motion type, second stream quality, etc...
+    //*/
+    //QnCameraUserAttributes getUserCameraSettings() const;
+
     void setScheduleTasks(const QnScheduleTaskList &scheduleTasks);
-    const QnScheduleTaskList getScheduleTasks() const;
+    QnScheduleTaskList getScheduleTasks() const;
 
     virtual bool hasDualStreaming() const;
 
@@ -198,9 +216,8 @@ public slots:
     virtual void recordingEventDetached();
 
 signals:
-    void scheduleDisabledChanged(const QnSecurityCamResourcePtr &resource);
-    void scheduleTasksChanged(const QnSecurityCamResourcePtr &resource);
-    void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
+    void scheduleDisabledChanged(const QnResourcePtr &resource);
+    void scheduleTasksChanged(const QnResourcePtr &resource);
     void groupNameChanged(const QnSecurityCamResourcePtr &resource);
     void motionRegionChanged(const QnResourcePtr &resource);
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonParamsEncoded);
@@ -246,31 +263,29 @@ protected:
     virtual void stopInputPortMonitoring();
     virtual bool isInputPortMonitored() const;
 
-    virtual void parameterValueChangedNotify(const QnParam &param) override;
-
-protected:
-    QList<QnMotionRegion> m_motionMaskList;
-
 private:
+    //QList<QnMotionRegion> m_motionMaskList;
     QnDataProviderFactory *m_dpFactory;
-    QnScheduleTaskList m_scheduleTasks;
-    Qn::MotionType m_motionType;
+    //QnScheduleTaskList m_scheduleTasks;
+    //mutable Qn::MotionType m_motionType;
     QAtomicInt m_inputPortListenerCount;
     int m_recActionCnt;
     QString m_groupName;
     QString m_groupId;
-    Qn::SecondStreamQuality  m_secondaryQuality;
-    bool m_cameraControlDisabled;
+    //Qn::SecondStreamQuality m_secondaryQuality;
+    //bool m_cameraControlDisabled;
     Qn::CameraStatusFlags m_statusFlags;
-    bool m_scheduleDisabled;
-    bool m_audioEnabled;
+    //bool m_scheduleDisabled;
+    //bool m_audioEnabled;
     bool m_advancedWorking;
     bool m_manuallyAdded;
     QString m_model;
     QString m_vendor;
-    int m_minDays;
-    int m_maxDays;
-    QnUuid m_preferedServerId;
+    //int m_minDays;
+    //int m_maxDays;
+    //QnUuid m_preferedServerId;
+
+    //QnMotionRegion getMotionRegionNonSafe(int channel) const;
 };
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)

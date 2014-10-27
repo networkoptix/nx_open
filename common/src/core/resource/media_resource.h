@@ -67,7 +67,8 @@ protected:
 
 protected:
     mutable QnCustomResourceVideoLayoutPtr m_customVideoLayout;
-    QnMediaDewarpingParams m_dewarpingParams;
+    //QnMediaDewarpingParams m_dewarpingParams;
+
 private:
     mutable QString m_cachedLayout;
     mutable QMutex m_layoutMutex;

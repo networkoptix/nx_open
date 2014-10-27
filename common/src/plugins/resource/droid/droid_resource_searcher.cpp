@@ -85,10 +85,8 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
                 continue;
 
             resource->setTypeId(rt);
-            //resource->setName(QString("Droid device ") + ip);
             resource->setName(QLatin1String("DroidLive"));
             resource->setMAC(QnMacAddress(data[2].replace(QLatin1Char(':'), QLatin1Char('-')).toUpper()));
-            //resource->setHostAddress(hostAddr, QnDomainMemory);
             resource->setDiscoveryAddr(QHostAddress(m_socketList[i]->getLocalAddress().address.toString()));
 
             resource->setUrl(QLatin1String("raw://") + data[1]);
@@ -98,7 +96,7 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
     }
 
     QnResourceList resList;
-    foreach(QnResourcePtr resPtr, result)
+    for(const QnResourcePtr& resPtr: result)
         resList << resPtr;
     return resList;
 }

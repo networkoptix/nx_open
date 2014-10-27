@@ -32,7 +32,7 @@ QnActiResource::QnActiResource()
 {
     setVendor(lit("ACTI"));
 
-    setAuth(QLatin1String("admin"), QLatin1String("123456"));
+    setAuth(QLatin1String("admin"), QLatin1String("123456"), false);
     for (uint i = 0; i < sizeof(DEFAULT_AVAIL_BITRATE_KBPS)/sizeof(int); ++i)
         m_availBitrate << DEFAULT_AVAIL_BITRATE_KBPS[i];
 }
@@ -131,7 +131,7 @@ QList<QSize> QnActiResource::parseResolutionStr(const QByteArray& resolutions)
 {
     QList<QSize> result;
     QList<QSize> availResolutions;
-    foreach(const QByteArray& r, resolutions.split(','))
+    for(const QByteArray& r: resolutions.split(','))
         result << extractResolution(r);
     qSort(result.begin(), result.end(), resolutionGreaterThan);
     return result;
@@ -141,7 +141,7 @@ QMap<QByteArray, QByteArray> QnActiResource::parseSystemInfo(const QByteArray& r
 {
     QMap<QByteArray, QByteArray> result;
     QList<QByteArray> lines = report.split('\n');
-    foreach(const QByteArray& line, lines) {
+    for(const QByteArray& line: lines) {
         QList<QByteArray> tmp = line.split('=');
         result.insert(tmp[0].trimmed().toLower(), tmp.size() >= 2 ? tmp[1].trimmed() : "");
     }
@@ -188,7 +188,7 @@ void QnActiResource::cameraMessageReceived( const QString& path, const QnRequest
 QList<int> QnActiResource::parseVideoBitrateCap(const QByteArray& bitrateCap) const
 {
     QList<int> result;
-    foreach(QByteArray bitrate, bitrateCap.split(','))
+    for(QByteArray bitrate: bitrateCap.split(','))
     {
         bitrate = bitrate.trimmed().toUpper();
         int coeff = 1;
@@ -288,7 +288,7 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     
     for (int i = 0; i < MAX_STREAMS && i < fpsList.size(); ++i) {
         QList<QByteArray> fps = fpsList[i].split(',');
-        foreach(const QByteArray& data, fps)
+        for(const QByteArray& data: fps)
             m_availFps[i] << data.toInt();
         qSort(m_availFps[i]);
     }
@@ -311,9 +311,9 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     QScopedPointer<QnAbstractPtzController> ptzController(createPtzControllerInternal());
     setPtzCapabilities(ptzController->getCapabilities());
 
-    setParam(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0, QnDomainDatabase);
-    setParam(Qn::MAX_FPS_PARAM_NAME, getMaxFps(), QnDomainDatabase);
-    setParam(Qn::HAS_DUAL_STREAMING_PARAM_NAME, !m_resolution[1].isEmpty() ? 1 : 0, QnDomainDatabase);
+    setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0);
+    setProperty(Qn::MAX_FPS_PARAM_NAME, getMaxFps());
+    setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, !m_resolution[1].isEmpty() ? 1 : 0);
 
     //detecting and saving selected resolutions
     CameraMediaStreams mediaStreams;
@@ -325,11 +325,6 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     saveParams();
 
     return CameraDiagnostics::NoErrorResult();
-}
-
-bool QnActiResource::isResourceAccessible()
-{
-    return updateMACAddress();
 }
 
 bool QnActiResource::startInputPortMonitoring()
@@ -533,10 +528,7 @@ bool QnActiResource::isAudioSupported() const
 
 bool QnActiResource::hasDualStreaming() const
 {
-    QVariant mediaVariant;
-    QnActiResource* this_casted = const_cast<QnActiResource*>(this);
-    this_casted->getParam(Qn::HAS_DUAL_STREAMING_PARAM_NAME, mediaVariant, QnDomainMemory);
-    return mediaVariant.toBool();
+    return getProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME).toInt() > 0;
 }
 
 QnAbstractPtzController *QnActiResource::createPtzControllerInternal()

@@ -105,7 +105,7 @@ void QnLiveStreamProvider::setSecondaryQuality(Qn::SecondStreamQuality  quality)
     {
         // must be primary, so should inform secondary
         m_cameraRes->lockConsumers();
-        foreach(QnResourceConsumer* consumer, m_cameraRes->getAllConsumers())
+        for(QnResourceConsumer* consumer: m_cameraRes->getAllConsumers())
         {
             QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
             if (lp && lp->getRole() == Qn::CR_SecondaryLiveVideo) {
@@ -206,7 +206,7 @@ void QnLiveStreamProvider::setFps(float f)
     {
         // must be primary, so should inform secondary
         m_cameraRes->lockConsumers();
-        foreach(QnResourceConsumer* consumer, m_cameraRes->getAllConsumers())
+        for(QnResourceConsumer* consumer: m_cameraRes->getAllConsumers())
         {
             QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
             if (lp && lp->getRole() == Qn::CR_SecondaryLiveVideo)
@@ -359,7 +359,7 @@ bool QnLiveStreamProvider::hasRunningLiveProvider(QnNetworkResource* netRes)
 {
     bool rez = false;
     netRes->lockConsumers();
-    foreach(QnResourceConsumer* consumer, netRes->getAllConsumers())
+    for(QnResourceConsumer* consumer: netRes->getAllConsumers())
     {
         QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
         if (lp)

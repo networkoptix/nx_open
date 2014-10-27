@@ -5,9 +5,11 @@
 #include <QtCore/QObject>
 #include <QtCore/QMutex>
 
+#include <nx_ec/data/api_fwd.h>
+
 #include <utils/common/singleton.h>
 #include <utils/common/connective.h>
-#include <utils/common/email.h>
+#include <utils/common/email_fwd.h>
 
 #include <core/resource/resource_fwd.h>
 
@@ -24,7 +26,7 @@ public:
     QnGlobalSettings(QObject *parent = NULL);
     virtual ~QnGlobalSettings();
 
-    QnKvPairList allSettings() const;
+    ec2::ApiResourceParamDataList allSettings() const;
 
     QSet<QString> disabledVendorsSet() const;
     QString disabledVendors() const;
@@ -33,8 +35,8 @@ public:
     bool isCameraSettingsOptimizationEnabled() const;
     void setCameraSettingsOptimizationEnabled(bool cameraSettingsOptimizationEnabled);
 
-    QnEmail::Settings emailSettings() const;
-    void setEmailSettings(const QnEmail::Settings &settings);
+    QnEmailSettings emailSettings() const;
+    void setEmailSettings(const QnEmailSettings &settings);
 
     void synchronizeNow();
     QnUserResourcePtr getAdminUser();
@@ -53,6 +55,7 @@ private:
 
     // set of email settings adaptors
     QnResourcePropertyAdaptor<QString> *m_serverAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_fromAdaptor;
     QnResourcePropertyAdaptor<QString> *m_userAdaptor;
     QnResourcePropertyAdaptor<QString> *m_passwordAdaptor;
     QnResourcePropertyAdaptor<QString> *m_signatureAdaptor;

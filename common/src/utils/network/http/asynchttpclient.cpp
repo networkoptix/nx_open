@@ -50,7 +50,16 @@ namespace nx_http
     QSharedPointer<AbstractStreamSocket> AsyncHttpClient::takeSocket()
     {
         QSharedPointer<AbstractStreamSocket> result = m_socket;
-        terminate();
+
+        {
+            QMutexLocker lk( &m_mutex );
+            m_terminated = true;
+        }
+        //after we set m_terminated to true with m_mutex locked socket event processing is stopped and m_socket cannot change its value
+        if( result )
+            result->cancelAsyncIO();
+        //AIOService guarantees that eventTriggered had returned and will never be called with m_socket
+
         m_socket.clear();
         return result;
     }
@@ -65,12 +74,8 @@ namespace nx_http
         }
         //after we set m_terminated to true with m_mutex locked socket event processing is stopped and m_socket cannot change its value
         if( m_socket )
-        {
-            m_socket->cancelAsyncIO( aio::etWrite );
-            m_socket->cancelAsyncIO( aio::etRead );
-
-            //AIOService guarantees that eventTriggered had returned and will never be called with m_socket
-        }
+            m_socket->terminateAsyncIO( true );
+        //AIOService guarantees that eventTriggered had returned and will never be called with m_socket
     }
 
     void AsyncHttpClient::asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode )
@@ -479,13 +484,21 @@ namespace nx_http
     void AsyncHttpClient::resetDataBeforeNewRequest()
     {
         //stopping client, if it is running
-        terminate();
+        {
+            QMutexLocker lk( &m_mutex );
+            m_terminated = true;
+        }
+        //after we set m_terminated to true with m_mutex locked socket event processing is stopped and m_socket cannot change its value
+        if( m_socket )
+            m_socket->cancelAsyncIO();
+
         {
             QMutexLocker lk( &m_mutex );
             m_terminated = false;
         }
 
         m_authorizationTried = false;
+        m_request = nx_http::Request();
     }
 
     bool AsyncHttpClient::initiateHttpMessageDelivery( const QUrl& url )
@@ -496,6 +509,7 @@ namespace nx_http
 
         if( m_socket )
         {
+            //TODO #ak think again about next cancellation
             m_socket->cancelAsyncIO( aio::etWrite );
             m_socket->cancelAsyncIO( aio::etRead );
 
@@ -595,6 +609,9 @@ namespace nx_http
             //m_request.headers.insert( std::make_pair("Connection", "keep-alive") );
             m_request.headers.insert( std::make_pair("Host", m_url.host().toLatin1()) );
         }
+
+        m_request.headers.insert(m_additionalHeaders.cbegin(), m_additionalHeaders.cend());
+
         //adding user credentials
 
         if (m_authType == authBasicAndDigest)
@@ -615,7 +632,7 @@ namespace nx_http
 
     void AsyncHttpClient::addRequestHeader(const StringType& key, const StringType& value)
     {
-        m_request.headers.insert( make_pair(key, value) );
+        m_additionalHeaders.insert( make_pair(key, value) );
     }
 
     void AsyncHttpClient::serializeRequest()

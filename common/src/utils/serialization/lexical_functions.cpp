@@ -103,7 +103,7 @@ bool deserialize(const QString &value, QColor *target) {
             return false;
 
         QList<int> colors;
-        foreach(const QString &arg, args) {
+        for(const QString &arg: args) {
             bool ok = false;
             int color = arg.toInt(&ok);
             if(!ok)

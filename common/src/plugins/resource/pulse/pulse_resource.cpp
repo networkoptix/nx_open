@@ -10,12 +10,7 @@ const QString QnPlPulseResource::MANUFACTURE(lit("Pulse"));
 QnPlPulseResource::QnPlPulseResource()
 {
     setVendor(lit("Pulse"));
-    setAuth(QLatin1String("admin"), QLatin1String("admin"));
-}
-
-bool QnPlPulseResource::isResourceAccessible()
-{
-    return updateMACAddress();
+    setAuth(QLatin1String("admin"), QLatin1String("admin"), false);
 }
 
 QString QnPlPulseResource::getDriverName() const

@@ -80,7 +80,7 @@ QnVideoTranscoder::QnVideoTranscoder(CodecID codecId):
 
 QnVideoTranscoder::~QnVideoTranscoder()
 {
-    foreach(QnAbstractImageFilter* filter, m_filters)
+    for(QnAbstractImageFilter* filter: m_filters)
         delete filter;
 }
 
@@ -101,7 +101,7 @@ void QnVideoTranscoder::addFilter(QnAbstractImageFilter* filter)
 
 void QnVideoTranscoder::processFilterChain(CLVideoDecoderOutput* decodedFrame, const QRectF& updateRect, qreal ar)
 {
-    foreach(QnAbstractImageFilter* filter, m_filters)
+    for(QnAbstractImageFilter* filter: m_filters)
         filter->updateImage(decodedFrame, updateRect, ar);
 }
 

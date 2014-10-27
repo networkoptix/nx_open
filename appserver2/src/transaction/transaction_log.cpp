@@ -114,16 +114,12 @@ QnUuid QnTransactionLog::makeHash(const QByteArray& data1, const QByteArray& dat
     return QnUuid::fromRfc4122(hash.result());
 }
 
-QnUuid QnTransactionLog::transactionHash(const ApiResourceParamsData& params) const
+QnUuid QnTransactionLog::transactionHash(const ApiResourceParamWithRefData& param) const
 {
     QCryptographicHash hash(QCryptographicHash::Md5);
     hash.addData("res_params");
-    hash.addData(params.id.toRfc4122());
-    foreach(const ApiResourceParamData& param, params.params) {
-        hash.addData(param.name.toUtf8());
-        if (param.predefinedParam)
-            hash.addData("1");
-    }
+    hash.addData(param.resourceId.toRfc4122());
+    hash.addData(param.name.toUtf8());
     return QnUuid::fromRfc4122(hash.result());
 }
 
@@ -135,20 +131,18 @@ QnUuid QnTransactionLog::makeHash(const QString& extraData, const ApiCameraBookm
     return QnUuid::fromRfc4122(hash.result());
 }
 
-QnUuid QnTransactionLog::makeHash(const QString &extraData, const ApiDiscoveryDataList &data) const {
+QnUuid QnTransactionLog::makeHash(const QString &extraData, const ApiDiscoveryData &data) const {
     QCryptographicHash hash(QCryptographicHash::Md5);
     hash.addData(extraData.toUtf8());
-    foreach (const ApiDiscoveryData &item, data) {
-        hash.addData(item.url.toUtf8());
-        hash.addData(item.id.toString().toUtf8());
-    }
+    hash.addData(data.url.toUtf8());
+    hash.addData(data.id.toString().toUtf8());
     return QnUuid::fromRfc4122(hash.result());
 }
 
 ErrorCode QnTransactionLog::updateSequence(const ApiUpdateSequenceData& data)
 {
     QnDbManager::Locker locker(dbManager);
-    foreach(const ApiSyncMarkerRecord& record, data.markers) 
+    for(const ApiSyncMarkerRecord& record: data.markers) 
     {
         ErrorCode result = updateSequenceNoLock(record.peerID, record.dbID, record.sequence);
         if (result != ErrorCode::ok)
@@ -289,8 +283,9 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
 {
     QReadLocker lock(&m_dbManager->getMutex());
     QMap <QnTranStateKey, int> tranLogSequence;
-    foreach(const QnTranStateKey& key, m_state.values.keys())
+    for(auto itr = m_state.values.begin(); itr != m_state.values.end(); ++itr)
     {
+        const QnTranStateKey& key = itr.key();
         QSqlQuery query(m_dbManager->getDB());
         query.prepare("SELECT tran_data, sequence FROM transaction_log WHERE peer_guid = ? and db_guid = ? and sequence > ?  order by sequence");
         query.addBindValue(key.peerID.toRfc4122());

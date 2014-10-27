@@ -38,7 +38,7 @@ QnThirdPartyResource::QnThirdPartyResource(
     m_encoderCount(0)
 {
     setVendor( discoveryManager.getVendorName() );
-    setAuth( QString::fromUtf8(camInfo.defaultLogin), QString::fromUtf8(camInfo.defaultPassword) );
+    setAuth( QString::fromUtf8(camInfo.defaultLogin), QString::fromUtf8(camInfo.defaultPassword), false );
 }
 
 QnThirdPartyResource::~QnThirdPartyResource()
@@ -54,11 +54,6 @@ QnAbstractPtzController* QnThirdPartyResource::createPtzControllerInternal()
     if( !ptzManager )
         return NULL;
     return new QnThirdPartyPtzController( toSharedPointer().staticCast<QnThirdPartyResource>(), ptzManager );
-}
-
-bool QnThirdPartyResource::isResourceAccessible()
-{
-    return updateMACAddress();
 }
 
 bool QnThirdPartyResource::ping()
@@ -208,7 +203,7 @@ QnTimePeriodList QnThirdPartyResource::getDtsTimePeriodsByMotionRegion(
         }
 
         const QVector<QRect>& rects = unitedRegion.rects();
-        foreach( QRect r, rects )
+        for(const  QRect& r: rects )
         {
             for( int y = r.top(); y < std::min<int>(motionDataPicture->height(), r.bottom()); ++y )
                 for( int x = r.left(); x < std::min<int>(motionDataPicture->width(), r.right()); ++x )
@@ -396,7 +391,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     //we support only two streams from camera
     m_encoderCount = m_encoderCount > 2 ? 2 : m_encoderCount;
 
-    setParam( Qn::HAS_DUAL_STREAMING_PARAM_NAME, (m_encoderCount > 1) ? 1 : 0, QnDomainDatabase );
+    setProperty( Qn::HAS_DUAL_STREAMING_PARAM_NAME, (m_encoderCount > 1) ? 1 : 0);
 
     //setting camera capabilities
     unsigned int cameraCapabilities = 0;
@@ -446,27 +441,26 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         }
         ptzManager->releaseRef();
     }
-    setParam(
+    setProperty(
         Qn::IS_AUDIO_SUPPORTED_PARAM_NAME,
-        (cameraCapabilities & nxcip::BaseCameraManager::audioCapability) ? 1 : 0,
-        QnDomainDatabase );
+        (cameraCapabilities & nxcip::BaseCameraManager::audioCapability) ? 1 : 0);
     if( cameraCapabilities & nxcip::BaseCameraManager::dtsArchiveCapability )
     {
-        setParam( Qn::DTS_PARAM_NAME, 1, QnDomainDatabase );
-        setParam( Qn::ANALOG_PARAM_NAME, 1, QnDomainDatabase );
+        setProperty( Qn::DTS_PARAM_NAME, 1);
+        setProperty( Qn::ANALOG_PARAM_NAME, 1);
     }
     if( cameraCapabilities & nxcip::BaseCameraManager::hardwareMotionCapability )
     {
-        setMotionType( Qn::MT_HardwareGrid );
-        setParam( Qn::MOTION_WINDOW_CNT_PARAM_NAME, 100, QnDomainDatabase );
-        setParam( Qn::MOTION_MASK_WINDOW_CNT_PARAM_NAME, 100, QnDomainDatabase );
-        setParam( Qn::MOTION_SENS_WINDOW_CNT_PARAM_NAME, 100, QnDomainDatabase );
-        setParam( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("softwaregrid,hardwaregrid"), QnDomainDatabase );
+        //setMotionType( Qn::MT_HardwareGrid );
+        setProperty( Qn::MOTION_WINDOW_CNT_PARAM_NAME, 100);
+        setProperty( Qn::MOTION_MASK_WINDOW_CNT_PARAM_NAME, 100);
+        setProperty( Qn::MOTION_SENS_WINDOW_CNT_PARAM_NAME, 100);
+        setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("softwaregrid,hardwaregrid"));
     }
     else
     {
-        setMotionType( Qn::MT_SoftwareGrid );
-        setParam( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("softwaregrid"), QnDomainDatabase );
+        //setMotionType( Qn::MT_SoftwareGrid );
+        setProperty( Qn::SUPPORTED_MOTION_PARAM_NAME, QStringLiteral("softwaregrid"));
     }
     if( cameraCapabilities & nxcip::BaseCameraManager::shareFpsCapability )
 		setStreamFpsSharingMethod(Qn::BasicFpsSharing);
@@ -518,12 +512,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     if( !maxFps )
         maxFps = DEFAULT_MAX_FPS_IN_CASE_IF_UNKNOWN;
 
-    if( !setParam( MAX_FPS_PARAM_NAME, maxFps, QnDomainDatabase ) )
-    {
-        NX_LOG( lit("Failed to set %1 parameter to %2 for third-party camera %3:%4 (url %5)").
-            arg(MAX_FPS_PARAM_NAME).arg(maxFps).arg(m_discoveryManager.getVendorName()).
-            arg(QString::fromUtf8(m_camInfo.modelName)).arg(QString::fromUtf8(m_camInfo.url)), cl_logDEBUG1 );
-    }
+    setProperty( MAX_FPS_PARAM_NAME, maxFps);
 
     if( (cameraCapabilities & nxcip::BaseCameraManager::relayInputCapability) ||
         (cameraCapabilities & nxcip::BaseCameraManager::relayOutputCapability) )
@@ -622,7 +611,7 @@ nxcip::Resolution QnThirdPartyResource::getNearestResolution( int encoderNumber,
 {
     const QList<nxcip::Resolution>& resolutionList = getEncoderResolutionList( encoderNumber );
     nxcip::Resolution foundResolution;
-    foreach( nxcip::Resolution resolution, resolutionList )
+    for(const  nxcip::Resolution& resolution: resolutionList )
     {
         if( resolution.width*resolution.height <= desiredResolution.width*desiredResolution.height &&
             resolution.width*resolution.height > foundResolution.width*foundResolution.height )

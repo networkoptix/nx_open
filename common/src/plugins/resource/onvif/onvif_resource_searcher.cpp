@@ -18,7 +18,7 @@ bool hasRunningLiveProvider(QnNetworkResourcePtr netRes)
 {
     bool rez = false;
     netRes->lockConsumers();
-    foreach(QnResourceConsumer* consumer, netRes->getAllConsumers())
+    for(QnResourceConsumer* consumer: netRes->getAllConsumers())
     {
         QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
         if (lp)
@@ -225,7 +225,7 @@ QnResourceList OnvifResourceSearcher::findResources()
     if (shouldStop())
          return QnResourceList();
 
-    m_wsddSearcher.findResources(result);
+    m_wsddSearcher.findResources( result, discoveryMode() );
 
     return result;
 }

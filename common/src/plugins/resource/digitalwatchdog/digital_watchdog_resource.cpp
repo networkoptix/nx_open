@@ -4,6 +4,9 @@
 #include "onvif/soapDeviceBindingProxy.h"
 #include "dw_ptz_controller.h"
 #include "dw_zoom_ptz_controller.h"
+#include "common/common_module.h"
+#include "core/resource_management/resource_data_pool.h"
+#include "newdw_ptz_controller.h"
 
 const QString CAMERA_SETTINGS_ID_PARAM = lit("cameraSettingsId");
 static const int HTTP_PORT = 80;
@@ -121,12 +124,22 @@ int QnPlWatchDogResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resoluti
     return qMax(1024,result);
 }
 
-QnAbstractPtzController *QnPlWatchDogResource::createPtzControllerInternal() {
-    QScopedPointer<QnAbstractPtzController> result(new QnDwPtzController(toSharedPointer(this)));
-    if(result->getCapabilities() == Qn::NoPtzCapabilities) {
-        result.reset();
-        if(m_hasZoom)
-            result.reset(new QnDwZoomPtzController(toSharedPointer(this)));
+QnAbstractPtzController *QnPlWatchDogResource::createPtzControllerInternal() 
+{
+    QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+    bool useHttpPtz = resourceData.value<bool>(lit("dw-http-ptz"), false);
+    QScopedPointer<QnAbstractPtzController> result;
+    if (useHttpPtz)
+    {
+        result.reset(new QnNewDWPtzController(toSharedPointer(this)));
+    }
+    else {
+        result.reset(new QnDwPtzController(toSharedPointer(this)));
+        if(result->getCapabilities() == Qn::NoPtzCapabilities) {
+            result.reset();
+            if(m_hasZoom)
+                result.reset(new QnDwZoomPtzController(toSharedPointer(this)));
+        }
     }
     return result.take();
 }
@@ -137,9 +150,7 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
     QnPlOnvifResource::fetchAndSetCameraSettings();
 
     QString cameraModel = fetchCameraModel();
-    QVariant baseId;
-    getParam(CAMERA_SETTINGS_ID_PARAM, baseId, QnDomainDatabase);
-    QString baseIdStr = baseId.toString();
+    QString baseIdStr = getProperty(CAMERA_SETTINGS_ID_PARAM);
 
     QString suffix = getIdSuffixByModel(cameraModel);
     if (!suffix.isEmpty()) {
@@ -149,7 +160,7 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
         QString prefix = baseIdStr.split(QLatin1String("-"))[0];
         QString fullCameraType = prefix + suffix;
         if (fullCameraType != baseIdStr)
-            setParam(CAMERA_SETTINGS_ID_PARAM, fullCameraType, QnDomainDatabase);
+            setProperty(CAMERA_SETTINGS_ID_PARAM, fullCameraType);
         baseIdStr = prefix;
     }
 
@@ -188,7 +199,7 @@ QString QnPlWatchDogResource::fetchCameraModel()
     return QString::fromUtf8(response.Model.c_str());
 }
 
-bool QnPlWatchDogResource::getParamPhysical(const QnParam &param, QVariant &val)
+bool QnPlWatchDogResource::getParamPhysical(const QString &param, QVariant &val)
 {
     QMutexLocker lock(&m_physicalParamsMutex);
 
@@ -196,7 +207,7 @@ bool QnPlWatchDogResource::getParamPhysical(const QnParam &param, QVariant &val)
     //to camera. All values can be get by one request, but our framework do getParamPhysical for every single param.
     QDateTime currTime = QDateTime::currentDateTime();
     if (m_advSettingsLastUpdated.isNull() || m_advSettingsLastUpdated.secsTo(currTime) > ADVANCED_SETTINGS_VALID_TIME) {
-        foreach (QnPlWatchDogResourceAdditionalSettingsPtr setting, m_additionalSettings)
+        for (const QnPlWatchDogResourceAdditionalSettingsPtr& setting: m_additionalSettings)
         {
             if (!setting->refreshValsFromCamera())
             {
@@ -206,7 +217,7 @@ bool QnPlWatchDogResource::getParamPhysical(const QnParam &param, QVariant &val)
         m_advSettingsLastUpdated = currTime;
     }
 
-    foreach (QnPlWatchDogResourceAdditionalSettingsPtr setting, m_additionalSettings)
+    for (const QnPlWatchDogResourceAdditionalSettingsPtr& setting: m_additionalSettings)
     {
         //If param is not in list of child, it will return false. Then will try to find it in parent.
         if (setting->getParamPhysicalFromBuffer(param, val))
@@ -219,11 +230,11 @@ bool QnPlWatchDogResource::getParamPhysical(const QnParam &param, QVariant &val)
     return QnPlOnvifResource::getParamPhysical(param, val);
 }
 
-bool QnPlWatchDogResource::setParamPhysical(const QnParam &param, const QVariant& val )
+bool QnPlWatchDogResource::setParamPhysical(const QString &param, const QVariant& val )
 {
     QMutexLocker lock(&m_physicalParamsMutex);
 
-    foreach (QnPlWatchDogResourceAdditionalSettingsPtr setting, m_additionalSettings)
+    for (const QnPlWatchDogResourceAdditionalSettingsPtr& setting: m_additionalSettings)
     {
         //If param is not in list of child, it will return false. Then will try to find it in parent.
 
@@ -263,9 +274,9 @@ bool QnPlWatchDogResourceAdditionalSettings::refreshValsFromCamera()
     return m_cameraProxy->getFromCameraIntoBuffer();
 }
 
-bool QnPlWatchDogResourceAdditionalSettings::getParamPhysicalFromBuffer(const QnParam &param, QVariant &val)
+bool QnPlWatchDogResourceAdditionalSettings::getParamPhysicalFromBuffer(const QString &param, QVariant &val)
 {
-    DWCameraSettings::Iterator it = m_settings.find(param.name());
+    DWCameraSettings::Iterator it = m_settings.find(param);
     if (it != m_settings.end()) {
         if (it.value().getFromBuffer(*m_cameraProxy)){
             val.setValue(it.value().serializeToStr());
@@ -281,12 +292,12 @@ bool QnPlWatchDogResourceAdditionalSettings::getParamPhysicalFromBuffer(const Qn
     return false;
 }
 
-bool QnPlWatchDogResourceAdditionalSettings::setParamPhysical(const QnParam &param, const QVariant& val)
+bool QnPlWatchDogResourceAdditionalSettings::setParamPhysical(const QString &param, const QVariant& val)
 {
     CameraSetting tmp;
     tmp.deserializeFromStr(val.toString());
 
-    DWCameraSettings::Iterator it = m_settings.find(param.name());
+    DWCameraSettings::Iterator it = m_settings.find(param);
     if (it != m_settings.end()) {
         CameraSettingValue oldVal = it.value().getCurrent();
         it.value().setCurrent(tmp.getCurrent());

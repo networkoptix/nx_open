@@ -77,7 +77,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     QString name;
     QString mac;
 
-    foreach(QString line, lines)
+    for(QString line: lines)
     {
         if (line.contains(QLatin1String("root.Network.Bonjour.FriendlyName")))
         {
@@ -109,7 +109,6 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     resource->setName(name);
     resource->setModel(name);
     resource->setMAC(QnMacAddress(mac));
-    //resource->setHostAddress(host, QnDomainMemory);
     QUrl finalUrl(url);
     finalUrl.setScheme(QLatin1String("http"));
     finalUrl.setPort(port);
@@ -195,7 +194,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
 
     smac = smac.toUpper();
 
-    foreach(QnResourcePtr res, result)
+    for(const QnResourcePtr& res: result)
     {
         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
     
@@ -234,8 +233,7 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
     int channels = 1;
     if (firstResource->hasParam(QLatin1String("channelsAmount")))
     {
-        QVariant val;
-        firstResource->getParam(QLatin1String("channelsAmount"), val, QnDomainMemory);
+        QString val = firstResource->getProperty(QLatin1String("channelsAmount"));
         channels = val.toUInt();
     }
     if (channels > 1)

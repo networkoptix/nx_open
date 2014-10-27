@@ -37,6 +37,7 @@ void QnSessionManagerSyncReply::terminate() {
 
 void QnSessionManagerSyncReply::requestFinished(const QnHTTPRawResponse& response, int handle) 
 {
+    Q_UNUSED(handle)
     QMutexLocker locker(&m_mutex);
     m_response = response;
     m_finished = true;
@@ -75,7 +76,7 @@ QnSessionManager::~QnSessionManager() {
 
     {
         QMutexLocker lock(&m_syncReplyMutex);
-        foreach(QnSessionManagerSyncReply* syncReply, m_syncReplyInProgress)
+        for(QnSessionManagerSyncReply* syncReply: m_syncReplyInProgress)
             syncReply->terminate();
     }
 
@@ -300,7 +301,7 @@ void QnSessionManager::at_aboutToBeStopped() {
     m_accessManager = 0;
 }
 
-void QnSessionManager::at_proxyAuthenticationRequired ( const QNetworkProxy & reply, QAuthenticator* authenticator)
+void QnSessionManager::at_proxyAuthenticationRequired ( const QNetworkProxy &, QAuthenticator* authenticator)
 {
     QString user = QnAppServerConnectionFactory::url().userName();
     QString password = QnAppServerConnectionFactory::url().password();
@@ -351,7 +352,7 @@ void QnSessionManager::at_asyncRequestQueued(int operation, AsyncRequestInfo req
     //qDebug() << "api url" << request.url();
 
     bool skipContentType = false;
-    foreach (QnRequestHeader header, headers) {
+    for (const QnRequestHeader& header: headers) {
         if (header.first == QLatin1String("Content-Type"))
             skipContentType = true;
         request.setRawHeader(header.first.toLatin1(), header.second.toUtf8());

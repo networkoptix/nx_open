@@ -7,10 +7,12 @@
 #include <QtCore/QMutexLocker>
 #include <QtXml/QXmlDefaultHandler>
 
+#include <api/global_settings.h>
 #include <common/common_globals.h>
 #include <utils/network/system_socket.h>
 
 #include <utils/common/app_info.h>
+
 
 using namespace std;
 
@@ -18,6 +20,7 @@ static const QHostAddress groupAddress(QLatin1String("239.255.255.250"));
 static const int GROUP_PORT = 1900;
 static const unsigned int MAX_UPNP_RESPONSE_PACKET_SIZE = 512*1024;
 static const int XML_DESCRIPTION_LIVE_TIME_MS = 5*60*1000;
+static const int PARTIAL_DISCOVERY_XML_DESCRIPTION_LIVE_TIME_MS = 24*60*60*1000;
 
 //!Partial parser for SSDP descrition xml (UPnP™ Device Architecture 1.1, 2.3)
 class UpnpDeviceDescriptionSaxHandler
@@ -122,7 +125,7 @@ void UPNPDeviceSearcher::pleaseStop()
         it != m_socketList.end();
         ++it )
     {
-        it->second.sock->cancelAsyncIO( aio::etRead );
+        it->second.sock->terminateAsyncIO( true );
     }
     m_socketList.clear();
 
@@ -220,13 +223,13 @@ void UPNPDeviceSearcher::onSomeBytesRead(
             {
                 if( it->second.sock.get() == sock )
                 {
-                    udpSock = it->second.sock;
+                    udpSock = std::move(it->second.sock);
                     m_socketList.erase( it );
                     break;
                 }
             }
         }
-        udpSock->cancelAsyncIO( aio::etRead );
+        udpSock->terminateAsyncIO( true );
         return;
     }
 
@@ -238,7 +241,6 @@ void UPNPDeviceSearcher::onSomeBytesRead(
         using namespace std::placeholders;
         sock->readSomeAsync( readBuffer, std::bind( &UPNPDeviceSearcher::onSomeBytesRead, this, sock, _1, readBuffer, _2 ) );
     };
-
     std::unique_ptr<UPNPDeviceSearcher, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
     {
@@ -270,7 +272,7 @@ void UPNPDeviceSearcher::onSomeBytesRead(
 
 void UPNPDeviceSearcher::dispatchDiscoverPackets()
 {
-    foreach( QnInterfaceAndAddr iface, getAllIPv4Interfaces() )
+    for(const  QnInterfaceAndAddr& iface: getAllIPv4Interfaces() )
     {
         const std::shared_ptr<AbstractDatagramSocket>& sock = getSockByIntf(iface);
         if( !sock )
@@ -404,7 +406,7 @@ void UPNPDeviceSearcher::processDeviceXml(
 QHostAddress UPNPDeviceSearcher::findBestIface( const QString& host )
 {
     QString oldAddress;
-    foreach( QnInterfaceAndAddr iface, getAllIPv4Interfaces() )
+    for(const  QnInterfaceAndAddr& iface: getAllIPv4Interfaces() )
     {
         const QString& newAddress = iface.address.toString();
         if( isNewDiscoveryAddressBetter(host, newAddress, oldAddress) )
@@ -413,13 +415,25 @@ QHostAddress UPNPDeviceSearcher::findBestIface( const QString& host )
     return QHostAddress(oldAddress);
 }
 
+int UPNPDeviceSearcher::cacheTimeout()
+{
+    int xmlDescriptionLiveTimeout = XML_DESCRIPTION_LIVE_TIME_MS;
+    QSet<QString> disabledVendorsForAutoSearch = QnGlobalSettings::instance()->disabledVendorsSet();
+    if( disabledVendorsForAutoSearch.size() == 1 &&
+        disabledVendorsForAutoSearch.contains(lit("all=partial")) )
+    {
+        xmlDescriptionLiveTimeout = PARTIAL_DISCOVERY_XML_DESCRIPTION_LIVE_TIME_MS;
+    }
+    return xmlDescriptionLiveTimeout;
+}
+
 const UPNPDeviceSearcher::UPNPDescriptionCacheItem* UPNPDeviceSearcher::findDevDescriptionInCache( const QByteArray& uuid )
 {
     std::map<QByteArray, UPNPDescriptionCacheItem>::iterator it = m_upnpDescCache.find( uuid );
     if( it == m_upnpDescCache.end() )
         return NULL;
 
-    if( m_cacheTimer.elapsed() - it->second.creationTimestamp > XML_DESCRIPTION_LIVE_TIME_MS )
+    if( m_cacheTimer.elapsed() - it->second.creationTimestamp > cacheTimeout() )
     {
         //item has expired
         m_upnpDescCache.erase( it );

@@ -42,6 +42,7 @@ private:
         Ready,
         Starting,
         InProgress,
+        InProgressFastScan,
         Stopping
     };
 

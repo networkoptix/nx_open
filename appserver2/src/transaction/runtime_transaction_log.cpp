@@ -108,7 +108,7 @@ QnTranState QnRuntimeTransactionLog::getTransactionsState()
 ErrorCode QnRuntimeTransactionLog::getTransactionsAfter(const QnTranState& state, QList<QnTransaction<ApiRuntimeData>>& result)
 {
     QMutexLocker lock(&m_mutex);
-    foreach (const ApiRuntimeData &data, m_data)
+    for (const ApiRuntimeData &data: m_data)
     {
         QnTranStateKey key(data.peer.id, data.peer.instanceId);
         if (data.version > state.values.value(key)) {

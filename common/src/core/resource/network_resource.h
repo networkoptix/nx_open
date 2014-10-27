@@ -28,7 +28,7 @@ public:
     virtual QString getUniqueId() const;
 
     virtual QString getHostAddress() const;
-    virtual bool setHostAddress(const QString &ip, QnDomain domain = QnDomainMemory);
+    virtual void setHostAddress(const QString &ip);
 
     QnMacAddress getMAC() const;
     void setMAC(const QnMacAddress &mac);
@@ -36,9 +36,9 @@ public:
     QString getPhysicalId() const;
     void setPhysicalId(const QString& physicalId);
 
-    inline void setAuth(const QString &user, const QString &password)
-    { QAuthenticator auth; auth.setUser(user); auth.setPassword(password); setAuth(auth); }
-    void setAuth(const QAuthenticator &auth);
+    inline void setAuth(const QString &user, const QString &password, bool replaceIfExists = true)
+    { QAuthenticator auth; auth.setUser(user); auth.setPassword(password); setAuth(auth, replaceIfExists); }
+    void setAuth(const QAuthenticator &auth, bool replaceIfExists = true);
     QAuthenticator getAuth() const;
 
     // if reader will find out that authentication is requred => setAuthenticated(false) must be called
@@ -73,19 +73,6 @@ public:
     void setNetworkTimeout(unsigned int timeout);
     virtual unsigned int getNetworkTimeout() const;
 
-
-    // sometimes resource is not in your lan, and it might be not pingable from one hand
-    // but from other hand it's still might replay to standard requests
-    // so this is the way to find out do we have to change ip address
-    virtual bool isResourceAccessible()  = 0;
-
-
-    // is some cases( like  device behind the router) the only possible way to discover the device is to check every ip address
-    // and no broad cast and multi cast is accessible. so you can not get MAC of device with standard methods
-    // the only way is to request it from device through http or so
-    // we need to get mac anyway to differentiate one device from another
-    virtual bool updateMACAddress() { return true; }
-
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
     // in some cases I just want to update couple of field from just discovered resource
@@ -107,7 +94,7 @@ public:
     static QnUuid uniqueIdToId(const QString& uniqId);
     virtual bool isAbstractResource() const { return false; }
 private:
-    QAuthenticator m_auth;
+    //QAuthenticator m_auth;
     bool m_authenticated;
 
     //QHostAddress m_hostAddr;

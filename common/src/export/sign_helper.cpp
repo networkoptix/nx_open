@@ -70,7 +70,7 @@ QnSignHelper::QnSignHelper():
 
     QList<QnLicensePtr> list = qnLicensePool->getLicenses();
     m_licensedToStr = tr("Trial license");
-    foreach (QnLicensePtr license, list)
+    for (const QnLicensePtr& license: list)
     {
         if (license->type() != Qn::LC_Trial)
             m_licensedToStr = license->name();
@@ -716,7 +716,7 @@ QByteArray QnSignHelper::getSignPattern()
 
     QList<QnLicensePtr> list = qnLicensePool->getLicenses();
     QString licenseName(tr("FREE license"));
-    foreach (QnLicensePtr license, list)
+    for (const QnLicensePtr& license: list)
     {
         if (license->name() != QLatin1String("FREE"))
             licenseName = license->name();

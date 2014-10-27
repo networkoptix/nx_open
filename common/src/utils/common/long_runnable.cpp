@@ -25,7 +25,7 @@ public:
 
     void stopAll() {
         QMutexLocker locker(&m_mutex);
-        foreach(QnLongRunnable *runnable, m_created)
+        for(QnLongRunnable *runnable: m_created)
             runnable->pleaseStop();
         waitAllLocked();
     }

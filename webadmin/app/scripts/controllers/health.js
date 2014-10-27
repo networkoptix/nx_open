@@ -89,9 +89,8 @@ angular.module('webadminApp')
             "StatisticsNETWORK":    ["#ff3434", "#b08f4c", "#8484ff", "#34ff84"]
         };
 
-
-
         var nocolor = 'rgba(255,255,255,0)';
+
         function prepaireDataSets(statistics){
             var datasets = [{
                 label: '',
@@ -183,13 +182,13 @@ angular.module('webadminApp')
             });
         }
 
+        var timeout = setTimeout(updateStatistics,$scope.interval);
         $scope.$on(
             "$destroy",
             function( event ) {
                 $timeout.cancel(statisticTimer);
+                clearTimeout(timeout);
             }
         );
 
-
-        updateStatistics();
     });

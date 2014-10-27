@@ -22,7 +22,7 @@ namespace {
     ec2::AbstractECConnectionPtr ec2Connection() { return QnAppServerConnectionFactory::getConnection2(); }
 
     QnUserResourcePtr getAdminUser() {
-        foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::user)) {
+        for (const QnResourcePtr &resource: qnResPool->getResourcesWithFlag(Qn::user)) {
             if (resource->getName() == lit("admin"))
                 return resource.dynamicCast<QnUserResource>();
         }
@@ -30,7 +30,8 @@ namespace {
     }
 }
 
-int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner) {
+int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner) 
+{
     Q_UNUSED(path)
     Q_UNUSED(owner)
 
@@ -89,7 +90,10 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
         return CODE_OK;
     }
 
-    if (!isCompatible(qnCommon->engineVersion(), moduleInformation.version) || moduleInformation.customization != QnAppInfo::customizationName()) {
+    bool customizationOK = moduleInformation.customization == QnAppInfo::customizationName();
+    if (QnModuleFinder::instance()->isCompatibilityMode())
+        customizationOK = true;
+    if (!isCompatible(qnCommon->engineVersion(), moduleInformation.version) || !customizationOK) {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("INCOMPATIBLE"));
         return CODE_OK;
     }
@@ -123,7 +127,7 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
         if (!moduleInformation.remoteAddresses.contains(url.host())) {
             QUrl simpleUrl = url;
             url.setPath(QString());
-            ec2Connection()->getDiscoveryManager()->addDiscoveryInformation(moduleInformation.id, QList<QUrl>() << simpleUrl, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+            ec2Connection()->getDiscoveryManager()->addDiscoveryInformation(moduleInformation.id, simpleUrl, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
         }
         QnModuleFinder::instance()->directModuleFinder()->checkUrl(url);
     }

@@ -29,7 +29,7 @@
 
 namespace ec2
 {
-    static const size_t RESPONSE_WAIT_TIMEOUT_MS = 10*1000;
+    static const size_t RESPONSE_WAIT_TIMEOUT_MS = 30*1000;
 
     class ClientQueryProcessor
     :

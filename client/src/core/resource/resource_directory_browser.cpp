@@ -69,7 +69,7 @@ QnResourceList QnResourceDirectoryBrowser::findResources()
     if (m_resourceReady)
         return QnResourceList();
 
-    setShouldBeUsed(false);
+    setDiscoveryMode( DiscoveryMode::disabled );
 
     QThread::Priority oldPriority = QThread::currentThread()->priority();
     QThread::currentThread()->setPriority(QThread::IdlePriority);

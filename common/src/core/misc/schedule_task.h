@@ -45,6 +45,19 @@ public:
         Qn::StreamQuality m_streamQuality;
         int m_fps;
         bool m_doRecordAudio;
+
+        inline bool operator==(const Data &e2) const
+        {
+            return m_dayOfWeek == e2.m_dayOfWeek &&
+                m_startTime == e2.m_startTime &&
+                m_endTime == e2.m_endTime &&
+                m_recordType == e2.m_recordType &&
+                m_beforeThreshold == e2.m_beforeThreshold &&
+                m_afterThreshold == e2.m_afterThreshold &&
+                m_streamQuality == e2.m_streamQuality &&
+                m_fps == e2.m_fps &&
+                m_doRecordAudio == e2.m_doRecordAudio;
+        }
     };
 
     QnScheduleTask()
@@ -109,6 +122,11 @@ public:
     */
     bool containTimeMs(int weekTimeMs) const;
 
+    bool operator==( const QnScheduleTask& right ) const
+    {
+        return m_resourceId == right.m_resourceId && m_data == right.m_data;
+    }
+
 private:
     //QnUuid m_id;
     QnUuid m_resourceId;
@@ -122,19 +140,6 @@ inline bool operator<(qint64 first, const QnScheduleTask &other)
 { return first < other.startTimeMs(); }
 inline bool operator<(const QnScheduleTask &other, qint64 first)
 { return other.startTimeMs() < first; }
-
-inline bool operator==(const QnScheduleTask::Data &e1, const QnScheduleTask::Data &e2)
-{
-    return e1.m_dayOfWeek == e2.m_dayOfWeek &&
-        e1.m_startTime == e2.m_startTime &&
-        e1.m_endTime == e2.m_endTime &&
-        e1.m_recordType == e2.m_recordType &&
-        e1.m_beforeThreshold == e2.m_beforeThreshold &&
-        e1.m_afterThreshold == e2.m_afterThreshold &&
-        e1.m_streamQuality == e2.m_streamQuality &&
-        e1.m_fps == e2.m_fps &&
-        e1.m_doRecordAudio == e2.m_doRecordAudio;
-}
 
 inline uint qHash(const QnScheduleTask::Data &key)
 {

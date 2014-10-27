@@ -17,6 +17,9 @@
 
 namespace {
     QAtomicInt qn_fakeHandle(INT_MAX / 2);
+
+    /** Minimum time (in milliseconds) for overlapping time periods requests.  */
+    const int minOverlapDuration = 40*1000;
 }
 
 QnGenericCameraDataLoader::QnGenericCameraDataLoader(const QnMediaServerConnectionPtr &connection, const QnNetworkResourcePtr &camera, Qn::CameraDataType dataType, QObject *parent):
@@ -82,10 +85,17 @@ int QnGenericCameraDataLoader::load(const QnTimePeriod &timePeriod, const QStrin
         if (itr != loadedPeriodList.cbegin())
             itr--;
 
-        if (qBetween(itr->startTimeMs, periodToLoad.startTimeMs, itr->startTimeMs + itr->durationMs))
+        /* If last period is still recording, request at least from its start. */
+        if (itr->durationMs == -1) {
+            qint64 endPoint = periodToLoad.startTimeMs + periodToLoad.durationMs;
+            periodToLoad.startTimeMs = itr->startTimeMs;
+            periodToLoad.durationMs = endPoint - periodToLoad.startTimeMs;
+        } 
+        /* If we are requesting start time which is already loaded, move it to end of recorded period minus minOverlapDuration. */
+        else if (qBetween(itr->startTimeMs, periodToLoad.startTimeMs, itr->startTimeMs + itr->durationMs))
         {
             qint64 endPoint = periodToLoad.startTimeMs + periodToLoad.durationMs;
-            periodToLoad.startTimeMs = itr->startTimeMs + itr->durationMs - 40*1000; // add addition 40 sec (may server does not flush data e.t.c)
+            periodToLoad.startTimeMs = itr->startTimeMs + itr->durationMs - minOverlapDuration; // add addition 40 sec (may server does not flush data e.t.c)
             periodToLoad.durationMs = endPoint - periodToLoad.startTimeMs;
             ++itr;
             if (itr != loadedPeriodList.cend()) {
@@ -93,6 +103,7 @@ int QnGenericCameraDataLoader::load(const QnTimePeriod &timePeriod, const QStrin
                     periodToLoad.durationMs = itr->startTimeMs - periodToLoad.startTimeMs;
             }
         }
+        /* Check if end point is overlapped and move it. */
         else if (qBetween(itr->startTimeMs, periodToLoad.startTimeMs + periodToLoad.durationMs, itr->startTimeMs + itr->durationMs))
         {
             periodToLoad.durationMs = itr->startTimeMs - periodToLoad.startTimeMs;
@@ -237,6 +248,11 @@ void QnGenericCameraDataLoader::handleDataLoaded(int status, const QnAbstractCam
 #ifdef CHUNKS_LOADER_DEBUG
                 qDebug() << debugName << "CHUNK total after" << m_loadedData[resolutionMs]->dataSource(); 
 #endif
+                updateLoadedPeriods(m_loading[i].period, resolutionMs);
+            }
+            /* Check if already recorded period was deleted on the server. */
+            else if (m_loadedData[resolutionMs] && data && data->isEmpty()) {
+                m_loadedData[resolutionMs]->trim(m_loading[i].period.startTimeMs);
                 updateLoadedPeriods(m_loading[i].period, resolutionMs);
             }
 

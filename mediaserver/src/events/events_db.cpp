@@ -14,6 +14,7 @@
 #include "recorder/storage_manager.h"
 #include <recording/time_period.h>
 #include <media_server/settings.h>
+#include "core/resource/network_resource.h"
 
 
 static const qint64 EVENTS_CLEANUP_INTERVAL = 1000000ll * 3600;
@@ -179,7 +180,7 @@ QString QnEventsDB::getRequestStr(const QnTimePeriod& period,
         request += QString(lit(" and event_resource_guid = %1 ")).arg(guidToSqlString(resList[0]->getId()));
     else if (resList.size() > 1) {
         QString idList;
-        foreach(QnResourcePtr res, resList) {
+        for(const QnResourcePtr& res: resList) {
             if (!idList.isEmpty())
                 idList += QLatin1Char(',');
             idList += guidToSqlString(res->getId());
@@ -192,7 +193,7 @@ QString QnEventsDB::getRequestStr(const QnTimePeriod& period,
         if (QnBusiness::hasChild(eventType)) {
             QList<QnBusiness::EventType> events = QnBusiness::childEvents(eventType);
             QString eventTypeStr;
-            foreach(QnBusiness::EventType evnt, events) {
+            for(QnBusiness::EventType evnt: events) {
                 if (!eventTypeStr.isEmpty())
                     eventTypeStr += QLatin1Char(',');
                 eventTypeStr += QString::number((int) evnt);

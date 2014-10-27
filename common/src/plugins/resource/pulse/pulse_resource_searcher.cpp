@@ -23,7 +23,7 @@ QnResourceList QnPlPulseSearcher::findResources()
     QnPlPulseSearcherHelper helper;
     QList<QnPlPulseSearcherHelper::WSResult> onnvifResponses = helper.findResources();
 
-    foreach(QnPlPulseSearcherHelper::WSResult r, onnvifResponses)
+    for(const QnPlPulseSearcherHelper::WSResult& r: onnvifResponses)
     {
         QnNetworkResourcePtr res = createResource(r.manufacture, r.name);
         if (!res)
@@ -34,7 +34,7 @@ QnResourceList QnPlPulseSearcher::findResources()
         if (cameraRes)
             cameraRes->setModel(r.name);
         res->setMAC(QnMacAddress(r.mac));
-        res->setHostAddress(r.ip, QnDomainMemory);
+        res->setHostAddress(r.ip);
         res->setDiscoveryAddr(QHostAddress(r.disc_ip));
 
         result.push_back(res);

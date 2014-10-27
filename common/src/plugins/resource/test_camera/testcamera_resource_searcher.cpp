@@ -20,7 +20,7 @@ QnTestCameraResourceSearcher::~QnTestCameraResourceSearcher()
 
 void QnTestCameraResourceSearcher::clearSocketList()
 {
-    foreach(const DiscoveryInfo& info, m_sockList)
+    for(const DiscoveryInfo& info: m_sockList)
         delete info.sock;
     m_sockList.clear();
 }
@@ -31,7 +31,7 @@ bool QnTestCameraResourceSearcher::updateSocketList()
     if (curretTime - m_sockUpdateTime > SOCK_UPDATE_INTERVAL)
     {
         clearSocketList();
-        foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
+        for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
         {
             DiscoveryInfo info(SocketFactory::createDatagramSocket(), iface.address);
             if (info.sock->bind(iface.address.toString(), 0))
@@ -47,7 +47,7 @@ bool QnTestCameraResourceSearcher::updateSocketList()
 
 void QnTestCameraResourceSearcher::sendBroadcast()
 {
-    foreach (const DiscoveryInfo& info, m_sockList)
+    for (const DiscoveryInfo& info: m_sockList)
         info.sock->sendTo(TestCamConst::TEST_CAMERA_FIND_MSG, strlen(TestCamConst::TEST_CAMERA_FIND_MSG), BROADCAST_ADDRESS, TestCamConst::DISCOVERY_PORT);
 }
 
@@ -63,7 +63,7 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
     QMap<QString, QnResourcePtr> resources;
     QSet<QString> processedMac;
 
-    foreach(const DiscoveryInfo& info, m_sockList)
+    for(const DiscoveryInfo& info: m_sockList)
     {
         AbstractDatagramSocket* sock = info.sock;
         while (sock->hasData())
@@ -109,7 +109,7 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
         }
     }
     QnResourceList rez;
-    foreach(QnResourcePtr res, resources.values())
+    for(const QnResourcePtr& res: resources.values())
         rez << res;
 
     sendBroadcast();

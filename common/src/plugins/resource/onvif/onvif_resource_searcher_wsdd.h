@@ -63,7 +63,7 @@ public:
     OnvifResourceSearcherWsdd();
     virtual ~OnvifResourceSearcherWsdd();
 
-    void findResources(QnResourceList& result);
+    void findResources(QnResourceList& result, DiscoveryMode discoveryMode);
 
     void pleaseStop();
 

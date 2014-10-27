@@ -125,7 +125,7 @@ QnWriterPool::QnWriterPool()
 }
 QnWriterPool::~QnWriterPool()
 {
-    foreach(QueueFileWriter* writer, m_writers.values())
+    for(QueueFileWriter* writer: m_writers.values())
         delete writer;
 }
 

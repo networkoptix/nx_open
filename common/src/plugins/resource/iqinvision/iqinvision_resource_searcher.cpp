@@ -133,7 +133,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
 
     smac = smac.toUpper();
 
-    foreach(QnResourcePtr res, result)
+    for(const QnResourcePtr& res: result)
     {
         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
     
@@ -148,7 +148,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
 
     QnPlIqResourcePtr resource ( new QnPlIqResource() );
 
-    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name, false);
     if (rt.isNull())
     {
         // try with default camera name
@@ -193,7 +193,7 @@ void QnPlIqResourceSearcher::processNativePacket(QnResourceList& result, const Q
 
     QByteArray name(responseData.data() + iqpos); // construct from null terminated char*
 
-    foreach(QnResourcePtr res, result)
+    for(const QnResourcePtr& res: result)
     {
         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
 
@@ -206,7 +206,7 @@ void QnPlIqResourceSearcher::processNativePacket(QnResourceList& result, const Q
     }
 
     QString nameStr = QString::fromLatin1(name);
-    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), nameStr);
+    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), nameStr, false);
     if (rt.isNull()) {
         rt = qnResTypePool->getResourceTypeId(manufacture(), DEFAULT_RESOURCE_TYPE);
         if (rt.isNull())
@@ -220,7 +220,7 @@ void QnPlIqResourceSearcher::processNativePacket(QnResourceList& result, const Q
     resource->setName(nameStr);
     resource->setModel(nameStr);
     resource->setMAC(macAddr);
-    resource->setHostAddress(peerAddress.toString(), QnDomainMemory);
+    resource->setHostAddress(peerAddress.toString());
     resource->setDiscoveryAddr(discoveryAddress);
 
     result.push_back(resource);
@@ -231,7 +231,7 @@ QnResourceList QnPlIqResourceSearcher::findResources()
 {
     QnResourceList result = QnMdnsResourceSearcher::findResources();
 
-    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
+    for (QnInterfaceAndAddr iface: getAllIPv4Interfaces())
     {
         std::unique_ptr<AbstractDatagramSocket> sendSock( SocketFactory::createDatagramSocket() );
         std::unique_ptr<AbstractDatagramSocket> receiveSock( SocketFactory::createDatagramSocket() );

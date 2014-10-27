@@ -16,6 +16,8 @@ QnRegion::QnRegion()
 }
 
 QnRegion::QnRegion(const QnRegion& right)
+:
+    QRegion()
 {
     //making deep copy of right
     const QVector<QRect>& _rects = right.rects();
@@ -250,7 +252,7 @@ bool QnMotionRegion::updateSensitivityAt(const QPoint& pos, int newSens)
     return false;
 }
 
-QnMotionRegion::RegionValid QnMotionRegion::isValid(int maxMotionRects, int maxMaskRects, int maxMotionSens) const
+QnMotionRegion::ErrorCode QnMotionRegion::isValid(int maxMotionRects, int maxMaskRects, int maxMotionSens) const
 {
     int count = 0;
     int sens_count = 0;
@@ -262,18 +264,18 @@ QnMotionRegion::RegionValid QnMotionRegion::isValid(int maxMotionRects, int maxM
             sens_count++;
     }
     if (maxMaskRects > 0 && getRectsBySens(0).size() > maxMaskRects)
-        return MASKS;
+        return ErrorCode::Masks;
 
     if (maxMotionSens > 0) {
         if (sens_count > maxMotionSens)
-            return SENS;
-        return VALID;
+            return ErrorCode::Sens;
+        return ErrorCode::Ok;
     }
 
     /** only if maxMotionSens == 0 */
     if(count > maxMotionRects)
-        return WINDOWS;
-    return VALID;
+        return ErrorCode::Windows;
+    return ErrorCode::Ok;
 }
 
 int QnMotionRegion::getMotionRectCount() const

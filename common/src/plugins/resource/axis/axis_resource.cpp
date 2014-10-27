@@ -26,18 +26,13 @@ static const quint16 DEFAULT_AXIS_API_PORT = 80;
 QnPlAxisResource::QnPlAxisResource()
 {
     setVendor(lit("Axis"));
-    setAuth(QLatin1String("root"), QLatin1String("root"));
+    setAuth(QLatin1String("root"), QLatin1String("root"), false);
     m_lastMotionReadTime = 0;
 }
 
 QnPlAxisResource::~QnPlAxisResource()
 {
     stopInputPortMonitoring();
-}
-
-bool QnPlAxisResource::isResourceAccessible()
-{
-    return updateMACAddress();
 }
 
 QString QnPlAxisResource::getDriverName() const
@@ -519,7 +514,7 @@ void QnPlAxisResource::setMotionMaskPhysical(int /*channel*/)
 
     m_mutex.lock();
 
-    const QnMotionRegion region = m_motionMaskList[0];
+    const QnMotionRegion region = getMotionRegion(0);
 
     QMap<int, QRect> existsWnd = m_motionWindows; // the key is window number
     QMultiMap<int, QRect> newWnd = region.getAllMotionRects(); // the key is motion sensitivity

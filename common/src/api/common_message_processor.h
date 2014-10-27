@@ -30,6 +30,11 @@ public:
     virtual void updateResource(const QnResourcePtr &resource);
 
     QMap<QnUuid, QnBusinessEventRulePtr> businessRules() const;
+
+    void processServerUserAttributesList( const QnMediaServerUserAttributesList& serverUserAttributesList );
+    void processCameraUserAttributesList( const QnCameraUserAttributesList& cameraUserAttributesList );
+    void processPropertyList(const ec2::ApiResourceParamWithRefDataList& params);
+    void processStatusList(const ec2::ApiResourceStatusDataList& params);
 signals:
     void connectionOpened();
     void connectionClosed();
@@ -83,21 +88,25 @@ private slots:
     void at_remotePeerLost(ec2::ApiPeerAliveData data);
 
     void on_gotInitialNotification(const ec2::QnFullResourceData &fullData);
-    void on_gotDiscoveryData(const ec2::ApiDiscoveryDataList &discoveryData, bool addInformation);
+    void on_gotDiscoveryData(const ec2::ApiDiscoveryData &discoveryData, bool addInformation);
 
     void on_resourceStatusChanged(const QnUuid &resourceId, Qn::ResourceStatus status );
-    void on_resourceParamsChanged(const QnUuid& resourceId, const QnKvPairList& kvPairs );
+    void on_resourceParamChanged(const ec2::ApiResourceParamWithRefData& param );
     void on_resourceRemoved(const QnUuid& resourceId );
 
+    void on_cameraUserAttributesChanged(const QnCameraUserAttributesPtr& userAttributes);
+    void on_cameraUserAttributesRemoved(const QnUuid& cameraID);
     void on_cameraHistoryChanged(const QnCameraHistoryItemPtr &cameraHistory);
     void on_cameraHistoryRemoved(const QnCameraHistoryItemPtr &cameraHistory);
+
+    void on_mediaServerUserAttributesChanged(const QnMediaServerUserAttributesPtr& userAttributes);
+    void on_mediaServerUserAttributesRemoved(const QnUuid& serverID);
 
     void on_businessEventRemoved(const QnUuid &id);
     void on_businessActionBroadcasted(const QnAbstractBusinessActionPtr &businessAction);
     void on_businessRuleReset(const QnBusinessEventRuleList &rules);
     void on_broadcastBusinessAction(const QnAbstractBusinessActionPtr& action);
     void on_execBusinessAction( const QnAbstractBusinessActionPtr& action );
-
     void on_panicModeChanged(Qn::PanicMode mode);   
 protected:
     ec2::AbstractECConnectionPtr m_connection;

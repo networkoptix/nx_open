@@ -229,7 +229,7 @@ public:
     int pingSystemAsync(const QUrl &url, const QString &password, QObject *target, const char *slot);
     int mergeSystemAsync(const QUrl &url, const QString &password, bool ownSettings, QObject *target, const char *slot);
 
-    int testEmailSettingsAsync(const QnEmail::Settings &settings, QObject *target, const char *slot);
+    int testEmailSettingsAsync(const QnEmailSettings &settings, QObject *target, const char *slot);
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;
 
