@@ -444,18 +444,22 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
 
 void QnStorageManager::onNewResource(const QnResourcePtr &resource)
 {
+    connect(resource.data(), &QnResource::resourceChanged, this, &QnStorageManager::at_storageChanged);
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (storage && storage->getParentId() == qnCommon->moduleGUID()) 
     {
         addStorage(storage);
+        updateStorageStatistics();
     }
 }
 
 void QnStorageManager::onDelResource(const QnResourcePtr &resource)
 {
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
-    if (storage && storage->getParentId() == qnCommon->moduleGUID()) 
+    if (storage && storage->getParentId() == qnCommon->moduleGUID())  {
         removeStorage(storage);
+        updateStorageStatistics();
+    }
 }
 
 QStringList QnStorageManager::getAllStoragePathes() const
@@ -479,6 +483,15 @@ void QnStorageManager::removeStorage(const QnStorageResourcePtr &storage)
             ++itr;
         }
     }
+}
+
+void QnStorageManager::at_storageChanged(const QnResourcePtr &)
+{
+    {
+        QMutexLocker lock(&m_mutexStorages);
+        m_storagesStatisticsReady = false;
+    }
+    updateStorageStatistics();
 }
 
 bool QnStorageManager::existsStorageWithID(const QnAbstractStorageResourceList& storages, const QnUuid &id) const
