@@ -113,7 +113,8 @@ QnResource::QnResource():
     m_initialized(false),
     m_lastInitTime(0),
     m_prevInitializationResult(CameraDiagnostics::ErrorCode::unknown),
-    m_lastMediaIssue(CameraDiagnostics::NoErrorResult())
+    m_lastMediaIssue(CameraDiagnostics::NoErrorResult()),
+    m_removedFromPool(false)
 {
     m_lastStatusUpdateTime = QDateTime::fromMSecsSinceEpoch(0);
 }
@@ -430,6 +431,11 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
 {
     if (newStatus == Qn::NotDefined)
         return;
+
+    if (m_removedFromPool)
+        return;
+
+
 
     QnUuid id = getId();
     Qn::ResourceStatus oldStatus = qnStatusDictionary->value(id);
@@ -887,4 +893,10 @@ void QnResource::setPtzCapabilities(Qn::PtzCapabilities capabilities) {
 
 void QnResource::setPtzCapability(Qn::PtzCapabilities capability, bool value) {
     setPtzCapabilities(value ? (getPtzCapabilities() | capability) : (getPtzCapabilities() & ~capability));
+}
+
+void QnResource::setRemovedFromPool(bool value)
+{
+    QMutexLocker mutexLocker(&m_mutex);
+    m_removedFromPool = value;
 }

@@ -260,8 +260,10 @@ bool QnRecordingManager::startOrStopRecording(const QnResourcePtr& res, QnVideoC
     QnLiveStreamProviderPtr providerLow = camera->getLiveReader(QnServer::LowQualityCatalog);
     QnSecurityCamResourcePtr cameraRes = res.dynamicCast<QnSecurityCamResource>();
 
-    if (!cameraRes->isInitialized() && !cameraRes->hasFlags(Qn::foreigner) && !cameraRes->isScheduleDisabled())
+    if (!cameraRes->isInitialized() && !cameraRes->hasFlags(Qn::foreigner) && !cameraRes->isScheduleDisabled()) {
         cameraRes->initAsync(true);
+        return false; // wait for initialization
+    }
 
     bool someRecordingIsPresent = false;
 

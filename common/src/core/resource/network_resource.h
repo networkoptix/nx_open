@@ -93,6 +93,7 @@ public:
 
     static QnUuid uniqueIdToId(const QString& uniqId);
     virtual bool isAbstractResource() const { return false; }
+    virtual void initializationDone() override;
 private:
     //QAuthenticator m_auth;
     bool m_authenticated;

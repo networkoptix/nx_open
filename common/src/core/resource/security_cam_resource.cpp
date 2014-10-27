@@ -149,7 +149,9 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
     return 0;
 }
 
-void QnSecurityCamResource::initializationDone() {
+void QnSecurityCamResource::initializationDone() 
+{
+    QnNetworkResource::initializationDone();
     if( m_inputPortListenerCount.load() > 0 )
         startInputPortMonitoring();
 }
