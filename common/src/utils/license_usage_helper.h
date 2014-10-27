@@ -97,9 +97,6 @@ class QnVideoWallLicenseUsageHelper: public QnLicenseUsageHelper {
 public:
     QnVideoWallLicenseUsageHelper(QObject *parent = NULL);
 
-    /** Propose to use itemsCount videowall items on the pc given for the given videowall. */
-    void propose(const QnVideoWallResourcePtr &videowall, const QnUuid &pcUuid, int itemsCount);
-
     /** Propose to use some more or less licenses directly (e.g. to start control session). */
     void propose(int count);
 

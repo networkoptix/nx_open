@@ -109,7 +109,13 @@ describe('Advanced Page', function () {
         expect("test").toBe("written");
     });
 
-    it("should upload some file and display an error",function(){
+    it("should upload some bad file and display an error",function(){
+        expect("test").toBe("written");
+    });
+
+
+
+    it("should hide progress bar after uploading",function(){
         expect("test").toBe("written");
     });
 });
