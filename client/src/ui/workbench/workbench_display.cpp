@@ -1161,6 +1161,9 @@ QRectF QnWorkbenchDisplay::itemEnclosingGeometry(QnWorkbenchItem *item) const {
         result.height() + delta.height() * step.height()
     );
 
+    if (item->geometry().isEmpty())
+        return result;
+
     /* Calculate bounds of the rotated item */
     qreal rotation = qAbs(item->rotation());
     if (!qFuzzyIsNull(rotation) && !qFuzzyEquals(rotation, 180)) {

@@ -37,7 +37,6 @@ private:
     void stopTesting(const QString &result = QString());
     void finishTesting();
     void loadSettings(const QString &server, QnEmail::ConnectionType connectionType, int port = 0);
-    void updateFocusedElement();
 
     void validateEmailSimple();
     void validateEmailAdvanced();
