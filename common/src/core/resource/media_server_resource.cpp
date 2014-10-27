@@ -13,6 +13,7 @@
 #include <rest/server/json_rest_result.h>
 #include "utils/common/sleep.h"
 #include "utils/network/networkoptixmodulerevealcommon.h"
+#include "utils/common/util.h"
 #include "media_server_user_attributes.h"
 #include "../resource_management/resource_pool.h"
 
@@ -81,7 +82,8 @@ void QnMediaServerResource::setApiUrl(const QString& restUrl)
     if (restUrl != m_apiUrl)
     {
         m_apiUrl = restUrl;
-        m_restConnection.clear();
+        if (m_restConnection)
+            m_restConnection->setUrl(m_apiUrl);
     }
 }
 
@@ -131,6 +133,11 @@ QList<QUrl> QnMediaServerResource::getIgnoredUrls() const
 {
     QMutexLocker lock(&m_mutex);
     return m_ignoredUrls;
+}
+
+quint16 QnMediaServerResource::getPort() const {
+    QUrl url(getApiUrl());
+    return url.port(DEFAULT_APPSERVER_PORT);
 }
 
 QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
@@ -368,8 +375,10 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         setStorages(otherStorages);
         */
     }
-    if (netAddrListChanged) {
+    if (netAddrListChanged || getPort() != localOther->getPort()) {
         m_apiUrl = localOther->m_apiUrl;    // do not update autodetected value with side changes
+        if (m_restConnection)
+            m_restConnection->setUrl(m_apiUrl);
         determineOptimalNetIF();
     } else {
         m_url = oldUrl; //rollback changed value to autodetected

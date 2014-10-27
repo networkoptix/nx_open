@@ -308,7 +308,7 @@ void QnWorkbenchNotificationsHandler::at_settings_valueChanged(int id) {
 }
 
 void QnWorkbenchNotificationsHandler::at_emailSettingsChanged() {
-    QnEmail::Settings settings = QnGlobalSettings::instance()->emailSettings();
+    QnEmailSettings settings = QnGlobalSettings::instance()->emailSettings();
     bool isInvalid = settings.server.isEmpty() || settings.user.isEmpty() || settings.password.isEmpty();
     setSystemHealthEventVisible(QnSystemHealth::SmtpIsNotSet, context()->user() && isInvalid);
 }

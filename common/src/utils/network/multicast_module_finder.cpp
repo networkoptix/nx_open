@@ -122,7 +122,7 @@ bool QnMulticastModuleFinder::processDiscoveryRequest(UDPSocket *udpSocket) {
     int bytesRead = udpSocket->recvFrom(readBuffer, READ_BUFFER_SIZE, remoteAddressStr, remotePort);
     if (bytesRead == -1) {
         SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-        NX_LOG(QString::fromLatin1("NetworkOptixModuleFinder. Failed to read socket on local address (%1). %2").
+        NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Failed to read socket on local address (%1). %2").
             arg(udpSocket->getLocalAddress().toString()).arg(SystemError::toString(prevErrorCode)), cl_logERROR);
         return false;
     }
@@ -132,7 +132,7 @@ bool QnMulticastModuleFinder::processDiscoveryRequest(UDPSocket *udpSocket) {
     const quint8 *requestBufStart = readBuffer;
     if (!request.deserialize(&requestBufStart, readBuffer + bytesRead)) {
         //invalid response
-        NX_LOG(QString::fromLatin1("NetworkOptixModuleFinder. Received invalid response from (%1:%2) on local address %3").
+        NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Received invalid response from (%1:%2) on local address %3").
             arg(remoteAddressStr).arg(remotePort).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG1);
         return false;
     }
@@ -143,7 +143,7 @@ bool QnMulticastModuleFinder::processDiscoveryRequest(UDPSocket *udpSocket) {
     if (!response.serialize(&responseBufStart, readBuffer + READ_BUFFER_SIZE))
         return false;
     if (!udpSocket->sendTo(readBuffer, responseBufStart - readBuffer, SocketAddress(remoteAddressStr, remotePort))) {
-        NX_LOG(QString::fromLatin1("NetworkOptixModuleFinder. Can't send response to address (%1:%2)").
+        NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Can't send response to address (%1:%2)").
             arg(remoteAddressStr).arg(remotePort), cl_logDEBUG1);
         return false;
 
@@ -162,7 +162,7 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
     int bytesRead = udpSocket->recvFrom(readBuffer, READ_BUFFER_SIZE, remoteAddressStr, remotePort);
     if (bytesRead == -1) {
         SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-        NX_LOG(QString::fromLatin1("NetworkOptixModuleFinder. Failed to read socket on local address (%1). %2").
+        NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Failed to read socket on local address (%1). %2").
             arg(udpSocket->getLocalAddress().toString()).arg(SystemError::toString(prevErrorCode)), cl_logERROR);
         return false;
     }
@@ -172,7 +172,7 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
     const quint8 *responseBufStart = readBuffer;
     if (!response.deserialize(&responseBufStart, readBuffer + bytesRead)) {
         //invalid response
-        NX_LOG(QString::fromLatin1("NetworkOptixModuleFinder. Received invalid response from (%1:%2) on local address %3").
+        NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Received invalid response from (%1:%2) on local address %3").
             arg(remoteAddressStr).arg(remotePort).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG1);
         return false;
     }
@@ -184,7 +184,7 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
         return true;
 
     if (!m_compatibilityMode && response.customization.toLower() != qnProductFeatures().customizationName.toLower()) { // TODO: #2.1 #Elric #AK check for "default" VS "Vms"
-        NX_LOG(QString::fromLatin1("NetworkOptixModuleFinder. Ignoring %1 (%2:%3) with different customization %4 on local address %5").
+        NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Ignoring %1 (%2:%3) with different customization %4 on local address %5").
             arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(response.customization).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG2);
         return false;
     }
@@ -201,7 +201,18 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
 
     moduleInformation.remoteAddresses.clear();
     moduleInformation.remoteAddresses.insert(remoteAddressStr);
-    moduleInformation.remoteAddresses.unite(oldModuleInformation.remoteAddresses);
+    if (oldModuleInformation.port == moduleInformation.port) {
+        moduleInformation.remoteAddresses.unite(oldModuleInformation.remoteAddresses);
+    } else {
+        foreach (const QString &oldAddress, oldModuleInformation.remoteAddresses) {
+            QnNetworkAddress oldNetworkAddress(QHostAddress(oldAddress), oldModuleInformation.port);
+            if (oldNetworkAddress.host() == address.host())
+                continue;
+
+            m_foundAddresses.remove(oldNetworkAddress);
+            emit moduleAddressLost(moduleInformation, oldNetworkAddress);
+        }
+    }
 
     if (oldModuleInformation != moduleInformation) {
         oldModuleInformation = moduleInformation;
@@ -215,7 +226,7 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
         addressIt = m_foundAddresses.insert(address, ModuleContext(response));
 
         emit moduleAddressFound(moduleInformation, address);
-        NX_LOG(QString::fromLatin1("NetworkOptixModuleFinder. New address (%2:%3) of remote server %1 found on local interface %4").
+        NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. New address (%2:%3) of remote server %1 found on local interface %4").
             arg(response.seed.toString()).arg(remoteAddressStr).arg(remotePort).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG1);
     }
     addressIt->prevResponseReceiveClock = QDateTime::currentMSecsSinceEpoch();
@@ -225,7 +236,7 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
 
 void QnMulticastModuleFinder::run() {
     initSystemThreadId();
-    NX_LOG(lit("NetworkOptixModuleFinder started"), cl_logDEBUG1);
+    NX_LOG(lit("QnMulticastModuleFinder started"), cl_logDEBUG1);
 
     static const unsigned int SEARCH_PACKET_LENGTH = 64;
     quint8 searchPacket[SEARCH_PACKET_LENGTH];
@@ -253,7 +264,7 @@ void QnMulticastModuleFinder::run() {
                 if (!socket->send(searchPacket, searchPacketBufStart - searchPacket)) {
                     //failed to send packet ???
                     SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-                    NX_LOG(lit("NetworkOptixModuleFinder. Failed to send packet to %1. %2").arg(socket->getPeerAddress().toString()).arg(SystemError::toString(prevErrorCode)), cl_logDEBUG1);
+                    NX_LOG(lit("QnMulticastModuleFinder. Failed to send packet to %1. %2").arg(socket->getPeerAddress().toString()).arg(SystemError::toString(prevErrorCode)), cl_logDEBUG1);
                     //TODO/IMPL if corresponding interface is down, should remove socket from set
                 }
             }
@@ -267,7 +278,7 @@ void QnMulticastModuleFinder::run() {
             SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
             if( prevErrorCode == SystemError::interrupted )
                 continue;
-            NX_LOG(lit("NetworkOptixModuleFinder. poll failed. %1").arg(SystemError::toString(prevErrorCode)), cl_logERROR);
+            NX_LOG(lit("QnMulticastModuleFinder. poll failed. %1").arg(SystemError::toString(prevErrorCode)), cl_logERROR);
             msleep(errorWaitTimeoutMs);
             continue;
         }
@@ -298,7 +309,7 @@ void QnMulticastModuleFinder::run() {
             QnModuleInformation &moduleInformation = m_foundModules[it->moduleId];
             moduleInformation.remoteAddresses.remove(it.key().host().toString());
 
-            NX_LOG(QString::fromLatin1("NetworkOptixModuleFinder. Module address (%2:%3) of remote server %1 is lost").
+            NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Module address (%2:%3) of remote server %1 is lost").
                 arg(it->moduleId.toString()).arg(it.key().host().toString()).arg(it.key().port()), cl_logDEBUG1);
 
             emit moduleChanged(moduleInformation);
@@ -308,7 +319,7 @@ void QnMulticastModuleFinder::run() {
         }
     }
 
-    NX_LOG(lit("NetworkOptixModuleFinder stopped"), cl_logDEBUG1);
+    NX_LOG(lit("QnMulticastModuleFinder stopped"), cl_logDEBUG1);
 }
 
 QnMulticastModuleFinder::ModuleContext::ModuleContext(const RevealResponse &response)

@@ -48,6 +48,8 @@ public:
     void setIgnoredUrls(const QList<QUrl> &urls);
     QList<QUrl> getIgnoredUrls() const;
 
+    quint16 getPort() const;
+
     QnMediaServerConnectionPtr apiConnection();
 
     QnAbstractStorageResourceList getStorages() const;

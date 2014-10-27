@@ -97,7 +97,7 @@ QnModuleInformation QnCommonModule::moduleInformation() const
                 if (!ignoredHosts.contains(url.host()))
                     moduleInformationCopy.remoteAddresses.insert(url.host());
             }
-            moduleInformationCopy.port = QUrl(server->getApiUrl()).port(moduleInformationCopy.port);
+            moduleInformationCopy.port = server->getPort();
         }
 
         for (const QnUserResourcePtr &user: qnResPool->getResourcesWithFlag(Qn::user).filtered<QnUserResource>()) {

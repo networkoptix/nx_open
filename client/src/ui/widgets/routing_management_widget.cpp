@@ -91,9 +91,7 @@ void QnRoutingManagementWidget::updateModel() {
         return;
     }
 
-    int port = QUrl(m_server->getApiUrl()).port();
-    if (port == -1)
-        port = defaultRtspPort;
+    quint16 port = m_server->getPort();
 
     QList<QUrl> addresses;
     foreach (const QHostAddress &address, m_server->getNetAddrList()) {
@@ -156,7 +154,7 @@ void QnRoutingManagementWidget::at_addButton_clicked() {
         url.setPort(defaultRtspPort);
 
     QList<QUrl> urls = m_server->getAdditionalUrls();
-    if ((m_server->getNetAddrList().contains(QHostAddress(url.host())) && url.port() == QUrl(m_server->getApiUrl()).port()) || urls.contains(url)) {
+    if ((m_server->getNetAddrList().contains(QHostAddress(url.host())) && url.port() == m_server->getPort()) || urls.contains(url)) {
         QMessageBox::warning(this, tr("Warning"), tr("This URL is already in the address list."));
         return;
     }
@@ -245,7 +243,7 @@ void QnRoutingManagementWidget::at_addressesView_doubleClicked(const QModelIndex
     if (oldUrl == url)
         return;
 
-    if (m_server->getNetAddrList().contains(QHostAddress(url.host())) && url.port() == QUrl(m_server->getApiUrl()).port()) {
+    if (m_server->getNetAddrList().contains(QHostAddress(url.host())) && url.port() == m_server->getPort()) {
         QMessageBox::warning(this, tr("Warning"), tr("This URL is already in the address list."));
         return;
     }

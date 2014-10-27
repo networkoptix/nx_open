@@ -7,6 +7,10 @@ commands = [
 'cscript FixExitDialog.js bin/${project.build.finalName}.msi'
 ]
 
+commands = [
+    os.path.join(os.getenv('environment'), "is5/ISCC.exe") + ' /obin /f${project.build.finalName} Product-full.iss'
+]
+
 for command in commands:
     p = subprocess.Popen(command, shell=True, stdout=PIPE)
     out, err = p.communicate()

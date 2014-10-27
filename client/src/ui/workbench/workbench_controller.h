@@ -76,6 +76,10 @@ public:
 
     QnWorkbenchGridMapper *mapper() const;
 
+    HandScrollInstrument *handScrollInstrument() const {
+        return m_handScrollInstrument;
+    }
+
     MotionSelectionInstrument *motionSelectionInstrument() const {
         return m_motionSelectionInstrument;
     }

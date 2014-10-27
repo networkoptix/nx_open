@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
      xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
-    <Bundle Version="${release.version}.${buildNumber}" UpgradeCode="{3C0EDCCA-2F0A-4ce0-81E2-D10807BDC211}">
+    <Bundle Version="${release.version}.${buildNumber}" UpgradeCode="{3C0EDCCA-2F0A-4ce0-81E2-D10807BDC211}" Compressed="yes">
         <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense"> 
           <bal:WixStandardBootstrapperApplication 
             SuppressRepair="yes" 

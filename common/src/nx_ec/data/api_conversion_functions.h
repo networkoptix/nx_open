@@ -7,6 +7,7 @@
 #include <core/resource/camera_bookmark_fwd.h>
 #include <business/business_fwd.h>
 #include <nx_ec/ec_api_fwd.h>
+#include <utils/common/email_fwd.h>
 
 namespace ec2 {
 
@@ -40,8 +41,8 @@ namespace ec2 {
     void fromApiToResource(const ApiCameraServerItemData &src, QnCameraHistoryItem &dst);
     void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHistoryList &dst);
 
-    void fromResourceToApi(const QnEmail::Settings &src, ApiEmailSettingsData &dst);
-    void fromApiToResource(const ApiEmailSettingsData &src, QnEmail::Settings &dst);
+    void fromResourceToApi(const QnEmailSettings &src, ApiEmailSettingsData &dst);
+    void fromApiToResource(const ApiEmailSettingsData &src, QnEmailSettings &dst);
 
     void fromApiToResourceList(const ApiFullInfoData &src, QnFullResourceData &dst, const ResourceContext &ctx);
 

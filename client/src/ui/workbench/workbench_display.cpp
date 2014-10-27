@@ -1986,6 +1986,7 @@ void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resou
         splashItem->setRect(QRectF(-toPoint(rect.size()) / 2, rect.size()));
         splashItem->setColor(withAlpha(QnNotificationLevels::notificationColor(static_cast<QnBusiness::EventType>(type)), 128));
         splashItem->setOpacity(0.0);
+        splashItem->setRotation(widget->rotation());
         splashItem->animate(1000, QnGeometry::dilated(splashItem->rect(), expansion), 0.0, true, 200, 1.0);
         scene()->addItem(splashItem);
         setLayer(splashItem, Qn::EffectsLayer);
