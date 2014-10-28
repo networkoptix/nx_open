@@ -1,6 +1,6 @@
-$icon-font-path: "/bower_components/sass-bootstrap/fonts/";
+$icon-font-path: "../fonts/";
 
-@import 'sass-bootstrap/lib/bootstrap';
+//@import 'sass-bootstrap/lib/bootstrap';
 
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
 
@@ -13,8 +13,7 @@ $icon-font-path: "/bower_components/sass-bootstrap/fonts/";
 
 /* Space out content a bit */
 body {
-    /*padding-top: 60px;
-    padding-bottom: 60px;*/
+    padding-bottom: 20px;
 }
 
 /* Everything but the jumbotron gets side spacing for mobile first views */
@@ -341,3 +340,8 @@ body {
     max-width: 320px;
   }
 }
+
+.serversList .active{
+  font-weight: bold;
+}
+

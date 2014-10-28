@@ -129,6 +129,7 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/url.h>
 #include <utils/math/math.h>
+#include <utils/aspect_ratio.h>
 
 
 #ifdef Q_OS_MACX
@@ -627,10 +628,7 @@ void QnWorkbenchActionHandler::at_workbench_cellAspectRatioChanged() {
                   ? workbench()->currentLayout()->cellAspectRatio()
                   : qnGlobals->defaultLayoutCellAspectRatio();
 
-    if (qFuzzyCompare(4.0 / 3.0, value))
-        action(Qn::SetCurrentLayoutAspectRatio4x3Action)->setChecked(true);
-    else
-        action(Qn::SetCurrentLayoutAspectRatio16x9Action)->setChecked(true); //default value
+    action(QnAspectRatio::aspectRatioActionId(QnAspectRatio::closestStandardRatio(value)))->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged() {
@@ -740,13 +738,8 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 
     QnWorkbenchLayout *workbenchLayout = workbench()->currentLayout();
     if (adjustAspectRatio && workbenchLayout->resource() == layout) {
-        const qreal normalAspectRatio = 4.0 / 3.0;
-        const qreal wideAspectRatio = 16.0 / 9.0;
-
-        qreal cellAspectRatio = -1.0;
         qreal midAspectRatio = 0.0;
         int count = 0;
-
 
         if (!widgets.isEmpty()) {
             /* Here we don't take into account already added widgets. It's ok because
@@ -762,7 +755,10 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
             foreach (QnWorkbenchItem *item, workbenchLayout->items()) {
                 QnResourceWidget *widget = context()->display()->widget(item);
                 if (widget && widget->hasAspectRatio()) {
-                    midAspectRatio += widget->aspectRatio();
+                    qreal aspectRatio = widget->aspectRatio();
+                    if (QnAspectRatio::isRotated90(item->rotation()))
+                        aspectRatio = 1.0 / aspectRatio;
+                    midAspectRatio += aspectRatio;
                     ++count;
                 }
             }
@@ -770,14 +766,11 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
 
         if (count > 0) {
             midAspectRatio /= count;
-            cellAspectRatio = (qAbs(midAspectRatio - normalAspectRatio) < qAbs(midAspectRatio - wideAspectRatio))
-                              ? normalAspectRatio : wideAspectRatio;
-        }
-
-        if (cellAspectRatio > 0)
-            layout->setCellAspectRatio(cellAspectRatio);
-        else if (workbenchLayout->items().size() > 1)
+            QnAspectRatio cellAspectRatio = QnAspectRatio::closestStandardRatio(midAspectRatio);
+            layout->setCellAspectRatio(cellAspectRatio.toReal());
+        } else if (workbenchLayout->items().size() > 1) {
             layout->setCellAspectRatio(qnGlobals->defaultLayoutCellAspectRatio());
+        }
     }
 }
 
@@ -1664,6 +1657,8 @@ void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
             }
         }
     }
+    if (workbench()->currentLayout()->items().isEmpty())
+        workbench()->currentLayout()->setCellAspectRatio(-1.0);
 }
 
 bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resource, const QString &newName) const {

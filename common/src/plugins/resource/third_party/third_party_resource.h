@@ -12,6 +12,8 @@
 
 #include <QSharedPointer>
 
+#include <plugins/resource/camera_settings/camera_settings.h>
+
 #include "core/resource/camera_resource.h"
 #include "../../camera_plugin_qt_wrapper.h"
 
@@ -22,8 +24,6 @@ class QnThirdPartyResource
     public QnPhysicalCameraResource,
     public nxcip::CameraInputEventHandler
 {
-    Q_OBJECT
-
 public:
     static const int PRIMARY_ENCODER_INDEX = 0;
     static const int SECONDARY_ENCODER_INDEX = 1;
@@ -36,7 +36,12 @@ public:
     virtual ~QnThirdPartyResource();
 
     //!Implementation of QnResource::getPtzController
-    virtual QnAbstractPtzController *createPtzControllerInternal() override;
+    virtual QnAbstractPtzController* createPtzControllerInternal() override;
+    //!Implementation of QnResource::getParamPhysical
+    virtual bool getParamPhysical( const QString& param, QVariant& val ) override;
+    //!Implementation of QnResource::setParamPhysical
+    virtual bool setParamPhysical( const QString& param, const QVariant& val ) override;
+
     //!Implementation of QnNetworkResource::ping
     /*!
         At the moment always returns \a true
@@ -117,6 +122,8 @@ private:
     QString m_defaultOutputID;
     int m_encoderCount;
     std::vector<nxcip::Resolution> m_selectedEncoderResolutions;
+    nxcip::BaseCameraManager3* m_cameraManager3;
+    std::map<QString, CameraSetting> m_cameraSettings;
 
     bool initializeIOPorts();
     nxcip::Resolution getMaxResolution( int encoderNumber ) const;

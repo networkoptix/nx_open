@@ -63,7 +63,6 @@ QnTransactionTransport::~QnTransactionTransport()
 
 void QnTransactionTransport::addData(QByteArray&& data)
 {
-    qWarning() << "transaction transport " <<m_remotePeer.id << "send data called";
     QMutexLocker lock(&m_mutex);
     m_dataToSend.push_back( std::move( data ) );
     if( (m_dataToSend.size() == 1) && m_socket )

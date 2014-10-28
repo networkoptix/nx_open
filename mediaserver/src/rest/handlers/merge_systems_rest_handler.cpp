@@ -22,7 +22,7 @@ namespace {
     ec2::AbstractECConnectionPtr ec2Connection() { return QnAppServerConnectionFactory::getConnection2(); }
 
     QnUserResourcePtr getAdminUser() {
-        foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::user)) {
+        for (const QnResourcePtr &resource: qnResPool->getResourcesWithFlag(Qn::user)) {
             if (resource->getName() == lit("admin"))
                 return resource.dynamicCast<QnUserResource>();
         }

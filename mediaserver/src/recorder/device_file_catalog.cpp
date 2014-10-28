@@ -159,7 +159,7 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk, bool checkDirOnly)
     QString fName = strPadLeft(QString::number(chunk.fileIndex), 3, '0') + QString(".mkv");
 
     bool found = false;
-    foreach(const QFileInfo& info, itr.value().entryList)
+    for(const QFileInfo& info: itr.value().entryList)
     {
         if (info.fileName() == fName)
         {
@@ -365,7 +365,7 @@ bool DeviceFileCatalog::needRebuildPause()
 void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageResourcePtr &storage, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& filter)
 {
     QDir dir(folder);
-    foreach(const QFileInfo& fi, dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name))
+    for(const QFileInfo& fi: dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name))
     {
         while (m_rebuildArchive != Rebuild_None && needRebuildPause())
             QnLongRunnable::msleep(100);
@@ -441,14 +441,14 @@ bool DeviceFileCatalog::doRebuildArchive(const QnStorageResourcePtr &storage, co
     QVector<EmptyFileInfo> emptyFileList;
     readStorageData(storage, m_catalog, allChunks, emptyFileList, period);
 
-    foreach(const EmptyFileInfo& emptyFile, emptyFileList) {
+    for(const EmptyFileInfo& emptyFile: emptyFileList) {
         if (emptyFile.startTimeMs < period.endTimeMs())
             qnFileDeletor->deleteFile(emptyFile.fileName);
     }
 
     QMutexLocker lk( &m_mutex );
 
-    foreach(const Chunk& chunk, allChunks)
+    for(const Chunk& chunk: allChunks)
         m_chunks.push_back(chunk);
 
     qWarning() << "rebuild archive for camera " << m_cameraUniqueId << prefixByCatalog(m_catalog) << "finished. time=" << t.elapsed() << "ms. processd files=" << m_chunks.size();

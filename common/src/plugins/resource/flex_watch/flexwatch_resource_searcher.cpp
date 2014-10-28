@@ -22,7 +22,7 @@ QnFlexWatchResourceSearcher::~QnFlexWatchResourceSearcher()
 
 void QnFlexWatchResourceSearcher::clearSocketList()
 {
-    foreach(AbstractDatagramSocket* sock, m_sockList)
+    for(AbstractDatagramSocket* sock: m_sockList)
         delete sock;
     m_sockList.clear();
 }
@@ -33,7 +33,7 @@ bool QnFlexWatchResourceSearcher::updateSocketList()
     if (curretTime - m_sockUpdateTime > SOCK_UPDATE_INTERVAL)
     {
         clearSocketList();
-        foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
+        for (QnInterfaceAndAddr iface: getAllIPv4Interfaces())
         {
             AbstractDatagramSocket* sock = SocketFactory::createDatagramSocket();
             //if (!bindToInterface(*sock, iface, 51001)) {
@@ -52,7 +52,7 @@ bool QnFlexWatchResourceSearcher::updateSocketList()
 void QnFlexWatchResourceSearcher::sendBroadcast()
 {
     QByteArray requestPattertn("53464a001c0000000000000000000000____f850000101000000d976");
-    foreach (AbstractDatagramSocket* sock, m_sockList)
+    for (AbstractDatagramSocket* sock: m_sockList)
     {
         if (shouldStop())
             break;
@@ -83,7 +83,7 @@ QnResourceList QnFlexWatchResourceSearcher::findResources()
 
     QSet<QString> processedMac;
 
-    foreach (AbstractDatagramSocket* sock, m_sockList)
+    for (AbstractDatagramSocket* sock: m_sockList)
     {
         if (shouldStop())
             return QnResourceList();
@@ -118,7 +118,7 @@ QnResourceList QnFlexWatchResourceSearcher::findResources()
             info.discoveryIp = sender;
 
             OnvifResourceInformationFetcher onfivFetcher;
-            onfivFetcher.findResources(QString(QLatin1String("http://%1/onvif/device_service")).arg(info.discoveryIp), info, result);
+            onfivFetcher.findResources(QString(QLatin1String("http://%1/onvif/device_service")).arg(info.discoveryIp), info, result, discoveryMode());
 
         }
 

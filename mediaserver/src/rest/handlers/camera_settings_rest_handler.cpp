@@ -110,19 +110,14 @@ int QnCameraSettingsRestHandler::executeGet( const QString& path, const QnReques
     awaitedParams.resource = res;
 
     if( cmdType == ctGetParam )
-        connect(
-            res.data(),
-            SIGNAL(asyncParamGetDone(const QnResourcePtr &, const QString&, const QVariant&, bool)),
-            this,
-            SLOT(asyncParamGetComplete(const QnResourcePtr &, const QString&, const QVariant&, bool)),
-            Qt::DirectConnection );
+        connect( res.data(), &QnResource::asyncParamGetDone, 
+                 this, &QnCameraSettingsRestHandler::asyncParamGetComplete,
+                 Qt::DirectConnection );
     else
-        connect(
-            res.data(),
-            SIGNAL(asyncParamSetDone(const QnResourcePtr &, const QString&, const QVariant&, bool)),
-            this,
-            SLOT(asyncParamSetComplete(const QnResourcePtr &, const QString&, const QVariant&, bool)),
-            Qt::DirectConnection );
+        connect( res.data(), &QnResource::asyncParamSetDone,
+                 this, &QnCameraSettingsRestHandler::asyncParamSetComplete,
+                 Qt::DirectConnection );
+
     for( QnRequestParamList::const_iterator
         it = locParams.begin();
         it != locParams.end();

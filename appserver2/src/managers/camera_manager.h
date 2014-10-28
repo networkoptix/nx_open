@@ -27,7 +27,7 @@ namespace ec2
             QnVirtualCameraResourcePtr cameraRes = m_resCtx.resFactory->createResource(
                 tran.params.typeId,
                 QnResourceParams(tran.params.id, tran.params.url, tran.params.vendor) ).dynamicCast<QnVirtualCameraResource>();
-            Q_ASSERT(cameraRes);
+            Q_ASSERT_X(cameraRes, Q_FUNC_INFO, QByteArray("Unknown resource type:") + tran.params.typeId.toByteArray());
             if (cameraRes) {
                 fromApiToResource(tran.params, cameraRes);
                 emit cameraAddedOrUpdated( std::move(cameraRes ));
@@ -37,7 +37,7 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiCameraDataList>& tran )
         {
             assert( tran.command == ApiCommand::saveCameras );
-            foreach(const ApiCameraData& camera, tran.params) 
+            for(const ApiCameraData& camera: tran.params) 
             {
                 QnVirtualCameraResourcePtr cameraRes = m_resCtx.resFactory->createResource(
                     camera.typeId,
@@ -56,7 +56,7 @@ namespace ec2
 
         void triggerNotification( const QnTransaction<ApiCameraAttributesDataList>& tran ) {
             assert( tran.command == ApiCommand::saveCameraUserAttributesList );
-            foreach(const ApiCameraAttributesData& attrs, tran.params) 
+            for(const ApiCameraAttributesData& attrs: tran.params) 
             {
                 QnCameraUserAttributesPtr cameraAttrs( new QnCameraUserAttributes() );
                 fromApiToResource( attrs, cameraAttrs );

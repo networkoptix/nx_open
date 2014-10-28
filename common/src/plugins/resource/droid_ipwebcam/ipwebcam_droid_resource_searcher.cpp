@@ -154,7 +154,7 @@ QnResourceList QnPlIpWebCamResourceSearcher::findResources()
 
         QString name = QLatin1String("DroidLive");
 
-        foreach(AnDroidDev ad, alist)
+        for(AnDroidDev ad: alist)
         {
             if (ad.android)
             {

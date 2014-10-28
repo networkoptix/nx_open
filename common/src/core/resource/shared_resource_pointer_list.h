@@ -47,7 +47,7 @@ public:
     template<class OtherResource>
     QnSharedResourcePointerList<OtherResource> filtered() const {
         QnSharedResourcePointerList<OtherResource> result;
-        foreach(const QnSharedResourcePointer<Resource> &resource, *this)
+        for(const QnSharedResourcePointer<Resource> &resource: *this)
             if(QnSharedResourcePointer<OtherResource> derived = resource.template dynamicCast<OtherResource>())
                 result.push_back(derived);
         return result;

@@ -22,6 +22,6 @@ void QnResourceStatusDiscionary::clear()
 void QnResourceStatusDiscionary::clear(const QVector<QnUuid>& idList)
 {
     QMutexLocker lock(&m_mutex);
-    foreach(const QnUuid& id, idList)
+    for(const QnUuid& id: idList)
         m_items.remove(id);
 }

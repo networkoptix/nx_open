@@ -88,7 +88,7 @@ void OnvifResourceSearcherMdns::findResources(QnResourceList& result, const Onvi
 #endif
 
 
-    foreach(const QHostAddress& localAddress, localAddresses)
+    for(const QHostAddress& localAddress: localAddresses)
     {
         QHostAddress groupAddress(QLatin1String("224.0.0.251"));
 

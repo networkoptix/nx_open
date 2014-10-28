@@ -246,10 +246,14 @@ void QnStatusOverlayWidget::paintFlashingText(QPainter *painter, const QStaticTe
     QnScopedPainterPenRollback penRollback(painter, palette().color(QPalette::WindowText));
     QnScopedPainterTransformRollback transformRollback(painter);
 
+    qreal scaleFactor = textSize * unit / staticFontSize;
+    if (text.size().width() * scaleFactor > rect.width())
+        scaleFactor = rect.width() / text.size().width();
+
     qreal opacity = painter->opacity();
     painter->setOpacity(opacity * qAbs(std::sin(QDateTime::currentMSecsSinceEpoch() / qreal(flashingPeriodMSec * 2) * M_PI)));
     painter->translate(rect.center() + offset * unit);
-    painter->scale(textSize * unit / staticFontSize, textSize * unit / staticFontSize);
+    painter->scale(scaleFactor, scaleFactor);
 
     painter->drawStaticText(-toPoint(text.size() / 2), text);
     painter->setOpacity(opacity);

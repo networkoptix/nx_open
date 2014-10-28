@@ -134,7 +134,7 @@ void QnRtspDataConsumer::getEdgePackets(qint64& firstVTime, qint64& lastVTime, b
 {
     for (int i = 0; i < m_dataQueue.size(); ++i)
     {
-        QnConstCompressedVideoDataPtr video = m_dataQueue.at(i).dynamicCast<const QnCompressedVideoData>();
+        const QnConstCompressedVideoDataPtr& video = m_dataQueue.atUnsafe(i).dynamicCast<const QnCompressedVideoData>();
         if (video && video->isLQ() == checkLQ) {
             firstVTime = video->timestamp;
             break;
@@ -143,7 +143,7 @@ void QnRtspDataConsumer::getEdgePackets(qint64& firstVTime, qint64& lastVTime, b
 
     for (int i = m_dataQueue.size()-1; i >=0; --i)
     {
-        QnConstCompressedVideoDataPtr video = m_dataQueue.at(i).dynamicCast<const QnCompressedVideoData>();
+        const QnConstCompressedVideoDataPtr& video = m_dataQueue.atUnsafe(i).dynamicCast<const QnCompressedVideoData>();
         if (video && video->isLQ() == checkLQ) {
             lastVTime = video->timestamp;
             break;
@@ -197,7 +197,7 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
         bool somethingDeleted = false;
         for (int i = m_dataQueue.size()-1; i >=0; --i)
         {
-            const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>( m_dataQueue.at(i).data() );
+            const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>( m_dataQueue.atUnsafe(i).data() );
             if (media->flags & AV_PKT_FLAG_KEY) 
             {
                 bool isHiQ = !(media->flags & QnAbstractMediaData::MediaFlags_LowQuality);
@@ -215,7 +215,7 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
         {
             for (int i = m_dataQueue.size()-1; i >=0; --i)
             {
-                const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>( m_dataQueue.at(i).data() );
+                const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>( m_dataQueue.atUnsafe(i).data() );
                 if (media->flags & AV_PKT_FLAG_KEY)
                 {
                     m_dataQueue.removeFirst(i);

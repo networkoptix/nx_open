@@ -10,7 +10,6 @@
 #include <QtCore/QList>
 #include <QtCore/QUrl>
 
-#include <utils/common/email.h>
 #include <utils/network/module_information.h>
 
 #include <api/model/connection_info.h>

@@ -10,5 +10,5 @@ rem set CONFIG2=%2
 rem IF NOT [%1] == [] call msbuild common-${arch}.vcproj /t:Rebuild /consoleloggerparameters:ErrorsOnly /p:Configuration=%CONFIG1%
 rem IF NOT [%2] == [] call msbuild common-${arch}.vcproj /t:Rebuild /consoleloggerparameters:ErrorsOnly /p:Configuration=%CONFIG2%
 
-rem call msbuild ${project.build.sourceDirectory}\${project.artifactId}-${arch}.vcxproj /t:Build /consoleloggerparameters:Summary /p:Configuration=${build.configuration}
-call ${environment.dir}\bin\jom /S
+call msbuild ${project.build.sourceDirectory}\${project.artifactId}-${arch}.vcxproj /t:Build /consoleloggerparameters:Summary /p:Configuration=${build.configuration}
+rem call ${environment.dir}\bin\jom /S

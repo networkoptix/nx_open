@@ -5,7 +5,7 @@ Description: ${license.text}
 Template: ${deb.customization.company.name}-client/accepted-client-eula
 Type: boolean
 Default: false
-Description: Do you accept the EULA license terms?
+Description: I accept the EULA license terms.
  In order to install this package, you must accept the license terms. Not accepting will cancel the
  installation.
 

@@ -27,6 +27,7 @@
 #include <ui/style/warning_style.h>
 #include <ui/models/license_list_model.h>
 #include <ui/dialogs/license_details_dialog.h>
+#include <ui/dialogs/message_box.h>
 
 #include <utils/license_usage_helper.h>
 #include <utils/serialization/json_functions.h>
@@ -163,10 +164,18 @@ void QnLicenseManagerWidget::updateLicenses() {
 }
 
 void QnLicenseManagerWidget::showMessage(const QString &title, const QString &message, bool warning) {
-    if (warning)
-        QMessageBox::warning(this, title, message);
-    else
-        QMessageBox::information(this, title, message);
+    QScopedPointer<QnWorkbenchStateDependentDialog<QnMessageBox>> messageBox(new QnWorkbenchStateDependentDialog<QnMessageBox>(this));
+    messageBox->setIcon(warning ? QMessageBox::Warning : QMessageBox::Information);
+    messageBox->setWindowTitle(title);
+    messageBox->setText(message);
+    QPushButton* copyButton = messageBox->addCustomButton(tr("Copy to Clipboard"), QMessageBox::HelpRole);
+    connect(copyButton, &QPushButton::clicked, this, [this, message]{
+        qApp->clipboard()->setText(message);
+    });
+    messageBox->setStandardButtons(QMessageBox::Ok);
+    messageBox->setEscapeButton(QMessageBox::Ok);
+    messageBox->setDefaultButton(QMessageBox::Ok);
+    messageBox->exec();
 }
 
 void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool infoMode, const QUrl &url) 

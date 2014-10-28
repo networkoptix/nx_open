@@ -202,7 +202,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
         result += tr("Conflict address: %1").arg(params.getSource());
 
         int n = 0;
-        foreach (const QString& mac, params.getConflicts()) {
+        for (const QString& mac: params.getConflicts()) {
             result += delimiter;
             result += tr("Camera #%1 MAC: %2").arg(++n).arg(mac);
         }
@@ -213,11 +213,12 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
         conflicts.sourceServer = params.getSource();
         conflicts.decode(params.getConflicts());
         int n = 0;
-        foreach (const QString &server, conflicts.camerasByServer.keys()) {
+        for (auto itr = conflicts.camerasByServer.begin(); itr != conflicts.camerasByServer.end(); ++itr) {
+            const QString &server = itr.key();
             result += delimiter;
             result += tr("Conflicting Server #%1: %2").arg(++n).arg(server);
             int m = 0;
-            foreach (const QString &camera, conflicts.camerasByServer[server]) {
+            for (const QString &camera: conflicts.camerasByServer[server]) {
                 result += delimiter;
                 result += tr("Camera #%1 MAC: %2").arg(++m).arg(camera);
             }
@@ -268,7 +269,9 @@ QVariantHash QnBusinessStringsHelper::eventDetailsMap(
     }
     case StorageFailureEvent:
     case NetworkIssueEvent:
-    case ServerFailureEvent: {
+    case ServerFailureEvent: 
+    case LicenseIssueEvent:
+    {
         detailsMap[tpReason] = eventReason(params);
         break;
     }
@@ -293,7 +296,8 @@ QVariantHash QnBusinessStringsHelper::eventDetailsMap(
 
         QVariantList conflictsList;
         int n = 0;
-        foreach (const QString &server, conflicts.camerasByServer.keys()) {
+        for (auto itr = conflicts.camerasByServer.begin(); itr != conflicts.camerasByServer.end(); ++itr) {
+            const QString &server = itr.key();
             foreach (const QString &camera, conflicts.camerasByServer[server]) {
                 QVariantHash conflict;
                 conflict[lit("number")] = ++n;
@@ -401,7 +405,8 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
     }
     case LicenseRemoved: {
         QString disabledCameras = reasonParamsEncoded;
-        result = tr("Recording on %n camera(s) is disabled. The number of active licenses is less than the number of recorded cameras.", NULL, disabledCameras.toInt());
+        result = tr("Recording on %n camera(s) is disabled: ", NULL, disabledCameras.split(L',').size());
+        result += disabledCameras;
         break;
     }
     default:
@@ -419,7 +424,7 @@ QString QnBusinessStringsHelper::aggregatedEventDetails(const QnAbstractBusiness
         result += eventDetailsWithTimestamp(action->getRuntimeParams(), action->getAggregationCount(), delimiter);
     }
 
-    foreach (const QnInfoDetail& detail, aggregationInfo.toList()) {
+    for (const QnInfoDetail& detail: aggregationInfo.toList()) {
         if (!result.isEmpty())
             result += delimiter;
         result += eventDetailsWithTimestamp(detail.runtimeParams(), detail.count(), delimiter);
@@ -435,7 +440,7 @@ QVariantList QnBusinessStringsHelper::aggregatedEventDetailsMap(const QnAbstract
         result << eventDetailsMap(action, QnInfoDetail(action->getRuntimeParams(), action->getAggregationCount()), useIp);
     }
 
-    foreach (const QnInfoDetail& detail, aggregationInfo.toList()) {
+    for (const QnInfoDetail& detail: aggregationInfo.toList()) {
         result << eventDetailsMap(action, detail, useIp);
     }
     return result;

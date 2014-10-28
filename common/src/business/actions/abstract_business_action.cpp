@@ -120,7 +120,7 @@ const QVector<QnUuid>& QnAbstractBusinessAction::getResources() const {
 QnResourceList QnAbstractBusinessAction::getResourceObjects() const
 {
     QnResourceList result;
-    foreach(const QnUuid& id, m_resources)
+    for(const QnUuid& id: m_resources)
     {
         QnResourcePtr res = qnResPool->getResourceById(id);
         if (res)

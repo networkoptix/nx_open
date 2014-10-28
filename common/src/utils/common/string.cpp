@@ -105,14 +105,14 @@ QString extractFileExtension(const QString &string) {
 
 QString generateUniqueString(const QStringList &usedStrings, const QString &defaultString, const QString &templateString) {
     QStringList lowerStrings;
-    foreach (const QString &string, usedStrings)
+    for (const QString &string: usedStrings)
         lowerStrings << string.toLower();
 
     QRegExp pattern = QRegExp(templateString.arg(lit("?([0-9]+)?")).toLower());
 
     /* Prepare new name. */
     int number = 0;
-    foreach(const QString &string, lowerStrings) {
+    for(const QString &string: lowerStrings) {
         if(!pattern.exactMatch(string))
             continue;
 

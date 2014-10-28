@@ -99,7 +99,7 @@ qint64 QnTimePeriodList::duration() const {
         return -1;
 
     qint64 result = 0;
-    foreach(const QnTimePeriod &period, *this)
+    for(const QnTimePeriod &period: *this)
         result += period.durationMs;
     return result;
 }

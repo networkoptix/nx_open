@@ -636,7 +636,7 @@ namespace applauncher
         QByteArray GetInstalledVersionsResponse::serialize() const
         {
             QByteArray result = Response::serialize();
-            foreach (const QnSoftwareVersion &version, versions) {
+            for (const QnSoftwareVersion &version: versions) {
                 result.append(version.toString().toLatin1());
                 result.append(',');
             }
@@ -654,7 +654,7 @@ namespace applauncher
                 return false;
 
             const QList<QnByteArrayConstRef> &versions = lines[1].split(',');
-            foreach (const QnByteArrayConstRef &version, versions)
+            for (const QnByteArrayConstRef &version: versions)
                 this->versions.append(QnSoftwareVersion(version.toByteArrayWithRawData()));
 
             return true;

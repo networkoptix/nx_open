@@ -64,7 +64,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
 
     QList<QSize> resolutions;
 
-    foreach(const QString& val,  vals)
+    for(const QString& val:  vals)
     {
         QStringList wh_s = val.split(QLatin1Char('x'));
         if (wh_s.size()<2)
@@ -165,7 +165,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
     vals = getValues(QLatin1String(fpses));
 
     QList<int> fpsList;
-    foreach(const QString& fpsS, vals)
+    for(const QString& fpsS: vals)
     {
         fpsList.push_back(fpsS.trimmed().toInt());
     }

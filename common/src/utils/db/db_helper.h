@@ -23,7 +23,7 @@ public:
 
         void beginTran();
         void rollback();
-        void commit();
+        bool commit();
     };
 
     class QnDbTransactionLocker
@@ -31,7 +31,7 @@ public:
     public:
         QnDbTransactionLocker(QnDbTransaction* tran);
         ~QnDbTransactionLocker();
-        void commit();
+        bool commit();
 
     private:
         bool m_committed;

@@ -34,7 +34,7 @@ QString QnEnvironment::searchInPath(QString executable) {
 #endif
 
     const QChar slash = QLatin1Char('/');
-    foreach (const QString &p, QProcessEnvironment::systemEnvironment().value(QLatin1String("PATH")).split(sep)) {
+    for (const QString &p: QProcessEnvironment::systemEnvironment().value(QLatin1String("PATH")).split(sep)) {
         QString fp = p + slash + executable;
 
         const QFileInfo fi(fp);
@@ -77,7 +77,7 @@ void QnEnvironment::showInGraphicalShell(QWidget *parent, const QString &path) {
 
 QString QnEnvironment::getUniqueFileName(const QString &dirName, const QString &baseName) {
     QStringList existingFiles;
-    foreach (const QFileInfo &info, QDir(dirName).entryInfoList(QDir::Files)) {
+    for (const QFileInfo &info: QDir(dirName).entryInfoList(QDir::Files)) {
         existingFiles << info.completeBaseName();
     }
 

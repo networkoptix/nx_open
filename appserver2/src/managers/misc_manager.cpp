@@ -11,15 +11,15 @@ namespace ec2 {
 void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiModuleData> &transaction) {
     QnModuleInformation moduleInformation;
     QnGlobalModuleFinder::fillFromApiModuleData(transaction.params, &moduleInformation);
-    foreach (const QnUuid &discovererId, transaction.params.discoverers)
+    for (const QnUuid &discovererId: transaction.params.discoverers)
         emit moduleChanged(moduleInformation, transaction.params.isAlive, discovererId);
 }
 
 void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiModuleDataList> &transaction) {
-    foreach (const ApiModuleData &data, transaction.params) {
+    for (const ApiModuleData &data: transaction.params) {
         QnModuleInformation moduleInformation;
         QnGlobalModuleFinder::fillFromApiModuleData(data, &moduleInformation);
-        foreach (const QnUuid &discovererId, data.discoverers)
+        for (const QnUuid &discovererId: data.discoverers)
             emit moduleChanged(moduleInformation, data.isAlive, discovererId);
     }
 }
@@ -84,7 +84,7 @@ template<class QueryProcessorType>
 QnTransaction<ApiModuleDataList> QnMiscManager<QueryProcessorType>::prepareTransaction(const QList<QnModuleInformation> &moduleInformationList, const QMultiHash<QnUuid, QnUuid> &discoverersByPeer) const {
     QnTransaction<ApiModuleDataList> transaction(ApiCommand::moduleInfoList);
 
-    foreach (const QnModuleInformation &moduleInformation, moduleInformationList) {
+    for (const QnModuleInformation &moduleInformation: moduleInformationList) {
         ApiModuleData data;
         QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &data);
         data.isAlive = true;

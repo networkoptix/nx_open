@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,$location) {
+    .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,$location,$timeout) {
 
         mediaserver.getCurrentUser().success(function(result){
             if(!result.reply.isAdmin){
@@ -94,6 +94,8 @@ angular.module('webadminApp')
                 }
             } else {
                 alert("Settings saved");
+                if( $scope.settings.port !=  window.location.port )
+                    window.location.href =  window.location.protocol + "//" + window.location.hostname + ":" + $scope.settings.port;
             }
         }
 
@@ -122,12 +124,9 @@ angular.module('webadminApp')
             var port = server.apiUrl.substring(server.apiUrl.lastIndexOf(":"));
             var url = "http://" + ips[i] + port;
 
-
-            //console.log("checkServersIp", url, server);
             mediaserver.getSettings(url).then(function(){
                 server.apiUrl = url;
             }).catch(function(){
-            //    console.log("fail again " + url);
                 if(i < ips.length-1)
                     checkServersIp (server,i+1);
                 else
@@ -141,10 +140,11 @@ angular.module('webadminApp')
                 return (server.status=='Online'?'0':'1') + server.Name + server.id;
                 // Сортировка: online->name->id
             });
-
-            _.each($scope.mediaServers,function(server){
-                var i=0;//1. Опрашиваем айпишники подряд
-                checkServersIp (server,i);
-            });
+            $timeout(function() {
+                _.each($scope.mediaServers, function (server) {
+                    var i = 0;//1. Опрашиваем айпишники подряд
+                    checkServersIp(server, i);
+                });
+            },1000);
         });
     });

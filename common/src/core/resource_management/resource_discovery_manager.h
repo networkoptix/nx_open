@@ -123,7 +123,6 @@ signals:
     void CameraIPConflict(QHostAddress addr, QStringList macAddrList);
 
 protected slots:
-    void onInitAsyncFinished(const QnResourcePtr& res, bool initialized);
     void at_resourceDeleted(const QnResourcePtr& resource);
     void at_resourceChanged(const QnResourcePtr& resource);
 private:
