@@ -56,6 +56,8 @@ describe('Advanced Page', function () {
 
 
     it("should show warning, then limit is more than free space",function(){
+        p.get();
+        expect(p.reduceArchiveAlert.isDisplayed()).toBe(false);
         p.storageLimitInput.getAttribute("max").then(function(max){
 
             var toset = parseFloat(max).toFixed(0)-1;
@@ -63,18 +65,21 @@ describe('Advanced Page', function () {
 
             expect(p.saveButton.isEnabled()).toBe(true);
             expect(p.storageLimitInput.element(by.xpath("..")).getAttribute("class")).toMatch("has-warning");
-
+            expect(p.reduceArchiveAlert.isDisplayed()).toBe(true);
+console.log("click 1");
             p.saveButton.click().then(function(){
                 var alertDialog = ptor.switchTo().alert();
                 expect(alertDialog.getText()).toContain("Possible partial remove of the video footage is expected");
                 alertDialog.dismiss();
             });
-
         });
     });
 
     it("should save settings and display it after reload",function(){
+        p.get();
         p.setStorageLimit(1);
+
+        console.log("click 2");
         p.saveButton.click().then(function(){
             var alertDialog = ptor.switchTo().alert();
             expect(alertDialog.getText()).toContain("Settings saved");
@@ -85,6 +90,8 @@ describe('Advanced Page', function () {
         expect(p.storageLimitInput.getAttribute("value")).toBe("1");
 
         p.setStorageLimit(5);
+
+        console.log("click 3");
         p.saveButton.click().then(function(){
             var alertDialog = ptor.switchTo().alert();
             expect(alertDialog.getText()).toContain("Settings saved");
@@ -96,28 +103,36 @@ describe('Advanced Page', function () {
     });
 
     it("should forbid disabling all storages",function(){
+        p.get();
+        expect(p.selectWritableStorageAlert.isDisplayed()).toBe(false);
+
         var total = p.storagesRows.count();
         var d = protractor.promise.defer();
         var readycounter=0;
         for(var i=0;i<total;i++){
+            console.log("test checkboxes",i);
             var row = p.storagesRows.get(i);
-            var checkbox = row.element(by.model("storage.isUsedForWriting"));
+            var checkbox = row.element(by.css(".isUsedForWriting"));//by.model("storage.isUsedForWriting"));
             checkbox.isSelected().then(function(isSelected){
+
                 if(isSelected) {
                     checkbox.click();
+                    console.log("click item to deselect");
                 }
+
                 expect(checkbox.isSelected()).toBe(false);
                 readycounter++;
 
                 if(readycounter == total){
-                    d.fulfill("ok");
+                     d.fulfill("ok");
                     done();
                 }
             });
         }
-        expect(d).toBe('ok');
-        expect(p.saveButton.isEnabled()).toBe(false);
-        expect("some warning").toBe("showed");
+        d.promise.then(function(){
+            expect(p.selectWritableStorageAlert.isDisplayed()).toBe(true);
+            expect(p.saveButton.isEnabled()).toBe(false);
+        });
     });
 
     it("should allow cancel changes",function(){

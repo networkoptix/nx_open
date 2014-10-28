@@ -12,6 +12,10 @@ var Page = function () {
 
     this.cancelButton = element(by.buttonText("Cancel"));
 
+    this.selectWritableStorageAlert = element(by.id("selectWritableStorageAlert"));
+
+    this.reduceArchiveAlert = element(by.id("reduceArchiveAlert"));
+
     this.storageLimitInput  = this.storagesRows.first().element(by.model("storage.reservedSpaceGb"));
     this.setStorageLimit = function (val){
         //Hack from https://github.com/angular/protractor/issues/562
