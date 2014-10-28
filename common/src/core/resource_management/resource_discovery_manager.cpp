@@ -249,16 +249,16 @@ void QnResourceDiscoveryManager::setLastDiscoveredResources(const QnResourceList
     m_discoveryUpdateIdx = (m_discoveryUpdateIdx + 1) % sz;
 }
 
-QnResourceList QnResourceDiscoveryManager::lastDiscoveredResources() const
+QSet<QString> QnResourceDiscoveryManager::lastDiscoveredIds() const
 {
     QMutexLocker lock(&m_resListMutex);
     int sz = sizeof(m_lastDiscoveredResources) / sizeof(QnResourceList);
-    QSet<QnResourcePtr> allResources;
+    QSet<QString> allDiscoveredIds;
     for (int i = 0; i < sz; ++i) {
         for(const QnResourcePtr& res: m_lastDiscoveredResources[i])
-            allResources << res;
+            allDiscoveredIds << res->getUniqueId();
     }
-    return allResources.toList();
+    return allDiscoveredIds;
 }
 
 void QnResourceDiscoveryManager::updateLocalNetworkInterfaces()
