@@ -336,39 +336,32 @@ void QnServerSettingsDialog::submitToResources()
 {
     if(m_hasStorageChanges) {
         QnAbstractStorageResourceList newStorages;
-        ec2::ApiIdDataList storagesToRemove;
         foreach(const QnStorageSpaceData &item, tableItems()) 
         {
-            if (item.isExternal && !item.isUsedForWriting)
-            {
-                storagesToRemove.push_back(QnAbstractStorageResource::fillID(m_server->getId(), item.url));
+            QnAbstractStorageResourcePtr storage = m_server->getStorageByUrl(item.url);
+            if (storage) {
+                if (item.isUsedForWriting != storage->isUsedForWriting()) {
+                    storage->setUsedForWriting(item.isUsedForWriting);
+                    newStorages.push_back(storage); // todo: #rvasilenko: temporarty code line. Need remote it after moving 'usedForWriting' to separate property
+                }
             }
             else {
-                QnAbstractStorageResourcePtr storage = m_server->getStorageByUrl(item.url);
-                if (storage) {
-                    if (item.isUsedForWriting != storage->isUsedForWriting()) {
-                        storage->setUsedForWriting(item.isUsedForWriting);
-                        newStorages.push_back(storage); // todo: #rvasilenko: temporarty code line. Need remote it after moving 'usedForWriting' to separate property
-                    }
-                }
-                else {
-                    // create or remove new storage
-                    QnAbstractStorageResourcePtr storage(new QnAbstractStorageResource());
-                    if (!item.storageId.isNull())
-                        storage->setId(item.storageId);
-                    QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(lit("Storage"));
-                    if (resType)
-                        storage->setTypeId(resType->getId());
-                    storage->setName(QnUuid::createUuid().toString());
-                    storage->setParentId(m_server->getId());
-                    storage->setUrl(item.url);
-                    storage->setSpaceLimit(item.reservedSpace); //client does not change space limit anymore
-                    storage->setUsedForWriting(item.isUsedForWriting);
-                    newStorages.push_back(storage);
-                }
+                // create or remove new storage
+                QnAbstractStorageResourcePtr storage(new QnAbstractStorageResource());
+                if (!item.storageId.isNull())
+                    storage->setId(item.storageId);
+                QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(lit("Storage"));
+                if (resType)
+                    storage->setTypeId(resType->getId());
+                storage->setName(QnUuid::createUuid().toString());
+                storage->setParentId(m_server->getId());
+                storage->setUrl(item.url);
+                storage->setSpaceLimit(item.reservedSpace); //client does not change space limit anymore
+                storage->setUsedForWriting(item.isUsedForWriting);
+                newStorages.push_back(storage);
             }
         }
-        m_server->setStorageDataToUpdate(newStorages, storagesToRemove);
+        m_server->setStorageDataToUpdate(newStorages, m_storagesToRemove);
     }
 
     m_server->setName(ui->nameLineEdit->text());
@@ -468,6 +461,7 @@ void QnServerSettingsDialog::at_storagesTable_contextMenuEvent(QObject *, QEvent
 
     QAction *action = menu->exec(QCursor::pos());
     if(action == m_removeAction) {
+        m_storagesToRemove.push_back(item.storageId);
         ui->storagesTable->removeRow(row);
         m_hasStorageChanges = true;
     }
