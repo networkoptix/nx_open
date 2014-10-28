@@ -40,6 +40,7 @@ protected:
 
     win32_exception( PEXCEPTION_POINTERS info );
 
+
 private:
     Address mWhere;
     unsigned mCode;

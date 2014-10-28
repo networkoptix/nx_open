@@ -8,6 +8,7 @@
 #include <string>
 
 #include <Dbghelp.h>
+#include <Windows.h>
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QStandardPaths>
@@ -46,6 +47,71 @@ win32_exception::Address access_violation::badAddress() const
 { 
     return mBadAddress; 
 }
+
+static
+void writeMiniDump( PEXCEPTION_POINTERS ex ) {
+    char strFileName[1024];
+    char strModuleName[1024];
+
+    // should not have any heap allocation
+    const char* strLocation = 
+        QStandardPaths::writableLocation( QStandardPaths::DataLocation ).toLatin1().constData();
+
+    // Get the current working directory
+    GetModuleFileNameA( NULL , strModuleName , 1024 );
+
+    // sprintf is safe since it is async-signal-safe which means
+    // it should not acquire any global lock internally. Otherwise
+    // we may deadlock here. 
+
+    int ret = sprintf(strFileName,"%s/%s_%d.minidump",
+        strLocation,
+        strModuleName,
+        GetCurrentProcessId());
+
+    if( ret <0 )
+        return;
+
+    HANDLE hFile = ::CreateFileA(
+        strFileName,
+        GENERIC_WRITE,
+        0,
+        NULL,
+        CREATE_NEW,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL);
+
+    if( hFile == INVALID_HANDLE_VALUE )
+        return;
+
+    MINIDUMP_EXCEPTION_INFORMATION sMDumpExcept; 
+
+    sMDumpExcept.ThreadId           = GetCurrentThreadId(); 
+    sMDumpExcept.ExceptionPointers  = ex; 
+    sMDumpExcept.ClientPointers     = FALSE; 
+
+    // This will generate the full minidump. I don't know the specific
+    // requirements of our dump file. If it is used for online report
+    // or online analyzing, we may need to generate small dump file 
+
+    MINIDUMP_TYPE sMDumpType =  (MINIDUMP_TYPE)(MiniDumpWithFullMemory | 
+                                            MiniDumpWithFullMemoryInfo | 
+                                                MiniDumpWithHandleData | 
+                                                MiniDumpWithThreadInfo | 
+                                            MiniDumpWithUnloadedModules ); 
+
+    ::MiniDumpWriteDump( 
+        GetCurrentProcess(),
+        GetCurrentProcessId(),
+        hFile,
+        sMDumpType,
+        ex == NULL ? NULL : &sMDumpExcept,
+        NULL,
+        NULL);
+
+    ::CloseHandle(hFile);
+}
+
 
 static LONG WINAPI unhandledSEHandler( __in struct _EXCEPTION_POINTERS* ExceptionInfo )
 {
@@ -100,6 +166,7 @@ static DWORD WINAPI dumpStackProc( LPVOID lpParam )
     //dumping stack
     const std::string& currentCallStack = getCallStack( targetThreadHandle, NULL, &threadContext );
     writeCrashInfo( "CRT_INVALID_PARAMETER", currentCallStack.c_str() );
+    writeMiniDump(NULL);
 
     //terminating process
     return TerminateProcess( GetCurrentProcess(), 1 ) ? 0 : 1;
@@ -119,6 +186,8 @@ static void dumpCrtError( const char* errorName )
     const std::string& currentCallStack = getCallStack( GetCurrentThread(), NULL, NULL );
     //NOTE on win64 currentCallStack will be empty
     writeCrashInfo( errorName, currentCallStack.c_str() );
+    writeMiniDump(NULL);
+
     TerminateProcess( GetCurrentProcess(), 1 );
 }
 
@@ -162,6 +231,7 @@ void win32_exception::translate(
         {
             access_violation e( info );
             writeCrashInfo( "EXCEPTION_ACCESS_VIOLATION", e.what() );
+            writeMiniDump(info);
             break;
         }
     
@@ -169,12 +239,14 @@ void win32_exception::translate(
         {
             win32_exception e( info );
             writeCrashInfo( "STRUCTURED EXCEPTION", e.what() );
+            writeMiniDump(info);
             break;
         }
     }
 
     TerminateProcess( GetCurrentProcess(), 1 );
 }
+
 
 #define SYMSIZE 10000
 #define MAXTEXT 5000
