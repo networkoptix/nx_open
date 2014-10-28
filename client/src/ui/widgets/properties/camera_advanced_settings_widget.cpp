@@ -287,12 +287,17 @@ QnSettingsTextFieldWidget::QnSettingsTextFieldWidget(const CameraSetting &obj, Q
     m_layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
     m_layout->addWidget(new QLabel(obj.getName()));
 
-    connect(m_lineEdit, SIGNAL(editingFinished()), this, SLOT(onChange()));
+    m_lineEdit->setReadOnly( obj.isReadOnly() );
+
+    connect( m_lineEdit, &QLineEdit::editingFinished, this, &QnSettingsTextFieldWidget::onChange );
 }
 
 void QnSettingsTextFieldWidget::onChange()
 {
-    m_lineEdit->text();
+    if( !m_lineEdit->isModified() )
+        return;
+    setParam( m_lineEdit->text() );
+    m_lineEdit->setModified( false );
 }
 
 void QnSettingsTextFieldWidget::refresh()

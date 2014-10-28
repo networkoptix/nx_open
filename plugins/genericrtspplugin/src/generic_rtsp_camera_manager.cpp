@@ -31,15 +31,25 @@ GenericRTSPCameraManager::~GenericRTSPCameraManager()
 
 void* GenericRTSPCameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )
 {
-    if( memcmp( &interfaceID, &nxcip::IID_BaseCameraManager, sizeof(nxcip::IID_BaseCameraManager) ) == 0 )
-    {
-        addRef();
-        return this;
-    }
     if( memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0 )
     {
         addRef();
         return static_cast<nxpl::PluginInterface*>(this);
+    }
+    if( memcmp( &interfaceID, &nxcip::IID_BaseCameraManager, sizeof(nxcip::IID_BaseCameraManager) ) == 0 )
+    {
+        addRef();
+        return static_cast<nxcip::BaseCameraManager*>(this);
+    }
+    if( memcmp( &interfaceID, &nxcip::IID_BaseCameraManager2, sizeof(nxcip::IID_BaseCameraManager2) ) == 0 )
+    {
+        addRef();
+        return static_cast<nxcip::BaseCameraManager2*>(this);
+    }
+    if( memcmp( &interfaceID, &nxcip::IID_BaseCameraManager3, sizeof(nxcip::IID_BaseCameraManager3) ) == 0 )
+    {
+        addRef();
+        return static_cast<nxcip::BaseCameraManager3*>(this);
     }
     return NULL;
 }
@@ -125,6 +135,65 @@ void GenericRTSPCameraManager::getLastErrorString( char* errorString ) const
     errorString[0] = '\0';
     //TODO/IMPL
 }
+
+
+int GenericRTSPCameraManager::createDtsArchiveReader( nxcip::DtsArchiveReader** /*dtsArchiveReader*/ ) const
+{
+    return nxcip::NX_NOT_IMPLEMENTED;
+}
+
+int GenericRTSPCameraManager::find( nxcip::ArchiveSearchOptions* /*searchOptions*/, nxcip::TimePeriods** /*timePeriods*/ ) const
+{
+    return nxcip::NX_NOT_IMPLEMENTED;
+}
+
+int GenericRTSPCameraManager::setMotionMask( nxcip::Picture* /*motionMask*/ )
+{
+    return nxcip::NX_NOT_IMPLEMENTED;
+}
+
+
+const char* GenericRTSPCameraManager::getParametersDescriptionXML() const
+{
+    static const char* rtspPluginParamsXML = "\
+        <cameras>                                                                                                   \
+            <camera name=\"rtsp_cam\">                                                                              \
+                <group name=\"main\">                                                                               \
+                    <param name=\"rtsp_url\" description=\"RTSP URL\" dataType=\"String\" readOnly=\"true\"/>       \
+                </group>                                                                                            \
+            </camera>                                                                                               \
+        </cameras>                                                                                                  \
+        ";
+
+    return rtspPluginParamsXML;
+}
+
+int GenericRTSPCameraManager::getParamValue( const char* paramName, char* valueBuf, int* valueBufSize ) const
+{
+    if( strcmp(paramName, "/main/rtsp_url") == 0 )
+    {
+        const int requiredBufSize = strlen( m_info.url )+1;
+        if( *valueBufSize < requiredBufSize )
+        {
+            *valueBufSize = requiredBufSize;
+            return nxcip::NX_MORE_DATA;
+        }
+        *valueBufSize = requiredBufSize;
+        strcpy( valueBuf, m_info.url );
+        return nxcip::NX_NO_ERROR;
+    }
+
+    return nxcip::NX_UNKNOWN_PARAMETER;
+}
+
+int GenericRTSPCameraManager::setParamValue( const char* paramName, const char* /*value*/ )
+{
+    if( strcmp(paramName, "/main/rtsp_url") == 0 )
+        return nxcip::NX_PARAM_READ_ONLY;
+
+    return nxcip::NX_UNKNOWN_PARAMETER;
+}
+
 
 const nxcip::CameraInfo& GenericRTSPCameraManager::info() const
 {
