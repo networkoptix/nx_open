@@ -639,9 +639,10 @@ namespace nxcip
             This XML describes parameters (types, possible values, etc..) accessible with \a getParamValue and \a setParamValue
         */
         virtual const char* getParametersDescriptionXML() const = 0;
-        //!Reads value of parameter \a paramID
+        //!Reads value of parameter \a paramName
         /*!
-            \param paramName \0-terminated utf-8 string specifing name of parameter
+            \param paramName \0-terminated utf-8 string specifing name of parameter.
+                This is a full name. I.e., if parameter belongs to some group, then /group_name/param_name is specified here
             \param valueBufSize IN: Length of \a valueBuf, OUT: length of string value not including \0-character
             \return\n
                 - \a NX_NO_ERROR if value loaded to value buf. Value is always \0-terminated utf8 string
@@ -649,9 +650,10 @@ namespace nxcip
                 - \a NX_MORE_DATA if \a valueBuf has not enough space. In this case \a *valueBufSize is set to required buf size
         */
         virtual int getParamValue( const char* paramName, char* valueBuf, int* valueBufSize ) const = 0;
-        //!Set value of parameter \a paramID to \a value
+        //!Set value of parameter \a paramName to \a value
         /*!
-            \param paramName \0-terminated utf-8 string specifing name of parameter
+            \param paramName \0-terminated utf-8 string specifing name of parameter.
+                This is a full name. I.e., if parameter belongs to some group, then /group_name/param_name is specified here
             \param value \0-terminated utf8 string
             \return\n
                 - \a NX_NO_ERROR if value successfully applied

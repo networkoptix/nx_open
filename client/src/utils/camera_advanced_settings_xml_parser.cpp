@@ -13,8 +13,12 @@ const QString CASXP_MAINTENANCE_GROUP_NAME(QLatin1String("%%Maintenance"));
 // class CameraSettingsLister
 //
 
-CameraSettingsLister::CameraSettingsLister(const QString& id, ParentOfRootElemFoundAware& obj):
-    CameraSettingReader(id),
+CameraSettingsLister::CameraSettingsLister(
+    const QString& id,
+    ParentOfRootElemFoundAware& obj,
+    const QnResourcePtr& cameraRes )
+:
+    CameraSettingReader(id, cameraRes),
     m_obj(obj)
 {
 
@@ -72,8 +76,16 @@ void CameraSettingsLister::parentOfRootElemFound(const QString& parentId)
 // class CameraSettingsWidgetsCreator
 //
 
-CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& id, ParentOfRootElemFoundAware& obj, QTreeWidget& rootWidget, QStackedLayout& rootLayout,
-        TreeWidgetItemsById& widgetsById, LayoutIndById& layoutIndById, SettingsWidgetsById& settingsWidgetsById, EmptyGroupsById& emptyGroupsById):
+CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(
+    const QString& id,
+    ParentOfRootElemFoundAware& obj,
+    QTreeWidget& rootWidget,
+    QStackedLayout& rootLayout,
+    TreeWidgetItemsById& widgetsById,
+    LayoutIndById& layoutIndById,
+    SettingsWidgetsById& settingsWidgetsById,
+    EmptyGroupsById& emptyGroupsById )
+:
     CameraSettingReader(id),
     m_obj(obj),
     m_settings(0),
@@ -85,8 +97,7 @@ CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& id, Pa
     m_emptyGroupsById(emptyGroupsById),
     m_owner(0)
 {
-    connect(&m_rootWidget, SIGNAL(itemPressed(QTreeWidgetItem*, int)), this,   SLOT(treeWidgetItemPressed(QTreeWidgetItem*, int)));
-    connect(&m_rootWidget, SIGNAL(itemSelectionChanged()), this,   SLOT(treeWidgetItemSelectionChanged()));
+    connect( &m_rootWidget, &QTreeWidget::itemSelectionChanged, this, &CameraSettingsWidgetsCreator::treeWidgetItemSelectionChanged );
 }
 
 CameraSettingsWidgetsCreator::~CameraSettingsWidgetsCreator()
@@ -220,6 +231,13 @@ void CameraSettingsWidgetsCreator::paramFound(const CameraSetting& value, const 
         return;
     }
 
+    //TODO #ak this is bullshit!
+        //parameter description must be taken from single place: xml or mediaserver reply (m_settings), not both!
+        //xml is preferred so that camera_settings.xml is parsed on client side only. 
+        //In this case mediaserver reply must contain only param values, not description
+    if( currIt != m_settings->end() )
+        currIt.value()->setIsReadOnly( value.isReadOnly() );
+
     QnSettingsScrollArea* rootWidget = 0;
     LayoutIndById::ConstIterator lIndIt = m_layoutIndById.find(parentId);
     if (lIndIt != m_layoutIndById.end()) {
@@ -236,7 +254,8 @@ void CameraSettingsWidgetsCreator::paramFound(const CameraSetting& value, const 
 
     //Description is not transported through http to avoid huge requests, so
     //setting it from camera_settings.xml file.
-    if (currIt != m_settings->end()) currIt.value()->setDescription(value.getDescription());
+    if (currIt != m_settings->end())
+        currIt.value()->setDescription(value.getDescription());
 
     QnAbstractSettingsWidget* tabWidget = 0;
     switch(value.getType())
@@ -334,32 +353,26 @@ QTreeWidgetItem* CameraSettingsWidgetsCreator::findParentForParam(const QString&
 
 void CameraSettingsWidgetsCreator::cleanDataOnFail()
 {
-    
 }
 
-void CameraSettingsWidgetsCreator::treeWidgetItemPressed(QTreeWidgetItem* item, int /*column*/)
+void CameraSettingsWidgetsCreator::treeWidgetItemSelectionChanged()
 {
-    if (!item) {
+    const QList<QTreeWidgetItem*>& selectedItems = m_rootWidget.selectedItems();
+    if( selectedItems.isEmpty() )
         return;
-    }
 
-    int ind = item->data(0, Qt::UserRole).toInt();
+    Q_ASSERT( selectedItems.size() == 1 );
+    QTreeWidgetItem* selectedItem = selectedItems.front();
+
+    int ind = selectedItem->data(0, Qt::UserRole).toInt();
     if (ind + 1 > m_rootLayout.count()) {
-        qDebug() << "CameraSettingsWidgetsCreator::treeWidgetItemPressed: index out of range! Ind = " << ind << ", Count = " << m_rootLayout.count();
+        qDebug() << "CameraSettingsWidgetsCreator::treeWidgetItemSelectionChanged: index out of range! Ind = " << ind << ", Count = " << m_rootLayout.count();
         return;
     }
 
     m_rootLayout.setCurrentIndex(ind);
 
     emit refreshAdvancedSettings();
-}
-
-void CameraSettingsWidgetsCreator::treeWidgetItemSelectionChanged()
-{
-    if (m_rootLayout.count() > 0) {
-        m_rootLayout.setCurrentIndex(0);
-        emit refreshAdvancedSettings();
-    }
 }
 
 void CameraSettingsWidgetsCreator::parentOfRootElemFound(const QString& parentId)
@@ -372,10 +385,14 @@ void CameraSettingsWidgetsCreator::parentOfRootElemFound(const QString& parentId
 //
 
 template <class T, class E>
-CameraSettingTreeReader<T, E>::CameraSettingTreeReader(const QString& id):
+CameraSettingTreeReader<T, E>::CameraSettingTreeReader(
+    const QString& id,
+    const QnResourcePtr& cameraRes )
+:
     m_initialId(id),
     m_currParentId(),
-    m_firstTime(true)
+    m_firstTime(true),
+    m_cameraRes(cameraRes)
 {
     
 }
@@ -396,7 +413,7 @@ void CameraSettingTreeReader<T, E>::parentOfRootElemFound(const QString& parentI
     m_currParentId = parentId;
 
     if (m_firstTime) {
-        m_objList.push_back(createElement(parentId));
+        m_objList.push_back(createElement(parentId, m_cameraRes));
     }
 }
 
@@ -441,15 +458,19 @@ void CameraSettingTreeReader<T, E>::clean()
 // class CameraSettingsTreeLister
 //
 
-CameraSettingsTreeLister::CameraSettingsTreeLister(const QString& id):
-    CameraSettingTreeReader<CameraSettingsLister, QSet<QString> >(id)
+CameraSettingsTreeLister::CameraSettingsTreeLister(
+    const QString& id,
+    const QnResourcePtr& cameraRes )
+:
+    CameraSettingTreeReader<CameraSettingsLister, QSet<QString> >(id, cameraRes)
 {
-    
 }
 
-CameraSettingsLister* CameraSettingsTreeLister::createElement(const QString& id)
+CameraSettingsLister* CameraSettingsTreeLister::createElement(
+    const QString& id,
+    const QnResourcePtr& cameraRes )
 {
-    return new CameraSettingsLister(id, *this);
+    return new CameraSettingsLister(id, *this, cameraRes);
 }
 
 QSet<QString>& CameraSettingsTreeLister::getAdditionalInfo()
@@ -504,10 +525,13 @@ CameraSettingsWidgetsTreeCreator::~CameraSettingsWidgetsTreeCreator()
 #endif
 }
 
-CameraSettingsWidgetsCreator* CameraSettingsWidgetsTreeCreator::createElement(const QString& id)
+CameraSettingsWidgetsCreator* CameraSettingsWidgetsTreeCreator::createElement(
+    const QString& id,
+    const QnResourcePtr& cameraRes )
 {
     CameraSettingsWidgetsCreator* result = new CameraSettingsWidgetsCreator(id, *this, m_rootWidget, m_rootLayout, m_treeWidgetsById,
         m_layoutIndById, m_settingsWidgetsById, m_emptyGroupsById);
+    result->setCamera( cameraRes );
     connect (result, &CameraSettingsWidgetsCreator::advancedParamChanged, this, &CameraSettingsWidgetsTreeCreator::advancedParamChanged);
     connect (result, &CameraSettingsWidgetsCreator::refreshAdvancedSettings, this, &CameraSettingsWidgetsTreeCreator::refreshAdvancedSettings);
     return result;

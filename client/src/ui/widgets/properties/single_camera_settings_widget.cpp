@@ -3,6 +3,7 @@
 #include <core/resource/media_server_resource.h>
 #include "core/resource/resource_fwd.h"
 
+#include <QtCore/QBuffer>
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
 #include <QtCore/QProcess>
@@ -259,7 +260,7 @@ bool QnSingleCameraSettingsWidget::initAdvancedTab()
     
     if ( m_camera )
     {
-        id = m_camera->getProperty(lit("cameraSettingsId"));
+        id = m_camera->getProperty( Qn::CAMERA_SETTINGS_ID_PARAM_NAME );
         isCameraSettingsId = !id.isNull();
         
         if ( qnCommon && qnCommon->dataPool() )
@@ -436,7 +437,7 @@ void QnSingleCameraSettingsWidget::loadAdvancedSettings()
     {
         if (!m_camera)
             return;
-        QString id = m_camera->getProperty(lit("cameraSettingsId"));
+        QString id = m_camera->getProperty( Qn::CAMERA_SETTINGS_ID_PARAM_NAME );
         if (!id.isNull())
         {
             QnMediaServerConnectionPtr serverConnection = getServerConnection();
@@ -444,7 +445,8 @@ void QnSingleCameraSettingsWidget::loadAdvancedSettings()
                 return;
             }
 
-            CameraSettingsTreeLister lister(id);
+            //TODO #ak remove this XML parsing run
+            CameraSettingsTreeLister lister( id, m_camera );
             QStringList settings = lister.proceed();
 
 #if 0
@@ -463,7 +465,6 @@ void QnSingleCameraSettingsWidget::loadAdvancedSettings()
             serverConnection->getParamsAsync(m_camera, settings, this, SLOT(at_advancedSettingsLoaded(int, const QnStringVariantPairList &, int)) );
         }
     }    
-    
 }
 
 const QnVirtualCameraResourcePtr &QnSingleCameraSettingsWidget::camera() const {
@@ -1089,6 +1090,8 @@ void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int status, const Q
     }
 
     //if (changesFound) {
+        //TODO #ak remove this XML parsing run
+        m_widgetsRecreator->setCamera( m_camera );
         m_widgetsRecreator->proceed(&m_cameraSettings);
     //}
 }

@@ -239,66 +239,81 @@ public:
     {
         static const size_t MS_PER_SEC = 1000;
 
-        MIB_IF_TABLE2* networkInterfaceTable = NULL;
-        if( GetIfTable2( &networkInterfaceTable ) != NO_ERROR )
+        if( m_mibIfTableBuffer.size() == 0 )
+            m_mibIfTableBuffer.resize( 256 );
+
+        DWORD resultCode = NO_ERROR;
+        MIB_IFTABLE* networkInterfaceTable = NULL;
+        for( int i = 0; i < 2; ++i )
+        {
+            ULONG bufSize = m_mibIfTableBuffer.size();
+            networkInterfaceTable = reinterpret_cast<MIB_IFTABLE*>(m_mibIfTableBuffer.data());
+            resultCode = GetIfTable( networkInterfaceTable, &bufSize, TRUE );
+            if( resultCode == ERROR_INSUFFICIENT_BUFFER )
+            {
+                m_mibIfTableBuffer.resize( bufSize );
+                continue;
+            }
+            break;
+        }
+
+        if( resultCode != NO_ERROR )
             return;
 
         ++m_networkStatCalcCounter;
 
         const qint64 currentClock = m_networkStatTimer.elapsed();
-        for( size_t i = 0; i < networkInterfaceTable->NumEntries; ++i )
+        for( size_t i = 0; i < networkInterfaceTable->dwNumEntries; ++i )
         {
-            const MIB_IF_ROW2& ifInfo = networkInterfaceTable->Table[i];
-            if( ifInfo.PhysicalAddressLength == 0 )
+            const MIB_IFROW& ifInfo = networkInterfaceTable->table[i];
+            if( ifInfo.dwPhysAddrLen == 0 )
                 continue;
-            if( !(ifInfo.Type & IF_TYPE_ETHERNET_CSMACD) )
+            if( !(ifInfo.dwType & IF_TYPE_ETHERNET_CSMACD) )
                 continue;
-            if( ifInfo.InterfaceAndOperStatusFlags.NotMediaConnected || ! ifInfo.InterfaceAndOperStatusFlags.ConnectorPresent )
-                continue;
-            if( ifInfo.OperStatus == IfOperStatusDown )
+            if( ifInfo.dwOperStatus != IF_OPER_STATUS_CONNECTED && ifInfo.dwOperStatus != IF_OPER_STATUS_OPERATIONAL )
                 continue;
 
-            std::pair<std::map<ULONG64, NetworkInterfaceStatData>::iterator, bool>
-                p = m_interfaceLoadByGUID.emplace( ifInfo.InterfaceLuid.Value, NetworkInterfaceStatData() );
+            const QByteArray physicalAddress( reinterpret_cast<const char*>(ifInfo.bPhysAddr), ifInfo.dwPhysAddrLen );
+
+            std::pair<std::map<QByteArray, NetworkInterfaceStatData>::iterator, bool>
+                p = m_interfaceLoadByMAC.emplace( physicalAddress, NetworkInterfaceStatData() );
             if( p.second )
             {
-                p.first->second.load.interfaceName = QString::fromWCharArray( ifInfo.Alias );
-                p.first->second.load.macAddress = QnMacAddress( QByteArray(reinterpret_cast<const char*>(ifInfo.PhysicalAddress), ifInfo.PhysicalAddressLength) );
+                p.first->second.load.interfaceName = QString::fromLocal8Bit( reinterpret_cast<const char*>(ifInfo.bDescr), ifInfo.dwDescrLen );
+                p.first->second.load.macAddress = QnMacAddress( physicalAddress );
                 p.first->second.load.type = QnPlatformMonitor::PhysicalInterface;
-                p.first->second.load.bytesPerSecMax = (ifInfo.TransmitLinkSpeed + ifInfo.ReceiveLinkSpeed) / 2 / CHAR_BIT;
+                p.first->second.load.bytesPerSecMax = ifInfo.dwSpeed / CHAR_BIT;
                 p.first->second.prevMeasureClock = currentClock;
-                p.first->second.inOctets = ifInfo.InOctets;
-                p.first->second.outOctets = ifInfo.OutOctets;
+                p.first->second.inOctets = ifInfo.dwInOctets;
+                p.first->second.outOctets = ifInfo.dwOutOctets;
             }
-            NetworkInterfaceStatData& intfLoad = m_interfaceLoadByGUID[ifInfo.InterfaceLuid.Value];
+            NetworkInterfaceStatData& intfLoad = p.first->second;
             intfLoad.networkStatCalcCounter = m_networkStatCalcCounter;
             if( intfLoad.prevMeasureClock == currentClock )
                 continue;   //not calculating load
             const qint64 msPassed = currentClock - intfLoad.prevMeasureClock;
-            intfLoad.load.bytesPerSecIn = p.first->second.load.bytesPerSecIn * 0.3 + ((ifInfo.InOctets - p.first->second.inOctets) * MS_PER_SEC / msPassed) * 0.7;
-            intfLoad.load.bytesPerSecOut = p.first->second.load.bytesPerSecOut * 0.3 + ((ifInfo.OutOctets - p.first->second.outOctets) * MS_PER_SEC / msPassed) * 0.7;
+            intfLoad.load.bytesPerSecIn = p.first->second.load.bytesPerSecIn * 0.3 + ((ifInfo.dwInOctets - p.first->second.inOctets) * MS_PER_SEC / msPassed) * 0.7;
+            intfLoad.load.bytesPerSecOut = p.first->second.load.bytesPerSecOut * 0.3 + ((ifInfo.dwOutOctets - p.first->second.outOctets) * MS_PER_SEC / msPassed) * 0.7;
 
-            p.first->second.inOctets = ifInfo.InOctets;
-            p.first->second.outOctets = ifInfo.OutOctets;
+            p.first->second.inOctets = ifInfo.dwInOctets;
+            p.first->second.outOctets = ifInfo.dwOutOctets;
             p.first->second.prevMeasureClock = currentClock;
         }
 
         //removing disabled interface
-        for( auto it = m_interfaceLoadByGUID.begin(); it != m_interfaceLoadByGUID.end(); )
+        for( auto it = m_interfaceLoadByMAC.begin(); it != m_interfaceLoadByMAC.end(); )
         {
             if( it->second.networkStatCalcCounter < m_networkStatCalcCounter )
-                it = m_interfaceLoadByGUID.erase(it);
+                it = m_interfaceLoadByMAC.erase(it);
             else
                 ++it;
         }
-
-        FreeMibTable( networkInterfaceTable );
     }
 
     QList<QnPlatformMonitor::NetworkLoad> networkInterfacelLoadData()
     {
         QList<QnPlatformMonitor::NetworkLoad> loadData;
-        for( const std::pair<ULONG64, NetworkInterfaceStatData>& ifStatData: m_interfaceLoadByGUID )
+        for( const std::pair<QByteArray, NetworkInterfaceStatData>& ifStatData: m_interfaceLoadByMAC )
             loadData.push_back( ifStatData.second.load );
         return loadData;
     }
@@ -306,7 +321,6 @@ public:
 private:
     const QnWindowsMonitorPrivate *d_func() const { return this; } /* For INVOKE to work. */
     
-private:
     struct NetworkInterfaceStatData
     {
         QnPlatformMonitor::NetworkLoad load;
@@ -346,11 +360,11 @@ private:
      * operation. */
     QHash<int, HddItem> lastItemByDiskId;
 
-    std::map<ULONG64, NetworkInterfaceStatData> m_interfaceLoadByGUID;
+    std::map<QByteArray, NetworkInterfaceStatData> m_interfaceLoadByMAC;
     QElapsedTimer m_networkStatTimer;
     size_t m_networkStatCalcCounter;
+    std::vector<char> m_mibIfTableBuffer;
 
-private:
     Q_DECLARE_PUBLIC(QnWindowsMonitor);
     QnWindowsMonitor *q_ptr;
 };
