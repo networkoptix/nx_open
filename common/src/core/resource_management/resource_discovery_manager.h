@@ -105,7 +105,7 @@ public:
     State state() const;
     
     void setLastDiscoveredResources(const QnResourceList& resources);
-    QnResourceList lastDiscoveredResources() const;
+    QSet<QString> lastDiscoveredIds() const;
 public slots:
     virtual void start( Priority priority = InheritPriority ) override;
 
@@ -159,7 +159,7 @@ private:
     QHash<QnUuid, QnManualCameraSearchCameraList> m_searchProcessResults;
 
     mutable QMutex m_resListMutex;
-    QnResourceList m_lastDiscoveredResources[4];
+    QnResourceList m_lastDiscoveredResources[5];
     int m_discoveryUpdateIdx;
 };
 
