@@ -682,7 +682,7 @@ bool QnDbManager::updateBusinessActionParameters() {
                 continue;
 
             QJsonObject remappedValues;
-            foreach (const QString &key, values.keys()) {
+            for (const QString &key: values.keys()) {
                 QString remappedKey = remapTable.contains(key) ? remapTable[key] : key;
                 remappedValues[remappedKey] = values[key];
             }
