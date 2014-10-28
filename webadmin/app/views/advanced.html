@@ -6,7 +6,7 @@
 
 
 <h2>Storages</h2>
-<form class="form" role="form">
+<form class="form" role="form" name="form" novalidate >
 
 <table class="table">
     <thead>
@@ -28,7 +28,8 @@
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="storage in storages">
+        <tr ng-repeat="storage in storages" ng-form="storageForm">
+
             <td><span class="read-container storage-url" title="{{storage.url}}" class="storage-url">{{storage.url}}</span></td>
             <td>
                 <div class="progress" style="margin-top:5px"
@@ -51,35 +52,41 @@
                 </div>
             </td>
             <td>
-                <div class="input-group {{storage.warning?'has-error':''}}">
+                <div class="input-group"
+                     ng-class="{'has-error':!storageForm.reservedSpaceGb.$valid,
+                     'has-warning':storage.reservedSpace >= storage.freeSpace}">
                     <input type="number"  class="form-control input-sm"
                            ng-model="storage.reservedSpaceGb"
+                           name="reservedSpaceGb"
                            min="1"
                            max="{{toGBs(storage.totalSpace)}}"
+                           required
                            placeholder="Reserved space"/>
                     <div class="input-group-addon">GB</div>
                 </div>
             </td>
-            <td>
+            <td ng-class="{'has-error':!storageForm.isUsedForWriting.$valid}">
                    <label class="read-container">
+                       <span class="checkbox-wrapper">
                         <input type="checkbox"
                            ng-model="storage.isUsedForWriting"
                            ng-disabled="!storage.isWritable"
+                           name="isUsedForWriting"
+                           ng-required="!someSelected"
                            placeholder="Use for writing"/>
-
+                        </span>
                         <icon for="storage.isUsedForWriting" on-true="pencil" title-true="Used for writing"></icon>
                         <icon for="storage.isWritable && !storage.isUsedForWriting" on-true="pencil" title-true="Writable" class="icon-inactive"></icon>
 
                    </label>
             </td>
-
             <td>
                 <span class="read-container">
                     <icon for="storage.isExternal" on-true="globe" on-false="hdd" title-true="External" title-false="Internal" ></icon>
-                    <icon for="storage.warning || form.$invalid" on-true="warning-sign" title-true="Writable" class="icon-warning"></icon>
                 </span>
             </td>
         </tr>
+
     </tbody>
 </table>
 <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Save</button>

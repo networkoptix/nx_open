@@ -7,7 +7,7 @@ angular.module('webadminApp')
             restrict: 'E',
                 template :
                     '<span class="btn btn-success fileinput-button" ><span>{{text}}</span>' +
-                    '<input type="file" name="installerFile1" class="fileupload" >' +
+                    '<input type="file" name="installerFile1" class="fileupload" id="fileupload" >' +
                     '</span>' +
                     '<div class="progress" style="display:none;"><div class="progress-bar progress-bar-success progress-bar-striped"></div></div>' ,
                 link :  function (scope, element, attrs) {

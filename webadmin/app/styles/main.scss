@@ -1,6 +1,6 @@
 $icon-font-path: "../fonts/";
 
-//@import 'sass-bootstrap/lib/bootstrap';
+@import 'sass-bootstrap/lib/_variables.scss';
 
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
 
@@ -343,5 +343,19 @@ body {
 
 .serversList .active{
   font-weight: bold;
+}
+
+.checkbox-wrapper{
+  display: inline-block;
+  padding:0px 0px 0px 4px;
+  width:20px;
+  height:20px;
+  border-radius: 3px;
+}
+.checkbox-wrapper input{
+  margin:0px;
+}
+.has-error .checkbox-wrapper{
+  background-color: $state-danger-text;
 }
 

@@ -3,6 +3,7 @@ var Page = require('./po.js');
 describe('Advanced Page', function () {
 
     var p = new Page();
+    var ptor = protractor.getInstance();
 
 
     it("should allow user to see storages: free space, limit, totalspace, enabled, some indicator",function(){
@@ -17,6 +18,8 @@ describe('Advanced Page', function () {
     it("should show warning tip",function(){
         expect(p.dangerAlert.isDisplayed()).toBe(true);
     });
+
+
 
     it("should allow user to change settings: limit, enabled",function(){
         var storage = p.storagesRows.first();
@@ -51,71 +54,93 @@ describe('Advanced Page', function () {
 
     });
 
+
+    it("should show warning, then limit is more than free space",function(){
+        p.storageLimitInput.getAttribute("max").then(function(max){
+
+            var toset = parseFloat(max).toFixed(0)-1;
+            p.setStorageLimit(toset);
+
+            expect(p.saveButton.isEnabled()).toBe(true);
+            expect(p.storageLimitInput.element(by.xpath("..")).getAttribute("class")).toMatch("has-warning");
+
+            p.saveButton.click().then(function(){
+                var alertDialog = ptor.switchTo().alert();
+                expect(alertDialog.getText()).toContain("Possible partial remove of the video footage is expected");
+                alertDialog.dismiss();
+            });
+
+        });
+    });
+
+    it("should save settings and display it after reload",function(){
+        p.setStorageLimit(1);
+        p.saveButton.click().then(function(){
+            var alertDialog = ptor.switchTo().alert();
+            expect(alertDialog.getText()).toContain("Settings saved");
+            alertDialog.accept();
+        });
+
+        p.get();
+        expect(p.storageLimitInput.getAttribute("value")).toBe("1");
+
+        p.setStorageLimit(5);
+        p.saveButton.click().then(function(){
+            var alertDialog = ptor.switchTo().alert();
+            expect(alertDialog.getText()).toContain("Settings saved");
+            alertDialog.accept();
+        });
+
+        p.get();
+        expect(p.storageLimitInput.getAttribute("value")).toBe("5");
+    });
+
     it("should forbid disabling all storages",function(){
         var total = p.storagesRows.count();
+        var d = protractor.promise.defer();
+        var readycounter=0;
         for(var i=0;i<total;i++){
             var row = p.storagesRows.get(i);
             var checkbox = row.element(by.model("storage.isUsedForWriting"));
+            checkbox.isSelected().then(function(isSelected){
+                if(isSelected) {
+                    checkbox.click();
+                }
+                expect(checkbox.isSelected()).toBe(false);
+                readycounter++;
 
-            var isSelected  = false;
-            checkbox.isSelected().then(function(val){ isSelected = val; });
-            if(isSelected)
-                checkbox.click();
-
-            expect(checkbox.isSelected()).toBe(false);
+                if(readycounter == total){
+                    d.fulfill("ok");
+                    done();
+                }
+            });
         }
+        expect(d).toBe('ok');
         expect(p.saveButton.isEnabled()).toBe(false);
         expect("some warning").toBe("showed");
     });
 
-    it("should show warning, then limit is more than free space",function(){
-        var max = 0;
-        p.storageLimitInput.getAttribute("max").then(function(val){max=val;});
-
-        p.setStorageLimit(max.toFixed(0)-1);
-
-        console.log("set max");
-        console.log(max.toFixed(0)-1);
-
-        expect(p.saveButton.isEnabled()).toBe(true);
-        expect(p.storageLimitInput.element(by.xpath("..")).getAttribute("class")).toNotMatch("has-warning");
-
-        // click
-        // handle confirm
-        // check it's text
-        // decline
-
-        expect("test").toBe("written");
-    });
-
-    it("should show error, then server returns error",function(){
-        expect("test").toBe("written");
-    });
-
-    it("should show confirm before saving",function(){
-        expect("test").toBe("written");
-    });
-
-
-    it("cancel button should cancel changes",function(){
-        expect("test").toBe("written");
-    });
-
-    it("should save settings and display it after reload",function(){
-        expect("test").toBe("written");
+    it("should allow cancel changes",function(){
+        p.storageLimitInput.getAttribute("value").then(function(oldlimit){
+            p.setStorageLimit(1);
+            p.cancelButton.click();
+            expect(p.storageLimitInput.getAttribute("value")).toBe(oldlimit);
+        });
     });
 
     it("should show button for updating system",function(){
-        expect("test").toBe("written");
+        expect(p.upgradeButton.isEnabled()).toBe(true);
     });
 
     it("should upload some bad file and display an error",function(){
-        expect("test").toBe("written");
-    });
+        var path = require('path');
 
-
-
-    it("should hide progress bar after uploading",function(){
-        expect("test").toBe("written");
+        var fileToUpload = './po.js';
+        var absolutePath = path.resolve(__dirname, fileToUpload);
+        p.upgradeButton.sendKeys(absolutePath).then(function(){
+            var alertDialog = ptor.switchTo().alert();
+            expect(alertDialog.getText()).toContain("Updating failed");
+            alertDialog.accept();
+        });
     });
 });
