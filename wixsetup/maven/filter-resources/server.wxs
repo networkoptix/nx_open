@@ -134,6 +134,9 @@
                 <File Id="ServerQt5Xml$(var.suffix).dll" Name="Qt5Xml$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Xml$(var.suffix).dll" />
             </Component>
             <Component>
+                <File Id="ServerQt5XmlPatterns$(var.suffix).dll" Name="Qt5XmlPatterns$(var.suffix).dll" Source="$(var.SourceDir)\Qt5XmlPatterns$(var.suffix).dll" />
+            </Component>
+            <Component>
                 <File Id="ServerQt5Sql$(var.suffix).dll" Name="Qt5Sql$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Sql$(var.suffix).dll" />
             </Component>
             <?if ${webkit} = true ?>
