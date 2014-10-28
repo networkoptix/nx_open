@@ -159,7 +159,7 @@ private:
     QHash<QnUuid, QnManualCameraSearchCameraList> m_searchProcessResults;
 
     mutable QMutex m_resListMutex;
-    QnResourceList m_lastDiscoveredResources[5];
+    QnResourceList m_lastDiscoveredResources[6];
     int m_discoveryUpdateIdx;
 };
 
