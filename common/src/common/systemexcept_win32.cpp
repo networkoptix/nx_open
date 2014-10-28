@@ -58,12 +58,13 @@ void writeMiniDump( PEXCEPTION_POINTERS ex ) {
         QStandardPaths::writableLocation( QStandardPaths::DataLocation ).toLatin1().constData();
 
     // Get the current working directory
-    GetModuleFileNameA( NULL , strModuleName , 1024 );
+    DWORD dwLen = GetModuleFileNameA( NULL , strModuleName , 1024 );
+    if( dwLen <=0 || dwLen == 1024 )
+        return;
 
     // sprintf is safe since it is async-signal-safe which means
     // it should not acquire any global lock internally. Otherwise
     // we may deadlock here. 
-
     int ret = sprintf(strFileName,"%s/%s_%d.minidump",
         strLocation,
         strModuleName,
