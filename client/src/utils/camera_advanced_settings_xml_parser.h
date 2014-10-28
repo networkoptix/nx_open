@@ -1,6 +1,8 @@
 #ifndef camera_advanced_settings_xml_parser_h_1819
 #define camera_advanced_settings_xml_parser_h_1819
 
+#include <memory>
+
 #include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QSet>
@@ -10,6 +12,7 @@
 #include <QtWebKitWidgets/QtWebKitWidgets>
 #endif
 
+#include <core/resource/resource_fwd.h>
 #include "plugins/resource/camera_settings/camera_settings.h"
 
 typedef QSharedPointer<CameraSetting> CameraSettingPtr;
@@ -39,7 +42,10 @@ class CameraSettingsLister: public CameraSettingReader
     ParentOfRootElemFoundAware& m_obj;
 
 public:
-    CameraSettingsLister(const QString& id, ParentOfRootElemFoundAware& obj);
+    CameraSettingsLister(
+        const QString& id,
+        ParentOfRootElemFoundAware& obj,
+        const QnResourcePtr& cameraRes = QnResourcePtr() );
     virtual ~CameraSettingsLister();
 
     //Set into 'out' all params from camera_settings.xml for desired camera
@@ -51,7 +57,7 @@ protected:
     virtual bool isParamEnabled(const QString& id, const QString& parentId);
     virtual void paramFound(const CameraSetting& value, const QString& parentId);
     virtual void cleanDataOnFail();
-    virtual void parentOfRootElemFound(const QString& parentId);
+    virtual void parentOfRootElemFound(const QString& parentId) override;
 
 private:
 
@@ -106,10 +112,9 @@ protected:
     virtual bool isParamEnabled(const QString& id, const QString& parentId);
     virtual void paramFound(const CameraSetting& value, const QString& parentId);
     virtual void cleanDataOnFail();
-    virtual void parentOfRootElemFound(const QString& parentId);
+    virtual void parentOfRootElemFound(const QString& parentId) override;
 
 protected slots:
-    void treeWidgetItemPressed(QTreeWidgetItem * item, int column);
     void treeWidgetItemSelectionChanged();
 
 signals:
@@ -139,19 +144,38 @@ private:
 template <class T, class E>
 class CameraSettingTreeReader: public ParentOfRootElemFoundAware
 {
-    const QString m_initialId;
-    QString m_currParentId;
-    bool m_firstTime;
+public:
+
+    CameraSettingTreeReader(
+        const QString& id,
+        const QnResourcePtr& cameraRes = QnResourcePtr() );
+    ~CameraSettingTreeReader();
+
+    void setCamera( const QnResourcePtr& cameraRes )
+    {
+        m_cameraRes = cameraRes;
+        for( T* obj: m_objList )
+            obj->setCamera( cameraRes );
+    }
+
+    //Apply 'proceed' method of T class for all parents of current camera
+    //(current camera is included also)
+    bool proceed();
 
 protected:
-
     QList<T*> m_objList;
 
     //Notification, that new parent was found
-    virtual void parentOfRootElemFound(const QString& parentId);
+    virtual void parentOfRootElemFound(const QString& parentId) override;
 
     //Create T class to proceed new parent
-    virtual T* createElement(const QString& id) = 0;
+    /*!
+        \param dataSource If not NULL, data should be read fom here (It must be xml source).
+            Otherwise, data is read from some internal source
+    */
+    virtual T* createElement(
+        const QString& id,
+        const QnResourcePtr& cameraRes ) = 0;
 
     //Method should return some object (additional info) required in proceed method of T class
     virtual E& getAdditionalInfo() = 0;
@@ -159,14 +183,11 @@ protected:
     //Cleaning activities
     void clean();
 
-public:
-
-    CameraSettingTreeReader(const QString& id);
-    ~CameraSettingTreeReader();
-
-    //Apply 'proceed' method of T class for all parents of current camera
-    //(current camera is included also)
-    bool proceed();
+private:
+    const QString m_initialId;
+    QString m_currParentId;
+    bool m_firstTime;
+    QnResourcePtr m_cameraRes;
 };
 
 //
@@ -182,9 +203,14 @@ protected:
 
 public:
 
-    CameraSettingsTreeLister(const QString& id);
+    CameraSettingsTreeLister(
+        const QString& id,
+        const QnResourcePtr& cameraRes = QnResourcePtr() );
 
-    CameraSettingsLister* createElement(const QString& id) override;
+    //!Implementation of CameraSettingTreeReader::createElement
+    virtual CameraSettingsLister* createElement(
+        const QString& id,
+        const QnResourcePtr& cameraRes = QnResourcePtr() ) override;
 
     QStringList proceed();
 };
@@ -234,7 +260,10 @@ public:
         );
     ~CameraSettingsWidgetsTreeCreator();
 
-    CameraSettingsWidgetsCreator* createElement(const QString& id) override;
+    //!Implementation of CameraSettingTreeReader::createElement
+    virtual CameraSettingsWidgetsCreator* createElement(
+        const QString& id,
+        const QnResourcePtr& cameraRes = QnResourcePtr() ) override;
 
     void proceed(CameraSettings* settings);
 

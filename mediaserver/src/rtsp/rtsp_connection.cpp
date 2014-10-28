@@ -911,7 +911,7 @@ void QnRtspConnectionProcessor::createDataProvider()
     }
     if (camera && d->liveMode == Mode_Live)
     {
-        if (!d->liveDpHi && !d->mediaRes->toResource()->hasFlags(Qn::foreigner)) {
+        if (!d->liveDpHi && !d->mediaRes->toResource()->hasFlags(Qn::foreigner) && d->mediaRes->toResource()->isInitialized()) {
             d->liveDpHi = camera->getLiveReader(QnServer::HiQualityCatalog);
             if (d->liveDpHi) {
                 connect(d->liveDpHi->getResource().data(), SIGNAL(parentIdChanged(const QnResourcePtr &)), this, SLOT(at_camera_parentIdChanged()), Qt::DirectConnection);

@@ -27,7 +27,7 @@ namespace ec2
             QnVirtualCameraResourcePtr cameraRes = m_resCtx.resFactory->createResource(
                 tran.params.typeId,
                 QnResourceParams(tran.params.id, tran.params.url, tran.params.vendor) ).dynamicCast<QnVirtualCameraResource>();
-            Q_ASSERT(cameraRes);
+            Q_ASSERT_X(cameraRes, Q_FUNC_INFO, QByteArray("Unknown resource type:") + tran.params.typeId.toByteArray());
             if (cameraRes) {
                 fromApiToResource(tran.params, cameraRes);
                 emit cameraAddedOrUpdated( std::move(cameraRes ));

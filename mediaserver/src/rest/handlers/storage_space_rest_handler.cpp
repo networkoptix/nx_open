@@ -43,14 +43,6 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
     for(const QnStorageResourcePtr &storage: qnStorageMan->getStorages()) {
         QString path = toNativeDirPath(storage->getPath());
         
-        bool isExternal = true;
-        for(const QnPlatformMonitor::PartitionSpace &partition: partitions) {
-            if(path.startsWith(partition.path)) {
-                isExternal = partition.type == QnPlatformMonitor::NetworkPartition;
-                break;
-            }
-        }
-
         if (storage->hasFlags(Qn::deprecated))
             continue;
 
@@ -60,7 +52,7 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
         data.totalSpace = storage->getTotalSpace();
         data.freeSpace = storage->getFreeSpace();
         data.reservedSpace = storage->getSpaceLimit();
-        data.isExternal = isExternal;
+        data.isExternal = storage->isExternal();
         data.isWritable = storage->isStorageAvailableForWriting();
         data.isUsedForWriting = storage->isUsedForWriting();
 

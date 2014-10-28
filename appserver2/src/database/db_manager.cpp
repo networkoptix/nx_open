@@ -422,7 +422,7 @@ bool QnDbManager::init(
 
     // Set admin user's password
     ApiUserDataList users;
-    ErrorCode errCode = doQueryNoLock( nullptr, users );
+    ErrorCode errCode = doQueryNoLock( m_adminUserID, users );
     if( errCode != ErrorCode::ok )
     {
         return false;

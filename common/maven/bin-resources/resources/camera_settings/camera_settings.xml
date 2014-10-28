@@ -8,40 +8,40 @@
 
       <param name = "Brightness"
                description = "Image brightness."
-               widget_type = "MinMaxStep"
+               dataType = "MinMaxStep"
                query = ""/>
 
       <param name = "Color Saturation"
                description = "Color saturation of the image."
-               widget_type = "MinMaxStep"
+               dataType = "MinMaxStep"
                query = ""/>
 
       <param name = "Contrast"
                description = "Contrast of the image."
-               widget_type = "MinMaxStep"
+               dataType = "MinMaxStep"
                query = ""/>
 
       <param name = "Ir Cut Filter Mode"
                description = "Infrared Cutoff Filter settings."
-               widget_type = "Enumeration"
+               dataType = "Enumeration"
                min = "ON,OFF,AUTO"
                max = "ON,OFF,AUTO"
                query = ""/>
 
       <param name = "Sharpness"
                description = "Sharpness of the Video image."
-               widget_type = "MinMaxStep"
+               dataType = "MinMaxStep"
                query = ""/>
 
       <group name = "Backlight Compensation"
              description ="">
         <param name = "Mode"
                description = "Enabled/disabled BLC mode (on/off)."
-               widget_type = "OnOff"
+               dataType = "Bool"
                query = ""/>
         <param name = "Level"
                description = "Level of BLC."
-               widget_type = "MinMaxStep"
+               dataType = "MinMaxStep"
                query = ""/>
       </group>
 
@@ -49,11 +49,11 @@
              description ="">
         <param name = "Mode"
                description = "Wide dynamic range mode (on/off)."
-               widget_type = "OnOff"
+               dataType = "Bool"
                query = ""/>
         <param name = "Level"
                description = "Level of wide dynamic range."
-               widget_type = "MinMaxStep"
+               dataType = "MinMaxStep"
                query = ""/>
       </group>
 
@@ -61,17 +61,17 @@
              description ="">
         <param name = "Mode"
                description = "White Balance (auto/manual)."
-               widget_type = "Enumeration"
+               dataType = "Enumeration"
                min = "AUTO,MANUAL"
                max = "AUTO,MANUAL"
                query = ""/>
         <param name = "Yr Gain"
                description = "Rgain."
-               widget_type = "MinMaxStep"
+               dataType = "MinMaxStep"
                query = ""/>
         <param name = "Yb Gain"
                description = "Bgain."
-               widget_type = "MinMaxStep"
+               dataType = "MinMaxStep"
                query = ""/>
       </group>
 
@@ -79,51 +79,51 @@
              description ="">
         <param name = "Mode"
                description = "Exposure Mode. Auto – Enabled the exposure algorithm on the device. Manual – Disabled exposure algorithm on the device."
-               widget_type = "Enumeration"
+               dataType = "Enumeration"
                min = "AUTO,MANUAL"
                max = "AUTO,MANUAL"
                query = ""/>
         <param name = "Priority"
                description = "The exposure priority mode (low noise/framerate)."
-               widget_type = "Enumeration"
+               dataType = "Enumeration"
                min = "LowNoise,FrameRate"
                max = "LowNoise,FrameRate"
                query = ""/>
         <param name = "Min Exposure Time"
                description = "Minimum value of exposure time range allowed to be used by the algorithm."
-               widget_type = "MinMaxStep"
+               dataType = "MinMaxStep"
                query = ""/>
         <param name = "Max Exposure Time"
                description = "Maximum value of exposure time range allowed to be used by the algorithm."
-               widget_type = "MinMaxStep"
+               dataType = "MinMaxStep"
                query = ""/>
         <param name = "Min Gain"
                description = "Minimum value of the sensor gain range that is allowed to be used by the algorithm."
-               widget_type = "MinMaxStep"
+               dataType = "MinMaxStep"
                query = ""/>
         <param name = "Max Gain"
                description = "Maximum value of the sensor gain range that is allowed to be used by the algorithm."
-               widget_type = "MinMaxStep"
+               dataType = "MinMaxStep"
                query = ""/>
         <param name = "Min Iris"
                description = "Minimum value of the iris range allowed to be used by the algorithm."
-               widget_type = "MinMaxStep"
+               dataType = "MinMaxStep"
                query = ""/>
         <param name = "Max Iris"
                description = "Maximum value of the iris range allowed to be used by the algorithm."
-               widget_type = "MinMaxStep"
+               dataType = "MinMaxStep"
                query = ""/>
         <param name = "Exposure Time"
                description = "The fixed exposure time used by the image sensor (μs)."
-               widget_type = "MinMaxStep"
+               dataType = "MinMaxStep"
                query = ""/>
         <param name = "Gain"
                description = "The fixed gain used by the image sensor (dB)."
-               widget_type = "MinMaxStep"
+               dataType = "MinMaxStep"
                query = ""/>
         <param name = "Iris"
                description = ""
-               widget_type = "MinMaxStep"
+               dataType = "MinMaxStep"
                query = "The fixed attenuation of input light affected by the iris (dB). 0dB maps to a fully opened iris."/>
       </group>
 
@@ -133,15 +133,15 @@
          description ="">
       <param name = "System Reboot"
              description = "This operation reboots the device."
-             widget_type = "Button"
+             dataType = "Button"
              query = ""/>
       <param name = "Soft System Factory Default"
              description = "This operation reloads all parameters on the device to their factory default values, except basic network settings like IP address, subnet and gateway or DHCP settings."
-             widget_type = "Button"
+             dataType = "Button"
              query = ""/>
       <param name = "Hard System Factory Default"
              description = "This operation reloads all parameters on the device to their factory default values."
-             widget_type = "Button"
+             dataType = "Button"
              query = ""/>
     </group>
 
@@ -159,21 +159,21 @@
 
         <param name = "Mode"
              description = "Also known as Color Balance. This gives the camera a reference to 'true white'."
-             widget_type = "Enumeration"
+             dataType = "Enumeration"
              min = "AUTO,AUTO_H,AUTO_L,PRESET,MANUAL"
              max = "AUTO,AUTO_H,AUTO_L,PRESET,MANUAL"
              query = "wbmode1"/>
 
         <param name = "Kelvin"
              description = "Determine the warmth of coolness of light."
-             widget_type = "Enumeration"
+             dataType = "Enumeration"
              min = "LOW,MIDDLE,HIGH"
              max = "LOW,MIDDLE,HIGH"
              query = "wbkelvin1"/>
 
         <param name = "Red"
              description = "White Balance Red Offset"
-             widget_type = "MinMaxStep"
+             dataType = "MinMaxStep"
              min = "0"
              max = "20"
              step = "1"
@@ -181,7 +181,7 @@
 
         <param name = "Blue"
              description = "White Balance Blue Offset"
-             widget_type = "MinMaxStep"
+             dataType = "MinMaxStep"
              min = "0"
              max = "20"
              step = "1"
@@ -194,7 +194,7 @@
 
         <param name = "Brightness"
              description = "Select from 0 (darkest) to 20 (brightest)."
-             widget_type = "MinMaxStep"
+             dataType = "MinMaxStep"
              min = "0"
              max = "20"
              step = "1"
@@ -202,28 +202,28 @@
 
         <param name = "Shutter Mode"
              description = "Set the amount of light allowed in the video manually or automatically."
-             widget_type = "Enumeration"
+             dataType = "Enumeration"
              min = "AUTO,MANUAL"
              max = "AUTO,MANUAL"
              query = "dssmode1"/>
 
         <param name = "Shutter Speed"
              description = "Select the speed the camera’s shutter will operate—1/30, 1/60, or 1/120."
-             widget_type = "Enumeration"
+             dataType = "Enumeration"
              min = "1/30,1/60,1/120"
              max = "1/30,1/60,1/120"
              query = "shutspeed1"/>
 
         <param name = "Digital Slow Shutter"
              description = "Recommended in low light conditions. Turn On or Off."
-             widget_type = "Enumeration"
+             dataType = "Enumeration"
              min = "OFF,2x,3x,4x"
              max = "OFF,2x,3x,4x"
              query = "dsslimit1"/>
 
         <param name = "AGC Gain"
              description = "Maximum light gain settings in low light conditions. Select from 0 (least light) to 20 (most light)."
-             widget_type = "MinMaxStep"
+             dataType = "MinMaxStep"
              min = "0"
              max = "20"
              step = "1"
@@ -236,14 +236,14 @@
 
         <param name = "Mode"
              description = "Set the mode to Night, Day, or Auto. If set as Auto, set a desired Color to B/W Level and B/W to Color Level."
-             widget_type = "Enumeration"
+             dataType = "Enumeration"
              min = "NIGHT(B/W),DAY(COLOR),AUTO"
              max = "NIGHT(B/W),DAY(COLOR),AUTO"
              query = "dnmode1"/>
 
         <param name = "Switching from Color to B/W"
              description = "The higher the number, the less darker the environment will have to be for the camera to switch from color to B/W."
-             widget_type = "MinMaxStep"
+             dataType = "MinMaxStep"
              min = "0"
              max = "10"
              step = "1"
@@ -251,7 +251,7 @@
 
         <param name = "Switching from B/W to Color"
              description = "This number should always be lower than the number set to color to B/W."
-             widget_type = "MinMaxStep"
+             dataType = "MinMaxStep"
              min = "0"
              max = "10"
              step = "1"
@@ -264,7 +264,7 @@
 
         <param name = "Chroma"
              description = "Affect the quality of the color in the image. The higher the numbers, the video will have brighter colors."
-             widget_type = "MinMaxStep"
+             dataType = "MinMaxStep"
              min = "0"
              max = "20"
              step = "1"
@@ -272,7 +272,7 @@
 
         <param name = "Sharpness"
              description = "Select from the sharpness of the image."
-             widget_type = "MinMaxStep"
+             dataType = "MinMaxStep"
              min = "0"
              max = "10"
              step = "1"
@@ -280,17 +280,17 @@
 
         <param name = "Mirror"
              description = "Mirror the image from left to right."
-             widget_type = "OnOff"
+             dataType = "Bool"
              query = "mirrormode1"/>
 
         <param name = "Flip"
              description = "Flip the image upside down."
-             widget_type = "OnOff"
+             dataType = "Bool"
              query = "flipmode1"/>
 
         <param name = "Digital Noise Reduction"
              description = "Control the level of noise in the image."
-             widget_type = "Enumeration"
+             dataType = "Enumeration"
              min = "OFF,LOW,MIDDLE,HIGH"
              max = "OFF,LOW,MIDDLE,HIGH"
              query = "nrmode1"/>
@@ -307,37 +307,37 @@
 
         <param name = "Server Address"
                description = "Upgrade the device’s firmware"
-               widget_type = "TextField"
+               dataType = "String"
                query = "address1"
                method = "POST"/>
 
         <param name = "Port"
                description = "Upgrade the device’s firmware"
-               widget_type = "TextField"
+               dataType = "String"
                query = "port1"
                method = "POST"/>
 
         <param name = "User ID"
                description = "Upgrade the device’s firmware"
-               widget_type = "TextField"
+               dataType = "String"
                query = "username1"
                method = "POST"/>
 
         <param name = "Password"
                description = "Upgrade the device’s firmware"
-               widget_type = "TextField"
+               dataType = "String"
                query = "password1"
                method = "POST"/>
 
         <param name = "Directory"
                description = "Upgrade the device’s firmware"
-               widget_type = "TextField"
+               dataType = "String"
                query = "directory1"
                method = "POST"/>
 
         <param name = "Check Upgrade"
                description = "Upgrade the device’s firmware"
-               widget_type = "Button"
+               dataType = "Button"
                query = "/cgi-bin/checkFTPupgrade.cgi"
                method = "POST"/>
 
@@ -358,7 +358,7 @@
 
         <param name = "Lens Mode"
              description = "Set the camera to indoor/ outdoor lighting environment."
-             widget_type = "Enumeration"
+             dataType = "Enumeration"
              min = "OUTDOOR,INDOOR"
              max = "OUTDOOR,INDOOR"
              query = "lensmode1"/>
@@ -370,7 +370,7 @@
 
         <param name = "BLC Mode"
              description = "Back Light Compensation Mode: This setup allows the camera to process an image that is harshly silhouette against a bright light source."
-             widget_type = "OnOff"
+             dataType = "Bool"
              step = "2"
              query = "blcmode1"/>
 
@@ -389,7 +389,7 @@
       
       <param name = "Zoom"
              description = "Zoom In / Zoom Out."
-             widget_type = "ControlButtonsPair"
+             dataType = "ControlButtonsPair"
              min = "zoomOut"
              max = "zoomIn"
              step = "stop"
@@ -397,7 +397,7 @@
 
       <param name = "Focus"
              description = "Move focus near / far"
-             widget_type = "ControlButtonsPair"
+             dataType = "ControlButtonsPair"
              min = "focusFar"
              max = "focusNear"
              step = "stop"
@@ -413,7 +413,7 @@
 
         <param name = "WDR/BLC Mode"
              description = "Back Light Compensation Mode: This setup allows the camera to process an image that is harshly silhouette against a bright light source."
-             widget_type = "Enumeration"
+             dataType = "Enumeration"
              min = "OFF,WDR,BLC"
              max = "OFF,WDR,BLC"
              query = "blcmode1"/>
@@ -429,37 +429,37 @@
 
               <param name = "Server Address"
                      description = "Upgrade the device’s firmware"
-                     widget_type = "TextField"
+                     dataType = "String"
                      query = "address1"
                      method = "POST"/>
 
               <param name = "Port"
                      description = "Upgrade the device’s firmware"
-                     widget_type = "TextField"
+                     dataType = "String"
                      query = "port1"
                      method = "POST"/>
 
               <param name = "User ID"
                      description = "Upgrade the device’s firmware"
-                     widget_type = "TextField"
+                     dataType = "String"
                      query = "username1"
                      method = "POST"/>
 
               <param name = "Password"
                      description = "Upgrade the device’s firmware"
-                     widget_type = "TextField"
+                     dataType = "String"
                      query = "password1"
                      method = "POST"/>
 
               <param name = "Directory"
                      description = "Upgrade the device’s firmware"
-                     widget_type = "TextField"
+                     dataType = "String"
                      query = "directory1"
                      method = "POST"/>
 
               <param name = "Check Upgrade"
                      description = "Upgrade the device’s firmware"
-                     widget_type = "Button"
+                     dataType = "Button"
                      query = "/cgi-bin/checkFTPupgrade.cgi"
                      method = "POST"/>
 

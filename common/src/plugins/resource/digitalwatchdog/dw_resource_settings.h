@@ -97,11 +97,11 @@ public:
 
 protected:
 
-    virtual bool isGroupEnabled(const QString& id, const QString& parentId, const QString& name);
-    virtual bool isParamEnabled(const QString& id, const QString& parentId);
-    virtual void paramFound(const CameraSetting& value, const QString& parentId);
-    virtual void cleanDataOnFail();
-    virtual void parentOfRootElemFound(const QString& parentId);
+    virtual bool isGroupEnabled(const QString& id, const QString& parentId, const QString& name) override;
+    virtual bool isParamEnabled(const QString& id, const QString& parentId) override;
+    virtual void paramFound(const CameraSetting& value, const QString& parentId) override;
+    virtual void cleanDataOnFail() override;
+    virtual void parentOfRootElemFound(const QString& parentId) override;
 
 private:
 
