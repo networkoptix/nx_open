@@ -22,7 +22,7 @@ QList<QnPlPulseSearcherHelper::WSResult> QnPlPulseSearcherHelper::findResources(
 {
     QMap<QString, WSResult> result;
 
-    foreach (const QnInterfaceAndAddr& iface, getAllIPv4Interfaces())
+    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
     {
         std::unique_ptr<AbstractDatagramSocket> socket( SocketFactory::createDatagramSocket() );
 

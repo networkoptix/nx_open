@@ -1,6 +1,8 @@
 
 #include "resource_discovery_manager.h"
 
+#include <list>
+
 #include <QtConcurrent>
 #include <set>
 
@@ -148,7 +150,7 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(const QnUuid &resourceT
             searchersList = m_searchersList;
         }
 
-        foreach (QnAbstractResourceSearcher *searcher, searchersList)
+        for (QnAbstractResourceSearcher *searcher: searchersList)
         {
             result = searcher->createResource(resourceTypeId, params);
             if (!result.isNull())
@@ -164,7 +166,7 @@ void QnResourceDiscoveryManager::pleaseStop()
     if (isRunning())
     {
         QMutexLocker locker(&m_searchersListMutex);
-        foreach (QnAbstractResourceSearcher *searcher, m_searchersList)
+        for (QnAbstractResourceSearcher *searcher: m_searchersList)
             searcher->pleaseStop();
     }
 
@@ -205,7 +207,7 @@ void QnResourceDiscoveryManager::doResourceDiscoverIteration()
     switch( m_state )
     {
         case InitialSearch:
-            foreach (QnAbstractResourceSearcher *searcher, searchersList)
+            for (QnAbstractResourceSearcher *searcher: searchersList)
             {
                 if ((searcher->discoveryMode() != DiscoveryMode::disabled) && searcher->isLocal())
                 {
@@ -253,7 +255,7 @@ QnResourceList QnResourceDiscoveryManager::lastDiscoveredResources() const
     int sz = sizeof(m_lastDiscoveredResources) / sizeof(QnResourceList);
     QSet<QnResourcePtr> allResources;
     for (int i = 0; i < sz; ++i) {
-        foreach(const QnResourcePtr& res, m_lastDiscoveredResources[i])
+        for(const QnResourcePtr& res: m_lastDiscoveredResources[i])
             allResources << res;
     }
     return allResources.toList();
@@ -301,13 +303,13 @@ void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList&
 
 QnResourceList QnResourceDiscoveryManager::findNewResources()
 {
-    QnResourceList resources;
+    std::list<std::pair<QnResourcePtr, QnAbstractResourceSearcher*>> resourcesAndSearches;
     std::set<QString> resourcePhysicalIDs;    //used to detect duplicate resources (same resource found by multiple drivers)
     m_searchersListMutex.lock();
     ResourceSearcherList searchersList = m_searchersList;
     m_searchersListMutex.unlock();
 
-    foreach (QnAbstractResourceSearcher *searcher, searchersList)
+    for (QnAbstractResourceSearcher *searcher: searchersList)
     {
         if ((searcher->discoveryMode() != DiscoveryMode::disabled) && !needToStop())
         {
@@ -347,21 +349,32 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
                 ++it;
             }
 
-            if( searcher->discoveryMode() == DiscoveryMode::partiallyEnabled )
-            {
-                //in partial discovery mode ignoring new resources
-                for( auto it = lst.begin(); it != lst.end(); )
-                {
-                    if( !qnResPool->getResourceByUniqId((*it)->getUniqueId()) )
-                        it = lst.erase( it );
-                    else
-                        ++it;
-                }
-            }
-
-            resources.append(lst);
+            for( QnResourcePtr& res: lst )
+                resourcesAndSearches.push_back( std::make_pair( std::move(res), searcher ) );
         }
     }
+
+    //filtering discovered resources by discovery mode
+    QnResourceList resources;
+    for( auto it = resourcesAndSearches.cbegin(); it != resourcesAndSearches.cend(); ++it )
+    {
+        switch( it->second->discoveryMode() )
+        {
+            case DiscoveryMode::partiallyEnabled:
+                if( !qnResPool->getResourceByUniqId(it->first->getUniqueId()) )
+                    continue;   //ignoring newly discovered camera
+                break;
+
+            case DiscoveryMode::disabled:
+                //discovery totally disabled, ignoring resource
+                continue;
+
+            default:
+                break;
+        }
+        resources.append( std::move(it->first) );
+    }
+    resourcesAndSearches.clear();
 
     appendManualDiscoveredResources(resources);
     setLastDiscoveredResources(resources);
@@ -441,17 +454,6 @@ bool QnResourceDiscoveryManager::registerManualCameras(const QnManualCameraInfoM
     return true;
 }
 
-
-void QnResourceDiscoveryManager::onInitAsyncFinished(const QnResourcePtr& res, bool initialized)
-{
-    QnNetworkResource* rpNetRes = dynamic_cast<QnNetworkResource*>(res.data());
-    if (initialized && rpNetRes && !rpNetRes->hasFlags(Qn::desktop_camera))
-    {
-        if (rpNetRes->getStatus() == Qn::Offline || rpNetRes->getStatus() == Qn::Unauthorized || rpNetRes->getStatus() == Qn::NotDefined)
-            rpNetRes->setStatus(Qn::Online);
-    }
-}
-
 void QnResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& resource)
 {
     QMutexLocker lock(&m_searchersListMutex);
@@ -502,7 +504,7 @@ void QnResourceDiscoveryManager::dtsAssignment()
         //QList<QnDtsUnit> unitsLst =  QnColdStoreDTSSearcher::instance().findDtsUnits();
         QList<QnDtsUnit> unitsLst =  m_dstList[i]->findDtsUnits();
 
-        foreach(const QnDtsUnit& unit, unitsLst)
+        for(const QnDtsUnit& unit: unitsLst)
         {
             QnResourcePtr res = qnResPool->getResourceByUniqId(unit.resourceID);
             if (!res)
@@ -565,6 +567,6 @@ void QnResourceDiscoveryManager::updateSearchersUsage() {
         searchers = m_searchersList;
     }
 
-    foreach(QnAbstractResourceSearcher *searcher, searchers)
+    for(QnAbstractResourceSearcher *searcher: searchers)
         updateSearcherUsage(searcher);
 }

@@ -44,6 +44,20 @@ namespace {
     const double minPtzZoomRectSize = 0.08;
 
     const qreal itemUnzoomThreshold = 0.975; /* In sync with hardcoded constant in workbench_controller */ // TODO: #Elric
+
+    Qt::Orientations capabilitiesToMode(Qn::PtzCapabilities capabilities) {
+        Qt::Orientations result = 0;
+        bool isFisheye = ((capabilities & Qn::VirtualPtzCapability) == Qn::VirtualPtzCapability);
+        if (isFisheye)
+            return result;
+
+        if ((capabilities & Qn::ContinuousPanCapability) == Qn::ContinuousPanCapability)
+            result |= Qt::Horizontal;
+
+        if ((capabilities & Qn::ContinuousTiltCapability) == Qn::ContinuousTiltCapability)
+            result |= Qt::Vertical;
+        return result;
+    }
 }
 
 
@@ -115,7 +129,7 @@ PtzOverlayWidget *PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widg
     overlay->focusAutoButton()->setTarget(widget);
     overlay->modeButton()->setTarget(widget);
     overlay->modeButton()->setVisible(isFisheye && isFisheyeEnabled);
-    overlay->setMarkersVisible(!isFisheye);
+    overlay->setMarkersMode(capabilitiesToMode(data.capabilities));
 
     data.overlayWidget = overlay;
 
@@ -201,7 +215,7 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget *widget) {
             overlayWidget->modeButton()->setText(QString::number(panoAngle));
         }
         overlayWidget->modeButton()->setVisible(isFisheye && isFisheyeEnabled);
-        overlayWidget->setMarkersVisible(!isFisheye);
+        overlayWidget->setMarkersMode(capabilitiesToMode(data.capabilities));
     }
 }
 

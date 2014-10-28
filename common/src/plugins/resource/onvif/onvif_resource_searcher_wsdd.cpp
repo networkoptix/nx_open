@@ -204,7 +204,7 @@ void OnvifResourceSearcherWsdd::pleaseStop()
     QHash<QString, QUdpSocketPtr>::iterator it = m_recvSocketList.begin();
     while (it != m_recvSocketList.end()) {
         bool found = false;
-        foreach(const QnInterfaceAndAddr& iface, interfaces)
+        for(const QnInterfaceAndAddr& iface: interfaces)
         {
             if (m_recvSocketList.contains(iface.address.toString())) {
                 found = true;
@@ -221,7 +221,7 @@ void OnvifResourceSearcherWsdd::pleaseStop()
     }
 
     //Add new
-    foreach(const QnInterfaceAndAddr& iface, interfaces)
+    for(const QnInterfaceAndAddr& iface: interfaces)
     {
         QString key = iface.address.toString();
 
@@ -320,7 +320,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result)
 
     if( !m_isFirstSearch )
     {
-        foreach(const QnInterfaceAndAddr& iface, intfList)
+        for(const QnInterfaceAndAddr& iface: intfList)
         {
             if (m_shouldStop)
                 return;
@@ -346,7 +346,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result)
         m_ifaceToSock.clear();
     }
 
-    foreach(const QnInterfaceAndAddr& iface, intfList)
+    for(const QnInterfaceAndAddr& iface: intfList)
     {
         if (m_shouldStop)
             return;
@@ -362,10 +362,10 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result)
         ::sleep( 1 );
 #endif
 
-        foreach(const QnInterfaceAndAddr& iface, intfList)
+        for(const QnInterfaceAndAddr& iface: intfList)
             readProbeMatches( iface, result );
 
-        foreach(const QnInterfaceAndAddr& iface, intfList)
+        for(const QnInterfaceAndAddr& iface: intfList)
         {
             if (m_shouldStop)
                 return;
@@ -423,7 +423,7 @@ QString OnvifResourceSearcherWsdd::getAppropriateAddress(const T* source, const 
     int relevantLevel = 0;
     QString addrListStr = QLatin1String(source->XAddrs);
     QStringList addrList = addrListStr.split(QLatin1Char(' '));
-    foreach (const QString& addrStr, addrList) {
+    for (const QString& addrStr: addrList) {
         if (addrStr.startsWith(prefixes[2])) {
             if (addrStr.startsWith(prefixes[0])) {
                 appropriateAddr = addrStr;

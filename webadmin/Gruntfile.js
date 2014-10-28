@@ -102,8 +102,8 @@ module.exports = function (grunt) {
 
 
                 //Evgeniy
-                {context: '/api/',host: '192.168.56.101',port: 7002,headers: {"Authorization": "Basic YWRtaW46MTIz"}},
-                {context: '/ec2/',host: '192.168.56.101',port: 7002,headers: {"Authorization": "Basic YWRtaW46MTIz"}}
+                {context: '/api/',host: '192.168.56.101',port: 9000,headers: {"Authorization": "Basic YWRtaW46MTIz"}},
+                {context: '/ec2/',host: '192.168.56.101',port: 9000,headers: {"Authorization": "Basic YWRtaW46MTIz"}}
 
                 //Sergey Yuldashev
                 //{context: '/api/', host: '10.0.2.203', port: 8001, headers: {"Authorization": "Basic YWRtaW46MTIz"}},
@@ -273,11 +273,11 @@ module.exports = function (grunt) {
                 generatedImagesDir: '.tmp/images/generated',
                 imagesDir: '<%= yeoman.app %>/images',
                 javascriptsDir: '<%= yeoman.app %>/scripts',
-                fontsDir: '<%= yeoman.app %>/styles/fonts',
+                fontsDir: '<%= yeoman.app %>/fonts',
                 importPath: '<%= yeoman.app %>/bower_components',
                 httpImagesPath: '/images',
                 httpGeneratedImagesPath: '/images/generated',
-                httpFontsPath: '/styles/fonts',
+                httpFontsPath: '/fonts',
                 relativeAssets: false,
                 assetCacheBuster: false,
                 raw: 'Sass::Script::Number.precision = 10\n'
@@ -300,9 +300,9 @@ module.exports = function (grunt) {
                 files: {
                     src: [
                         '<%= yeoman.dist %>/scripts/{,*/}*.js',
-                        '<%= yeoman.dist %>/styles/{,*/}*.css',
-                        '<%= yeoman.dist %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
-                        '<%= yeoman.dist %>/styles/fonts/*'
+                        '<%= yeoman.dist %>/styles/{,*/}*.css'//,
+                        //'<%= yeoman.dist %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
+                        //'<%= yeoman.dist %>/fonts/*'
                     ]
                 }
             }
@@ -323,7 +323,13 @@ module.exports = function (grunt) {
             html: ['<%= yeoman.dist %>/{,*/}{*.html,*.xsl}'],
             css: ['<%= yeoman.dist %>/styles/{,*/}*.css'],
             options: {
-                assetsDirs: ['<%= yeoman.dist %>']
+                assetsDirs: [
+                    '<%= yeoman.dist %>',
+                    '<%= yeoman.dist %>/fonts',
+
+                    '<%= yeoman.app %>',
+                    '<%= yeoman.app %>/fonts'
+                ]
             }
         },
 
@@ -463,7 +469,7 @@ module.exports = function (grunt) {
         // By default, your `index.html`'s <!-- Usemin block --> will take care of
         // minification. These next options are pre-configured if you do not wish
         // to use the Usemin blocks.
-        // cssmin: {
+        //cssmin: {
         //   dist: {
         //     files: {
         //       '<%= yeoman.dist %>/styles/main.css': [
@@ -472,7 +478,7 @@ module.exports = function (grunt) {
         //       ]
         //     }
         //   }
-        // },
+        //},
         // uglify: {
         //   dist: {
         //     files: {
@@ -513,9 +519,11 @@ module.exports = function (grunt) {
             }
         },
         protractor_webdriver: {
-            options: {
-                baseUrl:"http://127.0.0.1:9009"
-                // Task-specific options go here.
+            options:{
+
+            },
+            default:{
+
             }
         }
     });

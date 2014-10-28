@@ -73,7 +73,7 @@ float QnAbstractStorageResource::bitrate() const
 {
     float rez = 0;
     QMutexLocker lock(&m_bitrateMtx);
-    foreach(const QnAbstractMediaStreamDataProvider* provider, m_providers)
+    for(const QnAbstractMediaStreamDataProvider* provider: m_providers)
         rez += provider->getBitrate();
     return rez;
 }
@@ -155,4 +155,10 @@ QnUuid QnAbstractStorageResource::fillID(const QnUuid& mserverId, const QString&
     QByteArray data1 = mserverId.toRfc4122();
     QByteArray data2 = url.toUtf8();
     return guidFromArbitraryData(data1.append(data2));
+}
+
+bool QnAbstractStorageResource::isExternal() const
+{
+    QString storageUrl = getUrl();
+    return storageUrl.trimmed().startsWith(lit("\\\\")) || QUrl(storageUrl).path().mid(1).startsWith(lit("\\\\"));
 }

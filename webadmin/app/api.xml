@@ -742,15 +742,6 @@
                     </result>
                 </function>
                 <function>
-                    <name>version</name>
-                    <description>Return server version.</description>
-                    <method>GET</method>
-                    <params/>
-                    <result>
-                        <caption>XML data with server version.</caption>
-                    </result>
-                </function>
-                <function>
                     <name>onEvent</name>
                     <description>Process business event from external system. Reserved for future
                         use.</description>

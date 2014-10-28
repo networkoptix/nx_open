@@ -37,7 +37,7 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiLayoutDataList>& tran )
         {
             assert(tran.command == ApiCommand::saveLayouts );
-            foreach(const ApiLayoutData& layout, tran.params) 
+            for(const ApiLayoutData& layout: tran.params) 
             {
                 QnLayoutResourcePtr layoutResource(new QnLayoutResource(m_resCtx.resTypePool));
                 fromApiToResource(layout, layoutResource);

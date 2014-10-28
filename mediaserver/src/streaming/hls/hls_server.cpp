@@ -589,7 +589,7 @@ namespace nx_hls
 
         //taking parameters, common for every chunks in playlist being generated
         RequestParamsType commonChunkParams;
-        foreach( RequestParamsType::value_type param, requestParams )
+        for( RequestParamsType::value_type param: requestParams )
         {
             if( param.first == StreamingParams::CHANNEL_PARAM_NAME ||
                 param.first == StreamingParams::PICTURE_SIZE_PIXELS_PARAM_NAME ||
@@ -641,7 +641,7 @@ namespace nx_hls
             hlsChunk.duration = chunkList[i].duration / (double)USEC_IN_SEC;
             hlsChunk.url = baseChunkUrl;
             QUrlQuery hlsChunkUrlQuery( hlsChunk.url.query() );
-            foreach( RequestParamsType::value_type param, commonChunkParams )
+            for( RequestParamsType::value_type param: commonChunkParams )
                 hlsChunkUrlQuery.addQueryItem( param.first, param.second );
             if( chunkList[i].alias )
             {

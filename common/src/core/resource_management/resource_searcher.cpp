@@ -76,7 +76,7 @@ void QnAbstractFileResourceSearcher::setPathCheckList(const QStringList& paths)
 QnResourceList QnAbstractFileResourceSearcher::checkFiles(const QStringList &files) const
 {
     QnResourceList result;
-    foreach (const QString &file, files) {
+    for (const QString &file: files) {
         if (QnResourcePtr res = checkFile(file))
             result.append(res);
     }

@@ -29,7 +29,7 @@ void QnStorageDb::afterDelete()
     QMutexLocker lock(&m_delMutex);
 
     QnDbTransactionLocker tran(getTransaction());
-    foreach(const DeleteRecordInfo& delRecord, m_recordsToDelete) {
+    for(const DeleteRecordInfo& delRecord: m_recordsToDelete) {
         if (!deleteRecordsInternal(delRecord)) {
             return; // keep record list to delete. try to the next time
         }
@@ -84,7 +84,7 @@ void QnStorageDb::addRecord(const QString& cameraUniqueId, QnServer::ChunksCatal
 void QnStorageDb::flushRecords()
 {
     QnDbTransactionLocker tran(getTransaction());
-    foreach(const DelayedData& data, m_delayedData)
+    for(const DelayedData& data: m_delayedData)
         addRecordInternal(data.cameraUniqueId, data.catalog, data.chunk);
     tran.commit();
     m_lastTranTime.restart();
@@ -125,7 +125,7 @@ bool QnStorageDb::replaceChunks(const QString& cameraUniqueId, QnServer::ChunksC
         return false;
     }
 
-    foreach(const DeviceFileCatalog::Chunk& chunk, chunks)
+    for(const DeviceFileCatalog::Chunk& chunk: chunks)
     {
         if (chunk.durationMs == -1)
             continue;
@@ -182,7 +182,7 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadFullFileCatalog() {
 
 bool isCatalogExistInResult(const QVector<DeviceFileCatalogPtr>& result, QnServer::ChunksCatalog catalog, const QString& uniqueId)
 {
-    foreach(const DeviceFileCatalogPtr& c, result) 
+    for(const DeviceFileCatalogPtr& c: result) 
     {
         if (c->getRole() == catalog && c->cameraUniqueId() == uniqueId)
             return true;
@@ -195,7 +195,7 @@ void QnStorageDb::addCatalogFromMediaFolder(const QString& postfix, QnServer::Ch
 
     QString root = closeDirPath(QFileInfo(m_sdb.databaseName()).absoluteDir().path()) + postfix;
     QDir dir(root);
-    foreach(const QFileInfo& fi, dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name))
+    for(const QFileInfo& fi: dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name))
     {
         QString uniqueId = fi.baseName();
         if (!isCatalogExistInResult(result, catalog, uniqueId)) {

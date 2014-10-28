@@ -351,7 +351,7 @@ void QnUserSettingsDialog::updateElement(Element element) {
         }
         break;
     case Email:
-        if(!ui->emailEdit->text().trimmed().isEmpty() && !QnEmail::isValid(ui->emailEdit->text())) {
+        if(!ui->emailEdit->text().trimmed().isEmpty() && !QnEmailAddress::isValid(ui->emailEdit->text())) {
             hint = tr("Invalid email address.");
             valid = false;
         }

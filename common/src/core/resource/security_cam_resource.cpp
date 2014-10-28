@@ -149,7 +149,9 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
     return 0;
 }
 
-void QnSecurityCamResource::initializationDone() {
+void QnSecurityCamResource::initializationDone() 
+{
+    QnNetworkResource::initializationDone();
     if( m_inputPortListenerCount.load() > 0 )
         startInputPortMonitoring();
 }
@@ -401,7 +403,7 @@ Qn::MotionTypes QnSecurityCamResource::supportedMotionType() const {
         return Qn::MT_NoMotion;
 
     Qn::MotionTypes result = Qn::MT_Default;
-    foreach(const QString& str, val.split(L',')) {
+    for(const QString& str: val.split(L',')) {
         QString s1 = str.toLower().trimmed();
         if (s1 == lit("hardwaregrid"))
             result |= Qn::MT_HardwareGrid;

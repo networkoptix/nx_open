@@ -346,7 +346,7 @@ NameHelper::NameHelper()
 {
     QnResourceTypePool::QnResourceTypeMap typeMap = qnResTypePool->getResourceTypeMap();
 
-    foreach(const QnResourceTypePtr& rt, typeMap) {
+    for(const QnResourceTypePtr& rt: typeMap) {
 
         if (rt->getParentId().isNull() || rt->getManufacture() == lit("OnvifDevice"))
             continue;

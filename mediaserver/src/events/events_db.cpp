@@ -442,7 +442,7 @@ QString QnEventsDB::getRequestStr(const QnTimePeriod& period,
         request += QString(lit(" and event_resource_guid = %1 ")).arg(guidToSqlString(resList[0]->getId()));
     else if (resList.size() > 1) {
         QString idList;
-        foreach(const QnResourcePtr& res, resList) {
+        for(const QnResourcePtr& res: resList) {
             if (!idList.isEmpty())
                 idList += QLatin1Char(',');
             idList += guidToSqlString(res->getId());
@@ -455,7 +455,7 @@ QString QnEventsDB::getRequestStr(const QnTimePeriod& period,
         if (QnBusiness::hasChild(eventType)) {
             QList<QnBusiness::EventType> events = QnBusiness::childEvents(eventType);
             QString eventTypeStr;
-            foreach(QnBusiness::EventType evnt, events) {
+            for(QnBusiness::EventType evnt: events) {
                 if (!eventTypeStr.isEmpty())
                     eventTypeStr += QLatin1Char(',');
                 eventTypeStr += QString::number((int) evnt);

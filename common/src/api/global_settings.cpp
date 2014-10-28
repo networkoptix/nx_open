@@ -8,6 +8,8 @@
 #include "resource_property_adaptor.h"
 
 #include <utils/common/app_info.h>
+#include <utils/common/email.h>
+
 #include <nx_ec/data/api_resource_data.h>
 
 
@@ -52,18 +54,20 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     m_disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameDisabledVendors, QString(), this);
     m_cameraSettingsOptimizationAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameCameraSettingsOptimization, true, this);
     m_serverAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameHost, QString(), this);
+    m_fromAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameFrom, QString(), this);
     m_userAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameUser, QString(), this);
     m_passwordAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(namePassword, QString(), this);
     m_signatureAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameSignature, QString(), this);
     m_supportEmailAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameSupportEmail, QnAppInfo::supportAddress()), this;
     m_connectionTypeAdaptor = new  QnLexicalResourcePropertyAdaptor<QnEmail::ConnectionType>(nameConnectionType, QnEmail::Unsecure, this);
     m_portAdaptor = new QnLexicalResourcePropertyAdaptor<int>(namePort, 0, this);
-    m_timeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(nameTimeout, QnEmail::defaultTimeoutSec(), this);
+    m_timeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(nameTimeout, QnEmailSettings::defaultTimeoutSec(), this);
     m_simpleAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameSimple, true, this);
 
     QList<QnAbstractResourcePropertyAdaptor*> emailAdaptors;
     emailAdaptors
         << m_serverAdaptor
+        << m_fromAdaptor
         << m_userAdaptor
         << m_passwordAdaptor
         << m_signatureAdaptor
@@ -83,12 +87,12 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);
     connect(m_cameraSettingsOptimizationAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraSettingsOptimizationChanged,   Qt::QueuedConnection);
 
-    foreach(QnAbstractResourcePropertyAdaptor* adaptor, emailAdaptors)
+    for(QnAbstractResourcePropertyAdaptor* adaptor: emailAdaptors)
         connect(adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::emailSettingsChanged, Qt::QueuedConnection);
 
     connect(qnResPool,                              &QnResourcePool::resourceAdded,                     this,   &QnGlobalSettings::at_resourcePool_resourceAdded);
     connect(qnResPool,                              &QnResourcePool::resourceRemoved,                   this,   &QnGlobalSettings::at_resourcePool_resourceRemoved);
-    foreach(const QnResourcePtr &resource, qnResPool->getResources())
+    for(const QnResourcePtr &resource: qnResPool->getResources())
         at_resourcePool_resourceAdded(resource);
 }
 
@@ -132,7 +136,7 @@ void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resour
     QMutexLocker locker(&m_mutex);
 
     m_admin = user;
-    foreach (QnAbstractResourcePropertyAdaptor* adaptor, m_allAdaptors)
+    for (QnAbstractResourcePropertyAdaptor* adaptor: m_allAdaptors)
         adaptor->setResource(user);
 }
 
@@ -143,7 +147,7 @@ void QnGlobalSettings::at_resourcePool_resourceRemoved(const QnResourcePtr &reso
     QMutexLocker locker(&m_mutex);
     m_admin.reset();
 
-    foreach (QnAbstractResourcePropertyAdaptor* adaptor, m_allAdaptors)
+    for (QnAbstractResourcePropertyAdaptor* adaptor: m_allAdaptors)
         adaptor->setResource(QnResourcePtr());
 }
 
@@ -154,9 +158,10 @@ ec2::ApiResourceParamDataList QnGlobalSettings::allSettings() const {
     return m_admin->getProperties();
 }
 
-QnEmail::Settings QnGlobalSettings::emailSettings() const {
-    QnEmail::Settings result;
+QnEmailSettings QnGlobalSettings::emailSettings() const {
+    QnEmailSettings result;
     result.server = m_serverAdaptor->value();
+    result.email = m_fromAdaptor->value();
     result.port = m_portAdaptor->value();
     result.user = m_userAdaptor->value();
     result.password = m_passwordAdaptor->value();
@@ -168,9 +173,10 @@ QnEmail::Settings QnGlobalSettings::emailSettings() const {
     return result;
 }
 
-void QnGlobalSettings::setEmailSettings(const QnEmail::Settings &settings) {
+void QnGlobalSettings::setEmailSettings(const QnEmailSettings &settings) {
     m_serverAdaptor->setValue(settings.server);
-    m_portAdaptor->setValue(settings.port == QnEmail::defaultPort(settings.connectionType) ? 0 : settings.port);
+    m_fromAdaptor->setValue(settings.email);
+    m_portAdaptor->setValue(settings.port == QnEmailSettings::defaultPort(settings.connectionType) ? 0 : settings.port);
     m_userAdaptor->setValue(settings.user);
     m_passwordAdaptor->setValue(settings.isValid() ? settings.password : QString());
     m_connectionTypeAdaptor->setValue(settings.connectionType);
@@ -181,11 +187,10 @@ void QnGlobalSettings::setEmailSettings(const QnEmail::Settings &settings) {
 }
 
 void QnGlobalSettings::synchronizeNow() {
-    foreach (QnAbstractResourcePropertyAdaptor* adaptor, m_allAdaptors)
+    for (QnAbstractResourcePropertyAdaptor* adaptor: m_allAdaptors)
         adaptor->synchronizeNow();
 }
 
-QnUserResourcePtr QnGlobalSettings::getAdminUser()
-{
+QnUserResourcePtr QnGlobalSettings::getAdminUser() {
     return m_admin;
 }

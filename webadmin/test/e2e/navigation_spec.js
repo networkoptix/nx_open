@@ -1,7 +1,12 @@
 'use strict';
 
 describe('Navigation Menu', function() {
-  it('changes active link depending on route', function() {
+
+
+    it("should stop test",function(){expect("other test").toBe("uncommented");});return;
+
+
+    it('changes active link depending on route', function() {
     browser.get('/');
 
     expect(element(by.css('.active')).getText()).toEqual('Settings');
@@ -17,8 +22,8 @@ describe('Navigation Menu', function() {
     }
   });
 
-
     it('shows essential server info in title', function() {
-        expect("test").toBe("written");
+        var servertitle = element(by.css(".navbar-brand"));
+        expect(servertitle.getAttribute("title")).toMatch(/Server\sname\:[\d\w\s*]+\nIP\:\s(\d+\.\d+\.\d+\.\d+\s*)+/);
     });
 });

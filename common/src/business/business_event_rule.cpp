@@ -47,7 +47,7 @@ QVector<QnUuid> QnBusinessEventRule::eventResources() const {
 QnResourceList QnBusinessEventRule::eventResourceObjects() const 
 {
     QnResourceList result;
-    foreach(const QnUuid& id, m_eventResources) {
+    for(const QnUuid& id: m_eventResources) {
         QnResourcePtr res = qnResPool->getResourceById(id);
         if (res)
             result << res;
@@ -92,7 +92,7 @@ QVector<QnUuid> QnBusinessEventRule::actionResources() const {
 QnResourceList QnBusinessEventRule::actionResourceObjects() const 
 {
     QnResourceList result;
-    foreach(const QnUuid& id, m_actionResources) {
+    for(const QnUuid& id: m_actionResources) {
         QnResourcePtr res = qnResPool->getResourceById(id);
         if (res)
             result << res;

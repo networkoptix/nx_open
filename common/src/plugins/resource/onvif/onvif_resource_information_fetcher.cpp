@@ -149,7 +149,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         soapWrapper.setLogin(info.defaultLogin);
         soapWrapper.setPassword(info.defaultPassword);
     }
-    else
+    else if (discoveryMode != DiscoveryMode::partiallyEnabled)
         soapWrapper.fetchLoginPassword(info.manufacturer);
 
     if( !existResource && discoveryMode == DiscoveryMode::partiallyEnabled )
@@ -299,7 +299,7 @@ bool OnvifResourceInformationFetcher::isMacAlreadyExists(const QString& mac, con
 {
     if (!mac.isEmpty()) {
 
-        foreach(const QnResourcePtr& res, resList) {
+        for(const QnResourcePtr& res: resList) {
             QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
 
             if (netRes->getMAC().toString() == mac) {

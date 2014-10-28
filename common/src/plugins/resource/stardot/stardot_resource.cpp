@@ -100,7 +100,7 @@ void QnStardotResource::detectMaxResolutionAndFps(const QByteArray& resList)
     m_resolutionNum = -1;
     m_resolution = QSize();
     m_maxFps = 0;
-    foreach(const QByteArray& line, resList.split('\n'))
+    for(const QByteArray& line: resList.split('\n'))
     {
         QList<QByteArray> fields = line.split(',');
         if (fields.size() < 4)
@@ -118,7 +118,7 @@ void QnStardotResource::detectMaxResolutionAndFps(const QByteArray& resList)
 void QnStardotResource::parseInfo(const QByteArray& info)
 {
     m_rtspPort = 0;
-    foreach(const QByteArray& line, info.split('\n'))
+    for(const QByteArray& line: info.split('\n'))
     {
         if (line.startsWith("h264_rtsp=")) {
             QByteArray portInfo = line.split('=')[1];

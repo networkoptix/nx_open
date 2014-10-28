@@ -120,7 +120,7 @@ QString passwordForBuild(unsigned buildNumber) {
 void clearUpdatesCache(const QnSoftwareVersion &versionToKeep) {
     QDir dir = updatesCacheDir();
     QStringList entries = dir.entryList(QDir::Files);
-    foreach (const QString &fileName, entries) {
+    for (const QString &fileName: entries) {
         QnSoftwareVersion version;
         if (verifyUpdatePackage(dir.absoluteFilePath(fileName), &version) && version == versionToKeep)
             continue;

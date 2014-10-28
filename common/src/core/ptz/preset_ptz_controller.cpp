@@ -134,7 +134,7 @@ bool QnPresetPtzController::activatePreset(const QString &presetId, qreal speed)
 
 bool QnPresetPtzController::getPresets(QnPtzPresetList *presets) {
     presets->clear();
-    foreach(const QnPtzPresetRecord &record, m_adaptor->value())
+    for(const QnPtzPresetRecord &record: m_adaptor->value())
         presets->push_back(record.preset);
     return true;
 }

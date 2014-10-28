@@ -38,7 +38,7 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey
     const QList<QByteArray> mainHardwareIds = qnLicensePool->mainHardwareIds();
     const QList<QByteArray> compatibleHardwareIds = qnLicensePool->compatibleHardwareIds();
     int hw = 0;
-    foreach (const QByteArray& hwid, mainHardwareIds) {
+    for (const QByteArray& hwid: mainHardwareIds) {
         QString name;
         if (hw == 0)
             name = QLatin1String("oldhwid");

@@ -93,7 +93,7 @@ void QnTranslationManager::installTranslation(const QnTranslation &translation) 
     if(locale.language() != QLocale::C)
         QLocale::setDefault(locale);
 
-    foreach(const QString &file, translation.filePaths()) {
+    for(const QString &file: translation.filePaths()) {
         QScopedPointer<QTranslator> translator(new QTranslator(qApp));
         if(translator->load(file))
             qApp->installTranslator(translator.take());
@@ -124,13 +124,13 @@ QList<QnTranslation> QnTranslationManager::loadTranslationsInternal() const {
     if(m_searchPaths.isEmpty() || m_prefixes.isEmpty())
         return result;
 
-    foreach(const QString &path, m_searchPaths) {
+    for(const QString &path: m_searchPaths) {
         QDir dir(path);
         if(!dir.exists())
             continue;
 
         QString mask = m_prefixes[0] + lit("*.qm");
-        foreach(const QString &fileName, dir.entryList(QStringList(mask))) {
+        for(const QString &fileName: dir.entryList(QStringList(mask))) {
             QnTranslation translation = loadTranslationInternal(dir.absolutePath(), fileName);
             if(!translation.isEmpty())
                 result.push_back(translation);

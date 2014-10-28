@@ -84,11 +84,22 @@ angular.module('webadminApp')
                         }
                     });
 
-                    mediaserver.saveStorages(info.storages).error(function(saveMediaServerReply){
-                    //mediaserver.saveMediaServer(info).error(function(saveMediaServerReply){
+                    mediaserver.saveStorages(info.storages).then(function(r){
+                        console.log("saveStorages" , r);
+                        if(typeof(r.error)!="undefined" && r.error!=0) {
+                            var errorToShow = r.errorString;
+                            /* switch (errorToShow) {
+                                case 'UNAUTHORIZED':
+                                case 'password':
+                                    errorToShow = "Wrong password.";
+                            } */
+                            alert("Error: " + errorToShow);
+                        }
+                        else{
+                            alert("Settings saved");
+                        }
+                    },function(saveMediaServerReply){
                         alert("Error: Couldn't save settings");
-                    }).then(function(saveMediaServerReply){
-                        alert("Settings saved");
                     });
                 });
             });

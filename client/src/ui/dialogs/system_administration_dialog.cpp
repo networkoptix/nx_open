@@ -46,16 +46,6 @@ void QnSystemAdministrationDialog::reject() {
     base_type::reject();
 }
 
-bool QnSystemAdministrationDialog::tryClose(bool force) {
-    Q_UNUSED(force)
-
-    if (!m_updatesWidget->cancelUpdate()) {
-        QMessageBox::critical(this, tr("Error"), tr("Please wait until update is finished."));
-        return false;
-    }
-    return true;
-}
-
 void QnSystemAdministrationDialog::accept() {
     if (m_updatesWidget->isUpdating()) {
         QMessageBox::information(this, tr("Information"), tr("Update is in process now."));

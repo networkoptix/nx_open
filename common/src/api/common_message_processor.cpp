@@ -141,7 +141,7 @@ void QnCommonMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data)
         res->setStatus(Qn::Offline);
         if (data.peer.peerType != Qn::PT_Server) {
             // This server hasn't own DB
-            foreach(const QnResourcePtr& camera, qnResPool->getAllCameras(res))
+            for(const QnResourcePtr& camera: qnResPool->getAllCameras(res))
                 camera->setStatus(Qn::Offline);
         }
     }
@@ -170,7 +170,7 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &
             m_additionalUrls.insert(data.id, url);
     }
 
-    foreach (const QnUuid &id, m_additionalUrls.uniqueKeys()) {
+    for (const QnUuid &id: m_additionalUrls.uniqueKeys()) {
         QnMediaServerResourcePtr server = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
@@ -178,18 +178,18 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &
         QList<QUrl> additionalUrls = server->getAdditionalUrls();
 
         if (addInformation) {
-            foreach (const QUrl &url, m_additionalUrls.values(id)) {
+            for (const QUrl &url: m_additionalUrls.values(id)) {
                 if (!additionalUrls.contains(url))
                     additionalUrls.append(url);
             }
         } else {
-            foreach (const QUrl &url, m_additionalUrls.values(id))
+            for (const QUrl &url: m_additionalUrls.values(id))
                 additionalUrls.removeOne(url);
         }
         server->setAdditionalUrls(additionalUrls);
     }
 
-    foreach (const QnUuid &id, m_ignoredUrls.uniqueKeys()) {
+    for (const QnUuid &id: m_ignoredUrls.uniqueKeys()) {
         QnMediaServerResourcePtr server = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
@@ -197,14 +197,14 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &
         QList<QUrl> ignoredUrls = server->getIgnoredUrls();
 
         if (addInformation) {
-            foreach (const QUrl &url, m_additionalUrls.values(id))
+            for (const QUrl &url: m_additionalUrls.values(id))
                 ignoredUrls.removeOne(url);
-            foreach (const QUrl &url, m_ignoredUrls.values(id)) {
+            for (const QUrl &url: m_ignoredUrls.values(id)) {
                 if (!ignoredUrls.contains(url))
                     ignoredUrls.append(url);
             }
         } else {
-            foreach (const QUrl &url, m_ignoredUrls.values(id))
+            for (const QUrl &url: m_ignoredUrls.values(id))
                 ignoredUrls.removeOne(url);
         }
         server->setIgnoredUrls(ignoredUrls);
@@ -238,7 +238,7 @@ void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )
         if (QnResourcePtr ownResource = qnResPool->getResourceById(resourceId)) 
         {
             // delete dependent objects
-            foreach(const QnResourcePtr& subRes, qnResPool->getResourcesByParentId(resourceId))
+            for(const QnResourcePtr& subRes: qnResPool->getResourcesByParentId(resourceId))
                 qnResPool->removeResource(subRes);
             qnResPool->removeResource(ownResource);
         }
@@ -334,7 +334,7 @@ void QnCommonMessageProcessor::on_businessActionBroadcasted( const QnAbstractBus
 void QnCommonMessageProcessor::on_businessRuleReset( const QnBusinessEventRuleList& rules )
 {
     m_rules.clear();
-    foreach(const QnBusinessEventRulePtr &bRule, rules)
+    for(const QnBusinessEventRulePtr &bRule: rules)
         m_rules[bRule->id()] = bRule;
 
     emit businessRuleReset(rules);
@@ -352,7 +352,7 @@ void QnCommonMessageProcessor::on_execBusinessAction( const QnAbstractBusinessAc
 
 void QnCommonMessageProcessor::on_panicModeChanged(Qn::PanicMode mode) {
     QnResourceList resList = qnResPool->getAllResourceByTypeName(lit("Server"));
-    foreach(const QnResourcePtr& res, resList) {
+    for(const QnResourcePtr& res: resList) {
         QnMediaServerResourcePtr mServer = res.dynamicCast<QnMediaServerResource>();
         if (mServer)
             mServer->setPanicMode(mode);
@@ -361,7 +361,7 @@ void QnCommonMessageProcessor::on_panicModeChanged(Qn::PanicMode mode) {
 
 // todo: ec2 relate logic. remove from this class
 void QnCommonMessageProcessor::afterRemovingResource(const QnUuid& id) {
-    foreach(const QnBusinessEventRulePtr& bRule, m_rules.values())
+    for(const QnBusinessEventRulePtr& bRule: m_rules.values())
     {
         if (bRule->eventResources().contains(id) || bRule->actionResources().contains(id))
         {
@@ -376,7 +376,7 @@ void QnCommonMessageProcessor::afterRemovingResource(const QnUuid& id) {
 void QnCommonMessageProcessor::processResources(const QnResourceList& resources)
 {
     qnResPool->beginTran();
-    foreach (const QnResourcePtr& resource, resources)
+    for (const QnResourcePtr& resource: resources)
         updateResource(resource);
     qnResPool->commit();
 }
@@ -388,7 +388,7 @@ void QnCommonMessageProcessor::processLicenses(const QnLicenseList& licenses)
 
 void QnCommonMessageProcessor::processCameraServerItems(const QnCameraHistoryList& cameraHistoryList)
 {
-    foreach(const QnCameraHistoryPtr& history, cameraHistoryList)
+    for(const QnCameraHistoryPtr& history: cameraHistoryList)
         QnCameraHistoryPool::instance()->addCameraHistory(history);
 }
 
@@ -421,13 +421,13 @@ void QnCommonMessageProcessor::processCameraUserAttributesList( const QnCameraUs
 
 void QnCommonMessageProcessor::processPropertyList(const ec2::ApiResourceParamWithRefDataList& params)
 {
-    foreach(const ec2::ApiResourceParamWithRefData& param, params)
+    for(const ec2::ApiResourceParamWithRefData& param: params)
         propertyDictionary->setValue(param.resourceId, param.name, param.value, false);
 }
 
 void QnCommonMessageProcessor::processStatusList(const ec2::ApiResourceStatusDataList& params)
 {
-    foreach(const ec2::ApiResourceStatusData& statusData, params)
+    for(const ec2::ApiResourceStatusData& statusData: params)
         on_resourceStatusChanged(statusData.id , statusData.status);
 }
 
@@ -458,7 +458,7 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
         emit syncTimeChanged(syncTime);
 
         ec2::QnPeerTimeInfoList peers = m_connection->getTimeManager()->getPeerTimeInfoList();
-        foreach(const ec2::QnPeerTimeInfo &info, peers) {
+        for(const ec2::QnPeerTimeInfo &info: peers) {
             if( !QnRuntimeInfoManager::instance()->hasItem(info.peerId) ) {
                 qWarning() << "Time for peer" << info.peerId << "received before peer was found";
                 continue;

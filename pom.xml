@@ -99,8 +99,8 @@
         <qtlib17>Positioning</qtlib17>
         <qtlib18>Sensors</qtlib18>
         <!--qtlib19 is for desktop only-->
-        <qtlib19/>
-        <qtlib20/>
+        <qtlib19></qtlib19>
+        <qtlib20>XmlPatterns</qtlib20>
 
         <!--QT plugins used-->      
         <qtplugin1>imageformats</qtplugin1>

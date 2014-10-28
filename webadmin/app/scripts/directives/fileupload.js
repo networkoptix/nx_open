@@ -20,12 +20,12 @@ angular.module('webadminApp')
 
                                 //call restart?
                             }else{
-                                switch(error.errorString){
+                                switch(data.result.errorString){
                                     case 'UP_TO_DATE':
                                         alert("Updating failed. The provided version is already installed.");
                                         break;
                                     case 'INVALID_FILE':
-                                        alert("Updating failed. Provided file is not a valid archive.");
+                                        alert("Updating failed. Provided file is not a valid update archive.");
                                         break;
                                     case 'INCOMPATIBLE_SYSTEM':
                                         alert("Updating failed. Provided file is targeted for another system.");

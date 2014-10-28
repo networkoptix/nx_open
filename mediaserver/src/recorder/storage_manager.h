@@ -124,6 +124,7 @@ public slots:
     void at_archiveRangeChanged(const QnAbstractStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
     void onNewResource(const QnResourcePtr &resource);
     void onDelResource(const QnResourcePtr &resource);
+    void at_storageChanged(const QnResourcePtr &storage);
 private:
     friend class TestStorageThread;
 

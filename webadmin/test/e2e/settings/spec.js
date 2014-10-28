@@ -2,45 +2,57 @@
 
 var SettingsPage = require('./po.js');
 describe('Settings Page', function () {
+
+    it("should stop test",function(){expect("other test").toBe("uncommented");});return;
+
     var p = new SettingsPage();
     var ptor = protractor.getInstance();
 
+
     it('Change password: should check oldpassword and newpassword and show some info', function () {
         p.get();
+
+        var confirmContainer = p.confirmPasswordInput.element(by.xpath('../..'));
         p.oldPasswordInput.sendKeys('1'); // Set something to old password field
 
         // Passwords are empty => No error, No message, No button
-        expect(p.confirmPasswordInput.getAttribute('class')).toNotMatch('ng-invalid');
+        expect(p.confirmPasswordInput.getAttribute('class')).toMatch('ng-invalid');
+        expect(confirmContainer.getAttribute('class')).toNotMatch('has-error');
         expect(p.mustBeEqualSpan.getAttribute('class')).toMatch('ng-hide');
         expect(p.changePasswordButton.isEnabled()).toBe(false);
 
         // Password field does has value, confirm does not => => No error, No message
         p.passwordInput.sendKeys('p123');
-        expect(p.confirmPasswordInput.getAttribute('class')).toNotMatch('ng-invalid');
+        expect(p.confirmPasswordInput.getAttribute('class')).toMatch('ng-invalid');
+        expect(confirmContainer.getAttribute('class')).toNotMatch('has-error');
         expect(p.mustBeEqualSpan.getAttribute('class')).toMatch('ng-hide');
         expect(p.changePasswordButton.isEnabled()).toBe(false);
 
         // Confirm has value and it differs from password
         p.confirmPasswordInput.sendKeys('q');
         expect(p.confirmPasswordInput.getAttribute('class')).toMatch('ng-invalid');
+        expect(confirmContainer.getAttribute('class')).toMatch('has-error');
         expect(p.mustBeEqualSpan.getAttribute('class')).toNotMatch('ng-hide');
         expect(p.changePasswordButton.isEnabled()).toBe(false);
 
         // Clear confirm field. No error, no message
         p.confirmPasswordInput.clear();
-        expect(p.confirmPasswordInput.getAttribute('class')).toNotMatch('ng-invalid');
+        expect(p.confirmPasswordInput.getAttribute('class')).toMatch('ng-invalid');
+        expect(confirmContainer.getAttribute('class')).toNotMatch('has-error');
         expect(p.mustBeEqualSpan.getAttribute('class')).toMatch('ng-hide');
         expect(p.changePasswordButton.isEnabled()).toBe(false);
 
         // Set values to be equal. => No error, no message
         p.confirmPasswordInput.sendKeys('p12');
         expect(p.confirmPasswordInput.getAttribute('class')).toMatch('ng-invalid');
+        expect(confirmContainer.getAttribute('class')).toMatch('has-error');
         expect(p.mustBeEqualSpan.getAttribute('class')).toNotMatch('ng-hide');
         expect(p.changePasswordButton.isEnabled()).toBe(false);
 
         // Append '3' to make fields equal
         p.confirmPasswordInput.sendKeys('3');
         expect(p.confirmPasswordInput.getAttribute('class')).toNotMatch('ng-invalid');
+        expect(confirmContainer.getAttribute('class')).toNotMatch('has-error');
         expect(p.mustBeEqualSpan.getAttribute('class')).toMatch('ng-hide');
         expect(p.changePasswordButton.isEnabled()).toBe(true);
     });
@@ -118,21 +130,7 @@ describe('Settings Page', function () {
 
 
     it("Change port: should save port and show message about restart",function(){
-        p.setPort(8888);
-        p.saveButton.click().then(function(){
-            var alertDialog = ptor.switchTo().alert(); // Expect alert.then( // <- this fixes the problem
-            expect(alertDialog.getText()).toContain("will be applied after restart");
-
-            alertDialog.dismiss();
-        });
-
-        p.setPort(7002);
-        p.saveButton.click().then(function(){
-            var alertDialog = ptor.switchTo().alert(); // Expect alert.then( // <- this fixes the problem
-            expect(alertDialog.getText()).toContain("will be applied after restart");
-
-            alertDialog.dismiss();
-        });
+        expect("actual changing port").toBe("tested manually");
     });
 
 
@@ -149,6 +147,7 @@ describe('Settings Page', function () {
 
 
     it("Change system name: should allow change name",function() {
+
         p.get();
         var oldSystemName = '';
         var temporarySystemName = 'some good name';

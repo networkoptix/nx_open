@@ -94,6 +94,8 @@ angular.module('webadminApp')
                 }
             } else {
                 alert("Settings saved");
+                if( $scope.settings.port !=  window.location.port )
+                    window.location.href =  window.location.protocol + "//" + window.location.hostname + ":" + $scope.settings.port;
             }
         }
 
@@ -122,12 +124,9 @@ angular.module('webadminApp')
             var port = server.apiUrl.substring(server.apiUrl.lastIndexOf(":"));
             var url = "http://" + ips[i] + port;
 
-
-            //console.log("checkServersIp", url, server);
             mediaserver.getSettings(url).then(function(){
                 server.apiUrl = url;
             }).catch(function(){
-            //    console.log("fail again " + url);
                 if(i < ips.length-1)
                     checkServersIp (server,i+1);
                 else

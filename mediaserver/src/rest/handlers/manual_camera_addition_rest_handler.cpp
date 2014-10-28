@@ -39,7 +39,7 @@ QnManualCameraAdditionRestHandler::QnManualCameraAdditionRestHandler()
 }
 
 QnManualCameraAdditionRestHandler::~QnManualCameraAdditionRestHandler() {
-    foreach (QnManualCameraSearcher* process, m_searchProcesses) {
+    for (QnManualCameraSearcher* process: m_searchProcesses) {
         process->cancel();
         delete process;
     }

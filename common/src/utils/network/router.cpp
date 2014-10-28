@@ -100,7 +100,7 @@ void QnRouter::at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleIn
 }
 
 void QnRouter::at_runtimeInfoManager_runtimeInfoAdded(const QnPeerRuntimeInfo &data) {
-    foreach (const ec2::ApiConnectionData &connection, data.data.availableConnections)
+    for (const ec2::ApiConnectionData &connection: data.data.availableConnections)
         addConnection(data.uuid, Endpoint(connection.peerId, connection.host, connection.port));
 }
 
@@ -124,7 +124,7 @@ void QnRouter::at_runtimeInfoManager_runtimeInfoChanged(const QnPeerRuntimeInfo 
 }
 
 void QnRouter::at_runtimeInfoManager_runtimeInfoRemoved(const QnPeerRuntimeInfo &data) {
-    foreach (const ec2::ApiConnectionData &connection, data.data.availableConnections)
+    for (const ec2::ApiConnectionData &connection: data.data.availableConnections)
         removeConnection(data.uuid, Endpoint(connection.peerId, connection.host, connection.port));
 }
 

@@ -142,7 +142,7 @@ QnUuid QnTransactionLog::makeHash(const QString &extraData, const ApiDiscoveryDa
 ErrorCode QnTransactionLog::updateSequence(const ApiUpdateSequenceData& data)
 {
     QnDbManager::Locker locker(dbManager);
-    foreach(const ApiSyncMarkerRecord& record, data.markers) 
+    for(const ApiSyncMarkerRecord& record: data.markers) 
     {
         ErrorCode result = updateSequenceNoLock(record.peerID, record.dbID, record.sequence);
         if (result != ErrorCode::ok)
@@ -283,8 +283,9 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
 {
     QReadLocker lock(&m_dbManager->getMutex());
     QMap <QnTranStateKey, int> tranLogSequence;
-    foreach(const QnTranStateKey& key, m_state.values.keys())
+    for(auto itr = m_state.values.begin(); itr != m_state.values.end(); ++itr)
     {
+        const QnTranStateKey& key = itr.key();
         QSqlQuery query(m_dbManager->getDB());
         query.prepare("SELECT tran_data, sequence FROM transaction_log WHERE peer_guid = ? and db_guid = ? and sequence > ?  order by sequence");
         query.addBindValue(key.peerID.toRfc4122());

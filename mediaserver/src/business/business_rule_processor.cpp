@@ -97,7 +97,7 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(const QnAbstrac
         const QnMediaServerResource* mServer = dynamic_cast<const QnMediaServerResource*>(mServerRes.data());
         if (!mServer || (mServer->getServerFlags() & Qn::SF_HasPublicIP))
             return QnMediaServerResourcePtr(); // do not proxy
-        foreach (const QnMediaServerResourcePtr& mServer, qnResPool->getAllServers())
+        for (const QnMediaServerResourcePtr& mServer: qnResPool->getAllServers())
         {
             if ((mServer->getServerFlags() & Qn::SF_HasPublicIP) && mServer->getStatus() == Qn::Online)
                 return mServer;
@@ -156,7 +156,7 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
         executeAction(action, QnResourcePtr());
     }
     else {
-        foreach(const QnResourcePtr& res, resList)
+        for(const QnResourcePtr& res: resList)
             executeAction(action, res);
     }
 }
@@ -245,7 +245,7 @@ void QnBusinessRuleProcessor::processBusinessEvent(const QnAbstractBusinessEvent
     QMutexLocker lock(&m_mutex);
 
     QnAbstractBusinessActionList actions = matchActions(bEvent);
-    foreach(const QnAbstractBusinessActionPtr& action, actions)
+    for(const QnAbstractBusinessActionPtr& action: actions)
     {
         executeAction(action);
     }
@@ -412,7 +412,7 @@ bool QnBusinessRuleProcessor::checkEventCondition(const QnAbstractBusinessEventP
 QnAbstractBusinessActionList QnBusinessRuleProcessor::matchActions(const QnAbstractBusinessEventPtr& bEvent)
 {
     QnAbstractBusinessActionList result;
-    foreach(const QnBusinessEventRulePtr& rule, m_rules)    
+    for(const QnBusinessEventRulePtr& rule: m_rules)    
     {
         if (rule->isDisabled() || rule->eventType() != bEvent->getEventType())
             continue;
@@ -472,9 +472,9 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
     }
 
     QStringList recipients;
-    foreach (const QnUserResourcePtr &user, action->getResourceObjects().filtered<QnUserResource>()) {
+    for (const QnUserResourcePtr &user: action->getResourceObjects().filtered<QnUserResource>()) {
         QString email = user->getEmail();
-        if (!email.isEmpty() && QnEmail::isValid(email))
+        if (!email.isEmpty() && QnEmailAddress::isValid(email))
             recipients << email;
     }
 
@@ -521,20 +521,20 @@ bool QnBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPt
 
     QStringList log;
     QStringList recipients;
-    foreach (const QnUserResourcePtr &user, action->getResourceObjects().filtered<QnUserResource>()) {
+    for (const QnUserResourcePtr &user: action->getResourceObjects().filtered<QnUserResource>()) {
         QString email = user->getEmail();
         log << QString(QLatin1String("%1 <%2>")).arg(user->getName()).arg(user->getEmail());
-        if (!email.isEmpty() && QnEmail::isValid(email))
+        if (!email.isEmpty() && QnEmailAddress::isValid(email))
             recipients << email;
     }
 
     QStringList additional = action->getParams().emailAddress.split(QLatin1Char(';'), QString::SkipEmptyParts);
-    foreach(const QString &email, additional) {
+    for(const QString &email: additional) {
         log << email;
         QString trimmed = email.trimmed();
         if (trimmed.isEmpty())
             continue;
-        if (QnEmail::isValid(trimmed))
+        if (QnEmailAddress::isValid(trimmed))
             recipients << email;
     }
 
@@ -555,7 +555,7 @@ bool QnBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPt
     assert(!partialInfo.attrName.isEmpty());
 //    contextMap[partialInfo.attrName] = lit("true");
 
-    QnEmail::Settings emailSettings = QnGlobalSettings::instance()->emailSettings();
+    QnEmailSettings emailSettings = QnGlobalSettings::instance()->emailSettings();
 
     QnEmailAttachmentList attachments;
     attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
@@ -666,7 +666,7 @@ void QnBusinessRuleProcessor::at_businessRuleReset(const QnBusinessEventRuleList
     }
     m_rules.clear();
 
-    foreach(const QnBusinessEventRulePtr& rule, rules) {
+    for(const QnBusinessEventRulePtr& rule: rules) {
         at_businessRuleChanged_i(rule);
     }
 }
@@ -678,7 +678,7 @@ void QnBusinessRuleProcessor::terminateRunningRule(const QnBusinessEventRulePtr&
     bool isToggledAction = QnBusiness::hasToggleState(rule->actionType()); // We decided to terminate continues actions only if rule is changed
     if (!runtimeRule.isActionRunning.isEmpty() && !runtimeRule.resources.isEmpty() && isToggledAction)
     {
-        foreach(const QnUuid& resId, runtimeRule.isActionRunning)
+        for(const QnUuid& resId: runtimeRule.isActionRunning)
         {
             // terminate all actions. If instant action, terminate all resources on which it was started
             QnAbstractBusinessEventPtr bEvent;

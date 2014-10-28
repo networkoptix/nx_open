@@ -36,7 +36,7 @@ ThirdPartyResourceSearcher::ThirdPartyResourceSearcher()
         ++it )
     {
         const QList<QString>& modelList = it->getReservedModelList();
-        foreach(const  QString& modelMask, modelList )
+        for(const  QString& modelMask: modelList )
             CameraDriverRestrictionList::instance()->allow( THIRD_PARTY_MANUFACTURER_NAME, it->getVendorName(), modelMask );
     }
 }
@@ -237,7 +237,7 @@ QnResourceList ThirdPartyResourceSearcher::createResListFromCameraInfoList(
     const QVector<nxcip::CameraInfo>& cameraInfoArray )
 {
     QnResourceList resList;
-    foreach(const  nxcip::CameraInfo& info, cameraInfoArray )
+    for(const  nxcip::CameraInfo& info: cameraInfoArray )
     {
         QnThirdPartyResourcePtr res = createResourceFromCameraInfo( discoveryManager, info );
         if( !res )

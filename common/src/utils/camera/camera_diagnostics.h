@@ -70,6 +70,7 @@ namespace CameraDiagnostics
             cameraInvalidParams,
             badMediaStream,
             noMediaStream,
+            cameraInitializationInProgress,
             unknown
         };
 
@@ -208,6 +209,12 @@ namespace CameraDiagnostics
     {
     public:
         UnknownErrorResult() : Result( ErrorCode::unknown ) {}
+    };
+
+    class InitializationInProgress : public Result
+    {
+    public:
+        InitializationInProgress() : Result( ErrorCode::cameraInitializationInProgress ) {}
     };
 
     class ServerTerminatedResult : public Result

@@ -102,7 +102,7 @@ QList<QnDtsUnit> QnColdStoreDTSSearcher::findDtsUnits()
 
     QList<QHostAddress> localAddresses = allLocalAddresses();
 
-    foreach(const QHostAddress& localAddress, localAddresses)
+    for(const QHostAddress& localAddress: localAddresses)
     {
         QHostAddress groupAddress(QLatin1String("239.200.200.201"));
 
@@ -163,7 +163,7 @@ QList<QnDtsUnit> QnColdStoreDTSSearcher::findDtsUnits()
 
         }
 
-        foreach(const QHostAddress& srv, server_list)
+        for(const QHostAddress& srv: server_list)
         {
 //			NX_LOG(QLatin1String("Found CS = "), srv.name, cl_logALWAYS);
 
@@ -238,7 +238,7 @@ void QnColdStoreDTSSearcher::requestFileList(QList<QnDtsUnit>& result, QHostAddr
         fileList.push_back(tmp);
     }
     
-    foreach(const QString& fn, fileList)
+    for(const QString& fn: fileList)
     {
         QString mac = fn;
         mac = mac.toUpper();

@@ -1,0 +1,27 @@
+<resources>
+    <oem name = "ArecontVision">
+        <resource name = "5245DN" public ="5245"/>
+        <resource name = "3226pmir" public ="3226"/>
+        
+        <resource name = "12176" public ="8365">
+            <params>
+                <param name = "MaxSensorWidth" default_value ="2048"/>
+                <param name = "MaxSensorHeight" default_value ="1536"/>
+                <param name = "MaxFPS" default_value ="5"/>
+            </params>
+        </resource>
+		
+	<resource name = "20175" public ="8365">
+            <params>
+                <param name = "MaxSensorWidth" default_value ="2560"/>
+                <param name = "MaxSensorHeight" default_value ="1920"/>
+                <param name = "MaxFPS" default_value ="3"/>
+            </params>
+        </resource>
+        <resource name = "3236" public ="3100">
+            <params>
+                <param name = "MaxFPS" default_value ="20"/>
+            </params>
+        </resource>
+    </oem>
+</resources>

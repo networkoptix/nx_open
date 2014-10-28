@@ -126,6 +126,25 @@ QnTimePeriodList QnBookmarkCameraData::dataSource() const {
     return m_dataSource;
 }
 
+bool QnBookmarkCameraData::trim(qint64 trimTime) {
+    if(m_dataSource.isEmpty())
+        return false;
+
+    QnTimePeriod period = m_dataSource.last();
+    if(period.durationMs != -1)
+        return false;
+
+    qint64 trimmedDurationMs = qMax(0ll, trimTime - period.startTimeMs);
+    period.durationMs = trimmedDurationMs;
+    if(period.durationMs == 0) {
+        m_dataSource.pop_back();
+    } else {
+        m_dataSource.back() = period;
+    }
+
+    return true;
+}
+
 QnCameraBookmark QnBookmarkCameraData::find(const qint64 position) const {
     QnCameraBookmark result;
     foreach (const QnCameraBookmark &bookmark, m_data) {

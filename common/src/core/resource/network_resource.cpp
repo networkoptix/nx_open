@@ -256,7 +256,7 @@ void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
 
 
     QList<QnResourcePtr> local_list;
-    foreach (const QnResourcePtr& res, lst.values())
+    for (const QnResourcePtr& res: lst.values())
     {
         QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
         if (netRes && !(netRes->checkNetworkStatus(QnNetworkResource::HasConflicts)))
@@ -273,7 +273,7 @@ void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
     {
         NX_LOG(QLatin1String("Done. Time elapsed: "), time.elapsed(), cl_logDEBUG1);
 
-        foreach(const QnResourcePtr& res, lst)
+        for(const QnResourcePtr& res: lst)
             NX_LOG(res->toString(), cl_logDEBUG1);
 
     }
@@ -288,4 +288,15 @@ QnUuid QnNetworkResource::uniqueIdToId(const QString& uniqId)
     md5.addData(uniqId.toUtf8());
     QnUuid id = QnUuid::fromRfc4122(md5.result());
     return id;
+}
+
+void QnNetworkResource::initializationDone()
+{
+    QnResource::initializationDone();
+
+    if (hasFlags(Qn::desktop_camera))
+        return;
+    
+    if (getStatus() == Qn::Offline || getStatus() == Qn::Unauthorized || getStatus() == Qn::NotDefined)
+        setStatus(Qn::Online);
 }
