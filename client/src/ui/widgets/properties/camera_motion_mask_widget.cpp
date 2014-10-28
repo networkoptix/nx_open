@@ -91,7 +91,7 @@ void QnCameraMotionMaskWidget::init() {
     disconnect(m_motionSelectionInstrument, NULL,                                                       m_controller,   NULL); // TODO: #Elric controller flags?
     connect(m_clickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),   this,           SLOT(at_itemClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(m_motionSelectionInstrument,  &MotionSelectionInstrument::motionRegionSelected,             this,           &QnCameraMotionMaskWidget::at_motionRegionSelected);
-    connect(m_motionSelectionInstrument,  &MotionSelectionInstrument::motionRegionCleared,              this,           &QnCameraMotionMaskWidget::at_motionRegionCleared);
+    connect(m_motionSelectionInstrument,  &MotionSelectionInstrument::motionRegionCleared,              this,           &QnCameraMotionMaskWidget::clearMotion);
 
     /* Set up UI. */
     QVBoxLayout *layout = new QVBoxLayout();
@@ -225,7 +225,20 @@ void QnCameraMotionMaskWidget::setMotionSensitivity(int motionSensitivity) {
 }
 
 void QnCameraMotionMaskWidget::clearMotion() {
-    at_motionRegionCleared();
+    if (!m_resourceWidget)
+        return;
+    bool changed = false;
+
+    const QList<QnMotionRegion> &regions = m_resourceWidget->motionSensitivity();
+    for (int i = 0; i < regions.size(); ++i) {
+        if(!regions[i].isEmpty()) {
+            changed = true;
+        }
+    }
+    m_resourceWidget->clearMotionSensitivity();
+
+    if(changed)
+        emit motionRegionListChanged();
 }
 
 bool QnCameraMotionMaskWidget::isValidMotionRegion() {
@@ -257,23 +270,6 @@ void QnCameraMotionMaskWidget::at_motionRegionSelected(QGraphicsView *, QnMediaR
         return;
 
     bool changed = widget->addToMotionSensitivity(gridRect, m_motionSensitivity);
-    if(changed)
-        emit motionRegionListChanged();
-}
-
-void QnCameraMotionMaskWidget::at_motionRegionCleared() {
-    if (!m_resourceWidget)
-        return;
-    bool changed = false;
-
-    const QList<QnMotionRegion> &regions = m_resourceWidget->motionSensitivity();
-    for (int i = 0; i < regions.size(); ++i) {
-        if(!regions[i].isEmpty()) {
-            changed = true;
-        }
-    }
-    m_resourceWidget->clearMotionSensitivity();
-
     if(changed)
         emit motionRegionListChanged();
 }
