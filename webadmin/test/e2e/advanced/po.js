@@ -10,6 +10,8 @@ var Page = function () {
     this.dangerAlert = element(by.id("alert-danger-page"));
     this.saveButton = element(by.buttonText("Save"));
 
+    this.cancelButton = element(by.buttonText("Cancel"));
+
     this.storageLimitInput  = this.storagesRows.first().element(by.model("storage.reservedSpaceGb"));
     this.setStorageLimit = function (val){
         //Hack from https://github.com/angular/protractor/issues/562
@@ -24,6 +26,8 @@ var Page = function () {
 
         this.storageLimitInput.sendKeys(val);
     }
+
+    this.upgradeButton = element(by.id("fileupload"));
 };
 
 module.exports = Page;
