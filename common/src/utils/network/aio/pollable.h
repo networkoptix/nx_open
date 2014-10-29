@@ -24,6 +24,7 @@ static const int INVALID_SOCKET = -1;
 
 typedef CommonSocketImpl<Pollable> PollableImpl;
 
+//!Incapsulates system object that can be polled with \a PollSet
 class Pollable
 {
 public:
@@ -33,7 +34,13 @@ public:
     virtual ~Pollable() {}
 
     AbstractSocket::SOCKET_HANDLE handle() const;
+    /*!
+        \note Zero timeout means infinite timeout
+    */
     bool getRecvTimeout( unsigned int* millis );
+    /*!
+        \note Zero timeout means infinite timeout
+    */
     bool getSendTimeout( unsigned int* millis );
 
     PollableImpl* impl();
