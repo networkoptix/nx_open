@@ -55,6 +55,7 @@ private:
 
     QString m_updateLocationPrefix;
     bool m_targetMustBeNewer;
+    bool m_checkLatestVersion;
 
     QHash<QnSystemInformation, QnUpdateFileInformationPtr> m_updateFiles;
     QnUpdateFileInformationPtr m_clientUpdateFile;
