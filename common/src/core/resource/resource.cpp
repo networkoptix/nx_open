@@ -189,10 +189,11 @@ void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modif
 }
 
 void QnResource::update(const QnResourcePtr& other, bool silenceMode) {
+    /*
     Q_ASSERT_X(other->metaObject()->className() == this->metaObject()->className(),
         Q_FUNC_INFO,
         "Trying to update " + QByteArray(this->metaObject()->className()) + " with " + QByteArray(other->metaObject()->className()));
-    
+    */
     for (QnResourceConsumer *consumer: m_consumers)
         consumer->beforeUpdate();
     QSet<QByteArray> modifiedFields;
