@@ -332,7 +332,8 @@
             <Binary Id="Warning" SourceFile="Binary\Exclam.ico" />
 
             <!-- WelcomeDlg -->
-            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">NOT PREVIOUSVERSIONSINSTALLED</Publish>          
+            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">NOT PREVIOUSVERSIONSINSTALLED AND NOT LICENSE_ALREADY_ACCEPTED</Publish>          
+            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg">NOT PREVIOUSVERSIONSINSTALLED AND LICENSE_ALREADY_ACCEPTED</Publish>          
             <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="UpgradeDlg">PREVIOUSVERSIONSINSTALLED</Publish>
 
             <!-- LicenseAgreementDlg -->
@@ -344,7 +345,9 @@
             <Publish Dialog="UpgradeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
 
             <!-- MediaServerDlg -->
-            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg"/>
+            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">NOT LICENSE_ALREADY_ACCEPTED</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">LICENSE_ALREADY_ACCEPTED</Publish>
+
             <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="AllFieldsAreMandatoryDlg" Order="1">NOT $(var.IsSettingsFilled)</Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="InvalidPasswordDlg" Order="1">$(var.IsSettingsFilled) AND NOT $(var.PasswordsEqual)</Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Property="BUSYPORT" Value="{}">$(var.IsSettingsCorrect)</Publish>
