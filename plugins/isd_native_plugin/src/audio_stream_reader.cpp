@@ -7,10 +7,13 @@
 
 #include <iostream>
 
+#include <utils/network/aio/aioservice.h>
+
 
 AudioStreamReader::AudioStreamReader()
 :
-    m_prevReceiverID(0)
+    m_prevReceiverID(0),
+    m_pollable(nullptr)
 {
 }
 
@@ -23,7 +26,7 @@ bool AudioStreamReader::initialize()
 {
     if( !initializeAmux() )
         return false;
-    return aio::AIOService::instance()->watchSocket( m_pollable, aio::etRead );
+    return aio::AIOService::instance()->watchSocket( m_pollable, aio::etRead, this );
 }
 
 /*!
@@ -48,7 +51,7 @@ nxcip::AudioFormat AudioStreamReader::getAudioFormat() const
     return m_audioFormat;
 }
 
-void AudioStreamReader::eventTriggered( Pollable* pollable, EventType eventType )
+void AudioStreamReader::eventTriggered( Pollable* pollable, aio::EventType eventType ) throw()
 {
     if( eventType == aio::etRead )
     {
@@ -61,7 +64,7 @@ void AudioStreamReader::eventTriggered( Pollable* pollable, EventType eventType 
     //re-initializing audio
     if( !initializeAmux() )
         return;
-    if( !aio::AIOService::instance()->watchSocket( m_pollable, aio::etRead ) )
+    if( !aio::AIOService::instance()->watchSocket( m_pollable, aio::etRead, this ) )
     {
         //TODO
     }

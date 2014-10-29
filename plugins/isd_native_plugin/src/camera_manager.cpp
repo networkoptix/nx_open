@@ -28,7 +28,7 @@ CameraManager::CameraManager( const nxcip::CameraInfo& info )
 {
 #ifndef NO_ISD_AUDIO
     m_audioStreamReader.reset( new AudioStreamReader() );
-    if( !m_audioStreamReader->initialized() )
+    if( !m_audioStreamReader->initialize() )
         m_audioStreamReader.reset();
 #endif
 }

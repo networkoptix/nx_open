@@ -18,6 +18,10 @@ namespace aio
     extern template class AIOThread<Pollable>;
 }
 
+#ifndef _WIN32
+static const int INVALID_SOCKET = -1;
+#endif
+
 typedef CommonSocketImpl<Pollable> PollableImpl;
 
 class Pollable

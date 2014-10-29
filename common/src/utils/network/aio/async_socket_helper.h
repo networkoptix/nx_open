@@ -279,7 +279,7 @@ private:
 
     virtual void eventTriggered( SocketType* sock, aio::EventType eventType ) throw() override
     {
-        assert( m_socket == sock );
+        assert( this->m_socket == sock );
 
         //TODO #ak split this method to multiple methods
 
@@ -496,7 +496,7 @@ private:
             {
                 //TODO #ak distinguish read and write
                 SystemError::ErrorCode sockErrorCode = SystemError::notConnected;
-                m_socket->getLastError( &sockErrorCode );
+                this->m_socket->getLastError( &sockErrorCode );
                 if( m_connectHandler )
                 {
                     m_connectSendHandlerTerminatedFlag = &terminated;
