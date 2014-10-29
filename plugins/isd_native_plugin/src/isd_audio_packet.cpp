@@ -6,25 +6,73 @@
 #include "isd_audio_packet.h"
 
 
+AudioData::AudioData(
+    size_t reserveSize,
+    nxcip::CompressionType audioCodec )
+:
+    m_data( nullptr ),
+    m_dataSize( 0 ),
+    m_capacity( 0 ),
+    m_audioCodec( audioCodec )
+{
+    m_data = new uint8_t[reserveSize];
+    if( !m_data )
+        return;
+    m_capacity = reserveSize;
+}
+
+AudioData::~AudioData()
+{
+    if( m_data )
+    {
+        delete[] m_data;
+        m_data = nullptr;
+    }
+}
+
+const uint8_t* AudioData::data() const
+{
+    return m_data;
+}
+
+size_t AudioData::dataSize() const
+{
+    return m_dataSize;
+}
+
+nxcip::CompressionType AudioData::codecType() const
+{
+    return m_audioCodec;
+}
+
+size_t AudioData::capacity() const
+{
+    return m_capacity;
+}
+
+uint8_t* AudioData::data()
+{
+    return m_data;
+}
+
+void AudioData::setDataSize( size_t _size )
+{
+    m_dataSize = _size;
+}
+
+
 ISDAudioPacket::ISDAudioPacket(
     int _channelNumber,
-    nxcip::UsecUTCTimestamp _timestamp,
-    nxcip::CompressionType _codecType )
+    nxcip::UsecUTCTimestamp _timestamp )
 :
     m_refManager( this ),
     m_channelNumber( _channelNumber ),
-    m_timestamp( _timestamp ),
-    m_codecType( _codecType ),
-    m_data( 0 ),
-    m_capacity( 0 ),
-    m_dataSize( 0 )
+    m_timestamp( _timestamp )
 {
 }
 
 ISDAudioPacket::~ISDAudioPacket()
 {
-    nxpt::freeAligned( m_data );
-    m_data = nullptr;
 }
 
 //!Implementation of nxpl::PluginInterface::queryInterface
@@ -70,13 +118,13 @@ nxcip::DataPacketType ISDAudioPacket::type() const
 //!Implementation of nxpl::MediaDataPacket::data
 const void* ISDAudioPacket::data() const
 {
-    return m_data;
+    return m_audioData->data();
 }
 
 //!Implementation of nxpl::MediaDataPacket::dataSize
 unsigned int ISDAudioPacket::dataSize() const
 {
-    return m_dataSize;
+    return m_audioData->dataSize();
 }
 
 //!Implementation of nxpl::MediaDataPacket::channelNumber
@@ -88,7 +136,7 @@ unsigned int ISDAudioPacket::channelNumber() const
 //!Implementation of nxpl::MediaDataPacket::codecType
 nxcip::CompressionType ISDAudioPacket::codecType() const
 {
-    return m_codecType;
+    return m_audioData->codecType();
 }
 
 //!Implementation of nxpl::MediaDataPacket::flags
@@ -101,28 +149,4 @@ unsigned int ISDAudioPacket::flags() const
 unsigned int ISDAudioPacket::cSeq() const
 {
     return 0;
-}
-
-void* ISDAudioPacket::data()
-{
-    return m_data;
-}
-
-void ISDAudioPacket::reserve( unsigned int _capacity )
-{
-    if( m_data )
-        nxpt::freeAligned( m_data );
-
-    m_capacity = _capacity;
-    m_data = (uint8_t*)nxpt::mallocAligned( _capacity + nxcip::MEDIA_PACKET_BUFFER_PADDING_SIZE, nxcip::MEDIA_DATA_BUFFER_ALIGNMENT );
-}
-
-unsigned int ISDAudioPacket::capacity() const
-{
-    return m_capacity;
-}
-
-void ISDAudioPacket::setDataSize( unsigned int _dataSize )
-{
-    m_dataSize = _dataSize;
 }

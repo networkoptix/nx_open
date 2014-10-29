@@ -76,6 +76,9 @@ static TimeSynchronizationData timeSyncData;
 StreamReader::StreamReader(
     nxpt::CommonRefManager* const parentRefManager,
     int encoderNum,
+#ifndef NO_ISD_AUDIO
+    const std::unique_ptr<AudioStreamReader>& audioStreamReader,
+#endif
     const char* /*cameraUid*/ )
 :
     m_refManager( parentRefManager ),
@@ -84,8 +87,12 @@ StreamReader::StreamReader(
     m_lastVideoTime(0),
     m_lastMotionTime(0),
 #ifndef NO_ISD_AUDIO
+    m_audioStreamReader( audioStreamReader ),
+    m_audioEventFD( eventfd( 0, EFD_SEMAPHORE ) ),
+    m_audioEventFDRegistered( false ),
     m_audioEnabled(false),
-    m_audioCodec(nxcip::CODEC_ID_NONE),
+    m_audioReceiverID(0),
+    //m_audioCodec(nxcip::CODEC_ID_NONE),
 #endif
     m_prevPts(0),
     m_timestampDelta(std::numeric_limits<int64_t>::max()),
@@ -117,6 +124,14 @@ StreamReader::~StreamReader()
         close( m_epollFD );
         m_epollFD = -1;
     }
+
+#ifndef NO_ISD_AUDIO
+    if( m_audioEventFD != -1 )
+    {
+        close( m_audioEventFD );
+        m_audioEventFD = -1;
+    }
+#endif
 }
 
 //!Implementation of nxpl::PluginInterface::queryInterface
@@ -170,50 +185,81 @@ void StreamReader::setMotionMask(const uint8_t* data)
 void StreamReader::setAudioEnabled( bool audioEnabled )
 {
 #ifndef NO_ISD_AUDIO
-    m_audioEnabled = audioEnabled;
+    m_audioEnabled.store( audioEnabled, std::memory_order_relaxed );
+
+    if( audioEnabled )
+    {
+        QMutexLocker lk( &m_mutex );
+        if( m_audioReceiverID > 0 )
+            m_audioStreamReader->removePacketReceiver( m_audioReceiverID );
+        m_audioReceiverID = m_audioStreamReader->setPacketReceiver(
+            std::bind( &StreamReader::onAudioDataAvailable, this, std::placeholders::_1 ) );
+    }
 #else
     Q_UNUSED( audioEnabled )
 #endif
 }
 
-int StreamReader::getAudioFormat( nxcip::AudioFormat* audioFormat ) const
-{
-#ifndef NO_ISD_AUDIO
-    QMutexLocker lk( &m_mutex );
-
-    if( !m_audioFormat.get() )
-        return nxcip::NX_TRY_AGAIN;
-
-    *audioFormat = *m_audioFormat.get();
-    return nxcip::NX_NO_ERROR;
-#else
-    Q_UNUSED( audioFormat )
-    return nxcip::NX_UNSUPPORTED_CODEC;
-#endif
-}
+//int StreamReader::getAudioFormat( nxcip::AudioFormat* audioFormat ) const
+//{
+//#ifndef NO_ISD_AUDIO
+//    //QMutexLocker lk( &m_mutex );
+//
+//    //if( !m_audioFormat.get() )
+//    //    return nxcip::NX_TRY_AGAIN;
+//
+//    //*audioFormat = *m_audioFormat.get();
+//    *audioFormat = m_audioStreamReader->getAudioFormat();
+//    return nxcip::NX_NO_ERROR;
+//#else
+//    Q_UNUSED( audioFormat )
+//    return nxcip::NX_UNSUPPORTED_CODEC;
+//#endif
+//}
 
 int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 {
     //std::cout << "ISD plugin getNextData started for encoder" << m_encoderNum << std::endl;
 
+    const bool audioEnabledLocal = m_audioEnabled.load( std::memory_order_relaxed );
+
     const size_t cameraStreamsToRead = 
           1                                                                 //video
         //+ (m_encoderNum == ENCODER_STREAM_TO_ADD_MOTION_TO ? 1 : 0)         //motion
 #ifndef NO_ISD_AUDIO
-        + ((m_encoderNum == HIGH_QUALITY_ENCODER) && m_audioEnabled ? 1 : 0)  //audio
+        //+ ((m_encoderNum == HIGH_QUALITY_ENCODER) && m_audioEnabled ? 1 : 0)  //audio
+        + (audioEnabledLocal ? 1 : 0)  //audio
 #endif
         ;
 
 #ifndef NO_ISD_AUDIO
-    if( !m_amux.get() && (m_encoderNum == HIGH_QUALITY_ENCODER) && m_audioEnabled )
+    if( audioEnabledLocal )
     {
-        //audio is not required
-        int result = initializeAMux();
-        if( result != nxcip::NX_NO_ERROR )
-            return result;
-        if( cameraStreamsToRead > 1 )    //using epoll only if receiving 2 streams or more
-            if( !registerFD( m_amux->GetFD() ) )
+        //assert( cameraStreamsToRead > 1 );
+        //if( m_encoderNum == HIGH_QUALITY_ENCODER )
+        //{
+        //    if( !m_amux.get() )
+        //    {
+        //        //audio is not required
+        //        int result = initializeAMux();
+        //        if( result != nxcip::NX_NO_ERROR )
+        //            return result;
+        //        if( !registerFD( m_amux->GetFD() ) )
+        //            return nxcip::NX_IO_ERROR;
+        //    }
+        //}
+        //else if( m_audioStreamBridge && !m_audioStreamBridgeRegistered )
+        //{
+        //    if( !registerFD( m_audioStreamBridge->eventFD() ) )
+        //        return nxcip::NX_IO_ERROR;
+        //    m_audioStreamBridgeRegistered = true;
+        //}
+        if( !m_audioEventFDRegistered && (m_audioEventFD != -1) )
+        {
+            if( !registerFD( m_audioEventFD ) )
                 return nxcip::NX_IO_ERROR;
+            m_audioEventFDRegistered = true;
+        }
     }
 #endif
 
@@ -226,16 +272,6 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
             if( !registerFD( m_vmux->GetFD() ) )
                 return nxcip::NX_IO_ERROR;
     }
-
-    //if( !m_vmuxMotion && (m_encoderNum == ENCODER_STREAM_TO_ADD_MOTION_TO) )
-    //{
-    //    int result = initializeVMuxMotion();
-    //    if( result != nxcip::NX_NO_ERROR )
-    //        return result;
-    //    //std::cout<<"Initialized motion. FD "<<m_vmuxMotion->GetFD()<<std::endl;
-    //    //if( !registerFD( m_vmuxMotion->GetFD() ) )
-    //    //    return nxcip::NX_IO_ERROR;
-    //}
 
     if( cameraStreamsToRead == 1 )
     {
@@ -283,11 +319,13 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
                 return result;
             }
 #ifndef NO_ISD_AUDIO
-            else if( eventsArray[i].data.fd == m_amux->GetFD() )
+            //else if( m_amux.get() && eventsArray[i].data.fd == m_amux->GetFD() )
+            else if( eventsArray[i].data.fd == m_audioEventFD )
             {
                 const int result = getAudioPacket( lpPacket );
                 if( result == nxcip::NX_TRY_AGAIN )
                     continue;   //trying again
+
                 return result;
             }
 #endif
@@ -492,107 +530,142 @@ int StreamReader::initializeVMuxMotion()
 }
 
 #ifndef NO_ISD_AUDIO
-int StreamReader::initializeAMux()
+//int StreamReader::initializeAMux()
+//{
+//    std::unique_ptr<Amux> amux( new Amux() );
+//    memset( &m_audioInfo, 0, sizeof(m_audioInfo) );
+//
+//    if( amux->GetInfo( &m_audioInfo ) )
+//    {
+//        std::cerr << "ISD plugin: can't get audio stream info\n";
+//        return nxcip::NX_IO_ERROR;
+//    }
+//
+//    switch( m_audioInfo.encoding )
+//    {
+//        case EncPCM:
+//            m_audioCodec = nxcip::CODEC_ID_PCM_S16LE;
+//            break;
+//        case EncUlaw:
+//            m_audioCodec = nxcip::CODEC_ID_PCM_MULAW;
+//            break;
+//        case EncAAC:
+//            m_audioCodec = nxcip::CODEC_ID_AAC;
+//            break;
+//        default:
+//            std::cerr << "ISD plugin: unsupported audio codec: "<<m_audioInfo.encoding<<"\n";
+//            return nxcip::NX_UNSUPPORTED_CODEC;
+//    }
+//
+//    if( amux->StartAudio() )
+//    {
+//        std::cerr << "ISD plugin: can't start audio stream\n";
+//        return nxcip::NX_IO_ERROR;
+//    }
+//
+//    //std::cout<<"AMUX initialized. Codec type "<<m_audioCodec<<" fd = "<<amux->GetFD()<<"\n";
+//
+//    m_amux = std::move(amux);
+//    return nxcip::NX_NO_ERROR;
+//}
+//
+//int StreamReader::getAudioPacket( nxcip::MediaDataPacket** lpPacket )
+//{
+//    int audioBytesAvailable = m_amux->BytesAvail();
+//    if( audioBytesAvailable <= 0 )
+//    {
+//        std::cerr<<"ISD plugin: no audio bytes available\n";
+//        m_amux.reset();
+//        return nxcip::NX_IO_ERROR;
+//    }
+//
+//    std::unique_ptr<ISDAudioPacket> audioPacket( new ISDAudioPacket(
+//        1,  //channel number
+//        m_lastVideoTime,
+//        m_audioCodec ) );
+//    audioPacket->reserve( audioBytesAvailable );
+//
+//    int bytesRead = m_amux->ReadAudio( (char*)audioPacket->data(), audioPacket->capacity() );
+//    if( bytesRead <= 0 )
+//    {
+//        std::cerr<<"ISD plugin: failed to read audio packet\n";
+//        m_amux.reset();
+//        return nxcip::NX_IO_ERROR;
+//    }
+//
+//    audioPacket->setDataSize( bytesRead );
+//
+//    if( !m_audioFormat.get() )
+//        fillAudioFormat( *audioPacket.get() );
+//
+//    //std::cout<<"Got audio packet. size "<<audioPacket->dataSize()<<", pts "<<audioPacket->timestamp()<<"\n";
+//
+//    *lpPacket = audioPacket.release();
+//    return nxcip::NX_NO_ERROR;
+//}
+//
+//void StreamReader::fillAudioFormat( const ISDAudioPacket& /*audioPacket*/ )
+//{
+//    QMutexLocker lk( &m_mutex );
+//
+//    m_audioFormat.reset( new nxcip::AudioFormat() );
+//
+//    m_audioFormat->compressionType = m_audioCodec;
+//    m_audioFormat->sampleRate = m_audioInfo.sample_rate;
+//    m_audioFormat->bitrate = m_audioInfo.bit_rate;
+//
+//    m_audioFormat->channels = 1;
+//    switch( m_audioCodec )
+//    {
+//        case nxcip::CODEC_ID_AAC:
+//        {
+//            //TODO/IMPL parsing ADTS header to get sample rate
+//            break;
+//        }
+//
+//        //case nxcip::CODEC_ID_PCM_S16LE:
+//        //case nxcip::CODEC_ID_PCM_MULAW:
+//        default:
+//            break;
+//    }
+//
+//    //std::cout<<"Audio format: sample_rate "<<m_audioInfo.sample_rate<<", bitrate "<<m_audioInfo.bit_rate<<"\n";
+//}
+
+void StreamReader::onAudioDataAvailable( const std::shared_ptr<AudioData>& audioDataPtr )
 {
-    std::unique_ptr<Amux> amux( new Amux() );
-    memset( &m_audioInfo, 0, sizeof(m_audioInfo) );
-
-    if( amux->GetInfo( &m_audioInfo ) )
-    {
-        std::cerr << "ISD plugin: can't get audio stream info\n";
-        return nxcip::NX_IO_ERROR;
-    }
-
-    switch( m_audioInfo.encoding )
-    {
-        case EncPCM:
-            m_audioCodec = nxcip::CODEC_ID_PCM_S16LE;
-            break;
-        case EncUlaw:
-            m_audioCodec = nxcip::CODEC_ID_PCM_MULAW;
-            break;
-        case EncAAC:
-            m_audioCodec = nxcip::CODEC_ID_AAC;
-            break;
-        default:
-            std::cerr << "ISD plugin: unsupported audio codec: "<<m_audioInfo.encoding<<"\n";
-            return nxcip::NX_UNSUPPORTED_CODEC;
-    }
-
-    if( amux->StartAudio() )
-    {
-        std::cerr << "ISD plugin: can't start audio stream\n";
-        return nxcip::NX_IO_ERROR;
-    }
-
-    //std::cout<<"AMUX initialized. Codec type "<<m_audioCodec<<" fd = "<<amux->GetFD()<<"\n";
-
-    m_amux = std::move(amux);
-    return nxcip::NX_NO_ERROR;
+    QMutexLocker lk( &m_mutex );
+    uint64_t increment = 1;
+    if( write( m_audioEventFD, &increment, sizeof(increment) ) == -1 )
+        return; //in case of error does not saving audio data
+    //TODO #ak limit m_audioPackets queue size
+    m_audioPackets.push_back( audioDataPtr );
 }
 
 int StreamReader::getAudioPacket( nxcip::MediaDataPacket** lpPacket )
 {
-    int audioBytesAvailable = m_amux->BytesAvail();
-    if( audioBytesAvailable <= 0 )
-    {
-        std::cerr<<"ISD plugin: no audio bytes available\n";
-        m_amux.reset();
+    uint64_t decrement = 0;
+    if( read( m_audioEventFD, &decrement, sizeof(decrement) ) == -1 )
         return nxcip::NX_IO_ERROR;
+
+    std::shared_ptr<AudioData> audioDataPtr;
+    {
+        QMutexLocker lk( &m_mutex );
+        if( m_audioPackets.empty() )
+            return nxcip::NX_TRY_AGAIN;
+        audioDataPtr = std::move(m_audioPackets.front());
+        m_audioPackets.pop_front();
     }
 
     std::unique_ptr<ISDAudioPacket> audioPacket( new ISDAudioPacket(
         1,  //channel number
-        m_lastVideoTime,
-        m_audioCodec ) );
-    audioPacket->reserve( audioBytesAvailable );
-
-    int bytesRead = m_amux->ReadAudio( (char*)audioPacket->data(), audioPacket->capacity() );
-    if( bytesRead <= 0 )
-    {
-        std::cerr<<"ISD plugin: failed to read audio packet\n";
-        m_amux.reset();
-        return nxcip::NX_IO_ERROR;
-    }
-
-    audioPacket->setDataSize( bytesRead );
-
-    if( !m_audioFormat.get() )
-        fillAudioFormat( *audioPacket.get() );
-
-    //std::cout<<"Got audio packet. size "<<audioPacket->dataSize()<<", pts "<<audioPacket->timestamp()<<"\n";
+        m_lastVideoTime ) );
+    audioPacket->setData( std::move(audioDataPtr) );
 
     *lpPacket = audioPacket.release();
     return nxcip::NX_NO_ERROR;
 }
 
-void StreamReader::fillAudioFormat( const ISDAudioPacket& /*audioPacket*/ )
-{
-    QMutexLocker lk( &m_mutex );
-
-    m_audioFormat.reset( new nxcip::AudioFormat() );
-
-    m_audioFormat->compressionType = m_audioCodec;
-    m_audioFormat->sampleRate = m_audioInfo.sample_rate;
-    m_audioFormat->bitrate = m_audioInfo.bit_rate;
-
-    m_audioFormat->channels = 1;
-    switch( m_audioCodec )
-    {
-        case nxcip::CODEC_ID_AAC:
-        {
-            //TODO/IMPL parsing ADTS header to get sample rate
-            break;
-        }
-
-        //case nxcip::CODEC_ID_PCM_S16LE:
-        //case nxcip::CODEC_ID_PCM_MULAW:
-        default:
-            break;
-    }
-
-    //std::cout<<"Audio format: sample_rate "<<m_audioInfo.sample_rate<<", bitrate "<<m_audioInfo.bit_rate<<"\n";
-}
 #endif
 
 bool StreamReader::registerFD( int fd )
@@ -635,11 +708,16 @@ void StreamReader::closeAllStreams()
     m_vmuxMotion.reset();
 
 #ifndef NO_ISD_AUDIO
-    if( m_amux.get() )
+    if( m_audioReceiverID > 0 )
     {
-        unregisterFD( m_amux->GetFD() );
-        m_amux.reset();
+        m_audioStreamReader->removePacketReceiver( m_audioReceiverID );
+        m_audioReceiverID = 0;
     }
+    //if( m_amux.get() )
+    //{
+    //    unregisterFD( m_amux->GetFD() );
+    //    m_amux.reset();
+    //}
 #endif
 }
 

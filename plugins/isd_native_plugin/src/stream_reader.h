@@ -6,15 +6,13 @@
 #ifndef ILP_STREAM_READER_H
 #define ILP_STREAM_READER_H
 
+#include <atomic>
 #include <memory>
 #include <stdint.h>
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QMutex>
 
-#ifndef NO_ISD_AUDIO
-#include <isd/amux/amux_iface.h>
-#endif
 #include <isd/vmux/vmux_iface.h>
 
 #include <plugins/camera_plugin.h>
@@ -22,7 +20,9 @@
 #include <utils/media/pts_to_clock_mapper.h>
 #include <utils/memory/cyclic_allocator.h>
 
+#include "audio_stream_reader.h"
 #include "isd_motion_estimation.h"
+#include "waitable_queue_with_eventfd.h"
 
 //#define DEBUG_OUTPUT
 
@@ -37,11 +37,18 @@ class StreamReader
 {
 public:
     /*!
-        \param liveMode In this mode, plays all pictures in a loop
+        \param audioStreamBridge Used to copy audio packets from primary stream reader to a secondary one. 
+            This is needed since audio can be read be single stream reader only but both readers must 
+            provide audio stream.
+        \note \a StreamReader instance with \a encoderNum set to 0 pushes packets to \a audioStreamBridge. 
+            The other \a StreamReader instance pops packets
     */
     StreamReader(
         nxpt::CommonRefManager* const parentRefManager,
         int encoderNum,
+#ifndef NO_ISD_AUDIO
+        const std::unique_ptr<AudioStreamReader>& audioStreamReader,
+#endif
         const char* cameraUid );
     virtual ~StreamReader();
 
@@ -59,7 +66,7 @@ public:
 
     void setMotionMask( const uint8_t* data );
     void setAudioEnabled( bool audioEnabled );
-    int getAudioFormat( nxcip::AudioFormat* audioFormat ) const;
+    //int getAudioFormat( nxcip::AudioFormat* audioFormat ) const;
 
 private:
     nxpt::CommonRefManager m_refManager;
@@ -70,11 +77,16 @@ private:
     std::unique_ptr<Vmux> m_vmux;
     std::unique_ptr<Vmux> m_vmuxMotion;
 #ifndef NO_ISD_AUDIO
-    amux_info_t m_audioInfo;
-    std::unique_ptr<Amux> m_amux;
-    bool m_audioEnabled;
-    nxcip::CompressionType m_audioCodec;
-    std::unique_ptr<nxcip::AudioFormat> m_audioFormat;
+    const std::unique_ptr<AudioStreamReader>& m_audioStreamReader;
+    std::deque<std::shared_ptr<AudioData>> m_audioPackets;
+    int m_audioEventFD;
+    bool m_audioEventFDRegistered;
+    //amux_info_t m_audioInfo;
+    //std::unique_ptr<Amux> m_amux;
+    std::atomic<bool> m_audioEnabled;
+    //nxcip::CompressionType m_audioCodec;
+    //std::unique_ptr<nxcip::AudioFormat> m_audioFormat;
+    size_t m_audioReceiverID;
 #endif
     mutable QMutex m_mutex;
     
@@ -106,9 +118,10 @@ private:
     bool registerFD( int fd );
     void unregisterFD( int fd );
 #ifndef NO_ISD_AUDIO
-    int initializeAMux();
+    //int initializeAMux();
+    void onAudioDataAvailable( const std::shared_ptr<AudioData>& audioDataPtr );
     int getAudioPacket( nxcip::MediaDataPacket** packet );
-    void fillAudioFormat( const ISDAudioPacket& audioPacket );
+    //void fillAudioFormat( const ISDAudioPacket& audioPacket );
 #endif
     void closeAllStreams();
     int64_t calcNextTimestamp( int32_t pts, int64_t absoluteTimeMS );
