@@ -74,6 +74,8 @@ void QnUpdateProcess::pleaseStop() {
 }
 
 void QnUpdateProcess::run() {
+    m_failedPeerIds.clear();
+
     QnCheckForUpdatesPeerTask *checkForUpdatesTask = new QnCheckForUpdatesPeerTask(m_target);
     connect(checkForUpdatesTask,  &QnCheckForUpdatesPeerTask::checkFinished,   this,  [this, checkForUpdatesTask](const QnCheckForUpdateResult &result){
         at_checkForUpdatesTaskFinished(checkForUpdatesTask, result);
@@ -97,6 +99,7 @@ void QnUpdateProcess::run() {
     QnUpdateResult result(m_updateResult);
     result.targetVersion = m_target.version;
     result.clientInstallerRequired = m_clientRequiresInstaller;
+    result.failedPeers = m_failedPeerIds;
 
     emit updateFinished(result);
 }
@@ -483,10 +486,21 @@ void QnUpdateProcess::installUpdatesToServers() {
     installUpdatesPeerTask->start(m_targetPeerIds - m_incompatiblePeerIds);
 }
 
-void QnUpdateProcess::at_uploadTask_finished(int errorCode) {
+void QnUpdateProcess::at_uploadTask_finished(int errorCode, const QSet<QnUuid> &failedPeers) {
     if (errorCode != 0) {
         setAllPeersStage(QnPeerUpdateStage::Init);
-        finishUpdate(errorCode == QnUploadUpdatesPeerTask::NoFreeSpaceError ? QnUpdateResult::UploadingFailed_NoFreeSpace : QnUpdateResult::UploadingFailed);
+        m_failedPeerIds = failedPeers;
+        switch (errorCode) {
+        case QnUploadUpdatesPeerTask::NoFreeSpaceError:
+            finishUpdate(QnUpdateResult::UploadingFailed_NoFreeSpace);
+            break;
+        case QnUploadUpdatesPeerTask::TimeoutError:
+            finishUpdate(QnUpdateResult::UploadingFailed_Timeout);
+            break;
+        default:
+            finishUpdate(QnUpdateResult::UploadingFailed);
+            break;
+        }
         return;
     }
 
