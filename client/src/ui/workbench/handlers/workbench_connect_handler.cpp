@@ -46,10 +46,12 @@
 
 #include <utils/app_server_notification_cache.h>
 #include <utils/connection_diagnostics_helper.h>
+#include <utils/common/collection.h>
 #include <utils/common/synctime.h>
 #include <utils/network/module_finder.h>
 #include <utils/network/global_module_finder.h>
 #include <utils/network/router.h>
+#include <utils/reconnect_helper.h>
 
 
 #include "compatibility.h"
@@ -372,104 +374,23 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
     if (currentUrl.isEmpty())
         return false;
 
-    QnReconnectInfoDialog* reconnectInfoDialog = new QnReconnectInfoDialog(mainWindow());
+    QPointer<QnReconnectInfoDialog> reconnectInfoDialog(new QnReconnectInfoDialog(mainWindow()));
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    reconnectInfoDialog,   &QDialog::hide);
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    reconnectInfoDialog,   &QObject::deleteLater);
-
-    reconnectInfoDialog->setText(tr("Resolving servers..."));
     reconnectInfoDialog->show();
 
-    QString userName = currentUrl.userName();
-    QString password = currentUrl.password();
-
-    QHostAddress currentAddr(currentUrl.host());
-    quint32 currentIp = currentAddr.toIPv4Address();
-    if (currentAddr.isNull()) {
-        QHostInfo currentInfo = QHostInfo::fromName(currentUrl.host());
-        foreach (const QHostAddress &addr, currentInfo.addresses()) {
-            currentIp = addr.toIPv4Address();
-            if (currentIp > 0)
-                break;
-        }
+    QScopedPointer<QnReconnectHelper> reconnectHelper(new QnReconnectHelper());
+  
+    /* Here we will wait for the reconnect or cancel. */
+    while (reconnectInfoDialog && !reconnectInfoDialog->wasCanceled()) {
+        reconnectInfoDialog->setCurrentServer(reconnectHelper->currentServer());
+        if (connectToServer(reconnectHelper->currentUrl(), true))   /* Here inner event loop will be started. */
+            break;
+        reconnectHelper->next();
     }
-
-    auto matchIpMetric = [](quint32 ip1, quint32 ip2) {
-        int i = 31;
-        while (i >= 0 && (ip1 >> i == ip2 >> i))
-            --i;
-        return 31 - i;
-    };
-
-    auto hostLessThan = [currentIp, matchIpMetric](const QUrl &left, const QUrl &right) {
-        QHostAddress laddr(left.host());
-        QHostAddress raddr(right.host());
-        if (laddr.isNull() || raddr.isNull())
-            return raddr.isNull();
-
-        int metricDiff = matchIpMetric(currentIp, laddr.toIPv4Address()) - matchIpMetric(currentIp, raddr.toIPv4Address());
-        return metricDiff != 0
-            ? metricDiff > 0
-            : laddr.toIPv4Address() < raddr.toIPv4Address();
-    };
-
-    QList<QnUuid> allServers;
-    foreach (const QnMediaServerResourcePtr &server, qnResPool->getResources<QnMediaServerResource>())
-        allServers << server->getId();
-
-    QList<QUrl> availableServers;
-    QMap<QString, int> hostsCount; // count duplicated hosts to display port in their url
-
-    foreach (const QnModuleInformation &info, QnModuleFinder::instance()->foundModules()) {
-        if (!allServers.contains(info.id))
-            continue;
-
-        foreach (const QString &remoteAddr, info.remoteAddresses) {
-            QUrl serverUrl;
-            serverUrl.setScheme(lit("http"));
-            serverUrl.setHost(remoteAddr);
-            serverUrl.setPort(info.port);
-            serverUrl.setUserName(userName);
-            serverUrl.setPassword(password);
-            availableServers << serverUrl;
-            ++hostsCount[serverUrl.host()];
-        }
-    }    
-
-    if (availableServers.isEmpty()) {
-        qWarning() << "No servers are available for reconnect" << allServers << "modules:" << QnModuleFinder::instance()->foundModules().size();
-        availableServers << currentUrl;
-    }
-
-    qSort(availableServers.begin(), availableServers.end(), hostLessThan);
-
-    auto getInfo = [availableServers, hostsCount](const QUrl &url) {
-        QStringList result;
-        foreach (const QUrl &serverUrl, availableServers) {
-            QString info = serverUrl.host();
-            if (hostsCount[info] > 1)
-                info = lit("%1:%2").arg(info).arg(serverUrl.port());
-            if (url.host() == serverUrl.host() && url.port() == serverUrl.port())
-                info = lit("<b>%1</b>").arg(info);
-            result << info;
-        }
-        return result.join(lit("<br>"));
-    };
 
     /* Main window can be closed in the event loop so the dialog will be freed. */
-    QPointer<QnReconnectInfoDialog> dialogGuard(reconnectInfoDialog);
-
-    /* Here we will wait for the reconnect or cancel. */
-    auto iter = availableServers.cbegin();
-    while (dialogGuard && !reconnectInfoDialog->wasCanceled()) {
-        reconnectInfoDialog->setText(getInfo(*iter));
-        if (connectToServer(*iter, true))   /* Here inner event loop will be started. */
-            break;
-        ++iter;
-        if (iter == availableServers.cend())
-            iter = availableServers.cbegin();   //loop
-    }
-
-    if (!dialogGuard)
+    if (!reconnectInfoDialog)
         return true;
 
     disconnect(QnClientMessageProcessor::instance(), NULL, reconnectInfoDialog, NULL);
