@@ -7,10 +7,11 @@ FULL_APPLAUNCHER_NAME="${company.name} Launcher.conf"
 
 PACKAGENAME=$COMPANY_NAME-client
 VERSION=${release.version}
+FULLVERSION=${release.version}.${buildNumber}
 MINORVERSION=${parsedVersion.majorVersion}.${parsedVersion.minorVersion}
 ARCHITECTURE=${os.arch}
 
-TARGET=/opt/$COMPANY_NAME/client/$MINORVERSION
+TARGET=/opt/$COMPANY_NAME/client/$FULLVERSION
 USRTARGET=/usr
 BINTARGET=$TARGET/bin
 BGTARGET=$TARGET/share/pictures/sample-backgrounds
