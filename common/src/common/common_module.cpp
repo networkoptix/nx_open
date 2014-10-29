@@ -39,6 +39,21 @@ QnCommonModule::~QnCommonModule() {
     return;
 }
 
+void QnCommonModule::setRemoteGUID(const QnUuid &guid) {
+    {
+        QMutexLocker lock(&m_mutex);
+        if (m_remoteUuid == guid)
+            return;
+        m_remoteUuid = guid;
+    }
+    emit remoteIdChanged(guid);
+}
+
+QnUuid QnCommonModule::remoteGUID() const {
+    QMutexLocker lock(&m_mutex);
+    return m_remoteUuid;
+}
+
 void QnCommonModule::setLocalSystemName(const QString &value) {
     if (m_localSystemName == value)
         return;
