@@ -1096,6 +1096,11 @@ int QnPlOnvifResource::getTimeDrift() const
     return m_timeDrift;
 }
 
+void QnPlOnvifResource::setTimeDrift(int value) 
+{
+    m_timeDrift = value;
+}
+
 void QnPlOnvifResource::calcTimeDrift()
 {
     m_timeDrift = calcTimeDrift(getDeviceOnvifUrl());
@@ -3162,5 +3167,12 @@ CameraDiagnostics::Result QnPlOnvifResource::getFullUrlInfo()
     return CameraDiagnostics::NoErrorResult();
 }
 
+void QnPlOnvifResource::updateOnvifUrls(const QnPlOnvifResourcePtr& other)
+{
+    setDeviceOnvifUrl(other->getDeviceOnvifUrl());
+    setMediaUrl(other->getMediaUrl());
+    setImagingUrl(other->getImagingUrl());
+    setPtzUrl(other->getPtzUrl());
+}
 
 #endif //ENABLE_ONVIF
