@@ -124,6 +124,25 @@ static std::string getCallStack(
     PEXCEPTION_RECORD exceptionRecord,
     PCONTEXT contextRecord );
 
+
+static BOOL WriteOutAll( HANDLE hFile , const char* sBuffer ) {
+    DWORD dwPos = 0;
+    DWORD dwSz = (DWORD)strlen(sBuffer);
+    DWORD dwWritten = 0;
+    while(dwSz == 0) {
+        BOOL bRet = ::WriteFile(hFile,
+                                sBuffer+dwPos,
+                                dwSz,
+                                &dwWritten,
+                                NULL);
+        if( bRet == FALSE )
+            return FALSE;
+        dwSz -= dwWritten;
+        dwPos+= dwWritten;
+    }
+    return TRUE;
+}
+
 static void writeCrashInfo(
     const char* title,
     const char* information )
@@ -136,6 +155,10 @@ static void writeCrashInfo(
         arg( QStandardPaths::writableLocation( QStandardPaths::DataLocation ) ).
         arg( exeFileInfo.baseName() ).
         arg( QCoreApplication::applicationPid() );
+    std::ofstream of( sFileName );
+    of<<title<<"\n";
+    of.write( information, strlen(information) );
+    of.close();
 #else
     // The following code will try my best to avoid (to my best knowledge)
     // 1) Heap allocation ( 1. Heap corruption 2. CRT global lock )
@@ -155,11 +178,34 @@ static void writeCrashInfo(
         GetCurrentProcessId());
     if( ret <=0 )
         return;
+
+    HANDLE hFile = ::CreateFileA(
+        sFileName,
+        GENERIC_WRITE,
+        0,
+        NULL,
+        CREATE_NEW,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL);
+
+    if(hFile == INVALID_HANDLE_VALUE)
+        return;
+
+    // Output the title
+    if( WriteOutAll(hFile,title) == FALSE )
+        goto done;
+
+    // Output the line breaker
+    if( WriteOutAll(hFile,"\n") == FALSE )
+        goto done;
+
+    // Output the buffer
+    if( WriteOutAll(hFile,information) == FALSE )
+        goto done;
+
+done:
+    ::CloseHandle(hFile);
 #endif 
-    std::ofstream of( sFileName );
-    of<<title<<"\n";
-    of.write( information, strlen(information) );
-    of.close();
 }
 
 static DWORD WINAPI dumpStackProc( LPVOID lpParam )
