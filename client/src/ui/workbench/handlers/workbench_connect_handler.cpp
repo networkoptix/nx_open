@@ -170,7 +170,8 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
     if (url.isValid()) {
         /* Videowall item */
         if (qnSettings->isVideoWallMode()) {
-            if (!connectToServer(url, true)) {
+            //TODO: #GDM #High videowall should try indefinitely
+            if (connectToServer(url, true) != ec2::ErrorCode::ok) {
                 QnGraphicsMessageBox* incompatibleMessageBox = QnGraphicsMessageBox::informationTicking(tr("Could not connect to server. Closing in %1..."), videowallCloseTimeoutMSec);
                 connect(incompatibleMessageBox, &QnGraphicsMessageBox::finished, action(Qn::ExitAction), &QAction::trigger);
             }
@@ -179,7 +180,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
         /* Login Dialog or 'Open in new window' with url */
         { 
             //try connect; if not - show login dialog
-            if (!connectToServer(url))
+            if (connectToServer(url) != ec2::ErrorCode::ok)
                 showLoginDialog();
         }
     } else {
@@ -193,7 +194,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
             && url.isValid() 
             && !url.password().isEmpty()) 
         {
-            if (!connectToServer(url))
+            if (connectToServer(url) != ec2::ErrorCode::ok)
                 showLoginDialog();
         } else 
         /* No saved password, just open Login Dialog. */ 
@@ -211,7 +212,7 @@ void QnWorkbenchConnectHandler::at_reconnectAction_triggered() {
     QUrl currentUrl = QnAppServerConnectionFactory::url(); 
     if (connected())
         disconnectFromServer(true);
-    if (!connectToServer(currentUrl))
+    if (connectToServer(currentUrl) != ec2::ErrorCode::ok)
         showLoginDialog();
 }
  
@@ -227,11 +228,11 @@ bool QnWorkbenchConnectHandler::connected() const {
     return !qnCommon->remoteGUID().isNull();
 }
 
-bool QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerUrl, bool silent) {
+ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerUrl, bool silent) {
     if (!silent) {
         Q_ASSERT(!connected());
         if (connected())
-            return true;
+            return ec2::ErrorCode::ok;
     }
     
     /* Hiding message box from previous connect. */
@@ -247,7 +248,7 @@ bool QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerUrl, bool s
 
     /* Check if we have entered 'connect' method again while were in 'connecting...' state */
     if (m_connectingHandle != result.handle())
-        return true;
+        return ec2::ErrorCode::ok;
     m_connectingHandle = 0;
 
     /* Hiding message box from current connect. */
@@ -260,10 +261,10 @@ bool QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerUrl, bool s
     
     switch (status) {
     case QnConnectionDiagnosticsHelper::Result::Failure:
-        return false;
+        return errCode;
     case QnConnectionDiagnosticsHelper::Result::Restart:
         menu()->trigger(Qn::ExitActionDelayed);
-        return true; // to avoid cycle
+        return ec2::ErrorCode::ok; // to avoid cycle
     default:    //success
         break;
     }
@@ -281,7 +282,7 @@ bool QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerUrl, bool s
 
     QnGlobalModuleFinder::instance()->setConnection(result.connection());
 
-    return true;
+    return ec2::ErrorCode::ok;
 }
 
 bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
@@ -379,12 +380,15 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    reconnectInfoDialog,   &QObject::deleteLater);
     reconnectInfoDialog->show();
 
+    ec2::ErrorCode errCode = ec2::ErrorCode::ok;
+
     QScopedPointer<QnReconnectHelper> reconnectHelper(new QnReconnectHelper());
   
     /* Here we will wait for the reconnect or cancel. */
     while (reconnectInfoDialog && !reconnectInfoDialog->wasCanceled()) {
         reconnectInfoDialog->setCurrentServer(reconnectHelper->currentServer());
-        if (connectToServer(reconnectHelper->currentUrl(), true))   /* Here inner event loop will be started. */
+        errCode = connectToServer(reconnectHelper->currentUrl(), true); /* Here inner event loop will be started. */
+        if (errCode == ec2::ErrorCode::ok || errCode == ec2::ErrorCode::unauthorized)   
             break;
         reconnectHelper->next();
     }
@@ -397,7 +401,7 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
     reconnectInfoDialog->deleteLater();
     if (reconnectInfoDialog->wasCanceled())
         return false;
-    return true;
+    return errCode == ec2::ErrorCode::ok;
 }
 
 
