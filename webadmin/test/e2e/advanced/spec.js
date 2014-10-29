@@ -4,7 +4,7 @@ describe('Advanced Page', function () {
 
 
 
-    it("should stop test",function(){expect("other test").toBe("uncommented");});return;
+    //it("should stop test",function(){expect("other test").toBe("uncommented");});return;
 
     var p = new Page();
     var ptor = protractor.getInstance();
@@ -66,7 +66,6 @@ describe('Advanced Page', function () {
             expect(p.saveButton.isEnabled()).toBe(true);
             expect(p.storageLimitInput.element(by.xpath("..")).getAttribute("class")).toMatch("has-warning");
             expect(p.reduceArchiveAlert.isDisplayed()).toBe(true);
-console.log("click 1");
             p.saveButton.click().then(function(){
                 var alertDialog = ptor.switchTo().alert();
                 expect(alertDialog.getText()).toContain("Possible partial remove of the video footage is expected");
@@ -79,27 +78,27 @@ console.log("click 1");
         p.get();
         p.setStorageLimit(1);
 
-        console.log("click 2");
         p.saveButton.click().then(function(){
             var alertDialog = ptor.switchTo().alert();
             expect(alertDialog.getText()).toContain("Settings saved");
             alertDialog.accept();
+
+            p.get();
+            expect(p.storageLimitInput.getAttribute("value")).toBe("1");
+
+            p.setStorageLimit(5);
+
+            console.log("click 3");
+            p.saveButton.click().then(function(){
+                var alertDialog = ptor.switchTo().alert();
+                expect(alertDialog.getText()).toContain("Settings saved");
+                alertDialog.accept();
+
+                p.get();
+                expect(p.storageLimitInput.getAttribute("value")).toBe("5");
+            });
+
         });
-
-        p.get();
-        expect(p.storageLimitInput.getAttribute("value")).toBe("1");
-
-        p.setStorageLimit(5);
-
-        console.log("click 3");
-        p.saveButton.click().then(function(){
-            var alertDialog = ptor.switchTo().alert();
-            expect(alertDialog.getText()).toContain("Settings saved");
-            alertDialog.accept();
-        });
-
-        p.get();
-        expect(p.storageLimitInput.getAttribute("value")).toBe("5");
     });
 
     it("should forbid disabling all storages",function(){

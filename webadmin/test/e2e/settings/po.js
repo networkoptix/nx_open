@@ -21,6 +21,18 @@ var SettingsPage = function () {
         browser.get('/#/settings');
     };
 
+
+    this.getServer = function () {
+        browser.get('http://admin:123@192.168.56.101:9000/static/index.html#/settings');
+    };
+    this.getServerOnAnotherPort = function () {
+        browser.get('http://admin:123@192.168.56.101:7000/static/index.html#/settings');
+    };
+    this.getServerWithAnotherPassword= function () {
+        browser.get('http://admin:1234@192.168.56.101:9000/static/index.html#/settings');
+    };
+
+
     this.setSystemName = function (systemName) {
         this.systemNameInput.clear();
         this.systemNameInput.sendKeys(systemName);

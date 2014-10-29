@@ -76,7 +76,7 @@ angular.module('webadminApp')
         }
 
         function errorHandler(r){
-            alert ("Connection error")
+            alert ("Connection error");
             return false;
         }
         function resultHandler (r){
@@ -102,7 +102,7 @@ angular.module('webadminApp')
         $scope.save = function () {
 
             if($scope.settingsForm.$valid) {
-                mediaserver.saveSettings($scope.settings.systemName, $scope.settings.port).success(resultHandler).error(errorHandler);
+                mediaserver.saveSettings($scope.settings.systemName, $scope.settings.port).then(resultHandler,errorHandler);
             }else{
                alert("form is not valid");
             }
@@ -110,7 +110,7 @@ angular.module('webadminApp')
 
         $scope.changePassword = function () {
             if($scope.password == $scope.confirmPassword)
-                mediaserver.changePassword($scope.password,$scope.oldPassword).success(resultHandler).error(errorHandler);
+                mediaserver.changePassword($scope.password,$scope.oldPassword).then(resultHandler,errorHandler);
         };
 
         $scope.restart = function () {
