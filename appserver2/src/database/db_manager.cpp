@@ -1068,7 +1068,7 @@ ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 inter
     if (!data.digest.isEmpty())
         insQuery2.prepare("INSERT OR REPLACE INTO vms_userprofile (user_id, resource_ptr_id, digest, rights) VALUES (:internalId, :internalId, :digest, :permissions)");
     else
-        insQuery2.prepare("UPDATE vms_userprofile SET rights=:permissions WHERE user_id=:internalId");
+        insQuery2.prepare("UPDATE vms_userprofile SET rights=:permissions WHERE resource_ptr_id=:internalId");
     QnSql::bind(data, &insQuery2);
     insQuery2.bindValue(":internalId", internalId);
     if (!insQuery2.exec())
@@ -1548,7 +1548,7 @@ ErrorCode QnDbManager::updateLayoutItems(const ApiLayoutData& data, qint32 inter
 ErrorCode QnDbManager::deleteUserProfileTable(const qint32 id)
 {
     QSqlQuery delQuery(m_sdb);
-    delQuery.prepare("DELETE FROM vms_userprofile where user_id = :id");
+    delQuery.prepare("DELETE FROM vms_userprofile where resource_ptr_id = :id");
     delQuery.bindValue(QLatin1String(":id"), id);
     if (delQuery.exec()) {
         return ErrorCode::ok;
@@ -2722,7 +2722,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& userId, ApiUserDataList& user
         u.is_superuser as isAdmin, u.email, p.digest as digest, u.password as hash, p.rights as permissions \
         FROM vms_resource r \
         JOIN auth_user u  on u.id = r.id\
-        JOIN vms_userprofile p on p.user_id = u.id\
+        JOIN vms_userprofile p on p.resource_ptr_id = u.id\
         %1\
         ORDER BY r.guid\
     ").arg(filterStr));
