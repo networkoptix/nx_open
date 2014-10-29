@@ -15,6 +15,7 @@
 -->  
   
   <Property Id="ARPNOREPAIR" Value="1" />    
+  <Property Id="ARPNOMODIFY" Value="1" />    
 
   <Icon Id="eve_logo.ico" SourceFile="Binary\eve\eve_logo.ico"/>
 

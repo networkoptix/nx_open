@@ -120,19 +120,6 @@ void QnNetworkResource::setAuthenticated(bool auth)
     m_authenticated = auth;
 }
 
-
-QHostAddress QnNetworkResource::getDiscoveryAddr() const
-{
-    QMutexLocker mutexLocker(&m_mutex);
-    return m_localAddress;
-}
-
-void QnNetworkResource::setDiscoveryAddr(QHostAddress addr)
-{
-    QMutexLocker mutexLocker(&m_mutex);
-    m_localAddress = addr;
-}
-
 int QnNetworkResource::httpPort() const
 {
     return m_httpPort;

@@ -180,8 +180,6 @@ QnResourceList QnPlIpWebCamResourceSearcher::findResources()
                 resource->setMAC(QnMacAddress(smac));
                 resource->setHostAddress(QHostAddress(ad.ip).toString());
                 
-                resource->setDiscoveryAddr(QHostAddress(ad.localAddr));
-
                 result.push_back(resource);
 
 

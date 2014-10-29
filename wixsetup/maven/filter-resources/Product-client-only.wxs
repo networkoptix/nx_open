@@ -106,7 +106,6 @@
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
 
         <Directory Id="TARGETDIR" Name="SourceDir">
-
             <Directory Id="MyPicturesFolder">
                 <Directory Id="${customization}BgDir" Name="${product.name} Backgrounds"/>
             </Directory>
@@ -175,11 +174,7 @@
             <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
             <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
 
-            <Property Id="ARPNOMODIFY" Value="1" />
-
-            <DialogRef Id="MyFeaturesDlg" />
             <DialogRef Id="SelectionWarningDlg" />
-            <DialogRef Id="DowngradeWarningDlg" />
             <DialogRef Id="BrowseDlg" />
             <DialogRef Id="DiskCostDlg" />
             <DialogRef Id="ErrorDlg" />
@@ -196,19 +191,18 @@
             <Publish Dialog="MyExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
             <Publish Dialog="MyExitDialog" Control="Finish" Order="1" Event="DoAction" Value="LaunchClient">WIXUI_EXITDIALOGOPTIONALCHECKBOX</Publish>
 
-            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">NOT PREVIOUSVERSIONSINSTALLED</Publish>          
+            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">NOT PREVIOUSVERSIONSINSTALLED AND NOT LICENSE_ALREADY_ACCEPTED</Publish>
+            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="ClientDlg">NOT PREVIOUSVERSIONSINSTALLED AND LICENSE_ALREADY_ACCEPTED</Publish>
             <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="UpgradeDlg">PREVIOUSVERSIONSINSTALLED</Publish>
 
             <Publish Dialog="UpgradeDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
             <Publish Dialog="UpgradeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
 
-            <Publish Dialog="DowngradeWarningDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
-            <Publish Dialog="DowngradeWarningDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
-
             <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
             <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="ClientDlg">LicenseAccepted = "1"</Publish>
 
-            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg" Order="2">1</Publish>
+            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg" Order="2">NOT LICENSE_ALREADY_ACCEPTED</Publish>
+            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="2">LICENSE_ALREADY_ACCEPTED</Publish>
             <Publish Dialog="ClientDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2">1</Publish>
 
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="ClientDlg">1</Publish>
@@ -237,8 +231,6 @@
             <Publish Dialog="VerifyReadyDlg" Control="Install" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)">1</Publish>
 
             <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
-            <Publish Dialog="MaintenanceTypeDlg" Control="ChangeButton" Event="NewDialog" Value="MyFeaturesDlg">1</Publish>
-            <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Property="REMOVE" Value="ALL">1</Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
