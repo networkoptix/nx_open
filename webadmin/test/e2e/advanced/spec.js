@@ -2,9 +2,12 @@
 var Page = require('./po.js');
 describe('Advanced Page', function () {
 
+
+
+    it("should stop test",function(){expect("other test").toBe("uncommented");});return;
+
     var p = new Page();
     var ptor = protractor.getInstance();
-
 
     it("should allow user to see storages: free space, limit, totalspace, enabled, some indicator",function(){
         p.get();
@@ -18,8 +21,6 @@ describe('Advanced Page', function () {
     it("should show warning tip",function(){
         expect(p.dangerAlert.isDisplayed()).toBe(true);
     });
-
-
 
     it("should allow user to change settings: limit, enabled",function(){
         var storage = p.storagesRows.first();
@@ -53,7 +54,6 @@ describe('Advanced Page', function () {
         expect(p.storageLimitInput.element(by.xpath("..")).getAttribute("class")).toNotMatch("has-error");
 
     });
-
 
     it("should show warning, then limit is more than free space",function(){
         p.get();
