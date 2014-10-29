@@ -66,34 +66,6 @@ int getSystemErrCode()
 #define SOCKET_ERROR (-1)
 #endif
 
-// SocketException Code
-
-//////////////////////////////////////////////////////////
-// SocketException implementation
-//////////////////////////////////////////////////////////
-
-SocketException::SocketException(const QString &message, bool inclSysMsg)
-throw() {
-    m_message[0] = 0;
-
-    QString userMessage(message);
-    if (inclSysMsg) {
-        userMessage.append(QLatin1String(": "));
-        userMessage.append(QLatin1String(strerror(errno)));
-    }
-
-    QByteArray data = userMessage.toLatin1();
-    strncpy(m_message, data.data(), MAX_ERROR_MSG_LENGTH-1);
-    m_message[MAX_ERROR_MSG_LENGTH-1] = 0;
-}
-
-SocketException::~SocketException() throw() {
-}
-
-const char *SocketException::what() const throw() {
-    return m_message;
-}
-
 
 //////////////////////////////////////////////////////////
 // Socket implementation
@@ -446,12 +418,12 @@ unsigned short Socket::resolveService(const QString &service,
         return ntohs(serv->s_port);    /* Found port (network byte order) by name */
 }
 
-SocketImpl* Socket::impl()
+SystemSocketImpl* Socket::impl()
 {
     return m_impl;
 }
 
-const SocketImpl* Socket::impl() const
+const SystemSocketImpl* Socket::impl() const
 {
     return m_impl;
 }
@@ -460,7 +432,7 @@ Socket::Socket(
     std::unique_ptr<BaseAsyncSocketImplHelper<Socket>> asyncHelper,
     int type,
     int protocol,
-    SocketImpl* impl )
+    SystemSocketImpl* impl )
 :
     m_socketHandle( -1 ),
     m_impl( impl ),
@@ -472,13 +444,13 @@ Socket::Socket(
     createSocket( type, protocol );
 
     if( !m_impl )
-        m_impl = new SocketImpl();
+        m_impl = new SystemSocketImpl();
 }
 
 Socket::Socket(
     std::unique_ptr<BaseAsyncSocketImplHelper<Socket>> asyncHelper,
     int _sockDesc,
-    SocketImpl* impl )
+    SystemSocketImpl* impl )
 :
     m_socketHandle( -1 ),
     m_impl( impl ),
@@ -489,13 +461,13 @@ Socket::Socket(
 {
     this->m_socketHandle = _sockDesc;
     if( !m_impl )
-        m_impl = new SocketImpl();
+        m_impl = new SystemSocketImpl();
 }
 
 Socket::Socket(
     int type,
     int protocol,
-    SocketImpl* impl )
+    SystemSocketImpl* impl )
 :
     m_socketHandle( -1 ),
     m_impl( impl ),
@@ -507,12 +479,12 @@ Socket::Socket(
     createSocket( type, protocol );
 
     if( !m_impl )
-        m_impl = new SocketImpl();
+        m_impl = new SystemSocketImpl();
 }
 
 Socket::Socket(
     int _sockDesc,
-    SocketImpl* impl )
+    SystemSocketImpl* impl )
 :
     m_socketHandle( -1 ),
     m_impl( impl ),
@@ -523,7 +495,7 @@ Socket::Socket(
 {
     this->m_socketHandle = _sockDesc;
     if( !m_impl )
-        m_impl = new SocketImpl();
+        m_impl = new SystemSocketImpl();
 }
 
 // Function to fill in address structure given an address and port
@@ -640,7 +612,7 @@ CommunicatingSocket::CommunicatingSocket(
     AbstractCommunicatingSocket* abstractSocketPtr,
     int type,
     int protocol,
-    SocketImpl* sockImpl )
+    SystemSocketImpl* sockImpl )
 :
     Socket(
         std::unique_ptr<BaseAsyncSocketImplHelper<Socket>>(
@@ -657,7 +629,7 @@ CommunicatingSocket::CommunicatingSocket(
 CommunicatingSocket::CommunicatingSocket(
     AbstractCommunicatingSocket* abstractSocketPtr,
     int newConnSD,
-    SocketImpl* sockImpl )
+    SystemSocketImpl* sockImpl )
 :
     Socket(
         std::unique_ptr<BaseAsyncSocketImplHelper<Socket>>(
@@ -940,7 +912,7 @@ bool CommunicatingSocket::registerTimerImpl( unsigned int timeoutMs, std::functi
 #ifdef _WIN32
 class Win32TcpSocketImpl
 :
-    public SocketImpl
+    public SystemSocketImpl
 {
 public:
     MIB_TCPROW win32TcpTableRow;
@@ -1188,7 +1160,7 @@ static int acceptWithTimeout( int m_socketHandle, int timeoutMillis = DEFAULT_AC
 
 class TCPServerSocketPrivate
 :
-    public SocketImpl,
+    public SystemSocketImpl,
     public aio::AIOEventHandler<Socket>
 {
 public:
@@ -1393,24 +1365,6 @@ void UDPSocket::setBroadcast() {
     setsockopt( m_implDelegate.handle(), SOL_SOCKET, SO_BROADCAST,
                (raw_type *) &broadcastPermission, sizeof(broadcastPermission));
 }
-
-//void UDPSocket::disconnect()  {
-//    sockaddr_in nullAddr;
-//    memset(&nullAddr, 0, sizeof(nullAddr));
-//    nullAddr.sin_family = AF_UNSPEC;
-//
-//    // Try to disconnect
-//    if (::connect(m_socketHandle, (sockaddr *) &nullAddr, sizeof(nullAddr)) < 0) {
-//#ifdef WIN32
-//        if (errno != WSAEAFNOSUPPORT)
-//#else
-//        if (errno != EAFNOSUPPORT)
-//#endif
-//        {
-//            throw SocketException(QString::fromLatin1("Disconnect failed (connect())."), true);
-//        }
-//    }
-//}
 
 void UDPSocket::setDestPort(unsigned short foreignPort)
 {
