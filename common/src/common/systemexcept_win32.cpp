@@ -62,7 +62,6 @@ void writeMiniDump( PEXCEPTION_POINTERS ex ) {
     if( dwLen <=0 || dwLen == 1024 )
         return;
 
-    // sprintf is safe since it is async-signal-safe which means
     // it should not acquire any global lock internally. Otherwise
     // we may deadlock here. 
     int ret = sprintf(strFileName,"%s/%s_%d.minidump",
@@ -129,7 +128,7 @@ static void writeCrashInfo(
     const char* title,
     const char* information )
 {
-
+#if 0
     // As bug 3355 indicates, the exception file should be saved to AppData folder on windows instead of
     // the client executable path for the permission problem. 
     const QFileInfo exeFileInfo( QCoreApplication::applicationFilePath() );
@@ -137,8 +136,27 @@ static void writeCrashInfo(
         arg( QStandardPaths::writableLocation( QStandardPaths::DataLocation ) ).
         arg( exeFileInfo.baseName() ).
         arg( QCoreApplication::applicationPid() );
-
-    std::ofstream of( exceptFileName.toLatin1().constData() );
+#else
+    // The following code will try my best to avoid (to my best knowledge)
+    // 1) Heap allocation ( 1. Heap corruption 2. CRT global lock )
+    // 2) Function that cannot be re-entered
+    // 3) Function that acquires global lock ( most of CRT function )
+    char sProcessName[1024];
+    char sFileName[1024];
+    DWORD dwLen = GetModuleFileNameA(NULL,sProcessName,1024);
+    if( dwLen <0 )
+        return;
+    int ret = sprintf(sFileName,"%s/%s_%d.except",
+        // Cannot avoid this one since it is determined by Qt Runtime 
+        // But since Qt uses copy-on-write, there is no reason this will
+        // have internal heap allocation .
+        QStandardPaths::writableLocation(QStandardPaths::DataLocation).toLatin1().constData(),
+        sProcessName,
+        GetCurrentProcessId());
+    if( ret <=0 )
+        return;
+#endif 
+    std::ofstream of( sFileName );
     of<<title<<"\n";
     of.write( information, strlen(information) );
     of.close();
