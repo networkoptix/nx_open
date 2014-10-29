@@ -865,7 +865,10 @@
                         </param>
                     </params>
                     <result>
-                        <caption>JSON with error code and flag "restartNeeded" that shows if the server must be restarted to apply settings.</caption>
+                        <caption>
+                            JSON with error code and flag "restartNeeded" that shows if the server must be restarted to apply settings.
+                            Error string contains a hint to identify a problem: SYSTEM_NAME, PORT or PASSWORD.
+                        </caption>
                     </result>
                 </function>
                 <function>
