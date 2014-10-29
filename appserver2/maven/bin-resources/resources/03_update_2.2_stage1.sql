@@ -35,7 +35,7 @@ ALTER TABLE "vms_layoutitem" RENAME TO vms_layoutitem_tmp;
 CREATE TABLE "vms_layoutitem" (
     "zoom_bottom" real NOT NULL DEFAULT 0,
     "right" real NOT NULL,
-    "uuid" varchar(40) NOT NULL,
+    "uuid" BLOB(16) NOT NULL,
     "zoom_left" real NOT NULL DEFAULT 0,
     "resource_guid" BLOB(16) NOT NULL,
     "zoom_right" real NOT NULL DEFAULT 0,
@@ -43,7 +43,7 @@ CREATE TABLE "vms_layoutitem" (
     "layout_id" integer NOT NULL,
     "bottom" real NOT NULL,
     "zoom_top" real NOT NULL DEFAULT 0,
-    "zoom_target_uuid" varchar(40),
+    "zoom_target_uuid" BLOB(16),
     "flags" integer NOT NULL,
     "contrast_params" varchar(200),
     "rotation" real NOT NULL,
