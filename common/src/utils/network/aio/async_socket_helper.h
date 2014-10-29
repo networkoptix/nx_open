@@ -285,6 +285,8 @@ private:
 
     virtual void eventTriggered( SocketType* sock, aio::EventType eventType ) throw() override
     {
+        assert( this->m_socket == sock );
+
         //TODO #ak split this method to multiple methods
 
         //NOTE aio garantees that all events on socket are handled in same aio thread, so no synchronization is required
@@ -500,7 +502,7 @@ private:
             {
                 //TODO #ak distinguish read and write
                 SystemError::ErrorCode sockErrorCode = SystemError::notConnected;
-                sock->getLastError( &sockErrorCode );
+                this->m_socket->getLastError( &sockErrorCode );
                 if( m_connectHandler )
                 {
                     m_connectSendHandlerTerminatedFlag = &terminated;

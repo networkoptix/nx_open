@@ -16,6 +16,7 @@
 #include <isd/amux/amux_iface.h>
 #endif
 #include <utils/network/aio/aioeventhandler.h>
+#include <utils/network/aio/pollable.h>
 
 #include "isd_audio_packet.h"
 
@@ -44,8 +45,9 @@ private:
     std::unique_ptr<Amux> m_amux;
     nxcip::AudioFormat m_audioFormat;
     size_t m_prevReceiverID;
+    Pollable* m_pollable;
 
-    virtual void eventTriggered( Pollable* obj, EventType eventType ) override;
+    virtual void eventTriggered( Pollable* obj, aio::EventType eventType ) throw();
 
     bool initializeAmux();
     int readAudioData();

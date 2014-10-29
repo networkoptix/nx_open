@@ -85,7 +85,7 @@ namespace aio
     namespace socket_to_pollset_static_map
     {
         template<class SocketType> struct get {};
-        template<> struct get<Socket> { typedef PollSet value; };
+        template<> struct get<Pollable> { typedef PollSet value; };
         template<> struct get<UdtSocket> { typedef UdtPollSet value; };
     }
 
@@ -669,7 +669,7 @@ namespace aio
         unsigned int timeoutMs,
         std::function<void()> socketAddedToPollHandler )
     {
-        //TODO #ak looks like copy-paste of previous method. Remove copy-paste!!!
+        //TODO #ak looks like copy-paste of previous method. Remove copy-paste nahuy!!!
 
         //NOTE m_impl->aioServiceMutex is locked up the stack
 
@@ -914,6 +914,6 @@ namespace aio
         NX_LOG( QLatin1String("AIO thread stopped"), cl_logDEBUG1 );
     }
 
-    template class AIOThread<Socket>;
+    template class AIOThread<Pollable>;
     template class AIOThread<UdtSocket>;
 }
