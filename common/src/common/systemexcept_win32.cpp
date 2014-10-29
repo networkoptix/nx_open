@@ -124,25 +124,6 @@ static std::string getCallStack(
     PEXCEPTION_RECORD exceptionRecord,
     PCONTEXT contextRecord );
 
-
-static BOOL WriteOutAll( HANDLE hFile , const char* sBuffer ) {
-    DWORD dwPos = 0;
-    DWORD dwSz = (DWORD)strlen(sBuffer);
-    DWORD dwWritten = 0;
-    while(dwSz == 0) {
-        BOOL bRet = ::WriteFile(hFile,
-                                sBuffer+dwPos,
-                                dwSz,
-                                &dwWritten,
-                                NULL);
-        if( bRet == FALSE )
-            return FALSE;
-        dwSz -= dwWritten;
-        dwPos+= dwWritten;
-    }
-    return TRUE;
-}
-
 static void writeCrashInfo(
     const char* title,
     const char* information )
@@ -192,15 +173,22 @@ static void writeCrashInfo(
         return;
 
     // Output the title
-    if( WriteOutAll(hFile,title) == FALSE )
+    BOOL bRet;
+
+    // This parameter is not in used for writing into file and the WriteFile ensure
+    // that the write will not partially succeed, but we still need it to make SDK happy.
+    DWORD dwWritten;
+
+    bRet = ::WriteFile(hFile,title,(DWORD)(strlen(title)),&dwWritten,NULL);
+    if( bRet == FALSE )
         goto done;
 
-    // Output the line breaker
-    if( WriteOutAll(hFile,"\n") == FALSE )
+    bRet = ::WriteFile(hFile,"\n",1,&dwWritten,NULL);
+    if( bRet == FALSE )
         goto done;
 
-    // Output the buffer
-    if( WriteOutAll(hFile,information) == FALSE )
+    bRet = ::WriteFile(hFile,information,(DWORD)(strlen(information)),&dwWritten,NULL);
+    if( bRet == FALSE )
         goto done;
 
 done:
