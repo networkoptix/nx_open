@@ -106,7 +106,6 @@
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
 
         <Directory Id="TARGETDIR" Name="SourceDir">
-
             <Directory Id="MyPicturesFolder">
                 <Directory Id="${customization}BgDir" Name="${product.name} Backgrounds"/>
             </Directory>
