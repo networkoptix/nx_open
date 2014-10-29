@@ -15,6 +15,8 @@ angular.module('webadminApp')
         };
 
         $scope.someSelected = false;
+        $scope.reduceArchiveWarning = false;
+
         mediaserver.getStorages().then(function (r) {
             $scope.storages = _.sortBy(r.data.reply.storages,function(storage){
                 return formatUrl(storage.url);
@@ -27,12 +29,17 @@ angular.module('webadminApp')
             }
 
             $scope.$watch(function(){
-
+                $scope.reduceArchiveWarning = false;
                 $scope.someSelected = false;
                 for(var i in $scope.storages){
                     var storage = $scope.storages[i];
                     storage.reservedSpace = storage.reservedSpaceGb * (1024*1024*1024);
                     $scope.someSelected |= storage.isUsedForWriting && storage.isWritable;
+
+                    if(storage.reservedSpace > storage.freeSpace ){
+                        $scope.reduceArchiveWarning = true;
+                    }
+
                     //storage.warning = storage.isUsedForWriting && (storage.reservedSpace <= 0 ||  storage.reservedSpace >= storage.totalSpace );
                 }
             });

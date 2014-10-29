@@ -5,7 +5,7 @@
     </div>
     <div class="col-sm-4 tc-chart-js-legend">
         <ul>
-            <li ng-repeat="dataset in datasets" >
+            <li ng-repeat="dataset in datasets" ng-class="{hidden:dataset.hideLegend}">
                 <label style="color:{{dataset.strokeColor}}">
                     <span class="legend-checkbox">
                         <input id="legend-checkbox{{$index}}" type="checkbox" ng-model="dataset.show" ng-change="updateVisibleDatasets()"/>

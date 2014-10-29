@@ -80,6 +80,10 @@ public:
         return m_handScrollInstrument;
     }
 
+    WheelZoomInstrument *wheelZoomInstrument() const {
+        return m_wheelZoomInstrument;
+    }
+
     MotionSelectionInstrument *motionSelectionInstrument() const {
         return m_motionSelectionInstrument;
     }

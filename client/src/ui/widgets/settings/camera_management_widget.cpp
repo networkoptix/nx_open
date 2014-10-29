@@ -1,44 +1,20 @@
 #include "camera_management_widget.h"
 #include "ui_camera_management_widget.h"
 
-#include <api/global_settings.h>
-
-#include <core/resource/resource.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource_management/resource_pool.h>
-
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/style/warning_style.h>
+
+#include <api/global_settings.h>
 
 QnCameraManagementWidget::QnCameraManagementWidget(QWidget *parent):
-    base_type(parent),
+    QnAbstractPreferencesWidget(parent),
     ui(new Ui::CameraManagementWidget)
 {
     ui->setupUi(this);
 
     setHelpTopic(ui->autoDiscoveryCheckBox, Qn::SystemSettings_Server_CameraAutoDiscovery_Help);
 
-    connect(ui->autoDiscoveryCheckBox,  &QCheckBox::clicked,         this,   &QnCameraManagementWidget::at_autoDiscoveryCheckBox_clicked);
-    connect(ui->autoDiscoveryCheckBox,  &QCheckBox::stateChanged,    this,   &QnCameraManagementWidget::updateFailoverWarning);
-
-    auto connectToServer = [this](const QnMediaServerResourcePtr &server) {
-        connect(server, &QnMediaServerResource::redundancyChanged, this, &QnCameraManagementWidget::updateFailoverWarning);
-    };
-
-    connect(qnResPool, &QnResourcePool::resourceAdded,  this, [this, connectToServer] (const QnResourcePtr &resource) {
-        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-        if (!server)
-            return;
-        connectToServer(server);
-        updateFailoverWarning();
-    });
-
-    foreach (const QnMediaServerResourcePtr &server, qnResPool->getResources<QnMediaServerResource>()) 
-        connectToServer(server);
-
-    setWarningStyle(ui->failoverWarningLabel);
-    updateFailoverWarning();
+    connect(ui->autoDiscoveryCheckBox,    SIGNAL(clicked()),                      this,   SLOT(at_autoDiscoveryCheckBox_clicked()));
 }
 
 QnCameraManagementWidget::~QnCameraManagementWidget() {
@@ -53,19 +29,6 @@ void QnCameraManagementWidget::at_autoDiscoveryCheckBox_clicked() {
         ui->autoDiscoveryCheckBox->setCheckState(Qt::Checked);
 }
 
-
-void QnCameraManagementWidget::updateFailoverWarning() {
-    bool hasFailover = false;
-    foreach (const QnMediaServerResourcePtr &server, qnResPool->getResources<QnMediaServerResource>()) {
-        if (!server->isRedundancy())
-            continue;
-        hasFailover = true;
-        break;
-    };
-    ui->failoverWarningLabel->setVisible(hasFailover && ui->autoDiscoveryCheckBox->checkState() == Qt::Unchecked);
-}
-
-
 void QnCameraManagementWidget::updateFromSettings() {
     QnGlobalSettings *settings = QnGlobalSettings::instance();
 
@@ -78,7 +41,6 @@ void QnCameraManagementWidget::updateFromSettings() {
         ui->autoDiscoveryCheckBox->setCheckState(Qt::CheckState::PartiallyChecked);
 
     ui->autoSettingsCheckBox->setChecked(settings->isCameraSettingsOptimizationEnabled());
-    updateFailoverWarning();
 }
 
 void QnCameraManagementWidget::submitToSettings() {
