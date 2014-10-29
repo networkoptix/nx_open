@@ -2075,7 +2075,7 @@ void restartServer()
     restartFlag = true;
     if (serviceMainInstance) {
         qWarning() << "restart requested!";
-        serviceMainInstance->stopAsync();
+        QTimer::singleShot(0, serviceMainInstance, SLOT(stopAsync()));
     }
 }
 

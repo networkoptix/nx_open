@@ -2,31 +2,17 @@
 
 #include <common/common_module.h>
 #include <media_server/settings.h>
+#include "utils/network/tcp_connection_priv.h"
 
 void restartServer();
 
-namespace HttpStatusCode {
-    enum Code {
-        ok = 200
-    };
-}
-
-int QnRestartRestHandler::executeGet(const QString &path, const QnRequestParamList &params, QByteArray &result, QByteArray &contentType, const QnRestConnectionProcessor*) 
-{
+int QnRestartRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor *) {
     Q_UNUSED(path)
-    Q_UNUSED(contentType)
-    Q_UNUSED(result)
     Q_UNUSED(params)
 
     restartServer();
-    return HttpStatusCode::ok;
-}
 
-int QnRestartRestHandler::executePost(const QString &path, const QnRequestParamList &params, const QByteArray &body, const QByteArray &srcBodyContentType, QByteArray &result, 
-                                      QByteArray &resultContentType, const QnRestConnectionProcessor* owner) 
-{
-    Q_UNUSED(body)
-    Q_UNUSED(srcBodyContentType)
+    result.setError(QnJsonRestResult::NoError);
 
-    return executeGet(path, params, result, resultContentType, owner);
+    return CODE_OK;
 }
