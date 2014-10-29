@@ -13,20 +13,24 @@
 AudioStreamReader::AudioStreamReader()
 :
     m_prevReceiverID(0),
-    m_pollable(nullptr)
+    m_initializedInitially(false)
 {
 }
 
 AudioStreamReader::~AudioStreamReader()
 {
-    aio::AIOService::instance()->removeFromWatch( m_pollable, aio::etRead, true );
+    if( m_pollable )
+        aio::AIOService::instance()->removeFromWatch( m_pollable.get(), aio::etRead, true );
 }
 
-bool AudioStreamReader::initialize()
+bool AudioStreamReader::initializeIfNeeded()
 {
+    if( m_initializedInitially )
+        return true;
     if( !initializeAmux() )
         return false;
-    return aio::AIOService::instance()->watchSocket( m_pollable, aio::etRead, this );
+    m_initializedInitially = aio::AIOService::instance()->watchSocket( m_pollable.get(), aio::etRead, this );
+    return m_initializedInitially;
 }
 
 /*!
@@ -35,7 +39,7 @@ bool AudioStreamReader::initialize()
 size_t AudioStreamReader::setPacketReceiver( std::function<void(const std::shared_ptr<AudioData>&)> packetReceiver )
 {
     std::unique_lock<std::mutex> lk( m_mutex );
-    size_t id = ++m_prevReceiverID;
+    const size_t id = ++m_prevReceiverID;
     m_packetReceivers[id] = std::move( packetReceiver );
     return id;
 }
@@ -53,6 +57,8 @@ nxcip::AudioFormat AudioStreamReader::getAudioFormat() const
 
 void AudioStreamReader::eventTriggered( Pollable* pollable, aio::EventType eventType ) throw()
 {
+    assert( m_pollable.get() == pollable );
+
     if( eventType == aio::etRead )
     {
         int result = readAudioData();
@@ -60,11 +66,11 @@ void AudioStreamReader::eventTriggered( Pollable* pollable, aio::EventType event
             return; //listening futher
     }
 
-    aio::AIOService::instance()->removeFromWatch( pollable, aio::etRead );
+    aio::AIOService::instance()->removeFromWatch( m_pollable.get(), aio::etRead );
     //re-initializing audio
     if( !initializeAmux() )
         return;
-    if( !aio::AIOService::instance()->watchSocket( m_pollable, aio::etRead, this ) )
+    if( !aio::AIOService::instance()->watchSocket( m_pollable.get(), aio::etRead, this ) )
     {
         //TODO
     }
@@ -94,6 +100,7 @@ int AudioStreamReader::readAudioData()
         return nxcip::NX_IO_ERROR;
     }
 
+    //std::cout<<"Read "<<bytesRead<<" bytes of audio"<<std::endl;
     audioPacket->setDataSize( bytesRead );
 
     //std::cout<<"Got audio packet. size "<<audioPacket->dataSize()<<", pts "<<audioPacket->timestamp()<<"\n";
@@ -153,19 +160,20 @@ bool AudioStreamReader::initializeAmux()
 
     if( amux->GetInfo( &m_audioInfo ) )
     {
-        std::cerr << "ISD plugin: can't get audio stream info\n";
+        std::cerr << "ISD plugin: can't get audio stream info. "<<strerror(errno)<<"\n";
         return false;
     }
 
     if( amux->StartAudio() )
     {
-        std::cerr << "ISD plugin: can't start audio stream\n";
+        std::cerr << "ISD plugin: can't start audio stream. "<<strerror(errno)<<"\n";
         return false;
     }
 
     //std::cout<<"AMUX initialized. Codec type "<<m_audioFormat.compressionType<<" fd = "<<amux->GetFD()<<"\n";
 
     m_amux = std::move(amux);
+    m_pollable.reset( new Pollable( m_amux->GetFD() ) );
 
     fillAudioFormat();
     return true;

@@ -30,7 +30,7 @@ public:
     ~AudioStreamReader();
 
     //!Be sure to call this after constructing object to see whether it is valid or not
-    bool initialize();
+    bool initializeIfNeeded();
     /*!
         \return id that can be used to remove receiver. This id is always greater than zero
     */
@@ -45,7 +45,8 @@ private:
     std::unique_ptr<Amux> m_amux;
     nxcip::AudioFormat m_audioFormat;
     size_t m_prevReceiverID;
-    Pollable* m_pollable;
+    std::unique_ptr<Pollable> m_pollable;
+    bool m_initializedInitially;
 
     virtual void eventTriggered( Pollable* obj, aio::EventType eventType ) throw();
 

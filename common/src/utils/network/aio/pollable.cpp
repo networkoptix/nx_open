@@ -5,6 +5,8 @@
 
 #include "pollable.h"
 
+#include <utils/common/systemerror.h>
+
 
 Pollable::Pollable(
     AbstractSocket::SOCKET_HANDLE fd,
@@ -44,4 +46,10 @@ PollableImpl* Pollable::impl()
 const PollableImpl* Pollable::impl() const
 {
     return m_impl.get();
+}
+
+bool Pollable::getLastError( SystemError::ErrorCode* errorCode )
+{
+    SystemError::setLastErrorCode( SystemError::notImplemented );
+    return false;
 }

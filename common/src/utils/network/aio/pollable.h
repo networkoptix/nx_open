@@ -28,6 +28,9 @@ typedef CommonSocketImpl<Pollable> PollableImpl;
 class Pollable
 {
 public:
+    /*!
+        \param fd Valid file descriptor. It is not closed on object destruction!
+    */
     Pollable(
         AbstractSocket::SOCKET_HANDLE fd,
         std::unique_ptr<PollableImpl> impl = std::unique_ptr<PollableImpl>() );
@@ -46,7 +49,7 @@ public:
     PollableImpl* impl();
     const PollableImpl* impl() const;
 
-    virtual bool getLastError( SystemError::ErrorCode* errorCode ) = 0;
+    virtual bool getLastError( SystemError::ErrorCode* errorCode );
 
 protected:
     AbstractSocket::SOCKET_HANDLE m_fd;

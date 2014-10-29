@@ -28,8 +28,6 @@ CameraManager::CameraManager( const nxcip::CameraInfo& info )
 {
 #ifndef NO_ISD_AUDIO
     m_audioStreamReader.reset( new AudioStreamReader() );
-    if( !m_audioStreamReader->initialize() )
-        m_audioStreamReader.reset();
 #endif
 }
 
@@ -131,6 +129,9 @@ void CameraManager::setCredentials( const char* username, const char* password )
 int CameraManager::setAudioEnabled( int audioEnabled )
 {
 #ifndef NO_ISD_AUDIO
+    if( !m_audioStreamReader->initializeIfNeeded() )
+        return nxcip::NX_IO_ERROR;
+
     m_audioEnabled = audioEnabled;
     if (m_encoder[0].get())
         m_encoder[0]->setAudioEnabled(m_audioEnabled);
