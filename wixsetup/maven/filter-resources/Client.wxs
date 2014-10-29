@@ -164,6 +164,9 @@
                 <File Id="ClientQt5Xml$(var.suffix).dll" Name="Qt5Xml$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Xml$(var.suffix).dll" />
             </Component>
             <Component>
+                <File Id="ClientQt5XmlPatterns$(var.suffix).dll" Name="Qt5XmlPatterns$(var.suffix).dll" Source="$(var.SourceDir)\Qt5XmlPatterns$(var.suffix).dll" />
+            </Component>
+            <Component>            
                 <File Id="ClientQt5Widgets$(var.suffix).dll" Name="Qt5Widgets$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Widgets$(var.suffix).dll"  />
             </Component>
             <Component>

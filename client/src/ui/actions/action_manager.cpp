@@ -741,13 +741,6 @@ QnActionManager::QnActionManager(QObject *parent):
         role(QAction::PreferencesRole).
         autoRepeat(false);
 
-    factory(Qn::WebClientAction).
-        flags(Qn::Main | Qn::Tree).
-        text(tr("Open Web Client...")).
-        autoRepeat(false).
-        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalViewLivePermission).
-        condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
-
     factory().
         flags(Qn::Main).
         separator();
@@ -1338,6 +1331,12 @@ QnActionManager::QnActionManager(QObject *parent):
                       new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
                       new QnNegativeActionCondition(new QnResourceStatusActionCondition(Qn::Incompatible, true, this), this),
                       this));
+
+    factory(Qn::WebClientAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+        text(tr("Open Web Page...")).
+        autoRepeat(false).
+        condition(new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this));
 
     factory(Qn::ConnectToCurrentSystem).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
