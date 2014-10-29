@@ -3,6 +3,7 @@
 #include "utils/network/router.h"
 
 //TODO: #dklychkov collect http codes in one place and stop copying enums
+//we already have nx_http::StatusCode::xxx
 namespace HttpCode {
     enum {
         Ok = 200,
