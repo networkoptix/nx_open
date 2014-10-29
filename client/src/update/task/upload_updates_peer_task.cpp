@@ -66,7 +66,7 @@ void QnUploadUpdatesPeerTask::uploadNextUpdate() {
     }
 }
 
-void QnUploadUpdatesPeerTask::at_uploader_finished(int errorCode) {
+void QnUploadUpdatesPeerTask::at_uploader_finished(int errorCode, const QSet<QnUuid> &failedPeers) {
     switch (errorCode) {
     case QnUpdateUploader::NoError:
         foreach (const QnUuid &id, m_uploader->peers()) {
@@ -79,10 +79,13 @@ void QnUploadUpdatesPeerTask::at_uploader_finished(int errorCode) {
 
         break;
     case QnUpdateUploader::NoFreeSpace:
-        finish(NoFreeSpaceError);
+        finish(NoFreeSpaceError, failedPeers);
+        break;
+    case QnUpdateUploader::TimeoutError:
+        finish(TimeoutError, failedPeers);
         break;
     default:
-        finish(UploadError);
+        finish(UploadError, failedPeers);
         break;
     }
 }

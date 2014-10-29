@@ -1,6 +1,7 @@
 'use strict';
 var Page = require('./po.js');
 describe('Restart Process', function () {
+    //it("should stop test",function(){expect("this test").toBe("runned separately");});return;
 
     var p = new Page();
 

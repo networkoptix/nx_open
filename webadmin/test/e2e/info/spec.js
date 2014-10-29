@@ -2,7 +2,7 @@
 var Page = require('./po.js');
 describe('Information Page', function () {
 
-    it("should stop test",function(){expect("other test").toBe("uncommented");});return;
+    //it("should stop test",function(){expect("other test").toBe("uncommented");});return;
 
     var p = new Page();
 

@@ -24,6 +24,7 @@ public:
     QnUuid( const char* text );
     QnUuid( const QString& text );
     QnUuid( const QByteArray& text );
+    explicit QnUuid( const QUuid &uuid );
 
     const QUuid& getQUuid() const
     {

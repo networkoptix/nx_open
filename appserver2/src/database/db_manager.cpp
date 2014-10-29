@@ -520,7 +520,7 @@ bool QnDbManager::resyncTransactionLog()
     if (!fillTransactionLogInternal<ApiResourceParamWithRefData, ApiResourceParamWithRefDataList>(ApiCommand::setResourceParam))
         return false;
 
-    if (!fillTransactionLogInternal<ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
+    if (!fillTransactionLogInternal<ApiStorageData, ApiStorageDataList>(ApiCommand::saveStorage))
         return false;
 
     if (!fillTransactionLogInternal<ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
@@ -562,6 +562,9 @@ QMap<int, QnUuid> QnDbManager::getGuidList( const QString& request, GuidConversi
             }
         case CM_INT:
             result.insert(id, intToGuid(id, intHashPostfix));
+            break;
+        case CM_String:
+            result.insert(id, QnUuid(data.toString()));
             break;
         default:
             {
@@ -627,6 +630,13 @@ bool QnDbManager::updateGuids()
 
     guids = getGuidList("SELECT li.id, r.guid FROM vms_layoutitem_tmp li JOIN vms_resource r on r.id = li.resource_id order by li.id", CM_Binary);
     if (!updateTableGuids("vms_layoutitem", "resource_guid", guids))
+        return false;
+
+    guids = getGuidList("SELECT li.id, li.uuid FROM vms_layoutitem_tmp li order by li.id", CM_String);
+    if (!updateTableGuids("vms_layoutitem", "uuid", guids))
+        return false;
+    guids = getGuidList("SELECT li.id, li.zoom_target_uuid FROM vms_layoutitem_tmp li order by li.id", CM_String);
+    if (!updateTableGuids("vms_layoutitem", "zoom_target_uuid", guids))
         return false;
 
     if (!updateResourceTypeGuids())
@@ -830,6 +840,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     else if (updateName == lit(":/updates/17_add_isd_cam.sql")) {
         updateResourceTypeGuids();
     }
+    else if (updateName == lit(":/updates/20_adding_camera_user_attributes.sql")) {
+        m_needResyncLog = true;
+    }    
     else if (updateName == lit(":/updates/21_new_dw_cam.sql")) {
         updateResourceTypeGuids();
     }
