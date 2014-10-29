@@ -1,6 +1,6 @@
 $icon-font-path: "../fonts/";
 
-//@import 'sass-bootstrap/lib/bootstrap';
+@import 'sass-bootstrap/lib/_variables.scss';
 
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
 
@@ -225,9 +225,6 @@ body {
   float: left;
   clear:both;
 }
-.tc-chart-js-legend li:first-child{
-  display: none;
-}
 .tc-chart-js-legend li span {
   width:22px;
   height:22px;
@@ -343,5 +340,27 @@ body {
 
 .serversList .active{
   font-weight: bold;
+}
+
+.checkbox-wrapper{
+  display: inline-block;
+  padding:0px 0px 0px 5px;
+  width:24px;
+  height:24px;
+  border-radius: 3px;
+}
+.checkbox-wrapper input{
+  margin:0px;
+}
+
+/*
+$state-danger-text:              #b94a48 !default;
+$state-danger-bg:                #f2dede !default;
+$state-danger-border:            darken(adjust-hue($state-danger-bg, -10), 5%) !default;
+*/
+
+.has-error .checkbox-wrapper{
+  background-color: $state-danger-border;
+  border: 1px solid $state-danger-text;
 }
 

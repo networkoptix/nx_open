@@ -422,7 +422,7 @@ bool QnDbManager::init(
 
     // Set admin user's password
     ApiUserDataList users;
-    ErrorCode errCode = doQueryNoLock( nullptr, users );
+    ErrorCode errCode = doQueryNoLock( m_adminUserID, users );
     if( errCode != ErrorCode::ok )
     {
         return false;
@@ -1320,7 +1320,6 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResourc
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::dbError;
     }
-    int gg = query.size();
     return ErrorCode::ok;
 }
 

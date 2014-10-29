@@ -66,34 +66,6 @@ int getSystemErrCode()
 #define SOCKET_ERROR (-1)
 #endif
 
-// SocketException Code
-
-//////////////////////////////////////////////////////////
-// SocketException implementation
-//////////////////////////////////////////////////////////
-
-SocketException::SocketException(const QString &message, bool inclSysMsg)
-throw() {
-    m_message[0] = 0;
-
-    QString userMessage(message);
-    if (inclSysMsg) {
-        userMessage.append(QLatin1String(": "));
-        userMessage.append(QLatin1String(strerror(errno)));
-    }
-
-    QByteArray data = userMessage.toLatin1();
-    strncpy(m_message, data.data(), MAX_ERROR_MSG_LENGTH-1);
-    m_message[MAX_ERROR_MSG_LENGTH-1] = 0;
-}
-
-SocketException::~SocketException() throw() {
-}
-
-const char *SocketException::what() const throw() {
-    return m_message;
-}
-
 
 //////////////////////////////////////////////////////////
 // Socket implementation
@@ -1344,24 +1316,6 @@ void UDPSocket::setBroadcast() {
     setsockopt( m_implDelegate.handle(), SOL_SOCKET, SO_BROADCAST,
                (raw_type *) &broadcastPermission, sizeof(broadcastPermission));
 }
-
-//void UDPSocket::disconnect()  {
-//    sockaddr_in nullAddr;
-//    memset(&nullAddr, 0, sizeof(nullAddr));
-//    nullAddr.sin_family = AF_UNSPEC;
-//
-//    // Try to disconnect
-//    if (::connect(m_socketHandle, (sockaddr *) &nullAddr, sizeof(nullAddr)) < 0) {
-//#ifdef WIN32
-//        if (errno != WSAEAFNOSUPPORT)
-//#else
-//        if (errno != EAFNOSUPPORT)
-//#endif
-//        {
-//            throw SocketException(QString::fromLatin1("Disconnect failed (connect())."), true);
-//        }
-//    }
-//}
 
 void UDPSocket::setDestPort(unsigned short foreignPort)
 {

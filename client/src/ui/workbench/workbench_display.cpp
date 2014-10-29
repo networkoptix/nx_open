@@ -421,7 +421,7 @@ void QnWorkbenchDisplay::initSceneView() {
     m_curtainItem = new QnCurtainItem();
     m_scene->addItem(m_curtainItem.data());
     setLayer(m_curtainItem.data(), Qn::BackLayer);
-    m_curtainItem.data()->setColor(QColor(0, 0, 0, 255));
+    m_curtainItem.data()->setColor(Qt::black);
     m_curtainAnimator->setCurtainItem(m_curtainItem.data());
 
     /* Set up grid. */
@@ -475,6 +475,14 @@ void QnWorkbenchDisplay::initBoundingInstrument() {
 QnGridItem *QnWorkbenchDisplay::gridItem() const {
     return m_gridItem.data();
 }
+
+QnCurtainItem* QnWorkbenchDisplay::curtainItem() const {
+    return m_curtainItem.data();
+} 
+
+QnCurtainAnimator* QnWorkbenchDisplay::curtainAnimator() const {
+    return m_curtainAnimator;
+} 
 
 QnGridBackgroundItem *QnWorkbenchDisplay::gridBackgroundItem() const {
     return m_gridBackgroundItem.data();

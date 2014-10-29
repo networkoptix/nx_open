@@ -250,7 +250,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::BusinessEventsLogAction));
     addAction(action(Qn::CameraListAction));
     addAction(action(Qn::BusinessEventsAction));
-    addAction(action(Qn::WebClientAction));
     addAction(action(Qn::OpenFileAction));
     addAction(action(Qn::OpenNewTabAction));
     addAction(action(Qn::OpenNewWindowAction));
