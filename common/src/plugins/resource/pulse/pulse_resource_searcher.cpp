@@ -35,7 +35,6 @@ QnResourceList QnPlPulseSearcher::findResources()
             cameraRes->setModel(r.name);
         res->setMAC(QnMacAddress(r.mac));
         res->setHostAddress(r.ip);
-        res->setDiscoveryAddr(QHostAddress(r.disc_ip));
 
         result.push_back(res);
 

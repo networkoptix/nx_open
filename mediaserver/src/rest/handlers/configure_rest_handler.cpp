@@ -136,7 +136,11 @@ int QnConfigureRestHandler::changePort(int port) {
 
     {
         QAbstractSocket socket(QAbstractSocket::TcpSocket, 0);
-        if (!socket.bind(port, QAbstractSocket::ReuseAddressHint))
+        QAbstractSocket::BindMode bindMode = QAbstractSocket::DontShareAddress;
+#ifndef Q_OS_WIN
+        bindMode |= QAbstractSocket::ReuseAddressHint;
+#endif
+        if (!socket.bind(port, bindMode))
             return ResultFail;
     }
     ::changePort(port);

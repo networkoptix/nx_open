@@ -208,8 +208,6 @@ QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(
     
         if (net_res->getMAC().toString() == smac)
         {
-            if (isNewDiscoveryAddressBetter(net_res->getHostAddress(), discoveryAddress.toString(), net_res->getDiscoveryAddr().toString()))
-                net_res->setDiscoveryAddr(discoveryAddress);
             return local_result; // already found;
         }
     }

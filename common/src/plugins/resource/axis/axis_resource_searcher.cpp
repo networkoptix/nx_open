@@ -199,8 +199,6 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
     
         if (net_res->getMAC().toString() == smac) {
-            if (isNewDiscoveryAddressBetter(net_res->getHostAddress(), discoveryAddress.toString(), net_res->getDiscoveryAddr().toString()))
-                net_res->setDiscoveryAddr(discoveryAddress);
             return local_results; // already found;
         }
     }
