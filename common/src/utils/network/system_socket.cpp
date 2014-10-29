@@ -1126,49 +1126,6 @@ public:
     {
     }
 
-    virtual void eventTriggered( Pollable* sock, aio::EventType eventType ) throw() override
-    {
-        assert( acceptHandler );
-
-        const int acceptAsyncCallCountBak = acceptAsyncCallCount;
-
-        switch( eventType )
-        {
-            case aio::etRead:
-            {
-                //accepting socket
-                AbstractStreamSocket* newSocket = m_sock->accept();
-                acceptHandler(
-                    newSocket != nullptr ? SystemError::noError : SystemError::getLastOSErrorCode(),
-                    newSocket );
-                break;
-            }
-
-            case aio::etReadTimedOut:
-                acceptHandler( SystemError::timedOut, nullptr );
-                break;
-
-            case aio::etError:
-            {
-                SystemError::ErrorCode errorCode = SystemError::noError;
-                sock->getLastError( &errorCode );
-                acceptHandler( errorCode, nullptr );
-                break;
-            }
-
-            default:
-                assert( false );
-                break;
-        }
-
-        //if asyncAccept has been called from onNewConnection, no need to call removeFromWatch
-        if( acceptAsyncCallCount > acceptAsyncCallCountBak )
-            return;
-
-        aio::AIOService::instance()->removeFromWatch( sock, aio::etRead );
-        acceptHandler = std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>();
-    }
-
     AbstractStreamSocket* accept( unsigned int recvTimeoutMs )
     {
         int newConnSD = acceptWithTimeout( socketHandle, recvTimeoutMs );
