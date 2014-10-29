@@ -149,8 +149,6 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             resource->setMAC(QnMacAddress(smac));
             resource->setHostAddress(sender);
 
-            resource->setDiscoveryAddr(iface.address);
-
             result.push_back(resource);
 
         }
