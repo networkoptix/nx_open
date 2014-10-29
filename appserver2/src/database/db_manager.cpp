@@ -1040,20 +1040,26 @@ QnUuid QnDbManager::getResourceGuid(const qint32 &internalId) {
 
 ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint32* internalId)
 {
-    //*internalId = getResourceInternalId(data.id);
+    *internalId = getResourceInternalId(data.id);
 
     //Q_ASSERT_X(data.status == Qn::NotDefined, Q_FUNC_INFO, "Status MUST be unchanged for resource modification. Use setStatus instead to modify it!");
 
     QSqlQuery query(m_sdb);
-    query.prepare("INSERT OR REPLACE INTO vms_resource (guid, xtype_guid, parent_guid, name, url) VALUES(:id, :typeId, :parentId, :name, :url)");
+    if (*internalId) {
+        query.prepare("UPDATE vms_resource SET guid = :id, xtype_guid = :typeId, parent_guid = :parentId, name = :name, url = :url WHERE id = :internalId");
+        query.bindValue(":internalId", *internalId);
+    }
+    else {
+        query.prepare("INSERT INTO vms_resource (guid, xtype_guid, parent_guid, name, url) VALUES(:id, :typeId, :parentId, :name, :url)");
+    }
     QnSql::bind(data, &query);
 
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::dbError;
     }
-    
-    *internalId = query.lastInsertId().toInt();
+    if (*internalId == 0)
+        *internalId = query.lastInsertId().toInt();
 
     return ErrorCode::ok;
 }
