@@ -16,33 +16,36 @@
 #endif
 
 #include "abstract_socket.h"
+#include "aio/pollable.h"
 #include "nettools.h"
 #include "socket_factory.h"
 #include "utils/common/byte_array.h"
 #include "../common/systemerror.h"
-#include "system_socket_impl.h"
+//#include "system_socket_impl.h"
 
 
 // TODO: #Elric why bother with maxlen and not use QByteArray directly? Remove.
 #define MAX_ERROR_MSG_LENGTH 1024
 
 
-//class SystemSocketImpl;
+typedef PollableImpl SystemSocketImpl;
 template<class SocketType> class BaseAsyncSocketImplHelper;
 
 /**
  *   Base class representing basic communication endpoint
  */
 class Socket
+:
+    public Pollable
 {
 public:
     Socket(
-        std::unique_ptr<BaseAsyncSocketImplHelper<Socket>> asyncHelper,
+        std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
         int type,
         int protocol,
         SystemSocketImpl* impl = nullptr );
     Socket(
-        std::unique_ptr<BaseAsyncSocketImplHelper<Socket>> asyncHelper,
+        std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
         int sockDesc,
         SystemSocketImpl* impl = nullptr );
     //TODO #ak remove following two constructors
@@ -92,16 +95,10 @@ public:
     bool getRecvBufferSize( unsigned int* buffSize );
     //!Implementation of AbstractSocket::setRecvTimeout
     bool setRecvTimeout( unsigned int ms );
-    //!Implementation of AbstractSocket::getRecvTimeout
-    bool getRecvTimeout( unsigned int* millis );
     //!Implementation of AbstractSocket::setSendTimeout
     bool setSendTimeout( unsigned int ms );
-    //!Implementation of AbstractSocket::getSendTimeout
-    bool getSendTimeout( unsigned int* millis );
-    //!Implementation of AbstractSocket::getLastError
-    bool getLastError( SystemError::ErrorCode* errorCode );
-    //!Implementation of AbstractSocket::handle
-    AbstractSocket::SOCKET_HANDLE handle() const;
+    //!Implementation of Pollable::getLastError
+    virtual bool getLastError( SystemError::ErrorCode* errorCode ) override;
     //!Implementation of AbstractSocket::postImpl
     bool postImpl( std::function<void()>&& handler );
     //!Implementation of AbstractSocket::dispatchImpl
@@ -172,21 +169,14 @@ public:
 
     bool failed() const;
 
-    SystemSocketImpl* impl();
-    const SystemSocketImpl* impl() const;
-
     bool fillAddr( const QString &address, unsigned short port, sockaddr_in &addr );
     bool createSocket( int type, int protocol );
 
 protected:
-    int m_socketHandle;              // Socket descriptor
-    SystemSocketImpl* m_impl;
-    std::unique_ptr<BaseAsyncSocketImplHelper<Socket>> m_baseAsyncHelper;
+    std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>> m_baseAsyncHelper;
 
 private:
     bool m_nonBlockingMode;
-    unsigned int m_readTimeoutMS;
-    unsigned int m_writeTimeoutMS;
 
     // Prevent the user from trying to use value semantics on this object
     Socket(const Socket &sock);
@@ -253,7 +243,7 @@ public:
     unsigned short getForeignPort() const;
 
 private:
-    AsyncSocketImplHelper<Socket>* m_aioHelper;
+    AsyncSocketImplHelper<Pollable>* m_aioHelper;
     bool m_connected;
 };
 
