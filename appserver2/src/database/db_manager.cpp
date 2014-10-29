@@ -1104,8 +1104,8 @@ ErrorCode QnDbManager::insertOrReplaceCamera(const ApiCameraData& data, qint32 i
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("\
         INSERT OR REPLACE INTO vms_camera (vendor, manually_added, resource_ptr_id, group_name, group_id,\
-        mac, model, status_flags, physical_id, resource_ptr_id) VALUES\
-        (:vendor, :manuallyAdded, :id, :groupName, :groupId, :mac, :model, :statusFlags, :physicalId, :internalId)\
+        mac, model, status_flags, physical_id) VALUES\
+        (:vendor, :manuallyAdded, :internalId, :groupName, :groupId, :mac, :model, :statusFlags, :physicalId)\
     ");
     QnSql::bind(data, &insQuery);
     insQuery.bindValue(":internalId", internalId);
