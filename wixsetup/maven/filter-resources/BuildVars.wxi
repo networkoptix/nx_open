@@ -34,5 +34,4 @@
 
     <?define SourceDir="${libdir}/${arch}/bin/${build.configuration}"?>                
     <?define PluginsDir="${libdir}/${arch}/bin/${build.configuration}/plugins"?>                        
-
 </Include>

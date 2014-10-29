@@ -318,7 +318,6 @@
             <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
 
             <DialogRef Id="SelectionWarningDlg" />
-            <DialogRef Id="DowngradeWarningDlg" />
             <DialogRef Id="BrowseDlg" />
             <DialogRef Id="DiskCostDlg" />
             <DialogRef Id="ErrorDlg" />
@@ -329,7 +328,6 @@
             <DialogRef Id="ProgressDlg" />
             <DialogRef Id="ResumeDlg" />
             <DialogRef Id="UserExit" />
-            <DialogRef Id="MyFeaturesDlg" />
 
             <Binary Id="Warning" SourceFile="Binary\Exclam.ico" />
 
@@ -344,10 +342,6 @@
             <!-- UpgradeDlg -->
             <Publish Dialog="UpgradeDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
             <Publish Dialog="UpgradeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
-
-            <!-- DowngradeWarningDlg -->
-            <Publish Dialog="DowngradeWarningDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
-            <Publish Dialog="DowngradeWarningDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
 
             <!-- MediaServerDlg -->
             <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg"/>
@@ -368,8 +362,7 @@
             <Publish Dialog="PortIsBusyDlg" Control="Next" Event="NewDialog" Value="[PORT_DIALOG_NEXT]">1</Publish>
 
             <!-- VerifyReadyDlg -->
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg">NOT $(var.VmsRemoving) AND NOT $(var.VmsUpgrading) AND $(var.Inst_S1)</Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg">NOT $(var.VmsRemoving) AND NOT $(var.VmsUpgrading) AND $(var.Inst_S0)</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg">NOT $(var.VmsRemoving) AND NOT $(var.VmsUpgrading)</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg"><![CDATA[ NOT $(var.Remove_S1) AND $(var.VmsRemoving) AND !ServerFeature <> 3 ]]></Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UninstallOptionsDlg">$(var.Remove_S1) OR (!ServerFeature = 3 AND $(var.VmsRemoving))</Publish>            
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg">$(var.VmsUpgrading)</Publish>
@@ -396,21 +389,12 @@
 
             <!-- MaintenanceTypeDlg -->
             <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
-            <Publish Dialog="MaintenanceTypeDlg" Control="ChangeButton" Event="NewDialog" Value="MyFeaturesDlg">1</Publish>
-            <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Property="REMOVE" Value="ALL">1</Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="UninstallOptionsDlg">!ServerFeature = 3</Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg"><![CDATA[ !ServerFeature <> 3 ]]></Publish>            
             
-            <Publish Dialog="MyFeaturesDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
-
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg">$(var.Inst_S1)</Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="UninstallOptionsDlg">$(var.ChangingNothing) AND $(var.Remove_S1)</Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">$(var.ChangingNothing) AND NOT $(var.Remove_S1)</Publish>
-
             <Publish Dialog="UninstallOptionsDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
-            <Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg"><![CDATA[ $(var.Remove_S1)  AND WixUI_InstallMode <> "Remove" ]]></Publish>
-            <Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg">NOT $(var.Remove_S1) OR WixUI_InstallMode = "Remove"</Publish>
+            <Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
             <Publish Dialog="UninstallOptionsDlg" Control="Back" Property="REMOVE" Value="{}">1</Publish>
             <Publish Dialog="UninstallOptionsDlg" Control="Back" Property="REMOVE_DATABASE" Value="0">1</Publish>
             
