@@ -19,9 +19,7 @@
 
 #ifndef QN_NO_BASE
 #   include <utils/common/id.h>
-#   include <utils/common/email.h>
 #   include <utils/common/latin1_array.h>
-#   include <api/model/email_attachment.h>
 #   include <core/resource/resource_fwd.h>
 #   include <business/business_fwd.h>
 #   include "utils/common/latin1_array.h"

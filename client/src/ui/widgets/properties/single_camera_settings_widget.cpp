@@ -3,6 +3,7 @@
 #include <core/resource/media_server_resource.h>
 #include "core/resource/resource_fwd.h"
 
+#include <QtCore/QBuffer>
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
 #include <QtCore/QProcess>
@@ -136,9 +137,9 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->cameraMotionButton,     SIGNAL(clicked(bool)),                  this,   SLOT(at_motionTypeChanged()));
     connect(ui->softwareMotionButton,   SIGNAL(clicked(bool)),                  this,   SLOT(at_motionTypeChanged()));
     connect(ui->sensitivitySlider,      SIGNAL(valueChanged(int)),              this,   SLOT(updateMotionWidgetSensitivity()));
-    connect(ui->resetMotionRegionsButton, SIGNAL(clicked()),                    this,   SLOT(at_motionSelectionCleared()));
-    connect(ui->pingButton,             SIGNAL(clicked()),                      this,   SLOT(at_pingButton_clicked()));
-    connect(ui->moreLicensesButton,     &QPushButton::clicked,                  this,   &QnSingleCameraSettingsWidget::moreLicensesRequested);
+    connect(ui->resetMotionRegionsButton,   &QPushButton::clicked,              this,   &QnSingleCameraSettingsWidget::at_resetMotionRegionsButton_clicked);
+    connect(ui->pingButton,                 &QPushButton::clicked,              this,   [this]{menu()->trigger(Qn::PingAction, QnActionParameters(m_camera));});
+    connect(ui->moreLicensesButton,         &QPushButton::clicked,              this,   &QnSingleCameraSettingsWidget::moreLicensesRequested);
 
     connect(ui->analogViewCheckBox,     SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
     connect(ui->analogViewCheckBox,     SIGNAL(stateChanged(int)),              this,   SLOT(updateLicenseText()), Qt::QueuedConnection);
@@ -259,7 +260,7 @@ bool QnSingleCameraSettingsWidget::initAdvancedTab()
     
     if ( m_camera )
     {
-        id = m_camera->getProperty(lit("cameraSettingsId"));
+        id = m_camera->getProperty( Qn::CAMERA_SETTINGS_ID_PARAM_NAME );
         isCameraSettingsId = !id.isNull();
         
         if ( qnCommon && qnCommon->dataPool() )
@@ -436,7 +437,7 @@ void QnSingleCameraSettingsWidget::loadAdvancedSettings()
     {
         if (!m_camera)
             return;
-        QString id = m_camera->getProperty(lit("cameraSettingsId"));
+        QString id = m_camera->getProperty( Qn::CAMERA_SETTINGS_ID_PARAM_NAME );
         if (!id.isNull())
         {
             QnMediaServerConnectionPtr serverConnection = getServerConnection();
@@ -444,7 +445,8 @@ void QnSingleCameraSettingsWidget::loadAdvancedSettings()
                 return;
             }
 
-            CameraSettingsTreeLister lister(id);
+            //TODO #ak remove this XML parsing run
+            CameraSettingsTreeLister lister( id, m_camera );
             QStringList settings = lister.proceed();
 
 #if 0
@@ -463,7 +465,6 @@ void QnSingleCameraSettingsWidget::loadAdvancedSettings()
             serverConnection->getParamsAsync(m_camera, settings, this, SLOT(at_advancedSettingsLoaded(int, const QnStringVariantPairList &, int)) );
         }
     }    
-    
 }
 
 const QnVirtualCameraResourcePtr &QnSingleCameraSettingsWidget::camera() const {
@@ -1089,12 +1090,10 @@ void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int status, const Q
     }
 
     //if (changesFound) {
+        //TODO #ak remove this XML parsing run
+        m_widgetsRecreator->setCamera( m_camera );
         m_widgetsRecreator->proceed(&m_cameraSettings);
     //}
-}
-
-void QnSingleCameraSettingsWidget::at_pingButton_clicked() {
-    menu()->trigger(Qn::PingAction, QnActionParameters(m_camera));
 }
 
 void QnSingleCameraSettingsWidget::at_analogViewCheckBox_clicked() {
@@ -1178,7 +1177,15 @@ void QnSingleCameraSettingsWidget::updateWebPageText() {
     }
 }
 
-void QnSingleCameraSettingsWidget::at_motionSelectionCleared() {
+void QnSingleCameraSettingsWidget::at_resetMotionRegionsButton_clicked() {
+    if (QMessageBox::warning(this,
+        tr("Confirm motion regions reset"),
+        tr("Are you sure you want to reset motion regions to the defaults?\n"\
+        "This action CANNOT be undone!"),
+        QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
+        QMessageBox::Cancel) == QMessageBox::Cancel)
+        return;
+
     if (m_motionWidget)
         m_motionWidget->clearMotion();
     m_hasMotionControlsChanges = false;

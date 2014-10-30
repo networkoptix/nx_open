@@ -14,6 +14,9 @@ angular.module('webadminApp')
             return decodeURIComponent(url.replace(/file:\/\/.+?:.+?\//gi,""));
         };
 
+        $scope.someSelected = false;
+        $scope.reduceArchiveWarning = false;
+
         mediaserver.getStorages().then(function (r) {
             $scope.storages = _.sortBy(r.data.reply.storages,function(storage){
                 return formatUrl(storage.url);
@@ -26,10 +29,18 @@ angular.module('webadminApp')
             }
 
             $scope.$watch(function(){
+                $scope.reduceArchiveWarning = false;
+                $scope.someSelected = false;
                 for(var i in $scope.storages){
                     var storage = $scope.storages[i];
                     storage.reservedSpace = storage.reservedSpaceGb * (1024*1024*1024);
-                    storage.warning = storage.isUsedForWriting && (storage.reservedSpace <= 0 ||  storage.reservedSpace >= storage.totalSpace );
+                    $scope.someSelected |= storage.isUsedForWriting && storage.isWritable;
+
+                    if(storage.reservedSpace > storage.freeSpace ){
+                        $scope.reduceArchiveWarning = true;
+                    }
+
+                    //storage.warning = storage.isUsedForWriting && (storage.reservedSpace <= 0 ||  storage.reservedSpace >= storage.totalSpace );
                 }
             });
         });
@@ -52,7 +63,6 @@ angular.module('webadminApp')
         $scope.update = function(){
 
         };
-
         $scope.save = function(){
             var needConfirm = false;
             var hasStorageForWriting;
@@ -84,11 +94,22 @@ angular.module('webadminApp')
                         }
                     });
 
-                    mediaserver.saveStorages(info.storages).error(function(saveMediaServerReply){
-                    //mediaserver.saveMediaServer(info).error(function(saveMediaServerReply){
+                    mediaserver.saveStorages(info.storages).then(function(r){
+                        console.log("saveStorages" , r);
+                        if(typeof(r.error)!="undefined" && r.error!=0) {
+                            var errorToShow = r.errorString;
+                            /* switch (errorToShow) {
+                                case 'UNAUTHORIZED':
+                                case 'password':
+                                    errorToShow = "Wrong password.";
+                            } */
+                            alert("Error: " + errorToShow);
+                        }
+                        else{
+                            alert("Settings saved");
+                        }
+                    },function(saveMediaServerReply){
                         alert("Error: Couldn't save settings");
-                    }).then(function(saveMediaServerReply){
-                        alert("Settings saved");
                     });
                 });
             });

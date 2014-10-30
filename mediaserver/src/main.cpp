@@ -275,7 +275,7 @@ QHostAddress resolveHost(const QString& hostString)
 
     // Initialize to zero
     host = QHostAddress();
-    foreach (const QHostAddress &address, info.addresses())
+    for (const QHostAddress &address: info.addresses())
     {
         if (address.toIPv4Address() != 0)
         {
@@ -408,7 +408,7 @@ static QStringList listRecordFolders()
     //QString maxFreeSpaceDrive;
     //int maxFreeSpace = 0;
 
-    foreach (const QFileInfo& drive, QDir::drives()) {
+    for (const QFileInfo& drive: QDir::drives()) {
         if (!drive.isWritable())
             continue;
 
@@ -442,7 +442,19 @@ static QStringList listRecordFolders()
 #endif
 
 #ifdef Q_OS_LINUX
-    folderPaths.append(getDataDirectory() + "/data");
+    QList<QnPlatformMonitor::PartitionSpace> partitions = 
+        qnPlatform->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
+            QnPlatformMonitor::LocalDiskPartition);
+
+    //always adding storage in data dir
+    const QString& dataDirStorage = QDir::cleanPath(getDataDirectory() + "/data");
+    for(int i = 0; i < partitions.size(); ++i)
+    {
+        if( dataDirStorage.startsWith(partitions[i].path) )
+            folderPaths.append( dataDirStorage );
+        else
+            folderPaths.append( QDir::cleanPath( QDir::toNativeSeparators(partitions[i].path) + lit("/") + QnAppInfo::mediaFolderName() ) );
+    }
 #endif
 
     return folderPaths;
@@ -453,7 +465,7 @@ QnAbstractStorageResourceList createStorages(const QnMediaServerResourcePtr mSer
     QnAbstractStorageResourceList storages;
     //bool isBigStorageExist = false;
     qint64 bigStorageThreshold = 0;
-    foreach(const QString& folderPath, listRecordFolders()) 
+    for(const QString& folderPath: listRecordFolders()) 
     {
         if (!mServer->getStorageByUrl(folderPath).isNull())
             continue;
@@ -479,7 +491,7 @@ QnAbstractStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
 {
     QMap<QnUuid, QnAbstractStorageResourcePtr> result;
     // I've switched all patches to native separator to fix network patches like \\computer\share
-    foreach(const QnAbstractStorageResourcePtr& abstractStorage, mServer->getStorages())
+    for(const QnAbstractStorageResourcePtr& abstractStorage: mServer->getStorages())
     {
         QnStorageResourcePtr storage = abstractStorage.dynamicCast<QnStorageResource>();
         if (!storage)
@@ -496,7 +508,7 @@ QnAbstractStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
     }
 
     qint64 bigStorageThreshold = 0;
-    foreach(const QnAbstractStorageResourcePtr& abstractStorage, mServer->getStorages()) {
+    for(const QnAbstractStorageResourcePtr& abstractStorage: mServer->getStorages()) {
         QnStorageResourcePtr storage = abstractStorage.dynamicCast<QnStorageResource>();
         if (!storage)
             continue;
@@ -505,7 +517,7 @@ QnAbstractStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
     }
     bigStorageThreshold /= QnStorageManager::BIG_STORAGE_THRESHOLD_COEFF;
 
-    foreach(const QnAbstractStorageResourcePtr& abstractStorage, mServer->getStorages()) {
+    for(const QnAbstractStorageResourcePtr& abstractStorage: mServer->getStorages()) {
         QnStorageResourcePtr storage = abstractStorage.dynamicCast<QnStorageResource>();
         if (!storage)
             continue;
@@ -545,7 +557,7 @@ QnMediaServerResourcePtr QnMain::findServer(ec2::AbstractECConnectionPtr ec2Conn
         QnSleep::msleep(1000);
     }
 
-    foreach(const QnMediaServerResourcePtr& server, servers)
+    for(const QnMediaServerResourcePtr& server: servers)
     {
         *pm = server->getPanicMode();
         if (server->getId() == serverGuid())
@@ -872,7 +884,7 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
             if (m_needStop)
                 return;
         }
-        foreach(const QnMediaServerResourcePtr &mediaServer, mediaServerList)
+        for(const QnMediaServerResourcePtr &mediaServer: mediaServerList)
             messageProcessor->updateResource(mediaServer);
 
         //reading server attributes
@@ -895,7 +907,7 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
             if (m_needStop)
                 return;
         }
-        foreach(const QnResourcePtr& storage, storages)
+        for(const QnResourcePtr& storage: storages)
             messageProcessor->updateResource( storage );
     }
 
@@ -934,7 +946,7 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         messageProcessor->processPropertyList( kvPairs );
 
         QnManualCameraInfoMap manualCameras;
-        foreach(const QnSecurityCamResourcePtr &camera, cameras) {
+        for(const QnSecurityCamResourcePtr &camera: cameras) {
             messageProcessor->updateResource(camera);
             if (camera->isManuallyAdded() && camera->getParentId() == m_mediaServer->getId()) {
                 QnResourceTypePtr resType = qnResTypePool->getResourceType(camera->getTypeId());
@@ -965,7 +977,7 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
                 return;
         }
 
-        foreach(QnCameraHistoryPtr history, cameraHistoryList)
+        for(QnCameraHistoryPtr history: cameraHistoryList)
             QnCameraHistoryPool::instance()->addCameraHistory(history);
     }
 
@@ -980,7 +992,7 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
                 return;
         }
 
-        foreach(const QnUserResourcePtr &user, users)
+        for(const QnUserResourcePtr &user: users)
             messageProcessor->updateResource(user);
     }
 
@@ -995,7 +1007,7 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
                 return;
         }
 
-        foreach(const QnVideoWallResourcePtr &videowall, videowalls)
+        for(const QnVideoWallResourcePtr &videowall: videowalls)
             messageProcessor->updateResource(videowall);
     }
 
@@ -1010,7 +1022,7 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
                 return;
         }
 
-        foreach(const QnBusinessEventRulePtr &rule, rules)
+        for(const QnBusinessEventRulePtr &rule: rules)
             messageProcessor->on_businessEventAddedOrUpdated(rule);
     }
 
@@ -1025,7 +1037,7 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
                 return;
         }
 
-        foreach(const QnLicensePtr &license, licenses)
+        for(const QnLicensePtr &license: licenses)
             messageProcessor->on_licenseChanged(license);
     }
 
@@ -1064,9 +1076,9 @@ void QnMain::at_localInterfacesChanged()
     m_mediaServer->setNetAddrList(intfList);
 
     QString defaultAddress = QUrl(m_mediaServer->getApiUrl()).host();
-    int port = QUrl(m_mediaServer->getApiUrl()).port();
+    int port = m_mediaServer->getPort();
     bool found = false;
-    foreach(const QHostAddress& addr, intfList) {
+    for(const QHostAddress& addr: intfList) {
         if (addr.toString() == defaultAddress) {
             found = true;
             break;
@@ -1104,7 +1116,7 @@ void QnMain::at_timer()
 {
     MSSettings::runTimeSettings()->setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
     QnResourcePtr mServer = qnResPool->getResourceById(qnCommon->moduleGUID());
-    foreach(const QnResourcePtr& res, qnResPool->getAllCameras(mServer))
+    for(const QnResourcePtr& res: qnResPool->getAllCameras(mServer))
     {
         QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
         if (cam)
@@ -1513,7 +1525,7 @@ void QnMain::run()
         }
 
         bool isModified = false;
-        if (m_universalTcpListener->getPort() != QUrl(server->getApiUrl()).port())
+        if (m_universalTcpListener->getPort() != server->getPort())
             isModified = true;
 
         setServerNameAndUrls(server, defaultLocalAddress(appserverHost), m_universalTcpListener->getPort());
@@ -1605,7 +1617,7 @@ void QnMain::run()
     }
     if (!cmdLineArguments.allowedDiscoveryPeers.isEmpty()) {
         QList<QnUuid> allowedPeers;
-        foreach (const QString &peer, cmdLineArguments.allowedDiscoveryPeers.split(";")) {
+        for (const QString &peer: cmdLineArguments.allowedDiscoveryPeers.split(";")) {
             QnUuid peerId(peer);
             if (!peerId.isNull())
                 allowedPeers << peerId;
@@ -1734,7 +1746,7 @@ void QnMain::run()
     QnAbstractStorageResourceList modifiedStorages = createStorages(m_mediaServer);
     modifiedStorages.append(updateStorages(m_mediaServer));
     saveStorages(ec2Connection, modifiedStorages);
-    foreach(const QnAbstractStorageResourcePtr &storage, modifiedStorages)
+    for(const QnAbstractStorageResourcePtr &storage: modifiedStorages)
         messageProcessor->updateResource(storage);
 
     qnStorageMan->doMigrateCSVCatalog();
@@ -1750,7 +1762,7 @@ void QnMain::run()
 
     /*
     QnScheduleTaskList scheduleTasks;
-    foreach (const QnScheduleTask &scheduleTask, scheduleTasks)
+    for (const QnScheduleTask &scheduleTask: scheduleTasks)
     {
         QString str;
         QTextStream stream(&str);
@@ -1859,6 +1871,13 @@ void QnMain::run()
 
     delete QnResourcePool::instance();
     QnResourcePool::initStaticInstance( NULL );
+}
+
+void QnMain::changePort(quint16 port) {
+    m_universalTcpListener->updatePort(port);
+    QString address = QUrl(m_mediaServer->getApiUrl()).host();
+    setServerNameAndUrls(m_mediaServer, address, port);
+    QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->save(m_mediaServer, this, &QnMain::at_serverSaved);
 }
 
 void QnMain::at_appStarted()
@@ -2056,8 +2075,14 @@ void restartServer()
     restartFlag = true;
     if (serviceMainInstance) {
         qWarning() << "restart requested!";
-        serviceMainInstance->stopAsync();
+        QTimer::singleShot(0, serviceMainInstance, SLOT(stopAsync()));
     }
+}
+
+void changePort(quint16 port)
+{
+    if (serviceMainInstance)
+        serviceMainInstance->changePort(port);
 }
 
 static void printVersion();

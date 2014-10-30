@@ -1,8 +1,13 @@
 #ifndef camera_settings_h_1726
 #define camera_settings_h_1726
 
+#include <memory>
+
 #include "qdom.h"
 #include <QHash>
+
+#include <core/resource/resource_fwd.h>
+
 
 class CameraSettingValue
 {
@@ -32,7 +37,17 @@ public:
 
 class CameraSetting {
 public:
-    enum WIDGET_TYPE { None, Value, OnOff, Boolean, MinMaxStep, Enumeration, Button, TextField, ControlButtonsPair };
+    enum WIDGET_TYPE
+    {
+        None,
+        Group,
+        OnOff,
+        MinMaxStep,
+        Enumeration,
+        Button,
+        TextField,
+        ControlButtonsPair
+    };
 
     static WIDGET_TYPE typeFromStr(const QString& value);
     static QString strFromType(const WIDGET_TYPE value);
@@ -40,18 +55,19 @@ public:
 
     static QString& SEPARATOR;
 
-    CameraSetting() {}
-
-    CameraSetting(const QString& id,
+    CameraSetting();
+    CameraSetting(
+        const QString& id,
         const QString& name,
         WIDGET_TYPE type,
         const QString& query,
         const QString& method,
         const QString& description,
-        const CameraSettingValue min = CameraSettingValue(),
-        const CameraSettingValue max = CameraSettingValue(),
-        const CameraSettingValue step = CameraSettingValue(),
-        const CameraSettingValue current = CameraSettingValue());
+        const CameraSettingValue& min = CameraSettingValue(),
+        const CameraSettingValue& max = CameraSettingValue(),
+        const CameraSettingValue& step = CameraSettingValue(),
+        const CameraSettingValue& current = CameraSettingValue(),
+        bool isReadOnly = false );
 
     virtual ~CameraSetting() {}
 
@@ -85,6 +101,9 @@ public:
     void setCurrent(const CameraSettingValue& current);
     CameraSettingValue getCurrent() const;
 
+    void setIsReadOnly( bool val );
+    bool isReadOnly() const;
+
     CameraSetting& operator= (const CameraSetting& rhs);
 
     QString serializeToStr() const;
@@ -103,6 +122,7 @@ private:
     CameraSettingValue m_max;
     CameraSettingValue m_step;
     CameraSettingValue m_current;
+    bool m_isReadOnly;
 };
 
 typedef QHash<QString, CameraSetting> CameraSettingsByIds;
@@ -114,26 +134,15 @@ class CameraSettingReader
     QString m_cameraId;
 
 public:
-
-    static const QString& ID_SEPARATOR;
-    static const QString& TAG_GROUP;
-    static const QString& TAG_PARAM;
-    static const QString& ATTR_PARENT;
-    static const QString& ATTR_ID;
-    static const QString& ATTR_NAME;
-    static const QString& ATTR_WIDGET_TYPE;
-    static const QString& ATTR_QUERY;
-    static const QString& ATTR_METHOD;
-    static const QString& ATTR_DESCRIPTION;
-    static const QString& ATTR_MIN;
-    static const QString& ATTR_MAX;
-    static const QString& ATTR_STEP;
-
     static QString createId(const QString& parentId, const QString& name);
     static bool isEnabled(const CameraSetting& val);
 
-    CameraSettingReader(const QString& cameraId);
+    CameraSettingReader(
+        const QString& cameraId,
+        const QnResourcePtr& cameraRes = QnResourcePtr() );
     virtual ~CameraSettingReader();
+
+    void setCamera( const QnResourcePtr& cameraRes );
 
     bool read(); //reads data from xml file
     bool proceed(); //parses data from file
@@ -156,7 +165,14 @@ protected:
     //The reader sends parent id of current <camera> tag to the child
     virtual void parentOfRootElemFound(const QString& parentId) = 0;
 
+    //!Triggered on each <camera> element occurence
+    /*!
+        If \a cameraId is specified than this method is triggered only for expected camera element
+    */
+    virtual void cameraElementFound(const QString& /*cameraName*/, const QString& /*parentId*/) {};
+
 private:
+    QnResourcePtr m_cameraRes;
 
     CameraSettingReader();
     bool parseCameraXml(const QDomElement& cameraXml);

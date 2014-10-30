@@ -1,6 +1,26 @@
 <Include>
     <?define arch = "${arch}"?>
     <?define vmax = "${vmax}"?>
+    <?define angle = "${angle}"?>
+    <?define webkit = "${webkit}"?>
+
+    <?define customization = "${customization}"?>
+
+    <?define releaseVersionFull = "${release.version}.${buildNumber}"?>
+    <?define releaseVersionMajor = "${parsedVersion.majorVersion}"?>
+    <?define releaseVersionMinor = "${parsedVersion.minorVersion}"?>
+
+    <?define productName = "${product.name}"?>
+    <?define applauncherName = "${applauncher.name}"?>
+    <?define clientName = "${client.name}"?>
+
+    <?define productExeName = "${product_name}"?>
+    <?define clientExeName = "${client_name}"?>
+
+    <?define mirrorListUrl = "${mirrorListUrl}"?>
+    <?define quicksync = "${quicksync}"?>
+    <?define translation1 = "${translation1}"?>
+
 
     <?if $(var.arch) = x86?>
     <?define ProgramFilesFolder = "ProgramFilesFolder"?>
@@ -34,5 +54,4 @@
 
     <?define SourceDir="${libdir}/${arch}/bin/${build.configuration}"?>                
     <?define PluginsDir="${libdir}/${arch}/bin/${build.configuration}/plugins"?>                        
-
 </Include>

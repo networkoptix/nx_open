@@ -101,7 +101,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
 void QnClientMessageProcessor::processResources(const QnResourceList& resources)
 {
     QnCommonMessageProcessor::processResources(resources);
-    foreach(const QnResourcePtr& resource, resources)
+    for(const QnResourcePtr& resource: resources)
         checkForTmpStatus(resource);
 }
 
@@ -135,7 +135,7 @@ void QnClientMessageProcessor::updateServerTmpStatus(const QnUuid& id, Qn::Resou
     QnResourcePtr server = qnResPool->getResourceById(id);
     if (!server)
         return;
-    foreach(QnResourcePtr res, qnResPool->getAllCameras(server)) {
+    for(QnResourcePtr res: qnResPool->getAllCameras(server)) {
         QnServerCameraPtr serverCamera = res.dynamicCast<QnServerCamera>();
         if (serverCamera)
             serverCamera->setTmpStatus(status);
@@ -152,7 +152,7 @@ void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data)
     if (data.peer.id != qnCommon->remoteGUID())
         return;
 
-    Q_ASSERT(!m_connected);
+    //Q_ASSERT(!m_connected);
     
     m_connected = true;
     emit connectionOpened();
@@ -191,5 +191,6 @@ void QnClientMessageProcessor::at_systemNameChangeRequested(const QString &syste
 void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
 {
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
+    m_incompatibleServerWatcher.reset();
     m_incompatibleServerWatcher.reset(new QnIncompatibleServerWatcher(this));
 }

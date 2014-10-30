@@ -20,6 +20,7 @@
 #include "utils/network/router.h"
 
 #include <utils/common/app_info.h>
+#include "core/resource/storage_resource.h"
 
 QnServerMessageProcessor::QnServerMessageProcessor()
 :
@@ -129,7 +130,7 @@ bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
     if (m_mServer) 
     {
         QHostAddress hostAddr(addr);
-        foreach(const QHostAddress& serverAddr, m_mServer->getNetAddrList())
+        for(const QHostAddress& serverAddr: m_mServer->getNetAddrList())
         {
             if (hostAddr == serverAddr)
                 return true;
@@ -204,16 +205,28 @@ bool QnServerMessageProcessor::canRemoveResource(const QnUuid& resourceId)
 { 
     QnResourcePtr res = qnResPool->getResourceById(resourceId);
     bool isOwnServer = (res && res->getId() == qnCommon->moduleGUID());
-    return !isOwnServer;
+    if (isOwnServer)
+        return false;
+    QnStorageResourcePtr storage = res.dynamicCast<QnStorageResource>();
+    bool isOwnStorage = (storage && storage->getParentId() == qnCommon->moduleGUID());
+    if (isOwnStorage && !storage->isExternal())
+        return false;
+
+    return true;
 }
 
 void QnServerMessageProcessor::removeResourceIgnored(const QnUuid& resourceId) 
 {
     QnMediaServerResourcePtr mServer = qnResPool->getResourceById(resourceId).dynamicCast<QnMediaServerResource>();
+    QnStorageResourcePtr storage = qnResPool->getResourceById(resourceId).dynamicCast<QnStorageResource>();
     bool isOwnServer = (mServer && mServer->getId() == qnCommon->moduleGUID());
+    bool isOwnStorage = (storage && storage->getParentId() == qnCommon->moduleGUID());
     if (isOwnServer) {
         QnMediaServerResourcePtr savedServer;
         QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveSync(mServer, &savedServer);
         QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusSync(mServer->getId(), Qn::Online);
+    }
+    else if (isOwnStorage && !storage->isExternal()) {
+        QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveStoragesSync(QnAbstractStorageResourceList() << storage);
     }
 }

@@ -3,6 +3,7 @@
 #include "utils/network/router.h"
 
 //TODO: #dklychkov collect http codes in one place and stop copying enums
+//we already have nx_http::StatusCode::xxx
 namespace HttpCode {
     enum {
         Ok = 200,
@@ -19,7 +20,7 @@ namespace {
         result.append(target.toByteArray());
         result.append("</b><br/>\r\n");
 
-        foreach (const QnRoutePoint &point, route.points) {
+        for (const QnRoutePoint &point: route.points) {
             result.append(point.peerId.toByteArray());
             result.append(" ");
             result.append(point.host.toUtf8());
@@ -44,7 +45,7 @@ int QnRoutingInformationRestHandler::executeGet(const QString &path, const QnReq
         command = command.mid(1);
 
     if (command == lit("routeTo")) {
-        QnUuid target = QnUuid(params.value(lit("target")));
+        QnUuid target(QUuid(params.value(lit("target"))));
         if (target.isNull()) {
             // suppose it to be host:port
             QStringList targetParams = params.value(lit("target")).split(QLatin1Char(':'));
@@ -102,8 +103,8 @@ int QnRoutingInformationRestHandler::executeGet(const QString &path, const QnReq
         result.append("<html><body>\r\n");
 
         QList<QnUuid> targets = target.isNull() ? routes.uniqueKeys() : (QList<QnUuid>() << target);
-        foreach (const QnUuid &id, targets) {
-            foreach (const QnRoute &route, routes.value(id)) {
+        for (const QnUuid &id: targets) {
+            for (const QnRoute &route: routes.value(id)) {
                 result.append(routeToHtml(id, route));
                 result.append("<br/>\r\n");
             }

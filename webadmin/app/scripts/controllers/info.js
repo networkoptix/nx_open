@@ -21,7 +21,6 @@ angular.module('webadminApp')
                storage.url = formatUrl(storage.url);
             });
         });
-
         $scope.formatSpace = function(bytes){
             var precision = 2;
             var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];

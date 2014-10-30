@@ -202,14 +202,12 @@ QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(
 
     smac = smac.toUpper();
 
-    foreach(const QnResourcePtr& res, result)
+    for(const QnResourcePtr& res: result)
     {
         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
     
         if (net_res->getMAC().toString() == smac)
         {
-            if (isNewDiscoveryAddressBetter(net_res->getHostAddress(), discoveryAddress.toString(), net_res->getDiscoveryAddr().toString()))
-                net_res->setDiscoveryAddr(discoveryAddress);
             return local_result; // already found;
         }
     }

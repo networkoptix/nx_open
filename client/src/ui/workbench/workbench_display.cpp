@@ -421,7 +421,7 @@ void QnWorkbenchDisplay::initSceneView() {
     m_curtainItem = new QnCurtainItem();
     m_scene->addItem(m_curtainItem.data());
     setLayer(m_curtainItem.data(), Qn::BackLayer);
-    m_curtainItem.data()->setColor(QColor(0, 0, 0, 255));
+    m_curtainItem.data()->setColor(Qt::black);
     m_curtainAnimator->setCurtainItem(m_curtainItem.data());
 
     /* Set up grid. */
@@ -475,6 +475,14 @@ void QnWorkbenchDisplay::initBoundingInstrument() {
 QnGridItem *QnWorkbenchDisplay::gridItem() const {
     return m_gridItem.data();
 }
+
+QnCurtainItem* QnWorkbenchDisplay::curtainItem() const {
+    return m_curtainItem.data();
+} 
+
+QnCurtainAnimator* QnWorkbenchDisplay::curtainAnimator() const {
+    return m_curtainAnimator;
+} 
 
 QnGridBackgroundItem *QnWorkbenchDisplay::gridBackgroundItem() const {
     return m_gridBackgroundItem.data();
@@ -1160,6 +1168,9 @@ QRectF QnWorkbenchDisplay::itemEnclosingGeometry(QnWorkbenchItem *item) const {
         result.width()  + delta.width()  * step.width(),
         result.height() + delta.height() * step.height()
     );
+
+    if (item->geometry().isEmpty())
+        return result;
 
     /* Calculate bounds of the rotated item */
     qreal rotation = qAbs(item->rotation());
@@ -1986,6 +1997,7 @@ void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resou
         splashItem->setRect(QRectF(-toPoint(rect.size()) / 2, rect.size()));
         splashItem->setColor(withAlpha(QnNotificationLevels::notificationColor(static_cast<QnBusiness::EventType>(type)), 128));
         splashItem->setOpacity(0.0);
+        splashItem->setRotation(widget->rotation());
         splashItem->animate(1000, QnGeometry::dilated(splashItem->rect(), expansion), 0.0, true, 200, 1.0);
         scene()->addItem(splashItem);
         setLayer(splashItem, Qn::EffectsLayer);

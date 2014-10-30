@@ -26,7 +26,7 @@ void QnRouteBuilder::addConnection(const QnUuid &from, const QnUuid &to, const Q
         routes.append(newRoute);
     } else {
         // we've got a new point, so we have to update routes
-        foreach (const QnRoute &route, m_routes.value(from)) {
+        for (const QnRoute &route: m_routes.value(from)) {
             QnRoute newRoute = route;
             newRoute.addPoint(point, weight);
             routes.append(newRoute);
@@ -77,7 +77,7 @@ bool QnRouteBuilder::insertRoute(const QnRoute &route) {
 
     QnRouteList &routeList = m_routes[route.points.last().peerId];
 
-    foreach (const QnRoute &existentRoute, routeList) {
+    for (const QnRoute &existentRoute: routeList) {
         if (existentRoute.isEqual(route))
             return false;
     }
@@ -95,7 +95,7 @@ void QnRouteBuilder::buildRoutes(const QList<QnRoute> &initialRoutes) {
         if (!insertRoute(route))
             continue;
 
-        foreach (const WeightedPoint &point, m_connections.values(route.points.last().peerId)) {
+        for (const WeightedPoint &point: m_connections.values(route.points.last().peerId)) {
             QnRoute newRoute = route;
             if (newRoute.addPoint(point.first, point.second))
                 routes.append(newRoute);

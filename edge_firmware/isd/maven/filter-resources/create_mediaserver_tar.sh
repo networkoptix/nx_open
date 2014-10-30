@@ -75,6 +75,7 @@ libQt5Multimedia.so.5.2.1 \
 libQt5Network.so.5.2.1 \
 libQt5Sql.so.5.2.1 \
 libQt5Xml.so.5.2.1 \
+libQt5XmlPatterns.so.5.2.1 \
 libquazip.so.1.0.0 \
 libsigar.so \
 libswresample.so.0.15.100 \

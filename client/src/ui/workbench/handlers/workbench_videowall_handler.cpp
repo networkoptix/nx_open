@@ -154,13 +154,25 @@ namespace {
             return;
 
         QnVideoWallPcData pc = firstIdx.videowall()->pcs()->getItem(firstIdx.item().pcUuid);
-        if (pc.screens.size() < screens.first())
+        if (screens.first() >= pc.screens.size())
             return;
+
+        QRect geometry = pc.screens[screens.first()].layoutGeometry;
+        if (geometry.isValid()) {
+            for (const QnLayoutItemData &item: layout->getItems()) {
+                if (!item.combinedGeometry.isValid())
+                    continue;
+                if (!item.combinedGeometry.intersects(geometry))
+                    continue;
+                geometry = QRect(); //invalidate selected geometry
+                break;
+            }
+        }
 
         QnLayoutItemData itemData;
         itemData.uuid = QnUuid::createUuid();
-        itemData.combinedGeometry = pc.screens[screens.first()].layoutGeometry;
-        if (itemData.combinedGeometry.isValid())
+        itemData.combinedGeometry = geometry;
+        if (geometry.isValid())
             itemData.flags = Qn::Pinned;
         else
             itemData.flags = Qn::PendingGeometryAdjustment;
@@ -2489,7 +2501,9 @@ void QnWorkbenchVideoWallHandler::updateReviewLayout(const QnVideoWallResourcePt
             // checking existing widgets with same screen sets
             // take any other item on this widget
             int otherIdx = qnIndexOf(indices, [&item](const QnVideoWallItemIndex &idx){return idx.uuid() != item.uuid; });
-            if ((otherIdx >= 0) && (indices[otherIdx].item().screenSnaps.screens() == item.screenSnaps.screens()))
+            if ((otherIdx >= 0) 
+                && (indices[otherIdx].item().pcUuid == item.pcUuid)
+                && (indices[otherIdx].item().screenSnaps.screens() == item.screenSnaps.screens()))
                 return workbenchItem;
 
             // our item is the only item on the widget, we can modify it as we want

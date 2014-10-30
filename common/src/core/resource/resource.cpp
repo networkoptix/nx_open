@@ -113,7 +113,8 @@ QnResource::QnResource():
     m_initialized(false),
     m_lastInitTime(0),
     m_prevInitializationResult(CameraDiagnostics::ErrorCode::unknown),
-    m_lastMediaIssue(CameraDiagnostics::NoErrorResult())
+    m_lastMediaIssue(CameraDiagnostics::NoErrorResult()),
+    m_removedFromPool(false)
 {
     m_lastStatusUpdateTime = QDateTime::fromMSecsSinceEpoch(0);
 }
@@ -187,9 +188,13 @@ void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modif
     }
 }
 
-void QnResource::update(const QnResourcePtr& other, bool silenceMode)
-{
-    foreach (QnResourceConsumer *consumer, m_consumers)
+void QnResource::update(const QnResourcePtr& other, bool silenceMode) {
+    /*
+    Q_ASSERT_X(other->metaObject()->className() == this->metaObject()->className(),
+        Q_FUNC_INFO,
+        "Trying to update " + QByteArray(this->metaObject()->className()) + " with " + QByteArray(other->metaObject()->className()));
+    */
+    for (QnResourceConsumer *consumer: m_consumers)
         consumer->beforeUpdate();
     QSet<QByteArray> modifiedFields;
     {
@@ -209,7 +214,7 @@ void QnResource::update(const QnResourcePtr& other, bool silenceMode)
     for (const ec2::ApiResourceParamData &param: other->getProperties())
         emitPropertyChanged(param.name);   //here "propertyChanged" will be called
     
-    foreach (QnResourceConsumer *consumer, m_consumers)
+    for (QnResourceConsumer *consumer: m_consumers)
         consumer->afterUpdate();
 }
 
@@ -431,6 +436,11 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
     if (newStatus == Qn::NotDefined)
         return;
 
+    if (m_removedFromPool)
+        return;
+
+
+
     QnUuid id = getId();
     Qn::ResourceStatus oldStatus = qnStatusDictionary->value(id);
     if (oldStatus == newStatus)
@@ -567,7 +577,7 @@ bool QnResource::hasConsumer(QnResourceConsumer *consumer) const
 bool QnResource::hasUnprocessedCommands() const
 {
     QMutexLocker locker(&m_consumersMtx);
-    foreach(QnResourceConsumer* consumer, m_consumers)
+    for(QnResourceConsumer* consumer: m_consumers)
     {
         if (dynamic_cast<QnResourceCommand*>(consumer))
             return true;
@@ -581,10 +591,10 @@ void QnResource::disconnectAllConsumers()
 {
     QMutexLocker locker(&m_consumersMtx);
 
-    foreach (QnResourceConsumer *consumer, m_consumers)
+    for (QnResourceConsumer *consumer: m_consumers)
         consumer->beforeDisconnectFromResource();
 
-    foreach (QnResourceConsumer *consumer, m_consumers)
+    for (QnResourceConsumer *consumer: m_consumers)
         consumer->disconnectFromResource();
 
     m_consumers.clear();
@@ -700,7 +710,7 @@ void QnResource::emitModificationSignals( const QSet<QByteArray>& modifiedFields
 
     const QnResourcePtr & _t1 = toSharedPointer(this);
     void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
-    foreach(const QByteArray& signalName, modifiedFields)
+    for(const QByteArray& signalName: modifiedFields)
         emitDynamicSignal((signalName + QByteArray("(QnResourcePtr)")).data(), _a);
 }
 
@@ -834,6 +844,9 @@ void QnResource::initAsync(bool optional)
     if (m_appStopping)
         return;
 
+    if (hasFlags(Qn::foreigner))
+        return; // removed to other server
+
     InitAsyncTask *task = new InitAsyncTask(toSharedPointer(this));
     if (optional) {
         if (m_initAsyncPool.tryStart(task))
@@ -887,4 +900,10 @@ void QnResource::setPtzCapabilities(Qn::PtzCapabilities capabilities) {
 
 void QnResource::setPtzCapability(Qn::PtzCapabilities capability, bool value) {
     setPtzCapabilities(value ? (getPtzCapabilities() | capability) : (getPtzCapabilities() & ~capability));
+}
+
+void QnResource::setRemovedFromPool(bool value)
+{
+    QMutexLocker mutexLocker(&m_mutex);
+    m_removedFromPool = value;
 }

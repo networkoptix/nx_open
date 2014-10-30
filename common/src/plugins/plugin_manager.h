@@ -54,7 +54,7 @@ public:
         QMutexLocker lk( &m_mutex );
 
         QList<T*> foundPlugins;
-        foreach( QSharedPointer<QPluginLoader> plugin, m_qtPlugins )
+        for( QSharedPointer<QPluginLoader> plugin: m_qtPlugins )
         {
             T* foundPlugin = qobject_cast<T*>(plugin->instance());
             if( foundPlugin )
@@ -71,7 +71,7 @@ public:
     template<class T> QList<T*> findNxPlugins( const nxpl::NX_GUID& guid ) const
     {
         QList<T*> foundPlugins;
-        foreach( nxpl::PluginInterface* plugin, m_nxPlugins )
+        for( nxpl::PluginInterface* plugin: m_nxPlugins )
         {
             void* ptr = plugin->queryInterface( guid );
             if( ptr )

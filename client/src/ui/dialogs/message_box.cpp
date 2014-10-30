@@ -58,3 +58,31 @@ QMessageBox::StandardButton QnMessageBox::critical(QWidget *parent, int helpTopi
     return showNewMessageBox(parent, Critical, helpTopicId, title, text, buttons, defaultButton);
 }
 
+QPushButton* QnMessageBox::addCustomButton(const QString &text, QMessageBox::ButtonRole role) {
+    QPushButton* button = addButton(text, role);
+    if (!button)
+        return button;
+
+    /* First-time setup */
+    if (m_customButtons.isEmpty()) {
+        QList<QDialogButtonBox *> buttonBoxes = findChildren<QDialogButtonBox *>();
+        Q_ASSERT(!buttonBoxes.isEmpty());
+        if (buttonBoxes.empty())
+            return button;
+
+        QDialogButtonBox* buttonBox = buttonBoxes.first();
+
+        disconnect(buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(_q_buttonClicked(QAbstractButton*)));
+        connect(this, SIGNAL(defaultButtonClicked(QAbstractButton*)), this, SLOT(_q_buttonClicked(QAbstractButton*)));
+
+        connect(buttonBox, &QDialogButtonBox::clicked, this, [this](QAbstractButton* clicked) {
+            if (m_customButtons.contains(clicked))
+                return;
+            emit defaultButtonClicked(clicked);
+        }); 
+    }
+    
+    m_customButtons << button;
+    
+    return button;
+}

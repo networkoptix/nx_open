@@ -792,7 +792,7 @@ void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget 
     opacityAnimator(m_resizedWidget)->animateTo(widgetManipulationOpacity);
 }
 
-void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, ResizingInfo *) {
+void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, ResizingInfo *info) {
     if(m_resizedWidget != item || item == NULL)
         return;
 
@@ -810,8 +810,31 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
         }
     }
 
+    if (gridSize.isEmpty())
+        gridSize = gridSize.expandedTo(QSize(1, 1));
+
     /* Calculate integer position. */
-    QPointF gridPosF = gridRectF.topLeft() + toPoint(gridSizeF - gridSize) / 2.0;
+    QPointF gridPosF;
+    switch (info->frameSection()) {
+    case Qt::TopSection:
+    case Qt::LeftSection:
+    case Qt::TopLeftSection:
+        gridPosF = gridRectF.bottomRight() - toPoint(gridSize);
+        break;
+    case Qt::BottomSection:
+    case Qt::RightSection:
+    case Qt::BottomRightSection:
+        gridPosF = gridRectF.topLeft();
+        break;
+    case Qt::TopRightSection:
+        gridPosF = QPointF(gridRectF.left(), gridRectF.bottom() - gridSize.height());
+        break;
+    case Qt::BottomLeftSection:
+        gridPosF = QPointF(gridRectF.right() - gridSize.width(), gridRectF.top());
+        break;
+    default:
+        gridPosF = gridRectF.topLeft() + toPoint(gridSizeF - gridSize) / 2;
+    }
     QPoint gridPos = gridPosF.toPoint(); /* QPointF::toPoint() uses qRound() internally. */
 
     /* Calculate new grid rect based on the dragged frame section. */

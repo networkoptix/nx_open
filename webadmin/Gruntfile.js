@@ -15,6 +15,9 @@ module.exports = function (grunt) {
     // Time how long tasks take. Can help when optimizing build times
     require('time-grunt')(grunt);
 
+    grunt.loadNpmTasks('grunt-protractor-webdriver');
+    grunt.loadNpmTasks('grunt-protractor-runner');
+
     // Define the configuration for all the tasks
     grunt.initConfig({
 
@@ -91,132 +94,36 @@ module.exports = function (grunt) {
                  }
                  */
 
-                //Sergey Yuldashev
-                /*{
-                    context: '/api/',
-                    host: '10.0.2.203',
-                    port: 8001,
-                    headers: {
-                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
-                        //"Authorization": "Basic dXNlcjoxMjM="//user:123
-                    }
-                }, {
-                    context: '/ec2/',
-                    host: '10.0.2.203',
-                    port: 8001,
-                    headers: {
-                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
-                        //"Authorization": "Basic dXNlcjoxMjM="//user:123
-                    }
-                }*/
+                //"Authorization": "Basic YWRtaW46MTIz" //admin:123
+                //"Authorization": "Basic dXNlcjoxMjM="//user:123
 
+                //Total proxy
+                //{context: '/',host: '192.168.56.101',port: 7002,headers: {"Authorization": "Basic YWRtaW46MTIz"}},
 
-
-                //Sergey Yuldashev 2
-                /*{
-                    context: '/api/',
-                    host: '10.0.2.203',
-                    port: 7601,
-                    headers: {
-                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
-                    }
-                }, {
-                    context: '/ec2/',
-                    host: '10.0.2.203',
-                    port: 7601,
-                    headers: {
-                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
-                    }
-                }*/
-
-                // Sasha
-                /*{
-                    context: '/api/',
-                    host: '10.0.2.224',
-                    port: 7021,//7004,7005,2006
-                    headers: {
-                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
-                    }
-                }, {
-                    context: '/ec2/',
-                    host: '10.0.2.224',
-                    port: 7021,//7004,7005,2006
-                    headers: {
-                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
-                    }
-                }*/
-
-                //Roman Vasilenko
-                {
-                    context: '/api/',
-                    host: '10.0.2.231',
-                    port: 7003,//7004,7005,2006
-                    headers: {
-                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
-                    }
-                }, {
-                    context: '/ec2/',
-                    host: '10.0.2.231',
-                    port: 7003,//7004,7005,2006
-                    headers: {
-                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
-                    }
-                }
-
-
-                //Daria
-                /*{
-                     context: '/api/',
-                     host: '10.0.2.229',
-                     port: 7039,
-                     headers: {
-                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
-                     }
-                },
-                {
-                     context: '/ec2/',
-                     host: '10.0.2.229',
-                     port: 7039,
-                     headers: {
-                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
-                     }
-                 }*/
 
                 //Evgeniy
-                /*{
-                    context: '/api/',
-                    host: '192.168.56.101',
-                    port: 7002,
-                    headers: {
-                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
-                    }
-                },
-                {
-                    context: '/ec2/',
-                    host: '192.168.56.101',
-                    port: 7002,
-                    headers: {
-                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
-                    }
-                }*/
+                {context: '/api/',host: '192.168.56.101',port: 9000,headers: {"Authorization": "Basic YWRtaW46MTIz"}},
+                {context: '/ec2/',host: '192.168.56.101',port: 9000,headers: {"Authorization": "Basic YWRtaW46MTIz"}}
+
+                //Sergey Yuldashev
+                //{context: '/api/', host: '10.0.2.203', port: 8001, headers: {"Authorization": "Basic YWRtaW46MTIz"}},
+                //{context: '/ec2/', host: '10.0.2.203', port: 8001, headers: {"Authorization": "Basic YWRtaW46MTIz"}}
+
+                // Sasha
+                //{context: '/api/', host: '10.0.2.224', port: 7021, headers: {"Authorization": "Basic YWRtaW46MTIz"}},
+                //{context: '/ec2/', host: '10.0.2.224', port: 7021, headers: {"Authorization": "Basic YWRtaW46MTIz"}}
+
+                //Roman Vasilenko  port: 7003,7004,7005,2006
+                //{context: '/api/', host: '10.0.2.231', port: 7003, headers: {"Authorization": "Basic YWRtaW46MTIz"}},
+                //{context: '/ec2/', host: '10.0.2.231', port: 7003, headers: {"Authorization": "Basic YWRtaW46MTIz"}}
+
+                //Daria
+                //{context: '/api/', host: '10.0.2.229', port: 7039, headers: {"Authorization": "Basic YWRtaW46MTIz"}},
+                //{context: '/ec2/', host: '10.0.2.229', port: 7039, headers: {"Authorization": "Basic YWRtaW46MTIz"}}
 
                 //Denis
-                /*{
-                    context: '/api/',
-                    host: '10.0.2.182',
-                    port: 7001,
-                    headers: {
-                        "Authorization": "Basic YWRtaW46MTIz" //admin:123
-                    }
-                },
-                {
-                     context: '/ec2/',
-                     host: '10.0.2.182',
-                     port: 7001,
-                     headers: {
-                         "Authorization": "Basic YWRtaW46MTIz" //admin:123
-                     }
-                }*/
+                //{context: '/api/', host: '10.0.2.182', port: 7001, headers: {"Authorization": "Basic YWRtaW46MTIz"}},
+                //{context: '/ec2/', host: '10.0.2.182', port: 7001, headers: {"Authorization": "Basic YWRtaW46MTIz"}}
             ],
             livereload: {
                 options: {
@@ -242,13 +149,34 @@ module.exports = function (grunt) {
                     open: true,
                     base: [
                         '.tmp',
+                        'test',
                         '<%= yeoman.app %>'
                     ]
                 }
             },
             test: {
                 options: {
-                    port: 9001,
+                    middleware: function (connect, options) {
+                        if (!Array.isArray(options.base)) {
+                            options.base = [options.base];
+                        }
+
+                        // Setup the proxy
+                        var middlewares = [require('grunt-connect-proxy/lib/utils').proxyRequest];
+
+                        // Serve static files.
+                        options.base.forEach(function (base) {
+                            middlewares.push(connect.static(base));
+                        });
+
+                        // Make directory browse-able.
+                        var directory = options.directory || options.base[options.base.length - 1];
+                        middlewares.push(connect.directory(directory));
+
+                        return middlewares;
+                    },
+                    port: 9000,
+
                     base: [
                         '.tmp',
                         'test',
@@ -345,11 +273,11 @@ module.exports = function (grunt) {
                 generatedImagesDir: '.tmp/images/generated',
                 imagesDir: '<%= yeoman.app %>/images',
                 javascriptsDir: '<%= yeoman.app %>/scripts',
-                fontsDir: '<%= yeoman.app %>/styles/fonts',
+                fontsDir: '<%= yeoman.app %>/fonts',
                 importPath: '<%= yeoman.app %>/bower_components',
                 httpImagesPath: '/images',
                 httpGeneratedImagesPath: '/images/generated',
-                httpFontsPath: '/styles/fonts',
+                httpFontsPath: '/fonts',
                 relativeAssets: false,
                 assetCacheBuster: false,
                 raw: 'Sass::Script::Number.precision = 10\n'
@@ -372,9 +300,9 @@ module.exports = function (grunt) {
                 files: {
                     src: [
                         '<%= yeoman.dist %>/scripts/{,*/}*.js',
-                        '<%= yeoman.dist %>/styles/{,*/}*.css',
-                        '<%= yeoman.dist %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
-                        '<%= yeoman.dist %>/styles/fonts/*'
+                        '<%= yeoman.dist %>/styles/{,*/}*.css'//,
+                        //'<%= yeoman.dist %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
+                        //'<%= yeoman.dist %>/fonts/*'
                     ]
                 }
             }
@@ -395,7 +323,13 @@ module.exports = function (grunt) {
             html: ['<%= yeoman.dist %>/{,*/}{*.html,*.xsl}'],
             css: ['<%= yeoman.dist %>/styles/{,*/}*.css'],
             options: {
-                assetsDirs: ['<%= yeoman.dist %>']
+                assetsDirs: [
+                    '<%= yeoman.dist %>',
+                    '<%= yeoman.dist %>/fonts',
+
+                    '<%= yeoman.app %>',
+                    '<%= yeoman.app %>/fonts'
+                ]
             }
         },
 
@@ -535,7 +469,7 @@ module.exports = function (grunt) {
         // By default, your `index.html`'s <!-- Usemin block --> will take care of
         // minification. These next options are pre-configured if you do not wish
         // to use the Usemin blocks.
-        // cssmin: {
+        //cssmin: {
         //   dist: {
         //     files: {
         //       '<%= yeoman.dist %>/styles/main.css': [
@@ -544,7 +478,7 @@ module.exports = function (grunt) {
         //       ]
         //     }
         //   }
-        // },
+        //},
         // uglify: {
         //   dist: {
         //     files: {
@@ -563,6 +497,33 @@ module.exports = function (grunt) {
             unit: {
                 configFile: 'karma.conf.js',
                 singleRun: true
+            }
+        },
+        protractor: {
+            options: {
+                configFile: "protractor-conf.js", // Default config file
+                keepAlive: true, // If false, the grunt process stops when the test fails.
+                noColor: false, // If true, protractor will not use colors in its output.
+                args: {
+                    // Arguments passed to the command
+                }
+            },
+            all: {   // Grunt requires at least one target to run so you can simply put 'all: {}' here too.
+                options: {
+                    //configFile: "e2e.conf.js", // Target-specific config file
+                    args: {} // Target-specific arguments
+                }
+            },
+            server:{
+
+            }
+        },
+        protractor_webdriver: {
+            options:{
+
+            },
+            default:{
+
             }
         }
     });
@@ -596,7 +557,9 @@ module.exports = function (grunt) {
         'configureProxies:server',
         'autoprefixer',
         'connect:test',
-        'karma'
+        'protractor_webdriver',
+        'protractor:all'
+        //'karma'
     ]);
 
     grunt.registerTask('build', [

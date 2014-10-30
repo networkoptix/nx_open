@@ -139,7 +139,7 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         QnTransaction<ApiIdDataList> tran(ApiCommand::removeResources);
-        foreach(const QnUuid& id, idList)
+        for(const QnUuid& id: idList)
             tran.params.push_back(id);
         using namespace std::placeholders;
         m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
@@ -162,8 +162,7 @@ namespace ec2
         ApiCommand::Value command,
         const ec2::ApiResourceParamWithRefDataList& kvPairs)
     {
-        QnTransaction<ApiResourceParamWithRefDataList> tran(command);
-        tran.params = kvPairs;
+        QnTransaction<ApiResourceParamWithRefDataList> tran(command, kvPairs);
         return tran;
     }
 

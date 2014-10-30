@@ -133,10 +133,9 @@ private slots:
     void at_cameraScheduleWidget_scheduleEnabledChanged();
     void at_linkActivated(const QString &urlString);
     void at_motionTypeChanged();
-    void at_motionSelectionCleared();
+    void at_resetMotionRegionsButton_clicked();
     void at_motionRegionListChanged();
     void at_advancedSettingsLoaded(int status, const QnStringVariantPairList &params, int handle);
-    void at_pingButton_clicked();
     void at_analogViewCheckBox_clicked();
     void at_fisheyeSettingsChanged();
 

@@ -37,14 +37,12 @@ namespace ec2
     class ApiObjectInfoList: public std::vector<ApiObjectInfo>
     {
     public:
-        std::vector<ApiIdData> toIdList() 
+        std::vector<ApiIdData> toIdList() const
         {
             std::vector<ApiIdData> result;
-            for (size_t i = 0; i < size(); ++i) {
-                ApiIdData data;
-                data.id = at(i).id;
-                result.push_back(data);
-            }
+            result.reserve(size());
+            for (size_t i = 0; i < size(); ++i)
+                result.push_back(ApiIdData(at(i).id));
             return result;
         }
     };
@@ -66,7 +64,7 @@ namespace ec2
         public:
             Locker(QnDbManager* db);
             ~Locker();
-            void commit();
+            bool commit();
 
         private:
             QnDbManager* m_db;
@@ -475,7 +473,7 @@ namespace ec2
         //void commit();
         //void rollback();
     private:
-        enum GuidConversionMethod {CM_Default, CM_Binary, CM_MakeHash, CM_INT};
+        enum GuidConversionMethod {CM_Default, CM_Binary, CM_MakeHash, CM_String, CM_INT};
 
         QMap<int, QnUuid> getGuidList(const QString& request, GuidConversionMethod method, const QByteArray& intHashPostfix = QByteArray());
 

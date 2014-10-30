@@ -181,6 +181,7 @@ namespace nx_http
         unsigned int m_responseReadTimeoutMs;
         unsigned int m_msgBodyReadTimeoutMs;
         AuthType m_authType;
+        HttpHeaders m_additionalHeaders;
 
         void asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode );
         void asyncSendDone( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten );

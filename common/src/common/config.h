@@ -63,10 +63,6 @@ static const int DEFAULT_RESOURCE_INIT_THREADS_COUNT = 64;
 #endif
 
 
-/* Define foreach */
-//#define foreach BOOST_FOREACH
-
-
 /* Some windows-specific defines. */
 #ifdef _WIN32
 #   undef NOMINMAX

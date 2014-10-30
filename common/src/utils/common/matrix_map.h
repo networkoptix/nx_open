@@ -83,7 +83,7 @@ public:
      */
     QSet<T> values(const QList<QRect> &regions) const {
         QSet<T> result;
-        foreach(const QRect &region, regions)
+        for(const QRect &region: regions)
             values(region, &result);
         return result;
     }

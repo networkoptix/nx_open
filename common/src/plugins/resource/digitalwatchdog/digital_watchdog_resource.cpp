@@ -4,8 +4,10 @@
 #include "onvif/soapDeviceBindingProxy.h"
 #include "dw_ptz_controller.h"
 #include "dw_zoom_ptz_controller.h"
+#include "common/common_module.h"
+#include "core/resource_management/resource_data_pool.h"
+#include "newdw_ptz_controller.h"
 
-const QString CAMERA_SETTINGS_ID_PARAM = lit("cameraSettingsId");
 static const int HTTP_PORT = 80;
 
 QString getIdSuffixByModel(const QString& cameraModel)
@@ -121,12 +123,22 @@ int QnPlWatchDogResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resoluti
     return qMax(1024,result);
 }
 
-QnAbstractPtzController *QnPlWatchDogResource::createPtzControllerInternal() {
-    QScopedPointer<QnAbstractPtzController> result(new QnDwPtzController(toSharedPointer(this)));
-    if(result->getCapabilities() == Qn::NoPtzCapabilities) {
-        result.reset();
-        if(m_hasZoom)
-            result.reset(new QnDwZoomPtzController(toSharedPointer(this)));
+QnAbstractPtzController *QnPlWatchDogResource::createPtzControllerInternal() 
+{
+    QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+    bool useHttpPtz = resourceData.value<bool>(lit("dw-http-ptz"), false);
+    QScopedPointer<QnAbstractPtzController> result;
+    if (useHttpPtz)
+    {
+        result.reset(new QnNewDWPtzController(toSharedPointer(this)));
+    }
+    else {
+        result.reset(new QnDwPtzController(toSharedPointer(this)));
+        if(result->getCapabilities() == Qn::NoPtzCapabilities) {
+            result.reset();
+            if(m_hasZoom)
+                result.reset(new QnDwZoomPtzController(toSharedPointer(this)));
+        }
     }
     return result.take();
 }
@@ -137,7 +149,7 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
     QnPlOnvifResource::fetchAndSetCameraSettings();
 
     QString cameraModel = fetchCameraModel();
-    QString baseIdStr = getProperty(CAMERA_SETTINGS_ID_PARAM);
+    QString baseIdStr = getProperty(Qn::CAMERA_SETTINGS_ID_PARAM_NAME);
 
     QString suffix = getIdSuffixByModel(cameraModel);
     if (!suffix.isEmpty()) {
@@ -147,7 +159,7 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
         QString prefix = baseIdStr.split(QLatin1String("-"))[0];
         QString fullCameraType = prefix + suffix;
         if (fullCameraType != baseIdStr)
-            setProperty(CAMERA_SETTINGS_ID_PARAM, fullCameraType);
+            setProperty(Qn::CAMERA_SETTINGS_ID_PARAM_NAME, fullCameraType);
         baseIdStr = prefix;
     }
 
@@ -194,7 +206,7 @@ bool QnPlWatchDogResource::getParamPhysical(const QString &param, QVariant &val)
     //to camera. All values can be get by one request, but our framework do getParamPhysical for every single param.
     QDateTime currTime = QDateTime::currentDateTime();
     if (m_advSettingsLastUpdated.isNull() || m_advSettingsLastUpdated.secsTo(currTime) > ADVANCED_SETTINGS_VALID_TIME) {
-        foreach (const QnPlWatchDogResourceAdditionalSettingsPtr& setting, m_additionalSettings)
+        for (const QnPlWatchDogResourceAdditionalSettingsPtr& setting: m_additionalSettings)
         {
             if (!setting->refreshValsFromCamera())
             {
@@ -204,7 +216,7 @@ bool QnPlWatchDogResource::getParamPhysical(const QString &param, QVariant &val)
         m_advSettingsLastUpdated = currTime;
     }
 
-    foreach (const QnPlWatchDogResourceAdditionalSettingsPtr& setting, m_additionalSettings)
+    for (const QnPlWatchDogResourceAdditionalSettingsPtr& setting: m_additionalSettings)
     {
         //If param is not in list of child, it will return false. Then will try to find it in parent.
         if (setting->getParamPhysicalFromBuffer(param, val))
@@ -221,7 +233,7 @@ bool QnPlWatchDogResource::setParamPhysical(const QString &param, const QVariant
 {
     QMutexLocker lock(&m_physicalParamsMutex);
 
-    foreach (const QnPlWatchDogResourceAdditionalSettingsPtr& setting, m_additionalSettings)
+    for (const QnPlWatchDogResourceAdditionalSettingsPtr& setting: m_additionalSettings)
     {
         //If param is not in list of child, it will return false. Then will try to find it in parent.
 

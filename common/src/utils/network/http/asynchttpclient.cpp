@@ -609,6 +609,9 @@ namespace nx_http
             //m_request.headers.insert( std::make_pair("Connection", "keep-alive") );
             m_request.headers.insert( std::make_pair("Host", m_url.host().toLatin1()) );
         }
+
+        m_request.headers.insert(m_additionalHeaders.cbegin(), m_additionalHeaders.cend());
+
         //adding user credentials
 
         if (m_authType == authBasicAndDigest)
@@ -629,7 +632,7 @@ namespace nx_http
 
     void AsyncHttpClient::addRequestHeader(const StringType& key, const StringType& value)
     {
-        m_request.headers.insert( make_pair(key, value) );
+        m_additionalHeaders.insert( make_pair(key, value) );
     }
 
     void AsyncHttpClient::serializeRequest()

@@ -16,6 +16,7 @@ public:
     enum ErrorCode {
         NoError,
         NoFreeSpace,
+        TimeoutError,
         UnknownError
     };
 
@@ -32,7 +33,7 @@ public:
 signals:
     void peerProgressChanged(const QnUuid &peerId, int progress);
     void progressChanged(int progress);
-    void finished(int errorCode);
+    void finished(int errorCode, const QSet<QnUuid> &failedPeers);
 
 private slots:
     void sendNextChunk();

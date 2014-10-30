@@ -15,6 +15,8 @@
 #include "utils/network/module_finder.h"
 #include "api/model/configure_reply.h"
 
+void changePort(quint16 port);
+
 namespace {
     enum Result {
         ResultOk,
@@ -41,7 +43,7 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     int changeSystemNameResult = changeSystemName(systemName, wholeSystem);
     if (changeSystemNameResult == ResultFail) {
         result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(lit("Can't change system name."));
+        result.setErrorString(lit("SYSTEM_NAME"));
     }
 
     /* reset connections if systemName is changed */
@@ -52,18 +54,18 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     int changePortResult = changePort(port);
     if (changePortResult == ResultFail) {
         result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(lit("Can't change port."));
+        result.setErrorString(lit("PORT"));
     }
 
     /* set password */
     int changeAdminPasswordResult = changeAdminPassword(password, passwordHash, passwordDigest, oldPassword);
     if (changeAdminPasswordResult == ResultFail) {
         result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(lit("Can't change admin password."));
+        result.setErrorString(lit("PASSWORD"));
     }
 
     QnConfigureReply reply;
-    reply.restartNeeded = changePortResult == ResultOk;
+    reply.restartNeeded = false;
     result.setReply(reply);
     return CODE_OK;
 }
@@ -94,7 +96,7 @@ int QnConfigureRestHandler::changeAdminPassword(const QString &password, const Q
     if (password.isEmpty() && (passwordHash.isEmpty() || passwordDigest.isEmpty()))
         return ResultSkip;
 
-    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::user)) {
+    for (const QnResourcePtr &resource: qnResPool->getResourcesWithFlag(Qn::user)) {
         QnUserResourcePtr user = resource.staticCast<QnUserResource>();
         if (user->getName() != lit("admin"))
             continue;
@@ -132,9 +134,18 @@ int QnConfigureRestHandler::changePort(int port) {
     if (!server)
         return ResultFail;
 
-    MSSettings::roSettings()->setValue(nx_ms_conf::SERVER_PORT, port);
+    {
+        QAbstractSocket socket(QAbstractSocket::TcpSocket, 0);
+        QAbstractSocket::BindMode bindMode = QAbstractSocket::DontShareAddress;
+#ifndef Q_OS_WIN
+        bindMode |= QAbstractSocket::ReuseAddressHint;
+#endif
+        if (!socket.bind(port, bindMode))
+            return ResultFail;
+    }
+    ::changePort(port);
 
-    //TODO: update port in TCP listener
+    MSSettings::roSettings()->setValue(nx_ms_conf::SERVER_PORT, port);
 
     return ResultOk;
 }

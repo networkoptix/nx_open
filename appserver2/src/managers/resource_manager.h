@@ -42,7 +42,7 @@ namespace ec2
         }
 
         void triggerNotification( const QnTransaction<ApiResourceParamWithRefDataList>& tran ) {
-            foreach(const ec2::ApiResourceParamWithRefData& param, tran.params)
+            for(const ec2::ApiResourceParamWithRefData& param: tran.params)
                 emit resourceParamChanged(param);
         }
 
@@ -51,7 +51,7 @@ namespace ec2
         }
 
         void triggerNotification( const QnTransaction<ApiIdDataList>& tran ) {
-            foreach(const ApiIdData& id, tran.params)
+            for(const ApiIdData& id: tran.params)
                 emit resourceRemoved( id.id );
         }
 

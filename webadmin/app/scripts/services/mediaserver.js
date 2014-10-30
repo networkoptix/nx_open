@@ -15,18 +15,22 @@ angular.module('webadminApp')
                     }
                     return cacheModuleInfo;
                 }
-                return $http.get(url + '/api/moduleInformation');
+                return $http.get(url + '/api/moduleInformation',{
+                    timeout: 3*1000
+                });
             },
             saveSettings: function(systemName,port) { return $http.post('/api/configure?systemName=' + systemName + '&port=' + port); },
-            changePassword: function(password,oldPassword) { return $http.post('/api/configure?password=' + password  + '&oldPassword=' + oldPassword); },
+            changePassword: function(password,oldPassword) {
+                return $http.post('/api/configure?password=' + password  + '&oldPassword=' + oldPassword);
+            },
             mergeSystems: function(url,password,keepMySystem){return $http.post('/api/mergeSystems?password=' + password  + '&url=' + encodeURIComponent(url) + "&takeRemoteSettings=" + (!keepMySystem)); },
             pingSystem: function(url,password){return $http.post('/api/pingSystem?password=' + password  + '&url=' + encodeURIComponent(url)); },
             restart: function() { return $http.post('/api/restart'); },
             getStorages: function(){ return $http.get('/api/storageSpace'); },
+            saveStorages:function(info){return $http.post('/ec2/saveStorages',info); },
             discoveredPeers:function(){return $http.get('/api/discoveredPeers'); },
             getMediaServer: function(id){return $http.get('/ec2/getMediaServersEx?id=' + id); },
             getMediaServers: function(){return $http.get('/ec2/getMediaServersEx'); },
-            saveStorages:function(info){return $http.post('/ec2/saveStorages',info); },
             saveMediaServer: function(info){return $http.post('/ec2/saveMediaServer',info); },
             statistics:function(url){
                 url = url || "";

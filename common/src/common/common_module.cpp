@@ -39,6 +39,21 @@ QnCommonModule::~QnCommonModule() {
     return;
 }
 
+void QnCommonModule::setRemoteGUID(const QnUuid &guid) {
+    {
+        QMutexLocker lock(&m_mutex);
+        if (m_remoteUuid == guid)
+            return;
+        m_remoteUuid = guid;
+    }
+    emit remoteIdChanged(guid);
+}
+
+QnUuid QnCommonModule::remoteGUID() const {
+    QMutexLocker lock(&m_mutex);
+    return m_remoteUuid;
+}
+
 void QnCommonModule::setLocalSystemName(const QString &value) {
     if (m_localSystemName == value)
         return;
@@ -85,21 +100,22 @@ QnModuleInformation QnCommonModule::moduleInformation() const
         const QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
         if (server) {
             QSet<QString> ignoredHosts;
-            foreach (const QUrl &url, server->getIgnoredUrls())
+            for (const QUrl &url: server->getIgnoredUrls())
                 ignoredHosts.insert(url.host());
 
-            foreach(const QHostAddress &address, server->getNetAddrList()) {
+            for(const QHostAddress &address: server->getNetAddrList()) {
                 QString addressString = address.toString();
                 if (!ignoredHosts.contains(addressString))
                     moduleInformationCopy.remoteAddresses.insert(addressString);
             }
-            foreach(const QUrl &url, server->getAdditionalUrls()) {
+            for(const QUrl &url: server->getAdditionalUrls()) {
                 if (!ignoredHosts.contains(url.host()))
                     moduleInformationCopy.remoteAddresses.insert(url.host());
             }
+            moduleInformationCopy.port = server->getPort();
         }
 
-        foreach (const QnUserResourcePtr &user, qnResPool->getResourcesWithFlag(Qn::user).filtered<QnUserResource>()) {
+        for (const QnUserResourcePtr &user: qnResPool->getResourcesWithFlag(Qn::user).filtered<QnUserResource>()) {
             if (user->getName() == lit("admin")) {
                 QCryptographicHash md5(QCryptographicHash::Md5);
                 md5.addData(user->getHash());

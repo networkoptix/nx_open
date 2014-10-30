@@ -163,8 +163,8 @@ void QnGraphicsMessageBox::hideImmideately() {
         animator->pause();
     animator->setDurationOverride(-1);
     animator->setSpeed(6.0);
-    connect(animator, SIGNAL(finished()), this, SIGNAL(finished()));
-    connect(animator, SIGNAL(finished()), this, SLOT(deleteLater()));
+    connect(animator, &VariantAnimator::finished, this, &QnGraphicsMessageBox::finished);
+    connect(animator, &VariantAnimator::finished, this, &QObject::deleteLater);
     animator->animateTo(0.0);
 }
 

@@ -49,7 +49,7 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(const QnResourcePtr& res):
 
     QnSecurityCamResourcePtr camRes = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
     if (camRes)
-        connect(this, &QnMulticodecRtpReader::networkIssue, camRes.data(), &QnSecurityCamResource::networkIssue);
+        connect(this, &QnMulticodecRtpReader::networkIssue, camRes.data(), &QnSecurityCamResource::networkIssue, Qt::DirectConnection);
     connect(res.data(), SIGNAL(propertyChanged(const QnResourcePtr &, const QString &)),          this, SLOT(at_propertyChanged(const QnResourcePtr &, const QString &)));
 }
 
@@ -236,7 +236,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         }
 
         if (m_rtcpReportTimer.elapsed() >= RTCP_REPORT_TIMEOUT) {
-            foreach(const TrackInfo& track, m_tracks) {
+            for(const TrackInfo& track: m_tracks) {
                 if (track.ioDevice)
                     buildClientRTCPReport(track.ioDevice->getRtcpTrackNum());
             }
@@ -273,7 +273,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
         }
 
         int nfds = 0;
-        foreach(const TrackInfo& track, m_tracks) {
+        for(const TrackInfo& track: m_tracks) {
             if(track.ioDevice) {
                 mediaSockPollArray[nfds].fd = track.ioDevice->getMediaSocket()->handle();
                 mediaSockPollArray[nfds++].events = POLLIN;
