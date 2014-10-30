@@ -175,7 +175,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     connect(m_dwm,                          SIGNAL(compositionChanged()),                   this,                                   SLOT(updateDwmState()));
 
     /* Set up properties. */
-    setWindowTitle(QApplication::applicationName());
+    setWindowTitle(QApplication::applicationDisplayName());
     setAcceptDrops(true);
 
     if (!qnSettings->isVideoWallMode()) {

@@ -24,6 +24,7 @@
         <appserver.name>Enterprise Controller</appserver.name>
         <appserver2.name>${company.name} New Enterprise Controller</appserver2.name>
         <client.name>${company.name} ${product.name} Client</client.name>
+        <client.display.name>${company.name} ${display.product.name} Client</client.display.name>
         <client.mediafolder.name>${product.name} Media</client.mediafolder.name>
         <applauncher.name>${company.name} Launcher</applauncher.name>
         <axiscamplugin.name>${company.name} AXIS camera integration plugin</axiscamplugin.name>
@@ -32,6 +33,7 @@
         <mediaproxy.name>${company.name} Media Proxy</mediaproxy.name>
         <testcamera.name>${company.name} Test Camera</testcamera.name>
         <traytool.name>${product.name} Tray Assistant</traytool.name>
+        <traytool.display.name>${display.product.name} Tray Assistant</traytool.display.name>
         <vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
         <license.environment>production</license.environment>
         <build.configuration>release</build.configuration>
