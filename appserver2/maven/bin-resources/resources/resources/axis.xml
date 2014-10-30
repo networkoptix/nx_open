@@ -1,0 +1,7 @@
+    <resource name = "AXISP7216" public = "AXIS_ENCODER">
+        <params>
+            <param name = "channelsAmount"
+             default_value = "16"/>
+
+        </params>
+    </resource>
