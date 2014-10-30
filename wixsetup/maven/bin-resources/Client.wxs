@@ -66,7 +66,7 @@
                     <Directory Id="$(var.customization)VoxDir" Name="vox"/>                                
 
                     <Component Id="ClientExecutable">
-                        <File Id="client.exe" Name="${display.product.name}.exe" Source="$(var.SourceDir)/${client_name}" KeyPath="yes">
+                        <File Id="client.exe" Name="${product.name}.exe" Source="$(var.SourceDir)/${client_name}" KeyPath="yes">
                             <fire:FirewallException Id="FirewallExceptionClient" Name="$(var.productName)" Scope="any" IgnoreFailure="yes"/>
                         </File>
                     </Component>                                
