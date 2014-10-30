@@ -35,10 +35,10 @@ static bool GetProgramName( char* buffer ) {
 static
 void writeMiniDump( PEXCEPTION_POINTERS ex ) {
     char sFileName[1024];
-    char sModuleName[1024];
+    char sProgramName[1024];
     char sAppData[MAX_PATH];
 
-    if( !GetProgramName(sModuleName) )
+    if( !GetProgramName(sProgramName) )
         return;
 
     if( FAILED(SHGetFolderPathA(
@@ -51,7 +51,7 @@ void writeMiniDump( PEXCEPTION_POINTERS ex ) {
 
     // it should not acquire any global lock internally. Otherwise
     // we may deadlock here. 
-    int ret = sprintf(sFileName,"%s\\%s_%d.dmp", sAppData , sModuleName, ::GetCurrentProcessId());
+    int ret = sprintf(sFileName,"%s\\%s_%d.dmp", sAppData , sProgramName, ::GetCurrentProcessId());
 
     if( ret <0 )
         return;
