@@ -363,6 +363,21 @@ QImage CLVideoDecoderOutput::toImage() const
     return img;
 }
 
+CLVideoDecoderOutput* CLVideoDecoderOutput::scaled(const QSize& newSize)
+{
+    CLVideoDecoderOutput* dst(new CLVideoDecoderOutput);
+    dst->reallocate(newSize.width(), newSize.height(), format);
+
+    SwsContext* scaleContext = sws_getContext(
+        width, height, (PixelFormat) format, 
+        newSize.width(), newSize.height(), (PixelFormat) format, 
+        SWS_BICUBIC, NULL, NULL, NULL);
+    
+    sws_scale(scaleContext, data, linesize, 0, height, dst->data, dst->linesize);
+    sws_freeContext(scaleContext);
+    return dst;
+}
+
 CLVideoDecoderOutput* CLVideoDecoderOutput::rotated(int angle)
 {
     if (angle > 180)

@@ -147,10 +147,16 @@ QnFisheyeImageFilter::QnFisheyeImageFilter(const QnMediaDewarpingParams& mediaDe
     memset (m_transform, 0, sizeof(m_transform));
 }
 
-CLVideoDecoderOutputPtr QnFisheyeImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame, const QRectF& updateRect, qreal ar)
+CLVideoDecoderOutputPtr QnFisheyeImageFilter::updateImage(const CLVideoDecoderOutputPtr& srcFrame, const QRectF& updateRect, qreal ar)
 {
     if (!m_itemDewarping.enabled || !m_mediaDewarping.enabled)
-        return frame;
+        return srcFrame;
+
+    CLVideoDecoderOutputPtr frame;
+    if (m_itemDewarping.panoFactor > 1)
+        frame = CLVideoDecoderOutputPtr(srcFrame->scaled(updatedResolution(srcFrame->size())));
+    else
+        frame = srcFrame;
 
     int left = qPower2Floor(updateRect.left() * frame->width, 16);
     int right = qPower2Floor(updateRect.right() * frame->width, 16);

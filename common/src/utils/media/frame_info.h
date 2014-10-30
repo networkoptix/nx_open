@@ -177,6 +177,10 @@ public:
 
     void copyDataFrom(const AVFrame* frame);
     CLVideoDecoderOutput* rotated(int angle);
+    /** Scale frame to new size */
+    CLVideoDecoderOutput* scaled(const QSize& newSize);
+
+    QSize size() const { return QSize(width, height); }
 public:
     QnAbstractMediaData::MediaFlags flags;
 
