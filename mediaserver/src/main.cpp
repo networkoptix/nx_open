@@ -830,13 +830,6 @@ void QnMain::stopObjects()
         delete m_universalTcpListener;
         m_universalTcpListener = 0;
     }
-
-    if (m_moduleFinder)
-    {
-        m_moduleFinder->stop();
-        delete m_moduleFinder;
-        m_moduleFinder = 0;
-    }
 }
 
 void QnMain::updateDisabledVendorsIfNeeded()
@@ -1611,6 +1604,7 @@ void QnMain::run()
     qnCommon->setModuleInformation(selfInformation);
 
     m_moduleFinder = new QnModuleFinder( false );
+    std::unique_ptr<QnModuleFinder> moduleFinderScopedPointer( m_moduleFinder );
     if (cmdLineArguments.devModeKey == lit("razrazraz")) {
         m_moduleFinder->setCompatibilityMode(true);
         ec2ConnectionFactory->setCompatibilityMode(true);

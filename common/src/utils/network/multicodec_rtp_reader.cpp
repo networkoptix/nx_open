@@ -72,7 +72,7 @@ void QnMulticodecRtpReader::clearKeyData(int channelNum)
 
 bool QnMulticodecRtpReader::gotKeyData(const QnAbstractMediaDataPtr& mediaData)
 {
-    if (m_gotKeyDataInfo.size() <= mediaData->channelNumber)
+    if ((unsigned int)m_gotKeyDataInfo.size() <= mediaData->channelNumber)
         m_gotKeyDataInfo.resize(mediaData->channelNumber + 1);
     if (mediaData->dataType == QnAbstractMediaData::VIDEO)
     {

@@ -173,25 +173,25 @@ namespace {
     // must since OpenSSL configured with thread support will give default version. Additionally, the
     // dynamic lock interface is not used in current OpenSSL version. So we don't use it.
 
-    static std::mutex* kOpenSSLGlobalLock;
+    static std::unique_ptr<std::mutex[]> kOpenSSLGlobalLock;
 
     void OpenSSLGlobalLock( int mode , int type , const char* file , int line ) {
         Q_UNUSED(file);
         Q_UNUSED(line);
-        Q_ASSERT( kOpenSSLGlobalLock != NULL );
+        Q_ASSERT( kOpenSSLGlobalLock.get() != nullptr );
         if( mode & CRYPTO_LOCK ) {
-            kOpenSSLGlobalLock[type].lock();
+            kOpenSSLGlobalLock.get()[type].lock();
         } else {
-            kOpenSSLGlobalLock[type].unlock();
+            kOpenSSLGlobalLock.get()[type].unlock();
         }
     }
 
     static std::once_flag kOpenSSLGlobalLockFlag;
 
     void OpenSSLInitGlobalLock() {
-        Q_ASSERT(kOpenSSLGlobalLock == NULL);
+        Q_ASSERT(kOpenSSLGlobalLock.get() == nullptr);
         // not safe here, new can throw exception 
-        kOpenSSLGlobalLock = new std::mutex[CRYPTO_num_locks()];
+        kOpenSSLGlobalLock.reset( new std::mutex[CRYPTO_num_locks()] );
     }
 
     void InitOpenSSLGlobalLock() {
@@ -382,7 +382,7 @@ namespace {
     private: // MISC
 
         bool IsBIOInBufferEmpty() {
-            return bio_in_buffer_pos_ != bio_in_buffer_.size();
+            return bio_in_buffer_pos_ != (size_t)bio_in_buffer_.size();
         }
 
         int DrainSSLBufferComponent( nx::Buffer* buffer , int bit_pos );
@@ -530,7 +530,7 @@ namespace {
                 std::min( size , static_cast<std::size_t>( bio_in_buffer_.size() - bio_in_buffer_pos_ ));
             memcpy(data, bio_in_buffer_.constData()+bio_in_buffer_pos_, digest_size);
             bio_in_buffer_pos_ += digest_size;
-            if( bio_in_buffer_pos_ == bio_in_buffer_.size() ) {
+            if( bio_in_buffer_pos_ == (size_t)bio_in_buffer_.size() ) {
                 bio_in_buffer_pos_ = 0;
                 bio_in_buffer_.clear();
             }
