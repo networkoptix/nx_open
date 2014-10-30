@@ -5,6 +5,7 @@
 
 #include "core/datapacket/video_data_packet.h"
 #include "decoders/video/ffmpeg.h"
+#include "filters/abstract_image_filter.h"
 
 extern "C" {
 #ifdef WIN32
@@ -259,13 +260,15 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
             decodedFrame = m_decodedFrameRect;
         }
 
-        if (decodedFrame->width != m_resolution.width() || decodedFrame->height != m_resolution.height() || decodedFrame->format != PIX_FMT_YUV420P) {
-            rescaleFrame(decodedFrame, dstRectF, video->channelNumber);
-            decodedFrame = m_scaledVideoFrame;
-        }
         decodedFrame->pts = m_decodedVideoFrame->pkt_dts;
         qreal ar = decoder->getWidth() * (qreal) decoder->getSampleAspectRatio() / (qreal) decoder->getHeight();
         decodedFrame = processFilterChain(decodedFrame, dstRectF, ar);
+
+        if (decodedFrame->width != m_resolution.width() || decodedFrame->height != m_resolution.height() || decodedFrame->format != PIX_FMT_YUV420P) 
+        {
+            rescaleFrame(decodedFrame, dstRectF, video->channelNumber);
+            decodedFrame = m_scaledVideoFrame;
+        }
 
         static AVRational r = {1, 1000000};
         decodedFrame->pts  = av_rescale_q(m_decodedVideoFrame->pkt_dts, r, m_encoderCtx->time_base);
@@ -311,6 +314,8 @@ void QnFfmpegVideoTranscoder::addFilter(QnAbstractImageFilter* filter)
 {
     QnVideoTranscoder::addFilter(filter);
     m_decodedVideoFrame->setUseExternalData(false); // do not modify ffmpeg frame buffer
+
+    setResolution(filter->updatedResolution(getResolution()));
 }
 
 #endif // ENABLE_DATA_PROVIDERS

@@ -14,8 +14,7 @@ public:
 
     virtual CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame, const QRectF& updateRect, qreal ar) override;
 
-    static QSize getOptimalSize(const QSize& srcResolution);
-
+    virtual QSize updatedResolution(const QSize& srcSize) override;
 private:
     int m_angle;
 };

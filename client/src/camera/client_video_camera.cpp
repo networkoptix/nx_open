@@ -178,6 +178,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
         m_exportRecorder->setSrcRect(srcRect);
         m_exportRecorder->setContrastParams(contrastParams);
         m_exportRecorder->setItemDewarpingParams(itemDewarpingParams);
+        m_exportRecorder->setRotation(90);
         connect(m_exportRecorder,   &QnStreamRecorder::recordingFinished, this,   &QnClientVideoCamera::stopExport);
         connect(m_exportRecorder,   &QnStreamRecorder::recordingProgress, this,   &QnClientVideoCamera::exportProgress);
         connect(m_exportRecorder,   &QnStreamRecorder::recordingFinished, this,   &QnClientVideoCamera::exportFinished);

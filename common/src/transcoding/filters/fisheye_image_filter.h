@@ -18,7 +18,7 @@ public:
     virtual CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame, const QRectF& updateRect, qreal ar) override;
 
     static QSize getOptimalSize(const QSize& srcResolution, const QnItemDewarpingParams& itemDewarpingParams);
-
+    virtual QSize updatedResolution(const QSize& srcSize) override;
 private:
     void updateFisheyeTransform(const QSize& imageSize, int plane, qreal ar);
     void updateFisheyeTransformRectilinear(const QSize& imageSize, int plane, qreal ar);

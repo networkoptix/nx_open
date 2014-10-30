@@ -85,7 +85,7 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     m_truncateIntervalEps(0),
     m_recordingFinished(false),
     m_role(Role_ServerRecording),
-    m_rotAngle(90)
+    m_rotAngle(0)
 {
     srand(QDateTime::currentMSecsSinceEpoch());
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
@@ -570,16 +570,11 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
                 m_videoTranscoder = new QnFfmpegVideoTranscoder(m_dstVideoCodec);
                 m_videoTranscoder->setMTMode(true);
 
-                if (m_itemDewarpingParams.enabled) {
+                QSize updatedDstSize(m_videoTranscoder->getResolution());
+                m_videoTranscoder->open(mediaData);
+
+                if (m_itemDewarpingParams.enabled)
                     m_videoTranscoder->addFilter(new QnFisheyeImageFilter(mediaDev->getDewarpingParams(), m_itemDewarpingParams));
-                    if (m_itemDewarpingParams.panoFactor > 1)
-                    {
-                        // update image aspect, keep megapixels amount unchanged
-                        m_videoTranscoder->open(mediaData);
-                        QSize res = QnFisheyeImageFilter::getOptimalSize(m_videoTranscoder->getResolution(), m_itemDewarpingParams);
-                        m_videoTranscoder->setResolution(res);
-                    }
-                }
                 if (m_contrastParams.enabled)
                     m_videoTranscoder->addFilter(new QnContrastImageFilter(m_contrastParams));
                 if (m_rotAngle)
@@ -592,7 +587,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
                 if (!m_srcRect.isEmpty() && !m_itemDewarpingParams.enabled)
                     m_videoTranscoder->setSrcRect(m_srcRect);
                 m_videoTranscoder->setVideoLayout(layout);
-                m_videoTranscoder->open(mediaData);
+                m_videoTranscoder->open(mediaData); // reopen again for new size
 
                 avcodec_copy_context(videoStream->codec, m_videoTranscoder->getCodecContext());
             }

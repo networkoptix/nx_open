@@ -13,4 +13,12 @@ CLVideoDecoderOutputPtr QnRotateImageFilter::updateImage(const CLVideoDecoderOut
     return CLVideoDecoderOutputPtr(frame->rotated(m_angle));
 }
 
+QSize QnRotateImageFilter::updatedResolution(const QSize& srcSize)
+{
+    QSize dstSize(srcSize);
+    if (m_angle == 90 || m_angle == 270)
+        dstSize.transpose();
+    return dstSize;
+}
+
 #endif // ENABLE_DATA_PROVIDERS

@@ -420,4 +420,9 @@ QSize QnFisheyeImageFilter::getOptimalSize(const QSize& srcResolution, const QnI
     return QSize(qPower2Floor(x, 16), qPower2Floor(y, 2));
 }
 
+QSize QnFisheyeImageFilter::updatedResolution(const QSize& srcSize)
+{
+    return getOptimalSize(srcSize, m_itemDewarping);
+}
+
 #endif // ENABLE_DATA_PROVIDERS

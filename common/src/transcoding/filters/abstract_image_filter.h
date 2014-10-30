@@ -26,6 +26,7 @@ public:
      * \param ar    image aspect ratio.
      */
     virtual CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame, const QRectF& updateRect, qreal ar) = 0;
+    virtual QSize updatedResolution(const QSize& srcSize) { return srcSize; }
 };
 
 #endif // ENABLE_DATA_PROVIDERS
