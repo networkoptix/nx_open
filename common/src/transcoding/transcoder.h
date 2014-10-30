@@ -113,7 +113,7 @@ protected:
     static const int WIDTH_ALIGN = 32;
     static const int HEIGHT_ALIGN = 2;
         
-    void processFilterChain(CLVideoDecoderOutput* decodedFrame, const QRectF& updateRect, qreal ar);
+    QSharedPointer<CLVideoDecoderOutput> processFilterChain(const QSharedPointer<CLVideoDecoderOutput>& decodedFrame, const QRectF& updateRect, qreal ar);
 
 protected:
     QSize m_resolution;

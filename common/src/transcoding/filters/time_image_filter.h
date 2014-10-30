@@ -12,10 +12,10 @@ class QnTimeImageFilter: public QnAbstractImageFilter
 public:
     QnTimeImageFilter(Qn::Corner datePos, qint64 timeOffsetMs);
     virtual ~QnTimeImageFilter();
-    virtual void updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect, qreal ar) override;
+    CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame, const QRectF& updateRect, qreal ar) override;
 
 private:
-    void initTimeDrawing(CLVideoDecoderOutput* frame, const QString& timeStr);
+    void initTimeDrawing(const CLVideoDecoderOutputPtr& frame, const QString& timeStr);
 
 private:
     QFont m_timeFont;

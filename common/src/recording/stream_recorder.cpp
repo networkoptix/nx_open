@@ -23,6 +23,7 @@
 #include "transcoding/filters/contrast_image_filter.h"
 #include "transcoding/filters/time_image_filter.h"
 #include "transcoding/filters/fisheye_image_filter.h"
+#include "transcoding/filters/rotate_image_filter.h"
 
 #include "decoders/video/ffmpeg.h"
 #include "export/sign_helper.h"
@@ -83,7 +84,8 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     m_nextIFrameTime(AV_NOPTS_VALUE),
     m_truncateIntervalEps(0),
     m_recordingFinished(false),
-    m_role(Role_ServerRecording)
+    m_role(Role_ServerRecording),
+    m_rotAngle(90)
 {
     srand(QDateTime::currentMSecsSinceEpoch());
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
@@ -499,7 +501,8 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
         (m_dstVideoCodec != CODEC_ID_NONE && m_dstVideoCodec != mediaData->compressionType) || 
         !m_srcRect.isEmpty() ||
         m_contrastParams.enabled ||
-        m_itemDewarpingParams.enabled;
+        m_itemDewarpingParams.enabled ||
+        m_rotAngle;
 
     const QnConstResourceVideoLayoutPtr& layout = mediaDev->getVideoLayout(m_mediaProvider);
     QString layoutStr = QnArchiveStreamReader::serializeLayout(layout.data());
@@ -579,6 +582,9 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
                 }
                 if (m_contrastParams.enabled)
                     m_videoTranscoder->addFilter(new QnContrastImageFilter(m_contrastParams));
+                if (m_rotAngle)
+                    m_videoTranscoder->addFilter(new QnRotateImageFilter(m_rotAngle));
+
                 if (m_timestampCorner != Qn::NoCorner) 
                     m_videoTranscoder->addFilter(new QnTimeImageFilter(m_timestampCorner, m_onscreenDateOffset));
 
@@ -887,6 +893,11 @@ void QnStreamRecorder::setContrastParams(const ImageCorrectionParams& params)
 void QnStreamRecorder::setItemDewarpingParams(const QnItemDewarpingParams& params)
 {
     m_itemDewarpingParams = params;
+}
+
+void QnStreamRecorder::setRotation(int angle)
+{
+    m_rotAngle = angle;
 }
 
 void QnStreamRecorder::disconnectFromResource()

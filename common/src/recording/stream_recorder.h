@@ -119,6 +119,8 @@ public:
 
     void setItemDewarpingParams(const QnItemDewarpingParams& params);
 
+    void setRotation(int angle);
+
     /*
     * Server time zone. Used for export to avi/mkv files
     */
@@ -215,6 +217,7 @@ private:
     /** If true method close() will emit signal recordingFinished() at the end. */
     bool m_recordingFinished;
     Role m_role;
+    int m_rotAngle;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

@@ -25,14 +25,14 @@ static const __m128i  sse_0000_intrs  = _mm_setr_epi32(0x00000000, 0x00000000, 0
     //TODO: C fallback routine
 #endif
 
-void QnContrastImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect, qreal ar)
+CLVideoDecoderOutputPtr QnContrastImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame, const QRectF& updateRect, qreal ar)
 {
     static const float GAMMA_EPS = 0.01f;
 
     if (!m_params.enabled)
-        return;
-    if (!isFormatSupported(frame))
-        return;
+        return frame;
+    if (!isFormatSupported(frame.data()))
+        return frame;
 
     m_gamma.analyseImage(frame->data[0], frame->width, frame->height, frame->linesize[0], m_params, updateRect);
 
@@ -127,6 +127,7 @@ void QnContrastImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRect
 #else
     //TODO: C fallback routine
 #endif
+    return frame;
 }
 
 #endif // ENABLE_DATA_PROVIDERS

@@ -362,3 +362,72 @@ QImage CLVideoDecoderOutput::toImage() const
     
     return img;
 }
+
+CLVideoDecoderOutput* CLVideoDecoderOutput::rotated(int angle)
+{
+    if (angle > 180)
+        angle = 270;
+    else if (angle > 90)
+        angle = 180;
+    else
+        angle = 90;
+
+    int dstWidth = width;
+    int dstHeight = height;
+    if (angle != 180)
+        qSwap(dstWidth, dstHeight);
+
+    CLVideoDecoderOutput* dstPict(new CLVideoDecoderOutput());
+    dstPict->reallocate(dstWidth, dstHeight, format);
+
+
+    const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[format];
+    for (int i = 0; i < descr->nb_components && data[i]; ++i) 
+    {
+        int filler = (i == 0 ? 0x0 : 0x80);
+        int numButes = dstPict->linesize[i] * dstHeight;
+        if (i > 0)
+            numButes >>= descr->log2_chroma_h;
+        memset(dstPict->data[i], filler, numButes);
+
+        int w = width;
+        int h = height;
+        if (i > 0) {
+            w >>= descr->log2_chroma_w;
+            h >>= descr->log2_chroma_h;
+        }
+
+        if (angle == 90) 
+        {
+            for (int y = 0; y < h; ++y) {
+                quint8* src = data[i] + linesize[i] * y;
+                quint8* dst = dstPict->data[i] + h -1 - y;
+                for (int x = 0; x < w; ++x) {
+                    *dst = *src++;
+                    dst += dstPict->linesize[i];
+                }
+            }
+        }
+        else if (angle == 180) 
+        {
+            for (int y = 0; y < h; ++y) {
+                quint8* src = data[i] + linesize[i] * y;
+                quint8* dst = dstPict->data[i] + dstPict->linesize[i] * (h-1 - y) + w-1;
+                for (int x = 0; x < w; ++x) {
+                    *dst-- = *src++;
+                }
+            }
+        }
+        else {
+            for (int y = 0; y < h; ++y) {
+                quint8* src = data[i] + linesize[i] * y;
+                quint8* dst = dstPict->data[i] + dstPict->linesize[i] * (w - 1) + y;
+                for (int x = 0; x < w; ++x) {
+                    *dst = *src++;
+                    dst -= dstPict->linesize[i];
+                }
+            }
+        }
+    }
+    return dstPict;
+}

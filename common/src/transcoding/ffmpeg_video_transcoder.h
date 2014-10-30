@@ -31,12 +31,12 @@ public:
     void setMTMode(bool value);
     virtual void addFilter(QnAbstractImageFilter* filter) override;
 private:
-    int rescaleFrame(CLVideoDecoderOutput* decodedFrame, const QRectF& dstRectF, int ch);
+    int rescaleFrame(const CLVideoDecoderOutputPtr& decodedFrame, const QRectF& dstRectF, int ch);
 private:
     QVector<CLFFmpegVideoDecoder*> m_videoDecoders;
-    QSharedPointer<CLVideoDecoderOutput> m_decodedVideoFrame;
-    CLVideoDecoderOutput m_scaledVideoFrame;
-    CLVideoDecoderOutput m_decodedFrameRect;
+    CLVideoDecoderOutputPtr m_decodedVideoFrame;
+    CLVideoDecoderOutputPtr m_scaledVideoFrame;
+    CLVideoDecoderOutputPtr m_decodedFrameRect;
 
     
 

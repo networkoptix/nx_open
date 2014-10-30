@@ -21,6 +21,8 @@ const static int MAX_VIDEO_FRAME = 1024 * 1024 * 3;
 QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
     QnVideoTranscoder(codecId),
     m_decodedVideoFrame(new CLVideoDecoderOutput()),
+    m_scaledVideoFrame(new CLVideoDecoderOutput()),
+    m_decodedFrameRect(new CLVideoDecoderOutput()),
     m_encoderCtx(0),
     m_firstEncodedPts(AV_NOPTS_VALUE),
     m_mtMode(false)
@@ -34,7 +36,7 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
 
     m_videoEncodingBuffer = (quint8*) qMallocAligned(MAX_VIDEO_FRAME, 32);
     m_decodedVideoFrame->setUseExternalData(true);
-    m_decodedFrameRect.setUseExternalData(true);
+    m_decodedFrameRect->setUseExternalData(true);
 }
 
 QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
@@ -61,17 +63,17 @@ void QnFfmpegVideoTranscoder::close()
     m_videoDecoders.clear();
 }
 
-int QnFfmpegVideoTranscoder::rescaleFrame(CLVideoDecoderOutput* decodedFrame, const QRectF& dstRectF, int ch)
+int QnFfmpegVideoTranscoder::rescaleFrame(const CLVideoDecoderOutputPtr& decodedFrame, const QRectF& dstRectF, int ch)
 {
-    if (m_scaledVideoFrame.width == 0) {
-        m_scaledVideoFrame.reallocate(m_resolution.width(), m_resolution.height(), PIX_FMT_YUV420P);
-        m_scaledVideoFrame.memZerro();
+    if (m_scaledVideoFrame->width == 0) {
+        m_scaledVideoFrame->reallocate(m_resolution.width(), m_resolution.height(), PIX_FMT_YUV420P);
+        m_scaledVideoFrame->memZerro();
     }
 
     QRect dstRect(0,0, m_resolution.width(), m_resolution.height());
     quint8* dstData[4];
     for (int i = 0; i < 4; ++i)
-        dstData[i] = m_scaledVideoFrame.data[i];
+        dstData[i] = m_scaledVideoFrame->data[i];
 
     if (m_layout)
     {
@@ -84,7 +86,7 @@ int QnFfmpegVideoTranscoder::rescaleFrame(CLVideoDecoderOutput* decodedFrame, co
             int w = dstRect.left();
             if (i > 0)
                 w >>= 1;
-            dstData[i] += w + dstRect.top() * m_scaledVideoFrame.linesize[i];
+            dstData[i] += w + dstRect.top() * m_scaledVideoFrame->linesize[i];
         }
     }
 
@@ -112,7 +114,7 @@ int QnFfmpegVideoTranscoder::rescaleFrame(CLVideoDecoderOutput* decodedFrame, co
     sws_scale(scaleContext[ch],
         decodedFrame->data, decodedFrame->linesize, 
         0, decodedFrame->height, 
-        dstData, m_scaledVideoFrame.linesize);
+        dstData, m_scaledVideoFrame->linesize);
     return 0;
 }
 
@@ -235,7 +237,7 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
                             1.0 / lSize.width(), 1.0 / lSize.height());
             }
         }
-        CLVideoDecoderOutput* decodedFrame = m_decodedVideoFrame.data();
+        CLVideoDecoderOutputPtr decodedFrame = m_decodedVideoFrame;
 
         if (!frameRect.isEmpty()) 
         {
@@ -248,22 +250,22 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
                     w >>= descr->log2_chroma_w;
                     h >>= descr->log2_chroma_h;
                 }
-                m_decodedFrameRect.data[i] = decodedFrame->data[i] + w + h * decodedFrame->linesize[i];
-                m_decodedFrameRect.linesize[i] = decodedFrame->linesize[i];
+                m_decodedFrameRect->data[i] = decodedFrame->data[i] + w + h * decodedFrame->linesize[i];
+                m_decodedFrameRect->linesize[i] = decodedFrame->linesize[i];
             }
-            m_decodedFrameRect.format = decodedFrame->format;
-            m_decodedFrameRect.width = frameRect.width();
-            m_decodedFrameRect.height = frameRect.height();
-            decodedFrame = &m_decodedFrameRect;
+            m_decodedFrameRect->format = decodedFrame->format;
+            m_decodedFrameRect->width = frameRect.width();
+            m_decodedFrameRect->height = frameRect.height();
+            decodedFrame = m_decodedFrameRect;
         }
 
         if (decodedFrame->width != m_resolution.width() || decodedFrame->height != m_resolution.height() || decodedFrame->format != PIX_FMT_YUV420P) {
             rescaleFrame(decodedFrame, dstRectF, video->channelNumber);
-            decodedFrame = &m_scaledVideoFrame;
+            decodedFrame = m_scaledVideoFrame;
         }
         decodedFrame->pts = m_decodedVideoFrame->pkt_dts;
         qreal ar = decoder->getWidth() * (qreal) decoder->getSampleAspectRatio() / (qreal) decoder->getHeight();
-        processFilterChain(decodedFrame, dstRectF, ar);
+        decodedFrame = processFilterChain(decodedFrame, dstRectF, ar);
 
         static AVRational r = {1, 1000000};
         decodedFrame->pts  = av_rescale_q(m_decodedVideoFrame->pkt_dts, r, m_encoderCtx->time_base);
@@ -274,7 +276,7 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
             return 0;
 
         //TODO: #vasilenko avoid using deprecated methods
-        int encoded = avcodec_encode_video(m_encoderCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, decodedFrame);
+        int encoded = avcodec_encode_video(m_encoderCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, decodedFrame.data());
 
         if (encoded < 0)
         {

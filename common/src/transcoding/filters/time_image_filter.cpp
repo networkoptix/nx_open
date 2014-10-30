@@ -36,7 +36,7 @@ QnTimeImageFilter::~QnTimeImageFilter()
     qFreeAligned(m_imageBuffer);
 }
 
-void QnTimeImageFilter::initTimeDrawing(CLVideoDecoderOutput* frame, const QString& timeStr)
+void QnTimeImageFilter::initTimeDrawing(const CLVideoDecoderOutputPtr& frame, const QString& timeStr)
 {
     m_timeFont.setBold(true);
     m_timeFont.setPixelSize(qMax(MIN_TEXT_HEIGHT, frame->height / TEXT_HEIGHT_IN_FRAME_PARTS));
@@ -77,26 +77,26 @@ void QnTimeImageFilter::initTimeDrawing(CLVideoDecoderOutput* frame, const QStri
     m_timeImg = new QImage(m_imageBuffer, drawWidth, drawHeight, drawWidth*4, QImage::Format_ARGB32_Premultiplied);
 }
 
-void QnTimeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect, qreal ar)
+CLVideoDecoderOutputPtr QnTimeImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame, const QRectF& updateRect, qreal ar)
 {
     switch(m_dateTextPos)
     {
     case Qn::TopLeftCorner:
         if (qAbs(updateRect.left()) > FPS_EPS || qAbs(updateRect.top()) > FPS_EPS)
-            return;
+            return frame;
         break;
     case Qn::TopRightCorner:
         if (qAbs(updateRect.right()-1.0) > FPS_EPS || qAbs(updateRect.top()) > FPS_EPS)
-            return;
+            return frame;
         break;
     case Qn::BottomRightCorner:
         if (qAbs(updateRect.right()-1.0) > FPS_EPS || qAbs(updateRect.bottom()-1.0) > FPS_EPS)
-            return;
+            return frame;
         break;
     case Qn::BottomLeftCorner:
     default:
         if (qAbs(updateRect.left()) > FPS_EPS || qAbs(updateRect.bottom()-1.0) > FPS_EPS)
-            return;
+            return frame;
         break;
     }
 
@@ -133,6 +133,7 @@ void QnTimeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& u
         frame->data[0]+bufPlaneYOffs, frame->data[1]+bufferUVOffs, frame->data[2]+bufferUVOffs,
         frame->linesize[0], frame->linesize[1], 
         m_timeImg->width(), m_timeImg->height(), false);
+    return frame;
 }
 
 #endif // ENABLE_DATA_PROVIDERS

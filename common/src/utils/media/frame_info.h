@@ -176,6 +176,7 @@ public:
     void memZerro();
 
     void copyDataFrom(const AVFrame* frame);
+    CLVideoDecoderOutput* rotated(int angle);
 public:
     QnAbstractMediaData::MediaFlags flags;
 
@@ -199,7 +200,7 @@ private:
     CLVideoDecoderOutput( const CLVideoDecoderOutput& );
     const CLVideoDecoderOutput& operator=( const CLVideoDecoderOutput& );
 };
-
+typedef QSharedPointer<CLVideoDecoderOutput> CLVideoDecoderOutputPtr;
 /*
 struct CLVideoDecoderOutput
 {

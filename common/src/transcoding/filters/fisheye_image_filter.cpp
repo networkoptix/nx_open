@@ -147,10 +147,10 @@ QnFisheyeImageFilter::QnFisheyeImageFilter(const QnMediaDewarpingParams& mediaDe
     memset (m_transform, 0, sizeof(m_transform));
 }
 
-void QnFisheyeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect, qreal ar)
+CLVideoDecoderOutputPtr QnFisheyeImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame, const QRectF& updateRect, qreal ar)
 {
     if (!m_itemDewarping.enabled || !m_mediaDewarping.enabled)
-        return;
+        return frame;
 
     int left = qPower2Floor(updateRect.left() * frame->width, 16);
     int right = qPower2Floor(updateRect.right() * frame->width, 16);
@@ -186,7 +186,7 @@ void QnFisheyeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF
         m_tmpBuffer->reallocate(frame->width, frame->height, frame->format);
     }
 
-    m_tmpBuffer->copyDataFrom(frame);
+    m_tmpBuffer->copyDataFrom(frame.data());
 
     for (int plane = 0; plane < descr->nb_components && frame->data[plane]; ++plane)
     {
@@ -218,6 +218,7 @@ void QnFisheyeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF
 #else
     //TODO: C fallback routine
 #endif
+    return frame;
 }
 
 QVector3D sphericalToCartesian(qreal theta, qreal phi) { // TODO: #Elric use function from coordinate_transform header

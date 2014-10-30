@@ -97,10 +97,14 @@ void QnVideoTranscoder::addFilter(QnAbstractImageFilter* filter)
     m_filters << filter;
 }
 
-void QnVideoTranscoder::processFilterChain(CLVideoDecoderOutput* decodedFrame, const QRectF& updateRect, qreal ar)
+CLVideoDecoderOutputPtr QnVideoTranscoder::processFilterChain(const CLVideoDecoderOutputPtr& decodedFrame, const QRectF& updateRect, qreal ar)
 {
+    if (m_filters.isEmpty())
+        return decodedFrame;
+    CLVideoDecoderOutputPtr result;
     for(QnAbstractImageFilter* filter: m_filters)
-        filter->updateImage(decodedFrame, updateRect, ar);
+        result = filter->updateImage(decodedFrame, updateRect, ar);
+    return result;
 }
 
 QSize QnVideoTranscoder::getResolution() const
