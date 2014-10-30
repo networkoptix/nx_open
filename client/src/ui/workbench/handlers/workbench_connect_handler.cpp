@@ -376,8 +376,8 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
         return false;
 
     QPointer<QnReconnectInfoDialog> reconnectInfoDialog(new QnReconnectInfoDialog(mainWindow()));
-    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    reconnectInfoDialog,   &QDialog::hide);
-    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    reconnectInfoDialog,   &QObject::deleteLater);
+    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    reconnectInfoDialog.data(),     &QDialog::hide);
+    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    reconnectInfoDialog.data(),     &QObject::deleteLater);
     reconnectInfoDialog->show();
 
     ec2::ErrorCode errCode = ec2::ErrorCode::ok;
