@@ -1,0 +1,24 @@
+#ifndef __TILED_IMAGE_FILTER_H__
+#define __TILED_IMAGE_FILTER_H__
+
+#ifdef ENABLE_DATA_PROVIDERS
+
+#include <QtGui/QFont>
+
+#include "abstract_image_filter.h"
+
+class QnResourceVideoLayout;
+
+class QnTiledImageFilter: public QnAbstractImageFilter
+{
+public:
+    QnTiledImageFilter(QSharedPointer<const QnResourceVideoLayout> videoLayout);
+    CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame, const QRectF& updateRect, qreal ar) override;
+    virtual QSize updatedResolution(const QSize& srcSize) override;
+private:
+    QSharedPointer<const QnResourceVideoLayout> videoLayout m_layout;
+};
+
+#endif // ENABLE_DATA_PROVIDER
+
+#endif // __TILED_IMAGE_FILTER_H__

@@ -573,6 +573,9 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
                 QSize updatedDstSize(m_videoTranscoder->getResolution());
                 m_videoTranscoder->open(mediaData);
 
+                if (!m_srcRect.isEmpty() && !m_itemDewarpingParams.enabled)
+                    m_videoTranscoder->setSrcRect(m_srcRect); // todo: add crop filter here
+
                 if (m_itemDewarpingParams.enabled)
                     m_videoTranscoder->addFilter(new QnFisheyeImageFilter(mediaDev->getDewarpingParams(), m_itemDewarpingParams));
                 if (m_contrastParams.enabled)
@@ -584,8 +587,6 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
                     m_videoTranscoder->addFilter(new QnTimeImageFilter(m_timestampCorner, m_onscreenDateOffset));
 
                 m_videoTranscoder->setQuality(Qn::QualityHighest);
-                if (!m_srcRect.isEmpty() && !m_itemDewarpingParams.enabled)
-                    m_videoTranscoder->setSrcRect(m_srcRect);
                 m_videoTranscoder->setVideoLayout(layout);
                 m_videoTranscoder->open(mediaData); // reopen again for new size
 

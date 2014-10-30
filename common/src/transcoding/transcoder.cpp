@@ -166,11 +166,6 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
     m_resolution.setWidth(qPower2Ceil((unsigned)width, WIDTH_ALIGN));
     m_resolution.setHeight(qPower2Ceil((unsigned)height, HEIGHT_ALIGN));
 
-    if (!m_srcRectF.isEmpty())
-    {
-        // round srcRect
-    }
-
     return true;
 }
 
