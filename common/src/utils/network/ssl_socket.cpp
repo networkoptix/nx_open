@@ -1374,6 +1374,7 @@ void QnSSLSocket::initSSLEngine(const QByteArray& certData)
         SSLStaticData::instance()->serverCTX->default_passwd_callback_userdata);
     SSL_CTX_use_certificate(SSLStaticData::instance()->serverCTX, x);
     SSL_CTX_use_certificate(SSLStaticData::instance()->clientCTX, x);
+    X509_free( x );
     BIO_free(bufio);
 
     bufio = BIO_new_mem_buf((void*) certData.data(), certData.size());
