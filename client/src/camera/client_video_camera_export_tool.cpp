@@ -11,6 +11,7 @@ QnClientVideoCameraExportTool::QnClientVideoCameraExportTool(
         QRectF sourceRect,
         const ImageCorrectionParams &imageCorrectionParams,
         const QnItemDewarpingParams &itemDewarpingParams,
+        int rotationAngle,
         QObject *parent) :
     QObject(parent),
     m_camera(camera),
@@ -22,7 +23,8 @@ QnClientVideoCameraExportTool::QnClientVideoCameraExportTool(
     m_sourceRect(sourceRect),
     m_imageCorrectionParams(imageCorrectionParams),
     m_itemDewarpingParams(itemDewarpingParams),
-    m_status(QnClientVideoCamera::NoError)
+    m_status(QnClientVideoCamera::NoError),
+    m_rotationAngle(rotationAngle)
 {
     connect(camera,     &QnClientVideoCamera::exportProgress,   this,   &QnClientVideoCameraExportTool::valueChanged);
     connect(camera,     &QnClientVideoCamera::exportFinished,   this,   &QnClientVideoCameraExportTool::at_camera_exportFinished);
@@ -43,7 +45,8 @@ void QnClientVideoCameraExportTool::start() {
                 m_serverTimeZoneMs,
                 m_sourceRect,
                 m_imageCorrectionParams,
-                m_itemDewarpingParams);
+                m_itemDewarpingParams,
+                m_rotationAngle);
 }
 
 int QnClientVideoCameraExportTool::status() const {

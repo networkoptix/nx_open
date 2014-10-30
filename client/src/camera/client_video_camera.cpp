@@ -144,7 +144,8 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
                                             qint64 timeOffsetMs, qint64 serverTimeZoneMs,
                                             QRectF srcRect,
                                             const ImageCorrectionParams& contrastParams,
-                                            const QnItemDewarpingParams& itemDewarpingParams)
+                                            const QnItemDewarpingParams& itemDewarpingParams,
+                                            int rotationAngle)
 {
     if (startTime > endTime)
         qSwap(startTime, endTime);
@@ -178,7 +179,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
         m_exportRecorder->setSrcRect(srcRect);
         m_exportRecorder->setContrastParams(contrastParams);
         m_exportRecorder->setItemDewarpingParams(itemDewarpingParams);
-        //m_exportRecorder->setRotation(90);
+        m_exportRecorder->setRotation(rotationAngle);
         connect(m_exportRecorder,   &QnStreamRecorder::recordingFinished, this,   &QnClientVideoCamera::stopExport);
         connect(m_exportRecorder,   &QnStreamRecorder::recordingProgress, this,   &QnClientVideoCamera::exportProgress);
         connect(m_exportRecorder,   &QnStreamRecorder::recordingFinished, this,   &QnClientVideoCamera::exportFinished);

@@ -110,7 +110,7 @@ public:
     virtual void addFilter(QnAbstractImageFilter* filter);
 
 protected:
-    static const int WIDTH_ALIGN = 32;
+    static const int WIDTH_ALIGN = 16;
     static const int HEIGHT_ALIGN = 2;
         
     QSharedPointer<CLVideoDecoderOutput> processFilterChain(const QSharedPointer<CLVideoDecoderOutput>& decodedFrame, const QRectF& updateRect, qreal ar);

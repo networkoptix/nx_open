@@ -322,7 +322,8 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
                                     timeOffset, serverTimeZone,
                                     itemData.zoomRect,
                                     itemData.contrastParams,
-                                    itemData.dewarpingParams);
+                                    itemData.dewarpingParams,
+                                    itemData.rotation);
 
     emit stageChanged(tr("Exporting to \"%2\"...").arg(m_targetFilename));
     return true;

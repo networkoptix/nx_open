@@ -422,6 +422,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
                                               itemData.zoomRect,
                                               contrastParams,
                                               dewarpingParams,
+                                              itemData.rotation,
                                               this);
 
     connect(exportProgressDialog,   &QnProgressDialog::canceled,    tool,                   &QnClientVideoCameraExportTool::stop);

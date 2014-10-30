@@ -6,16 +6,7 @@
 #include "core/datapacket/video_data_packet.h"
 #include "decoders/video/ffmpeg.h"
 #include "filters/abstract_image_filter.h"
-
-extern "C" {
-#ifdef WIN32
-#define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
-#endif
-#include <libavutil/pixdesc.h>
-#ifdef WIN32
-#undef AVPixFmtDescriptor
-#endif
-};
+#include "filters/crop_image_filter.h"
 
 const static int MAX_VIDEO_FRAME = 1024 * 1024 * 3;
 
@@ -23,7 +14,6 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
     QnVideoTranscoder(codecId),
     m_decodedVideoFrame(new CLVideoDecoderOutput()),
     m_scaledVideoFrame(new CLVideoDecoderOutput()),
-    m_decodedFrameRect(new CLVideoDecoderOutput()),
     m_encoderCtx(0),
     m_firstEncodedPts(AV_NOPTS_VALUE),
     m_mtMode(false)
@@ -37,7 +27,6 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
 
     m_videoEncodingBuffer = (quint8*) qMallocAligned(MAX_VIDEO_FRAME, 32);
     m_decodedVideoFrame->setUseExternalData(true);
-    m_decodedFrameRect->setUseExternalData(true);
 }
 
 QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
@@ -238,30 +227,13 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
                             1.0 / lSize.width(), 1.0 / lSize.height());
             }
         }
-        CLVideoDecoderOutputPtr decodedFrame = m_decodedVideoFrame;
+        qreal ar = decoder->getWidth() * (qreal) decoder->getSampleAspectRatio() / (qreal) decoder->getHeight();
 
-        if (!frameRect.isEmpty()) 
-        {
-            const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[decodedFrame->format];
-            for (int i = 0; i < descr->nb_components && decodedFrame->data[i]; ++i)
-            {
-                int w = frameRect.left();
-                int h = frameRect.top();
-                if (i > 0) {
-                    w >>= descr->log2_chroma_w;
-                    h >>= descr->log2_chroma_h;
-                }
-                m_decodedFrameRect->data[i] = decodedFrame->data[i] + w + h * decodedFrame->linesize[i];
-                m_decodedFrameRect->linesize[i] = decodedFrame->linesize[i];
-            }
-            m_decodedFrameRect->format = decodedFrame->format;
-            m_decodedFrameRect->width = frameRect.width();
-            m_decodedFrameRect->height = frameRect.height();
-            decodedFrame = m_decodedFrameRect;
-        }
+        CLVideoDecoderOutputPtr decodedFrame = m_decodedVideoFrame;
+        if (!frameRect.isEmpty())
+            decodedFrame = QnCropImageFilter(frameRect).updateImage(decodedFrame, dstRectF, ar);
 
         decodedFrame->pts = m_decodedVideoFrame->pkt_dts;
-        qreal ar = decoder->getWidth() * (qreal) decoder->getSampleAspectRatio() / (qreal) decoder->getHeight();
         decodedFrame = processFilterChain(decodedFrame, dstRectF, ar);
 
         if (decodedFrame->width != m_resolution.width() || decodedFrame->height != m_resolution.height() || decodedFrame->format != PIX_FMT_YUV420P) 
