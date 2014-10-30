@@ -12,6 +12,7 @@
 #include <common/common_module.h>
 
 #include <ui/common/palette.h>
+#include <ui/common/ui_resource_name.h>
 #include <ui/models/sorted_server_updates_model.h>
 #include <ui/dialogs/file_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
@@ -34,6 +35,25 @@ namespace {
     const int tooLateDayOfWeek = Qt::Thursday;
 
     const int autoCheckIntervalMs = 5 * 60 * 1000;  // 5 minutes
+
+
+    QStringList serverNames(const QSet<QnUuid> &serverIds) {
+        QStringList result;
+
+        foreach (const QnUuid &id, serverIds) {
+            QnMediaServerResourcePtr server = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>();
+            if (!server)
+                continue;
+
+            result.append(getResourceName(server));
+        }
+
+        return result;
+    }
+
+    QString serverNamesString(const QSet<QnUuid> &serverIds) {
+        return serverNames(serverIds).join(lit(", "));
+    }
 }
 
 QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
@@ -327,7 +347,16 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
             QMessageBox::critical(this, tr("Update failed"), tr("Could not push updates to servers."));
             break;
         case QnUpdateResult::UploadingFailed_NoFreeSpace:
-            QMessageBox::critical(this, tr("Update failed"), tr("Could not push updates to servers.") + lit("\n") + tr("No free space left on the server."));
+            QMessageBox::critical(this, tr("Update failed"),
+                                  tr("Could not push updates to servers.") +
+                                  lit("\n") +
+                                  tr("No free space left on %n servers: %1", "", result.failedPeers.size()).arg(serverNamesString(result.failedPeers)));
+            break;
+        case QnUpdateResult::UploadingFailed_Timeout:
+            QMessageBox::critical(this, tr("Update failed"),
+                                  tr("Could not push updates to servers.") +
+                                  lit("\n") +
+                                  tr("%n servers are not responding: %1", "", result.failedPeers.size()).arg(serverNamesString(result.failedPeers)));
             break;
         case QnUpdateResult::ClientInstallationFailed:
             QMessageBox::critical(this, tr("Update failed"), tr("Could not install an update to the client."));

@@ -42,6 +42,12 @@ QnUuid::QnUuid( const QByteArray& text )
     }
 }
 
+QnUuid::QnUuid(const QUuid &uuid)
+:
+    m_uuid(uuid)
+{
+}
+
 const QByteArray& QnUuid::toByteArray() const
 {
     if( !m_byteArrayRepresentation )

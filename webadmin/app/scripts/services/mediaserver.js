@@ -15,13 +15,14 @@ angular.module('webadminApp')
                     }
                     return cacheModuleInfo;
                 }
-                console.log("get settings",url + '/api/moduleInformation');
                 return $http.get(url + '/api/moduleInformation',{
                     timeout: 3*1000
                 });
             },
             saveSettings: function(systemName,port) { return $http.post('/api/configure?systemName=' + systemName + '&port=' + port); },
-            changePassword: function(password,oldPassword) { return $http.post('/api/configure?password=' + password  + '&oldPassword=' + oldPassword); },
+            changePassword: function(password,oldPassword) {
+                return $http.post('/api/configure?password=' + password  + '&oldPassword=' + oldPassword);
+            },
             mergeSystems: function(url,password,keepMySystem){return $http.post('/api/mergeSystems?password=' + password  + '&url=' + encodeURIComponent(url) + "&takeRemoteSettings=" + (!keepMySystem)); },
             pingSystem: function(url,password){return $http.post('/api/pingSystem?password=' + password  + '&url=' + encodeURIComponent(url)); },
             restart: function() { return $http.post('/api/restart'); },

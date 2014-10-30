@@ -95,7 +95,7 @@ void QnUpdateUploader::at_updateManager_updateUploadProgress(const QString &upda
 
         if (chunks != ec2::AbstractUpdatesManager::NoError) {
             cleanUp();
-            emit finished(chunks == ec2::AbstractUpdatesManager::NoFreeSpace ? NoFreeSpace : UnknownError);
+            emit finished(chunks == ec2::AbstractUpdatesManager::NoFreeSpace ? NoFreeSpace : UnknownError, QSet<QnUuid>() << peerId);
             return;
         } else {
             progress = 100;
@@ -113,7 +113,7 @@ void QnUpdateUploader::at_updateManager_updateUploadProgress(const QString &upda
 
     if (m_progressById.isEmpty()) {
         cleanUp();
-        emit finished(NoError);
+        emit finished(NoError, QSet<QnUuid>());
     }
 
     m_pendingPeers.remove(peerId);
@@ -125,7 +125,7 @@ void QnUpdateUploader::at_updateManager_updateUploadProgress(const QString &upda
 
 void QnUpdateUploader::at_chunkTimer_timeout() {
     cleanUp();
-    emit finished(UnknownError);
+    emit finished(TimeoutError, m_pendingPeers);
 }
 
 void QnUpdateUploader::cleanUp() {

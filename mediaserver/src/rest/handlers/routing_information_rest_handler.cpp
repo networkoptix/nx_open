@@ -3,6 +3,7 @@
 #include "utils/network/router.h"
 
 //TODO: #dklychkov collect http codes in one place and stop copying enums
+//we already have nx_http::StatusCode::xxx
 namespace HttpCode {
     enum {
         Ok = 200,
@@ -44,7 +45,7 @@ int QnRoutingInformationRestHandler::executeGet(const QString &path, const QnReq
         command = command.mid(1);
 
     if (command == lit("routeTo")) {
-        QnUuid target = QnUuid(params.value(lit("target")));
+        QnUuid target(QUuid(params.value(lit("target"))));
         if (target.isNull()) {
             // suppose it to be host:port
             QStringList targetParams = params.value(lit("target")).split(QLatin1Char(':'));

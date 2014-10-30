@@ -170,6 +170,16 @@ public:
     QnGridItem *gridItem() const;
 
     /**
+     * \returns                         Curtain item (that is painted in black when a single widget is zoomed). 
+     */
+    QnCurtainItem* curtainItem() const;
+
+    /**
+     * \returns                         Curtain item animator. 
+     */
+    QnCurtainAnimator* curtainAnimator() const;
+
+    /**
      * \returns                         Grid background item (E-Mapping).
      */
     QnGridBackgroundItem *gridBackgroundItem() const;

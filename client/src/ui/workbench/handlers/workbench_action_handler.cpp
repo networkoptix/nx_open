@@ -1199,10 +1199,15 @@ void QnWorkbenchActionHandler::at_openBusinessRulesAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_webClientAction_triggered() {
-    QUrl url(QnAppServerConnectionFactory::url());
+    QnActionParameters parameters = menu()->currentParameters(sender());
+
+    QnMediaServerResourcePtr server = parameters.resource().dynamicCast<QnMediaServerResource>();
+    if (!server)
+        return;
+
+    QUrl url(server->getApiUrl());
     url.setUserName(QString());
     url.setPassword(QString());
-    url.setPath(QLatin1String("/web/"));
     QDesktopServices::openUrl(url);
 }
 

@@ -28,7 +28,7 @@ protected:
         const QHostAddress& foundHostAddress ) override;
     virtual QnResourceList findResources() override;
 private:
-    void  processNativePacket(QnResourceList& result, const QByteArray& responseData, const QHostAddress& discoveryAddress);
+    void  processNativePacket(QnResourceList& result, const QByteArray& responseData);
 };
 
 #endif // #ifdef ENABLE_IQE
