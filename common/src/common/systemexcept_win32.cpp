@@ -9,71 +9,55 @@
 
 #include <Dbghelp.h>
 #include <Windows.h>
+#include <ShlObj.h>
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QStandardPaths>
 
-using std::string;
-
-//typedef struct STACK_FRAME
-//{
-//    STACK_FRAME* Ebp;   //address of the calling function frame
-//    PBYTE Ret_Addr;      //return address
-//    DWORD Param[0];      //parameter list - could be empty
-//} STACK_FRAME;
-//typedef STACK_FRAME* PSTACK_FRAME;
-
-const char* win32_exception::what() const 
-{ 
-    return m_what.c_str(); 
+static int GetBaseName( const char* name , DWORD len ) {
+    for( DWORD i = len-1 ; i >= 0 ; --i ) {
+        if( name[i] == '\\' || name[i] == '/' )
+            return i+1;
+    }
+    return 0;
 }
 
-win32_exception::Address win32_exception::where() const 
-{ 
-    return mWhere; 
-}
-
-unsigned win32_exception::code() const 
-{ 
-    return mCode; 
-}
-
-bool access_violation::isWrite() const 
-{ 
-    return mIsWrite; 
-}
-
-win32_exception::Address access_violation::badAddress() const 
-{ 
-    return mBadAddress; 
+static bool GetProgramName( char* buffer ) {
+    char sModuleName[1024];
+    DWORD dwLen = ::GetModuleFileNameA(NULL,sModuleName,1024);
+    if( dwLen == 1024 || dwLen < 0 )
+        return false;
+    int iBaseNamePos = GetBaseName( sModuleName , dwLen );
+    CopyMemory( buffer , sModuleName + iBaseNamePos , dwLen - iBaseNamePos + 1 );
+    return true;
 }
 
 static
 void writeMiniDump( PEXCEPTION_POINTERS ex ) {
-    char strFileName[1024];
-    char strModuleName[1024];
+    char sFileName[1024];
+    char sModuleName[1024];
+    char sAppData[MAX_PATH];
 
-    // should not have any heap allocation
-    const char* strLocation = 
-        QStandardPaths::writableLocation( QStandardPaths::DataLocation ).toLatin1().constData();
+    if( !GetProgramName(sModuleName) )
+        return;
 
-    // Get the current working directory
-    DWORD dwLen = GetModuleFileNameA( NULL , strModuleName , 1024 );
-    if( dwLen <=0 || dwLen == 1024 )
+    if( FAILED(SHGetFolderPathA(
+            NULL,
+            CSIDL_LOCAL_APPDATA,
+            NULL,
+            0,
+            sAppData)))
         return;
 
     // it should not acquire any global lock internally. Otherwise
     // we may deadlock here. 
-    int ret = sprintf(strFileName,"%s/%s_%d.minidump",
-        strLocation,
-        strModuleName,
-        GetCurrentProcessId());
+    int ret = sprintf(sFileName,"%s\\%s_%d.dmp", sAppData , sModuleName, ::GetCurrentProcessId());
 
     if( ret <0 )
         return;
 
     HANDLE hFile = ::CreateFileA(
-        strFileName,
+        sFileName,
         GENERIC_WRITE,
         0,
         NULL,
@@ -86,7 +70,7 @@ void writeMiniDump( PEXCEPTION_POINTERS ex ) {
 
     MINIDUMP_EXCEPTION_INFORMATION sMDumpExcept; 
 
-    sMDumpExcept.ThreadId           = GetCurrentThreadId(); 
+    sMDumpExcept.ThreadId           = ::GetCurrentThreadId(); 
     sMDumpExcept.ExceptionPointers  = ex; 
     sMDumpExcept.ClientPointers     = FALSE; 
 
@@ -94,15 +78,14 @@ void writeMiniDump( PEXCEPTION_POINTERS ex ) {
     // requirements of our dump file. If it is used for online report
     // or online analyzing, we may need to generate small dump file 
 
-    MINIDUMP_TYPE sMDumpType =  (MINIDUMP_TYPE)(MiniDumpWithFullMemory | 
-                                            MiniDumpWithFullMemoryInfo | 
+    MINIDUMP_TYPE sMDumpType =  (MINIDUMP_TYPE)( MiniDumpWithFullMemoryInfo | 
                                                 MiniDumpWithHandleData | 
                                                 MiniDumpWithThreadInfo | 
                                             MiniDumpWithUnloadedModules ); 
 
     ::MiniDumpWriteDump( 
-        GetCurrentProcess(),
-        GetCurrentProcessId(),
+        ::GetCurrentProcess(),
+        ::GetCurrentProcessId(),
         hFile,
         sMDumpType,
         ex == NULL ? NULL : &sMDumpExcept,
@@ -112,51 +95,44 @@ void writeMiniDump( PEXCEPTION_POINTERS ex ) {
     ::CloseHandle(hFile);
 }
 
+static void translate( unsigned int code , _EXCEPTION_POINTERS* ExceptionInfo ) {
+    Q_UNUSED(code);
+    writeMiniDump(ExceptionInfo);
+    TerminateProcess( GetCurrentProcess(), 1 );
+}
 
 static LONG WINAPI unhandledSEHandler( __in struct _EXCEPTION_POINTERS* ExceptionInfo )
 {
-    win32_exception::translate( EXCEPTION_ACCESS_VIOLATION, ExceptionInfo );
+    translate(0,ExceptionInfo);
     return EXCEPTION_EXECUTE_HANDLER;
 }
 
-static std::string getCallStack(
-    HANDLE threadID,
-    PEXCEPTION_RECORD exceptionRecord,
-    PCONTEXT contextRecord );
-
+#if 0
 static void writeCrashInfo(
     const char* title,
     const char* information )
 {
-#if 0
-    // As bug 3355 indicates, the exception file should be saved to AppData folder on windows instead of
-    // the client executable path for the permission problem. 
-    const QFileInfo exeFileInfo( QCoreApplication::applicationFilePath() );
-    const QString exceptFileName = lit("%1/%2_%3.except").
-        arg( QStandardPaths::writableLocation( QStandardPaths::DataLocation ) ).
-        arg( exeFileInfo.baseName() ).
-        arg( QCoreApplication::applicationPid() );
-    std::ofstream of( sFileName );
-    of<<title<<"\n";
-    of.write( information, strlen(information) );
-    of.close();
-#else
     // The following code will try my best to avoid (to my best knowledge)
     // 1) Heap allocation ( 1. Heap corruption 2. CRT global lock )
     // 2) Function that cannot be re-entered
     // 3) Function that acquires global lock ( most of CRT function )
     char sProcessName[1024];
     char sFileName[1024];
-    DWORD dwLen = GetModuleFileNameA(NULL,sProcessName,1024);
-    if( dwLen <0 )
+    char sAppData[MAX_PATH];
+
+    if( !GetProgramName(sProcessName) )
         return;
-    int ret = sprintf(sFileName,"%s/%s_%d.except",
-        // Cannot avoid this one since it is determined by Qt Runtime 
-        // But since Qt uses copy-on-write, there is no reason this will
-        // have internal heap allocation .
-        QStandardPaths::writableLocation(QStandardPaths::DataLocation).toLatin1().constData(),
-        sProcessName,
-        GetCurrentProcessId());
+    
+    if( FAILED(SHGetFolderPathA(
+            NULL,
+            CSIDL_LOCAL_APPDATA,
+            NULL,
+            0,
+            sAppData)))
+        return;
+
+    int ret = sprintf(sFileName,"%s\\%s_%d.except", sAppData, sProcessName, ::GetCurrentProcessId());
+
     if( ret <=0 )
         return;
 
@@ -172,9 +148,7 @@ static void writeCrashInfo(
     if(hFile == INVALID_HANDLE_VALUE)
         return;
 
-    // Output the title
     BOOL bRet;
-
     // This parameter is not in used for writing into file and the WriteFile ensure
     // that the write will not partially succeed, but we still need it to make SDK happy.
     DWORD dwWritten;
@@ -188,13 +162,11 @@ static void writeCrashInfo(
         goto done;
 
     bRet = ::WriteFile(hFile,information,(DWORD)(strlen(information)),&dwWritten,NULL);
-    if( bRet == FALSE )
-        goto done;
 
 done:
     ::CloseHandle(hFile);
-#endif 
 }
+#endif 
 
 static DWORD WINAPI dumpStackProc( LPVOID lpParam )
 {
@@ -216,16 +188,12 @@ static DWORD WINAPI dumpStackProc( LPVOID lpParam )
         //TODO/IMPL
     }
 
-    //dumping stack
-    const std::string& currentCallStack = getCallStack( targetThreadHandle, NULL, &threadContext );
-    writeCrashInfo( "CRT_INVALID_PARAMETER", currentCallStack.c_str() );
     writeMiniDump(NULL);
-
     //terminating process
     return TerminateProcess( GetCurrentProcess(), 1 ) ? 0 : 1;
 }
 
-static void dumpCrtError( const char* errorName )
+static void dumpCrtError()
 {
     //creating thread to dump call stack of current thread
     HANDLE currentThreadExtHandle = INVALID_HANDLE_VALUE;
@@ -235,12 +203,7 @@ static void dumpCrtError( const char* errorName )
         ::Sleep( 10000 );
         return;
     }
-
-    const std::string& currentCallStack = getCallStack( GetCurrentThread(), NULL, NULL );
-    //NOTE on win64 currentCallStack will be empty
-    writeCrashInfo( errorName, currentCallStack.c_str() );
     writeMiniDump(NULL);
-
     TerminateProcess( GetCurrentProcess(), 1 );
 }
 
@@ -251,12 +214,12 @@ static void invalidCrtCallParameterHandler(
    unsigned int /*line*/,
    uintptr_t /*pReserved*/ )
 {
-    dumpCrtError( "CRT_INVALID_PARAMETER" );
+    dumpCrtError();
 }
 
 static void myPurecallHandler()
 {
-    dumpCrtError( "PURE_VIRTUAL_CALL" );
+    dumpCrtError();
 }
 
 void win32_exception::installGlobalUnhandledExceptionHandler()
@@ -271,35 +234,10 @@ void win32_exception::installGlobalUnhandledExceptionHandler()
 
 void win32_exception::installThreadSpecificUnhandledExceptionHandler()
 {
-    _set_se_translator( &win32_exception::translate );
+    _set_se_translator( translate );
 }
 
-void win32_exception::translate(
-    unsigned int code, 
-    PEXCEPTION_POINTERS info )
-{
-    switch( code )
-    {
-        case EXCEPTION_ACCESS_VIOLATION:
-        {
-            access_violation e( info );
-            writeCrashInfo( "EXCEPTION_ACCESS_VIOLATION", e.what() );
-            writeMiniDump(info);
-            break;
-        }
-    
-        default:
-        {
-            win32_exception e( info );
-            writeCrashInfo( "STRUCTURED EXCEPTION", e.what() );
-            writeMiniDump(info);
-            break;
-        }
-    }
-
-    TerminateProcess( GetCurrentProcess(), 1 );
-}
-
+#if 0
 
 #define SYMSIZE 10000
 #define MAXTEXT 5000
@@ -555,125 +493,5 @@ static std::string getCallStack(
 
     return out;
 }
-
-static const char* exceptToString( DWORD code )
-{
-    switch( code )
-    {
-    //case EXCEPTION_ACCESS_VIOLATION:
-    //    return "The thread tried to read from or write to a virtual address for which it does not have the appropriate access.";
-    //case EXCEPTION_ARRAY_BOUNDS_EXCEEDED:
-    //    return "The thread tried to access an array element that is out of bounds and the underlying hardware supports bounds checking.";
-    //case EXCEPTION_BREAKPOINT: 
-    //    return "A breakpoint was encountered.";
-    //case EXCEPTION_DATATYPE_MISALIGNMENT:
-    //    return "The thread tried to read or write data that is misaligned on hardware that does not provide alignment. For example, 16-bit values must be aligned on 2-byte boundaries; 32-bit values on 4-byte boundaries, and so on.";
-    //case EXCEPTION_FLT_DENORMAL_OPERAND:
-    //    return "One of the operands in a floating-point operation is denormal. A denormal value is one that is too small to represent as a standard floating-point value.";
-    //case EXCEPTION_FLT_DIVIDE_BY_ZERO:
-    //    return "The thread tried to divide a floating-point value by a floating-point divisor of zero.";
-    //case EXCEPTION_FLT_INEXACT_RESULT:
-    //    return "The result of a floating-point operation cannot be represented exactly as a decimal fraction.";
-    //case EXCEPTION_FLT_INVALID_OPERATION:
-    //    return "This exception represents any floating-point exception not included in this list.";
-    //case EXCEPTION_FLT_OVERFLOW:
-    //    return "The exponent of a floating-point operation is greater than the magnitude allowed by the corresponding type.";
-    //case EXCEPTION_FLT_STACK_CHECK:
-    //    return "The stack overflowed or underflowed as the result of a floating-point operation.";
-    //case EXCEPTION_FLT_UNDERFLOW:
-    //    return "The exponent of a floating-point operation is less than the magnitude allowed by the corresponding type.";
-    //case EXCEPTION_ILLEGAL_INSTRUCTION:
-    //    return "The thread tried to execute an invalid instruction.";
-    //case EXCEPTION_IN_PAGE_ERROR:
-    //    return "The thread tried to access a page that was not present, and the system was unable to load the page. For example, this exception might occur if a network connection is lost while running a program over the network.";
-    //case EXCEPTION_INT_DIVIDE_BY_ZERO:
-    //    return "The thread tried to divide an integer value by an integer divisor of zero.";
-    //case EXCEPTION_INT_OVERFLOW:
-    //    return "The result of an integer operation caused a carry out of the most significant bit of the result.";
-    //case EXCEPTION_INVALID_DISPOSITION:
-    //    return "An exception handler returned an invalid disposition to the exception dispatcher. Programmers using a high-level language such as C should never encounter this exception.";
-    //case EXCEPTION_NONCONTINUABLE_EXCEPTION:
-    //    return "The thread tried to continue execution after a noncontinuable exception occurred.";
-    //case EXCEPTION_PRIV_INSTRUCTION:
-    //    return "The thread tried to execute an instruction whose operation is not allowed in the current machine mode.";
-    //case EXCEPTION_SINGLE_STEP:
-    //    return "A trace trap or other single-instruction mechanism signaled that one instruction has been executed.";
-    //case EXCEPTION_STACK_OVERFLOW:
-    //    return "The thread used up its stack.";
-    case EXCEPTION_ACCESS_VIOLATION:
-        return "EXCEPTION_ACCESS_VIOLATION.";
-    case EXCEPTION_ARRAY_BOUNDS_EXCEEDED:
-        return "EXCEPTION_ARRAY_BOUNDS_EXCEEDED.";
-    case EXCEPTION_BREAKPOINT: 
-        return "EXCEPTION_BREAKPOINT.";
-    case EXCEPTION_DATATYPE_MISALIGNMENT:
-        return "EXCEPTION_DATATYPE_MISALIGNMENT.";
-    case EXCEPTION_FLT_DENORMAL_OPERAND:
-        return "EXCEPTION_FLT_DENORMAL_OPERAND.";
-    case EXCEPTION_FLT_DIVIDE_BY_ZERO:
-        return "EXCEPTION_FLT_DIVIDE_BY_ZERO.";
-    case EXCEPTION_FLT_INEXACT_RESULT:
-        return "EXCEPTION_FLT_INEXACT_RESULT.";
-    case EXCEPTION_FLT_INVALID_OPERATION:
-        return "EXCEPTION_FLT_INVALID_OPERATION.";
-    case EXCEPTION_FLT_OVERFLOW:
-        return "EXCEPTION_FLT_OVERFLOW.";
-    case EXCEPTION_FLT_STACK_CHECK:
-        return "EXCEPTION_FLT_STACK_CHECK.";
-    case EXCEPTION_FLT_UNDERFLOW:
-        return "EXCEPTION_FLT_UNDERFLOW.";
-    case EXCEPTION_ILLEGAL_INSTRUCTION:
-        return "EXCEPTION_ILLEGAL_INSTRUCTION.";
-    case EXCEPTION_IN_PAGE_ERROR:
-        return "EXCEPTION_IN_PAGE_ERROR.";
-    case EXCEPTION_INT_DIVIDE_BY_ZERO:
-        return "EXCEPTION_INT_DIVIDE_BY_ZERO.";
-    case EXCEPTION_INT_OVERFLOW:
-        return "EXCEPTION_INT_OVERFLOW.";
-    case EXCEPTION_INVALID_DISPOSITION:
-        return "EXCEPTION_INVALID_DISPOSITION.";
-    case EXCEPTION_NONCONTINUABLE_EXCEPTION:
-        return "EXCEPTION_NONCONTINUABLE_EXCEPTION.";
-    case EXCEPTION_PRIV_INSTRUCTION:
-        return "EXCEPTION_PRIV_INSTRUCTION.";
-    case EXCEPTION_SINGLE_STEP:
-        return "EXCEPTION_SINGLE_STEP.";
-    case EXCEPTION_STACK_OVERFLOW:
-        return "EXCEPTION_STACK_OVERFLOW.";
-    default:
-        return "Unknown exception";
-    }
-}
-
-win32_exception::win32_exception( PEXCEPTION_POINTERS info )
-: 
-    mWhere( info->ExceptionRecord->ExceptionAddress ),
-    mCode( info->ExceptionRecord->ExceptionCode )
-{
-    std::ostringstream oss;
-
-    oss << std::string( "WIN32 SYSTEM EXCEPTION. " ) << exceptToString( info->ExceptionRecord->ExceptionCode );
-    oss << "\nCall stack:\n";
-    oss << getCallStack( GetCurrentThread(), info->ExceptionRecord, info->ContextRecord );
-
-    oss << "ExceptionCode: " << info->ExceptionRecord->ExceptionCode << ".";
-    oss << " ExceptionFlags: " << info->ExceptionRecord->ExceptionFlags << ".";
-    oss << " ExceptionAddress: 0x" << std::hex<< (uint32_t)info->ExceptionRecord->ExceptionAddress << ".";
-    oss << " NumberParameters: " << info->ExceptionRecord->NumberParameters << ".";
-
-    m_what = oss.str();
-}
-
-access_violation::access_violation( PEXCEPTION_POINTERS info )
-: 
-    win32_exception( info ),
-    mIsWrite( false ),
-    mBadAddress( 0 )
-{
-    mIsWrite = info->ExceptionRecord->ExceptionInformation[0] == 1;
-    mBadAddress = reinterpret_cast<win32_exception::Address>(info->ExceptionRecord->ExceptionInformation[1]);
-    std::ostringstream oss;
-    oss << " BadAddress: 0x" <<std::hex<< (uint32_t)info->ExceptionRecord->ExceptionAddress << ".";
-}
-
+#endif 
 #endif
