@@ -8,10 +8,10 @@
               <RegistryValue Root="HKCR" Type="string" Key="HDW.nov\DefaultIcon" Value="&quot;[#client.exe]&quot;" />
               <RegistryValue Root="HKCR" Type="string" Key=".nov" Value="HDW.nov" />
               
-              <RegistryValue Root="HKLM" Key="SOFTWARE\Classes\SystemFileAssociations\.nov\shell\play.${product.name}.exe" Value="!(loc.Associations_PlayWith)" Type="string" />
-              <RegistryValue Root="HKLM" Key="SOFTWARE\Classes\SystemFileAssociations\.nov\shell\play.${product.name}.exe\command" Value="&quot;[#client.exe]&quot; &quot;%1&quot;" Type="string" />
+              <RegistryValue Root="HKLM" Key="SOFTWARE\Classes\SystemFileAssociations\.nov\shell\play.${display.product.name}.exe" Value="!(loc.Associations_PlayWith)" Type="string" />
+              <RegistryValue Root="HKLM" Key="SOFTWARE\Classes\SystemFileAssociations\.nov\shell\play.${display.product.name}.exe\command" Value="&quot;[#client.exe]&quot; &quot;%1&quot;" Type="string" />
 
-              <RegistryValue Root="HKCR" Type="string" Key="Applications\${product.name}.exe\SupportedTypes" Name=".nov" Value=""/>
+              <RegistryValue Root="HKCR" Type="string" Key="Applications\${display.product.name}.exe\SupportedTypes" Name=".nov" Value=""/>
               <RegistryValue Root="HKLM" Type="string" Key="Software\Clients\Media\EVE media player\Capabilities\FileAssociations" Name=".nov" Value="HDW.nov"/>
             </Component>
 

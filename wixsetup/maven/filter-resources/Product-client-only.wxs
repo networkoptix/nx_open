@@ -112,7 +112,7 @@
 
             <Directory Id="$(var.ProgramFilesFolder)">
                 <Directory Id="NetworkOptix" Name="${company.name}">
-                    <Directory Id="INSTALLDIR" Name="${product.name}">
+                    <Directory Id="INSTALLDIR" Name="${display.product.name}">
                     </Directory>
                 </Directory>
             </Directory>
