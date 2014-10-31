@@ -208,13 +208,30 @@ bool ApplauncherProcess::sendTaskToRunningLauncherInstance()
 }
 
 static const QLatin1String PREVIOUS_LAUNCHED_VERSION_PARAM_NAME( "previousLaunchedVersion" );
+static const QLatin1String PREVIOUS_USED_CMD_PARAMS_PARAM_NAME( "previousUsedCmdParams" );
+static const QLatin1String MOST_RECENT_VERSION_PARAM_NAME( "mostRecentVersion" );
 
-bool ApplauncherProcess::getVersionToLaunch( QnSoftwareVersion* const versionToLaunch, QString* const appArgs )
+bool ApplauncherProcess::getVersionToLaunch(
+    QnSoftwareVersion* const versionToLaunch,
+    QString* const appArgs )
 {
+    if( m_settings->contains( MOST_RECENT_VERSION_PARAM_NAME ) )
+    {
+        const QnSoftwareVersion& previousMostRecentVersion = 
+            QnSoftwareVersion(m_settings->value( MOST_RECENT_VERSION_PARAM_NAME ).toString());
+        if( previousMostRecentVersion < m_installationManager->latestVersion() )
+        {
+            //newer version have been installed since previous client start, 
+            //ignoring previous launched version and running the new one
+            *versionToLaunch = m_installationManager->latestVersion();
+            return true;
+        }
+    }
+
     if( m_settings->contains( PREVIOUS_LAUNCHED_VERSION_PARAM_NAME ) )
     {
         *versionToLaunch = QnSoftwareVersion(m_settings->value( PREVIOUS_LAUNCHED_VERSION_PARAM_NAME ).toString());
-        *appArgs = m_settings->value( "previousUsedCmdParams" ).toString();
+        *appArgs = m_settings->value( PREVIOUS_USED_CMD_PARAMS_PARAM_NAME ).toString();
     }
     else if( m_installationManager->count() > 0 )
     {
@@ -368,6 +385,7 @@ bool ApplauncherProcess::startApplication(
     {
         NX_LOG( QString::fromLatin1("Successfully launched version %1 (path %2)").arg(task->version.toString()).arg(binPath), cl_logDEBUG1 );
         m_settings->setValue( PREVIOUS_LAUNCHED_VERSION_PARAM_NAME, task->version.toString() );
+        m_settings->setValue( MOST_RECENT_VERSION_PARAM_NAME, m_installationManager->latestVersion().toString() );
         m_settings->sync();
         response->result = applauncher::api::ResultType::ok;
         return true;
