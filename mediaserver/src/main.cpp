@@ -1567,8 +1567,14 @@ void QnMain::run()
             QnSleep::msleep(1000);
     }
 
+    /* This key means that password should be forcibly changed in the database. */
+    const QString passwordChangeKey = "appserverPassword";
     MSSettings::roSettings()->remove(OBSOLETE_SERVER_GUID);
-    MSSettings::roSettings()->remove("appserverPassword");
+    MSSettings::roSettings()->remove(passwordChangeKey);
+#ifdef _DEBUG
+    MSSettings::roSettings()->sync();
+    Q_ASSERT_X(!MSSettings::roSettings()->contains(passwordChangeKey), Q_FUNC_INFO, "appserverPassword could not be removed from the registry. Restart the server as Administrator");
+#endif
 
     if (needToStop()) {
         stopObjects();
