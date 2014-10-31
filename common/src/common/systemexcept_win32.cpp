@@ -10,9 +10,50 @@
 #include <Dbghelp.h>
 #include <Windows.h>
 #include <ShlObj.h>
+#include <platform/win32_syscall_resolver.h>
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QStandardPaths>
+
+typedef BOOL (*pfMiniDumpWriteDump) (
+    HANDLE,
+    DWORD,
+    HANDLE,
+    MINIDUMP_TYPE,
+    PMINIDUMP_EXCEPTION_INFORMATION,
+    PMINIDUMP_USER_STREAM_INFORMATION ,
+    PMINIDUMP_CALLBACK_INFORMATION );
+
+
+static BOOL InvokeMiniDumpWriteDump( 
+    HANDLE hProcess,
+    DWORD ProcessId,
+    HANDLE hFile,
+    MINIDUMP_TYPE DumpType,
+    PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
+    PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,
+    PMINIDUMP_CALLBACK_INFORMATION CallbackParam ) {
+        pfMiniDumpWriteDump pFunc = 
+            Win32FuncResolver::instance()->resolveFunction<pfMiniDumpWriteDump> (
+            L"DbgHelp.dll",
+            "MiniDumpWriteDump",
+            NULL);
+        if( pFunc == NULL ) {
+            return FALSE;
+        } else {
+            return pFunc(hProcess, 
+                         ProcessId,
+                         hFile,
+                         DumpType,
+                         ExceptionParam,
+                         UserStreamParam,
+                         CallbackParam);
+        }
+}
+
+
+static
+void LegacyDump( HANDLE );
 
 static int GetBaseName( const char* name , DWORD len ) {
     for( DWORD i = len-1 ; i >= 0 ; --i ) {
@@ -33,7 +74,7 @@ static bool GetProgramName( char* buffer ) {
 }
 
 static
-void writeMiniDump( PEXCEPTION_POINTERS ex ) {
+void writeMiniDump( HANDLE hThread , PEXCEPTION_POINTERS ex ) {
     char sFileName[1024];
     char sProgramName[1024];
     char sAppData[MAX_PATH];
@@ -82,22 +123,25 @@ void writeMiniDump( PEXCEPTION_POINTERS ex ) {
                                                 MiniDumpWithHandleData | 
                                                 MiniDumpWithThreadInfo | 
                                             MiniDumpWithUnloadedModules ); 
-
-    ::MiniDumpWriteDump( 
+    if( InvokeMiniDumpWriteDump( 
         ::GetCurrentProcess(),
         ::GetCurrentProcessId(),
         hFile,
         sMDumpType,
         ex == NULL ? NULL : &sMDumpExcept,
         NULL,
-        NULL);
-
+        NULL) == FALSE ) {
+            LegacyDump(hThread);
+    }
     ::CloseHandle(hFile);
 }
 
+
+
+
 static void translate( unsigned int code , _EXCEPTION_POINTERS* ExceptionInfo ) {
     Q_UNUSED(code);
-    writeMiniDump(ExceptionInfo);
+    writeMiniDump( GetCurrentThread() , ExceptionInfo );
     TerminateProcess( GetCurrentProcess(), 1 );
 }
 
@@ -188,7 +232,7 @@ static DWORD WINAPI dumpStackProc( LPVOID lpParam )
         //TODO/IMPL
     }
 
-    writeMiniDump(NULL);
+    writeMiniDump(targetThreadHandle,NULL);
     //terminating process
     return TerminateProcess( GetCurrentProcess(), 1 ) ? 0 : 1;
 }
@@ -203,7 +247,7 @@ static void dumpCrtError()
         ::Sleep( 10000 );
         return;
     }
-    writeMiniDump(NULL);
+    writeMiniDump(currentThreadExtHandle,NULL);
     TerminateProcess( GetCurrentProcess(), 1 );
 }
 
@@ -494,4 +538,142 @@ static std::string getCallStack(
     return out;
 }
 #endif 
+
+
+#define MAX_SYMBOL_SIZE 1024
+
+static
+HANDLE 
+CreateLegacyDumpFile() {
+    char sProcessName[1024];
+    char sFileName[1024];
+    char sAppData[MAX_PATH];
+
+    if( !GetProgramName(sProcessName) )
+        return INVALID_HANDLE_VALUE;
+
+    if( FAILED(SHGetFolderPathA(
+        NULL,
+        CSIDL_LOCAL_APPDATA,
+        NULL,
+        0,
+        sAppData)))
+        return INVALID_HANDLE_VALUE;
+
+    int ret = sprintf(sFileName,"%s\\%s_%d.except", sAppData, sProcessName, ::GetCurrentProcessId());
+
+    if( ret <=0 )
+        return INVALID_HANDLE_VALUE;
+
+    return ::CreateFileA(
+        sFileName,
+        GENERIC_WRITE,
+        0,
+        NULL,
+        CREATE_NEW,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL);
+}
+
+static
+void FWriteFile( HANDLE hFile , const char* fmt , ... ) {
+    va_list vl;
+    va_start(vl,fmt);
+    char pBuffer[1024];
+    DWORD dwWritten;
+    int iRet = vsprintf(pBuffer,fmt,vl);
+    if( iRet <=0 )
+        return;
+    WriteFile(hFile,pBuffer,iRet,&dwWritten,NULL);
+}
+
+static
+void LegacyDump( HANDLE hThread ) {
+    STACKFRAME64 StackFrame;
+    BOOL bRet;
+    PIMAGEHLP_SYMBOL64 pImgSymbol;
+    IMAGEHLP_MODULE64 ModuleName;
+    DWORD64 dwDisp;
+    CONTEXT ContextRecord;
+    PCONTEXT pContextRecord = &ContextRecord;
+    char pBuffer[MAX_SYMBOL_SIZE+sizeof(IMAGEHLP_SYMBOL64)];
+
+    HANDLE hProcess = GetCurrentProcess();
+    HANDLE hFile = CreateLegacyDumpFile();
+
+    if( hFile == INVALID_HANDLE_VALUE )
+        return;
+
+    memset( pContextRecord, 0, sizeof(CONTEXT) );
+    pContextRecord->ContextFlags = (CONTEXT_FULL);
+    if( !GetThreadContext( hThread, pContextRecord ) ) {
+        pContextRecord = NULL;
+    }
+
+
+    if( pContextRecord ) {
+#ifdef _WIN64
+#else
+        StackFrame.AddrPC.Offset = pContextRecord->Eip;
+        StackFrame.AddrStack.Offset = pContextRecord->Esp;
+        StackFrame.AddrFrame.Offset = pContextRecord->Ebp;
+#endif
+    }
+
+    StackFrame.AddrPC.Mode = AddrModeFlat;
+    StackFrame.AddrStack.Mode = AddrModeFlat;
+    StackFrame.AddrFrame.Mode = AddrModeFlat;
+    ModuleName.SizeOfStruct = sizeof(ModuleName);
+
+    SymSetOptions( SYMOPT_UNDNAME );
+    pImgSymbol = reinterpret_cast<PIMAGEHLP_SYMBOL64>(pBuffer);
+
+    bRet = SymInitialize(GetCurrentProcess(), NULL, TRUE);
+    if( bRet == FALSE ) {
+        goto done;
+    }
+
+    FWriteFile(hFile,"%s\n","-----------------Stack Trace-----------------");
+
+    while( true ) {
+        bRet = StackWalk64(
+#ifndef _WIN64
+            IMAGE_FILE_MACHINE_I386,
+#else
+            IMAGE_FILE_MACHINE_AMD64,
+#endif
+            GetCurrentProcess(),
+            hThread,
+            &StackFrame,
+            pContextRecord,
+            NULL,
+            SymFunctionTableAccess64,
+            SymGetModuleBase64,
+            NULL );
+
+        if( bRet == FALSE ) {
+            FWriteFile(hFile,"%s","-----------------Done -------------------");
+            goto done;
+        }
+
+        FWriteFile(hFile,"%08x:",StackFrame.AddrPC.Offset);
+        if( SymGetModuleInfo64(GetCurrentProcess(), StackFrame.AddrPC.Offset, &ModuleName) ) {
+            FWriteFile(hFile," %s",ModuleName.ModuleName);
+        }
+        pImgSymbol->Size = MAX_SYMBOL_SIZE+sizeof(IMAGEHLP_SYMBOL64);
+        pImgSymbol->MaxNameLength = MAX_SYMBOL_SIZE;
+        if( SymGetSymFromAddr64(
+            hProcess,
+            StackFrame.AddrPC.Offset,
+            &dwDisp,
+            pImgSymbol )) {
+                FWriteFile(hFile," %s() + 0x%x\n",pImgSymbol->Name, dwDisp);
+        }
+    }
+
+
+done:
+    ::CloseHandle(hFile);
+}
+
 #endif
