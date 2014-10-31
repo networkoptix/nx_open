@@ -18,7 +18,7 @@ public:
 
 private:
     void initTimeDrawing(const CLVideoDecoderOutputPtr& frame, const QString& timeStr);
-
+    qint64 calcHash(const quint8* data, int width, int height, int linesize);
 private:
     QFont m_timeFont;
     int m_dateTimeXOffs;
@@ -29,7 +29,8 @@ private:
     qint64 m_onscreenDateOffset;
     quint8* m_imageBuffer;
     Qn::Corner m_dateTextPos;
-    int m_channel;
+    bool m_checkHash;
+    qint64 m_hash;
 };
 
 #endif // ENABLE_DATA_PROVIDER

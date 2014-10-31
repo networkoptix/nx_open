@@ -27,29 +27,9 @@ QnTimeImageFilter::QnTimeImageFilter(const QSharedPointer<const QnResourceVideoL
     m_onscreenDateOffset(timeOffsetMs),
     m_imageBuffer(0),
     m_dateTextPos(datePos),
-    m_channel(0)
+    m_checkHash(videoLayout->channelCount() > 1),
+    m_hash(-1)
 {
-    QPoint textPos;
-    switch(m_dateTextPos)
-    {
-    case Qn::TopLeftCorner:
-        textPos = QPoint(0, 0);
-        break;
-    case Qn::TopRightCorner:
-        textPos = QPoint(videoLayout->size().width()-1, 0);
-        break;
-    case Qn::BottomRightCorner:
-        textPos = QPoint(videoLayout->size().width()-1, videoLayout->size().height()-1);
-        break;
-    case Qn::BottomLeftCorner:
-    default:
-        textPos = QPoint(0, videoLayout->size().height()-1);
-        break;
-    }
-    for (int ch = 0; ch < videoLayout->channelCount(); ++ch) {
-        if (videoLayout->position(ch) == textPos)
-            m_channel = ch;
-    }
 }
 
 QnTimeImageFilter::~QnTimeImageFilter()
@@ -64,7 +44,7 @@ void QnTimeImageFilter::initTimeDrawing(const CLVideoDecoderOutputPtr& frame, co
     m_timeFont.setPixelSize(qMax(MIN_TEXT_HEIGHT, frame->height / TEXT_HEIGHT_IN_FRAME_PARTS));
     QFontMetrics metric(m_timeFont);
     
-    while (metric.width(timeStr) >= frame->width && m_timeFont.pixelSize() > 0)
+    while (metric.width(timeStr) >= frame->width - metric.averageCharWidth() && m_timeFont.pixelSize() > 0)
     {
         m_timeFont.setPixelSize(m_timeFont.pixelSize()-1);
         metric = QFontMetrics(m_timeFont);
@@ -104,10 +84,20 @@ void QnTimeImageFilter::initTimeDrawing(const CLVideoDecoderOutputPtr& frame, co
     m_timeImg = new QImage(m_imageBuffer, drawWidth, drawHeight, drawWidth*4, QImage::Format_ARGB32_Premultiplied);
 }
 
+qint64 QnTimeImageFilter::calcHash(const quint8* data, int width, int height, int linesize)
+{
+    qint64 result = 0;
+    const qint64* data64 = (const qint64*) data;
+    for (int y = 0; y < height; ++y) {
+        for (int i = 0; i < width / sizeof(qint64); ++i)
+            result += data64[i];
+        data64 += linesize / sizeof(qint64);
+    }
+    return result;
+}
+
 CLVideoDecoderOutputPtr QnTimeImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame)
 {
-    if (frame->channel != m_channel)
-        return frame;
 
     QString timeStr;
     qint64 displayTime = frame->pts/1000 + m_onscreenDateOffset;
@@ -121,6 +111,12 @@ CLVideoDecoderOutputPtr QnTimeImageFilter::updateImage(const CLVideoDecoderOutpu
 
     int bufPlaneYOffs  = m_bufXOffs + m_bufYOffs * frame->linesize[0];
     int bufferUVOffs = m_bufXOffs/2 + m_bufYOffs * frame->linesize[1] / 2;
+
+    if (m_checkHash) {
+        qint64 hash = calcHash(frame->data[0]+bufPlaneYOffs, m_timeImg->width(), m_timeImg->height(), frame->linesize[0]);
+        if (hash == m_hash)
+            return frame;
+    }
 
     // copy and convert frame buffer to image
     yuv420_argb32_simd_intr(m_imageBuffer,
@@ -142,6 +138,10 @@ CLVideoDecoderOutputPtr QnTimeImageFilter::updateImage(const CLVideoDecoderOutpu
         frame->data[0]+bufPlaneYOffs, frame->data[1]+bufferUVOffs, frame->data[2]+bufferUVOffs,
         frame->linesize[0], frame->linesize[1], 
         m_timeImg->width(), m_timeImg->height(), false);
+
+    if (m_checkHash)
+        m_hash = calcHash(frame->data[0]+bufPlaneYOffs, m_timeImg->width(), m_timeImg->height(), frame->linesize[0]);
+
     return frame;
 }
 
