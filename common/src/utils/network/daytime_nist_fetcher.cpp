@@ -124,6 +124,7 @@ static qint64 actsTimeToUTCMillis( const char* actsStr )
         &curTime.tm_hour, &curTime.tm_min, &curTime.tm_sec, &curTime.tm_isdst, &leap, &health, &msADV );
     curTime.tm_mon -= 1;    //must be from 0 to 11
     curTime.tm_year += 100; //current year minus 1900
+    curTime.tm_isdst = 0;   //we have UTC in curTime and there is no DST in UTC
     time_t utcTime = mktime( &curTime );
 
     if( utcTime < 0 )
