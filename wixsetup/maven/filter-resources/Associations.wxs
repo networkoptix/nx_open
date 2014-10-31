@@ -3,7 +3,7 @@
 <Fragment>
   <DirectoryRef Id="INSTALLDIR">
      <Component Id="NovFileAssociation" DiskId="1">
-              <RegistryValue Root="HKCR" Type="string" Key="HDW.nov" Value="${product.name} Video (.nov)" KeyPath="yes" />
+              <RegistryValue Root="HKCR" Type="string" Key="HDW.nov" Value="${display.product.name} Video (.nov)" KeyPath="yes" />
               <RegistryValue Root="HKCR" Type="string" Key="HDW.nov\shell\open\command" Value="&quot;[#client.exe]&quot; &quot;%1&quot;"/>
               <RegistryValue Root="HKCR" Type="string" Key="HDW.nov\DefaultIcon" Value="&quot;[#client.exe]&quot;" />
               <RegistryValue Root="HKCR" Type="string" Key=".nov" Value="HDW.nov" />
