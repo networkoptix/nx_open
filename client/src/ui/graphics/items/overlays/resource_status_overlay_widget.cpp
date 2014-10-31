@@ -213,6 +213,9 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
         paintFlashingText(painter, m_staticTexts[UnauthorizedText], 0.125);
         paintFlashingText(painter, m_staticTexts[UnauthorizedSubText], 0.05, QPointF(0.0, 0.25));
         break;
+    case Qn::ServerUnauthorizedOverlay:
+        paintFlashingText(painter, m_staticTexts[UnauthorizedText], 0.125);
+        break;
     case Qn::ServerOfflineOverlay:
         paintFlashingText(painter, m_staticTexts[ServerOfflineText], 0.125);
         break;
