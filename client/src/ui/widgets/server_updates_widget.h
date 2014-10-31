@@ -40,6 +40,7 @@ private slots:
 
     void at_tool_stageChanged(QnFullUpdateStage stage);
     void at_tool_stageProgressChanged(QnFullUpdateStage stage, int progress);
+
 private:
     void initSourceMenu();
     void initLinkButtons();
