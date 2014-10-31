@@ -25,6 +25,7 @@
 #include "transcoding/filters/fisheye_image_filter.h"
 #include "transcoding/filters/rotate_image_filter.h"
 #include "transcoding/filters/crop_image_filter.h"
+#include "transcoding/filters/tiled_image_filter.h"
 
 #include "decoders/video/ffmpeg.h"
 #include "export/sign_helper.h"
@@ -583,6 +584,9 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
 
                 QSize updatedDstSize(m_videoTranscoder->getResolution());
                 m_videoTranscoder->open(mediaData);
+
+                if (layout->channelCount() > 1)
+                    m_videoTranscoder->addFilter(new QnTiledImageFilter(layout));
 
                 if (!m_srcRect.isEmpty() && !m_itemDewarpingParams.enabled) {
                     QRect rect(cwiseMul(m_srcRect, m_videoTranscoder->getResolution()).toRect());

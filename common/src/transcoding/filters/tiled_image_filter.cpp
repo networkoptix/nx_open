@@ -17,7 +17,7 @@ CLVideoDecoderOutputPtr QnTiledImageFilter::updateImage(const CLVideoDecoderOutp
 
     QSize size(frame->width, frame->height);
     if (!m_tiledFrame || size != m_size) {
-        size = m_size;
+        m_size = size;
         m_tiledFrame = CLVideoDecoderOutputPtr(new CLVideoDecoderOutput());
         m_tiledFrame->reallocate(frame->width * m_layout->size().width(), frame->height * m_layout->size().height(), frame->format);
         m_tiledFrame->memZerro();
@@ -25,7 +25,7 @@ CLVideoDecoderOutputPtr QnTiledImageFilter::updateImage(const CLVideoDecoderOutp
     }
 
     QPoint pos = m_layout->position(frame->channel);
-    QRect rect(pos.x() * m_size.width(), pos.x() * m_size.height(), m_size.width(), m_size.height());
+    QRect rect(pos.x() * m_size.width(), pos.y() * m_size.height(), m_size.width(), m_size.height());
     CLVideoDecoderOutputPtr croppedFrame = QnCropImageFilter(rect).updateImage(m_tiledFrame);
     CLVideoDecoderOutput::copy(frame.data(), croppedFrame.data());
     return m_tiledFrame;

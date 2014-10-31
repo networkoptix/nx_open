@@ -128,24 +128,6 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
         m_resolution = QSize(decoder.getContext()->width, decoder.getContext()->height);
     }
 
-    int width = m_resolution.width();
-    int height = m_resolution.height();
-    if (m_layout) {
-        if (lineAmountSpecified) {
-            int maxDimension = qMax(m_layout->size().width(), m_layout->size().height());
-            width /= maxDimension;
-            height /= maxDimension;
-        }
-        width = qPower2Ceil((unsigned) width , WIDTH_ALIGN);
-        height = qPower2Ceil((unsigned) height , HEIGHT_ALIGN);
-
-        width *= m_layout->size().width();
-        height *= m_layout->size().height();
-    }
-
-    m_resolution.setWidth(qPower2Ceil((unsigned)width, WIDTH_ALIGN));
-    m_resolution.setHeight(qPower2Ceil((unsigned)height, HEIGHT_ALIGN));
-
     return true;
 }
 

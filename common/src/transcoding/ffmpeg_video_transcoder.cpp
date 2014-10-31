@@ -135,6 +135,7 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
 
     if (decoder->decode(video, &m_decodedVideoFrame)) 
     {
+        m_decodedVideoFrame->channel = video->channelNumber;
         CLVideoDecoderOutputPtr decodedFrame = m_decodedVideoFrame;
 
         decodedFrame->pts = m_decodedVideoFrame->pkt_dts;
