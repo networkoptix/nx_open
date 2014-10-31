@@ -80,28 +80,23 @@ void CLVideoDecoderOutput::clean()
 void CLVideoDecoderOutput::copy(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst)
 {
     if (src->width != dst->width || src->height != dst->height || src->format != dst->format)
-    {
-        // need to reallocate dst memory
-        //rounding width and height to 32 and 16 bytes respectively
-        const int roundedWidth = (src->width & 0x1f) != 0 ? ((src->width & 0xffffffe0) + 0x20) : src->width;
-        const int roundedHeight = (src->height & 0x0f) != 0 ? ((src->height & 0xfffffff0) + 0x10) : src->height;
-        dst->setUseExternalData(false);
-        int numBytes = avpicture_get_size((PixelFormat) src->format, roundedWidth, roundedHeight);
-        avpicture_fill((AVPicture*) dst, (quint8*) av_malloc(numBytes), (PixelFormat) src->format, roundedWidth, roundedHeight);
+        dst->reallocate(src->width, src->height, src->format);
 
-        dst->width = src->width;
-        dst->height = src->height;
-        dst->format = src->format;
-    }
-
-    int yu_h = dst->format == PIX_FMT_YUV420P ? dst->height/2 : dst->height;
     dst->assignMiscData(src);
     //TODO/IMPL
     //dst->metadata = QnMetaDataV1Ptr( new QnMetaDataV1( *src->metadata ) );
 
-    copyPlane(dst->data[0], src->data[0], dst->linesize[0], dst->linesize[0], src->linesize[0], src->height);
-    copyPlane(dst->data[1], src->data[1], dst->linesize[1], dst->linesize[1], src->linesize[1], yu_h);
-    copyPlane(dst->data[2], src->data[2], dst->linesize[2], dst->linesize[2], src->linesize[2], yu_h);
+    const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[src->format];
+    for (int i = 0; i < descr->nb_components && src->data[i]; ++i)
+    {
+        int h = src->height;
+        int w = src->width;
+        if (i > 0) {
+            h >>= descr->log2_chroma_h;
+            w >>= descr->log2_chroma_w;
+        }
+        copyPlane(dst->data[i], src->data[i], w, dst->linesize[i], src->linesize[i], h);
+    }
 }
 
 /*
@@ -356,7 +351,7 @@ QImage CLVideoDecoderOutput::toImage() const
     return img;
 }
 
-void CLVideoDecoderOutput::assignMiscData(CLVideoDecoderOutput* other)
+void CLVideoDecoderOutput::assignMiscData(const CLVideoDecoderOutput* other)
 {
     pkt_dts = other->pkt_dts;
     pkt_pts = other->pkt_pts;
@@ -449,8 +444,5 @@ CLVideoDecoderOutput* CLVideoDecoderOutput::rotated(int angle)
         }
     }
 
-    dstPict->channel = channel;
-    dstPict->pts = pts;
-    dstPict->sample_aspect_ratio = sample_aspect_ratio;
     return dstPict;
 }

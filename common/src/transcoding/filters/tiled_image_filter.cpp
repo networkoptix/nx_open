@@ -21,8 +21,8 @@ CLVideoDecoderOutputPtr QnTiledImageFilter::updateImage(const CLVideoDecoderOutp
         m_tiledFrame = CLVideoDecoderOutputPtr(new CLVideoDecoderOutput());
         m_tiledFrame->reallocate(frame->width * m_layout->size().width(), frame->height * m_layout->size().height(), frame->format);
         m_tiledFrame->memZerro();
-        m_tiledFrame->assignMiscData(frame.data());
     }
+    m_tiledFrame->assignMiscData(frame.data());
 
     QPoint pos = m_layout->position(frame->channel);
     QRect rect(pos.x() * m_size.width(), pos.y() * m_size.height(), m_size.width(), m_size.height());
