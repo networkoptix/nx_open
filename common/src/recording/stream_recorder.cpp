@@ -24,6 +24,7 @@
 #include "transcoding/filters/time_image_filter.h"
 #include "transcoding/filters/fisheye_image_filter.h"
 #include "transcoding/filters/rotate_image_filter.h"
+#include "transcoding/filters/crop_image_filter.h"
 
 #include "decoders/video/ffmpeg.h"
 #include "export/sign_helper.h"
@@ -32,6 +33,16 @@ static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4352;
 
 static const int STORE_QUEUE_SIZE = 50;
+
+static QRectF cwiseMul(const QRectF &l, const QSizeF &r) 
+{
+    return QRectF(
+        l.left()   * r.width(),
+        l.top()    * r.height(),
+        l.width()  * r.width(),
+        l.height() * r.height()
+        );
+}
 
 QString QnStreamRecorder::errorString(int errCode) {
     switch (errCode) {
@@ -573,9 +584,10 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
                 QSize updatedDstSize(m_videoTranscoder->getResolution());
                 m_videoTranscoder->open(mediaData);
 
-                if (!m_srcRect.isEmpty() && !m_itemDewarpingParams.enabled)
-                    m_videoTranscoder->setSrcRect(m_srcRect); // todo: add crop filter here
-
+                if (!m_srcRect.isEmpty() && !m_itemDewarpingParams.enabled) {
+                    QRect rect(cwiseMul(m_srcRect, m_videoTranscoder->getResolution()).toRect());
+                    m_videoTranscoder->addFilter(new QnCropImageFilter(QnCodecTranscoder::roundRect(rect)));
+                }
                 if (m_itemDewarpingParams.enabled)
                     m_videoTranscoder->addFilter(new QnFisheyeImageFilter(mediaDev->getDewarpingParams(), m_itemDewarpingParams));
                 if (m_contrastParams.enabled)
@@ -584,7 +596,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
                     m_videoTranscoder->addFilter(new QnRotateImageFilter(m_rotAngle));
 
                 if (m_timestampCorner != Qn::NoCorner) 
-                    m_videoTranscoder->addFilter(new QnTimeImageFilter(m_timestampCorner, m_onscreenDateOffset));
+                    m_videoTranscoder->addFilter(new QnTimeImageFilter(layout, m_timestampCorner, m_onscreenDateOffset));
 
                 m_videoTranscoder->setQuality(Qn::QualityHighest);
                 m_videoTranscoder->setVideoLayout(layout);

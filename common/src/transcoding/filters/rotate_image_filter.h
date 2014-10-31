@@ -12,7 +12,7 @@ class QnRotateImageFilter: public QnAbstractImageFilter
 public:
     QnRotateImageFilter(int angle);
 
-    virtual CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame, const QRectF& updateRect, qreal ar) override;
+    virtual CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) override;
 
     virtual QSize updatedResolution(const QSize& srcSize) override;
 private:

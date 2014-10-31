@@ -5,12 +5,12 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-QnTiledImageFilter::QnTiledImageFilter(QSharedPointer<const QnResourceVideoLayout> videoLayout): m_layout(videoLayout)
+QnTiledImageFilter::QnTiledImageFilter(const QSharedPointer<const QnResourceVideoLayout>& videoLayout): m_layout(videoLayout)
 {
 
 }
 
-CLVideoDecoderOutputPtr QnTiledImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame, const QRectF& updateRect, qreal ar)
+CLVideoDecoderOutputPtr QnTiledImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame)
 {
     if (m_layout->size().width() == 1 && m_layout->size().height() == 1)
         return frame;
@@ -21,11 +21,12 @@ CLVideoDecoderOutputPtr QnTiledImageFilter::updateImage(const CLVideoDecoderOutp
         m_tiledFrame = CLVideoDecoderOutputPtr(new CLVideoDecoderOutput());
         m_tiledFrame->reallocate(frame->width * m_layout->size().width(), frame->height * m_layout->size().height(), frame->format);
         m_tiledFrame->memZerro();
+        m_tiledFrame->assignMiscData(frame.data());
     }
 
     QPoint pos = m_layout->position(frame->channel);
     QRect rect(pos.x() * m_size.width(), pos.x() * m_size.height(), m_size.width(), m_size.height());
-    CLVideoDecoderOutputPtr croppedFrame = QnCropImageFilter(rect).updateImage(m_tiledFrame, updateRect, ar);
+    CLVideoDecoderOutputPtr croppedFrame = QnCropImageFilter(rect).updateImage(m_tiledFrame);
     CLVideoDecoderOutput::copy(frame.data(), croppedFrame.data());
     return m_tiledFrame;
 }

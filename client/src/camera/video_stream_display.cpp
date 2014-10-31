@@ -1036,8 +1036,6 @@ QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params,
     if (!anyQuality && (m_lastDisplayedFrame->flags & QnAbstractMediaData::MediaFlags_LowQuality))
         return QImage();    //screenshot will be received from the server
 
-    qreal ar = dec->getWidth() * (qreal) dec->getSampleAspectRatio() / (qreal) dec->getHeight();
-
     // copy image
     CLVideoDecoderOutputPtr srcFrame(new CLVideoDecoderOutput());
     srcFrame->setUseExternalData(false);
@@ -1065,12 +1063,12 @@ QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params,
 
     if (params.enabled) {
         QnContrastImageFilter filter(params);
-        filter.updateImage(srcFrame, QRectF(0.0, 0.0, 1.0, 1.0), ar);
+        srcFrame = filter.updateImage(srcFrame);
     }
 
     if (mediaDewarping.enabled && itemDewarping.enabled) {
         QnFisheyeImageFilter filter2(mediaDewarping, itemDewarping);
-        filter2.updateImage(srcFrame, QRectF(0.0, 0.0, 1.0, 1.0), ar);
+        srcFrame = filter2.updateImage(srcFrame);
     }
 
     // convert colorSpace

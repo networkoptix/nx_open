@@ -363,10 +363,18 @@ QImage CLVideoDecoderOutput::toImage() const
     return img;
 }
 
+void CLVideoDecoderOutput::assignMiscData(CLVideoDecoderOutput* other)
+{
+    channel = other->channel;
+    pts = other->pts;
+    sample_aspect_ratio = other->sample_aspect_ratio;
+}
+
 CLVideoDecoderOutput* CLVideoDecoderOutput::scaled(const QSize& newSize)
 {
     CLVideoDecoderOutput* dst(new CLVideoDecoderOutput);
     dst->reallocate(newSize.width(), newSize.height(), format);
+    dst->assignMiscData(this);
 
     SwsContext* scaleContext = sws_getContext(
         width, height, (PixelFormat) format, 
@@ -394,7 +402,7 @@ CLVideoDecoderOutput* CLVideoDecoderOutput::rotated(int angle)
 
     CLVideoDecoderOutput* dstPict(new CLVideoDecoderOutput());
     dstPict->reallocate(dstWidth, dstHeight, format);
-
+    dstPict->assignMiscData(this);
 
     const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[format];
     for (int i = 0; i < descr->nb_components && data[i]; ++i) 
@@ -444,5 +452,9 @@ CLVideoDecoderOutput* CLVideoDecoderOutput::rotated(int angle)
             }
         }
     }
+
+    dstPict->channel = channel;
+    dstPict->pts = pts;
+    dstPict->sample_aspect_ratio = sample_aspect_ratio;
     return dstPict;
 }

@@ -51,12 +51,7 @@ void QnCodecTranscoder::setQuality( Qn::StreamQuality quality )
     m_quality = quality;
 }
 
-void QnCodecTranscoder::setSrcRect(const QRectF& srcRect)
-{
-    m_srcRectF = srcRect;
-}
-
-QRect QnCodecTranscoder::roundRect(const QRect& srcRect) const
+QRect QnCodecTranscoder::roundRect(const QRect& srcRect)
 {
     int left = qPower2Floor((unsigned) srcRect.left(), 16);
     int top = qPower2Floor((unsigned) srcRect.top(), 2);
@@ -97,13 +92,13 @@ void QnVideoTranscoder::addFilter(QnAbstractImageFilter* filter)
     m_filters << filter;
 }
 
-CLVideoDecoderOutputPtr QnVideoTranscoder::processFilterChain(const CLVideoDecoderOutputPtr& decodedFrame, const QRectF& updateRect, qreal ar)
+CLVideoDecoderOutputPtr QnVideoTranscoder::processFilterChain(const CLVideoDecoderOutputPtr& decodedFrame)
 {
     if (m_filters.isEmpty())
         return decodedFrame;
     CLVideoDecoderOutputPtr result;
     for(QnAbstractImageFilter* filter: m_filters)
-        result = filter->updateImage(decodedFrame, updateRect, ar);
+        result = filter->updateImage(decodedFrame);
     return result;
 }
 
@@ -146,21 +141,6 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 
         width *= m_layout->size().width();
         height *= m_layout->size().height();
-    }
-
-    if (!m_srcRectF.isEmpty())
-    {
-        // round srcRect
-        int srcLeft = qPower2Floor(unsigned(m_srcRectF.left() * width), WIDTH_ALIGN);
-        int srcTop = qPower2Floor(unsigned(m_srcRectF.top() * height), HEIGHT_ALIGN);
-        int srcWidth = qPower2Ceil(unsigned(m_srcRectF.width() * width), WIDTH_ALIGN);
-        int srcHeight = qPower2Ceil(unsigned(m_srcRectF.height() * height), HEIGHT_ALIGN);
-
-        m_srcRectF = QRectF(srcLeft / (qreal) width, srcTop / (qreal) height, 
-                            srcWidth / (qreal) width, srcHeight / (qreal) height);
-
-        width  = srcWidth;
-        height = srcHeight;
     }
 
     m_resolution.setWidth(qPower2Ceil((unsigned)width, WIDTH_ALIGN));

@@ -8,7 +8,7 @@ QnRotateImageFilter::QnRotateImageFilter(int angle): m_angle(angle)
     
 }
 
-CLVideoDecoderOutputPtr QnRotateImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame, const QRectF& updateRect, qreal ar)
+CLVideoDecoderOutputPtr QnRotateImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame)
 {
     return CLVideoDecoderOutputPtr(frame->rotated(m_angle));
 }

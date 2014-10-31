@@ -402,7 +402,6 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         painter->drawImage(QPointF(0, 0), resizedToAr, QnGeometry::cwiseMul(parameters.zoomRect, resizedToAr.size()));
     }
     
-    qreal ar = resized.width() / (qreal) resized.height();
     int panoFactor = (parameters.mediaDewarpingParams.enabled && parameters.itemDewarpingParams.enabled) ? parameters.itemDewarpingParams.panoFactor : 1;
     if (panoFactor > 1)
 		resized = resized.scaled(QnFisheyeImageFilter::getOptimalSize(resized.size(), parameters.itemDewarpingParams));
@@ -410,12 +409,12 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
     QSharedPointer<CLVideoDecoderOutput> frame(new CLVideoDecoderOutput(resized));
     if (parameters.imageCorrectionParams.enabled) {
         QnContrastImageFilter filter(parameters.imageCorrectionParams);
-        filter.updateImage(frame, QRectF(0.0, 0.0, 1.0, 1.0), ar);
+        frame = filter.updateImage(frame);
     }
 
     if (parameters.mediaDewarpingParams.enabled && parameters.itemDewarpingParams.enabled) {
         QnFisheyeImageFilter filter(parameters.mediaDewarpingParams, parameters.itemDewarpingParams);
-        filter.updateImage(frame, QRectF(0.0, 0.0, 1.0, 1.0), ar);
+        frame = filter.updateImage(frame);
     }
 
     QImage timestamped = frame->toImage();

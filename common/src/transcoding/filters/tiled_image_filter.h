@@ -12,8 +12,8 @@ class QnResourceVideoLayout;
 class QnTiledImageFilter: public QnAbstractImageFilter
 {
 public:
-    QnTiledImageFilter(QSharedPointer<const QnResourceVideoLayout> videoLayout);
-    virtual CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame, const QRectF& updateRect, qreal ar) override;
+    QnTiledImageFilter(const QSharedPointer<const QnResourceVideoLayout>& videoLayout);
+    virtual CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) override;
     virtual QSize updatedResolution(const QSize& srcSize) override;
 private:
     QSharedPointer<const QnResourceVideoLayout> m_layout;

@@ -19,7 +19,7 @@ QnCropImageFilter::QnCropImageFilter(const QRect& rect): m_rect(rect)
     
 }
 
-CLVideoDecoderOutputPtr QnCropImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame, const QRectF& updateRect, qreal ar)
+CLVideoDecoderOutputPtr QnCropImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame)
 {
     if (m_rect.isEmpty())
         return frame;
@@ -43,6 +43,7 @@ CLVideoDecoderOutputPtr QnCropImageFilter::updateImage(const CLVideoDecoderOutpu
     result->width = frameRect.width();
     result->height = frameRect.height();
 
+    result->assignMiscData(frame.data());
     return result;
 }
 

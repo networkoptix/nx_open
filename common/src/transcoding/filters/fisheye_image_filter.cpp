@@ -147,7 +147,7 @@ QnFisheyeImageFilter::QnFisheyeImageFilter(const QnMediaDewarpingParams& mediaDe
     memset (m_transform, 0, sizeof(m_transform));
 }
 
-CLVideoDecoderOutputPtr QnFisheyeImageFilter::updateImage(const CLVideoDecoderOutputPtr& srcFrame, const QRectF& updateRect, qreal ar)
+CLVideoDecoderOutputPtr QnFisheyeImageFilter::updateImage(const CLVideoDecoderOutputPtr& srcFrame)
 {
     if (!m_itemDewarping.enabled || !m_mediaDewarping.enabled)
         return srcFrame;
@@ -158,10 +158,10 @@ CLVideoDecoderOutputPtr QnFisheyeImageFilter::updateImage(const CLVideoDecoderOu
     else
         frame = srcFrame;
 
-    int left = qPower2Floor(updateRect.left() * frame->width, 16);
-    int right = qPower2Floor(updateRect.right() * frame->width, 16);
-    int top = updateRect.top() * frame->height;
-    int bottom = updateRect.bottom() * frame->height;
+    int left = 0;
+    int right = frame->width;
+    int top = 0;
+    int bottom = frame->height;
     QSize imageSize(right - left, bottom - top);
 
     const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[frame->format];
@@ -185,6 +185,7 @@ CLVideoDecoderOutputPtr QnFisheyeImageFilter::updateImage(const CLVideoDecoderOu
                 w >>= descr->log2_chroma_w;
                 h >>= descr->log2_chroma_h;
             }
+            qreal ar = srcFrame->width * (qreal) srcFrame->sample_aspect_ratio / (qreal) srcFrame->height;
             updateFisheyeTransform(QSize(w, h), plane, ar);
         }
         m_lastImageSize = imageSize;

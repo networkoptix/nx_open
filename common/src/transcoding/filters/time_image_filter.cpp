@@ -11,13 +11,14 @@
 #include <utils/math/math.h>
 #include <utils/media/frame_info.h>
 #include <utils/color_space/yuvconvert.h>
+#include "core/resource/resource_media_layout.h"
 
 
 static const int TEXT_HEIGHT_IN_FRAME_PARTS = 25;
 static const int MIN_TEXT_HEIGHT = 14;
 static const double FPS_EPS = 1e-8;
 
-QnTimeImageFilter::QnTimeImageFilter(Qn::Corner datePos, qint64 timeOffsetMs):
+QnTimeImageFilter::QnTimeImageFilter(const QSharedPointer<const QnResourceVideoLayout>& videoLayout, Qn::Corner datePos, qint64 timeOffsetMs):
     m_dateTimeXOffs(0),
     m_dateTimeYOffs(0),
     m_bufXOffs(0),
@@ -25,9 +26,30 @@ QnTimeImageFilter::QnTimeImageFilter(Qn::Corner datePos, qint64 timeOffsetMs):
     m_timeImg(0),
     m_onscreenDateOffset(timeOffsetMs),
     m_imageBuffer(0),
-    m_dateTextPos(datePos)
+    m_dateTextPos(datePos),
+    m_channel(0)
 {
-
+    QPoint textPos;
+    switch(m_dateTextPos)
+    {
+    case Qn::TopLeftCorner:
+        textPos = QPoint(0, 0);
+        break;
+    case Qn::TopRightCorner:
+        textPos = QPoint(videoLayout->size().width()-1, 0);
+        break;
+    case Qn::BottomRightCorner:
+        textPos = QPoint(videoLayout->size().width()-1, videoLayout->size().height()-1);
+        break;
+    case Qn::BottomLeftCorner:
+    default:
+        textPos = QPoint(0, videoLayout->size().height()-1);
+        break;
+    }
+    for (int ch = 0; ch < videoLayout->channelCount(); ++ch) {
+        if (videoLayout->position(ch) == textPos)
+            m_channel = ch;
+    }
 }
 
 QnTimeImageFilter::~QnTimeImageFilter()
@@ -77,28 +99,10 @@ void QnTimeImageFilter::initTimeDrawing(const CLVideoDecoderOutputPtr& frame, co
     m_timeImg = new QImage(m_imageBuffer, drawWidth, drawHeight, drawWidth*4, QImage::Format_ARGB32_Premultiplied);
 }
 
-CLVideoDecoderOutputPtr QnTimeImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame, const QRectF& updateRect, qreal ar)
+CLVideoDecoderOutputPtr QnTimeImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame)
 {
-    switch(m_dateTextPos)
-    {
-    case Qn::TopLeftCorner:
-        if (qAbs(updateRect.left()) > FPS_EPS || qAbs(updateRect.top()) > FPS_EPS)
-            return frame;
-        break;
-    case Qn::TopRightCorner:
-        if (qAbs(updateRect.right()-1.0) > FPS_EPS || qAbs(updateRect.top()) > FPS_EPS)
-            return frame;
-        break;
-    case Qn::BottomRightCorner:
-        if (qAbs(updateRect.right()-1.0) > FPS_EPS || qAbs(updateRect.bottom()-1.0) > FPS_EPS)
-            return frame;
-        break;
-    case Qn::BottomLeftCorner:
-    default:
-        if (qAbs(updateRect.left()) > FPS_EPS || qAbs(updateRect.bottom()-1.0) > FPS_EPS)
-            return frame;
-        break;
-    }
+    if (frame->channel != m_channel)
+        return frame;
 
     QString timeStr;
     qint64 displayTime = frame->pts/1000 + m_onscreenDateOffset;

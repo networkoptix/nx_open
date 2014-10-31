@@ -72,17 +72,15 @@ public:
     virtual int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result) = 0;
     QString getLastError() const;
     virtual void setQuality( Qn::StreamQuality quality );
-    void setSrcRect(const QRectF& srcRect);
     virtual bool existMoreData() const { return false; }
+    static QRect roundRect(const QRect& srcRect);
 protected:
-    QRect roundRect(const QRect& srcRect) const;
 protected:
     QString m_lastErrMessage;
     QnCodecParams::Value m_params;
     int m_bitrate;
     CodecID m_codecId;
     Qn::StreamQuality m_quality;
-    QRectF m_srcRectF;
 };
 typedef QSharedPointer<QnCodecTranscoder> QnCodecTranscoderPtr;
 
@@ -113,7 +111,7 @@ protected:
     static const int WIDTH_ALIGN = 16;
     static const int HEIGHT_ALIGN = 2;
         
-    QSharedPointer<CLVideoDecoderOutput> processFilterChain(const QSharedPointer<CLVideoDecoderOutput>& decodedFrame, const QRectF& updateRect, qreal ar);
+    QSharedPointer<CLVideoDecoderOutput> processFilterChain(const QSharedPointer<CLVideoDecoderOutput>& decodedFrame);
 
 protected:
     QSize m_resolution;

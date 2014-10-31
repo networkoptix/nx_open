@@ -181,6 +181,9 @@ public:
     CLVideoDecoderOutput* scaled(const QSize& newSize);
 
     QSize size() const { return QSize(width, height); }
+
+    /** Assign misc fields except but no video data */
+    void assignMiscData(CLVideoDecoderOutput* other);
 public:
     QnAbstractMediaData::MediaFlags flags;
 
