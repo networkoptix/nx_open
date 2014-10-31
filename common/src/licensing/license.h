@@ -85,6 +85,9 @@ public:
     static QString displayName(Qn::LicenseType licenseType);
     QString longDisplayName() const;
     static QString longDisplayName(Qn::LicenseType licenseType);
+
+    /** Id of the server this license attached to (if it is present in the current system). */
+    QnUuid serverId() const;
 private:
     QByteArray m_rawLicense;
 
@@ -115,7 +118,6 @@ private:
         QByteArray* const v2LicenseBlock );
     void verify( const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock );
 
-    QnUuid findRuntimeDataByLicense() const;
     bool gotError(ErrorCode* errCode, ErrorCode errorCode) const;
 };
 

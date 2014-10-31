@@ -58,7 +58,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent):
     setWarningStyle(ui->licenseKeyWarningLabel);
     ui->licenseKeyWarningLabel->setVisible(false);
 
-    ui->serverIconLabel->setPixmap(qnResIconCache->icon(QnResourceIconCache::Server).pixmap(24, 24));
+    ui->serverIconLabel->setPixmap(qnResIconCache->icon(QnResourceIconCache::Server).pixmap(18, 18));
 
     connect(ui->onlineKeyEdit,              SIGNAL(textChanged(QString)),       this,   SLOT(updateControls()));
     connect(ui->activationTypeComboBox,     SIGNAL(currentIndexChanged(int)),   this,   SLOT(at_activationTypeComboBox_currentIndexChanged()));

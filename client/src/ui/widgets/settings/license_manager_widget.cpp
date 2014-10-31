@@ -49,6 +49,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
         << QnLicenseListModel::CameraCountColumn 
         << QnLicenseListModel::LicenseKeyColumn 
         << QnLicenseListModel::ExpirationDateColumn
+        << QnLicenseListModel::ServerColumn
         << QnLicenseListModel::LicenseStatusColumn
         ;
 
