@@ -74,11 +74,10 @@ namespace nx_tz
     int getLocalTimeZoneOffset()
     {
 #ifdef _WIN32
-        int daylight;
-        _get_daylight(&daylight);
-        long timezone = 0;
-        _get_timezone(&timezone);
-        return -(timezone / SEC_PER_MIN) + (daylight ? MIN_PER_HOUR : 0);
+        struct _timeb timeB;
+        memset( &timeB, 0, sizeof(timeB) );
+        _ftime( &timeB );
+        return -timeB.timezone + (timeB.dstflag ? MIN_PER_HOUR : 0);
 #else //if defined(__linux__)
         //cannot rely on ftime on linux
 
