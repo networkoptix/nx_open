@@ -145,7 +145,7 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
             decodedFrame = CLVideoDecoderOutputPtr(decodedFrame->scaled(m_resolution));
 
         static AVRational r = {1, 1000000};
-        decodedFrame->pts  = av_rescale_q(m_decodedVideoFrame->pkt_dts, r, m_encoderCtx->time_base);
+        decodedFrame->pts  = av_rescale_q(decodedFrame->pts, r, m_encoderCtx->time_base);
         if ((quint64)m_firstEncodedPts == AV_NOPTS_VALUE)
             m_firstEncodedPts = decodedFrame->pts;
 

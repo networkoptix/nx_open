@@ -2,6 +2,7 @@
 #include "core/resource/resource_media_layout.h"
 #include "utils/media/frame_info.h"
 #include "crop_image_filter.h"
+#include "utils/common/util.h"
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -22,7 +23,9 @@ CLVideoDecoderOutputPtr QnTiledImageFilter::updateImage(const CLVideoDecoderOutp
         m_tiledFrame->reallocate(frame->width * m_layout->size().width(), frame->height * m_layout->size().height(), frame->format);
         m_tiledFrame->memZerro();
     }
+    qint64 oldTime = m_tiledFrame->pts;
     m_tiledFrame->assignMiscData(frame.data());
+    m_tiledFrame->pts = qMax(m_tiledFrame->pts, oldTime + MIN_FRAME_DURATION);
 
     QPoint pos = m_layout->position(frame->channel);
     QRect rect(pos.x() * m_size.width(), pos.y() * m_size.height(), m_size.width(), m_size.height());
