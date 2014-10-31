@@ -94,7 +94,7 @@
 
     <!-- MyFeaturesDlg -->
     <String Id="MyFeaturesDlg_Components"                           Overridable="yes">Composants</String>
-    <String Id="MyFeaturesDlg_Client"                               Overridable="yes">${client.name} (Je veux voir le vidéo enregistré ailleurs)</String>
+    <String Id="MyFeaturesDlg_Client"                               Overridable="yes">${client.display.name} (Je veux voir le vidéo enregistré ailleurs)</String>
     <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (Je veux enregistrer localement sur ce PC)</String>
     <String Id="MyFeaturesDlg_EnterpriseController"                 Overridable="yes">${appserver.name} (Gestion de base de données. Ne doit pas être installé plus d'une fois sur un réseau)</String>    
 

@@ -98,7 +98,7 @@
 
     <!-- MyFeaturesDlg -->
     <String Id="MyFeaturesDlg_Components"                           Overridable="yes">Компоненты</String>
-    <String Id="MyFeaturesDlg_Client"                               Overridable="yes">${client.name} (Я хочу смотреть видео, записанное в другом месте)</String>
+    <String Id="MyFeaturesDlg_Client"                               Overridable="yes">${client.display.name} (Я хочу смотреть видео, записанное в другом месте)</String>
     <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (Я хочу вести локальную запись на этом ПК)</String>
     <String Id="MyFeaturesDlg_EnterpriseController"                 Overridable="yes">${appserver.name} (Управление базой данных. Только ОДИН такой компонент должен быть установлен в сети!)</String>    
 

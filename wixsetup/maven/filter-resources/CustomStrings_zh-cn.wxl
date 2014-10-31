@@ -98,7 +98,7 @@
 
     <!-- MyFeaturesDlg -->
     <String Id="MyFeaturesDlg_Components"                           Overridable="yes">组件</String>
-    <String Id="MyFeaturesDlg_Client"                               Overridable="yes">${client.name} (客户端，可以使用它访问视频和录像)</String>
+    <String Id="MyFeaturesDlg_Client"                               Overridable="yes">${client.display.name} (客户端，可以使用它访问视频和录像)</String>
     <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (媒体存储服务，可以使用它在进行本地录像)</String>
     <String Id="MyFeaturesDlg_EnterpriseController"                 Overridable="yes">${appserver.name} (数据管理控制服务. 在一个网络中只能安装一个控制服务)</String>    
 
