@@ -95,14 +95,7 @@ void CLVideoDecoderOutput::copy(const CLVideoDecoderOutput* src, CLVideoDecoderO
     }
 
     int yu_h = dst->format == PIX_FMT_YUV420P ? dst->height/2 : dst->height;
-
-    dst->pkt_dts = src->pkt_dts;
-    dst->pkt_pts = src->pkt_pts;
-    dst->pts = src->pts;
-
-    dst->flags = src->flags;
-    dst->sample_aspect_ratio = src->sample_aspect_ratio ;
-    dst->channel = src->channel;
+    dst->assignMiscData(src);
     //TODO/IMPL
     //dst->metadata = QnMetaDataV1Ptr( new QnMetaDataV1( *src->metadata ) );
 
@@ -365,9 +358,12 @@ QImage CLVideoDecoderOutput::toImage() const
 
 void CLVideoDecoderOutput::assignMiscData(CLVideoDecoderOutput* other)
 {
-    channel = other->channel;
+    pkt_dts = other->pkt_dts;
+    pkt_pts = other->pkt_pts;
     pts = other->pts;
+    flags = other->flags;
     sample_aspect_ratio = other->sample_aspect_ratio;
+    channel = other->channel;
 }
 
 CLVideoDecoderOutput* CLVideoDecoderOutput::scaled(const QSize& newSize)
