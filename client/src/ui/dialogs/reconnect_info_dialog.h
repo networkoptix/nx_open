@@ -22,6 +22,8 @@ public:
     QnMediaServerResourcePtr currentServer() const;
     void setCurrentServer(const QnMediaServerResourcePtr &server);
 
+    virtual void reject() override;
+
 signals:
     void currentServerChanged(const QnMediaServerResourcePtr &server);
 private:

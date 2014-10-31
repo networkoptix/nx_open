@@ -23,9 +23,7 @@ QnReconnectInfoDialog::QnReconnectInfoDialog(QWidget *parent, Qt::WindowFlags wi
     ui->setupUi(this);
 
     connect(ui->buttonBox,  &QDialogButtonBox::rejected, this, [this]{
-        m_cancelled = true;
-        ui->buttonBox->button(QDialogButtonBox::Cancel)->setEnabled(false);
-        ui->label->setText(tr("Canceling..."));
+        reject();
     });
 
     QnUuid currentServerId = qnCommon->remoteGUID();
@@ -69,6 +67,15 @@ QnReconnectInfoDialog::QnReconnectInfoDialog(QWidget *parent, Qt::WindowFlags wi
 
 QnReconnectInfoDialog::~QnReconnectInfoDialog()
 {}
+
+
+void QnReconnectInfoDialog::reject() {
+    m_cancelled = true;
+    ui->buttonBox->button(QDialogButtonBox::Cancel)->setEnabled(false);
+    ui->label->setText(tr("Canceling..."));
+    /* We are not closing dialog here intentionally. */
+}
+
 
 bool QnReconnectInfoDialog::wasCanceled() const {
     return m_cancelled;
