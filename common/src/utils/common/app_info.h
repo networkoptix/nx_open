@@ -37,6 +37,7 @@ struct QnAppInfo {
     static QString settingsUrl();
     static QString mirrorListUrl();
     static QString helpUrl();
+    static QString updateGeneratorUrl();
 
     static int     freeLicenseCount();
     static QString freeLicenseKey();
