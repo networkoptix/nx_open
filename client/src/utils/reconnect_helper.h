@@ -10,6 +10,8 @@ class QnReconnectHelper: public QObject {
 public:
     QnReconnectHelper(QObject *parent = NULL);
 
+    QnMediaServerResourceList servers() const;
+
     QnMediaServerResourcePtr currentServer() const;
     QUrl currentUrl() const;
 

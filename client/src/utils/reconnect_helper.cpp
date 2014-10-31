@@ -13,7 +13,10 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <ui/common/ui_resource_name.h>
+
 #include <utils/common/collection.h>
+#include <utils/common/string.h>
 #include <utils/network/module_finder.h>
 
 QnReconnectHelper::InterfaceInfo::InterfaceInfo():
@@ -36,7 +39,7 @@ QnReconnectHelper::QnReconnectHelper(QObject *parent /*= NULL*/):
         m_allServers << m_currentServer;
 
     qSort(m_allServers.begin(), m_allServers.end(), [](const QnMediaServerResourcePtr &left, const QnMediaServerResourcePtr &right) {
-        return left->getId() < right->getId();
+        return naturalStringCompare(getResourceName(left), getResourceName(right), Qt::CaseInsensitive , false);
     });
 
     if (!m_currentServer && !m_allServers.isEmpty())
@@ -80,43 +83,11 @@ QnReconnectHelper::QnReconnectHelper(QObject *parent /*= NULL*/):
 
         updateInterfacesForServer(server->getId());
     }
+}
 
 
-/*
-
-    QHostAddress currentAddr(currentUrl.host());
-    quint32 currentIp = currentAddr.toIPv4Address();
-    if (currentAddr.isNull()) {
-        QHostInfo currentInfo = QHostInfo::fromName(currentUrl.host());
-        for (const QHostAddress &addr: currentInfo.addresses()) {
-            currentIp = addr.toIPv4Address();
-            if (currentIp > 0)
-                break;
-        }
-    }
-
-    auto matchIpMetric = [](quint32 ip1, quint32 ip2) {
-        int i = 31;
-        while (i >= 0 && (ip1 >> i == ip2 >> i))
-            --i;
-        return 31 - i;
-    };
-
-    auto hostLessThan = [currentIp, matchIpMetric](const AddressInfo &left, const AddressInfo &right) {
-        QHostAddress laddr(left.url.host());
-        QHostAddress raddr(right.url.host());
-        if (laddr.isNull() || raddr.isNull())
-            return raddr.isNull();
-
-        int metricDiff = matchIpMetric(currentIp, laddr.toIPv4Address()) - matchIpMetric(currentIp, raddr.toIPv4Address());
-        return metricDiff != 0
-            ? metricDiff > 0
-            : laddr.toIPv4Address() < raddr.toIPv4Address();
-    };
-
-
-*/
-
+QnMediaServerResourceList QnReconnectHelper::servers() const {
+    return m_allServers;
 }
 
 QnMediaServerResourcePtr QnReconnectHelper::currentServer() const {
