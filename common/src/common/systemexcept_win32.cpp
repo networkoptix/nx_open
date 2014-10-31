@@ -74,7 +74,7 @@ static bool GetProgramName( char* buffer ) {
 }
 
 static
-void writeMiniDump( HANDLE hThread , PEXCEPTION_POINTERS ex ) {
+void WriteDump( HANDLE hThread , PEXCEPTION_POINTERS ex ) {
     char sFileName[1024];
     char sProgramName[1024];
     char sAppData[MAX_PATH];
@@ -136,12 +136,9 @@ void writeMiniDump( HANDLE hThread , PEXCEPTION_POINTERS ex ) {
     ::CloseHandle(hFile);
 }
 
-
-
-
 static void translate( unsigned int code , _EXCEPTION_POINTERS* ExceptionInfo ) {
     Q_UNUSED(code);
-    writeMiniDump( GetCurrentThread() , ExceptionInfo );
+    WriteDump( GetCurrentThread() , ExceptionInfo );
     TerminateProcess( GetCurrentProcess(), 1 );
 }
 
@@ -232,7 +229,7 @@ static DWORD WINAPI dumpStackProc( LPVOID lpParam )
         //TODO/IMPL
     }
 
-    writeMiniDump(targetThreadHandle,NULL);
+    WriteDump(targetThreadHandle,NULL);
     //terminating process
     return TerminateProcess( GetCurrentProcess(), 1 ) ? 0 : 1;
 }
@@ -247,7 +244,7 @@ static void dumpCrtError()
         ::Sleep( 10000 );
         return;
     }
-    writeMiniDump(currentThreadExtHandle,NULL);
+    WriteDump(currentThreadExtHandle,NULL);
     TerminateProcess( GetCurrentProcess(), 1 );
 }
 
@@ -668,6 +665,8 @@ void LegacyDump( HANDLE hThread ) {
             &dwDisp,
             pImgSymbol )) {
                 FWriteFile(hFile," %s() + 0x%x\n",pImgSymbol->Name, dwDisp);
+        } else {
+            FWriteFile(hFile,"%s","\n");
         }
     }
 
