@@ -48,8 +48,9 @@ public:
     DeviceSoapWrapper* getDeviceSoapWrapper();
 
 private:
-
     OnvifCameraSettingsResp();
+    OnvifCameraSettingsResp( const OnvifCameraSettingsResp& );
+    OnvifCameraSettingsResp& operator=( const OnvifCameraSettingsResp& );
 };
 
 //
