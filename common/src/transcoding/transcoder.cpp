@@ -96,9 +96,9 @@ CLVideoDecoderOutputPtr QnVideoTranscoder::processFilterChain(const CLVideoDecod
 {
     if (m_filters.isEmpty())
         return decodedFrame;
-    CLVideoDecoderOutputPtr result;
+    CLVideoDecoderOutputPtr result = decodedFrame;
     for(QnAbstractImageFilter* filter: m_filters)
-        result = filter->updateImage(decodedFrame);
+        result = filter->updateImage(result);
     return result;
 }
 
