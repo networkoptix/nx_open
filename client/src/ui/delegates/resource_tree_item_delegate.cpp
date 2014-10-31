@@ -62,9 +62,6 @@ void QnResourceTreeItemDelegate::paint(QPainter *painter, const QStyleOptionView
         optionV4.font.setBold(bold);
     }
 
-    if (!resource.isNull() && resource->hasFlags(Qn::server) && resource->getId() == qnCommon->remoteGUID())
-        optionV4.font.setBold(true);
-
     QStyle *style = optionV4.widget ? optionV4.widget->style() : QApplication::style();
 
     /* Highlight currently raised/zoomed item. */
