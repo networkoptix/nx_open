@@ -1757,13 +1757,14 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         /* Recorder name should not be validated. */
         QString groupId = camera->getGroupId();
         QnVirtualCameraResourceList modified;
-        foreach(const QnResourcePtr &resource, qnResPool->getResources()) {
-            QnVirtualCameraResourcePtr cam = resource.dynamicCast<QnVirtualCameraResource>();
+        foreach(const QnVirtualCameraResourcePtr &cam, qnResPool->getResources<QnVirtualCameraResource>()) {
             if (!cam || cam->getGroupId() != groupId)
                 continue;
             cam->setGroupName(name);
             modified << cam;
         }
+        if (modified.isEmpty())
+            return; // very strange outcome - at least camera should be in the list
         const QList<QnUuid>& idList = idListFromResList(modified);
         connection2()->getCameraManager()->saveUserAttributes(
             QnCameraUserAttributePool::instance()->getAttributesList(idList),
@@ -2245,24 +2246,19 @@ void QnWorkbenchActionHandler::at_backgroundImageStored(const QString &filename,
 
 void QnWorkbenchActionHandler::at_resources_saved( int handle, ec2::ErrorCode errorCode, const QnResourceList& resources ) {
     Q_UNUSED(handle);
+    Q_ASSERT(!resources.isEmpty());
 
     if( errorCode == ec2::ErrorCode::ok )
         return;
 
-    if (!resources.isEmpty()) {
-        QnResourceListDialog::exec(
-            mainWindow(),
-            resources,
-            tr("Error"),
-            tr("Could not save the following %n items to Server.", "", resources.size()),
-            QDialogButtonBox::Ok
+    QnResourceListDialog::exec(
+        mainWindow(),
+        resources,
+        tr("Error"),
+        tr("Could not save the following %n items.", "", resources.size()),
+        QDialogButtonBox::Ok
         );
-    } else { // Note that we may get reply of size 0 if Server is down.
-        QMessageBox::warning(
-                    mainWindow(),
-                    tr("Changes are not applied"),
-                    tr("Could not save changes to Server."));
-    }
+ 
 }
 
 void QnWorkbenchActionHandler::at_resources_properties_saved( int /*handle*/, ec2::ErrorCode /*errorCode */)
