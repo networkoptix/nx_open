@@ -400,6 +400,13 @@ void QnSmtpSettingsWidget::validateEmailAdvanced() {
 }
 
 bool QnSmtpSettingsWidget::hasChanges() const  {
-    return settings() != QnGlobalSettings::instance()->emailSettings();
+    QnEmailSettings local = settings();
+    QnEmailSettings remote = QnGlobalSettings::instance()->emailSettings();
+
+    /* Do not notify about changes if no valid settings are provided. */
+    if (!local.isValid() && !remote.isValid())
+        return false;
+
+    return local.equals(remote);
 }
 
