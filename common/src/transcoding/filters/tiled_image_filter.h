@@ -13,10 +13,12 @@ class QnTiledImageFilter: public QnAbstractImageFilter
 {
 public:
     QnTiledImageFilter(QSharedPointer<const QnResourceVideoLayout> videoLayout);
-    CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame, const QRectF& updateRect, qreal ar) override;
+    virtual CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame, const QRectF& updateRect, qreal ar) override;
     virtual QSize updatedResolution(const QSize& srcSize) override;
 private:
-    QSharedPointer<const QnResourceVideoLayout> videoLayout m_layout;
+    QSharedPointer<const QnResourceVideoLayout> m_layout;
+    CLVideoDecoderOutputPtr m_tiledFrame;
+    QSize m_size;
 };
 
 #endif // ENABLE_DATA_PROVIDER
