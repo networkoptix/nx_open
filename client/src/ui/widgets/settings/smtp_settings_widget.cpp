@@ -407,6 +407,6 @@ bool QnSmtpSettingsWidget::hasChanges() const  {
     if (!local.isValid() && !remote.isValid())
         return false;
 
-    return local.equals(remote);
+    return !local.equals(remote);
 }
 
