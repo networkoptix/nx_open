@@ -23,15 +23,14 @@ CLVideoDecoderOutputPtr QnCropImageFilter::updateImage(const CLVideoDecoderOutpu
 {
     if (m_rect.isEmpty())
         return frame;
-    QRect frameRect;
     CLVideoDecoderOutputPtr result(new CLVideoDecoderOutput());
     result->setUseExternalData(true);
 
     const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[frame->format];
     for (int i = 0; i < descr->nb_components && frame->data[i]; ++i)
     {
-        int w = frameRect.left();
-        int h = frameRect.top();
+        int w = m_rect.left();
+        int h = m_rect.top();
         if (i > 0) {
             w >>= descr->log2_chroma_w;
             h >>= descr->log2_chroma_h;
@@ -40,8 +39,8 @@ CLVideoDecoderOutputPtr QnCropImageFilter::updateImage(const CLVideoDecoderOutpu
         result->linesize[i] = frame->linesize[i];
     }
     result->format = frame->format;
-    result->width = frameRect.width();
-    result->height = frameRect.height();
+    result->width = m_rect.width();
+    result->height = m_rect.height();
 
     result->assignMiscData(frame.data());
     return result;
