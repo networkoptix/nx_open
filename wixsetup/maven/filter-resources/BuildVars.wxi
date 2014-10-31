@@ -10,7 +10,7 @@
     <?define releaseVersionMajor = "${parsedVersion.majorVersion}"?>
     <?define releaseVersionMinor = "${parsedVersion.minorVersion}"?>
 
-    <?define productName = "${product.name}"?>
+    <?define productName = "${display.product.name}"?>
     <?define applauncherName = "${applauncher.name}"?>
     <?define clientName = "${client.name}"?>
 

@@ -35,6 +35,7 @@
         <traytool.name>${product.name} Tray Assistant</traytool.name>
         <traytool.display.name>${display.product.name} Tray Assistant</traytool.display.name>
         <vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
+        <wixsetup.name>${company.name} ${display.product.name} Setup v.${release.version}</wixsetup.name>
         <license.environment>production</license.environment>
         <build.configuration>release</build.configuration>
         <buildNumber>0</buildNumber>
