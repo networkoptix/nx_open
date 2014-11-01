@@ -3,6 +3,7 @@
 
 #include "systemexcept_win32.h"
 
+#include <memory>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -24,32 +25,6 @@ typedef BOOL (*pfMiniDumpWriteDump) (
     PMINIDUMP_USER_STREAM_INFORMATION ,
     PMINIDUMP_CALLBACK_INFORMATION );
 
-
-static BOOL InvokeMiniDumpWriteDump( 
-    HANDLE hProcess,
-    DWORD ProcessId,
-    HANDLE hFile,
-    MINIDUMP_TYPE DumpType,
-    PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam,
-    PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,
-    PMINIDUMP_CALLBACK_INFORMATION CallbackParam ) {
-        pfMiniDumpWriteDump pFunc = 
-            Win32FuncResolver::instance()->resolveFunction<pfMiniDumpWriteDump> (
-            L"DbgHelp.dll",
-            "MiniDumpWriteDump",
-            NULL);
-        if( pFunc == NULL ) {
-            return FALSE;
-        } else {
-            return pFunc(hProcess, 
-                         ProcessId,
-                         hFile,
-                         DumpType,
-                         ExceptionParam,
-                         UserStreamParam,
-                         CallbackParam);
-        }
-}
 
 
 static
@@ -75,6 +50,19 @@ static bool GetProgramName( char* buffer ) {
 
 static
 void WriteDump( HANDLE hThread , PEXCEPTION_POINTERS ex ) {
+
+    static const pfMiniDumpWriteDump MiniDumpWriteDumpAddress = 
+        Win32FuncResolver::instance()->resolveFunction<pfMiniDumpWriteDump> (
+        L"DbgHelp.dll",
+        "MiniDumpWriteDump",
+        NULL);
+    if( MiniDumpWriteDumpAddress == NULL )
+    {
+        LegacyDump(hThread);
+        return;
+    }
+
+
     char sFileName[1024];
     char sProgramName[1024];
     char sAppData[MAX_PATH];
@@ -123,16 +111,15 @@ void WriteDump( HANDLE hThread , PEXCEPTION_POINTERS ex ) {
                                                 MiniDumpWithHandleData | 
                                                 MiniDumpWithThreadInfo | 
                                             MiniDumpWithUnloadedModules ); 
-    if( InvokeMiniDumpWriteDump( 
+
+    MiniDumpWriteDumpAddress( 
         ::GetCurrentProcess(),
         ::GetCurrentProcessId(),
         hFile,
         sMDumpType,
         ex == NULL ? NULL : &sMDumpExcept,
         NULL,
-        NULL) == FALSE ) {
-            LegacyDump(hThread);
-    }
+        NULL );
     ::CloseHandle(hFile);
 }
 
@@ -147,67 +134,6 @@ static LONG WINAPI unhandledSEHandler( __in struct _EXCEPTION_POINTERS* Exceptio
     translate(0,ExceptionInfo);
     return EXCEPTION_EXECUTE_HANDLER;
 }
-
-#if 0
-static void writeCrashInfo(
-    const char* title,
-    const char* information )
-{
-    // The following code will try my best to avoid (to my best knowledge)
-    // 1) Heap allocation ( 1. Heap corruption 2. CRT global lock )
-    // 2) Function that cannot be re-entered
-    // 3) Function that acquires global lock ( most of CRT function )
-    char sProcessName[1024];
-    char sFileName[1024];
-    char sAppData[MAX_PATH];
-
-    if( !GetProgramName(sProcessName) )
-        return;
-    
-    if( FAILED(SHGetFolderPathA(
-            NULL,
-            CSIDL_LOCAL_APPDATA,
-            NULL,
-            0,
-            sAppData)))
-        return;
-
-    int ret = sprintf(sFileName,"%s\\%s_%d.except", sAppData, sProcessName, ::GetCurrentProcessId());
-
-    if( ret <=0 )
-        return;
-
-    HANDLE hFile = ::CreateFileA(
-        sFileName,
-        GENERIC_WRITE,
-        0,
-        NULL,
-        CREATE_NEW,
-        FILE_ATTRIBUTE_NORMAL,
-        NULL);
-
-    if(hFile == INVALID_HANDLE_VALUE)
-        return;
-
-    BOOL bRet;
-    // This parameter is not in used for writing into file and the WriteFile ensure
-    // that the write will not partially succeed, but we still need it to make SDK happy.
-    DWORD dwWritten;
-
-    bRet = ::WriteFile(hFile,title,(DWORD)(strlen(title)),&dwWritten,NULL);
-    if( bRet == FALSE )
-        goto done;
-
-    bRet = ::WriteFile(hFile,"\n",1,&dwWritten,NULL);
-    if( bRet == FALSE )
-        goto done;
-
-    bRet = ::WriteFile(hFile,information,(DWORD)(strlen(information)),&dwWritten,NULL);
-
-done:
-    ::CloseHandle(hFile);
-}
-#endif 
 
 static DWORD WINAPI dumpStackProc( LPVOID lpParam )
 {
@@ -596,10 +522,12 @@ void LegacyDump( HANDLE hThread ) {
     char pBuffer[MAX_SYMBOL_SIZE+sizeof(IMAGEHLP_SYMBOL64)];
 
     HANDLE hProcess = GetCurrentProcess();
-    HANDLE hFile = CreateLegacyDumpFile();
-
-    if( hFile == INVALID_HANDLE_VALUE )
+    std::unique_ptr<void, decltype(&::CloseHandle)> hFile( CreateLegacyDumpFile(), ::CloseHandle );
+    if( hFile.get() == INVALID_HANDLE_VALUE )
+    {
+        hFile.release();
         return;
+    }
 
     memset( pContextRecord, 0, sizeof(CONTEXT) );
     pContextRecord->ContextFlags = (CONTEXT_FULL);
@@ -626,11 +554,10 @@ void LegacyDump( HANDLE hThread ) {
     pImgSymbol = reinterpret_cast<PIMAGEHLP_SYMBOL64>(pBuffer);
 
     bRet = SymInitialize(GetCurrentProcess(), NULL, TRUE);
-    if( bRet == FALSE ) {
-        goto done;
-    }
+    if( bRet == FALSE )
+        return;
 
-    FWriteFile(hFile,"%s\n","-----------------Stack Trace-----------------");
+    FWriteFile(hFile.get(),"%s\n","-----------------Stack Trace-----------------");
 
     while( true ) {
         bRet = StackWalk64(
@@ -649,13 +576,13 @@ void LegacyDump( HANDLE hThread ) {
             NULL );
 
         if( bRet == FALSE ) {
-            FWriteFile(hFile,"%s","-----------------Done -------------------");
-            goto done;
+            FWriteFile(hFile.get(),"%s","-----------------Done -------------------");
+            return;
         }
 
-        FWriteFile(hFile,"%08x:",StackFrame.AddrPC.Offset);
+        FWriteFile(hFile.get(),"%08x:",StackFrame.AddrPC.Offset);
         if( SymGetModuleInfo64(GetCurrentProcess(), StackFrame.AddrPC.Offset, &ModuleName) ) {
-            FWriteFile(hFile," %s",ModuleName.ModuleName);
+            FWriteFile(hFile.get()," %s",ModuleName.ModuleName);
         }
         pImgSymbol->Size = MAX_SYMBOL_SIZE+sizeof(IMAGEHLP_SYMBOL64);
         pImgSymbol->MaxNameLength = MAX_SYMBOL_SIZE;
@@ -664,15 +591,11 @@ void LegacyDump( HANDLE hThread ) {
             StackFrame.AddrPC.Offset,
             &dwDisp,
             pImgSymbol )) {
-                FWriteFile(hFile," %s() + 0x%x\n",pImgSymbol->Name, dwDisp);
+                FWriteFile(hFile.get()," %s() + 0x%x\n",pImgSymbol->Name, dwDisp);
         } else {
-            FWriteFile(hFile,"%s","\n");
+            FWriteFile(hFile.get(),"%s","\n");
         }
     }
-
-
-done:
-    ::CloseHandle(hFile);
 }
 
 #endif
