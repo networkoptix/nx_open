@@ -1,5 +1,5 @@
 #define CompanyName "${company.name}"
-#define ProductName "${product.name}"
+#define ProductName "${display.product.name}"
 #define Box "${box}"
 #define Arch "${arch}"
 #define BuildConfiguration "${build.configuration}"
