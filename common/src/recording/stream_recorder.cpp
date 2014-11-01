@@ -532,12 +532,13 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
                         QJson::serialized<QnMediaDewarpingParams>(mediaDewarpingParams), 0);
         }
 
-        QnAviArchiveCustomData customData;
-        customData.overridenAr = m_device->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
-        av_dict_set(&m_formatCtx->metadata,
-            QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::CustomTag, fileExt),
-            QJson::serialized<QnAviArchiveCustomData>(customData), 0);
-        
+        if (!isTranscode) {
+            QnAviArchiveCustomData customData;
+            customData.overridenAr = m_device->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
+            av_dict_set(&m_formatCtx->metadata,
+                QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::CustomTag, fileExt),
+                QJson::serialized<QnAviArchiveCustomData>(customData), 0);
+        }        
 
 #ifndef SIGN_FRAME_ENABLED
         if (m_needCalcSignature) {
