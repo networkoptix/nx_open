@@ -15,6 +15,7 @@
 #ifndef NO_ISD_AUDIO
 #include <isd/amux/amux_iface.h>
 #endif
+#include <utils/media/pts_to_clock_mapper.h>
 #include <utils/network/aio/aioeventhandler.h>
 #include <utils/network/aio/pollable.h>
 
@@ -47,6 +48,8 @@ private:
     size_t m_prevReceiverID;
     std::unique_ptr<Pollable> m_pollable;
     bool m_initializedInitially;
+    PtsToClockMapper m_ptsMapper;
+    int m_framesSinceTimeResync;
 
     virtual void eventTriggered( Pollable* obj, aio::EventType eventType ) throw();
 

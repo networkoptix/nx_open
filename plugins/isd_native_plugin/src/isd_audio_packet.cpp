@@ -13,7 +13,8 @@ AudioData::AudioData(
     m_data( nullptr ),
     m_dataSize( 0 ),
     m_capacity( 0 ),
-    m_audioCodec( audioCodec )
+    m_audioCodec( audioCodec ),
+    m_timestamp( -1 )
 {
     m_data = new uint8_t[reserveSize];
     if( !m_data )
@@ -60,14 +61,22 @@ void AudioData::setDataSize( size_t _size )
     m_dataSize = _size;
 }
 
+void AudioData::setTimestamp( nxcip::UsecUTCTimestamp timestamp )
+{
+    m_timestamp = timestamp;
+}
 
-ISDAudioPacket::ISDAudioPacket(
-    int _channelNumber,
-    nxcip::UsecUTCTimestamp _timestamp )
+nxcip::UsecUTCTimestamp AudioData::getTimestamp() const
+{
+    return m_timestamp;
+}
+
+
+
+ISDAudioPacket::ISDAudioPacket( int _channelNumber )
 :
     m_refManager( this ),
-    m_channelNumber( _channelNumber ),
-    m_timestamp( _timestamp )
+    m_channelNumber( _channelNumber )
 {
 }
 
@@ -106,7 +115,7 @@ unsigned int ISDAudioPacket::releaseRef()
 //!Implementation of nxpl::MediaDataPacket::isKeyFrame
 nxcip::UsecUTCTimestamp ISDAudioPacket::timestamp() const
 {
-    return m_timestamp;
+    return m_audioData->getTimestamp();
 }
 
 //!Implementation of nxpl::MediaDataPacket::type

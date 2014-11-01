@@ -24,7 +24,6 @@
 #include <iostream>
 #include <fstream>
 
-#include <QDateTime>
 #include <QMutex>
 #include <QMutexLocker>
 
@@ -36,6 +35,7 @@
 #include "ilp_empty_packet.h"
 #include "isd_audio_packet.h"
 #include "linux_process_info.h"
+#include "stream_time_sync_data.h"
 
 
 //#define DUMP_VIDEO_STREAM
@@ -57,21 +57,6 @@ static const int MSEC_IN_SEC = 1000;
 static const int USEC_IN_SEC = 1000*1000;
 static const int USEC_IN_MSEC = 1000;
 static const int MAX_FRAMES_BETWEEN_TIME_RESYNC = 300;
-
-struct TimeSynchronizationData
-{
-    int encoderThatInitializedThis;
-    PtsToClockMapper::TimeSynchronizationData timeSyncData;
-    QMutex mutex;
-
-    TimeSynchronizationData()
-    :
-        encoderThatInitializedThis( -1 )
-    {
-    }
-};
-
-static TimeSynchronizationData timeSyncData;
 
 StreamReader::StreamReader(
     nxpt::CommonRefManager* const parentRefManager,
@@ -98,7 +83,7 @@ StreamReader::StreamReader(
     m_framesSinceTimeResync(MAX_FRAMES_BETWEEN_TIME_RESYNC),
     m_epollFD(-1),
     m_motionData(nullptr),
-    m_ptsMapper(90000, &timeSyncData.timeSyncData, encoderNum),
+    m_ptsMapper(90000, &TimeSynchronizationData::instance()->timeSyncData, encoderNum),
     m_currentGopSizeBytes( 0 )
 #ifdef DEBUG_OUTPUT
     ,m_totalFramesRead(0)
@@ -272,23 +257,17 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         //getting corresponding packet
         for( int i = 0; i < result; ++i )
         {
-            //TODO/IMPL check eventsArray[i].events
+            //TODO #ak check eventsArray[i].events
 
+            int result = nxcip::NX_NO_ERROR;
             if( eventsArray[i].data.fd == m_vmux->GetFD() )
             {
-                const int result = getVideoPacket( lpPacket );
-                if( result == nxcip::NX_TRY_AGAIN )
-                    continue;   //trying again
-                return result;
+                result = getVideoPacket( lpPacket );
             }
 #ifndef NO_ISD_AUDIO
             else if( eventsArray[i].data.fd == m_audioEventFD )
             {
-                const int result = getAudioPacket( lpPacket );
-                if( result == nxcip::NX_TRY_AGAIN )
-                    continue;   //trying again
-
-                return result;
+                result = getAudioPacket( lpPacket );
             }
 #endif
             else
@@ -296,6 +275,14 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
                 assert( false );
                 return nxcip::NX_IO_ERROR;
             }
+
+            if( result == nxcip::NX_TRY_AGAIN )
+                continue;   //trying again
+            //if( *lpPacket )
+            //    std::cout<<"encoder "<<m_encoderNum<<". "
+            //        "Returning "<<((*lpPacket)->type()==nxcip::dptAudio ? "audio" : "video")<<" "
+            //        "packet, ts "<<(*lpPacket)->timestamp()<<std::endl;
+            return result;
         }
     }
 }
@@ -395,7 +382,7 @@ int StreamReader::getVideoPacket( nxcip::MediaDataPacket** lpPacket )
 #ifdef ABSOLUTE_FRAME_TIME_PRESENT
             , (qint64)frame.tv_sec * USEC_IN_SEC + frame.tv_usec
 #else
-            , QDateTime::currentMSecsSinceEpoch()
+            , qnSyncTime->currentMSecsSinceEpoch() * USEC_IN_MSEC
 #endif
             ),
         (frame.vmux_info.pic_type == VMUX_IDR_FRAME ? nxcip::MediaDataPacket::fKeyPacket : 0) | 
@@ -527,9 +514,7 @@ int StreamReader::getAudioPacket( nxcip::MediaDataPacket** lpPacket )
         m_audioPackets.pop_front();
     }
 
-    std::unique_ptr<ISDAudioPacket> audioPacket( new ISDAudioPacket(
-        1,  //channel number
-        m_lastVideoTime ) );
+    std::unique_ptr<ISDAudioPacket> audioPacket( new ISDAudioPacket( 1 ) );  //channel number
     audioPacket->setData( std::move(audioDataPtr) );
 
     *lpPacket = audioPacket.release();
@@ -590,12 +575,13 @@ int64_t StreamReader::calcNextTimestamp( int32_t pts, int64_t absoluteSourceTime
 {
     if( m_framesSinceTimeResync >= MAX_FRAMES_BETWEEN_TIME_RESYNC )
     {
-        QMutexLocker lk( &timeSyncData.mutex );
+        QMutexLocker lk( &TimeSynchronizationData::instance()->mutex );
 
-        if( timeSyncData.encoderThatInitializedThis == -1 || timeSyncData.encoderThatInitializedThis == m_encoderNum )
+        if( TimeSynchronizationData::instance()->encoderThatInitializedThis == -1 || 
+            TimeSynchronizationData::instance()->encoderThatInitializedThis == m_encoderNum )
         {
             resyncTime( absoluteSourceTimeUSec );
-            timeSyncData.encoderThatInitializedThis = m_encoderNum;
+            TimeSynchronizationData::instance()->encoderThatInitializedThis = m_encoderNum;
         }
 
         m_ptsMapper.updateTimeMapping( pts, absoluteSourceTimeUSec );
@@ -611,7 +597,7 @@ void StreamReader::resyncTime( int64_t absoluteSourceTimeUSec )
     struct timeval currentTime;
     memset( &currentTime, 0, sizeof(currentTime) );
     gettimeofday( &currentTime, NULL );
-    timeSyncData.timeSyncData.mapLocalTimeToSourceAbsoluteTime( 
+    TimeSynchronizationData::instance()->timeSyncData.mapLocalTimeToSourceAbsoluteTime( 
         qnSyncTime->currentMSecsSinceEpoch()*USEC_IN_MSEC - ((int64_t)currentTime.tv_sec*USEC_IN_SEC + currentTime.tv_usec - absoluteSourceTimeUSec),
         absoluteSourceTimeUSec );
 

@@ -7,13 +7,24 @@
 
 #include <iostream>
 
+#include <QDateTime>
+
 #include <utils/network/aio/aioservice.h>
 
+#include "stream_time_sync_data.h"
+
+
+static const int MS_PER_SEC = 1000;
+static const int USEC_PER_MSEC = 1000;
+static const int AUDIO_ENCODER_ID = 10;
+static const int MAX_FRAMES_BETWEEN_TIME_RESYNC = 300;
 
 AudioStreamReader::AudioStreamReader()
 :
     m_prevReceiverID(0),
-    m_initializedInitially(false)
+    m_initializedInitially(false),
+    m_ptsMapper(MS_PER_SEC, &TimeSynchronizationData::instance()->timeSyncData, AUDIO_ENCODER_ID),
+    m_framesSinceTimeResync(MAX_FRAMES_BETWEEN_TIME_RESYNC)
 {
 }
 
@@ -102,6 +113,16 @@ int AudioStreamReader::readAudioData()
 
     //std::cout<<"Read "<<bytesRead<<" bytes of audio"<<std::endl;
     audioPacket->setDataSize( bytesRead );
+
+    const qint64 curTime = QDateTime::currentMSecsSinceEpoch();
+    if( m_framesSinceTimeResync >= MAX_FRAMES_BETWEEN_TIME_RESYNC )
+    {
+        m_ptsMapper.updateTimeMapping( curTime, curTime * USEC_PER_MSEC );
+        m_framesSinceTimeResync = 0;
+    }
+    ++m_framesSinceTimeResync;
+
+    audioPacket->setTimestamp( m_ptsMapper.getTimestamp( curTime ) );
 
     //std::cout<<"Got audio packet. size "<<audioPacket->dataSize()<<", pts "<<audioPacket->timestamp()<<"\n";
 

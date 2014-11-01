@@ -28,12 +28,15 @@ public:
     size_t capacity() const;
     uint8_t* data();
     void setDataSize( size_t _size );
+    void setTimestamp( nxcip::UsecUTCTimestamp timestamp );
+    nxcip::UsecUTCTimestamp getTimestamp() const;
 
 private:
     uint8_t* m_data;
     size_t m_dataSize;
     size_t m_capacity;
     nxcip::CompressionType m_audioCodec;
+    nxcip::UsecUTCTimestamp m_timestamp;
 };
 
 class ISDAudioPacket
@@ -41,9 +44,7 @@ class ISDAudioPacket
     public nxcip::MediaDataPacket
 {
 public:
-    ISDAudioPacket(
-        int _channelNumber,
-        nxcip::UsecUTCTimestamp _timestamp );
+    ISDAudioPacket( int _channelNumber );
     virtual ~ISDAudioPacket();
 
     //!Implementation of nxpl::PluginInterface::queryInterface
@@ -79,7 +80,6 @@ public:
 private:
     nxpt::CommonRefManager m_refManager;
     const int m_channelNumber;
-    nxcip::UsecUTCTimestamp m_timestamp;
     nxcip::CompressionType m_codecType;
 
     std::shared_ptr<AudioData> m_audioData;
