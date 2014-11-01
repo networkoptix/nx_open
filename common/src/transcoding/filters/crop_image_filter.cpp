@@ -23,6 +23,7 @@ CLVideoDecoderOutputPtr QnCropImageFilter::updateImage(const CLVideoDecoderOutpu
 {
     if (m_rect.isEmpty())
         return frame;
+    m_tmpRef = frame; // keep object undeleted
     CLVideoDecoderOutputPtr result(new CLVideoDecoderOutput());
     result->setUseExternalData(true);
 

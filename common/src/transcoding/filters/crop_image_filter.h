@@ -17,6 +17,7 @@ public:
     virtual QSize updatedResolution(const QSize& srcSize) override;
 private:
     QRect m_rect;
+    CLVideoDecoderOutputPtr m_tmpRef;
 };
 
 #endif // ENABLE_DATA_PROVIDERS
