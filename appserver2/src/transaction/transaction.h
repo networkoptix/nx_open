@@ -139,6 +139,7 @@ namespace ec2
             discoverPeer                = 1401, /*< ApiDiscoveryData */
             addDiscoveryInformation     = 1402, /*< ApiDiscoveryData*/
             removeDiscoveryInformation  = 1403, /*< ApiDiscoveryData*/
+            getDiscoveryData            = 1404, /*< ApiDiscoveryDataList */
 
             /* Misc */
             forcePrimaryTimeServer      = 2001,  /*< ApiIdData */

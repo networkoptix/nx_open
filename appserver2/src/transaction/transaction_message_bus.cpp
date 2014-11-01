@@ -150,6 +150,7 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::addDiscoveryInformation:
     case ApiCommand::removeDiscoveryInformation:
                                             return handleTransactionParams<ApiDiscoveryData>        (serializedTransaction, &stream, transaction, function, fastFunction);
+    case ApiCommand::getDiscoveryData:      return handleTransactionParams<ApiDiscoveryDataList>    (serializedTransaction, &stream, transaction, function, fastFunction);
 
     case ApiCommand::changeSystemName:      return handleTransactionParams<ApiSystemNameData>       (serializedTransaction, &stream, transaction, function, fastFunction);
 

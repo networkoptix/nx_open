@@ -226,12 +226,14 @@ namespace ec2
         //AbstractMiscManager::moduleInfoList
         registerUpdateFuncHandler<ApiModuleDataList>(restProcessorPool, ApiCommand::moduleInfoList);
 
-        //AbstractMiscManager::discoverPeer
+        //AbstractDiscoveryManager::discoverPeer
         registerUpdateFuncHandler<ApiDiscoverPeerData>(restProcessorPool, ApiCommand::discoverPeer);
-        //AbstractMiscManager::addDiscoveryInformation
+        //AbstractDiscoveryManager::addDiscoveryInformation
         registerUpdateFuncHandler<ApiDiscoveryData>(restProcessorPool, ApiCommand::addDiscoveryInformation);
-        //AbstractMiscManager::removeDiscoveryInformation
+        //AbstractDiscoveryManager::removeDiscoveryInformation
         registerUpdateFuncHandler<ApiDiscoveryData>(restProcessorPool, ApiCommand::removeDiscoveryInformation);
+        //AbstractDiscoveryManager::getDiscoveryData
+        registerGetFuncHandler<std::nullptr_t, ApiDiscoveryDataList>(restProcessorPool, ApiCommand::getDiscoveryData);
         //AbstractMiscManager::changeSystemName
         registerUpdateFuncHandler<ApiSystemNameData>(restProcessorPool, ApiCommand::changeSystemName);
 
