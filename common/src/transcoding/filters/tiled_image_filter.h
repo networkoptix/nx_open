@@ -19,6 +19,7 @@ private:
     QSharedPointer<const QnResourceVideoLayout> m_layout;
     CLVideoDecoderOutputPtr m_tiledFrame;
     QSize m_size;
+    qint64 m_prevFrameTime; 
 };
 
 #endif // ENABLE_DATA_PROVIDER
