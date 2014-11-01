@@ -32,7 +32,7 @@ namespace aio
     {
     public:
         //!map<pair<socket, event type> >
-        typedef std::set<std::pair<Socket*, aio::EventType> > MonitoredEventSet;
+        typedef std::set<std::pair<Pollable*, aio::EventType> > MonitoredEventSet;
 
         int kqueueFD;
         MonitoredEventSet monitoredEvents;
@@ -136,14 +136,14 @@ namespace aio
         return *this;
     }
 
-    Socket* PollSet::const_iterator::socket()
+    Pollable* PollSet::const_iterator::socket()
     {
-        return static_cast<Socket*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata);
+        return static_cast<Pollable*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata);
     }
 
-    const Socket* PollSet::const_iterator::socket() const
+    const Pollable* PollSet::const_iterator::socket() const
     {
-        return static_cast<Socket*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata);
+        return static_cast<Pollable*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata);
     }
 
     /*!
@@ -164,7 +164,7 @@ namespace aio
 
     void* PollSet::const_iterator::userData()
     {
-        return static_cast<Socket*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata)->impl()->eventTypeToUserData[eventType()];
+        return static_cast<Pollable*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata)->impl()->eventTypeToUserData[eventType()];
     }
 
     bool PollSet::const_iterator::operator==( const const_iterator& right ) const
@@ -223,7 +223,7 @@ namespace aio
     }
 
     //!Add socket to set. Does not take socket ownership
-    bool PollSet::add( Socket* const sock, EventType eventType, void* userData )
+    bool PollSet::add( Pollable* const sock, EventType eventType, void* userData )
     {
         pair<PollSetImpl::MonitoredEventSet::iterator, bool> p = m_impl->monitoredEvents.insert( make_pair( sock, eventType ) );
         if( !p.second )
@@ -245,7 +245,7 @@ namespace aio
     }
 
     //!Remove socket from set
-    void PollSet::remove( Socket* const sock, EventType eventType )
+    void PollSet::remove( Pollable* const sock, EventType eventType )
     {
         PollSetImpl::MonitoredEventSet::iterator it = m_impl->monitoredEvents.find( make_pair( sock, eventType ) );
         if( it == m_impl->monitoredEvents.end() )

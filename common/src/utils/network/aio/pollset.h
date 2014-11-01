@@ -9,7 +9,7 @@
 #include <cstddef>
 
 
-class Socket;
+class Pollable;
 
 namespace aio
 {
@@ -63,8 +63,8 @@ namespace aio
             //!Selects next socket which state has been changed with previous \a poll call
             const_iterator& operator++();       //++it
 
-            Socket* socket();
-            const Socket* socket() const;
+            Pollable* socket();
+            const Pollable* socket() const;
             /*!
                 \return Triggered event
             */
@@ -100,12 +100,12 @@ namespace aio
             \note Ivalidates all iterators
             \note \a userData is associated with pair (\a sock, \a eventType)
         */
-        bool add( Socket* const sock, EventType eventType, void* userData = NULL );
+        bool add( Pollable* const sock, EventType eventType, void* userData = NULL );
         //!Do not monitor event \a eventType on socket \a sock anymore
         /*!
             \note Ivalidates all iterators to the left of removed element. So, it is ok to iterate signalled sockets and remove current element
         */
-        void remove( Socket* const sock, EventType eventType );
+        void remove( Pollable* const sock, EventType eventType );
         //!Returns number of sockets in pollset
         /*!
             Returned value should only be used for compare with \a maxPollSetSize()
