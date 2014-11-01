@@ -1181,7 +1181,7 @@ bool TCPServerSocket::listen( int queueLen )
 void TCPServerSocket::terminateAsyncIO( bool /*waitForRunningHandlerCompletion*/ )
 {
     //m_implDelegate.m_baseAsyncHelper->terminateAsyncIO();
-    m_implDelegate.impl()->terminated.store( true, std::memory_order_relaxed );
+    ++m_implDelegate.impl()->terminated;
 }
 
 //!Implementation of AbstractStreamServerSocket::accept

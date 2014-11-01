@@ -33,7 +33,7 @@ public:
 
     bool post( std::function<void()>&& handler )
     {
-        if( m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
+        if( m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return true;
 
         return aio::AIOService::instance()->post( m_socket, std::move(handler) );
@@ -41,7 +41,7 @@ public:
 
     bool dispatch( std::function<void()>&& handler )
     {
-        if( m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
+        if( m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return true;
 
         return aio::AIOService::instance()->dispatch( m_socket, std::move(handler) );
@@ -50,7 +50,7 @@ public:
     //!This call stops async I/O on socket and it can never be resumed!
     void terminateAsyncIO()
     {
-        m_socket->impl()->terminated.store( true, std::memory_order_relaxed );
+        ++m_socket->impl()->terminated;
     }
 
 protected:
@@ -136,7 +136,7 @@ public:
     {
         //TODO with UDT we have to maintain pollset.add(socket), socket.connect, pollset.poll pipeline
 
-        if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
+        if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
         {
             //socket has been terminated, no async call possible. 
             //Returning true to trick calling party: let it think everything OK and
@@ -174,7 +174,7 @@ public:
 
     bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
     {
-        if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
+        if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return true;
 
         static const int DEFAULT_RESERVE_SIZE = 4 * 1024;
@@ -193,7 +193,7 @@ public:
 
     bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
     {
-        if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
+        if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return true;
 
         assert( buf.size() > 0 );
@@ -216,7 +216,7 @@ public:
 
     bool registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler )
     {
-        if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
+        if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return true;
 
         m_timerHandler = std::move( handler );
@@ -230,10 +230,17 @@ public:
     {
         if( eventType == aio::etNone )
         {
+            assert( waitForRunningHandlerCompletion );
+            //TODO #ak add asynchronous cancellation
+
+            ++this->m_socket->impl()->terminated;   //ignoring all new I/O operations while cancellation is in progress
+
             cancelAsyncIO( aio::etRead, waitForRunningHandlerCompletion );
             cancelAsyncIO( aio::etWrite, waitForRunningHandlerCompletion );
             cancelAsyncIO( aio::etTimedOut, waitForRunningHandlerCompletion );
             aio::AIOService::instance()->cancelPostedCalls( this->m_socket, waitForRunningHandlerCompletion );
+
+            --this->m_socket->impl()->terminated;
             return;
         }
 
