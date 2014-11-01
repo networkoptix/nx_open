@@ -172,8 +172,6 @@ namespace {
 // must since OpenSSL configured with thread support will give default version. Additionally, the
 // dynamic lock interface is not used in current OpenSSL version. So we don't use it.
 
-static std::mutex* kOpenSSLGlobalLock;
-
     static std::unique_ptr<std::mutex[]> kOpenSSLGlobalLock;
 
     void OpenSSLGlobalLock( int mode , int type , const char* file , int line ) {
@@ -974,8 +972,6 @@ private:
     nx::Buffer sniffer_buffer_; 
 
 };
-
-}// namespace
 
 
 // ---------------------------- QnSSLSocket -----------------------------------
