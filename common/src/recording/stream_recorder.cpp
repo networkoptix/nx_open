@@ -29,6 +29,7 @@
 
 #include "decoders/video/ffmpeg.h"
 #include "export/sign_helper.h"
+#include "transcoding/filters/scale_image_filter.h"
 
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4352;
@@ -97,7 +98,8 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     m_truncateIntervalEps(0),
     m_recordingFinished(false),
     m_role(Role_ServerRecording),
-    m_rotAngle(0)
+    m_rotAngle(0),
+    m_customAR(0.0)
 {
     srand(QDateTime::currentMSecsSinceEpoch());
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
@@ -514,7 +516,8 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
         !m_srcRect.isEmpty() ||
         m_contrastParams.enabled ||
         m_itemDewarpingParams.enabled ||
-        m_rotAngle;
+        m_rotAngle ||
+        m_customAR;
 
     const QnConstResourceVideoLayoutPtr& layout = mediaDev->getVideoLayout(m_mediaProvider);
     QString layoutStr = QnArchiveStreamReader::serializeLayout(layout.data());
@@ -583,8 +586,16 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
                 m_videoTranscoder = new QnFfmpegVideoTranscoder(m_dstVideoCodec);
                 m_videoTranscoder->setMTMode(true);
 
-                QSize updatedDstSize(m_videoTranscoder->getResolution());
                 m_videoTranscoder->open(mediaData);
+
+                if (m_customAR != 0.0) {
+                    QSize srcSize(m_videoTranscoder->getResolution());
+                    QSize newSize;
+                    newSize.setHeight(srcSize.height());
+                    newSize.setWidth(srcSize.height() * m_customAR + 0.5);
+                    if (newSize != srcSize)
+                        m_videoTranscoder->addFilter(new QnScaleImageFilter(QnCodecTranscoder::roundSize(newSize)));
+                }
 
                 if (layout->channelCount() > 1)
                     m_videoTranscoder->addFilter(new QnTiledImageFilter(layout));
@@ -911,6 +922,11 @@ void QnStreamRecorder::setItemDewarpingParams(const QnItemDewarpingParams& param
 void QnStreamRecorder::setRotation(int angle)
 {
     m_rotAngle = angle;
+}
+
+void QnStreamRecorder::setCustomAR(qreal ar)
+{
+    m_customAR = ar;
 }
 
 void QnStreamRecorder::disconnectFromResource()

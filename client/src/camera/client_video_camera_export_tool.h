@@ -21,6 +21,7 @@ public:
             const ImageCorrectionParams &imageCorrectionParams,
             const QnItemDewarpingParams &itemDewarpingParams,
             int rotationAngle,
+            qreal customAR,
             QObject *parent = 0);
 
     /**
@@ -78,6 +79,7 @@ private:
     QnItemDewarpingParams m_itemDewarpingParams;
     int m_status;
     int m_rotationAngle; // in degree
+    qreal m_customAR;
 };
 
 #endif // CLIENT_VIDEO_CAMERA_EXPORT_TOOL_H

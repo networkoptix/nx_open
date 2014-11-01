@@ -62,6 +62,14 @@ QRect QnCodecTranscoder::roundRect(const QRect& srcRect)
     return QRect(left, top, width, height);
 }
 
+QSize QnCodecTranscoder::roundSize(const QSize& size)
+{
+    int width = qPower2Ceil((unsigned) size.width(), 16);
+    int height = qPower2Ceil((unsigned) size.height(), 2);
+
+    return QSize(width, height);
+}
+
 // --------------------------- QnVideoTranscoder -----------------
 
 QnVideoTranscoder::QnVideoTranscoder(CodecID codecId):

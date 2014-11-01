@@ -411,7 +411,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(resource, 0);
     }
     qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(resource, Qn::InvalidUtcOffset);
-
+    qreal customAr = widget->resource()->toResource()->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
     QnClientVideoCameraExportTool *tool = new QnClientVideoCameraExportTool(
                                               camera,
                                               period,
@@ -423,6 +423,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
                                               contrastParams,
                                               dewarpingParams,
                                               itemData.rotation,
+                                              customAr,
                                               this);
 
     connect(exportProgressDialog,   &QnProgressDialog::canceled,    tool,                   &QnClientVideoCameraExportTool::stop);

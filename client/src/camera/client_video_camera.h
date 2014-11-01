@@ -67,7 +67,8 @@ public:
                                  QRectF srcRect = QRectF(),
                                  const ImageCorrectionParams& contrastParams = ImageCorrectionParams(),
                                  const QnItemDewarpingParams& itemDewarpingParams = QnItemDewarpingParams(),
-                                 int rotationAngle = 0);
+                                 int rotationAngle = 0,
+                                 qreal customAR= 0.0);
 
     void setResource(QnMediaResourcePtr resource);
     QString exportedFileName() const;

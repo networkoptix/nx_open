@@ -121,6 +121,8 @@ public:
 
     void setRotation(int angle);
 
+    void setCustomAR(qreal ar);
+
     /*
     * Server time zone. Used for export to avi/mkv files
     */
@@ -218,6 +220,7 @@ private:
     bool m_recordingFinished;
     Role m_role;
     int m_rotAngle;
+    qreal m_customAR;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

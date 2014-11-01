@@ -311,7 +311,7 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
         timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(resource, 0);
     }
     qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(resource, Qn::InvalidUtcOffset);
-
+    qreal customAr = resource->toResource()->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
     m_currentCamera->exportMediaPeriodToFile(m_period.startTimeMs * 1000ll,
                                     (m_period.startTimeMs + m_period.durationMs) * 1000ll,
                                     uniqId,
@@ -323,6 +323,7 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
                                     itemData.zoomRect,
                                     itemData.contrastParams,
                                     itemData.dewarpingParams,
+                                    customAr,
                                     itemData.rotation);
 
     emit stageChanged(tr("Exporting to \"%2\"...").arg(m_targetFilename));

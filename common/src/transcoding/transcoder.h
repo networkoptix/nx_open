@@ -74,6 +74,7 @@ public:
     virtual void setQuality( Qn::StreamQuality quality );
     virtual bool existMoreData() const { return false; }
     static QRect roundRect(const QRect& srcRect);
+    static QSize roundSize(const QSize& size);
 protected:
 protected:
     QString m_lastErrMessage;
