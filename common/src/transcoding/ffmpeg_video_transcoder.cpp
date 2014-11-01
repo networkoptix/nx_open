@@ -142,7 +142,7 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         decodedFrame = processFilterChain(decodedFrame);
 
         if (decodedFrame->width != m_resolution.width() || decodedFrame->height != m_resolution.height() || decodedFrame->format != PIX_FMT_YUV420P) 
-            decodedFrame = CLVideoDecoderOutputPtr(decodedFrame->scaled(m_resolution));
+            decodedFrame = CLVideoDecoderOutputPtr(decodedFrame->scaled(m_resolution, PIX_FMT_YUV420P));
 
         static AVRational r = {1, 1000000};
         decodedFrame->pts  = av_rescale_q(decodedFrame->pts, r, m_encoderCtx->time_base);

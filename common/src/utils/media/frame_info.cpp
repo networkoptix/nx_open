@@ -361,15 +361,17 @@ void CLVideoDecoderOutput::assignMiscData(const CLVideoDecoderOutput* other)
     channel = other->channel;
 }
 
-CLVideoDecoderOutput* CLVideoDecoderOutput::scaled(const QSize& newSize)
+CLVideoDecoderOutput* CLVideoDecoderOutput::scaled(const QSize& newSize, PixelFormat newFormat)
 {
+    if (newFormat == PIX_FMT_NONE)
+        newFormat = (PixelFormat) format;
     CLVideoDecoderOutput* dst(new CLVideoDecoderOutput);
-    dst->reallocate(newSize.width(), newSize.height(), format);
+    dst->reallocate(newSize.width(), newSize.height(), newFormat);
     dst->assignMiscData(this);
 
     SwsContext* scaleContext = sws_getContext(
         width, height, (PixelFormat) format, 
-        newSize.width(), newSize.height(), (PixelFormat) format, 
+        newSize.width(), newSize.height(), newFormat, 
         SWS_BICUBIC, NULL, NULL, NULL);
     
     sws_scale(scaleContext, data, linesize, 0, height, dst->data, dst->linesize);
