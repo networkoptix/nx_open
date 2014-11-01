@@ -64,7 +64,7 @@ namespace aio
         class SockCtx
         {
         public:
-            Socket* sock;
+            Pollable* sock;
             void* userData[aio::etMax];
             size_t polledEventsMask;
 
@@ -77,7 +77,7 @@ namespace aio
             }
 
             SockCtx(
-                Socket* sock,
+                Pollable* sock,
                 size_t polledEventsMask )
             :
                 sock( sock ),
@@ -204,7 +204,7 @@ namespace aio
     class ConstIteratorImpl
     {
     public:
-        Socket* sock;
+        Pollable* sock;
         void* userData;
         //!bitmask of aio::EventType
         aio::EventType currentSocketREvent;
@@ -328,12 +328,12 @@ namespace aio
         return *this;
     }
 
-    Socket* PollSet::const_iterator::socket()
+    Pollable* PollSet::const_iterator::socket()
     {
         return m_impl->sock;
     }
 
-    const Socket* PollSet::const_iterator::socket() const
+    const Pollable* PollSet::const_iterator::socket() const
     {
         return m_impl->sock;
     }
@@ -405,7 +405,7 @@ namespace aio
 
     //!Add socket to set. Does not take socket ownership
     bool PollSet::add(
-        Socket* const sock,
+        Pollable* const sock,
         aio::EventType eventType,
         void* userData )
     {
@@ -418,7 +418,7 @@ namespace aio
     }
 
     //!Remove socket from set
-    void PollSet::remove( Socket* const sock, aio::EventType eventType )
+    void PollSet::remove( Pollable* const sock, aio::EventType eventType )
     {
 #ifdef _DEBUG
         sock->handle(); //checking that socket object is still alive, since linux and mac implementation use socket in PollSet::remove

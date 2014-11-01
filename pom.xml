@@ -23,16 +23,19 @@
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
         <appserver.name>Enterprise Controller</appserver.name>
         <appserver2.name>${company.name} New Enterprise Controller</appserver2.name>
-        <client.name>${company.name} ${product.name} Client</client.name>
+        <client.name>${product.name}</client.name>
+        <client.display.name>${display.product.name} Client</client.display.name>
         <client.mediafolder.name>${product.name} Media</client.mediafolder.name>
-        <applauncher.name>${company.name} Launcher</applauncher.name>
+        <applauncher.name>${product.name} Launcher</applauncher.name>
         <axiscamplugin.name>${company.name} AXIS camera integration plugin</axiscamplugin.name>
         <genericrtspplugin.name>${company.name} generic RTSP plugin</genericrtspplugin.name>
         <mediaserver.name>${company.name} Media Server</mediaserver.name>
         <mediaproxy.name>${company.name} Media Proxy</mediaproxy.name>
         <testcamera.name>${company.name} Test Camera</testcamera.name>
         <traytool.name>${product.name} Tray Assistant</traytool.name>
+        <traytool.display.name>${display.product.name} Tray Assistant</traytool.display.name>
         <vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
+        <wixsetup.name>${company.name} ${display.product.name} Setup v.${release.version}</wixsetup.name>
         <license.environment>production</license.environment>
         <build.configuration>release</build.configuration>
         <buildNumber>0</buildNumber>
@@ -334,6 +337,7 @@
                 <module>client</module>                     
                 <module>wixsetup/wixsetup-server-only</module>
                 <module>wixsetup/wixsetup-client-only</module>
+<!--                <module>wixsetup/wixsetup-full</module> -->
             </modules>
             <properties>
                 <qt.dir>${libdir}/${arch}</qt.dir>

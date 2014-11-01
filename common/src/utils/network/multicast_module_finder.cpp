@@ -319,6 +319,11 @@ void QnMulticastModuleFinder::run() {
         }
     }
 
+    for (UDPSocket *socket: m_clientSockets)
+        m_pollSet.remove( socket->implementationDelegate(), aio::etRead );
+    if (m_serverSocket)
+        m_pollSet.remove( m_serverSocket->implementationDelegate(), aio::etRead );
+
     NX_LOG(lit("QnMulticastModuleFinder stopped"), cl_logDEBUG1);
 }
 

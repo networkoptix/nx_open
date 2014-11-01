@@ -18,6 +18,7 @@ public:
     static const int HTTP_LOG_INDEX = CUSTOM_LOG_BASE_ID + 1;
 
     QnLog();
+    ~QnLog();
 
     bool create(const QString &baseName, quint32 maxFileSize, quint8 maxBackupFiles, QnLogLevel logLevel);
 

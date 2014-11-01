@@ -30,7 +30,6 @@ namespace aio
         \note Currently, win32 implementation uses select, so it is far from being efficient. Linux implementation uses epoll, BSD - kqueue
         \note All methods are thread-safe
         \note All methods are not blocking except \a AIOService::removeFromWatch called with \a waitForRunningHandlerCompletion set to \a true
-        \todo Socket termination???
     */
     class AIOService
     {
@@ -279,7 +278,7 @@ namespace aio
             std::map<std::pair<SocketType*, aio::EventType>, std::pair<AIOThreadType*, unsigned int> > sockets;
         };
 
-        SocketAIOContext<Socket> m_systemSocketAIO;
+        SocketAIOContext<Pollable> m_systemSocketAIO;
         mutable QMutex m_mutex;
 
         template<class SocketType> SocketAIOContext<SocketType>& getAIOHandlingContext();

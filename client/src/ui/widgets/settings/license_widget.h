@@ -43,6 +43,7 @@ protected:
 
 private slots:
     void updateControls();
+    void updateCurrentServer();
 
     void at_browseLicenseFileButton_clicked();
     void at_activationTypeComboBox_currentIndexChanged();

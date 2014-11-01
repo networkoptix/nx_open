@@ -1339,7 +1339,6 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResourc
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::dbError;
     }
-    int gg = query.size();
     return ErrorCode::ok;
 }
 
