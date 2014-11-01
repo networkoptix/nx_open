@@ -258,6 +258,9 @@ namespace ec2
             std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2 ) );
         registerFunctorHandler<ApiLoginData, QnConnectionInfo>( restProcessorPool, ApiCommand::testConnection,
             std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2 ) );
+
+        registerFunctorHandler<std::nullptr_t, ApiResourceParamDataList>( restProcessorPool, ApiCommand::getSettings,
+            std::bind( &Ec2DirectConnectionFactory::getSettings, this, _1, _2 ) );
     }
 
     void Ec2DirectConnectionFactory::setContext( const ResourceContext& resCtx )
@@ -504,6 +507,13 @@ namespace ec2
         m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
             addr, ApiCommand::testConnection, loginInfo, func );
         return reqID;
+    }
+
+    ErrorCode Ec2DirectConnectionFactory::getSettings( std::nullptr_t, ApiResourceParamDataList* const outData )
+    {
+        if( !QnDbManager::instance() )
+            return ErrorCode::ioError;
+        return QnDbManager::instance()->readSettings( *outData );
     }
 
     template<class InputDataType>
