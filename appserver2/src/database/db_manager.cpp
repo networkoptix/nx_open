@@ -2129,6 +2129,18 @@ bool QnDbManager::readMiscParam( const QByteArray& name, QByteArray* value )
     return false;
 }
 
+ErrorCode QnDbManager::readSettings(ApiResourceParamDataList& settings)
+{
+    ApiResourceParamWithRefDataList params;
+    ErrorCode rez = doQueryNoLock(m_adminUserID, params);
+    settings.reserve( params.size() );
+    if (rez == ErrorCode::ok) {
+        for(ec2::ApiResourceParamWithRefData& param: params)
+            settings.push_back(ApiResourceParamData(std::move(param.name), std::move(param.value)));
+    }
+    return rez;
+}
+
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiIdData>& tran)
 {
     switch(tran.command) {
@@ -2988,18 +3000,6 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
     mergeObjectListData<ApiVideowallData>(data.videowalls,  kvPairs, &ApiVideowallData::addParams,   &ApiResourceParamWithRefData::resourceId);
 */
     return err;
-}
-
-//getParams
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiResourceParamDataList& data)
-{
-    ApiResourceParamWithRefDataList params;
-    ErrorCode rez = doQueryNoLock(m_adminUserID, params);
-    if (rez == ErrorCode::ok) {
-        for(const ec2::ApiResourceParamWithRefData& param: params)
-            data.push_back(ApiResourceParamData(param.name, param.value));
-    }
-    return rez;
 }
 
 ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t &, ApiDiscoveryDataList &data) {
