@@ -391,6 +391,12 @@ CLVideoDecoderOutput* CLVideoDecoderOutput::rotated(int angle)
     if (angle != 180)
         qSwap(dstWidth, dstHeight);
 
+    bool transposeChroma = false;
+    if (angle == 90 || angle == 270) {
+        if (format == PIX_FMT_YUV422P || format == PIX_FMT_YUVJ422P)
+            transposeChroma = true;
+    }
+
     CLVideoDecoderOutput* dstPict(new CLVideoDecoderOutput());
     dstPict->reallocate(dstWidth, dstHeight, format);
     dstPict->assignMiscData(this);
@@ -406,39 +412,85 @@ CLVideoDecoderOutput* CLVideoDecoderOutput::rotated(int angle)
 
         int w = width;
         int h = height;
-        if (i > 0) {
+        
+        if (i > 0 && !transposeChroma) {
             w >>= descr->log2_chroma_w;
             h >>= descr->log2_chroma_h;
         }
 
-        if (angle == 90) 
+        if (angle == 90)
         {
-            for (int y = 0; y < h; ++y) {
-                quint8* src = data[i] + linesize[i] * y;
-                quint8* dst = dstPict->data[i] + h -1 - y;
-                for (int x = 0; x < w; ++x) {
-                    *dst = *src++;
-                    dst += dstPict->linesize[i];
+            int dstLineStep = dstPict->linesize[i];
+
+            if (transposeChroma && i > 0)
+            {
+                for (int y = 0; y < h; y += 2) 
+                {
+                    quint8* src = data[i] + linesize[i] * y;
+                    quint8* dst = dstPict->data[i] + (h - y)/2 - 1;
+                    for (int x = 0; x < w/2; ++x) {
+                        quint8 pixel = ((quint16) src[0] + (quint16) src[linesize[i]]) >> 1;
+                        dst[0] = pixel;
+                        dst += dstLineStep;
+                        dst[0] = pixel;
+                        dst += dstLineStep;
+                        src++;
+                    }
+                }
+            }
+            else {
+                for (int y = 0; y < h; ++y) 
+                {
+                    quint8* src = data[i] + linesize[i] * y;
+                    quint8* dst = dstPict->data[i] + h - y -1;
+                    if (angle == 270)
+                        dst += (w-1) * dstPict->linesize[i];
+                    for (int x = 0; x < w; ++x) {
+                        *dst = *src++;
+                        dst += dstLineStep;
+                    }
                 }
             }
         }
-        else if (angle == 180) 
+        else if (angle == 270)
         {
+            int dstLineStep = -dstPict->linesize[i];
+
+            if (transposeChroma && i > 0)
+            {
+                for (int y = 0; y < h; y += 2) 
+                {
+                    quint8* src = data[i] + linesize[i] * y;
+                    quint8* dst = dstPict->data[i] + (w-1) * dstPict->linesize[i] + y/2;
+                    for (int x = 0; x < w/2; ++x) {
+                        quint8 pixel = ((quint16) src[0] + (quint16) src[linesize[i]]) >> 1;
+                        dst[0] = pixel;
+                        dst += dstLineStep;
+                        dst[0] = pixel;
+                        dst += dstLineStep;
+                        src++;
+                    }
+                }
+            }
+            else {
+                for (int y = 0; y < h; ++y) 
+                {
+                    quint8* src = data[i] + linesize[i] * y;
+                    quint8* dst = dstPict->data[i] + (w-1) * dstPict->linesize[i] + y;
+                    for (int x = 0; x < w; ++x) {
+                        *dst = *src++;
+                        dst += dstLineStep;
+                    }
+                }
+            }
+        }
+        else 
+        {  // 180
             for (int y = 0; y < h; ++y) {
                 quint8* src = data[i] + linesize[i] * y;
                 quint8* dst = dstPict->data[i] + dstPict->linesize[i] * (h-1 - y) + w-1;
                 for (int x = 0; x < w; ++x) {
                     *dst-- = *src++;
-                }
-            }
-        }
-        else {
-            for (int y = 0; y < h; ++y) {
-                quint8* src = data[i] + linesize[i] * y;
-                quint8* dst = dstPict->data[i] + dstPict->linesize[i] * (w - 1) + y;
-                for (int x = 0; x < w; ++x) {
-                    *dst = *src++;
-                    dst -= dstPict->linesize[i];
                 }
             }
         }
