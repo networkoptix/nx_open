@@ -6,19 +6,19 @@ angular.module('webadminApp')
         $scope.interval = 1000;// 1 секунда
         $scope.serverIsOnline = true;
 
+        var colors =  {
+            "StatisticsCPU":        ["#3776ca"],
+            "StatisticsRAM":        ["#db3ba9"],
+            "StatisticsHDD":        ["#438231","#484848","#aa880b","#b25e26","#9200d1","#00d5d5","#267f00","#8f5656","#c90000"],
+            "StatisticsNETWORK":    ["#ff3434", "#b08f4c", "#8484ff", "#34ff84"]
+        };
+
+        var nocolor = 'rgba(255,255,255,0)';
+
+
         $scope.data = {
             labels: Array.apply(null, new Array( $scope.healthLength)).map(String.prototype.valueOf,''),
-            datasets: [{
-                label: '',
-                fillColor: nocolor,
-                strokeColor: nocolor,
-                pointColor: nocolor,
-                pointStrokeColor: nocolor,
-                pointHighlightFill: nocolor,
-                pointHighlightStroke: nocolor,
-                show:true,
-                data: Array.apply(null, new Array($scope.healthLength)).map(Number.prototype.valueOf,100)
-            }]
+            datasets: []
         };
 
         $scope.legend = '';
@@ -82,16 +82,8 @@ angular.module('webadminApp')
             legendTemplate : '<ul class="tc-chart-js-legend"><% for (var i=0; i<datasets.length; i++){%><li><span style="background-color:<%=datasets[i].strokeColor%>"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>'
         };
 
-        var colors =  {
-            "StatisticsCPU":        ["#3776ca"],
-            "StatisticsRAM":        ["#db3ba9"],
-            "StatisticsHDD":        ["#438231","#484848","#aa880b","#b25e26","#9200d1","#00d5d5","#267f00","#8f5656","#c90000"],
-            "StatisticsNETWORK":    ["#ff3434", "#b08f4c", "#8484ff", "#34ff84"]
-        };
 
-        var nocolor = 'rgba(255,255,255,0)';
-
-        function prepaireDataSets(statistics){
+        function prepareDataSets(statistics){
             var datasets = [{
                 label: '',
                 fillColor: nocolor,
@@ -101,7 +93,19 @@ angular.module('webadminApp')
                 pointHighlightFill: nocolor,
                 pointHighlightStroke: nocolor,
                 show:true,
+                hideLegend:true,
                 data: Array.apply(null, new Array($scope.healthLength)).map(Number.prototype.valueOf,100)
+            },{
+                label: '',
+                fillColor: nocolor,
+                strokeColor: nocolor,
+                pointColor: nocolor,
+                pointStrokeColor: nocolor,
+                pointHighlightFill: nocolor,
+                pointHighlightStroke: nocolor,
+                show:true,
+                hideLegend:true,
+                data: Array.apply(null, new Array($scope.healthLength)).map(Number.prototype.valueOf,0)
             }];
             for(var i=0;i<statistics.length;i++){
 
@@ -116,23 +120,28 @@ angular.module('webadminApp')
                     pointHighlightFill: color,
                     pointHighlightStroke: color,
                     show: true,
+                    hideLegend:false,
                     data: Array.apply(null, new Array($scope.healthLength)).map(Number.prototype.valueOf,0)
                 });
             }
+            console.log(datasets);
             $scope.datasets = datasets;
             $scope.updateVisibleDatasets();
         }
 
+
+
         $scope.updateVisibleDatasets = function(){
             $scope.data.datasets = _.filter($scope.datasets,function(dataset){return dataset.show});
-        }
+        };
+
 
 
 
         function updateStatisticsDataSets(statistics){
             var datasets = $scope.datasets;
 
-            for(var i=0; i < datasets.length;i++){
+            for(var i=2; i < datasets.length;i++){
                 var dataset = datasets[i];
 
                 var value = 0;
@@ -149,22 +158,21 @@ angular.module('webadminApp')
                     console.log(value,dataset,needstat);
                 }
 
-                if(i!=0) {
-                    dataset.data.push(value * 100);
-
-                    if (dataset.data.length > $scope.healthLength) {
-                        dataset.data = dataset.data.slice(dataset.data.length - $scope.healthLength, dataset.data.length);
-                    }
+                dataset.data.push(value * 100);
+                if (dataset.data.length > $scope.healthLength) {
+                    dataset.data = dataset.data.slice(dataset.data.length - $scope.healthLength, dataset.data.length);
                 }
+
             }
         }
+
 
         var statisticTimer = null;
         function updateStatistics() {
             mediaserver.statistics().then(function (r) {
                 if(statisticTimer == null){
                     // Подготовить легенды
-                    prepaireDataSets(r.data.reply.statistics);
+                    prepareDataSets(r.data.reply.statistics);
                 }
                 $scope.serverIsOnline = true;
 

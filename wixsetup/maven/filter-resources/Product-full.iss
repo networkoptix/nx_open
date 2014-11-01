@@ -38,8 +38,8 @@ Source: "..\..\wixsetup-server-only\{#Arch}\bin\{#NamespaceMinor}-{#NamespaceAdd
 Source: "..\..\wixsetup-client-only\{#Arch}\bin\{#NamespaceMinor}-{#NamespaceAdditional}-client-{#AppVersion}-{#Box}-{#Arch}-{#BuildConfiguration}{#BetaSuffix}.msi"; DestDir: "{tmp}"; Components: client; Check: ClientCheck
 
 [Run]
-Filename: "msiexec.exe"; Parameters: "/i ""{tmp}\networkoptix-hdwitness-server-2.3.0.0-win78-x64-release-beta.msi"""; Components: server; Check: ServerCheck
-Filename: "msiexec.exe"; Parameters: "/quiet /i ""{tmp}\networkoptix-hdwitness-client-2.3.0.0-win78-x64-release-beta.msi"""; Components: client; Check: ClientCheck
+Filename: "msiexec.exe"; Parameters: "/i ""{tmp}\{#NamespaceMinor}-{#NamespaceAdditional}-client-{#AppVersion}-{#Box}-{#Arch}-{#BuildConfiguration}{#BetaSuffix}.msi LICENSE_ALREADY_ACCEPTED=yes"""; Components: server; Check: ServerCheck
+Filename: "msiexec.exe"; Parameters: "/i ""{tmp}\{#NamespaceMinor}-{#NamespaceAdditional}-client-{#AppVersion}-{#Box}-{#Arch}-{#BuildConfiguration}{#BetaSuffix}.msi LICENSE_ALREADY_ACCEPTED=yes"""; Components: client; Check: ClientCheck
 
 [Code]
 var

@@ -51,7 +51,7 @@
 #define QN_FREE_LICENSE_IS_TRIAL        ${freeLicenseIsTrial}
 #define QN_SHOWCASE_URL                 "${showcase.url}/${customization}"
 #define QN_SETTINGS_URL                 "${settings.url}/${customization}.json"
-#define QN_PRODUCT_NAME_LONG            "${product.name}"
+#define QN_PRODUCT_NAME_LONG            "${display.product.name}"
 #define QN_BUILDENV_PATH                "${environment.dir}"
 #define QN_MIRRORLIST_URL               "${mirrorListUrl}"
 #define QN_HELP_URL                     "${helpUrl}/${customization}/${parsedVersion.majorVersion}/${parsedVersion.minorVersion}/url"

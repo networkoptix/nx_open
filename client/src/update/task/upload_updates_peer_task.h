@@ -13,6 +13,7 @@ public:
         NoError = 0,
         ConsistencyError,
         UploadError,
+        TimeoutError,
         NoFreeSpaceError
     };
 
@@ -29,7 +30,7 @@ private:
     void uploadNextUpdate();
 
 private slots:
-    void at_uploader_finished(int errorCode);
+    void at_uploader_finished(int errorCode, const QSet<QnUuid> &failedPeers);
     void at_uploader_progressChanged(int progress);
 
 private:

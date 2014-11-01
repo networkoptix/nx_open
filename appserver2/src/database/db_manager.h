@@ -473,7 +473,7 @@ namespace ec2
         //void commit();
         //void rollback();
     private:
-        enum GuidConversionMethod {CM_Default, CM_Binary, CM_MakeHash, CM_INT};
+        enum GuidConversionMethod {CM_Default, CM_Binary, CM_MakeHash, CM_String, CM_INT};
 
         QMap<int, QnUuid> getGuidList(const QString& request, GuidConversionMethod method, const QByteArray& intHashPostfix = QByteArray());
 

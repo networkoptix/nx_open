@@ -1,6 +1,7 @@
 'use strict';
 var Page = require('./po.js');
 describe('Help Page', function () {
+    //it("should stop test",function(){expect("other test").toBe("uncommented");});return;
 
     var p = new Page();
 

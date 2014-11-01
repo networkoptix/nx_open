@@ -102,17 +102,17 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
     const int onvifPort = url.port(nx_http::DEFAULT_HTTP_PORT);
     QString onvifUrl(QLatin1String("onvif/device_service"));
 
-    QnPlOnvifResourcePtr resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
-    resource->setTypeId(typePtr->getId());
+    QString urlBase = urlStr.left(urlStr.indexOf(QLatin1String("?")));
+    QnPlOnvifResourcePtr rpResource = qnResPool->getResourceByUrl(urlBase).dynamicCast<QnPlOnvifResource>();
+
+    QnPlOnvifResourcePtr resource = createResource(rpResource ? rpResource->getTypeId() : typePtr->getId(), QnResourceParams()).dynamicCast<QnPlOnvifResource>();
     resource->setAuth(auth);
     QString deviceUrl = QString(QLatin1String("http://%1:%2/%3")).arg(url.host()).arg(onvifPort).arg(onvifUrl);
     resource->setUrl(deviceUrl);
     resource->setDeviceOnvifUrl(deviceUrl);
 
     // optimization. do not pull resource every time if resource already in pool
-    QString urlBase = urlStr.left(urlStr.indexOf(QLatin1String("?")));
-    QnPlOnvifResourcePtr rpResource = qnResPool->getResourceByUrl(urlBase).dynamicCast<QnPlOnvifResource>();
-    if (rpResource) 
+    if (rpResource)
     {
         int channel = QUrlQuery(url.query()).queryItemValue(QLatin1String("channel")).toInt();
         
@@ -174,8 +174,15 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         resource->setVendor( manufacturer );
         resource->setName( modelName );
         //QnUuid rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false);
-        if (!rt.isNull())
-            resource->setTypeId(rt);
+        if (!rt.isNull() && rt != resource->getTypeId()) 
+        {
+            QnPlOnvifResourcePtr updatedResource = createResource(rt, QnResourceParams()).dynamicCast<QnPlOnvifResource>();
+            updatedResource->update(resource);
+            updatedResource->setPhysicalId(resource->getPhysicalId());
+            updatedResource->updateOnvifUrls(resource); // runtime resource data
+            updatedResource->setTimeDrift(resource->getTimeDrift()); // runtime resource data
+            resource = updatedResource;
+        }
 
         if(!resource->getUniqueId().isEmpty())
         {
@@ -195,7 +202,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
 
                 for (int i = 1; i < resource->getMaxChannels(); ++i) 
                 {
-                    QnPlOnvifResourcePtr res(new QnPlOnvifResource());
+                    QnPlOnvifResourcePtr res = createResource(resource->getTypeId(), QnResourceParams()).dynamicCast<QnPlOnvifResource>();
                     res->setVendor( manufacturer );
                     res->setPhysicalId(resource->getPhysicalId());
                     res->update(resource, true);

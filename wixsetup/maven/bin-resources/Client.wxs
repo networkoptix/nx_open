@@ -4,45 +4,47 @@
     <Fragment Id='FragmentClient'>
         <?include BuildVars.wxi ?>
 
-        <DirectoryRef Id="INSTALLDIR">
-            <Directory Id="${customization}ClientDir" Name="Client">
-                <Directory Id="${customization}HelpDir" Name="help"/>                         
+        <?define clientDirId = "$(var.customization)_$(var.releaseVersionFull)_Dir"?>
 
-                <Directory Id="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir" Name="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}">
+        <DirectoryRef Id="INSTALLDIR">
+            <Directory Id="$(var.customization)ClientDir" Name="Client">
+                <Directory Id="$(var.customization)HelpDir" Name="help"/>                         
+
+                <Directory Id="$(var.clientDirId)" Name="$(var.releaseVersionFull)">
 
                     <Component Id="AppLauncherExecutable">
-                        <File Id="applauncher.exe" Name="${product.name} Launcher.exe" Source="$(var.SourceDir)/applauncher.exe" KeyPath="yes">
-                            <Shortcut Id="StartmenuAppLauncher" Directory="ProgramMenuDir" Name="${product.name}"
-                              WorkingDirectory='${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir' Advertise="yes" Icon="icon_menu.exe" >
+                        <File Id="applauncher.exe" Name="$(var.productName) Launcher.exe" Source="$(var.SourceDir)/applauncher.exe" KeyPath="yes">
+                            <Shortcut Id="StartmenuAppLauncher" Directory="ProgramMenuDir" Name="$(var.productName)"
+                              WorkingDirectory='$(var.clientDirId)' Advertise="yes" Icon="icon_menu.exe" >
                             </Shortcut>
                         </File>
                     </Component>
 
                     <Component Id="AppLauncherConfiguration">
                         <RegistryKey Root="HKCU"
-                                 Key="Software\[Manufacturer]\${applauncher.name}">
-                            <RegistryValue Type="string" Name="previousLaunchedVersion" Value="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}"/>
+                                 Key="Software\[Manufacturer]\$(var.applauncherName)">
+                            <RegistryValue Type="string" Name="previousLaunchedVersion" Value="$(var.releaseVersionMajor).$(var.releaseVersionMinor)"/>
                         </RegistryKey>
                         <RegistryKey Root="HKLM"
-                                 Key="Software\[Manufacturer]\${applauncher.name}">
-                            <RegistryValue Type="string" Name="mirrorListUrl" Value="${mirrorListUrl}"/>
+                                 Key="Software\[Manufacturer]\$(var.applauncherName)">
+                            <RegistryValue Type="string" Name="mirrorListUrl" Value="$(var.mirrorListUrl)"/>
                         </RegistryKey>                        
                     </Component>                                
 
                     <Component Id="DefaultLanguage">
                         <RegistryKey Root="HKCU"
-                                 Key="Software\[Manufacturer]\${client.name}">
-                            <RegistryValue Type="string" Name="translationPath" Value=":/translations/common_${translation1}.qm"/>
+                                 Key="Software\[Manufacturer]\$(var.clientName)">
+                            <RegistryValue Type="string" Name="translationPath" Value=":/translations/common_$(var.translation1).qm"/>
                         </RegistryKey>
                     </Component>    
 
                     <Component Id="clientShortcutDesktop">
                         <Condition>INSTALL_SHORTCUT_DESKTOP</Condition>
 
-                        <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\${applauncher.name}" Name="clientShortcutDesktop" Type="integer" Value="1" KeyPath="yes"/>
+                        <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\$(var.applauncherName)" Name="clientShortcutDesktop" Type="integer" Value="1" KeyPath="yes"/>
 
-                        <Shortcut Id="DesktopClient" Directory="DesktopFolder" Name="${product.name}"
-                          WorkingDirectory='${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir' Target="[#applauncher.exe]" Icon="icon_desktop.exe">
+                        <Shortcut Id="DesktopClient" Directory="DesktopFolder" Name="$(var.productName)"
+                          WorkingDirectory='$(var.clientDirId)' Target="[#applauncher.exe]" Icon="icon_desktop.exe">
                         </Shortcut>
                     </Component>                            
 
@@ -61,11 +63,11 @@
                     <Directory Id="Platforms" Name="platforms">
                     </Directory>                    
 
-                    <Directory Id="${customization}VoxDir" Name="vox"/>                                
+                    <Directory Id="$(var.customization)VoxDir" Name="vox"/>                                
 
                     <Component Id="ClientExecutable">
-                        <File Id="client.exe" Name="${product_name}" Source="$(var.SourceDir)/${client_name}" KeyPath="yes">
-                            <fire:FirewallException Id="FirewallExceptionClient" Name="${product.name}" Scope="any" IgnoreFailure="yes"/>
+                        <File Id="client.exe" Name="$(var.productExeName)" Source="$(var.SourceDir)/$(var.clientExeName)" KeyPath="yes">
+                            <fire:FirewallException Id="FirewallExceptionClient" Name="$(var.productName)" Scope="any" IgnoreFailure="yes"/>
                         </File>
                     </Component>                                
 
@@ -75,7 +77,7 @@
                         </Condition>
 
                         <RegistryKey Root="HKCU"
-                                 Key="Software\[Manufacturer]\${client.name}">
+                                 Key="Software\[Manufacturer]\$(var.clientName)">
                             <RegistryValue Type="string" Name="afterFirstRun" Value="false"/>
                             <RegistryValue Type="string" Name="appserverHost" Value="[CLIENT_APPSERVER_HOST]"/>
                             <RegistryValue Type="string" Name="appserverPort" Value="[CLIENT_APPSERVER_PORT]"/>
@@ -88,13 +90,13 @@
                     </Component>
 
                     <Component Id="ClientVsRedistributable">
-                        <File Id="VcRedistexe" Name="vcredist_${arch}.exe" Source="$(var.SourceDir)\vcredist_${arch}.exe"/>
+                        <File Id="VcRedistexe" Name="vcredist_$(var.arch).exe" Source="$(var.SourceDir)\vcredist_$(var.arch).exe"/>
                     </Component>
                 </Directory>                 
             </Directory>
         </DirectoryRef>
 
-        <ComponentGroup Id="ClientFFmpegLibraries" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
+        <ComponentGroup Id="ClientFFmpegLibraries" Directory="$(var.clientDirId)">
             <Component>
                 <File Id="ClientAvcodecDll" Name="avcodec-54.dll" Source="$(var.SourceDir)/avcodec-54.dll"/>
             </Component>
@@ -127,7 +129,7 @@
             </Component>
         </ComponentGroup>
 
-        <?if ${quicksync} = true ?>
+        <?if $(var.quicksync) = true ?>
         <ComponentGroup Id="ClientQuickSync" Directory="Plugins">
             <Component>
                 <File Id="ClientQuickSyncDll" Name="quicksyncdecoder.dll" Source="$(var.PluginsDir)/quicksyncdecoder.dll"/>
@@ -137,14 +139,14 @@
             </Component>
         </ComponentGroup>                            
         <?endif?>
-		<?if ${angle} = true ?>
-        <ComponentGroup Id="ClientDirectx" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
+        <?if $(var.angle) = true ?>
+        <ComponentGroup Id="ClientDirectx" Directory="$(var.clientDirId)">
             <Component>
                 <File Id="ClientD3dCompilerDll" Name="D3DCompiler_43.dll" Source="$(var.SourceDir)/D3DCompiler_43.dll"/>
             </Component>
         </ComponentGroup>        
         <?endif?>
-        <ComponentGroup Id="ClientQTLibraries" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
+        <ComponentGroup Id="ClientQTLibraries" Directory="$(var.clientDirId)">
             <Component>
                 <File Id="ClientQt5Core$(var.suffix).dll" Name="Qt5Core$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Core$(var.suffix).dll" />
             </Component>
@@ -164,6 +166,9 @@
                 <File Id="ClientQt5Xml$(var.suffix).dll" Name="Qt5Xml$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Xml$(var.suffix).dll" />
             </Component>
             <Component>
+                <File Id="ClientQt5XmlPatterns$(var.suffix).dll" Name="Qt5XmlPatterns$(var.suffix).dll" Source="$(var.SourceDir)\..\Qt5XmlPatterns$(var.suffix).dll" />
+            </Component>
+            <Component>            
                 <File Id="ClientQt5Widgets$(var.suffix).dll" Name="Qt5Widgets$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Widgets$(var.suffix).dll"  />
             </Component>
             <Component>
@@ -176,14 +181,14 @@
             <Component>
                 <File Id="ClientQt5PrintSupport$(var.suffix).dll" Name="Qt5PrintSupport$(var.suffix).dll" Source="$(var.SourceDir)\Qt5PrintSupport$(var.suffix).dll"  />                
             </Component>             
-            <?if ${webkit} = true ?>
-			<Component>
+            <?if $(var.webkit) = true ?>
+            <Component>
                 <File Id="ClientQt5WebKit$(var.suffix).dll" Name="Qt5WebKit$(var.suffix).dll" Source="$(var.SourceDir)\Qt5WebKit$(var.suffix).dll"  />                
             </Component>             
             <Component>
                 <File Id="ClientQt5WebKitWidgets$(var.suffix).dll" Name="Qt5WebKitWidgets$(var.suffix).dll" Source="$(var.SourceDir)\Qt5WebKitWidgets$(var.suffix).dll"  />                
             </Component>
-			<?endif?>			
+            <?endif?>           
             <Component>
                 <File Id="ClientQt5MultimediaWidgets$(var.suffix).dll" Name="Qt5MultimediaWidgets$(var.suffix).dll" Source="$(var.SourceDir)\Qt5MultimediaWidgets$(var.suffix).dll"  />                
             </Component>             
@@ -193,8 +198,8 @@
             <Component>
                 <File Id="ClientQt5Quick$(var.suffix).dll" Name="Qt5Quick$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Quick$(var.suffix).dll"  />                
             </Component>             
-            <?if ${webkit} = true ?>
-			<Component>
+            <?if $(var.webkit) = true ?>
+            <Component>
                 <File Id="Clienticudt53.dll" Name="icudt53.dll" Source="$(var.SourceDir)\icudt53.dll"  />                
             </Component>                 
             <Component>
@@ -203,15 +208,15 @@
             <Component>
                 <File Id="Clienticuuc5.dll" Name="icuuc53.dll" Source="$(var.SourceDir)\icuuc53.dll"  />                
             </Component>
-			<?endif?>            
-            <?if ${angle} = true ?>			
+            <?endif?>            
+            <?if $(var.angle) = true ?>         
             <Component>
                 <File Id="ClientlibGLESv2$(var.suffix).dll" Name="libGLESv2$(var.suffix).dll" Source="$(var.SourceDir)\libGLESv2$(var.suffix).dll"  />                
             </Component>                         
             <Component>
                 <File Id="ClientlibEGL$(var.suffix).dll" Name="libEGL$(var.suffix).dll" Source="$(var.SourceDir)\libEGL$(var.suffix).dll"  />                
             </Component>
-            <?endif?>					
+            <?endif?>                   
             <Component>
                 <File Id="Clientquazip.dll" Name="quazip.dll" Source="$(var.SourceDir)\quazip.dll"  />                
             </Component>
@@ -220,7 +225,7 @@
             </Component>                                           
         </ComponentGroup>
 
-        <ComponentGroup Id="ClientOpenAL" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
+        <ComponentGroup Id="ClientOpenAL" Directory="$(var.clientDirId)">
             <Component>
                 <File Id="OpenAL32.dll" Name="OpenAL32.dll" Source="$(var.SourceDir)\OpenAL32.dll"/>
             </Component>
@@ -229,7 +234,7 @@
             </Component>
         </ComponentGroup>
 
-        <ComponentGroup Id="ClientOpenSSL" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
+        <ComponentGroup Id="ClientOpenSSL" Directory="$(var.clientDirId)">
             <Component>
                 <File Id="Clientlibeay32.dll" Name="libeay32.dll" Source="$(var.SourceDir)\libeay32.dll"/>
             </Component>
@@ -262,7 +267,7 @@
             </Component>
         </ComponentGroup>            
 
-        <Feature Id="ClientFeature" Title="${product.name} Client" Level="1"
+        <Feature Id="ClientFeature" Title="$(var.productName) Client" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
 
             <ComponentRef Id="NovFileAssociation"/>
@@ -276,12 +281,12 @@
             <ComponentGroupRef Id="ClientVoxComponent"/>
             <ComponentGroupRef Id="ClientBgComponent"/>
             <ComponentRef Id="ClientConfiguration" />
-            <?if ${quicksync} = true ?>
+            <?if $(var.quicksync) = true ?>
             <ComponentGroupRef Id="ClientQuickSync"/>
             <?endif?>
-            <?if ${angle} = true ?>
-			<ComponentGroupRef Id="ClientDirectx"/>
-			<?endif?>
+            <?if $(var.angle) = true ?>
+            <ComponentGroupRef Id="ClientDirectx"/>
+            <?endif?>
             <ComponentGroupRef Id="ClientFFmpegLibraries"/>
             <ComponentGroupRef Id="ClientQTLibraries" />
             <ComponentGroupRef Id="ImageFormats" />

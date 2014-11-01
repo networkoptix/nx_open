@@ -121,7 +121,6 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
 
         resource->setUrl(QString(QLatin1String("http://%1:%2?channel=%3&http_port=%4")).arg(host).arg(apiPort).arg(i+1).arg(httpPort));
         resource->setPhysicalId(QString(QLatin1String("%1_%2")).arg(resource->getMAC().toString()).arg(i+1));
-        resource->setDiscoveryAddr(discoveryAddr);
         resource->setAuth(auth);
         resource->setGroupName(groupName);
         QString groupId = QString(QLatin1String("VMAX480_uuid_%1:%2")).arg(host).arg(apiPort);

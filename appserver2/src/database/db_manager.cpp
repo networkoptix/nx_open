@@ -520,7 +520,7 @@ bool QnDbManager::resyncTransactionLog()
     if (!fillTransactionLogInternal<ApiResourceParamWithRefData, ApiResourceParamWithRefDataList>(ApiCommand::setResourceParam))
         return false;
 
-    if (!fillTransactionLogInternal<ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
+    if (!fillTransactionLogInternal<ApiStorageData, ApiStorageDataList>(ApiCommand::saveStorage))
         return false;
 
     if (!fillTransactionLogInternal<ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
@@ -562,6 +562,9 @@ QMap<int, QnUuid> QnDbManager::getGuidList( const QString& request, GuidConversi
             }
         case CM_INT:
             result.insert(id, intToGuid(id, intHashPostfix));
+            break;
+        case CM_String:
+            result.insert(id, QnUuid(data.toString()));
             break;
         default:
             {
@@ -627,6 +630,13 @@ bool QnDbManager::updateGuids()
 
     guids = getGuidList("SELECT li.id, r.guid FROM vms_layoutitem_tmp li JOIN vms_resource r on r.id = li.resource_id order by li.id", CM_Binary);
     if (!updateTableGuids("vms_layoutitem", "resource_guid", guids))
+        return false;
+
+    guids = getGuidList("SELECT li.id, li.uuid FROM vms_layoutitem_tmp li order by li.id", CM_String);
+    if (!updateTableGuids("vms_layoutitem", "uuid", guids))
+        return false;
+    guids = getGuidList("SELECT li.id, li.zoom_target_uuid FROM vms_layoutitem_tmp li order by li.id", CM_String);
+    if (!updateTableGuids("vms_layoutitem", "zoom_target_uuid", guids))
         return false;
 
     if (!updateResourceTypeGuids())
@@ -830,6 +840,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     else if (updateName == lit(":/updates/17_add_isd_cam.sql")) {
         updateResourceTypeGuids();
     }
+    else if (updateName == lit(":/updates/20_adding_camera_user_attributes.sql")) {
+        m_needResyncLog = true;
+    }    
     else if (updateName == lit(":/updates/21_new_dw_cam.sql")) {
         updateResourceTypeGuids();
     }
@@ -1027,20 +1040,26 @@ QnUuid QnDbManager::getResourceGuid(const qint32 &internalId) {
 
 ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint32* internalId)
 {
-    //*internalId = getResourceInternalId(data.id);
+    *internalId = getResourceInternalId(data.id);
 
     //Q_ASSERT_X(data.status == Qn::NotDefined, Q_FUNC_INFO, "Status MUST be unchanged for resource modification. Use setStatus instead to modify it!");
 
     QSqlQuery query(m_sdb);
-    query.prepare("INSERT OR REPLACE INTO vms_resource (guid, xtype_guid, parent_guid, name, url) VALUES(:id, :typeId, :parentId, :name, :url)");
+    if (*internalId) {
+        query.prepare("UPDATE vms_resource SET guid = :id, xtype_guid = :typeId, parent_guid = :parentId, name = :name, url = :url WHERE id = :internalId");
+        query.bindValue(":internalId", *internalId);
+    }
+    else {
+        query.prepare("INSERT INTO vms_resource (guid, xtype_guid, parent_guid, name, url) VALUES(:id, :typeId, :parentId, :name, :url)");
+    }
     QnSql::bind(data, &query);
 
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::dbError;
     }
-    
-    *internalId = query.lastInsertId().toInt();
+    if (*internalId == 0)
+        *internalId = query.lastInsertId().toInt();
 
     return ErrorCode::ok;
 }
@@ -1085,8 +1104,8 @@ ErrorCode QnDbManager::insertOrReplaceCamera(const ApiCameraData& data, qint32 i
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("\
         INSERT OR REPLACE INTO vms_camera (vendor, manually_added, resource_ptr_id, group_name, group_id,\
-        mac, model, status_flags, physical_id, resource_ptr_id) VALUES\
-        (:vendor, :manuallyAdded, :id, :groupName, :groupId, :mac, :model, :statusFlags, :physicalId, :internalId)\
+        mac, model, status_flags, physical_id) VALUES\
+        (:vendor, :manuallyAdded, :internalId, :groupName, :groupId, :mac, :model, :statusFlags, :physicalId)\
     ");
     QnSql::bind(data, &insQuery);
     insQuery.bindValue(":internalId", internalId);

@@ -442,7 +442,19 @@ static QStringList listRecordFolders()
 #endif
 
 #ifdef Q_OS_LINUX
-    folderPaths.append(getDataDirectory() + "/data");
+    QList<QnPlatformMonitor::PartitionSpace> partitions = 
+        qnPlatform->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
+            QnPlatformMonitor::LocalDiskPartition);
+
+    //always adding storage in data dir
+    const QString& dataDirStorage = QDir::cleanPath(getDataDirectory() + "/data");
+    for(int i = 0; i < partitions.size(); ++i)
+    {
+        if( dataDirStorage.startsWith(partitions[i].path) )
+            folderPaths.append( dataDirStorage );
+        else
+            folderPaths.append( QDir::cleanPath( QDir::toNativeSeparators(partitions[i].path) + lit("/") + QnAppInfo::mediaFolderName() ) );
+    }
 #endif
 
     return folderPaths;
@@ -2063,7 +2075,7 @@ void restartServer()
     restartFlag = true;
     if (serviceMainInstance) {
         qWarning() << "restart requested!";
-        serviceMainInstance->stopAsync();
+        QTimer::singleShot(0, serviceMainInstance, SLOT(stopAsync()));
     }
 }
 

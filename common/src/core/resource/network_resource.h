@@ -45,11 +45,6 @@ public:
     bool isAuthenticated() const;
     void setAuthenticated(bool auth);
 
-    // address used to discover this resource ( in case if machine has more than one NIC/address)
-    // by default we assume that password is login and password are known and getDiscoveryAddr returns true
-    QHostAddress getDiscoveryAddr() const;
-    void setDiscoveryAddr(QHostAddress addr);
-
     virtual int httpPort() const;
     virtual void setHttpPort( int newPort );
 
@@ -101,8 +96,6 @@ private:
     //QHostAddress m_hostAddr;
     QnMacAddress m_macAddress;
     QString m_physicalId;
-
-    QHostAddress m_localAddress; // address used to discover this resource ( in case if machine has more than one NIC/address
 
     NetworkStatus m_networkStatus;
 
