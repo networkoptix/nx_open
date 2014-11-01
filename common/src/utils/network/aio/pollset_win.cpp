@@ -19,8 +19,8 @@
 
 namespace aio
 {
-    typedef std::map<Socket*, void*> PolledSockets;
-    typedef std::pair<Socket*, void*> SocketContext;
+    typedef std::map<Pollable*, void*> PolledSockets;
+    typedef std::pair<Pollable*, void*> SocketContext;
 
     class PollSetImpl
     {
@@ -52,7 +52,7 @@ namespace aio
         }
 
         PolledSockets::iterator findSocketContextIter(
-            Socket* const sock,
+            Pollable* const sock,
             aio::EventType eventType,
             PolledSockets** setToUse )
         {
@@ -213,12 +213,12 @@ namespace aio
         return *this;
     }
 
-    Socket* PollSet::const_iterator::socket()
+    Pollable* PollSet::const_iterator::socket()
     {
         return m_impl->currentSocket.first;
     }
 
-    const Socket* PollSet::const_iterator::socket() const
+    const Pollable* PollSet::const_iterator::socket() const
     {
         return m_impl->currentSocket.first;
     }
@@ -283,7 +283,7 @@ namespace aio
 
     //!Add socket to set. Does not take socket ownership
     bool PollSet::add(
-        Socket* const sock,
+        Pollable* const sock,
         aio::EventType eventType,
         void* userData )
     {
@@ -306,7 +306,7 @@ namespace aio
     }
 
     //!Remove socket from set
-    void PollSet::remove( Socket* const sock, aio::EventType eventType )
+    void PollSet::remove( Pollable* const sock, aio::EventType eventType )
     {
 #ifdef _DEBUG
         sock->handle(); //checking that socket object is still alive, since linux and mac implementation use socket in PollSet::remove
@@ -358,7 +358,7 @@ namespace aio
         return result;
     }
 
-    bool PollSet::canAcceptSocket( Socket* const sock ) const
+    bool PollSet::canAcceptSocket( Pollable* const sock ) const
     {
         return
             m_impl->readSockets.find( sock ) != m_impl->readSockets.end() ||

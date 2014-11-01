@@ -2,6 +2,12 @@
 
 #include <cassert>
 
+#include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
+
+#include <ui/style/resource_icon_cache.h>
+#include <ui/common/ui_resource_name.h>
+
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
 #include "utils/math/math.h"
@@ -63,6 +69,7 @@ QString QnLicenseListModel::columnTitle(Column column) {
     case LicenseKeyColumn:      return tr("License Key");
     case ExpirationDateColumn:  return tr("Expiration Date");
     case LicenseStatusColumn:   return tr("Status");
+    case ServerColumn:          return tr("Server");        
     default:
         assert(false);
         return QString();
@@ -122,6 +129,22 @@ QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr 
             }
             break;
         }
+    case ServerColumn:
+        {
+            QnUuid serverId = license->serverId();
+            QnMediaServerResourcePtr server = qnResPool->getResourceById(serverId).dynamicCast<QnMediaServerResource>();
+            if (!server) {
+                item->setText(tr("<Server not found>"));
+                item->setData(QVariant(), Qt::DecorationRole);
+                item->setData(QBrush(colors.expired), Qt::ForegroundRole);
+            } else {
+                item->setText(getResourceName(server));
+                item->setData(qnResIconCache->icon(QnResourceIconCache::Server).pixmap(16, 16), Qt::DecorationRole);
+                item->setData(QBrush(colors.normal), Qt::ForegroundRole);
+            }
+
+        }
+        break;
     default:
         assert(false);
     }

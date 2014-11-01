@@ -42,7 +42,7 @@ CLIENT_IMAGEFORMATS_PATH=$CLIENT_BIN_PATH/imageformats
 CLIENT_VOX_PATH=$CLIENT_BIN_PATH/vox
 CLIENT_PLATFORMS_PATH=$CLIENT_BIN_PATH/platforms
 CLIENT_BG_PATH=${libdir}/backgrounds
-CLIENT_HELP_PATH=${environment.dir}/help/${release.version}/${customization}
+CLIENT_HELP_PATH=${ClientHelpSourceDir}
 ICONS_PATH=${customization.dir}/icons/hicolor
 CLIENT_LIB_PATH=${libdir}/lib/${build.configuration}
 

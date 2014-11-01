@@ -14,6 +14,7 @@
 	<name>HD Witness Installer</name>
 
 	<properties>
+        <product.title>${wixsetup.name}</product.title>
 		<root.dir>${basedir}/..</root.dir>
 		<skip.test>true</skip.test>
 		<skip.compress>true</skip.compress>
@@ -21,6 +22,7 @@
 	</properties>
 
 	<build>
+        <finalName>${installer.name}-${release.version}.${buildNumber}-${box}-${arch}-${build.configuration}-${install.type}-beta</finalName>
 		<directory>${arch}</directory>
 		<sourceDirectory>${basedir}</sourceDirectory>
 		<plugins>

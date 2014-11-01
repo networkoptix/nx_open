@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <map>
+#include <memory>
 #include <set>
 
 #include <boost/optional.hpp>
@@ -115,8 +116,8 @@ public:
         }
 
         /* Reading current disk statistics. */
-        FILE *file = fopen("/proc/diskstats", "r");
-        if(!file)
+        std::unique_ptr<FILE, decltype(&fclose)> file( fopen("/proc/diskstats", "r"), fclose );
+        if( !file )
         {
             m_hddStatCalcTimer.restart();
             return zeroLoad();
@@ -124,7 +125,7 @@ public:
 
         QHash<int, unsigned int> diskTimeById;
         char line[MAX_LINE_LENGTH];
-        while(fgets(line, MAX_LINE_LENGTH, file) != NULL) {
+        while(fgets(line, MAX_LINE_LENGTH, file.get()) != NULL) {
             DiskStatSys diskStat;
             memset(diskStat.device_name, 0, sizeof(diskStat.device_name));
 
@@ -162,7 +163,6 @@ public:
         }
         lastDiskTimeById = diskTimeById;
 
-        fclose(file);
         m_hddStatCalcTimer.restart();
 
         return result;
@@ -191,7 +191,7 @@ public:
             return;
         lastPartitionsUpdateTime = time;
 
-        FILE *file = fopen("/proc/partitions", "r");
+        std::unique_ptr<FILE, decltype(&fclose)> file( fopen("/proc/partitions", "r"), fclose );
         if(!file)
             return;
 
@@ -199,7 +199,7 @@ public:
         char line[MAX_LINE_LENGTH];
         //!map<devname, pair<major, minor> >
         std::map<QString, std::pair<unsigned int, unsigned int> > allPartitions;
-        for(int i = 0; fgets(line, MAX_LINE_LENGTH, file) != NULL; ++i) {
+        for(int i = 0; fgets(line, MAX_LINE_LENGTH, file.get()) != NULL; ++i) {
             if(i == 0)
                 continue; /* Skip header. */
 
@@ -233,8 +233,6 @@ public:
             const int id = calculateId( major, minor );
             diskById[id] = Hdd( id, devName, devName );
         }
-
-        fclose(file);
 
         // TODO: #Elric read network drives?
     }
@@ -377,14 +375,14 @@ QnLinuxMonitor::~QnLinuxMonitor() {
 
 qreal QnLinuxMonitor::totalCpuUsage()
 {
-    FILE *file = fopen("/proc/stat", "r");
+    std::unique_ptr<FILE, decltype(&fclose)> file( fopen("/proc/stat", "r"), fclose );
     if(!file)
         return 0;
 
     int64_t cpuTimeTotal = 0;
     int64_t cpuTimeIdle = d_ptr->prevCPUTimeIdle;
     char line[MAX_LINE_LENGTH];
-    for( int i = 0; fgets(line, MAX_LINE_LENGTH, file) != NULL; ++i )
+    for( int i = 0; fgets(line, MAX_LINE_LENGTH, file.get()) != NULL; ++i )
     {
         QByteArray lineStr( line );
         const QList<QByteArray>& tokens = lineStr.split( ' ' );
@@ -408,7 +406,7 @@ qreal QnLinuxMonitor::totalCpuUsage()
 
     }
 
-    fclose( file );
+    file.reset();
 
     if( d_ptr->prevCPUTimeTotal == -1 )
         d_ptr->prevCPUTimeTotal = cpuTimeTotal;
@@ -427,7 +425,7 @@ qreal QnLinuxMonitor::totalCpuUsage()
 
 qreal QnLinuxMonitor::totalRamUsage()
 {
-    FILE *file = fopen("/proc/meminfo", "r");
+    std::unique_ptr<FILE, decltype(&fclose)> file( fopen("/proc/meminfo", "r"), fclose );
     if(!file)
         return 0;
 
@@ -435,7 +433,7 @@ qreal QnLinuxMonitor::totalRamUsage()
     boost::optional<uint64_t> memTotalKB;
     boost::optional<uint64_t> memFreeKB;
     boost::optional<uint64_t> memCachedKB;
-    for( int i = 0; fgets(line, MAX_LINE_LENGTH, file) != NULL; ++i )
+    for( int i = 0; fgets(line, MAX_LINE_LENGTH, file.get()) != NULL; ++i )
     {
         const size_t length = strlen(line);
         
@@ -462,8 +460,6 @@ qreal QnLinuxMonitor::totalRamUsage()
     if( !memTotalKB || !memFreeKB || !memCachedKB )
         return 0;
 
-    fclose( file );
-    file = nullptr;
     return 1.0 - ((memFreeKB.get()+memCachedKB.get()) / (qreal)(memTotalKB.get() == 0 ? ((memFreeKB.get() + memCachedKB.get())+1) : memTotalKB.get()));   //protecting from zero-memory-size error in /proc/meminfo. This situation is not possible in real life, so don't worry
 }
 
@@ -485,12 +481,12 @@ QList<QnPlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo
     //map<device, path>
     std::map<QString, QString> deviceToPath;
     std::set<QString> mountPointsToIgnore;
-    FILE* file = fopen("/proc/mounts", "r");
+    std::unique_ptr<FILE, decltype(&fclose)> file( fopen("/proc/mounts", "r"), fclose );
     if( !file )
         return partitions;
 
     char line[MAX_LINE_LENGTH];
-    for( int i = 0; fgets(line, MAX_LINE_LENGTH, file) != NULL; ++i )
+    for( int i = 0; fgets(line, MAX_LINE_LENGTH, file.get()) != NULL; ++i )
     {
         if( i == 0 )
             continue; /* Skip header. */

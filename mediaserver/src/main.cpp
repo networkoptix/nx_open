@@ -830,13 +830,6 @@ void QnMain::stopObjects()
         delete m_universalTcpListener;
         m_universalTcpListener = 0;
     }
-
-    if (m_moduleFinder)
-    {
-        m_moduleFinder->stop();
-        delete m_moduleFinder;
-        m_moduleFinder = 0;
-    }
 }
 
 void QnMain::updateDisabledVendorsIfNeeded()
@@ -1574,8 +1567,14 @@ void QnMain::run()
             QnSleep::msleep(1000);
     }
 
+    /* This key means that password should be forcibly changed in the database. */
+    const QString passwordChangeKey = "appserverPassword";
     MSSettings::roSettings()->remove(OBSOLETE_SERVER_GUID);
-    MSSettings::roSettings()->remove("appserverPassword");
+    MSSettings::roSettings()->remove(passwordChangeKey);
+#ifdef _DEBUG
+    MSSettings::roSettings()->sync();
+    Q_ASSERT_X(!MSSettings::roSettings()->contains(passwordChangeKey), Q_FUNC_INFO, "appserverPassword could not be removed from the registry. Restart the server as Administrator");
+#endif
 
     if (needToStop()) {
         stopObjects();
@@ -1611,6 +1610,7 @@ void QnMain::run()
     qnCommon->setModuleInformation(selfInformation);
 
     m_moduleFinder = new QnModuleFinder( false );
+    std::unique_ptr<QnModuleFinder> moduleFinderScopedPointer( m_moduleFinder );
     if (cmdLineArguments.devModeKey == lit("razrazraz")) {
         m_moduleFinder->setCompatibilityMode(true);
         ec2ConnectionFactory->setCompatibilityMode(true);

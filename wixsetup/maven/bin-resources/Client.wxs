@@ -13,7 +13,7 @@
                 <Directory Id="$(var.clientDirId)" Name="$(var.releaseVersionFull)">
 
                     <Component Id="AppLauncherExecutable">
-                        <File Id="applauncher.exe" Name="$(var.productName) Launcher.exe" Source="$(var.SourceDir)/applauncher.exe" KeyPath="yes">
+                        <File Id="applauncher.exe" Name="$(var.applauncherName).exe" Source="$(var.SourceDir)/applauncher.exe" KeyPath="yes">
                             <Shortcut Id="StartmenuAppLauncher" Directory="ProgramMenuDir" Name="$(var.productName)"
                               WorkingDirectory='$(var.clientDirId)' Advertise="yes" Icon="icon_menu.exe" >
                             </Shortcut>
@@ -66,7 +66,7 @@
                     <Directory Id="$(var.customization)VoxDir" Name="vox"/>                                
 
                     <Component Id="ClientExecutable">
-                        <File Id="client.exe" Name="$(var.productExeName)" Source="$(var.SourceDir)/$(var.clientExeName)" KeyPath="yes">
+                        <File Id="client.exe" Name="$(var.clientName).exe" Source="$(var.SourceDir)/client.exe" KeyPath="yes">
                             <fire:FirewallException Id="FirewallExceptionClient" Name="$(var.productName)" Scope="any" IgnoreFailure="yes"/>
                         </File>
                     </Component>                                

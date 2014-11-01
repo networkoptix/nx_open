@@ -3,8 +3,8 @@
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension"
      xmlns:SystemTools="http://schemas.appsecinc.com/wix/SystemToolsExtension">
-    <Product Id="*" Name="${product.name} Client" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${customization.clientUpgradeCode}">
-        <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="${company.name} ${product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
+    <Product Id="*" Name="${display.product.name} Client" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${customization.clientUpgradeCode}">
+        <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="${company.name} ${display.product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
 
         <?include ControlPanel.wxi ?>
         <?include BuildVars.wxi ?>
@@ -52,7 +52,7 @@
         <Property Id="LAUNCHAPPONEXIT" Secure="yes" />
 
         <!-- Properties -->
-        <Property Id="WelcomeDlg_Title" Value="${product.name} Installer Setup" />
+        <Property Id="WelcomeDlg_Title" Value="${display.product.name} Installer Setup" />
 
         <Property Id="INSTALL_SHORTCUT_DESKTOP" Value="1"/>
 
@@ -112,7 +112,7 @@
 
             <Directory Id="$(var.ProgramFilesFolder)">
                 <Directory Id="NetworkOptix" Name="${company.name}">
-                    <Directory Id="INSTALLDIR" Name="${product.name}">
+                    <Directory Id="INSTALLDIR" Name="${display.product.name}">
                     </Directory>
                 </Directory>
             </Directory>

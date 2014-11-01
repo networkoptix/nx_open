@@ -521,7 +521,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnHelpHandler helpHandler;
     qApp->installEventFilter(&helpHandler);
 
-    cl_log.log(qApp->applicationName(), " started", cl_logALWAYS);
+    cl_log.log(qApp->applicationDisplayName(), " started", cl_logALWAYS);
     cl_log.log("Software version: ", QApplication::applicationVersion(), cl_logALWAYS);
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 

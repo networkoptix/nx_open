@@ -1,6 +1,8 @@
 #ifndef NETWORKOPTIXMODULEFINDER_H
 #define NETWORKOPTIXMODULEFINDER_H
 
+#include <memory>
+
 #include <QtCore/QHash>
 #include <QtNetwork/QHostAddress>
 
@@ -53,7 +55,7 @@ private slots:
     //void at_resourcePool_resourceChanged(const QnResourcePtr &resource);
 
 private:
-    QnMulticastModuleFinder *m_multicastModuleFinder;
+    std::unique_ptr<QnMulticastModuleFinder> m_multicastModuleFinder;
     QnDirectModuleFinder *m_directModuleFinder;
     QnModuleFinderHelper *m_directModuleFinderHelper;
 

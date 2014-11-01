@@ -375,14 +375,17 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
     if (currentUrl.isEmpty())
         return false;
 
+    QScopedPointer<QnReconnectHelper> reconnectHelper(new QnReconnectHelper());
     QPointer<QnReconnectInfoDialog> reconnectInfoDialog(new QnReconnectInfoDialog(mainWindow()));
+    reconnectInfoDialog->setServers(reconnectHelper->servers());
+
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    reconnectInfoDialog.data(),     &QDialog::hide);
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    reconnectInfoDialog.data(),     &QObject::deleteLater);
     reconnectInfoDialog->show();
 
     ec2::ErrorCode errCode = ec2::ErrorCode::ok;
 
-    QScopedPointer<QnReconnectHelper> reconnectHelper(new QnReconnectHelper());
+    
   
     /* Here we will wait for the reconnect or cancel. */
     while (reconnectInfoDialog && !reconnectInfoDialog->wasCanceled()) {

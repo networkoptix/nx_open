@@ -18,6 +18,7 @@
 #define QN_BETA                         "${beta}"
 #define QN_ORGANIZATION_NAME            "${company.name}"
 #define QN_APPLICATION_NAME             "${product.title}"
+#define QN_APPLICATION_DISPLAY_NAME     "${product.display.title}"
 #define QN_APPLICATION_VERSION          "${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${buildNumber}"
 #ifdef _WIN32
 #   define QN_PRODUCT_NAME              "${product.name}"

@@ -310,6 +310,7 @@ int doInstallation(
 #include <utils/network/http/httpclient.h>
 
 //--rsync --dir=c:/temp/1 --url=http://enk.me/clients/2.1/default/windows/x64/
+//--rsync --dir=c:/tmp/1/ --url=http://downloads.hdwitness.com/clients/2.1/default/windows/x64/
 
 int downloadFile( const QString& url, const QString& destFilePath )
 {
