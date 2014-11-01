@@ -12,10 +12,10 @@
 
     <?define productName = "${display.product.name}"?>
     <?define applauncherName = "${applauncher.name}"?>
-    <?define clientName = "${client.display.name}"?>
+    <?define clientName = "${client.name}"?>
 
     <?define productExeName = "${product_name}"?>
-    <?define clientExeName = "${client_name}"?>
+    <?define clientExeName = "${product.name}"?>
 
     <?define mirrorListUrl = "${mirrorListUrl}"?>
     <?define quicksync = "${quicksync}"?>

@@ -13,7 +13,7 @@
                 <Directory Id="$(var.clientDirId)" Name="$(var.releaseVersionFull)">
 
                     <Component Id="AppLauncherExecutable">
-                        <File Id="applauncher.exe" Name="$(var.applauncherName) Launcher.exe" Source="$(var.SourceDir)/applauncher.exe" KeyPath="yes">
+                        <File Id="applauncher.exe" Name="$(var.applauncherName).exe" Source="$(var.SourceDir)/applauncher.exe" KeyPath="yes">
                             <Shortcut Id="StartmenuAppLauncher" Directory="ProgramMenuDir" Name="$(var.productName)"
                               WorkingDirectory='$(var.clientDirId)' Advertise="yes" Icon="icon_menu.exe" >
                             </Shortcut>
