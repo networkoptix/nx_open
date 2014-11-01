@@ -157,6 +157,7 @@ public:
     int getSecondaryH264Profile() const;
     QSize getMaxResolution() const;
     int getTimeDrift() const; // return clock diff between camera and local clock at seconds
+    void setTimeDrift(int value); // return clock diff between camera and local clock at seconds
     //bool isSoapAuthorized() const;
     const QSize getVideoSourceSize() const;
 
@@ -165,6 +166,8 @@ public:
     const QString getAudioEncoderId() const;
     const QString getVideoSourceId() const;
     const QString getAudioSourceId() const;
+
+    void updateOnvifUrls(const QnPlOnvifResourcePtr& other);
 
 
     QString getMediaUrl() const;

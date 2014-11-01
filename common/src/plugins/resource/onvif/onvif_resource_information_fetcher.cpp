@@ -2,6 +2,10 @@
 #ifdef ENABLE_ONVIF
 
 #include "onvif_resource_information_fetcher.h"
+
+#include <memory>
+#include <mutex>
+
 #include "onvif_resource.h"
 #include "onvif/soapDeviceBindingProxy.h"
 #include "../digitalwatchdog/digital_watchdog_resource.h"
@@ -54,7 +58,8 @@ bool OnvifResourceInformationFetcher::isModelContainVendor(const QString& vendor
         return false;
 }
 
-OnvifResourceInformationFetcher::OnvifResourceInformationFetcher():
+OnvifResourceInformationFetcher::OnvifResourceInformationFetcher()
+:
     /*passwordsData(PasswordHelper::instance()),*/
     camersNamesData(NameHelper::instance()),
     m_shouldStop(false)
@@ -74,10 +79,15 @@ OnvifResourceInformationFetcher::OnvifResourceInformationFetcher():
     }
 }
 
+static std::unique_ptr<OnvifResourceInformationFetcher> OnvifResourceInformationFetcher_instance;
+static std::once_flag OnvifResourceInformationFetcher_onceFlag;
+
 OnvifResourceInformationFetcher& OnvifResourceInformationFetcher::instance()
 {
-    static OnvifResourceInformationFetcher inst;
-    return inst;
+    std::call_once(
+        OnvifResourceInformationFetcher_onceFlag,
+        [](){ OnvifResourceInformationFetcher_instance.reset( new OnvifResourceInformationFetcher() ); } );
+    return *OnvifResourceInformationFetcher_instance.get();
 }
 
 void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result, DiscoveryMode discoveryMode) const

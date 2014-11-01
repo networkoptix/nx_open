@@ -72,7 +72,7 @@ void QnMulticodecRtpReader::clearKeyData(int channelNum)
 
 bool QnMulticodecRtpReader::gotKeyData(const QnAbstractMediaDataPtr& mediaData)
 {
-    if (m_gotKeyDataInfo.size() <= mediaData->channelNumber)
+    if ((size_t)m_gotKeyDataInfo.size() <= mediaData->channelNumber)
         m_gotKeyDataInfo.resize(mediaData->channelNumber + 1);
     if (mediaData->dataType == QnAbstractMediaData::VIDEO)
     {
@@ -253,7 +253,7 @@ static const int MEDIA_DATA_READ_TIMEOUT_MS = 100;
 
 QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
 {
-    int readed;
+    int readed = 0;
     int errorRetryCount = 0;
 
     pollfd mediaSockPollArray[MAX_MEDIA_SOCKET_COUNT];

@@ -24,22 +24,32 @@ static const int INVALID_SOCKET = -1;
 
 typedef CommonSocketImpl<Pollable> PollableImpl;
 
+//!Incapsulates system object that can be polled with \a PollSet
 class Pollable
 {
 public:
+    /*!
+        \param fd Valid file descriptor. It is not closed on object destruction!
+    */
     Pollable(
         AbstractSocket::SOCKET_HANDLE fd,
         std::unique_ptr<PollableImpl> impl = std::unique_ptr<PollableImpl>() );
     virtual ~Pollable() {}
 
     AbstractSocket::SOCKET_HANDLE handle() const;
+    /*!
+        \note Zero timeout means infinite timeout
+    */
     bool getRecvTimeout( unsigned int* millis );
+    /*!
+        \note Zero timeout means infinite timeout
+    */
     bool getSendTimeout( unsigned int* millis );
 
     PollableImpl* impl();
     const PollableImpl* impl() const;
 
-    virtual bool getLastError( SystemError::ErrorCode* errorCode ) const = 0;
+    virtual bool getLastError( SystemError::ErrorCode* errorCode ) const;
 
 protected:
     AbstractSocket::SOCKET_HANDLE m_fd;

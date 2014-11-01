@@ -56,7 +56,7 @@ public:
     /*!
         \a localTimeOnSource Usec. Absolute time on source corresponding to \a pts
     */
-    void updateTimeMapping( pts_type pts, int64_t localTimeOnSource );
+    void updateTimeMapping( pts_type pts, int64_t localTimeOnSourceUSec );
 
 private:
     //void resyncTime( int32_t pts, int64_t absoluteSourceTimeUsec );

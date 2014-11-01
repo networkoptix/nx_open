@@ -22,9 +22,9 @@ QnModuleFinder::QnModuleFinder(bool clientOnly) :
     m_directModuleFinder(new QnDirectModuleFinder(this)),
     m_directModuleFinderHelper(new QnModuleFinderHelper(this))
 {
-    connect(m_multicastModuleFinder,        &QnMulticastModuleFinder::moduleAddressFound,       this,       &QnModuleFinder::at_moduleAddressFound);
-    connect(m_multicastModuleFinder,        &QnMulticastModuleFinder::moduleAddressLost,        this,       &QnModuleFinder::at_moduleAddressLost);
-    connect(m_multicastModuleFinder,        &QnMulticastModuleFinder::moduleChanged,            this,       &QnModuleFinder::at_moduleChanged);
+    connect(m_multicastModuleFinder.get(),        &QnMulticastModuleFinder::moduleAddressFound,       this,       &QnModuleFinder::at_moduleAddressFound);
+    connect(m_multicastModuleFinder.get(),        &QnMulticastModuleFinder::moduleAddressLost,        this,       &QnModuleFinder::at_moduleAddressLost);
+    connect(m_multicastModuleFinder.get(),        &QnMulticastModuleFinder::moduleChanged,            this,       &QnModuleFinder::at_moduleChanged);
     connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleUrlFound,              this,       &QnModuleFinder::at_moduleUrlFound);
     connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleUrlLost,               this,       &QnModuleFinder::at_moduleUrlLost);
     connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleChanged,               this,       &QnModuleFinder::at_moduleChanged);
@@ -55,7 +55,7 @@ QnModuleInformation QnModuleFinder::moduleInformation(const QString &moduleId) c
 }
 
 QnMulticastModuleFinder *QnModuleFinder::multicastModuleFinder() const {
-    return m_multicastModuleFinder;
+    return m_multicastModuleFinder.get();
 }
 
 QnDirectModuleFinder *QnModuleFinder::directModuleFinder() const {
@@ -158,7 +158,7 @@ void QnModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInformati
 
     QnModuleInformation updatedModuleInformation = moduleInformation;
 
-    if (sender() == m_multicastModuleFinder)
+    if (sender() == m_multicastModuleFinder.get())
         updatedModuleInformation.remoteAddresses.unite(m_directModuleFinder->moduleInformation(moduleInformation.id).remoteAddresses);
     else if (sender() == m_directModuleFinder)
         updatedModuleInformation.remoteAddresses.unite(m_multicastModuleFinder->moduleInformation(moduleInformation.id).remoteAddresses);

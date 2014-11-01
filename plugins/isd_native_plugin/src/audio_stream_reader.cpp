@@ -7,26 +7,41 @@
 
 #include <iostream>
 
+#include <QDateTime>
+
 #include <utils/network/aio/aioservice.h>
 
+#include "stream_time_sync_data.h"
+
+
+static const int MS_PER_SEC = 1000;
+static const int USEC_PER_MSEC = 1000;
+static const int AUDIO_ENCODER_ID = 10;
+static const int MAX_FRAMES_BETWEEN_TIME_RESYNC = 300;
 
 AudioStreamReader::AudioStreamReader()
 :
     m_prevReceiverID(0),
-    m_pollable(nullptr)
+    m_initializedInitially(false),
+    m_ptsMapper(MS_PER_SEC, &TimeSynchronizationData::instance()->timeSyncData, AUDIO_ENCODER_ID),
+    m_framesSinceTimeResync(MAX_FRAMES_BETWEEN_TIME_RESYNC)
 {
 }
 
 AudioStreamReader::~AudioStreamReader()
 {
-    aio::AIOService::instance()->removeFromWatch( m_pollable, aio::etRead, true );
+    if( m_pollable )
+        aio::AIOService::instance()->removeFromWatch( m_pollable.get(), aio::etRead, true );
 }
 
-bool AudioStreamReader::initialize()
+bool AudioStreamReader::initializeIfNeeded()
 {
+    if( m_initializedInitially )
+        return true;
     if( !initializeAmux() )
         return false;
-    return aio::AIOService::instance()->watchSocket( m_pollable, aio::etRead, this );
+    m_initializedInitially = aio::AIOService::instance()->watchSocket( m_pollable.get(), aio::etRead, this );
+    return m_initializedInitially;
 }
 
 /*!
@@ -35,7 +50,7 @@ bool AudioStreamReader::initialize()
 size_t AudioStreamReader::setPacketReceiver( std::function<void(const std::shared_ptr<AudioData>&)> packetReceiver )
 {
     std::unique_lock<std::mutex> lk( m_mutex );
-    size_t id = ++m_prevReceiverID;
+    const size_t id = ++m_prevReceiverID;
     m_packetReceivers[id] = std::move( packetReceiver );
     return id;
 }
@@ -53,6 +68,8 @@ nxcip::AudioFormat AudioStreamReader::getAudioFormat() const
 
 void AudioStreamReader::eventTriggered( Pollable* pollable, aio::EventType eventType ) throw()
 {
+    assert( m_pollable.get() == pollable );
+
     if( eventType == aio::etRead )
     {
         int result = readAudioData();
@@ -60,11 +77,11 @@ void AudioStreamReader::eventTriggered( Pollable* pollable, aio::EventType event
             return; //listening futher
     }
 
-    aio::AIOService::instance()->removeFromWatch( pollable, aio::etRead );
+    aio::AIOService::instance()->removeFromWatch( m_pollable.get(), aio::etRead );
     //re-initializing audio
     if( !initializeAmux() )
         return;
-    if( !aio::AIOService::instance()->watchSocket( m_pollable, aio::etRead, this ) )
+    if( !aio::AIOService::instance()->watchSocket( m_pollable.get(), aio::etRead, this ) )
     {
         //TODO
     }
@@ -94,7 +111,18 @@ int AudioStreamReader::readAudioData()
         return nxcip::NX_IO_ERROR;
     }
 
+    //std::cout<<"Read "<<bytesRead<<" bytes of audio"<<std::endl;
     audioPacket->setDataSize( bytesRead );
+
+    const qint64 curTime = QDateTime::currentMSecsSinceEpoch();
+    if( m_framesSinceTimeResync >= MAX_FRAMES_BETWEEN_TIME_RESYNC )
+    {
+        m_ptsMapper.updateTimeMapping( curTime, curTime * USEC_PER_MSEC );
+        m_framesSinceTimeResync = 0;
+    }
+    ++m_framesSinceTimeResync;
+
+    audioPacket->setTimestamp( m_ptsMapper.getTimestamp( curTime ) );
 
     //std::cout<<"Got audio packet. size "<<audioPacket->dataSize()<<", pts "<<audioPacket->timestamp()<<"\n";
 
@@ -153,19 +181,20 @@ bool AudioStreamReader::initializeAmux()
 
     if( amux->GetInfo( &m_audioInfo ) )
     {
-        std::cerr << "ISD plugin: can't get audio stream info\n";
+        std::cerr << "ISD plugin: can't get audio stream info. "<<strerror(errno)<<"\n";
         return false;
     }
 
     if( amux->StartAudio() )
     {
-        std::cerr << "ISD plugin: can't start audio stream\n";
+        std::cerr << "ISD plugin: can't start audio stream. "<<strerror(errno)<<"\n";
         return false;
     }
 
     //std::cout<<"AMUX initialized. Codec type "<<m_audioFormat.compressionType<<" fd = "<<amux->GetFD()<<"\n";
 
     m_amux = std::move(amux);
+    m_pollable.reset( new Pollable( m_amux->GetFD() ) );
 
     fillAudioFormat();
     return true;

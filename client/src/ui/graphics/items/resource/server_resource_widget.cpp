@@ -770,6 +770,9 @@ Qn::ResourceStatusOverlay QnServerResourceWidget::calculateStatusOverlay() const
 
     if (m_resource->getStatus() == Qn::Offline)
         return Qn::ServerOfflineOverlay;
+    if (m_resource->getStatus() == Qn::Unauthorized)
+       return Qn::ServerUnauthorizedOverlay;
+
     return base_type::calculateStatusOverlay();
 }
 

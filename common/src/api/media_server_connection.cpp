@@ -303,10 +303,13 @@ QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver,
 
     QString guid = mserver->getProperty(lit("guid"));
 
-    QnRequestHeaderList extraHeaders;
-    extraHeaders.insert(lit("x-server-guid"), guid.isEmpty() ? mserver->getId().toString() : guid);
+    QnRequestHeaderList queryParameters;
+	queryParameters.insert(lit("x-server-guid"), mserver->getId().toString());
 
-    setExtraQueryParameters(extraHeaders);
+    setExtraQueryParameters(queryParameters);
+
+    QnRequestHeaderList extraHeaders;
+	extraHeaders.insert(lit("x-server-guid"), guid.isEmpty() ? mserver->getId().toString() : guid);
 
     if (!videowallGuid.isNull())
         extraHeaders.insert(lit("X-NetworkOptix-VideoWall"), videowallGuid.toString());

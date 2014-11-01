@@ -58,7 +58,7 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     m_userAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameUser, QString(), this);
     m_passwordAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(namePassword, QString(), this);
     m_signatureAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameSignature, QString(), this);
-    m_supportEmailAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameSupportEmail, QnAppInfo::supportAddress()), this;
+    m_supportEmailAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameSupportEmail, QnAppInfo::supportAddress(), this);
     m_connectionTypeAdaptor = new  QnLexicalResourcePropertyAdaptor<QnEmail::ConnectionType>(nameConnectionType, QnEmail::Unsecure, this);
     m_portAdaptor = new QnLexicalResourcePropertyAdaptor<int>(namePort, 0, this);
     m_timeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(nameTimeout, QnEmailSettings::defaultTimeoutSec(), this);

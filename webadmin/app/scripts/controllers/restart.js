@@ -48,6 +48,9 @@ angular.module('webadminApp')
             //2. call restart function
             mediaserver.restart().then(function () {
                     pingServer();  //3. ping every second
+                },function () {//on error - ping
+                    pingServer();  //3. ping every second
+                    return false;
                 }
             )
         }).error(function(){

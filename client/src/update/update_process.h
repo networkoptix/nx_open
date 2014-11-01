@@ -90,7 +90,7 @@ private:
     void at_checkForUpdatesTaskFinished(QnCheckForUpdatesPeerTask* task, const QnCheckForUpdateResult &result);
     void at_downloadTaskFinished(QnDownloadUpdatesPeerTask* task, int errorCode);
     void at_restUpdateTask_finished(int errorCode);
-    void at_uploadTask_finished(int errorCode);
+    void at_uploadTask_finished(int errorCode, const QSet<QnUuid> &failedPeers);
     void at_installTask_finished(int errorCode);
 
     void at_restUpdateTask_peerUpdateFinished(const QnUuid &incompatibleId, const QnUuid &id);
@@ -112,6 +112,7 @@ private:
     QHash<QnUuid, QnPeerUpdateInformation> m_updateInformationById;
     QMultiHash<QnSystemInformation, QnUuid> m_idBySystemInformation;
     QnUpdateResult::Value m_updateResult;
+    QSet<QnUuid> m_failedPeerIds;
 };
 
 

@@ -10,6 +10,8 @@
           </bal:WixStandardBootstrapperApplication> 
         </BootstrapperApplicationRef> 
 <!--        <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense"/>
+                      Value="&quot;[${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir]${display.product.name} Launcher.exe&quot; &quot;quit&quot;" Execute="immediate" />
+                    <Directory Id="INSTALLDIR" Name="${display.product.name}">
 
         <bal:WixExtendedBootstrapperApplication SuppressOptionsUI="yes" LicenseUrl="" />
         <WixVariable Id="WixStdbaLicenseUrl" Value=""/> -->

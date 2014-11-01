@@ -264,7 +264,7 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     discoveryManager->getRef()->addRef();   //this ref will be released by QnThirdPartyResource
 
     QString vendor = discoveryManager->getVendorName();
-    bool vendorIsRtsp = vendor == lit("GENERIC_RTSP");
+    bool vendorIsRtsp = vendor == lit("GENERIC_RTSP");  //TODO #ak remove this!
 
     QnThirdPartyResourcePtr resource(new QnThirdPartyResource(cameraInfo, camManager, discoveryManager->getRef()));
     resource->setTypeId(typeId);

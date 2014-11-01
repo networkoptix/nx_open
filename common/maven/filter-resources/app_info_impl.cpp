@@ -75,11 +75,11 @@ QString QnAppInfo::productNameShort() {
 }
 
 QString QnAppInfo::productNameLong() {
-    return QStringLiteral("${product.name}");
+    return QStringLiteral("${display.product.name}");
 }
 
 QString QnAppInfo::customizationName() {
-    return lit("${customization}");
+    return QStringLiteral("${customization}");
 }
 
 QString QnAppInfo::clientExecutableName() {
@@ -128,6 +128,10 @@ QString QnAppInfo::mirrorListUrl() {
 
 QString QnAppInfo::helpUrl() {
     return QStringLiteral("${helpUrl}/${customization}/${parsedVersion.majorVersion}/${parsedVersion.minorVersion}/url");
+}
+
+QString QnAppInfo::updateGeneratorUrl() {
+    return QStringLiteral("${update.generator.url}");
 }
 
 int QnAppInfo::freeLicenseCount() {

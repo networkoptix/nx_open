@@ -81,11 +81,7 @@ private:
     std::deque<std::shared_ptr<AudioData>> m_audioPackets;
     int m_audioEventFD;
     bool m_audioEventFDRegistered;
-    //amux_info_t m_audioInfo;
-    //std::unique_ptr<Amux> m_amux;
     std::atomic<bool> m_audioEnabled;
-    //nxcip::CompressionType m_audioCodec;
-    //std::unique_ptr<nxcip::AudioFormat> m_audioFormat;
     size_t m_audioReceiverID;
 #endif
     mutable QMutex m_mutex;
@@ -118,10 +114,8 @@ private:
     bool registerFD( int fd );
     void unregisterFD( int fd );
 #ifndef NO_ISD_AUDIO
-    //int initializeAMux();
     void onAudioDataAvailable( const std::shared_ptr<AudioData>& audioDataPtr );
     int getAudioPacket( nxcip::MediaDataPacket** packet );
-    //void fillAudioFormat( const ISDAudioPacket& audioPacket );
 #endif
     void closeAllStreams();
     int64_t calcNextTimestamp( int32_t pts, int64_t absoluteTimeMS );

@@ -9,10 +9,9 @@
 #include <QtCore/QDir>
 #include <QtCore/QRegExp>
 
+#include <utils/common/app_info.h>
 #include <utils/common/log.h>
 #include <utils/update/zip_utils.h>
-
-#include <utils/common/app_info.h>
 
 
 namespace {
@@ -91,7 +90,7 @@ void InstallationManager::updateInstalledVersionsInformation()
     }
 
     std::unique_lock<std::mutex> lk(m_mutex);
-    m_installationByVersion = installations;
+    m_installationByVersion = std::move(installations);
     lk.unlock();
 
     createGhosts();
@@ -235,6 +234,16 @@ QnClientInstallationPtr InstallationManager::installationForVersion(const QnSoft
     std::unique_lock<std::mutex> lk( m_mutex );
     QnClientInstallationPtr installation = m_installationByVersion.value(version);
     lk.unlock();
+
+    if( !installation )
+    {
+        //maybe installation is actually there but we do not know about it?
+            //scanning dir once again
+        const_cast<InstallationManager*>(this)->updateInstalledVersionsInformation();
+
+        std::unique_lock<std::mutex> lk( m_mutex );
+        installation = m_installationByVersion.value(version);
+    }
 
     if (installation)
         return installation;

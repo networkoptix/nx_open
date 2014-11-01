@@ -370,7 +370,7 @@ bool QnTimeServerSelectionModel::calculateSameTimezone() const {
 
     foreach (const Item &item, m_items) {
         QnMediaServerResourcePtr server = qnResPool->getResourceById(item.peerId).dynamicCast<QnMediaServerResource>();
-        if (!server)
+        if (!server || server->getStatus() != Qn::Online)
             continue;
 
         qint64 offset = watcher->utcOffset(server); /* In milliseconds. */

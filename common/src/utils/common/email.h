@@ -41,6 +41,8 @@ struct QnEmailSettings {
     bool isNull() const;
     bool isValid() const;
 
+    bool equals(const QnEmailSettings &other, bool compareView = false) const;
+
     static int defaultPort(QnEmail::ConnectionType connectionType);
     static int defaultTimeoutSec();
 };
@@ -76,7 +78,7 @@ private:
 };
 
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnEmailSmtpServerPreset)(QnEmailSettings), (metatype)(lexical)(eq)(json))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnEmailSmtpServerPreset)(QnEmailSettings), (metatype)(lexical)(json))
 
 #endif // QN_EMAIL_H
 

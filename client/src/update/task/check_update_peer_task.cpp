@@ -198,8 +198,11 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply *
         return;
     }
 
-    if (m_target.version.isNull())
+
+    if (m_target.version.isNull()) {
         m_target.version = latestVersion;
+        m_checkLatestVersion = true;
+    }
     m_updateLocationPrefix = updatesPrefix;
     m_releaseNotesUrl = QUrl(map.value(lit("release_notes")).toString());
 
@@ -341,6 +344,11 @@ void QnCheckForUpdatesPeerTask::at_zipExtractor_finished(int error) {
 }
 
 void QnCheckForUpdatesPeerTask::finishTask(QnCheckForUpdateResult::Value value) {
+    if (m_checkLatestVersion && value == QnCheckForUpdateResult::NoSuchBuild) {
+        m_target.version = QnSoftwareVersion();
+        value = QnCheckForUpdateResult::NoNewerVersion;
+    }
+
     QnCheckForUpdateResult result(value);
     result.latestVersion = m_target.version;
     result.systems = m_updateFiles.keys().toSet();

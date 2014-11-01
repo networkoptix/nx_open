@@ -26,6 +26,7 @@ int main(int argc, char *argv[])
 
     QApplication::setOrganizationName(QLatin1String(QN_ORGANIZATION_NAME));
     QApplication::setApplicationName(QLatin1String(QN_APPLICATION_NAME));
+    QApplication::setApplicationDisplayName(QLatin1String(QN_APPLICATION_DISPLAY_NAME));
     QApplication::setApplicationVersion(QLatin1String(QN_APPLICATION_VERSION));
 
     // Each user may have it's own traytool running.

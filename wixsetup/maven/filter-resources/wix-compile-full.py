@@ -3,8 +3,8 @@ from subprocess import Popen, PIPE
 
 commands = [
 'candle -dinstalltype="${install.type}" -arch ${arch} -out obj\${build.configuration}\ Product-${install.type}.wxs -ext WixBalExtension',
-'light -cultures:${installer.language} -loc CustomStrings_${installer.language}.wxl  -out bin/${project.build.finalName}.msi obj\${build.configuration}\*.wixobj -ext WixBalExtension',
-'cscript FixExitDialog.js bin/${project.build.finalName}.msi'
+'light -cultures:${installer.language} -loc CustomStrings_${installer.language}.wxl  -out bin/${finalName}.msi obj\${build.configuration}\*.wixobj -ext WixBalExtension',
+'cscript FixExitDialog.js bin/${finalName}.msi'
 ]
 
 commands = [

@@ -134,7 +134,7 @@
                 <File Id="ServerQt5Xml$(var.suffix).dll" Name="Qt5Xml$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Xml$(var.suffix).dll" />
             </Component>
             <Component>
-                <File Id="ServerQt5XmlPatterns$(var.suffix).dll" Name="Qt5XmlPatterns$(var.suffix).dll" Source="$(var.SourceDir)\Qt5XmlPatterns$(var.suffix).dll" />
+                <File Id="ServerQt5XmlPatterns$(var.suffix).dll" Name="Qt5XmlPatterns$(var.suffix).dll" Source="$(var.SourceDir)\..\Qt5XmlPatterns$(var.suffix).dll" />
             </Component>
             <Component>
                 <File Id="ServerQt5Sql$(var.suffix).dll" Name="Qt5Sql$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Sql$(var.suffix).dll" />
@@ -195,7 +195,7 @@
         </ComponentGroup>                            
         <?endif?>
 
-        <Feature Id="ServerFeature" Title="${product.name} Media Server" Level="1"
+        <Feature Id="ServerFeature" Title="${display.product.name} Media Server" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
             <!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ServerFeature <> 3 ]]> </Condition>-->
 

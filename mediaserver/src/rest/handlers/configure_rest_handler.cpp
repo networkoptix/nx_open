@@ -43,7 +43,7 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     int changeSystemNameResult = changeSystemName(systemName, wholeSystem);
     if (changeSystemNameResult == ResultFail) {
         result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(lit("Can't change system name."));
+        result.setErrorString(lit("SYSTEM_NAME"));
     }
 
     /* reset connections if systemName is changed */
@@ -54,14 +54,14 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     int changePortResult = changePort(port);
     if (changePortResult == ResultFail) {
         result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(lit("Can't change port."));
+        result.setErrorString(lit("PORT"));
     }
 
     /* set password */
     int changeAdminPasswordResult = changeAdminPassword(password, passwordHash, passwordDigest, oldPassword);
     if (changeAdminPasswordResult == ResultFail) {
         result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(lit("Can't change admin password."));
+        result.setErrorString(lit("PASSWORD"));
     }
 
     QnConfigureReply reply;
@@ -136,7 +136,11 @@ int QnConfigureRestHandler::changePort(int port) {
 
     {
         QAbstractSocket socket(QAbstractSocket::TcpSocket, 0);
-        if (!socket.bind(port, QAbstractSocket::ReuseAddressHint))
+        QAbstractSocket::BindMode bindMode = QAbstractSocket::DontShareAddress;
+#ifndef Q_OS_WIN
+        bindMode |= QAbstractSocket::ReuseAddressHint;
+#endif
+        if (!socket.bind(port, bindMode))
             return ResultFail;
     }
     ::changePort(port);

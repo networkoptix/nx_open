@@ -810,12 +810,19 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
         }
     }
 
+    if (gridSize.isEmpty())
+        gridSize = gridSize.expandedTo(QSize(1, 1));
+
     /* Calculate integer position. */
     QPointF gridPosF;
     switch (info->frameSection()) {
+    case Qt::TopSection:
+    case Qt::LeftSection:
     case Qt::TopLeftSection:
         gridPosF = gridRectF.bottomRight() - toPoint(gridSize);
         break;
+    case Qt::BottomSection:
+    case Qt::RightSection:
     case Qt::BottomRightSection:
         gridPosF = gridRectF.topLeft();
         break;

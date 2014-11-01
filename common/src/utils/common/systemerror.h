@@ -36,6 +36,7 @@ namespace SystemError
     static const ErrorCode again = EAGAIN;
     static const ErrorCode hostUnreach = WSAEHOSTUNREACH;
     static const ErrorCode nomem = ENOMEM;
+    static const ErrorCode notImplemented = ENOSYS;
 #else
     static const ErrorCode wouldBlock = EWOULDBLOCK;
     static const ErrorCode inProgress = EINPROGRESS;
@@ -48,6 +49,7 @@ namespace SystemError
     static const ErrorCode again = EAGAIN;
     static const ErrorCode hostUnreach = EHOSTUNREACH;
     static const ErrorCode nomem = ENOMEM;
+    static const ErrorCode notImplemented = ENOSYS;
 #endif
 
     //!Returns error code of previous system call
