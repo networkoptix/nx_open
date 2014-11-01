@@ -590,13 +590,8 @@ void QnGLRenderer::drawBindedTexture( QnGLShaderProgram* shader , const float* v
         shader->enableAttributeArray( VERTEX_TEXCOORD0_INDX );
         shader->setAttributeBuffer( VERTEX_TEXCOORD0_INDX, GL_FLOAT, 0, VERTEX_TEXCOORD0_SIZE );
 
-        if (!shader->initialized()) {
-            shader->bindAttributeLocation("aPosition",VERTEX_POS_INDX);
-            shader->bindAttributeLocation("aTexcoord",VERTEX_TEXCOORD0_INDX);
-            shader->markInitialized();
-        };    
-
         m_positionBuffer.release();
+
         m_textureBuffer.release();
         m_vertices.release();
 
@@ -609,8 +604,13 @@ void QnGLRenderer::drawBindedTexture( QnGLShaderProgram* shader , const float* v
         m_textureBuffer.bind();
         m_textureBuffer.write(0, texData.data(), texData.size());
         m_textureBuffer.release();
-
     }
+
+    if (!shader->initialized()) {
+        shader->bindAttributeLocation("aPosition",VERTEX_POS_INDX);
+        shader->bindAttributeLocation("aTexcoord",VERTEX_TEXCOORD0_INDX);
+        shader->markInitialized();
+    };
 
     QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawBindedTextureOnQuadVao(&m_vertices, shader);
 }
