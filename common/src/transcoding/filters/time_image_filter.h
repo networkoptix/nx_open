@@ -15,7 +15,7 @@ public:
     QnTimeImageFilter(const QSharedPointer<const QnResourceVideoLayout>& videoLayout, Qn::Corner datePos, qint64 timeOffsetMs);
     virtual ~QnTimeImageFilter();
     CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) override;
-
+    virtual QSize updatedResolution(const QSize& srcSize) override { return srcSize; }
 private:
     void initTimeDrawing(const CLVideoDecoderOutputPtr& frame, const QString& timeStr);
     qint64 calcHash(const quint8* data, int width, int height, int linesize);

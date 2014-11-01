@@ -22,11 +22,15 @@ public:
      * Update video image.
      * 
      * \param frame image to update
-     * \param updateRect    image rect to update. Filter MUST not update image outside the rect. Rect in range [0..1]
-     * \param ar    image aspect ratio.
      */
     virtual CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) = 0;
-    virtual QSize updatedResolution(const QSize& srcSize) { return srcSize; }
+
+    /**
+     * Update video size.
+     * 
+     * \param srcSize input image size. Function should return output image size
+     */
+    virtual QSize updatedResolution(const QSize& srcSize) = 0;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

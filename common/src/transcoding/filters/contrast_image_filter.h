@@ -13,7 +13,7 @@ class QnContrastImageFilter: public QnAbstractImageFilter
 public:
     QnContrastImageFilter(const ImageCorrectionParams& params);
     CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) override;
-
+    virtual QSize updatedResolution(const QSize& srcSize) override { return srcSize; }
 private:
     bool isFormatSupported(CLVideoDecoderOutput* frame) const;
 
