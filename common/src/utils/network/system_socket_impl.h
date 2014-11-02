@@ -6,11 +6,7 @@
 #ifndef SOCKET_IMPL_H
 #define SOCKET_IMPL_H
 
-#include <array>
-#include <atomic>
-
-#include "aio/pollset.h"
-#include "aio/aiothread.h"
+#include "common_socket_impl.h"
 
 
 class Socket;
@@ -19,17 +15,6 @@ namespace aio
     extern template class AIOThread<Socket>;
 }
 
-class SocketImpl
-{
-public:
-    std::atomic<aio::AIOThread<Socket>*> aioThread;
-    std::atomic<bool> terminated;
-    std::array<void*, aio::etMax> eventTypeToUserData;
-
-    SocketImpl();
-    virtual ~SocketImpl() {}
-
-private:
-};
+typedef CommonSocketImpl<Socket> SystemSocketImpl;
 
 #endif  //SOCKET_IMPL_H

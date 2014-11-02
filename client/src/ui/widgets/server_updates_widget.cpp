@@ -151,6 +151,13 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     m_longUpdateWarningTimer->setSingleShot(true);
     connect(m_longUpdateWarningTimer, &QTimer::timeout, ui->longUpdateWarning, &QLabel::show);
 
+    connect(qnResPool, &QnResourcePool::statusChanged, this, [this] (const QnResourcePtr &resource) {
+        if (!resource->hasFlags(Qn::server))
+            return;
+
+        ui->linkLineEdit->setText(m_updateTool->generateUpdatePackageUrl(m_targetVersion).toString());
+    });
+
     at_tool_stageChanged(QnFullUpdateStage::Init);
 }
 

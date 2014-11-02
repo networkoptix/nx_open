@@ -19,8 +19,13 @@ public:
 
     bool wasCanceled() const;
 
+    QnMediaServerResourceList servers() const;
+    void setServers(const QnMediaServerResourceList &servers);
+
     QnMediaServerResourcePtr currentServer() const;
     void setCurrentServer(const QnMediaServerResourcePtr &server);
+
+    virtual void reject() override;
 
 signals:
     void currentServerChanged(const QnMediaServerResourcePtr &server);

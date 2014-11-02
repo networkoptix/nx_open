@@ -186,9 +186,6 @@ namespace ec2
         //getLicenses
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiLicenseDataList& data);
 
-        //getParams
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiResourceParamDataList& data);
-
         // ApiDiscoveryDataList
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiDiscoveryDataList& data);
 
@@ -203,6 +200,9 @@ namespace ec2
 
         bool saveMiscParam( const QByteArray& name, const QByteArray& value );
         bool readMiscParam( const QByteArray& name, QByteArray* value );
+
+        //!Reads settings (properties of user 'admin')
+        ErrorCode readSettings(ApiResourceParamDataList& settings);
 
     signals:
         //!Emitted after \a QnDbManager::init was successfully executed
@@ -394,6 +394,11 @@ namespace ec2
         }
         
         ErrorCode executeTransactionInternal(const QnTransaction<ApiTranSyncDoneData> &) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveryDataList> &) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }

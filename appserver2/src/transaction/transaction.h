@@ -139,6 +139,7 @@ namespace ec2
             discoverPeer                = 1401, /*< ApiDiscoveryData */
             addDiscoveryInformation     = 1402, /*< ApiDiscoveryData*/
             removeDiscoveryInformation  = 1403, /*< ApiDiscoveryData*/
+            getDiscoveryData            = 1404, /*< ApiDiscoveryDataList */
 
             /* Misc */
             forcePrimaryTimeServer      = 2001,  /*< ApiIdData */
@@ -147,6 +148,7 @@ namespace ec2
             changeSystemName            = 2004,  /*< ApiSystemNameData */
             getKnownPeersSystemTime     = 2005,  /*< ApiPeerSystemTimeDataList */
             markLicenseOverflow         = 2006,  /*< ApiLicenseOverflowData */
+            getSettings                 = 2007,  /*< ApiResourceParamDataList */
 
             //getHelp                     = 9003,  /*< ApiHelpGroupDataList */
 			runtimeInfoChanged          = 9004,  /*< ApiRuntimeData */

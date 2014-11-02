@@ -87,7 +87,7 @@ QnSystrayWindow::QnSystrayWindow()
 
     m_trayIcon->show();
 
-    setWindowTitle(tr("%1 Tray Assistant").arg(lit(QN_ORGANIZATION_NAME)));
+    setWindowTitle(QLatin1String(QN_APPLICATION_DISPLAY_NAME));
 
     connect(&m_findServices, SIGNAL(timeout()), this, SLOT(findServiceInfo()));
     connect(&m_updateServiceStatus, SIGNAL(timeout()), this, SLOT(updateServiceInfo()));

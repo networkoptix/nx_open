@@ -16,73 +16,46 @@
 #endif
 
 #include "abstract_socket.h"
+#include "aio/pollable.h"
 #include "nettools.h"
 #include "socket_factory.h"
 #include "utils/common/byte_array.h"
 #include "../common/systemerror.h"
-#include "system_socket_impl.h"
+//#include "system_socket_impl.h"
 
 
 // TODO: #Elric why bother with maxlen and not use QByteArray directly? Remove.
 #define MAX_ERROR_MSG_LENGTH 1024
 
-// TODO: #Elric inherit from QnException?
-// 
-/**
- *   Signals a problem with the execution of a socket call.
- */
-class SocketException : public std::exception {
-public:
-    /**
-      *   Construct a SocketException with a explanatory message.
-      *   @param message explanatory message
-      *   @param incSysMsg true if system message (from strerror(errno))
-      *   should be postfixed to the user provided message
-    */
-    SocketException(const QString &message, bool inclSysMsg = false) throw();
 
-    /**
-     *   Provided just to guarantee that no exceptions are thrown.
-     */
-    ~SocketException() throw();
-
-    /**
-     *   Get the exception message
-     *   @return exception message
-     */
-    const char *what() const throw();
-
-private:
-    char m_message[MAX_ERROR_MSG_LENGTH];
-};
-
-
-//class SocketImpl;
+typedef PollableImpl SystemSocketImpl;
 template<class SocketType> class BaseAsyncSocketImplHelper;
 
 /**
  *   Base class representing basic communication endpoint
  */
 class Socket
+:
+    public Pollable
 {
 public:
     Socket(
-        std::unique_ptr<BaseAsyncSocketImplHelper<Socket>> asyncHelper,
+        std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
         int type,
         int protocol,
-        SocketImpl* impl = nullptr );
+        SystemSocketImpl* impl = nullptr );
     Socket(
-        std::unique_ptr<BaseAsyncSocketImplHelper<Socket>> asyncHelper,
+        std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
         int sockDesc,
-        SocketImpl* impl = nullptr );
+        SystemSocketImpl* impl = nullptr );
     //TODO #ak remove following two constructors
     Socket(
         int type,
         int protocol,
-        SocketImpl* impl = nullptr );
+        SystemSocketImpl* impl = nullptr );
     Socket(
         int sockDesc,
-        SocketImpl* impl = nullptr );
+        SystemSocketImpl* impl = nullptr );
 
     /**
      *   Close and deallocate this socket
@@ -122,16 +95,10 @@ public:
     bool getRecvBufferSize( unsigned int* buffSize );
     //!Implementation of AbstractSocket::setRecvTimeout
     bool setRecvTimeout( unsigned int ms );
-    //!Implementation of AbstractSocket::getRecvTimeout
-    bool getRecvTimeout( unsigned int* millis );
     //!Implementation of AbstractSocket::setSendTimeout
     bool setSendTimeout( unsigned int ms );
-    //!Implementation of AbstractSocket::getSendTimeout
-    bool getSendTimeout( unsigned int* millis );
-    //!Implementation of AbstractSocket::getLastError
-    bool getLastError( SystemError::ErrorCode* errorCode );
-    //!Implementation of AbstractSocket::handle
-    AbstractSocket::SOCKET_HANDLE handle() const;
+    //!Implementation of Pollable::getLastError
+    virtual bool getLastError( SystemError::ErrorCode* errorCode ) override;
     //!Implementation of AbstractSocket::postImpl
     bool postImpl( std::function<void()>&& handler );
     //!Implementation of AbstractSocket::dispatchImpl
@@ -141,14 +108,12 @@ public:
     /**
      *   Get the local address
      *   @return local address of socket
-     *   @exception SocketException thrown if fetch fails
      */
     QString getLocalHostAddress() const;
 
     /**
      *   Get the peer address
      *   @return remove address of socket
-     *   @exception SocketException thrown if fetch fails
      */
     QString getPeerHostAddress() const;
     quint32 getPeerAddressUint() const;
@@ -156,7 +121,6 @@ public:
     /**
      *   Get the local port
      *   @return local port of socket
-     *   @exception SocketException thrown if fetch fails
      */
     unsigned short getLocalPort() const;
 
@@ -164,7 +128,6 @@ public:
      *   Set the local port to the specified port and the local address
      *   to any interface
      *   @param localPort local port
-     *   @exception SocketException thrown if setting local port fails
      */
     bool setLocalPort(unsigned short localPort) ;
 
@@ -174,7 +137,6 @@ public:
      *   will be selected.
      *   @param localAddress local address
      *   @param localPort local port
-     *   @exception SocketException thrown if setting local port or address fails
      */
     bool setLocalAddressAndPort(const QString &localAddress,
                                 unsigned short localPort = 0) ;
@@ -193,7 +155,6 @@ public:
      *   @param buffer buffer to receive the data
      *   @param bufferLen maximum number of bytes to read into buffer
      *   @return number of bytes read, 0 for EOF, and -1 for error
-     *   @exception SocketException thrown WinSock clean up fails
      */
     static void cleanUp() ;
 
@@ -208,21 +169,14 @@ public:
 
     bool failed() const;
 
-    SocketImpl* impl();
-    const SocketImpl* impl() const;
-
     bool fillAddr( const QString &address, unsigned short port, sockaddr_in &addr );
     bool createSocket( int type, int protocol );
 
 protected:
-    int m_socketHandle;              // Socket descriptor
-    SocketImpl* m_impl;
-    std::unique_ptr<BaseAsyncSocketImplHelper<Socket>> m_baseAsyncHelper;
+    std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>> m_baseAsyncHelper;
 
 private:
     bool m_nonBlockingMode;
-    unsigned int m_readTimeoutMS;
-    unsigned int m_writeTimeoutMS;
 
     // Prevent the user from trying to use value semantics on this object
     Socket(const Socket &sock);
@@ -239,8 +193,8 @@ class CommunicatingSocket
     public Socket
 {
 public:
-    CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr, int type, int protocol, SocketImpl* sockImpl = nullptr );
-    CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr, int newConnSD, SocketImpl* sockImpl = nullptr );
+    CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr, int type, int protocol, SystemSocketImpl* sockImpl = nullptr );
+    CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr, int newConnSD, SystemSocketImpl* sockImpl = nullptr );
 
     virtual ~CommunicatingSocket();
 
@@ -279,19 +233,17 @@ public:
     /**
      *   Get the foreign address.  Call connect() before calling recv()
      *   @return foreign address
-     *   @exception SocketException thrown if unable to fetch foreign address
      */
     QString getForeignHostAddress() const;
 
     /**
      *   Get the foreign port.  Call connect() before calling recv()
      *   @return foreign port
-     *   @exception SocketException thrown if unable to fetch foreign port
      */
     unsigned short getForeignPort() const;
 
 private:
-    AsyncSocketImplHelper<Socket>* m_aioHelper;
+    AsyncSocketImplHelper<Pollable>* m_aioHelper;
     bool m_connected;
 };
 
@@ -482,7 +434,6 @@ class TCPSocket
 public:
     /**
      *   Construct a TCP socket with no connection
-     *   @exception SocketException thrown if unable to create TCP socket
      */
     TCPSocket() ;
 
@@ -491,7 +442,6 @@ public:
      *   and port
      *   @param foreignAddress foreign address (IP address or name)
      *   @param foreignPort foreign port
-     *   @exception SocketException thrown if unable to create TCP socket
      */
     TCPSocket(const QString &foreignAddress, unsigned short foreignPort);
     //!User by \a TCPServerSocket class
@@ -534,7 +484,6 @@ public:
     /**
      *   Blocks until a new connection is established on this socket or error
      *   @return new connection socket
-     *   @exception SocketException thrown if attempt to accept a new connection fails
      */
     static int accept(int sockDesc);
 
@@ -568,14 +517,12 @@ public:
 
     /**
      *   Construct a UDP socket
-     *   @exception SocketException thrown if unable to create UDP socket
      */
     UDPSocket() ;
 
     /**
      *   Construct a UDP socket with the given local port
      *   @param localPort local port
-     *   @exception SocketException thrown if unable to create UDP socket
      */
     UDPSocket(unsigned short localPort) ;
 
@@ -583,7 +530,6 @@ public:
      *   Construct a UDP socket with the given local port and address
      *   @param localAddress local address
      *   @param localPort local port
-     *   @exception SocketException thrown if unable to create UDP socket
      */
     UDPSocket(const QString &localAddress, unsigned short localPort);
 
@@ -592,7 +538,6 @@ public:
     /**
      *   Unset foreign address and port
      *   @return true if disassociation is successful
-     *   @exception SocketException thrown if unable to disconnect UDP socket
      */
     //void disconnect() ;
 

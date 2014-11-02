@@ -29,9 +29,6 @@ namespace ec2
             dbUrl.toLocalFile(),
             QUrlQuery(dbUrl.query()).queryItemValue("staticdb_path") );
 
-        ApiResourceParamDataList paramList;
-        QnDbManager::instance()->doQueryNoLock(nullptr, paramList);
-
         QnTransactionMessageBus::instance()->setHandler( notificationManager() );
         QnTransactionMessageBus::instance()->setLocalPeer(ApiPeerData(qnCommon->moduleGUID(), qnCommon->runningInstanceGUID(), Qn::PT_Server));
     }

@@ -185,12 +185,6 @@ private:
 // QnLog
 // -------------------------------------------------------------------------- //
 
-QnLog::QnLog()
-:
-    d( new QnLogPrivate() )
-{
-}
-
 class QnLogs
 {
 public:
@@ -224,6 +218,17 @@ private:
 
 Q_GLOBAL_STATIC(QnLogs, qn_logsInstance);
 
+
+QnLog::QnLog()
+:
+    d( new QnLogPrivate() )
+{
+}
+
+QnLog::~QnLog()
+{
+    delete d;
+}
 
 QnLog* QnLog::instance( int logID )
 {

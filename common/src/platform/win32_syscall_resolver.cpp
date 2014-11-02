@@ -7,6 +7,9 @@
 
 #include "win32_syscall_resolver.h"
 
+#include <memory>
+#include <mutex>
+
 
 Win32FuncResolver::Win32FuncResolver()
 {
@@ -19,10 +22,15 @@ Win32FuncResolver::~Win32FuncResolver()
     m_loadedLibraries.clear();
 }
 
+static std::unique_ptr<Win32FuncResolver> Win32FuncResolver_instance;
+static std::once_flag Win32FuncResolver_onceFlag;
+
 Win32FuncResolver* Win32FuncResolver::instance()
 {
-    static Win32FuncResolver _instance;
-    return &_instance;
+    std::call_once(
+        Win32FuncResolver_onceFlag,
+        [](){ Win32FuncResolver_instance.reset( new Win32FuncResolver() ); } );
+    return Win32FuncResolver_instance.get();
 }
 
 void* Win32FuncResolver::resolveFunction( const std::wstring& libName, const std::string& funcName )

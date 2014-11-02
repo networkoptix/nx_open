@@ -61,15 +61,30 @@ void QnCameraThumbnailManager::selectResource(const QnResourcePtr &resource) {
     emit thumbnailReadyDelayed(resource->getId(), thumbnail);
 }
 
+
+QPixmap QnCameraThumbnailManager::scaledPixmap(const QPixmap &pixmap) const {
+    Q_ASSERT(!m_thumnailSize.isNull());
+    if (m_thumnailSize.isNull())
+        return pixmap;
+
+    if (m_thumnailSize.width() == 0)
+        return pixmap.scaledToHeight(m_thumnailSize.height(), Qt::SmoothTransformation);
+    if (m_thumnailSize.height() == 0)
+        return pixmap.scaledToWidth(m_thumnailSize.width(), Qt::SmoothTransformation);
+    return pixmap.scaled(m_thumnailSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+}
+
+
 void QnCameraThumbnailManager::setThumbnailSize(const QSize &size) {
     if (m_thumnailSize == size)
         return;
 
     m_thumnailSize = size;
     m_statusPixmaps.clear();
-    m_statusPixmaps[Loading] = qnSkin->pixmap("events/thumb_loading.png").scaled(m_thumnailSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    m_statusPixmaps[NoData] = qnSkin->pixmap("events/thumb_no_data.png").scaled(m_thumnailSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    m_statusPixmaps[NoSignal] = qnSkin->pixmap("events/thumb_no_signal.png").scaled(m_thumnailSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    
+    m_statusPixmaps[Loading] = scaledPixmap(qnSkin->pixmap("events/thumb_loading.png"));
+    m_statusPixmaps[NoData] = scaledPixmap(qnSkin->pixmap("events/thumb_no_data.png"));
+    m_statusPixmaps[NoSignal] = scaledPixmap(qnSkin->pixmap("events/thumb_no_signal.png"));
 }
 
 int QnCameraThumbnailManager::loadThumbnailForResource(const QnResourcePtr &resource) {

@@ -180,6 +180,20 @@ QString QnLicense::longDisplayName(Qn::LicenseType licenseType) {
     return QString();
 }
 
+QnUuid QnLicense::serverId() const {
+    for(const QnPeerRuntimeInfo& info: QnRuntimeInfoManager::instance()->items()->getItems())
+    {
+        if (info.data.peer.peerType != Qn::PT_Server)
+            continue;
+
+        bool hwKeyOK = info.data.mainHardwareIds.contains(m_hardwareId) || info.data.compatibleHardwareIds.contains(m_hardwareId);
+        bool brandOK = m_brand.isEmpty() || (m_brand == info.data.brand);
+        if (hwKeyOK && brandOK)
+            return info.uuid;
+    }
+    return QnUuid();
+}
+
 const QString &QnLicense::name() const
 {
     return m_name;
@@ -238,21 +252,6 @@ const QByteArray& QnLicense::rawLicense() const
     return m_rawLicense;
 }
 
-QnUuid QnLicense::findRuntimeDataByLicense() const
-{
-    for(const QnPeerRuntimeInfo& info: QnRuntimeInfoManager::instance()->items()->getItems())
-    {
-        if (info.data.peer.peerType != Qn::PT_Server)
-            continue;
-
-        bool hwKeyOK = info.data.mainHardwareIds.contains(m_hardwareId) || info.data.compatibleHardwareIds.contains(m_hardwareId);
-        bool brandOK = m_brand.isEmpty() || (m_brand == info.data.brand);
-        if (hwKeyOK && brandOK)
-            return info.uuid;
-    }
-    return QnUuid();
-}
-
 bool QnLicense::gotError(ErrorCode* errCode, ErrorCode errorCode) const
 {
     if (errCode)
@@ -286,7 +285,7 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
     if (!m_isValid1 && !m_isValid2 && mode != VM_CheckInfo)
         return gotError(errCode, InvalidSignature);
     
-    QnPeerRuntimeInfo info = QnRuntimeInfoManager::instance()->items()->getItem(mode == VM_Regular ? findRuntimeDataByLicense() : qnCommon->remoteGUID());
+    QnPeerRuntimeInfo info = QnRuntimeInfoManager::instance()->items()->getItem(mode == VM_Regular ? serverId() : qnCommon->remoteGUID());
     if (info.uuid.isNull())
         return gotError(errCode, InvalidHardwareID); // peer where license was activated not found
 

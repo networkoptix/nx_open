@@ -87,6 +87,7 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiModuleData>& tran );
         void triggerNotification( const QnTransaction<ApiModuleDataList>& tran );
         void triggerNotification( const QnTransaction<ApiDiscoveryData>& tran );
+        void triggerNotification( const QnTransaction<ApiDiscoveryDataList>& tran );
         void triggerNotification( const QnTransaction<ApiDiscoverPeerData>& tran );
         void triggerNotification( const QnTransaction<ApiSystemNameData>& tran );
         void triggerNotification( const QnTransaction<ApiRuntimeData>& tran );

@@ -94,8 +94,24 @@ QList<QnModuleInformation> QnMulticastModuleFinder::foundModules() const {
 
 void QnMulticastModuleFinder::addIgnoredModule(const QnNetworkAddress &address, const QnUuid &id) {
     QMutexLocker lk(&m_mutex);
-    if (!m_ignoredModules.contains(address, id))
-        m_ignoredModules.insert(address, id);
+    if (m_ignoredModules.contains(address, id))
+        return;
+
+    m_ignoredModules.insert(address, id);
+
+    auto it = m_foundAddresses.find(address);
+    if (it == m_foundAddresses.end())
+        return;
+
+    auto moduleIt = m_foundModules.find(id);
+    if (moduleIt == m_foundModules.end())
+        return;
+
+    if (!moduleIt->remoteAddresses.remove(address.host().toString()))
+        return;
+
+    emit moduleAddressLost(*moduleIt, address);
+    emit moduleChanged(*moduleIt);
 }
 
 void QnMulticastModuleFinder::removeIgnoredModule(const QnNetworkAddress &address, const QnUuid &id) {
@@ -318,6 +334,11 @@ void QnMulticastModuleFinder::run() {
             it = m_foundAddresses.erase(it);
         }
     }
+
+    for (UDPSocket *socket: m_clientSockets)
+        m_pollSet.remove( socket->implementationDelegate(), aio::etRead );
+    if (m_serverSocket)
+        m_pollSet.remove( m_serverSocket->implementationDelegate(), aio::etRead );
 
     NX_LOG(lit("QnMulticastModuleFinder stopped"), cl_logDEBUG1);
 }

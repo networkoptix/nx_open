@@ -2,6 +2,9 @@
 
 #ifdef ENABLE_COLDSTORE
 
+#include <memory>
+#include <mutex>
+
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 #include <QtCore/QElapsedTimer>
@@ -87,10 +90,16 @@ QnColdStoreDTSSearcher::~QnColdStoreDTSSearcher()
     delete m_request;
 };
 
+static std::unique_ptr<QnColdStoreDTSSearcher> QnColdStoreDTSSearcher_instance;
+static std::once_flag QnColdStoreDTSSearcher_onceFlag;
+
 QnColdStoreDTSSearcher& QnColdStoreDTSSearcher::instance()
 {
-    static QnColdStoreDTSSearcher inst;
-    return inst;
+    std::call_once(
+        QnColdStoreDTSSearcher_onceFlag,
+        [](){ QnColdStoreDTSSearcher_instance.reset( new QnColdStoreDTSSearcher() ); } );
+    
+    return *QnColdStoreDTSSearcher_instance.get();
 }
 
 

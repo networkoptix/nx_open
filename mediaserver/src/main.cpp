@@ -830,13 +830,6 @@ void QnMain::stopObjects()
         delete m_universalTcpListener;
         m_universalTcpListener = 0;
     }
-
-    if (m_moduleFinder)
-    {
-        m_moduleFinder->stop();
-        delete m_moduleFinder;
-        m_moduleFinder = 0;
-    }
 }
 
 void QnMain::updateDisabledVendorsIfNeeded()
@@ -884,8 +877,30 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
             if (m_needStop)
                 return;
         }
-        for(const QnMediaServerResourcePtr &mediaServer: mediaServerList)
+
+        ec2::ApiDiscoveryDataList discoveryDataList;
+        while( ec2Connection->getDiscoveryManager()->getDiscoveryDataSync(&discoveryDataList) != ec2::ErrorCode::ok )
+        {
+            NX_LOG( lit("QnMain::run(). Can't get discovery data."), cl_logERROR );
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
+        }
+
+        QMultiHash<QnUuid, QUrl> additionalAddressesById;
+        QMultiHash<QnUuid, QUrl> ignoredAddressesById;
+        for (const ec2::ApiDiscoveryData &data: discoveryDataList) {
+            if (data.ignore)
+                ignoredAddressesById.insert(data.id, data.url);
+            else
+                additionalAddressesById.insert(data.id, data.url);
+        }
+
+        for(const QnMediaServerResourcePtr &mediaServer: mediaServerList) {
+            mediaServer->setAdditionalUrls(additionalAddressesById.values(mediaServer->getId()));
+            mediaServer->setIgnoredUrls(ignoredAddressesById.values(mediaServer->getId()));
             messageProcessor->updateResource(mediaServer);
+        }
 
         //reading server attributes
         QnMediaServerUserAttributesList mediaServerUserAttributesList;
@@ -1574,8 +1589,14 @@ void QnMain::run()
             QnSleep::msleep(1000);
     }
 
+    /* This key means that password should be forcibly changed in the database. */
+    const QString passwordChangeKey = "appserverPassword";
     MSSettings::roSettings()->remove(OBSOLETE_SERVER_GUID);
-    MSSettings::roSettings()->remove("appserverPassword");
+    MSSettings::roSettings()->remove(passwordChangeKey);
+#ifdef _DEBUG
+    MSSettings::roSettings()->sync();
+    Q_ASSERT_X(!MSSettings::roSettings()->contains(passwordChangeKey), Q_FUNC_INFO, "appserverPassword could not be removed from the registry. Restart the server as Administrator");
+#endif
 
     if (needToStop()) {
         stopObjects();
@@ -1611,6 +1632,7 @@ void QnMain::run()
     qnCommon->setModuleInformation(selfInformation);
 
     m_moduleFinder = new QnModuleFinder( false );
+    std::unique_ptr<QnModuleFinder> moduleFinderScopedPointer( m_moduleFinder );
     if (cmdLineArguments.devModeKey == lit("razrazraz")) {
         m_moduleFinder->setCompatibilityMode(true);
         ec2ConnectionFactory->setCompatibilityMode(true);

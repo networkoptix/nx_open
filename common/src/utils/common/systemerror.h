@@ -35,6 +35,7 @@ namespace SystemError
     static const ErrorCode interrupted = WSAEINTR;
     static const ErrorCode again = EAGAIN;
     static const ErrorCode nomem = ENOMEM;
+    static const ErrorCode notImplemented = ENOSYS;
 #else
     static const ErrorCode wouldBlock = EWOULDBLOCK;
     static const ErrorCode inProgress = EINPROGRESS;
@@ -46,6 +47,7 @@ namespace SystemError
     static const ErrorCode interrupted = EINTR;
     static const ErrorCode again = EAGAIN;
     static const ErrorCode nomem = ENOMEM;
+    static const ErrorCode notImplemented = ENOSYS;
 #endif
 
     //!Returns error code of previous system call

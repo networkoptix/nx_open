@@ -900,6 +900,16 @@ namespace ec2
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
+        template<class TargetType, class HandlerType> int getDiscoveryData(TargetType *target, HandlerType handler) {
+            return getDiscoveryData(std::static_pointer_cast<impl::GetDiscoveryDataHandler>(
+                std::make_shared<impl::CustomGetDiscoveryDataHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+        ErrorCode getDiscoveryDataSync(ApiDiscoveryDataList* const discoveryDataList) {
+            int(AbstractDiscoveryManager::*fn)(impl::GetDiscoveryDataHandlerPtr) = &AbstractDiscoveryManager::getDiscoveryData;
+            return impl::doSyncCall<impl::GetDiscoveryDataHandler>(std::bind(fn, this, std::placeholders::_1), discoveryDataList);
+        }
+
     signals:
         void peerDiscoveryRequested(const QUrl &url);
         void discoveryInformationChanged(const ApiDiscoveryData &data, bool addInformation);
@@ -908,6 +918,7 @@ namespace ec2
         virtual int discoverPeer(const QUrl &url, impl::SimpleHandlerPtr handler) = 0;
         virtual int addDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) = 0;
         virtual int removeDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) = 0;
+        virtual int getDiscoveryData(impl::GetDiscoveryDataHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractDiscoveryManager> AbstractDiscoveryManagerPtr;
 

@@ -840,10 +840,22 @@ void QnPlOnvifResource::notificationReceived(
         NX_LOG( lit("Received notification with no topic specified. Ignoring..."), cl_logDEBUG2 );
         return;
     }
+    
+    QString eventTopic( QLatin1String(notification.oasisWsnB2__Topic->__item) );
+    //eventTopic may have namespaces. E.g., ns:Device/ns:Trigger/ns:Relay, 
+        //but we want Device/Trigger/Relay. Fixing...
+    QStringList eventTopicTokens = eventTopic.split( QLatin1Char('/') );
+    for( QString& token: eventTopicTokens )
+    {
+        int nsSepIndex = token.indexOf( QLatin1Char(':') );
+        if( nsSepIndex != -1 )
+            token.remove( 0, nsSepIndex+1 );
+    }
+    eventTopic = eventTopicTokens.join( QLatin1Char('/') );
 
-    if( std::strstr(notification.oasisWsnB2__Topic->__item, "Trigger/Relay") == nullptr &&
-        std::strstr(notification.oasisWsnB2__Topic->__item, "IO/Port") == nullptr &&
-        std::strstr(notification.oasisWsnB2__Topic->__item, "Trigger/DigitalInputs") == nullptr )
+    if( eventTopic.indexOf( lit("Trigger/Relay") ) == -1 &&
+        eventTopic.indexOf( lit("IO/Port") ) == -1 &&
+        eventTopic.indexOf( lit("Trigger/DigitalInput") ) == -1 )
     {
         NX_LOG( lit("Received notification with unknown topic: %1. Ignoring...").
             arg(QLatin1String(notification.oasisWsnB2__Topic->__item)), cl_logDEBUG2 );
@@ -872,10 +884,11 @@ void QnPlOnvifResource::notificationReceived(
         it != handler.source.end();
         ++it )
     {
-        if( it->name == QLatin1String("port") || 
-            it->name == QLatin1String("InputToken") || 
-            it->name == QLatin1String("RelayToken") || 
-            it->name == QLatin1String("RelayInputToken") )
+        if( it->name == lit("port") || 
+            it->name == lit("InputToken") || 
+            it->name == lit("RelayToken") || 
+            it->name == lit("Index") ||
+            it->name == lit("RelayInputToken") )
         {
             portSourceIter = it;
             break;
@@ -883,8 +896,11 @@ void QnPlOnvifResource::notificationReceived(
     }
 
     if( portSourceIter == handler.source.end()  //source is not port
-        || (handler.data.name != QLatin1String("LogicalState") &&
-            handler.data.name != QLatin1String("state")) )
+        || (handler.data.name != lit("LogicalState") &&
+            handler.data.name != lit("state") &&
+            handler.data.name != lit("Level") &&
+            handler.data.name != lit("RelayLogicalState"))
+        )
     {
         return;
     }
@@ -3060,6 +3076,10 @@ void QnPlOnvifResource::setRelayOutputStateNonSafe(
         auth.password(),
         m_timeDrift );
 
+    //omitting namespace prefix in request
+    //TODO #ak do it for every request?
+    soap_omode( soapWrapper.getProxy()->soap, SOAP_XML_DEFAULTNS );
+    
     _onvifDevice__SetRelayOutputState request;
     request.RelayOutputToken = relayOutputInfo.token;
     request.LogicalState = active ? onvifXsd__RelayLogicalState__active : onvifXsd__RelayLogicalState__inactive;
