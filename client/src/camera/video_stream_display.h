@@ -10,6 +10,7 @@ extern "C"
 #include "decoders/video/abstractdecoder.h"
 #include <utils/common/stoppable.h>
 #include "frame_scaler.h"
+#include "transcoding/filters/filter_helper.h"
 
 
 class QnAbstractVideoDecoder;
@@ -52,10 +53,7 @@ public:
     void setMTDecoding(bool value);
 
     void setSpeed(float value);
-    virtual QImage getScreenshot(const ImageCorrectionParams& imageCorrection,
-                                 const QnMediaDewarpingParams& mediaDewarping,
-                                 const QnItemDewarpingParams& itemDewarping,
-                                 bool anyQuality) override;
+    virtual QImage getScreenshot(const QnImageFilterHelper& imageProcessingParams, bool anyQuality) override;
     virtual QImage getGrayscaleScreenshot() override; 
     void setCurrentTime(qint64 time);
     void canUseBufferedFrameDisplayer(bool value);

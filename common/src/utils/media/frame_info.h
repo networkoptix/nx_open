@@ -13,6 +13,7 @@ extern "C"
 #include <core/ptz/media_dewarping_params.h>
 #include <core/ptz/item_dewarping_params.h>
 #include "utils/color_space/image_correction.h"
+#include "transcoding/filters/filter_helper.h"
 
 
 #define AV_REVERSE_BLOCK_START QnAbstractMediaData::MediaFlags_ReverseBlockStart
@@ -272,10 +273,7 @@ struct CLVideoData
 class ScreenshotInterface
 {
 public:
-    virtual QImage getScreenshot(const ImageCorrectionParams& imageCorrection,
-                                 const QnMediaDewarpingParams& mediaDewarping,
-                                 const QnItemDewarpingParams& itemDewarping,
-                                 bool anyQuality) = 0; // 8 bit Y channel only
+    virtual QImage getScreenshot(const QnImageFilterHelper& imageProcessingParams, bool anyQuality) = 0; // 8 bit Y channel only
     virtual QImage getGrayscaleScreenshot() = 0;
 };
 

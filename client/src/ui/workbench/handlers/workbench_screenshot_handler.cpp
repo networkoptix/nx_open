@@ -37,6 +37,7 @@
 #include <utils/common/environment.h>
 #include <utils/common/warnings.h>
 #include "transcoding/filters/fisheye_image_filter.h"
+#include "transcoding/filters/filter_helper.h"
 
 //#define QN_SCREENSHOT_DEBUG
 #ifdef QN_SCREENSHOT_DEBUG
@@ -189,8 +190,16 @@ QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnScre
     if (!server || (server->getServerFlags() & Qn::SF_Edge))
         anyQuality = true; // local file or edge cameras will be done locally
 
+    // Either tiling (pano cameras) and crop rect are handled here, so it isn't passed to image processing params
+
+    QnImageFilterHelper imageProcessingParams;
+    imageProcessingParams.setContrastParams(parameters.imageCorrectionParams);
+    imageProcessingParams.setDewarpingParams(parameters.mediaDewarpingParams, parameters.itemDewarpingParams);
+    imageProcessingParams.setRotation(parameters.rotationAngle);
+    imageProcessingParams.setCustomAR(parameters.customAspectRatio);
+
     for (int i = 0; i < layout->channelCount(); ++i) {
-        QImage channelImage = display->camDisplay()->getScreenshot(i, parameters.imageCorrectionParams, parameters.mediaDewarpingParams, parameters.itemDewarpingParams, anyQuality);
+        QImage channelImage = display->camDisplay()->getScreenshot(i, imageProcessingParams, anyQuality);
         if (channelImage.isNull())
             return NULL;    // async remote screenshot provider will be used
         images.push_back(channelImage);
@@ -240,6 +249,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     parameters.imageCorrectionParams = widget->item()->imageEnhancement();
     parameters.zoomRect = parameters.itemDewarpingParams.enabled ? QRectF() : widget->zoomRect();
     parameters.customAspectRatio = display->camDisplay()->overridenAspectRatio();
+    parameters.rotationAngle = widget->rotation();
 
 		// ----------------------------------------------------- 
 		// This localOffset is used to fix the issue : Bug #2988 
