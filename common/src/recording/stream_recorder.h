@@ -24,6 +24,7 @@ extern "C"
 
 #include "utils/color_space/image_correction.h"
 #include "core/resource/resource_consumer.h"
+#include "transcoding/filters/filter_helper.h"
 
 class QnAbstractMediaStreamDataProvider;
 class QnFfmpegAudioTranscoder;
@@ -97,7 +98,6 @@ public:
     QByteArray getSignature() const;
 
     void setRole(Role role);
-    void setTimestampCorner(Qn::Corner pos);
 
     void setStorage(const QnStorageResourcePtr& storage);
 
@@ -110,25 +110,13 @@ public:
     */
     void setAudioCodec(CodecID codec);
 
-    /*
-    * Time difference between client and server time zone. Used for onScreen timestamp drawing
-    */
-    void setOnScreenDateOffset(qint64 timeOffsetMs);
-
-    void setContrastParams(const ImageCorrectionParams& params);
-
-    void setItemDewarpingParams(const QnItemDewarpingParams& params);
-
-    void setRotation(int angle);
-
-    void setCustomAR(qreal ar);
 
     /*
     * Server time zone. Used for export to avi/mkv files
     */
     void setServerTimeZoneMs(qint64 value);
 
-    void setSrcRect(const QRectF& srcRect);
+    void setExtraTranscodeParams(const QnImageFilterHelper& extraParams);
 signals:
     void recordingStarted();
     void recordingProgress(int progress);
@@ -195,7 +183,6 @@ private:
     QImage m_logo;
 #endif
     QString m_container;
-    int m_videoChannels;
     QnCodecAudioFormat m_prevAudioFormat;
     AVIOContext* m_ioContext;
     bool m_needReopen;
@@ -206,21 +193,15 @@ private:
     QnFfmpegVideoTranscoder* m_videoTranscoder;
     CodecID m_dstAudioCodec;
     CodecID m_dstVideoCodec;
-    qint64 m_onscreenDateOffset;
-    Qn::Corner m_timestampCorner;
     qint64 m_serverTimeZoneMs;
 
     qint64 m_nextIFrameTime;
     qint64 m_truncateIntervalEps;
-    QRectF m_srcRect;
-    ImageCorrectionParams m_contrastParams;
-    QnItemDewarpingParams m_itemDewarpingParams;
 
     /** If true method close() will emit signal recordingFinished() at the end. */
     bool m_recordingFinished;
     Role m_role;
-    int m_rotAngle;
-    qreal m_customAR;
+    QnImageFilterHelper m_extraTranscodeParams;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

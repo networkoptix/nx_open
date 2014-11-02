@@ -16,7 +16,7 @@ public:
     * param videoSize - transcoded video size
     */
     QnUniversalRtpEncoder(QnConstAbstractMediaDataPtr media, CodecID transcodeToCodec, const QSize& videoSize,
-                          QnConstResourceVideoLayoutPtr layout, int rotationAngle, qreal customAR);
+                          const QnImageFilterHelper& extraTranscodeParams);
 
     virtual QByteArray getAdditionSDP() override;
 

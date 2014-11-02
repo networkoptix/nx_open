@@ -29,7 +29,7 @@ public:
 
     /* Allow multithread transcoding */
     void setMTMode(bool value);
-    virtual void addFilter(QnAbstractImageFilter* filter) override;
+    virtual void setFilterList(QList<QnAbstractImageFilterPtr> filterList) override;
 private:
     QVector<CLFFmpegVideoDecoder*> m_videoDecoders;
     CLVideoDecoderOutputPtr m_decodedVideoFrame;

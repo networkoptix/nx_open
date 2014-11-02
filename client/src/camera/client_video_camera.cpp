@@ -177,11 +177,17 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
         m_exportRecorder = new QnStreamRecorder(m_resource->toResourcePtr());
         if (storage)
             m_exportRecorder->setStorage(storage);
-        m_exportRecorder->setSrcRect(srcRect);
-        m_exportRecorder->setContrastParams(contrastParams);
-        m_exportRecorder->setItemDewarpingParams(itemDewarpingParams);
-        m_exportRecorder->setRotation(rotationAngle);
-        m_exportRecorder->setCustomAR(customAR);
+
+        QnImageFilterHelper extraParams;
+        extraParams.setSrcRect(srcRect);
+        extraParams.setContrastParams(contrastParams);
+        extraParams.setDewarpingParams(resource()->getDewarpingParams(), itemDewarpingParams);
+        extraParams.setRotation(rotationAngle);
+        extraParams.setCustomAR(customAR);
+        extraParams.setTimeCorner(timestamps, timeOffsetMs);
+        extraParams.setVideoLayout(resource()->getVideoLayout());
+        m_exportRecorder->setExtraTranscodeParams(extraParams);
+
         connect(m_exportRecorder,   &QnStreamRecorder::recordingFinished, this,   &QnClientVideoCamera::stopExport);
         connect(m_exportRecorder,   &QnStreamRecorder::recordingProgress, this,   &QnClientVideoCamera::exportProgress);
         connect(m_exportRecorder,   &QnStreamRecorder::recordingFinished, this,   &QnClientVideoCamera::exportFinished);
@@ -200,11 +206,8 @@ void QnClientVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTi
     m_exportRecorder->setEofDateTime(endTime);
     m_exportRecorder->setFileName(fileName);
     m_exportRecorder->setRole(role);
-    m_exportRecorder->setTimestampCorner(timestamps);
-    m_exportRecorder->setOnScreenDateOffset(timeOffsetMs);
     m_exportRecorder->setServerTimeZoneMs(serverTimeZoneMs);
     m_exportRecorder->setContainer(format);
-
     m_exportRecorder->setNeedCalcSignature(true);
 
     m_exportReader->addDataProcessor(m_exportRecorder);

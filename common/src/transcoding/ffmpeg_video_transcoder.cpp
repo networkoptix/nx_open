@@ -178,9 +178,9 @@ void QnFfmpegVideoTranscoder::setMTMode(bool value)
     m_mtMode = value;
 }
 
-void QnFfmpegVideoTranscoder::addFilter(QnAbstractImageFilter* filter)
+void QnFfmpegVideoTranscoder::setFilterList(QList<QnAbstractImageFilterPtr> filters)
 {
-    QnVideoTranscoder::addFilter(filter);
+    QnVideoTranscoder::setFilterList(filters);
     m_decodedVideoFrame->setUseExternalData(false); // do not modify ffmpeg frame buffer
 }
 

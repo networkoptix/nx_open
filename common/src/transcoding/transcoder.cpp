@@ -76,16 +76,13 @@ QSize QnCodecTranscoder::roundSize(const QSize& size)
 // --------------------------- QnVideoTranscoder -----------------
 
 QnVideoTranscoder::QnVideoTranscoder(CodecID codecId):
-    QnCodecTranscoder(codecId),
-    m_opened(false)
+    QnCodecTranscoder(codecId)
 {
 
 }
 
 QnVideoTranscoder::~QnVideoTranscoder()
 {
-    for(QnAbstractImageFilter* filter: m_filters)
-        delete filter;
 }
 
 void QnVideoTranscoder::setResolution(const QSize& value)
@@ -93,11 +90,9 @@ void QnVideoTranscoder::setResolution(const QSize& value)
     m_resolution = value;
 }
 
-void QnVideoTranscoder::addFilter(QnAbstractImageFilter* filter)
+void QnVideoTranscoder::setFilterList(QList<QnAbstractImageFilterPtr> filterList)
 {
-    m_filters << filter;
-    if (m_opened)
-        setResolution(filter->updatedResolution(getResolution()));
+    m_filters = filterList;
 }
 
 CLVideoDecoderOutputPtr QnVideoTranscoder::processFilterChain(const CLVideoDecoderOutputPtr& decodedFrame)
@@ -105,7 +100,7 @@ CLVideoDecoderOutputPtr QnVideoTranscoder::processFilterChain(const CLVideoDecod
     if (m_filters.isEmpty())
         return decodedFrame;
     CLVideoDecoderOutputPtr result = decodedFrame;
-    for(QnAbstractImageFilter* filter: m_filters)
+    for(QnAbstractImageFilterPtr filter: m_filters)
         result = filter->updateImage(result);
     return result;
 }
@@ -136,11 +131,9 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
         m_resolution = QSize(decoder.getContext()->width, decoder.getContext()->height);
     }
 
-    if (!m_opened) {
-        for(auto filter: m_filters)
-            setResolution(filter->updatedResolution(getResolution()));
-        m_opened = true;
-    }
+    for(auto filter: m_filters)
+        setResolution(filter->updatedResolution(getResolution()));
+
     return true;
 }
 
@@ -155,11 +148,8 @@ QnTranscoder::QnTranscoder():
     m_internalBuffer(CL_MEDIA_ALIGNMENT, 1024*1024),
     m_firstTime(AV_NOPTS_VALUE),
     m_initialized(false),
-    m_vLayout(0),
     m_eofCounter(0),
-    m_packetizedMode(false),
-    m_rotAngle(0),
-    m_customAR(0.0)
+    m_packetizedMode(false)
 {
     QThread::currentThread()->setPriority(QThread::LowPriority); 
 }
@@ -237,21 +227,6 @@ int QnTranscoder::suggestMediaStreamParams(
     return qMax(128,result)*1024;
 }
 
-void QnTranscoder::setRotation(int angle)
-{
-    m_rotAngle = angle;
-}
-
-void QnTranscoder::setCustomAR(qreal ar)
-{
-    m_customAR = ar;
-}
-
-void QnTranscoder::setVideoLayout(QnConstResourceVideoLayoutPtr layout)
-{
-    m_vLayout = layout;
-}
-
 int QnTranscoder::setVideoCodec(
     CodecID codec,
     TranscodeMethod method,
@@ -280,20 +255,7 @@ int QnTranscoder::setVideoCodec(
             ffmpegTranscoder->setBitrate(bitrate);
             ffmpegTranscoder->setParams(params);
             ffmpegTranscoder->setQuality(quality);
-
-            if (m_customAR != 0.0) {
-                QSize newSize;
-                newSize.setHeight(resolution.height());
-                newSize.setWidth(resolution.height() * m_customAR + 0.5);
-                if (newSize != resolution)
-                    ffmpegTranscoder->addFilter(new QnScaleImageFilter(QnCodecTranscoder::roundSize(newSize)));
-            }
-
-            if (m_vLayout->channelCount() > 1)
-                ffmpegTranscoder->addFilter(new QnTiledImageFilter(m_vLayout));
-
-            if (m_rotAngle)
-                ffmpegTranscoder->addFilter(new QnRotateImageFilter(m_rotAngle));
+            ffmpegTranscoder->setFilterList(m_extraTranscodeParams.createFilterChain(resolution));
 
             bool isAtom = getCPUString().toLower().contains(QLatin1String("atom"));
             if (isAtom || resolution.height() >= 1080)
@@ -433,4 +395,9 @@ void QnTranscoder::setPacketizedMode(bool value)
 const QVector<int>& QnTranscoder::getPacketsSize()
 {
     return m_outputPacketSize;
+}
+
+void QnTranscoder::setExtraTranscodeParams(const QnImageFilterHelper& extraParams)
+{
+    m_extraTranscodeParams = extraParams;
 }

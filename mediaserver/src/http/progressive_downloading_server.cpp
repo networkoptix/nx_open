@@ -483,12 +483,14 @@ void QnProgressiveDownloadingConsumer::run()
 
         QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>();
         if (mediaRes) {
-            d->transcoder.setVideoLayout(mediaRes->getVideoLayout());
-
+            QnImageFilterHelper extraParams;
+            extraParams.setVideoLayout(mediaRes->getVideoLayout());
             int rotation = mediaRes->toResource()->getProperty(QnMediaResource::rotationKey()).toInt();
             qreal customAR = mediaRes->toResource()->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
-            d->transcoder.setRotation(rotation);
-            d->transcoder.setCustomAR(customAR);
+            extraParams.setRotation(rotation);
+            extraParams.setCustomAR(customAR);
+            
+            d->transcoder.setExtraTranscodeParams(extraParams);
         }
 
         if (d->transcoder.setVideoCodec(

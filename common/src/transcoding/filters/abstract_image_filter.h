@@ -33,6 +33,8 @@ public:
     virtual QSize updatedResolution(const QSize& srcSize) = 0;
 };
 
+typedef QSharedPointer<QnAbstractImageFilter> QnAbstractImageFilterPtr;
+
 #endif // ENABLE_DATA_PROVIDERS
 
 #endif // __ABSTRACT_IMAGE_FILTER_H__

@@ -14,8 +14,9 @@ extern "C"
 #include "core/datapacket/audio_data_packet.h"
 #include "core/datapacket/video_data_packet.h"
 #include "core/resource/media_resource.h"
+#include "filters/abstract_image_filter.h"
+#include "filters/filter_helper.h"
 
-class QnAbstractImageFilter;
 class CLVideoDecoderOutput;
 
 /*!
@@ -105,7 +106,7 @@ public:
 
     virtual bool open(const QnConstCompressedVideoDataPtr& video);
 
-    virtual void addFilter(QnAbstractImageFilter* filter);
+    virtual void setFilterList(QList<QnAbstractImageFilterPtr> filterList);
 
 protected:
     static const int WIDTH_ALIGN = 16;
@@ -115,7 +116,7 @@ protected:
 
 protected:
     QSize m_resolution;
-    QList<QnAbstractImageFilter*> m_filters;
+    QList<QnAbstractImageFilterPtr> m_filters;
     bool m_opened;
 };
 typedef QSharedPointer<QnVideoTranscoder> QnVideoTranscoderPtr;
@@ -151,9 +152,6 @@ public:
     */
     virtual int setContainer(const QString& value) = 0;
 
-    void setVideoLayout(QnConstResourceVideoLayoutPtr layout);
-    void setRotation(int angle);
-    void setCustomAR(qreal ar);
 
     /*
     * Set ffmpeg video codec and params
@@ -219,6 +217,7 @@ public:
         Qn::StreamQuality quality,
         QnCodecParams::Value* const params = NULL );
 
+    void setExtraTranscodeParams(const QnImageFilterHelper& extraParams);
 protected:
     /*
     *  Prepare to transcode. If 'direct stream copy' is used, function got not empty video and audio data
@@ -241,15 +240,13 @@ protected:
 
 protected:
     bool m_initialized;
-    QnConstResourceVideoLayoutPtr m_vLayout;
 private:
     QString m_lastErrMessage;
     QQueue<QnConstCompressedVideoDataPtr> m_delayedVideoQueue;
     QQueue<QnConstCompressedAudioDataPtr> m_delayedAudioQueue;
     int m_eofCounter;
     bool m_packetizedMode;
-    int m_rotAngle;
-    qreal m_customAR;
+    QnImageFilterHelper m_extraTranscodeParams;
 };
 
 typedef QSharedPointer<QnTranscoder> QnTranscoderPtr;
