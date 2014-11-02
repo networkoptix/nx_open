@@ -190,7 +190,7 @@ CLVideoDecoderOutputPtr QnFisheyeImageFilter::updateImage(const CLVideoDecoderOu
         }
         m_lastImageSize = imageSize;
         m_lastImageFormat = frame->format;
-        m_tmpBuffer->reallocate(frame->width, frame->height, frame->format);
+        m_tmpBuffer->reallocate(frame->width, frame->height, frame->format, qPower2Ceil(unsigned(frame->width + 2), CL_MEDIA_ALIGNMENT));
     }
 
     m_tmpBuffer->copyDataFrom(frame.data());
@@ -318,7 +318,7 @@ void QnFisheyeImageFilter::updateFisheyeTransformRectilinear(const QSize& imageS
             if (dstX < 0.0 || dstX > (qreal) (imageSize.width() - 1) ||
                 dstY < 0.0 || dstY > (qreal) (imageSize.height() - 1))
             {
-                dstX = 0.0;
+                dstX = imageSize.width();
                 dstY = 0.0;
             }
 
@@ -405,7 +405,7 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
             if (dstX < 0.0 || dstX > (qreal) (imageSize.width() - 1) ||
                 dstY < 0.0 || dstY > (qreal) (imageSize.height() - 1))
             {
-                dstX = 0.0;
+                dstX = imageSize.width();
                 dstY = 0.0;
             }
             
