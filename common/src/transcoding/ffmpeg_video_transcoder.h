@@ -37,7 +37,6 @@ private:
     quint8* m_videoEncodingBuffer;
     AVCodecContext* m_encoderCtx;
 
-    SwsContext* scaleContext[CL_MAX_CHANNELS];
     int m_lastSrcWidth[CL_MAX_CHANNELS];
     int m_lastSrcHeight[CL_MAX_CHANNELS];
 

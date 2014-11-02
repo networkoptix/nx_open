@@ -102,7 +102,6 @@ public:
     virtual void setResolution( const QSize& value );
     //!Returns picture size (in pixels) of output video stream
     QSize getResolution() const;
-    void setVideoLayout(QnConstResourceVideoLayoutPtr layout);
 
     virtual bool open(const QnConstCompressedVideoDataPtr& video);
 
@@ -116,8 +115,8 @@ protected:
 
 protected:
     QSize m_resolution;
-    QnConstResourceVideoLayoutPtr m_layout;
     QList<QnAbstractImageFilter*> m_filters;
+    bool m_opened;
 };
 typedef QSharedPointer<QnVideoTranscoder> QnVideoTranscoderPtr;
 
@@ -153,6 +152,8 @@ public:
     virtual int setContainer(const QString& value) = 0;
 
     void setVideoLayout(QnConstResourceVideoLayoutPtr layout);
+    void setRotation(int angle);
+    void setCustomAR(qreal ar);
 
     /*
     * Set ffmpeg video codec and params
@@ -247,6 +248,8 @@ private:
     QQueue<QnConstCompressedAudioDataPtr> m_delayedAudioQueue;
     int m_eofCounter;
     bool m_packetizedMode;
+    int m_rotAngle;
+    qreal m_customAR;
 };
 
 typedef QSharedPointer<QnTranscoder> QnTranscoderPtr;

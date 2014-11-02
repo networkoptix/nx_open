@@ -19,11 +19,10 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) 
     {
-        scaleContext[i] = 0;
         m_lastSrcWidth[i] = -1;
         m_lastSrcHeight[i] = -1;
     }
-
+    m_videoDecoders.resize(CL_MAX_CHANNELS);
     m_videoEncodingBuffer = (quint8*) qMallocAligned(MAX_VIDEO_FRAME, 32);
     m_decodedVideoFrame->setUseExternalData(true);
 }
@@ -36,20 +35,16 @@ QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
 
 void QnFfmpegVideoTranscoder::close()
 {
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
-        if (scaleContext[i])
-            sws_freeContext(scaleContext[i]);
-    }
-
     if (m_encoderCtx) {
         avcodec_close(m_encoderCtx);
         av_free(m_encoderCtx);
         m_encoderCtx = 0;
     }
 
-    for (int i = 0; i < m_videoDecoders.size(); ++i)
+    for (int i = 0; i < m_videoDecoders.size(); ++i) {
         delete m_videoDecoders[i];
-    m_videoDecoders.clear();
+        m_videoDecoders[i] = 0;
+    }
 }
 
 bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
@@ -57,10 +52,6 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
     close();
 
     QnVideoTranscoder::open(video);
-
-    int channels = m_layout ? m_layout->channelCount() : 1;
-    for (int i = 0; i < channels; ++i)
-        m_videoDecoders << new CLFFmpegVideoDecoder(video->compressionType, video, m_mtMode);
 
     AVCodec* avCodec = avcodec_find_encoder(m_codecId);
     if (avCodec == 0)
@@ -116,6 +107,7 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
         return false;
     }
 
+
     return true;
 }
 
@@ -131,7 +123,9 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
 
 
     QnConstCompressedVideoDataPtr video = qSharedPointerDynamicCast<const QnCompressedVideoData>(media);
-    CLFFmpegVideoDecoder* decoder = m_videoDecoders[m_layout ? video->channelNumber : 0];
+    CLFFmpegVideoDecoder* decoder = m_videoDecoders[video->channelNumber];
+    if (!decoder)
+        decoder = m_videoDecoders[video->channelNumber] = new CLFFmpegVideoDecoder(video->compressionType, video, m_mtMode);
 
     if (decoder->decode(video, &m_decodedVideoFrame)) 
     {
@@ -188,8 +182,6 @@ void QnFfmpegVideoTranscoder::addFilter(QnAbstractImageFilter* filter)
 {
     QnVideoTranscoder::addFilter(filter);
     m_decodedVideoFrame->setUseExternalData(false); // do not modify ffmpeg frame buffer
-
-    setResolution(filter->updatedResolution(getResolution()));
 }
 
 #endif // ENABLE_DATA_PROVIDERS

@@ -3,11 +3,14 @@
 #include <utils/math/math.h>
 #include <core/resource/media_resource.h>
 
-#include "filters/abstract_image_filter.h"
-
 #include "ffmpeg_transcoder.h"
 #include "ffmpeg_video_transcoder.h"
 #include "ffmpeg_audio_transcoder.h"
+
+#include "filters/abstract_image_filter.h"
+#include "filters/tiled_image_filter.h"
+#include "filters/scale_image_filter.h"
+#include "filters/rotate_image_filter.h"
 
 // ---------------------------- QnCodecTranscoder ------------------
 QnCodecTranscoder::QnCodecTranscoder(CodecID codecId)
@@ -74,7 +77,7 @@ QSize QnCodecTranscoder::roundSize(const QSize& size)
 
 QnVideoTranscoder::QnVideoTranscoder(CodecID codecId):
     QnCodecTranscoder(codecId),
-    m_layout(0)
+    m_opened(false)
 {
 
 }
@@ -85,11 +88,6 @@ QnVideoTranscoder::~QnVideoTranscoder()
         delete filter;
 }
 
-void QnVideoTranscoder::setVideoLayout(QnConstResourceVideoLayoutPtr layout)
-{
-    m_layout = layout;
-}
-
 void QnVideoTranscoder::setResolution(const QSize& value)
 {
     m_resolution = value;
@@ -98,6 +96,8 @@ void QnVideoTranscoder::setResolution(const QSize& value)
 void QnVideoTranscoder::addFilter(QnAbstractImageFilter* filter)
 {
     m_filters << filter;
+    if (m_opened)
+        setResolution(filter->updatedResolution(getResolution()));
 }
 
 CLVideoDecoderOutputPtr QnVideoTranscoder::processFilterChain(const CLVideoDecoderOutputPtr& decodedFrame)
@@ -136,6 +136,11 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
         m_resolution = QSize(decoder.getContext()->width, decoder.getContext()->height);
     }
 
+    if (!m_opened) {
+        for(auto filter: m_filters)
+            setResolution(filter->updatedResolution(getResolution()));
+        m_opened = true;
+    }
     return true;
 }
 
@@ -152,7 +157,9 @@ QnTranscoder::QnTranscoder():
     m_initialized(false),
     m_vLayout(0),
     m_eofCounter(0),
-    m_packetizedMode(false)
+    m_packetizedMode(false),
+    m_rotAngle(0),
+    m_customAR(0.0)
 {
     QThread::currentThread()->setPriority(QThread::LowPriority); 
 }
@@ -230,6 +237,16 @@ int QnTranscoder::suggestMediaStreamParams(
     return qMax(128,result)*1024;
 }
 
+void QnTranscoder::setRotation(int angle)
+{
+    m_rotAngle = angle;
+}
+
+void QnTranscoder::setCustomAR(qreal ar)
+{
+    m_customAR = ar;
+}
+
 void QnTranscoder::setVideoLayout(QnConstResourceVideoLayoutPtr layout)
 {
     m_vLayout = layout;
@@ -258,7 +275,26 @@ int QnTranscoder::setVideoCodec(
         case TM_FfmpegTranscode:
         {
             ffmpegTranscoder = new QnFfmpegVideoTranscoder(codec);
-            ffmpegTranscoder->setVideoLayout(m_vLayout);
+
+            ffmpegTranscoder->setResolution(resolution);
+            ffmpegTranscoder->setBitrate(bitrate);
+            ffmpegTranscoder->setParams(params);
+            ffmpegTranscoder->setQuality(quality);
+
+            if (m_customAR != 0.0) {
+                QSize newSize;
+                newSize.setHeight(resolution.height());
+                newSize.setWidth(resolution.height() * m_customAR + 0.5);
+                if (newSize != resolution)
+                    ffmpegTranscoder->addFilter(new QnScaleImageFilter(QnCodecTranscoder::roundSize(newSize)));
+            }
+
+            if (m_vLayout->channelCount() > 1)
+                ffmpegTranscoder->addFilter(new QnTiledImageFilter(m_vLayout));
+
+            if (m_rotAngle)
+                ffmpegTranscoder->addFilter(new QnRotateImageFilter(m_rotAngle));
+
             bool isAtom = getCPUString().toLower().contains(QLatin1String("atom"));
             if (isAtom || resolution.height() >= 1080)
                 ffmpegTranscoder->setMTMode(true);
@@ -276,13 +312,6 @@ int QnTranscoder::setVideoCodec(
         default:
             m_lastErrMessage = tr("Unknown transcoding method.");
             return -1;
-    }
-    if (m_vTranscoder)
-    {
-        m_vTranscoder->setResolution(resolution);
-        m_vTranscoder->setBitrate(bitrate);
-        m_vTranscoder->setParams(params);
-        m_vTranscoder->setQuality(quality);
     }
     return 0;
 }

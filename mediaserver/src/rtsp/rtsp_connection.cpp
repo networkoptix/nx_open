@@ -518,7 +518,9 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbst
         //dstCodec = CODEC_ID_AAC; // keep aac without transcoding for audio
     //CodecID dstCodec = media->dataType == QnAbstractMediaData::VIDEO ? CODEC_ID_MPEG4 : media->compressionType;
     QSharedPointer<QnUniversalRtpEncoder> universalEncoder;
-
+    QnResourcePtr res = getResource()->toResourcePtr();
+    int rotation = res->getProperty(QnMediaResource::rotationKey()).toInt();
+    qreal customAR = res->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
     switch (dstCodec)
     {
         //case CODEC_ID_H264:
@@ -549,7 +551,7 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbst
         case CODEC_ID_VP8:
         case CODEC_ID_ADPCM_G722:
         case CODEC_ID_ADPCM_G726:
-            universalEncoder = QSharedPointer<QnUniversalRtpEncoder>(new QnUniversalRtpEncoder(media, dstCodec, resolution, vLayout)); // transcode src codec to MPEG4/AAC
+            universalEncoder = QSharedPointer<QnUniversalRtpEncoder>(new QnUniversalRtpEncoder(media, dstCodec, resolution, vLayout, rotation, customAR)); // transcode src codec to MPEG4/AAC
             if (universalEncoder->isOpened())
                 return universalEncoder;
             else

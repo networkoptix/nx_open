@@ -615,7 +615,6 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
                     m_videoTranscoder->addFilter(new QnTimeImageFilter(layout, m_timestampCorner, m_onscreenDateOffset));
 
                 m_videoTranscoder->setQuality(Qn::QualityHighest);
-                m_videoTranscoder->setVideoLayout(layout);
                 m_videoTranscoder->open(mediaData); // reopen again for new size
 
                 avcodec_copy_context(videoStream->codec, m_videoTranscoder->getCodecContext());
