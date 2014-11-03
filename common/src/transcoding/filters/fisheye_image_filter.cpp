@@ -185,7 +185,8 @@ CLVideoDecoderOutputPtr QnFisheyeImageFilter::updateImage(const CLVideoDecoderOu
                 w >>= descr->log2_chroma_w;
                 h >>= descr->log2_chroma_h;
             }
-            qreal ar = srcFrame->width * (qreal) srcFrame->sample_aspect_ratio / (qreal) srcFrame->height;
+            qreal sar = srcFrame->sample_aspect_ratio ? srcFrame->sample_aspect_ratio : 1.0;
+            qreal ar = srcFrame->width * sar / (qreal) srcFrame->height;
             updateFisheyeTransform(QSize(w, h), plane, ar);
         }
         m_lastImageSize = imageSize;
