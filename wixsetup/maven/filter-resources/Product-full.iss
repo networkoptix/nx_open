@@ -24,6 +24,10 @@ Uninstallable=no
 CreateAppDir=no
 ArchitecturesAllowed={#Arch}
 
+[Languages]
+Name: "en"; MessagesFile: "compiler:Default.isl"
+Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
+
 [Types]
 Name: "full"; Description: "Launch Both Server and Client Installers"; Check: FullCheck
 Name: "client"; Description: "Launch Client Installer"; Check: ClientCheck

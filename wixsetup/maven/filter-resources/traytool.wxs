@@ -16,7 +16,7 @@
                                    WorkingDirectory='${customization}TrayToolDir' Advertise="yes" Icon="icon_menu.exe">
                          </Shortcut>
 
-                         <Shortcut Id="StartmenuStartupTrayTool" Directory="StartupFolder" Name="${traytool.name}"
+                         <Shortcut Id="StartmenuStartupTrayTool" Directory="StartupFolder" Name="${display.traytool.name}"
                                    WorkingDirectory='${customization}TrayToolDir' Advertise="yes" Icon="icon_menu.exe">
                          </Shortcut>
                      </File>
