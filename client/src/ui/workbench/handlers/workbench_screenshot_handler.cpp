@@ -38,6 +38,7 @@
 #include <utils/common/warnings.h>
 #include "transcoding/filters/fisheye_image_filter.h"
 #include "transcoding/filters/filter_helper.h"
+#include "transcoding/filters/abstract_image_filter.h"
 
 //#define QN_SCREENSHOT_DEBUG
 #ifdef QN_SCREENSHOT_DEBUG
@@ -49,52 +50,6 @@
 namespace {
     const int showProgressDelay = 1500; // 1.5 sec
     const int minProgressDisplayTime = 1000; // 1 sec
-
-    void drawTimeStamp(QImage &image, Qn::Corner position, const QString &timestamp) {
-        if (position == Qn::NoCorner)
-            return;
-
-        QScopedPointer<QPainter> painter(new QPainter(&image));
-        QRect rect(image.rect());
-
-        QFont font;
-        font.setPixelSize(qMax(rect.height() / 20, 12));
-
-        QFontMetrics fm(font);
-        QSize size = fm.size(0, timestamp);
-        int spacing = 2;
-
-        painter->setPen(Qt::black);
-        painter->setBrush(Qt::white);
-        painter->setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::HighQualityAntialiasing);
-
-        QPainterPath path;
-        int x = rect.x();
-        int y = rect.y();
-
-        switch (position) {
-        case Qn::TopLeftCorner:
-        case Qn::BottomLeftCorner:
-            x += rect.x() + spacing * 2;
-            break;
-        default:
-            x += rect.width() - size.width() - spacing*2;
-            break;
-        }
-
-        switch (position) {
-        case Qn::TopLeftCorner:
-        case Qn::TopRightCorner:
-            y += spacing + fm.ascent();
-            break;
-        default:
-            y += rect.height() - fm.descent() - spacing;
-            break;
-        }
-
-        path.addText(x, y, font, timestamp);
-        painter->drawPath(path);
-    }
 }
 
 QString QnScreenshotParameters::timeString() const {
@@ -179,8 +134,6 @@ QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnScre
     if (!display)
         return NULL;
 
-    QList<QImage> images;
-
     TRACE("SCREENSHOT DEWARPING" << parameters.itemDewarpingParams.enabled << parameters.itemDewarpingParams.xAngle << parameters.itemDewarpingParams.yAngle << parameters.itemDewarpingParams.fov);
 
     QnConstResourceVideoLayoutPtr layout = display->videoLayout();
@@ -193,36 +146,24 @@ QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnScre
     // Either tiling (pano cameras) and crop rect are handled here, so it isn't passed to image processing params
 
     QnImageFilterHelper imageProcessingParams;
+    QnMediaResourcePtr mediaRes = display->resource().dynamicCast<QnMediaResource>();
+    if (mediaRes)
+        imageProcessingParams.setVideoLayout(layout);
+    imageProcessingParams.setSrcRect(parameters.zoomRect);
     imageProcessingParams.setContrastParams(parameters.imageCorrectionParams);
     imageProcessingParams.setDewarpingParams(parameters.mediaDewarpingParams, parameters.itemDewarpingParams);
     imageProcessingParams.setRotation(parameters.rotationAngle);
     imageProcessingParams.setCustomAR(parameters.customAspectRatio);
 
-    for (int i = 0; i < layout->channelCount(); ++i) {
-        QImage channelImage = display->camDisplay()->getScreenshot(i, imageProcessingParams, anyQuality);
-        if (channelImage.isNull())
-            return NULL;    // async remote screenshot provider will be used
-        images.push_back(channelImage);
-    }
-    QSize channelSize = images[0].size();
-    QSize totalSize = QnGeometry::cwiseMul(channelSize, layout->size());
-
-    QImage screenshot(totalSize.width(), totalSize.height(), QImage::Format_ARGB32);
-    screenshot.fill(qRgba(0, 0, 0, 0));
-
-    QScopedPointer<QPainter> painter(new QPainter(&screenshot));
-    painter->setCompositionMode(QPainter::CompositionMode_Source);
-    for (int i = 0; i < layout->channelCount(); ++i) {
-        painter->drawImage(
-                    QnGeometry::cwiseMul(layout->position(i), channelSize),
-                    images[i]
-                    );
-    }
+    QImage screenshot = display->camDisplay()->getScreenshot(imageProcessingParams, anyQuality);
 
     // avoiding post-processing duplication
     parameters.imageCorrectionParams.enabled = false;
     parameters.mediaDewarpingParams.enabled = false;
     parameters.itemDewarpingParams.enabled = false;
+    parameters.zoomRect = QRectF();
+    parameters.customAspectRatio = 0.0;
+    parameters.rotationAngle = 0;
 
     return new QnBasicImageProvider(screenshot);
 }
@@ -384,55 +325,24 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
     hideProgressDelayed();
 
     QnScreenshotParameters parameters = loader->parameters();
-
-    QImage resizedToAr = image;
-    qreal sourceAr = (qreal)image.width() / image.height();
-    if (!qFuzzyIsNull(parameters.customAspectRatio) && !qFuzzyEquals(parameters.customAspectRatio, sourceAr)) {
-        QSizeF targetSize = image.size();
-        if (parameters.customAspectRatio > sourceAr)
-            targetSize.setHeight(targetSize.width() / parameters.customAspectRatio);
-        else
-            targetSize.setWidth(targetSize.height() * parameters.customAspectRatio);
-
-        resizedToAr = QImage(targetSize.toSize(), QImage::Format_ARGB32);
-        resizedToAr.fill(qRgba(0, 0, 0, 0));
-
-        QScopedPointer<QPainter> painter(new QPainter(&resizedToAr));
-        painter->setCompositionMode(QPainter::CompositionMode_Source);
-        painter->drawImage(resizedToAr.rect(), image, image.rect());
+    QnImageFilterHelper transcodeParams;
+    // Doing heavy filters only. This filters doesn't supported on server side for screenshots
+    transcodeParams.setDewarpingParams(parameters.mediaDewarpingParams, parameters.itemDewarpingParams);
+    transcodeParams.setContrastParams(parameters.imageCorrectionParams);
+    transcodeParams.setTimeCorner(parameters.timestampPosition, 0);
+    QList<QnAbstractImageFilterPtr> filters = transcodeParams.createFilterChain(image.size());
+    QImage result = image;
+    if (!filters.isEmpty()) {
+        QSharedPointer<CLVideoDecoderOutput> frame(new CLVideoDecoderOutput(result));
+        frame->pts = parameters.time;
+        for(auto filter: filters)
+            frame = filter->updateImage(frame);
+        result = frame->toImage();
     }
-
-    QImage resized = resizedToAr;
-    if (!parameters.zoomRect.isNull()) {
-        resized = QImage(resizedToAr.width() * parameters.zoomRect.width(), resizedToAr.height() * parameters.zoomRect.height(), QImage::Format_ARGB32);
-        resized.fill(qRgba(0, 0, 0, 0));
-
-        QScopedPointer<QPainter> painter(new QPainter(&resized));
-        painter->setCompositionMode(QPainter::CompositionMode_Source);
-        painter->drawImage(QPointF(0, 0), resizedToAr, QnGeometry::cwiseMul(parameters.zoomRect, resizedToAr.size()));
-    }
-    
-    int panoFactor = (parameters.mediaDewarpingParams.enabled && parameters.itemDewarpingParams.enabled) ? parameters.itemDewarpingParams.panoFactor : 1;
-    if (panoFactor > 1)
-		resized = resized.scaled(QnFisheyeImageFilter::getOptimalSize(resized.size(), parameters.itemDewarpingParams));
-
-    QSharedPointer<CLVideoDecoderOutput> frame(new CLVideoDecoderOutput(resized));
-    if (parameters.imageCorrectionParams.enabled) {
-        QnContrastImageFilter filter(parameters.imageCorrectionParams);
-        frame = filter.updateImage(frame);
-    }
-
-    if (parameters.mediaDewarpingParams.enabled && parameters.itemDewarpingParams.enabled) {
-        QnFisheyeImageFilter filter(parameters.mediaDewarpingParams, parameters.itemDewarpingParams);
-        frame = filter.updateImage(frame);
-    }
-
-    QImage timestamped = frame->toImage();
-    drawTimeStamp(timestamped, parameters.timestampPosition, parameters.timeString());
 
     QString filename = loader->parameters().filename;
 
-    if (!timestamped.save(filename)) {
+    if (!result.save(filename)) {
         hideProgress();
 
         QMessageBox::critical(

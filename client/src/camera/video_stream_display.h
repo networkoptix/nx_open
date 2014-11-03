@@ -53,7 +53,7 @@ public:
     void setMTDecoding(bool value);
 
     void setSpeed(float value);
-    virtual QImage getScreenshot(const QnImageFilterHelper& imageProcessingParams, bool anyQuality) override;
+    virtual CLVideoDecoderOutputPtr getScreenshot(bool anyQuality) override;
     virtual QImage getGrayscaleScreenshot() override; 
     void setCurrentTime(qint64 time);
     void canUseBufferedFrameDisplayer(bool value);

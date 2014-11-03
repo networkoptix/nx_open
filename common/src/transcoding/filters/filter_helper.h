@@ -20,8 +20,8 @@ public:
     void setSrcRect(const QRectF& cropRect); // crop image filter
     void setDewarpingParams(const QnMediaDewarpingParams& params1, const QnItemDewarpingParams& params2); // fisheye image filter
     void setContrastParams(const ImageCorrectionParams& params); // contrast image filter
-    void setTimeCorner(Qn::Corner corner, int offset); // time image filter
-
+    void setTimeCorner(Qn::Corner corner, qint64 offset); // time image filter
+    
     QList<QnAbstractImageFilterPtr> createFilterChain(const QSize& srcResolution) const;
     bool isEmpty() const;
 private:
@@ -33,7 +33,7 @@ private:
     QnItemDewarpingParams m_itemDewarpingParams;
     ImageCorrectionParams m_contrastParams;
     Qn::Corner m_timestampCorner;
-    int m_onscreenDateOffset;
+    qint64 m_onscreenDateOffset;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

@@ -273,7 +273,7 @@ struct CLVideoData
 class ScreenshotInterface
 {
 public:
-    virtual QImage getScreenshot(const QnImageFilterHelper& imageProcessingParams, bool anyQuality) = 0; // 8 bit Y channel only
+    virtual CLVideoDecoderOutputPtr getScreenshot(bool anyQuality) = 0;
     virtual QImage getGrayscaleScreenshot() = 0;
 };
 

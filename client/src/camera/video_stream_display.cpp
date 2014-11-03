@@ -1017,28 +1017,20 @@ QImage QnVideoStreamDisplay::getGrayscaleScreenshot()
 }
 
 
-QImage QnVideoStreamDisplay::getScreenshot(const QnImageFilterHelper& imageProcessingParams, bool anyQuality) 
+CLVideoDecoderOutputPtr QnVideoStreamDisplay::getScreenshot(bool anyQuality)
 {
-    if (m_decoder.isEmpty())
-        return QImage();
-
     QMutexLocker mutex(&m_mtx);
 
     if (!(m_lastDisplayedFrame || !m_lastDisplayedFrame->data[0] || !m_lastDisplayedFrame->width))
-        return QImage();
+        return CLVideoDecoderOutputPtr();
 
     // feature #2563
     if (!anyQuality && (m_lastDisplayedFrame->flags & QnAbstractMediaData::MediaFlags_LowQuality))
-        return QImage();    //screenshot will be received from the server
+        return CLVideoDecoderOutputPtr();    //screenshot will be received from the server
 
-    QList<QnAbstractImageFilterPtr> filters = imageProcessingParams.createFilterChain(QSize(m_lastDisplayedFrame->width, m_lastDisplayedFrame->height));
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
-    
     CLVideoDecoderOutput::copy(m_lastDisplayedFrame.data(), outFrame.data());
-    for(auto filter: filters)
-        outFrame = filter->updateImage(outFrame);
-    
-    return outFrame->toImage();
+    return outFrame;
 }
 
 void QnVideoStreamDisplay::setCurrentTime(qint64 time)

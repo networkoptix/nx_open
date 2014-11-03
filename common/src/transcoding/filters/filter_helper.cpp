@@ -59,7 +59,7 @@ void QnImageFilterHelper::setContrastParams(const ImageCorrectionParams& params)
     m_contrastParams = params;
 }
 
-void QnImageFilterHelper::setTimeCorner(Qn::Corner corner, int onscreenDateOffset)
+void QnImageFilterHelper::setTimeCorner(Qn::Corner corner, qint64 onscreenDateOffset)
 {
     m_timestampCorner = corner;
     m_onscreenDateOffset = onscreenDateOffset;

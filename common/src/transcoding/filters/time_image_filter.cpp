@@ -27,7 +27,7 @@ QnTimeImageFilter::QnTimeImageFilter(const QSharedPointer<const QnResourceVideoL
     m_onscreenDateOffset(timeOffsetMs),
     m_imageBuffer(0),
     m_dateTextPos(datePos),
-    m_checkHash(videoLayout->channelCount() > 1),
+    m_checkHash(videoLayout && videoLayout->channelCount() > 1),
     m_hash(-1)
 {
 }
@@ -126,7 +126,7 @@ CLVideoDecoderOutputPtr QnTimeImageFilter::updateImage(const CLVideoDecoderOutpu
         frame->linesize[0], frame->linesize[1], 255);
 
     QPainter p(m_timeImg);
-    p.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
+    p.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::HighQualityAntialiasing);
     QPainterPath path;
     path.addText(m_dateTimeXOffs, m_dateTimeYOffs, m_timeFont, timeStr);
     p.setBrush(Qt::white);
