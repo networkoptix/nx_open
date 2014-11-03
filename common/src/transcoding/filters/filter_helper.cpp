@@ -85,6 +85,14 @@ bool QnImageFilterHelper::isEmpty() const
     return true;
 }
 
+QSize QnImageFilterHelper::updatedResolution(const QList<QnAbstractImageFilterPtr>& filters, const QSize& srcResolution) const
+{
+    QSize result(srcResolution);
+    for (auto filter: filters)
+        result = filter->updatedResolution(result);
+    return result;
+}
+
 QList<QnAbstractImageFilterPtr> QnImageFilterHelper::createFilterChain(const QSize& srcResolution) const
 {
     QList<QnAbstractImageFilterPtr> result;
@@ -101,7 +109,7 @@ QList<QnAbstractImageFilterPtr> QnImageFilterHelper::createFilterChain(const QSi
         result << QnAbstractImageFilterPtr(new QnTiledImageFilter(m_layout));
 
     if (!m_cropRect.isEmpty() && !m_itemDewarpingParams.enabled) {
-        QRect rect(cwiseMul(m_cropRect, srcResolution).toRect());
+        QRect rect(cwiseMul(m_cropRect, updatedResolution(result, srcResolution)).toRect());
         result << QnAbstractImageFilterPtr(new QnCropImageFilter(QnCodecTranscoder::roundRect(rect)));
     }
     if (m_itemDewarpingParams.enabled)

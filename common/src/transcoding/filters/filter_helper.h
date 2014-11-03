@@ -25,6 +25,8 @@ public:
     QList<QnAbstractImageFilterPtr> createFilterChain(const QSize& srcResolution) const;
     bool isEmpty() const;
 private:
+    QSize updatedResolution(const QList<QnAbstractImageFilterPtr>& filters, const QSize& srcResolution) const;
+private:
     QnConstResourceVideoLayoutPtr m_layout;
     qreal m_customAR;
     int m_rotAngle;
