@@ -1021,7 +1021,7 @@ CLVideoDecoderOutputPtr QnVideoStreamDisplay::getScreenshot(bool anyQuality)
 {
     QMutexLocker mutex(&m_mtx);
 
-    if (!(m_lastDisplayedFrame || !m_lastDisplayedFrame->data[0] || !m_lastDisplayedFrame->width))
+    if (!m_lastDisplayedFrame || !m_lastDisplayedFrame->data[0] || !m_lastDisplayedFrame->width)
         return CLVideoDecoderOutputPtr();
 
     // feature #2563
