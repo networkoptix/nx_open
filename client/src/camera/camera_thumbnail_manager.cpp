@@ -103,6 +103,7 @@ int QnCameraThumbnailManager::loadThumbnailForResource(const QnResourcePtr &reso
     return serverConnection->getThumbnailAsync(
                 networkResource,
                 -1,
+                -1,
                 m_thumnailSize,
                 QLatin1String("jpg"),
                 QnMediaServerConnection::IFrameAfterTime,

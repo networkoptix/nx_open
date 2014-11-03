@@ -325,7 +325,7 @@ QnAbstractReplyProcessor *QnMediaServerConnection::newReplyProcessor(int object)
 }
 
 int QnMediaServerConnection::getThumbnailAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, const
-                                                QSize& size, const QString& imageFormat, RoundMethod method, QObject *target, const char *slot)
+                                                int rotation, const QSize& size, const QString& imageFormat, RoundMethod method, QObject *target, const char *slot)
 {
     QnRequestParamList params;
 
@@ -335,6 +335,8 @@ int QnMediaServerConnection::getThumbnailAsync(const QnNetworkResourcePtr &camer
         params << QnRequestParam("width", size.width());
     if (size.height() > 0)
         params << QnRequestParam("height", size.height());
+    if (rotation != -1)
+        params << QnRequestParam("rotate", rotation);
     params << QnRequestParam("format", imageFormat);
     QString methodStr(lit("before"));
     if (method == Precise)

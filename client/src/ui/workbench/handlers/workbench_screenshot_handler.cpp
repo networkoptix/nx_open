@@ -204,7 +204,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
 
     QnImageProvider* imageProvider = getLocalScreenshotProvider(parameters, display.data());
     if (!imageProvider)
-        imageProvider = QnSingleThumbnailLoader::newInstance(widget->resource()->toResourcePtr(), parameters.time);
+        imageProvider = QnSingleThumbnailLoader::newInstance(widget->resource()->toResourcePtr(), parameters.time, 0);
     QnScreenshotLoader* loader = new QnScreenshotLoader(parameters, this);
     connect(loader, &QnImageProvider::imageChanged, this,   &QnWorkbenchScreenshotHandler::at_imageLoaded);
     loader->setBaseProvider(imageProvider); // preload screenshot here
@@ -332,6 +332,8 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
     transcodeParams.setDewarpingParams(parameters.mediaDewarpingParams, parameters.itemDewarpingParams);
     transcodeParams.setContrastParams(parameters.imageCorrectionParams);
     transcodeParams.setTimeCorner(parameters.timestampPosition, 0);
+    transcodeParams.setRotation(parameters.rotationAngle);
+    transcodeParams.setSrcRect(parameters.zoomRect);
     QList<QnAbstractImageFilterPtr> filters = transcodeParams.createFilterChain(image.size());
     QImage result = image;
     if (!filters.isEmpty()) {

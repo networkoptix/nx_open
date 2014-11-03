@@ -772,7 +772,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
             ui->expertSettingsWidget->updateFromResources(QnVirtualCameraResourceList() << m_camera);
 
             if (!m_imageProvidersByResourceId.contains(m_camera->getId()))
-                m_imageProvidersByResourceId[m_camera->getId()] = QnSingleThumbnailLoader::newInstance(m_camera, -1, fisheyeThumbnailSize, QnSingleThumbnailLoader::JpgFormat, this);
+                m_imageProvidersByResourceId[m_camera->getId()] = QnSingleThumbnailLoader::newInstance(m_camera, -1, -1, fisheyeThumbnailSize, QnSingleThumbnailLoader::JpgFormat, this);
             ui->fisheyeSettingsWidget->updateFromParams(m_camera->getDewarpingParams(), m_imageProvidersByResourceId[m_camera->getId()]);
         }
     }
