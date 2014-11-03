@@ -15,6 +15,6 @@ namespace aio
     extern template class AIOThread<Socket>;
 }
 
-typedef CommonSocketImpl<Socket> PollableSystemSocketImpl;
+typedef CommonSocketImpl<Socket> SystemSocketImpl;
 
 #endif  //SOCKET_IMPL_H
