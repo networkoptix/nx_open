@@ -18,12 +18,16 @@ extern "C"
 #include <utils/math/math.h>
 #include "core/resource/network_resource.h"
 #include "core/resource_management/resource_pool.h"
-#include "core/resource/camera_resource.h"
-#include "plugins/resource/server_archive/server_archive_delegate.h"
 #include "core/datapacket/media_data_packet.h"
 #include "decoders/video/ffmpeg.h"
+#include "plugins/resource/server_archive/server_archive_delegate.h"
+#include "core/resource/camera_resource.h"
 #include "camera/camera_pool.h"
 #include "qmath.h"
+#include "transcoding/transcoder.h"
+#include "transcoding/filters/tiled_image_filter.h"
+#include "transcoding/filters/scale_image_filter.h"
+#include "transcoding/filters/rotate_image_filter.h"
 
 static const int MAX_GOP_LEN = 100;
 static const qint64 LATEST_IMAGE = -1;
@@ -81,6 +85,117 @@ PixelFormat updatePixelFormat(PixelFormat fmt)
     default:
         return fmt;
     }
+}
+
+QSharedPointer<CLVideoDecoderOutput> QnImageRestHandler::readFrame(qint64 time, 
+                                                                   bool useHQ, 
+                                                                   RoundMethod roundMethod, 
+                                                                   const QSharedPointer<QnVirtualCameraResource>& res, 
+                                                                   QnServerArchiveDelegate& serverDelegate, 
+                                                                   int prefferedChannel)
+{
+    QnVideoCamera* camera = qnCameraPool->getVideoCamera(res);
+
+    QSharedPointer<CLVideoDecoderOutput> outFrame( new CLVideoDecoderOutput() );
+
+    QnConstCompressedVideoDataPtr video;
+    if (time == DATETIME_NOW) 
+    {
+        // get live data
+        if (camera)
+            video = camera->getLastVideoFrame(useHQ, prefferedChannel);
+    }
+    else if (time == LATEST_IMAGE)
+    {
+        // get latest data
+        if (camera) {
+            video = camera->getLastVideoFrame(useHQ, prefferedChannel);
+            if (!video)
+                video = camera->getLastVideoFrame(!useHQ, prefferedChannel);
+        }
+        if (!video) {
+            video = camera->getLastVideoFrame(!useHQ, prefferedChannel);
+            if (!serverDelegate.isOpened()) {
+                serverDelegate.open(res);
+                serverDelegate.seek(serverDelegate.endTime()-1000*100, true);
+            }
+            video = getNextArchiveVideoPacket(serverDelegate, AV_NOPTS_VALUE);
+        }
+        else {
+            time = DATETIME_NOW;
+        }
+    }
+    else {
+        // get archive data
+        if (!serverDelegate.isOpened()) {
+            serverDelegate.open(res);
+            serverDelegate.seek(time, true);
+        }
+        video = getNextArchiveVideoPacket(serverDelegate, roundMethod == IFrameAfterTime ? time : AV_NOPTS_VALUE);
+
+        if (!video) {
+            video = camera->getFrameByTime(useHQ, time, roundMethod == IFrameAfterTime, prefferedChannel); // try approx frame from GOP keeper
+            time = DATETIME_NOW;
+        }
+        if (!video)
+            video = camera->getFrameByTime(!useHQ, time, roundMethod == IFrameAfterTime, prefferedChannel); // try approx frame from GOP keeper
+    }
+    if (!video) 
+        return QSharedPointer<CLVideoDecoderOutput>();
+
+    CLFFmpegVideoDecoder decoder(video->compressionType, video, false);
+    bool gotFrame = false;
+
+    if (time == DATETIME_NOW) {
+        if (res->getStatus() == Qn::Online || res->getStatus() == Qn::Recording)
+        {
+            gotFrame = decoder.decode(video, &outFrame);
+            if (!gotFrame)
+                gotFrame = decoder.decode(video, &outFrame); // decode twice
+        }
+    }
+    else {
+        bool precise = roundMethod == Precise;
+        for (int i = 0; i < MAX_GOP_LEN && !gotFrame && video; ++i)
+        {
+            gotFrame = decoder.decode(video, &outFrame) && (!precise || video->timestamp >= time);
+            if (gotFrame)
+                break;
+            video = getNextArchiveVideoPacket(serverDelegate, AV_NOPTS_VALUE);
+        }
+    }
+    outFrame->channel = video->channelNumber;
+    return outFrame;
+}
+
+QSize QnImageRestHandler::updateDstSize(const QSharedPointer<QnVirtualCameraResource>& res, const QSize& srcSize, QSharedPointer<CLVideoDecoderOutput> outFrame)
+{
+    QSize dstSize(srcSize);
+    double sar = outFrame->sample_aspect_ratio;
+    double ar = sar * outFrame->width / outFrame->height;
+    if (!dstSize.isEmpty()) {
+        dstSize.setHeight(qPower2Ceil((unsigned) dstSize.height(), 4));
+        dstSize.setWidth(qPower2Ceil((unsigned) dstSize.width(), 4));
+    }
+    else if (dstSize.height() > 0) {
+        dstSize.setHeight(qPower2Ceil((unsigned) dstSize.height(), 4));
+        dstSize.setWidth(qPower2Ceil((unsigned) (dstSize.height()*ar), 4));
+    }
+    else if (dstSize.width() > 0) {
+        dstSize.setWidth(qPower2Ceil((unsigned) dstSize.width(), 4));
+        dstSize.setHeight(qPower2Ceil((unsigned) (dstSize.width()/ar), 4));
+    }
+    else {
+        dstSize = QSize(outFrame->width * sar, outFrame->height);
+    }
+    dstSize.setWidth(qMin(dstSize.width(), outFrame->width * sar));
+    dstSize.setHeight(qMin(dstSize.height(), outFrame->height));
+
+    qreal customAR = res->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
+    if (customAR != 0.0)
+        dstSize.setWidth(dstSize.height() * customAR);
+
+    return QnCodecTranscoder::roundSize(dstSize);
 }
 
 int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
@@ -186,114 +301,58 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
     if (!useHQ)
         serverDelegate.setQuality(MEDIA_Quality_Low, true);
 
-    QnConstCompressedVideoDataPtr video;
-    QSharedPointer<CLVideoDecoderOutput> outFrame( new CLVideoDecoderOutput() );
-    QnVideoCamera* camera = qnCameraPool->getVideoCamera(res);
+    QnConstResourceVideoLayoutPtr layout = res->getVideoLayout();
+    QList<QnAbstractImageFilterPtr> filterChain;
 
-    if (time == DATETIME_NOW) 
+    CLVideoDecoderOutputPtr outFrame;
+    int channelMask = (1 << layout->channelCount()) -1;
+    bool gotNullFrame = false;
+    for (int i = 0; i < layout->channelCount(); ++i) 
     {
-        // get live data
-        if (camera)
-            video = camera->getLastVideoFrame(useHQ);
+        CLVideoDecoderOutputPtr frame = readFrame(time, useHQ, roundMethod, res, serverDelegate, i);
+        if (!frame) {
+            gotNullFrame = true;
+            if (i == 0)
+                return noVideoError(result, time);
+            else
+                continue;
+        }
+        channelMask &= ~(1 << frame->channel);
+        if (i == 0) {
+            dstSize = updateDstSize(res, dstSize, frame);
+            if (dstSize.width() <= 16 || dstSize.height() <= 8)
+            {
+                // something wrong
+                result.append("<root>\n");
+                result.append("Internal server error");
+                result.append("</root>\n");
+                return CODE_INTERNAL_ERROR;
+            }
+            filterChain << QnAbstractImageFilterPtr(new QnScaleImageFilter(dstSize));
+            filterChain << QnAbstractImageFilterPtr(new QnTiledImageFilter(layout));
+            filterChain << QnAbstractImageFilterPtr(new QnRotateImageFilter(rotate));
+        }
+        for(auto filter: filterChain)
+            frame = filter->updateImage(frame);
+        if (frame)
+            outFrame = frame;
     }
-    else if (time == LATEST_IMAGE)
+    // read more archive frames to get all channels for pano cameras
+    if (channelMask && !gotNullFrame)
     {
-        // get latest data
-        if (camera) {
-            video = camera->getLastVideoFrame(useHQ);
-            if (!video)
-                video = camera->getLastVideoFrame(!useHQ);
-        }
-        if (!video) {
-            video = camera->getLastVideoFrame(!useHQ);
-
-            serverDelegate.open(res);
-            serverDelegate.seek(serverDelegate.endTime()-1000*100, true);
-            video = getNextArchiveVideoPacket(serverDelegate, AV_NOPTS_VALUE);
-        }
-        else {
-            time = DATETIME_NOW;
+        for (int i = 0; i < 10; ++i) {
+            CLVideoDecoderOutputPtr frame = readFrame(time, useHQ, roundMethod, res, serverDelegate, 0);
+            if (frame) {
+                channelMask &= ~(1 << frame->channel);
+                for(auto filter: filterChain)
+                    frame = filter->updateImage(frame);
+                outFrame = frame;
+            }
         }
     }
-    else {
-        // get archive data
-        serverDelegate.open(res);
-        serverDelegate.seek(time, true);
-        video = getNextArchiveVideoPacket(serverDelegate, roundMethod == IFrameAfterTime ? time : AV_NOPTS_VALUE);
-
-        if (!video) {
-            video = camera->getFrameByTime(useHQ, time, roundMethod == IFrameAfterTime); // try approx frame from GOP keeper
-            time = DATETIME_NOW;
-        }
-        if (!video)
-            video = camera->getFrameByTime(!useHQ, time, roundMethod == IFrameAfterTime); // try approx frame from GOP keeper
-    }
-    if (!video) 
-        return noVideoError(result, time);
-
-    CLFFmpegVideoDecoder decoder(video->compressionType, video, false);
-    bool gotFrame = false;
-
-    if (time == DATETIME_NOW) {
-        if (res->getStatus() == Qn::Online || res->getStatus() == Qn::Recording)
-        {
-            gotFrame = decoder.decode(video, &outFrame);
-            if (!gotFrame)
-                gotFrame = decoder.decode(video, &outFrame); // decode twice
-        }
-    }
-    else {
-        bool precise = roundMethod == Precise;
-        for (int i = 0; i < MAX_GOP_LEN && !gotFrame && video; ++i)
-        {
-            gotFrame = decoder.decode(video, &outFrame) && (!precise || video->timestamp >= time);
-            if (gotFrame)
-                break;
-            video = getNextArchiveVideoPacket(serverDelegate, AV_NOPTS_VALUE);
-        }
-    }
-    if (!gotFrame)
-        return noVideoError(result, time);
-
-    double sar = decoder.getSampleAspectRatio();
-    double ar = sar * outFrame->width / outFrame->height;
-    if (!dstSize.isEmpty()) {
-        dstSize.setHeight(qPower2Ceil((unsigned) dstSize.height(), 4));
-        dstSize.setWidth(qPower2Ceil((unsigned) dstSize.width(), 4));
-    }
-    else if (dstSize.height() > 0) {
-        dstSize.setHeight(qPower2Ceil((unsigned) dstSize.height(), 4));
-        dstSize.setWidth(qPower2Ceil((unsigned) (dstSize.height()*ar), 4));
-    }
-    else if (dstSize.width() > 0) {
-        dstSize.setWidth(qPower2Ceil((unsigned) dstSize.width(), 4));
-        dstSize.setHeight(qPower2Ceil((unsigned) (dstSize.width()/ar), 4));
-    }
-    else {
-        dstSize = QSize(outFrame->width * sar, outFrame->height);
-    }
-    dstSize.setWidth(qMin(dstSize.width(), outFrame->width * sar));
-    dstSize.setHeight(qMin(dstSize.height(), outFrame->height));
-
-    if (dstSize.width() < 8 || dstSize.height() < 8)
-    {
-        // something wrong
-        result.append("<root>\n");
-        result.append("Internal server error");
-        result.append("</root>\n");
-        return CODE_INTERNAL_ERROR;
-    }
-
-    int roundedWidth = qPower2Ceil((unsigned) dstSize.width(), 8);
-    int roundedHeight = qPower2Ceil((unsigned) dstSize.height(), 2);
 
     if (format == "jpg" || format == "jpeg")
     {
-        // prepare image using ffmpeg encoder
-        outFrame = CLVideoDecoderOutputPtr(outFrame->scaled(dstSize));
-        if (rotate != 0)
-            outFrame = CLVideoDecoderOutputPtr(outFrame->rotated(rotate));
-
         AVCodecContext* videoEncoderCodecCtx = avcodec_alloc_context3(0);
         videoEncoderCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
         videoEncoderCodecCtx->codec_id = (format == "jpg" || format == "jpeg") ? CODEC_ID_MJPEG : CODEC_ID_PNG;
@@ -323,40 +382,9 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
     else
     {
         // prepare image using QT
-
-        PixelFormat ffmpegColorFormat = PIX_FMT_BGRA;
-        QImage::Format qtColorFormat = QImage::Format_ARGB32_Premultiplied;
-        if (colorSpace == "gray8") {
-            ffmpegColorFormat = PIX_FMT_GRAY8;
-            qtColorFormat = QImage::Format_Indexed8;
-        }
-
-
-        int numBytes = avpicture_get_size(ffmpegColorFormat, roundedWidth, roundedHeight);
-        uchar* scaleBuffer = static_cast<uchar*>(qMallocAligned(numBytes, 32));
-        SwsContext* scaleContext = sws_getContext(outFrame->width, outFrame->height, PixelFormat(outFrame->format), 
-                                   dstSize.width(), dstSize.height(), ffmpegColorFormat, SWS_BICUBIC, NULL, NULL, NULL);
-
-        AVPicture dstPict;
-        avpicture_fill(&dstPict, scaleBuffer, (PixelFormat) ffmpegColorFormat, roundedWidth, roundedHeight);
-    
-        QImage image(scaleBuffer, dstSize.width(), dstSize.height(), dstPict.linesize[0], qtColorFormat);
-        sws_scale(scaleContext, outFrame->data, outFrame->linesize, 0, outFrame->height, dstPict.data, dstPict.linesize);
-
+        QImage image = outFrame->toImage();
         QBuffer output(&result);
-        
-        if (rotate != 0) {
-            QTransform transform;
-            transform.rotate(rotate);
-            QImage rotatedImage =  image.transformed(transform);
-            rotatedImage.save(&output, format);
-        }
-        else {
-            image.save(&output, format);
-        }
-
-        sws_freeContext(scaleContext);
-        qFreeAligned(scaleBuffer);
+        image.save(&output, format);
     }
 
     if (result.isEmpty())

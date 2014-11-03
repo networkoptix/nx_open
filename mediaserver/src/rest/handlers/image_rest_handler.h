@@ -4,6 +4,10 @@
 #include <QtCore/QByteArray>
 #include "rest/server/request_handler.h"
 
+class CLVideoDecoderOutput;
+class QnVirtualCameraResource;
+class QnServerArchiveDelegate;
+
 class QnImageRestHandler: public QnRestRequestHandler
 {
     Q_OBJECT
@@ -16,7 +20,8 @@ public:
 
 private:
     int noVideoError(QByteArray& result, qint64 time);
-
+    QSharedPointer<CLVideoDecoderOutput> readFrame(qint64 time, bool useHQ, RoundMethod roundMethod, const QSharedPointer<QnVirtualCameraResource>& res, QnServerArchiveDelegate& serverDelegate, int prefferedChannel);
+    QSize updateDstSize(const QSharedPointer<QnVirtualCameraResource>& res, const QSize& dstSize, QSharedPointer<CLVideoDecoderOutput> outFrame);
 private:
     bool m_detectAvailableOnly;
 };

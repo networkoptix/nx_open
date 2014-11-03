@@ -10,7 +10,10 @@ QnRotateImageFilter::QnRotateImageFilter(int angle): m_angle(angle)
 
 CLVideoDecoderOutputPtr QnRotateImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame)
 {
-    return CLVideoDecoderOutputPtr(frame->rotated(m_angle));
+    if (m_angle == 0)
+        return frame;
+    else
+        return CLVideoDecoderOutputPtr(frame->rotated(m_angle));
 }
 
 QSize QnRotateImageFilter::updatedResolution(const QSize& srcSize)

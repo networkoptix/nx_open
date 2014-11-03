@@ -160,9 +160,9 @@ QImage QnMServerBusinessRuleProcessor::getEventScreenshot(const QnBusinessEventP
     if (!camera)
         return result;
 
-    QnConstCompressedVideoDataPtr video = camera->getLastVideoFrame(true);
+    QnConstCompressedVideoDataPtr video = camera->getLastVideoFrame(true, 0); // todo: add pano, rotation e.t.c support here
     if (!video)
-        video = camera->getLastVideoFrame(false);
+        video = camera->getLastVideoFrame(false, 0);
 
     if (!video)
         return result;

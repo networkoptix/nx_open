@@ -587,7 +587,7 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(QnAbstractM
             camera = qnCameraPool->getVideoCamera(getResource()->toResourcePtr());
         if (camera) {
             if (dataType == QnAbstractMediaData::VIDEO)
-                rez =  camera->getLastVideoFrame(isHQ);
+                rez =  camera->getLastVideoFrame(isHQ, 0);
             else
                 rez = camera->getLastAudioFrame(isHQ);
             if (rez)
