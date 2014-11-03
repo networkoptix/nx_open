@@ -156,6 +156,8 @@ QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnScre
     imageProcessingParams.setCustomAR(parameters.customAspectRatio);
 
     QImage screenshot = display->camDisplay()->getScreenshot(imageProcessingParams, anyQuality);
+    if (screenshot.isNull())
+        return NULL;
 
     // avoiding post-processing duplication
     parameters.imageCorrectionParams.enabled = false;
