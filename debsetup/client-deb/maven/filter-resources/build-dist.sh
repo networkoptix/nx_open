@@ -59,7 +59,7 @@ mkdir -p $ICONSTAGE
 mkdir -p "$STAGE/etc/xdg/$FULL_COMPANY_NAME"
 mv -f debian/client.conf $STAGE/etc/xdg/"$FULL_COMPANY_NAME"/"$FULL_PRODUCT_NAME"
 mv -f debian/applauncher.conf $STAGE/etc/xdg/"$FULL_COMPANY_NAME"/"$FULL_APPLAUNCHER_NAME"
-mv -f usr/share/applications/icon.desktop usr/share/applications/${namespace.additional}.desktop
+mv -f usr/share/applications/icon.desktop usr/share/applications/${installer.name}.desktop
 
 # Copy client binary, old version libs
 cp -r $CLIENT_BIN_PATH/client $BINSTAGE/client-bin
