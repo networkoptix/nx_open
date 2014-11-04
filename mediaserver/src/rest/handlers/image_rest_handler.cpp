@@ -94,7 +94,7 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
                 roundMethod = QnGetImageHelper::IFrameBeforeTime;
             else if (val == lit("precise") || val == lit("exact")) {
 #               ifdef EDGE_SERVER
-                    roundMethod = IFrameBeforeTime;
+                    roundMethod = QnGetImageHelper::IFrameBeforeTime;
                     qWarning() << "Get image performance hint: Ignore precise round method to reduce CPU usage";
 #               else
                     roundMethod = QnGetImageHelper::Precise;
