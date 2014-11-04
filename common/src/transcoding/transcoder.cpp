@@ -56,7 +56,7 @@ void QnCodecTranscoder::setQuality( Qn::StreamQuality quality )
 
 QRect QnCodecTranscoder::roundRect(const QRect& srcRect)
 {
-    int left = qPower2Floor((unsigned) srcRect.left(), 16);
+    int left = qPower2Floor((unsigned) srcRect.left(), CL_MEDIA_ALIGNMENT);
     int top = qPower2Floor((unsigned) srcRect.top(), 2);
 
     int width = qPower2Ceil((unsigned) srcRect.width(), 16);
