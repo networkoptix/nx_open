@@ -246,21 +246,24 @@ QImage QnCamDisplay::getScreenshot(const QnImageFilterHelper& imageProcessingPar
 {
     QList<QnAbstractImageFilterPtr> filters;
     CLVideoDecoderOutputPtr frame;
+    bool filtersReady = false;
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
     {
         if (m_display[i]) 
         {
             frame = m_display[i]->getScreenshot(anyQuality);
-            if (i == 0) {
-                if (!frame)
-                    return QImage();
-                filters = imageProcessingParams.createFilterChain(QSize(frame->width, frame->height));
+            if (frame)
+            {
+                if (!filtersReady) {
+                    filtersReady = true;
+                    filters = imageProcessingParams.createFilterChain(QSize(frame->width, frame->height));
+                }
+                for(auto filter: filters)
+                    frame = filter->updateImage(frame);
             }
-            for(auto filter: filters)
-                frame = filter->updateImage(frame);
         }
     }
-    return frame->toImage();
+    return frame ? frame->toImage() : QImage();
 }
 
 QImage QnCamDisplay::getGrayscaleScreenshot(int channel)
