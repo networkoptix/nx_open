@@ -7,6 +7,7 @@
 #include "core/resource/camera_resource.h"
 #include "camera/camera_pool.h"
 #include "plugins/resource/server_archive/server_archive_delegate.h"
+#include "decoders/video/ffmpeg.h"
 
 static const int MAX_GOP_LEN = 100;
 
