@@ -590,7 +590,10 @@ static char *sdp_write_media_attributes(char *buff, int size, AVCodecContext *c,
 }
 
 
-QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnConstAbstractMediaDataPtr media, CodecID transcodeToCodec, const QSize& videoSize, QnConstResourceVideoLayoutPtr vLayout)
+QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnConstAbstractMediaDataPtr media, 
+                                             CodecID transcodeToCodec, 
+                                             const QSize& videoSize, 
+                                             const QnImageFilterHelper& extraTranscodeParams)
 :
     m_outputBuffer(CL_MEDIA_ALIGNMENT, 0),
     m_outputPos(0),
@@ -610,7 +613,7 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnConstAbstractMediaDataPtr media, 
         method = media->compressionType == transcodeToCodec ? QnTranscoder::TM_DirectStreamCopy : QnTranscoder::TM_FfmpegTranscode;
 
     if (media->dataType == QnAbstractMediaData::VIDEO) {
-        m_transcoder.setVideoLayout(vLayout);
+        m_transcoder.setExtraTranscodeParams(extraTranscodeParams);
         m_transcoder.setVideoCodec(m_codec, method, Qn::QualityNormal, videoSize);
     }
     else {

@@ -12,8 +12,8 @@ class QnContrastImageFilter: public QnAbstractImageFilter
 {
 public:
     QnContrastImageFilter(const ImageCorrectionParams& params);
-    virtual void updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect, qreal ar) override;
-
+    CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) override;
+    virtual QSize updatedResolution(const QSize& srcSize) override { return srcSize; }
 private:
     bool isFormatSupported(CLVideoDecoderOutput* frame) const;
 

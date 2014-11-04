@@ -84,6 +84,11 @@ qint64 QnServerArchiveDelegate::endTime()
     return rez;
 }
 
+bool QnServerArchiveDelegate::isOpened() const
+{
+    return m_opened;
+}
+
 bool QnServerArchiveDelegate::open(const QnResourcePtr &resource)
 {
     QMutexLocker lk( &m_mutex );
