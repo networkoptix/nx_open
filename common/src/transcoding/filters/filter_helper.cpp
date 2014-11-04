@@ -10,16 +10,6 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-static QRectF cwiseMul(const QRectF &l, const QSizeF &r) 
-{
-    return QRectF(
-        l.left()   * r.width(),
-        l.top()    * r.height(),
-        l.width()  * r.width(),
-        l.height() * r.height()
-        );
-}
-
 QnImageFilterHelper::QnImageFilterHelper():
     m_customAR(0.0),
     m_rotAngle(0),
@@ -109,8 +99,7 @@ QList<QnAbstractImageFilterPtr> QnImageFilterHelper::createFilterChain(const QSi
         result << QnAbstractImageFilterPtr(new QnTiledImageFilter(m_layout));
 
     if (!m_cropRect.isEmpty() && !m_itemDewarpingParams.enabled) {
-        QRect rect(cwiseMul(m_cropRect, updatedResolution(result, srcResolution)).toRect());
-        result << QnAbstractImageFilterPtr(new QnCropImageFilter(QnCodecTranscoder::roundRect(rect)));
+        result << QnAbstractImageFilterPtr(new QnCropImageFilter(m_cropRect));
     }
     if (m_itemDewarpingParams.enabled)
         result << QnAbstractImageFilterPtr(new QnFisheyeImageFilter(m_mediaDewarpingParams, m_itemDewarpingParams));

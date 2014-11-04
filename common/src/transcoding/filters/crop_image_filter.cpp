@@ -1,5 +1,7 @@
 #include "crop_image_filter.h"
 #include "utils/media/frame_info.h"
+#include "../transcoder.h"
+
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -13,19 +15,40 @@ extern "C" {
 #endif
 };
 
+static QRectF cwiseMul(const QRectF &l, const QSizeF &r) 
+{
+    return QRectF(
+        l.left()   * r.width(),
+        l.top()    * r.height(),
+        l.width()  * r.width(),
+        l.height() * r.height()
+        );
+}
 
-QnCropImageFilter::QnCropImageFilter(const QRect& rect): m_rect(rect)
+QnCropImageFilter::QnCropImageFilter(const QRectF& rect): m_rectF(rect)
 {
     
 }
 
+QnCropImageFilter::QnCropImageFilter(const QRect& rect): m_rect(rect)
+{
+
+}
+
 CLVideoDecoderOutputPtr QnCropImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame)
 {
-    if (m_rect.isEmpty())
+    if (m_rect.isEmpty() && m_rectF.isEmpty())
         return frame;
     m_tmpRef = frame; // keep object undeleted
     CLVideoDecoderOutputPtr result(new CLVideoDecoderOutput());
     result->setUseExternalData(true);
+
+    if (!m_rectF.isNull() && (m_rect.isNull() || frame->size() != m_size)) 
+    {
+        m_size = frame->size();
+        QRect rect(cwiseMul(m_rectF, frame->size()).toRect());
+        m_rect = QnCodecTranscoder::roundRect(rect);
+    }
 
     const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[frame->format];
     for (int i = 0; i < descr->nb_components && frame->data[i]; ++i)
@@ -49,10 +72,11 @@ CLVideoDecoderOutputPtr QnCropImageFilter::updateImage(const CLVideoDecoderOutpu
 
 QSize QnCropImageFilter::updatedResolution(const QSize& srcSize)
 {
-    if (m_rect.isEmpty())
+    if (m_rectF.isEmpty())
         return srcSize;
-    else
-        return m_rect.size();
+
+    QRect rect(cwiseMul(m_rectF, srcSize).toRect());
+    return QnCodecTranscoder::roundRect(rect).size();
 }
 
 #endif // ENABLE_DATA_PROVIDERS
