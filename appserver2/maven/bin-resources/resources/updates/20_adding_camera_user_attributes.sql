@@ -93,6 +93,13 @@ INSERT INTO vms_camera_user_attributes
   FROM vms_camera_tmp c
   JOIN vms_resource r on r.id = c.resource_ptr_id;
 
+INSERT INTO vms_kvpair (resource_guid, name, value)
+     SELECT r.guid, "credentials", c.login || ":" || c.password
+      FROM vms_camera_tmp c
+      JOIN vms_resource r on r.id = c.resource_ptr_id
+     WHERE length(c.login) > 0;
+
+
 DROP TABLE vms_camera_tmp;
 
 ALTER TABLE "vms_server" RENAME TO "vms_server_tmp";
