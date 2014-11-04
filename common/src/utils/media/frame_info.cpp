@@ -322,11 +322,11 @@ CLVideoDecoderOutput::CLVideoDecoderOutput(QImage image)
     reallocate(image.width(), image.height(), PIX_FMT_YUV420P);
     CLVideoDecoderOutput src;
 
-    src.reallocate(width, height, PIX_FMT_RGBA);
+    src.reallocate(width, height, PIX_FMT_BGRA);
     for (int y = 0; y < height; ++y)
         memcpy(src.data[0] + src.linesize[0]*y, image.scanLine(y), width * 4);
 
-    SwsContext* scaleContext = sws_getContext(width, height, PIX_FMT_RGBA, 
+    SwsContext* scaleContext = sws_getContext(width, height, PIX_FMT_BGRA, 
                                               width, height, PIX_FMT_YUV420P, 
                                               SWS_BICUBIC, NULL, NULL, NULL);
     sws_scale(scaleContext, src.data, src.linesize, 0, height, data, linesize);
