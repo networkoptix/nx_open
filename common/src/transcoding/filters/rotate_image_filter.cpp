@@ -5,7 +5,11 @@
 
 QnRotateImageFilter::QnRotateImageFilter(int angle): m_angle(angle)
 {
-    
+    // normalize value
+    m_angle = m_angle % 360;
+    if (m_angle < 0)    
+        m_angle += 360;
+    m_angle = int(m_angle/90.0 + 0.5)*90;
 }
 
 CLVideoDecoderOutputPtr QnRotateImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame)

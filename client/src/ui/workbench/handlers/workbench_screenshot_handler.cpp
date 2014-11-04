@@ -193,6 +193,9 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     parameters.zoomRect = parameters.itemDewarpingParams.enabled ? QRectF() : widget->zoomRect();
     parameters.customAspectRatio = display->camDisplay()->overridenAspectRatio();
     parameters.rotationAngle = widget->rotation();
+    // Revert UI has 'hack'. VerticalDown fisheye option is emulated by additional rotation. But filter has built-in support for that option.
+    if (parameters.itemDewarpingParams.enabled && parameters.mediaDewarpingParams.viewMode == QnMediaDewarpingParams::VerticalDown)
+        parameters.rotationAngle -= 180;
 
 		// ----------------------------------------------------- 
 		// This localOffset is used to fix the issue : Bug #2988 

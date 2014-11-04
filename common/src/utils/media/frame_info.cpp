@@ -336,10 +336,10 @@ CLVideoDecoderOutput::CLVideoDecoderOutput(QImage image)
 QImage CLVideoDecoderOutput::toImage() const
 {
     CLVideoDecoderOutput dst;
-    dst.reallocate(width, height, PIX_FMT_RGBA);
+    dst.reallocate(width, height, PIX_FMT_BGRA);
 
     SwsContext* scaleContext = sws_getContext(width, height, (PixelFormat) format, 
-                                              width, height, PIX_FMT_RGBA, 
+                                              width, height, PIX_FMT_BGRA,
                                               SWS_BICUBIC, NULL, NULL, NULL);
     sws_scale(scaleContext, data, linesize, 0, height, dst.data, dst.linesize);
     sws_freeContext(scaleContext);
