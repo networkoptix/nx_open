@@ -5,16 +5,8 @@
 
 #include "core/datapacket/video_data_packet.h"
 #include "decoders/video/ffmpeg.h"
-
-extern "C" {
-#ifdef WIN32
-#define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
-#endif
-#include <libavutil/pixdesc.h>
-#ifdef WIN32
-#undef AVPixFmtDescriptor
-#endif
-};
+#include "filters/abstract_image_filter.h"
+#include "filters/crop_image_filter.h"
 
 const static int MAX_VIDEO_FRAME = 1024 * 1024 * 3;
 
@@ -27,14 +19,12 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) 
     {
-        scaleContext[i] = 0;
         m_lastSrcWidth[i] = -1;
         m_lastSrcHeight[i] = -1;
     }
-
+    m_videoDecoders.resize(CL_MAX_CHANNELS);
     m_videoEncodingBuffer = (quint8*) qMallocAligned(MAX_VIDEO_FRAME, 32);
     m_decodedVideoFrame->setUseExternalData(true);
-    m_decodedFrameRect.setUseExternalData(true);
 }
 
 QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
@@ -45,75 +35,16 @@ QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
 
 void QnFfmpegVideoTranscoder::close()
 {
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
-        if (scaleContext[i])
-            sws_freeContext(scaleContext[i]);
-    }
-
     if (m_encoderCtx) {
         avcodec_close(m_encoderCtx);
         av_free(m_encoderCtx);
         m_encoderCtx = 0;
     }
 
-    for (int i = 0; i < m_videoDecoders.size(); ++i)
+    for (int i = 0; i < m_videoDecoders.size(); ++i) {
         delete m_videoDecoders[i];
-    m_videoDecoders.clear();
-}
-
-int QnFfmpegVideoTranscoder::rescaleFrame(CLVideoDecoderOutput* decodedFrame, const QRectF& dstRectF, int ch)
-{
-    if (m_scaledVideoFrame.width == 0) {
-        m_scaledVideoFrame.reallocate(m_resolution.width(), m_resolution.height(), PIX_FMT_YUV420P);
-        m_scaledVideoFrame.memZerro();
+        m_videoDecoders[i] = 0;
     }
-
-    QRect dstRect(0,0, m_resolution.width(), m_resolution.height());
-    quint8* dstData[4];
-    for (int i = 0; i < 4; ++i)
-        dstData[i] = m_scaledVideoFrame.data[i];
-
-    if (m_layout)
-    {
-        dstRect = QRect(dstRectF.left() * m_resolution.width() + 0.5, dstRectF.top() * m_resolution.height() + 0.5,
-                        dstRectF.width() * m_resolution.width() + 0.5, dstRectF.height() * m_resolution.height() + 0.5);
-        dstRect = roundRect(dstRect);
-
-        for (int i = 0; i < 3; ++i)
-        {
-            int w = dstRect.left();
-            if (i > 0)
-                w >>= 1;
-            dstData[i] += w + dstRect.top() * m_scaledVideoFrame.linesize[i];
-        }
-    }
-
-    if (decodedFrame->width != m_lastSrcWidth[ch] ||  decodedFrame->height != m_lastSrcHeight[ch])
-    {
-        // src resolution is changed
-        m_lastSrcWidth[ch] = decodedFrame->width;
-        m_lastSrcHeight[ch] = decodedFrame->height;
-        if (scaleContext[ch]) {
-            sws_freeContext(scaleContext[ch]);
-            scaleContext[ch] = 0;
-        }
-    }
-
-    if (scaleContext[ch] == 0)
-    {
-        scaleContext[ch] = sws_getContext(decodedFrame->width, decodedFrame->height, (PixelFormat) decodedFrame->format, 
-                                      dstRect.width(), dstRect.height(), (PixelFormat) PIX_FMT_YUV420P, SWS_BILINEAR, NULL, NULL, NULL);
-        if (!scaleContext) {
-            m_lastErrMessage = tr("Could not allocate scaler context for resolution %1x%2.").arg(m_resolution.width()).arg(m_resolution.height());
-            return -4;
-        }
-    }
-
-    sws_scale(scaleContext[ch],
-        decodedFrame->data, decodedFrame->linesize, 
-        0, decodedFrame->height, 
-        dstData, m_scaledVideoFrame.linesize);
-    return 0;
 }
 
 bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
@@ -121,10 +52,6 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
     close();
 
     QnVideoTranscoder::open(video);
-
-    int channels = m_layout ? m_layout->channelCount() : 1;
-    for (int i = 0; i < channels; ++i)
-        m_videoDecoders << new CLFFmpegVideoDecoder(video->compressionType, video, m_mtMode);
 
     AVCodec* avCodec = avcodec_find_encoder(m_codecId);
     if (avCodec == 0)
@@ -180,6 +107,7 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
         return false;
     }
 
+
     return true;
 }
 
@@ -195,78 +123,23 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
 
 
     QnConstCompressedVideoDataPtr video = qSharedPointerDynamicCast<const QnCompressedVideoData>(media);
-    CLFFmpegVideoDecoder* decoder = m_videoDecoders[m_layout ? video->channelNumber : 0];
-    QRectF dstRectF(0,0, 1,1);
+    CLFFmpegVideoDecoder* decoder = m_videoDecoders[video->channelNumber];
+    if (!decoder)
+        decoder = m_videoDecoders[video->channelNumber] = new CLFFmpegVideoDecoder(video->compressionType, video, m_mtMode);
 
     if (decoder->decode(video, &m_decodedVideoFrame)) 
     {
+        m_decodedVideoFrame->channel = video->channelNumber;
+        CLVideoDecoderOutputPtr decodedFrame = m_decodedVideoFrame;
 
-        QRect frameRect;
-        if (m_layout)
-        {
-            QPoint pos = m_layout->position(video->channelNumber);
-            QSize lSize = m_layout->size();
-            if (!m_srcRectF.isEmpty())
-            {
-                QRectF srcRectF(m_srcRectF.left() * lSize.width(), m_srcRectF.top() * lSize.height(),
-                                m_srcRectF.width() * lSize.width(), m_srcRectF.height() * lSize.height());
-                QRectF channelRect(pos.x(), pos.y(), 1, 1);
-
-                if (!channelRect.intersects(srcRectF))
-                    return 0; // channel outside bounding rect
-
-                QRectF frameRectF = srcRectF.intersected(channelRect);
-
-                qreal dstWidth = frameRectF.width() / srcRectF.width();
-                qreal dstHeight = frameRectF.height() / srcRectF.height();
-                qreal dstLeft = (frameRectF.left() - srcRectF.left())/srcRectF.width();
-                qreal dstTop = (frameRectF.top() - srcRectF.top())/srcRectF.height();
-                dstRectF = QRectF(dstLeft, dstTop, dstWidth, dstHeight);
-
-                frameRectF.translate(-channelRect.left(), -channelRect.top());
-                dstRectF.setRight(qMin<double>(channelRect.right(), 1.0)); // avoid epsilon factor
-                dstRectF.setBottom(qMin<double>(channelRect.bottom(), 1.0));
-                frameRect = QRect(frameRectF.left() * decoder->getWidth() + 0.5, frameRectF.top() * decoder->getHeight() + 0.5, 
-                    frameRectF.width() * decoder->getWidth() + 0.5, frameRectF.height() * decoder->getHeight() + 0.5);
-                frameRect = roundRect(frameRect);
-            }
-            else {
-                dstRectF = QRectF(pos.x() / (qreal) lSize.width(), pos.y() / (qreal) lSize.height(),
-                            1.0 / lSize.width(), 1.0 / lSize.height());
-            }
-        }
-        CLVideoDecoderOutput* decodedFrame = m_decodedVideoFrame.data();
-
-        if (!frameRect.isEmpty()) 
-        {
-            const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[decodedFrame->format];
-            for (int i = 0; i < descr->nb_components && decodedFrame->data[i]; ++i)
-            {
-                int w = frameRect.left();
-                int h = frameRect.top();
-                if (i > 0) {
-                    w >>= descr->log2_chroma_w;
-                    h >>= descr->log2_chroma_h;
-                }
-                m_decodedFrameRect.data[i] = decodedFrame->data[i] + w + h * decodedFrame->linesize[i];
-                m_decodedFrameRect.linesize[i] = decodedFrame->linesize[i];
-            }
-            m_decodedFrameRect.format = decodedFrame->format;
-            m_decodedFrameRect.width = frameRect.width();
-            m_decodedFrameRect.height = frameRect.height();
-            decodedFrame = &m_decodedFrameRect;
-        }
-
-        if (decodedFrame->width != m_resolution.width() || decodedFrame->height != m_resolution.height() || decodedFrame->format != PIX_FMT_YUV420P) {
-            rescaleFrame(decodedFrame, dstRectF, video->channelNumber);
-            decodedFrame = &m_scaledVideoFrame;
-        }
         decodedFrame->pts = m_decodedVideoFrame->pkt_dts;
-        qreal ar = decoder->getWidth() * (qreal) decoder->getSampleAspectRatio() / (qreal) decoder->getHeight();
-        processFilterChain(decodedFrame, dstRectF, ar);
+        decodedFrame = processFilterChain(decodedFrame);
+
+        if (decodedFrame->width != m_resolution.width() || decodedFrame->height != m_resolution.height() || decodedFrame->format != PIX_FMT_YUV420P) 
+            decodedFrame = CLVideoDecoderOutputPtr(decodedFrame->scaled(m_resolution, PIX_FMT_YUV420P));
 
         static AVRational r = {1, 1000000};
-        decodedFrame->pts  = av_rescale_q(m_decodedVideoFrame->pkt_dts, r, m_encoderCtx->time_base);
+        decodedFrame->pts  = av_rescale_q(decodedFrame->pts, r, m_encoderCtx->time_base);
         if ((quint64)m_firstEncodedPts == AV_NOPTS_VALUE)
             m_firstEncodedPts = decodedFrame->pts;
 
@@ -274,7 +147,7 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
             return 0;
 
         //TODO: #vasilenko avoid using deprecated methods
-        int encoded = avcodec_encode_video(m_encoderCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, decodedFrame);
+        int encoded = avcodec_encode_video(m_encoderCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, decodedFrame.data());
 
         if (encoded < 0)
         {
@@ -305,9 +178,9 @@ void QnFfmpegVideoTranscoder::setMTMode(bool value)
     m_mtMode = value;
 }
 
-void QnFfmpegVideoTranscoder::addFilter(QnAbstractImageFilter* filter)
+void QnFfmpegVideoTranscoder::setFilterList(QList<QnAbstractImageFilterPtr> filters)
 {
-    QnVideoTranscoder::addFilter(filter);
+    QnVideoTranscoder::setFilterList(filters);
     m_decodedVideoFrame->setUseExternalData(false); // do not modify ffmpeg frame buffer
 }
 

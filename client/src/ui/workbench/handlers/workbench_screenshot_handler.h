@@ -17,7 +17,10 @@ class QPainter;
 class QnResourceDisplay;
 class QnProgressDialog;
 
-struct QnScreenshotParameters {
+struct QnScreenshotParameters 
+{
+    QnScreenshotParameters(): time(0), isUtc(false), customAspectRatio(0.0), rotationAngle(0.0) {}
+
     qint64 time;    //in microseconds since epoch
     bool isUtc;
     QString filename;
@@ -27,6 +30,7 @@ struct QnScreenshotParameters {
     ImageCorrectionParams imageCorrectionParams;
     QRectF zoomRect;
     qreal customAspectRatio;
+    qreal rotationAngle;
 
     QString timeString() const;
 };

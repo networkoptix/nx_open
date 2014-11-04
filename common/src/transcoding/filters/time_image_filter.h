@@ -7,16 +7,18 @@
 
 #include "abstract_image_filter.h"
 
+class QnResourceVideoLayout;
+
 class QnTimeImageFilter: public QnAbstractImageFilter
 {
 public:
-    QnTimeImageFilter(Qn::Corner datePos, qint64 timeOffsetMs);
+    QnTimeImageFilter(const QSharedPointer<const QnResourceVideoLayout>& videoLayout, Qn::Corner datePos, qint64 timeOffsetMs);
     virtual ~QnTimeImageFilter();
-    virtual void updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect, qreal ar) override;
-
+    CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) override;
+    virtual QSize updatedResolution(const QSize& srcSize) override { return srcSize; }
 private:
-    void initTimeDrawing(CLVideoDecoderOutput* frame, const QString& timeStr);
-
+    void initTimeDrawing(const CLVideoDecoderOutputPtr& frame, const QString& timeStr);
+    qint64 calcHash(const quint8* data, int width, int height, int linesize);
 private:
     QFont m_timeFont;
     int m_dateTimeXOffs;
@@ -27,6 +29,8 @@ private:
     qint64 m_onscreenDateOffset;
     quint8* m_imageBuffer;
     Qn::Corner m_dateTextPos;
+    bool m_checkHash;
+    qint64 m_hash;
 };
 
 #endif // ENABLE_DATA_PROVIDER

@@ -10,6 +10,7 @@
 
 QnSingleThumbnailLoader *QnSingleThumbnailLoader::newInstance(QnResourcePtr resource,
                                                               qint64 microSecSinceEpoch,
+                                                              int rotation,
                                                               const QSize &size,
                                                               ThumbnailFormat format,
                                                               QObject *parent)
@@ -26,12 +27,13 @@ QnSingleThumbnailLoader *QnSingleThumbnailLoader::newInstance(QnResourcePtr reso
     if (!serverConnection)
         return NULL;
 
-    return new QnSingleThumbnailLoader(serverConnection, networkResource, microSecSinceEpoch, size, format, parent);
+    return new QnSingleThumbnailLoader(serverConnection, networkResource, microSecSinceEpoch, rotation, size, format, parent);
 }
 
 QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnMediaServerConnectionPtr &connection,
                                                  QnNetworkResourcePtr resource,
                                                  qint64 microSecSinceEpoch,
+                                                 int rotation,
                                                  const QSize &size,
                                                  ThumbnailFormat format,
                                                  QObject *parent):
@@ -39,6 +41,7 @@ QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnMediaServerConnectionPt
     m_resource(resource),
     m_connection(connection),
     m_microSecSinceEpoch(microSecSinceEpoch),
+    m_rotation(rotation),
     m_size(size),
     m_format(format)
 {
@@ -57,6 +60,7 @@ void QnSingleThumbnailLoader::doLoadAsync() {
     m_connection->getThumbnailAsync(
             m_resource.dynamicCast<QnNetworkResource>(),
             m_microSecSinceEpoch,
+            m_rotation,
             m_size,
             formatToString(m_format),
             QnMediaServerConnection::Precise,

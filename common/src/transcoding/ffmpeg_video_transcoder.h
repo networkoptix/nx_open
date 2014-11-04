@@ -29,21 +29,14 @@ public:
 
     /* Allow multithread transcoding */
     void setMTMode(bool value);
-    virtual void addFilter(QnAbstractImageFilter* filter) override;
-private:
-    int rescaleFrame(CLVideoDecoderOutput* decodedFrame, const QRectF& dstRectF, int ch);
+    virtual void setFilterList(QList<QnAbstractImageFilterPtr> filterList) override;
 private:
     QVector<CLFFmpegVideoDecoder*> m_videoDecoders;
-    QSharedPointer<CLVideoDecoderOutput> m_decodedVideoFrame;
-    CLVideoDecoderOutput m_scaledVideoFrame;
-    CLVideoDecoderOutput m_decodedFrameRect;
-
-    
+    CLVideoDecoderOutputPtr m_decodedVideoFrame;
 
     quint8* m_videoEncodingBuffer;
     AVCodecContext* m_encoderCtx;
 
-    SwsContext* scaleContext[CL_MAX_CHANNELS];
     int m_lastSrcWidth[CL_MAX_CHANNELS];
     int m_lastSrcHeight[CL_MAX_CHANNELS];
 

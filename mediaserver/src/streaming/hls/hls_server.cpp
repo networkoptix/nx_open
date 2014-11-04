@@ -285,7 +285,7 @@ namespace nx_hls
             return nx_http::StatusCode::forbidden;
         }
 
-        QnConstCompressedVideoDataPtr lastVideoFrame = camera->getLastVideoFrame( true );
+        QnConstCompressedVideoDataPtr lastVideoFrame = camera->getLastVideoFrame( true, 0 );
         if( lastVideoFrame && (lastVideoFrame->compressionType != CODEC_ID_H264) && (lastVideoFrame->compressionType != CODEC_ID_NONE) )
         {
             //video is not in h.264 format
@@ -908,7 +908,7 @@ namespace nx_hls
         if( bandwidth == -1 )
         {
             //estimating bitrate as we can
-            QnConstCompressedVideoDataPtr videoFrame = videoCamera->getLastVideoFrame( streamQuality == MEDIA_Quality_High );
+            QnConstCompressedVideoDataPtr videoFrame = videoCamera->getLastVideoFrame( streamQuality == MEDIA_Quality_High, 0);
             if( videoFrame )
                 bandwidth = videoFrame->dataSize() * CHAR_BIT / COMMON_KEY_FRAME_TO_NON_KEY_FRAME_RATIO * camResource->getMaxFps();
         }

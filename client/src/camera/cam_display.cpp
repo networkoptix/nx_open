@@ -242,13 +242,28 @@ void QnCamDisplay::removeVideoRenderer(QnAbstractRenderer* vw)
     }
 }
 
-QImage QnCamDisplay::getScreenshot(int channel,
-                                   const ImageCorrectionParams& params,
-                                   const QnMediaDewarpingParams &mediaDewarping,
-                                   const QnItemDewarpingParams &itemDewarping,
-                                   bool anyQuality)
+QImage QnCamDisplay::getScreenshot(const QnImageFilterHelper& imageProcessingParams, bool anyQuality)
 {
-    return m_display[channel]->getScreenshot(params, mediaDewarping, itemDewarping, anyQuality);
+    QList<QnAbstractImageFilterPtr> filters;
+    CLVideoDecoderOutputPtr frame;
+    bool filtersReady = false;
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+    {
+        if (m_display[i]) 
+        {
+            frame = m_display[i]->getScreenshot(anyQuality);
+            if (frame)
+            {
+                if (!filtersReady) {
+                    filtersReady = true;
+                    filters = imageProcessingParams.createFilterChain(QSize(frame->width, frame->height));
+                }
+                for(auto filter: filters)
+                    frame = filter->updateImage(frame);
+            }
+        }
+    }
+    return frame ? frame->toImage() : QImage();
 }
 
 QImage QnCamDisplay::getGrayscaleScreenshot(int channel)
