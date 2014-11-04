@@ -243,6 +243,9 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     QString selectedFilter;
     ImageCorrectionParams contrastParams = itemData.contrastParams;
     QnItemDewarpingParams dewarpingParams = itemData.dewarpingParams;
+    int rotation = itemData.rotation;
+    QRectF zoomRect = itemData.zoomRect;
+    qreal customAr = widget->resource()->toResource()->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
 
     QString namePart = replaceNonFileNameCharacters(widget->resource()->toResourcePtr()->getName(), L'_');
     QString timePart = (widget->resource()->toResource()->flags() & Qn::utc)
@@ -279,15 +282,10 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         dialog->addWidget(tr("Timestamps:"), comboBox, delegate);
 
 
-        bool doTranscode = contrastParams.enabled || dewarpingParams.enabled;
-        if (doTranscode) {
-            if (contrastParams.enabled && dewarpingParams.enabled) {
-                dialog->addCheckBox(tr("Apply dewarping and image correction (requires transcoding)"), &doTranscode, delegate);
-            } else if (contrastParams.enabled) {
-                dialog->addCheckBox(tr("Apply image correction (requires transcoding)"), &doTranscode, delegate);
-            } else {
-                dialog->addCheckBox(tr("Apply dewarping (requires transcoding)"), &doTranscode, delegate);
-            }
+        bool doTranscode = contrastParams.enabled || dewarpingParams.enabled || itemData.rotation || customAr || !zoomRect.isNull();
+        if (doTranscode) 
+        {
+            dialog->addCheckBox(tr("Transcode video to guarantee WYSIWYG"), &doTranscode, delegate);
         }
 
         if (!dialog->exec())
@@ -305,8 +303,13 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
 
         timestampPos = (Qn::Corner) comboBox->itemData(comboBox->currentIndex()).toInt();
 
-        contrastParams.enabled &= doTranscode;
-        dewarpingParams.enabled &= doTranscode;
+        if (!doTranscode) {
+            contrastParams.enabled = false;
+            dewarpingParams.enabled = false;
+            rotation = 0;
+            zoomRect = QRectF();
+            customAr = 0.0;
+        }
 
         if (dialog->selectedNameFilter().contains(aviFileFilter)) {
             QnCachingCameraDataLoader* loader = navigator()->loader(widget->resource()->toResourcePtr());
@@ -411,7 +414,6 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(resource, 0);
     }
     qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(resource, Qn::InvalidUtcOffset);
-    qreal customAr = widget->resource()->toResource()->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
     QnClientVideoCameraExportTool *tool = new QnClientVideoCameraExportTool(
                                               camera,
                                               period,
@@ -419,10 +421,10 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
                                               timestampPos,
                                               timeOffset,
                                               serverTimeZone,
-                                              itemData.zoomRect,
+                                              zoomRect,
                                               contrastParams,
                                               dewarpingParams,
-                                              itemData.rotation,
+                                              rotation,
                                               customAr,
                                               this);
 
