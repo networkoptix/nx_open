@@ -10,10 +10,6 @@
 
 #include <utils/common/model_functions.h>
 
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(QnEmail, ConnectionType);
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnEmailSmtpServerPreset)(QnEmailSettings), (json)(eq), _Fields, (optional, true))
-
 namespace {
     typedef QHash<QString, QnEmailSmtpServerPreset> QnSmtpPresets;
 
@@ -61,11 +57,6 @@ int QnEmailSettings::defaultPort(QnEmail::ConnectionType connectionType) {
     }
 }
 
-
-bool QnEmailSettings::isNull() const {
-    return server.isEmpty();
-}
-
 bool QnEmailSettings::isValid() const {
     return 
         !email.isEmpty() && 
@@ -104,12 +95,12 @@ bool QnEmailAddress::isValid(const QString &email) {
 }
 
 QString QnEmailAddress::user() const {
-    int idx = m_email.indexOf(QLatin1Char('@'));
+    int idx = m_email.indexOf(L'@');
     return m_email.left(idx).trimmed();
 }
 
 QString QnEmailAddress::domain() const {
-    int idx = m_email.indexOf(QLatin1Char('@'));
+    int idx = m_email.indexOf(L'@');
     return m_email.mid(idx + 1).trimmed();
 }
 
@@ -148,3 +139,7 @@ void QnEmailAddress::initSmtpPresets() const {
         qWarning() << "Smtp Presets file could not be parsed!";
     smtpInitialized = true;
 }
+
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(QnEmail, ConnectionType);
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnEmailSmtpServerPreset)(QnEmailSettings), (json)(eq), _Fields, (optional, true))
