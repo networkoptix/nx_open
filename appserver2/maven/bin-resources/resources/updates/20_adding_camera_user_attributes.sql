@@ -1,3 +1,5 @@
+-- Migration is processed in the application. Do not rename file.
+
 ALTER TABLE "vms_camera" RENAME TO "vms_camera_tmp";
 
 CREATE TABLE "vms_camera" (

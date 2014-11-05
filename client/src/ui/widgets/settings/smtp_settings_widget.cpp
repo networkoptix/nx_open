@@ -129,7 +129,7 @@ void QnSmtpSettingsWidget::updateFromSettings() {
     ui->simpleSignatureLineEdit->setText(settings.signature);
     ui->supportEmailLineEdit->setText(settings.supportEmail);
     ui->simpleSupportEmailLineEdit->setText(settings.supportEmail);
-    ui->advancedCheckBox->setChecked(!settings.simple);
+    ui->advancedCheckBox->setChecked(settings.isValid() && !settings.simple);
     ui->stackedWidget->setCurrentIndex(ui->advancedCheckBox->isChecked()
         ? AdvancedPage
         : SimplePage);
@@ -175,8 +175,6 @@ QnEmailSettings QnSmtpSettingsWidget::settings() const {
             : ui->sslRadioButton->isChecked()
               ? QnEmail::Ssl
               : QnEmail::Unsecure;
-    if (result.port == 0)
-        result.port = QnEmailSettings::defaultPort(result.connectionType);
     result.simple = false;
     result.signature = ui->signatureLineEdit->text();
     result.supportEmail = ui->supportEmailLineEdit->text();
@@ -283,21 +281,18 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
         return;
     }
 
-    QnMediaServerResourcePtr serverResource;
-    QnMediaServerResourceList servers = qnResPool->getAllServers();
-    if (!servers.isEmpty()) {
-        serverResource = servers.first();
-        foreach(QnMediaServerResourcePtr mserver, servers)
-        {
-            if (mserver->getServerFlags() & Qn::SF_HasPublicIP) {
-                serverResource = mserver;
-                break;
-            }
-        }
+    QnMediaServerConnectionPtr serverConnection;
+    for(const QnMediaServerResourcePtr server: qnResPool->getAllServers()) {
+        if (server->getStatus() != Qn::Online)
+            continue;
+
+        if (!(server->getServerFlags() & Qn::SF_HasPublicIP))
+            continue;
+        
+        serverConnection = server->apiConnection();
+        break;
     }
-    QnMediaServerConnectionPtr serverConnection = serverResource
-        ? serverResource->apiConnection()
-        : QnMediaServerConnectionPtr();
+
     if (!serverConnection) {
         QMessageBox::warning(this, tr("Network Error"), tr("Could not perform a test. None of your servers has a public IP."));
         return;
