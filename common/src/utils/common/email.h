@@ -38,7 +38,6 @@ struct QnEmailSettings {
     //TODO: #GDM #Common think where else we can store it
     bool simple;                        /**< Flag that we are using simple view. */
 
-    bool isNull() const;
     bool isValid() const;
 
     bool equals(const QnEmailSettings &other, bool compareView = false) const;
