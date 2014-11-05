@@ -214,12 +214,16 @@ void QnCameraSettingsDialog::submitToResources(bool checkControls /*= false*/) {
         return;
 
     /* Dialog will be shown inside */
-    if (!m_settingsWidget->isValidMotionRegion())
+    if (!m_settingsWidget->isValidMotionRegion()) {
+        m_ignoreAccept = true;
         return;
+    }
 
     /* Dialog will be shown inside */
-    if (!m_settingsWidget->isValidSecondStream())
+    if (!m_settingsWidget->isValidSecondStream()) {
+        m_ignoreAccept = true;
         return;
+    }
 
     //checking if showing Licenses limit exceeded is appropriate
     if(m_settingsWidget->licensedParametersModified() )
