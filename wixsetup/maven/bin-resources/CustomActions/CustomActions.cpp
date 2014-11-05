@@ -426,7 +426,11 @@ UINT __stdcall CopyDatabaseFile(MSIHANDLE hInstall)
         fromFile = params.Tokenize(_T(";"), curPos);
         toFile = params.Tokenize(_T(";"), curPos);
 
-        CopyFile(fromFile, toFile, TRUE);
+        if (!PathFileExists(toFile)) {
+            CopyFile(fromFile, toFile, TRUE);
+            CopyFile(fromFile + L"-shm", toFile + L"-shm", FALSE);
+            CopyFile(fromFile + L"-wal", toFile + L"-wal", FALSE);
+        }
     }
 
 LExit:
