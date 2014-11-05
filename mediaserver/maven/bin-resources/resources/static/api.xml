@@ -712,6 +712,7 @@
                 <function>
                     <name>activateLicense</name>
                     <description>Activate new license and return license json data if success</description>
+                    <method>GET</method>
                     <params>
                         <param>
                             <name>key</name>
@@ -720,8 +721,6 @@
                             <values/>
                         </param>
                     </params>
-                    <method>GET</method>
-                    <params/>
                     <result>
                         <caption>JSON data.</caption>
                     </result>
@@ -732,13 +731,13 @@
                     <method>POST</method>
                     <params/>
                     <result>
-                        <caption>JSON with error code</caption>
+                        <caption>JSON with error code
                         When all is OK errorString will be empty. In case of error errorString will contain:
                         UP_TO_DATE if the provided version is already installed;
                         INVALID_FILE if the provided file cannot be opened as a ZIP archive;
                         INCOMPATIBLE_SYSTEM if the update file is targeted for another system;
                         EXTRACTION_ERROR if some extraction problems were found (e.g. not enough space);
-                        INSTALLATION_ERROR if the server couldn't execute installation script.
+                        INSTALLATION_ERROR if the server couldn't execute installation script.</caption>
                     </result>
                 </function>
                 <function>
@@ -754,7 +753,7 @@
                     <description>Returns a list of the discovered peers.</description>
                     <method>GET</method>
                     <params/>
-                    <result>JSON with a list of the discovered peers</result>
+                    <result><caption>JSON with a list of the discovered peers</caption></result>
                 </function>
                 <function>
                     <name>restart</name>
