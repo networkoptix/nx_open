@@ -21,11 +21,6 @@
 #include "socket_factory.h"
 #include "utils/common/byte_array.h"
 #include "../common/systemerror.h"
-//#include "system_socket_impl.h"
-
-
-// TODO: #Elric why bother with maxlen and not use QByteArray directly? Remove.
-#define MAX_ERROR_MSG_LENGTH 1024
 
 
 typedef PollableImpl PollableSystemSocketImpl;

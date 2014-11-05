@@ -18,22 +18,22 @@ public:
     virtual void reject() override;
     virtual void accept() override;
 
-    virtual void loadData();
-    virtual void submitData();
-
     bool tryClose(bool force);
 protected:
     void addPage(int key, QnAbstractPreferencesWidget *page, const QString &title);
 
-    void setTabWidget(QTabWidget *tabWidget);
+    virtual void loadData();
+    virtual void submitData();
 
-    bool confirm() const;
-    bool discard() const;
+    virtual bool confirm();
+    virtual bool discard();
 
-    bool hasChanges() const;
+    virtual bool hasChanges() const;
 
 private:
     void initializeTabWidget();
+
+    void setTabWidget(QTabWidget *tabWidget);
 private:
     struct Page {
         int key;

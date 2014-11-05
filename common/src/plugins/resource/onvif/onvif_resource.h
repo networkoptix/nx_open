@@ -439,8 +439,6 @@ private:
     QString m_audioSourceId;
     QString m_videoSourceToken;
 
-    bool m_needUpdateOnvifUrl;
-
     QString m_imagingUrl;
     QString m_ptzUrl;
     QString m_ptzProfileToken;

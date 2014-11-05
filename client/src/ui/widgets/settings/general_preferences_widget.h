@@ -24,41 +24,19 @@ public:
     virtual void updateFromSettings() override;
 
     virtual bool confirm() override;
-    virtual bool discard() override;
-private:
-    void initTranslations();
-
-    QColor backgroundColor() const;
-    void updateBackgroundColor();
-
-    void selectBackgroundImage();
-
 private slots:
     void at_browseMainMediaFolderButton_clicked();
     void at_addExtraMediaFolderButton_clicked();
     void at_removeExtraMediaFolderButton_clicked();
     void at_extraMediaFoldersList_selectionChanged();
-    void at_timeModeComboBox_activated();
 
     void at_browseLogsButton_clicked();
     void at_clearCacheButton_clicked();
-
 private:
     QScopedPointer<Ui::GeneralPreferencesWidget> ui;
-    QScopedPointer<QColorDialog> m_colorDialog;
-    bool m_updating;
 
     bool m_oldDownmix;
     bool m_oldDoubleBuffering;
-    int m_oldLanguage;
-    int m_oldSkin;
-
-    Qn::ClientBackground m_oldBackgroundMode;
-    QColor m_oldCustomBackgroundColor;
-
-    QString m_oldBackgroundImage;
-    qreal m_oldBackgroundImageOpacity;
-    Qn::ImageBehaviour m_oldBackgroundImageMode;
 };
 
 #endif // GENERAL_PREFERENCES_WIDGET_H

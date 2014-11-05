@@ -17,6 +17,7 @@ class QnPreferencesDialog: public QnGenericTabbedDialog, public QnWorkbenchConte
 public:
     enum DialogPage {
         GeneralPage,
+        LookAndFeelPage,
         RecordingPage,
         NotificationsPage,
 
@@ -26,7 +27,12 @@ public:
     QnPreferencesDialog(QWidget *parent = 0);
     ~QnPreferencesDialog();
 
+protected:
+
     virtual void submitData() override;
+
+    virtual bool confirm() override;
+
 private:
     Q_DISABLE_COPY(QnPreferencesDialog)
 
