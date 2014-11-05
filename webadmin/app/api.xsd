@@ -40,7 +40,7 @@
                 <xs:element ref="name"/>
                 <xs:element ref="description"/>
                 <xs:element ref="method"/>
-                <xs:element ref="params" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element ref="params"/>
                 <xs:element ref="result"/>
             </xs:sequence>
         </xs:complexType>
