@@ -1238,6 +1238,12 @@ bool QnPlOnvifResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &sourc
 
     bool result = QnPhysicalCameraResource::mergeResourcesIfNeeded(source);
 
+    QString onvifUrlSource = onvifR->getDeviceOnvifUrl();
+    if (!onvifUrlSource.isEmpty() && getDeviceOnvifUrl() != onvifUrlSource)
+    {
+        setDeviceOnvifUrl(onvifUrlSource);
+        result = true;
+    }
 
     return result;
 }
