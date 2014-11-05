@@ -21,7 +21,7 @@
                 <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
                 <link rel="stylesheet" href="styles/29403685.vendor.css"/>
 
-                <link rel="stylesheet" href="styles/c3171492.main.css"/>
+                <link rel="stylesheet" href="styles/de7cee80.main.css"/>
 
                 <link rel="stylesheet" href="customization/styles.css"/>
             </head>
@@ -52,6 +52,7 @@
                                     <xsl:variable name="urlPrefix" select="urlPrefix"/>
                                     <li>
                                         <a>
+                                            <span class="glyphicon glyphicon-plus"> </span>
                                             <xsl:attribute name="href">#group_<xsl:value-of
                                                   select="$groupName"/>
                                             </xsl:attribute>
@@ -171,6 +172,23 @@
                     $('body').scrollspy({
                         target: '.bs-docs-sidebar',
                         offset: 40
+                    });
+
+                    $(".nav .glyphicon").click(function(){
+                        var $container = $(this).parent().parent();
+
+                        // .active
+                        // .pinned
+                        // .pinned-hidden
+
+                        if($container.hasClass("active")){
+                            $container.removeClass("pinned")
+                                    .toggleClass("pinned-hidden");
+                        }else{
+                            $container.toggleClass("pinned")
+                                    .removeClass("pinned-hidden");
+                        }
+                        return false;
                     });
                 });
             </script>

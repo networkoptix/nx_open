@@ -58,6 +58,7 @@
                                     <xsl:variable name="urlPrefix" select="urlPrefix"/>
                                     <li>
                                         <a>
+                                            <span class="glyphicon glyphicon-plus"> </span>
                                             <xsl:attribute name="href">#group_<xsl:value-of
                                                   select="$groupName"/>
                                             </xsl:attribute>
@@ -181,6 +182,23 @@
                     $('body').scrollspy({
                         target: '.bs-docs-sidebar',
                         offset: 40
+                    });
+
+                    $(".nav .glyphicon").click(function(){
+                        var $container = $(this).parent().parent();
+
+                        // .active
+                        // .pinned
+                        // .pinned-hidden
+
+                        if($container.hasClass("active")){
+                            $container.removeClass("pinned")
+                                    .toggleClass("pinned-hidden");
+                        }else{
+                            $container.toggleClass("pinned")
+                                    .removeClass("pinned-hidden");
+                        }
+                        return false;
                     });
                 });
             </script>
