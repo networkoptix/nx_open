@@ -167,16 +167,16 @@ body {
 }
 
 
-.bs-docs-sidebar .nav .glyphicon{
+.bs-docs-sidebar .nav .glyphicon:before{
   content: "\2b";
 }
 
-.bs-docs-sidebar .nav>.active .glyphicon,
-.bs-docs-sidebar .nav>.pinned .glyphicon {
+.bs-docs-sidebar .nav>.active .glyphicon:before,
+.bs-docs-sidebar .nav>.pinned .glyphicon:before {
   content: "\2212";
 }
 
-.bs-docs-sidebar .nav>.active.pinned-hidden .glyphicon{
+.bs-docs-sidebar .nav>.active.pinned-hidden .glyphicon:before{
   content: "\2b" !important;
 }
 
