@@ -335,18 +335,8 @@ QnResourceList QnResourcePool::getAllCameras(const QnResourcePtr &mServer, bool 
     return result;
 }
 
-QnMediaServerResourceList QnResourcePool::getAllServers() const 
-{
-    QMutexLocker locker(&m_resourcesMtx);
-    QnMediaServerResourceList result;
-    for (const QnResourcePtr &resource: m_resources) 
-    {
-        QnMediaServerResourcePtr mServer = resource.dynamicCast<QnMediaServerResource>();
-        if (mServer)
-            result << mServer;
-    }
-
-    return result;
+QnMediaServerResourceList QnResourcePool::getAllServers() const {
+    return getResources<QnMediaServerResource>();
 }
 
 QnResourceList QnResourcePool::getResourcesByParentId(const QnUuid& parentId) const
