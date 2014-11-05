@@ -17,7 +17,6 @@
 #include <unistd.h>
 
 #include "../system_socket.h"
-#include "../system_socket_impl.h"
 
 
 //TODO #ak get rid of PollSetImpl::monitoredEvents due to performance cosiderations
