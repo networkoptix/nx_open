@@ -322,18 +322,8 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
 
 void QnMServerResourceDiscoveryManager::updateResourceStatus(const QnNetworkResourcePtr& rpNetRes)
 {
-    if (rpNetRes->hasFlags(Qn::foreigner))
-        return;
-    
-    
-    if (rpNetRes->getStatus() == Qn::Offline) 
-    {
-        // if resource with OK ip seems to be found; I do it coz if there is no readers and camera was offline and now online => status needs to be changed
-        if (rpNetRes->getLastStatusUpdateTime().msecsTo(qnSyncTime->currentDateTime()) > 30)
-            rpNetRes->initAsync(false);
-    }
-    else if (!rpNetRes->isInitialized())
-        rpNetRes->initAsync(false); // Resource already in resource pool. Try to init resource if resource is not authorized or not initialized by other reason
+    if (!rpNetRes->isInitialized() && !rpNetRes->hasFlags(Qn::foreigner))
+        rpNetRes->initAsync(false); // wait for initialization
 }
 
 void QnMServerResourceDiscoveryManager::pingResources(const QnResourcePtr& res)
