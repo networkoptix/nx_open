@@ -126,7 +126,7 @@ angular.module('webadminApp')
 
             mediaserver.getSettings(url).then(function(){
                 server.apiUrl = url;
-            }).catch(function(){
+            },function(){
                 if(i < ips.length-1)
                     checkServersIp (server,i+1);
                 else
