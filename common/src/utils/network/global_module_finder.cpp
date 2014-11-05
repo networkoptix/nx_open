@@ -28,23 +28,21 @@ QnGlobalModuleFinder::QnGlobalModuleFinder(QnModuleFinder *moduleFinder, QObject
 void QnGlobalModuleFinder::setConnection(const ec2::AbstractECConnectionPtr &connection) {
     ec2::AbstractECConnectionPtr oldConnection = m_connection.lock();
 
-    if (oldConnection) {
+    if (oldConnection)
         oldConnection->getMiscManager()->disconnect(this);
 
-        QSet<QnUuid> discoverers;
-        for (const QSet<QnUuid> &moduleDiscoverer: m_discovererIdByServerId)
-            discoverers.unite(moduleDiscoverer);
+    QSet<QnUuid> discoverers;
+    for (const QSet<QnUuid> &moduleDiscoverer: m_discovererIdByServerId)
+        discoverers.unite(moduleDiscoverer);
+    discoverers.remove(qnCommon->moduleGUID());
 
-        discoverers.remove(qnCommon->moduleGUID());
-
-        for (const QnUuid &id: discoverers)
-            removeAllModulesDiscoveredBy(id);
-    }
+    for (const QnUuid &id: discoverers)
+        removeAllModulesDiscoveredBy(id);
 
     m_connection = connection;
 
     if (connection)
-        connect(connection->getMiscManager().get(),        &ec2::AbstractMiscManager::moduleChanged,  this,   &QnGlobalModuleFinder::at_moduleChanged,  Qt::QueuedConnection);
+        connect(connection->getMiscManager().get(), &ec2::AbstractMiscManager::moduleChanged, this, &QnGlobalModuleFinder::at_moduleChanged, Qt::QueuedConnection);
 }
 
 void QnGlobalModuleFinder::fillApiModuleData(const QnModuleInformation &moduleInformation, ec2::ApiModuleData *data) {
@@ -101,13 +99,13 @@ void QnGlobalModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInf
 void QnGlobalModuleFinder::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation) {
     addModule(moduleInformation, qnCommon->moduleGUID());
     if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
-        connection->getMiscManager()->sendModuleInformation(moduleInformation, true, QnUuid(qnCommon->moduleGUID()), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        connection->getMiscManager()->sendModuleInformation(moduleInformation, true, qnCommon->moduleGUID(), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
 void QnGlobalModuleFinder::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation) {
     removeModule(moduleInformation, qnCommon->moduleGUID());
     if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
-        connection->getMiscManager()->sendModuleInformation(moduleInformation, false, QnUuid(qnCommon->moduleGUID()), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        connection->getMiscManager()->sendModuleInformation(moduleInformation, false, qnCommon->moduleGUID(), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
 void QnGlobalModuleFinder::at_resourcePool_statusChanged(const QnResourcePtr &resource) {
@@ -185,6 +183,7 @@ void QnGlobalModuleFinder::removeAllModulesDiscoveredBy(const QnUuid &discoverer
                 NX_LOG(lit("QnGlobalModuleFinder. Module %1 is lost.").arg(it.value().id.toString()), cl_logDEBUG1);
                 emit peerLost(it.value());
                 it = m_moduleInformationById.erase(it);
+                m_discoveredAddresses.remove(it.key());
                 continue;
             }
         }
@@ -193,10 +192,19 @@ void QnGlobalModuleFinder::removeAllModulesDiscoveredBy(const QnUuid &discoverer
 
     for (auto it = m_discoveredAddresses.begin(); it != m_discoveredAddresses.end(); /* no inc */) {
         it.value().remove(discoverer);
-        if (it.value().isEmpty())
+        if (it.value().isEmpty()) {
             it = m_discoveredAddresses.erase(it);
-        else
+        } else {
+            QnModuleInformation moduleInformation = m_moduleInformationById[it.key()];
+            QSet<QString> addresses = getModuleAddresses(moduleInformation.id);
+            if (addresses != moduleInformation.remoteAddresses) {
+                NX_LOG(lit("QnGlobalModuleFinder. Module %1 is changed, addresses = [%2]")
+                       .arg(moduleInformation.id.toString())
+                       .arg(QStringList(QStringList::fromSet(moduleInformation.remoteAddresses)).join(lit(", "))), cl_logDEBUG1);
+                emit peerChanged(moduleInformation);
+            }
             ++it;
+        }
     }
 }
 
