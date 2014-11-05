@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>480</width>
-    <height>442</height>
+    <height>220</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,7 +33,11 @@
      <property name="title">
       <string>Alarms/Events</string>
      </property>
-     <layout class="QVBoxLayout" name="businessEventsLayout"/>
+     <layout class="QVBoxLayout" name="businessEventsLayout">
+      <property name="spacing">
+       <number>2</number>
+      </property>
+     </layout>
     </widget>
    </item>
    <item>
@@ -41,7 +45,11 @@
      <property name="title">
       <string>System Notifications</string>
      </property>
-     <layout class="QVBoxLayout" name="systemHealthLayout"/>
+     <layout class="QVBoxLayout" name="systemHealthLayout">
+      <property name="spacing">
+       <number>2</number>
+      </property>
+     </layout>
     </widget>
    </item>
    <item>

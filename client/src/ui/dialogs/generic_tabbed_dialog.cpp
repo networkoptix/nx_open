@@ -108,14 +108,14 @@ void QnGenericTabbedDialog::initializeTabWidget() {
     setTabWidget(tabWidgets[0]);
 }
 
-bool QnGenericTabbedDialog::confirm() const {
+bool QnGenericTabbedDialog::confirm() {
     foreach(const Page &page, m_pages)
         if (!page.widget->confirm())
             return false;
     return true;
 }
 
-bool QnGenericTabbedDialog::discard() const {
+bool QnGenericTabbedDialog::discard() {
     foreach(const Page &page, m_pages)
         if (!page.widget->discard())
             return false;
