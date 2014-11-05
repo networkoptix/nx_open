@@ -249,7 +249,6 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_secondaryH264Profile(-1),
     m_audioBitrate(0),
     m_audioSamplerate(0),
-    m_needUpdateOnvifUrl(false),
     m_timeDrift(0),
     m_prevSoapCallResult(0),
     m_inputMonitored(false),
@@ -466,8 +465,6 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 #endif
             return CameraDiagnostics::CameraInvalidParams(lit("ONVIF media URL is not filled by camera"));
         }
-        else
-            m_needUpdateOnvifUrl = false;
     }
 
     if (m_appStopping)
@@ -487,10 +484,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 
     result = fetchAndSetResourceOptions();
     if (!result) 
-    {
-        m_needUpdateOnvifUrl = true;
         return result;
-    }
 
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
@@ -1244,6 +1238,12 @@ bool QnPlOnvifResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &sourc
 
     bool result = QnPhysicalCameraResource::mergeResourcesIfNeeded(source);
 
+    QString onvifUrlSource = onvifR->getDeviceOnvifUrl();
+    if (!onvifUrlSource.isEmpty() && getDeviceOnvifUrl() != onvifUrlSource)
+    {
+        setDeviceOnvifUrl(onvifUrlSource);
+        result = true;
+    }
 
     return result;
 }
