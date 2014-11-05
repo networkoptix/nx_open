@@ -370,8 +370,6 @@
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UninstallOptionsDlg">$(var.Remove_S1) OR (!ServerFeature = 3 AND $(var.VmsRemoving))</Publish>            
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg">$(var.VmsUpgrading)</Publish>
             
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Property="REMOVE" Value="{}" Order="3"><![CDATA[ Installed ]]></Publish>
-
             <Publish Dialog="VerifyReadyDlg" Control="Install" Event="AddLocal" Value="ServerFeature">INSTALL_SERVER</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Install" Event="Remove" Value="ServerFeature">NOT INSTALL_SERVER</Publish>
 
@@ -388,16 +386,16 @@
             <Publish Dialog="MyExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
 
             <!-- MaintenanceWelcomeDlg -->
-            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
+            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="UninstallOptionsDlg">1</Publish>
+            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Property="REMOVE" Value="ALL">1</Publish>
+            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Property="WixUI_InstallMode" Value="Remove">1</Publish>
 
             <!-- MaintenanceTypeDlg -->
-            <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
-            <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Property="REMOVE" Value="ALL">1</Publish>
-            <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="UninstallOptionsDlg">!ServerFeature = 3</Publish>
-            <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg"><![CDATA[ !ServerFeature <> 3 ]]></Publish>            
+            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="UninstallOptionsDlg">!ServerFeature = 3</Publish>
+            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg"><![CDATA[ !ServerFeature <> 3 ]]></Publish>            
             
             <Publish Dialog="UninstallOptionsDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
-            <Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
+            <Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
             <Publish Dialog="UninstallOptionsDlg" Control="Back" Property="REMOVE" Value="{}">1</Publish>
             <Publish Dialog="UninstallOptionsDlg" Control="Back" Property="REMOVE_DATABASE" Value="0">1</Publish>
             
