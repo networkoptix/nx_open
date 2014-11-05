@@ -98,6 +98,29 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
     setWarningStyle(ui->detectErrorLabel);
     setWarningStyle(ui->supportEmailWarningLabel);
 
+    /* Mark some fields as mandatory, so field label will turn red if the field is empty. */
+    auto declareMandatoryField = [this](QLabel* label, QLineEdit* lineEdit) {
+        /* On every field text change we should check its contents and repaint label with corresponding color. */
+        connect(lineEdit, &QLineEdit::textChanged, this, [this, label](const QString &text) {
+            QPalette palette = this->palette();
+            if (text.isEmpty())
+                setWarningStyle(&palette);
+            label->setPalette(palette);
+        });
+        /* Default field value is empty, so the label should be red by default. */
+        setWarningStyle(label);
+    };
+
+    /* Mark simple view mandatory fields. */
+    declareMandatoryField(ui->simpleEmailLabel, ui->simpleEmailLineEdit);
+    declareMandatoryField(ui->simplePasswordLabel, ui->simplePasswordLineEdit);
+
+    /* Mark advanced view mandatory fields. */
+    declareMandatoryField(ui->emailLabel, ui->emailLineEdit);
+    declareMandatoryField(ui->serverLabel, ui->serverLineEdit);
+    declareMandatoryField(ui->userLabel, ui->userLineEdit);
+    declareMandatoryField(ui->passwordLabel, ui->passwordLineEdit);
+
     const QString autoPort = tr("Auto");
     ui->portComboBox->addItem(autoPort, 0);
     for (QnEmail::ConnectionType type: connectionTypesAllowed()) {
@@ -129,7 +152,7 @@ void QnSmtpSettingsWidget::updateFromSettings() {
     ui->simpleSignatureLineEdit->setText(settings.signature);
     ui->supportEmailLineEdit->setText(settings.supportEmail);
     ui->simpleSupportEmailLineEdit->setText(settings.supportEmail);
-    ui->advancedCheckBox->setChecked(settings.isValid() && !settings.simple);
+    ui->advancedCheckBox->setChecked(!settings.simple);
     ui->stackedWidget->setCurrentIndex(ui->advancedCheckBox->isChecked()
         ? AdvancedPage
         : SimplePage);
@@ -276,7 +299,7 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
     QnEmailSettings result = settings();
     result.timeout = testSmtpTimeoutMSec / 1000;
 
-    if (result.isNull()) {
+    if (!result.isValid()) {
         QMessageBox::warning(this, tr("Invalid data"), tr("Provided parameters are not valid. Could not perform a test."));
         return;
     }
@@ -331,7 +354,7 @@ void QnSmtpSettingsWidget::at_testEmailSettingsFinished(int status, const QnTest
         return;
 
     stopTesting(status != 0 || reply.errorCode != 0
-        ? tr("Error while testing settings")
+        ? tr("Failed")
         : tr("Success") );
 }
 
