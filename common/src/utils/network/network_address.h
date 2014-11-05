@@ -6,6 +6,7 @@
 class QnNetworkAddress {
 public:
     QnNetworkAddress();
+    QnNetworkAddress(const QString &host, quint16 port);
     QnNetworkAddress(const QHostAddress &host, quint16 port);
     QnNetworkAddress(const QUrl &url);
 
