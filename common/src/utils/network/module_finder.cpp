@@ -109,7 +109,7 @@ void QnModuleFinder::at_moduleAddressLost(const QnModuleInformation &moduleInfor
         emit moduleUrlLost(m_foundModules.value(moduleInformation.id), url);
 
         QnModuleInformation locModuleInformation = m_foundModules.value(moduleInformation.id);
-        if (locModuleInformation.remoteAddresses.isEmpty()) {
+        if ((locModuleInformation.remoteAddresses - (QSet<QString>() << url.host())).isEmpty()) {
             m_foundModules.remove(moduleInformation.id);
             NX_LOG(lit("QnModuleFinder: Module %1 lost.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
             emit moduleLost(locModuleInformation);
@@ -144,7 +144,7 @@ void QnModuleFinder::at_moduleUrlLost(const QnModuleInformation &moduleInformati
         emit moduleUrlLost(m_foundModules.value(moduleInformation.id), url);
 
         QnModuleInformation locModuleInformation = m_foundModules.value(moduleInformation.id);
-        if (locModuleInformation.remoteAddresses.isEmpty()) {
+        if ((locModuleInformation.remoteAddresses - (QSet<QString>() << url.host())).isEmpty()) {
             m_foundModules.remove(moduleInformation.id);
             NX_LOG(lit("QnModuleFinder: Module %1 lost.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
             emit moduleLost(locModuleInformation);
@@ -164,6 +164,9 @@ void QnModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInformati
         updatedModuleInformation.remoteAddresses.unite(m_multicastModuleFinder->moduleInformation(moduleInformation.id).remoteAddresses);
     else
         Q_ASSERT_X(0, "Invalid sender in slot", Q_FUNC_INFO);
+
+    if (updatedModuleInformation.remoteAddresses.isEmpty())
+        return;
 
     QnModuleInformation &oldModuleInformation = m_foundModules[moduleInformation.id];
     if (oldModuleInformation != updatedModuleInformation) {

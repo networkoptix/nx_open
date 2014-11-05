@@ -48,6 +48,8 @@ QnAspectRatio QnAspectRatio::closestStandardRatio(qreal aspectRatio) {
 }
 
 bool QnAspectRatio::isRotated90(qreal angle) {
+    while (angle > 180)
+        angle -= 180;
     return qAbs(90 - qAbs(angle)) < 45;
 }
 
