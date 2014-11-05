@@ -832,24 +832,18 @@
                             <optional>true</optional>
                             <values/>
                         </param>
-                    </params>
-                    <params>
                         <param>
                             <name>wholeSystem</name>
                             <description>Flag shows if the specified system name must be set to the all servers in the system.</description>
                             <optional>true</optional>
                             <values/>
                         </param>
-                    </params>
-                    <params>
                         <param>
                             <name>port</name>
                             <description>New listening port.</description>
                             <optional>true</optional>
                             <values/>
                         </param>
-                    </params>
-                    <params>
                         <param>
                             <name>password</name>
                             <description>New admin password.</description>
