@@ -12,11 +12,11 @@
                      <File Id="traytool.exe" Name="traytool.exe" Source="$(var.SourceDir)/traytool.exe" KeyPath="yes">
                          <fire:FirewallException Id="FirewallException${customization}TrayTool" Name="VMS Tray Tool" Scope="any" IgnoreFailure="yes"/>
 
-                         <Shortcut Id="StartmenuTrayTool" Directory="ProgramMenuDir" Name="${traytool.name}"
+                         <Shortcut Id="StartmenuTrayTool" Directory="ProgramMenuDir" Name="${traytool.display.name}"
                                    WorkingDirectory='${customization}TrayToolDir' Advertise="yes" Icon="icon_menu.exe">
                          </Shortcut>
 
-                         <Shortcut Id="StartmenuStartupTrayTool" Directory="StartupFolder" Name="${display.traytool.name}"
+                         <Shortcut Id="StartmenuStartupTrayTool" Directory="StartupFolder" Name="${traytool.display.name}"
                                    WorkingDirectory='${customization}TrayToolDir' Advertise="yes" Icon="icon_menu.exe">
                          </Shortcut>
                      </File>
