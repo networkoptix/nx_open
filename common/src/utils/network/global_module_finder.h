@@ -21,9 +21,6 @@ public:
     static void fillFromApiModuleData(const ec2::ApiModuleData &data, QnModuleInformation *moduleInformation);
 
     QList<QnModuleInformation> foundModules() const;
-
-    QSet<QnUuid> discoverers(const QnUuid &moduleId);
-
     QnModuleInformation moduleInformation(const QnUuid &id) const;
 
 signals:
@@ -31,25 +28,23 @@ signals:
     void peerLost(const QnModuleInformation &moduleInformation);
 
 private slots:
-    void at_moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive, const QnUuid &discoverer);
+    void at_moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive);
     void at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation);
     void at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation);
 
-    void at_resourcePool_statusChanged(const QnResourcePtr &resource);
-    void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
+    void at_router_connectionAdded(const QnUuid &discovererId, const QnUuid &peerId, const QString &host);
+    void at_router_connectionRemoved(const QnUuid &discovererId, const QnUuid &peerId, const QString &host);
 
 private:
-    void addModule(const QnModuleInformation &moduleInformation, const QnUuid &discoverer);
-    void removeModule(const QnModuleInformation &moduleInformation, const QnUuid &discoverer);
+    void addModule(const QnModuleInformation &moduleInformation);
 
-    void removeAllModulesDiscoveredBy(const QnUuid &discoverer);
     QSet<QString> getModuleAddresses(const QnUuid &id) const;
+    void updateAddresses(const QnUuid &id);
 
 private:
     std::weak_ptr<ec2::AbstractECConnection> m_connection;  // just to know from where to disconnect
     QPointer<QnModuleFinder> m_moduleFinder;
     QHash<QnUuid, QnModuleInformation> m_moduleInformationById;
-    QHash<QnUuid, QSet<QnUuid>> m_discovererIdByServerId;
     QHash<QnUuid, QHash<QnUuid, QSet<QString>>> m_discoveredAddresses;
 };
 
