@@ -58,10 +58,11 @@
                                     <xsl:variable name="urlPrefix" select="urlPrefix"/>
                                     <li>
                                         <a>
-                                            <span class="glyphicon glyphicon-plus"> </span>
                                             <xsl:attribute name="href">#group_<xsl:value-of
                                                   select="$groupName"/>
                                             </xsl:attribute>
+
+                                            <span class="glyphicon"></span>
                                             <xsl:value-of select="groupName"/>
                                         </a>
                                         <ul class="nav nav-stacked">
