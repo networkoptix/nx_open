@@ -246,7 +246,7 @@ public:
         MIB_IFTABLE* networkInterfaceTable = NULL;
         for( int i = 0; i < 2; ++i )
         {
-            ULONG bufSize = m_mibIfTableBuffer.size();
+            ULONG bufSize = (ULONG)m_mibIfTableBuffer.size();
             networkInterfaceTable = reinterpret_cast<MIB_IFTABLE*>(m_mibIfTableBuffer.data());
             resultCode = GetIfTable( networkInterfaceTable, &bufSize, TRUE );
             if( resultCode == ERROR_INSUFFICIENT_BUFFER )
@@ -292,8 +292,8 @@ public:
             if( intfLoad.prevMeasureClock == currentClock )
                 continue;   //not calculating load
             const qint64 msPassed = currentClock - intfLoad.prevMeasureClock;
-            intfLoad.load.bytesPerSecIn = p.first->second.load.bytesPerSecIn * 0.3 + ((ifInfo.dwInOctets - p.first->second.inOctets) * MS_PER_SEC / msPassed) * 0.7;
-            intfLoad.load.bytesPerSecOut = p.first->second.load.bytesPerSecOut * 0.3 + ((ifInfo.dwOutOctets - p.first->second.outOctets) * MS_PER_SEC / msPassed) * 0.7;
+            intfLoad.load.bytesPerSecIn = p.first->second.load.bytesPerSecIn * 0.3 + ((ifInfo.dwInOctets - (DWORD)p.first->second.inOctets) * MS_PER_SEC / msPassed) * 0.7;
+            intfLoad.load.bytesPerSecOut = p.first->second.load.bytesPerSecOut * 0.3 + ((ifInfo.dwOutOctets - (DWORD)p.first->second.outOctets) * MS_PER_SEC / msPassed) * 0.7;
 
             p.first->second.inOctets = ifInfo.dwInOctets;
             p.first->second.outOctets = ifInfo.dwOutOctets;
