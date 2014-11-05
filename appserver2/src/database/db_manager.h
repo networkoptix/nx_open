@@ -466,6 +466,8 @@ namespace ec2
         ErrorCode addCameraBookmarkTag(const ApiCameraBookmarkTagData &tag);
         ErrorCode removeCameraBookmarkTag(const ApiCameraBookmarkTagData &tag);
 
+        ErrorCode insertOrReplaceStoredFile(const QString &fileName, const QByteArray &fileContents);
+
         bool createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2);
         bool migrateBusinessEvents();
         bool doRemap(int id, int newVal, const QString& fieldName);
@@ -487,6 +489,7 @@ namespace ec2
         bool updateGuids();
         QnUuid getType(const QString& typeName);
         bool resyncTransactionLog();
+        bool insertDefaultStoredFiles();
 
         template <class ObjectType, class ObjectListType> 
         bool fillTransactionLogInternal(ApiCommand::Value command);
