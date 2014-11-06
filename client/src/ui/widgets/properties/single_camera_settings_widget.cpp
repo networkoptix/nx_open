@@ -568,7 +568,11 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         m_camera->setCameraName(ui->nameEdit->text());
         m_camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());
         //m_camera->setUrl(ui->ipAddressEdit->text());
-        m_camera->setAuth(ui->loginEdit->text(), ui->passwordEdit->text());
+        QAuthenticator loginEditAuth;
+        loginEditAuth.setUser( ui->loginEdit->text() );
+        loginEditAuth.setPassword( ui->passwordEdit->text() );
+        if( m_camera->getAuth() != loginEditAuth )
+            m_camera->setAuth( loginEditAuth );
 
         if (m_camera->isDtsBased()) {
             m_camera->setScheduleDisabled(!ui->analogViewCheckBox->isChecked());
