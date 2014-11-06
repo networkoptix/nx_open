@@ -82,7 +82,12 @@ void QnGlobalModuleFinder::fillFromApiModuleData(const ec2::ApiModuleData &data,
 }
 
 QList<QnModuleInformation> QnGlobalModuleFinder::foundModules() const {
-    return m_moduleInformationById.values();
+    QList<QnModuleInformation> result;
+    for (const QnModuleInformation &moduleInformation: m_moduleInformationById) {
+        if (!moduleInformation.remoteAddresses.isEmpty())
+            result.append(moduleInformation);
+    }
+    return result;
 }
 
 QnModuleInformation QnGlobalModuleFinder::moduleInformation(const QnUuid &id) const {
