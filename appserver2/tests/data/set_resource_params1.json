@@ -1,0 +1,12 @@
+[
+    {
+        "name": "DeviceUrl",
+        "resourceId": "{5493904f-e817-62cc-6fed-14c7ddfe57d1}",
+        "value": "http://192.168.0.31:8032/onvif/device_service"
+    },
+    {
+        "name": "firmware",
+        "resourceId": "{5493904f-e817-62cc-6fed-14c7ddfe57d1}",
+        "value": ""
+    }
+]
