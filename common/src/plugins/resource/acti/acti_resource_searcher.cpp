@@ -136,7 +136,7 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
 
     QnActiResourcePtr actiRes(new QnActiResource);
     actiRes->setUrl(url.toString());
-    actiRes->setAuth(auth);
+    actiRes->setDefaultAuth(auth);
 
     QString devUrl = QString(lit("http://%1:%2")).arg(url.host()).arg(url.port(80));
     CashedDevInfo devInfo = m_cashedDevInfo.value(devUrl);
@@ -197,12 +197,12 @@ void QnActiResourceSearcher::processPacket(
     resource->setPhysicalId(QString(QLatin1String("ACTI_%1")).arg(sn));
 
     if (!auth.isNull()) {
-        resource->setAuth(auth);
+        resource->setDefaultAuth(auth);
     } else {
         QAuthenticator defaultAuth;
         defaultAuth.setUser(DEFAULT_LOGIN);
         defaultAuth.setPassword(DEFAULT_PASSWORD);
-        resource->setAuth(defaultAuth);
+        resource->setDefaultAuth(defaultAuth);
     }
 
     result << resource;

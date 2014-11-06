@@ -43,7 +43,7 @@ QnThirdPartyResource::QnThirdPartyResource(
     m_cameraManager3( nullptr )
 {
     setVendor( discoveryManager.getVendorName() );
-    setAuth( QString::fromUtf8(camInfo.defaultLogin), QString::fromUtf8(camInfo.defaultPassword), false );
+    setDefaultAuth(QString::fromUtf8(camInfo.defaultLogin), QString::fromUtf8(camInfo.defaultPassword));
 }
 
 QnThirdPartyResource::~QnThirdPartyResource()

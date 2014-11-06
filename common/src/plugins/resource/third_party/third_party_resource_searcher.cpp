@@ -274,7 +274,7 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
         resource->setName( QString::fromUtf8("%1-%2").arg(vendor).arg(QString::fromUtf8(cameraInfo.modelName)) );
     resource->setModel( QString::fromUtf8(cameraInfo.modelName) );
     resource->setMAC( QnMacAddress(QString::fromUtf8(cameraInfo.uid).trimmed()) );
-    resource->setAuth( QString::fromUtf8(cameraInfo.defaultLogin), QString::fromUtf8(cameraInfo.defaultPassword) );
+    resource->setDefaultAuth( QString::fromUtf8(cameraInfo.defaultLogin), QString::fromUtf8(cameraInfo.defaultPassword) );
     resource->setUrl( QString::fromUtf8(cameraInfo.url) );
     resource->setPhysicalId( QString::fromUtf8(cameraInfo.uid).trimmed() );
     resource->setVendor( vendor );

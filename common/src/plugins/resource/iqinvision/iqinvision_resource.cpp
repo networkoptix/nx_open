@@ -10,7 +10,7 @@ const QString QnPlIqResource::MANUFACTURE(lit("IqEye"));
 QnPlIqResource::QnPlIqResource()
 {
     setVendor(lit("IqEye"));
-    setAuth(lit("root"), lit("system"));
+    setDefaultAuth(lit("root"), lit("system"));
 }
 
 QString QnPlIqResource::getDriverName() const
