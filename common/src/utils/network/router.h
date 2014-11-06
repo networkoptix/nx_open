@@ -48,6 +48,8 @@ private slots:
     void at_runtimeInfoManager_runtimeInfoChanged(const QnPeerRuntimeInfo &data);
     void at_runtimeInfoManager_runtimeInfoRemoved(const QnPeerRuntimeInfo &data);
 
+    void at_refreshTimer_timeout();
+
 private:
     bool addConnection(const QnUuid &id, const Endpoint &endpoint);
     bool removeConnection(const QnUuid &id, const Endpoint &endpoint);
