@@ -161,9 +161,9 @@ public:
         m_lastTickTime = 0;
         m_stickyLogScaleHi = 1.0;
         m_stickyLogScaleLo = -1.0;
-        m_defaultStickyLogScaleResettingThreshold = 0.80;
+        m_defaultStickyLogScaleResettingThreshold = 0.7;
         m_stickyLogScaleResettingThreshold = m_defaultStickyLogScaleResettingThreshold;
-        m_logScaleResettingSpeedMultiplier = 0.2;
+        m_logScaleResettingSpeedMultiplier = 0.16;
     }
 
     void update() {
