@@ -536,9 +536,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     moduleFinder->setCompatibilityMode(qnSettings->isDevMode());
     moduleFinder->start();
 
-    QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder());
-
     QScopedPointer<QnRouter> router(new QnRouter(moduleFinder.data(), true));
+
+    QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder());
 
     QScopedPointer<QnServerInterfaceWatcher> serverInterfaceWatcher(new QnServerInterfaceWatcher(router.data()));
 
