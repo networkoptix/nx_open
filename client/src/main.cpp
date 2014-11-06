@@ -398,7 +398,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 	// TODO: #Elric why QString???
     if (!lightMode.isEmpty()) {
         bool ok;
-        int lightModeOverride = lightMode.toInt(&ok);
+        Qn::LightModeFlags lightModeOverride(lightMode.toInt(&ok));
         if (ok)
             qnSettings->setLightModeOverride(lightModeOverride);
         else
