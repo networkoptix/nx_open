@@ -10,7 +10,7 @@
             <Directory Id="$(var.customization)ClientDir" Name="Client">
                 <Directory Id="$(var.customization)HelpDir" Name="help"/>                         
 
-                <Directory Id="$(var.clientDirId)" Name="$(var.releaseVersionFull)">
+                <Directory Id="$(var.clientDirId)" Name="$(var.releaseVersionMajor).$(var.releaseVersionMinor)">
 
                     <Component Id="AppLauncherExecutable">
                         <File Id="applauncher.exe" Name="$(var.applauncherName).exe" Source="$(var.SourceDir)/applauncher.exe" KeyPath="yes">

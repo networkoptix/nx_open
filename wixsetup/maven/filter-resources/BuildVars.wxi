@@ -12,7 +12,7 @@
 
     <?define productName = "${display.product.name}"?>
     <?define applauncherName = "${applauncher.name}"?>
-    <?define clientName = "${client.name}"?>
+    <?define clientName = "${product.name}"?>
 
     <?define productExeName = "${product_name}"?>
     <?define clientExeName = "${product.name}"?>
