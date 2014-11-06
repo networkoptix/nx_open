@@ -172,31 +172,59 @@ namespace {
 // must since OpenSSL configured with thread support will give default version. Additionally, the
 // dynamic lock interface is not used in current OpenSSL version. So we don't use it.
 
-    static std::unique_ptr<std::mutex[]> kOpenSSLGlobalLock;
+    void OpenSSLGlobalLock( int mode , int type , const char* file , int line );
+    typedef void (*OpensslLockCallbackFuncType)( int , int , const char* , int );
+
+    class OpenSSLGlobalLockContext
+    {
+    public:
+        std::unique_ptr<std::mutex[]> locks;
+
+        OpenSSLGlobalLockContext()
+        :
+            m_opensslLockCallbackBak(nullptr)
+        {
+            m_opensslLockCallbackBak = CRYPTO_get_locking_callback();
+            // not safe here, new can throw exception 
+            locks.reset( new std::mutex[CRYPTO_num_locks()] );
+            CRYPTO_set_locking_callback( OpenSSLGlobalLock );
+        }
+
+        ~OpenSSLGlobalLockContext()
+        {
+            CRYPTO_set_locking_callback( m_opensslLockCallbackBak );
+            m_opensslLockCallbackBak = nullptr;
+        }
+
+    private:
+        OpensslLockCallbackFuncType m_opensslLockCallbackBak;
+    };
+
+    static std::unique_ptr<OpenSSLGlobalLockContext> kOpenSSLGlobalLock;
 
     void OpenSSLGlobalLock( int mode , int type , const char* file , int line ) {
         Q_UNUSED(file);
         Q_UNUSED(line);
         Q_ASSERT( kOpenSSLGlobalLock.get() != nullptr );
         if( mode & CRYPTO_LOCK ) {
-            kOpenSSLGlobalLock.get()[type].lock();
+            kOpenSSLGlobalLock->locks.get()[type].lock();
         } else {
-            kOpenSSLGlobalLock.get()[type].unlock();
+            kOpenSSLGlobalLock->locks.get()[type].unlock();
         }
+    }
+
+    void OpenSSLInitGlobalLockInternal()
+    {
+        Q_ASSERT(kOpenSSLGlobalLock.get() == nullptr);
+        // not safe here, new can throw exception 
+        kOpenSSLGlobalLock.reset( new OpenSSLGlobalLockContext() );
     }
 }
 
 static std::once_flag kOpenSSLGlobalLockFlag;
 
-    void OpenSSLInitGlobalLock() {
-        Q_ASSERT(kOpenSSLGlobalLock.get() == nullptr);
-        // not safe here, new can throw exception 
-        kOpenSSLGlobalLock.reset( new std::mutex[CRYPTO_num_locks()] );
-        CRYPTO_set_locking_callback(OpenSSLGlobalLock);
-    }
-
 void InitOpenSSLGlobalLock() {
-    std::call_once(kOpenSSLGlobalLockFlag,OpenSSLInitGlobalLock);
+    std::call_once(kOpenSSLGlobalLockFlag, OpenSSLInitGlobalLockInternal);
 }
 
 SystemError::ErrorCode kSSLInternalError = 100;
