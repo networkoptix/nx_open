@@ -29,7 +29,7 @@ public:
     ~QnRouter();
 
     QMultiHash<QnUuid, Endpoint> connections() const;
-    QHash<QnUuid, QnRouteList> routes() const;
+    QHash<QnUuid, QnRoute> routes() const;
 
     QnRoute routeTo(const QnUuid &id) const;
     QnRoute routeTo(const QString &host, quint16 port) const;

@@ -65,7 +65,50 @@ class EnumerateAllEC2GetCallsTest(unittest.TestCase):
 
 
 
-class TestEC2ServerModification(unittest.TestCase):
+cameraJson = """[
+    {
+        "audioEnabled": false,
+        "controlEnabled": false,
+        "dewarpingParams": "",
+        "groupId": "",
+        "groupName": "",
+        "id": "{066fbf9c-2e11-a501-6e15-dfb0fb97c7cb}",
+        "mac": "00-40-8C-BF-92-CE",
+        "manuallyAdded": false,
+        "maxArchiveDays": 0,
+        "minArchiveDays": 0,
+        "model": "AXISP1344",
+        "motionMask": "",
+        "motionType": "MT_Default",
+        "name": "AXISP1344",
+        "parentId": "{47bf37a0-72a6-2890-b967-5da9c390d28a}",
+        "physicalId": "00-40-8C-BF-92-CE",
+        "preferedServerId": "{00000000-0000-0000-0000-000000000000}",
+        "scheduleEnabled": false,
+        "scheduleTasks": [ ],
+        "secondaryStreamQuality": "SSQualityLow",
+        "status": "Unauthorized",
+        "statusFlags": "CSF_NoFlags",
+        "typeId": "{15379a04-aba4-f5dc-e0de-36979fc36954}",
+        "url": "192.168.0.92",
+        "vendor": "Axis"
+    }
+]"""
+
+
+class GenerateCameraTest(unittest.TestCase):
+
+    def test_addCamera(self):
+        reqName="saveCameras"
+        req = urllib2.Request("http://%s:%d/ec2/%s" % (serverAddress,serverPort,reqName), data=cameraJson, headers={'Content-Type': 'application/json'})
+        response = urllib2.urlopen(req)
+        self.assertTrue(response.getcode() == 200, "%s failed with statusCode %d" % (reqName,response.getcode()))
+        print "%s OK\r\n" % (reqName)
+
+
+
+#class TestEC2ServerModification(unittest.TestCase):
+class TestEC2ServerModification():
     serverList=()
 
     ec2GetRequests = [
