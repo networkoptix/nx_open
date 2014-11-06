@@ -3,7 +3,8 @@ import urllib2
 import urllib
 import ConfigParser
 import time
-import thread
+import threading
+import json
 
 #class TestSequenceFunctions(unittest.TestCase):
 
@@ -54,7 +55,6 @@ ec2GetRequests = [
 serverAddress = None
 serverPort = None
 
-
 class EnumerateAllEC2GetCallsTest(unittest.TestCase):
 
     def test_callAllGetters(self):
@@ -66,7 +66,6 @@ class EnumerateAllEC2GetCallsTest(unittest.TestCase):
 
 
 class TestEC2ServerModification(unittest.TestCase):
-    """description of class"""
     serverList=()
 
     ec2GetRequests = [
@@ -94,9 +93,12 @@ class TestEC2ServerModification(unittest.TestCase):
     SERVER_PORT = 2
 
     testCaseList=[]
+    serverStatesSyncTimeout=0
 
     def setUp(self):
         self.loadConfig()
+        self.ensureServerListStates()
+        print "Start executing cluster tests\n"
 
     def loadConfig(self):
         # reading the config 
@@ -107,9 +109,11 @@ class TestEC2ServerModification(unittest.TestCase):
 
         # get the server list from the config file
         serverListStr = cfg_parser.get("ClusterTest","serverList")
+
         # split it into the list
         serverList = serverListStr.split(",")
         self.serverList=[]
+
         # now for each list
         for server in serverList:
             self.serverList.append((
@@ -118,15 +122,25 @@ class TestEC2ServerModification(unittest.TestCase):
                 cfg_parser.getint(server,"port")))
                 
         # load other config
-        testCaseList=cfg_parser.get("ClusterTest","testCaseFile").split(",")
+        testCaseList=cfg_parser.get("ClusterTest","testCaseList").split(",")
+
+        # the test case list is a dictionary groupped by the group name
         for testCaseFile in testCaseList:
+            # Each test case file is a group of test case, the test inside of a 
+            # group test file will be executed in parallel instead of one by one
+            caseList=[]
             config=ConfigParser.RawConfigParser()
             config.read(testCaseFile)
             all_sec=config.sections()
             for section in all_sec:
-                self.testCaseList.append(config.items(section))
+                caseList.append( (section,config.items(section)) )
+            # insert the case list to the group list
+            self.testCaseList.append((testCaseFile,caseList))
 
-    # This function will check whether each element in returnList has same value.
+        # loading the timeout for server status synchronization 
+        self.serverStatesSyncTimeout = cfg_parser.getint("ClusterTest","serverStatusSyncTimeout")
+
+    # This function will check whether each element in returnList has same values.
     # The expected element in returnList is urlib2 response object, and once we
     # find out there'are difference in returnList, we'll just return false otherwise
     # we will return true here
@@ -147,16 +161,42 @@ class TestEC2ServerModification(unittest.TestCase):
                         self.assertTrue(false,"The server:%s method:%s return value differs from other"%
                             (response[0],methodName))
 
-    def checkMethodStatusConsistent(self,method):
+    def checkMethodStatusConsistent(self,method,method_list):
         responseList=[]
+        url_query=None
+
+        if method_list != None:
+            url_query = urllib.urlencode(
+                method_list)
+
         for server in self.serverList:
-            responseList.append(
-                    (server[self.SERVER_NAME],
-                        urllib2.urlopen( "http://%s:%d/ec2/%s"%(server[self.SERVER_ADDR],server[self.SERVER_PORT],method))
-                        ))
+            if url_query == None:
+                responseList.append(
+                        (server[self.SERVER_NAME],
+                            urllib2.urlopen( 
+                                "http://%s:%d/ec2/%s"%(
+                                    server[self.SERVER_ADDR],
+                                    server[self.SERVER_PORT],
+                                    method))))
+            else:
+                responseList.append(
+                        (server[self.SERVER_NAME],
+                            urllib2.urlopen( 
+                                "http://%s:%d/ec2/%s?%s"%(
+                                    server[self.SERVER_ADDR],
+                                    server[self.SERVER_PORT],
+                                    method,
+                                    url_query))))
+
         # checking the last response validation 
         self.checkResultEqual(responseList,method)
 
+    def ensureServerListStates(self):
+        time.sleep(self.serverStatesSyncTimeout)
+        for method in self.ec2GetRequests:
+            self.checkMethodStatusConsistent(method,None)
+
+        print "All test servers have same states\n"
 
     def getServerInfo(self,serverName):
         for server in self.serverList:
@@ -171,13 +211,55 @@ class TestEC2ServerModification(unittest.TestCase):
 
         return None
 
+
+    def parseMethods(self,method):
+        methods_list = method.split(';')
+        ret=[]
+        for entry in methods_list:
+            entry = entry.split(',')
+
+            post_data=None
+            method_name=None
+
+            if len(entry) == 2 :
+                f = open(entry[1],'r')
+                post_data = f.read()
+                f.close()
+
+            method_name = entry[0]
+
+            ret.append((
+                "http://%s:%d/ec2/%s"%(serverAddress,serverPort,method_name),
+                method_name,
+                post_data))
+
+        return ret
+
+    def parseObserver(self,observer):
+        observer_list=observer.split(',')
+        query_list = None
+
+        if len(observer_list) == 2:
+            query_list=dict()
+            l=observer_list[1].split(';')
+            for query in l:
+                kv=query.split(':')
+                query_list[kv[0]]=kv[1]
+
+        return (observer_list[0],query_list)
+
     def formatTestCaseParam(self,testCase):
         method = self.getTestCaseListItem(testCase,"method")
         if method == None:
             return False
+
+        method_list = self.parseMethods(method)
+
         observer = self.getTestCaseListItem(testCase,"observer")
         if observer == None:
             return False
+
+        observer = self.parseObserver(observer)
 
         server = self.getTestCaseListItem(testCase,"server")
         if server == None:
@@ -190,59 +272,99 @@ class TestEC2ServerModification(unittest.TestCase):
         timeout = self.getTestCaseListItem(testCase,"timeout")
         if timeout == None:
             return False
+        # convert it into the integer 
+        timeout = int(timeout)
 
-        parameters={}
-        for entry in testCase:
-            if (entry[0] == "method") or (entry[0] == "observer") or (entry[0] == "server") or (entry[0] == "timeout"):
-                continue
-            else:
-                parameters[entry[0]]=entry[1]
-
-        url_appending = urllib.urlencode(parameters)
-
-        return ("http://%s:%d/ec2/%s?%s"%(server[self.SERVER_ADDR],server[self.SERVER_PORT],method,url_appending),
-                method,
+        return (method_list,
                 observer,
                 timeout,
                 server[self.SERVER_NAME])
 
-    def sendRequest(self,url,timeout):
+    def sendRequest(self,url,timeout,post_data,tc_name,req_name,ser_name):
         # issue the query request here
-        response = urllib2.urlopen(url)
+        response=None
+
+        if post_data != None:
+            req = urllib2.Request(url, data=post_data, headers={'Content-type': 'application/json'})
+            response = urllib2.urlopen(req)
+        else:
+            response = urllib2.urlopen(url)
+
         if response == None:
+            print "Test case:%s failed.\nThe request:%s for server:%s failed with connection" \
+                %(tc_name,req_name,ser_name)
             return False
+
         if response.getcode() != 200:
+            print "Test case:%s failed.\nThe request:%s for server:%s failed with http error code:%d" \
+                %(tc_name,req_name,ser_name,response.getcode())
             return False
-        return response
+
+        data = response.read()
+
+        if data != '' and data != None:
+            ret_obj = json.loads( data )
+            if "error" in ret_obj:
+                # The request failed
+                print "Test case:%s failed.\nThe request:%s for server:%s failed " \
+                        "with error:%s"%(tc_name,req_name,ser_name,ret_obj["errorString"])
+                return False
+
+        return True
+
 
     def waitForResponse(self,observer,timeout):
-        time.sleep(timeout/1000)
-        self.checkMethodStatusConsistent(observer)
-        
+        time.sleep(timeout)
+        self.checkMethodStatusConsistent(observer[0],observer[1])
 
+    def workOnSingleTestCase(self,test_case_name,tc):
+        arg = self.formatTestCaseParam(tc)
+        if arg == False:
+            return
+        
+        methods_list=arg[0]
+        observer=arg[1]
+        timeout=arg[2]
+        server_name=arg[3]
+
+        # sending out all the request one by one here
+        for methods in methods_list:
+            # Sending out the request
+            self.assertTrue(self.sendRequest(methods[0],timeout,methods[2], \
+                test_case_name,methods[1],server_name),"Failed")
+
+        self.waitForResponse(observer,timeout)
+
+    def runSingleTestCase(self,test_case_name,tc):
+        # Execute the test case in another thread
+        th = threading.Thread(target=self.workOnSingleTestCase,args=(test_case_name,tc,))
+        th.start()
+        return th
+
+    def runSingleTestGroup(self,group_list):
+        # executing the test group locally here
+        print "Start executing test group:%s\n"%(group_list[0])
+
+        thread_list=[]
+        # the group_list[1][0] is the test case name
+        for tc in group_list[1]:
+            thread_list.append(self.runSingleTestCase(tc[0],tc[1]))
+
+        # join all the thread test here
+        for th in thread_list:
+            th.join()
+
+        print "Test group:%s execution finished"%(group_list[0])
+    
     # Iterating all the dynamic execution in the configuration list one by one
     # Generally, a modification test is formed as following structure:
     # (1) A modification
     # (2) Wait for some time
     # (3) Checking all the machine are on the same page
 
-    def test_2(self):
-        for testCase in self.testCaseList:
-            arguments = self.formatTestCaseParam(testCase)
-            if arguments == False:
-                continue
-            self.assertTrue(self.sendRequest( arguments[0], arguments[3]),
-                            "Cannot send request:%s to server:%s"%(arguments[1],arguments[4]))
-            self.waitForResponse(arguments[2],arugments[3])
-
-
-    # This test is used to ensure that at very first stage, all the server has exactly same 
-    # states. Since the execution order of each test case is based on the string order so ,
-    # test_XX will make sure the execution order. This method is not very elegant , but works.
-
-    def test_1(self):
-        for method in self.ec2GetRequests:
-            self.checkMethodStatusConsistent(method)
+    def test_runAllTestCase(self):
+        for group_case in self.testCaseList:
+            self.runSingleTestGroup(group_case)
 
 if __name__ == '__main__':
     # reading config
