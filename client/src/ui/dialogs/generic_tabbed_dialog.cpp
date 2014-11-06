@@ -177,3 +177,6 @@ bool QnGenericTabbedDialog::tryClose(bool force) {
     return true;
 }
 
+void QnGenericTabbedDialog::forcedUpdate() {
+    loadData();
+}

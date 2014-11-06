@@ -628,3 +628,7 @@ void QnWorkbenchLayoutsHandler::at_layouts_saved(int status, const QnResourceLis
 bool QnWorkbenchLayoutsHandler::tryClose(bool force) {
     return closeAllLayouts(true, force);
 }
+
+void QnWorkbenchLayoutsHandler::forcedUpdate() {
+    //do nothing
+}

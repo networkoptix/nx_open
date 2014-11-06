@@ -18,6 +18,7 @@ public:
     virtual void reject() override;
     virtual void accept() override;
 
+    void forcedUpdate();
     bool tryClose(bool force);
 protected:
     void addPage(int key, QnAbstractPreferencesWidget *page, const QString &title);

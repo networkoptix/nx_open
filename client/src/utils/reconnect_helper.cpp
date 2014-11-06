@@ -114,12 +114,9 @@ void QnReconnectHelper::next() {
     updateInterfacesForServer(id);
     m_currentUrl = bestInterfaceForServer(id);
     
-    qDebug() << "next server is" << m_currentServer->getName();
     for (auto iter: m_interfacesByServer[id]) {
         QByteArray status = iter.online ? "online" : "offline";
-        qDebug() << "server interface" << iter.url << "is" << status;
     }
-    qDebug() << "best interface" << m_currentUrl;
 }
 
 void QnReconnectHelper::updateInterfacesForServer(const QnUuid &id) {
