@@ -118,7 +118,7 @@ QSize QnDlink_cam_info::secondaryStreamResolution() const
 QnPlDlinkResource::QnPlDlinkResource()
 {
     setVendor(lit("Dlink"));
-    setAuth(QLatin1String("admin"), QLatin1String(""), false);
+    setDefaultAuth(QLatin1String("admin"), QLatin1String(""));
 }
 
 QString QnPlDlinkResource::getDriverName() const

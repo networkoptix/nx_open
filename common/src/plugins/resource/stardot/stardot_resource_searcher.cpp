@@ -237,7 +237,7 @@ QList<QnResourcePtr> QnStardotResourceSearcher::checkHostAddr(const QUrl& url, c
     res->setModel(model);
     res->setMAC(QnMacAddress(mac));
     res->setHostAddress(host);
-    res->setAuth(auth);
+    res->setDefaultAuth(auth);
 
     QList<QnResourcePtr> resList;
     resList << res;

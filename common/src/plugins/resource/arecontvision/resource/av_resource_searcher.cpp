@@ -256,7 +256,7 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url,
         res->setHostAddress(host);
     else
         res->setUrl(devUrl);
-    res->setAuth(auth);
+    res->setDefaultAuth(auth);
 
     QList<QnResourcePtr> resList;
     resList << res;

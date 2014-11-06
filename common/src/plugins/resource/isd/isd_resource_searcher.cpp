@@ -133,7 +133,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
         resource->setHostAddress(host);
     else
         resource->setUrl(QString(lit("http://%1:%2")).arg(host).arg(port));
-    resource->setAuth(auth);
+    resource->setDefaultAuth(auth);
 
     //resource->setDiscoveryAddr(iface.address);
     QList<QnResourcePtr> result;
