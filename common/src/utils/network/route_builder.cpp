@@ -39,8 +39,18 @@ void QnRouteBuilder::removeConnection(const QnUuid &from, const QnUuid &to, cons
     }
 }
 
-void QnRouteBuilder::clear() {
-    m_routes.clear();
+void QnRouteBuilder::clear(bool indirectOnly) {
+    if (!indirectOnly) {
+        m_routes.clear();
+        return;
+    }
+
+    for (auto it = m_routes.begin(); it != m_routes.end(); /* no inc */) {
+        if (it->length() > 1)
+            it = m_routes.erase(it);
+        else
+            ++it;
+    }
 }
 
 QnRoute QnRouteBuilder::routeTo(const QnUuid &peerId) {
@@ -49,7 +59,9 @@ QnRoute QnRouteBuilder::routeTo(const QnUuid &peerId) {
         return route;
 
     route = buildRouteTo(peerId);
-    m_routes[peerId] = route;
+    if (route.isValid())
+        m_routes[peerId] = route;
+
     return route;
 }
 

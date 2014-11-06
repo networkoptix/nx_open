@@ -7,6 +7,10 @@
 #include "route_builder.h"
 #include "module_finder.h"
 
+namespace {
+    const int refreshInterval = 2 * 60 * 1000; // 2 minutes
+}
+
 QnRouter::QnRouter(QnModuleFinder *moduleFinder, bool passive, QObject *parent) :
     QObject(parent),
     m_mutex(QMutex::Recursive),
@@ -21,6 +25,10 @@ QnRouter::QnRouter(QnModuleFinder *moduleFinder, bool passive, QObject *parent) 
     connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoAdded,    this,   &QnRouter::at_runtimeInfoManager_runtimeInfoAdded);
     connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoChanged,  this,   &QnRouter::at_runtimeInfoManager_runtimeInfoChanged);
     connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoRemoved,  this,   &QnRouter::at_runtimeInfoManager_runtimeInfoRemoved);
+
+    QTimer *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &QnRouter::at_refreshTimer_timeout);
+    timer->start(refreshInterval);
 }
 
 QnRouter::~QnRouter() {}
@@ -126,6 +134,11 @@ void QnRouter::at_runtimeInfoManager_runtimeInfoChanged(const QnPeerRuntimeInfo 
 void QnRouter::at_runtimeInfoManager_runtimeInfoRemoved(const QnPeerRuntimeInfo &data) {
     for (const ec2::ApiConnectionData &connection: data.data.availableConnections)
         removeConnection(data.uuid, Endpoint(connection.peerId, connection.host, connection.port));
+}
+
+void QnRouter::at_refreshTimer_timeout() {
+    QMutexLocker lk(&m_mutex);
+    m_routeBuilder->clear();
 }
 
 bool QnRouter::addConnection(const QnUuid &id, const QnRouter::Endpoint &endpoint) {
