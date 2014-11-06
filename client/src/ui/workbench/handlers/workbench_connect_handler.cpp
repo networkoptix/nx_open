@@ -74,6 +74,9 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /*= 0*/):
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    this,   &QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened);
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionClosed,    this,   &QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed);
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::initialResourcesReceived,    this,   [this] {
+        /* Reload all dialogs and dependent data. */
+        context()->instance<QnWorkbenchStateManager>()->forcedUpdate();
+
         /* We are just reconnected automatically, e.g. after update. */
         if (!m_readyForConnection)
             return;
@@ -393,7 +396,11 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
         errCode = connectToServer(reconnectHelper->currentUrl(), true); /* Here inner event loop will be started. */
         if (errCode == ec2::ErrorCode::ok || errCode == ec2::ErrorCode::unauthorized)   
             break;
-        reconnectHelper->next();
+
+        /* Find next valid server for reconnect. */
+        do {
+            reconnectHelper->next();
+        } while (!reconnectHelper->currentUrl().isValid());
     }
 
     /* Main window can be closed in the event loop so the dialog will be freed. */
