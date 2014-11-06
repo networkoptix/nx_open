@@ -36,9 +36,6 @@ namespace Qn
         else if( httpContentType == "application/xml" )
             return XmlFormat;
         else
-        {
-            assert(false);
             return UnsupportedFormat;
-        }
     }
 }

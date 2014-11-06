@@ -1,0 +1,16 @@
+[
+    {
+        "groupId": "",
+        "groupName": "",
+        "id": "{066fbf9c-2e11-a501-6e15-dfb0fb97c7cb}",
+        "mac": "00-40-8C-BF-92-CE",
+        "manuallyAdded": false,
+        "model": "AXISP1344",
+        "name": "AXISP1344",
+        "parentId": "{47bf37a0-72a6-2890-b967-5da9c390d28a}",
+        "statusFlags": "CSF_NoFlags",
+        "typeId": "{15379a04-aba4-f5dc-e0de-36979fc36954}",
+        "url": "192.168.0.92",
+        "vendor": "Axis"
+    }
+]

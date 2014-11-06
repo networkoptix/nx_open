@@ -663,6 +663,55 @@ bool QnDbManager::updateGuids()
     return true;
 }
 
+void scanDirectoryRecursive(const QString &directory, QStringList &result) {
+    QDir sourceDirectory(directory);
+    for(const QFileInfo& info: sourceDirectory.entryInfoList(QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Files, QDir::DirsFirst)) {
+        if (info.isDir())
+            scanDirectoryRecursive(info.absoluteFilePath(), result);
+        else
+            result.append(info.absoluteFilePath());
+    }
+};
+
+ErrorCode QnDbManager::insertOrReplaceStoredFile(const QString &fileName, const QByteArray &fileContents) {
+    QSqlQuery query(m_sdb);
+    query.prepare("INSERT OR REPLACE INTO vms_storedFiles (path, data) values (:path, :data)");
+    query.bindValue(":path", fileName);
+    query.bindValue(":data", fileContents);
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::dbError;
+    }
+    return ErrorCode::ok;
+}
+
+
+/** Insert sample files into database. */
+bool QnDbManager::insertDefaultStoredFiles() {
+
+    /* Directory name selected equal to the database table name. */
+    const QString baseDirectoryName = lit(":/vms_storedfiles/");
+
+    /* Get all files from the base directory in the resources. Enter folders recursively. */
+    QStringList files;
+    scanDirectoryRecursive(baseDirectoryName, files);
+
+    /* Add each file to database */
+    QDir baseDir(baseDirectoryName);
+    for(const QString &fileName: files) {
+        QString relativeName = baseDir.relativeFilePath(fileName);
+        QFile file(fileName);
+        if (!file.open(QIODevice::ReadOnly))
+            return false;
+        QByteArray data = file.readAll();
+
+        ErrorCode status = insertOrReplaceStoredFile(relativeName, data);
+        if (status != ErrorCode::ok)
+            return false;
+    }
+    return true;
+}
+
 namespace oldBusinessData // TODO: #Elric #EC2 sane naming
 {
     enum BusinessEventType
@@ -846,6 +895,10 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     else if (updateName == lit(":/updates/21_new_dw_cam.sql")) {
         updateResourceTypeGuids();
     }
+    else if (updateName == lit(":/updates/24_insert_default_stored_files.sql")) {
+        insertDefaultStoredFiles();
+    }
+
 
     return true;
 }
@@ -1957,20 +2010,9 @@ ErrorCode QnDbManager::removeLayoutInternal(const QnUuid& id, const qint32 &inte
     return err;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStoredFileData>& tran)
-{
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStoredFileData>& tran) {
     assert( tran.command == ApiCommand::addStoredFile || tran.command == ApiCommand::updateStoredFile );
-
-    QSqlQuery query(m_sdb);
-    query.prepare("INSERT OR REPLACE INTO vms_storedFiles (path, data) values (:path, :data)");
-    query.bindValue(":path", tran.params.path);
-    query.bindValue(":data", tran.params.data);
-    if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
-        return ErrorCode::dbError;
-    }
-    
-    return ErrorCode::ok;
+    return insertOrReplaceStoredFile(tran.params.path, tran.params.data);
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStoredFilePath>& tran)
@@ -2127,6 +2169,18 @@ bool QnDbManager::readMiscParam( const QByteArray& name, QByteArray* value )
         return true;
     }
     return false;
+}
+
+ErrorCode QnDbManager::readSettings(ApiResourceParamDataList& settings)
+{
+    ApiResourceParamWithRefDataList params;
+    ErrorCode rez = doQueryNoLock(m_adminUserID, params);
+    settings.reserve( params.size() );
+    if (rez == ErrorCode::ok) {
+        for(ec2::ApiResourceParamWithRefData& param: params)
+            settings.push_back(ApiResourceParamData(std::move(param.name), std::move(param.value)));
+    }
+    return rez;
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiIdData>& tran)
@@ -2988,18 +3042,6 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
     mergeObjectListData<ApiVideowallData>(data.videowalls,  kvPairs, &ApiVideowallData::addParams,   &ApiResourceParamWithRefData::resourceId);
 */
     return err;
-}
-
-//getParams
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiResourceParamDataList& data)
-{
-    ApiResourceParamWithRefDataList params;
-    ErrorCode rez = doQueryNoLock(m_adminUserID, params);
-    if (rez == ErrorCode::ok) {
-        for(const ec2::ApiResourceParamWithRefData& param: params)
-            data.push_back(ApiResourceParamData(param.name, param.value));
-    }
-    return rez;
 }
 
 ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t &, ApiDiscoveryDataList &data) {

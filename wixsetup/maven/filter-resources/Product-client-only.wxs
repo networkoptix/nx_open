@@ -84,8 +84,22 @@
         <!-- Custom actions -->
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
         <CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="applauncher.exe" ExeCommand=""/>
-
         <CustomAction Id="NoDowngrade" Error="NoDowngrade" /> 
+
+        <CustomAction Id="CloseAppLauncherAction_Cmd" Property="CloseAppLauncherAction"
+                      Value="&quot;[$(var.clientDirId)]$(var.applauncherName).exe&quot; &quot;quit&quot;" Execute="immediate" />
+        <CustomAction Id="CloseAppLauncherAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
+                      Execute="deferred" Return="ignore" Impersonate="no" />
+
+        <CustomAction Id="CloseAppLauncherAction2_Cmd" Property="CloseAppLauncherAction2"
+                      Value='"[WindowsFolder]\System32\taskkill.exe" /F /IM "${display.product.name} Launcher.exe"' Execute="immediate" />
+        <CustomAction Id="CloseAppLauncherAction2" BinaryKey="WixCA" DllEntry="CAQuietExec"
+                      Execute="deferred" Return="ignore" Impersonate="no" />
+
+        <CustomAction Id="CloseAppLauncherAction3_Cmd" Property="CloseAppLauncherAction3"
+                      Value='"[WindowsFolder]\System32\taskkill.exe" /F /IM "${product.name} Launcher.exe"' Execute="immediate" />
+        <CustomAction Id="CloseAppLauncherAction3" BinaryKey="WixCA" DllEntry="CAQuietExec"
+                      Execute="deferred" Return="ignore" Impersonate="no" />
 
         <MajorUpgrade AllowSameVersionUpgrades="yes"
             Schedule="afterInstallInitialize"
@@ -101,6 +115,13 @@
         <InstallExecuteSequence>
             <FindRelatedProducts Before="AppSearch" />
             <AppSearch Before="LaunchConditions" />
+
+            <Custom Action="CloseAppLauncherAction_Cmd" Before="CloseAppLauncherAction">NOT $(var.VmsInstalling)</Custom>
+            <Custom Action="CloseAppLauncherAction" Before="CloseAppLauncherAction2_Cmd">NOT $(var.VmsInstalling)</Custom>
+            <Custom Action="CloseAppLauncherAction2_Cmd" Before="CloseAppLauncherAction2">NOT $(var.VmsInstalling)</Custom>
+            <Custom Action="CloseAppLauncherAction2" Before="CloseAppLauncherAction3_Cmd">NOT $(var.VmsInstalling)</Custom>
+            <Custom Action="CloseAppLauncherAction3_Cmd" Before="CloseAppLauncherAction3">NOT $(var.VmsInstalling)</Custom>
+            <Custom Action="CloseAppLauncherAction3" Before="StopServices">NOT $(var.VmsInstalling)</Custom>
         </InstallExecuteSequence>
 
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
@@ -205,16 +226,8 @@
             <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="2">LICENSE_ALREADY_ACCEPTED</Publish>
             <Publish Dialog="ClientDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2">1</Publish>
 
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="ClientDlg">1</Publish>
-
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">
-                <![CDATA[ $(var.VmsRemoving) OR WixUI_InstallMode = "Repair" ]]>
-            </Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">
-                <![CDATA[ $(var.VmsRemoving) ]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Property="REMOVE" Value="{}" Order="3">
-                <![CDATA[ Installed ]]>
-            </Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="ClientDlg">NOT $(var.VmsRemoving)</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg" Order="2">$(var.VmsRemoving)</Publish>
 
             <Publish Dialog="VerifyReadyDlg" Control="Install" Event="AddLocal" Value="ClientFeature">INSTALL_CLIENT</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Install" Event="Remove" Value="ClientFeature">NOT INSTALL_CLIENT</Publish>
@@ -230,15 +243,9 @@
 
             <Publish Dialog="VerifyReadyDlg" Control="Install" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)">1</Publish>
 
-            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
-            <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Property="REMOVE" Value="ALL">1</Publish>
-            <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
-            <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
-
-            <Publish Dialog="UninstallOptionsDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
-            <Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
-            <Publish Dialog="UninstallOptionsDlg" Control="Back" Property="REMOVE" Value="{}">1</Publish>
-            <Publish Dialog="UninstallOptionsDlg" Control="Back" Property="REMOVE_DATABASE" Value="0">1</Publish>
+            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Property="REMOVE" Value="ALL">1</Publish>
+            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Property="WixUI_InstallMode" Value="Remove">1</Publish>
         </UI>
     </Product>
 </Wix>

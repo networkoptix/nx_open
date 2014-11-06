@@ -157,8 +157,28 @@ body {
   display: none;
 }
 /* show active nested list */
-.bs-docs-sidebar .nav>.active>ul.nav {
+.bs-docs-sidebar .nav>.active>ul.nav,
+.bs-docs-sidebar .nav>.pinned>ul.nav {
   display: block;
+}
+
+.bs-docs-sidebar .nav>.active.pinned-hidden>ul.nav{
+  display: none !important;
+}
+
+
+.bs-docs-sidebar .nav .glyphicon:before{
+  content: "\2b";
+  font-size: 70%;
+}
+
+.bs-docs-sidebar .nav>.active .glyphicon:before,
+.bs-docs-sidebar .nav>.pinned .glyphicon:before {
+  content: "\2212";
+}
+
+.bs-docs-sidebar .nav>.active.pinned-hidden .glyphicon:before{
+  content: "\2b" !important;
 }
 
 /* Iframe with logs on info page */

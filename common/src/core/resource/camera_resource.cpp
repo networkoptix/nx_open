@@ -210,7 +210,7 @@ QString QnVirtualCameraResource::getUniqueId() const
 }
 
 bool QnVirtualCameraResource::isForcedAudioSupported() const {
-    QString val = getProperty(lit("forcedIsAudioSupported"));
+    QString val = getProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME);
     return val.toUInt() > 0;
 }
 
@@ -218,7 +218,7 @@ void QnVirtualCameraResource::forceEnableAudio()
 { 
 	if (isForcedAudioSupported())
         return;
-    setProperty(lit("forcedIsAudioSupported"), 1);
+    setProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME, 1);
     saveParams(); 
 }
 
@@ -226,7 +226,7 @@ void QnVirtualCameraResource::forceDisableAudio()
 { 
     if (!isForcedAudioSupported())
         return;
-    setProperty(lit("forcedIsAudioSupported"), QString(lit("0")));
+    setProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME, QString(lit("0")));
     saveParams(); 
 }
 

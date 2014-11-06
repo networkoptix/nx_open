@@ -401,11 +401,11 @@ Socket::Socket(
     std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
     int type,
     int protocol,
-    SystemSocketImpl* impl )
+    PollableSystemSocketImpl* impl )
 :
     Pollable(
         INVALID_SOCKET,
-        std::unique_ptr<SystemSocketImpl>(impl) ),
+        std::unique_ptr<PollableSystemSocketImpl>(impl) ),
     m_baseAsyncHelper( std::move(asyncHelper) ),
     m_nonBlockingMode( false )
 {
@@ -415,11 +415,11 @@ Socket::Socket(
 Socket::Socket(
     std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
     int _sockDesc,
-    SystemSocketImpl* impl )
+    PollableSystemSocketImpl* impl )
 :
     Pollable(
         _sockDesc,
-        std::unique_ptr<SystemSocketImpl>(impl) ),
+        std::unique_ptr<PollableSystemSocketImpl>(impl) ),
     m_baseAsyncHelper( std::move(asyncHelper) ),
     m_nonBlockingMode( false )
 {
@@ -428,11 +428,11 @@ Socket::Socket(
 Socket::Socket(
     int type,
     int protocol,
-    SystemSocketImpl* impl )
+    PollableSystemSocketImpl* impl )
 :
     Pollable(
         INVALID_SOCKET,
-        std::unique_ptr<SystemSocketImpl>(impl) ),
+        std::unique_ptr<PollableSystemSocketImpl>(impl) ),
     m_baseAsyncHelper( new BaseAsyncSocketImplHelper<Pollable>(this) ),
     m_nonBlockingMode( false )
 {
@@ -441,11 +441,11 @@ Socket::Socket(
 
 Socket::Socket(
     int _sockDesc,
-    SystemSocketImpl* impl )
+    PollableSystemSocketImpl* impl )
 :
     Pollable(
         _sockDesc,
-        std::unique_ptr<SystemSocketImpl>(impl) ),
+        std::unique_ptr<PollableSystemSocketImpl>(impl) ),
     m_baseAsyncHelper( new BaseAsyncSocketImplHelper<Pollable>(this) ),
     m_nonBlockingMode( false )
 {
@@ -565,7 +565,7 @@ CommunicatingSocket::CommunicatingSocket(
     AbstractCommunicatingSocket* abstractSocketPtr,
     int type,
     int protocol,
-    SystemSocketImpl* sockImpl )
+    PollableSystemSocketImpl* sockImpl )
 :
     Socket(
         std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>>(
@@ -582,7 +582,7 @@ CommunicatingSocket::CommunicatingSocket(
 CommunicatingSocket::CommunicatingSocket(
     AbstractCommunicatingSocket* abstractSocketPtr,
     int newConnSD,
-    SystemSocketImpl* sockImpl )
+    PollableSystemSocketImpl* sockImpl )
 :
     Socket(
         std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>>(
@@ -865,7 +865,7 @@ bool CommunicatingSocket::registerTimerImpl( unsigned int timeoutMs, std::functi
 #ifdef _WIN32
 class Win32TcpSocketImpl
 :
-    public SystemSocketImpl
+    public PollableSystemSocketImpl
 {
 public:
     MIB_TCPROW win32TcpTableRow;
@@ -1113,7 +1113,7 @@ static int acceptWithTimeout( int m_fd, int timeoutMillis = DEFAULT_ACCEPT_TIMEO
 
 class TCPServerSocketPrivate
 :
-    public SystemSocketImpl,
+    public PollableSystemSocketImpl,
     public aio::AIOEventHandler<Pollable>
 {
 public:

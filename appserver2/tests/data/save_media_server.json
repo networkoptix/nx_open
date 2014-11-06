@@ -1,0 +1,15 @@
+{
+    "apiUrl": "http://10.0.2.141:7001",
+    "authKey": "{2ce2adcb-9377-40d4-a103-f8ad6bddd4c3}",
+    "flags": "SF_HasPublicIP",
+    "id": "{47bf37a0-72a6-2890-b967-5da9c390d28a}",
+    "name": "Server",
+    "networkAddresses": "192.168.0.1;10.0.2.141;192.168.88.1;95.31.23.214",
+    "panicMode": "PM_None",
+    "parentId": "{00000000-0000-0000-0000-000000000000}",
+    "systemInfo": "windows x64 win78",
+    "systemName": "ak_ec_2.3",
+    "typeId": "{be5d1ee0-b92c-3b34-86d9-bca2dab7826f}", 
+    "url": "rtsp://10.0.2.141:7001",
+    "version": "2.3.0.0"
+}

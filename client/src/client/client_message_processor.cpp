@@ -113,7 +113,7 @@ void QnClientMessageProcessor::checkForTmpStatus(const QnResourcePtr& resource)
     {
         if (mediaServer->getStatus() == Qn::NotDefined)
             return;
-        else if (mediaServer->getStatus() == Qn::Offline)
+        else if (mediaServer->getStatus() == Qn::Offline || mediaServer->getStatus() == Qn::Unauthorized)
             updateServerTmpStatus(mediaServer->getId(), Qn::Offline);
         else
             updateServerTmpStatus(mediaServer->getId(), Qn::NotDefined);
@@ -122,7 +122,7 @@ void QnClientMessageProcessor::checkForTmpStatus(const QnResourcePtr& resource)
     {
         QnMediaServerResourcePtr mediaServer = qnResPool->getResourceById(serverCamera->getParentId()).dynamicCast<QnMediaServerResource>();
         if (mediaServer) {
-            if (mediaServer->getStatus() ==Qn::Offline)
+            if (mediaServer->getStatus() == Qn::Offline || mediaServer->getStatus() == Qn::Unauthorized)
                 serverCamera->setTmpStatus(Qn::Offline);
             else
                 serverCamera->setTmpStatus(Qn::NotDefined);

@@ -72,7 +72,7 @@
 #define VER_PRODUCTVERSION              ${parsedVersion.majorVersion},${parsedVersion.minorVersion},${parsedVersion.incrementalVersion}
 #define VER_PRODUCTVERSION_STR          "${release.version}.${buildNumber}"
 #define VER_COMPANYNAME_STR             "${company.name}"
-#define VER_FILEDESCRIPTION_STR         "${product.title}"
+#define VER_FILEDESCRIPTION_STR         "${product.display.title}"
 #define VER_INTERNALNAME_STR            "${product.title}"
 #define VER_LEGALCOPYRIGHT_STR          "Copyright (c) 2011-2013 Network Optix"
 #define VER_LEGALTRADEMARKS1_STR        "All Rights Reserved"

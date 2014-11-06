@@ -80,6 +80,18 @@ public:
      */
     virtual ~QnWorkbenchDisplay();
 
+     /**
+     * \returns                         Light mode of this workbench display.
+     */
+    Qn::LightModeFlags lightMode() const;
+
+     /**
+     * \param mode                      Light mode for the current display.
+     *                                  Enables or disables certain visualization features
+     *                                  to simplify and speed up painting.
+     */
+    void setLightMode(Qn::LightModeFlags mode);
+
     /**
      * \returns                         Instrument manager owned by this workbench display. 
      */
@@ -424,6 +436,9 @@ private:
 
     /** Current view. */
     QnGraphicsView *m_view;
+
+    /** Set of flags to simplify and speed up painting. */
+    Qn::LightModeFlags m_lightMode;
 
     /** Zoomed state toggle. */
     QnToggle *m_zoomedToggle;

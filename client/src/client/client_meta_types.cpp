@@ -31,6 +31,7 @@ QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode)
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ClientSkin)
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ClientBackground)
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ImageBehaviour)
+//QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::LightModeFlag)
 
 void QnClientMetaTypes::initialize() {
     /* Note that running the code twice is perfectly OK, 
@@ -72,6 +73,9 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnActionParameters>();
     qRegisterMetaType<QnAspectRatioHash>();
     qRegisterMetaTypeStreamOperators<QnAspectRatioHash>();
+
+    qRegisterMetaType<Qn::LightModeFlags>();
+
     qRegisterMetaType<QnWeakObjectHash>();
     qRegisterMetaType<WeakGraphicsItemPointerList>();
     qRegisterMetaType<QnCustomization>();

@@ -29,7 +29,7 @@ public:
     ~QnRouter();
 
     QMultiHash<QnUuid, Endpoint> connections() const;
-    QHash<QnUuid, QnRouteList> routes() const;
+    QHash<QnUuid, QnRoute> routes() const;
 
     QnRoute routeTo(const QnUuid &id) const;
     QnRoute routeTo(const QString &host, quint16 port) const;
@@ -47,6 +47,8 @@ private slots:
     void at_runtimeInfoManager_runtimeInfoAdded(const QnPeerRuntimeInfo &data);
     void at_runtimeInfoManager_runtimeInfoChanged(const QnPeerRuntimeInfo &data);
     void at_runtimeInfoManager_runtimeInfoRemoved(const QnPeerRuntimeInfo &data);
+
+    void at_refreshTimer_timeout();
 
 private:
     bool addConnection(const QnUuid &id, const Endpoint &endpoint);

@@ -85,6 +85,11 @@ QnUuid QnUuid::createUuid()
     return _uuid;
 }
 
+QnUuid QnUuid::fromStringSafe(const QString &uuid)
+{
+    return QnUuid(QUuid(uuid));
+}
+
 uint qHash( const QnUuid& uuid, uint seed ) throw()
 {
     return qHash( uuid.getQUuid(), seed );

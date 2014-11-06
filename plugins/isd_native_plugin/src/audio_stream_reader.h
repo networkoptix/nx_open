@@ -3,6 +3,8 @@
 * akolesnikov@networkoptix.com
 ***********************************************************/
 
+#ifndef NO_ISD_AUDIO
+
 #ifndef AUDIO_STREAM_READER_H
 #define AUDIO_STREAM_READER_H
 
@@ -59,3 +61,5 @@ private:
 };
 
 #endif  //AUDIO_STREAM_READER_H
+
+#endif

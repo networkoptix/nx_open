@@ -136,8 +136,11 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
 
     m_camManager.setCredentials( m_thirdPartyRes->getAuth().user(), m_thirdPartyRes->getAuth().password() );
 
-    if( m_camManager.setAudioEnabled( m_thirdPartyRes->isAudioEnabled() ) != nxcip::NX_NO_ERROR )
-        return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("audio"));
+    if( m_cameraCapabilities & nxcip::BaseCameraManager::audioCapability )
+    {
+        if( m_camManager.setAudioEnabled( m_thirdPartyRes->isAudioEnabled() ) != nxcip::NX_NO_ERROR )
+            return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("audio"));
+    }
 
     const nxcip::Resolution& resolution = m_thirdPartyRes->getSelectedResolutionForEncoder( encoderIndex );
     if( resolution.width*resolution.height > 0 )

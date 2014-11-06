@@ -26,7 +26,7 @@ static const quint16 DEFAULT_AXIS_API_PORT = 80;
 QnPlAxisResource::QnPlAxisResource()
 {
     setVendor(lit("Axis"));
-    setAuth(QLatin1String("root"), QLatin1String("root"), false);
+    setDefaultAuth(QLatin1String("root"), QLatin1String("root"));
     m_lastMotionReadTime = 0;
 }
 

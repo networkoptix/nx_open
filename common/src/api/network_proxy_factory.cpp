@@ -86,7 +86,7 @@ QNetworkProxy QnNetworkProxyFactory::proxyToResource(const QnResourcePtr &resour
     }
 
     if (server) {
-		QnUuid id(QUuid(server->getProperty(lit("guid"))));
+        QnUuid id = QnUuid::fromStringSafe(server->getProperty(lit("guid")));
 		if (id.isNull())
 			id = server->getId();
 

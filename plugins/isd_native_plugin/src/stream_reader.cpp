@@ -188,7 +188,9 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 {
     //std::cout << "ISD plugin getNextData started for encoder" << m_encoderNum << std::endl;
 
+#ifndef NO_ISD_AUDIO
     const bool audioEnabledLocal = m_audioEnabled.load( std::memory_order_relaxed );
+    #endif
 
     const size_t cameraStreamsToRead = 
           1                                                                 //video

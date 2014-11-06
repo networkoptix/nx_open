@@ -94,8 +94,24 @@ QList<QnModuleInformation> QnMulticastModuleFinder::foundModules() const {
 
 void QnMulticastModuleFinder::addIgnoredModule(const QnNetworkAddress &address, const QnUuid &id) {
     QMutexLocker lk(&m_mutex);
-    if (!m_ignoredModules.contains(address, id))
-        m_ignoredModules.insert(address, id);
+    if (m_ignoredModules.contains(address, id))
+        return;
+
+    m_ignoredModules.insert(address, id);
+
+    auto it = m_foundAddresses.find(address);
+    if (it == m_foundAddresses.end())
+        return;
+
+    auto moduleIt = m_foundModules.find(id);
+    if (moduleIt == m_foundModules.end())
+        return;
+
+    if (!moduleIt->remoteAddresses.remove(address.host().toString()))
+        return;
+
+    emit moduleAddressLost(*moduleIt, address);
+    emit moduleChanged(*moduleIt);
 }
 
 void QnMulticastModuleFinder::removeIgnoredModule(const QnNetworkAddress &address, const QnUuid &id) {

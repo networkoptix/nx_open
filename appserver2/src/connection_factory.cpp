@@ -226,12 +226,14 @@ namespace ec2
         //AbstractMiscManager::moduleInfoList
         registerUpdateFuncHandler<ApiModuleDataList>(restProcessorPool, ApiCommand::moduleInfoList);
 
-        //AbstractMiscManager::discoverPeer
+        //AbstractDiscoveryManager::discoverPeer
         registerUpdateFuncHandler<ApiDiscoverPeerData>(restProcessorPool, ApiCommand::discoverPeer);
-        //AbstractMiscManager::addDiscoveryInformation
+        //AbstractDiscoveryManager::addDiscoveryInformation
         registerUpdateFuncHandler<ApiDiscoveryData>(restProcessorPool, ApiCommand::addDiscoveryInformation);
-        //AbstractMiscManager::removeDiscoveryInformation
+        //AbstractDiscoveryManager::removeDiscoveryInformation
         registerUpdateFuncHandler<ApiDiscoveryData>(restProcessorPool, ApiCommand::removeDiscoveryInformation);
+        //AbstractDiscoveryManager::getDiscoveryData
+        registerGetFuncHandler<std::nullptr_t, ApiDiscoveryDataList>(restProcessorPool, ApiCommand::getDiscoveryData);
         //AbstractMiscManager::changeSystemName
         registerUpdateFuncHandler<ApiSystemNameData>(restProcessorPool, ApiCommand::changeSystemName);
 
@@ -258,6 +260,9 @@ namespace ec2
             std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2 ) );
         registerFunctorHandler<ApiLoginData, QnConnectionInfo>( restProcessorPool, ApiCommand::testConnection,
             std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2 ) );
+
+        registerFunctorHandler<std::nullptr_t, ApiResourceParamDataList>( restProcessorPool, ApiCommand::getSettings,
+            std::bind( &Ec2DirectConnectionFactory::getSettings, this, _1, _2 ) );
     }
 
     void Ec2DirectConnectionFactory::setContext( const ResourceContext& resCtx )
@@ -504,6 +509,13 @@ namespace ec2
         m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
             addr, ApiCommand::testConnection, loginInfo, func );
         return reqID;
+    }
+
+    ErrorCode Ec2DirectConnectionFactory::getSettings( std::nullptr_t, ApiResourceParamDataList* const outData )
+    {
+        if( !QnDbManager::instance() )
+            return ErrorCode::ioError;
+        return QnDbManager::instance()->readSettings( *outData );
     }
 
     template<class InputDataType>

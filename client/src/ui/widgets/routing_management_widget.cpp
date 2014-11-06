@@ -151,7 +151,7 @@ void QnRoutingManagementWidget::at_addButton_clicked() {
     }
 
     if (url.port() == -1)
-        url.setPort(defaultRtspPort);
+        url.setPort(m_server ? m_server->getPort() : defaultRtspPort);
 
     QList<QUrl> urls = m_server->getAdditionalUrls();
     if ((m_server->getNetAddrList().contains(QHostAddress(url.host())) && url.port() == m_server->getPort()) || urls.contains(url)) {

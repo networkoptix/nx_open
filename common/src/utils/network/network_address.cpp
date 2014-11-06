@@ -7,6 +7,12 @@ QnNetworkAddress::QnNetworkAddress() :
 {
 }
 
+QnNetworkAddress::QnNetworkAddress(const QString &host, quint16 port) :
+    m_host(QHostAddress(host)),
+    m_port(port)
+{
+}
+
 QnNetworkAddress::QnNetworkAddress(const QHostAddress &address, quint16 port) :
     m_host(address),
     m_port(port)

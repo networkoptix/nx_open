@@ -269,6 +269,10 @@ namespace ec2
         m_discoveryManager->triggerNotification(tran);
     }
 
+    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveryDataList> &tran) {
+        m_discoveryManager->triggerNotification(tran);
+    }
+
     void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiDiscoverPeerData> &tran) {
         m_discoveryManager->triggerNotification(tran);
     }

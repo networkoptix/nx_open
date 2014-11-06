@@ -94,14 +94,22 @@ void QnNetworkResource::setPhysicalId(const QString &physicalId)
     m_physicalId = physicalId;
 }
 
-void QnNetworkResource::setAuth(const QAuthenticator &auth, bool replaceIfExists)
+void QnNetworkResource::setAuth(const QAuthenticator &auth)
 {
-    setProperty( Qn::CAMERA_CREDENTIALS_PARAM_NAME, lit("%1:%2").arg(auth.user()).arg(auth.password()), true, replaceIfExists );
+    setProperty( Qn::CAMERA_CREDENTIALS_PARAM_NAME, lit("%1:%2").arg(auth.user()).arg(auth.password()), true);
+}
+
+void QnNetworkResource::setDefaultAuth(const QAuthenticator &auth)
+{
+    setProperty( Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME, lit("%1:%2").arg(auth.user()).arg(auth.password()), true);
 }
 
 QAuthenticator QnNetworkResource::getAuth() const
 {
-    const QStringList& credentialsList = getProperty(Qn::CAMERA_CREDENTIALS_PARAM_NAME).split(lit(":"));
+    QString value = getProperty(Qn::CAMERA_CREDENTIALS_PARAM_NAME);
+    if (value.isNull())
+        value = getProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME);
+    const QStringList& credentialsList = value.split(lit(":"));
     QAuthenticator auth;
     if( credentialsList.size() >= 1 )
         auth.setUser( credentialsList[0] );
@@ -286,4 +294,20 @@ void QnNetworkResource::initializationDone()
     
     if (getStatus() == Qn::Offline || getStatus() == Qn::Unauthorized || getStatus() == Qn::NotDefined)
         setStatus(Qn::Online);
+}
+
+void QnNetworkResource::setAuth(const QString &user, const QString &password)
+{ 
+    QAuthenticator auth; 
+    auth.setUser(user); 
+    auth.setPassword(password); 
+    setAuth(auth); 
+}
+
+void QnNetworkResource::setDefaultAuth(const QString &user, const QString &password)
+{ 
+    QAuthenticator auth; 
+    auth.setUser(user); 
+    auth.setPassword(password); 
+    setDefaultAuth(auth); 
 }

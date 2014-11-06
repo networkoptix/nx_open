@@ -1,3 +1,5 @@
+-- Migration is processed in the application. Do not rename file.
+
 ALTER TABLE "vms_camera" RENAME TO "vms_camera_tmp";
 
 CREATE TABLE "vms_camera" (
@@ -92,6 +94,13 @@ INSERT INTO vms_camera_user_attributes
     c.prefered_server_id
   FROM vms_camera_tmp c
   JOIN vms_resource r on r.id = c.resource_ptr_id;
+
+INSERT INTO vms_kvpair (resource_guid, name, value)
+     SELECT r.guid, "credentials", c.login || ":" || c.password
+      FROM vms_camera_tmp c
+      JOIN vms_resource r on r.id = c.resource_ptr_id
+     WHERE length(c.login) > 0;
+
 
 DROP TABLE vms_camera_tmp;
 

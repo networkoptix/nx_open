@@ -86,6 +86,7 @@ namespace ec2
             QnConnectionInfo* const connectionInfo );
         int testDirectConnection( const QUrl& addr, impl::TestConnectionHandlerPtr handler );
         int testRemoteConnection( const QUrl& addr, impl::TestConnectionHandlerPtr handler );
+        ErrorCode getSettings( std::nullptr_t, ApiResourceParamDataList* const outData );
 
         template<class InputDataType>
             void registerUpdateFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd );

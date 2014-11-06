@@ -23,10 +23,11 @@
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
         <appserver.name>Enterprise Controller</appserver.name>
         <appserver2.name>${company.name} New Enterprise Controller</appserver2.name>
-        <client.name>${product.name}</client.name>
-        <client.display.name>${display.product.name} Client</client.display.name>
+        <client.name>${company.name} ${product.name} Client</client.name>
+        <client.display.name>${company.name} ${display.product.name} Client</client.display.name>
         <client.mediafolder.name>${product.name} Media</client.mediafolder.name>
         <applauncher.name>${product.name} Launcher</applauncher.name>
+        <applauncher.display.name>${display.product.name} Launcher</applauncher.display.name>
         <axiscamplugin.name>${company.name} AXIS camera integration plugin</axiscamplugin.name>
         <genericrtspplugin.name>${company.name} generic RTSP plugin</genericrtspplugin.name>
         <mediaserver.name>${company.name} Media Server</mediaserver.name>

@@ -299,7 +299,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
     resource->setDeviceOnvifUrl(deviceUrl);
 
     if (!login.isEmpty())
-        resource->setAuth(login, passwd);
+        resource->setDefaultAuth(login, passwd);
 
     return resource;
 }
