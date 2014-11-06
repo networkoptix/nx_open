@@ -24,11 +24,10 @@ angular.module('webadminApp')
                     element.find(".read-container").hide();
                     element.find(".edit-container").show();
                     element.find("input").focus();
-                }
+                };
                 scope.save = function(){
                     if(oldvalue != scope.model){
 
-                        console.log("we should call save function here, val:", attrs.nxOnsave);
                         // Save!
                         scope.$parent.$eval(attrs.nxOnsave);
                     }
@@ -36,14 +35,13 @@ angular.module('webadminApp')
                     oldvalue = scope.model;
                     element.find(".read-container").show();
                     element.find(".edit-container").hide();
-                }
+                };
                 scope.cancel = function(){
                     scope.model = oldvalue;
                     scope.$apply();
-                    console.log("cancel",oldvalue);
                     element.find(".read-container").show();
                     element.find(".edit-container").hide();
-                }
+                };
 
                 element.find(".edit-container").hide();
             }
