@@ -30,7 +30,7 @@ QMultiHash<QnUuid, QnRouter::Endpoint> QnRouter::connections() const {
     return m_connections;
 }
 
-QHash<QnUuid, QnRouteList> QnRouter::routes() const {
+QHash<QnUuid, QnRoute> QnRouter::routes() const {
     QMutexLocker lk(&m_mutex);
     return m_routeBuilder->routes();
 }
