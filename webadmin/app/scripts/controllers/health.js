@@ -124,7 +124,6 @@ angular.module('webadminApp')
                     data: Array.apply(null, new Array($scope.healthLength)).map(Number.prototype.valueOf,0)
                 });
             }
-            console.log(datasets);
             $scope.datasets = datasets;
             $scope.updateVisibleDatasets();
         }
@@ -154,9 +153,6 @@ angular.module('webadminApp')
                     value  = needstat[0].value;
                 }
 
-                if(value>100){
-                    console.log(value,dataset,needstat);
-                }
 
                 dataset.data.push(value * 100);
                 if (dataset.data.length > $scope.healthLength) {

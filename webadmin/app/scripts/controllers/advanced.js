@@ -95,8 +95,7 @@ angular.module('webadminApp')
                     });
 
                     mediaserver.saveStorages(info.storages).then(function(r){
-                        console.log("saveStorages" , r);
-                        if(typeof(r.error)!="undefined" && r.error!=0) {
+                         if(typeof(r.error)!="undefined" && r.error!=0) {
                             var errorToShow = r.errorString;
                             /* switch (errorToShow) {
                                 case 'UNAUTHORIZED':
