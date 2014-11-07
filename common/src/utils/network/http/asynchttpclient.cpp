@@ -78,6 +78,127 @@ namespace nx_http
         //AIOService guarantees that eventTriggered had returned and will never be called with m_socket
     }
 
+    AsyncHttpClient::State AsyncHttpClient::state() const
+    {
+        return m_state;
+    }
+
+    bool AsyncHttpClient::failed() const
+    {
+        return m_state == sFailed;
+    }
+
+    //!Start request to \a url
+    /*!
+        \return true, if socket is created and async connect is started. false otherwise
+        To get error description use SystemError::getLastOSErrorCode()
+    */
+    bool AsyncHttpClient::doGet( const QUrl& url )
+    {
+        resetDataBeforeNewRequest();
+        m_url = url;
+        composeRequest( nx_http::Method::GET );
+        return initiateHttpMessageDelivery( url );
+    }
+
+    bool AsyncHttpClient::doPost(
+        const QUrl& url,
+        const nx_http::StringType& contentType,
+        const nx_http::StringType& messageBody )
+    {
+        resetDataBeforeNewRequest();
+        m_url = url;
+        composeRequest( nx_http::Method::POST );
+        m_request.headers.insert( make_pair("Content-Type", contentType) );
+        m_request.headers.insert( make_pair("Content-Length", StringType::number(messageBody.size())) );
+        //TODO #ak support chunked encoding & compression
+        m_request.headers.insert( make_pair("Content-Encoding", "identity") );
+        m_request.messageBody = messageBody;
+        return initiateHttpMessageDelivery( url );
+    }
+
+    /*!
+        Response is valid only after signal \a responseReceived() has been emitted
+    */
+    const Response* AsyncHttpClient::response() const
+    {
+        const Message& httpMsg = m_httpStreamReader.message();
+        return httpMsg.type == MessageType::response ? httpMsg.response : NULL;
+    }
+
+    StringType AsyncHttpClient::contentType() const
+    {
+        const Message& httpMsg = m_httpStreamReader.message();
+        if( httpMsg.type == MessageType::none )
+            return StringType();
+        HttpHeaders::const_iterator contentTypeIter = httpMsg.headers().find( "Content-Type" );
+        if( contentTypeIter == httpMsg.headers().end() )
+            return StringType();
+        return contentTypeIter->second;
+    }
+
+    //!Returns current message body buffer, clearing it
+    BufferType AsyncHttpClient::fetchMessageBodyBuffer()
+    {
+        return m_httpStreamReader.fetchMessageBody();
+    }
+
+    const QUrl& AsyncHttpClient::url() const
+    {
+        return m_url;
+    }
+
+    quint64 AsyncHttpClient::totalBytesRead() const
+    {
+        QMutexLocker lk( &m_mutex );
+        return m_totalBytesRead;
+    }
+
+    void AsyncHttpClient::setUseCompression( bool toggleUseEntityEncoding )
+    {
+        m_contentEncodingUsed = toggleUseEntityEncoding;
+    }
+
+    void AsyncHttpClient::setSubsequentReconnectTries( int /*reconnectTries*/ )
+    {
+        //TODO #ak
+    }
+
+    void AsyncHttpClient::setTotalReconnectTries( int /*reconnectTries*/ )
+    {
+        //TODO #ak
+    }
+
+    void AsyncHttpClient::setUserAgent( const QString& userAgent )
+    {
+        m_userAgent = userAgent;
+    }
+
+    void AsyncHttpClient::setUserName( const QString& userName )
+    {
+        m_userName = userName;
+    }
+
+    void AsyncHttpClient::setUserPassword( const QString& userPassword )
+    {
+        m_userPassword = userPassword;
+    }
+
+    void AsyncHttpClient::setResponseReadTimeoutMs( unsigned int _responseReadTimeoutMs )
+    {
+        m_responseReadTimeoutMs = _responseReadTimeoutMs;
+    }
+
+    void AsyncHttpClient::setMessageBodyReadTimeoutMs( unsigned int messageBodyReadTimeoutMs )
+    {
+        m_msgBodyReadTimeoutMs = messageBodyReadTimeoutMs;
+    }
+
+    void AsyncHttpClient::setDecodeChunkedMessageBody( bool val )
+    {
+        m_httpStreamReader.setDecodeChunkedMessageBody( val );
+    }
+
     void AsyncHttpClient::asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode )
     {
         std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
@@ -360,127 +481,6 @@ namespace nx_http
         }
     }
 
-    AsyncHttpClient::State AsyncHttpClient::state() const
-    {
-        return m_state;
-    }
-
-    bool AsyncHttpClient::failed() const
-    {
-        return m_state == sFailed;
-    }
-
-    //!Start request to \a url
-    /*!
-        \return true, if socket is created and async connect is started. false otherwise
-        To get error description use SystemError::getLastOSErrorCode()
-    */
-    bool AsyncHttpClient::doGet( const QUrl& url )
-    {
-        resetDataBeforeNewRequest();
-        m_url = url;
-        composeRequest( nx_http::Method::GET );
-        return initiateHttpMessageDelivery( url );
-    }
-
-    bool AsyncHttpClient::doPost(
-        const QUrl& url,
-        const nx_http::StringType& contentType,
-        const nx_http::StringType& messageBody )
-    {
-        resetDataBeforeNewRequest();
-        m_url = url;
-        composeRequest( nx_http::Method::POST );
-        m_request.headers.insert( make_pair("Content-Type", contentType) );
-        m_request.headers.insert( make_pair("Content-Length", StringType::number(messageBody.size())) );
-        //TODO #ak support chunked encoding & compression
-        m_request.headers.insert( make_pair("Content-Encoding", "identity") );
-        m_request.messageBody = messageBody;
-        return initiateHttpMessageDelivery( url );
-    }
-
-    /*!
-        Response is valid only after signal \a responseReceived() has been emitted
-    */
-    const Response* AsyncHttpClient::response() const
-    {
-        const Message& httpMsg = m_httpStreamReader.message();
-        return httpMsg.type == MessageType::response ? httpMsg.response : NULL;
-    }
-
-    StringType AsyncHttpClient::contentType() const
-    {
-        const Message& httpMsg = m_httpStreamReader.message();
-        if( httpMsg.type == MessageType::none )
-            return StringType();
-        HttpHeaders::const_iterator contentTypeIter = httpMsg.headers().find( "Content-Type" );
-        if( contentTypeIter == httpMsg.headers().end() )
-            return StringType();
-        return contentTypeIter->second;
-    }
-
-    //!Returns current message body buffer, clearing it
-    BufferType AsyncHttpClient::fetchMessageBodyBuffer()
-    {
-        return m_httpStreamReader.fetchMessageBody();
-    }
-
-    const QUrl& AsyncHttpClient::url() const
-    {
-        return m_url;
-    }
-
-    quint64 AsyncHttpClient::totalBytesRead() const
-    {
-        QMutexLocker lk( &m_mutex );
-        return m_totalBytesRead;
-    }
-
-    void AsyncHttpClient::setUseCompression( bool toggleUseEntityEncoding )
-    {
-        m_contentEncodingUsed = toggleUseEntityEncoding;
-    }
-
-    void AsyncHttpClient::setSubsequentReconnectTries( int /*reconnectTries*/ )
-    {
-        //TODO #ak
-    }
-
-    void AsyncHttpClient::setTotalReconnectTries( int /*reconnectTries*/ )
-    {
-        //TODO #ak
-    }
-
-    void AsyncHttpClient::setUserAgent( const QString& userAgent )
-    {
-        m_userAgent = userAgent;
-    }
-
-    void AsyncHttpClient::setUserName( const QString& userName )
-    {
-        m_userName = userName;
-    }
-
-    void AsyncHttpClient::setUserPassword( const QString& userPassword )
-    {
-        m_userPassword = userPassword;
-    }
-
-    void AsyncHttpClient::setResponseReadTimeoutMs( unsigned int _responseReadTimeoutMs )
-    {
-        m_responseReadTimeoutMs = _responseReadTimeoutMs;
-    }
-
-    void AsyncHttpClient::setMessageBodyReadTimeoutMs( unsigned int messageBodyReadTimeoutMs )
-    {
-        m_msgBodyReadTimeoutMs = messageBodyReadTimeoutMs;
-    }
-
-    void AsyncHttpClient::setDecodeChunkedMessageBody( bool val )
-    {
-        m_httpStreamReader.setDecodeChunkedMessageBody( val );
-    }
-
     void AsyncHttpClient::resetDataBeforeNewRequest()
     {
         //stopping client, if it is running
@@ -614,20 +614,8 @@ namespace nx_http
 
         //adding user credentials
 
-        if (m_authType == authBasicAndDigest)
-        {
-            if( !m_userName.isEmpty() || !m_userPassword.isEmpty() )
-            {
-                nx_http::insertOrReplaceHeader(
-                    &m_request.headers,
-                    nx_http::HttpHeader(
-                        header::Authorization::NAME,
-                        header::BasicAuthorization( m_userName.toLatin1(), m_userPassword.toLatin1() ).toString() ) );
-            }
-        }
-        else {
-            nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
-        }
+        //not using Basic authentication by default, since it is not secure
+        nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
     }
 
     void AsyncHttpClient::addRequestHeader(const StringType& key, const StringType& value)
