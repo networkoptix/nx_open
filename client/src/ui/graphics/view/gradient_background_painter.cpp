@@ -33,9 +33,8 @@ QnGradientBackgroundPainter::QnGradientBackgroundPainter(qreal cycleIntervalSecs
     m_cycleIntervalSecs(cycleIntervalSecs),
     m_rainbow(new QnRainbow(this))
 {
-    connect(this->context()->instance<QnWorkbenchPanicWatcher>(),               &QnWorkbenchPanicWatcher::panicModeChanged, this,   &QnGradientBackgroundPainter::updateBackgroundColorAnimated);
-    connect(qnSettings->notifier(QnClientSettings::BACKGROUND_MODE),            &QnPropertyNotifier::valueChanged,          this,   &QnGradientBackgroundPainter::updateBackgroundColorAnimated);
-    connect(qnSettings->notifier(QnClientSettings::CUSTOM_BACKGROUND_COLOR),    &QnPropertyNotifier::valueChanged,          this,   &QnGradientBackgroundPainter::updateBackgroundColorAnimated);
+    connect(this->context()->instance<QnWorkbenchPanicWatcher>(),   &QnWorkbenchPanicWatcher::panicModeChanged, this,   &QnGradientBackgroundPainter::updateBackgroundColorAnimated);
+    connect(qnSettings->notifier(QnClientSettings::BACKGROUND),     &QnPropertyNotifier::valueChanged,          this,   &QnGradientBackgroundPainter::updateBackgroundColorAnimated);
 
     updateBackgroundColor(false);
 
@@ -112,29 +111,30 @@ void QnGradientBackgroundPainter::setColors(const QnBackgroundColors &colors) {
 }
 
 void QnGradientBackgroundPainter::updateBackgroundColor(bool animate) {
-    QColor backgroundColor;
+    QnClientBackground background = qnSettings->background();
+
+    QColor targetColor;
     
     if(context()->instance<QnWorkbenchPanicWatcher>()->isPanicMode())
-        backgroundColor = m_colors.panic;
-    else switch (qnSettings->backgroundMode()) {
-    case Qn::NoBackground:
-        backgroundColor = QColor();
+        targetColor = m_colors.panic;
+    else if (!background.animationEnabled)
+        targetColor = QColor();
+    else switch (background.animationMode) {
+    case Qn::DefaultAnimation:
+        targetColor = m_colors.normal;
         break;
-    case Qn::DefaultBackground:
-        backgroundColor = m_colors.normal;
+    case Qn::RainbowAnimation:
+        targetColor = toTransparent(m_rainbow->currentColor(), 0.5);
         break;
-    case Qn::RainbowBackground:
-        backgroundColor = toTransparent(m_rainbow->currentColor(), 0.5);
-        break;
-    case Qn::CustomColorBackground:
-        backgroundColor = qnSettings->customBackgroundColor();
+    case Qn::CustomAnimation:
+        targetColor = background.animationCustomColor;
         break;
     }
 
     if(animate) {
-        backgroundColorAnimator()->animateTo(backgroundColor);
+        backgroundColorAnimator()->animateTo(targetColor);
     } else {
-        m_currentColor = backgroundColor;
+        m_currentColor = targetColor;
     }
 }
 
@@ -142,7 +142,10 @@ void QnGradientBackgroundPainter::drawLayer(QPainter *painter, const QRectF &rec
     if (!isEnabled())
         return;
 
-    if (qnSettings->backgroundMode() == Qn::RainbowBackground
+    QnClientBackground background = qnSettings->background();
+
+    if (background.animationEnabled
+        && background.animationMode == Qn::RainbowAnimation
         && !context()->instance<QnWorkbenchPanicWatcher>()->isPanicMode()
         && !backgroundColorAnimator()->isRunning())
     {

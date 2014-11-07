@@ -461,7 +461,7 @@ void QnWorkbenchDisplay::initSceneView() {
     /* Set up background */ 
     if (!(m_lightMode & Qn::LightModeNoSceneBackground)) {
         /* Never set QObject* parent in the QScopedPointer-stored objects if not sure in the descruction order. */
-        m_backgroundPainter = new QnGradientBackgroundPainter(qnSettings->radialBackgroundCycle(), NULL, context());
+        m_backgroundPainter = new QnGradientBackgroundPainter(qnSettings->background().animationPeriodSec, NULL, context());
         m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
     }
 

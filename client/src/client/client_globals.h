@@ -260,12 +260,10 @@ namespace Qn {
         LightSkin
     };
 
-    enum ClientBackground {
-        NoBackground,
-        DefaultBackground,
-        RainbowBackground,
-        CustomColorBackground,
-        ImageBackground
+    enum BackgroundAnimationMode {
+        DefaultAnimation,
+        RainbowAnimation,
+        CustomAnimation
     };
 
     enum ImageBehaviour {
@@ -284,8 +282,8 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::ClientSkin)(Qn::ClientBackground)(Qn::ImageBehaviour), 
-    (metatype)(lexical)
+    (Qn::ClientSkin)(Qn::BackgroundAnimationMode)(Qn::ImageBehaviour), 
+    (metatype)(lexical)(datastream)
     )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

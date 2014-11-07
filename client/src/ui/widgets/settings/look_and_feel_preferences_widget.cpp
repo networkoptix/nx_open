@@ -37,79 +37,28 @@ QnLookAndFeelPreferencesWidget::QnLookAndFeelPreferencesWidget(QWidget *parent) 
     m_updating(false),
     m_oldLanguage(0),
     m_oldSkin(0),
-    m_oldBackgroundMode(Qn::DefaultBackground),
-    m_oldBackgroundImageOpacity(0.5),
-    m_oldBackgroundImageMode(Qn::StretchImage)
+    m_oldTimeMode(Qn::ServerTimeMode)
 {
     ui->setupUi(this);
 
-    ui->timeModeComboBox->addItem(tr("Server Time"), Qn::ServerTimeMode);
-    ui->timeModeComboBox->addItem(tr("Client Time"), Qn::ClientTimeMode);
-
-    ui->skinComboBox->addItem(tr("Dark"), Qn::DarkSkin);
-    ui->skinComboBox->addItem(tr("Light"), Qn::LightSkin);
-
-    setHelpTopic(ui->tourCycleTimeLabel,      ui->tourCycleTimeSpinBox,       Qn::SystemSettings_General_TourCycleTime_Help);
-    setHelpTopic(ui->showIpInTreeLabel,       ui->showIpInTreeCheckBox,       Qn::SystemSettings_General_ShowIpInTree_Help);
-    setHelpTopic(ui->languageLabel,           ui->languageComboBox,           Qn::SystemSettings_General_Language_Help);
     setHelpTopic(ui->lookAndFeelGroupBox,                                     Qn::SystemSettings_General_Customizing_Help);
+    setHelpTopic(ui->languageLabel,           ui->languageComboBox,           Qn::SystemSettings_General_Language_Help);
+    setHelpTopic(ui->tourCycleTimeLabel,      ui->tourCycleTimeSpinBox,       Qn::SystemSettings_General_TourCycleTime_Help);
+    setHelpTopic(ui->showIpInTreeLabel,       ui->showIpInTreeCheckBox,       Qn::SystemSettings_General_ShowIpInTree_Help);   
 
-    initTranslations();
-
-    setWarningStyle(ui->languageWarningLabel);
-    setWarningStyle(ui->skinWarningLabel);
-    ui->languageWarningLabel->setVisible(false);
-    ui->skinWarningLabel->setVisible(false);
-
-    connect(ui->timeModeComboBox,                       QnComboboxActivated,            this,   &QnLookAndFeelPreferencesWidget::at_timeModeComboBox_activated);
-    connect(ui->languageComboBox,                       QnComboboxCurrentIndexChanged,  this,   [this](int index) {
-        ui->languageWarningLabel->setVisible(m_oldLanguage != index);
-    });
-    connect(ui->skinComboBox,                           QnComboboxCurrentIndexChanged,  this,   [this](int index) {
-        ui->skinWarningLabel->setVisible(m_oldSkin != index);
-    });
-
-    QButtonGroup* buttonGroup = new QButtonGroup(this);
-    buttonGroup->addButton(ui->backgroundEmptyRadioButton,      Qn::NoBackground);
-    buttonGroup->addButton(ui->backgroundDefaultRadioButton,    Qn::DefaultBackground);
-    buttonGroup->addButton(ui->backgroundRainbowRadioButton,    Qn::RainbowBackground);
-    buttonGroup->addButton(ui->backgroundCustomRadioButton,     Qn::CustomColorBackground);
-    buttonGroup->addButton(ui->backgroundImageRadioButton,      Qn::ImageBackground);
-
-    connect(buttonGroup,    QnButtonGroupIdToggled, this, [this](int id, bool toggled) {
-        if (!toggled)
-            return;
-
-        action(Qn::ToggleBackgroundAnimationAction)->setChecked(id != Qn::NoBackground && id != Qn::ImageBackground);
-        qnSettings->setBackgroundMode(static_cast<Qn::ClientBackground>(id));
-    });
-
-    connect(ui->selectColorButton,                      &QPushButton::clicked,          this,   [this] {
-        if (m_colorDialog->exec())
-            updateBackgroundColor();
-    });
-
-    connect(ui->backgroundColorOpacitySpinBox,          QnSpinboxIntValueChanged,       this,   &QnLookAndFeelPreferencesWidget::updateBackgroundColor);
-
-    connect(ui->selectImageButton,                      &QPushButton::clicked,          this,   &QnLookAndFeelPreferencesWidget::selectBackgroundImage);
-    connect(ui->backgroundImageOpacitySpinBox,          QnSpinboxIntValueChanged,       this,   [this](int value) {
-        if (!m_updating)
-            qnSettings->setBackgroundImageOpacity(0.01 * value);
-    });
-
-    ui->backgroundImageModeComboBox->addItem(tr("Stretch"), qVariantFromValue(Qn::StretchImage));
-    ui->backgroundImageModeComboBox->addItem(tr("Fit"),     qVariantFromValue(Qn::FitImage));
-    ui->backgroundImageModeComboBox->addItem(tr("Crop"),    qVariantFromValue(Qn::CropImage));
-
-    connect(ui->backgroundImageModeComboBox,            QnComboboxCurrentIndexChanged,  this,   [this] {
-        if (m_updating)
-            return;
-        qnSettings->setBackgroundImageMode(ui->backgroundImageModeComboBox->currentData().value<Qn::ImageBehaviour>());
-    });
+    setupLanguageUi();
+    setupSkinUi();
+    setupTimeModeUi();
+    setupBackgroundUi();
 }
 
 QnLookAndFeelPreferencesWidget::~QnLookAndFeelPreferencesWidget()
 {
+}
+
+bool QnLookAndFeelPreferencesWidget::event(QEvent *event) {
+    bool result = base_type::event(event);
+    return result;
 }
 
 void QnLookAndFeelPreferencesWidget::submitToSettings() {
@@ -151,46 +100,31 @@ void QnLookAndFeelPreferencesWidget::updateFromSettings() {
     ui->languageComboBox->setCurrentIndex(m_oldLanguage);
 
     bool backgroundAllowed = !(qnSettings->lightMode() & Qn::LightModeNoSceneBackground);
-    ui->backgroundGroupBox->setEnabled(backgroundAllowed);
-    m_oldBackgroundMode = qnSettings->backgroundMode();
-    m_oldCustomBackgroundColor = qnSettings->customBackgroundColor();
-    m_oldBackgroundImage = qnSettings->backgroundImage();
-    m_oldBackgroundImageOpacity = qnSettings->backgroundImageOpacity();
-    m_oldBackgroundImageMode = qnSettings->backgroundImageMode();
+    ui->animationGroupBox->setEnabled(backgroundAllowed);
+    ui->imageGroupBox->setEnabled(backgroundAllowed);
+
+    QnClientBackground background = qnSettings->background();
+    m_oldBackground = background;
 
     if (!backgroundAllowed) {
-        ui->backgroundEmptyRadioButton->setChecked(true);
+        ui->animationEnabledCheckBox->setChecked(false);
+        ui->imageEnabledCheckBox->setChecked(false);
     } else {
-        switch (qnSettings->backgroundMode()) {
-        case Qn::NoBackground:
-            ui->backgroundEmptyRadioButton->setChecked(true);
-            break;
-        case Qn::RainbowBackground:
-            ui->backgroundRainbowRadioButton->setChecked(true);
-            break;
-        case Qn::CustomColorBackground:
-            ui->backgroundCustomRadioButton->setChecked(true);
-            break;
-        case Qn::ImageBackground:
-            ui->backgroundImageRadioButton->setChecked(true);
-            break;
-        default:
-            ui->backgroundDefaultRadioButton->setChecked(true);
-            break;
-        }
+        ui->animationEnabledCheckBox->setChecked(background.animationEnabled);
+        ui->animationColorComboBox->setCurrentIndex(ui->animationColorComboBox->findData(qVariantFromValue(background.animationMode)));
+        ui->colorSelectButton->setEnabled(background.animationMode == Qn::CustomAnimation);
+        QColor customColor = background.animationCustomColor;
+        if (!customColor.isValid())
+            customColor = withAlpha(Qt::darkBlue, 64);
+        m_colorDialog->setCurrentColor(withAlpha(customColor, 255));
+        ui->animationOpacitySpinBox->setValue(qRound(customColor.alphaF() * 100));
+        updateAnimationCustomColor();
+
+        ui->imageEnabledCheckBox->setChecked(background.imageEnabled);
+        ui->imageNameLineEdit->setText(background.imageOriginalName);
+        ui->imageModeComboBox->setCurrentIndex(ui->imageModeComboBox->findData(qVariantFromValue(background.imageMode)));
+        ui->imageOpacitySpinBox->setValue(qRound(background.imageOpacity * 100));
     }
-
-    QColor customColor = qnSettings->customBackgroundColor();
-    if (!customColor.isValid())
-        customColor = withAlpha(Qt::darkBlue, 64);
-
-    m_colorDialog->setCurrentColor(withAlpha(customColor, 255));
-    ui->backgroundColorOpacitySpinBox->setValue(qRound(customColor.alphaF() * 100));
-    ui->backgroundImageOpacitySpinBox->setValue(qRound(qnSettings->backgroundImageOpacity() * 100));
-
-    ui->backgroundImageModeComboBox->setCurrentIndex(ui->backgroundImageModeComboBox->findData(qVariantFromValue(qnSettings->backgroundImageMode())));
-
-    updateBackgroundColor();
 }
 
 bool QnLookAndFeelPreferencesWidget::confirm() {
@@ -200,36 +134,36 @@ bool QnLookAndFeelPreferencesWidget::confirm() {
 
 bool QnLookAndFeelPreferencesWidget::discard() {
     bool backgroundAllowed = !(qnSettings->lightMode() & Qn::LightModeNoSceneBackground);
-    if (backgroundAllowed) {
-        qnSettings->setBackgroundMode(m_oldBackgroundMode);
-        qnSettings->setCustomBackgroundColor(m_oldCustomBackgroundColor);
-        qnSettings->setBackgroundImage(m_oldBackgroundImage);
-        qnSettings->setBackgroundImageOpacity(m_oldBackgroundImageOpacity);
-        qnSettings->setBackgroundImageMode(m_oldBackgroundImageMode);
-    }
+    if (backgroundAllowed)
+        qnSettings->setBackground(m_oldBackground);
     return true;
 }
 
-
-void QnLookAndFeelPreferencesWidget::initTranslations() {
-    QnTranslationListModel *model = new QnTranslationListModel(this);
-    model->setTranslations(qnCommon->instance<QnClientTranslationManager>()->loadTranslations());
-    ui->languageComboBox->setModel(model);
-}
-
-QColor QnLookAndFeelPreferencesWidget::backgroundColor() const {
+QColor QnLookAndFeelPreferencesWidget::animationCustomColor() const {
     QColor color = m_colorDialog->currentColor();
-    color.setAlphaF(0.01* ui->backgroundColorOpacitySpinBox->value());
+    color.setAlphaF(0.01* ui->animationOpacitySpinBox->value());
     return color;
 }
 
-void QnLookAndFeelPreferencesWidget::updateBackgroundColor() {
-    QPixmap pixmap(16, 16);
-    pixmap.fill(withAlpha(backgroundColor(), 255));
-    ui->selectColorButton->setIcon(pixmap);
+void QnLookAndFeelPreferencesWidget::updateAnimationCustomColor() {
+    const int iconDim = 16;
+    const QSize iconSize(iconDim, iconDim);
+    const QRect iconRect(QPoint(0, 0), iconSize);
+    {
+        QPixmap pixmap(iconSize);
+        pixmap.fill(Qt::transparent);
+        QPainter painter(&pixmap);
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(withAlpha(animationCustomColor(), 255));
+        painter.drawRoundedRect(iconRect, 50, 50, Qt::RelativeSize);
+        ui->colorSelectButton->setIcon(pixmap);
+    }
 
-    if (!m_updating)
-        qnSettings->setCustomBackgroundColor(backgroundColor());
+    if (!m_updating) {
+        QnClientBackground background = qnSettings->background();
+        background.animationCustomColor = animationCustomColor();
+        qnSettings->setBackground(background);
+    }
 }
 
 void QnLookAndFeelPreferencesWidget::selectBackgroundImage() {
@@ -253,15 +187,14 @@ void QnLookAndFeelPreferencesWidget::selectBackgroundImage() {
     if(!dialog->exec())
         return;
 
-    QString fileName = dialog->selectedFile();
-    if (fileName.isEmpty())
+    QString originalFileName = dialog->selectedFile();
+    if (originalFileName.isEmpty())
         return;
 
-    qnSettings->setBackgroundsFolder(QFileInfo(fileName).absolutePath());
+    qnSettings->setBackgroundsFolder(QFileInfo(originalFileName).absolutePath());
 
-
-    QString cachedName = QnAppServerImageCache::cachedImageFilename(fileName);
-    if (qnSettings->backgroundImage() == cachedName)
+    QString cachedName = QnAppServerImageCache::cachedImageFilename(originalFileName);
+    if (qnSettings->background().imageName == cachedName)
         return;
 
     QnProgressDialog* progressDialog = new QnProgressDialog(this);
@@ -271,23 +204,124 @@ void QnLookAndFeelPreferencesWidget::selectBackgroundImage() {
     progressDialog->setModal(true);
 
     QnLocalFileCache* imgCache = new QnLocalFileCache(this);
-    connect(imgCache, &QnAppServerFileCache::fileUploaded, this, [this, imgCache, progressDialog](const QString &filename) {
-        if (!progressDialog->wasCanceled())
-            qnSettings->setBackgroundImage(filename);
+    connect(imgCache, &QnAppServerFileCache::fileUploaded, this, [this, imgCache, progressDialog, originalFileName](const QString &storedFileName) {
+        if (!progressDialog->wasCanceled()) {
+            QnClientBackground background = qnSettings->background();
+            background.imageName = storedFileName;
+            background.imageOriginalName = QFileInfo(originalFileName).fileName();
+            qnSettings->setBackground(background);
+            ui->imageNameLineEdit->setText( background.imageOriginalName);
+        }
         imgCache->deleteLater();
         progressDialog->hide();
         progressDialog->deleteLater();
     });
  
-    imgCache->storeImage(fileName);
+    imgCache->storeImage(originalFileName);
     progressDialog->exec();
 }
 
-// -------------------------------------------------------------------------- //
-// Handlers
-// -------------------------------------------------------------------------- //
-void QnLookAndFeelPreferencesWidget::at_timeModeComboBox_activated() {
-    if(ui->timeModeComboBox->itemData(ui->timeModeComboBox->currentIndex(), Qt::UserRole).toInt() == Qn::ClientTimeMode) {
-        QMessageBox::warning(this, tr("Warning"), tr("This option will not affect Recording Schedule. \nRecording Schedule is always based on Server Time."));
-    }
+void QnLookAndFeelPreferencesWidget::setupLanguageUi() {
+    QnTranslationListModel *model = new QnTranslationListModel(this);
+    model->setTranslations(qnCommon->instance<QnClientTranslationManager>()->loadTranslations());
+    ui->languageComboBox->setModel(model);
+
+    setWarningStyle(ui->languageWarningLabel);
+    ui->languageWarningLabel->setVisible(false);
+
+    connect(ui->languageComboBox, QnComboboxCurrentIndexChanged,  this,   [this](int index) {
+        ui->languageWarningLabel->setVisible(m_oldLanguage != index);
+    });
+}
+
+void QnLookAndFeelPreferencesWidget::setupSkinUi() {
+    ui->skinComboBox->addItem(tr("Dark"), Qn::DarkSkin);
+    ui->skinComboBox->addItem(tr("Light"), Qn::LightSkin);
+    setWarningStyle(ui->skinWarningLabel);
+    ui->skinWarningLabel->setVisible(false);
+
+    connect(ui->skinComboBox, QnComboboxCurrentIndexChanged,  this,   [this](int index) {
+        ui->skinWarningLabel->setVisible(m_oldSkin != index);
+    });
+}
+
+void QnLookAndFeelPreferencesWidget::setupTimeModeUi() {
+    ui->timeModeComboBox->addItem(tr("Server Time"), Qn::ServerTimeMode);
+    ui->timeModeComboBox->addItem(tr("Client Time"), Qn::ClientTimeMode);
+    connect(ui->timeModeComboBox, QnComboboxActivated,  this,   [this](int index) {
+        Qn::TimeMode selectedMode = static_cast<Qn::TimeMode>(ui->timeModeComboBox->itemData(index).toInt());
+        ui->timeModeWarningLabel->setVisible(m_oldTimeMode == Qn::ServerTimeMode && selectedMode == Qn::ClientTimeMode);
+    });
+    setWarningStyle(ui->timeModeWarningLabel);
+    ui->timeModeWarningLabel->setVisible(false);
+}
+
+void QnLookAndFeelPreferencesWidget::setupBackgroundUi() {
+    ui->animationColorComboBox->addItem(tr("Default"),  qVariantFromValue(Qn::DefaultAnimation));
+    ui->animationColorComboBox->addItem(tr("Rainbow"),  qVariantFromValue(Qn::RainbowAnimation));
+    ui->animationColorComboBox->addItem(tr("Custom..."),qVariantFromValue(Qn::CustomAnimation));
+
+    ui->imageModeComboBox->addItem(tr("Stretch"), qVariantFromValue(Qn::StretchImage));
+    ui->imageModeComboBox->addItem(tr("Fit"),     qVariantFromValue(Qn::FitImage));
+    ui->imageModeComboBox->addItem(tr("Crop"),    qVariantFromValue(Qn::CropImage));
+
+    connect(ui->animationEnabledCheckBox, &QCheckBox::toggled, this, [this] (bool checked) {
+        ui->animationWidget->setEnabled(checked);
+
+        if (m_updating)
+            return;
+
+        action(Qn::ToggleBackgroundAnimationAction)->setChecked(checked);
+
+        QnClientBackground background = qnSettings->background();
+        background.animationEnabled = checked;
+        qnSettings->setBackground(background);
+    });
+
+    connect(ui->imageEnabledCheckBox, &QCheckBox::toggled, this, [this] (bool checked) {
+        ui->imageWidget->setEnabled(checked);
+
+        if (m_updating)
+            return;
+
+        QnClientBackground background = qnSettings->background();
+        background.imageEnabled = checked;
+        qnSettings->setBackground(background);
+    });
+
+    connect(ui->animationColorComboBox, QnComboboxCurrentIndexChanged,  this,   [this] {
+        if (m_updating)
+            return;
+        Qn::BackgroundAnimationMode selected = ui->animationColorComboBox->currentData().value<Qn::BackgroundAnimationMode>();
+        ui->colorSelectButton->setEnabled(selected == Qn::CustomAnimation);
+        QnClientBackground background = qnSettings->background();
+        background.animationMode = selected;
+        qnSettings->setBackground(background);
+    });
+
+    connect(ui->colorSelectButton,  &QPushButton::clicked, this, [this] {
+        if (!m_colorDialog->exec())
+            return;
+        updateAnimationCustomColor();
+    });
+
+    connect(ui->animationOpacitySpinBox,  QnSpinboxIntValueChanged, this,   &QnLookAndFeelPreferencesWidget::updateAnimationCustomColor);
+    connect(ui->imageSelectButton,        &QPushButton::clicked,    this,   &QnLookAndFeelPreferencesWidget::selectBackgroundImage);
+    connect(ui->imageModeComboBox,        QnComboboxCurrentIndexChanged,  this,   [this] {
+        if (m_updating)
+            return;
+
+        QnClientBackground background = qnSettings->background();
+        background.imageMode = ui->imageModeComboBox->currentData().value<Qn::ImageBehaviour>();
+        qnSettings->setBackground(background);
+    });
+
+    connect(ui->imageOpacitySpinBox,      QnSpinboxIntValueChanged, this,   [this](int value) {
+        if (m_updating)
+            return;
+
+        QnClientBackground background = qnSettings->background();
+        background.imageOpacity = 0.01 * value;
+        qnSettings->setBackground(background);
+    });
 }
