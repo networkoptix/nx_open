@@ -11,9 +11,12 @@
 
 #include "business/business_event_connector.h"
 #include "serverutil.h"
+#include "business/events/mserver_failure_business_event.h"
+#include "business/business_rule_processor.h"
 
 
 static const long long USEC_PER_MSEC = 1000;
+static const int SEND_ERROR_TIMEOUT = 1000 * 60;
 
 MediaServerStatusWatcher::MediaServerStatusWatcher()
 {
@@ -24,14 +27,32 @@ MediaServerStatusWatcher::~MediaServerStatusWatcher()
 {
 }
 
+void MediaServerStatusWatcher::sendError()
+{
+    auto itr = m_candidatesToError.begin();
+    while (itr != m_candidatesToError.end()) {
+        OfflineServerData& data = itr.value();
+        if (data.timer.elapsed() > SEND_ERROR_TIMEOUT/2) 
+        {
+            qnBusinessRuleProcessor->processBusinessEvent(data.serverData);
+            itr = m_candidatesToError.erase(itr);
+        }
+        else {
+            ++itr;
+        }
+    }
+}
+
 void MediaServerStatusWatcher::at_resource_statusChanged( const QnResourcePtr& resource )
 {
     const QnMediaServerResourcePtr& mserverRes = resource.dynamicCast<QnMediaServerResource>();
     if( !mserverRes )
         return;
 
-    if( mserverRes->getStatus() != Qn::ResourceStatus::Offline )
+    if( mserverRes->getStatus() != Qn::ResourceStatus::Offline ) {
+        m_candidatesToError.remove(mserverRes->getId());
         return;
+    }
 
     //deciding, if it is we who is expected to generate this event
         //next (in guid ascending order) online server after fallen one is expected to generate this event
@@ -62,9 +83,16 @@ void MediaServerStatusWatcher::at_resource_statusChanged( const QnResourcePtr& r
             return; //it is not we who was chosen to send event
     }
 
+    QnMServerFailureBusinessEventPtr mserverEvent(new QnMServerFailureBusinessEvent(mserverRes, qnSyncTime->currentMSecsSinceEpoch() * USEC_PER_MSEC, QnBusiness::ServerTerminatedReason, QString()));
+    OfflineServerData data;
+    data.serverData = mserverEvent;
+    m_candidatesToError[mserverRes->getId()] = data;
+    QTimer::singleShot(SEND_ERROR_TIMEOUT, this, SLOT(sendError()));
+    /*
     qnBusinessRuleConnector->at_mserverFailure(
         mserverRes,
         qnSyncTime->currentMSecsSinceEpoch() * USEC_PER_MSEC,
         QnBusiness::ServerTerminatedReason,
         QString() );
+    */
 }
