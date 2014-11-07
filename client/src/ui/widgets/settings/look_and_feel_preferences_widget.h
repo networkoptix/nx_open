@@ -4,6 +4,8 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
+#include <client/client_model_types.h>
+
 #include <ui/widgets/settings/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -39,9 +41,6 @@ private:
     void updateAnimationCustomColor();
 
     void selectBackgroundImage();
-
-//    void alignGrids();
-
 private:
     QScopedPointer<Ui::LookAndFeelPreferencesWidget> ui;
     QScopedPointer<QColorDialog> m_colorDialog;
@@ -52,12 +51,7 @@ private:
 
     Qn::TimeMode m_oldTimeMode;
 
-    Qn::ClientBackground m_oldBackgroundMode;
-    QColor m_oldCustomBackgroundColor;
-
-    QString m_oldBackgroundImage;
-    qreal m_oldBackgroundImageOpacity;
-    Qn::ImageBehaviour m_oldBackgroundImageMode;
+    QnClientBackground m_oldBackground;
 };
 
 #endif // LOOK_AND_FEEL_PREFERENCES_WIDGET_H

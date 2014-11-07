@@ -170,7 +170,8 @@ void QnGeneralPreferencesWidget::at_browseLogsButton_clicked() {
 }
 
 void QnGeneralPreferencesWidget::at_clearCacheButton_clicked() {
-    QString backgroundImage = qnSettings->backgroundImage();
+    QString backgroundImage = qnSettings->background().imageName;
+    /* Lock background image so it will not be deleted. */
     if (!backgroundImage.isEmpty()) {
         QnLocalFileCache cache;
         QString path = cache.getFullPath(backgroundImage);

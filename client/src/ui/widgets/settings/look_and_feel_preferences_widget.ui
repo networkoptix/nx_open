@@ -220,7 +220,7 @@ Recording Schedule is always based on Server Time.</string>
            <item>
             <widget class="QPushButton" name="colorSelectButton">
              <property name="text">
-              <string>...</string>
+              <string>Select color...</string>
              </property>
             </widget>
            </item>
