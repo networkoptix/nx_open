@@ -144,7 +144,7 @@ class ClusterTest():
             ret,reason = self._checkResultEqual(responseList,method)
 
             if ret == False:
-                print "Failed:%s"%(reasone)
+                print "Failed:%s"%(reason)
 
             return ret
 
