@@ -314,6 +314,19 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>browseMainMediaFolderButton</tabstop>
+  <tabstop>extraMediaFoldersList</tabstop>
+  <tabstop>addExtraMediaFolderButton</tabstop>
+  <tabstop>removeExtraMediaFolderButton</tabstop>
+  <tabstop>downmixAudioCheckBox</tabstop>
+  <tabstop>pauseOnInactivityCheckBox</tabstop>
+  <tabstop>idleTimeoutSpinBox</tabstop>
+  <tabstop>autoStartCheckBox</tabstop>
+  <tabstop>doubleBufferCheckbox</tabstop>
+  <tabstop>browseLogsButton</tabstop>
+  <tabstop>clearCacheButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

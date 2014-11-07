@@ -13,7 +13,6 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::ClientBackground,
                                           (Qn::DefaultBackground,       "DefaultBackground")
                                           (Qn::RainbowBackground,       "RainbowBackground")
                                           (Qn::CustomColorBackground,   "CustomColorBackground")
-                                          (Qn::ImageBackground,         "ImageBackground")
                                           );
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::ImageBehaviour,

@@ -30,17 +30,17 @@ protected:
     virtual bool event(QEvent *event) override;
 
 private:
-    void initTranslations();
+    void setupLanguageUi();
+    void setupSkinUi();
+    void setupTimeModeUi();
+    void setupBackgroundUi();
 
-    QColor backgroundColor() const;
-    void updateBackgroundColor();
+    QColor animationCustomColor() const;
+    void updateAnimationCustomColor();
 
     void selectBackgroundImage();
 
-    void alignGrids();
-
-private slots:
-    void at_timeModeComboBox_activated();
+//    void alignGrids();
 
 private:
     QScopedPointer<Ui::LookAndFeelPreferencesWidget> ui;
@@ -49,6 +49,8 @@ private:
 
     int m_oldLanguage;
     int m_oldSkin;
+
+    Qn::TimeMode m_oldTimeMode;
 
     Qn::ClientBackground m_oldBackgroundMode;
     QColor m_oldCustomBackgroundColor;

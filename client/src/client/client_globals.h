@@ -264,8 +264,7 @@ namespace Qn {
         NoBackground,
         DefaultBackground,
         RainbowBackground,
-        CustomColorBackground,
-        ImageBackground
+        CustomColorBackground
     };
 
     enum ImageBehaviour {

@@ -133,10 +133,7 @@ void QnGridBackgroundItem::updateDefaultBackground(int settingsId) {
     case QnClientSettings::BACKGROUND_MODE:
     case QnClientSettings::BACKGROUND_IMAGE:
         {
-            QString filename = qnSettings->backgroundMode() == Qn::ImageBackground
-                ? qnSettings->backgroundImage()
-                : QString();
-
+            QString filename = qnSettings->backgroundImage();
             if (d->imageFilename == filename) 
                 return;
 
@@ -221,9 +218,7 @@ void QnGridBackgroundItem::update(const QnLayoutResourcePtr &layout) {
     bool isExportedLayout = snapshotManager()->isFile(layout);
 
     QString filename = isDefaultBackground
-        ? qnSettings->backgroundMode() == Qn::ImageBackground
-            ? qnSettings->backgroundImage()
-            : QString()
+        ? qnSettings->backgroundImage()
         : layout->backgroundImageFilename();
 
     QSize imageSize = isDefaultBackground
