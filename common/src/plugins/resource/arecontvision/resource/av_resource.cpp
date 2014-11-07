@@ -9,6 +9,7 @@
 #endif
 
 #include <utils/common/log.h>
+#include <utils/network/http/httpclient.h>
 #include <utils/network/nettools.h>
 #include <utils/network/ping.h>
 
@@ -169,6 +170,38 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
     }
 
     return result;
+}
+
+bool QnPlAreconVisionResource::ping()
+{
+    //checking that camera is alive and on its place
+    const QString& urlStr = getUrl();
+    QUrl url = QUrl(urlStr);
+    if( url.host().isEmpty() )
+    {
+        //url is just IP address?
+        url.setScheme( lit("http") );
+        url.setHost( urlStr );
+    }
+    url.setPath( lit("/get?mac") );
+    url.setUserName( getAuth().user() );
+    url.setPassword( getAuth().password() );
+
+    nx_http::HttpClient httpClient;
+    if( !httpClient.doGet( url ) )
+        return false;
+    if( httpClient.response()->statusLine.statusCode != nx_http::StatusCode::ok )
+        return false;
+    nx_http::BufferType msgBody;
+    while( !httpClient.eof() )
+        msgBody += httpClient.fetchMessageBodyBuffer();
+
+    const int sepIndex = msgBody.indexOf('=');
+    if( sepIndex == -1 )
+        return false;
+    const QByteArray& mac = msgBody.mid( sepIndex+1 );
+
+    return getMAC() == QnMacAddress(mac);
 }
 
 CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()

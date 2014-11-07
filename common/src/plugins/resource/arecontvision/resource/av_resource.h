@@ -39,6 +39,9 @@ public:
     virtual QnResourcePtr updateResource();
     //========
 
+    //!Implementation of QnNetworkResource::ping
+    virtual bool ping() override;
+
     virtual QString getDriverName() const override;
 
     virtual Qn::StreamQuality getBestQualityForSuchOnScreenSize(const QSize& size) const override;
