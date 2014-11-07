@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>423</width>
-    <height>342</height>
+    <height>360</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -186,15 +186,15 @@
      <property name="title">
       <string>Background</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
+     <layout class="QGridLayout" name="gridLayout" rowminimumheight="23,23,23,23,23">
+      <item row="0" column="0">
        <widget class="QRadioButton" name="backgroundEmptyRadioButton">
         <property name="text">
          <string>No background</string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="1" column="0">
        <widget class="QRadioButton" name="backgroundDefaultRadioButton">
         <property name="text">
          <string>Default background</string>
@@ -204,14 +204,14 @@
         </property>
        </widget>
       </item>
-      <item>
+      <item row="2" column="0">
        <widget class="QRadioButton" name="backgroundRainbowRadioButton">
         <property name="text">
          <string>Rainbow mode</string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="3" column="0">
        <widget class="QWidget" name="backgroundColorWidget" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_12">
          <property name="leftMargin">
@@ -279,7 +279,7 @@
         </layout>
        </widget>
       </item>
-      <item>
+      <item row="4" column="0">
        <widget class="QWidget" name="backgroundImageWidget" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_11">
          <property name="leftMargin">

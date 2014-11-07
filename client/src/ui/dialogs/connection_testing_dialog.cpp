@@ -21,13 +21,16 @@
 
 #include <client/client_settings.h>
 
+#include <nx_ec/ec_proto_version.h>
+
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 
+#include <utils/common/app_info.h>
 #include <utils/common/warnings.h>
 
-#include <utils/common/app_info.h>
 #include "compatibility.h"
+
 
 QnConnectionTestingDialog::QnConnectionTestingDialog( QWidget *parent) :
     QnButtonBoxDialog(parent),
@@ -90,6 +93,7 @@ void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode
     else
         compatibilityChecker = &localChecker;
 
+    //TODO #GDM almost same code exists in QnConnectionDiagnosticsHelper::validateConnection
 
     bool success = true;
     QString detail;
@@ -98,7 +102,14 @@ void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode
     bool compatibleProduct = qnSettings->isDevMode() || connectionInfo.brand.isEmpty()
             || connectionInfo.brand == QnAppInfo::productNameShort();
 
-    if (errorCode == ec2::ErrorCode::unauthorized) {
+    if (connectionInfo.nxClusterProtoVersion != nx_ec::EC2_PROTO_VERSION) {
+        success = false;
+        detail = tr("Server has a different ec2 protocol version:\n"
+            " - Client version: %1.\n"
+            " - Server version: %2."
+            ).arg(nx_ec::EC2_PROTO_VERSION).arg(connectionInfo.nxClusterProtoVersion);
+        helpTopicId = Qn::VersionMismatch_Help;
+    } else if (errorCode == ec2::ErrorCode::unauthorized) {
         success = false;
         detail = tr("Login or password you have entered are incorrect, please try again.");
         helpTopicId = Qn::Login_Help;

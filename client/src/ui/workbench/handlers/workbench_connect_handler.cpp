@@ -25,6 +25,8 @@
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/status_dictionary.h>
 
+#include <nx_ec/ec_proto_version.h>
+
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameter_types.h>
@@ -258,10 +260,13 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     hideMessageBox();
 
     QnConnectionInfo connectionInfo = result.reply<QnConnectionInfo>();
+    QWidget* parentWidget = (m_loginDialog && m_loginDialog->isActiveWindow())
+        ? m_loginDialog.data()
+        : mainWindow();
     QnConnectionDiagnosticsHelper::Result status = silent
         ? QnConnectionDiagnosticsHelper::validateConnectionLight(connectionInfo, errCode)
-        : QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errCode, appServerUrl, mainWindow());
-    
+        : QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errCode, appServerUrl, parentWidget);
+
     switch (status) {
     case QnConnectionDiagnosticsHelper::Result::Failure:
         return errCode;
