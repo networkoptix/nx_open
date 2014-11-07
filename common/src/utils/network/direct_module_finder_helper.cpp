@@ -40,8 +40,10 @@ QnUrlSet QnModuleFinderHelper::urlsForPeriodicalCheck() const {
     return m_urlsForPeriodicalCheck;
 }
 
-void QnModuleFinderHelper::setUrlsForPeriodicalCheck(const QnUrlSet &urls) {
+void QnModuleFinderHelper::setUrlsForPeriodicalCheck(const QnUrlSet &urls, bool check) {
     m_urlsForPeriodicalCheck = urls;
+    if (check)
+        at_timer_timeout();
 }
 
 void QnModuleFinderHelper::at_resourceAdded(const QnResourcePtr &resource) {
