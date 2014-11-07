@@ -174,6 +174,11 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
 
 bool QnPlAreconVisionResource::ping()
 {
+    return checkIfOnline();
+}
+
+bool QnPlAreconVisionResource::checkIfOnline()
+{
     //checking that camera is alive and on its place
     const QString& urlStr = getUrl();
     QUrl url = QUrl(urlStr);

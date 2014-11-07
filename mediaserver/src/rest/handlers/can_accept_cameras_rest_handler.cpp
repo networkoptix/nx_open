@@ -61,7 +61,7 @@ int QnCanAcceptCameraRestHandler::executePost(const QString &path, const QnReque
     //checking cameras with unicast
     QnConcurrent::QnFuture<bool> camerasToPingResults = QnConcurrent::mapped(
         camerasToPing,
-        [](const QnSecurityCamResourcePtr& camera) -> bool { return camera->ping(); } );
+        [](const QnSecurityCamResourcePtr& camera) -> bool { return camera->checkIfOnline(); } );
 
     manualDiscoveryResults.waitForFinished();
     for (QFuture<QnResourceList>::const_iterator
