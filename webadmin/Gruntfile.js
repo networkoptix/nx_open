@@ -236,7 +236,6 @@ module.exports = function (grunt) {
                     force: true
                 }
             }
-
         },
 
         // Add vendor prefixed styles
