@@ -49,6 +49,7 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
     ui->downmixWarningLabel->setVisible(false);
     ui->idleTimeoutWidget->setEnabled(false);
     ui->doubleBufferRestartLabel->setVisible(false);
+    ui->doubleBufferWarningLabel->setVisible(false);
 
     connect(ui->browseMainMediaFolderButton,            &QPushButton::clicked,          this,   &QnGeneralPreferencesWidget::at_browseMainMediaFolderButton_clicked);
     connect(ui->addExtraMediaFolderButton,              &QPushButton::clicked,          this,   &QnGeneralPreferencesWidget::at_addExtraMediaFolderButton_clicked);
@@ -62,7 +63,9 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(QWidget *parent) :
         ui->downmixWarningLabel->setVisible(m_oldDownmix != toggled);
     });
     connect(ui->doubleBufferCheckbox,                   &QCheckBox::toggled,            this,   [this](bool toggled) {
-        ui->doubleBufferWarningLabel->setVisible(!toggled);
+        /* Show warning message if the user disables double buffering. */
+        ui->doubleBufferWarningLabel->setVisible(!toggled && m_oldDoubleBuffering);
+        /* Show restart notification if user changes value. */
         ui->doubleBufferRestartLabel->setVisible(toggled != m_oldDoubleBuffering);
     });
 }

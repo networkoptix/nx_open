@@ -25,6 +25,10 @@ public:
 
     virtual bool confirm() override;
     virtual bool discard() override;
+
+protected:
+    virtual bool event(QEvent *event) override;
+
 private:
     void initTranslations();
 
@@ -32,6 +36,8 @@ private:
     void updateBackgroundColor();
 
     void selectBackgroundImage();
+
+    void alignGrids();
 
 private slots:
     void at_timeModeComboBox_activated();

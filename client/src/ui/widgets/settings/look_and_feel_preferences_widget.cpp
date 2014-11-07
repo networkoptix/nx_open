@@ -29,6 +29,27 @@
 #include <utils/math/color_transformations.h>
 #include <utils/local_file_cache.h>
 
+namespace {
+
+    class QnColorComboBoxItemDelegate: public QStyledItemDelegate {
+        typedef QStyledItemDelegate base_type;
+    public:
+        explicit QnColorComboBoxItemDelegate(QObject *parent = 0): base_type(parent) {}
+        ~QnColorComboBoxItemDelegate() {}
+
+        virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) {
+            base_type::paint(painter, option, index);
+        }
+
+        virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override {
+            QSize result = base_type::sizeHint(option, index);
+            result += QSize(48, 0); 
+            return result;
+        }
+
+    };
+}
+
 QnLookAndFeelPreferencesWidget::QnLookAndFeelPreferencesWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -69,7 +90,7 @@ QnLookAndFeelPreferencesWidget::QnLookAndFeelPreferencesWidget(QWidget *parent) 
         ui->skinWarningLabel->setVisible(m_oldSkin != index);
     });
 
-    QButtonGroup* buttonGroup = new QButtonGroup(this);
+  /*  QButtonGroup* buttonGroup = new QButtonGroup(this);
     buttonGroup->addButton(ui->backgroundEmptyRadioButton,      Qn::NoBackground);
     buttonGroup->addButton(ui->backgroundDefaultRadioButton,    Qn::DefaultBackground);
     buttonGroup->addButton(ui->backgroundRainbowRadioButton,    Qn::RainbowBackground);
@@ -96,20 +117,80 @@ QnLookAndFeelPreferencesWidget::QnLookAndFeelPreferencesWidget(QWidget *parent) 
         if (!m_updating)
             qnSettings->setBackgroundImageOpacity(0.01 * value);
     });
-
+    */
     ui->backgroundImageModeComboBox->addItem(tr("Stretch"), qVariantFromValue(Qn::StretchImage));
     ui->backgroundImageModeComboBox->addItem(tr("Fit"),     qVariantFromValue(Qn::FitImage));
     ui->backgroundImageModeComboBox->addItem(tr("Crop"),    qVariantFromValue(Qn::CropImage));
 
+    
+    int iconDim = 16;
+    QSize iconSize(iconDim, iconDim);
+    QRect iconRect(QPoint(0, 0), iconSize);
+    {
+        QPixmap pixmap(iconSize);
+        pixmap.fill(Qt::transparent);
+        QPainter painter(&pixmap);
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(Qt::blue);
+        painter.drawRoundedRect(iconRect, 50, 50, Qt::RelativeSize);
+
+        ui->colorComboBox->addItem(pixmap, tr("Default"), qVariantFromValue(Qn::DefaultBackground));
+    }
+
+    {
+        QVector<QColor> colors;
+        colors << 
+            QColor(0xFFFF0000) <<
+            QColor(0xFFFF7F00) <<
+            QColor(0xFFFFFF00) <<
+            QColor(0xFF00FF00) <<
+            QColor(0xFF0000FF) <<
+            QColor(0xFF4B0082) <<
+            QColor(0xFF8B00FF);
+
+        QLinearGradient rainbow(0, 0, iconDim, iconDim);
+        qreal pos = 0.0;
+        qreal step = 1.0 / (colors.size() - 1);
+        for(const QColor &color: colors) {
+            rainbow.setColorAt(pos, color);
+            pos += step;
+        }
+
+        QPixmap pixmap(iconSize);
+        pixmap.fill(Qt::transparent);
+        QPainter painter(&pixmap);
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(rainbow);
+        painter.drawRoundedRect(iconRect, 50, 50, Qt::RelativeSize);
+
+        ui->colorComboBox->addItem(pixmap, tr("Rainbow"),   qVariantFromValue(Qn::RainbowBackground));
+    }
+
+    {
+        QPixmap pixmap(16, 16);
+        pixmap.fill(Qt::red);
+        ui->colorComboBox->addItem(pixmap, tr("Custom..."), qVariantFromValue(Qn::CustomColorBackground));
+    } 
+
+    /*
     connect(ui->backgroundImageModeComboBox,            QnComboboxCurrentIndexChanged,  this,   [this] {
         if (m_updating)
             return;
         qnSettings->setBackgroundImageMode(ui->backgroundImageModeComboBox->currentData().value<Qn::ImageBehaviour>());
-    });
+    });*/
 }
 
 QnLookAndFeelPreferencesWidget::~QnLookAndFeelPreferencesWidget()
 {
+}
+
+bool QnLookAndFeelPreferencesWidget::event(QEvent *event) {
+    bool result = base_type::event(event);
+
+    if(event->type() == QEvent::Show)
+        alignGrids();
+
+    return result;
 }
 
 void QnLookAndFeelPreferencesWidget::submitToSettings() {
@@ -151,14 +232,15 @@ void QnLookAndFeelPreferencesWidget::updateFromSettings() {
     ui->languageComboBox->setCurrentIndex(m_oldLanguage);
 
     bool backgroundAllowed = !(qnSettings->lightMode() & Qn::LightModeNoSceneBackground);
-    ui->backgroundGroupBox->setEnabled(backgroundAllowed);
+    ui->animationGroupBox->setEnabled(backgroundAllowed);
+    ui->imageGroupBox->setEnabled(backgroundAllowed);
     m_oldBackgroundMode = qnSettings->backgroundMode();
     m_oldCustomBackgroundColor = qnSettings->customBackgroundColor();
     m_oldBackgroundImage = qnSettings->backgroundImage();
     m_oldBackgroundImageOpacity = qnSettings->backgroundImageOpacity();
     m_oldBackgroundImageMode = qnSettings->backgroundImageMode();
 
-    if (!backgroundAllowed) {
+ /*   if (!backgroundAllowed) {
         ui->backgroundEmptyRadioButton->setChecked(true);
     } else {
         switch (qnSettings->backgroundMode()) {
@@ -190,7 +272,7 @@ void QnLookAndFeelPreferencesWidget::updateFromSettings() {
 
     ui->backgroundImageModeComboBox->setCurrentIndex(ui->backgroundImageModeComboBox->findData(qVariantFromValue(qnSettings->backgroundImageMode())));
 
-    updateBackgroundColor();
+    updateBackgroundColor();*/
 }
 
 bool QnLookAndFeelPreferencesWidget::confirm() {
@@ -224,12 +306,12 @@ QColor QnLookAndFeelPreferencesWidget::backgroundColor() const {
 }
 
 void QnLookAndFeelPreferencesWidget::updateBackgroundColor() {
-    QPixmap pixmap(16, 16);
+  /*  QPixmap pixmap(16, 16);
     pixmap.fill(withAlpha(backgroundColor(), 255));
     ui->selectColorButton->setIcon(pixmap);
 
     if (!m_updating)
-        qnSettings->setCustomBackgroundColor(backgroundColor());
+        qnSettings->setCustomBackgroundColor(backgroundColor());*/
 }
 
 void QnLookAndFeelPreferencesWidget::selectBackgroundImage() {
@@ -282,6 +364,43 @@ void QnLookAndFeelPreferencesWidget::selectBackgroundImage() {
     imgCache->storeImage(fileName);
     progressDialog->exec();
 }
+
+void QnLookAndFeelPreferencesWidget::alignGrids() {
+    QList<QGroupBox*> groupBoxes = this->findChildren<QGroupBox *>();
+
+    int maxLabelWidth = 0;
+    int maxRowHeight = 0;
+
+    /* Calculate max sizes. */
+    for (QGroupBox* groupBox: groupBoxes) {
+        QGridLayout* layout = qobject_cast<QGridLayout*>(groupBox->layout());
+        if (!layout)
+            continue;
+
+        for (int row = 0; row < layout->rowCount(); ++row) {            
+            QRect labelCellRect = layout->cellRect(row, 0);
+            if (labelCellRect.isValid()) {
+                maxLabelWidth = qMax(maxLabelWidth, labelCellRect.width());
+                maxRowHeight = qMax(maxRowHeight, labelCellRect.height());
+            }
+        }
+    }
+
+    /* Apply calculated sizes. */
+    for (QGroupBox* groupBox: groupBoxes) {
+        QGridLayout* layout = qobject_cast<QGridLayout*>(groupBox->layout());
+        if (!layout)
+            continue;
+
+        if (maxLabelWidth > 0)
+            layout->setColumnMinimumWidth(0, maxLabelWidth);
+
+        if (maxRowHeight > 0)
+            for (int row = 0; row < layout->rowCount(); ++row) 
+                layout->setRowMinimumHeight(row, maxRowHeight);
+    }
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
