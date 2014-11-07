@@ -6,6 +6,7 @@
 #include <client/client_settings.h>
 
 #include <nx_ec/ec_api.h>
+#include <nx_ec/ec_proto_version.h>
 
 #include <ui/dialogs/message_box.h>
 #include <ui/dialogs/compatibility_version_installation_dialog.h>
@@ -29,6 +30,9 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
         success |= qnSettings->isDevMode() || connectionInfo.brand.isEmpty() || connectionInfo.brand == QnAppInfo::productNameShort();
 
     if(!success)
+        return Result::Failure;
+
+    if (connectionInfo.nxClusterProtoVersion != nx_ec::EC2_PROTO_VERSION)
         return Result::Failure;
 
     QnCompatibilityChecker remoteChecker(connectionInfo.compatibilityItems);
@@ -68,6 +72,20 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
             "If this error persists, please contact your VMS administrator.");
     } else { //brand incompatible
         detail = tr("You are trying to connect to incompatible Server.");
+    }
+
+    if (connectionInfo.nxClusterProtoVersion != nx_ec::EC2_PROTO_VERSION) {
+        QnMessageBox::warning(
+            parentWidget,
+            Qn::VersionMismatch_Help,
+            tr("Could not connect to Server"),
+            tr("You are about to connect to Server which has a different ec2 protocol version:\n"
+            " - Client version: %1.\n"
+            " - Server version: %2."
+            ).arg(nx_ec::EC2_PROTO_VERSION).arg(connectionInfo.nxClusterProtoVersion),
+            QMessageBox::Ok
+            );
+        return Result::Failure;
     }
 
     if(!success) {

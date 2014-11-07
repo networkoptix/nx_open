@@ -6,6 +6,8 @@
 #include <QtCore/QHash>
 #include <QtCore/QVector>
 
+#include <utils/common/log.h>
+#include <utils/common/systemerror.h>
 #include <utils/common/warnings.h>
 
 #define NOMINMAX
@@ -382,6 +384,70 @@ QnWindowsMonitor::QnWindowsMonitor(QObject *parent):
 
 QnWindowsMonitor::~QnWindowsMonitor() {
     return;
+}
+
+QList<QnPlatformMonitor::PartitionSpace> QnWindowsMonitor::totalPartitionSpaceInfo()
+{
+    QList<PartitionSpace> drives;
+
+    DWORD localDisksBitmask = GetLogicalDrives();
+    if( localDisksBitmask == 0 )
+        return std::move(drives);
+
+    wchar_t curDiskName[] = L"A:\\";
+    for( int i = 0; i < sizeof(localDisksBitmask)*CHAR_BIT; ++i, ++curDiskName[0] )
+    {
+        if( (localDisksBitmask & (1 << i)) == 0 )
+            continue;
+
+        PartitionSpace driveInfo;
+        driveInfo.path = QString::fromWCharArray(curDiskName, sizeof(curDiskName)/sizeof(*curDiskName)-1);  //omitting trailing backslash
+        NX_LOG( lit("MONITOR. Found disk %1").arg(driveInfo.path), cl_logDEBUG2 );
+        switch( GetDriveType(curDiskName) )
+        {
+            case DRIVE_NO_ROOT_DIR:
+                NX_LOG( lit("MONITOR. Disk %1. DRIVE_NO_ROOT_DIR").arg(driveInfo.path), cl_logDEBUG2 );
+                continue;
+            case DRIVE_REMOVABLE:
+                //TODO #ak no proper type in QnPlatformMonitor
+                driveInfo.type = QnPlatformMonitor::OpticalDiskPartition;
+                break;
+            case DRIVE_FIXED:
+                driveInfo.type = QnPlatformMonitor::LocalDiskPartition;
+                break;
+            case DRIVE_REMOTE:
+                driveInfo.type = QnPlatformMonitor::NetworkPartition;
+                break;
+            case DRIVE_CDROM:
+                driveInfo.type = QnPlatformMonitor::OpticalDiskPartition;
+                break;
+            case DRIVE_RAMDISK:
+                driveInfo.type = QnPlatformMonitor::RamDiskPartition;
+                break;
+            case DRIVE_UNKNOWN:
+            default:
+                driveInfo.type = QnPlatformMonitor::UnknownPartition;
+                break;
+        }
+        quint64 freeBytesAvailableToCaller = -1;
+        quint64 totalNumberOfBytes = -1;
+        quint64 totalNumberOfFreeBytes = -1;
+        if( !GetDiskFreeSpaceEx(
+                curDiskName,
+                (PULARGE_INTEGER)&freeBytesAvailableToCaller,
+                (PULARGE_INTEGER)&totalNumberOfBytes,
+                (PULARGE_INTEGER)&totalNumberOfFreeBytes ) )
+        {
+            NX_LOG( lit("MONITOR. Disk %1. Failed to get disk space. %2").arg(driveInfo.path).arg(SystemError::getLastOSErrorText()), cl_logDEBUG2 );
+            continue;
+        }
+        driveInfo.sizeBytes = totalNumberOfBytes;
+        driveInfo.freeBytes = totalNumberOfFreeBytes;
+
+        drives.push_back( std::move(driveInfo) );
+    }
+
+    return std::move(drives);
 }
 
 QList<QnPlatformMonitor::HddLoad> QnWindowsMonitor::totalHddLoad() {

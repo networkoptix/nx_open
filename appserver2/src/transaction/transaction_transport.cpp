@@ -3,6 +3,8 @@
 #include <QtCore/QUrlQuery>
 #include <QtCore/QTimer>
 
+#include <nx_ec/ec_proto_version.h>
+
 #include "transaction_message_bus.h"
 #include "utils/common/log.h"
 #include "utils/common/systemerror.h"
@@ -482,6 +484,22 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
 
     if (itrGuid == client->response()->headers.end())
     {
+        cancelConnecting();
+        return;
+    }
+
+    //checking remote server protocol version
+    nx_http::HttpHeaders::const_iterator ec2ProtoVersionIter = 
+        client->response()->headers.find(nx_ec::EC2_PROTO_VERSION_HEADER_NAME);
+    const int remotePeerEcProtoVersion = ec2ProtoVersionIter == client->response()->headers.end()
+        ? nx_ec::INITIAL_EC2_PROTO_VERSION
+        : ec2ProtoVersionIter->second.toInt();
+    if( nx_ec::EC2_PROTO_VERSION != remotePeerEcProtoVersion )
+    {
+        NX_LOG( QString::fromLatin1("Cannot connect to server %1 because of different EC2 proto version. "
+            "Local peer version: %2, remote peer version: %3").
+            arg(client->url().toString()).arg(nx_ec::EC2_PROTO_VERSION).arg(remotePeerEcProtoVersion),
+            cl_logWARNING );
         cancelConnecting();
         return;
     }
