@@ -1,17 +1,17 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('mediaserver', function ($http, $resource) {
+    .factory('mediaserver', function ($http) {
 
         var cacheModuleInfo = null;
 
         return {
             getSettings: function(url) {
-                url = url || "";
+                url = url || '';
 
-                if(url==""){// Кешируем данные о сервере, чтобы не запрашивать 10 раз
-                    if(cacheModuleInfo == null){
-                        cacheModuleInfo = $http.get(url + '/api/moduleInformation')
+                if(url===''){// Кешируем данные о сервере, чтобы не запрашивать 10 раз
+                    if(cacheModuleInfo === null){
+                        cacheModuleInfo = $http.get(url + '/api/moduleInformation');
                     }
                     return cacheModuleInfo;
                 }
@@ -23,7 +23,7 @@ angular.module('webadminApp')
             changePassword: function(password,oldPassword) {
                 return $http.post('/api/configure?password=' + password  + '&oldPassword=' + oldPassword);
             },
-            mergeSystems: function(url,password,keepMySystem){return $http.post('/api/mergeSystems?password=' + password  + '&url=' + encodeURIComponent(url) + "&takeRemoteSettings=" + (!keepMySystem)); },
+            mergeSystems: function(url,password,keepMySystem){return $http.post('/api/mergeSystems?password=' + password  + '&url=' + encodeURIComponent(url) + '&takeRemoteSettings=' + (!keepMySystem)); },
             pingSystem: function(url,password){return $http.post('/api/pingSystem?password=' + password  + '&url=' + encodeURIComponent(url)); },
             restart: function() { return $http.post('/api/restart'); },
             getStorages: function(){ return $http.get('/api/storageSpace'); },
@@ -33,7 +33,7 @@ angular.module('webadminApp')
             getMediaServers: function(){return $http.get('/ec2/getMediaServersEx'); },
             saveMediaServer: function(info){return $http.post('/ec2/saveMediaServer',info); },
             statistics:function(url){
-                url = url || "";
+                url = url || '';
                 return $http.get(url + '/api/statistics');
             },
             getCurrentUser:function(){return $http.post('/api/getCurrentUser');}
