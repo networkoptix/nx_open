@@ -127,7 +127,7 @@ void QnCameraThumbnailManager::at_thumbnailReceived(int status, const QImage &th
         data.loadingHandle = 0;
         QPixmap thumbnail = data.status == Loaded
                 ? QPixmap::fromImage(data.thumbnail)
-                : qnSkin->pixmap("events/thumb_no_data.png");
+                : m_statusPixmaps[data.status];
         emit thumbnailReady(resource->getId(), thumbnail);
         break;
     }

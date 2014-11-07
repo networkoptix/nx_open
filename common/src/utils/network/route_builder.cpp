@@ -1,5 +1,7 @@
 #include "route_builder.h"
 
+#include <QtCore/QQueue>
+
 QnRouteBuilder::QnRouteBuilder(const QnUuid &startId) :
     m_startId(startId)
 {
@@ -17,22 +19,6 @@ void QnRouteBuilder::addConnection(const QnUuid &from, const QnUuid &to, const Q
         return;
 
     m_connections.insert(from, WeightedPoint(QnRoutePoint(to, host, port), weight));
-
-    QList<QnRoute> routes;
-    if (m_startId == from) {
-        // we've got a new direct connection
-        QnRoute newRoute;
-        newRoute.addPoint(point, weight);
-        routes.append(newRoute);
-    } else {
-        // we've got a new point, so we have to update routes
-        for (const QnRoute &route: m_routes.value(from)) {
-            QnRoute newRoute = route;
-            newRoute.addPoint(point, weight);
-            routes.append(newRoute);
-        }
-    }
-    buildRoutes(routes);
 }
 
 void QnRouteBuilder::removeConnection(const QnUuid &from, const QnUuid &to, const QString &host, quint16 port) {
@@ -40,67 +26,91 @@ void QnRouteBuilder::removeConnection(const QnUuid &from, const QnUuid &to, cons
 
     QnRoutePoint point(to, host, port);
 
-    auto it = findConnection(from, QnRoutePoint(to, host, port));
+    auto it = findConnection(from, point);
     if (it == m_connections.end())
         return;
     m_connections.erase(it);
 
-    // remove all routes containing the given connection
-    for (auto rtIt = m_routes.begin(); rtIt != m_routes.end(); ++rtIt) {
-        for (auto it = rtIt.value().begin(); it != rtIt.value().end(); ) {
-            if (it->containsConnection(m_startId, from, point))
-                it = rtIt.value().erase(it);
-            else
-                ++it;
-        }
+    for (auto it = m_routes.begin(); it != m_routes.end(); /* no inc */) {
+        if (it->containsConnection(m_startId, from, point))
+            it = m_routes.erase(it);
+        else
+            ++it;
     }
 }
 
-void QnRouteBuilder::clear() {
-    m_routes.clear();
+void QnRouteBuilder::clear(bool indirectOnly) {
+    if (!indirectOnly) {
+        m_routes.clear();
+        return;
+    }
+
+    for (auto it = m_routes.begin(); it != m_routes.end(); /* no inc */) {
+        if (it->length() > 1)
+            it = m_routes.erase(it);
+        else
+            ++it;
+    }
 }
 
-QnRoute QnRouteBuilder::routeTo(const QnUuid &peerId) const {
-    const QnRouteList &routeList = m_routes[peerId];
-    if (routeList.isEmpty())
-        return QnRoute();
-    else
-        return routeList.first();
+QnRoute QnRouteBuilder::routeTo(const QnUuid &peerId) {
+    QnRoute route = m_routes.value(peerId);
+    if (route.isValid())
+        return route;
+
+    route = buildRouteTo(peerId);
+    if (route.isValid())
+        m_routes[peerId] = route;
+
+    return route;
 }
 
-QHash<QnUuid, QnRouteList> QnRouteBuilder::routes() const {
+QHash<QnUuid, QnRoute> QnRouteBuilder::routes() const {
     return m_routes;
 }
 
-bool QnRouteBuilder::insertRoute(const QnRoute &route) {
-    Q_ASSERT(!route.points.isEmpty());
+QnRoute QnRouteBuilder::buildRouteTo(const QnUuid &peerId) {
+    QHash<QnUuid, QnUuid> trace;
+    QHash<QPair<QnUuid, QnUuid>, WeightedPoint> usedPoints;
+    QQueue<QnUuid> points;
+    QSet<QnUuid> checkedPoints;
 
-    QnRouteList &routeList = m_routes[route.points.last().peerId];
+    points.enqueue(m_startId);
+    checkedPoints.insert(m_startId);
 
-    for (const QnRoute &existentRoute: routeList) {
-        if (existentRoute.isEqual(route))
-            return false;
-    }
+    while (!points.isEmpty()) {
+        QnUuid current = points.dequeue();
 
-    routeList.insert(qLowerBound(routeList.begin(), routeList.end(), route), route);
-    return true;
-}
+        for (const WeightedPoint &point: m_connections.values(current)) {
+            QnUuid id = point.first.peerId;
+            if (checkedPoints.contains(id))
+                continue;
 
-void QnRouteBuilder::buildRoutes(const QList<QnRoute> &initialRoutes) {
-    QList<QnRoute> routes = initialRoutes;
+            trace[id] = current;
+            usedPoints.insert(QPair<QnUuid, QnUuid>(current, id), point);
 
-    while (!routes.isEmpty()) {
-        QnRoute route = routes.takeFirst();
+            if (id == peerId) {
+                QList<WeightedPoint> points;
+                QnUuid id = peerId;
+                while (id != m_startId) {
+                    QnUuid source = trace.value(id);
+                    points.prepend(usedPoints.value(QPair<QnUuid, QnUuid>(source, id)));
+                    id = source;
+                }
 
-        if (!insertRoute(route))
-            continue;
+                QnRoute route;
+                for (const WeightedPoint &point: points)
+                    route.addPoint(point.first, point.second);
 
-        for (const WeightedPoint &point: m_connections.values(route.points.last().peerId)) {
-            QnRoute newRoute = route;
-            if (newRoute.addPoint(point.first, point.second))
-                routes.append(newRoute);
+                return route;
+            }
+
+            checkedPoints.insert(id);
+            points.enqueue(id);
         }
     }
+
+    return QnRoute();
 }
 
 QMultiHash<QnUuid, QnRouteBuilder::WeightedPoint>::iterator QnRouteBuilder::findConnection(const QnUuid &from, const QnRoutePoint &point) {

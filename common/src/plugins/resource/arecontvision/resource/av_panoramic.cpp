@@ -40,8 +40,8 @@ bool QnArecontPanoramicResource::getParamPhysical(int channel, const QString& na
 {
     m_mutex.lock();
     m_mutex.unlock();
-
-    CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
+    QUrl devUrl(getUrl());
+    CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
     QString request = QLatin1String("get") + QString::number(channel) + QLatin1String("?") + name;
 
     CLHttpStatus status = connection.doGET(request);
@@ -76,10 +76,10 @@ bool QnArecontPanoramicResource::setParamPhysical(const QString &param, const QV
 {
     if (setSpecialParam(param, val))
         return true;
-
+    QUrl devUrl(getUrl());
     for (int i = 1; i <=4 ; ++i)
     {
-        CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
+        CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
 
         QString request = QLatin1String("set") + QString::number(i) + QLatin1Char('?') + param + QLatin1Char('=') + val.toString();
 
@@ -130,8 +130,8 @@ void QnArecontPanoramicResource::updateFlipState()
     if (m_flipTimer.isValid() && m_flipTimer.elapsed() < 1000)
         return;
     m_flipTimer.restart();
-
-    CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
+    QUrl devUrl(getUrl());
+    CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
     QString request = QLatin1String("get?rotate");
     CLHttpStatus responseCode = connection.doGET(request);
     if (responseCode != CL_HTTP_SUCCESS)

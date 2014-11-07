@@ -22,7 +22,7 @@ public:
     explicit QnModuleFinderHelper(QnModuleFinder *moduleFinder);
 
     QnUrlSet urlsForPeriodicalCheck() const;
-    void setUrlsForPeriodicalCheck(const QnUrlSet &urls);
+    void setUrlsForPeriodicalCheck(const QnUrlSet &urls, bool check = false);
 
 private slots:
     void at_resourceAdded(const QnResourcePtr &resource);

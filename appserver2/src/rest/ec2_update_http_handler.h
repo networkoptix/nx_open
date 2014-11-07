@@ -95,7 +95,7 @@ namespace ec2
                 //    tran = QnXml::deserialized<QnTransaction<RequestDataType>>(body);
                 //    break;
                 default:
-                    assert(false);
+                    return nx_http::StatusCode::notAcceptable;
             }
             if (!success) {
                 if (format == Qn::JsonFormat)

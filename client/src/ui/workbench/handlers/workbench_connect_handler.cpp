@@ -25,6 +25,8 @@
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/status_dictionary.h>
 
+#include <nx_ec/ec_proto_version.h>
+
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameter_types.h>
@@ -74,6 +76,9 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /*= 0*/):
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    this,   &QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened);
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionClosed,    this,   &QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed);
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::initialResourcesReceived,    this,   [this] {
+        /* Reload all dialogs and dependent data. */
+        context()->instance<QnWorkbenchStateManager>()->forcedUpdate();
+
         /* We are just reconnected automatically, e.g. after update. */
         if (!m_readyForConnection)
             return;
@@ -255,10 +260,13 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     hideMessageBox();
 
     QnConnectionInfo connectionInfo = result.reply<QnConnectionInfo>();
+    QWidget* parentWidget = (m_loginDialog && m_loginDialog->isActiveWindow())
+        ? m_loginDialog.data()
+        : mainWindow();
     QnConnectionDiagnosticsHelper::Result status = silent
         ? QnConnectionDiagnosticsHelper::validateConnectionLight(connectionInfo, errCode)
-        : QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errCode, appServerUrl, mainWindow());
-    
+        : QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errCode, appServerUrl, parentWidget);
+
     switch (status) {
     case QnConnectionDiagnosticsHelper::Result::Failure:
         return errCode;
@@ -393,7 +401,11 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
         errCode = connectToServer(reconnectHelper->currentUrl(), true); /* Here inner event loop will be started. */
         if (errCode == ec2::ErrorCode::ok || errCode == ec2::ErrorCode::unauthorized)   
             break;
-        reconnectHelper->next();
+
+        /* Find next valid server for reconnect. */
+        do {
+            reconnectHelper->next();
+        } while (!reconnectHelper->currentUrl().isValid());
     }
 
     /* Main window can be closed in the event loop so the dialog will be freed. */

@@ -1660,10 +1660,10 @@ void QnMain::run()
 #endif
     // ------------------------------------------
 
+    QScopedPointer<QnRouter> router(new QnRouter(m_moduleFinder, false));
+
     QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder(m_moduleFinder));
     globalModuleFinder->setConnection(ec2Connection);
-
-    QScopedPointer<QnRouter> router(new QnRouter(m_moduleFinder, false));
 
     QScopedPointer<QnServerUpdateTool> serverUpdateTool(new QnServerUpdateTool());
 

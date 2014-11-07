@@ -896,7 +896,6 @@ QnTransaction<ApiModuleDataList> QnTransactionMessageBus::prepareModulesDataTran
         ApiModuleData data;
         QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &data);
         data.isAlive = true;
-        data.discoverers = QnGlobalModuleFinder::instance()->discoverers(data.id).toList();
         transaction.params.push_back(data);
     }
     transaction.peerID = m_localPeer.id;

@@ -171,6 +171,13 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
         } else {
             return defaultValue;
         }
+    case LIGHT_MODE:
+        {
+            QVariant baseValue = base_type::readValueFromSettings(settings, id, defaultValue);
+            if (baseValue.type() == QVariant::Int)  //compatibility mode
+                return qVariantFromValue(static_cast<Qn::LightModeFlags>(baseValue.toInt()));
+            return baseValue;
+        }
     case DEBUG_COUNTER:
     case DEV_MODE:
     case VIDEO_WALL_MODE:

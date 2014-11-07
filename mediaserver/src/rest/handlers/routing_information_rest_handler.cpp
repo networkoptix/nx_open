@@ -96,18 +96,16 @@ int QnRoutingInformationRestHandler::executeGet(const QString &path, const QnReq
         result.append("</body></html>\r\n");
 
         return HttpCode::Ok;
-    } else if (command == lit("routes")) {
+    } else if (command == lit("cachedRoutes")) {
         QnUuid target = QnUuid(params.value(lit("target")));
-        QHash<QnUuid, QnRouteList> routes = QnRouter::instance()->routes();
+        QHash<QnUuid, QnRoute> routes = QnRouter::instance()->routes();
 
         result.append("<html><body>\r\n");
 
         QList<QnUuid> targets = target.isNull() ? routes.uniqueKeys() : (QList<QnUuid>() << target);
         for (const QnUuid &id: targets) {
-            for (const QnRoute &route: routes.value(id)) {
-                result.append(routeToHtml(id, route));
-                result.append("<br/>\r\n");
-            }
+            result.append(routeToHtml(id, routes.value(id)));
+            result.append("<br/>\r\n");
         }
 
         if (!target.isNull() && routes.count(target) == 0) {
@@ -115,7 +113,7 @@ int QnRoutingInformationRestHandler::executeGet(const QString &path, const QnReq
             result.append(params.value(lit("target")));
             result.append("\r\n");
         } else if (routes.isEmpty()) {
-            result.append("There are no available routes on this server.\r\n");
+            result.append("There are no cached routes on this server.\r\n");
         }
 
         result.append("</body></html>\r\n");

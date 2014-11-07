@@ -36,9 +36,12 @@ public:
     QString getPhysicalId() const;
     void setPhysicalId(const QString& physicalId);
 
-    inline void setAuth(const QString &user, const QString &password, bool replaceIfExists = true)
-    { QAuthenticator auth; auth.setUser(user); auth.setPassword(password); setAuth(auth, replaceIfExists); }
-    void setAuth(const QAuthenticator &auth, bool replaceIfExists = true);
+    void setAuth(const QString &user, const QString &password);
+    void setAuth(const QAuthenticator &auth);
+
+    void setDefaultAuth(const QString &user, const QString &password);
+    void setDefaultAuth(const QAuthenticator &auth);
+
     QAuthenticator getAuth() const;
 
     // if reader will find out that authentication is requred => setAuthenticated(false) must be called

@@ -8,6 +8,10 @@ bool QnRoute::isEqual(const QnRoute &other) const {
     return points == other.points;
 }
 
+int QnRoute::length() const {
+    return points.size();
+}
+
 bool QnRoute::addPoint(const QnRoutePoint &point, int weight) {
     // prevent loops in routes
     for (const QnRoutePoint &p: points) {

@@ -27,6 +27,12 @@ public:
             base_type::hide();
         return true;
     }
+
+    /** Forcibly update dialog contents. Default behavior is - simply close dialog. */
+    virtual void forcedUpdate() override {
+        tryClose(true);
+    }
+
 };
 
 #undef ID
@@ -44,6 +50,9 @@ public:
     QnWorkbenchStateDependentButtonBoxDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
 
     virtual bool tryClose(bool force) override;
+
+    /** Forcibly update dialog contents. Default behavior is - simply close dialog. */
+    virtual void forcedUpdate() override;
 };
 
 

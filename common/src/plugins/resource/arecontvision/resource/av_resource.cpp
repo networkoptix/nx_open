@@ -46,7 +46,8 @@ CLHttpStatus QnPlAreconVisionResource::getRegister(int page, int num, int& val)
     QString req;
     QTextStream(&req) << "getreg?page=" << page << "&reg=" << num;
 
-    CLSimpleHTTPClient http(getHostAddress(), 80,getNetworkTimeout(), getAuth());
+    QUrl devUrl(getUrl());
+    CLSimpleHTTPClient http(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
 
     CLHttpStatus result = http.doGET(req);
 
@@ -76,8 +77,8 @@ CLHttpStatus QnPlAreconVisionResource::setRegister(int page, int num, int val)
 {
     QString req;
     QTextStream(&req) << "setreg?page=" << page << "&reg=" << num << "&val=" << val;
-
-    CLSimpleHTTPClient http(getHostAddress(), 80,getNetworkTimeout(), getAuth());
+    QUrl devUrl(getUrl());
+    CLSimpleHTTPClient http(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
 
     CLHttpStatus result = http.doGET(req);
 
@@ -278,7 +279,8 @@ bool QnPlAreconVisionResource::isH264() const
 //===============================================================================================================================
 bool QnPlAreconVisionResource::getParamPhysical(const QString &param, QVariant &val)
 {
-    CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
+    QUrl devUrl(getUrl());
+    CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
 
     QString request = lit("get?") + param;
 
@@ -312,7 +314,8 @@ bool QnPlAreconVisionResource::getParamPhysical(const QString &param, QVariant &
 
 bool QnPlAreconVisionResource::setParamPhysical(const QString &param, const QVariant& val )
 {
-    CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
+    QUrl devUrl(getUrl());
+    CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
 
     QString request = lit("set?") + param;
     request += QLatin1Char('=') + val.toString();
