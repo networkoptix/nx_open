@@ -639,16 +639,19 @@ bool QnResource::hasProperty(const QString &key) const {
 QString QnResource::getProperty(const QString &key) const {
     //QMutexLocker mutexLocker(&m_mutex);
     //return m_propertyByKey.value(key, defaultValue);
-
+    QString value;
     {
         QMutexLocker lk( &m_mutex );
         if( m_id.isNull() ) {
             auto itr =  m_locallySavedProperties.find(key);
-            return itr != m_locallySavedProperties.end() ? itr->second.value : QString();
+            if (itr != m_locallySavedProperties.end())
+                value = itr->second.value;
+        }
+        else {
+            value = propertyDictionary->value(getId(), key);
         }
     }
 
-    QString value = propertyDictionary->value(getId(), key);
     if (value.isNull()) {
         // find default value in resourceType
         QnResourceTypePtr resType = qnResTypePool->getResourceType(m_typeId); 
