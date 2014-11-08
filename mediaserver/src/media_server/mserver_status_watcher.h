@@ -27,6 +27,7 @@ public:
 
 public slots:
     void at_resource_statusChanged( const QnResourcePtr& resource );
+    void at_resource_removed( const QnResourcePtr& resource );
 private slots:
     void sendError();
 private:
@@ -38,6 +39,7 @@ private:
     };
 
     QMap<QnUuid, OfflineServerData> m_candidatesToError;
+    QSet<QnUuid> m_onlineServers;
 };
 
 #endif  //NX_MSERVER_STATUS_WATCHER_H

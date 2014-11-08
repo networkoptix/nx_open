@@ -21,6 +21,7 @@ static const int SEND_ERROR_TIMEOUT = 1000 * 60;
 MediaServerStatusWatcher::MediaServerStatusWatcher()
 {
     connect(qnResPool, &QnResourcePool::statusChanged, this, &MediaServerStatusWatcher::at_resource_statusChanged);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &MediaServerStatusWatcher::at_resource_removed);
 }
 
 MediaServerStatusWatcher::~MediaServerStatusWatcher()
@@ -43,6 +44,12 @@ void MediaServerStatusWatcher::sendError()
     }
 }
 
+void MediaServerStatusWatcher::at_resource_removed( const QnResourcePtr& resource )
+{
+    m_candidatesToError.remove(resource->getId());
+    m_onlineServers.remove(resource->getId());
+}
+
 void MediaServerStatusWatcher::at_resource_statusChanged( const QnResourcePtr& resource )
 {
     const QnMediaServerResourcePtr& mserverRes = resource.dynamicCast<QnMediaServerResource>();
@@ -50,9 +57,14 @@ void MediaServerStatusWatcher::at_resource_statusChanged( const QnResourcePtr& r
         return;
 
     if( mserverRes->getStatus() != Qn::ResourceStatus::Offline ) {
+        m_onlineServers << mserverRes->getId();
         m_candidatesToError.remove(mserverRes->getId());
         return;
     }
+
+    if (!m_onlineServers.contains(mserverRes->getId()))
+        return; // we interesting in online->offline changes only
+    m_onlineServers.remove(mserverRes->getId());
 
     //deciding, if it is we who is expected to generate this event
         //next (in guid ascending order) online server after fallen one is expected to generate this event
