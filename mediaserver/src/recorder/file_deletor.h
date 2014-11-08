@@ -19,6 +19,7 @@ public:
     static QnFileDeletor* instance();
     void deleteFile(const QString& fileName);
     void deleteDir(const QString& dirName);
+    void deleteDirRecursive(const QString& dirName);
     
     QnFileDeletor();
     ~QnFileDeletor();

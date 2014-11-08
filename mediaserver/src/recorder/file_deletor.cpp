@@ -78,6 +78,19 @@ void QnFileDeletor::deleteDir(const QString& dirName)
         deleteFile(fi.absoluteFilePath());
 }
 
+void QnFileDeletor::deleteDirRecursive(const QString& dirName)
+{
+    QDir dir(dirName);
+    QList<QFileInfo> list = dir.entryInfoList(QDir::Files |QDir::Dirs | QDir::NoDotAndDotDot);
+    for(const QFileInfo& fi: list) {
+        if (fi.isDir())
+            deleteDirRecursive(fi.absoluteFilePath());
+        else
+            deleteFile(fi.absoluteFilePath());
+    }
+    dir.rmdir(dirName);
+}
+
 void QnFileDeletor::deleteFile(const QString& fileName)
 {
     if (QFile::exists(fileName))

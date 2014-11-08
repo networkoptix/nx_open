@@ -489,7 +489,7 @@ namespace ec2
         bool updateGuids();
         QnUuid getType(const QString& typeName);
         bool resyncTransactionLog();
-        bool insertDefaultStoredFiles();
+        bool addStoredFiles(const QString& baseDirectoryName);
 
         template <class ObjectType, class ObjectListType> 
         bool fillTransactionLogInternal(ApiCommand::Value command);

@@ -49,6 +49,27 @@ static QnDbManager* globalInstance = 0; // TODO: #Elric #EC2 use QnSingleton
 static const char LICENSE_EXPIRED_TIME_KEY[] = "{4208502A-BD7F-47C2-B290-83017D83CDB7}";
 static const char DB_INSTANCE_KEY[] = "DB_INSTANCE_ID";
 
+static bool removeDirRecursive(const QString & dirName)
+{
+    bool result = true;
+    QDir dir(dirName);
+
+    if (dir.exists(dirName)) {
+        for(const QFileInfo& info: dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst)) 
+        {
+            if (info.isDir())
+                result = removeDir(info.absoluteFilePath());
+            else
+                result = QFile::remove(info.absoluteFilePath());
+
+            if (!result)
+                return result;
+        }
+        result = dir.rmdir(dirName);
+    }
+    return result;
+}
+
 template <class T>
 void assertSorted(std::vector<T> &data) {
 #ifdef _DEBUG
@@ -321,6 +342,11 @@ bool QnDbManager::init(
             }
         }
     }
+
+    QString storedFilesDir = closeDirPath(dbFilePath) + QString(lit("vms_storedfiles/"));
+    addStoredFiles(storedFilesDir);
+    removeDirRecursive(storedFilesDir);
+
     // updateDBVersion();
     QSqlQuery insVersionQuery( m_sdb );
     insVersionQuery.prepare( "INSERT OR REPLACE INTO misc_data (key, data) values (?,?)" );
@@ -690,10 +716,9 @@ ErrorCode QnDbManager::insertOrReplaceStoredFile(const QString &fileName, const 
 
 
 /** Insert sample files into database. */
-bool QnDbManager::insertDefaultStoredFiles() {
+bool QnDbManager::addStoredFiles(const QString& baseDirectoryName) {
 
     /* Directory name selected equal to the database table name. */
-    const QString baseDirectoryName = lit(":/vms_storedfiles/");
 
     /* Get all files from the base directory in the resources. Enter folders recursively. */
     QStringList files;
@@ -899,7 +924,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         updateResourceTypeGuids();
     }
     else if (updateName == lit(":/updates/24_insert_default_stored_files.sql")) {
-        insertDefaultStoredFiles();
+        addStoredFiles(lit(":/vms_storedfiles/"));
     }
 
 
