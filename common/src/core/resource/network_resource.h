@@ -86,8 +86,15 @@ public:
     //!Returns true if camera is accessible
     /*!
         Default implementation just establishes connection to \a getHostAddress() : \a httpPort()
+        \todo #ak This method is used in diagnostics only. Throw it away and use \a QnNetworkResource::checkIfOnline instead
     */
     virtual bool ping();
+    //!Checks if camera is online
+    /*!
+        \note Implementation MUST check not only camera address:port accessibility, but also check some unique parameters of camera
+        \note Default implementation returns false
+    */
+    virtual bool checkIfOnline();
 
     static QnUuid uniqueIdToId(const QString& uniqId);
     virtual bool isAbstractResource() const { return false; }

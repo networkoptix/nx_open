@@ -233,6 +233,11 @@ bool QnNetworkResource::ping()
     return sock->connect( getHostAddress(), QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
 }
 
+bool QnNetworkResource::checkIfOnline()
+{
+    return false;
+}
+
 QnTimePeriodList QnNetworkResource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) {
     Q_UNUSED(startTimeMs)
     Q_UNUSED(endTimeMs)

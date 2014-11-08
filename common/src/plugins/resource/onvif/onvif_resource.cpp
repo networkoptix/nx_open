@@ -453,7 +453,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 
     //if (getImagingUrl().isEmpty() || getMediaUrl().isEmpty() || getName().contains(QLatin1String("Unknown")) || getMAC().isNull() || m_needUpdateOnvifUrl)
     {
-        //const CameraDiagnostics::Result result = fetchAndSetDeviceInformationPriv(false);
+        updateFirmware();
         CameraDiagnostics::Result result = getFullUrlInfo();
         if (!result)
             return result;
@@ -3130,6 +3130,22 @@ void QnPlOnvifResource::afterConfigureStream()
     while (m_streamConfCounter > 0)
         m_streamConfCond.wait(&m_streamConfMutex);
 
+}
+
+void QnPlOnvifResource::updateFirmware()
+{
+    QAuthenticator auth(getAuth());
+    DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
+
+    DeviceInfoReq request;
+    DeviceInfoResp response;
+    int soapRes = soapWrapper.getDeviceInformation(request, response);
+    if (soapRes == SOAP_OK) 
+    {
+        QString firmware = QString::fromStdString(response.FirmwareVersion);
+        if (!firmware.isEmpty())
+            setFirmware(firmware);
+    }
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::getFullUrlInfo()
