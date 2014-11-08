@@ -357,7 +357,7 @@ class MediaServerGenerator(BasicGenerator):
         "apiUrl": "%s",
         "authKey": "%s",
         "flags": "SF_HasPublicIP",
-        "id": "{47bf37a0-72a6-2890-b967-5da9c390d28a}",
+        "id": "%s",
         "name": "%s",
         "networkAddresses": "192.168.0.1;10.0.2.141;192.168.88.1;95.31.23.214",
         "panicMode": "PM_None",
@@ -379,6 +379,7 @@ class MediaServerGenerator(BasicGenerator):
             ret.append(
                self._template%(
                    self.generateIpV4Endpoint(),
+                   self.generateRandomId(),
                    self.generateRandomId(),
                    self._generateRandomName(),
                    self._generateRandomName(),
@@ -762,7 +763,7 @@ class CameraTest(ClusterTestBase):
         return "getCameras?format=json"
 
 
-class UserTest():
+class UserTest(ClusterTestBase):
     _gen = None
     _testCase=2
 
@@ -784,7 +785,7 @@ class UserTest():
         return "getUsers?format=json"
 
 
-class MediaServerTest():
+class MediaServerTest(ClusterTestBase):
     _gen=None
     _testCase=2
 
@@ -805,7 +806,7 @@ class MediaServerTest():
     def _getObserverName(self):
         return "getMediaServersEx?format=json"
 
-class ResourceSaveTest():
+class ResourceSaveTest(ClusterTestBase):
     _gen = None
     _testCase =2
 
@@ -915,7 +916,7 @@ class ServerUserAttributesListDataTest(ClusterTestBase):
 
 # The following test will issue the modify and remove on different servers to
 # trigger confliction resolving.
-class ResourceConflictionTest():
+class ResourceConflictionTest(ClusterTestBase):
     _gen = None
     _testCase=2
 
@@ -1026,7 +1027,7 @@ class PerformanceOperation():
     def _remove(self,uuid):
         self._removeAll([uuid])
 
-class UserOpereation(PerformanceOperation):
+class UserOperation(PerformanceOperation):
     def add(self,num):
         gen = UserDataGenerator()
         self._sendOp("saveUsers",gen.generateUserData(num))
