@@ -21,3 +21,5 @@ INSERT INTO vms_kvpair (resource_id, value, name)
 
 update auth_user set id = (select resource_ptr_id from vms_userprofile where user_id = auth_user.id);
 update vms_userprofile set user_id = resource_ptr_id;
+
+update vms_cameraserveritem set timestamp = timestamp * 1000;
