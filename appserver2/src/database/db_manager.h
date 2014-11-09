@@ -135,6 +135,10 @@ namespace ec2
         //getStorageData
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFileData& data);
 
+        //getStoredFiles
+        ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFileDataList& data);
+        ErrorCode doQueryNoLock(const std::nullptr_t&, ApiStoredFileDataList& data) { return doQueryNoLock(ApiStoredFilePath(), data); }
+
         //getResourceTypes
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiResourceTypeDataList& resourceTypeList);
 
@@ -489,7 +493,7 @@ namespace ec2
         bool updateGuids();
         QnUuid getType(const QString& typeName);
         bool resyncTransactionLog();
-        bool addStoredFiles(const QString& baseDirectoryName);
+        bool addStoredFiles(const QString& baseDirectoryName, int* count = 0);
 
         template <class ObjectType, class ObjectListType> 
         bool fillTransactionLogInternal(ApiCommand::Value command);
@@ -522,6 +526,7 @@ namespace ec2
         mutable QReadWriteLock m_mutexStatic;
         bool m_needResyncLog;
         bool m_needResyncLicenses;
+        bool m_needResyncFiles;
     };
 };
 

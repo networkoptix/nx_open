@@ -104,6 +104,7 @@ namespace ec2
             REGISTER_COMMAND(addStoredFile),
             REGISTER_COMMAND(updateStoredFile),
             REGISTER_COMMAND(removeStoredFile),
+            REGISTER_COMMAND(getStoredFiles),
 
             REGISTER_COMMAND(addLicenses),
             REGISTER_COMMAND(addLicense),

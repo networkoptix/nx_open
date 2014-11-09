@@ -115,6 +115,7 @@ namespace ec2
             addStoredFile               = 902,  /*< ApiStoredFileData */
             updateStoredFile            = 903,  /*< ApiStoredFileData */
             removeStoredFile            = 904,  /*< ApiStoredFilePath */
+            getStoredFiles              = 905,  /*< ApiStoredFileDataList */
 
             /* Licenses */
             getLicenses                 = 1000, /*< ApiLicenseDataList */

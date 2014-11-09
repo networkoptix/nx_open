@@ -257,7 +257,8 @@ QnDbManager::QnDbManager()
     m_initialized(false),
     m_tranStatic(m_sdbStatic, m_mutexStatic),
     m_needResyncLog(false),
-    m_needResyncLicenses(false)
+    m_needResyncLicenses(false),
+    m_needResyncFiles(false)
 {
 	Q_ASSERT(!globalInstance);
 	globalInstance = this;
@@ -344,7 +345,9 @@ bool QnDbManager::init(
     }
 
     QString storedFilesDir = closeDirPath(dbFilePath) + QString(lit("vms_storedfiles/"));
-    addStoredFiles(storedFilesDir);
+    int addedStoredFilesCnt = 0;
+    addStoredFiles(storedFilesDir, &addedStoredFilesCnt);
+    m_needResyncFiles = addedStoredFilesCnt > 0;
     removeDirRecursive(storedFilesDir);
 
     // updateDBVersion();
@@ -441,9 +444,15 @@ bool QnDbManager::init(
         if (!resyncTransactionLog())
 		    return false;
     }
-    else if (m_needResyncLicenses) {
-        if (!fillTransactionLogInternal<ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
-            return false;
+    else {
+        if (m_needResyncLicenses) {
+            if (!fillTransactionLogInternal<ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
+                return false;
+        }
+        if (m_needResyncFiles) {
+            if (!fillTransactionLogInternal<ApiStoredFileData, ApiStoredFileDataList>(ApiCommand::addStoredFile))
+                return false;
+        }
     }
 
     // Set admin user's password
@@ -553,6 +562,9 @@ bool QnDbManager::resyncTransactionLog()
         return false;
 
     if (!fillTransactionLogInternal<ApiCameraServerItemData, ApiCameraServerItemDataList>(ApiCommand::addCameraHistoryItem))
+        return false;
+
+    if (!fillTransactionLogInternal<ApiStoredFileData, ApiStoredFileDataList>(ApiCommand::addStoredFile))
         return false;
 
     return true;
@@ -716,7 +728,10 @@ ErrorCode QnDbManager::insertOrReplaceStoredFile(const QString &fileName, const 
 
 
 /** Insert sample files into database. */
-bool QnDbManager::addStoredFiles(const QString& baseDirectoryName) {
+bool QnDbManager::addStoredFiles(const QString& baseDirectoryName, int* count) 
+{
+    if (count)
+        *count = 0;
 
     /* Directory name selected equal to the database table name. */
 
@@ -736,6 +751,9 @@ bool QnDbManager::addStoredFiles(const QString& baseDirectoryName) {
         ErrorCode status = insertOrReplaceStoredFile(relativeName, data);
         if (status != ErrorCode::ok)
             return false;
+
+        if (count)
+            ++(*count);
     }
     return true;
 }
@@ -3264,6 +3282,24 @@ ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFil
     data.path = path.path;
     if (query.next())
         data.data = query.value(0).toByteArray();
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFileDataList& data)
+{
+    QString filter;
+    if (!path.path.isEmpty())
+        filter = QString("WHERE path = '%1'").arg(path.path);
+
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    query.prepare(QString("SELECT path, data FROM vms_storedFiles %1").arg(filter));
+    if (!query.exec())
+    {
+        qWarning() << Q_FUNC_INFO << __LINE__ << query.lastError();
+        return ErrorCode::dbError;
+    }
+    QnSql::fetch_many(query, &data);
     return ErrorCode::ok;
 }
 
