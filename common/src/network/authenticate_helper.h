@@ -76,7 +76,8 @@ public:
 
     void clear()
     {
-        std::move( authenticateHeader );
+        authenticateHeader.reset();
+        responseStatusCode = nx_http::StatusCode::ok;
     }
 };
 
