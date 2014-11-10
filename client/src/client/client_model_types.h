@@ -11,6 +11,8 @@
 #include <QtCore/QDataStream>
 #include <QtGui/QVector3D>
 
+#include <client/client_globals.h>
+
 #include <utils/common/id.h>
 #include <utils/common/model_functions_fwd.h>
 #include <recording/time_period.h>
@@ -24,7 +26,7 @@ typedef QHash<QString, QWeakPointer<QObject> > QnWeakObjectHash;
 Q_DECLARE_METATYPE(QnWeakObjectHash)
 
 // -------------------------------------------------------------------------- //
-// QnWorkbenchState
+// QnThumbnailsSearchState
 // -------------------------------------------------------------------------- //
 /**
  * Additional data for a thumbnails search layout.
@@ -121,5 +123,42 @@ struct QnPtzHotkey {
 typedef QHash<int, QString> QnPtzHotkeyHash;
 
 QN_FUSION_DECLARE_FUNCTIONS(QnPtzHotkey, (json)(metatype));
+
+
+// -------------------------------------------------------------------------- //
+// QnClientBackground
+// -------------------------------------------------------------------------- //
+/**
+ * Set of options how to display client background.
+ */
+struct QnClientBackground {
+    QnClientBackground():
+        animationEnabled(true),
+        animationMode(Qn::DefaultAnimation),
+        animationCustomColor(QColor()),
+        animationPeriodSec(120),
+        imageEnabled(false),
+        imageMode(Qn::StretchImage),
+        imageOpacity(0.5)
+    {}
+
+    bool animationEnabled;
+    Qn::BackgroundAnimationMode animationMode;
+    QColor animationCustomColor;
+    int animationPeriodSec;
+
+    bool imageEnabled;
+    QString imageName;
+    QString imageOriginalName;
+    Qn::ImageBehaviour imageMode;
+    qreal imageOpacity;
+
+    qreal actualImageOpacity() const {
+        return imageEnabled ? imageOpacity : 0.0;
+    }
+};
+#define QnClientBackground_Fields (animationEnabled)(animationMode)(animationCustomColor)(animationPeriodSec)(imageEnabled)(imageName)(imageOriginalName)(imageMode)(imageOpacity)
+
+QN_FUSION_DECLARE_FUNCTIONS(QnClientBackground, (datastream)(metatype));
 
 #endif // QN_CLIENT_MODEL_TYPES_H

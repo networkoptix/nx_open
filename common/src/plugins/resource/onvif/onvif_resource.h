@@ -303,7 +303,7 @@ protected:
     int getSecondaryIndex(const QList<VideoOptionsLocal>& optList) const;
     //!Registeres local NotificationConsumer in resource's NotificationProducer
     bool registerNotificationConsumer();
-
+    void updateFirmware();
 private slots:
     void onRenewSubscriptionTimer( quint64 timerID );
 

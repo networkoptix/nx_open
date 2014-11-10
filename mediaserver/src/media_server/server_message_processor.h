@@ -35,10 +35,13 @@ private slots:
 
     void at_systemNameChangeRequested(const QString &systemName);
     void at_remotePeerUnauthorized(const QnUuid& id);
+    void at_remotePeerFound(ec2::ApiPeerAliveData data);
+    void at_remotePeerLost(ec2::ApiPeerAliveData data);
 private:
     mutable QMutex m_mutexAddrList;
     const int m_serverPort;
     mutable QnMediaServerResourcePtr m_mServer;
+    QSet<QnUuid> m_delayedOnlineStatus;
 };
 
 #endif // QN_SERVER_MESSAGE_PROCESSOR_H

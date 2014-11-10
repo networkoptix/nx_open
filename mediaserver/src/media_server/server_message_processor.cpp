@@ -81,12 +81,16 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource)
             resource->setStatus(Qn::Online);
         }
     }
-
-    if (QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId()))
+    QnUuid resId = resource->getId();
+    if (QnResourcePtr ownResource = qnResPool->getResourceById(resId))
         ownResource->update(resource);
     else
         qnResPool->addResource(resource);
 
+    if (m_delayedOnlineStatus.contains(resId)) {
+        m_delayedOnlineStatus.remove(resId);
+        resource->setStatus(Qn::Online);
+    }
 }
 
 void QnServerMessageProcessor::afterRemovingResource(const QnUuid& id)
@@ -105,7 +109,23 @@ void QnServerMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 
     connect( connection, &ec2::AbstractECConnection::remotePeerUnauthorized, this, &QnServerMessageProcessor::at_remotePeerUnauthorized );
 
+    connect(connection, &ec2::AbstractECConnection::remotePeerFound,                this, &QnServerMessageProcessor::at_remotePeerFound );
+    connect(connection, &ec2::AbstractECConnection::remotePeerLost,                 this, &QnServerMessageProcessor::at_remotePeerLost );
+
     QnCommonMessageProcessor::init(connection);
+}
+
+void QnServerMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data)
+{
+	// If resource in the pool then CommonMessageProcessor changes status to Online
+    QnResourcePtr res = qnResPool->getResourceById(data.peer.id);
+    if (!res)
+        m_delayedOnlineStatus << data.peer.id;
+}
+
+void QnServerMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data)
+{
+    m_delayedOnlineStatus.remove(data.peer.id);
 }
 
 void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) 

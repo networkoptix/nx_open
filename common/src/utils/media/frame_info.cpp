@@ -160,6 +160,11 @@ void CLVideoDecoderOutput::memZerro()
     }
 }
 
+void CLVideoDecoderOutput::reallocate(const QSize& size, int newFormat)
+{
+    reallocate(size.width(), size.height(), newFormat);
+}
+
 void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat)
 {
     clean();

@@ -6,75 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>423</width>
-    <height>360</height>
+    <width>419</width>
+    <height>469</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string/>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0">
+  <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
     <widget class="QGroupBox" name="lookAndFeelGroupBox">
      <property name="title">
       <string>Look and Feel</string>
      </property>
-     <layout class="QFormLayout" name="formLayout">
-      <property name="fieldGrowthPolicy">
-       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-      </property>
-      <item row="0" column="0">
-       <widget class="QLabel" name="tourCycleTimeLabel">
-        <property name="text">
-         <string>Tour sequence cycle time:</string>
-        </property>
-        <property name="buddy">
-         <cstring>tourCycleTimeSpinBox</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1">
-        <item>
-         <widget class="QSpinBox" name="tourCycleTimeSpinBox">
-          <property name="minimum">
-           <number>1</number>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string> seconds</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="showIpInTreeLabel">
-        <property name="text">
-         <string>Show IP in tree:</string>
-        </property>
-        <property name="buddy">
-         <cstring>showIpInTreeCheckBox</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QCheckBox" name="showIpInTreeCheckBox">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="timelineModeLabel">
-        <property name="text">
-         <string>Timeline mode:</string>
-        </property>
-       </widget>
-      </item>
+     <layout class="QGridLayout" name="gridLayout">
       <item row="2" column="1">
        <layout class="QHBoxLayout" name="horizontalLayout_6">
         <item>
@@ -95,14 +40,51 @@
         </item>
        </layout>
       </item>
-      <item row="3" column="0">
+      <item row="2" column="0">
+       <widget class="QLabel" name="timelineModeLabel">
+        <property name="text">
+         <string>Timeline mode:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="languageLabel">
+        <property name="text">
+         <string>Language:</string>
+        </property>
+        <property name="buddy">
+         <cstring>languageComboBox</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="showIpInTreeLabel">
+        <property name="text">
+         <string>Show IP in tree:</string>
+        </property>
+        <property name="buddy">
+         <cstring>showIpInTreeCheckBox</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
        <widget class="QLabel" name="skinLabel">
         <property name="text">
          <string>Skin:</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
+      <item row="5" column="0">
+       <widget class="QLabel" name="tourCycleTimeLabel">
+        <property name="text">
+         <string>Tour sequence cycle time:</string>
+        </property>
+        <property name="buddy">
+         <cstring>tourCycleTimeSpinBox</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
        <layout class="QHBoxLayout" name="horizontalLayout_9">
         <item>
          <widget class="QComboBox" name="skinComboBox"/>
@@ -129,29 +111,25 @@
         </item>
        </layout>
       </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="languageLabel">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Language:</string>
-        </property>
-        <property name="buddy">
-         <cstring>languageComboBox</cstring>
-        </property>
-       </widget>
+      <item row="5" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1">
+        <item>
+         <widget class="QSpinBox" name="tourCycleTimeSpinBox">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string> seconds</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
-      <item row="4" column="1">
+      <item row="0" column="1">
        <layout class="QHBoxLayout" name="horizontalLayout_7">
         <item>
          <widget class="QComboBox" name="languageComboBox"/>
@@ -178,42 +156,43 @@
         </item>
        </layout>
       </item>
+      <item row="4" column="1">
+       <widget class="QCheckBox" name="showIpInTreeCheckBox">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLabel" name="timeModeWarningLabel">
+        <property name="text">
+         <string>This option will not affect Recording Schedule.
+Recording Schedule is always based on Server Time.</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="backgroundGroupBox">
+    <widget class="QGroupBox" name="animationGroupBox">
      <property name="title">
-      <string>Background</string>
+      <string>Background Animation</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout" rowminimumheight="23,23,23,23,23">
-      <item row="0" column="0">
-       <widget class="QRadioButton" name="backgroundEmptyRadioButton">
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QCheckBox" name="animationEnabledCheckBox">
         <property name="text">
-         <string>No background</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QRadioButton" name="backgroundDefaultRadioButton">
-        <property name="text">
-         <string>Default background</string>
+         <string>Enable Background Animation</string>
         </property>
         <property name="checked">
          <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QRadioButton" name="backgroundRainbowRadioButton">
-        <property name="text">
-         <string>Rainbow mode</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QWidget" name="backgroundColorWidget" native="true">
-        <layout class="QHBoxLayout" name="horizontalLayout_12">
+      <item>
+       <widget class="QWidget" name="animationWidget" native="true">
+        <layout class="QGridLayout" name="gridLayout_4">
          <property name="leftMargin">
           <number>0</number>
          </property>
@@ -226,62 +205,105 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item>
-          <widget class="QRadioButton" name="backgroundCustomRadioButton">
+         <item row="0" column="0">
+          <widget class="QLabel" name="animationColorLabel">
            <property name="text">
-            <string>Custom color</string>
+            <string>Color:</string>
            </property>
           </widget>
          </item>
-         <item>
-          <spacer name="horizontalSpacer_4">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
+         <item row="0" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_8">
+           <item>
+            <widget class="QComboBox" name="animationColorComboBox"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="colorSelectButton">
+             <property name="text">
+              <string>Select color...</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </item>
-         <item>
-          <widget class="QPushButton" name="selectColorButton">
-           <property name="text">
-            <string>Select color...</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="backgroundColorOpacityLabel">
+         <item row="1" column="0">
+          <widget class="QLabel" name="animationOpacityLabel">
            <property name="text">
             <string>Intensity:</string>
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QSpinBox" name="backgroundColorOpacitySpinBox">
-           <property name="suffix">
-            <string>%</string>
-           </property>
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>100</number>
-           </property>
-           <property name="value">
-            <number>25</number>
-           </property>
-          </widget>
+         <item row="1" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
+           <item>
+            <widget class="QSpinBox" name="animationOpacitySpinBox">
+             <property name="suffix">
+              <string>%</string>
+             </property>
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>100</number>
+             </property>
+             <property name="value">
+              <number>25</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_8">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </item>
         </layout>
        </widget>
       </item>
-      <item row="4" column="0">
-       <widget class="QWidget" name="backgroundImageWidget" native="true">
-        <layout class="QHBoxLayout" name="horizontalLayout_11">
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="imageGroupBox">
+     <property name="title">
+      <string>Background Image</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QCheckBox" name="imageEnabledCheckBox">
+        <property name="text">
+         <string>Enable Background Image</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" name="imageWidget" native="true">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_2">
          <property name="leftMargin">
           <number>0</number>
          </property>
@@ -294,58 +316,100 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item>
-          <widget class="QRadioButton" name="backgroundImageRadioButton">
+         <item row="0" column="0">
+          <widget class="QLabel" name="imageNameLabel">
            <property name="text">
-            <string>Custom image</string>
+            <string>Image:</string>
            </property>
           </widget>
          </item>
-         <item>
-          <spacer name="horizontalSpacer_6">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>174</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
+         <item row="0" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QLineEdit" name="imageNameLineEdit">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+             <property name="placeholderText">
+              <string>&lt;No image&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="imageSelectButton">
+             <property name="text">
+              <string>Browse...</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
-         <item>
-          <widget class="QPushButton" name="selectImageButton">
+         <item row="1" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="QComboBox" name="imageModeComboBox"/>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_6">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="imageModeLabel">
            <property name="text">
-            <string>Browse...</string>
+            <string>Mode:</string>
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QComboBox" name="backgroundImageModeComboBox"/>
-         </item>
-         <item>
-          <widget class="QLabel" name="backgroundImageOpacityLabel">
+         <item row="2" column="0">
+          <widget class="QLabel" name="imageOpacityLabel">
            <property name="text">
             <string>Intensity:</string>
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QSpinBox" name="backgroundImageOpacitySpinBox">
-           <property name="suffix">
-            <string>%</string>
-           </property>
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>100</number>
-           </property>
-           <property name="value">
-            <number>25</number>
-           </property>
-          </widget>
+         <item row="2" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QSpinBox" name="imageOpacitySpinBox">
+             <property name="suffix">
+              <string>%</string>
+             </property>
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>100</number>
+             </property>
+             <property name="value">
+              <number>25</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_7">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </item>
         </layout>
        </widget>
@@ -368,6 +432,21 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>languageComboBox</tabstop>
+  <tabstop>skinComboBox</tabstop>
+  <tabstop>timeModeComboBox</tabstop>
+  <tabstop>showIpInTreeCheckBox</tabstop>
+  <tabstop>tourCycleTimeSpinBox</tabstop>
+  <tabstop>animationEnabledCheckBox</tabstop>
+  <tabstop>animationColorComboBox</tabstop>
+  <tabstop>animationOpacitySpinBox</tabstop>
+  <tabstop>imageEnabledCheckBox</tabstop>
+  <tabstop>imageNameLineEdit</tabstop>
+  <tabstop>imageSelectButton</tabstop>
+  <tabstop>imageModeComboBox</tabstop>
+  <tabstop>imageOpacitySpinBox</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

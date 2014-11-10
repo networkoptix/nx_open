@@ -18,8 +18,13 @@ QnGlobalModuleFinder::QnGlobalModuleFinder(QnModuleFinder *moduleFinder, QObject
     connect(QnRouter::instance(),   &QnRouter::connectionRemoved,   this,       &QnGlobalModuleFinder::at_router_connectionRemoved);
 
     QMultiHash<QnUuid, QnRouter::Endpoint> connections = QnRouter::instance()->connections();
-    for (auto it = connections.begin(); it != connections.end(); ++it)
+    for (auto it = connections.begin(); it != connections.end(); ++it) {
+		/* Ignore addresses discovered by client */
+		if (!moduleFinder && it.key() == qnCommon->moduleGUID())
+			continue;
+
         at_router_connectionAdded(it.key(), it->id, it->host);
+	}
 
     if (moduleFinder) {
         for (const QnModuleInformation &moduleInformation: moduleFinder->foundModules())
@@ -114,6 +119,10 @@ void QnGlobalModuleFinder::at_moduleFinder_moduleLost(const QnModuleInformation 
 }
 
 void QnGlobalModuleFinder::at_router_connectionAdded(const QnUuid &discovererId, const QnUuid &peerId, const QString &host) {
+	/* Ignore addresses discovered by client */
+	if (!m_moduleFinder && discovererId == qnCommon->moduleGUID())
+		return;
+
     QSet<QString> &addresses = m_discoveredAddresses[peerId][discovererId];
     auto it = addresses.find(host);
     if (it != addresses.end())
@@ -123,6 +132,10 @@ void QnGlobalModuleFinder::at_router_connectionAdded(const QnUuid &discovererId,
 }
 
 void QnGlobalModuleFinder::at_router_connectionRemoved(const QnUuid &discovererId, const QnUuid &peerId, const QString &host) {
+	/* Ignore addresses discovered by client */
+	if (!m_moduleFinder && discovererId == qnCommon->moduleGUID())
+		return;
+
     if (!m_discoveredAddresses[peerId][discovererId].remove(host))
         return;
     updateAddresses(peerId);
@@ -139,6 +152,7 @@ void QnGlobalModuleFinder::updateAddresses(const QnUuid &id) {
 
     moduleInformation.remoteAddresses = addresses;
     m_moduleInformationById[id] = moduleInformation;
+
     if (moduleInformation.remoteAddresses.isEmpty()) {
         NX_LOG(lit("QnGlobalModuleFinder. Module %1 is lost").arg(moduleInformation.id.toString()), cl_logDEBUG1);
         emit peerLost(moduleInformation);
