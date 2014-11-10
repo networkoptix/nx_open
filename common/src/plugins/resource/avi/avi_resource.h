@@ -37,10 +37,13 @@ public:
     qint64 timeZoneOffset() const;
     QnAviArchiveDelegate* createArchiveDelegate() const;
 
+    virtual Qn::ResourceStatus getStatus() const override;
+    virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode = false) override;
 private:
     QnStorageResourcePtr m_storage;
     QnMetaDataLightVector m_motionBuffer[CL_MAX_CHANNELS];
     qint64 m_timeZoneOffset;
+    Qn::ResourceStatus m_localStatus;
 };
 
 #endif // ENABLE_ARCHIVE
