@@ -153,7 +153,7 @@ bool QnMergeSystemsRestHandler::changeSystemName(const QString &systemName) {
 }
 
 bool QnMergeSystemsRestHandler::changeAdminPassword(const QString &password) {
-    if (QnUserResourcePtr admin = getAdminUser()) {
+    if (QnUserResourcePtr admin = qnResPool->getAdministrator()) {
         admin->setPassword(password);
         admin->generateHash();
         ec2Connection()->getUserManager()->save(admin, this, [](int, ec2::ErrorCode) { return; });
