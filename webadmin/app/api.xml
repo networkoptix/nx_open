@@ -1589,6 +1589,12 @@
                             <optional>true</optional>
                         </param>
                         <param>
+                            <name>rotation</name>
+                            <description>Rotate item. Can be 0, 90, 180 or 270 degree. If parameter is absent, video will be rotated to default value defined in a camera settings dialog.
+                                         Parameter take place if video transcoding is activated (parameter codec and/or parameter resolution are presents.)</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
                             <name>codec</name>
                             <description>Defines video codec used for transcoding. Default value H263.</description>
                             <optional>true</optional>
@@ -1695,6 +1701,11 @@
                         <param>
                             <name>pos</name>
                             <description>If present and not equal to &lt;now&gt;, specifies archive stream start positions in milliseconds from epoch (1970-01-01 00:00, UTC). Otherwise, LIVE stream is provided</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>rotation</name>
+                            <description>Rotate item. Can be 0, 90, 180 or 270 degree. If parameter is absent, video will be rotated to default value defined in a camera settings dialog</description>
                             <optional>true</optional>
                         </param>
                     </params>
