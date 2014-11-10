@@ -520,7 +520,15 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbst
     QSharedPointer<QnUniversalRtpEncoder> universalEncoder;
     
     QnResourcePtr res = getResource()->toResourcePtr();
-    int rotation = res->getProperty(QnMediaResource::rotationKey()).toInt();
+
+    QUrl url(d->request.requestLine.url);
+    const QUrlQuery urlQuery( url.query() );
+    int rotation;
+    if (urlQuery.hasQueryItem("rotation"))
+        rotation = urlQuery.queryItemValue("rotation").toInt();
+    else
+        rotation = res->getProperty(QnMediaResource::rotationKey()).toInt();
+
     qreal customAR = res->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
 
     QnImageFilterHelper extraTranscodeParams;
