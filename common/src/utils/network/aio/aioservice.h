@@ -8,6 +8,7 @@
 
 #include <atomic>
 #include <memory>
+#include <atomic>
 
 #include <boost/optional.hpp>
 
@@ -29,7 +30,6 @@ namespace aio
         \note Currently, win32 implementation uses select, so it is far from being efficient. Linux implementation uses epoll, BSD - kqueue
         \note All methods are thread-safe
         \note All methods are not blocking except \a AIOService::removeFromWatch called with \a waitForRunningHandlerCompletion set to \a true
-        \todo Socket termination???
     */
     class AIOService
     {
@@ -238,16 +238,27 @@ namespace aio
                 auto aioThread = it->second.first;
                 aioHandlingContext.sockets.erase( it );
                 aioThread->removeFromWatch( sock, eventType, waitForRunningHandlerCompletion );
-                //TODO #ak make following check constant-time
-                auto sameSockIter = aioHandlingContext.sockets.lower_bound( std::make_pair( sock, (aio::EventType)0 ) );
-                if( sameSockIter == aioHandlingContext.sockets.end() || 
-                    sameSockIter->first.first != sock )
-                {
-                    //socket is not polled for any events or has been marked for 
-                        //pollig stop, removing scheduled functor calls (if any)
-                    aioThread->cancelPostedCalls( sock, waitForRunningHandlerCompletion );
-                }
             }
+        }
+
+        template<class SocketType>
+        void cancelPostedCalls(
+            SocketType* const sock,
+            bool waitForRunningHandlerCompletion = true )
+        {
+            QMutexLocker lk( &m_mutex );
+            cancelPostedCallsNonSafe( sock, waitForRunningHandlerCompletion );
+        }
+
+        template<class SocketType>
+        void cancelPostedCallsNonSafe(
+            SocketType* const sock,
+            bool waitForRunningHandlerCompletion = true )
+        {
+            typename SocketAIOContext<SocketType>::AIOThreadType* aioThread = sock->impl()->aioThread.load( std::memory_order_relaxed );
+            if( !aioThread )
+                return;
+            aioThread->cancelPostedCalls( sock, waitForRunningHandlerCompletion );
         }
 
         /*!
@@ -267,7 +278,7 @@ namespace aio
             std::map<std::pair<SocketType*, aio::EventType>, std::pair<AIOThreadType*, unsigned int> > sockets;
         };
 
-        SocketAIOContext<Socket> m_systemSocketAIO;
+        SocketAIOContext<Pollable> m_systemSocketAIO;
         mutable QMutex m_mutex;
 
         template<class SocketType> SocketAIOContext<SocketType>& getAIOHandlingContext();
@@ -285,8 +296,6 @@ namespace aio
                 threadIter != aioHandlingContext.aioThreadPool.cend();
                 ++threadIter )
             {
-                if( !(*threadIter)->canAcceptSocket( sock ) )
-                    continue;
                 if( threadToUse && threadToUse->socketsHandled() < (*threadIter)->socketsHandled() )
                     continue;
                 threadToUse = *threadIter;

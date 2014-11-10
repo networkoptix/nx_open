@@ -53,6 +53,8 @@ namespace {
         QScopedArrayPointer<unsigned char> decrypted(new unsigned char[signature.size()]);
         int ret = RSA_public_decrypt(signature.size(), (const unsigned char*)signature.data(), decrypted.data(), publicRSAKey, RSA_PKCS1_PADDING);
         RSA_free(publicRSAKey);
+        if (ret == -1)
+            return false;
 
         // Verify signature is correct
         return memcmp(decrypted.data(), dataHash.data(), ret) == 0;
@@ -178,6 +180,20 @@ QString QnLicense::longDisplayName(Qn::LicenseType licenseType) {
     return QString();
 }
 
+QnUuid QnLicense::serverId() const {
+    for(const QnPeerRuntimeInfo& info: QnRuntimeInfoManager::instance()->items()->getItems())
+    {
+        if (info.data.peer.peerType != Qn::PT_Server)
+            continue;
+
+        bool hwKeyOK = info.data.mainHardwareIds.contains(m_hardwareId) || info.data.compatibleHardwareIds.contains(m_hardwareId);
+        bool brandOK = m_brand.isEmpty() || (m_brand == info.data.brand);
+        if (hwKeyOK && brandOK)
+            return info.uuid;
+    }
+    return QnUuid();
+}
+
 const QString &QnLicense::name() const
 {
     return m_name;
@@ -236,21 +252,6 @@ const QByteArray& QnLicense::rawLicense() const
     return m_rawLicense;
 }
 
-QnUuid QnLicense::findRuntimeDataByLicense() const
-{
-    foreach(const QnPeerRuntimeInfo& info, QnRuntimeInfoManager::instance()->items()->getItems())
-    {
-        if (info.data.peer.peerType != Qn::PT_Server)
-            continue;
-
-        bool hwKeyOK = info.data.mainHardwareIds.contains(m_hardwareId) || info.data.compatibleHardwareIds.contains(m_hardwareId);
-        bool brandOK = m_brand.isEmpty() || (m_brand == info.data.brand);
-        if (hwKeyOK && brandOK)
-            return info.uuid;
-    }
-    return QnUuid();
-}
-
 bool QnLicense::gotError(ErrorCode* errCode, ErrorCode errorCode) const
 {
     if (errCode)
@@ -284,7 +285,7 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
     if (!m_isValid1 && !m_isValid2 && mode != VM_CheckInfo)
         return gotError(errCode, InvalidSignature);
     
-    QnPeerRuntimeInfo info = QnRuntimeInfoManager::instance()->items()->getItem(mode == VM_Regular ? findRuntimeDataByLicense() : qnCommon->remoteGUID());
+    QnPeerRuntimeInfo info = QnRuntimeInfoManager::instance()->items()->getItem(mode == VM_Regular ? serverId() : qnCommon->remoteGUID());
     if (info.uuid.isNull())
         return gotError(errCode, InvalidHardwareID); // peer where license was activated not found
 
@@ -300,7 +301,7 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
 
     if (isEdgeBox && type() == Qn::LC_Edge) 
     {
-        foreach(QnLicensePtr license, qnLicensePool->getLicenses()) {
+        for(const QnLicensePtr& license: qnLicensePool->getLicenses()) {
             if (license->hardwareId() == hardwareId() && license->type() == type()) 
             {
                 if (mode == VM_CheckInfo && license->key() != key())
@@ -382,7 +383,7 @@ void QnLicense::parseLicenseBlock(
     QByteArray* const v2LicenseBlock )
 {
     int n = 0;
-    foreach (QByteArray line, licenseBlock.split('\n'))
+    for (QByteArray line: licenseBlock.split('\n'))
     {
         line = line.trimmed();
         if (line.isEmpty())
@@ -471,7 +472,7 @@ int QnLicenseListHelper::totalLicenseByType(Qn::LicenseType licenseType) const
 {
     int result = 0;
 
-    foreach (QnLicensePtr license, m_licenseDict.values()) 
+    for (const QnLicensePtr& license: m_licenseDict.values()) 
     {
         if (license->type() == licenseType && license->isValid())
             result += license->cameraCount();
@@ -481,7 +482,7 @@ int QnLicenseListHelper::totalLicenseByType(Qn::LicenseType licenseType) const
 
 void QnLicenseListHelper::update(const QnLicenseList& licenseList) {
     m_licenseDict.clear();
-    foreach (QnLicensePtr license, licenseList) {
+    for (const QnLicensePtr& license: licenseList) {
         m_licenseDict[license->key()] = license;
     }
 }
@@ -501,7 +502,7 @@ QnLicensePool::QnLicensePool():
 
 void QnLicensePool::at_timer()
 {
-    foreach(const QnLicensePtr license, m_licenseDict)
+    for(const QnLicensePtr& license: m_licenseDict)
     {
         QnLicense::ErrorCode errCode;
         license->isValid(&errCode);
@@ -565,7 +566,7 @@ bool QnLicensePool::addLicenses_i(const QnLicenseList &licenses)
 {
     bool atLeastOneAdded = false;
 
-    foreach(QnLicensePtr license, licenses) {
+    for(const QnLicensePtr& license: licenses) {
         if (addLicense_i(license))
             atLeastOneAdded = true;
     }

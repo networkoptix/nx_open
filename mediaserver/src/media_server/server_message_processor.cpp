@@ -20,6 +20,7 @@
 #include "utils/network/router.h"
 
 #include <utils/common/app_info.h>
+#include "core/resource/storage_resource.h"
 
 QnServerMessageProcessor::QnServerMessageProcessor()
 :
@@ -37,8 +38,9 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource)
     const bool isCamera = dynamic_cast<const QnVirtualCameraResource*>(resource.data()) != nullptr;
     const bool isUser = dynamic_cast<const QnUserResource*>(resource.data()) != nullptr;
     const bool isVideowall = dynamic_cast<const QnVideoWallResource*>(resource.data()) != nullptr;
+    const bool isStorage = dynamic_cast<const QnAbstractStorageResource*>(resource.data()) != nullptr;
 
-    if (!isServer && !isCamera && !isUser && !isVideowall)
+    if (!isServer && !isCamera && !isUser && !isVideowall && !isStorage)
         return;
 
     //storing all servers' cameras too
@@ -79,12 +81,16 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource)
             resource->setStatus(Qn::Online);
         }
     }
-
-    if (QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId()))
+    QnUuid resId = resource->getId();
+    if (QnResourcePtr ownResource = qnResPool->getResourceById(resId))
         ownResource->update(resource);
     else
         qnResPool->addResource(resource);
 
+    if (m_delayedOnlineStatus.contains(resId)) {
+        m_delayedOnlineStatus.remove(resId);
+        resource->setStatus(Qn::Online);
+    }
 }
 
 void QnServerMessageProcessor::afterRemovingResource(const QnUuid& id)
@@ -103,7 +109,23 @@ void QnServerMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 
     connect( connection, &ec2::AbstractECConnection::remotePeerUnauthorized, this, &QnServerMessageProcessor::at_remotePeerUnauthorized );
 
+    connect(connection, &ec2::AbstractECConnection::remotePeerFound,                this, &QnServerMessageProcessor::at_remotePeerFound );
+    connect(connection, &ec2::AbstractECConnection::remotePeerLost,                 this, &QnServerMessageProcessor::at_remotePeerLost );
+
     QnCommonMessageProcessor::init(connection);
+}
+
+void QnServerMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data)
+{
+	// If resource in the pool then CommonMessageProcessor changes status to Online
+    QnResourcePtr res = qnResPool->getResourceById(data.peer.id);
+    if (!res)
+        m_delayedOnlineStatus << data.peer.id;
+}
+
+void QnServerMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data)
+{
+    m_delayedOnlineStatus.remove(data.peer.id);
 }
 
 void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) 
@@ -128,7 +150,7 @@ bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
     if (m_mServer) 
     {
         QHostAddress hostAddr(addr);
-        foreach(const QHostAddress& serverAddr, m_mServer->getNetAddrList())
+        for(const QHostAddress& serverAddr: m_mServer->getNetAddrList())
         {
             if (hostAddr == serverAddr)
                 return true;
@@ -203,16 +225,28 @@ bool QnServerMessageProcessor::canRemoveResource(const QnUuid& resourceId)
 { 
     QnResourcePtr res = qnResPool->getResourceById(resourceId);
     bool isOwnServer = (res && res->getId() == qnCommon->moduleGUID());
-    return !isOwnServer;
+    if (isOwnServer)
+        return false;
+    QnStorageResourcePtr storage = res.dynamicCast<QnStorageResource>();
+    bool isOwnStorage = (storage && storage->getParentId() == qnCommon->moduleGUID());
+    if (isOwnStorage && !storage->isExternal())
+        return false;
+
+    return true;
 }
 
 void QnServerMessageProcessor::removeResourceIgnored(const QnUuid& resourceId) 
 {
     QnMediaServerResourcePtr mServer = qnResPool->getResourceById(resourceId).dynamicCast<QnMediaServerResource>();
+    QnStorageResourcePtr storage = qnResPool->getResourceById(resourceId).dynamicCast<QnStorageResource>();
     bool isOwnServer = (mServer && mServer->getId() == qnCommon->moduleGUID());
+    bool isOwnStorage = (storage && storage->getParentId() == qnCommon->moduleGUID());
     if (isOwnServer) {
         QnMediaServerResourcePtr savedServer;
         QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveSync(mServer, &savedServer);
         QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusSync(mServer->getId(), Qn::Online);
+    }
+    else if (isOwnStorage && !storage->isExternal()) {
+        QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveStoragesSync(QnAbstractStorageResourceList() << storage);
     }
 }

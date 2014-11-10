@@ -61,7 +61,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 #endif
         return QnResourceList();
 
-    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
+    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
     {
 
         if (shouldStop())
@@ -122,7 +122,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 
 
             bool haveToContinue = false;
-            foreach(QnResourcePtr res, result)
+            for(const QnResourcePtr& res: result)
             {
                 QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
 
@@ -147,9 +147,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             resource->setName(name);
             resource->setModel(name);
             resource->setMAC(QnMacAddress(smac));
-            resource->setHostAddress(sender, QnDomainMemory);
-
-            resource->setDiscoveryAddr(iface.address);
+            resource->setHostAddress(sender);
 
             result.push_back(resource);
 
@@ -194,7 +192,7 @@ QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, c
     QString name;
     QString mac;
 
-    foreach(QString line, lines)
+    for(const QString& line: lines)
     {
         if (line.contains(QLatin1String("name=")))
         {
@@ -222,8 +220,8 @@ QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, c
     resource->setName(name);
     resource->setMAC(QnMacAddress(mac));
     (resource.dynamicCast<QnPlDlinkResource>())->setModel(name);
-    resource->setHostAddress(host, QnDomainMemory);
-    resource->setAuth(auth);
+    resource->setHostAddress(host);
+    resource->setDefaultAuth(auth);
 
     //resource->setDiscoveryAddr(iface.address);
     QList<QnResourcePtr> result;

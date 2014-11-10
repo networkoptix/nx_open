@@ -6,8 +6,6 @@
 #include "resource_fwd.h"
 
 #include <core/dataconsumer/abstract_data_consumer.h>
-#include <core/datapacket/abstract_data_packet.h>
-
 
 class QN_EXPORT QnResourceCommandProcessor : public QnAbstractDataConsumer
 {

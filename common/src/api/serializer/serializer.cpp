@@ -1,8 +1,10 @@
 #include "serializer.h"
 
+#include <core/resource/motion_window.h>
+
 void parseRegion(QRegion& region, const QString& regionString)
 {
-    foreach (QString rectString, regionString.split(QLatin1Char(';')))
+    for (QString rectString: regionString.split(QLatin1Char(';')))
     {
         QRect rect;
         QStringList rectList = rectString.split(QLatin1Char(','));
@@ -22,7 +24,7 @@ void parseRegionList(QList<QRegion>& regions, const QString& regionsString)
 {
     QStringList regList = regionsString.split(QLatin1Char(':'));
     regions.clear();
-    foreach(const QString& regionStr, regList)
+    for(const QString& regionStr: regList)
     {
         QRegion region;
         parseRegion(region, regionStr);
@@ -46,7 +48,7 @@ void parseMotionRegion(QnMotionRegion& region, const QByteArray& regionString)
 {
     QList<QRect> motionMask;
     bool firstRect = true;
-    foreach (const QByteArray& rectString, regionString.split(';'))
+    for (const QByteArray& rectString: regionString.split(';'))
     {
         QList<QByteArray> rectList = rectString.split(',');
         QRect r;
@@ -84,12 +86,12 @@ QString serializeMotionRegion(const QnMotionRegion& region)
 {
     QStringList regionList;
 
-    //foreach (const QnMotionWindow& window, region)
+    //for (const QnMotionWindow& window: region)
     for (int i = QnMotionRegion::MIN_SENSITIVITY; i <= QnMotionRegion::MAX_SENSITIVITY; ++i)
     {
         if (!region.getRegionBySens(i).isEmpty())
         {
-            foreach(const QRect& rect, region.getRectsBySens(i))
+            for(const QRect& rect: region.getRectsBySens(i))
             {
                 QStringList rectList;
                 rectList << QString::number(i) << QString::number(rect.left()) << QString::number(rect.top()) << QString::number(rect.width()) << QString::number(rect.height());
@@ -105,7 +107,7 @@ QString serializeRegion(const QRegion& region)
 {
     QStringList regionList;
 
-    foreach (const QRect& rect, region.rects())
+    for (const QRect& rect: region.rects())
     {
         QStringList rectList;
         rectList << QString::number(rect.left()) << QString::number(rect.top()) << QString::number(rect.width()) << QString::number(rect.height());

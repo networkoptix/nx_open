@@ -6,6 +6,7 @@
 #include <client/client_settings.h>
 
 #include <nx_ec/ec_api.h>
+#include <nx_ec/ec_proto_version.h>
 
 #include <ui/dialogs/message_box.h>
 #include <ui/dialogs/compatibility_version_installation_dialog.h>
@@ -21,7 +22,40 @@ namespace {
     QnSoftwareVersion minSupportedVersion("1.4"); 
 }
 
+QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateConnectionLight(const QnConnectionInfo &connectionInfo, ec2::ErrorCode errorCode) {
+    bool success = (errorCode == ec2::ErrorCode::ok);
+
+    //checking brand compatibility
+    if (success)
+        success |= qnSettings->isDevMode() || connectionInfo.brand.isEmpty() || connectionInfo.brand == QnAppInfo::productNameShort();
+
+    if(!success)
+        return Result::Failure;
+
+    if (connectionInfo.nxClusterProtoVersion != nx_ec::EC2_PROTO_VERSION)
+        return Result::Failure;
+
+    QnCompatibilityChecker remoteChecker(connectionInfo.compatibilityItems);
+    QnCompatibilityChecker localChecker(localCompatibilityItems());
+
+    QnCompatibilityChecker *compatibilityChecker;
+    if (remoteChecker.size() > localChecker.size()) {
+        compatibilityChecker = &remoteChecker;
+    } else {
+        compatibilityChecker = &localChecker;
+    }
+
+    return (compatibilityChecker->isCompatible(lit("Client"), QnSoftwareVersion(qnCommon->engineVersion().toString()), lit("ECS"), connectionInfo.version))
+        ? Result::Success
+        : Result::Failure;
+}
+
+
 QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateConnection(const QnConnectionInfo &connectionInfo, ec2::ErrorCode errorCode, const QUrl &url, QWidget* parentWidget) {
+    if (validateConnectionLight(connectionInfo, errorCode) == Result::Success)
+        return Result::Success;
+
+    //TODO: #GDM duplicated code
     bool success = (errorCode == ec2::ErrorCode::ok);
 
     //checking brand compatibility
@@ -38,6 +72,20 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
             "If this error persists, please contact your VMS administrator.");
     } else { //brand incompatible
         detail = tr("You are trying to connect to incompatible Server.");
+    }
+
+    if (connectionInfo.nxClusterProtoVersion != nx_ec::EC2_PROTO_VERSION) {
+        QnMessageBox::warning(
+            parentWidget,
+            Qn::VersionMismatch_Help,
+            tr("Could not connect to Server"),
+            tr("You are about to connect to Server which has a different ec2 protocol version:\n"
+            " - Client version: %1.\n"
+            " - Server version: %2."
+            ).arg(nx_ec::EC2_PROTO_VERSION).arg(connectionInfo.nxClusterProtoVersion),
+            QMessageBox::Ok
+            );
+        return Result::Failure;
     }
 
     if(!success) {

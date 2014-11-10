@@ -7,6 +7,7 @@
 #include <core/resource/camera_bookmark_fwd.h>
 #include <business/business_fwd.h>
 #include <nx_ec/ec_api_fwd.h>
+#include <utils/common/email_fwd.h>
 
 namespace ec2 {
 
@@ -18,21 +19,30 @@ namespace ec2 {
     void fromResourceToApi(const QnAbstractBusinessActionPtr &src, ApiBusinessActionData &dst);
     void fromApiToResource(const ApiBusinessActionData &src, QnAbstractBusinessActionPtr &dst, QnResourcePool *resourcePool);
 
-    void fromResourceToApi(const QnScheduleTask &src, ApiScheduleTaskData &dst);
-    void fromApiToResource(const ApiScheduleTaskData &src, QnScheduleTask &dst, const QnUuid &resourceId);
-
     void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst);
     void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst);
     void fromApiToResourceList(const ApiCameraDataList &src, QnResourceList &dst, QnResourceFactory *factory);
     void fromApiToResourceList(const ApiCameraDataList &src, QnVirtualCameraResourceList &dst, QnResourceFactory *factory);
     void fromResourceListToApi(const QnVirtualCameraResourceList &src, ApiCameraDataList &dst);
 
+    void fromResourceToApi(const QnScheduleTask &src, ApiScheduleTaskData &dst);
+    void fromApiToResource(const ApiScheduleTaskData &src, QnScheduleTask &dst, const QnUuid &resourceId);
+
+    void fromApiToResource(const ApiCameraAttributesData& src, const QnCameraUserAttributesPtr& dst);
+    void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributesData& dst);
+    void fromApiToResourceList(const ApiCameraAttributesDataList &src, QnCameraUserAttributesList& dst);
+    void fromResourceListToApi(const QnCameraUserAttributesList& src, ApiCameraAttributesDataList& dst);
+
+    void fromApiToResource(const ApiCameraDataEx &src, QnVirtualCameraResourcePtr &dst);
+    void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraDataEx &dst);
+    void fromResourceListToApi(const QnVirtualCameraResourceList &src, ApiCameraDataExList &dst);
+
     void fromResourceToApi(const QnCameraHistoryItem &src, ApiCameraServerItemData &dst);
     void fromApiToResource(const ApiCameraServerItemData &src, QnCameraHistoryItem &dst);
     void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHistoryList &dst);
 
-    void fromResourceToApi(const QnEmail::Settings &src, ApiEmailSettingsData &dst);
-    void fromApiToResource(const ApiEmailSettingsData &src, QnEmail::Settings &dst);
+    void fromResourceToApi(const QnEmailSettings &src, ApiEmailSettingsData &dst);
+    void fromApiToResource(const ApiEmailSettingsData &src, QnEmailSettings &dst);
 
     void fromApiToResourceList(const ApiFullInfoData &src, QnFullResourceData &dst, const ResourceContext &ctx);
 
@@ -53,21 +63,24 @@ namespace ec2 {
 
     void fromResourceToApi(const QnAbstractStorageResourcePtr &src, ApiStorageData &dst);
     void fromApiToResource(const ApiStorageData &src, QnAbstractStorageResourcePtr &dst);
+    void fromResourceToApi(const QnAbstractStorageResourceList &src, ApiStorageDataList &dst);
 
     void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData &dst);
     void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &dst, const ResourceContext &ctx);
     void fromApiToResourceList(const ApiMediaServerDataList &src, QnResourceList &dst, const ResourceContext &ctx);
     void fromApiToResourceList(const ApiMediaServerDataList &src, QnMediaServerResourceList &dst, const ResourceContext &ctx);
-
+    void fromResourceToApi(const QnMediaServerUserAttributesPtr& src, ApiMediaServerUserAttributesData& dst);
+    void fromApiToResource(const ApiMediaServerUserAttributesData& src, QnMediaServerUserAttributesPtr& dst);
+    void fromApiToResourceList(const ApiMediaServerUserAttributesDataList &src, QnMediaServerUserAttributesList& dst);
+    void fromResourceListToApi(const QnMediaServerUserAttributesList& src, ApiMediaServerUserAttributesDataList& dst);
+    
     void fromResourceToApi(const QnResourcePtr &src, ApiResourceData &dst);
-    void fromApiToResource(const ApiResourceData &src, QnResourcePtr &dst);
+    void fromApiToResource(const ApiResourceData &src, QnResource* dst);
     void fromApiToResourceList(const ApiResourceDataList &src, QnResourceList &dst, QnResourceFactory *factory);
 
-    void fromResourceListToApi(const QnKvPairList &src, ApiResourceParamDataList &dst);
-    void fromApiToResourceList(const ApiResourceParamDataList &src, QnKvPairList &dst);
+    void fromResourceListToApi(const ec2::ApiResourceParamDataList &src, ApiResourceParamDataList &dst);
+    void fromApiToResourceList(const ApiResourceParamDataList &src, ec2::ApiResourceParamDataList &dst);
 
-    void fromApiToResource(const ApiPropertyTypeData &src, QnParamTypePtr &dst);
-    
     void fromApiToResource(const ApiResourceTypeData &src, QnResourceTypePtr &dst);
     void fromApiToResourceList(const ApiResourceTypeDataList &src, QnResourceTypeList &dst);
 
@@ -75,6 +88,7 @@ namespace ec2 {
     void fromResourceToApi(const QnUserResourcePtr &resource, ApiUserData &data);
     void fromApiToResourceList(const ApiUserDataList &src, QnResourceList &dst);
     void fromApiToResourceList(const ApiUserDataList &src, QnUserResourceList &dst);
+    void fromApiToResourceList(const ApiStorageDataList &src, QnResourceList &dst, const ResourceContext &ctx);
 
     void fromApiToResource(const ApiVideowallData &src, QnVideoWallResourcePtr &dst);
     void fromResourceToApi(const QnVideoWallResourcePtr &src, ApiVideowallData &dst);

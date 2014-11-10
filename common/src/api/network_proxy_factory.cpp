@@ -18,6 +18,7 @@ QnNetworkProxyFactory::QnNetworkProxyFactory() {}
 QnNetworkProxyFactory::~QnNetworkProxyFactory() {}
 
 QUrl QnNetworkProxyFactory::urlToResource(const QUrl &baseUrl, const QnResourcePtr &resource, QnNetworkProxyFactory::WhereToPlaceProxyCredentials credentialsBehavior) {
+    Q_UNUSED(credentialsBehavior)
     const QNetworkProxy &proxy = proxyToResource(resource);
 
     switch (proxy.type()) {
@@ -67,13 +68,13 @@ QList<QNetworkProxy> QnNetworkProxyFactory::queryProxy(const QNetworkProxyQuery 
     if (resourceGuid.isNull())
         return QList<QNetworkProxy>() << QNetworkProxy(QNetworkProxy::NoProxy);
 
-    return QList<QNetworkProxy>() << proxyToResource(qnResPool->getResourceById(resourceGuid));
+	return QList<QNetworkProxy>() << proxyToResource(qnResPool->getIncompatibleResourceById(resourceGuid, true));
 }
 
 QNetworkProxy QnNetworkProxyFactory::proxyToResource(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr server;
-
-    if (resource.dynamicCast<QnSecurityCamResource>()) {
+    QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
+    if (camera) {
         QnResourcePtr parent = resource->getParentResource();
 
         while (parent && !parent->hasFlags(Qn::server))
@@ -85,10 +86,19 @@ QNetworkProxy QnNetworkProxyFactory::proxyToResource(const QnResourcePtr &resour
     }
 
     if (server) {
-        QnRoute route = QnRouter::instance()->routeTo(server->getId());
-        if (route.isValid() && route.points.size() > 1)
-            return QNetworkProxy(QNetworkProxy::HttpProxy, route.points.first().host, route.points.first().port,
-                                 QnAppServerConnectionFactory::url().userName(), QnAppServerConnectionFactory::url().password());
+        QnUuid id = QnUuid::fromStringSafe(server->getProperty(lit("guid")));
+		if (id.isNull())
+			id = server->getId();
+
+        QnRoute route = QnRouter::instance()->routeTo(id);
+        if (route.isValid()) {
+            /* Requests to cameras should be always proxied.
+               Requests to servers should be proxied wher the server is not directly available from the client. */
+            if (camera || route.points.size() > 1) {
+                return QNetworkProxy(QNetworkProxy::HttpProxy, route.points.first().host, route.points.first().port,
+                                     QnAppServerConnectionFactory::url().userName(), QnAppServerConnectionFactory::url().password());
+            }
+        }
     }
 
     return QNetworkProxy(QNetworkProxy::NoProxy);

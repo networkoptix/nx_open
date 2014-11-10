@@ -154,13 +154,25 @@ namespace {
             return;
 
         QnVideoWallPcData pc = firstIdx.videowall()->pcs()->getItem(firstIdx.item().pcUuid);
-        if (pc.screens.size() < screens.first())
+        if (screens.first() >= pc.screens.size())
             return;
+
+        QRect geometry = pc.screens[screens.first()].layoutGeometry;
+        if (geometry.isValid()) {
+            for (const QnLayoutItemData &item: layout->getItems()) {
+                if (!item.combinedGeometry.isValid())
+                    continue;
+                if (!item.combinedGeometry.intersects(geometry))
+                    continue;
+                geometry = QRect(); //invalidate selected geometry
+                break;
+            }
+        }
 
         QnLayoutItemData itemData;
         itemData.uuid = QnUuid::createUuid();
-        itemData.combinedGeometry = pc.screens[screens.first()].layoutGeometry;
-        if (itemData.combinedGeometry.isValid())
+        itemData.combinedGeometry = geometry;
+        if (geometry.isValid())
             itemData.flags = Qn::Pinned;
         else
             itemData.flags = Qn::PendingGeometryAdjustment;
@@ -196,9 +208,6 @@ namespace {
     const int cacheMessagesTimeoutMs = 500;
 
     const qreal defaultReviewAR = 1920.0 / 1080.0;
-
-    /** Minimal amount of licenses to allow videowall creating. */
-    const int videowallStarterPackAmount = 5;
 }
 
 class QnVideowallAutoStarter: public QnWorkbenchAutoStarter {
@@ -885,14 +894,14 @@ void QnWorkbenchVideoWallHandler::restoreMessages(const QnUuid &controllerUuid, 
 
 bool QnWorkbenchVideoWallHandler::canStartControlMode() const {
     QnLicenseListHelper licenseList(qnLicensePool->getLicenses());
-    if (licenseList.totalLicenseByType(Qn::LC_VideoWall) < videowallStarterPackAmount) {
+    if (licenseList.totalLicenseByType(Qn::LC_VideoWall) == 0) {
         QMessageBox::warning(mainWindow(),
             tr("More licenses required"),
-            tr("To enable the feature please activate Video Wall starter license."));
+            tr("To enable the feature please activate at least one Video Wall license."));
         return false;
     }
 
-    QnVideoWallLicenseUsageProposer proposer(m_licensesHelper.data(), 1);
+    QnVideoWallLicenseUsageProposer proposer(m_licensesHelper.data(), 0, 1);
     if (!validateLicenses(tr("Could not start Video Wall control session.")))
         return false;
     
@@ -917,8 +926,6 @@ bool QnWorkbenchVideoWallHandler::canStartControlMode() const {
 
 void QnWorkbenchVideoWallHandler::setControlMode(bool active) {
     if (active && !canStartControlMode()) {
-        workbench()->currentLayout()->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(QnUuid()));
-        workbench()->currentLayout()->notifyTitleChanged();
         return;
     }
 
@@ -1189,13 +1196,13 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
 
 void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
     QnLicenseListHelper licenseList(qnLicensePool->getLicenses());
-    if (licenseList.totalLicenseByType(Qn::LC_VideoWall) < videowallStarterPackAmount) {
+    if (licenseList.totalLicenseByType(Qn::LC_VideoWall) == 0) {
         QMessageBox::warning(mainWindow(),
             tr("More licenses required"),
-            tr("To enable the feature please activate Video Wall starter license"));
+            tr("To enable the feature please activate at least one Video Wall license"));
         return;
-    }
-
+    } //TODO: #GDM add "Licenses" button
+	
 	QStringList usedNames;
     foreach(const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::videowall))
         usedNames << resource->getName().trimmed().toLower();
@@ -1339,6 +1346,9 @@ void QnWorkbenchVideoWallHandler::at_startVideoWallAction_triggered() {
     if(videoWall.isNull())
         return;
     
+    if (!validateLicenses(tr("Could not start Video Wall.")))
+        return;
+
     startVideowallAndExit(videoWall);
 }
 
@@ -1571,7 +1581,6 @@ void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered() {
         return;
 
     QnVirtualCameraResourcePtr desktopCamera;
-
     foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::desktop_camera)) {
         if (resource->getUniqueId() != QnAppServerConnectionFactory::clientGuid())
             continue;
@@ -2355,8 +2364,10 @@ void QnWorkbenchVideoWallHandler::setItemOnline(const QnUuid &instanceGuid, bool
 
 void QnWorkbenchVideoWallHandler::setItemControlledBy(const QnUuid &layoutId, const QnUuid &controllerId, bool on) {
     bool needUpdate = false;
-    QnUuid currentId = workbench()->currentLayout()->resource()->getId();
+    if (!workbench()->currentLayout() || !workbench()->currentLayout()->resource())
+        return;
 
+    QnUuid currentId = workbench()->currentLayout()->resource()->getId();
     foreach (const QnVideoWallResourcePtr &videoWall, qnResPool->getResources<QnVideoWallResource>()) {
         foreach (const QnVideoWallItem &item, videoWall->items()->getItems()) {
             if (!on && item.runtimeStatus.controlledBy == controllerId) {
@@ -2490,7 +2501,9 @@ void QnWorkbenchVideoWallHandler::updateReviewLayout(const QnVideoWallResourcePt
             // checking existing widgets with same screen sets
             // take any other item on this widget
             int otherIdx = qnIndexOf(indices, [&item](const QnVideoWallItemIndex &idx){return idx.uuid() != item.uuid; });
-            if ((otherIdx >= 0) && (indices[otherIdx].item().screenSnaps.screens() == item.screenSnaps.screens()))
+            if ((otherIdx >= 0) 
+                && (indices[otherIdx].item().pcUuid == item.pcUuid)
+                && (indices[otherIdx].item().screenSnaps.screens() == item.screenSnaps.screens()))
                 return workbenchItem;
 
             // our item is the only item on the widget, we can modify it as we want

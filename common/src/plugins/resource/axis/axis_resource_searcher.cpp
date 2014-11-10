@@ -77,7 +77,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     QString name;
     QString mac;
 
-    foreach(QString line, lines)
+    for(QString line: lines)
     {
         if (line.contains(QLatin1String("root.Network.Bonjour.FriendlyName")))
         {
@@ -109,12 +109,11 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     resource->setName(name);
     resource->setModel(name);
     resource->setMAC(QnMacAddress(mac));
-    //resource->setHostAddress(host, QnDomainMemory);
     QUrl finalUrl(url);
     finalUrl.setScheme(QLatin1String("http"));
     finalUrl.setPort(port);
     resource->setUrl(finalUrl.toString());
-    resource->setAuth(auth);
+    resource->setDefaultAuth(auth);
 
     //resource->setDiscoveryAddr(iface.address);
     QList<QnResourcePtr> result;
@@ -195,13 +194,11 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
 
     smac = smac.toUpper();
 
-    foreach(QnResourcePtr res, result)
+    for(const QnResourcePtr& res: result)
     {
         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
     
         if (net_res->getMAC().toString() == smac) {
-            if (isNewDiscoveryAddressBetter(net_res->getHostAddress(), discoveryAddress.toString(), net_res->getDiscoveryAddr().toString()))
-                net_res->setDiscoveryAddr(discoveryAddress);
             return local_results; // already found;
         }
     }
@@ -234,8 +231,7 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
     int channels = 1;
     if (firstResource->hasParam(QLatin1String("channelsAmount")))
     {
-        QVariant val;
-        firstResource->getParam(QLatin1String("channelsAmount"), val, QnDomainMemory);
+        QString val = firstResource->getProperty(QLatin1String("channelsAmount"));
         channels = val.toUInt();
     }
     if (channels > 1)
@@ -260,7 +256,7 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
             resource->setMAC(firstResource->getMAC());
             resource->setGroupName(physicalId);
             resource->setGroupId(physicalId);
-            resource->setAuth(firstResource->getAuth());
+            resource->setDefaultAuth(firstResource->getAuth());
             resource->setUrl(firstResource->getUrl());
 
             resource->setPhysicalId(resource->getPhysicalId() + QLatin1String("_channel_") + QString::number(i));

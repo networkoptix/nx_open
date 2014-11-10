@@ -1,6 +1,10 @@
 #ifdef ENABLE_PULSE_CAMERA
 
 #include "pulse_resource_searcher.h"
+
+#include <memory>
+#include <mutex>
+
 #include "pulse_searcher_helper.h"
 #include "../pulse/pulse_resource.h"
 
@@ -10,10 +14,15 @@ QnPlPulseSearcher::QnPlPulseSearcher()
 
 }
 
+static std::unique_ptr<QnPlPulseSearcher> QnPlPulseSearcher_instance;
+static std::once_flag QnPlPulseSearcher_onceFlag;
+
 QnPlPulseSearcher& QnPlPulseSearcher::instance()
 {
-    static QnPlPulseSearcher inst;
-    return inst;
+    std::call_once(
+        QnPlPulseSearcher_onceFlag,
+        [](){ QnPlPulseSearcher_instance.reset( new QnPlPulseSearcher() ); } );
+    return *QnPlPulseSearcher_instance.get();
 }
 
 QnResourceList QnPlPulseSearcher::findResources()
@@ -23,7 +32,7 @@ QnResourceList QnPlPulseSearcher::findResources()
     QnPlPulseSearcherHelper helper;
     QList<QnPlPulseSearcherHelper::WSResult> onnvifResponses = helper.findResources();
 
-    foreach(QnPlPulseSearcherHelper::WSResult r, onnvifResponses)
+    for(const QnPlPulseSearcherHelper::WSResult& r: onnvifResponses)
     {
         QnNetworkResourcePtr res = createResource(r.manufacture, r.name);
         if (!res)
@@ -34,8 +43,7 @@ QnResourceList QnPlPulseSearcher::findResources()
         if (cameraRes)
             cameraRes->setModel(r.name);
         res->setMAC(QnMacAddress(r.mac));
-        res->setHostAddress(r.ip, QnDomainMemory);
-        res->setDiscoveryAddr(QHostAddress(r.disc_ip));
+        res->setHostAddress(r.ip);
 
         result.push_back(res);
 

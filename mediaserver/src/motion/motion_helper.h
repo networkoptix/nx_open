@@ -5,10 +5,9 @@
 #include <QtGui/QRegion>
 #include <QtCore/QMap>
 #include "utils/media/sse_helper.h"
-#include "core/datapacket/media_data_packet.h"
-#include "core/resource/network_resource.h"
 #include "recorder/device_file_catalog.h"
 #include "motion_archive.h"
+#include "core/resource/resource_fwd.h"
 
 class QnTimePeriodList;
 

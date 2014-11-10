@@ -285,7 +285,7 @@ namespace nx_hls
             return nx_http::StatusCode::forbidden;
         }
 
-        QnConstCompressedVideoDataPtr lastVideoFrame = camera->getLastVideoFrame( true );
+        QnConstCompressedVideoDataPtr lastVideoFrame = camera->getLastVideoFrame( true, 0 );
         if( lastVideoFrame && (lastVideoFrame->compressionType != CODEC_ID_H264) && (lastVideoFrame->compressionType != CODEC_ID_NONE) )
         {
             //video is not in h.264 format
@@ -589,7 +589,7 @@ namespace nx_hls
 
         //taking parameters, common for every chunks in playlist being generated
         RequestParamsType commonChunkParams;
-        foreach( RequestParamsType::value_type param, requestParams )
+        for( RequestParamsType::value_type param: requestParams )
         {
             if( param.first == StreamingParams::CHANNEL_PARAM_NAME ||
                 param.first == StreamingParams::PICTURE_SIZE_PIXELS_PARAM_NAME ||
@@ -641,7 +641,7 @@ namespace nx_hls
             hlsChunk.duration = chunkList[i].duration / (double)USEC_IN_SEC;
             hlsChunk.url = baseChunkUrl;
             QUrlQuery hlsChunkUrlQuery( hlsChunk.url.query() );
-            foreach( RequestParamsType::value_type param, commonChunkParams )
+            for( RequestParamsType::value_type param: commonChunkParams )
                 hlsChunkUrlQuery.addQueryItem( param.first, param.second );
             if( chunkList[i].alias )
             {
@@ -908,7 +908,7 @@ namespace nx_hls
         if( bandwidth == -1 )
         {
             //estimating bitrate as we can
-            QnConstCompressedVideoDataPtr videoFrame = videoCamera->getLastVideoFrame( streamQuality == MEDIA_Quality_High );
+            QnConstCompressedVideoDataPtr videoFrame = videoCamera->getLastVideoFrame( streamQuality == MEDIA_Quality_High, 0);
             if( videoFrame )
                 bandwidth = videoFrame->dataSize() * CHAR_BIT / COMMON_KEY_FRAME_TO_NON_KEY_FRAME_RATIO * camResource->getMaxFps();
         }

@@ -7,7 +7,7 @@ angular.module('webadminApp')
             restrict: 'E',
                 template :
                     '<span class="btn btn-success fileinput-button" ><span>{{text}}</span>' +
-                    '<input type="file" name="installerFile1" class="fileupload" >' +
+                    '<input type="file" name="installerFile1" class="fileupload" id="fileupload" >' +
                     '</span>' +
                     '<div class="progress" style="display:none;"><div class="progress-bar progress-bar-success progress-bar-striped"></div></div>' ,
                 link :  function (scope, element, attrs) {
@@ -20,12 +20,12 @@ angular.module('webadminApp')
 
                                 //call restart?
                             }else{
-                                switch(error.errorString){
+                                switch(data.result.errorString){
                                     case 'UP_TO_DATE':
                                         alert("Updating failed. The provided version is already installed.");
                                         break;
                                     case 'INVALID_FILE':
-                                        alert("Updating failed. Provided file is not a valid archive.");
+                                        alert("Updating failed. Provided file is not a valid update archive.");
                                         break;
                                     case 'INCOMPATIBLE_SYSTEM':
                                         alert("Updating failed. Provided file is targeted for another system.");

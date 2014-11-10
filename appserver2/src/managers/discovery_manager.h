@@ -10,8 +10,9 @@ namespace ec2 {
     class QnDiscoveryNotificationManager : public AbstractDiscoveryManager {
     public:
         void triggerNotification(const QnTransaction<ApiDiscoverPeerData> &transaction);
-        void triggerNotification(const QnTransaction<ApiDiscoveryDataList> &transaction);
-        void triggerNotification(const ApiDiscoveryDataList &discoveryData, bool addInformation = true);
+        void triggerNotification(const QnTransaction<ApiDiscoveryData> &transaction);
+        void triggerNotification(const ApiDiscoveryData &discoveryData, bool addInformation = true);
+        void triggerNotification(const QnTransaction<ApiDiscoveryDataList> &tran);
     };
 
     template<class QueryProcessorType>
@@ -22,13 +23,14 @@ namespace ec2 {
 
     protected:
         virtual int discoverPeer(const QUrl &url, impl::SimpleHandlerPtr handler) override;
-        virtual int addDiscoveryInformation(const QnUuid &id, const QList<QUrl> &urls, bool ignore, impl::SimpleHandlerPtr handler) override;
-        virtual int removeDiscoveryInformation(const QnUuid &id, const QList<QUrl> &urls, bool ignore, impl::SimpleHandlerPtr handler) override;
+        virtual int addDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) override;
+        virtual int removeDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) override;
+        virtual int getDiscoveryData(impl::GetDiscoveryDataHandlerPtr handler) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;
 
-        QnTransaction<ApiDiscoveryDataList> prepareTransaction(ApiCommand::Value command, const QnUuid &id, const QList<QUrl> &urls, bool ignore) const;
+        QnTransaction<ApiDiscoveryData> prepareTransaction(ApiCommand::Value command, const QnUuid &id, const QUrl &url, bool ignore) const;
         QnTransaction<ApiDiscoverPeerData> prepareTransaction(const QUrl &url) const;
     };
 

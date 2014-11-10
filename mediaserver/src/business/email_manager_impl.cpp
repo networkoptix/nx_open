@@ -10,6 +10,7 @@
 #include <utils/common/log.h>
 
 #include "nx_ec/data/api_email_data.h"
+#include <utils/common/email.h>
 
 namespace {
     SmtpClient::ConnectionType smtpConnectionType(QnEmail::ConnectionType ct) {
@@ -27,8 +28,8 @@ EmailManagerImpl::EmailManagerImpl()
 {
 }
 
-bool EmailManagerImpl::testConnection(const QnEmail::Settings &settings) {
-    int port = settings.port ? settings.port : QnEmail::defaultPort(settings.connectionType);
+bool EmailManagerImpl::testConnection(const QnEmailSettings &settings) {
+    int port = settings.port ? settings.port : QnEmailSettings::defaultPort(settings.connectionType);
 
     SmtpClient::ConnectionType connectionType = smtpConnectionType(settings.connectionType);
     SmtpClient smtp(settings.server, port, connectionType);
@@ -44,14 +45,23 @@ bool EmailManagerImpl::testConnection(const QnEmail::Settings &settings) {
 
 bool EmailManagerImpl::sendEmail(const ec2::ApiEmailData& data) {
 
-    QnEmail::Settings settings = QnGlobalSettings::instance()->emailSettings();
+    QnEmailSettings settings = QnGlobalSettings::instance()->emailSettings();
     if (!settings.isValid())
         return true;    // empty settings should not give us an error while trying to send email, should them?
 
     MimeMessage message;
-    QString sender = QString(lit("%1@%2")).arg(settings.user).arg(settings.server);
+    QString sender;
+    if (!settings.email.isEmpty())
+        sender = settings.email;
+    else if (settings.user.contains(L'@'))
+        sender = settings.user;
+    else if (settings.server.startsWith("smtp."))
+        sender = QString(lit("%1@%2")).arg(settings.user).arg(settings.server.mid(5));
+    else
+        sender = QString(lit("%1@%2")).arg(settings.user).arg(settings.server);
+
     message.setSender(EmailAddress(sender));
-    foreach (const QString &recipient, data.to) {
+    for (const QString &recipient: data.to) {
         message.addRecipient(EmailAddress(recipient));
     }
     
@@ -59,11 +69,11 @@ bool EmailManagerImpl::sendEmail(const ec2::ApiEmailData& data) {
     message.addPart(new MimeHtml(data.body));
 
     // Need to store all attachments as smtp client operates on attachment pointers
-    foreach (QnEmailAttachmentPtr attachment, data.attachments)
+    for (const QnEmailAttachmentPtr& attachment: data.attachments)
         message.addPart(new MimeInlineFile(attachment->content, attachment->filename, attachment->mimetype));
 
     // Actually send
-    int port = settings.port ? settings.port : QnEmail::defaultPort(settings.connectionType);
+    int port = settings.port ? settings.port : QnEmailSettings::defaultPort(settings.connectionType);
     SmtpClient::ConnectionType connectionType = smtpConnectionType(settings.connectionType);
     SmtpClient smtp(settings.server, port, connectionType);
 

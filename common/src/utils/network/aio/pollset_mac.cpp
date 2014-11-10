@@ -8,6 +8,7 @@
 
 #include "pollset.h"
 
+#include <limits>
 #include <set>
 
 #include <sys/types.h>
@@ -16,7 +17,6 @@
 #include <unistd.h>
 
 #include "../system_socket.h"
-#include "../system_socket_impl.h"
 
 
 //TODO #ak get rid of PollSetImpl::monitoredEvents due to performance cosiderations
@@ -31,7 +31,7 @@ namespace aio
     {
     public:
         //!map<pair<socket, event type> >
-        typedef std::set<std::pair<Socket*, aio::EventType> > MonitoredEventSet;
+        typedef std::set<std::pair<Pollable*, aio::EventType> > MonitoredEventSet;
 
         int kqueueFD;
         MonitoredEventSet monitoredEvents;
@@ -127,21 +127,22 @@ namespace aio
     {
         m_impl->currentIndex++;
         while( m_impl->currentIndex < m_impl->pollSetImpl->receivedEventCount && 
-               m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].filter == EVFILT_USER )
+               (m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].filter == EVFILT_USER ||
+                m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].ident == (uintptr_t)-1) )  //socket has been removed
         {
             m_impl->currentIndex++;
         }
         return *this;
     }
 
-    Socket* PollSet::const_iterator::socket()
+    Pollable* PollSet::const_iterator::socket()
     {
-        return static_cast<Socket*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata);
+        return static_cast<Pollable*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata);
     }
 
-    const Socket* PollSet::const_iterator::socket() const
+    const Pollable* PollSet::const_iterator::socket() const
     {
-        return static_cast<Socket*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata);
+        return static_cast<Pollable*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata);
     }
 
     /*!
@@ -149,9 +150,11 @@ namespace aio
     */
     aio::EventType PollSet::const_iterator::eventType() const
     {
-        int kFilterType = m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].filter;
+        const int kFilterType = m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].filter;
         aio::EventType revents = aio::etNone;
-        if( kFilterType == EVFILT_READ )
+        if( m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].flags & EV_ERROR )
+            revents = aio::etError;
+        else if( kFilterType == EVFILT_READ )
             revents = aio::etRead;
         else if( kFilterType == EVFILT_WRITE )
             revents = aio::etWrite;
@@ -160,7 +163,7 @@ namespace aio
 
     void* PollSet::const_iterator::userData()
     {
-        return dynamic_cast<Socket*>(static_cast<Socket*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata))->impl()->getUserData(eventType());
+        return static_cast<Pollable*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata)->impl()->eventTypeToUserData[eventType()];
     }
 
     bool PollSet::const_iterator::operator==( const const_iterator& right ) const
@@ -187,7 +190,7 @@ namespace aio
 
         //registering filter for interrupting poll
         struct kevent _newEvent;
-        EV_SET( &_newEvent, 0, EVFILT_USER, EV_ADD, 0, 0, NULL );
+        EV_SET( &_newEvent, 0, EVFILT_USER, EV_ADD | EV_ENABLE, 0, 0, NULL );
         kevent( m_impl->kqueueFD, &_newEvent, 1, NULL, 0, NULL );
     }
 
@@ -219,7 +222,7 @@ namespace aio
     }
 
     //!Add socket to set. Does not take socket ownership
-    bool PollSet::add( Socket* const sock, EventType eventType, void* userData )
+    bool PollSet::add( Pollable* const sock, EventType eventType, void* userData )
     {
         pair<PollSetImpl::MonitoredEventSet::iterator, bool> p = m_impl->monitoredEvents.insert( make_pair( sock, eventType ) );
         if( !p.second )
@@ -229,10 +232,10 @@ namespace aio
 
         //adding new fd to set
         struct kevent _newEvent;
-        EV_SET( &_newEvent, sock->handle(), kfilterType, EV_ADD, 0, 0, sock );
+        EV_SET( &_newEvent, sock->handle(), kfilterType, EV_ADD | EV_ENABLE, 0, 0, sock );
         if( kevent( m_impl->kqueueFD, &_newEvent, 1, NULL, 0, NULL ) == 0 )
         {
-            dynamic_cast<Socket*>(sock)->impl()->getUserData(eventType) = userData;
+            sock->impl()->eventTypeToUserData[eventType] = userData;
             return true;
         }
 
@@ -241,11 +244,11 @@ namespace aio
     }
 
     //!Remove socket from set
-    void* PollSet::remove( Socket* const sock, EventType eventType )
+    void PollSet::remove( Pollable* const sock, EventType eventType )
     {
         PollSetImpl::MonitoredEventSet::iterator it = m_impl->monitoredEvents.find( make_pair( sock, eventType ) );
         if( it == m_impl->monitoredEvents.end() )
-            return NULL;
+            return;
 
         const int kfilterType = eventType == etRead ? EVFILT_READ : EVFILT_WRITE;
 
@@ -254,9 +257,16 @@ namespace aio
         kevent( m_impl->kqueueFD, &_eventChange, 1, NULL, 0, NULL );  //ignoring return code, since event is removed in any case
         m_impl->monitoredEvents.erase( it );
 
-        void* userData = dynamic_cast<Socket*>(sock)->impl()->getUserData(eventType);
-        dynamic_cast<Socket*>(sock)->impl()->getUserData(eventType) = NULL;
-        return userData;
+        //erasing socket from occured events array
+        //TODO #ak better remove this linear run
+        for( size_t i = 0; i < m_impl->receivedEventCount; ++i )
+        {
+            if( m_impl->receivedEventlist[i].ident == sock->handle() && m_impl->receivedEventlist[i].filter == kfilterType )
+                m_impl->receivedEventlist[i].ident = (uintptr_t)-1;
+        }
+
+        //TODO #ak must not save user data in socket
+        sock->impl()->eventTypeToUserData[eventType] = NULL;
     }
 
     size_t PollSet::size() const
@@ -264,17 +274,12 @@ namespace aio
         return m_impl->monitoredEvents.size();
     }
 
-    void* PollSet::getUserData( Socket* const sock, EventType eventType ) const
-    {
-        return dynamic_cast<Socket*>(sock)->impl()->getUserData(eventType);
-    }
-
     static const int INTERRUPT_CHECK_TIMEOUT_MS = 100;
     static const int MILLIS_IN_SEC = 1000;
     static const int NSEC_IN_MS = 1000000;
 
     /*!
-        \param millisToWait if 0, method returns immediatly. If > 0, returns on event or after \a millisToWait milliseconds.
+        \param millisToWait if 0, method returns immediately. If > 0, returns on event or after \a millisToWait milliseconds.
             If < 0, returns after occuring of event
         \return -1 on error, 0 if \a millisToWait timeout has expired, > 0 - number of socket whose state has been changed
     */
@@ -289,7 +294,13 @@ namespace aio
             timeout.tv_nsec = (millisToWait % MILLIS_IN_SEC) * NSEC_IN_MS;
         }
         m_impl->receivedEventCount = 0;
-        int result = kevent( m_impl->kqueueFD, NULL, 0, m_impl->receivedEventlist, sizeof(m_impl->receivedEventlist)/sizeof(*m_impl->receivedEventlist), millisToWait >= 0 ? &timeout : NULL );
+        int result = kevent(
+            m_impl->kqueueFD,
+            NULL,
+            0,
+            m_impl->receivedEventlist, 
+            sizeof(m_impl->receivedEventlist)/sizeof(*m_impl->receivedEventlist),
+            millisToWait >= 0 ? &timeout : NULL );
         if( result == EINTR )
             return 0;   //TODO #ak repeat wait (with timeout correction) in this case
         if( result <= 0 )
@@ -297,11 +308,6 @@ namespace aio
 
         m_impl->receivedEventCount = result;
         return result;
-    }
-
-    bool PollSet::canAcceptSocket( Socket* const /*sock*/ ) const
-    {
-        return true;
     }
 
     //!Returns iterator pointing to first socket, which state has been changed in previous \a poll call
@@ -325,7 +331,7 @@ namespace aio
 
     unsigned int PollSet::maxPollSetSize()
     {
-        return 16*1024; //TODO #ak: why?
+        return std::numeric_limits<unsigned int>::max();
     }
 }
 

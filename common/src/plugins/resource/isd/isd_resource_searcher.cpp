@@ -69,26 +69,28 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
 
     int timeout = 2000;
 
+    QString name;
+    QString vendor;
+
     CLHttpStatus status;
-    QString name = QString(QLatin1String(downloadFile(status, QLatin1String("api/param.cgi?req=General.Brand.ModelName"), host, port, timeout, auth)));
+    QByteArray data = downloadFile(status, QLatin1String("/api/param.cgi?req=General.Brand.CompanyName&req=General.Brand.ModelName"), host, port, timeout, auth);
+    for (const QByteArray& line: data.split(L'\n'))
+    {
+        if (line.startsWith("General.Brand.ModelName")) {
+            name = getValueFromString(QString::fromUtf8(line)).trimmed();
+            name.replace(QLatin1Char(' '), QString()); // remove spaces
+            //name.replace(QLatin1Char('-'), QString()); // remove spaces
+            name.replace(QLatin1Char('\r'), QString()); // remove spaces
+            name.replace(QLatin1Char('\n'), QString()); // remove spaces
+            name.replace(QLatin1Char('\t'), QString()); // remove tabs
+        }
+        else if (line.startsWith("General.Brand.CompanyName")) {
+            vendor = getValueFromString(QString::fromUtf8(line)).trimmed();
+        }
+    }
 
-    name.replace(QLatin1Char(' '), QString()); // remove spaces
-    //name.replace(QLatin1Char('-'), QString()); // remove spaces
-    name.replace(QLatin1Char('\r'), QString()); // remove spaces
-    name.replace(QLatin1Char('\n'), QString()); // remove spaces
-    name.replace(QLatin1Char('\t'), QString()); // remove tabs
-
-
-    if (name.length()==0)
+    if (name.isEmpty() || vendor != lit("Innovative Security Designs"))
         return QList<QnResourcePtr>();
-
-
-    name = getValueFromString(name).trimmed();
-
-
-
-    if (name.endsWith(QLatin1Char('0')))
-        name.chop(1);
 
 
     QString mac = QString(QLatin1String(downloadFile(status, QLatin1String("/api/param.cgi?req=Network.1.MacAddress"), host, port, timeout, auth)));
@@ -128,10 +130,10 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
     resource->setModel(name);
     resource->setMAC(QnMacAddress(mac));
     if (port == 80)
-        resource->setHostAddress(host, QnDomainMemory);
+        resource->setHostAddress(host);
     else
         resource->setUrl(QString(lit("http://%1:%2")).arg(host).arg(port));
-    resource->setAuth(auth);
+    resource->setDefaultAuth(auth);
 
     //resource->setDiscoveryAddr(iface.address);
     QList<QnResourcePtr> result;
@@ -202,14 +204,12 @@ QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(
 
     smac = smac.toUpper();
 
-    foreach(QnResourcePtr res, result)
+    for(const QnResourcePtr& res: result)
     {
         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
     
         if (net_res->getMAC().toString() == smac)
         {
-            if (isNewDiscoveryAddressBetter(net_res->getHostAddress(), discoveryAddress.toString(), net_res->getDiscoveryAddr().toString()))
-                net_res->setDiscoveryAddr(discoveryAddress);
             return local_result; // already found;
         }
     }

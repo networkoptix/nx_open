@@ -7,8 +7,19 @@
 
 struct QnResourceParams {
     QnResourceParams() {}
-    QnResourceParams(const QString &url, const QString &vendor): url(url), vendor(vendor) {}
+    QnResourceParams(
+        const QnUuid &resID,
+        const QString &url,
+        const QString &vendor)
+    :
+        resID(resID),
+        url(url),
+        vendor(vendor)
+    {
+        assert( !resID.isNull() );
+    }
 
+    QnUuid resID;
     QString url;
     QString vendor;
 };

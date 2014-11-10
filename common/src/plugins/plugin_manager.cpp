@@ -117,7 +117,7 @@ void PluginManager::loadPluginsFromDir( const QString& dirToSearchIn, PluginType
 {
     QDir pluginDir( dirToSearchIn );
     const QStringList& entries = pluginDir.entryList( QStringList(), QDir::Files | QDir::Readable );
-    foreach( const QString& entry, entries )
+    for( const QString& entry: entries )
     {
         if( !QLibrary::isLibrary( entry ) )
             continue;

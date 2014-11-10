@@ -49,6 +49,11 @@ void QnWorkbenchStateManager::unregisterDelegate(QnWorkbenchStateDelegate *d) {
     m_delegates.removeOne(d);
 }
 
+void QnWorkbenchStateManager::forcedUpdate() {
+    for (QnWorkbenchStateDelegate *d: m_delegates)
+        d->forcedUpdate();
+}
+
 
 QnWorkbenchStateDelegate::QnWorkbenchStateDelegate(QObject *parent /*= NULL*/):
     QnWorkbenchContextAware(parent)

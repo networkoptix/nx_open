@@ -24,6 +24,7 @@ public:
     QnUuid( const char* text );
     QnUuid( const QString& text );
     QnUuid( const QByteArray& text );
+    explicit QnUuid( const QUuid &uuid );
 
     const QUuid& getQUuid() const
     {
@@ -57,6 +58,11 @@ public:
 
     static QnUuid fromRfc4122( const QByteArray& bytes );
     static QnUuid createUuid();
+
+    /*! Construct QnUuid from string representation.
+     * If the string is not a valid UUID null QnUuid will be returned.
+     */
+    static QnUuid fromStringSafe( const QString &uuid );
 
 private:
     QUuid m_uuid;

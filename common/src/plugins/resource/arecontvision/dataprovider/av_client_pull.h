@@ -28,8 +28,13 @@ protected:
     int getBitrate() const;
     bool isH264() const;
     void updateCameraParams();
+
+private:
+    QSize getMaxSensorSize(const QnResourcePtr& res) const;
+
 private slots:
     void at_resourceInitDone(const QnResourcePtr &resource);
+
 protected:
     // in av cameras you do not know the size of the frame in advance; 
     //so we can save a lot of memory by receiving all frames in this buff 

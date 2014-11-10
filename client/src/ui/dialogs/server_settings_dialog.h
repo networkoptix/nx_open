@@ -13,6 +13,7 @@
 #include "api/model/rebuild_archive_reply.h"
 
 #include <ui/dialogs/workbench_state_dependent_dialog.h>
+#include "nx_ec/data/api_fwd.h"
 
 class QLabel;
 
@@ -42,6 +43,7 @@ private:
         Ready,
         Starting,
         InProgress,
+        InProgressFastScan,
         Stopping
     };
 
@@ -83,6 +85,7 @@ private:
     bool m_maxCamerasAdjusted;
 
     RebuildState m_rebuildState;
+    ec2::ApiIdDataList m_storagesToRemove;
 };
 
 #endif // SERVER_SETTINGS_DIALOG_H

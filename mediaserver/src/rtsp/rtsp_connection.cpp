@@ -518,6 +518,15 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbst
         //dstCodec = CODEC_ID_AAC; // keep aac without transcoding for audio
     //CodecID dstCodec = media->dataType == QnAbstractMediaData::VIDEO ? CODEC_ID_MPEG4 : media->compressionType;
     QSharedPointer<QnUniversalRtpEncoder> universalEncoder;
+    
+    QnResourcePtr res = getResource()->toResourcePtr();
+    int rotation = res->getProperty(QnMediaResource::rotationKey()).toInt();
+    qreal customAR = res->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
+
+    QnImageFilterHelper extraTranscodeParams;
+    extraTranscodeParams.setVideoLayout(vLayout);
+    extraTranscodeParams.setRotation(rotation);
+    extraTranscodeParams.setCustomAR(customAR);
 
     switch (dstCodec)
     {
@@ -549,7 +558,7 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbst
         case CODEC_ID_VP8:
         case CODEC_ID_ADPCM_G722:
         case CODEC_ID_ADPCM_G726:
-            universalEncoder = QSharedPointer<QnUniversalRtpEncoder>(new QnUniversalRtpEncoder(media, dstCodec, resolution, vLayout)); // transcode src codec to MPEG4/AAC
+            universalEncoder = QSharedPointer<QnUniversalRtpEncoder>(new QnUniversalRtpEncoder(media, dstCodec, resolution, extraTranscodeParams)); // transcode src codec to MPEG4/AAC
             if (universalEncoder->isOpened())
                 return universalEncoder;
             else
@@ -578,7 +587,7 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(QnAbstractM
             camera = qnCameraPool->getVideoCamera(getResource()->toResourcePtr());
         if (camera) {
             if (dataType == QnAbstractMediaData::VIDEO)
-                rez =  camera->getLastVideoFrame(isHQ);
+                rez =  camera->getLastVideoFrame(isHQ, 0);
             else
                 rez = camera->getLastAudioFrame(isHQ);
             if (rez)
@@ -764,7 +773,7 @@ int QnRtspConnectionProcessor::composeSetup()
     if (trackId >= 0)
     {
         QList<QByteArray> transportInfo = transport.split(';');
-        foreach(const QByteArray& data, transportInfo)
+        for(const QByteArray& data: transportInfo)
         {
             /*
             if (data.startsWith("interleaved="))
@@ -911,7 +920,7 @@ void QnRtspConnectionProcessor::createDataProvider()
     }
     if (camera && d->liveMode == Mode_Live)
     {
-        if (!d->liveDpHi && !d->mediaRes->toResource()->hasFlags(Qn::foreigner)) {
+        if (!d->liveDpHi && !d->mediaRes->toResource()->hasFlags(Qn::foreigner) && d->mediaRes->toResource()->isInitialized()) {
             d->liveDpHi = camera->getLiveReader(QnServer::HiQualityCatalog);
             if (d->liveDpHi) {
                 connect(d->liveDpHi->getResource().data(), SIGNAL(parentIdChanged(const QnResourcePtr &)), this, SLOT(at_camera_parentIdChanged()), Qt::DirectConnection);
@@ -1205,7 +1214,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
     createDataProvider();
 
     QList<QByteArray> parameters = d->requestBody.split('\n');
-    foreach(const QByteArray& parameter, parameters)
+    for(const QByteArray& parameter: parameters)
     {
         QByteArray normParam = parameter.trimmed().toLower();
         QList<QByteArray> vals = parameter.split(':');
@@ -1255,7 +1264,7 @@ int QnRtspConnectionProcessor::composeGetParameter()
 {
     Q_D(QnRtspConnectionProcessor);
     QList<QByteArray> parameters = d->requestBody.split('\n');
-    foreach(const QByteArray& parameter, parameters)
+    for(const QByteArray& parameter: parameters)
     {
         QByteArray normParamName = parameter.trimmed().toLower();
         if (normParamName == "position" || normParamName.isEmpty())

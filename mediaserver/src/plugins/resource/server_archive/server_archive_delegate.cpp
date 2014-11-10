@@ -11,6 +11,8 @@
 #include "motion/motion_archive.h"
 #include "motion/motion_helper.h"
 #include "utils/common/sleep.h"
+#include "core/resource/network_resource.h"
+#include "plugins/resource/avi/avi_resource.h"
 
 static const qint64 MOTION_LOAD_STEP = 1000ll * 3600;
 static const int SECOND_STREAM_FIND_EPS = 1000 * 5;
@@ -80,6 +82,11 @@ qint64 QnServerArchiveDelegate::endTime()
         rez *= 1000;
     
     return rez;
+}
+
+bool QnServerArchiveDelegate::isOpened() const
+{
+    return m_opened;
 }
 
 bool QnServerArchiveDelegate::open(const QnResourcePtr &resource)

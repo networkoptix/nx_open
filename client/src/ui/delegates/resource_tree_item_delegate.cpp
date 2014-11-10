@@ -16,6 +16,8 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_item.h>
 
+#include <common/common_module.h>
+
 QnResourceTreeItemDelegate::QnResourceTreeItemDelegate(QObject *parent):
     base_type(parent)
 {

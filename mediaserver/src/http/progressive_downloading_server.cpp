@@ -92,7 +92,7 @@ public:
             qint64 firstTime = lastTime - tmpQueue.size() * timeResolution;
             for (int i = 0; i < tmpQueue.size(); ++i)
             {
-                QnAbstractMediaDataPtr srcMedia = qSharedPointerDynamicCast<QnAbstractMediaData>(tmpQueue.at(i));
+                const QnAbstractMediaDataPtr& srcMedia = qSharedPointerDynamicCast<QnAbstractMediaData>(tmpQueue.atUnsafe(i));
                 QnAbstractMediaDataPtr media = QnAbstractMediaDataPtr(srcMedia->clone());
                 media->timestamp = firstTime + i*timeResolution;
                 m_dataQueue.push(media);
@@ -482,8 +482,16 @@ void QnProgressiveDownloadingConsumer::run()
         }
 
         QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>();
-        if (mediaRes)
-            d->transcoder.setVideoLayout(mediaRes->getVideoLayout());
+        if (mediaRes) {
+            QnImageFilterHelper extraParams;
+            extraParams.setVideoLayout(mediaRes->getVideoLayout());
+            int rotation = mediaRes->toResource()->getProperty(QnMediaResource::rotationKey()).toInt();
+            qreal customAR = mediaRes->toResource()->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
+            extraParams.setRotation(rotation);
+            extraParams.setCustomAR(customAR);
+            
+            d->transcoder.setExtraTranscodeParams(extraParams);
+        }
 
         if (d->transcoder.setVideoCodec(
                 d->videoCodec,

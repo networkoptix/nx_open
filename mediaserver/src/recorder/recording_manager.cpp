@@ -1,5 +1,5 @@
 #include "recording_manager.h"
-
+#include <core/resource_management/resource_properties.h>
 #include <core/resource/resource.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/security_cam_resource.h>
@@ -31,10 +31,18 @@
 #include "api/runtime_info_manager.h"
 #include "utils/license_usage_helper.h"
 #include "media_server/settings.h"
+#include "core/resource/camera_user_attribute_pool.h"
 
 
 static const qint64 LICENSE_RECORDING_STOP_TIME = 60 * 24 * 7;
 static const QString LICENSE_OVERFLOW_LOCK_NAME(lit("__LICENSE_OVERFLOW__"));
+
+class QnServerDataProviderFactory: public QnDataProviderFactory
+{
+public:
+    static QnServerDataProviderFactory* instance();
+    virtual QnAbstractStreamDataProvider* createDataProviderInternal(const QnResourcePtr& res, Qn::ConnectionRole role) override;
+};
 
 QnRecordingManager::QnRecordingManager(): m_mutex(QMutex::Recursive)
 {
@@ -116,7 +124,7 @@ void QnRecordingManager::stop()
 
     QMutexLocker lock(&m_mutex);
 
-    foreach(const Recorders& recorders, m_recordMap.values())
+    for(const Recorders& recorders: m_recordMap.values())
     {
         beforeDeleteRecorder(recorders);
     }
@@ -252,8 +260,10 @@ bool QnRecordingManager::startOrStopRecording(const QnResourcePtr& res, QnVideoC
     QnLiveStreamProviderPtr providerLow = camera->getLiveReader(QnServer::LowQualityCatalog);
     QnSecurityCamResourcePtr cameraRes = res.dynamicCast<QnSecurityCamResource>();
 
-    if (!cameraRes->isInitialized() && !cameraRes->hasFlags(Qn::foreigner) && !cameraRes->isScheduleDisabled())
+    if (!cameraRes->isInitialized() && !cameraRes->hasFlags(Qn::foreigner) && !cameraRes->isScheduleDisabled()) {
         cameraRes->initAsync(true);
+        return false; // wait for initialization
+    }
 
     bool someRecordingIsPresent = false;
 
@@ -457,25 +467,6 @@ void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
         updateCamera(camera);
         return;
     }
-
-    const QnMediaServerResource* server = dynamic_cast<const QnMediaServerResource*>(resource.data());
-    if (server && server->getId() == serverGuid())
-        connect(server, SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_server_resourceChanged(const QnResourcePtr &)), Qt::QueuedConnection);
-}
-
-void QnRecordingManager::at_server_resourceChanged(const QnResourcePtr &resource)
-{
-    const QnMediaServerResource* server = dynamic_cast<const QnMediaServerResource*>(resource.data());
-    if(!server)
-        return;
-
-    qnStorageMan->removeAbsentStorages(server->getStorages());
-    foreach(QnAbstractStorageResourcePtr storage, server->getStorages())
-    {
-        QnStorageResourcePtr physicalStorage = qSharedPointerDynamicCast<QnStorageResource>(storage);
-        if (physicalStorage)
-            qnStorageMan->addStorage(physicalStorage);
-    }
 }
 
 void QnRecordingManager::onRemoveResource(const QnResourcePtr &resource)
@@ -557,7 +548,7 @@ QnResourceList QnRecordingManager::getLocalControlledCameras()
     // return own cameras + cameras from servers without DB (remote connected servers)
     QnResourceList cameras = qnResPool->getAllCameras(QnResourcePtr());
     QnResourceList result;
-    foreach(const QnResourcePtr &camRes, cameras)
+    for(const QnResourcePtr &camRes: cameras)
     {
         const QnResourcePtr& parentRes = camRes->getParentResource();
         const QnMediaServerResource* mServer = dynamic_cast<const QnMediaServerResource*>(parentRes.data());
@@ -593,7 +584,7 @@ void QnRecordingManager::at_checkLicenses()
 
         // Too many licenses. check if server has own recording cameras and force to disable recording
         QnResourceList ownCameras = getLocalControlledCameras();
-        foreach(QnResourcePtr camRes, ownCameras)
+        for(const QnResourcePtr& camRes: ownCameras)
         {
             QnVirtualCameraResourcePtr camera = camRes.dynamicCast<QnVirtualCameraResource>();
             if (helper.isOverflowForCamera(camera))
@@ -620,11 +611,11 @@ void QnRecordingManager::at_licenseMutexLocked()
 {
     QnCamLicenseUsageHelper helper;
 
-    int disabledCameras = 0;
+    QString disabledCameras;
     
     // Too many licenses. check if server has own recording cameras and force to disable recording
     const QnResourceList& ownCameras = getLocalControlledCameras();
-    foreach(QnResourcePtr camRes, ownCameras)
+    for(const QnResourcePtr& camRes: ownCameras)
     {
         if (helper.isValid())
             break;
@@ -633,14 +624,17 @@ void QnRecordingManager::at_licenseMutexLocked()
         if (helper.isOverflowForCamera(camera))
         {
             camera->setScheduleDisabled(true);
-            ec2::ErrorCode errCode =  QnAppServerConnectionFactory::getConnection2()->getCameraManager()->addCameraSync(camera);
+            QList<QnUuid> idList;
+            idList << camera->getId();
+            ec2::ErrorCode errCode =  QnAppServerConnectionFactory::getConnection2()->getCameraManager()->saveUserAttributesSync(QnCameraUserAttributePool::instance()->getAttributesList(idList));
             if (errCode != ec2::ErrorCode::ok)
             {
                 qWarning() << "Can't turn off recording for camera:" << camera->getUniqueId() << "error:" << ec2::toString(errCode);
                 camera->setScheduleDisabled(false); // rollback
                 continue;
             }
-            disabledCameras++;
+            propertyDictionary->saveParams( camera->getId() );
+            disabledCameras += QString(lit("%1 (%2)")).arg(camera->getName()).arg(camera->getHostAddress());
             helper.update();
         }
     }
@@ -648,9 +642,9 @@ void QnRecordingManager::at_licenseMutexLocked()
     m_licenseMutex->deleteLater();
     m_licenseMutex = 0;
 
-    if (disabledCameras > 0) {
+    if (!disabledCameras.isEmpty()) {
         QnResourcePtr resource = qnResPool->getResourceById(qnCommon->moduleGUID());
-        emit recordingDisabled(resource, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::LicenseRemoved, QString::number(disabledCameras));
+        emit recordingDisabled(resource, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::LicenseRemoved, disabledCameras);
     }
 }
 

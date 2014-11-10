@@ -11,11 +11,10 @@ typedef QList<QnServerCameraPtr> QnServerCameraList;
 class QnServerCamera: public QnVirtualCameraResource {
     Q_OBJECT
 
+    typedef QnVirtualCameraResource base_type;
 public:
     QnServerCamera(const QnUuid& resourceTypeId);
 
-    virtual bool isResourceAccessible() override;
-    virtual bool updateMACAddress() override;
     virtual QString getDriverName() const override;
     virtual void setIframeDistance(int frames, int timems) override;
 
@@ -26,6 +25,7 @@ public:
 
     void setTmpStatus(Qn::ResourceStatus status);
 
+    virtual Qn::ResourceFlags flags() const override;
 protected:
     virtual QnAbstractStreamDataProvider *createLiveDataProvider() override;
 

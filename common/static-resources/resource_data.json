@@ -90,14 +90,19 @@
             "keys": [
                 "ACTI|KCM3311","ACTI|KCM7211","ACTI|KCM5611","ACTI|KCM5311","Sony|SNC-EM600","Sony|SNC-CX600","Sony|SNC-DH120T",
                 "Sony|SNC-XM636",
-			"DW|DWC-MB421TIR","Win4NET Co., Ltd.|Clebo-BL20",
+			"DW|DWC-MB421TIR","Win4NET Co., Ltd.|Clebo-BL20"
+            ],
+            "ptzCapabilities": "ContinuousZoomCapability"
+        },
+        {
+            "keys": [
 		        "VISTA|VK2-1080VRDIR3V9F",
 		        "VISTA|VK2-1080VFD3V9F",
 		        "VISTA|VK2-1080BIR3V9F",
 		        "VISTA|VK2-720VZMI",
 		        "VISTA|VK2-720VZMX"
             ],
-            "ptzCapabilities": "ContinuousZoomCapability"
+            "ptzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability"
         },
         {
             "keys": [
@@ -106,6 +111,12 @@
 				"DW|DWC-MPTFM","Win4NET Co., Ltd.|Clebo-MPTFM"
             ],
             "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability",
+            "ptzTraits": "FourWayPtz"
+        },
+        {
+            "keys": [
+                "General|IP Camera"
+            ],
             "ptzTraits": "FourWayPtz"
         },
         {
@@ -138,11 +149,17 @@
             ],
             "vistaFocusDevices": ["EncoderVistaPTZ"]
         },
-		{
+	{
             "keys": [
                 "DW|DWC-MD421D","Win4NET Co., Ltd.|Clebo-FD20"
             ],
             "ptzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability"
+        },
+	{
+            "keys": [
+                "DW|DWC-PV2M4TIR","DW|DWC-PB2M4TIR"
+            ],
+	    "dw-http-ptz": true
         },
         {
             "keys": [

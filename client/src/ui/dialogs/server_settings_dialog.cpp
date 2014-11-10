@@ -14,15 +14,21 @@
 #include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
 
-#include <api/global_settings.h>
 #include <api/model/storage_space_reply.h>
 
-#include <client/client_model_types.h>
-#include <client/client_settings.h>
+#include <utils/common/counter.h>
+#include <utils/common/string.h>
+#include <utils/common/variant.h>
+#include <utils/common/event_processors.h>
+#include <utils/math/interpolator.h>
+#include <utils/math/color_transformations.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_server_resource.h>
+
+#include <client/client_model_types.h>
+#include <client/client_settings.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/dialogs/storage_url_dialog.h>
@@ -34,13 +40,6 @@
 #include <ui/widgets/storage_space_slider.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/workbench_context.h>
-
-#include <utils/common/counter.h>
-#include <utils/common/string.h>
-#include <utils/common/variant.h>
-#include <utils/common/event_processors.h>
-#include <utils/math/interpolator.h>
-#include <utils/math/color_transformations.h>
 
 //#define QN_SHOW_ARCHIVE_SPACE_COLUMN
 
@@ -295,6 +294,9 @@ QList<QnStorageSpaceData> QnServerSettingsDialog::tableItems() const {
     return result;
 }
 
+static const int PC_SERVER_MAX_CAMERAS = 128;
+static const int EDGE_SERVER_MAX_CAMERAS = 1;
+
 void QnServerSettingsDialog::updateFromResources() 
 {
     m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_replyReceived(int, const QnStorageSpaceReply &, int)));
@@ -306,15 +308,18 @@ void QnServerSettingsDialog::updateFromResources()
     setTableItems(QList<QnStorageSpaceData>());
     setBottomLabelText(tr("Loading..."));
 
-    //bool edge = QnMediaServerResource::isEdgeServer(m_server);
     ui->nameLineEdit->setText(m_server->getName());
-    //ui->nameLineEdit->setEnabled(!edge);
-    ui->maxCamerasSpinBox->setValue(m_server->getMaxCameras());
+    int currentMaxCamerasValue = m_server->getMaxCameras();
+    if( currentMaxCamerasValue == 0 )
+        if( !m_server->getServerFlags().testFlag(Qn::SF_Edge) )
+            currentMaxCamerasValue = PC_SERVER_MAX_CAMERAS; //not an edge server
+        else
+            currentMaxCamerasValue = EDGE_SERVER_MAX_CAMERAS;   //edge server
+    ui->maxCamerasSpinBox->setValue(currentMaxCamerasValue);
     ui->failoverCheckBox->setChecked(m_server->isRedundancy());
-    //ui->failoverCheckBox->setEnabled(!edge);
     ui->maxCamerasWidget->setEnabled(m_server->isRedundancy());
 
-    int maxCameras = (m_server->getServerFlags() & Qn::SF_Edge) ? 1 : 128;
+    const int maxCameras = (m_server->getServerFlags() & Qn::SF_Edge) ? EDGE_SERVER_MAX_CAMERAS : PC_SERVER_MAX_CAMERAS;
     ui->maxCamerasSpinBox->setMaximum(maxCameras);
 
     ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
@@ -326,34 +331,36 @@ void QnServerSettingsDialog::updateFromResources()
     updateFailoverLabel();
 }
 
-void QnServerSettingsDialog::submitToResources() {
+void QnServerSettingsDialog::submitToResources() 
+{
     if(m_hasStorageChanges) {
-        QnServerStorageStateHash serverStorageStates = qnSettings->serverStorageStates();
-
-        QnAbstractStorageResourceList storages;
-        foreach(const QnStorageSpaceData &item, tableItems()) {
-            if(!item.isUsedForWriting && item.storageId.isNull()) {
-                serverStorageStates.insert(QnServerStorageKey(m_server->getId(), item.url), item.reservedSpace);
-                continue;
+        QnAbstractStorageResourceList newStorages;
+        foreach(const QnStorageSpaceData &item, tableItems()) 
+        {
+            QnAbstractStorageResourcePtr storage = m_server->getStorageByUrl(item.url);
+            if (storage) {
+                if (item.isUsedForWriting != storage->isUsedForWriting()) {
+                    storage->setUsedForWriting(item.isUsedForWriting);
+                    newStorages.push_back(storage); // todo: #rvasilenko: temporarty code line. Need remote it after moving 'usedForWriting' to separate property
+                }
             }
-
-            QnAbstractStorageResourcePtr storage(new QnAbstractStorageResource());
-            if (!item.storageId.isNull())
-                storage->setId(item.storageId);
-            QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(lit("Storage"));
-            if (resType)
-                storage->setTypeId(resType->getId());
-            storage->setName(QnUuid::createUuid().toString());
-            storage->setParentId(m_server->getId());
-            storage->setUrl(item.url);
-            storage->setSpaceLimit(item.reservedSpace); //client does not change space limit anymore
-            storage->setUsedForWriting(item.isUsedForWriting);
-
-            storages.push_back(storage);
+            else {
+                // create or remove new storage
+                QnAbstractStorageResourcePtr storage(new QnAbstractStorageResource());
+                if (!item.storageId.isNull())
+                    storage->setId(item.storageId);
+                QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(lit("Storage"));
+                if (resType)
+                    storage->setTypeId(resType->getId());
+                storage->setName(QnUuid::createUuid().toString());
+                storage->setParentId(m_server->getId());
+                storage->setUrl(item.url);
+                storage->setSpaceLimit(item.reservedSpace); //client does not change space limit anymore
+                storage->setUsedForWriting(item.isUsedForWriting);
+                newStorages.push_back(storage);
+            }
         }
-        m_server->setStorages(storages);
-
-        qnSettings->setServerStorageStates(serverStorageStates);
+        m_server->setStorageDataToUpdate(newStorages, m_storagesToRemove);
     }
 
     m_server->setName(ui->nameLineEdit->text());
@@ -453,6 +460,7 @@ void QnServerSettingsDialog::at_storagesTable_contextMenuEvent(QObject *, QEvent
 
     QAction *action = menu->exec(QCursor::pos());
     if(action == m_removeAction) {
+        m_storagesToRemove.push_back(item.storageId);
         ui->storagesTable->removeRow(row);
         m_hasStorageChanges = true;
     }
@@ -506,6 +514,10 @@ void QnServerSettingsDialog::updateRebuildUi(RebuildState newState, int progress
      m_rebuildState = newState;
 
      ui->rebuildGroupBox->setEnabled(newState != RebuildState::Invalid);
+     if (newState != RebuildState::InProgressFastScan)
+        ui->rebuildGroupBox->setTitle(tr("Rebuild archive index"));
+     else
+         ui->rebuildGroupBox->setTitle(tr("Fast initial scan in progress"));
      if (progress >= 0)
         ui->rebuildProgressBar->setValue(progress);
      ui->rebuildStartButton->setEnabled(newState == RebuildState::Ready);
@@ -516,7 +528,7 @@ void QnServerSettingsDialog::updateRebuildUi(RebuildState newState, int progress
          tr("Finished"),
          tr("Rebuilding archive index is completed."));
 
-     ui->stackedWidget->setCurrentIndex(newState == RebuildState::InProgress 
+     ui->stackedWidget->setCurrentIndex(newState == RebuildState::InProgress || newState == RebuildState::InProgressFastScan
          ? ui->stackedWidget->indexOf(ui->rebuildProgressPage)
          : ui->stackedWidget->indexOf(ui->rebuildPreparePage));
 }
@@ -524,9 +536,6 @@ void QnServerSettingsDialog::updateRebuildUi(RebuildState newState, int progress
 void QnServerSettingsDialog::updateFailoverLabel() {
 
     auto getErrorText = [this] {
-        if (QnGlobalSettings::instance()->disabledVendorsSet().contains(lit("all")))
-            return tr("Cameras autodiscovery should be enabled for this feature.");
-
         if (qnResPool->getResources<QnMediaServerResource>().size() < 2)
             return tr("At least two servers are required for this feature.");
 
@@ -557,6 +566,9 @@ void QnServerSettingsDialog::at_archiveRebuildReply(int status, const QnRebuildA
         case QnRebuildArchiveReply::Started:
             state = RebuildState::InProgress;
             break;
+        case QnRebuildArchiveReply::FastScan:
+            state = RebuildState::InProgressFastScan;
+            break;
         case QnRebuildArchiveReply::Stopped:
             state = RebuildState::Ready;
             break;
@@ -566,7 +578,7 @@ void QnServerSettingsDialog::at_archiveRebuildReply(int status, const QnRebuildA
     }
     updateRebuildUi(state, reply.progress());
 
-    if (reply.state() == QnRebuildArchiveReply::Started)
+    if (reply.state() == QnRebuildArchiveReply::Started || reply.state() == QnRebuildArchiveReply::FastScan)
         QTimer::singleShot(500, this, SLOT(sendNextArchiveRequest()));
 }
 
@@ -580,15 +592,7 @@ void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceRe
         return;
     }
 
-    QnServerStorageStateHash serverStorageStates = qnSettings->serverStorageStates();
-
     QList<QnStorageSpaceData> items = reply.storages;
-    for(int i = 0; i < items.size(); i++) {
-        QnStorageSpaceData &item = items[i];
-
-        if(item.reservedSpace == -1)
-            item.reservedSpace = serverStorageStates.value(QnServerStorageKey(m_server->getId(), item.url) , -1);
-    }
 
     struct StorageSpaceDataLess {
         bool operator()(const QnStorageSpaceData &l, const QnStorageSpaceData &r) {

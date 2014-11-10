@@ -38,7 +38,12 @@ namespace ec2
             REGISTER_COMMAND(getResourceTypes),
             REGISTER_COMMAND(setResourceStatus),
             REGISTER_COMMAND(setResourceParams),
+            REGISTER_COMMAND(setResourceParam),
+            REGISTER_COMMAND(removeResourceParam),
+            REGISTER_COMMAND(removeResourceParams),
             REGISTER_COMMAND(getResourceParams),
+            REGISTER_COMMAND(getStatusList),
+            REGISTER_COMMAND(removeResources),
             REGISTER_COMMAND(saveResource),
             REGISTER_COMMAND(removeResource),
             REGISTER_COMMAND(setPanicMode),
@@ -50,6 +55,10 @@ namespace ec2
             REGISTER_COMMAND(getCameras),
             REGISTER_COMMAND(getCameraHistoryItems),
             REGISTER_COMMAND(addCameraHistoryItem),
+            REGISTER_COMMAND(saveCameraUserAttributes),
+            REGISTER_COMMAND(saveCameraUserAttributesList),
+            REGISTER_COMMAND(getCameraUserAttributes),
+            REGISTER_COMMAND(getCamerasEx),
 
             REGISTER_COMMAND(addCameraBookmarkTags),
             REGISTER_COMMAND(getCameraBookmarkTags),
@@ -59,6 +68,15 @@ namespace ec2
             REGISTER_COMMAND(getMediaServers),
             REGISTER_COMMAND(saveMediaServer),
             REGISTER_COMMAND(removeMediaServer),
+            REGISTER_COMMAND(saveServerUserAttributes),
+            REGISTER_COMMAND(saveServerUserAttributesList),
+            REGISTER_COMMAND(getServerUserAttributes),
+            REGISTER_COMMAND(saveStorage),
+            REGISTER_COMMAND(saveStorages),
+            REGISTER_COMMAND(getStorages),
+            REGISTER_COMMAND(removeStorage),
+            REGISTER_COMMAND(removeStorages),
+            REGISTER_COMMAND(getMediaServersEx),
 
             REGISTER_COMMAND(saveUser),
             REGISTER_COMMAND(getUsers),
@@ -86,6 +104,7 @@ namespace ec2
             REGISTER_COMMAND(addStoredFile),
             REGISTER_COMMAND(updateStoredFile),
             REGISTER_COMMAND(removeStoredFile),
+            REGISTER_COMMAND(getStoredFiles),
 
             REGISTER_COMMAND(addLicenses),
             REGISTER_COMMAND(addLicense),
@@ -109,6 +128,7 @@ namespace ec2
             REGISTER_COMMAND(discoverPeer),
             REGISTER_COMMAND(addDiscoveryInformation),
             REGISTER_COMMAND(removeDiscoveryInformation),
+            REGISTER_COMMAND(getDiscoveryData),
 
             REGISTER_COMMAND(forcePrimaryTimeServer),
             REGISTER_COMMAND(broadcastPeerSystemTime),
@@ -120,12 +140,13 @@ namespace ec2
             REGISTER_COMMAND(dumpDatabase),
             REGISTER_COMMAND(restoreDatabase),
             REGISTER_COMMAND(updatePersistentSequence),
-            REGISTER_COMMAND(markLicenseOverflow)
+            REGISTER_COMMAND(markLicenseOverflow),
+            REGISTER_COMMAND(getSettings)
         };
 
         QString toString(Value val) 
         {
-            for (int i = 0; i < sizeof(COMMAND_NAMES) / sizeof(ApiCommandName); ++i)
+            for (size_t i = 0; i < sizeof(COMMAND_NAMES) / sizeof(ApiCommandName); ++i)
             {
                 if (COMMAND_NAMES[i].command == val)
                     return QString::fromUtf8(COMMAND_NAMES[i].name);
@@ -136,7 +157,7 @@ namespace ec2
         Value fromString(const QString& val)
         {
             QByteArray data = val.toUtf8();
-            for (int i = 0; i < sizeof(COMMAND_NAMES) / sizeof(ApiCommandName); ++i)
+            for (size_t i = 0; i < sizeof(COMMAND_NAMES) / sizeof(ApiCommandName); ++i)
             {
                 if (COMMAND_NAMES[i].name == data)
                     return COMMAND_NAMES[i].command;
@@ -161,10 +182,16 @@ namespace ec2
         {
             return  val == saveResource   ||
                 val == removeResource  ||
+                val == removeResources  ||
                 val == setResourceStatus ||
                 val == setResourceParams ||
+                val == setResourceParam ||
+                val == removeResourceParam ||
+                val == removeResourceParams ||
                 val == setPanicMode ||
                 val == saveCamera ||
+                val == saveCameraUserAttributes ||
+                val == saveCameraUserAttributesList ||
                 val == saveCameras ||
                 val == removeCamera ||
                 val == addCameraHistoryItem ||
@@ -172,6 +199,12 @@ namespace ec2
                 val == addCameraBookmarkTags ||
                 val == removeCameraBookmarkTags ||
                 val == saveMediaServer ||
+                val == saveServerUserAttributes ||
+                val == saveServerUserAttributesList ||
+                val == saveStorage ||
+                val == saveStorages ||
+                val == removeStorage ||
+                val == removeStorages ||
                 val == removeMediaServer ||
                 val == saveUser ||
                 val == removeUser ||
@@ -188,6 +221,7 @@ namespace ec2
                 val == removeStoredFile ||
                 val == addDiscoveryInformation ||
                 val == removeDiscoveryInformation ||
+                val == getDiscoveryData ||
                 val == addLicense ||
                 val == addLicenses ||
                 val == removeLicense || 
@@ -199,7 +233,7 @@ namespace ec2
 
     int generateRequestID()
     {
-        static std::atomic<int> requestID;
+        static std::atomic<int> requestID( 0 );
         return ++requestID;
     }
 

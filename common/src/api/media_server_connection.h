@@ -73,6 +73,7 @@ public:
      * 
      * \param camera
      * \param timeUsec                  Requested time in usecs. Can be DATE_TIME_NOW for live video or -1 for request latest available image.
+     * \param rotate                    image rotation in degree. -1 value: use default
      * \param size                      Can be filled partially: only width or height. In this case other dimension is auto detected.
      * \param imageFormat               Can be 'jpeg', 'tiff', 'png', etc...
      * \param method                    If parameter is 'before' or 'after' server returns nearest I-frame before or after time.
@@ -80,7 +81,7 @@ public:
      * \param slot
      * \returns                         Request handle.
      */
-    int getThumbnailAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, const QSize& size, const QString& imageFormat, RoundMethod method, QObject *target, const char *slot);
+    int getThumbnailAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, int rotation, const QSize& size, const QString& imageFormat, RoundMethod method, QObject *target, const char *slot);
 
     /** 
      * Check \a list of cameras for discovery. Return new list with contains only accessible cameras.
@@ -229,7 +230,7 @@ public:
     int pingSystemAsync(const QUrl &url, const QString &password, QObject *target, const char *slot);
     int mergeSystemAsync(const QUrl &url, const QString &password, bool ownSettings, QObject *target, const char *slot);
 
-    int testEmailSettingsAsync(const QnEmail::Settings &settings, QObject *target, const char *slot);
+    int testEmailSettingsAsync(const QnEmailSettings &settings, QObject *target, const char *slot);
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;
 

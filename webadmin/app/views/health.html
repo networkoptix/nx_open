@@ -5,11 +5,11 @@
     </div>
     <div class="col-sm-4 tc-chart-js-legend">
         <ul>
-            <li ng-repeat="dataset in datasets" >
-                <label style="color:{{dataset.strokeColor}}">
-                    <span class="legend-checkbox">
+            <li ng-repeat="dataset in datasets" ng-class="{hidden:dataset.hideLegend}">
+                <label style="color:{{dataset.strokeColor}};">
+                    <span class="legend-checkbox" style="background-color:{{dataset.strokeColor}}">
                         <input id="legend-checkbox{{$index}}" type="checkbox" ng-model="dataset.show" ng-change="updateVisibleDatasets()"/>
-                        <label for="legend-checkbox{{$index}}" style="background-color:{{dataset.strokeColor}}" ></label>
+                        <label for="legend-checkbox{{$index}}"  class="glyphicon "></label>
                     </span>
                     {{dataset.label}} ({{(dataset.data[dataset.data.length-1] ).toFixed(0)}}%)
                 </label>

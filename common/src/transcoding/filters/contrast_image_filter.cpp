@@ -5,11 +5,13 @@
 #include <utils/media/frame_info.h>
 #include <utils/math/math.h>
 
-QnContrastImageFilter::QnContrastImageFilter(const ImageCorrectionParams& params):
+QnContrastImageFilter::QnContrastImageFilter(const ImageCorrectionParams& params, bool doDeepCopy):
     m_params(params),
     m_lastGamma(-1.0)
 {
     memset(m_gammaCorrection, 0, sizeof(m_gammaCorrection));
+    if (doDeepCopy)
+        m_deepCopyFrame = CLVideoDecoderOutputPtr(new CLVideoDecoderOutput());
 }
 
 bool QnContrastImageFilter::isFormatSupported(CLVideoDecoderOutput* frame) const
@@ -25,16 +27,20 @@ static const __m128i  sse_0000_intrs  = _mm_setr_epi32(0x00000000, 0x00000000, 0
     //TODO: C fallback routine
 #endif
 
-void QnContrastImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect, qreal ar)
+CLVideoDecoderOutputPtr QnContrastImageFilter::updateImage(const CLVideoDecoderOutputPtr& srcFrame)
 {
+    if (m_deepCopyFrame)
+        CLVideoDecoderOutput::copy(srcFrame.data(), m_deepCopyFrame.data());
+    const CLVideoDecoderOutputPtr& frame = m_deepCopyFrame ? m_deepCopyFrame : srcFrame;
+
     static const float GAMMA_EPS = 0.01f;
 
     if (!m_params.enabled)
-        return;
-    if (!isFormatSupported(frame))
-        return;
+        return frame;
+    if (!isFormatSupported(frame.data()))
+        return frame;
 
-    m_gamma.analyseImage(frame->data[0], frame->width, frame->height, frame->linesize[0], m_params, updateRect);
+    m_gamma.analyseImage(frame->data[0], frame->width, frame->height, frame->linesize[0], m_params);
 
     if (qAbs(m_gamma.gamma - m_lastGamma) > GAMMA_EPS && m_gamma.gamma != 1.0)
     {
@@ -44,11 +50,11 @@ void QnContrastImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRect
         m_lastGamma = m_gamma.gamma;
     }
 
-    int left = qPower2Floor(updateRect.left() * frame->width, 16);
-    int right = qPower2Floor(updateRect.right() * frame->width, 16);
-    int top = updateRect.top() * frame->height;
-    int bottom = updateRect.bottom() * frame->height;
-
+    int left = 0;
+    int right = frame->width;
+    int top = 0;
+    int bottom = frame->height;
+    
     int xSteps = (right - left) / 16;
 
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
@@ -127,6 +133,7 @@ void QnContrastImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRect
 #else
     //TODO: C fallback routine
 #endif
+    return frame;
 }
 
 #endif // ENABLE_DATA_PROVIDERS

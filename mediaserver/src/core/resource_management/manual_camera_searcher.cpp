@@ -43,7 +43,7 @@ namespace {
             QnNetworkResourcePtr netRes = resource.dynamicCast<QnNetworkResource>();
             if (netRes) {
                 QnNetworkResourceList existResList = qnResPool->getAllNetResourceByHostAddress(netRes->getHostAddress());
-                foreach(QnNetworkResourcePtr existRes, existResList) 
+                for(const QnNetworkResourcePtr& existRes: existResList) 
                 {
                     QnVirtualCameraResourcePtr existCam = existRes.dynamicCast<QnVirtualCameraResource>();
                     if (!existCam)
@@ -83,7 +83,7 @@ struct SinglePluginChecker {
 
     QnManualCameraSearchCameraList mapFunction() const {
         QnManualCameraSearchCameraList results;
-        foreach(const QnResourcePtr &resource, plugin->checkHostAddr(url, auth, true))
+        for(const QnResourcePtr &resource: plugin->checkHostAddr(url, auth, true))
         {
             QnSecurityCamResourcePtr camRes = resource.dynamicCast<QnSecurityCamResource>();
             //checking, if found resource is reserved by some other searcher
@@ -116,7 +116,7 @@ struct PluginsEnumerator {
 
     QList<SinglePluginChecker> enumerate() const {
         QList<SinglePluginChecker> result;
-        foreach(QnAbstractResourceSearcher* as, QnResourceDiscoveryManager::instance()->plugins()) {
+        for(QnAbstractResourceSearcher* as: QnResourceDiscoveryManager::instance()->plugins()) {
             QnAbstractNetworkResourceSearcher* ns = dynamic_cast<QnAbstractNetworkResourceSearcher*>(as);
             Q_ASSERT( ns );
             result << SinglePluginChecker(ns, url, auth);
@@ -184,7 +184,7 @@ bool QnManualCameraSearcher::run( QThreadPool* threadPool, const QString &startA
             }
         }
 
-        foreach(const QString& addr, onlineHosts)
+        for(const QString& addr: onlineHosts)
             checkers << PluginsEnumerator(addr, port, auth).enumerate();
     }
 

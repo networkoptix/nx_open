@@ -5,91 +5,79 @@
 #include <QtCore/QStringList>
 #include <QtCore/QMetaType>
 
-#include <api/model/kvpair.h>
-
-#include <boost/operators.hpp>
-
+#include <utils/common/email_fwd.h>
 #include <utils/common/model_functions_fwd.h>
 
-class QnEmail {
-    Q_GADGET
-    Q_ENUMS(ConnectionType)
+struct QnEmailSmtpServerPreset {
+    QnEmailSmtpServerPreset();
+    QnEmailSmtpServerPreset(const QString &server, QnEmail::ConnectionType connectionType = QnEmail::Tls, int port = 0);
 
-public:
-    // TODO: #Elric #EC2 move out, rename?
-    enum ConnectionType {
-        Unsecure = 0,
-        Ssl = 1,
-        Tls = 2,
-        ConnectionTypeCount
-    };
+    bool isNull() const {
+        return server.isEmpty();
+    }
 
-    struct SmtpServerPreset {
-        SmtpServerPreset();
-        SmtpServerPreset(const QString &server, ConnectionType connectionType = Tls, int port = 0);
+    QString server;
+    QnEmail::ConnectionType connectionType;
+    int port;
+};
+#define QnEmailSmtpServerPreset_Fields (server)(connectionType)(port)
 
-        bool isNull() const {
-            return server.isEmpty();
-        }
+struct QnEmailSettings {
+    QnEmailSettings();
 
-        QString server;
-        ConnectionType connectionType;
-        int port;
-    };
+    QString email;                      /**< Sender email. Used as MAIL FROM. */
+    QString server;                     /**< Target smtp server. */
+    QString user;                       /**< Username for smtp authorization. */
+    QString password;                   /**< Password for smtp authorization. */
+    QString signature;                  /**< Signature text. Used in the email text. */
+    QString supportEmail;               /**< Support email. Used in the email text. */
+    QnEmail::ConnectionType connectionType;      /**< Connection protocol (TLS/SSL/Unsecure). */
+    int port;                           /**< Smtp server port. */
+    int timeout;                        /**< Connection timeout. */
 
-    struct Settings: public boost::equality_comparable1<Settings> {
-        Settings();
-
-        bool isNull() const;
-        bool isValid() const;
-
-        QString server;
-        QString user;
-        QString password;
-        QString signature;
-        QString supportEmail;
-        ConnectionType connectionType;
-        int port;
-        int timeout;
-
-        //TODO: #GDM #Common think where else we can store it
-        /** Flag that we are using simple view */
-        bool simple;
-
-        friend bool operator==(const Settings &l, const Settings &r);
-    };
-
-
-    QnEmail(const QString &email);
-
-    static bool isValid(const QString &email);
-    static int defaultPort(ConnectionType connectionType);
-    static int defaultTimeoutSec();
+    //TODO: #GDM #Common think where else we can store it
+    bool simple;                        /**< Flag that we are using simple view. */
 
     bool isValid() const;
 
-    /**
-     * @brief smtpServer        This function should be called only from GUI thread
-     *                          because it may call initSmtpPresets().
-     * @return                  Corresponding smtp server preset if exists.
-     */
-    SmtpServerPreset smtpServer() const;
+    bool equals(const QnEmailSettings &other, bool compareView = false) const;
 
-    Settings settings() const;
+    static int defaultPort(QnEmail::ConnectionType connectionType);
+    static int defaultTimeoutSec();
+};
+#define QnEmailSettings_Fields (email)(server)(user)(password)(signature)(supportEmail)(connectionType)(port)(timeout)(simple)
+
+class QnEmailAddress {
+public:
+    explicit QnEmailAddress(const QString &email);
+
+    static bool isValid(const QString &email);
+    bool isValid() const;
+
+    /**
+    * @brief smtpServer        This function should be called only from GUI thread
+    *                          because it may call initSmtpPresets().
+    * @return                  Corresponding smtp server preset if exists.
+    */
+    QnEmailSmtpServerPreset smtpServer() const;
+
+    QnEmailSettings settings() const;
+
+    QString user() const;
     QString domain() const;
 
 private:
     /**
-     * @brief initSmtpPresets   This function should be called only from GUI thread
-     *                          because sync checks are not implemented.
-     */
+    * @brief initSmtpPresets   This function should be called only from GUI thread
+    *                          because sync checks are not implemented.
+    */
     void initSmtpPresets() const;
 
     QString m_email;
 };
 
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(QnEmail::ConnectionType)
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnEmail::SmtpServerPreset)(QnEmail::ConnectionType), (metatype)(lexical))
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnEmailSmtpServerPreset)(QnEmailSettings), (metatype)(lexical)(json))
 
 #endif // QN_EMAIL_H
 

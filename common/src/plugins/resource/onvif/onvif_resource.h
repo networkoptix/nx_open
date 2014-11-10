@@ -121,15 +121,12 @@ public:
 
     static const QString createOnvifEndpointUrl(const QString& ipAddress);
 
-    virtual bool setHostAddress(const QString &ip, QnDomain domain = QnDomainMemory) override;
+    virtual void setHostAddress(const QString &ip) override;
 
 
-    virtual bool isResourceAccessible() override;
     virtual QString getDriverName() const override;
 
-    virtual int getMaxFps() const override;
     virtual void setIframeDistance(int /*frames*/, int /*timems*/) override {}
-    virtual bool hasDualStreaming() const override;
 
     virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) override;
 
@@ -160,6 +157,7 @@ public:
     int getSecondaryH264Profile() const;
     QSize getMaxResolution() const;
     int getTimeDrift() const; // return clock diff between camera and local clock at seconds
+    void setTimeDrift(int value); // return clock diff between camera and local clock at seconds
     //bool isSoapAuthorized() const;
     const QSize getVideoSourceSize() const;
 
@@ -168,6 +166,8 @@ public:
     const QString getAudioEncoderId() const;
     const QString getVideoSourceId() const;
     const QString getAudioSourceId() const;
+
+    void updateOnvifUrls(const QnPlOnvifResourcePtr& other);
 
 
     QString getMediaUrl() const;
@@ -245,8 +245,8 @@ protected:
 
     virtual CameraDiagnostics::Result updateResourceCapabilities();
 
-    virtual bool getParamPhysical(const QnParam &param, QVariant &val);
-    virtual bool setParamPhysical(const QnParam &param, const QVariant& val);
+    virtual bool getParamPhysical(const QString &param, QVariant &val);
+    virtual bool setParamPhysical(const QString &param, const QVariant& val);
 
     virtual void fetchAndSetCameraSettings();
 
@@ -303,7 +303,7 @@ protected:
     int getSecondaryIndex(const QList<VideoOptionsLocal>& optList) const;
     //!Registeres local NotificationConsumer in resource's NotificationProducer
     bool registerNotificationConsumer();
-
+    void updateFirmware();
 private slots:
     void onRenewSubscriptionTimer( quint64 timerID );
 
@@ -439,8 +439,6 @@ private:
     QString m_audioSourceId;
     QString m_videoSourceToken;
 
-    bool m_needUpdateOnvifUrl;
-
     QString m_imagingUrl;
     QString m_ptzUrl;
     QString m_ptzProfileToken;
@@ -451,7 +449,8 @@ private:
     std::map<QString, bool> m_relayInputStates;
     std::string m_deviceIOUrl;
     QString m_onvifNotificationSubscriptionID;
-    mutable QMutex m_subscriptionMutex;
+    mutable QMutex m_ioPortMutex;
+    bool m_inputMonitored;
     EventMonitorType m_eventMonitorType;
     quint64 m_timerID;
     quint64 m_renewSubscriptionTaskID;

@@ -43,8 +43,6 @@ private:
     qint64 m_timeZoneOffset;
 };
 
-typedef QnSharedResourcePointer<QnAviResource> QnAviResourcePtr;
-
 #endif // ENABLE_ARCHIVE
 
 #endif // QN_AVI_RESOURCE_H

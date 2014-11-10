@@ -83,8 +83,12 @@ inline unsigned long long qn_ntohll(unsigned long long value) { return qFromBigE
 
 /* Note that we have to use #defines here so that these functions work even if
  * they are also defined in system network headers. */
+#ifndef htonll
 #define htonll qn_htonll
+#endif
+#ifndef ntohll
 #define ntohll qn_ntohll
+#endif
 
 
 /**

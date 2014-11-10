@@ -25,7 +25,7 @@ void QnClientPullMediaStreamProvider::run()
 {
     initSystemThreadId();
     setPriority(QThread::HighPriority);
-    NX_LOG("stream reader started", cl_logDEBUG1);
+    NX_LOG("stream reader started", cl_logDEBUG2);
 
     int numberOfChnnels = 1;
 
@@ -52,7 +52,8 @@ void QnClientPullMediaStreamProvider::run()
         }
 
 
-        if (getResource()->hasUnprocessedCommands()) // if command processor has something in the queue for this resource let it go first
+        if (getResource()->hasUnprocessedCommands() || // if command processor has something in the queue for this resource let it go first
+            !m_resource->isInitialized())
         {
             QnSleep::msleep(5);
             continue;
@@ -152,7 +153,7 @@ void QnClientPullMediaStreamProvider::run()
 
     afterRun();
 
-    NX_LOG("stream reader stopped", cl_logDEBUG1);
+    NX_LOG("stream reader stopped", cl_logDEBUG2);
 }
 
 void QnClientPullMediaStreamProvider::beforeRun()

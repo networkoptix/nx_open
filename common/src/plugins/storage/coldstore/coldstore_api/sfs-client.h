@@ -27,8 +27,12 @@
 
 namespace Veracity
 {
+#ifndef ntohll
 	u64 ntohll(u64 v);
+#endif
+#ifndef htonll
 	u64 htonll(u64 v);
+#endif
 
 	class TCPConnection
 	{

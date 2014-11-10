@@ -22,9 +22,9 @@ QnModuleFinder::QnModuleFinder(bool clientOnly) :
     m_directModuleFinder(new QnDirectModuleFinder(this)),
     m_directModuleFinderHelper(new QnModuleFinderHelper(this))
 {
-    connect(m_multicastModuleFinder,        &QnMulticastModuleFinder::moduleAddressFound,       this,       &QnModuleFinder::at_moduleAddressFound);
-    connect(m_multicastModuleFinder,        &QnMulticastModuleFinder::moduleAddressLost,        this,       &QnModuleFinder::at_moduleAddressLost);
-    connect(m_multicastModuleFinder,        &QnMulticastModuleFinder::moduleChanged,            this,       &QnModuleFinder::at_moduleChanged);
+    connect(m_multicastModuleFinder.get(),        &QnMulticastModuleFinder::moduleAddressFound,       this,       &QnModuleFinder::at_moduleAddressFound);
+    connect(m_multicastModuleFinder.get(),        &QnMulticastModuleFinder::moduleAddressLost,        this,       &QnModuleFinder::at_moduleAddressLost);
+    connect(m_multicastModuleFinder.get(),        &QnMulticastModuleFinder::moduleChanged,            this,       &QnModuleFinder::at_moduleChanged);
     connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleUrlFound,              this,       &QnModuleFinder::at_moduleUrlFound);
     connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleUrlLost,               this,       &QnModuleFinder::at_moduleUrlLost);
     connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleChanged,               this,       &QnModuleFinder::at_moduleChanged);
@@ -41,6 +41,11 @@ void QnModuleFinder::setCompatibilityMode(bool compatibilityMode) {
     m_directModuleFinder->setCompatibilityMode(compatibilityMode);
 }
 
+bool QnModuleFinder::isCompatibilityMode() const
+{
+    return m_directModuleFinder->isCompatibilityMode();
+}
+
 QList<QnModuleInformation> QnModuleFinder::foundModules() const {
     return m_foundModules.values();
 }
@@ -50,7 +55,7 @@ QnModuleInformation QnModuleFinder::moduleInformation(const QString &moduleId) c
 }
 
 QnMulticastModuleFinder *QnModuleFinder::multicastModuleFinder() const {
-    return m_multicastModuleFinder;
+    return m_multicastModuleFinder.get();
 }
 
 QnDirectModuleFinder *QnModuleFinder::directModuleFinder() const {
@@ -104,7 +109,7 @@ void QnModuleFinder::at_moduleAddressLost(const QnModuleInformation &moduleInfor
         emit moduleUrlLost(m_foundModules.value(moduleInformation.id), url);
 
         QnModuleInformation locModuleInformation = m_foundModules.value(moduleInformation.id);
-        if (locModuleInformation.remoteAddresses.isEmpty()) {
+        if ((locModuleInformation.remoteAddresses - (QSet<QString>() << url.host())).isEmpty()) {
             m_foundModules.remove(moduleInformation.id);
             NX_LOG(lit("QnModuleFinder: Module %1 lost.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
             emit moduleLost(locModuleInformation);
@@ -139,7 +144,7 @@ void QnModuleFinder::at_moduleUrlLost(const QnModuleInformation &moduleInformati
         emit moduleUrlLost(m_foundModules.value(moduleInformation.id), url);
 
         QnModuleInformation locModuleInformation = m_foundModules.value(moduleInformation.id);
-        if (locModuleInformation.remoteAddresses.isEmpty()) {
+        if ((locModuleInformation.remoteAddresses - (QSet<QString>() << url.host())).isEmpty()) {
             m_foundModules.remove(moduleInformation.id);
             NX_LOG(lit("QnModuleFinder: Module %1 lost.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
             emit moduleLost(locModuleInformation);
@@ -153,12 +158,15 @@ void QnModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInformati
 
     QnModuleInformation updatedModuleInformation = moduleInformation;
 
-    if (sender() == m_multicastModuleFinder)
+    if (sender() == m_multicastModuleFinder.get())
         updatedModuleInformation.remoteAddresses.unite(m_directModuleFinder->moduleInformation(moduleInformation.id).remoteAddresses);
     else if (sender() == m_directModuleFinder)
         updatedModuleInformation.remoteAddresses.unite(m_multicastModuleFinder->moduleInformation(moduleInformation.id).remoteAddresses);
     else
         Q_ASSERT_X(0, "Invalid sender in slot", Q_FUNC_INFO);
+
+    if (updatedModuleInformation.remoteAddresses.isEmpty())
+        return;
 
     QnModuleInformation &oldModuleInformation = m_foundModules[moduleInformation.id];
     if (oldModuleInformation != updatedModuleInformation) {

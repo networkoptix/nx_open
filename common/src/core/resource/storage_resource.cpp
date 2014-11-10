@@ -14,12 +14,6 @@ QnStorageResource::~QnStorageResource()
 {
 }
 
-
-void QnStorageResource::setUrl(const QString& value)
-{
-    QnResource::setUrl(value);
-}
-
 /*
 qint64 QnStorageResource::getWritedSpace() const
 {

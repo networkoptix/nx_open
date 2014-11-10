@@ -435,7 +435,7 @@ namespace nx_tz
         { "AX", "Europe/Mariehamn", 120, 180 },
         { "BY", "Europe/Minsk", 180, 180 },
         { "MC", "Europe/Monaco", 60, 120 },
-        { "RU", "Europe/Moscow", 240, 240 },
+        { "RU", "Europe/Moscow", 180, 180 },
         { "", "Europe/Nicosia", 120, 180 },
         { "NO", "Europe/Oslo", 60, 120 },
         { "FR", "Europe/Paris", 60, 120 },

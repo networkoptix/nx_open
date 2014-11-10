@@ -19,13 +19,10 @@
 
 namespace {
 
-    const QString QN_UPDATE_PACKAGE_URL = lit("http://updates.hdw.mx/upcombiner/upcombine");
-    
-
     #ifdef Q_OS_MACX
-    const bool defaultDisableClientUpdates = true;
+    const bool defaultEnableClientUpdates = false;
     #else
-    const bool defaultDisableClientUpdates = false;
+    const bool defaultEnableClientUpdates = true;
     #endif
 
     QnSoftwareVersion getCurrentVersion() {
@@ -45,7 +42,7 @@ QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
     QObject(parent),
     m_stage(QnFullUpdateStage::Init),
     m_updateProcess(NULL),
-    m_disableClientUpdates(defaultDisableClientUpdates)
+    m_enableClientUpdates(defaultEnableClientUpdates)
 {
     auto targetsWatcher = [this] {
         if (!m_targets.isEmpty())
@@ -122,7 +119,7 @@ void QnMediaServerUpdateTool::setTargets(const QSet<QnUuid> &targets, bool clien
         suitableTargets.insert(id);
     }
 
-    m_disableClientUpdates = !client;
+    m_enableClientUpdates = client;
 
     emit targetsChanged(suitableTargets);
 }
@@ -185,30 +182,30 @@ QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl(const QnSoftwareVersion &
 
     query.addQueryItem(lit("customization"), QnAppInfo::customizationName());
 
-    QUrl url(QN_UPDATE_PACKAGE_URL + versionSuffix);
+    QUrl url(QnAppInfo::updateGeneratorUrl() + versionSuffix);
     url.setQuery(query);
 
     return url;
 }
 
 void QnMediaServerUpdateTool::checkForUpdates(const QnSoftwareVersion &version, bool denyMajorUpdates, std::function<void(const QnCheckForUpdateResult &result)> func) {
-    QnUpdateTarget target(actualTargetIds(), version, m_disableClientUpdates || qnSettings->isClientUpdateDisabled(), denyMajorUpdates);
+    QnUpdateTarget target(actualTargetIds(), version, !m_enableClientUpdates || qnSettings->isClientUpdateDisabled(), denyMajorUpdates);
     checkForUpdates(target, func);
 }
 
 void QnMediaServerUpdateTool::checkForUpdates(const QString &fileName, std::function<void(const QnCheckForUpdateResult &result)> func) {
-    QnUpdateTarget target(actualTargetIds(), fileName, m_disableClientUpdates || qnSettings->isClientUpdateDisabled());
+    QnUpdateTarget target(actualTargetIds(), fileName, !m_enableClientUpdates || qnSettings->isClientUpdateDisabled());
     checkForUpdates(target, func);
 }
 
 
 void QnMediaServerUpdateTool::startUpdate(const QnSoftwareVersion &version /*= QnSoftwareVersion()*/, bool denyMajorUpdates /*= false*/) {
-    QnUpdateTarget target(actualTargetIds(), version, m_disableClientUpdates || qnSettings->isClientUpdateDisabled(), denyMajorUpdates);
+    QnUpdateTarget target(actualTargetIds(), version, !m_enableClientUpdates || qnSettings->isClientUpdateDisabled(), denyMajorUpdates);
     startUpdate(target);
 }
 
 void QnMediaServerUpdateTool::startUpdate(const QString &fileName) {
-    QnUpdateTarget target(actualTargetIds(), fileName, m_disableClientUpdates || qnSettings->isClientUpdateDisabled());
+    QnUpdateTarget target(actualTargetIds(), fileName, !m_enableClientUpdates || qnSettings->isClientUpdateDisabled());
     startUpdate(target);
 }
 
@@ -219,7 +216,7 @@ bool QnMediaServerUpdateTool::cancelUpdate() {
     if (m_stage == QnFullUpdateStage::Servers)
         return false;
 
-    setTargets(QSet<QnUuid>(), defaultDisableClientUpdates);
+    setTargets(QSet<QnUuid>(), defaultEnableClientUpdates);
     m_updateProcess->pleaseStop();
     return true;
 }
@@ -243,7 +240,7 @@ void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget &target) {
         return;
 
     if (m_targets.isEmpty())
-        setTargets(target.targets, defaultDisableClientUpdates);
+        setTargets(target.targets, defaultEnableClientUpdates);
 
     m_updateProcess = new QnUpdateProcess(target);
     connect(m_updateProcess, &QnUpdateProcess::stageChanged,                    this, &QnMediaServerUpdateTool::setStage);
@@ -255,7 +252,7 @@ void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget &target) {
     connect(m_updateProcess, &QThread::finished, this, [this]{
         m_updateProcess->deleteLater();
         m_updateProcess = NULL;
-        setTargets(QSet<QnUuid>(), defaultDisableClientUpdates);
+        setTargets(QSet<QnUuid>(), defaultEnableClientUpdates);
     });
 
     m_updateProcess->start();

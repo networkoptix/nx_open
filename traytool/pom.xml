@@ -21,7 +21,8 @@
     <name>HD Witness Tray Assistant</name>  
 
     <properties>
-        <product.title>${traytool.name}</product.title>     
+        <product.title>${traytool.name}</product.title>
+        <product.display.title>${traytool.display.name}</product.display.title>
         <!--Global libs-->
         <global.libs></global.libs>
         <!--Specific os libs used-->

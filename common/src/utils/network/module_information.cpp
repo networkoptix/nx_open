@@ -11,7 +11,7 @@ bool QnModuleInformation::isCompatibleToCurrentSystem() const {
 }
 
 bool QnModuleInformation::isLocal() const {
-    foreach (const QHostAddress &address, QNetworkInterface::allAddresses()) {
+    for (const QHostAddress &address: QNetworkInterface::allAddresses()) {
         if (remoteAddresses.contains(address.toString()))
             return true;
     }

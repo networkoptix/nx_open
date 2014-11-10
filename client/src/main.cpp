@@ -56,7 +56,9 @@ extern "C"
 
 #define TEST_RTSP_SERVER
 
+#include <core/resource/camera_user_attribute_pool.h>
 #include "core/resource/media_server_resource.h"
+#include <core/resource/media_server_user_attributes.h>
 #include "core/resource/storage_resource.h"
 
 #include "plugins/resource/axis/axis_resource_searcher.h"
@@ -122,6 +124,8 @@ extern "C"
 #include "ui/workaround/mac_utils.h"
 #endif
 #include "api/runtime_info_manager.h"
+#include "core/resource_management/resource_properties.h"
+#include "core/resource_management/status_dictionary.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -394,7 +398,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 	// TODO: #Elric why QString???
     if (!lightMode.isEmpty()) {
         bool ok;
-        int lightModeOverride = lightMode.toInt(&ok);
+        Qn::LightModeFlags lightModeOverride(lightMode.toInt(&ok));
         if (ok)
             qnSettings->setLightModeOverride(lightModeOverride);
         else
@@ -431,6 +435,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     application->setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 #endif
 
+    QnResourcePropertyDictionary dictionary;
+    QnResourceStatusDiscionary statusDictionary;
     QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
     QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
     QScopedPointer<QnClientPtzControllerPool> clientPtzPool(new QnClientPtzControllerPool());
@@ -515,7 +521,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnHelpHandler helpHandler;
     qApp->installEventFilter(&helpHandler);
 
-    cl_log.log(qApp->applicationName(), " started", cl_logALWAYS);
+    cl_log.log(qApp->applicationDisplayName(), " started", cl_logALWAYS);
     cl_log.log("Software version: ", QApplication::applicationVersion(), cl_logALWAYS);
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
@@ -530,9 +536,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     moduleFinder->setCompatibilityMode(qnSettings->isDevMode());
     moduleFinder->start();
 
-    QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder());
-
     QScopedPointer<QnRouter> router(new QnRouter(moduleFinder.data(), true));
+
+    QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder());
 
     QScopedPointer<QnServerInterfaceWatcher> serverInterfaceWatcher(new QnServerInterfaceWatcher(router.data()));
 
@@ -759,6 +765,8 @@ int main(int argc, char **argv)
     QnClientModule client(argc, argv);
 
     QnSessionManager::instance();
+    std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
+    std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );
     QnResourcePool::initStaticInstance( new QnResourcePool() );
 
 #ifdef Q_OS_MAC

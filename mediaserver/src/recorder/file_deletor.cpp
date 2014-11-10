@@ -59,13 +59,13 @@ bool QnFileDeletor::internalDeleteFile(const QString& fileName)
 {
     if (!QFile::remove(fileName))
         return false;
-    QString dirName = fileName.left(fileName.lastIndexOf(QLatin1Char('/')));
+    QString dirName = fileName.left(fileName.lastIndexOf(QDir::separator()));
     while(1) 
     {
         QDir dir (dirName);
         if (!dir.rmdir(dirName))
             break;
-        dirName = dirName.left(dirName.lastIndexOf(QLatin1Char('/')));
+        dirName = dirName.left(dirName.lastIndexOf(QDir::separator()));
     }
     return true;
 }
@@ -74,8 +74,21 @@ void QnFileDeletor::deleteDir(const QString& dirName)
 {
     QDir dir(dirName);
     QList<QFileInfo> list = dir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
-    foreach(const QFileInfo& fi, list)
+    for(const QFileInfo& fi: list)
         deleteFile(fi.absoluteFilePath());
+}
+
+void QnFileDeletor::deleteDirRecursive(const QString& dirName)
+{
+    QDir dir(dirName);
+    QList<QFileInfo> list = dir.entryInfoList(QDir::Files |QDir::Dirs | QDir::NoDotAndDotDot);
+    for(const QFileInfo& fi: list) {
+        if (fi.isDir())
+            deleteDirRecursive(fi.absoluteFilePath());
+        else
+            deleteFile(fi.absoluteFilePath());
+    }
+    dir.rmdir(dirName);
 }
 
 void QnFileDeletor::deleteFile(const QString& fileName)
@@ -155,7 +168,7 @@ void QnFileDeletor::processPostponedFiles()
     QFile tmpFile(m_mediaRoot + QLatin1String("tmp.csv"));
     if (!tmpFile.open(QFile::WriteOnly | QFile::Truncate))
         return;
-    foreach(QString fileName, newList)
+    for(const QString& fileName: newList)
     {
         tmpFile.write(fileName.toUtf8());
         tmpFile.write("\n");

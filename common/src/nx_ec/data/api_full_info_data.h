@@ -9,7 +9,9 @@ namespace ec2
     struct ApiFullInfoData: ApiData {
         ApiResourceTypeDataList resourceTypes;
         ApiMediaServerDataList servers;
+        ApiMediaServerUserAttributesDataList serversUserAttributesList;
         ApiCameraDataList cameras;
+        ApiCameraAttributesDataList cameraUserAttributesList;
         ApiUserDataList users;
         ApiLayoutDataList layouts;
         ApiVideowallDataList videowalls;
@@ -17,8 +19,12 @@ namespace ec2
         ApiCameraServerItemDataList cameraHistory;
         ApiLicenseDataList licenses;
         ApiDiscoveryDataList discoveryData;
+        ApiResourceParamWithRefDataList allProperties;
+        ApiStorageDataList storages;
+        ApiResourceStatusDataList resStatusList;
     };
-#define ApiFullInfoData_Fields (resourceTypes)(servers)(cameras)(users)(layouts)(videowalls)(rules)(cameraHistory)(licenses)(discoveryData)
+#define ApiFullInfoData_Fields (resourceTypes)(servers)(serversUserAttributesList)(cameras)(cameraUserAttributesList)(users)(layouts)(videowalls)(rules)\
+                               (cameraHistory)(licenses)(discoveryData)(allProperties)(storages)(resStatusList)
 
 } // namespace ec2
 

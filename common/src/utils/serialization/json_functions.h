@@ -322,7 +322,8 @@ namespace QJsonDetail {
     void serialize_enum(QnJsonContext *ctx, const T &value, QJsonValue *target, typename std::enable_if<QnLexical::is_numerically_serializable<T>::value>::type * = NULL) {
         QnSerialization::check_enum_binary<T>();
 
-        ::serialize(ctx, static_cast<qint32>(value), target); /* Note the direct call instead of invocation through QJson. */
+        QString lexical = QnLexical::serialized(value);
+        ::serialize(ctx, lexical, target); /* Note the direct call instead of invocation through QJson. */
     }
 
     template<class T>

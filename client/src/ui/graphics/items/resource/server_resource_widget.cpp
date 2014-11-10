@@ -765,8 +765,14 @@ QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() c
 }
 
 Qn::ResourceStatusOverlay QnServerResourceWidget::calculateStatusOverlay() const {
+    if (qnSettings->isVideoWallMode() && !QnVideoWallLicenseUsageHelper().isValid()) 
+        return Qn::VideowallWithoutLicenseOverlay;
+
     if (m_resource->getStatus() == Qn::Offline)
         return Qn::ServerOfflineOverlay;
+    if (m_resource->getStatus() == Qn::Unauthorized)
+       return Qn::ServerUnauthorizedOverlay;
+
     return base_type::calculateStatusOverlay();
 }
 

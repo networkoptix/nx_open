@@ -4,6 +4,10 @@
 #include "api_globals.h"
 #include "api_data.h"
 
+#include <api/model/email_attachment.h>
+
+#include <utils/common/email_fwd.h>
+
 namespace ec2
 {
     struct ApiEmailSettingsData: ApiData
@@ -17,7 +21,7 @@ namespace ec2
         QString password;
         QnEmail::ConnectionType connectionType;
     };
-#define ApiEmailSettingsData_Fields (host)(port)(user)(password)(connectionType)
+#define ApiEmailSettingsData_Fields (host)(port)(user)(from)(password)(connectionType)
 	
 
     struct ApiEmailData: ApiData

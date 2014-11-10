@@ -168,6 +168,8 @@ namespace QnConcurrent
 
         public:
             typedef typename base_type::size_type size_type;
+            typedef typename std::vector<T>::reference reference;
+            typedef typename std::vector<T>::const_reference const_reference;
 
             void setTotalTasksToRun( size_type totalTasksToRun )
             {
@@ -175,13 +177,13 @@ namespace QnConcurrent
                 m_results.resize( totalTasksToRun );
             }
 
-            T& resultAt( size_type index )
+            reference resultAt( size_type index )
             {
                 QMutexLocker lk( &this->m_mutex );
                 return m_results[index];
             }
 
-            const T& resultAt( size_type index ) const
+            const_reference resultAt( size_type index ) const
             {
                 QMutexLocker lk( &this->m_mutex );
                 return m_results[index];
@@ -250,7 +252,8 @@ namespace QnConcurrent
             {
                 QMutexLocker lk( &m_mutex );
 
-                std::pair<typename Container::iterator, int> curVal( m_currentIter, m_currentIndex );
+                //TODO #ak is int appropriate here?
+                std::pair<typename Container::iterator, int> curVal( m_currentIter, (int)m_currentIndex );
                 if( m_currentIter != m_container.end() )
                 {
                     ++m_currentIter;
@@ -365,9 +368,11 @@ namespace QnConcurrent
     {
     public:
         typedef typename QnFutureBase<T>::size_type size_type;
+        typedef typename QnFutureBase<T>::FutureImplType::reference reference;
+        typedef typename QnFutureBase<T>::FutureImplType::const_reference const_reference;
 
-        T& resultAt( size_type index ) { return this->m_impl->resultAt( index ); }
-        const T& resultAt( size_type index ) const { return this->m_impl->resultAt( index ); }
+        reference resultAt( size_type index ) { return this->m_impl->resultAt( index ); }
+        const_reference resultAt( size_type index ) const { return this->m_impl->resultAt( index ); }
     };
 
     template<>
@@ -447,7 +452,7 @@ namespace QnConcurrent
         Container& container,
         Function function )
     {
-        return mapped( *QThreadPool::globalInstance(), 0, container, function );
+        return mapped( QThreadPool::globalInstance(), 0, container, function );
     }
 
     /*!

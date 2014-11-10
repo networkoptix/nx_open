@@ -239,7 +239,7 @@ bool QnPropertyStorage::updateFromCommandLine(int &argc, char **argv, QTextStrea
     QList<int> ids = m_argumentNamesById.keys();
 
     QnCommandLineParser parser;
-    foreach(int id, ids) {
+    for(int id: ids) {
         if(!isWritableLocked(id)) {
             qnWarning("Argument name is set for non-writable property '%1', property will not be read.", m_nameById.value(id));
             continue;
@@ -247,7 +247,7 @@ bool QnPropertyStorage::updateFromCommandLine(int &argc, char **argv, QTextStrea
 
         int type = m_typeById.value(id, QMetaType::UnknownType);
 
-        foreach(const QString &name, m_argumentNamesById.value(id)) {
+        for(const QString &name: m_argumentNamesById.value(id)) {
             parser.addParameter(
                 QMetaType::QString, /* We don't want the parser to perform type checks. */
                 name,
@@ -262,7 +262,7 @@ bool QnPropertyStorage::updateFromCommandLine(int &argc, char **argv, QTextStrea
         return false;
 
     bool result = true;
-    foreach(int id, ids) {
+    for(int id: ids) {
         QStringList names = m_argumentNamesById.value(id);
         if(names.isEmpty())
             continue;
@@ -306,7 +306,7 @@ void QnPropertyStorage::unlock() const {
         if(m_threadSafe)
             m_mutex->unlock();
 
-        foreach(int id, pendingNotifications) {
+        for(int id: pendingNotifications) {
             QnPropertyNotifier *notifier = notifiers.value(id);
 
             emit const_cast<QnPropertyStorage *>(this)->valueChanged(id);
@@ -326,12 +326,12 @@ void QnPropertyStorage::notify(int id) const {
 }
 
 void QnPropertyStorage::updateValuesFromSettings(QSettings *settings, const QList<int> &ids) {
-    foreach(int id, ids)
+    for(int id: ids)
         updateValue(id, readValueFromSettings(settings, id, value(id)));
 }
 
 void QnPropertyStorage::submitValuesToSettings(QSettings *settings, const QList<int> &ids) const {
-    foreach(int id, ids)
+    for(int id: ids)
         if(isWritableLocked(id))
             writeValueToSettings(settings, id, value(id));
 }
@@ -348,7 +348,7 @@ void QnPropertyStorage::writeValueToSettings(QSettings *settings, int id, const 
 }
 
 void QnPropertyStorage::updateValuesFromJson(const QJsonObject &json, const QList<int> &ids) {
-    foreach(int id, ids)
+    for(int id: ids)
         updateValue(id, readValueFromJson(json, id, value(id)));
 }
 

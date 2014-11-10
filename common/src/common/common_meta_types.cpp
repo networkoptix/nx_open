@@ -26,12 +26,14 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/camera_user_attributes.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/motion_window.h>
 #include <core/resource/layout_item_data.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/media_server_user_attributes.h>
 #include <core/resource/camera_history.h>
 
 #include <core/resource/camera_bookmark_fwd.h>
@@ -62,6 +64,7 @@
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_lock_data.h>
 #include <nx_ec/data/api_discovery_data.h>
+#include <nx_ec/data/api_resource_data.h>
 
 namespace {
     volatile bool qn_commonMetaTypes_initialized = false;
@@ -85,12 +88,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnMacAddress>();
     qRegisterMetaType<QnPeerRuntimeInfo>();
 
-    qRegisterMetaType<QnParam>();
+    //qRegisterMetaType<QnParam>();
     
-    qRegisterMetaType<QnKvPair>();
-    qRegisterMetaType<QnKvPairList>();
-    qRegisterMetaType<QnKvPairListsById>();
-
     qRegisterMetaType<QnResourceTypeList>();
     qRegisterMetaType<QnResourcePtr>();
     qRegisterMetaType<QnResourceList>();
@@ -108,6 +107,14 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QnUserResourceList>();
     qRegisterMetaType<QnVideoWallResourceList>();
+
+    qRegisterMetaType<QnCameraUserAttributes>();
+    qRegisterMetaType<QnCameraUserAttributesPtr>();
+    qRegisterMetaType<QnCameraUserAttributesList>();
+
+    qRegisterMetaType<QnMediaServerUserAttributes>();
+    qRegisterMetaType<QnMediaServerUserAttributesPtr>();
+    qRegisterMetaType<QnMediaServerUserAttributesList>();
 
     qRegisterMetaType<QnCameraHistoryList>();
     qRegisterMetaType<QnCameraHistoryItemPtr>();
@@ -210,9 +217,15 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<ec2::QnPeerTimeInfoList>( "QnPeerTimeInfoList" );
     qRegisterMetaType<ec2::ApiPeerAliveData>( "ApiPeerAliveData" ); 
     qRegisterMetaType<ec2::ApiDiscoveryDataList>( "ApiDiscoveryDataList" ); 
+    qRegisterMetaType<ec2::ApiDiscoveryData>( "ApiDiscoveryData" ); 
     qRegisterMetaType<ec2::ApiRuntimeData>( "ApiRuntimeData" ); 
     qRegisterMetaType<ec2::ApiDatabaseDumpData>( "ApiDatabaseDumpData" ); 
     qRegisterMetaType<ec2::ApiLockData>( "ApiLockData" ); 
+    qRegisterMetaType<ec2::ApiResourceParamWithRefData>( "ApiResourceParamWithRefData" ); 
+    qRegisterMetaType<ec2::ApiResourceParamWithRefDataList>("ApiResourceParamWithRefDataList");
+
+    qRegisterMetaType<ec2::ApiResourceParamData>("ApiResourceParamData");
+    qRegisterMetaType<ec2::ApiResourceParamData>("ApiResourceParamDataList");
 
     qRegisterMetaType<QnUuid>( "QnUuid" );
     qRegisterMetaTypeStreamOperators<QnUuid>( "QnUuid" );

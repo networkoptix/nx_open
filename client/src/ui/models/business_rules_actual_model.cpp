@@ -63,7 +63,27 @@ void QnBusinessRulesActualModel::at_message_ruleDeleted(const QnUuid &id) {
 void QnBusinessRulesActualModel::at_message_ruleReset(const QnBusinessEventRuleList &rules) {
     emit beforeModelChanged();
     clear();
-    foreach (const QnBusinessEventRulePtr &rule, rules)
+    QnBusinessEventRuleList sorted(rules);
+    qSort(sorted.begin(), sorted.end(), [](const QnBusinessEventRulePtr &left, const QnBusinessEventRulePtr &right) {
+        if (left->isDisabled() != right->isDisabled())
+            return right->isDisabled();
+
+        if (left->eventType() != right->eventType())
+            return left->eventType() < right->eventType();
+
+        if (left->actionType() != right->actionType())
+            return left->actionType() < right->actionType();
+
+        if (left->eventResources().size() != right->eventResources().size())
+            return (left->eventResources().size() < right->eventResources().size());
+
+        if (left->actionResources().size() != right->actionResources().size())
+            return (left->actionResources().size() < right->actionResources().size());        
+
+        return left->id() < right->id();
+    });
+
+    foreach (const QnBusinessEventRulePtr &rule, sorted)
         addRule(rule);
     emit afterModelChanged(RulesLoaded, true);
 }

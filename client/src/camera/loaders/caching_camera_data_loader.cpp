@@ -389,6 +389,7 @@ void QnCachingCameraDataLoader::discardCachedData() {
         m_requestedTimePeriods[timePeriodType].clear();
         m_timePeriodCameraData[timePeriodType].clear();
         updateTimePeriods(timePeriodToDataType(timePeriodType));
+        emit periodsChanged(timePeriodType);
     }
 
 #ifdef QN_ENABLE_BOOKMARKS

@@ -246,6 +246,10 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     connect(item, &QnWorkbenchItem::dataChanged, this, &QnResourceWidget::at_itemDataChanged);
 
+    /* Videowall license changes helper */
+    QnLicenseUsageHelper* videowallLicenseHelper = new QnVideoWallLicenseUsageHelper(this);
+    connect(videowallLicenseHelper, &QnLicenseUsageHelper::licensesChanged, this, &QnResourceWidget::updateStatusOverlay);
+
     /* Run handlers. */
     updateTitleText();
     updateButtonsVisibility();
@@ -434,7 +438,7 @@ QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint) const {
     if(!hasAspectRatio())
         return constraint;
 
-    return expanded(m_aspectRatio, constraint, Qt::KeepAspectRatio);
+    return expanded(m_aspectRatio, constraint, Qt::KeepAspectRatioByExpanding);
 }
 
 void QnResourceWidget::updateCheckedButtons() {

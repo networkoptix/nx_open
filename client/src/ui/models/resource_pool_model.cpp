@@ -588,10 +588,8 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     if (server) {
         connect(server,     &QnMediaServerResource::redundancyChanged,  this,   &QnResourcePoolModel::at_server_redundancyChanged);
 
-        if (server->getStatus() == Qn::Incompatible) {
+        if (server->getStatus() == Qn::Incompatible)
             connect(server, &QnMediaServerResource::systemNameChanged,  this,   &QnResourcePoolModel::at_server_systemNameChanged);
-            m_rootNodes[Qn::OtherSystemsNode]->update();
-        }
     }
 
     QnResourcePoolModelNode *node = this->node(resource);
@@ -599,6 +597,17 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
 
     at_resource_parentIdChanged(resource);
     at_resource_resourceChanged(resource);
+
+    if (server) {
+        m_rootNodes[Qn::OtherSystemsNode]->update();
+
+        QnUuid serverId = server->getId();
+        foreach (QnResourcePoolModelNode *node, m_rootNodes[Qn::BastardNode]->children()) {
+            QnResourcePtr resource = node->resource();
+            if (resource && resource->getParentId() == serverId)
+                at_resource_parentIdChanged(resource);
+        }
+    }
 
     if(layout)
         foreach(const QnLayoutItemData &item, layout->getItems())
@@ -759,6 +768,7 @@ void QnResourcePoolModel::at_server_systemNameChanged(const QnResourcePtr &resou
 
     QnResourcePoolModelNode *node = this->node(resource);
     node->setParent(expectedParent(node));
+    m_rootNodes[Qn::OtherSystemsNode]->update();
 }
 
 void QnResourcePoolModel::at_server_redundancyChanged(const QnResourcePtr &resource) {

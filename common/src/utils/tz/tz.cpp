@@ -23,55 +23,49 @@ namespace nx_tz
     class TZIndex
     {
     public:
-        TZIndex()
-        {
-            for( size_t i = 0; i < sizeof(timezones) / sizeof(*timezones); ++i )
-            {
-                m_tzNameToTzData.emplace(
-                    QByteArray::fromRawData(timezones[i].tz, (int)strlen(timezones[i].tz)),
-                    timezones[i]);
-            }
-        }
+        TZIndex();
 
-        ISOTimezoneData getTzOffsets(const QByteArray& tzName) const
-        {
-            ISOTimezoneData result;
-            memset(&result, 0, sizeof(result));
-            auto it = m_tzNameToTzData.find( tzName );
-            if( it == m_tzNameToTzData.end() )
-                return result;
-            return it->second;
-        }
+        ISOTimezoneData getTzOffsets(const QByteArray& tzName) const;
 
-
-        static std::atomic<TZIndex*> tzIndexInstance;
-        static std::mutex tzIndexInstanciationMutex;
-
-        static TZIndex* instance()
-        {
-            TZIndex* tzIndex = tzIndexInstance.load(std::memory_order_relaxed);
-            std::atomic_thread_fence(std::memory_order_acquire);
-            if( tzIndex == nullptr )
-            {
-                std::lock_guard<std::mutex> lock(tzIndexInstanciationMutex);
-                tzIndex = tzIndexInstance.load(std::memory_order_relaxed);
-                if( tzIndex == nullptr )
-                {
-                    //if required, building tz index
-                    tzIndex = new TZIndex();
-                    std::atomic_thread_fence(std::memory_order_release);
-                    tzIndexInstance.store(tzIndex, std::memory_order_relaxed);
-                }
-            }
-            return tzIndex;
-        }
+        static TZIndex* instance();
 
     private:
         std::map<QByteArray, ISOTimezoneData> m_tzNameToTzData;
     };
 
-    std::atomic<TZIndex*> TZIndex::tzIndexInstance;
-    std::mutex TZIndex::tzIndexInstanciationMutex;
+    TZIndex::TZIndex()
+    {
+        for( size_t i = 0; i < sizeof(timezones) / sizeof(*timezones); ++i )
+        {
+            m_tzNameToTzData.emplace(
+                QByteArray::fromRawData(timezones[i].tz, (int)strlen(timezones[i].tz)),
+                timezones[i]);
+        }
+    }
+
+    ISOTimezoneData TZIndex::getTzOffsets(const QByteArray& tzName) const
+    {
+        ISOTimezoneData result;
+        memset(&result, 0, sizeof(result));
+        auto it = m_tzNameToTzData.find( tzName );
+        if( it == m_tzNameToTzData.end() )
+            return result;
+        return it->second;
+    }
+
+    static std::unique_ptr<TZIndex> TZIndex_instance;
+    static std::once_flag TZIndex_onceFlag;
+
+    TZIndex* TZIndex::instance()
+    {
+        std::call_once(
+            TZIndex_onceFlag,
+            [](){ TZIndex_instance.reset( new TZIndex() ); } );
+
+        return TZIndex_instance.get();
+    }
+
+
 
 
     static const int MIN_PER_HOUR = 60;
@@ -80,11 +74,10 @@ namespace nx_tz
     int getLocalTimeZoneOffset()
     {
 #ifdef _WIN32
-        int daylight;
-        _get_daylight(&daylight);
-        long timezone = 0;
-        _get_timezone(&timezone);
-        return -(timezone / SEC_PER_MIN) + (daylight ? MIN_PER_HOUR : 0);
+        struct _timeb timeB;
+        memset( &timeB, 0, sizeof(timeB) );
+        _ftime( &timeB );
+        return -timeB.timezone + (timeB.dstflag ? MIN_PER_HOUR : 0);
 #else //if defined(__linux__)
         //cannot rely on ftime on linux
 

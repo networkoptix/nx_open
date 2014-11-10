@@ -24,6 +24,7 @@ public:
 
 private slots:
     void at_urlComboBox_activated(int index);
+    void at_urlComboBox_editingFinished();
     void at_testConnectionButton_clicked();
     void at_mergeButton_clicked();
 

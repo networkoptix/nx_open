@@ -25,11 +25,16 @@ protected:
 
     bool connected() const;
 
-    bool connectToServer(const QUrl &appServerUrl);
+    ec2::ErrorCode connectToServer(const QUrl &appServerUrl, bool silent = false);
     bool disconnectFromServer(bool force);
 
     void hideMessageBox();
     void showLoginDialog();
+
+    bool tryToRestoreConnection();
+
+    /** Clear all local data structures. */
+    void clearConnection();
 private:
     void at_messageProcessor_connectionOpened();
     void at_messageProcessor_connectionClosed();

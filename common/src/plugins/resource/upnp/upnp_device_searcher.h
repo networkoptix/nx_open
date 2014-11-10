@@ -96,7 +96,7 @@ public:
     void processDiscoveredDevices( UPNPSearchHandler* handlerToUse = NULL );
 
     static UPNPDeviceSearcher* instance();
-
+    static int cacheTimeout();
 private:
     class DiscoveredDeviceInfo
     {

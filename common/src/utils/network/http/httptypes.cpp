@@ -323,6 +323,7 @@ namespace nx_http
         *dstBuffer += method;
         *dstBuffer += " ";
         *dstBuffer += url.toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters).toLatin1();
+        *dstBuffer += urlPostfix;
         *dstBuffer += " ";
         version.serialize( dstBuffer );
         *dstBuffer += "\r\n";
@@ -481,7 +482,7 @@ namespace nx_http
         if (cookieIter == headers.end())
             return BufferType();
 
-        foreach(const BufferType& value, cookieIter->second.split(';'))
+        for(const BufferType& value: cookieIter->second.split(';'))
         {
             QList<BufferType> params = value.split('=');
             if (params.size() > 1 && params[0].trimmed() == name)

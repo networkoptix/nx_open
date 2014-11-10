@@ -33,6 +33,8 @@ public:
 
     void stopObjects();
     void run();
+
+    void changePort(quint16 port);
 public slots:
     void stopAsync();
     void stopSync();
@@ -58,6 +60,7 @@ private:
     bool initTcpListener();
     QHostAddress getPublicAddress();
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection, Qn::PanicMode* pm);
+    void saveStorages(ec2::AbstractECConnectionPtr ec2Connection, const QnAbstractStorageResourceList& storages);
 private:
     int m_argc;
     char** m_argv;

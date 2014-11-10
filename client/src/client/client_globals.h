@@ -177,7 +177,9 @@ namespace Qn {
         UnauthorizedOverlay,
         OfflineOverlay,
         AnalogWithoutLicenseOverlay,
+        VideowallWithoutLicenseOverlay,
         ServerOfflineOverlay,
+        ServerUnauthorizedOverlay,
 
         OverlayCount
     };
@@ -248,6 +250,7 @@ namespace Qn {
         LightModeFull               = 0xFFFFFFFF
 
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(LightModeFlag)
     Q_DECLARE_FLAGS(LightModeFlags, LightModeFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(LightModeFlags)
 
@@ -257,12 +260,10 @@ namespace Qn {
         LightSkin
     };
 
-    enum ClientBackground {
-        NoBackground,
-        DefaultBackground,
-        RainbowBackground,
-        CustomColorBackground,
-        ImageBackground
+    enum BackgroundAnimationMode {
+        DefaultAnimation,
+        RainbowAnimation,
+        CustomAnimation
     };
 
     enum ImageBehaviour {
@@ -275,15 +276,20 @@ namespace Qn {
 
 } // namespace Qn
 
-Q_DECLARE_METATYPE(Qn::ItemRole)
-Q_DECLARE_METATYPE(Qn::TimeMode)
-Q_DECLARE_METATYPE(Qn::ClientSkin)
-Q_DECLARE_METATYPE(Qn::ClientBackground)
-Q_DECLARE_METATYPE(Qn::ImageBehaviour)
-Q_DECLARE_METATYPE(Qn::NodeType)
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::ItemRole)(Qn::TimeMode)(Qn::NodeType), 
+    (metatype)
+    )
 
-QN_FUSION_DECLARE_FUNCTIONS(Qn::ClientSkin, (lexical))
-QN_FUSION_DECLARE_FUNCTIONS(Qn::ClientBackground, (lexical))
-QN_FUSION_DECLARE_FUNCTIONS(Qn::ImageBehaviour, (lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::ClientSkin)(Qn::BackgroundAnimationMode)(Qn::ImageBehaviour), 
+    (metatype)(lexical)(datastream)
+    )
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::LightModeFlags), 
+    (metatype)(numeric)
+    )
+
 
 #endif // QN_CLIENT_GLOBALS_H

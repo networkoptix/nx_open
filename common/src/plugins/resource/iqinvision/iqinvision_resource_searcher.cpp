@@ -133,14 +133,12 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
 
     smac = smac.toUpper();
 
-    foreach(QnResourcePtr res, result)
+    for(const QnResourcePtr& res: result)
     {
         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
     
         if (net_res->getMAC().toString() == smac)
         {
-            if (isNewDiscoveryAddressBetter(net_res->getHostAddress(), discoveryAddress.toString(), net_res->getDiscoveryAddr().toString()))
-                net_res->setDiscoveryAddr(discoveryAddress);
             return local_results; // already found;
         }
     }
@@ -148,7 +146,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
 
     QnPlIqResourcePtr resource ( new QnPlIqResource() );
 
-    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name, false);
     if (rt.isNull())
     {
         // try with default camera name
@@ -167,7 +165,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
     return local_results;
 }
 
-void QnPlIqResourceSearcher::processNativePacket(QnResourceList& result, const QByteArray& responseData, const QHostAddress& discoveryAddress)
+void QnPlIqResourceSearcher::processNativePacket(QnResourceList& result, const QByteArray& responseData)
 {
     /*
     QFile gggFile("c:/123");
@@ -193,20 +191,18 @@ void QnPlIqResourceSearcher::processNativePacket(QnResourceList& result, const Q
 
     QByteArray name(responseData.data() + iqpos); // construct from null terminated char*
 
-    foreach(QnResourcePtr res, result)
+    for(const QnResourcePtr& res: result)
     {
         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
 
         if (net_res->getMAC() == macAddr)
         {
-            if (isNewDiscoveryAddressBetter(net_res->getHostAddress(), discoveryAddress.toString(), net_res->getDiscoveryAddr().toString()))
-                net_res->setDiscoveryAddr(discoveryAddress);
             return; // already found;
         }
     }
 
     QString nameStr = QString::fromLatin1(name);
-    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), nameStr);
+    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), nameStr, false);
     if (rt.isNull()) {
         rt = qnResTypePool->getResourceTypeId(manufacture(), DEFAULT_RESOURCE_TYPE);
         if (rt.isNull())
@@ -220,8 +216,7 @@ void QnPlIqResourceSearcher::processNativePacket(QnResourceList& result, const Q
     resource->setName(nameStr);
     resource->setModel(nameStr);
     resource->setMAC(macAddr);
-    resource->setHostAddress(peerAddress.toString(), QnDomainMemory);
-    resource->setDiscoveryAddr(discoveryAddress);
+    resource->setHostAddress(peerAddress.toString());
 
     result.push_back(resource);
 }
@@ -231,13 +226,14 @@ QnResourceList QnPlIqResourceSearcher::findResources()
 {
     QnResourceList result = QnMdnsResourceSearcher::findResources();
 
-    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
+    std::unique_ptr<AbstractDatagramSocket> receiveSock( SocketFactory::createDatagramSocket() );
+    if (!receiveSock->bind(SocketAddress( HostAddress::anyHost, NATIVE_DISCOVERY_RESPONSE_PORT)))
+        return result;
+
+    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
     {
         std::unique_ptr<AbstractDatagramSocket> sendSock( SocketFactory::createDatagramSocket() );
-        std::unique_ptr<AbstractDatagramSocket> receiveSock( SocketFactory::createDatagramSocket() );
         if (!sendSock->bind(iface.address.toString(), NATIVE_DISCOVERY_REQUEST_PORT))
-            continue;
-        if (!receiveSock->bind(iface.address.toString(), NATIVE_DISCOVERY_RESPONSE_PORT))
             continue;
 
         for (uint i = 0; i < sizeof(requests)/sizeof(char*); ++i)
@@ -246,24 +242,24 @@ QnResourceList QnPlIqResourceSearcher::findResources()
             QByteArray datagram(requests[i], REQUEST_SIZE);
             sendSock->sendTo(datagram.data(), datagram.size(), BROADCAST_ADDRESS, NATIVE_DISCOVERY_REQUEST_PORT);
         }
-
-        QnSleep::msleep(300);
-
-        while (receiveSock->hasData())
-        {
-            QByteArray datagram;
-            datagram.resize( AbstractDatagramSocket::MAX_DATAGRAM_SIZE );
-
-            QString sender;
-            quint16 senderPort;
-
-            int readed = receiveSock->recvFrom(datagram.data(), datagram.size(), sender, senderPort);
-
-            if (senderPort == NATIVE_DISCOVERY_RESPONSE_PORT && readed > 128) // minimum response size
-                processNativePacket(result, datagram.left(readed), iface.address);
-        }
-        //processNativePacket(result, QByteArray(), iface.address);
     }
+
+    QnSleep::msleep(300);
+
+    while (receiveSock->hasData())
+    {
+        QByteArray datagram;
+        datagram.resize( AbstractDatagramSocket::MAX_DATAGRAM_SIZE );
+
+        QString sender;
+        quint16 senderPort;
+
+        int readed = receiveSock->recvFrom(datagram.data(), datagram.size(), sender, senderPort);
+
+        if (senderPort == NATIVE_DISCOVERY_RESPONSE_PORT && readed > 128) // minimum response size
+            processNativePacket(result, datagram.left(readed));
+    }
+
 
     return result;
 

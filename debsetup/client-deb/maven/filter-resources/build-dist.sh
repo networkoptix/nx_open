@@ -7,10 +7,11 @@ FULL_APPLAUNCHER_NAME="${company.name} Launcher.conf"
 
 PACKAGENAME=$COMPANY_NAME-client
 VERSION=${release.version}
+FULLVERSION=${release.version}.${buildNumber}
 MINORVERSION=${parsedVersion.majorVersion}.${parsedVersion.minorVersion}
 ARCHITECTURE=${os.arch}
 
-TARGET=/opt/$COMPANY_NAME/client/$MINORVERSION
+TARGET=/opt/$COMPANY_NAME/client/$FULLVERSION
 USRTARGET=/usr
 BINTARGET=$TARGET/bin
 BGTARGET=$TARGET/share/pictures/sample-backgrounds
@@ -41,7 +42,7 @@ CLIENT_IMAGEFORMATS_PATH=$CLIENT_BIN_PATH/imageformats
 CLIENT_VOX_PATH=$CLIENT_BIN_PATH/vox
 CLIENT_PLATFORMS_PATH=$CLIENT_BIN_PATH/platforms
 CLIENT_BG_PATH=${libdir}/backgrounds
-CLIENT_HELP_PATH=${environment.dir}/help/${release.version}/${customization}
+CLIENT_HELP_PATH=${ClientHelpSourceDir}
 ICONS_PATH=${customization.dir}/icons/hicolor
 CLIENT_LIB_PATH=${libdir}/lib/${build.configuration}
 
@@ -58,7 +59,7 @@ mkdir -p $ICONSTAGE
 mkdir -p "$STAGE/etc/xdg/$FULL_COMPANY_NAME"
 mv -f debian/client.conf $STAGE/etc/xdg/"$FULL_COMPANY_NAME"/"$FULL_PRODUCT_NAME"
 mv -f debian/applauncher.conf $STAGE/etc/xdg/"$FULL_COMPANY_NAME"/"$FULL_APPLAUNCHER_NAME"
-mv -f usr/share/applications/icon.desktop usr/share/applications/${namespace.additional}.desktop
+mv -f usr/share/applications/icon.desktop usr/share/applications/${installer.name}.desktop
 
 # Copy client binary, old version libs
 cp -r $CLIENT_BIN_PATH/client $BINSTAGE/client-bin

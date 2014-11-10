@@ -84,7 +84,6 @@ protected:
     virtual CameraDiagnostics::Result initInternal() override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
-    virtual bool isResourceAccessible();
     //!Implementation of QnSecurityCamResource::startInputPortMonitoring
     virtual bool startInputPortMonitoring() override;
     //!Implementation of QnSecurityCamResource::stopInputPortMonitoring

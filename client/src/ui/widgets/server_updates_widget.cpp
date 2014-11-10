@@ -12,6 +12,7 @@
 #include <common/common_module.h>
 
 #include <ui/common/palette.h>
+#include <ui/common/ui_resource_name.h>
 #include <ui/models/sorted_server_updates_model.h>
 #include <ui/dialogs/file_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
@@ -34,6 +35,25 @@ namespace {
     const int tooLateDayOfWeek = Qt::Thursday;
 
     const int autoCheckIntervalMs = 5 * 60 * 1000;  // 5 minutes
+
+
+    QStringList serverNames(const QSet<QnUuid> &serverIds) {
+        QStringList result;
+
+        foreach (const QnUuid &id, serverIds) {
+            QnMediaServerResourcePtr server = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>();
+            if (!server)
+                continue;
+
+            result.append(getResourceName(server));
+        }
+
+        return result;
+    }
+
+    QString serverNamesString(const QSet<QnUuid> &serverIds) {
+        return serverNames(serverIds).join(lit(", "));
+    }
 }
 
 QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
@@ -130,6 +150,13 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     m_longUpdateWarningTimer->setInterval(longInstallWarningTimeout);
     m_longUpdateWarningTimer->setSingleShot(true);
     connect(m_longUpdateWarningTimer, &QTimer::timeout, ui->longUpdateWarning, &QLabel::show);
+
+    connect(qnResPool, &QnResourcePool::statusChanged, this, [this] (const QnResourcePtr &resource) {
+        if (!resource->hasFlags(Qn::server))
+            return;
+
+        ui->linkLineEdit->setText(m_updateTool->generateUpdatePackageUrl(m_targetVersion).toString());
+    });
 
     at_tool_stageChanged(QnFullUpdateStage::Init);
 }
@@ -269,7 +296,7 @@ bool QnServerUpdatesWidget::confirm() {
 
 bool QnServerUpdatesWidget::discard() {
     if(!cancelUpdate()) {
-        QMessageBox::critical(this, tr("Error"), tr("Cannot cancel update at this state."));
+        QMessageBox::critical(this, tr("Error"), tr("Cannot cancel update at this state.\nPlease wait until update is finished"));
         return false;
     }
 
@@ -280,58 +307,78 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
     ui->updateProgessBar->setValue(100);
     ui->updateProgessBar->setFormat(tr("Update finished... 100%"));
 
-    switch (result.result) {
-    case QnUpdateResult::Successful:
-        {
-            QString message = tr("Update has been successfully finished.");
+    if (isVisible()) {
+        switch (result.result) {
+        case QnUpdateResult::Successful:
+            {
+                QString message = tr("Update has been successfully finished.");
 
-            message += lit("\n");
-            if (result.clientInstallerRequired)
-                message += tr("Now you have to update the client using an installer.");
-            else
-                message += tr("The client will be restarted to the updated version.");
+                bool clientUpdated = (result.targetVersion != qnCommon->engineVersion());
 
+                if (clientUpdated) {
+                    message += lit("\n");
+                    if (result.clientInstallerRequired)
+                        message += tr("Now you have to update the client using an installer.");
+                    else
+                        message += tr("The client will be restarted to the updated version.");
+                }
 
-            QMessageBox::information(this, tr("Update is successful"), message);
+                QMessageBox::information(this, tr("Update is successful"), message);
 
-            if (!result.clientInstallerRequired) {
-                if (!applauncher::restartClient(result.targetVersion) == applauncher::api::ResultType::ok) {
-                    QMessageBox::critical(this,
-                        tr("Launcher process is not found"),
-                        tr("Cannot restart the client.\n"
-                        "Please close the application and start it again using the shortcut in the start menu."));
-                } else {
-                    qApp->exit(0);
-                    applauncher::scheduleProcessKill(QCoreApplication::applicationPid(), processTerminateTimeout);
+                if (clientUpdated && !result.clientInstallerRequired) {
+                    if (!applauncher::restartClient(result.targetVersion) == applauncher::api::ResultType::ok) {
+                        QMessageBox::critical(this,
+                            tr("Launcher process is not found"),
+                            tr("Cannot restart the client.\n"
+                            "Please close the application and start it again using the shortcut in the start menu."));
+                    } else {
+                        qApp->exit(0);
+                        applauncher::scheduleProcessKill(QCoreApplication::applicationPid(), processTerminateTimeout);
+                    }
                 }
             }
+            break;
+        case QnUpdateResult::Cancelled:
+            QMessageBox::information(this, tr("Update cancelled"), tr("Update has been cancelled."));
+            break;
+        case QnUpdateResult::LockFailed:
+            QMessageBox::critical(this, tr("Update failed"), tr("Someone has already started an update."));
+            break;
+        case QnUpdateResult::DownloadingFailed:
+            QMessageBox::critical(this, tr("Update failed"), tr("Could not download updates."));
+            break;
+        case QnUpdateResult::DownloadingFailed_NoFreeSpace:
+            QMessageBox::critical(this, tr("Update failed"), tr("Could not download updates.") + lit("\n") + tr("No free space left on the disk."));
+            break;
+        case QnUpdateResult::UploadingFailed:
+            QMessageBox::critical(this, tr("Update failed"), tr("Could not push updates to servers."));
+            break;
+        case QnUpdateResult::UploadingFailed_NoFreeSpace:
+            QMessageBox::critical(this, tr("Update failed"),
+                                  tr("Could not push updates to servers.") +
+                                  lit("\n") +
+                                  tr("No free space left on %n servers: %1", "", result.failedPeers.size()).arg(serverNamesString(result.failedPeers)));
+            break;
+        case QnUpdateResult::UploadingFailed_Timeout:
+            QMessageBox::critical(this, tr("Update failed"),
+                                  tr("Could not push updates to servers.") +
+                                  lit("\n") +
+                                  tr("%n servers are not responding: %1", "", result.failedPeers.size()).arg(serverNamesString(result.failedPeers)));
+            break;
+        case QnUpdateResult::UploadingFailed_Offline:
+            QMessageBox::critical(this, tr("Update failed"),
+                                  tr("Could not push updates to servers.") +
+                                  lit("\n") +
+                                  tr("%n servers have gone offline: %1", "", result.failedPeers.size()).arg(serverNamesString(result.failedPeers)));
+            break;
+        case QnUpdateResult::ClientInstallationFailed:
+            QMessageBox::critical(this, tr("Update failed"), tr("Could not install an update to the client."));
+            break;
+        case QnUpdateResult::InstallationFailed:
+        case QnUpdateResult::RestInstallationFailed:
+            QMessageBox::critical(this, tr("Update failed"), tr("Could not install updates on one or more servers."));
+            break;
         }
-        break;
-    case QnUpdateResult::Cancelled:
-        QMessageBox::information(this, tr("Update cancelled"), tr("Update has been cancelled."));
-        break;
-    case QnUpdateResult::LockFailed:
-        QMessageBox::critical(this, tr("Update failed"), tr("Someone has already started an update."));
-        break;
-    case QnUpdateResult::DownloadingFailed:
-        QMessageBox::critical(this, tr("Update failed"), tr("Could not download updates."));
-        break;
-    case QnUpdateResult::DownloadingFailed_NoFreeSpace:
-        QMessageBox::critical(this, tr("Update failed"), tr("Could not download updates.") + lit("\n") + tr("No free space left on the disk."));
-        break;
-    case QnUpdateResult::UploadingFailed:
-        QMessageBox::critical(this, tr("Update failed"), tr("Could not push updates to servers."));
-        break;
-    case QnUpdateResult::UploadingFailed_NoFreeSpace:
-        QMessageBox::critical(this, tr("Update failed"), tr("Could not push updates to servers.") + lit("\n") + tr("No free space left on the server."));
-        break;
-    case QnUpdateResult::ClientInstallationFailed:
-        QMessageBox::critical(this, tr("Update failed"), tr("Could not install an update to the client."));
-        break;
-    case QnUpdateResult::InstallationFailed:
-    case QnUpdateResult::RestInstallationFailed:
-        QMessageBox::critical(this, tr("Update failed"), tr("Could not install updates on one or more servers."));
-        break;
     }
 
     bool canUpdate = result.result != QnUpdateResult::Successful;

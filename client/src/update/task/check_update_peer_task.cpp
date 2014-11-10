@@ -91,22 +91,23 @@ void QnCheckForUpdatesPeerTask::checkUpdateCoverage() {
         if (!server)
             continue;
 
-        QnUpdateFileInformationPtr updateFileInformation = m_updateFiles.value(server->getSystemInfo(), QnUpdateFileInformationPtr());
-        if (!updateFileInformation) {
+        bool updateServer = this->needUpdate(server->getVersion(), m_target.version);
+        if (updateServer && !m_updateFiles.value(server->getSystemInfo())) {
             finishTask(QnCheckForUpdateResult::ServerUpdateImpossible);
             return;
         }
-        needUpdate |= this->needUpdate(server->getVersion(), updateFileInformation->version);
+        needUpdate |= updateServer;
     }
 
     if (!m_target.denyClientUpdates && !m_clientRequiresInstaller) {
-        if (!m_clientUpdateFile) {
+        bool updateClient = this->needUpdate(qnCommon->engineVersion(), m_target.version);
+
+        if (updateClient && !m_clientUpdateFile) {
             finishTask(QnCheckForUpdateResult::ClientUpdateImpossible);
             return;
         }
 
-        if ((m_targetMustBeNewer && m_clientUpdateFile->version > qnCommon->engineVersion()) || (!m_targetMustBeNewer && m_clientUpdateFile->version != qnCommon->engineVersion()))
-            needUpdate = true;
+        needUpdate |= updateClient;
     }
 
     finishTask(needUpdate ? QnCheckForUpdateResult::UpdateFound : QnCheckForUpdateResult::NoNewerVersion);
@@ -197,8 +198,11 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply *
         return;
     }
 
-    if (m_target.version.isNull())
+
+    if (m_target.version.isNull()) {
         m_target.version = latestVersion;
+        m_checkLatestVersion = true;
+    }
     m_updateLocationPrefix = updatesPrefix;
     m_releaseNotesUrl = QUrl(map.value(lit("release_notes")).toString());
 
@@ -340,6 +344,11 @@ void QnCheckForUpdatesPeerTask::at_zipExtractor_finished(int error) {
 }
 
 void QnCheckForUpdatesPeerTask::finishTask(QnCheckForUpdateResult::Value value) {
+    if (m_checkLatestVersion && value == QnCheckForUpdateResult::NoSuchBuild) {
+        m_target.version = QnSoftwareVersion();
+        value = QnCheckForUpdateResult::NoNewerVersion;
+    }
+
     QnCheckForUpdateResult result(value);
     result.latestVersion = m_target.version;
     result.systems = m_updateFiles.keys().toSet();

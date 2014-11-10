@@ -42,6 +42,8 @@ struct QnUpdateResult {
         DownloadingFailed_NoFreeSpace,
         UploadingFailed,
         UploadingFailed_NoFreeSpace,
+        UploadingFailed_Timeout,
+        UploadingFailed_Offline,
         ClientInstallationFailed,
         InstallationFailed,
         RestInstallationFailed
@@ -56,6 +58,7 @@ struct QnUpdateResult {
     Value result;
     QnSoftwareVersion targetVersion;
     bool clientInstallerRequired;
+    QSet<QnUuid> failedPeers;
 };
 Q_DECLARE_METATYPE(QnUpdateResult);
 

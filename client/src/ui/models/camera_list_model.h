@@ -23,7 +23,7 @@ public:
         ModelColumn,
         FirmwareColumn,
         IpColumn,
-        UniqIdColumn,
+        MacColumn,
         ServerColumn,
         ColumnCount
     };

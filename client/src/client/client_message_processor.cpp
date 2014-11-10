@@ -24,15 +24,15 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 {
     QnCommonMessageProcessor::init(connection);
     if (connection) {
-        assert(!m_connected);
-        assert(qnCommon->remoteGUID().isNull());
+       // Q_ASSERT(!m_connected);                   //TODO: #GDM fails in auto-reconnect method
+       // assert(qnCommon->remoteGUID().isNull());  //TODO: #GDM fails in auto-reconnect method
         qnCommon->setRemoteGUID(QnUuid(connection->connectionInfo().ecsGuid));
         connect( connection, &ec2::AbstractECConnection::remotePeerFound, this, &QnClientMessageProcessor::at_remotePeerFound);
         connect( connection, &ec2::AbstractECConnection::remotePeerLost, this, &QnClientMessageProcessor::at_remotePeerLost);
         connect( connection->getMiscManager(), &ec2::AbstractMiscManager::systemNameChangeRequested,
                  this, &QnClientMessageProcessor::at_systemNameChangeRequested );
     } else if (m_connected) { // double init by null is allowed
-        assert(!qnCommon->remoteGUID().isNull());
+        Q_ASSERT(!qnCommon->remoteGUID().isNull());
         ec2::ApiPeerAliveData data;
         data.peer.id = qnCommon->remoteGUID();
         qnCommon->setRemoteGUID(QnUuid());
@@ -101,7 +101,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
 void QnClientMessageProcessor::processResources(const QnResourceList& resources)
 {
     QnCommonMessageProcessor::processResources(resources);
-    foreach(const QnResourcePtr& resource, resources)
+    for(const QnResourcePtr& resource: resources)
         checkForTmpStatus(resource);
 }
 
@@ -113,7 +113,7 @@ void QnClientMessageProcessor::checkForTmpStatus(const QnResourcePtr& resource)
     {
         if (mediaServer->getStatus() == Qn::NotDefined)
             return;
-        else if (mediaServer->getStatus() == Qn::Offline)
+        else if (mediaServer->getStatus() == Qn::Offline || mediaServer->getStatus() == Qn::Unauthorized)
             updateServerTmpStatus(mediaServer->getId(), Qn::Offline);
         else
             updateServerTmpStatus(mediaServer->getId(), Qn::NotDefined);
@@ -122,7 +122,7 @@ void QnClientMessageProcessor::checkForTmpStatus(const QnResourcePtr& resource)
     {
         QnMediaServerResourcePtr mediaServer = qnResPool->getResourceById(serverCamera->getParentId()).dynamicCast<QnMediaServerResource>();
         if (mediaServer) {
-            if (mediaServer->getStatus() ==Qn::Offline)
+            if (mediaServer->getStatus() == Qn::Offline || mediaServer->getStatus() == Qn::Unauthorized)
                 serverCamera->setTmpStatus(Qn::Offline);
             else
                 serverCamera->setTmpStatus(Qn::NotDefined);
@@ -135,7 +135,7 @@ void QnClientMessageProcessor::updateServerTmpStatus(const QnUuid& id, Qn::Resou
     QnResourcePtr server = qnResPool->getResourceById(id);
     if (!server)
         return;
-    foreach(QnResourcePtr res, qnResPool->getAllCameras(server)) {
+    for(QnResourcePtr res: qnResPool->getAllCameras(server)) {
         QnServerCameraPtr serverCamera = res.dynamicCast<QnServerCamera>();
         if (serverCamera)
             serverCamera->setTmpStatus(status);
@@ -152,7 +152,7 @@ void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data)
     if (data.peer.id != qnCommon->remoteGUID())
         return;
 
-    assert(!m_connected);
+    //Q_ASSERT(!m_connected);
     
     m_connected = true;
     emit connectionOpened();
@@ -191,5 +191,6 @@ void QnClientMessageProcessor::at_systemNameChangeRequested(const QString &syste
 void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
 {
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
+    m_incompatibleServerWatcher.reset();
     m_incompatibleServerWatcher.reset(new QnIncompatibleServerWatcher(this));
 }

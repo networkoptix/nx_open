@@ -10,49 +10,40 @@ namespace ec2
     struct ApiResourceParamData: ApiData
     {
         ApiResourceParamData() {}
-        ApiResourceParamData(const QString& name, const QString& value, bool predefinedParam): value(value), name(name), predefinedParam(predefinedParam) {}
+        ApiResourceParamData(const QString& name, const QString& value): value(value), name(name) {}
 
         QString value;
         QString name;
-        bool predefinedParam;
     };
-#define ApiResourceParamData_Fields (value)(name)(predefinedParam)
+#define ApiResourceParamData_Fields (value)(name)
 
 
     struct ApiResourceParamWithRefData: ApiResourceParamData
     {
+        ApiResourceParamWithRefData() {}
+        ApiResourceParamWithRefData(const QnUuid& resourceId, const QString& name, const QString& value): ApiResourceParamData(name, value), resourceId(resourceId) {}
         QnUuid resourceId;
     };
 #define ApiResourceParamWithRefData_Fields ApiResourceParamData_Fields (resourceId)
 
 
-    struct ApiResourceParamsData: ApiData
-    {
-        QnUuid id;
-        std::vector<ApiResourceParamData> params;
-    };
-#define ApiResourceParamsData_Fields (id)(params)
-
-
     struct ApiResourceData: ApiData {
-        ApiResourceData(): status(Qn::Offline) {}
+        ApiResourceData() {}
 
         QnUuid          id;
         QnUuid          parentId;
-        Qn::ResourceStatus    status;
         QString       name;
         QString       url;
         QnUuid          typeId;
-        std::vector<ApiResourceParamData> addParams;
     };
-#define ApiResourceData_Fields (id)(parentId)(status)(name)(url)(typeId)(addParams)
+#define ApiResourceData_Fields (id)(parentId)(name)(url)(typeId)
 
-    struct ApiSetResourceStatusData: ApiData
+    struct ApiResourceStatusData: ApiData
     {
         QnUuid id;
         Qn::ResourceStatus status;
     };
-#define ApiSetResourceStatusData_Fields (id)(status)
+#define ApiResourceStatusData_Fields (id)(status)
 
 } // namespace ec2
 

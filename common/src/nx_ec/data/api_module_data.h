@@ -19,10 +19,9 @@ namespace ec2 {
         QByteArray authHash;
 
         bool isAlive;
-        QList<QnUuid> discoverers;
     };
 
-#define ApiModuleData_Fields (type)(id)(systemName)(version)(systemInformation)(addresses)(port)(isAlive)(discoverers)(customization)(name)(sslAllowed)(authHash)
+#define ApiModuleData_Fields (type)(id)(systemName)(version)(systemInformation)(addresses)(port)(isAlive)(customization)(name)(sslAllowed)(authHash)
 
 } // namespace ec2
 

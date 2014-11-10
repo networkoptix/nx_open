@@ -24,15 +24,19 @@
         <appserver.name>Enterprise Controller</appserver.name>
         <appserver2.name>${company.name} New Enterprise Controller</appserver2.name>
         <client.name>${company.name} ${product.name} Client</client.name>
+        <client.display.name>${company.name} ${display.product.name} Client</client.display.name>
         <client.mediafolder.name>${product.name} Media</client.mediafolder.name>
-        <applauncher.name>${company.name} Launcher</applauncher.name>
+        <applauncher.name>${product.name} Launcher</applauncher.name>
+        <applauncher.display.name>${display.product.name} Launcher</applauncher.display.name>
         <axiscamplugin.name>${company.name} AXIS camera integration plugin</axiscamplugin.name>
         <genericrtspplugin.name>${company.name} generic RTSP plugin</genericrtspplugin.name>
         <mediaserver.name>${company.name} Media Server</mediaserver.name>
         <mediaproxy.name>${company.name} Media Proxy</mediaproxy.name>
         <testcamera.name>${company.name} Test Camera</testcamera.name>
         <traytool.name>${product.name} Tray Assistant</traytool.name>
+        <traytool.display.name>${display.product.name} Tray Assistant</traytool.display.name>
         <vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
+        <wixsetup.name>${company.name} ${display.product.name} Setup v.${release.version}</wixsetup.name>
         <license.environment>production</license.environment>
         <build.configuration>release</build.configuration>
         <buildNumber>0</buildNumber>
@@ -99,8 +103,8 @@
         <qtlib17>Positioning</qtlib17>
         <qtlib18>Sensors</qtlib18>
         <!--qtlib19 is for desktop only-->
-        <qtlib19/>
-        <qtlib20/>
+        <qtlib19></qtlib19>
+        <qtlib20>XmlPatterns</qtlib20>
 
         <!--QT plugins used-->      
         <qtplugin1>imageformats</qtplugin1>
@@ -334,12 +338,15 @@
                 <module>client</module>                     
                 <module>wixsetup/wixsetup-server-only</module>
                 <module>wixsetup/wixsetup-client-only</module>
+<!--                <module>wixsetup/wixsetup-full</module> -->
             </modules>
             <properties>
                 <qt.dir>${libdir}/${arch}</qt.dir>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
                 <init.python.dir>${environment.dir}/python/${arch}</init.python.dir>
                 <python.dir>${libdir}/${arch}/python/scripts</python.dir>                
+                <python.executable>python.exe</python.executable>
+                <python.virtualenv>virtualenv.exe</python.virtualenv>
                 <buildenv.script>get_buildenv.bat</buildenv.script>
                 <platform>windows</platform>
                 <compiler>msvc2012u3</compiler>
@@ -387,6 +394,8 @@
                 <environment.dir>${env.environment}</environment.dir>
                 <init.python.dir>/usr/bin</init.python.dir>                
                 <python.dir>${libdir}/${arch}/python/bin</python.dir>
+                <python.executable>python2</python.executable>
+                <python.virtualenv>virtualenv2</python.virtualenv>
                 <buildenv.script>get_buildenv.sh</buildenv.script>                
                 <qt.dir>${libdir}</qt.dir>
                 <common.platform>unix</common.platform>
@@ -428,6 +437,8 @@
                 <arch>x64</arch>
                 <qt.spec>macx-clang-libc++</qt.spec>
                 <qt.classifier>${platform}-${arch}</qt.classifier>
+                <python.executable>python</python.executable>
+                <python.virtualenv>virtualenv</python.virtualenv>
             </properties>
             <modules>
                 <module>macsetup/client-dmg</module>

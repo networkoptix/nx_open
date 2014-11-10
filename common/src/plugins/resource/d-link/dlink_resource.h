@@ -51,8 +51,6 @@ public:
 
     QnPlDlinkResource();
 
-    virtual bool isResourceAccessible();
-
     virtual QString getDriverName() const override;
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames

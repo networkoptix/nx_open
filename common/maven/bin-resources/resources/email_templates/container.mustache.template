@@ -53,7 +53,7 @@
             <div class="content">
                 <table > <!-- bgcolor="#FFFFFF" -->
                     <tr>
-                        <td class="small" width="20%" style="vertical-align: top; padding-right:10px;"><img src="{{eventLogoFilename}}"/></td>
+                        <td class="small" width="20%" style="vertical-align: top; padding-right:10px;"><img src="{{eventLogoFilename}}" height="75"/></td>
                         <td>
                             <h5>{{event}}: {{source}}</h5>
                             {{#urlext}}

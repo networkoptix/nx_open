@@ -105,7 +105,7 @@ public:
     State state() const;
     
     void setLastDiscoveredResources(const QnResourceList& resources);
-    QnResourceList lastDiscoveredResources() const;
+    QSet<QString> lastDiscoveredIds() const;
 public slots:
     virtual void start( Priority priority = InheritPriority ) override;
 
@@ -123,7 +123,6 @@ signals:
     void CameraIPConflict(QHostAddress addr, QStringList macAddrList);
 
 protected slots:
-    void onInitAsyncFinished(const QnResourcePtr& res, bool initialized);
     void at_resourceDeleted(const QnResourcePtr& resource);
     void at_resourceChanged(const QnResourcePtr& resource);
 private:
@@ -160,7 +159,7 @@ private:
     QHash<QnUuid, QnManualCameraSearchCameraList> m_searchProcessResults;
 
     mutable QMutex m_resListMutex;
-    QnResourceList m_lastDiscoveredResources[4];
+    QnResourceList m_lastDiscoveredResources[6];
     int m_discoveryUpdateIdx;
 };
 

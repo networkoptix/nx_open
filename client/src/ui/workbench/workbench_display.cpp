@@ -18,6 +18,7 @@
 #include <utils/common/toggle.h>
 #include <utils/common/util.h>
 #include <utils/common/variant_timer.h>
+#include <utils/aspect_ratio.h>
 
 #include <client/client_meta_types.h>
 #include <common/common_meta_types.h>
@@ -169,6 +170,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     QnWorkbenchContextAware(parent),
     m_scene(NULL),
     m_view(NULL),
+    m_lightMode(0),
     m_frontZ(0.0),
     m_frameOpacity(1.0),
     m_frameWidthsDirty(false),
@@ -272,6 +274,23 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
 
 QnWorkbenchDisplay::~QnWorkbenchDisplay() {
     setScene(NULL);
+}
+
+Qn::LightModeFlags QnWorkbenchDisplay::lightMode() const {
+    return m_lightMode;
+}
+
+void QnWorkbenchDisplay::setLightMode(Qn::LightModeFlags mode) {
+    if(m_lightMode == mode)
+        return;
+
+    if(m_scene && m_view)
+        deinitSceneView();
+
+    m_lightMode = mode;
+
+    if(m_scene && m_view)
+        initSceneView();
 }
 
 void QnWorkbenchDisplay::setScene(QGraphicsScene *scene) {
@@ -421,7 +440,7 @@ void QnWorkbenchDisplay::initSceneView() {
     m_curtainItem = new QnCurtainItem();
     m_scene->addItem(m_curtainItem.data());
     setLayer(m_curtainItem.data(), Qn::BackLayer);
-    m_curtainItem.data()->setColor(QColor(0, 0, 0, 255));
+    m_curtainItem.data()->setColor(Qt::black);
     m_curtainAnimator->setCurtainItem(m_curtainItem.data());
 
     /* Set up grid. */
@@ -440,11 +459,9 @@ void QnWorkbenchDisplay::initSceneView() {
     gridBackgroundItem()->setMapper(workbench()->mapper());
 
     /* Set up background */ 
-    if (qnSettings->lightMode() & Qn::LightModeNoSceneBackground) {
-        action(Qn::ToggleBackgroundAnimationAction)->setDisabled(true);
-    } else {
+    if (!(m_lightMode & Qn::LightModeNoSceneBackground)) {
         /* Never set QObject* parent in the QScopedPointer-stored objects if not sure in the descruction order. */
-        m_backgroundPainter = new QnGradientBackgroundPainter(qnSettings->radialBackgroundCycle(), NULL, context());
+        m_backgroundPainter = new QnGradientBackgroundPainter(qnSettings->background().animationPeriodSec, NULL, context());
         m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
     }
 
@@ -475,6 +492,14 @@ void QnWorkbenchDisplay::initBoundingInstrument() {
 QnGridItem *QnWorkbenchDisplay::gridItem() const {
     return m_gridItem.data();
 }
+
+QnCurtainItem* QnWorkbenchDisplay::curtainItem() const {
+    return m_curtainItem.data();
+} 
+
+QnCurtainAnimator* QnWorkbenchDisplay::curtainAnimator() const {
+    return m_curtainAnimator;
+} 
 
 QnGridBackgroundItem *QnWorkbenchDisplay::gridBackgroundItem() const {
     return m_gridBackgroundItem.data();
@@ -590,7 +615,7 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
         if(oldWidget != NULL) {
             synchronize(oldWidget, true);
 
-            if (!(qnSettings->lightMode() & Qn::LightModeNoLayoutBackground)) {
+            if (!(m_lightMode & Qn::LightModeNoLayoutBackground)) {
                 ensureRaisedConeItem(oldWidget);
                 raisedConeItem(oldWidget)->setEffectEnabled(false);
                 setLayer(raisedConeItem(oldWidget), Qn::RaisedConeBgLayer);
@@ -600,7 +625,7 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
         if(newWidget != NULL) {
             bringToFront(newWidget);
 
-            if (!(qnSettings->lightMode() & Qn::LightModeNoLayoutBackground)) {
+            if (!(m_lightMode & Qn::LightModeNoLayoutBackground)) {
                 ensureRaisedConeItem(newWidget);
                 setLayer(raisedConeItem(newWidget), Qn::RaisedConeLayer);
                 raisedConeItem(newWidget)->setEffectEnabled(!workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty());
@@ -697,7 +722,7 @@ void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout) {
     if (!layout)
         return;
 
-    if (qnSettings->lightMode() & Qn::LightModeNoLayoutBackground)
+    if (m_lightMode & Qn::LightModeNoLayoutBackground)
         return;
 
     gridBackgroundItem()->update(layout);
@@ -807,7 +832,7 @@ void QnWorkbenchDisplay::bringToFront(QnWorkbenchItem *item) {
 }
 
 bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bool startDisplay) {
-    int maxItems = (qnSettings->lightMode() & Qn::LightModeSingleItem)
+    int maxItems = (m_lightMode & Qn::LightModeSingleItem)
             ? 1
             : qnSettings->maxSceneVideoItems();
 
@@ -1161,6 +1186,9 @@ QRectF QnWorkbenchDisplay::itemEnclosingGeometry(QnWorkbenchItem *item) const {
         result.height() + delta.height() * step.height()
     );
 
+    if (item->geometry().isEmpty())
+        return result;
+
     /* Calculate bounds of the rotated item */
     qreal rotation = qAbs(item->rotation());
     if (!qFuzzyIsNull(rotation) && !qFuzzyEquals(rotation, 180)) {
@@ -1219,7 +1247,15 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const {
             ? layoutBoundingRect
             : layoutBoundingRect.united(backgroundBoundingRect);
 
-    return workbench()->mapper()->mapFromGridF(QRectF(sceneBoundingRect));
+    /* Do not add additional spacing in following cases: */
+    bool noAdjust = qnSettings->isVideoWallMode()                           /*< Videowall client. */
+        || !backgroundBoundingRect.isNull();                                /*< There is a layout background. */
+
+    if (noAdjust)
+        return workbench()->mapper()->mapFromGridF(QRectF(sceneBoundingRect));
+    
+    const qreal minAdjust = 0.015;
+    return workbench()->mapper()->mapFromGridF(QRectF(sceneBoundingRect).adjusted(-minAdjust, -minAdjust, minAdjust, minAdjust));
 }
 
 QRectF QnWorkbenchDisplay::viewportGeometry() const {
@@ -1327,7 +1363,7 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
             magicConst = 0.8;   //TODO: #Elric magic const
         else
         if (
-            !(qnSettings->lightMode() & Qn::LightModeNoLayoutBackground) &&
+            !(m_lightMode & Qn::LightModeNoLayoutBackground) &&
             (workbench()->currentLayout()->resource() && !workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty())
         ) 
             magicConst = 0.33;  //TODO: #Elric magic const
@@ -1499,7 +1535,7 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
     /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
     QnConstResourceVideoLayoutPtr videoLayout = widget->channelLayout();
     qreal estimatedAspectRatio = aspectRatio(videoLayout->size()) * (item->zoomRect().isNull() ? 1.0 : aspectRatio(item->zoomRect())) * (4.0 / 3.0);
-    if (qAbs(qAbs(item->rotation()) - 90) < 45)
+    if (QnAspectRatio::isRotated90(item->rotation()))
         estimatedAspectRatio = 1 / estimatedAspectRatio;
     const Qt::Orientation orientation = estimatedAspectRatio > 1.0 ? Qt::Vertical : Qt::Horizontal;
     const QSize size = bestSingleBoundedSize(workbench()->mapper(), 1, orientation, estimatedAspectRatio);
@@ -1932,7 +1968,7 @@ void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &reso
 }
 
 void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const QnAbstractBusinessActionPtr &businessAction) {
-    if (qnSettings->lightMode() & Qn::LightModeNoNotifications)
+    if (m_lightMode & Qn::LightModeNoNotifications)
         return;
 
     QnResourcePtr resource = qnResPool->getResourceById(businessAction->getRuntimeParams().getEventResourceId());
@@ -1958,7 +1994,7 @@ void QnWorkbenchDisplay::at_notificationTimer_timeout(const QVariant &resource, 
 }
 
 void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resource, int type) {
-    if (qnSettings->lightMode() & Qn::LightModeNoNotifications)
+    if (m_lightMode & Qn::LightModeNoNotifications)
         return;
 
     foreach(QnResourceWidget *widget, this->widgets(resource)) {
@@ -1978,9 +2014,9 @@ void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resou
         splashItem->setRect(QRectF(-toPoint(rect.size()) / 2, rect.size()));
         splashItem->setColor(withAlpha(QnNotificationLevels::notificationColor(static_cast<QnBusiness::EventType>(type)), 128));
         splashItem->setOpacity(0.0);
+        splashItem->setRotation(widget->rotation());
         splashItem->animate(1000, QnGeometry::dilated(splashItem->rect(), expansion), 0.0, true, 200, 1.0);
         scene()->addItem(splashItem);
         setLayer(splashItem, Qn::EffectsLayer);
     }
 }
-

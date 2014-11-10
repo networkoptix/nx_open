@@ -19,6 +19,8 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <utils/common/app_info.h>
+#include <utils/common/email.h>
+
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 
@@ -28,6 +30,13 @@ namespace {
         AdvancedPage,
         TestingPage
     };
+
+    QList<QnEmail::ConnectionType> connectionTypesAllowed() {
+        return QList<QnEmail::ConnectionType>() 
+            << QnEmail::Unsecure
+            << QnEmail::Ssl
+            << QnEmail::Tls;
+    }
 
     const int testSmtpTimeoutMSec = 20 * 1000;
 }
@@ -80,6 +89,7 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
     connect(m_timeoutTimer,                 &QTimer::timeout,                   this,   &QnSmtpSettingsWidget::at_timer_timeout);
     connect(ui->simpleEmailLineEdit,        &QLineEdit::textChanged,            this,   &QnSmtpSettingsWidget::validateEmailSimple);
     connect(ui->simpleSupportEmailLineEdit, &QLineEdit::textChanged,            this,   &QnSmtpSettingsWidget::validateEmailSimple);
+    connect(ui->emailLineEdit,              &QLineEdit::textChanged,            this,   &QnSmtpSettingsWidget::validateEmailAdvanced);
     connect(ui->supportEmailLineEdit,       &QLineEdit::textChanged,            this,   &QnSmtpSettingsWidget::validateEmailAdvanced);
     connect(QnGlobalSettings::instance(),   &QnGlobalSettings::emailSettingsChanged, this,  &QnSmtpSettingsWidget::updateFromSettings);
 
@@ -88,10 +98,33 @@ QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
     setWarningStyle(ui->detectErrorLabel);
     setWarningStyle(ui->supportEmailWarningLabel);
 
+    /* Mark some fields as mandatory, so field label will turn red if the field is empty. */
+    auto declareMandatoryField = [this](QLabel* label, QLineEdit* lineEdit) {
+        /* On every field text change we should check its contents and repaint label with corresponding color. */
+        connect(lineEdit, &QLineEdit::textChanged, this, [this, label](const QString &text) {
+            QPalette palette = this->palette();
+            if (text.isEmpty())
+                setWarningStyle(&palette);
+            label->setPalette(palette);
+        });
+        /* Default field value is empty, so the label should be red by default. */
+        setWarningStyle(label);
+    };
+
+    /* Mark simple view mandatory fields. */
+    declareMandatoryField(ui->simpleEmailLabel, ui->simpleEmailLineEdit);
+    declareMandatoryField(ui->simplePasswordLabel, ui->simplePasswordLineEdit);
+
+    /* Mark advanced view mandatory fields. */
+    declareMandatoryField(ui->emailLabel, ui->emailLineEdit);
+    declareMandatoryField(ui->serverLabel, ui->serverLineEdit);
+    declareMandatoryField(ui->userLabel, ui->userLineEdit);
+    declareMandatoryField(ui->passwordLabel, ui->passwordLineEdit);
+
     const QString autoPort = tr("Auto");
     ui->portComboBox->addItem(autoPort, 0);
-    for (int i = 0; i < QnEmail::ConnectionTypeCount; i++) {
-        int port = QnEmail::defaultPort(static_cast<QnEmail::ConnectionType>(i));
+    for (QnEmail::ConnectionType type: connectionTypesAllowed()) {
+        int port = QnEmailSettings::defaultPort(type);
         ui->portComboBox->addItem(QString::number(port), port);
     }
     ui->portComboBox->setValidator(new QnPortNumberValidator(autoPort, this));
@@ -107,11 +140,12 @@ QnSmtpSettingsWidget::~QnSmtpSettingsWidget()
 void QnSmtpSettingsWidget::updateFromSettings() {
     finishTesting();
 
-    QnEmail::Settings settings = QnGlobalSettings::instance()->emailSettings();
+    QnEmailSettings settings = QnGlobalSettings::instance()->emailSettings();
 
     loadSettings(settings.server, settings.connectionType, settings.port);
     ui->userLineEdit->setText(settings.user);
-    ui->simpleEmailLineEdit->setText(settings.user);
+    ui->emailLineEdit->setText(settings.email);
+    ui->simpleEmailLineEdit->setText(settings.email);
     ui->passwordLineEdit->setText(settings.password);
     ui->simplePasswordLineEdit->setText(settings.password);
     ui->signatureLineEdit->setText(settings.signature);
@@ -122,7 +156,6 @@ void QnSmtpSettingsWidget::updateFromSettings() {
     ui->stackedWidget->setCurrentIndex(ui->advancedCheckBox->isChecked()
         ? AdvancedPage
         : SimplePage);
-    updateFocusedElement();
 }
 
 void QnSmtpSettingsWidget::submitToSettings() {
@@ -139,27 +172,15 @@ bool QnSmtpSettingsWidget::discard() {
     return base_type::discard();
 }
 
-void QnSmtpSettingsWidget::updateFocusedElement() {
-    switch (ui->stackedWidget->currentIndex()) {
-    case SimplePage:
-        ui->simpleEmailLineEdit->setFocus();
-        break;
-    case AdvancedPage:
-        ui->serverLineEdit->setFocus();
-        break;
-    default:
-        break;
-    }
-}
+QnEmailSettings QnSmtpSettingsWidget::settings() const {
 
-QnEmail::Settings QnSmtpSettingsWidget::settings() const {
-
-    QnEmail::Settings result;
+    QnEmailSettings result;
 
     if (!ui->advancedCheckBox->isChecked()) {
-        QnEmail email(ui->simpleEmailLineEdit->text());
+        QnEmailAddress email(ui->simpleEmailLineEdit->text());
         result = email.settings();
-        result.user = ui->simpleEmailLineEdit->text();
+        result.email = ui->simpleEmailLineEdit->text(); 
+        result.user = result.email;
         result.password = ui->simplePasswordLineEdit->text();
         result.simple = true;
         result.signature = ui->simpleSignatureLineEdit->text();
@@ -168,6 +189,7 @@ QnEmail::Settings QnSmtpSettingsWidget::settings() const {
     }
 
     result.server = ui->serverLineEdit->text();
+    result.email = ui->emailLineEdit->text();
     result.port = ui->portComboBox->currentText().toInt();
     result.user = ui->userLineEdit->text();
     result.password = ui->passwordLineEdit->text();
@@ -176,8 +198,6 @@ QnEmail::Settings QnSmtpSettingsWidget::settings() const {
             : ui->sslRadioButton->isChecked()
               ? QnEmail::Ssl
               : QnEmail::Unsecure;
-    if (result.port == 0)
-        result.port = QnEmail::defaultPort(result.connectionType);
     result.simple = false;
     result.signature = ui->signatureLineEdit->text();
     result.supportEmail = ui->supportEmailLineEdit->text();
@@ -236,7 +256,7 @@ void QnSmtpSettingsWidget::loadSettings(const QString &server, QnEmail::Connecti
 
 void QnSmtpSettingsWidget::at_portComboBox_currentIndexChanged(int index) {
     int port = ui->portComboBox->itemData(index).toInt();
-    if (port == QnEmail::defaultPort(QnEmail::Ssl)) {
+    if (port == QnEmailSettings::defaultPort(QnEmail::Ssl)) {
         ui->tlsRecommendedLabel->hide();
         ui->sslRecommendedLabel->show();
     } else {
@@ -248,9 +268,9 @@ void QnSmtpSettingsWidget::at_portComboBox_currentIndexChanged(int index) {
 void QnSmtpSettingsWidget::at_advancedCheckBox_toggled(bool toggled) {
     if (toggled) {
         QString value = ui->simpleEmailLineEdit->text();
-        QnEmail email(value);
+        QnEmailAddress email(value);
 
-        QnEmail::SmtpServerPreset preset = email.smtpServer();
+        QnEmailSmtpServerPreset preset = email.smtpServer();
         if (preset.isNull()) {
             QString domain = email.domain();
             if (!domain.isEmpty())
@@ -259,13 +279,14 @@ void QnSmtpSettingsWidget::at_advancedCheckBox_toggled(bool toggled) {
         } else {
             loadSettings(preset.server, preset.connectionType, preset.port);
         }
-        ui->userLineEdit->setText(value);
+        ui->userLineEdit->setText(email.user());
+        ui->emailLineEdit->setText(value);
         ui->passwordLineEdit->setText(ui->simplePasswordLineEdit->text());
         ui->signatureLineEdit->setText(ui->simpleSignatureLineEdit->text());
         ui->supportEmailLineEdit->setText(ui->simpleSupportEmailLineEdit->text());
         validateEmailAdvanced();
     } else {
-        ui->simpleEmailLineEdit->setText(ui->userLineEdit->text());
+        ui->simpleEmailLineEdit->setText(ui->emailLineEdit->text());
         ui->simplePasswordLineEdit->setText(ui->passwordLineEdit->text());
         ui->simpleSignatureLineEdit->setText(ui->signatureLineEdit->text());
         ui->simpleSupportEmailLineEdit->setText(ui->supportEmailLineEdit->text());
@@ -275,29 +296,26 @@ void QnSmtpSettingsWidget::at_advancedCheckBox_toggled(bool toggled) {
 }
 
 void QnSmtpSettingsWidget::at_testButton_clicked() {
-    QnEmail::Settings result = settings();
+    QnEmailSettings result = settings();
     result.timeout = testSmtpTimeoutMSec / 1000;
 
-    if (result.isNull()) {
+    if (!result.isValid()) {
         QMessageBox::warning(this, tr("Invalid data"), tr("Provided parameters are not valid. Could not perform a test."));
         return;
     }
 
-    QnMediaServerResourcePtr serverResource;
-    QnMediaServerResourceList servers = qnResPool->getAllServers();
-    if (!servers.isEmpty()) {
-        serverResource = servers.first();
-        foreach(QnMediaServerResourcePtr mserver, servers)
-        {
-            if (mserver->getServerFlags() & Qn::SF_HasPublicIP) {
-                serverResource = mserver;
-                break;
-            }
-        }
+    QnMediaServerConnectionPtr serverConnection;
+    for(const QnMediaServerResourcePtr server: qnResPool->getAllServers()) {
+        if (server->getStatus() != Qn::Online)
+            continue;
+
+        if (!(server->getServerFlags() & Qn::SF_HasPublicIP))
+            continue;
+        
+        serverConnection = server->apiConnection();
+        break;
     }
-    QnMediaServerConnectionPtr serverConnection = serverResource
-        ? serverResource->apiConnection()
-        : QnMediaServerConnectionPtr();
+
     if (!serverConnection) {
         QMessageBox::warning(this, tr("Network Error"), tr("Could not perform a test. None of your servers has a public IP."));
         return;
@@ -307,7 +325,7 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
 
     ui->testServerLabel->setText(result.server);
     ui->testPortLabel->setText(QString::number(result.port == 0
-                                               ? QnEmail::defaultPort(result.connectionType)
+                                               ? QnEmailSettings::defaultPort(result.connectionType)
                                                : result.port));
     ui->testUserLabel->setText(result.user);
     ui->testSecurityLabel->setText(result.connectionType == QnEmail::Tls
@@ -336,7 +354,7 @@ void QnSmtpSettingsWidget::at_testEmailSettingsFinished(int status, const QnTest
         return;
 
     stopTesting(status != 0 || reply.errorCode != 0
-        ? tr("Error while testing settings")
+        ? tr("Failed")
         : tr("Success") );
 }
 
@@ -362,7 +380,7 @@ void QnSmtpSettingsWidget::validateEmailSimple() {
     const QString supportEmail = ui->simpleSupportEmailLineEdit->text();
 
     if (!targetEmail.isEmpty()) {
-        QnEmail email(targetEmail); 
+        QnEmailAddress email(targetEmail); 
         if (!email.isValid())
             errorText = tr("Email is not valid");
         else if (email.smtpServer().isNull())
@@ -370,7 +388,7 @@ void QnSmtpSettingsWidget::validateEmailSimple() {
     }
 
     if (errorText.isEmpty() && !supportEmail.isEmpty()) {
-        QnEmail support(supportEmail);
+        QnEmailAddress support(supportEmail);
         if (!support.isValid())
             errorText = tr("Support email is not valid");
     } 
@@ -381,10 +399,17 @@ void QnSmtpSettingsWidget::validateEmailSimple() {
 void QnSmtpSettingsWidget::validateEmailAdvanced() {
     QString errorText;
 
+    const QString targetEmail = ui->emailLineEdit->text();
     const QString supportEmail = ui->supportEmailLineEdit->text();
 
-    if (!supportEmail.isEmpty()) {
-        QnEmail support(supportEmail);
+    if (!targetEmail.isEmpty()) {
+        QnEmailAddress email(targetEmail); 
+        if (!email.isValid())
+            errorText = tr("Email is not valid");
+    }
+
+    if (errorText.isEmpty() && !supportEmail.isEmpty()) {
+        QnEmailAddress support(supportEmail);
         if (!support.isValid())
             errorText = tr("Support email is not valid");
     }
@@ -393,6 +418,13 @@ void QnSmtpSettingsWidget::validateEmailAdvanced() {
 }
 
 bool QnSmtpSettingsWidget::hasChanges() const  {
-    return settings() != QnGlobalSettings::instance()->emailSettings();
+    QnEmailSettings local = settings();
+    QnEmailSettings remote = QnGlobalSettings::instance()->emailSettings();
+
+    /* Do not notify about changes if no valid settings are provided. */
+    if (!local.isValid() && !remote.isValid())
+        return false;
+
+    return !local.equals(remote);
 }
 

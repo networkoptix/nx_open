@@ -3,6 +3,8 @@
 #include <QtGui/QPixmap>
 #include <QtGui/QPainter>
 
+#include <common/common_module.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/videowall_resource.h>
@@ -33,9 +35,13 @@ QnResourceIconCache::QnResourceIconCache(QObject *parent): QObject(parent) {
 
     m_cache.insert(Server | Offline,        qnSkin->icon("tree/server_offline.png"));
     m_cache.insert(Server | Incompatible,   qnSkin->icon("tree/server_incompatible.png"));
+    m_cache.insert(Server | Control,        qnSkin->icon("tree/server.png"));
     m_cache.insert(Camera | Offline,        qnSkin->icon("tree/camera_offline.png"));
     m_cache.insert(Camera | Unauthorized,   qnSkin->icon("tree/camera_unauthorized.png"));
     m_cache.insert(Layout | Locked,         qnSkin->icon("tree/layout_locked.png"));
+    m_cache.insert(VideoWallItem | Locked,  qnSkin->icon("tree/screen_locked.png"));
+    m_cache.insert(VideoWallItem | Control, qnSkin->icon("tree/screen_controlled.png"));
+    m_cache.insert(VideoWallItem | Offline, qnSkin->icon("tree/screen_offline.png"));
 
     m_cache.insert(Offline,                 qnSkin->icon("tree/offline.png"));
     m_cache.insert(Unauthorized,            qnSkin->icon("tree/unauthorized.png"));
@@ -127,7 +133,10 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr &resource)
     else {
         switch (resource->getStatus()) {
         case Qn::Online:
-            status = Online;
+            if (key == Server && resource->getId() == qnCommon->remoteGUID())
+                status = Control;
+            else
+                status = Online;
             break;
         case Qn::Offline:
             status = Offline;

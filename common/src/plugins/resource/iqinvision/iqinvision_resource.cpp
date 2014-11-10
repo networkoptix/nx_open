@@ -10,12 +10,7 @@ const QString QnPlIqResource::MANUFACTURE(lit("IqEye"));
 QnPlIqResource::QnPlIqResource()
 {
     setVendor(lit("IqEye"));
-    setAuth(lit("root"), lit("system"));
-}
-
-bool QnPlIqResource::isResourceAccessible()
-{
-    return updateMACAddress();
+    setDefaultAuth(lit("root"), lit("system"));
 }
 
 QString QnPlIqResource::getDriverName() const
@@ -141,7 +136,6 @@ bool QnPlIqResource::isRtp() const
         name == QLatin1String("IQM31S") ||
         name == QLatin1String("IQM32N") ||
         //name == QLatin1String("IQ765N") ||
-        name == QLatin1String("IQEYE753") ||
         name == QLatin1String("IQM32S");
 }
 

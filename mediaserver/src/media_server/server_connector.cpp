@@ -51,14 +51,20 @@ void QnServerConnector::at_moduleFinder_moduleUrlLost(const QnModuleInformation 
 }
 
 void QnServerConnector::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation) {
-    if (moduleInformation.isCompatibleToCurrentSystem())
-        return;
-
-    foreach (const QString &address, moduleInformation.remoteAddresses) {
-        QUrl url;
-        url.setHost(address);
-        url.setPort(moduleInformation.port);
-        removeConnection(moduleInformation, url);
+    if (moduleInformation.isCompatibleToCurrentSystem()) {
+        for (const QString &address: moduleInformation.remoteAddresses) {
+            QUrl url;
+            url.setHost(address);
+            url.setPort(moduleInformation.port);
+            addConnection(moduleInformation, url);
+        }
+    } else {
+        for (const QString &address: moduleInformation.remoteAddresses) {
+            QUrl url;
+            url.setHost(address);
+            url.setPort(moduleInformation.port);
+            removeConnection(moduleInformation, url);
+        }
     }
 }
 
@@ -103,15 +109,15 @@ void QnServerConnector::removeConnection(const QnModuleInformation &moduleInform
 void QnServerConnector::reconnect() {
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
 
-    foreach (const QString &urlStr, m_usedUrls)
+    for (const QString &urlStr: m_usedUrls)
         ec2Connection->deleteRemotePeer(urlStr);
     m_usedUrls.clear();
 
-    foreach (const QnModuleInformation &moduleInformation, m_moduleFinder->foundModules()) {
+    for (const QnModuleInformation &moduleInformation: m_moduleFinder->foundModules()) {
         if (!moduleInformation.isCompatibleToCurrentSystem())
             continue;
 
-        foreach (const QString &address, moduleInformation.remoteAddresses) {
+        for (const QString &address: moduleInformation.remoteAddresses) {
             QUrl url;
             url.setHost(address);
             url.setPort(moduleInformation.port);

@@ -8,7 +8,9 @@
 
 #include <api/app_server_connection.h>
 #include "nx_ec/dummy_handler.h"
-
+#include "nx_ec/data/api_resource_data.h"
+#include "../resource_management/resource_properties.h"
+#include "param.h"
 
 static const float MAX_EPS = 0.01f;
 static const int MAX_ISSUE_CNT = 3; // max camera issues during a 1 min.
@@ -128,8 +130,6 @@ void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& sup
     static const char* HLS_TRANSPORT_NAME = "hls";
     static const char* MJPEG_TRANSPORT_NAME = "mjpeg";
 
-    static const char* CAMERA_MEDIA_STREAM_LIST_PARAM_NAME = "mediaStreams";
-
     CameraMediaStreams fullStreamList( supportedNativeStreams );
     for( std::vector<CameraMediaStreamInfo>::iterator
         it = fullStreamList.streams.begin();
@@ -177,8 +177,8 @@ void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& sup
 #endif
 
     //saving fullStreamList;
-    const QByteArray& serializedStreams = QJson::serialized( fullStreamList );
-    setParam( QLatin1String(CAMERA_MEDIA_STREAM_LIST_PARAM_NAME), QLatin1String(serializedStreams), QnDomainDatabase );
+    QByteArray serializedStreams = QJson::serialized( fullStreamList );
+    setProperty(Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME, QString::fromUtf8(serializedStreams));
 }
 
 // --------------- QnVirtualCameraResource ----------------------
@@ -210,9 +210,7 @@ QString QnVirtualCameraResource::getUniqueId() const
 }
 
 bool QnVirtualCameraResource::isForcedAudioSupported() const {
-    QVariant val;
-    if (!getParam(lit("forcedIsAudioSupported"), val, QnDomainMemory))
-        return false;
+    QString val = getProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME);
     return val.toUInt() > 0;
 }
 
@@ -220,7 +218,7 @@ void QnVirtualCameraResource::forceEnableAudio()
 { 
 	if (isForcedAudioSupported())
         return;
-    setParam(lit("forcedIsAudioSupported"), 1, QnDomainDatabase); 
+    setProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME, 1);
     saveParams(); 
 }
 
@@ -228,39 +226,18 @@ void QnVirtualCameraResource::forceDisableAudio()
 { 
     if (!isForcedAudioSupported())
         return;
-    setParam(lit("forcedIsAudioSupported"), 0, QnDomainDatabase); 
+    setProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME, QString(lit("0")));
     saveParams(); 
 }
 
 void QnVirtualCameraResource::saveParams()
 {
-    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
-    QnKvPairList params;
-
-    foreach(const QnParam& param, getResourceParamList().list())
-    {
-        if (param.domain() == QnDomainDatabase)
-            params << QnKvPair(param.name(), param.value().toString());
-    }
-
-    QnKvPairListsById  outData;
-    ec2::ErrorCode rez = conn->getResourceManager()->saveSync(getId(), params, true, &outData);
-
-    if (rez != ec2::ErrorCode::ok) {
-        qCritical() << Q_FUNC_INFO << ": can't save resource params to Server. Resource physicalId: "
-            << getPhysicalId() << ". Description: " << ec2::toString(rez);
-    }
+    propertyDictionary->saveParams(getId());
 }
 
 void QnVirtualCameraResource::saveParamsAsync()
 {
-    QnKvPairList params;
-    foreach(const QnParam& param, getResourceParamList().list())
-    {
-        if (param.domain() == QnDomainDatabase)
-            params << QnKvPair(param.name(), param.value().toString());
-    }
-    QnAppServerConnectionFactory::getConnection2()->getResourceManager()->save(getId(), params, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    propertyDictionary->saveParamsAsync(getId());
 }
 
 QString QnVirtualCameraResource::toSearchString() const

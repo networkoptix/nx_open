@@ -175,7 +175,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     connect(m_dwm,                          SIGNAL(compositionChanged()),                   this,                                   SLOT(updateDwmState()));
 
     /* Set up properties. */
-    setWindowTitle(QApplication::applicationName());
+    setWindowTitle(QString());
     setAcceptDrops(true);
 
     if (!qnSettings->isVideoWallMode()) {
@@ -192,12 +192,16 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_view->setAutoFillBackground(true);
 
     /* Set up model & control machinery. */
+    display()->setLightMode(qnSettings->lightMode());
     display()->setScene(m_scene.data());
     display()->setView(m_view.data());
     if (qnSettings->isVideoWallMode())
         display()->setNormalMarginFlags(0);
     else
         display()->setNormalMarginFlags(Qn::MarginsAffectSize | Qn::MarginsAffectPosition);
+
+    if (qnSettings->lightMode() & Qn::LightModeNoSceneBackground)
+        action(Qn::ToggleBackgroundAnimationAction)->setDisabled(true);
 
     m_controller.reset(new QnWorkbenchController(this));
     if (qnSettings->isVideoWallMode())
@@ -250,7 +254,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::BusinessEventsLogAction));
     addAction(action(Qn::CameraListAction));
     addAction(action(Qn::BusinessEventsAction));
-    addAction(action(Qn::WebClientAction));
     addAction(action(Qn::OpenFileAction));
     addAction(action(Qn::OpenNewTabAction));
     addAction(action(Qn::OpenNewWindowAction));
@@ -273,6 +276,9 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::DebugShowResourcePoolAction));
     addAction(action(Qn::DebugControlPanelAction));
     addAction(action(Qn::ToggleBackgroundAnimationAction));
+#ifdef _DEBUG
+    addAction(action(Qn::SystemAdministrationAction));
+#endif
     connect(action(Qn::MaximizeAction),     SIGNAL(toggled(bool)),                          this,                                   SLOT(setMaximized(bool)));
     connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
     connect(action(Qn::MinimizeAction),     SIGNAL(triggered()),                            this,                                   SLOT(minimize()));

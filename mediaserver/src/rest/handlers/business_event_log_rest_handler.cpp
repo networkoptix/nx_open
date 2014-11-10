@@ -50,8 +50,9 @@ int QnBusinessEventLogRestHandler::executeGet(const QString& path, const QnReque
             }
             else if (params[i].first == "event") {
                 eventType = (QnBusiness::EventType) params[i].second.toInt();
-                if(!QnBusiness::allEvents().contains(eventType))
-                    errStr = QString("Invalid event type %1").arg(params[i].second);
+                if(!QnBusiness::allEvents().contains(eventType) 
+                    && !QnBusiness::hasChild(eventType))
+                       errStr = QString("Invalid event type %1").arg(params[i].second);
             }
             else if (params[i].first == "action") {
                 actionType = (QnBusiness::ActionType) params[i].second.toInt();

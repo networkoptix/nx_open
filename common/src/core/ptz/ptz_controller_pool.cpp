@@ -67,7 +67,7 @@ QnPtzControllerPool::QnPtzControllerPool(QObject *parent):
 
     connect(d->resourcePool,    &QnResourcePool::resourceAdded,             this,   &QnPtzControllerPool::registerResource);
     connect(d->resourcePool,    &QnResourcePool::resourceRemoved,           this,   &QnPtzControllerPool::unregisterResource);
-    foreach(const QnResourcePtr &resource, d->resourcePool->getResources())
+    for(const QnResourcePtr &resource: d->resourcePool->getResources())
         registerResource(resource);
 }
 

@@ -9,7 +9,7 @@
 #include <cstddef>
 
 
-class Socket;
+class Pollable;
 
 namespace aio
 {
@@ -40,6 +40,7 @@ namespace aio
         Every socket is always monitored for error and all errors are reported.
         \note This class is not thread-safe
         \note If multiple event occured on same socket each event will be presented separately
+        \note Polling same socket with two \a PollSet instances results in undefined behavior
     */
     class PollSet
     {
@@ -62,8 +63,8 @@ namespace aio
             //!Selects next socket which state has been changed with previous \a poll call
             const_iterator& operator++();       //++it
 
-            Socket* socket();
-            const Socket* socket() const;
+            Pollable* socket();
+            const Pollable* socket() const;
             /*!
                 \return Triggered event
             */
@@ -99,22 +100,17 @@ namespace aio
             \note Ivalidates all iterators
             \note \a userData is associated with pair (\a sock, \a eventType)
         */
-        bool add( Socket* const sock, EventType eventType, void* userData = NULL );
+        bool add( Pollable* const sock, EventType eventType, void* userData = NULL );
         //!Do not monitor event \a eventType on socket \a sock anymore
         /*!
-            \return User data, associated with \a sock and \a eventType. NULL, if \a sock was not found
             \note Ivalidates all iterators to the left of removed element. So, it is ok to iterate signalled sockets and remove current element
         */
-        void* remove( Socket* const sock, EventType eventType );
+        void remove( Pollable* const sock, EventType eventType );
         //!Returns number of sockets in pollset
         /*!
             Returned value should only be used for compare with \a maxPollSetSize()
         */
         size_t size() const;
-        /*!
-            \return NULL if \a sock is not listnened for \a eventType
-        */
-        void* getUserData( Socket* const sock, EventType eventType ) const;
         /*!
             \param millisToWait if 0, method returns immediatly. If > 0, returns on event or after \a millisToWait milliseconds.
                 If < 0, method blocks till event
@@ -122,13 +118,6 @@ namespace aio
             \note If multiple event occured on same socket each event will be present as a single element
         */
         int poll( int millisToWait = INFINITE_TIMEOUT );
-        //!Returns true, if can accept socket \a sock for monitoring
-        /*!
-            It is garanteed that, if socket is already present in pollset it will always be accepted for monitoring other events
-            \note This method is required only because \a select is used on win32. On linux and mac this method always returns \a true
-            \todo remove this method after moving windows implementation to IO Completion Ports
-        */
-        bool canAcceptSocket( Socket* const sock ) const;
 
         //!Returns iterator pointing to first socket, which state has been changed in previous \a poll call
         const_iterator begin() const;

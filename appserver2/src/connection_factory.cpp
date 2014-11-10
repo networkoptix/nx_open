@@ -11,6 +11,7 @@
 
 #include <network/authenticate_helper.h>
 #include <network/universal_tcp_listener.h>
+#include <nx_ec/ec_proto_version.h>
 #include <utils/common/concurrent.h>
 #include <utils/network/simple_http_client.h>
 
@@ -18,6 +19,7 @@
 #include "ec2_connection.h"
 #include "ec2_thread_pool.h"
 #include "nx_ec/data/api_resource_type_data.h"
+#include "nx_ec/data/api_camera_data_ex.h"
 #include "remote_ec_connection.h"
 #include "rest/ec2_base_query_http_handler.h"
 #include "rest/ec2_update_http_handler.h"
@@ -28,6 +30,7 @@
 #include <utils/common/app_info.h>
 #include "mutex/distributed_mutex_manager.h"
 #include "transaction/runtime_transaction_log.h"
+
 
 namespace ec2
 {
@@ -108,11 +111,11 @@ namespace ec2
         //AbstractResourceManager::getResource
         //registerGetFuncHandler<std::nullptr_t, ApiResourceData>( restProcessorPool, ApiCommand::getResource );
         //AbstractResourceManager::setResourceStatus
-        registerUpdateFuncHandler<ApiSetResourceStatusData>( restProcessorPool, ApiCommand::setResourceStatus );
+        registerUpdateFuncHandler<ApiResourceStatusData>( restProcessorPool, ApiCommand::setResourceStatus );
         //AbstractResourceManager::getKvPairs
-        registerGetFuncHandler<QnUuid, ApiResourceParamsData>( restProcessorPool, ApiCommand::getResourceParams );
+        registerGetFuncHandler<QnUuid, ApiResourceParamWithRefDataList>( restProcessorPool, ApiCommand::getResourceParams );
         //AbstractResourceManager::save
-        registerUpdateFuncHandler<ApiResourceParamsData>( restProcessorPool, ApiCommand::setResourceParams );
+        registerUpdateFuncHandler<ApiResourceParamWithRefDataList>( restProcessorPool, ApiCommand::setResourceParams );
         //AbstractResourceManager::save
         registerUpdateFuncHandler<ApiResourceData>( restProcessorPool, ApiCommand::saveResource );
         //AbstractResourceManager::remove
@@ -123,9 +126,21 @@ namespace ec2
         registerGetFuncHandler<QnUuid, ApiMediaServerDataList>( restProcessorPool, ApiCommand::getMediaServers );
         //AbstractMediaServerManager::save
         registerUpdateFuncHandler<ApiMediaServerData>( restProcessorPool, ApiCommand::saveMediaServer );
+        //AbstractCameraManager::saveUserAttributes
+        registerUpdateFuncHandler<ApiMediaServerUserAttributesDataList>( restProcessorPool, ApiCommand::saveServerUserAttributesList );
+        //AbstractCameraManager::getUserAttributes
+        registerGetFuncHandler<QnUuid, ApiMediaServerUserAttributesDataList>( restProcessorPool, ApiCommand::getServerUserAttributes );
         //AbstractMediaServerManager::remove
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeMediaServer );
 
+        //AbstractMediaServerManager::getServersEx
+        registerGetFuncHandler<QnUuid, ApiMediaServerDataExList>( restProcessorPool, ApiCommand::getMediaServersEx );
+
+        registerUpdateFuncHandler<ApiStorageDataList>( restProcessorPool, ApiCommand::saveStorages);
+        registerUpdateFuncHandler<ApiStorageData>( restProcessorPool, ApiCommand::saveStorage);
+        registerUpdateFuncHandler<ApiIdDataList>( restProcessorPool, ApiCommand::removeStorages);
+        registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeStorage);
+        registerUpdateFuncHandler<ApiIdDataList>( restProcessorPool, ApiCommand::removeResources);
 
         //AbstractCameraManager::addCamera
         registerUpdateFuncHandler<ApiCameraData>( restProcessorPool, ApiCommand::saveCamera );
@@ -133,6 +148,10 @@ namespace ec2
         registerUpdateFuncHandler<ApiCameraDataList>( restProcessorPool, ApiCommand::saveCameras );
         //AbstractCameraManager::getCameras
         registerGetFuncHandler<QnUuid, ApiCameraDataList>( restProcessorPool, ApiCommand::getCameras );
+        //AbstractCameraManager::saveUserAttributes
+        registerUpdateFuncHandler<ApiCameraAttributesDataList>( restProcessorPool, ApiCommand::saveCameraUserAttributesList );
+        //AbstractCameraManager::getUserAttributes
+        registerGetFuncHandler<QnUuid, ApiCameraAttributesDataList>( restProcessorPool, ApiCommand::getCameraUserAttributes );
         //AbstractCameraManager::addCameraHistoryItem
         registerUpdateFuncHandler<ApiCameraServerItemData>( restProcessorPool, ApiCommand::addCameraHistoryItem );
         //AbstractCameraManager::removeCameraHistoryItem
@@ -141,6 +160,10 @@ namespace ec2
         registerGetFuncHandler<std::nullptr_t, ApiCameraServerItemDataList>( restProcessorPool, ApiCommand::getCameraHistoryItems );
         //AbstractCameraManager::getBookmarkTags
         registerGetFuncHandler<std::nullptr_t, ApiCameraBookmarkTagDataList>( restProcessorPool, ApiCommand::getCameraBookmarkTags );
+        //AbstractCameraManager::getCamerasEx
+        registerGetFuncHandler<QnUuid, ApiCameraDataExList>( restProcessorPool, ApiCommand::getCamerasEx );
+
+        registerGetFuncHandler<QnUuid, ApiStorageDataList>( restProcessorPool, ApiCommand::getStorages );
 
         //AbstractCameraManager::getBookmarkTags
 
@@ -205,12 +228,14 @@ namespace ec2
         //AbstractMiscManager::moduleInfoList
         registerUpdateFuncHandler<ApiModuleDataList>(restProcessorPool, ApiCommand::moduleInfoList);
 
-        //AbstractMiscManager::discoverPeer
+        //AbstractDiscoveryManager::discoverPeer
         registerUpdateFuncHandler<ApiDiscoverPeerData>(restProcessorPool, ApiCommand::discoverPeer);
-        //AbstractMiscManager::addDiscoveryInformation
-        registerUpdateFuncHandler<ApiDiscoveryDataList>(restProcessorPool, ApiCommand::addDiscoveryInformation);
-        //AbstractMiscManager::removeDiscoveryInformation
-        registerUpdateFuncHandler<ApiDiscoveryDataList>(restProcessorPool, ApiCommand::removeDiscoveryInformation);
+        //AbstractDiscoveryManager::addDiscoveryInformation
+        registerUpdateFuncHandler<ApiDiscoveryData>(restProcessorPool, ApiCommand::addDiscoveryInformation);
+        //AbstractDiscoveryManager::removeDiscoveryInformation
+        registerUpdateFuncHandler<ApiDiscoveryData>(restProcessorPool, ApiCommand::removeDiscoveryInformation);
+        //AbstractDiscoveryManager::getDiscoveryData
+        registerGetFuncHandler<std::nullptr_t, ApiDiscoveryDataList>(restProcessorPool, ApiCommand::getDiscoveryData);
         //AbstractMiscManager::changeSystemName
         registerUpdateFuncHandler<ApiSystemNameData>(restProcessorPool, ApiCommand::changeSystemName);
 
@@ -237,6 +262,9 @@ namespace ec2
             std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2 ) );
         registerFunctorHandler<ApiLoginData, QnConnectionInfo>( restProcessorPool, ApiCommand::testConnection,
             std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2 ) );
+
+        registerFunctorHandler<std::nullptr_t, ApiResourceParamDataList>( restProcessorPool, ApiCommand::getSettings,
+            std::bind( &Ec2DirectConnectionFactory::getSettings, this, _1, _2 ) );
     }
 
     void Ec2DirectConnectionFactory::setContext( const ResourceContext& resCtx )
@@ -383,7 +411,7 @@ namespace ec2
                         ecURL,
                         [reqID, handler](ErrorCode errorCode, const QnConnectionInfo& oldECConnectionInfo) {
                             if( errorCode == ErrorCode::ok && oldECConnectionInfo.version >= SoftwareVersionType( 2, 3, 0 ) )
-                                handler->done(  //somehow, connected to 2.3 server ith old ec connection. Returning error, since could not connect to ec 2.3 during normal connect
+                                handler->done(  //somehow, connected to 2.3 server with old ec connection. Returning error, since could not connect to ec 2.3 during normal connect
                                     reqID,
                                     ErrorCode::ioError,
                                     AbstractECConnectionPtr() );
@@ -451,6 +479,7 @@ namespace ec2
         connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
         connectionInfo->box = QnAppInfo::armBox();
         connectionInfo->allowSslConnections = m_sslEnabled;
+        connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
         return ErrorCode::ok;
     }
 
@@ -483,6 +512,13 @@ namespace ec2
         m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
             addr, ApiCommand::testConnection, loginInfo, func );
         return reqID;
+    }
+
+    ErrorCode Ec2DirectConnectionFactory::getSettings( std::nullptr_t, ApiResourceParamDataList* const outData )
+    {
+        if( !QnDbManager::instance() )
+            return ErrorCode::ioError;
+        return QnDbManager::instance()->readSettings( *outData );
     }
 
     template<class InputDataType>

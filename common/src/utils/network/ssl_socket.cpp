@@ -173,25 +173,25 @@ namespace {
     // must since OpenSSL configured with thread support will give default version. Additionally, the
     // dynamic lock interface is not used in current OpenSSL version. So we don't use it.
 
-    static std::mutex* kOpenSSLGlobalLock;
+    static std::unique_ptr<std::mutex[]> kOpenSSLGlobalLock;
 
     void OpenSSLGlobalLock( int mode , int type , const char* file , int line ) {
         Q_UNUSED(file);
         Q_UNUSED(line);
-        Q_ASSERT( kOpenSSLGlobalLock != NULL );
+        Q_ASSERT( kOpenSSLGlobalLock.get() != nullptr );
         if( mode & CRYPTO_LOCK ) {
-            kOpenSSLGlobalLock[type].lock();
+            kOpenSSLGlobalLock.get()[type].lock();
         } else {
-            kOpenSSLGlobalLock[type].unlock();
+            kOpenSSLGlobalLock.get()[type].unlock();
         }
     }
 
     static std::once_flag kOpenSSLGlobalLockFlag;
 
     void OpenSSLInitGlobalLock() {
-        Q_ASSERT(kOpenSSLGlobalLock == NULL);
+        Q_ASSERT(kOpenSSLGlobalLock.get() == nullptr);
         // not safe here, new can throw exception 
-        kOpenSSLGlobalLock = new std::mutex[CRYPTO_num_locks()];
+        kOpenSSLGlobalLock.reset( new std::mutex[CRYPTO_num_locks()] );
     }
 
     void InitOpenSSLGlobalLock() {
@@ -382,7 +382,7 @@ namespace {
     private: // MISC
 
         bool IsBIOInBufferEmpty() {
-            return bio_in_buffer_pos_ != bio_in_buffer_.size();
+            return bio_in_buffer_pos_ != (size_t)bio_in_buffer_.size();
         }
 
         int DrainSSLBufferComponent( nx::Buffer* buffer , int bit_pos );
@@ -530,7 +530,7 @@ namespace {
                 std::min( size , static_cast<std::size_t>( bio_in_buffer_.size() - bio_in_buffer_pos_ ));
             memcpy(data, bio_in_buffer_.constData()+bio_in_buffer_pos_, digest_size);
             bio_in_buffer_pos_ += digest_size;
-            if( bio_in_buffer_pos_ == bio_in_buffer_.size() ) {
+            if( bio_in_buffer_pos_ == (size_t)bio_in_buffer_.size() ) {
                 bio_in_buffer_pos_ = 0;
                 bio_in_buffer_.clear();
             }
@@ -1374,6 +1374,7 @@ void QnSSLSocket::initSSLEngine(const QByteArray& certData)
         SSLStaticData::instance()->serverCTX->default_passwd_callback_userdata);
     SSL_CTX_use_certificate(SSLStaticData::instance()->serverCTX, x);
     SSL_CTX_use_certificate(SSLStaticData::instance()->clientCTX, x);
+    X509_free( x );
     BIO_free(bufio);
 
     bufio = BIO_new_mem_buf((void*) certData.data(), certData.size());
@@ -1397,9 +1398,7 @@ class QnSSLSocketPrivate
 {
 public:
     AbstractStreamSocket* wrappedSocket;
-    SSL* ssl;
-    BIO* read;
-    BIO* write;
+    std::unique_ptr<SSL, decltype(&SSL_free)> ssl;
     bool isServerSide;
     quint8 extraBuffer[32];
     int extraBufferLen;
@@ -1415,11 +1414,9 @@ public:
     std::shared_ptr<AsyncSSL> async_ssl_ptr;
 
     QnSSLSocketPrivate()
-        :
+    :
         wrappedSocket( nullptr ),
-        ssl(nullptr),
-        read(nullptr),
-        write(nullptr),
+        ssl( nullptr, SSL_free ),
         isServerSide( false ),
         extraBufferLen( 0 ),
         ecnryptionEnabled(false),
@@ -1437,7 +1434,7 @@ QnSSLSocket::QnSSLSocket(AbstractStreamSocket* wrappedSocket, bool isServerSide)
     d->extraBufferLen = 0;
     init();
     InitOpenSSLGlobalLock();
-    d->async_ssl_ptr.reset( new AsyncSSL(d->ssl,isServerSide,d->wrappedSocket) );
+    d->async_ssl_ptr.reset( new AsyncSSL(d->ssl.get(),isServerSide,d->wrappedSocket) );
 }
 
 QnSSLSocket::QnSSLSocket(QnSSLSocketPrivate* priv, AbstractStreamSocket* wrappedSocket, bool isServerSide):
@@ -1455,21 +1452,20 @@ void QnSSLSocket::init()
 {
     Q_D(QnSSLSocket);
 
-    d->read = BIO_new(&Proxy_server_socket);
-    BIO_set_nbio(d->read, 1);
-    BIO_set_app_data(d->read, this);
+    BIO* rbio = BIO_new(&Proxy_server_socket);
+    BIO_set_nbio(rbio, 1);
+    BIO_set_app_data(rbio, this);
 
-    d->write = BIO_new(&Proxy_server_socket);
-    BIO_set_app_data(d->write, this);
-    BIO_set_nbio(d->write, 1);
+    BIO* wbio = BIO_new(&Proxy_server_socket);
+    BIO_set_app_data(wbio, this);
+    BIO_set_nbio(wbio, 1);
 
     assert(d->isServerSide ? SSLStaticData::instance()->serverCTX : SSLStaticData::instance()->clientCTX);
 
-    d->ssl = SSL_new(d->isServerSide ? SSLStaticData::instance()->serverCTX : SSLStaticData::instance()->clientCTX);  // get new SSL state with context 
-    SSL_set_verify(d->ssl, SSL_VERIFY_NONE, NULL);
-    SSL_set_session_id_context(d->ssl, sid, 4);
-    SSL_set_bio(d->ssl, d->read, d->write);
-
+    d->ssl.reset( SSL_new(d->isServerSide ? SSLStaticData::instance()->serverCTX : SSLStaticData::instance()->clientCTX) );  // get new SSL state with context 
+    SSL_set_verify(d->ssl.get(), SSL_VERIFY_NONE, NULL);
+    SSL_set_session_id_context(d->ssl.get(), sid, 4);
+    SSL_set_bio(d->ssl.get(), rbio, wbio);  //d->ssl will free bio when freed
 }
 
 QnSSLSocket::~QnSSLSocket()
@@ -1478,9 +1474,6 @@ QnSSLSocket::~QnSSLSocket()
     if(d->mode == ASYNC ) {
         if(d->async_ssl_ptr)
             d->async_ssl_ptr->WaitForAllPendingIOFinish();
-    } else {
-        if (d->ssl)
-            SSL_free(d->ssl);
     }
     delete d->wrappedSocket;
     delete d_ptr;
@@ -1490,18 +1483,18 @@ QnSSLSocket::~QnSSLSocket()
 bool QnSSLSocket::doServerHandshake()
 {
     Q_D(QnSSLSocket);
-    SSL_set_accept_state(d->ssl);
+    SSL_set_accept_state(d->ssl.get());
 
-    return SSL_do_handshake(d->ssl) == 1;
+    return SSL_do_handshake(d->ssl.get()) == 1;
 }
 
 bool QnSSLSocket::doClientHandshake()
 {
     Q_D(QnSSLSocket);
-    SSL_set_connect_state(d->ssl);
+    SSL_set_connect_state(d->ssl.get());
 
-    int ret = SSL_do_handshake(d->ssl);
-    //int err2 = SSL_get_error(d->ssl, ret);
+    int ret = SSL_do_handshake(d->ssl.get());
+    //int err2 = SSL_get_error(d->ssl.get(), ret);
     //const char* err = ERR_reason_error_string(ERR_get_error());
     return ret == 1;
 }
@@ -1534,13 +1527,13 @@ int QnSSLSocket::recv( void* buffer, unsigned int bufferLen, int flags)
         return d->wrappedSocket->recv( buffer, bufferLen, flags );
 
     d->mode.store(QnSSLSocket::SYNC,std::memory_order_release);
-    if (!SSL_is_init_finished(d->ssl)) {
+    if (!SSL_is_init_finished(d->ssl.get())) {
         if (d->isServerSide)
             doServerHandshake();
         else
             doClientHandshake();
     }
-    return SSL_read(d->ssl, (char*) buffer, bufferLen);
+    return SSL_read(d->ssl.get(), (char*) buffer, bufferLen);
 }
 
 int QnSSLSocket::sendInternal( const void* buffer, unsigned int bufferLen )
@@ -1557,14 +1550,14 @@ int QnSSLSocket::send( const void* buffer, unsigned int bufferLen )
         return d->wrappedSocket->send( buffer, bufferLen );
 
     d->mode.store(QnSSLSocket::SYNC,std::memory_order_release);
-    if (!SSL_is_init_finished(d->ssl)) {
+    if (!SSL_is_init_finished(d->ssl.get())) {
         if (d->isServerSide)
             doServerHandshake();
         else
             doClientHandshake();
     }
 
-    return SSL_write(d->ssl, buffer, bufferLen);
+    return SSL_write(d->ssl.get(), buffer, bufferLen);
 }
 
 bool QnSSLSocket::reopen()
@@ -1759,6 +1752,12 @@ bool QnSSLSocket::dispatchImpl( std::function<void()>&& handler )
     return d->wrappedSocket->dispatch( std::move(handler) );
 }
 
+void QnSSLSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
+{
+    Q_D(const QnSSLSocket);
+    return d->wrappedSocket->terminateAsyncIO( waitForRunningHandlerCompletion );
+}
+
 bool QnSSLSocket::connectWithoutEncryption(
     const QString& foreignAddress,
     unsigned short foreignPort,
@@ -1853,7 +1852,7 @@ QnMixedSSLSocket::QnMixedSSLSocket(AbstractStreamSocket* wrappedSocket):
     Q_D(QnMixedSSLSocket);
     d->initState = true;
     d->useSSL = false;
-    d->async_ssl_ptr.reset( new MixedAsyncSSL(d->ssl,d->wrappedSocket));
+    d->async_ssl_ptr.reset( new MixedAsyncSSL(d->ssl.get(),d->wrappedSocket));
 }
 
 int QnMixedSSLSocket::recv( void* buffer, unsigned int bufferLen, int flags)

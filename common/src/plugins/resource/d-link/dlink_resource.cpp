@@ -47,7 +47,7 @@ QSize QnDlink_cam_info::resolutionCloseTo(int width) const
     QSize result = resolutions.at(0);
 
 
-    foreach(const QSize& size, resolutions)
+    for(const QSize& size: resolutions)
     {
         if (size.width() <= width)
             return size;
@@ -85,7 +85,7 @@ int QnDlink_cam_info::frameRateCloseTo(int fr)
 
     int result = possibleFps.at(0);
 
-    foreach(int fps, possibleFps)
+    for(int fps: possibleFps)
     {
         if (fps <= fr)
         {
@@ -118,13 +118,7 @@ QSize QnDlink_cam_info::secondaryStreamResolution() const
 QnPlDlinkResource::QnPlDlinkResource()
 {
     setVendor(lit("Dlink"));
-    setAuth(QLatin1String("admin"), QLatin1String(""));
-}
-
-
-bool QnPlDlinkResource::isResourceAccessible()
-{
-    return true;
+    setDefaultAuth(QLatin1String("admin"), QLatin1String(""));
 }
 
 QString QnPlDlinkResource::getDriverName() const
@@ -201,7 +195,7 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
 
     m_camInfo.clear();
 
-    foreach(QString line, lines)
+    for(const QString& line: lines)
     {
         if (line.contains(QLatin1String("videos=")))
         {
@@ -219,7 +213,7 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
         else if (line.contains(QLatin1String("resolutions=")))
         {
             QStringList vals = getValues(line);
-            foreach(const QString& val,  vals)
+            for(const QString& val:  vals)
             {
                 QStringList wh_s = val.split(QLatin1Char('x'));
                 if (wh_s.size()<2)
@@ -232,7 +226,7 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
         else if (line.contains(QLatin1String("framerates=")))
         {
             QStringList vals = getValues(line);
-            foreach(const QString& val,  vals)
+            for(const QString& val:  vals)
             {
                 m_camInfo.possibleFps.push_back( val.toInt() );
 
@@ -241,7 +235,7 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
         else if (line.contains(QLatin1String("vbitrates=")))
         {
             QStringList vals = getValues(line);
-            foreach(QString bs, vals)
+            for(const QString& bs: vals)
             {
                 bool m = bs.toLower().contains(QLatin1Char('m'));
                 bool k = bs.toLower().contains(QLatin1Char('k'));
@@ -371,7 +365,7 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
     };
 
     int sensitivity = 50;
-    QnMotionRegion region = m_motionMaskList[0];
+    QnMotionRegion region = getMotionRegion(0);
     for (int sens = QnMotionRegion::MIN_SENSITIVITY+1; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
     {
 

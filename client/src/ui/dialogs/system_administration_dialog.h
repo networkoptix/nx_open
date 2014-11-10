@@ -32,7 +32,6 @@ public:
 
     virtual void accept() override;
     virtual void reject() override;
-    bool tryClose(bool force);
 
 private:
     Q_DISABLE_COPY(QnSystemAdministrationDialog)

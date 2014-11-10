@@ -714,7 +714,7 @@ namespace Qee {
     QVariant Evaluator::evaluate(const Program &program) const {
         QVector<QVariant> stack;
 
-        foreach(const Instruction &instruction, program)
+        for(const Instruction &instruction: program)
             exec(stack, instruction);
 
         if(stack.size() != 1)

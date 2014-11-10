@@ -61,6 +61,7 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget *parent, Qt::Window
     m_staticTexts[UnauthorizedText] = tr("Unauthorized");
     m_staticTexts[UnauthorizedSubText] = tr("Please check authentication information<br/>in camera settings");
     m_staticTexts[AnalogLicenseText] = tr("Activate analog license to remove this message");
+    m_staticTexts[VideowallLicenseText] = tr("Activate Video Wall license to remove this message");
     m_staticTexts[LoadingText] = tr("Loading...");
 
     for(int i = 0; i < m_staticTexts.size(); i++) {
@@ -212,6 +213,9 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
         paintFlashingText(painter, m_staticTexts[UnauthorizedText], 0.125);
         paintFlashingText(painter, m_staticTexts[UnauthorizedSubText], 0.05, QPointF(0.0, 0.25));
         break;
+    case Qn::ServerUnauthorizedOverlay:
+        paintFlashingText(painter, m_staticTexts[UnauthorizedText], 0.125);
+        break;
     case Qn::ServerOfflineOverlay:
         paintFlashingText(painter, m_staticTexts[ServerOfflineText], 0.125);
         break;
@@ -223,6 +227,14 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
                 paintFlashingText(painter, m_staticTexts[AnalogLicenseText], 0.035, QPointF(0.0, 0.06 * i));
             break;
         }   
+    case Qn::VideowallWithoutLicenseOverlay:
+        {
+            QRectF rect = this->rect();
+            int count = qFloor(qMax(1.0, rect.height() / rect.width()) * 7.5);
+            for (int i = -count; i <= count; i++)
+                paintFlashingText(painter, m_staticTexts[VideowallLicenseText], 0.035, QPointF(0.0, 0.06 * i));
+            break;
+        }
     default:
         break;
     }
@@ -237,10 +249,14 @@ void QnStatusOverlayWidget::paintFlashingText(QPainter *painter, const QStaticTe
     QnScopedPainterPenRollback penRollback(painter, palette().color(QPalette::WindowText));
     QnScopedPainterTransformRollback transformRollback(painter);
 
+    qreal scaleFactor = textSize * unit / staticFontSize;
+    if (text.size().width() * scaleFactor > rect.width())
+        scaleFactor = rect.width() / text.size().width();
+
     qreal opacity = painter->opacity();
     painter->setOpacity(opacity * qAbs(std::sin(QDateTime::currentMSecsSinceEpoch() / qreal(flashingPeriodMSec * 2) * M_PI)));
     painter->translate(rect.center() + offset * unit);
-    painter->scale(textSize * unit / staticFontSize, textSize * unit / staticFontSize);
+    painter->scale(scaleFactor, scaleFactor);
 
     painter->drawStaticText(-toPoint(text.size() / 2), text);
     painter->setOpacity(opacity);

@@ -119,12 +119,12 @@ void QnMediaServerStatisticsStorage::at_statisticsReceived(int status, const QnS
     }
 
     QSet<QString> notUpdated;
-    foreach(QString key, m_history.keys())
+    for(const QString& key: m_history.keys())
         notUpdated << key;
 
     m_uptimeMs = reply.uptimeMs;
 
-    foreach(const QnStatisticsDataItem &nextData, reply.statistics) 
+    for(const QnStatisticsDataItem &nextData: reply.statistics) 
     {
 
         if (m_flagsFilter.contains(nextData.deviceType) &&
@@ -141,7 +141,7 @@ void QnMediaServerStatisticsStorage::at_statisticsReceived(int status, const QnS
         normalizeValuesList(stats.values, m_pointsLimit);
     }
 
-    foreach(QString id, notUpdated) {
+    for(const QString& id: notUpdated) {
         QnStatisticsData &stats = m_history[id];
         stats.values.append(noDataValue);
         normalizeValuesList(stats.values, m_pointsLimit);

@@ -11,6 +11,7 @@
 #include "ui/common/ui_resource_name.h"
 #include "ui/style/warning_style.h"
 #include "utils/merge_systems_tool.h"
+#include "utils/common/util.h"
 
 QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
     QDialog(parent),
@@ -29,6 +30,8 @@ QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
     buttonGroup->addButton(ui->remoteSystemRadioButton);
 
     connect(ui->urlComboBox,            SIGNAL(activated(int)),             this,   SLOT(at_urlComboBox_activated(int)));
+    connect(ui->urlComboBox->lineEdit(),&QLineEdit::editingFinished,        this,   &QnMergeSystemsDialog::at_urlComboBox_editingFinished);
+    connect(ui->urlComboBox->lineEdit(),SIGNAL(returnPressed()),            ui->passwordEdit,   SLOT(setFocus()));
     connect(ui->passwordEdit,           &QLineEdit::returnPressed,          this,   &QnMergeSystemsDialog::at_testConnectionButton_clicked);
     connect(ui->testConnectionButton,   &QPushButton::clicked,              this,   &QnMergeSystemsDialog::at_testConnectionButton_clicked);
     connect(m_mergeButton,              &QPushButton::clicked,              this,   &QnMergeSystemsDialog::at_mergeButton_clicked);
@@ -99,6 +102,13 @@ void QnMergeSystemsDialog::at_urlComboBox_activated(int index) {
     ui->passwordEdit->setFocus();
 }
 
+void QnMergeSystemsDialog::at_urlComboBox_editingFinished() {
+    QUrl url = QUrl::fromUserInput(ui->urlComboBox->currentText());
+    if (url.port() == -1)
+        url.setPort(DEFAULT_APPSERVER_PORT);
+    ui->urlComboBox->setCurrentText(url.toString());
+}
+
 void QnMergeSystemsDialog::at_testConnectionButton_clicked() {
     m_discoverer.clear();
     m_url.clear();
@@ -142,9 +152,13 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(const QnModuleInformation &m
     ui->buttonBox->hideProgress();
 
     switch (errorCode) {
-    case QnMergeSystemsTool::NoError:
-        if (qnResPool->getResourceById(moduleInformation.id)) {
-            updateErrorLabel(tr("This is the current system URL."));
+    case QnMergeSystemsTool::NoError: {
+        QnMediaServerResourcePtr server = qnResPool->getResourceById(moduleInformation.id).dynamicCast<QnMediaServerResource>();
+        if (server && server->getStatus() == Qn::Online && moduleInformation.systemName == qnCommon->localSystemName()) {
+            if (m_url.host() == lit("localhost") || m_url.host() == lit("127.0.0.1"))
+                updateErrorLabel(tr("Use a specific hostname or IP address rather than %1.").arg(m_url.host()));
+            else
+                updateErrorLabel(tr("This is the current system URL."));
             break;
         }
         m_discoverer = discoverer;
@@ -154,6 +168,7 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(const QnModuleInformation &m
         ui->remoteSystemRadioButton->setText(moduleInformation.systemName);
         updateErrorLabel(QString());
         break;
+    }
     case QnMergeSystemsTool::AuthentificationError:
         updateErrorLabel(tr("The password is invalid."));
         break;

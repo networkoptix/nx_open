@@ -5,6 +5,10 @@ import argparse
 import os
 from itertools import combinations
 
+class Project:
+    CLIENT = 'client'
+    INTRO = ["intro.mkv", "intro.avi", "intro.png", "intro.jpg", "intro.jpeg"]
+
 class ColorDummy():
     class Empty(object):
         def __getattribute__(self, name):
@@ -28,13 +32,19 @@ def err(message):
     print colorer.Style.BRIGHT + colorer.Fore.RED + message
 
 class Customization():
-    def __init__(self, name, path):
+    def __init__(self, name, path, project):
         self.name = name
         self.path = path
-        skinPath = os.path.join(self.path, 'client/resources')
-        self.basePath = os.path.join(skinPath, 'skin')
-        self.darkPath = os.path.join(skinPath, 'skin_dark')
-        self.lightPath = os.path.join(skinPath, 'skin_light')
+        self.project = project
+        self.rootPath = os.path.join(self.path, project)
+        if project == Project.CLIENT:
+            self.basePath = os.path.join(self.rootPath, 'resources', 'skin')
+            self.darkPath = os.path.join(self.rootPath, 'resources', 'skin_dark')
+            self.lightPath = os.path.join(self.rootPath, 'resources', 'skin_light')
+        else:
+            self.basePath = self.rootPath
+            #self.darkPath = os.path.join(self.rootPath, 'resources', 'skin_dark')
+            #self.lightPath = os.path.join(self.rootPath, 'resources', 'skin_light')
         self.base = []
         self.dark = []
         self.light = []
@@ -52,6 +62,9 @@ class Customization():
         err('Invalid build.properties file: ' + os.path.join(self.path, 'build.properties'))
         return False
         
+    def relativePath(self, path, entry):
+        return os.path.relpath(os.path.join(path, entry), self.rootPath)
+       
     def populateFileList(self):
     
         for dirname, dirnames, filenames in os.walk(self.basePath):
@@ -59,22 +72,36 @@ class Customization():
             for filename in filenames:
                 self.base.append(os.path.join(dirname, filename)[cut:])
         
-        for dirname, dirnames, filenames in os.walk(self.darkPath):
-            cut = len(self.darkPath) + 1
-            for filename in filenames:
-                self.dark.append(os.path.join(dirname, filename)[cut:])
+        if hasattr(self, 'darkPath'):
+            for dirname, dirnames, filenames in os.walk(self.darkPath):
+                cut = len(self.darkPath) + 1
+                for filename in filenames:
+                    self.dark.append(os.path.join(dirname, filename)[cut:])
+        
+        if hasattr(self, 'lightPath'):
+            for dirname, dirnames, filenames in os.walk(self.lightPath):
+                cut = len(self.lightPath) + 1
+                for filename in filenames:
+                    self.light.append(os.path.join(dirname, filename)[cut:])
                 
-        for dirname, dirnames, filenames in os.walk(self.lightPath):
-            cut = len(self.lightPath) + 1
-            for filename in filenames:
-                self.light.append(os.path.join(dirname, filename)[cut:])
-                
-        self.total = list(set(self.base + self.dark + self.light))
+        self.total = sorted(list(set(self.base + self.dark + self.light)))
         
     def validateInner(self):
         info('Validating ' + self.name + '...')
         clean = True
         error = False
+        
+        if self.project == Project.CLIENT:
+            hasIntro = False
+            for intro in Project.INTRO:
+                if intro in self.total:
+                    hasIntro = True
+            
+            if not hasIntro:
+                clean = False
+                error = True
+                err('Intro is missing in ' + self.name)
+        
         for entry in self.base:
             if entry in self.dark and entry in self.light:
                 clean = False
@@ -84,19 +111,19 @@ class Customization():
             if not entry in self.light:
                 clean = False
                 if entry in self.base:
-                    warn('File ' + os.path.join(self.lightPath, entry) + ' missing, using base version')
+                    warn('File ' + self.relativePath(self.lightPath, entry) + ' missing, using base version')
                 else:
                     error = True
-                    err('File ' + os.path.join(self.darkPath, entry) + ' missing in light skin')
+                    err('File ' + self.relativePath(self.darkPath, entry) + ' missing in light skin')
                 
         for entry in self.light:
             if not entry in self.dark:
                 clean = False
                 if entry in self.base:
-                    warn('File ' + os.path.join(self.darkPath, entry) + ' missing, using base version')
+                    warn('File ' + self.relativePath(self.darkPath, entry) + ' missing, using base version')
                 else:
                     error = True
-                    err('File ' + os.path.join(self.lightPath, entry) + ' missing in dark skin')
+                    err('File ' + self.relativePath(self.lightPath, entry) + ' missing in dark skin')
         if clean:
             green('Success')
         if error:
@@ -106,10 +133,17 @@ class Customization():
     def validateCross(self, other):
         info('Validating ' + self.name + ' vs ' + other.name + '...')
         clean = True
+       
         for entry in self.total:
+            #Intro files are checked an inner way
+            if self.project == Project.CLIENT:
+                if entry in Project.INTRO:
+                    continue
+                
             if not entry in other.total:
                 clean = False
-                err('File ' + os.path.join(self.basePath, entry) + ' missing in ' + other.name)
+                err('File ' + self.relativePath(self.basePath, entry) + ' missing in ' + other.name)
+                
         if clean:
             green('Success')
             return 0
@@ -118,12 +152,15 @@ class Customization():
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--color', action='store_true', help="colorized output")
+    parser.add_argument('-p', '--project', default='client', help="target project, default is client")
     args = parser.parse_args()
     if args.color:
         from colorama import Fore, Back, Style, init
         init(autoreset=True) # use Colorama to make Termcolor work on Windows too
         global colorer
         import colorama as colorer
+    
+    project = args.project
 
     scriptDir = os.path.dirname(os.path.abspath(__file__))
     rootDir = os.path.join(scriptDir, '../customization')
@@ -136,7 +173,7 @@ def main():
         path = os.path.join(rootDir, entry)
         if (not os.path.isdir(path)):
             continue
-        c = Customization(entry, path)
+        c = Customization(entry, path, project)
         if c.isRoot():
             c.populateFileList()
             invalidInner += c.validateInner()
@@ -147,7 +184,7 @@ def main():
     for c1, c2 in combinations(roots, 2):
         invalidCross += c1.validateCross(c2)
         invalidCross += c2.validateCross(c1)
-    print colorer.Style.BRIGHT + 'Validation finished'
+    info('Validation finished')
     if invalidInner > 0:
         sys.exit(1)
     if invalidCross > 0:

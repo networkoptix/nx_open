@@ -13,7 +13,7 @@ namespace {
      */
     QRegExp buildFilter(const QList<QString> &parts) {
         QString pattern;
-        foreach (const QString &part, parts) {
+        for (const QString &part: parts) {
             if (!pattern.isEmpty())
                 pattern += QLatin1Char('|');
             pattern += QRegExp::escape(part);
@@ -247,7 +247,7 @@ QnResourceCriterion::Operation QnResourceCriterion::check(const QnResourcePtr &r
         break;
     }
     case Group:
-        foreach(const QnResourceCriterion &criterion, static_cast<const QnResourceCriterionGroup *>(this)->criteria()) {
+        for(const QnResourceCriterion &criterion: static_cast<const QnResourceCriterionGroup *>(this)->criteria()) {
             result = criterion.check(resource);
             if(result != Next)
                 break;
@@ -400,7 +400,7 @@ void QnResourceCriterionGroup::setPattern(const QString &pattern) {
 
         QString chunks = normalizedPattern.mid(pos, i - pos);
         pos = i + 1;
-        foreach(const QString &chunk, chunks.split(spaces, QString::SkipEmptyParts)) {
+        for(const QString &chunk: chunks.split(spaces, QString::SkipEmptyParts)) {
             QString key;
             QString pattern;
             
