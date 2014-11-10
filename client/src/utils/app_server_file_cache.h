@@ -35,6 +35,9 @@ public:
 
     virtual void deleteFile(const QString &filename);
 
+    /** Clear cache state. */
+    virtual void clear();
+
     static void clearLocalCache();
 protected:
     void ensureCacheFolder();
@@ -54,13 +57,11 @@ private slots:
     void at_fileLoaded( int handle, ec2::ErrorCode errorCode, const QByteArray& data );
     void at_fileUploaded(int handle, ec2::ErrorCode errorCode);
     void at_fileDeleted(int handle, ec2::ErrorCode errorCode);
-    void at_fileListReceived(int handle, ec2::ErrorCode errorCode, const QStringList& filenames);
 private:
+    const QString m_folderName;
     QHash<int, QString> m_loading;
     QHash<int, QString> m_uploading;
     QHash<int, QString> m_deleting;
-    int m_fileListHandle;
-    QString m_folderName;
 };
 
 #endif // APP_SERVER_FILE_CACHE_H

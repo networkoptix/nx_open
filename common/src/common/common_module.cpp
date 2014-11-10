@@ -115,8 +115,8 @@ QnModuleInformation QnCommonModule::moduleInformation() const
             moduleInformationCopy.port = server->getPort();
         }
 
-        for (const QnUserResourcePtr &user: qnResPool->getResourcesWithFlag(Qn::user).filtered<QnUserResource>()) {
-            if (user->getName() == lit("admin")) {
+        for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>()) {
+            if (user->getName().toLower() == lit("admin")) {
                 QCryptographicHash md5(QCryptographicHash::Md5);
                 md5.addData(user->getHash());
                 md5.addData(moduleInformationCopy.systemName.toUtf8());

@@ -45,6 +45,7 @@
 #include <ui/workbench/workbench_state_manager.h>
 
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
+#include <ui/workbench/watchers/workbench_user_watcher.h>
 
 #include <utils/app_server_notification_cache.h>
 #include <utils/connection_diagnostics_helper.h>
@@ -91,6 +92,9 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /*= 0*/):
 
         menu()->trigger(Qn::VersionMismatchMessageAction);
     });
+
+    QnWorkbenchUserWatcher* userWatcher = context()->instance<QnWorkbenchUserWatcher>();
+    connect(userWatcher, &QnWorkbenchUserWatcher::reconnectRequired, this, &QnWorkbenchConnectHandler::at_reconnectAction_triggered);
 
     connect(action(Qn::ConnectAction),              &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_connectAction_triggered);
     connect(action(Qn::ReconnectAction),            &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_reconnectAction_triggered);
@@ -393,8 +397,6 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
 
     ec2::ErrorCode errCode = ec2::ErrorCode::ok;
 
-    
-  
     /* Here we will wait for the reconnect or cancel. */
     while (reconnectInfoDialog && !reconnectInfoDialog->wasCanceled()) {
         reconnectInfoDialog->setCurrentServer(reconnectHelper->currentServer());

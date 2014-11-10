@@ -30,7 +30,7 @@ namespace {
     QnUserResourcePtr getAdminUser() {
         foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::user)) {
             QnUserResourcePtr user = resource.staticCast<QnUserResource>();
-            if (user->getName() == lit("admin"))
+            if (user->getName().toLower() == lit("admin"))
                 return user;
         }
         return QnUserResourcePtr();
