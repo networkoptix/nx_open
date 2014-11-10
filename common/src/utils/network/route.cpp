@@ -41,6 +41,13 @@ bool QnRoute::operator <(const QnRoute &other) const {
         return points.size() < other.points.size();
 }
 
+QnRoute QnRoute::operator +(const QnRoute &other) const {
+	QnRoute route = *this;
+	route.points.append(other.points);
+	route.weight += other.weight;
+	return route;
+}
+
 bool QnRoutePoint::operator ==(const QnRoutePoint &other) const {
     return peerId == other.peerId && host == other.host && port == other.port;
 }

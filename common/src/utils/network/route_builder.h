@@ -12,7 +12,7 @@ public:
 
     void clear(bool indirectOnly = false);
 
-    QnRoute routeTo(const QnUuid &peerId);
+    QnRoute routeTo(const QnUuid &peerId, const QnUuid &via = QnUuid());
 
     QHash<QnUuid, QnRoute> routes() const;
 
@@ -20,7 +20,7 @@ private:
     typedef QPair<QnRoutePoint, int> WeightedPoint;
 
 private:
-    QnRoute buildRouteTo(const QnUuid &peerId);
+    QnRoute buildRouteTo(const QnUuid &peerId, const QnUuid &from = QnUuid());
     QMultiHash<QnUuid, WeightedPoint>::iterator findConnection(const QnUuid &from, const QnRoutePoint &point);
 
 private:
