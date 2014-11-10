@@ -505,57 +505,71 @@ namespace nx_http
     {
         using namespace std::placeholders;
 
+        bool canUseExistingConnection = true;
+        if( m_httpStreamReader.message().type == nx_http::MessageType::response )
+        {
+            canUseExistingConnection = nx_http::getHeaderValue(
+                m_httpStreamReader.message().response->headers,
+                "Connection" ) != "close";
+        }
+
         m_httpStreamReader.resetState();
 
         if( m_socket )
         {
             //TODO #ak think again about next cancellation
-            m_socket->cancelAsyncIO( aio::etWrite );
-            m_socket->cancelAsyncIO( aio::etRead );
+            m_socket->cancelAsyncIO();
 
-            serializeRequest();
-            m_state = sSendingRequest;
+            if( canUseExistingConnection )
+            {
+                serializeRequest();
+                m_state = sSendingRequest;
 
-            if( m_socket->sendAsync( m_requestBuffer, std::bind( &AsyncHttpClient::asyncSendDone, this, m_socket.data(), _1, _2 ) ) )
+                if( !m_socket->sendAsync( m_requestBuffer, std::bind( &AsyncHttpClient::asyncSendDone, this, m_socket.data(), _1, _2 ) ) )
+                {
+                    NX_LOG( lit("Failed to init async socket call (connecting to %1:%2) to aio service. %3").
+                        arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
+                    m_socket.clear();
+                    return false;
+                }
                 return true;
+            }
+            else
+            {
+                m_socket.clear();
+            }
         }
-        else {
+
+        m_state = sInit;
+
+        m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(/*url.scheme() == lit("https")*/));
+        if( !m_socket->setNonBlockingMode( true ) ||
+            !m_socket->setSendTimeout( DEFAULT_CONNECT_TIMEOUT ) ||
+            !m_socket->setRecvTimeout( m_responseReadTimeoutMs ) )
+        {
+            NX_LOG( lit("Failed to put socket to non blocking mode. %1").
+                arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
+            m_socket.clear();
+            return false;
+        }
+
+        m_url = url;
+        m_state = sWaitingConnectToHost;
+
+        //starting async connect
+        if( !m_socket->connectAsync(
+                SocketAddress( url.host(), url.port( DEFAULT_HTTP_PORT ) ),
+                std::bind( &AsyncHttpClient::asyncConnectDone, this, m_socket.data(), _1 ) ) )
+        {
+            NX_LOG( lit("Failed to perform async connect to %1:%2. %3").
+                arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
+            m_socket.clear();
+            m_url.clear();
             m_state = sInit;
-
-            m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(/*url.scheme() == lit("https")*/));
-            if( !m_socket->setNonBlockingMode( true ) ||
-                !m_socket->setSendTimeout( DEFAULT_CONNECT_TIMEOUT ) ||
-                !m_socket->setRecvTimeout( m_responseReadTimeoutMs ) )
-            {
-                NX_LOG( lit("Failed to put socket to non blocking mode. %1").
-                    arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
-                m_socket.clear();
-                return false;
-            }
-
-            m_url = url;
-            m_state = sWaitingConnectToHost;
-
-            //starting async connect
-            if( !m_socket->connectAsync(
-                    SocketAddress( url.host(), url.port( DEFAULT_HTTP_PORT ) ),
-                    std::bind( &AsyncHttpClient::asyncConnectDone, this, m_socket.data(), _1 ) ) )
-            {
-                NX_LOG( lit("Failed to perform async connect to %1:%2. %3").
-                    arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
-                m_socket.clear();
-                m_url.clear();
-                m_state = sInit;
-                return false;
-            }
-
-            return true;
+            return false;
         }
 
-        NX_LOG( lit("Failed to init async socket call (connecting to %1:%2) to aio service. %3").
-            arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
-        m_socket.clear();
-        return false;
+        return true;
     }
 
     size_t AsyncHttpClient::readAndParseHttp( size_t bytesRead )
@@ -613,6 +627,10 @@ namespace nx_http
         m_request.headers.insert(m_additionalHeaders.cbegin(), m_additionalHeaders.cend());
 
         //adding user credentials
+        if( !m_url.userName().isEmpty() )
+            m_userName = m_url.userName();
+        if( !m_url.password().isEmpty() )
+            m_userPassword = m_url.password();
 
         //not using Basic authentication by default, since it is not secure
         nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
