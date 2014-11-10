@@ -26,15 +26,6 @@ namespace {
         CheckingForUpdates,
         Updating
     };
-
-    QnUserResourcePtr getAdminUser() {
-        foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::user)) {
-            QnUserResourcePtr user = resource.staticCast<QnUserResource>();
-            if (user->getName().toLower() == lit("admin"))
-                return user;
-        }
-        return QnUserResourcePtr();
-    }
 }
 
 QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QnWorkbenchContext *context, QObject *parent) :
@@ -92,7 +83,7 @@ void QnConnectToCurrentSystemTool::configureServer() {
     emit progressChanged(0);
     emit stateChanged(tr("Configuring server(s)"));
 
-    QnUserResourcePtr adminUser = getAdminUser();
+    QnUserResourcePtr adminUser = qnResPool->getAdministrator();
     if (!adminUser) {
         finish(ConfigurationFailed);
         return;

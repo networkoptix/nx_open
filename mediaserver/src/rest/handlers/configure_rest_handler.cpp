@@ -96,31 +96,28 @@ int QnConfigureRestHandler::changeAdminPassword(const QString &password, const Q
     if (password.isEmpty() && (passwordHash.isEmpty() || passwordDigest.isEmpty()))
         return ResultSkip;
 
-    for (const QnResourcePtr &resource: qnResPool->getResourcesWithFlag(Qn::user)) {
-        QnUserResourcePtr user = resource.staticCast<QnUserResource>();
-        if (user->getName().toLower() != lit("admin"))
-            continue;
+    QnUserResourcePtr admin = qnResPool->getAdministrator();
+    if (!admin)
+         return ResultFail;
 
-        if (!password.isEmpty()) {
-            /* check old password */
-            if (!user->checkPassword(oldPassword))
-                return ResultFail;
+    if (!password.isEmpty()) {
+        /* check old password */
+        if (!admin->checkPassword(oldPassword))
+            return ResultFail;
 
-            /* set new password */
-            user->setPassword(password);
-            user->generateHash();
-            QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(user, this, [](int, ec2::ErrorCode) { return; });
-            user->setPassword(QString());
-        } else {
-            if (user->getHash() != passwordHash || user->getDigest() != passwordDigest) {
-                user->setHash(passwordHash);
-                user->setDigest(passwordDigest);
-                QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(user, this, [](int, ec2::ErrorCode) { return; });
-            }
+        /* set new password */
+        admin->setPassword(password);
+        admin->generateHash();
+        QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(admin, this, [](int, ec2::ErrorCode) { return; });
+        admin->setPassword(QString());
+    } else {
+        if (admin->getHash() != passwordHash || admin->getDigest() != passwordDigest) {
+            admin->setHash(passwordHash);
+            admin->setDigest(passwordDigest);
+            QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(admin, this, [](int, ec2::ErrorCode) { return; });
         }
-        return ResultOk;
     }
-    return ResultFail;
+    return ResultOk;
 }
 
 int QnConfigureRestHandler::changePort(int port) {

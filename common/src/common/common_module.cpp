@@ -115,14 +115,14 @@ QnModuleInformation QnCommonModule::moduleInformation() const
             moduleInformationCopy.port = server->getPort();
         }
 
-        for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>()) {
-            if (user->getName().toLower() == lit("admin")) {
-                QCryptographicHash md5(QCryptographicHash::Md5);
-                md5.addData(user->getHash());
-                md5.addData(moduleInformationCopy.systemName.toUtf8());
-                moduleInformationCopy.authHash = md5.result();
-            }
+        QnUserResourcePtr admin = qnResPool->getAdministrator();
+        if (admin) {
+            QCryptographicHash md5(QCryptographicHash::Md5);
+            md5.addData(admin->getHash());
+            md5.addData(moduleInformationCopy.systemName.toUtf8());
+            moduleInformationCopy.authHash = md5.result();
         }
+
     }
 
     return moduleInformationCopy;
