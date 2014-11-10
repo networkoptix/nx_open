@@ -863,30 +863,35 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
         return;
     }
 
-    QnResourceList errorResources; // TODO: #Elric check server cameras
-
-    // TODO: #Elric implement proper rollback in case of an error
+    QnVirtualCameraResourceList errorResources; // TODO: #Elric check server cameras
     for (auto itr = modifiedResources.begin(); itr != modifiedResources.end();) {
-        if (reply.uniqueIdList.contains((*itr)->getUniqueId())) {
-            (*itr)->setParentId(server->getId());
-            (*itr)->setPreferedServerId(server->getId());
-            ++itr;
-        }
-        else {
+        if (!reply.uniqueIdList.contains((*itr)->getUniqueId())) {
             errorResources << *itr;
             itr = modifiedResources.erase(itr);
+        } else {
+            ++itr;
         }
     }
 
     if(!errorResources.empty()) {
-        QnResourceListDialog::exec(
-            mainWindow(),
-            errorResources,
-            Qn::MainWindow_Tree_DragCameras_Help,
-            tr("Error"),
-            tr("Camera(s) cannot be moved to server '%1' because the server cannot discover it.", NULL, errorResources.size()).arg(server->getName()),
-            QDialogButtonBox::Ok
-            );
+        QDialogButtonBox::StandardButton result =
+            QnResourceListDialog::exec(
+                mainWindow(),
+                errorResources,
+                Qn::MainWindow_Tree_DragCameras_Help,
+                tr("Error"),
+                tr("Server %1 cannot discover these cameras so far. Are you sure you want to move them?", NULL, errorResources.size()).arg(server->getName()),
+                QDialogButtonBox::Yes | QDialogButtonBox::No
+                );
+        /* If user is sure, return invalid cameras back to list. */
+        if (result == QDialogButtonBox::Yes)
+            modifiedResources << errorResources;
+    }
+
+    const QnUuid serverId = server->getId();
+    for (auto camera: modifiedResources) {
+        camera->setParentId(serverId);
+        camera->setPreferedServerId(serverId);
     }
 
     if(!modifiedResources.empty()) {
