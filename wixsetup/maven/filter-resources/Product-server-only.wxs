@@ -137,6 +137,10 @@
             Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\db\ecs.db;[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\${mediaserver.name}\ecs.sqlite"/>
         <CustomAction Id="CopyDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="CopyDatabaseFile" Execute="deferred" Impersonate="no"/>
 
+        <CustomAction Id="CopyHostedFiles_Cmd" Property="CopyHostedFiles" Execute="immediate" Impersonate="yes"
+            Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\hostedfiles;[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\${mediaserver.name}\vms_storedfiles"/>
+        <CustomAction Id="CopyHostedFiles" BinaryKey="CustomActions.dll" DllEntry="CopyHostedFiles" Execute="deferred" Impersonate="no"/>
+
         <CustomAction Id="DeleteOldMediaserverSettings_Cmd" Property="DeleteOldMediaserverSettings" Value="$(var.ServerRegPath)" Execute="immediate" Impersonate="yes"/>
         <CustomAction Id="DeleteOldMediaserverSettings" BinaryKey="CustomActions.dll" DllEntry="DeleteOldMediaserverSettings" Execute="deferred" Impersonate="no"/>
         
@@ -198,6 +202,10 @@
             <Custom Action="CopyDatabaseFile_Cmd" After="InstallFiles">
                 <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]></Custom>
             <Custom Action="CopyDatabaseFile" After="CopyDatabaseFile_Cmd">
+                <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="CopyHostedFiles_Cmd" After="InstallFiles">
+                <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="CopyHostedFiles" After="CopyHostedFiles_Cmd">
                 <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]></Custom>
 
             <Custom Action="CertGenAction_Cmd" After="CopyDatabaseFile">

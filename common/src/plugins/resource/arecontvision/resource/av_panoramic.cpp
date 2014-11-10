@@ -168,12 +168,24 @@ bool QnArecontPanoramicResource::setCamQuality(int q)
 
 }
 
+QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getDefaultVideoLayout() const
+{
+    if (m_defaultVideoLayout)
+        return m_defaultVideoLayout;
+
+    QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId()); 
+    if (resType)
+        m_defaultVideoLayout = QnResourceVideoLayoutPtr(QnCustomResourceVideoLayout::fromString(resType->defaultValue(Qn::VIDEO_LAYOUT_PARAM_NAME)));
+    else
+        m_defaultVideoLayout = QnResourceVideoLayoutPtr(new QnDefaultResourceVideoLayout());
+    return m_defaultVideoLayout;
+}
+
 QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
     QMutexLocker lock(&m_mutex);
 
-    const QnConstResourceVideoLayoutPtr& layout = QnPlAreconVisionResource::getVideoLayout(dataProvider);
-    //const QnConstCustomResourceVideoLayoutPtr& customLayout = std::dynamic_pointer_cast<const QnCustomResourceVideoLayout>(layout);
+    const QnConstResourceVideoLayoutPtr layout = QnArecontPanoramicResource::getDefaultVideoLayout();
     const QnCustomResourceVideoLayout* customLayout = dynamic_cast<const QnCustomResourceVideoLayout*>(layout.data());
     const_cast<QnArecontPanoramicResource*>(this)->updateFlipState();
     if (m_isRotated && customLayout)

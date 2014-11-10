@@ -32,6 +32,7 @@ struct QnRoute {
     bool containsConnection(const QnUuid &first, const QnUuid &from, const QnRoutePoint &point) const;
 
     bool operator <(const QnRoute &other) const;
+	QnRoute operator +(const QnRoute &other) const;
 };
 
 typedef QList<QnRoute> QnRouteList;

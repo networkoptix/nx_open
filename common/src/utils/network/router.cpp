@@ -43,9 +43,9 @@ QHash<QnUuid, QnRoute> QnRouter::routes() const {
     return m_routeBuilder->routes();
 }
 
-QnRoute QnRouter::routeTo(const QnUuid &id) const {
+QnRoute QnRouter::routeTo(const QnUuid &id, const QnUuid &via) const {
     QMutexLocker lk(&m_mutex);
-    return m_routeBuilder->routeTo(id);
+    return m_routeBuilder->routeTo(id, via);
 }
 
 QnRoute QnRouter::routeTo(const QString &host, quint16 port) const {
