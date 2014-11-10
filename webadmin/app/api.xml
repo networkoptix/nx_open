@@ -797,8 +797,8 @@
                     </result>
                 </function>
                 <function>
-                    <name>routingInformation/routes</name>
-                    <description>Get all routes to all peers in the current system.</description>
+                    <name>routingInformation/cachedRoutes</name>
+                    <description>Get a list of cached routes.</description>
                     <method>GET</method>
                     <params/>
                     <result>

@@ -365,6 +365,12 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
                                   lit("\n") +
                                   tr("%n servers are not responding: %1", "", result.failedPeers.size()).arg(serverNamesString(result.failedPeers)));
             break;
+        case QnUpdateResult::UploadingFailed_Offline:
+            QMessageBox::critical(this, tr("Update failed"),
+                                  tr("Could not push updates to servers.") +
+                                  lit("\n") +
+                                  tr("%n servers have gone offline: %1", "", result.failedPeers.size()).arg(serverNamesString(result.failedPeers)));
+            break;
         case QnUpdateResult::ClientInstallationFailed:
             QMessageBox::critical(this, tr("Update failed"), tr("Could not install an update to the client."));
             break;

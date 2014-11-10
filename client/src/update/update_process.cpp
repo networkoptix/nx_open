@@ -463,7 +463,8 @@ void QnUpdateProcess::uploadUpdatesToServers() {
 
         if (resource->getStatus() != Qn::Online) {
             uploadUpdatesPeerTaskPtr->cancel();
-            finishUpdate(QnUpdateResult::UploadingFailed);
+            m_failedPeerIds.insert(resource->getId());
+            finishUpdate(QnUpdateResult::UploadingFailed_Offline);
         }
     });
 }
