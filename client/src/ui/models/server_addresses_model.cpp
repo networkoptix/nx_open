@@ -2,9 +2,22 @@
 
 #include <QtCore/QSet>
 
+#include "utils/common/util.h"
+
 QnServerAddressesModel::QnServerAddressesModel(QObject *parent) :
-    base_type(parent)
+    base_type(parent),
+    m_port(-1)
 {
+}
+
+void QnServerAddressesModel::setPort(int port) {
+    beginResetModel();
+    m_port = port;
+    endResetModel();
+}
+
+int QnServerAddressesModel::port() const {
+    return m_port;
 }
 
 void QnServerAddressesModel::setAddressList(const QList<QUrl> &addresses) {
@@ -37,11 +50,41 @@ QSet<QUrl> QnServerAddressesModel::ignoredAddresses() const {
     return m_ignoredAddresses;
 }
 
-void QnServerAddressesModel::resetModel(const QList<QUrl> &addresses, const QList<QUrl> &manualAddresses, const QSet<QUrl> &ignoredAddresses) {
+void QnServerAddressesModel::addAddress(const QUrl &url, bool isManualAddress) {
+    int row;
+    if (isManualAddress)
+        row = m_addresses.size() + m_manualAddresses.size();
+    else
+        row = m_addresses.size();
+
+    beginInsertRows(QModelIndex(), row, row);
+    if (isManualAddress)
+        m_manualAddresses.append(url);
+    else
+        m_addresses.append(url);
+    endInsertRows();
+}
+
+void QnServerAddressesModel::removeAddressAtIndex(const QModelIndex &index) {
+    if (!hasIndex(index.row(), index.column()))
+        return;
+
+    beginRemoveRows(QModelIndex(), index.row(), index.row());
+
+    if (index.row() < m_addresses.size())
+        m_addresses.removeAt(index.row());
+    else
+        m_manualAddresses.removeAt(index.row() - m_addresses.size());
+
+    endRemoveRows();
+}
+
+void QnServerAddressesModel::resetModel(const QList<QUrl> &addresses, const QList<QUrl> &manualAddresses, const QSet<QUrl> &ignoredAddresses, int port) {
     beginResetModel();
     m_addresses = addresses;
     m_manualAddresses = manualAddresses;
     m_ignoredAddresses = ignoredAddresses;
+    m_port = port;
     endResetModel();
 }
 
@@ -77,11 +120,11 @@ QVariant QnServerAddressesModel::data(const QModelIndex &index, int role) const 
     switch (role) {
     case Qt::DisplayRole:
         if (index.column() == AddressColumn)
-            return addressAtIndex(index).toString();
+            return addressAtIndex(index, m_port).toString();
         break;
     case Qt::EditRole:
         if (index.column() == AddressColumn)
-            return addressAtIndex(index);
+            return addressAtIndex(index, m_port).toString();
         break;
     case Qt::CheckStateRole:
         if (index.column() == InUseColumn)
@@ -101,12 +144,46 @@ QVariant QnServerAddressesModel::data(const QModelIndex &index, int role) const 
 bool QnServerAddressesModel::setData(const QModelIndex &index, const QVariant &value, int role) {
     Q_UNUSED(role)
 
-    if (index.column() != InUseColumn)
+    switch (index.column()) {
+    case AddressColumn: {
+        QUrl url = QUrl::fromUserInput(value.toString());
+        if (!url.isValid())
+            return false;
+
+        if (url.port() == m_port)
+            url.setPort(-1);
+
+        if (m_addresses.contains(url) || m_ignoredAddresses.contains(url))
+            return false;
+
+        if (url.port() == -1) {
+            QUrl explicitUrl = url;
+            explicitUrl.setPort(m_port);
+
+            if (m_addresses.contains(explicitUrl) || m_ignoredAddresses.contains(explicitUrl))
+                return false;
+        }
+
+        if (index.row() < m_addresses.size())
+            m_addresses[index.row()] = url;
+        else
+            m_manualAddresses[index.row() - m_addresses.size()] = url;
+
+        return true;
+    }
+    case InUseColumn: {
+        QUrl url = addressAtIndex(index);
+
+        if (value.toInt() == Qt::Unchecked)
+            m_ignoredAddresses.insert(url);
+        else
+            m_ignoredAddresses.remove(url);
+
+        return true;
+    }
+    default:
         return false;
-
-    emit ignoreChangeRequested(index.sibling(index.row(), AddressColumn).data().toString(), value.toInt() == Qt::Unchecked);
-
-    return false;
+    }
 }
 
 QVariant QnServerAddressesModel::headerData(int section, Qt::Orientation orientation, int role) const {
@@ -147,8 +224,17 @@ Qt::ItemFlags QnServerAddressesModel::flags(const QModelIndex &index) const {
 
     Qt::ItemFlags flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 
-    if (index.column() == InUseColumn)
+    switch (index.column()) {
+    case AddressColumn:
+        if (index.row() >= m_addresses.size())
+            flags |= Qt::ItemIsEditable;
+        break;
+    case InUseColumn:
         flags |= Qt::ItemIsUserCheckable;
+        break;
+    default:
+        break;
+    }
 
     return flags;
 }
@@ -163,14 +249,25 @@ void QnServerAddressesModel::setColors(const QnRoutingManagementColors &colors) 
         emit dataChanged(index(0, AddressColumn), index(m_addresses.size() + m_manualAddresses.size(), AddressColumn));
 }
 
-QUrl QnServerAddressesModel::addressAtIndex(const QModelIndex &index) const {
+QUrl QnServerAddressesModel::addressAtIndex(const QModelIndex &index, int defaultPort) const {
     if (!hasIndex(index.row(), index.column(), index.parent()))
         return QString();
 
+    QUrl url;
+
+    int idx = index.row();
+
     if (index.row() < m_addresses.size())
-        return m_addresses[index.row()];
-    else
-        return m_manualAddresses[index.row() - m_addresses.size()];
+        url = m_addresses[index.row()];
+    else {
+        idx -= m_addresses.size();
+        url = m_manualAddresses[idx];
+    }
+
+    if (url.port() == -1)
+        url.setPort(defaultPort);
+
+    return url;
 }
 
 

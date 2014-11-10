@@ -21,7 +21,15 @@ public:
         ColumnCount
     };
 
+    enum EditingError {
+        InvalidUrl,
+        ExistingUrl
+    };
+
     explicit QnServerAddressesModel(QObject *parent = 0);
+
+    void setPort(int port);
+    int port() const;
 
     void setAddressList(const QList<QUrl> &addresses);
     QList<QUrl> addressList() const;
@@ -32,8 +40,11 @@ public:
     void setIgnoredAddresses(const QSet<QUrl> &ignoredAddresses);
     QSet<QUrl> ignoredAddresses() const;
 
+    void addAddress(const QUrl &url, bool isManualAddress = true);
+    void removeAddressAtIndex(const QModelIndex &index);
+
     void clear();
-    void resetModel(const QList<QUrl> &addresses, const QList<QUrl> &manualAddresses, const QSet<QUrl> &ignoredAddresses);
+    void resetModel(const QList<QUrl> &addresses, const QList<QUrl> &manualAddresses, const QSet<QUrl> &ignoredAddresses, int port);
 
     bool isManualAddress(const QModelIndex &index) const;
 
@@ -51,12 +62,13 @@ public:
     void setColors(const QnRoutingManagementColors &colors);
 
 signals:
-    void ignoreChangeRequested(const QString &addressAtIndex, bool ignore);
+    void urlEditingFailed(const QModelIndex &index, int error);
 
 private:
-    QUrl addressAtIndex(const QModelIndex &index) const;
+    QUrl addressAtIndex(const QModelIndex &index, int defaultPort = -1) const;
 
 private:
+    int m_port;
     QList<QUrl> m_addresses;
     QList<QUrl> m_manualAddresses;
     QSet<QUrl> m_ignoredAddresses;
