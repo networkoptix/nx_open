@@ -8,6 +8,7 @@
 #  include <arpa/inet.h>
 #endif
 
+#include <utils/common/concurrent.h>
 #include <utils/common/log.h>
 #include <utils/network/http/httpclient.h>
 #include <utils/network/nettools.h>
@@ -174,10 +175,15 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
 
 bool QnPlAreconVisionResource::ping()
 {
-    return checkIfOnline();
+    QnConcurrent::QnFuture<bool> result(1);
+    if( !checkIfOnlineAsync( [&result]( bool onlineOrNot ) {
+            result.setResultAt(0, onlineOrNot); } ) )
+        return false;
+    result.waitForFinished();
+    return result.resultAt(0);
 }
 
-bool QnPlAreconVisionResource::checkIfOnline()
+bool QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)>&& completionHandler )
 {
     //checking that camera is alive and on its place
     const QString& urlStr = getUrl();
@@ -192,21 +198,36 @@ bool QnPlAreconVisionResource::checkIfOnline()
     url.setUserName( getAuth().user() );
     url.setPassword( getAuth().password() );
 
-    nx_http::HttpClient httpClient;
-    if( !httpClient.doGet( url ) )
-        return false;
-    if( httpClient.response()->statusLine.statusCode != nx_http::StatusCode::ok )
-        return false;
-    nx_http::BufferType msgBody;
-    while( !httpClient.eof() )
-        msgBody += httpClient.fetchMessageBodyBuffer();
+    nx_http::AsyncHttpClientPtr httpClientCaptured = std::make_shared<nx_http::AsyncHttpClient>();
+    const QnMacAddress cameraMAC = getMAC();
 
-    const int sepIndex = msgBody.indexOf('=');
-    if( sepIndex == -1 )
-        return false;
-    const QByteArray& mac = msgBody.mid( sepIndex+1 );
+    auto httpReqCompletionHandler = [httpClientCaptured, cameraMAC, completionHandler]
+        ( const nx_http::AsyncHttpClientPtr& httpClient ) mutable
+    {
+        httpClientCaptured.reset();
 
-    return getMAC() == QnMacAddress(mac);
+        auto completionHandlerLocal = std::move( completionHandler );
+        if( (httpClient->failed()) ||
+            (httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok) )
+        {
+            completionHandlerLocal( false );
+            return;
+        }
+        nx_http::BufferType msgBody = httpClient->fetchMessageBodyBuffer();
+        const int sepIndex = msgBody.indexOf('=');
+        if( sepIndex == -1 )
+        {
+            completionHandlerLocal( false );
+            return;
+        }
+        const QByteArray& mac = msgBody.mid( sepIndex+1 );
+        completionHandlerLocal( cameraMAC == QnMacAddress(mac) );
+    };
+    connect( httpClientCaptured.get(), &nx_http::AsyncHttpClient::done,
+             this, httpReqCompletionHandler,
+             Qt::DirectConnection );
+
+    return httpClientCaptured->doGet( url );
 }
 
 CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
