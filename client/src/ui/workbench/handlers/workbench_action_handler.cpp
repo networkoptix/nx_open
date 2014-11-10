@@ -1418,6 +1418,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         item.resource.path = resource->getUniqueId();
         item.contrastParams = widget->item()->imageEnhancement();
         item.dewarpingParams = widget->item()->dewarpingParams();
+        item.rotation =  widget->item()->rotation();
         item.dataByRole[Qn::ItemPausedRole] = true;
         item.dataByRole[Qn::ItemSliderSelectionRole] = QVariant::fromValue<QnTimePeriod>(localPeriod);
         item.dataByRole[Qn::ItemSliderWindowRole] = QVariant::fromValue<QnTimePeriod>(period);
