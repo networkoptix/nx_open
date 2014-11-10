@@ -19,9 +19,14 @@ CLVideoDecoderOutputPtr QnTiledImageFilter::updateImage(const CLVideoDecoderOutp
     QSize size(frame->width, frame->height);
     if (!m_tiledFrame || size != m_size) {
         m_size = size;
-        m_tiledFrame = CLVideoDecoderOutputPtr(new CLVideoDecoderOutput());
-        m_tiledFrame->reallocate(frame->width * m_layout->size().width(), frame->height * m_layout->size().height(), frame->format);
-        m_tiledFrame->memZerro();
+        QSize newSize(frame->width * m_layout->size().width(), frame->height * m_layout->size().height());
+        if (m_tiledFrame)
+            m_tiledFrame = CLVideoDecoderOutputPtr(m_tiledFrame->scaled(newSize, (PixelFormat) frame->format));
+        else {
+            m_tiledFrame = CLVideoDecoderOutputPtr(new CLVideoDecoderOutput());
+            m_tiledFrame->reallocate(newSize, frame->format);
+            m_tiledFrame->memZerro();
+        }
     }
     m_tiledFrame->assignMiscData(frame.data());
     m_prevFrameTime = m_tiledFrame->pts = qMax( static_cast<qint64>(m_tiledFrame->pts) , m_prevFrameTime + MIN_FRAME_DURATION );

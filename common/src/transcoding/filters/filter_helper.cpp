@@ -95,8 +95,11 @@ QList<QnAbstractImageFilterPtr> QnImageFilterHelper::createFilterChain(const QSi
             result << QnAbstractImageFilterPtr(new QnScaleImageFilter(QnCodecTranscoder::roundSize(newSize)));
     }
 
-    if (m_layout && m_layout->channelCount() > 1)
+    bool tiledFilterExist = false;
+    if (m_layout && m_layout->channelCount() > 1) {
         result << QnAbstractImageFilterPtr(new QnTiledImageFilter(m_layout));
+        tiledFilterExist = true;
+    }
 
     if (!m_cropRect.isEmpty() && !m_itemDewarpingParams.enabled) {
         result << QnAbstractImageFilterPtr(new QnCropImageFilter(m_cropRect));
@@ -104,7 +107,7 @@ QList<QnAbstractImageFilterPtr> QnImageFilterHelper::createFilterChain(const QSi
     if (m_itemDewarpingParams.enabled)
         result << QnAbstractImageFilterPtr(new QnFisheyeImageFilter(m_mediaDewarpingParams, m_itemDewarpingParams));
     if (m_contrastParams.enabled)
-        result << QnAbstractImageFilterPtr(new QnContrastImageFilter(m_contrastParams));
+        result << QnAbstractImageFilterPtr(new QnContrastImageFilter(m_contrastParams, tiledFilterExist));
     if (m_rotAngle)
         result << QnAbstractImageFilterPtr(new QnRotateImageFilter(m_rotAngle));
 
