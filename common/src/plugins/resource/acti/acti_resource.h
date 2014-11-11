@@ -74,7 +74,7 @@ public:
     //!Implementation of TimerEventHandler::onTimer
     virtual void onTimer( const quint64& timerID );
 
-    static CLHttpStatus QnActiResource::makeActiRequest(
+    static CLHttpStatus makeActiRequest(
         const QUrl& url,
         const QAuthenticator& auth,
         const QString& group,
