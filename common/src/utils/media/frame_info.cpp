@@ -373,6 +373,7 @@ CLVideoDecoderOutput* CLVideoDecoderOutput::scaled(const QSize& newSize, PixelFo
     CLVideoDecoderOutput* dst(new CLVideoDecoderOutput);
     dst->reallocate(newSize.width(), newSize.height(), newFormat);
     dst->assignMiscData(this);
+    dst->sample_aspect_ratio = 1.0;
 
     SwsContext* scaleContext = sws_getContext(
         width, height, (PixelFormat) format, 
