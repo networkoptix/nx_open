@@ -356,3 +356,7 @@ $state-danger-border:            darken(adjust-hue($state-danger-bg, -10), 5%) !
   border: 1px solid $state-danger-text;
 }
 
+
+.tree .active>a{
+  font-weight: bold;
+}

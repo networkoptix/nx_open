@@ -1,1 +1,28 @@
-<ng-include src="'customization/webclient.html'"></ng-include>
+<div class="col-sm-4">
+    <ul class="tree">
+        <li ng-repeat="server in mediaServers">
+            {{server.name}}
+            <ul>
+                <li ng-repeat="camera in cameras[server.id]"
+                        ng-class="{active:activeCamera===camera}">
+                    <a ng-click="selectCamera(camera);$event.stopPropagation()">
+                        {{camera.name}} ({{camera.url}})
+                    </a>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div>
+<div class="col-sm-8">
+
+    <div style="width:640px;height:480px" class="videogular-container">
+        <videogular vg-theme="'bower_components/videogular-themes-default/videogular.css'" vg-autoplay="true" autoplay="true">
+            <vg-video vg-src="acitveVideoSource" vg-autoplay="true" autoplay="true">
+            </vg-video>
+            <vg-controls>
+                <vg-play-pause-button></vg-play-pause-button>
+                <vg-fullscreenButton></vg-fullscreenButton>
+            </vg-controls>
+        </videogular>
+    </div>
+</div>

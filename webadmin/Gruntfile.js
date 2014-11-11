@@ -103,7 +103,9 @@ module.exports = function (grunt) {
 
                 //Evgeniy
                 {context: '/api/',host: '192.168.56.101',port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
-                {context: '/ec2/',host: '192.168.56.101',port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}}
+                {context: '/ec2/',host: '192.168.56.101',port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
+                {context: '/media/',host: '192.168.56.101',port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
+                {context: '/hls/',host: '192.168.56.101',port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}}
 
                 //Sergey Yuldashev
                 //{context: '/api/', host: '10.0.2.203', port: 8001, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
