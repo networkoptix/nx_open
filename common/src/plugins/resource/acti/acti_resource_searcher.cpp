@@ -1,12 +1,13 @@
 #ifdef ENABLE_ACTI
 
-#include <QtNetwork/QNetworkReply>
+#include <core/resource_management/resource_pool.h>
 
 #include "acti_resource_searcher.h"
 #include "core/resource/camera_resource.h"
 #include "acti_resource.h"
 #include "../mdns/mdns_listener.h"
 #include "utils/network/http/asynchttpclient.h"
+
 
 extern QString getValueFromString(const QString& line);
 
@@ -141,13 +142,14 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
     QString devUrl = QString(lit("http://%1:%2")).arg(url.host()).arg(url.port(80));
     CashedDevInfo devInfo = m_cashedDevInfo.value(devUrl);
 
+    QnMacAddress cameraMAC;
     if (devInfo.info.presentationUrl.isEmpty() || devInfo.timer.elapsed() > CACHE_UPDATE_TIME)
     {
         CLHttpStatus status;
         QByteArray serverReport = actiRes->makeActiRequest(QLatin1String("system"), QLatin1String("SYSTEM_INFO"), status, true);
         if (status != CL_HTTP_SUCCESS)
             return result;
-        QMap<QByteArray, QByteArray> report = actiRes->parseSystemInfo(serverReport);
+        QMap<QByteArray, QByteArray> report = QnActiResource::parseSystemInfo(serverReport);
         if (report.isEmpty())
             return result;
 
@@ -155,8 +157,9 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
         devInfo.info.friendlyName = QString::fromUtf8(report.value("company name"));
         devInfo.info.manufacturer = manufacture();
         QByteArray model = report.value("production id").split('-')[0];
-        devInfo.info.modelName = QString::fromUtf8(actiRes->unquoteStr(model));
-        devInfo.info.serialNumber = QString::fromUtf8(report.value("mac address"));
+        devInfo.info.modelName = QString::fromUtf8(QnActiResource::unquoteStr(model));
+        cameraMAC = QnMacAddress(report.value("mac address"));
+        devInfo.info.serialNumber = cameraMAC.toString();
 
         if (devInfo.info.modelName.isEmpty() || devInfo.info.serialNumber.isEmpty())
             return result;
@@ -164,37 +167,73 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
         devInfo.timer.restart();
         m_cashedDevInfo[devUrl] = devInfo;
     }
-    processPacket(QHostAddress(), url.host(), devInfo.info, QByteArray(), auth, result);
+    createResource( devInfo.info, cameraMAC, auth, result );
 
     return result;
 }
 
+static QString serialNumberToPhysicalID( const QString& serialNumber )
+{
+    QString sn = serialNumber;
+    sn.replace( lit(":"), lit("_"));
+    return QString(lit("ACTI_%1")).arg(sn);
+}
+
 void QnActiResourceSearcher::processPacket(
-    const QHostAddress& discoveryAddr,
-    const QString& host,
+    const QHostAddress& /*discoveryAddr*/,
+    const QString& /*host*/,
     const UpnpDeviceInfo& devInfo,
     const QByteArray& /*xmlDevInfo*/,
-    const QAuthenticator &auth,
-    QnResourceList& result)
+    const QAuthenticator& auth,
+    QnResourceList& result )
 {
-    Q_UNUSED(discoveryAddr)
-    Q_UNUSED(host)
     if (!devInfo.manufacturer.toUpper().startsWith(manufacture()))
         return;
 
+    QnMacAddress cameraMAC;
+    QnNetworkResourcePtr existingRes = qnResPool->getNetResourceByPhysicalId( serialNumberToPhysicalID(devInfo.serialNumber) );
+    QAuthenticator cameraAuth;
+    cameraAuth.setUser(DEFAULT_LOGIN);
+    cameraAuth.setPassword(DEFAULT_PASSWORD);
+    if( existingRes )
+    {
+        cameraMAC = existingRes->getMAC();
+        cameraAuth = existingRes->getAuth();
+    }
+
+    if( cameraMAC.isNull() )
+    {
+        QByteArray serverReport;
+        CLHttpStatus status = QnActiResource::makeActiRequest(
+            QUrl(devInfo.presentationUrl), cameraAuth, lit("system"), lit("SYSTEM_INFO"), true, &serverReport );
+        if( status == CL_HTTP_SUCCESS )
+        {
+            QMap<QByteArray, QByteArray> report = QnActiResource::parseSystemInfo(serverReport);
+            cameraMAC = QnMacAddress(report.value("mac address"));
+        }
+    }
+
+    createResource( devInfo, cameraMAC, auth, result );
+}
+
+void QnActiResourceSearcher::createResource(
+    const UpnpDeviceInfo& devInfo,
+    const QnMacAddress& mac,
+    const QAuthenticator& auth,
+    QnResourceList& result )
+{
     QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("ACTI_COMMON"));
     if (rt.isNull())
         return;
 
-    QnActiResourcePtr resource ( new QnActiResource() );
+    QnActiResourcePtr resource( new QnActiResource() );
 
     resource->setTypeId(rt);
     resource->setName(QString(QLatin1String("ACTi-")) + devInfo.modelName);
     resource->setModel(devInfo.modelName);
     resource->setUrl(devInfo.presentationUrl);
-    QString sn = devInfo.serialNumber;
-    sn = sn.replace(QLatin1String(":"), QLatin1String("_"));
-    resource->setPhysicalId(QString(QLatin1String("ACTI_%1")).arg(sn));
+    resource->setMAC(mac);
+    resource->setPhysicalId( serialNumberToPhysicalID(devInfo.serialNumber) );
 
     if (!auth.isNull()) {
         resource->setDefaultAuth(auth);

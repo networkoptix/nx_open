@@ -33,6 +33,9 @@ public:
     QnActiResource();
     ~QnActiResource();
 
+    //!Implementation of QnNetworkResource::checkIfOnlineAsync
+    virtual bool checkIfOnlineAsync( std::function<void(bool)>&& completionHandler ) override;
+    
     virtual QString getDriverName() const override;
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
@@ -71,8 +74,16 @@ public:
     //!Implementation of TimerEventHandler::onTimer
     virtual void onTimer( const quint64& timerID );
 
+    static CLHttpStatus QnActiResource::makeActiRequest(
+        const QUrl& url,
+        const QAuthenticator& auth,
+        const QString& group,
+        const QString& command,
+        bool keepAllData,
+        QByteArray* const msgBody,
+        QString* const localAddress = nullptr );
     static QByteArray unquoteStr(const QByteArray& value);
-    QMap<QByteArray, QByteArray> parseSystemInfo(const QByteArray& report) const;
+    static QMap<QByteArray, QByteArray> parseSystemInfo(const QByteArray& report);
 
     //!Called by http server on receiving message from camera
     void cameraMessageReceived( const QString& path, const QnRequestParamList& message );
