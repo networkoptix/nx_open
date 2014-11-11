@@ -291,26 +291,5 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (metatype)(numeric)
     )
 
-inline QDataStream &operator<<(QDataStream &stream, const Qn::BackgroundAnimationMode &value) {
-    return stream << static_cast<int>(value);                                   
-}
-
-inline QDataStream &operator>>(QDataStream &stream, Qn::BackgroundAnimationMode &value) {              
-    int tmp;                                                                    
-    stream >> tmp;                                                              
-    value = static_cast<Qn::BackgroundAnimationMode>(tmp);                                             
-    return stream;                                                              
-}
-
-inline QDataStream &operator<<(QDataStream &stream, const Qn::ImageBehaviour &value) {
-    return stream << static_cast<int>(value);                                   
-}
-
-inline QDataStream &operator>>(QDataStream &stream, Qn::ImageBehaviour &value) {              
-    int tmp;                                                                    
-    stream >> tmp;                                                              
-    value = static_cast<Qn::ImageBehaviour>(tmp);                                             
-    return stream;                                                              
-}
 
 #endif // QN_CLIENT_GLOBALS_H

@@ -85,6 +85,9 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /*= NULL*
         beginRemoveRows(QModelIndex(), idx, idx);
         m_items.removeAt(idx);
         endRemoveRows();
+
+        if (m_selectedServer == info.uuid)
+            setSelectedServer(QnUuid());
     });
 
     /* Handle adding new servers (to display name correctly). */
