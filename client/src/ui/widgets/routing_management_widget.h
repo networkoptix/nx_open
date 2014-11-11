@@ -19,6 +19,8 @@ class QnServerAddressesModel;
 class QnSortedServerAddressesModel;
 class QnResourceListModel;
 
+class RoutingManagementChanges;
+
 class QnRoutingManagementWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware {
     Q_OBJECT
     typedef Connective<QnAbstractPreferencesWidget> base_type;
@@ -47,13 +49,11 @@ private slots:
 
 private:
     QScopedPointer<Ui::QnRoutingManagementWidget> ui;
+    QScopedPointer<RoutingManagementChanges> m_changes;
     QnResourceListModel *m_serverListModel;
     QnServerAddressesModel *m_serverAddressesModel;
     QnSortedServerAddressesModel *m_sortedServerAddressesModel;
     QnMediaServerResourcePtr m_server;
-    QMultiHash<QnUuid, QHostAddress> m_autoAddressesByServerId;
-    QMultiHash<QnUuid, QUrl> m_additionalUrlsByServerId;
-    QMultiHash<QnUuid, QUrl> m_ignoredUrlsByServerId;
 };
 
 #endif // ROUTING_MANAGEMENT_WIDGET_H
