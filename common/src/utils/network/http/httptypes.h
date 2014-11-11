@@ -353,7 +353,6 @@ namespace nx_http
         //!Http authentication scheme enumeration
         namespace AuthScheme
         {
-            // TODO: #Elric #enum
             enum Value
             {
                 none,

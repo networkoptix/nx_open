@@ -29,6 +29,8 @@ namespace {
 
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode)
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ClientSkin)
+QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::BackgroundAnimationMode)
+QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ImageBehaviour)
 
 void QnClientMetaTypes::initialize() {
     /* Note that running the code twice is perfectly OK, 

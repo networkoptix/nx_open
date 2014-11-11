@@ -66,6 +66,8 @@ QnUuid QnRouter::whoIs(const QString &host, quint16 port) const {
 void QnRouter::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url) {
     Endpoint endpoint(moduleInformation.id, url.host(), url.port());
 
+    Q_ASSERT_X(!endpoint.id.isNull(), "Endpoint cannot has null id!", Q_FUNC_INFO);
+
     if (!addConnection(qnCommon->moduleGUID(), endpoint))
         return;
 

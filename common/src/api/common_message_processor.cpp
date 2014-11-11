@@ -157,58 +157,25 @@ void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResour
 
 void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &data, bool addInformation)
 {
-    QMultiHash<QnUuid, QUrl> m_additionalUrls;
-    QMultiHash<QnUuid, QUrl> m_ignoredUrls;
+    QnMediaServerResourcePtr server = qnResPool->getResourceById(data.id).dynamicCast<QnMediaServerResource>();
+    if (!server)
+        return;
 
-    QUrl url(data.url);
-    if (data.ignore) {
-        if (url.port() != -1 && !m_additionalUrls.contains(data.id, url))
-            m_additionalUrls.insert(data.id, url);
-        m_ignoredUrls.insert(data.id, url);
+    QList<QUrl> additionalUrls = server->getAdditionalUrls();
+    QList<QUrl> ignoredUrls = server->getIgnoredUrls();
+
+    if (addInformation) {
+        if (!additionalUrls.contains(data.url))
+            additionalUrls.append(data.url);
+
+        if (data.ignore && !ignoredUrls.contains(data.url))
+            ignoredUrls.append(data.url);
     } else {
-        if (!m_additionalUrls.contains(data.id, url))
-            m_additionalUrls.insert(data.id, url);
+        additionalUrls.removeOne(data.url);
+        ignoredUrls.removeOne(data.url);
     }
-
-    for (const QnUuid &id: m_additionalUrls.uniqueKeys()) {
-        QnMediaServerResourcePtr server = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>();
-        if (!server)
-            continue;
-
-        QList<QUrl> additionalUrls = server->getAdditionalUrls();
-
-        if (addInformation) {
-            for (const QUrl &url: m_additionalUrls.values(id)) {
-                if (!additionalUrls.contains(url))
-                    additionalUrls.append(url);
-            }
-        } else {
-            for (const QUrl &url: m_additionalUrls.values(id))
-                additionalUrls.removeOne(url);
-        }
-        server->setAdditionalUrls(additionalUrls);
-    }
-
-    for (const QnUuid &id: m_ignoredUrls.uniqueKeys()) {
-        QnMediaServerResourcePtr server = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>();
-        if (!server)
-            continue;
-
-        QList<QUrl> ignoredUrls = server->getIgnoredUrls();
-
-        if (addInformation) {
-            for (const QUrl &url: m_additionalUrls.values(id))
-                ignoredUrls.removeOne(url);
-            for (const QUrl &url: m_ignoredUrls.values(id)) {
-                if (!ignoredUrls.contains(url))
-                    ignoredUrls.append(url);
-            }
-        } else {
-            for (const QUrl &url: m_ignoredUrls.values(id))
-                ignoredUrls.removeOne(url);
-        }
-        server->setIgnoredUrls(ignoredUrls);
-    }
+    server->setAdditionalUrls(additionalUrls);
+    server->setIgnoredUrls(ignoredUrls);
 }
 
 void QnCommonMessageProcessor::on_resourceStatusChanged( const QnUuid& resourceId, Qn::ResourceStatus status )

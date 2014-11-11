@@ -761,76 +761,88 @@ namespace nx_http
 
         header::WWWAuthenticate wwwAuthenticateHeader;
         wwwAuthenticateHeader.parse( wwwAuthenticateIter->second );
-        if( wwwAuthenticateHeader.authScheme != header::AuthScheme::digest )
-            return false;
-
-        //reading params
-        QMap<BufferType, BufferType>::const_iterator nonceIter = wwwAuthenticateHeader.params.find("nonce");
-        const BufferType nonce = nonceIter != wwwAuthenticateHeader.params.end() ? nonceIter.value() : BufferType();
-        QMap<BufferType, BufferType>::const_iterator realmIter = wwwAuthenticateHeader.params.find("realm");
-        const BufferType realm = realmIter != wwwAuthenticateHeader.params.end() ? realmIter.value() : BufferType();
-        QMap<BufferType, BufferType>::const_iterator qopIter = wwwAuthenticateHeader.params.find("qop");
-        const BufferType qop = qopIter != wwwAuthenticateHeader.params.end() ? qopIter.value() : BufferType();
-
-        if( qop.indexOf("auth-int") != -1 ) //TODO #ak qop can have value "auth,auth-int". That should be supported
-            return false;   //qop=auth-int is not supported
-
-        BufferType ha1;
-        QCryptographicHash md5HashCalc( QCryptographicHash::Md5 );
-        if (m_authType == authDigestWithPasswordHash) {
-            ha1 = m_userPassword.toUtf8();
-        }
-        else {
-            //HA1
-            md5HashCalc.addData( m_userName.toLatin1() );
-            md5HashCalc.addData( ":" );
-            md5HashCalc.addData( realm );
-            md5HashCalc.addData( ":" );
-            md5HashCalc.addData( m_userPassword.toLatin1() );
-            ha1 = md5HashCalc.result().toHex();
-        }
-        //HA2, qop=auth-int is not supported
-        md5HashCalc.reset();
-        md5HashCalc.addData( m_request.requestLine.method );
-        md5HashCalc.addData( ":" );
-        md5HashCalc.addData( m_url.path().toLatin1() );
-        const BufferType& ha2 = md5HashCalc.result().toHex();
-        //response
-        header::DigestAuthorization digestAuthorizationHeader;
-        digestAuthorizationHeader.addParam( "username", m_userName.toLatin1() );
-        digestAuthorizationHeader.addParam( "realm", realm );
-        digestAuthorizationHeader.addParam( "nonce", nonce );
-        digestAuthorizationHeader.addParam( "uri", m_url.path().toLatin1() );
-        md5HashCalc.reset();
-        md5HashCalc.addData( ha1 );
-        md5HashCalc.addData( ":" );
-        md5HashCalc.addData( nonce );
-        md5HashCalc.addData( ":" );
-        if( !qop.isEmpty() )
+        if( wwwAuthenticateHeader.authScheme == header::AuthScheme::basic )
         {
-            const BufferType nonceCount = "00000001";     //TODO/IMPL
-            const BufferType clientNonce = "0a4f113b";    //TODO/IMPL
-
-            md5HashCalc.addData( nonceCount );
-            md5HashCalc.addData( ":" );
-            md5HashCalc.addData( clientNonce );
-            md5HashCalc.addData( ":" );
-            md5HashCalc.addData( qop );
-            md5HashCalc.addData( ":" );
-
-            digestAuthorizationHeader.addParam( "qop", qop );
-            digestAuthorizationHeader.addParam( "nc", nonceCount );
-            digestAuthorizationHeader.addParam( "cnonce", clientNonce );
+            nx_http::insertOrReplaceHeader(
+                &m_request.headers,
+                nx_http::HttpHeader(
+                    header::Authorization::NAME,
+                    header::BasicAuthorization( m_userName.toLatin1(), m_userPassword.toLatin1() ).toString() ) );
         }
-        md5HashCalc.addData( ha2 );
-        digestAuthorizationHeader.addParam( "response", md5HashCalc.result().toHex() );
+        else if( wwwAuthenticateHeader.authScheme == header::AuthScheme::digest )
+        {
+            //reading params
+            QMap<BufferType, BufferType>::const_iterator nonceIter = wwwAuthenticateHeader.params.find("nonce");
+            const BufferType nonce = nonceIter != wwwAuthenticateHeader.params.end() ? nonceIter.value() : BufferType();
+            QMap<BufferType, BufferType>::const_iterator realmIter = wwwAuthenticateHeader.params.find("realm");
+            const BufferType realm = realmIter != wwwAuthenticateHeader.params.end() ? realmIter.value() : BufferType();
+            QMap<BufferType, BufferType>::const_iterator qopIter = wwwAuthenticateHeader.params.find("qop");
+            const BufferType qop = qopIter != wwwAuthenticateHeader.params.end() ? qopIter.value() : BufferType();
 
-        BufferType authorizationStr;
-        digestAuthorizationHeader.serialize( &authorizationStr );
+            if( qop.indexOf("auth-int") != -1 ) //TODO #ak qop can have value "auth,auth-int". That should be supported
+                return false;   //qop=auth-int is not supported
 
-        nx_http::insertOrReplaceHeader(
-            &m_request.headers,
-            nx_http::HttpHeader( header::Authorization::NAME, authorizationStr ) );
+            BufferType ha1;
+            QCryptographicHash md5HashCalc( QCryptographicHash::Md5 );
+            if (m_authType == authDigestWithPasswordHash) {
+                ha1 = m_userPassword.toUtf8();
+            }
+            else {
+                //HA1
+                md5HashCalc.addData( m_userName.toLatin1() );
+                md5HashCalc.addData( ":" );
+                md5HashCalc.addData( realm );
+                md5HashCalc.addData( ":" );
+                md5HashCalc.addData( m_userPassword.toLatin1() );
+                ha1 = md5HashCalc.result().toHex();
+            }
+            //HA2, qop=auth-int is not supported
+            md5HashCalc.reset();
+            md5HashCalc.addData( m_request.requestLine.method );
+            md5HashCalc.addData( ":" );
+            md5HashCalc.addData( m_url.path().toLatin1() );
+            const BufferType& ha2 = md5HashCalc.result().toHex();
+            //response
+            header::DigestAuthorization digestAuthorizationHeader;
+            digestAuthorizationHeader.addParam( "username", m_userName.toLatin1() );
+            digestAuthorizationHeader.addParam( "realm", realm );
+            digestAuthorizationHeader.addParam( "nonce", nonce );
+            digestAuthorizationHeader.addParam( "uri", m_url.path().toLatin1() );
+            md5HashCalc.reset();
+            md5HashCalc.addData( ha1 );
+            md5HashCalc.addData( ":" );
+            md5HashCalc.addData( nonce );
+            md5HashCalc.addData( ":" );
+            if( !qop.isEmpty() )
+            {
+                const BufferType nonceCount = "00000001";     //TODO/IMPL
+                const BufferType clientNonce = "0a4f113b";    //TODO/IMPL
+
+                md5HashCalc.addData( nonceCount );
+                md5HashCalc.addData( ":" );
+                md5HashCalc.addData( clientNonce );
+                md5HashCalc.addData( ":" );
+                md5HashCalc.addData( qop );
+                md5HashCalc.addData( ":" );
+
+                digestAuthorizationHeader.addParam( "qop", qop );
+                digestAuthorizationHeader.addParam( "nc", nonceCount );
+                digestAuthorizationHeader.addParam( "cnonce", clientNonce );
+            }
+            md5HashCalc.addData( ha2 );
+            digestAuthorizationHeader.addParam( "response", md5HashCalc.result().toHex() );
+
+            BufferType authorizationStr;
+            digestAuthorizationHeader.serialize( &authorizationStr );
+
+            nx_http::insertOrReplaceHeader(
+                &m_request.headers,
+                nx_http::HttpHeader( header::Authorization::NAME, authorizationStr ) );
+        }
+        else
+        {
+            return false;
+        }
 
         m_authorizationTried = true;
         return initiateHttpMessageDelivery( m_url );
@@ -864,5 +876,44 @@ namespace nx_http
     void AsyncHttpClient::setAuthType(AuthType value)
     {
         m_authType = value;
+    }
+
+
+    bool downloadFileAsync(
+        const QUrl& url,
+        std::function<void(SystemError::ErrorCode, int, nx_http::BufferType)> completionHandler )
+    {
+        nx_http::AsyncHttpClientPtr httpClientCaptured = std::make_shared<nx_http::AsyncHttpClient>();
+        auto requestCompletionFunc = [httpClientCaptured, completionHandler]
+            ( nx_http::AsyncHttpClientPtr httpClient ) mutable
+        {
+            httpClientCaptured.reset();
+
+            if( httpClient->failed() )
+                return completionHandler(
+                    SystemError::connectionReset,
+                    nx_http::StatusCode::ok,
+                    nx_http::BufferType() );
+
+            if( httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok &&
+                httpClient->response()->statusLine.statusCode != nx_http::StatusCode::partialContent )
+            {
+                return completionHandler(
+                    SystemError::noError,
+                    httpClient->response()->statusLine.statusCode,
+                    nx_http::BufferType() );
+            }
+
+            completionHandler( 
+                SystemError::noError,
+                httpClient->response()->statusLine.statusCode,
+                httpClient->fetchMessageBodyBuffer() );
+        };
+        QObject::connect(
+            httpClientCaptured.get(), &nx_http::AsyncHttpClient::done,
+            httpClientCaptured.get(), requestCompletionFunc,
+            Qt::DirectConnection );
+
+        return httpClientCaptured->doGet( url );
     }
 }
