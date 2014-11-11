@@ -20,14 +20,6 @@
 
 namespace {
     ec2::AbstractECConnectionPtr ec2Connection() { return QnAppServerConnectionFactory::getConnection2(); }
-
-    QnUserResourcePtr getAdminUser() {
-        for (const QnResourcePtr &resource: qnResPool->getResourcesWithFlag(Qn::user)) {
-            if (resource->getName() == lit("admin"))
-                return resource.dynamicCast<QnUserResource>();
-        }
-        return QnUserResourcePtr();
-    }
 }
 
 int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner) 
@@ -105,7 +97,7 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
         }
         changeAdminPassword(password);
     } else {
-        QnUserResourcePtr admin = getAdminUser();
+        QnUserResourcePtr admin = qnResPool->getAdministrator();
         if (!admin) {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("INTERNAL_ERROR"));
             return CODE_OK;
@@ -161,7 +153,7 @@ bool QnMergeSystemsRestHandler::changeSystemName(const QString &systemName) {
 }
 
 bool QnMergeSystemsRestHandler::changeAdminPassword(const QString &password) {
-    if (QnUserResourcePtr admin = getAdminUser()) {
+    if (QnUserResourcePtr admin = qnResPool->getAdministrator()) {
         admin->setPassword(password);
         admin->generateHash();
         ec2Connection()->getUserManager()->save(admin, this, [](int, ec2::ErrorCode) { return; });

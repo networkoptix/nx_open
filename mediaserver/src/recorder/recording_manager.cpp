@@ -277,8 +277,9 @@ bool QnRecordingManager::startOrStopRecording(const QnResourcePtr& res, QnVideoC
             if (recorderHiRes) {
                 if (!recorderHiRes->isRunning()) {
                     NX_LOG(QString(lit("Recording started for camera %1")).arg(res->getUniqueId()), cl_logINFO);
+                    recorderHiRes->start();
+                    camera->inUse(recorderHiRes);
                 }
-                recorderHiRes->start();
             }
             providerHi->startIfNotRunning();
         }
@@ -296,13 +297,16 @@ bool QnRecordingManager::startOrStopRecording(const QnResourcePtr& res, QnVideoC
                     if (!recorderLowRes->isRunning()) {
                         NX_LOG(QString(lit("Recording started (secondary stream) for camera  %1")).arg(res->getUniqueId()), cl_logINFO);
                         recorderLowRes->start();
+                        camera->inUse(recorderLowRes);
                     }
                 }
                 providerLow->startIfNotRunning();
             }
             else {
-                if (recorderLowRes && recorderLowRes->isRunning())
+                if (recorderLowRes && recorderLowRes->isRunning()) {
                     recorderLowRes->pleaseStop();
+                    camera->notInUse(recorderLowRes);
+                }
                 camera->updateActivity();
             }
         }
@@ -317,10 +321,14 @@ bool QnRecordingManager::startOrStopRecording(const QnResourcePtr& res, QnVideoC
         if (needStopHi || needStopLow)
             someRecordingIsPresent = true;
 
-        if (needStopHi)
+        if (needStopHi) {
             recorderHiRes->pleaseStop();
-        if (needStopLow)
+            camera->notInUse(recorderHiRes);
+        }
+        if (needStopLow) {
             recorderLowRes->pleaseStop();
+            camera->notInUse(recorderLowRes);
+        }
 
         camera->updateActivity();
 

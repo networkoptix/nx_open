@@ -1,18 +1,20 @@
 #ifdef ENABLE_DLINK
 
 #include "dlink_resource.h"
-#include "../onvif/dataprovider/onvif_mjpeg.h"
+
+#include <utils/network/http/asynchttpclient.h>
+
 #include "dlink_stream_reader.h"
+#include "../onvif/dataprovider/onvif_mjpeg.h"
+
 
 const QString QnPlDlinkResource::MANUFACTURE(lit("Dlink"));
 
-
 QnDlink_cam_info::QnDlink_cam_info():
-hasMPEG4(false),
-hasFixedQuality(false),
-numberOfVideoProfiles(0)
+    hasMPEG4(false),
+    hasFixedQuality(false),
+    numberOfVideoProfiles(0)
 {
-
 }
 
 void QnDlink_cam_info::clear()
@@ -119,6 +121,54 @@ QnPlDlinkResource::QnPlDlinkResource()
 {
     setVendor(lit("Dlink"));
     setDefaultAuth(QLatin1String("admin"), QLatin1String(""));
+}
+
+bool QnPlDlinkResource::checkIfOnlineAsync( std::function<void(bool)>&& completionHandler )
+{
+    QUrl apiUrl;
+    apiUrl.setScheme( lit("http") );
+    apiUrl.setHost( getHostAddress() );
+    apiUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
+    apiUrl.setUserName( getAuth().user() );
+    apiUrl.setPassword( getAuth().password() );
+    apiUrl.setPath( lit("/common/info.cgi") );
+
+    QString resourceMac = getMAC().toString();
+    auto requestCompletionFunc = [resourceMac, completionHandler]
+        ( SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody ) mutable
+    {
+        if( osErrorCode != SystemError::noError ||
+            statusCode != nx_http::StatusCode::ok )
+        {
+            return completionHandler( false );
+        }
+
+        //msgBody contains parameters "param1=value1" each on its line
+
+        nx_http::LineSplitter lineSplitter;
+        QnByteArrayConstRef line;
+        size_t bytesRead = 0;
+        size_t dataOffset = 0;
+        while( lineSplitter.parseByLines( nx_http::ConstBufferRefType(msgBody, dataOffset), &line, &bytesRead) )
+        {
+            dataOffset += bytesRead;
+            const int sepIndex = line.indexOf('=');
+            if( sepIndex == -1 )
+                continue;
+            if( line.mid( 0, sepIndex ) == "macaddr" )
+            {
+                QByteArray mac = line.mid( sepIndex+1 );
+                mac.replace( ':', '-' );
+                return completionHandler( mac == resourceMac.toLatin1() );
+            }
+        }
+
+        completionHandler( false );
+    };
+
+    return nx_http::downloadFileAsync(
+        apiUrl,
+        requestCompletionFunc );
 }
 
 QString QnPlDlinkResource::getDriverName() const

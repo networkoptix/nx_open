@@ -102,7 +102,7 @@
 		        "VISTA|VK2-720VZMI",
 		        "VISTA|VK2-720VZMX"
             ],
-            "ptzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability"
+            "ptzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability"
         },
         {
             "keys": [

@@ -485,7 +485,11 @@ void QnProgressiveDownloadingConsumer::run()
         if (mediaRes) {
             QnImageFilterHelper extraParams;
             extraParams.setVideoLayout(mediaRes->getVideoLayout());
-            int rotation = mediaRes->toResource()->getProperty(QnMediaResource::rotationKey()).toInt();
+            int rotation;
+            if (decodedUrlQuery.hasQueryItem("rotation"))
+                rotation = decodedUrlQuery.queryItemValue("rotation").toInt();
+            else
+                rotation = mediaRes->toResource()->getProperty(QnMediaResource::rotationKey()).toInt();
             qreal customAR = mediaRes->toResource()->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
             extraParams.setRotation(rotation);
             extraParams.setCustomAR(customAR);

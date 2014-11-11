@@ -127,16 +127,17 @@ public:
         \return \a true if async call has been started successfully
         \note Request interleaving is not supported. Issueing new request with previous still running causes undefined behavior
     */
-    template<class ResultHandler>
-    bool callAsync(const Request& request, ResultHandler resultHandler)
+    template<class RequestType, class ResultHandler>
+    bool callAsync(RequestType&& request, ResultHandler&& resultHandler)
     {
         m_state = init;
-        m_extCompletionHandler = std::move(resultHandler);
+        m_extCompletionHandler = std::forward<ResultHandler>(resultHandler);
         m_resultHandler = [this](int resultCode) {
             QMutexLocker lk(&m_mutex);
+            std::function<void(int)> extCompletionHandlerLocal = std::move( m_extCompletionHandler );
             m_socket.reset();
             lk.unlock();
-            m_extCompletionHandler(resultCode);
+            extCompletionHandlerLocal( resultCode );
         };
 
         //NOTE not locking mutex because all public method calls are synchronized
@@ -157,7 +158,7 @@ public:
         m_syncWrapper->getProxy()->soap->master = m_socket->handle();
 
         //serializing request
-        m_request = request;
+        m_request = std::forward<RequestType>(request);
 
         const QUrl endpoint(QLatin1String(m_syncWrapper->endpoint()));
 
@@ -168,6 +169,7 @@ public:
                 std::bind( &GSoapAsyncCallWrapper::onConnectCompleted, this, _1 ) ) )
         {
             m_socket.reset();
+            m_extCompletionHandler = std::function<void(int)>();
             return false;
         }
 
