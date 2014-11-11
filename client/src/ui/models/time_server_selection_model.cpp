@@ -54,10 +54,17 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /*= NULL*
 
     /* Handle peer time updates. */
     connect(processor, &QnCommonMessageProcessor::peerTimeChanged, this, [this](const QnUuid &peerId, qint64 syncTime, qint64 peerTime) {
+        /* Store received value to use it later. */
+        qint64 offset = peerTime - syncTime;
+        m_serverOffsetCache[peerId] = offset;
+        PRINT_DEBUG("get time for peer " + peerId.toByteArray());
+
+        /* Check if the server is already online. */
         int idx = qnIndexOf(m_items, [peerId](const Item &item) {return item.peerId == peerId; });
         if (idx < 0)
             return;
-        m_items[idx].offset = peerTime - syncTime;
+
+        m_items[idx].offset = offset;
         m_items[idx].ready = true;
         PRINT_DEBUG("peer " + peerId.toByteArray() + " is ready");
         emit dataChanged(index(idx, TimeColumn), index(idx, OffsetColumn), textRoles);
@@ -135,11 +142,11 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /*= NULL*
     });
 
     /* Requesting initial time. */
-    QHash<QnUuid, qint64> timeByPeer;
+    qint64 currentSyncTime = qnSyncTime->currentMSecsSinceEpoch();
     if (auto connection = QnAppServerConnectionFactory::getConnection2()) {
         auto timeManager = connection->getTimeManager();
         foreach(const ec2::QnPeerTimeInfo &info, timeManager->getPeerTimeInfoList())
-            timeByPeer[info.peerId] = info.time;
+            m_serverOffsetCache[info.peerId] = info.time - currentSyncTime;
     }
 
     /* Fill table with current data. */
@@ -147,7 +154,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /*= NULL*
     foreach (const QnPeerRuntimeInfo &runtimeInfo, QnRuntimeInfoManager::instance()->items()->getItems()) {
         if (runtimeInfo.data.peer.peerType != Qn::PT_Server)
             continue;
-        addItem(runtimeInfo, timeByPeer.value(runtimeInfo.uuid, 0));
+        addItem(runtimeInfo);
     }
     endResetModel();
 }
@@ -298,7 +305,7 @@ void QnTimeServerSelectionModel::updateTime() {
     updateColumn(Columns::TimeColumn);
 }
 
-void QnTimeServerSelectionModel::addItem(const QnPeerRuntimeInfo &info, qint64 time) {
+void QnTimeServerSelectionModel::addItem(const QnPeerRuntimeInfo &info) {
     PRINT_DEBUG("peer " + info.uuid.toByteArray() + " is added");
 #ifdef _DEBUG
     QnMediaServerResourcePtr server = qnResPool->getResourceById(info.uuid).dynamicCast<QnMediaServerResource>();
@@ -313,9 +320,11 @@ void QnTimeServerSelectionModel::addItem(const QnPeerRuntimeInfo &info, qint64 t
         PRINT_DEBUG("peer " + info.uuid.toByteArray() + " is SELECTED");
         m_selectedServer = item.peerId;
     }
-    item.ready = time > 0;
-    if (time > 0)
-        item.offset = time - qnSyncTime->currentMSecsSinceEpoch();
+    item.ready = m_serverOffsetCache.contains(item.peerId);
+    if (item.ready) {
+        item.offset = m_serverOffsetCache[item.peerId];
+        PRINT_DEBUG("peer " + info.uuid.toByteArray() + " is ready");
+    }
     m_items << item;
 
     m_sameTimezoneValid = false;
