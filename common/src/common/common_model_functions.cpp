@@ -21,13 +21,6 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::PtzTraits,
     (Qn::ManualAutoFocusPtzTrait,  "ManualAutoFocus")
 )
 
-// TODO: #Elric #2.3 code duplication ^v
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::PtzTrait,
-    (Qn::FourWayPtzTrait,          "FourWayPtz")
-    (Qn::EightWayPtzTrait,         "EightWayPtz")
-    (Qn::ManualAutoFocusPtzTrait,  "ManualAutoFocus")
-)
-
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, RecordingType)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PropertyDataType)
 

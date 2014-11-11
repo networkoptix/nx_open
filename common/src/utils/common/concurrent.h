@@ -45,13 +45,14 @@ namespace QnConcurrent
             typedef T value_type;
             typedef std::vector<bool>::size_type size_type;
 
-            QnFutureImplBase()
+            QnFutureImplBase( size_type totalTasksToWaitFor = 0 )
             :
-                m_totalTasksToRun( 0 ),
+                m_totalTasksToRun( totalTasksToWaitFor ),
                 m_tasksCompleted( 0 ),
-                m_startedTaskCount( 0 ),
+                m_startedTaskCount( totalTasksToWaitFor ),
                 m_isCancelled( false )
             {
+                m_completionMarks.resize( m_totalTasksToRun );
             }
 
             ~QnFutureImplBase()
@@ -171,6 +172,13 @@ namespace QnConcurrent
             typedef typename std::vector<T>::reference reference;
             typedef typename std::vector<T>::const_reference const_reference;
 
+            QnFutureImpl( size_type totalTasksToWaitFor = 0 )
+            :
+                base_type( totalTasksToWaitFor )
+            {
+                m_results.resize( totalTasksToWaitFor );
+            }
+
             void setTotalTasksToRun( size_type totalTasksToRun )
             {
                 base_type::setTotalTasksToRun( totalTasksToRun );
@@ -192,18 +200,20 @@ namespace QnConcurrent
             template<class Function, class Data>
             void executeFunctionOnDataAtPos( size_type index, Function function, const Data& data )
             {
-                const T& result = function( data );
-                QMutexLocker lk( &this->m_mutex );
-                m_results[index] = std::move(result);
-                this->setCompletedAtNonSafe( index );
+                setResultAt( index, function( data ) );
             }
 
             template<class Function>
             void executeFunctionOnDataAtPos( size_type index, Function function )
             {
-                const T& result = function();
+                setResultAt( index, function() );
+            }
+
+            template<class ResultType>
+            void setResultAt( size_type index, ResultType&& result )
+            {
                 QMutexLocker lk( &this->m_mutex );
-                m_results[index] = std::move(result);
+                m_results[index] = std::forward<ResultType>(result);
                 this->setCompletedAtNonSafe( index );
             }
 
@@ -216,19 +226,27 @@ namespace QnConcurrent
         :
             public QnFutureImplBase<void>
         {
+            typedef QnFutureImplBase<void> base_type;
+
         public:
+            QnFutureImpl( size_type totalTasksToWaitFor = 0 ) : base_type( totalTasksToWaitFor ) {}
+
             template<class Function, class Data>
             void executeFunctionOnDataAtPos( size_type index, Function function, const Data& data )
             {
                 function( data );
-                QMutexLocker lk( &this->m_mutex );
-                this->setCompletedAtNonSafe( index );
+                setResultAt( index );
             }
 
             template<class Function>
             void executeFunctionOnDataAtPos( size_type index, Function function )
             {
                 function();
+                setResultAt( index );
+            }
+
+            void setResultAt( size_type index )
+            {
                 QMutexLocker lk( &this->m_mutex );
                 this->setCompletedAtNonSafe( index );
             }
@@ -338,7 +356,8 @@ namespace QnConcurrent
         typedef typename FutureImplType::value_type value_type;
         typedef typename FutureImplType::size_type size_type;
 
-        QnFutureBase() : m_impl( new FutureImplType() ) {}
+        QnFutureBase( size_type totalTasksToWaitFor = 0 )
+            : m_impl( new FutureImplType( totalTasksToWaitFor ) ) {}
 
         void waitForFinished() { m_impl->waitForFinished(); }
         void cancel() { m_impl->cancel(); }
@@ -366,13 +385,22 @@ namespace QnConcurrent
     :
         public QnFutureBase<T>
     {
+        typedef QnFutureBase<T> base_type;
+
     public:
-        typedef typename QnFutureBase<T>::size_type size_type;
-        typedef typename QnFutureBase<T>::FutureImplType::reference reference;
-        typedef typename QnFutureBase<T>::FutureImplType::const_reference const_reference;
+        typedef typename base_type::size_type size_type;
+        typedef typename base_type::FutureImplType::reference reference;
+        typedef typename base_type::FutureImplType::const_reference const_reference;
+
+        QnFuture( size_type totalTasksToWaitFor = 0 )
+            : base_type( totalTasksToWaitFor ) {}
 
         reference resultAt( size_type index ) { return this->m_impl->resultAt( index ); }
         const_reference resultAt( size_type index ) const { return this->m_impl->resultAt( index ); }
+        template<class ResultType>
+            void setResultAt( size_type index, ResultType&& result ) {
+                this->m_impl->setResultAt( index, std::forward<ResultType>(result) );
+            }
     };
 
     template<>
@@ -380,7 +408,15 @@ namespace QnConcurrent
     :
         public QnFutureBase<void>
     {
+        typedef QnFutureBase<void> base_type;
+
     public:
+        QnFuture( size_type totalTasksToWaitFor = 0 )
+            : base_type( totalTasksToWaitFor ) {}
+
+        void setResultAt( size_type index ) {
+            this->m_impl->setResultAt( index );
+        }
     };
 
     /*!
