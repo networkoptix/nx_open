@@ -5,422 +5,1111 @@ import ConfigParser
 import time
 import threading
 import json
+import random
+import md5
+import string
+import sys
+import Queue
 
-#class TestSequenceFunctions(unittest.TestCase):
+class ClusterTest():
+    clusterTestServerList=[]
+    clusterTestSleepTime=None
+    clusterTestServerUUIDList=[]
 
-#    def setUp(self):
-#        self.seq = range(10)
-
-#    def test_shuffle(self):
-#        # make sure the shuffled sequence does not lose any elements
-#        random.shuffle(self.seq)
-#        self.seq.sort()
-#        self.assertEqual(self.seq, range(10))
-
-#        # should raise an exception for an immutable sequence
-#        self.assertRaises(TypeError, random.shuffle, (1,2,3))
-
-#    def test_choice(self):
-#        element = random.choice(self.seq)
-#        self.assertTrue(element in self.seq)
-
-#    def test_sample(self):
-#        with self.assertRaises(ValueError):
-#            random.sample(self.seq, 20)
-#        for element in random.sample(self.seq, 5):
-#            self.assertTrue(element in self.seq)
-
-
-ec2GetRequests = [
-    "getResourceTypes",
-    "getResourceParams",
-    "getMediaServers",
-    "getMediaServersEx",
-    "getCameras",
-    "getCamerasEx",
-    "getCameraHistoryItems",
-    "getCameraBookmarkTags",
-    "getBusinessRules",
-    "getUsers",
-    "getVideowalls",
-    "getLayouts",
-    "listDirectory",
-    "getStoredFile",
-    "getSettings",
-    "getCurrentTime",
-    "getFullInfo",
-    "getLicenses"
-]
-
-serverAddress = None
-serverPort = None
-
-class EnumerateAllEC2GetCallsTest(unittest.TestCase):
-
-    def test_callAllGetters(self):
-        for reqName in ec2GetRequests:
-            response = urllib2.urlopen("http://%s:%d/ec2/%s" % (serverAddress,serverPort,reqName))
-            self.assertTrue(response.getcode() == 200, "%s failed with statusCode %d" % (reqName,response.getcode()))
-            print "%s OK\r\n" % (reqName)
-
-
-
-cameraJson = """[
-    {
-        "audioEnabled": false,
-        "controlEnabled": false,
-        "dewarpingParams": "",
-        "groupId": "",
-        "groupName": "",
-        "id": "{066fbf9c-2e11-a501-6e15-dfb0fb97c7cb}",
-        "mac": "00-40-8C-BF-92-CE",
-        "manuallyAdded": false,
-        "maxArchiveDays": 0,
-        "minArchiveDays": 0,
-        "model": "AXISP1344",
-        "motionMask": "",
-        "motionType": "MT_Default",
-        "name": "AXISP1344",
-        "parentId": "{47bf37a0-72a6-2890-b967-5da9c390d28a}",
-        "physicalId": "00-40-8C-BF-92-CE",
-        "preferedServerId": "{00000000-0000-0000-0000-000000000000}",
-        "scheduleEnabled": false,
-        "scheduleTasks": [ ],
-        "secondaryStreamQuality": "SSQualityLow",
-        "status": "Unauthorized",
-        "statusFlags": "CSF_NoFlags",
-        "typeId": "{15379a04-aba4-f5dc-e0de-36979fc36954}",
-        "url": "192.168.0.92",
-        "vendor": "Axis"
-    }
-]"""
-
-
-class GenerateCameraTest(unittest.TestCase):
-
-    def test_addCamera(self):
-        reqName="saveCameras"
-        req = urllib2.Request("http://%s:%d/ec2/%s" % (serverAddress,serverPort,reqName), data=cameraJson, headers={'Content-Type': 'application/json'})
-        response = urllib2.urlopen(req)
-        self.assertTrue(response.getcode() == 200, "%s failed with statusCode %d" % (reqName,response.getcode()))
-        print "%s OK\r\n" % (reqName)
-
-
-
-#class TestEC2ServerModification(unittest.TestCase):
-class TestEC2ServerModification():
-    serverList=()
-
-    ec2GetRequests = [
-    "getResourceTypes",
-    "getResourceParams",
-    "getMediaServers",
-    "getMediaServersEx",
-    "getCameras",
-    "getCamerasEx",
-    "getCameraHistoryItems",
-    "getCameraBookmarkTags",
-    "getBusinessRules",
-    "getUsers",
-    "getVideowalls",
-    "getLayouts",
-    "listDirectory",
-    "getStoredFile",
-    "getSettings",
-    "getFullInfo",
-    "getLicenses"
+    _getterAPIList = [
+        "getResourceTypes",
+        "getResourceParams",
+        "getMediaServers",
+        "getMediaServersEx",
+        "getCameras",
+        "getCamerasEx",
+        "getCameraHistoryItems",
+        "getCameraBookmarkTags",
+        "getBusinessRules",
+        "getUsers",
+        "getVideowalls",
+        "getLayouts",
+        "listDirectory",
+        "getStoredFile",
+        "getSettings",
+        "getFullInfo",
+        "getLicenses"
     ]
 
-    SERVER_NAME = 0
-    SERVER_ADDR = 1
-    SERVER_PORT = 2
+    def _getServerName(self,obj,uuid):
+        for s in obj:
+            if s["id"] == uuid:
+                return s["name"]
+        return None
 
-    testCaseList=[]
-    serverStatesSyncTimeout=0
+    # call this function after reading the clusterTestServerList
+    def _fetchClusterTestServerUUIDList(self):
 
-    def setUp(self):
-        self.loadConfig()
-        self.ensureServerListStates()
-        print "Start executing cluster tests\n"
+        server_id_list=[]
+        for s in self.clusterTestServerList:
+            response = urllib2.urlopen(
+                "http://%s/ec2/testConnection?format=json"%(s))
+            if response.getcode() != 200:
+                return (False,"testConnection response with error code:%d"%(response.getcode()))
+            json_obj = json.loads( response.read() )
+            server_id_list.append(json_obj["ecsGuid"])
 
-    def loadConfig(self):
-        # reading the config 
-        cfg_parser = ConfigParser.RawConfigParser()
-        ret = cfg_parser.read("ec2_cluster_test.cfg")
-        if not ret:
-            raise Exception("No configuration file:ec2_cluster_test.cfg")
 
-        # get the server list from the config file
-        serverListStr = cfg_parser.get("ClusterTest","serverList")
+        # We still need to get the server name since this is useful for 
+        # the SaveServerAttributeList test (required in its post data)
 
-        # split it into the list
-        serverList = serverListStr.split(",")
-        self.serverList=[]
+        response = urllib2.urlopen(
+            "http://%s/ec2/getMediaServersEx?format=json"%(self.clusterTestServerList[0]))
 
-        # now for each list
-        for server in serverList:
-            self.serverList.append((
-                server,
-                cfg_parser.get(server,"serverAddress"),
-                cfg_parser.getint(server,"port")))
-                
-        # load other config
-        testCaseList=cfg_parser.get("ClusterTest","testCaseList").split(",")
+        if response.getcode() != 200:
+            return (False,"getMediaServersEx resposne with error code:%d"%(response.getcode()))
 
-        # the test case list is a dictionary groupped by the group name
-        for testCaseFile in testCaseList:
-            # Each test case file is a group of test case, the test inside of a 
-            # group test file will be executed in parallel instead of one by one
-            caseList=[]
-            config=ConfigParser.RawConfigParser()
-            config.read(testCaseFile)
-            all_sec=config.sections()
-            for section in all_sec:
-                caseList.append( (section,config.items(section)) )
-            # insert the case list to the group list
-            self.testCaseList.append((testCaseFile,caseList))
+        json_obj = json.loads( response.read() )
 
-        # loading the timeout for server status synchronization 
-        self.serverStatesSyncTimeout = cfg_parser.getint("ClusterTest","serverStatusSyncTimeout")
+        for uuid in server_id_list:
+            n = self._getServerName(json_obj,uuid)
+            if n == None:
+                return (False,"Cannot get UUID:%s related server name using getMediaServersEx"%(uuid))
+            else:
+                self.clusterTestServerUUIDList.append((uuid,n))
 
-    # This function will check whether each element in returnList has same values.
-    # The expected element in returnList is urlib2 response object, and once we
-    # find out there'are difference in returnList, we'll just return false otherwise
-    # we will return true here
+        return (True,"")
 
-    def checkResultEqual(self,responseList,methodName):
+    def _checkResultEqual(self,responseList,methodName):
         result=None
         for response in responseList:
-            if response[1].getcode() != 200:
-                self.assertTrue(false,"The server:%s method:%s http request failed with code:%d"%
-                    (response[0],methodName,response[1].getcode))
+            if response.getcode() != 200:
+                return(False,"method:%s http request failed with code:%d"%
+                    (methodName,response.getcode))
             else:
                 # painfully slow, just bulk string comparison here
                 if result == None:
-                    result=response[1].read()
+                    result=response.read()
                 else:
-                    output = response[1].read()
+                    output = response.read()
                     if result != output:
-                        self.assertTrue(false,"The server:%s method:%s return value differs from other"%
-                            (response[0],methodName))
+                        return(False,"method:%s return value differs from other"%
+                            (methodName))
+        return (True,"")
 
-    def checkMethodStatusConsistent(self,method,method_list):
-        responseList=[]
-        url_query=None
-
-        if method_list != None:
-            url_query = urllib.urlencode(
-                method_list)
-
-        for server in self.serverList:
-            if url_query == None:
+    def checkMethodStatusConsistent(self,method):
+            responseList=[]
+            for server in self.clusterTestServerList:
                 responseList.append(
-                        (server[self.SERVER_NAME],
-                            urllib2.urlopen( 
-                                "http://%s:%d/ec2/%s"%(
-                                    server[self.SERVER_ADDR],
-                                    server[self.SERVER_PORT],
-                                    method))))
-            else:
-                responseList.append(
-                        (server[self.SERVER_NAME],
-                            urllib2.urlopen( 
-                                "http://%s:%d/ec2/%s?%s"%(
-                                    server[self.SERVER_ADDR],
-                                    server[self.SERVER_PORT],
-                                    method,
-                                    url_query))))
+                    (urllib2.urlopen( "http://%s/ec2/%s"%( server, method))))
 
-        # checking the last response validation 
-        self.checkResultEqual(responseList,method)
+            # checking the last response validation 
+            return self._checkResultEqual(responseList,method)
 
-    def ensureServerListStates(self):
-        time.sleep(self.serverStatesSyncTimeout)
-        for method in self.ec2GetRequests:
-            self.checkMethodStatusConsistent(method,None)
+    def _ensureServerListStates(self,sleep_timeout):
+        time.sleep(sleep_timeout)
+        for method in self._getterAPIList:
+            ret,reason = self.checkMethodStatusConsistent(method)
+            if ret == False:
+                return (ret,reason)
+        return (True,"")
 
-        print "All test servers have same states\n"
+    def _loadConfig(self):
+        parser = ConfigParser.RawConfigParser();
+        parser.read("ec2_tests.cfg")
+        self.clusterTestServerList = parser.get("General","serverList").split(",")
+        self.clusterTestSleepTime = parser.getint("General","clusterTestSleepTime")
+        return (parser.get("General","password"),parser.get("General","username"))
 
-    def getServerInfo(self,serverName):
-        for server in self.serverList:
-            if server[self.SERVER_NAME] == serverName:
-                return server
-        return None
+    def init(self):
+        pwd,un=self._loadConfig()
+        # configure different domain password strategy
+        passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
+        for s in self.clusterTestServerList:
+            passman.add_password( "NetworkOptix","http://%s/ec2/" %(s), un, pwd )
+        urllib2.install_opener(urllib2.build_opener(urllib2.HTTPDigestAuthHandler(passman)))
 
-    def getTestCaseListItem(self,testCase,key):
-        for entry in testCase:
-            if entry[0] == key:
-                return entry[1]
+        # ensure all the server are on the same page
+        ret,reason = self._ensureServerListStates(self.clusterTestSleepTime)
 
-        return None
+        if ret == False:
+            return (ret,reason)
+
+        ret,reason = self._fetchClusterTestServerUUIDList()
+
+        if ret == False:
+            return (ret,reason)
+
+        return (True,"")
+
+clusterTest=ClusterTest()
+
+class EnumerateAllEC2GetCallsTest():
+    _ec2GetRequests = [
+        "getResourceTypes",
+        "getResourceParams",
+        "getMediaServers",
+        "getMediaServersEx",
+        "getCameras",
+        "getCamerasEx",
+        "getCameraHistoryItems",
+        "getCameraBookmarkTags",
+        "getBusinessRules",
+        "getUsers",
+        "getVideowalls",
+        "getLayouts",
+        "listDirectory",
+        "getStoredFile",
+        "getSettings",
+        "getCurrentTime",
+        "getFullInfo",
+        "getLicenses"
+    ]
+
+    def test_callAllGetters(self):
+        for s in clusterTest.clusterTestServerList:
+            for reqName in ec2GetRequests:
+                response = urllib2.urlopen("http://%s/ec2/%s" % (s,reqName))
+                self.assertTrue(response.getcode() == 200, \
+                    "%s failed with statusCode %d" % (reqName,response.getcode()))
+            print "Server:%s test for all getter pass"%(s)
 
 
-    def parseMethods(self,method):
-        methods_list = method.split(';')
-        ret=[]
-        for entry in methods_list:
-            entry = entry.split(',')
+class BasicGenerator():
+    # generate MAC address of the object
+    def generateMac(self):
+        l=[]
+        for i in range(0,5):
+            l.append(str(random.randint(0,255))+'-')
+        l.append(str(random.randint(0,255)))
+        return ''.join(l)
 
-            post_data=None
-            method_name=None
+    def generateTrueFalse(self):
+        if random.randint(0,1) == 0:
+            return "false"
+        else:
+            return "true"
 
-            if len(entry) == 2 :
-                f = open(entry[1],'r')
-                post_data = f.read()
-                f.close()
+    def generateRandomString(self,length):
+        chars=string.ascii_uppercase + string.digits
+        return ''.join(random.choice(chars) for _ in range(length))
 
-            method_name = entry[0]
+    def generateUUIdFromMd5(self,salt):
+        m=md5.new()
+        m.update(salt)
+        v = m.digest()
+        return "{%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x}" \
+            %(ord(v[0]),ord(v[1]),ord(v[2]),ord(v[3]),
+              ord(v[4]),ord(v[5]),ord(v[6]),ord(v[7]),
+              ord(v[8]),ord(v[9]),ord(v[10]),ord(v[11]),
+              ord(v[12]),ord(v[13]),ord(v[14]),ord(v[15]))
+        
+    def generateRandomId(self):
+        length = random.randint(6,12)
+        salt=self.generateRandomString(length)
+        return self.generateUUIdFromMd5(salt)
 
-            ret.append((
-                "http://%s:%d/ec2/%s"%(serverAddress,serverPort,method_name),
-                method_name,
-                post_data))
+    def generateIpV4(self):
+        return "%d.%d.%d.%d"%(
+            random.randint(0,255),
+            random.randint(0,255),
+            random.randint(0,255),
+            random.randint(0,255))
+
+    def generateIpV4Endpoint(self):
+        return "%s:%d"%(self.generateIpV4(),random.randint(0,65535))
+
+    def generateEmail(self):
+        len = random.randint(6,20)
+        user_name = self.generateRandomString(len)
+        return "%s@gmail.com"%(user_name)
+
+    def generateEnum(self,*args):
+        idx = random.randint(0,len(args)-1)
+        return args[idx]
+
+    def generateUsernamePasswordAndDigest(self):
+        un_len = random.randint(4,12)
+        pwd_len= random.randint(8,20)
+
+        un = self.generateRandomString(un_len)
+        pwd= self.generateRandomString(pwd_len)
+
+        m = md5.new()
+        m.update("%s:NetworkOptix:%s"%(un,pwd))
+        d = m.digest()
+
+        return (un,pwd,''.join('%02x'%ord(i) for i in d))
+    
+    def generatePasswordHash(self,pwd):
+        salt = "%x"%(random.randint(0,4294967295))
+        m=md5.new()
+        m.update(salt)
+        m.update(pwd)
+        md5_digest = ''.join('%02x'%ord(i) for i in m.digest())
+        return "md5$%s$%s"%(salt,md5_digest)
+
+class CameraDataGenerator(BasicGenerator):
+    _template="""[
+        {
+            "audioEnabled": %s,
+            "controlEnabled": %s,
+            "dewarpingParams": "",
+            "groupId": "",
+            "groupName": "",
+            "id": "%s",
+            "mac": "%s",
+            "manuallyAdded": false,
+            "maxArchiveDays": 0,
+            "minArchiveDays": 0,
+            "model": "%s",
+            "motionMask": "",
+            "motionType": "MT_Default",
+            "name": "%s",
+            "parentId": "{47bf37a0-72a6-2890-b967-5da9c390d28a}",
+            "physicalId": "%s",
+            "preferedServerId": "{00000000-0000-0000-0000-000000000000}",
+            "scheduleEnabled": false,
+            "scheduleTasks": [ ],
+            "secondaryStreamQuality": "SSQualityLow",
+            "status": "Unauthorized",
+            "statusFlags": "CSF_NoFlags",
+            "typeId": "{1657647e-f6e4-bc39-d5e8-563c93cb5e1c}",
+            "url": "%s",
+            "vendor": "%s"
+        }
+    ]"""
+
+    def _generateCameraId(self,mac):
+        return self.generateUUIdFromMd5(mac)
+
+    def generateCameraData(self,number):
+        ret = []
+        for i in range(number):
+            mac = self.generateMac()
+            id = self._generateCameraId(mac)
+            name_and_model= self.generateRandomString(6)
+            ret.append( self._template%(
+                    self.generateTrueFalse(),
+                    self.generateTrueFalse(),
+                    id,
+                    mac,
+                    name_and_model,
+                    name_and_model,
+                    mac,
+                    self.generateIpV4(),
+                    self.generateRandomString(4)))
 
         return ret
 
-    def parseObserver(self,observer):
-        observer_list=observer.split(',')
-        query_list = None
+class UserDataGenerator(BasicGenerator):
+    _template = """
+    {
+        "digest": "%s",
+        "email": "%s",
+        "hash": "%s",
+        "id": "%s",
+        "isAdmin": false,
+        "name": "%s",
+        "parentId": "{00000000-0000-0000-0000-000000000000}",
+        "permissions": "255",
+        "typeId": "{774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}",
+        "url": ""
+    }
+    """
 
-        if len(observer_list) == 2:
-            query_list=dict()
-            l=observer_list[1].split(';')
-            for query in l:
-                kv=query.split(':')
-                query_list[kv[0]]=kv[1]
+    def generateUserData(self,number):
+        ret=[]
+        for i in range(number):
+            un,pwd,digest = self.generateUsernamePasswordAndDigest()
+            ret.append(self._template%(
+                digest,
+                self.generateEmail(),
+                self.generatePasswordHash(pwd),
+                self.generateRandomId(),
+                un))
 
-        return (observer_list[0],query_list)
+        return ret
 
-    def formatTestCaseParam(self,testCase):
-        method = self.getTestCaseListItem(testCase,"method")
-        if method == None:
-            return False
+class MediaServerGenerator(BasicGenerator):
+    _template= """
+    {
+        "apiUrl": "%s",
+        "authKey": "%s",
+        "flags": "SF_HasPublicIP",
+        "id": "%s",
+        "name": "%s",
+        "networkAddresses": "192.168.0.1;10.0.2.141;192.168.88.1;95.31.23.214",
+        "panicMode": "PM_None",
+        "parentId": "{00000000-0000-0000-0000-000000000000}",
+        "systemInfo": "windows x64 win78",
+        "systemName": "%s",
+        "typeId": "{be5d1ee0-b92c-3b34-86d9-bca2dab7826f}",
+        "url": "rtsp://%s",
+        "version": "2.3.0.0"
+    }
+    """
+    def _generateRandomName(self):
+        length = random.randint(5,20)
+        return self.generateRandomString(length)
 
-        method_list = self.parseMethods(method)
+    def generateMediaServerData(self,number):
+        ret = []
+        for i in range(number):
+            ret.append(
+               self._template%(
+                   self.generateIpV4Endpoint(),
+                   self.generateRandomId(),
+                   self.generateRandomId(),
+                   self._generateRandomName(),
+                   self._generateRandomName(),
+                   self.generateIpV4Endpoint()))
 
-        observer = self.getTestCaseListItem(testCase,"observer")
-        if observer == None:
-            return False
+        return ret
 
-        observer = self.parseObserver(observer)
+class ResourceDataGenerator(BasicGenerator):
 
-        server = self.getTestCaseListItem(testCase,"server")
-        if server == None:
+    _ec2ResourceGetter=[
+        "getCameras",
+        "getMediaServersEx",
+        "getUsers"
+        ]
+
+    _resourceParEntryTemplate= """
+        {
+            "name":"%s",
+            "resourceId":"%s",
+            "value":"%s"
+        }
+    """
+
+    _resourceSaveTemplate= """
+        {
+            "id":"%s",
+            "name":"%s",
+            "parentId":"%s",
+            "typeId":"%s",
+            "url":"%s"
+        }
+    """
+
+    _resourceRemoveTemplate = """
+        {
+            "id":"%s"
+        }
+    """
+
+    # this list contains all the existed resource that I can find.
+    # The method for finding each resource is based on the API in
+    # the list _ec2ResourceGetter. What's more , the parentId, typeId
+    # and resource name will be recorded (Can be None).
+
+    _existedResourceList=[]
+
+    
+    # this function is used to retrieve the resource list on the 
+    # server side. We just retrieve the resource list from the 
+    # very first server since each server has exact same resource
+
+    def _retrieveResourceUUIDList(self):
+        for api in self._ec2ResourceGetter:
+            response = urllib2.urlopen(
+                    "http://%s/ec2/%s?format=json"%(
+                        clusterTest.clusterTestServerList[0],
+                        api))
+
+            if response.getcode() != 200:
+                continue
+            json_obj = json.loads( response.read() )
+            for ele in json_obj:
+                self._existedResourceList.append(
+                    (ele["id"],ele["parentId"],ele["typeId"]))
+
+        if len(self._existedResourceList) == 0:
             return False
         else:
-            server = self.getServerInfo(server)
-            if server == None:
-                return False
+            return True
+        
+    
+    def __init__(self):
+        ret = self._retrieveResourceUUIDList()
+        if ret == False:
+            raise Exception("cannot retrieve resources list on server side")
 
-        timeout = self.getTestCaseListItem(testCase,"timeout")
-        if timeout == None:
+    def _generateKeyValue(self,uuid):
+        key_len = random.randint(4,12)
+        val_len = random.randint(24,512)
+        return self._resourceParEntryTemplate%(
+            self.generateRandomString(key_len),
+            uuid,
+            self.generateRandomString(val_len))
+
+    def _getRandomResourceUUID(self):
+        idx = random.randint(0,len(self._existedResourceList)-1)
+        return self._existedResourceList[idx][0]
+
+    def _generateOneResourceParams(self):
+        uuid = self._getRandomResourceUUID()
+        kv_list=["["]
+        num = random.randint(2,20)
+        for i in range(num-1):
+            num = random.randint(2,20)
+            kv_list.append(
+                self._generateKeyValue(uuid))
+            kv_list.append(",")
+
+        kv_list.append(self._generateKeyValue(uuid))
+        kv_list.append("]")
+
+        return ''.join(kv_list)
+    
+    def generateResourceParams(self,number):
+        ret=[]
+        for i in range(number):
+            ret.append(self._generateOneResourceParams())
+        return ret
+
+    def generateSaveResource(self,number):
+        ret = []
+        # get one existed resource from the server 
+        res = self._existedResourceList[
+            random.randint(0,len(self._existedResourceList)-1)]
+
+        for i in range(number):
+            ret.append(
+                self._resourceSaveTemplate%(
+                res[0],
+                self.generateRandomString(random.randint(4,12)),
+                res[1],
+                res[2],
+                self.generateIpV4()))
+
+        return ret
+
+    def generateRemoveResource(self,number):
+        ret = []
+        for i in range(number):
+            ret.append( self._resourceRemoveTemplate%( self._getRandomResourceUUID() ) )
+        return ret
+
+
+    def generateResourceConfliction(self,number):
+        ret = []
+        for _ in range(number):
+            res = self._existedResourceList[
+                random.randint(0,len(self._existedResourceList)-1)]
+            ret.append((
+                # resource save template
+                self._resourceSaveTemplate%(
+                res[0],
+                self.generateRandomString(random.randint(4,12)),
+                res[1],
+                res[2],
+                self.generateIpV4()),
+                # resource remove template
+                self._resourceRemoveTemplate%(res[0])))
+
+        return ret
+
+class CameraUserAttributesListDataGenerator(BasicGenerator):
+    _template="""
+        [
+            {
+                "audioEnabled": %s,
+                "cameraID": "%s",
+                "cameraName": "%s",
+                "controlEnabled": %s,
+                "dewarpingParams": "%s",
+                "maxArchiveDays": -30,
+                "minArchiveDays": -1,
+                "motionMask": "5,0,0,44,32:5,0,0,44,32:5,0,0,44,32:5,0,0,44,32",
+                "motionType": "MT_SoftwareGrid",
+                "preferedServerId": "%s",
+                "scheduleEnabled": %s,
+                "scheduleTasks": [ ],
+                "secondaryStreamQuality": "SSQualityMedium"
+            }
+        ]
+        """
+
+    _dewarpingTemplate = "{ \\\"enabled\\\":%s,\\\"fovRot\\\":%s,\
+            \\\"hStretch\\\":%s,\\\"radius\\\":%s, \\\"viewMode\\\":\\\"VerticalDown\\\",\
+            \\\"xCenter\\\":%s,\\\"yCenter\\\":%s}"
+
+    _existedCameraUUIDList=[]
+
+    def __init__(self):
+        if self._fetchExistedCameraUUIDList() == False:
+            raise Exception("cannot fetch camera list on server")
+
+    def _fetchExistedCameraUUIDList(self):
+        response = urllib2.urlopen(
+            "http://%s/ec2/getCameras?format=json"%(clusterTest.clusterTestServerList[0]))
+        if response == None or response.getcode() != 200:
             return False
-        # convert it into the integer 
-        timeout = int(timeout)
 
-        return (method_list,
-                observer,
-                timeout,
-                server[self.SERVER_NAME])
+        ret = json.loads(response.read())
 
-    def sendRequest(self,url,timeout,post_data,tc_name,req_name,ser_name):
-        # issue the query request here
-        response=None
-
-        if post_data != None:
-            req = urllib2.Request(url, data=post_data, headers={'Content-type': 'application/json'})
-            response = urllib2.urlopen(req)
-        else:
-            response = urllib2.urlopen(url)
-
-        if response == None:
-            print "Test case:%s failed.\nThe request:%s for server:%s failed with connection" \
-                %(tc_name,req_name,ser_name)
-            return False
-
-        if response.getcode() != 200:
-            print "Test case:%s failed.\nThe request:%s for server:%s failed with http error code:%d" \
-                %(tc_name,req_name,ser_name,response.getcode())
-            return False
-
-        data = response.read()
-
-        if data != '' and data != None:
-            ret_obj = json.loads( data )
-            if "error" in ret_obj:
-                # The request failed
-                print "Test case:%s failed.\nThe request:%s for server:%s failed " \
-                        "with error:%s"%(tc_name,req_name,ser_name,ret_obj["errorString"])
-                return False
+        for ele in ret:
+            self._existedCameraUUIDList.append(
+                (ele["id"],ele["name"]))
 
         return True
 
+    def _getRandomServerId(self):
+        idx = random.randint(0,len(clusterTest.clusterTestServerUUIDList)-1)
+        return clusterTest.clusterTestServerUUIDList[idx][0]
 
-    def waitForResponse(self,observer,timeout):
-        time.sleep(timeout)
-        self.checkMethodStatusConsistent(observer[0],observer[1])
+    def _generateNormalizeRange(self):
+        return str(random.random())
 
-    def workOnSingleTestCase(self,test_case_name,tc):
-        arg = self.formatTestCaseParam(tc)
-        if arg == False:
+    def _generateDewarpingPar(self):
+        return self._dewarpingTemplate%(
+            self.generateTrueFalse(),
+            self._generateNormalizeRange(),
+            self._generateNormalizeRange(),
+            self._generateNormalizeRange(),
+            self._generateNormalizeRange(),
+            self._generateNormalizeRange())
+
+    def _getRandomCameraUUIDAndName(self):
+        return self._existedCameraUUIDList[
+            random.randint(0,len(self._existedCameraUUIDList)-1)]
+
+    def generateCameraUserAttribute(self,number):
+        ret=[]
+
+        for i in range(number):
+            uuid , name = self._getRandomCameraUUIDAndName()
+            ret.append(
+                self._template%(
+                    self.generateTrueFalse(),
+                    uuid,name,
+                    self.generateTrueFalse(),
+                    self._generateDewarpingPar(),
+                    self._getRandomServerId(),
+                    self.generateTrueFalse()))
+
+        return ret
+
+class ServerUserAttributesListDataGenerator(BasicGenerator):
+    _template="""
+    [
+        {
+            "allowAutoRedundancy": %s,
+            "maxCameras": %s,
+            "serverID": "%s",
+            "serverName": "%s"
+        }
+    ]
+    """
+
+    def _getRandomServer(self):
+        idx = random.randint(0,len(clusterTest.clusterTestServerUUIDList)-1)
+        return clusterTest.clusterTestServerUUIDList[idx]
+
+    def generateServerUserAttributesList(self,number):
+        ret=[]
+        for i in range(number):
+            uuid,name = self._getRandomServer()
+            ret.append(
+                self._template%(
+                    self.generateTrueFalse(),
+                    random.randint(0,200),
+                    uuid,name))
+        return ret
+
+# Thread queue for multi-task. This is useful since if the user
+# want too many data to be sent to the server, then there maybe
+# thousands of threads to be created, which is not something we
+# want it. This is not a real-time queue, but a push-sync-join
+
+class ClusterWorker():
+    _queue=None
+    _threadList=None
+    _threadNum=1
+
+    def __init__(self,num,element_size):
+        self._queue = Queue.Queue(element_size)
+        self._threadList = []
+        self._threadNum = num
+        if element_size < num:
+            self._threadNum = element_size
+
+    def _worker(self):
+        while not self._queue.empty():
+            t,a=self._queue.get(True)
+            t(*a)
+
+    def _initializeThreadWorker(self):
+        for _ in range(self._threadNum):
+            t = threading.Thread(target=self._worker)
+            t.start()
+            self._threadList.append(t)
+
+    def join(self):
+        # We delay the real operation until we call join
+        self._initializeThreadWorker()
+        # Now we safely join the thread since the queue 
+        # will utimatly be empty after execution 
+        for t in self._threadList:
+            t.join()
+
+    def enqueue(self,task,args):
+        self._queue.put((task,args),True)
+
+
+class ClusterTestBase(unittest.TestCase):
+    def _generateModifySeq(self):
+        return None
+
+    def _getMethodName(self):
+        pass
+
+    def _getObserverName(self):
+        pass
+
+    def _defaultModifySeq(self,fakeData):
+        ret=[]
+        for f in fakeData:
+            # pick up a server randomly
+            ret.append(
+                (f,clusterTest.clusterTestServerList[
+                    random.randint(0,len(clusterTest.clusterTestServerList)-1)]))
+        return ret
+
+    def _dumpFailedRequest(self,data,methodName):
+        f = open("%s.failed.%.json"%(methodName,threading.active_count()),"w")
+        f.write(data)
+        f.close()
+
+    def _sendRequest(self,methodName,d,server):
+        req = urllib2.Request("http://%s/ec2/%s" % (server,methodName), \
+            data=d, headers={'Content-Type': 'application/json'})
+        response = urllib2.urlopen(req)
+
+        # Do a sligtly graceful way to dump the sample of failure 
+        if response.getcode() != 200:
+            self._dumpFailedRequest(d,methodName)
+
+        self.assertTrue(response.getcode() == 200, \
+            "%s failed with statusCode %d" % (methodName,response.getcode()))
+        print "%s OK\r\n" % (methodName)
+
+    def test(self):
+        postDataList = self._generateModifySeq()
+
+        # skip this class
+        if postDataList == None:
             return
-        
-        methods_list=arg[0]
-        observer=arg[1]
-        timeout=arg[2]
-        server_name=arg[3]
 
-        # sending out all the request one by one here
-        for methods in methods_list:
-            # Sending out the request
-            self.assertTrue(self.sendRequest(methods[0],timeout,methods[2], \
-                test_case_name,methods[1],server_name),"Failed")
+        workerQueue=ClusterWorker(32,len(postDataList))
 
-        self.waitForResponse(observer,timeout)
+        print "===================================\n"
+        print "Test:%s start!\n"%(self._getMethodName())
 
-    def runSingleTestCase(self,test_case_name,tc):
-        # Execute the test case in another thread
-        th = threading.Thread(target=self.workOnSingleTestCase,args=(test_case_name,tc,))
-        th.start()
-        return th
+        for test in postDataList:
+            workerQueue.enqueue( self._sendRequest , (self._getMethodName(),test[0],test[1],) )
 
-    def runSingleTestGroup(self,group_list):
-        # executing the test group locally here
-        print "Start executing test group:%s\n"%(group_list[0])
+        workerQueue.join()
+                
+        time.sleep(clusterTest.clusterTestSleepTime)
+        ret , reason = clusterTest.checkMethodStatusConsistent(self._getObserverName())
+        self.assertTrue(ret,reason)
 
-        thread_list=[]
-        # the group_list[1][0] is the test case name
-        for tc in group_list[1]:
-            thread_list.append(self.runSingleTestCase(tc[0],tc[1]))
+        print "Test:%s finish!\n"%(self._getMethodName())
+        print "===================================\n"
 
-        # join all the thread test here
-        for th in thread_list:
-            th.join()
 
-        print "Test group:%s execution finished"%(group_list[0])
+class CameraTest():
+    _gen=None
+    _testCase=2
+
+    def setTestCase(self,num):
+        self._testCase=num
+
+    def setUp(self):
+        self._gen = CameraDataGenerator()
     
-    # Iterating all the dynamic execution in the configuration list one by one
-    # Generally, a modification test is formed as following structure:
-    # (1) A modification
-    # (2) Wait for some time
-    # (3) Checking all the machine are on the same page
+    def _generateModifySeq(self):
+        return self._defaultModifySeq(
+               self._gen.generateCameraData(
+               self._testCase))
 
-    def test_runAllTestCase(self):
-        for group_case in self.testCaseList:
-            self.runSingleTestGroup(group_case)
+    def _getMethodName(self):
+        return "saveCameras"
 
+    def _getObserverName(self):
+        return "getCameras?format=json"
+
+
+class UserTest():
+    _gen = None
+    _testCase=2
+
+    def setTestCase(self,num):
+        self._testCase=num
+
+    def setUp(self):
+        self._gen = UserDataGenerator()
+
+    def _generateModifySeq(self):
+        return self._defaultModifySeq(
+               self._gen.generateUserData(
+               self._testCase))
+
+    def _getMethodName(self):
+        return "saveUser"
+
+    def _getObserverName(self):
+        return "getUsers?format=json"
+
+
+class MediaServerTest():
+    _gen=None
+    _testCase=2
+
+    def setTestCase(self,num):
+        self._testCase=num
+
+    def setUp(self):
+        self._gen = MediaServerGenerator()
+
+    def _generateModifySeq(self):
+        return self._defaultModifySeq(
+               self._gen.generateMediaServerData(
+               self._testCase))
+
+    def _getMethodName(self):
+        return "saveMediaServer"
+
+    def _getObserverName(self):
+        return "getMediaServersEx?format=json"
+
+class ResourceSaveTest(ClusterTestBase):
+    _gen = None
+    _testCase =2
+
+    def setTestCase(self,num):
+        self._testCase=num
+
+    def setUp(self):
+        self._gen = ResourceDataGenerator()
+    
+    def _generateModifySeq(self):
+        return self._defaultModifySeq(
+                self._gen.generateSaveResource(
+                self._testCase))
+
+    def _getMethodName(self):
+        return "saveResource"
+
+    def _getObserverName(self):
+        return "getResourceTypes?format=json"
+
+
+class ResourceParaTest():
+    _gen = None
+    _testCase=2
+
+    def setTestCase(self,num):
+        self._testCase=num
+
+    def setUp(self):
+        self._gen = ResourceDataGenerator()
+
+    def _generateModifySeq(self):
+        return self._defaultModifySeq(
+               self._gen.generateResourceParams(
+               self._testCase))
+    
+    def _getMethodName(self):
+        return "setResourceParams"
+
+    def _getObserverName(self):
+        return "getResourceParams?format=json"
+
+
+class ResourceRemoveTest():
+    _gen = None
+    _testCase=2
+
+    def setTestCase(self,num):
+        self._testCase=num
+
+    def setUp(self):
+        self._gen = ResourceDataGenerator()
+
+    def _generateModifySeq(self):
+        return self._defaultModifySeq(
+                self._gen.generateRemoveResource(
+                self._testCase))
+
+    def _getMethodName(self):
+        return "removeResource"
+
+    def _getObserverName(self):
+        return "getResourceTypes?format=json"
+
+
+class CameraUserAttributeListTest():
+    _gen = None
+    _testCase=2
+
+    def setTestCase(self,num):
+        self._testCase=num
+
+    def setUp(self):
+        self._gen = CameraUserAttributesListDataGenerator()
+
+    def _generateModifySeq(self):
+        return self._defaultModifySeq(
+                self._gen.generateCameraUserAttribute(
+                self._testCase))
+
+    def _getMethodName(self):
+        return "saveCameraUserAttributesList"
+
+    def _getObserverName(self):
+        return "getCameraUserAttributes"
+
+
+class ServerUserAttributesListDataTest():
+    _gen = None
+    _testCase=2
+
+    def setTestCase(self,num):
+        self._testCase=num
+
+    def setUp(self):
+        self._gen = ServerUserAttributesListDataGenerator()
+
+    def _generateModifySeq(self):
+        return self._defaultModifySeq(
+                self._gen.generateServerUserAttributesList(self._testCase))
+
+    def _getMethodName(self):
+        return "saveServerUserAttributesList"
+
+    def _getObserverName(self):
+        return "getServerUserAttributes"
+
+# The following test will issue the modify and remove on different servers to
+# trigger confliction resolving.
+class ResourceConflictionTest():
+    _gen = None
+    _testCase=2
+
+    def setTestCase(self,num):
+        self._testCase=num
+
+    def setUp(self):
+        self._gen = ResourceDataGenerator()
+
+    def _generateRandomServerPair(self):
+        # generate first server here
+        s1 = clusterTest.clusterTestServerList[
+            random.randint(0,len(clusterTest.clusterTestServerList)-1)]
+        s2 = None
+        if len(clusterTest.clusterTestServerList) == 1:
+            s2 = s1
+        else:
+            while True:
+                s2 = clusterTest.clusterTestServerList[
+                random.randint(0,len(clusterTest.clusterTestServerList)-1)]
+                if s2 != s1:
+                    break
+        return (s1,s2)
+
+    # Overwrite the test function since the base method doesn't work here
+    def test(self):
+        postDataList = self._gen.generateResourceConfliction(self._testCase)
+
+        workerQueue=ClusterWorker(32,len(postDataList)*2)
+
+        print "===================================\n"
+        print "Test:Resource Confliction start!\n"
+
+        for test in postDataList:
+            s1,s2 = self._generateRandomServerPair()
+            # modify the resource
+            workerQueue.enqueue( self._sendRequest , ("saveResource",test[0],s1,) )
+            # remove the resource
+            workerQueue.enqueue( self._sendRequest , ("removeResource",test[1],s2) )
+
+        workerQueue.join()
+                
+        time.sleep(clusterTest.clusterTestSleepTime)
+        ret , reason = clusterTest.checkMethodStatusConsistent( \
+            "getResourceTypes?format=json")
+
+        self.assertTrue(ret,reason)
+
+        print "Test:Resource Confliction finish!\n"
+        print "===================================\n"
+
+
+# Performance test function
+# only support add/remove ,value can only be user and media server
+class PerformanceOperation():
+    def _sendRequest(self,methodName,d,server):
+        req = urllib2.Request("http://%s/ec2/%s" % (server,methodName), \
+        data=d, headers={'Content-Type': 'application/json'})
+        response = urllib2.urlopen(req)
+
+        # Do a sligtly graceful way to dump the sample of failure 
+        if response.getcode() != 200:
+            self._dumpFailedRequest(d,methodName)
+
+        if response.getcode() != 200:
+            print "%s failed with statusCode %d" % (methodName,response.getcode())
+        else:
+            print "%s OK\r\n" % (methodName)
+
+
+    def _getUUIDList(self,methodName):
+        response = urllib2.urlopen(
+            "http://%s/ec2/%s?format=json"%(
+                clusterTest.clusterTestServerList[0],methodName))
+
+        if response.getcode() != 200:
+            return None
+
+        json_obj = json.loads(response.read())
+        ret=[]
+        for entry in json_obj:
+            ret.append(entry["id"])
+        return ret
+
+    def _sendOp(self,methodName,dataList):
+        worker = ClusterWorker(32,len(dataList))
+        for d in dataList:
+            worker.enqueue(
+                self._sendRequest,
+                (methodName,d,
+                    clusterTest.clusterTestServerList[
+                        random.randint(0,len(clusterTest.clusterTestServerList)-1)]))
+
+        worker.join()
+
+    _resourceRemoveTemplate = """
+        {
+            "id":"%s"
+        }
+    """
+    def _removeAll(self,uuidList):
+        data=[]
+        for uuid in uuidList:
+            data.append(
+                self._resourceRemoveTemplate%(uuid))
+        self._sendOp("removeResource",data)
+
+    def _remove(self,uuid):
+        self._removeAll([uuid])
+
+class UserOperation(PerformanceOperation):
+    def add(self,num):
+        gen = UserDataGenerator()
+        self._sendOp("saveUser",gen.generateUserData(num))
+        return True
+
+    def remove(self,who):
+        self._remove(who)
+        return True
+
+    def removeAll(self):
+        uuidList = self._getUUIDList("getUsers?format=json")
+        if uuidList == None:
+            return False
+        self._removeAll(uuidList)
+        return True
+
+class MediaServerOperation(PerformanceOperation):
+    def add(self,num):
+        gen = MediaServerGenerator()
+        self._sendOp("saveMediaServer",
+                     gen.generateMediaServerData(num))
+        return True
+
+    def remove(self,uuid):
+        self_.remove(uuid)
+        return True
+
+    def removeAll(self):
+        uuidList=self._getUUIDList("getMediaServersEx?format=json")
+        if uuidList == None:
+            return False
+        self._removeAll(uuidList)
+        return True
+
+class CameraOperation(PerformanceOperation):
+    def add(self,num):
+        gen = CameraDataGenerator()
+        self._sendOp(
+            "saveCameras",
+            gen.generateCameraData(num))
+        return True
+
+    def remove(self,uuid):
+        self._remove(uuid)
+        return True
+
+    def removeAll(self):
+        uuidList=self._getUUIDList("getCameras?format=json")
+        if uuidList == None:
+            return False
+        self._removeAll(uuidList)
+        return True
+
+def runPerformanceTest():
+    if len(sys.argv) != 3 and len(sys.argv) != 2 :
+        return (False,"2 or 1 parameters are needed")
+
+    l = sys.argv[1].split('=')
+    
+    if l[0] != '--add' and l[0] != '--remove':
+        return (False,"Unknown first parameter options")
+
+    t=globals()["%sOperation"%(l[1])]
+
+    if t == None:
+        return (False,"Unknown target operations:%s"%(l[1]))
+    else:
+        t = t()
+    
+    if l[0] == '--add':
+        if len(sys.argv) != 3 :
+            return (False,"--add must have --count option")
+        l = sys.argv[2].split('=')
+        if l[0] == '--count':
+            num=int(l[1])
+            if num <=0 :
+                return (False,"--count must be positive integer")
+            if t.add(num) == False:
+                return (False,"cannot perform add operation")
+        else:
+            return (False,"--add can only have --count options")
+    elif l[0] == '--remove':
+        if len(sys.argv) == 3:
+            l = sys.argv[2].split('=')
+            if l[0] == '--id':
+                if t.remove(l[1]) == False:
+                    return (False,"cannot perform remove UID operation")
+            else:
+                return (False,"--remove can only have --id options")
+        elif len(sys.argv) == 2:
+            if t.removeAll() == False:
+                return (False,"cannot perform remove all operation")
+    else:
+        return (False,"Unknown command:%s"%(l[0]))
+
+    return True
+            
 if __name__ == '__main__':
-    # reading config
-    config = ConfigParser.RawConfigParser()
-    config.read("ec2_tests.cfg")
+    # initialize cluster test environment
+    ret,reason = clusterTest.init()
 
-    serverAddress = config.get("General", "serverAddress")
-    serverPort = config.getint("General", "port")
-    serverUser = config.get("General", "user")
-    serverPassword = config.get("General", "password")
-
-    passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
-    passman.add_password( "NetworkOptix", "http://%s:%d/ec2/" % (serverAddress, serverPort), serverUser, serverPassword )
-    urllib2.install_opener(urllib2.build_opener(urllib2.HTTPDigestAuthHandler(passman)))
-
-    unittest.main()
+    if ret == False:
+        print "Failed to initialize the cluster test object:%s"%(reason)
+    else:
+        if len(sys.argv) == 1:
+            unittest.main()
+        else:
+            ret = runPerformanceTest()
+            if ret != True:
+                print ret[1]
