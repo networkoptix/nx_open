@@ -120,11 +120,11 @@ QVariant QnServerAddressesModel::data(const QModelIndex &index, int role) const 
     switch (role) {
     case Qt::DisplayRole:
         if (index.column() == AddressColumn)
-            return addressAtIndex(index, m_port).toString();
+            return addressAtIndex(index, m_port);
         break;
     case Qt::EditRole:
         if (index.column() == AddressColumn)
-            return addressAtIndex(index, m_port).toString();
+            return addressAtIndex(index);
         break;
     case Qt::CheckStateRole:
         if (index.column() == InUseColumn)
@@ -147,27 +147,38 @@ bool QnServerAddressesModel::setData(const QModelIndex &index, const QVariant &v
     switch (index.column()) {
     case AddressColumn: {
         QUrl url = QUrl::fromUserInput(value.toString());
-        if (!url.isValid())
+        if (url.isEmpty())
             return false;
+
+        if (!url.isValid()) {
+            emit urlEditingFailed(index, InvalidUrl);
+            return false;
+        }
 
         if (url.port() == m_port)
             url.setPort(-1);
 
-        if (m_addresses.contains(url) || m_ignoredAddresses.contains(url))
+        if (m_addresses.contains(url) || m_ignoredAddresses.contains(url)) {
+            emit urlEditingFailed(index, ExistingUrl);
             return false;
+        }
 
         if (url.port() == -1) {
             QUrl explicitUrl = url;
             explicitUrl.setPort(m_port);
 
-            if (m_addresses.contains(explicitUrl) || m_ignoredAddresses.contains(explicitUrl))
+            if (m_addresses.contains(explicitUrl) || m_ignoredAddresses.contains(explicitUrl)) {
+                emit urlEditingFailed(index, ExistingUrl);
                 return false;
+            }
         }
 
         if (index.row() < m_addresses.size())
             m_addresses[index.row()] = url;
         else
             m_manualAddresses[index.row() - m_addresses.size()] = url;
+
+        emit dataChanged(index, index);
 
         return true;
     }
@@ -179,6 +190,7 @@ bool QnServerAddressesModel::setData(const QModelIndex &index, const QVariant &v
         else
             m_ignoredAddresses.remove(url);
 
+        emit dataChanged(index, index);
         return true;
     }
     default:

@@ -175,13 +175,14 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
 
     connect(ui->serversView->selectionModel(),  &QItemSelectionModel::currentRowChanged,        this,   &QnRoutingManagementWidget::at_serversView_currentIndexChanged);
     connect(ui->addressesView->selectionModel(),&QItemSelectionModel::currentRowChanged,        this,   &QnRoutingManagementWidget::updateUi);
-//    connect(ui->addressesView,                  &QAbstractItemView::doubleClicked,              this,   &QnRoutingManagementWidget::at_addressesView_doubleClicked);
-//    connect(m_serverAddressesModel,             &QnServerAddressesModel::inUseFlagChanged, this,   &QnRoutingManagementWidget::at_serverAddressesModel_ignoreChangeRequested);
+    connect(m_serverAddressesModel,             &QnServerAddressesModel::dataChanged,           this,   &QnRoutingManagementWidget::at_serverAddressesModel_dataChanged);
+    connect(m_serverAddressesModel,             &QnServerAddressesModel::urlEditingFailed,      this,   [this](const QModelIndex &, int error) { reportUrlEditingError(error); });
     connect(ui->addButton,                      &QPushButton::clicked,                          this,   &QnRoutingManagementWidget::at_addButton_clicked);
     connect(ui->removeButton,                   &QPushButton::clicked,                          this,   &QnRoutingManagementWidget::at_removeButton_clicked);
 
     connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnRoutingManagementWidget::at_resourcePool_resourceAdded);
     connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   &QnRoutingManagementWidget::at_resourcePool_resourceRemoved);
+
 
     m_serverListModel->setResources(qnResPool->getResourcesWithFlag(Qn::server));
 
@@ -296,14 +297,12 @@ void QnRoutingManagementWidget::at_addButton_clicked() {
 
     QUrl url = QUrl::fromUserInput(urlString);
     if (!url.isValid()) {
-        QMessageBox::critical(this, tr("Error"), tr("You have entered an invalid URL."));
+        reportUrlEditingError(QnServerAddressesModel::InvalidUrl);
         return;
     }
 
     if (url.port() == m_server->getPort())
         url.setPort(-1);
-
-    QnUuid serverId = m_server->getId();
 
     QUrl explicitUrl = url;
     explicitUrl.setPort(m_server->getPort());
@@ -311,7 +310,7 @@ void QnRoutingManagementWidget::at_addButton_clicked() {
         m_serverAddressesModel->manualAddressList().contains(url) ||
         m_serverAddressesModel->manualAddressList().contains(explicitUrl))
     {
-        QMessageBox::warning(this, tr("Warning"), tr("This URL is already in the address list."));
+        reportUrlEditingError(QnServerAddressesModel::ExistingUrl);
         return;
     }
 
@@ -353,83 +352,30 @@ void QnRoutingManagementWidget::at_serversView_currentIndexChanged(const QModelI
     }
 }
 
-//void QnRoutingManagementWidget::at_addressesView_doubleClicked(const QModelIndex &index) {
-//    if (!index.isValid())
-//        return;
+void QnRoutingManagementWidget::at_serverAddressesModel_dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight) {
+    if (!m_server)
+        return;
 
-//    if (index.column() != QnServerAddressesModel::AddressColumn)
-//        return;
+    if (topLeft != bottomRight || topLeft.column() != QnServerAddressesModel::InUseColumn)
+        return;
 
-//    if (!m_server)
-//        return;
+    if (topLeft.data(Qt::CheckStateRole).toInt() == Qt::Unchecked) {
+        QUrl url = topLeft.sibling(topLeft.row(), QnServerAddressesModel::AddressColumn).data(Qt::EditRole).toUrl();
+        if (url.port() == -1 && m_server->getNetAddrList().contains(QHostAddress(url.host())))
+            ui->warningLabel->show();
+    }
+}
 
-//    if (!m_serverAddressesModel->isManualAddress(m_sortedServerAddressesModel->mapToSource(index)))
-//        return;
-
-//    QUrl oldUrl = index.data(Qt::EditRole).toUrl();
-
-//    QString urlString = QInputDialog::getText(this, tr("Edit URL"), tr("URL"), QLineEdit::Normal, oldUrl.toString());
-//    if (urlString.isEmpty())
-//        return;
-
-//    QUrl url = QUrl::fromUserInput(urlString);
-//    if (!url.isValid()) {
-//        QMessageBox::critical(this, tr("Error"), tr("You have entered an invalid URL."));
-//        return;
-//    }
-
-//    if (url.port() == -1)
-//        url.setPort(DEFAULT_APPSERVER_PORT);
-
-//    if (oldUrl == url)
-//        return;
-
-//    if (m_server->getNetAddrList().contains(QHostAddress(url.host())) && url.port() == m_server->getPort()) {
-//        QMessageBox::warning(this, tr("Warning"), tr("This URL is already in the address list."));
-//        return;
-//    }
-
-//    QList<QUrl> urls = m_server->getAdditionalUrls();
-//    urls.removeOne(oldUrl);
-//    urls.append(url);
-//    m_server->setAdditionalUrls(urls);
-
-//    connection2()->getDiscoveryManager()->removeDiscoveryInformation(m_server->getId(), oldUrl, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-//    connection2()->getDiscoveryManager()->addDiscoveryInformation(m_server->getId(), url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-//}
-
-//void QnRoutingManagementWidget::at_serverAddressesModel_ignoreChangeRequested(const QString &address, bool ignore) {
-//    if (!m_server)
-//        return;
-
-//    int port = QUrl(m_server->getApiUrl()).port();
-//    if (port == -1)
-//        port = defaultRtspPort;
-
-//    QUrl url(address);
-//    if (m_server->getNetAddrList().contains(QHostAddress(url.host())) && url.port() == port)
-//        url.setPort(-1);
-
-//    QList<QUrl> ignoredUrls = m_server->getIgnoredUrls();
-
-//    if (ignore) {
-//        if (ignoredUrls.contains(url))
-//            return;
-//        ignoredUrls.append(url);
-//        connection2()->getDiscoveryManager()->addDiscoveryInformation(m_server->getId(), url, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-//        if (url.port() == -1)
-//            ui->warningLabel->show();
-//    } else {
-//        if (!ignoredUrls.removeOne(url))
-//            return;
-
-//        if (url.port() == -1)
-//            connection2()->getDiscoveryManager()->removeDiscoveryInformation(m_server->getId(), url, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-//        else
-//            connection2()->getDiscoveryManager()->addDiscoveryInformation(m_server->getId(), url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-//    }
-//    m_server->setIgnoredUrls(ignoredUrls);
-//}
+void QnRoutingManagementWidget::reportUrlEditingError(int error) {
+    switch (error) {
+    case QnServerAddressesModel::InvalidUrl:
+        QMessageBox::critical(this, tr("Error"), tr("You have entered an invalid URL."));
+        break;
+    case QnServerAddressesModel::ExistingUrl:
+        QMessageBox::warning(this, tr("Warning"), tr("This URL is already in the address list."));
+        break;
+    }
+}
 
 void QnRoutingManagementWidget::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();

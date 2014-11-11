@@ -41,8 +41,8 @@ private slots:
     void at_addButton_clicked();
     void at_removeButton_clicked();
     void at_serversView_currentIndexChanged(const QModelIndex &current, const QModelIndex &previous);
-//    void at_addressesView_doubleClicked(const QModelIndex &index);
-//    void at_serverAddressesModel_ignoreChangeRequested(const QString &address, bool ignore);
+    void at_serverAddressesModel_dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
+    void reportUrlEditingError(int error);
 
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
