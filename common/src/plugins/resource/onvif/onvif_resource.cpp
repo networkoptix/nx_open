@@ -2854,11 +2854,14 @@ void QnPlOnvifResource::pullMessages(quint64 /*timerID*/)
 
     std::unique_ptr<PullPointSubscriptionWrapper> soapWrapper(
         new PullPointSubscriptionWrapper(
-            m_eventCapabilities->XAddr,
+            m_onvifNotificationSubscriptionReference.isEmpty()
+                ? m_eventCapabilities->XAddr
+                : m_onvifNotificationSubscriptionReference.toStdString(),
             auth.user(),
             auth.password(),
             m_timeDrift ) );
     soapWrapper->getProxy()->soap->imode |= SOAP_XML_IGNORENS;
+    soap_omode( soapWrapper->getProxy()->soap, SOAP_XML_DEFAULTNS );
 
     char* buf = (char*)malloc(512);
 

@@ -890,14 +890,21 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         QMultiHash<QnUuid, QUrl> additionalAddressesById;
         QMultiHash<QnUuid, QUrl> ignoredAddressesById;
         for (const ec2::ApiDiscoveryData &data: discoveryDataList) {
+            additionalAddressesById.insert(data.id, data.url);
             if (data.ignore)
                 ignoredAddressesById.insert(data.id, data.url);
-            else
-                additionalAddressesById.insert(data.id, data.url);
         }
 
         for(const QnMediaServerResourcePtr &mediaServer: mediaServerList) {
-            mediaServer->setAdditionalUrls(additionalAddressesById.values(mediaServer->getId()));
+            QList<QHostAddress> addresses = mediaServer->getNetAddrList();
+            QList<QUrl> additionalAddresses = additionalAddressesById.values(mediaServer->getId());
+            for (auto it = additionalAddresses.begin(); it != additionalAddresses.end(); /* no inc */) {
+                if (it->port() == -1 && addresses.contains(QHostAddress(it->host())))
+                    it = additionalAddresses.erase(it);
+                else
+                    ++it;
+            }
+            mediaServer->setAdditionalUrls(additionalAddresses);
             mediaServer->setIgnoredUrls(ignoredAddressesById.values(mediaServer->getId()));
             messageProcessor->updateResource(mediaServer);
         }

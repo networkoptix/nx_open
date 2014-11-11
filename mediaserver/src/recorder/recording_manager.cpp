@@ -277,8 +277,8 @@ bool QnRecordingManager::startOrStopRecording(const QnResourcePtr& res, QnVideoC
             if (recorderHiRes) {
                 if (!recorderHiRes->isRunning()) {
                     NX_LOG(QString(lit("Recording started for camera %1")).arg(res->getUniqueId()), cl_logINFO);
+                    recorderHiRes->start();
                 }
-                recorderHiRes->start();
             }
             providerHi->startIfNotRunning();
         }
