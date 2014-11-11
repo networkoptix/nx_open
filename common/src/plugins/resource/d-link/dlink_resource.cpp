@@ -133,20 +133,16 @@ bool QnPlDlinkResource::checkIfOnlineAsync( std::function<void(bool)>&& completi
     apiUrl.setPassword( getAuth().password() );
     apiUrl.setPath( lit("/common/info.cgi") );
 
-    nx_http::AsyncHttpClientPtr httpClientCaptured = std::make_shared<nx_http::AsyncHttpClient>();
     QString resourceMac = getMAC().toString();
-    auto requestCompletionFunc = [httpClientCaptured, resourceMac, completionHandler]
-        ( nx_http::AsyncHttpClientPtr httpClient ) mutable
+    auto requestCompletionFunc = [resourceMac, completionHandler]
+        ( SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody ) mutable
     {
-        httpClientCaptured.reset();
-
-        if( httpClient->failed() ||
-            httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok )
+        if( osErrorCode != SystemError::noError ||
+            statusCode != nx_http::StatusCode::ok )
         {
             return completionHandler( false );
         }
 
-        nx_http::BufferType msgBody = httpClient->fetchMessageBodyBuffer();
         //msgBody contains parameters "param1=value1" each on its line
 
         nx_http::LineSplitter lineSplitter;
@@ -169,12 +165,10 @@ bool QnPlDlinkResource::checkIfOnlineAsync( std::function<void(bool)>&& completi
 
         completionHandler( false );
     };
-    connect(
-        httpClientCaptured.get(), &nx_http::AsyncHttpClient::done,
-        this, requestCompletionFunc,
-        Qt::DirectConnection );
 
-    return httpClientCaptured->doGet( apiUrl );
+    return nx_http::downloadFileAsync(
+        apiUrl,
+        requestCompletionFunc );
 }
 
 QString QnPlDlinkResource::getDriverName() const
