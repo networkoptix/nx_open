@@ -54,7 +54,7 @@ void QnRouteBuilder::clear(bool indirectOnly) {
 }
 
 QnRoute QnRouteBuilder::routeTo(const QnUuid &peerId, const QnUuid &via) {
-	if (via != peerId) {
+	if (!via.isNull() && via != peerId && via != m_startId) {
 		QnRoute preRoute = buildRouteTo(via);
 		if (!preRoute.isValid())
 			return QnRoute();
