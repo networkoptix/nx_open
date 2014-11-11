@@ -40,25 +40,22 @@ bool QnPlAxisResource::checkIfOnlineAsync( std::function<void(bool)>&& completio
     QUrl apiUrl;
     apiUrl.setScheme( lit("http") );
     apiUrl.setHost( getHostAddress() );
-    apiUrl.setPort( QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT) );
+    apiUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
     apiUrl.setUserName( getAuth().user() );
     apiUrl.setPassword( getAuth().password() );
-    apiUrl.setPath( lit("/axis-cgi/param.cgi?action=list&group=root.Network.eth0.MACAddress") );
+    apiUrl.setPath( lit("/axis-cgi/param.cgi") );
+    apiUrl.setQuery( lit("action=list&group=root.Network.eth0.MACAddress") );
 
-    nx_http::AsyncHttpClientPtr httpClientCaptured = std::make_shared<nx_http::AsyncHttpClient>();
     QString resourceMac = getMAC().toString();
-    auto requestCompletionFunc = [httpClientCaptured, resourceMac, completionHandler]
-        ( nx_http::AsyncHttpClientPtr httpClient ) mutable
+    auto requestCompletionFunc = [resourceMac, completionHandler]
+        ( SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody ) mutable
     {
-        httpClientCaptured.reset();
-
-        if( httpClient->failed() ||
-            httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok )
+        if( osErrorCode != SystemError::noError ||
+            statusCode != nx_http::StatusCode::ok )
         {
             return completionHandler( false );
         }
 
-        nx_http::BufferType msgBody = httpClient->fetchMessageBodyBuffer();
         int sepIndex = msgBody.indexOf('=');
         if( sepIndex == -1 )
             return completionHandler( false );
@@ -66,12 +63,10 @@ bool QnPlAxisResource::checkIfOnlineAsync( std::function<void(bool)>&& completio
         macAddress.replace( ':', '-' );
         completionHandler( macAddress == resourceMac.toLatin1() );
     };
-    connect(
-        httpClientCaptured.get(), &nx_http::AsyncHttpClient::done,
-        this, requestCompletionFunc,
-        Qt::DirectConnection );
 
-    return httpClientCaptured->doGet( apiUrl );
+    return nx_http::downloadFileAsync(
+        apiUrl,
+        requestCompletionFunc );
 }
 
 QString QnPlAxisResource::getDriverName() const

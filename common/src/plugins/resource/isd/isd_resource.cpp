@@ -1,6 +1,7 @@
 #ifdef ENABLE_ISD
 
 #include <utils/math/math.h>
+#include <utils/network/http/asynchttpclient.h>
 
 #include "isd_stream_reader.h"
 #include "isd_resource.h"
@@ -35,6 +36,39 @@ QnPlIsdResource::QnPlIsdResource()
 {
     setVendor(lit("ISD"));
     setDefaultAuth(QLatin1String("root"), QLatin1String("admin"));
+}
+
+bool QnPlIsdResource::checkIfOnlineAsync( std::function<void(bool)>&& completionHandler )
+{
+    QUrl apiUrl;
+    apiUrl.setScheme( lit("http") );
+    apiUrl.setHost( getHostAddress() );
+    apiUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
+    apiUrl.setUserName( getAuth().user() );
+    apiUrl.setPassword( getAuth().password() );
+    apiUrl.setPath( lit("/api/param.cgi") );
+    apiUrl.setQuery( lit("req=Network.1.MacAddress") );
+
+    QString resourceMac = getMAC().toString();
+    auto requestCompletionFunc = [resourceMac, completionHandler]
+        ( SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody ) mutable
+    {
+        if( osErrorCode != SystemError::noError ||
+            statusCode != nx_http::StatusCode::ok )
+        {
+            return completionHandler( false );
+        }
+
+        int sepIndex = msgBody.indexOf('=');
+        if( sepIndex == -1 )
+            return completionHandler( false );
+        QByteArray macAddress = msgBody.mid(sepIndex+1).trimmed();
+        completionHandler( macAddress == resourceMac.toLatin1() );
+    };
+
+    return nx_http::downloadFileAsync(
+        apiUrl,
+        requestCompletionFunc );
 }
 
 QString QnPlIsdResource::getDriverName() const
