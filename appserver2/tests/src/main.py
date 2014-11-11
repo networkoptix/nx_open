@@ -42,6 +42,12 @@ class ClusterTest():
                 return s["name"]
         return None
 
+    def _patchUUID(self,uuid):
+        if uuid[0] == '{' :
+            return uuid
+        else:
+            return "{%s}"%(uuid)
+
     # call this function after reading the clusterTestServerList
     def _fetchClusterTestServerUUIDList(self):
 
@@ -52,8 +58,7 @@ class ClusterTest():
             if response.getcode() != 200:
                 return (False,"testConnection response with error code:%d"%(response.getcode()))
             json_obj = json.loads( response.read() )
-            server_id_list.append(json_obj["ecsGuid"])
-
+            server_id_list.append(self._patchUUID(json_obj["ecsGuid"]))
 
         # We still need to get the server name since this is useful for 
         # the SaveServerAttributeList test (required in its post data)
@@ -68,8 +73,10 @@ class ClusterTest():
 
         for uuid in server_id_list:
             n = self._getServerName(json_obj,uuid)
-            self.clusterTestServerUUIDList.append((uuid,n))
-
+            if n == None:
+                return (False,"Cannot fetch server name with UUID:%s"%(uuid))
+            else:
+                self.clusterTestServerUUIDList.append((uuid,n))
         return (True,"")
 
     def _checkResultEqual(self,responseList,methodName):
@@ -375,16 +382,6 @@ class ResourceDataGenerator(BasicGenerator):
         }
     """
 
-    _resourceSaveTemplate= """
-        {
-            "id":"%s",
-            "name":"%s",
-            "parentId":"%s",
-            "typeId":"%s",
-            "url":"%s"
-        }
-    """
-
     _resourceRemoveTemplate = """
         {
             "id":"%s"
@@ -461,23 +458,6 @@ class ResourceDataGenerator(BasicGenerator):
             ret.append(self._generateOneResourceParams())
         return ret
 
-    def generateSaveResource(self,number):
-        ret = []
-        # get one existed resource from the server 
-        res = self._existedResourceList[
-            random.randint(0,len(self._existedResourceList)-1)]
-
-        for i in range(number):
-            ret.append(
-                self._resourceSaveTemplate%(
-                res[0],
-                self.generateRandomString(random.randint(4,12)),
-                res[1],
-                res[2],
-                self.generateIpV4()))
-
-        return ret
-
     def generateRemoveResource(self,number):
         ret = []
         for i in range(number):
@@ -485,24 +465,227 @@ class ResourceDataGenerator(BasicGenerator):
         return ret
 
 
-    def generateResourceConfliction(self,number):
-        ret = []
-        for _ in range(number):
-            res = self._existedResourceList[
-                random.randint(0,len(self._existedResourceList)-1)]
-            ret.append((
-                # resource save template
-                self._resourceSaveTemplate%(
-                res[0],
-                self.generateRandomString(random.randint(4,12)),
-                res[1],
-                res[2],
-                self.generateIpV4()),
-                # resource remove template
-                self._resourceRemoveTemplate%(res[0])))
+# This class is used to generate data for simulating resource confliction
 
-        return ret
+# Currently we don't have general method to _UPDATE_ an existed record in db,
+# so I implement it through creation routine since this routine is the only way
+# to modify the existed record now.
 
+class CameraConflictionDataGenerator(BasicGenerator):
+    #(id,mac,model,parentId,typeId,url,vendor)
+    _existedCameraList=[]
+    # For simplicity , we just modify the name of this camera
+    _updateTemplate= \
+    """
+        [{
+            "groupId": "",
+            "groupName": "",
+            "id": "%s",
+            "mac": "%s",
+            "manuallyAdded": false,
+            "maxArchiveDays": 0,
+            "minArchiveDays": 0,
+            "model": "%s",
+            "motionMask": "",
+            "motionType": "MT_Default",
+            "name": "%s",
+            "parentId": "%s",
+            "physicalId": "%s",
+            "preferedServerId": "{00000000-0000-0000-0000-000000000000}",
+            "scheduleEnabled": false,
+            "scheduleTasks": [ ],
+            "secondaryStreamQuality": "SSQualityLow",
+            "status": "Unauthorized",
+            "statusFlags": "CSF_NoFlags",
+            "typeId": "%s",
+            "url": "%s",
+            "vendor": "%s"
+        }]
+    """
+    # removeTemplate 
+    _removeTemplate = \
+        """
+        {
+            id="%s"
+        }
+        """
+
+    def _fetchExistedCameras(self):
+        response = urllib2.urlopen(
+            "http://%s/ec2/getCameras?format=json"%(
+                clusterTest.clusterTestServerList[0]))
+
+        if response.getcode() != 200 :
+            return False
+
+        json_obj = json.loads( response.read() )
+
+        for obj in json_obj:
+            self._existedCameraList.append(
+                (obj["id"],obj["mac"],obj["model"],obj["parentId"],
+                 obj["typeId"],obj["url"],obj["vendor"]))
+        return True
+
+    def __init__(self):
+        if self._fetchExistedCameras() == False:
+            raise Exception("Cannot get existed camera list")
+    
+    def _generateModify(self,camera):
+        name = self.generateRandomString(random.randint(8,12))
+        return self._updateTemplate%(
+            camera[0],
+            camera[1],
+            camera[2],
+            name,
+            camera[3],
+            camera[1], 
+            camera[4],
+            camera[5],
+            camera[6])
+    
+    def _generateRemove(self,camera):
+        return self._removeTemplate%(camera[0])  
+    
+    def generateData(self):
+        camera = self._existedCameraList[
+                random.randint(0,len(self._existedCameraList)-1)]
+
+        return (self._generateModify(camera),self._generateRemove(camera))
+
+class UserConflictionDataGenerator(BasicGenerator):
+    _updateTemplate = """
+    {
+        "digest": "%s",
+        "email": "%s",
+        "hash": "%s",
+        "id": "%s",
+        "isAdmin": false,
+        "name": "%s",
+        "parentId": "{00000000-0000-0000-0000-000000000000}",
+        "permissions": "%s",
+        "typeId": "{774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}",
+        "url": ""
+    }
+    """
+
+    _removeTemplate = """
+        {
+            id="%s"
+        }
+    """
+
+    _existedUserList=[]
+
+    def _fetchExistedUser(self):
+        response = urllib2.urlopen(
+            "http://%s/ec2/getUsers?format=json"%(
+                clusterTest.clusterTestServerList[0]))
+
+        if response.getcode() != 200:
+            return False;
+
+        json_obj = json.loads( response.read() )
+
+        for entry in json_obj:
+            self._existedUserList.append(
+                (entry["digest"],entry["email"],entry["hash"],
+                 entry["id"],entry["permissions"]))
+
+        return True
+
+    def __init__(self):
+        if self._fetchExistedUser() == False:
+            raise Exception("Cannot get existed user list")
+
+    def _generateModify(self,user):
+        name = self.generateRandomString(
+            random.randint(8,20))
+
+        return self._updateTemplate%(
+            user[0],
+            user[1],
+            user[2],
+            user[3],
+            name,
+            user[4])
+
+    def _generateRemove(self,user):
+        return self._removeTemplate%(user[3])
+
+
+    def generateData(self):
+        user = self._existedUserList[
+            random.randint(0,len(self._existedUserList)-1)]
+
+        return(self._generateModify(user),self._generateRemove(user))
+
+
+class MediaServerConflictionDataGenerator(BasicGenerator):
+    _updateTemplate= """
+    {
+        "apiUrl": "%s",
+        "authKey": "%s",
+        "flags": "SF_HasPublicIP",
+        "id": "%s",
+        "name": "%s",
+        "networkAddresses": "192.168.0.1;10.0.2.141;192.168.88.1;95.31.23.214",
+        "panicMode": "PM_None",
+        "parentId": "{00000000-0000-0000-0000-000000000000}",
+        "systemInfo": "windows x64 win78",
+        "systemName": "%s",
+        "typeId": "{be5d1ee0-b92c-3b34-86d9-bca2dab7826f}",
+        "url": "%s",
+        "version": "2.3.0.0"
+    }
+    """
+
+    _removeTemplate = """
+        {
+            id="%s"
+        }
+    """
+
+    _existedMediaServerList=[]
+
+    def _fetchExistedMediaServer(self):
+        response = urllib2.urlopen(
+            "http://%s/ec2/getMediaServersEx?format=json"%(
+                clusterTest.clusterTestServerList[0]))
+
+        if response.getcode() != 200:
+            return False;
+
+        json_obj = json.loads( response.read() )
+
+        for server in json_obj:
+            self._existedMediaServerList.append(
+                (server["apiUrl"],server["authKey"],server["id"],
+                 server["systemName"],server["url"]))
+
+        return True
+
+
+    def __init__(self):
+        if self._fetchExistedMediaServer() == False:
+            raise Exception("Cannot fetch media server list")
+
+
+    def _generateModify(self,server):
+        name = self.generateRandomString(
+            random.randint(8,20))
+
+        return self._updateTemplate%(
+            server[0],server[1],server[2],name,
+            server[3],server[4])
+
+    def _generateRemove(self,server):
+        return self._removeTemplate%(server[2])
+
+    def generateData(self):
+        server = self._existedMediaServerList[
+                random.randint(0,len(self._existedMediaServerList)-1)]
+        return (self._generateModify(server),self._generateRemove(server))
+            
 class CameraUserAttributesListDataGenerator(BasicGenerator):
     _template="""
         [
@@ -678,6 +861,7 @@ class ClusterTestBase(unittest.TestCase):
     def _sendRequest(self,methodName,d,server):
         req = urllib2.Request("http://%s/ec2/%s" % (server,methodName), \
             data=d, headers={'Content-Type': 'application/json'})
+
         response = urllib2.urlopen(req)
 
         # Do a sligtly graceful way to dump the sample of failure 
@@ -686,7 +870,6 @@ class ClusterTestBase(unittest.TestCase):
 
         self.assertTrue(response.getcode() == 200, \
             "%s failed with statusCode %d" % (methodName,response.getcode()))
-        print "%s OK\r\n" % (methodName)
 
     def test(self):
         postDataList = self._generateModifySeq()
@@ -713,7 +896,7 @@ class ClusterTestBase(unittest.TestCase):
         print "===================================\n"
 
 
-class CameraTest():
+class CameraTest(ClusterTestBase):
     _gen=None
     _testCase=2
 
@@ -735,7 +918,7 @@ class CameraTest():
         return "getCameras?format=json"
 
 
-class UserTest():
+class UserTest(ClusterTestBase):
     _gen = None
     _testCase=2
 
@@ -757,7 +940,7 @@ class UserTest():
         return "getUsers?format=json"
 
 
-class MediaServerTest():
+class MediaServerTest(ClusterTestBase):
     _gen=None
     _testCase=2
 
@@ -778,29 +961,7 @@ class MediaServerTest():
     def _getObserverName(self):
         return "getMediaServersEx?format=json"
 
-class ResourceSaveTest(ClusterTestBase):
-    _gen = None
-    _testCase =2
-
-    def setTestCase(self,num):
-        self._testCase=num
-
-    def setUp(self):
-        self._gen = ResourceDataGenerator()
-    
-    def _generateModifySeq(self):
-        return self._defaultModifySeq(
-                self._gen.generateSaveResource(
-                self._testCase))
-
-    def _getMethodName(self):
-        return "saveResource"
-
-    def _getObserverName(self):
-        return "getResourceTypes?format=json"
-
-
-class ResourceParaTest():
+class ResourceParaTest(ClusterTestBase):
     _gen = None
     _testCase=2
 
@@ -822,7 +983,7 @@ class ResourceParaTest():
         return "getResourceParams?format=json"
 
 
-class ResourceRemoveTest():
+class ResourceRemoveTest(ClusterTestBase):
     _gen = None
     _testCase=2
 
@@ -844,7 +1005,7 @@ class ResourceRemoveTest():
         return "getResourceTypes?format=json"
 
 
-class CameraUserAttributeListTest():
+class CameraUserAttributeListTest(ClusterTestBase):
     _gen = None
     _testCase=2
 
@@ -866,7 +1027,7 @@ class CameraUserAttributeListTest():
         return "getCameraUserAttributes"
 
 
-class ServerUserAttributesListDataTest():
+class ServerUserAttributesListDataTest(ClusterTestBase):
     _gen = None
     _testCase=2
 
@@ -888,15 +1049,20 @@ class ServerUserAttributesListDataTest():
 
 # The following test will issue the modify and remove on different servers to
 # trigger confliction resolving.
-class ResourceConflictionTest():
-    _gen = None
+class ResourceConflictionTest(ClusterTestBase):
     _testCase=2
 
+    _conflictList=[]
+    
     def setTestCase(self,num):
         self._testCase=num
 
     def setUp(self):
-        self._gen = ResourceDataGenerator()
+        self._conflictList = [
+            ("removeResource","saveMediaServer",MediaServerConflictionDataGenerator()),
+            ("removeResource","saveUser",UserConflictionDataGenerator()),
+            ("removeResource","saveCameras",CameraConflictionDataGenerator())
+        ]
 
     def _generateRandomServerPair(self):
         # generate first server here
@@ -913,31 +1079,46 @@ class ResourceConflictionTest():
                     break
         return (s1,s2)
 
+    def _generateResourceConfliction(self):
+        return self._conflictList[
+            random.randint(0,len(self._conflictList)-1)]
+
+
+    def _checkStatus(self):
+        apiList = [
+            "getMediaServersEx?format=json",
+            "getUsers?format=json",
+            "getCameras?format=json"
+        ]
+
+        time.sleep(clusterTest.clusterTestSleepTime)
+        for api in  apiList:
+            ret , reason = clusterTest.checkMethodStatusConsistent(api)
+            self.assertTrue(ret,reason) 
+
+
     # Overwrite the test function since the base method doesn't work here
     def test(self):
-        postDataList = self._gen.generateResourceConfliction(self._testCase)
-
-        workerQueue=ClusterWorker(32,len(postDataList)*2)
+        workerQueue=ClusterWorker(32,self._testCase*2)
 
         print "===================================\n"
-        print "Test:Resource Confliction start!\n"
+        print "Test:ResourceConfliction start!\n"
 
-        for test in postDataList:
+        for _ in range(self._testCase):
+            conf = self._generateResourceConfliction()
             s1,s2 = self._generateRandomServerPair()
+            data  = conf[2].generateData()
+
             # modify the resource
-            workerQueue.enqueue( self._sendRequest , ("saveResource",test[0],s1,) )
+            workerQueue.enqueue( self._sendRequest , (conf[1],data[0][0],s1,) )
             # remove the resource
-            workerQueue.enqueue( self._sendRequest , ("removeResource",test[1],s2) )
+            workerQueue.enqueue( self._sendRequest , (conf[0],data[0][1],s2,) )
 
         workerQueue.join()
-                
-        time.sleep(clusterTest.clusterTestSleepTime)
-        ret , reason = clusterTest.checkMethodStatusConsistent( \
-            "getResourceTypes?format=json")
 
-        self.assertTrue(ret,reason)
+        self._checkStatus()
 
-        print "Test:Resource Confliction finish!\n"
+        print "Test:ResourceConfliction finish!\n"
         print "===================================\n"
 
 
@@ -1100,7 +1281,6 @@ def runPerformanceTest():
 if __name__ == '__main__':
     # initialize cluster test environment
     ret,reason = clusterTest.init()
-
     if ret == False:
         print "Failed to initialize the cluster test object:%s"%(reason)
     else:
