@@ -255,10 +255,19 @@ void QnRoutingManagementWidget::updateModel() {
 
     m_changes->changes.value(serverId).apply(additionalUrls, ignoredUrls);
 
-    // TODO: #dklychkov save the exact address as well as index and try to restore it first
     int row = ui->addressesView->currentIndex().row();
+    QUrl url = ui->addressesView->currentIndex().data(Qt::EditRole).toUrl();
 
     m_serverAddressesModel->resetModel(autoUrls.toList(), additionalUrls.toList(), ignoredUrls, m_server->getPort());
+
+    int rowCount = m_serverAddressesModel->rowCount();
+    for (int i = 0; i < rowCount; i++) {
+        QModelIndex index = m_serverAddressesModel->index(i, QnServerAddressesModel::AddressColumn);
+        if (m_serverAddressesModel->data(index, Qt::EditRole).toUrl() == url) {
+            row = m_sortedServerAddressesModel->mapFromSource(index).row();
+            break;
+        }
+    }
 
     if (row < m_sortedServerAddressesModel->rowCount())
         ui->addressesView->setCurrentIndex(m_sortedServerAddressesModel->index(row, 0));
@@ -328,6 +337,9 @@ void QnRoutingManagementWidget::at_removeButton_clicked() {
         return;
 
     m_serverAddressesModel->removeAddressAtIndex(index);
+
+    int row = qMin(m_sortedServerAddressesModel->rowCount() - 1, currentIndex.row());
+    ui->addressesView->setCurrentIndex(m_sortedServerAddressesModel->index(row, 0));
 }
 
 void QnRoutingManagementWidget::at_serversView_currentIndexChanged(const QModelIndex &current, const QModelIndex &previous) {
@@ -360,8 +372,7 @@ void QnRoutingManagementWidget::at_serverAddressesModel_dataChanged(const QModel
         return;
 
     if (topLeft.data(Qt::CheckStateRole).toInt() == Qt::Unchecked) {
-        QUrl url = topLeft.sibling(topLeft.row(), QnServerAddressesModel::AddressColumn).data(Qt::EditRole).toUrl();
-        if (url.port() == -1 && m_server->getNetAddrList().contains(QHostAddress(url.host())))
+        if (!m_serverAddressesModel->isManualAddress(topLeft))
             ui->warningLabel->show();
     }
 }
