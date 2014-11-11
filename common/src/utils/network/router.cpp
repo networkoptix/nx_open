@@ -144,6 +144,10 @@ void QnRouter::at_refreshTimer_timeout() {
 bool QnRouter::addConnection(const QnUuid &id, const QnRouter::Endpoint &endpoint) {
     QMutexLocker lk(&m_mutex);
 
+    if (endpoint.id.isNull()) {
+        qDebug() << "wait!!!";
+    }
+
     if (m_connections.contains(id, endpoint))
         return false;
 
