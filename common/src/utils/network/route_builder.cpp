@@ -19,6 +19,13 @@ void QnRouteBuilder::addConnection(const QnUuid &from, const QnUuid &to, const Q
         return;
 
     m_connections.insert(from, WeightedPoint(QnRoutePoint(to, host, port), weight));
+
+    for (auto it = m_routes.begin(); it != m_routes.end(); /* no inc */) {
+        if (it->containsPoint(from) || it->containsPoint(to))
+            it = m_routes.erase(it);
+        else
+            ++it;
+    }
 }
 
 void QnRouteBuilder::removeConnection(const QnUuid &from, const QnUuid &to, const QString &host, quint16 port) {
@@ -33,20 +40,6 @@ void QnRouteBuilder::removeConnection(const QnUuid &from, const QnUuid &to, cons
 
     for (auto it = m_routes.begin(); it != m_routes.end(); /* no inc */) {
         if (it->containsConnection(m_startId, from, point))
-            it = m_routes.erase(it);
-        else
-            ++it;
-    }
-}
-
-void QnRouteBuilder::clear(bool indirectOnly) {
-    if (!indirectOnly) {
-        m_routes.clear();
-        return;
-    }
-
-    for (auto it = m_routes.begin(); it != m_routes.end(); /* no inc */) {
-        if (it->length() > 1)
             it = m_routes.erase(it);
         else
             ++it;
