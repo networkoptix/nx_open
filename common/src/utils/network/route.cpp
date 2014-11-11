@@ -34,6 +34,14 @@ bool QnRoute::containsConnection(const QnUuid &first, const QnUuid &from, const 
     return false;
 }
 
+bool QnRoute::containsPoint(const QnUuid &id) const {
+    for (const QnRoutePoint &point: points) {
+        if (point.peerId == id)
+            return true;
+    }
+    return false;
+}
+
 bool QnRoute::operator <(const QnRoute &other) const {
     if (weight != other.weight)
         return weight < other.weight;
