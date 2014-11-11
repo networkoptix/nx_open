@@ -68,10 +68,7 @@ class ClusterTest():
 
         for uuid in server_id_list:
             n = self._getServerName(json_obj,uuid)
-            if n == None:
-                return (False,"Cannot get UUID:%s related server name using getMediaServersEx"%(uuid))
-            else:
-                self.clusterTestServerUUIDList.append((uuid,n))
+            self.clusterTestServerUUIDList.append((uuid,n))
 
         return (True,"")
 
