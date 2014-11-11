@@ -9,7 +9,7 @@ angular.module('webadminApp')
 
 
         function formatUrl(url){
-            return decodeURIComponent(url.replace(/file:\/\/.+?:.+?\//gi,""));
+            return decodeURIComponent(url.replace(/file:\/\/.+?:.+?\//gi,''));
         }
 
         mediaserver.getStorages().then(function (r) {
@@ -18,19 +18,21 @@ angular.module('webadminApp')
             });
 
             _.each($scope.storages,function(storage){
-               storage.url = formatUrl(storage.url);
+                storage.url = formatUrl(storage.url);
             });
         });
         $scope.formatSpace = function(bytes){
             var precision = 2;
             var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
             var posttxt = 0;
-            if (bytes == 0) return 'n/a';
+            if (bytes === 0){
+                return 'n/a';
+            }
             while( bytes >= 1024 ) {
                 posttxt++;
                 bytes = bytes / 1024;
             }
-            return Number(bytes).toFixed(precision) + " " + sizes[posttxt];
+            return Number(bytes).toFixed(precision) + ' ' + sizes[posttxt];
         };
 
     });

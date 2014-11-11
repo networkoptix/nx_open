@@ -236,8 +236,8 @@ bool QnRtspClientArchiveDelegate::openInternal() {
     m_opened = m_rtspSession.isOpened();
     m_sendedCSec = m_rtspSession.lastSendedCSeq();
 
+    m_globalMinArchiveTime = checkMinTimeFromOtherServer(m_camera);
     if (m_opened) {
-        m_globalMinArchiveTime = checkMinTimeFromOtherServer(m_camera);
 
         QList<QByteArray> audioSDP = m_rtspSession.getSdpByType(RTPSession::TT_AUDIO);
         parseAudioSDP(audioSDP);
