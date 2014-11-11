@@ -217,6 +217,11 @@ bool QnNetworkResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &sourc
         setUrl(source->getUrl());
         return true;
     }
+    if (source->getMAC() != getMAC())
+    {
+        setMAC(source->getMAC());
+        return true;
+    }
 
     return false;
 }
