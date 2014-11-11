@@ -30,6 +30,7 @@ struct QnRoute {
 
     bool addPoint(const QnRoutePoint &point, int weight);
     bool containsConnection(const QnUuid &first, const QnUuid &from, const QnRoutePoint &point) const;
+    bool containsPoint(const QnUuid &id) const;
 
     bool operator <(const QnRoute &other) const;
 	QnRoute operator +(const QnRoute &other) const;
