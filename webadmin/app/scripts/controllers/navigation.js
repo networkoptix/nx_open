@@ -9,13 +9,13 @@ angular.module('webadminApp')
         mediaserver.getCurrentUser().success(function(result){
             $scope.user = {
                 isAdmin:result.reply.isAdmin
-            }
+            };
         });
 
         mediaserver.getSettings().then(function (r) {
             $scope.settings = {
                 name:r.data.reply.name,
-                remoteAddresses:r.data.reply.remoteAddresses.join("\n")
+                remoteAddresses:r.data.reply.remoteAddresses.join('\n')
             };
         });
         $scope.isActive = function (path) {

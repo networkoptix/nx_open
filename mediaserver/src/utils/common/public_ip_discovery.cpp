@@ -6,7 +6,7 @@
 #include "utils/common/sleep.h"
 #include "qcoreapplication.h"
 
-static const QString DEFAULT_URL_LIST("http://checkrealip.com; http://networkoptix.com/myip.php; http://checkip.eurodyndns.org");
+static const QString DEFAULT_URL_LIST("http://checkrealip.com;http://checkip.eurodyndns.org");
 static const QRegExp iPRegExpr("[^a-zA-Z0-9\\.](([0-9]){1,3}\\.){3}([0-9]){1,3}[^a-zA-Z0-9\\.]");
 
 QnPublicIPDiscovery::QnPublicIPDiscovery():
@@ -18,7 +18,7 @@ QnPublicIPDiscovery::QnPublicIPDiscovery():
 void QnPublicIPDiscovery::update()
 {
     m_ipFound = false;
-    QStringList urls = MSSettings::roSettings()->value("publicIPServers", DEFAULT_URL_LIST).toString().split(";");
+    QStringList urls = MSSettings::roSettings()->value("publicIPServers", DEFAULT_URL_LIST).toString().split(";", QString::SkipEmptyParts);
 
     for (int i = 0; i < urls.size(); ++i) {
         m_replyInProgress++;

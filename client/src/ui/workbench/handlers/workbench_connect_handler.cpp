@@ -390,6 +390,9 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
         return false;
 
     QScopedPointer<QnReconnectHelper> reconnectHelper(new QnReconnectHelper());
+    if (reconnectHelper->servers().isEmpty())
+        return false;
+
     QPointer<QnReconnectInfoDialog> reconnectInfoDialog(new QnReconnectInfoDialog(mainWindow()));
     reconnectInfoDialog->setServers(reconnectHelper->servers());
 

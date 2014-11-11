@@ -46,6 +46,7 @@ private:
     void initLinkButtons();
     void initBuildSelectionButtons();
 
+    void autoCheckForUpdatesInternet();
     void checkForUpdatesInternet(bool autoSwitch = false, bool autoStart = false);
     void checkForUpdatesLocal();
 
@@ -71,6 +72,8 @@ private:
     QUrl m_releaseNotesUrl;
 
     QTimer *m_longUpdateWarningTimer;
+
+    qint64 m_lastAutoUpdateCheck;
 };
 
 #endif // SERVER_UPDATES_WIDGET_H

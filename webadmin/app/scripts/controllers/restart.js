@@ -5,11 +5,9 @@ angular.module('webadminApp')
 
         port = port || window.location.port;
         $scope.state = '';
-        var statisticUrl = window.location.protocol + "//" + window.location.hostname + ":"
-            + port;
+        var statisticUrl = window.location.protocol + '//' + window.location.hostname + ':' + port;
 
         $scope.url = statisticUrl + window.location.pathname + window.location.search;
-
 
         var oldUptime = Number.MAX_VALUE;
         var serverWasDown = false;
@@ -25,15 +23,15 @@ angular.module('webadminApp')
             request.success(function(result){
                 if(serverWasDown || result.reply.uptimeMs < oldUptime )
                 {
-                    $scope.state = "server is starting";
+                    $scope.state = 'server is starting';
                     return reload();
                 }
 
-                $scope.state = "server is restarting";
-                oldUptime = result.reply.uptimeMs;;
+                $scope.state = 'server is restarting';
+                oldUptime = result.reply.uptimeMs;
                 setTimeout(pingServer,1000);
-            }).error(function(result){
-                $scope.state = "server is offline";
+            }).error(function(){
+                $scope.state = 'server is offline';
                 serverWasDown = true; // server was down once - next success should restart server
                 setTimeout(pingServer,1000);
                 return false;
@@ -52,9 +50,9 @@ angular.module('webadminApp')
                     pingServer();  //3. ping every second
                     return false;
                 }
-            )
+            );
         }).error(function(){
-            $scope.state = "server is offline";
+            $scope.state = 'server is offline';
             setTimeout(pingServer,1000);
             return false;
         });
