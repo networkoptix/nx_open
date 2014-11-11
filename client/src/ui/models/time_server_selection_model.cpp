@@ -34,6 +34,16 @@ namespace {
         << Qt::CheckStateRole;
 }
 
+#ifdef _DEBUG
+    #define QN_TIME_SERVER_SELECTION_MODEL_DEBUG
+#endif
+
+#ifdef QN_TIME_SERVER_SELECTION_MODEL_DEBUG
+#define PRINT_DEBUG(MSG) qDebug() << MSG
+#else
+#define PRINT_DEBUG(MSG) 
+#endif 
+
 QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /*= NULL*/):
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -49,6 +59,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /*= NULL*
             return;
         m_items[idx].offset = peerTime - syncTime;
         m_items[idx].ready = true;
+        PRINT_DEBUG("peer " + peerId.toByteArray() + " is ready");
         emit dataChanged(index(idx, TimeColumn), index(idx, OffsetColumn), textRoles);
     });
 
@@ -67,6 +78,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /*= NULL*
         if (info.data.peer.peerType != Qn::PT_Server)
             return;
 
+        PRINT_DEBUG("peer " + info.uuid.toByteArray() + " is changed");
         if (isSelected(info.data.serverTimePriority))
             setSelectedServer(info.uuid);
         else if (info.uuid == m_selectedServer)
@@ -82,6 +94,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /*= NULL*
         if (idx < 0)
             return;
 
+        PRINT_DEBUG("peer " + info.uuid.toByteArray() + " is removed");
         beginRemoveRows(QModelIndex(), idx, idx);
         m_items.removeAt(idx);
         endRemoveRows();
@@ -286,11 +299,20 @@ void QnTimeServerSelectionModel::updateTime() {
 }
 
 void QnTimeServerSelectionModel::addItem(const QnPeerRuntimeInfo &info, qint64 time) {
+    PRINT_DEBUG("peer " + info.uuid.toByteArray() + " is added");
+#ifdef _DEBUG
+    QnMediaServerResourcePtr server = qnResPool->getResourceById(info.uuid).dynamicCast<QnMediaServerResource>();
+    QString title = server ? getFullResourceName(server, true) : tr("Server");
+    PRINT_DEBUG("peer " + info.uuid.toByteArray() + " name is " + title.toUtf8());
+#endif // DEBUG
+
     Item item;
     item.peerId = info.uuid;
     item.priority = info.data.serverTimePriority;
-    if (isSelected(item.priority))
+    if (isSelected(item.priority)) {
+        PRINT_DEBUG("peer " + info.uuid.toByteArray() + " is SELECTED");
         m_selectedServer = item.peerId;
+    }
     item.ready = time > 0;
     if (time > 0)
         item.offset = time - qnSyncTime->currentMSecsSinceEpoch();
@@ -307,10 +329,14 @@ void QnTimeServerSelectionModel::setSelectedServer(const QnUuid &serverId) {
     if (m_selectedServer == serverId)
         return;
 
+    PRINT_DEBUG("model: set selected peer to " + serverId.toByteArray());
+
     if (!serverId.isNull()) {
         int idx = qnIndexOf(m_items, [serverId](const Item &item){return item.peerId == serverId; });
-        if (idx < 0)
+        if (idx < 0) {
+            PRINT_DEBUG("model: selected peer " + serverId.toByteArray() + " NOT FOUND");
             return;
+        }
     }
 
     m_selectedServer = serverId;
@@ -342,18 +368,6 @@ QString QnTimeServerSelectionModel::formattedOffset(qint64 offsetMSec) {
     QTimeSpan span(offsetMSec);
     span.normalize();
     return span.toApproximateString();
-
-/*
-    QString body;
-
-    QString format = lit("%1%2%3");
-    if (span > QTimeSpan::Hour)
-        return format.arg(sign).arg(span.toHours(), 2, 'g', 2).arg(tr("h"));
-    else if (span > QTimeSpan::Minute)
-        return format.arg(sign).arg(span.toMinutes(), 2, 'g', 2).arg(tr("m"));
-    else 
-        return format.arg(sign).arg(span.toSecs(), 2, 'g', 2).arg(tr("s"));
-*/
 }
 
 bool QnTimeServerSelectionModel::sameTimezone() const {
