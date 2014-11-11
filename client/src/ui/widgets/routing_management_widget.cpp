@@ -234,8 +234,12 @@ void QnRoutingManagementWidget::submitToSettings() {
 
             if (it.value())
                 connection2()->getDiscoveryManager()->addDiscoveryInformation(serverId, url, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-            else
-                connection2()->getDiscoveryManager()->removeDiscoveryInformation(serverId, url, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+            else {
+                if (autoUrls.contains(url))
+                    connection2()->getDiscoveryManager()->removeDiscoveryInformation(serverId, url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+                else
+                    connection2()->getDiscoveryManager()->addDiscoveryInformation(serverId, url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+            }
         }
     }
 }
