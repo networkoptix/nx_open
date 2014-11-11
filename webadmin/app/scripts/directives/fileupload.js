@@ -14,7 +14,7 @@ angular.module('webadminApp').directive('fileupload',function(){
                 url: attrs.url,
                 dataType: 'json',
                 done: function (e, data) {
-                    if(data.result.error===0){
+                    if(data.result.error==='0'){
                         alert('Updating successfully started. It will take several minutes');
 
                         //call restart?

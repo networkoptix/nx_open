@@ -37,7 +37,7 @@ angular.module('webadminApp')
             modalInstance.result.then(function (settings) {
                 $log.info(settings);
                 mediaserver.mergeSystems(settings.url,settings.password,settings.keepMySystem).then(function(r){
-                    if(r.data.error!==0){
+                    if(r.data.error!=='0'){
                         var errorToShow = r.data.errorString;
                         switch(errorToShow){
                             case 'FAIL':
@@ -80,15 +80,18 @@ angular.module('webadminApp')
             return false;
         }
         function resultHandler (r){
-            if(r.error!==0) {
-                var errorToShow = r.errorString;
+            var data = r.data;
+
+            if(data.error!=='0') {
+                console.log("some error",data);
+                var errorToShow = data.errorString;
                 switch (errorToShow) {
                     case 'UNAUTHORIZED':
                     case 'password':
                         errorToShow = 'Wrong password.';
                 }
                 alert('Error: ' + errorToShow);
-            }else if (r.reply.restartNeeded) {
+            }else if (data.reply.restartNeeded) {
                 if (confirm('All changes saved. New settings will be applied after restart. \n Do you want to restart server now?')) {
                     restartServer(true);
                 }
@@ -134,6 +137,12 @@ angular.module('webadminApp')
                 }
                 else {
                     server.status = 'Unavailable';
+
+                    $scope.mediaServers = _.sortBy($scope.mediaServers,function(server){
+                        return (server.status==='Online'?'0':'1') + server.Name + server.id;
+                        // Сортировка: online->name->id
+                    });
+
                 }
                 return false;
             });
