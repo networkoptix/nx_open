@@ -8,7 +8,9 @@
 #  include <arpa/inet.h>
 #endif
 
+#include <utils/common/concurrent.h>
 #include <utils/common/log.h>
+#include <utils/network/http/httpclient.h>
 #include <utils/network/nettools.h>
 #include <utils/network/ping.h>
 
@@ -46,7 +48,8 @@ CLHttpStatus QnPlAreconVisionResource::getRegister(int page, int num, int& val)
     QString req;
     QTextStream(&req) << "getreg?page=" << page << "&reg=" << num;
 
-    CLSimpleHTTPClient http(getHostAddress(), 80,getNetworkTimeout(), getAuth());
+    QUrl devUrl(getUrl());
+    CLSimpleHTTPClient http(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
 
     CLHttpStatus result = http.doGET(req);
 
@@ -76,8 +79,8 @@ CLHttpStatus QnPlAreconVisionResource::setRegister(int page, int num, int val)
 {
     QString req;
     QTextStream(&req) << "setreg?page=" << page << "&reg=" << num << "&val=" << val;
-
-    CLSimpleHTTPClient http(getHostAddress(), 80,getNetworkTimeout(), getAuth());
+    QUrl devUrl(getUrl());
+    CLSimpleHTTPClient http(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
 
     CLHttpStatus result = http.doGET(req);
 
@@ -168,6 +171,63 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
     }
 
     return result;
+}
+
+bool QnPlAreconVisionResource::ping()
+{
+    QnConcurrent::QnFuture<bool> result(1);
+    if( !checkIfOnlineAsync( [&result]( bool onlineOrNot ) {
+            result.setResultAt(0, onlineOrNot); } ) )
+        return false;
+    result.waitForFinished();
+    return result.resultAt(0);
+}
+
+bool QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)>&& completionHandler )
+{
+    //checking that camera is alive and on its place
+    const QString& urlStr = getUrl();
+    QUrl url = QUrl(urlStr);
+    if( url.host().isEmpty() )
+    {
+        //url is just IP address?
+        url.setScheme( lit("http") );
+        url.setHost( urlStr );
+    }
+    url.setPath( lit("/get?mac") );
+    url.setUserName( getAuth().user() );
+    url.setPassword( getAuth().password() );
+
+    nx_http::AsyncHttpClientPtr httpClientCaptured = std::make_shared<nx_http::AsyncHttpClient>();
+    const QnMacAddress cameraMAC = getMAC();
+
+    auto httpReqCompletionHandler = [httpClientCaptured, cameraMAC, completionHandler]
+        ( const nx_http::AsyncHttpClientPtr& httpClient ) mutable
+    {
+        httpClientCaptured.reset();
+
+        auto completionHandlerLocal = std::move( completionHandler );
+        if( (httpClient->failed()) ||
+            (httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok) )
+        {
+            completionHandlerLocal( false );
+            return;
+        }
+        nx_http::BufferType msgBody = httpClient->fetchMessageBodyBuffer();
+        const int sepIndex = msgBody.indexOf('=');
+        if( sepIndex == -1 )
+        {
+            completionHandlerLocal( false );
+            return;
+        }
+        const QByteArray& mac = msgBody.mid( sepIndex+1 );
+        completionHandlerLocal( cameraMAC == QnMacAddress(mac) );
+    };
+    connect( httpClientCaptured.get(), &nx_http::AsyncHttpClient::done,
+             this, httpReqCompletionHandler,
+             Qt::DirectConnection );
+
+    return httpClientCaptured->doGet( url );
 }
 
 CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
@@ -278,7 +338,8 @@ bool QnPlAreconVisionResource::isH264() const
 //===============================================================================================================================
 bool QnPlAreconVisionResource::getParamPhysical(const QString &param, QVariant &val)
 {
-    CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
+    QUrl devUrl(getUrl());
+    CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
 
     QString request = lit("get?") + param;
 
@@ -312,7 +373,8 @@ bool QnPlAreconVisionResource::getParamPhysical(const QString &param, QVariant &
 
 bool QnPlAreconVisionResource::setParamPhysical(const QString &param, const QVariant& val )
 {
-    CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
+    QUrl devUrl(getUrl());
+    CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
 
     QString request = lit("set?") + param;
     request += QLatin1Char('=') + val.toString();

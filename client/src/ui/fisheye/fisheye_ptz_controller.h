@@ -37,7 +37,7 @@ public:
     QnItemDewarpingParams itemDewarpingParams() const;
 
     static QVector3D positionFromRect(const QnMediaDewarpingParams &dewarpingParams, const QRectF &rect);
-
+    qreal customAR() const;
 protected:
     virtual void tick(int deltaMSecs) override;
 

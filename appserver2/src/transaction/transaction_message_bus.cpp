@@ -150,6 +150,7 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::addDiscoveryInformation:
     case ApiCommand::removeDiscoveryInformation:
                                             return handleTransactionParams<ApiDiscoveryData>        (serializedTransaction, &stream, transaction, function, fastFunction);
+    case ApiCommand::getDiscoveryData:      return handleTransactionParams<ApiDiscoveryDataList>    (serializedTransaction, &stream, transaction, function, fastFunction);
 
     case ApiCommand::changeSystemName:      return handleTransactionParams<ApiSystemNameData>       (serializedTransaction, &stream, transaction, function, fastFunction);
 
@@ -895,7 +896,6 @@ QnTransaction<ApiModuleDataList> QnTransactionMessageBus::prepareModulesDataTran
         ApiModuleData data;
         QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &data);
         data.isAlive = true;
-        data.discoverers = QnGlobalModuleFinder::instance()->discoverers(data.id).toList();
         transaction.params.push_back(data);
     }
     transaction.peerID = m_localPeer.id;

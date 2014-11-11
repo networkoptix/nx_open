@@ -426,7 +426,46 @@ UINT __stdcall CopyDatabaseFile(MSIHANDLE hInstall)
         fromFile = params.Tokenize(_T(";"), curPos);
         toFile = params.Tokenize(_T(";"), curPos);
 
-        CopyFile(fromFile, toFile, TRUE);
+        if (!PathFileExists(toFile)) {
+            CopyFile(fromFile, toFile, TRUE);
+            CopyFile(fromFile + L"-shm", toFile + L"-shm", FALSE);
+            CopyFile(fromFile + L"-wal", toFile + L"-wal", FALSE);
+        }
+    }
+
+LExit:
+    
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
+
+UINT __stdcall CopyHostedFiles(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    hr = WcaInitialize(hInstall, "CopyHostedFiles");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+    {
+        CAtlString params, fromFile, toFile;
+        params = GetProperty(hInstall, L"CustomActionData");
+
+        int curPos = 0;
+        fromFile = params.Tokenize(_T(";"), curPos);
+        toFile = params.Tokenize(_T(";"), curPos);
+
+        if (!PathFileExists(toFile)) {
+            SHFILEOPSTRUCT s = { 0 };
+            s.hwnd = 0;
+            s.wFunc = FO_COPY;
+            s.pFrom = fromFile;
+            s.pTo = toFile;
+            s.fFlags = FOF_NOCONFIRMATION | FOF_NOCONFIRMMKDIR | FOF_NOERRORUI;
+            SHFileOperation(&s);
+        }
     }
 
 LExit:

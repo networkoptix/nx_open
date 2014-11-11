@@ -32,7 +32,7 @@ QnActiResource::QnActiResource()
 {
     setVendor(lit("ACTI"));
 
-    setAuth(QLatin1String("admin"), QLatin1String("123456"), false);
+    setDefaultAuth(QLatin1String("admin"), QLatin1String("123456"));
     for (uint i = 0; i < sizeof(DEFAULT_AVAIL_BITRATE_KBPS)/sizeof(int); ++i)
         m_availBitrate << DEFAULT_AVAIL_BITRATE_KBPS[i];
 }
@@ -51,6 +51,41 @@ QnActiResource::~QnActiResource()
         TimerManager::instance()->joinAndDeleteTimer( taskID );
         lk.relock();
     }
+}
+
+bool QnActiResource::checkIfOnlineAsync( std::function<void(bool)>&& completionHandler )
+{
+    QUrl apiUrl;
+    apiUrl.setScheme( lit("http") );
+    apiUrl.setHost( getHostAddress() );
+    apiUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
+    apiUrl.setUserName( getAuth().user() );
+    apiUrl.setPassword( getAuth().password() );
+    apiUrl.setPath( lit("/cgi-bin/system") );
+    apiUrl.setQuery( lit("USER=%1&PWD=%2&SYSTEM_INFO").arg(getAuth().user()).arg(getAuth().password()) );
+
+    QString resourceMac = getMAC().toString();
+    auto requestCompletionFunc = [resourceMac, completionHandler]
+        ( SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody ) mutable
+    {
+        if( osErrorCode != SystemError::noError ||
+            statusCode != nx_http::StatusCode::ok )
+        {
+            return completionHandler( false );
+        }
+
+        if( msgBody.startsWith("ERROR: bad account") )
+            return completionHandler( false );
+
+        QMap<QByteArray, QByteArray> report = QnActiResource::parseSystemInfo( msgBody );
+        QByteArray mac = report.value("mac address");
+        mac.replace( ':', '-' );
+        completionHandler( mac == resourceMac.toLatin1() );
+    };
+
+    return nx_http::downloadFileAsync(
+        apiUrl,
+        requestCompletionFunc );
 }
 
 void QnActiResource::setEventPort(int eventPort) {
@@ -99,25 +134,34 @@ QByteArray QnActiResource::unquoteStr(const QByteArray& v)
 QByteArray QnActiResource::makeActiRequest(const QString& group, const QString& command, CLHttpStatus& status, bool keepAllData, QString* const localAddress) const
 {
     QByteArray result;
+    status = makeActiRequest( getUrl(), getAuth(), group, command, keepAllData, &result, localAddress );
+    return result;
+}
 
-    QUrl url(getUrl());
-    QAuthenticator auth = getAuth();
-    CLSimpleHTTPClient client(url.host(), url.port(80), TCP_TIMEOUT, QAuthenticator());
+CLHttpStatus QnActiResource::makeActiRequest(
+    const QUrl& url,
+    const QAuthenticator& auth,
+    const QString& group,
+    const QString& command,
+    bool keepAllData,
+    QByteArray* const msgBody,
+    QString* const localAddress )
+{
+    CLSimpleHTTPClient client(url.host(), url.port(nx_http::DEFAULT_HTTP_PORT), TCP_TIMEOUT, QAuthenticator());
     QString pattern(QLatin1String("cgi-bin/%1?USER=%2&PWD=%3&%4"));
-    status = client.doGET(pattern.arg(group).arg(auth.user()).arg(auth.password()).arg(command));
+    CLHttpStatus status = client.doGET(pattern.arg(group).arg(auth.user()).arg(auth.password()).arg(command));
     if (status == CL_HTTP_SUCCESS) {
         if( localAddress )
             *localAddress = client.localAddress();
-        client.readAll(result);
-        if (result.startsWith("ERROR: bad account")) {
-            status = CL_HTTP_AUTH_REQUIRED; 
-            return QByteArray();
-        }
+        msgBody->clear();
+        client.readAll(*msgBody);
+        if (msgBody->startsWith("ERROR: bad account"))
+            return CL_HTTP_AUTH_REQUIRED; 
     }
-    if (keepAllData)
-        return result;
-    else
-        return unquoteStr(result.mid(result.indexOf('=')+1).trimmed());
+
+    if (!keepAllData)
+        *msgBody = unquoteStr(msgBody->mid(msgBody->indexOf('=')+1).trimmed());
+    return status;
 }
 
 static bool resolutionGreaterThan(const QSize &s1, const QSize &s2)
@@ -137,7 +181,7 @@ QList<QSize> QnActiResource::parseResolutionStr(const QByteArray& resolutions)
     return result;
 }
 
-QMap<QByteArray, QByteArray> QnActiResource::parseSystemInfo(const QByteArray& report) const
+QMap<QByteArray, QByteArray> QnActiResource::parseSystemInfo(const QByteArray& report)
 {
     QMap<QByteArray, QByteArray> result;
     QList<QByteArray> lines = report.split('\n');

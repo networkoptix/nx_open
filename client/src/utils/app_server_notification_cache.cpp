@@ -15,7 +15,7 @@
 namespace {
     const QLatin1String folder("notifications");
     const QLatin1String targetContainter("mp3");
-    const QLatin1String titleTag("Title");
+    const QLatin1String titleTag("Title");  //TODO: #GDM replace with database field
 }
 
 QnAppServerNotificationCache::QnAppServerNotificationCache(QObject *parent) :
@@ -82,6 +82,7 @@ bool QnAppServerNotificationCache::updateTitle(const QString &filename, const QS
 }
 
 void QnAppServerNotificationCache::clear() {
+    base_type::clear();
     m_model->init();
 }
 

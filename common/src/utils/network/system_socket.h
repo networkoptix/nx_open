@@ -22,14 +22,9 @@
 #include "socket_impl_helper.h"
 #include "utils/common/byte_array.h"
 #include "../common/systemerror.h"
-//#include "system_socket_impl.h"
 
 
-// TODO: #Elric why bother with maxlen and not use QByteArray directly? Remove.
-#define MAX_ERROR_MSG_LENGTH 1024
-
-
-typedef PollableImpl SystemSocketImpl;
+typedef PollableImpl PollableSystemSocketImpl;
 template<class SocketType> class BaseAsyncSocketImplHelper;
 
 /**
@@ -44,19 +39,19 @@ public:
         std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
         int type,
         int protocol,
-        SystemSocketImpl* impl = nullptr );
+        PollableSystemSocketImpl* impl = nullptr );
     Socket(
         std::unique_ptr<BaseAsyncSocketImplHelper<Pollable>> asyncHelper,
         int sockDesc,
-        SystemSocketImpl* impl = nullptr );
+        PollableSystemSocketImpl* impl = nullptr );
     //TODO #ak remove following two constructors
     Socket(
         int type,
         int protocol,
-        SystemSocketImpl* impl = nullptr );
+        PollableSystemSocketImpl* impl = nullptr );
     Socket(
         int sockDesc,
-        SystemSocketImpl* impl = nullptr );
+        PollableSystemSocketImpl* impl = nullptr );
 
     /**
      *   Close and deallocate this socket
@@ -194,8 +189,8 @@ class CommunicatingSocket
     public Socket
 {
 public:
-    CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr, int type, int protocol, SystemSocketImpl* sockImpl = nullptr );
-    CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr, int newConnSD, SystemSocketImpl* sockImpl = nullptr );
+    CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr, int type, int protocol, PollableSystemSocketImpl* sockImpl = nullptr );
+    CommunicatingSocket( AbstractCommunicatingSocket* abstractSocketPtr, int newConnSD, PollableSystemSocketImpl* sockImpl = nullptr );
 
     virtual ~CommunicatingSocket();
 

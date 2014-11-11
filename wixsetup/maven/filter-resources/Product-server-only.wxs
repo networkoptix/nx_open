@@ -108,7 +108,7 @@
         </Property>
 
         <Property Id="ALLOW_CAMERA_CHANGES" Secure="yes">
-            <RegistrySearch Id="AllowCameraChangesReg" Root="HKLM" Key="$(var.ServerRegPath)" Name="allowCameraChanges" Type="raw" Win64="yes"/>
+            <RegistrySearch Id="AllowCameraChangesReg" Root="HKLM" Key="$(var.ECRegPath)" Name="allowCameraChanges" Type="raw" Win64="yes"/>
         </Property>
 
         <Property Id="SERVER_LOGIN" Value="admin"/>
@@ -136,6 +136,10 @@
         <CustomAction Id="CopyDatabaseFile_Cmd" Property="CopyDatabaseFile" Execute="immediate" Impersonate="yes"
             Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\db\ecs.db;[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\${mediaserver.name}\ecs.sqlite"/>
         <CustomAction Id="CopyDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="CopyDatabaseFile" Execute="deferred" Impersonate="no"/>
+
+        <CustomAction Id="CopyHostedFiles_Cmd" Property="CopyHostedFiles" Execute="immediate" Impersonate="yes"
+            Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\hostedfiles;[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\${mediaserver.name}\vms_storedfiles"/>
+        <CustomAction Id="CopyHostedFiles" BinaryKey="CustomActions.dll" DllEntry="CopyHostedFiles" Execute="deferred" Impersonate="no"/>
 
         <CustomAction Id="DeleteOldMediaserverSettings_Cmd" Property="DeleteOldMediaserverSettings" Value="$(var.ServerRegPath)" Execute="immediate" Impersonate="yes"/>
         <CustomAction Id="DeleteOldMediaserverSettings" BinaryKey="CustomActions.dll" DllEntry="DeleteOldMediaserverSettings" Execute="deferred" Impersonate="no"/>
@@ -198,6 +202,10 @@
             <Custom Action="CopyDatabaseFile_Cmd" After="InstallFiles">
                 <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]></Custom>
             <Custom Action="CopyDatabaseFile" After="CopyDatabaseFile_Cmd">
+                <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="CopyHostedFiles_Cmd" After="InstallFiles">
+                <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="CopyHostedFiles" After="CopyHostedFiles_Cmd">
                 <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]></Custom>
 
             <Custom Action="CertGenAction_Cmd" After="CopyDatabaseFile">
@@ -370,8 +378,6 @@
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UninstallOptionsDlg">$(var.Remove_S1) OR (!ServerFeature = 3 AND $(var.VmsRemoving))</Publish>            
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg">$(var.VmsUpgrading)</Publish>
             
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Property="REMOVE" Value="{}" Order="3"><![CDATA[ Installed ]]></Publish>
-
             <Publish Dialog="VerifyReadyDlg" Control="Install" Event="AddLocal" Value="ServerFeature">INSTALL_SERVER</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Install" Event="Remove" Value="ServerFeature">NOT INSTALL_SERVER</Publish>
 
@@ -388,16 +394,16 @@
             <Publish Dialog="MyExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
 
             <!-- MaintenanceWelcomeDlg -->
-            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
+            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="UninstallOptionsDlg">1</Publish>
+            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Property="REMOVE" Value="ALL">1</Publish>
+            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Property="WixUI_InstallMode" Value="Remove">1</Publish>
 
             <!-- MaintenanceTypeDlg -->
-            <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
-            <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Property="REMOVE" Value="ALL">1</Publish>
-            <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="UninstallOptionsDlg">!ServerFeature = 3</Publish>
-            <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg"><![CDATA[ !ServerFeature <> 3 ]]></Publish>            
+            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="UninstallOptionsDlg">!ServerFeature = 3</Publish>
+            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg"><![CDATA[ !ServerFeature <> 3 ]]></Publish>            
             
             <Publish Dialog="UninstallOptionsDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
-            <Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
+            <Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
             <Publish Dialog="UninstallOptionsDlg" Control="Back" Property="REMOVE" Value="{}">1</Publish>
             <Publish Dialog="UninstallOptionsDlg" Control="Back" Property="REMOVE_DATABASE" Value="0">1</Publish>
             

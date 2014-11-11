@@ -11,16 +11,14 @@ namespace ec2 {
 void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiModuleData> &transaction) {
     QnModuleInformation moduleInformation;
     QnGlobalModuleFinder::fillFromApiModuleData(transaction.params, &moduleInformation);
-    for (const QnUuid &discovererId: transaction.params.discoverers)
-        emit moduleChanged(moduleInformation, transaction.params.isAlive, discovererId);
+    emit moduleChanged(moduleInformation, transaction.params.isAlive);
 }
 
 void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiModuleDataList> &transaction) {
     for (const ApiModuleData &data: transaction.params) {
         QnModuleInformation moduleInformation;
         QnGlobalModuleFinder::fillFromApiModuleData(data, &moduleInformation);
-        for (const QnUuid &discovererId: data.discoverers)
-            emit moduleChanged(moduleInformation, data.isAlive, discovererId);
+        emit moduleChanged(moduleInformation, data.isAlive);
     }
 }
 
@@ -38,9 +36,9 @@ template<class QueryProcessorType>
 QnMiscManager<QueryProcessorType>::~QnMiscManager() {}
 
 template<class QueryProcessorType>
-int QnMiscManager<QueryProcessorType>::sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, const QnUuid &discoverer, impl::SimpleHandlerPtr handler) {
+int QnMiscManager<QueryProcessorType>::sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
-    auto transaction = prepareTransaction(moduleInformation, isAlive, discoverer);
+    auto transaction = prepareTransaction(moduleInformation, isAlive);
 
     using namespace std::placeholders;
     m_queryProcessor->processUpdateAsync(transaction, [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });
@@ -49,9 +47,9 @@ int QnMiscManager<QueryProcessorType>::sendModuleInformation(const QnModuleInfor
 }
 
 template<class QueryProcessorType>
-int QnMiscManager<QueryProcessorType>::sendModuleInformationList(const QList<QnModuleInformation> &moduleInformationList, const QMultiHash<QnUuid, QnUuid> &discoverersByPeer, impl::SimpleHandlerPtr handler) {
+int QnMiscManager<QueryProcessorType>::sendModuleInformationList(const QList<QnModuleInformation> &moduleInformationList, impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
-    auto transaction = prepareTransaction(moduleInformationList, discoverersByPeer);
+    auto transaction = prepareTransaction(moduleInformationList);
 
     using namespace std::placeholders;
     m_queryProcessor->processUpdateAsync(transaction, [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });
@@ -71,24 +69,22 @@ int QnMiscManager<QueryProcessorType>::changeSystemName(const QString &systemNam
 }
 
 template<class QueryProcessorType>
-QnTransaction<ApiModuleData> QnMiscManager<QueryProcessorType>::prepareTransaction(const QnModuleInformation &moduleInformation, bool isAlive, const QnUuid &discoverer) const {
+QnTransaction<ApiModuleData> QnMiscManager<QueryProcessorType>::prepareTransaction(const QnModuleInformation &moduleInformation, bool isAlive) const {
     QnTransaction<ApiModuleData> transaction(ApiCommand::moduleInfo);
     QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &transaction.params);
     transaction.params.isAlive = isAlive;
-    transaction.params.discoverers.append(discoverer);
 
     return transaction;
 }
 
 template<class QueryProcessorType>
-QnTransaction<ApiModuleDataList> QnMiscManager<QueryProcessorType>::prepareTransaction(const QList<QnModuleInformation> &moduleInformationList, const QMultiHash<QnUuid, QnUuid> &discoverersByPeer) const {
+QnTransaction<ApiModuleDataList> QnMiscManager<QueryProcessorType>::prepareTransaction(const QList<QnModuleInformation> &moduleInformationList) const {
     QnTransaction<ApiModuleDataList> transaction(ApiCommand::moduleInfoList);
 
     for (const QnModuleInformation &moduleInformation: moduleInformationList) {
         ApiModuleData data;
         QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &data);
         data.isAlive = true;
-        data.discoverers = discoverersByPeer.values(data.id);
         transaction.params.push_back(data);
     }
 

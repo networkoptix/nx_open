@@ -175,7 +175,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     connect(m_dwm,                          SIGNAL(compositionChanged()),                   this,                                   SLOT(updateDwmState()));
 
     /* Set up properties. */
-    setWindowTitle(QApplication::applicationDisplayName());
+    setWindowTitle(QString());
     setAcceptDrops(true);
 
     if (!qnSettings->isVideoWallMode()) {
@@ -192,12 +192,16 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_view->setAutoFillBackground(true);
 
     /* Set up model & control machinery. */
+    display()->setLightMode(qnSettings->lightMode());
     display()->setScene(m_scene.data());
     display()->setView(m_view.data());
     if (qnSettings->isVideoWallMode())
         display()->setNormalMarginFlags(0);
     else
         display()->setNormalMarginFlags(Qn::MarginsAffectSize | Qn::MarginsAffectPosition);
+
+    if (qnSettings->lightMode() & Qn::LightModeNoSceneBackground)
+        action(Qn::ToggleBackgroundAnimationAction)->setDisabled(true);
 
     m_controller.reset(new QnWorkbenchController(this));
     if (qnSettings->isVideoWallMode())

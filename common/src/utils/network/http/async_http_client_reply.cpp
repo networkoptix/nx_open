@@ -50,14 +50,11 @@ void QnAsyncHttpClientReply::at_client_done(const nx_http::AsyncHttpClientPtr &c
 
     m_url = client->url();
 
-    if ((m_failed = client->failed())) {
-        emit finished(this);
-        return;
+    if (!(m_failed = client->failed())) {
+        m_contentType = client->contentType();
+        m_data = client->fetchMessageBodyBuffer();
+        m_response = *client->response();
     }
-
-    m_contentType = client->contentType();
-    m_data = client->fetchMessageBodyBuffer();
-    m_response = *client->response();
 
     lock.unlock();
 

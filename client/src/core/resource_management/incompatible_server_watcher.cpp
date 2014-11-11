@@ -4,6 +4,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <utils/network/global_module_finder.h>
+#include <utils/network/router.h>
 #include <utils/common/log.h>
 #include <common/common_module.h>
 
@@ -16,7 +17,16 @@ void updateServer(const QnMediaServerResourcePtr &server, const QnModuleInformat
     server->setNetAddrList(addressList);
 
     if (!addressList.isEmpty()) {
-        QString url = QString(lit("http://%1:%2")).arg(addressList.first().toString()).arg(moduleInformation.port);
+        QString address = addressList.first().toString();
+        quint16 port = moduleInformation.port;
+        if (QnRouter::instance()) {
+            QnRoute route = QnRouter::instance()->routeTo(moduleInformation.id, qnCommon->remoteGUID());
+            if (route.isValid()) {
+                address = route.points.last().host;
+                port = route.points.last().port;
+            }
+        }
+        QString url = QString(lit("http://%1:%2")).arg(address).arg(port);
         server->setApiUrl(url);
         server->setUrl(url);
     }

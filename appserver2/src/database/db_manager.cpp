@@ -49,6 +49,27 @@ static QnDbManager* globalInstance = 0; // TODO: #Elric #EC2 use QnSingleton
 static const char LICENSE_EXPIRED_TIME_KEY[] = "{4208502A-BD7F-47C2-B290-83017D83CDB7}";
 static const char DB_INSTANCE_KEY[] = "DB_INSTANCE_ID";
 
+static bool removeDirRecursive(const QString & dirName)
+{
+    bool result = true;
+    QDir dir(dirName);
+
+    if (dir.exists(dirName)) {
+        for(const QFileInfo& info: dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst)) 
+        {
+            if (info.isDir())
+                result = removeDir(info.absoluteFilePath());
+            else
+                result = QFile::remove(info.absoluteFilePath());
+
+            if (!result)
+                return result;
+        }
+        result = dir.rmdir(dirName);
+    }
+    return result;
+}
+
 template <class T>
 void assertSorted(std::vector<T> &data) {
 #ifdef _DEBUG
@@ -236,7 +257,8 @@ QnDbManager::QnDbManager()
     m_initialized(false),
     m_tranStatic(m_sdbStatic, m_mutexStatic),
     m_needResyncLog(false),
-    m_needResyncLicenses(false)
+    m_needResyncLicenses(false),
+    m_needResyncFiles(false)
 {
 	Q_ASSERT(!globalInstance);
 	globalInstance = this;
@@ -321,6 +343,13 @@ bool QnDbManager::init(
             }
         }
     }
+
+    QString storedFilesDir = closeDirPath(dbFilePath) + QString(lit("vms_storedfiles/"));
+    int addedStoredFilesCnt = 0;
+    addStoredFiles(storedFilesDir, &addedStoredFilesCnt);
+    m_needResyncFiles = addedStoredFilesCnt > 0;
+    removeDirRecursive(storedFilesDir);
+
     // updateDBVersion();
     QSqlQuery insVersionQuery( m_sdb );
     insVersionQuery.prepare( "INSERT OR REPLACE INTO misc_data (key, data) values (?,?)" );
@@ -415,9 +444,15 @@ bool QnDbManager::init(
         if (!resyncTransactionLog())
 		    return false;
     }
-    else if (m_needResyncLicenses) {
-        if (!fillTransactionLogInternal<ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
-            return false;
+    else {
+        if (m_needResyncLicenses) {
+            if (!fillTransactionLogInternal<ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
+                return false;
+        }
+        if (m_needResyncFiles) {
+            if (!fillTransactionLogInternal<ApiStoredFileData, ApiStoredFileDataList>(ApiCommand::addStoredFile))
+                return false;
+        }
     }
 
     // Set admin user's password
@@ -524,6 +559,12 @@ bool QnDbManager::resyncTransactionLog()
         return false;
 
     if (!fillTransactionLogInternal<ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
+        return false;
+
+    if (!fillTransactionLogInternal<ApiCameraServerItemData, ApiCameraServerItemDataList>(ApiCommand::addCameraHistoryItem))
+        return false;
+
+    if (!fillTransactionLogInternal<ApiStoredFileData, ApiStoredFileDataList>(ApiCommand::addStoredFile))
         return false;
 
     return true;
@@ -660,6 +701,60 @@ bool QnDbManager::updateGuids()
     if (!updateTableGuids("vms_businessrule", "guid", guids))
         return false;
 
+    return true;
+}
+
+void scanDirectoryRecursive(const QString &directory, QStringList &result) {
+    QDir sourceDirectory(directory);
+    for(const QFileInfo& info: sourceDirectory.entryInfoList(QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Files, QDir::DirsFirst)) {
+        if (info.isDir())
+            scanDirectoryRecursive(info.absoluteFilePath(), result);
+        else
+            result.append(info.absoluteFilePath());
+    }
+};
+
+ErrorCode QnDbManager::insertOrReplaceStoredFile(const QString &fileName, const QByteArray &fileContents) {
+    QSqlQuery query(m_sdb);
+    query.prepare("INSERT OR REPLACE INTO vms_storedFiles (path, data) values (:path, :data)");
+    query.bindValue(":path", fileName);
+    query.bindValue(":data", fileContents);
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::dbError;
+    }
+    return ErrorCode::ok;
+}
+
+
+/** Insert sample files into database. */
+bool QnDbManager::addStoredFiles(const QString& baseDirectoryName, int* count) 
+{
+    if (count)
+        *count = 0;
+
+    /* Directory name selected equal to the database table name. */
+
+    /* Get all files from the base directory in the resources. Enter folders recursively. */
+    QStringList files;
+    scanDirectoryRecursive(baseDirectoryName, files);
+
+    /* Add each file to database */
+    QDir baseDir(baseDirectoryName);
+    for(const QString &fileName: files) {
+        QString relativeName = baseDir.relativeFilePath(fileName);
+        QFile file(fileName);
+        if (!file.open(QIODevice::ReadOnly))
+            return false;
+        QByteArray data = file.readAll();
+
+        ErrorCode status = insertOrReplaceStoredFile(relativeName, data);
+        if (status != ErrorCode::ok)
+            return false;
+
+        if (count)
+            ++(*count);
+    }
     return true;
 }
 
@@ -846,6 +941,10 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     else if (updateName == lit(":/updates/21_new_dw_cam.sql")) {
         updateResourceTypeGuids();
     }
+    else if (updateName == lit(":/updates/24_insert_default_stored_files.sql")) {
+        addStoredFiles(lit(":/vms_storedfiles/"));
+    }
+
 
     return true;
 }
@@ -1957,20 +2056,9 @@ ErrorCode QnDbManager::removeLayoutInternal(const QnUuid& id, const qint32 &inte
     return err;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStoredFileData>& tran)
-{
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStoredFileData>& tran) {
     assert( tran.command == ApiCommand::addStoredFile || tran.command == ApiCommand::updateStoredFile );
-
-    QSqlQuery query(m_sdb);
-    query.prepare("INSERT OR REPLACE INTO vms_storedFiles (path, data) values (:path, :data)");
-    query.bindValue(":path", tran.params.path);
-    query.bindValue(":data", tran.params.data);
-    if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
-        return ErrorCode::dbError;
-    }
-    
-    return ErrorCode::ok;
+    return insertOrReplaceStoredFile(tran.params.path, tran.params.data);
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStoredFilePath>& tran)
@@ -2127,6 +2215,18 @@ bool QnDbManager::readMiscParam( const QByteArray& name, QByteArray* value )
         return true;
     }
     return false;
+}
+
+ErrorCode QnDbManager::readSettings(ApiResourceParamDataList& settings)
+{
+    ApiResourceParamWithRefDataList params;
+    ErrorCode rez = doQueryNoLock(m_adminUserID, params);
+    settings.reserve( params.size() );
+    if (rez == ErrorCode::ok) {
+        for(ec2::ApiResourceParamWithRefData& param: params)
+            settings.push_back(ApiResourceParamData(std::move(param.name), std::move(param.value)));
+    }
+    return rez;
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiIdData>& tran)
@@ -2990,18 +3090,6 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
     return err;
 }
 
-//getParams
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiResourceParamDataList& data)
-{
-    ApiResourceParamWithRefDataList params;
-    ErrorCode rez = doQueryNoLock(m_adminUserID, params);
-    if (rez == ErrorCode::ok) {
-        for(const ec2::ApiResourceParamWithRefData& param: params)
-            data.push_back(ApiResourceParamData(param.name, param.value));
-    }
-    return rez;
-}
-
 ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t &, ApiDiscoveryDataList &data) {
     QSqlQuery query(m_sdb);
 
@@ -3194,6 +3282,24 @@ ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFil
     data.path = path.path;
     if (query.next())
         data.data = query.value(0).toByteArray();
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFileDataList& data)
+{
+    QString filter;
+    if (!path.path.isEmpty())
+        filter = QString("WHERE path = '%1'").arg(path.path);
+
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    query.prepare(QString("SELECT path, data FROM vms_storedFiles %1").arg(filter));
+    if (!query.exec())
+    {
+        qWarning() << Q_FUNC_INFO << __LINE__ << query.lastError();
+        return ErrorCode::dbError;
+    }
+    QnSql::fetch_many(query, &data);
     return ErrorCode::ok;
 }
 

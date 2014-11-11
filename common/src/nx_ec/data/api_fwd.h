@@ -85,6 +85,8 @@ namespace ec2 {
     struct ApiDatabaseDumpData;
     struct ApiLicenseOverflowData;
 
+    
+    typedef std::vector<ApiStoredFileData> ApiStoredFileDataList;
     typedef std::vector<ApiBusinessRuleData> ApiBusinessRuleDataList;
     typedef std::vector<ApiCameraData> ApiCameraDataList;
     typedef std::vector<ApiCameraAttributesData> ApiCameraAttributesDataList;

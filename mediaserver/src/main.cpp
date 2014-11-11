@@ -877,8 +877,37 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
             if (m_needStop)
                 return;
         }
-        for(const QnMediaServerResourcePtr &mediaServer: mediaServerList)
+
+        ec2::ApiDiscoveryDataList discoveryDataList;
+        while( ec2Connection->getDiscoveryManager()->getDiscoveryDataSync(&discoveryDataList) != ec2::ErrorCode::ok )
+        {
+            NX_LOG( lit("QnMain::run(). Can't get discovery data."), cl_logERROR );
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
+        }
+
+        QMultiHash<QnUuid, QUrl> additionalAddressesById;
+        QMultiHash<QnUuid, QUrl> ignoredAddressesById;
+        for (const ec2::ApiDiscoveryData &data: discoveryDataList) {
+            additionalAddressesById.insert(data.id, data.url);
+            if (data.ignore)
+                ignoredAddressesById.insert(data.id, data.url);
+        }
+
+        for(const QnMediaServerResourcePtr &mediaServer: mediaServerList) {
+            QList<QHostAddress> addresses = mediaServer->getNetAddrList();
+            QList<QUrl> additionalAddresses = additionalAddressesById.values(mediaServer->getId());
+            for (auto it = additionalAddresses.begin(); it != additionalAddresses.end(); /* no inc */) {
+                if (it->port() == -1 && addresses.contains(QHostAddress(it->host())))
+                    it = additionalAddresses.erase(it);
+                else
+                    ++it;
+            }
+            mediaServer->setAdditionalUrls(additionalAddresses);
+            mediaServer->setIgnoredUrls(ignoredAddressesById.values(mediaServer->getId()));
             messageProcessor->updateResource(mediaServer);
+        }
 
         //reading server attributes
         QnMediaServerUserAttributesList mediaServerUserAttributesList;
@@ -1638,10 +1667,10 @@ void QnMain::run()
 #endif
     // ------------------------------------------
 
+    QScopedPointer<QnRouter> router(new QnRouter(m_moduleFinder, false));
+
     QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder(m_moduleFinder));
     globalModuleFinder->setConnection(ec2Connection);
-
-    QScopedPointer<QnRouter> router(new QnRouter(m_moduleFinder, false));
 
     QScopedPointer<QnServerUpdateTool> serverUpdateTool(new QnServerUpdateTool());
 

@@ -4,7 +4,6 @@
 #ifndef SYSTEMEXCEPT_WIN32_H
 #define SYSTEMEXCEPT_WIN32_H
 
-#include <exception>
 #include <string>
 #include <windows.h>
 
@@ -18,49 +17,15 @@
     \todo some refactoring is required
 */
 class win32_exception
-: 
-    public std::exception
 {
 public:
-    typedef const void *Address; 
 
     //!Registers handler to intercept system exceptions (e.g., Access violation)
     static void installGlobalUnhandledExceptionHandler();
     static void installThreadSpecificUnhandledExceptionHandler();
-    virtual const char* what() const;
-    Address where() const;
-    unsigned code() const;
 
-    static void translate( 
-        unsigned int code, 
-        PEXCEPTION_POINTERS info );
-
-protected:
-    std::string m_what;
-
-    win32_exception( PEXCEPTION_POINTERS info );
-
-private:
-    Address mWhere;
-    unsigned mCode;
 };
 
-class access_violation
-: 
-    public win32_exception
-{
-public:
-    bool isWrite() const;
-    Address badAddress() const;
-
-private:
-    bool mIsWrite;
-    Address mBadAddress;
-    access_violation( PEXCEPTION_POINTERS info );
-    friend void win32_exception::translate( 
-        unsigned int code, 
-        PEXCEPTION_POINTERS info );
-};
 
 #endif    //SYSTEMEXCEPT_WIN32_H
 

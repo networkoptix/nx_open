@@ -33,7 +33,7 @@ QnReconnectHelper::QnReconnectHelper(QObject *parent /*= NULL*/):
     m_userName = m_currentUrl.userName();
     m_password = m_currentUrl.password();
 
-    /* List of all connected servers. Should not be updated as we are disconnected. */
+    /* List of all known servers. Should not be updated as we are disconnected. */
     m_allServers = qnResPool->getResources<QnMediaServerResource>();
     if (m_currentServer && !m_allServers.contains(m_currentServer))
         m_allServers << m_currentServer;
@@ -113,25 +113,32 @@ void QnReconnectHelper::next() {
 
     updateInterfacesForServer(id);
     m_currentUrl = bestInterfaceForServer(id);
-    
-    qDebug() << "next server is" << m_currentServer->getName();
-    for (auto iter: m_interfacesByServer[id]) {
-        QByteArray status = iter.online ? "online" : "offline";
-        qDebug() << "server interface" << iter.url << "is" << status;
-    }
-    qDebug() << "best interface" << m_currentUrl;
+}
+
+void QnReconnectHelper::markServerAsInvalid(const QnMediaServerResourcePtr &server) {
+    if (!m_allServers.contains(server))
+        return;
+
+    QList<InterfaceInfo> &interfaces = m_interfacesByServer[server->getId()];
+    for (InterfaceInfo &item: interfaces)
+        item.ignored = true;
 }
 
 void QnReconnectHelper::updateInterfacesForServer(const QnUuid &id) {
     QList<InterfaceInfo> &interfaces = m_interfacesByServer[id];
-    for (InterfaceInfo &item: interfaces) {
+    for (InterfaceInfo &item: interfaces)
         item.online = false;
-    }
 
     auto modules = QnModuleFinder::instance()->foundModules();
     auto iter = boost::find_if(modules, [id](const QnModuleInformation &info){return info.id == id;});
     if (iter == boost::end(modules))
         return;
+
+    if (iter->systemName != qnCommon->localSystemName()) {
+        for (InterfaceInfo &item: interfaces)
+            item.ignored = true;
+        return;
+    }
 
     int port = iter->port;
     for (const QString &remoteAddr: iter->remoteAddresses) {
@@ -180,8 +187,8 @@ QUrl QnReconnectHelper::bestInterfaceForServer(const QnUuid &id) {
     });
 
     Q_ASSERT(iter != boost::end(interfaces));
-    if(iter == boost::end(interfaces))
-        return m_currentUrl;
+    if(iter == boost::end(interfaces) || iter->ignored)
+        return QUrl();
 
     (*iter).count++;
     return iter->url;

@@ -34,7 +34,7 @@ namespace {
 
     const int tooLateDayOfWeek = Qt::Thursday;
 
-    const int autoCheckIntervalMs = 5 * 60 * 1000;  // 5 minutes
+    const int autoCheckIntervalMs = 60 * 60 * 1000;  // 1 hour
 
 
     QStringList serverNames(const QSet<QnUuid> &serverIds) {
@@ -63,7 +63,8 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     m_latestVersion(qnCommon->engineVersion()),
     m_checkingInternet(false),
     m_checkingLocal(false),
-    m_longUpdateWarningTimer(new QTimer(this))
+    m_longUpdateWarningTimer(new QTimer(this)),
+    m_lastAutoUpdateCheck(0)
 {
     ui->setupUi(this);
 
@@ -143,7 +144,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
         if (!m_targetVersion.isNull())
             return;
 
-        checkForUpdatesInternet();
+        autoCheckForUpdatesInternet();
     });
     updateTimer->start();
 
@@ -159,6 +160,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     });
 
     at_tool_stageChanged(QnFullUpdateStage::Init);
+    checkForUpdatesInternet(true);
 }
 
 
@@ -279,10 +281,7 @@ QnMediaServerUpdateTool *QnServerUpdatesWidget::updateTool() const {
 }
 
 void QnServerUpdatesWidget::updateFromSettings() {
-    if (!m_updateTool->idle())
-        return;
-
-    checkForUpdatesInternet(true);
+    //do nothing
 }
 
 bool QnServerUpdatesWidget::confirm() {
@@ -365,6 +364,12 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
                                   lit("\n") +
                                   tr("%n servers are not responding: %1", "", result.failedPeers.size()).arg(serverNamesString(result.failedPeers)));
             break;
+        case QnUpdateResult::UploadingFailed_Offline:
+            QMessageBox::critical(this, tr("Update failed"),
+                                  tr("Could not push updates to servers.") +
+                                  lit("\n") +
+                                  tr("%n servers have gone offline: %1", "", result.failedPeers.size()).arg(serverNamesString(result.failedPeers)));
+            break;
         case QnUpdateResult::ClientInstallationFailed:
             QMessageBox::critical(this, tr("Update failed"), tr("Could not install an update to the client."));
             break;
@@ -382,10 +387,18 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
         ui->internetUpdateButton->setEnabled(canUpdate);
 }
 
+void QnServerUpdatesWidget::autoCheckForUpdatesInternet() {
+    qint64 now = QDateTime::currentMSecsSinceEpoch();
+    if (now - m_lastAutoUpdateCheck < autoCheckIntervalMs)
+        return;
+    checkForUpdatesInternet();
+}
+
 void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch, bool autoStart) {
     if (m_checkingInternet || !m_updateTool->idle())
         return;
     m_checkingInternet = true;
+    m_lastAutoUpdateCheck = QDateTime::currentMSecsSinceEpoch();
 
     ui->internetUpdateButton->setEnabled(false);
     ui->latestBuildLabel->setEnabled(false);

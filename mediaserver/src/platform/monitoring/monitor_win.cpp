@@ -6,6 +6,8 @@
 #include <QtCore/QHash>
 #include <QtCore/QVector>
 
+#include <utils/common/log.h>
+#include <utils/common/systemerror.h>
 #include <utils/common/warnings.h>
 
 #define NOMINMAX
@@ -246,7 +248,7 @@ public:
         MIB_IFTABLE* networkInterfaceTable = NULL;
         for( int i = 0; i < 2; ++i )
         {
-            ULONG bufSize = m_mibIfTableBuffer.size();
+            ULONG bufSize = (ULONG)m_mibIfTableBuffer.size();
             networkInterfaceTable = reinterpret_cast<MIB_IFTABLE*>(m_mibIfTableBuffer.data());
             resultCode = GetIfTable( networkInterfaceTable, &bufSize, TRUE );
             if( resultCode == ERROR_INSUFFICIENT_BUFFER )
@@ -292,8 +294,8 @@ public:
             if( intfLoad.prevMeasureClock == currentClock )
                 continue;   //not calculating load
             const qint64 msPassed = currentClock - intfLoad.prevMeasureClock;
-            intfLoad.load.bytesPerSecIn = p.first->second.load.bytesPerSecIn * 0.3 + ((ifInfo.dwInOctets - p.first->second.inOctets) * MS_PER_SEC / msPassed) * 0.7;
-            intfLoad.load.bytesPerSecOut = p.first->second.load.bytesPerSecOut * 0.3 + ((ifInfo.dwOutOctets - p.first->second.outOctets) * MS_PER_SEC / msPassed) * 0.7;
+            intfLoad.load.bytesPerSecIn = p.first->second.load.bytesPerSecIn * 0.3 + ((ifInfo.dwInOctets - (DWORD)p.first->second.inOctets) * MS_PER_SEC / msPassed) * 0.7;
+            intfLoad.load.bytesPerSecOut = p.first->second.load.bytesPerSecOut * 0.3 + ((ifInfo.dwOutOctets - (DWORD)p.first->second.outOctets) * MS_PER_SEC / msPassed) * 0.7;
 
             p.first->second.inOctets = ifInfo.dwInOctets;
             p.first->second.outOctets = ifInfo.dwOutOctets;
@@ -382,6 +384,70 @@ QnWindowsMonitor::QnWindowsMonitor(QObject *parent):
 
 QnWindowsMonitor::~QnWindowsMonitor() {
     return;
+}
+
+QList<QnPlatformMonitor::PartitionSpace> QnWindowsMonitor::totalPartitionSpaceInfo()
+{
+    QList<PartitionSpace> drives;
+
+    DWORD localDisksBitmask = GetLogicalDrives();
+    if( localDisksBitmask == 0 )
+        return std::move(drives);
+
+    wchar_t curDiskName[] = L"A:\\";
+    for( int i = 0; i < sizeof(localDisksBitmask)*CHAR_BIT; ++i, ++curDiskName[0] )
+    {
+        if( (localDisksBitmask & (1 << i)) == 0 )
+            continue;
+
+        PartitionSpace driveInfo;
+        driveInfo.path = QString::fromWCharArray(curDiskName, sizeof(curDiskName)/sizeof(*curDiskName)-1);  //omitting trailing backslash
+        NX_LOG( lit("MONITOR. Found disk %1").arg(driveInfo.path), cl_logDEBUG2 );
+        switch( GetDriveType(curDiskName) )
+        {
+            case DRIVE_NO_ROOT_DIR:
+                NX_LOG( lit("MONITOR. Disk %1. DRIVE_NO_ROOT_DIR").arg(driveInfo.path), cl_logDEBUG2 );
+                continue;
+            case DRIVE_REMOVABLE:
+                //TODO #ak no proper type in QnPlatformMonitor
+                driveInfo.type = QnPlatformMonitor::OpticalDiskPartition;
+                break;
+            case DRIVE_FIXED:
+                driveInfo.type = QnPlatformMonitor::LocalDiskPartition;
+                break;
+            case DRIVE_REMOTE:
+                driveInfo.type = QnPlatformMonitor::NetworkPartition;
+                break;
+            case DRIVE_CDROM:
+                driveInfo.type = QnPlatformMonitor::OpticalDiskPartition;
+                break;
+            case DRIVE_RAMDISK:
+                driveInfo.type = QnPlatformMonitor::RamDiskPartition;
+                break;
+            case DRIVE_UNKNOWN:
+            default:
+                driveInfo.type = QnPlatformMonitor::UnknownPartition;
+                break;
+        }
+        quint64 freeBytesAvailableToCaller = -1;
+        quint64 totalNumberOfBytes = -1;
+        quint64 totalNumberOfFreeBytes = -1;
+        if( !GetDiskFreeSpaceEx(
+                curDiskName,
+                (PULARGE_INTEGER)&freeBytesAvailableToCaller,
+                (PULARGE_INTEGER)&totalNumberOfBytes,
+                (PULARGE_INTEGER)&totalNumberOfFreeBytes ) )
+        {
+            NX_LOG( lit("MONITOR. Disk %1. Failed to get disk space. %2").arg(driveInfo.path).arg(SystemError::getLastOSErrorText()), cl_logDEBUG2 );
+            continue;
+        }
+        driveInfo.sizeBytes = totalNumberOfBytes;
+        driveInfo.freeBytes = totalNumberOfFreeBytes;
+
+        drives.push_back( std::move(driveInfo) );
+    }
+
+    return std::move(drives);
 }
 
 QList<QnPlatformMonitor::HddLoad> QnWindowsMonitor::totalHddLoad() {

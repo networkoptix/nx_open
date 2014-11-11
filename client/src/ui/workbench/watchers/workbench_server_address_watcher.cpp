@@ -27,7 +27,13 @@ void QnWorkbenchServerAddressWatcher::setDirectModuleFinder(QnDirectModuleFinder
 }
 
 void QnWorkbenchServerAddressWatcher::setDirectModuleFinderHelper(QnModuleFinderHelper *directModuleFinderHelper) {
+    if (m_directModuleFinderHelper)
+        m_directModuleFinderHelper->setUrlsForPeriodicalCheck(QnUrlSet());
+
     m_directModuleFinderHelper = directModuleFinderHelper;
+
+    if (m_directModuleFinderHelper)
+        m_directModuleFinderHelper->setUrlsForPeriodicalCheck(m_urls, true);
 }
 
 void QnWorkbenchServerAddressWatcher::at_directModuleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url) {

@@ -349,7 +349,6 @@ private:
     Qn::ResourceFlags m_flags;
     
     QDateTime m_lastDiscoveredTime;
-    QDateTime m_lastStatusUpdateTime;
 
     QStringList m_tags;
 

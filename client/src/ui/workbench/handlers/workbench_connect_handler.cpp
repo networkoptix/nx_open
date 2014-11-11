@@ -25,6 +25,8 @@
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/status_dictionary.h>
 
+#include <nx_ec/ec_proto_version.h>
+
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameter_types.h>
@@ -43,6 +45,7 @@
 #include <ui/workbench/workbench_state_manager.h>
 
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
+#include <ui/workbench/watchers/workbench_user_watcher.h>
 
 #include <utils/app_server_notification_cache.h>
 #include <utils/connection_diagnostics_helper.h>
@@ -74,6 +77,9 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /*= 0*/):
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    this,   &QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened);
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionClosed,    this,   &QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed);
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::initialResourcesReceived,    this,   [this] {
+        /* Reload all dialogs and dependent data. */
+        context()->instance<QnWorkbenchStateManager>()->forcedUpdate();
+
         /* We are just reconnected automatically, e.g. after update. */
         if (!m_readyForConnection)
             return;
@@ -86,6 +92,9 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /*= 0*/):
 
         menu()->trigger(Qn::VersionMismatchMessageAction);
     });
+
+    QnWorkbenchUserWatcher* userWatcher = context()->instance<QnWorkbenchUserWatcher>();
+    connect(userWatcher, &QnWorkbenchUserWatcher::reconnectRequired, this, &QnWorkbenchConnectHandler::at_reconnectAction_triggered);
 
     connect(action(Qn::ConnectAction),              &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_connectAction_triggered);
     connect(action(Qn::ReconnectAction),            &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_reconnectAction_triggered);
@@ -255,13 +264,18 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
     hideMessageBox();
 
     QnConnectionInfo connectionInfo = result.reply<QnConnectionInfo>();
+    QWidget* parentWidget = (m_loginDialog && m_loginDialog->isActiveWindow())
+        ? m_loginDialog.data()
+        : mainWindow();
     QnConnectionDiagnosticsHelper::Result status = silent
         ? QnConnectionDiagnosticsHelper::validateConnectionLight(connectionInfo, errCode)
-        : QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errCode, appServerUrl, mainWindow());
-    
+        : QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errCode, appServerUrl, parentWidget);
+
     switch (status) {
     case QnConnectionDiagnosticsHelper::Result::Failure:
-        return errCode;
+        return errCode == ec2::ErrorCode::ok 
+            ? ec2::ErrorCode::incompatiblePeer  /* Substitute value for incompatible peers. */
+            : errCode;
     case QnConnectionDiagnosticsHelper::Result::Restart:
         menu()->trigger(Qn::ExitActionDelayed);
         return ec2::ErrorCode::ok; // to avoid cycle
@@ -376,6 +390,9 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
         return false;
 
     QScopedPointer<QnReconnectHelper> reconnectHelper(new QnReconnectHelper());
+    if (reconnectHelper->servers().isEmpty())
+        return false;
+
     QPointer<QnReconnectInfoDialog> reconnectInfoDialog(new QnReconnectInfoDialog(mainWindow()));
     reconnectInfoDialog->setServers(reconnectHelper->servers());
 
@@ -383,17 +400,34 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    reconnectInfoDialog.data(),     &QObject::deleteLater);
     reconnectInfoDialog->show();
 
-    ec2::ErrorCode errCode = ec2::ErrorCode::ok;
+    bool success = false;
 
-    
-  
     /* Here we will wait for the reconnect or cancel. */
     while (reconnectInfoDialog && !reconnectInfoDialog->wasCanceled()) {
         reconnectInfoDialog->setCurrentServer(reconnectHelper->currentServer());
-        errCode = connectToServer(reconnectHelper->currentUrl(), true); /* Here inner event loop will be started. */
-        if (errCode == ec2::ErrorCode::ok || errCode == ec2::ErrorCode::unauthorized)   
+        ec2::ErrorCode errCode = connectToServer(reconnectHelper->currentUrl(), true); /* Here inner event loop will be started. */
+        if (errCode == ec2::ErrorCode::ok) {
+            success = true;
             break;
-        reconnectHelper->next();
+        }
+
+        if (errCode == ec2::ErrorCode::incompatiblePeer || errCode == ec2::ErrorCode::unauthorized)
+            reconnectHelper->markServerAsInvalid(reconnectHelper->currentServer());
+
+        /* Find next valid server for reconnect. */
+        QnMediaServerResourceList allServers = reconnectHelper->servers();
+        bool found = true;
+        do {
+            reconnectHelper->next();
+            /* We have found at least one correct interface for the server. */
+            found = reconnectHelper->currentUrl().isValid();
+            if (!found) /* Do not try to connect to invalid servers. */
+                allServers.removeOne(reconnectHelper->currentServer());
+        } while (!found && !allServers.isEmpty());
+
+        /* Break cycle if we cannot find any valid server. */
+        if (!found) 
+            break;
     }
 
     /* Main window can be closed in the event loop so the dialog will be freed. */
@@ -404,7 +438,7 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
     reconnectInfoDialog->deleteLater();
     if (reconnectInfoDialog->wasCanceled())
         return false;
-    return errCode == ec2::ErrorCode::ok;
+    return success;
 }
 
 

@@ -143,23 +143,8 @@ public:
         /** Flag that client is run in videowall mode. */
         VIDEO_WALL_MODE,
 
-        /** Mode of the client background. */
-        BACKGROUND_MODE,
-
-        /** Custom color of the background circles. */
-        CUSTOM_BACKGROUND_COLOR,
-
-        /** Custom image for the background. */
-        BACKGROUND_IMAGE,
-
-        /** Opacity of the custom background image. */
-        BACKGROUND_IMAGE_OPACITY,
-
-        /** Background image handling mode. */
-        BACKGROUND_IMAGE_MODE,
-
-        /** Speed of background circles movement. Value is period (in seconds) of the full movement cycle. Default is 120 seconds. */
-        RADIAL_BACKGROUND_CYCLE,
+        /** Full set of background options. */
+        BACKGROUND,
 
         /** A list of the urls that were discovered by QnDirectModuleFinder. */
         KNOWN_SERVER_URLS,
@@ -250,17 +235,12 @@ private:
         QN_DECLARE_RW_PROPERTY(quint64,                     userIdleTimeoutMSecs,   setUserIdleTimeoutMSecs,    USER_IDLE_TIMEOUT_MSECS,    0)
         QN_DECLARE_RW_PROPERTY(bool,                        isPtzPresetInUseWarningDisabled,    setPtzPresetInUseWarningDisabled,   PTZ_PRESET_IN_USE_WARNING_DISABLED, false)
         QN_DECLARE_RW_PROPERTY(Qn::Corner,                  timestampCorner,        setTimestampCorner,         TIMESTAMP_CORNER,           Qn::BottomRightCorner)
-        QN_DECLARE_RW_PROPERTY(int,                         lightMode,              setLightMode,               LIGHT_MODE,                 0)  //int because of intended flags system
-        QN_DECLARE_RW_PROPERTY(int,                         lightModeOverride,      setLightModeOverride,       LIGHT_MODE_OVERRIDE,        0)
+        QN_DECLARE_RW_PROPERTY(Qn::LightModeFlags,          lightMode,              setLightMode,               LIGHT_MODE,                 0) 
+        QN_DECLARE_RW_PROPERTY(Qn::LightModeFlags,          lightModeOverride,      setLightModeOverride,       LIGHT_MODE_OVERRIDE,        0)
         QN_DECLARE_RW_PROPERTY(Qn::ClientSkin,              clientSkin,             setClientSkin,              CLIENT_SKIN,                Qn::DarkSkin)
+        QN_DECLARE_RW_PROPERTY(QnClientBackground,          background,             setBackground,              BACKGROUND,                 QnClientBackground())
         QN_DECLARE_RW_PROPERTY(QnUuid,                      pcUuid,                 setPcUuid,                  PC_UUID,                    QnUuid())
         QN_DECLARE_RW_PROPERTY(bool,                        isVideoWallMode,        setVideoWallMode,           VIDEO_WALL_MODE,            false)
-        QN_DECLARE_RW_PROPERTY(Qn::ClientBackground,        backgroundMode,         setBackgroundMode,          BACKGROUND_MODE,            Qn::DefaultBackground)
-        QN_DECLARE_RW_PROPERTY(QColor,                      customBackgroundColor,  setCustomBackgroundColor,   CUSTOM_BACKGROUND_COLOR,    QColor())
-        QN_DECLARE_RW_PROPERTY(QString,                     backgroundImage,        setBackgroundImage,         BACKGROUND_IMAGE,           QString())
-        QN_DECLARE_RW_PROPERTY(Qn::ImageBehaviour,          backgroundImageMode,    setBackgroundImageMode,     BACKGROUND_IMAGE_MODE,      Qn::StretchImage)
-        QN_DECLARE_RW_PROPERTY(qreal,                       backgroundImageOpacity, setBackgroundImageOpacity,  BACKGROUND_IMAGE_OPACITY,   0.5)
-        QN_DECLARE_RW_PROPERTY (int,                        radialBackgroundCycle,  setRadialBackgroundCycle,   RADIAL_BACKGROUND_CYCLE,    120)
         QN_DECLARE_RW_PROPERTY(QList<QUrl>,                 knownServerUrls,        setKnownServerUrls,         KNOWN_SERVER_URLS,          QList<QUrl>())
     QN_END_PROPERTY_STORAGE()
 

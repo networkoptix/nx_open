@@ -13,4 +13,8 @@ bool QnWorkbenchStateDependentButtonBoxDialog::tryClose(bool force) {
     return true;
 }
 
+void QnWorkbenchStateDependentButtonBoxDialog::forcedUpdate() {
+    tryClose(true);
+}
+
 

@@ -25,9 +25,10 @@ case `uname -s` in
         NPROCESSORS=`sysctl hw.ncpu | awk '{print $2}'`
         ;;
 esac
-
-if [ '${project.artifactId}' == 'common' ] || [ '${project.artifactId}' == 'mediaserver' ]  || [ '${project.artifactId}' == 'appserver2' || [ '${project.artifactId}' == 'isd_native_plugin' ]; then
-     DEBUG=ext_debug
+if [ '${box}' == 'isd' ] || [ '${box}' == 'isd_s2' ]; then
+    if [ '${project.artifactId}' == 'common' ] || [ '${project.artifactId}' == 'mediaserver' ]  || [ '${project.artifactId}' == 'appserver2' || [ '${project.artifactId}' == 'isd_native_plugin' ]; then
+        DEBUG=ext_debug
+    fi
 fi
 
 make --no-p QUIET=yes -f Makefile.$CONFIG -j $[NPROCESSORS+1] $DEBUG || exit 1

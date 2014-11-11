@@ -568,7 +568,11 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         m_camera->setCameraName(ui->nameEdit->text());
         m_camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());
         //m_camera->setUrl(ui->ipAddressEdit->text());
-        m_camera->setAuth(ui->loginEdit->text(), ui->passwordEdit->text());
+        QAuthenticator loginEditAuth;
+        loginEditAuth.setUser( ui->loginEdit->text() );
+        loginEditAuth.setPassword( ui->passwordEdit->text() );
+        if( m_camera->getAuth() != loginEditAuth )
+            m_camera->setAuth( loginEditAuth );
 
         if (m_camera->isDtsBased()) {
             m_camera->setScheduleDisabled(!ui->analogViewCheckBox->isChecked());
@@ -772,7 +776,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
             ui->expertSettingsWidget->updateFromResources(QnVirtualCameraResourceList() << m_camera);
 
             if (!m_imageProvidersByResourceId.contains(m_camera->getId()))
-                m_imageProvidersByResourceId[m_camera->getId()] = QnSingleThumbnailLoader::newInstance(m_camera, -1, fisheyeThumbnailSize, QnSingleThumbnailLoader::JpgFormat, this);
+                m_imageProvidersByResourceId[m_camera->getId()] = QnSingleThumbnailLoader::newInstance(m_camera, -1, -1, fisheyeThumbnailSize, QnSingleThumbnailLoader::JpgFormat, this);
             ui->fisheyeSettingsWidget->updateFromParams(m_camera->getDewarpingParams(), m_imageProvidersByResourceId[m_camera->getId()]);
         }
     }

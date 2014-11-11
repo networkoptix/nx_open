@@ -99,7 +99,7 @@ QString QnAboutDialog::connectedServers() const {
         if(!resource) 
             continue;
                       
-        QString server = tr("Server v%1 at %2<br/>").arg(data.version.toString()).arg(QUrl(resource->getUrl()).host());
+        QString server = tr("Server at %2: v%1<br/>").arg(data.version.toString()).arg(QUrl(resource->getUrl()).host());
 
         bool updateRequested = QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
 

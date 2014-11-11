@@ -109,7 +109,6 @@ private:
     Q_DISABLE_COPY(QnCameraAdditionDialog)
 
     QScopedPointer<Ui::CameraAdditionDialog> ui;
-    QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;
     State m_state;
     QnMediaServerResourcePtr m_server;
     QnCheckBoxedHeaderView* m_header;

@@ -22,6 +22,7 @@ public:
     void renameLayout(const QnLayoutResourcePtr &layout, const QString &newName);
     bool closeAllLayouts(bool waitForReply = false, bool force = false);
     bool tryClose(bool force);
+    void forcedUpdate();
 
 protected:
     ec2::AbstractECConnectionPtr connection2() const;

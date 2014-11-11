@@ -61,6 +61,8 @@
                                             <xsl:attribute name="href">#group_<xsl:value-of
                                                   select="$groupName"/>
                                             </xsl:attribute>
+
+                                            <span class="glyphicon"></span>
                                             <xsl:value-of select="groupName"/>
                                         </a>
                                         <ul class="nav nav-stacked">
@@ -182,27 +184,43 @@
                         target: '.bs-docs-sidebar',
                         offset: 40
                     });
+
+                    $(".nav .glyphicon").click(function(){
+                        var $container = $(this).parent().parent();
+
+                        // .active
+                        // .pinned
+                        // .pinned-hidden
+
+                        if($container.hasClass("active")){
+                            $container.removeClass("pinned")
+                                    .toggleClass("pinned-hidden");
+                        }else{
+                            $container.toggleClass("pinned")
+                                    .removeClass("pinned-hidden");
+                        }
+                        return false;
+                    });
                 });
             </script>
         </html>
     </xsl:template>
     <xsl:template match="result">
-            <xsl:value-of select="caption"/>
-        
+        <xsl:value-of select="caption"/>
         <xsl:if test="attributes/attribute">
             <div class="panel panel-default">
-                    <table class="table">
-                        <xsl:for-each select="attributes/attribute">
-                            <tr>
-                                <td>
-                                    <xsl:value-of select="name"/>
-                                </td>
-                                <td>
-                                    <xsl:value-of select="description"/>
-                                </td>
-                            </tr>
-                        </xsl:for-each>
-                    </table>
+                <table class="table">
+                    <xsl:for-each select="attributes/attribute">
+                        <tr>
+                            <td>
+                                <xsl:value-of select="name"/>
+                            </td>
+                            <td>
+                                <xsl:value-of select="description"/>
+                            </td>
+                        </tr>
+                    </xsl:for-each>
+                </table>
             </div>
         </xsl:if>
     </xsl:template>

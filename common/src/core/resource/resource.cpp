@@ -116,7 +116,6 @@ QnResource::QnResource():
     m_lastMediaIssue(CameraDiagnostics::NoErrorResult()),
     m_removedFromPool(false)
 {
-    m_lastStatusUpdateTime = QDateTime::fromMSecsSinceEpoch(0);
 }
 
 QnResource::~QnResource()
@@ -428,7 +427,6 @@ void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatu
 
     QDateTime dt = qnSyncTime->currentDateTime();
     QMutexLocker mutexLocker(&m_mutex);
-    m_lastStatusUpdateTime = dt;
 }
 
 void QnResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
@@ -448,12 +446,6 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
     qnStatusDictionary->setValue(id, newStatus);
     if (!silenceMode)
         doStatusChanged(oldStatus, newStatus);
-}
-
-QDateTime QnResource::getLastStatusUpdateTime() const
-{
-    QMutexLocker mutexLocker(&m_mutex);
-    return m_lastStatusUpdateTime;
 }
 
 QDateTime QnResource::getLastDiscoveredTime() const
@@ -647,16 +639,19 @@ bool QnResource::hasProperty(const QString &key) const {
 QString QnResource::getProperty(const QString &key) const {
     //QMutexLocker mutexLocker(&m_mutex);
     //return m_propertyByKey.value(key, defaultValue);
-
+    QString value;
     {
         QMutexLocker lk( &m_mutex );
         if( m_id.isNull() ) {
             auto itr =  m_locallySavedProperties.find(key);
-            return itr != m_locallySavedProperties.end() ? itr->second.value : QString();
+            if (itr != m_locallySavedProperties.end())
+                value = itr->second.value;
+        }
+        else {
+            value = propertyDictionary->value(getId(), key);
         }
     }
 
-    QString value = propertyDictionary->value(getId(), key);
     if (value.isNull()) {
         // find default value in resourceType
         QnResourceTypePtr resType = qnResTypePool->getResourceType(m_typeId); 

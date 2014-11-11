@@ -62,6 +62,7 @@ void QnCameraMotionMaskWidget::init() {
     m_context->workbench()->setCurrentLayout(workbenchLayout);
     
     QnWorkbenchDisplay *display = m_context->display();
+    display->setLightMode(Qn::LightModeFull);
     display->setScene(m_scene.data());
     display->setView(m_view.data());
     display->curtainAnimator()->setCurtainItem(nullptr);

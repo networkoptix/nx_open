@@ -30,14 +30,14 @@ QMultiHash<QnUuid, QnRouter::Endpoint> QnRouter::connections() const {
     return m_connections;
 }
 
-QHash<QnUuid, QnRouteList> QnRouter::routes() const {
+QHash<QnUuid, QnRoute> QnRouter::routes() const {
     QMutexLocker lk(&m_mutex);
     return m_routeBuilder->routes();
 }
 
-QnRoute QnRouter::routeTo(const QnUuid &id) const {
+QnRoute QnRouter::routeTo(const QnUuid &id, const QnUuid &via) const {
     QMutexLocker lk(&m_mutex);
-    return m_routeBuilder->routeTo(id);
+    return m_routeBuilder->routeTo(id, via);
 }
 
 QnRoute QnRouter::routeTo(const QString &host, quint16 port) const {
@@ -57,6 +57,8 @@ QnUuid QnRouter::whoIs(const QString &host, quint16 port) const {
 
 void QnRouter::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url) {
     Endpoint endpoint(moduleInformation.id, url.host(), url.port());
+
+    Q_ASSERT_X(!endpoint.id.isNull(), "Endpoint cannot has null id!", Q_FUNC_INFO);
 
     if (!addConnection(qnCommon->moduleGUID(), endpoint))
         return;

@@ -12,7 +12,7 @@
 
     <?define productName = "${display.product.name}"?>
     <?define applauncherName = "${applauncher.name}"?>
-    <?define clientName = "${client.name}"?>
+    <?define clientName = "${product.name}"?>
 
     <?define productExeName = "${product_name}"?>
     <?define clientExeName = "${product.name}"?>
@@ -54,4 +54,6 @@
 
     <?define SourceDir="${libdir}/${arch}/bin/${build.configuration}"?>                
     <?define PluginsDir="${libdir}/${arch}/bin/${build.configuration}/plugins"?>                        
+
+    <?define clientDirId = "$(var.customization)_$(var.releaseVersionFull)_Dir"?>
 </Include>

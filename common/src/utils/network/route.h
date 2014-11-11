@@ -8,6 +8,8 @@ struct QnRoutePoint {
     QString host;
     quint16 port;
 
+    QnRoutePoint() {}
+
     QnRoutePoint(const QnUuid &peerId, const QString &host, quint16 port) :
         peerId(peerId), host(host), port(port)
     {}
@@ -24,10 +26,14 @@ struct QnRoute {
     bool isValid() const;
     bool isEqual(const QnRoute &other) const;
 
+    int length() const;
+
     bool addPoint(const QnRoutePoint &point, int weight);
     bool containsConnection(const QnUuid &first, const QnUuid &from, const QnRoutePoint &point) const;
+    bool containsPoint(const QnUuid &id) const;
 
     bool operator <(const QnRoute &other) const;
+	QnRoute operator +(const QnRoute &other) const;
 };
 
 typedef QList<QnRoute> QnRouteList;

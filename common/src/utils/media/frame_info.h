@@ -13,6 +13,7 @@ extern "C"
 #include <core/ptz/media_dewarping_params.h>
 #include <core/ptz/item_dewarping_params.h>
 #include "utils/color_space/image_correction.h"
+#include "transcoding/filters/filter_helper.h"
 
 
 #define AV_REVERSE_BLOCK_START QnAbstractMediaData::MediaFlags_ReverseBlockStart
@@ -172,10 +173,19 @@ public:
     //void setDisplaying(bool value) {m_displaying = value; }
     //bool isDisplaying() const { return m_displaying; }
     void reallocate(int newWidth, int newHeight, int format);
+    void reallocate(const QSize& size, int format);
     void reallocate(int newWidth, int newHeight, int newFormat, int lineSizeHint);
     void memZerro();
 
     void copyDataFrom(const AVFrame* frame);
+    CLVideoDecoderOutput* rotated(int angle);
+    /** Scale frame to new size */
+    CLVideoDecoderOutput* scaled(const QSize& newSize, PixelFormat newFormat = PIX_FMT_NONE);
+
+    QSize size() const { return QSize(width, height); }
+
+    /** Assign misc fields except but no video data */
+    void assignMiscData(const CLVideoDecoderOutput* other);
 public:
     QnAbstractMediaData::MediaFlags flags;
 
@@ -199,7 +209,7 @@ private:
     CLVideoDecoderOutput( const CLVideoDecoderOutput& );
     const CLVideoDecoderOutput& operator=( const CLVideoDecoderOutput& );
 };
-
+typedef QSharedPointer<CLVideoDecoderOutput> CLVideoDecoderOutputPtr;
 /*
 struct CLVideoDecoderOutput
 {
@@ -264,10 +274,7 @@ struct CLVideoData
 class ScreenshotInterface
 {
 public:
-    virtual QImage getScreenshot(const ImageCorrectionParams& imageCorrection,
-                                 const QnMediaDewarpingParams& mediaDewarping,
-                                 const QnItemDewarpingParams& itemDewarping,
-                                 bool anyQuality) = 0; // 8 bit Y channel only
+    virtual CLVideoDecoderOutputPtr getScreenshot(bool anyQuality) = 0;
     virtual QImage getGrayscaleScreenshot() = 0;
 };
 

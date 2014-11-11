@@ -104,6 +104,7 @@ namespace ec2
             REGISTER_COMMAND(addStoredFile),
             REGISTER_COMMAND(updateStoredFile),
             REGISTER_COMMAND(removeStoredFile),
+            REGISTER_COMMAND(getStoredFiles),
 
             REGISTER_COMMAND(addLicenses),
             REGISTER_COMMAND(addLicense),
@@ -127,6 +128,7 @@ namespace ec2
             REGISTER_COMMAND(discoverPeer),
             REGISTER_COMMAND(addDiscoveryInformation),
             REGISTER_COMMAND(removeDiscoveryInformation),
+            REGISTER_COMMAND(getDiscoveryData),
 
             REGISTER_COMMAND(forcePrimaryTimeServer),
             REGISTER_COMMAND(broadcastPeerSystemTime),
@@ -138,7 +140,8 @@ namespace ec2
             REGISTER_COMMAND(dumpDatabase),
             REGISTER_COMMAND(restoreDatabase),
             REGISTER_COMMAND(updatePersistentSequence),
-            REGISTER_COMMAND(markLicenseOverflow)
+            REGISTER_COMMAND(markLicenseOverflow),
+            REGISTER_COMMAND(getSettings)
         };
 
         QString toString(Value val) 
@@ -218,6 +221,7 @@ namespace ec2
                 val == removeStoredFile ||
                 val == addDiscoveryInformation ||
                 val == removeDiscoveryInformation ||
+                val == getDiscoveryData ||
                 val == addLicense ||
                 val == addLicenses ||
                 val == removeLicense || 

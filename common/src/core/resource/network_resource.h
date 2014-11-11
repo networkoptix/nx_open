@@ -36,9 +36,12 @@ public:
     QString getPhysicalId() const;
     void setPhysicalId(const QString& physicalId);
 
-    inline void setAuth(const QString &user, const QString &password, bool replaceIfExists = true)
-    { QAuthenticator auth; auth.setUser(user); auth.setPassword(password); setAuth(auth, replaceIfExists); }
-    void setAuth(const QAuthenticator &auth, bool replaceIfExists = true);
+    void setAuth(const QString &user, const QString &password);
+    void setAuth(const QAuthenticator &auth);
+
+    void setDefaultAuth(const QString &user, const QString &password);
+    void setDefaultAuth(const QAuthenticator &auth);
+
     QAuthenticator getAuth() const;
 
     // if reader will find out that authentication is requred => setAuthenticated(false) must be called
@@ -83,12 +86,22 @@ public:
     //!Returns true if camera is accessible
     /*!
         Default implementation just establishes connection to \a getHostAddress() : \a httpPort()
+        \todo #ak This method is used in diagnostics only. Throw it away and use \a QnNetworkResource::checkIfOnlineAsync instead
     */
     virtual bool ping();
+    //!Checks if camera is online
+    /*!
+        \param completionHandler Invoked on check completion. Check result is passed to the functor
+        \return true if async operation has been started. false otherwise
+        \note Implementation MUST check not only camera address:port accessibility, but also check some unique parameters of camera
+        \note Default implementation returns false
+    */
+    virtual bool checkIfOnlineAsync( std::function<void(bool)>&& completionHandler );
 
     static QnUuid uniqueIdToId(const QString& uniqId);
     virtual bool isAbstractResource() const { return false; }
     virtual void initializationDone() override;
+
 private:
     //QAuthenticator m_auth;
     bool m_authenticated;

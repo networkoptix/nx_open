@@ -29,7 +29,7 @@ namespace {
 
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode)
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ClientSkin)
-QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ClientBackground)
+QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::BackgroundAnimationMode)
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ImageBehaviour)
 
 void QnClientMetaTypes::initialize() {
@@ -63,8 +63,10 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaTypeStreamOperators<Qn::TimeMode>();
     qRegisterMetaType<Qn::ClientSkin>();
     qRegisterMetaTypeStreamOperators<Qn::ClientSkin>();
-    qRegisterMetaType<Qn::ClientBackground>();
-    qRegisterMetaTypeStreamOperators<Qn::ClientBackground>();
+    qRegisterMetaType<Qn::BackgroundAnimationMode>();
+    qRegisterMetaTypeStreamOperators<Qn::BackgroundAnimationMode>();
+    qRegisterMetaType<QnClientBackground>();
+    qRegisterMetaTypeStreamOperators<QnClientBackground>();
     qRegisterMetaType<Qn::ImageBehaviour>();
     qRegisterMetaTypeStreamOperators<Qn::ImageBehaviour>();
     qRegisterMetaType<ImageCorrectionParams>();
@@ -72,6 +74,9 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnActionParameters>();
     qRegisterMetaType<QnAspectRatioHash>();
     qRegisterMetaTypeStreamOperators<QnAspectRatioHash>();
+
+    qRegisterMetaType<Qn::LightModeFlags>();
+
     qRegisterMetaType<QnWeakObjectHash>();
     qRegisterMetaType<WeakGraphicsItemPointerList>();
     qRegisterMetaType<QnCustomization>();
@@ -115,7 +120,7 @@ void QnClientMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnServerUpdatesColors>();
 
     QnJsonSerializer::registerSerializer<Qn::ClientSkin>();
-    QnJsonSerializer::registerSerializer<Qn::ClientBackground>();
+    QnJsonSerializer::registerSerializer<Qn::BackgroundAnimationMode>();
     QnJsonSerializer::registerSerializer<Qn::ImageBehaviour>();
     QnJsonSerializer::registerSerializer<QnPaletteData>();
     QnJsonSerializer::registerSerializer<QnPenData>();

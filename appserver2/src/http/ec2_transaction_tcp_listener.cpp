@@ -2,6 +2,8 @@
 
 #include <QtCore/QUrlQuery>
 
+#include <nx_ec/ec_proto_version.h>
+
 #include "utils/network/tcp_connection_priv.h"
 #include "transaction/transaction_message_bus.h"
 #include "nx_ec/data/api_full_info_data.h"
@@ -72,6 +74,9 @@ void QnTransactionTcpProcessor::run()
 
     d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
     d->response.headers.insert(nx_http::HttpHeader("runtime-guid", qnCommon->runningInstanceGUID().toByteArray()));
+    d->response.headers.insert(nx_http::HttpHeader(
+        nx_ec::EC2_PROTO_VERSION_HEADER_NAME,
+        nx_http::StringType::number(nx_ec::EC2_PROTO_VERSION)));
 
     if (remotePeer.peerType == Qn::PT_Server)
     {

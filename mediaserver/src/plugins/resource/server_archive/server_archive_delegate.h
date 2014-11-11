@@ -21,6 +21,7 @@ public:
     //virtual void setSendMotion(bool value) override;
 
     virtual bool open(const QnResourcePtr &resource);
+    bool isOpened() const;
     virtual void close();
     virtual qint64 startTime();
     virtual qint64 endTime();

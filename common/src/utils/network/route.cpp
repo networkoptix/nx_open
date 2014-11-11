@@ -8,6 +8,10 @@ bool QnRoute::isEqual(const QnRoute &other) const {
     return points == other.points;
 }
 
+int QnRoute::length() const {
+    return points.size();
+}
+
 bool QnRoute::addPoint(const QnRoutePoint &point, int weight) {
     // prevent loops in routes
     for (const QnRoutePoint &p: points) {
@@ -30,11 +34,26 @@ bool QnRoute::containsConnection(const QnUuid &first, const QnUuid &from, const 
     return false;
 }
 
+bool QnRoute::containsPoint(const QnUuid &id) const {
+    for (const QnRoutePoint &point: points) {
+        if (point.peerId == id)
+            return true;
+    }
+    return false;
+}
+
 bool QnRoute::operator <(const QnRoute &other) const {
     if (weight != other.weight)
         return weight < other.weight;
     else
         return points.size() < other.points.size();
+}
+
+QnRoute QnRoute::operator +(const QnRoute &other) const {
+	QnRoute route = *this;
+	route.points.append(other.points);
+	route.weight += other.weight;
+	return route;
 }
 
 bool QnRoutePoint::operator ==(const QnRoutePoint &other) const {

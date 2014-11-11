@@ -124,6 +124,9 @@ public:
     virtual void setHostAddress(const QString &ip) override;
 
 
+    //!Implementation of QnNetworkResource::checkIfOnlineAsync
+    virtual bool checkIfOnlineAsync( std::function<void(bool)>&& completionHandler ) override;
+
     virtual QString getDriverName() const override;
 
     virtual void setIframeDistance(int /*frames*/, int /*timems*/) override {}
@@ -303,7 +306,7 @@ protected:
     int getSecondaryIndex(const QList<VideoOptionsLocal>& optList) const;
     //!Registeres local NotificationConsumer in resource's NotificationProducer
     bool registerNotificationConsumer();
-
+    void updateFirmware();
 private slots:
     void onRenewSubscriptionTimer( quint64 timerID );
 
@@ -438,8 +441,6 @@ private:
     QString m_videoSourceId;
     QString m_audioSourceId;
     QString m_videoSourceToken;
-
-    bool m_needUpdateOnvifUrl;
 
     QString m_imagingUrl;
     QString m_ptzUrl;

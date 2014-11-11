@@ -249,7 +249,6 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_secondaryH264Profile(-1),
     m_audioBitrate(0),
     m_audioSamplerate(0),
-    m_needUpdateOnvifUrl(false),
     m_timeDrift(0),
     m_prevSoapCallResult(0),
     m_inputMonitored(false),
@@ -374,6 +373,49 @@ const QString QnPlOnvifResource::createOnvifEndpointUrl(const QString& ipAddress
     return QLatin1String(ONVIF_PROTOCOL_PREFIX) + ipAddress + QLatin1String(ONVIF_URL_SUFFIX);
 }
 
+
+typedef GSoapAsyncCallWrapper <
+    DeviceSoapWrapper,
+    NetIfacesReq,
+    NetIfacesResp
+> GSoapDeviceGetNetworkIntfAsyncWrapper;
+
+bool QnPlOnvifResource::checkIfOnlineAsync( std::function<void(bool)>&& completionHandler )
+{
+    const QAuthenticator auth( getAuth() );
+    const QString deviceUrl = getDeviceOnvifUrl();
+    if( deviceUrl.isEmpty() )
+        return false;
+
+    std::unique_ptr<DeviceSoapWrapper> soapWrapper( new DeviceSoapWrapper(
+        deviceUrl.toStdString(),
+        auth.user(),
+        auth.password(),
+        m_timeDrift ) );
+
+    //Trying to get HardwareId
+    auto asyncWrapper = std::make_shared<GSoapDeviceGetNetworkIntfAsyncWrapper>(
+        std::move(soapWrapper),
+        &DeviceSoapWrapper::getNetworkInterfaces );
+
+    const QnMacAddress resourceMAC = getMAC();
+    auto onvifCallCompletionFunc =
+        [asyncWrapper, deviceUrl, resourceMAC, completionHandler]( int soapResultCode )
+        {
+            if( soapResultCode != SOAP_OK )
+                return completionHandler( false );
+
+            completionHandler(
+                resourceMAC.toString() == 
+                QnPlOnvifResource::fetchMacAddress( asyncWrapper->response(), QUrl(deviceUrl).host() ) );
+        };
+
+    NetIfacesReq request;
+    return asyncWrapper->callAsync(
+        request,
+        onvifCallCompletionFunc );
+}
+
 QString QnPlOnvifResource::getDriverName() const
 {
     return MANUFACTURE;
@@ -444,7 +486,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 #endif
         return m_prevOnvifResultCode.errorCode != CameraDiagnostics::ErrorCode::noError
             ? m_prevOnvifResultCode
-            : CameraDiagnostics::RequestFailedResult(QLatin1String("getDeviceOnvifUrl"), QString());
+            : CameraDiagnostics::RequestFailedResult(lit("getDeviceOnvifUrl"), QString());
     }
 
     calcTimeDrift();
@@ -454,7 +496,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 
     //if (getImagingUrl().isEmpty() || getMediaUrl().isEmpty() || getName().contains(QLatin1String("Unknown")) || getMAC().isNull() || m_needUpdateOnvifUrl)
     {
-        //const CameraDiagnostics::Result result = fetchAndSetDeviceInformationPriv(false);
+        updateFirmware();
         CameraDiagnostics::Result result = getFullUrlInfo();
         if (!result)
             return result;
@@ -466,8 +508,6 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 #endif
             return CameraDiagnostics::CameraInvalidParams(lit("ONVIF media URL is not filled by camera"));
         }
-        else
-            m_needUpdateOnvifUrl = false;
     }
 
     if (m_appStopping)
@@ -487,10 +527,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 
     result = fetchAndSetResourceOptions();
     if (!result) 
-    {
-        m_needUpdateOnvifUrl = true;
         return result;
-    }
 
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
@@ -1244,6 +1281,12 @@ bool QnPlOnvifResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &sourc
 
     bool result = QnPhysicalCameraResource::mergeResourcesIfNeeded(source);
 
+    QString onvifUrlSource = onvifR->getDeviceOnvifUrl();
+    if (!onvifUrlSource.isEmpty() && getDeviceOnvifUrl() != onvifUrlSource)
+    {
+        setDeviceOnvifUrl(onvifUrlSource);
+        result = true;
+    }
 
     return result;
 }
@@ -2811,11 +2854,14 @@ void QnPlOnvifResource::pullMessages(quint64 /*timerID*/)
 
     std::unique_ptr<PullPointSubscriptionWrapper> soapWrapper(
         new PullPointSubscriptionWrapper(
-            m_eventCapabilities->XAddr,
+            m_onvifNotificationSubscriptionReference.isEmpty()
+                ? m_eventCapabilities->XAddr
+                : m_onvifNotificationSubscriptionReference.toStdString(),
             auth.user(),
             auth.password(),
             m_timeDrift ) );
     soapWrapper->getProxy()->soap->imode |= SOAP_XML_IGNORENS;
+    soap_omode( soapWrapper->getProxy()->soap, SOAP_XML_DEFAULTNS );
 
     char* buf = (char*)malloc(512);
 
@@ -3130,6 +3176,22 @@ void QnPlOnvifResource::afterConfigureStream()
     while (m_streamConfCounter > 0)
         m_streamConfCond.wait(&m_streamConfMutex);
 
+}
+
+void QnPlOnvifResource::updateFirmware()
+{
+    QAuthenticator auth(getAuth());
+    DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user(), auth.password(), m_timeDrift);
+
+    DeviceInfoReq request;
+    DeviceInfoResp response;
+    int soapRes = soapWrapper.getDeviceInformation(request, response);
+    if (soapRes == SOAP_OK) 
+    {
+        QString firmware = QString::fromStdString(response.FirmwareVersion);
+        if (!firmware.isEmpty())
+            setFirmware(firmware);
+    }
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::getFullUrlInfo()

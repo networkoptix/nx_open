@@ -135,6 +135,10 @@ namespace ec2
         //getStorageData
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFileData& data);
 
+        //getStoredFiles
+        ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFileDataList& data);
+        ErrorCode doQueryNoLock(const std::nullptr_t&, ApiStoredFileDataList& data) { return doQueryNoLock(ApiStoredFilePath(), data); }
+
         //getResourceTypes
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiResourceTypeDataList& resourceTypeList);
 
@@ -186,9 +190,6 @@ namespace ec2
         //getLicenses
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiLicenseDataList& data);
 
-        //getParams
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiResourceParamDataList& data);
-
         // ApiDiscoveryDataList
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiDiscoveryDataList& data);
 
@@ -203,6 +204,9 @@ namespace ec2
 
         bool saveMiscParam( const QByteArray& name, const QByteArray& value );
         bool readMiscParam( const QByteArray& name, QByteArray* value );
+
+        //!Reads settings (properties of user 'admin')
+        ErrorCode readSettings(ApiResourceParamDataList& settings);
 
     signals:
         //!Emitted after \a QnDbManager::init was successfully executed
@@ -398,6 +402,11 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveryDataList> &) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
         ErrorCode deleteTableRecord(const QnUuid& id, const QString& tableName, const QString& fieldName);
         ErrorCode deleteTableRecord(const qint32& internalId, const QString& tableName, const QString& fieldName);
 
@@ -461,6 +470,8 @@ namespace ec2
         ErrorCode addCameraBookmarkTag(const ApiCameraBookmarkTagData &tag);
         ErrorCode removeCameraBookmarkTag(const ApiCameraBookmarkTagData &tag);
 
+        ErrorCode insertOrReplaceStoredFile(const QString &fileName, const QByteArray &fileContents);
+
         bool createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2);
         bool migrateBusinessEvents();
         bool doRemap(int id, int newVal, const QString& fieldName);
@@ -482,6 +493,7 @@ namespace ec2
         bool updateGuids();
         QnUuid getType(const QString& typeName);
         bool resyncTransactionLog();
+        bool addStoredFiles(const QString& baseDirectoryName, int* count = 0);
 
         template <class ObjectType, class ObjectListType> 
         bool fillTransactionLogInternal(ApiCommand::Value command);
@@ -514,6 +526,7 @@ namespace ec2
         mutable QReadWriteLock m_mutexStatic;
         bool m_needResyncLog;
         bool m_needResyncLicenses;
+        bool m_needResyncFiles;
     };
 };
 

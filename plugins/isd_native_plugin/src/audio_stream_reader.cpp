@@ -3,6 +3,8 @@
 * akolesnikov@networkoptix.com
 ***********************************************************/
 
+#ifndef NO_ISD_AUDIO
+
 #include "audio_stream_reader.h"
 
 #include <iostream>
@@ -199,3 +201,5 @@ bool AudioStreamReader::initializeAmux()
     fillAudioFormat();
     return true;
 }
+
+#endif

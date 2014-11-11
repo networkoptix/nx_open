@@ -39,6 +39,11 @@ public:
     virtual QnResourcePtr updateResource();
     //========
 
+    //!Implementation of QnNetworkResource::ping
+    virtual bool ping() override;
+    //!Implementation of QnNetworkResource::checkIfOnlineAsync
+    virtual bool checkIfOnlineAsync( std::function<void(bool)>&& completionHandler ) override;
+
     virtual QString getDriverName() const override;
 
     virtual Qn::StreamQuality getBestQualityForSuchOnScreenSize(const QSize& size) const override;

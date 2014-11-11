@@ -195,6 +195,7 @@ namespace ec2
         QnUuid transactionHash(const ApiModuleDataList& ) const                 { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiDiscoverPeerData& ) const               { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiSystemNameData& ) const                 { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
+        QnUuid transactionHash(const ApiDiscoveryDataList& ) const              { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
 
         QnUuid transactionHash(const ApiLockData& ) const                       { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiPeerAliveData& ) const                  { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }

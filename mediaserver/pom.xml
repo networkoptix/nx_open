@@ -22,6 +22,7 @@
 
     <properties>
         <product.title>${mediaserver.name}</product.title>  
+        <product.display.title>${mediaserver.display.name}</product.display.title>
         <!--Global libs-->		
         <qt.libs>core network xml sql concurrent multimedia</qt.libs>
         <global.libs>-lcommon -lappserver2 -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lswresample -lpostproc -lonvif -lquazip -ludt</global.libs>
