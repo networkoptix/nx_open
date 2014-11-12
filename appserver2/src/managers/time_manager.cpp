@@ -812,6 +812,10 @@ namespace ec2
                     arg(QDateTime::fromMSecsSinceEpoch(m_usedTimeSyncInfo.syncTime).toString(Qt::ISODate)).arg(timeDeltaStr.toLongLong()), cl_logWARNING );
             }
         }
+
+        auto localTimePriorityKey = m_localTimePriorityKey;
+        lk.unlock();
+        updateRuntimeInfoPriority( localTimePriorityKey.toUInt64() );
     }
 
     void TimeSynchronizationManager::peerSystemTimeReceivedNonSafe( const ApiPeerSystemTimeData& data )
