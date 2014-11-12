@@ -1480,6 +1480,8 @@ void QnMain::run()
     if (needToStop())
         return;
 
+    if (MSSettings::roSettings()->value("disableTranscoding").toBool())
+        qnCommon->setTranscodeDisabled(true);
 
     QnResource::startCommandProc();
 
