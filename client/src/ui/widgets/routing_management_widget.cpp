@@ -405,8 +405,11 @@ void QnRoutingManagementWidget::at_resourcePool_resourceAdded(const QnResourcePt
 }
 
 void QnRoutingManagementWidget::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
-    if (resource->hasFlags(Qn::server))
-        m_serverListModel->removeResource(resource);
+    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    if (!server || server->getStatus() == Qn::Incompatible)
+        return;
+
+    m_serverListModel->removeResource(resource);
 
     if (m_server == resource)
         updateModel();
