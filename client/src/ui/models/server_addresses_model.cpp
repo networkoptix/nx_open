@@ -3,6 +3,7 @@
 #include <QtCore/QSet>
 
 #include "utils/common/util.h"
+#include "utils/common/string.h"
 
 QnServerAddressesModel::QnServerAddressesModel(QObject *parent) :
     base_type(parent),
@@ -297,5 +298,7 @@ bool QnSortedServerAddressesModel::lessThan(const QModelIndex &left, const QMode
     if (lmanual != rmanual)
         return rmanual;
 
-    return left.data().toString() < right.data().toString();
+    int result = naturalStringCompare(left.data().toString(), right.data().toString(), Qt::CaseInsensitive, false);
+
+    return result < 0;
 }

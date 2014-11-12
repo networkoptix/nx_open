@@ -70,10 +70,10 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     createActions();
 
     m_rulesViewModel = new QnBusinessRulesActualModel(this);
-
-//     QnSortedBusinessRulesModel* sortedModel = new QnSortedBusinessRulesModel(this);
-//     sortedModel->setSourceModel(m_rulesViewModel);
-//     sortedModel->sort(0);
+    /* Force column width must be set before table initializing because header options are not updated. */
+    const qreal magicNumber = 1.1;  /* Give some space for drop-down indicator */
+    m_rulesViewModel->forceColumnMinWidth(QnBusiness::EventColumn, magicNumber * QnBusinessRuleItemDelegate::maximumWidth(QnBusiness::EventColumn, this->fontMetrics()));
+    m_rulesViewModel->forceColumnMinWidth(QnBusiness::ActionColumn, magicNumber * QnBusinessRuleItemDelegate::maximumWidth(QnBusiness::ActionColumn, this->fontMetrics()));
 
     ui->tableView->setModel(m_rulesViewModel);
     ui->tableView->horizontalHeader()->setVisible(true);
@@ -90,6 +90,8 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     ui->tableView->installEventFilter(this);
 
     ui->tableView->setItemDelegate(new QnBusinessRuleItemDelegate(this));
+
+    
 
     connect(m_rulesViewModel, &QAbstractItemModel::dataChanged, this, &QnBusinessRulesDialog::at_model_dataChanged);
     connect(ui->tableView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &QnBusinessRulesDialog::at_tableView_currentRowChanged);
