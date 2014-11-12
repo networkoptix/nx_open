@@ -31,7 +31,12 @@ angular.module('webadminApp')
             discoveredPeers:function(){return $http.get('/api/discoveredPeers'); },
             getMediaServer: function(id){return $http.get('/ec2/getMediaServersEx?id=' + id.replace("{","").replace("}","")); },
             getMediaServers: function(){return $http.get('/ec2/getMediaServersEx'); },
-            getCameras:function(id){return $http.get('/ec2/getCamerasEx?id="' + id.replace('{','').replace('}','') +'"'); },
+            getCameras:function(id){
+                if(typeof(id)!="undefined")
+                    return $http.get('/ec2/getCamerasEx?id=' + id.replace('{','').replace('}',''));
+                return $http.get('/ec2/getCamerasEx');
+            },
+
             saveMediaServer: function(info){return $http.post('/ec2/saveMediaServer',info); },
             statistics:function(url){
                 url = url || '';

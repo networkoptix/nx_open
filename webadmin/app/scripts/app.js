@@ -52,7 +52,12 @@ angular.module('webadminApp', [
         })
         .when('/webclient', {
             templateUrl: 'views/webclient.html',
-            controller: 'WebclientCtrl'
+            controller: 'WebclientCtrl',
+            reloadOnSearch: false
+        }).when('/webclient/:cameraId', {
+            templateUrl: 'views/webclient.html',
+            controller: 'WebclientCtrl',
+            reloadOnSearch: false
         })
         .when('/sdkeula', {
             templateUrl: 'views/sdkeula.html',
@@ -62,3 +67,18 @@ angular.module('webadminApp', [
             redirectTo: '/settings'
         });
 });
+
+
+angular.module('webadminApp').run(['$route', '$rootScope', '$location', function ($route, $rootScope, $location) {
+    var original = $location.path;
+    $location.path = function (path, reload) {
+        if (reload === false) {
+            var lastRoute = $route.current;
+            var un = $rootScope.$on('$locationChangeSuccess', function () {
+                $route.current = lastRoute;
+                un();
+            });
+        }
+        return original.apply($location, [path]);
+    };
+}]);
