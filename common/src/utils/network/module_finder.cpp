@@ -28,8 +28,6 @@ QnModuleFinder::QnModuleFinder(bool clientOnly) :
     connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleUrlFound,              this,       &QnModuleFinder::at_moduleUrlFound);
     connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleUrlLost,               this,       &QnModuleFinder::at_moduleUrlLost);
     connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleChanged,               this,       &QnModuleFinder::at_moduleChanged);
-    //connect(qnResPool,                      &QnResourcePool::resourceAdded,                     this,       &QnModuleFinder::at_resourcePool_resourceChanged);
-    //connect(qnResPool,                      &QnResourcePool::resourceChanged,                   this,       &QnModuleFinder::at_resourcePool_resourceChanged);
 }
 
 QnModuleFinder::~QnModuleFinder() {
@@ -181,28 +179,6 @@ void QnModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInformati
         }
     }
 }
-
-/*
-void QnModuleFinder::at_resourcePool_resourceChanged(const QnResourcePtr &resource) {
-    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (!server)
-        return;
-
-    auto it = m_foundModules.find(server->getId());
-    if (it == m_foundModules.end())
-        return;
-
-    QnModuleInformation moduleInformation = server->getModuleInformation();
-    moduleInformation.remoteAddresses = it->remoteAddresses;
-    moduleInformation.sslAllowed = it->sslAllowed;
-
-    if (moduleInformation == *it)
-        return;
-
-    *it = moduleInformation;
-    emit moduleChanged(moduleInformation);
-}
-*/
 
 void QnModuleFinder::stop() {
     m_multicastModuleFinder->stop();
