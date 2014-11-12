@@ -10,6 +10,7 @@ mkdir %TARGET_DIR%\include\plugins\
 mkdir %TARGET_DIR%\sample\
 mkdir %TARGET_DIR%\sample\axiscamplugin\
 copy /Y readme.txt %TARGET_DIR%\
+copy /Y ..\common\maven\bin-resources\resources\camera_settings\camera_settings.xsd %TARGET_DIR%\camera_settings.xsd
 
 @rem Copying integration headers
 copy /Y ..\common\src\plugins\plugin_api.h %TARGET_DIR%\include\plugins\
