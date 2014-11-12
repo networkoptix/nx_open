@@ -26,9 +26,11 @@ public:
     explicit QnConnectToCurrentSystemTool(QnWorkbenchContext *context, QObject *parent = 0);
     ~QnConnectToCurrentSystemTool();
 
-    void start(const QSet<QnUuid> &targets, const QString &password);
+    void start(const QSet<QnUuid> &targets, const QString &adminUser, const QString &password);
 
     QSet<QnUuid> targets() const;
+    QString user() const;
+    QString password() const;
 
 public slots:
     void cancel();
@@ -53,6 +55,7 @@ private slots:
 
 private:
     QSet<QnUuid> m_targets;
+    QString m_user;
     QString m_password;
 
     QSet<QnUuid> m_restartTargets;

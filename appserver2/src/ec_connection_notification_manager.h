@@ -75,7 +75,6 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiStoredFileData>& tran );
         void triggerNotification( const QnTransaction<ApiStoredFilePath>& tran );
         void triggerNotification( const QnTransaction<ApiFullInfoData>& tran );
-        void triggerNotification( const QnTransaction<ApiPanicModeData>& tran );
         void triggerNotification( const QnTransaction<ApiResourceParamDataList>& tran );
         void triggerNotification( const QnTransaction<ApiVideowallControlMessageData>& tran );
         void triggerNotification( const QnTransaction<ApiEmailSettingsData>& /*tran*/ );

@@ -28,6 +28,7 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
     Q_UNUSED(owner)
 
     QUrl url = params.value(lit("url"));
+    QString user = params.value(lit("user"), lit("admin"));
     QString password = params.value(lit("password"));
     bool takeRemoteSettings = params.value(lit("takeRemoteSettings"), lit("false")) != lit("false");
 
@@ -52,7 +53,7 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
     /* Get module information to get system name. */
 
     QAuthenticator auth;
-    auth.setUser(lit("admin"));
+    auth.setUser(user);
     auth.setPassword(password);
 
     CLSimpleHTTPClient client(url, 10000, auth);

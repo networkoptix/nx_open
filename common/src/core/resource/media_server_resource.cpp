@@ -16,6 +16,7 @@
 #include "utils/common/util.h"
 #include "media_server_user_attributes.h"
 #include "../resource_management/resource_pool.h"
+#include "utils/serialization/lexical.h"
 
 
 const QString QnMediaServerResource::USE_PROXY = QLatin1String("proxy");
@@ -31,7 +32,6 @@ private:
 QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePool):
     m_primaryIFSelected(false),
     m_serverFlags(Qn::SF_None),
-    m_panicMode(Qn::PM_None),
     m_guard(NULL)
 {
     setTypeId(resTypePool->getFixedResourceTypeId(lit("Server")));
@@ -278,18 +278,20 @@ QString QnMediaServerResource::getPrimaryIF() const
     return m_primaryIf;
 }
 
-Qn::PanicMode QnMediaServerResource::getPanicMode() const {
-    return m_panicMode;
+Qn::PanicMode QnMediaServerResource::getPanicMode() const 
+{
+    QString strVal = getProperty(lit("panic_mode"));
+    Qn::PanicMode result = Qn::PM_None;
+    QnLexical::deserialize(strVal, &result);
+    return result;
 }
 
 void QnMediaServerResource::setPanicMode(Qn::PanicMode panicMode) {
-    {
-        QMutexLocker lock(&m_mutex);
-        if(m_panicMode == panicMode)
-            return;
-        m_panicMode = panicMode;
-    }
-    emit panicModeChanged(::toSharedPointer(this));
+    if(getPanicMode() == panicMode)
+        return;
+    QString strVal;
+    QnLexical::serialize(panicMode, &strVal);
+    setProperty(lit("panic_mode"), strVal);
 }
 
 Qn::ServerFlags QnMediaServerResource::getServerFlags() const
@@ -343,12 +345,8 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
 
     QnMediaServerResource* localOther = dynamic_cast<QnMediaServerResource*>(other.data());
     if(localOther) {
-        if (m_panicMode != localOther->m_panicMode)
-            modifiedFields << "panicModeChanged";
         if (m_version != localOther->m_version)
             modifiedFields << "versionChanged";
-
-        m_panicMode = localOther->m_panicMode;
 
         m_serverFlags = localOther->m_serverFlags;
         netAddrListChanged = m_netAddrList != localOther->m_netAddrList;

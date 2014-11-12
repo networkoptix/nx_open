@@ -34,7 +34,6 @@ namespace ec2 {
     struct ApiMediaServerData;
     struct ApiMediaServerUserAttributesData;
     struct ApiMediaServerDataEx;
-    struct ApiPanicModeData;
     struct ApiPropertyTypeData;
     struct ApiResetBusinessRuleData;
     struct ApiResourceData;
@@ -135,7 +134,6 @@ namespace ec2 {
     (ApiMediaServerData)\
     (ApiMediaServerUserAttributesData)\
     (ApiMediaServerDataEx)\
-    (ApiPanicModeData)\
     (ApiPeerSystemTimeData)\
     (ApiPropertyTypeData)\
     (ApiResetBusinessRuleData)\

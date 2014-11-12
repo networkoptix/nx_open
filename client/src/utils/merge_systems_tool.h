@@ -23,8 +23,8 @@ public:
 
     explicit QnMergeSystemsTool(QObject *parent = 0);
 
-    void pingSystem(const QUrl &url, const QString &password);
-    void mergeSystem(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &password, bool ownSettings);
+    void pingSystem(const QUrl &url, const QString &user, const QString &password);
+    void mergeSystem(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &user, const QString &password, bool ownSettings);
 
 signals:
     void systemFound(const QnModuleInformation &moduleInformation, const QnMediaServerResourcePtr &discoverer, int errorCode);

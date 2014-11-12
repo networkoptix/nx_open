@@ -211,6 +211,10 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
 
     setMaxFps(fpsList.at(0));
 
+    setProperty(
+        Qn::SUPPORTED_MOTION_PARAM_NAME,
+        qnResTypePool->getResourceType( getTypeId() )->defaultValue( Qn::SUPPORTED_MOTION_PARAM_NAME ) );
+
     CameraMediaStreams mediaStreams;
     mediaStreams.streams.push_back( CameraMediaStreamInfo( m_resolution1, CODEC_ID_H264 ) );
     if( m_resolution2.width() > 0 )

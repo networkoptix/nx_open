@@ -1054,19 +1054,6 @@ namespace ec2
         virtual AbstractTimeManagerPtr getTimeManager() = 0;
 
         /*!
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> int setPanicMode( Qn::PanicMode value, TargetType* target, HandlerType handler ) {
-            return setPanicMode( value,
-                std::static_pointer_cast<impl::SimpleHandler>(
-                    std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-        ErrorCode setPanicModeSync(Qn::PanicMode value) {
-            int(AbstractECConnection::*fn)(Qn::PanicMode, impl::SimpleHandlerPtr) = &AbstractECConnection::setPanicMode;
-            return impl::doSyncCall<impl::SimpleHandler>( std::bind(fn, this, value, std::placeholders::_1));
-        }
-
-        /*!
             \param handler Functor with params: (ErrorCode, QByteArray dbFile)
         */
         template<class TargetType, class HandlerType> int dumpDatabaseAsync( TargetType* target, HandlerType handler ) {
@@ -1107,12 +1094,10 @@ namespace ec2
         void remotePeerUnauthorized(const QnUuid& id);
 
         void settingsChanged(ec2::ApiResourceParamDataList settings);
-        void panicModeChanged(Qn::PanicMode mode);
 
         void databaseDumped();
 
     protected:
-        virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) = 0;
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) = 0;
         virtual int restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, impl::SimpleHandlerPtr handler ) = 0;
     };  

@@ -542,10 +542,9 @@ void setServerNameAndUrls(QnMediaServerResourcePtr server, const QString& myAddr
     server->setApiUrl(QString("http://%1:%2").arg(myAddress).arg(port));
 }
 
-QnMediaServerResourcePtr QnMain::findServer(ec2::AbstractECConnectionPtr ec2Connection, Qn::PanicMode* pm)
+QnMediaServerResourcePtr QnMain::findServer(ec2::AbstractECConnectionPtr ec2Connection)
 {
     QnMediaServerResourceList servers;
-    *pm = Qn::PM_None;
 
     while (servers.isEmpty() && !needToStop())
     {
@@ -559,7 +558,6 @@ QnMediaServerResourcePtr QnMain::findServer(ec2::AbstractECConnectionPtr ec2Conn
 
     for(const QnMediaServerResourcePtr& server: servers)
     {
-        *pm = server->getPanicMode();
         if (server->getId() == serverGuid())
             return server;
     }
@@ -1063,6 +1061,10 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
             messageProcessor->on_licenseChanged(license);
     }
 
+    if (m_mediaServer->getPanicMode() == Qn::PM_BusinessEvents) {
+        m_mediaServer->setPanicMode(Qn::PM_None);
+        propertyDictionary->saveParams(m_mediaServer->getId());
+    }
 }
 
 void QnMain::at_updatePublicAddress(const QHostAddress& publicIP)
@@ -1511,15 +1513,13 @@ void QnMain::run()
 
     qnCommon->setModuleUlr(QString("http://%1:%2").arg(m_publicAddress.toString()).arg(m_universalTcpListener->getPort()));
 
-    Qn::PanicMode pm;
     while (m_mediaServer.isNull() && !needToStop())
     {
-        QnMediaServerResourcePtr server = findServer(ec2Connection, &pm);
+        QnMediaServerResourcePtr server = findServer(ec2Connection);
 
         if (!server) {
             server = QnMediaServerResourcePtr(new QnMediaServerResource(qnResTypePool));
             server->setId(serverGuid());
-            server->setPanicMode(pm);
             server->setMaxCameras(DEFAULT_MAX_CAMERAS);
         }
         server->setSystemInfo(QnSystemInformation::currentSystemInformation());
