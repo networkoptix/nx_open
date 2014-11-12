@@ -794,6 +794,8 @@ class ServerUserAttributesListDataGenerator(BasicGenerator):
                     uuid,name))
         return ret
 
+
+
 # Thread queue for multi-task. This is useful since if the user
 # want too many data to be sent to the server, then there maybe
 # thousands of threads to be created, which is not something we
@@ -1122,6 +1124,194 @@ class ResourceConflictionTest(ClusterTestBase):
         print "===================================\n"
 
 
+
+# ========================================
+# Server Merge Automatic Test
+# ========================================
+
+
+# This class represents a single server with a UNIQUE system name.
+# After we initialize this server, we will make it executes certain
+# type of random data generation, after such generation, the server
+# will have different states with other servers 
+
+class PrepareServerStatus(BasicGenerator):
+    _minData = 2
+    _maxData = 8
+    _systemNameTemplate = """
+    {
+        "systemName":"%s"
+    }"""
+
+    getterAPI=[
+        "getResourceParams",
+        "getMediaServers",
+        "getMediaServersEx",
+        "getCameras",
+        "getUsers",
+        "getServerUserAttributes",
+        "getCameraUserAttributes"
+    ]
+
+    # Function to generate method and class matching
+    def _generateDataAndAPIList(self):
+
+        def cameraFunc(num):
+            gen = CameraDataGenerator()
+            return gen.generateCameraData(num)
+
+        def userFunc(num):
+            gen = UserDataGenerator()
+            return gen.generateUserData(num)
+
+        def mediaServerFunc(num):
+            gen = MediaServerGenerator()
+            return gen.generateMediaServerData(num)
+
+        def resourceParAddFunc(num):
+            gen = ResourceDataGenerator()
+            return gen.generateResourceParams(num)
+
+        def cameraUserAttributesListFunc(num):
+            gen = CameraUserAttributesListDataGenerator()
+            return gen.generateCameraUserAttribute(num)
+
+        def serverUserAttributesListFunc(num):
+            gen = ServerUserAttributesListDataGenerator()
+            return gen.generateServerUserAttributesList(num)
+
+        return [
+            ("saveCameras",cameraFunc),
+            ("saveUser",userFunc),
+            ("saveMediaServer",mediaServerFunc),
+            ("setResourceParams",resourceParAddFunc),
+            ("saveServerUserAttributesList",serverUserAttributesListFunc),
+            ("saveCameraUserAttributesList",cameraUserAttributesListFunc)
+        ]
+
+    def _sendRequest(self,addr,method,d):
+        req = urllib2.Request("http://%s/ec2/%s" %(addr,method), \
+              data=d, 
+              headers={'Content-Type': 'application/json'})
+
+        response = urllib2.urlopen(req)
+
+        if response.getcode() != 200 :
+            return (False,"Cannot issue changeSystemName with HTTP code:%d"%(response.getcode()))
+
+        return (True,"")
+
+    def _setSystemName(self,addr,name):
+        return self._sendRequest(addr,"changeSystemName",
+                                 self._systemNameTemplate%(name))
+
+    def _generateRandomStates(self,addr):
+        api_list = self._generateDataAndAPIList()
+        for api in api_list:
+            num = random.randint(self._minData,self._maxData)
+            data_list = api[1](num)
+            for data in data_list:
+                ret,reason = self._sendRequest(addr,api[0],data)
+                if ret == False:
+                    return (ret,reason)
+        return (True,"")
+
+    def main(self,addr,name):
+        # 1, change the system name
+        self._setSystemName(addr,name)
+        # 2, generate random data to this server
+        ret,reason = self._generateRandomStates(addr)
+        if ret == False:
+            raise Exception("Cannot generate random states:%s"%(reason))
+    
+# This class is used to control the whole merge test
+class MergeTest():
+    _phase1WaitTime = 5
+    _systemName="mergeTest"
+    _gen = BasicGenerator()
+    _systemNameTemplate = """
+    {
+        "systemName":"%s"
+    }"""
+
+    # This function will ENSURE that the random system name is unique
+    def _generateRandomSystemName(self):
+        ret = []
+        s = set()
+        for i in range(len(clusterTest.clusterTestServerList)):
+            length = random.randint(16,30)
+            while True:
+                name = self._gen.generateRandomString(
+                    length)
+                if name in s or name == self._systemName:
+                    continue
+                else:
+                    s.add(name)
+                    ret.append(
+                        (clusterTest.clusterTestServerList[i],name))
+                    break
+        return ret
+
+    # First phase will make each server has its own status
+    # and also its unique system name there
+
+    def _phase1(self):
+        testList = self._generateRandomSystemName()
+        worker=ClusterWorker(32,len(testList))
+
+        for entry in testList:
+            worker.enqueue( 
+                PrepareServerStatus().main,
+                (entry[0],entry[1],))
+
+        worker.join()
+        time.sleep( self._phase1WaitTime )
+
+    # Second phase will make each server has the same system
+    # name which triggers server merge operations there. 
+
+    def _setSystemName(self,addr):
+
+        req = urllib2.Request("http://%s/ec2/changeSystemName" %(addr), \
+              data=self._systemNameTemplate%(self._systemName), 
+              headers={'Content-Type': 'application/json'})
+
+        response = urllib2.urlopen(req)
+
+        if response.getcode() != 200 :
+            return (False,"Cannot issue changeSystemName with HTTP code:%d"%(response.getcode()))
+
+        return (True,"")
+
+    def _setToSameSystemName(self):
+        worker=ClusterWorker(32,len(clusterTest.clusterTestServerList))
+        for entry in  clusterTest.clusterTestServerList:
+            worker.enqueue(
+                self._setSystemName,(entry,))
+        worker.join()
+
+    def _phase2(self):
+        self._setToSameSystemName()
+        # Wait until the synchronization time out expires
+        time.sleep( clusterTest.clusterTestSleepTime )
+        # Do the status checking of _ALL_ API
+        for api in PrepareServerStatus.getterAPI:
+            ret , reason = clusterTest.checkMethodStatusConsistent("%s?format=json"%(api))
+            if ret == False:
+                return (ret,reason)
+        return (True,"")
+
+    def test(self):
+        print "================================\n"
+        print "Server Merge Test Start\n"
+
+        self._phase1()
+        self._phase2()
+
+        print "Server Merge Test End\n"
+        print "================================\n"
+
+
 # Performance test function
 # only support add/remove ,value can only be user and media server
 class PerformanceOperation():
@@ -1287,6 +1477,9 @@ if __name__ == '__main__':
         if len(sys.argv) == 1:
             unittest.main()
         else:
-            ret = runPerformanceTest()
-            if ret != True:
-                print ret[1]
+            if sys.argv[1] == '--merge-test':
+                MergeTest().test()
+            else:
+                ret = runPerformanceTest()
+                if ret != True:
+                    print ret[1]
