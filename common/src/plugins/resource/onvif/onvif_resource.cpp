@@ -373,6 +373,49 @@ const QString QnPlOnvifResource::createOnvifEndpointUrl(const QString& ipAddress
     return QLatin1String(ONVIF_PROTOCOL_PREFIX) + ipAddress + QLatin1String(ONVIF_URL_SUFFIX);
 }
 
+
+typedef GSoapAsyncCallWrapper <
+    DeviceSoapWrapper,
+    NetIfacesReq,
+    NetIfacesResp
+> GSoapDeviceGetNetworkIntfAsyncWrapper;
+
+bool QnPlOnvifResource::checkIfOnlineAsync( std::function<void(bool)>&& completionHandler )
+{
+    const QAuthenticator auth( getAuth() );
+    const QString deviceUrl = getDeviceOnvifUrl();
+    if( deviceUrl.isEmpty() )
+        return false;
+
+    std::unique_ptr<DeviceSoapWrapper> soapWrapper( new DeviceSoapWrapper(
+        deviceUrl.toStdString(),
+        auth.user(),
+        auth.password(),
+        m_timeDrift ) );
+
+    //Trying to get HardwareId
+    auto asyncWrapper = std::make_shared<GSoapDeviceGetNetworkIntfAsyncWrapper>(
+        std::move(soapWrapper),
+        &DeviceSoapWrapper::getNetworkInterfaces );
+
+    const QnMacAddress resourceMAC = getMAC();
+    auto onvifCallCompletionFunc =
+        [asyncWrapper, deviceUrl, resourceMAC, completionHandler]( int soapResultCode )
+        {
+            if( soapResultCode != SOAP_OK )
+                return completionHandler( false );
+
+            completionHandler(
+                resourceMAC.toString() == 
+                QnPlOnvifResource::fetchMacAddress( asyncWrapper->response(), QUrl(deviceUrl).host() ) );
+        };
+
+    NetIfacesReq request;
+    return asyncWrapper->callAsync(
+        request,
+        onvifCallCompletionFunc );
+}
+
 QString QnPlOnvifResource::getDriverName() const
 {
     return MANUFACTURE;
@@ -443,7 +486,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 #endif
         return m_prevOnvifResultCode.errorCode != CameraDiagnostics::ErrorCode::noError
             ? m_prevOnvifResultCode
-            : CameraDiagnostics::RequestFailedResult(QLatin1String("getDeviceOnvifUrl"), QString());
+            : CameraDiagnostics::RequestFailedResult(lit("getDeviceOnvifUrl"), QString());
     }
 
     calcTimeDrift();
@@ -2811,11 +2854,14 @@ void QnPlOnvifResource::pullMessages(quint64 /*timerID*/)
 
     std::unique_ptr<PullPointSubscriptionWrapper> soapWrapper(
         new PullPointSubscriptionWrapper(
-            m_eventCapabilities->XAddr,
+            m_onvifNotificationSubscriptionReference.isEmpty()
+                ? m_eventCapabilities->XAddr
+                : m_onvifNotificationSubscriptionReference.toStdString(),
             auth.user(),
             auth.password(),
             m_timeDrift ) );
     soapWrapper->getProxy()->soap->imode |= SOAP_XML_IGNORENS;
+    soap_omode( soapWrapper->getProxy()->soap, SOAP_XML_DEFAULTNS );
 
     char* buf = (char*)malloc(512);
 

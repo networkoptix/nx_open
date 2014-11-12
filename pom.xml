@@ -31,7 +31,9 @@
         <axiscamplugin.name>${company.name} AXIS camera integration plugin</axiscamplugin.name>
         <genericrtspplugin.name>${company.name} generic RTSP plugin</genericrtspplugin.name>
         <mediaserver.name>${company.name} Media Server</mediaserver.name>
+        <mediaserver.display.name>${display.product.name} Tray Assistant</mediaserver.display.name>
         <mediaproxy.name>${company.name} Media Proxy</mediaproxy.name>
+        <mediaproxy.display.name>${company.name} Media Proxy</mediaproxy.display.name>
         <testcamera.name>${company.name} Test Camera</testcamera.name>
         <traytool.name>${product.name} Tray Assistant</traytool.name>
         <traytool.display.name>${display.product.name} Tray Assistant</traytool.display.name>
@@ -352,10 +354,15 @@
                 <compiler>msvc2012u3</compiler>
                 <arch>x64</arch>
                 <box>win78</box>
-                <modification>win78</modification>
                 <force_x86>false</force_x86>
-                <qt.spec>win32-msvc2012</qt.spec>
+                <!-- Testing WinXP hacks on Win78. If doesn't work properly, then revert back -->
+                <!-- <qt.spec>win32-msvc2012</qt.spec>
                 <PlatformToolSet>v110</PlatformToolSet>
+                <modification>win78</modification> -->
+                <qt.spec>win32-msvc2012xp</qt.spec>
+                <PlatformToolSet>v110_xp</PlatformToolSet>
+                <modification>winxp</modification>                
+                
                 <profile.classifier>${platform}</profile.classifier>                
                 <windows>true</windows>
                 <unix>false</unix>
@@ -363,7 +370,8 @@
                 <global.windows.defines>ENABLE_VMAX</global.windows.defines>
             </properties>
         </profile>
-        <profile>
+        <!-- Testing WinXP hacks on Win78. If doesn't work properly, then revert back -->
+        <!--<profile>
             <id>windows-xp</id>
             <activation>
                 <os>
@@ -380,7 +388,7 @@
                 <PlatformToolSet>v110_xp</PlatformToolSet>
                 <modification>winxp</modification>
             </properties>
-        </profile>
+        </profile> -->
 
         <profile>
             <!-- Common Profile for Linux, Mac, Arm -->

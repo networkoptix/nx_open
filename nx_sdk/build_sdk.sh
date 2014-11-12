@@ -26,6 +26,7 @@ fi
 
 mkdir -p $TARGET_DIR/include/plugins/
 cp -f readme.txt $TARGET_DIR
+cp -f ../common/maven/bin-resources/resources/camera_settings/camera_settings.xsd %TARGET_DIR%
 
 #Copying integration headers
 cp -f ../common/src/plugins/plugin_api.h $TARGET_DIR/include/plugins/

@@ -32,6 +32,25 @@ namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
 }
 
+namespace QnBusiness {
+    QList<Columns> allColumns() {
+        static QList<Columns> result;
+        if (result.isEmpty()) {
+            result 
+                << ModifiedColumn
+                << DisabledColumn
+                << EventColumn
+                << SourceColumn
+                << SpacerColumn
+                << ActionColumn
+                << TargetColumn
+                << AggregationColumn;
+        }
+        return result;
+    }
+}
+
+
 QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),

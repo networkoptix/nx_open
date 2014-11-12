@@ -147,7 +147,8 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(qint64 time,
             video = getNextArchiveVideoPacket(serverDelegate, AV_NOPTS_VALUE);
         }
     }
-    outFrame->channel = video->channelNumber;
+    if (video)
+        outFrame->channel = video->channelNumber;
     return outFrame;
 }
 

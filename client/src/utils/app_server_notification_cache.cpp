@@ -82,6 +82,7 @@ bool QnAppServerNotificationCache::updateTitle(const QString &filename, const QS
 }
 
 void QnAppServerNotificationCache::clear() {
+    base_type::clear();
     m_model->init();
 }
 

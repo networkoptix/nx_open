@@ -13,12 +13,11 @@
 
 QnAppServerFileCache::QnAppServerFileCache(QString folderName, QObject *parent) :
     QObject(parent),
-    m_fileListHandle(0),
     m_folderName(folderName)
 {
-    connect(this, SIGNAL(delayedFileDownloaded(QString,bool)), this, SIGNAL(fileDownloaded(QString,bool)), Qt::QueuedConnection);
-    connect(this, SIGNAL(delayedFileUploaded(QString,bool)), this, SIGNAL(fileUploaded(QString,bool)), Qt::QueuedConnection);
-    connect(this, SIGNAL(delayedFileDeleted(QString,bool)), this, SIGNAL(fileDeleted(QString,bool)), Qt::QueuedConnection);
+    connect(this, SIGNAL(delayedFileDownloaded(QString,bool)),  this, SIGNAL(fileDownloaded(QString,bool)), Qt::QueuedConnection);
+    connect(this, SIGNAL(delayedFileUploaded(QString,bool)),    this, SIGNAL(fileUploaded(QString,bool)), Qt::QueuedConnection);
+    connect(this, SIGNAL(delayedFileDeleted(QString,bool)),     this, SIGNAL(fileDeleted(QString,bool)), Qt::QueuedConnection);
 }
 
 QnAppServerFileCache::~QnAppServerFileCache(){}
@@ -57,22 +56,13 @@ void QnAppServerFileCache::clearLocalCache() {
 
 void QnAppServerFileCache::getFileList() {
     auto connection = QnAppServerConnectionFactory::getConnection2();
-    if (!connection) {
-        m_fileListHandle = -1;
-        return;
-    }
-
-    m_fileListHandle = connection->getStoredFileManager()->listDirectory(
-                m_folderName,
-                this,
-                &QnAppServerFileCache::at_fileListReceived );
-}
-
-void QnAppServerFileCache::at_fileListReceived(int handle, ec2::ErrorCode errorCode, const QStringList& filenames) {
-    if (handle != m_fileListHandle)
+    if (!connection)
         return;
 
-    emit fileListReceived(filenames, errorCode == ec2::ErrorCode::ok);
+    connection->getStoredFileManager()->listDirectory(m_folderName, this, [this](int handle, ec2::ErrorCode errorCode, const QStringList& filenames) {
+        Q_UNUSED(handle);
+        emit fileListReceived(filenames, errorCode == ec2::ErrorCode::ok);
+    } );
 }
 
 // -------------- Download File methods ----------
@@ -97,7 +87,11 @@ void QnAppServerFileCache::downloadFile(const QString &filename) {
     if (m_loading.values().contains(filename))
       return;
 
-    int handle = QnAppServerConnectionFactory::getConnection2()->getStoredFileManager()->getStoredFile(
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection)
+        return;
+
+    int handle = connection->getStoredFileManager()->getStoredFile(
                 m_folderName + QLatin1Char('/') + filename,
                 this,
                 &QnAppServerFileCache::at_fileLoaded );
@@ -143,10 +137,14 @@ void QnAppServerFileCache::uploadFile(const QString &filename) {
         return;
     }
 
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection)
+        return;
+
     QByteArray data = file.readAll();
     file.close();
 
-    int handle = QnAppServerConnectionFactory::getConnection2()->getStoredFileManager()->addStoredFile(
+    int handle = connection->getStoredFileManager()->addStoredFile(
                 m_folderName + QLatin1Char('/') +filename,
                 data,
                 this,
@@ -188,7 +186,11 @@ void QnAppServerFileCache::deleteFile(const QString &filename) {
     if (m_deleting.values().contains(filename))
       return;
 
-    int handle = QnAppServerConnectionFactory::getConnection2()->getStoredFileManager()->deleteStoredFile(
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection)
+        return;
+
+    int handle = connection->getStoredFileManager()->deleteStoredFile(
                     m_folderName + QLatin1Char('/') +filename,
                     this,
                     &QnAppServerFileCache::at_fileDeleted );
@@ -206,4 +208,10 @@ void QnAppServerFileCache::at_fileDeleted( int handle, ec2::ErrorCode errorCode 
     if (ok)
         QFile::remove(getFullPath(filename));
     emit fileDeleted(filename, ok);
+}
+
+void QnAppServerFileCache::clear() {
+    m_loading.clear();
+    m_uploading.clear();
+    m_deleting.clear();
 }

@@ -52,7 +52,6 @@ private slots:
     void at_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url);
     void at_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url);
     void at_moduleChanged(const QnModuleInformation &moduleInformation);
-    //void at_resourcePool_resourceChanged(const QnResourcePtr &resource);
 
 private:
     std::unique_ptr<QnMulticastModuleFinder> m_multicastModuleFinder;

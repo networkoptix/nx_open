@@ -35,6 +35,40 @@ QnPlAxisResource::~QnPlAxisResource()
     stopInputPortMonitoring();
 }
 
+bool QnPlAxisResource::checkIfOnlineAsync( std::function<void(bool)>&& completionHandler )
+{
+    QUrl apiUrl;
+    apiUrl.setScheme( lit("http") );
+    apiUrl.setHost( getHostAddress() );
+    apiUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
+    apiUrl.setUserName( getAuth().user() );
+    apiUrl.setPassword( getAuth().password() );
+    apiUrl.setPath( lit("/axis-cgi/param.cgi") );
+    apiUrl.setQuery( lit("action=list&group=root.Network.eth0.MACAddress") );
+
+    QString resourceMac = getMAC().toString();
+    auto requestCompletionFunc = [resourceMac, completionHandler]
+        ( SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody ) mutable
+    {
+        if( osErrorCode != SystemError::noError ||
+            statusCode != nx_http::StatusCode::ok )
+        {
+            return completionHandler( false );
+        }
+
+        int sepIndex = msgBody.indexOf('=');
+        if( sepIndex == -1 )
+            return completionHandler( false );
+        QByteArray macAddress = msgBody.mid(sepIndex+1).trimmed();
+        macAddress.replace( ':', '-' );
+        completionHandler( macAddress == resourceMac.toLatin1() );
+    };
+
+    return nx_http::downloadFileAsync(
+        apiUrl,
+        requestCompletionFunc );
+}
+
 QString QnPlAxisResource::getDriverName() const
 {
     return MANUFACTURE;

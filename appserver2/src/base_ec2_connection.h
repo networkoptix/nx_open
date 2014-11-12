@@ -58,7 +58,6 @@ namespace ec2
         virtual AbstractDiscoveryManagerPtr getDiscoveryManager() override;
         virtual AbstractTimeManagerPtr getTimeManager() override;
 
-        virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) override;
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) override;
         virtual int restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, impl::SimpleHandlerPtr handler ) override;
 
@@ -86,9 +85,6 @@ namespace ec2
         std::shared_ptr<QnDiscoveryManager<QueryProcessorType>> m_discoveryManager;
         std::shared_ptr<QnTimeManager<QueryProcessorType>> m_timeManager;
         std::unique_ptr<ECConnectionNotificationManager> m_notificationManager;
-
-    private:
-        QnTransaction<ApiPanicModeData> prepareTransaction( ApiCommand::Value cmd, const Qn::PanicMode& mode);
     };
 }
 

@@ -50,7 +50,7 @@ angular.module('webadminApp')
 
 
             mediaserver.pingSystem($scope.settings.url, $scope.settings.password).then(function(r){
-                if(r.data.error!==0){
+                if(r.data.error!=='0'){
                     var errorToShow = r.data.errorString;
                     switch(errorToShow){
                         case 'FAIL':

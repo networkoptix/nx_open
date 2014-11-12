@@ -25,7 +25,11 @@ QnWorkbenchPanicWatcher::~QnWorkbenchPanicWatcher() {
 }
 
 void QnWorkbenchPanicWatcher::updatePanicMode() {
-    bool panicMode = !m_servers.isEmpty() && m_panicServers.size() == m_servers.size();
+    auto servers = qnResPool->getResources<QnMediaServerResource>();
+    bool panicMode = std::any_of(servers.cbegin(), servers.cend(), [](const QnMediaServerResourcePtr &server) {
+        return server->getPanicMode() != Qn::PM_None && server->getStatus() == Qn::Online;
+    });
+
     if(m_panicMode == panicMode)
         return;
 
@@ -43,12 +47,8 @@ void QnWorkbenchPanicWatcher::at_resourcePool_resourceAdded(const QnResourcePtr 
     if(!server)
         return;
 
-    connect(server, &QnMediaServerResource::panicModeChanged, this, &QnWorkbenchPanicWatcher::at_resource_panicModeChanged);
-
-    m_servers.insert(server);
-    if(server->getPanicMode() != Qn::PM_None)
-        m_panicServers.insert(server);
-
+    connect(server, &QnMediaServerResource::statusChanged,    this, &QnWorkbenchPanicWatcher::updatePanicMode);
+    connect(server, &QnMediaServerResource::propertyChanged,  this, &QnWorkbenchPanicWatcher::updatePanicMode);
     updatePanicMode();
 }
 
@@ -56,26 +56,6 @@ void QnWorkbenchPanicWatcher::at_resourcePool_resourceRemoved(const QnResourcePt
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if(!server)
         return;
-
-    m_servers.remove(server);
-    m_panicServers.remove(server);
-
     disconnect(server.data(), NULL, this, NULL);
-
     updatePanicMode();
 }
-
-void QnWorkbenchPanicWatcher::at_resource_panicModeChanged(const QnResourcePtr &resource) {
-    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (!server)
-        return;
-
-    if(server->getPanicMode() != Qn::PM_None) {
-        m_panicServers.insert(server);
-    } else {
-        m_panicServers.remove(server);
-    }
-
-    updatePanicMode();
-}
-

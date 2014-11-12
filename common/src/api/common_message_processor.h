@@ -107,7 +107,6 @@ private slots:
     void on_businessRuleReset(const QnBusinessEventRuleList &rules);
     void on_broadcastBusinessAction(const QnAbstractBusinessActionPtr& action);
     void on_execBusinessAction( const QnAbstractBusinessActionPtr& action );
-    void on_panicModeChanged(Qn::PanicMode mode);   
 protected:
     ec2::AbstractECConnectionPtr m_connection;
     QMap<QnUuid, QnBusinessEventRulePtr> m_rules;

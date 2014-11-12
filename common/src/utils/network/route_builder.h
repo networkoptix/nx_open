@@ -10,8 +10,6 @@ public:
     void addConnection(const QnUuid &from, const QnUuid &to, const QString &host, quint16 port, int weight = 5);
     void removeConnection(const QnUuid &from, const QnUuid &to, const QString &host, quint16 port);
 
-    void clear(bool indirectOnly = false);
-
     QnRoute routeTo(const QnUuid &peerId, const QnUuid &via = QnUuid());
 
     QHash<QnUuid, QnRoute> routes() const;

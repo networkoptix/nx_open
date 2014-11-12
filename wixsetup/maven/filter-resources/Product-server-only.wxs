@@ -10,7 +10,6 @@
         <?include BuildVars.wxi ?>
 
         <?define ProductName="${display.product.name}"?>
-        <?define ECRegPath="Software\${company.name}\${appserver.name}"?>
         <?define ServerRegPath="Software\${company.name}\${mediaserver.name}"?>
 
         <!-- Add property to access from custom actions -->
@@ -108,7 +107,7 @@
         </Property>
 
         <Property Id="ALLOW_CAMERA_CHANGES" Secure="yes">
-            <RegistrySearch Id="AllowCameraChangesReg" Root="HKLM" Key="$(var.ServerRegPath)" Name="allowCameraChanges" Type="raw" Win64="yes"/>
+            <RegistrySearch Id="AllowCameraChangesReg" Root="HKLM" Key="$(var.ECRegPath)" Name="allowCameraChanges" Type="raw" Win64="yes"/>
         </Property>
 
         <Property Id="SERVER_LOGIN" Value="admin"/>

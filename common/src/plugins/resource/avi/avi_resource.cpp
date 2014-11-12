@@ -27,6 +27,7 @@ QnAviResource::QnAviResource(const QString& file)
         addFlags(Qn::still_image);
     m_timeZoneOffset = Qn::InvalidUtcOffset;
     setId(guidFromArbitraryData(getUniqueId().toUtf8()));
+    m_localStatus = Qn::Online;
 }
 
 QnAviResource::~QnAviResource()
@@ -105,6 +106,16 @@ void QnAviResource::setTimeZoneOffset(qint64 value)
 qint64 QnAviResource::timeZoneOffset() const
 {
     return m_timeZoneOffset;
+}
+
+Qn::ResourceStatus QnAviResource::getStatus() const
+{
+    return m_localStatus;
+}
+
+void QnAviResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
+{
+    m_localStatus = newStatus;
 }
 
 #endif // ENABLE_ARCHIVE

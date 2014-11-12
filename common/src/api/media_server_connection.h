@@ -227,8 +227,8 @@ public:
 
     int configureAsync(bool wholeSystem, const QString &systemName, const QString &password, const QByteArray &passwordHash, const QByteArray &passwordDigest, int port, QObject *target, const char *slot);
 
-    int pingSystemAsync(const QUrl &url, const QString &password, QObject *target, const char *slot);
-    int mergeSystemAsync(const QUrl &url, const QString &password, bool ownSettings, QObject *target, const char *slot);
+    int pingSystemAsync(const QUrl &url, const QString &user, const QString &password, QObject *target, const char *slot);
+    int mergeSystemAsync(const QUrl &url, const QString &user, const QString &password, bool ownSettings, QObject *target, const char *slot);
 
     int testEmailSettingsAsync(const QnEmailSettings &settings, QObject *target, const char *slot);
 protected:

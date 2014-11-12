@@ -76,7 +76,9 @@ void QnDirectModuleFinder::removeUrl(const QUrl &url, const QnUuid &id) {
         if (m_lastPingByUrl.take(locUrl) != 0) {
             QnUuid id = m_moduleByUrl.take(locUrl);
             NX_LOG(lit("QnDirectModuleFinder: Url %2 of the module %1 is removed.").arg(id.toString()).arg(locUrl.toString()), cl_logDEBUG1);
-            emit moduleUrlLost(m_foundModules.value(id), locUrl);
+            QnModuleInformation moduleInformation = m_foundModules.value(id);
+            emit moduleUrlLost(moduleInformation, locUrl);
+            emit moduleChanged(moduleInformation);
         }
     }
 }
@@ -90,7 +92,9 @@ void QnDirectModuleFinder::addIgnoredModule(const QUrl &url, const QnUuid &id) {
             m_lastPingByUrl.remove(locUrl);
             m_moduleByUrl.remove(locUrl);
             NX_LOG(lit("QnDirectModuleFinder: Url %2 of the module %1 is removed.").arg(id.toString()).arg(locUrl.toString()), cl_logDEBUG1);
-            emit moduleUrlLost(m_foundModules.value(id), locUrl);
+            QnModuleInformation moduleInformation = m_foundModules.value(id);
+            emit moduleUrlLost(moduleInformation, locUrl);
+            emit moduleChanged(moduleInformation);
         }
     }
 }
@@ -105,7 +109,9 @@ void QnDirectModuleFinder::addIgnoredUrl(const QUrl &url) {
     if (m_lastPingByUrl.take(locUrl) != 0) {
         QnUuid id = m_moduleByUrl.take(locUrl);
         NX_LOG(lit("QnDirectModuleFinder: Url %2 of the module %1 is removed.").arg(id.toString()).arg(locUrl.toString()), cl_logDEBUG1);
-        emit moduleUrlLost(m_foundModules.value(id), locUrl);
+        QnModuleInformation moduleInformation = m_foundModules.value(id);
+        emit moduleUrlLost(moduleInformation, locUrl);
+        emit moduleChanged(moduleInformation);
     }
 }
 
