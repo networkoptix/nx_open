@@ -44,6 +44,7 @@ private:
 
     QnMediaServerResourcePtr m_discoverer;
     QUrl m_url;
+    QString m_user;
     QString m_password;
 };
 

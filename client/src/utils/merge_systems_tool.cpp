@@ -36,19 +36,19 @@ QnMergeSystemsTool::QnMergeSystemsTool(QObject *parent) :
 {
 }
 
-void QnMergeSystemsTool::pingSystem(const QUrl &url, const QString &password) {
+void QnMergeSystemsTool::pingSystem(const QUrl &url, const QString &user, const QString &password) {
     m_serverByRequestHandle.clear();
     foreach (const QnMediaServerResourcePtr &server, qnResPool->getAllServers()) {
         if (server->getStatus() != Qn::Online)
             continue;
 
-        int handle = server->apiConnection()->pingSystemAsync(url, password, this, SLOT(at_pingSystem_finished(int,QnModuleInformation,int,QString)));
+        int handle = server->apiConnection()->pingSystemAsync(url, user, password, this, SLOT(at_pingSystem_finished(int,QnModuleInformation,int,QString)));
         m_serverByRequestHandle[handle] = server;
     }
 }
 
-void QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &password, bool ownSettings) {
-    proxy->apiConnection()->mergeSystemAsync(url, password, ownSettings, this, SLOT(at_mergeSystem_finished(int,QnModuleInformation,int,QString)));
+void QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &user, const QString &password, bool ownSettings) {
+    proxy->apiConnection()->mergeSystemAsync(url, user, password, ownSettings, this, SLOT(at_mergeSystem_finished(int,QnModuleInformation,int,QString)));
 }
 
 void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInformation &moduleInformation, int handle, const QString &errorString) {

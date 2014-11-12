@@ -12,6 +12,7 @@ int QnPingSystemRestHandler::executeGet(const QString &path, const QnRequestPara
     Q_UNUSED(path)
 
     QUrl url = params.value(lit("url"));
+    QString user = params.value(lit("user"), lit("admin"));
     QString password = params.value(lit("password"));
 
     if (url.isEmpty()) {
@@ -33,7 +34,7 @@ int QnPingSystemRestHandler::executeGet(const QString &path, const QnRequestPara
     }
 
     QAuthenticator auth;
-    auth.setUser(lit("admin"));
+    auth.setUser(user);
     auth.setPassword(password);
 
     CLSimpleHTTPClient client(url, 10000, auth);
