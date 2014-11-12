@@ -8,7 +8,7 @@ angular.module('webadminApp')
             scope: {
                 'for': '='
             },
-            template: '<span ng-show=\'for || onFalse\' class=\'glyphicon glyphicon-{{for?onTrue:onFalse}} {{class}}\' title=\'{{for?titleTrue:titleFalse}}\'></span>',
+            template: '<span ng-if=\'for || onFalse\' class=\'glyphicon glyphicon-{{for?onTrue:onFalse}} {{class}}\' title=\'{{for?titleTrue:titleFalse}}\'></span>',
             link: function (scope, element, attrs) {
                 scope.onTrue = attrs.onTrue || 'ok';
                 scope.onFalse = attrs.onFalse;

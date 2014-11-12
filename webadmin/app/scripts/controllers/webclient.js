@@ -1,5 +1,6 @@
 'use strict';
 
-angular.module('webadminApp').controller('WebclientCtrl', function (/*$scope*/) {
+angular.module('webadminApp')
+    .controller('WebclientCtrl', function ($scope, mediaserver) {
 
-});
+    });
