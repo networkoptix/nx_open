@@ -321,11 +321,9 @@ void QnCommonMessageProcessor::on_execBusinessAction( const QnAbstractBusinessAc
 }
 
 void QnCommonMessageProcessor::on_panicModeChanged(Qn::PanicMode mode) {
-    QnResourceList resList = qnResPool->getAllResourceByTypeName(lit("Server"));
-    for(const QnResourcePtr& res: resList) {
-        QnMediaServerResourcePtr mServer = res.dynamicCast<QnMediaServerResource>();
-        if (mServer)
-            mServer->setPanicMode(mode);
+    QnMediaServerResourceList servers = qnResPool->getResources<QnMediaServerResource>();
+    for(const QnMediaServerResourcePtr &server: servers) {
+        server->setPanicMode(mode);
     }
 }
 
