@@ -1061,6 +1061,10 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
             messageProcessor->on_licenseChanged(license);
     }
 
+    if (m_mediaServer->getPanicMode() == Qn::PM_BusinessEvents) {
+        m_mediaServer->setPanicMode(Qn::PM_None);
+        propertyDictionary->saveParams(m_mediaServer->getId());
+    }
 }
 
 void QnMain::at_updatePublicAddress(const QHostAddress& publicIP)
