@@ -633,6 +633,11 @@ namespace nxcip
         public BaseCameraManager2
     {
     public:
+        enum CameraCapability3
+        { 
+            cameraParamsPersistentCapability   = 0x0800      //!<Camera parameters can be read/set even if camera is not accessible at the moment
+        };
+
         //!Returns XML describing camera parameters
         /*!
             XML MUST conform to camera_parameters.xsd which can be found in SDK. Sample XML also can be found there
