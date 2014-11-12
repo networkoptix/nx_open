@@ -54,9 +54,13 @@ angular.module('webadminApp', [
             templateUrl: 'views/webclient.html',
             controller: 'WebclientCtrl',
             reloadOnSearch: false
-        }).when('/webclient/:cameraId', {
-            templateUrl: 'views/webclient.html',
-            controller: 'WebclientCtrl',
+        }).when('/view/', {
+            templateUrl: 'views/view.html',
+            controller: 'ViewCtrl',
+            reloadOnSearch: false
+        }).when('/view/:cameraId', {
+            templateUrl: 'views/view.html',
+            controller: 'ViewCtrl',
             reloadOnSearch: false
         })
         .when('/sdkeula', {
