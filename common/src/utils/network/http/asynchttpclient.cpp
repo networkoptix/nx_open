@@ -831,15 +831,15 @@ namespace nx_http
         {
             header::DigestAuthorization digestAuthorizationHeader;
             if( !calcDigestResponse(
-                m_request.requestLine.method,
-                m_userName,
-                m_authType != authDigestWithPasswordHash ? m_userPassword : boost::optional<QString>(),
-                m_authType == authDigestWithPasswordHash ? m_userPassword.toLatin1() : boost::optional<QByteArray>(),
-                m_url,
-                wwwAuthenticateHeader,
-                &digestAuthorizationHeader ) )
+                    m_request.requestLine.method,
+                    m_userName,
+                    m_authType != authDigestWithPasswordHash ? m_userPassword : boost::optional<QString>(),
+                    m_authType == authDigestWithPasswordHash ? m_userPassword.toLatin1() : boost::optional<QByteArray>(),
+                    m_url,
+                    wwwAuthenticateHeader,
+                    &digestAuthorizationHeader ) )
             {
-                retuern false;
+                return false;
             }
             BufferType authorizationStr;
             digestAuthorizationHeader.serialize( &authorizationStr );
