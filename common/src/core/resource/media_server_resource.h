@@ -109,7 +109,6 @@ private:
     void onRequestDone( int reqID, ec2::ErrorCode errorCode );
 signals:
     void serverIfFound(const QnMediaServerResourcePtr &resource, const QString &, const QString& );
-    void panicModeChanged(const QnResourcePtr &resource);
     //! This signal is emmited when the set of additional URLs or ignored URLs has been changed.
     void auxUrlsChanged(const QnResourcePtr &resource);
     void versionChanged(const QnResourcePtr &resource);
@@ -127,7 +126,6 @@ private:
     //QnAbstractStorageResourceList m_storages;
     bool m_primaryIFSelected;
     Qn::ServerFlags m_serverFlags;
-    Qn::PanicMode m_panicMode;
     QnSoftwareVersion m_version;
     QnSystemInformation m_systemInfo;
     QString m_systemName;

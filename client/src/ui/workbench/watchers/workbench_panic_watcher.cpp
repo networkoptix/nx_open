@@ -27,7 +27,7 @@ QnWorkbenchPanicWatcher::~QnWorkbenchPanicWatcher() {
 void QnWorkbenchPanicWatcher::updatePanicMode() {
     auto servers = qnResPool->getResources<QnMediaServerResource>();
     bool panicMode = std::any_of(servers.cbegin(), servers.cend(), [](const QnMediaServerResourcePtr &server) {
-        return server->getPanicMode() != Qn::PM_None;
+        return server->getPanicMode() != Qn::PM_None && server->getStatus() == Qn::Online;
     });
 
     if(m_panicMode == panicMode)
@@ -47,7 +47,8 @@ void QnWorkbenchPanicWatcher::at_resourcePool_resourceAdded(const QnResourcePtr 
     if(!server)
         return;
 
-    connect(server, &QnMediaServerResource::panicModeChanged, this, &QnWorkbenchPanicWatcher::updatePanicMode);
+    connect(server, &QnMediaServerResource::statusChanged,    this, &QnWorkbenchPanicWatcher::updatePanicMode);
+    connect(server, &QnMediaServerResource::propertyChanged,  this, &QnWorkbenchPanicWatcher::updatePanicMode);
     updatePanicMode();
 }
 

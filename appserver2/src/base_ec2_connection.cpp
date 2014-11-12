@@ -140,23 +140,6 @@ namespace ec2
     }
 
     template<class T>
-    int BaseEc2Connection<T>::setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler )
-    {
-        const int reqID = generateRequestID();
-
-        ApiCommand::Value command = ApiCommand::setPanicMode;
-
-        //performing request
-        auto tran = prepareTransaction( command, value );
-
-        using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1) );
-
-        return reqID;
-    }
-
-
-    template<class T>
     int BaseEc2Connection<T>::dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler )
     {
         const int reqID = generateRequestID();
@@ -185,14 +168,6 @@ namespace ec2
         m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1) );
 
         return reqID;
-    }
-
-    template<class T>
-    QnTransaction<ApiPanicModeData> BaseEc2Connection<T>::prepareTransaction( ApiCommand::Value command, const Qn::PanicMode& mode)
-    {
-        QnTransaction<ApiPanicModeData> tran(command);
-        tran.params.mode = mode;
-        return tran;
     }
 
     template<class T>

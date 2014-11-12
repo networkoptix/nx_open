@@ -55,7 +55,6 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     connect(connection, &ec2::AbstractECConnection::remotePeerLost,                 this, &QnCommonMessageProcessor::remotePeerLost );
     connect(connection, &ec2::AbstractECConnection::initNotification,               this, &QnCommonMessageProcessor::on_gotInitialNotification );
     connect(connection, &ec2::AbstractECConnection::runtimeInfoChanged,             this, &QnCommonMessageProcessor::runtimeInfoChanged );
-    connect(connection, &ec2::AbstractECConnection::panicModeChanged,               this, &QnCommonMessageProcessor::on_panicModeChanged );
 
     auto resourceManager = connection->getResourceManager();
     connect(resourceManager, &ec2::AbstractResourceManager::resourceChanged,        this, [this](const QnResourcePtr &resource){updateResource(resource);});
@@ -318,13 +317,6 @@ void QnCommonMessageProcessor::on_broadcastBusinessAction( const QnAbstractBusin
 void QnCommonMessageProcessor::on_execBusinessAction( const QnAbstractBusinessActionPtr& action )
 {
     execBusinessActionInternal(action);
-}
-
-void QnCommonMessageProcessor::on_panicModeChanged(Qn::PanicMode mode) {
-    QnMediaServerResourceList servers = qnResPool->getResources<QnMediaServerResource>();
-    for(const QnMediaServerResourcePtr &server: servers) {
-        server->setPanicMode(mode);
-    }
 }
 
 // todo: ec2 relate logic. remove from this class

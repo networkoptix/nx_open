@@ -303,7 +303,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
     connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
-    connect(context()->instance<QnWorkbenchPanicWatcher>(),     SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
+    //connect(context()->instance<QnWorkbenchPanicWatcher>(),     SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
     connect(context()->instance<QnWorkbenchScheduleWatcher>(),  SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
     connect(context()->instance<QnWorkbenchUpdateWatcher>(),    SIGNAL(availableUpdateChanged()), this, SLOT(at_updateWatcher_availableUpdateChanged()));
 
@@ -312,7 +312,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
 
 
     /* Run handlers that update state. */
-    at_panicWatcher_panicModeChanged();
+    //at_panicWatcher_panicModeChanged();
     at_scheduleWatcher_scheduleEnabledChanged();
     at_updateWatcher_availableUpdateChanged();
 }
@@ -2341,12 +2341,7 @@ void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
             if (checked)
                 val = Qn::PM_User;
             resource->setPanicMode(val);
-            connection2()->getMediaServerManager()->saveUserAttributes(
-                QnMediaServerUserAttributesList() << QnMediaServerUserAttributesPool::instance()->get(resource->getId()),
-                this,
-                [this, resource]( int reqID, ec2::ErrorCode errorCode ) {
-                    at_resources_saved( reqID, errorCode, QnResourceList() << resource );
-                });
+            propertyDictionary->saveParamsAsync(resource->getId());
         }
     }
 }

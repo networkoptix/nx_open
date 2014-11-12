@@ -218,10 +218,6 @@ namespace ec2
             m_discoveryManager->triggerNotification(data);
     }
 
-    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiPanicModeData>& tran ) {
-        emit m_ecConnection->panicModeChanged(tran.params.mode);
-    }
-
     void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiVideowallControlMessageData>& tran ) {
         return m_videowallManager->triggerNotification(tran);
     }
