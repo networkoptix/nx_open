@@ -10,7 +10,6 @@
         <?include BuildVars.wxi ?>
 
         <?define ProductName="${display.product.name}"?>
-        <?define ECRegPath="Software\${company.name}\${appserver.name}"?>
         <?define ServerRegPath="Software\${company.name}\${mediaserver.name}"?>
 
         <!-- Add property to access from custom actions -->
