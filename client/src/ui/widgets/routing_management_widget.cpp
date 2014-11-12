@@ -167,6 +167,10 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
 
     m_serverAddressesModel = new QnServerAddressesModel(this);
     m_sortedServerAddressesModel = new QnSortedServerAddressesModel(this);
+    m_sortedServerAddressesModel->setDynamicSortFilter(true);
+    m_sortedServerAddressesModel->setSortRole(Qt::DisplayRole);
+    m_sortedServerAddressesModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+    m_sortedServerAddressesModel->sort(QnServerAddressesModel::AddressColumn);
     m_sortedServerAddressesModel->setSourceModel(m_serverAddressesModel);
     ui->addressesView->setModel(m_sortedServerAddressesModel);
     ui->addressesView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
