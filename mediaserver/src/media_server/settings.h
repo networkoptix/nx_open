@@ -69,6 +69,9 @@ namespace nx_ms_conf
 
     static const QLatin1String ALLOW_SSL_CONNECTIONS( "allowSslConnections" );
     static const bool DEFAULT_ALLOW_SSL_CONNECTIONS = true;
+
+    /** Semicolon-separated list of servers to get public ip. */
+    static const QLatin1String PUBLIC_IP_SERVERS( "publicIPServers" );
 }
 
 /*!
