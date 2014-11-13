@@ -102,14 +102,7 @@ void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode
     bool compatibleProduct = qnSettings->isDevMode() || connectionInfo.brand.isEmpty()
             || connectionInfo.brand == QnAppInfo::productNameShort();
 
-    if (connectionInfo.nxClusterProtoVersion != nx_ec::EC2_PROTO_VERSION) {
-        success = false;
-        detail = tr("Server has a different ec2 protocol version:\n"
-            " - Client version: %1.\n"
-            " - Server version: %2."
-            ).arg(nx_ec::EC2_PROTO_VERSION).arg(connectionInfo.nxClusterProtoVersion);
-        helpTopicId = Qn::VersionMismatch_Help;
-    } else if (errorCode == ec2::ErrorCode::unauthorized) {
+     if (errorCode == ec2::ErrorCode::unauthorized) {
         success = false;
         detail = tr("Login or password you have entered are incorrect, please try again.");
         helpTopicId = Qn::Login_Help;
@@ -145,6 +138,17 @@ void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode
                     .arg(connectionInfo.version.toString());
             helpTopicId = Qn::VersionMismatch_Help;
         }
+    } else if (connectionInfo.nxClusterProtoVersion != nx_ec::EC2_PROTO_VERSION) {
+        success = false;
+        QString olderComponent = connectionInfo.nxClusterProtoVersion < nx_ec::EC2_PROTO_VERSION
+            ? tr("Server")
+            : tr("Client");
+       detail = tr("Server has a different version:\n"
+            " - Client version: %1.\n"
+            " - Server version: %2.\n"
+            "These versions are not compatible. Please update your %3"
+            ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()).arg(olderComponent);
+        helpTopicId = Qn::VersionMismatch_Help;
     }
 
     updateUi(success, detail, helpTopicId);
