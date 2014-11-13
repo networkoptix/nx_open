@@ -60,6 +60,9 @@ void QnRouter::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleI
 
     Q_ASSERT_X(!endpoint.id.isNull(), "Endpoint cannot has null id!", Q_FUNC_INFO);
 
+    if (endpoint.id.isNull())
+        return;
+
     if (!addConnection(qnCommon->moduleGUID(), endpoint))
         return;
 
