@@ -113,7 +113,10 @@ void QnMulticastModuleFinder::addIgnoredModule(const QnNetworkAddress &address, 
     if (it->moduleId == id)
         m_foundAddresses.erase(it);
 
+    NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Module address (%2:%3) of remote server %1 is lost").
+        arg(id.toString()).arg(address.host().toString()).arg(address.port()), cl_logDEBUG1);
     emit moduleAddressLost(*moduleIt, address);
+    NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Module %1 has changed.").arg(id.toString()), cl_logDEBUG1);
     emit moduleChanged(*moduleIt);
 }
 
@@ -226,12 +229,15 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
         for (const QString &oldAddress: oldModuleInformation.remoteAddresses) {
             QnNetworkAddress oldNetworkAddress(QHostAddress(oldAddress), oldModuleInformation.port);
             m_foundAddresses.remove(oldNetworkAddress);
+            NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Module address (%2:%3) of remote server %1 is lost").
+                arg(oldModuleInformation.id.toString()).arg(oldAddress).arg(oldModuleInformation.port), cl_logDEBUG1);
             emit moduleAddressLost(moduleInformation, oldNetworkAddress);
         }
     }
 
     if (oldModuleInformation != moduleInformation) {
         oldModuleInformation = moduleInformation;
+        NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Module %1 has changed.").arg(response.seed.toString()), cl_logDEBUG1);
         emit moduleChanged(moduleInformation);
     }
 
@@ -241,9 +247,9 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
     if (addressIt == m_foundAddresses.end()) {
         addressIt = m_foundAddresses.insert(address, ModuleContext(response));
 
-        emit moduleAddressFound(moduleInformation, address);
         NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. New address (%2:%3) of remote server %1 found on local interface %4").
             arg(response.seed.toString()).arg(remoteAddressStr).arg(remotePort).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG1);
+        emit moduleAddressFound(moduleInformation, address);
     }
     addressIt->prevResponseReceiveClock = QDateTime::currentMSecsSinceEpoch();
 
@@ -325,10 +331,11 @@ void QnMulticastModuleFinder::run() {
             QnModuleInformation &moduleInformation = m_foundModules[it->moduleId];
             moduleInformation.remoteAddresses.remove(it.key().host().toString());
 
+
             NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Module address (%2:%3) of remote server %1 is lost").
                 arg(it->moduleId.toString()).arg(it.key().host().toString()).arg(it.key().port()), cl_logDEBUG1);
-
             emit moduleAddressLost(moduleInformation, it.key());
+            NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Module %1 has changed.").arg(it->moduleId.toString()), cl_logDEBUG1);
             emit moduleChanged(moduleInformation);
 
             it = m_foundAddresses.erase(it);
