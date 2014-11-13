@@ -276,9 +276,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::DebugShowResourcePoolAction));
     addAction(action(Qn::DebugControlPanelAction));
     addAction(action(Qn::ToggleBackgroundAnimationAction));
-#ifdef _DEBUG
     addAction(action(Qn::SystemAdministrationAction));
-#endif
+
     connect(action(Qn::MaximizeAction),     SIGNAL(toggled(bool)),                          this,                                   SLOT(setMaximized(bool)));
     connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
     connect(action(Qn::MinimizeAction),     SIGNAL(triggered()),                            this,                                   SLOT(minimize()));
