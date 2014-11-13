@@ -90,41 +90,37 @@ QnBusinessRuleItemDelegate::~QnBusinessRuleItemDelegate() {
 
 }
 
-int QnBusinessRuleItemDelegate::maximumWidth(int column, const QFontMetrics &metrics) {   
-    const qreal magicNumber = 1.1;
+int QnBusinessRuleItemDelegate::optimalWidth(int column, const QFontMetrics &metrics) {   
+    const int dropDownSpacer = 40;  /* Leave some space for the drop-down indicator. */
     switch (column) {
     case QnBusiness::EventColumn: 
         {
-            auto eventWidth = [metrics, magicNumber](QnBusiness::EventType eventType){
-                return magicNumber * metrics.width(QnBusinessStringsHelper::eventName(eventType));
+            auto eventWidth = [metrics] (QnBusiness::EventType eventType){
+                return metrics.width(QnBusinessStringsHelper::eventName(eventType));
             };
             int result = -1;
             for(QnBusiness::EventType eventType: QnBusiness::allEvents())
                 result = qMax(result, eventWidth(eventType));
-            return result;
+            return dropDownSpacer + result;
         }
     case QnBusiness::ActionColumn: 
         {
-            auto actionWidth = [metrics, magicNumber](QnBusiness::ActionType actionType){
-                return magicNumber * metrics.width(QnBusinessStringsHelper::actionName(actionType));
+            auto actionWidth = [metrics](QnBusiness::ActionType actionType){
+                return metrics.width(QnBusinessStringsHelper::actionName(actionType));
             };
             int result = -1;
             for(QnBusiness::ActionType actionType: QnBusiness::allActions())
                 result = qMax(result, actionWidth(actionType));
-            return result;
+            return dropDownSpacer + result;
         }
-
+    case QnBusiness::AggregationColumn:
+        {
+            return QnAggregationWidget::optimalWidth();
+        }
     default:
         break;
     }
     return -1;
-}
-
-QSize QnBusinessRuleItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const {
-    QSize sh = base_type::sizeHint(option, index);
-    if (index.column() == QnBusiness::EventColumn || index.column() == QnBusiness::ActionColumn)
-        sh.setWidth(sh.width() * 1.5);
-    return sh;
 }
 
 void QnBusinessRuleItemDelegate::initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const  {
