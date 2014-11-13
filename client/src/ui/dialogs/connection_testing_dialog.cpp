@@ -102,7 +102,7 @@ void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode
     bool compatibleProduct = qnSettings->isDevMode() || connectionInfo.brand.isEmpty()
             || connectionInfo.brand == QnAppInfo::productNameShort();
 
-    if (connectionInfo.nxClusterProtoVersion != nx_ec::EC2_PROTO_VERSION) {
+    if ((errorCode == ec2::ErrorCode::ok) && (connectionInfo.nxClusterProtoVersion != nx_ec::EC2_PROTO_VERSION)) {
         success = false;
         detail = tr("Server has a different ec2 protocol version:\n"
             " - Client version: %1.\n"

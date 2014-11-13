@@ -74,7 +74,9 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
         detail = tr("You are trying to connect to incompatible Server.");
     }
 
-    if (connectionInfo.nxClusterProtoVersion != nx_ec::EC2_PROTO_VERSION) {
+    if ((errorCode == ec2::ErrorCode::ok) && 
+        (connectionInfo.nxClusterProtoVersion != nx_ec::EC2_PROTO_VERSION))
+    {
         QnMessageBox::warning(
             parentWidget,
             Qn::VersionMismatch_Help,
