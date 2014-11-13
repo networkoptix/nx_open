@@ -756,6 +756,11 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
                 QnResourceWidget *widget = context()->display()->widget(item);
                 if (widget && widget->hasAspectRatio()) {
                     qreal aspectRatio = widget->aspectRatio();
+
+                    QString customAspectRatio = widget->resource()->getProperty(QnMediaResource::customAspectRatioKey());
+                    if (!customAspectRatio.isEmpty())
+                        aspectRatio = customAspectRatio.toDouble();
+
                     if (QnAspectRatio::isRotated90(item->rotation()))
                         aspectRatio = 1.0 / aspectRatio;
                     midAspectRatio += aspectRatio;
