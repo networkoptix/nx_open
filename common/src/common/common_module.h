@@ -66,6 +66,8 @@ public:
     void setModuleInformation(const QnModuleInformation &moduleInformation);
     QnModuleInformation moduleInformation() const;
 
+    bool isTranscodeDisabled() const { return m_transcodingDisabled; }
+    void setTranscodeDisabled(bool value) { m_transcodingDisabled = value; }
 signals:
     void systemNameChanged(const QString &systemName);
     void remoteIdChanged(const QnUuid &id);
@@ -87,6 +89,7 @@ private:
     QnSoftwareVersion m_engineVersion;
     QnModuleInformation m_moduleInformation;
     mutable QMutex m_mutex;
+    bool m_transcodingDisabled;
 };
 
 #define qnCommon (QnCommonModule::instance())

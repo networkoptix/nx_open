@@ -1,5 +1,6 @@
 #include "rtp_universal_encoder.h"
 #include "utils/network/rtp_stream_parser.h"
+#include "common/common_module.h"
 
 extern "C" {
 #include <libavutil/opt.h>
@@ -619,6 +620,12 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnConstAbstractMediaDataPtr media,
     else {
         m_transcoder.setAudioCodec(m_codec, method);
     }
+
+    if (qnCommon->isTranscodeDisabled()) {
+        m_isOpened = false;
+        qWarning() << "Video transcoding is disabled in the server settings. Feature unavailable.";
+    }
+    else if (m_isVideo)
     if (m_isVideo)
         m_isOpened = m_transcoder.open(media.dynamicCast<const QnCompressedVideoData>(), QnConstCompressedAudioDataPtr()) == 0;
     else

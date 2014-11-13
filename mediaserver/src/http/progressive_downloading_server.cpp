@@ -31,6 +31,7 @@
 #include <media_server/settings.h>
 
 #include "cached_output_stream.h"
+#include "common/common_module.h"
 
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
@@ -410,6 +411,13 @@ void QnProgressiveDownloadingConsumer::run()
 {
     Q_D(QnProgressiveDownloadingConsumer);
     initSystemThreadId();
+
+    if (qnCommon->isTranscodeDisabled())
+    {
+        d->responseBody = QByteArray("Video transcoding is disabled in the server settings. Feature unavailable.");
+        sendResponse(CODE_NOT_IMPLEMETED, "text/plain");
+        return;
+    }
 
     QnAbstractMediaStreamDataProviderPtr dataProvider;
 
