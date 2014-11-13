@@ -43,9 +43,15 @@ protected:
     virtual void dragLeaveEvent(QDragLeaveEvent *event) override;
     virtual void timerEvent(QTimerEvent *event) override;
 
+    virtual bool edit(const QModelIndex &index, EditTrigger trigger, QEvent *event) override;
+    virtual void closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint) override;
+
 private:
     QBasicTimer m_openTimer;
     QPoint m_dragMovePos;
+
+    /* Flag that an element is edited right now. Workaround for Qt bug: state() is not always Editing. */
+    bool m_editorOpen;
 };
 
 

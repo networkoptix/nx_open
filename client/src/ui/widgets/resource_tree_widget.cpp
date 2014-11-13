@@ -250,7 +250,8 @@ void QnResourceTreeWidget::setWorkbench(QnWorkbench *workbench) {
 }
 
 void QnResourceTreeWidget::edit() {
-    ui->resourcesTreeView->edit(selectionModel()->currentIndex());
+    QAbstractItemView* view = ui->resourcesTreeView;
+    view->edit(selectionModel()->currentIndex());
 }
 
 void QnResourceTreeWidget::expand(const QModelIndex &index) {
