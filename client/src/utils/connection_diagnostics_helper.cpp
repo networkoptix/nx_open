@@ -74,22 +74,6 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
         detail = tr("You are trying to connect to incompatible Server.");
     }
 
-    if ((errorCode == ec2::ErrorCode::ok) && 
-        (connectionInfo.nxClusterProtoVersion != nx_ec::EC2_PROTO_VERSION))
-    {
-        QnMessageBox::warning(
-            parentWidget,
-            Qn::VersionMismatch_Help,
-            tr("Could not connect to Server"),
-            tr("You are about to connect to Server which has a different ec2 protocol version:\n"
-            " - Client version: %1.\n"
-            " - Server version: %2."
-            ).arg(nx_ec::EC2_PROTO_VERSION).arg(connectionInfo.nxClusterProtoVersion),
-            QMessageBox::Ok
-            );
-        return Result::Failure;
-    }
-
     if(!success) {
         QnMessageBox::warning(
             parentWidget,
@@ -110,8 +94,28 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
         compatibilityChecker = &localChecker;
     }
 
-    if (compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(qnCommon->engineVersion().toString()), QLatin1String("ECS"), connectionInfo.version))
+    if (compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(qnCommon->engineVersion().toString()), QLatin1String("ECS"), connectionInfo.version)) {
+
+        if (connectionInfo.nxClusterProtoVersion != nx_ec::EC2_PROTO_VERSION) {
+            QString olderComponent = connectionInfo.nxClusterProtoVersion < nx_ec::EC2_PROTO_VERSION
+                ? tr("Server")
+                : tr("Client");
+            QnMessageBox::warning(
+                parentWidget,
+                Qn::VersionMismatch_Help,
+                tr("Could not connect to Server"),
+                tr("You are about to connect to Server which has a different version:\n"
+                " - Client version: %1.\n"
+                " - Server version: %2.\n"
+                "These versions are not compatible. Please update your %3"
+                ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()).arg(olderComponent),
+                QMessageBox::Ok
+                );
+            return Result::Failure;
+        }
+
         return Result::Success;
+    }
 
     if (connectionInfo.version < minSupportedVersion) {
         QnMessageBox::warning(
