@@ -17,7 +17,7 @@
         "_": "Globals settings. These ones will go away in one of the future versions.",
         
         "frameColor":               "custom_grey",
-        "businessRuleDisabledHighlightColor": "QColor(64, 64, 64)",
+        "businessRuleDisabledHighlightColor": "#afafaf",
         "businessRuleInvalidBackgroundColor": "#ffbaba",
         "businessRuleInvalidColumnBackgroundColor": "#ff5757",
         "businessRuleInvalidHighlightColor": "selection"

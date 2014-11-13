@@ -85,8 +85,8 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     ui->tableView->resizeColumnsToContents();
 
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QnBusiness::SourceColumn, QHeaderView::Interactive);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QnBusiness::TargetColumn, QHeaderView::Interactive);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QnBusiness::SourceColumn, QHeaderView::Stretch);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QnBusiness::TargetColumn, QHeaderView::Stretch);
     for (QnBusiness::Columns column: forcedColumns)
         ui->tableView->horizontalHeader()->setSectionResizeMode(column, QHeaderView::Fixed);
     
