@@ -24,6 +24,8 @@ public:
     operator double() const;
     operator QString() const;
 
+    const QString& str() const { return value; }
+
     bool operator < ( const CameraSettingValue & other ) const;
     bool operator > ( const CameraSettingValue & other ) const;
     bool operator <= ( const CameraSettingValue & other ) const;
