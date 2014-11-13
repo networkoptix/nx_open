@@ -11,7 +11,7 @@
 
 namespace {
     const QString primaryUrlsList("http://checkrealip.com;http://checkip.eurodyndns.org");
-    const QString secondaryUrlsList("http://www.networkoptix.com/myip.php");
+    const QString secondaryUrlsList("http://networkoptix.com/myip");
     const int requestTimeoutMs = 4*1000;
     const QRegExp iPRegExpr("[^a-zA-Z0-9\\.](([0-9]){1,3}\\.){3}([0-9]){1,3}[^a-zA-Z0-9\\.]");
 }
