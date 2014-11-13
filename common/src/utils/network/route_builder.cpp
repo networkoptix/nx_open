@@ -19,6 +19,13 @@ void QnRouteBuilder::addConnection(const QnUuid &from, const QnUuid &to, const Q
         return;
 
     m_connections.insert(from, WeightedPoint(QnRoutePoint(to, host, port), weight));
+
+    for (auto it = m_routes.begin(); it != m_routes.end(); /* no inc */) {
+        if (it->containsPoint(from) || it->containsPoint(to))
+            it = m_routes.erase(it);
+        else
+            ++it;
+    }
 }
 
 void QnRouteBuilder::removeConnection(const QnUuid &from, const QnUuid &to, const QString &host, quint16 port) {
@@ -39,21 +46,19 @@ void QnRouteBuilder::removeConnection(const QnUuid &from, const QnUuid &to, cons
     }
 }
 
-void QnRouteBuilder::clear(bool indirectOnly) {
-    if (!indirectOnly) {
-        m_routes.clear();
-        return;
-    }
+QnRoute QnRouteBuilder::routeTo(const QnUuid &peerId, const QnUuid &via) {
+	if (!via.isNull() && via != peerId && via != m_startId) {
+		QnRoute preRoute = buildRouteTo(via);
+		if (!preRoute.isValid())
+			return QnRoute();
 
-    for (auto it = m_routes.begin(); it != m_routes.end(); /* no inc */) {
-        if (it->length() > 1)
-            it = m_routes.erase(it);
-        else
-            ++it;
-    }
-}
+		QnRoute postRoute = buildRouteTo(peerId, via);
+		if (!postRoute.isValid())
+			return QnRoute();
 
-QnRoute QnRouteBuilder::routeTo(const QnUuid &peerId) {
+		return preRoute + postRoute;
+	}
+
     QnRoute route = m_routes.value(peerId);
     if (route.isValid())
         return route;
@@ -69,14 +74,15 @@ QHash<QnUuid, QnRoute> QnRouteBuilder::routes() const {
     return m_routes;
 }
 
-QnRoute QnRouteBuilder::buildRouteTo(const QnUuid &peerId) {
+QnRoute QnRouteBuilder::buildRouteTo(const QnUuid &peerId, const QnUuid &from) {
     QHash<QnUuid, QnUuid> trace;
     QHash<QPair<QnUuid, QnUuid>, WeightedPoint> usedPoints;
     QQueue<QnUuid> points;
     QSet<QnUuid> checkedPoints;
+    QnUuid startId = from.isNull() ? m_startId : from;
 
-    points.enqueue(m_startId);
-    checkedPoints.insert(m_startId);
+    points.enqueue(startId);
+    checkedPoints.insert(startId);
 
     while (!points.isEmpty()) {
         QnUuid current = points.dequeue();
@@ -92,7 +98,7 @@ QnRoute QnRouteBuilder::buildRouteTo(const QnUuid &peerId) {
             if (id == peerId) {
                 QList<WeightedPoint> points;
                 QnUuid id = peerId;
-                while (id != m_startId) {
+                while (id != startId) {
                     QnUuid source = trace.value(id);
                     points.prepend(usedPoints.value(QPair<QnUuid, QnUuid>(source, id)));
                     id = source;

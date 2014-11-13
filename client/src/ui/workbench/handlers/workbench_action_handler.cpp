@@ -303,7 +303,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
     connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
-    connect(context()->instance<QnWorkbenchPanicWatcher>(),     SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
+    //connect(context()->instance<QnWorkbenchPanicWatcher>(),     SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
     connect(context()->instance<QnWorkbenchScheduleWatcher>(),  SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
     connect(context()->instance<QnWorkbenchUpdateWatcher>(),    SIGNAL(availableUpdateChanged()), this, SLOT(at_updateWatcher_availableUpdateChanged()));
 
@@ -312,7 +312,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
 
 
     /* Run handlers that update state. */
-    at_panicWatcher_panicModeChanged();
+    //at_panicWatcher_panicModeChanged();
     at_scheduleWatcher_scheduleEnabledChanged();
     at_updateWatcher_availableUpdateChanged();
 }
@@ -756,6 +756,11 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
                 QnResourceWidget *widget = context()->display()->widget(item);
                 if (widget && widget->hasAspectRatio()) {
                     qreal aspectRatio = widget->aspectRatio();
+
+                    QString customAspectRatio = widget->resource()->getProperty(QnMediaResource::customAspectRatioKey());
+                    if (!customAspectRatio.isEmpty())
+                        aspectRatio = customAspectRatio.toDouble();
+
                     if (QnAspectRatio::isRotated90(item->rotation()))
                         aspectRatio = 1.0 / aspectRatio;
                     midAspectRatio += aspectRatio;
@@ -863,30 +868,35 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
         return;
     }
 
-    QnResourceList errorResources; // TODO: #Elric check server cameras
-
-    // TODO: #Elric implement proper rollback in case of an error
+    QnVirtualCameraResourceList errorResources; // TODO: #Elric check server cameras
     for (auto itr = modifiedResources.begin(); itr != modifiedResources.end();) {
-        if (reply.uniqueIdList.contains((*itr)->getUniqueId())) {
-            (*itr)->setParentId(server->getId());
-            (*itr)->setPreferedServerId(server->getId());
-            ++itr;
-        }
-        else {
+        if (!reply.uniqueIdList.contains((*itr)->getUniqueId())) {
             errorResources << *itr;
             itr = modifiedResources.erase(itr);
+        } else {
+            ++itr;
         }
     }
 
     if(!errorResources.empty()) {
-        QnResourceListDialog::exec(
-            mainWindow(),
-            errorResources,
-            Qn::MainWindow_Tree_DragCameras_Help,
-            tr("Error"),
-            tr("Camera(s) cannot be moved to server '%1' because the server cannot discover it.", NULL, errorResources.size()).arg(server->getName()),
-            QDialogButtonBox::Ok
-            );
+        QDialogButtonBox::StandardButton result =
+            QnResourceListDialog::exec(
+                mainWindow(),
+                errorResources,
+                Qn::MainWindow_Tree_DragCameras_Help,
+                tr("Error"),
+                tr("Server %1 cannot discover these cameras so far. Are you sure you want to move them?", NULL, errorResources.size()).arg(server->getName()),
+                QDialogButtonBox::Yes | QDialogButtonBox::No
+                );
+        /* If user is sure, return invalid cameras back to list. */
+        if (result == QDialogButtonBox::Yes)
+            modifiedResources << errorResources;
+    }
+
+    const QnUuid serverId = server->getId();
+    for (auto camera: modifiedResources) {
+        camera->setParentId(serverId);
+        camera->setPreferedServerId(serverId);
     }
 
     if(!modifiedResources.empty()) {
@@ -1388,12 +1398,25 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     }
 
     /* Calculate size of the resulting matrix. */
-    qreal desiredAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
+    qreal desiredItemAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
     QnResourceWidget *widget = parameters.widget();
     if (widget && widget->hasAspectRatio())
-        desiredAspectRatio = widget->aspectRatio();
+        desiredItemAspectRatio = widget->aspectRatio();
 
-    const int matrixWidth = qMax(1, qRound(std::sqrt(desiredAspectRatio * itemCount)));
+    /* Calculate best size for layout cells. */
+    qreal desiredCellAspectRatio = desiredItemAspectRatio;
+    /* If the item is rotated, use its enclosing geometry to get best tiling. */
+    if (!qFuzzyIsNull(widget->item()->rotation())) {
+        QTransform rotationTransform;
+        rotationTransform.rotate(widget->item()->rotation());
+        QRectF rotated = rotationTransform.mapRect(widget->rect());
+        desiredCellAspectRatio = QnGeometry::aspectRatio(rotated);
+    }
+
+    /* Aspect ratio of the screen free space. */
+    qreal displayAspectRatio = QnGeometry::aspectRatio(display()->layoutBoundingGeometry());
+
+    const int matrixWidth = qMax(1, qRound(std::sqrt(displayAspectRatio * itemCount / desiredCellAspectRatio)));
 
     /* Construct and add a new layout. */
     QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
@@ -1418,11 +1441,12 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         item.resource.path = resource->getUniqueId();
         item.contrastParams = widget->item()->imageEnhancement();
         item.dewarpingParams = widget->item()->dewarpingParams();
+        item.rotation =  widget->item()->rotation();
         item.dataByRole[Qn::ItemPausedRole] = true;
         item.dataByRole[Qn::ItemSliderSelectionRole] = QVariant::fromValue<QnTimePeriod>(localPeriod);
         item.dataByRole[Qn::ItemSliderWindowRole] = QVariant::fromValue<QnTimePeriod>(period);
         item.dataByRole[Qn::ItemTimeRole] = localTime;
-        item.dataByRole[Qn::ItemAspectRatioRole] = desiredAspectRatio;  // set aspect ratio to make thumbnails load in all cases, see #2619
+        item.dataByRole[Qn::ItemAspectRatioRole] = desiredItemAspectRatio;  // set aspect ratio to make thumbnails load in all cases, see #2619
         item.dataByRole[Qn::TimePeriodsRole] = QVariant::fromValue<QnTimePeriodList>(localPeriods);
 
         layout->addItem(item);
@@ -1434,7 +1458,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState()));
     layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission));
     layout->setData(Qn::LayoutSearchStateRole, QVariant::fromValue<QnThumbnailsSearchState>(QnThumbnailsSearchState(period, step)));
-    layout->setData(Qn::LayoutCellAspectRatioRole, desiredAspectRatio);
+    layout->setData(Qn::LayoutCellAspectRatioRole, desiredCellAspectRatio);
     layout->setLocalRange(period);
 
     resourcePool()->addResource(layout);
@@ -2322,12 +2346,7 @@ void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
             if (checked)
                 val = Qn::PM_User;
             resource->setPanicMode(val);
-            connection2()->getMediaServerManager()->saveUserAttributes(
-                QnMediaServerUserAttributesList() << QnMediaServerUserAttributesPool::instance()->get(resource->getId()),
-                this,
-                [this, resource]( int reqID, ec2::ErrorCode errorCode ) {
-                    at_resources_saved( reqID, errorCode, QnResourceList() << resource );
-                });
+            propertyDictionary->saveParamsAsync(resource->getId());
         }
     }
 }

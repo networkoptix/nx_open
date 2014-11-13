@@ -332,9 +332,6 @@ void QnCachingCameraDataLoader::at_loader_ready(const QnAbstractCameraDataPtr &d
     case Qn::BookmarkTimePeriod:
         {
             Qn::TimePeriodContent timePeriodType = dataTypeToPeriod(dataType);
-
-            if (m_timePeriodCameraData[timePeriodType].contains(data))
-                return;
             m_timePeriodCameraData[timePeriodType].append(data);
 #ifdef QN_ENABLE_BOOKMARKS
             if (dataType == Qn::BookmarkTimePeriod)

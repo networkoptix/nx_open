@@ -22,7 +22,7 @@
 	</properties>
 
 	<build>
-        <finalName>${installer.name}-${release.version}.${buildNumber}-${box}-${arch}-${build.configuration}-${install.type}-beta</finalName>
+        <finalName>${installer.name}-${release.version}.${buildNumber}-${arch}-${build.configuration}-${install.type}-beta</finalName>
 		<directory>${arch}</directory>
 		<sourceDirectory>${basedir}</sourceDirectory>
 		<plugins>

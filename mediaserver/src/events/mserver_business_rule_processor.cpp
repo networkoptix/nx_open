@@ -20,6 +20,7 @@
 
 #include "mserver_business_rule_processor.h"
 #include "camera/get_image_helper.h"
+#include "core/resource_management/resource_properties.h"
 
 QnMServerBusinessRuleProcessor::QnMServerBusinessRuleProcessor(): QnBusinessRuleProcessor()
 {
@@ -78,9 +79,8 @@ bool QnMServerBusinessRuleProcessor::executePanicAction(const QnPanicBusinessAct
     Qn::PanicMode val = Qn::PM_None;
     if (action->getToggleState() == QnBusiness::ActiveState)
         val =  Qn::PM_BusinessEvents;
-    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
-    conn->setPanicModeSync(val);
     mediaServer->setPanicMode(val);
+    propertyDictionary->saveParams(mediaServer->getId());
     return true;
 }
 

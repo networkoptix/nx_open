@@ -83,7 +83,8 @@
 <ul class="serversList">
     <li ng-repeat="server in mediaServers" ng-class="{active:settings.id == server.id.replace('{','').replace('}','')}">
         <icon for="server.status!='Online'" on-true="warning-sign" title-true="Unavailable" ></icon>
-        <a ng-href="{{server.apiUrl}}" target="_blank">{{server.name}} ({{server.apiUrl.replace('http://','').replace('https://','')}})</a>
+        <a ng-if="server.status=='Online'" ng-href="{{server.apiUrl}}" target="_blank">{{server.name}} ({{server.apiUrl.replace('http://','').replace('https://','')}})</a>
+        <span ng-if="server.status!='Online'" >{{server.name}} ({{server.apiUrl.replace('http://','').replace('https://','')}})</span>
         {{settings.id == server.id.replace('{','').replace('}','')?'(current)':''}}
     </li>
 </ul>

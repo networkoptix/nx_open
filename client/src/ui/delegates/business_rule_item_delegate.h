@@ -47,6 +47,8 @@ class QnBusinessRuleItemDelegate: public QStyledItemDelegate, public QnWorkbench
 public:
     explicit QnBusinessRuleItemDelegate(QObject *parent = 0);
     ~QnBusinessRuleItemDelegate();
+
+    static int maximumWidth(int column, const QFontMetrics &metrics);
 protected:
     virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;

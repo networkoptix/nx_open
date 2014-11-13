@@ -115,11 +115,19 @@ void QnReconnectHelper::next() {
     m_currentUrl = bestInterfaceForServer(id);
 }
 
+void QnReconnectHelper::markServerAsInvalid(const QnMediaServerResourcePtr &server) {
+    if (!m_allServers.contains(server))
+        return;
+
+    QList<InterfaceInfo> &interfaces = m_interfacesByServer[server->getId()];
+    for (InterfaceInfo &item: interfaces)
+        item.ignored = true;
+}
+
 void QnReconnectHelper::updateInterfacesForServer(const QnUuid &id) {
     QList<InterfaceInfo> &interfaces = m_interfacesByServer[id];
-    for (InterfaceInfo &item: interfaces) {
+    for (InterfaceInfo &item: interfaces)
         item.online = false;
-    }
 
     auto modules = QnModuleFinder::instance()->foundModules();
     auto iter = boost::find_if(modules, [id](const QnModuleInformation &info){return info.id == id;});
@@ -127,9 +135,8 @@ void QnReconnectHelper::updateInterfacesForServer(const QnUuid &id) {
         return;
 
     if (iter->systemName != qnCommon->localSystemName()) {
-        for (InterfaceInfo &item: interfaces) {
+        for (InterfaceInfo &item: interfaces)
             item.ignored = true;
-        }
         return;
     }
 

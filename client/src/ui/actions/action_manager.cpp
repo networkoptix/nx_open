@@ -722,10 +722,8 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::SystemAdministrationAction).
         flags(Qn::Main | Qn::Tree).
         text(tr("System Administration...")).
-#ifdef _DEBUG
         flags(Qn::Main | Qn::Tree | Qn::GlobalHotkey).
         shortcut(tr("Ctrl+Alt+A")).
-#endif
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 

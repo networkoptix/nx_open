@@ -542,10 +542,9 @@ void setServerNameAndUrls(QnMediaServerResourcePtr server, const QString& myAddr
     server->setApiUrl(QString("http://%1:%2").arg(myAddress).arg(port));
 }
 
-QnMediaServerResourcePtr QnMain::findServer(ec2::AbstractECConnectionPtr ec2Connection, Qn::PanicMode* pm)
+QnMediaServerResourcePtr QnMain::findServer(ec2::AbstractECConnectionPtr ec2Connection)
 {
     QnMediaServerResourceList servers;
-    *pm = Qn::PM_None;
 
     while (servers.isEmpty() && !needToStop())
     {
@@ -559,7 +558,6 @@ QnMediaServerResourcePtr QnMain::findServer(ec2::AbstractECConnectionPtr ec2Conn
 
     for(const QnMediaServerResourcePtr& server: servers)
     {
-        *pm = server->getPanicMode();
         if (server->getId() == serverGuid())
             return server;
     }
@@ -890,14 +888,21 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         QMultiHash<QnUuid, QUrl> additionalAddressesById;
         QMultiHash<QnUuid, QUrl> ignoredAddressesById;
         for (const ec2::ApiDiscoveryData &data: discoveryDataList) {
+            additionalAddressesById.insert(data.id, data.url);
             if (data.ignore)
                 ignoredAddressesById.insert(data.id, data.url);
-            else
-                additionalAddressesById.insert(data.id, data.url);
         }
 
         for(const QnMediaServerResourcePtr &mediaServer: mediaServerList) {
-            mediaServer->setAdditionalUrls(additionalAddressesById.values(mediaServer->getId()));
+            QList<QHostAddress> addresses = mediaServer->getNetAddrList();
+            QList<QUrl> additionalAddresses = additionalAddressesById.values(mediaServer->getId());
+            for (auto it = additionalAddresses.begin(); it != additionalAddresses.end(); /* no inc */) {
+                if (it->port() == -1 && addresses.contains(QHostAddress(it->host())))
+                    it = additionalAddresses.erase(it);
+                else
+                    ++it;
+            }
+            mediaServer->setAdditionalUrls(additionalAddresses);
             mediaServer->setIgnoredUrls(ignoredAddressesById.values(mediaServer->getId()));
             messageProcessor->updateResource(mediaServer);
         }
@@ -1056,6 +1061,10 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
             messageProcessor->on_licenseChanged(license);
     }
 
+    if (m_mediaServer->getPanicMode() == Qn::PM_BusinessEvents) {
+        m_mediaServer->setPanicMode(Qn::PM_None);
+        propertyDictionary->saveParams(m_mediaServer->getId());
+    }
 }
 
 void QnMain::at_updatePublicAddress(const QHostAddress& publicIP)
@@ -1471,6 +1480,8 @@ void QnMain::run()
     if (needToStop())
         return;
 
+    if (MSSettings::roSettings()->value("disableTranscoding").toBool())
+        qnCommon->setTranscodeDisabled(true);
 
     QnResource::startCommandProc();
 
@@ -1504,15 +1515,13 @@ void QnMain::run()
 
     qnCommon->setModuleUlr(QString("http://%1:%2").arg(m_publicAddress.toString()).arg(m_universalTcpListener->getPort()));
 
-    Qn::PanicMode pm;
     while (m_mediaServer.isNull() && !needToStop())
     {
-        QnMediaServerResourcePtr server = findServer(ec2Connection, &pm);
+        QnMediaServerResourcePtr server = findServer(ec2Connection);
 
         if (!server) {
             server = QnMediaServerResourcePtr(new QnMediaServerResource(qnResTypePool));
             server->setId(serverGuid());
-            server->setPanicMode(pm);
             server->setMaxCameras(DEFAULT_MAX_CAMERAS);
         }
         server->setSystemInfo(QnSystemInformation::currentSystemInformation());

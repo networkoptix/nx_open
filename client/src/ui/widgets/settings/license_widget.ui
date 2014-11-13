@@ -199,6 +199,13 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
+      <widget class="QLabel" name="boundToLabel">
+       <property name="text">
+        <string>License will be bound to:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QLabel" name="serverIconLabel"/>
      </item>
      <item>

@@ -18,7 +18,7 @@ public:
 
     bool storeSound(const QString &filePath, int maxLengthMSecs = -1, const QString &customTitle = QString());
     bool updateTitle(const QString &filename, const QString &title);
-    void clear();
+    virtual void clear() override;
 
     QnNotificationSoundModel* persistentGuiModel() const;
 public slots:

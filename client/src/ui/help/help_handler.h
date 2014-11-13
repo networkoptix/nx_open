@@ -21,14 +21,13 @@ public:
 protected:
     QUrl urlForTopic(int topic) const;
 
-private slots:
-    void at_helpUrlDetector_urlFetched(const QString &helpUrl);
-    void at_helpUrlDetector_error();
-
 private:
     int m_topic;
     QString m_helpRoot;
     QString m_onlineHelpRoot;
+
+    /** If the online help could not be loaded, try again in some time. */
+    int m_helpRetryPeriodMSec;
 };
 
 

@@ -6,7 +6,16 @@ angular.module('webadminApp', [
     'ngSanitize',
     'ngRoute',
     'ui.bootstrap',
-    'tc.chartjs'
+    'tc.chartjs',
+
+
+    "com.2fdevs.videogular",
+    "com.2fdevs.videogular.plugins.controls",
+    "com.2fdevs.videogular.plugins.buffering",
+    "com.2fdevs.videogular.plugins.dash",
+    "com.2fdevs.videogular.plugins.poster"
+
+
 ]).config(function ($routeProvider) {
     $routeProvider
         .when('/settings', {
@@ -34,8 +43,8 @@ angular.module('webadminApp', [
             controller: 'MainCtrl'
         })
         .when('/login', {
-          templateUrl: 'views/login.html',
-          controller: 'LoginCtrl'
+            templateUrl: 'views/login.html',
+            controller: 'LoginCtrl'
         })
         .when('/advanced', {
             templateUrl: 'views/advanced.html',
@@ -43,7 +52,16 @@ angular.module('webadminApp', [
         })
         .when('/webclient', {
             templateUrl: 'views/webclient.html',
-            controller: 'WebclientCtrl'
+            controller: 'WebclientCtrl',
+            reloadOnSearch: false
+        }).when('/view/', {
+            templateUrl: 'views/view.html',
+            controller: 'ViewCtrl',
+            reloadOnSearch: false
+        }).when('/view/:cameraId', {
+            templateUrl: 'views/view.html',
+            controller: 'ViewCtrl',
+            reloadOnSearch: false
         })
         .when('/sdkeula', {
             templateUrl: 'views/sdkeula.html',
@@ -53,3 +71,18 @@ angular.module('webadminApp', [
             redirectTo: '/settings'
         });
 });
+
+
+angular.module('webadminApp').run(['$route', '$rootScope', '$location', function ($route, $rootScope, $location) {
+    var original = $location.path;
+    $location.path = function (path, reload) {
+        if (reload === false) {
+            var lastRoute = $route.current;
+            var un = $rootScope.$on('$locationChangeSuccess', function () {
+                $route.current = lastRoute;
+                un();
+            });
+        }
+        return original.apply($location, [path]);
+    };
+}]);

@@ -45,7 +45,6 @@ namespace ec2
             setResourceParams           = 204,  /*< ApiResourceParamWithRefDataList */
             getResourceTypes            = 205,  /*< ApiResourceTypeDataList*/
             getFullInfo                 = 206,  /*< ApiFullInfoData */
-            setPanicMode                = 207,  /*< ApiPanicModeData */
             setResourceParam            = 208,   /*< ApiResourceParamWithRefData */
             removeResourceParam         = 209,   /*< ApiResourceParamWithRefData */
             removeResourceParams        = 210,   /*< ApiResourceParamWithRefDataList */

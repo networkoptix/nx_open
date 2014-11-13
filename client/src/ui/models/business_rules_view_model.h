@@ -35,16 +35,22 @@ public:
 
     void clear();
     void addRules(const QnBusinessEventRuleList &businessRules);
-    void addRule(QnBusinessEventRulePtr rule);
+    void addRule(const QnBusinessEventRulePtr &rule);
 
-    void updateRule(QnBusinessEventRulePtr rule);
+    void updateRule(const QnBusinessEventRulePtr &rule);
 
     void deleteRule(QnBusinessRuleViewModel* ruleModel);
     void deleteRule(const QnUuid &id);
 
+    void forceColumnMinWidth(QnBusiness::Columns column, int width);
+
     QnBusinessRuleViewModel* getRuleModel(int row);
 protected:
     QnBusinessRuleViewModel* ruleModelById(const QnUuid &id);
+
+private:
+    QString columnTitle(QnBusiness::Columns column) const;
+    QSize columnSizeHint(QnBusiness::Columns column) const;
 
 private slots:
     void at_rule_dataChanged(QnBusinessRuleViewModel* source, QnBusiness::Fields fields);
@@ -53,7 +59,8 @@ private slots:
 
 private:
     QList<QnBusinessRuleViewModel *> m_rules;
-    QMap<int, QnBusiness::Fields> m_fieldsByColumn;
+    QMap<QnBusiness::Columns, QnBusiness::Fields> m_fieldsByColumn;
+    QMap<QnBusiness::Columns, int> m_forcedWidthByColumn;
 };
 
 

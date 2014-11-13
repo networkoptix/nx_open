@@ -7,11 +7,6 @@
 #include <business/business_action_parameters.h>
 #include <business/business_strings_helper.h>
 #include <business/business_resource_validation.h>
-//#include <business/events/motion_business_event.h>
-//#include <business/events/camera_input_business_event.h>
-//#include <business/actions/recording_business_action.h>
-//#include <business/actions/camera_output_business_action.h>
-//#include <business/actions/sendmail_business_action.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
@@ -93,6 +88,36 @@ QnBusinessRuleItemDelegate::QnBusinessRuleItemDelegate(QObject *parent):
 
 QnBusinessRuleItemDelegate::~QnBusinessRuleItemDelegate() {
 
+}
+
+int QnBusinessRuleItemDelegate::maximumWidth(int column, const QFontMetrics &metrics) {   
+    const qreal magicNumber = 1.1;
+    switch (column) {
+    case QnBusiness::EventColumn: 
+        {
+            auto eventWidth = [metrics, magicNumber](QnBusiness::EventType eventType){
+                return magicNumber * metrics.width(QnBusinessStringsHelper::eventName(eventType));
+            };
+            int result = -1;
+            for(QnBusiness::EventType eventType: QnBusiness::allEvents())
+                result = qMax(result, eventWidth(eventType));
+            return result;
+        }
+    case QnBusiness::ActionColumn: 
+        {
+            auto actionWidth = [metrics, magicNumber](QnBusiness::ActionType actionType){
+                return magicNumber * metrics.width(QnBusinessStringsHelper::actionName(actionType));
+            };
+            int result = -1;
+            for(QnBusiness::ActionType actionType: QnBusiness::allActions())
+                result = qMax(result, actionWidth(actionType));
+            return result;
+        }
+
+    default:
+        break;
+    }
+    return -1;
 }
 
 QSize QnBusinessRuleItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const {

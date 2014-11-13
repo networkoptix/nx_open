@@ -26,15 +26,6 @@ namespace {
         CheckingForUpdates,
         Updating
     };
-
-    QnUserResourcePtr getAdminUser() {
-        foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::user)) {
-            QnUserResourcePtr user = resource.staticCast<QnUserResource>();
-            if (user->getName() == lit("admin"))
-                return user;
-        }
-        return QnUserResourcePtr();
-    }
 }
 
 QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QnWorkbenchContext *context, QObject *parent) :
@@ -47,13 +38,14 @@ QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QnWorkbenchContext *c
 
 QnConnectToCurrentSystemTool::~QnConnectToCurrentSystemTool() {}
 
-void QnConnectToCurrentSystemTool::start(const QSet<QnUuid> &targets, const QString &password) {
+void QnConnectToCurrentSystemTool::start(const QSet<QnUuid> &targets, const QString &adminUser, const QString &password) {
     if (targets.isEmpty()) {
         finish(NoError);
         return;
     }
 
     m_targets = targets;
+    m_user = adminUser;
     m_password = password;
     m_restartTargets.clear();
     m_updateTargets.clear();
@@ -70,6 +62,14 @@ void QnConnectToCurrentSystemTool::start(const QSet<QnUuid> &targets, const QStr
 
 QSet<QnUuid> QnConnectToCurrentSystemTool::targets() const {
     return m_targets;
+}
+
+QString QnConnectToCurrentSystemTool::user() const {
+    return m_user;
+}
+
+QString QnConnectToCurrentSystemTool::password() const {
+    return m_password;
 }
 
 void QnConnectToCurrentSystemTool::cancel() {
@@ -92,7 +92,7 @@ void QnConnectToCurrentSystemTool::configureServer() {
     emit progressChanged(0);
     emit stateChanged(tr("Configuring server(s)"));
 
-    QnUserResourcePtr adminUser = getAdminUser();
+    QnUserResourcePtr adminUser = qnResPool->getAdministrator();
     if (!adminUser) {
         finish(ConfigurationFailed);
         return;
@@ -106,7 +106,7 @@ void QnConnectToCurrentSystemTool::configureServer() {
         QUrl url = server->apiConnection()->url();
         m_oldUrls.insert(id, url);
         url.setScheme(lit("http")); // TODO: #dklychkov Fix a bug in QNetworkAccessManager and use https
-        url.setUserName(lit("admin"));
+        url.setUserName(m_user);
         url.setPassword(m_password);
         server->apiConnection()->setUrl(url);
     }

@@ -452,11 +452,13 @@ void QnWorkbenchDisplay::initSceneView() {
     m_gridItem.data()->setLineWidth(100.0);
     m_gridItem.data()->setMapper(workbench()->mapper());
 
-    m_gridBackgroundItem = new QnGridBackgroundItem(NULL, context());
-    m_scene->addItem(gridBackgroundItem());
-    setLayer(gridBackgroundItem(), Qn::EMappingLayer);
-    gridBackgroundItem()->setOpacity(0.0);
-    gridBackgroundItem()->setMapper(workbench()->mapper());
+	if (!(m_lightMode & Qn::LightModeNoLayoutBackground)) {
+		m_gridBackgroundItem = new QnGridBackgroundItem(NULL, context());
+		m_scene->addItem(gridBackgroundItem());
+		setLayer(gridBackgroundItem(), Qn::EMappingLayer);
+		gridBackgroundItem()->setOpacity(0.0);
+		gridBackgroundItem()->setMapper(workbench()->mapper());
+	}
 
     /* Set up background */ 
     if (!(m_lightMode & Qn::LightModeNoSceneBackground)) {
@@ -725,7 +727,8 @@ void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout) {
     if (m_lightMode & Qn::LightModeNoLayoutBackground)
         return;
 
-    gridBackgroundItem()->update(layout);
+	if (gridBackgroundItem())
+		gridBackgroundItem()->update(layout);
 
     synchronizeSceneBounds();
     fitInView();

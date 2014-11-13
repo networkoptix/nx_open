@@ -84,7 +84,7 @@ module.exports = function (grunt) {
                     host: '10.0.2.229',
                     port: 7039,
                     headers: { //admin:123
-                        "Authorization": "Basic YWRtaW46MTIz"
+                        'Authorization': 'Basic YWRtaW46MTIz'
                     }
                  },
                  {
@@ -94,36 +94,42 @@ module.exports = function (grunt) {
                  }
                  */
 
-                //"Authorization": "Basic YWRtaW46MTIz" //admin:123
-                //"Authorization": "Basic dXNlcjoxMjM="//user:123
+                //'Authorization': 'Basic YWRtaW46MTIz' //admin:123
+                //'Authorization': 'Basic dXNlcjoxMjM='//user:123
 
                 //Total proxy
-                //{context: '/',host: '192.168.56.101',port: 7002,headers: {"Authorization": "Basic YWRtaW46MTIz"}},
+                //{context: '/',host: '192.168.56.101',port: 7002,headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
 
 
-                //Evgeniy
-                {context: '/api/',host: '192.168.56.101',port: 9000,headers: {"Authorization": "Basic YWRtaW46MTIz"}},
-                {context: '/ec2/',host: '192.168.56.101',port: 9000,headers: {"Authorization": "Basic YWRtaW46MTIz"}}
-
+                /*//Evgeniy
+                {context: '/api/',host: '192.168.56.101',port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
+                {context: '/ec2/',host: '192.168.56.101',port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
+                {context: '/media/',host: '192.168.56.101',port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
+                {context: '/hls/',host: '192.168.56.101',port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}}
+*/
                 //Sergey Yuldashev
-                //{context: '/api/', host: '10.0.2.203', port: 8001, headers: {"Authorization": "Basic YWRtaW46MTIz"}},
-                //{context: '/ec2/', host: '10.0.2.203', port: 8001, headers: {"Authorization": "Basic YWRtaW46MTIz"}}
-
+/*                {context: '/api/',      host: '10.0.2.203', port: 8901, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
+                {context: '/ec2/',      host: '10.0.2.203', port: 8901, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
+                {context: '/media/',    host: '10.0.2.203', port: 8901, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
+                {context: '/hls/',      host: '10.0.2.203', port: 8901, headers: {'Authorization': 'Basic YWRtaW46MTIz'}}
+*/
                 // Sasha
-                //{context: '/api/', host: '10.0.2.224', port: 7021, headers: {"Authorization": "Basic YWRtaW46MTIz"}},
-                //{context: '/ec2/', host: '10.0.2.224', port: 7021, headers: {"Authorization": "Basic YWRtaW46MTIz"}}
+                {context: '/api/',      host: '10.0.2.202', port: 7001, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
+                {context: '/ec2/',      host: '10.0.2.202', port: 7001, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
+                {context: '/media/',    host: '10.0.2.202', port: 7001, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
+                {context: '/hls/',      host: '10.0.2.202', port: 7001, headers: {'Authorization': 'Basic YWRtaW46MTIz'}}
 
                 //Roman Vasilenko  port: 7003,7004,7005,2006
-                //{context: '/api/', host: '10.0.2.231', port: 7003, headers: {"Authorization": "Basic YWRtaW46MTIz"}},
-                //{context: '/ec2/', host: '10.0.2.231', port: 7003, headers: {"Authorization": "Basic YWRtaW46MTIz"}}
+                //{context: '/api/', host: '10.0.2.231', port: 7003, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
+                //{context: '/ec2/', host: '10.0.2.231', port: 7003, headers: {'Authorization': 'Basic YWRtaW46MTIz'}}
 
                 //Daria
-                //{context: '/api/', host: '10.0.2.229', port: 7039, headers: {"Authorization": "Basic YWRtaW46MTIz"}},
-                //{context: '/ec2/', host: '10.0.2.229', port: 7039, headers: {"Authorization": "Basic YWRtaW46MTIz"}}
+                //{context: '/api/', host: '10.0.2.229', port: 7039, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
+                //{context: '/ec2/', host: '10.0.2.229', port: 7039, headers: {'Authorization': 'Basic YWRtaW46MTIz'}}
 
                 //Denis
-                //{context: '/api/', host: '10.0.2.182', port: 7001, headers: {"Authorization": "Basic YWRtaW46MTIz"}},
-                //{context: '/ec2/', host: '10.0.2.182', port: 7001, headers: {"Authorization": "Basic YWRtaW46MTIz"}}
+                //{context: '/api/', host: '10.0.2.182', port: 7001, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
+                //{context: '/ec2/', host: '10.0.2.182', port: 7001, headers: {'Authorization': 'Basic YWRtaW46MTIz'}}
             ],
             livereload: {
                 options: {
@@ -500,7 +506,7 @@ module.exports = function (grunt) {
         },
         protractor: {
             options: {
-                configFile: "protractor-conf.js", // Default config file
+                configFile: 'protractor-conf.js', // Default config file
                 keepAlive: true, // If false, the grunt process stops when the test fails.
                 noColor: false, // If true, protractor will not use colors in its output.
                 args: {
@@ -509,7 +515,7 @@ module.exports = function (grunt) {
             },
             all: {   // Grunt requires at least one target to run so you can simply put 'all: {}' here too.
                 options: {
-                    //configFile: "e2e.conf.js", // Target-specific config file
+                    //configFile: 'e2e.conf.js', // Target-specific config file
                     args: {} // Target-specific arguments
                 }
             },
@@ -557,7 +563,8 @@ module.exports = function (grunt) {
         'autoprefixer',
         'connect:test',
         'protractor_webdriver',
-        'protractor:all'
+        'protractor:all',
+        'newer:jshint'
         //'karma'
     ]);
 

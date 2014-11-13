@@ -181,7 +181,10 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
             {
                 getAuthInfo();
                 if (recursive)
+                {
+                    close();
                     return doPOST(requestStr, body, false);
+                }
                 else
                     return CL_HTTP_AUTH_REQUIRED;
             }
@@ -351,7 +354,10 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
                 getAuthInfo();
 
                 if (recursive)
+                {
+                    close();
                     return doGET(requestStr, false);
+                }
                 else
                     return CL_HTTP_AUTH_REQUIRED;
             }

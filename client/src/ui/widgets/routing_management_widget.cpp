@@ -14,10 +14,9 @@
 #include "ui/style/warning_style.h"
 #include "common/common_module.h"
 #include "utils/common/string.h"
+#include "utils/common/util.h"
 
 namespace {
-    const int defaultRtspPort = 7001;
-
     ec2::AbstractECConnectionPtr connection2() {
         return QnAppServerConnectionFactory::getConnection2();
     }
@@ -32,12 +31,127 @@ namespace {
             return naturalStringLessThan(leftString, rightString);
         }
     };
+
+    static void getAddresses(const QnMediaServerResourcePtr &server, QSet<QUrl> &autoUrls, QSet<QUrl> &additionalUrls, QSet<QUrl> &ignoredUrls) {
+        for (const QHostAddress &address: server->getNetAddrList()) {
+            QUrl url;
+            url.setScheme(lit("http"));
+            url.setHost(address.toString());
+            autoUrls.insert(url);
+        }
+
+        for (const QUrl &url: server->getAdditionalUrls())
+            additionalUrls.insert(url);
+
+        for (const QUrl &url: server->getIgnoredUrls())
+            ignoredUrls.insert(url);
+    }
 }
+
+class RoutingChange {
+public:
+    QHash<QUrl, bool> addresses;
+    QHash<QUrl, bool> ignoredAddresses;
+
+    void apply(QSet<QUrl> &additionalUrls, QSet<QUrl> &ignoredUrls) const {
+        processSet(additionalUrls, addresses);
+        processSet(ignoredUrls, ignoredAddresses);
+    }
+
+    void simplify(const QSet<QUrl> &autoUrls, const QSet<QUrl> &additionalUrls, const QSet<QUrl> &ignoredUrls, int port) {
+        for (auto it = addresses.begin(); it != addresses.end(); /* no inc */) {
+            QUrl url = it.key();
+            QUrl explicitUrl = url;
+            explicitUrl.setPort(port);
+
+            if (autoUrls.contains(url) || it.value() == (additionalUrls.contains(url) || additionalUrls.contains(explicitUrl)))
+                it = addresses.erase(it);
+            else
+                ++it;
+        }
+        for (auto it = ignoredAddresses.begin(); it != ignoredAddresses.end(); /* no inc */) {
+            QUrl url = it.key();
+            QUrl explicitUrl = url;
+            explicitUrl.setPort(port);
+
+            if (it.value() == (ignoredUrls.contains(url) || ignoredUrls.contains(explicitUrl)))
+                it = ignoredAddresses.erase(it);
+            else
+                ++it;
+        }
+    }
+
+    static RoutingChange diff(const QSet<QUrl> &additionalUrlsA, const QSet<QUrl> &ignoredUrlsA,
+                              const QSet<QUrl> &additionalUrlsB, const QSet<QUrl> &ignoredUrlsB)
+    {
+        RoutingChange change;
+
+        QSet<QUrl> removed = additionalUrlsA;
+        QSet<QUrl> added = additionalUrlsB;
+        for (auto it = removed.begin(); it != removed.end(); /* no inc */) {
+            QUrl url = *it;
+            QUrl implicitUrl = url;
+            implicitUrl.setPort(-1);
+
+            if (added.contains(url) || added.contains(implicitUrl)) {
+                added.remove(url);
+                added.remove(implicitUrl);
+                it = removed.erase(it);
+            } else {
+                ++it;
+            }
+        }
+
+        for (const QUrl &url: removed)
+            change.addresses.insert(url, false);
+        for (const QUrl &url: added)
+            change.addresses.insert(url, true);
+
+        removed = ignoredUrlsA;
+        added = ignoredUrlsB;
+        for (auto it = removed.begin(); it != removed.end(); /* no inc */) {
+            QUrl url = *it;
+            QUrl implicitUrl = url;
+            implicitUrl.setPort(-1);
+
+            if (added.contains(url) || added.contains(implicitUrl)) {
+                added.remove(url);
+                added.remove(implicitUrl);
+                it = removed.erase(it);
+            } else {
+                ++it;
+            }
+        }
+
+        for (const QUrl &url: removed)
+            change.ignoredAddresses.insert(url, false);
+        for (const QUrl &url: added)
+            change.ignoredAddresses.insert(url, true);
+
+        return change;
+    }
+
+private:
+    void processSet(QSet<QUrl> &set, const QHash<QUrl, bool> &hash) const {
+        for (auto it = hash.begin(); it != hash.end(); ++it) {
+            if (it.value())
+                set.insert(it.key());
+            else
+                set.remove(it.key());
+        }
+    }
+};
+
+class RoutingManagementChanges {
+public:
+    QHash<QnUuid, RoutingChange> changes;
+};
 
 QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::QnRoutingManagementWidget)
+    ui(new Ui::QnRoutingManagementWidget),
+    m_changes(new RoutingManagementChanges)
 {
     ui->setupUi(this);
     setWarningStyle(ui->warningLabel);
@@ -53,6 +167,10 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
 
     m_serverAddressesModel = new QnServerAddressesModel(this);
     m_sortedServerAddressesModel = new QnSortedServerAddressesModel(this);
+    m_sortedServerAddressesModel->setDynamicSortFilter(true);
+    m_sortedServerAddressesModel->setSortRole(Qt::DisplayRole);
+    m_sortedServerAddressesModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+    m_sortedServerAddressesModel->sort(QnServerAddressesModel::AddressColumn);
     m_sortedServerAddressesModel->setSourceModel(m_serverAddressesModel);
     ui->addressesView->setModel(m_sortedServerAddressesModel);
     ui->addressesView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -61,13 +179,14 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
 
     connect(ui->serversView->selectionModel(),  &QItemSelectionModel::currentRowChanged,        this,   &QnRoutingManagementWidget::at_serversView_currentIndexChanged);
     connect(ui->addressesView->selectionModel(),&QItemSelectionModel::currentRowChanged,        this,   &QnRoutingManagementWidget::updateUi);
-    connect(ui->addressesView,                  &QAbstractItemView::doubleClicked,              this,   &QnRoutingManagementWidget::at_addressesView_doubleClicked);
-    connect(m_serverAddressesModel,             &QnServerAddressesModel::ignoreChangeRequested, this,   &QnRoutingManagementWidget::at_serverAddressesModel_ignoreChangeRequested);
+    connect(m_serverAddressesModel,             &QnServerAddressesModel::dataChanged,           this,   &QnRoutingManagementWidget::at_serverAddressesModel_dataChanged);
+    connect(m_serverAddressesModel,             &QnServerAddressesModel::urlEditingFailed,      this,   [this](const QModelIndex &, int error) { reportUrlEditingError(error); });
     connect(ui->addButton,                      &QPushButton::clicked,                          this,   &QnRoutingManagementWidget::at_addButton_clicked);
     connect(ui->removeButton,                   &QPushButton::clicked,                          this,   &QnRoutingManagementWidget::at_removeButton_clicked);
 
     connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnRoutingManagementWidget::at_resourcePool_resourceAdded);
     connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   &QnRoutingManagementWidget::at_resourcePool_resourceRemoved);
+
 
     m_serverListModel->setResources(qnResPool->getResourcesWithFlag(Qn::server));
 
@@ -80,9 +199,53 @@ void QnRoutingManagementWidget::updateFromSettings() {
     ui->warningLabel->hide();
 }
 
-bool QnRoutingManagementWidget::confirm() {
+void QnRoutingManagementWidget::submitToSettings() {
     ui->warningLabel->hide();
-    return true;
+
+    updateFromModel();
+
+    for (auto it = m_changes->changes.begin(); it != m_changes->changes.end(); ++it) {
+        QnUuid serverId = it.key();
+        QnMediaServerResourcePtr server = qnResPool->getResourceById(serverId).dynamicCast<QnMediaServerResource>();
+        if (!server)
+            continue;
+
+        QSet<QUrl> autoUrls;
+        QSet<QUrl> additionalUrls;
+        QSet<QUrl> ignoredUrls;
+        getAddresses(server, autoUrls, additionalUrls, ignoredUrls);
+
+        it->simplify(autoUrls, additionalUrls, ignoredUrls, server->getPort());
+        QHash<QUrl, bool> additional = it->addresses;
+        QHash<QUrl, bool> ignored = it->ignoredAddresses;
+
+        for (auto it = additional.begin(); it != additional.end(); ++it) {
+            QUrl url = it.key();
+
+            if (it.value()) {
+                bool ign = false;
+                if (ignored.contains(url))
+                    ign = ignored.take(url);
+
+                connection2()->getDiscoveryManager()->addDiscoveryInformation(serverId, url, ign, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+            } else {
+                ignored.remove(url);
+                connection2()->getDiscoveryManager()->removeDiscoveryInformation(serverId, url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+            }
+        }
+        for (auto it = ignored.begin(); it != ignored.end(); ++it) {
+            QUrl url = it.key();
+
+            if (it.value())
+                connection2()->getDiscoveryManager()->addDiscoveryInformation(serverId, url, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+            else {
+                if (autoUrls.contains(url))
+                    connection2()->getDiscoveryManager()->removeDiscoveryInformation(serverId, url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+                else
+                    connection2()->getDiscoveryManager()->addDiscoveryInformation(serverId, url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+            }
+        }
+    }
 }
 
 void QnRoutingManagementWidget::updateModel() {
@@ -91,42 +254,47 @@ void QnRoutingManagementWidget::updateModel() {
         return;
     }
 
-    quint16 port = m_server->getPort();
+    QnUuid serverId = m_server->getId();
 
-    QList<QUrl> addresses;
-    foreach (const QHostAddress &address, m_server->getNetAddrList()) {
-        QUrl url;
-        url.setScheme(lit("http"));
-        url.setHost(address.toString());
-        url.setPort(port);
-        url.setPath(QString());
+    QSet<QUrl> autoUrls;
+    QSet<QUrl> additionalUrls;
+    QSet<QUrl> ignoredUrls;
+    getAddresses(m_server, autoUrls, additionalUrls, ignoredUrls);
 
-        addresses.append(url);
-    }
-
-    QList<QUrl> manualAddresses;
-    foreach (const QUrl &url, m_server->getAdditionalUrls()) {
-        QUrl actualUrl = url;
-        if (actualUrl.port() == -1)
-            actualUrl.setPort(port);
-        manualAddresses.append(actualUrl);
-    }
-
-    QSet<QUrl> ignoredAddresses;
-    foreach (const QUrl &url, m_server->getIgnoredUrls()) {
-        QUrl actualUrl = url;
-        if (actualUrl.port() == -1)
-            actualUrl.setPort(port);
-        ignoredAddresses.insert(actualUrl);
-    }
-
+    m_changes->changes.value(serverId).apply(additionalUrls, ignoredUrls);
 
     int row = ui->addressesView->currentIndex().row();
+    QUrl url = ui->addressesView->currentIndex().data(Qt::EditRole).toUrl();
 
-    m_serverAddressesModel->resetModel(addresses, manualAddresses, ignoredAddresses);
+    m_serverAddressesModel->resetModel(autoUrls.toList(), additionalUrls.toList(), ignoredUrls, m_server->getPort());
+
+    int rowCount = m_serverAddressesModel->rowCount();
+    for (int i = 0; i < rowCount; i++) {
+        QModelIndex index = m_serverAddressesModel->index(i, QnServerAddressesModel::AddressColumn);
+        if (m_serverAddressesModel->data(index, Qt::EditRole).toUrl() == url) {
+            row = m_sortedServerAddressesModel->mapFromSource(index).row();
+            break;
+        }
+    }
 
     if (row < m_sortedServerAddressesModel->rowCount())
         ui->addressesView->setCurrentIndex(m_sortedServerAddressesModel->index(row, 0));
+}
+
+void QnRoutingManagementWidget::updateFromModel() {
+    if (!m_server)
+        return;
+
+    QnUuid serverId = m_server->getId();
+
+    QSet<QUrl> autoUrls;
+    QSet<QUrl> additionalUrls;
+    QSet<QUrl> ignoredUrls;
+    getAddresses(m_server, autoUrls, additionalUrls, ignoredUrls);
+    m_changes->changes[serverId] = RoutingChange::diff(
+                                       additionalUrls, ignoredUrls,
+                                       QSet<QUrl>::fromList(m_serverAddressesModel->manualAddressList()),
+                                       m_serverAddressesModel->ignoredAddresses());
 }
 
 void QnRoutingManagementWidget::updateUi() {
@@ -146,23 +314,24 @@ void QnRoutingManagementWidget::at_addButton_clicked() {
 
     QUrl url = QUrl::fromUserInput(urlString);
     if (!url.isValid()) {
-        QMessageBox::critical(this, tr("Error"), tr("You have entered an invalid URL."));
+        reportUrlEditingError(QnServerAddressesModel::InvalidUrl);
         return;
     }
 
-    if (url.port() == -1)
-        url.setPort(m_server ? m_server->getPort() : defaultRtspPort);
+    if (url.port() == m_server->getPort())
+        url.setPort(-1);
 
-    QList<QUrl> urls = m_server->getAdditionalUrls();
-    if ((m_server->getNetAddrList().contains(QHostAddress(url.host())) && url.port() == m_server->getPort()) || urls.contains(url)) {
-        QMessageBox::warning(this, tr("Warning"), tr("This URL is already in the address list."));
+    QUrl explicitUrl = url;
+    explicitUrl.setPort(m_server->getPort());
+    if (m_serverAddressesModel->addressList().contains(url) ||
+        m_serverAddressesModel->manualAddressList().contains(url) ||
+        m_serverAddressesModel->manualAddressList().contains(explicitUrl))
+    {
+        reportUrlEditingError(QnServerAddressesModel::ExistingUrl);
         return;
     }
 
-    urls.append(url);
-
-    connection2()->getDiscoveryManager()->addDiscoveryInformation(m_server->getId(), url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-    m_server->setAdditionalUrls(urls);
+    m_serverAddressesModel->addAddress(url);
 }
 
 void QnRoutingManagementWidget::at_removeButton_clicked() {
@@ -175,20 +344,10 @@ void QnRoutingManagementWidget::at_removeButton_clicked() {
     if (!m_server)
         return;
 
-    QUrl url(index.data(Qt::EditRole).toUrl());
-    QList<QUrl> urls = m_server->getAdditionalUrls();
-    if (!urls.removeOne(url))
-        return;
+    m_serverAddressesModel->removeAddressAtIndex(index);
 
-    connection2()->getDiscoveryManager()->removeDiscoveryInformation(m_server->getId(), url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-    m_server->setAdditionalUrls(urls);
-
-    if (m_sortedServerAddressesModel->rowCount() > 0) {
-        ui->addressesView->setCurrentIndex(m_sortedServerAddressesModel->index(
-                                               qMin(currentIndex.row(), m_sortedServerAddressesModel->rowCount() - 1), currentIndex.column()));
-    } else {
-        ui->addressesView->setCurrentIndex(QModelIndex());
-    }
+    int row = qMin(m_sortedServerAddressesModel->rowCount() - 1, currentIndex.row());
+    ui->addressesView->setCurrentIndex(m_sortedServerAddressesModel->index(row, 0));
 }
 
 void QnRoutingManagementWidget::at_serversView_currentIndexChanged(const QModelIndex &current, const QModelIndex &previous) {
@@ -197,6 +356,7 @@ void QnRoutingManagementWidget::at_serversView_currentIndexChanged(const QModelI
     if (m_server)
         m_server->disconnect(this);
 
+    updateFromModel();
 
     QnMediaServerResourcePtr server = current.data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnMediaServerResource>();
     if (server == m_server)
@@ -212,82 +372,28 @@ void QnRoutingManagementWidget::at_serversView_currentIndexChanged(const QModelI
     }
 }
 
-void QnRoutingManagementWidget::at_addressesView_doubleClicked(const QModelIndex &index) {
-    if (!index.isValid())
-        return;
-
-    if (index.column() != QnServerAddressesModel::AddressColumn)
-        return;
-
+void QnRoutingManagementWidget::at_serverAddressesModel_dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight) {
     if (!m_server)
         return;
 
-    if (!m_serverAddressesModel->isManualAddress(m_sortedServerAddressesModel->mapToSource(index)))
+    if (topLeft != bottomRight || topLeft.column() != QnServerAddressesModel::InUseColumn)
         return;
 
-    QUrl oldUrl = index.data(Qt::EditRole).toUrl();
-
-    QString urlString = QInputDialog::getText(this, tr("Edit URL"), tr("URL"), QLineEdit::Normal, oldUrl.toString());
-    if (urlString.isEmpty())
-        return;
-
-    QUrl url = QUrl::fromUserInput(urlString);
-    if (!url.isValid()) {
-        QMessageBox::critical(this, tr("Error"), tr("You have entered an invalid URL."));
-        return;
+    if (topLeft.data(Qt::CheckStateRole).toInt() == Qt::Unchecked) {
+        if (!m_serverAddressesModel->isManualAddress(topLeft))
+            ui->warningLabel->show();
     }
-
-    if (url.port() == -1)
-        url.setPort(defaultRtspPort);
-
-    if (oldUrl == url)
-        return;
-
-    if (m_server->getNetAddrList().contains(QHostAddress(url.host())) && url.port() == m_server->getPort()) {
-        QMessageBox::warning(this, tr("Warning"), tr("This URL is already in the address list."));
-        return;
-    }
-
-    QList<QUrl> urls = m_server->getAdditionalUrls();
-    urls.removeOne(oldUrl);
-    urls.append(url);
-    m_server->setAdditionalUrls(urls);
-
-    connection2()->getDiscoveryManager()->removeDiscoveryInformation(m_server->getId(), oldUrl, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-    connection2()->getDiscoveryManager()->addDiscoveryInformation(m_server->getId(), url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
-void QnRoutingManagementWidget::at_serverAddressesModel_ignoreChangeRequested(const QString &address, bool ignore) {
-    if (!m_server)
-        return;
-
-    int port = QUrl(m_server->getApiUrl()).port();
-    if (port == -1)
-        port = defaultRtspPort;
-
-    QUrl url(address);
-    if (m_server->getNetAddrList().contains(QHostAddress(url.host())) && url.port() == port)
-        url.setPort(-1);
-
-    QList<QUrl> ignoredUrls = m_server->getIgnoredUrls();
-
-    if (ignore) {
-        if (ignoredUrls.contains(url))
-            return;
-        ignoredUrls.append(url);
-        connection2()->getDiscoveryManager()->addDiscoveryInformation(m_server->getId(), url, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-        if (url.port() == -1)
-            ui->warningLabel->show();
-    } else {
-        if (!ignoredUrls.removeOne(url))
-            return;
-
-        if (url.port() == -1)
-            connection2()->getDiscoveryManager()->removeDiscoveryInformation(m_server->getId(), url, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-        else
-            connection2()->getDiscoveryManager()->addDiscoveryInformation(m_server->getId(), url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+void QnRoutingManagementWidget::reportUrlEditingError(int error) {
+    switch (error) {
+    case QnServerAddressesModel::InvalidUrl:
+        QMessageBox::critical(this, tr("Error"), tr("You have entered an invalid URL."));
+        break;
+    case QnServerAddressesModel::ExistingUrl:
+        QMessageBox::warning(this, tr("Warning"), tr("This URL is already in the address list."));
+        break;
     }
-    m_server->setIgnoredUrls(ignoredUrls);
 }
 
 void QnRoutingManagementWidget::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
@@ -299,8 +405,11 @@ void QnRoutingManagementWidget::at_resourcePool_resourceAdded(const QnResourcePt
 }
 
 void QnRoutingManagementWidget::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
-    if (resource->hasFlags(Qn::server))
-        m_serverListModel->removeResource(resource);
+    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    if (!server || server->getStatus() == Qn::Incompatible)
+        return;
+
+    m_serverListModel->removeResource(resource);
 
     if (m_server == resource)
         updateModel();

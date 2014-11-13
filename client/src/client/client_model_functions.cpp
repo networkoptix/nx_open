@@ -1,7 +1,9 @@
+
 #include <utils/common/model_functions.h>
 
-#include "client_globals.h"
-#include "client_model_types.h"
+#include <client/client_globals.h>
+#include <client/client_meta_types.h>
+#include <client/client_model_types.h>
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::ClientSkin,
     (Qn::LightSkin, "LightSkin")

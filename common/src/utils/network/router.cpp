@@ -7,10 +7,6 @@
 #include "route_builder.h"
 #include "module_finder.h"
 
-namespace {
-    const int refreshInterval = 2 * 60 * 1000; // 2 minutes
-}
-
 QnRouter::QnRouter(QnModuleFinder *moduleFinder, bool passive, QObject *parent) :
     QObject(parent),
     m_mutex(QMutex::Recursive),
@@ -25,10 +21,6 @@ QnRouter::QnRouter(QnModuleFinder *moduleFinder, bool passive, QObject *parent) 
     connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoAdded,    this,   &QnRouter::at_runtimeInfoManager_runtimeInfoAdded);
     connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoChanged,  this,   &QnRouter::at_runtimeInfoManager_runtimeInfoChanged);
     connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoRemoved,  this,   &QnRouter::at_runtimeInfoManager_runtimeInfoRemoved);
-
-    QTimer *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout, this, &QnRouter::at_refreshTimer_timeout);
-    timer->start(refreshInterval);
 }
 
 QnRouter::~QnRouter() {}
@@ -43,9 +35,9 @@ QHash<QnUuid, QnRoute> QnRouter::routes() const {
     return m_routeBuilder->routes();
 }
 
-QnRoute QnRouter::routeTo(const QnUuid &id) const {
+QnRoute QnRouter::routeTo(const QnUuid &id, const QnUuid &via) const {
     QMutexLocker lk(&m_mutex);
-    return m_routeBuilder->routeTo(id);
+    return m_routeBuilder->routeTo(id, via);
 }
 
 QnRoute QnRouter::routeTo(const QString &host, quint16 port) const {
@@ -65,6 +57,11 @@ QnUuid QnRouter::whoIs(const QString &host, quint16 port) const {
 
 void QnRouter::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url) {
     Endpoint endpoint(moduleInformation.id, url.host(), url.port());
+
+    Q_ASSERT_X(!endpoint.id.isNull(), "Endpoint cannot has null id!", Q_FUNC_INFO);
+
+    if (endpoint.id.isNull())
+        return;
 
     if (!addConnection(qnCommon->moduleGUID(), endpoint))
         return;
@@ -134,11 +131,6 @@ void QnRouter::at_runtimeInfoManager_runtimeInfoChanged(const QnPeerRuntimeInfo 
 void QnRouter::at_runtimeInfoManager_runtimeInfoRemoved(const QnPeerRuntimeInfo &data) {
     for (const ec2::ApiConnectionData &connection: data.data.availableConnections)
         removeConnection(data.uuid, Endpoint(connection.peerId, connection.host, connection.port));
-}
-
-void QnRouter::at_refreshTimer_timeout() {
-    QMutexLocker lk(&m_mutex);
-    m_routeBuilder->clear();
 }
 
 bool QnRouter::addConnection(const QnUuid &id, const QnRouter::Endpoint &endpoint) {

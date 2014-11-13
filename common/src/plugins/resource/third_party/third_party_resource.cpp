@@ -44,6 +44,9 @@ QnThirdPartyResource::QnThirdPartyResource(
 {
     setVendor( discoveryManager.getVendorName() );
     setDefaultAuth(QString::fromUtf8(camInfo.defaultLogin), QString::fromUtf8(camInfo.defaultPassword));
+
+    if( m_camManager )
+        m_cameraManager3 = (nxcip::BaseCameraManager3*)m_camManager->getRef()->queryInterface( nxcip::IID_BaseCameraManager3 );
 }
 
 QnThirdPartyResource::~QnThirdPartyResource()

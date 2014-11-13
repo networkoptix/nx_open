@@ -603,7 +603,6 @@ void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData &
     dst.networkAddresses = serializeNetAddrList(src->getNetAddrList());
     dst.apiUrl = src->getApiUrl();
     dst.flags = src->getServerFlags();
-    dst.panicMode = src->getPanicMode();
     dst.version = src->getVersion().toString();
     dst.systemInfo = src->getSystemInfo().toString();
     dst.authKey = src->getAuthKey();
@@ -619,7 +618,6 @@ void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &
     dst->setApiUrl(src.apiUrl);
     dst->setNetAddrList(resNetAddrList);
     dst->setServerFlags(src.flags);
-    dst->setPanicMode(src.panicMode);
     dst->setVersion(QnSoftwareVersion(src.version));
     dst->setSystemInfo(QnSystemInformation(src.systemInfo));
     dst->setAuthKey(src.authKey);
