@@ -1,5 +1,5 @@
-#ifndef PACIDAL_DEVREADER_H
-#define PACIDAL_DEVREADER_H
+#ifndef ITE_DEVREADER_H
+#define ITE_DEVREADER_H
 
 #include <ctime>
 #include <vector>
@@ -28,7 +28,7 @@ namespace
 }
 #endif
 
-namespace pacidal
+namespace ite
 {
     //!
     class Timer
@@ -71,9 +71,8 @@ namespace pacidal
     class DevReader
     {
     public:
-        DevReader(PacidalStream* s, size_t size)
-        :
-            m_stream(s),
+        DevReader(It930Stream * s, size_t size)
+        :   m_stream(s),
             m_size(size),
             m_pos(0),
             m_timerStarted( false ),
@@ -127,7 +126,7 @@ namespace pacidal
         bool timerAlive() const { return m_timerStarted && !m_timerFinished; }
 
     private:
-        PacidalStream * m_stream;
+        It930Stream * m_stream;
         std::vector<uint8_t> m_buf;
         const size_t m_size;
         size_t m_pos;
@@ -324,4 +323,4 @@ namespace pacidal
     };
 }
 
-#endif //PACIDAL_DEVREADER_H
+#endif // ITE_DEVREADER_H

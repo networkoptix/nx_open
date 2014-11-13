@@ -4,7 +4,7 @@
 #include "stream_reader.h"
 #include "video_packet.h"
 
-namespace pacidal
+namespace ite
 {
     DEFAULT_REF_COUNTER(StreamReader)
 
@@ -20,7 +20,7 @@ namespace pacidal
     {
     }
 
-    void* StreamReader::queryInterface( const nxpl::NX_GUID& interfaceID )
+    void * StreamReader::queryInterface( const nxpl::NX_GUID& interfaceID )
     {
         if (interfaceID == nxcip::IID_StreamReader)
         {

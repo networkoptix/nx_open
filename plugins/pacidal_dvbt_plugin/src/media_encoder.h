@@ -1,5 +1,5 @@
-#ifndef PACIDAL_MEDIA_ENCODER_H
-#define PACIDAL_MEDIA_ENCODER_H
+#ifndef ITE_MEDIA_ENCODER_H
+#define ITE_MEDIA_ENCODER_H
 
 #include <memory>
 
@@ -9,7 +9,7 @@
 #include "stream_reader.h"
 
 
-namespace pacidal
+namespace ite
 {
     /*!
         \note Delegates reference counting to \a AxisCameraManager instance
@@ -52,4 +52,4 @@ namespace pacidal
     };
 }
 
-#endif  //PACIDAL_MEDIA_ENCODER_H
+#endif // ITE_MEDIA_ENCODER_H

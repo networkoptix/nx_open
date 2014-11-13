@@ -3,6 +3,7 @@
 
 #include <dirent.h>
 #include <string>
+#include <set>
 
 //#include <utils/common/log.h>
 
@@ -13,15 +14,15 @@ extern "C"
 #ifdef _WIN32
     __declspec(dllexport)
 #endif
-    nxpl::PluginInterface* createNXPluginInstance()
+    nxpl::PluginInterface * createNXPluginInstance()
     {
-        return new pacidal::DiscoveryManager();
+        return new ite::DiscoveryManager();
     }
 }
 
 namespace
 {
-    static const char* VENDOR_NAME = "Pacidal";
+    static const char* VENDOR_NAME = "it930x";
 #if 0
     void debugPrintInfo(const nxcip::CameraInfo& info)
     {
@@ -35,16 +36,19 @@ namespace
 #endif
 }
 
-namespace pacidal
+namespace ite
 {
     DEFAULT_REF_COUNTER(DiscoveryManager)
 
-    DiscoveryManager* DiscoveryManager::Instance;
+    DiscoveryManager * DiscoveryManager::Instance;
 
     DiscoveryManager::DiscoveryManager()
-    :
-        m_refManager( this )
+    :   m_refManager( this ),
+        comPort_("/dev/tnt0", 9600)
     {
+        ComPort::Instance = &comPort_;
+        rcShell_.startRcvThread();
+
         Instance = this;
     }
 
@@ -56,7 +60,7 @@ namespace pacidal
         Instance = nullptr;
     }
 
-    void* DiscoveryManager::queryInterface( const nxpl::NX_GUID& interfaceID )
+    void * DiscoveryManager::queryInterface( const nxpl::NX_GUID& interfaceID )
     {
         if (interfaceID == nxcip::IID_CameraDiscoveryManager)
         {
@@ -77,56 +81,61 @@ namespace pacidal
         strcpy( buf, VENDOR_NAME );
     }
 
-    int DiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* /*localInterfaceIPAddr*/ )
+    int DiscoveryManager::findCameras(nxcip::CameraInfo * cameras, const char * /*localInterfaceIPAddr*/)
     {
-        unsigned cameraNum = 0;
+        if (! ComPort::Instance->isOK())
+            return nxcip::NX_IO_ERROR;
 
-        DIR* dir = ::opendir( "/dev" );
-        if (dir != NULL)
+        // FIXME
+        static bool firstTime = true;
+        if (firstTime)
         {
-            struct dirent * ent;
-            while ((ent = ::readdir( dir )) != NULL)
+            firstTime = false;
+            updateRxDevices();
+            updateTxLinks();
+        }
+
+        unsigned cameraNum = 0;
+        std::set<unsigned> foundTx;
+
+        for (auto it = m_txLinks.begin(); it != m_txLinks.end(); ++it)
+        {
+            unsigned txID = it->second.txID;
+            if (foundTx.find(txID) != foundTx.end())
+                continue;
+
+            std::string strTxID = RxDevice::id2str(txID);
+
+            nxcip::CameraInfo& info = cameras[cameraNum];
+
+            std::string strURL = strTxID + "-" + RxDevice::id2str(it->second.frequency);
+            memset( &info, 0, sizeof(nxcip::CameraInfo) );
+            strncpy( info.url, strURL.c_str(), std::min(strURL.size(), sizeof(nxcip::CameraInfo::url)-1) );
+            strncpy( info.uid, strTxID.c_str(), std::min(strTxID.size(), sizeof(nxcip::CameraInfo::uid)-1) );
+
+            CameraManager * cam = nullptr;
+
             {
-                nxcip::CameraInfo& info = cameras[cameraNum];
+                std::lock_guard<std::mutex> lock( m_contentMutex ); // LOCK
 
-                std::string file( ent->d_name );
-                if (file.find( CameraManager::DEVICE_PATTERN ) != std::string::npos)
+                auto it = m_cameras.find(txID);
+                if (it == m_cameras.end())
                 {
-                    memset( &info, 0, sizeof(nxcip::CameraInfo) );
-                    strncpy( info.url, file.c_str(), std::min(file.size(), sizeof(nxcip::CameraInfo::url)-1) );
-                    strncpy( info.uid, file.c_str(), std::min(file.size(), sizeof(nxcip::CameraInfo::uid)-1) );
-
-                    unsigned id = CameraManager::cameraId( info );
-                    CameraManager * cam = nullptr;
-
-                    {
-                        std::lock_guard<std::mutex> lock( m_contentMutex ); // LOCK
-
-                        auto it = m_cameras.find(id);
-                        if (it == m_cameras.end())
-                        {
-                            // can't avoid lock for ctor
-                            auto sp = std::make_shared<CameraManager>( info, false ); // create CameraManager
-                            m_cameras[id] = sp;
-                            cam = sp.get();
-                            cam->addRef();
-                        }
-                        else
-                            cam = it->second.get();
-                    }
-
-                    if (cam)
-                    {
-                        cam->getCameraInfo( &info );
-                        if (!cam->hasEncoders())
-                            cam->reload();
-                    }
-
-                    if (cam && cam->hasEncoders())
-                        ++cameraNum;
+                    auto sp = std::make_shared<CameraManager>( info ); // create CameraManager
+                    m_cameras[txID] = sp;
+                    cam = sp.get();
+                    cam->addRef();
                 }
+                else
+                    cam = it->second.get();
             }
-            ::closedir( dir );
+
+            if (cam)
+            {
+                foundTx.insert(txID);
+                //cam->getCameraInfo( &info );
+                ++cameraNum;
+            }
         }
 
         return cameraNum;
@@ -151,28 +160,35 @@ namespace pacidal
         return nxcip::NX_NO_ERROR;
     }
 
-    nxcip::BaseCameraManager* DiscoveryManager::createCameraManager( const nxcip::CameraInfo& info )
+    nxcip::BaseCameraManager * DiscoveryManager::createCameraManager( const nxcip::CameraInfo& info )
     {
-        unsigned id = CameraManager::cameraId( info );
+        unsigned txID = RxDevice::str2id(info.uid);
         CameraManager* cam = nullptr;
 
         {
             std::lock_guard<std::mutex> lock( m_contentMutex ); // LOCK
 
-            auto it = m_cameras.find(id);
+            auto it = m_cameras.find(txID);
             if (it != m_cameras.end())
+            {
                 cam = it->second.get();
+                if (!cam->rxDevice())
+                    cam->setRxDevice( getRx4Tx(cam->txID()) );
+            }
+
 
             // before findCameras() on restart, use saved info from DB
             if (!cam)
             {
-                // can't avoid lock for ctor
-                auto sp = std::make_shared<CameraManager>( info /*, false*/ );  // create CameraManager
-                m_cameras[id] = sp;
+                auto sp = std::make_shared<CameraManager>( info );  // create CameraManager
+                m_cameras[txID] = sp;
                 cam = sp.get();
                 cam->addRef();
             }
         }
+
+        if (cam && cam->rxDevice() && !cam->hasEncoders())
+            cam->reload();
 
         if (cam)
             cam->addRef();
@@ -183,5 +199,114 @@ namespace pacidal
     {
         *count = 0;
         return nxcip::NX_NO_ERROR;
+    }
+
+    void DiscoveryManager::getRxDevNames(std::vector<std::string>& devs)
+    {
+        devs.clear();
+
+        DIR * dir = ::opendir( "/dev" );
+        if (dir != NULL)
+        {
+            struct dirent * ent;
+            while ((ent = ::readdir( dir )) != NULL)
+            {
+                std::string file( ent->d_name );
+                if (file.find( RxDevice::DEVICE_PATTERN ) != std::string::npos)
+                    devs.push_back(file);
+            }
+            ::closedir( dir );
+        }
+    }
+
+    void DiscoveryManager::updateRxDevices()
+    {
+        std::vector<std::string> rxDevs;
+        getRxDevNames(rxDevs);
+
+        for (size_t i = 0; i < rxDevs.size(); ++i)
+        {
+            unsigned id = RxDevice::dev2id(rxDevs[i]);
+
+            std::lock_guard<std::mutex> lock( m_contentMutex ); // LOCK
+
+            auto it = m_rxDevs.find(id);
+            if (it == m_rxDevs.end())
+            {
+                m_rxDevs[id] = std::make_shared<RxDevice>(id);
+            }
+        }
+    }
+
+    // TODO: reduce time
+    void DiscoveryManager::updateTxLinks()
+    {
+        std::vector<IDsLink> links;
+        RxDevicePtr rxDev;
+
+        for (size_t i = 0; i < m_rxDevs.size(); ++i)
+        {
+            {
+                std::lock_guard<std::mutex> lock( m_contentMutex ); // LOCK
+
+                rxDev = m_rxDevs[i];
+            }
+
+            if (rxDev->isLocked())
+            {
+                rcShell_.getDevIDsActivity(links);
+            }
+            else
+            {
+                rxDev->open();
+
+                for (size_t j = 0; j < DeviceInfo::CHANNELS_NUM; ++j)
+                {
+                    // TODO: self device mutex
+                    std::lock_guard<std::mutex> lock( m_contentMutex ); // LOCK
+
+                    rxDev->lockF( DeviceInfo::chanFrequency(j) );
+                    rcShell_.getDevIDsActivity(links);
+                    rxDev->unlockF();
+                }
+
+                rxDev->close();
+            }
+        }
+
+        std::lock_guard<std::mutex> lock( m_contentMutex ); // LOCK
+
+        for (size_t i = 0; i < links.size(); ++i)
+        {
+            unsigned txID = links[i].txID;
+
+            auto it = m_txLinks.find(txID);
+            if (it == m_txLinks.end() || it->second.rxID != links[i].rxID)
+                m_txLinks.insert( std::make_pair(txID, links[i]) );
+        }
+    }
+
+    RxDevicePtr DiscoveryManager::getRx4Tx(unsigned txID)
+    {
+        // already ander lock: createCameraManager (L) -> reload -> getRx4Tx
+
+        //std::lock_guard<std::mutex> lock( m_contentMutex ); // LOCK
+
+        auto range = m_txLinks.equal_range(txID);
+        for (auto it = range.first; it != range.second; ++it)
+        {
+            auto itRx = m_rxDevs.find(it->second.rxID);
+            RxDevicePtr dev = itRx->second;
+
+            if (dev->isLocked()) // device is reading another channel
+                continue;
+
+            if (!dev->isOpen())
+                dev->open();
+            dev->lockF(it->second.frequency);
+            return dev;
+        }
+
+        return RxDevicePtr();
     }
 }

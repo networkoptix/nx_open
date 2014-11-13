@@ -1,5 +1,5 @@
-#ifndef LIBAV_VIDEO_PACKET_H
-#define LIBAV_VIDEO_PACKET_H
+#ifndef ITE_VIDEO_PACKET_H
+#define ITE_VIDEO_PACKET_H
 
 #include <memory>
 
@@ -8,23 +8,19 @@
 
 #include "ref_counter.h"
 
-namespace pacidal
+namespace ite
 {
     //!
-    class VideoPacket
-    :
-        public nxcip::VideoDataPacket
+    class VideoPacket : public nxcip::VideoDataPacket
     {
         DEF_REF_COUNTER
 
     public:
         VideoPacket()
-        :
-            m_refManager( this ),
+        :   m_refManager( this ),
             m_data( nullptr ),
             m_size( 0 )
-        {
-        }
+        {}
 
         VideoPacket(const uint8_t* data, unsigned size);
         virtual ~VideoPacket();
@@ -67,4 +63,4 @@ namespace pacidal
     };
 }
 
-#endif  //LIBAV_VIDEO_PACKET_H
+#endif // ITE_VIDEO_PACKET_H

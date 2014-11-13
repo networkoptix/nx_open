@@ -1,5 +1,5 @@
-#ifndef PACIDAL_STREAM_READER_H
-#define PACIDAL_STREAM_READER_H
+#ifndef ITE_STREAM_READER_H
+#define ITE_STREAM_READER_H
 
 #include <atomic>
 
@@ -9,12 +9,10 @@
 #include "ref_counter.h"
 #include "camera_manager.h"
 
-namespace pacidal
+namespace ite
 {
     //!
-    class StreamReader
-    :
-        public nxcip::StreamReader
+    class StreamReader : public nxcip::StreamReader
     {
         DEF_REF_COUNTER
 
@@ -35,4 +33,4 @@ namespace pacidal
     };
 }
 
-#endif //PACIDAL_STREAM_READER_H
+#endif // ITE_STREAM_READER_H

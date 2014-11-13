@@ -24,7 +24,7 @@ static int interruptFindInputFormat(void* opaque)
 #endif
 }
 
-namespace pacidal
+namespace ite
 {
     constexpr static const char * EXPECTED_IFORMAT = "mpegts";
     static AVInputFormat * sExpectedFormat = av_find_input_format( EXPECTED_IFORMAT );
@@ -144,4 +144,4 @@ namespace pacidal
     };
 }
 
-#endif //LIBAV_WRAP
+#endif // LIBAV_WRAP

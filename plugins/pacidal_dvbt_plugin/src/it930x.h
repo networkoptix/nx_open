@@ -1,25 +1,25 @@
-#ifndef PACIDAL_DEVICE_H
-#define PACIDAL_DEVICE_H
+#ifndef ITE_DEVICE_H
+#define ITE_DEVICE_H
 
 extern "C"
 {
 #include "DTVAPI.h"
 }
 
-namespace pacidal
+namespace ite
 {
-    class PacidalStream;
+    class It930Stream;
 
-    /// Pacidal DVB-T reciver
+    /// ITE DVB-T reciver
     ///
     /// RX Setting (from driver readme):
     /// URB_COUNT   4
     /// URB_BUFSIZE 153408
     /// GETDATATIMEOUT: 3000ms
     ///
-    class PacidalIt930x
+    class It930x
     {
-        friend class PacidalStream;
+        friend class It930Stream;
 
     public:
         static const unsigned MPEG_TS_PACKET_SIZE = 188;
@@ -44,14 +44,14 @@ namespace pacidal
 
         //
 
-        PacidalIt930x(uint8_t number)
+        It930x(uint8_t number)
         {
             handle_ = DTV_DeviceOpen(ENDEAVOUR, number);
             if (handle_ < 0)
                 throw "DTV_DeviceOpen";
         }
 
-        ~PacidalIt930x()
+        ~It930x()
         {
            DTV_DeviceClose(handle_);
         }
@@ -168,17 +168,17 @@ namespace pacidal
     };
 
     ///
-    class PacidalStream
+    class It930Stream
     {
     public:
-        PacidalStream(const PacidalIt930x& p)
+        It930Stream(const It930x& p)
         :   parent_(&p)
         {
             if (DTV_StartCapture(parent_->handle_))
                 throw "DTV_StartCapture";
         }
 
-        ~PacidalStream()
+        ~It930Stream()
         {
             DTV_StopCapture(parent_->handle_);
         }
@@ -193,8 +193,8 @@ namespace pacidal
         }
 
     private:
-        const PacidalIt930x * parent_;
+        const It930x * parent_;
     };
 }
 
-#endif //PACIDAL_DEVICE_H
+#endif // ITE_DEVICE_H

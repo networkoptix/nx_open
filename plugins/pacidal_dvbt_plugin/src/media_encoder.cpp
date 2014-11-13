@@ -4,13 +4,12 @@
 
 #include "discovery_manager.h"
 
-namespace pacidal
+namespace ite
 {
     DEFAULT_REF_COUNTER(MediaEncoder)
 
-    MediaEncoder::MediaEncoder(CameraManager* const cameraManager, int encoderNumber)
-    :
-        m_refManager( this ),
+    MediaEncoder::MediaEncoder(CameraManager * const cameraManager, int encoderNumber)
+    :   m_refManager( this ),
         m_cameraManager( cameraManager ),
         m_encoderNumber( encoderNumber )
     {

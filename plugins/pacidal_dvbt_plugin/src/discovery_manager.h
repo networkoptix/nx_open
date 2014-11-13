@@ -1,7 +1,9 @@
-#ifndef PACIDAL_DISCOVERY_MANAGER_H
-#define PACIDAL_DISCOVERY_MANAGER_H
+#ifndef ITE_DISCOVERY_MANAGER_H
+#define ITE_DISCOVERY_MANAGER_H
 
 #include <memory>
+#include <string>
+#include <vector>
 #include <map>
 #include <mutex>
 
@@ -9,13 +11,13 @@
 
 #include "ref_counter.h"
 #include "camera_manager.h"
+#include "rc_com.h"
+#include "rc_shell.h"
 
-namespace pacidal
+namespace ite
 {
     //!
-    class DiscoveryManager
-    :
-        public nxcip::CameraDiscoveryManager
+    class DiscoveryManager : public nxcip::CameraDiscoveryManager
     {
         DEF_REF_COUNTER
 
@@ -39,16 +41,26 @@ namespace pacidal
 
         //
 
-        static nxpt::CommonRefManager* refManager() { return &(Instance->m_refManager); }
+        static nxpt::CommonRefManager * refManager() { return &(Instance->m_refManager); }
 
     private:
         typedef std::shared_ptr<CameraManager> CameraPtr;
 
-        mutable std::mutex m_contentMutex;
-        std::map<unsigned, CameraPtr> m_cameras;
+        static DiscoveryManager * Instance;
 
-        static DiscoveryManager* Instance;
+        mutable std::mutex m_contentMutex;
+        std::map<unsigned, RxDevicePtr> m_rxDevs;   // {RxID, RxDev}
+        std::multimap<unsigned, IDsLink> m_txLinks; // {TxID, RxTxLink}
+        std::map<unsigned, CameraPtr> m_cameras;    // {CamId, Camera}
+        ComPort comPort_;
+        RCShell rcShell_;
+
+        static void getRxDevNames(std::vector<std::string>& names);
+        void updateRxDevices();
+        void updateTxLinks();
+
+        RxDevicePtr getRx4Tx(unsigned txID);
     };
 }
 
-#endif  //PACIDAL_DISCOVERY_MANAGER_H
+#endif // ITE_DISCOVERY_MANAGER_H

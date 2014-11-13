@@ -14,13 +14,12 @@ namespace
     }
 }
 
-namespace pacidal
+namespace ite
 {
     DEFAULT_REF_COUNTER(VideoPacket)
 
     VideoPacket::VideoPacket( const uint8_t* data, unsigned size )
-    :
-        m_refManager( this ),
+    :   m_refManager( this ),
         m_size( 0 ),
         m_time( 0 ),
         m_flags( 0 )
@@ -39,7 +38,7 @@ namespace pacidal
     {
     }
 
-    void* VideoPacket::queryInterface( const nxpl::NX_GUID& interfaceID )
+    void * VideoPacket::queryInterface( const nxpl::NX_GUID& interfaceID )
     {
         if (interfaceID == nxcip::IID_VideoDataPacket)
         {
