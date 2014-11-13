@@ -234,8 +234,8 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
             QnModuleInformation &prevModuleInformation = m_foundModules[moduleId];
             prevModuleInformation.remoteAddresses.remove(url.host());
             NX_LOG(lit("QnDirectModuleFinder: Url %2 of the module %1 is lost.").arg(prevModuleInformation.id.toString()).arg(url.toString()), cl_logDEBUG1);
-            emit moduleChanged(prevModuleInformation);
             emit moduleUrlLost(prevModuleInformation, url);
+            emit moduleChanged(prevModuleInformation);
             lastPing = 0;
         }
         moduleId = moduleInformation.id;
@@ -262,8 +262,8 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
             QnModuleInformation &moduleInformation = m_foundModules[id];
             moduleInformation.remoteAddresses.remove(url.host());
             NX_LOG(lit("QnDirectModuleFinder: Url %2 of the module %1 is lost.").arg(moduleInformation.id.toString()).arg(url.toString()), cl_logDEBUG1);
-            emit moduleChanged(moduleInformation);
             emit moduleUrlLost(moduleInformation, url);
+            emit moduleChanged(moduleInformation);
         }
     }
 }
