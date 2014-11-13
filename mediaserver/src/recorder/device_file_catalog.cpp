@@ -230,6 +230,8 @@ void DeviceFileCatalog::replaceChunks(int storageIndex, const std::deque<Chunk>&
 
 QSet<QDate> DeviceFileCatalog::recordedMonthList()
 {
+    QMutexLocker lock(&m_mutex);
+
     QSet<QDate> rez;
     if (m_chunks.empty())
         return rez;
