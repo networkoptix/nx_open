@@ -83,7 +83,7 @@ angular.module('webadminApp')
             var data = r.data;
 
             if(data.error!=='0') {
-                console.log("some error",data);
+                console.log('some error',data);
                 var errorToShow = data.errorString;
                 switch (errorToShow) {
                     case 'UNAUTHORIZED':

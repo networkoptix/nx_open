@@ -38,13 +38,13 @@ angular.module('webadminApp').controller('ViewCtrl', function ($scope,$location,
             function cameraSorter(camera){
                 camera.url = extractDomain(camera.url);
 
-                if(camera.id == $scope.cameraId){
+                if(camera.id === $scope.cameraId){
                     $scope.selectCamera(camera);
                 }
 
                 var num = 0;
                 try {
-                    var addrArray = camera.url.split(".");
+                    var addrArray = camera.url.split('.');
                     for (var i = 0; i < addrArray.length; i++) {
                         var power = 3 - i;
                         num += ((parseInt(addrArray[i]) % 256 * Math.pow(256, power)));
@@ -52,13 +52,14 @@ angular.module('webadminApp').controller('ViewCtrl', function ($scope,$location,
                     if(isNaN(num)){
                         throw num;
                     }
-                    num = num.toString(16);;
-                    if(num.length<8)
-                        num='0'+num;
+                    num = num.toString(16);
+                    if(num.length<8) {
+                        num = '0' + num;
+                    }
                 } catch (a) {
                     num = camera.url;
                 }
-                return camera.name + "__" + num;
+                return camera.name + '__' + num;
             }
 
             //1. split cameras with groupId and without
@@ -91,7 +92,7 @@ angular.module('webadminApp').controller('ViewCtrl', function ($scope,$location,
                 };
             });
 
-            console.log("groups",cams[1]);
+            console.log('groups',cams[1]);
 
             //6 union cameras back
             cameras = _.union(cams[0],cams[1]);
@@ -104,22 +105,22 @@ angular.module('webadminApp').controller('ViewCtrl', function ($scope,$location,
 
             $scope.allcameras = cameras;
 
-            console.log("Cameras",$scope.cameras);
+            console.log('Cameras',$scope.cameras);
         },function(){
-            alert("network problem");
+            alert('network problem');
         });
     }
     mediaserver.getMediaServers().then(function(data){
-        console.log("getMediaServers",data.data);
+        console.log('getMediaServers',data.data);
 
         _.each(data.data,function(server){
             server.url = extractDomain(server.url);
-            server.collapsed = server.status!='Online' && (server.allowAutoRedundancy || server.flags.indexOf('SF_Edge')<0);
+            server.collapsed = server.status !== 'Online' && (server.allowAutoRedundancy || server.flags.indexOf('SF_Edge')<0);
         });
         $scope.mediaServers = data.data;
         getCameras();
     },function(){
-        alert("network problem");
+        alert('network problem');
     });
 
     mediaserver.getSettings().then(function (r) {
