@@ -26,13 +26,15 @@
 </div>
 <div class="col-sm-8">
     <div style="width:640px;height:480px" class="videogular-container" ng-if="activeCamera!==null">
-        <videogular vg-theme="'bower_components/videogular-themes-default/videogular.css'" vg-autoplay="true" autoplay="true">
-            <vg-video vg-src="acitveVideoSource" vg-autoplay="true" autoplay="true">
+        <videogular vg-theme="'bower_components/videogular-themes-default/videogular.css'" vg-autoplay="true" >
+            <vg-video vg-src="acitveVideoSource" >
             </vg-video>
             <vg-controls>
                 <vg-play-pause-button></vg-play-pause-button>
+                <vg-quality current="activeResolution" list="availableResolutions" ></vg-quality>
                 <vg-fullscreenButton></vg-fullscreenButton>
             </vg-controls>
+            <vg-buffering></vg-buffering>
         </videogular>
     </div>
 </div>
