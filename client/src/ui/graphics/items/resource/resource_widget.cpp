@@ -329,7 +329,7 @@ void QnResourceWidget::setAspectRatio(qreal aspectRatio) {
     m_aspectRatio = aspectRatio;
 
     updateGeometry(); /* Discard cached size hints. */
-    setGeometry(expanded(m_aspectRatio, enclosingGeometry, Qt::KeepAspectRatio));
+    setEnclosingGeometry(enclosingGeometry);
 
     emit aspectRatioChanged();
 }
