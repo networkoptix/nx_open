@@ -50,7 +50,7 @@
     <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">Разрешить системе оптимизировать настройки камер (рекомендуется)</String>   
     
     <!-- Associations -->
-    <String Id="Associations_PlayWith"                              Overridable="yes">Воспроизвести с помощью ${display.display.product.name}</String>
+    <String Id="Associations_PlayWith"                              Overridable="yes">Воспроизвести с помощью ${display.product.name}</String>
 
     <!-- ClientDlg -->
     <String Id="ClientDlg_Shortcut"                                 Overridable="yes">Ярлыки</String>
@@ -126,7 +126,7 @@
     <String Id="PortIsBusyDlg_PortOccupiedMessage"                  Overridable="yes">Указанный порт занят. Нажмите "Далее" если Вы уверены, что хотите его использовать.</String>    
 
     <!-- Product -->
-    <String Id="Product_LaunchClient"                               Overridable="yes">Запустить ${display.display.product.name} по окончании установки.</String>    
+    <String Id="Product_LaunchClient"                               Overridable="yes">Запустить ${display.product.name} по окончании установки.</String>    
     <String Id="Product_ArchMismatch"                               Overridable="yes">Этот продукт предназначен для 32-разрядной ОС. Установка будет закончена.</String>    
 
     <!-- SelectionWarningDlg -->
@@ -134,8 +134,8 @@
 
     <!-- UninstallOptionsDlg -->
     <String Id="UninstallOptionsDlg_UninstallOptions"               Overridable="yes">Параметры удаления</String>
-    <String Id="UninstallOptionsDlg_KeepDatabase"                   Overridable="yes">Оставить базу данных ${display.display.product.name}</String>
-    <String Id="UninstallOptionsDlg_RemoveDatabase"                 Overridable="yes">Удалить базу данных ${display.display.product.name}</String>
+    <String Id="UninstallOptionsDlg_KeepDatabase"                   Overridable="yes">Оставить базу данных ${display.product.name}</String>
+    <String Id="UninstallOptionsDlg_RemoveDatabase"                 Overridable="yes">Удалить базу данных ${display.product.name}</String>
     <String Id="UninstallOptionsDlg_Current"                        Overridable="yes">Текущую</String>  
     <String Id="UninstallOptionsDlgVersionToKeep"                   Overridable="yes">Сохранить:</String>   
     
