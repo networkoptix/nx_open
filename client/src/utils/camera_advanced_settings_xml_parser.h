@@ -177,6 +177,7 @@ protected:
 
     //Method should return some object (additional info) required in proceed method of T class
     virtual E getAdditionalInfo() = 0;
+    virtual void setAdditionalInfo(const E &value) = 0;
 
     //Cleaning activities
     void clean();
@@ -198,6 +199,7 @@ class CameraSettingsTreeLister: public CameraSettingTreeReader<CameraSettingsLis
 
 protected:
     virtual QSet<QString> getAdditionalInfo() override;
+    virtual void setAdditionalInfo(const QSet<QString> &value) override;
 
 public:
 
@@ -255,6 +257,7 @@ signals:
 
 protected:
     virtual CameraSettings getAdditionalInfo() override;
+    virtual void setAdditionalInfo(const CameraSettings &value) override;
 
 private:
     void removeEmptyWidgetGroups();

@@ -5,13 +5,12 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include "api/media_server_connection.h"
-
 #include "ui/workbench/workbench_context_aware.h"
 
 #include "camera_settings_tab.h"
 
 #include <utils/common/connective.h>
+#include <utils/common/uuid.h>
 
 namespace Ui {
     class SingleCameraSettingsWidget;
