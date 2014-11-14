@@ -19,6 +19,20 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
+     <widget class="QWidget" name="noSettingsPage">
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>This camera has no advanced settings</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="manualPage">
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>

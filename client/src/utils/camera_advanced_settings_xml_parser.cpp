@@ -431,10 +431,12 @@ bool CameraSettingTreeReader<T, E>::proceed()
 
         T* nextElem = m_firstTime? m_objList.back(): m_objList.at(i++);
         //ToDo: check impossible situation i > size - 1
-        if (!nextElem->proceed(getAdditionalInfo())) {
+        auto info = getAdditionalInfo();
+        if (!nextElem->proceed(info)) {
             clean();
             return false;
         }
+        setAdditionalInfo(info);
     }
     while (currentId != m_currParentId);
 
@@ -481,6 +483,10 @@ QStringList CameraSettingsTreeLister::proceed()
     return m_params.toList();
 }
 
+void CameraSettingsTreeLister::setAdditionalInfo(const QSet<QString> &value) {
+    m_params = value;
+}
+
 //
 // class CameraSettingsWidgetsTreeCreator
 //
@@ -525,6 +531,10 @@ CameraSettingsWidgetsCreator* CameraSettingsWidgetsTreeCreator::createElement(
 
 CameraSettings CameraSettingsWidgetsTreeCreator::getAdditionalInfo() {
     return m_settings;
+}
+
+void CameraSettingsWidgetsTreeCreator::setAdditionalInfo(const CameraSettings &value) {
+    m_settings = value;
 }
 
 void CameraSettingsWidgetsTreeCreator::proceed(const CameraSettings &settings) {

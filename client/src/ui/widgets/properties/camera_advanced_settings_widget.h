@@ -30,11 +30,11 @@ public:
 
     void updateFromResource();
 
-    void updateWebPage();
+    void reloadData();
 private:
+    void updatePage();
+
     void clean();
-    void load();
-    bool init();
     void refresh();
 
     void createWidgetsRecreator(const QString &cameraUniqueId, const QString &paramId);
@@ -43,11 +43,21 @@ private:
     void at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator);
     void at_proxyAuthenticationRequired ( const QNetworkProxy & , QAuthenticator * authenticator);
 
-    void at_advancedSettingsLoaded(int status, const QnStringVariantPairList &params, int handle);
     void at_advancedParamChanged(const CameraSetting& val);
+
+private slots:
+    void at_advancedSettingsLoaded(int status, const QnStringVariantPairList &params, int handle);
     void at_advancedParam_saved(int httpStatusCode, const QnStringBoolPairList& operationResult);
+
 private:
+    enum class Page {
+        Empty,
+        Manual,
+        Web
+    };
+
     QScopedPointer<Ui::CameraAdvancedSettingsWidget> ui;
+    Page m_page;
     QnVirtualCameraResourcePtr m_camera;
     QMutex m_cameraMutex;
     CameraSettingsWidgetsTreeCreator* m_widgetsRecreator;

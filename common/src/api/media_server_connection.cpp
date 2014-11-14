@@ -387,32 +387,22 @@ int QnMediaServerConnection::getTimePeriodsAsync(const QnNetworkResourceList &li
     return sendAsyncGetRequest(TimePeriodsObject, params, QN_STRINGIZE_TYPE(QnTimePeriodList), target, slot);
 }
 
-QnRequestParamList QnMediaServerConnection::createGetParamsRequest(const QnNetworkResourcePtr &camera, const QStringList &params) {
-    QnRequestParamList result;
-    result << QnRequestParam("res_id", camera->getPhysicalId());
-    for(QString param: params)
-        result << QnRequestParam(param, QString());
-    return result;
-}
-
 int QnMediaServerConnection::getParamsAsync(const QnNetworkResourcePtr &camera, const QStringList &keys, QObject *target, const char *slot) {
-    return sendAsyncGetRequest(GetParamsObject, createGetParamsRequest(camera, keys), QN_STRINGIZE_TYPE(QnStringVariantPairList), target, slot);
+    QnRequestParamList params;
+    params << QnRequestParam("res_id", camera->getPhysicalId());
+    for(const QString &param: keys)
+        params << QnRequestParam(param, QString());
+
+    return sendAsyncGetRequest(GetParamsObject, params, QN_STRINGIZE_TYPE(QnStringVariantPairList), target, slot);
 }
 
-int QnMediaServerConnection::getParamsSync(const QnNetworkResourcePtr &camera, const QStringList &keys, QnStringVariantPairList *reply) {
-    return sendSyncGetRequest(GetParamsObject, createGetParamsRequest(camera, keys), reply);
-}
+int QnMediaServerConnection::setParamsAsync(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &values, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("res_id", camera->getPhysicalId());
+    for(QnStringVariantPairList::const_iterator i = values.begin(); i != values.end(); ++i)
+        params << QnRequestParam(i->first, i->second.toString());
 
-QnRequestParamList QnMediaServerConnection::createSetParamsRequest(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params) {
-    QnRequestParamList result;
-    result << QnRequestParam("res_id", camera->getPhysicalId());
-    for(QnStringVariantPairList::const_iterator i = params.begin(); i != params.end(); ++i)
-        result << QnRequestParam(i->first, i->second.toString());
-    return result;
-}
-
-int QnMediaServerConnection::setParamsAsync(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params, QObject *target, const char *slot) {
-    return sendAsyncGetRequest(SetParamsObject, createSetParamsRequest(camera, params), QN_STRINGIZE_TYPE(QnStringBoolPairList), target, slot);
+    return sendAsyncGetRequest(SetParamsObject, params, QN_STRINGIZE_TYPE(QnStringBoolPairList), target, slot);
 }
 
 int QnMediaServerConnection::searchCameraAsyncStart(const QString &startAddr, const QString &endAddr, const QString &username, const QString &password, int port, QObject *target, const char *slot) {

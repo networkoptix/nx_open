@@ -125,11 +125,6 @@ public:
         QObject *target, 
         const char *slot);
 
-    /**
-     * \returns                         Http response status (200 in case of success).
-     */
-    int getParamsSync(const QnNetworkResourcePtr &camera, const QStringList &keys, QnStringVariantPairList *reply);
-
     /** 
      * Set \a camera params.
      * 
@@ -221,9 +216,6 @@ public:
     int testEmailSettingsAsync(const QnEmailSettings &settings, QObject *target, const char *slot);
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;
-
-    static QnRequestParamList createGetParamsRequest(const QnNetworkResourcePtr &camera, const QStringList &params);
-    static QnRequestParamList createSetParamsRequest(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params);
 
 private:
     QString m_proxyAddr;

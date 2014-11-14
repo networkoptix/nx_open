@@ -1,7 +1,5 @@
 #include "single_camera_settings_widget.h"
 #include "ui_single_camera_settings_widget.h"
-#include <core/resource/media_server_resource.h>
-#include "core/resource/resource_fwd.h"
 
 #include <QtCore/QBuffer>
 #include <QtCore/QUrl>
@@ -9,9 +7,6 @@
 #include <QtCore/QProcess>
 #include <QtWidgets/QMessageBox>
 #include <QtGui/QDesktopServices>
-// #include <QtWidgets/QSplitter>
-// #include <QtWidgets/QStackedLayout>
-// #include <QtWidgets/QStyle>
 
 #include <camera/single_thumbnail_loader.h>
 
@@ -47,14 +42,8 @@
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/license_usage_helper.h>
-/*#include <common/common_module.h>*/
-/*#include <core/resource/resource_data.h>*/
-/*#include <core/resource_management/resource_data_pool.h>*/
-/*#include "api/app_server_connection.h"*/
 
 #include "client/client_settings.h"
-/*#include "camera_advanced_settings_web_page.h"*/
-
 
 namespace {
     const QSize fisheyeThumbnailSize(0, 0); //unlimited size for better calibration
@@ -193,13 +182,11 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
         connect(m_camera, SIGNAL(resourceChanged(const QnResourcePtr &)),   this, SLOT(updateIpAddressText()));
         connect(m_camera, &QnResource::urlChanged,      this, &QnSingleCameraSettingsWidget::updateWebPageText); // TODO: #GDM also listen to hostAddress changes?
         connect(m_camera, &QnResource::resourceChanged, this, &QnSingleCameraSettingsWidget::updateWebPageText); // TODO: #GDM why?
-
-        QStackedLayout* stacked_layout = dynamic_cast<QStackedLayout*>(ui->advancedTab->layout());
-    }
+   }
 
     updateFromResource();
     if (m_camera && currentTab() == Qn::AdvancedCameraSettingsTab)
-        ui->advancedSettingsWidget->updateWebPage();
+        ui->advancedSettingsWidget->reloadData();
 }
 
 Qn::CameraSettingsTab QnSingleCameraSettingsWidget::currentTab() const {
@@ -828,7 +815,7 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged() {
 
         case Qn::AdvancedCameraSettingsTab:
         {
-            ui->advancedSettingsWidget->updateWebPage();
+            ui->advancedSettingsWidget->reloadData();
             break;
         }
 
