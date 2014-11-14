@@ -239,7 +239,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QnAdvancedSettingsWidget" name="expertSettingsWidget" native="true"/>
+        <widget class="QnCameraExpertSettingsWidget" name="expertSettingsWidget" native="true"/>
        </item>
       </layout>
      </widget>
@@ -255,7 +255,7 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnAdvancedSettingsWidget</class>
+   <class>QnCameraExpertSettingsWidget</class>
    <extends>QWidget</extends>
    <header>ui/widgets/properties/expert_settings_widget.h</header>
    <container>1</container>

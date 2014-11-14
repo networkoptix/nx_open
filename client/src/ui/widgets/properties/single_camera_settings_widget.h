@@ -2,11 +2,6 @@
 #define CAMERA_SETTINGS_DIALOG_H
 
 #include <QtWidgets/QWidget>
-#include <QtNetwork/QNetworkReply>
-#include <QtWebKitWidgets/QtWebKitWidgets>
-
-#include "utils/camera_advanced_settings_xml_parser.h"
-#include "utils/common/connective.h"
 
 #include <core/resource/resource_fwd.h>
 
@@ -15,6 +10,8 @@
 #include "ui/workbench/workbench_context_aware.h"
 
 #include "camera_settings_tab.h"
+
+#include <utils/common/connective.h>
 
 namespace Ui {
     class SingleCameraSettingsWidget;
@@ -69,8 +66,6 @@ public:
         m_hasMotionControlsChanges = false;
     }
 
-    QnMediaServerConnectionPtr getServerConnection() const;
-
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
@@ -87,10 +82,6 @@ public:
     bool isValidSecondStream();
 
     void setExportScheduleButtonEnabled(bool enabled);
-
-public slots:
-    void at_advancedParamChanged(const CameraSetting& val);
-    void refreshAdvancedSettings();
 
 signals:
     void hasChangesChanged();
@@ -115,8 +106,6 @@ private slots:
     void at_motionTypeChanged();
     void at_resetMotionRegionsButton_clicked();
     void at_motionRegionListChanged();
-    void at_advancedSettingsLoaded(int status, const QnStringVariantPairList &params, int handle);
-    void at_advancedParam_saved(int httpStatusCode, const QnStringBoolPairList& operationResult);
     void at_analogViewCheckBox_clicked();
     void at_fisheyeSettingsChanged();
 
@@ -141,20 +130,14 @@ private:
     void connectToMotionWidget();
 
     bool initAdvancedTab();
-    void loadAdvancedSettings();
-
-    void cleanAdvancedSettings();
-    void updateWebPage(QStackedLayout* stackedLayout , QWebView* advancedWebView);
-
-    Q_SLOT void at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator);
-    Q_SLOT void at_proxyAuthenticationRequired ( const QNetworkProxy & , QAuthenticator * authenticator);
+    void initAdvancedTabWebView();
 
 private:
     Q_DISABLE_COPY(QnSingleCameraSettingsWidget)
     Q_DECLARE_PRIVATE(QnCameraSettingsWidget)
 
     QScopedPointer<Ui::SingleCameraSettingsWidget> ui;
-    QMutex m_cameraMutex;
+  
     QnVirtualCameraResourcePtr m_camera;
     bool m_cameraSupportsMotion;
 
@@ -178,13 +161,8 @@ private:
     QVBoxLayout *m_motionLayout;
     bool m_inUpdateMaxFps;
 
-    CameraSettings m_cameraSettings;
-    CameraSettingsWidgetsTreeCreator* m_widgetsRecreator;
-    mutable QnMediaServerConnectionPtr m_serverConnection;
-
     QHash<QnUuid, QnImageProvider*> m_imageProvidersByResourceId;
-	QUrl m_lastCameraPageUrl;
-    CameraAdvancedSettingsWebPage* m_cameraAdvancedSettingsWebPage;
+    
 };
 
 #endif // CAMERA_SETTINGS_DIALOG_H

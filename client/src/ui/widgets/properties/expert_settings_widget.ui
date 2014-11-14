@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>AdvancedSettingsWidget</class>
- <widget class="QWidget" name="AdvancedSettingsWidget">
+ <class>CameraExpertSettingsWidget</class>
+ <widget class="QWidget" name="CameraExpertSettingsWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
