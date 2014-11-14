@@ -54,6 +54,7 @@
 #include <network/default_tcp_connection_processor.h>
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/ec_api.h>
+#include <nx_ec/ec_proto_version.h>
 
 #include <platform/platform_abstraction.h>
 
@@ -1637,6 +1638,7 @@ void QnMain::run()
     //selfInformation.remoteAddresses = ;
     selfInformation.id = serverGuid();
     selfInformation.sslAllowed = MSSettings::roSettings()->value( nx_ms_conf::ALLOW_SSL_CONNECTIONS, nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS ).toBool();
+    selfInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
 
     qnCommon->setModuleInformation(selfInformation);
 

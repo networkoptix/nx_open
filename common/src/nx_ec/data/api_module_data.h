@@ -17,11 +17,12 @@ namespace ec2 {
         QString name;
         bool sslAllowed;
         QByteArray authHash;
+        int protoVersion;
 
         bool isAlive;
     };
 
-#define ApiModuleData_Fields (type)(id)(systemName)(version)(systemInformation)(addresses)(port)(isAlive)(customization)(name)(sslAllowed)(authHash)
+#define ApiModuleData_Fields (type)(id)(systemName)(version)(systemInformation)(addresses)(port)(isAlive)(customization)(name)(sslAllowed)(authHash)(protoVersion)
 
 } // namespace ec2
 
