@@ -18,13 +18,6 @@
 
 #include "abstract_connection.h"
 
-typedef QList<QPair<QString, bool> > QnStringBoolPairList;
-typedef QList<QPair<QString, QVariant> > QnStringVariantPairList;
-
-Q_DECLARE_METATYPE(QnStringBoolPairList);
-Q_DECLARE_METATYPE(QnStringVariantPairList);
-
-
 // TODO: #MSAPI move to api/model or even to common_globals, 
 // add lexical serialization (see QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS)
 // 
