@@ -148,7 +148,6 @@
 
 namespace {
     const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
-    QColor redTextColor = Qt::red; // TODO: #dklychkov make it customizable
 }
 
 //!time that is given to process to exit. After that, applauncher (if present) will try to terminate it
@@ -304,8 +303,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
     connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
     //connect(context()->instance<QnWorkbenchPanicWatcher>(),     SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
-    connect(context()->instance<QnWorkbenchScheduleWatcher>(),  SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
-    connect(context()->instance<QnWorkbenchUpdateWatcher>(),    SIGNAL(availableUpdateChanged()), this, SLOT(at_updateWatcher_availableUpdateChanged()));
+    connect(context()->instance<QnWorkbenchScheduleWatcher>(),  SIGNAL(scheduleEnabledChanged()),   this,   SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
 
     connect(action(Qn::ExitActionDelayed), &QAction::triggered, action(Qn::ExitAction), &QAction::trigger, Qt::QueuedConnection);
     connect(action(Qn::BeforeExitAction),  &QAction::triggered, this, &QnWorkbenchActionHandler::at_beforeExitAction_triggered);
@@ -314,7 +312,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     /* Run handlers that update state. */
     //at_panicWatcher_panicModeChanged();
     at_scheduleWatcher_scheduleEnabledChanged();
-    at_updateWatcher_availableUpdateChanged();
 }
 
 QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
@@ -1082,52 +1079,6 @@ void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
         menu()->trigger(Qn::DropResourcesAction, addToResourcePool(dirName));
 }
 
-void QnWorkbenchActionHandler::notifyAboutUpdate() {
-    QnSoftwareVersion version = context()->instance<QnWorkbenchUpdateWatcher>()->availableUpdate();
-    if(version.isNull())
-        return;
-
-    if (version <= qnSettings->ignoredUpdateVersion())
-        return;
-
-    QnSoftwareVersion current = qnCommon->engineVersion();
-
-    bool majorVersionChange = version.major() > current.major() || version.minor() > current.minor();
-
-    QString title;
-    QString message;
-    if (majorVersionChange) {
-        title = tr("Newer version is available");
-        message = tr("New version is available.");
-        message += lit("<br/>");
-        message += tr("Would you like to upgrade?");
-    } else {
-        title = tr("Upgrade is recommended");
-        message = tr("New version is available.");
-        message += lit("<br/>");
-        message += tr("Major issues have been fixed.");
-        message += lit("<br/><span style=\"color:%1;\">").arg(redTextColor.name());
-        message += tr("Update is strongly recommended.");
-        message += lit("</span><br/>");
-        message += tr("Would you like to upgrade?");
-    }
-
-    QnCheckableMessageBox messageBox(mainWindow());
-    messageBox.setWindowTitle(title);
-    messageBox.setIconPixmap(QMessageBox::standardIcon(QMessageBox::Question));
-    messageBox.setRichText(message);
-    messageBox.setCheckBoxText(tr("Don't notify again about this update."));
-    messageBox.setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No);
-    setHelpTopic(&messageBox, Qn::Upgrade_Help);
-    int res = messageBox.exec();
-
-    if (res == QMessageBox::Accepted) {
-        at_systemUpdateAction_triggered();
-    } else {
-        qnSettings->setIgnoredUpdateVersion(messageBox.isChecked() ? version : QnSoftwareVersion());
-    }
-}
-
 void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePtr &layout) {
     if(!layout)
         return;
@@ -1149,11 +1100,6 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
         if (wlayout)
             wlayout->centralizeItems();
     }
-}
-
-void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
-    if (qnSettings->isAutoCheckForUpdates())
-        notifyAboutUpdate();
 }
 
 void QnWorkbenchActionHandler::at_showcaseAction_triggered() {

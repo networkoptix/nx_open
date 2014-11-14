@@ -20,7 +20,7 @@ public slots:
     void checkForUpdates();
 
 signals:
-    void updateAvailable(const QnSoftwareVersion &version);
+    void updateAvailable(const QnSoftwareVersion &latest, const QnSoftwareVersion &patch);
 
 private slots:
     void at_networkReply_finished();

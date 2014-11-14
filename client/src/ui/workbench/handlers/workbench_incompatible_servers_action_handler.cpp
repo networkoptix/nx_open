@@ -1,6 +1,7 @@
 #include "workbench_incompatible_servers_action_handler.h"
 
 #include <QtWidgets/QMessageBox>
+#include <QtWidgets/QInputDialog>
 #include <QtCore/QUrl>
 
 #include <core/resource/resource.h>
@@ -9,7 +10,6 @@
 #include <ui/actions/action_parameter_types.h>
 #include <ui/dialogs/merge_systems_dialog.h>
 #include <ui/dialogs/progress_dialog.h>
-#include <ui/dialogs/credentials_dialog.h>
 
 #include <update/connect_to_current_system_tool.h>
 #include <utils/merge_systems_tool.h>
@@ -50,20 +50,18 @@ void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(const Q
     QString password = initialPassword;
 
     forever {
-        QnCredentialsDialog dialog(mainWindow());
-        dialog.setWindowTitle(tr("Enter admin name and password..."));
-        dialog.setUser(user);
-        dialog.setPassword(password);
+        QInputDialog dialog(mainWindow());
+        dialog.setWindowTitle(tr("Enter Password..."));
+        dialog.setLabelText(tr("Administrator Password"));
+        dialog.setTextEchoMode(QLineEdit::Password);
+        dialog.setTextValue(password);
 
         if (dialog.exec() != QDialog::Accepted)
             return;
 
-        user = dialog.user();
-        password = dialog.password();
+        password = dialog.textValue();
 
-        if (user.isEmpty())
-            QMessageBox::critical(mainWindow(), tr("Error"), tr("User name cannot be empty!"));
-        else if (password.isEmpty())
+        if (password.isEmpty())
             QMessageBox::critical(mainWindow(), tr("Error"), tr("Password cannot be empty!"));
         else
             break;

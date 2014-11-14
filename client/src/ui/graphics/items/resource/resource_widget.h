@@ -44,7 +44,6 @@ class QnResourceWidget: public Overlayed<Shaded<Animated<Instrumented<Connective
     Q_PROPERTY(QColor frameDistinctionColor READ frameDistinctionColor WRITE setFrameDistinctionColor NOTIFY frameDistinctionColorChanged)
     Q_PROPERTY(QPointF shadowDisplacement READ shadowDisplacement WRITE setShadowDisplacement)
     Q_PROPERTY(QRectF enclosingGeometry READ enclosingGeometry WRITE setEnclosingGeometry)
-    Q_PROPERTY(qreal enclosingAspectRatio READ enclosingAspectRatio WRITE setEnclosingAspectRatio)
     Q_PROPERTY(bool localActive READ isLocalActive WRITE setLocalActive)
     Q_FLAGS(Options Option)
 
@@ -162,27 +161,13 @@ public:
     }
 
     /**
-     * Every widget is considered to be inscribed into an enclosing rectangle with a
-     * fixed aspect ratio. When aspect ratio of the widget itself changes, it is
-     * re-inscribed into its enclosed rectangle.
-     *
-     * \returns                         Aspect ratio of the enclosing rectangle for this widget.
-     */
-    qreal enclosingAspectRatio() const {
-        return m_enclosingAspectRatio;
-    }
-
-    /**
-     * \param enclosingAspectRatio      New enclosing aspect ratio.
-     */
-    void setEnclosingAspectRatio(qreal enclosingAspectRatio);
-
-    /**
      * \returns                         Geometry of the enclosing rectangle for this widget.
      */
     QRectF enclosingGeometry() const;
 
     /**
+     * Every widget is considered to be inscribed into an enclosing rectangle.
+     * Item will be inscribed even if it is rotated.
      * \param enclosingGeometry         Geometry of the enclosing rectangle for this widget.
      */
     void setEnclosingGeometry(const QRectF &enclosingGeometry);
@@ -382,8 +367,8 @@ private:
     /** Aspect ratio. Negative value means that aspect ratio is not enforced. */
     qreal m_aspectRatio;
 
-    /** Aspect ratio of the virtual enclosing rectangle. */
-    qreal m_enclosingAspectRatio;
+    /** Virtual enclosing rectangle. */
+    QRectF m_enclosingGeometry;
 
     /** Cached size of a single media channel, in screen coordinates. */
     QSize m_channelScreenSize;
