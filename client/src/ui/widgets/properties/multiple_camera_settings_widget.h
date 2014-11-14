@@ -53,18 +53,6 @@ public:
         m_hasScheduleControlsChanges = false;
     }
 
-    const QList< QPair< QString, QVariant> >& getModifiedAdvancedParams() const {
-        //Currently this ability avaible only for single camera settings
-        Q_ASSERT(false);
-        return *(new QList< QPair< QString, QVariant> >);
-    }
-
-    QnMediaServerConnectionPtr getServerConnection() const {
-        //This ability avaible only for single camera settings
-        Q_ASSERT(false);
-        return QnMediaServerConnectionPtr(0);
-    }
-
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 

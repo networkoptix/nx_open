@@ -51,12 +51,6 @@ public:
     void setScheduleEnabled(bool enabled);
     bool isScheduleEnabled() const;
 
-    bool hasCameraChanges() const {
-        return m_hasCameraChanges;
-    }
-    bool hasAnyCameraChanges() const {
-        return m_anyCameraChanges;
-    }
     bool hasDbChanges() const {
         return m_hasDbChanges;
     }
@@ -81,13 +75,7 @@ public:
         m_hasMotionControlsChanges = false;
     }
 
-
-
     QnMediaServerConnectionPtr getServerConnection() const;
-
-    const QList< QPair< QString, QVariant> >& getModifiedAdvancedParams() const {
-        return m_modifiedAdvancedParamsOutgoing;
-    }
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
@@ -113,7 +101,6 @@ public slots:
 signals:
     void hasChangesChanged();
     void moreLicensesRequested();
-    void advancedSettingChanged();
     void scheduleExported(const QnVirtualCameraResourceList &);
 
 protected:
@@ -125,7 +112,6 @@ protected:
 private slots:
     void at_tabWidget_currentChanged();
     void at_dbDataChanged();
-    void at_cameraDataChanged();
     void at_cameraScheduleWidget_scheduleTasksChanged();
     void at_cameraScheduleWidget_recordingSettingsChanged();
     void at_cameraScheduleWidget_gridParamsChanged();
@@ -136,6 +122,7 @@ private slots:
     void at_resetMotionRegionsButton_clicked();
     void at_motionRegionListChanged();
     void at_advancedSettingsLoaded(int status, const QnStringVariantPairList &params, int handle);
+    void at_advancedParam_saved(int httpStatusCode, const QnStringBoolPairList& operationResult);
     void at_analogViewCheckBox_clicked();
     void at_fisheyeSettingsChanged();
 
@@ -147,8 +134,6 @@ private slots:
     void updateWebPageText();
 
 private:
-    void setHasCameraChanges(bool hasChanges);
-    void setAnyCameraChanges(bool hasChanges);
     void setHasDbChanges(bool hasChanges);
 
     void updateMotionWidgetFromResource();
@@ -180,8 +165,6 @@ private:
     QnVirtualCameraResourcePtr m_camera;
     bool m_cameraSupportsMotion;
 
-    bool m_hasCameraChanges;
-    bool m_anyCameraChanges;
     bool m_hasDbChanges;
 
     bool m_scheduleEnabledChanged;
@@ -204,8 +187,6 @@ private:
 
     CameraSettings m_cameraSettings;
     CameraSettingsWidgetsTreeCreator* m_widgetsRecreator;
-    QList< QPair< QString, QVariant> > m_modifiedAdvancedParams;
-    QList< QPair< QString, QVariant> > m_modifiedAdvancedParamsOutgoing;
     mutable QnMediaServerConnectionPtr m_serverConnection;
 
     QHash<QnUuid, QnImageProvider*> m_imageProvidersByResourceId;
