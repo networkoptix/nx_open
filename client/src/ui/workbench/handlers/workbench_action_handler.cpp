@@ -2427,7 +2427,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
         "<br/>"
         "%1"
         "<br/>"
-        "Please upgrade all components to the latest version %2."
+        "Please update all components to the latest version %2."
     ).arg(components).arg(latestMsVersion.toString());
 
     QScopedPointer<QnWorkbenchStateDependentDialog<QMessageBox> > messageBox(
@@ -2438,7 +2438,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
     messageBox->setStandardButtons(QMessageBox::Cancel);
     setHelpTopic(messageBox.data(), Qn::VersionMismatch_Help);
 
-    QPushButton *updateButton = messageBox->addButton(tr("Upgrade..."), QMessageBox::HelpRole);
+    QPushButton *updateButton = messageBox->addButton(tr("Update..."), QMessageBox::HelpRole);
     connect(updateButton, &QPushButton::clicked, this, [this] {
         menu()->trigger(Qn::SystemUpdateAction);
     }, Qt::QueuedConnection);

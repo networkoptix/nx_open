@@ -68,16 +68,16 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnSoftwareVersio
         title = tr("Newer version is available");
         message = tr("New version <b>%1</b> is available.").arg(updateVersion.toString());
         message += lit("<br/>");
-        message += tr("Would you like to upgrade?");
+        message += tr("Would you like to update?");
     } else {
-        title = tr("Upgrade is recommended");
+        title = tr("Update is recommended");
         message = tr("New version <b>%1</b> is available.").arg(updateVersion.toString());
         message += lit("<br/>");
         message += tr("Major issues have been fixed.");
         message += lit("<br/><span style=\"color:%1;\">").arg(redTextColor.name());
         message += tr("Update is strongly recommended.");
         message += lit("</span><br/>");
-        message += tr("Would you like to upgrade?");
+        message += tr("Would you like to update?");
     }
 
     QnCheckableMessageBox messageBox(mainWindow());
