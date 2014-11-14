@@ -55,8 +55,6 @@ public:
     static QString strFromType(const WIDGET_TYPE value);
     static bool isTypeWithoutValue(const WIDGET_TYPE value);
 
-    static QString& SEPARATOR;
-
     CameraSetting();
     CameraSetting(
         const QString& id,

@@ -415,10 +415,6 @@ int QnMediaServerConnection::setParamsAsync(const QnNetworkResourcePtr &camera, 
     return sendAsyncGetRequest(SetParamsObject, createSetParamsRequest(camera, params), QN_STRINGIZE_TYPE(QnStringBoolPairList), target, slot);
 }
 
-int QnMediaServerConnection::setParamsSync(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params, QnStringBoolPairList *reply) {
-    return sendSyncGetRequest(SetParamsObject, createSetParamsRequest(camera, params), reply);
-}
-
 int QnMediaServerConnection::searchCameraAsyncStart(const QString &startAddr, const QString &endAddr, const QString &username, const QString &password, int port, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("start_ip", startAddr);

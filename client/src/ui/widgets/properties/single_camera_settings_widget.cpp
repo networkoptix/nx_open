@@ -67,8 +67,6 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     d_ptr(new QnCameraSettingsWidgetPrivate()),
     ui(new Ui::SingleCameraSettingsWidget),
     m_cameraSupportsMotion(false),
-    m_hasCameraChanges(false),
-    m_anyCameraChanges(false),
     m_hasDbChanges(false),
     m_scheduleEnabledChanged(false),
     m_hasScheduleChanges(false),
@@ -254,7 +252,6 @@ bool QnSingleCameraSettingsWidget::initAdvancedTab()
 #ifdef QT_WEBKITWIDGETS_LIB
     QWebView* advancedWebView = 0;
 #endif
-    setAnyCameraChanges(false);
     bool isCameraSettingsId = false;
     bool showUrl = false;
     
@@ -288,7 +285,7 @@ bool QnSingleCameraSettingsWidget::initAdvancedTab()
 
             advancedTreeWidget = new QTreeWidget();
             advancedTreeWidget->setColumnCount(1);
-            advancedTreeWidget->setHeaderLabel(lit("Category")); // TODO: #TR #Elric
+            advancedTreeWidget->setHeaderLabel(tr("Category"));
 
             QWidget* advancedWidget = new QWidget();
             advancedLayout = new QStackedLayout(advancedWidget);
@@ -448,20 +445,6 @@ void QnSingleCameraSettingsWidget::loadAdvancedSettings()
             //TODO #ak remove this XML parsing run
             CameraSettingsTreeLister lister( id, m_camera );
             QStringList settings = lister.proceed();
-
-#if 0
-            if(m_widgetsRecreator) {
-                m_cameraSettings.clear();
-                foreach(const QString &setting, settings) {
-                    CameraSettingPtr tmp(new CameraSetting());
-                    tmp->deserializeFromStr(setting);
-                    m_cameraSettings.insert(tmp->getId(), tmp);
-                }
-
-                m_widgetsRecreator->proceed(&m_cameraSettings);
-            }
-#endif
-
             serverConnection->getParamsAsync(m_camera, settings, this, SLOT(at_advancedSettingsLoaded(int, const QnStringVariantPairList &, int)) );
         }
     }    
@@ -621,15 +604,6 @@ void QnSingleCameraSettingsWidget::submitToResource() {
 
         setHasDbChanges(false);
     }
-
-    if (hasCameraChanges()) {
-        m_modifiedAdvancedParamsOutgoing.clear();
-        m_modifiedAdvancedParamsOutgoing.append(m_modifiedAdvancedParams);
-        m_modifiedAdvancedParams.clear();
-        setHasCameraChanges(false);
-    } else {
-        setAnyCameraChanges(false);
-    }
 }
 
 void QnSingleCameraSettingsWidget::reject()
@@ -637,9 +611,8 @@ void QnSingleCameraSettingsWidget::reject()
     updateFromResource();
 }
 
-bool QnSingleCameraSettingsWidget::licensedParametersModified() const
-{
-    if( !hasDbChanges() && !hasCameraChanges() && !hasAnyCameraChanges() )
+bool QnSingleCameraSettingsWidget::licensedParametersModified() const {
+    if( !hasDbChanges() )
         return false;//nothing have been changed
 
     return m_scheduleEnabledChanged || m_hasScheduleChanges;
@@ -791,7 +764,6 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
     updateRecordingParamsAvailability();
 
     setHasDbChanges(false);
-    setHasCameraChanges(false);
     m_scheduleEnabledChanged = false;
     m_hasScheduleControlsChanges = false;
     m_hasMotionControlsChanges = false;
@@ -863,35 +835,7 @@ void QnSingleCameraSettingsWidget::setHasDbChanges(bool hasChanges) {
         return;
 
     m_hasDbChanges = hasChanges;
-    if(!m_hasDbChanges && !hasCameraChanges())
-    {
-        m_scheduleEnabledChanged = false;
-        m_hasScheduleChanges = false;
-    }
-
-    emit hasChangesChanged();
-}
-
-void QnSingleCameraSettingsWidget::setHasCameraChanges(bool hasChanges) {
-    if(m_hasCameraChanges == hasChanges)
-        return;
-
-    m_hasCameraChanges = hasChanges;
-    if(!m_hasCameraChanges && !hasDbChanges())
-    {
-        m_scheduleEnabledChanged = false;
-        m_hasScheduleChanges = false;
-    }
-
-    emit hasChangesChanged();
-}
-
-void QnSingleCameraSettingsWidget::setAnyCameraChanges(bool hasChanges) {
-    if(m_anyCameraChanges == hasChanges)
-        return;
-
-    m_anyCameraChanges = hasChanges;
-    if(!m_anyCameraChanges && !hasDbChanges())
+    if(!m_hasDbChanges)
     {
         m_scheduleEnabledChanged = false;
         m_hasScheduleChanges = false;
@@ -1054,22 +998,16 @@ void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int status, const Q
         return;
     }
 
-   // bool changesFound = false;
-    QList<QPair<QString, QVariant> >::ConstIterator it = params.begin();
-
-    for (; it != params.end(); ++it)
-    {
-  //      QString key = it->first;
+    for (auto it = params.cbegin(); it != params.cend(); ++it) {
         QString val = it->second.toString();
+        if (val.isEmpty())
+            continue;
 
-        if (!val.isEmpty())
-        {
             CameraSettingPtr tmp(new CameraSetting());
             tmp->deserializeFromStr(val);
 
             CameraSettings::Iterator sIt = m_cameraSettings.find(tmp->getId());
             if (sIt == m_cameraSettings.end()) {
-             //   changesFound = true;
                 m_cameraSettings.insert(tmp->getId(), tmp);
                 continue;
             }
@@ -1078,7 +1016,6 @@ void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int status, const Q
             if (CameraSettingReader::isEnabled(savedVal)) {
                 CameraSettingValue newVal = tmp->getCurrent();
                 if (savedVal.getCurrent() != newVal) {
-                //    changesFound = true;
                     savedVal.setCurrent(newVal);
                 }
                 continue;
@@ -1090,14 +1027,11 @@ void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int status, const Q
                 m_cameraSettings.insert(tmp->getId(), tmp);
                 continue;
             }
-        }
+
     }
 
-    //if (changesFound) {
-        //TODO #ak remove this XML parsing run
         m_widgetsRecreator->setCamera( m_camera );
         m_widgetsRecreator->proceed(&m_cameraSettings);
-    //}
 }
 
 void QnSingleCameraSettingsWidget::at_analogViewCheckBox_clicked() {
@@ -1259,13 +1193,8 @@ void QnSingleCameraSettingsWidget::at_dbDataChanged() {
     setHasDbChanges(true);
 }
 
-void QnSingleCameraSettingsWidget::at_cameraDataChanged() {
-    setHasCameraChanges(true);
-}
-
 void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChanged() {
     at_dbDataChanged();
-    at_cameraDataChanged();
 
     m_hasScheduleChanges = true;
     m_hasScheduleControlsChanges = false;
@@ -1273,7 +1202,6 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChanged(
 
 void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_recordingSettingsChanged() {
     at_dbDataChanged();
-    at_cameraDataChanged();
 
     m_hasScheduleChanges = true;
 }
@@ -1292,10 +1220,16 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChange
 }
 
 void QnSingleCameraSettingsWidget::at_advancedParamChanged(const CameraSetting& val) {
-    m_modifiedAdvancedParams.push_back(QPair<QString, QVariant>(val.getId(), QVariant(val.serializeToStr())));
-    setAnyCameraChanges(true);
-    at_cameraDataChanged();
-    emit advancedSettingChanged();
+
+    auto serverConnection = getServerConnection();
+    if (!serverConnection)
+        return;
+    
+    QnStringVariantPairList params;
+    params << QPair<QString, QVariant>(val.getId(), QVariant(val.serializeToStr()));
+    serverConnection->setParamsAsync(m_camera, params, this, SLOT(at_advancedParam_saved(int, const QnStringBoolPairList &)));
+
+    return;
 
     if (m_widgetsRecreator && m_camera->getUniqueId() == m_widgetsRecreator->getCameraId())
     {
@@ -1308,10 +1242,35 @@ void QnSingleCameraSettingsWidget::at_advancedParamChanged(const CameraSetting& 
     }
 }
 
-void QnSingleCameraSettingsWidget::refreshAdvancedSettings()
-{
-    if (m_widgetsRecreator)
+void QnSingleCameraSettingsWidget::at_advancedParam_saved(int httpStatusCode, const QnStringBoolPairList& operationResult) {
+    QString error = httpStatusCode == 0 
+        ? tr("Possibly, appropriate camera's service is unavailable now")
+        : tr("Server returned the following error code : ") + httpStatusCode; 
+
+    QString failedParams;
+    for (auto it = operationResult.constBegin(); it != operationResult.constEnd(); ++it)
     {
+        if (!it->second) {
+            QString formattedParam(lit("Advanced->") + it->first.right(it->first.length() - 2));
+            failedParams += lit("\n");
+            failedParams += formattedParam.replace(lit("%%"), lit("->")); // TODO: #Elric #TR
+        }
+    }
+
+    if (!failedParams.isEmpty()) {
+        QMessageBox::warning(
+            this,
+            tr("Could not save parameters"),
+            tr("Failed to save the following parameters (%1):\n%2").arg(error, failedParams)
+            );
+
+        refreshAdvancedSettings();
+    }
+}
+
+
+void QnSingleCameraSettingsWidget::refreshAdvancedSettings() {
+    if (m_widgetsRecreator) {
         loadAdvancedSettings();
     }
 }
@@ -1321,7 +1280,6 @@ void QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged() {
         return;
 
     at_dbDataChanged();
-    at_cameraDataChanged();
 
     // Preview the changes on the central widget
 

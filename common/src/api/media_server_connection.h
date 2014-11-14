@@ -149,11 +149,6 @@ public:
     int setParamsAsync(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params, QObject *target, const char *slot);
 
     /**
-     * \returns                         Http response status (200 in case of success).
-     */
-    int setParamsSync(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params, QnStringBoolPairList *reply);
-
-    /** 
      * \returns                         Request handle. 
      */
     int getStatisticsAsync(QObject *target, const char *slot);
