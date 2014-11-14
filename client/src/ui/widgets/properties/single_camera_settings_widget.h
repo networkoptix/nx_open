@@ -3,10 +3,7 @@
 
 #include <QtWidgets/QWidget>
 #include <QtNetwork/QNetworkReply>
-
-#ifdef QT_WEBKITWIDGETS_LIB
 #include <QtWebKitWidgets/QtWebKitWidgets>
-#endif
 
 #include "utils/camera_advanced_settings_xml_parser.h"
 #include "utils/common/connective.h"
@@ -27,10 +24,7 @@ class QVBoxLayout;
 class QnCameraMotionMaskWidget;
 class QnCameraSettingsWidgetPrivate;
 class QnImageProvider;
-
-#ifdef QT_WEBKITWIDGETS_LIB
 class CameraAdvancedSettingsWebPage;
-#endif
 
 class QnSingleCameraSettingsWidget : public Connective<QWidget>, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -150,9 +144,8 @@ private:
     void loadAdvancedSettings();
 
     void cleanAdvancedSettings();
-#ifdef QT_WEBKITWIDGETS_LIB
     void updateWebPage(QStackedLayout* stackedLayout , QWebView* advancedWebView);
-#endif
+
     Q_SLOT void at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator);
     Q_SLOT void at_proxyAuthenticationRequired ( const QNetworkProxy & , QAuthenticator * authenticator);
 
@@ -191,9 +184,7 @@ private:
 
     QHash<QnUuid, QnImageProvider*> m_imageProvidersByResourceId;
 	QUrl m_lastCameraPageUrl;
-#ifdef QT_WEBKITWIDGETS_LIB
     CameraAdvancedSettingsWebPage* m_cameraAdvancedSettingsWebPage;
-#endif
 };
 
 #endif // CAMERA_SETTINGS_DIALOG_H
