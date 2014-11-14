@@ -116,17 +116,10 @@ void QnMergeSystemsDialog::at_testConnectionButton_clicked() {
     m_password.clear();
 
     QUrl url = QUrl::fromUserInput(ui->urlComboBox->currentText());
-    QString user = ui->userNameEdit->text();
     QString password = ui->passwordEdit->text();
 
     if ((url.scheme() != lit("http") && url.scheme() != lit("https")) || url.host().isEmpty()) {
         updateErrorLabel(tr("The URL is invalid."));
-        updateConfigurationBlock();
-        return;
-    }
-
-    if (user.isEmpty()) {
-        updateErrorLabel(tr("Admin name cannot be empty."));
         updateConfigurationBlock();
         return;
     }
@@ -138,9 +131,9 @@ void QnMergeSystemsDialog::at_testConnectionButton_clicked() {
     }
 
     m_url = url;
-    m_user = user;
+    m_user = lit("admin");
     m_password = password;
-    m_mergeTool->pingSystem(url, user, password);
+    m_mergeTool->pingSystem(m_url, m_user, m_password);
     ui->buttonBox->showProgress(tr("testing..."));
 }
 
