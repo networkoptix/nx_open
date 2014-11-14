@@ -269,7 +269,6 @@ protected slots:
     void at_panicWatcher_panicModeChanged();
     void at_scheduleWatcher_scheduleEnabledChanged();
     void at_togglePanicModeAction_toggled(bool checked);
-    void at_updateWatcher_availableUpdateChanged();
     void at_layoutCountWatcher_layoutCountChanged();
 
     void at_toggleTourAction_toggled(bool checked);

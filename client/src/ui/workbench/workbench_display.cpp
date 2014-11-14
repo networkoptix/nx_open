@@ -1328,6 +1328,10 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
 
     QRectF enclosingGeometry = itemEnclosingGeometry(item);
 
+    /* Remove cell spacing for raized widget */
+    if (widget == raisedWidget)
+        enclosingGeometry = dilated(enclosingGeometry, workbench()->mapper()->spacing());
+
     /* Adjust for raise. */
     if(widget == raisedWidget && widget != zoomedWidget && m_view != NULL) {
 
@@ -1371,17 +1375,6 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     if(widget == raisedWidget || widget == zoomedWidget)
         bringToFront(widget);
 
-    /* Calculate bounds of the rotated item */
-    qreal aspectRatio = widget->hasAspectRatio() ? widget->aspectRatio() : 4.0 / 3.0;
-    QRectF bound = rotated(expanded(aspectRatio, enclosingGeometry, Qt::KeepAspectRatio), item->rotation());
-    qreal scale = scaleFactor(bound.size(), enclosingGeometry.size(), Qt::KeepAspectRatio);
-    qreal xdiff = enclosingGeometry.width() / 2.0 * (1.0 - scale);
-    qreal ydiff = enclosingGeometry.height() / 2.0 * (1.0 - scale);
-    enclosingGeometry.adjust(xdiff, ydiff, -xdiff, -ydiff);
-
-    /* Update enclosing aspect ratio. */
-    widget->setEnclosingAspectRatio(enclosingGeometry.width() / enclosingGeometry.height());
-
     /* Calculate rotation. */
     qreal rotation = item->rotation();
     if(item->data<bool>(Qn::ItemFlipRole, false))
@@ -1393,8 +1386,8 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
         animator->moveTo(enclosingGeometry, rotation);
     } else {
         animator->stop();
-        widget->setEnclosingGeometry(enclosingGeometry);
         widget->setRotation(rotation);
+        widget->setEnclosingGeometry(enclosingGeometry);
     }
 }
 

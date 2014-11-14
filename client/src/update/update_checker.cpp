@@ -4,6 +4,7 @@
 #include <QtNetwork/QNetworkReply>
 
 #include <utils/common/app_info.h>
+#include <common/common_module.h>
 
 QnUpdateChecker::QnUpdateChecker(const QUrl &url, QObject *parent) :
     QObject(parent),
@@ -30,6 +31,13 @@ void QnUpdateChecker::at_networkReply_finished() {
     QByteArray data = reply->readAll();
     QVariantMap map = QJsonDocument::fromJson(data).toVariant().toMap();
     map = map.value(QnAppInfo::customizationName()).toMap();
-    QnSoftwareVersion latestVersion(map.value(lit("latest_version")).toString());
-    emit updateAvailable(latestVersion);
+
+    QString currentRelease = map.value(lit("current_release")).toString();
+    if (currentRelease.isEmpty())
+        return;
+
+    map = map.value(lit("releases")).toMap();
+    QnSoftwareVersion latestVersion(map.value(currentRelease).toString());
+    QnSoftwareVersion patchVersion(map.value(qnCommon->engineVersion().toString(QnSoftwareVersion::MinorFormat)).toString());
+    emit updateAvailable(latestVersion, patchVersion);
 }
