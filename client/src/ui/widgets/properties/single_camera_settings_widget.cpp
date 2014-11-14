@@ -77,10 +77,8 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     m_motionWidget(NULL),
     m_inUpdateMaxFps(false),
     m_widgetsRecreator(0),
-    m_serverConnection(0)
-#ifdef QT_WEBKITWIDGETS_LIB
-    ,m_cameraAdvancedSettingsWebPage(0)
-#endif
+    m_serverConnection(0),
+    m_cameraAdvancedSettingsWebPage(0)
 {
     ui->setupUi(this);
 
@@ -211,7 +209,6 @@ void QnSingleCameraSettingsWidget::at_proxyAuthenticationRequired ( const QNetwo
     authenticator->setPassword(password);
 }
 
-#ifdef QT_WEBKITWIDGETS_LIB
 void QnSingleCameraSettingsWidget::updateWebPage(QStackedLayout* stackedLayout , QWebView* advancedWebView)
 {
     if (!m_camera)
@@ -242,16 +239,13 @@ void QnSingleCameraSettingsWidget::updateWebPage(QStackedLayout* stackedLayout ,
         }                
     } 
 }
-#endif
 
 bool QnSingleCameraSettingsWidget::initAdvancedTab()
 {
     QString id;
     QTreeWidget* advancedTreeWidget = 0;
     QStackedLayout* advancedLayout = 0;
-#ifdef QT_WEBKITWIDGETS_LIB
     QWebView* advancedWebView = 0;
-#endif
     bool isCameraSettingsId = false;
     bool showUrl = false;
     
@@ -260,7 +254,7 @@ bool QnSingleCameraSettingsWidget::initAdvancedTab()
         id = m_camera->getProperty( Qn::CAMERA_SETTINGS_ID_PARAM_NAME );
         isCameraSettingsId = !id.isNull();
         
-        if ( qnCommon && qnCommon->dataPool() )
+        if ( qnCommon->dataPool() )
         {
             QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
             showUrl = resourceData.value<bool>(lit("showUrl"), false);
@@ -299,7 +293,6 @@ bool QnSingleCameraSettingsWidget::initAdvancedTab()
             sizes[0] = 200;
             sizes[1] = 400;
             advancedSplitter->setSizes(sizes);
-#ifdef QT_WEBKITWIDGETS_LIB
             advancedWebView = new QWebView(ui->advancedTab);
             m_cameraAdvancedSettingsWebPage = new CameraAdvancedSettingsWebPage( advancedWebView );
             advancedWebView->setPage(m_cameraAdvancedSettingsWebPage);
@@ -367,7 +360,6 @@ bool QnSingleCameraSettingsWidget::initAdvancedTab()
             stacked_layout->addWidget(advancedWebView);
             if( currentTab() == Qn::AdvancedCameraSettingsTab )
                 updateWebPage(stacked_layout, advancedWebView);
-#endif
         } else {
             if (m_camera->getUniqueId() == m_widgetsRecreator->getCameraId()) {
                 return showOldSettings;
@@ -382,16 +374,12 @@ bool QnSingleCameraSettingsWidget::initAdvancedTab()
 
             advancedTreeWidget = m_widgetsRecreator->getRootWidget();
             advancedLayout = m_widgetsRecreator->getRootLayout();
-#ifdef QT_WEBKITWIDGETS_LIB
             advancedWebView = m_widgetsRecreator->getWebView();
-#endif
             cleanAdvancedSettings();
         }
 
         m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(m_camera->getUniqueId(), id, 
-#ifdef QT_WEBKITWIDGETS_LIB
             advancedWebView,
-#endif
             *advancedTreeWidget, *advancedLayout);
         connect(m_widgetsRecreator, &CameraSettingsWidgetsTreeCreator::advancedParamChanged, this, &QnSingleCameraSettingsWidget::at_advancedParamChanged);
         connect(m_widgetsRecreator, &CameraSettingsWidgetsTreeCreator::refreshAdvancedSettings, this, &QnSingleCameraSettingsWidget::refreshAdvancedSettings, Qt::QueuedConnection);
@@ -401,16 +389,12 @@ bool QnSingleCameraSettingsWidget::initAdvancedTab()
     {
         advancedTreeWidget = m_widgetsRecreator->getRootWidget();
         advancedLayout = m_widgetsRecreator->getRootLayout();
-#ifdef QT_WEBKITWIDGETS_LIB
         advancedWebView = m_widgetsRecreator->getWebView();
-#endif
         cleanAdvancedSettings();
 
         //Dummy creator: required for cameras, that doesn't support advanced settings
 		m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(QString(), QString(),
-#ifdef QT_WEBKITWIDGETS_LIB
             advancedWebView,
-#endif
             *advancedTreeWidget, *advancedLayout);
     }
 
@@ -474,11 +458,9 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
         connect(m_camera, SIGNAL(urlChanged(const QnResourcePtr &)),        this, SLOT(updateWebPageText())); // TODO: #Elric also listen to hostAddress changes?
         connect(m_camera, SIGNAL(resourceChanged(const QnResourcePtr &)),   this, SLOT(updateWebPageText()));
         
-#ifdef QT_WEBKITWIDGETS_LIB
         QStackedLayout* stacked_layout = dynamic_cast<QStackedLayout*>(ui->advancedTab->layout());
         if ( m_widgetsRecreator && m_widgetsRecreator->getWebView() && stacked_layout && (currentTab() == Qn::AdvancedCameraSettingsTab) )
             updateWebPage( stacked_layout, m_widgetsRecreator->getWebView() );
-#endif
     }
 
     updateFromResource();
@@ -1164,7 +1146,6 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged() {
             break;
         }
 
-#ifdef QT_WEBKITWIDGETS_LIB
         case Qn::AdvancedCameraSettingsTab:
         {
             QStackedLayout* stacked_layout = dynamic_cast<QStackedLayout*>(ui->advancedTab->layout());
@@ -1172,7 +1153,6 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged() {
                 updateWebPage( stacked_layout, m_widgetsRecreator->getWebView() );
             break;
         }
-#endif
 
         case Qn::FisheyeCameraSettingsTab:
         {
