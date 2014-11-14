@@ -2423,7 +2423,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
 
 
     QString message = tr(
-        "Some components of the system are not upgraded:<br/>"
+        "Some components of the system are not updated:<br/>"
         "<br/>"
         "%1"
         "<br/>"
