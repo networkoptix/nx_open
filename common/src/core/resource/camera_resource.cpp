@@ -29,6 +29,20 @@ QnPhysicalCameraResource::QnPhysicalCameraResource():
 
 int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const
 {
+    float lowEnd = 0.1;
+    float hiEnd = 1.0;
+
+    float qualityFactor = lowEnd + (hiEnd - lowEnd) * (quality - Qn::QualityLowest) / (Qn::QualityHighest - Qn::QualityLowest);
+
+    float resolutionFactor = 0.009 * pow(resolution.width() * resolution.height(), (float)0.7);
+
+    float frameRateFactor = fps/1.0;
+
+    float result = qualityFactor*frameRateFactor * resolutionFactor;
+
+    return qMax(192, result);
+
+    /*
     // I assume for a Qn::QualityHighest quality 30 fps for 1080 we need 10 mbps
     // I assume for a Qn::QualityLowest quality 30 fps for 1080 we need 1 mbps
 
@@ -45,6 +59,7 @@ int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality quality, QSiz
     result *= (resolutionFactor * frameRateFactor);
 
     return qMax(192,result);
+    */
 }
 
 int QnPhysicalCameraResource::getChannel() const

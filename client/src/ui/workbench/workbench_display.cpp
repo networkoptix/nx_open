@@ -1189,25 +1189,6 @@ QRectF QnWorkbenchDisplay::itemEnclosingGeometry(QnWorkbenchItem *item) const {
         result.height() + delta.height() * step.height()
     );
 
-    if (item->geometry().isEmpty())
-        return result;
-
-    /* Calculate bounds of the rotated item */
-    qreal rotation = qAbs(item->rotation());
-    if (!qFuzzyIsNull(rotation) && !qFuzzyEquals(rotation, 180)) {
-        QnResourceWidget *widget = this->widget(item);
-        if (widget) {
-            QRectF bound = result;
-            if (widget->hasAspectRatio())
-                bound = expanded(widget->aspectRatio(), result, Qt::KeepAspectRatio);
-            bound = rotated(bound, item->rotation());
-            qreal scale = scaleFactor(bound.size(), result.size(), Qt::KeepAspectRatio);
-            qreal xdiff = result.width() / 2.0 * (1.0 - scale);
-            qreal ydiff = result.height() / 2.0 * (1.0 - scale);
-            result.adjust(xdiff, ydiff, -xdiff, -ydiff);
-        }
-    }
-
     return result;
 }
 
@@ -1389,6 +1370,14 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     /* Update Z value. */
     if(widget == raisedWidget || widget == zoomedWidget)
         bringToFront(widget);
+
+    /* Calculate bounds of the rotated item */
+    qreal aspectRatio = widget->hasAspectRatio() ? widget->aspectRatio() : 4.0 / 3.0;
+    QRectF bound = rotated(expanded(aspectRatio, enclosingGeometry, Qt::KeepAspectRatio), item->rotation());
+    qreal scale = scaleFactor(bound.size(), enclosingGeometry.size(), Qt::KeepAspectRatio);
+    qreal xdiff = enclosingGeometry.width() / 2.0 * (1.0 - scale);
+    qreal ydiff = enclosingGeometry.height() / 2.0 * (1.0 - scale);
+    enclosingGeometry.adjust(xdiff, ydiff, -xdiff, -ydiff);
 
     /* Update enclosing aspect ratio. */
     widget->setEnclosingAspectRatio(enclosingGeometry.width() / enclosingGeometry.height());
