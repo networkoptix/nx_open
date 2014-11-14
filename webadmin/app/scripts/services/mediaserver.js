@@ -29,11 +29,12 @@ angular.module('webadminApp')
             getStorages: function(){ return $http.get('/api/storageSpace'); },
             saveStorages:function(info){return $http.post('/ec2/saveStorages',info); },
             discoveredPeers:function(){return $http.get('/api/discoveredPeers'); },
-            getMediaServer: function(id){return $http.get('/ec2/getMediaServersEx?id=' + id.replace("{","").replace("}","")); },
+            getMediaServer: function(id){return $http.get('/ec2/getMediaServersEx?id=' + id.replace('{','').replace('}','')); },
             getMediaServers: function(){return $http.get('/ec2/getMediaServersEx'); },
             getCameras:function(id){
-                if(typeof(id)!="undefined")
+                if(typeof(id)!=='undefined'){
                     return $http.get('/ec2/getCamerasEx?id=' + id.replace('{','').replace('}',''));
+                }
                 return $http.get('/ec2/getCamerasEx');
             },
 

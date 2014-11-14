@@ -9,11 +9,11 @@ angular.module('webadminApp', [
     'tc.chartjs',
 
 
-    "com.2fdevs.videogular",
-    "com.2fdevs.videogular.plugins.controls",
-    "com.2fdevs.videogular.plugins.buffering",
-    "com.2fdevs.videogular.plugins.dash",
-    "com.2fdevs.videogular.plugins.poster"
+    'com.2fdevs.videogular',
+    'com.2fdevs.videogular.plugins.controls',
+    'com.2fdevs.videogular.plugins.buffering',
+    'com.2fdevs.videogular.plugins.dash',
+    'com.2fdevs.videogular.plugins.poster'
 
 
 ]).config(function ($routeProvider) {
