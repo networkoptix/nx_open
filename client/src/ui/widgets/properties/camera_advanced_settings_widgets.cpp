@@ -1,4 +1,4 @@
-#include "camera_advanced_settings_widget.h"
+#include "camera_advanced_settings_widgets.h"
 
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QLabel>
