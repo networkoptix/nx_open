@@ -69,6 +69,8 @@ CLSimpleHTTPClient::CLSimpleHTTPClient(const QUrl& url, unsigned int timeout, co
     m_dataRestLen(0),
     m_localPort(0)
 {
+    if (m_host.isNull() && !url.host().isEmpty())
+        m_host = resolveAddress(url.host());
     initSocket(url.scheme() == lit("https"));
 }
 
