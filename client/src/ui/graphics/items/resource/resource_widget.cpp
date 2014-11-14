@@ -100,7 +100,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_item(item),
     m_options(DisplaySelection | DisplayButtons),
     m_localActive(false),
-    m_enclosingAspectRatio(1.0),
     m_frameOpacity(1.0),
     m_frameWidth(-1.0),
     m_titleTextFormat(lit("%1")),
@@ -335,19 +334,41 @@ void QnResourceWidget::setAspectRatio(qreal aspectRatio) {
     emit aspectRatioChanged();
 }
 
-void QnResourceWidget::setEnclosingAspectRatio(qreal enclosingAspectRatio) {
-    m_enclosingAspectRatio = enclosingAspectRatio;
-}
-
 QRectF QnResourceWidget::enclosingGeometry() const {
-    return expanded(m_enclosingAspectRatio, geometry(), Qt::KeepAspectRatioByExpanding);
+    QRectF rect = m_enclosingGeometry;
+    rect.moveCenter(geometry().center());
+    return rect;
 }
 
 void QnResourceWidget::setEnclosingGeometry(const QRectF &enclosingGeometry) {
-    m_enclosingAspectRatio = enclosingGeometry.width() / enclosingGeometry.height();
+    m_enclosingGeometry = enclosingGeometry;
 
     if(hasAspectRatio()) {
-        setGeometry(expanded(m_aspectRatio, enclosingGeometry, Qt::KeepAspectRatio));
+        /* Calculate bounds of the rotated item. */
+
+        /* 1. Take a rectangle with our aspect ratio */
+        QRectF geom = expanded(m_aspectRatio, enclosingGeometry, Qt::KeepAspectRatio);
+
+        /* 2. Rotate it */
+        QPointF c = geom.center();
+        QTransform transform;
+        transform.translate(c.x(), c.y());
+        transform.rotate(rotation());
+        transform.translate(-c.x(), -c.y());
+        QRectF rotated = transform.mapRect(geom);
+
+        /* 3. Scale it to fit enclosing geometry */
+        QSizeF scaledSize = bounded(expanded(rotated.size(), enclosingGeometry.size(), Qt::KeepAspectRatio), enclosingGeometry.size(), Qt::KeepAspectRatio);
+
+        /* 4. Get scale factor */
+        qreal scale = QnGeometry::scaleFactor(rotated.size(), scaledSize, Qt::KeepAspectRatio);
+
+        /* 5. Scale original non-rotated geometry */
+        qreal xdiff = geom.width() / 2.0 * (1.0 - scale);
+        qreal ydiff = geom.height() / 2.0 * (1.0 - scale);
+        geom.adjust(xdiff, ydiff, -xdiff, -ydiff);
+
+        setGeometry(geom);
     } else {
         setGeometry(enclosingGeometry);
     }
