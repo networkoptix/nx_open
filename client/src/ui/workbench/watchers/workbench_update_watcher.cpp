@@ -44,58 +44,34 @@ void QnWorkbenchUpdateWatcher::stop() {
     m_timer->stop();
 }
 
-void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnSoftwareVersion &latestVersion, const QnSoftwareVersion &patchVersion) {
-    if (latestVersion.isNull() && patchVersion.isNull())
+void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnSoftwareVersion &updateVersion) {
+    if (updateVersion.isNull())
         return;
 
     if (!m_timer->isActive())
         return;
 
-    QnSoftwareVersion versionToNotify;
-    QList<QnSoftwareVersion> ignoredVersions = qnSettings->ignoredUpdateVersion();
+    if (m_latestVersion == updateVersion || qnSettings->ignoredUpdateVersion() >= updateVersion)
+        return;
 
-    while (ignoredVersions.size() < 2)
-        ignoredVersions.append(QnSoftwareVersion());
-
-    if (m_latestVersion != latestVersion) {
-        if (ignoredVersions.isEmpty() || ignoredVersions.first() < latestVersion) {
-            versionToNotify = latestVersion;
-            ignoredVersions.first() = latestVersion;
-        }
-    }
-
-    if (versionToNotify.isNull() && m_patchVersion != patchVersion) {
-        if (ignoredVersions.isEmpty() || ignoredVersions.last() < patchVersion) {
-            versionToNotify = patchVersion;
-            ignoredVersions.last() = patchVersion;
-        }
-    }
-
-    if (latestVersion == patchVersion)
-        ignoredVersions.first() = ignoredVersions.last() = latestVersion;
-
-    m_latestVersion = latestVersion;
-    m_patchVersion = patchVersion;
+    m_latestVersion = updateVersion;
 
     if (!qnSettings->isAutoCheckForUpdates())
         return;
 
-    if (versionToNotify.isNull())
-        return;
-
     QnSoftwareVersion current = qnCommon->engineVersion();
-    bool majorVersionChange = versionToNotify.major() > current.major() || versionToNotify.minor() > current.minor();
+    bool majorVersionChange = updateVersion.major() > current.major() || updateVersion.minor() > current.minor();
 
     QString title;
     QString message;
     if (majorVersionChange) {
         title = tr("Newer version is available");
-        message = tr("New version is available.");
+        message = tr("New version <b>%1</b> is available.").arg(updateVersion.toString());
         message += lit("<br/>");
         message += tr("Would you like to upgrade?");
     } else {
         title = tr("Upgrade is recommended");
-        message = tr("New version is available.");
+        message = tr("New version <b>%1</b> is available.").arg(updateVersion.toString());
         message += lit("<br/>");
         message += tr("Major issues have been fixed.");
         message += lit("<br/><span style=\"color:%1;\">").arg(redTextColor.name());
@@ -116,6 +92,6 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnSoftwareVersio
     if (res == QnCheckableMessageBox::Accepted) {
         action(Qn::SystemUpdateAction)->trigger();
     } else {
-        qnSettings->setIgnoredUpdateVersion(messageBox.isChecked() ? ignoredVersions : QList<QnSoftwareVersion>());
+        qnSettings->setIgnoredUpdateVersion(messageBox.isChecked() ? updateVersion : QnSoftwareVersion());
     }
 }

@@ -15,7 +15,6 @@
 
 #include <utils/common/id.h>
 #include <utils/common/model_functions_fwd.h>
-#include <utils/common/software_version.h>
 #include <recording/time_period.h>
 
 
@@ -105,9 +104,6 @@ QN_FUSION_DECLARE_FUNCTIONS(QnLicenseWarningState, (datastream)(metatype));
 typedef QHash<QString, qreal> QnAspectRatioHash;
 Q_DECLARE_METATYPE(QnAspectRatioHash)
 
-
-typedef QList<QnSoftwareVersion> QnSoftwareVersionList;
-Q_DECLARE_METATYPE(QnSoftwareVersionList)
 
 // -------------------------------------------------------------------------- //
 // QnPtzHotkey

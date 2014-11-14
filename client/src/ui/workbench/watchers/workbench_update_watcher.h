@@ -16,20 +16,18 @@ public:
     virtual ~QnWorkbenchUpdateWatcher();
 
     QnSoftwareVersion latestVersion() const { return m_latestVersion; }
-    QnSoftwareVersion patchVersion() const { return m_patchVersion; }
 
 public slots:
     void start();
     void stop();
 
 private slots:
-    void at_checker_updateAvailable(const QnSoftwareVersion &latestVersion, const QnSoftwareVersion &patchVersion);
+    void at_checker_updateAvailable(const QnSoftwareVersion &updateVersion);
 
 private:
     QnUpdateChecker *m_checker;
     QTimer *m_timer;
     QnSoftwareVersion m_latestVersion;
-    QnSoftwareVersion m_patchVersion;
 };
 
 #endif // QN_WORKBENCH_UPDATE_WATCHER_H

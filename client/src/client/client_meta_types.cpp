@@ -72,8 +72,6 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnActionParameters>();
     qRegisterMetaType<QnAspectRatioHash>();
     qRegisterMetaTypeStreamOperators<QnAspectRatioHash>();
-    qRegisterMetaType<QnSoftwareVersionList>();
-    qRegisterMetaTypeStreamOperators<QnSoftwareVersionList>();
 
     qRegisterMetaType<Qn::LightModeFlags>();
 
