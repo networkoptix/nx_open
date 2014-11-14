@@ -492,17 +492,13 @@ QStringList CameraSettingsTreeLister::proceed()
 CameraSettingsWidgetsTreeCreator::CameraSettingsWidgetsTreeCreator(
     const QString& cameraId,
     const QString& id,
-#ifdef QT_WEBKITWIDGETS_LIB
     QWebView* webView,
-#endif
     QTreeWidget& rootWidget,
     QStackedLayout& rootLayout
     )
 :
     CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>(id),
-#ifdef QT_WEBKITWIDGETS_LIB
     m_webView(webView),
-#endif
     m_rootWidget(rootWidget),
     m_rootLayout(rootLayout),
     m_treeWidgetsById(),
@@ -520,9 +516,7 @@ CameraSettingsWidgetsTreeCreator::~CameraSettingsWidgetsTreeCreator()
     removeEmptyWidgetGroups();
     m_treeWidgetsById.clear();
     m_rootWidget.clear();
-#ifdef QT_WEBKITWIDGETS_LIB
     m_webView = NULL;
-#endif
 }
 
 CameraSettingsWidgetsCreator* CameraSettingsWidgetsTreeCreator::createElement(
@@ -570,12 +564,10 @@ QStackedLayout* CameraSettingsWidgetsTreeCreator::getRootLayout()
     return &m_rootLayout;
 }
 
-#ifdef QT_WEBKITWIDGETS_LIB
 QWebView* CameraSettingsWidgetsTreeCreator::getWebView()
 {
     return m_webView;
 }
-#endif
 
 void CameraSettingsWidgetsTreeCreator::removeEmptyWidgetGroups()
 {

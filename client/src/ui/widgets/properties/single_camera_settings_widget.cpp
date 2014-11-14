@@ -365,13 +365,6 @@ bool QnSingleCameraSettingsWidget::initAdvancedTab()
                 return showOldSettings;
             }
 
-            if (id == m_widgetsRecreator->getId()) {
-
-                //ToDo: disable all and return. Currently, will do the same as for another type of cameras
-                //disable;
-                //return;
-            }
-
             advancedTreeWidget = m_widgetsRecreator->getRootWidget();
             advancedLayout = m_widgetsRecreator->getRootLayout();
             advancedWebView = m_widgetsRecreator->getWebView();

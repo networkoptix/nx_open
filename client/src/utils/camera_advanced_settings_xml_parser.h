@@ -8,9 +8,7 @@
 #include <QtCore/QSet>
 #include <QtWidgets/QTreeWidgetItem>
 #include <QtWidgets/QStackedLayout>
-#ifdef QT_WEBKITWIDGETS_LIB
 #include <QtWebKitWidgets/QtWebKitWidgets>
-#endif
 
 #include <core/resource/resource_fwd.h>
 #include "plugins/resource/camera_settings/camera_settings.h"
@@ -228,9 +226,7 @@ class CameraSettingsWidgetsTreeCreator: public QObject, public CameraSettingTree
     typedef CameraSettingsWidgetsCreator::SettingsWidgetsById SettingsWidgetsById;
     typedef CameraSettingsWidgetsCreator::EmptyGroupsById EmptyGroupsById;
 
-#ifdef QT_WEBKITWIDGETS_LIB
     QWebView* m_webView;
-#endif
     QTreeWidget& m_rootWidget;
     QStackedLayout& m_rootLayout;
     TreeWidgetItemsById m_treeWidgetsById;
@@ -252,9 +248,7 @@ public:
     CameraSettingsWidgetsTreeCreator(
         const QString& cameraId,
         const QString& id,
-#ifdef QT_WEBKITWIDGETS_LIB
         QWebView* webView,
-#endif
         QTreeWidget& rootWidget,
         QStackedLayout& rootLayout
         );
@@ -271,9 +265,7 @@ public:
     QString getCameraId() const;
     QTreeWidget* getRootWidget();
     QStackedLayout* getRootLayout();
-#ifdef QT_WEBKITWIDGETS_LIB
     QWebView* getWebView();
-#endif
 
 signals:
     void advancedParamChanged(const CameraSetting &param);
