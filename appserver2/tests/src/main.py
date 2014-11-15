@@ -1292,80 +1292,195 @@ class PerformanceOperation():
 # ===================================
 # RTSP test
 # ===================================
-class RRTcp:
-	
-	_socket = None
-	_addr = None
-	_port = None
-	_data = None
-	
-	def __init__(self,addr,port,data):
-		self._port = port
-		self._addr = addr
-		self._data = data
-		
-	def _request(self):
-		data = self._data
-		while True:
-			sz = self._socket.send(data)
-			if sz == len(data):
-				return
-			else:
-				data = data[sz:]
-				
-	
-	def _checkEOF(self,data):
-		return data.find("\r\n\r\n") > 0
-	
-	def _response(self):
-		ret = ""
-		while True:
-			data = self._socket.recv(1024)
-			if not data:
-				return ret
-			else:
-				ret += data
-				if self._checkEOF(ret):
-					return ret
-					
-	
-	def __enter__(self):
-		self._socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-		self._socket.connect((self._addr,self._port))
-		self._request()
-		return self._response()
-		
-	def __exit__(self,type,value,trace):
-		self._socket.close()
 
-	
+class RRRtspTcp:
+    _socket = None
+    _addr = None
+    _port = None
+    _data = None
+    _cid = None
+    _sid = None
+    _mac = None
+    _uname = None
+    _pwd = None
+
+    _rtspBasicTemplate =  "\
+        PLAY rtsp://%s/%s RTSP/1.0\r\n\
+        CSeq: 2\r\n\
+        Range: npt=now-\r\n\
+        Scale: 1\r\n\
+        x-guid: %s\r\n\
+        Session:\r\n\
+        User-Agent: Network Optix\r\n\
+        x-play-now: true\r\n\
+        Authorization: Basic YWRtaW46MTIz\r\n\
+        x-server-guid: %s\r\n\r\n"
+
+    _rtspDigestTemplate = "\
+        PLAY rtsp://%s/%s RTSP/1.0\r\n\
+        CSeq: 2\r\n\
+        Range: npt=now-\r\n\
+        Scale: 1\r\n\
+        x-guid: %s\r\n\
+        Session:\r\n\
+        User-Agent: Network Optix\r\n\
+        x-play-now: true\r\n\
+        %s\
+        x-server-guid: %s\r\n\r\n"
+
+    _digestAuthTemplate = " \
+        Authorization: Digest \
+        username=\"%s\", \
+        realm=\"%s\", \
+        nonce=\"%s\", \
+        uri=\"%s\", \
+        response=\"%s\""
+    
+    def __init__(self,addr,port,mac,cid,sid,uname,pwd):
+        self._port = port
+        self._addr = addr
+        self._data = self._rtspBasicTemplate%(
+            "%s:%d"%(addr,port),
+            mac,
+            cid,
+            sid)
+
+        self._cid = cid
+        self._sid = sid
+        self._mac = mac
+        self._uname = uname
+        self._pwd = pwd
+
+    def _checkEOF(self,data):
+        return data.find("\r\n\r\n") > 0
+
+    def _parseRelamAndNonce(self,reply):
+        idx = reply.find("WWW-Authenticate")
+        if idx < 0:
+            return False
+        # realm is fixed for our server
+        realm = "NetworkOptix"
+
+        # find the Nonce
+        idx = reply.find("nonce=",idx)
+        if idx < 0:
+            return False
+        idx_start = idx + 6
+        idx_end = reply.find(",",idx)
+        if idx_end < 0:
+            idx_end = reply.find("\r\n",idx)
+            if idx_end <0:
+                return False
+        nonce = reply[idx_start+1:idx_end-1]
+
+        return (realm,nonce)
+
+    # This function only calcuate the digest response
+    # not the specific header field. So another format
+    # is required to format the header into the target
+    # HTTP digest authentication
+
+    def _calDigest(self,realm,nonce):
+        m = md5.new()
+        m.update( "%s:%s:%s"%(self._uname,realm,self._pwd) )
+        part1 = m.digest()
+
+        m = md5.new()
+        m.update( "PLAY:http://%s:%d/%s"%(self._addr,self._port,self._mac) )
+        part2 = m.digest()
+
+        m = md5.new()
+        m.update("%s:%s:%s"%(part1,nonce,part2))
+        resp = m.digest()
+
+        # represent the final digest as ANSI printable code
+        return ''.join('%02x' % ord(i) for i in resp)
+
+
+    def _formatDigestHeader(self,realm,nonce):
+        resp = self._calDigest(realm,nonce)
+        return self._digestAuthTemplate%(
+            self._uname,
+            realm,
+            nonce,
+            "http://%s:%d/%s"%(self._addr,self._port,self._mac),
+            resp)
+
+    def _requestWithDigest(self,reply):
+        realm = None
+        nonce = None
+        ret = self._parseRelamAndNonce(reply)
+        if ret == False:
+            return reply
+        else:
+            realm = ret[0]
+            nonce = ret[1]
+        auth = self._formatDigestHeader(realm,nonce)
+        data = self._rtspDigestTemplate%(
+            "%s:%d"%(self._addr,self._port),
+            self._mac,
+            self._cid,
+            auth,
+            self._sid)
+        self._request(data)
+        return self._response()
+
+
+    def _checkAuthorization(self,data):
+        return data.find("Unauthorized") <0
+    
+    
+    def _request(self,data):
+        while True:
+            sz = self._socket.send(data)
+            if sz == len(data):
+                return
+            else:
+                data = data[sz:] 
+            
+    def _response(self):
+        ret = ""
+        while True:
+            data = self._socket.recv(1024)
+            if not data:
+                return ret
+            else:
+                ret += data
+                if self._checkEOF(ret):
+                    return ret
+
+    def __enter__(self):
+        self._socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        self._socket.connect((self._addr,self._port))
+        self._request(self._data)
+        reply = self._response()
+        if not self._checkAuthorization(reply):
+            return self._requestWithDigest(reply)
+        else:
+            return reply
+        
+    def __exit__(self,type,value,trace):
+        self._socket.close()
+
 
 class SingleServerRtspTest():
     _testCase = 0 
     """ The RTSP test case number """
-
-    _rtspRequestTemplate = "\
-            PLAY rtsp://%s/%s RTSP/1.0\r\n\
-            CSeq: 2\r\n\
-            Range: npt=now-\r\n\
-            Scale: 1\r\n\
-            x-guid: %s\r\n\
-            Session:\r\n\
-            User-Agent: Network Optix\r\n\
-            x-play-now: true\r\n\
-            Authorization: Basic YWRtaW46MTIz\r\n\
-            x-server-guid: %s\r\n\r\n"
 
     _serverEndpoint = None
     _serverGUID = None
     _cameraList = []
     _cameraInfoTable = dict()
     _testCase = 0
+    _username = None
+    _password = None
 
-    def __init__(self,serverEndpoint,serverGUID,testCase):
+    def __init__(self,serverEndpoint,serverGUID,testCase,uname,pwd):
         self._serverEndpoint = serverEndpoint
         self._serverGUID = serverGUID
         self._testCase = testCase
+        self._username = uname
+        self._password = pwd
 
         self._fetchCameraList()
 
@@ -1391,11 +1506,12 @@ class SingleServerRtspTest():
         c = self._cameraList[random.randint(0,len(self._cameraList) - 1)]
         l = self._serverEndpoint.split(":")
 
-        with RRTcp(l[0],int(l[1]),
-				  self._rtspRequestTemplate % (self._serverEndpoint,
-					    c[0],
-					    c[1],
-					    self._serverGUID)) as reply:
+        with RRRtspTcp(l[0],int(l[1]),
+                     c[0],
+                     c[1],
+                     self._serverGUID,
+                     self._username,
+                     self._password) as reply:
 
             assert self._checkReply(reply),"Server:%s RTSP failed, with reply:%s" % (self._serverEndpoint,reply)
 
@@ -1407,17 +1523,22 @@ class SingleServerRtspTest():
 
 class ServerRtspTest:
     _testCase = 0
+    _username = None
+    _password = None
     
     def __init__(self):
         p = ConfigParser.RawConfigParser()
         p.read("ec2_tests.cfg")
         self._testCase = p.getint("Rtsp","testSize")
+        self._username = p.get("General","username")
+        self._password = p.get("General","password")
         
     def test(self):
         for i in range(len(clusterTest.clusterTestServerList)):
             serverAddr = clusterTest.clusterTestServerList[i]
             serverAddrGUID = clusterTest.clusterTestServerUUIDList[i][0]
-            SingleServerRtspTest(serverAddr,serverAddrGUID,self._testCase).run()
+            SingleServerRtspTest(serverAddr,serverAddrGUID,self._testCase,
+                              self._username,self._password).run()
 
 class UserOperation(PerformanceOperation):
     def add(self,num):
