@@ -17,6 +17,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_data_pool.h>
 
+#include <ui/style/warning_style.h>
 #include <ui/widgets/properties/camera_advanced_settings_web_page.h>
 
 #include <utils/common/model_functions.h>
@@ -27,7 +28,8 @@ QnCameraAdvancedSettingsWidget::QnCameraAdvancedSettingsWidget(QWidget* parent /
     ui(new Ui::CameraAdvancedSettingsWidget),
     m_page(Page::Empty),
     m_widgetsRecreator(NULL),
-    m_paramRequestHandle(0)
+    m_paramRequestHandle(0),
+    m_applyingParamsCount(0)
 {
     ui->setupUi(this);
 
@@ -36,69 +38,11 @@ QnCameraAdvancedSettingsWidget::QnCameraAdvancedSettingsWidget(QWidget* parent /
     sizes[1] = 400;
     ui->splitter->setSizes(sizes);
 
+    initWebView();
+
     ui->manualLoadingWidget->setText(tr("Please wait while settings are being loaded.\nThis can take a lot of time."));
-    
-    m_cameraAdvancedSettingsWebPage = new CameraAdvancedSettingsWebPage(ui->webView);
-    ui->webView->setPage(m_cameraAdvancedSettingsWebPage);
-
-    QStyle* style = QStyleFactory().create(lit("fusion"));
-    ui->webView->setStyle(style);
-
-
-    QPalette palGreenHlText = this->palette();
-
-    // Outline around the menu
-    palGreenHlText.setColor(QPalette::Window, Qt::gray);    
-    palGreenHlText.setColor(QPalette::WindowText, Qt::black);
-
-    palGreenHlText.setColor(QPalette::BrightText, Qt::gray);  
-    palGreenHlText.setColor(QPalette::BrightText, Qt::black);
-
-    // combo button
-    palGreenHlText.setColor(QPalette::Button, Qt::gray);  
-    palGreenHlText.setColor(QPalette::ButtonText, Qt::black);
-
-    // combo menu
-    palGreenHlText.setColor(QPalette::Base, Qt::gray);  
-    palGreenHlText.setColor(QPalette::Text, Qt::black);
-
-    // tool tips
-    palGreenHlText.setColor(QPalette::ToolTipBase, Qt::gray);  
-    palGreenHlText.setColor(QPalette::ToolTipText, Qt::black);
-
-    palGreenHlText.setColor(QPalette::NoRole, Qt::gray);  
-    palGreenHlText.setColor(QPalette::AlternateBase, Qt::gray);  
-
-    palGreenHlText.setColor(QPalette::Link, Qt::black);  
-    palGreenHlText.setColor(QPalette::LinkVisited, Qt::black);  
-
-
-
-    // highlight button & menu
-    palGreenHlText.setColor(QPalette::Highlight, Qt::gray);   
-    palGreenHlText.setColor(QPalette::HighlightedText, Qt::black);
-
-    // to customize the disabled color
-    palGreenHlText.setColor(QPalette::Disabled, QPalette::Button, Qt::gray);
-    palGreenHlText.setColor(QPalette::Disabled, QPalette::ButtonText, Qt::black);
-
-
-
-    ui->webView->setPalette(palGreenHlText);
-
-    ui->webView->setAutoFillBackground(true);
-    //ui->webView->setStyleSheet(lit("background-color: rgb(255, 255, 255); color: rgb(255, 255, 255)"));
-
-    ui->webView->setBackgroundRole(palGreenHlText.Base);
-    ui->webView->setForegroundRole(palGreenHlText.Base);
-
-    connect(ui->webView->page()->networkAccessManager(), &QNetworkAccessManager::sslErrors,
-        this, [](QNetworkReply* reply, const QList<QSslError> &){reply->ignoreSslErrors();} );
-    connect(ui->webView->page()->networkAccessManager(), &QNetworkAccessManager::authenticationRequired,
-        this, &QnCameraAdvancedSettingsWidget::at_authenticationRequired, Qt::DirectConnection );
-    connect(ui->webView->page()->networkAccessManager(), &QNetworkAccessManager::proxyAuthenticationRequired,
-        this, &QnCameraAdvancedSettingsWidget::at_proxyAuthenticationRequired, Qt::DirectConnection);
-
+    setWarningStyle(ui->manualWarningLabel);
+    updateApplyingParamsLabel();
 }
 
 QnCameraAdvancedSettingsWidget::~QnCameraAdvancedSettingsWidget() {
@@ -135,14 +79,6 @@ void QnCameraAdvancedSettingsWidget::clean() {
         targetLayout->removeItem(targetLayout->itemAt(0));
 }
 
-void QnCameraAdvancedSettingsWidget::refresh() {
-    qDebug() << "asked for refresh, WHY";
-    return;
-
-    clean();
-    reloadData();
-}
-
 void QnCameraAdvancedSettingsWidget::createWidgetsRecreator(const QString &paramId) {
     clean();
 
@@ -153,7 +89,6 @@ void QnCameraAdvancedSettingsWidget::createWidgetsRecreator(const QString &param
     m_widgetsRecreator->setCamera( m_camera );
 
     connect(m_widgetsRecreator, &CameraSettingsWidgetsTreeCreator::advancedParamChanged, this, &QnCameraAdvancedSettingsWidget::at_advancedParamChanged);
-    connect(m_widgetsRecreator, &CameraSettingsWidgetsTreeCreator::refreshAdvancedSettings, this, &QnCameraAdvancedSettingsWidget::refresh, Qt::QueuedConnection);
 }
 
 void QnCameraAdvancedSettingsWidget::updatePage() {
@@ -245,6 +180,75 @@ QnMediaServerConnectionPtr QnCameraAdvancedSettingsWidget::getServerConnection()
     return QnMediaServerConnectionPtr();
 }
 
+void QnCameraAdvancedSettingsWidget::initWebView() {
+    m_cameraAdvancedSettingsWebPage = new CameraAdvancedSettingsWebPage(ui->webView);
+    ui->webView->setPage(m_cameraAdvancedSettingsWebPage);
+
+    QStyle* style = QStyleFactory().create(lit("fusion"));
+    ui->webView->setStyle(style);
+
+    QPalette palGreenHlText = this->palette();
+
+    // Outline around the menu
+    palGreenHlText.setColor(QPalette::Window, Qt::gray);    
+    palGreenHlText.setColor(QPalette::WindowText, Qt::black);
+
+    palGreenHlText.setColor(QPalette::BrightText, Qt::gray);  
+    palGreenHlText.setColor(QPalette::BrightText, Qt::black);
+
+    // combo button
+    palGreenHlText.setColor(QPalette::Button, Qt::gray);  
+    palGreenHlText.setColor(QPalette::ButtonText, Qt::black);
+
+    // combo menu
+    palGreenHlText.setColor(QPalette::Base, Qt::gray);  
+    palGreenHlText.setColor(QPalette::Text, Qt::black);
+
+    // tool tips
+    palGreenHlText.setColor(QPalette::ToolTipBase, Qt::gray);  
+    palGreenHlText.setColor(QPalette::ToolTipText, Qt::black);
+
+    palGreenHlText.setColor(QPalette::NoRole, Qt::gray);  
+    palGreenHlText.setColor(QPalette::AlternateBase, Qt::gray);  
+
+    palGreenHlText.setColor(QPalette::Link, Qt::black);  
+    palGreenHlText.setColor(QPalette::LinkVisited, Qt::black);  
+
+
+
+    // highlight button & menu
+    palGreenHlText.setColor(QPalette::Highlight, Qt::gray);   
+    palGreenHlText.setColor(QPalette::HighlightedText, Qt::black);
+
+    // to customize the disabled color
+    palGreenHlText.setColor(QPalette::Disabled, QPalette::Button, Qt::gray);
+    palGreenHlText.setColor(QPalette::Disabled, QPalette::ButtonText, Qt::black);
+
+
+
+    ui->webView->setPalette(palGreenHlText);
+
+    ui->webView->setAutoFillBackground(true);
+    //ui->webView->setStyleSheet(lit("background-color: rgb(255, 255, 255); color: rgb(255, 255, 255)"));
+
+    ui->webView->setBackgroundRole(palGreenHlText.Base);
+    ui->webView->setForegroundRole(palGreenHlText.Base);
+
+    connect(ui->webView->page()->networkAccessManager(), &QNetworkAccessManager::sslErrors,
+        this, [](QNetworkReply* reply, const QList<QSslError> &){reply->ignoreSslErrors();} );
+    connect(ui->webView->page()->networkAccessManager(), &QNetworkAccessManager::authenticationRequired,
+        this, &QnCameraAdvancedSettingsWidget::at_authenticationRequired, Qt::DirectConnection );
+    connect(ui->webView->page()->networkAccessManager(), &QNetworkAccessManager::proxyAuthenticationRequired,
+        this, &QnCameraAdvancedSettingsWidget::at_proxyAuthenticationRequired, Qt::DirectConnection);
+}
+
+
+void QnCameraAdvancedSettingsWidget::updateApplyingParamsLabel() {
+    ui->manualApplyingProgressWidget->setVisible(m_applyingParamsCount > 0);
+    ui->manualApplyingProgressWidget->setText(tr("Applying settings..."));
+}
+
+
 void QnCameraAdvancedSettingsWidget::at_authenticationRequired(QNetworkReply* /*reply*/, QAuthenticator * authenticator)
 {
     QMutexLocker locker(&m_cameraMutex);
@@ -270,11 +274,6 @@ void QnCameraAdvancedSettingsWidget::at_advancedSettingsLoaded(int status, const
         return;
 
     ui->manualSettingsWidget->setCurrentWidget(ui->manualContentPage);
-
-    qDebug() << "PARAMS LOADED";
-    for (auto it = params.cbegin(); it != params.cend(); ++it) {
-        qDebug() << "PARAM" << it->first << it->second.toString();
-    }
 
     if (!m_widgetsRecreator) {
         qWarning() << "QnSingleCameraSettingsWidget::at_advancedSettingsLoaded: widgets creator ptr is null, camera id: "
@@ -323,7 +322,8 @@ void QnCameraAdvancedSettingsWidget::at_advancedSettingsLoaded(int status, const
 }
 
 void QnCameraAdvancedSettingsWidget::at_advancedParam_saved(int httpStatusCode, const QnStringBoolPairList& operationResult) {
-    qDebug() << "at_advancedParam_saved" << httpStatusCode << operationResult;
+    --m_applyingParamsCount;
+    updateApplyingParamsLabel();
 
     QString error = httpStatusCode == 0 
         ? tr("Possibly, appropriate camera's service is unavailable now")
@@ -345,8 +345,6 @@ void QnCameraAdvancedSettingsWidget::at_advancedParam_saved(int httpStatusCode, 
             tr("Could not save parameters"),
             tr("Failed to save the following parameters (%1):\n%2").arg(error, failedParams)
             );
-
-        refresh();
     }
 }
 
@@ -358,4 +356,7 @@ void QnCameraAdvancedSettingsWidget::at_advancedParamChanged(const CameraSetting
     QnStringVariantPairList params;
     params << QPair<QString, QVariant>(val.getId(), QVariant(val.serializeToStr()));
     serverConnection->setParamsAsync(m_camera, params, this, SLOT(at_advancedParam_saved(int, const QnStringBoolPairList &)));
+    ++m_applyingParamsCount;
+    updateApplyingParamsLabel();
 }
+
