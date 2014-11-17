@@ -200,10 +200,17 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
 
     for (nx_http::HttpHeaders::iterator itr = d->request.headers.begin(); itr != d->request.headers.end(); ++itr)
     {
-        if (itr->first.toLower() == "host" && !host.isEmpty())
+        if (itr->first.toLower() == "host" && !host.isEmpty()) {
             itr->second = host.toUtf8();
-        else if (itr->first == "x-server-guid")
+        } else if (itr->first == "x-camera-guid") {
+            QnUuid cameraGuid = QnUuid::fromStringSafe(itr->second);
+            if (!cameraGuid.isNull()) {
+                if (QnResourcePtr camera = qnResPool->getResourceById(cameraGuid))
+                    xServerGUID = camera->getParentId().toString();
+            }
+        } else if (itr->first == "x-server-guid"){
             xServerGUID = itr->second;
+        }
     }
 
     QnRoute route;
