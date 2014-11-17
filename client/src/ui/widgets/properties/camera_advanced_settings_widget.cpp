@@ -23,6 +23,14 @@
 #include <utils/common/model_functions.h>
 #include <utils/camera_advanced_settings_xml_parser.h>
 
+namespace {
+
+    bool isStatusValid(Qn::ResourceStatus status) {
+        return status == Qn::Online || status == Qn::Recording;
+    }
+
+}
+
 QnCameraAdvancedSettingsWidget::QnCameraAdvancedSettingsWidget(QWidget* parent /*= 0*/):
     base_type(parent),
     ui(new Ui::CameraAdvancedSettingsWidget),
@@ -121,7 +129,7 @@ void QnCameraAdvancedSettingsWidget::updatePage() {
         if (!m_camera)
             return Page::Empty;
 
-        if ( m_camera->getStatus() != Qn::Online)
+        if (!isStatusValid(m_camera->getStatus()))
             return Page::CannotLoad;
         
         QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
@@ -142,7 +150,7 @@ void QnCameraAdvancedSettingsWidget::updatePage() {
 void QnCameraAdvancedSettingsWidget::reloadData() {
     updatePage();
 
-    if (!m_camera || m_camera->getStatus() != Qn::Online)
+    if (!m_camera || !isStatusValid(m_camera->getStatus()))
         return;
 
     if (m_page == QnCameraAdvancedSettingsWidget::Page::Manual) {
@@ -158,8 +166,8 @@ void QnCameraAdvancedSettingsWidget::reloadData() {
         QStringList settings = lister.proceed();
 
         ui->manualSettingsWidget->setCurrentWidget(ui->manualLoadingPage);
-        m_paramRequestHandle = serverConnection->getParamsAsync(m_camera, settings, this, SLOT(at_advancedSettingsLoaded(int, const QnStringVariantPairList &, int)) );
 
+        m_paramRequestHandle = serverConnection->getParamsAsync(m_camera, settings, this, SLOT(at_advancedSettingsLoaded(int, const QnStringVariantPairList &, int)) );
     } else if (m_page == QnCameraAdvancedSettingsWidget::Page::Web) {
         QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
         m_lastCameraPageUrl = QString(QLatin1String("http://%1:%2/%3")).
@@ -321,7 +329,7 @@ void QnCameraAdvancedSettingsWidget::at_advancedSettingsLoaded(int status, const
 
     if (cameraSettings.isEmpty())
         setPage(Page::CannotLoad);
-    else        
+    else      
         m_widgetsRecreator->proceed(cameraSettings);
 }
 
