@@ -10,8 +10,12 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Drawing;
 
+
+
 namespace MyLibVLC
 {
+    
+
     // http://www.videolan.org/developers/vlc/doc/doxygen/html/group__libvlc.html
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -25,58 +29,60 @@ namespace MyLibVLC
 
     static class LibVlc
     {
+        const string DLL_FOLDER = "NetworkOptixVLCVideoPlayer";
+
         #region core
 
-        [DllImport("libvlc", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DLL_FOLDER+"\\libvlc.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr libvlc_new(int argc, [In] string[] str_array);
 
         //[DllImport("libvlc")]
         //public static extern IntPtr libvlc_new(Int argc, [MarshalAs(UnmanagedType.LPArray,
         //  ArraySubType = UnmanagedType.LPStr)] string[] argv);
 
-        [DllImport("libvlc")]
+        [DllImport(DLL_FOLDER + "\\libvlc.dll")]
         public static extern void libvlc_release(IntPtr instance);
         #endregion
 
         //LIBVLC_API libvlc_media_t * 	libvlc_media_new_location (libvlc_instance_t *p_instance, const char *psz_mrl)
 
         #region media
-        [DllImport("libvlc", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DLL_FOLDER + "\\libvlc.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr libvlc_media_new_location(IntPtr p_instance, [In] string psz_mrl);
 
         //[DllImport("libvlc")]
         //public static extern IntPtr libvlc_media_new_location(IntPtr p_instance,[MarshalAs(UnmanagedType.LPStr)] string psz_mrl);
 
-        [DllImport("libvlc", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DLL_FOLDER + "\\libvlc.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void libvlc_media_release(IntPtr p_meta_desc);
         #endregion
 
         #region media player
-        [DllImport("libvlc", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DLL_FOLDER + "\\libvlc.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr libvlc_media_player_new_from_media(IntPtr media);
 
-        [DllImport("libvlc", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DLL_FOLDER + "\\libvlc.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void libvlc_media_player_release(IntPtr player);
 
-        [DllImport("libvlc", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DLL_FOLDER + "\\libvlc.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void libvlc_media_player_set_hwnd(IntPtr player, IntPtr drawable);
 
-        [DllImport("libvlc", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DLL_FOLDER + "\\libvlc.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int libvlc_media_player_play(IntPtr player);
 
-        [DllImport("libvlc", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DLL_FOLDER + "\\libvlc.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void libvlc_media_player_pause(IntPtr player);
 
-        [DllImport("libvlc", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DLL_FOLDER + "\\libvlc.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void libvlc_media_player_stop(IntPtr player);
 
-        [DllImport("libvlc", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DLL_FOLDER + "\\libvlc.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void libvlc_media_player_set_time(IntPtr p_mi, Int64 i_time);
 
-        [DllImport("libvlc", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DLL_FOLDER + "\\libvlc.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern Int64 libvlc_media_player_get_time(IntPtr p_mi);
 
-        [DllImport("libvlc", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DLL_FOLDER + "\\libvlc.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern int libvlc_media_player_set_rate(IntPtr p_mi, float rate);
 
 
@@ -123,7 +129,7 @@ namespace Company.Product.OemDvrMiniDriver
 			_logger.InfoFormat("Queried supplier Oem DVR: {0}", supplierIdentity);
 			return supplierIdentity;
 		}
-
+        
 		/// <summary>
 		/// Verifies the host and credentials that will be stored in the Net2 database and with which requested footage will be viewed.
 		/// </summary>
@@ -133,7 +139,13 @@ namespace Company.Product.OemDvrMiniDriver
 		{
 			try
 			{
-                string url_str = String.Format("http://{0}:{1}/ec2/testConnection", connectionInfo.HostName, connectionInfo.Port);
+                
+                Uri url = new Uri(connectionInfo.HostName);
+                int port = (int)connectionInfo.Port;
+                if (port == 0)
+                    port = url.Port;
+
+                string url_str = String.Format("http://{0}:{1}/ec2/testConnection", url.Host, port);
 
                 WebRequest request = HttpWebRequest.Create(url_str);
 
@@ -198,7 +210,7 @@ namespace Company.Product.OemDvrMiniDriver
                 int port = (int)connectionInfo.Port;
                 if (port == 0)
                     port = url.Port;
-                               
+                
 
                 string url_str = String.Format("http://{0}:{1}/ec2/getCameras?format=csv", url.Host, port);
                 //string url_str = String.Format("http://{0}:{1}/ec2/getCameras?format=csv", "127.0.0.1", 7002);
@@ -270,57 +282,64 @@ namespace Company.Product.OemDvrMiniDriver
 		/// <returns>The completion status of the request.</returns>
 		public OemDvrStatus PlayFootage(OemDvrConnection cnInfo, OemDvrFootageRequest pbInfo, Panel pbSurface)
 		{
-            //DateTime dt = new DateTime( 2014 ,5, 21 , 19 ,30 , 30);
-            double tick = (pbInfo.StartTimeUtc.ToUniversalTime() - new DateTime(1970, 1, 1)).TotalMilliseconds;
-            m_startTimeinMicroseconds = (long)tick * 1000;
+            try
+            {
+                //DateTime dt = new DateTime( 2014 ,5, 21 , 19 ,30 , 30);
+                double tick = (pbInfo.StartTimeUtc.ToUniversalTime() - new DateTime(1970, 1, 1)).TotalMilliseconds;
+                m_startTimeinMicroseconds = (long)tick * 1000;
 
-            
-            Uri url = new Uri(cnInfo.HostName);
-            m_port = cnInfo.Port;
-            if (m_port == 0)
-                m_port = (uint)url.Port;
-
+           
+                
+                Uri url = new Uri(cnInfo.HostName);
+                m_port = cnInfo.Port;
+                if (m_port == 0)
+                    m_port = (uint)url.Port;
+                m_host = url.Host;
+                
              
- 
-            //m_hwnd = pbSurface.Handle;
-            m_host = url.Host;
-            //m_port = 7002;
+                
+                //m_host = "127.0.0.1";
+                //m_port = 7002;
+                
+                if (m_video == null)
+                {
+                    pbSurface.Resize += PbSurfaceResize;
+                    m_video = new List<Video>();
+                }
+                m_panel = pbSurface;
+                m_panel.Controls.Clear();
 
-            if (m_video == null)
-            {
-                pbSurface.Resize += PbSurfaceResize;
-                m_video = new List<Video>();
-            }
-            m_panel = pbSurface;
-            m_panel.Controls.Clear();
-
+                
             
-            for (int i = 0; i < pbInfo.DvrCameras.Length; i++)
-            {
-                Video video = new Video();
-                video.cameraId = pbInfo.DvrCameras[i].CameraId;
-                Button dynamicbutton = new Button();
-                dynamicbutton.Visible = true;                                                
-                dynamicbutton.Location = new Point(100*i,0);
-                dynamicbutton.Height = 200;
-                dynamicbutton.Width = 100;
-                dynamicbutton.Show();
-                pbSurface.Controls.Add(dynamicbutton);
-                video.window = dynamicbutton;
-                m_video.Add(video);
-            };
+                for (int i = 0; i < pbInfo.DvrCameras.Length; i++)
+                {
+                    Video video = new Video();
+                    video.cameraId = pbInfo.DvrCameras[i].CameraId;
+                    if (pbInfo.DvrCameras.Length > 1)
+                    {
+                        Button dynamicbutton = new Button();
+                        dynamicbutton.Visible = true;
+                        dynamicbutton.Location = new Point(100 * i, 0);
+                        dynamicbutton.Height = 200;
+                        dynamicbutton.Width = 100;
+                        dynamicbutton.Show();
+                        pbSurface.Controls.Add(dynamicbutton);
+                        video.window = dynamicbutton;
+                    }
+                    else video.window = null;                   
+                    m_video.Add(video);
+                };
 
-            Resize(pbSurface.Width, pbSurface.Height);
+                Resize(pbSurface.Width, pbSurface.Height);
 
 
 
-            m_timer.Reset();
-            m_timeAdvance = 0;
+                m_timer.Reset();
+                m_timeAdvance = 0;
 
                       
 
-			try
-			{
+			
 				if ((pbInfo.DvrCameras == null) || (pbInfo.DvrCameras.Length <= 0))
 				{
 					_logger.Error("Playback request without cameras.");
@@ -424,6 +443,8 @@ namespace Company.Product.OemDvrMiniDriver
 					case OemDvrPlaybackFunction.Stop:
 						{
                             Stop();
+                            m_video.Clear();
+                            m_panel.Controls.Clear();
                             m_timer.Reset();
                             m_timeAdvance = 0;
                             controlOk = true;
@@ -463,14 +484,14 @@ namespace Company.Product.OemDvrMiniDriver
             string mediaFile;
             for (int i = 0; i < m_video.Count; i++)
             {
-                Video video = new Video();
+                Video video = m_video[i];
                 video.instance = MyLibVLC.LibVlc.libvlc_new(args.Length, args);
-
-                mediaFile = String.Format("rtsp://{0}:{1}/{2}?codec={3}&pos={4}", m_host, m_port, m_video[i].cameraId, "mpeg2video", allTime);
-                video.media = MyLibVLC.LibVlc.libvlc_media_new_location(m_video[i].instance, mediaFile);
-                video.player = MyLibVLC.LibVlc.libvlc_media_player_new_from_media(m_video[i].media);
-                MyLibVLC.LibVlc.libvlc_media_player_set_hwnd(m_video[i].player, m_video[i].window.Handle);
-
+                mediaFile = String.Format("rtsp://{0}:{1}/{2}?pos={3}&codec={4}", m_host, m_port, video.cameraId, allTime, "mpeg2video");
+                video.media = MyLibVLC.LibVlc.libvlc_media_new_location(video.instance, mediaFile);
+                video.player = MyLibVLC.LibVlc.libvlc_media_player_new_from_media(video.media);
+                if (video.window != null)
+                    MyLibVLC.LibVlc.libvlc_media_player_set_hwnd(video.player, video.window.Handle);
+                else MyLibVLC.LibVlc.libvlc_media_player_set_hwnd(video.player, m_panel.Handle);
                 m_video[i] = video;
             }
         }
@@ -489,10 +510,8 @@ namespace Company.Product.OemDvrMiniDriver
                 MyLibVLC.LibVlc.libvlc_media_player_stop(m_video[i].player);
                 MyLibVLC.LibVlc.libvlc_media_player_release(m_video[i].player);
                 MyLibVLC.LibVlc.libvlc_media_release(m_video[i].media);
-                //MyLibVLC.LibVlc.libvlc_release(m_video[i].instance);
             }
-            m_panel.Controls.Clear();
-            m_video.Clear();
+ 
         }
         private void Pause()
         {
@@ -505,32 +524,35 @@ namespace Company.Product.OemDvrMiniDriver
         }
         private void Resize(int w, int h)
         {
-            double value = (Math.Sqrt((double)m_video.Count * (double)h / (double)w));
-            int numY = (int)Math.Round(value);
-            int numX = (int)Math.Round(value * (double)w / ((double)h));
-            while (numX * numY < m_video.Count)
-                numY++;
-            while (numY > 1 && numX * (numY - 1) >= m_video.Count)
-                numY--;
-            while (numX > 1 && (numX - 1) * numY >= m_video.Count)
-                numX--;
-
-            int smallWidth = (int)((double)w / (double)numX);
-            int smallHeight = (int)((double)h / (double)numY);
-            int it = 0;
-            for (int i = 0; i < numY; i++)
+            if (m_video.Count > 1)
             {
-                for (int j = 0; j < numX; j++)
+                double value = (Math.Sqrt((double)m_video.Count * (double)h / (double)w));
+                int numY = (int)Math.Round(value);
+                int numX = (int)Math.Round(value * (double)w / ((double)h));
+                while (numX * numY < m_video.Count)
+                    numY++;
+                while (numY > 1 && numX * (numY - 1) >= m_video.Count)
+                    numY--;
+                while (numX > 1 && (numX - 1) * numY >= m_video.Count)
+                    numX--;
+
+                int smallWidth = (int)((double)w / (double)numX);
+                int smallHeight = (int)((double)h / (double)numY);
+                int it = 0;
+                for (int i = 0; i < numY; i++)
                 {
-                    if (it < m_video.Count)
+                    for (int j = 0; j < numX; j++)
                     {
-                        m_video[it].window.Location = new Point(smallWidth * j, smallHeight * i);
-                        m_video[it].window.Width = smallWidth;
-                        m_video[it].window.Height = smallHeight;
-                        it++;
-                    }                    
+                        if (it < m_video.Count)
+                        {
+                            m_video[it].window.Location = new Point(smallWidth * j, smallHeight * i);
+                            m_video[it].window.Width = smallWidth;
+                            m_video[it].window.Height = smallHeight;
+                            it++;
+                        }
+                    }
                 }
-            }
+            }            
         }
         private void PbSurfaceResize(object sender, EventArgs e)
         {
