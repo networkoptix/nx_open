@@ -36,7 +36,7 @@ bool RevealRequest::deserialize(const quint8 **bufStart, const quint8 *bufEnd) {
 
 
 
-RevealResponse::RevealResponse() : port(0), sslAllowed(false) {}
+RevealResponse::RevealResponse() : port(0), sslAllowed(false), protoVersion(0) {}
 
 RevealResponse::RevealResponse(const QnModuleInformation &moduleInformation) {
     type = moduleInformation.type;

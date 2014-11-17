@@ -20,6 +20,8 @@ namespace ec2 {
         int protoVersion;
 
         bool isAlive;
+
+        ApiModuleData() : protoVersion(0) {}
     };
 
 #define ApiModuleData_Fields (type)(id)(systemName)(version)(systemInformation)(addresses)(port)(isAlive)(customization)(name)(sslAllowed)(authHash)(protoVersion)
