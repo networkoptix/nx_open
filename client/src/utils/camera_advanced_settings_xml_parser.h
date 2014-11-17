@@ -116,7 +116,6 @@ protected slots:
     void treeWidgetItemSelectionChanged();
 
 signals:
-    void refreshAdvancedSettings();
     void advancedParamChanged(const CameraSetting &param);
 
 private:
@@ -250,7 +249,6 @@ public:
 
 signals:
     void advancedParamChanged(const CameraSetting &param);
-    void refreshAdvancedSettings();
 
 protected:
     virtual CameraSettings &dataPtr() override;

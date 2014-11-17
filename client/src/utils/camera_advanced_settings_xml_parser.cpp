@@ -368,8 +368,6 @@ void CameraSettingsWidgetsCreator::treeWidgetItemSelectionChanged()
     }
 
     m_rootLayout->setCurrentIndex(ind);
-
-    emit refreshAdvancedSettings();
 }
 
 void CameraSettingsWidgetsCreator::parentOfRootElemFound(const QString& parentId)
@@ -517,7 +515,6 @@ CameraSettingsWidgetsCreator* CameraSettingsWidgetsTreeCreator::createElement(
         m_layoutIndById, m_settingsWidgetsById, m_emptyGroupsById);
     result->setCamera( cameraRes );
     connect (result, &CameraSettingsWidgetsCreator::advancedParamChanged, this, &CameraSettingsWidgetsTreeCreator::advancedParamChanged);
-    connect (result, &CameraSettingsWidgetsCreator::refreshAdvancedSettings, this, &CameraSettingsWidgetsTreeCreator::refreshAdvancedSettings);
     return result;
 }
 

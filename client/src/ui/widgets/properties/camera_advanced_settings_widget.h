@@ -32,10 +32,11 @@ public:
 
     void reloadData();
 private:
+    void initWebView();
+
     void updatePage();
 
     void clean();
-    void refresh();
 
     void createWidgetsRecreator(const QString &paramId);
     QnMediaServerConnectionPtr getServerConnection() const;
@@ -44,6 +45,8 @@ private:
     void at_proxyAuthenticationRequired ( const QNetworkProxy & , QAuthenticator * authenticator);
 
     void at_advancedParamChanged(const CameraSetting& val);
+
+    void updateApplyingParamsLabel();
 
 private slots:
     void at_advancedSettingsLoaded(int status, const QnStringVariantPairList &params, int handle);
@@ -65,6 +68,7 @@ private:
     CameraAdvancedSettingsWebPage* m_cameraAdvancedSettingsWebPage;
     QUrl m_lastCameraPageUrl;
     int m_paramRequestHandle;
+    int m_applyingParamsCount;
 };
 
 #endif // QN_CAMERA_ADVANCED_SETTINGS_WIDGET_H
