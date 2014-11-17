@@ -203,6 +203,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<Qn::PanicMode>();
 
     qRegisterMetaType<QnModuleInformation>();
+    qRegisterMetaType<QList<QnModuleInformation>>();
 
     qRegisterMetaType<Qn::CameraDataType>();
 
