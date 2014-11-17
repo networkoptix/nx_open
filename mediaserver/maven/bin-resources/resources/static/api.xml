@@ -773,7 +773,14 @@
                     <name>moduleInformation</name>
                     <description>Get information about the server.</description>
                     <method>GET</method>
-                    <params/>
+                    <params>
+                        <param>
+                            <name>allModules</name>
+                            <description>Set it to true to get all modules from the system.</description>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
+                    </params>
                     <result>
                         <caption>JSON object with module information.</caption>
                     </result>
