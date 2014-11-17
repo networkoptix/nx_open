@@ -10,6 +10,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
+#include <client/client_message_processor.h>
 
 #include <ui/common/palette.h>
 #include <ui/common/ui_resource_name.h>
@@ -324,8 +325,10 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
 
                 QMessageBox::information(this, tr("Update is successful"), message);
 
+                bool unholdConnection = !clientUpdated;
                 if (clientUpdated && !result.clientInstallerRequired) {
-                    if (!applauncher::restartClient(result.targetVersion) == applauncher::api::ResultType::ok) {
+                    if (applauncher::restartClient(result.targetVersion) != applauncher::api::ResultType::ok) {
+                        unholdConnection = true;
                         QMessageBox::critical(this,
                             tr("Launcher process is not found"),
                             tr("Cannot restart the client.\n"
@@ -335,6 +338,9 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
                         applauncher::scheduleProcessKill(QCoreApplication::applicationPid(), processTerminateTimeout);
                     }
                 }
+
+                if (unholdConnection)
+                    static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance())->setHoldConnection(false);
             }
             break;
         case QnUpdateResult::Cancelled:

@@ -4,6 +4,7 @@
 
 #include <api/app_server_connection.h>
 #include <nx_ec/ec_api.h>
+#include <nx_ec/ec_proto_version.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
@@ -22,7 +23,8 @@ namespace {
 }
 
 QnInstallUpdatesPeerTask::QnInstallUpdatesPeerTask(QObject *parent) :
-    QnNetworkPeerTask(parent)
+    QnNetworkPeerTask(parent),
+    m_protoProblemDetected(false)
 {
     m_checkTimer = new QTimer(this);
     m_checkTimer->setSingleShot(true);
@@ -44,7 +46,9 @@ void QnInstallUpdatesPeerTask::setVersion(const QnSoftwareVersion &version) {
 
 void QnInstallUpdatesPeerTask::finish(int errorCode) {
     qnResPool->disconnect(this);
-    static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance())->setHoldConnection(false);
+    /* There's no need to unhold connection now if we can't connect to the server */
+    if (!m_protoProblemDetected)
+        static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance())->setHoldConnection(false);
     QnNetworkPeerTask::finish(errorCode);
 }
 
@@ -60,6 +64,7 @@ void QnInstallUpdatesPeerTask::doStart() {
 
     m_stoppingPeers = m_restartingPeers = m_pendingPeers = peers();
 
+    m_protoProblemDetected = false;
     static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance())->setHoldConnection(true);
 
     connection2()->getUpdatesManager()->installUpdate(m_updateId, m_pendingPeers,
@@ -162,6 +167,9 @@ void QnInstallUpdatesPeerTask::at_gotModuleInformation(int status, const QList<Q
         QnMediaServerResourcePtr server = qnResPool->getResourceById(moduleInformation.id).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
+
+        if (moduleInformation.protoVersion != nx_ec::EC2_PROTO_VERSION)
+            m_protoProblemDetected = true;
 
         if (server->getVersion() != moduleInformation.version) {
             server->setVersion(moduleInformation.version);

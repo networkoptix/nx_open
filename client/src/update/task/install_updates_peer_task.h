@@ -42,6 +42,7 @@ private:
     QSet<QnUuid> m_pendingPeers;
     QTimer *m_checkTimer;
     QTimer *m_pingTimer;
+    bool m_protoProblemDetected;
 };
 
 #endif // INSTALL_UPDATES_PEER_TASK_H
