@@ -144,6 +144,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         QnStringVariantPairList reply;
 
         for(const QByteArray &line: response.data.split('\n')) {
+            if (line.isEmpty())
+                continue;
+
             int sepPos = line.indexOf('=');
             if(sepPos == -1) {
                 reply.push_back(qMakePair(QString::fromUtf8(line.constData(), line.size()), QVariant())); /* No value. */

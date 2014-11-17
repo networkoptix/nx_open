@@ -102,7 +102,7 @@ public:
     virtual ~CameraSettingsWidgetsCreator();
 
     //Create or refresh advanced settings widgets according to info got from mediaserver ('settings' param)
-    bool proceed(const CameraSettings& settings);
+    bool proceed(CameraSettings& settings);
 
 protected:
 
@@ -168,7 +168,7 @@ protected:
 
     //Create T class to proceed new parent
     /*!
-        \param dataSource If not NULL, data should be read fom here (It must be xml source).
+        \param dataSource If not NULL, data should be read from here (It must be xml source).
             Otherwise, data is read from some internal source
     */
     virtual T* createElement(
@@ -176,8 +176,7 @@ protected:
         const QnResourcePtr& cameraRes ) = 0;
 
     //Method should return some object (additional info) required in proceed method of T class
-    virtual E getAdditionalInfo() = 0;
-    virtual void setAdditionalInfo(const E &value) = 0;
+    virtual E& dataPtr() = 0;
 
     //Cleaning activities
     void clean();
@@ -198,8 +197,7 @@ class CameraSettingsTreeLister: public CameraSettingTreeReader<CameraSettingsLis
     QSet<QString> m_params;
 
 protected:
-    virtual QSet<QString> getAdditionalInfo() override;
-    virtual void setAdditionalInfo(const QSet<QString> &value) override;
+    virtual QSet<QString>& dataPtr() override;
 
 public:
 
@@ -230,7 +228,6 @@ class CameraSettingsWidgetsTreeCreator: public QObject, public CameraSettingTree
 
 public:
     CameraSettingsWidgetsTreeCreator(
-        const QString& cameraId,
         const QString& id,
         QWebView* webView,
         QTreeWidget* rootWidget,
@@ -243,10 +240,10 @@ public:
         const QString& id,
         const QnResourcePtr& cameraRes = QnResourcePtr() ) override;
 
-    void proceed(const CameraSettings &settings);
+    void proceed(CameraSettings &settings);
 
     QString getId() const;
-    QString getCameraId() const;
+    
     QTreeWidget* getRootWidget();
     QStackedLayout* getRootLayout();
     QWebView* getWebView();
@@ -256,12 +253,10 @@ signals:
     void refreshAdvancedSettings();
 
 protected:
-    virtual CameraSettings getAdditionalInfo() override;
-    virtual void setAdditionalInfo(const CameraSettings &value) override;
+    virtual CameraSettings &dataPtr() override;
 
 private:
     void removeEmptyWidgetGroups();
-
 private:
     QWebView* m_webView;
     QTreeWidget* m_rootWidget;
@@ -272,7 +267,6 @@ private:
     EmptyGroupsById m_emptyGroupsById;
     CameraSettings m_settings;
     const QString m_id;
-    const QString m_cameraId;
 };
 
 #endif //camera_advanced_settings_xml_parser_h_1819
