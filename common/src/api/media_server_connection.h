@@ -231,6 +231,8 @@ public:
     int mergeSystemAsync(const QUrl &url, const QString &user, const QString &password, bool ownSettings, QObject *target, const char *slot);
 
     int testEmailSettingsAsync(const QnEmailSettings &settings, QObject *target, const char *slot);
+
+    int modulesInformation(QObject *target, const char *slot);
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;
 

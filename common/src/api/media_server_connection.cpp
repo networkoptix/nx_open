@@ -85,6 +85,7 @@ namespace {
         (PingSystemObject,         "pingSystem")
         (MergeSystemsObject,       "mergeSystems")
         (TestEmailSettingsObject,  "testEmailSettings")
+        (ModulesInformationObject, "moduleInformationAuthenticated")
     );
 
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -275,6 +276,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         break;
     case ConfigureObject:
         processJsonReply<QnConfigureReply>(this, response, handle);
+        break;
+    case ModulesInformationObject:
+        processJsonReply<QList<QnModuleInformation>>(this, response, handle);
         break;
     case PingSystemObject:
         processJsonReply<QnModuleInformation>(this, response, handle);
@@ -816,4 +820,11 @@ int QnMediaServerConnection::mergeSystemAsync(const QUrl &url, const QString &us
     params << QnRequestParam("takeRemoteSettings", !ownSettings ? lit("true") : lit("false"));
 
     return sendAsyncGetRequest(MergeSystemsObject, params, QN_STRINGIZE_TYPE(QnModuleInformation), target, slot);
+}
+
+int QnMediaServerConnection::modulesInformation(QObject *target, const char *slot)
+{
+    QnRequestParamList params;
+    params << QnRequestParam("allModules", lit("true"));
+    return sendAsyncGetRequest(ModulesInformationObject, params, QN_STRINGIZE_TYPE(QList<QnModuleInformation>), target, slot);
 }
