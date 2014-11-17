@@ -148,10 +148,6 @@ void QnInstallUpdatesPeerTask::at_checkTimer_timeout() {
 }
 
 void QnInstallUpdatesPeerTask::at_pingTimer_timeout() {
-    if (!m_ecServer) {
-        m_pingTimer->stop();
-        return;
-    }
     m_pingTimer->setInterval(pingInterval);
     m_ecServer->apiConnection()->modulesInformation(this, SLOT(at_gotModuleInformation(int,QList<QnModuleInformation>,int)));
 }
@@ -167,6 +163,9 @@ void QnInstallUpdatesPeerTask::at_gotModuleInformation(int status, const QList<Q
         if (!server)
             continue;
 
-        server->setVersion(moduleInformation.version);
+        if (server->getVersion() != moduleInformation.version) {
+            server->setVersion(moduleInformation.version);
+            at_resourceChanged(server);
+        }
     }
 }
