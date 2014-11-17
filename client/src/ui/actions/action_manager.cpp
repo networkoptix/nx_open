@@ -1335,7 +1335,11 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("Open Web Page...")).
         autoRepeat(false).
-        condition(new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this));
+        condition(new QnConjunctionActionCondition(
+                      new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
+                      new QnServerWebPageCondition(this),
+                      this
+                      ));
 
     factory(Qn::ConnectToCurrentSystem).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
