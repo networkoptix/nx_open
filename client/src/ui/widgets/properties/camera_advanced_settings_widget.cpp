@@ -249,8 +249,7 @@ void QnCameraAdvancedSettingsWidget::updateApplyingParamsLabel() {
 }
 
 
-void QnCameraAdvancedSettingsWidget::at_authenticationRequired(QNetworkReply* /*reply*/, QAuthenticator * authenticator)
-{
+void QnCameraAdvancedSettingsWidget::at_authenticationRequired(QNetworkReply* /*reply*/, QAuthenticator * authenticator) {
     QMutexLocker locker(&m_cameraMutex);
     if (!m_camera)
         return;
