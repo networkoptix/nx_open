@@ -91,9 +91,33 @@ void QnCameraAdvancedSettingsWidget::createWidgetsRecreator(const QString &param
     connect(m_widgetsRecreator, &CameraSettingsWidgetsTreeCreator::advancedParamChanged, this, &QnCameraAdvancedSettingsWidget::at_advancedParamChanged);
 }
 
+void QnCameraAdvancedSettingsWidget::setPage(Page page) {
+    if (m_page == page)
+        return;
+
+    m_page = page;
+
+    auto widgetByPage = [this] ()-> QWidget* {
+        switch (m_page) {
+        case Page::Empty:
+            return ui->noSettingsPage;
+        case Page::CannotLoad:
+            return ui->cannotLoadPage;
+        case Page::Manual:
+            return ui->manualPage;
+        case Page::Web:
+            return ui->webPage;
+        }
+        return nullptr;
+    };
+
+    ui->stackedWidget->setCurrentWidget(widgetByPage());
+}
+
+
 void QnCameraAdvancedSettingsWidget::updatePage() {
     
-    auto getPage = [this]{
+    auto calculatePage = [this]{
         if (!m_camera)
             return Page::Empty;
 
@@ -111,27 +135,8 @@ void QnCameraAdvancedSettingsWidget::updatePage() {
         return Page::Empty;
     };
 
-    Page newPage = getPage();
-    if (m_page == newPage)
-        return;
-
-    m_page = newPage;
-
-    auto widgetByPage = [this] ()-> QWidget* {
-        switch (m_page) {
-        case Page::Empty:
-            return ui->noSettingsPage;
-        case Page::CannotLoad:
-            return ui->cannotLoadPage;
-        case Page::Manual:
-            return ui->manualPage;
-        case Page::Web:
-            return ui->webPage;
-        }
-        return nullptr;
-    };
-
-    ui->stackedWidget->setCurrentWidget(widgetByPage());
+    Page newPage = calculatePage();
+    setPage(newPage);
 }
 
 void QnCameraAdvancedSettingsWidget::reloadData() {
@@ -224,8 +229,6 @@ void QnCameraAdvancedSettingsWidget::initWebView() {
     palGreenHlText.setColor(QPalette::Disabled, QPalette::Button, Qt::gray);
     palGreenHlText.setColor(QPalette::Disabled, QPalette::ButtonText, Qt::black);
 
-
-
     ui->webView->setPalette(palGreenHlText);
 
     ui->webView->setAutoFillBackground(true);
@@ -316,8 +319,10 @@ void QnCameraAdvancedSettingsWidget::at_advancedSettingsLoaded(int status, const
         }
     }
 
-    
-    m_widgetsRecreator->proceed(cameraSettings);
+    if (cameraSettings.isEmpty())
+        setPage(Page::CannotLoad);
+    else        
+        m_widgetsRecreator->proceed(cameraSettings);
 }
 
 void QnCameraAdvancedSettingsWidget::at_advancedParam_saved(int httpStatusCode, const QnStringBoolPairList& operationResult) {

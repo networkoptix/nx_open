@@ -24,7 +24,7 @@
        <item>
         <widget class="QLabel" name="cannotLoadLabel">
          <property name="text">
-          <string>Settings cannot be loaded</string>
+          <string>Advanced settings for this camera cannot be loaded</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
