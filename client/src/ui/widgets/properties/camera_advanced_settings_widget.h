@@ -59,6 +59,7 @@ private:
         Manual,
         Web
     };
+    void setPage(Page page);
 
     QScopedPointer<Ui::CameraAdvancedSettingsWidget> ui;
     Page m_page;
