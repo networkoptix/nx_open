@@ -37,7 +37,7 @@ private:
     void clean();
     void refresh();
 
-    void createWidgetsRecreator(const QString &cameraUniqueId, const QString &paramId);
+    void createWidgetsRecreator(const QString &paramId);
     QnMediaServerConnectionPtr getServerConnection() const;
 
     void at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator);
@@ -52,6 +52,7 @@ private slots:
 private:
     enum class Page {
         Empty,
+        CannotLoad,
         Manual,
         Web
     };
@@ -63,6 +64,7 @@ private:
     CameraSettingsWidgetsTreeCreator* m_widgetsRecreator;
     CameraAdvancedSettingsWebPage* m_cameraAdvancedSettingsWebPage;
     QUrl m_lastCameraPageUrl;
+    int m_paramRequestHandle;
 };
 
 #endif // QN_CAMERA_ADVANCED_SETTINGS_WIDGET_H

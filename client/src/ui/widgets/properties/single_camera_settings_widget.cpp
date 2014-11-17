@@ -185,7 +185,7 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
    }
 
     updateFromResource();
-    if (m_camera && currentTab() == Qn::AdvancedCameraSettingsTab)
+    if (currentTab() == Qn::AdvancedCameraSettingsTab)
         ui->advancedSettingsWidget->reloadData();
 }
 

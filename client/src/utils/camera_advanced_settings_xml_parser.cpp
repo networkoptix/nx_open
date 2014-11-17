@@ -119,7 +119,7 @@ void CameraSettingsWidgetsCreator::removeLayoutItems()
     }
 }
 
-bool CameraSettingsWidgetsCreator::proceed(const CameraSettings &settings)
+bool CameraSettingsWidgetsCreator::proceed(CameraSettings &settings)
 {
     m_settings = settings;
 
@@ -431,12 +431,10 @@ bool CameraSettingTreeReader<T, E>::proceed()
 
         T* nextElem = m_firstTime? m_objList.back(): m_objList.at(i++);
         //ToDo: check impossible situation i > size - 1
-        auto info = getAdditionalInfo();
-        if (!nextElem->proceed(info)) {
+        if (!nextElem->proceed(dataPtr())) {
             clean();
             return false;
         }
-        setAdditionalInfo(info);
     }
     while (currentId != m_currParentId);
 
@@ -472,7 +470,7 @@ CameraSettingsLister* CameraSettingsTreeLister::createElement(
     return new CameraSettingsLister(id, *this, cameraRes);
 }
 
-QSet<QString> CameraSettingsTreeLister::getAdditionalInfo() {
+QSet<QString>& CameraSettingsTreeLister::dataPtr() {
     return m_params;
 }
 
@@ -483,16 +481,11 @@ QStringList CameraSettingsTreeLister::proceed()
     return m_params.toList();
 }
 
-void CameraSettingsTreeLister::setAdditionalInfo(const QSet<QString> &value) {
-    m_params = value;
-}
-
 //
 // class CameraSettingsWidgetsTreeCreator
 //
 
 CameraSettingsWidgetsTreeCreator::CameraSettingsWidgetsTreeCreator(
-    const QString& cameraId,
     const QString& id,
     QWebView* webView,
     QTreeWidget* rootWidget,
@@ -503,8 +496,7 @@ CameraSettingsWidgetsTreeCreator::CameraSettingsWidgetsTreeCreator(
     m_webView(webView),
     m_rootWidget(rootWidget),
     m_rootLayout(rootLayout),
-    m_id(id),
-    m_cameraId(cameraId)
+    m_id(id)
 {
     
 }
@@ -529,15 +521,11 @@ CameraSettingsWidgetsCreator* CameraSettingsWidgetsTreeCreator::createElement(
     return result;
 }
 
-CameraSettings CameraSettingsWidgetsTreeCreator::getAdditionalInfo() {
+CameraSettings& CameraSettingsWidgetsTreeCreator::dataPtr() {
     return m_settings;
 }
 
-void CameraSettingsWidgetsTreeCreator::setAdditionalInfo(const CameraSettings &value) {
-    m_settings = value;
-}
-
-void CameraSettingsWidgetsTreeCreator::proceed(const CameraSettings &settings) {
+void CameraSettingsWidgetsTreeCreator::proceed(CameraSettings &settings) {
     m_settings = settings;
     if ( !m_id.isNull() )
         CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>::proceed();
@@ -546,11 +534,6 @@ void CameraSettingsWidgetsTreeCreator::proceed(const CameraSettings &settings) {
 QString CameraSettingsWidgetsTreeCreator::getId() const
 {
     return m_id;
-}
-
-QString CameraSettingsWidgetsTreeCreator::getCameraId() const
-{
-    return m_cameraId;
 }
 
 QTreeWidget* CameraSettingsWidgetsTreeCreator::getRootWidget()
