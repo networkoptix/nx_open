@@ -46,6 +46,7 @@ int QnRoutingInformationRestHandler::executeGet(const QString &path, const QnReq
 
     if (command == lit("routeTo")) {
         QnUuid target = QnUuid::fromStringSafe(params.value(lit("target")));
+        QnRoute route;
         if (target.isNull()) {
             // suppose it to be host:port
             QStringList targetParams = params.value(lit("target")).split(QLatin1Char(':'));
@@ -59,9 +60,10 @@ int QnRoutingInformationRestHandler::executeGet(const QString &path, const QnReq
                 return HttpCode::BadRequest;
 
             target = QnRouter::instance()->whoIs(host, port);
+            route = QnRouter::instance()->routeTo(host, port);
+        } else {
+            route = QnRouter::instance()->routeTo(target);
         }
-
-        QnRoute route = QnRouter::instance()->routeTo(target);
 
         result.append("<html><body>\r\n");
 

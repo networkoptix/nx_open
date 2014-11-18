@@ -18,13 +18,6 @@
 
 #include "abstract_connection.h"
 
-typedef QList<QPair<QString, bool> > QnStringBoolPairList;
-typedef QList<QPair<QString, QVariant> > QnStringVariantPairList;
-
-Q_DECLARE_METATYPE(QnStringBoolPairList);
-Q_DECLARE_METATYPE(QnStringVariantPairList);
-
-
 // TODO: #MSAPI move to api/model or even to common_globals, 
 // add lexical serialization (see QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS)
 // 
@@ -132,11 +125,6 @@ public:
         QObject *target, 
         const char *slot);
 
-    /**
-     * \returns                         Http response status (200 in case of success).
-     */
-    int getParamsSync(const QnNetworkResourcePtr &camera, const QStringList &keys, QnStringVariantPairList *reply);
-
     /** 
      * Set \a camera params.
      * 
@@ -149,11 +137,6 @@ public:
     int setParamsAsync(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params, QObject *target, const char *slot);
 
     /**
-     * \returns                         Http response status (200 in case of success).
-     */
-    int setParamsSync(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params, QnStringBoolPairList *reply);
-
-    /** 
      * \returns                         Request handle. 
      */
     int getStatisticsAsync(QObject *target, const char *slot);
@@ -235,9 +218,6 @@ public:
     int modulesInformation(QObject *target, const char *slot);
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;
-
-    static QnRequestParamList createGetParamsRequest(const QnNetworkResourcePtr &camera, const QStringList &params);
-    static QnRequestParamList createSetParamsRequest(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params);
 
 private:
     QString m_proxyAddr;

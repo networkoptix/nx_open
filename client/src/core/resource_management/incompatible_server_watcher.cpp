@@ -80,7 +80,8 @@ void QnIncompatibleServerWatcher::at_peerChanged(const QnModuleInformation &modu
     bool compatible = moduleInformation.isCompatibleToCurrentSystem();
     bool authorized = moduleInformation.authHash == qnCommon->moduleInformation().authHash;
 
-    if (compatible && (authorized || qnResPool->getResourceById(moduleInformation.id))) {
+    QnResourcePtr resource = qnResPool->getResourceById(moduleInformation.id);
+    if ((compatible && (authorized || resource)) || (resource && resource->getStatus() == Qn::Online)) {
         removeResource(m_fakeUuidByServerUuid.value(moduleInformation.id));
         return;
     }

@@ -121,7 +121,7 @@ QRectF QnGridBackgroundItem::boundingRect() const {
     return d->rect;
 }
 
-void QnGridBackgroundItem::updateDefaultBackground(int settingsId) {
+void QnGridBackgroundItem::updateDefaultBackground() {
     Q_D(QnGridBackgroundItem);
     if (!d->isDefaultBackground)
         return;

@@ -505,17 +505,17 @@ void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &mod
     data.systemName = moduleInformation.systemName;
 
     /* prefer localhost */
-    QHostAddress address(QHostAddress::LocalHost);
-    if (!moduleInformation.remoteAddresses.contains(address.toString()))
+    QString address = QHostAddress(QHostAddress::LocalHost).toString();
+    if (!moduleInformation.remoteAddresses.contains(address))
         address = *moduleInformation.remoteAddresses.cbegin();
 
     data.url.setScheme(lit("http"));
-    data.url.setHost(address.toString());
+    data.url.setHost(address);
     data.url.setPort(moduleInformation.port);
 
     QnEcData &oldData = m_foundEcs[moduleInformation.id];
     if (!oldData.id.isNull()) {
-        if (!address.isLoopback() && moduleInformation.remoteAddresses.contains(oldData.url.host()))
+        if (!QHostAddress(address).isLoopback() && moduleInformation.remoteAddresses.contains(oldData.url.host()))
             data.url.setHost(oldData.url.host());
 
         if (oldData != data) {

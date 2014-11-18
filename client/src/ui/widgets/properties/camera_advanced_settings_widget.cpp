@@ -1,366 +1,374 @@
 #include "camera_advanced_settings_widget.h"
+#include "ui_camera_advanced_settings_widget.h"
 
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QStyle>
-#include <QtWidgets/QStyleFactory>
-#include <QtWidgets/QVBoxLayout>
+#include <QtNetwork/QNetworkReply>
 
+#include <api/app_server_connection.h>
+#include <api/media_server_connection.h>
+#include <api/network_proxy_factory.h>
 
-QnSettingsScrollArea::QnSettingsScrollArea(QWidget* parent):
-    QScrollArea(parent)
-{
-    QWidget *widget = new QWidget();
-    widget->setLayout(new QVBoxLayout());
-    setWidget(widget);
-    if(isVisible())
-        widget->show();
+#include <common/common_module.h>
 
-    setWidgetResizable(true);
-}
+#include <core/resource/resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/param.h>
+#include <core/resource/resource_data.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_data_pool.h>
 
-void QnSettingsScrollArea::addWidget(QWidget *widgetToAdd)
-{
-    if (widget()->layout()->count() != 0)
-        widget()->layout()->removeItem(widget()->layout()->itemAt(widget()->layout()->count() - 1));
+#include <ui/style/warning_style.h>
+#include <ui/widgets/properties/camera_advanced_settings_web_page.h>
 
-    widgetToAdd->setParent(widget());
-    dynamic_cast<QVBoxLayout*>(widget()->layout())->addWidget(widgetToAdd);
-    static_cast<QVBoxLayout*>(widget()->layout())->addStretch(1);
-}
+#include <utils/common/model_functions.h>
+#include <utils/camera_advanced_settings_xml_parser.h>
 
-//==============================================
+namespace {
 
-QnSettingsSlider::QnSettingsSlider(Qt::Orientation orientation, QWidget *parent)
-: QSlider(orientation, parent)
-{
-    //setStyle(QStyleFactory::create(qApp->style()->objectName()));
-}
-
-void QnSettingsSlider::keyReleaseEvent(QKeyEvent *event)
-{
-    QSlider::keyReleaseEvent(event);
-
-    emit onKeyReleased();
-}
-//==============================================
-
-QnAbstractSettingsWidget::QnAbstractSettingsWidget(const CameraSetting &obj, QnSettingsScrollArea *parent, const QString& hint)
-    : QWidget(0),
-      m_param(obj),
-      m_layout(new QHBoxLayout()),
-      m_hint(hint)
-{
-    if (parent)
-        parent->addWidget(this);
-    setLayout(m_layout);
-    setToolTip(m_hint);
-}
-
-QnAbstractSettingsWidget::~QnAbstractSettingsWidget()
-{
-
-}
-
-CameraSetting QnAbstractSettingsWidget::param() const
-{
-    return m_param;
-}
-
-void QnAbstractSettingsWidget::setParam(const CameraSettingValue& val)
-{
-    m_param.setCurrent(val);
-    emit advancedParamChanged(m_param);
-}
-
-//==============================================
-QnSettingsOnOffWidget::QnSettingsOnOffWidget(const CameraSetting &obj, QnSettingsScrollArea *parent):
-    QnAbstractSettingsWidget(obj, parent, obj.getDescription())
-{
-    m_checkBox = new QCheckBox(m_param.getName());
-    m_layout->addWidget(m_checkBox);
-
-    if (m_param.getCurrent() == m_param.getMax())
-        m_checkBox->setCheckState(Qt::Checked);
-
-    connect(m_checkBox, SIGNAL(stateChanged ( int )), this, SLOT(stateChanged(int)));
-}
-
-void QnSettingsOnOffWidget::refresh()
-{
-    if (m_param.getCurrent() == m_param.getMax()) {
-        m_checkBox->setCheckState(Qt::Checked);
-    } else {
-        m_checkBox->setCheckState(Qt::Unchecked);
+    bool isStatusValid(Qn::ResourceStatus status) {
+        return status == Qn::Online || status == Qn::Recording;
     }
 
 }
 
-QnSettingsOnOffWidget::~QnSettingsOnOffWidget()
+QnCameraAdvancedSettingsWidget::QnCameraAdvancedSettingsWidget(QWidget* parent /*= 0*/):
+    base_type(parent),
+    ui(new Ui::CameraAdvancedSettingsWidget),
+    m_page(Page::Empty),
+    m_widgetsRecreator(NULL),
+    m_paramRequestHandle(0),
+    m_applyingParamsCount(0)
 {
+    ui->setupUi(this);
+
+    QList<int> sizes = ui->splitter->sizes();
+    sizes[0] = 200;
+    sizes[1] = 400;
+    ui->splitter->setSizes(sizes);
+
+    initWebView();
+
+    ui->manualLoadingWidget->setText(tr("Please wait while settings are being loaded.\nThis can take a lot of time."));
+    setWarningStyle(ui->manualWarningLabel);
+    updateApplyingParamsLabel();
 }
 
-void QnSettingsOnOffWidget::stateChanged(int state)
-{
-    QString val = state == Qt::Checked ? (QString)m_param.getMax() : (QString)m_param.getMin();
-    setParam(val);
+QnCameraAdvancedSettingsWidget::~QnCameraAdvancedSettingsWidget() {
+    clean();
 }
 
-void QnSettingsOnOffWidget::updateParam(QString val)
-{
-    m_checkBox->setChecked(val == m_param.getMax()); // emits stateChanged
+const QnVirtualCameraResourcePtr & QnCameraAdvancedSettingsWidget::camera() const {
+    return m_camera;
 }
 
-//==============================================
-QnSettingsMinMaxStepWidget::QnSettingsMinMaxStepWidget(const CameraSetting &obj, QnSettingsScrollArea *parent):
-    QnAbstractSettingsWidget(obj, parent, obj.getDescription())
-{
-    QVBoxLayout *vlayout = new QVBoxLayout();
-    m_layout->addLayout(vlayout);
+void QnCameraAdvancedSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &camera) {
+    if (m_camera == camera)
+        return;
 
-    m_groupBox = new QGroupBox();
-    vlayout->addWidget(new QWidget());
-    vlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
-    vlayout->addWidget(m_groupBox);
-    vlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
-    vlayout->addWidget(new QWidget());
-
-    m_slider = new QnSettingsSlider(Qt::Horizontal, m_groupBox);
-
-    m_slider->setRange(m_param.getMin(), m_param.getMax());
-    m_slider->setValue(m_param.getCurrent());
-    m_slider->setWindowTitle(m_param.getName() + QLatin1String(" (") + (QString)m_param.getCurrent() + QLatin1Char(')'));
-
-    m_groupBox->setTitle(m_param.getName() + QLatin1String(" (") + (QString)m_param.getCurrent() + QLatin1Char(')'));
-
-    QVBoxLayout *layout = new QVBoxLayout(m_groupBox);
-    layout->addWidget(m_slider);
-
-    connect(m_slider, SIGNAL(sliderReleased()), this, SLOT(onValChanged()));
-    connect(m_slider, SIGNAL(onKeyReleased()), this, SLOT(onValChanged()));
-    connect(m_slider, SIGNAL(valueChanged(int)), this, SLOT(onValChanged(int)) );
+    QMutexLocker locker(&m_cameraMutex);
+    m_camera = camera;
+    m_cameraAdvancedSettingsWebPage->setCamera(m_camera);      
 }
 
-void QnSettingsMinMaxStepWidget::refresh()
-{
-    m_slider->setRange(m_param.getMin(), m_param.getMax());
-    m_slider->setValue(m_param.getCurrent());
-    m_slider->setWindowTitle(m_param.getName() + QLatin1String(" (") + (QString)m_param.getCurrent() + QLatin1Char(')'));
-
-    m_groupBox->setTitle(m_param.getName() + QLatin1String(" (") + (QString)m_param.getCurrent() + QLatin1Char(')'));
+void QnCameraAdvancedSettingsWidget::updateFromResource() {
+    clean();
+    updatePage();
 }
 
-void QnSettingsMinMaxStepWidget::onValChanged(int val)
-{
-    m_groupBox->setTitle(m_param.getName() + QLatin1String(" (") + QString::number(val) + QLatin1Char(')'));
+void QnCameraAdvancedSettingsWidget::clean() {
+    if (m_widgetsRecreator) {
+        delete m_widgetsRecreator;
+        m_widgetsRecreator = NULL;
+    }
+
+    /* Remove all auto-created widgets. */
+    auto targetLayout = ui->propertiesStackedWidget->layout();
+    while (targetLayout->count() > 0)
+        targetLayout->removeItem(targetLayout->itemAt(0));
 }
 
-void QnSettingsMinMaxStepWidget::onValChanged()
-{
-    setParam(m_slider->value());
+void QnCameraAdvancedSettingsWidget::createWidgetsRecreator(const QString &paramId) {
+    clean();
+
+    QStackedLayout* stackedLayout = qobject_cast<QStackedLayout*>(ui->propertiesStackedWidget->layout());
+    Q_ASSERT(stackedLayout);
+
+    m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(paramId,  ui->webView, ui->treeWidget, stackedLayout);
+    m_widgetsRecreator->setCamera( m_camera );
+
+    connect(m_widgetsRecreator, &CameraSettingsWidgetsTreeCreator::advancedParamChanged, this, &QnCameraAdvancedSettingsWidget::at_advancedParamChanged);
 }
 
-void QnSettingsMinMaxStepWidget::updateParam(QString val)
-{
-    CameraSettingValue cv(val);
-    m_slider->setValue(cv);
+void QnCameraAdvancedSettingsWidget::setPage(Page page) {
+    if (m_page == page)
+        return;
+
+    m_page = page;
+
+    auto widgetByPage = [this] ()-> QWidget* {
+        switch (m_page) {
+        case Page::Empty:
+            return ui->noSettingsPage;
+        case Page::CannotLoad:
+            return ui->cannotLoadPage;
+        case Page::Manual:
+            return ui->manualPage;
+        case Page::Web:
+            return ui->webPage;
+        }
+        return nullptr;
+    };
+
+    ui->stackedWidget->setCurrentWidget(widgetByPage());
 }
 
-//==============================================
-QnSettingsEnumerationWidget::QnSettingsEnumerationWidget(const CameraSetting &obj, QnSettingsScrollArea *parent):
-    QnAbstractSettingsWidget(obj, parent, obj.getDescription())
-{
-    QVBoxLayout *vlayout = new QVBoxLayout();
-    m_layout->addLayout(vlayout);
 
-    QGroupBox* groupBox = new QGroupBox();
-    vlayout->addWidget(new QWidget());
-    vlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
-    vlayout->addWidget(groupBox);
-    vlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
-    vlayout->addWidget(new QWidget());
-
-    groupBox->setTitle(m_param.getName());
-
-    QVBoxLayout *layout = new QVBoxLayout(groupBox);
-
-    QStringList values = static_cast<QString>(m_param.getMin()).split(QLatin1Char(','));
-    for (int i = 0; i < values.length(); ++i)
-    {
-        QString val = values[i].trimmed();
-
-        QRadioButton *btn = new QRadioButton(val, groupBox);
-        layout->addWidget(btn);
-
-        if (val == m_param.getCurrent())
-            btn->setChecked(true);
-
-        btn->setObjectName(val);
+void QnCameraAdvancedSettingsWidget::updatePage() {
     
-        m_radioBtns.push_back(btn);
+    auto calculatePage = [this]{
+        if (!m_camera)
+            return Page::Empty;
 
-        connect(btn , SIGNAL(clicked()), this, SLOT(onClicked()));
+        if (!isStatusValid(m_camera->getStatus()))
+            return Page::CannotLoad;
+        
+        QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
+        bool hasWebPage = resourceData.value<bool>(lit("showUrl"), false);
+        if (hasWebPage) 
+            return Page::Web;
+
+        if (!m_camera->getProperty( Qn::CAMERA_SETTINGS_ID_PARAM_NAME ).isNull()) 
+            return Page::Manual;
+        
+        return Page::Empty;
+    };
+
+    Page newPage = calculatePage();
+    setPage(newPage);
+}
+
+void QnCameraAdvancedSettingsWidget::reloadData() {
+    updatePage();
+
+    if (!m_camera || !isStatusValid(m_camera->getStatus()))
+        return;
+
+    if (m_page == QnCameraAdvancedSettingsWidget::Page::Manual) {
+        QnMediaServerConnectionPtr serverConnection = getServerConnection();
+        if (!serverConnection)
+            return;
+
+        QString id = m_camera->getProperty( Qn::CAMERA_SETTINGS_ID_PARAM_NAME );
+        createWidgetsRecreator(id);
+
+        //TODO #ak remove this XML parsing run      
+        CameraSettingsTreeLister lister( id, m_camera );
+        QStringList settings = lister.proceed();
+
+        ui->manualSettingsWidget->setCurrentWidget(ui->manualLoadingPage);
+
+        m_paramRequestHandle = serverConnection->getParamsAsync(m_camera, settings, this, SLOT(at_advancedSettingsLoaded(int, const QnStringVariantPairList &, int)) );
+    } else if (m_page == QnCameraAdvancedSettingsWidget::Page::Web) {
+        QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
+        m_lastCameraPageUrl = QString(QLatin1String("http://%1:%2/%3")).
+            arg(m_camera->getHostAddress()).arg(m_camera->httpPort()).
+            arg(resourceData.value<QString>(lit("urlLocalePath"), QString()));
+        m_lastCameraPageUrl.setUserName( m_camera->getAuth().user() );
+        m_lastCameraPageUrl.setPassword( m_camera->getAuth().password() );
+        m_cameraAdvancedSettingsWebPage->networkAccessManager()->setProxy(QnNetworkProxyFactory::instance()->proxyToResource(m_camera));
+
+        ui->webView->reload();
+        ui->webView->load( QNetworkRequest(m_lastCameraPageUrl) );
+        ui->webView->show();
     }
 }
 
-void QnSettingsEnumerationWidget::refresh()
-{
-    QStringList values = static_cast<QString>(m_param.getMin()).split(QLatin1Char(','));
-    for (int i = 0; i < values.length(); ++i)
-    {
-        QString val = values[i].trimmed();
-        QRadioButton *btn = m_radioBtns.at(i);
+QnMediaServerConnectionPtr QnCameraAdvancedSettingsWidget::getServerConnection() const {
+    if (!m_camera)
+        return QnMediaServerConnectionPtr();
 
-        if (val == m_param.getCurrent()) {
-            btn->setChecked(true);
-        } else {
-            btn->setChecked(false);
+    if (QnMediaServerResourcePtr mediaServer = m_camera->getParentResource().dynamicCast<QnMediaServerResource>())
+        return mediaServer->apiConnection();
+
+    return QnMediaServerConnectionPtr();
+}
+
+void QnCameraAdvancedSettingsWidget::initWebView() {
+    m_cameraAdvancedSettingsWebPage = new CameraAdvancedSettingsWebPage(ui->webView);
+    ui->webView->setPage(m_cameraAdvancedSettingsWebPage);
+
+    QStyle* style = QStyleFactory().create(lit("fusion"));
+    ui->webView->setStyle(style);
+
+    QPalette palGreenHlText = this->palette();
+
+    // Outline around the menu
+    palGreenHlText.setColor(QPalette::Window, Qt::gray);    
+    palGreenHlText.setColor(QPalette::WindowText, Qt::black);
+
+    palGreenHlText.setColor(QPalette::BrightText, Qt::gray);  
+    palGreenHlText.setColor(QPalette::BrightText, Qt::black);
+
+    // combo button
+    palGreenHlText.setColor(QPalette::Button, Qt::gray);  
+    palGreenHlText.setColor(QPalette::ButtonText, Qt::black);
+
+    // combo menu
+    palGreenHlText.setColor(QPalette::Base, Qt::gray);  
+    palGreenHlText.setColor(QPalette::Text, Qt::black);
+
+    // tool tips
+    palGreenHlText.setColor(QPalette::ToolTipBase, Qt::gray);  
+    palGreenHlText.setColor(QPalette::ToolTipText, Qt::black);
+
+    palGreenHlText.setColor(QPalette::NoRole, Qt::gray);  
+    palGreenHlText.setColor(QPalette::AlternateBase, Qt::gray);  
+
+    palGreenHlText.setColor(QPalette::Link, Qt::black);  
+    palGreenHlText.setColor(QPalette::LinkVisited, Qt::black);  
+
+
+
+    // highlight button & menu
+    palGreenHlText.setColor(QPalette::Highlight, Qt::gray);   
+    palGreenHlText.setColor(QPalette::HighlightedText, Qt::black);
+
+    // to customize the disabled color
+    palGreenHlText.setColor(QPalette::Disabled, QPalette::Button, Qt::gray);
+    palGreenHlText.setColor(QPalette::Disabled, QPalette::ButtonText, Qt::black);
+
+    ui->webView->setPalette(palGreenHlText);
+
+    ui->webView->setAutoFillBackground(true);
+    //ui->webView->setStyleSheet(lit("background-color: rgb(255, 255, 255); color: rgb(255, 255, 255)"));
+
+    ui->webView->setBackgroundRole(palGreenHlText.Base);
+    ui->webView->setForegroundRole(palGreenHlText.Base);
+
+    connect(ui->webView->page()->networkAccessManager(), &QNetworkAccessManager::sslErrors,
+        this, [](QNetworkReply* reply, const QList<QSslError> &){reply->ignoreSslErrors();} );
+    connect(ui->webView->page()->networkAccessManager(), &QNetworkAccessManager::authenticationRequired,
+        this, &QnCameraAdvancedSettingsWidget::at_authenticationRequired, Qt::DirectConnection );
+    connect(ui->webView->page()->networkAccessManager(), &QNetworkAccessManager::proxyAuthenticationRequired,
+        this, &QnCameraAdvancedSettingsWidget::at_proxyAuthenticationRequired, Qt::DirectConnection);
+}
+
+
+void QnCameraAdvancedSettingsWidget::updateApplyingParamsLabel() {
+    ui->manualApplyingProgressWidget->setVisible(m_applyingParamsCount > 0);
+    ui->manualApplyingProgressWidget->setText(tr("Applying settings..."));
+}
+
+
+void QnCameraAdvancedSettingsWidget::at_authenticationRequired(QNetworkReply* /*reply*/, QAuthenticator * authenticator) {
+    QMutexLocker locker(&m_cameraMutex);
+    if (!m_camera)
+        return;
+    authenticator->setUser(m_camera->getAuth().user());
+    authenticator->setPassword(m_camera->getAuth().password());
+}
+
+void QnCameraAdvancedSettingsWidget::at_proxyAuthenticationRequired(const QNetworkProxy & , QAuthenticator * authenticator) {    
+    QMutexLocker locker(&m_cameraMutex);
+    if (!m_camera)
+        return;
+
+    QString user = QnAppServerConnectionFactory::url().userName();
+    QString password = QnAppServerConnectionFactory::url().password();
+    authenticator->setUser(user);
+    authenticator->setPassword(password);
+}
+
+void QnCameraAdvancedSettingsWidget::at_advancedSettingsLoaded(int status, const QnStringVariantPairList &params, int handle) {
+    if (handle != m_paramRequestHandle)
+        return;
+
+    ui->manualSettingsWidget->setCurrentWidget(ui->manualContentPage);
+
+    if (!m_widgetsRecreator) {
+        qWarning() << "QnSingleCameraSettingsWidget::at_advancedSettingsLoaded: widgets creator ptr is null, camera id: "
+            << (m_camera == 0? lit("unknown"): m_camera->getUniqueId());
+        return;
+    }
+    if (status != 0) {
+        qWarning() << "QnSingleCameraSettingsWidget::at_advancedSettingsLoaded: http status code is not OK: " << status
+            << ". Camera id: " << (m_camera == 0? lit("unknown"): m_camera->getUniqueId());
+        return;
+    }
+
+    CameraSettings cameraSettings;
+    for (auto it = params.cbegin(); it != params.cend(); ++it) {
+        QString val = it->second.toString();
+        if (val.isEmpty())
+            continue;
+
+        CameraSettingPtr tmp(new CameraSetting());
+        tmp->deserializeFromStr(val);
+
+        CameraSettings::Iterator sIt = cameraSettings.find(tmp->getId());
+        if (sIt == cameraSettings.end()) {
+            cameraSettings.insert(tmp->getId(), tmp);
+            continue;
+        }
+
+        CameraSetting& savedVal = *(sIt.value());
+        if (CameraSettingReader::isEnabled(savedVal)) {
+            CameraSettingValue newVal = tmp->getCurrent();
+            if (savedVal.getCurrent() != newVal) {
+                savedVal.setCurrent(newVal);
+            }
+            continue;
+        }
+
+        if (CameraSettingReader::isEnabled(*tmp)) {
+            cameraSettings.erase(sIt);
+            cameraSettings.insert(tmp->getId(), tmp);
+            continue;
         }
     }
+
+    if (cameraSettings.isEmpty())
+        setPage(Page::CannotLoad);
+    else      
+        m_widgetsRecreator->proceed(cameraSettings);
 }
 
-void QnSettingsEnumerationWidget::onClicked()
-{
-    QString val = QObject::sender()->objectName();
+void QnCameraAdvancedSettingsWidget::at_advancedParam_saved(int httpStatusCode, const QnStringBoolPairList& operationResult) {
+    --m_applyingParamsCount;
+    updateApplyingParamsLabel();
 
-    setParam(val);
-}
+    QString error = httpStatusCode == 0 
+        ? tr("Possibly, appropriate camera's service is unavailable now")
+        : tr("Server returned the following error code : ") + httpStatusCode; 
 
-void QnSettingsEnumerationWidget::updateParam(QString val)
-{
-    QRadioButton* btn = getBtnByname(val);
-    if (btn)
-        btn->setChecked(true);
-}
-
-QRadioButton* QnSettingsEnumerationWidget::getBtnByname(const QString& name)
-{
-    foreach(QRadioButton* btn, m_radioBtns)
+    QString failedParams;
+    for (auto it = operationResult.constBegin(); it != operationResult.constEnd(); ++it)
     {
-        if (btn->objectName() == name)
-            return btn;
+        if (!it->second) {
+            QString formattedParam(lit("Advanced->") + it->first.right(it->first.length() - 2));
+            failedParams += lit("\n");
+            failedParams += formattedParam.replace(lit("%%"), lit("->")); // TODO: #Elric #TR
+        }
     }
 
-    return 0;
+    if (!failedParams.isEmpty()) {
+        QMessageBox::warning(
+            this,
+            tr("Could not save parameters"),
+            tr("Failed to save the following parameters (%1):\n%2").arg(error, failedParams)
+            );
+    }
 }
 
-//==================================================
-QnSettingsButtonWidget::QnSettingsButtonWidget(const CameraSetting &obj, QnSettingsScrollArea *parent):
-    QnAbstractSettingsWidget(obj, parent, obj.getDescription())
-{
-    QPushButton* btn = new QPushButton(m_param.getName());
-    m_layout->addWidget(new QWidget());
-    m_layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
-    m_layout->addWidget(btn);
-    m_layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
-    m_layout->addWidget(new QWidget()); // TODO: #Elric hueta
-
-    QObject::connect(btn, SIGNAL(released()), this, SLOT(onClicked()));
-
-    btn->setFocusPolicy(Qt::NoFocus);
-}
-
-void QnSettingsButtonWidget::refresh()
-{
-}
-
-void QnSettingsButtonWidget::onClicked()
-{
-    setParam("");
-}
-
-void QnSettingsButtonWidget::updateParam(QString /*val*/)
-{
-    
-}
-
-//==============================================
-QnSettingsTextFieldWidget::QnSettingsTextFieldWidget(const CameraSetting &obj, QnSettingsScrollArea *parent):
-    QnAbstractSettingsWidget(obj, parent, obj.getDescription())
-{
-    m_lineEdit = new QLineEdit();
-    m_lineEdit->setText(obj.getCurrent());
-
-    m_layout->addWidget(new QWidget());
-    m_layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
-    m_layout->addWidget(m_lineEdit);
-    m_layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
-    m_layout->addWidget(new QLabel(obj.getName()));
-
-    m_lineEdit->setReadOnly( obj.isReadOnly() );
-
-    connect( m_lineEdit, &QLineEdit::editingFinished, this, &QnSettingsTextFieldWidget::onChange );
-}
-
-void QnSettingsTextFieldWidget::onChange()
-{
-    if( !m_lineEdit->isModified() )
+void QnCameraAdvancedSettingsWidget::at_advancedParamChanged(const CameraSetting& val) {
+    auto serverConnection = getServerConnection();
+    if (!serverConnection)
         return;
-    setParam( m_lineEdit->text() );
-    m_lineEdit->setModified( false );
+
+    QnStringVariantPairList params;
+    params << QPair<QString, QVariant>(val.getId(), QVariant(val.serializeToStr()));
+    serverConnection->setParamsAsync(m_camera, params, this, SLOT(at_advancedParam_saved(int, const QnStringBoolPairList &)));
+    ++m_applyingParamsCount;
+    updateApplyingParamsLabel();
 }
 
-void QnSettingsTextFieldWidget::refresh()
-{
-    m_lineEdit->setText(m_param.getCurrent());
-}
-
-void QnSettingsTextFieldWidget::updateParam(QString val)
-{
-    Q_UNUSED(val)
-}
-
-//==============================================
-QnSettingsControlButtonsPairWidget::QnSettingsControlButtonsPairWidget(const CameraSetting &obj, QnSettingsScrollArea *parent):
-    QnAbstractSettingsWidget(obj, parent, obj.getDescription())
-{
-    QHBoxLayout *hlayout = new QHBoxLayout();
-    m_layout->addLayout(hlayout);
-
-    m_minBtn = new QPushButton(lit("-"));
-    m_minBtn->setFocusPolicy(Qt::NoFocus);
-    m_maxBtn = new QPushButton(lit("+"));
-    m_maxBtn->setFocusPolicy(Qt::NoFocus);
-
-    hlayout->addStretch(1);
-    hlayout->addWidget(new QLabel(obj.getName()));
-    hlayout->addWidget(m_minBtn);
-    hlayout->addWidget(m_maxBtn);
-    hlayout->addStretch(1);
-
-    QObject::connect(m_minBtn, SIGNAL(pressed()), this, SLOT(onMinPressed()));
-    QObject::connect(m_minBtn, SIGNAL(released()), this, SLOT(onMinReleased()));
-
-    QObject::connect(m_maxBtn, SIGNAL(pressed()), this, SLOT(onMaxPressed()));
-    QObject::connect(m_maxBtn, SIGNAL(released()), this, SLOT(onMaxReleased()));
-}
-
-void QnSettingsControlButtonsPairWidget::onMinPressed()
-{
-    setParam(m_param.getMin());
-}
-
-void QnSettingsControlButtonsPairWidget::onMinReleased()
-{
-    setParam(m_param.getStep());
-}
-
-void QnSettingsControlButtonsPairWidget::onMaxPressed()
-{
-    setParam(m_param.getMax());
-}
-
-void QnSettingsControlButtonsPairWidget::onMaxReleased()
-{
-    setParam(m_param.getStep());
-}
-
-void QnSettingsControlButtonsPairWidget::refresh()
-{
-    
-}
-
-void QnSettingsControlButtonsPairWidget::updateParam(QString val)
-{
-    Q_UNUSED(val)
-}

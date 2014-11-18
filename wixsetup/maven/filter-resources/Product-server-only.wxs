@@ -186,9 +186,9 @@
             <FindRelatedProducts Before="AppSearch" />
             <AppSearch Before="LaunchConditions" />
 
-            <Custom Action="FindFreePorts" Before="AssignServerPort"/>
-            <Custom Action="AssignServerPort" Before="FindConfiguredStorages">NOT SERVER_PORT</Custom>
-            <Custom Action="FindConfiguredStorages" Before="CostInitialize"/> 
+            <Custom Action="FindFreePorts" After="SetServerPort2"/>
+            <Custom Action="AssignServerPort" After="FindFreePorts">NOT SERVER_PORT</Custom>
+            <Custom Action="FindConfiguredStorages" After="AssignServerPort"/> 
         </InstallUISequence>
 
         <InstallExecuteSequence>
