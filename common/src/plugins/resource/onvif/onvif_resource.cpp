@@ -38,6 +38,7 @@
 #include "common/common_module.h"
 #include "utils/common/timermanager.h"
 #include "gsoap_async_call_wrapper.h"
+#include "plugins/resource/d-link/dlink_ptz_controller.h"
 
 //!assumes that camera can only work in bistable mode (true for some (or all?) DW cameras)
 #define SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
@@ -2533,12 +2534,25 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
     }
 }
 
+QnAbstractPtzController* QnPlOnvifResource::createSpecialPtzController()
+{
+    if (getModel() == lit("DCS-5615"))
+        return new QnDlinkPtzController(toSharedPointer(this));
+    else
+        return 0;
+}
+
 QnAbstractPtzController *QnPlOnvifResource::createPtzControllerInternal()
 {
+    QScopedPointer<QnAbstractPtzController> result;
+    result.reset(createSpecialPtzController());
+    if (result)
+        return result.take();
+
     if(getPtzUrl().isEmpty() || getPtzConfigurationToken().isEmpty())
         return NULL;
 
-    QScopedPointer<QnOnvifPtzController> result(new QnOnvifPtzController(toSharedPointer(this)));
+    result.reset(new QnOnvifPtzController(toSharedPointer(this)));
     if(result->getCapabilities() == Qn::NoPtzCapabilities)
         return NULL;
     

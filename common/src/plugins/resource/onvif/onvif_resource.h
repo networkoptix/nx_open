@@ -489,6 +489,7 @@ private:
         bool active,
         unsigned int autoResetTimeoutMS );
     CameraDiagnostics::Result fetchAndSetDeviceInformationPriv( bool performSimpleCheck );
+    QnAbstractPtzController* createSpecialPtzController();
 };
 
 #endif //ENABLE_ONVIF
