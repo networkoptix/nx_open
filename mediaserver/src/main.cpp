@@ -1623,13 +1623,16 @@ void QnMain::run()
     QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);
 
+    bool compatibilityMode = cmdLineArguments.devModeKey == lit("razrazraz");
+
     QString moduleName = qApp->applicationName();
     if( moduleName.startsWith( qApp->organizationName() ) )
         moduleName = moduleName.mid( qApp->organizationName().length() ).trimmed();
 
     QnModuleInformation selfInformation;
     selfInformation.type = moduleName;
-    selfInformation.customization = QnAppInfo::customizationName();
+    if (!compatibilityMode)
+        selfInformation.customization = QnAppInfo::customizationName();
     selfInformation.version = qnCommon->engineVersion();
     selfInformation.systemInformation = QnSystemInformation::currentSystemInformation();
     selfInformation.systemName = qnCommon->localSystemName();
@@ -1644,10 +1647,8 @@ void QnMain::run()
 
     m_moduleFinder = new QnModuleFinder( false );
     std::unique_ptr<QnModuleFinder> moduleFinderScopedPointer( m_moduleFinder );
-    if (cmdLineArguments.devModeKey == lit("razrazraz")) {
-        m_moduleFinder->setCompatibilityMode(true);
-        ec2ConnectionFactory->setCompatibilityMode(true);
-    }
+    m_moduleFinder->setCompatibilityMode(compatibilityMode);
+    ec2ConnectionFactory->setCompatibilityMode(compatibilityMode);
     if (!cmdLineArguments.allowedDiscoveryPeers.isEmpty()) {
         QList<QnUuid> allowedPeers;
         for (const QString &peer: cmdLineArguments.allowedDiscoveryPeers.split(";")) {

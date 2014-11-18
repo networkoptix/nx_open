@@ -37,7 +37,6 @@ angular.module('webadminApp')
                 }
                 return $http.get('/ec2/getCamerasEx');
             },
-
             saveMediaServer: function(info){return $http.post('/ec2/saveMediaServer',info); },
             statistics:function(url){
                 url = url || '';
@@ -46,13 +45,13 @@ angular.module('webadminApp')
             getCurrentUser:function(){return $http.post('/api/getCurrentUser');},
             getRecords:function(serverUrl,physicalId,startTime,endTime,detail){
                 var d = new Date();
-                if(typeof(startTime)=='undefined'){
+                if(typeof(startTime)==='undefined'){
                     startTime = d.getTime() - 30*24*60*60*1000;
                 }
-                if(typeof(endTime)=='undefined'){
+                if(typeof(endTime)==='undefined'){
                     endTime = d.getTime() + 100*1000;
                 }
-                if(typeof(detail)=='undefined'){
+                if(typeof(detail)==='undefined'){
                     detail = (endTime - startTime) / 1000;
                 }
                 if(serverUrl !== '/'){

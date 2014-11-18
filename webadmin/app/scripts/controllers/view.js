@@ -26,7 +26,7 @@ angular.module('webadminApp').controller('ViewCtrl', function ($scope,$location,
     }
     function requestCameraRecords(camera){
         mediaserver.getRecords(getServerUrl(getCamerasServer(camera)),camera.physicalId).then(function(data){
-           console.log(data.data);
+            console.log(data.data);
         });
     }
 
