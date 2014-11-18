@@ -1325,16 +1325,10 @@ class RRRtspTcp:
         Session:\r\n\
         User-Agent: Network Optix\r\n\
         x-play-now: true\r\n\
-        %s\
+        %s\r\n \
         x-server-guid: %s\r\n\r\n"
 
-    _digestAuthTemplate = " \
-        Authorization: Digest \
-        username=\"%s\", \
-        realm=\"%s\", \
-        nonce=\"%s\", \
-        uri=\"%s\", \
-        response=\"%s\""
+    _digestAuthTemplate = "Authorization:Digest username=\"%s\",realm=\"%s\",nonce=\"%s\",uri=\"%s\",response=\"%s\""
     
     def __init__(self,addr,port,mac,cid,sid,uname,pwd):
         self._port = port
@@ -1380,21 +1374,24 @@ class RRRtspTcp:
     # is required to format the header into the target
     # HTTP digest authentication
 
+    def _generateMD5String(self,m):
+        return ''.join('%02x' % ord(i) for i in m)
+
     def _calDigest(self,realm,nonce):
         m = md5.new()
         m.update( "%s:%s:%s"%(self._uname,realm,self._pwd) )
         part1 = m.digest()
 
         m = md5.new()
-        m.update( "PLAY:http://%s:%d/%s"%(self._addr,self._port,self._mac) )
+        m.update( "PLAY:/%s"%(self._mac) )
         part2 = m.digest()
 
         m = md5.new()
-        m.update("%s:%s:%s"%(part1,nonce,part2))
+        m.update("%s:%s:%s"%(self._generateMD5String(part1),nonce,self._generateMD5String(part2)))
         resp = m.digest()
 
         # represent the final digest as ANSI printable code
-        return ''.join('%02x' % ord(i) for i in resp)
+        return self._generateMD5String(resp)
 
 
     def _formatDigestHeader(self,realm,nonce):
@@ -1403,7 +1400,7 @@ class RRRtspTcp:
             self._uname,
             realm,
             nonce,
-            "http://%s:%d/%s"%(self._addr,self._port,self._mac),
+            "/%s"%(self._mac),
             resp)
 
     def _requestWithDigest(self,reply):

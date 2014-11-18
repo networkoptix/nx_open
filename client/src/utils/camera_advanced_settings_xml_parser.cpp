@@ -1,4 +1,3 @@
-
 #include "camera_advanced_settings_xml_parser.h"
 
 #include <QtCore/QDebug>
@@ -123,7 +122,11 @@ bool CameraSettingsWidgetsCreator::proceed(CameraSettings &settings)
 {
     m_settings = settings;
 
-    return read() && CameraSettingReader::proceed();
+    bool result = read() && CameraSettingReader::proceed();
+    if (result)
+        setupWidgetDependencies();
+
+    return result;
 }
 
 bool CameraSettingsWidgetsCreator::isGroupEnabled(const QString& id, const QString& parentId, const QString& name) {
@@ -146,68 +149,12 @@ bool CameraSettingsWidgetsCreator::isGroupEnabled(const QString& id, const QStri
     return true;
 }
 
-bool CameraSettingsWidgetsCreator::isEnabledByOtherSettings(const QString& id, const QString& /*parentId*/)
-{
-    //ToDo: remove hardcode
-    if (!getCameraId().startsWith(lit("DIGITALWATCHDOG"))) {
-        return true;
-    }
-
-    if (id == lit("%%Imaging%%White Balance%%Kelvin") ||
-        id == lit("%%Imaging%%White Balance%%Red") ||
-        id == lit("%%Imaging%%White Balance%%Blue") )
-    {
-        CameraSettings::Iterator settingIt = m_settings.find(lit("%%Imaging%%White Balance%%Mode"));
-        QString val = settingIt != m_settings.end() ? static_cast<QString>(settingIt.value()->getCurrent()) : QString();
-        if (val == lit("MANUAL")) {
-            return true;
-        }
-        return false;
-    }
-
-    if (id == lit("%%Imaging%%Exposure%%Shutter Speed") )
-    {
-        CameraSettings::Iterator settingIt = m_settings.find(lit("%%Imaging%%Exposure%%Shutter Mode"));
-        QString val = settingIt != m_settings.end() ? static_cast<QString>(settingIt.value()->getCurrent()) : QString();
-        if (val == lit("MANUAL")) {
-            return true;
-        }
-        return false;
-    }
-
-    if (id == lit("%%Imaging%%Day & Night%%Switching from Color to B/W") ||
-        id == lit("%%Imaging%%Day & Night%%Switching from B/W to Color") )
-    {
-        CameraSettings::Iterator settingIt = m_settings.find(lit("%%Imaging%%Day & Night%%Mode"));
-        QString val = settingIt != m_settings.end() ? static_cast<QString>(settingIt.value()->getCurrent()) : QString();
-        if (val == lit("AUTO")) {
-            return true;
-        }
-        return false;
-    }
-
-    return true;
-}
-
-bool CameraSettingsWidgetsCreator::isParamEnabled(const QString& id, const QString& parentId)
-{
-    bool enabled = isEnabledByOtherSettings(id, parentId);
-
+bool CameraSettingsWidgetsCreator::isParamEnabled(const QString& id, const QString& parentId) {
+    Q_UNUSED(parentId);
     SettingsWidgetsById::Iterator swbiIt = m_settingsWidgetsById.find(id);
-    if (swbiIt != m_settingsWidgetsById.end())
-    {
-        if (enabled) {
-            swbiIt.value()->refresh();
-        } else {
-            delete swbiIt.value();
-            m_settingsWidgetsById.erase(swbiIt);
-        }
-
+    if (swbiIt != m_settingsWidgetsById.end()) {
+        swbiIt.value()->refresh();
         //Already created, so we don't need creation, so returning false
-        return false;
-    }
-
-    if (!enabled) {
         return false;
     }
 
@@ -375,6 +322,84 @@ void CameraSettingsWidgetsCreator::parentOfRootElemFound(const QString& parentId
     m_obj.parentOfRootElemFound(parentId);
 }
 
+void CameraSettingsWidgetsCreator::setupWidgetDependencies() {
+
+    //TODO: #GDM move hardcode to dependency structure
+    if (!getCameraId().startsWith(lit("DIGITALWATCHDOG"))) {
+        return;
+    }
+
+    /* If parameter baseParameterId value equals to baseParameterValue, 
+     * all dependentParameters should be enabled.
+     * Otherwise they should be disabled. 
+     */
+    struct DependencyEntry {
+        QString baseParameterId;
+        QString baseParameterValue;
+        QStringList dependentParameters;
+    };
+    QList<DependencyEntry> entries; //TODO: #GDM these parameters should be read from some other place, e.g. cameras xml file.
+
+    /* Form table of dependent parameters. */
+    {
+        DependencyEntry imageBalance;
+        imageBalance.baseParameterId = lit("%%Imaging%%White Balance%%Mode");
+        imageBalance.baseParameterValue = lit("MANUAL");
+        imageBalance.dependentParameters = QStringList()
+            << lit("%%Imaging%%White Balance%%Kelvin")
+            << lit("%%Imaging%%White Balance%%Red")
+            << lit("%%Imaging%%White Balance%%Blue");
+        entries << imageBalance;
+    }
+    {
+        DependencyEntry imageExposure;
+        imageExposure.baseParameterId = lit("%%Imaging%%Exposure%%Shutter Mode");
+        imageExposure.baseParameterValue = lit("MANUAL");
+        imageExposure.dependentParameters = QStringList()
+            << lit("%%Imaging%%Exposure%%Shutter Speed");
+        entries << imageExposure;
+    }
+    {
+        DependencyEntry imageDayAndNight;
+        imageDayAndNight.baseParameterId = lit("%%Imaging%%Day & Night%%Mode");
+        imageDayAndNight.baseParameterValue = lit("AUTO");  //TODO: #GDM are you sure there should be AUTO?
+        imageDayAndNight.dependentParameters = QStringList()
+            << lit("%%Imaging%%Day & Night%%Switching from Color to B/W")
+            << lit("%%Imaging%%Day & Night%%Switching from B/W to Color");
+        entries << imageDayAndNight;
+    }
+
+    /* Process dependency table. */
+    for (const DependencyEntry &entry: entries) {
+        /* Skip parameters that are not present. */
+        if (!m_settings.contains(entry.baseParameterId))
+            continue;
+
+        if (!m_settingsWidgetsById.contains(entry.baseParameterId))
+            continue;
+
+        auto baseParam = m_settings[entry.baseParameterId];
+        QString value = baseParam->getCurrent();
+        bool enable = (value == entry.baseParameterValue);
+
+        auto baseWidget = m_settingsWidgetsById[entry.baseParameterId];
+
+        /* Setup dependency. */
+        for (const QString &dependentParamId: entry.dependentParameters) {
+            if (!m_settingsWidgetsById.contains(dependentParamId))
+                continue;
+
+            auto dependentWidget = m_settingsWidgetsById[dependentParamId];
+            auto targetValue = entry.baseParameterValue;
+            dependentWidget->setEnabled(enable);
+            /* Make all dependent widgets listen the base widget. */
+            connect(baseWidget, &QnAbstractSettingsWidget::advancedParamChanged, dependentWidget, [dependentWidget, targetValue](const CameraSetting &val) {
+                dependentWidget->setEnabled(val.getCurrent() == targetValue);
+            });
+        }
+    }
+}
+
 //
 // class CameraSettingTreeReader
 //
@@ -524,6 +549,7 @@ CameraSettings& CameraSettingsWidgetsTreeCreator::dataPtr() {
 
 void CameraSettingsWidgetsTreeCreator::proceed(CameraSettings &settings) {
     m_settings = settings;
+    bool result = false;
     if ( !m_id.isNull() )
         CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>::proceed();
 }

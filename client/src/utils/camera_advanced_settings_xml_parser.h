@@ -121,7 +121,9 @@ signals:
 private:
     void removeLayoutItems();
     QTreeWidgetItem* findParentForParam(const QString& parentId);
-    bool isEnabledByOtherSettings(const QString& id, const QString& parentId);
+
+    /** Some widgets depend on other widgets values. They should be disabled or enabled in time. */
+    void setupWidgetDependencies();
 
     ParentOfRootElemFoundAware& m_obj;
     CameraSettings m_settings;
