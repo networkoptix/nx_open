@@ -1038,6 +1038,8 @@ bool QnMotionEstimation::analizeFrame(const QnCompressedVideoDataPtr& videoData)
 
     if (!m_decoder->decode(videoData, &m_frames[idx]))
         return false;
+    if (m_frames[idx]->width <= 8 || m_frames[idx]->height <= 8)
+        return false;
     m_videoResolution.setWidth( m_frames[idx]->width );
     m_videoResolution.setHeight( m_frames[idx]->height );
     if (m_firstFrameTime == qint64(AV_NOPTS_VALUE))
@@ -1059,9 +1061,9 @@ bool QnMotionEstimation::analizeFrame(const QnCompressedVideoDataPtr& videoData)
     //    fillFrameRect(m_frames[idx], QRect(QPoint(0, m_frames[idx]->height/2), QPoint(m_frames[idx]->width, m_frames[idx]->height)), 40);
 #endif
 
-    if (m_decoder->getWidth() != m_lastImgWidth || m_decoder->getHeight() != m_lastImgHeight || m_isNewMask)
+    if (m_frames[idx]->width != m_lastImgWidth || m_frames[idx]->height != m_lastImgHeight || m_isNewMask)
 	{
-        reallocateMask(m_decoder->getWidth(), m_decoder->getHeight());
+        reallocateMask(m_frames[idx]->width, m_frames[idx]->height);
 		m_scaleXStep = m_lastImgWidth * 65536 / MD_WIDTH;
 		m_scaleYStep = m_lastImgHeight * 65536 / MD_HEIGHT;
 	};
