@@ -343,7 +343,7 @@ QRectF QnResourceWidget::enclosingGeometry() const {
 void QnResourceWidget::setEnclosingGeometry(const QRectF &enclosingGeometry) {
     m_enclosingGeometry = enclosingGeometry;
 
-    if(hasAspectRatio()) {
+    if(hasAspectRatio() && !enclosingGeometry.isEmpty()) {
         /* Calculate bounds of the rotated item. */
 
         /* 1. Take a rectangle with our aspect ratio */
