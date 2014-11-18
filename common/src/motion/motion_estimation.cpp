@@ -794,6 +794,8 @@ void QnMotionEstimation::reallocateMask(int width, int height)
 
 void QnMotionEstimation::analizeMotionAmount(quint8* frame)
 {
+    qWarning() << "analize1. m_scaledWidth=" << m_scaledWidth;
+
     // 1. filtering. If a lot of motion around current pixel, mark it too, also remove motion if diff < mask
     quint8* curPtr = frame;
     quint8* dstPtr = m_filteredFrame;
@@ -805,6 +807,8 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
         maskPtr++;
         dstPtr++;
     }
+
+    qWarning() << "analize1.1";
 
     for (int x = 1; x < m_scaledWidth-1; ++x)
     {
@@ -843,12 +847,16 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
         dstPtr++;
     }
 
+    qWarning() << "analize1.2";
+
     for (int y = 0; y < MD_HEIGHT; ++y) {
         *dstPtr = *curPtr <= *maskPtr ? 0 : *curPtr;
         curPtr++;
         maskPtr++;
         dstPtr++;
     }
+
+    qWarning() << "analize2.";
 
     // 2. Determine linked areas
     int currentLinkIndex = 1;
@@ -913,6 +921,8 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
         }
     }
 
+    qWarning() << "analize3.";
+
     // 3. path compression
     m_linkedMap[0] = 0;
     for (int i = 1; i < currentLinkIndex; ++i)
@@ -946,6 +956,9 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
         }
     }
 #endif
+
+    qWarning() << "analize4.";
+
     // 6. remove motion if motion square is not enough and write result to bitarray
     for (int i = 0; i < MD_HEIGHT*m_scaledWidth;)
     {
