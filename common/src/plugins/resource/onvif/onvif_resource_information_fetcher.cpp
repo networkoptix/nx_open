@@ -338,6 +338,8 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
         resource = QnPlOnvifResourcePtr(new QnPlWatchDogResource());
     else if (manufacture.toLower() == QLatin1String("panoramic"))
         resource = QnPlOnvifResourcePtr(new QnPlWatchDogResource());
+    else if (manufacture.toLower() == QLatin1String("ipnc"))   // new dw panoramic cameras
+        resource = QnPlOnvifResourcePtr(new QnPlWatchDogResource());
     else if (manufacture.toLower().contains(QLatin1String("sony")))
         resource = QnPlOnvifResourcePtr(new QnPlSonyResource());
     else if (manufacture.toLower().contains(QLatin1String("seyeon tech")))
