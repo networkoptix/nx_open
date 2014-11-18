@@ -19,7 +19,7 @@
         <skip.test>true</skip.test>
         <skip.compress>true</skip.compress>
         <DbSync22Dir>${libdir}/${arch}/share/dbsync-2.2</DbSync22Dir>
-        <final.artifact.name>qulu</final.artifact.name>
+        <final.artifact.name>${installer.name}</final.artifact.name>
     </properties>
 
     <build>
