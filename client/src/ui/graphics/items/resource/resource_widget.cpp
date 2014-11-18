@@ -342,10 +342,7 @@ QRectF QnResourceWidget::enclosingGeometry() const {
 
 void QnResourceWidget::setEnclosingGeometry(const QRectF &enclosingGeometry) {
     m_enclosingGeometry = enclosingGeometry;
-    QRectF g = calculateGeometry(enclosingGeometry);
-    qDebug() << enclosingGeometry.size() << g.size();
-    setGeometry(g);
-//    setGeometry(calculateGeometry(enclosingGeometry));
+    setGeometry(calculateGeometry(enclosingGeometry));
 }
 
 QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry) const {
