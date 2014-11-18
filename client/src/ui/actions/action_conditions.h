@@ -644,4 +644,13 @@ private:
     Qn::LightModeFlags m_lightModeFlags;
 };
 
+class QnServerWebPageCondition: public QnActionCondition {
+public:
+    QnServerWebPageCondition(QObject *parent = 0):
+        QnActionCondition(parent)
+    {}
+
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+};
+
 #endif // QN_ACTION_CONDITIONS_H

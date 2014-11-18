@@ -7,6 +7,7 @@
 #include <common/common_module.h>
 
 #include <utils/common/warnings.h>
+#include <utils/network/router.h>
 
 #include <core/resource_management/resource_criterion.h>
 #include <core/resource_management/resource_pool.h>
@@ -1008,4 +1009,17 @@ Qn::ActionVisibility QnDisjunctionActionCondition::check(const QnActionParameter
         result = qMax(result, condition->check(parameters));
 
     return result;
+}
+
+
+Qn::ActionVisibility QnServerWebPageCondition::check(const QnResourceList &resources) {
+    if (resources.size() != 1)
+        return Qn::InvisibleAction;
+
+    QnMediaServerResourcePtr server = resources.first().dynamicCast<QnMediaServerResource>();
+    if (!server)
+        return Qn::InvisibleAction;
+
+    QnRoute route = QnRouter::instance()->routeTo(server->getId());
+    return route.length() == 1 ? Qn::EnabledAction : Qn::DisabledAction;
 }

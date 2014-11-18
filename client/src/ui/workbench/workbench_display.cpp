@@ -1206,14 +1206,8 @@ QRectF QnWorkbenchDisplay::itemGeometry(QnWorkbenchItem *item, QRectF *enclosing
         return QRectF();
     }
 
-    QRectF result = itemEnclosingGeometry(item);
-    if(enclosingGeometry != NULL)
-        *enclosingGeometry = rotated(result, item->rotation());
-
-    if(!widget->hasAspectRatio())
-        return rotated(result, item->rotation());
-
-    return rotated(expanded(widget->aspectRatio(), result, Qt::KeepAspectRatio), item->rotation());
+    QRectF geometry = rotated(widget->calculateGeometry(itemEnclosingGeometry(item)), item->rotation());
+    return geometry;
 }
 
 QRectF QnWorkbenchDisplay::layoutBoundingGeometry() const {
@@ -1382,7 +1376,7 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
 
     /* Move! */
     WidgetAnimator *animator = this->animator(widget);
-    if(animate) {
+    if(animate && enclosingGeometry != widget->enclosingGeometry()) {
         animator->moveTo(enclosingGeometry, rotation);
     } else {
         animator->stop();
