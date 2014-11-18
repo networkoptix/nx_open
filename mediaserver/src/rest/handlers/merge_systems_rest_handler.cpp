@@ -83,9 +83,9 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
         return CODE_OK;
     }
 
-    bool customizationOK = moduleInformation.customization == QnAppInfo::customizationName();
-    if (QnModuleFinder::instance()->isCompatibilityMode())
-        customizationOK = true;
+    bool customizationOK = moduleInformation.customization == QnAppInfo::customizationName() ||
+                           moduleInformation.customization.isEmpty() ||
+                           QnModuleFinder::instance()->isCompatibilityMode();
     if (!isCompatible(qnCommon->engineVersion(), moduleInformation.version) || !customizationOK) {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("INCOMPATIBLE"));
         return CODE_OK;
