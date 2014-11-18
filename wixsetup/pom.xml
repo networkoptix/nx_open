@@ -21,14 +21,8 @@
 		<DbSync22Dir>${libdir}/${arch}/share/dbsync-2.2</DbSync22Dir>
 	</properties>
     
-    <modules>
-        <module>wixsetup-server-only</module>
-        <module>wixsetup-client-only</module>	
-        <module>wixsetup-full</module>	
-    </modules>
-    
 	<build>
-        <finalName>${installer.name}-${release.version}.${buildNumber}-${arch}-${build.configuration}-${install.type}-beta</finalName>
+        <finalName>${installer.name}-${release.version}.${buildNumber}-${arch}-${build.configuration}</finalName>
 		<directory>${arch}</directory>
 		<sourceDirectory>${basedir}</sourceDirectory>
 		<plugins>
@@ -160,7 +154,7 @@
 						<configuration>
 							<executable>${init.python.dir}/python</executable>
 							<arguments>
-                                <argument>wix-compile-${install.type}.py</argument>
+                                <argument>wix-compile.py</argument>
 							</arguments>
 							<workingDirectory>${project.build.directory}</workingDirectory>
 						</configuration>                    

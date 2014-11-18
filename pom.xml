@@ -338,9 +338,7 @@
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->                   
                 <module>client</module>                     
-                <module>wixsetup/wixsetup-server-only</module>
-                <module>wixsetup/wixsetup-client-only</module>
-<!--                <module>wixsetup/wixsetup-full</module> -->
+                <module>wixsetup/wixsetup</module>
             </modules>
             <properties>
                 <qt.dir>${libdir}/${arch}</qt.dir>
