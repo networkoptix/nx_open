@@ -38,7 +38,7 @@ namespace {
 
 
 QnLicenseWidget::QnLicenseWidget(QWidget *parent):
-    QWidget(parent),
+    base_type(parent),
     ui(new Ui::LicenseWidget),
     m_state(Normal),
     m_freeLicenseAvailable(true)
@@ -59,6 +59,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent):
     ui->licenseKeyWarningLabel->setVisible(false);
 
     ui->serverIconLabel->setPixmap(qnResIconCache->icon(QnResourceIconCache::Server).pixmap(18, 18));
+    setPaletteColor(ui->serverNameLabel, QPalette::Active, QPalette::Base, this->palette().color(QPalette::Window));
 
     connect(ui->onlineKeyEdit,              SIGNAL(textChanged(QString)),       this,   SLOT(updateControls()));
     connect(ui->activationTypeComboBox,     SIGNAL(currentIndexChanged(int)),   this,   SLOT(at_activationTypeComboBox_currentIndexChanged()));
@@ -163,6 +164,16 @@ void QnLicenseWidget::updateControls() {
 void QnLicenseWidget::updateCurrentServer() {
     QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->remoteGUID()).dynamicCast<QnMediaServerResource>();
     Q_ASSERT(server);
+
+    if (m_currentServer != server) {
+        if (m_currentServer)
+            disconnect(m_currentServer, NULL, this, NULL);
+        m_currentServer = server;
+        if (m_currentServer)
+            connect(m_currentServer, &QnResource::nameChanged, this, &QnLicenseWidget::updateCurrentServer);
+    }
+
+
     bool valid = !server.isNull();
 
     QString name = getResourceName(server);
@@ -170,6 +181,7 @@ void QnLicenseWidget::updateCurrentServer() {
     ui->serverIconLabel->setVisible(valid);
     ui->serverNameLabel->setVisible(valid);
     ui->serverNameLabel->setText(name);
+    ui->serverNameLabel->setSelection(0,0);
 }
 
 
