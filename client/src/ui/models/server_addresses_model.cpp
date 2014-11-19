@@ -148,6 +148,8 @@ bool QnServerAddressesModel::setData(const QModelIndex &index, const QVariant &v
     switch (index.column()) {
     case AddressColumn: {
         QUrl url = QUrl::fromUserInput(value.toString());
+        url.setScheme(lit("http"));
+
         if (url.isEmpty())
             return false;
 

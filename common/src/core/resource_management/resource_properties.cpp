@@ -173,3 +173,14 @@ ec2::ApiResourceParamDataList QnResourcePropertyDictionary::allProperties(const 
 
     return result;
 }
+
+QHash<QnUuid, QSet<QString> > QnResourcePropertyDictionary::allPropertyNamesByResource() const {
+    QHash<QnUuid, QSet<QString> > result;
+
+    QMutexLocker lock(&m_mutex);
+    for (auto iter = m_items.constBegin(); iter != m_items.constEnd(); ++iter) {
+        QnUuid id = iter.key();
+        result.insert(id, iter.value().keys().toSet());
+    }
+    return result;
+}

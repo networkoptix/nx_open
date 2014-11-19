@@ -31,10 +31,10 @@ public:
 
     QMap<QnUuid, QnBusinessEventRulePtr> businessRules() const;
 
-    void processServerUserAttributesList( const QnMediaServerUserAttributesList& serverUserAttributesList );
-    void processCameraUserAttributesList( const QnCameraUserAttributesList& cameraUserAttributesList );
-    void processPropertyList(const ec2::ApiResourceParamWithRefDataList& params);
-    void processStatusList(const ec2::ApiResourceStatusDataList& params);
+    void resetServerUserAttributesList( const QnMediaServerUserAttributesList& serverUserAttributesList );
+    void resetCameraUserAttributesList( const QnCameraUserAttributesList& cameraUserAttributesList );
+    void resetPropertyList(const ec2::ApiResourceParamWithRefDataList& params);
+    void resetStatusList(const ec2::ApiResourceStatusDataList& params);
 signals:
     void connectionOpened();
     void connectionClosed();
@@ -71,9 +71,9 @@ protected:
     
     virtual void afterRemovingResource(const QnUuid &id);
 
-    virtual void processResources(const QnResourceList &resources);
-    void processLicenses(const QnLicenseList &licenses);
-    void processCameraServerItems(const QnCameraHistoryList &cameraHistoryList);
+    virtual void resetResources(const QnResourceList &resources);
+    void resetLicenses(const QnLicenseList &licenses);
+    void resetCameraServerItems(const QnCameraHistoryList &cameraHistoryList);
     
     virtual bool canRemoveResource(const QnUuid& resourceId);
     virtual void removeResourceIgnored(const QnUuid& resourceId);
