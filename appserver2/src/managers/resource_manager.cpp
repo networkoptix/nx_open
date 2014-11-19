@@ -50,6 +50,19 @@ namespace ec2
     }
 
     template<class T>
+    int QnResourceManager<T>::setResourceStatusLocal( const QnUuid& resourceId, Qn::ResourceStatus status, impl::SetResourceStatusHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+
+        //performing request
+        auto tran = prepareTransaction( ApiCommand::setResourceStatus, resourceId, status );
+        tran.isLocal = true;
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SetResourceStatusHandler::done ), handler, reqID, _1, resourceId));
+        return reqID;
+    }
+
+    template<class T>
     int QnResourceManager<T>::getKvPairs( const QnUuid &resourceId, impl::GetKvPairsHandlerPtr handler )
     {
         const int reqID = generateRequestID();
