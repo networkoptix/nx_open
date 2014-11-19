@@ -117,13 +117,13 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(const QnAbstrac
 
 bool QnBusinessRuleProcessor::needProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res)
 {
-    const QnMediaServerResourcePtr& routeToServer = getDestMServer(action, res);
+    const QnMediaServerResourcePtr routeToServer = getDestMServer(action, res);
     return routeToServer && !action->isReceivedFromRemoteHost() && routeToServer->getId() != getGuid();
 }
 
 void QnBusinessRuleProcessor::doProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res)
 {
-    const QnMediaServerResourcePtr& routeToServer = getDestMServer(action, res);
+    const QnMediaServerResourcePtr routeToServer = getDestMServer(action, res);
     if (routeToServer) 
     {
         // todo: it is better to use action.clone here
