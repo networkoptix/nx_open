@@ -25,7 +25,7 @@
 
                 <link rel="stylesheet" href="customization/styles.css"/>
             </head>
-            <body style="min-width: 370px;">
+            <body style="min-width: 450px;">
                 <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
                     <div class="container">
                         <div class="navbar-header">
