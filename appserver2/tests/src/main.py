@@ -1304,8 +1304,7 @@ class RRRtspTcp:
     _uname = None
     _pwd = None
 
-    _rtspBasicTemplate =  "\
-        PLAY rtsp://%s/%s RTSP/1.0\r\n\
+    _rtspBasicTemplate =  "PLAY rtsp://%s/%s RTSP/1.0\r\n\
         CSeq: 2\r\n\
         Range: npt=now-\r\n\
         Scale: 1\r\n\
@@ -1316,8 +1315,7 @@ class RRRtspTcp:
         Authorization: Basic YWRtaW46MTIz\r\n\
         x-server-guid: %s\r\n\r\n"
 
-    _rtspDigestTemplate = "\
-        PLAY rtsp://%s/%s RTSP/1.0\r\n\
+    _rtspDigestTemplate = "PLAY rtsp://%s/%s RTSP/1.0\r\n\
         CSeq: 2\r\n\
         Range: npt=now-\r\n\
         Scale: 1\r\n\
@@ -1328,7 +1326,7 @@ class RRRtspTcp:
         %s\r\n \
         x-server-guid: %s\r\n\r\n"
 
-    _digestAuthTemplate = "Authorization:Digest username=\"%s\",realm=\"%s\",nonce=\"%s\",uri=\"%s\",response=\"%s\""
+    _digestAuthTemplate = "Authorization:Digest username=\"%s\",realm=\"%s\",nonce=\"%s\",uri=\"%s\",response=\"%s\",algorithm=\"MD5\""
     
     def __init__(self,addr,port,mac,cid,sid,uname,pwd):
         self._port = port
