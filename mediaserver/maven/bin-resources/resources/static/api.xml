@@ -658,6 +658,25 @@
                             <optional>false</optional>
                             <values/>
                         </param>
+                        <param>
+                            <name>periodsType</name>
+                            <description>Chunk type.</description>
+                            <optional>false</optional>
+                            <values>
+                                <value>
+                                    <name>0</name>
+                                    <description>All records</description>
+                                </value>
+                                <value>
+                                    <name>1</name>
+                                    <description>Only chunk with motion (parameter motionRegions required)</description>
+                                </value>
+                                <value>
+                                    <name>2</name>
+                                    <description>Bookmarks (reserverd for future use)</description>
+                                </value>
+                            </values>
+                        </param>
                     </params>
                     <result>
                         <caption>Chunks data in requested format. Chunks are merged for all requested
