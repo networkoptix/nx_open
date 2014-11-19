@@ -178,7 +178,7 @@ void QnGenericCameraDataLoader::at_bookmarksReceived(int status, const QnCameraB
 void QnGenericCameraDataLoader::updateLoadedPeriods(const QnTimePeriod &loadedPeriod, const qint64 resolutionMs) {
     QnTimePeriod newPeriod(loadedPeriod);
     const QnAbstractCameraDataPtr &loadedData = m_loadedData[resolutionMs];
-    QnTimePeriodList &loadedPeriods = m_loadedPeriods[resolutionMs];
+    QnTimePeriodList loadedPeriods = m_loadedPeriods[resolutionMs];
 
     /* Cut off the last one minute as it may not contain the valid data yet. */ // TODO: #Elric cut off near live only
     newPeriod.durationMs -= 60 * 1000; 
@@ -204,12 +204,13 @@ void QnGenericCameraDataLoader::updateLoadedPeriods(const QnTimePeriod &loadedPe
         qint64 lastDataTime = loadedData->dataSource().last().startTimeMs;
         while (!loadedPeriods.isEmpty() && loadedPeriods.last().startTimeMs > lastDataTime)
             loadedPeriods.pop_back();
-        if (!m_loadedPeriods.isEmpty()) {
+        if (!loadedPeriods.isEmpty()) {
             QnTimePeriod& lastPeriod = loadedPeriods.last();
             lastPeriod.durationMs = qMin(lastPeriod.durationMs, lastDataTime - lastPeriod.startTimeMs);
         }
     }
 
+    m_loadedPeriods[resolutionMs] = loadedPeriods;
 }
 
 //#define CHUNKS_LOADER_DEBUG
