@@ -957,6 +957,7 @@ Qn::ActionVisibility QnResourceStatusActionCondition::check(const QnResourceList
 }
 
 Qn::ActionVisibility QnDesktopCameraActionCondition::check(const QnActionParameters &parameters) {
+    Q_UNUSED(parameters);
 #ifdef Q_OS_WIN
     if (!context()->user())
         return Qn::InvisibleAction;
@@ -969,7 +970,6 @@ Qn::ActionVisibility QnDesktopCameraActionCondition::check(const QnActionParamet
     return Qn::InvisibleAction;
    
 #else
-    Q_UNUSED(parameters)
     return Qn::InvisibleAction;
 #endif
 }
@@ -1009,17 +1009,4 @@ Qn::ActionVisibility QnDisjunctionActionCondition::check(const QnActionParameter
         result = qMax(result, condition->check(parameters));
 
     return result;
-}
-
-
-Qn::ActionVisibility QnServerWebPageCondition::check(const QnResourceList &resources) {
-    if (resources.size() != 1)
-        return Qn::InvisibleAction;
-
-    QnMediaServerResourcePtr server = resources.first().dynamicCast<QnMediaServerResource>();
-    if (!server)
-        return Qn::InvisibleAction;
-
-    QnRoute route = QnRouter::instance()->routeTo(server->getId());
-    return route.length() == 1 ? Qn::EnabledAction : Qn::DisabledAction;
 }

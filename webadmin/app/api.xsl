@@ -50,7 +50,7 @@
 
                 <div class="container">
                     <div class="row">
-                        <nav class="col-xs-4 bs-docs-sidebar">
+                        <nav class="col-sm-4 bs-docs-sidebar">
                             <ul class="nav nav-stacked fixed" id="sidebar">
                                 <xsl:for-each select="/apidoc/groups/group">
                                     <xsl:variable name="groupName"
@@ -82,7 +82,7 @@
                                     </li>
                                 </xsl:for-each>
                             </ul>
-                        </nav> <div class="col-xs-8">
+                        </nav> <div class="col-sm-8">
                             <xsl:for-each select="apidoc/groups/group">
                                 <xsl:variable name="groupName"
                                     select="translate(groupName, ' ()', '___')"/>

@@ -720,10 +720,16 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Open in Browser..."));
 
     factory(Qn::SystemAdministrationAction).
-        flags(Qn::Main | Qn::Tree).
-        text(tr("System Administration...")).
         flags(Qn::Main | Qn::Tree | Qn::GlobalHotkey).
+        text(tr("System Administration...")).
         shortcut(tr("Ctrl+Alt+A")).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
+
+    factory(Qn::WebClientAction).
+        flags(Qn::Tree | Qn::NoTarget | Qn::SingleTarget | Qn::ResourceTarget).
+        text(tr("Open Web Client...")).
+        autoRepeat(false).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 
@@ -1330,16 +1336,6 @@ QnActionManager::QnActionManager(QObject *parent):
                       new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
                       new QnNegativeActionCondition(new QnResourceStatusActionCondition(Qn::Incompatible, true, this), this),
                       this));
-
-    factory(Qn::WebClientAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-        text(tr("Open Web Page...")).
-        autoRepeat(false).
-        condition(new QnConjunctionActionCondition(
-                      new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
-                      new QnServerWebPageCondition(this),
-                      this
-                      ));
 
     factory(Qn::ConnectToCurrentSystem).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).

@@ -135,7 +135,7 @@ struct QnClientBackground {
     QnClientBackground():
         animationEnabled(true),
         animationMode(Qn::DefaultAnimation),
-        animationCustomColor(QColor()),
+        animationCustomColor(QColor(0, 0, 255, 51)),
         animationPeriodSec(120),
         imageEnabled(false),
         imageMode(Qn::StretchImage),

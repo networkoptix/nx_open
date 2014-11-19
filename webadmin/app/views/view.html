@@ -7,9 +7,7 @@
                     <icon for="!server.collapsed && cameras[server.id].length>0" on-true="chevron-down" title-true="collapse" ></icon>
                     <icon for="server.collapsed && cameras[server.id].length>0" on-true="chevron-right" title-true="expand"  ></icon>
                     <icon for="!cameras[server.id] || cameras[server.id].length < 1" on-true="empty"></icon>
-
                     <span class="glyphicon glyphicon-align-justify" title="{{server.status}}"></span>
-
                     <icon for="server.status=='Unauthorized'" on-true="lock" title="Unauthorized" ></icon>
                     {{server.name}} ({{server.url}}) {{settings.id == server.id.replace('{','').replace('}','')?'(current)':''}}
                 </span>
