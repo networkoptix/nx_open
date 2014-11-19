@@ -176,7 +176,7 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCam
             checkList << ArchiveTimeCheckInfo(camera, otherMediaServer, this);
     }
 
-    QtConcurrent::filtered(checkList, checkGlobalMinTime);
+    QtConcurrent::blockingFilter(checkList, checkGlobalMinTime);
 }
 
 QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getServerOnTime(qint64 timeUsec) {
