@@ -333,23 +333,37 @@ void QnCommonMessageProcessor::afterRemovingResource(const QnUuid& id) {
 }
 
 
-void QnCommonMessageProcessor::processResources(const QnResourceList& resources)
-{
+void QnCommonMessageProcessor::resetResources(const QnResourceList& resources) {
+    /* Store all remote resources id to clean them if they are not in the list anymore. */
+    QHash<QnUuid, QnResourcePtr> remoteResources;
+    for (const QnResourcePtr &resource: qnResPool->getResourcesWithFlag(Qn::remote))
+        remoteResources.insert(resource->getId(), resource);
+    
+    /* Remove all incompatible resources - they will be added if exist. */
+    qnResPool->removeResources(qnResPool->getAllIncompatibleResources());
+
+    /* Packet adding. */
     qnResPool->beginTran();
-    for (const QnResourcePtr& resource: resources)
+    for (const QnResourcePtr& resource: resources) {
+        /* Update existing. */
         updateResource(resource);
+
+        /* And keep them from removing. */
+        remoteResources.remove(resource->getId());
+    }
     qnResPool->commit();
+
+    /* Remove absent resources. */
+    for (const QnResourcePtr& resource: remoteResources)
+        qnResPool->removeResource(resource);
 }
 
-void QnCommonMessageProcessor::processLicenses(const QnLicenseList& licenses)
-{
+void QnCommonMessageProcessor::resetLicenses(const QnLicenseList& licenses) {
     qnLicensePool->replaceLicenses(licenses);
 }
 
-void QnCommonMessageProcessor::processCameraServerItems(const QnCameraHistoryList& cameraHistoryList)
-{
-    for(const QnCameraHistoryPtr& history: cameraHistoryList)
-        QnCameraHistoryPool::instance()->addCameraHistory(history);
+void QnCommonMessageProcessor::resetCameraServerItems(const QnCameraHistoryList& cameraHistoryList) {
+    QnCameraHistoryPool::instance()->resetCameraHistory(cameraHistoryList);
 }
 
 bool QnCommonMessageProcessor::canRemoveResource(const QnUuid &) 
@@ -361,7 +375,7 @@ void QnCommonMessageProcessor::removeResourceIgnored(const QnUuid &)
 {
 }
 
-void QnCommonMessageProcessor::processServerUserAttributesList( const QnMediaServerUserAttributesList& serverUserAttributesList )
+void QnCommonMessageProcessor::resetServerUserAttributesList( const QnMediaServerUserAttributesList& serverUserAttributesList )
 {
     for( const QnMediaServerUserAttributesPtr& serverAttrs: serverUserAttributesList )
     {
@@ -370,7 +384,7 @@ void QnCommonMessageProcessor::processServerUserAttributesList( const QnMediaSer
     }
 }
 
-void QnCommonMessageProcessor::processCameraUserAttributesList( const QnCameraUserAttributesList& cameraUserAttributesList )
+void QnCommonMessageProcessor::resetCameraUserAttributesList( const QnCameraUserAttributesList& cameraUserAttributesList )
 {
     for( const QnCameraUserAttributesPtr& cameraAttrs: cameraUserAttributesList )
     {
@@ -379,14 +393,27 @@ void QnCommonMessageProcessor::processCameraUserAttributesList( const QnCameraUs
     }
 }
 
-void QnCommonMessageProcessor::processPropertyList(const ec2::ApiResourceParamWithRefDataList& params)
-{
-    for(const ec2::ApiResourceParamWithRefData& param: params)
-        propertyDictionary->setValue(param.resourceId, param.name, param.value, false);
+void QnCommonMessageProcessor::resetPropertyList(const ec2::ApiResourceParamWithRefDataList& params) {
+    /* Store existing parameter keys. */
+    auto existingProperties = propertyDictionary->allPropertyNamesByResource();
+
+    /* Update changed values. */
+    for(const ec2::ApiResourceParamWithRefData& param: params) {
+        on_resourceParamChanged(param);
+        if (existingProperties.contains(param.resourceId))
+            existingProperties[param.resourceId].remove(param.name);
+    }
+
+    /* Clean values that are not in the list anymore. */
+    for (auto iter = existingProperties.constBegin(); iter != existingProperties.constEnd(); ++iter) {
+        QnUuid resourceId = iter.key();
+        for (auto paramName: iter.value())
+            on_resourceParamChanged(ec2::ApiResourceParamWithRefData(resourceId, paramName, QString()));
+    }
 }
 
-void QnCommonMessageProcessor::processStatusList(const ec2::ApiResourceStatusDataList& params)
-{
+void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataList& params) {
+    qnStatusDictionary->clear();
     for(const ec2::ApiResourceStatusData& statusData: params)
         on_resourceStatusChanged(statusData.id , statusData.status);
 }
@@ -394,14 +421,13 @@ void QnCommonMessageProcessor::processStatusList(const ec2::ApiResourceStatusDat
 void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
 {
     //QnAppServerConnectionFactory::setBox(fullData.serverInfo.platform);
-
-    processPropertyList(fullData.allProperties);
-    processResources(fullData.resources);
-    processServerUserAttributesList( fullData.serverUserAttributesList );
-    processCameraUserAttributesList( fullData.cameraUserAttributesList );
-    processLicenses(fullData.licenses);
-    processCameraServerItems(fullData.cameraHistory);
-    processStatusList(fullData.resStatusList);
+    resetResources(fullData.resources);
+    resetPropertyList(fullData.allProperties);
+    resetServerUserAttributesList( fullData.serverUserAttributesList );
+    resetCameraUserAttributesList( fullData.cameraUserAttributesList );
+    resetLicenses(fullData.licenses);
+    resetCameraServerItems(fullData.cameraHistory);
+    resetStatusList(fullData.resStatusList);
 
     //on_runtimeInfoChanged(fullData.serverInfo);
     qnSyncTime->reset();   

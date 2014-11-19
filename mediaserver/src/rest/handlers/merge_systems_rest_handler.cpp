@@ -118,8 +118,11 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
 
     if (qnResPool->getResourceById(moduleInformation.id).isNull()) {
         if (!moduleInformation.remoteAddresses.contains(url.host())) {
-            QUrl simpleUrl = url;
-            url.setPath(QString());
+            QUrl simpleUrl;
+            simpleUrl.setScheme(lit("http"));
+            simpleUrl.setHost(url.host());
+            if (url.port() != moduleInformation.port)
+                simpleUrl.setPort(url.port());
             ec2Connection()->getDiscoveryManager()->addDiscoveryInformation(moduleInformation.id, simpleUrl, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
         }
         QnModuleFinder::instance()->directModuleFinder()->checkUrl(url);

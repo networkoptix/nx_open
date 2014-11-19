@@ -101,9 +101,8 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
     checkForTmpStatus(ownResource);
 }
 
-void QnClientMessageProcessor::processResources(const QnResourceList& resources)
-{
-    QnCommonMessageProcessor::processResources(resources);
+void QnClientMessageProcessor::resetResources(const QnResourceList& resources) {
+    QnCommonMessageProcessor::resetResources(resources);
     for(const QnResourcePtr& resource: resources)
         checkForTmpStatus(resource);
 }
