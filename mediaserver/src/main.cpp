@@ -917,7 +917,7 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
             if (m_needStop)
                 return;
         }
-        messageProcessor->processServerUserAttributesList( mediaServerUserAttributesList );
+        messageProcessor->resetServerUserAttributesList( mediaServerUserAttributesList );
 
         //read server's storages
         QnResourceList storages;
@@ -953,7 +953,7 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
             if (m_needStop)
                 return;
         }
-        messageProcessor->processCameraUserAttributesList( cameraUserAttributesList );
+        messageProcessor->resetCameraUserAttributesList( cameraUserAttributesList );
 
         // read properties dictionary
         ec2::ApiResourceParamWithRefDataList kvPairs;
@@ -964,7 +964,7 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
             if (m_needStop)
                 return;
         }
-        messageProcessor->processPropertyList( kvPairs );
+        messageProcessor->resetPropertyList( kvPairs );
 
         QnManualCameraInfoMap manualCameras;
         for(const QnSecurityCamResourcePtr &camera: cameras) {
@@ -985,7 +985,7 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
             if (m_needStop)
                 return;
         }
-        messageProcessor->processStatusList( statusList );
+        messageProcessor->resetStatusList( statusList );
     }
 
     {

@@ -22,6 +22,9 @@ public:
     bool setValue(const QnUuid& resourceId, const QString& key, const QString& value, bool markDirty = true, bool replaceIfExists = true);
     bool hasProperty(const QnUuid& resourceId, const QString& key) const;
     ec2::ApiResourceParamDataList allProperties(const QnUuid& resourceId) const;
+    
+    QHash<QnUuid, QSet<QString> > allPropertyNamesByResource() const;
+
     void clear();
     void clear(const QVector<QnUuid>& idList);
 signals:
