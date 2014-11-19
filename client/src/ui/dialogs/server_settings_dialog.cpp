@@ -166,7 +166,11 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
 
     QPushButton* webPageButton = new QPushButton(this);
     QnAction* webPageAction = menu()->action(Qn::WebClientAction);
-    webPageButton->setText(webPageAction->text());
+    webPageButton->setText(tr("Open Web Page..."));
+    webPageButton->setEnabled(m_server->getStatus() == Qn::Online);
+    connect(server, &QnResource::statusChanged, this, [this, webPageButton] {
+        webPageButton->setEnabled(m_server->getStatus() == Qn::Online);
+    });
     connect(webPageButton, &QPushButton::clicked, webPageAction, &QAction::trigger);
 
     ui->buttonBox->addButton(webPageButton, QDialogButtonBox::HelpRole);
