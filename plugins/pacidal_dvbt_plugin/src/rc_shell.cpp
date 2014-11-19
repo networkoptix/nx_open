@@ -410,10 +410,11 @@ RCShell::Error RCShell::processCommand(Command& cmdPart)
             return lastError_ = RCERR_RET_CODE;
 
         unsigned short command = info->cmd().commandID();
+        unsigned error = Cmd_HostParser(deviceInfo, command, info->cmd().data(), info->cmd().size());
+
         if (info->isWaiting() && info->waitingCmd() == command)
             info->setWaiting(false);
 
-        unsigned error = Cmd_HostParser(deviceInfo, command, info->cmd().data(), info->cmd().size());
         if (error == ModulatorError_NO_ERROR)
         {
             info->cmd().setValid();

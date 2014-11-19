@@ -14,9 +14,7 @@ namespace ite
     /*!
         \note Delegates reference counting to \a AxisCameraManager instance
     */
-    class MediaEncoder
-    :
-        public nxcip::CameraMediaEncoder2
+    class MediaEncoder : public nxcip::CameraMediaEncoder2
     {
         DEF_REF_COUNTER
 
@@ -45,7 +43,7 @@ namespace ite
         nxcip::ResolutionInfo& resolution() { return m_resolution; }
 
     private:
-        CameraManager* m_cameraManager;
+        CameraManager * m_cameraManager;
         std::unique_ptr<StreamReader> m_streamReader;
         int m_encoderNumber;
         nxcip::ResolutionInfo m_resolution;

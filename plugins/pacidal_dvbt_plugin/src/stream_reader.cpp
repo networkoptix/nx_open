@@ -14,6 +14,7 @@ namespace ite
         m_cameraManager( cameraManager ),
         m_encoderNumber( encoderNumber )
     {
+        m_cameraManager->openStream(m_encoderNumber);
     }
 
     StreamReader::~StreamReader()
@@ -50,5 +51,6 @@ namespace ite
 
     void StreamReader::interrupt()
     {
+        m_cameraManager->closeStream(m_encoderNumber);
     }
 }

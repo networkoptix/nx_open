@@ -23,10 +23,58 @@ extern "C"
     }
 }
 
+namespace
+{
+    typedef enum
+    {
+        ITE_PARAM_NONE,
+        ITE_PARAM_FREQUENCY,
+        ITE_PARAM_PRESENTED,
+        ITE_PARAM_STRENGTH,
+        // ...
+        ITE_PARAM_REBOOT,
+        ITE_PARAM_SET_DEFAULTS
+    } CameraParams;
+
+    const char * PARAM_NAME_FREQUENCY =     "/Transmission/Frequency";
+    const char * PARAM_NAME_PRESENTED =     "/Transmission/Presented";
+    const char * PARAM_NAME_STRENGTH =      "/Transmission/Strength";
+    const char * PARAM_NAME_REBOOT =        "/Commands/Reboot";
+    const char * PARAM_NAME_SET_DEFAULTS =  "/Commands/Set Defaults";
+
+    std::string num2str(unsigned id)
+    {
+        std::stringstream ss;
+        ss << id;
+        return ss.str();
+    }
+
+    CameraParams str2param(const char * paramName)
+    {
+        if (! strcmp(paramName, PARAM_NAME_FREQUENCY))
+            return ITE_PARAM_FREQUENCY;
+        if (! strcmp(paramName, PARAM_NAME_PRESENTED))
+            return ITE_PARAM_PRESENTED;
+        if (! strcmp(paramName, PARAM_NAME_STRENGTH))
+            return ITE_PARAM_STRENGTH;
+
+        if (! strcmp(paramName, PARAM_NAME_REBOOT))
+            return ITE_PARAM_REBOOT;
+        if (! strcmp(paramName, PARAM_NAME_SET_DEFAULTS))
+            return ITE_PARAM_SET_DEFAULTS;
+
+        return ITE_PARAM_NONE;
+    }
+}
+
 namespace ite
 {
     RxDevice::RxDevice(unsigned id)
-    :   m_id(id)
+    :   m_id(id),
+        m_camera(nullptr),
+        m_frequency(0),
+        m_strength(0),
+        m_presented(false)
     {}
 
     bool RxDevice::open()
@@ -44,7 +92,7 @@ namespace ite
         return false;
     }
 
-    bool RxDevice::lockF(unsigned freq)
+    bool RxDevice::lockF(CameraManager * cam, unsigned freq)
     {
         try
         {
@@ -55,6 +103,8 @@ namespace ite
 
             m_device->lockChannel(freq);
             m_devStream.reset( new It930Stream( *m_device ) );
+            m_frequency = freq;
+            m_camera = cam;
             return true;
         }
         catch (const char * msg)
@@ -65,32 +115,21 @@ namespace ite
 
     bool RxDevice::stats()
     {
-        static const unsigned MIN_SIGNAL_STRENGTH = 50; // 0..100
-        //static const unsigned MAX_SIGNAL_ABORTS = 1000; // 0..10000 for this device version
-        //static const unsigned MAX_SIGNAL_BER = 50;
-
-        bool locked = false, presented = false;
-        uint8_t abortCount = 0;
-        float ber = 0.0f;
-
         try
         {
-            m_device->statistic( locked, presented, m_strength, abortCount, ber );
+            bool locked = false;
+            uint8_t abortCount = 0;
+            float ber = 0.0f;
+
+            m_presented = false;
+            m_strength = 0;
+            m_device->statistic(locked, m_presented, m_strength, abortCount, ber);
+            return true;
         }
         catch (const char * msg)
-        {
-            //m_errorStr = "Can't get statistics";
-            return false;
-        }
+        {}
 
-        // Detecting NO SIGNAL
-        if (m_strength < MIN_SIGNAL_STRENGTH)
-            return false;
-#if 0
-        if (abortCount > MAX_SIGNAL_ABORTS || ber > MAX_SIGNAL_BER)
-            return false;
-#endif
-        return true;
+        return false;
     }
 
     void RxDevice::driverInfo(std::string& driverVersion, std::string& fwVersion, std::string& company, std::string& model) const
@@ -132,9 +171,7 @@ namespace ite
 
     std::string RxDevice::id2str(unsigned id)
     {
-        std::stringstream ss;
-        ss << id;
-        return ss.str();
+        return num2str(id);
     }
 
     //
@@ -143,6 +180,7 @@ namespace ite
 
     CameraManager::CameraManager(const nxcip::CameraInfo& info)
     :   m_refManager( DiscoveryManager::refManager() ),
+        m_frequency(0),
         m_threadObject( nullptr ),
         m_hasThread( false ),
         m_threadJoined( true ),
@@ -154,9 +192,7 @@ namespace ite
     }
 
     CameraManager::~CameraManager()
-    {
-        m_rxDevice->close(); // keep it
-    }
+    {}
 
     void * CameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )
     {
@@ -186,48 +222,137 @@ namespace ite
     const char * CameraManager::getParametersDescriptionXML() const
     {
         static const char * paramsXML =
-            "<cameras> \
-               <camera name=\"ite_cam\"> \
-                   <group name=\"main\"> \
-                       <param name=\"Frequency\" dataType=\"Enumeration\" readOnly=\"true\" \
-                            min=\"177000,201000\" \
-                            max=\"177000,201000\" \
-                        /> \
-                    </group> \
-               </camera> \
-            </cameras>";
+            "<cameras> "
+                "<camera name=\"it930x\"> "
+                    "<group name=\"Transmission\"> "
+                        "<param name=\"Frequency\" dataType=\"Enumeration\" "
+                            "min=\"177,189,201,213,225,237,249,261,273,363,375,387,399,411,423,473\" "
+                            "max=\"177,189,201,213,225,237,249,261,273,363,375,387,399,411,423,473\" /> "
+                        "<param name=\"Present\" dataType=\"Bool\" readOnly=\"true\" /> "
+                        "<param name=\"Strength\" dataType=\"MinMaxStep\" readOnly=\"true\" min=\"0\" max=\"100\" /> "
+                    "</group> "
+#if 0
+                    "<group name=\"Commands\"> "
+                        "<param name=\"Reboot\" dataType=\"Button\" /> "
+                        "<param name=\"Set Defaults\" dataType=\"Button\" /> "
+                    "</group> "
+#endif
+                "</camera> "
+            "</cameras>";
         return paramsXML;
     }
 
     int CameraManager::getParamValue(const char * paramName, char * valueBuf, int * valueBufSize) const
     {
-        if (strcmp(paramName, "/main/it930x_freq") == 0)
-        {
-            static const char * FREQ = "177000";
+        std::string strValue;
 
-            unsigned strSize = strlen(FREQ) + 1;
-            if( *valueBufSize < strSize )
+        switch (str2param(paramName))
+        {
+            case ITE_PARAM_FREQUENCY:
+            {
+                getParamStr_Frequency(strValue);
+                break;
+            }
+            case ITE_PARAM_PRESENTED:
+                getParamStr_Presented(strValue);
+                break;
+            case ITE_PARAM_STRENGTH:
+                getParamStr_Strength(strValue);
+                break;
+            case ITE_PARAM_REBOOT:
+                break;
+            case ITE_PARAM_SET_DEFAULTS:
+                break;
+
+            case ITE_PARAM_NONE:
+            default:
+                return nxcip::NX_UNKNOWN_PARAMETER;
+        }
+
+        if (strValue.size())
+        {
+            unsigned strSize = strValue.size() + 1;
+            if (*valueBufSize < strSize)
             {
                 *valueBufSize = strSize;
                 return nxcip::NX_MORE_DATA;
             }
 
             *valueBufSize = strSize;
-            strncpy(valueBuf, FREQ, strSize);
-            return nxcip::NX_NO_ERROR;
+            strncpy(valueBuf, strValue.c_str(), strSize);
         }
+        else
+            valueBufSize = 0;
 
-        return nxcip::NX_UNKNOWN_PARAMETER;
+        return nxcip::NX_NO_ERROR;
     }
 
+    // TODO
     int CameraManager::setParamValue(const char * paramName, const char * value)
     {
-        if (strcmp(paramName, "/main/it930x_freq") == 0)
-            return nxcip::NX_NO_ERROR;
+        if (!value)
+            return nxcip::NX_INVALID_PARAM_VALUE;
 
-        return nxcip::NX_UNKNOWN_PARAMETER;
+        switch (str2param(paramName))
+        {
+            case ITE_PARAM_FREQUENCY:
+            {
+                std::string str(value);
+                setParam_Frequency(str);
+                break;
+            }
+
+            case ITE_PARAM_PRESENTED:
+            case ITE_PARAM_STRENGTH:
+                return nxcip::NX_PARAM_READ_ONLY;
+
+            case ITE_PARAM_REBOOT:
+                break;
+            case ITE_PARAM_SET_DEFAULTS:
+                break;
+
+            case ITE_PARAM_NONE:
+            default:
+                return nxcip::NX_UNKNOWN_PARAMETER;
+        }
+
+        return nxcip::NX_NO_ERROR;
     }
 
+    void CameraManager::getParamStr_Frequency(std::string& s) const
+    {
+        if (m_rxDevice && m_rxDevice->frequency())
+        {
+            unsigned freq = m_rxDevice->frequency() / 1000;
+            s = num2str(freq);
+        }
+    }
+
+    void CameraManager::getParamStr_Presented(std::string& s) const
+    {
+        if (m_rxDevice)
+        {
+            if (m_rxDevice->presented())
+                s = "true";
+            else
+                s = "false";
+        }
+    }
+
+    void CameraManager::getParamStr_Strength(std::string& s) const
+    {
+        if (m_rxDevice)
+            s = num2str(m_rxDevice->strength());
+    }
+
+    void CameraManager::setParam_Frequency(std::string& s)
+    {
+        // TODO
+    }
+
+    //
+
+    // TODO: get from RC
     int CameraManager::getEncoderCount( int* encoderCount ) const
     {
 #if 0
@@ -248,7 +373,24 @@ namespace ite
 
     int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** encoderPtr )
     {
+        if (!hasEncoders())
+        {
+            if (! captureAnyRxDevice())
+            {
+                DiscoveryManager::updateInfo(m_info, 0xffff, m_frequency);
+                return nxcip::NX_TRY_AGAIN;
+            }
+
+            reload();
+        }
+
+        if (! m_rxDevice.get())
+            return nxcip::NX_TRY_AGAIN;
+
         std::lock_guard<std::mutex> lock( m_encMutex ); // LOCK
+
+        if (m_encoders.empty())
+            return nxcip::NX_TRY_AGAIN;
 
         if (static_cast<unsigned>(encoderIndex) >= m_encoders.size())
             return nxcip::NX_INVALID_ENCODER_NUMBER;
@@ -323,29 +465,159 @@ namespace ite
 
     // internals
 
+    void CameraManager::openStream(unsigned encNo)
+    {
+        // TODO: lock
+        m_openedStreams.insert(encNo);
+    }
+
+    void CameraManager::closeStream(unsigned encNo)
+    {
+        // TODO: lock
+        m_openedStreams.erase(encNo);
+    }
+
+    bool CameraManager::stopStreams()
+    {
+#if 0
+        // TODO: lock
+        if (m_openedStreams.size())
+            return false;
+
+        {
+            std::lock_guard<std::mutex> lock( m_reloadMutex ); // LOCK
+            stopDevReader();
+        }
+
+        m_rxDevice.reset();
+        return true;
+#endif
+        return false;
+    }
+
+    void CameraManager::addRxDevice(RxDevicePtr dev)
+    {
+        bool found = false;
+        for (auto it = m_supportedRxDevices.begin(); it != m_supportedRxDevices.end(); ++it)
+        {
+            if ((*it)->rxID() == dev->rxID()) {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+            m_supportedRxDevices.push_back(dev);
+    }
+
+    bool CameraManager::captureAnyRxDevice()
+    {
+        std::lock_guard<std::mutex> lock( m_reloadMutex ); // LOCK
+
+        if (!m_frequency || m_supportedRxDevices.empty())
+            return false;
+
+        if (m_rxDevice.get())
+            return captureSameRxDevice();
+
+        for (size_t i = 0; i < m_supportedRxDevices.size(); ++i)
+        {
+            RxDevicePtr dev = m_supportedRxDevices[i];
+            if (captureFreeRxDevice(dev))
+                return true;
+        }
+
+        for (size_t i = 0; i < m_supportedRxDevices.size(); ++i)
+        {
+            RxDevicePtr dev = m_supportedRxDevices[i];
+            if (captureOpenedRxDevice(dev))
+                return true;
+        }
+
+        return false;
+    }
+
+    bool CameraManager::captureSameRxDevice()
+    {
+        std::lock_guard<std::mutex> lock( m_rxDevice->mutex() ); // LOCK
+
+        if (m_rxDevice->isLocked() && m_rxDevice->frequency() == m_frequency)
+            return true;
+
+        if (!m_rxDevice->isOpen())
+            m_rxDevice->open();
+
+        m_rxDevice->unlockF();
+        m_rxDevice->lockF(this, m_frequency);
+        if (m_rxDevice->isLocked())
+        {
+            m_rxDevice->stats();
+            DiscoveryManager::updateInfo(m_info, m_rxDevice->rxID(), m_frequency);
+            return true;
+        }
+
+        m_rxDevice.reset();
+        return false;
+    }
+
+    bool CameraManager::captureFreeRxDevice(RxDevicePtr dev)
+    {
+        if (! dev.get())
+            return false;
+
+        std::lock_guard<std::mutex> lock( dev->mutex() ); // LOCK
+
+        if (dev->isLocked()) // device is reading another channel
+            return false;
+
+        if (!dev->isOpen())
+            dev->open();
+
+        dev->lockF(this, m_frequency);
+        if (dev->isLocked())
+        {
+            dev->stats();
+            m_rxDevice = dev; // under lock
+            DiscoveryManager::updateInfo(m_info, m_rxDevice->rxID(), m_frequency);
+            return true;
+        }
+
+        return false;
+    }
+
+    bool CameraManager::captureOpenedRxDevice(RxDevicePtr dev)
+    {
+        std::lock_guard<std::mutex> lock( dev->mutex() ); // LOCK
+
+        CameraManager * cam = dev->camera();
+
+        if (cam->stopStreams())
+        {
+            dev->unlockF();
+            dev->lockF(this, m_frequency);
+            if (dev->isLocked())
+            {
+                dev->stats();
+                m_rxDevice = dev; // under lock
+                DiscoveryManager::updateInfo(m_info, m_rxDevice->rxID(), m_frequency);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     void CameraManager::reload()
     {
         std::lock_guard<std::mutex> lock( m_reloadMutex ); // LOCK
 
-        // check reload from another thread
+        // check reload from another thread / for another encoder
         if (hasEncoders())
             return;
 
-#define RELOAD_VARIVANT 2
-#if RELOAD_VARIVANT == 1
-        stopDevReader();
-        m_rxDevice->stopDevice();
-        if (m_rxDevice->lockFrequency() && m_rxDevice->stats() && initDevReader())
-            initEncoders();
-#elif RELOAD_VARIVANT == 2
-        m_rxDevice->stats();
         stopDevReader();
         if (initDevReader())
             initEncoders();
-#elif RELOAD_VARIVANT == 3
-        stopEncoders();
-        initEncoders();
-#endif
     }
 
     bool CameraManager::initDevReader()

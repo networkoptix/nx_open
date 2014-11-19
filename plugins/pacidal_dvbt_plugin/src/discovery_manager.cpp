@@ -22,18 +22,7 @@ extern "C"
 
 namespace
 {
-    static const char* VENDOR_NAME = "it930x";
-#if 0
-    void debugPrintInfo(const nxcip::CameraInfo& info)
-    {
-        std::string s = std::string(info.url);
-        s += " - ";
-        s += std::string(info.modelName);
-        s += " - ";
-        s += std::string(info.firmware);
-        NX_LOG( s.c_str(), cl_logDEBUG1 );
-    }
-#endif
+    static const char* VENDOR_NAME = "ITE";
 }
 
 namespace ite
@@ -76,6 +65,31 @@ namespace ite
         return nullptr;
     }
 
+    int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* /*cameras*/, const char* /*address*/, const char* /*login*/, const char* /*password*/ )
+    {
+        return nxcip::NX_NOT_IMPLEMENTED;
+    }
+
+    int DiscoveryManager::fromMDNSData(
+        const char* /*discoveredAddress*/,
+        const unsigned char* /*mdnsResponsePacket*/,
+        int /*mdnsResponsePacketSize*/,
+        nxcip::CameraInfo* /*cameraInfo*/ )
+    {
+        return nxcip::NX_NO_ERROR;
+    }
+
+    int DiscoveryManager::fromUpnpData( const char* /*upnpXMLData*/, int /*upnpXMLDataSize*/, nxcip::CameraInfo* /*cameraInfo*/ )
+    {
+        return nxcip::NX_NO_ERROR;
+    }
+
+    int DiscoveryManager::getReservedModelList( char** /*modelList*/, int* count )
+    {
+        *count = 0;
+        return nxcip::NX_NO_ERROR;
+    }
+
     void DiscoveryManager::getVendorName( char* buf ) const
     {
         strcpy( buf, VENDOR_NAME );
@@ -104,14 +118,8 @@ namespace ite
             if (foundTx.find(txID) != foundTx.end())
                 continue;
 
-            std::string strTxID = RxDevice::id2str(txID);
-
             nxcip::CameraInfo& info = cameras[cameraNum];
-
-            std::string strURL = strTxID + "-" + RxDevice::id2str(it->second.frequency);
-            memset( &info, 0, sizeof(nxcip::CameraInfo) );
-            strncpy( info.url, strURL.c_str(), std::min(strURL.size(), sizeof(nxcip::CameraInfo::url)-1) );
-            strncpy( info.uid, strTxID.c_str(), std::min(strTxID.size(), sizeof(nxcip::CameraInfo::uid)-1) );
+            makeInfo(info, txID, 0xffff, it->second.frequency);
 
             CameraManager * cam = nullptr;
 
@@ -133,7 +141,7 @@ namespace ite
             if (cam)
             {
                 foundTx.insert(txID);
-                //cam->getCameraInfo( &info );
+                cam->getCameraInfo( &info );
                 ++cameraNum;
             }
         }
@@ -141,29 +149,10 @@ namespace ite
         return cameraNum;
     }
 
-    int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* /*cameras*/, const char* /*address*/, const char* /*login*/, const char* /*password*/ )
-    {
-        return nxcip::NX_NOT_IMPLEMENTED;
-    }
-
-    int DiscoveryManager::fromMDNSData(
-        const char* /*discoveredAddress*/,
-        const unsigned char* /*mdnsResponsePacket*/,
-        int /*mdnsResponsePacketSize*/,
-        nxcip::CameraInfo* /*cameraInfo*/ )
-    {
-        return nxcip::NX_NO_ERROR;
-    }
-
-    int DiscoveryManager::fromUpnpData( const char* /*upnpXMLData*/, int /*upnpXMLDataSize*/, nxcip::CameraInfo* /*cameraInfo*/ )
-    {
-        return nxcip::NX_NO_ERROR;
-    }
-
     nxcip::BaseCameraManager * DiscoveryManager::createCameraManager( const nxcip::CameraInfo& info )
     {
-        unsigned txID = RxDevice::str2id(info.uid);
-        CameraManager* cam = nullptr;
+        unsigned short txID = RxDevice::str2id(info.uid);
+        CameraManager * cam = nullptr;
 
         {
             std::lock_guard<std::mutex> lock( m_contentMutex ); // LOCK
@@ -172,33 +161,49 @@ namespace ite
             if (it != m_cameras.end())
             {
                 cam = it->second.get();
-                if (!cam->rxDevice())
-                    cam->setRxDevice( getRx4Tx(cam->txID()) );
+                getRx4Camera(cam);
             }
+        }
 
+        // before findCameras() on restart, use saved info from DB
+        if (!cam)
+        {
+            unsigned short rxID;
+            unsigned frequency;
+            parseInfo(info, txID, rxID, frequency);
 
-            // before findCameras() on restart, use saved info from DB
-            if (!cam)
+            checkLink(txID, rxID, frequency);
+
             {
+                std::lock_guard<std::mutex> lock( m_contentMutex ); // LOCK
+
                 auto sp = std::make_shared<CameraManager>( info );  // create CameraManager
                 m_cameras[txID] = sp;
                 cam = sp.get();
                 cam->addRef();
+
+                getRx4Camera(cam);
             }
         }
-
-        if (cam && cam->rxDevice() && !cam->hasEncoders())
-            cam->reload();
 
         if (cam)
             cam->addRef();
         return cam;
     }
 
-    int DiscoveryManager::getReservedModelList( char** /*modelList*/, int* count )
+    void DiscoveryManager::getRx4Camera(CameraManager * cam)
     {
-        *count = 0;
-        return nxcip::NX_NO_ERROR;
+        // already locked
+        //std::lock_guard<std::mutex> lock( m_contentMutex );
+
+        auto range = m_txLinks.equal_range( cam->txID() );
+        for (auto itTx = range.first; itTx != range.second; ++itTx)
+        {
+            auto itRx = m_rxDevs.find(itTx->second.rxID);
+            RxDevicePtr dev = itRx->second;
+            cam->addRxDevice(dev);
+            cam->setFrequency(itTx->second.frequency);
+        }
     }
 
     void DiscoveryManager::getRxDevNames(std::vector<std::string>& devs)
@@ -232,10 +237,49 @@ namespace ite
 
             auto it = m_rxDevs.find(id);
             if (it == m_rxDevs.end())
-            {
                 m_rxDevs[id] = std::make_shared<RxDevice>(id);
+#if 0
+            break; // one device for DEBUG
+#endif
+        }
+    }
+
+    void DiscoveryManager::checkLink(unsigned short /*txID*/, unsigned short rxID, unsigned frequency)
+    {
+        if (m_rxDevs.empty())
+            updateRxDevices();
+
+        std::vector<IDsLink> links;
+        std::vector<RxDevicePtr> rxDevs;
+
+        {
+            std::lock_guard<std::mutex> lock( m_contentMutex ); // LOCK
+
+            if (rxID != 0xffff)
+            {
+                auto it = m_rxDevs.find(rxID);
+                if (it != m_rxDevs.end())
+                    rxDevs.push_back(it->second);
+            }
+            else
+            {
+                for (auto it = m_rxDevs.begin(); it != m_rxDevs.end(); ++it)
+                    rxDevs.push_back(it->second);
             }
         }
+
+        for (size_t i = 0; i < rxDevs.size(); ++i)
+        {
+            RxDevicePtr dev = rxDevs[i];
+
+            std::lock_guard<std::mutex> lock( dev->mutex() ); // LOCK
+
+            dev->lockF( nullptr, DeviceInfo::chanFrequency(frequency) );
+            rcShell_.getDevIDsActivity(links);
+            dev->unlockF();
+        }
+
+        addTxLinks(links);
     }
 
     // TODO: reduce time
@@ -252,20 +296,27 @@ namespace ite
                 rxDev = m_rxDevs[i];
             }
 
+            if (! rxDev.get())
+                continue;
+
             if (rxDev->isLocked())
             {
                 rcShell_.getDevIDsActivity(links);
             }
             else
             {
-                rxDev->open();
+                if (! rxDev->isOpen())
+                    rxDev->open();
 
+#if 0
+                for (size_t j = 0; j < 4 /*DeviceInfo::CHANNELS_NUM*/; ++j) // DEBUG
+#else
                 for (size_t j = 0; j < DeviceInfo::CHANNELS_NUM; ++j)
+#endif
                 {
-                    // TODO: self device mutex
-                    std::lock_guard<std::mutex> lock( m_contentMutex ); // LOCK
+                    std::lock_guard<std::mutex> lock( rxDev->mutex() ); // LOCK
 
-                    rxDev->lockF( DeviceInfo::chanFrequency(j) );
+                    rxDev->lockF( nullptr, DeviceInfo::chanFrequency(j) );
                     rcShell_.getDevIDsActivity(links);
                     rxDev->unlockF();
                 }
@@ -274,6 +325,11 @@ namespace ite
             }
         }
 
+        addTxLinks(links);
+    }
+
+    void DiscoveryManager::addTxLinks(const std::vector<IDsLink>& links)
+    {
         std::lock_guard<std::mutex> lock( m_contentMutex ); // LOCK
 
         for (size_t i = 0; i < links.size(); ++i)
@@ -283,30 +339,42 @@ namespace ite
             auto it = m_txLinks.find(txID);
             if (it == m_txLinks.end() || it->second.rxID != links[i].rxID)
                 m_txLinks.insert( std::make_pair(txID, links[i]) );
+            else
+                it->second.frequency = links[i].frequency;
         }
     }
 
-    RxDevicePtr DiscoveryManager::getRx4Tx(unsigned txID)
+    // CameraInfo stuff
+
+    // rxID = 0xffff means "no rxID set"
+    void DiscoveryManager::makeInfo(nxcip::CameraInfo& info, unsigned short txID, unsigned short rxID, unsigned frequency)
     {
-        // already ander lock: createCameraManager (L) -> reload -> getRx4Tx
+        std::string strTxID = RxDevice::id2str(txID);
 
-        //std::lock_guard<std::mutex> lock( m_contentMutex ); // LOCK
+        memset( &info, 0, sizeof(nxcip::CameraInfo) );
+        strncpy( info.modelName, "Pacidal", sizeof(nxcip::CameraInfo::modelName)-1 ); // TODO
+        strncpy( info.url, strTxID.c_str(), std::min(strTxID.size(), sizeof(nxcip::CameraInfo::url)-1) );
+        strncpy( info.uid, strTxID.c_str(), std::min(strTxID.size(), sizeof(nxcip::CameraInfo::uid)-1) );
 
-        auto range = m_txLinks.equal_range(txID);
-        for (auto it = range.first; it != range.second; ++it)
-        {
-            auto itRx = m_rxDevs.find(it->second.rxID);
-            RxDevicePtr dev = itRx->second;
+        unsigned shift = sizeof(unsigned short);
+        memcpy(info.auxiliaryData, &txID, shift);
+        memcpy(info.auxiliaryData + shift, &rxID, shift);
+        memcpy(info.auxiliaryData + shift*2, &frequency, sizeof(unsigned));
+    }
 
-            if (dev->isLocked()) // device is reading another channel
-                continue;
+    void DiscoveryManager::updateInfo(nxcip::CameraInfo& info, unsigned short rxID, unsigned frequency)
+    {
+        unsigned shift = sizeof(unsigned short);
+        //memcpy(info.auxiliaryData, &txID, shift);
+        memcpy(info.auxiliaryData + shift, &rxID, shift);
+        memcpy(info.auxiliaryData + shift*2, &frequency, sizeof(unsigned));
+    }
 
-            if (!dev->isOpen())
-                dev->open();
-            dev->lockF(it->second.frequency);
-            return dev;
-        }
-
-        return RxDevicePtr();
+    void DiscoveryManager::parseInfo(const nxcip::CameraInfo& info, unsigned short& txID, unsigned short& rxID, unsigned& frequency)
+    {
+        unsigned shift = sizeof(unsigned short);
+        memcpy(&txID, info.auxiliaryData, shift);
+        memcpy(&rxID, info.auxiliaryData + shift, shift);
+        memcpy(&frequency, info.auxiliaryData + shift*2, sizeof(unsigned));
     }
 }

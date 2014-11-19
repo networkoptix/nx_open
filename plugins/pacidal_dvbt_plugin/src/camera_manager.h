@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <deque>
+#include <set>
 #include <memory>
 #include <mutex>
 #include <thread>
@@ -23,6 +24,7 @@ namespace ite
     struct LibAV;
     class DevReader;
     class ReadThread;
+    class CameraManager;
 
     typedef std::shared_ptr<VideoPacket> VideoPacketPtr;
 
@@ -65,6 +67,8 @@ namespace ite
 
         RxDevice(unsigned id);
 
+        unsigned rxID() const { return m_id; }
+
         It930x * device() { return m_device.get(); }
         It930Stream * devStream() { return m_devStream.get(); }
 
@@ -76,13 +80,24 @@ namespace ite
             m_device.reset();
         }
 
-        bool lockF(unsigned freq);
+        bool lockF(CameraManager * cam, unsigned freq);
         bool isLocked() const { return m_devStream.get(); }
-        void unlockF() { m_devStream.reset(); }
+        void unlockF()
+        {
+            m_devStream.reset();
+            m_frequency = 0;
+            m_camera = nullptr;
+        }
 
         bool stats();
 
         void driverInfo(std::string& driverVersion, std::string& fwVersion, std::string& company, std::string& model) const;
+
+        std::mutex& mutex() { return m_mutex; }
+
+        unsigned frequency() const { return m_frequency; }
+        uint8_t strength() const { return m_strength; }
+        bool presented() const { return m_presented; }
 
         static unsigned dev2id(const std::string& devName);
         static unsigned str2id(const std::string& devName);
@@ -94,11 +109,17 @@ namespace ite
 
         static std::string id2str(unsigned id);
 
+        CameraManager * camera() { return m_camera; }
+
     private:
         unsigned m_id;
-        uint8_t m_strength;
         std::unique_ptr<It930x> m_device;
         std::unique_ptr<It930Stream> m_devStream;
+        mutable std::mutex m_mutex;
+        CameraManager * m_camera;
+        unsigned m_frequency;
+        uint8_t m_strength;
+        bool m_presented;
     };
 
     typedef std::shared_ptr<RxDevice> RxDevicePtr;
@@ -156,17 +177,26 @@ namespace ite
         DevReader * devReader() { return m_devReader.get(); }
 
         unsigned txID() const { return m_txID; }
-        RxDevicePtr rxDevice() { return m_rxDevice; }
-        void setRxDevice(RxDevicePtr dev) { m_rxDevice = dev; }
+
+        unsigned frequency() const { return m_frequency; }
+        void setFrequency(unsigned freq) { m_frequency = freq; }
+        void addRxDevice(RxDevicePtr dev);
+
+        void openStream(unsigned encNo);
+        void closeStream(unsigned encNo);
+        bool stopStreams();
 
     private:
         unsigned m_txID;
+        unsigned m_frequency;
         mutable std::mutex m_encMutex;
         mutable std::mutex m_reloadMutex;
         std::vector<std::shared_ptr<MediaEncoder>> m_encoders;
         std::vector<std::shared_ptr<VideoPacketQueue>> m_encQueues;
+        std::set<unsigned> m_openedStreams;
 
         RxDevicePtr m_rxDevice;
+        std::vector<RxDevicePtr> m_supportedRxDevices;
         std::unique_ptr<DevReader> m_devReader;
         std::unique_ptr<LibAV> m_libAV;
         ReadThread * m_threadObject;
@@ -177,12 +207,23 @@ namespace ite
         mutable const char * m_errorStr;
         nxcip::CameraInfo m_info;
 
+        bool captureAnyRxDevice();
+        bool captureSameRxDevice();
+        bool captureFreeRxDevice(RxDevicePtr);
+        bool captureOpenedRxDevice(RxDevicePtr);
+
         bool initDevReader();
         void stopDevReader();
         bool hasDevReader() const { return m_devReader.get(); }
 
         void initEncoders();
         void stopEncoders();
+
+        void getParamStr_Frequency(std::string& s) const;
+        void getParamStr_Presented(std::string& s) const;
+        void getParamStr_Strength(std::string& s) const;
+
+        void setParam_Frequency(std::string& s);
 
         std::unique_ptr<VideoPacket> nextDevPacket(unsigned& streamNum);
     };

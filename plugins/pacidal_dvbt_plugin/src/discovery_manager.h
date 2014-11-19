@@ -43,6 +43,10 @@ namespace ite
 
         static nxpt::CommonRefManager * refManager() { return &(Instance->m_refManager); }
 
+        static void makeInfo(nxcip::CameraInfo& cameraInfo, unsigned short txID, unsigned short rxID, unsigned frequency);
+        static void updateInfo(nxcip::CameraInfo& cameraInfo, unsigned short rxID, unsigned frequency);
+        static void parseInfo(const nxcip::CameraInfo& cameraInfo, unsigned short& txID, unsigned short& rxID, unsigned& frequency);
+
     private:
         typedef std::shared_ptr<CameraManager> CameraPtr;
 
@@ -58,8 +62,11 @@ namespace ite
         static void getRxDevNames(std::vector<std::string>& names);
         void updateRxDevices();
         void updateTxLinks();
+        void checkLink(unsigned short txID, unsigned short rxID, unsigned frequency);
 
-        RxDevicePtr getRx4Tx(unsigned txID);
+        void addTxLinks(const std::vector<IDsLink>&);
+
+        void getRx4Camera(CameraManager * cam);
     };
 }
 

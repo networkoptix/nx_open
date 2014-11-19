@@ -227,12 +227,12 @@ namespace ite
 
         void sendCmd(unsigned short command)
         {
+            setWaiting(true, input2output(command));
+
             info_.cmdSendConfig.bIsCmdBroadcast = False;
             unsigned error = Cmd_Send(&info_, command);
             if (error)
                 throw "Can't send cmd";
-
-            setWaiting(true, input2output(command));
         }
 
         DeviceInfo(const DeviceInfo& );
