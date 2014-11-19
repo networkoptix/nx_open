@@ -9,7 +9,7 @@
                     <icon for="!cameras[server.id] || cameras[server.id].length < 1" on-true="empty"></icon>
                     <span class="glyphicon glyphicon-align-justify" title="{{server.status}}"></span>
                     <icon for="server.status=='Unauthorized'" on-true="lock" title="Unauthorized" ></icon>
-                    {{server.name}} ({{server.url}}) {{settings.id == server.id.replace('{','').replace('}','')?'(current)':''}}
+                    &nbsp;{{server.name}} ({{server.url}}) {{settings.id == server.id.replace('{','').replace('}','')?'(current)':''}}
                 </span>
                 <ul class="nav nav-pills nav-stacked"
                     ng-class="{hidden:server.collapsed, edge: (server.flags.indexOf('SF_Edge')>=0) && !server.allowAutoRedundancy }">

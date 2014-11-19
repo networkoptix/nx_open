@@ -54,7 +54,7 @@ angular.module('webadminApp')
                 if(typeof(detail)==='undefined'){
                     detail = (endTime - startTime) / 1000;
                 }
-                if(serverUrl !== '/'){
+                if(serverUrl !== '/' && serverUrl !== '' && serverUrl !== null){
                     serverUrl = '/proxy/'+ serverUrl + '/';
                 }
                 //RecordedTimePeriods
