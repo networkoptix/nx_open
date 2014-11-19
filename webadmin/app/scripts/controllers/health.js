@@ -18,7 +18,18 @@ angular.module('webadminApp')
 
         $scope.data = {
             labels: Array.apply(null, new Array( $scope.healthLength)).map(String.prototype.valueOf,''),
-            datasets: []
+            datasets: [{ // we need some data
+                label: '',
+                fillColor: nocolor,
+                strokeColor: nocolor,
+                pointColor: nocolor,
+                pointStrokeColor: nocolor,
+                pointHighlightFill: nocolor,
+                pointHighlightStroke: nocolor,
+                show:true,
+                hideLegend:true,
+                data: Array.apply(null, new Array($scope.healthLength)).map(Number.prototype.valueOf,100)
+            }]
         };
 
         $scope.legend = '';
@@ -27,7 +38,7 @@ angular.module('webadminApp')
 
             animation:false,
             scaleOverride: false,
-            scaleSteps: 4,
+            scaleSteps: 10,
             scaleShowLabels: false ,
             scaleLabel: '<%=value%> %',
             scaleIntegersOnly:true,
@@ -161,6 +172,9 @@ angular.module('webadminApp')
                 }
 
             }
+
+
+            console.log(datasets,statistics);
         }
 
 
@@ -173,7 +187,7 @@ angular.module('webadminApp')
                 }
                 $scope.serverIsOnline = true;
 
-                updateStatisticsDataSets((r.status===200 && r.data.error === 0) ? r.data.reply.statistics:[]);
+                updateStatisticsDataSets((r.status===200 && r.data.error === "0") ? r.data.reply.statistics:[]);
 
                 statisticTimer = $timeout(updateStatistics,$scope.interval);
                 return false;

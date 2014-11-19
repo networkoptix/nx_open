@@ -22,6 +22,9 @@ angular.module('webadminApp').controller('ViewCtrl', function ($scope,$location,
         });
     }
     function getServerUrl(server){
+        if( $scope.settings.id === server.id.replace('{','').replace('}','')){
+            return '';
+        }
         return server.apiUrl.replace('http://','').replace('https://','');
     }
     function requestCameraRecords(camera){
