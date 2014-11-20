@@ -450,12 +450,12 @@ bool RCShell::sendGetIDs(int iWaitTime)
     return false;
 }
 
-void RCShell::getDevIDsActivity(std::vector<IDsLink>& outLinks)
+void RCShell::updateDevIDs()
 {
     {
         std::lock_guard<std::mutex> lock(mutex_); // LOCK
 
-        for (unsigned i = 0; i < devs_.size(); ++i)
+        for (size_t i = 0; i < devs_.size(); ++i)
             devs_[i]->setOff();
     }
 
@@ -463,7 +463,18 @@ void RCShell::getDevIDsActivity(std::vector<IDsLink>& outLinks)
     if (!ok)
         return;
 
-    getDevIDs(outLinks);
+    {
+        std::lock_guard<std::mutex> lock(mutex_); // LOCK
+
+        for (size_t i = 0; i < devs_.size(); ++i)
+        {
+            //if (devs_[i]->isOn())
+            //{
+                devs_[i]->getTransmissionParameters();
+                //devs_[i]->wait();
+            //}
+        }
+    }
 }
 
 void RCShell::getDevIDs(std::vector<IDsLink>& outLinks)
@@ -475,12 +486,6 @@ void RCShell::getDevIDs(std::vector<IDsLink>& outLinks)
 
     for (unsigned i = 0; i < devs_.size(); ++i)
     {
-        if (devs_[i]->isOn())
-        {
-            devs_[i]->getTransmissionParameters();
-            devs_[i]->wait();
-        }
-
         IDsLink idl;
         idl.rxID = devs_[i]->rxID();
         idl.txID = devs_[i]->txID();

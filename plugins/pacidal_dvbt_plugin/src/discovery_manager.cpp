@@ -108,6 +108,12 @@ namespace ite
             updateRxDevices();
             updateTxLinks();
         }
+        else
+        {
+            std::vector<IDsLink> links;
+            rcShell_.getDevIDs(links);
+            addTxLinks(links);
+        }
 
         unsigned cameraNum = 0;
         std::set<unsigned> foundTx;
@@ -140,6 +146,8 @@ namespace ite
 
             if (cam)
             {
+                getRx4Camera(cam);
+
                 foundTx.insert(txID);
                 cam->getCameraInfo( &info );
                 ++cameraNum;
@@ -159,10 +167,7 @@ namespace ite
 
             auto it = m_cameras.find(txID);
             if (it != m_cameras.end())
-            {
                 cam = it->second.get();
-                getRx4Camera(cam);
-            }
         }
 
         // before findCameras() on restart, use saved info from DB
@@ -182,7 +187,7 @@ namespace ite
                 cam = sp.get();
                 cam->addRef();
 
-                getRx4Camera(cam);
+                cam->setFrequency(frequency);
             }
         }
 
@@ -193,16 +198,18 @@ namespace ite
 
     void DiscoveryManager::getRx4Camera(CameraManager * cam)
     {
-        // already locked
-        //std::lock_guard<std::mutex> lock( m_contentMutex );
+        std::lock_guard<std::mutex> lock( m_contentMutex );
 
         auto range = m_txLinks.equal_range( cam->txID() );
         for (auto itTx = range.first; itTx != range.second; ++itTx)
         {
             auto itRx = m_rxDevs.find(itTx->second.rxID);
-            RxDevicePtr dev = itRx->second;
-            cam->addRxDevice(dev);
-            cam->setFrequency(itTx->second.frequency);
+            if (itRx != m_rxDevs.end())
+            {
+                RxDevicePtr dev = itRx->second;
+                cam->addRxDevice(dev);
+                cam->setFrequency(itTx->second.frequency);
+            }
         }
     }
 
@@ -232,99 +239,63 @@ namespace ite
         for (size_t i = 0; i < rxDevs.size(); ++i)
         {
             unsigned id = RxDevice::dev2id(rxDevs[i]);
-
+#if 0
+            if (id) // DEBUG: leave one Rx device
+                continue;
+#endif
             std::lock_guard<std::mutex> lock( m_contentMutex ); // LOCK
 
             auto it = m_rxDevs.find(id);
             if (it == m_rxDevs.end())
                 m_rxDevs[id] = std::make_shared<RxDevice>(id);
-#if 0
-            break; // one device for DEBUG
-#endif
         }
     }
 
     void DiscoveryManager::checkLink(unsigned short /*txID*/, unsigned short rxID, unsigned frequency)
     {
-        if (m_rxDevs.empty())
-            updateRxDevices();
+        // TODO
+    }
 
-        std::vector<IDsLink> links;
-        std::vector<RxDevicePtr> rxDevs;
+    void DiscoveryManager::updateTxLinks()
+    {
+        std::vector<RxDevicePtr> scanDevs;
 
         {
             std::lock_guard<std::mutex> lock( m_contentMutex ); // LOCK
 
-            if (rxID != 0xffff)
+            for (size_t i = 0; i < m_rxDevs.size(); ++i)
             {
-                auto it = m_rxDevs.find(rxID);
-                if (it != m_rxDevs.end())
-                    rxDevs.push_back(it->second);
-            }
-            else
-            {
-                for (auto it = m_rxDevs.begin(); it != m_rxDevs.end(); ++it)
-                    rxDevs.push_back(it->second);
+                if (m_rxDevs[i].get() && ! m_rxDevs[i]->isLocked())
+                    scanDevs.push_back(m_rxDevs[i]);
             }
         }
 
-        for (size_t i = 0; i < rxDevs.size(); ++i)
+        for (size_t i = 0; i < scanDevs.size(); ++i)
         {
-            RxDevicePtr dev = rxDevs[i];
-
-            std::lock_guard<std::mutex> lock( dev->mutex() ); // LOCK
-
-            dev->lockF( nullptr, DeviceInfo::chanFrequency(frequency) );
-            rcShell_.getDevIDsActivity(links);
-            dev->unlockF();
+            scanDevs[i]->mutex().lock();
+            if (! scanDevs[i]->isOpen())
+                scanDevs[i]->open();
         }
 
-        addTxLinks(links);
-    }
+        for (size_t ch = 0; ch < DeviceInfo::CHANNELS_NUM; ++ch)
+        {
+            for (size_t i = 0; i < scanDevs.size(); ++i)
+                scanDevs[i]->lockF( nullptr, DeviceInfo::chanFrequency(ch) );
 
-    // TODO: reduce time
-    void DiscoveryManager::updateTxLinks()
-    {
+            rcShell_.updateDevIDs();
+
+            for (size_t i = 0; i < scanDevs.size(); ++i)
+                scanDevs[i]->unlockF();
+        }
+
+        for (size_t i = 0; i < scanDevs.size(); ++i)
+        {
+            scanDevs[i]->close();
+            scanDevs[i]->mutex().unlock();
+        }
+
         std::vector<IDsLink> links;
-        RxDevicePtr rxDev;
-
-        for (size_t i = 0; i < m_rxDevs.size(); ++i)
-        {
-            {
-                std::lock_guard<std::mutex> lock( m_contentMutex ); // LOCK
-
-                rxDev = m_rxDevs[i];
-            }
-
-            if (! rxDev.get())
-                continue;
-
-            if (rxDev->isLocked())
-            {
-                rcShell_.getDevIDsActivity(links);
-            }
-            else
-            {
-                if (! rxDev->isOpen())
-                    rxDev->open();
-
-#if 0
-                for (size_t j = 0; j < 4 /*DeviceInfo::CHANNELS_NUM*/; ++j) // DEBUG
-#else
-                for (size_t j = 0; j < DeviceInfo::CHANNELS_NUM; ++j)
-#endif
-                {
-                    std::lock_guard<std::mutex> lock( rxDev->mutex() ); // LOCK
-
-                    rxDev->lockF( nullptr, DeviceInfo::chanFrequency(j) );
-                    rcShell_.getDevIDsActivity(links);
-                    rxDev->unlockF();
-                }
-
-                rxDev->close();
-            }
-        }
-
+        rcShell_.getDevIDs(links);
         addTxLinks(links);
     }
 

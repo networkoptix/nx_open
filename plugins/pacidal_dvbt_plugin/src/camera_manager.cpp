@@ -183,12 +183,15 @@ namespace ite
         m_frequency(0),
         m_threadObject( nullptr ),
         m_hasThread( false ),
-        m_threadJoined( true ),
+        m_loading(false),
         m_errorStr( nullptr )
     {
         memcpy( &m_info, &info, sizeof(nxcip::CameraInfo) );
 
-        m_txID = RxDevice::str2id( info.uid );
+        unsigned short rxID;
+        DiscoveryManager::parseInfo(info, m_txID, rxID, m_frequency);
+
+        //tryLoad();
     }
 
     CameraManager::~CameraManager()
@@ -355,37 +358,51 @@ namespace ite
     // TODO: get from RC
     int CameraManager::getEncoderCount( int* encoderCount ) const
     {
-#if 0
-        if (!hasEncoders())
+        State state = checkState();
+        switch (state)
         {
-            *encoderCount = 0;
-            return nxcip::NX_TRY_AGAIN;
+            case STATE_NO_CAMERA:
+            case STATE_NO_FREQUENCY:
+            case STATE_NO_RECEIVER:
+            case STATE_DEVICE_READY:
+            case STATE_STREAM_LOADING:
+#if 0
+                *encoderCount = 0;
+                return nxcip::NX_TRY_AGAIN;
+#else
+                *encoderCount = 2; // FIXME
+                return nxcip::NX_NO_ERROR;
+#endif
+
+            case STATE_STREAM_READY:
+            case STATE_STREAM_READING:
+                break;
         }
 
         std::lock_guard<std::mutex> lock( m_encMutex ); // LOCK
 
         *encoderCount = m_encoders.size();
-#else
-        *encoderCount = 2; // FIXME
-#endif
         return nxcip::NX_NO_ERROR;
     }
 
     int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** encoderPtr )
     {
-        if (!hasEncoders())
+        tryLoad();
+
+        State state = checkState();
+        switch (state)
         {
-            if (! captureAnyRxDevice())
-            {
-                DiscoveryManager::updateInfo(m_info, 0xffff, m_frequency);
+            case STATE_NO_CAMERA:
+            case STATE_NO_FREQUENCY:
+            case STATE_NO_RECEIVER:
+            case STATE_DEVICE_READY:
+            case STATE_STREAM_LOADING:
                 return nxcip::NX_TRY_AGAIN;
-            }
 
-            reload();
+            case STATE_STREAM_READY:
+            case STATE_STREAM_READING:
+                break;
         }
-
-        if (! m_rxDevice.get())
-            return nxcip::NX_TRY_AGAIN;
 
         std::lock_guard<std::mutex> lock( m_encMutex ); // LOCK
 
@@ -465,34 +482,99 @@ namespace ite
 
     // internals
 
+    CameraManager::State CameraManager::checkState() const
+    {
+        if (! m_txID)
+            return STATE_NO_CAMERA;
+
+        if (! m_frequency)
+            return STATE_NO_FREQUENCY;
+
+        if (m_supportedRxDevices.empty() || ! m_rxDevice.get())
+            return STATE_NO_RECEIVER;
+
+        if (m_rxDevice.get() && ! m_loading && ! m_hasThread)
+            return STATE_DEVICE_READY;
+
+        if (m_loading)
+            return STATE_STREAM_LOADING;
+
+        if (m_hasThread && m_openedStreams.empty())
+            return STATE_STREAM_READY;
+
+        return STATE_STREAM_READING;
+    }
+
+    void CameraManager::tryLoad()
+    {
+        std::lock_guard<std::mutex> lock( m_reloadMutex ); // LOCK
+
+        State state = checkState();
+        switch (state)
+        {
+            case STATE_NO_CAMERA:
+            case STATE_NO_FREQUENCY:
+                return; // can do nothing
+
+            case STATE_NO_RECEIVER:
+            {
+                bool ok = captureAnyRxDevice();
+                if (! ok)
+                {
+                    DiscoveryManager::updateInfo(m_info, 0xffff, m_frequency);
+                    break;
+                }
+                // no break
+            }
+
+            case STATE_DEVICE_READY:
+            {
+                reloadMedia();
+                break;
+            }
+
+            case STATE_STREAM_LOADING:
+            case STATE_STREAM_READY:
+            case STATE_STREAM_READING:
+                break;
+        }
+    }
+
+    void CameraManager::reloadMedia()
+    {
+        m_loading = true;
+
+        stopDevReader();
+        if (initDevReader())
+            initEncoders();
+
+        m_loading = false;
+    }
+
     void CameraManager::openStream(unsigned encNo)
     {
-        // TODO: lock
+        std::lock_guard<std::mutex> lock( m_reloadMutex ); // LOCK
+
         m_openedStreams.insert(encNo);
     }
 
     void CameraManager::closeStream(unsigned encNo)
     {
-        // TODO: lock
+        std::lock_guard<std::mutex> lock( m_reloadMutex ); // LOCK
+
         m_openedStreams.erase(encNo);
     }
 
     bool CameraManager::stopStreams()
     {
-#if 0
-        // TODO: lock
+        std::lock_guard<std::mutex> lock( m_reloadMutex ); // LOCK
+
         if (m_openedStreams.size())
             return false;
 
-        {
-            std::lock_guard<std::mutex> lock( m_reloadMutex ); // LOCK
-            stopDevReader();
-        }
-
-        m_rxDevice.reset();
+        stopDevReader();
+        m_rxDevice.reset(); // still've been locking frequency
         return true;
-#endif
-        return false;
     }
 
     void CameraManager::addRxDevice(RxDevicePtr dev)
@@ -512,8 +594,6 @@ namespace ite
 
     bool CameraManager::captureAnyRxDevice()
     {
-        std::lock_guard<std::mutex> lock( m_reloadMutex ); // LOCK
-
         if (!m_frequency || m_supportedRxDevices.empty())
             return false;
 
@@ -607,19 +687,6 @@ namespace ite
         return false;
     }
 
-    void CameraManager::reload()
-    {
-        std::lock_guard<std::mutex> lock( m_reloadMutex ); // LOCK
-
-        // check reload from another thread / for another encoder
-        if (hasEncoders())
-            return;
-
-        stopDevReader();
-        if (initDevReader())
-            initEncoders();
-    }
-
     bool CameraManager::initDevReader()
     {
         if (!m_rxDevice || !m_rxDevice->isLocked())
@@ -639,6 +706,8 @@ namespace ite
 
     void CameraManager::initEncoders()
     {
+        stopEncoders();
+
         static const float HARDCODED_FPS = 30.0f;
         static const unsigned WAIT_LIBAV_INIT_DURATION_S = 10;
         static std::chrono::seconds dura( WAIT_LIBAV_INIT_DURATION_S );
@@ -689,8 +758,7 @@ namespace ite
             if (streamsCount)
             {
                 m_readThread = std::thread( ReadThread(this, m_libAV.get()) );
-                //m_hasThread = true;
-                m_threadJoined = false;
+                m_hasThread = true;
             }
         }
     }
@@ -699,12 +767,19 @@ namespace ite
     {
         try
         {
-            if (m_threadObject)
-                m_threadObject->stop();
+            if (m_hasThread)
+            {
+                // HACK
+                for (unsigned i = 0; !m_threadObject && i < 100; ++i)
+                    usleep(10000);
 
-            if (!m_threadJoined) {
-                m_readThread.join();
-                m_threadJoined = true;
+                if (m_threadObject)
+                {
+                    m_threadObject->stop();
+                    m_readThread.join();
+                }
+
+                m_hasThread = false;
             }
 
             m_threadObject = nullptr;

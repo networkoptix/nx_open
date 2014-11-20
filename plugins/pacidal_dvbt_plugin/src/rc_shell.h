@@ -307,8 +307,8 @@ namespace ite
 
         void printDevices();
 
+        void updateDevIDs();
         void getDevIDs(std::vector<IDsLink>& links);
-        void getDevIDsActivity(std::vector<IDsLink>& links);
         bool getDevIDsChannel(unsigned channel, std::vector<IDsLink>& outLinks);
         DeviceInfoPtr device(const IDsLink& idl) const;
 

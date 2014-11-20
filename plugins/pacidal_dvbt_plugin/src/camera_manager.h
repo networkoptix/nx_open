@@ -165,18 +165,15 @@ namespace ite
 
         std::shared_ptr<VideoPacketQueue> queue(unsigned num) const;
 
-        void reload();
-        bool hasEncoders() const { return m_hasThread; }
-
         void setThreadObj(ReadThread * ptr)
         {
             m_threadObject = ptr;
-            m_hasThread = (ptr != nullptr);
+            //m_hasThread = (ptr != nullptr);
         }
 
         DevReader * devReader() { return m_devReader.get(); }
 
-        unsigned txID() const { return m_txID; }
+        unsigned short txID() const { return m_txID; }
 
         unsigned frequency() const { return m_frequency; }
         void setFrequency(unsigned freq) { m_frequency = freq; }
@@ -187,7 +184,7 @@ namespace ite
         bool stopStreams();
 
     private:
-        unsigned m_txID;
+        unsigned short m_txID;
         unsigned m_frequency;
         mutable std::mutex m_encMutex;
         mutable std::mutex m_reloadMutex;
@@ -201,8 +198,9 @@ namespace ite
         std::unique_ptr<LibAV> m_libAV;
         ReadThread * m_threadObject;
         std::thread m_readThread;
-        std::atomic_bool m_hasThread;
-        bool m_threadJoined;
+        //std::atomic_bool m_hasThread;
+        bool m_hasThread;
+        bool m_loading;
 
         mutable const char * m_errorStr;
         nxcip::CameraInfo m_info;
@@ -214,18 +212,35 @@ namespace ite
 
         bool initDevReader();
         void stopDevReader();
-        bool hasDevReader() const { return m_devReader.get(); }
 
         void initEncoders();
         void stopEncoders();
+
+        void reloadMedia();
+        void tryLoad();
+
+        std::unique_ptr<VideoPacket> nextDevPacket(unsigned& streamNum);
+
+        typedef enum
+        {
+            STATE_NO_CAMERA,        // no Tx
+            STATE_NO_FREQUENCY,     // frequency not set
+            STATE_NO_RECEIVER,      // no Rx for Tx
+            STATE_DEVICE_READY,     // got Rx for Tx
+            STATE_STREAM_LOADING,   // loading data streams
+            STATE_STREAM_READY,     // got data streams, no readers
+            STATE_STREAM_READING    // got readers
+        } State;
+
+        State checkState() const;
+
+        //
 
         void getParamStr_Frequency(std::string& s) const;
         void getParamStr_Presented(std::string& s) const;
         void getParamStr_Strength(std::string& s) const;
 
         void setParam_Frequency(std::string& s);
-
-        std::unique_ptr<VideoPacket> nextDevPacket(unsigned& streamNum);
     };
 }
 

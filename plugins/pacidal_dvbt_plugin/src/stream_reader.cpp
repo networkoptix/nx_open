@@ -19,6 +19,7 @@ namespace ite
 
     StreamReader::~StreamReader()
     {
+        m_cameraManager->closeStream(m_encoderNumber);
     }
 
     void * StreamReader::queryInterface( const nxpl::NX_GUID& interfaceID )
@@ -51,6 +52,5 @@ namespace ite
 
     void StreamReader::interrupt()
     {
-        m_cameraManager->closeStream(m_encoderNumber);
     }
 }
