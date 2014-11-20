@@ -131,7 +131,7 @@ void QnIncompatibleServerWatcher::at_resourcePool_resourceChanged(const QnResour
         return;
 
     Qn::ResourceStatus status = server->getStatus();
-    if (status != Qn::Offline && server->getModuleInformation().isCompatibleToCurrentSystem())
+    if (status != Qn::Offline && server->getModuleInformation().isCompatibleToCurrentSystem(true))
         removeResource(m_fakeUuidByServerUuid.value(id));
 }
 
@@ -146,6 +146,12 @@ void QnIncompatibleServerWatcher::removeResource(const QnUuid &id) {
     m_fakeUuidByServerUuid.remove(serverId);
 
     QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
-    if (server)
+    if (server) {
+        NX_LOG(lit("QnIncompatibleServerWatcher: Remove incompatible server %1 at %2")
+            .arg(serverId.toString())
+            .arg(server->getSystemName()),
+            cl_logDEBUG1);
+
         qnResPool->removeResource(server);
+    }
 }

@@ -7,8 +7,10 @@
 #include <nx_ec/ec_proto_version.h>
 
 
-bool QnModuleInformation::isCompatibleToCurrentSystem() const {
-    return protoVersion == nx_ec::EC2_PROTO_VERSION && systemName == qnCommon->localSystemName() && isCompatible(version, qnCommon->engineVersion());
+bool QnModuleInformation::isCompatibleToCurrentSystem(bool ignoreProtoVersion) const {
+    return (ignoreProtoVersion || protoVersion == nx_ec::EC2_PROTO_VERSION) &&
+            systemName == qnCommon->localSystemName() &&
+            isCompatible(version, qnCommon->engineVersion());
 }
 
 bool QnModuleInformation::isLocal() const {
