@@ -498,7 +498,7 @@ QString OnvifResourceSearcherWsdd::getManufacturer(const T* source, const QStrin
     }
 
     QByteArray scopes = source->Scopes->__item;
-    int posStart = scopes.indexOf(SCOPES_NAME_PREFIX);
+    int posStart = scopes.indexOf(SCOPES_HARDWARE_PREFIX);
     if (posStart == -1) {
         return QString();
     }
@@ -506,7 +506,7 @@ QString OnvifResourceSearcherWsdd::getManufacturer(const T* source, const QStrin
     int posEnd = posStart != -1? scopes.indexOf(' ', posStart): -1;
     posEnd = posEnd != -1? posEnd: scopes.size();
 
-    int skipSize = sizeof(SCOPES_NAME_PREFIX) - 1;
+    int skipSize = sizeof(SCOPES_HARDWARE_PREFIX) - 1;
     QByteArray percentEncodedValue = scopes.mid(posStart + skipSize, posEnd - posStart - skipSize).replace(name, "");
     QString result = QUrl::fromPercentEncoding(percentEncodedValue).trimmed();
     if (result.endsWith(lit("_")))
@@ -524,7 +524,7 @@ QString OnvifResourceSearcherWsdd::getName(const T* source) const
     QString scopes = QLatin1String(source->Scopes->__item);
 
 
-    int posStart = scopes.indexOf(QLatin1String(SCOPES_HARDWARE_PREFIX));
+    int posStart = scopes.indexOf(QLatin1String(SCOPES_NAME_PREFIX));
     if (posStart == -1) {
         return QString();
     }
@@ -532,7 +532,7 @@ QString OnvifResourceSearcherWsdd::getName(const T* source) const
     int posEnd = posStart != -1? scopes.indexOf(QLatin1Char(' '), posStart): -1;
     posEnd = posEnd != -1? posEnd: scopes.size();
 
-    int skipSize = sizeof(SCOPES_HARDWARE_PREFIX) - 1;
+    int skipSize = sizeof(SCOPES_NAME_PREFIX) - 1;
     QString percentEncodedValue = scopes.mid(posStart + skipSize, posEnd - posStart - skipSize);
 
     return QUrl::fromPercentEncoding(QByteArray(percentEncodedValue.toStdString().c_str())).trimmed();
@@ -556,6 +556,17 @@ void OnvifResourceSearcherWsdd::fillWsddStructs(wsdd__ProbeType& probe, wsa__End
     endpoint.__anyAttribute = NULL;
 }
 
+void fixDiscoveredName(QString& name, QString& manufacturer)
+{
+    if (name.toLower() == lit("digital watchdog")) {
+        qSwap(name, manufacturer); // workaround DW bug
+    }
+    else if (name.toLower().startsWith(lit("isd "))) {
+        manufacturer = lit("ISD");
+        name = name.mid(4);
+    }
+}
+
 template <class T> 
 void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const T* source,
     const SOAP_ENV__Header* header, const QStringList& addrPrefixes, const QString& host) const
@@ -570,9 +581,9 @@ void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const 
     }
 
     QString name = getName(source);
-    QString manufacturer;
-    if (!name.isEmpty())
-        manufacturer = getManufacturer(source, name);
+    QString manufacturer = getManufacturer(source, name);
+    fixDiscoveredName(name, manufacturer);
+
     QString mac = getMac(source, header);
 
     QString endpointId = replaceNonFileNameCharacters(getEndpointAddress(source), QLatin1Char('_'));
