@@ -7,17 +7,15 @@
                     <icon for="!server.collapsed && cameras[server.id].length>0" on-true="chevron-down" title-true="collapse" ></icon>
                     <icon for="server.collapsed && cameras[server.id].length>0" on-true="chevron-right" title-true="expand"  ></icon>
                     <icon for="!cameras[server.id] || cameras[server.id].length < 1" on-true="empty"></icon>
-
                     <span class="glyphicon glyphicon-align-justify" title="{{server.status}}"></span>
-
                     <icon for="server.status=='Unauthorized'" on-true="lock" title="Unauthorized" ></icon>
-                    {{server.name}} ({{server.url}}) {{settings.id == server.id.replace('{','').replace('}','')?'(current)':''}}
+                    &nbsp;{{server.name}} ({{server.url}}) {{settings.id == server.id.replace('{','').replace('}','')?'(current)':''}}
                 </span>
                 <ul class="nav nav-pills nav-stacked"
                     ng-class="{hidden:server.collapsed, edge: (server.flags.indexOf('SF_Edge')>=0) && !server.allowAutoRedundancy }">
                     <li ng-repeat="camera in cameras[server.id]"
                         ng-class="{active:activeCamera===camera}"
-                        ng-include="camera.isGroup?'/views/components/camerasGroupNode.html':'/views/components/cameraNode.html'" >
+                        ng-include="camera.isGroup?'views/components/camerasGroupNode.html':'views/components/cameraNode.html'" >
                     </li>
                 </ul>
             </li>
@@ -26,13 +24,15 @@
 </div>
 <div class="col-sm-8">
     <div style="width:640px;height:480px" class="videogular-container" ng-if="activeCamera!==null">
-        <videogular vg-theme="'bower_components/videogular-themes-default/videogular.css'" vg-autoplay="true" autoplay="true">
-            <vg-video vg-src="acitveVideoSource" vg-autoplay="true" autoplay="true">
+        <videogular vg-theme="'bower_components/videogular-themes-default/videogular.css'" vg-autoplay="true" >
+            <vg-video vg-src="acitveVideoSource" >
             </vg-video>
             <vg-controls>
                 <vg-play-pause-button></vg-play-pause-button>
+                <vg-quality current="activeResolution" list="availableResolutions" ></vg-quality>
                 <vg-fullscreenButton></vg-fullscreenButton>
             </vg-controls>
+            <vg-buffering></vg-buffering>
         </videogular>
     </div>
 </div>

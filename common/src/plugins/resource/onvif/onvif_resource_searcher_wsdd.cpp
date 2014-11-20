@@ -570,13 +570,10 @@ void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const 
     }
 
     QString name = getName(source);
-    QString manufacturer = getManufacturer(source, name);
+    QString manufacturer;
+    if (!name.isEmpty())
+        manufacturer = getManufacturer(source, name);
     QString mac = getMac(source, header);
-    if (name.isEmpty()) {
-        name = manufacturer;
-        manufacturer.clear();
-    }
-    
 
     QString endpointId = replaceNonFileNameCharacters(getEndpointAddress(source), QLatin1Char('_'));
     QString uniqId = !mac.isEmpty() ? mac : endpointId;

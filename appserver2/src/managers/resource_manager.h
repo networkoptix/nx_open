@@ -74,6 +74,7 @@ namespace ec2
         virtual int getResourceTypes( impl::GetResourceTypesHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::setResourceStatus
         virtual int setResourceStatus( const QnUuid& resourceId, Qn::ResourceStatus status, impl::SetResourceStatusHandlerPtr handler ) override;
+        virtual int setResourceStatusLocal( const QnUuid& resourceId, Qn::ResourceStatus status, impl::SetResourceStatusHandlerPtr handler ) override;
         //virtual int setResourceDisabled( const QnUuid& resourceId, bool disabled, impl::SetResourceDisabledHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::getKvPairs
         virtual int getKvPairs( const QnUuid &resourceId, impl::GetKvPairsHandlerPtr handler ) override;

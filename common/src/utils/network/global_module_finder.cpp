@@ -8,6 +8,7 @@
 #include <api/app_server_connection.h>
 #include <nx_ec/data/api_module_data.h>
 #include <nx_ec/dummy_handler.h>
+#include <nx_ec/ec_proto_version.h>
 
 QnGlobalModuleFinder::QnGlobalModuleFinder(QnModuleFinder *moduleFinder, QObject *parent) :
     QObject(parent),
@@ -69,6 +70,7 @@ void QnGlobalModuleFinder::fillApiModuleData(const QnModuleInformation &moduleIn
     data->name = moduleInformation.name;
     data->authHash = moduleInformation.authHash;
     data->sslAllowed = moduleInformation.sslAllowed;
+    data->protoVersion = moduleInformation.protoVersion;
     data->isAlive = true;
 }
 
@@ -84,6 +86,7 @@ void QnGlobalModuleFinder::fillFromApiModuleData(const ec2::ApiModuleData &data,
     moduleInformation->name = data.name;
     moduleInformation->authHash = data.authHash;
     moduleInformation->sslAllowed = data.sslAllowed;
+    moduleInformation->protoVersion = data.protoVersion == 0 ? nx_ec::INITIAL_EC2_PROTO_VERSION : data.protoVersion;
 }
 
 QList<QnModuleInformation> QnGlobalModuleFinder::foundModules() const {

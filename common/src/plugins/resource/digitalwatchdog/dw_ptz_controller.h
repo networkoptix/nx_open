@@ -15,7 +15,9 @@ public:
 
     virtual bool continuousMove(const QVector3D &speed) override;
     virtual bool getFlip(Qt::Orientations *flip) override;
-
+private slots:
+    void at_physicalParamChanged(const QString& name, const QString& value);
+    void updateFlipState();
 private:
     QnPlWatchDogResourcePtr m_resource;
     Qt::Orientations m_flip;

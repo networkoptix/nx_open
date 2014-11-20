@@ -23,7 +23,7 @@ protected:
     virtual void onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) override;
     virtual void updateResource(const QnResourcePtr &resource) override;
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData) override;
-    virtual void processResources(const QnResourceList& resources) override;
+    virtual void resetResources(const QnResourceList& resources) override;
 
 private slots:
     void at_remotePeerFound(ec2::ApiPeerAliveData data);

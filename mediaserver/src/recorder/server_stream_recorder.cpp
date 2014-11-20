@@ -19,6 +19,8 @@
 #include <media_server/settings.h>
 #include "utils/common/util.h" /* For MAX_FRAME_DURATION, MIN_FRAME_DURATION. */
 
+#include <boost/algorithm/cxx11/any_of.hpp>
+
 
 static const int MOTION_PREBUFFER_SIZE = 8;
 
@@ -403,11 +405,18 @@ void QnServerStreamRecorder::setSpecialRecordingMode(QnScheduleTask& task)
     m_lastSchedulePeriod.clear();
 }
 
+bool QnServerStreamRecorder::isPanicMode() const
+{
+    return boost::algorithm::any_of(qnResPool->getAllServers(), [](const QnMediaServerResourcePtr& server) {
+        return server->getPanicMode() != Qn::PM_None && server->getStatus() == Qn::Online;
+    });
+}
+
 void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
 {
     QMutexLocker lock(&m_scheduleMutex);
 
-    if (m_mediaServer && m_mediaServer->getPanicMode() != Qn::PM_None)
+    if (isPanicMode())
     {
         if (!m_usedPanicMode)
         {

@@ -92,6 +92,9 @@ public:
     static QnCameraHistoryPool* instance();
     QnCameraHistoryPtr getCameraHistory(const QnResourcePtr &camera) const;
     QnCameraHistoryPtr getCameraHistory(const QString& uniqueId) const;
+
+    void resetCameraHistory(const QnCameraHistoryList& cameraHistoryList);
+
     void addCameraHistory(const QnCameraHistoryPtr &history);
     void addCameraHistoryItem(const QnCameraHistoryItem& historyItem);
 

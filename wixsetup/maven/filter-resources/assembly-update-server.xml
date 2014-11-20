@@ -9,7 +9,7 @@
 			<directory>${project.build.directory}/bin</directory>
 			<outputDirectory>..</outputDirectory>
 			<includes>
-				<include>${finalName}.msi</include>
+				<include>*-server-*.msi</include>
 			</includes>		
 		</fileSet>				
 		<fileSet>

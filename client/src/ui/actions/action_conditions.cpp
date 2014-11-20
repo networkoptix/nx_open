@@ -7,6 +7,7 @@
 #include <common/common_module.h>
 
 #include <utils/common/warnings.h>
+#include <utils/network/router.h>
 
 #include <core/resource_management/resource_criterion.h>
 #include <core/resource_management/resource_pool.h>
@@ -956,6 +957,7 @@ Qn::ActionVisibility QnResourceStatusActionCondition::check(const QnResourceList
 }
 
 Qn::ActionVisibility QnDesktopCameraActionCondition::check(const QnActionParameters &parameters) {
+    Q_UNUSED(parameters);
 #ifdef Q_OS_WIN
     if (!context()->user())
         return Qn::InvisibleAction;
@@ -968,7 +970,6 @@ Qn::ActionVisibility QnDesktopCameraActionCondition::check(const QnActionParamet
     return Qn::InvisibleAction;
    
 #else
-    Q_UNUSED(parameters)
     return Qn::InvisibleAction;
 #endif
 }

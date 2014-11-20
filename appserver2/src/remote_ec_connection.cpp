@@ -27,8 +27,10 @@ namespace ec2
 
     RemoteEC2Connection::~RemoteEC2Connection()
     {
-        QnTransactionMessageBus::instance()->removeConnectionFromPeer( m_peerUrl );
-        QnTransactionMessageBus::instance()->removeHandler( notificationManager() );
+        if (QnTransactionMessageBus::instance()) {
+            QnTransactionMessageBus::instance()->removeConnectionFromPeer( m_peerUrl );
+            QnTransactionMessageBus::instance()->removeHandler( notificationManager() );
+        }
 
         //TODO #ak next call can be placed here just because we always have just one connection to EC
         TimeSynchronizationManager::instance()->forgetSynchronizedTime();

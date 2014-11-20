@@ -115,7 +115,7 @@ void QnLookAndFeelPreferencesWidget::updateFromSettings() {
         ui->colorSelectButton->setEnabled(background.animationMode == Qn::CustomAnimation);
         QColor customColor = background.animationCustomColor;
         if (!customColor.isValid())
-            customColor = withAlpha(Qt::darkBlue, 64);
+            customColor = withAlpha(Qt::blue, 51);
         m_colorDialog->setCurrentColor(withAlpha(customColor, 255));
         ui->animationOpacitySpinBox->setValue(qRound(customColor.alphaF() * 100));
         updateAnimationCustomColor();

@@ -463,6 +463,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
     updateMotionAvailability();
     updateLicenseText();
     updateIpAddressText();
+    updateWebPageText();
     ui->advancedSettingsWidget->updateFromResource();
     
     updateRecordingParamsAvailability();

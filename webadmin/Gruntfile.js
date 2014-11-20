@@ -102,10 +102,12 @@ module.exports = function (grunt) {
 
 
                 //Evgeniy
-                {context: '/api/',host: '192.168.56.101',port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
-                {context: '/ec2/',host: '192.168.56.101',port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
-                {context: '/media/',host: '192.168.56.101',port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
-                {context: '/hls/',host: '192.168.56.101',port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}}
+
+                {context: '/api/', host: '192.168.56.101', port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
+                {context: '/ec2/', host: '192.168.56.101', port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
+                {context: '/media/', host: '192.168.56.101', port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
+                {context: '/hls/', host: '192.168.56.101',port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
+                {context: '/proxy/', host: '192.168.56.101',port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}}
 
                 //Sergey Yuldashev
 /*                {context: '/api/',      host: '10.0.2.203', port: 8901, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
@@ -117,7 +119,8 @@ module.exports = function (grunt) {
                 /*{context: '/api/',      host: '10.0.2.202', port: 7001, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
                 {context: '/ec2/',      host: '10.0.2.202', port: 7001, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
                 {context: '/media/',    host: '10.0.2.202', port: 7001, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
-                {context: '/hls/',      host: '10.0.2.202', port: 7001, headers: {'Authorization': 'Basic YWRtaW46MTIz'}}
+                {context: '/hls/',      host: '10.0.2.202', port: 7001, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
+                {context: '/proxy/',      host: '10.0.2.202', port: 7001, headers: {'Authorization': 'Basic YWRtaW46MTIz'}}
 */
                 //Roman Vasilenko  port: 7003,7004,7005,2006
                 //{context: '/api/', host: '10.0.2.231', port: 7003, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
@@ -192,6 +195,26 @@ module.exports = function (grunt) {
             },
             dist: {
                 options: {
+                    middleware: function (connect, options) {
+                        if (!Array.isArray(options.base)) {
+                            options.base = [options.base];
+                        }
+
+                        // Setup the proxy
+                        var middlewares = [require('grunt-connect-proxy/lib/utils').proxyRequest];
+
+                        // Serve static files.
+                        options.base.forEach(function (base) {
+                            middlewares.push(connect.static(base));
+                        });
+
+                        // Make directory browse-able.
+                        var directory = options.directory || options.base[options.base.length - 1];
+                        middlewares.push(connect.directory(directory));
+
+                        return middlewares;
+                    },
+                    open: true,
                     base: '<%= yeoman.dist %>'
                 }
             }
@@ -422,6 +445,7 @@ module.exports = function (grunt) {
                             'views/{,*/}*.html',
                             'customization/*',
                             //'bower_components/**/*',
+                            //'bower_components/videogular-themes-default/videogular.css',
                             'images/{,*/}*.{webp}',
                             'fonts/*'
                         ]
@@ -536,7 +560,11 @@ module.exports = function (grunt) {
 
     grunt.registerTask('serve', function (target) {
         if (target === 'dist') {
-            return grunt.task.run(['build', 'connect:dist:keepalive']);
+            return grunt.task.run([
+                'build',
+                'configureProxies:server',
+                //'connect:livereload',
+                'connect:dist:keepalive']);
         }
 
         grunt.task.run([

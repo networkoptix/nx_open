@@ -1159,6 +1159,10 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
 
     QnMediaServerResourcePtr server = parameters.resource().dynamicCast<QnMediaServerResource>();
     if (!server)
+        /* If target server is not provided, open the server we are currently connected to. */
+        server = qnResPool->getResourceById(qnCommon->remoteGUID()).dynamicCast<QnMediaServerResource>();
+
+    if (!server)
         return;
 
     QUrl url(server->getApiUrl());
@@ -2423,11 +2427,11 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
 
 
     QString message = tr(
-        "Some components of the system are not upgraded:<br/>"
+        "Some components of the system are not updated:<br/>"
         "<br/>"
         "%1"
         "<br/>"
-        "Please upgrade all components to the latest version %2."
+        "Please update all components to the latest version %2."
     ).arg(components).arg(latestMsVersion.toString());
 
     QScopedPointer<QnWorkbenchStateDependentDialog<QMessageBox> > messageBox(
@@ -2438,7 +2442,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
     messageBox->setStandardButtons(QMessageBox::Cancel);
     setHelpTopic(messageBox.data(), Qn::VersionMismatch_Help);
 
-    QPushButton *updateButton = messageBox->addButton(tr("Upgrade..."), QMessageBox::HelpRole);
+    QPushButton *updateButton = messageBox->addButton(tr("Update..."), QMessageBox::HelpRole);
     connect(updateButton, &QPushButton::clicked, this, [this] {
         menu()->trigger(Qn::SystemUpdateAction);
     }, Qt::QueuedConnection);

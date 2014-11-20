@@ -15,7 +15,6 @@
 
 #include <utils/common/id.h>
 #include <utils/common/model_functions_fwd.h>
-#include <utils/common/software_version.h>
 #include <recording/time_period.h>
 
 
@@ -106,9 +105,6 @@ typedef QHash<QString, qreal> QnAspectRatioHash;
 Q_DECLARE_METATYPE(QnAspectRatioHash)
 
 
-typedef QList<QnSoftwareVersion> QnSoftwareVersionList;
-Q_DECLARE_METATYPE(QnSoftwareVersionList)
-
 // -------------------------------------------------------------------------- //
 // QnPtzHotkey
 // -------------------------------------------------------------------------- //
@@ -139,7 +135,7 @@ struct QnClientBackground {
     QnClientBackground():
         animationEnabled(true),
         animationMode(Qn::DefaultAnimation),
-        animationCustomColor(QColor()),
+        animationCustomColor(QColor(0, 0, 255, 51)),
         animationPeriodSec(120),
         imageEnabled(false),
         imageMode(Qn::StretchImage),

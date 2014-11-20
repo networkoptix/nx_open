@@ -54,6 +54,7 @@
 #include <network/default_tcp_connection_processor.h>
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/ec_api.h>
+#include <nx_ec/ec_proto_version.h>
 
 #include <platform/platform_abstraction.h>
 
@@ -916,7 +917,7 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
             if (m_needStop)
                 return;
         }
-        messageProcessor->processServerUserAttributesList( mediaServerUserAttributesList );
+        messageProcessor->resetServerUserAttributesList( mediaServerUserAttributesList );
 
         //read server's storages
         QnResourceList storages;
@@ -952,7 +953,7 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
             if (m_needStop)
                 return;
         }
-        messageProcessor->processCameraUserAttributesList( cameraUserAttributesList );
+        messageProcessor->resetCameraUserAttributesList( cameraUserAttributesList );
 
         // read properties dictionary
         ec2::ApiResourceParamWithRefDataList kvPairs;
@@ -963,7 +964,7 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
             if (m_needStop)
                 return;
         }
-        messageProcessor->processPropertyList( kvPairs );
+        messageProcessor->resetPropertyList( kvPairs );
 
         QnManualCameraInfoMap manualCameras;
         for(const QnSecurityCamResourcePtr &camera: cameras) {
@@ -984,7 +985,7 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
             if (m_needStop)
                 return;
         }
-        messageProcessor->processStatusList( statusList );
+        messageProcessor->resetStatusList( statusList );
     }
 
     {
@@ -1416,7 +1417,7 @@ void QnMain::run()
         MSSettings::roSettings()->remove("appserverHost");
         MSSettings::roSettings()->remove("appserverPort");
         MSSettings::roSettings()->remove("appserverLogin");
-        MSSettings::roSettings()->remove("appserverPassword");
+        MSSettings::roSettings()->setValue("appserverPassword", "");
         MSSettings::roSettings()->remove(PENDING_SWITCH_TO_CLUSTER_MODE);
         MSSettings::roSettings()->sync();
 
@@ -1601,10 +1602,10 @@ void QnMain::run()
     /* This key means that password should be forcibly changed in the database. */
     const QString passwordChangeKey = "appserverPassword";
     MSSettings::roSettings()->remove(OBSOLETE_SERVER_GUID);
-    MSSettings::roSettings()->remove(passwordChangeKey);
+    MSSettings::roSettings()->setValue(passwordChangeKey, "");
 #ifdef _DEBUG
     MSSettings::roSettings()->sync();
-    Q_ASSERT_X(!MSSettings::roSettings()->contains(passwordChangeKey), Q_FUNC_INFO, "appserverPassword could not be removed from the registry. Restart the server as Administrator");
+    Q_ASSERT_X(MSSettings::roSettings()->value(passwordChangeKey).toString().isEmpty(), Q_FUNC_INFO, "appserverPassword is not emptyu in registry. Restart the server as Administrator");
 #endif
 
     if (needToStop()) {
@@ -1622,13 +1623,16 @@ void QnMain::run()
     QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);
 
+    bool compatibilityMode = cmdLineArguments.devModeKey == lit("razrazraz");
+
     QString moduleName = qApp->applicationName();
     if( moduleName.startsWith( qApp->organizationName() ) )
         moduleName = moduleName.mid( qApp->organizationName().length() ).trimmed();
 
     QnModuleInformation selfInformation;
     selfInformation.type = moduleName;
-    selfInformation.customization = QnAppInfo::customizationName();
+    if (!compatibilityMode)
+        selfInformation.customization = QnAppInfo::customizationName();
     selfInformation.version = qnCommon->engineVersion();
     selfInformation.systemInformation = QnSystemInformation::currentSystemInformation();
     selfInformation.systemName = qnCommon->localSystemName();
@@ -1637,15 +1641,14 @@ void QnMain::run()
     //selfInformation.remoteAddresses = ;
     selfInformation.id = serverGuid();
     selfInformation.sslAllowed = MSSettings::roSettings()->value( nx_ms_conf::ALLOW_SSL_CONNECTIONS, nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS ).toBool();
+    selfInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
 
     qnCommon->setModuleInformation(selfInformation);
 
     m_moduleFinder = new QnModuleFinder( false );
     std::unique_ptr<QnModuleFinder> moduleFinderScopedPointer( m_moduleFinder );
-    if (cmdLineArguments.devModeKey == lit("razrazraz")) {
-        m_moduleFinder->setCompatibilityMode(true);
-        ec2ConnectionFactory->setCompatibilityMode(true);
-    }
+    m_moduleFinder->setCompatibilityMode(compatibilityMode);
+    ec2ConnectionFactory->setCompatibilityMode(compatibilityMode);
     if (!cmdLineArguments.allowedDiscoveryPeers.isEmpty()) {
         QList<QnUuid> allowedPeers;
         for (const QString &peer: cmdLineArguments.allowedDiscoveryPeers.split(";")) {

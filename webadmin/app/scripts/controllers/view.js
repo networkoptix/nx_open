@@ -6,23 +6,58 @@ angular.module('webadminApp').controller('ViewCtrl', function ($scope,$location,
     $scope.cameras = {};
     $scope.activeCamera = null;
 
-    $scope.selectCamera = function(activeCamera){
+    $scope.activeResolution = '320p';
+    $scope.availableResolutions = ['1080p', '720p', '640p', '320p', '240p'];
 
-        $location.path('/view/' + activeCamera.id, false);
+    $scope.settings = {id:null};
+    mediaserver.getSettings().then(function (r) {
+        $scope.settings = {
+            id: r.data.reply.id
+        };
+    });
 
-        $scope.activeCamera = activeCamera;
+    function getCamerasServer(camera){
+        return _.find($scope.mediaServers,function(server){
+            return server.id === camera.parentId;
+        });
+    }
+    function getServerUrl(server){
+        if( $scope.settings.id === server.id.replace('{','').replace('}','')){
+            return '';
+        }
+        return server.apiUrl.replace('http://','').replace('https://','');
+    }
+    function requestCameraRecords(camera){
+        mediaserver.getRecords(getServerUrl(getCamerasServer(camera)),camera.physicalId).then(function(data){
+            console.log(data.data);
+        });
+    }
+
+    function updateVideoSource(){
+        var cameraId = $scope.activeCamera.physicalId;
+        var server = getCamerasServer ($scope.activeCamera);
+        var serverUrl = '';
+        if( $scope.settings.id !== server.id.replace('{','').replace('}','')){
+            serverUrl = '/proxy/' + getServerUrl(server);
+        }
 
         $scope.acitveVideoSource = [
-            { src:'/media/'+ activeCamera.physicalId+'.webm', type:'video/webm' },
-            { src:'/media/'+ activeCamera.physicalId+'.mp4', type:'video/mp4' },
-            { src:'/hls/'+ activeCamera.physicalId+'.m3u' },
-            { src:'/hls/'+ activeCamera.physicalId+'.m3u8' },
-            { src:'/hls/'+ activeCamera.physicalId+'.mpegts' },
-            { src:'/hls/'+ activeCamera.physicalId+'.3gp' },
-            { src: '/hls/' + activeCamera.physicalId + '.mpjpeg' }
+            { src: serverUrl + '/media/' + cameraId + '.webm?resolution='   +  $scope.activeResolution, type:'video/webm' },
+            { src: serverUrl + '/media/' + cameraId + '.mp4?resolution='    +  $scope.activeResolution, type:'video/mp4' },
+            { src: serverUrl + '/hls/'   + cameraId + '.m3u?resolution='    +  $scope.activeResolution },
+            { src: serverUrl + '/hls/'   + cameraId + '.m3u8?resolution='   +  $scope.activeResolution },
+            { src: serverUrl + '/media/' + cameraId + '.mpegts?resolution=' +  $scope.activeResolution },
+            { src: serverUrl + '/media/' + cameraId + '.3gp?resolution='    +  $scope.activeResolution },
+            { src: serverUrl + '/media/' + cameraId + '.mpjpeg?resolution=' +  $scope.activeResolution }
         ];
+        console.log($scope.acitveVideoSource[0].src);
+    }
 
-
+    $scope.selectCamera = function(activeCamera){
+        $location.path('/view/' + activeCamera.id, false);
+        $scope.activeCamera = activeCamera;
+        updateVideoSource();
+        requestCameraRecords( activeCamera );
         return false;
     };
 
@@ -121,14 +156,6 @@ angular.module('webadminApp').controller('ViewCtrl', function ($scope,$location,
         getCameras();
     },function(){
         alert('network problem');
-    });
-
-    mediaserver.getSettings().then(function (r) {
-        $scope.settings = {
-            systemName: r.data.reply.systemName,
-            port: r.data.reply.port,
-            id: r.data.reply.id
-        };
     });
 
 

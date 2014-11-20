@@ -166,6 +166,9 @@ protected:
         return sendSyncGetRequest(object, QnRequestHeaderList(), params, reply);
     }
 
+    QnResource *targetResource() const;
+    virtual bool isReady() const;
+
 private:
     static bool connectProcessor(QnAbstractReplyProcessor *sender, const char *signal, QObject *receiver, const char *method, Qt::ConnectionType connectionType = Qt::AutoConnection);
 
