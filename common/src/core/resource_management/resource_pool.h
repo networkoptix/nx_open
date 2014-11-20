@@ -147,14 +147,16 @@ signals:
     void statusChanged(const QnResourcePtr &resource);
 
     void aboutToBeDestroyed();
-
+private:
+    void invalidateCache();
 private:
     mutable QMutex m_resourcesMtx;
     bool m_tranInProgress;
     QnResourceList m_tmpResources;
     QHash<QnUuid, QnResourcePtr> m_resources;
     QHash<QnUuid, QnResourcePtr> m_incompatibleResources;
-
+    mutable QMutex m_cacheMutex;
+    mutable QnMediaServerResourceList m_cachedServerList;
     /*!
         \return true, if \a resource has been inserted. false - if updated existing resource
     */
