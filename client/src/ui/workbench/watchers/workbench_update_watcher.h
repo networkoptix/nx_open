@@ -22,7 +22,7 @@ public slots:
     void stop();
 
 private slots:
-    void at_checker_updateAvailable(const QnSoftwareVersion &updateVersion);
+    void at_checker_updateAvailable(const QnSoftwareVersion &updateVersion, const QUrl &releaseNotesUrl);
 
 private:
     QnUpdateChecker *m_checker;

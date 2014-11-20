@@ -727,7 +727,7 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 
     factory(Qn::WebClientAction).
-        flags(Qn::Tree | Qn::NoTarget | Qn::SingleTarget | Qn::ResourceTarget).
+        flags(Qn::Tree | Qn::NoTarget).
         text(tr("Open Web Client...")).
         autoRepeat(false).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).

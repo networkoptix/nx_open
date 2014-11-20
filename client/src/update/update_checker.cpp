@@ -30,6 +30,7 @@ void QnUpdateChecker::at_networkReply_finished() {
 
     QByteArray data = reply->readAll();
     QVariantMap map = QJsonDocument::fromJson(data).toVariant().toMap();
+
     map = map.value(QnAppInfo::customizationName()).toMap();
 
     QString currentRelease = map.value(lit("current_release")).toString();
@@ -39,8 +40,10 @@ void QnUpdateChecker::at_networkReply_finished() {
     if (currentRelease.isEmpty())
         return;
 
+    QUrl releaseNotesUrl = map.value(lit("release_notes")).toUrl();
+
     map = map.value(lit("releases")).toMap();
     QnSoftwareVersion version(map.value(currentRelease).toString());
     if (!version.isNull())
-        emit updateAvailable(version);
+        emit updateAvailable(version, releaseNotesUrl);
 }

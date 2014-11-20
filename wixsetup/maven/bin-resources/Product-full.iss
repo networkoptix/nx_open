@@ -24,7 +24,7 @@ en.LaunchServer=Launch Server Installer
 
 ru.ClientIsAlreadyInstalled=Клиент уже установлен
 ru.ServerIsAlreadyInstalled=Сервер уже установлен
-ru.LaunchBoth=Запустить об инсталлятора
+ru.LaunchBoth=Запустить оба инсталлятора
 ru.LaunchClient=Запустить инсталлятор клиента
 ru.LaunchServer=Запустить инсталлятор сервера
 
