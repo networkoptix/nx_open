@@ -1417,7 +1417,7 @@ void QnMain::run()
         MSSettings::roSettings()->remove("appserverHost");
         MSSettings::roSettings()->remove("appserverPort");
         MSSettings::roSettings()->remove("appserverLogin");
-        MSSettings::roSettings()->remove("appserverPassword");
+        MSSettings::roSettings()->setValue("appserverPassword", "");
         MSSettings::roSettings()->remove(PENDING_SWITCH_TO_CLUSTER_MODE);
         MSSettings::roSettings()->sync();
 
@@ -1602,10 +1602,10 @@ void QnMain::run()
     /* This key means that password should be forcibly changed in the database. */
     const QString passwordChangeKey = "appserverPassword";
     MSSettings::roSettings()->remove(OBSOLETE_SERVER_GUID);
-    MSSettings::roSettings()->remove(passwordChangeKey);
+    MSSettings::roSettings()->setValue(passwordChangeKey, "");
 #ifdef _DEBUG
     MSSettings::roSettings()->sync();
-    Q_ASSERT_X(!MSSettings::roSettings()->contains(passwordChangeKey), Q_FUNC_INFO, "appserverPassword could not be removed from the registry. Restart the server as Administrator");
+    Q_ASSERT_X(MSSettings::roSettings()->value(passwordChangeKey).isEmpty(), Q_FUNC_INFO, "appserverPassword is not emptyu in registry. Restart the server as Administrator");
 #endif
 
     if (needToStop()) {
