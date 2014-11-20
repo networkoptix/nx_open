@@ -13,11 +13,13 @@ QnCameraUserAttributes::QnCameraUserAttributes()
     motionType(Qn::MT_Default),
     scheduleDisabled(true),
     audioEnabled(false),
-    cameraControlDisabled( !QnGlobalSettings::instance()->isCameraSettingsOptimizationEnabled() ),
+    cameraControlDisabled(false),
     secondaryQuality(Qn::SSQualityMedium),
     minDays(0),
     maxDays(0)
 {
+	if (QnGlobalSettings::instance())
+		cameraControlDisabled = !QnGlobalSettings::instance()->isCameraSettingsOptimizationEnabled();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         motionRegions << QnMotionRegion();
 }
