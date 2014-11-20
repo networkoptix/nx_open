@@ -331,6 +331,10 @@ QnAbstractReplyProcessor *QnMediaServerConnection::newReplyProcessor(int object)
     return new QnMediaServerReplyProcessor(object);
 }
 
+bool QnMediaServerConnection::isReady() const {
+    return targetResource() && targetResource()->getStatus() != Qn::Offline;
+}
+
 int QnMediaServerConnection::getThumbnailAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, const
                                                 int rotation, const QSize& size, const QString& imageFormat, RoundMethod method, QObject *target, const char *slot)
 {

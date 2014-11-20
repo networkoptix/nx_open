@@ -76,6 +76,9 @@ QString QnAbstractConnection::objectName(int object) const {
 }
 
 int QnAbstractConnection::sendAsyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, const char *replyTypeName, QObject *target, const char *slot) {
+    if (!isReady())
+        return -1;
+
     QnAbstractReplyProcessor *processor = nullptr;
 
     if (target && slot) {
@@ -167,5 +170,13 @@ int QnAbstractConnection::sendSyncPostRequest(int object, const QnRequestHeaderL
 
 int QnAbstractConnection::sendSyncPostRequest(int object, const QnRequestParamList &params, const QByteArray& data, QVariant *reply) {
     return sendSyncPostRequest(object, QnRequestHeaderList(), params, data, reply);
+}
+
+QnResource *QnAbstractConnection::targetResource() const {
+    return m_targetRes;
+}
+
+bool QnAbstractConnection::isReady() const {
+    return true;
 }
 
