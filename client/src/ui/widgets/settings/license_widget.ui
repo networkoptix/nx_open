@@ -197,31 +197,27 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,0,0">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0">
      <item>
-      <widget class="QLabel" name="boundToLabel">
-       <property name="text">
-        <string>License will be bound to:</string>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
        </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="serverIconLabel"/>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="serverNameLabel">
-       <property name="frame">
-        <bool>false</bool>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
        </property>
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-      </widget>
+      </spacer>
      </item>
      <item>
       <widget class="QPushButton" name="activateFreeLicenseButton">
        <property name="enabled">
         <bool>true</bool>
+       </property>
+       <property name="toolTip">
+        <string>License will be bound to the current server</string>
        </property>
        <property name="text">
         <string>Activate Free License</string>
@@ -232,6 +228,9 @@
       <widget class="QPushButton" name="activateLicenseButton">
        <property name="enabled">
         <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>License will be bound to the current server</string>
        </property>
        <property name="text">
         <string>Activate License</string>

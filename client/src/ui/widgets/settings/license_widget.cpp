@@ -6,16 +6,7 @@
 
 #include <QtWidgets/QMessageBox>
 
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkReply>
-#include <QtNetwork/QNetworkRequest>
-
 #include <common/common_module.h>
-
-#include <client/client_message_processor.h>
-
-#include <core/resource/media_server_resource.h>
-#include <core/resource_management/resource_pool.h>
 
 #include <licensing/license.h>
 
@@ -23,8 +14,6 @@
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/file_dialog.h>
 #include <ui/style/warning_style.h>
-#include <ui/style/resource_icon_cache.h>
-#include <ui/common/ui_resource_name.h>
 
 #include <utils/common/app_info.h>
 #include <utils/common/product_features.h>
@@ -58,9 +47,6 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent):
     setWarningStyle(ui->licenseKeyWarningLabel);
     ui->licenseKeyWarningLabel->setVisible(false);
 
-    ui->serverIconLabel->setPixmap(qnResIconCache->icon(QnResourceIconCache::Server).pixmap(18, 18));
-    setPaletteColor(ui->serverNameLabel, QPalette::Active, QPalette::Base, this->palette().color(QPalette::Window));
-
     connect(ui->onlineKeyEdit,              SIGNAL(textChanged(QString)),       this,   SLOT(updateControls()));
     connect(ui->activationTypeComboBox,     SIGNAL(currentIndexChanged(int)),   this,   SLOT(at_activationTypeComboBox_currentIndexChanged()));
     connect(ui->browseLicenseFileButton,    SIGNAL(clicked()),                  this,   SLOT(at_browseLicenseFileButton_clicked()));
@@ -89,10 +75,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent):
             && text.length() != ui->onlineKeyEdit->maxLength());
     });
 
-    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::initialResourcesReceived,    this,   &QnLicenseWidget::updateCurrentServer);
-
     updateControls();
-    updateCurrentServer();
 }
 
 QnLicenseWidget::~QnLicenseWidget() {
@@ -160,30 +143,6 @@ void QnLicenseWidget::updateControls() {
         ui->activateLicenseButton->setEnabled(false);
     }
 }
-
-void QnLicenseWidget::updateCurrentServer() {
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->remoteGUID()).dynamicCast<QnMediaServerResource>();
-    Q_ASSERT(server);
-
-    if (m_currentServer != server) {
-        if (m_currentServer)
-            disconnect(m_currentServer, NULL, this, NULL);
-        m_currentServer = server;
-        if (m_currentServer)
-            connect(m_currentServer, &QnResource::nameChanged, this, &QnLicenseWidget::updateCurrentServer);
-    }
-
-
-    bool valid = !server.isNull();
-
-    QString name = getResourceName(server);
-
-    ui->serverIconLabel->setVisible(valid);
-    ui->serverNameLabel->setVisible(valid);
-    ui->serverNameLabel->setText(name);
-    ui->serverNameLabel->setSelection(0,0);
-}
-
 
 // -------------------------------------------------------------------------- //
 // Handlers

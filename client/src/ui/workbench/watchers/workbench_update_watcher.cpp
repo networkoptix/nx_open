@@ -3,6 +3,8 @@
 #include <QtCore/QTimer>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMessageBox>
+#include <QtWidgets/QPushButton>
+#include <QtGui/QDesktopServices>
 
 #include <client/client_settings.h>
 #include <common/common_module.h>
@@ -10,10 +12,10 @@
 #include <ui/dialogs/checkable_message_box.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/style/globals.h>
 
 namespace {
     const int updatePeriodMSec = 60 * 60 * 1000; /* 1 hour. */
-    QColor redTextColor = Qt::red; // TODO: #dklychkov make it customizable
 } // anonymous namespace
 
 QnWorkbenchUpdateWatcher::QnWorkbenchUpdateWatcher(QObject *parent):
@@ -44,7 +46,7 @@ void QnWorkbenchUpdateWatcher::stop() {
     m_timer->stop();
 }
 
-void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnSoftwareVersion &updateVersion) {
+void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnSoftwareVersion &updateVersion, const QUrl &releaseNotesUrl) {
     if (updateVersion.isNull())
         return;
 
@@ -74,7 +76,7 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnSoftwareVersio
         message = tr("New version <b>%1</b> is available.").arg(updateVersion.toString());
         message += lit("<br/>");
         message += tr("Major issues have been fixed.");
-        message += lit("<br/><span style=\"color:%1;\">").arg(redTextColor.name());
+        message += lit("<br/><span style=\"color:%1;\">").arg(qnGlobals->errorTextColor().name());
         message += tr("Update is strongly recommended.");
         message += lit("</span><br/>");
         message += tr("Would you like to update?");
@@ -87,6 +89,14 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnSoftwareVersio
     messageBox.setCheckBoxText(tr("Don't notify again about this update."));
     messageBox.setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No);
     setHelpTopic(&messageBox, Qn::Upgrade_Help);
+
+    if (releaseNotesUrl.isValid()) {
+        QPushButton *button = messageBox.addButton(tr("Release Notes"), QDialogButtonBox::ActionRole);
+        connect(button, &QPushButton::clicked, this, [&releaseNotesUrl]() {
+            QDesktopServices::openUrl(releaseNotesUrl);
+        });
+    }
+
     int res = messageBox.exec();
 
     if (res == QnCheckableMessageBox::Accepted) {

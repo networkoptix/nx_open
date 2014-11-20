@@ -48,11 +48,9 @@ protected:
 
 private slots:
     void updateControls();
-    void updateCurrentServer();
 
     void at_browseLicenseFileButton_clicked();
     void at_activationTypeComboBox_currentIndexChanged();
-
 private:
     Q_DISABLE_COPY(QnLicenseWidget)
 
