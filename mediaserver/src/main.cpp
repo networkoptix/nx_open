@@ -1605,7 +1605,7 @@ void QnMain::run()
     MSSettings::roSettings()->setValue(passwordChangeKey, "");
 #ifdef _DEBUG
     MSSettings::roSettings()->sync();
-    Q_ASSERT_X(MSSettings::roSettings()->value(passwordChangeKey).isEmpty(), Q_FUNC_INFO, "appserverPassword is not emptyu in registry. Restart the server as Administrator");
+    Q_ASSERT_X(MSSettings::roSettings()->value(passwordChangeKey).toString().isEmpty(), Q_FUNC_INFO, "appserverPassword is not emptyu in registry. Restart the server as Administrator");
 #endif
 
     if (needToStop()) {
