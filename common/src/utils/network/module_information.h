@@ -25,7 +25,7 @@ struct QnModuleInformation {
 
     QnModuleInformation() : port(0), sslAllowed(false), protoVersion(0) {}
 
-    bool isCompatibleToCurrentSystem() const;
+    bool isCompatibleToCurrentSystem(bool ignoreProtoVersion = false) const;
     bool isLocal() const; //!< true if at least one address from \a remoteHostAddress is a local address
 };
 #define QnModuleInformation_Fields (type)(customization)(version)(systemInformation)(systemName)(name)(port)(remoteAddresses)(id)(sslAllowed)(authHash)(protoVersion)
