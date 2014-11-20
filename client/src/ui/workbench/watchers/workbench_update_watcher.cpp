@@ -9,6 +9,7 @@
 #include <client/client_settings.h>
 #include <common/common_module.h>
 #include <update/update_checker.h>
+#include <ui/dialogs/checkable_message_box.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
