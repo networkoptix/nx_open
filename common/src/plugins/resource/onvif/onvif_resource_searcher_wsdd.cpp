@@ -565,6 +565,9 @@ void fixDiscoveredName(QString& name, QString& manufacturer)
         manufacturer = lit("ISD");
         name = name.mid(4);
     }
+    else if (name == lit("networkcamera") && manufacturer.isEmpty()) {
+        name.clear(); // some DW cameras report invalid model in multicast and empty vendor
+    }
 }
 
 template <class T> 
