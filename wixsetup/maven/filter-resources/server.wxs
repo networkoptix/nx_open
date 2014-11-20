@@ -38,10 +38,8 @@
                     <RegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}">
                         <RegistryValue Type="string" Name="systemName" Value="[SYSTEM_NAME]"/>
                         <RegistryValue Type="string" Name="port" Value="[SERVER_PORT]"/>
-                        <RegistryValue Type="string" Name="allowCameraChanges" Value="[ALLOW_CAMERA_CHANGES]"/>
+                        <RegistryValue Type="string" Name="cameraSettingsOptimization" Value="[ALLOW_CAMERA_CHANGES]"/>
                     </RegistryKey>
-
-                    <RemoveRegistryValue Root="HKLM" Key="$(var.ECRegPath)" Name="allowCameraChanges"/>
                 </Component>
 
                 <Component Id="ServerConfigurationPassword">
