@@ -21,7 +21,7 @@ namespace ec2 {
 
         bool isAlive;
 
-        ApiModuleData() : protoVersion(0) {}
+        ApiModuleData() : port(0), sslAllowed(false), protoVersion(0), isAlive(false) {}
     };
 
 #define ApiModuleData_Fields (type)(id)(systemName)(version)(systemInformation)(addresses)(port)(isAlive)(customization)(name)(sslAllowed)(authHash)(protoVersion)

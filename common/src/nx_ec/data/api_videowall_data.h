@@ -7,7 +7,10 @@
 
 namespace ec2
 {
-    struct ApiVideowallItemData: ApiData {
+    struct ApiVideowallItemData: ApiData 
+    {
+        ApiVideowallItemData(): ApiData(), snapLeft(0), snapTop(0), snapRight(0), snapBottom(0) {}
+
         QnUuid guid;
         QnUuid pcGuid;
         QnUuid layoutGuid;
@@ -20,7 +23,10 @@ namespace ec2
 #define ApiVideowallItemData_Fields (guid)(pcGuid)(layoutGuid)(name)(snapLeft)(snapTop)(snapRight)(snapBottom)
 
 
-    struct ApiVideowallScreenData: ApiData {
+    struct ApiVideowallScreenData: ApiData 
+    {
+        ApiVideowallScreenData(): ApiData(), pcIndex(0), desktopLeft(0), desktopTop(0), desktopWidth(0), desktopHeight(0), layoutLeft(0), layoutTop(0), layoutWidth(0), layoutHeight(0) {}
+
         QnUuid pcGuid;
         int pcIndex;
         int desktopLeft;
@@ -62,7 +68,10 @@ namespace ec2
 #define ApiVideowallData_Fields ApiResourceData_Fields (autorun)(items)(screens)(matrices)
 
 
-    struct ApiVideowallControlMessageData: ApiData {
+    struct ApiVideowallControlMessageData: ApiData 
+    {
+        ApiVideowallControlMessageData(): operation(0) {}
+
         int operation;
         QnUuid videowallGuid;
         QnUuid instanceGuid;
