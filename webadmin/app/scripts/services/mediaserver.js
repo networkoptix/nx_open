@@ -4,7 +4,7 @@ angular.module('webadminApp')
     .factory('mediaserver', function ($http) {
 
         var cacheModuleInfo = null;
-
+        var cacheCurrentUser = null;
         return {
             getSettings: function(url) {
                 url = url || '';
@@ -42,8 +42,13 @@ angular.module('webadminApp')
                 url = url || '';
                 return $http.get(url + '/api/statistics');
             },
-            getCurrentUser:function(){return $http.post('/api/getCurrentUser');},
-            getRecords:function(serverUrl,physicalId,startTime,endTime,detail){
+            getCurrentUser:function(){
+                if(cacheCurrentUser === null){
+                    cacheCurrentUser = $http.get('/api/getCurrentUser');
+                }
+                return cacheCurrentUser;
+            },
+            getRecords:function(serverUrl,physicalId,startTime,endTime,detail,periodsType){
                 var d = new Date();
                 if(typeof(startTime)==='undefined'){
                     startTime = d.getTime() - 30*24*60*60*1000;
@@ -54,6 +59,11 @@ angular.module('webadminApp')
                 if(typeof(detail)==='undefined'){
                     detail = (endTime - startTime) / 1000;
                 }
+
+                if(typeof(periodsType)==='undefined'){
+                    periodsType = 0;
+                }
+
                 if(serverUrl !== '/' && serverUrl !== '' && serverUrl !== null){
                     serverUrl = '/proxy/'+ serverUrl + '/';
                 }
@@ -62,7 +72,8 @@ angular.module('webadminApp')
                     '?physicalId=' + physicalId +
                     '&startTime=' + startTime +
                     '&endTime=' + endTime +
-                    '&detail=' + detail );
+                    '&detail=' + detail +
+                    '&periodsType=' + periodsType);
             }
         };
     });

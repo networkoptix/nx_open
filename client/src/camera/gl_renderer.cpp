@@ -158,6 +158,7 @@ QnGLRenderer::~QnGLRenderer()
 void QnGLRenderer::beforeDestroy()
 {
     m_shaders.clear();
+	m_vertices.clear();
 }
 
 void QnGLRenderer::applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation)
@@ -576,8 +577,10 @@ void QnGLRenderer::drawBindedTexture( QnGLShaderProgram* shader , const float* v
     const int VERTEX_TEXCOORD0_SIZE = 2; // s and t
 
     if (!m_initialized) {
-        m_vertices.create();
-        m_vertices.bind();
+		if (!m_vertices)
+			m_vertices.reset(new QOpenGLVertexArrayObject());
+        m_vertices->create();
+        m_vertices->bind();
 
         m_positionBuffer.create();
         m_positionBuffer.setUsagePattern( QOpenGLBuffer::DynamicDraw );
@@ -596,7 +599,7 @@ void QnGLRenderer::drawBindedTexture( QnGLShaderProgram* shader , const float* v
         m_positionBuffer.release();
 
         m_textureBuffer.release();
-        m_vertices.release();
+        m_vertices->release();
 
         m_initialized = true;
     } else {
@@ -615,7 +618,7 @@ void QnGLRenderer::drawBindedTexture( QnGLShaderProgram* shader , const float* v
         shader->markInitialized();
     };
 
-    QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawBindedTextureOnQuadVao(&m_vertices, shader);
+    QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawBindedTextureOnQuadVao(m_vertices.data(), shader);
 }
 
 qint64 QnGLRenderer::lastDisplayedTime() const

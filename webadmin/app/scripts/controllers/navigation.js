@@ -3,13 +3,12 @@
 angular.module('webadminApp')
     .controller('NavigationCtrl', function ($scope, $location, mediaserver) {
         $scope.user = {
-            isAdmin:true
+            isAdmin: true
         };
 
         mediaserver.getCurrentUser().success(function(result){
             $scope.user = {
-                isAdmin:result.reply
-
+                isAdmin: result.reply.permissions & Config.globalEditServersPermissions
             };
         });
 

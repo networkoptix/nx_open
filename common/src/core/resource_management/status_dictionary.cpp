@@ -4,7 +4,7 @@ Qn::ResourceStatus QnResourceStatusDiscionary::value(const QnUuid& resourceId) c
 {
     QMutexLocker lock(&m_mutex);
     auto itr = m_items.find(resourceId);
-    return itr != m_items.end() ? itr.value() : Qn::NotDefined;
+    return itr != m_items.end() ? itr.value() : Qn::Offline;
 }
 
 void QnResourceStatusDiscionary::setValue(const QnUuid& resourceId, Qn::ResourceStatus status)
