@@ -1,5 +1,7 @@
 #include "camera_advanced_param_widgets_manager.h"
 
+#include <ui/widgets/properties/camera_advanced_param_widget_factory.h>
+
 QnCameraAdvancedParamWidgetsManager::QnCameraAdvancedParamWidgetsManager(QTreeWidget* groupWidget, QStackedWidget* contentsWidget, QObject* parent /*= NULL*/):
 	QObject(parent),
 	m_groupWidget(groupWidget),
@@ -8,12 +10,21 @@ QnCameraAdvancedParamWidgetsManager::QnCameraAdvancedParamWidgetsManager(QTreeWi
 
 }
 
-void QnCameraAdvancedParamWidgetsManager::displayParams(const QnCameraAdvancedParams &params) {
+void QnCameraAdvancedParamWidgetsManager::clear() {
 	disconnect(m_groupWidget, NULL, this, NULL);
 
+	for(QnAbstractCameraAdvancedParamWidget* widget: m_paramWidgetsById)
+		disconnect(widget, NULL, this, NULL);
+
+	m_paramWidgetsById.clear();
 	m_groupWidget->clear();
 	while (m_contentsWidget->count() > 0)
 		m_contentsWidget->removeWidget(m_contentsWidget->widget(0));
+}
+
+
+void QnCameraAdvancedParamWidgetsManager::displayParams(const QnCameraAdvancedParams &params) {
+	clear();
 
 	for (const QnCameraAdvancedParamGroup &group: params.groups)
 		createGroupWidgets(group);
@@ -28,6 +39,20 @@ void QnCameraAdvancedParamWidgetsManager::displayParams(const QnCameraAdvancedPa
 	if (m_groupWidget->topLevelItemCount() > 0)
 		m_groupWidget->setCurrentItem(m_groupWidget->topLevelItem(0));
 }
+
+void QnCameraAdvancedParamWidgetsManager::loadValues(const QHash<QString, QString> &valuesById) {
+	for (auto iter = m_paramWidgetsById.cbegin(); iter != m_paramWidgetsById.cend(); ++iter) {
+		QString id = iter.key();
+		if (!valuesById.contains(id))
+			continue;
+
+		auto widget = iter.value();
+		widget->setValue(valuesById[id]);
+		widget->setEnabled(true);
+		connect(widget, &QnAbstractCameraAdvancedParamWidget::valueChanged, this, &QnCameraAdvancedParamWidgetsManager::paramValueChanged);
+	}
+}
+
 
 void QnCameraAdvancedParamWidgetsManager::createGroupWidgets(const QnCameraAdvancedParamGroup &group, QTreeWidgetItem* parentItem) {
 	QTreeWidgetItem* item;
@@ -53,6 +78,31 @@ void QnCameraAdvancedParamWidgetsManager::createGroupWidgets(const QnCameraAdvan
 
 
 QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const std::vector<QnCameraAdvancedParameter> &params) {
-	QString title = params.empty() ? lit("empty params") : params.back().name;
-	return new QLabel(title, m_contentsWidget);
+
+	QScrollArea* listWidget = new QScrollArea(m_contentsWidget);
+	listWidget->setWidgetResizable(true);
+	
+	QFormLayout* formLayout = new QFormLayout(listWidget);
+	listWidget->setLayout(formLayout);
+
+	for(const QnCameraAdvancedParameter &param: params) {
+		QnAbstractCameraAdvancedParamWidget* widget = QnCameraAdvancedParamWidgetFactory::createWidget(param, listWidget);
+		if (!widget)
+			continue;
+
+		if (param.dataType != QnCameraAdvancedParameter::DataType::Button)
+			formLayout->addRow(param.name, widget);
+		else
+			formLayout->addRow(QString(), widget);
+
+		if (!param.getId().isEmpty()) {
+			m_paramWidgetsById[param.getId()] = widget;
+			/* Widget is disabled until it receive correct value. */
+			widget->setEnabled(false);
+		}
+	}
+
+	//listLayout->addStretch();
+
+	return listWidget;
 }
