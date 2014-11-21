@@ -224,6 +224,8 @@ void QnCamDisplay::addVideoRenderer(int channelCount, QnAbstractRenderer* vw, bo
         if (!m_display[i]) {
             m_display[i] = new QnVideoStreamDisplay(canDownscale, i);
             m_channelsCount++;
+            if (m_forceMtDecoding)
+                m_display[i]->setMTDecoding(true);
         }
         int rendersCount = m_display[i]->addRenderer(vw);
         m_multiView = rendersCount > 1;
@@ -429,22 +431,24 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
     //qDebug() << "vd->flags & QnAbstractMediaData::MediaFlags_FCZ" << (vd->flags & QnAbstractMediaData::MediaFlags_FCZ);
 
-    bool canSwitchToMT = isFullScreen() || qnRedAssController->counsumerCount() == 1;
-    bool shouldSwitchToMT = (m_isRealTimeSource && m_totalFrames > 100 && m_dataQueue.size() >= m_dataQueue.size()-1) || !m_isRealTimeSource;
-    if (canSwitchToMT && shouldSwitchToMT) {
-        if (!m_useMTRealTimeDecode) {
-            m_useMTRealTimeDecode = true;
-            setMTDecoding(true); 
+    if (!m_forceMtDecoding)
+    {
+        bool canSwitchToMT = isFullScreen() || qnRedAssController->counsumerCount() == 1;
+        bool shouldSwitchToMT = (m_isRealTimeSource && m_totalFrames > 100 && m_dataQueue.size() >= m_dataQueue.size()-1) || !m_isRealTimeSource;
+        if (canSwitchToMT && shouldSwitchToMT) {
+            if (!m_useMTRealTimeDecode) {
+                m_useMTRealTimeDecode = true;
+                setMTDecoding(true); 
+            }
+        }
+        else {
+            if (m_useMTRealTimeDecode) {
+                m_totalFrames = 0;
+                m_useMTRealTimeDecode = false;
+                setMTDecoding(false); 
+            }
         }
     }
-    else {
-        if (m_useMTRealTimeDecode) {
-            m_totalFrames = 0;
-            m_useMTRealTimeDecode = false;
-            setMTDecoding(false); 
-        }
-    }
-
 
     if (m_isRealTimeSource && vd && !isPrebuffering)
     {
@@ -906,13 +910,16 @@ void QnCamDisplay::processNewSpeed(float speed)
         m_audioDisplay->clearAudioBuffer();
     }
 
-    if (qAbs(speed) > 1.0 + FPS_EPS || speed < 0)
+    if (!m_forceMtDecoding) 
     {
-        for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; i++)
-            m_display[i]->setMTDecoding(true);
-    }
-    else if (speed != 0) {
-        setMTDecoding(m_useMtDecoding);
+        if (qAbs(speed) > 1.0 + FPS_EPS || speed < 0)
+        {
+            for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; i++)
+                m_display[i]->setMTDecoding(true);
+        }
+        else if (speed != 0) {
+            setMTDecoding(m_useMtDecoding);
+        }
     }
 
     if (speed < 0 && m_prevSpeed >= 0)
@@ -1330,7 +1337,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
             vd = nextInOutVideodata(incoming, channel);
 
             if (vd) {
-                if (!m_useMtDecoding && (!m_isRealTimeSource || m_forceMtDecoding))
+                if (!m_useMtDecoding && !m_isRealTimeSource)
                     setMTDecoding(true);
 
                 bool ignoreVideo = vd->flags & QnAbstractMediaData::MediaFlags_Ignore;
@@ -1400,10 +1407,14 @@ void QnCamDisplay::playAudio(bool play)
         else
             m_audioDisplay->resume();
     }
-    if (m_isRealTimeSource)
-        setMTDecoding(play && (m_useMTRealTimeDecode || m_forceMtDecoding));
-    else
-        setMTDecoding(play);
+
+    if (!m_forceMtDecoding) 
+    {
+        if (m_isRealTimeSource)
+            setMTDecoding(play && m_useMTRealTimeDecode);
+        else
+            setMTDecoding(play);
+    }
 }
 
 void QnCamDisplay::pauseAudio()
@@ -1413,7 +1424,8 @@ void QnCamDisplay::pauseAudio()
         QMutexLocker lock(&m_audioChangeMutex);
         m_audioDisplay->suspend();
     }
-    setMTDecoding(false);
+    if (!m_forceMtDecoding)
+        setMTDecoding(false);
 }
 
 //==========================================================================
