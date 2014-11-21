@@ -102,8 +102,8 @@ namespace {
                 ignoredList.append(url);
 
             QVariantMap map;
-            map[lit("used")] = usedList;
-            map[lit("ignored")] = ignoredList;
+            map.insert(lit("used"), usedList);
+            map.insert(lit("ignored"), ignoredList);
 
             rules[id.toString()] = map;
         }
