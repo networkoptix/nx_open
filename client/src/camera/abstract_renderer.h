@@ -31,6 +31,8 @@ public:
      */
     virtual void waitForFrameDisplayed(int channel) = 0;
 
+    virtual void waitForQueueLessThan(int channel, int count) = 0;
+
     /**
      * Upon return there is no frames to display and renderer has finished displaying current frame
     */

@@ -188,7 +188,8 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
 
     // quality control
 
-    if (/*(media->flags & AV_PKT_FLAG_KEY) &&*/ m_dataQueue.size() > m_dataQueue.maxSize() && dataQueueDuration() > TO_LOWQ_SWITCH_MIN_QUEUE_DURATION)
+    if (m_dataQueue.size() > MAX_DATA_QUEUE_SIZE ||
+       (m_dataQueue.size() > m_dataQueue.maxSize() && dataQueueDuration() > TO_LOWQ_SWITCH_MIN_QUEUE_DURATION))
     {
         m_dataQueue.lock();
         bool clearHiQ = m_liveQuality != MEDIA_Quality_Low; // remove LQ packets, keep HQ
