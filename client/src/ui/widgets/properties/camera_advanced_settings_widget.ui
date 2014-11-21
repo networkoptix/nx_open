@@ -53,16 +53,7 @@
         <widget class="QStackedWidget" name="manualSettingsWidget">
          <widget class="QWidget" name="manualLoadingPage">
           <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
+           <property name="margin">
             <number>0</number>
            </property>
            <item>
@@ -98,16 +89,7 @@
          </widget>
          <widget class="QWidget" name="manualContentPage">
           <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,1,0">
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
+           <property name="margin">
             <number>0</number>
            </property>
            <item>
@@ -132,9 +114,7 @@
                </property>
               </column>
              </widget>
-             <widget class="QStackedWidget" name="propertiesStackedWidget">
-              <widget class="QWidget" name="emptyPage"/>
-             </widget>
+             <widget class="QStackedWidget" name="propertiesStackedWidget"/>
             </widget>
            </item>
            <item>
@@ -166,8 +146,8 @@
      <widget class="QWidget" name="webPage">
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QWebView" name="webView">
-         <property name="url">
+        <widget class="QWebView" name="webView" native="true">
+         <property name="url" stdset="0">
           <url>
            <string>about:blank</string>
           </url>

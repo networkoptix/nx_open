@@ -31,38 +31,38 @@ namespace QnXmlTag {
 	const QString readOnly			= lit("readOnly");
 }
 
-CameraAdvancedParameter::CameraAdvancedParameter():
+QnCameraAdvancedParameter::QnCameraAdvancedParameter():
     dataType(DataType::None),
     readOnly(false)
 {
 
 }
 
-QString CameraAdvancedParameter::getId() const {
+QString QnCameraAdvancedParameter::getId() const {
 	return query;
 }
 
-QString CameraAdvancedParameter::dataTypeToString(DataType value) {
+QString QnCameraAdvancedParameter::dataTypeToString(DataType value) {
 	switch (value) {
-	case CameraAdvancedParameter::DataType::Bool:
+	case QnCameraAdvancedParameter::DataType::Bool:
 		return lit("Bool");
-	case CameraAdvancedParameter::DataType::MinMaxStep:
+	case QnCameraAdvancedParameter::DataType::MinMaxStep:
 		return lit("MinMaxStep");
-	case CameraAdvancedParameter::DataType::Enumeration:
+	case QnCameraAdvancedParameter::DataType::Enumeration:
 		return lit("Enumeration");
-	case CameraAdvancedParameter::DataType::Button:
+	case QnCameraAdvancedParameter::DataType::Button:
 		return lit("Button");
-	case CameraAdvancedParameter::DataType::String:
+	case QnCameraAdvancedParameter::DataType::String:
 		return lit("String");
-	case CameraAdvancedParameter::DataType::ControlButtonsPair:
+	case QnCameraAdvancedParameter::DataType::ControlButtonsPair:
 		return lit("ControlButtonsPair");
 	default:
 		return QString();
 	}
 }
 
-CameraAdvancedParameter::DataType CameraAdvancedParameter::stringToDataType(const QString &value) {
-	static QList<CameraAdvancedParameter::DataType> allDataTypes;
+QnCameraAdvancedParameter::DataType QnCameraAdvancedParameter::stringToDataType(const QString &value) {
+	static QList<QnCameraAdvancedParameter::DataType> allDataTypes;
 	if (allDataTypes.isEmpty())
 		allDataTypes 
 		<< DataType::Bool 
@@ -78,11 +78,11 @@ CameraAdvancedParameter::DataType CameraAdvancedParameter::stringToDataType(cons
 }
 
 
-void CameraAdvancedParamGroup::merge(const CameraAdvancedParamGroup &other) {
-	for (const CameraAdvancedParamGroup &group: other.groups) {
+void QnCameraAdvancedParamGroup::merge(const QnCameraAdvancedParamGroup &other) {
+	for (const QnCameraAdvancedParamGroup &group: other.groups) {
 		QString groupName = group.name;
 
-		auto iter = boost::range::find_if(this->groups, [groupName](const CameraAdvancedParamGroup &group) {
+		auto iter = boost::range::find_if(this->groups, [groupName](const QnCameraAdvancedParamGroup &group) {
 			return group.name == groupName;
 		});
 		if (iter == boost::end(this->groups))
@@ -91,10 +91,10 @@ void CameraAdvancedParamGroup::merge(const CameraAdvancedParamGroup &other) {
 			iter->merge(group);
 	}
 
-	for (const CameraAdvancedParameter &param: other.params) {
+	for (const QnCameraAdvancedParameter &param: other.params) {
 		QString paramName = param.name;
 
-		auto iter = boost::range::find_if(this->params, [paramName](const CameraAdvancedParameter &param) {
+		auto iter = boost::range::find_if(this->params, [paramName](const QnCameraAdvancedParameter &param) {
 			return param.name == paramName;
 		});
 		/* Parameter should be just replaced. */
@@ -105,11 +105,11 @@ void CameraAdvancedParamGroup::merge(const CameraAdvancedParamGroup &other) {
 }
 
 
-void CameraAdvancedParams::merge(const CameraAdvancedParams &other) {
-	for (const CameraAdvancedParamGroup &group: other.groups) {
+void QnCameraAdvancedParams::merge(const QnCameraAdvancedParams &other) {
+	for (const QnCameraAdvancedParamGroup &group: other.groups) {
 		QString groupName = group.name;
 
-		auto iter = boost::range::find_if(this->groups, [groupName](const CameraAdvancedParamGroup &group) {
+		auto iter = boost::range::find_if(this->groups, [groupName](const QnCameraAdvancedParamGroup &group) {
 			return group.name == groupName;
 		});
 		if (iter == boost::end(this->groups))
@@ -121,12 +121,12 @@ void CameraAdvancedParams::merge(const CameraAdvancedParams &other) {
 }
 
 
-bool CameraAdvancedParamsTree::isEmpty() const {
+bool QnCameraAdvancedParamsTree::isEmpty() const {
 	return cameraTypeName.isEmpty() && children.empty();
 }
 
-CameraAdvancedParams CameraAdvancedParamsTree::flatten(const QString &cameraTypeName) const {
-	CameraAdvancedParams result = this->params;
+QnCameraAdvancedParams QnCameraAdvancedParamsTree::flatten(const QString &cameraTypeName) const {
+	QnCameraAdvancedParams result = this->params;
 
 	if (this->cameraTypeName == cameraTypeName)
 		return result;
@@ -138,17 +138,17 @@ CameraAdvancedParams CameraAdvancedParamsTree::flatten(const QString &cameraType
 	return result;
 }
 
-bool CameraAdvancedParamsTree::containsSubTree(const QString &cameraTypeName) const {
+bool QnCameraAdvancedParamsTree::containsSubTree(const QString &cameraTypeName) const {
 	return cameraTypeName.isEmpty() 
 		|| cameraTypeName == this->cameraTypeName 
-		|| boost::algorithm::any_of(children, [cameraTypeName](const CameraAdvancedParamsTree &child){return child.containsSubTree(cameraTypeName);});
+		|| boost::algorithm::any_of(children, [cameraTypeName](const QnCameraAdvancedParamsTree &child){return child.containsSubTree(cameraTypeName);});
 }
 
 
 
 QnCameraAdvancedParamsReader::QnCameraAdvancedParamsReader() {}
 
-CameraAdvancedParams QnCameraAdvancedParamsReader::params(const QnResourcePtr &resource) const {
+QnCameraAdvancedParams QnCameraAdvancedParamsReader::params(const QnResourcePtr &resource) const {
 	Q_ASSERT(resource);
 
 	QnUuid id = resource->getId();
@@ -163,8 +163,8 @@ CameraAdvancedParams QnCameraAdvancedParamsReader::params(const QnResourcePtr &r
 	if( !cameraSettingsXml.isEmpty() ) {
 		QBuffer dataSource;
 		dataSource.setData( cameraSettingsXml.toUtf8() );
-		CameraAdvancedParamsTree params = readXml(&dataSource);
-		CameraAdvancedParams result = params.flatten();
+		QnCameraAdvancedParamsTree params = readXml(&dataSource);
+		QnCameraAdvancedParams result = params.flatten();
 
 		/* Cache result for future use. */
 		m_paramsByCameraId[id] = result;
@@ -183,9 +183,9 @@ CameraAdvancedParams QnCameraAdvancedParamsReader::params(const QnResourcePtr &r
 
 	const QString cameraType = calculateCameraType(resource);
 	if (cameraType.isEmpty())
-		return CameraAdvancedParams();
+		return QnCameraAdvancedParams();
 
-	CameraAdvancedParams result = m_defaultParamsTree.flatten(cameraType);
+	QnCameraAdvancedParams result = m_defaultParamsTree.flatten(cameraType);
 	/* Cache result for future use. */
 	m_paramsByCameraId[id] = result;
 	return result;
@@ -195,16 +195,16 @@ QString QnCameraAdvancedParamsReader::calculateCameraType(const QnResourcePtr &r
 	return resource->getProperty( Qn::CAMERA_SETTINGS_ID_PARAM_NAME );
 }
 
-void QnCameraAdvancedParamsReader::buildTree(const QMultiMap<QString, CameraAdvancedParamsTree> &source, CameraAdvancedParamsTree &out) const {
+void QnCameraAdvancedParamsReader::buildTree(const QMultiMap<QString, QnCameraAdvancedParamsTree> &source, QnCameraAdvancedParamsTree &out) const {
 	auto range = source.values(out.cameraTypeName);
-	for (CameraAdvancedParamsTree& child: range) {
+	for (QnCameraAdvancedParamsTree& child: range) {
 		buildTree(source, child);
 		out.children.push_back(child);
 	}
 }
 
-CameraAdvancedParamsTree QnCameraAdvancedParamsReader::readXml(QIODevice *xmlSource) const {
-	CameraAdvancedParamsTree result;
+QnCameraAdvancedParamsTree QnCameraAdvancedParamsReader::readXml(QIODevice *xmlSource) const {
+	QnCameraAdvancedParamsTree result;
 
 	QDomDocument xmlDom;
 	{
@@ -225,13 +225,13 @@ CameraAdvancedParamsTree QnCameraAdvancedParamsReader::readXml(QIODevice *xmlSou
 		return result;
 	}
 
-	QMultiMap<QString, CameraAdvancedParamsTree> treesByParentId;
+	QMultiMap<QString, QnCameraAdvancedParamsTree> treesByParentId;
 
 	for (QDomNode node = root.firstChild(); !node.isNull(); node = node.nextSibling()) {
 		if (node.toElement().tagName() != QnXmlTag::cameraType)
 			continue;
 
-		CameraAdvancedParamsTree cameraTree;
+		QnCameraAdvancedParamsTree cameraTree;
 		cameraTree.cameraTypeName = node.attributes().namedItem(QnXmlTag::cameraTypeName).nodeValue();
 		cameraTree.params = parseCameraXml(node.toElement());
 		
@@ -244,43 +244,43 @@ CameraAdvancedParamsTree QnCameraAdvancedParamsReader::readXml(QIODevice *xmlSou
 	return result;
 }
 
-CameraAdvancedParams QnCameraAdvancedParamsReader::parseCameraXml(const QDomElement& cameraXml) const {
-	CameraAdvancedParams result;
+QnCameraAdvancedParams QnCameraAdvancedParamsReader::parseCameraXml(const QDomElement& cameraXml) const {
+	QnCameraAdvancedParams result;
 	for (QDomNode node = cameraXml.firstChild(); !node.isNull(); node = node.nextSibling()) {
 		if (node.nodeName() != QnXmlTag::group) 
 			continue;
 		
-		CameraAdvancedParamGroup group = parseGroupXml(node.toElement());
+		QnCameraAdvancedParamGroup group = parseGroupXml(node.toElement());
 		result.groups.push_back(group);
 	}
 	return result;
 }
 
-CameraAdvancedParamGroup QnCameraAdvancedParamsReader::parseGroupXml(const QDomElement &groupXml) const {
-	CameraAdvancedParamGroup result;
+QnCameraAdvancedParamGroup QnCameraAdvancedParamsReader::parseGroupXml(const QDomElement &groupXml) const {
+	QnCameraAdvancedParamGroup result;
 
 	result.name = groupXml.attribute(QnXmlTag::name);
 	result.description = groupXml.attribute(QnXmlTag::description);
 
 	for (QDomNode node = groupXml.firstChild(); !node.isNull(); node = node.nextSibling()) {
 		if (node.nodeName() == QnXmlTag::group) {
-			CameraAdvancedParamGroup group = parseGroupXml(node.toElement());
+			QnCameraAdvancedParamGroup group = parseGroupXml(node.toElement());
 			result.groups.push_back(group);
 		} else if (node.nodeName() == QnXmlTag::param) {
-			CameraAdvancedParameter param = parseElementXml(node.toElement());
+			QnCameraAdvancedParameter param = parseElementXml(node.toElement());
 			result.params.push_back(param);
 		}
 	}
 	return result;
 }
 
-CameraAdvancedParameter QnCameraAdvancedParamsReader::parseElementXml(const QDomElement &elementXml) const {
-	CameraAdvancedParameter result;
+QnCameraAdvancedParameter QnCameraAdvancedParamsReader::parseElementXml(const QDomElement &elementXml) const {
+	QnCameraAdvancedParameter result;
 
 	result.name = elementXml.attribute(QnXmlTag::name);
 	result.description = elementXml.attribute(QnXmlTag::description);
 	result.query = elementXml.attribute(QnXmlTag::query);
-	result.dataType = CameraAdvancedParameter::stringToDataType(elementXml.attribute(QnXmlTag::dataType));
+	result.dataType = QnCameraAdvancedParameter::stringToDataType(elementXml.attribute(QnXmlTag::dataType));
 	result.method = elementXml.attribute(QnXmlTag::method);
 	result.min = elementXml.attribute(QnXmlTag::min);
 	result.max = elementXml.attribute(QnXmlTag::max);
@@ -291,17 +291,17 @@ CameraAdvancedParameter QnCameraAdvancedParamsReader::parseElementXml(const QDom
 }
 
 
-bool deserialize(QnJsonContext *, const QJsonValue &value, CameraAdvancedParameter::DataType *target) {
-	*target = CameraAdvancedParameter::stringToDataType(value.toString());
+bool deserialize(QnJsonContext *, const QJsonValue &value, QnCameraAdvancedParameter::DataType *target) {
+	*target = QnCameraAdvancedParameter::stringToDataType(value.toString());
 	return true;
 }
 
-void serialize(QnJsonContext *ctx, const CameraAdvancedParameter::DataType &value, QJsonValue *target) {
-	QJson::serialize(ctx, CameraAdvancedParameter::dataTypeToString(value), target);
+void serialize(QnJsonContext *ctx, const QnCameraAdvancedParameter::DataType &value, QJsonValue *target) {
+	QJson::serialize(ctx, QnCameraAdvancedParameter::dataTypeToString(value), target);
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-	CameraAdvancedParameterTypes,
+	QnCameraAdvancedParameterTypes,
 	(json),
 	_Fields,
 	(optional, true)

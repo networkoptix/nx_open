@@ -16,6 +16,8 @@ class QNetworkReply;
 class CameraSettingsWidgetsTreeCreator;
 class CameraAdvancedSettingsWebPage;
 class CameraSetting;
+class QnCameraAdvancedParamsReader;
+class QnCameraAdvancedParamWidgetsManager;
 
 class QnCameraAdvancedSettingsWidget : public Connective<QWidget> {
     Q_OBJECT
@@ -62,10 +64,11 @@ private:
     void setPage(Page page);
 
     QScopedPointer<Ui::CameraAdvancedSettingsWidget> ui;
+	QScopedPointer<QnCameraAdvancedParamsReader> m_advancedParamsReader;
+	QScopedPointer<QnCameraAdvancedParamWidgetsManager> m_advancedParamWidgetsManager;
     Page m_page;
     QnVirtualCameraResourcePtr m_camera;
     QMutex m_cameraMutex;
-    CameraSettingsWidgetsTreeCreator* m_widgetsRecreator;
     CameraAdvancedSettingsWebPage* m_cameraAdvancedSettingsWebPage;
     QUrl m_lastCameraPageUrl;
     int m_paramRequestHandle;

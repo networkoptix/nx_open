@@ -1,11 +1,14 @@
 #ifndef QN_CAMERA_ADVANCED_PARAM
 #define QN_CAMERA_ADVANCED_PARAM
 
+#include <QtCore/QHash>
+
 #include <core/resource/resource_fwd.h>
 
 #include <utils/common/model_functions_fwd.h>
+#include <utils/common/uuid.h>
 
-struct CameraAdvancedParameter {
+struct QnCameraAdvancedParameter {
     enum class DataType {
         None,
         Bool,
@@ -28,40 +31,40 @@ struct CameraAdvancedParameter {
     QString step;
     bool readOnly;
 
-    CameraAdvancedParameter();
+    QnCameraAdvancedParameter();
 
 	static QString dataTypeToString(DataType value);
 	static DataType stringToDataType(const QString &value);
 };
-#define CameraAdvancedParameter_Fields (name)(description)(query)(dataType)(method)(min)(max)(step)(readOnly)
+#define QnCameraAdvancedParameter_Fields (name)(description)(query)(dataType)(method)(min)(max)(step)(readOnly)
 
-struct CameraAdvancedParamGroup {
+struct QnCameraAdvancedParamGroup {
     QString name;
     QString description;
-    std::vector<CameraAdvancedParamGroup> groups;
-    std::vector<CameraAdvancedParameter> params;
+    std::vector<QnCameraAdvancedParamGroup> groups;
+    std::vector<QnCameraAdvancedParameter> params;
 
-	void merge(const CameraAdvancedParamGroup &other);
+	void merge(const QnCameraAdvancedParamGroup &other);
 };
-#define CameraAdvancedParamGroup_Fields (name)(description)(groups)(params)
+#define QnCameraAdvancedParamGroup_Fields (name)(description)(groups)(params)
 
-struct CameraAdvancedParams {
-    std::vector<CameraAdvancedParamGroup> groups;
+struct QnCameraAdvancedParams {
+    std::vector<QnCameraAdvancedParamGroup> groups;
 
-	void merge(const CameraAdvancedParams &other);
+	void merge(const QnCameraAdvancedParams &other);
 };
-#define CameraAdvancedParams_Fields (groups)
+#define QnCameraAdvancedParams_Fields (groups)
 
-struct CameraAdvancedParamsTree {
+struct QnCameraAdvancedParamsTree {
 	QString cameraTypeName;
-	std::vector<CameraAdvancedParamsTree> children;
+	std::vector<QnCameraAdvancedParamsTree> children;
 
-	CameraAdvancedParams params;
+	QnCameraAdvancedParams params;
 
 	bool isEmpty() const;
 
 	bool containsSubTree(const QString &cameraTypeName) const;
-	CameraAdvancedParams flatten(const QString &cameraTypeName = QString()) const;
+	QnCameraAdvancedParams flatten(const QString &cameraTypeName = QString()) const;
 };
 
 /** Class for reading camera advanced parameters xml file. */
@@ -70,32 +73,32 @@ public:
     QnCameraAdvancedParamsReader();
 
 	/** Get parameters tree for the given camera. */
-	CameraAdvancedParams params(const QnResourcePtr &resource) const;
+	QnCameraAdvancedParams params(const QnResourcePtr &resource) const;
 private:
 	/** Get inner camera type that is used in the xml as node id. */
 	QString calculateCameraType(const QnResourcePtr &resource) const;
 
 	/** Parse xml and add its contents to the inner structure. */
-	CameraAdvancedParamsTree readXml(QIODevice *xmlSource) const;
+	QnCameraAdvancedParamsTree readXml(QIODevice *xmlSource) const;
 
-	CameraAdvancedParams parseCameraXml(const QDomElement &cameraXml) const;
-	CameraAdvancedParamGroup parseGroupXml(const QDomElement &groupXml) const;
-	CameraAdvancedParameter parseElementXml(const QDomElement &elementXml) const;
+	QnCameraAdvancedParams parseCameraXml(const QDomElement &cameraXml) const;
+	QnCameraAdvancedParamGroup parseGroupXml(const QDomElement &groupXml) const;
+	QnCameraAdvancedParameter parseElementXml(const QDomElement &elementXml) const;
 
-	void buildTree(const QMultiMap<QString, CameraAdvancedParamsTree> &source, CameraAdvancedParamsTree &out) const;
+	void buildTree(const QMultiMap<QString, QnCameraAdvancedParamsTree> &source, QnCameraAdvancedParamsTree &out) const;
 
 private:
 	/* Per-camera parameters cache. */
-	mutable QHash<QnUuid, CameraAdvancedParams> m_paramsByCameraId;
+	mutable QHash<QnUuid, QnCameraAdvancedParams> m_paramsByCameraId;
 
 	/* Default parameters tree. */
-	mutable CameraAdvancedParamsTree m_defaultParamsTree;
+	mutable QnCameraAdvancedParamsTree m_defaultParamsTree;
 };
 
-#define CameraAdvancedParameterTypes (CameraAdvancedParameter)(CameraAdvancedParamGroup)(CameraAdvancedParams)
+#define QnCameraAdvancedParameterTypes (QnCameraAdvancedParameter)(QnCameraAdvancedParamGroup)(QnCameraAdvancedParams)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-	CameraAdvancedParameterTypes,
+	QnCameraAdvancedParameterTypes,
 	(json)
 	)
 
