@@ -332,7 +332,11 @@ QnAbstractReplyProcessor *QnMediaServerConnection::newReplyProcessor(int object)
 }
 
 bool QnMediaServerConnection::isReady() const {
-    return targetResource() && targetResource()->getStatus() != Qn::Offline;
+    if (!targetResource())
+        return false;
+
+    Qn::ResourceStatus status = targetResource()->getStatus();
+    return status != Qn::Offline && status != Qn::NotDefined;
 }
 
 int QnMediaServerConnection::getThumbnailAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, const
