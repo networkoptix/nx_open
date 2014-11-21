@@ -47,6 +47,9 @@ namespace ite
         static void updateInfo(nxcip::CameraInfo& cameraInfo, unsigned short rxID, unsigned frequency);
         static void parseInfo(const nxcip::CameraInfo& cameraInfo, unsigned short& txID, unsigned short& rxID, unsigned& frequency);
 
+        void updateRxDevices();
+        void updateTxLinks(unsigned chan);
+
     private:
         typedef std::shared_ptr<CameraManager> CameraPtr;
 
@@ -60,8 +63,6 @@ namespace ite
         RCShell rcShell_;
 
         static void getRxDevNames(std::vector<std::string>& names);
-        void updateRxDevices();
-        void updateTxLinks();
         void checkLink(unsigned short txID, unsigned short rxID, unsigned frequency);
 
         void addTxLinks(const std::vector<IDsLink>&);

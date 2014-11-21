@@ -757,8 +757,13 @@ namespace ite
 
             if (streamsCount)
             {
-                m_readThread = std::thread( ReadThread(this, m_libAV.get()) );
-                m_hasThread = true;
+                try
+                {
+                    m_readThread = std::thread( ReadThread(this, m_libAV.get()) );
+                    m_hasThread = true;
+                }
+                catch (std::system_error& )
+                {}
             }
         }
     }
@@ -790,9 +795,6 @@ namespace ite
         }
 
         std::lock_guard<std::mutex> lock( m_encMutex ); // LOCK
-
-        for (auto it = m_encoders.begin(); it != m_encoders.end(); ++it)
-            (*it)->releaseRef();
         m_encoders.clear();
         m_encQueues.clear();
 

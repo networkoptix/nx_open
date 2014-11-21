@@ -30,6 +30,7 @@ namespace ite
     private:
         CameraManager* m_cameraManager;
         int m_encoderNumber;
+        //unsigned m_DEBUG_refCounter;
     };
 }
 

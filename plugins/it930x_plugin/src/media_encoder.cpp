@@ -6,12 +6,27 @@
 
 namespace ite
 {
+#if 1
     DEFAULT_REF_COUNTER(MediaEncoder)
+#else
+    unsigned int MediaEncoder::addRef()
+    {
+        ++m_DEBUG_refCounter;
+        return m_refManager.addRef();
+    }
+
+    unsigned int MediaEncoder::releaseRef()
+    {
+        --m_DEBUG_refCounter;
+        return m_refManager.releaseRef();
+    }
+#endif
 
     MediaEncoder::MediaEncoder(CameraManager * const cameraManager, int encoderNumber)
     :   m_refManager( this ),
         m_cameraManager( cameraManager ),
         m_encoderNumber( encoderNumber )
+        //m_DEBUG_refCounter(0)
     {
     }
 

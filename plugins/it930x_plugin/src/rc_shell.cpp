@@ -471,7 +471,7 @@ void RCShell::updateDevIDs()
             //if (devs_[i]->isOn())
             //{
                 devs_[i]->getTransmissionParameters();
-                //devs_[i]->wait();
+                devs_[i]->wait();
             //}
         }
     }

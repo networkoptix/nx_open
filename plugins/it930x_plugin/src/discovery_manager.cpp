@@ -20,13 +20,63 @@ extern "C"
     }
 }
 
-namespace
-{
-    static const char* VENDOR_NAME = "ITE";
-}
-
 namespace ite
 {
+    static const char * VENDOR_NAME = "ITE";
+
+    class RCUpdateDevsThread;
+    static RCUpdateDevsThread * updateThreadObj = nullptr;
+    static std::thread updateThread;
+
+    class RCUpdateDevsThread
+    {
+    public:
+        RCUpdateDevsThread(DiscoveryManager * discovery, RCShell * shell)
+        :   m_stopMe(false),
+            m_discovery(discovery),
+            m_rcShell(shell)
+        {}
+
+        RCUpdateDevsThread(const RCUpdateDevsThread& rct)
+        :   m_stopMe(false),
+            m_discovery(rct.m_discovery),
+            m_rcShell(rct.m_rcShell)
+        {}
+
+        void operator () ()
+        {
+            static const unsigned WAIT_RC_TIMEOUT_S = 4;
+            static std::chrono::seconds dura( WAIT_RC_TIMEOUT_S );
+            static std::chrono::milliseconds ms10(10);
+
+            updateThreadObj = this;
+
+            while (!m_stopMe)
+            {
+                m_discovery->updateRxDevices();
+
+                for (size_t ch = 0; ch < DeviceInfo::CHANNELS_NUM; ++ch)
+                {
+                    m_discovery->updateTxLinks(ch);
+                    std::this_thread::sleep_for(ms10); // free devices for a while
+                }
+
+                std::this_thread::sleep_for(dura);
+            }
+
+            updateThreadObj = nullptr;
+        }
+
+        void stop() { m_stopMe = true; }
+
+    private:
+        std::atomic_bool m_stopMe;
+        DiscoveryManager * m_discovery;
+        RCShell * m_rcShell;
+    };
+
+    //
+
     DEFAULT_REF_COUNTER(DiscoveryManager)
 
     DiscoveryManager * DiscoveryManager::Instance;
@@ -39,12 +89,25 @@ namespace ite
         rcShell_.startRcvThread();
 
         Instance = this;
+
+        try
+        {
+            updateThread = std::thread( RCUpdateDevsThread(this, &rcShell_) );
+        }
+        catch (std::system_error& )
+        {}
     }
 
     DiscoveryManager::~DiscoveryManager()
     {
         for (auto it = m_cameras.begin(); it != m_cameras.end(); ++it)
             it->second->releaseRef();
+
+        if (updateThreadObj)
+        {
+            updateThreadObj->stop();
+            updateThread.join();
+        }
 
         Instance = nullptr;
     }
@@ -100,20 +163,9 @@ namespace ite
         if (! ComPort::Instance->isOK())
             return nxcip::NX_IO_ERROR;
 
-        // FIXME
-        static bool firstTime = true;
-        if (firstTime)
-        {
-            firstTime = false;
-            updateRxDevices();
-            updateTxLinks();
-        }
-        else
-        {
-            std::vector<IDsLink> links;
-            rcShell_.getDevIDs(links);
-            addTxLinks(links);
-        }
+        std::vector<IDsLink> links;
+        rcShell_.getDevIDs(links);
+        addTxLinks(links);
 
         unsigned cameraNum = 0;
         std::set<unsigned> foundTx;
@@ -239,7 +291,7 @@ namespace ite
         for (size_t i = 0; i < rxDevs.size(); ++i)
         {
             unsigned id = RxDevice::dev2id(rxDevs[i]);
-#if 1
+#if 0
             if (id) // DEBUG: leave one Rx device
                 continue;
 #endif
@@ -248,6 +300,8 @@ namespace ite
             auto it = m_rxDevs.find(id);
             if (it == m_rxDevs.end())
                 m_rxDevs[id] = std::make_shared<RxDevice>(id);
+
+            // TODO: remove lost devices (USB)
         }
     }
 
@@ -256,7 +310,7 @@ namespace ite
         // TODO
     }
 
-    void DiscoveryManager::updateTxLinks()
+    void DiscoveryManager::updateTxLinks(unsigned chan)
     {
         std::vector<RxDevicePtr> scanDevs;
 
@@ -272,26 +326,20 @@ namespace ite
 
         for (size_t i = 0; i < scanDevs.size(); ++i)
         {
-            scanDevs[i]->mutex().lock();
+            std::lock_guard<std::mutex> lock( scanDevs[i]->mutex() );
+
+            if (scanDevs[i]->isLocked())
+                continue;
+
             if (! scanDevs[i]->isOpen())
                 scanDevs[i]->open();
-        }
 
-        for (size_t ch = 0; ch < DeviceInfo::CHANNELS_NUM; ++ch)
-        {
-            for (size_t i = 0; i < scanDevs.size(); ++i)
-                scanDevs[i]->lockF( nullptr, DeviceInfo::chanFrequency(ch) );
+            scanDevs[i]->lockF( nullptr, DeviceInfo::chanFrequency(chan) );
 
             rcShell_.updateDevIDs();
 
-            for (size_t i = 0; i < scanDevs.size(); ++i)
-                scanDevs[i]->unlockF();
-        }
-
-        for (size_t i = 0; i < scanDevs.size(); ++i)
-        {
-            scanDevs[i]->close();
-            scanDevs[i]->mutex().unlock();
+            scanDevs[i]->unlockF();
+            //scanDevs[i]->close();
         }
 
         std::vector<IDsLink> links;
