@@ -109,6 +109,8 @@ void QnMediaServerResource::setAdditionalUrls(const QList<QUrl> &urls)
 {
     {
         QMutexLocker lock(&m_mutex);
+        if (m_additionalUrls == urls)
+            return;
         m_additionalUrls = urls;
     }
     emit auxUrlsChanged(::toSharedPointer(this));
@@ -124,6 +126,8 @@ void QnMediaServerResource::setIgnoredUrls(const QList<QUrl> &urls)
 {
     {
         QMutexLocker lock(&m_mutex);
+        if (m_ignoredUrls == urls)
+            return;
         m_ignoredUrls = urls;
     }
     emit auxUrlsChanged(::toSharedPointer(this));

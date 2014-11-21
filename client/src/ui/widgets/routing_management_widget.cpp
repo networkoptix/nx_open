@@ -246,6 +246,8 @@ void QnRoutingManagementWidget::submitToSettings() {
             }
         }
     }
+
+    m_changes->changes.clear();
 }
 
 void QnRoutingManagementWidget::updateModel() {

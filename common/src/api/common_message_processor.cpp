@@ -167,11 +167,14 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &
     QList<QUrl> ignoredUrls = server->getIgnoredUrls();
 
     if (addInformation) {
-        if (!additionalUrls.contains(url) && !addresses.contains(QHostAddress(url.host())))
-            additionalUrls.append(url);
-
-        if (data.ignore && !ignoredUrls.contains(url))
-            ignoredUrls.append(url);
+        if (!data.ignore) {
+            if (!additionalUrls.contains(url) && !addresses.contains(QHostAddress(url.host())))
+                additionalUrls.append(url);
+            ignoredUrls.removeOne(url);
+        } else {
+            if (!ignoredUrls.contains(url))
+                ignoredUrls.append(url);
+        }
     } else {
         additionalUrls.removeOne(url);
         ignoredUrls.removeOne(url);
