@@ -36,7 +36,8 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(const QnResourcePtr& res):
     m_pleaseStop(false),
     m_gotSomeFrame(false),
     m_role(Qn::CR_Default),
-    m_gotData(false)
+    m_gotData(false),
+    m_rtpStarted(false)
 {
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
     if (netRes)
@@ -97,24 +98,31 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
 
     } while(result && !gotKeyData(result));
     
-    if (result)
+    if (result) {
         m_gotSomeFrame = true;
+        return result;
+    }
+    
+    if (!m_gotSomeFrame)
+        return result; // if no frame received yet do not report network issue error
 
-    if (!result && m_RtpSession.isOpened() && !m_pleaseStop && m_gotSomeFrame) 
+    bool isRtpFail = !m_RtpSession.isOpened() && m_rtpStarted;
+    int elapsed = m_dataTimer.elapsed();
+    if (isRtpFail || elapsed > MAX_FRAME_DURATION*2)
     {
-        NX_LOG(QString(lit("RTP read timeout for camera %1. Reopen stream")).arg(getResource()->getUniqueId()), cl_logWARNING);
-
-        int elapsed = m_dataTimer.elapsed();
         QString reasonParamsEncoded;
         QnBusiness::EventReason reason;
         if (elapsed > MAX_FRAME_DURATION*2) {
             reason = QnBusiness::NetworkNoFrameReason;
             reasonParamsEncoded = QnNetworkIssueBusinessEvent::encodeTimeoutMsecs(elapsed);
+            NX_LOG(QString(lit("RTP read timeout for camera %1. Reopen stream")).arg(getResource()->getUniqueId()), cl_logWARNING);
         }
         else {
             reason = QnBusiness::NetworkConnectionClosedReason;
             reasonParamsEncoded = QnNetworkIssueBusinessEvent::encodePrimaryStream(m_role != Qn::CR_SecondaryLiveVideo);
+            NX_LOG(QString(lit("RTP connection was forcibly closed by camera %1. Reopen stream")).arg(getResource()->getUniqueId()), cl_logWARNING);
         }
+
         emit networkIssue(getResource(),
             qnSyncTime->currentUSecsSinceEpoch(),
             reason,
@@ -394,6 +402,7 @@ static int TCP_READ_BUFFER_SIZE = 512*1024;
 CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
 {
     m_pleaseStop = false;
+    m_rtpStarted = false;
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
     //m_timeHelper.reset();
@@ -517,7 +526,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
         m_RtpSession.stop();
         return CameraDiagnostics::NoMediaTrackResult( url );
     }
-
+    m_rtpStarted = true;
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -528,6 +537,7 @@ int QnMulticodecRtpReader::getLastResponseCode() const
 
 void QnMulticodecRtpReader::closeStream()
 {
+    m_rtpStarted = false;
     m_RtpSession.sendTeardown();
     m_RtpSession.stop();
     for (unsigned int i = 0; i < m_demuxedData.size(); ++i) {
@@ -549,6 +559,7 @@ QnConstResourceAudioLayoutPtr QnMulticodecRtpReader::getAudioLayout() const
 void QnMulticodecRtpReader::pleaseStop()
 {
     m_pleaseStop = true;
+    m_rtpStarted = false;
     m_RtpSession.stop();
 }
 
