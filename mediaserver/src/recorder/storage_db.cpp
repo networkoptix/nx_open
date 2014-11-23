@@ -78,10 +78,16 @@ void QnStorageDb::addRecord(const QString& cameraUniqueId, QnServer::ChunksCatal
     if (m_lastTranTime.elapsed() < COMMIT_INTERVAL) 
         return;
 
-    flushRecords();
+    flushRecordsNoLock();
 }
 
 void QnStorageDb::flushRecords()
+{
+    QMutexLocker locker(&m_mutex);
+    flushRecordsNoLock();
+}
+
+void QnStorageDb::flushRecordsNoLock()
 {
     QnDbTransactionLocker tran(getTransaction());
     for(const DelayedData& data: m_delayedData)
