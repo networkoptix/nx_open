@@ -27,7 +27,7 @@ namespace ec2
     {
         template<class T> 
         void operator()(const QnTransaction<T> &tran) const {
-            qnTransactionBus->sendTransaction( tran );
+            qnTransactionBus->sendTransaction( tran, tran.isLocal ? qnTransactionBus->aliveClientPeers().keys().toSet() : QnPeerSet());
         }
     };
 
@@ -90,7 +90,7 @@ namespace ec2
                 if (!dbTran->commit())
                     return;
             }
-            else if( !tran.isLocal )
+            else 
             {
                 transactionsToSend.push_back( std::bind(SendTransactionFunction(), tran ) );
             }
@@ -148,8 +148,7 @@ namespace ec2
             if (errorCode != ErrorCode::ok)
                 return errorCode;
 
-            if( !tran.isLocal )
-                transactionsToSend->push_back( std::bind(SendTransactionFunction(), tran ) );
+            transactionsToSend->push_back( std::bind(SendTransactionFunction(), tran ) );
 
             return errorCode;
         }

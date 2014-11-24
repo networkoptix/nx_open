@@ -4,13 +4,13 @@
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 #include "api/app_server_connection.h"
+#include "core/resource_management/resource_pool.h"
 
 
 QnServerCamera::QnServerCamera(const QnUuid& resourceTypeId): QnVirtualCameraResource()
 {
     setTypeId(resourceTypeId);
     addFlags(Qn::server_live_cam);
-    m_tmpStatus = Qn::NotDefined;
 }
 
 QString QnServerCamera::getDriverName() const
@@ -57,19 +57,12 @@ QnAbstractStreamDataProvider* QnServerCamera::createLiveDataProvider()
 
 Qn::ResourceStatus QnServerCamera::getStatus() const
 {
-    if (m_tmpStatus != Qn::NotDefined)
-        return m_tmpStatus;
-    else
-        return QnResource::getStatus();
-}
-
-void QnServerCamera::setTmpStatus(Qn::ResourceStatus status)
-{
-    if (status != m_tmpStatus) {
-        Qn::ResourceStatus oldStatus = getStatus();
-        m_tmpStatus = status;
-        Qn::ResourceStatus newStatus = getStatus();
-        if (oldStatus != newStatus)
-            emit statusChanged(toSharedPointer(this));
+    QnResourcePtr serverRes = qnResPool->getResourceById(getParentId());
+    if (serverRes) {
+         Qn::ResourceStatus status = serverRes->getStatus();
+         if (status == Qn::Offline || status == Qn::Unauthorized)
+             return Qn::Offline;
     }
+
+    return QnResource::getStatus();
 }

@@ -501,6 +501,9 @@ void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silence
         m_statusTimer.restart();
     }
     QnResource::setStatus(newStatus, silenceMode);
+    QnResourceList childList = qnResPool->getResourcesByParentId(getId());
+    for(const QnResourcePtr& res: childList)
+        emit res->statusChanged(res);
 }
 
 qint64 QnMediaServerResource::currentStatusTime() const

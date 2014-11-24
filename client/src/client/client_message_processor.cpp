@@ -58,7 +58,6 @@ void QnClientMessageProcessor::setHoldConnection(bool holdConnection) {
 
 void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) {
     resource->setStatus(status);
-    checkForTmpStatus(resource);
 }
 
 void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource) 
@@ -87,7 +86,6 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
                 if (QnMediaServerResourcePtr updatedServer = resource.dynamicCast<QnMediaServerResource>()) {
                     if (isCompatible(qnCommon->engineVersion(), updatedServer->getVersion())) {
                         mediaServer->setStatus(Qn::Online);
-                        checkForTmpStatus(mediaServer);
                     }
                 }
             }
@@ -99,51 +97,10 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
 
     if (QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
         layout->requestStore();
-
-    checkForTmpStatus(ownResource);
 }
 
 void QnClientMessageProcessor::resetResources(const QnResourceList& resources) {
     QnCommonMessageProcessor::resetResources(resources);
-    for(const QnResourcePtr& resource: resources)
-        checkForTmpStatus(resource);
-}
-
-void QnClientMessageProcessor::checkForTmpStatus(const QnResourcePtr& resource)
-{
-    // process tmp status
-    
-    if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>()) 
-    {
-        if (mediaServer->getStatus() == Qn::NotDefined)
-            return;
-        else if (mediaServer->getStatus() == Qn::Offline || mediaServer->getStatus() == Qn::Unauthorized)
-            updateServerTmpStatus(mediaServer->getId(), Qn::Offline);
-        else
-            updateServerTmpStatus(mediaServer->getId(), Qn::NotDefined);
-    }
-    else if (QnServerCameraPtr serverCamera = resource.dynamicCast<QnServerCamera>()) 
-    {
-        QnMediaServerResourcePtr mediaServer = qnResPool->getResourceById(serverCamera->getParentId()).dynamicCast<QnMediaServerResource>();
-        if (mediaServer) {
-            if (mediaServer->getStatus() == Qn::Offline || mediaServer->getStatus() == Qn::Unauthorized)
-                serverCamera->setTmpStatus(Qn::Offline);
-            else
-                serverCamera->setTmpStatus(Qn::NotDefined);
-        }
-    }
-}
-
-void QnClientMessageProcessor::updateServerTmpStatus(const QnUuid& id, Qn::ResourceStatus status)
-{
-    QnResourcePtr server = qnResPool->getResourceById(id);
-    if (!server)
-        return;
-    for(QnResourcePtr res: qnResPool->getAllCameras(server)) {
-        QnServerCameraPtr serverCamera = res.dynamicCast<QnServerCamera>();
-        if (serverCamera)
-            serverCamera->setTmpStatus(status);
-    }
 }
 
 void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data)
@@ -152,6 +109,12 @@ void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data)
         qWarning() << "at_remotePeerFound received while disconnected";
         return;
     }
+
+    /*
+    QnMediaServerResourcePtr server = qnResPool->getResourceById(data.peer.id).staticCast<QnMediaServerResource>();
+    if (server)
+        server->setStatus(Qn::Online);
+    */
 
     if (data.peer.id != qnCommon->remoteGUID())
         return;
@@ -169,11 +132,11 @@ void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data)
         return;
     }
 
+    /*
     QnMediaServerResourcePtr server = qnResPool->getResourceById(data.peer.id).staticCast<QnMediaServerResource>();
-    if (server) {
+    if (server)
         server->setStatus(Qn::Offline);
-        checkForTmpStatus(server);
-    }
+    */
 
     if (data.peer.id != qnCommon->remoteGUID())
         return;
