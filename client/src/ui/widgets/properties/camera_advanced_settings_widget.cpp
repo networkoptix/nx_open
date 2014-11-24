@@ -335,7 +335,7 @@ void QnCameraAdvancedSettingsWidget::at_advancedParamChanged(const QString &id, 
         return;
 
 	QnCameraAdvancedParamValue changedValue(id, value);
-    serverConnection->setParamsAsync(m_camera, QnCameraAdvancedParamValueList() << changedValue, this, SLOT(at_advancedParam_saved(int, const QnCameraAdvancedParamValueList &)));
+    serverConnection->setParamsAsync(m_camera, QnCameraAdvancedParamValueList() << changedValue, this, SLOT(at_advancedParam_saved(int, const QnCameraAdvancedParamValueList &, int)));
     ++m_applyingParamsCount;
     updateApplyingParamsLabel();
 }
