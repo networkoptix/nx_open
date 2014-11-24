@@ -14,7 +14,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include "rest/server/request_handler.h"
+#include <rest/server/json_rest_handler.h>
 
 
 //!Handles requests to set/get camera parameters. All methods are re-enterable
@@ -47,16 +47,13 @@ struct AwaitedParameters;
 
 class QnCameraSettingsRestHandler
 :
-    public QnRestRequestHandler
+    public QnJsonRestHandler
 {
     Q_OBJECT
 
 public:
-    //!Implementation of QnRestRequestHandler::executeGet
-    virtual int executeGet( const QString& path, const QnRequestParamList& params, QByteArray& responseMessageBody, QByteArray& contentType, const QnRestConnectionProcessor*) override;
-    //!Implementation of QnRestRequestHandler::executePost
-    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& requestBody, const QByteArray& srcBodyContentType, 
-                            QByteArray& responseMessageBody, QByteArray& contentType, const QnRestConnectionProcessor*) override;
+    //!Implementation of QnJsonRestHandler::executeGet
+    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
     //!Implementation of QnRestRequestHandler::description
     //virtual QString description(TCPSocket* tcpSocket) const;
 

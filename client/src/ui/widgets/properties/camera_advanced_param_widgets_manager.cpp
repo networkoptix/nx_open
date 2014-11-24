@@ -43,14 +43,13 @@ void QnCameraAdvancedParamWidgetsManager::displayParams(const QnCameraAdvancedPa
 		m_groupWidget->setCurrentItem(m_groupWidget->topLevelItem(0));
 }
 
-void QnCameraAdvancedParamWidgetsManager::loadValues(const QHash<QString, QString> &valuesById) {
-	for (auto iter = m_paramWidgetsById.cbegin(); iter != m_paramWidgetsById.cend(); ++iter) {
-		QString id = iter.key();
-		if (!valuesById.contains(id))
+void QnCameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParamValueList &params) {
+	for (const QnCameraAdvancedParamValue &param: params) {
+		if (!m_paramWidgetsById.contains(param.id))
 			continue;
 
-		auto widget = iter.value();
-		widget->setValue(valuesById[id]);
+		auto widget = m_paramWidgetsById[param.id];
+		widget->setValue(param.value);
 		widget->setEnabled(true);
 		connect(widget, &QnAbstractCameraAdvancedParamWidget::valueChanged, this, &QnCameraAdvancedParamWidgetsManager::paramValueChanged);
 	}

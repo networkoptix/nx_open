@@ -39,8 +39,7 @@ signals:
     void finished(int status, const QnTimePeriodList &reply, int handle, const QString &errorString);
     void finished(int status, const QnStatisticsReply &reply, int handle, const QString &errorString);
     void finished(int status, const QVector3D &reply, int handle, const QString &errorString);
-    void finished(int status, const QnStringVariantPairList &reply, int handle, const QString &errorString);
-    void finished(int status, const QnStringBoolPairList &reply, int handle, const QString &errorString);
+	void finished(int status, const QnCameraAdvancedParamValueList &reply, int handle, const QString &errorString);
     void finished(int status, const QnTimeReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnTestEmailSettingsReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnCameraDiagnosticsReply &reply, int handle, const QString &errorString);

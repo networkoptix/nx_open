@@ -14,7 +14,7 @@ public:
 	explicit QnCameraAdvancedParamWidgetsManager(QTreeWidget* groupWidget, QStackedWidget* contentsWidget, QObject* parent = NULL);
 
 	void displayParams(const QnCameraAdvancedParams &params);
-	void loadValues(const QHash<QString, QString> &valuesById);
+	void loadValues(const QnCameraAdvancedParamValueList &params);
 
 signals:
 	void paramValueChanged(const QString &id, const QString &value);

@@ -122,9 +122,9 @@
                dataType = "MinMaxStep"
                query = ""/>
         <param name = "Iris"
-               description = ""
+               description = "The fixed attenuation of input light affected by the iris (dB). 0dB maps to a fully opened iris."
                dataType = "MinMaxStep"
-               query = "The fixed attenuation of input light affected by the iris (dB). 0dB maps to a fully opened iris."/>
+               query = ""/>
       </group>
 
     </group>
@@ -393,7 +393,7 @@
              min = "zoomOut"
              max = "zoomIn"
              step = "stop"
-             query = "/cgi-bin/ptzctrl.cgi?ptzchannel=0&amp;ptzctrlvalue"/>
+             query = "/cgi-bin/ptzctrl.cgi?ptzchannel=0&amp;query=zoom&amp;ptzctrlvalue"/>
 
       <param name = "Focus"
              description = "Move focus near / far"
@@ -401,7 +401,7 @@
              min = "focusFar"
              max = "focusNear"
              step = "stop"
-             query = "/cgi-bin/ptzctrl.cgi?ptzchannel=0&amp;ptzctrlvalue"/>
+             query = "/cgi-bin/ptzctrl.cgi?ptzchannel=0&amp;query=focus&amp;ptzctrlvalue"/>
 
     </group>
 

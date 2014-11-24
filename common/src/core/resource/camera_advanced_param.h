@@ -8,6 +8,17 @@
 #include <utils/common/model_functions_fwd.h>
 #include <utils/common/uuid.h>
 
+class QDomElement;
+
+struct QnCameraAdvancedParamValue {
+	QString id;
+	QString value;
+
+	QnCameraAdvancedParamValue();
+	QnCameraAdvancedParamValue(const QString &id, const QString &value);
+};
+#define QnCameraAdvancedParamValue_Fields (id)(value)
+
 struct QnCameraAdvancedParameter {
     enum class DataType {
         None,
@@ -96,11 +107,13 @@ private:
 	mutable QnCameraAdvancedParamsTree m_defaultParamsTree;
 };
 
-#define QnCameraAdvancedParameterTypes (QnCameraAdvancedParameter)(QnCameraAdvancedParamGroup)(QnCameraAdvancedParams)
+#define QnCameraAdvancedParameterTypes (QnCameraAdvancedParamValue)(QnCameraAdvancedParameter)(QnCameraAdvancedParamGroup)(QnCameraAdvancedParams)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 	QnCameraAdvancedParameterTypes,
-	(json)
+	(json)(metatype)
 	)
+
+Q_DECLARE_METATYPE(QnCameraAdvancedParamValueList)
 
 #endif //QN_CAMERA_ADVANCED_PARAM

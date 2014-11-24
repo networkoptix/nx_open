@@ -10,6 +10,7 @@
 #include <QtNetwork/QNetworkProxy>
 #include <QtNetwork/QNetworkReply>
 
+#include <core/resource/camera_advanced_param.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/network_resource.h>
@@ -141,45 +142,10 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         processJsonReply<QnStatisticsReply>(this, response, handle);
         break;
     }
-    case GetParamsObject: {
-        QnStringVariantPairList reply;
-
-        for(const QByteArray &line: response.data.split('\n')) {
-            if (line.isEmpty())
-                continue;
-
-            int sepPos = line.indexOf('=');
-            if(sepPos == -1) {
-                reply.push_back(qMakePair(QString::fromUtf8(line.constData(), line.size()), QVariant())); /* No value. */
-            } else {
-                QByteArray key = line.mid(0, sepPos);
-                QByteArray value = line.mid(sepPos + 1);
-                reply.push_back(qMakePair(
-                    QString::fromUtf8(key.constData(), key.size()),
-                    QVariant(QString::fromUtf8(value.constData(), value.size()))
-                ));
-            }
-        }
-
-        emitFinished(this, response.status, reply, handle);
-        break;
-    }
-    case SetParamsObject: {
-        QnStringBoolPairList reply;
-
-        for(const QByteArray &line: response.data.split('\n')) {
-            int sepPos = line.indexOf(':');
-            if(sepPos == -1)
-                continue; /* Invalid format. */
-
-            QByteArray key = line.mid(sepPos+1);
-            reply.push_back(qMakePair(
-                QString::fromUtf8(key.data(), key.size()),
-                line.mid(0, sepPos) == "ok"
-            ));
-        }
-
-        emitFinished(this, response.status, reply, handle);
+    case GetParamsObject:
+	case SetParamsObject:
+	{
+		processJsonReply<QnCameraAdvancedParamValueList>(this, response, handle);
         break;
     }
     case TimeObject:
@@ -403,21 +369,25 @@ int QnMediaServerConnection::getTimePeriodsAsync(const QnNetworkResourceList &li
 }
 
 int QnMediaServerConnection::getParamsAsync(const QnNetworkResourcePtr &camera, const QStringList &keys, QObject *target, const char *slot) {
-    QnRequestParamList params;
+	Q_ASSERT_X(!keys.isEmpty(), Q_FUNC_INFO, "parameter names should be provided");
+
+	QnRequestParamList params;
     params << QnRequestParam("res_id", camera->getPhysicalId());
     for(const QString &param: keys)
         params << QnRequestParam(param, QString());
 
-    return sendAsyncGetRequest(GetParamsObject, params, QN_STRINGIZE_TYPE(QnStringVariantPairList), target, slot);
+    return sendAsyncGetRequest(GetParamsObject, params, QN_STRINGIZE_TYPE(QnCameraAdvancedParamValueList), target, slot);
 }
 
-int QnMediaServerConnection::setParamsAsync(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &values, QObject *target, const char *slot) {
+int QnMediaServerConnection::setParamsAsync(const QnNetworkResourcePtr &camera, const QnCameraAdvancedParamValueList &values, QObject *target, const char *slot) {
+	Q_ASSERT_X(!values.isEmpty(), Q_FUNC_INFO, "parameter names should be provided");
+
     QnRequestParamList params;
     params << QnRequestParam("res_id", camera->getPhysicalId());
-    for(QnStringVariantPairList::const_iterator i = values.begin(); i != values.end(); ++i)
-        params << QnRequestParam(i->first, i->second.toString());
+    for(const QnCameraAdvancedParamValue value: values)
+        params << QnRequestParam(value.id, value.value);
 
-    return sendAsyncGetRequest(SetParamsObject, params, QN_STRINGIZE_TYPE(QnStringBoolPairList), target, slot);
+    return sendAsyncGetRequest(SetParamsObject, params, QN_STRINGIZE_TYPE(QnCameraAdvancedParamValueList), target, slot);
 }
 
 int QnMediaServerConnection::searchCameraAsyncStart(const QString &startAddr, const QString &endAddr, const QString &username, const QString &password, int port, QObject *target, const char *slot) {

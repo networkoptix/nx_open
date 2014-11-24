@@ -1,5 +1,7 @@
 #include "camera_advanced_param.h"
 
+#include <QtXml/QDomElement>
+
 #include <boost/range.hpp>
 #include <boost/algorithm/cxx11/any_of.hpp>
 #include <boost/range/algorithm/find_if.hpp>
@@ -30,6 +32,13 @@ namespace QnXmlTag {
 	const QString step				= lit("step");
 	const QString readOnly			= lit("readOnly");
 }
+
+QnCameraAdvancedParamValue::QnCameraAdvancedParamValue() {}
+
+QnCameraAdvancedParamValue::QnCameraAdvancedParamValue(const QString &id, const QString &value):
+	id(id), value(value)
+{}
+
 
 QnCameraAdvancedParameter::QnCameraAdvancedParameter():
     dataType(DataType::None),
@@ -107,7 +116,6 @@ void QnCameraAdvancedParamGroup::merge(const QnCameraAdvancedParamGroup &other) 
 	}
 }
 
-
 void QnCameraAdvancedParams::merge(const QnCameraAdvancedParams &other) {
 	for (const QnCameraAdvancedParamGroup &group: other.groups) {
 		QString groupName = group.name;
@@ -122,7 +130,6 @@ void QnCameraAdvancedParams::merge(const QnCameraAdvancedParams &other) {
 	}
 
 }
-
 
 bool QnCameraAdvancedParamsTree::isEmpty() const {
 	return cameraTypeName.isEmpty() && children.empty();
