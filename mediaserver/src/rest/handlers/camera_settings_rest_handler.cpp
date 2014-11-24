@@ -27,8 +27,8 @@ namespace {
 
 	QSet<QString> allParameterIds(const QnCameraAdvancedParamGroup& group) {
 		QSet<QString> result;
-		for (const QnCameraAdvancedParamGroup &group: group.groups)
-			result.unite(allParameterIds(group));
+		for (const QnCameraAdvancedParamGroup &subGroup: group.groups)
+			result.unite(allParameterIds(subGroup));
 		for (const QnCameraAdvancedParameter &param: group.params)
 			if (!param.getId().isEmpty())
 				result.insert(param.getId());
@@ -207,7 +207,7 @@ void QnCameraSettingsRestHandler::asyncParamGetComplete(const QnResourcePtr &res
 
     NX_LOG( QString::fromLatin1("QnCameraSettingsHandler::asyncParamGetComplete. paramName %1, paramValue %2").arg(paramName).arg(paramValue.toString()), cl_logDEBUG1 );
 
-	qDebug() << "param processing complete" << paramName << paramValue;
+	qDebug() << "param processing complete" << paramName << paramValue.toString();
     for( std::set<AwaitedParameters*>::const_iterator
         it = m_awaitedParamsSets.begin();
         it != m_awaitedParamsSets.end();

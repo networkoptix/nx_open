@@ -38,8 +38,8 @@ namespace {
 
 	QSet<QString> parameterIds(const QnCameraAdvancedParamGroup& group) {
 		QSet<QString> result;
-		for (const QnCameraAdvancedParamGroup &group: group.groups)
-			result.unite(parameterIds(group));
+		for (const QnCameraAdvancedParamGroup &subGroup: group.groups)
+			result.unite(parameterIds(subGroup));
 		for (const QnCameraAdvancedParameter &param: group.params)
 			if (parameterRequired(param))
 				result.insert(param.getId());

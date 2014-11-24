@@ -74,6 +74,7 @@ QnAbstractPtzController* QnThirdPartyResource::createPtzControllerInternal()
 
 bool QnThirdPartyResource::getParamPhysical( const QString& param, QVariant& val )
 {
+	qDebug() << "QnThirdPartyResource::getParamPhysical" << param;
     QMutexLocker lk( &m_mutex );
 
     if( !m_cameraManager3 )
@@ -95,6 +96,7 @@ bool QnThirdPartyResource::getParamPhysical( const QString& param, QVariant& val
             case nxcip::NX_NO_ERROR:
             {
                 val = QString::fromUtf8( valueBuf.get(), valueBufSize );
+				qDebug() << "QnThirdPartyResource::getParamPhysical calculated result" << param << val.toString() << val.toString().size();
                 return true;
             }
             case nxcip::NX_MORE_DATA:
@@ -107,7 +109,7 @@ bool QnThirdPartyResource::getParamPhysical( const QString& param, QVariant& val
     }
 
     //TODO #ak return error description
-
+	qDebug() << "QnThirdPartyResource::getParamPhysical could not calculate result for" << param;
     return false;
 }
 
