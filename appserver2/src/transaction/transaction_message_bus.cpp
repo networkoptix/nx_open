@@ -1190,6 +1190,19 @@ QnTransactionMessageBus::AlivePeersMap QnTransactionMessageBus::aliveServerPeers
     return result;
 }
 
+QnTransactionMessageBus::AlivePeersMap QnTransactionMessageBus::aliveClientPeers() const
+{
+    QMutexLocker lock(&m_mutex);
+    AlivePeersMap result;
+    for(AlivePeersMap::const_iterator itr = m_alivePeers.begin(); itr != m_alivePeers.end(); ++itr)
+    {
+        if (itr->peer.isClient())
+            result.insert(itr.key(), itr.value());
+    }
+
+    return result;
+}
+
 void QnTransactionMessageBus::setLocalPeer(const ApiPeerData localPeer) {
     m_localPeer = localPeer;
 }

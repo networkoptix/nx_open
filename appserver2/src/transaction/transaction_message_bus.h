@@ -95,6 +95,7 @@ namespace ec2
         * Return all alive server peers
         */
         AlivePeersMap aliveServerPeers() const;
+        AlivePeersMap aliveClientPeers() const;
 
     signals:
         void peerLost(ApiPeerAliveData data);

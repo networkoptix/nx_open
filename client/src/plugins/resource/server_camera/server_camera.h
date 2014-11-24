@@ -23,14 +23,11 @@ public:
 
     virtual Qn::ResourceStatus getStatus() const override;
 
-    void setTmpStatus(Qn::ResourceStatus status);
-
     virtual Qn::ResourceFlags flags() const override;
 protected:
     virtual QnAbstractStreamDataProvider *createLiveDataProvider() override;
 
 private:
-    Qn::ResourceStatus m_tmpStatus;
     QnServerCameraPtr m_activeCamera;
 };
 
