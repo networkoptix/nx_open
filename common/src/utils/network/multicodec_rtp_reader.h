@@ -113,6 +113,7 @@ private:
     QnConstResourceAudioLayoutPtr m_audioLayout;
     bool m_gotData;
     QElapsedTimer m_dataTimer;
+    bool m_rtpStarted;
 };
 
 #endif // ENABLE_DATA_PROVIDERS
