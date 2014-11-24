@@ -849,14 +849,14 @@ void QnMain::updateDisabledVendorsIfNeeded()
 
 void QnMain::updateAllowCameraCHangesIfNeed()
 {
-    static const QString DV_PROPERTY = QLatin1String("allowCameraChanges");
+    static const QString DV_PROPERTY = QLatin1String("cameraSettingsOptimization");
 
     QString allowCameraChanges = MSSettings::roSettings()->value(DV_PROPERTY).toString();
     if (!allowCameraChanges.isEmpty())
     {
         QnGlobalSettings *settings = QnGlobalSettings::instance();
         settings->setCameraSettingsOptimizationEnabled(allowCameraChanges.toLower() == lit("true") || allowCameraChanges == lit("1"));
-        MSSettings::roSettings()->remove(DV_PROPERTY);
+        MSSettings::roSettings()->setValue(DV_PROPERTY, "");
     }
 }
 

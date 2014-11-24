@@ -927,7 +927,8 @@ void QnStorageManager::updateStorageStatistics()
     if (m_storagesStatisticsReady) 
         return;
 
-    double totalSpace = 0;
+    qint64 totalSpace = 0;
+    qint64 minSpace = INT64_MAX;
     QSet<QnStorageResourcePtr> storages = getWritableStorages();
     m_isWritableStorageAvail = !storages.isEmpty();
     for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
@@ -935,15 +936,15 @@ void QnStorageManager::updateStorageStatistics()
         QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (*itr);
         qint64 storageSpace = qMax(0ll, fileStorage->getTotalSpace() - fileStorage->getSpaceLimit());
         totalSpace += storageSpace;
+        minSpace = qMin(minSpace, storageSpace);
     }
 
     for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
         QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (*itr);
-
         qint64 storageSpace = qMax(0ll, fileStorage->getTotalSpace() - fileStorage->getSpaceLimit());
         // write to large HDD more often then small HDD
-        fileStorage->setStorageBitrateCoeff(1.0 - storageSpace / totalSpace);
+        fileStorage->setStorageBitrateCoeff(storageSpace / (double) minSpace);
     }
     m_storagesStatisticsReady = true;
     m_warnSended = false;
@@ -965,8 +966,8 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
         QnStorageResourcePtr storage = *itr;
-        qDebug() << "QnFileStorageResource " << storage->getPath() << "current bitrate=" << storage->bitrate();
-        float bitrate = storage->bitrate() * storage->getStorageBitrateCoeff();
+        qDebug() << "QnFileStorageResource " << storage->getPath() << "current bitrate=" << storage->bitrate() << "coeff=" << storage->getStorageBitrateCoeff();
+        float bitrate = storage->bitrate() / storage->getStorageBitrateCoeff();
         minBitrate = qMin(minBitrate, bitrate);
         bitrateInfo << QPair<float, QnStorageResourcePtr>(bitrate, storage);
     }

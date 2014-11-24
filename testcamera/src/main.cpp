@@ -9,6 +9,10 @@
 #include "common/common_module.h"
 #include "utils/common/synctime.h"
 #include "core/resource_management/status_dictionary.h"
+#include "core/resource/resource_fwd.h"
+#include "core/resource/camera_user_attribute_pool.h"
+#include "api/global_settings.h"
+#include "core/resource_management/resource_properties.h"
 
 
 QString doUnquote(const QString& fileName)
@@ -89,6 +93,8 @@ int main(int argc, char *argv[])
     QnCameraPool::initGlobalInstance( new QnCameraPool( localInterfacesToListen ) );
     QnCameraPool::instance()->start();
     QnResourceStatusDiscionary statusDictionary;
+	QnResourcePropertyDictionary dictionary;
+	std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
     for (int i = 1; i < argc; ++i)
     {
         QString param = argv[i];

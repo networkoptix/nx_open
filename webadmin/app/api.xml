@@ -815,20 +815,34 @@
                 </function>
                 <function>
                     <name>routingInformation/connections</name>
-                    <description>Get all connections established in the current system.</description>
+                    <description>Get all connections found  in the current system.</description>
                     <method>GET</method>
-                    <params/>
+                    <params>
+                        <param>
+                            <name>target</name>
+                            <description>Show connections from this peer</description>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
+                    </params>
                     <result>
-                        <caption>HTML with connection list.</caption>
+                        <caption>JSON with connection list.</caption>
                     </result>
                 </function>
                 <function>
                     <name>routingInformation/cachedRoutes</name>
                     <description>Get a list of cached routes.</description>
                     <method>GET</method>
-                    <params/>
+                    <params>
+                        <param>
+                            <name>target</name>
+                            <description>Show to this peer</description>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
+                    </params>
                     <result>
-                        <caption>HTML with route list.</caption>
+                        <caption>JSON with route list.</caption>
                     </result>
                 </function>
                 <function>
@@ -844,7 +858,23 @@
                         </param>
                     </params>
                     <result>
-                        <caption>HTML with route.</caption>
+                        <caption>JSON with route.</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>routingInformation/rules</name>
+                    <description>Get routing rules.</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>target</name>
+                            <description>Show rules for the specified peer.</description>
+                            <optional>false</optional>
+                            <values/>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>JSON with rules.</caption>
                     </result>
                 </function>
                 <function>

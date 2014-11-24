@@ -798,6 +798,8 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation()
             setFirmware(extInfo.firmware);
         if (getMAC().isNull())
             setMAC(QnMacAddress(extInfo.mac));
+        if (getVendor() == lit("ONVIF") && !extInfo.vendor.isNull())
+            setVendor(extInfo.vendor); // update default vendor
         if (getPhysicalId().isEmpty())
             setPhysicalId(extInfo.hardwareId);
     }

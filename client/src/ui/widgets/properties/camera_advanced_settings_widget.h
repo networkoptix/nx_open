@@ -16,6 +16,8 @@ class QNetworkReply;
 class CameraSettingsWidgetsTreeCreator;
 class CameraAdvancedSettingsWebPage;
 class CameraSetting;
+class QnCameraAdvancedParamsReader;
+class QnCameraAdvancedParamWidgetsManager;
 
 class QnCameraAdvancedSettingsWidget : public Connective<QWidget> {
     Q_OBJECT
@@ -44,13 +46,13 @@ private:
     void at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator);
     void at_proxyAuthenticationRequired ( const QNetworkProxy & , QAuthenticator * authenticator);
 
-    void at_advancedParamChanged(const CameraSetting& val);
+    void at_advancedParamChanged(const QString &id, const QString &value);
 
     void updateApplyingParamsLabel();
 
 private slots:
-    void at_advancedSettingsLoaded(int status, const QnStringVariantPairList &params, int handle);
-    void at_advancedParam_saved(int httpStatusCode, const QnStringBoolPairList& operationResult);
+    void at_advancedSettingsLoaded(int status, const QnCameraAdvancedParamValueList &params, int handle);
+    void at_advancedParam_saved(int status, const QnCameraAdvancedParamValueList &params, int handle);
 
 private:
     enum class Page {
@@ -62,10 +64,11 @@ private:
     void setPage(Page page);
 
     QScopedPointer<Ui::CameraAdvancedSettingsWidget> ui;
+	QScopedPointer<QnCameraAdvancedParamsReader> m_advancedParamsReader;
+	QScopedPointer<QnCameraAdvancedParamWidgetsManager> m_advancedParamWidgetsManager;
     Page m_page;
     QnVirtualCameraResourcePtr m_camera;
     QMutex m_cameraMutex;
-    CameraSettingsWidgetsTreeCreator* m_widgetsRecreator;
     CameraAdvancedSettingsWebPage* m_cameraAdvancedSettingsWebPage;
     QUrl m_lastCameraPageUrl;
     int m_paramRequestHandle;

@@ -48,6 +48,7 @@ class OnvifResourceSearcherWsdd
 {
     static QString& LOCAL_ADDR;
     static const char SCOPES_NAME_PREFIX[];
+    static const char SCOPES_LOCATION_PREFIX[];
     static const char SCOPES_HARDWARE_PREFIX[];
     static const char PROBE_TYPE[];
     static const char WSA_ADDRESS[];
@@ -80,7 +81,7 @@ private:
     void findEndpointsImpl( EndpointInfoHash& result, const QnInterfaceAndAddr& iface ) const;
 
     template <class T> QString getAppropriateAddress(const T* source, const QStringList& prefixes) const;
-    template <class T> QString getName(const T* source) const;
+    template <class T> QString extractScope(const T* source, const QString& pattern) const;
     template <class T> QString getManufacturer(const T* source, const QString& name) const;
     template <class T> QString getMac(const T* source, const SOAP_ENV__Header* header) const;
     template <class T> QString getEndpointAddress(const T* source) const;

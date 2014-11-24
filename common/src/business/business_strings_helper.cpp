@@ -367,9 +367,9 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
     case NetworkConnectionClosedReason: {
         bool isPrimaryStream = QnNetworkIssueBusinessEvent::decodePrimaryStream(reasonParamsEncoded, true);
         if (isPrimaryStream)
-            result = tr("Connection to camera primary stream was unexpectedly closed.");
+            result = tr("Connection to camera (primary stream) was unexpectedly closed.");
         else
-            result = tr("Connection to camera secondary stream was unexpectedly closed.");
+            result = tr("Connection to camera (secondary stream) was unexpectedly closed.");
         break;
     }
     case NetworkRtpPacketLossReason: {

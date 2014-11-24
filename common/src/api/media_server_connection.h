@@ -97,9 +97,21 @@ public:
      * is called with signature <tt>(int httpStatusCode, const QList<QPair<QString, QVariant> > &params)</tt>.
      * \a status is 0 in case of success, in other cases it holds error code 
      * 
+	 * \param keys						List of parameter ids that are requested.
      * \returns                         Request handle.
      */
     int getParamsAsync(const QnNetworkResourcePtr &camera, const QStringList &keys, QObject *target, const char *slot);
+
+	/** 
+     * Set \a camera params.
+     * 
+     * Returns immediately. On request completion \a slot of object \a target is 
+     * called with signature <tt>(int httpStatusCode, const QList<QPair<QString, bool> > &operationResult)</tt>
+     * \a status is 0 in case of success, in other cases it holds error code
+     * 
+     * \returns                         Request handle.
+     */
+    int setParamsAsync(const QnNetworkResourcePtr &camera, const QnCameraAdvancedParamValueList &params, QObject *target, const char *slot);
 
     /** 
      * Get \a event log. 
@@ -124,17 +136,6 @@ public:
         QnUuid businessRuleId, 
         QObject *target, 
         const char *slot);
-
-    /** 
-     * Set \a camera params.
-     * 
-     * Returns immediately. On request completion \a slot of object \a target is 
-     * called with signature <tt>(int httpStatusCode, const QList<QPair<QString, bool> > &operationResult)</tt>
-     * \a status is 0 in case of success, in other cases it holds error code
-     * 
-     * \returns                         Request handle.
-     */
-    int setParamsAsync(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params, QObject *target, const char *slot);
 
     /**
      * \returns                         Request handle. 

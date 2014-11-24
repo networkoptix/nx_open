@@ -10,6 +10,7 @@
 #include <common/common_module.h>
 
 #include <core/resource/resource.h>
+#include <core/resource/camera_advanced_param.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/param.h>
@@ -19,9 +20,9 @@
 
 #include <ui/style/warning_style.h>
 #include <ui/widgets/properties/camera_advanced_settings_web_page.h>
+#include <ui/widgets/properties/camera_advanced_param_widgets_manager.h>
 
 #include <utils/common/model_functions.h>
-#include <utils/camera_advanced_settings_xml_parser.h>
 
 namespace {
 
@@ -29,17 +30,42 @@ namespace {
         return status == Qn::Online || status == Qn::Recording;
     }
 
+	bool parameterRequired(const QnCameraAdvancedParameter &param) {
+		return param.isValid()
+			&& param.dataType != QnCameraAdvancedParameter::DataType::Button
+			&& param.dataType != QnCameraAdvancedParameter::DataType::ControlButtonsPair;
+	}
+
+	QSet<QString> parameterIds(const QnCameraAdvancedParamGroup& group) {
+		QSet<QString> result;
+		for (const QnCameraAdvancedParamGroup &group: group.groups)
+			result.unite(parameterIds(group));
+		for (const QnCameraAdvancedParameter &param: group.params)
+			if (parameterRequired(param))
+				result.insert(param.getId());
+		return result;
+	}
+
+	QSet<QString> parameterIds(const QnCameraAdvancedParams& params) {
+		QSet<QString> result;
+		for (const QnCameraAdvancedParamGroup &group: params.groups)
+			result.unite(parameterIds(group));
+		return result;
+	}
+
 }
 
 QnCameraAdvancedSettingsWidget::QnCameraAdvancedSettingsWidget(QWidget* parent /*= 0*/):
     base_type(parent),
     ui(new Ui::CameraAdvancedSettingsWidget),
+	m_advancedParamsReader(new QnCameraAdvancedParamsReader()),
     m_page(Page::Empty),
-    m_widgetsRecreator(NULL),
     m_paramRequestHandle(0),
     m_applyingParamsCount(0)
 {
     ui->setupUi(this);
+	m_advancedParamWidgetsManager.reset(new QnCameraAdvancedParamWidgetsManager(ui->treeWidget, ui->propertiesStackedWidget));
+	connect(m_advancedParamWidgetsManager, &QnCameraAdvancedParamWidgetsManager::paramValueChanged, this, &QnCameraAdvancedSettingsWidget::at_advancedParamChanged);
 
     QList<int> sizes = ui->splitter->sizes();
     sizes[0] = 200;
@@ -76,27 +102,9 @@ void QnCameraAdvancedSettingsWidget::updateFromResource() {
 }
 
 void QnCameraAdvancedSettingsWidget::clean() {
-    if (m_widgetsRecreator) {
-        delete m_widgetsRecreator;
-        m_widgetsRecreator = NULL;
-    }
-
-    /* Remove all auto-created widgets. */
-    auto targetLayout = ui->propertiesStackedWidget->layout();
-    while (targetLayout->count() > 0)
-        targetLayout->removeItem(targetLayout->itemAt(0));
 }
 
 void QnCameraAdvancedSettingsWidget::createWidgetsRecreator(const QString &paramId) {
-    clean();
-
-    QStackedLayout* stackedLayout = qobject_cast<QStackedLayout*>(ui->propertiesStackedWidget->layout());
-    Q_ASSERT(stackedLayout);
-
-    m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(paramId,  ui->webView, ui->treeWidget, stackedLayout);
-    m_widgetsRecreator->setCamera( m_camera );
-
-    connect(m_widgetsRecreator, &CameraSettingsWidgetsTreeCreator::advancedParamChanged, this, &QnCameraAdvancedSettingsWidget::at_advancedParamChanged);
 }
 
 void QnCameraAdvancedSettingsWidget::setPage(Page page) {
@@ -154,20 +162,22 @@ void QnCameraAdvancedSettingsWidget::reloadData() {
         return;
 
     if (m_page == QnCameraAdvancedSettingsWidget::Page::Manual) {
+		auto params = m_advancedParamsReader->params(m_camera);
+		m_advancedParamWidgetsManager->displayParams(params);
+
+		QStringList paramIds = parameterIds(params).toList();
+
+		qDebug() << paramIds;
+		qDebug() << "requesting parameters:" << paramIds.size();
+
+		ui->manualSettingsWidget->setCurrentWidget(ui->manualContentPage);
+
         QnMediaServerConnectionPtr serverConnection = getServerConnection();
         if (!serverConnection)
             return;
-
-        QString id = m_camera->getProperty( Qn::CAMERA_SETTINGS_ID_PARAM_NAME );
-        createWidgetsRecreator(id);
-
-        //TODO #ak remove this XML parsing run      
-        CameraSettingsTreeLister lister( id, m_camera );
-        QStringList settings = lister.proceed();
-
+		
         ui->manualSettingsWidget->setCurrentWidget(ui->manualLoadingPage);
-
-        m_paramRequestHandle = serverConnection->getParamsAsync(m_camera, settings, this, SLOT(at_advancedSettingsLoaded(int, const QnStringVariantPairList &, int)) );
+        m_paramRequestHandle = serverConnection->getParamsAsync(m_camera, paramIds, this, SLOT(at_advancedSettingsLoaded(int, const QnCameraAdvancedParamValueList &, int)) );
     } else if (m_page == QnCameraAdvancedSettingsWidget::Page::Web) {
         QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
         m_lastCameraPageUrl = QString(QLatin1String("http://%1:%2/%3")).
@@ -279,69 +289,32 @@ void QnCameraAdvancedSettingsWidget::at_proxyAuthenticationRequired(const QNetwo
     authenticator->setPassword(password);
 }
 
-void QnCameraAdvancedSettingsWidget::at_advancedSettingsLoaded(int status, const QnStringVariantPairList &params, int handle) {
+void QnCameraAdvancedSettingsWidget::at_advancedSettingsLoaded(int status, const QnCameraAdvancedParamValueList &params, int handle) {
     if (handle != m_paramRequestHandle)
         return;
 
     ui->manualSettingsWidget->setCurrentWidget(ui->manualContentPage);
 
-    if (!m_widgetsRecreator) {
-        qWarning() << "QnSingleCameraSettingsWidget::at_advancedSettingsLoaded: widgets creator ptr is null, camera id: "
-            << (m_camera == 0? lit("unknown"): m_camera->getUniqueId());
-        return;
-    }
-    if (status != 0) {
+    if (params.isEmpty() || status != 0) {
         qWarning() << "QnSingleCameraSettingsWidget::at_advancedSettingsLoaded: http status code is not OK: " << status
             << ". Camera id: " << (m_camera == 0? lit("unknown"): m_camera->getUniqueId());
+		setPage(Page::CannotLoad);
         return;
     }
+	
+	m_advancedParamWidgetsManager->loadValues(params);
 
-    CameraSettings cameraSettings;
-    for (auto it = params.cbegin(); it != params.cend(); ++it) {
-        QString val = it->second.toString();
-        if (val.isEmpty())
-            continue;
-
-        CameraSettingPtr tmp(new CameraSetting());
-        tmp->deserializeFromStr(val);
-
-        CameraSettings::Iterator sIt = cameraSettings.find(tmp->getId());
-        if (sIt == cameraSettings.end()) {
-            cameraSettings.insert(tmp->getId(), tmp);
-            continue;
-        }
-
-        CameraSetting& savedVal = *(sIt.value());
-        if (CameraSettingReader::isEnabled(savedVal)) {
-            CameraSettingValue newVal = tmp->getCurrent();
-            if (savedVal.getCurrent() != newVal) {
-                savedVal.setCurrent(newVal);
-            }
-            continue;
-        }
-
-        if (CameraSettingReader::isEnabled(*tmp)) {
-            cameraSettings.erase(sIt);
-            cameraSettings.insert(tmp->getId(), tmp);
-            continue;
-        }
-    }
-
-    if (cameraSettings.isEmpty())
-        setPage(Page::CannotLoad);
-    else      
-        m_widgetsRecreator->proceed(cameraSettings);
 }
 
-void QnCameraAdvancedSettingsWidget::at_advancedParam_saved(int httpStatusCode, const QnStringBoolPairList& operationResult) {
+void QnCameraAdvancedSettingsWidget::at_advancedParam_saved(int status, const QnCameraAdvancedParamValueList &params, int handle) {
     --m_applyingParamsCount;
     updateApplyingParamsLabel();
 
-    QString error = httpStatusCode == 0 
+    QString error = status == 0 
         ? tr("Possibly, appropriate camera's service is unavailable now")
-        : tr("Server returned the following error code : ") + httpStatusCode; 
+        : tr("Server returned the following error code : ") + status; 
 
-    QString failedParams;
+   /* QString failedParams;
     for (auto it = operationResult.constBegin(); it != operationResult.constEnd(); ++it)
     {
         if (!it->second) {
@@ -357,18 +330,16 @@ void QnCameraAdvancedSettingsWidget::at_advancedParam_saved(int httpStatusCode, 
             tr("Could not save parameters"),
             tr("Failed to save the following parameters (%1):\n%2").arg(error, failedParams)
             );
-    }
+    }*/
 }
 
-void QnCameraAdvancedSettingsWidget::at_advancedParamChanged(const CameraSetting& val) {
+void QnCameraAdvancedSettingsWidget::at_advancedParamChanged(const QString &id, const QString &value) {
     auto serverConnection = getServerConnection();
     if (!serverConnection)
         return;
 
-    QnStringVariantPairList params;
-    params << QPair<QString, QVariant>(val.getId(), QVariant(val.serializeToStr()));
-    serverConnection->setParamsAsync(m_camera, params, this, SLOT(at_advancedParam_saved(int, const QnStringBoolPairList &)));
+	QnCameraAdvancedParamValue changedValue(id, value);
+    serverConnection->setParamsAsync(m_camera, QnCameraAdvancedParamValueList() << changedValue, this, SLOT(at_advancedParam_saved(int, const QnCameraAdvancedParamValueList &)));
     ++m_applyingParamsCount;
     updateApplyingParamsLabel();
 }
-
