@@ -582,6 +582,10 @@ void fixDiscoveredName(QString& name, QString& manufacturer, const QString& loca
     else if (lowerName == lit("networkcamera") && manufacturer.isEmpty()) {
         name.clear(); // some DW cameras report invalid model in multicast and empty vendor
     }
+    else if (lowerName == lit("networkcamera") && manufacturer.toLower().startsWith(lit("dcs-"))) {
+        name = manufacturer;
+        manufacturer = lit("DLink");
+    }
 }
 
 template <class T> 
