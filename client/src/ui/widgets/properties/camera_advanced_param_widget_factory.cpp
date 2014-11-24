@@ -99,7 +99,7 @@ public:
 	}
 
 	virtual QString value() const override	{
-		return m_comboBox->currentIndex();
+		return QString::number(m_comboBox->currentIndex());
 	}
 
 	virtual void setValue(const QString &newValue) override	{

@@ -135,7 +135,7 @@ int QnCameraSettingsRestHandler::executeGet(const QString &path, const QnRequest
             camera->setParamPhysicalAsync(param.id, param.value);
 		}
         else if( cmdType == ctGetParam ) {
-			qDebug() << "requested parameter" << param.id;
+			qDebug() << "requesting parameter" << param.id;
             camera->getParamPhysicalAsync(param.id);
 		}
     }
@@ -150,15 +150,21 @@ int QnCameraSettingsRestHandler::executeGet(const QString &path, const QnRequest
             const qint64 curClock = asyncOpCompletionTimer.elapsed();
 
 			/* Out of time, returning what we have. */
-            if( curClock >= (int)MAX_WAIT_TIMEOUT_MS )
+            if( curClock >= (int)MAX_WAIT_TIMEOUT_MS ) {
+				qDebug() << "timeout reached while waiting params";
                 break;
+			}
             
+			qDebug() << "wait a little more";
             m_cond.wait( &m_mutex, MAX_WAIT_TIMEOUT_MS - curClock );
 
 			/* Received all parameters. */
-            if( awaitedParams.requested.empty() )
+            if( awaitedParams.requested.empty() ) {
+				qDebug() << "all parameters received successfully";
                 break;
+			}
         }
+		qDebug() << "stop waiting for parameters";
         m_awaitedParamsSets.erase( awaitedParamsIter );
     }
 
@@ -217,11 +223,17 @@ void QnCameraSettingsRestHandler::asyncParamGetComplete(const QnResourcePtr &res
         if(!awaitedParams || awaitedParams->resource != resource)
             continue;
 
-		if (!awaitedParams->requested.contains(paramName))
+		if (!awaitedParams->requested.contains(paramName)) {
+			qDebug() << "waiting params set does not contains" << paramName;
 			continue;
+		}
 
-		if (result)
+		if (result) {
+			qDebug() << "adding" << paramName << "to result";
 			awaitedParams->result << QnCameraAdvancedParamValue(paramName, paramValue.toString());
+		} else {
+			qDebug() << "parameter request was not successful, skipping";
+		}
 		awaitedParams->requested.remove(paramName);
     }
 
