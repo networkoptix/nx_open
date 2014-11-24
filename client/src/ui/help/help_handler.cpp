@@ -23,18 +23,35 @@ namespace {
         }
     }
 
+    /** If the help could not be loaded, try again in 30 seconds. */
+    const int defaultHelpRetryPeriodMSec = 30*1000;
+
+    /** Send requests at least once a hour. */
+    const int maximumHelpRetryPeriodMSec = 60*60*1000;
+
 } // anonymous namespace
 
 
 QnHelpHandler::QnHelpHandler(QObject *parent):
     QObject(parent),
-    m_topic(Qn::Empty_Help)
+    m_topic(Qn::Empty_Help),
+    m_helpRetryPeriodMSec(defaultHelpRetryPeriodMSec)
 {
     m_helpRoot = qApp->applicationDirPath() + QLatin1String("/../help");
 
     QnOnlineHelpDetector *helpDetector = new QnOnlineHelpDetector(this);
-    connect(helpDetector,   &QnOnlineHelpDetector::urlFetched,  this,   &QnHelpHandler::at_helpUrlDetector_urlFetched);
-    connect(helpDetector,   &QnOnlineHelpDetector::error,       this,   &QnHelpHandler::at_helpUrlDetector_error);
+    connect(helpDetector,   &QnOnlineHelpDetector::urlFetched,  this,   [this, helpDetector](const QString &helpUrl) {
+        m_onlineHelpRoot = helpUrl;
+        helpDetector->deleteLater();
+    });
+
+    connect(helpDetector,   &QnOnlineHelpDetector::error,       this,  [this, helpDetector] {
+         QTimer::singleShot(m_helpRetryPeriodMSec, helpDetector, SLOT(fetchHelpUrl()));
+
+         /* Try again in the double time but at least once a maximumHelpRetryPeriodMSec. */
+         if (m_helpRetryPeriodMSec < maximumHelpRetryPeriodMSec)
+            m_helpRetryPeriodMSec = qMin(m_helpRetryPeriodMSec * 2, maximumHelpRetryPeriodMSec);
+    });
 }
 
 QnHelpHandler::~QnHelpHandler() {
@@ -65,23 +82,6 @@ QUrl QnHelpHandler::urlForTopic(int topic) const {
         QMessageBox::warning(0, tr("Error"), tr("Error")); // TODO: #dklychkov place something more detailed in the future
 
     return QUrl();
-}
-
-void QnHelpHandler::at_helpUrlDetector_urlFetched(const QString &helpUrl) {
-    QnOnlineHelpDetector *detector = qobject_cast<QnOnlineHelpDetector*>(sender());
-    if (!detector)
-        return;
-
-    detector->deleteLater();
-    m_onlineHelpRoot = helpUrl;
-}
-
-void QnHelpHandler::at_helpUrlDetector_error() {
-    QnOnlineHelpDetector *detector = qobject_cast<QnOnlineHelpDetector*>(sender());
-    if (!detector)
-        return;
-
-    QTimer::singleShot(30 * 1000, detector, SLOT(fetchHelpUrl()));
 }
 
 bool QnHelpHandler::eventFilter(QObject *watched, QEvent *event) {

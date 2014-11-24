@@ -6,7 +6,7 @@
 #ifndef SOCKET_COMMON_H
 #define SOCKET_COMMON_H
 
-#ifdef Q_OS_WIN
+#ifdef _WIN32
 #   include <winsock2.h>
 #else
 #   include <sys/socket.h>
@@ -37,6 +37,8 @@ public:
     //!Returns ip in local byte order
     uint32_t ipv4() const;
     QString toString() const;
+
+    struct in_addr inAddr() const;
 
     static const HostAddress localhost;
     static const HostAddress anyHost;

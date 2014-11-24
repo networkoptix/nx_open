@@ -848,7 +848,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="162"/>
         <source>Show IP in tree:</source>
-        <translation>在樹中顯示 IP:</translation>
+        <translation>顯示IP於列表:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="179"/>
@@ -1755,9 +1755,9 @@ Built for %5-%6 with %7.&lt;br/&gt;
 &lt;b&gt;OpenGL max texture size&lt;/b&gt;: %4.&lt;br/&gt;
 </source>
         <translation>&lt;b&gt;OpenGL 版本&lt;/b&gt;: %1.&lt;br/&gt;
-&lt;b&gt;OpenGL 渲染r&lt;/b&gt;: %2.&lt;br/&gt;
+&lt;b&gt;OpenGL 渲染&lt;/b&gt;: %2.&lt;br/&gt;
 &lt;b&gt;OpenGL 供應商&lt;/b&gt;: %3.&lt;br/&gt;
-&lt;b&gt;OpenGL 最大紋理大小e&lt;/b&gt;: %4.&lt;br/&gt;</translation>
+&lt;b&gt;OpenGL 最大紋理大小&lt;/b&gt;: %4.&lt;br/&gt;</translation>
     </message>
 </context>
 <context>
@@ -1939,7 +1939,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="481"/>
         <source>Logout</source>
-        <translation>佈局</translation>
+        <translation>登出</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="491"/>
@@ -4996,7 +4996,7 @@ Required at least %3 digital and %4 analog licenses.</source>
     </message>
     <message>
         <source>Invalid License. Contact our support team to get a valid License.</source>
-        <translation type="obsolete">無效授權。請聯繫 [山宏有限公司] 購買授權。</translation>
+        <translation type="obsolete">無效授權。請聯繫 支持團隊 購買授權。</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="101"/>
@@ -5029,7 +5029,7 @@ At least %3 licenses are required.</source>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="232"/>
         <source>Invalid License. Please contact our support team to get a valid license.</source>
-        <translation>無效授權。請聯繫 [山宏有限公司] 購買授權 (02)82261416。</translation>
+        <translation>無效授權。請與我們聯繫 。</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="236"/>
@@ -5135,7 +5135,7 @@ Try to activate your License manually.</source>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="39"/>
         <source>Please send E-Mail with the Serial Key and the Hardware ID provided to &lt;a href=&quot;mailto:%1&quot;&gt;%1&lt;/a&gt;. Then we&apos;ll send you an Activation Key which should be filled in the field below.</source>
-        <translation>請將您的授權金鑰及硬體 ID 寄給 [山宏有限公司]。 &lt;a href=&quot;mailto:%1&quot;&gt;%1&lt;/a&gt;.我們會寄送啟動碼給您並填入下面的欄位後即可啟動。</translation>
+        <translation>請將您的授權金鑰及硬體 ID 寄給客服信箱。 &lt;a href=&quot;mailto:%1&quot;&gt;%1&lt;/a&gt;我們會寄送啟動碼給您並填入下面的欄位後即可啟動。</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="117"/>
@@ -5399,7 +5399,7 @@ Client Version %2 is required to connect to this Enterprise Controller. Please d
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="202"/>
         <source>Dewarping</source>
-        <translation>延伸轉正 (Dewarping)</translation>
+        <translation>魚眼校正 (Dewarping)</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="211"/>
@@ -9111,7 +9111,7 @@ Please wait for the camera to go online.</source>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="630"/>
         <source>Expert</source>
-        <translation>匯出</translation>
+        <translation>專家模式</translation>
     </message>
 </context>
 <context>

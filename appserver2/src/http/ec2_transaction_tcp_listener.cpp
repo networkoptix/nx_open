@@ -2,6 +2,8 @@
 
 #include <QtCore/QUrlQuery>
 
+#include <nx_ec/ec_proto_version.h>
+
 #include "utils/network/tcp_connection_priv.h"
 #include "transaction/transaction_message_bus.h"
 #include "nx_ec/data/api_full_info_data.h"
@@ -52,10 +54,11 @@ void QnTransactionTcpProcessor::run()
     QUrlQuery query = QUrlQuery(d->request.requestLine.url.query());
     bool isClient = query.hasQueryItem("isClient");
     bool isMobileClient = query.hasQueryItem("isMobile");
-    QUuid remoteGuid  = QUuid(query.queryItemValue("guid"));
+    QnUuid remoteGuid  = QnUuid(query.queryItemValue("guid"));
+    QnUuid remoteRuntimeGuid  = QnUuid(query.queryItemValue("runtime-guid"));
     if (remoteGuid.isNull())
-        remoteGuid = QUuid::createUuid();
-    QUuid videowallGuid = QUuid(query.queryItemValue("videowallGuid"));
+        remoteGuid = QnUuid::createUuid();
+    QnUuid videowallGuid = QnUuid(query.queryItemValue("videowallGuid"));
     bool isVideowall = (!videowallGuid.isNull());
 
     Qn::PeerType peerType = isMobileClient  ? Qn::PT_MobileClient
@@ -67,9 +70,13 @@ void QnTransactionTcpProcessor::run()
     if (query.hasQueryItem("format"))
          QnLexical::deserialize(query.queryItemValue("format"), &dataFormat);
 
-    ApiPeerData remotePeer(remoteGuid, peerType, dataFormat);
+    ApiPeerData remotePeer(remoteGuid, remoteRuntimeGuid, peerType, dataFormat);
 
     d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
+    d->response.headers.insert(nx_http::HttpHeader("runtime-guid", qnCommon->runningInstanceGUID().toByteArray()));
+    d->response.headers.insert(nx_http::HttpHeader(
+        nx_ec::EC2_PROTO_VERSION_HEADER_NAME,
+        nx_http::StringType::number(nx_ec::EC2_PROTO_VERSION)));
 
     if (remotePeer.peerType == Qn::PT_Server)
     {
@@ -89,6 +96,10 @@ void QnTransactionTcpProcessor::run()
         parseRequest();
 
         d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
+        d->response.headers.insert(nx_http::HttpHeader("runtime-guid", qnCommon->runningInstanceGUID().toByteArray()));
+        d->response.headers.insert(nx_http::HttpHeader(
+            nx_ec::EC2_PROTO_VERSION_HEADER_NAME,
+            nx_http::StringType::number(nx_ec::EC2_PROTO_VERSION)));
     }
 
     query = QUrlQuery(d->request.requestLine.url.query());

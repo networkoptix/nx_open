@@ -8,7 +8,7 @@
 #include "recorder/device_file_catalog.h"
 #include "recorder/storage_manager.h"
 
-int QnRebuildArchiveRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+int QnRebuildArchiveRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path)
     Q_UNUSED(params)
@@ -24,7 +24,6 @@ int QnRebuildArchiveRestHandler::executeGet(const QString& path, const QnRequest
     QString messageStr;
     QString stateStr(lit("unknown"));
 
-
     if (method == "start") {
         if (QnStorageManager::instance()->rebuildState() == QnStorageManager::RebuildState_None) {
             QnStorageManager::instance()->rebuildCatalogAsync();
@@ -38,11 +37,16 @@ int QnRebuildArchiveRestHandler::executeGet(const QString& path, const QnRequest
     }
     else if (method == "stop") {
         progress = 100;
-        if (QnStorageManager::instance()->rebuildState() != QnStorageManager::RebuildState_None)
-            messageStr = lit("Rebuild archive canceled");
-        else
-            messageStr = lit("Rebuild is not running. nothing to do");
-        QnStorageManager::instance()->cancelRebuildCatalogAsync();
+        if (QnStorageManager::instance()->rebuildState() == QnStorageManager::RebuildState_Initial) {
+            messageStr = lit("Fast initial scan can't be canceled");
+        }
+        else { 
+            if (QnStorageManager::instance()->rebuildState() != QnStorageManager::RebuildState_None)
+                messageStr = lit("Rebuild archive canceled");
+            else
+                messageStr = lit("Rebuild is not running. nothing to do");
+            QnStorageManager::instance()->cancelRebuildCatalogAsync();
+        }
     }
     else {
         progress = QnStorageManager::instance()->rebuildProgress()*100 + 0.5;
@@ -66,6 +70,9 @@ int QnRebuildArchiveRestHandler::executeGet(const QString& path, const QnRequest
     case QnStorageManager::RebuildState_Started:
         stateStr = "started";
         break;
+    case QnStorageManager::RebuildState_Initial:
+        stateStr = "Fast scan";
+        break;
     }
 
     result.append(QString("<root><message>%1</message><progress>%2</progress><state>%3</state></root>\n").arg(messageStr).arg(progress).arg(stateStr).toUtf8());
@@ -73,7 +80,8 @@ int QnRebuildArchiveRestHandler::executeGet(const QString& path, const QnRequest
     return CODE_OK;
 }
 
-int QnRebuildArchiveRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, QByteArray& contentType)
+int QnRebuildArchiveRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, 
+                                             QByteArray& contentType, const QnRestConnectionProcessor* owner)
 {
-    return executeGet(path, params, result, contentType);
+    return executeGet(path, params, result, contentType, owner);
 }

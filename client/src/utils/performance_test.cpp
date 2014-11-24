@@ -5,7 +5,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtOpenGL/QGLWidget>
 
-#include <version.h>
+#include <utils/common/app_info.h>
 #include <utils/common/performance.h>
 #include <client/client_globals.h>
 #include <client/client_settings.h>
@@ -29,9 +29,9 @@ void QnPerformanceTest::detectLightMode() {
 
 #ifdef Q_OS_LINUX
     QString cpuName = QnPerformance::cpuName();
-    QRegExp atomCpuRegExp(lit("Intel\\(R\\) Atom\\(TM\\) CPU .*"));
-    if (atomCpuRegExp.exactMatch(cpuName))
-        poorCpu = true;
+    QRegExp poorCpuRegExp(lit("Intel\\(R\\) (Atom\\(TM\\)|Celeron\\(R\\)) CPU .*"));
+    poorCpu = poorCpuRegExp.exactMatch(cpuName);
+    qDebug() << "QnPerformanceTest: CPU: " << cpuName << " poor: " << poorCpu;
 
     // Create OpenGL context and check GL_RENDERER
     if (Display *display = QX11Info::display()) {
@@ -41,9 +41,9 @@ void QnPerformanceTest::detectLightMode() {
                 glXMakeCurrent(display, DefaultRootWindow(display), context);
 
                 QString renderer = QLatin1String(reinterpret_cast<const char *>(glGetString(GL_RENDERER)));
-                QRegExp slowRendererRegExp(lit("Gallium .* on llvmpipe .*"));
-                if (slowRendererRegExp.exactMatch(renderer))
-                    poorGpu = true;
+                QRegExp poorRendererRegExp(lit("Gallium .* on llvmpipe .*|Mesa DRI Intel\\(R\\) Bay Trail.*"));
+                poorGpu = poorRendererRegExp.exactMatch(renderer);
+                qDebug() << "QnPerformanceTest: Renderer: " << renderer << " poor: " << poorGpu;
 
                 glXDestroyContext(display, context);
             }
@@ -61,7 +61,7 @@ void QnPerformanceTest::detectLightMode() {
             QCoreApplication::translate("QnPerformance", "Warning"),
             QCoreApplication::translate("QnPerformance", "Performance of this computer allows running %1 in configuration mode only. "
                                                          "For full-featured mode please use another computer.").
-                    arg(QLatin1String(QN_PRODUCT_NAME_LONG)),
+                    arg(QnAppInfo::productNameLong()),
             QMessageBox::StandardButtons(QMessageBox::Ok),
             QMessageBox::Ok
         );

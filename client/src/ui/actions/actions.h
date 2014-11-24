@@ -128,11 +128,6 @@ namespace Qn {
         WhatsThisAction,
 
         /**
-         * Clears application cache folders (layout backgrounds, sounds)
-         */
-        ClearCacheAction,
-
-        /**
          * Cancels Tour Mode if it is started, otherwise works as FullScreenAction.
          */
         EscapeHotkeyAction,
@@ -215,6 +210,11 @@ namespace Qn {
          *                                                      If not provided, current connection info will be used.
          */
         QueueAppRestartAction,
+
+        /**
+         * Offers user to select server in cluster for other servers to synchronize time with
+         */
+        SelectTimeServerAction,
 
 
         /* Main menu actions. */
@@ -356,8 +356,10 @@ namespace Qn {
          */
         SystemAdministrationAction,
 
-        //ShowMediaServerLogs,
-
+        /**
+         * System administration dialog - updates page.
+         */
+        SystemUpdateAction,
 
         /* Tab bar actions. */
 
@@ -663,6 +665,16 @@ namespace Qn {
          */
         ToggleRadassAction,
 
+        /**
+         * Connect incompatible server to current system
+         */
+        ConnectToCurrentSystem,
+
+        /**
+         * Merge the other system with the current system
+         */
+        MergeSystems,
+
         /* PTZ Actions */
 
         /**
@@ -821,6 +833,16 @@ namespace Qn {
          * Sets aspect ratio of current layout's cells to 4x3.
          */
         SetCurrentLayoutAspectRatio4x3Action,
+
+        /**
+         * Sets aspect ratio of current layout's cells to 9x16.
+         */
+        SetCurrentLayoutAspectRatio9x16Action,
+
+        /**
+         * Sets aspect ratio of current layout's cells to 3x4.
+         */
+        SetCurrentLayoutAspectRatio3x4Action,
 
         /**
          * Sets spacing of current layout's cells to 0%.

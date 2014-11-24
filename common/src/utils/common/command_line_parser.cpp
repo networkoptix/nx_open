@@ -88,14 +88,14 @@ void QnCommandLineParser::print(QTextStream &stream) const {
 
     int shortNameWidth = 0;
     int longNameWidth = 0;
-    foreach(const QnCommandLineParameter &parameter, m_parameters) {
+    for(const QnCommandLineParameter &parameter: m_parameters) {
         shortNameWidth = qMax(shortNameWidth, parameter.shortName().size());
         longNameWidth = qMax(longNameWidth, parameter.longName().size());
     }
     if(longNameWidth > 0)
         longNameWidth++; /* So that there is a single space between long & short names. */
 
-    foreach(const QnCommandLineParameter &parameter, m_parameters) {
+    for(const QnCommandLineParameter &parameter: m_parameters) {
         stream.setFieldAlignment(QTextStream::AlignRight);
         
         stream.setFieldWidth(shortNameWidth);

@@ -47,7 +47,7 @@ void QJsonDetail::serialize_json(const QJsonValue &value, QByteArray *target, QJ
 }
 
 QJsonValue::Type expected_json_type(const QByteArray &value) {
-    foreach(const char c, value) {
+    for(const char c: value) {
         switch (c) {
         case ' ':
         case '\t':
@@ -200,7 +200,7 @@ public:
         registerSerializer<QVector2D>();
         registerSerializer<QVector3D>();
         registerSerializer<QVector4D>();
-        registerSerializer<QUuid>();
+        registerSerializer<QnUuid>();
         registerSerializer<QUrl>();
         registerSerializer<QFont>();
 

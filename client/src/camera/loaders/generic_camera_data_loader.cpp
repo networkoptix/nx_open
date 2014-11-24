@@ -17,29 +17,31 @@
 
 namespace {
     QAtomicInt qn_fakeHandle(INT_MAX / 2);
+
+    /** Minimum time (in milliseconds) for overlapping time periods requests.  */
+    const int minOverlapDuration = 40*1000;
 }
 
-QnGenericCameraDataLoader::QnGenericCameraDataLoader(const QnMediaServerConnectionPtr &connection, const QnNetworkResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent):
-    QnAbstractCameraDataLoader(resource, dataType, parent),
+QnGenericCameraDataLoader::QnGenericCameraDataLoader(const QnMediaServerConnectionPtr &connection, const QnNetworkResourcePtr &camera, Qn::CameraDataType dataType, QObject *parent):
+    QnAbstractCameraDataLoader(camera, dataType, parent),
     m_connection(connection)
 {
     if(!connection)
         qnNullWarning(connection);
 
-    if(!resource)
-        qnNullWarning(resource);
+    if(!camera)
+        qnNullWarning(camera);
 }
 
-QnGenericCameraDataLoader *QnGenericCameraDataLoader::newInstance(const QnMediaServerResourcePtr &serverResource, const QnResourcePtr &resource,  Qn::CameraDataType dataType, QObject *parent) {
-    QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
-    if (!networkResource || !serverResource)
+QnGenericCameraDataLoader *QnGenericCameraDataLoader::newInstance(const QnMediaServerResourcePtr &server, const QnNetworkResourcePtr &camera,  Qn::CameraDataType dataType, QObject *parent) {
+    if (!server || !camera)
         return NULL;
     
-    QnMediaServerConnectionPtr serverConnection = serverResource->apiConnection();
+    QnMediaServerConnectionPtr serverConnection = server->apiConnection();
     if (!serverConnection)
         return NULL;
 
-    return new QnGenericCameraDataLoader(serverConnection, networkResource, dataType, parent);
+    return new QnGenericCameraDataLoader(serverConnection, camera, dataType, parent);
 }
 
 int QnGenericCameraDataLoader::load(const QnTimePeriod &timePeriod, const QString &filter, const qint64 resolutionMs) {
@@ -47,7 +49,7 @@ int QnGenericCameraDataLoader::load(const QnTimePeriod &timePeriod, const QStrin
         discardCachedData(resolutionMs);
     m_filter = filter;
 
-    QnTimePeriodList &loadedPeriodList = m_loadedPeriods[resolutionMs];
+    const QnTimePeriodList &loadedPeriodList = m_loadedPeriods[resolutionMs];
 
     /* Check whether the requested data is already loaded. */
     foreach(const QnTimePeriod &loadedPeriod, loadedPeriodList) {
@@ -79,21 +81,29 @@ int QnGenericCameraDataLoader::load(const QnTimePeriod &timePeriod, const QStrin
     QnTimePeriod periodToLoad = timePeriod;
     if (!loadedPeriodList.isEmpty())
     {
-        QnTimePeriodList::iterator itr = qUpperBound(loadedPeriodList.begin(), loadedPeriodList.end(), periodToLoad.startTimeMs);
-        if (itr != loadedPeriodList.begin())
+        QnTimePeriodList::const_iterator itr = qUpperBound(loadedPeriodList.cbegin(), loadedPeriodList.cend(), periodToLoad.startTimeMs);
+        if (itr != loadedPeriodList.cbegin())
             itr--;
 
-        if (qBetween(itr->startTimeMs, periodToLoad.startTimeMs, itr->startTimeMs + itr->durationMs))
+        /* If last period is still recording, request at least from its start. */
+        if (itr->durationMs == -1) {
+            qint64 endPoint = periodToLoad.startTimeMs + periodToLoad.durationMs;
+            periodToLoad.startTimeMs = itr->startTimeMs;
+            periodToLoad.durationMs = endPoint - periodToLoad.startTimeMs;
+        } 
+        /* If we are requesting start time which is already loaded, move it to end of recorded period minus minOverlapDuration. */
+        else if (qBetween(itr->startTimeMs, periodToLoad.startTimeMs, itr->startTimeMs + itr->durationMs))
         {
             qint64 endPoint = periodToLoad.startTimeMs + periodToLoad.durationMs;
-            periodToLoad.startTimeMs = itr->startTimeMs + itr->durationMs - 40*1000; // add addition 40 sec (may server does not flush data e.t.c)
+            periodToLoad.startTimeMs = itr->startTimeMs + itr->durationMs - minOverlapDuration; // add addition 40 sec (may server does not flush data e.t.c)
             periodToLoad.durationMs = endPoint - periodToLoad.startTimeMs;
             ++itr;
-            if (itr != loadedPeriodList.end()) {
+            if (itr != loadedPeriodList.cend()) {
                 if (itr->startTimeMs < periodToLoad.startTimeMs + periodToLoad.durationMs)
                     periodToLoad.durationMs = itr->startTimeMs - periodToLoad.startTimeMs;
             }
         }
+        /* Check if end point is overlapped and move it. */
         else if (qBetween(itr->startTimeMs, periodToLoad.startTimeMs + periodToLoad.durationMs, itr->startTimeMs + itr->durationMs))
         {
             periodToLoad.durationMs = itr->startTimeMs - periodToLoad.startTimeMs;
@@ -167,8 +177,8 @@ void QnGenericCameraDataLoader::at_bookmarksReceived(int status, const QnCameraB
 
 void QnGenericCameraDataLoader::updateLoadedPeriods(const QnTimePeriod &loadedPeriod, const qint64 resolutionMs) {
     QnTimePeriod newPeriod(loadedPeriod);
-    QnAbstractCameraDataPtr &loadedData = m_loadedData[resolutionMs];
-    QnTimePeriodList &loadedPeriods = m_loadedPeriods[resolutionMs];
+    const QnAbstractCameraDataPtr &loadedData = m_loadedData[resolutionMs];
+    QnTimePeriodList loadedPeriods = m_loadedPeriods[resolutionMs];
 
     /* Cut off the last one minute as it may not contain the valid data yet. */ // TODO: #Elric cut off near live only
     newPeriod.durationMs -= 60 * 1000; 
@@ -194,27 +204,56 @@ void QnGenericCameraDataLoader::updateLoadedPeriods(const QnTimePeriod &loadedPe
         qint64 lastDataTime = loadedData->dataSource().last().startTimeMs;
         while (!loadedPeriods.isEmpty() && loadedPeriods.last().startTimeMs > lastDataTime)
             loadedPeriods.pop_back();
-        if (!m_loadedPeriods.isEmpty()) {
+        if (!loadedPeriods.isEmpty()) {
             QnTimePeriod& lastPeriod = loadedPeriods.last();
             lastPeriod.durationMs = qMin(lastPeriod.durationMs, lastDataTime - lastPeriod.startTimeMs);
         }
     }
+
+    m_loadedPeriods[resolutionMs] = loadedPeriods;
 }
+
+//#define CHUNKS_LOADER_DEBUG
 
 void QnGenericCameraDataLoader::handleDataLoaded(int status, const QnAbstractCameraDataPtr &data, int requstHandle) {
     for (int i = 0; i < m_loading.size(); ++i) {
         if (m_loading[i].handle != requstHandle)
             continue;
-        
+#ifdef CHUNKS_LOADER_DEBUG
+        QString debugName = m_connection->url().host();
+#endif
+
         qint64 resolutionMs = m_loading[i].resolutionMs;
         if (status == 0) {
+
+#ifdef CHUNKS_LOADER_DEBUG
+            if (!data->dataSource().isEmpty()) {
+                qDebug() << "---------------------------------------------------------------------";
+                qDebug() << debugName << "CHUNK request" << m_loading[i].period;
+                qDebug() << debugName << "CHUNK data" << data->dataSource();
+                if (m_loadedData[resolutionMs])
+                    qDebug() << debugName << "CHUNK total before" << m_loadedData[resolutionMs]->dataSource(); 
+            }
+#endif
+
             if (!m_loadedData[resolutionMs] && data) {
                 m_loadedData[resolutionMs] = data;
+#ifdef CHUNKS_LOADER_DEBUG
+                qDebug() << debugName << "CHUNK total after" << m_loadedData[resolutionMs]->dataSource(); 
+#endif
                 updateLoadedPeriods(m_loading[i].period, resolutionMs);
             }
             else
             if (data && !data->isEmpty()) {
                 m_loadedData[resolutionMs]->append(data);
+#ifdef CHUNKS_LOADER_DEBUG
+                qDebug() << debugName << "CHUNK total after" << m_loadedData[resolutionMs]->dataSource(); 
+#endif
+                updateLoadedPeriods(m_loading[i].period, resolutionMs);
+            }
+            /* Check if already recorded period was deleted on the server. */
+            else if (m_loadedData[resolutionMs] && data && data->isEmpty()) {
+                m_loadedData[resolutionMs]->trim(m_loading[i].period.startTimeMs);
                 updateLoadedPeriods(m_loading[i].period, resolutionMs);
             }
 

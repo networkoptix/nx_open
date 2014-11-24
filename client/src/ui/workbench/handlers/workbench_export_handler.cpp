@@ -42,7 +42,7 @@
 #include <utils/common/environment.h>
 #include <utils/common/string.h>
 
-#include "version.h"
+#include <utils/common/app_info.h>
 
 namespace {
 
@@ -84,9 +84,9 @@ QnWorkbenchExportHandler::QnWorkbenchExportHandler(QObject *parent):
 #ifdef Q_OS_WIN
 QString QnWorkbenchExportHandler::binaryFilterName() const {
 #ifdef Q_OS_WIN64
-    return tr("Executable %1 Media File (x64) (*.exe)").arg(QLatin1String(QN_ORGANIZATION_NAME));
+    return tr("Executable %1 Media File (x64) (*.exe)").arg(QnAppInfo::organizationName());
 #else
-    return tr("Executable %1 Media File (x86) (*.exe)").arg(QLatin1String(QN_ORGANIZATION_NAME));
+    return tr("Executable %1 Media File (x86) (*.exe)").arg(QnAppInfo::organizationName());
 #endif
 }
 #endif
@@ -243,6 +243,9 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     QString selectedFilter;
     ImageCorrectionParams contrastParams = itemData.contrastParams;
     QnItemDewarpingParams dewarpingParams = itemData.dewarpingParams;
+    int rotation = itemData.rotation;
+    QRectF zoomRect = itemData.zoomRect;
+    qreal customAr = widget->resource()->toResource()->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
 
     QString namePart = replaceNonFileNameCharacters(widget->resource()->toResourcePtr()->getName(), L'_');
     QString timePart = (widget->resource()->toResource()->flags() & Qn::utc)
@@ -279,15 +282,10 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         dialog->addWidget(tr("Timestamps:"), comboBox, delegate);
 
 
-        bool doTranscode = contrastParams.enabled || dewarpingParams.enabled;
-        if (doTranscode) {
-            if (contrastParams.enabled && dewarpingParams.enabled) {
-                dialog->addCheckBox(tr("Apply dewarping and image correction (requires transcoding)"), &doTranscode, delegate);
-            } else if (contrastParams.enabled) {
-                dialog->addCheckBox(tr("Apply image correction (requires transcoding)"), &doTranscode, delegate);
-            } else {
-                dialog->addCheckBox(tr("Apply dewarping (requires transcoding)"), &doTranscode, delegate);
-            }
+        bool doTranscode = contrastParams.enabled || dewarpingParams.enabled || itemData.rotation || customAr || !zoomRect.isNull();
+        if (doTranscode) 
+        {
+            dialog->addCheckBox(tr("Transcode video to guarantee WYSIWYG"), &doTranscode, delegate);
         }
 
         if (!dialog->exec())
@@ -305,8 +303,13 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
 
         timestampPos = (Qn::Corner) comboBox->itemData(comboBox->currentIndex()).toInt();
 
-        contrastParams.enabled &= doTranscode;
-        dewarpingParams.enabled &= doTranscode;
+        if (!doTranscode) {
+            contrastParams.enabled = false;
+            dewarpingParams.enabled = false;
+            rotation = 0;
+            zoomRect = QRectF();
+            customAr = 0.0;
+        }
 
         if (dialog->selectedNameFilter().contains(aviFileFilter)) {
             QnCachingCameraDataLoader* loader = navigator()->loader(widget->resource()->toResourcePtr());
@@ -387,10 +390,9 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         if (existingLayout)
             removeLayoutFromPool(existingLayout);
 
-        QnLayoutResourcePtr newLayout(new QnLayoutResource());
-        newLayout->setTypeByName(lit("Layout"));
+        QnLayoutResourcePtr newLayout(new QnLayoutResource(qnResTypePool));
 
-        itemData.uuid = QUuid::createUuid();
+        itemData.uuid = QnUuid::createUuid();
         newLayout->addItem(itemData);
         saveLayoutToLocalFile(newLayout, period, fileName, Qn::LayoutExport, false, true);
         return;
@@ -412,7 +414,6 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(resource, 0);
     }
     qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(resource, Qn::InvalidUtcOffset);
-
     QnClientVideoCameraExportTool *tool = new QnClientVideoCameraExportTool(
                                               camera,
                                               period,
@@ -420,9 +421,11 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
                                               timestampPos,
                                               timeOffset,
                                               serverTimeZone,
-                                              itemData.zoomRect,
+                                              zoomRect,
                                               contrastParams,
                                               dewarpingParams,
+                                              rotation,
+                                              customAr,
                                               this);
 
     connect(exportProgressDialog,   &QnProgressDialog::canceled,    tool,                   &QnClientVideoCameraExportTool::stop);
@@ -528,7 +531,7 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
         previousDir = qnSettings->mediaFolder();
 
     QString suggestion = replaceNonFileNameCharacters(layout->getName(), QLatin1Char('_'));
-    suggestion = QnEnvironment::getUniqueFileName(previousDir, suggestion);
+    suggestion = QnEnvironment::getUniqueFileName(previousDir, QFileInfo(suggestion).baseName());
 
     QString fileName;
     bool readOnly = false;
@@ -536,7 +539,7 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
 #ifdef Q_OS_WIN
     QString filterSeparator(QLatin1String(";;"));
 #endif
-    QString mediaFileFilter = tr("%1 Media File (*.nov)").arg(lit(QN_ORGANIZATION_NAME))
+    QString mediaFileFilter = tr("%1 Media File (*.nov)").arg(QnAppInfo::organizationName())
 #ifdef Q_OS_WIN
             + filterSeparator
             + binaryFilterName()

@@ -2,8 +2,11 @@
 #include <cassert>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/warnings.h>
+
 #include <core/resource/user_resource.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
+
 #include "workbench.h"
 #include "workbench_layout.h"
 #include "workbench_layout_synchronizer.h"
@@ -53,9 +56,8 @@ void QnWorkbenchSynchronizer::submit() {
 
         if(resource.isNull()) { 
             /* This actually is a newly created layout. */
-            resource = QnLayoutResourcePtr(new QnLayoutResource());
-            resource->setId(QUuid::createUuid());
-            resource->setTypeByName(lit("Layout"));
+            resource = QnLayoutResourcePtr(new QnLayoutResource(qnResTypePool));
+            resource->setId(QnUuid::createUuid());
             resource->addFlags(Qn::local); // TODO: #Elric #EC2
 
             QnWorkbenchLayoutSynchronizer *synchronizer = new QnWorkbenchLayoutSynchronizer(layout, resource, this);

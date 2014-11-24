@@ -20,7 +20,7 @@
 
 typedef QnBusinessActionData* QnLightBusinessActionP;
 
-QHash<QUuid, QnResourcePtr> QnEventLogModel::m_resourcesHash;
+QHash<QnUuid, QnResourcePtr> QnEventLogModel::m_resourcesHash;
 
 // -------------------------------------------------------------------------- //
 // QnEventLogModel::DataIndex
@@ -313,7 +313,7 @@ QnResourcePtr QnEventLogModel::getResource(const Column &column, const QnBusines
     return QnResourcePtr();
 }
 
-QnResourcePtr QnEventLogModel::getResourceById(const QUuid &id) {
+QnResourcePtr QnEventLogModel::getResourceById(const QnUuid &id) {
     if (id.isNull())
         return QnResourcePtr();
 
@@ -329,7 +329,7 @@ QnResourcePtr QnEventLogModel::getResourceById(const QUuid &id) {
 }
 
 QVariant QnEventLogModel::iconData(const Column& column, const QnBusinessActionData &action) {
-    QUuid resId;
+    QnUuid resId;
     switch(column) {
     case EventCameraColumn: 
         resId = action.getRuntimeParams().getEventResourceId();
@@ -338,8 +338,8 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnBusinessActionD
         {
             QnBusiness::ActionType actionType = action.actionType();
             if (actionType == QnBusiness::SendMailAction) {
-                if (!action.getParams().getEmailAddress().isEmpty()) {
-                    if (action.getParams().getEmailAddress().count(L'@') > 1)
+                if (!action.getParams().emailAddress.isEmpty()) {
+                    if (action.getParams().emailAddress.count(L'@') > 1)
                         return qnResIconCache->icon(QnResourceIconCache::Users);
                     else
                         return qnResIconCache->icon(QnResourceIconCache::User);
@@ -349,7 +349,7 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnBusinessActionD
                 }
             }
             else if (actionType == QnBusiness::ShowPopupAction) {
-                if (action.getParams().getUserGroup() == QnBusinessActionParameters::AdminOnly)
+                if (action.getParams().userGroup == QnBusinessActionParameters::AdminOnly)
                     return qnResIconCache->icon(QnResourceIconCache::User);
                 else
                     return qnResIconCache->icon(QnResourceIconCache::Users);
@@ -363,7 +363,7 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnBusinessActionD
     return qnResIconCache->icon(getResourceById(resId));
 }
 
-QString QnEventLogModel::getResourceNameString(QUuid id) {
+QString QnEventLogModel::getResourceNameString(QnUuid id) {
     return getResourceName(getResourceById(id));
 }
 
@@ -395,9 +395,9 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
     case ActionCameraColumn: {
         QnBusiness::ActionType actionType = action.actionType();
         if (actionType == QnBusiness::SendMailAction)
-            return action.getParams().getEmailAddress();
+            return action.getParams().emailAddress;
         else if (actionType == QnBusiness::ShowPopupAction)
-            return getUserGroupString(action.getParams().getUserGroup());
+            return getUserGroupString(action.getParams().userGroup);
         else
             return getResourceNameString(action.getRuntimeParams().getActionResourceId());
     }

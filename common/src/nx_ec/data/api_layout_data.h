@@ -8,21 +8,24 @@
 namespace ec2
 {
 
-    struct ApiLayoutItemData: ApiData {
-        QUuid id;
+    struct ApiLayoutItemData: ApiData 
+    {
+        ApiLayoutItemData(): ApiData(), flags(0), left(0), top(0), right(0), bottom(0), rotation(0.0), zoomLeft(0.0), zoomTop(0.0), zoomRight(0.0), zoomBottom(0.0) {}
+
+        QnUuid id;
         qint32 flags;
         float left;
         float top;
         float right;
         float bottom;
         float rotation;
-        QUuid resourceId;
+        QnUuid resourceId;
         QString resourcePath;
         float zoomLeft;
         float zoomTop;
         float zoomRight;
         float zoomBottom;
-        QUuid zoomTargetId;
+        QnUuid zoomTargetId;
         QnLatin1Array contrastParams; // TODO: #API I'll think about this one.
         QnLatin1Array dewarpingParams;
     };
@@ -31,7 +34,7 @@ namespace ec2
 
 
     struct ApiLayoutItemWithRefData: ApiLayoutItemData {
-        QUuid layoutId;
+        QnUuid layoutId;
     };
 #define ApiLayoutItemWithRefData_Fields ApiLayoutItemData_Fields (layoutId)
 

@@ -71,7 +71,13 @@ protected:
         Qn::NodeType leftNode = left.data(Qn::NodeTypeRole).value<Qn::NodeType>();
         Qn::NodeType rightNode = right.data(Qn::NodeTypeRole).value<Qn::NodeType>();
 
-        /* Local node must be the last one in a list. */
+        /* "Other Systems" must be the last element */
+        bool leftOtherSystems = leftNode == Qn::OtherSystemsNode;
+        bool rightOtherSystems = rightNode == Qn::OtherSystemsNode;
+        if(leftOtherSystems ^ rightOtherSystems) /* One of the nodes is an "other systems" node, but not both. */
+            return rightOtherSystems;
+
+        /* Local node must be just before "other systems". */
         bool leftLocal = leftNode == Qn::LocalNode;
         bool rightLocal = rightNode == Qn::LocalNode;
         if(leftLocal ^ rightLocal) /* One of the nodes is a local node, but not both. */
@@ -83,6 +89,11 @@ protected:
         bool rightVideoWall = rightResource.dynamicCast<QnVideoWallResource>();
         if(leftVideoWall ^ rightVideoWall) /* One of the nodes is a videowall node, but not both. */
             return rightVideoWall;
+
+        bool leftIncompatible = leftResource && (leftResource->getStatus() == Qn::Incompatible);
+        bool rightIncompatible = rightResource && (rightResource->getStatus() == Qn::Incompatible);
+        if(leftIncompatible ^ rightIncompatible) /* One of the nodes is incompatible server node, but not both. */
+            return rightIncompatible;
 
         // checking pairs of VideoWallItemNode + VideoWallMatrixNode
         if ((leftNode == Qn::VideoWallItemNode || rightNode == Qn::VideoWallItemNode)
@@ -239,7 +250,8 @@ void QnResourceTreeWidget::setWorkbench(QnWorkbench *workbench) {
 }
 
 void QnResourceTreeWidget::edit() {
-    ui->resourcesTreeView->edit(selectionModel()->currentIndex());
+    QAbstractItemView* view = ui->resourcesTreeView;
+    view->edit(selectionModel()->currentIndex());
 }
 
 void QnResourceTreeWidget::expand(const QModelIndex &index) {

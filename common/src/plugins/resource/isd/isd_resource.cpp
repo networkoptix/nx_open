@@ -1,6 +1,7 @@
 #ifdef ENABLE_ISD
 
 #include <utils/math/math.h>
+#include <utils/network/http/asynchttpclient.h>
 
 #include "isd_stream_reader.h"
 #include "isd_resource.h"
@@ -34,12 +35,40 @@ static bool sizeCompare(const QSize &s1, const QSize &s2)
 QnPlIsdResource::QnPlIsdResource()
 {
     setVendor(lit("ISD"));
-    setAuth(QLatin1String("root"), QLatin1String("admin"));
+    setDefaultAuth(QLatin1String("root"), QLatin1String("admin"));
 }
 
-bool QnPlIsdResource::isResourceAccessible()
+bool QnPlIsdResource::checkIfOnlineAsync( std::function<void(bool)>&& completionHandler )
 {
-    return updateMACAddress();
+    QUrl apiUrl;
+    apiUrl.setScheme( lit("http") );
+    apiUrl.setHost( getHostAddress() );
+    apiUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
+    apiUrl.setUserName( getAuth().user() );
+    apiUrl.setPassword( getAuth().password() );
+    apiUrl.setPath( lit("/api/param.cgi") );
+    apiUrl.setQuery( lit("req=Network.1.MacAddress") );
+
+    QString resourceMac = getMAC().toString();
+    auto requestCompletionFunc = [resourceMac, completionHandler]
+        ( SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody ) mutable
+    {
+        if( osErrorCode != SystemError::noError ||
+            statusCode != nx_http::StatusCode::ok )
+        {
+            return completionHandler( false );
+        }
+
+        int sepIndex = msgBody.indexOf('=');
+        if( sepIndex == -1 )
+            return completionHandler( false );
+        QByteArray macAddress = msgBody.mid(sepIndex+1).trimmed();
+        completionHandler( macAddress == resourceMac.toLatin1() );
+    };
+
+    return nx_http::downloadFileAsync(
+        apiUrl,
+        requestCompletionFunc );
 }
 
 QString QnPlIsdResource::getDriverName() const
@@ -55,7 +84,8 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
     CLHttpStatus status;
-    QByteArray reslst = downloadFile(status, QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.ResolutionList"),  getHostAddress(), 80, 3000, getAuth());
+    int port = QUrl(getUrl()).port(80);
+    QByteArray reslst = downloadFile(status, QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.ResolutionList"),  getHostAddress(), port, 3000, getAuth());
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
@@ -68,7 +98,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
 
     QList<QSize> resolutions;
 
-    foreach(const QString& val,  vals)
+    for(const QString& val:  vals)
     {
         QStringList wh_s = val.split(QLatin1Char('x'));
         if (wh_s.size()<2)
@@ -140,7 +170,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
 
 
     /*
-    QByteArray reslst2 = downloadFile(status, "api/param.cgi?req=VideoInput.1.h264.2.ResolutionList",  getHostAddress(), 80, 3000, getAuth());
+    QByteArray reslst2 = downloadFile(status, "api/param.cgi?req=VideoInput.1.h264.2.ResolutionList",  getHostAddress(), port, 3000, getAuth());
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
@@ -150,14 +180,14 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
     */
 
 
-    QByteArray fpses = downloadFile(status, QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.FrameRateList"),  getHostAddress(), 80, 3000, getAuth());
+    QByteArray fpses = downloadFile(status, QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.FrameRateList"),  getHostAddress(), port, 3000, getAuth());
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
         setStatus(Qn::Unauthorized);
         QUrl requestedUrl;
         requestedUrl.setHost( getHostAddress() );
-        requestedUrl.setPort( 80 );
+        requestedUrl.setPort( port );
         requestedUrl.setScheme( QLatin1String("http") );
         requestedUrl.setPath( QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.FrameRateList") );
         return CameraDiagnostics::NotAuthorisedResult( requestedUrl.toString() );
@@ -169,7 +199,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
     vals = getValues(QLatin1String(fpses));
 
     QList<int> fpsList;
-    foreach(QString fpsS, vals)
+    for(const QString& fpsS: vals)
     {
         fpsList.push_back(fpsS.trimmed().toInt());
     }
@@ -181,12 +211,18 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
 
     setMaxFps(fpsList.at(0));
 
+    setProperty(
+        Qn::SUPPORTED_MOTION_PARAM_NAME,
+        qnResTypePool->getResourceType( getTypeId() )->defaultValue( Qn::SUPPORTED_MOTION_PARAM_NAME ) );
+
     CameraMediaStreams mediaStreams;
     mediaStreams.streams.push_back( CameraMediaStreamInfo( m_resolution1, CODEC_ID_H264 ) );
     if( m_resolution2.width() > 0 )
         mediaStreams.streams.push_back( CameraMediaStreamInfo( m_resolution2, CODEC_ID_H264 ) );
     saveResolutionList( mediaStreams );
 
+    setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, 1);
+    //setMotionType( Qn::MT_SoftwareGrid );
     saveParams();
 
     return CameraDiagnostics::NoErrorResult();
@@ -230,21 +266,7 @@ QnConstResourceAudioLayoutPtr QnPlIsdResource::getAudioLayout(const QnAbstractSt
 
 void QnPlIsdResource::setMaxFps(int f)
 {
-    setParam(MAX_FPS_PARAM_NAME, f, QnDomainDatabase);
-}
-
-int QnPlIsdResource::getMaxFps() const
-{
-    QVariant mediaVariant;
-    QnSecurityCamResource* this_casted = const_cast<QnPlIsdResource*>(this);
-
-    if (!hasParam(MAX_FPS_PARAM_NAME))
-    {
-        return QnPhysicalCameraResource::getMaxFps();
-    }
-
-    this_casted->getParam(MAX_FPS_PARAM_NAME, mediaVariant, QnDomainMemory);
-    return mediaVariant.toInt();
+    setProperty(MAX_FPS_PARAM_NAME, f);
 }
 
 #endif // #ifdef ENABLE_ISD

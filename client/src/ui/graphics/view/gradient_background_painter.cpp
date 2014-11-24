@@ -21,20 +21,22 @@
 #include <ui/workaround/gl_native_painting.h>
 #include <opengl_renderer.h>
 
+namespace {
+    const int sectorCount = 32;
+    const int circlesCount = 2;
+}
+
 QnGradientBackgroundPainter::QnGradientBackgroundPainter(qreal cycleIntervalSecs, QObject *parent, QnWorkbenchContext *context):
     base_type(parent),
     QnWorkbenchContextAware(context),
     m_backgroundColorAnimator(NULL),
     m_cycleIntervalSecs(cycleIntervalSecs),
-    m_rainbow(NULL)
+    m_rainbow(new QnRainbow(this))
 {
-    connect(this->context()->instance<QnWorkbenchPanicWatcher>(), &QnWorkbenchPanicWatcher::panicModeChanged, this, &QnGradientBackgroundPainter::updateBackgroundColorAnimated);
+    connect(this->context()->instance<QnWorkbenchPanicWatcher>(),   &QnWorkbenchPanicWatcher::panicModeChanged, this,   &QnGradientBackgroundPainter::updateBackgroundColorAnimated);
+    connect(qnSettings->notifier(QnClientSettings::BACKGROUND),     &QnPropertyNotifier::valueChanged,          this,   &QnGradientBackgroundPainter::updateBackgroundColorAnimated);
 
-    if(qnSettings->isRainbowMode()) {
-        m_rainbow = new QnRainbow(this);
-    }
-
-        updateBackgroundColor(false);
+    updateBackgroundColor(false);
 
     m_timer.start();
 }
@@ -104,34 +106,58 @@ const QnBackgroundColors &QnGradientBackgroundPainter::colors() {
 }
 
 void QnGradientBackgroundPainter::setColors(const QnBackgroundColors &colors) {
-    m_colors = colors;
-    
+    m_colors = colors;  
     updateBackgroundColor(false);
 }
 
 void QnGradientBackgroundPainter::updateBackgroundColor(bool animate) {
-    QColor backgroundColor;
+    QnClientBackground background = qnSettings->background();
+
+    QColor targetColor;
+    int actualAlpha = background.animationCustomColor.isValid()
+        ? background.animationCustomColor.alpha()
+        : m_colors.normal.alpha();
     
-    if(m_rainbow) {
-        backgroundColor = toTransparent(m_rainbow->currentColor(), 0.5);
-    } else if(context()->instance<QnWorkbenchPanicWatcher>()->isPanicMode()) {
-        backgroundColor = m_colors.panic;
-    } else {
-        backgroundColor = m_colors.normal;
+    if(context()->instance<QnWorkbenchPanicWatcher>()->isPanicMode())
+        targetColor = m_colors.panic;
+    else if (!background.animationEnabled)
+        targetColor = QColor();
+    else switch (background.animationMode) {
+    case Qn::DefaultAnimation:
+        targetColor = withAlpha(m_colors.normal, actualAlpha);
+        break;
+    case Qn::RainbowAnimation:
+        targetColor = withAlpha(m_rainbow->currentColor(), actualAlpha);
+        break;
+    case Qn::CustomAnimation:
+        targetColor = background.animationCustomColor;
+        break;
     }
 
     if(animate) {
-        backgroundColorAnimator()->animateTo(backgroundColor);
+        backgroundColorAnimator()->animateTo(targetColor);
     } else {
-        m_currentColor = backgroundColor;
+        m_currentColor = targetColor;
     }
 }
 
 void QnGradientBackgroundPainter::drawLayer(QPainter *painter, const QRectF &rect) {
-    if(m_rainbow && !backgroundColorAnimator()->isRunning()) {
+    if (!isEnabled())
+        return;
+
+    QnClientBackground background = qnSettings->background();
+
+    if (background.animationEnabled
+        && background.animationMode == Qn::RainbowAnimation
+        && !context()->instance<QnWorkbenchPanicWatcher>()->isPanicMode()
+        && !backgroundColorAnimator()->isRunning())
+    {
         m_rainbow->advance();
         updateBackgroundColorAnimated();
     }
+
+    if (!m_currentColor.isValid())
+        return;
 
     qreal pos = position();
 
@@ -142,63 +168,29 @@ void QnGradientBackgroundPainter::drawLayer(QPainter *painter, const QRectF &rec
 
     qreal radius = qMin(rect.width(), rect.height()) / 1.4142;
 
-#ifdef QN_BACKGROUND_PAINTER_NO_OPENGL
-    {
-        QRadialGradient radialGrad(center1, radius);
-        radialGrad.setColorAt(0, color);
-        radialGrad.setColorAt(1, QColor(0, 0, 0, 0));
-        painter->fillRect(rect, radialGrad);
-    }
-
-    {
-        QRadialGradient radialGrad(center2, radius);
-        radialGrad.setColorAt(0, color);
-        radialGrad.setColorAt(1, QColor(0, 0, 0, 0));
-        painter->fillRect(rect, radialGrad);
-    }
-#else
     if(!m_gradientPainter)
-        m_gradientPainter.reset(new QnRadialGradientPainter(32, QColor(255, 255, 255, 255), QColor(255, 255, 255, 0), QGLContext::currentContext()));
+        m_gradientPainter.reset(new QnRadialGradientPainter(sectorCount, QColor(255, 255, 255, 255), QColor(255, 255, 255, 0), QGLContext::currentContext()));
 
     if(m_gradientPainter->isAvailable()) {
 
-    QnGlNativePainting::begin(QGLContext::currentContext(),painter);
+        QnGlNativePainting::begin(QGLContext::currentContext(),painter);
         {
-            if(!m_gradientPainter)
-                m_gradientPainter.reset(new QnRadialGradientPainter(32, QColor(255, 255, 255, 255), QColor(255, 255, 255, 0), QGLContext::currentContext()));
-
-            //glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        
-        QMatrix4x4 m = QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix();
 
-        //glPushMatrix();
-
-        //qDebug()<<"model_view 1"<<QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix();
-        QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix().translate(center1.x(), center1.y());
-        //qDebug()<<"model_view translate"<<center1.x() <<center1.y()<<QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix();
-        //glTranslate(center1);
-        QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix().scale(radius, radius);
-        //qDebug()<<"model_view 3 scale"<<radius<<QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix();
-        //glScale(radius, radius);
-            m_gradientPainter->paint(color);
-        //glPopMatrix();
-        QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix() = m;
-
-        //glPushMatrix();
-        
-        QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix().translate(center2.x(), center2.y());
-        //glTranslate(center2);
-        QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix().scale(radius, radius);
-        //glScale(radius, radius);
-            m_gradientPainter->paint(color);
-
-        QnOpenGLRendererManager::instance(QGLContext::currentContext()).getModelViewMatrix() = m;
-        //glPopMatrix();
+            auto renderer = QnOpenGLRendererManager::instance(QGLContext::currentContext());
+            
+            const qreal distance = (center2.x() - center1.x()) / (circlesCount - 1);
+            for (int step = 0; step < circlesCount; ++step) {
+                QMatrix4x4 m = renderer->pushModelViewMatrix();
+                m.translate(center1.x() + step * distance, center1.y());
+                m.scale(radius, radius);
+                renderer->setModelViewMatrix(m);
+                m_gradientPainter->paint(color);
+                renderer->popModelViewMatrix();
+            }
 
             glDisable(GL_BLEND);
-            //glPopAttrib();
         }
         QnGlNativePainting::end(painter);
     } else {
@@ -216,4 +208,3 @@ void QnGradientBackgroundPainter::drawLayer(QPainter *painter, const QRectF &rec
         }
     }
 }
-#endif

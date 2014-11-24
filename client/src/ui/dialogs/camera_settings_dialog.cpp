@@ -8,6 +8,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/user_resource.h>
 
 #include <ui/actions/actions.h>
@@ -23,6 +24,7 @@
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/license_usage_helper.h>
+#include "core/resource_management/resource_properties.h"
 
 QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     base_type(parent),
@@ -52,22 +54,23 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     layout->addWidget(m_settingsWidget);
     layout->addWidget(m_buttonBox);
 
-    connect(m_buttonBox,        SIGNAL(accepted()),                 this,   SLOT(acceptIfSafe()));
+    //connect(m_buttonBox,        &QDialogButtonBox::accepted,        this,   &QnCameraSettingsDialog::acceptIfSafe);
 
-    connect(m_settingsWidget,   SIGNAL(hasChangesChanged()),        this,   SLOT(at_settingsWidget_hasChangesChanged()));
-    connect(m_settingsWidget,   SIGNAL(modeChanged()),              this,   SLOT(at_settingsWidget_modeChanged()));
-    connect(m_settingsWidget,   SIGNAL(advancedSettingChanged()),   this,   SLOT(at_advancedSettingChanged()));
+    connect(m_settingsWidget,   &QnCameraSettingsWidget::hasChangesChanged,         this,   &QnCameraSettingsDialog::at_settingsWidget_hasChangesChanged);
+    connect(m_settingsWidget,   &QnCameraSettingsWidget::modeChanged,               this,   &QnCameraSettingsDialog::at_settingsWidget_modeChanged);
     
     connect(m_openButton,       &QPushButton::clicked,              this,   &QnCameraSettingsDialog::at_openButton_clicked);
     connect(m_diagnoseButton,   &QPushButton::clicked,              this,   &QnCameraSettingsDialog::at_diagnoseButton_clicked);
     connect(m_rulesButton,      &QPushButton::clicked,              this,   &QnCameraSettingsDialog::at_rulesButton_clicked);
 
     connect(m_settingsWidget,   &QnCameraSettingsWidget::scheduleExported, this,    &QnCameraSettingsDialog::saveCameras);
-    connect(m_settingsWidget,   &QnCameraSettingsWidget::resourcesChanged,  this,   &QnCameraSettingsDialog::updateReadOnly);
+    connect(m_settingsWidget,   &QnCameraSettingsWidget::resourcesChanged, this,   &QnCameraSettingsDialog::updateReadOnly);
     
-    connect(context(),          &QnWorkbenchContext::userChanged,           this,   &QnCameraSettingsDialog::updateReadOnly);
+    connect(context(),          &QnWorkbenchContext::userChanged,          this,   &QnCameraSettingsDialog::updateReadOnly);
 
     connect(action(Qn::SelectionChangeAction),  &QAction::triggered,    this,   &QnCameraSettingsDialog::at_selectionChangeAction_triggered);
+
+    connect(propertyDictionary, &QnResourcePropertyDictionary::asyncSaveDone, this, &QnCameraSettingsDialog::at_cameras_properties_saved);
 
     at_settingsWidget_hasChangesChanged();
 }
@@ -101,7 +104,7 @@ void QnCameraSettingsDialog::reject() {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnCameraSettingsDialog::at_settingsWidget_hasChangesChanged() {
-    bool hasChanges = m_settingsWidget->hasDbChanges() || m_settingsWidget->hasAnyCameraChanges();
+    bool hasChanges = m_settingsWidget->hasDbChanges();
     m_applyButton->setEnabled(hasChanges);
     m_settingsWidget->setExportScheduleButtonEnabled(!hasChanges);
 }
@@ -112,18 +115,6 @@ void QnCameraSettingsDialog::at_settingsWidget_modeChanged() {
     m_openButton->setVisible(mode == QnCameraSettingsWidget::SingleMode);
     m_diagnoseButton->setVisible(mode == QnCameraSettingsWidget::SingleMode || mode == QnCameraSettingsWidget::MultiMode);
     m_rulesButton->setVisible(mode == QnCameraSettingsWidget::SingleMode);
-}
-
-void QnCameraSettingsDialog::at_advancedSettingChanged() {
-    if (!m_settingsWidget->hasCameraChanges()) 
-        return;
-
-    QnVirtualCameraResourceList cameras = m_settingsWidget->cameras();
-    if(cameras.empty())
-        return;
-
-    m_settingsWidget->submitToResources();
-    saveAdvancedCameraSettingsAsync(cameras);
 }
 
 void QnCameraSettingsDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button) {
@@ -160,7 +151,7 @@ void QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList &camer
         &&  isVisible()
         &&  m_settingsWidget->cameras() != cameras
         && !m_settingsWidget->cameras().isEmpty()
-        &&  (m_settingsWidget->hasDbChanges() || m_settingsWidget->hasCameraChanges());
+        &&  (m_settingsWidget->hasDbChanges());
 
     if (askConfirmation) {
         QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
@@ -179,7 +170,6 @@ void QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList &camer
 
 void QnCameraSettingsDialog::submitToResources(bool checkControls /*= false*/) {
     bool hasDbChanges = m_settingsWidget->hasDbChanges();
-    bool hasCameraChanges = m_settingsWidget->hasCameraChanges();
 
     if (checkControls && m_settingsWidget->hasScheduleControlsChanges()){
         QString message = tr("Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.");
@@ -201,7 +191,7 @@ void QnCameraSettingsDialog::submitToResources(bool checkControls /*= false*/) {
         }
     }
 
-    if (!hasDbChanges && !hasCameraChanges && !m_settingsWidget->hasAnyCameraChanges()) {
+    if (!hasDbChanges) {
         return;
     }
 
@@ -210,12 +200,16 @@ void QnCameraSettingsDialog::submitToResources(bool checkControls /*= false*/) {
         return;
 
     /* Dialog will be shown inside */
-    if (!m_settingsWidget->isValidMotionRegion())
+    if (!m_settingsWidget->isValidMotionRegion()) {
+        m_ignoreAccept = true;
         return;
+    }
 
     /* Dialog will be shown inside */
-    if (!m_settingsWidget->isValidSecondStream())
+    if (!m_settingsWidget->isValidSecondStream()) {
+        m_ignoreAccept = true;
         return;
+    }
 
     //checking if showing Licenses limit exceeded is appropriate
     if(m_settingsWidget->licensedParametersModified() )
@@ -231,12 +225,7 @@ void QnCameraSettingsDialog::submitToResources(bool checkControls /*= false*/) {
 
     /* Submit and save it. */
     m_settingsWidget->submitToResources();
-
-    if (hasDbChanges)
         saveCameras(cameras);
-
-    if (hasCameraChanges)
-        saveAdvancedCameraSettingsAsync(cameras);
 }
 
 void QnCameraSettingsDialog::at_cameras_saved(ec2::ErrorCode errorCode, const QnVirtualCameraResourceList& cameras) {
@@ -249,55 +238,27 @@ void QnCameraSettingsDialog::at_cameras_saved(ec2::ErrorCode errorCode, const Qn
         QDialogButtonBox::Ok);
 }
 
+void QnCameraSettingsDialog::at_cameras_properties_saved(int requestId, ec2::ErrorCode errorCode) 
+{
+    if( errorCode == ec2::ErrorCode::ok )
+        return;
+}
+
 void QnCameraSettingsDialog::saveCameras(const QnVirtualCameraResourceList &cameras) {
     if (cameras.isEmpty())
         return;
-
-    QnAppServerConnectionFactory::getConnection2()->getCameraManager()->save( cameras, this,
+    QList<QnUuid> idList = idListFromResList(cameras);
+    for( const QnVirtualCameraResourcePtr& camera: cameras )
+        if( camera->preferedServerId().isNull() )
+            camera->setPreferedServerId( camera->getParentId() );
+    QnAppServerConnectionFactory::getConnection2()->getCameraManager()->saveUserAttributes(
+        QnCameraUserAttributePool::instance()->getAttributesList(idList),
+        this,
         [this, cameras]( int reqID, ec2::ErrorCode errorCode ) {
             Q_UNUSED(reqID);
             at_cameras_saved(errorCode, cameras); 
     } );
-}
-
-void QnCameraSettingsDialog::saveAdvancedCameraSettingsAsync(const QnVirtualCameraResourceList &cameras) {
-    if (m_settingsWidget->mode() != QnCameraSettingsWidget::SingleMode || cameras.size() != 1)
-    {
-        //Advanced camera settings must be available only for single mode
-        Q_ASSERT(false);
-    }
-
-    QnVirtualCameraResourcePtr cameraPtr = cameras.front();
-    QnMediaServerConnectionPtr serverConnectionPtr = m_settingsWidget->getServerConnection();
-    if (serverConnectionPtr.isNull())
-    {
-        QString error = lit("Connection refused"); // #TR #Elric
-
-        QString failedParams;
-        for (auto it = m_settingsWidget->getModifiedAdvancedParams().constBegin(); it != m_settingsWidget->getModifiedAdvancedParams().constEnd(); ++it)
-        {
-            QString formattedParam(it->first.right(it->first.length() - 2));
-            failedParams += lit("\n"); // #TR #Elric
-            failedParams += formattedParam.replace(lit("%%"), lit("->")); // #TR? #Elric
-        }
-
-        if (!failedParams.isEmpty()) {
-            QMessageBox::warning(
-                this,
-                tr("Could not save parameters"),
-                tr("Failed to save the following parameters (%1):\n%2").arg(error, failedParams)
-                );
-
-            m_settingsWidget->updateFromResources();
-        }
-
-        return;
-    }
-
-    // TODO: #Elric method called even if nothing has changed
-    // TODO: #Elric result slot at_camera_settings_saved() is not called
-    serverConnectionPtr->setParamsAsync(cameraPtr, m_settingsWidget->getModifiedAdvancedParams(),
-        this, SLOT(at_camera_settings_saved(int, const QList<QPair<QString, bool> >&)) );
+    propertyDictionary->saveParamsAsync(idList);
 }
 
 void QnCameraSettingsDialog::at_openButton_clicked() {
@@ -340,28 +301,6 @@ void QnCameraSettingsDialog::at_selectionChangeAction_triggered() {
 }
 
 void QnCameraSettingsDialog::at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult) {
-    QString error = httpStatusCode == 0 
-        ? lit("Possibly, appropriate camera's service is unavailable now")
-        : lit("Server returned the following error code : ") + httpStatusCode; // #TR #Elric
 
-    QString failedParams;
-    for (auto it = operationResult.constBegin(); it != operationResult.constEnd(); ++it)
-    {
-        if (!it->second) {
-            QString formattedParam(lit("Advanced->") + it->first.right(it->first.length() - 2));
-            failedParams += lit("\n");
-            failedParams += formattedParam.replace(lit("%%"), lit("->")); // TODO: #Elric #TR
-        }
-    }
-
-    if (!failedParams.isEmpty()) {
-        QMessageBox::warning(
-            this,
-            tr("Could not save parameters"),
-            tr("Failed to save the following parameters (%1):\n%2").arg(error, failedParams)
-            );
-
-        m_settingsWidget->updateFromResources();
-    }
 }
 

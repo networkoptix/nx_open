@@ -9,8 +9,7 @@
 
 #include "transaction/transaction_message_bus.h"
 #include "common/common_module.h"
-#include "mutex/distributed_mutex.h"
-
+#include "managers/time_manager.h"
 
 namespace ec2
 {
@@ -23,15 +22,18 @@ namespace ec2
         m_queryProcessor( queryProcessor ),
         m_connectionInfo( connectionInfo )
     {
-        ec2::QnDistributedMutexManager::initStaticInstance(new ec2::QnDistributedMutexManager());
-
         QnTransactionMessageBus::instance()->setHandler( notificationManager() );
     }
 
     RemoteEC2Connection::~RemoteEC2Connection()
     {
-        QnTransactionMessageBus::instance()->removeConnectionFromPeer( m_peerUrl );
-        QnTransactionMessageBus::instance()->removeHandler( notificationManager() );
+        if (QnTransactionMessageBus::instance()) {
+            QnTransactionMessageBus::instance()->removeConnectionFromPeer( m_peerUrl );
+            QnTransactionMessageBus::instance()->removeHandler( notificationManager() );
+        }
+
+        //TODO #ak next call can be placed here just because we always have just one connection to EC
+        TimeSynchronizationManager::instance()->forgetSynchronizedTime();
     }
 
     QnConnectionInfo RemoteEC2Connection::connectionInfo() const
@@ -42,9 +44,9 @@ namespace ec2
     void RemoteEC2Connection::startReceivingNotifications() {
 
         // in remote mode we are always working as a client
-        ApiPeerData localPeer(qnCommon->moduleGUID(), Qn::PT_DesktopClient);
+        ApiPeerData localPeer(qnCommon->moduleGUID(), qnCommon->runningInstanceGUID(), Qn::PT_DesktopClient);
 
-        QUuid videowallGuid = QnAppServerConnectionFactory::videowallGuid();
+        QnUuid videowallGuid = QnAppServerConnectionFactory::videowallGuid();
         if (!videowallGuid.isNull())
             localPeer.peerType = Qn::PT_VideowallClient;
         
@@ -52,9 +54,11 @@ namespace ec2
         QnTransactionMessageBus::instance()->start();
 
         QUrl url(m_queryProcessor->getUrl());
+        url.setScheme( m_connectionInfo.allowSslConnections ? lit("https") : lit("http") );
         url.setPath("ec2/events");
         QUrlQuery q;
         q.addQueryItem("guid", qnCommon->moduleGUID().toString());
+        q.addQueryItem("runtime-guid", qnCommon->runningInstanceGUID().toString());
         url.setQuery(q);
         m_peerUrl = url;
         QnTransactionMessageBus::instance()->addConnectionToPeer(url);

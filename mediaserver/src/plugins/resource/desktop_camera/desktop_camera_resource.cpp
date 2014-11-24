@@ -35,11 +35,6 @@ bool QnDesktopCameraResource::setRelayOutputState(const QString& outputID, bool 
     return false;
 }
 
-bool QnDesktopCameraResource::isResourceAccessible()
-{
-    return true;
-}
-
 QnAbstractStreamDataProvider* QnDesktopCameraResource::createLiveDataProvider()
 {
     return new QnDesktopCameraStreamReader(toSharedPointer());

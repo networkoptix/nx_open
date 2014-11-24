@@ -43,7 +43,7 @@ QnTimeScrollBarColors::QnTimeScrollBarColors() {
 }
 
 QnBackgroundColors::QnBackgroundColors() {
-    normal = QColor(26, 26, 240, 40);
+    normal = QColor(0, 0, 255, 51);
     panic = QColor(255, 0, 0, 255);
 }
 
@@ -120,6 +120,10 @@ QnLicensesListModelColors::QnLicensesListModelColors() {
     expired = QColor(Qt::red);
 }
 
+QnRoutingManagementColors::QnRoutingManagementColors() {
+    readOnly = Qt::lightGray;
+}
+
 QnVideowallManageWidgetColors::QnVideowallManageWidgetColors() {
     desktop = Qt::darkGray;
     freeSpace = Qt::lightGray;
@@ -127,6 +131,14 @@ QnVideowallManageWidgetColors::QnVideowallManageWidgetColors() {
     text = Qt::white;
     error = Qt::red;
 }
+
+
+QnServerUpdatesColors::QnServerUpdatesColors() {
+    latest = Qt::green;
+    target = Qt::yellow;
+    error = Qt::red;
+}
+
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     QN_CLIENT_COLOR_TYPES,

@@ -58,6 +58,13 @@ QnBookmarkCameraData::QnBookmarkCameraData(const QnCameraBookmarkList &data):
     updateDataSource();
 }
 
+
+QnAbstractCameraDataPtr QnBookmarkCameraData::clone() const {
+    QnAbstractCameraDataPtr result(new QnBookmarkCameraData(m_data));
+    return result;
+}
+
+
 bool QnBookmarkCameraData::isEmpty() const {
     return m_data.isEmpty();
 }
@@ -105,7 +112,7 @@ bool QnBookmarkCameraData::contains(const QnAbstractCameraDataPtr &other) const 
     if (!other_casted)
         return false;
 
-    QSet<QUuid> lookedUp;
+    QSet<QnUuid> lookedUp;
     foreach (const QnCameraBookmark &bookmark, other_casted->m_data)
         lookedUp.insert(bookmark.guid);
 
@@ -117,6 +124,25 @@ bool QnBookmarkCameraData::contains(const QnAbstractCameraDataPtr &other) const 
 
 QnTimePeriodList QnBookmarkCameraData::dataSource() const {
     return m_dataSource;
+}
+
+bool QnBookmarkCameraData::trim(qint64 trimTime) {
+    if(m_dataSource.isEmpty())
+        return false;
+
+    QnTimePeriod period = m_dataSource.last();
+    if(period.durationMs != -1)
+        return false;
+
+    qint64 trimmedDurationMs = qMax(0ll, trimTime - period.startTimeMs);
+    period.durationMs = trimmedDurationMs;
+    if(period.durationMs == 0) {
+        m_dataSource.pop_back();
+    } else {
+        m_dataSource.back() = period;
+    }
+
+    return true;
 }
 
 QnCameraBookmark QnBookmarkCameraData::find(const qint64 position) const {
@@ -187,5 +213,4 @@ void QnBookmarkCameraData::updateDataSource() {
         periods.append(QnTimePeriodList(QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs)));
     m_dataSource = QnTimePeriodList::mergeTimePeriods(periods); //TODO: #GDM #Bookmarks need an analogue for the single periods
 }
-
 

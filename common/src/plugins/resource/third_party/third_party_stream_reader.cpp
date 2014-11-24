@@ -91,7 +91,7 @@ void ThirdPartyStreamReader::updateSoftwareMotion()
     //converting region
     for( int sens = QnMotionRegion::MIN_SENSITIVITY; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens )
     {
-        foreach( const QRect& rect, region.getRectsBySens(sens) )
+        for( const QRect& rect: region.getRectsBySens(sens) )
         {
             //std::cout<<"Motion mask: sens "<<sens<<", rect ("<<rect.left()<<", "<<rect.top()<<", "<<rect.width()<<", "<<rect.height()<<"\n";
 
@@ -134,8 +134,13 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
     }
     nxcip_qt::CameraMediaEncoder cameraEncoder( intf );
 
-    if( m_camManager.setAudioEnabled( m_thirdPartyRes->isAudioEnabled() ) != nxcip::NX_NO_ERROR )
-        return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("audio"));
+    m_camManager.setCredentials( m_thirdPartyRes->getAuth().user(), m_thirdPartyRes->getAuth().password() );
+
+    if( m_cameraCapabilities & nxcip::BaseCameraManager::audioCapability )
+    {
+        if( m_camManager.setAudioEnabled( m_thirdPartyRes->isAudioEnabled() ) != nxcip::NX_NO_ERROR )
+            return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("audio"));
+    }
 
     const nxcip::Resolution& resolution = m_thirdPartyRes->getSelectedResolutionForEncoder( encoderIndex );
     if( resolution.width*resolution.height > 0 )
@@ -312,7 +317,8 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
             }
             else
             {
-                rez = readStreamReader( m_liveStreamReader );
+                int errorCode = 0;
+                rez = readStreamReader( m_liveStreamReader, &errorCode );
                 if( rez )
                 {
                     rez->flags |= QnAbstractMediaData::MediaFlags_LIVE;
@@ -333,6 +339,11 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
                         }
                         static_cast<QnCompressedAudioData*>(rez.data())->context = m_audioContext;
                     }
+                }
+                else
+                {
+                    if( errorCode == nxcip::NX_NOT_AUTHORIZED )
+                        m_thirdPartyRes->setStatus( Qn::Unauthorized );
                 }
             }
         }
@@ -427,10 +438,13 @@ CodecID ThirdPartyStreamReader::toFFmpegCodecID( nxcip::CompressionType compress
     }
 }
 
-QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamReader* streamReader )
+QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamReader* streamReader, int* outErrorCode )
 {
     nxcip::MediaDataPacket* packet = NULL;
-    if( streamReader->getNextData( &packet ) != nxcip::NX_NO_ERROR || !packet)
+    const int errorCode = streamReader->getNextData( &packet );
+    if( outErrorCode )
+        *outErrorCode = errorCode;
+    if( errorCode != nxcip::NX_NO_ERROR || !packet)
         return QnAbstractMediaDataPtr();    //error reading data
 
     nxpt::ScopedRef<nxcip::MediaDataPacket> packetAp( packet, false );
@@ -563,6 +577,11 @@ void ThirdPartyStreamReader::initializeAudioContext( const nxcip::AudioFormat& a
     m_audioContext->ctx()->bits_per_coded_sample = audioFormat.bitsPerCodedSample;
 
     m_audioLayout->addAudioTrack( QnResourceAudioLayout::AudioTrack(m_audioContext, QString()) );
+}
+
+QnConstResourceVideoLayoutPtr ThirdPartyStreamReader::getVideoLayout() const
+{
+    return m_builtinStreamReader ? m_builtinStreamReader->getVideoLayout() : QnConstResourceVideoLayoutPtr();
 }
 
 #endif // ENABLE_THIRD_PARTY

@@ -1,0 +1,9 @@
+<resources>
+    <oem name = "Dlink">
+    <resource name = "DCS-6210" public="DLINK_COMMON">
+        <params>
+            <param name = "MaxFPS" default_value ="15"/>
+        </params>
+    </resource>
+    </oem>
+</resources>

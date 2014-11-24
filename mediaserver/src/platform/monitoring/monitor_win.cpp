@@ -2,9 +2,12 @@
 
 #include <cassert>
 
-#include <QtCore/QVector>
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QHash>
+#include <QtCore/QVector>
 
+#include <utils/common/log.h>
+#include <utils/common/systemerror.h>
 #include <utils/common/warnings.h>
 
 #define NOMINMAX
@@ -76,11 +79,13 @@ public:
         pdhLibrary(0), 
         query(0),
         diskCounter(0),
-        lastCollectTimeMSec(0)
+        lastCollectTimeMSec(0),
+        m_networkStatCalcCounter()
     {
         pdhLibrary = LoadLibraryW(L"pdh.dll");
         if(!pdhLibrary)
             checkError("LoadLibrary", GetLastError());
+        m_networkStatTimer.restart();
     }
 
     virtual ~QnWindowsMonitorPrivate() {
@@ -232,10 +237,110 @@ public:
         return result.doubleValue / 100.0;
     }
 
+    void recalcNetworkStatistics()
+    {
+        static const size_t MS_PER_SEC = 1000;
+
+        if( m_mibIfTableBuffer.size() == 0 )
+            m_mibIfTableBuffer.resize( 256 );
+
+        DWORD resultCode = NO_ERROR;
+        MIB_IFTABLE* networkInterfaceTable = NULL;
+        for( int i = 0; i < 2; ++i )
+        {
+            ULONG bufSize = (ULONG)m_mibIfTableBuffer.size();
+            networkInterfaceTable = reinterpret_cast<MIB_IFTABLE*>(m_mibIfTableBuffer.data());
+            resultCode = GetIfTable( networkInterfaceTable, &bufSize, TRUE );
+            if( resultCode == ERROR_INSUFFICIENT_BUFFER )
+            {
+                m_mibIfTableBuffer.resize( bufSize );
+                continue;
+            }
+            break;
+        }
+
+        if( resultCode != NO_ERROR )
+            return;
+
+        ++m_networkStatCalcCounter;
+
+        const qint64 currentClock = m_networkStatTimer.elapsed();
+        for( size_t i = 0; i < networkInterfaceTable->dwNumEntries; ++i )
+        {
+            const MIB_IFROW& ifInfo = networkInterfaceTable->table[i];
+            if( ifInfo.dwPhysAddrLen == 0 )
+                continue;
+            if( !(ifInfo.dwType & IF_TYPE_ETHERNET_CSMACD) )
+                continue;
+            if( ifInfo.dwOperStatus != IF_OPER_STATUS_CONNECTED && ifInfo.dwOperStatus != IF_OPER_STATUS_OPERATIONAL )
+                continue;
+
+            const QByteArray physicalAddress( reinterpret_cast<const char*>(ifInfo.bPhysAddr), ifInfo.dwPhysAddrLen );
+
+            std::pair<std::map<QByteArray, NetworkInterfaceStatData>::iterator, bool>
+                p = m_interfaceLoadByMAC.emplace( physicalAddress, NetworkInterfaceStatData() );
+            if( p.second )
+            {
+                p.first->second.load.interfaceName = QString::fromLocal8Bit( reinterpret_cast<const char*>(ifInfo.bDescr), ifInfo.dwDescrLen );
+                p.first->second.load.macAddress = QnMacAddress( physicalAddress );
+                p.first->second.load.type = QnPlatformMonitor::PhysicalInterface;
+                p.first->second.load.bytesPerSecMax = ifInfo.dwSpeed / CHAR_BIT;
+                p.first->second.prevMeasureClock = currentClock;
+                p.first->second.inOctets = ifInfo.dwInOctets;
+                p.first->second.outOctets = ifInfo.dwOutOctets;
+            }
+            NetworkInterfaceStatData& intfLoad = p.first->second;
+            intfLoad.networkStatCalcCounter = m_networkStatCalcCounter;
+            if( intfLoad.prevMeasureClock == currentClock )
+                continue;   //not calculating load
+            const qint64 msPassed = currentClock - intfLoad.prevMeasureClock;
+            intfLoad.load.bytesPerSecIn = p.first->second.load.bytesPerSecIn * 0.3 + ((ifInfo.dwInOctets - (DWORD)p.first->second.inOctets) * MS_PER_SEC / msPassed) * 0.7;
+            intfLoad.load.bytesPerSecOut = p.first->second.load.bytesPerSecOut * 0.3 + ((ifInfo.dwOutOctets - (DWORD)p.first->second.outOctets) * MS_PER_SEC / msPassed) * 0.7;
+
+            p.first->second.inOctets = ifInfo.dwInOctets;
+            p.first->second.outOctets = ifInfo.dwOutOctets;
+            p.first->second.prevMeasureClock = currentClock;
+        }
+
+        //removing disabled interface
+        for( auto it = m_interfaceLoadByMAC.begin(); it != m_interfaceLoadByMAC.end(); )
+        {
+            if( it->second.networkStatCalcCounter < m_networkStatCalcCounter )
+                it = m_interfaceLoadByMAC.erase(it);
+            else
+                ++it;
+        }
+    }
+
+    QList<QnPlatformMonitor::NetworkLoad> networkInterfacelLoadData()
+    {
+        QList<QnPlatformMonitor::NetworkLoad> loadData;
+        for( const std::pair<QByteArray, NetworkInterfaceStatData>& ifStatData: m_interfaceLoadByMAC )
+            loadData.push_back( ifStatData.second.load );
+        return loadData;
+    }
+
 private:
     const QnWindowsMonitorPrivate *d_func() const { return this; } /* For INVOKE to work. */
     
-private:
+    struct NetworkInterfaceStatData
+    {
+        QnPlatformMonitor::NetworkLoad load;
+        ULONG64 inOctets;
+        ULONG64 outOctets;
+        qint64 prevMeasureClock;
+        size_t networkStatCalcCounter;
+
+        NetworkInterfaceStatData()
+        :
+            inOctets(0),
+            outOctets(0),
+            prevMeasureClock(-1),
+            networkStatCalcCounter(0)
+        {
+        }
+    };
+
     /** Handle to PHD dll. Used to query error messages via <tt>FormatMessage</tt>. */
     HMODULE pdhLibrary;
 
@@ -257,7 +362,11 @@ private:
      * operation. */
     QHash<int, HddItem> lastItemByDiskId;
 
-private:
+    std::map<QByteArray, NetworkInterfaceStatData> m_interfaceLoadByMAC;
+    QElapsedTimer m_networkStatTimer;
+    size_t m_networkStatCalcCounter;
+    std::vector<char> m_mibIfTableBuffer;
+
     Q_DECLARE_PUBLIC(QnWindowsMonitor);
     QnWindowsMonitor *q_ptr;
 };
@@ -277,13 +386,77 @@ QnWindowsMonitor::~QnWindowsMonitor() {
     return;
 }
 
+QList<QnPlatformMonitor::PartitionSpace> QnWindowsMonitor::totalPartitionSpaceInfo()
+{
+    QList<PartitionSpace> drives;
+
+    DWORD localDisksBitmask = GetLogicalDrives();
+    if( localDisksBitmask == 0 )
+        return std::move(drives);
+
+    wchar_t curDiskName[] = L"A:\\";
+    for( int i = 0; i < sizeof(localDisksBitmask)*CHAR_BIT; ++i, ++curDiskName[0] )
+    {
+        if( (localDisksBitmask & (1 << i)) == 0 )
+            continue;
+
+        PartitionSpace driveInfo;
+        driveInfo.path = QString::fromWCharArray(curDiskName, sizeof(curDiskName)/sizeof(*curDiskName)-1);  //omitting trailing backslash
+        NX_LOG( lit("MONITOR. Found disk %1").arg(driveInfo.path), cl_logDEBUG2 );
+        switch( GetDriveType(curDiskName) )
+        {
+            case DRIVE_NO_ROOT_DIR:
+                NX_LOG( lit("MONITOR. Disk %1. DRIVE_NO_ROOT_DIR").arg(driveInfo.path), cl_logDEBUG2 );
+                continue;
+            case DRIVE_REMOVABLE:
+                //TODO #ak no proper type in QnPlatformMonitor
+                driveInfo.type = QnPlatformMonitor::OpticalDiskPartition;
+                break;
+            case DRIVE_FIXED:
+                driveInfo.type = QnPlatformMonitor::LocalDiskPartition;
+                break;
+            case DRIVE_REMOTE:
+                driveInfo.type = QnPlatformMonitor::NetworkPartition;
+                break;
+            case DRIVE_CDROM:
+                driveInfo.type = QnPlatformMonitor::OpticalDiskPartition;
+                break;
+            case DRIVE_RAMDISK:
+                driveInfo.type = QnPlatformMonitor::RamDiskPartition;
+                break;
+            case DRIVE_UNKNOWN:
+            default:
+                driveInfo.type = QnPlatformMonitor::UnknownPartition;
+                break;
+        }
+        quint64 freeBytesAvailableToCaller = -1;
+        quint64 totalNumberOfBytes = -1;
+        quint64 totalNumberOfFreeBytes = -1;
+        if( !GetDiskFreeSpaceEx(
+                curDiskName,
+                (PULARGE_INTEGER)&freeBytesAvailableToCaller,
+                (PULARGE_INTEGER)&totalNumberOfBytes,
+                (PULARGE_INTEGER)&totalNumberOfFreeBytes ) )
+        {
+            NX_LOG( lit("MONITOR. Disk %1. Failed to get disk space. %2").arg(driveInfo.path).arg(SystemError::getLastOSErrorText()), cl_logDEBUG2 );
+            continue;
+        }
+        driveInfo.sizeBytes = totalNumberOfBytes;
+        driveInfo.freeBytes = totalNumberOfFreeBytes;
+
+        drives.push_back( std::move(driveInfo) );
+    }
+
+    return std::move(drives);
+}
+
 QList<QnPlatformMonitor::HddLoad> QnWindowsMonitor::totalHddLoad() {
     Q_D(QnWindowsMonitor);
 
     d->collectQuery();
 
     QList<QnPlatformMonitor::HddLoad> result;
-    foreach(const QnWindowsMonitorPrivate::HddItem &item, d->itemByDiskId) {
+    for(const QnWindowsMonitorPrivate::HddItem &item: d->itemByDiskId) {
         qreal load = 0.0;
         if(d->lastItemByDiskId.contains(item.hdd.id)) 
             load = d->diskCounterValue(d->diskCounter, d->lastItemByDiskId[item.hdd.id].counter, item.counter);
@@ -291,4 +464,13 @@ QList<QnPlatformMonitor::HddLoad> QnWindowsMonitor::totalHddLoad() {
         result.push_back(HddLoad(item.hdd, load));
     }
     return result;
+}
+
+QList<QnPlatformMonitor::NetworkLoad> QnWindowsMonitor::totalNetworkLoad()
+{
+    Q_D(QnWindowsMonitor);
+
+    d->recalcNetworkStatistics();
+
+    return d->networkInterfacelLoadData();
 }

@@ -14,10 +14,12 @@
     <name>HD Witness Installer</name>
 
     <properties>
+        <product.title>${wixsetup.name}</product.title>
         <root.dir>${basedir}/..</root.dir>
         <skip.test>true</skip.test>
         <skip.compress>true</skip.compress>
         <DbSync22Dir>${libdir}/${arch}/share/dbsync-2.2</DbSync22Dir>
+        <final.artifact.name>${installer.name}</final.artifact.name>
     </properties>
 
     <build>
@@ -80,35 +82,35 @@
                     </execution>
                 </executions>
             </plugin>	
-					<plugin>
-						<groupId>com.google.code.maven-replacer-plugin</groupId>
-						<artifactId>replacer</artifactId>
-						<version>1.5.2</version>
-						<executions>
-							<execution>
-								<phase>generate-resources</phase>
-								<goals>
-									<goal>replace</goal>
-								</goals>
-								<configuration>
-									<encoding>utf-8</encoding>
-									<file>${project.build.directory}/CustomActions/CustomActions-${arch}.vcxproj</file>
-									<!-- <excludes>
+            <plugin>
+                <groupId>com.google.code.maven-replacer-plugin</groupId>
+                <artifactId>replacer</artifactId>
+                <version>1.5.2</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>replace</goal>
+                        </goals>
+                        <configuration>
+                            <encoding>utf-8</encoding>
+                            <file>${project.build.directory}/CustomActions/CustomActions-${arch}.vcxproj</file>
+                            <!-- <excludes>
 										<exclude>**/vmaxproxy-x64.vcproj</exclude>
 									</excludes> -->	
-									<ignoreMissingFile>true</ignoreMissingFile>                                    
-									<replacements>
-										<replacement>
-                                            <token>
-                                                <![CDATA[<PlatformToolset>v110</PlatformToolset>]]></token>
-                                            <value>
-                                                <![CDATA[<PlatformToolSet>${PlatformToolSet}</PlatformToolSet>]]></value>
-                                        </replacement>           
-									</replacements>
-								</configuration>								
-							</execution>
-						</executions>
-					</plugin>                     
+                            <ignoreMissingFile>true</ignoreMissingFile>                                    
+                            <replacements>
+                                <replacement>
+                                    <token>
+                                        <![CDATA[<PlatformToolset>v110</PlatformToolset>]]></token>
+                                    <value>
+                                        <![CDATA[<PlatformToolSet>${PlatformToolSet}</PlatformToolSet>]]></value>
+                                </replacement>           
+                            </replacements>
+                        </configuration>								
+                    </execution>
+                </executions>
+            </plugin>                     
 
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -118,7 +120,7 @@
 
                     <execution>
                         <id>package-CustomActions-with-msbuild</id>
-                        <phase>process-resources</phase>
+                        <phase>process-sources</phase>
                         <goals>
                             <goal>exec</goal>
                         </goals>
@@ -130,12 +132,12 @@
 
                     <execution>
                         <id>wix-gen</id>
-                        <phase>prepare-package</phase>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>${python.dir}/python</executable>
+                            <executable>${init.python.dir}/python</executable>
                             <arguments>
                                 <argument>wix-gen.py</argument>
                             </arguments>
@@ -145,12 +147,12 @@
 
                     <execution>
                         <id>wix-compile</id>
-                        <phase>package</phase>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <executable>${python.dir}/python</executable>
+                            <executable>${init.python.dir}/python</executable>
                             <arguments>
                                 <argument>wix-compile.py</argument>
                             </arguments>
@@ -184,7 +186,54 @@
                         </configuration>    
                     </execution>
                 </executions>
-            </plugin>                    
+            </plugin>        
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2.2</version>
+                <executions>
+                    <execution>
+                        <id>client-update-package</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>${project.build.directory}/assembly-update-client.xml</descriptor>
+                            </descriptors>
+                            <finalName>client-update</finalName>							
+                        </configuration>
+                    </execution>	
+                    <execution>
+                        <id>pack-debug</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>${project.build.directory}/assembly-debug.xml</descriptor>
+                            </descriptors>	
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>server-update-package</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>${project.build.directory}/assembly-update-server.xml</descriptor>
+                            </descriptors>
+                            <finalName>server-update</finalName>							
+                        </configuration>
+                    </execution>	                    
+                </executions>				
+            </plugin> 	            
+
         </plugins>
     </build>       
 </project>

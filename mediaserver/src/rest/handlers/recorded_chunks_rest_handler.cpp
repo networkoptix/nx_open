@@ -12,7 +12,7 @@
 #include "motion/motion_helper.h"
 #include "api/serializer/serializer.h"
 
-int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path)
     qint64 startTime = -1, endTime = 1, detailLevel = -1;
@@ -114,7 +114,7 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
                 bookmarksFilter.text = filter;
                 QnCameraBookmarkList bookmarks;
                 if (qnStorageMan->getBookmarks(physicalId.toUtf8(), bookmarksFilter, bookmarks)) {
-                    foreach (const QnCameraBookmark &bookmark, bookmarks)
+                    for (const QnCameraBookmark &bookmark: bookmarks)
                         periods << QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs);                    
                 }
             } else {
@@ -141,13 +141,13 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
             break;
         case ChunkFormat_XML:
             result.append("<recordedTimePeriods xmlns=\"http://www.networkoptix.com/xsd/api/recordedTimePeriods\">\n");
-            foreach(QnTimePeriod period, periods)
+            for(const QnTimePeriod& period: periods)
                 result.append(QString("<timePeriod startTime=\"%1\" duration=\"%2\" />\n").arg(period.startTimeMs).arg(period.durationMs));
             result.append("</recordedTimePeriods>\n");
             break;
         case ChunkFormat_Text:
             result.append("<root>\n");
-            foreach(QnTimePeriod period, periods) {
+            for(const QnTimePeriod& period: periods) {
                 result.append("<chunk>");
                 result.append(QDateTime::fromMSecsSinceEpoch(period.startTimeMs).toString(QLatin1String("dd-MM-yyyy hh:mm:ss.zzz")));
                 result.append("    ");
@@ -161,7 +161,7 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
             contentType = "application/json";
 
             result.append(callback);
-            result.append("([");
+            result.append("[");
             int nSize = periods.size();
             for (int n = 0; n < nSize; ++n)
             {
@@ -174,15 +174,16 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
                     .append("]");
             }
                 
-            result.append("]);");
+            result.append("]");
             break;
     }
 
     return CODE_OK;
 }
 
-int QnRecordedChunksRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, QByteArray& contentType)
+int QnRecordedChunksRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, 
+                                             QByteArray& contentType, const QnRestConnectionProcessor* owner)
 {
-    return executeGet(path, params, result, contentType);
+    return executeGet(path, params, result, contentType, owner);
 }
 

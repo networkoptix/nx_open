@@ -98,6 +98,9 @@ public:
             case noMediaStream:
                 errorMessage = tr("Media stream is opened but no media data was received.");
                 break;
+            case cameraInitializationInProgress:
+                errorMessage = tr("Camera initialization process in progress");
+                break;
             default:
             {
                 int nonEmptyParamCount = 0;

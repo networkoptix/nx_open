@@ -16,7 +16,7 @@ struct QnPeerRuntimeInfo {
         uuid(runtimeData.peer.id),
         data(runtimeData){}
 
-    QUuid uuid;
+    QnUuid uuid;
     ec2::ApiRuntimeData data;
 
     bool operator==(const QnPeerRuntimeInfo& other) const {
@@ -30,7 +30,7 @@ Q_DECLARE_METATYPE(QnPeerRuntimeInfo)
 Q_DECLARE_TYPEINFO(QnPeerRuntimeInfo, Q_MOVABLE_TYPE);
 
 typedef QList<QnPeerRuntimeInfo> QnPeerRuntimeInfoList;
-typedef QHash<QUuid, QnPeerRuntimeInfo> QnPeerRuntimeInfoMap;
+typedef QHash<QnUuid, QnPeerRuntimeInfo> QnPeerRuntimeInfoMap;
 
 Q_DECLARE_METATYPE(QnPeerRuntimeInfoList)
 Q_DECLARE_METATYPE(QnPeerRuntimeInfoMap)
@@ -44,11 +44,14 @@ class QnRuntimeInfoManager: public QObject,
 public:
     QnRuntimeInfoManager(QObject* parent = NULL);
 
-    QnThreadsafeItemStorage<QnPeerRuntimeInfo> *items() const;
+    const QnThreadsafeItemStorage<QnPeerRuntimeInfo> *items() const;
 
     QnPeerRuntimeInfo localInfo() const;
     QnPeerRuntimeInfo remoteInfo() const;
-    bool hasItem(const QUuid& id);
+    bool hasItem(const QnUuid& id);
+    QnPeerRuntimeInfo item(const QnUuid& id) const;
+
+    void updateLocalItem(const QnPeerRuntimeInfo& value);
 signals:
     void runtimeInfoAdded(const QnPeerRuntimeInfo &data);
     void runtimeInfoChanged(const QnPeerRuntimeInfo &data);
@@ -60,6 +63,7 @@ private:
 private:
     /** Mutex that is to be used when accessing items. */
     mutable QMutex m_mutex;
+    mutable QMutex m_updateMutex;
     QScopedPointer<QnThreadsafeItemStorage<QnPeerRuntimeInfo> > m_items;
 };
 

@@ -125,7 +125,7 @@ QnWriterPool::QnWriterPool()
 }
 QnWriterPool::~QnWriterPool()
 {
-    foreach(QueueFileWriter* writer, m_writers.values())
+    for(QueueFileWriter* writer: m_writers.values())
         delete writer;
 }
 
@@ -140,7 +140,7 @@ QueueFileWriter* QnWriterPool::getWriter(const QString& fileName)
     QString drive = fileName.left(fileName.indexOf('/'));
     QnStorageResourcePtr storage = qnStorageMan->getStorageByUrl(fileName);
     if (storage)
-        drive = storage->getUrl();
+        drive = storage->getPath();
     if (drive.endsWith('/'))
         drive = drive.left(drive.length()-1);
 

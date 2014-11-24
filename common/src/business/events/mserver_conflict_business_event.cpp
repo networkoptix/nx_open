@@ -4,7 +4,7 @@
 
 QStringList QnCameraConflictList::encode() const {
     QStringList result;
-    foreach(const QString &server, camerasByServer.keys()) {
+    for(const QString &server: camerasByServer.keys()) {
         result.append(server);
         QStringList cameras = camerasByServer[server];
         result.append(QString::number(cameras.size()));
@@ -24,7 +24,7 @@ void QnCameraConflictList::decode(const QStringList &encoded) {
     int counter = 0;
     QString curServer;
 
-    foreach (const QString &value, encoded) {
+    for (const QString &value: encoded) {
         switch(state) {
         case Server:
             curServer = value;

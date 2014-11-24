@@ -61,6 +61,7 @@ namespace Qee {
             QChar c = m_source[m_pos];
             switch(c.unicode()) {
             case L' ': case L'\t': case L'\n': case L'\r':
+                m_pos++;
                 break;
             case L'_': 
                 return readVariableToken();
@@ -447,8 +448,10 @@ namespace Qee {
 // Evaluator Functions and Constants
 // -------------------------------------------------------------------------- //
     QVariant eval_QColor(const ParameterPack &args) {
-        args.requireSize(3, 4);
+        if (args.size() == 0)
+            return QColor();
 
+        args.requireSize(3, 4);
         int r = args.get<int>(0);
         int g = args.get<int>(1);
         int b = args.get<int>(2);
@@ -712,7 +715,7 @@ namespace Qee {
     QVariant Evaluator::evaluate(const Program &program) const {
         QVector<QVariant> stack;
 
-        foreach(const Instruction &instruction, program)
+        for(const Instruction &instruction: program)
             exec(stack, instruction);
 
         if(stack.size() != 1)

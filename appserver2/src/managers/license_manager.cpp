@@ -16,7 +16,7 @@ namespace ec2
         QnLicenseList licenseList;
         fromApiToResourceList(tran.params, licenseList);
 
-        foreach (const QnLicensePtr& license, licenseList) {
+        for (const QnLicensePtr& license: licenseList) {
             emit licenseChanged(license);
         }
     }
@@ -64,7 +64,7 @@ namespace ec2
         const int reqID = generateRequestID();
 
         //for( QnLicensePtr lic: licenses )
-        //    lic->setId(QUuid::createUuid());
+        //    lic->setId(QnUuid::createUuid());
 
         auto tran = prepareTransaction( ApiCommand::addLicenses, licenses );
 
@@ -80,7 +80,7 @@ namespace ec2
         const int reqID = generateRequestID();
 
         //for( QnLicensePtr lic: licenses )
-        //    lic->setId(QUuid::createUuid());
+        //    lic->setId(QnUuid::createUuid());
 
         auto tran = prepareTransaction( ApiCommand::removeLicense, license );
 

@@ -32,6 +32,41 @@ namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
 }
 
+namespace QnBusiness {
+    QList<Columns> allColumns() {
+        static QList<Columns> result;
+        if (result.isEmpty()) {
+            result 
+                << ModifiedColumn
+                << DisabledColumn
+                << EventColumn
+                << SourceColumn
+                << SpacerColumn
+                << ActionColumn
+                << TargetColumn
+                << AggregationColumn;
+        }
+        return result;
+    }
+
+    QnResourceList filterEventResources(const QnResourceList &resources, EventType eventType) {
+        if (requiresCameraResource(eventType))
+            return resources.filtered<QnVirtualCameraResource>();
+        if (requiresServerResource(eventType))
+            return resources.filtered<QnMediaServerResource>();
+        return QnResourceList();
+    }
+
+    QnResourceList filterActionResources(const QnResourceList &resources, ActionType actionType) {
+        if (requiresCameraResource(actionType))
+            return resources.filtered<QnVirtualCameraResource>();
+        if (requiresUserResource(actionType))
+            return resources.filtered<QnUserResource>();
+        return QnResourceList();
+    }
+}
+
+
 QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -47,11 +82,9 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     m_actionTypesModel(new QStandardItemModel(this))
 {
 
-    for (int i = 1; i < QnBusiness::EventCount; i++) {
-        QnBusiness::EventType val = (QnBusiness::EventType)i;
-
-        QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::eventName(val));
-        item->setData(val);
+    for (QnBusiness::EventType eventType: QnBusiness::allEvents()) {
+        QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::eventName(eventType));
+        item->setData(eventType);
 
         QList<QStandardItem *> row;
         row << item;
@@ -69,14 +102,10 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
         m_eventStatesModel->appendRow(row);
     }
 
-    for (int i = 1; i < QnBusiness::ActionCount; i++) {
-        QnBusiness::ActionType val = (QnBusiness::ActionType)i;
-        if (!QnBusiness::isImplemented(val))
-            continue;
-
-        QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(val));
-        item->setData(val);
-        item->setData(QnBusiness::hasToggleState(val), ProlongedActionRole);
+    for (QnBusiness::ActionType actionType: QnBusiness::allActions()) {      
+        QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(actionType));
+        item->setData(actionType);
+        item->setData(QnBusiness::hasToggleState(actionType), ProlongedActionRole);
 
         QList<QStandardItem *> row;
         row << item;
@@ -130,14 +159,14 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
         {
             switch (m_actionType) {
             case QnBusiness::SendMailAction:
-                return m_actionParams.getEmailAddress();
+                return m_actionParams.emailAddress;
             case QnBusiness::ShowPopupAction:
-                return (int)m_actionParams.getUserGroup();
+                return (int)m_actionParams.userGroup;
             case QnBusiness::PlaySoundAction:
             case QnBusiness::PlaySoundOnceAction:
-                return m_actionParams.getSoundUrl();
+                return m_actionParams.soundUrl;
             case QnBusiness::SayTextAction:
-                return m_actionParams.getSayText();
+                return m_actionParams.sayText;
             default:
                 break;
             }
@@ -173,13 +202,13 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
         return getText(column, false);
 
     case Qn::EventTypeRole:
-        return m_eventType;
+        return qVariantFromValue(m_eventType);
     case Qn::EventResourcesRole:
-        return QVariant::fromValue<QnResourceList>(m_eventResources);
+        return QVariant::fromValue<QnResourceList>(filterEventResources(m_eventResources, m_eventType));
     case Qn::ActionTypeRole:
-        return m_actionType;
+        return qVariantFromValue(m_actionType);
     case Qn::ActionResourcesRole:
-        return QVariant::fromValue<QnResourceList>(m_actionResources);
+        return QVariant::fromValue<QnResourceList>(filterActionResources(m_actionResources, m_actionType));
 
     case Qn::HelpTopicIdRole:
         return getHelpTopic(column);
@@ -210,7 +239,7 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
         setActionType((QnBusiness::ActionType)value.toInt());
         return true;
     case QnBusiness::SourceColumn:
-        setEventResources(value.value<QnResourceList>());
+        setEventResources(filterEventResources(value.value<QnResourceList>(), m_eventType));
         return true;
     case QnBusiness::TargetColumn:
         switch(m_actionType) {
@@ -219,9 +248,8 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
             QnBusinessActionParameters params = m_actionParams;
 
             // TODO: #GDM #Business you're implicitly relying on what enum values are, which is very bad.
-            // This code will fail silently if someone changes the header. Please write it properly.
-            
-            params.setUserGroup((QnBusinessActionParameters::UserGroup)value.toInt()); 
+            // This code will fail silently if someone changes the header. Please write it properly.           
+            params.userGroup = (QnBusinessActionParameters::UserGroup)value.toInt(); 
             setActionParams(params);
             break;
         }
@@ -229,19 +257,19 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
         case QnBusiness::PlaySoundOnceAction:
         {
             QnBusinessActionParameters params;
-            params.setSoundUrl(value.toString());
+            params.soundUrl = value.toString();
             setActionParams(params);
             break;
         }
         case QnBusiness::SayTextAction:
         {
             QnBusinessActionParameters params;
-            params.setSayText(value.toString());
+            params.sayText = value.toString();
             setActionParams(params);
             break;
         }
         default:
-            setActionResources(value.value<QnResourceList>());
+            setActionResources(filterActionResources(value.value<QnResourceList>(), m_actionType));
             break;
         }
         return true;
@@ -262,7 +290,7 @@ void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) 
     m_eventType = businessRule->eventType();
 
     m_eventResources.clear();
-    m_eventResources.append(businessRule->eventResourceObjects());
+    m_eventResources.append(filterEventResources(businessRule->eventResourceObjects(), m_eventType));
 
     m_eventParams = businessRule->eventParams();
 
@@ -271,7 +299,7 @@ void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) 
     m_actionType = businessRule->actionType();
 
     m_actionResources.clear();
-    m_actionResources.append(businessRule->actionResourceObjects());
+    m_actionResources.append(filterActionResources(businessRule->actionResourceObjects(), m_actionType));
 
     m_actionParams = businessRule->actionParams();
 
@@ -287,9 +315,9 @@ void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) 
     emit dataChanged(this, QnBusiness::AllFieldsMask);
 }
 
-static QVector<QUuid> toIdList(const QnResourceList& list)
+static QVector<QnUuid> toIdList(const QnResourceList& list)
 {
-    QVector<QUuid> result;
+    QVector<QnUuid> result;
     result.reserve(list.size());
     for (int i = 0; i < list.size(); ++i)
         result << list[i]->getId();
@@ -300,21 +328,11 @@ QnBusinessEventRulePtr QnBusinessRuleViewModel::createRule() const {
     QnBusinessEventRulePtr rule(new QnBusinessEventRule());
     rule->setId(m_id);
     rule->setEventType(m_eventType);
-    if (QnBusiness::requiresCameraResource(m_eventType))
-        rule->setEventResources(toIdList(m_eventResources.filtered<QnVirtualCameraResource>()));
-    else if (QnBusiness::requiresServerResource(m_eventType))
-        rule->setEventResources(toIdList(m_eventResources.filtered<QnMediaServerResource>()));
-    else
-        rule->setEventResources(QVector<QUuid>());
+    rule->setEventResources(toIdList(filterEventResources(m_eventResources, m_eventType)));
     rule->setEventState(m_eventState);   //TODO: #GDM #Business check
     rule->setEventParams(m_eventParams); //TODO: #GDM #Business filtered
     rule->setActionType(m_actionType);
-    if (QnBusiness::requiresCameraResource(m_actionType))
-        rule->setActionResources(toIdList(m_actionResources.filtered<QnVirtualCameraResource>()));
-    else if (QnBusiness::requiresUserResource(m_actionType))
-        rule->setActionResources(toIdList(m_actionResources.filtered<QnUserResource>()));
-    else
-        rule->setActionResources(QVector<QUuid>());
+    rule->setActionResources(toIdList(filterActionResources(m_actionResources, m_actionType)));
     rule->setActionParams(m_actionParams); //TODO: #GDM #Business filtered
     rule->setAggregationPeriod(m_aggregationPeriod);
     rule->setDisabled(m_disabled);
@@ -326,7 +344,7 @@ QnBusinessEventRulePtr QnBusinessRuleViewModel::createRule() const {
 // setters and getters
 
 
-QUuid QnBusinessRuleViewModel::id() const {
+QnUuid QnBusinessRuleViewModel::id() const {
     return m_id;
 }
 
@@ -637,7 +655,7 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const {
     case QnBusiness::SourceColumn:
     {
         //TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
-        QnResourceList resources = m_eventResources; //TODO: #GDM #Business filtered by type
+        QnResourceList resources = filterEventResources(m_eventResources, m_eventType);
         if (!QnBusiness::isResourceRequired(m_eventType)) {
             return qnResIconCache->icon(QnResourceIconCache::Servers);
         } else if (resources.size() == 1) {
@@ -661,7 +679,7 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const {
         }
         case QnBusiness::ShowPopupAction:
         {
-            if (m_actionParams.getUserGroup() == QnBusinessActionParameters::AdminOnly)
+            if (m_actionParams.userGroup == QnBusinessActionParameters::AdminOnly)
                 return qnResIconCache->icon(QnResourceIconCache::User);
             else
                 return qnResIconCache->icon(QnResourceIconCache::Users);
@@ -675,7 +693,7 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const {
         }
 
         //TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
-        QnResourceList resources = m_actionResources; //TODO: #GDM #Business filtered by type
+        QnResourceList resources = filterActionResources(m_actionResources, m_actionType);
         if (!QnBusiness::requiresCameraResource(m_actionType)) {
             return qnResIconCache->icon(QnResourceIconCache::Servers);
         } else if (resources.size() == 1) {
@@ -686,7 +704,6 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const {
         } else {
             return qnResIconCache->icon(QnResourceIconCache::Camera);
         }
-        //TODO: #GDM #Business special icon for sound action
     }
     default:
         break;
@@ -715,9 +732,9 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
     {
         switch (m_eventType) {
         case QnBusiness::CameraMotionEvent:
-            return isResourcesListValid<QnCameraMotionPolicy>(m_eventResources);
+            return isResourcesListValid<QnCameraMotionPolicy>(filterEventResources(m_eventResources, m_eventType));
         case QnBusiness::CameraInputEvent:
-            return isResourcesListValid<QnCameraInputPolicy>(m_eventResources);
+            return isResourcesListValid<QnCameraInputPolicy>(filterEventResources(m_eventResources, m_eventType));
         default:
             return true;
         }
@@ -730,16 +747,16 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
             bool any = false;
             foreach (const QnUserResourcePtr &user, m_actionResources.filtered<QnUserResource>()) {
                 QString email = user->getEmail();
-                if (email.isEmpty() || !QnEmail::isValid(email))
+                if (email.isEmpty() || !QnEmailAddress::isValid(email))
                     return false;
                 any = true;
             }
 
-            QStringList additional = m_actionParams.getEmailAddress().split(QLatin1Char(';'), QString::SkipEmptyParts);
+            QStringList additional = m_actionParams.emailAddress.split(QLatin1Char(';'), QString::SkipEmptyParts);
             foreach(const QString &email, additional) {
                 if (email.trimmed().isEmpty())
                     continue;
-                if (!QnEmail::isValid(email))
+                if (!QnEmailAddress::isValid(email))
                     return false;
                 any = true;
             }
@@ -752,15 +769,15 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
             return isResourcesListValid<QnCameraOutputPolicy>(m_actionResources);
         case QnBusiness::PlaySoundAction:
         case QnBusiness::PlaySoundOnceAction:
-            return !m_actionParams.getSoundUrl().isEmpty();
+            return !m_actionParams.soundUrl.isEmpty();
         case QnBusiness::SayTextAction:
-            return !m_actionParams.getSayText().isEmpty();
+            return !m_actionParams.sayText.isEmpty();
         default:
             break;
         }
 
         //TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
-        QnResourceList resources = m_actionResources.filtered<QnVirtualCameraResource>();
+        QnResourceList resources = filterActionResources(m_actionResources, m_actionType);
         if (QnBusiness::requiresCameraResource(m_actionType) && resources.isEmpty()) {
             return false;
         }
@@ -784,12 +801,12 @@ void QnBusinessRuleViewModel::updateActionTypesModel() {
 }
 
 QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const {
+    QnResourceList resources = filterEventResources(m_eventResources, m_eventType);
     if (m_eventType == QnBusiness::CameraMotionEvent)
-        return QnCameraMotionPolicy::getText(m_eventResources, detailed);
+        return QnCameraMotionPolicy::getText(resources, detailed);
     else if (m_eventType == QnBusiness::CameraInputEvent)
-        return QnCameraInputPolicy::getText(m_eventResources, detailed);
-
-    QnResourceList resources = m_eventResources; //TODO: #GDM #Business filtered by type
+        return QnCameraInputPolicy::getText(resources, detailed);
+    
     if (!QnBusiness::isResourceRequired(m_eventType)) {
         return tr("<System>");
     } else if (resources.size() == 1) {
@@ -808,40 +825,41 @@ QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const {
 }
 
 QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
+    QnResourceList resources = filterActionResources(m_actionResources, m_actionType);
     switch(m_actionType) {
     case QnBusiness::SendMailAction:
     {
         QStringList additional;
-        foreach (QString address, m_actionParams.getEmailAddress().split(QLatin1Char(';'), QString::SkipEmptyParts)) {
+        foreach (QString address, m_actionParams.emailAddress.split(QLatin1Char(';'), QString::SkipEmptyParts)) {
             QString trimmed = address.trimmed();
             if (trimmed.isEmpty())
                 continue;
             additional << trimmed;
         }
-        return QnUserEmailPolicy::getText(m_actionResources,
+        return QnUserEmailPolicy::getText(resources,
                                           detailed,
                                           additional);
     }
     case QnBusiness::ShowPopupAction:
     {
-        if (m_actionParams.getUserGroup() == QnBusinessActionParameters::AdminOnly)
+        if (m_actionParams.userGroup == QnBusinessActionParameters::AdminOnly)
             return tr("Administrators only");
         else
             return tr("All users");
     }
     case QnBusiness::CameraRecordingAction:
     {
-        return QnCameraRecordingPolicy::getText(m_actionResources, detailed);
+        return QnCameraRecordingPolicy::getText(resources, detailed);
     }
     case QnBusiness::CameraOutputAction:
     case QnBusiness::CameraOutputOnceAction:
     {
-        return QnCameraOutputPolicy::getText(m_actionResources, detailed);
+        return QnCameraOutputPolicy::getText(resources, detailed);
     }
     case QnBusiness::PlaySoundAction:
     case QnBusiness::PlaySoundOnceAction:
     {
-        QString filename = m_actionParams.getSoundUrl();
+        QString filename = m_actionParams.soundUrl;
         if (filename.isEmpty())
             return tr("Select a sound");
         QnNotificationSoundModel* soundModel = context()->instance<QnAppServerNotificationCache>()->persistentGuiModel();
@@ -849,7 +867,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     }
     case QnBusiness::SayTextAction:
     {
-        QString text = m_actionParams.getSayText();
+        QString text = m_actionParams.sayText;
         if (text.isEmpty())
             return tr("Enter text");
         return text;
@@ -859,7 +877,6 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     }
 
     //TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
-    QnResourceList resources = m_actionResources;
     if (!QnBusiness::requiresCameraResource(m_actionType)) {
         return tr("<System>");
     } else if (resources.size() == 1) {

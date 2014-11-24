@@ -36,8 +36,11 @@ namespace nx_hls
 
     HLSLivePlaylistManager::~HLSLivePlaylistManager()
     {
-        m_mediaStreamCache->unblockData( m_blockID );
-        m_blockID = -1;
+        if( m_blockID != -1 )
+        {
+            m_mediaStreamCache->unblockData( m_blockID );
+            m_blockID = -1;
+        }
         m_mediaStreamCache->removeKeyFrameEventReceiver( m_eventRegistrationID );
     }
 

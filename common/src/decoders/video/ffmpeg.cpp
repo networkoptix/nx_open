@@ -319,13 +319,13 @@ int CLFFmpegVideoDecoder::findMotionInfo(qint64 pkt_dts)
 void CLFFmpegVideoDecoder::reallocateDeinterlacedFrame()
 {
     int roundWidth = qPower2Ceil((unsigned) m_context->width, 32);
-    int numBytes = avpicture_get_size(PIX_FMT_YUV420P, roundWidth, m_context->height);
+    int numBytes = avpicture_get_size(m_context->pix_fmt, roundWidth, m_context->height);
     if (numBytes > 0) {
         if (m_deinterlaceBuffer)
             av_free(m_deinterlaceBuffer);
 
         m_deinterlaceBuffer = (quint8*)av_malloc(numBytes * sizeof(quint8));
-        avpicture_fill((AVPicture *)m_deinterlacedFrame, m_deinterlaceBuffer, PIX_FMT_YUV420P, roundWidth, m_context->height);
+        avpicture_fill((AVPicture *)m_deinterlacedFrame, m_deinterlaceBuffer, m_context->pix_fmt, roundWidth, m_context->height);
         m_deinterlacedFrame->width = m_context->width;
         m_deinterlacedFrame->height = m_context->height;
     }

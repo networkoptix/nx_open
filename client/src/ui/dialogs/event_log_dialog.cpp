@@ -33,7 +33,7 @@
 #include <ui/style/warning_style.h>
 
 #include <ui/workbench/workbench_context.h>
-#include <ui/workaround/qt5_combobox_workaround.h>
+#include <ui/workaround/widgets_signals_workaround.h>
 
 namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
@@ -84,14 +84,10 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
         m_actionTypesModel->appendRow(anyActionItem);
 
 
-        for (int i = 1; i < QnBusiness::ActionCount; i++) {
-            QnBusiness::ActionType val = (QnBusiness::ActionType) i;
-            if (!QnBusiness::isImplemented(val))
-                continue;
-
-            QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(val));
-            item->setData(val);
-            item->setData(QnBusiness::hasToggleState(val), ProlongedActionRole);
+        for (QnBusiness::ActionType actionType: QnBusiness::allActions()) {
+            QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(actionType));
+            item->setData(actionType);
+            item->setData(QnBusiness::hasToggleState(actionType), ProlongedActionRole);
 
             QList<QStandardItem *> row;
             row << item;
@@ -272,7 +268,7 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
                 m_filterCameraList,
                 eventType,
                 actionType,
-                QUuid(),
+                QnUuid(),
                 this, SLOT(at_gotEvents(int, const QnBusinessActionDataListPtr&, int)));
         }
     }

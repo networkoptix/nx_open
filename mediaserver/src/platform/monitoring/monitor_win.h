@@ -13,7 +13,12 @@ public:
     QnWindowsMonitor(QObject *parent = NULL);
     virtual ~QnWindowsMonitor();
 
+    //!Implementation of \a QnPlatformMonitor::totalPartitionSpaceInfo
+    virtual QList<PartitionSpace> totalPartitionSpaceInfo() override;
+    //!Implementation of \a QnPlatformMonitor::totalHddLoad
     virtual QList<HddLoad> totalHddLoad() override;
+    //!Implementation of \a QnPlatformMonitor::totalNetworkLoad
+    virtual QList<NetworkLoad> totalNetworkLoad() override;
 
 private:
     Q_DECLARE_PRIVATE(QnWindowsMonitor);

@@ -2,6 +2,9 @@
 
 #ifdef ENABLE_COLDSTORE
 
+#include <memory>
+#include <mutex>
+
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 #include <QtCore/QElapsedTimer>
@@ -87,10 +90,16 @@ QnColdStoreDTSSearcher::~QnColdStoreDTSSearcher()
     delete m_request;
 };
 
+static std::unique_ptr<QnColdStoreDTSSearcher> QnColdStoreDTSSearcher_instance;
+static std::once_flag QnColdStoreDTSSearcher_onceFlag;
+
 QnColdStoreDTSSearcher& QnColdStoreDTSSearcher::instance()
 {
-    static QnColdStoreDTSSearcher inst;
-    return inst;
+    std::call_once(
+        QnColdStoreDTSSearcher_onceFlag,
+        [](){ QnColdStoreDTSSearcher_instance.reset( new QnColdStoreDTSSearcher() ); } );
+    
+    return *QnColdStoreDTSSearcher_instance.get();
 }
 
 
@@ -102,7 +111,7 @@ QList<QnDtsUnit> QnColdStoreDTSSearcher::findDtsUnits()
 
     QList<QHostAddress> localAddresses = allLocalAddresses();
 
-    foreach(const QHostAddress& localAddress, localAddresses)
+    for(const QHostAddress& localAddress: localAddresses)
     {
         QHostAddress groupAddress(QLatin1String("239.200.200.201"));
 
@@ -122,7 +131,7 @@ QList<QnDtsUnit> QnColdStoreDTSSearcher::findDtsUnits()
             continue;
 
 
-        sendSocket.sendTo(m_request->data(), m_request->size(), groupAddress.toString(), coldStoreSendPort);
+        sendSocket.sendTo(m_request->data(), m_request->size(), SocketAddress(groupAddress.toString(), coldStoreSendPort));
 
 
         QElapsedTimer time;
@@ -163,7 +172,7 @@ QList<QnDtsUnit> QnColdStoreDTSSearcher::findDtsUnits()
 
         }
 
-        foreach(const QHostAddress& srv, server_list)
+        for(const QHostAddress& srv: server_list)
         {
 //			NX_LOG(QLatin1String("Found CS = "), srv.name, cl_logALWAYS);
 
@@ -238,7 +247,7 @@ void QnColdStoreDTSSearcher::requestFileList(QList<QnDtsUnit>& result, QHostAddr
         fileList.push_back(tmp);
     }
     
-    foreach(const QString& fn, fileList)
+    for(const QString& fn: fileList)
     {
         QString mac = fn;
         mac = mac.toUpper();

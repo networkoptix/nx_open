@@ -81,6 +81,10 @@ public:
         return readNumberInternal(QnUbjson::Int64Marker, target);
     }
 
+    bool readUInt64(quint64 *target) {
+        return readNumberInternal(QnUbjson::Int64Marker, (qint64*)target);
+    }
+
     bool readFloat(float *target) {
         // TODO: #Elric support NaN (like in JSON spec)
         return readNumberInternal(QnUbjson::FloatMarker, target);

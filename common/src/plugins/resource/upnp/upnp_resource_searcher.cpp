@@ -9,7 +9,7 @@
 #include "utils/network/nettools.h"
 #include "utils/network/system_socket.h"
 
-#include "version.h"
+#include <utils/common/app_info.h>
 
 static const QHostAddress groupAddress(QLatin1String("239.255.255.250"));
 
@@ -85,7 +85,7 @@ QnUpnpResourceSearcher::QnUpnpResourceSearcher():
 
 QnUpnpResourceSearcher::~QnUpnpResourceSearcher()
 {
-    foreach(AbstractDatagramSocket* sock, m_socketList)
+    for(AbstractDatagramSocket* sock: m_socketList)
         delete sock;
     delete m_receiveSocket;
 }
@@ -98,7 +98,7 @@ AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndA
         udpSock->setReuseAddrFlag(true);
         udpSock->bind( SocketAddress( HostAddress::anyHost, GROUP_PORT ) );
         
-        foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces()) {
+        for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces()) {
             udpSock->joinGroup(groupAddress.toString(), iface.address.toString());
         }
         m_receiveSocket = udpSock;
@@ -138,7 +138,7 @@ AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndA
 
 QByteArray QnUpnpResourceSearcher::getDeviceDescription(const QByteArray& uuidStr, const QUrl& url)
 {
-    if (m_cacheLivetime.elapsed() > CACHE_TIME_TIME) {
+    if (m_cacheLivetime.elapsed() > UPNPDeviceSearcher::cacheTimeout()) {
         m_cacheLivetime.restart();
         m_deviceXmlCache.clear();
     }
@@ -161,7 +161,7 @@ QHostAddress QnUpnpResourceSearcher::findBestIface(const QString& host)
 {
     QString oldAddress;
     QString result;
-    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
+    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
     {
         QString newAddress = iface.address.toString();
         if (isNewDiscoveryAddressBetter(host, newAddress, oldAddress))
@@ -243,7 +243,7 @@ QnResourceList QnUpnpResourceSearcher::findResources(void)
     QnResourceList result;
     QSet<QByteArray> processedUuid;
 
-    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
+    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
     {
         AbstractDatagramSocket* sock = sockByName(iface);
         if (!sock)
@@ -254,7 +254,7 @@ QnResourceList QnUpnpResourceSearcher::findResources(void)
         data.append("M-SEARCH * HTTP/1.1\r\n");
         //data.append("Host: 192.168.0.150:1900\r\n");
         data.append("Host: ").append(sock->getLocalAddress().toString()).append("\r\n");
-        data.append(lit("ST:urn:schemas-upnp-org:device:%1 Server:1\r\n").arg(lit(QN_ORGANIZATION_NAME)));
+        data.append(lit("ST:urn:schemas-upnp-org:device:%1 Server:1\r\n").arg(QnAppInfo::organizationName()));
         data.append("Man:\"ssdp:discover\"\r\n");
         data.append("MX:3\r\n\r\n");
         sock->sendTo(data.data(), data.size(), groupAddress.toString(), GROUP_PORT);

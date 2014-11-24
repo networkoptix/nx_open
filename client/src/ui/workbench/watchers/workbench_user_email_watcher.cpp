@@ -5,6 +5,8 @@
 
 #include <utils/common/email.h>
 
+#include <ui/workbench/workbench_context.h>
+
 QnWorkbenchUserEmailWatcher::QnWorkbenchUserEmailWatcher(QObject *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent)
@@ -13,6 +15,8 @@ QnWorkbenchUserEmailWatcher::QnWorkbenchUserEmailWatcher(QObject *parent) :
     connect(resourcePool(), SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
     foreach(const QnResourcePtr &resource, resourcePool()->getResources())
         at_resourcePool_resourceAdded(resource);
+
+    connect(context(), &QnWorkbenchContext::userChanged, this, &QnWorkbenchUserEmailWatcher::forceCheckAll);
 }
 
 QnWorkbenchUserEmailWatcher::~QnWorkbenchUserEmailWatcher() {
@@ -21,7 +25,7 @@ QnWorkbenchUserEmailWatcher::~QnWorkbenchUserEmailWatcher() {
 }
 
 void QnWorkbenchUserEmailWatcher::forceCheck(const QnUserResourcePtr &user) {
-    emit userEmailValidityChanged(user, m_emailValidByUser.value(user, QnEmail::isValid(user->getEmail())));
+    emit userEmailValidityChanged(user, m_emailValidByUser.value(user, QnEmailAddress::isValid(user->getEmail())));
 }
 
 void QnWorkbenchUserEmailWatcher::forceCheckAll() {
@@ -60,7 +64,7 @@ void QnWorkbenchUserEmailWatcher::at_user_emailChanged(const QnResourcePtr &reso
     if (!user)
         return;
 
-    bool valid = QnEmail::isValid(user->getEmail());
+    bool valid = QnEmailAddress::isValid(user->getEmail());
     if (m_emailValidByUser.contains(user) && m_emailValidByUser[user] == valid)
         return;
 

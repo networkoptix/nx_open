@@ -1,3 +1,6 @@
+
+#if 0
+
 #include "binary_transaction_serializer.h"
 
 namespace ec2
@@ -11,7 +14,7 @@ namespace ec2
             return false;
 
 #ifdef _DEBUG
-        foreach (const QUuid& peer, transportHeader.dstPeers)
+        for (const QnUuid& peer: transportHeader.dstPeers)
             assert(!peer.isNull());
 #endif
 
@@ -19,3 +22,5 @@ namespace ec2
         return true;
     }
 }
+
+#endif

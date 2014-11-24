@@ -47,7 +47,7 @@ void QnAbstractDataConsumer::run()
 
         if (!get)
         {
-            NX_LOG( lit("QnAbstractDataConsumer::run. queue is empty %1").arg((int)(long)(&m_dataQueue)), cl_logDEBUG2 );
+            //NX_LOG( lit("QnAbstractDataConsumer::run. queue is empty %1").arg((int)(long)(&m_dataQueue)), cl_logDEBUG2 );
             QnSleep::msleep(10);
             continue;
         }
@@ -67,6 +67,11 @@ void QnAbstractDataConsumer::run()
 int QnAbstractDataConsumer::queueSize() const
 {
     return m_dataQueue.size();
+}
+
+int QnAbstractDataConsumer::maxQueueSize() const
+{
+    return m_dataQueue.maxSize();
 }
 
 #endif // ENABLE_DATA_PROVIDERS

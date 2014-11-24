@@ -44,7 +44,6 @@ class QnResourceWidget: public Overlayed<Shaded<Animated<Instrumented<Connective
     Q_PROPERTY(QColor frameDistinctionColor READ frameDistinctionColor WRITE setFrameDistinctionColor NOTIFY frameDistinctionColorChanged)
     Q_PROPERTY(QPointF shadowDisplacement READ shadowDisplacement WRITE setShadowDisplacement)
     Q_PROPERTY(QRectF enclosingGeometry READ enclosingGeometry WRITE setEnclosingGeometry)
-    Q_PROPERTY(qreal enclosingAspectRatio READ enclosingAspectRatio WRITE setEnclosingAspectRatio)
     Q_PROPERTY(bool localActive READ isLocalActive WRITE setLocalActive)
     Q_FLAGS(Options Option)
 
@@ -64,7 +63,8 @@ public:
         ControlPtz                  = 0x0100,   /**< Whether PTZ state can be controlled with mouse. */
         ControlZoomWindow           = 0x0200,   /**< Whether zoom windows can be created by dragging the mouse. */
 
-        WindowRotationForbidden     = 0x1000
+        WindowRotationForbidden     = 0x1000,
+        SyncPlayForbidden           = 0x2000,   /**< Whether SyncPlay is forbidden for this widget. */
     };
     Q_DECLARE_FLAGS(Options, Option)
 
@@ -161,30 +161,22 @@ public:
     }
 
     /**
-     * Every widget is considered to be inscribed into an enclosing rectangle with a
-     * fixed aspect ratio. When aspect ratio of the widget itself changes, it is
-     * re-inscribed into its enclosed rectangle.
-     *
-     * \returns                         Aspect ratio of the enclosing rectangle for this widget.
-     */
-    qreal enclosingAspectRatio() const {
-        return m_enclosingAspectRatio;
-    }
-
-    /**
-     * \param enclosingAspectRatio      New enclosing aspect ratio.
-     */
-    void setEnclosingAspectRatio(qreal enclosingAspectRatio);
-
-    /**
      * \returns                         Geometry of the enclosing rectangle for this widget.
      */
     QRectF enclosingGeometry() const;
 
     /**
+     * Every widget is considered to be inscribed into an enclosing rectangle.
+     * Item will be inscribed even if it is rotated.
      * \param enclosingGeometry         Geometry of the enclosing rectangle for this widget.
      */
     void setEnclosingGeometry(const QRectF &enclosingGeometry);
+
+    /**
+     * Calculate real item geometry according to the specified enclosing geometry.
+     * \see setEnclosingGeometry
+     */
+    QRectF calculateGeometry(const QRectF &enclosingGeometry) const;
 
     /**
      * \returns                         Options for this widget.
@@ -381,8 +373,8 @@ private:
     /** Aspect ratio. Negative value means that aspect ratio is not enforced. */
     qreal m_aspectRatio;
 
-    /** Aspect ratio of the virtual enclosing rectangle. */
-    qreal m_enclosingAspectRatio;
+    /** Virtual enclosing rectangle. */
+    QRectF m_enclosingGeometry;
 
     /** Cached size of a single media channel, in screen coordinates. */
     QSize m_channelScreenSize;
@@ -438,6 +430,7 @@ typedef QList<QnResourceWidget *> QnResourceWidgetList;
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Options)
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Buttons)
+Q_DECLARE_METATYPE(QnResourceWidget::Options)
 Q_DECLARE_METATYPE(QnResourceWidget *)
 Q_DECLARE_METATYPE(QnResourceWidgetList);
 

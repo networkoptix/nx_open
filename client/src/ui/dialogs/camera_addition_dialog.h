@@ -109,7 +109,6 @@ private:
     Q_DISABLE_COPY(QnCameraAdditionDialog)
 
     QScopedPointer<Ui::CameraAdditionDialog> ui;
-    QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;
     State m_state;
     QnMediaServerResourcePtr m_server;
     QnCheckBoxedHeaderView* m_header;
@@ -119,7 +118,7 @@ private:
     bool m_inCheckStateChange;
 
     /** Uuid of the currently running process (if any). */
-    QUuid m_processUuid;
+    QnUuid m_processUuid;
 };
 
 #endif // CAMERA_ADDITION_DIALOG_H

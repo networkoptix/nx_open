@@ -74,6 +74,8 @@ CameraDiagnostics::Result AVClientPullSSTFTPStreamreader::diagnoseMediaStreamCon
 
 QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 {
+    updateCameraParams();
+
     if (needMetaData())
     {
         const QnAbstractMediaDataPtr& metadata = getMetaData();
@@ -417,7 +419,7 @@ QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getCameraMetadata()
 {
     QnMetaDataV1Ptr motion(new QnMetaDataV1());
     QVariant mdresult;
-    if (!getResource()->getParam(QLatin1String("MdResult"), mdresult, QnDomainPhysical))
+    if (!getResource()->getParamPhysical(QLatin1String("mdresult"), mdresult))
         return QnMetaDataV1Ptr(0);
 
     if (mdresult.toString() == QLatin1String("no motion"))
@@ -432,19 +434,16 @@ QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getCameraMetadata()
         return QnMetaDataV1Ptr(0);
 
 
-    QVariant zone_size;
-    if (!getResource()->getParam(QLatin1String("Zone size"), zone_size, QnDomainMemory))
+    QString zone_size = getResource()->getProperty(QLatin1String("Zone size"));
+    if (zone_size.isEmpty())
         return QnMetaDataV1Ptr(0);
 
     int pixelZoneSize = zone_size.toInt() * 32;
 
 
-    QVariant maxSensorWidth;
-    QVariant maxSensorHight;
-    getResource()->getParam(QLatin1String("MaxSensorWidth"), maxSensorWidth, QnDomainMemory);
-    getResource()->getParam(QLatin1String("MaxSensorHeight"), maxSensorHight, QnDomainMemory);
-
-
+    QVariant maxSensorWidth = getResource()->getProperty(lit("MaxSensorWidth"));
+    QVariant maxSensorHight = getResource()->getProperty(lit("MaxSensorHeight"));
+    
     QRect imageRect(0, 0, maxSensorWidth.toInt(), maxSensorHight.toInt());
     QRect zeroZoneRect(0, 0, pixelZoneSize, pixelZoneSize);
 

@@ -3,6 +3,8 @@
 
 #include <server/server_globals.h>
 
+#include <core/resource/resource_fwd.h>
+
 #include "recording/stream_recorder.h"
 #include "core/misc/schedule_task.h"
 #include "recorder/device_file_catalog.h"
@@ -71,6 +73,7 @@ private:
     int getFpsForValue(int fps);
     void writeRecentlyMotion(qint64 writeAfterTime);
     void keepRecentlyMotion(const QnConstAbstractMediaDataPtr& md);
+    bool isPanicMode() const;
 private slots:
     void at_recordingFinished(int status, const QString &filename);
     void at_camera_propertyChanged(const QnResourcePtr &, const QString &);

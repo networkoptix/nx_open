@@ -7,7 +7,7 @@
 
 #include <utils/common/matrix_map.h>
 #include <utils/common/rect_set.h>
-#include <utils/common/hash.h> /* For qHash(const QUuid &). */
+#include <utils/common/hash.h> /* For qHash(const QnUuid &). */
 
 #include <core/resource/resource_fwd.h>
 
@@ -183,7 +183,7 @@ public:
      * \param uuid                      Universally unique identifier to get item for.
      * \returns                         Item for the given universally unique identifier, or NULL if no such item exists in this layout.
      */
-    QnWorkbenchItem *item(const QUuid &uuid) const;
+    QnWorkbenchItem *item(const QnUuid &uuid) const;
 
     /**
      * \param region                    Region to get pinned items at.
@@ -382,7 +382,7 @@ private:
 
     void addZoomLinkInternal(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem, bool notifyItem);
     void removeZoomLinkInternal(QnWorkbenchItem *item, QnWorkbenchItem *zoomTargetItem, bool notifyItem);
-    QUuid zoomTargetUuidInternal(QnWorkbenchItem *item) const;
+    QnUuid zoomTargetUuidInternal(QnWorkbenchItem *item) const;
 
     void initCellParameters();
 
@@ -421,7 +421,7 @@ private:
     bool m_locked;
 
     /** Map from item's universally unique identifier to item. */
-    QHash<QUuid, QnWorkbenchItem *> m_itemByUuid;
+    QHash<QnUuid, QnWorkbenchItem *> m_itemByUuid;
 
     /** Empty item list, to return a reference to. */
     const QSet<QnWorkbenchItem *> m_noItems;

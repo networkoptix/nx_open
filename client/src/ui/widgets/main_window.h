@@ -57,7 +57,7 @@ public:
 
     void updateDecorationsState();
 public slots:
-    void handleMessage(const QString &message);
+    bool handleMessage(const QString &message);
 
 protected:
     virtual bool event(QEvent *event) override;
@@ -130,6 +130,8 @@ private:
     QRect m_storedGeometry;
 #endif
     bool m_enableBackgroundAnimation;
+
+    bool m_inFullscreenTransition;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnMainWindow::Options);

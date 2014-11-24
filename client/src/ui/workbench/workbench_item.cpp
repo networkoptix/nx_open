@@ -4,6 +4,7 @@
 
 #include <common/common_meta_types.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <ui/common/geometry.h>
@@ -11,14 +12,25 @@
 #include "workbench_layout.h"
 
 
-QnWorkbenchItem::QnWorkbenchItem(const QString &resourceUid, const QUuid &uuid, QObject *parent):
+QnWorkbenchItem::QnWorkbenchItem(const QString &resourceUid, const QnUuid &uuid, QObject *parent):
     QObject(parent),
     m_layout(NULL),
     m_resourceUid(resourceUid),
     m_uuid(uuid),
     m_flags(0),
     m_rotation(0.0)
-{}
+{
+    if(resourceUid.isEmpty())
+        return;
+
+    QnResourcePtr resource = qnResPool->getResourceByUniqId(resourceUid);
+    if(!resource)
+        return;
+
+    QString forcedRotation = resource->getProperty(QnMediaResource::rotationKey());
+    if (!forcedRotation.isEmpty()) 
+        m_rotation = forcedRotation.toInt();
+}
 
 QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent):
     QObject(parent),
@@ -59,14 +71,14 @@ QnLayoutItemData QnWorkbenchItem::data() const {
 
     data.uuid = m_uuid;
     data.resource.path = m_resourceUid;
-    data.resource.id = resource ? resource->getId() : QUuid();
+    data.resource.id = resource ? resource->getId() : QnUuid();
     data.flags = flags();
     data.rotation = rotation();
     data.combinedGeometry = combinedGeometry();
     data.zoomRect = zoomRect();
     data.contrastParams = imageEnhancement();
     data.dewarpingParams = dewarpingParams();
-    data.zoomTargetUuid = zoomTargetItem() ? zoomTargetItem()->uuid() : QUuid();
+    data.zoomTargetUuid = zoomTargetItem() ? zoomTargetItem()->uuid() : QnUuid();
     data.dataByRole = m_dataByRole;
 
     return data;
@@ -78,7 +90,7 @@ bool QnWorkbenchItem::update(const QnLayoutItemData &data) {
 
 #ifdef _DEBUG
     QnResourcePtr resource = qnResPool->getResourceByUniqId(resourceUid());
-    QUuid localId = resource ? resource->getId() : QUuid();
+    QnUuid localId = resource ? resource->getId() : QnUuid();
     if(data.resource.id != localId && data.resource.path != m_resourceUid)
         qnWarning("Updating item '%1' from a data with different ids (%2 != %3 and %4 != %5).", resourceUid(), localId.toString(), data.resource.id.toString(), data.resource.path, m_resourceUid);
 #endif
@@ -104,7 +116,7 @@ void QnWorkbenchItem::submit(QnLayoutItemData &data) const {
         qnWarning("Submitting item '%1' to a data with different uuid (%2 != %3).", resourceUid(), data.uuid, uuid());
 
 #ifdef _DEBUG
-    QUuid localId = qnResPool->getResourceByUniqId(resourceUid())->getId();
+    QnUuid localId = qnResPool->getResourceByUniqId(resourceUid())->getId();
     if(data.resource.id != localId && data.resource.path != m_resourceUid)
         qnWarning("Submitting item '%1' to a data with different ids (%2 != %3 and %4 != %5).", resourceUid(), localId.toString(), data.resource.id.toString(), data.resource.path, m_resourceUid);
 #endif
@@ -114,7 +126,7 @@ void QnWorkbenchItem::submit(QnLayoutItemData &data) const {
     data.zoomRect = zoomRect();
     data.contrastParams = imageEnhancement();
     data.dewarpingParams = dewarpingParams();
-    data.zoomTargetUuid = zoomTargetItem() ? zoomTargetItem()->uuid() : QUuid();
+    data.zoomTargetUuid = zoomTargetItem() ? zoomTargetItem()->uuid() : QnUuid();
     data.combinedGeometry = combinedGeometry();
     data.dataByRole = m_dataByRole;
 }
@@ -300,7 +312,7 @@ QVariant QnWorkbenchItem::data(int role) const {
     case Qn::ResourceUidRole:
         return resourceUid();
     case Qn::ItemUuidRole:
-        return QVariant::fromValue<QUuid>(uuid());
+        return QVariant::fromValue<QnUuid>(uuid());
     case Qn::ItemGeometryRole:
         return geometry();
     case Qn::ItemGeometryDeltaRole:
@@ -332,7 +344,7 @@ bool QnWorkbenchItem::setData(int role, const QVariant &value) {
             return false;
         }
     case Qn::ItemUuidRole:
-        if(value.value<QUuid>() == uuid()) {
+        if(value.value<QnUuid>() == uuid()) {
             return true;
         } else {
             qnWarning("Changing UUID of a workbench item is not supported.");

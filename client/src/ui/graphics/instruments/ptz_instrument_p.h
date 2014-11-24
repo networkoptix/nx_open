@@ -184,7 +184,7 @@ class PtzOverlayWidget: public GraphicsWidget {
 public:
     PtzOverlayWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): 
         base_type(parent, windowFlags),
-        m_markersVisible(true)
+        m_markersMode(Qt::Horizontal | Qt::Vertical)
     {
         setAcceptedMouseButtons(0);
 
@@ -290,12 +290,12 @@ public:
         return m_modeButton;
     }
 
-    bool isMarkersVisible() const {
-        return m_markersVisible;
+    Qt::Orientations markersMode() const {
+        return m_markersMode;
     }
 
-    void setMarkersVisible(bool markersVisible) {
-        m_markersVisible = markersVisible;
+    void setMarkersMode(Qt::Orientations mode) {
+        m_markersMode = mode;
     }
 
     virtual void setGeometry(const QRectF &rect) override {
@@ -308,7 +308,7 @@ public:
     }
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-        if(!m_markersVisible) {
+        if(m_markersMode == 0) {
             base_type::paint(painter, option, widget);
             return;
         }
@@ -320,24 +320,28 @@ public:
         QPointF center = rect.center();
         qreal unit = this->unit();
 
-        qreal x = unit * 3.0;
-        while(x < rect.width() / 2.0) {
-            crosshairLines 
-                << center + QPointF(-x, unit / 2.0) << center + QPointF(-x, -unit / 2.0);
-            
-            if(x < rect.width() / 2.0 - 3.0 * unit || !m_focusInButton->isVisible())
+        if (m_markersMode & Qt::Horizontal) {
+            qreal x = unit * 3.0;
+            while(x < rect.width() / 2.0) {
                 crosshairLines 
+                    << center + QPointF(-x, unit / 2.0) << center + QPointF(-x, -unit / 2.0);
+
+                if(x < rect.width() / 2.0 - 3.0 * unit || !m_focusInButton->isVisible())
+                    crosshairLines 
                     << center + QPointF( x, unit / 2.0) << center + QPointF( x, -unit / 2.0);
 
-            x += unit;
+                x += unit;
+            }
         }
 
-        qreal y = unit * 3.0;
-        while(y < rect.height() / 2.0) {
-            crosshairLines 
-                << center + QPointF(unit / 2.0,  y) << center + QPointF(-unit / 2.0,  y)
-                << center + QPointF(unit / 2.0, -y) << center + QPointF(-unit / 2.0, -y);
-            y += unit;
+        if (m_markersMode & Qt::Vertical) {
+            qreal y = unit * 3.0;
+            while(y < rect.height() / 2.0) {
+                crosshairLines 
+                    << center + QPointF(unit / 2.0,  y) << center + QPointF(-unit / 2.0,  y)
+                    << center + QPointF(unit / 2.0, -y) << center + QPointF(-unit / 2.0, -y);
+                y += unit;
+            }
         }
 
         QN_SCOPED_PAINTER_PEN_ROLLBACK(painter, m_pen);
@@ -379,7 +383,7 @@ private:
     }
 
 private:
-    bool m_markersVisible;
+    Qt::Orientations m_markersMode;
     PtzManipulatorWidget *m_manipulatorWidget;
     PtzImageButtonWidget *m_zoomInButton;
     PtzImageButtonWidget *m_zoomOutButton;

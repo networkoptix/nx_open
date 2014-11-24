@@ -36,7 +36,7 @@ class QnVideowallItemWidget : public Overlayed<Animated<Connective<QnClickableWi
 
     Q_PROPERTY(QnResourceWidgetFrameColors frameColors READ frameColors WRITE setFrameColors)
 public:
-    explicit QnVideowallItemWidget(const QnVideoWallResourcePtr &videowall, const QUuid &itemUuid, QnVideowallScreenWidget *parent, QGraphicsWidget* parentWidget, Qt::WindowFlags windowFlags = 0);
+    explicit QnVideowallItemWidget(const QnVideoWallResourcePtr &videowall, const QnUuid &itemUuid, QnVideowallScreenWidget *parent, QGraphicsWidget* parentWidget, Qt::WindowFlags windowFlags = 0);
 
     const QnResourceWidgetFrameColors &frameColors() const;
     void setFrameColors(const QnResourceWidgetFrameColors &frameColors);
@@ -94,7 +94,7 @@ private:
     const QnVideoWallResourcePtr m_videowall;
 
     /** Uuid of the current screen instance. */
-    const QUuid m_itemUuid;
+    const QnUuid m_itemUuid;
 
     /** Cached field to be used as action parameters source. */
     const QnVideoWallItemIndexList m_indices;

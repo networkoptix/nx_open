@@ -14,6 +14,8 @@ public:
     QnBookmarkCameraData();
     QnBookmarkCameraData(const QnCameraBookmarkList &data);
 
+    QnAbstractCameraDataPtr clone() const override;
+
     /**
      * @brief isEmpty                               Check that the list is not empty.
      * @return                                      True if there is at least one bookmark.
@@ -49,6 +51,13 @@ public:
      * @return                                      Sorted list of time periods containing the bookmarks.
      */
     virtual QnTimePeriodList dataSource() const override;
+
+    /**
+     * @brief trim                                  Trim the last time period if it is not finished.
+     * @param trimTime                              Value to be set as the end time of the last time period.
+     * @return                                      True if the list was modified, false otherwise.
+     */
+    virtual bool trim(qint64 trimTime) override;
 
     /**
      * @brief find                                  Find the longest bookmark covering the certain moment of time.

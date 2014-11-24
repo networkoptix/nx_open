@@ -28,8 +28,7 @@ static const QByteArray guidStr("{756E732D-0FB1-4f91-8CE0-381D1A3F84E8}");
 QByteArray localAppServerHost()
 {
     QByteArray result = MSSettings::roSettings()->value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString().toUtf8();
-    if (result == "localhost" || result == "127.0.0.1")
-    {
+    if (isLocalAppServer(result)) {
         QList<QnInterfaceAndAddr> interfaces = getAllIPv4Interfaces();
         if (!interfaces.isEmpty())
             result = interfaces[0].address.toString().toUtf8();
@@ -54,7 +53,7 @@ class DiscoveryPacket
     {
         bool rez = false;
         netRes->lockConsumers();
-        foreach(QnResourceConsumer* consumer, netRes->getAllConsumers())
+        for(QnResourceConsumer* consumer: netRes->getAllConsumers())
         {
             QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(consumer);
             if (lp)
@@ -127,7 +126,7 @@ public:
         result << appServerGuid;
         result << localAppServerHost();
         QStringList cameras = getLocalUsingCameras();
-        foreach (const QString &camera, cameras)
+        for (const QString &camera: cameras)
             result.append(camera.toUtf8());
         return listToByteArray(result);
     }
@@ -137,7 +136,7 @@ public:
         if (localCameras.isEmpty())
             return;
 
-        foreach (const QByteArray &camera, m_cameras) {
+        for (const QByteArray &camera: m_cameras) {
             QString cam = QString::fromUtf8(camera);
             if (localCameras.contains(cam) && !result.contains(cam))
                 result << cam;
@@ -184,7 +183,7 @@ void QnMServerResourceSearcher::run()
 void QnMServerResourceSearcher::updateSocketList()
 {
     deleteSocketList();
-    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
+    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
     {
         UDPSocket* socket = new UDPSocket();
         QString localAddress = iface.address.toString();

@@ -2,6 +2,10 @@
 #ifdef ENABLE_ONVIF
 
 #include "onvif_resource_information_fetcher.h"
+
+#include <memory>
+#include <mutex>
+
 #include "onvif_resource.h"
 #include "onvif/soapDeviceBindingProxy.h"
 #include "../digitalwatchdog/digital_watchdog_resource.h"
@@ -26,9 +30,11 @@ static const char* ANALOG_CAMERAS[][2] =
 // Add vendor and camera model to ommit ONVIF search (case insensitive)
 static const char* IGNORE_VENDORS[][2] =
 {
-    {"*networkcamera*", "IP*"}, // DLINK
-    {"*", "*spartan-6*"},       // ArecontVision
-    {"acti*", "*"}              // ACTi. Current ONVIF implementation quite unstable. Vendor name is not filled by camera!
+    {"IP*", "*networkcamera*"}, // DLINK
+    {"ISD", "*"},              // ISD
+    {"spartan-6*", "*"},       // ArecontVision
+    {"acti*", "*"},              // ACTi. Current ONVIF implementation quite unstable. Vendor name is not filled by camera!
+    {"*", "KCM*"}              // ACTi.
 };
 
 bool OnvifResourceInformationFetcher::isAnalogOnvifResource(const QString& vendor, const QString& model)
@@ -53,7 +59,8 @@ bool OnvifResourceInformationFetcher::isModelContainVendor(const QString& vendor
         return false;
 }
 
-OnvifResourceInformationFetcher::OnvifResourceInformationFetcher():
+OnvifResourceInformationFetcher::OnvifResourceInformationFetcher()
+:
     /*passwordsData(PasswordHelper::instance()),*/
     camersNamesData(NameHelper::instance()),
     m_shouldStop(false)
@@ -73,18 +80,23 @@ OnvifResourceInformationFetcher::OnvifResourceInformationFetcher():
     }
 }
 
+static std::unique_ptr<OnvifResourceInformationFetcher> OnvifResourceInformationFetcher_instance;
+static std::once_flag OnvifResourceInformationFetcher_onceFlag;
+
 OnvifResourceInformationFetcher& OnvifResourceInformationFetcher::instance()
 {
-    static OnvifResourceInformationFetcher inst;
-    return inst;
+    std::call_once(
+        OnvifResourceInformationFetcher_onceFlag,
+        [](){ OnvifResourceInformationFetcher_instance.reset( new OnvifResourceInformationFetcher() ); } );
+    return *OnvifResourceInformationFetcher_instance.get();
 }
 
-void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result) const
+void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result, DiscoveryMode discoveryMode) const
 {
     EndpointInfoHash::ConstIterator iter = endpointInfo.begin();
 
     while(iter != endpointInfo.end() && !m_shouldStop) {
-        findResources(iter.key(), iter.value(), result);
+        findResources(iter.key(), iter.value(), result, discoveryMode);
 
         ++iter;
     }
@@ -108,7 +120,7 @@ bool OnvifResourceInformationFetcher::isModelSupported(const QString& manufactur
     return NameHelper::instance().isManufacturerSupported(manufacturer) && NameHelper::instance().isSupported(modelName);
 }
 
-void OnvifResourceInformationFetcher::findResources(const QString& endpoint, const EndpointAdditionalInfo& info, QnResourceList& result) const
+void OnvifResourceInformationFetcher::findResources(const QString& endpoint, const EndpointAdditionalInfo& info, QnResourceList& result, DiscoveryMode discoveryMode) const
 {
     if (endpoint.isEmpty()) {
         qDebug() << "OnvifResourceInformationFetcher::findResources: response packet was received, but appropriate URL was not found.";
@@ -139,8 +151,6 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     DeviceSoapWrapper soapWrapper(endpoint.toStdString(), QString(), QString(), 0);
 
     QnVirtualCameraResourcePtr existResource = qnResPool->getNetResourceByPhysicalId(info.uniqId).dynamicCast<QnVirtualCameraResource>();
-    if (!existResource)
-        existResource = qnResPool->getResourceByParam(QnPlOnvifResource::ONVIF_ID_PARAM_NAME, info.uniqId).dynamicCast<QnVirtualCameraResource>();
 
     if (existResource) {
         soapWrapper.setLogin(existResource->getAuth().user());
@@ -150,8 +160,14 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         soapWrapper.setLogin(info.defaultLogin);
         soapWrapper.setPassword(info.defaultPassword);
     }
-    else
+    else if (discoveryMode != DiscoveryMode::partiallyEnabled)
         soapWrapper.fetchLoginPassword(info.manufacturer);
+
+    if( !existResource && discoveryMode == DiscoveryMode::partiallyEnabled )
+        return; //ignoring unknown cameras
+
+    if (m_shouldStop)
+        return;
 
     //Trying to get name and manufacturer
     if (existResource)
@@ -164,7 +180,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
             mac = existResource->getMAC().toString();
     }
 
-    if (model.isEmpty() || manufacturer.isEmpty() || mac.isEmpty())
+    if (model.isEmpty() || manufacturer.isEmpty()  || QnMacAddress(mac).isNull())
     {
         OnvifResExtInfo extInfo;
         QAuthenticator auth;
@@ -172,6 +188,9 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         auth.setPassword(soapWrapper.getPassword());
         CameraDiagnostics::Result result = QnPlOnvifResource::readDeviceInformation(endpoint, auth, INT_MAX, &extInfo);
         
+        if (m_shouldStop)
+            return;
+
         if (!result && result.errorCode != CameraDiagnostics::ErrorCode::notAuthorised)
             return; // non onvif device
 
@@ -243,9 +262,9 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     }
 }
 
-QUuid OnvifResourceInformationFetcher::getOnvifResourceType(const QString& manufacturer, const QString&  model) const
+QnUuid OnvifResourceInformationFetcher::getOnvifResourceType(const QString& manufacturer, const QString&  model) const
 {
-    QUuid rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false); // try to find child resource type, use real manufacturer name as camera model in onvif XML
+    QnUuid rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false); // try to find child resource type, use real manufacturer name as camera model in onvif XML
     if (!rt.isNull())
         return rt;
     else if (isAnalogOnvifResource(manufacturer, model) && !onvifAnalogTypeId.isNull())
@@ -266,23 +285,22 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
 
     resource->setTypeId(getOnvifResourceType(manufacturer, model));
 
-    resource->setHostAddress(QHostAddress(sender).toString(), QnDomainMemory);
-    resource->setDiscoveryAddr(discoveryIp);
+    resource->setHostAddress(QHostAddress(sender).toString());
     resource->setModel(model);
     if (isModelContainVendor(manufacturer, model))
         resource->setName(model); 
     else
         resource->setName(manufacturer + model); 
-    resource->setMAC(QnMacAddress(mac));
+    QnMacAddress macAddr(mac);
+    resource->setMAC(macAddr);
     resource->setFirmware(firmware);
 
-    if (mac.isEmpty())
-        resource->setPhysicalId(uniqId);
+	resource->setPhysicalId(uniqId);
 
     resource->setDeviceOnvifUrl(deviceUrl);
 
     if (!login.isEmpty())
-        resource->setAuth(login, passwd);
+        resource->setDefaultAuth(login, passwd);
 
     return resource;
 }
@@ -291,7 +309,7 @@ bool OnvifResourceInformationFetcher::isMacAlreadyExists(const QString& mac, con
 {
     if (!mac.isEmpty()) {
 
-        foreach(QnResourcePtr res, resList) {
+        for(const QnResourcePtr& res: resList) {
             QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
 
             if (netRes->getMAC().toString() == mac) {
@@ -318,6 +336,10 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
 {
     QnPlOnvifResourcePtr resource;
     if (manufacture.toLower().contains(QLatin1String("digital watchdog")))
+        resource = QnPlOnvifResourcePtr(new QnPlWatchDogResource());
+    else if (manufacture.toLower() == QLatin1String("panoramic"))
+        resource = QnPlOnvifResourcePtr(new QnPlWatchDogResource());
+    else if (manufacture.toLower() == QLatin1String("ipnc"))   // new dw panoramic cameras
         resource = QnPlOnvifResourcePtr(new QnPlWatchDogResource());
     else if (manufacture.toLower().contains(QLatin1String("sony")))
         resource = QnPlOnvifResourcePtr(new QnPlSonyResource());

@@ -11,7 +11,7 @@ void QnMdnsPacket::toDatagram(QByteArray& datagram)
     QDataStream stream(&datagram, QIODevice::WriteOnly);
     stream << transactionId << flags << questions << answerRRs << authorityRRs << additionalRRs;
 
-    foreach (const Query& query, queries)
+    for (const Query& query: queries)
     {
         stream.writeRawData(query.queryName.data(), query.queryName.size());
         stream << (quint8)0;

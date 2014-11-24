@@ -17,6 +17,7 @@
 #include "../client/client_settings.h"
 #include "transcoding/filters/contrast_image_filter.h"
 #include "transcoding/filters/fisheye_image_filter.h"
+#include "transcoding/filters/filter_helper.h"
 
 
 static const int MAX_REVERSE_QUEUE_SIZE = 1024*1024 * 300; // at bytes
@@ -764,7 +765,7 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, cons
             else {
                 if (qAbs(m_speed) < 1.0 + FPS_EPS) {
                     foreach(QnAbstractRenderer* render, m_renderList)
-                        render->waitForFrameDisplayed(outFrame->channel); // wait old frame
+                        render->waitForQueueLessThan(outFrame->channel, MAX_FRAME_QUEUE_SIZE); // wait old frame
                 }
                 foreach(QnAbstractRenderer* render, m_renderList)
                     render->draw(outFrame); // send new one
@@ -1016,87 +1017,20 @@ QImage QnVideoStreamDisplay::getGrayscaleScreenshot()
 }
 
 
-QImage QnVideoStreamDisplay::getScreenshot(const ImageCorrectionParams& params,
-                                           const QnMediaDewarpingParams& mediaDewarping,
-                                           const QnItemDewarpingParams& itemDewarping,
-                                           bool anyQuality) {
-    if (m_decoder.isEmpty())
-        return QImage();
-    QnAbstractVideoDecoder* dec = m_decoder.begin().value();
+CLVideoDecoderOutputPtr QnVideoStreamDisplay::getScreenshot(bool anyQuality)
+{
     QMutexLocker mutex(&m_mtx);
-    const AVFrame* lastFrame = dec->lastFrame();
 
-    if (m_reverseMode && m_lastDisplayedFrame && m_lastDisplayedFrame->data[0])
-        lastFrame = m_lastDisplayedFrame.data();
-
-    if (!lastFrame || !lastFrame->width || !lastFrame->data[0])
-        return QImage();
+    if (!m_lastDisplayedFrame || !m_lastDisplayedFrame->data[0] || !m_lastDisplayedFrame->width)
+        return CLVideoDecoderOutputPtr();
 
     // feature #2563
     if (!anyQuality && (m_lastDisplayedFrame->flags & QnAbstractMediaData::MediaFlags_LowQuality))
-        return QImage();    //screenshot will be received from the server
+        return CLVideoDecoderOutputPtr();    //screenshot will be received from the server
 
-    qreal ar = dec->getWidth() * (qreal) dec->getSampleAspectRatio() / (qreal) dec->getHeight();
-
-    // copy image
-    QScopedPointer<CLVideoDecoderOutput> srcFrame(new CLVideoDecoderOutput());
-    srcFrame->setUseExternalData(false);
-
-    QSize srcSize(QSize(lastFrame->width, lastFrame->height));
-    QSize frameCopySize = QnFisheyeImageFilter::getOptimalSize(srcSize, itemDewarping);
-
-    srcFrame->reallocate(frameCopySize.width(), frameCopySize.height(), lastFrame->format);
-
-    if (frameCopySize == srcSize) {
-        av_picture_copy((AVPicture*) srcFrame.data(), (AVPicture*) lastFrame, (PixelFormat) lastFrame->format, lastFrame->width, lastFrame->height);
-    } else {
-        // resize frame
-        SwsContext* convertor = sws_getContext(
-            lastFrame->width,       lastFrame->height,  (PixelFormat) lastFrame->format,
-            srcFrame->width,        srcFrame->height, (PixelFormat) srcFrame->format,
-            SWS_BILINEAR, NULL, NULL, NULL);
-        if( !convertor )
-            return QImage();
-
-        sws_scale(convertor, lastFrame->data, lastFrame->linesize, 0, lastFrame->height, 
-                             srcFrame->data, srcFrame->linesize);
-        sws_freeContext(convertor);
-    }
-
-    if (params.enabled) {
-        QnContrastImageFilter filter(params);
-        filter.updateImage(srcFrame.data(), QRectF(0.0, 0.0, 1.0, 1.0), ar);
-    }
-
-    if (mediaDewarping.enabled && itemDewarping.enabled) {
-        QnFisheyeImageFilter filter2(mediaDewarping, itemDewarping);
-        filter2.updateImage(srcFrame.data(), QRectF(0.0, 0.0, 1.0, 1.0), ar);
-    }
-
-    // convert colorSpace
-    SwsContext* convertor = sws_getContext(srcFrame->width, srcFrame->height, (PixelFormat) srcFrame->format,
-        srcFrame->width, srcFrame->height, PIX_FMT_BGRA,
-        SWS_POINT, NULL, NULL, NULL);
-    if( !convertor )
-        return QImage();
-
-    int numBytes = avpicture_get_size(PIX_FMT_RGBA, srcFrame->width, srcFrame->height);
-
-    AVPicture outPicture; 
-    avpicture_fill( (AVPicture*) &outPicture, (quint8*) av_malloc(numBytes), PIX_FMT_BGRA, srcFrame->width, srcFrame->height);
-    outPicture.data[4] = outPicture.data[5] = outPicture.data[6] = outPicture.data[7] = 0;
-
-    sws_scale(convertor, srcFrame->data, srcFrame->linesize, 
-              0, srcFrame->height, 
-              outPicture.data, outPicture.linesize);
-    sws_freeContext(convertor);
-
-    // convert to QImage
-    QImage tmp(outPicture.data[0], srcFrame->width, srcFrame->height, outPicture.linesize[0], QImage::Format_ARGB32);
-    QImage rez( srcFrame->width, srcFrame->height, QImage::Format_ARGB32);
-    rez = tmp.copy(0,0, srcFrame->width, srcFrame->height);
-    avpicture_free(&outPicture);
-    return rez;
+    CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
+    CLVideoDecoderOutput::copy(m_lastDisplayedFrame.data(), outFrame.data());
+    return outFrame;
 }
 
 void QnVideoStreamDisplay::setCurrentTime(qint64 time)

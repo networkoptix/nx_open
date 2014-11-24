@@ -217,6 +217,7 @@ void QnCameraAdditionDialog::setState(QnCameraAdditionDialog::State state) {
         ui->actionButtonsStackedWidget->setEnabled(true);
         ui->scanButton->setFocus();
         ui->scanButton->setDefault(true);
+        ui->scanButton->setEnabled(true);
         clearTable();
         break;
     case InitialOffline:
@@ -225,6 +226,7 @@ void QnCameraAdditionDialog::setState(QnCameraAdditionDialog::State state) {
         ui->actionButtonsStackedWidget->setCurrentWidget(ui->scanButtonPage);
         ui->actionButtonsStackedWidget->setEnabled(false);
         ui->buttonBox->button(QDialogButtonBox::Close)->setFocus();
+        ui->scanButton->setEnabled(false);
         clearTable();
         break;
     case Searching:
@@ -561,7 +563,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked() {
     }
 
     setState(Searching);
-    m_processUuid = QUuid();
+    m_processUuid = QnUuid();
     m_server->apiConnection()->searchCameraAsyncStart(startAddrStr, endAddrStr, username, password, port, this, SLOT(at_searchRequestReply(int, const QVariant &, int)));
 }
 
@@ -578,7 +580,7 @@ void QnCameraAdditionDialog::at_stopScanButton_clicked() {
     ui->progressBar->setFormat(tr("Finishing search..."));
     ui->progressBar->setMaximum(1);
     ui->progressBar->setValue(0);
-    m_processUuid = QUuid();
+    m_processUuid = QnUuid();
 }
 
 void QnCameraAdditionDialog::at_addButton_clicked() {
@@ -766,7 +768,7 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
             setState(Initial);
             QMessageBox::information(this, tr("Finished"), tr("No cameras found."));
         }
-        m_processUuid = QUuid();
+        m_processUuid = QnUuid();
     }
 
     if (m_state != Searching)

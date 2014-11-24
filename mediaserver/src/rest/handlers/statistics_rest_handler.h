@@ -2,19 +2,20 @@
 #define QN_STATISTICS_REST_HANDLER_H
 
 #include "rest/server/request_handler.h"
+#include "rest/server/json_rest_handler.h"
 
 class QnGlobalMonitor;
 
-class QnStatisticsRestHandler: public QnRestRequestHandler {
+class QnStatisticsRestHandler: public QnJsonRestHandler {
     Q_OBJECT
 public:
     QnStatisticsRestHandler();
     virtual ~QnStatisticsRestHandler();
 
-    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType);
-    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, const QByteArray& srcBodyContentType, QByteArray& result, QByteArray& contentType);
+    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
 private:
     QnGlobalMonitor *m_monitor;
 };
+
 
 #endif // QN_STATISTICS_REST_HANDLER_H

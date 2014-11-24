@@ -57,12 +57,11 @@ public slots:
 protected slots:
     void at_viewport_resized();
     void at_motionRegionSelected(QGraphicsView *view, QnMediaResourceWidget *widget, const QRect &gridRect);
-    void at_motionRegionCleared();
     void at_itemClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
 
 private:
     void init();
-    void showTooManyWindowsMessage(const QnMotionRegion &region, const QnMotionRegion::RegionValid kind);
+    void showTooManyWindowsMessage(const QnMotionRegion &region, const QnMotionRegion::ErrorCode errCode);
 
 private:
     QnVirtualCameraResourcePtr m_camera;

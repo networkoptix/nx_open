@@ -3,61 +3,19 @@
 
 #include <atomic>
 #include <iostream>
+#include <memory>
 #include <mutex>
 
+#include <QtCore/QCoreApplication>
 #include <QtCore/QSettings>
 
-#include "version.h"
-
-
-static std::mutex settingsMutex;
-
-static void initializeSettingsFromConfFile( QSettings*& settingsInstance, const QString& fileName )
-{
-    if( settingsInstance )
-        return;
-
-    std::unique_lock<std::mutex> lk( settingsMutex );
-
-    if( settingsInstance )
-        return;
-
-    settingsInstance = new QSettings( fileName, QSettings::IniFormat );
-}
-
-static QSettings* getSettingsInstance(
-    QSettings*& settingsInstance
-#ifndef _WIN32
-    , const QString& defaultConfigFileName
-#endif
-    )
-{
-    if( settingsInstance )
-        return settingsInstance;
-
-    std::unique_lock<std::mutex> lk( settingsMutex );
-
-    if( settingsInstance )
-        return settingsInstance;
-
-#ifndef _WIN32
-    settingsInstance = new QSettings( defaultConfigFileName, QSettings::IniFormat );
-#else
-    settingsInstance = new QSettings( QSettings::SystemScope, QN_ORGANIZATION_NAME, QN_APPLICATION_NAME );
-#endif
-
-    return settingsInstance;
-}
-
+#include <utils/common/app_info.h>
 
 
 #ifndef _WIN32
-static QString defaultConfigFileName = QString("/opt/%1/mediaserver/etc/mediaserver.conf").arg(VER_LINUX_ORGANIZATION_NAME);
-static QString defaultConfigFileNameRunTime = QString("/opt/%1/mediaserver/etc/running_time.conf").arg(VER_LINUX_ORGANIZATION_NAME);
+static QString defaultConfigFileName = QString("/opt/%1/mediaserver/etc/mediaserver.conf").arg(QnAppInfo::linuxOrganizationName());
+static QString defaultConfigFileNameRunTime = QString("/opt/%1/mediaserver/etc/running_time.conf").arg(QnAppInfo::linuxOrganizationName());
 #endif
-
-static QSettings* roSettingsInstance = NULL;
-static QSettings* rwSettingsInstance = NULL;
 
 QString MSSettings::defaultROSettingsFilePath()
 {
@@ -68,19 +26,31 @@ QString MSSettings::defaultROSettingsFilePath()
 #endif
 }
 
+static std::unique_ptr<QSettings> roSettingsInstance;
+static std::once_flag roSettings_onceFlag;
+
 void MSSettings::initializeROSettingsFromConfFile( const QString& fileName )
 {
-    initializeSettingsFromConfFile( roSettingsInstance, fileName );
+    std::call_once(
+        roSettings_onceFlag,
+        [fileName](){ roSettingsInstance.reset( new QSettings( fileName, QSettings::IniFormat ) ); } );
 }
 
 QSettings* MSSettings::roSettings()
 {
-    return getSettingsInstance(
-        roSettingsInstance
+    std::call_once(
+        roSettings_onceFlag,
+        [](){
+            roSettingsInstance.reset( new QSettings(
 #ifndef _WIN32
-        , defaultConfigFileName
+                defaultConfigFileName, QSettings::IniFormat
+#else
+                QSettings::SystemScope, QnAppInfo::organizationName(), QCoreApplication::applicationName()
 #endif
-        );
+            ) );
+        } );
+
+    return roSettingsInstance.get();
 }
 
 QString MSSettings::defaultRunTimeSettingsFilePath()
@@ -92,17 +62,29 @@ QString MSSettings::defaultRunTimeSettingsFilePath()
 #endif
 }
 
+static std::unique_ptr<QSettings> rwSettingsInstance;
+static std::once_flag rwSettings_onceFlag;
+
 void MSSettings::initializeRunTimeSettingsFromConfFile( const QString& fileName )
 {
-    initializeSettingsFromConfFile( rwSettingsInstance, fileName );
+    std::call_once(
+        rwSettings_onceFlag,
+        [fileName](){ rwSettingsInstance.reset( new QSettings( fileName, QSettings::IniFormat ) ); } );
 }
 
 QSettings* MSSettings::runTimeSettings()
 {
-    return getSettingsInstance(
-        rwSettingsInstance
+    std::call_once(
+        rwSettings_onceFlag,
+        [](){
+            rwSettingsInstance.reset( new QSettings(
 #ifndef _WIN32
-        , defaultConfigFileNameRunTime
+                defaultConfigFileNameRunTime, QSettings::IniFormat
+#else
+                QSettings::SystemScope, QnAppInfo::organizationName(), QCoreApplication::applicationName()
 #endif
-        );
+            ) );
+        } );
+
+    return rwSettingsInstance.get();
 }

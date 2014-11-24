@@ -147,6 +147,11 @@ public:
     void redirectAction(QMenu *menu, Qn::ActionId sourceId, QAction *targetAction);
 
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
+
+signals:
+    void menuAboutToShow(QMenu* menu);
+    void menuAboutToHide(QMenu* menu);
+
 protected:
     friend class QnAction;
 

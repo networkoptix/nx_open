@@ -86,14 +86,15 @@ public:
     void addDTSServer(QnAbstractDTSSearcher* serv);
     void setResourceProcessor(QnResourceProcessor* processor);
 
-    virtual QnResourcePtr createResource(const QUuid &resourceTypeId, const QnResourceParams& params) override;
+    virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
 
     virtual void pleaseStop();
 
     void setReady(bool ready);
 
     bool registerManualCameras(const QnManualCameraInfoMap& cameras);
-    bool containManualCamera(const QString& uniqId);
+    bool containManualCamera(const QString& url);
+    void fillManualCamInfo(QnManualCameraInfoMap& cameras, const QnSecurityCamResourcePtr& camera);
 
     ResourceSearcherList plugins() const;
 
@@ -102,7 +103,9 @@ public:
 
     static void init(QnResourceDiscoveryManager* instance);
     State state() const;
-
+    
+    void setLastDiscoveredResources(const QnResourceList& resources);
+    QSet<QString> lastDiscoveredIds() const;
 public slots:
     virtual void start( Priority priority = InheritPriority ) override;
 
@@ -120,9 +123,8 @@ signals:
     void CameraIPConflict(QHostAddress addr, QStringList macAddrList);
 
 protected slots:
-    void onInitAsyncFinished(const QnResourcePtr& res, bool initialized);
     void at_resourceDeleted(const QnResourcePtr& resource);
-
+    void at_resourceChanged(const QnResourcePtr& resource);
 private:
     void updateLocalNetworkInterfaces();
 
@@ -153,8 +155,12 @@ private:
     State m_state;
     QSet<QString> m_recentlyDeleted;
 
-    QHash<QUuid, QnManualCameraSearchStatus> m_searchProcessStatuses;
-    QHash<QUuid, QnManualCameraSearchCameraList> m_searchProcessResults;
+    QHash<QnUuid, QnManualCameraSearchStatus> m_searchProcessStatuses;
+    QHash<QnUuid, QnManualCameraSearchCameraList> m_searchProcessResults;
+
+    mutable QMutex m_resListMutex;
+    QnResourceList m_lastDiscoveredResources[6];
+    int m_discoveryUpdateIdx;
 };
 
 #endif //QN_RESOURCE_DISCOVERY_MANAGER_H

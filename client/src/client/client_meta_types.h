@@ -1,7 +1,7 @@
 #ifndef QN_CLIENT_META_TYPES_H
 #define QN_CLIENT_META_TYPES_H
 
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtCore/QVector>
 #include <QtCore/QMetaType>
 #include <QtGui/QColor>
@@ -18,8 +18,8 @@ public:
     static void initialize();
 };
 
-Q_DECLARE_METATYPE(Qt::KeyboardModifiers);
-Q_DECLARE_METATYPE(QVector<QUuid>);
-Q_DECLARE_METATYPE(QVector<QColor>);
+Q_DECLARE_METATYPE(Qt::KeyboardModifiers)
+Q_DECLARE_METATYPE(QVector<QnUuid>)
+Q_DECLARE_METATYPE(QVector<QColor>)
 
 #endif // QN_CLIENT_META_TYPES_H

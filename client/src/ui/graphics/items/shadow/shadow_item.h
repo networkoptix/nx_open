@@ -46,13 +46,13 @@ public:
     virtual QPainterPath shape() const override;
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
-
 protected:
     friend class QnShadowShapeProvider;
 
     void invalidateShadowShape();
     void ensureShadowShape() const;
     void ensureShadowParameters() const;
+    void initializeVao();
 
 private:
     QColor m_color;
@@ -64,6 +64,10 @@ private:
     mutable bool m_parametersValid;
     mutable QRectF m_boundingRect;
     mutable QPainterPath m_painterPath;
+
+    bool m_vaoInitialized;
+    QOpenGLVertexArrayObject m_vertices;
+    QOpenGLBuffer m_positionBuffer;
 };
 
 #endif // QN_SHADOW_ITEM

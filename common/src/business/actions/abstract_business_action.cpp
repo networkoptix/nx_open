@@ -77,9 +77,23 @@ namespace QnBusiness {
         }
     }
 
-    bool isImplemented(ActionType actionType) { 
-        return actionType != BookmarkAction; 
+    QList<ActionType> allActions() {
+        QList<ActionType> result;
+        result
+            << CameraOutputAction
+            << CameraOutputOnceAction
+            //<< BookmarkAction
+            << CameraRecordingAction
+            << PanicRecordingAction
+            << SendMailAction
+            << DiagnosticsAction
+            << ShowPopupAction
+            << PlaySoundAction
+            << PlaySoundOnceAction
+            << SayTextAction;
+        return result;
     }
+
 }
 
 QnAbstractBusinessAction::QnAbstractBusinessAction(const QnBusiness::ActionType actionType, const QnBusinessEventParameters& runtimeParams):
@@ -95,18 +109,18 @@ QnAbstractBusinessAction::~QnAbstractBusinessAction()
 {
 }
 
-void QnAbstractBusinessAction::setResources(const QVector<QUuid>& resources) {
+void QnAbstractBusinessAction::setResources(const QVector<QnUuid>& resources) {
     m_resources = resources;
 }
 
-const QVector<QUuid>& QnAbstractBusinessAction::getResources() const {
+const QVector<QnUuid>& QnAbstractBusinessAction::getResources() const {
     return m_resources;
 }
 
 QnResourceList QnAbstractBusinessAction::getResourceObjects() const
 {
     QnResourceList result;
-    foreach(const QUuid& id, m_resources)
+    for(const QnUuid& id: m_resources)
     {
         QnResourcePtr res = qnResPool->getResourceById(id);
         if (res)
@@ -135,11 +149,11 @@ const QnBusinessEventParameters& QnAbstractBusinessAction::getRuntimeParams() co
     return m_runtimeParams;
 }
 
-void QnAbstractBusinessAction::setBusinessRuleId(const QUuid& value) {
+void QnAbstractBusinessAction::setBusinessRuleId(const QnUuid& value) {
     m_businessRuleId = value;
 }
 
-QUuid QnAbstractBusinessAction::getBusinessRuleId() const {
+QnUuid QnAbstractBusinessAction::getBusinessRuleId() const {
     return m_businessRuleId;
 }
 

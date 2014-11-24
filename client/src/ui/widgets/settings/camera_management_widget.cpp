@@ -33,7 +33,7 @@ void QnCameraManagementWidget::updateFromSettings() {
     QnGlobalSettings *settings = QnGlobalSettings::instance();
 
     QSet<QString> disabledVendors = settings->disabledVendorsSet();
-    if (disabledVendors.contains(lit("all")))
+    if (disabledVendors.contains(lit("all")) || disabledVendors.contains(lit("all=partial")))
         ui->autoDiscoveryCheckBox->setCheckState(Qt::CheckState::Unchecked);
     else if (disabledVendors.isEmpty())
         ui->autoDiscoveryCheckBox->setCheckState(Qt::CheckState::Checked);
@@ -49,7 +49,7 @@ void QnCameraManagementWidget::submitToSettings() {
     if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Checked)
         settings->setDisabledVendors(QString());
     else if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Unchecked)
-        settings->setDisabledVendors(lit("all"));
+        settings->setDisabledVendors(lit("all=partial"));
 
     settings->setCameraSettingsOptimizationEnabled(ui->autoSettingsCheckBox->isChecked());
 }
@@ -59,11 +59,11 @@ bool QnCameraManagementWidget::hasChanges() const  {
 
     if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Checked
         && !settings->disabledVendors().isEmpty())
-         return true;
+        return true;
     
     if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Unchecked
-        && settings->disabledVendors() != lit("all"))
-         return true;
+        && !settings->disabledVendors().contains(lit("all")) )  //MUST not overwrite "all" with "all=partial"
+        return true;
 
     if (settings->isCameraSettingsOptimizationEnabled() != ui->autoSettingsCheckBox->isChecked())
         return true;

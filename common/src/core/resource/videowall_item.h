@@ -4,7 +4,7 @@
 #include <QtCore/QHash>
 #include <QtCore/QList>
 #include <QtCore/QMetaType>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #include <core/misc/screen_snap.h>
 
@@ -19,22 +19,24 @@ class QMimeData;
  */
 class QnVideoWallItem {
 public:
-    QnVideoWallItem(): online(false) {}
+    QnVideoWallItem() {
+        runtimeStatus.online = false;
+    }
 
     /**
      * @brief layout                        Id of this item's layout resource (if any).
      */
-    QUuid layout;
+    QnUuid layout;
 
     /**
      * @brief uuid                          Id of this item instance.
      */
-    QUuid uuid;
+    QnUuid uuid;
 
     /**
      * @brief pcUuid                        Id of the real system (PC) instance.
      */
-    QUuid pcUuid;
+    QnUuid pcUuid;
 
     /**
      * @brief name                          Display name of the item.
@@ -44,22 +46,26 @@ public:
     QnScreenSnaps screenSnaps;
 
     /** Status of the running videowall instance bound to this item. Runtime status, should not be serialized or saved. */
-    bool online;
-
+    struct {
+        bool online;
+        QnUuid controlledBy;
+    } runtimeStatus;
 
     static QString mimeType();
 
-    static void serializeUuids(const QList<QUuid> &uuids, QMimeData *mimeData);
+    static void serializeUuids(const QList<QnUuid> &uuids, QMimeData *mimeData);
 
-    static QList<QUuid> deserializeUuids(const QMimeData *mimeData);
+    static QList<QnUuid> deserializeUuids(const QMimeData *mimeData);
 
     friend bool operator==(const QnVideoWallItem &l, const QnVideoWallItem &r) {
-        return (l.layout == r.layout &&
-                l.uuid == r.uuid &&
-                l.pcUuid == r.pcUuid &&
-                l.name == r.name &&
-                l.online == r.online &&
-                l.screenSnaps == r.screenSnaps);
+        return (l.layout == r.layout 
+            && l.uuid == r.uuid
+            && l.pcUuid == r.pcUuid
+            && l.name == r.name
+            && l.screenSnaps == r.screenSnaps
+            && l.runtimeStatus.online == r.runtimeStatus.online
+            && l.runtimeStatus.controlledBy == r.runtimeStatus.controlledBy 
+            );
     }
 };
 
@@ -67,7 +73,7 @@ Q_DECLARE_METATYPE(QnVideoWallItem)
 Q_DECLARE_TYPEINFO(QnVideoWallItem, Q_MOVABLE_TYPE);
 
 typedef QList<QnVideoWallItem> QnVideoWallItemList;
-typedef QHash<QUuid, QnVideoWallItem> QnVideoWallItemMap;
+typedef QHash<QnUuid, QnVideoWallItem> QnVideoWallItemMap;
 
 
 Q_DECLARE_METATYPE(QnVideoWallItemList)

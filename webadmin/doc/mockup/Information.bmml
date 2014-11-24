@@ -1,0 +1,78 @@
+<mockup version="1.0" skin="sketch" fontFace="Balsamiq Sans" measuredW="1471" measuredH="700" mockupW="1174" mockupH="655">
+  <controls>
+    <control controlID="13" controlTypeID="com.balsamiq.mockups::BrowserWindow" x="297" y="45" w="1174" h="655" measuredW="450" measuredH="400" zOrder="0" locked="true" isInGroup="-1">
+      <controlProperties>
+        <text>Network%20Optix%20Admin%0Ahttp%3A//192.168.0.1</text>
+      </controlProperties>
+    </control>
+    <control controlID="14" controlTypeID="com.balsamiq.mockups::LinkBar" x="306" y="129" w="-1" h="-1" measuredW="242" measuredH="19" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <hrefs>Settings%26bm%3BSettings.bmml%26bm%3BSettings.bmml%26bm%3BSettings.bmml%2CInformation%26bm%3BInformation.bmml%26bm%3BInformation.bmml%26bm%3BInformation.bmml%2CFor%20Developers%26bm%3BFor%20Developers.bmml%26bm%3BFor%20Developers.bmml%26bm%3BFor%20Developers.bmml</hrefs>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%229%2C86%2C60%2C99%22%20href%3D%22Settings.bmml%22%20alt%3D%22Settings%22%20id%3D%2214%22/%3E%3Carea%20shape%3D%22rect%22%20coords%3D%2278%2C86%2C144%2C99%22%20href%3D%22Information.bmml%22%20alt%3D%22Information%22%20id%3D%2214%22/%3E%3Carea%20shape%3D%22rect%22%20coords%3D%22162%2C86%2C251%2C99%22%20href%3D%22For%2520Developers.bmml%22%20alt%3D%22For%20Developers%22%20id%3D%2214%22/%3E</map>
+        <selectedIndex>1</selectedIndex>
+        <text>Settings%2C%20Information%2C%20For%20Developers</text>
+      </controlProperties>
+    </control>
+    <control controlID="15" controlTypeID="com.balsamiq.mockups::LinkBar" x="1367" y="129" w="-1" h="-1" measuredW="92" measuredH="19" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <hrefs>http%3A//support.networkoptix.com%2C</hrefs>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%221070%2C86%2C1117%2C99%22%20href%3D%22http%3A//support.networkoptix.com%22%20alt%3D%22http%3A//support.networkoptix.com%22%20id%3D%2215%22%20target%3D%22_blank%22/%3E</map>
+        <text>Support%2C%20Help</text>
+      </controlProperties>
+    </control>
+    <control controlID="16" controlTypeID="com.balsamiq.mockups::Label" x="1203" y="634" w="255" h="-1" measuredW="258" measuredH="21" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Copyright%20%28c%29%202011-2014%2C%20Network%20Optix%20Inc</text>
+      </controlProperties>
+    </control>
+    <control controlID="22" controlTypeID="com.balsamiq.mockups::TextArea" x="519" y="427" w="729" h="156" measuredW="200" measuredH="140" zOrder="5" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>10</size>
+        <text>Thu%20May%2029%2014%20%2014%3A03%3A15.486%20Thread%207f55aeffd700%20%28DEBUG%29%3A%20Received%20message%20BroadcastBusinessAction%2C%20resourceId%200%2C%20resource%20NULL%0AThu%20May%2029%2014%20%2014%3A03%3A32.216%20Thread%207f551ffff700%20%28DEBUG%29%3A%20Failed%20to%20send%20request%20to%20http%3A//10.0.2.182%3A49152/devicedesc.xml.%20Connection%20refused%0AThu%20May%2029%2014%20%2014%3A03%3A36.878%20Thread%207f551ffff700%20%28DEBUG%29%3A%20Failed%20to%20send%20request%20to%20http%3A//10.0.2.204%3A49152/devicedesc.xml.%20Connection%20refused%0AThu%20May%2029%2014%20%2014%3A03%3A36.878%20Thread%207f551ffff700%20%28DEBUG%29%3A%20Failed%20to%20send%20request%20to%20http%3A//192.168.0.26%3A49152/devicedesc.xml.%20Connection%20refused%0AThu%20May%2029%2014%20%2014%3A03%3A36.878%20Thread%207f551ffff700%20%28DEBUG%29%3A%20Failed%20to%20send%20request%20to%20http%3A//10.0.2.132%3A49152/devicedesc.xml.%20Connection%20refused%0AThu%20May%2029%2014%20%2014%3A03%3A36.879%20Thread%207f551ffff700%20%28DEBUG%29%3A%20Failed%20to%20send%20request%20to%20http%3A//10.0.2.215%3A49152/devicedesc.xml.%20Connection%20refused%0AThu%20May%2029%2014%20%2014%3A04%3A05.042%20Thread%207f551ffff700%20%28DEBUG%29%3A%20Failed%20to%20send%20request%20to%20http%3A//10.0.2.190%3A49152/devicedesc.xml.%20Connection%20refused%0AThu%20May%2029%2014%20%2014%3A04%3A12.806%20Thread%207f551ffff700%20%28DEBUG%29%3A%20Failed%20to%20connect%20to%2010.0.2.203%3A49152.%208%0AThu%20May%2029%2014%20%2014%3A04%3A15.486%20Thread%207f55aeffd700%20%28DEBUG%29%3A%20Received%20message%20BroadcastBusinessAction%2C%20resourceId%200%2C%20resource%20NULL%0AThu%20May%2029%2014%20%2014%3A04%3A26.888%20Thread%207f551ffff700%20%28DEBUG%29%3A%20Failed%20to%20connect%20to%2010.0.2.186%3A49152.%208%0AThu%20May%2029%2014%20%2014%3A04%3A33.307%20Thread%207f551ffff700%20%28DEBUG%29%3A%20Failed%20to%20send%20request%20to%20http%3A//10.0.2.182%3A49152/devicedesc.xml.%20Connection%20refused%0AThu%20May%2029%2014%20%2014%3A04%3A37.968%20Thread%207f551ffff700%20%28DEBUG%29%3A%20Failed%20to%20send%20request%20to%20http%3A//10.0.2.204%3A49152/devicedesc.xml.%20Connection%20refused%0AThu%20May%2029%2014%20%2014%3A04%3A37.968%20Thread%207f551ffff700%20%28DEBUG%29%3A%20Failed%20to%20send%20request%20to%20http%3A//192.168.0.26%3A49152/devicedesc.xml.%20Connection%20refused%0AThu%20May%2029%2014%20%2014%3A04%3A37.968%20Thread%207f551ffff700%20%28DEBUG%29%3A%20Failed%20to%20send%20request%20to%20http%3A//10.0.2.132%3A49152/devicedesc.xml.%20Connection%20refused%0AThu%20May%2029%2014%20%2014%3A04%3A37.982%20Thread%207f551ffff700%20%28DEBUG%29%3A%20Failed%20to%20send%20request%20to%20http%3A//10.0.2.215%3A49152/devicedesc.xml.%20Connection%20refused%0AThu%20May%2029%2014%20%2014%3A04%3A50.260%20Thread%207f55aeffd700%20%28DEBUG%29%3A%20Received%20message%20RuntimeInfoChange%2C%20resourceId%200%2C%20resource%20NULL</text>
+      </controlProperties>
+    </control>
+    <control controlID="23" controlTypeID="com.balsamiq.mockups::Button" x="1093" y="605" w="155" h="29" measuredW="157" measuredH="27" zOrder="6" locked="false" isInGroup="-1">
+      <controlProperties>
+        <icon>DownloadIcon%7Csmall</icon>
+        <text>Download%20Log%20File</text>
+      </controlProperties>
+    </control>
+    <control controlID="25" controlTypeID="__group__" x="519" y="163" w="730" h="249" measuredW="730" measuredH="249" zOrder="4" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="__group__" x="0" y="69" w="730" h="180" measuredW="730" measuredH="180" zOrder="0" locked="false" isInGroup="25">
+          <groupChildrenDescriptors>
+            <control controlID="0" controlTypeID="com.balsamiq.mockups::Image" x="0" y="0" w="180" h="179" measuredW="265" measuredH="293" zOrder="0" locked="false" isInGroup="0">
+              <controlProperties>
+                <filter>true</filter>
+                <src>./assets/Screen%2520Shot%25202014-05-29%2520at%25201.55.30%2520PM.png</src>
+              </controlProperties>
+            </control>
+            <control controlID="1" controlTypeID="com.balsamiq.mockups::Image" x="182" y="0" w="179" h="179" measuredW="263" measuredH="288" zOrder="1" locked="false" isInGroup="0">
+              <controlProperties>
+                <filter>true</filter>
+                <src>./assets/Screen%2520Shot%25202014-05-29%2520at%25201.55.45%2520PM.png</src>
+              </controlProperties>
+            </control>
+            <control controlID="2" controlTypeID="com.balsamiq.mockups::Image" x="367" y="0" w="176" h="179" measuredW="259" measuredH="291" zOrder="2" locked="false" isInGroup="0">
+              <controlProperties>
+                <filter>true</filter>
+                <src>./assets/Screen%2520Shot%25202014-05-29%2520at%25201.56.21%2520PM.png</src>
+              </controlProperties>
+            </control>
+            <control controlID="3" controlTypeID="com.balsamiq.mockups::Image" x="550" y="2" w="180" h="178" measuredW="265" measuredH="291" zOrder="3" locked="false" isInGroup="0">
+              <controlProperties>
+                <filter>true</filter>
+                <src>./assets/Screen%2520Shot%25202014-05-29%2520at%25201.55.53%2520PM.png</src>
+              </controlProperties>
+            </control>
+          </groupChildrenDescriptors>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Title" x="204" y="0" w="331" h="-1" measuredW="335" measuredH="43" zOrder="1" locked="false" isInGroup="25">
+          <controlProperties>
+            <text>Server%20information</text>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+  </controls>
+</mockup>

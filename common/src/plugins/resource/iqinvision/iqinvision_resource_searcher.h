@@ -13,7 +13,7 @@ class QnPlIqResourceSearcher : public QnMdnsResourceSearcher
 public:
     QnPlIqResourceSearcher();
 
-    virtual QnResourcePtr createResource(const QUuid &resourceTypeId, const QnResourceParams& params) override;
+    virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
 
     // return the manufacture of the server
     virtual QString manufacture() const;
@@ -28,7 +28,7 @@ protected:
         const QHostAddress& foundHostAddress ) override;
     virtual QnResourceList findResources() override;
 private:
-    void  processNativePacket(QnResourceList& result, const QByteArray& responseData, const QHostAddress& discoveryAddress);
+    void  processNativePacket(QnResourceList& result, const QByteArray& responseData);
 };
 
 #endif // #ifdef ENABLE_IQE

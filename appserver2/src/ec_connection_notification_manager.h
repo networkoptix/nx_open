@@ -24,6 +24,8 @@ namespace ec2
     class QnVideowallNotificationManager;
     class QnStoredFileNotificationManager;
     class QnUpdatesNotificationManager;
+    class QnMiscNotificationManager;
+    class QnDiscoveryNotificationManager;
 
     //!Stands for emitting API notifications
     class ECConnectionNotificationManager
@@ -41,20 +43,30 @@ namespace ec2
             QnLayoutNotificationManager* layoutManager,
             QnVideowallNotificationManager* videowallManager,
             QnStoredFileNotificationManager* storedFileManager,
-            QnUpdatesNotificationManager* updatesManager );
+            QnUpdatesNotificationManager* updatesManager,
+            QnMiscNotificationManager* miscManager,
+            QnDiscoveryNotificationManager* discoveryManager);
 
         void triggerNotification( const QnTransaction<ApiLicenseDataList>& tran );
         void triggerNotification( const QnTransaction<ApiLicenseData>& tran );
         void triggerNotification( const QnTransaction<ApiResetBusinessRuleData>& tran );
         void triggerNotification( const QnTransaction<ApiCameraData>& tran );
         void triggerNotification( const QnTransaction<ApiCameraDataList>& tran );
+        void triggerNotification( const QnTransaction<ApiCameraAttributesData>& tran );
+        void triggerNotification( const QnTransaction<ApiCameraAttributesDataList>& tran );
         void triggerNotification( const QnTransaction<ApiBusinessActionData>& tran );
         void triggerNotification( const QnTransaction<ApiVideowallData>& tran );
         void triggerNotification( const QnTransaction<ApiIdData>& tran );
+        void triggerNotification( const QnTransaction<ApiIdDataList>& tran );
         void triggerNotification( const QnTransaction<ApiMediaServerData>& tran );
+        void triggerNotification( const QnTransaction<ApiStorageData>& tran );
+        void triggerNotification( const QnTransaction<ApiStorageDataList>& tran );
+        void triggerNotification( const QnTransaction<ApiMediaServerUserAttributesData>& tran );
+        void triggerNotification( const QnTransaction<ApiMediaServerUserAttributesDataList>& tran );
         void triggerNotification( const QnTransaction<ApiResourceData>& tran );
-        void triggerNotification( const QnTransaction<ApiSetResourceStatusData>& tran );
-        void triggerNotification( const QnTransaction<ApiResourceParamsData>& tran );
+        void triggerNotification( const QnTransaction<ApiResourceStatusData>& tran );
+        void triggerNotification( const QnTransaction<ApiResourceParamWithRefData>& tran );
+        void triggerNotification( const QnTransaction<ApiResourceParamWithRefDataList>& tran );
         void triggerNotification( const QnTransaction<ApiCameraServerItemData>& tran );
         void triggerNotification( const QnTransaction<ApiUserData>& tran );
         void triggerNotification( const QnTransaction<ApiBusinessRuleData>& tran );
@@ -63,7 +75,6 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiStoredFileData>& tran );
         void triggerNotification( const QnTransaction<ApiStoredFilePath>& tran );
         void triggerNotification( const QnTransaction<ApiFullInfoData>& tran );
-        void triggerNotification( const QnTransaction<ApiPanicModeData>& tran );
         void triggerNotification( const QnTransaction<ApiResourceParamDataList>& tran );
         void triggerNotification( const QnTransaction<ApiVideowallControlMessageData>& tran );
         void triggerNotification( const QnTransaction<ApiEmailSettingsData>& /*tran*/ );
@@ -72,8 +83,18 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiUpdateUploadData>& tran );
         void triggerNotification( const QnTransaction<ApiUpdateUploadResponceData>& tran );
         void triggerNotification( const QnTransaction<ApiCameraBookmarkTagDataList>& tran );
+        void triggerNotification( const QnTransaction<ApiModuleData>& tran );
+        void triggerNotification( const QnTransaction<ApiModuleDataList>& tran );
+        void triggerNotification( const QnTransaction<ApiDiscoveryData>& tran );
+        void triggerNotification( const QnTransaction<ApiDiscoveryDataList>& tran );
+        void triggerNotification( const QnTransaction<ApiDiscoverPeerData>& tran );
+        void triggerNotification( const QnTransaction<ApiSystemNameData>& tran );
         void triggerNotification( const QnTransaction<ApiRuntimeData>& tran );
-        void triggerNotification(const QnTransaction<ApiDatabaseDumpData> & /*tran*/);
+        void triggerNotification( const QnTransaction<ApiPeerSystemTimeData>& tran );
+        void triggerNotification( const QnTransaction<ApiPeerSystemTimeDataList>& tran );
+        void triggerNotification( const QnTransaction<ApiDatabaseDumpData> & /*tran*/ );
+
+        void triggerNotification(const QnTransaction<ApiUpdateSequenceData> &/*tran*/) { /* nothing to do */ }
 
         void triggerNotification(const QnTransaction<ApiLockData> &/*tran*/) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
@@ -81,12 +102,16 @@ namespace ec2
         void triggerNotification(const QnTransaction<ApiPeerAliveData> &/*tran*/)  {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
         }
-        void triggerNotification(const QnTransaction<QnTranState> &/*tran*/)  {
+        void triggerNotification(const QnTransaction<ApiSyncRequestData> &/*tran*/)  {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
         }
         void triggerNotification(const QnTransaction<QnTranStateResponse> &/*tran*/) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
         }
+        void triggerNotification(const QnTransaction<ApiTranSyncDoneData> &/*tran*/) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
+        }
+
     private:
         ResourceContext m_resCtx;
         AbstractECConnection* m_ecConnection;
@@ -100,6 +125,8 @@ namespace ec2
         QnVideowallNotificationManager* m_videowallManager;
         QnStoredFileNotificationManager* m_storedFileManager;
         QnUpdatesNotificationManager* m_updatesManager;
+        QnMiscNotificationManager* m_miscManager;
+        QnDiscoveryNotificationManager* m_discoveryManager;
     };
 }
 

@@ -24,7 +24,7 @@ void QnTranslationListModel::setTranslations(const QList<QnTranslation> &transla
     m_translations = translations;
     
     m_hasExternal = false;
-    foreach(const QnTranslation &translation, m_translations) {
+    for(const QnTranslation &translation: m_translations) {
         if(!isInternal(translation)) {
             m_hasExternal = true;
             break;
@@ -84,7 +84,7 @@ bool QnTranslationListModel::setData(const QModelIndex &, const QVariant &, int)
 }
 
 bool QnTranslationListModel::isInternal(const QnTranslation &translation) {
-    foreach(const QString &filePath, translation.filePaths())
+    for(const QString &filePath: translation.filePaths())
         if(!filePath.startsWith(lit(":/")))
             return false;
     return true;

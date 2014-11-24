@@ -13,6 +13,7 @@
 #include "api/model/rebuild_archive_reply.h"
 
 #include <ui/dialogs/workbench_state_dependent_dialog.h>
+#include "nx_ec/data/api_fwd.h"
 
 class QLabel;
 
@@ -42,6 +43,7 @@ private:
         Ready,
         Starting,
         InProgress,
+        InProgressFastScan,
         Stopping
     };
 
@@ -58,6 +60,7 @@ private:
     int dataRowCount() const;
 
     void updateRebuildUi(RebuildState newState, int progress = -1);
+    void updateFailoverLabel();
 
 private slots:
     void at_tableBottomLabel_linkActivated();
@@ -79,8 +82,10 @@ private:
     QAction *m_removeAction;
 
     bool m_hasStorageChanges;
+    bool m_maxCamerasAdjusted;
 
     RebuildState m_rebuildState;
+    ec2::ApiIdDataList m_storagesToRemove;
 };
 
 #endif // SERVER_SETTINGS_DIALOG_H

@@ -52,6 +52,13 @@ namespace nx_http
         }
     }
 
+    void removeHeader( HttpHeaders* const headers, const StringType& headerName )
+    {
+        HttpHeaders::iterator itr = headers->lower_bound( headerName );
+        while (itr != headers->end() && itr->first == headerName)
+            itr = headers->erase(itr);
+    }
+
     ////////////////////////////////////////////////////////////
     //// parse utils
     ////////////////////////////////////////////////////////////
@@ -175,8 +182,8 @@ namespace nx_http
             return true;
         }
 
-        //skipping whitespaces after headerValue
-        const size_t headerValueEnd = find_last_not_of( data, " ", headerValueStart );
+        //skipping separators after headerValue
+        const size_t headerValueEnd = find_last_not_of( data, " \n\r", headerValueStart );
         if( headerValueEnd == BufferNpos )
             return false;
 
@@ -228,8 +235,12 @@ namespace nx_http
                     return StringType("Not Found");
                 case notAllowed:
                     return StringType("Not Allowed");
+                case notAcceptable:
+                    return StringType("Not Acceptable");
                 case proxyAuthenticationRequired:
                     return StringType("Proxy Authentication Required");
+                case rangeNotSatisfiable:
+                    return StringType("Requested range not satisfiable");
                 case internalServerError:
                     return StringType("Internal Server Error");
                 case notImplemented:
@@ -312,6 +323,7 @@ namespace nx_http
         *dstBuffer += method;
         *dstBuffer += " ";
         *dstBuffer += url.toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters).toLatin1();
+        *dstBuffer += urlPostfix;
         *dstBuffer += " ";
         version.serialize( dstBuffer );
         *dstBuffer += "\r\n";
@@ -464,6 +476,22 @@ namespace nx_http
         dstBuffer->append( messageBody );
     }
 
+    BufferType Request::getCookieValue(const BufferType& name) const
+    {
+        nx_http::HttpHeaders::const_iterator cookieIter = headers.find( "cookie" );
+        if (cookieIter == headers.end())
+            return BufferType();
+
+        for(const BufferType& value: cookieIter->second.split(';'))
+        {
+            QList<BufferType> params = value.split('=');
+            if (params.size() > 1 && params[0].trimmed() == name)
+                return params[1];
+        }
+
+        return BufferType();
+    }
+        
 
     ////////////////////////////////////////////////////////////
     //// class Response
@@ -545,6 +573,15 @@ namespace nx_http
             request = NULL;
     }
 
+    Message::Message( Message&& right )
+    :
+        type( right.type ),
+        request( right.request )
+    {
+        right.type = MessageType::none;
+        right.request = nullptr;
+    }
+
     Message::~Message()
     {
         clear();
@@ -559,6 +596,30 @@ namespace nx_http
         else if( type == MessageType::response )
             response = new Response( *right.response );
         return *this;
+    }
+
+    Message& Message::operator=(Message&& right)
+    {
+        clear();
+
+        type = right.type;
+        right.type = MessageType::none;
+        request = right.request;
+        right.request = nullptr;
+        return *this;
+    }
+
+    void Message::serialize( BufferType* const dstBuffer ) const
+    {
+        switch( type )
+        {
+            case MessageType::request:
+                return request->serialize( dstBuffer );
+            case MessageType::response:
+                return response->serialize( dstBuffer );
+            default:
+                return /*false*/;
+        }
     }
 
     void Message::clear()
@@ -589,7 +650,7 @@ namespace nx_http
     }
 
 
-	namespace Header
+	namespace header
 	{
 		namespace AuthScheme
 		{
@@ -809,5 +870,377 @@ namespace nx_http
 
             return true;
         }
+
+
+        //////////////////////////////////////////////
+        //   Accept-Encoding
+        //////////////////////////////////////////////
+
+        AcceptEncodingHeader::AcceptEncodingHeader( const nx_http::StringType& strValue )
+        :
+            m_strValue( strValue )
+        {
+        }
+
+        bool AcceptEncodingHeader::encodingIsAllowed( const nx_http::StringType& encodingName, float* q ) const
+        {
+            //TODO #ak using very simplified (and incorrect) implementation because it is currently use only by hls and this implementation is enough for hls client
+            if( m_strValue.isEmpty() ||                         //empty Accept-Encoding means any encoding will do
+                m_strValue.indexOf(encodingName) >= 0 || 
+                m_strValue.indexOf('*') >= 0 )
+            {
+                if( q )
+                    *q = 0.5;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+
+        //////////////////////////////////////////////
+        //   Range
+        //////////////////////////////////////////////
+
+        Range::Range()
+        {
+        }
+
+        bool Range::parse( const nx_http::StringType& strValue )
+        {
+            auto simpleRangeList = strValue.split(',');
+            rangeSpecList.reserve( simpleRangeList.size() );
+            for( const StringType& simpleRangeStr: simpleRangeList )
+            {
+                if( simpleRangeStr.isEmpty() )
+                    return false;
+                RangeSpec rangeSpec;
+                const int sepPos = simpleRangeStr.indexOf('-');
+                if( sepPos == -1 )
+                {
+                    rangeSpec.start = simpleRangeStr.toULongLong();
+                    rangeSpec.end = rangeSpec.start;
+                }
+                else
+                {
+                    rangeSpec.start = StringType::fromRawData(simpleRangeStr.constData(), sepPos).toULongLong();
+                    if( sepPos < simpleRangeStr.size()-1 )  //range end is not empty
+                       rangeSpec.end = StringType::fromRawData(simpleRangeStr.constData()+sepPos+1, simpleRangeStr.size()-sepPos-1).toULongLong();
+                }
+                if( rangeSpec.end && rangeSpec.end < rangeSpec.start )
+                    return false;
+                rangeSpecList.push_back( std::move(rangeSpec) );
+            }
+
+            return true;
+        }
+
+        bool Range::validateByContentSize( size_t contentSize ) const
+        {
+            for( const RangeSpec& rangeSpec: rangeSpecList )
+            {
+                if( (rangeSpec.start >= contentSize) || (rangeSpec.end && rangeSpec.end.get() >= contentSize) )
+                    return false;
+            }
+
+            return true;
+        }
+
+        bool Range::empty() const
+        {
+            return rangeSpecList.empty();
+        }
+
+        bool Range::full( size_t contentSize ) const
+        {
+            if( contentSize == 0 )
+                return true;
+
+            //map<start, end>
+            std::map<quint64, quint64> rangesSorted;
+            for( const RangeSpec& rangeSpec: rangeSpecList )
+                rangesSorted.emplace( rangeSpec.start, rangeSpec.end ? rangeSpec.end.get() : contentSize );
+
+            quint64 curPos = 0;
+            for( const std::pair<quint64, quint64>& range: rangesSorted )
+            {
+                if( range.first > curPos )
+                    return false;
+                if( range.second >= curPos )
+                    curPos = range.second+1;
+            }
+
+            return curPos >= contentSize;
+        }
+
+        quint64 Range::totalRangeLength( size_t contentSize ) const
+        {
+            if( contentSize == 0 || rangeSpecList.empty() )
+                return 0;
+
+            //map<start, end>
+            std::map<quint64, quint64> rangesSorted;
+            for( const RangeSpec& rangeSpec: rangeSpecList )
+                rangesSorted.emplace( rangeSpec.start, rangeSpec.end ? rangeSpec.end.get() : contentSize );
+
+            quint64 curPos = 0;
+            quint64 totalLength = 0;
+            for( const std::pair<quint64, quint64>& range: rangesSorted )
+            {
+                if( curPos < range.first )
+                    curPos = range.first;
+                if( range.second < curPos )
+                    continue;
+                const quint64 endPos = std::min<quint64>( contentSize-1, range.second );
+                totalLength += endPos - curPos + 1;
+                curPos = endPos + 1;
+                if( curPos >= contentSize )
+                    break;
+            }
+
+            return totalLength;
+        }
+
+
+        //////////////////////////////////////////////
+        //   Via
+        //////////////////////////////////////////////
+
+        bool Via::parse( const nx_http::StringType& strValue )
+        {
+            if( strValue.isEmpty() )
+                return true;
+
+            //introducing loop counter to guarantee method finiteness in case of bug in code
+            for( size_t curEntryEnd = nx_http::find_first_of(strValue, ","), curEntryStart = 0, i = 0;
+                curEntryStart != -1 && (i < 1000);
+                curEntryStart = (curEntryEnd == -1 ? curEntryEnd : curEntryEnd+1), curEntryEnd = nx_http::find_first_of(strValue, ",", curEntryEnd+1), ++i )
+            {
+                ProxyEntry entry;
+
+                //skipping spaces at the start of entry
+                while( (strValue.at(curEntryStart) == ' ') && (curEntryStart < (curEntryEnd == -1 ? strValue.size() : curEntryEnd)) )
+                    ++curEntryStart;
+
+                //curEntryStart points first char after comma
+                size_t receivedProtoEnd = nx_http::find_first_of( strValue, " ", curEntryStart );
+                if( receivedProtoEnd == nx_http::BufferNpos )
+                    return false;
+                ConstBufferRefType protoNameVersion( strValue, curEntryStart, receivedProtoEnd-curEntryStart );
+                size_t nameVersionSep = nx_http::find_first_of( protoNameVersion, "/" );
+                if( nameVersionSep == nx_http::BufferNpos )
+                {
+                    //only version present
+                    entry.protoVersion = protoNameVersion;
+                }
+                else
+                {
+                    entry.protoName = protoNameVersion.mid( 0, nameVersionSep );
+                    entry.protoVersion = protoNameVersion.mid( nameVersionSep+1 );
+                }
+
+                size_t receivedByStart = nx_http::find_first_not_of( strValue, " ", receivedProtoEnd+1 );
+                if( receivedByStart == nx_http::BufferNpos || receivedByStart > curEntryEnd )
+                    return false;   //no receivedBy field
+
+                size_t receivedByEnd = nx_http::find_first_of( strValue, " ", receivedByStart );
+                if( receivedByEnd == nx_http::BufferNpos || (receivedByEnd > curEntryEnd) )
+                {
+                    receivedByEnd = curEntryEnd;
+                }
+                else
+                {
+                    //comment present
+                    size_t commentStart = nx_http::find_first_not_of( strValue, " ", receivedByEnd+1 );
+                    if( commentStart != nx_http::BufferNpos && commentStart < curEntryEnd )
+                        entry.comment = strValue.mid( commentStart, curEntryEnd == nx_http::BufferNpos ? -1 : (curEntryEnd-commentStart) ); //space are allowed in comment
+                }
+                entry.receivedBy = strValue.mid( receivedByStart, receivedByEnd-receivedByStart );
+
+                entries.push_back( entry );
+            }
+
+            return true;
+        }
+
+        StringType Via::toString() const
+        {
+            StringType result;
+
+            //TODO #ak estimate required buffer size and allocate in advance
+
+            for( const ProxyEntry& entry: entries )
+            {
+                if( !result.isEmpty() )
+                    result += ", ";
+
+                if( entry.protoName )
+                {
+                    result += entry.protoName.get();
+                    result += "/";
+                }
+                result += entry.protoVersion;
+                result += ' ';
+                result += entry.receivedBy;
+                if( !entry.comment.isEmpty() )
+                {
+                    result += ' ';
+                    result += entry.comment;
+                }
+            }
+            return result;
+        }
     }
+
+
+    ChunkHeader::ChunkHeader()
+    :
+        chunkSize( 0 )
+    {
+    }
+
+    void ChunkHeader::clear()
+    {
+        chunkSize = 0;
+        extensions.clear();
+    }
+
+    /*!
+        \return bytes read from \a buf
+    */
+    int ChunkHeader::parse( const ConstBufferRefType& buf )
+    {
+        const char* curPos = buf.constData();
+        const char* dataEnd = curPos + buf.size();
+
+        enum State
+        {
+            readingChunkSize,
+            readingExtName,
+            readingExtVal,
+            readingCRLF
+        }
+        state = readingChunkSize;
+        chunkSize = 0;
+        const char* extNameStart = 0;
+        const char* extSepPos = 0;
+        const char* extValStart = 0;
+
+        for( ; curPos < dataEnd; ++curPos )
+        {
+            const char ch = *curPos;
+            switch( ch )
+            {
+                case ';':
+                    if( state == readingExtName )
+                    {
+                        if( curPos == extNameStart )
+                            return -1;  //empty extension
+                        extensions.push_back( std::make_pair( BufferType(extNameStart, curPos-extNameStart), BufferType() ) );
+                    }
+                    else if( state == readingExtVal )
+                    {
+                        if( extSepPos == extNameStart )
+                            return -1;  //empty extension
+
+                        if( *extValStart == '"' )
+                            ++extValStart;
+                        int extValSize = curPos - extValStart;
+                        if( extValSize > 0 && *(extValStart + extValSize - 1) == '"' )
+                            --extValSize;
+
+                        extensions.push_back( std::make_pair( BufferType( extNameStart, extSepPos - extNameStart ), BufferType( extValStart, extValSize ) ) );
+                    }
+
+                    state = readingExtName;
+                    extNameStart = curPos+1;
+                    continue;
+
+                case '=':
+                    if( state == readingExtName )
+                    {
+                        state = readingExtVal;
+                        extSepPos = curPos;
+                        extValStart = curPos + 1;
+                    }
+                    else
+                    {
+                        //unexpected token
+                        return -1;
+                    }
+                    break;
+
+                case '\r':
+                    if( state == readingExtName )
+                    {
+                        if( curPos == extNameStart )
+                            return -1;  //empty extension
+                        extensions.push_back( std::make_pair( BufferType(extNameStart, curPos-extNameStart), BufferType() ) );
+                    }
+                    else if( state == readingExtVal )
+                    {
+                        if( extSepPos == extNameStart )
+                            return -1;  //empty extension
+
+                        if( *extValStart == '"' )
+                            ++extValStart;
+                        int extValSize = curPos - extValStart;
+                        if( extValSize > 0 && *(extValStart + extValSize - 1) == '"' )
+                            --extValSize;
+
+                        extensions.push_back( std::make_pair( BufferType( extNameStart, extSepPos - extNameStart ), BufferType( extValStart, extValSize ) ) );
+                    }
+
+                    if( (dataEnd - curPos < 2) || *(curPos+1) != '\n' )
+                        return -1;
+                    return curPos + 2 - buf.constData();
+
+                default:
+                    if( state == readingChunkSize )
+                    {
+                        if (ch >= '0' && ch <= '9')
+                            chunkSize = (chunkSize << 4) | (ch - '0');
+                        else if (ch >= 'a' && ch <= 'f')
+                            chunkSize = (chunkSize << 4) | (ch - 'a' + 10);
+                        else if (ch >= 'A' && ch <= 'F')
+                            chunkSize = (chunkSize << 4) | (ch - 'A' + 10);
+                        else
+                            return -1;  //unexpected token
+                    }
+                    break;
+            }
+        }
+
+        return -1;
+    }
+
+    int ChunkHeader::serialize( BufferType* const /*dstBuffer*/ ) const
+    {
+        //TODO #ak
+        return -1;
+    }
+
+    /*
+    int ChunkHeader_parse_test()
+    {
+        nx_http::ChunkHeader chunkHeader;
+        int bytesRead = chunkHeader.parse( QByteArray("1f5c;her=hren\r\n") );
+        chunkHeader = nx_http::ChunkHeader();
+        bytesRead = chunkHeader.parse( QByteArray("0001f;\r\n") );
+        chunkHeader = nx_http::ChunkHeader();
+        bytesRead = chunkHeader.parse( QByteArray("0001f\r\n") );
+        chunkHeader = nx_http::ChunkHeader();
+        bytesRead = chunkHeader.parse( QByteArray("1000;lonely;one=two\r\n") );
+        chunkHeader = nx_http::ChunkHeader();
+        bytesRead = chunkHeader.parse( QByteArray("1000;lonely\r") );
+        chunkHeader = nx_http::ChunkHeader();
+        bytesRead = chunkHeader.parse( QByteArray("1000;lonely\n") );
+        chunkHeader = nx_http::ChunkHeader();
+        bytesRead = chunkHeader.parse( QByteArray("10") );
+        chunkHeader = nx_http::ChunkHeader();
+        return 0;
+    }
+    */
 }

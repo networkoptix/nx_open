@@ -10,6 +10,8 @@ namespace Ui {
     class QnSystemAdministrationDialog;
 }
 
+class QnServerUpdatesWidget;
+
 class QnSystemAdministrationDialog : public QnGenericTabbedDialog, public QnWorkbenchContextAware {
     Q_OBJECT
     typedef QnGenericTabbedDialog base_type;
@@ -19,6 +21,8 @@ public:
         LicensesPage,
         SmtpPage,
         UpdatesPage,
+        RoutingManagement,
+        TimeServerSelection,
 
         PageCount
     };
@@ -26,10 +30,14 @@ public:
     QnSystemAdministrationDialog(QWidget *parent = 0);
     ~QnSystemAdministrationDialog();
 
+    virtual void accept() override;
+    virtual void reject() override;
+
 private:
     Q_DISABLE_COPY(QnSystemAdministrationDialog)
 
     QScopedPointer<Ui::QnSystemAdministrationDialog> ui;
+    QnServerUpdatesWidget *m_updatesWidget;
     QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;
 };
 

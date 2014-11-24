@@ -38,6 +38,7 @@
                     <RegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}">
                         <RegistryValue Type="string" Name="systemName" Value="[SYSTEM_NAME]"/>
                         <RegistryValue Type="string" Name="port" Value="[SERVER_PORT]"/>
+                        <RegistryValue Type="string" Name="cameraSettingsOptimization" Value="[ALLOW_CAMERA_CHANGES]"/>
                     </RegistryKey>
                 </Component>
 
@@ -45,7 +46,7 @@
                     <Condition>SERVER_PASSWORD</Condition>
 
                     <RegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}">
-                        <RegistryValue Type="string" Name="adminPassword" Value="[SERVER_PASSWORD]"/>
+                        <RegistryValue Type="string" Name="appserverPassword" Value="[SERVER_PASSWORD]"/>
                     </RegistryKey>
                 </Component>
 
@@ -133,6 +134,9 @@
                 <File Id="ServerQt5Xml$(var.suffix).dll" Name="Qt5Xml$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Xml$(var.suffix).dll" />
             </Component>
             <Component>
+                <File Id="ServerQt5XmlPatterns$(var.suffix).dll" Name="Qt5XmlPatterns$(var.suffix).dll" Source="$(var.SourceDir)\..\Qt5XmlPatterns$(var.suffix).dll" />
+            </Component>
+            <Component>
                 <File Id="ServerQt5Sql$(var.suffix).dll" Name="Qt5Sql$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Sql$(var.suffix).dll" />
             </Component>
             <?if ${webkit} = true ?>
@@ -191,7 +195,7 @@
         </ComponentGroup>                            
         <?endif?>
 
-        <Feature Id="ServerFeature" Title="${product.name} Media Server" Level="1"
+        <Feature Id="ServerFeature" Title="${display.product.name} Media Server" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
             <!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ServerFeature <> 3 ]]> </Condition>-->
 
@@ -219,7 +223,7 @@
 
             <ComponentRef Id="traytool.exe"/>
             <ComponentGroupRef Id="TrayToolQTLibraries"/>
-            <ComponentGroupRef Id="TraytoolPlatforms" />            
+            <ComponentGroupRef Id="TraytoolPlatforms" />
 
         </Feature>
 

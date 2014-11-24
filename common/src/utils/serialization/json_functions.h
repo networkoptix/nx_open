@@ -14,7 +14,7 @@
 #include <QtCore/QRectF>
 #include <QtCore/QPoint>
 #include <QtCore/QPointF>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtCore/QUrl>
 #include <QtCore/QtNumeric>
 #include <QtCore/QJsonArray>
@@ -322,7 +322,8 @@ namespace QJsonDetail {
     void serialize_enum(QnJsonContext *ctx, const T &value, QJsonValue *target, typename std::enable_if<QnLexical::is_numerically_serializable<T>::value>::type * = NULL) {
         QnSerialization::check_enum_binary<T>();
 
-        ::serialize(ctx, static_cast<qint32>(value), target); /* Note the direct call instead of invocation through QJson. */
+        QString lexical = QnLexical::serialized(value);
+        ::serialize(ctx, lexical, target); /* Note the direct call instead of invocation through QJson. */
     }
 
     template<class T>
@@ -368,7 +369,7 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, T *target, typenam
 }
 
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QByteArray)(QnLatin1Array)(QColor)(QBrush)(QSize)(QSizeF)(QRect)(QRectF)(QPoint)(QPointF)(QRegion)(QVector2D)(QVector3D)(QVector4D)(QUuid)(QUrl)(QFont), (json))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QByteArray)(QnLatin1Array)(QColor)(QBrush)(QSize)(QSizeF)(QRect)(QRectF)(QPoint)(QPointF)(QRegion)(QVector2D)(QVector3D)(QVector4D)(QnUuid)(QUrl)(QFont), (json))
 
 void qnJsonFunctionsUnitTest();
 

@@ -2,13 +2,15 @@
 
 #include <utils/common/checked_cast.h>
 #include <core/resource/resource.h>
+#include <core/resource/resource_name.h>
 
 #include <ui/style/resource_icon_cache.h>
 #include <client/client_globals.h>
 
 QnResourceListModel::QnResourceListModel(QObject *parent): 
     QAbstractListModel(parent),
-    m_readOnly(true) // TODO: #Elric change to false, makes more sense.
+    m_readOnly(true), // TODO: #Elric change to false, makes more sense.
+    m_showIp(false)
 {}
 
 QnResourceListModel::~QnResourceListModel() {
@@ -49,29 +51,37 @@ void QnResourceListModel::addResource(const QnResourcePtr &resource) {
         if (r->getId() == resource->getId())
             return;
 
-    beginResetModel();
+    int row = m_resources.size();
+    beginInsertRows(QModelIndex(), row, row);
+
     connect(resource.data(), SIGNAL(nameChanged(const QnResourcePtr &)),    this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
     connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),  this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
     connect(resource.data(), SIGNAL(resourceChanged(const QnResourcePtr &)),this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
     m_resources << resource;
-    endResetModel();
+
+    endInsertRows();
 }
 
 void QnResourceListModel::removeResource(const QnResourcePtr &resource) {
     if (!resource)
         return;
 
-    beginResetModel();
+    int row;
 
-    for (int i = 0; i < m_resources.size(); ++i) {
-        if (m_resources[i]->getId() == resource->getId()) { // TODO: #Elric check by pointer, not id. Makes no sense.
-            disconnect(m_resources[i].data(), NULL, this, NULL);
-            m_resources.removeAt(i);
+    for (row = 0; row < m_resources.size(); ++row) {
+        if (m_resources[row]->getId() == resource->getId()) // TODO: #Elric check by pointer, not id. Makes no sense.
             break;
-        }
     }
 
-    endResetModel();
+    if (row == m_resources.size())
+        return;
+
+    beginRemoveRows(QModelIndex(), row, row);
+
+    m_resources[row]->disconnect(this);
+    m_resources.removeAt(row);
+
+    endRemoveRows();
 }
 
 void QnResourceListModel::updateFromResources() {
@@ -87,6 +97,10 @@ void QnResourceListModel::submitToResources() {
         if(!m_names[i].isNull())
             m_resources[i]->setName(m_names[i]);
     m_names.clear();
+}
+
+void QnResourceListModel::setShowIp(bool showIp) {
+    m_showIp = showIp;
 }
 
 int QnResourceListModel::rowCount(const QModelIndex &parent) const {
@@ -124,18 +138,25 @@ QVariant QnResourceListModel::data(const QModelIndex &index, int role) const {
         return QVariant();
 
     switch(role) {
-    case Qt::EditRole:
     case Qt::DisplayRole:
+    case Qt::EditRole:
     case Qt::ToolTipRole:
     case Qt::StatusTipRole:
     case Qt::WhatsThisRole:
     case Qt::AccessibleTextRole:
-    case Qt::AccessibleDescriptionRole:
+    case Qt::AccessibleDescriptionRole: {
+        QString name;
         if(m_names.size() > index.row() && !m_names[index.row()].isNull()) {
-            return m_names[index.row()];
+            name = m_names[index.row()];
         } else {
-            return resource->getName();
+            name = resource->getName();
         }
+
+        if (m_showIp && role != Qt::EditRole)
+            return lit("%1 (%2)").arg(name, extractHost(resource->getUrl()));
+        else
+            return name;
+    }
     case Qt::DecorationRole:
         if (index.column() == 0)
             return qnResIconCache->icon(resource);

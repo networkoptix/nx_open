@@ -18,7 +18,7 @@ public:
     QnMServerBusinessRuleProcessor();
     virtual ~QnMServerBusinessRuleProcessor();
 
-    virtual QUuid getGuid() const override;
+    virtual QnUuid getGuid() const override;
     
     /*
     * How long to keep event log in usecs

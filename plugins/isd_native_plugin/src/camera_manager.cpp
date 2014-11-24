@@ -19,10 +19,16 @@ CameraManager::CameraManager( const nxcip::CameraInfo& info )
     m_capabilities( 
         nxcip::BaseCameraManager::nativeMediaStreamCapability |
         //nxcip::BaseCameraManager::shareFpsCapability |
+#ifndef NO_ISD_AUDIO
+	nxcip::BaseCameraManager::audioCapability |
+#endif
         nxcip::BaseCameraManager::hardwareMotionCapability),
     m_motionMask( nullptr ),
     m_audioEnabled( false )
 {
+#ifndef NO_ISD_AUDIO
+    m_audioStreamReader.reset( new AudioStreamReader() );
+#endif
 }
 
 CameraManager::~CameraManager()
@@ -79,7 +85,13 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
 
     if( !m_encoder[encoderIndex].get() )
     {
-        m_encoder[encoderIndex].reset( new MediaEncoder(this, encoderIndex) );
+        m_encoder[encoderIndex].reset( new MediaEncoder(
+            this,
+            encoderIndex
+#ifndef NO_ISD_AUDIO
+            , m_audioStreamReader
+#endif
+            ) );
         m_encoder[encoderIndex]->setAudioEnabled( m_audioEnabled );
     }
     m_encoder[encoderIndex]->addRef();
@@ -116,12 +128,19 @@ void CameraManager::setCredentials( const char* username, const char* password )
 //!Implementation of nxcip::BaseCameraManager::setAudioEnabled
 int CameraManager::setAudioEnabled( int audioEnabled )
 {
+#ifndef NO_ISD_AUDIO
+    if( !m_audioStreamReader->initializeIfNeeded() )
+        return nxcip::NX_IO_ERROR;
+
     m_audioEnabled = audioEnabled;
     if (m_encoder[0].get())
         m_encoder[0]->setAudioEnabled(m_audioEnabled);
     if (m_encoder[1].get())
         m_encoder[1]->setAudioEnabled(m_audioEnabled);
     return nxcip::NX_NO_ERROR;
+#else
+    return nxcip::NX_NOT_IMPLEMENTED;
+#endif
 }
 
 //!Implementation of nxcip::BaseCameraManager::getPTZManager
@@ -155,7 +174,7 @@ int CameraManager::createDtsArchiveReader( nxcip::DtsArchiveReader** dtsArchiveR
     return nxcip::NX_NOT_IMPLEMENTED;
 }
 
-int CameraManager::find( nxcip::ArchiveSearchOptions* searchOptions, nxcip::TimePeriods** timePeriods ) const
+int CameraManager::find( nxcip::ArchiveSearchOptions* /*searchOptions*/, nxcip::TimePeriods** /*timePeriods*/ ) const
 {
     /*
     std::auto_ptr<TimePeriods> resTimePeriods( new TimePeriods() );

@@ -22,7 +22,7 @@ namespace ec2
     }
 
     template<class T>
-    int QnUserManager<T>::getUsers( impl::GetUsersHandlerPtr handler )
+    int QnUserManager<T>::getUsers(const QnUuid& userId, impl::GetUsersHandlerPtr handler )
     {
         const int reqID = generateRequestID();
 
@@ -32,7 +32,7 @@ namespace ec2
                 fromApiToResourceList(users, outData);
             handler->done( reqID, errorCode, outData );
         };
-        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiUserDataList, decltype(queryDoneHandler)> ( ApiCommand::getUsers, nullptr, queryDoneHandler);
+        m_queryProcessor->template processQueryAsync<QnUuid, ApiUserDataList, decltype(queryDoneHandler)> ( ApiCommand::getUsers, userId, queryDoneHandler);
         return reqID;
     }
 
@@ -75,7 +75,7 @@ namespace ec2
         //preparing output data
         QnUserResourceList users;
         if (resource->getId().isNull()) {
-            resource->setId(QUuid::createUuid());
+            resource->setId(QnUuid::createUuid());
         }
         users.push_back( resource );
 
@@ -86,7 +86,7 @@ namespace ec2
     }
 
     template<class T>
-    int QnUserManager<T>::remove( const QUuid& id, impl::SimpleHandlerPtr handler )
+    int QnUserManager<T>::remove( const QnUuid& id, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
         auto tran = prepareTransaction( ApiCommand::removeUser, id );
@@ -104,7 +104,7 @@ namespace ec2
     }
 
     template<class T>
-    QnTransaction<ApiIdData> QnUserManager<T>::prepareTransaction( ApiCommand::Value command, const QUuid& id )
+    QnTransaction<ApiIdData> QnUserManager<T>::prepareTransaction( ApiCommand::Value command, const QnUuid& id )
     {
         QnTransaction<ApiIdData> tran(command);
         tran.params.id = id;

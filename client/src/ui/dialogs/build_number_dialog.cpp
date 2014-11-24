@@ -4,38 +4,30 @@
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QPushButton>
 
+#include "utils/update/update_utils.h"
+
 namespace {
-    const char passwordChars[] = "abcdefghijklmnopqrstuvwxyz0123456789";
-    const int passwordLength = 6;
-
-    QString getPasswordForBuild(unsigned buildNumber) {
-        unsigned seed1 = buildNumber;
-        unsigned seed2 = (buildNumber + 13) * 179;
-        unsigned seed3 = buildNumber << 16;
-        unsigned seed4 = ((buildNumber + 179) * 13) << 16;
-        unsigned seed = seed1 ^ seed2 ^ seed3 ^ seed4;
-
-        QString password;
-        const int charsCount = sizeof(passwordChars) - 1;
-        for (int i = 0; i < passwordLength; i++) {
-            password += QChar::fromLatin1(passwordChars[seed % charsCount]);
-            seed /= charsCount;
-        }
-        return password;
-    }
-
     bool checkPassword(int buildNumber, const QString &password) {
-        return getPasswordForBuild((unsigned)buildNumber) == password;
+#ifdef _DEBUG
+        Q_UNUSED(buildNumber);
+        Q_UNUSED(password);
+        return true;
+#else
+        return passwordForBuild((unsigned)buildNumber) == password;
+#endif
     }
 }
 
 QnBuildNumberDialog::QnBuildNumberDialog(QWidget *parent) :
-    QDialog(parent),
+    base_type(parent),
     ui(new Ui::QnBuildNumberDialog)
 {
     ui->setupUi(this);
-    ui->buildNumberEdit->setValidator(new QIntValidator(ui->buildNumberEdit));
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setText(tr("Update"));
+    auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
+    connect(ui->buildNumberEdit, &QLineEdit::textChanged, this, [this, okButton](const QString &text) {
+        okButton->setEnabled(text.toInt() > 0);
+    });
+    okButton->setEnabled(false);
 }
 
 QnBuildNumberDialog::~QnBuildNumberDialog() {}

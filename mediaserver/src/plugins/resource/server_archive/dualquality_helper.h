@@ -1,7 +1,7 @@
 #ifndef __DUAL_QUALITY_HELPER__
 #define __DUAL_QUALITY_HELPER__
 
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #include "recorder/device_file_catalog.h"
 #include "core/resource/resource_fwd.h"

@@ -9,6 +9,8 @@
 #include "plugins/resource/upnp/upnp_resource_searcher.h"
 
 
+class QnMacAddress;
+
 class QnActiResourceSearcher : public QObject, public QnUpnpResourceSearcher
 {
     Q_OBJECT
@@ -17,7 +19,7 @@ public:
     QnActiResourceSearcher();
     virtual ~QnActiResourceSearcher();
 
-    virtual QnResourcePtr createResource(const QUuid &resourceTypeId, const QnResourceParams& params);
+    virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params);
 
     virtual QString manufacture() const;
 
@@ -54,6 +56,12 @@ private:
     QMutex m_mutex;
 
     QByteArray getDeviceXml(const QUrl& url);
+
+    void createResource(
+        const UpnpDeviceInfo& devInfo,
+        const QnMacAddress& mac,
+        const QAuthenticator &auth,
+        QnResourceList& result );
 
 private slots:
     void at_httpConnectionDone(nx_http::AsyncHttpClientPtr reply);

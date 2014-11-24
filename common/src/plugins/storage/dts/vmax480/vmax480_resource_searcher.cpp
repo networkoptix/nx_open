@@ -67,7 +67,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
     QAuthenticator auth;
     auth.setUser(QLatin1String("admin"));
 
-    QUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
     if (rt.isNull())
         return;
 
@@ -121,8 +121,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
 
         resource->setUrl(QString(QLatin1String("http://%1:%2?channel=%3&http_port=%4")).arg(host).arg(apiPort).arg(i+1).arg(httpPort));
         resource->setPhysicalId(QString(QLatin1String("%1_%2")).arg(resource->getMAC().toString()).arg(i+1));
-        resource->setDiscoveryAddr(discoveryAddr);
-        resource->setAuth(auth);
+        resource->setDefaultAuth(auth);
         resource->setGroupName(groupName);
         QString groupId = QString(QLatin1String("VMAX480_uuid_%1:%2")).arg(host).arg(apiPort);
         resource->setGroupId(groupId);
@@ -131,7 +130,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
     }
 }
 
-QnResourcePtr QnPlVmax480ResourceSearcher::createResource(const QUuid &resourceTypeId, const QnResourceParams& params)
+QnResourcePtr QnPlVmax480ResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;
 
@@ -349,7 +348,7 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
 
     QString baseName = QString(QLatin1String("DW-VF")) + QString::number(channels);
 
-    QUuid rt = qnResTypePool->getResourceTypeId(manufacture(), baseName);
+    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), baseName);
     if (rt.isNull())
         return result;
 
@@ -377,7 +376,7 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
 
         resource->setUrl(QString(QLatin1String("http://%1:%2?channel=%3&http_port=%4")).arg(url.host()).arg(apiPort).arg(i+1).arg(httpPort));
         resource->setPhysicalId(QString(QLatin1String("VMAX_DVR_%1_%2")).arg(url.host()).arg(i+1));
-        resource->setAuth(auth);
+        resource->setDefaultAuth(auth);
         resource->setGroupId(groupId);
         resource->setGroupName(groupName);
 

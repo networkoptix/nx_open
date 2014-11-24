@@ -14,7 +14,7 @@
 #include "recorder/storage_manager.h"
 #include "media_server/settings.h"
 
-#include <version.h>
+#include <utils/common/app_info.h>
 
 
 namespace {
@@ -31,7 +31,8 @@ QnStorageSpaceRestHandler::QnStorageSpaceRestHandler():
     m_monitor(qnPlatform->monitor()) 
 {}
 
-int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams &, QnJsonRestResult &result) {
+int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams &, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
+{
     QnStorageSpaceReply reply;
 
     QList<QnPlatformMonitor::PartitionSpace> partitions = m_monitor->totalPartitionSpaceInfo(QnPlatformMonitor::LocalDiskPartition | QnPlatformMonitor::NetworkPartition);
@@ -39,27 +40,19 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
         partitions[i].path = toNativeDirPath(partitions[i].path);
 
     QList<QString> storagePaths;
-    foreach(const QnStorageResourcePtr &storage, qnStorageMan->getStorages()) {
-        QString path = toNativeDirPath(storage->getUrl());
+    for(const QnStorageResourcePtr &storage: qnStorageMan->getStorages()) {
+        QString path = toNativeDirPath(storage->getPath());
         
-        bool isExternal = true;
-        foreach(const QnPlatformMonitor::PartitionSpace &partition, partitions) {
-            if(path.startsWith(partition.path)) {
-                isExternal = partition.type == QnPlatformMonitor::NetworkPartition;
-                break;
-            }
-        }
-
         if (storage->hasFlags(Qn::deprecated))
             continue;
 
         QnStorageSpaceData data;
-        data.path = storage->getUrl();
+        data.url = storage->getUrl();
         data.storageId = storage->getId();
         data.totalSpace = storage->getTotalSpace();
         data.freeSpace = storage->getFreeSpace();
         data.reservedSpace = storage->getSpaceLimit();
-        data.isExternal = isExternal;
+        data.isExternal = storage->isExternal();
         data.isWritable = storage->isStorageAvailableForWriting();
         data.isUsedForWriting = storage->isUsedForWriting();
 
@@ -76,9 +69,9 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
         storagePaths.push_back(path);
     }
 
-    foreach(const QnPlatformMonitor::PartitionSpace &partition, partitions) {
+    for(const QnPlatformMonitor::PartitionSpace &partition: partitions) {
         bool hasStorage = false;
-        foreach(const QString &storagePath, storagePaths) {
+        for(const QString &storagePath: storagePaths) {
             if(storagePath.startsWith(partition.path)) {
                 hasStorage = true;
                 break;
@@ -90,8 +83,8 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
         const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong();
 
         QnStorageSpaceData data;
-        data.path = partition.path + lit(QN_MEDIA_FOLDER_NAME) + QDir::separator();
-        data.storageId = QUuid();
+        data.url = partition.path + QnAppInfo::mediaFolderName();
+        data.storageId = QnUuid();
         data.totalSpace = partition.sizeBytes;
         data.freeSpace = partition.freeBytes;
         data.reservedSpace = defaultStorageSpaceLimit;
@@ -101,9 +94,9 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
         if( data.totalSpace < defaultStorageSpaceLimit )
             continue;
 
-        QnStorageResourcePtr storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(data.path, false));
+        QnStorageResourcePtr storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(data.url, false));
         if (storage) {
-            storage->setUrl(data.path); /* createStorage does not fill url. */
+            storage->setUrl(data.url); /* createStorage does not fill url. */
             storage->setSpaceLimit( defaultStorageSpaceLimit );
             data.isWritable = storage->isStorageAvailableForWriting();
         } else {

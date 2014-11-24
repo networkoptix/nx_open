@@ -7,7 +7,7 @@
 #include <QtCore/QPair>
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #include <QNetworkReply>
 
@@ -19,7 +19,7 @@ public:
     QnRequestParam(const QString &first, const QString &second): base_type(first, second) {}
     QnRequestParam(const char *first, const char *second): base_type(QLatin1String(first), QLatin1String(second)) {}
     QnRequestParam(const char *first, const QString &second): base_type(QLatin1String(first), second) {}
-    QnRequestParam(const char *first, const QUuid &second): base_type(QLatin1String(first), second.toString()) {}
+    QnRequestParam(const char *first, const QnUuid &second): base_type(QLatin1String(first), second.toString()) {}
     QnRequestParam(const QString &first, const char *second): base_type(first, QLatin1String(second)) {}
     QnRequestParam(const char *first, qint64 second): base_type(QLatin1String(first), QString::number(second)) {}
 };

@@ -6,7 +6,7 @@
 #include <utils/common/synctime.h>
 
 
-QnSystemHealthBusinessAction::QnSystemHealthBusinessAction(QnSystemHealth::MessageType message, const QUuid& eventResourceId):
+QnSystemHealthBusinessAction::QnSystemHealthBusinessAction(QnSystemHealth::MessageType message, const QnUuid& eventResourceId):
     base_type(QnBusiness::ShowPopupAction, QnBusinessEventParameters())
 {
     QnBusinessEventParameters runtimeParams;
@@ -16,7 +16,7 @@ QnSystemHealthBusinessAction::QnSystemHealthBusinessAction(QnSystemHealth::Messa
     setRuntimeParams(runtimeParams);
 
     QnBusinessActionParameters actionParams;
-    actionParams.setUserGroup(QnBusinessActionParameters::AdminOnly);
+    actionParams.userGroup = QnBusinessActionParameters::AdminOnly;
     setParams(actionParams);
 
 }

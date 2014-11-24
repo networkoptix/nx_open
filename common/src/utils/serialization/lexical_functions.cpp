@@ -65,12 +65,12 @@ bool deserialize(const QString &value, bool *target) {
     }
 }
 
-void serialize(const QUuid &value, QString *target) {
+void serialize(const QnUuid &value, QString *target) {
     *target = value.toString();
 }
 
-bool deserialize(const QString &value, QUuid *target) {
-    QUuid result(value);
+bool deserialize(const QString &value, QnUuid *target) {
+    QnUuid result(value);
     if(result.isNull() && value != lit("00000000-0000-0000-0000-000000000000") && value != lit("{00000000-0000-0000-0000-000000000000}"))
         return false;
 
@@ -103,7 +103,7 @@ bool deserialize(const QString &value, QColor *target) {
             return false;
 
         QList<int> colors;
-        foreach(const QString &arg, args) {
+        for(const QString &arg: args) {
             bool ok = false;
             int color = arg.toInt(&ok);
             if(!ok)

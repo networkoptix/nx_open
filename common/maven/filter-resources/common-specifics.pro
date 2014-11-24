@@ -1,5 +1,9 @@
 TEMPLATE = lib
-QT += core gui network xml sql concurrent multimedia
+QT += core gui network xml xmlpatterns sql concurrent multimedia
+
+exists( ${libdir}/libcreateprocess.pri ) {
+  include( ${libdir}/libcreateprocess.pri )
+}
 
 mac {
   OBJECTIVE_SOURCES += ${basedir}/src/utils/mac_utils.mm
@@ -32,3 +36,5 @@ TRANSLATIONS += ${basedir}/translations/common_en.ts \
 
   QMAKE_EXTRA_TARGETS += ext_debug ext_debug2
 }
+
+SOURCES += ${project.build.directory}/app_info_impl.cpp

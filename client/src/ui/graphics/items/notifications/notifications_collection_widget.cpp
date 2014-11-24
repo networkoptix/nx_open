@@ -154,48 +154,34 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
 
     qreal buttonSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
 
-    QnImageButtonWidget *settingsButton = new QnImageButtonWidget(m_headerWidget);
-    settingsButton->setIcon(qnSkin->icon("events/settings.png"));
-    settingsButton->setToolTip(tr("Settings..."));
-    settingsButton->setFixedSize(buttonSize);
-    settingsButton->setCached(true);
-    connect(settingsButton, &QnImageButtonWidget::clicked, this->context()->action(Qn::BusinessEventsAction), &QAction::triggered); // TODO: #Elric #GDM I think we should call QAction::trigger, not triggered.
-
-    QnImageButtonWidget *filterButton = new QnImageButtonWidget(m_headerWidget);
-    filterButton->setIcon(qnSkin->icon("events/filter.png"));
-    filterButton->setToolTip(tr("Filter..."));
-    filterButton->setFixedSize(buttonSize);
-    filterButton->setCached(true);
-    connect(filterButton,   &QnImageButtonWidget::clicked, this->context()->action(Qn::PreferencesNotificationTabAction), &QAction::triggered); // TODO: #Elric #GDM same here ^
-
-    QnImageButtonWidget *eventLogButton = new QnImageButtonWidget(m_headerWidget);
-    eventLogButton->setIcon(qnSkin->icon("events/log.png"));
-    eventLogButton->setToolTip(tr("Event Log"));
-    eventLogButton->setFixedSize(buttonSize);
-    eventLogButton->setCached(true);
-    setHelpTopic(eventLogButton, Qn::MainWindow_Notifications_EventLog_Help);
-    connect(eventLogButton,   &QnImageButtonWidget::clicked, this->context()->action(Qn::BusinessEventsLogAction), &QAction::triggered); // TODO: #Elric #GDM same here ^
-
-    QnImageButtonWidget *debugButton = NULL;
-    if(qnSettings->isDevMode()) {
-        debugButton = new QnImageButtonWidget(m_headerWidget);
-        debugButton->setIcon(qnSkin->icon("item/search.png"));
-        debugButton->setToolTip(tr("DEBUG"));
-        debugButton->setFixedSize(buttonSize);
-        debugButton->setCached(true);
-        connect(debugButton, &QnImageButtonWidget::clicked, this, &QnNotificationsCollectionWidget::at_debugButton_clicked);
-    }
+    auto newButton = [this, buttonSize](Qn::ActionId actionId, int helpTopicId) {
+        QnImageButtonWidget *button = new QnImageButtonWidget(m_headerWidget);
+        button->setDefaultAction(action(actionId));
+        button->setFixedSize(buttonSize);
+        button->setCached(true);
+        if (helpTopicId >= 0)
+            setHelpTopic(button, helpTopicId);
+        return button;
+    };
 
     qreal margin = (widgetHeight - buttonSize) / 2.0;
     QGraphicsLinearLayout *controlsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     controlsLayout->setSpacing(2.0);
     controlsLayout->setContentsMargins(2.0, margin, 2.0, margin);
     controlsLayout->addStretch();
-    if(debugButton)
+    if(qnSettings->isDevMode()) {
+        QnImageButtonWidget *debugButton = new QnImageButtonWidget(m_headerWidget);
+        debugButton->setIcon(qnSkin->icon("item/search.png"));
+        debugButton->setToolTip(tr("DEBUG"));
+        debugButton->setFixedSize(buttonSize);
+        debugButton->setCached(true);
+        connect(debugButton, &QnImageButtonWidget::clicked, this, &QnNotificationsCollectionWidget::at_debugButton_clicked);
         controlsLayout->addItem(debugButton);
-    controlsLayout->addItem(eventLogButton);
-    controlsLayout->addItem(settingsButton);
-    controlsLayout->addItem(filterButton);
+    }
+        
+    controlsLayout->addItem(newButton(Qn::BusinessEventsLogAction, Qn::MainWindow_Notifications_EventLog_Help));
+    controlsLayout->addItem(newButton(Qn::BusinessEventsAction, -1));
+    controlsLayout->addItem(newButton(Qn::PreferencesNotificationTabAction, -1));
     m_headerWidget->setLayout(controlsLayout);
 
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
@@ -253,13 +239,13 @@ void QnNotificationsCollectionWidget::setBlinker(QnBlinkingImageButtonWidget *bl
 }
 
 void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationWidget *item, QnResourcePtr resource, qint64 usecsSinceEpoch) {
-    QnSingleThumbnailLoader *loader = QnSingleThumbnailLoader::newInstance(resource, usecsSinceEpoch, thumbnailSize, QnSingleThumbnailLoader::JpgFormat, item);
+    QnSingleThumbnailLoader *loader = QnSingleThumbnailLoader::newInstance(resource, usecsSinceEpoch, -1, thumbnailSize, QnSingleThumbnailLoader::JpgFormat, item);
     item->setImageProvider(loader);
 }
 
 void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
-    QUuid resourceId = params.getEventResourceId();
+    QnUuid resourceId = params.getEventResourceId();
     QnResourcePtr resource = qnResPool->getResourceById(resourceId);
     if (!resource)
         return;
@@ -276,7 +262,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
     const bool soundAction = businessAction->actionType() == QnBusiness::PlaySoundAction;
     if (soundAction) {
-        QString soundUrl = businessAction->getParams().getSoundUrl();
+        QString soundUrl = businessAction->getParams().soundUrl;
         m_itemsByLoadingSound.insert(soundUrl, item);
         context()->instance<QnAppServerNotificationCache>()->downloadFile(soundUrl);
         item->setNotificationLevel(Qn::CommonNotification);
@@ -391,7 +377,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 }
 
 void QnNotificationsCollectionWidget::hideBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
-    QUuid ruleId = businessAction->getBusinessRuleId();
+    QnUuid ruleId = businessAction->getBusinessRuleId();
     QnResourcePtr resource = qnResPool->getResourceById(businessAction->getRuntimeParams().getEventResourceId());
     if (!resource)
         return;
@@ -412,15 +398,20 @@ QnNotificationWidget* QnNotificationsCollectionWidget::findItem(QnSystemHealth::
     return NULL;
 }
 
-QnNotificationWidget* QnNotificationsCollectionWidget::findItem(const QUuid& businessRuleId, const QnResourcePtr &resource, bool useResource) {
+QnNotificationWidget* QnNotificationsCollectionWidget::findItem(const QnUuid& businessRuleId, const QnResourcePtr &resource, bool useResource) {
     foreach (QnNotificationWidget *item, m_itemsByBusinessRuleId.values(businessRuleId))
         if (!useResource || resource == item->property(itemResourcePropertyName).value<QnResourcePtr>())
             return item;
     return NULL;
 }
 
-void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
-    QnNotificationWidget *item = findItem(message, resource);
+void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::MessageType message, const QVariant& params )
+{
+    QnResourcePtr resource;
+    if( params.canConvert<QnResourcePtr>() )
+        resource = params.value<QnResourcePtr>();
+
+    QnNotificationWidget *item = findItem( message, resource );
     if (item)
         return;
 
@@ -445,7 +436,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
     case QnSystemHealth::SmtpIsNotSet:
         item->addActionButton(
             qnSkin->icon("events/smtp.png"),
-            tr("SMTP Settings"),
+            tr("SMTP Settin gs"),
             Qn::PreferencesSmtpTabAction
         );
         break;
@@ -464,6 +455,20 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             Qn::OpenLoginDialogAction
         );
         break;
+    case QnSystemHealth::NoPrimaryTimeServer:
+    {
+        QnActionParameters actionParams;
+        if( params.canConvert<QnActionParameters>() )
+            actionParams = params.value<QnActionParameters>();
+        item->addActionButton(
+            qnSkin->icon( "events/settings.png" ),
+            QnSystemHealthStringsHelper::messageTitle( QnSystemHealth::NoPrimaryTimeServer ),
+            //tr( "Connect to server" ),
+            Qn::SelectTimeServerAction,
+            actionParams
+        );
+        break;
+    }
     case QnSystemHealth::EmailSendError:
         item->addActionButton(
             qnSkin->icon("events/email.png"),
@@ -499,7 +504,11 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
     m_itemsByMessageType.insert(message, item);
 }
 
-void QnNotificationsCollectionWidget::hideSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourcePtr &resource) {
+void QnNotificationsCollectionWidget::hideSystemHealthMessage(QnSystemHealth::MessageType message, const QVariant& params) {
+    QnResourcePtr resource;
+    if( params.canConvert<QnResourcePtr>() )
+        resource = params.value<QnResourcePtr>();
+
     if (!resource) {
         foreach (QnNotificationWidget* item, m_itemsByMessageType.values(message))
             m_list->removeItem(item);
@@ -529,23 +538,11 @@ void QnNotificationsCollectionWidget::updateBlinker() {
     blinker()->setColor(QnNotificationLevels::notificationColor(m_list->notificationLevel()));
 }
 
-void QnNotificationsCollectionWidget::at_settingsButton_clicked() {
-    menu()->trigger(Qn::BusinessEventsAction);
-}
-
-void QnNotificationsCollectionWidget::at_filterButton_clicked() {
-    menu()->trigger(Qn::PreferencesNotificationTabAction);
-}
-
-void QnNotificationsCollectionWidget::at_eventLogButton_clicked() {
-    menu()->trigger(Qn::BusinessEventsLogAction);
-}
-
 void QnNotificationsCollectionWidget::at_debugButton_clicked() {
-    QnResourceList servers = qnResPool->getResources().filtered<QnMediaServerResource>();
+    QnResourceList servers = qnResPool->getResources<QnMediaServerResource>();
     QnResourcePtr sampleServer = servers.isEmpty() ? QnResourcePtr() : servers.first();
 
-    QnResourceList cameras = qnResPool->getResources().filtered<QnVirtualCameraResource>();
+    QnResourceList cameras = qnResPool->getResources<QnVirtualCameraResource>();
     QnResourcePtr sampleCamera = cameras.isEmpty() ? QnResourcePtr() : cameras.first();
 
     //TODO: #GDM #Business REMOVE DEBUG
@@ -557,7 +554,7 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
             resource = context()->user();
             break;
         case QnSystemHealth::UsersEmailIsEmpty:
-            resource = qnResPool->getResources().filtered<QnUserResource>().last();
+            resource = qnResPool->getResources<QnUserResource>().last();
             break;
         case QnSystemHealth::StoragesNotConfigured:
         case QnSystemHealth::StoragesAreFull:
@@ -568,12 +565,11 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
         default:
             break;
         }
-        showSystemHealthMessage(message, resource);
+        showSystemHealthMessage(message, QVariant::fromValue(resource));
     }
 
     //TODO: #GDM #Business REMOVE DEBUG
-    for (int i = 1; i < QnBusiness::EventCount; i++) {
-        QnBusiness::EventType eventType = QnBusiness::EventType(i);
+    for (QnBusiness::EventType eventType: QnBusiness::allEvents()) {
 
         QnBusinessEventParameters params;
         params.setEventType(eventType);
@@ -678,7 +674,7 @@ void QnNotificationsCollectionWidget::at_list_itemRemoved(QnNotificationWidget *
     foreach (QnSystemHealth::MessageType messageType, m_itemsByMessageType.keys(item))
         m_itemsByMessageType.remove(messageType, item);
 
-    foreach (const QUuid& ruleId, m_itemsByBusinessRuleId.keys(item))
+    foreach (const QnUuid& ruleId, m_itemsByBusinessRuleId.keys(item))
         m_itemsByBusinessRuleId.remove(ruleId, item);
 
     foreach (QString soundPath, m_itemsByLoadingSound.keys(item))

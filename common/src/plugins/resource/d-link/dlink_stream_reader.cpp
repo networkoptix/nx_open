@@ -368,7 +368,7 @@ QString PlDlinkStreamReader::getRTPurl(int profileId) const
     int lastProfileId = -1;
     QByteArray requiredProfile = QString(lit("profileid=%1")).arg(profileId).toUtf8();
     QList<QByteArray> lines = reply.split('\n');
-    foreach(QByteArray line, lines)
+    for(QByteArray line: lines)
     {
         line = line.toLower().trimmed();
         if (line.startsWith("profileid="))
@@ -518,7 +518,7 @@ QnMetaDataV1Ptr PlDlinkStreamReader::getCameraMetadata()
 
     bool empty = true;
 
-    foreach(QString line, lines)
+    for(const QString& line: lines)
     {
         QString line_low = line.toLower();
 
@@ -544,5 +544,12 @@ QnMetaDataV1Ptr PlDlinkStreamReader::getCameraMetadata()
     filterMotionByMask(motion);
     return motion;
 }
+
+void PlDlinkStreamReader::pleaseStop()
+{
+    CLServerPushStreamReader::pleaseStop();
+    m_rtpReader.pleaseStop();
+}
+
 
 #endif // #ifdef ENABLE_DLINK

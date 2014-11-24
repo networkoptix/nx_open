@@ -13,6 +13,7 @@
 
 #include "utils/common/long_runnable.h"
 #include "nx_ec/impl/ec_api_impl.h"
+#include "utils/common/public_ip_discovery.h"
 
 
 class QnAppserverResourceProcessor;
@@ -32,6 +33,8 @@ public:
 
     void stopObjects();
     void run();
+
+    void changePort(quint16 port);
 public slots:
     void stopAsync();
     void stopSync();
@@ -46,18 +49,18 @@ private slots:
     void at_timer();
     void at_connectionOpened();
 
-    void at_peerFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QString &localInterfaceAddress);
-    void at_peerLost(const QnModuleInformation &moduleInformation);
-
     void at_appStarted();
     void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
     void at_emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);
     void at_restartServerRequired();
+    void at_updatePublicAddress(const QHostAddress& publicIP);
 private:
     void updateDisabledVendorsIfNeeded();
     void updateAllowCameraCHangesIfNeed();
     bool initTcpListener();
     QHostAddress getPublicAddress();
+    QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);
+    void saveStorages(ec2::AbstractECConnectionPtr ec2Connection, const QnAbstractStorageResourceList& storages);
 private:
     int m_argc;
     char** m_argv;
@@ -67,7 +70,10 @@ private:
     QnModuleFinder* m_moduleFinder;
     QnUniversalTcpListener* m_universalTcpListener;
     QnMediaServerResourcePtr m_mediaServer;
-    QSet<QUuid> m_updateUserRequests;
+    QSet<QnUuid> m_updateUserRequests;
+    QHostAddress m_publicAddress;
+    std::unique_ptr<QnPublicIPDiscovery> m_ipDiscovery;
+    std::unique_ptr<QTimer> m_updatePiblicIpTimer;
 };
 
 #endif // MAIN_H

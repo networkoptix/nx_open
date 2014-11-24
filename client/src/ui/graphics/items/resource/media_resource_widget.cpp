@@ -18,6 +18,8 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
+
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/preset_ptz_controller.h>
 #include <core/ptz/tour_ptz_controller.h>
@@ -507,7 +509,6 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display) {
         m_display->addRenderer(m_renderer);
         m_renderer->setChannelCount(m_display->videoLayout()->channelCount());
         updateCustomAspectRatio();
-        updateRotation();
     } else {
         setChannelLayout(QnConstResourceVideoLayoutPtr(new QnDefaultResourceVideoLayout()));
         m_renderer->setChannelCount(0);
@@ -855,11 +856,14 @@ QString QnMediaResourceWidget::calculateInfoText() const {
 
     for(int i = 0; i < channelCount(); i++) {
         const QnStatistics *statistics = m_display->mediaProvider()->getStatistics(i);
+        if (statistics->isConnectionLost()) //TODO: #GDM check does not work, case #3993
+            continue;
         fps = qMax(fps, static_cast<qreal>(statistics->getFrameRate()));
         mbps += statistics->getBitrate();
     }
 
     QSize size = m_display->camDisplay()->getRawDataSize();
+    size.setWidth(size.width() * m_display->camDisplay()->channelsCount());
 
     QString codecString;
     if(QnMediaContextPtr codecContext = m_display->mediaProvider()->getCodecContext()) {
@@ -1026,8 +1030,6 @@ void QnMediaResourceWidget::at_resource_propertyChanged(const QnResourcePtr &res
     Q_UNUSED(resource);
     if (key == QnMediaResource::customAspectRatioKey())
         updateCustomAspectRatio();
-    else if(key == QnMediaResource::rotationKey())
-        updateRotation();
 }
 
 void QnMediaResourceWidget::updateAspectRatio() {
@@ -1217,19 +1219,4 @@ void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {
 
 void QnMediaResourceWidget::at_item_imageEnhancementChanged() {
     setImageEnhancement(item()->imageEnhancement());
-}
-
-void QnMediaResourceWidget::updateRotation() {
-    if(!m_display)
-        return;
-    QString par = m_resource->toResource()->getProperty(QnMediaResource::rotationKey());
-    if( par.isEmpty() ) {
-        item()->setRotation(0);
-        return;
-    }
-    bool ok;
-    int degree = par.toInt(&ok);
-    Q_ASSERT(ok);
-    if( item()->rotation() != degree )
-        item()->setRotation(degree);
 }

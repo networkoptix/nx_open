@@ -6,9 +6,13 @@
 // TODO: #Elric this belongs together with server_settings
 
 QString authKey();
-QUuid serverGuid();
+QnUuid serverGuid();
+void setUseAlternativeGuid(bool value);
 
 QString getDataDirectory();
 void syncStoragesToSettings(const QnMediaServerResourcePtr &server);
+bool backupDatabase();
+
+bool isLocalAppServer(const QString &host);
 
 #endif // _SERVER_UTIL_H

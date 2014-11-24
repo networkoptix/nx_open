@@ -24,25 +24,19 @@ public:
     virtual void updateFromSettings() override;
 
     virtual bool confirm() override;
-private:
-    void initTranslations();
-
 private slots:
     void at_browseMainMediaFolderButton_clicked();
     void at_addExtraMediaFolderButton_clicked();
     void at_removeExtraMediaFolderButton_clicked();
     void at_extraMediaFoldersList_selectionChanged();
-    void at_timeModeComboBox_activated();
 
     void at_browseLogsButton_clicked();
-
+    void at_clearCacheButton_clicked();
 private:
     QScopedPointer<Ui::GeneralPreferencesWidget> ui;
 
     bool m_oldDownmix;
     bool m_oldDoubleBuffering;
-    int m_oldLanguage;
-    int m_oldSkin;
 };
 
 #endif // GENERAL_PREFERENCES_WIDGET_H

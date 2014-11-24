@@ -27,7 +27,7 @@ class QnFisheyePtzController;
 class QnGlRendererShaders: public QObject {
     Q_OBJECT;
 public:
-    QnGlRendererShaders(const QGLContext *context, QObject *parent = NULL);
+    QnGlRendererShaders(QObject *parent = NULL);
     virtual ~QnGlRendererShaders();
 
     QnYv12ToRgbShaderProgram *yv12ToRgb;
@@ -158,10 +158,19 @@ private:
      * \param v_array
      * \param tx_array texture vertexes array
      */
-    void drawBindedTexture( QnAbstractBaseGLShaderProgramm* program , const float* v_array, const float* tx_array );
+    void drawBindedTexture( QnGLShaderProgram* shader , const float* v_array, const float* tx_array );
     void updateTexture( const QSharedPointer<CLVideoDecoderOutput>& curImg );
     bool isYuvFormat() const;
     int glRGBFormat() const;
+
+private:
+    bool m_initialized;
+
+	/* QOpenGLVertexArrayObject can be destroyed only in the current context.
+	 * So if we are creating it on the stack, asynchronous deleting becomes unaccessible. */
+    QSharedPointer<QOpenGLVertexArrayObject> m_vertices;
+    QOpenGLBuffer m_positionBuffer;
+    QOpenGLBuffer m_textureBuffer;
 };
 
 #endif //QN_GL_RENDERER_H

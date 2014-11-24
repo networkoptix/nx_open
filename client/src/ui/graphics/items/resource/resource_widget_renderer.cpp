@@ -15,7 +15,8 @@ QnResourceWidgetRenderer::QnResourceWidgetRenderer(QObject* parent, QGLContext* 
 :
     QnAbstractRenderer( parent ),
     m_glContext( context ),
-    m_screenshotInterface(0)
+    m_screenshotInterface(0),
+    m_panoFactor(1)
 {
     Q_ASSERT( context != NULL );
 
@@ -55,6 +56,7 @@ void QnResourceWidgetRenderer::setChannelCount(int channelCount)
         delete m_channelRenderers[i].renderer;
         delete m_channelRenderers[i].uploader;
     }
+    m_panoFactor = channelCount;
 
     m_channelRenderers.resize( channelCount );
     m_renderingEnabled.resize( channelCount, true );
@@ -176,6 +178,8 @@ QnMetaDataV1Ptr QnResourceWidgetRenderer::lastFrameMetadata(int channel) const
 }
 
 Qn::RenderStatus QnResourceWidgetRenderer::paint(int channel, const QRectF &sourceRect, const QRectF &targetRect, qreal opacity) {
+    if (m_channelRenderers.size() < channel)
+        return Qn::NothingRendered;
     RenderingTools &ctx = m_channelRenderers[channel];
     if(!ctx.renderer)
         return Qn::NothingRendered;
@@ -272,6 +276,13 @@ void QnResourceWidgetRenderer::waitForFrameDisplayed(int channel) {
     ctx.uploader->ensureAllFramesWillBeDisplayed();
 }
 
+void QnResourceWidgetRenderer::waitForQueueLessThan(int channel, int maxSize) {
+    RenderingTools& ctx = m_channelRenderers[channel];
+    if( !ctx.uploader )
+        return;
+    ctx.uploader->ensureQueueLessThen(maxSize);
+}
+
 void QnResourceWidgetRenderer::finishPostedFramesRender(int channel)
 {
     RenderingTools& ctx = m_channelRenderers[channel];
@@ -299,15 +310,8 @@ bool QnResourceWidgetRenderer::constantDownscaleFactor() const {
 QSize QnResourceWidgetRenderer::sourceSize() const {
     QMutexLocker locker(&m_mutex);
 
-    return m_sourceSize;
-
-    /*
-    int panoFactor = 1;
-    if (!m_channelRenderers.empty() && m_channelRenderers[0].renderer)
-        panoFactor = m_channelRenderers[0].renderer->panoFactor();
-
-    return QSize(m_sourceSize.width() * panoFactor, m_sourceSize.height());
-    */
+    //return QSize(m_sourceSize.width() * m_panoFactor, m_sourceSize.height());
+    return QSize(m_sourceSize.width(), m_sourceSize.height());
 }
 
 const QGLContext* QnResourceWidgetRenderer::glContext() const

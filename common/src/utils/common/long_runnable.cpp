@@ -25,7 +25,7 @@ public:
 
     void stopAll() {
         QMutexLocker locker(&m_mutex);
-        foreach(QnLongRunnable *runnable, m_created)
+        for(QnLongRunnable *runnable: m_created)
             runnable->pleaseStop();
         waitAllLocked();
     }
@@ -171,13 +171,18 @@ void QnLongRunnable::initSystemThreadId() {
     if(m_systemThreadId)
         return;
 
+    m_systemThreadId = currentThreadSystemId();
+}
+
+std::uintptr_t QnLongRunnable::currentThreadSystemId()
+{
 #if defined(Q_OS_LINUX)
-    /* This one is purely for debugging purposes. 
-     * QThread::currentThreadId is implemented via pthread_self, 
-     * which is not an identifier you see in GDB. */
-    m_systemThreadId = gettid();
+    /* This one is purely for debugging purposes.
+    * QThread::currentThreadId is implemented via pthread_self,
+    * which is not an identifier you see in GDB. */
+    return gettid();
 #else
-    m_systemThreadId = reinterpret_cast<std::uintptr_t>(QThread::currentThreadId());
+    return reinterpret_cast<std::uintptr_t>(QThread::currentThreadId());
 #endif
 }
 

@@ -23,7 +23,7 @@
 #include <ui/workbench/workbench_layout.h>
 
 QList<QAction *> QnOpenCurrentUserLayoutActionFactory::newActions(const QnActionParameters &, QObject *parent) {
-    QnLayoutResourceList layouts = resourcePool()->getResourcesWithParentId(QUuid()).filtered<QnLayoutResource>(); /* Multi-videos will go here. */
+    QnLayoutResourceList layouts = resourcePool()->getResourcesWithParentId(QnUuid()).filtered<QnLayoutResource>(); /* Multi-videos will go here. */
     if(context()->user())
         layouts.append(resourcePool()->getResourcesWithParentId(context()->user()->getId()).filtered<QnLayoutResource>());
     
@@ -155,7 +155,7 @@ void QnPtzPresetsToursActionFactory::at_action_triggered() {
 
 QMenu* QnEdgeNodeActionFactory::newMenu(const QnActionParameters &parameters, QWidget *parentWidget) {
     QnVirtualCameraResourcePtr edgeCamera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
-    if (!edgeCamera || !QnMediaServerResource::isEdgeServer(edgeCamera->getParentResource()))
+    if (!edgeCamera || !QnMediaServerResource::isHiddenServer(edgeCamera->getParentResource()))
         return NULL;
 
     return menu()->newMenu(Qn::NoAction, Qn::TreeScope, parentWidget, QnActionParameters(edgeCamera->getParentResource()));

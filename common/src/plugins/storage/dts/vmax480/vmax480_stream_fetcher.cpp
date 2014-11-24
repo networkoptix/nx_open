@@ -97,7 +97,7 @@ bool VMaxStreamFetcher::vmaxArchivePlay(QnVmax480DataConsumer* consumer, qint64 
     m_seekTimer.restart();
     m_eofReached = false;
 
-    foreach(CLDataQueue* dataQueue, m_dataConsumers) {
+    for(CLDataQueue* dataQueue: m_dataConsumers) {
         if (dataQueue)
             dataQueue->clear();
     }
@@ -137,7 +137,7 @@ void VMaxStreamFetcher::onConnectionEstablished(QnVMax480ConnectionProcessor* co
 int VMaxStreamFetcher::getCurrentChannelMask() const
 {
     int mask = 0;
-    foreach(QnVmax480DataConsumer* consumer,  m_dataConsumers.keys())
+    for(QnVmax480DataConsumer* consumer:  m_dataConsumers.keys())
     {
         if (consumer->getChannel() != -1)
             mask |= 1 << consumer->getChannel();
@@ -211,21 +211,21 @@ void VMaxStreamFetcher::onGotArchiveRange(quint32 startDateTime, quint32 endDate
     dynamic_cast<QnPlVmax480Resource*>(m_res)->setArchiveRange(startDateTime * 1000000ll, endDateTime * 1000000ll);
 
     QMutexLocker lock(&m_mutex);
-    foreach(QnVmax480DataConsumer* consumer, m_dataConsumers.keys())
+    for(QnVmax480DataConsumer* consumer: m_dataConsumers.keys())
         consumer->onGotArchiveRange(startDateTime, endDateTime);
 }
 
 void VMaxStreamFetcher::onGotMonthInfo(const QDate& month, int monthInfo)
 {
     QMutexLocker lock(&m_mutex);
-    foreach(QnVmax480DataConsumer* consumer, m_dataConsumers.keys())
+    for(QnVmax480DataConsumer* consumer: m_dataConsumers.keys())
         consumer->onGotMonthInfo(month, monthInfo);
 }
 
 void VMaxStreamFetcher::onGotDayInfo(int dayNum, const QByteArray& data)
 {
     QMutexLocker lock(&m_mutex);
-    foreach(QnVmax480DataConsumer* consumer, m_dataConsumers.keys())
+    for(QnVmax480DataConsumer* consumer: m_dataConsumers.keys())
         consumer->onGotDayInfo(dayNum, data);
 }
 
@@ -385,7 +385,7 @@ bool VMaxStreamFetcher::registerConsumer(QnVmax480DataConsumer* consumer, int* c
     m_dataConsumers.insert(consumer, new CLDataQueue(MAX_QUEUE_SIZE));
     if (count) {
         *count = 0;
-        foreach(QnVmax480DataConsumer* c, m_dataConsumers.keys())
+        for(QnVmax480DataConsumer* c: m_dataConsumers.keys())
         {
             if (!c->isStopping())
                 (*count)++;
@@ -410,7 +410,7 @@ bool VMaxStreamFetcher::registerConsumer(QnVmax480DataConsumer* consumer, int* c
 int VMaxStreamFetcher::getChannelUsage(int ch)
 {
     int channelUsage = 0;
-    foreach(QnVmax480DataConsumer* c, m_dataConsumers.keys())
+    for(QnVmax480DataConsumer* c: m_dataConsumers.keys())
     {
         if (c->getChannel() == ch)
             channelUsage++;
@@ -574,7 +574,7 @@ void VMaxStreamFetcher::pleaseStop()
 void VMaxStreamFetcher::pleaseStopAll()
 {
     QMutexLocker lock(&m_instMutex);
-    foreach(VMaxStreamFetcher* fetcher, m_instances.values())
+    for(VMaxStreamFetcher* fetcher: m_instances.values())
         fetcher->pleaseStop();
 }
 

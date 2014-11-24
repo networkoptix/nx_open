@@ -3,30 +3,31 @@
 
 #include <QtCore/QObject>
 
-#include <utils/appcast/update_info.h>
+#include <utils/common/software_version.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 class QnUpdateChecker;
+class QTimer;
 
-class QnWorkbenchUpdateWatcher: public QObject {
-    Q_OBJECT;
+class QnWorkbenchUpdateWatcher: public QObject, public QnWorkbenchContextAware {
+    Q_OBJECT
 public:
     QnWorkbenchUpdateWatcher(QObject *parent = NULL);
     virtual ~QnWorkbenchUpdateWatcher();
 
-    QnUpdateInfoItem availableUpdate() const {
-        return m_availableUpdate;
-    }
+    QnSoftwareVersion latestVersion() const { return m_latestVersion; }
 
-signals:
-    void availableUpdateChanged();
+public slots:
+    void start();
+    void stop();
 
 private slots:
-    void at_checker_updatesAvailable(QnUpdateInfoItemList updates);
-    void at_timer_timeout();
+    void at_checker_updateAvailable(const QnSoftwareVersion &updateVersion, const QUrl &releaseNotesUrl);
 
 private:
     QnUpdateChecker *m_checker;
-    QnUpdateInfoItem m_availableUpdate;
+    QTimer *m_timer;
+    QnSoftwareVersion m_latestVersion;
 };
 
 #endif // QN_WORKBENCH_UPDATE_WATCHER_H

@@ -72,16 +72,12 @@
   DEFINES += ENABLE_SSL
 }
 
-!contains( DEFINES, DISABLE_BOOKMARKS) {
-  DEFINES += QN_ENABLE_BOOKMARKS
-}
-
-contains(NAME, mediaserver) || contains(NAME, common) {
-  IS_VMAX_ENABLED=${vmax}
-  contains( IS_VMAX_ENABLED, true ) {
-    DEFINES += ENABLE_VMAX
-  }
-}
+#contains(NAME, mediaserver) || contains(NAME, common) {
+#  IS_VMAX_ENABLED=${vmax}
+#  contains( IS_VMAX_ENABLED, true ) {
+#    DEFINES += ENABLE_VMAX
+#  }
+#}
 
 contains(NAME, client) {
   IS_DYNAMIC_CUSTOMIZATION_ENABLED=${dynamic.customization}

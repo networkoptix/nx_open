@@ -69,6 +69,8 @@ CLSimpleHTTPClient::CLSimpleHTTPClient(const QUrl& url, unsigned int timeout, co
     m_dataRestLen(0),
     m_localPort(0)
 {
+    if (m_host.isNull() && !url.host().isEmpty())
+        m_host = resolveAddress(url.host());
     initSocket(url.scheme() == lit("https"));
 }
 
@@ -181,7 +183,10 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
             {
                 getAuthInfo();
                 if (recursive)
+                {
+                    close();
                     return doPOST(requestStr, body, false);
+                }
                 else
                     return CL_HTTP_AUTH_REQUIRED;
             }
@@ -351,7 +356,10 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
                 getAuthInfo();
 
                 if (recursive)
+                {
+                    close();
                     return doGET(requestStr, false);
+                }
                 else
                     return CL_HTTP_AUTH_REQUIRED;
             }

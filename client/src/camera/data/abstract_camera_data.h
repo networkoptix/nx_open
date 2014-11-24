@@ -15,6 +15,12 @@ public:
     virtual ~QnAbstractCameraData() {}
 
     /**
+     * @brief clone                                 Deep copy of the object.
+     * @return                                      Shared pointer to the new data object.
+     */
+    virtual QnAbstractCameraDataPtr clone() const = 0;
+
+    /**
      * @brief isEmpty                               Check that there is some data in the struct.
      * @return                                      True if there is at least one piece of data.
      */
@@ -31,6 +37,13 @@ public:
      * @param other                                 List of data structs to append.
      */
     virtual void append(const QList<QnAbstractCameraDataPtr> &other) = 0;
+
+    /**
+     * @brief trim                                  Trim the last data source period if it is not finished.
+     * @param trimTime                              Value to be set as the end time of the last time period.
+     * @return                                      True if the data source was modified, false otherwise.
+     */
+    virtual bool trim(qint64 trimTime) = 0;
 
     /**
      * @brief clear                                 Remove all data from the struct.

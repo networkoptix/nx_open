@@ -1,7 +1,7 @@
 #ifndef QN_CLIENT_MODEL_TYPES_H
 #define QN_CLIENT_MODEL_TYPES_H
 
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtCore/QList>
 #include <QtCore/QHash>
 #include <QtCore/QString>
@@ -10,6 +10,8 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QDataStream>
 #include <QtGui/QVector3D>
+
+#include <client/client_globals.h>
 
 #include <utils/common/id.h>
 #include <utils/common/model_functions_fwd.h>
@@ -23,9 +25,8 @@ typedef QHash<QString, QWeakPointer<QObject> > QnWeakObjectHash;
 
 Q_DECLARE_METATYPE(QnWeakObjectHash)
 
-
 // -------------------------------------------------------------------------- //
-// QnWorkbenchState
+// QnThumbnailsSearchState
 // -------------------------------------------------------------------------- //
 /**
  * Additional data for a thumbnails search layout.
@@ -53,7 +54,7 @@ public:
     QnWorkbenchState(): currentLayoutIndex(-1) {}
 
     int currentLayoutIndex;
-    QList<QUuid> layoutUuids;
+    QList<QnUuid> layoutUuids;
 };
 
 /**
@@ -70,15 +71,12 @@ QN_FUSION_DECLARE_FUNCTIONS(QnWorkbenchState, (datastream)(metatype));
 // -------------------------------------------------------------------------- //
 struct QnServerStorageKey {
     QnServerStorageKey() {}
-    QnServerStorageKey(const QUuid &serverUuid, const QString &storagePath): serverUuid(serverUuid), storagePath(storagePath) {}
+    QnServerStorageKey(const QnUuid &serverUuid, const QString &storagePath): serverUuid(serverUuid), storagePath(storagePath) {}
 
-    QUuid serverUuid;
+    QnUuid serverUuid;
     QString storagePath;
 };
 
-typedef QHash<QnServerStorageKey, qint64> QnServerStorageStateHash;
-
-Q_DECLARE_METATYPE(QnServerStorageStateHash);
 QN_FUSION_DECLARE_FUNCTIONS(QnServerStorageKey, (datastream)(eq)(hash)(metatype));
 
 
@@ -125,5 +123,42 @@ struct QnPtzHotkey {
 typedef QHash<int, QString> QnPtzHotkeyHash;
 
 QN_FUSION_DECLARE_FUNCTIONS(QnPtzHotkey, (json)(metatype));
+
+
+// -------------------------------------------------------------------------- //
+// QnClientBackground
+// -------------------------------------------------------------------------- //
+/**
+ * Set of options how to display client background.
+ */
+struct QnClientBackground {
+    QnClientBackground():
+        animationEnabled(true),
+        animationMode(Qn::DefaultAnimation),
+        animationCustomColor(QColor(0, 0, 255, 51)),
+        animationPeriodSec(120),
+        imageEnabled(false),
+        imageMode(Qn::StretchImage),
+        imageOpacity(0.5)
+    {}
+
+    bool animationEnabled;
+    Qn::BackgroundAnimationMode animationMode;
+    QColor animationCustomColor;
+    int animationPeriodSec;
+
+    bool imageEnabled;
+    QString imageName;
+    QString imageOriginalName;
+    Qn::ImageBehaviour imageMode;
+    qreal imageOpacity;
+
+    qreal actualImageOpacity() const {
+        return imageEnabled ? imageOpacity : 0.0;
+    }
+};
+#define QnClientBackground_Fields (animationEnabled)(animationMode)(animationCustomColor)(animationPeriodSec)(imageEnabled)(imageName)(imageOriginalName)(imageMode)(imageOpacity)
+
+QN_FUSION_DECLARE_FUNCTIONS(QnClientBackground, (datastream)(metatype));
 
 #endif // QN_CLIENT_MODEL_TYPES_H

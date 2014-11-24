@@ -1,7 +1,7 @@
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QUrlQuery>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtCore/QSet>
 #include <QtCore/QTextStream>
 #include <QtCore/QDebug>
@@ -518,6 +518,23 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbst
         //dstCodec = CODEC_ID_AAC; // keep aac without transcoding for audio
     //CodecID dstCodec = media->dataType == QnAbstractMediaData::VIDEO ? CODEC_ID_MPEG4 : media->compressionType;
     QSharedPointer<QnUniversalRtpEncoder> universalEncoder;
+    
+    QnResourcePtr res = getResource()->toResourcePtr();
+
+    QUrl url(d->request.requestLine.url);
+    const QUrlQuery urlQuery( url.query() );
+    int rotation;
+    if (urlQuery.hasQueryItem("rotation"))
+        rotation = urlQuery.queryItemValue("rotation").toInt();
+    else
+        rotation = res->getProperty(QnMediaResource::rotationKey()).toInt();
+
+    qreal customAR = res->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
+
+    QnImageFilterHelper extraTranscodeParams;
+    extraTranscodeParams.setVideoLayout(vLayout);
+    extraTranscodeParams.setRotation(rotation);
+    extraTranscodeParams.setCustomAR(customAR);
 
     switch (dstCodec)
     {
@@ -549,7 +566,7 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbst
         case CODEC_ID_VP8:
         case CODEC_ID_ADPCM_G722:
         case CODEC_ID_ADPCM_G726:
-            universalEncoder = QSharedPointer<QnUniversalRtpEncoder>(new QnUniversalRtpEncoder(media, dstCodec, resolution, vLayout)); // transcode src codec to MPEG4/AAC
+            universalEncoder = QSharedPointer<QnUniversalRtpEncoder>(new QnUniversalRtpEncoder(media, dstCodec, resolution, extraTranscodeParams)); // transcode src codec to MPEG4/AAC
             if (universalEncoder->isOpened())
                 return universalEncoder;
             else
@@ -578,7 +595,7 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(QnAbstractM
             camera = qnCameraPool->getVideoCamera(getResource()->toResourcePtr());
         if (camera) {
             if (dataType == QnAbstractMediaData::VIDEO)
-                rez =  camera->getLastVideoFrame(isHQ);
+                rez =  camera->getLastVideoFrame(isHQ, 0);
             else
                 rez = camera->getLastAudioFrame(isHQ);
             if (rez)
@@ -595,7 +612,7 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(QnAbstractM
     if (archive.getAudioLayout()->channelCount() == 0 && dataType == QnAbstractMediaData::AUDIO)
         return rez;
 
-    for (int i = 0; i < 20; ++i)
+    for (int i = 0; i < 40; ++i)
     {
         QnConstAbstractMediaDataPtr media = archive.getNextData();
         if (!media)
@@ -764,7 +781,7 @@ int QnRtspConnectionProcessor::composeSetup()
     if (trackId >= 0)
     {
         QList<QByteArray> transportInfo = transport.split(';');
-        foreach(const QByteArray& data, transportInfo)
+        for(const QByteArray& data: transportInfo)
         {
             /*
             if (data.startsWith("interleaved="))
@@ -911,7 +928,7 @@ void QnRtspConnectionProcessor::createDataProvider()
     }
     if (camera && d->liveMode == Mode_Live)
     {
-        if (!d->liveDpHi && !d->mediaRes->toResource()->hasFlags(Qn::foreigner)) {
+        if (!d->liveDpHi && !d->mediaRes->toResource()->hasFlags(Qn::foreigner) && d->mediaRes->toResource()->isInitialized()) {
             d->liveDpHi = camera->getLiveReader(QnServer::HiQualityCatalog);
             if (d->liveDpHi) {
                 connect(d->liveDpHi->getResource().data(), SIGNAL(parentIdChanged(const QnResourcePtr &)), this, SLOT(at_camera_parentIdChanged()), Qt::DirectConnection);
@@ -942,7 +959,7 @@ void QnRtspConnectionProcessor::createDataProvider()
 
     if (!d->thumbnailsDP && d->liveMode == Mode_ThumbNails) {
         d->thumbnailsDP = QSharedPointer<QnThumbnailsStreamReader>(new QnThumbnailsStreamReader(d->mediaRes->toResourcePtr()));
-        d->thumbnailsDP->setGroupId(QUuid::createUuid().toString().toUtf8());
+        d->thumbnailsDP->setGroupId(QnUuid::createUuid().toString().toUtf8());
     }
 }
 
@@ -1012,6 +1029,16 @@ int QnRtspConnectionProcessor::composePlay()
     if (d->mediaRes == 0)
         return CODE_NOT_FOUND;
 
+    if (!nx_http::getHeaderValue(d->request.headers, "x-media-step").isEmpty())
+        d->liveMode = Mode_ThumbNails;
+    else if (d->rtspScale >= 0 && d->startTime == DATETIME_NOW)
+        d->liveMode = Mode_Live;
+    else
+        d->liveMode = Mode_Archive;
+
+    createDataProvider();
+    checkQuality();
+
     if (d->trackInfo.isEmpty())
     {
         if (nx_http::getHeaderValue(d->request.headers, "x-play-now").isEmpty())
@@ -1029,16 +1056,6 @@ int QnRtspConnectionProcessor::composePlay()
                 d->response.headers.insert( std::make_pair(nx_http::StringType("x-video-layout"), layoutStr.toLatin1()) );
         }
     }
-
-    if (!nx_http::getHeaderValue(d->request.headers, "x-media-step").isEmpty())
-        d->liveMode = Mode_ThumbNails;
-    else if (d->rtspScale >= 0 && d->startTime == DATETIME_NOW)
-        d->liveMode = Mode_Live;
-    else
-        d->liveMode = Mode_Archive;
-
-    createDataProvider();
-    checkQuality();
 
     d->lastPlayCSeq = nx_http::getHeaderValue(d->request.headers, "CSeq").toInt();
 
@@ -1205,7 +1222,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
     createDataProvider();
 
     QList<QByteArray> parameters = d->requestBody.split('\n');
-    foreach(const QByteArray& parameter, parameters)
+    for(const QByteArray& parameter: parameters)
     {
         QByteArray normParam = parameter.trimmed().toLower();
         QList<QByteArray> vals = parameter.split(':');
@@ -1255,7 +1272,7 @@ int QnRtspConnectionProcessor::composeGetParameter()
 {
     Q_D(QnRtspConnectionProcessor);
     QList<QByteArray> parameters = d->requestBody.split('\n');
-    foreach(const QByteArray& parameter, parameters)
+    for(const QByteArray& parameter: parameters)
     {
         QByteArray normParamName = parameter.trimmed().toLower();
         if (normParamName == "position" || normParamName.isEmpty())

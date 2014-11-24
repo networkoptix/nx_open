@@ -1,11 +1,15 @@
 TEMPLATE = app
 CONFIG += console
+QT += xmlpatterns
 
 include($$ADDITIONAL_QT_INCLUDES/qtsingleapplication/src/qtsinglecoreapplication.pri)
 include($$ADDITIONAL_QT_INCLUDES/qtservice/src/qtservice.pri)
 
-INCLUDEPATH += ${root.dir}/appserver2/src/
+exists( ${libdir}/libcreateprocess.pri ) {
+  include(${libdir}/libcreateprocess.pri)
+}
 
+INCLUDEPATH += ${root.dir}/appserver2/src/
 
 !win32 {
   ext_debug2.target  = $(TARGET).debug

@@ -22,6 +22,7 @@
 
     <properties>
         <product.title>${mediaserver.name}</product.title>  
+        <product.display.title>${mediaserver.display.name}</product.display.title>
         <!--Global libs-->		
         <qt.libs>core network xml sql concurrent multimedia</qt.libs>
         <global.libs>-lcommon -lappserver2 -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lswresample -lpostproc -lonvif -lquazip</global.libs>
@@ -29,14 +30,72 @@
         <windows.oslibs>Ws2_32.lib DbgHelp.lib sigar.lib -lIphlpapi -lwinmm -lssleay32 -llibeay32</windows.oslibs>
         <linux.oslibs>-lmp3lame -lssl -lcrypto -lsigar -lfaac -lvpx -lvorbisenc -lvorbis</linux.oslibs>
         <linux.arm.oslibs>-lssl -lcrypto -lsigar</linux.arm.oslibs>
-        <windows.oslibs.release></windows.oslibs.release>
-        <windows.oslibs.debug></windows.oslibs.debug>                
+        <windows.oslibs.release/>
+        <windows.oslibs.debug/>                
         <mac.oslibs>-lssl -lbz2 -framework IOKit -framework CoreServices -lsigar-universal64-macosx</mac.oslibs>
         <!--Global defines-->
-        <global.defines></global.defines>
+        <global.defines/>
         <!--Specific os defines-->
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
         <linux.defines/>
         <mac.defines/>      
+
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_sdk</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+            <classifier>archive</classifier>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>  
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <id>copy-platform-libs</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/resources/static</outputDirectory>
+                            <stripVersion>true</stripVersion>
+                        </configuration>                        
+                    </execution>                            
+                </executions>
+            </plugin>         
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>copy-mediaserver-resources</id>
+                        <!-- This variable is for Android. Resources for all modules should be copied on the "generate-sources" phase. However Android should copy resources at "validate" -->
+                        <phase>${resources.phase}</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/resources/static</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>          
+                                <resource>
+                                    <directory>${root.dir}/webadmin</directory>
+                                    <filtering>true</filtering>
+                                </resource>                                                                          
+                            </resources>              
+                        </configuration>            
+                    </execution>
+                </executions>
+            </plugin>              
+        </plugins>          
+    </build>
 </project>

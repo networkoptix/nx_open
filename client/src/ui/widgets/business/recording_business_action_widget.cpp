@@ -66,12 +66,12 @@ void QnRecordingBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewMod
 
         QnBusinessActionParameters params = model->actionParams();
 
-        int quality = ui->qualityComboBox->findData((int) params.getStreamQuality());
+        int quality = ui->qualityComboBox->findData((int) params.streamQuality);
         if (quality >= 0)
             ui->qualityComboBox->setCurrentIndex(quality);
 
-        ui->fpsSpinBox->setValue(params.getFps());
-        ui->afterSpinBox->setValue(params.getRecordAfter());
+        ui->fpsSpinBox->setValue(params.fps);
+        ui->afterSpinBox->setValue(params.recordAfter);
     }
 }
 
@@ -81,8 +81,8 @@ void QnRecordingBusinessActionWidget::paramsChanged() {
 
     QnBusinessActionParameters params;
 
-    params.setFps(ui->fpsSpinBox->value());
-    params.setRecordAfter(ui->afterSpinBox->value());
-    params.setStreamQuality((Qn::StreamQuality)ui->qualityComboBox->itemData(ui->qualityComboBox->currentIndex()).toInt());
+    params.fps = ui->fpsSpinBox->value();
+    params.recordAfter = ui->afterSpinBox->value();
+    params.streamQuality = (Qn::StreamQuality)ui->qualityComboBox->itemData(ui->qualityComboBox->currentIndex()).toInt();
     model()->setActionParams(params);
 }

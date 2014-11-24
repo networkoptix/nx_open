@@ -248,7 +248,7 @@ bool QnLayoutFileStorageResource::switchToFile(const QString& oldName, const QSt
     for (QSet<QnLayoutFileStorageResource*>::Iterator itr = m_allStorages.begin(); itr != m_allStorages.end(); ++itr) 
     {
         QnLayoutFileStorageResource* storage = *itr;
-        QString storageUrl = removeProtocolPrefix(storage->getUrl());
+        QString storageUrl = storage->getPath();
         if (storageUrl == removeProtocolPrefix(newName) || storageUrl == removeProtocolPrefix(oldName))
             storage->closeOpenedFiles();
     }
@@ -265,7 +265,7 @@ bool QnLayoutFileStorageResource::switchToFile(const QString& oldName, const QSt
     for (QSet<QnLayoutFileStorageResource*>::Iterator itr = m_allStorages.begin(); itr != m_allStorages.end(); ++itr) 
     {
         QnLayoutFileStorageResource* storage = *itr;
-        QString storageUrl = removeProtocolPrefix(storage->getUrl());
+        QString storageUrl = storage->getPath();
         if (storageUrl == removeProtocolPrefix(newName)) {
             storage->setUrl(newName); // update binary offsetvalue
             storage->restoreOpenedFiles();
@@ -284,7 +284,7 @@ bool QnLayoutFileStorageResource::removeDir(const QString& url)
 {
     QDir dir(removeProtocolPrefix(url));
     QList<QFileInfo> list = dir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
-    foreach(const QFileInfo& fi, list)
+    for(const QFileInfo& fi: list)
         removeFile(fi.absoluteFilePath());
     return true;
 }
@@ -330,7 +330,7 @@ qint64 QnLayoutFileStorageResource::getFileSize(const QString& url) const
 
 bool QnLayoutFileStorageResource::isStorageAvailable()
 {
-    QString tmpDir = closeDirPath(removeProtocolPrefix(getUrl())) + QLatin1String("tmp") + QString::number(qrand());
+    QString tmpDir = closeDirPath(getPath()) + QLatin1String("tmp") + QString::number(qrand());
     QDir dir(tmpDir);
     if (dir.exists()) {
         dir.remove(tmpDir);
@@ -467,6 +467,7 @@ qint64 QnLayoutFileStorageResource::getFileOffset(const QString& fileName, qint6
 
 void QnLayoutFileStorageResource::setUrl(const QString& value)
 {
+    setId(QnUuid::createUuid());
     QnStorageResource::setUrl(value);
     if (value.endsWith(QLatin1String(".exe")) || value.endsWith(QLatin1String(".exe.tmp")))
     {

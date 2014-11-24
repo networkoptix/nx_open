@@ -122,7 +122,7 @@ int QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &resource, 
 
 int QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourceList &resources, QObject *object, const char *slot) {
     QnWorkbenchLayoutReplyProcessor *processor = new QnWorkbenchLayoutReplyProcessor(this, resources);
-    connect(processor, SIGNAL(finished(int, const QnResourceList &, int)), object, slot);
+    connect(processor, SIGNAL(finished(int, const QnResourceList &, int, const QString &)), object, slot);
     return save(resources, processor);
 }
 

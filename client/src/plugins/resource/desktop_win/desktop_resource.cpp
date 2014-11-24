@@ -8,7 +8,7 @@
 #include "plugins/resource/desktop_camera/desktop_camera_connection.h"
 
 namespace {
-    const QUuid desktopResourceUuid(lit("{B3B2235F-D279-4d28-9012-00DE1002A61D}"));
+    const QnUuid desktopResourceUuid(lit("{B3B2235F-D279-4d28-9012-00DE1002A61D}"));
 }
 
 //static QnDesktopResource* instance = 0;
@@ -16,7 +16,7 @@ namespace {
 QnDesktopResource::QnDesktopResource(QGLWidget* mainWindow): QnAbstractArchiveResource() 
 {
     m_mainWidget = mainWindow;
-    addFlags(Qn::local_live_cam);
+    addFlags(Qn::local_live_cam | Qn::desktop_camera);
 
     const QString name = lit("Desktop");
     setName(name);
@@ -115,14 +115,14 @@ void QnDesktopResource::removeConnection(QnMediaServerResourcePtr mServer)
 }
 
 static QSharedPointer<QnEmptyResourceAudioLayout> emptyAudioLayout( new QnEmptyResourceAudioLayout() );
-QnConstResourceAudioLayoutPtr QnDesktopResource::getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/)
+QnConstResourceAudioLayoutPtr QnDesktopResource::getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/) const
 {
     if (!m_desktopDataProvider)
         return emptyAudioLayout;
     return m_desktopDataProvider->getAudioLayout();
 }
 
-QUuid QnDesktopResource::getDesktopResourceUuid() {
+QnUuid QnDesktopResource::getDesktopResourceUuid() {
     return desktopResourceUuid;
 }
 

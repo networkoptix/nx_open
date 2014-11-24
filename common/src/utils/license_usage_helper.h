@@ -6,7 +6,7 @@
 
 #include <utils/common/connective.h>
 
-static const QString QN_LICENSE_URL(lit("http://networkoptix.com/nolicensed_vms/activate.php"));
+static const QString QN_LICENSE_URL(lit("http://licensing.networkoptix.com/nxlicensed/activate.php"));
 
 class QnLicenseUsageHelper: public Connective<QObject>
 {
@@ -97,12 +97,11 @@ class QnVideoWallLicenseUsageHelper: public QnLicenseUsageHelper {
 public:
     QnVideoWallLicenseUsageHelper(QObject *parent = NULL);
 
-    /** Propose to use itemsCount videowall items on the pc given for the given videowall. */
-    void propose(const QnVideoWallResourcePtr &videowall, const QUuid &pcUuid, int itemsCount);
-
     /** Propose to use some more or less licenses directly (e.g. to start control session). */
     void propose(int count);
 
+    /** Calculate how many licenses are required for the given screens count. */
+    static int licensesForScreens(int screens);
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
     virtual int calculateUsedLicenses(Qn::LicenseType licenseType) const override;
@@ -111,7 +110,7 @@ protected:
 /** Utility RAAA class to propose some licenses usage. */
 class QnVideoWallLicenseUsageProposer {
 public:
-    QnVideoWallLicenseUsageProposer(QnVideoWallLicenseUsageHelper* helper, int count);
+    QnVideoWallLicenseUsageProposer(QnVideoWallLicenseUsageHelper* helper, int screenCount, int controlSessionsCount);
     ~QnVideoWallLicenseUsageProposer();
 private:
     QPointer<QnVideoWallLicenseUsageHelper> m_helper;

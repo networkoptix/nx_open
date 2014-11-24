@@ -7,6 +7,9 @@
 #include <utils/common/model_functions.h>
 
 #include <core/resource/resource_consumer.h>
+#include <core/resource/resource.h>
+#include <core/resource/storage_resource.h>
+
 #include <core/datapacket/abstract_data_packet.h>
 #include <core/datapacket/media_data_packet.h>
 #include <core/dataprovider/media_streamdataprovider.h>
@@ -20,14 +23,28 @@
 #include "transcoding/filters/contrast_image_filter.h"
 #include "transcoding/filters/time_image_filter.h"
 #include "transcoding/filters/fisheye_image_filter.h"
+#include "transcoding/filters/rotate_image_filter.h"
+#include "transcoding/filters/crop_image_filter.h"
+#include "transcoding/filters/tiled_image_filter.h"
 
 #include "decoders/video/ffmpeg.h"
 #include "export/sign_helper.h"
+#include "transcoding/filters/scale_image_filter.h"
 
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4352;
 
 static const int STORE_QUEUE_SIZE = 50;
+
+static QRectF cwiseMul(const QRectF &l, const QSizeF &r) 
+{
+    return QRectF(
+        l.left()   * r.width(),
+        l.top()    * r.height(),
+        l.width()  * r.width(),
+        l.height() * r.height()
+        );
+}
 
 QString QnStreamRecorder::errorString(int errCode) {
     switch (errCode) {
@@ -44,6 +61,7 @@ QString QnStreamRecorder::errorString(int errCode) {
 
 QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     QnAbstractDataConsumer(STORE_QUEUE_SIZE),
+    QnResourceConsumer(dev),
     m_device(dev),
     m_firstTime(true),
     m_truncateInterval(0),
@@ -65,7 +83,6 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     m_mediaProvider(0),
     m_mdctx(EXPORT_SIGN_METHOD),
     m_container(QLatin1String("matroska")),
-    m_videoChannels(0),
     m_ioContext(0),
     m_needReopen(false),
     m_isAudioPresent(false),
@@ -73,8 +90,6 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     m_videoTranscoder(0),
     m_dstAudioCodec(CODEC_ID_NONE),
     m_dstVideoCodec(CODEC_ID_NONE),
-    m_onscreenDateOffset(0),
-    m_timestampCorner(Qn::NoCorner),
     m_serverTimeZoneMs(Qn::InvalidUtcOffset),
     m_nextIFrameTime(AV_NOPTS_VALUE),
     m_truncateIntervalEps(0),
@@ -491,11 +506,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
 
     // m_forceDefaultCtx: for server archive, if file is recreated - we need to use default context.
     // for exporting AVI files we must use original context, so need to reset "force" for exporting purpose
-    bool isTranscode = m_timestampCorner != Qn::NoCorner || 
-        (m_dstVideoCodec != CODEC_ID_NONE && m_dstVideoCodec != mediaData->compressionType) || 
-        !m_srcRect.isEmpty() ||
-        m_contrastParams.enabled ||
-        m_itemDewarpingParams.enabled;
+    bool isTranscode = !m_extraTranscodeParams.isEmpty() || (m_dstVideoCodec != CODEC_ID_NONE && m_dstVideoCodec != mediaData->compressionType);
 
     const QnConstResourceVideoLayoutPtr& layout = mediaDev->getVideoLayout(m_mediaProvider);
     QString layoutStr = QnArchiveStreamReader::serializeLayout(layout.data());
@@ -506,19 +517,20 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
         av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::StartTimeTag, fileExt), QString::number(startTime).toLatin1().data(), 0);
         av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::SoftwareTag, fileExt), "Network Optix", 0);
         QnMediaDewarpingParams mediaDewarpingParams = mediaDev->getDewarpingParams();
-        if (mediaDewarpingParams.enabled && !m_itemDewarpingParams.enabled) {
+        if (mediaDewarpingParams.enabled && !isTranscode) {
             // dewarping exists in resource and not activated now. Allow dewarping for saved file
             av_dict_set(&m_formatCtx->metadata,
                         QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::DewarpingTag, fileExt),
                         QJson::serialized<QnMediaDewarpingParams>(mediaDewarpingParams), 0);
         }
 
-        QnAviArchiveCustomData customData;
-        customData.overridenAr = m_device->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
-        av_dict_set(&m_formatCtx->metadata,
-            QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::CustomTag, fileExt),
-            QJson::serialized<QnAviArchiveCustomData>(customData), 0);
-        
+        if (!isTranscode) {
+            QnAviArchiveCustomData customData;
+            customData.overridenAr = m_device->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
+            av_dict_set(&m_formatCtx->metadata,
+                QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::CustomTag, fileExt),
+                QJson::serialized<QnAviArchiveCustomData>(customData), 0);
+        }        
 
 #ifndef SIGN_FRAME_ENABLED
         if (m_needCalcSignature) {
@@ -535,9 +547,9 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
         m_formatCtx->start_time = mediaData->timestamp;
 
 
-        m_videoChannels = isTranscode ? 1 : layout->channelCount();
+        int videoChannels = isTranscode ? 1 : layout->channelCount();
 
-        for (int i = 0; i < m_videoChannels; ++i) 
+        for (int i = 0; i < videoChannels; ++i) 
         {
             // TODO: #vasilenko avoid using deprecated methods
             AVStream* videoStream = av_new_stream(m_formatCtx, DEFAULT_VIDEO_STREAM_ID+i);
@@ -563,26 +575,10 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
                 m_videoTranscoder = new QnFfmpegVideoTranscoder(m_dstVideoCodec);
                 m_videoTranscoder->setMTMode(true);
 
-                if (m_itemDewarpingParams.enabled) {
-                    m_videoTranscoder->addFilter(new QnFisheyeImageFilter(mediaDev->getDewarpingParams(), m_itemDewarpingParams));
-                    if (m_itemDewarpingParams.panoFactor > 1)
-                    {
-                        // update image aspect, keep megapixels amount unchanged
-                        m_videoTranscoder->open(mediaData);
-                        QSize res = QnFisheyeImageFilter::getOptimalSize(m_videoTranscoder->getResolution(), m_itemDewarpingParams);
-                        m_videoTranscoder->setResolution(res);
-                    }
-                }
-                if (m_contrastParams.enabled)
-                    m_videoTranscoder->addFilter(new QnContrastImageFilter(m_contrastParams));
-                if (m_timestampCorner != Qn::NoCorner) 
-                    m_videoTranscoder->addFilter(new QnTimeImageFilter(m_timestampCorner, m_onscreenDateOffset));
-
-                m_videoTranscoder->setQuality(Qn::QualityHighest);
-                if (!m_srcRect.isEmpty() && !m_itemDewarpingParams.enabled)
-                    m_videoTranscoder->setSrcRect(m_srcRect);
-                m_videoTranscoder->setVideoLayout(layout);
                 m_videoTranscoder->open(mediaData);
+                m_videoTranscoder->setFilterList(m_extraTranscodeParams.createFilterChain(m_videoTranscoder->getResolution()));
+                m_videoTranscoder->setQuality(Qn::QualityHighest);
+                m_videoTranscoder->open(mediaData); // reopen again for new size
 
                 avcodec_copy_context(videoStream->codec, m_videoTranscoder->getCodecContext());
             }
@@ -820,11 +816,6 @@ void QnStreamRecorder::setRole(Role role)
     m_forceDefaultCtx = m_role == Role_ServerRecording || m_role == Role_FileExportWithEmptyContext;
 }
 
-void QnStreamRecorder::setTimestampCorner(Qn::Corner pos)
-{
-    m_timestampCorner = pos;
-}
-
 #ifdef SIGN_FRAME_ENABLED
 void QnStreamRecorder::setSignLogo(const QImage& logo)
 {
@@ -860,30 +851,20 @@ void QnStreamRecorder::setAudioCodec(CodecID codec)
     m_dstAudioCodec = codec;
 }
 
-void QnStreamRecorder::setOnScreenDateOffset(qint64 timeOffsetMs)
-{
-    m_onscreenDateOffset = timeOffsetMs;
-}
-
 void QnStreamRecorder::setServerTimeZoneMs(qint64 value)
 {
     m_serverTimeZoneMs = value;
 }
 
-void QnStreamRecorder::setSrcRect(const QRectF& srcRect)
+void QnStreamRecorder::disconnectFromResource()
 {
-    m_srcRect = srcRect;
+    stop();
+    QnResourceConsumer::disconnectFromResource();
 }
 
-void QnStreamRecorder::setContrastParams(const ImageCorrectionParams& params)
+void QnStreamRecorder::setExtraTranscodeParams(const QnImageFilterHelper& extraParams)
 {
-    m_contrastParams = params;
-}
-
-void QnStreamRecorder::setItemDewarpingParams(const QnItemDewarpingParams& params)
-{
-    m_itemDewarpingParams = params;
+    m_extraTranscodeParams = extraParams;
 }
 
 #endif // ENABLE_DATA_PROVIDERS
-

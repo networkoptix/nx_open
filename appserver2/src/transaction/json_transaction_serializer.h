@@ -38,7 +38,6 @@ namespace ec2
 
             QJsonObject tranObject;
             tranObject["tran"] = jsonTran;
-            tranObject["params"] = jsonParams;
             
             QByteArray* result = new QByteArray();
             QJson::serialize(tranObject, result);
@@ -53,6 +52,11 @@ namespace ec2
         QByteArray serializedTransactionWithHeader(const QnTransaction<T> &tran, const QnTransactionTransportHeader &header) {
             Q_UNUSED(header);    //header is really unused in json clients
             return serializedTransaction(tran);
+        }
+
+        QByteArray serializedTransactionWithHeader(const QByteArray &serializedTran, const QnTransactionTransportHeader &header) {
+            Q_UNUSED(header);    //header is really unused in json clients
+            return serializedTran;
         }
 
     private:

@@ -38,7 +38,7 @@ QnResourceDirectoryBrowser::QnResourceDirectoryBrowser() {
     m_resourceReady = false;
 }
 
-QnResourcePtr QnResourceDirectoryBrowser::createResource(const QUuid &resourceTypeId, const QnResourceParams& params) {
+QnResourcePtr QnResourceDirectoryBrowser::createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) {
     QnResourcePtr result;
 
     if (!isResourceTypeSupported(resourceTypeId)) {
@@ -69,7 +69,7 @@ QnResourceList QnResourceDirectoryBrowser::findResources()
     if (m_resourceReady)
         return QnResourceList();
 
-    setShouldBeUsed(false);
+    setDiscoveryMode( DiscoveryMode::disabled );
 
     QThread::Priority oldPriority = QThread::currentThread()->priority();
     QThread::currentThread()->setPriority(QThread::IdlePriority);
@@ -145,7 +145,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     QByteArray layoutData = layoutFile->readAll();
     layoutFile.reset();
     
-    QnLayoutResourcePtr layout(new QnLayoutResource());
+    QnLayoutResourcePtr layout(new QnLayoutResource(qnResTypePool));
     ec2::ApiLayoutData apiLayout;
     if (!QJson::deserialize(layoutData, &apiLayout)) {
         QnProto::Message<ec2::ApiLayoutData> apiLayoutMessage;
@@ -167,14 +167,14 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     QScopedPointer<QIODevice> uuidFile(layoutStorage.open(lit("uuid.bin"), QIODevice::ReadOnly));
     if (uuidFile) {
         QByteArray data = uuidFile->readAll();
-        layout->setId(QUuid(data.data()));
+        layout->setId(QnUuid(data.data()));
         QnLayoutResourcePtr existingLayout = qnResPool->getResourceById(layout->getId()).dynamicCast<QnLayoutResource>();
         if (existingLayout)
             return existingLayout;
 
         uuidFile.reset();
     } else {
-        layout->setId(QUuid::createUuid());
+        layout->setId(QnUuid::createUuid());
     }
 
     QScopedPointer<QIODevice> rangeFile(layoutStorage.open(lit("range.bin"), QIODevice::ReadOnly));
@@ -206,15 +206,15 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
         if (backgroundFile) {
             QByteArray data = backgroundFile->readAll();
             QnLocalFileCache cache;
-            cache.storeImage(layout->backgroundImageFilename(), data);
+            cache.storeImageData(layout->backgroundImageFilename(), data);
 
             backgroundFile.reset();
         }
     }
 
 
-    layout->setParentId(QUuid());
-    layout->setId(QUuid::createUuid());
+    layout->setParentId(QnUuid());
+    layout->setId(QnUuid::createUuid());
     layout->setName(QFileInfo(xfile).fileName());
     // No need to do so, at end of this function the author do it again. ---- DPENG
     //layout->addFlags(Qn::local);
@@ -236,7 +236,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     for (int i = 0; i < items.size(); ++i) {
         QnLayoutItemData& item = items[i];
         QString path = item.resource.path;
-        item.uuid = QUuid::createUuid();
+        item.uuid = QnUuid::createUuid();
         if (!path.endsWith(lit(".mkv")))
             item.resource.path += lit(".mkv");
         item.resource.path = QnLayoutFileStorageResource::updateNovParent(xfile,item.resource.path);

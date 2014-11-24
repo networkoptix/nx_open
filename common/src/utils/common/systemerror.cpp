@@ -59,4 +59,13 @@ namespace SystemError
     {
         return toString(getLastOSErrorCode());
     }
+
+    void setLastErrorCode( ErrorCode errorCode )
+    {
+#ifdef _WIN32
+        SetLastError( errorCode );
+#else
+        errno = errorCode;
+#endif
+    }
 }

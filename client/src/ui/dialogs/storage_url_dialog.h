@@ -33,12 +33,13 @@ public:
 
 protected:
     virtual void accept() override;
-
+private:
+    QString makeUrl(const QString& path, const QString& login, const QString& password);
 private slots:
     void updateComboBox();
 
     void at_protocolComboBox_currentIndexChanged();
-
+    QString normalizePath(QString path);
 private:
     QScopedPointer<Ui::StorageUrlDialog> ui;
     QnMediaServerResourcePtr m_server;

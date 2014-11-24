@@ -37,7 +37,7 @@ fi
 PORT_DEFAULT="7001"
 TRANSPORT_DEAULT="auto"
 PUBLIC_IP_ENABLED_DEFAULT="auto"
-SYSTEM_NAME=$COMPANY_NAME
+SYSTEM_NAME_DEFAULT=$COMPANY_NAME
 ALLOW_CAMERA_CHANGES_DEFAULT=true
 
 function is_local_addr {
@@ -110,7 +110,7 @@ function ask_for_value {
     echo $RESULT
 }
 
-function validate_adminPassword {
+function validate_appserverPassword {
     [ -n "$1" ]
 }
 
@@ -120,6 +120,22 @@ function validate_port {
 
 function validate_storage {
   [[ "$1" == /* ]]
+}
+
+function find_free_port {
+    local port=$1
+
+    while :
+    do
+        netstat -nl4t | awk '{print $4;}' | grep ":$port" > /dev/null 2>&1
+        if [ $? -ne 0 ] 
+        then
+            echo $port
+            return
+        else
+            port=$((port+10))
+        fi
+    done
 }
 
 case "$1" in
@@ -139,13 +155,13 @@ case "$1" in
 
         PORT="$($CFG_HELPER port)"
         [ -z "$PORT" ] && PORT="$($EC_CFG_HELPER port)"
-        [ -z "$PORT" ] && PORT=$PORT_DEFAULT        
+        [ -z "$PORT" ] && PORT=`find_free_port $PORT_DEFAULT`
         PORT=$(ask_for_value port "$PORT")
         $CFG_HELPER port "$PORT"
 
         if [ ! -f $DB_PATH -a ! -f $OLD_DB_PATH ]; then
-            ADMIN_PASSWORD=$(ask_for_value adminPassword "$ADMIN_PASSWORD")
-            $CFG_HELPER adminPassword "$ADMIN_PASSWORD"
+            APPSERVER_PASSWORD=$(ask_for_value appserverPassword "$APPSERVER_PASSWORD")
+            $CFG_HELPER appserverPassword "$APPSERVER_PASSWORD"
         fi
 
         TRANSPORT="$($CFG_HELPER rtspTransport)"
@@ -154,7 +170,7 @@ case "$1" in
 
         SYSTEM_NAME="$($CFG_HELPER systemName)"
         [ -z "$SYSTEM_NAME" ] && SYSTEM_NAME=$SYSTEM_NAME_DEFAULT
-        SYSTEM_NAME=$(ask_for_value systemName "$systemName")
+        SYSTEM_NAME=$(ask_for_value systemName "$SYSTEM_NAME")
         $CFG_HELPER systemName "$SYSTEM_NAME"
 
         ALLOW_CAMERA_CHANGES="$($CFG_HELPER allowCameraChanges)"

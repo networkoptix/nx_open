@@ -243,7 +243,7 @@
           <item row="1" column="0">
            <widget class="QCheckBox" name="forceRotationCheckBox">
             <property name="text">
-             <string>Force rotation to:</string>
+             <string>Default rotation:</string>
             </property>
            </widget>
           </item>
@@ -603,6 +603,11 @@
       <attribute name="title">
        <string>Advanced</string>
       </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QnCameraAdvancedSettingsWidget" name="advancedSettingsWidget" native="true"/>
+       </item>
+      </layout>
      </widget>
      <widget class="QWidget" name="expertTab">
       <attribute name="title">
@@ -622,7 +627,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QnAdvancedSettingsWidget" name="expertSettingsWidget" native="true"/>
+        <widget class="QnCameraExpertSettingsWidget" name="expertSettingsWidget" native="true"/>
        </item>
       </layout>
      </widget>
@@ -638,7 +643,7 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QnAdvancedSettingsWidget</class>
+   <class>QnCameraExpertSettingsWidget</class>
    <extends>QWidget</extends>
    <header>ui/widgets/properties/expert_settings_widget.h</header>
    <container>1</container>
@@ -658,6 +663,12 @@
    <class>QnFisheyeSettingsWidget</class>
    <extends>QWidget</extends>
    <header>ui/widgets/properties/fisheye_settings_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnCameraAdvancedSettingsWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/properties/camera_advanced_settings_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

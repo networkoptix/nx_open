@@ -19,7 +19,7 @@ template<class Base>
 class QnWorkbenchStateDependentDialog: public Base, public QnWorkbenchStateDelegate  {
     typedef Base base_type;
 public:
-    QN_FORWARD_CONSTRUCTOR(QnWorkbenchStateDependentDialog, Base, ID(COMMA QnWorkbenchStateDelegate(this->parent()) {}));
+    QN_FORWARD_CONSTRUCTOR(QnWorkbenchStateDependentDialog, Base, ID(COMMA QnWorkbenchStateDelegate(this->parent()) {}))
 
     virtual bool tryClose(bool force) override {
         base_type::reject();
@@ -27,6 +27,12 @@ public:
             base_type::hide();
         return true;
     }
+
+    /** Forcibly update dialog contents. Default behavior is - simply close dialog. */
+    virtual void forcedUpdate() override {
+        tryClose(true);
+    }
+
 };
 
 #undef ID
@@ -44,6 +50,9 @@ public:
     QnWorkbenchStateDependentButtonBoxDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
 
     virtual bool tryClose(bool force) override;
+
+    /** Forcibly update dialog contents. Default behavior is - simply close dialog. */
+    virtual void forcedUpdate() override;
 };
 
 

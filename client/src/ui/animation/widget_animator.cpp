@@ -27,8 +27,8 @@ WidgetAnimator::WidgetAnimator(QGraphicsWidget *widget, const QByteArray &geomet
     m_rotationAnimator->setTargetObject(widget);
     m_rotationAnimator->setAccessor(new PropertyAccessor(rotationPropertyName));
 
-    addAnimator(m_geometryAnimator);
     addAnimator(m_rotationAnimator);
+    addAnimator(m_geometryAnimator);
 }
 
 WidgetAnimator::~WidgetAnimator() {
@@ -43,11 +43,13 @@ void WidgetAnimator::moveTo(const QRectF &geometry, qreal rotation, const QEasin
 
     pause();
 
-    m_geometryAnimator->setTargetValue(geometry);
-    m_geometryAnimator->setEasingCurve(curve);
+    /* Rotation must be set first. It's needed to calculate item geometry according to enclosing geometry. */
 
     m_rotationAnimator->setTargetValue(rotation);
     m_rotationAnimator->setEasingCurve(curve);
+
+    m_geometryAnimator->setTargetValue(geometry);
+    m_geometryAnimator->setEasingCurve(curve);
 
     start();
 }

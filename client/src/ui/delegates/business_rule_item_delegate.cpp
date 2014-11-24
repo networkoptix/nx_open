@@ -7,11 +7,6 @@
 #include <business/business_action_parameters.h>
 #include <business/business_strings_helper.h>
 #include <business/business_resource_validation.h>
-//#include <business/events/motion_business_event.h>
-//#include <business/events/camera_input_business_event.h>
-//#include <business/actions/recording_business_action.h>
-//#include <business/actions/camera_output_business_action.h>
-//#include <business/actions/sendmail_business_action.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
@@ -95,11 +90,37 @@ QnBusinessRuleItemDelegate::~QnBusinessRuleItemDelegate() {
 
 }
 
-QSize QnBusinessRuleItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const {
-    QSize sh = base_type::sizeHint(option, index);
-    if (index.column() == QnBusiness::EventColumn || index.column() == QnBusiness::ActionColumn)
-        sh.setWidth(sh.width() * 1.5);
-    return sh;
+int QnBusinessRuleItemDelegate::optimalWidth(int column, const QFontMetrics &metrics) {   
+    const int dropDownSpacer = 40;  /* Leave some space for the drop-down indicator. */
+    switch (column) {
+    case QnBusiness::EventColumn: 
+        {
+            auto eventWidth = [metrics] (QnBusiness::EventType eventType){
+                return metrics.width(QnBusinessStringsHelper::eventName(eventType));
+            };
+            int result = -1;
+            for(QnBusiness::EventType eventType: QnBusiness::allEvents())
+                result = qMax(result, eventWidth(eventType));
+            return dropDownSpacer + result;
+        }
+    case QnBusiness::ActionColumn: 
+        {
+            auto actionWidth = [metrics](QnBusiness::ActionType actionType){
+                return metrics.width(QnBusinessStringsHelper::actionName(actionType));
+            };
+            int result = -1;
+            for(QnBusiness::ActionType actionType: QnBusiness::allActions())
+                result = qMax(result, actionWidth(actionType));
+            return dropDownSpacer + result;
+        }
+    case QnBusiness::AggregationColumn:
+        {
+            return QnAggregationWidget::optimalWidth();
+        }
+    default:
+        break;
+    }
+    return -1;
 }
 
 void QnBusinessRuleItemDelegate::initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const  {
@@ -122,7 +143,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         //TODO: #GDM #Business server selection dialog?
         connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
 
-        QnBusiness::EventType eventType = (QnBusiness::EventType)index.data(Qn::EventTypeRole).toInt();
+        QnBusiness::EventType eventType = index.data(Qn::EventTypeRole).value<QnBusiness::EventType>();
         if (eventType == QnBusiness::CameraMotionEvent)
             btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraMotionPolicy>(btn));
         else if (eventType == QnBusiness::CameraInputEvent)
@@ -132,7 +153,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
     }
     case QnBusiness::TargetColumn:
     {
-        QnBusiness::ActionType actionType = (QnBusiness::ActionType)index.data(Qn::ActionTypeRole).toInt();
+        QnBusiness::ActionType actionType = index.data(Qn::ActionTypeRole).value<QnBusiness::ActionType>();
 
         switch (actionType) {
         case QnBusiness::ShowPopupAction:
@@ -173,9 +194,8 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
     case QnBusiness::EventColumn:
     {
         QComboBox* comboBox = new QComboBox(parent);
-        for (int i = 1; i < QnBusiness::EventCount; i++) {
-            QnBusiness::EventType val = (QnBusiness::EventType) i;
-            comboBox->addItem(QnBusinessStringsHelper::eventName(val), val);
+        for (QnBusiness::EventType eventType: QnBusiness::allEvents()) {
+            comboBox->addItem(QnBusinessStringsHelper::eventName(eventType), eventType);
         }
         return comboBox;
     }
@@ -183,13 +203,10 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
     {
         bool instant = index.data(Qn::ActionIsInstantRole).toBool();
         QComboBox* comboBox = new QComboBox(parent);
-        for (int i = 1; i < QnBusiness::ActionCount; i++) {
-            QnBusiness::ActionType val = (QnBusiness::ActionType)i;
-            if (instant && QnBusiness::hasToggleState(val))
+        for (QnBusiness::ActionType actionType: QnBusiness::allActions()) {
+            if (instant && QnBusiness::hasToggleState(actionType))
                 continue;
-            if (!QnBusiness::isImplemented(val))
-                continue;
-            comboBox->addItem(QnBusinessStringsHelper::actionName(val), val);
+            comboBox->addItem(QnBusinessStringsHelper::actionName(actionType), actionType);
         }
         return comboBox;
     }
@@ -220,7 +237,7 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
     }
     case QnBusiness::TargetColumn:
     {
-        QnBusiness::ActionType actionType = (QnBusiness::ActionType)index.data(Qn::ActionTypeRole).toInt();
+        QnBusiness::ActionType actionType = index.data(Qn::ActionTypeRole).value<QnBusiness::ActionType>();
 
         switch (actionType) {
         case QnBusiness::ShowPopupAction:
@@ -259,13 +276,13 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
     }
     case QnBusiness::EventColumn:
         if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
-            comboBox->setCurrentIndex(comboBox->findData(index.data(Qn::EventTypeRole)));
+            comboBox->setCurrentIndex(comboBox->findData(index.data(Qn::EventTypeRole).value<QnBusiness::EventType>()));
             connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
         }
         return;
     case QnBusiness::ActionColumn:
         if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
-            comboBox->setCurrentIndex(comboBox->findData(index.data(Qn::ActionTypeRole)));
+            comboBox->setCurrentIndex(comboBox->findData(index.data(Qn::ActionTypeRole).value<QnBusiness::ActionType>()));
             connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
         }
         return;
@@ -295,7 +312,7 @@ void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemMode
     }
     case QnBusiness::TargetColumn:
     {
-        QnBusiness::ActionType actionType = (QnBusiness::ActionType)index.data(Qn::ActionTypeRole).toInt();
+        QnBusiness::ActionType actionType = index.data(Qn::ActionTypeRole).value<QnBusiness::ActionType>();
 
         switch (actionType) {
         case QnBusiness::ShowPopupAction:

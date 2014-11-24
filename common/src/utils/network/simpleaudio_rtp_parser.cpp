@@ -46,7 +46,7 @@ void QnSimpleAudioRtpParser::setSDPInfo(QList<QByteArray> lines)
         else if (lines[i].startsWith("a=fmtp"))
         {
             QList<QByteArray> params = lines[i].mid(lines[i].indexOf(' ')+1).split(';');
-            foreach(QByteArray param, params) 
+            for(QByteArray param: params) 
             {
                 param = param.trimmed();
                 //processStringParam("mode-set", m_mode, param);
@@ -67,10 +67,10 @@ void QnSimpleAudioRtpParser::setSDPInfo(QList<QByteArray> lines)
     m_audioLayout->setAudioTrackInfo(track);
 }
 
-bool QnSimpleAudioRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result)
+bool QnSimpleAudioRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, const RtspStatistic& statistics, bool& gotData)
 {
+    gotData = false;
     const quint8* rtpBuffer = rtpBufferBase + bufferOffset;
-    result.clear();
 
     RtpHeader* rtpHeader = (RtpHeader*) rtpBuffer;
     const quint8* curPtr = rtpBuffer + RtpHeader::RTP_HEADER_SIZE;
@@ -103,8 +103,8 @@ bool QnSimpleAudioRtpParser::processData(quint8* rtpBufferBase, int bufferOffset
         audioData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
 
     audioData->m_data.write((const char*)curPtr, end - curPtr);
-    result << audioData;
-
+    m_audioData.push_back(audioData);
+    gotData = true;
     return true;
 }
 

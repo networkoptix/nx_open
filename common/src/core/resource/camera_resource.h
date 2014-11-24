@@ -7,6 +7,7 @@
 
 #include <nx_ec/impl/ec_api_impl.h>
 #include <utils/common/model_functions_fwd.h>
+#include <utils/camera/camera_diagnostics.h>
 
 #include "security_cam_resource.h"
 
@@ -34,6 +35,7 @@ public:
     void forceDisableAudio();
     bool isForcedAudioSupported() const;
     void saveParams();
+    void saveParamsAsync();
     int saveAsync();
 public slots:
     void issueOccured();

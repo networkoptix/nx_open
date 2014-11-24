@@ -7,7 +7,10 @@
 #include <utils/math/math.h>
 
 #include <api/app_server_connection.h>
-
+#include "nx_ec/dummy_handler.h"
+#include "nx_ec/data/api_resource_data.h"
+#include "../resource_management/resource_properties.h"
+#include "param.h"
 
 static const float MAX_EPS = 0.01f;
 static const int MAX_ISSUE_CNT = 3; // max camera issues during a 1 min.
@@ -26,6 +29,20 @@ QnPhysicalCameraResource::QnPhysicalCameraResource():
 
 int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const
 {
+    float lowEnd = 0.1;
+    float hiEnd = 1.0;
+
+    float qualityFactor = lowEnd + (hiEnd - lowEnd) * (quality - Qn::QualityLowest) / (Qn::QualityHighest - Qn::QualityLowest);
+
+    float resolutionFactor = 0.009 * pow(resolution.width() * resolution.height(), (float)0.7);
+
+    float frameRateFactor = fps/1.0;
+
+    float result = qualityFactor*frameRateFactor * resolutionFactor;
+
+    return qMax(192, result);
+
+    /*
     // I assume for a Qn::QualityHighest quality 30 fps for 1080 we need 10 mbps
     // I assume for a Qn::QualityLowest quality 30 fps for 1080 we need 1 mbps
 
@@ -42,6 +59,7 @@ int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality quality, QSiz
     result *= (resolutionFactor * frameRateFactor);
 
     return qMax(192,result);
+    */
 }
 
 int QnPhysicalCameraResource::getChannel() const
@@ -127,26 +145,35 @@ void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& sup
     static const char* HLS_TRANSPORT_NAME = "hls";
     static const char* MJPEG_TRANSPORT_NAME = "mjpeg";
 
-    static const char* CAMERA_MEDIA_STREAM_LIST_PARAM_NAME = "mediaStreams";
-
     CameraMediaStreams fullStreamList( supportedNativeStreams );
-    for( CameraMediaStreamInfo& streamInfo: fullStreamList.streams )
+    for( std::vector<CameraMediaStreamInfo>::iterator
+        it = fullStreamList.streams.begin();
+        it != fullStreamList.streams.end();
+         )
     {
-        switch( streamInfo.codec )
+        if( it->resolution.isEmpty() || it->resolution == lit("0x0") )
+        {
+            it = fullStreamList.streams.erase( it );
+            continue;
+        }
+
+        switch( it->codec )
         {
             case CODEC_ID_H264:
-                streamInfo.transports.push_back( QLatin1String(RTSP_TRANSPORT_NAME) );
-                streamInfo.transports.push_back( QLatin1String(HLS_TRANSPORT_NAME) );
+                it->transports.push_back( QLatin1String(RTSP_TRANSPORT_NAME) );
+                it->transports.push_back( QLatin1String(HLS_TRANSPORT_NAME) );
                 break;
             case CODEC_ID_MPEG4:
-                streamInfo.transports.push_back( QLatin1String(RTSP_TRANSPORT_NAME) );
+                it->transports.push_back( QLatin1String(RTSP_TRANSPORT_NAME) );
                 break;
             case CODEC_ID_MJPEG:
-                streamInfo.transports.push_back( QLatin1String(MJPEG_TRANSPORT_NAME) );
+                it->transports.push_back( QLatin1String(MJPEG_TRANSPORT_NAME) );
                 break;
             default:
                 break;
         }
+
+        ++it;
     }
 
 #if !defined(EDGE_SERVER) && !defined(__arm__)
@@ -165,8 +192,8 @@ void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& sup
 #endif
 
     //saving fullStreamList;
-    const QByteArray& serializedStreams = QJson::serialized( fullStreamList );
-    setParam( QLatin1String(CAMERA_MEDIA_STREAM_LIST_PARAM_NAME), QLatin1String(serializedStreams), QnDomainDatabase );
+    QByteArray serializedStreams = QJson::serialized( fullStreamList );
+    setProperty(Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME, QString::fromUtf8(serializedStreams));
 }
 
 // --------------- QnVirtualCameraResource ----------------------
@@ -198,9 +225,7 @@ QString QnVirtualCameraResource::getUniqueId() const
 }
 
 bool QnVirtualCameraResource::isForcedAudioSupported() const {
-    QVariant val;
-    if (!getParam(lit("forcedIsAudioSupported"), val, QnDomainMemory))
-        return false;
+    QString val = getProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME);
     return val.toUInt() > 0;
 }
 
@@ -208,7 +233,7 @@ void QnVirtualCameraResource::forceEnableAudio()
 { 
 	if (isForcedAudioSupported())
         return;
-    setParam(lit("forcedIsAudioSupported"), 1, QnDomainDatabase); 
+    setProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME, 1);
     saveParams(); 
 }
 
@@ -216,28 +241,18 @@ void QnVirtualCameraResource::forceDisableAudio()
 { 
     if (!isForcedAudioSupported())
         return;
-    setParam(lit("forcedIsAudioSupported"), 0, QnDomainDatabase); 
+    setProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME, QString(lit("0")));
     saveParams(); 
 }
 
 void QnVirtualCameraResource::saveParams()
 {
-    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
-    QnKvPairList params;
+    propertyDictionary->saveParams(getId());
+}
 
-    foreach(const QnParam& param, getResourceParamList().list())
-    {
-        if (param.domain() == QnDomainDatabase)
-            params << QnKvPair(param.name(), param.value().toString());
-    }
-
-    QnKvPairListsById  outData;
-    ec2::ErrorCode rez = conn->getResourceManager()->saveSync(getId(), params, true, &outData);
-
-    if (rez != ec2::ErrorCode::ok) {
-        qCritical() << Q_FUNC_INFO << ": can't save resource params to Server. Resource physicalId: "
-            << getPhysicalId() << ". Description: " << ec2::toString(rez);
-    }
+void QnVirtualCameraResource::saveParamsAsync()
+{
+    propertyDictionary->saveParamsAsync(getId());
 }
 
 QString QnVirtualCameraResource::toSearchString() const

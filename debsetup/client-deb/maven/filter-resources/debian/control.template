@@ -14,4 +14,4 @@ Provides: ${deb.customization.company.name}-client
 Section: database
 Priority: optional
 Homepage: http://${company.url}/
-Description: ${company.name} ${product.name} Client
+Description: ${company.name} ${display.product.name} Client

@@ -3,7 +3,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QHash>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtOpenGL/QGLWidget>
 
 #include <utils/common/connective.h>
@@ -79,6 +79,18 @@ public:
      * Virtual destructor.
      */
     virtual ~QnWorkbenchDisplay();
+
+     /**
+     * \returns                         Light mode of this workbench display.
+     */
+    Qn::LightModeFlags lightMode() const;
+
+     /**
+     * \param mode                      Light mode for the current display.
+     *                                  Enables or disables certain visualization features
+     *                                  to simplify and speed up painting.
+     */
+    void setLightMode(Qn::LightModeFlags mode);
 
     /**
      * \returns                         Instrument manager owned by this workbench display. 
@@ -170,6 +182,16 @@ public:
     QnGridItem *gridItem() const;
 
     /**
+     * \returns                         Curtain item (that is painted in black when a single widget is zoomed). 
+     */
+    QnCurtainItem* curtainItem() const;
+
+    /**
+     * \returns                         Curtain item animator. 
+     */
+    QnCurtainAnimator* curtainAnimator() const;
+
+    /**
      * \returns                         Grid background item (E-Mapping).
      */
     QnGridBackgroundItem *gridBackgroundItem() const;
@@ -188,7 +210,7 @@ public:
 
     QnResourceWidget *widget(Qn::ItemRole role) const;
 
-    QnResourceWidget *widget(const QUuid &uuid) const;
+    QnResourceWidget *widget(const QnUuid &uuid) const;
 
     QList<QnResourceWidget *> widgets(const QnResourcePtr &resource) const;
 
@@ -414,6 +436,9 @@ private:
 
     /** Current view. */
     QnGraphicsView *m_view;
+
+    /** Set of flags to simplify and speed up painting. */
+    Qn::LightModeFlags m_lightMode;
 
     /** Zoomed state toggle. */
     QnToggle *m_zoomedToggle;

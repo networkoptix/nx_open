@@ -1,5 +1,75 @@
+
 #include "motion_window.h"
+
+#include <QtCore/QMutexLocker>
+
 #include "core/datapacket/media_data_packet.h"
+
+
+
+////////////////////////////////////////////////////////////
+//// QnRegion class
+////////////////////////////////////////////////////////////
+
+QnRegion::QnRegion()
+{
+}
+
+QnRegion::QnRegion(const QnRegion& right)
+:
+    QRegion()
+{
+    //making deep copy of right
+    const QVector<QRect>& _rects = right.rects();
+    setRects( _rects.constData(), _rects.size() );
+}
+
+QnRegion::QnRegion(int x, int y, int w, int h, RegionType t)
+:
+    QRegion( x, y, w, h, t )
+{
+}
+
+QnRegion::QnRegion(const QPolygon & a, Qt::FillRule fillRule)
+:
+    QRegion( a, fillRule )
+{
+}
+
+QnRegion::QnRegion(const QBitmap & bm)
+:
+    QRegion( bm )
+{
+}
+
+QnRegion::QnRegion(const QRect & r, RegionType t)
+:
+    QRegion( r, t )
+{
+}
+
+QnRegion& QnRegion::operator=( const QnRegion& r )
+{
+    if( this != &r )
+    {
+        //making deep copy of right
+        const QVector<QRect>& _rects = r.rects();
+        setRects( _rects.constData(), _rects.size() );
+    }
+    return *this;
+}
+
+QVector<QRect> QnRegion::rects() const
+{
+    QMutexLocker lk( &m_mutex );
+    return QRegion::rects();
+}
+
+
+
+////////////////////////////////////////////////////////////
+//// QnMotionRegion class
+////////////////////////////////////////////////////////////
 
 QnMotionRegion::QnMotionRegion()
 {
@@ -7,19 +77,39 @@ QnMotionRegion::QnMotionRegion()
     addRect(DEFAULT_SENSITIVITY, QRect(0,0,MD_WIDTH, MD_HEIGHT));
 }
 
+QnMotionRegion::QnMotionRegion( const QnMotionRegion& right )
+:
+    m_dirty( right.m_dirty )
+{
+    for( size_t i = 0; i < sizeof(m_data) / sizeof(*m_data); ++i )
+        m_data[i] = right.m_data[i];
+    for( size_t i = 0; i < sizeof(m_pathCache) / sizeof(*m_pathCache); ++i )
+        m_pathCache[i] = right.m_pathCache[i];
+}
+
+QnMotionRegion& QnMotionRegion::operator=( const QnMotionRegion& right )
+{
+    for( size_t i = 0; i < sizeof(m_data) / sizeof(*m_data); ++i )
+        m_data[i] = right.m_data[i];
+    for( size_t i = 0; i < sizeof(m_pathCache) / sizeof(*m_pathCache); ++i )
+        m_pathCache[i] = right.m_pathCache[i];
+    m_dirty = right.m_dirty;
+    return *this;
+}
+
 void QnMotionRegion::removeDefaultMotion()
 {
     for (int i = MIN_SENSITIVITY; i <= MAX_SENSITIVITY; ++i)
-        m_data[i] = QRegion();
+        m_data[i] = QnRegion();
      m_dirty = true;
 }
 
-QRegion QnMotionRegion::getMotionMask() const
+QnRegion QnMotionRegion::getMotionMask() const
 {
     return m_data[0];
 }
 
-QRegion QnMotionRegion::getRegionBySens(int value) const
+QnRegion QnMotionRegion::getRegionBySens(int value) const
 {
     return m_data[value];
 }
@@ -124,7 +214,7 @@ bool QnMotionRegion::updateSensitivityAt(const QPoint& pos, int newSens)
             if (sens == newSens)
                 return false;
             QVector<QRect> rects = m_data[sens].rects();
-            QRegion linkedRects;
+            QnRegion linkedRects;
             for (int i = 0; i < rects.size(); ++i)
             {
                 if (rects[i].contains(pos)) {
@@ -151,7 +241,7 @@ bool QnMotionRegion::updateSensitivityAt(const QPoint& pos, int newSens)
                     }
                 }
             }
-            m_data[sens] = QRegion();
+            m_data[sens] = QnRegion();
             for (int i = 0; i < rects.size(); ++i)
                 m_data[sens] += rects[i];
             m_data[newSens] += linkedRects;
@@ -162,7 +252,7 @@ bool QnMotionRegion::updateSensitivityAt(const QPoint& pos, int newSens)
     return false;
 }
 
-QnMotionRegion::RegionValid QnMotionRegion::isValid(int maxMotionRects, int maxMaskRects, int maxMotionSens) const
+QnMotionRegion::ErrorCode QnMotionRegion::isValid(int maxMotionRects, int maxMaskRects, int maxMotionSens) const
 {
     int count = 0;
     int sens_count = 0;
@@ -174,18 +264,18 @@ QnMotionRegion::RegionValid QnMotionRegion::isValid(int maxMotionRects, int maxM
             sens_count++;
     }
     if (maxMaskRects > 0 && getRectsBySens(0).size() > maxMaskRects)
-        return MASKS;
+        return ErrorCode::Masks;
 
     if (maxMotionSens > 0) {
         if (sens_count > maxMotionSens)
-            return SENS;
-        return VALID;
+            return ErrorCode::Sens;
+        return ErrorCode::Ok;
     }
 
     /** only if maxMotionSens == 0 */
     if(count > maxMotionRects)
-        return WINDOWS;
-    return VALID;
+        return ErrorCode::Windows;
+    return ErrorCode::Ok;
 }
 
 int QnMotionRegion::getMotionRectCount() const
@@ -217,7 +307,7 @@ int QnMotionRegion::getMotionSensCount() const
 void QnMotionRegion::updatePathCache()
 {
     for (int sens = QnMotionRegion::MIN_SENSITIVITY; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens){
-        QRegion region = m_data[sens];
+        QnRegion region = m_data[sens];
         if (sens > 0)
             region -= m_data[0];
         QPainterPath path;

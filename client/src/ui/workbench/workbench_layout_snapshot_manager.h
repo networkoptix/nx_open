@@ -6,7 +6,7 @@
 #include <nx_ec/ec_api.h>
 
 #include <core/resource/resource_fwd.h>
-#include <core/resource/layout_resource.h>
+
 #include <api/abstract_reply_processor.h>
 
 #include <client/client_globals.h>
@@ -31,7 +31,7 @@ public slots:
     void processReply( int reqID, ec2::ErrorCode errorCode );
 
 signals:
-    void finished(int status, const QnResourceList &resources, int handle);
+    void finished(int status, const QnResourceList &resources, int handle, const QString &errorString);
 
 private:
     friend class QnAbstractReplyProcessor;

@@ -25,6 +25,7 @@ public:
     virtual void putData( const QnAbstractDataPacketPtr& data ) override;
     virtual void clearUnprocessedData();
     int queueSize() const;
+    int maxQueueSize() const;
     virtual void setSingleShotMode(bool /*single*/) {}
 
     virtual void setSpeed(float /*value*/) {}

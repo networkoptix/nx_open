@@ -1,18 +1,20 @@
 #ifdef ENABLE_DLINK
 
 #include "dlink_resource.h"
-#include "../onvif/dataprovider/onvif_mjpeg.h"
+
+#include <utils/network/http/asynchttpclient.h>
+
 #include "dlink_stream_reader.h"
+#include "../onvif/dataprovider/onvif_mjpeg.h"
+
 
 const QString QnPlDlinkResource::MANUFACTURE(lit("Dlink"));
 
-
 QnDlink_cam_info::QnDlink_cam_info():
-hasMPEG4(false),
-hasFixedQuality(false),
-numberOfVideoProfiles(0)
+    hasMPEG4(false),
+    hasFixedQuality(false),
+    numberOfVideoProfiles(0)
 {
-
 }
 
 void QnDlink_cam_info::clear()
@@ -47,7 +49,7 @@ QSize QnDlink_cam_info::resolutionCloseTo(int width) const
     QSize result = resolutions.at(0);
 
 
-    foreach(const QSize& size, resolutions)
+    for(const QSize& size: resolutions)
     {
         if (size.width() <= width)
             return size;
@@ -85,7 +87,7 @@ int QnDlink_cam_info::frameRateCloseTo(int fr)
 
     int result = possibleFps.at(0);
 
-    foreach(int fps, possibleFps)
+    for(int fps: possibleFps)
     {
         if (fps <= fr)
         {
@@ -118,13 +120,55 @@ QSize QnDlink_cam_info::secondaryStreamResolution() const
 QnPlDlinkResource::QnPlDlinkResource()
 {
     setVendor(lit("Dlink"));
-    setAuth(QLatin1String("admin"), QLatin1String(""));
+    setDefaultAuth(QLatin1String("admin"), QLatin1String(""));
 }
 
-
-bool QnPlDlinkResource::isResourceAccessible()
+bool QnPlDlinkResource::checkIfOnlineAsync( std::function<void(bool)>&& completionHandler )
 {
-    return true;
+    QUrl apiUrl;
+    apiUrl.setScheme( lit("http") );
+    apiUrl.setHost( getHostAddress() );
+    apiUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
+    apiUrl.setUserName( getAuth().user() );
+    apiUrl.setPassword( getAuth().password() );
+    apiUrl.setPath( lit("/common/info.cgi") );
+
+    QString resourceMac = getMAC().toString();
+    auto requestCompletionFunc = [resourceMac, completionHandler]
+        ( SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody ) mutable
+    {
+        if( osErrorCode != SystemError::noError ||
+            statusCode != nx_http::StatusCode::ok )
+        {
+            return completionHandler( false );
+        }
+
+        //msgBody contains parameters "param1=value1" each on its line
+
+        nx_http::LineSplitter lineSplitter;
+        QnByteArrayConstRef line;
+        size_t bytesRead = 0;
+        size_t dataOffset = 0;
+        while( lineSplitter.parseByLines( nx_http::ConstBufferRefType(msgBody, dataOffset), &line, &bytesRead) )
+        {
+            dataOffset += bytesRead;
+            const int sepIndex = line.indexOf('=');
+            if( sepIndex == -1 )
+                continue;
+            if( line.mid( 0, sepIndex ) == "macaddr" )
+            {
+                QByteArray mac = line.mid( sepIndex+1 );
+                mac.replace( ':', '-' );
+                return completionHandler( mac == resourceMac.toLatin1() );
+            }
+        }
+
+        completionHandler( false );
+    };
+
+    return nx_http::downloadFileAsync(
+        apiUrl,
+        requestCompletionFunc );
 }
 
 QString QnPlDlinkResource::getDriverName() const
@@ -196,14 +240,12 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
         return CameraDiagnostics::UnknownErrorResult();
 
 
-    QMutexLocker mutexLocker(&m_mutex);
-
     QString file_s = QLatin1String(cam_info_file);
     QStringList lines = file_s.split(QLatin1String("\r\n"), QString::SkipEmptyParts);
 
     m_camInfo.clear();
 
-    foreach(QString line, lines)
+    for(const QString& line: lines)
     {
         if (line.contains(QLatin1String("videos=")))
         {
@@ -221,7 +263,7 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
         else if (line.contains(QLatin1String("resolutions=")))
         {
             QStringList vals = getValues(line);
-            foreach(const QString& val,  vals)
+            for(const QString& val:  vals)
             {
                 QStringList wh_s = val.split(QLatin1Char('x'));
                 if (wh_s.size()<2)
@@ -234,7 +276,7 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
         else if (line.contains(QLatin1String("framerates=")))
         {
             QStringList vals = getValues(line);
-            foreach(const QString& val,  vals)
+            for(const QString& val:  vals)
             {
                 m_camInfo.possibleFps.push_back( val.toInt() );
 
@@ -243,7 +285,7 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
         else if (line.contains(QLatin1String("vbitrates=")))
         {
             QStringList vals = getValues(line);
-            foreach(QString bs, vals)
+            for(const QString& bs: vals)
             {
                 bool m = bs.toLower().contains(QLatin1Char('m'));
                 bool k = bs.toLower().contains(QLatin1Char('k'));
@@ -373,7 +415,7 @@ void QnPlDlinkResource::setMotionMaskPhysical(int channel)
     };
 
     int sensitivity = 50;
-    QnMotionRegion region = m_motionMaskList[0];
+    QnMotionRegion region = getMotionRegion(0);
     for (int sens = QnMotionRegion::MIN_SENSITIVITY+1; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
     {
 

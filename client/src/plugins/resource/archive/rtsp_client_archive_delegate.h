@@ -1,7 +1,7 @@
 #ifndef __RTSP_CLIENT_ARCHIVE_DELEGATE_H
 #define __RTSP_CLIENT_ARCHIVE_DELEGATE_H
 
-
+#include <utils/common/uuid.h>
 #include <utils/network/rtpsession.h>
 #include <utils/network/ffmpeg_rtp_parser.h>
 
@@ -24,7 +24,7 @@ public:
     virtual ~QnRtspClientArchiveDelegate();
 
     void setCamera(const QnVirtualCameraResourcePtr &camera);
-    void setServer(const QnMediaServerResourcePtr &server);
+    void setFixedServer(const QnMediaServerResourcePtr &server);
 
     virtual bool open(const QnResourcePtr &resource) override;
     virtual void close() override;
@@ -59,6 +59,8 @@ public:
     void setMultiserverAllowed(bool value);
 
     void setPlayNowModeAllowed(bool value);
+
+    void checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server);
 signals:
     void dataDropped(QnArchiveStreamReader* reader);
 private:
@@ -72,7 +74,7 @@ private:
     QnMediaServerResourcePtr getNextMediaServerFromTime(const QnVirtualCameraResourcePtr &camera, qint64 time);
     QnAbstractMediaDataPtr getNextDataInternal();
     QString getUrl(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server = QnMediaServerResourcePtr()) const;
-    qint64 checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera) const;
+    void checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera);
     void setupRtspSession(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, RTPSession* session, bool usePredefinedTracks) const;
     void parseAudioSDP(const QList<QByteArray>& audioSDP);
 private:
@@ -87,6 +89,7 @@ private:
     bool m_opened;
     QnVirtualCameraResourcePtr m_camera;
     QnMediaServerResourcePtr m_server;
+    QnMediaServerResourcePtr m_fixedServer;
     //bool m_waitBOF;
     int m_lastPacketFlags;
     bool m_closing;
@@ -115,8 +118,9 @@ private:
     struct {
         QString username;
         QString password;
-        QUuid videowall;
+        QnUuid videowall;
     } m_auth;
+    mutable QMutex m_timeMutex;
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;

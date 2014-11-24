@@ -13,7 +13,7 @@ QnPlIpWebCamResourceSearcher::QnPlIpWebCamResourceSearcher()
 {
 }
 
-QnResourcePtr QnPlIpWebCamResourceSearcher::createResource(const QUuid &resourceTypeId, const QnResourceParams& params)
+QnResourcePtr QnPlIpWebCamResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;
 
@@ -154,14 +154,14 @@ QnResourceList QnPlIpWebCamResourceSearcher::findResources()
 
         QString name = QLatin1String("DroidLive");
 
-        foreach(AnDroidDev ad, alist)
+        for(AnDroidDev ad: alist)
         {
             if (ad.android)
             {
 
                 QnNetworkResourcePtr resource ( new QnPlDriodIpWebCamResource() );
 
-                QUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+                QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
                 if (rt.isNull())
                     continue;
 
@@ -178,10 +178,8 @@ QnResourceList QnPlIpWebCamResourceSearcher::findResources()
                 resource->setTypeId(rt);
                 resource->setName(name);
                 resource->setMAC(QnMacAddress(smac));
-                resource->setHostAddress(QHostAddress(ad.ip).toString(), QnDomainMemory);
+                resource->setHostAddress(QHostAddress(ad.ip).toString());
                 
-                resource->setDiscoveryAddr(QHostAddress(ad.localAddr));
-
                 result.push_back(resource);
 
 

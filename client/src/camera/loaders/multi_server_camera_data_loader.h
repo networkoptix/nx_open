@@ -28,7 +28,7 @@ private slots:
     void onLoadingFailed(int code, int handle);
 
 private:
-    int loadInternal(const QnMediaServerResourcePtr &mServer, const QnNetworkResourcePtr &networkResource, const QnTimePeriod &period, const QString &filter, const qint64 resolutionMs);
+    int loadInternal(const QnMediaServerResourcePtr &server, const QnNetworkResourcePtr &camera, const QnTimePeriod &period, const QString &filter, const qint64 resolutionMs);
 
 private:
     QMap<QString, QnAbstractCameraDataLoader *> m_cache;

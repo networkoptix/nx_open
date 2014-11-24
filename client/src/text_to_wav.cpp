@@ -6,7 +6,7 @@
 
 #include <festival.h>
 
-#include <version.h>
+#include <utils/common/app_info.h>
 #include <EST_wave_aux.h>
 
 #include "text_to_wav.h"
@@ -210,7 +210,11 @@ static void initFestival()
 {
     //initializing festival engine
     //sprintf( festivalVoxPath, "%s/festival.vox/lib/", QN_BUILDENV_PATH );
+#ifdef Q_OS_MAC
+    sprintf( festivalVoxPath, "%s/../Resources/vox/", QCoreApplication::applicationDirPath().toLatin1().constData() );
+#else
     sprintf( festivalVoxPath, "%s/vox/", QCoreApplication::applicationDirPath().toLatin1().constData() );
+#endif
     festival_libdir = festivalVoxPath;
 
     const int heap_size = 1510000;  // default scheme heap size

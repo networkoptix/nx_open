@@ -29,6 +29,26 @@
 #include <client/client_settings.h>
 #include <client/client_message_processor.h>
 
+
+class QnSortedBusinessRulesModel: public QSortFilterProxyModel {
+public:
+    explicit QnSortedBusinessRulesModel(QObject *parent = 0): QSortFilterProxyModel(parent) {}
+
+protected:
+    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override {
+
+        QnBusiness::ActionType lAction = left.data(Qn::ActionTypeRole).value<QnBusiness::ActionType>();
+        QnBusiness::ActionType rAction = right.data(Qn::ActionTypeRole).value<QnBusiness::ActionType>();
+        if (lAction != rAction)
+            return lAction < rAction;
+
+        QnBusiness::EventType lEvent = left.data(Qn::EventTypeRole).value<QnBusiness::EventType>();
+        QnBusiness::EventType rEvent = right.data(Qn::EventTypeRole).value<QnBusiness::EventType>();
+        return lEvent < rEvent;
+    }
+};
+
+
 QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     base_type(parent),
     ui(new Ui::BusinessRulesDialog()),
@@ -50,22 +70,29 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     createActions();
 
     m_rulesViewModel = new QnBusinessRulesActualModel(this);
+    /* Force column width must be set before table initializing because header options are not updated. */
+
+    QList<QnBusiness::Columns> forcedColumns;
+    forcedColumns << QnBusiness::EventColumn << QnBusiness::ActionColumn << QnBusiness::AggregationColumn;
+    for (QnBusiness::Columns column: forcedColumns) {
+        m_rulesViewModel->forceColumnMinWidth(column, QnBusinessRuleItemDelegate::optimalWidth(column, this->fontMetrics()));
+    }
 
     ui->tableView->setModel(m_rulesViewModel);
     ui->tableView->horizontalHeader()->setVisible(true);
+    ui->tableView->horizontalHeader()->setStretchLastSection(false);
 
     ui->tableView->resizeColumnsToContents();
 
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QnBusiness::EventColumn, QHeaderView::Interactive);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QnBusiness::SourceColumn, QHeaderView::Interactive);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QnBusiness::ActionColumn, QHeaderView::Interactive);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QnBusiness::TargetColumn, QHeaderView::Interactive);
-
-    ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QnBusiness::SourceColumn, QHeaderView::Stretch);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QnBusiness::TargetColumn, QHeaderView::Stretch);
+    for (QnBusiness::Columns column: forcedColumns)
+        ui->tableView->horizontalHeader()->setSectionResizeMode(column, QHeaderView::Fixed);
+    
     ui->tableView->installEventFilter(this);
 
-    ui->tableView->setItemDelegate(new QnBusinessRuleItemDelegate(this));
+    ui->tableView->setItemDelegate(new QnBusinessRuleItemDelegate(this));  
 
     connect(m_rulesViewModel, &QAbstractItemModel::dataChanged, this, &QnBusinessRulesDialog::at_model_dataChanged);
     connect(ui->tableView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &QnBusinessRulesDialog::at_tableView_currentRowChanged);
@@ -81,7 +108,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 
     //TODO: #GDM #Business show description label if no rules are loaded
 
-    connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this, &QnBusinessRulesDialog::at_saveAllButton_clicked);
+    connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this, &QnBusinessRulesDialog::saveAll);
     connect(ui->addRuleButton,                              &QPushButton::clicked, this, &QnBusinessRulesDialog::at_newRuleButton_clicked);
     connect(ui->deleteRuleButton,                           &QPushButton::clicked, this, &QnBusinessRulesDialog::at_deleteButton_clicked);
     connect(ui->advancedButton,                             &QPushButton::clicked, this, &QnBusinessRulesDialog::toggleAdvancedMode);
@@ -96,6 +123,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(ui->clearFilterButton,                          &QToolButton::clicked, this, &QnBusinessRulesDialog::at_clearFilterButton_clicked);
 
     updateFilter();  
+    updateControlButtons();
 }
 
 QnBusinessRulesDialog::~QnBusinessRulesDialog() {
@@ -155,22 +183,14 @@ void QnBusinessRulesDialog::at_beforeModelChanged() {
     updateControlButtons();
 }
 
-void QnBusinessRulesDialog::at_message_ruleDeleted(const QUuid &id) {
+void QnBusinessRulesDialog::at_message_ruleDeleted(const QnUuid &id) {
     m_pendingDeleteRules.removeOne(id); //TODO: #GDM #Business ask user
 }
 
 void QnBusinessRulesDialog::at_newRuleButton_clicked() {
     m_rulesViewModel->addRule(QnBusinessEventRulePtr());
-    ui->tableView->setCurrentIndex(m_rulesViewModel->index(m_rulesViewModel->rowCount() - 1, 0));
-    if (m_rulesViewModel->rowCount() == 1) {
-        ui->tableView->resizeColumnsToContents();
-        ui->tableView->horizontalHeader()->setStretchLastSection(true);
-        ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
-    }
-}
 
-void QnBusinessRulesDialog::at_saveAllButton_clicked() {
-    saveAll();
+    ui->tableView->setCurrentIndex(m_rulesViewModel->index(m_rulesViewModel->rowCount() - 1, 0));
 }
 
 void QnBusinessRulesDialog::at_deleteButton_clicked() {
@@ -216,9 +236,6 @@ void QnBusinessRulesDialog::at_afterModelChanged(QnBusinessRulesActualModelChang
     }
 
     if (change == RulesLoaded) {
-        ui->tableView->resizeColumnsToContents();
-        ui->tableView->horizontalHeader()->setStretchLastSection(true);
-        ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
         updateFilter();
     }
     updateControlButtons();
@@ -321,7 +338,7 @@ bool QnBusinessRulesDialog::saveAll() {
     }
 
     //TODO: #GDM #Business replace with QnAppServerReplyProcessor
-    foreach (const QUuid& id, m_pendingDeleteRules) {
+    foreach (const QnUuid& id, m_pendingDeleteRules) {
         int handle = QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->deleteRule(
             id, this, &QnBusinessRulesDialog::at_resources_deleted );
         m_deleting[handle] = id;
@@ -407,7 +424,7 @@ void QnBusinessRulesDialog::updateFilter() {
 
     filter = filter.trimmed();
     bool anyCameraPassFilter = false;
-    foreach (const QnResourcePtr camera, qnResPool->getAllCameras(QnResourcePtr()))  {
+    foreach (const QnResourcePtr camera, qnResPool->getAllCameras(QnResourcePtr(), true))  {
         anyCameraPassFilter = camera->toSearchString().contains(filter, Qt::CaseInsensitive);
         if (anyCameraPassFilter)
             break;

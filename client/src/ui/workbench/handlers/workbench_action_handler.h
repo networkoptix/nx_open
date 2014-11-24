@@ -1,6 +1,8 @@
 #ifndef QN_WORKBENCH_ACTION_HANDLER_H
 #define QN_WORKBENCH_ACTION_HANDLER_H
 
+#include <atomic>
+
 #include <QtCore/QBuffer>
 #include <QtCore/QObject>
 
@@ -23,6 +25,7 @@
 #include <ui/dialogs/camera_list_dialog.h>
 
 #include <utils/color_space/image_correction.h>
+#include "api/model/camera_list_reply.h"
 
 class QAction;
 class QMenu;
@@ -51,6 +54,8 @@ namespace detail {
     class QnResourceStatusReplyProcessor: public QObject {
         Q_OBJECT
     public:
+        std::atomic<int> awaitedResponseCount;
+
         QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnVirtualCameraResourceList &resources);
 
     public slots:
@@ -115,7 +120,7 @@ protected:
         bool usePosition;
         QPointF position;
         QRectF zoomWindow;
-        QUuid zoomUuid;
+        QnUuid zoomUuid;
         qint64 time;
         QColor frameDistinctionColor;
         qreal rotation;
@@ -125,7 +130,7 @@ protected:
         AddToLayoutParams():
             usePosition(false),
             position(QPointF()),
-            zoomUuid(QUuid()),
+            zoomUuid(QnUuid()),
             time(-1),
             rotation(0)
         {}
@@ -210,6 +215,7 @@ protected slots:
     void at_cameraListAction_triggered();
     void at_webClientAction_triggered();
     void at_systemAdministrationAction_triggered();
+    void at_systemUpdateAction_triggered();
     void at_preferencesGeneralTabAction_triggered();
     void at_preferencesLicensesTabAction_triggered();
     void at_preferencesSmtpTabAction_triggered();
@@ -243,21 +249,14 @@ protected slots:
 
     void at_setCurrentLayoutAspectRatio4x3Action_triggered();
     void at_setCurrentLayoutAspectRatio16x9Action_triggered();
+    void at_setCurrentLayoutAspectRatio3x4Action_triggered();
+    void at_setCurrentLayoutAspectRatio9x16Action_triggered();
     void at_setCurrentLayoutItemSpacing0Action_triggered();
     void at_setCurrentLayoutItemSpacing10Action_triggered();
     void at_setCurrentLayoutItemSpacing20Action_triggered();
     void at_setCurrentLayoutItemSpacing30Action_triggered();
 
     void at_createZoomWindowAction_triggered();
-
-    void at_rotate0Action_triggered();
-    void at_rotate90Action_triggered();
-    void at_rotate180Action_triggered();
-    void at_rotate270Action_triggered();
-
-    void at_radassAutoAction_triggered();
-    void at_radassLowAction_triggered();
-    void at_radassHighAction_triggered();
 
     void at_setAsBackgroundAction_triggered();
     void at_backgroundImageStored(const QString &filename, bool success);
@@ -270,7 +269,6 @@ protected slots:
     void at_panicWatcher_panicModeChanged();
     void at_scheduleWatcher_scheduleEnabledChanged();
     void at_togglePanicModeAction_toggled(bool checked);
-    void at_updateWatcher_availableUpdateChanged();
     void at_layoutCountWatcher_layoutCountChanged();
 
     void at_toggleTourAction_toggled(bool checked);
@@ -281,18 +279,17 @@ protected slots:
 
     void at_escapeHotkeyAction_triggered();
 
-    void at_clearCacheAction_triggered();
-
     void at_messageBoxAction_triggered();
 
     void at_browseUrlAction_triggered();
 
     void at_versionMismatchMessageAction_triggered();
-    void at_versionMismatchWatcher_mismatchDataChanged();
 
     void at_betaVersionMessageAction_triggered();
 
     void at_queueAppRestartAction_triggered();
+    void at_selectTimeServerAction_triggered();
+    void at_cameraListChecked(int status, const QnCameraListReply& reply, int handle);
 private:
     void notifyAboutUpdate();
 
@@ -332,6 +329,14 @@ private:
     QnStorageResourcePtr m_exportStorage;
 
     QTimer *m_tourTimer;
+    struct CameraMovingInfo 
+    {
+        CameraMovingInfo() {}
+        CameraMovingInfo(const QnVirtualCameraResourceList& cameras, const QnResourcePtr& dstServer): cameras(cameras), dstServer(dstServer) {}
+        QnVirtualCameraResourceList cameras;
+        QnResourcePtr dstServer;
+    };
+    QMap<int, CameraMovingInfo> m_awaitingMoveCameras;
 };
 
 #endif // QN_WORKBENCH_ACTION_HANDLER_H

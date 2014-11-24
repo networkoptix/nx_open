@@ -128,6 +128,32 @@ private:
     QList<QnActionCondition*> m_conditions;
 };
 
+/**
+ * Condition wich is a disjunction of two or more conditions.
+ * It acts like logical OR, e.g. an action is enabled if one of conditions in the conjunction is true.
+ * But the result (Qn::ActionVisibility) may have 3 values: [Invisible, Disabled, Enabled], so this action condition chooses
+ * the maximal value from its conjuncts.
+ */
+class QnDisjunctionActionCondition: public QnActionCondition {
+public:
+    QnDisjunctionActionCondition(const QList<QnActionCondition*> conditions, QObject *parent = NULL);
+    QnDisjunctionActionCondition(QnActionCondition *condition1, QnActionCondition *condition2, QObject *parent = NULL);
+    QnDisjunctionActionCondition(QnActionCondition *condition1, QnActionCondition *condition2, QnActionCondition *condition3, QObject *parent = NULL);
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+
+private:
+    QList<QnActionCondition*> m_conditions;
+};
+
+class QnNegativeActionCondition: public QnActionCondition {
+public:
+    QnNegativeActionCondition(QnActionCondition *condition, QObject *parent = NULL) : QnActionCondition(parent), m_condition(condition) {}
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+private:
+    QnActionCondition *m_condition;
+};
 
 /**
  * Condition for a single resource widget that checks its zoomed state.
@@ -293,6 +319,18 @@ private:
     bool m_current;
 };
 
+/**
+ * Condition for saving of a layout with a new name.
+ */
+class QnSaveLayoutAsActionCondition: public QnActionCondition {
+public:
+    QnSaveLayoutAsActionCondition(bool isCurrent, QObject *parent): QnActionCondition(parent), m_current(isCurrent) {}
+
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+
+private:
+    bool m_current;
+};
 
 /**
  * Condition based on the count of layouts that are currently open.
@@ -450,6 +488,17 @@ public:
 
 private:
     Qn::NodeType m_nodeType;
+};
+
+class QnResourceStatusActionCondition: public QnActionCondition {
+public:
+    QnResourceStatusActionCondition(Qn::ResourceStatus status, bool allResources, QObject *parent): QnActionCondition(parent), m_status(status), m_all(allResources) {}
+
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+
+private:
+    Qn::ResourceStatus m_status;
+    bool m_all;
 };
 
 class QnOpenInCurrentLayoutActionCondition: public QnActionCondition {

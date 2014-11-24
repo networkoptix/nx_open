@@ -2,7 +2,7 @@
 
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 
 #include <client/client_message_processor.h>
 
@@ -15,7 +15,7 @@
 namespace {
     const QLatin1String folder("notifications");
     const QLatin1String targetContainter("mp3");
-    const QLatin1String titleTag("Title");
+    const QLatin1String titleTag("Title");  //TODO: #GDM replace with database field
 }
 
 QnAppServerNotificationCache::QnAppServerNotificationCache(QObject *parent) :
@@ -41,7 +41,7 @@ QnNotificationSoundModel* QnAppServerNotificationCache::persistentGuiModel() con
 }
 
 bool QnAppServerNotificationCache::storeSound(const QString &filePath, int maxLengthMSecs, const QString &customTitle) {
-    QString uuid = QUuid::createUuid().toString();
+    QString uuid = QnUuid::createUuid().toString();
     QString newFilename = uuid.mid(1, uuid.size() - 2) + QLatin1String(".mp3");
 
     QString title = customTitle;
@@ -82,6 +82,7 @@ bool QnAppServerNotificationCache::updateTitle(const QString &filename, const QS
 }
 
 void QnAppServerNotificationCache::clear() {
+    base_type::clear();
     m_model->init();
 }
 

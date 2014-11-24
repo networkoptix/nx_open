@@ -1,6 +1,6 @@
-$icon-font-path: "/bower_components/sass-bootstrap/fonts/";
+$icon-font-path: "../fonts/";
 
-@import 'sass-bootstrap/lib/bootstrap';
+@import 'sass-bootstrap/lib/_variables.scss';
 
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
 
@@ -13,8 +13,7 @@ $icon-font-path: "/bower_components/sass-bootstrap/fonts/";
 
 /* Space out content a bit */
 body {
-    padding-top: 60px;
-    padding-bottom: 60px;
+    padding-bottom: 20px;
 }
 
 /* Everything but the jumbotron gets side spacing for mobile first views */
@@ -72,7 +71,7 @@ body {
 /* Responsive: Portrait tablets and up */
 @media screen and (min-width: 768px) {
     .container {
-        max-width: 730px;
+        max-width: 800px;
     }
 
     /* Remove the padding we set earlier */
@@ -158,6 +157,251 @@ body {
   display: none;
 }
 /* show active nested list */
-.bs-docs-sidebar .nav>.active>ul.nav {
+.bs-docs-sidebar .nav>.active>ul.nav,
+.bs-docs-sidebar .nav>.pinned>ul.nav {
   display: block;
+}
+
+.bs-docs-sidebar .nav>.active.pinned-hidden>ul.nav{
+  display: none !important;
+}
+
+
+.bs-docs-sidebar .nav .glyphicon:before{
+  content: "\2b";
+  font-size: 70%;
+}
+
+.bs-docs-sidebar .nav>.active .glyphicon:before,
+.bs-docs-sidebar .nav>.pinned .glyphicon:before {
+  content: "\2212";
+}
+
+.bs-docs-sidebar .nav>.active.pinned-hidden .glyphicon:before{
+  content: "\2b" !important;
+}
+
+/* Iframe with logs on info page */
+.log-frame{
+  border: none;
+  width: 100%;
+  height:300px;
+  border-radius:5px;
+}
+
+/* inactive icon for settings */
+.icon-inactive{
+  color:silver;
+}
+
+/*inplace edit styles*/
+.inplace-edit{
+  display:inline-block;
+  margin-top:-3px;
+}
+
+.read-container{
+  padding-top:7px;
+  padding-left:13px;
+  padding-bottom:7px;
+  display:inline-block;
+}
+
+.inplace-btn{
+  cursor:pointer;
+}
+
+/* show label for free storage*/
+.progress{
+  position:relative;
+  margin-bottom:0px;
+}
+.progress .progress-label{
+  position:absolute;
+  z-index:100;
+  width:100%;
+  text-align: center;
+}
+
+.progress .progress-overlay{
+  position:absolute;
+  z-index:100;
+  opacity: 0.7;
+}
+/*Column for url in storages table*/
+.url-column{
+  max-width: 200px;
+  overflow:hidden;
+  text-overflow: ellipsis;
+}
+
+
+.tc-chart-js-legend {
+  list-style-type: none;
+  padding-left: 0px;
+}
+.tc-chart-js-legend li {
+  display: block;
+  float: left;
+  clear:both;
+}
+.tc-chart-js-legend li span {
+  width:22px;
+  height:22px;
+  display:block;
+  text-align:center;
+  vertical-align: middle;
+  float:left;
+  margin-right:15px;
+}
+
+
+/* SQUARED FOUR */
+.legend-checkbox {
+  width: 20px;
+  position: relative;
+}
+.legend-checkbox input{
+  display:none;
+}
+
+.legend-checkbox label {
+  cursor: pointer;
+  color: black;
+}
+
+
+.legend-checkbox:hover label:before {
+  content: "\e013";
+  opacity: 0.5;
+}
+
+.legend-checkbox input[type=checkbox]:checked + label:before {
+  content: "\e013";
+  opacity: 1;
+}
+
+
+
+.fileinput-button {
+  position: relative;
+  overflow: hidden;
+}
+.fileinput-button input {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  opacity: 0;
+  -ms-filter: 'alpha(opacity=0)';
+  font-size: 200px;
+  direction: ltr;
+  cursor: pointer;
+}
+
+/* Fixes for IE < 8 */
+@media screen\9 {
+  .fileinput-button input {
+    filter: alpha(opacity=0);
+    font-size: 100%;
+    height: 100%;
+  }
+}
+
+
+
+.navbar-brand
+{
+  padding: 0 15px;
+  white-space: nowrap;
+  overflow:hidden;
+  text-overflow: ellipsis;
+}
+
+@media (min-width: 786px) {
+  .navbar-brand {
+    max-width: 270px;
+  }
+}
+@media (min-width: 992px) {
+
+  .navbar-brand {
+    max-width: 320px;
+  }
+}
+
+.serversList .active{
+  font-weight: bold;
+}
+
+.checkbox-wrapper{
+  display: inline-block;
+  padding:0px 0px 0px 5px;
+  width:24px;
+  height:24px;
+  border-radius: 3px;
+}
+.checkbox-wrapper input{
+  margin:0px;
+}
+
+/*
+$state-danger-text:              #b94a48 !default;
+$state-danger-bg:                #f2dede !default;
+$state-danger-border:            darken(adjust-hue($state-danger-bg, -10), 5%) !default;
+*/
+
+.has-error .checkbox-wrapper{
+  background-color: $state-danger-border;
+  border: 1px solid $state-danger-text;
+}
+
+
+.tree .active>a{
+  font-weight: bold;
+}
+.tree .offline {
+  color:silver;
+}
+
+.small .nav>li>a, .small .nav>li>.span-element{
+  padding:5px 15px;
+  display: block;
+}
+.offline {
+  color:silver;
+}
+.viewport-vertical{
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
+  width: 257px;
+  top: 0px;
+  padding-top: 60px;
+}
+
+html, body {height: 100%;}
+
+.viewport-container{
+  padding: 0px;
+}
+.tree li>a, .tree li>.span-element {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+
+.nav>li>ul>li>a,
+.nav>li>ul>li>.span-element {
+  padding-left: 30px !important;
+}
+
+.nav>li ul>li>ul>li>a,
+.nav>li ul>li>ul>li>.span-element {
+  padding-left: 50px !important;
+}
+
+span.danger{
+  color:$alert-danger-text;
 }

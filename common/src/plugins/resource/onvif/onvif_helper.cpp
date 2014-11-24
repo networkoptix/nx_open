@@ -12,63 +12,64 @@
 //const QRegExp& UNNEEDED_CHARACTERS = *new QRegExp("[\\t\\n -]+");
 const QRegExp& UNNEEDED_CHARACTERS = *new QRegExp(QLatin1String("[^\\d\\w]+"));
 
-const char* PasswordHelper::ACTI_MANUFACTURER = "acti";
-const char* PasswordHelper::ARECONT_VISION_MANUFACTURER = "arecontvision";
-const char* PasswordHelper::AVIGILON_MANUFACTURER = "avigilon";
-const char* PasswordHelper::AXIS_MANUFACTURER = "axis";
-const char* PasswordHelper::BASLER_MANUFACTURER = "basler";
-const char* PasswordHelper::BOSH_DINION_MANUFACTURER = "bosch";
-const char* PasswordHelper::BRICKCOM_MANUFACTURER = "brickcom";
-const char* PasswordHelper::CISCO_MANUFACTURER = "cisco";
-const char* PasswordHelper::DIGITALWATCHDOG_MANUFACTURER = "digitalwatchdog";
-const char* PasswordHelper::DLINK_MANUFACTURER = "dlink";
-const char* PasswordHelper::DROID_MANUFACTURER = "networkoptixdroid";
-const char* PasswordHelper::GRANDSTREAM_MANUFACTURER = "grandstream";
-const char* PasswordHelper::HIKVISION_MANUFACTURER = "hikvision";
-const char* PasswordHelper::HONEYWELL_MANUFACTURER = "honeywell";
-const char* PasswordHelper::IQINVISION_MANUFACTURER = "iqinvision";
-const char* PasswordHelper::IPX_DDK_MANUFACTURER = "ipxddk";
-const char* PasswordHelper::ISD_MANUFACTURER = "isd";
-const char* PasswordHelper::MOBOTIX_MANUFACTURER = "mobotix";
-const char* PasswordHelper::PANASONIC_MANUFACTURER = "panasonic";
-const char* PasswordHelper::PELCO_SARIX_MANUFACTURER = "pelcosarix";
-const char* PasswordHelper::PIXORD_MANUFACTURER = "pixord";
-const char* PasswordHelper::PULSE_MANUFACTURER = "pulse";
-const char* PasswordHelper::SAMSUNG_MANUFACTURER = "samsung";
-const char* PasswordHelper::SANYO_MANUFACTURER = "sanyo";
-const char* PasswordHelper::SCALLOP_MANUFACTURER = "scallop";
-const char* PasswordHelper::SONY_MANUFACTURER = "sony";
-const char* PasswordHelper::STARDOT_MANUFACTURER = "stardot";
-const char* PasswordHelper::STARVEDIA_MANUFACTURER = "starvedia";
-const char* PasswordHelper::TRENDNET_MANUFACTURER = "trendnet";
-const char* PasswordHelper::TOSHIBA_MANUFACTURER = "toshiba";
-const char* PasswordHelper::VIDEOIQ_MANUFACTURER = "videoiq";
-const char* PasswordHelper::VIVOTEK_MANUFACTURER = "vivotek";
-const char* PasswordHelper::UBIQUITI_MANUFACTURER = "ubiquiti";
-const char* PasswordHelper::CAMERA_MANUFACTURER = "camera";
+static const char* ACTI_MANUFACTURER = "acti";
+static const char* ARECONT_VISION_MANUFACTURER = "arecontvision";
+static const char* AVIGILON_MANUFACTURER = "avigilon";
+static const char* AXIS_MANUFACTURER = "axis";
+static const char* BASLER_MANUFACTURER = "basler";
+static const char* BOSH_DINION_MANUFACTURER = "bosch";
+static const char* BRICKCOM_MANUFACTURER = "brickcom";
+static const char* CISCO_MANUFACTURER = "cisco";
+static const char* DIGITALWATCHDOG_MANUFACTURER = "digitalwatchdog";
+static const char* DLINK_MANUFACTURER = "dlink";
+static const char* DROID_MANUFACTURER = "networkoptixdroid";
+static const char* GRANDSTREAM_MANUFACTURER = "grandstream";
+static const char* HIKVISION_MANUFACTURER = "hikvision";
+static const char* HONEYWELL_MANUFACTURER = "honeywell";
+static const char* IQINVISION_MANUFACTURER = "iqinvision";
+static const char* IPX_DDK_MANUFACTURER = "ipxddk";
+static const char* ISD_MANUFACTURER = "isd";
+static const char* MOBOTIX_MANUFACTURER = "mobotix";
+static const char* PANASONIC_MANUFACTURER = "panasonic";
+static const char* PELCO_SARIX_MANUFACTURER = "pelcosarix";
+static const char* PIXORD_MANUFACTURER = "pixord";
+static const char* PULSE_MANUFACTURER = "pulse";
+static const char* SAMSUNG_MANUFACTURER = "samsung";
+static const char* SANYO_MANUFACTURER = "sanyo";
+static const char* SCALLOP_MANUFACTURER = "scallop";
+static const char* SONY_MANUFACTURER = "sony";
+static const char* STARDOT_MANUFACTURER = "stardot";
+static const char* STARVEDIA_MANUFACTURER = "starvedia";
+static const char* TRENDNET_MANUFACTURER = "trendnet";
+static const char* TOSHIBA_MANUFACTURER = "toshiba";
+static const char* VIDEOIQ_MANUFACTURER = "videoiq";
+static const char* VIVOTEK_MANUFACTURER = "vivotek";
+static const char* UBIQUITI_MANUFACTURER = "ubiquiti";
+static const char* CAMERA_MANUFACTURER = "camera";
+static const char* DEFAULT_MANUFACTURER = "DEFAULT";
 
-const char* PasswordHelper::DVTEL_MANUFACTURER = "dvtel";
-const char* PasswordHelper::FLIR_MANUFACTURER = "flir";
-const char* PasswordHelper::SENTRY_MANUFACTURER = "sentry360";
+static const char* DVTEL_MANUFACTURER = "dvtel";
+static const char* FLIR_MANUFACTURER = "flir";
+static const char* SENTRY_MANUFACTURER = "sentry360";
 
-const char* ADMIN1 = "admin";
-const char* ADMIN2 = "Admin";
-const char* ADMIN3 = "administrator";
-const char* ROOT = "root";
-const char* SUPERVISOR = "supervisor";
-const char* MAIN_USER1 = "ubnt";
-const char* PASSWD1 = "123456";
-const char* PASSWD2 = "pass";
-const char* PASSWD3 = "12345";
-const char* PASSWD4 = "1234";
-const char* PASSWD5 = "system";
-const char* PASSWD6 = "meinsm";
-const char* PASSWD7 = "4321";
-const char* PASSWD8 = "1111111";
-const char* PASSWD9 = "password";
-const char* PASSWD10 = "";
-const char* PASSWD11 = "ikwd";
-const char* PASSWD_CAMERA = "camera";
+static const char* ADMIN1 = "admin";
+static const char* ADMIN2 = "Admin";
+static const char* ADMIN3 = "administrator";
+static const char* ROOT = "root";
+static const char* SUPERVISOR = "supervisor";
+static const char* MAIN_USER1 = "ubnt";
+static const char* PASSWD1 = "123456";
+static const char* PASSWD2 = "pass";
+static const char* PASSWD3 = "12345";
+static const char* PASSWD4 = "1234";
+static const char* PASSWD5 = "system";
+static const char* PASSWD6 = "meinsm";
+static const char* PASSWD7 = "4321";
+static const char* PASSWD8 = "1111111";
+static const char* PASSWD9 = "password";
+static const char* PASSWD10 = "";
+static const char* PASSWD11 = "ikwd";
+static const char* PASSWD_CAMERA = "camera";
 
 //
 // PasswordHelper
@@ -199,9 +200,16 @@ PasswordHelper::PasswordHelper()
     setPasswordInfo("vista_", "admin", "admin");
     setPasswordInfo("norbain_", "admin", "admin");
 
-    //if (cl_log.logLevel() >= cl_logDEBUG1) {
-    //    printPasswords();
-    //}
+    setPasswordInfo("canon", "root", "camera");
+
+    // default password list
+
+    setPasswordInfo(DEFAULT_MANUFACTURER, "admin", "admin");
+    setPasswordInfo(DEFAULT_MANUFACTURER, "root", "root");
+    setPasswordInfo(DEFAULT_MANUFACTURER, "root", "admin");
+    setPasswordInfo(DEFAULT_MANUFACTURER, "root", "pass");
+    setPasswordInfo(DEFAULT_MANUFACTURER, "admin", "pass");
+
 }
 
 void PasswordHelper::setPasswordInfo(const char* manufacturer, const char* login, const char* passwd)
@@ -212,7 +220,6 @@ void PasswordHelper::setPasswordInfo(const char* manufacturer, const char* login
         iter = manufacturerPasswords.insert(manufacturerStr, PasswordList());
     }
 
-    allPasswords.insert(QPair<const char*, const char*>(login, passwd));
     iter.value().insert(QPair<const char*, const char*>(login, passwd));
 }
 
@@ -234,9 +241,8 @@ const PasswordList& PasswordHelper::getPasswordsByManufacturer(const QString& ma
     ManufacturerPasswords::ConstIterator it = manufacturer.isEmpty()? manufacturerPasswords.end():
         manufacturerPasswords.find(manufacturer.toLower().replace(UNNEEDED_CHARACTERS, QString()));
 
-    if (it == manufacturerPasswords.end()) {
-        return allPasswords;
-    }
+    if (it == manufacturerPasswords.end())
+        it = manufacturerPasswords.find(QLatin1String(DEFAULT_MANUFACTURER));
 
     return it.value();
 }
@@ -342,9 +348,9 @@ NameHelper::NameHelper()
 {
     QnResourceTypePool::QnResourceTypeMap typeMap = qnResTypePool->getResourceTypeMap();
 
-    foreach(QnResourceTypePtr rt, typeMap) {
+    for(const QnResourceTypePtr& rt: typeMap) {
 
-        if (rt->getParentId().isNull())
+        if (rt->getParentId().isNull() || rt->getManufacture() == lit("OnvifDevice"))
             continue;
 
         QString normalizedManufacturer = rt->getManufacture().toLower().replace(UNNEEDED_CHARACTERS, QString());

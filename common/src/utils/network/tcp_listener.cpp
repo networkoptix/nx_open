@@ -63,7 +63,8 @@ void QnTcpListener::setAuth(const QByteArray& userName, const QByteArray& passwo
     d->authDigest = digest.toBase64();
 }
 
-QnTcpListener::QnTcpListener(const QHostAddress& address, int port, int maxConnections):
+QnTcpListener::QnTcpListener( const QHostAddress& address, int port, int maxConnections, bool useSSL )
+:
     d_ptr(new QnTcpListenerPrivate())
 {
     Q_D(QnTcpListener);
@@ -71,6 +72,7 @@ QnTcpListener::QnTcpListener(const QHostAddress& address, int port, int maxConne
     d->localPort = port;
     d->serverSocket = 0;
     d->maxConnections = maxConnections;
+    d->useSSL = useSSL;
 }
 
 QnTcpListener::~QnTcpListener()
@@ -87,7 +89,7 @@ bool QnTcpListener::bindToLocalAddress()
 {
     Q_D(QnTcpListener);
 
-    d->serverSocket = SocketFactory::createStreamServerSocket(d->useSSL);
+    d->serverSocket = SocketFactory::createStreamServerSocket(true/*d->useSSL*/);
     if( !d->serverSocket->setReuseAddrFlag( true ) ||
         !d->serverSocket->bind( SocketAddress( d->serverAddress.toString(), d->localPort ) ) ||
         !d->serverSocket->listen() )
@@ -129,7 +131,7 @@ void QnTcpListener::removeDisconnectedConnections()
         }
     }
 
-    foreach(QnLongRunnable* processor, toDeleteList)
+    for(QnLongRunnable* processor: toDeleteList)
         delete processor;
 }
 
@@ -154,6 +156,11 @@ void QnTcpListener::addOwnership(QnLongRunnable* processor)
     d->connections << processor;
 }
 
+bool QnTcpListener::isSslEnabled() const
+{
+    Q_D(const QnTcpListener);
+    return d->useSSL;
+}
 
 void QnTcpListener::pleaseStop()
 {
@@ -195,12 +202,6 @@ void QnTcpListener::updatePort(int newPort)
     d->newPort = newPort;
 }
 
-void QnTcpListener::enableSSLMode()
-{
-    Q_D(QnTcpListener);
-    d->useSSL = true;
-}
-
 void QnTcpListener::run()
 {
     Q_D(QnTcpListener);
@@ -224,15 +225,15 @@ void QnTcpListener::run()
                 NX_LOG( lit("TCPListener (%1:%2). Switching port to: %3").arg(d->serverAddress.toString()).arg(d->localPort).arg(d->newPort), cl_logWARNING );
                 removeAllConnections();
                 delete d->serverSocket;
+                int oldPort = d->localPort;
+                d->localPort = d->newPort;
+                d->newPort = 0;
                 if( !bindToLocalAddress() )
                 {
                     QThread::msleep(1000);
                     continue;
                 }
-                NX_LOG( lit("TCPListener (%1:%2). Switched to port %3").arg(d->serverAddress.toString()).arg(d->localPort).arg(d->newPort), cl_logWARNING );
-
-                d->localPort = d->newPort;
-                d->newPort = 0;
+                NX_LOG( lit("TCPListener (%1:%2). Switched to port %3").arg(d->serverAddress.toString()).arg(oldPort).arg(d->localPort), cl_logWARNING );
             }
 
             AbstractStreamSocket* clientSocket = d->serverSocket->accept();

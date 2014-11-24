@@ -88,11 +88,11 @@ namespace QnLayoutProto {
         return true;
     }
 
-    bool deserialize(const QnProtoValue &value, QUuid *target) {
+    bool deserialize(const QnProtoValue &value, QnUuid *target) {
         if(value.type() != QnProtoValue::Bytes)
             return false;
 
-        *target = QUuid(value.toBytes()); /* We don't check for error here because we don't care. */
+        *target = QnUuid(value.toBytes()); /* We don't check for error here because we don't care. */
         return true;
     }
 
@@ -226,6 +226,13 @@ namespace QnLayoutProto {
         if(!deserialize(value, &message))
             return false;
 
+        /* Initializing optional fields */
+        target->editable = false;
+        target->locked = false;
+        target->backgroundWidth = 1;
+        target->backgroundHeight = 1;
+        target->backgroundOpacity = 0.7f;
+
         for(const QnProtoRecord &record: message) {
             switch(record.index()) {
             case Resource::NameField:
@@ -255,11 +262,20 @@ namespace QnLayoutProto {
                         if(!deserialize(record.value(), &target->verticalSpacing))
                             return false;
                         break;
-                    case Layout::ItemField: 
-                        target->items.push_back(ec2::ApiLayoutItemData());
-                        if(!deserialize(record.value(), &target->items.back()))
+                    case Layout::ItemField: {
+                        ec2::ApiLayoutItemData item;
+
+                        /* Initializing optional fields. */
+                        item.zoomLeft = 0.0;
+                        item.zoomTop  = 0.0;
+                        item.zoomRight = 0.0;
+                        item.zoomBottom = 0.0;
+                        if(!deserialize(record.value(), &item))
                             return false;
+
+                        target->items.push_back(item);
                         break;
+                                            }
                     case Layout::UserCanEditField:
                         if(!deserialize(record.value(), &target->editable))
                             return false;

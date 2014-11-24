@@ -1,7 +1,7 @@
 [Desktop Entry]
-Name=${product.name}
-Comment=${product.name} Client
-Exec=/opt/${deb.customization.company.name}/client/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}/bin/applauncher
+Name=${display.product.name}
+Comment=${display.product.name} Client
+Exec=/opt/${deb.customization.company.name}/client/${release.version}.${buildNumber}/bin/applauncher
 Icon=vmsclient-${customization}.png
 Terminal=false
 Type=Application

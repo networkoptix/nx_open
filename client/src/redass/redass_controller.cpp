@@ -301,7 +301,7 @@ void QnRedAssController::onTimer()
         // switch LQ->HQ for LIVE here
         if (display->isRealTimeSource() && display->getArchiveReader()->getQuality() == MEDIA_Quality_Low &&   // LQ live stream
             qnSyncTime->currentMSecsSinceEpoch() - m_redAssInfo[display].lqTime > QUALITY_SWITCH_INTERVAL &&  // no drop report several last seconds
-            display->queueSize() < 2 && // there are no a lot of packets in the queue (it is possible if CPU slow)
+            display->queueSize() <= display->maxQueueSize()/2 && // there are no a lot of packets in the queue (it is possible if CPU slow)
             m_lastSwitchTimer.elapsed() >= QUALITY_SWITCH_INTERVAL && // no recently slow report by any camera
             !isSmallItem2(display))  // is big enough item for HQ
         {

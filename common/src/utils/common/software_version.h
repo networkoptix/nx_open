@@ -21,16 +21,9 @@ public:
         MinorFormat = 2
     };
 
-    QnSoftwareVersion() { 
-        m_data[0] = m_data[1] = m_data[2] = m_data[3] = 0;
-    }
+    QnSoftwareVersion();
 
-    QnSoftwareVersion(int major, int minor, int bugfix, int build) {
-        m_data[0] = major;
-        m_data[1] = minor;
-        m_data[2] = bugfix;
-        m_data[3] = build;
-    }
+    QnSoftwareVersion(int major, int minor, int bugfix = 0, int build = 0);
 
     /**
      * Creates a software version object from a string. Note that this function
@@ -38,23 +31,13 @@ public:
      * 
      * \param versionString             Version string.
      */
-    explicit QnSoftwareVersion(const QString &versionString) {
-        deserialize(versionString, this);
-    }
-
-    explicit QnSoftwareVersion(const char *versionString) {
-        deserialize(QString(QLatin1String(versionString)), this);
-    }
-
-    explicit QnSoftwareVersion(const QByteArray &versionString) {
-        deserialize(QString(QLatin1String(versionString.constData())), this);
-    }
+    explicit QnSoftwareVersion(const QString &versionString);
+    explicit QnSoftwareVersion(const char *versionString);
+    explicit QnSoftwareVersion(const QByteArray &versionString);
 
     QString toString(Format format = FullFormat) const;
 
-    bool isNull() const {
-        return m_data[0] == 0 && m_data[1] == 0 && m_data[2] == 0 && m_data[3] == 0;
-    }
+    bool isNull() const;
 
     int major() const {
         return m_data[0];
@@ -79,7 +62,7 @@ public:
     friend bool operator<(const QnSoftwareVersion &l, const QnSoftwareVersion &r);
     friend bool operator==(const QnSoftwareVersion &l, const QnSoftwareVersion &r);
 
-    QN_FUSION_DECLARE_FUNCTIONS(QnSoftwareVersion, (ubjson)(xml)(json)(lexical)(binary)(datastream)(csv_field), friend)
+    QN_FUSION_DECLARE_FUNCTIONS(QnSoftwareVersion, (ubjson)(xml)(json)(lexical)(datastream)(csv_field), friend)
 
 private:
     std::array<int, 4> m_data;

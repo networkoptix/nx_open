@@ -1,33 +1,33 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <WixLocalization Culture="zh-CN" xmlns="http://schemas.microsoft.com/wix/2006/localization">
-    <String Id="AdvancedWelcomeEulaDlg_Title"                       Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
-    <String Id="BrowseDlg_Title"                                    Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
-    <String Id="CancelDlg_Title"                                    Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
-    <String Id="CustomizeDlg_Title"                                 Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
-    <String Id="DiskCostDlg_Title"                                  Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
-    <String Id="ErrorDlg_Title"                                     Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
-    <String Id="ExitDialog_Title"                                   Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
-    <String Id="FatalError_Title"                                   Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
-    <String Id="FeaturesDlg_Title"                                  Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
-    <String Id="FilesInUse_Title"                                   Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
-    <String Id="InstallDirDlg_Title"                                Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
-    <String Id="InstallScopeDlg_Title"                              Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
-    <String Id="InvalidDirDlg_Title"                                Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
-    <String Id="LicenseAgreementDlg_Title"                          Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
-    <String Id="MaintenanceTypeDlg_Title"                           Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
-    <String Id="MaintenanceWelcomeDlg_Title"                        Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
-    <String Id="MsiRMFilesInUse_Title"                              Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
-    <String Id="OutOfDiskDlg_Title"                                 Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
-    <String Id="OutOfRbDiskDlg_Title"                               Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
-    <String Id="PrepareDlg_Title"                                   Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
-    <String Id="ProgressDlg_Title"                                  Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
-    <String Id="ResumeDlg_Title"                                    Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
-    <String Id="SetupTypeDlg_Title"                                 Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
-    <String Id="UserExit_Title"                                     Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
-    <String Id="VerifyReadyDlg_Title"                               Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
-    <String Id="WaitForCostingDlg_Title"                            Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
-    <String Id="WelcomeDlg_Title"                                   Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
-    <String Id="WelcomeEulaDlg_Title"                               Overridable="yes">${company.name} ${product.name} 安装 v.${release.version}</String>
+    <String Id="AdvancedWelcomeEulaDlg_Title"                       Overridable="yes">${product.title}</String>
+    <String Id="BrowseDlg_Title"                                    Overridable="yes">${product.title}</String>
+    <String Id="CancelDlg_Title"                                    Overridable="yes">${product.title}</String>
+    <String Id="CustomizeDlg_Title"                                 Overridable="yes">${product.title}</String>
+    <String Id="DiskCostDlg_Title"                                  Overridable="yes">${product.title}</String>
+    <String Id="ErrorDlg_Title"                                     Overridable="yes">${product.title}</String>
+    <String Id="ExitDialog_Title"                                   Overridable="yes">${product.title}</String>
+    <String Id="FatalError_Title"                                   Overridable="yes">${product.title}</String>
+    <String Id="FeaturesDlg_Title"                                  Overridable="yes">${product.title}</String>
+    <String Id="FilesInUse_Title"                                   Overridable="yes">${product.title}</String>
+    <String Id="InstallDirDlg_Title"                                Overridable="yes">${product.title}</String>
+    <String Id="InstallScopeDlg_Title"                              Overridable="yes">${product.title}</String>
+    <String Id="InvalidDirDlg_Title"                                Overridable="yes">${product.title}</String>
+    <String Id="LicenseAgreementDlg_Title"                          Overridable="yes">${product.title}</String>
+    <String Id="MaintenanceTypeDlg_Title"                           Overridable="yes">${product.title}</String>
+    <String Id="MaintenanceWelcomeDlg_Title"                        Overridable="yes">${product.title}</String>
+    <String Id="MsiRMFilesInUse_Title"                              Overridable="yes">${product.title}</String>
+    <String Id="OutOfDiskDlg_Title"                                 Overridable="yes">${product.title}</String>
+    <String Id="OutOfRbDiskDlg_Title"                               Overridable="yes">${product.title}</String>
+    <String Id="PrepareDlg_Title"                                   Overridable="yes">${product.title}</String>
+    <String Id="ProgressDlg_Title"                                  Overridable="yes">${product.title}</String>
+    <String Id="ResumeDlg_Title"                                    Overridable="yes">${product.title}</String>
+    <String Id="SetupTypeDlg_Title"                                 Overridable="yes">${product.title}</String>
+    <String Id="UserExit_Title"                                     Overridable="yes">${product.title}</String>
+    <String Id="VerifyReadyDlg_Title"                               Overridable="yes">${product.title}</String>
+    <String Id="WaitForCostingDlg_Title"                            Overridable="yes">${product.title}</String>
+    <String Id="WelcomeDlg_Title"                                   Overridable="yes">${product.title}</String>
+    <String Id="WelcomeEulaDlg_Title"                               Overridable="yes">${product.title}</String>
 
     <!-- Standard Strings (Common Buttons, Labels etc) -->
     <String Id="StdString_Ok"                                       Overridable="yes">确定</String>
@@ -46,11 +46,11 @@
     <String Id="AppServerDlg_Network"                               Overridable="yes">网络配置</String>    
     <String Id="AppServerDlg_ProxyPort"                             Overridable="yes">代理端口</String>
     <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">确认密码</String>   
-    <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">额外的参数</String>   
+    <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">系统优化设置</String>   
     <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">允许系统以优化相机设置（推荐）</String>     
 
     <!-- Associations -->
-    <String Id="Associations_PlayWith"                              Overridable="yes">运行 ${product.name}</String>
+    <String Id="Associations_PlayWith"                              Overridable="yes">运行 ${display.product.name}</String>
 
     <!-- ClientDlg -->
     <String Id="ClientDlg_Shortcut"                                 Overridable="yes">快捷方式</String>
@@ -65,7 +65,9 @@
     <String Id="EmptyPasswordDlg_Warning"                           Overridable="yes">警告</String>     
 
     <!-- InstallTypeDlg -->
+    <String Id="InstallTypeDlg_Full"                                Overridable="yes">快速全部安装 (安装所有组件)</String>    
     <String Id="InstallTypeDlg_QuickFull"                           Overridable="yes">快速全部安装 (安装所有组件)</String>
+    <String Id="InstallTypeDlg_ServerOnly"                          Overridable="yes">服务器</String>    
     <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">安装客户端(可以使用客户端访问视频和录像)</String>
     <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">高级安装</String>
     <String Id="InstallTypeDlg_SelectInstallType"                   Overridable="yes">请选择安装方式</String>
@@ -85,16 +87,18 @@
     <String Id="MediaServerDlg_AppserverPort"                       Overridable="yes">端口</String>
     <String Id="MediaServerDlg_Login"                               Overridable="yes">用户名</String>
     <String Id="MediaServerDlg_Password"                            Overridable="yes">密码</String>  
+    <String Id="MediaServerDlg_PasswordConfirm"                     Overridable="yes">确认密码</String>          
     <String Id="MediaServerDlg_MediaserverPort"                     Overridable="yes">媒体服务器端口</String>
     <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">系统控制器</String>
     <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">媒体服务器配置</String>
     <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">媒体服务器</String>  
+    <String Id="MediaServerDlg_SystemName"                          Overridable="yes">系统名称</String>      
 
     <!-- MyExitDialog -->
 
     <!-- MyFeaturesDlg -->
     <String Id="MyFeaturesDlg_Components"                           Overridable="yes">组件</String>
-    <String Id="MyFeaturesDlg_Client"                               Overridable="yes">${client.name} (客户端，可以使用它访问视频和录像)</String>
+    <String Id="MyFeaturesDlg_Client"                               Overridable="yes">${client.display.name} (客户端，可以使用它访问视频和录像)</String>
     <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (媒体存储服务，可以使用它在进行本地录像)</String>
     <String Id="MyFeaturesDlg_EnterpriseController"                 Overridable="yes">${appserver.name} (数据管理控制服务. 在一个网络中只能安装一个控制服务)</String>    
 
@@ -122,7 +126,7 @@
     <String Id="PortIsBusyDlg_PortOccupiedMessage"                  Overridable="yes">设置的端口已经被占用，请设置正确的端口。</String>    
 
     <!-- Product -->
-    <String Id="Product_LaunchClient"                               Overridable="yes">当 ${product.name} 安装成后自动运行.</String>    
+    <String Id="Product_LaunchClient"                               Overridable="yes">当 ${display.product.name} 安装成后自动运行.</String>    
     <String Id="Product_ArchMismatch"                               Overridable="yes">这个包是专为32位操作系统.安装程序将无法继续.</String>	
 
     <!-- SelectionWarningDlg -->
@@ -130,8 +134,8 @@
 
     <!-- UninstallOptionsDlg -->
     <String Id="UninstallOptionsDlg_UninstallOptions"               Overridable="yes">卸载选项</String>
-    <String Id="UninstallOptionsDlg_KeepDatabase"                   Overridable="yes">保留 ${product.name} 数据库</String>
-    <String Id="UninstallOptionsDlg_RemoveDatabase"                 Overridable="yes">移除 ${product.name} 数据库</String>
+    <String Id="UninstallOptionsDlg_KeepDatabase"                   Overridable="yes">保留 ${display.product.name} 数据库</String>
+    <String Id="UninstallOptionsDlg_RemoveDatabase"                 Overridable="yes">移除 ${display.product.name} 数据库</String>
     <String Id="UninstallOptionsDlg_Current"                        Overridable="yes">当前版本</String>  
     <String Id="UninstallOptionsDlgVersionToKeep"                   Overridable="yes">已安装版本:</String>   
     

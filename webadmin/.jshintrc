@@ -17,8 +17,14 @@
   "unused": true,
   "strict": true,
   "trailing": true,
-  "smarttabs": true,
+  "smarttabs": false,
   "globals": {
-    "angular": false
+    "angular": false,
+    "$": false,
+    "jQuery": false,
+    "_": false,
+      "Config":true,
+      "alert":false,
+      "confirm":false
   }
 }

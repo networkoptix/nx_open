@@ -18,24 +18,34 @@ public:
     virtual void reject() override;
     virtual void accept() override;
 
-    virtual void loadData();
-    virtual void submitData();
-
+    void forcedUpdate();
     bool tryClose(bool force);
 protected:
     void addPage(int key, QnAbstractPreferencesWidget *page, const QString &title);
 
-    void setTabWidget(QTabWidget *tabWidget);
+    virtual void loadData();
+    virtual void submitData();
 
-    virtual bool confirm() const;
-    virtual bool discard() const;
+    virtual bool confirm();
+    virtual bool discard();
 
     virtual bool hasChanges() const;
 
 private:
     void initializeTabWidget();
+
+    void setTabWidget(QTabWidget *tabWidget);
 private:
-    QMap<int, QnAbstractPreferencesWidget*> m_pages;
+    struct Page {
+        int key;
+        QString title;
+        QnAbstractPreferencesWidget* widget;
+    };
+
+    QList<Page> modifiedPages() const;
+
+
+    QList<Page> m_pages;
     QPointer<QTabWidget> m_tabWidget;
 
 };

@@ -25,11 +25,16 @@ protected:
 
     bool connected() const;
 
-    bool connectToServer(const QUrl &appServerUrl);
+    ec2::ErrorCode connectToServer(const QUrl &appServerUrl, bool silent = false);
     bool disconnectFromServer(bool force);
 
     void hideMessageBox();
     void showLoginDialog();
+
+    bool tryToRestoreConnection();
+
+    /** Clear all local data structures. */
+    void clearConnection();
 private:
     void at_messageProcessor_connectionOpened();
     void at_messageProcessor_connectionClosed();
@@ -43,6 +48,9 @@ private:
     QnGraphicsMessageBox* m_connectingMessageBox;
     QPointer<QnLoginDialog> m_loginDialog;
     int m_connectingHandle;
+
+    /** Flag that we should handle new connection. */
+    bool m_readyForConnection;
 };
 
 #endif // WORKBENCH_CONNECT_HANDLER_H

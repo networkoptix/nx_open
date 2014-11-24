@@ -20,6 +20,7 @@
 #include <QtCore/QtGlobal>
 #include <QtCore/QDateTime>
 #include <QtCore/QDebug>
+#include "core/resource/resource.h"
 
 
 namespace {
@@ -121,8 +122,8 @@ int soap_wsse_add_PlainTextAuth(struct soap *soap, const char *id, const char *u
 
 
 
-const int SOAP_RECEIVE_TIMEOUT = 30; // "+" in seconds, "-" in mseconds
-const int SOAP_SEND_TIMEOUT = 30; // "+" in seconds, "-" in mseconds
+const int SOAP_RECEIVE_TIMEOUT = 10; // "+" in seconds, "-" in mseconds
+const int SOAP_SEND_TIMEOUT = 10; // "+" in seconds, "-" in mseconds
 const int SOAP_CONNECT_TIMEOUT = 5; // "+" in seconds, "-" in mseconds
 const int SOAP_ACCEPT_TIMEOUT = 5; // "+" in seconds, "-" in mseconds
 const QLatin1String DEFAULT_ONVIF_LOGIN = QLatin1String("admin");
@@ -290,13 +291,20 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer)
     QString passwd;
     int soapRes = SOAP_OK;
     do {
-        NX_LOG( QString::fromLatin1("Trying login = %1 password = %2)").arg(login).arg(passwd), cl_logDEBUG2 );
+        if (QnResource::isStopping())
+            return false;
+
+        QTime timer;
+        timer.restart();
+
         setLogin(login);
         setPassword(passwd);
 
         NetIfacesReq request1;
         NetIfacesResp response1;
         soapRes = getNetworkInterfaces(request1, response1);
+
+        NX_LOG( QString::fromLatin1("Trying login = '%1' password = '%2'. url=%3. time = %4)").arg(login).arg(passwd).arg(getEndpointUrl()).arg(timer.elapsed()), cl_logDEBUG2 );
 
         if (soapRes == SOAP_OK || !isNotAuthenticated()) {
             NX_LOG( lit("Finished picking password"), cl_logDEBUG2 );

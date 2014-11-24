@@ -51,7 +51,8 @@ public:
 
     QnPlDlinkResource();
 
-    virtual bool isResourceAccessible();
+    //!Implementation of QnNetworkResource::checkIfOnlineAsync
+    virtual bool checkIfOnlineAsync( std::function<void(bool)>&& completionHandler ) override;
 
     virtual QString getDriverName() const override;
 

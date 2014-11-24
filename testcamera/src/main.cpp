@@ -7,9 +7,13 @@
 #include "camera_pool.h"
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
 #include "common/common_module.h"
+#include "utils/common/synctime.h"
+#include "core/resource_management/status_dictionary.h"
+#include "core/resource/resource_fwd.h"
+#include "core/resource/camera_user_attribute_pool.h"
+#include "api/global_settings.h"
+#include "core/resource_management/resource_properties.h"
 
-
-QSettings qSettings;	//TODO/FIXME remove this shit. Have to add to build common as shared object, since it requires extern qSettibns to be defined somewhere...
 
 QString doUnquote(const QString& fileName)
 {
@@ -42,6 +46,7 @@ int main(int argc, char *argv[])
     QCoreApplication app(argc, argv);
 
     QnCommonModule common(argc, argv);
+    QnSyncTime syncTime;
 
     new QnLongRunnablePool();
 
@@ -87,7 +92,9 @@ int main(int argc, char *argv[])
 
     QnCameraPool::initGlobalInstance( new QnCameraPool( localInterfacesToListen ) );
     QnCameraPool::instance()->start();
-
+    QnResourceStatusDiscionary statusDictionary;
+	QnResourcePropertyDictionary dictionary;
+	std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
     for (int i = 1; i < argc; ++i)
     {
         QString param = argv[i];

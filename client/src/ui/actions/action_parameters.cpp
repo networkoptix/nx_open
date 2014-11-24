@@ -1,5 +1,6 @@
 #include "action_parameters.h"
 
+#include <core/resource/resource.h>
 #include <core/resource/layout_item_index.h>
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_matrix_index.h>

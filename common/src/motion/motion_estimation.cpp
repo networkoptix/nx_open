@@ -594,7 +594,7 @@ void getFrame_avgY_array_x_x_mc(const CLVideoDecoderOutput* frame, quint8* dst, 
 }
 
 
-QnMotionEstimation::QnMotionEstimation()
+QnMotionEstimation::QnMotionEstimation(): m_channelNum(0)
 {
     m_decoder = 0;
     //m_outFrame.setUseExternalData(false);
@@ -1038,6 +1038,8 @@ bool QnMotionEstimation::analizeFrame(const QnCompressedVideoDataPtr& videoData)
 
     if (!m_decoder->decode(videoData, &m_frames[idx]))
         return false;
+    if (m_frames[idx]->width <= 8 || m_frames[idx]->height <= 8)
+        return false;
     m_videoResolution.setWidth( m_frames[idx]->width );
     m_videoResolution.setHeight( m_frames[idx]->height );
     if (m_firstFrameTime == qint64(AV_NOPTS_VALUE))
@@ -1059,9 +1061,9 @@ bool QnMotionEstimation::analizeFrame(const QnCompressedVideoDataPtr& videoData)
     //    fillFrameRect(m_frames[idx], QRect(QPoint(0, m_frames[idx]->height/2), QPoint(m_frames[idx]->width, m_frames[idx]->height)), 40);
 #endif
 
-    if (m_decoder->getWidth() != m_lastImgWidth || m_decoder->getHeight() != m_lastImgHeight || m_isNewMask)
+    if (m_frames[idx]->width != m_lastImgWidth || m_frames[idx]->height != m_lastImgHeight || m_isNewMask)
 	{
-        reallocateMask(m_decoder->getWidth(), m_decoder->getHeight());
+        reallocateMask(m_frames[idx]->width, m_frames[idx]->height);
 		m_scaleXStep = m_lastImgWidth * 65536 / MD_WIDTH;
 		m_scaleYStep = m_lastImgHeight * 65536 / MD_HEIGHT;
 	};
@@ -1163,7 +1165,7 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
     //rez->timestamp = m_firstFrameTime == AV_NOPTS_VALUE ? qnSyncTime->currentMSecsSinceEpoch()*1000 : m_firstFrameTime;
     //rez->timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
     rez->timestamp = m_lastFrameTime == (qint64)AV_NOPTS_VALUE ? qnSyncTime->currentMSecsSinceEpoch()*1000 : m_lastFrameTime;
-
+    rez->channelNumber = m_channelNum;
     rez->m_duration = 1000*1000*1000; // 1000 sec ;
     if (m_decoder == 0)
         return rez;
@@ -1248,7 +1250,7 @@ void QnMotionEstimation::setMotionMask(const QnMotionRegion& region)
     memset(m_motionMask, 255, MD_WIDTH * MD_HEIGHT);
     for (int sens = QnMotionRegion::MIN_SENSITIVITY; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
     {
-        foreach(const QRect& rect, region.getRectsBySens(sens))
+        for(const QRect& rect: region.getRectsBySens(sens))
         {
             for (int y = rect.top(); y <= rect.bottom(); ++y)
             {
@@ -1262,6 +1264,11 @@ void QnMotionEstimation::setMotionMask(const QnMotionRegion& region)
         }
     }
     m_lastImgWidth = m_lastImgHeight = 0;
+}
+
+void QnMotionEstimation::setChannelNum(int value)
+{
+    m_channelNum = value;
 }
 
 #endif //ENABLE_SOFTWARE_MOTION_DETECTION

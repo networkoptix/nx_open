@@ -25,7 +25,7 @@ void QnClientPullMediaStreamProvider::run()
 {
     initSystemThreadId();
     setPriority(QThread::HighPriority);
-    NX_LOG("stream reader started", cl_logDEBUG1);
+    NX_LOG("stream reader started", cl_logDEBUG2);
 
     int numberOfChnnels = 1;
 
@@ -52,7 +52,8 @@ void QnClientPullMediaStreamProvider::run()
         }
 
 
-        if (getResource()->hasUnprocessedCommands()) // if command processor has something in the queue for this resource let it go first
+        if (getResource()->hasUnprocessedCommands() || // if command processor has something in the queue for this resource let it go first
+            !m_resource->isInitialized())
         {
             QnSleep::msleep(5);
             continue;
@@ -62,9 +63,6 @@ void QnClientPullMediaStreamProvider::run()
 
         if (data==0)
         {
-            if (needToStop())
-                continue;
-
             setNeedKeyData();
             mFramesLost++;
             m_stat[0].onData(0);
@@ -78,15 +76,8 @@ void QnClientPullMediaStreamProvider::run()
                 m_stat[0].onLostConnection();
             }
 
-            /*
-            if (getResource()->getStatus() == Qn::Offline) {
-                for (int i = 0; i < 100 && !m_needStop; ++i)
-                    QnSleep::msleep(10);
-            }
-            else */
-            {
+            if (!needToStop())
                 QnSleep::msleep(30);
-            }
 
             continue;
         }
@@ -162,7 +153,7 @@ void QnClientPullMediaStreamProvider::run()
 
     afterRun();
 
-    NX_LOG("stream reader stopped", cl_logDEBUG1);
+    NX_LOG("stream reader stopped", cl_logDEBUG2);
 }
 
 void QnClientPullMediaStreamProvider::beforeRun()

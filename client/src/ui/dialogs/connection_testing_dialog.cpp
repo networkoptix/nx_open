@@ -17,15 +17,20 @@
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
 
+#include <common/common_module.h>
+
 #include <client/client_settings.h>
+
+#include <nx_ec/ec_proto_version.h>
 
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 
+#include <utils/common/app_info.h>
 #include <utils/common/warnings.h>
 
-#include "version.h"
 #include "compatibility.h"
+
 
 QnConnectionTestingDialog::QnConnectionTestingDialog( QWidget *parent) :
     QnButtonBoxDialog(parent),
@@ -88,15 +93,16 @@ void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode
     else
         compatibilityChecker = &localChecker;
 
+    //TODO #GDM almost same code exists in QnConnectionDiagnosticsHelper::validateConnection
 
     bool success = true;
     QString detail;
     int helpTopicId = -1;
 
     bool compatibleProduct = qnSettings->isDevMode() || connectionInfo.brand.isEmpty()
-            || connectionInfo.brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
+            || connectionInfo.brand == QnAppInfo::productNameShort();
 
-    if (errorCode == ec2::ErrorCode::unauthorized) {
+     if (errorCode == ec2::ErrorCode::unauthorized) {
         success = false;
         detail = tr("Login or password you have entered are incorrect, please try again.");
         helpTopicId = Qn::Login_Help;
@@ -110,7 +116,7 @@ void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode
         success = false;
         detail = tr("You are trying to connect to incompatible Server.");
         helpTopicId = Qn::Login_Help;
-    } else if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectionInfo.version)) {
+    } else if (!compatibilityChecker->isCompatible(QLatin1String("Client"), qnCommon->engineVersion(), QLatin1String("ECS"), connectionInfo.version)) {
         QnSoftwareVersion minSupportedVersion("1.4");
 
         if (connectionInfo.version < minSupportedVersion) {
@@ -118,7 +124,7 @@ void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode
                         " - Client version: %1.\n"\
                         " - Server version: %2.\n"\
                         "Compatibility mode for versions lower than %3 is not supported.")
-                    .arg(QLatin1String(QN_ENGINE_VERSION))
+                    .arg(qnCommon->engineVersion().toString())
                     .arg(connectionInfo.version.toString())
                     .arg(minSupportedVersion.toString());
             success = false;
@@ -128,10 +134,21 @@ void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode
                         " - Client version: %1.\n"\
                         " - Server version: %2.\n"\
                         "You will be asked to restart the client in compatibility mode.")
-                    .arg(QLatin1String(QN_ENGINE_VERSION))
+                    .arg(qnCommon->engineVersion().toString())
                     .arg(connectionInfo.version.toString());
             helpTopicId = Qn::VersionMismatch_Help;
         }
+    } else if (connectionInfo.nxClusterProtoVersion != nx_ec::EC2_PROTO_VERSION) {
+        success = false;
+        QString olderComponent = connectionInfo.nxClusterProtoVersion < nx_ec::EC2_PROTO_VERSION
+            ? tr("Server")
+            : tr("Client");
+       detail = tr("Server has a different version:\n"
+            " - Client version: %1.\n"
+            " - Server version: %2.\n"
+            "These versions are not compatible. Please update your %3"
+            ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()).arg(olderComponent);
+        helpTopicId = Qn::VersionMismatch_Help;
     }
 
     updateUi(success, detail, helpTopicId);

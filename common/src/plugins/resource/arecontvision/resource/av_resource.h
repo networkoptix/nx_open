@@ -28,9 +28,9 @@ public:
 
     bool isPanoramic() const;
     bool isDualSensor() const;
-    virtual bool isAbstractResource() const override { return true; }
+    virtual bool isAbstractResource() const override;
 
-    virtual bool setHostAddress(const QString& ip, QnDomain domain);
+    virtual void setHostAddress(const QString& ip) override;
 
     virtual bool getDescription() {return true;};
 
@@ -39,9 +39,12 @@ public:
     virtual QnResourcePtr updateResource();
     //========
 
+    //!Implementation of QnNetworkResource::ping
+    virtual bool ping() override;
+    //!Implementation of QnNetworkResource::checkIfOnlineAsync
+    virtual bool checkIfOnlineAsync( std::function<void(bool)>&& completionHandler ) override;
+
     virtual QString getDriverName() const override;
-    virtual bool isResourceAccessible();
-    virtual bool updateMACAddress();
 
     virtual Qn::StreamQuality getBestQualityForSuchOnScreenSize(const QSize& size) const override;
 
@@ -62,13 +65,13 @@ protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
     // should just do physical job ( network or so ) do not care about memory domain
-    virtual bool getParamPhysical(const QnParam &param, QVariant &val);
-    virtual bool setParamPhysical(const QnParam &param, const QVariant &val);
+    virtual bool getParamPhysical(const QString &param, QVariant &val) override;
+    virtual bool setParamPhysical(const QString &param, const QVariant &val) override;
 
     virtual void setMotionMaskPhysical(int channel) override;
 public:
     static QnPlAreconVisionResource* createResourceByName(const QString &name);
-    static QnPlAreconVisionResource* createResourceByTypeId(QUuid rt);
+    static QnPlAreconVisionResource* createResourceByTypeId(QnUuid rt);
 
     static bool isPanoramic(QnResourceTypePtr resType);
 

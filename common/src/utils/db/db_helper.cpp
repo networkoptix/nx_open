@@ -25,11 +25,14 @@ void QnDbHelper::QnDbTransaction::rollback()
     m_mutex.unlock();
 }
 
-void QnDbHelper::QnDbTransaction::commit()
+bool QnDbHelper::QnDbTransaction::commit()
 {
     QSqlQuery query(m_database);
-    query.exec(lit("COMMIT"));
+    bool rez = query.exec(lit("COMMIT"));
+    if (!rez)
+        qWarning() << "Commit failed:" << query.lastError();
     m_mutex.unlock();
+    return rez;
 }
 
 QnDbHelper::QnDbTransactionLocker::QnDbTransactionLocker(QnDbTransaction* tran): 
@@ -45,10 +48,10 @@ QnDbHelper::QnDbTransactionLocker::~QnDbTransactionLocker()
         m_tran->rollback();
 }
 
-void QnDbHelper::QnDbTransactionLocker::commit()
+bool QnDbHelper::QnDbTransactionLocker::commit()
 {
-    m_tran->commit();
     m_committed = true;
+    return m_tran->commit();
 }
 
 
@@ -105,7 +108,7 @@ bool QnDbHelper::execSQLFile(const QString& fileName, QSqlDatabase& database)
     qDebug() << "creating db" << n << "commands queued";
     int i = 0;
 #endif // DB_DEBUG
-    foreach(const QByteArray& singleCommand, commands)
+    for(const QByteArray& singleCommand: commands)
     {
 #ifdef DB_DEBUG
         qDebug() << QString(QLatin1String("processing command %1 of %2")).arg(++i).arg(n);
@@ -122,6 +125,15 @@ bool QnDbHelper::execSQLFile(const QString& fileName, QSqlDatabase& database)
     return true;
 }
 
+QnDbHelper::QnDbTransaction* QnDbHelper::getTransaction()
+{
+    return &m_tran;
+}
+
+const QnDbHelper::QnDbTransaction* QnDbHelper::getTransaction() const
+{
+    return &m_tran;
+}
 
 bool QnDbHelper::isObjectExists(const QString& objectType, const QString& objectName, QSqlDatabase& database)
 {

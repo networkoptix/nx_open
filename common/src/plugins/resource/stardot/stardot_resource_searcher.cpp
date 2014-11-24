@@ -29,7 +29,7 @@ QnResourceList QnStardotResourceSearcher::findResources()
 {
     QnResourceList result;
 
-    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
+    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
     {
         if (shouldStop())
             return QnResourceList();
@@ -98,14 +98,13 @@ QnResourceList QnStardotResourceSearcher::findResources()
                 // in any case let's HTTP do it's job at very end of discovery
                 QnStardotResourcePtr resource( new QnStardotResource() );
                 //resource->setName("AVUNKNOWN");
-                QUuid typeId = qnResTypePool->getResourceTypeId(QnStardotResource::MANUFACTURE, lit("STARDOT_COMMON"));
+                QnUuid typeId = qnResTypePool->getResourceTypeId(QnStardotResource::MANUFACTURE, lit("STARDOT_COMMON"));
                 if (typeId.isNull())
                     continue;
                 resource->setTypeId(typeId);
 
-                resource->setHostAddress(sender, QnDomainMemory);
+                resource->setHostAddress(sender);
                 resource->setMAC(QnMacAddress(mac));
-                resource->setDiscoveryAddr(iface.address);
                 resource->setModel(QLatin1String(model));
                 resource->setName(QLatin1String(model));
                 
@@ -122,14 +121,10 @@ QnResourceList QnStardotResourceSearcher::findResources()
 
 
                 bool need_to_continue = false;
-                foreach(QnResourcePtr res, result)
+                for(const QnResourcePtr& res: result)
                 {
                     if (res->getUniqueId() == resource->getUniqueId())
                     {
-                        QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
-                        if (isNewDiscoveryAddressBetter(net_res->getHostAddress(), iface.address.toString(), net_res->getDiscoveryAddr().toString()))
-                            net_res->setDiscoveryAddr(iface.address);
-                    
                         need_to_continue = true; //already has such
                         break;
                     }
@@ -151,7 +146,7 @@ QnResourceList QnStardotResourceSearcher::findResources()
 
 }
 
-QnResourcePtr QnStardotResourceSearcher::createResource(const QUuid &resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnStardotResourceSearcher::createResource(const QnUuid &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 
@@ -223,7 +218,7 @@ QList<QnResourcePtr> QnStardotResourceSearcher::checkHostAddr(const QUrl& url, c
     if (model.isEmpty())
         return QList<QnResourcePtr>();
 
-    QUuid rt = qnResTypePool->getResourceTypeId(manufacture(), model);
+    QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), model);
     if (rt.isNull())
         return QList<QnResourcePtr>();
 
@@ -241,8 +236,8 @@ QList<QnResourcePtr> QnStardotResourceSearcher::checkHostAddr(const QUrl& url, c
     res->setName(model);
     res->setModel(model);
     res->setMAC(QnMacAddress(mac));
-    res->setHostAddress(host, QnDomainMemory);
-    res->setAuth(auth);
+    res->setHostAddress(host);
+    res->setDefaultAuth(auth);
 
     QList<QnResourcePtr> resList;
     resList << res;

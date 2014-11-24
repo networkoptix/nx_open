@@ -7,10 +7,13 @@
 
 namespace ec2
 {
-    struct ApiVideowallItemData: ApiData {
-        QUuid guid;
-        QUuid pcGuid;
-        QUuid layoutGuid;
+    struct ApiVideowallItemData: ApiData 
+    {
+        ApiVideowallItemData(): ApiData(), snapLeft(0), snapTop(0), snapRight(0), snapBottom(0) {}
+
+        QnUuid guid;
+        QnUuid pcGuid;
+        QnUuid layoutGuid;
         QString name;
         int snapLeft;
         int snapTop;
@@ -20,8 +23,11 @@ namespace ec2
 #define ApiVideowallItemData_Fields (guid)(pcGuid)(layoutGuid)(name)(snapLeft)(snapTop)(snapRight)(snapBottom)
 
 
-    struct ApiVideowallScreenData: ApiData {
-        QUuid pcGuid;
+    struct ApiVideowallScreenData: ApiData 
+    {
+        ApiVideowallScreenData(): ApiData(), pcIndex(0), desktopLeft(0), desktopTop(0), desktopWidth(0), desktopHeight(0), layoutLeft(0), layoutTop(0), layoutWidth(0), layoutHeight(0) {}
+
+        QnUuid pcGuid;
         int pcIndex;
         int desktopLeft;
         int desktopTop;
@@ -36,8 +42,8 @@ namespace ec2
 
 
     struct ApiVideowallMatrixItemData: ApiData {
-        QUuid itemGuid;
-        QUuid layoutGuid;
+        QnUuid itemGuid;
+        QnUuid layoutGuid;
     };
 #define ApiVideowallMatrixItemData_Fields (itemGuid)(layoutGuid)
 
@@ -62,34 +68,37 @@ namespace ec2
 #define ApiVideowallData_Fields ApiResourceData_Fields (autorun)(items)(screens)(matrices)
 
 
-    struct ApiVideowallControlMessageData: ApiData {
+    struct ApiVideowallControlMessageData: ApiData 
+    {
+        ApiVideowallControlMessageData(): operation(0) {}
+
         int operation;
-        QUuid videowallGuid;
-        QUuid instanceGuid;
+        QnUuid videowallGuid;
+        QnUuid instanceGuid;
         std::map<QString, QString> params;
     };
 #define ApiVideowallControlMessageData_Fields (operation)(videowallGuid)(instanceGuid)(params)
 
     struct ApiVideowallItemWithRefData: public ApiVideowallItemData {
-        QUuid videowallGuid;
+        QnUuid videowallGuid;
     };
 #define ApiVideowallItemWithRefData_Fields ApiVideowallItemData_Fields (videowallGuid)
 
 
     struct ApiVideowallScreenWithRefData: public ApiVideowallScreenData {
-        QUuid videowallGuid;
+        QnUuid videowallGuid;
     };
 #define ApiVideowallScreenWithRefData_Fields ApiVideowallScreenData_Fields (videowallGuid)
 
 
     struct ApiVideowallMatrixItemWithRefData: public ApiVideowallMatrixItemData {
-        QUuid matrixGuid;
+        QnUuid matrixGuid;
     };
 #define ApiVideowallMatrixItemWithRefData_Fields ApiVideowallMatrixItemData_Fields (matrixGuid)
 
 
     struct ApiVideowallMatrixWithRefData: public ApiVideowallMatrixData {
-        QUuid videowallGuid;
+        QnUuid videowallGuid;
     };
 #define ApiVideowallMatrixWithRefData_Fields ApiVideowallMatrixData_Fields (videowallGuid)
 

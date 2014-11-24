@@ -14,7 +14,6 @@ public:
     int getFps() const;
     Qn::StreamQuality getStreamQuality() const;
     int getRecordDuration() const;
-    int getRecordBefore() const;
     int getRecordAfter() const;
 };
 

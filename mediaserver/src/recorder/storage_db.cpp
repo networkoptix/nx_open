@@ -28,14 +28,13 @@ void QnStorageDb::afterDelete()
 {
     QMutexLocker lock(&m_delMutex);
 
-    beginTran();
-    foreach(const DeleteRecordInfo& delRecord, m_recordsToDelete) {
+    QnDbTransactionLocker tran(getTransaction());
+    for(const DeleteRecordInfo& delRecord: m_recordsToDelete) {
         if (!deleteRecordsInternal(delRecord)) {
-            rollback();
             return; // keep record list to delete. try to the next time
         }
     }
-    commit();
+    tran.commit();
 
     m_recordsToDelete.clear();
 }
@@ -79,15 +78,21 @@ void QnStorageDb::addRecord(const QString& cameraUniqueId, QnServer::ChunksCatal
     if (m_lastTranTime.elapsed() < COMMIT_INTERVAL) 
         return;
 
-    flushRecords();
+    flushRecordsNoLock();
 }
 
 void QnStorageDb::flushRecords()
 {
-    beginTran();
-    foreach(const DelayedData& data, m_delayedData)
+    QMutexLocker locker(&m_mutex);
+    flushRecordsNoLock();
+}
+
+void QnStorageDb::flushRecordsNoLock()
+{
+    QnDbTransactionLocker tran(getTransaction());
+    for(const DelayedData& data: m_delayedData)
         addRecordInternal(data.cameraUniqueId, data.catalog, data.chunk);
-    commit();
+    tran.commit();
     m_lastTranTime.restart();
     m_delayedData.clear();
 }
@@ -114,7 +119,7 @@ bool QnStorageDb::addRecordInternal(const QString& cameraUniqueId, QnServer::Chu
 
 bool QnStorageDb::replaceChunks(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const std::deque<DeviceFileCatalog::Chunk>& chunks)
 {
-    beginTran();
+    QnDbTransactionLocker tran(getTransaction());
 
     QSqlQuery query(m_sdb);
     query.prepare("DELETE FROM storage_data WHERE unique_id = ? AND role = ?");
@@ -123,22 +128,20 @@ bool QnStorageDb::replaceChunks(const QString& cameraUniqueId, QnServer::ChunksC
 
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
-        rollback();
         return false;
     }
 
-    foreach(const DeviceFileCatalog::Chunk& chunk, chunks)
+    for(const DeviceFileCatalog::Chunk& chunk: chunks)
     {
         if (chunk.durationMs == -1)
             continue;
 
         if (!addRecordInternal(cameraUniqueId, catalog, chunk)) {
-            rollback();
             return false;
         }
     }
 
-    commit();
+    tran.commit();
     return true;
 }
 
@@ -151,16 +154,14 @@ bool QnStorageDb::open(const QString& fileName)
 
 bool QnStorageDb::createDatabase()
 {
-    beginTran();
+    QnDbTransactionLocker tran(getTransaction());
     if (!isObjectExists(lit("table"), lit("storage_data"), m_sdb))
     {
         if (!execSQLFile(lit(":/01_create_storage_db.sql"), m_sdb)) {
-            rollback();
             return false;
         }
 
         if (!execSQLFile(lit(":/02_storage_bookmarks.sql"), m_sdb)) {
-            rollback();
             return false;
         }
     }
@@ -168,7 +169,7 @@ bool QnStorageDb::createDatabase()
     if (!initializeBookmarksFtsTable())
         return false;
 
-    commit();
+    tran.commit();
 
     m_lastTranTime.restart();
     return true;
@@ -201,7 +202,7 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadFullFileCatalog() {
 
 bool isCatalogExistInResult(const QVector<DeviceFileCatalogPtr>& result, QnServer::ChunksCatalog catalog, const QString& uniqueId)
 {
-    foreach(const DeviceFileCatalogPtr& c, result) 
+    for(const DeviceFileCatalogPtr& c: result) 
     {
         if (c->getRole() == catalog && c->cameraUniqueId() == uniqueId)
             return true;
@@ -214,7 +215,7 @@ void QnStorageDb::addCatalogFromMediaFolder(const QString& postfix, QnServer::Ch
 
     QString root = closeDirPath(QFileInfo(m_sdb.databaseName()).absoluteDir().path()) + postfix;
     QDir dir(root);
-    foreach(const QFileInfo& fi, dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name))
+    for(const QFileInfo& fi: dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name))
     {
         QString uniqueId = fi.baseName();
         if (!isCatalogExistInResult(result, catalog, uniqueId)) {
@@ -373,10 +374,10 @@ bool QnStorageDb::getBookmarks(const QString& cameraUniqueId, const QnCameraBook
     int guidFieldIdx = queryInfo.indexOf("guid");
     int tagNameFieldIdx = queryInfo.indexOf("tagName");
 
-    QUuid prevGuid;
+    QnUuid prevGuid;
 
     while (query.next()) {
-        QUuid guid = QUuid::fromRfc4122(query.value(guidFieldIdx).toByteArray());
+        QnUuid guid = QnUuid::fromRfc4122(query.value(guidFieldIdx).toByteArray());
         if (guid != prevGuid) {
             prevGuid = guid;
             result.push_back(QnCameraBookmark());

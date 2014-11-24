@@ -9,7 +9,7 @@
 #include <utils/network/http/httptypes.h>
 
 
-int QnGetSystemNameRestHandler::executeGet(const QString& /*path*/, const QnRequestParamList& /*params*/, QByteArray& result, QByteArray& contentType)
+int QnGetSystemNameRestHandler::executeGet(const QString& /*path*/, const QnRequestParamList& /*params*/, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
     result = qnCommon->localSystemName().toUtf8();
     contentType = "application/text";
@@ -17,7 +17,8 @@ int QnGetSystemNameRestHandler::executeGet(const QString& /*path*/, const QnRequ
 }
 
 int QnGetSystemNameRestHandler::executePost(const QString& /*path*/, const QnRequestParamList& /*params*/, 
-                                            const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType */, QByteArray& /*result*/, QByteArray& /*contentType*/)
+                                            const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType */, QByteArray& /*result*/, QByteArray& /*contentType*/
+                                            , const QnRestConnectionProcessor*)
 {
     return nx_http::StatusCode::forbidden;
 }

@@ -4,7 +4,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include "api/app_server_connection.h"
-//#include "core/resource/media_server_resource.h"
+#include "core/resource/media_server_resource.h"
 
 QnResourceStatusWatcher::QnResourceStatusWatcher()
 {
@@ -34,10 +34,13 @@ void QnResourceStatusWatcher::updateResourceStatusAsync(const QnResourcePtr &res
         return;
 
     m_setStatusInProgress.insert(resource->getId());
-    QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatus(resource->getId(), resource->getStatus(), this, &QnResourceStatusWatcher::requestFinished2);
+    if (resource.dynamicCast<QnMediaServerResource>())
+        QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusLocal(resource->getId(), resource->getStatus(), this, &QnResourceStatusWatcher::requestFinished2);
+    else
+        QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatus(resource->getId(), resource->getStatus(), this, &QnResourceStatusWatcher::requestFinished2);
 }
 
-void QnResourceStatusWatcher::requestFinished2(int /*reqID*/, ec2::ErrorCode errCode, const QUuid& id)
+void QnResourceStatusWatcher::requestFinished2(int /*reqID*/, ec2::ErrorCode errCode, const QnUuid& id)
 {
     if (errCode != ec2::ErrorCode::ok)
         qCritical() << "Failed to update resource status" << id.toString();

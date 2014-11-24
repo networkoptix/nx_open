@@ -10,57 +10,42 @@ namespace ec2
     struct ApiResourceParamData: ApiData
     {
         ApiResourceParamData() {}
-        ApiResourceParamData(const QString& name, const QString& value, bool predefinedParam): value(value), name(name), predefinedParam(predefinedParam) {}
+        ApiResourceParamData(const QString& name, const QString& value): value(value), name(name) {}
 
         QString value;
         QString name;
-        bool predefinedParam;
     };
-#define ApiResourceParamData_Fields (value)(name)(predefinedParam)
+#define ApiResourceParamData_Fields (value)(name)
 
 
     struct ApiResourceParamWithRefData: ApiResourceParamData
     {
-        QUuid resourceId;
+        ApiResourceParamWithRefData() {}
+        ApiResourceParamWithRefData(const QnUuid& resourceId, const QString& name, const QString& value): ApiResourceParamData(name, value), resourceId(resourceId) {}
+        QnUuid resourceId;
     };
 #define ApiResourceParamWithRefData_Fields ApiResourceParamData_Fields (resourceId)
 
 
-    struct ApiResourceParamsData: ApiData
-    {
-        QUuid id;
-        std::vector<ApiResourceParamData> params;
-    };
-#define ApiResourceParamsData_Fields (id)(params)
-
-
     struct ApiResourceData: ApiData {
-        ApiResourceData(): status(Qn::Offline) {}
+        ApiResourceData() {}
 
-        QUuid          id;
-        QUuid          parentId;
-        Qn::ResourceStatus    status;
+        QnUuid          id;
+        QnUuid          parentId;
         QString       name;
         QString       url;
-        QUuid          typeId;
-        std::vector<ApiResourceParamData> addParams;
+        QnUuid          typeId;
     };
-#define ApiResourceData_Fields (id)(parentId)(status)(name)(url)(typeId)(addParams)
+#define ApiResourceData_Fields (id)(parentId)(name)(url)(typeId)
 
-/*
-    struct ApiSetResourceDisabledData: ApiData {
-        QUuid id;
-        bool disabled;
-    };
-#define ApiSetResourceDisabledData_Fields (id)(disabled)
-*/
-
-    struct ApiSetResourceStatusData: ApiData
+    struct ApiResourceStatusData: ApiData
     {
-        QUuid id;
+        ApiResourceStatusData(): status(Qn::Offline) {}
+
+        QnUuid id;
         Qn::ResourceStatus status;
     };
-#define ApiSetResourceStatusData_Fields (id)(status)
+#define ApiResourceStatusData_Fields (id)(status)
 
 } // namespace ec2
 

@@ -31,17 +31,19 @@ namespace ec2
         virtual AbstractVideowallManagerPtr getVideowallManager() override;
         virtual AbstractStoredFileManagerPtr getStoredFileManager() override;
         virtual AbstractUpdatesManagerPtr getUpdatesManager() override;
+        virtual AbstractMiscManagerPtr getMiscManager() override;
+        virtual AbstractDiscoveryManagerPtr getDiscoveryManager() override;
+        virtual AbstractTimeManagerPtr getTimeManager() override;
 
-        virtual int setPanicMode(Qn::PanicMode value, impl::SimpleHandlerPtr handler) override;
-        virtual int getCurrentTime(impl::CurrentTimeHandlerPtr handler) override;
-        virtual int dumpDatabaseAsync(impl::DumpDatabaseHandlerPtr handler) override;
-        virtual int restoreDatabaseAsync(const ApiDatabaseDumpData& dbFile, impl::SimpleHandlerPtr handler) override;
-
-        virtual void addRemotePeer(const QUrl& url, const QUuid& peerGuid) override;
+        virtual void addRemotePeer(const QUrl& url) override;
         virtual void deleteRemotePeer(const QUrl& url) override;
         virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) override;
 
         virtual void startReceivingNotifications() override;
+
+    protected:
+        virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) override;
+        virtual int restoreDatabaseAsync( const ApiDatabaseDumpData& dbFile, impl::SimpleHandlerPtr handler ) override;
 
     private:
         QnConnectionInfo m_connectionInfo;

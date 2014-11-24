@@ -78,7 +78,7 @@ QString QnLicenseUsageHelper::getUsageText(Qn::LicenseType licenseType) const {
 QString QnLicenseUsageHelper::getUsageText() const 
 {
     QString licenseText;
-    foreach (Qn::LicenseType lt, licenseTypes()) {
+    for(Qn::LicenseType lt: licenseTypes()) {
 //         if (totalLicense(lt) == 0)
 //             continue;
         if (!licenseText.isEmpty())
@@ -97,7 +97,7 @@ QString QnLicenseUsageHelper::getProposedUsageText(Qn::LicenseType licenseType) 
 QString QnLicenseUsageHelper::getProposedUsageText() const
 {
     QString licenseText;
-    foreach (Qn::LicenseType lt, licenseTypes()) {
+    for (Qn::LicenseType lt: licenseTypes()) {
         if (!licenseText.isEmpty())
             licenseText += lit("\n");
         licenseText += getProposedUsageText(lt);
@@ -118,7 +118,7 @@ QString QnLicenseUsageHelper::getRequiredLicenseMsg(Qn::LicenseType licenseType)
 QString QnLicenseUsageHelper::getRequiredLicenseMsg() const
 {
     QString licenseText;
-    foreach (Qn::LicenseType lt, licenseTypes()) {
+    for (Qn::LicenseType lt: licenseTypes()) {
         if (!licenseText.isEmpty())
             licenseText += lit("\n");
         licenseText += getRequiredLicenseMsg(lt);
@@ -132,27 +132,27 @@ void QnLicenseUsageHelper::update() {
 
     int maxTotal = 0;
     int maxLicenses[Qn::LC_Count];
-    foreach (Qn::LicenseType lt, licenseTypes()) {
+    for (Qn::LicenseType lt: licenseTypes()) {
         m_usedLicenses[lt] = calculateUsedLicenses(lt) + m_proposedLicenses[lt];
         maxLicenses[lt] = m_licenses.totalLicenseByType(lt);
         maxTotal += maxLicenses[lt];
     }
 
-    foreach (Qn::LicenseType lt, licenseTypes()) {
-        foreach(const LicenseCompatibility& c, compatibleLicenseType) {
+    for (Qn::LicenseType lt: licenseTypes()) {
+        for(const LicenseCompatibility& c: compatibleLicenseType) {
             if (c.child == lt)
                 borrowLicenseFromClass(m_usedLicenses[c.master], maxLicenses[c.master], m_usedLicenses[lt], maxLicenses[lt]);
         }
     }
 
-    foreach (Qn::LicenseType lt, licenseTypes())
+    for (Qn::LicenseType lt: licenseTypes())
         m_overflowLicenses[lt] = qMax(0, m_usedLicenses[lt] - maxLicenses[lt]);
 
     emit licensesChanged();
 }
 
 bool QnLicenseUsageHelper::isValid() const {
-    foreach (Qn::LicenseType lt, licenseTypes())
+    for (Qn::LicenseType lt: licenseTypes())
         if (!isValid(lt))
             return false;
     return true;
@@ -174,6 +174,28 @@ QList<Qn::LicenseType> QnLicenseUsageHelper::licenseTypes() const {
     if (m_licenseTypes.isEmpty())
         m_licenseTypes = calculateLicenseTypes();
     return m_licenseTypes;
+}
+
+QString QnLicenseUsageHelper::activationMessage(const QJsonObject& errorMessage)
+{
+    QString messageId = errorMessage.value(lit("messageId")).toString();
+    QString message = errorMessage.value(lit("message")).toString();
+    QVariantMap arguments = errorMessage.value(lit("arguments")).toObject().toVariantMap();
+
+    if(messageId == lit("DatabaseError")) {
+        message = tr("There was a problem activating your license key. Database error has occurred.");  //TODO: Feature #3629 case J
+    } else if(messageId == lit("InvalidData")) {
+        message = tr("There was a problem activating your license key. Invalid data received. Please contact support team to report issue.");
+    } else if(messageId == lit("InvalidKey")) {
+        message = tr("The license key you have entered is invalid. Please check that license key is entered correctly. "
+            "If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.");
+    } else if(messageId == lit("InvalidBrand")) {
+        message = tr("You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.");
+    } else if(messageId == lit("AlreadyActivated")) {
+        message = tr("This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to get a valid license key.");
+    }
+
+    return Mustache::renderTemplate(message, arguments);
 }
 
 /************************************************************************/
@@ -207,7 +229,7 @@ void QnCamLicenseUsageHelper::init() {
 }
 
 void QnCamLicenseUsageHelper::propose(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable) {
-    foreach (const QnVirtualCameraResourcePtr &camera, proposedCameras) 
+    for (const QnVirtualCameraResourcePtr &camera: proposedCameras) 
     {
         QnResourcePtr mserver = qnResPool->getResourceById(camera->getParentId());
         if (!mserver || mserver->getStatus() == Qn::Offline)
@@ -218,7 +240,7 @@ void QnCamLicenseUsageHelper::propose(const QnVirtualCameraResourceList &propose
             m_proposedLicenses[camera->licenseType()]++;
     }
     if (!proposedEnable) {
-        foreach (Qn::LicenseType lt, licenseTypes())
+        for (Qn::LicenseType lt: licenseTypes())
             m_proposedLicenses[lt] *= -1;
     }
     update();
@@ -269,7 +291,7 @@ QnVideoWallLicenseUsageHelper::QnVideoWallLicenseUsageHelper(QObject *parent):
     connect(qnResPool, &QnResourcePool::resourceAdded,   this,   connectIfNeeded);
     connect(qnResPool, &QnResourcePool::resourceAdded,   this,   updateIfNeeded);
     connect(qnResPool, &QnResourcePool::resourceRemoved, this,   updateIfNeeded);
-    foreach (const QnVideoWallResourcePtr &videowall, qnResPool->getResources().filtered<QnVideoWallResource>())
+    for (const QnVideoWallResourcePtr &videowall: qnResPool->getResources<QnVideoWallResource>())
         connectTo(videowall);
 
     connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoAdded,    this, &QnVideoWallLicenseUsageHelper::update);
@@ -285,50 +307,21 @@ QList<Qn::LicenseType> QnVideoWallLicenseUsageHelper::calculateLicenseTypes() co
 
 int QnVideoWallLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType licenseType) const {
     Q_ASSERT(licenseType == Qn::LC_VideoWall);
-    int result = 0;
-    foreach (const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems())
-        /* Calculating running control sessions. */
-        result += info.data.videoWallControlSessions;
-
-    foreach (const QnVideoWallResourcePtr &videowall, qnResPool->getResources().filtered<QnVideoWallResource>()) {
-        /* Calculating total screens. */
-        result += videowall->items()->getItems().size();
-
-        /* Calculating "PushMyScreen" items. */
-        foreach(const QnVideoWallItem &item, videowall->items()->getItems()) {
-            if (item.layout.isNull())
-                continue;
-
-            QnLayoutResourcePtr layout = qnResPool->getResourceById(item.layout).dynamicCast<QnLayoutResource>();
-            if (!layout)
-                continue;
-            
-            foreach (const QnLayoutItemData &data, layout->getItems()) {
-                QnResourcePtr resource = (!data.resource.id.isNull())
-                    ? qnResPool->getResourceById(data.resource.id)
-                    : qnResPool->getResourceByUniqId(data.resource.path); //TODO: #EC2
-                if (!resource || !resource->hasFlags(Qn::desktop_camera))
-                    continue;
-
-                result++;   //desktop camera found
-            }
-        }
+    
+    /* Calculating running control sessions. */
+    int controlSessions = 0;
+    for (const QnPeerRuntimeInfo &info: QnRuntimeInfoManager::instance()->items()->getItems()) {
+        if (info.data.videoWallControlSession.isNull())
+            continue;
+        ++controlSessions;
     }
 
-    return result;
-}
+    /* Calculating total screens. */
+    int usedScreens = 0;
+    for (const QnVideoWallResourcePtr &videowall: qnResPool->getResources<QnVideoWallResource>())
+        usedScreens += videowall->items()->getItems().size();
 
-void QnVideoWallLicenseUsageHelper::propose(const QnVideoWallResourcePtr &videowall, const QUuid &pcUuid, int itemsCount) {
-    int used = 0;
-    if (!pcUuid.isNull()) {
-        foreach(const QnVideoWallItem &item, videowall->items()->getItems()) {
-            if (item.pcUuid != pcUuid)
-                continue;
-            used++;
-        }
-    }
-    m_proposedLicenses[Qn::LC_VideoWall] = itemsCount - used;
-    update();
+    return qMax(controlSessions, QnVideoWallLicenseUsageHelper::licensesForScreens(usedScreens));
 }
 
 void QnVideoWallLicenseUsageHelper::propose(int count) {
@@ -336,37 +329,49 @@ void QnVideoWallLicenseUsageHelper::propose(int count) {
     update();
 }
 
-QnVideoWallLicenseUsageProposer::QnVideoWallLicenseUsageProposer(QnVideoWallLicenseUsageHelper* helper, int count):
+int QnVideoWallLicenseUsageHelper::licensesForScreens(int screens) {
+    return (screens + 1) / 2;
+}
+
+QnVideoWallLicenseUsageProposer::QnVideoWallLicenseUsageProposer(QnVideoWallLicenseUsageHelper* helper, int screenCount, int controlSessionsCount):
     m_helper(helper),
-    m_count(count)
+    m_count(0)
 {
-    if (m_helper)
-        m_helper->propose(m_count);
+    if (!m_helper)
+        return;
+
+    /* Calculate total screens used. */
+    int totalScreens = 0;
+    for (const QnVideoWallResourcePtr &videowall: qnResPool->getResources<QnVideoWallResource>())
+        totalScreens += videowall->items()->getItems().size();
+    int screensLicensesUsed = QnVideoWallLicenseUsageHelper::licensesForScreens(totalScreens);
+
+    /* Calculate total control sessions running. */
+    int controlSessions = 0;
+    for (const QnPeerRuntimeInfo &info: QnRuntimeInfoManager::instance()->items()->getItems()) {
+        if (info.data.videoWallControlSession.isNull())
+            continue;
+        ++controlSessions;
+    }
+
+    /* Select which requirement is currently in action. */
+    int totalLicensesUsed = qMax(screensLicensesUsed, controlSessions);
+
+    /* Proposed change for screens. */
+    int screensValue = QnVideoWallLicenseUsageHelper::licensesForScreens(totalScreens + screenCount);
+
+    /* Proposed change for control sessions. */
+    int controlSessionsValue = controlSessions + controlSessionsCount;
+
+    /* Select proposed requirement. */
+    int proposedLicensesUsage = qMax(controlSessionsValue, screensValue);
+
+    m_count = proposedLicensesUsage - totalLicensesUsed;
+    m_helper->propose(m_count);
 }
 
 QnVideoWallLicenseUsageProposer::~QnVideoWallLicenseUsageProposer() {
-    if (m_helper)
-        m_helper->propose(-m_count);
-}
-
-QString QnLicenseUsageHelper::activationMessage(const QJsonObject& errorMessage)
-{
-    QString messageId = errorMessage.value(lit("messageId")).toString();
-    QString message = errorMessage.value(lit("message")).toString();
-    QVariantMap arguments = errorMessage.value(lit("arguments")).toObject().toVariantMap();
-
-    if(messageId == lit("DatabaseError")) {
-        message = tr("There was a problem activating your license key. Database error has occurred.");  //TODO: Feature #3629 case J
-    } else if(messageId == lit("InvalidData")) {
-        message = tr("There was a problem activating your license key. Invalid data received. Please contact support team to report issue.");
-    } else if(messageId == lit("InvalidKey")) {
-        message = tr("The license key you have entered is invalid. Please check that license key is entered correctly. "
-            "If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.");
-    } else if(messageId == lit("InvalidBrand")) {
-        message = tr("You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.");
-    } else if(messageId == lit("AlreadyActivated")) {
-        message = tr("This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to get a valid license key.");
-    }
-
-    return Mustache::renderTemplate(message, arguments);
+    if (!m_helper)
+        return;
+    m_helper->propose(-m_count);
 }

@@ -1,8 +1,26 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver) {
-        $scope.settings = mediaserver.settings.get();
+    .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,$location,$timeout) {
+
+        mediaserver.getCurrentUser().success(function(result){
+            if(! result.reply.permissions & Config.globalEditServersPermissions ){
+                $location.path('/info'); //no admin rights - redirect
+                return;
+            }
+        });
+
+
+        mediaserver.getSettings().then(function (r) {
+            $scope.settings = {
+                systemName: r.data.reply.systemName,
+                port: r.data.reply.port,
+                id: r.data.reply.id
+            };
+        });
+
+        $scope.password = '';
+        $scope.oldPassword = '';
         $scope.confirmPassword = '';
 
         $scope.openJoinDialog = function () {
@@ -18,16 +36,128 @@ angular.module('webadminApp')
 
             modalInstance.result.then(function (settings) {
                 $log.info(settings);
-            }, function () {
-                $log.info('Modal dismissed at: ' + new Date());
+                mediaserver.mergeSystems(settings.url,settings.password,settings.keepMySystem).then(function(r){
+                    if(r.data.error!=='0'){
+                        var errorToShow = r.data.errorString;
+                        switch(errorToShow){
+                            case 'FAIL':
+                                errorToShow = 'System is unreachable or doesn\'t exist.';
+                                break;
+                            case 'UNAUTHORIZED':
+                            case 'password':
+                                errorToShow = 'Wrong password.';
+                                break;
+                            case 'INCOMPATIBLE':
+                                errorToShow = 'Found system has incompatible version.';
+                                break;
+                            case 'url':
+                                errorToShow = 'Wrong url.';
+                                break;
+                        }
+                        alert('Merge failed: ' + errorToShow);
+                    }else {
+                        alert('Merge succeed.');
+                        window.location.reload();
+                    }
+                });
             });
         };
 
+        function restartServer(passPort){
+            $modal.open({
+                templateUrl: 'views/restart.html',
+                controller: 'RestartCtrl',
+                resolve:{
+                    port:function(){
+                        return passPort?$scope.settings.port:null;
+                    }
+                }
+            });
+        }
+
+        function errorHandler(){
+            alert ('Connection error');
+            return false;
+        }
+        function resultHandler (r){
+            var data = r.data;
+
+            if(data.error!=='0') {
+                console.log('some error',data);
+                var errorToShow = data.errorString;
+                switch (errorToShow) {
+                    case 'UNAUTHORIZED':
+                    case 'password':
+                        errorToShow = 'Wrong password.';
+                }
+                alert('Error: ' + errorToShow);
+            }else if (data.reply.restartNeeded) {
+                if (confirm('All changes saved. New settings will be applied after restart. \n Do you want to restart server now?')) {
+                    restartServer(true);
+                }
+            } else {
+                alert('Settings saved');
+                if( $scope.settings.port !==  window.location.port ) {
+                    window.location.href = window.location.protocol + '//' + window.location.hostname + ':' + $scope.settings.port;
+                }
+            }
+        }
+
         $scope.save = function () {
-            mediaserver.settings.save($scope.settings);
+
+            if($scope.settingsForm.$valid) {
+                mediaserver.saveSettings($scope.settings.systemName, $scope.settings.port).then(resultHandler,errorHandler);
+            }else{
+                alert('form is not valid');
+            }
+        };
+
+        $scope.changePassword = function () {
+            if($scope.password === $scope.confirmPassword) {
+                mediaserver.changePassword($scope.password, $scope.oldPassword).then(resultHandler, errorHandler);
+            }
         };
 
         $scope.restart = function () {
-            mediaserver.restart();
+            if(confirm('Do you want to restart server now?')){
+                restartServer(false);
+            }
         };
+
+        function checkServersIp(server,i){
+            var ips = server.networkAddresses.split(';');
+            var port = server.apiUrl.substring(server.apiUrl.lastIndexOf(':'));
+            var url = 'http://' + ips[i] + port;
+
+            mediaserver.getSettings(url).then(function(){
+                server.apiUrl = url;
+            },function(){
+                if(i < ips.length-1) {
+                    checkServersIp(server, i + 1);
+                }
+                else {
+                    server.status = 'Unavailable';
+
+                    $scope.mediaServers = _.sortBy($scope.mediaServers,function(server){
+                        return (server.status==='Online'?'0':'1') + server.Name + server.id;
+                        // Сортировка: online->name->id
+                    });
+
+                }
+                return false;
+            });
+        }
+
+        mediaserver.getMediaServers().success(function(data){
+            $scope.mediaServers = _.sortBy(data,function(server){
+                return (server.status==='Online'?'0':'1') + server.Name + server.id;
+                // Сортировка: online->name->id
+            });
+            $timeout(function() {
+                _.each($scope.mediaServers, function (server) {
+                    var i = 0;//1. Опрашиваем айпишники подряд
+                    checkServersIp(server, i);
+                });
+            },1000);
+        });
     });

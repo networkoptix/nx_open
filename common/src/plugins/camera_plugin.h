@@ -18,7 +18,7 @@
 
     \note all text values are NULL-terminated utf-8
     \note If not specified in interface's description, plugin interfaces are used in multithreaded environment the following way:\n
-        - single interface pointer is never used concurrently by multiple threads, but different pointers to same interface 
+        - single interface instance is never used concurrently by multiple threads, but different instances of the same interface 
             (e.g., \a nxcip::BaseCameraManager) can be used by different threads concurrently
 */
 namespace nxcip
@@ -46,6 +46,9 @@ namespace nxcip
     static const int NX_TRY_AGAIN = -26;
     //!Blocking call has been interrupted (e.g., by \a StreamReader::interrupt)
     static const int NX_INTERRUPTED = -27;
+    static const int NX_PARAM_READ_ONLY = -40;
+    static const int NX_UNKNOWN_PARAMETER = -41;
+    static const int NX_INVALID_PARAM_VALUE = -42;
     static const int NX_OTHER_ERROR = -100;
 
 
@@ -522,8 +525,8 @@ namespace nxcip
         */
         virtual bool atEnd() const = 0;
         /*!
-            \param[out] start Start of time period (usec since 1970-01-01, UTC)
-            \param[out] end End of time period (usec since 1970-01-01, UTC)
+            \param[out] start Start of time period (usec (microseconds) since 1970-01-01, UTC)
+            \param[out] end End of time period (usec (microseconds) since 1970-01-01, UTC)
             \return \a true, if data present (cursor is on valid position)
         */
         virtual bool get( UsecUTCTimestamp* start, UsecUTCTimestamp* end ) const = 0;
@@ -614,6 +617,56 @@ namespace nxcip
             \return \b NX_NO_ERROR on success, otherwise - error code
         */
         virtual int setMotionMask( Picture* motionMask ) = 0;
+    };
+
+
+    // {840DEECD-2F9B-4859-9081-9592D17177F8}
+    static const nxpl::NX_GUID IID_BaseCameraManager3 = { { 0x84, 0x0d, 0xee, 0xcd, 0x2f, 0x9b, 0x48, 0x59, 0x90, 0x81, 0x95, 0x92, 0xd1, 0x71, 0x77, 0xf8 } };
+
+    //!Extends \a BaseCameraManager2 by adding editable parameters
+    /*!
+        - all parameters have type string
+        - parameter ids always start with 0
+    */
+    class BaseCameraManager3
+    :
+        public BaseCameraManager2
+    {
+    public:
+        enum CameraCapability3
+        { 
+            cameraParamsPersistentCapability   = 0x0800      //!<Camera parameters can be read/set even if camera is not accessible at the moment
+        };
+
+        //!Returns XML describing camera parameters
+        /*!
+            XML MUST conform to camera_parameters.xsd which can be found in SDK. Sample XML also can be found there
+            This XML describes parameters (types, possible values, etc..) accessible with \a getParamValue and \a setParamValue
+        */
+        virtual const char* getParametersDescriptionXML() const = 0;
+        //!Reads value of parameter \a paramName
+        /*!
+            \param paramName \0-terminated utf-8 string specifing name of parameter.
+                This is a full name. I.e., if parameter belongs to some group, then /group_name/param_name is specified here
+            \param valueBufSize IN: Length of \a valueBuf, OUT: length of string value not including \0-character
+            \return\n
+                - \a NX_NO_ERROR if value loaded to value buf. Value is always \0-terminated utf8 string
+                - \a NX_UNKNOWN_PARAMETER if \a paramName specifies unknown parameter
+                - \a NX_MORE_DATA if \a valueBuf has not enough space. In this case \a *valueBufSize is set to required buf size
+        */
+        virtual int getParamValue( const char* paramName, char* valueBuf, int* valueBufSize ) const = 0;
+        //!Set value of parameter \a paramName to \a value
+        /*!
+            \param paramName \0-terminated utf-8 string specifing name of parameter.
+                This is a full name. I.e., if parameter belongs to some group, then /group_name/param_name is specified here
+            \param value \0-terminated utf8 string
+            \return\n
+                - \a NX_NO_ERROR if value successfully applied
+                - \a NX_UNKNOWN_PARAMETER if \a paramName specifies unknown parameter
+                - \a NX_PARAM_READ_ONLY if parameter is read only (check \a pfReadOnly flag)
+                - \a NX_INVALID_PARAM_VALUE if parameter value does not pass validity check
+        */
+        virtual int setParamValue( const char* paramName, const char* value ) = 0;
     };
 
 
@@ -815,7 +868,7 @@ namespace nxcip
             fStreamReset        = 0x10
         };
 
-        //!Packet's timestamp (usec since 1970-01-01, UTC)
+        //!Packet's timestamp (usec (microseconds) since 1970-01-01, UTC)
         virtual UsecUTCTimestamp timestamp() const = 0;
         //!Packet type
         virtual DataPacketType type() const = 0;
@@ -1018,12 +1071,12 @@ namespace nxcip
             \a DtsArchiveReader instance holds reference to returned \a StreamReader instance
         */
         virtual StreamReader* getStreamReader() = 0;
-        //!Returns timestamp (usec since 1970-01-01, UTC) of oldest data, present in the archive
+        //!Returns timestamp (usec (microseconds) since 1970-01-01, UTC) of oldest data, present in the archive
         /*!
             This value can be changed at any time (if record is ongoing)
         */
         virtual UsecUTCTimestamp startTime() const = 0;
-        //!Returns timestamp (usec since 1970-01-01, UTC) of newest data, present in the archive
+        //!Returns timestamp (usec (microseconds) since 1970-01-01, UTC) of newest data, present in the archive
         /*!
             This value can be changed at any time (if record is ongoing)
         */
@@ -1087,7 +1140,7 @@ namespace nxcip
             bool waitForKeyFrame ) = 0;
         //!Play time range [start; end) skipping frames
         /*!
-            Tells to skip media packets for inter-packet timestamp gap to be at least \a step usec.
+            Tells to skip media packets for inter-packet timestamp gap to be at least \a step usec (microseconds).
             When frame skipping is implied, audio packets SHOULD not be reported
             \param[in] cSeq New value of command sequence counter
             \param start Position to seek to

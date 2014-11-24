@@ -27,9 +27,6 @@ class QnLicense;
 typedef QSharedPointer<QnLicense> QnLicensePtr;
 typedef QList<QnLicensePtr> QnLicenseList;
 
-struct QnParamType;
-typedef QSharedPointer<QnParamType> QnParamTypePtr;
-
 class QnVideoWallItem;
 class QnVideoWallControlMessage;
 
@@ -88,6 +85,10 @@ class QnSecurityCamResource;
 typedef QnSharedResourcePointer<QnSecurityCamResource> QnSecurityCamResourcePtr;
 typedef QnSharedResourcePointerList<QnSecurityCamResource> QnSecurityCamResourceList;
 
+class QnCameraUserAttributes;
+typedef QSharedPointer<QnCameraUserAttributes> QnCameraUserAttributesPtr;
+typedef QList<QnCameraUserAttributesPtr> QnCameraUserAttributesList;
+
 class QnStorageResource;
 typedef QnSharedResourcePointer<QnStorageResource> QnStorageResourcePtr;
 typedef QnSharedResourcePointerList<QnStorageResource> QnStorageResourceList;
@@ -103,6 +104,10 @@ typedef QnSharedResourcePointerList<QnUserResource> QnUserResourceList;
 class QnMediaServerResource;
 typedef QnSharedResourcePointer<QnMediaServerResource> QnMediaServerResourcePtr;
 typedef QnSharedResourcePointerList<QnMediaServerResource> QnMediaServerResourceList;
+
+class QnMediaServerUserAttributes;
+typedef QSharedPointer<QnMediaServerUserAttributes> QnMediaServerUserAttributesPtr;
+typedef QList<QnMediaServerUserAttributesPtr> QnMediaServerUserAttributesList;
 
 class QnPlColdStoreStorage;
 typedef QnSharedResourcePointer<QnPlColdStoreStorage> QnPlColdStoreStoragePtr;
@@ -158,5 +163,9 @@ typedef QList<QnVideoWallItemIndex> QnVideoWallItemIndexList;
 
 class QnVideoWallMatrixIndex;
 typedef QList<QnVideoWallMatrixIndex> QnVideoWallMatrixIndexList;
+
+class QnAviResource;
+typedef QnSharedResourcePointer<QnAviResource> QnAviResourcePtr;
+
 
 #endif // QN_RESOURCE_FWD_H

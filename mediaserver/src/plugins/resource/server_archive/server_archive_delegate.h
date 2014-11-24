@@ -4,9 +4,8 @@
 #include <QtCore/QMutex>
 #include <QtGui/QRegion>
 
-#include "plugins/resource/archive/abstract_archive_delegate.h"
+#include "core/resource/resource_fwd.h"
 #include "plugins/resource/avi/avi_archive_delegate.h"
-#include "plugins/resource/avi/avi_resource.h"
 #include "recorder/device_file_catalog.h"
 #include "recorder/storage_manager.h"
 #include "utils/media/sse_helper.h"
@@ -22,6 +21,7 @@ public:
     //virtual void setSendMotion(bool value) override;
 
     virtual bool open(const QnResourcePtr &resource);
+    bool isOpened() const;
     virtual void close();
     virtual qint64 startTime();
     virtual qint64 endTime();

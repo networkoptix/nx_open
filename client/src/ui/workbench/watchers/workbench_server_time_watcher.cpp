@@ -75,10 +75,7 @@ qint64 QnWorkbenchServerTimeWatcher::localOffset(const QnMediaResourcePtr &resou
 }
 
 void QnWorkbenchServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr &server) {
-    if(server->getStatus() == Qn::Offline)
-        return;
-
-    if(server->getPrimaryIF().isNull())
+    if(server->getStatus() != Qn::Online)
         return;
 
     int handle = server->apiConnection()->getTimeAsync(this, SLOT(at_replyReceived(int, const QnTimeReply &, int)));
@@ -91,7 +88,7 @@ void QnWorkbenchServerTimeWatcher::sendRequest(const QnMediaServerResourcePtr &s
 // -------------------------------------------------------------------------- //
 void QnWorkbenchServerTimeWatcher::timerEvent(QTimerEvent *event) {
     if(event->timerId() == m_timer.timerId()) {
-        foreach(const QnMediaServerResourcePtr &server, resourcePool()->getResources().filtered<QnMediaServerResource>())
+        foreach(const QnMediaServerResourcePtr &server, resourcePool()->getResources<QnMediaServerResource>())
             sendRequest(server);
     } else {
         base_type::timerEvent(event);
@@ -100,7 +97,7 @@ void QnWorkbenchServerTimeWatcher::timerEvent(QTimerEvent *event) {
 
 void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if(!server)
+    if (!server || !server->getProperty(lit("guid")).isEmpty()) // TODO: #dklychkov add a proper way to check for fake servers
         return;
 
     connect(server.data(), SIGNAL(serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)), this, SLOT(at_server_serverIfFound(const QnMediaServerResourcePtr &)));

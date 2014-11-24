@@ -36,7 +36,7 @@ ThirdPartyResourceSearcher::ThirdPartyResourceSearcher()
         ++it )
     {
         const QList<QString>& modelList = it->getReservedModelList();
-        foreach( QString modelMask, modelList )
+        for(const  QString& modelMask: modelList )
             CameraDriverRestrictionList::instance()->allow( THIRD_PARTY_MANUFACTURER_NAME, it->getVendorName(), modelMask );
     }
 }
@@ -45,7 +45,7 @@ ThirdPartyResourceSearcher::~ThirdPartyResourceSearcher()
 {
 }
 
-QnResourcePtr ThirdPartyResourceSearcher::createResource( const QUuid &resourceTypeId, const QnResourceParams& params )
+QnResourcePtr ThirdPartyResourceSearcher::createResource( const QnUuid &resourceTypeId, const QnResourceParams& params )
 {
     QnThirdPartyResourcePtr result;
 
@@ -58,36 +58,14 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( const QUuid &resourceT
     }
 
     if( resourceType->getManufacture() != manufacture() )
-    {
-        //qDebug() << "Manufature " << resourceType->getManufacture() << " != " << manufacture();
         return result;
-    }
 
     nxcip::CameraInfo cameraInfo;
-    //todo: #a.kolesnikov Check if only url parameter is enough. Create resource SHOULDN'T use a lot of parameters to create new resource instance
+    //TODO #ak restore all resource cameraInfo fields here
     strcpy( cameraInfo.url, params.url.toLatin1().constData() );
-    
-
-    //analyzing parameters, getting discoveryManager and filling in cameraInfo
-    //QString resourceName;
-
-    /*
-    for( QnResourceParameters::const_iterator
-        it = parameters.begin();
-        it != parameters.end();
-        ++it )
-    {
-        const QByteArray& valLatin1 = it.value().toLatin1();
-        if( it.key() == "physicalId")
-            strcpy( cameraInfo.uid, valLatin1.data() );
-        else if( it.key() == "url")
-            strcpy( cameraInfo.url, valLatin1.data() );
-        else if( it.key() == "name")
-            resourceName = it.value();
-    }
-    */
 
     nxcip_qt::CameraDiscoveryManager* discoveryManager = NULL;
+    //vendor is required to find plugin to use
     //choosing correct plugin
     for( QList<nxcip_qt::CameraDiscoveryManager>::iterator
         it = m_thirdPartyCamPlugins.begin();
@@ -104,29 +82,15 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( const QUuid &resourceT
         return QnThirdPartyResourcePtr();
 
     Q_ASSERT( discoveryManager->getRef() );
-
-    const QByteArray& resourceNameLatin1 = params.vendor.toLatin1();
-    strcpy( cameraInfo.modelName, resourceNameLatin1.data() + discoveryManager->getVendorName().size() + 1 );   //skipping vendor name and '-'
-
-    nxcip::BaseCameraManager* camManager = discoveryManager->createCameraManager( cameraInfo );
-    if( !camManager )
-        return QnThirdPartyResourcePtr();
-
-    result = QnThirdPartyResourcePtr( new QnThirdPartyResource( cameraInfo, camManager, *discoveryManager ) );
+    //NOTE not calling discoveryManager->createCameraManager here because we do not know camera parameters (model, firmware, even uid), 
+        //so just instanciating QnThirdPartyResource
+    result = QnThirdPartyResourcePtr( new QnThirdPartyResource( cameraInfo, nullptr, *discoveryManager ) );
     result->setTypeId(resourceTypeId);
     result->setPhysicalId(QString::fromUtf8(cameraInfo.uid).trimmed());
-
-    unsigned int caps = 0;
-    if (camManager->getCameraCapabilities(&caps) == 0) 
-    {
-        if( caps & nxcip::BaseCameraManager::shareIpCapability )
-            result->setCameraCapability( Qn::ShareIpCapability, true );
-    }
 
     NX_LOG( lit("Created third party resource (manufacturer %1, res type id %2)").
         arg(discoveryManager->getVendorName()).arg(resourceTypeId.toString()), cl_logDEBUG2 );
 
-    //result->deserialize( parameters );
     return result;
 }
 
@@ -273,7 +237,7 @@ QnResourceList ThirdPartyResourceSearcher::createResListFromCameraInfoList(
     const QVector<nxcip::CameraInfo>& cameraInfoArray )
 {
     QnResourceList resList;
-    foreach( nxcip::CameraInfo info, cameraInfoArray )
+    for(const  nxcip::CameraInfo& info: cameraInfoArray )
     {
         QnThirdPartyResourcePtr res = createResourceFromCameraInfo( discoveryManager, info );
         if( !res )
@@ -289,7 +253,7 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     nxcip_qt::CameraDiscoveryManager* const discoveryManager,
     const nxcip::CameraInfo& cameraInfo )
 {
-    QUuid typeId = qnResTypePool->getResourceTypeId(manufacture(), THIRD_PARTY_MODEL_NAME);
+    QnUuid typeId = qnResTypePool->getResourceTypeId(manufacture(), THIRD_PARTY_MODEL_NAME);
     if( typeId.isNull() )
         return QnThirdPartyResourcePtr();
 
@@ -300,7 +264,7 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     discoveryManager->getRef()->addRef();   //this ref will be released by QnThirdPartyResource
 
     QString vendor = discoveryManager->getVendorName();
-    bool vendorIsRtsp = vendor == lit("GENERIC_RTSP");
+    bool vendorIsRtsp = vendor == lit("GENERIC_RTSP");  //TODO #ak remove this!
 
     QnThirdPartyResourcePtr resource(new QnThirdPartyResource(cameraInfo, camManager, discoveryManager->getRef()));
     resource->setTypeId(typeId);
@@ -310,10 +274,12 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
         resource->setName( QString::fromUtf8("%1-%2").arg(vendor).arg(QString::fromUtf8(cameraInfo.modelName)) );
     resource->setModel( QString::fromUtf8(cameraInfo.modelName) );
     resource->setMAC( QnMacAddress(QString::fromUtf8(cameraInfo.uid).trimmed()) );
-    resource->setAuth( QString::fromUtf8(cameraInfo.defaultLogin), QString::fromUtf8(cameraInfo.defaultPassword) );
+    resource->setDefaultAuth( QString::fromUtf8(cameraInfo.defaultLogin), QString::fromUtf8(cameraInfo.defaultPassword) );
     resource->setUrl( QString::fromUtf8(cameraInfo.url) );
     resource->setPhysicalId( QString::fromUtf8(cameraInfo.uid).trimmed() );
     resource->setVendor( vendor );
+    if( strlen(cameraInfo.auxiliaryData) > 0 )
+        resource->setProperty( QnThirdPartyResource::AUX_DATA_PARAM_NAME, QString::fromLatin1(cameraInfo.auxiliaryData) );
 
     if( !qnResPool->getNetResourceByPhysicalId( resource->getPhysicalId() ) )
     {
@@ -323,7 +289,7 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
         const QnResourceData& resourceData = qnCommon->dataPool()->data(resource);
         const float maxFps = resourceData.value<float>( lit("MaxFPS"), 0.0 );
         if( maxFps > 0.0 )
-            resource->setParam( lit("MaxFPS"), maxFps, QnDomainDatabase );
+            resource->setProperty( lit("MaxFPS"), maxFps);
     }
     
     unsigned int caps;
@@ -333,11 +299,13 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
             resource->setCameraCapability( Qn::ShareIpCapability, true );
     }
 
+    /*
     if (!vendorIsRtsp) { //Bug #3276: Remove group element for generic rtsp/http links
         QString groupName = QString(lit("%1-%2")).arg(vendor).arg(resource->getHostAddress());
         resource->setGroupName(groupName);
         resource->setGroupId(groupName.toLower().trimmed());
     }
+    */
     return resource;
 }
 

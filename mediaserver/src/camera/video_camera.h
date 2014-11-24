@@ -31,8 +31,8 @@ public:
 
     //QnMediaContextPtr getVideoCodecContext(bool primaryLiveStream);
     //QnMediaContextPtr getAudioCodecContext(bool primaryLiveStream);
-    QnConstCompressedVideoDataPtr getLastVideoFrame(bool primaryLiveStream) const;
-    QnConstCompressedVideoDataPtr getFrameByTime(bool primaryLiveStream, qint64 time, bool iFrameAfterTime) const;
+    QnConstCompressedVideoDataPtr getLastVideoFrame(bool primaryLiveStream, int channel) const;
+    QnConstCompressedVideoDataPtr getFrameByTime(bool primaryLiveStream, qint64 time, bool iFrameAfterTime, int channel) const;
     QnConstCompressedAudioDataPtr getLastAudioFrame(bool primaryLiveStream) const;
 	Q_SLOT void at_camera_resourceChanged();
     void beforeStop();

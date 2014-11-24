@@ -39,11 +39,18 @@ static QStringList getValues(const QString& line)
 
 MediaEncoder::MediaEncoder(
     CameraManager* const cameraManager,
-    unsigned int encoderNum )
+    unsigned int encoderNum
+#ifndef NO_ISD_AUDIO
+    , const std::unique_ptr<AudioStreamReader>& audioStreamReader
+#endif
+    )
 :
     m_refManager( cameraManager->refManager() ),
     m_cameraManager( cameraManager ),
     m_encoderNum( encoderNum ),
+#ifndef NO_ISD_AUDIO
+    m_audioStreamReader( audioStreamReader ),
+#endif
     m_motionMask( nullptr ),
     m_fpsListRead( false ),
     m_resolutionListRead( false ),
@@ -200,6 +207,9 @@ nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
         m_streamReader.reset( new StreamReader(
             &m_refManager,
             m_encoderNum,
+#ifndef NO_ISD_AUDIO
+            m_audioStreamReader,
+#endif
             m_cameraManager->info().uid ) );
         if (m_motionMask)
             m_streamReader->setMotionMask((const uint8_t*) m_motionMask->data());
@@ -211,17 +221,24 @@ nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
 
 int MediaEncoder::getAudioFormat( nxcip::AudioFormat* audioFormat ) const
 {
-    if( !m_streamReader.get() ) {
-        m_streamReader.reset( new StreamReader(
-            &m_refManager,
-            m_encoderNum,
-            m_cameraManager->info().uid ) );
-        if (m_motionMask)
-            m_streamReader->setMotionMask((const uint8_t*) m_motionMask->data());
-        m_streamReader->setAudioEnabled( m_audioEnabled );
-    }
+#ifndef NO_ISD_AUDIO
+    *audioFormat = m_audioStreamReader->getAudioFormat();
+    return nxcip::NX_NO_ERROR;
+#else
+    return nxcip::NX_NOT_IMPLEMENTED;
+#endif
+    //if( !m_streamReader.get() ) {
+    //    m_streamReader.reset( new StreamReader(
+    //        &m_refManager,
+    //        m_encoderNum,
+    //        m_audioStreamBridge,
+    //        m_cameraManager->info().uid ) );
+    //    if (m_motionMask)
+    //        m_streamReader->setMotionMask((const uint8_t*) m_motionMask->data());
+    //    m_streamReader->setAudioEnabled( m_audioEnabled );
+    //}
 
-    return m_streamReader->getAudioFormat( audioFormat );
+    //return m_streamReader->getAudioFormat( audioFormat );
 }
 
 void MediaEncoder::setMotionMask( nxcip::Picture* motionMask )

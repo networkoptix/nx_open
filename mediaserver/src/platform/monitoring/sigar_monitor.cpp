@@ -125,10 +125,15 @@ public:
         result.path = QLatin1String(fileSystem.dir_name);
         result.freeBytes = usage.free * 1024;
         result.sizeBytes = usage.total * 1024;
-        if( strcmp( fileSystem.sys_type_name, "fuseblk" ) == 0 )
+        if( strcmp( fileSystem.sys_type_name, "fuseblk" ) == 0 ||
+            strcmp( fileSystem.sys_type_name, "exfat" ) == 0 )
+        {
             result.type = QnPlatformMonitor::LocalDiskPartition;      //TODO #ak this is workaround, have to fix it correctly
+        }
         else
+        {
             result.type = partitionType(fileSystem.type);
+        }
 
         return result;
     }

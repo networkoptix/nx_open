@@ -9,6 +9,15 @@
 class QUrl;
 class QAuthenticator;
 
+enum class DiscoveryMode
+{
+    fullyEnabled,
+    //!In this mode only known cameras are searched. Unknown cameras are ignored
+    partiallyEnabled,
+    //!No auto camera discovery is done
+    disabled
+};
+
 /**
  * Interface for resource searcher plugins.
  */
@@ -20,17 +29,9 @@ protected:
 public:
     virtual ~QnAbstractResourceSearcher();
 
-    /**
-     * Enables or disables this searcher.
-     * 
-     * \param use                       Whether this searcher should be used.
-     */
-    void setShouldBeUsed(bool use);
-
-    /**
-     * \returns                         Whether this searcher should be used.
-     */
-    bool shouldBeUsed() const;
+    //!Enables/disables camera discovery
+    void setDiscoveryMode( DiscoveryMode mode );
+    DiscoveryMode discoveryMode() const;
 
     /**
      * Searches for resources.
@@ -53,7 +54,7 @@ public:
      * \param resourceTypeId            Identifier of the type to check.
      * \returns                         Whether this factory can be used to create resources of the given type.
      */
-    virtual bool isResourceTypeSupported(QUuid resourceTypeId) const;
+    virtual bool isResourceTypeSupported(QnUuid resourceTypeId) const;
 
     /**
      * \returns                         Name of the manufacturer for the resources this searcher adds. 
@@ -84,7 +85,7 @@ protected:
     bool shouldStop() const;
 
 private:
-    bool m_shouldbeUsed;
+    DiscoveryMode m_discoveryMode;
     bool m_localResources;
     volatile bool m_shouldStop;
 };

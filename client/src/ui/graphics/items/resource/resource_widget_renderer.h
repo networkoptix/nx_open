@@ -49,6 +49,7 @@ public:
     virtual void discardAllFramesPostedToDisplay(int channel) override;
     //!Blocks till last frame passed to \a draw method is displayed on screen
     virtual void waitForFrameDisplayed(int channel) override;
+    virtual void waitForQueueLessThan(int channel, int maxSize) override;
     //!Implementation of finishPostedFramesRender QnAbstractRenderer::finishPostedFramesRender
     virtual void finishPostedFramesRender(int channel) override;
 
@@ -141,7 +142,7 @@ private:
 
     std::vector<bool> m_renderingEnabled;
     ScreenshotInterface* m_screenshotInterface;
-
+    int m_panoFactor;
 #ifdef TEST_FISHEYE_CALIBRATOR
     bool m_isCircleDetected;
 #endif

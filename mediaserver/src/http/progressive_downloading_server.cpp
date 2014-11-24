@@ -31,6 +31,7 @@
 #include <media_server/settings.h>
 
 #include "cached_output_stream.h"
+#include "common/common_module.h"
 
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
@@ -92,7 +93,7 @@ public:
             qint64 firstTime = lastTime - tmpQueue.size() * timeResolution;
             for (int i = 0; i < tmpQueue.size(); ++i)
             {
-                QnAbstractMediaDataPtr srcMedia = qSharedPointerDynamicCast<QnAbstractMediaData>(tmpQueue.at(i));
+                const QnAbstractMediaDataPtr& srcMedia = qSharedPointerDynamicCast<QnAbstractMediaData>(tmpQueue.atUnsafe(i));
                 QnAbstractMediaDataPtr media = QnAbstractMediaDataPtr(srcMedia->clone());
                 media->timestamp = firstTime + i*timeResolution;
                 m_dataQueue.push(media);
@@ -311,10 +312,8 @@ public:
 };
 
 static QAtomicInt QnProgressiveDownloadingConsumer_count = 0;
-static const QLatin1String PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME_PARAM_NAME("progressiveDownloading/sessionLiveTimeSec");
 static const QLatin1String DROP_LATE_FRAMES_PARAM_NAME( "dlf" );
 static const QLatin1String STAND_FRAME_DURATION_PARAM_NAME( "sfd" );
-static const int DEFAULT_MAX_CONNECTION_LIVE_TIME = 30*60;    //30 minutes
 static const int MS_PER_SEC = 1000;
 
 QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
@@ -333,7 +332,9 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointe
         arg(d->foreignAddress).arg(d->foreignPort).
         arg(QnProgressiveDownloadingConsumer_count.fetchAndAddOrdered(1)+1), cl_logDEBUG1 );
 
-    const int sessionLiveTimeoutSec = MSSettings::roSettings()->value( PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME_PARAM_NAME, DEFAULT_MAX_CONNECTION_LIVE_TIME ).toUInt();
+    const int sessionLiveTimeoutSec = MSSettings::roSettings()->value(
+        nx_ms_conf::PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME,
+        nx_ms_conf::DEFAULT_PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME ).toUInt();
     if( sessionLiveTimeoutSec > 0 )
         d->killTimerID = TimerManager::instance()->addTimer(
             this,
@@ -374,6 +375,10 @@ QByteArray QnProgressiveDownloadingConsumer::getMimeType(const QByteArray& strea
         return "video/3gp";
     else if (streamingFormat == "rtp")
         return "video/3gp";
+    else if (streamingFormat == "flv")
+        return "video/x-flv";
+    else if (streamingFormat == "f4v")
+        return "video/x-f4v";
     else if (streamingFormat == "mpjpeg")
         return "multipart/x-mixed-replace;boundary=--ffserver";
     else 
@@ -396,12 +401,23 @@ void QnProgressiveDownloadingConsumer::updateCodecByFormat(const QByteArray& str
         d->videoCodec = CODEC_ID_MPEG4;
     else if (streamingFormat == "mpjpeg")
         d->videoCodec = CODEC_ID_MJPEG;
+    else if (streamingFormat == "flv")
+        d->videoCodec = CODEC_ID_H264;  //TODO #ak need to use "copy"
+    else if (streamingFormat == "f4v")
+        d->videoCodec = CODEC_ID_H264;  //TODO #ak need to use "copy"
 }
 
 void QnProgressiveDownloadingConsumer::run()
 {
     Q_D(QnProgressiveDownloadingConsumer);
     initSystemThreadId();
+
+    if (qnCommon->isTranscodeDisabled())
+    {
+        d->responseBody = QByteArray("Video transcoding is disabled in the server settings. Feature unavailable.");
+        sendResponse(CODE_NOT_IMPLEMETED, "text/plain");
+        return;
+    }
 
     QnAbstractMediaStreamDataProviderPtr dataProvider;
 
@@ -474,12 +490,24 @@ void QnProgressiveDownloadingConsumer::run()
         }
 
         QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>();
-        if (mediaRes)
-            d->transcoder.setVideoLayout(mediaRes->getVideoLayout());
+        if (mediaRes) {
+            QnImageFilterHelper extraParams;
+            extraParams.setVideoLayout(mediaRes->getVideoLayout());
+            int rotation;
+            if (decodedUrlQuery.hasQueryItem("rotation"))
+                rotation = decodedUrlQuery.queryItemValue("rotation").toInt();
+            else
+                rotation = mediaRes->toResource()->getProperty(QnMediaResource::rotationKey()).toInt();
+            qreal customAR = mediaRes->toResource()->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
+            extraParams.setRotation(rotation);
+            extraParams.setCustomAR(customAR);
+            
+            d->transcoder.setExtraTranscodeParams(extraParams);
+        }
 
         if (d->transcoder.setVideoCodec(
                 d->videoCodec,
-                QnTranscoder::TM_FfmpegTranscode,
+                d->videoCodec == CODEC_ID_H264 ? QnTranscoder::TM_DirectStreamCopy : QnTranscoder::TM_FfmpegTranscode,
                 quality,
                 videoSize,
                 -1,
@@ -523,12 +551,7 @@ void QnProgressiveDownloadingConsumer::run()
 
         if (isLive)
         {
-            if (resource->getStatus() != Qn::Online && resource->getStatus() != Qn::Recording)
-            {
-                d->responseBody = "Video camera is not ready yet";
-                sendResponse(CODE_NOT_FOUND, "text/plain");
-                return;
-            }
+            //if camera is offline trying to put it online
 
             if (isUTCRequest)
             {
@@ -538,7 +561,7 @@ void QnProgressiveDownloadingConsumer::run()
             }
 
             if (!camera) {
-                d->responseBody = "Media not found";
+                d->responseBody = "Media not found\r\n";
                 sendResponse(CODE_NOT_FOUND, "text/plain");
                 return;
             }
@@ -620,7 +643,7 @@ void QnProgressiveDownloadingConsumer::run()
         
         if (dataProvider == 0)
         {
-            d->responseBody = "Video camera is not ready yet";
+            d->responseBody = "Video camera is not ready yet\r\n";
             sendResponse(CODE_NOT_FOUND, "text/plain");
             return;
         }

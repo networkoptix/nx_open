@@ -18,9 +18,8 @@ public:
 
     QnPlIsdResource();
 
-    virtual bool isResourceAccessible();
-
-    virtual int getMaxFps() const override;
+    //!Implementation of QnNetworkResource::checkIfOnlineAsync
+    virtual bool checkIfOnlineAsync( std::function<void(bool)>&& completionHandler ) override;
 
     QSize getPrimaryResolution() const;
     QSize getSecondaryResolution() const;

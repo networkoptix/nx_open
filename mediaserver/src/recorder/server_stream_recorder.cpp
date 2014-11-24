@@ -4,7 +4,7 @@
 #include "storage_manager.h"
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "core/dataprovider/live_stream_provider.h"
-#include "core/resource/resource_fwd.h"
+#include "core/resource/resource.h"
 #include "core/resource/camera_resource.h"
 #include "utils/common/synctime.h"
 #include "utils/math/math.h"
@@ -18,6 +18,8 @@
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
 #include "utils/common/util.h" /* For MAX_FRAME_DURATION, MIN_FRAME_DURATION. */
+
+#include <boost/algorithm/cxx11/any_of.hpp>
 
 
 static const int MOTION_PREBUFFER_SIZE = 8;
@@ -137,7 +139,7 @@ void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData
 
     bool rez = m_queuedSize <= m_maxRecordQueueSizeBytes && (size_t)m_dataQueue.size() < m_maxRecordQueueSizeElements;
     if (!rez) {
-        emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageFullReason, m_storage);
+        emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageTooSlowReason, m_storage);
 
         qWarning() << "HDD/SSD is slowing down recording for camera " << m_device->getUniqueId() << ". "<<m_dataQueue.size()<<" frames have been dropped!";
         markNeedKeyData();
@@ -403,11 +405,18 @@ void QnServerStreamRecorder::setSpecialRecordingMode(QnScheduleTask& task)
     m_lastSchedulePeriod.clear();
 }
 
+bool QnServerStreamRecorder::isPanicMode() const
+{
+    return boost::algorithm::any_of(qnResPool->getAllServers(), [](const QnMediaServerResourcePtr& server) {
+        return server->getPanicMode() != Qn::PM_None && server->getStatus() == Qn::Online;
+    });
+}
+
 void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
 {
     QMutexLocker lock(&m_scheduleMutex);
 
-    if (m_mediaServer && m_mediaServer->getPanicMode() != Qn::PM_None)
+    if (isPanicMode())
     {
         if (!m_usedPanicMode)
         {
@@ -427,7 +436,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
     }
 
     m_usedSpecialRecordingMode = m_usedPanicMode = false;
-    QnScheduleTask noRecordTask(QUuid(), 1, 0, 0, Qn::RT_Never, 0, 0);
+    QnScheduleTask noRecordTask(QnUuid(), 1, 0, 0, Qn::RT_Never, 0, 0);
 
     if (!m_schedule.isEmpty())
     {

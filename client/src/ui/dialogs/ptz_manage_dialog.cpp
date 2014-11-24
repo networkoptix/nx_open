@@ -1,7 +1,7 @@
 #include "ptz_manage_dialog.h"
 #include "ui_ptz_manage_dialog.h"
 
-#include <QtCore/QUuid>
+#include <utils/common/uuid.h>
 #include <QtCore/QScopedPointer>
 
 #include <QtWidgets/QStyledItemDelegate>
@@ -580,7 +580,7 @@ void QnPtzManageDialog::storePreview(const QString &id) {
     // TODO: #dklychkov get image from the resource
 //    widget->display()->mediaResource()->getImage(...);
     QImage image;
-    m_cache->storeImage(id, image);
+    m_cache->storeImageData(id, image);
 }
 
 void QnPtzManageDialog::setPreview(const QImage &image) {
