@@ -38,9 +38,6 @@ private:
 
     void updatePage();
 
-    void clean();
-
-    void createWidgetsRecreator(const QString &paramId);
     QnMediaServerConnectionPtr getServerConnection() const;
 
     void at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator);

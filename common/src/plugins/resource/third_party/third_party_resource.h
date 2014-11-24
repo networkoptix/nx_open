@@ -123,7 +123,6 @@ private:
     int m_encoderCount;
     std::vector<nxcip::Resolution> m_selectedEncoderResolutions;
     nxcip::BaseCameraManager3* m_cameraManager3;
-    std::map<QString, CameraSetting> m_cameraSettings;
 
     bool initializeIOPorts();
     nxcip::Resolution getMaxResolution( int encoderNumber ) const;

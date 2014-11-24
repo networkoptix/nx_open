@@ -90,21 +90,23 @@ private:
 	/** Get inner camera type that is used in the xml as node id. */
 	QString calculateCameraType(const QnResourcePtr &resource) const;
 
-	/** Parse xml and add its contents to the inner structure. */
-	QnCameraAdvancedParamsTree readXml(QIODevice *xmlSource) const;
-
-	QnCameraAdvancedParams parseCameraXml(const QDomElement &cameraXml) const;
-	QnCameraAdvancedParamGroup parseGroupXml(const QDomElement &groupXml) const;
-	QnCameraAdvancedParameter parseElementXml(const QDomElement &elementXml) const;
-
-	void buildTree(const QMultiMap<QString, QnCameraAdvancedParamsTree> &source, QnCameraAdvancedParamsTree &out) const;
-
 private:
 	/* Per-camera parameters cache. */
 	mutable QHash<QnUuid, QnCameraAdvancedParams> m_paramsByCameraId;
 
 	/* Default parameters tree. */
 	mutable QnCameraAdvancedParamsTree m_defaultParamsTree;
+};
+
+class QnCameraAdvacedParamsXmlParser {
+public:
+	static QnCameraAdvancedParamsTree readXml(QIODevice *xmlSource);
+private:
+	static QnCameraAdvancedParams parseCameraXml(const QDomElement &cameraXml);
+	static QnCameraAdvancedParamGroup parseGroupXml(const QDomElement &groupXml);
+	static QnCameraAdvancedParameter parseElementXml(const QDomElement &elementXml);
+
+	static void buildTree(const QMultiMap<QString, QnCameraAdvancedParamsTree> &source, QnCameraAdvancedParamsTree &out);
 };
 
 #define QnCameraAdvancedParameterTypes (QnCameraAdvancedParamValue)(QnCameraAdvancedParameter)(QnCameraAdvancedParamGroup)(QnCameraAdvancedParams)

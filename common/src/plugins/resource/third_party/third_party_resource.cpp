@@ -15,6 +15,8 @@
 #include <QtXmlPatterns/QXmlSchema>
 #include <QtXmlPatterns/QXmlSchemaValidator>
 
+#include <core/resource/camera_advanced_param.h>
+
 #include <utils/common/log.h>
 
 #include "api/app_server_connection.h"
@@ -77,16 +79,6 @@ bool QnThirdPartyResource::getParamPhysical( const QString& param, QVariant& val
     if( !m_cameraManager3 )
         return false;
 
-    auto settingIter = m_cameraSettings.find( param );
-    if( settingIter == m_cameraSettings.end() )
-        return false;
-
-    if( settingIter->second.getType() == CameraSetting::Group )
-        return true;
-
-    QString paramNameInternal = param;
-    paramNameInternal.replace( lit("%%"), lit("/") );
-
     static const size_t DEFAULT_PARAM_VALUE_BUF_SIZE = 256;
     int valueBufSize = DEFAULT_PARAM_VALUE_BUF_SIZE;
     std::unique_ptr<char[]> valueBuf( new char[valueBufSize] );
@@ -95,16 +87,14 @@ bool QnThirdPartyResource::getParamPhysical( const QString& param, QVariant& val
     for( int i = 0; i < 2; ++i )
     {
         result = m_cameraManager3->getParamValue(
-            paramNameInternal.toUtf8().constData(),
+            param.toUtf8().constData(),
             valueBuf.get(),
             &valueBufSize );
         switch( result )
         {
             case nxcip::NX_NO_ERROR:
             {
-                CameraSetting outVal = settingIter->second;
-                outVal.setCurrent( QString::fromUtf8( valueBuf.get(), valueBufSize ) );
-                val = outVal.serializeToStr();
+                val = QString::fromUtf8( valueBuf.get(), valueBufSize );
                 return true;
             }
             case nxcip::NX_MORE_DATA:
@@ -644,20 +634,22 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
                 //parsing xml to load param list and get cameraID
 
                 QMutexLocker lk( &m_mutex );
-                m_cameraSettings.clear();
-                CameraParamsReader cameraSettingsReader( &m_cameraSettings, this->toSharedPointer() );
-                if( !cameraSettingsReader.read() || !cameraSettingsReader.proceed() )
+				QBuffer dataSource;
+				dataSource.setData(paramDescXML);
+				auto paramsTree = QnCameraAdvacedParamsXmlParser::readXml(&dataSource);
+                
+                if( !paramsTree.isEmpty() )
                 {
                     NX_LOG( lit("Could not parse camera parameters description xml"), cl_logWARNING );
                 }
-                else if( cameraSettingsReader.foundCameraNames().size() != 1 )
+                else if( paramsTree.children.size() != 1 )
                 {
                     NX_LOG( lit("Invalid camera parameters description xml! It contains more than one <camera> element"), cl_logWARNING );
                 }
                 else
                 {
                     setProperty( Qn::PHYSICAL_CAMERA_SETTINGS_XML_PARAM_NAME, QString::fromUtf8(paramDescXML) );
-                    setProperty( Qn::CAMERA_SETTINGS_ID_PARAM_NAME, cameraSettingsReader.foundCameraNames().front() );
+                    setProperty( Qn::CAMERA_SETTINGS_ID_PARAM_NAME, paramsTree.children.front().cameraTypeName );
                 }
             }
             else

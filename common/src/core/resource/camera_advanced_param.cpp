@@ -177,7 +177,7 @@ QnCameraAdvancedParams QnCameraAdvancedParamsReader::params(const QnResourcePtr 
 	if( !cameraSettingsXml.isEmpty() ) {
 		QBuffer dataSource;
 		dataSource.setData( cameraSettingsXml.toUtf8() );
-		QnCameraAdvancedParamsTree params = readXml(&dataSource);
+		QnCameraAdvancedParamsTree params = QnCameraAdvacedParamsXmlParser::readXml(&dataSource);
 		QnCameraAdvancedParams result = params.flatten(cameraType);
 
 		/* Cache result for future use. */
@@ -191,7 +191,7 @@ QnCameraAdvancedParams QnCameraAdvancedParamsReader::params(const QnResourcePtr 
 		QFile dataSource(defaultXmlFilename);
 		Q_ASSERT_X(dataSource.exists(), Q_FUNC_INFO, "Could not read " + defaultXmlFilename.toLatin1());
 		if (dataSource.exists())
-			m_defaultParamsTree = readXml(&dataSource);
+			m_defaultParamsTree = QnCameraAdvacedParamsXmlParser::readXml(&dataSource);
 		Q_ASSERT_X(!m_defaultParamsTree.isEmpty(), Q_FUNC_INFO, defaultXmlFilename.toLatin1() + " is not valid");
 	}
 
@@ -205,7 +205,7 @@ QString QnCameraAdvancedParamsReader::calculateCameraType(const QnResourcePtr &r
 	return resource->getProperty( Qn::CAMERA_SETTINGS_ID_PARAM_NAME );
 }
 
-void QnCameraAdvancedParamsReader::buildTree(const QMultiMap<QString, QnCameraAdvancedParamsTree> &source, QnCameraAdvancedParamsTree &out) const {
+void QnCameraAdvacedParamsXmlParser::buildTree(const QMultiMap<QString, QnCameraAdvancedParamsTree> &source, QnCameraAdvancedParamsTree &out) {
 	auto range = source.values(out.cameraTypeName);
 	for (QnCameraAdvancedParamsTree& child: range) {
 		buildTree(source, child);
@@ -213,7 +213,7 @@ void QnCameraAdvancedParamsReader::buildTree(const QMultiMap<QString, QnCameraAd
 	}
 }
 
-QnCameraAdvancedParamsTree QnCameraAdvancedParamsReader::readXml(QIODevice *xmlSource) const {
+QnCameraAdvancedParamsTree QnCameraAdvacedParamsXmlParser::readXml(QIODevice *xmlSource) {
 	QnCameraAdvancedParamsTree result;
 
 	QDomDocument xmlDom;
@@ -254,7 +254,7 @@ QnCameraAdvancedParamsTree QnCameraAdvancedParamsReader::readXml(QIODevice *xmlS
 	return result;
 }
 
-QnCameraAdvancedParams QnCameraAdvancedParamsReader::parseCameraXml(const QDomElement& cameraXml) const {
+QnCameraAdvancedParams QnCameraAdvacedParamsXmlParser::parseCameraXml(const QDomElement& cameraXml) {
 	QnCameraAdvancedParams result;
 	for (QDomNode node = cameraXml.firstChild(); !node.isNull(); node = node.nextSibling()) {
 		if (node.nodeName() != QnXmlTag::group) 
@@ -266,7 +266,7 @@ QnCameraAdvancedParams QnCameraAdvancedParamsReader::parseCameraXml(const QDomEl
 	return result;
 }
 
-QnCameraAdvancedParamGroup QnCameraAdvancedParamsReader::parseGroupXml(const QDomElement &groupXml) const {
+QnCameraAdvancedParamGroup QnCameraAdvacedParamsXmlParser::parseGroupXml(const QDomElement &groupXml) {
 	QnCameraAdvancedParamGroup result;
 
 	result.name = groupXml.attribute(QnXmlTag::name);
@@ -284,7 +284,7 @@ QnCameraAdvancedParamGroup QnCameraAdvancedParamsReader::parseGroupXml(const QDo
 	return result;
 }
 
-QnCameraAdvancedParameter QnCameraAdvancedParamsReader::parseElementXml(const QDomElement &elementXml) const {
+QnCameraAdvancedParameter QnCameraAdvacedParamsXmlParser::parseElementXml(const QDomElement &elementXml) {
 	QnCameraAdvancedParameter result;
 
 	result.name = elementXml.attribute(QnXmlTag::name);

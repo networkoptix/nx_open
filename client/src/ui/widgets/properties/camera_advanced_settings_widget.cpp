@@ -80,7 +80,6 @@ QnCameraAdvancedSettingsWidget::QnCameraAdvancedSettingsWidget(QWidget* parent /
 }
 
 QnCameraAdvancedSettingsWidget::~QnCameraAdvancedSettingsWidget() {
-    clean();
 }
 
 const QnVirtualCameraResourcePtr & QnCameraAdvancedSettingsWidget::camera() const {
@@ -97,14 +96,7 @@ void QnCameraAdvancedSettingsWidget::setCamera(const QnVirtualCameraResourcePtr 
 }
 
 void QnCameraAdvancedSettingsWidget::updateFromResource() {
-    clean();
     updatePage();
-}
-
-void QnCameraAdvancedSettingsWidget::clean() {
-}
-
-void QnCameraAdvancedSettingsWidget::createWidgetsRecreator(const QString &paramId) {
 }
 
 void QnCameraAdvancedSettingsWidget::setPage(Page page) {
