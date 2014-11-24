@@ -5,6 +5,7 @@
       <xs:enumeration value="MinMaxStep"/>
       <xs:enumeration value="Enumeration"/>
       <xs:enumeration value="String"/>
+      <xs:enumeration value="Button"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:element name="cameras">
@@ -21,6 +22,7 @@
                         <xs:simpleContent>
                           <xs:extension base="xs:string">
                             <xs:attribute type="xs:string" name="name" use="required"/>
+                            <xs:attribute type="xs:string" name="query" use="optional"/>
                             <xs:attribute type="xs:string" name="description" use="optional"/>
                             <xs:attribute type="DataType" name="dataType" use="required"/>
                             <xs:attribute type="xs:string" name="min" use="optional"/>
@@ -39,6 +41,7 @@
                               <xs:simpleContent>
                                 <xs:extension base="xs:string">
                                   <xs:attribute type="xs:string" name="name" use="required"/>
+                                  <xs:attribute type="xs:string" name="query" use="optional"/>
                                   <xs:attribute type="xs:string" name="description" use="optional"/>
                                   <xs:attribute type="DataType" name="dataType" use="required"/>
                                   <xs:attribute type="xs:string" name="min" use="optional"/>

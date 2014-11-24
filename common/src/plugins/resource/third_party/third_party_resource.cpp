@@ -119,16 +119,13 @@ bool QnThirdPartyResource::setParamPhysical( const QString& param, const QVarian
     if( !m_cameraManager3 )
         return false;
 
-    QString paramNameInternal = param;
-    paramNameInternal.replace( lit("%%"), lit("/") );
-
     //TODO #ak return error description
     CameraSetting newValue;
     if( !newValue.deserializeFromStr( val.toString() ) )
         return false;
 
     return m_cameraManager3->setParamValue(
-        paramNameInternal.toUtf8().constData(),
+        param.toUtf8().constData(),
         newValue.getCurrent().str().toUtf8().constData() ) == nxcip::NX_NO_ERROR;
 }
 
@@ -622,6 +619,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         if( paramDescXMLStr != nullptr )
         {
             QByteArray paramDescXML = QByteArray::fromRawData( paramDescXMLStr, strlen(paramDescXMLStr) );
+            //qDebug() << paramDescXML;
             QUrl schemaUrl( lit("qrc:/camera_settings/camera_settings.xsd") );
 
             //validating xml
@@ -640,7 +638,9 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
 				dataSource.setData(paramDescXML);
 				auto paramsTree = QnCameraAdvacedParamsXmlParser::readXml(&dataSource);
                 
-                if( !paramsTree.isEmpty() )
+                Q_ASSERT_X(paramsTree.children.size() == 1, Q_FUNC_INFO, "xml should contain one camera");
+
+                if( paramsTree.isEmpty() )
                 {
                     NX_LOG( lit("Could not parse camera parameters description xml"), cl_logWARNING );
                 }

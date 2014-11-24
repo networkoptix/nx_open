@@ -97,7 +97,7 @@ namespace ite
 
         unsigned frequency() const { return m_frequency; }
         uint8_t strength() const { return m_strength; }
-        bool presented() const { return m_presented; }
+        bool present() const { return m_present; }
 
         static unsigned dev2id(const std::string& devName);
         static unsigned str2id(const std::string& devName);
@@ -119,7 +119,7 @@ namespace ite
         CameraManager * m_camera;
         unsigned m_frequency;
         uint8_t m_strength;
-        bool m_presented;
+        bool m_present;
     };
 
     typedef std::shared_ptr<RxDevice> RxDevicePtr;
@@ -236,11 +236,11 @@ namespace ite
 
         //
 
-        void getParamStr_Frequency(std::string& s) const;
-        void getParamStr_Presented(std::string& s) const;
+        void getParamStr_Channel(std::string& s) const;
+        void getParamStr_Present(std::string& s) const;
         void getParamStr_Strength(std::string& s) const;
 
-        void setParam_Frequency(std::string& s);
+        bool setParam_Channel(std::string& s);
     };
 }
 

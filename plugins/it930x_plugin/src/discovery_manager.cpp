@@ -396,4 +396,17 @@ namespace ite
         memcpy(&rxID, info.auxiliaryData + shift, shift);
         memcpy(&frequency, info.auxiliaryData + shift*2, sizeof(unsigned));
     }
+
+    // Tx parameters
+
+    bool DiscoveryManager::setChannel(unsigned short txID, unsigned short rxID, unsigned chan)
+    {
+        IDsLink idl;
+        idl.txID = txID;
+        idl.rxID = rxID;
+        //idl.frequency = 0;
+
+        rcShell_.setChannel(idl, chan);
+        return false;
+    }
 }

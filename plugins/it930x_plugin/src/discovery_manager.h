@@ -42,6 +42,7 @@ namespace ite
         //
 
         static nxpt::CommonRefManager * refManager() { return &(Instance->m_refManager); }
+        static DiscoveryManager * instance() { return Instance; }
 
         static void makeInfo(nxcip::CameraInfo& cameraInfo, unsigned short txID, unsigned short rxID, unsigned frequency);
         static void updateInfo(nxcip::CameraInfo& cameraInfo, unsigned short rxID, unsigned frequency);
@@ -49,6 +50,8 @@ namespace ite
 
         void updateRxDevices();
         void updateTxLinks(unsigned chan);
+
+        bool setChannel(unsigned short txID, unsigned short rxID, unsigned chan);
 
     private:
         typedef std::shared_ptr<CameraManager> CameraPtr;

@@ -28,19 +28,51 @@ namespace
     typedef enum
     {
         ITE_PARAM_NONE,
-        ITE_PARAM_FREQUENCY,
-        ITE_PARAM_PRESENTED,
+        ITE_PARAM_CHANNEL,
+        ITE_PARAM_PRESENT,
         ITE_PARAM_STRENGTH,
         // ...
         ITE_PARAM_REBOOT,
         ITE_PARAM_SET_DEFAULTS
     } CameraParams;
-
-    const char * PARAM_NAME_FREQUENCY =     "/Transmission/Frequency";
-    const char * PARAM_NAME_PRESENTED =     "/Transmission/Presented";
+#if 0
+    const char * PARAM_NAME_CHANNEL =       "/Transmission/Channel";
+    const char * PARAM_NAME_PRESENT =       "/Transmission/Present";
     const char * PARAM_NAME_STRENGTH =      "/Transmission/Strength";
     const char * PARAM_NAME_REBOOT =        "/Commands/Reboot";
-    const char * PARAM_NAME_SET_DEFAULTS =  "/Commands/Set Defaults";
+    const char * PARAM_NAME_SET_DEFAULTS =  "/Commands/SetDefaults";
+#endif
+    const char * PARAM_QUERY_CHANNEL =       "channel";
+    const char * PARAM_QUERY_PRESENT =       "present";
+    const char * PARAM_QUERY_STRENGTH =      "strength";
+    const char * PARAM_QUERY_REBOOT =        "reboot";
+    const char * PARAM_QUERY_SET_DEFAULTS =  "setDefaults";
+
+    const char * PARAM_CHANNEL_0 = "0 (177)";
+    const char * PARAM_CHANNEL_1 = "1 (189)";
+    const char * PARAM_CHANNEL_2 = "2 (201)";
+    const char * PARAM_CHANNEL_3 = "3 (213)";
+    const char * PARAM_CHANNEL_4 = "4 (225)";
+    const char * PARAM_CHANNEL_5 = "5 (237)";
+    const char * PARAM_CHANNEL_6 = "6 (249)";
+    const char * PARAM_CHANNEL_7 = "7 (261)";
+    const char * PARAM_CHANNEL_8 = "8 (273)";
+    const char * PARAM_CHANNEL_9 = "9 (363)";
+    const char * PARAM_CHANNEL_10 = "10 (375)";
+    const char * PARAM_CHANNEL_11 = "11 (387)";
+    const char * PARAM_CHANNEL_12 = "12 (399)";
+    const char * PARAM_CHANNEL_13 = "13 (411)";
+    const char * PARAM_CHANNEL_14 = "14 (423)";
+    const char * PARAM_CHANNEL_15 = "15 (473)";
+
+    unsigned str2num(std::string& s)
+    {
+        unsigned value;
+        std::stringstream ss;
+        ss << s;
+        ss >> value;
+        return value;
+    }
 
     std::string num2str(unsigned id)
     {
@@ -51,19 +83,44 @@ namespace
 
     CameraParams str2param(const char * paramName)
     {
-        if (! strcmp(paramName, PARAM_NAME_FREQUENCY))
-            return ITE_PARAM_FREQUENCY;
-        if (! strcmp(paramName, PARAM_NAME_PRESENTED))
-            return ITE_PARAM_PRESENTED;
-        if (! strcmp(paramName, PARAM_NAME_STRENGTH))
+        if (! strcmp(paramName, PARAM_QUERY_CHANNEL))
+            return ITE_PARAM_CHANNEL;
+        if (! strcmp(paramName, PARAM_QUERY_PRESENT))
+            return ITE_PARAM_PRESENT;
+        if (! strcmp(paramName, PARAM_QUERY_STRENGTH))
             return ITE_PARAM_STRENGTH;
 
-        if (! strcmp(paramName, PARAM_NAME_REBOOT))
+        if (! strcmp(paramName, PARAM_QUERY_REBOOT))
             return ITE_PARAM_REBOOT;
-        if (! strcmp(paramName, PARAM_NAME_SET_DEFAULTS))
+        if (! strcmp(paramName, PARAM_QUERY_SET_DEFAULTS))
             return ITE_PARAM_SET_DEFAULTS;
 
         return ITE_PARAM_NONE;
+    }
+
+    unsigned replaceSubstring(std::string& str, const std::string& from, const std::string& to)
+    {
+        if (from.empty())
+            return 0;
+
+        unsigned count = 0;
+        size_t start_pos = 0;
+        while ( (start_pos = str.find(from, start_pos)) != std::string::npos )
+        {
+            str.replace(start_pos, from.length(), to);
+            start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+            ++count;
+        }
+
+        return count;
+    }
+
+    unsigned replaceSubstring(std::string& str, const char * from, const char * to)
+    {
+        std::string sFrom(from);
+        std::string sTo(to);
+
+        return replaceSubstring(str, sFrom, sTo);
     }
 }
 
@@ -74,7 +131,7 @@ namespace ite
         m_camera(nullptr),
         m_frequency(0),
         m_strength(0),
-        m_presented(false)
+        m_present(false)
     {}
 
     bool RxDevice::open()
@@ -121,9 +178,9 @@ namespace ite
             uint8_t abortCount = 0;
             float ber = 0.0f;
 
-            m_presented = false;
+            m_present = false;
             m_strength = 0;
-            m_device->statistic(locked, m_presented, m_strength, abortCount, ber);
+            m_device->statistic(locked, m_present, m_strength, abortCount, ber);
             return true;
         }
         catch (const char * msg)
@@ -224,25 +281,53 @@ namespace ite
 
     const char * CameraManager::getParametersDescriptionXML() const
     {
-        static const char * paramsXML =
+        static std::string paramsXML;
+        if (! paramsXML.size()) // first time
+        {
+            // TODO: lock + check
+
+            paramsXML =
             "<cameras> "
                 "<camera name=\"it930x\"> "
                     "<group name=\"Transmission\"> "
-                        "<param name=\"Frequency\" dataType=\"Enumeration\" "
-                            "min=\"177,189,201,213,225,237,249,261,273,363,375,387,399,411,423,473\" "
-                            "max=\"177,189,201,213,225,237,249,261,273,363,375,387,399,411,423,473\" /> "
-                        "<param name=\"Present\" dataType=\"Bool\" readOnly=\"true\" /> "
-                        "<param name=\"Strength\" dataType=\"MinMaxStep\" readOnly=\"true\" min=\"0\" max=\"100\" /> "
+                        "<param query=\"{channel}\" name=\"Channel\" dataType=\"Enumeration\" "
+                            "min=\"{ch0},{ch1},{ch2},{ch3},{ch4},{ch5},{ch6},{ch7},{ch8},{ch9},{ch10},{ch11},{ch12},{ch13},{ch14},{ch15}\" "
+                            "max=\"{ch0},{ch1},{ch2},{ch3},{ch4},{ch5},{ch6},{ch7},{ch8},{ch9},{ch10},{ch11},{ch12},{ch13},{ch14},{ch15}\" /> "
+                        "<param query=\"{present}\" name=\"Present\" dataType=\"Bool\" readOnly=\"true\" /> "
+                        "<param query=\"{strength}\" name=\"Strength\" dataType=\"MinMaxStep\" readOnly=\"true\" min=\"0\" max=\"100\" /> "
                     "</group> "
-#if 0
                     "<group name=\"Commands\"> "
-                        "<param name=\"Reboot\" dataType=\"Button\" /> "
-                        "<param name=\"Set Defaults\" dataType=\"Button\" /> "
+                        "<param query=\"{reboot}\"  name=\"Reboot\" dataType=\"Button\" /> "
+                        "<param query=\"{setDefs}\" name=\"Set Defaults\" dataType=\"Button\" /> "
                     "</group> "
-#endif
                 "</camera> "
             "</cameras>";
-        return paramsXML;
+
+            replaceSubstring(paramsXML, "{channel}",    PARAM_QUERY_CHANNEL);
+            replaceSubstring(paramsXML, "{present}",    PARAM_QUERY_PRESENT);
+            replaceSubstring(paramsXML, "{strength}",   PARAM_QUERY_STRENGTH);
+            replaceSubstring(paramsXML, "{reboot}",     PARAM_QUERY_REBOOT);
+            replaceSubstring(paramsXML, "{setDefs}",    PARAM_QUERY_SET_DEFAULTS);
+
+            replaceSubstring(paramsXML, "{ch0}", PARAM_CHANNEL_0);
+            replaceSubstring(paramsXML, "{ch1}", PARAM_CHANNEL_1);
+            replaceSubstring(paramsXML, "{ch2}", PARAM_CHANNEL_2);
+            replaceSubstring(paramsXML, "{ch3}", PARAM_CHANNEL_3);
+            replaceSubstring(paramsXML, "{ch4}", PARAM_CHANNEL_4);
+            replaceSubstring(paramsXML, "{ch5}", PARAM_CHANNEL_5);
+            replaceSubstring(paramsXML, "{ch6}", PARAM_CHANNEL_6);
+            replaceSubstring(paramsXML, "{ch7}", PARAM_CHANNEL_7);
+            replaceSubstring(paramsXML, "{ch8}", PARAM_CHANNEL_8);
+            replaceSubstring(paramsXML, "{ch9}", PARAM_CHANNEL_9);
+            replaceSubstring(paramsXML, "{ch10}", PARAM_CHANNEL_10);
+            replaceSubstring(paramsXML, "{ch11}", PARAM_CHANNEL_11);
+            replaceSubstring(paramsXML, "{ch12}", PARAM_CHANNEL_12);
+            replaceSubstring(paramsXML, "{ch13}", PARAM_CHANNEL_13);
+            replaceSubstring(paramsXML, "{ch14}", PARAM_CHANNEL_14);
+            replaceSubstring(paramsXML, "{ch15}", PARAM_CHANNEL_15);
+        }
+
+        return paramsXML.c_str();
     }
 
     int CameraManager::getParamValue(const char * paramName, char * valueBuf, int * valueBufSize) const
@@ -251,13 +336,13 @@ namespace ite
 
         switch (str2param(paramName))
         {
-            case ITE_PARAM_FREQUENCY:
+            case ITE_PARAM_CHANNEL:
             {
-                getParamStr_Frequency(strValue);
+                getParamStr_Channel(strValue);
                 break;
             }
-            case ITE_PARAM_PRESENTED:
-                getParamStr_Presented(strValue);
+            case ITE_PARAM_PRESENT:
+                getParamStr_Present(strValue);
                 break;
             case ITE_PARAM_STRENGTH:
                 getParamStr_Strength(strValue);
@@ -274,7 +359,7 @@ namespace ite
 
         if (strValue.size())
         {
-            unsigned strSize = strValue.size() + 1;
+            unsigned strSize = strValue.size();
             if (*valueBufSize < strSize)
             {
                 *valueBufSize = strSize;
@@ -283,6 +368,7 @@ namespace ite
 
             *valueBufSize = strSize;
             strncpy(valueBuf, strValue.c_str(), strSize);
+            valueBuf[strSize] = '\0';
         }
         else
             valueBufSize = 0;
@@ -298,14 +384,15 @@ namespace ite
 
         switch (str2param(paramName))
         {
-            case ITE_PARAM_FREQUENCY:
+            case ITE_PARAM_CHANNEL:
             {
                 std::string str(value);
-                setParam_Frequency(str);
+                if (! setParam_Channel(str))
+                    return nxcip::NX_INVALID_PARAM_VALUE;
                 break;
             }
 
-            case ITE_PARAM_PRESENTED:
+            case ITE_PARAM_PRESENT:
             case ITE_PARAM_STRENGTH:
                 return nxcip::NX_PARAM_READ_ONLY;
 
@@ -322,20 +409,21 @@ namespace ite
         return nxcip::NX_NO_ERROR;
     }
 
-    void CameraManager::getParamStr_Frequency(std::string& s) const
+    void CameraManager::getParamStr_Channel(std::string& s) const
     {
         if (m_rxDevice && m_rxDevice->frequency())
         {
-            unsigned freq = m_rxDevice->frequency() / 1000;
-            s = num2str(freq);
+            unsigned chan = DeviceInfo::freqChannel(m_rxDevice->frequency());
+            if (chan < DeviceInfo::CHANNELS_NUM)
+                s = num2str(chan);
         }
     }
 
-    void CameraManager::getParamStr_Presented(std::string& s) const
+    void CameraManager::getParamStr_Present(std::string& s) const
     {
         if (m_rxDevice)
         {
-            if (m_rxDevice->presented())
+            if (m_rxDevice->present())
                 s = "true";
             else
                 s = "false";
@@ -348,14 +436,21 @@ namespace ite
             s = num2str(m_rxDevice->strength());
     }
 
-    void CameraManager::setParam_Frequency(std::string& s)
+    bool CameraManager::setParam_Channel(std::string& s)
     {
-        // TODO
+        unsigned chan = str2num(s);
+
+        // TODO: validate chan
+
+        if (stopStreams() && captureAnyRxDevice())
+        {
+            return DiscoveryManager::instance()->setChannel(m_txID, m_rxDevice->rxID(), chan);
+        }
+        return false;
     }
 
     //
 
-    // TODO: get from RC
     int CameraManager::getEncoderCount( int* encoderCount ) const
     {
         State state = checkState();
@@ -370,7 +465,7 @@ namespace ite
                 *encoderCount = 0;
                 return nxcip::NX_TRY_AGAIN;
 #else
-                *encoderCount = 2; // FIXME
+                *encoderCount = 2; // TODO: get from RC
                 return nxcip::NX_NO_ERROR;
 #endif
 
@@ -791,7 +886,7 @@ namespace ite
         }
         catch (const std::exception& e)
         {
-            std::string s = e.what();
+            //std::string s = e.what();
         }
 
         std::lock_guard<std::mutex> lock( m_encMutex ); // LOCK

@@ -74,6 +74,32 @@ namespace ite
             return FREQ_X;
         }
 
+        static unsigned freqChannel(unsigned freq)
+        {
+            switch (freq)
+            {
+                case FREQ_CH00: return 0;
+                case FREQ_CH01: return 1;
+                case FREQ_CH02: return 2;
+                case FREQ_CH03: return 3;
+                case FREQ_CH04: return 4;
+                case FREQ_CH05: return 5;
+                case FREQ_CH06: return 6;
+                case FREQ_CH07: return 7;
+                case FREQ_CH08: return 8;
+                case FREQ_CH09: return 9;
+                case FREQ_CH10: return 10;
+                case FREQ_CH11: return 11;
+                case FREQ_CH12: return 12;
+                case FREQ_CH13: return 13;
+                case FREQ_CH14: return 14;
+                case FREQ_CH15: return 15;
+                default:
+                    break;
+            }
+            return 0xffff;
+        }
+
         bool setChannel(unsigned channel);
         bool setEncoderCfg(unsigned streamNo, unsigned bitrate, unsigned fps);
 
