@@ -1,5 +1,7 @@
 #include "camera_advanced_param_widget_factory.h"
 
+#include <ui/common/read_only.h>
+#include <ui/style/warning_style.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <QtCore/QObject>
@@ -11,6 +13,13 @@ QnAbstractCameraAdvancedParamWidget::QnAbstractCameraAdvancedParamWidget(const Q
 {
 	m_layout->setContentsMargins(0, 0, 0, 0);
 	setLayout(m_layout);
+
+	if (parameter.readOnly) {
+		QLabel* readOnlyLabel = new QLabel(tr("Read-Only"));
+		setWarningStyle(readOnlyLabel);
+		m_layout->addWidget(readOnlyLabel);
+	}
+		
 }
 
 class QnBoolCameraAdvancedParamWidget: public QnAbstractCameraAdvancedParamWidget {
@@ -20,9 +29,10 @@ public:
 		m_checkBox(new QCheckBox(this))
 	{
 		m_checkBox->setToolTip(parameter.description);
+		setReadOnly(m_checkBox, parameter.readOnly);
 
-		m_layout->addWidget(m_checkBox);
-		m_layout->addStretch();
+		m_layout->insertStretch(0);
+		m_layout->insertWidget(0, m_checkBox);
 		connect(m_checkBox, &QCheckBox::stateChanged, this, [this] {
 			emit valueChanged(m_id, value());
 		});
@@ -50,9 +60,10 @@ public:
 		m_spinBox->setMaximum(parameter.max.toInt());
 		m_spinBox->setSingleStep(parameter.step.toInt());
 		m_spinBox->setToolTip(parameter.description);
+		setReadOnly(m_spinBox, parameter.readOnly);
 
-		m_layout->addWidget(m_spinBox);
-		m_layout->addStretch();
+		m_layout->insertStretch(0);
+		m_layout->insertWidget(0, m_spinBox);
 		connect(m_spinBox, QnSpinboxIntValueChanged, this, [this] {
 			emit valueChanged(m_id, value());
 		});
@@ -78,20 +89,21 @@ public:
 	{
 		m_comboBox->addItems(parameter.min.split(L',', QString::SkipEmptyParts));
 		m_comboBox->setToolTip(parameter.description);
+		setReadOnly(m_comboBox, parameter.readOnly);
 
-		m_layout->addWidget(m_comboBox);
-		m_layout->addStretch();
+		m_layout->insertStretch(0);
+		m_layout->insertWidget(0, m_comboBox);
 		connect(m_comboBox, &QComboBox::currentTextChanged, this, [this] {
 			emit valueChanged(m_id, value());
 		});
 	}
 
 	virtual QString value() const override	{
-		return m_comboBox->currentText();
+		return m_comboBox->currentIndex();
 	}
 
 	virtual void setValue(const QString &newValue) override	{
-		m_comboBox->setCurrentText(newValue);
+		m_comboBox->setCurrentIndex(newValue.toInt());
 	}
 
 private:
@@ -106,9 +118,10 @@ public:
 		QPushButton *button = new QPushButton(this);
 		button->setText(parameter.name);
 		button->setToolTip(parameter.description);
+		setReadOnly(button, parameter.readOnly);
 
-		m_layout->addWidget(button);
-		m_layout->addStretch();
+		m_layout->insertStretch(0);
+		m_layout->insertWidget(0, button);
 		connect(button, &QPushButton::clicked, this, [this] {
 			emit valueChanged(m_id, QString());
 		});
@@ -125,8 +138,9 @@ public:
 		m_lineEdit(new QLineEdit(this))
 	{
 		m_lineEdit->setToolTip(parameter.description);
+		setReadOnly(m_lineEdit, parameter.readOnly);
 
-		m_layout->addWidget(m_lineEdit);
+		m_layout->insertWidget(0, m_lineEdit);
 		
 		connect(m_lineEdit, &QLineEdit::textEdited, this, [this] {
 			emit valueChanged(m_id, value());
@@ -153,14 +167,17 @@ public:
 		QPushButton *plusButton = new QPushButton(this);
 		plusButton->setText(lit("+"));
 		plusButton->setToolTip(parameter.description);
-		m_layout->addWidget(plusButton);
+		setReadOnly(plusButton, parameter.readOnly);
 
 		QPushButton *minusButton = new QPushButton(this);
 		minusButton->setText(lit("-"));
 		minusButton->setToolTip(parameter.description);
-		m_layout->addWidget(minusButton);
+		setReadOnly(minusButton, parameter.readOnly);
 
-		m_layout->addStretch();
+		m_layout->insertStretch(0);
+		m_layout->insertWidget(0, minusButton);
+		m_layout->insertWidget(0, plusButton);
+
 		connect(plusButton, &QPushButton::clicked, this, [this] {
 			emit valueChanged(m_id, QString());
 		});

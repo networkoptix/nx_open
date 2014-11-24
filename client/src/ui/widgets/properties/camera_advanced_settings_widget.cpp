@@ -158,10 +158,6 @@ void QnCameraAdvancedSettingsWidget::reloadData() {
 		m_advancedParamWidgetsManager->displayParams(params);
 
 		QStringList paramIds = parameterIds(params).toList();
-
-		qDebug() << paramIds;
-		qDebug() << "requesting parameters:" << paramIds.size();
-
 		ui->manualSettingsWidget->setCurrentWidget(ui->manualContentPage);
 
 		/* Nothing to request. */

@@ -3,7 +3,6 @@
 #include <boost/range.hpp>
 #include <boost/algorithm/cxx11/any_of.hpp>
 
-#include <ui/common/read_only.h>
 #include <ui/widgets/properties/camera_advanced_param_widget_factory.h>
 
 QnCameraAdvancedParamWidgetsManager::QnCameraAdvancedParamWidgetsManager(QTreeWidget* groupWidget, QStackedWidget* contentsWidget, QObject* parent /*= NULL*/):
@@ -120,7 +119,6 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString &
 
 		/* Widget is disabled until it receive correct value. */
 		widget->setEnabled(false);
-		setReadOnly(widget, param.readOnly);
 	}
 
 	return groupBox;
