@@ -44,6 +44,7 @@
 */
 
 struct AwaitedParameters;
+class QnCameraAdvancedParamsReader;
 
 class QnCameraSettingsRestHandler
 :
@@ -51,7 +52,11 @@ class QnCameraSettingsRestHandler
 {
     Q_OBJECT
 
+	typedef QnJsonRestHandler base_type;
 public:
+	QnCameraSettingsRestHandler();
+	virtual ~QnCameraSettingsRestHandler();
+
     //!Implementation of QnJsonRestHandler::executeGet
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
     //!Implementation of QnRestRequestHandler::description
@@ -61,6 +66,8 @@ private:
     QMutex m_mutex;
     QWaitCondition m_cond;
     std::set<AwaitedParameters*> m_awaitedParamsSets;
+	QScopedPointer<QnCameraAdvancedParamsReader> m_paramsReader;
+
 
 private slots:
     void asyncParamGetComplete(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result);

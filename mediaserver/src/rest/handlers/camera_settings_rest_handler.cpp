@@ -20,14 +20,45 @@
 #include <utils/network/tcp_connection_priv.h>
 
 
-//!max time (milliseconds) to wait for async operation completion
-static const unsigned long MAX_WAIT_TIMEOUT_MS = 15000;
+namespace {
+
+	//!max time (milliseconds) to wait for async operation completion
+	static const unsigned long MAX_WAIT_TIMEOUT_MS = 15000;
+
+	QSet<QString> allParameterIds(const QnCameraAdvancedParamGroup& group) {
+		QSet<QString> result;
+		for (const QnCameraAdvancedParamGroup &group: group.groups)
+			result.unite(allParameterIds(group));
+		for (const QnCameraAdvancedParameter &param: group.params)
+			if (!param.getId().isEmpty())
+				result.insert(param.getId());
+		return result;
+	}
+
+	QSet<QString> allParameterIds(const QnCameraAdvancedParams& params) {
+		QSet<QString> result;
+		for (const QnCameraAdvancedParamGroup &group: params.groups)
+			result.unite(allParameterIds(group));
+		return result;
+	}
+}
+
+
 
 struct AwaitedParameters {
     QnResourcePtr resource;
 	QSet<QString> requested;
     QnCameraAdvancedParamValueList result;
 };
+
+QnCameraSettingsRestHandler::QnCameraSettingsRestHandler():
+	base_type(),
+	m_paramsReader(new QnCameraAdvancedParamsReader())
+{
+}
+
+QnCameraSettingsRestHandler::~QnCameraSettingsRestHandler()
+{}
 
 int QnCameraSettingsRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) {
 
@@ -55,9 +86,20 @@ int QnCameraSettingsRestHandler::executeGet(const QString &path, const QnRequest
 	locParams.remove(lit("x-server-guid"));
 	locParams.remove(lit("res_id"));
 
+	/* Filter allower parameters. */
+	auto allowedParams = m_paramsReader->params(camera);
+	QSet<QString> allowedIds = allParameterIds(allowedParams);
+
+	for(auto iter = locParams.begin(); iter != locParams.end();) {
+		if (allowedIds.contains(iter.key()))
+			++iter;
+		else
+			iter = locParams.erase(iter);
+	}
+
     //TODO it would be nice to fill reasonPhrase too
     if( locParams.empty() ) {
-		NX_LOG( QString::fromLatin1("QnCameraSettingsHandler. No param names in request %1").arg(path), cl_logWARNING );
+		NX_LOG( QString::fromLatin1("QnCameraSettingsHandler. No valid param names in request %1").arg(path), cl_logWARNING );
         return CODE_BAD_REQUEST;
 	}
 
@@ -191,4 +233,5 @@ void QnCameraSettingsRestHandler::asyncParamSetComplete(const QnResourcePtr &res
     //processing is identical to the previous method
     asyncParamGetComplete(resource, paramName, paramValue, result);
 }
+
 
