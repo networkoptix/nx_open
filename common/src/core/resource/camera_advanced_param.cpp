@@ -167,6 +167,10 @@ QnCameraAdvancedParams QnCameraAdvancedParamsReader::params(const QnResourcePtr 
 	if (m_paramsByCameraId.contains(id))
 		return m_paramsByCameraId[id];
 
+	const QString cameraType = calculateCameraType(resource);
+	if (cameraType.isEmpty())
+		return QnCameraAdvancedParams();
+
 	/* Check if the camera has its own xml. */
 	QString cameraSettingsXml = resource->getProperty( Qn::PHYSICAL_CAMERA_SETTINGS_XML_PARAM_NAME );
 	/* If yes, read it. */
@@ -174,7 +178,7 @@ QnCameraAdvancedParams QnCameraAdvancedParamsReader::params(const QnResourcePtr 
 		QBuffer dataSource;
 		dataSource.setData( cameraSettingsXml.toUtf8() );
 		QnCameraAdvancedParamsTree params = readXml(&dataSource);
-		QnCameraAdvancedParams result = params.flatten();
+		QnCameraAdvancedParams result = params.flatten(cameraType);
 
 		/* Cache result for future use. */
 		m_paramsByCameraId[id] = result;
@@ -190,10 +194,6 @@ QnCameraAdvancedParams QnCameraAdvancedParamsReader::params(const QnResourcePtr 
 			m_defaultParamsTree = readXml(&dataSource);
 		Q_ASSERT_X(!m_defaultParamsTree.isEmpty(), Q_FUNC_INFO, defaultXmlFilename.toLatin1() + " is not valid");
 	}
-
-	const QString cameraType = calculateCameraType(resource);
-	if (cameraType.isEmpty())
-		return QnCameraAdvancedParams();
 
 	QnCameraAdvancedParams result = m_defaultParamsTree.flatten(cameraType);
 	/* Cache result for future use. */

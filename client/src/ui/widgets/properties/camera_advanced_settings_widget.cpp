@@ -172,6 +172,10 @@ void QnCameraAdvancedSettingsWidget::reloadData() {
 
 		ui->manualSettingsWidget->setCurrentWidget(ui->manualContentPage);
 
+		/* Nothing to request. */
+		if (paramIds.isEmpty())
+			return;
+
         QnMediaServerConnectionPtr serverConnection = getServerConnection();
         if (!serverConnection)
             return;
