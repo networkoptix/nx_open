@@ -1,5 +1,8 @@
 #include "camera_advanced_param_widgets_manager.h"
 
+#include <boost/range.hpp>
+#include <boost/algorithm/cxx11/any_of.hpp>
+
 #include <ui/widgets/properties/camera_advanced_param_widget_factory.h>
 
 QnCameraAdvancedParamWidgetsManager::QnCameraAdvancedParamWidgetsManager(QTreeWidget* groupWidget, QStackedWidget* contentsWidget, QObject* parent /*= NULL*/):
@@ -53,8 +56,18 @@ void QnCameraAdvancedParamWidgetsManager::loadValues(const QHash<QString, QStrin
 	}
 }
 
+bool QnCameraAdvancedParamWidgetsManager::hasValidValues(const QnCameraAdvancedParamGroup &group) const {
+	bool hasValidParameter = boost::algorithm::any_of(group.params, [](const QnCameraAdvancedParameter &param){return param.isValid();});
+	if (hasValidParameter)
+		return true;
+	return boost::algorithm::any_of(group.groups, [this](const QnCameraAdvancedParamGroup &group){return hasValidValues(group);});
+}
+
 
 void QnCameraAdvancedParamWidgetsManager::createGroupWidgets(const QnCameraAdvancedParamGroup &group, QTreeWidgetItem* parentItem) {
+	if (!hasValidValues(group))
+		return;
+
 	QTreeWidgetItem* item;
 	if (parentItem) {
 		item = new QTreeWidgetItem(parentItem);
@@ -67,7 +80,7 @@ void QnCameraAdvancedParamWidgetsManager::createGroupWidgets(const QnCameraAdvan
 	item->setData(0, Qt::DisplayRole, group.name);
 	item->setData(0, Qt::ToolTipRole, group.description);
 
-	QWidget* contentsPage = createContentsPage(group.params);
+	QWidget* contentsPage = createContentsPage(group.name, group.params);
 	m_contentsWidget->addWidget(contentsPage);
 
 	item->setData(0, Qt::UserRole, qVariantFromValue(contentsPage));
@@ -77,32 +90,39 @@ void QnCameraAdvancedParamWidgetsManager::createGroupWidgets(const QnCameraAdvan
 }
 
 
-QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const std::vector<QnCameraAdvancedParameter> &params) {
+QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString &name, const std::vector<QnCameraAdvancedParameter> &params) {
+	QGroupBox* groupBox = new QGroupBox(m_contentsWidget);
+	groupBox->setTitle(name);
+	groupBox->setLayout(new QHBoxLayout(groupBox));
 
-	QScrollArea* listWidget = new QScrollArea(m_contentsWidget);
-	listWidget->setWidgetResizable(true);
+	QScrollArea* scrollArea = new QScrollArea(groupBox);
+	scrollArea->setWidgetResizable(true);
+
+	groupBox->layout()->addWidget(scrollArea);
 	
-	QFormLayout* formLayout = new QFormLayout(listWidget);
-	listWidget->setLayout(formLayout);
+	QWidget* scrollAreaWidgetContents = new QWidget();
+
+	QFormLayout* formLayout = new QFormLayout(scrollAreaWidgetContents);
+	scrollAreaWidgetContents->setLayout(formLayout);
+	scrollArea->setWidget(scrollAreaWidgetContents);
 
 	for(const QnCameraAdvancedParameter &param: params) {
-		QnAbstractCameraAdvancedParamWidget* widget = QnCameraAdvancedParamWidgetFactory::createWidget(param, listWidget);
+		QnAbstractCameraAdvancedParamWidget* widget = QnCameraAdvancedParamWidgetFactory::createWidget(param, scrollAreaWidgetContents);
 		if (!widget)
 			continue;
 
+		QLabel* label = new QLabel(scrollAreaWidgetContents);
+		label->setToolTip(param.description);
 		if (param.dataType != QnCameraAdvancedParameter::DataType::Button)
-			formLayout->addRow(param.name, widget);
-		else
-			formLayout->addRow(QString(), widget);
+			label->setText(lit("%1: ").arg(param.name));
+		formLayout->addRow(label, widget);
+		m_paramWidgetsById[param.getId()] = widget;
 
-		if (!param.getId().isEmpty()) {
-			m_paramWidgetsById[param.getId()] = widget;
-			/* Widget is disabled until it receive correct value. */
-			widget->setEnabled(false);
-		}
+		/* Widget is disabled until it receive correct value. */
+		widget->setEnabled(false);
 	}
 
 	//listLayout->addStretch();
 
-	return listWidget;
+	return groupBox;
 }

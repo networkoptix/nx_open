@@ -42,6 +42,10 @@ QString QnCameraAdvancedParameter::getId() const {
 	return query;
 }
 
+bool QnCameraAdvancedParameter::isValid() const {
+	return !getId().isEmpty();
+}
+
 QString QnCameraAdvancedParameter::dataTypeToString(DataType value) {
 	switch (value) {
 	case QnCameraAdvancedParameter::DataType::Bool:
@@ -76,7 +80,6 @@ QnCameraAdvancedParameter::DataType QnCameraAdvancedParameter::stringToDataType(
 			return dataType;
 	return DataType::None;
 }
-
 
 void QnCameraAdvancedParamGroup::merge(const QnCameraAdvancedParamGroup &other) {
 	for (const QnCameraAdvancedParamGroup &group: other.groups) {

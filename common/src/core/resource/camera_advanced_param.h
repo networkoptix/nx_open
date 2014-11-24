@@ -20,6 +20,7 @@ struct QnCameraAdvancedParameter {
     };
 
 	QString getId() const;
+	bool isValid() const;
 
     QString name;
     QString description;

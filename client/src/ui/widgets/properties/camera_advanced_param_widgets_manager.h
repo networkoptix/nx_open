@@ -22,8 +22,11 @@ signals:
 private:
 	void clear();
 
+	/** Check if group has at least one valid value. */
+	bool hasValidValues(const QnCameraAdvancedParamGroup &group) const;
+
 	void createGroupWidgets(const QnCameraAdvancedParamGroup &group, QTreeWidgetItem* parentItem = NULL);
-	QWidget* createContentsPage(const std::vector<QnCameraAdvancedParameter> &params);
+	QWidget* createContentsPage(const QString &name, const std::vector<QnCameraAdvancedParameter> &params);
 
 private:
 	QTreeWidget* m_groupWidget;
