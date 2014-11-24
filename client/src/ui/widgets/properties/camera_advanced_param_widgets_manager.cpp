@@ -56,10 +56,10 @@ void QnCameraAdvancedParamWidgetsManager::loadValues(const QnCameraAdvancedParam
 }
 
 bool QnCameraAdvancedParamWidgetsManager::hasValidValues(const QnCameraAdvancedParamGroup &group) const {
-	bool hasValidParameter = boost::algorithm::any_of(group.params, [](const QnCameraAdvancedParameter &param){return param.isValid();});
+    bool hasValidParameter = boost::algorithm::any_of(group.params, [](const QnCameraAdvancedParameter &param){return param.isValid();});
 	if (hasValidParameter)
 		return true;
-	return boost::algorithm::any_of(group.groups, [this](const QnCameraAdvancedParamGroup &group){return hasValidValues(group);});
+    return boost::algorithm::any_of(group.groups, [this](const QnCameraAdvancedParamGroup &group){return hasValidValues(group);});
 }
 
 
@@ -84,8 +84,8 @@ void QnCameraAdvancedParamWidgetsManager::createGroupWidgets(const QnCameraAdvan
 
 	item->setData(0, Qt::UserRole, qVariantFromValue(contentsPage));
 
-	for (const QnCameraAdvancedParamGroup &group: group.groups)
-		createGroupWidgets(group, item);
+    for (const QnCameraAdvancedParamGroup &subGroup: group.groups)
+        createGroupWidgets(subGroup, item);
 }
 
 

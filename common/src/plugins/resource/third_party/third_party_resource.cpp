@@ -119,14 +119,9 @@ bool QnThirdPartyResource::setParamPhysical( const QString& param, const QVarian
     if( !m_cameraManager3 )
         return false;
 
-    //TODO #ak return error description
-    CameraSetting newValue;
-    if( !newValue.deserializeFromStr( val.toString() ) )
-        return false;
-
     return m_cameraManager3->setParamValue(
         param.toUtf8().constData(),
-        newValue.getCurrent().str().toUtf8().constData() ) == nxcip::NX_NO_ERROR;
+        val.toString().toUtf8().constData() ) == nxcip::NX_NO_ERROR;
 }
 
 bool QnThirdPartyResource::ping()
