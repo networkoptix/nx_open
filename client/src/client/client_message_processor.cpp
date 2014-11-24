@@ -85,8 +85,10 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
             /* Handling a case when an incompatible server is changing its systemName at runtime and becoming compatible. */
             if (resource->getStatus() == Qn::NotDefined && mediaServer->getStatus() == Qn::Incompatible) {
                 if (QnMediaServerResourcePtr updatedServer = resource.dynamicCast<QnMediaServerResource>()) {
-                    if (isCompatible(qnCommon->engineVersion(), updatedServer->getVersion()))
+                    if (isCompatible(qnCommon->engineVersion(), updatedServer->getVersion())) {
                         mediaServer->setStatus(Qn::Online);
+                        checkForTmpStatus(mediaServer);
+                    }
                 }
             }
         }
@@ -168,8 +170,10 @@ void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data)
     }
 
     QnMediaServerResourcePtr server = qnResPool->getResourceById(data.peer.id).staticCast<QnMediaServerResource>();
-    if (server)
+    if (server) {
         server->setStatus(Qn::Offline);
+        checkForTmpStatus(server);
+    }
 
     if (data.peer.id != qnCommon->remoteGUID())
         return;
