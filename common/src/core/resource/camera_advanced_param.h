@@ -47,6 +47,8 @@ struct QnCameraAdvancedParameter {
 
 	static QString dataTypeToString(DataType value);
 	static DataType stringToDataType(const QString &value);
+
+	static bool dataTypeHasValue(DataType value);
 };
 #define QnCameraAdvancedParameter_Fields (name)(description)(query)(dataType)(method)(min)(max)(step)(readOnly)
 

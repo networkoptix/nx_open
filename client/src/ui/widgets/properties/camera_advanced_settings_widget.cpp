@@ -31,9 +31,7 @@ namespace {
     }
 
 	bool parameterRequired(const QnCameraAdvancedParameter &param) {
-		return param.isValid()
-			&& param.dataType != QnCameraAdvancedParameter::DataType::Button
-			&& param.dataType != QnCameraAdvancedParameter::DataType::ControlButtonsPair;
+		return param.isValid() && QnCameraAdvancedParameter::dataTypeHasValue(param.dataType);
 	}
 
 	QSet<QString> parameterIds(const QnCameraAdvancedParamGroup& group) {

@@ -69,9 +69,8 @@ QString QnCameraAdvancedParameter::dataTypeToString(DataType value) {
 		return lit("String");
 	case QnCameraAdvancedParameter::DataType::ControlButtonsPair:
 		return lit("ControlButtonsPair");
-	default:
-		return QString();
 	}
+	return QString();
 }
 
 QnCameraAdvancedParameter::DataType QnCameraAdvancedParameter::stringToDataType(const QString &value) {
@@ -88,6 +87,20 @@ QnCameraAdvancedParameter::DataType QnCameraAdvancedParameter::stringToDataType(
 		if (dataTypeToString(dataType) == value)
 			return dataType;
 	return DataType::None;
+}
+
+bool QnCameraAdvancedParameter::dataTypeHasValue(DataType value) {
+	switch (value) {
+	case QnCameraAdvancedParameter::DataType::Bool:
+	case QnCameraAdvancedParameter::DataType::MinMaxStep:
+	case QnCameraAdvancedParameter::DataType::Enumeration:
+	case QnCameraAdvancedParameter::DataType::String:
+		return true;
+	case QnCameraAdvancedParameter::DataType::Button:
+	case QnCameraAdvancedParameter::DataType::ControlButtonsPair:
+		return false;
+	}
+	return false;
 }
 
 void QnCameraAdvancedParamGroup::merge(const QnCameraAdvancedParamGroup &other) {
