@@ -29,8 +29,8 @@ QnPhysicalCameraResource::QnPhysicalCameraResource():
 
 int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const
 {
-    float lowEnd = 0.1;
-    float hiEnd = 1.0;
+    float lowEnd = 0.1f;
+    float hiEnd = 1.0f;
 
     float qualityFactor = lowEnd + (hiEnd - lowEnd) * (quality - Qn::QualityLowest) / (Qn::QualityHighest - Qn::QualityLowest);
 
