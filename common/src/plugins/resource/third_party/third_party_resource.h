@@ -37,10 +37,11 @@ public:
 
     //!Implementation of QnResource::getPtzController
     virtual QnAbstractPtzController* createPtzControllerInternal() override;
+    
     //!Implementation of QnResource::getParamPhysical
-    virtual bool getParamPhysical( const QString& param, QVariant& val ) override;
+    virtual bool getParamPhysical(const QString &id, QString &value) override;
     //!Implementation of QnResource::setParamPhysical
-    virtual bool setParamPhysical( const QString& param, const QVariant& val ) override;
+    virtual bool setParamPhysical(const QString &id, const QString &value) override;
 
     //!Implementation of QnNetworkResource::ping
     /*!

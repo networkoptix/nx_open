@@ -72,16 +72,15 @@ bool QnArecontPanoramicResource::getParamPhysical(int channel, const QString& na
     return true;
 }
 
-bool QnArecontPanoramicResource::setParamPhysical(const QString &param, const QVariant& val )
-{
-    if (setSpecialParam(param, val))
+bool QnArecontPanoramicResource::setParamPhysical(const QString &id, const QString &value) {
+    if (setSpecialParam(id, value))
         return true;
     QUrl devUrl(getUrl());
     for (int i = 1; i <=4 ; ++i)
     {
         CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
 
-        QString request = QLatin1String("set") + QString::number(i) + QLatin1Char('?') + param + QLatin1Char('=') + val.toString();
+        QString request = QLatin1String("set") + QString::number(i) + QLatin1Char('?') + id + QLatin1Char('=') + value;
 
         if (connection.doGET(request)!=CL_HTTP_SUCCESS)
             if (connection.doGET(request)!=CL_HTTP_SUCCESS) // try twice.
@@ -90,18 +89,17 @@ bool QnArecontPanoramicResource::setParamPhysical(const QString &param, const QV
     return true;
 }
 
-bool QnArecontPanoramicResource::setSpecialParam(const QString& name, const QVariant& val)
-{
-    if (name == QLatin1String("resolution"))
+bool QnArecontPanoramicResource::setSpecialParam(const QString &id, const QString& value) {
+    if (id == lit("resolution"))
     {
-        if (val.toString() == QLatin1String("half"))
+        if (value == lit("half"))
             return setResolution(false);
-        if (val.toString() == QLatin1String("full"))
+        if (value == lit("full"))
             return setResolution(true);
     }
-    else if (name == QLatin1String("Quality"))
+    else if (id == lit("Quality"))
     {
-        int q = val.toInt();
+        int q = value.toInt();
         if (q >= 1 && q <= 21)
             return setCamQuality(q);
     }
@@ -118,7 +116,7 @@ CameraDiagnostics::Result QnArecontPanoramicResource::initInternal()
 
     setRegister(3, 100, 10); // sets I frame frequency to 10
 
-    setParamPhysical(QLatin1String("cnannelenable"), 15); // to enable all channels
+    setParamPhysical(lit("cnannelenable"), QString::number(15)); // to enable all channels
 
     updateFlipState();
 

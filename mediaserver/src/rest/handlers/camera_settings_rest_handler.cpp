@@ -86,7 +86,7 @@ int QnCameraSettingsRestHandler::executeGet(const QString &path, const QnRequest
 	locParams.remove(lit("x-server-guid"));
 	locParams.remove(lit("res_id"));
 
-	/* Filter allower parameters. */
+	/* Filter allowed parameters. */
 	auto allowedParams = m_paramsReader->params(camera);
 	QSet<QString> allowedIds = allParameterIds(allowedParams);
 
@@ -207,13 +207,12 @@ int QnCameraSettingsRestHandler::executeGet(const QString &path, const QnRequest
 //
 //}
 
-void QnCameraSettingsRestHandler::asyncParamGetComplete(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result )
-{
+void QnCameraSettingsRestHandler::asyncParamGetComplete(const QnResourcePtr &resource, const QString &id, const QString &value, bool success) {
     QMutexLocker lk( &m_mutex );
 
-    NX_LOG( QString::fromLatin1("QnCameraSettingsHandler::asyncParamGetComplete. paramName %1, paramValue %2").arg(paramName).arg(paramValue.toString()), cl_logDEBUG1 );
+    NX_LOG( QString::fromLatin1("QnCameraSettingsHandler::asyncParamGetComplete. paramName %1, paramValue %2").arg(id).arg(value), cl_logDEBUG1 );
 
-	qDebug() << "param processing complete" << paramName << paramValue.toString();
+	qDebug() << "param processing complete" << id << value;
     for( std::set<AwaitedParameters*>::const_iterator
         it = m_awaitedParamsSets.begin();
         it != m_awaitedParamsSets.end();
@@ -223,27 +222,26 @@ void QnCameraSettingsRestHandler::asyncParamGetComplete(const QnResourcePtr &res
         if(!awaitedParams || awaitedParams->resource != resource)
             continue;
 
-		if (!awaitedParams->requested.contains(paramName)) {
-			qDebug() << "waiting params set does not contains" << paramName;
+		if (!awaitedParams->requested.contains(id)) {
+			qDebug() << "waiting params set does not contains" << value;
 			continue;
 		}
 
-		if (result) {
-			qDebug() << "adding" << paramName << "to result";
-			awaitedParams->result << QnCameraAdvancedParamValue(paramName, paramValue.toString());
+		if (success) {
+			qDebug() << "adding" << id << "to result";
+			awaitedParams->result << QnCameraAdvancedParamValue(id, value);
 		} else {
 			qDebug() << "parameter request was not successful, skipping";
 		}
-		awaitedParams->requested.remove(paramName);
+		awaitedParams->requested.remove(id);
     }
 
     m_cond.wakeAll();
 }
 
-void QnCameraSettingsRestHandler::asyncParamSetComplete(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result )
-{
+void QnCameraSettingsRestHandler::asyncParamSetComplete(const QnResourcePtr &resource, const QString &id, const QString &value, bool success) {
     //processing is identical to the previous method
-    asyncParamGetComplete(resource, paramName, paramValue, result);
+    asyncParamGetComplete(resource, id, value, success);
 }
 
 

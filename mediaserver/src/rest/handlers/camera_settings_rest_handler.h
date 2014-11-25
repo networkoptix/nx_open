@@ -70,8 +70,8 @@ private:
 
 
 private slots:
-    void asyncParamGetComplete(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result);
-    void asyncParamSetComplete(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result);
+    void asyncParamGetComplete(const QnResourcePtr &resource, const QString &id, const QString &value, bool success);
+    void asyncParamSetComplete(const QnResourcePtr &resource, const QString &id, const QString &value, bool success);
 };
 
 //!Handles getCameraParam request

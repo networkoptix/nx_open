@@ -72,9 +72,8 @@ QnAbstractPtzController* QnThirdPartyResource::createPtzControllerInternal()
     return new QnThirdPartyPtzController( toSharedPointer().staticCast<QnThirdPartyResource>(), ptzManager );
 }
 
-bool QnThirdPartyResource::getParamPhysical( const QString& param, QVariant& val )
-{
-	qDebug() << "QnThirdPartyResource::getParamPhysical" << param;
+bool QnThirdPartyResource::getParamPhysical(const QString& id, QString &value) {
+	qDebug() << "QnThirdPartyResource::getParamPhysical" << id;
     QMutexLocker lk( &m_mutex );
 
     if( !m_cameraManager3 )
@@ -88,15 +87,15 @@ bool QnThirdPartyResource::getParamPhysical( const QString& param, QVariant& val
     for( int i = 0; i < 2; ++i )
     {
         result = m_cameraManager3->getParamValue(
-            param.toUtf8().constData(),
+            id.toUtf8().constData(),
             valueBuf.get(),
             &valueBufSize );
         switch( result )
         {
             case nxcip::NX_NO_ERROR:
             {
-                val = QString::fromUtf8( valueBuf.get(), valueBufSize );
-				qDebug() << "QnThirdPartyResource::getParamPhysical calculated result" << param << val.toString() << val.toString().size();
+                value = QString::fromUtf8( valueBuf.get(), valueBufSize );
+				qDebug() << "QnThirdPartyResource::getParamPhysical calculated result" << id << value << value.size();
                 return true;
             }
             case nxcip::NX_MORE_DATA:
@@ -109,19 +108,18 @@ bool QnThirdPartyResource::getParamPhysical( const QString& param, QVariant& val
     }
 
     //TODO #ak return error description
-	qDebug() << "QnThirdPartyResource::getParamPhysical could not calculate result for" << param;
+	qDebug() << "QnThirdPartyResource::getParamPhysical could not calculate result for" << id;
     return false;
 }
 
-bool QnThirdPartyResource::setParamPhysical( const QString& param, const QVariant& val )
-{
+bool QnThirdPartyResource::setParamPhysical(const QString& id, const QString &value) {
     QMutexLocker lk( &m_mutex );
     if( !m_cameraManager3 )
         return false;
 
     return m_cameraManager3->setParamValue(
-        param.toUtf8().constData(),
-        val.toString().toUtf8().constData() ) == nxcip::NX_NO_ERROR;
+        id.toUtf8().constData(),
+        value.toUtf8().constData() ) == nxcip::NX_NO_ERROR;
 }
 
 bool QnThirdPartyResource::ping()

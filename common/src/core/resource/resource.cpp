@@ -42,26 +42,26 @@ static const qint64 MIN_INIT_INTERVAL = 1000000ll * 30;
 class QnResourceGetParamCommand : public QnResourceCommand
 {
 public:
-    QnResourceGetParamCommand(QnResourcePtr res, const QString& name):
+    QnResourceGetParamCommand(QnResourcePtr res, const QString& id):
         QnResourceCommand(res),
-        m_name(name)
+        m_id(id)
     {}
 
     virtual void beforeDisconnectFromResource(){}
 
     bool execute()
     {
-        bool rez = false;
-        QVariant val;
+        bool success = false;
+        QString value;
         if (isConnectedToTheResource()) {
-            rez = m_resource->getParamPhysical(m_name, val);
+            success = m_resource->getParamPhysical(m_id, value);
         }
-        emit m_resource->asyncParamGetDone(m_resource, m_name, val, rez);
-        return rez;
+        emit m_resource->asyncParamGetDone(m_resource, m_id, value, success);
+        return success;
     }
 
 private:
-    QString m_name;
+    QString m_id;
 };
 
 typedef QSharedPointer<QnResourceGetParamCommand> QnResourceGetParamCommandPtr;
@@ -74,10 +74,10 @@ typedef QSharedPointer<QnResourceGetParamCommand> QnResourceGetParamCommandPtr;
 class QnResourceSetParamCommand : public QnResourceCommand
 {
 public:
-    QnResourceSetParamCommand(QnResourcePtr res, const QString& name, const QVariant& val):
+    QnResourceSetParamCommand(QnResourcePtr res, const QString& id, const QString& value):
         QnResourceCommand(res),
-        m_name(name),
-        m_val(val)
+        m_id(id),
+        m_value(value)
     {}
 
     virtual void beforeDisconnectFromResource(){}
@@ -87,14 +87,14 @@ public:
         if (!isConnectedToTheResource())
             return false;
 
-        bool rez = m_resource->setParamPhysical(m_name, m_val);
-        emit m_resource->asyncParamSetDone(m_resource, m_name, m_val, rez);
-        return rez;
+        bool success = m_resource->setParamPhysical(m_id, m_value);
+        emit m_resource->asyncParamSetDone(m_resource, m_id, m_value, success);
+        return success;
     }
 
 private:
-    QString m_name;
-    QVariant m_val;
+    QString m_id;
+    QString m_value;
 };
 typedef QSharedPointer<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
 
@@ -346,21 +346,23 @@ bool QnResource::hasParam(const QString &name) const
     return resType->hasParam(name);
 }
 
-bool QnResource::getParamPhysical(const QString&/* name*/, QVariant &/*val*/)
-{
+bool QnResource::getParamPhysical(const QString &id, QString &value) {
+    Q_UNUSED(id)
+    Q_UNUSED(value)
     return false;
 }
 
-bool QnResource::setParamPhysical(const QString &/*param*/, const QVariant &/*val*/)
-{
+bool QnResource::setParamPhysical(const QString &id, const QString &value) {
+    Q_UNUSED(id)
+    Q_UNUSED(value)
     return false;
 }
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-void QnResource::setParamPhysicalAsync(const QString& name, const QVariant& val)
+void QnResource::setParamPhysicalAsync(const QString& name, const QString& value)
 {
-    QnResourceSetParamCommandPtr command(new QnResourceSetParamCommand(toSharedPointer(this), name, val));
+    QnResourceSetParamCommandPtr command(new QnResourceSetParamCommand(toSharedPointer(this), name, value));
     addCommandToProc(command);
 }
 
