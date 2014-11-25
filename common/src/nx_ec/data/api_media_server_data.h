@@ -52,16 +52,17 @@ namespace ec2
         ApiMediaServerData,
         ApiMediaServerUserAttributesData
     {
+        ApiMediaServerDataEx(): ApiMediaServerData(), ApiMediaServerUserAttributesData(), status(Qn::Offline) {}
+
         Qn::ResourceStatus status;
         std::vector<ApiResourceParamData> addParams;
         ApiStorageDataList storages;
 
-        ApiMediaServerDataEx();
-
         template<class ApiMediaServerDataRefType>
         ApiMediaServerDataEx( ApiMediaServerDataRefType&& mediaServerData )
         :
-            ApiMediaServerData( std::forward<ApiMediaServerDataRefType>(mediaServerData) )
+            ApiMediaServerData( std::forward<ApiMediaServerDataRefType>(mediaServerData) ),
+            status(Qn::Offline)
         {
         }
     };

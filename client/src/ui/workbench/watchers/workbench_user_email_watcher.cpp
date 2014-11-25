@@ -5,6 +5,8 @@
 
 #include <utils/common/email.h>
 
+#include <ui/workbench/workbench_context.h>
+
 QnWorkbenchUserEmailWatcher::QnWorkbenchUserEmailWatcher(QObject *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent)
@@ -13,6 +15,8 @@ QnWorkbenchUserEmailWatcher::QnWorkbenchUserEmailWatcher(QObject *parent) :
     connect(resourcePool(), SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
     foreach(const QnResourcePtr &resource, resourcePool()->getResources())
         at_resourcePool_resourceAdded(resource);
+
+    connect(context(), &QnWorkbenchContext::userChanged, this, &QnWorkbenchUserEmailWatcher::forceCheckAll);
 }
 
 QnWorkbenchUserEmailWatcher::~QnWorkbenchUserEmailWatcher() {

@@ -96,7 +96,7 @@ int QnNoptixStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, c
     case PM_ToolBarIconSize:
         return 18;
     case PM_SliderLength:
-        if(option->styleObject) {
+        if(option && option->styleObject) {
             int result = qvariant_cast<int>(option->styleObject->property(Qn::SliderLength), -1);
             if(result >= 0)
                 return result;

@@ -48,6 +48,7 @@ public:
     bool deleteCameraBookmark(const QnCameraBookmark &bookmark);
     bool getBookmarks(const QString& cameraUniqueId, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);
 private:
+    void flushRecordsNoLock();
     bool initializeBookmarksFtsTable();
 
     bool deleteRecordsInternal(const DeleteRecordInfo& delRecord);

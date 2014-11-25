@@ -51,6 +51,7 @@ signals:
 
 private:
     void enqueRequest(const QUrl &url);
+    void processFailedReply(const QUrl &url);
 
 private slots:
     void activateRequests();

@@ -168,7 +168,7 @@
         "colors": {
             "_": "Background gradient colors.",
             
-            "normal": "#004276.setAlpha(76)",
+            "normal": "#0000FF.setAlpha(51)",
             "panic": "#FF0000"
         }
     },

@@ -191,11 +191,6 @@ void QnBusinessRulesDialog::at_newRuleButton_clicked() {
     m_rulesViewModel->addRule(QnBusinessEventRulePtr());
 
     ui->tableView->setCurrentIndex(m_rulesViewModel->index(m_rulesViewModel->rowCount() - 1, 0));
-    if (m_rulesViewModel->rowCount() == 1) {
-        ui->tableView->resizeColumnsToContents();
-        ui->tableView->horizontalHeader()->setStretchLastSection(true);
-        ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
-    }
 }
 
 void QnBusinessRulesDialog::at_deleteButton_clicked() {
@@ -241,9 +236,6 @@ void QnBusinessRulesDialog::at_afterModelChanged(QnBusinessRulesActualModelChang
     }
 
     if (change == RulesLoaded) {
-        ui->tableView->resizeColumnsToContents();
-        ui->tableView->horizontalHeader()->setStretchLastSection(true);
-        ui->tableView->horizontalHeader()->setCascadingSectionResizes(true);
         updateFilter();
     }
     updateControlButtons();

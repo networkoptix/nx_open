@@ -185,11 +185,9 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply *
     map = map.value(QnAppInfo::customizationName()).toMap();
     QVariantMap releasesMap = map.value(lit("releases")).toMap();
 
-    QString currentRelease;
-    if (m_target.denyMajorUpdates)
+    QString currentRelease = map.value(lit("current_release")).toString();
+    if (m_target.denyMajorUpdates || QnSoftwareVersion(currentRelease) < qnCommon->engineVersion())
         currentRelease = qnCommon->engineVersion().toString(QnSoftwareVersion::MinorFormat);
-    else
-        currentRelease = map.value(lit("current_release")).toString();
 
     QnSoftwareVersion latestVersion = QnSoftwareVersion(releasesMap.value(currentRelease).toString());
     QString updatesPrefix = map.value(lit("updates_prefix")).toString();

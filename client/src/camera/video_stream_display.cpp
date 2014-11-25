@@ -765,7 +765,7 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, cons
             else {
                 if (qAbs(m_speed) < 1.0 + FPS_EPS) {
                     foreach(QnAbstractRenderer* render, m_renderList)
-                        render->waitForFrameDisplayed(outFrame->channel); // wait old frame
+                        render->waitForQueueLessThan(outFrame->channel, MAX_FRAME_QUEUE_SIZE); // wait old frame
                 }
                 foreach(QnAbstractRenderer* render, m_renderList)
                     render->draw(outFrame); // send new one

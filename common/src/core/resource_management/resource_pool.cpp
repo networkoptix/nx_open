@@ -205,6 +205,7 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
         if( resIter != m_resources.end() )
         {
             m_resources.erase( resIter );
+            invalidateCache();
             removedResources.append(resource);
         }
         else
@@ -213,6 +214,7 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
             if (resIter != m_incompatibleResources.end())
             {
                 m_incompatibleResources.erase(resIter);
+                invalidateCache();
                 removedResources.append(resource);
             }
         }
@@ -335,8 +337,12 @@ QnResourceList QnResourcePool::getAllCameras(const QnResourcePtr &mServer, bool 
     return result;
 }
 
-QnMediaServerResourceList QnResourcePool::getAllServers() const {
-    return getResources<QnMediaServerResource>();
+QnMediaServerResourceList QnResourcePool::getAllServers() const
+{
+    QMutexLocker lock(&m_cacheMutex);
+    if (m_cachedServerList.isEmpty())
+        m_cachedServerList = getResources<QnMediaServerResource>();
+    return m_cachedServerList;
 }
 
 QnResourceList QnResourcePool::getResourcesByParentId(const QnUuid& parentId) const
@@ -509,6 +515,7 @@ bool QnResourcePool::insertOrUpdateResource( const QnResourcePtr &resource, QHas
     if (itr == resourcePool->end()) {
         // new resource
         resourcePool->insert(id, resource);
+        invalidateCache();
         return true;
     }
     else {
@@ -580,4 +587,10 @@ QnVideoWallMatrixIndexList QnResourcePool::getVideoWallMatricesByUuid(const QLis
             result << index;
     }
     return result;
+}
+
+void QnResourcePool::invalidateCache()
+{
+    QMutexLocker lock(&m_cacheMutex);
+    m_cachedServerList.clear();
 }

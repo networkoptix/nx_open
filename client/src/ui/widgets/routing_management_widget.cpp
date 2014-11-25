@@ -246,6 +246,8 @@ void QnRoutingManagementWidget::submitToSettings() {
             }
         }
     }
+
+    m_changes->changes.clear();
 }
 
 void QnRoutingManagementWidget::updateModel() {
@@ -313,6 +315,8 @@ void QnRoutingManagementWidget::at_addButton_clicked() {
         return;
 
     QUrl url = QUrl::fromUserInput(urlString);
+    url.setScheme(lit("http"));
+
     if (!url.isValid()) {
         reportUrlEditingError(QnServerAddressesModel::InvalidUrl);
         return;

@@ -27,6 +27,7 @@ static const int CHECK_HELLO_RETRY_COUNT = 50;
 QString& OnvifResourceSearcherWsdd::LOCAL_ADDR = *new QString(QLatin1String("127.0.0.1"));
 const char OnvifResourceSearcherWsdd::SCOPES_NAME_PREFIX[] = "onvif://www.onvif.org/name/";
 const char OnvifResourceSearcherWsdd::SCOPES_HARDWARE_PREFIX[] = "onvif://www.onvif.org/hardware/";
+const char OnvifResourceSearcherWsdd::SCOPES_LOCATION_PREFIX[] = "onvif://www.onvif.org/location/";
 const char OnvifResourceSearcherWsdd::PROBE_TYPE[] = "onvifDiscovery:NetworkVideoTransmitter";
 const char OnvifResourceSearcherWsdd::WSA_ADDRESS[] = "http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous";
 const char OnvifResourceSearcherWsdd::WSDD_ADDRESS[] = "urn:schemas-xmlsoap-org:ws:2005:04:discovery";
@@ -498,7 +499,7 @@ QString OnvifResourceSearcherWsdd::getManufacturer(const T* source, const QStrin
     }
 
     QByteArray scopes = source->Scopes->__item;
-    int posStart = scopes.indexOf(SCOPES_NAME_PREFIX);
+    int posStart = scopes.indexOf(SCOPES_HARDWARE_PREFIX);
     if (posStart == -1) {
         return QString();
     }
@@ -506,7 +507,7 @@ QString OnvifResourceSearcherWsdd::getManufacturer(const T* source, const QStrin
     int posEnd = posStart != -1? scopes.indexOf(' ', posStart): -1;
     posEnd = posEnd != -1? posEnd: scopes.size();
 
-    int skipSize = sizeof(SCOPES_NAME_PREFIX) - 1;
+    int skipSize = sizeof(SCOPES_HARDWARE_PREFIX) - 1;
     QByteArray percentEncodedValue = scopes.mid(posStart + skipSize, posEnd - posStart - skipSize).replace(name, "");
     QString result = QUrl::fromPercentEncoding(percentEncodedValue).trimmed();
     if (result.endsWith(lit("_")))
@@ -515,7 +516,7 @@ QString OnvifResourceSearcherWsdd::getManufacturer(const T* source, const QStrin
 }
 
 template <class T>
-QString OnvifResourceSearcherWsdd::getName(const T* source) const
+QString OnvifResourceSearcherWsdd::extractScope(const T* source, const QString& pattern) const
 {
     if (!source || !source->Scopes || !source->Scopes->__item) {
             return QString();
@@ -524,7 +525,7 @@ QString OnvifResourceSearcherWsdd::getName(const T* source) const
     QString scopes = QLatin1String(source->Scopes->__item);
 
 
-    int posStart = scopes.indexOf(QLatin1String(SCOPES_HARDWARE_PREFIX));
+    int posStart = scopes.indexOf(pattern);
     if (posStart == -1) {
         return QString();
     }
@@ -532,7 +533,7 @@ QString OnvifResourceSearcherWsdd::getName(const T* source) const
     int posEnd = posStart != -1? scopes.indexOf(QLatin1Char(' '), posStart): -1;
     posEnd = posEnd != -1? posEnd: scopes.size();
 
-    int skipSize = sizeof(SCOPES_HARDWARE_PREFIX) - 1;
+    int skipSize = pattern.length();
     QString percentEncodedValue = scopes.mid(posStart + skipSize, posEnd - posStart - skipSize);
 
     return QUrl::fromPercentEncoding(QByteArray(percentEncodedValue.toStdString().c_str())).trimmed();
@@ -556,6 +557,37 @@ void OnvifResourceSearcherWsdd::fillWsddStructs(wsdd__ProbeType& probe, wsa__End
     endpoint.__anyAttribute = NULL;
 }
 
+void fixDiscoveredName(QString& name, QString& manufacturer, const QString& location)
+{
+    QString lowerName = name.toLower();
+
+    if (lowerName == lit("nexcom_camera")) {
+        name.clear();
+        manufacturer = lit("Nexcom");
+    }
+    else if (location.toLower() == lit("canon") && lowerName == lit("camera")) {
+        name = manufacturer;
+        manufacturer = location;
+    }
+    else if (lowerName == lit("digital watchdog")) {
+        qSwap(name, manufacturer);
+    }
+    else if (lowerName == lit("sony")) {
+        qSwap(name, manufacturer);
+    }
+    else if (lowerName.startsWith(lit("isd "))) {
+        manufacturer = lit("ISD");
+        name = name.mid(4);
+    }
+    else if (lowerName == lit("networkcamera") && manufacturer.isEmpty()) {
+        name.clear(); // some DW cameras report invalid model in multicast and empty vendor
+    }
+    else if (lowerName == lit("networkcamera") && manufacturer.toLower().startsWith(lit("dcs-"))) {
+        name = manufacturer;
+        manufacturer = lit("DLink");
+    }
+}
+
 template <class T> 
 void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const T* source,
     const SOAP_ENV__Header* header, const QStringList& addrPrefixes, const QString& host) const
@@ -569,14 +601,12 @@ void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const 
         return;
     }
 
-    QString name = getName(source);
+    QString name = extractScope(source, QLatin1String(SCOPES_NAME_PREFIX));
     QString manufacturer = getManufacturer(source, name);
+    QString location = extractScope(source, QLatin1String(SCOPES_LOCATION_PREFIX));
+    fixDiscoveredName(name, manufacturer, location);
+
     QString mac = getMac(source, header);
-    if (name.isEmpty()) {
-        name = manufacturer;
-        manufacturer.clear();
-    }
-    
 
     QString endpointId = replaceNonFileNameCharacters(getEndpointAddress(source), QLatin1Char('_'));
     QString uniqId = !mac.isEmpty() ? mac : endpointId;

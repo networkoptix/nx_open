@@ -29,6 +29,9 @@ void QnWorkbenchLayoutAspectRatioWatcher::at_renderWatcher_widgetChanged(QnResou
     if (!m_watchedLayout)
         return;
 
+    if (m_watchedLayout->items().size() > 1 && m_watchedLayout->hasCellAspectRatio())
+        return;
+
     bool hasAspectRatio = widget->hasAspectRatio();
     if (hasAspectRatio)
         m_watchedLayout->setCellAspectRatio(QnAspectRatio::closestStandardRatio(widget->aspectRatio()).toReal());
@@ -53,6 +56,9 @@ void QnWorkbenchLayoutAspectRatioWatcher::at_resourceWidget_aspectRatioChanged()
 
     if (!m_monitoring)
         disconnect(widget, &QnResourceWidget::aspectRatioChanged, this, &QnWorkbenchLayoutAspectRatioWatcher::at_resourceWidget_aspectRatioChanged);
+
+    if (m_watchedLayout->items().size() > 1 && m_watchedLayout->hasCellAspectRatio())
+        return;
 
     m_watchedLayout->setCellAspectRatio(QnAspectRatio::closestStandardRatio(widget->aspectRatio()).toReal());
 }

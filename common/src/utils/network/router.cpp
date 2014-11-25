@@ -42,7 +42,19 @@ QnRoute QnRouter::routeTo(const QnUuid &id, const QnUuid &via) const {
 
 QnRoute QnRouter::routeTo(const QString &host, quint16 port) const {
     QnUuid id = whoIs(host, port);
-    return id.isNull() ? QnRoute() : routeTo(id);
+    if (id.isNull())
+        return QnRoute();
+
+    QnRoute route = routeTo(id);
+
+    /* Ensure the latest point is the requested point */
+    if (route.isValid() && route.points.last().host != host) {
+        QnUuid from = route.length() > 1 ? route.points[route.length() - 2].peerId : qnCommon->moduleGUID();
+        if (m_connections.contains(from, Endpoint(id, host, port)))
+            route.points.last() = QnRoutePoint(id, host, port);
+    }
+
+    return route;
 }
 
 QnUuid QnRouter::whoIs(const QString &host, quint16 port) const {
@@ -57,8 +69,6 @@ QnUuid QnRouter::whoIs(const QString &host, quint16 port) const {
 
 void QnRouter::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url) {
     Endpoint endpoint(moduleInformation.id, url.host(), url.port());
-
-    Q_ASSERT_X(!endpoint.id.isNull(), "Endpoint cannot has null id!", Q_FUNC_INFO);
 
     if (endpoint.id.isNull())
         return;

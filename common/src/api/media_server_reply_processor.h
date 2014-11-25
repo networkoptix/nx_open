@@ -57,6 +57,7 @@ signals:
     void finished(int status, const QnCameraBookmarkList &reply, int handle, const QString &errorString);
     void finished(int status, const QnConfigureReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnModuleInformation &reply, int handle, const QString &errorString);
+    void finished(int status, const QList<QnModuleInformation> &reply, int handle, const QString &errorString);
 
 private:
     friend class QnAbstractReplyProcessor;

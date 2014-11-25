@@ -40,6 +40,8 @@ namespace ec2
 
     struct ApiResourceStatusData: ApiData
     {
+        ApiResourceStatusData(): status(Qn::Offline) {}
+
         QnUuid id;
         Qn::ResourceStatus status;
     };

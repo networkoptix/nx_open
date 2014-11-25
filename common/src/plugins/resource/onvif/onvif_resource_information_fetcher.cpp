@@ -30,10 +30,11 @@ static const char* ANALOG_CAMERAS[][2] =
 // Add vendor and camera model to ommit ONVIF search (case insensitive)
 static const char* IGNORE_VENDORS[][2] =
 {
-    {"*networkcamera*", "IP*"}, // DLINK
-    {"*", "*spartan-6*"},       // ArecontVision
+    {"IP*", "*networkcamera*"}, // DLINK
+    {"ISD", "*"},              // ISD
+    {"spartan-6*", "*"},       // ArecontVision
     {"acti*", "*"},              // ACTi. Current ONVIF implementation quite unstable. Vendor name is not filled by camera!
-    {"*", "KCM*"}              // ACTi. Current ONVIF implementation quite unstable. Vendor name is not filled by camera!
+    {"*", "KCM*"}              // ACTi.
 };
 
 bool OnvifResourceInformationFetcher::isAnalogOnvifResource(const QString& vendor, const QString& model)
@@ -337,6 +338,8 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
     if (manufacture.toLower().contains(QLatin1String("digital watchdog")))
         resource = QnPlOnvifResourcePtr(new QnPlWatchDogResource());
     else if (manufacture.toLower() == QLatin1String("panoramic"))
+        resource = QnPlOnvifResourcePtr(new QnPlWatchDogResource());
+    else if (manufacture.toLower() == QLatin1String("ipnc"))   // new dw panoramic cameras
         resource = QnPlOnvifResourcePtr(new QnPlWatchDogResource());
     else if (manufacture.toLower().contains(QLatin1String("sony")))
         resource = QnPlOnvifResourcePtr(new QnPlSonyResource());

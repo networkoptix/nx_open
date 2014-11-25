@@ -182,7 +182,7 @@ QnUuid QnResourceTypePool::getResourceTypeId(const QString& manufacture, const Q
     {
         //NX_LOG(rt->getName(), cl_logALWAYS); //debug
 
-        if (rt->getName() == name && rt->getManufacture()==manufacture)
+        if (rt->getName().compare(name, Qt::CaseInsensitive) == 0 && rt->getManufacture()==manufacture)
             return rt->getId();
     }
 

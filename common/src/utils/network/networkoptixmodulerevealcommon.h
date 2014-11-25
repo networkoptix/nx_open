@@ -50,6 +50,7 @@ public:
     bool sslAllowed;
     QStringList remoteAddresses;
     QByteArray authHash;
+    int protoVersion;
 
     RevealResponse();
     RevealResponse(const QnModuleInformation &moduleInformation);

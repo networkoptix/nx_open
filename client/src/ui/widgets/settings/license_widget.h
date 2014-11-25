@@ -3,13 +3,18 @@
 
 #include <QtWidgets/QWidget>
 
+#include <core/resource/resource_fwd.h>
+
+#include <utils/common/connective.h>
+
 namespace Ui {
     class LicenseWidget;
 }
 
-class QnLicenseWidget : public QWidget {
+class QnLicenseWidget : public Connective<QWidget> {
     Q_OBJECT
 
+    typedef Connective<QWidget> base_type;
 public:
     enum State {
         Normal,     /**< Operational state. */
@@ -43,11 +48,9 @@ protected:
 
 private slots:
     void updateControls();
-    void updateCurrentServer();
 
     void at_browseLicenseFileButton_clicked();
     void at_activationTypeComboBox_currentIndexChanged();
-
 private:
     Q_DISABLE_COPY(QnLicenseWidget)
 
@@ -55,6 +58,7 @@ private:
     State m_state;
     QByteArray m_activationKey;
     bool m_freeLicenseAvailable;
+    QnMediaServerResourcePtr m_currentServer;
 };
 
 #endif // QN_LICENSE_WIDGET_H

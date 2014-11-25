@@ -37,8 +37,6 @@ public:
     bool isScheduleEnabled() const;
 
     bool hasDbChanges() const;
-    bool hasCameraChanges() const;
-    bool hasAnyCameraChanges() const;
 
     /** Checks if user changed schedule controls but not applied them */
     bool hasScheduleControlsChanges() const;
@@ -51,9 +49,6 @@ public:
 
     /** Clear flag that  user changed motion controls but not applied them */
     void clearMotionControlsChanges();
-
-    const QList< QPair< QString, QVariant> >& getModifiedAdvancedParams() const;
-    QnMediaServerConnectionPtr getServerConnection() const;
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly) const;
@@ -79,13 +74,11 @@ signals:
     void hasChangesChanged();
     void modeChanged();
     void moreLicensesRequested();
-    void advancedSettingChanged();
     void scheduleExported(const QnVirtualCameraResourceList &);
     void resourcesChanged();
 
 protected slots:
     void at_moreLicensesRequested();
-    void at_advancedSettingChanged();
 
 private:
     void setMode(Mode mode);

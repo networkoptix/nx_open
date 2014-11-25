@@ -8,7 +8,6 @@
 
 #include <core/resource/resource_fwd.h>
 
-
 class CameraSettingValue
 {
     QString value;
@@ -54,8 +53,6 @@ public:
     static WIDGET_TYPE typeFromStr(const QString& value);
     static QString strFromType(const WIDGET_TYPE value);
     static bool isTypeWithoutValue(const WIDGET_TYPE value);
-
-    static QString& SEPARATOR;
 
     CameraSetting();
     CameraSetting(
@@ -167,7 +164,7 @@ protected:
     //The reader sends parent id of current <camera> tag to the child
     virtual void parentOfRootElemFound(const QString& parentId) = 0;
 
-    //!Triggered on each <camera> element occurence
+    //!Triggered on each <camera> element occurrence
     /*!
         If \a cameraId is specified than this method is triggered only for expected camera element
     */

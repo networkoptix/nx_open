@@ -90,7 +90,11 @@ void QnModuleFinder::at_moduleAddressFound(const QnModuleInformation &moduleInfo
 
         if (!m_directFoundUrls.contains(moduleInformation.id, url)) {
             NX_LOG(lit("QnModuleFinder: New URL from multicast finder: %1 %2").arg(moduleInformation.id.toString()).arg(url.toString()), cl_logDEBUG1);
-            emit moduleUrlFound(m_foundModules.value(moduleInformation.id), url);
+            QnModuleInformation oldModuleInformation = m_foundModules.value(moduleInformation.id);
+            Q_ASSERT_X(!oldModuleInformation.id.isNull(), "Module information must exist here", Q_FUNC_INFO);
+            if (oldModuleInformation.id.isNull())
+                oldModuleInformation = moduleInformation;
+            emit moduleUrlFound(oldModuleInformation, url);
         }
     }
 }
@@ -126,7 +130,11 @@ void QnModuleFinder::at_moduleUrlFound(const QnModuleInformation &moduleInformat
 
         if (!m_multicastFoundUrls.contains(moduleInformation.id, url)) {
             NX_LOG(lit("QnModuleFinder: New URL from direct finder: %1 %2").arg(moduleInformation.id.toString()).arg(url.toString()), cl_logDEBUG1);
-            emit moduleUrlFound(m_foundModules.value(moduleInformation.id), url);
+            QnModuleInformation oldModuleInformation = m_foundModules.value(moduleInformation.id);
+            Q_ASSERT_X(!oldModuleInformation.id.isNull(), "Module information must exist here", Q_FUNC_INFO);
+            if (oldModuleInformation.id.isNull())
+                oldModuleInformation = moduleInformation;
+            emit moduleUrlFound(oldModuleInformation, url);
         }
     }
 }

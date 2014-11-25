@@ -37,6 +37,7 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
         data.peer.id = qnCommon->remoteGUID();
         qnCommon->setRemoteGUID(QnUuid());
         m_connected = false;
+        m_incompatibleServerWatcher.reset();
         emit connectionClosed();
     } else if (!qnCommon->remoteGUID().isNull()) { // we are trying to reconnect to server now
         qnCommon->setRemoteGUID(QnUuid());
@@ -49,13 +50,14 @@ void QnClientMessageProcessor::setHoldConnection(bool holdConnection) {
 
     m_holdConnection = holdConnection;
 
-    if (!m_holdConnection && !m_connected && !qnCommon->remoteGUID().isNull())
+    if (!m_holdConnection && !m_connected && !qnCommon->remoteGUID().isNull()) {
+        m_incompatibleServerWatcher.reset();
         emit connectionClosed();
+    }
 }
 
 void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) {
     resource->setStatus(status);
-    checkForTmpStatus(resource);
 }
 
 void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource) 
@@ -82,8 +84,9 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
             /* Handling a case when an incompatible server is changing its systemName at runtime and becoming compatible. */
             if (resource->getStatus() == Qn::NotDefined && mediaServer->getStatus() == Qn::Incompatible) {
                 if (QnMediaServerResourcePtr updatedServer = resource.dynamicCast<QnMediaServerResource>()) {
-                    if (isCompatible(qnCommon->engineVersion(), updatedServer->getVersion()))
+                    if (isCompatible(qnCommon->engineVersion(), updatedServer->getVersion())) {
                         mediaServer->setStatus(Qn::Online);
+                    }
                 }
             }
         }
@@ -94,52 +97,10 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
 
     if (QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
         layout->requestStore();
-
-    checkForTmpStatus(ownResource);
 }
 
-void QnClientMessageProcessor::processResources(const QnResourceList& resources)
-{
-    QnCommonMessageProcessor::processResources(resources);
-    for(const QnResourcePtr& resource: resources)
-        checkForTmpStatus(resource);
-}
-
-void QnClientMessageProcessor::checkForTmpStatus(const QnResourcePtr& resource)
-{
-    // process tmp status
-    
-    if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>()) 
-    {
-        if (mediaServer->getStatus() == Qn::NotDefined)
-            return;
-        else if (mediaServer->getStatus() == Qn::Offline || mediaServer->getStatus() == Qn::Unauthorized)
-            updateServerTmpStatus(mediaServer->getId(), Qn::Offline);
-        else
-            updateServerTmpStatus(mediaServer->getId(), Qn::NotDefined);
-    }
-    else if (QnServerCameraPtr serverCamera = resource.dynamicCast<QnServerCamera>()) 
-    {
-        QnMediaServerResourcePtr mediaServer = qnResPool->getResourceById(serverCamera->getParentId()).dynamicCast<QnMediaServerResource>();
-        if (mediaServer) {
-            if (mediaServer->getStatus() == Qn::Offline || mediaServer->getStatus() == Qn::Unauthorized)
-                serverCamera->setTmpStatus(Qn::Offline);
-            else
-                serverCamera->setTmpStatus(Qn::NotDefined);
-        }
-    }
-}
-
-void QnClientMessageProcessor::updateServerTmpStatus(const QnUuid& id, Qn::ResourceStatus status)
-{
-    QnResourcePtr server = qnResPool->getResourceById(id);
-    if (!server)
-        return;
-    for(QnResourcePtr res: qnResPool->getAllCameras(server)) {
-        QnServerCameraPtr serverCamera = res.dynamicCast<QnServerCamera>();
-        if (serverCamera)
-            serverCamera->setTmpStatus(status);
-    }
+void QnClientMessageProcessor::resetResources(const QnResourceList& resources) {
+    QnCommonMessageProcessor::resetResources(resources);
 }
 
 void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data)
@@ -148,6 +109,12 @@ void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data)
         qWarning() << "at_remotePeerFound received while disconnected";
         return;
     }
+
+    /*
+    QnMediaServerResourcePtr server = qnResPool->getResourceById(data.peer.id).staticCast<QnMediaServerResource>();
+    if (server)
+        server->setStatus(Qn::Online);
+    */
 
     if (data.peer.id != qnCommon->remoteGUID())
         return;
@@ -165,9 +132,11 @@ void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data)
         return;
     }
 
+    /*
     QnMediaServerResourcePtr server = qnResPool->getResourceById(data.peer.id).staticCast<QnMediaServerResource>();
     if (server)
         server->setStatus(Qn::Offline);
+    */
 
     if (data.peer.id != qnCommon->remoteGUID())
         return;
@@ -177,8 +146,10 @@ void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data)
 
     m_connected = false;
 
-    if (!m_holdConnection)
+    if (!m_holdConnection) {
         emit connectionClosed();
+        m_incompatibleServerWatcher.reset();
+    }
 }
 
 void QnClientMessageProcessor::at_systemNameChangeRequested(const QString &systemName) {
