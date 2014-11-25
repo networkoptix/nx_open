@@ -100,7 +100,7 @@ namespace ite
             return 0xffff;
         }
 
-        bool setChannel(unsigned channel);
+        bool setChannel(unsigned channel, bool sendRequest = true);
         bool setEncoderCfg(unsigned streamNo, unsigned bitrate, unsigned fps);
 
         static unsigned short input2output(unsigned short command)
@@ -334,11 +334,10 @@ namespace ite
         void printDevices();
 
         void updateDevIDs();
-        void getDevIDs(std::vector<IDsLink>& links);
-        bool getDevIDsChannel(unsigned channel, std::vector<IDsLink>& outLinks);
+        void getDevIDs(std::vector<IDsLink>& outLinks);
         DeviceInfoPtr device(const IDsLink& idl) const;
 
-        bool setChannel(const IDsLink& idl, unsigned channel);
+        bool setChannel(unsigned short txID, unsigned channel);
 
     private:
         mutable std::mutex mutex_;
