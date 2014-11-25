@@ -70,6 +70,8 @@ struct QnCameraAdvancedParamGroup {
     std::vector<QnCameraAdvancedParameter> params;
 
 	void merge(const QnCameraAdvancedParamGroup &other);
+
+    QnCameraAdvancedParameter getParameterById(const QString &id) const;
 };
 #define QnCameraAdvancedParamGroup_Fields (name)(description)(groups)(params)
 
@@ -77,6 +79,8 @@ struct QnCameraAdvancedParams {
     std::vector<QnCameraAdvancedParamGroup> groups;
 
 	void merge(const QnCameraAdvancedParams &other);
+
+    QnCameraAdvancedParameter getParameterById(const QString &id) const;
 };
 #define QnCameraAdvancedParams_Fields (groups)
 

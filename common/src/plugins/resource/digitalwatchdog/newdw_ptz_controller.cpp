@@ -6,7 +6,7 @@
 
 static const int CACHE_UPDATE_TIMEOUT = 60 * 1000;
 
-QnNewDWPtzController::QnNewDWPtzController(const QnPlWatchDogResourcePtr &resource):
+QnNewDWPtzController::QnNewDWPtzController(const QnDigitalWatchdogResourcePtr &resource):
     QnBasicPtzController(resource),
     m_resource(resource)
 {

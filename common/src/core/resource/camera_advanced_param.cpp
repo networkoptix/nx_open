@@ -154,6 +154,21 @@ void QnCameraAdvancedParamGroup::merge(const QnCameraAdvancedParamGroup &other) 
 	}
 }
 
+QnCameraAdvancedParameter QnCameraAdvancedParamGroup::getParameterById(const QString &id) const {
+
+    for (const QnCameraAdvancedParameter &param: params)
+        if (param.getId() == id)
+            return param;
+
+    QnCameraAdvancedParameter result;
+    for (const QnCameraAdvancedParamGroup &group: groups) {
+        result = group.getParameterById(id);
+        if (result.isValid())
+            return result;
+    }
+    return result;
+}
+
 void QnCameraAdvancedParams::merge(const QnCameraAdvancedParams &other) {
 	for (const QnCameraAdvancedParamGroup &group: other.groups) {
 		QString groupName = group.name;
@@ -167,6 +182,16 @@ void QnCameraAdvancedParams::merge(const QnCameraAdvancedParams &other) {
 			iter->merge(group);
 	}
 
+}
+
+QnCameraAdvancedParameter QnCameraAdvancedParams::getParameterById(const QString &id) const {
+    QnCameraAdvancedParameter result;
+    for (const QnCameraAdvancedParamGroup &group: groups) {
+        result = group.getParameterById(id);
+        if (result.isValid())
+            return result;
+    }
+    return result;
 }
 
 bool QnCameraAdvancedParamsTree::isEmpty() const {
@@ -329,7 +354,7 @@ QnCameraAdvancedParameter QnCameraAdvacedParamsXmlParser::parseElementXml(const 
 	result.description = elementXml.attribute(QnXmlTag::description);
 	result.query = elementXml.attribute(QnXmlTag::query);
 	result.dataType = QnCameraAdvancedParameter::stringToDataType(elementXml.attribute(QnXmlTag::dataType));
-	result.method = elementXml.attribute(QnXmlTag::method);
+	result.method = elementXml.attribute(QnXmlTag::method, lit("GET"));
 	result.min = elementXml.attribute(QnXmlTag::min);
 	result.max = elementXml.attribute(QnXmlTag::max);
 	result.step = elementXml.attribute(QnXmlTag::step);

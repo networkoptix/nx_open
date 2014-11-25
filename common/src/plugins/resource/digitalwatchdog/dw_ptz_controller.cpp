@@ -3,37 +3,39 @@
 
 #include "digital_watchdog_resource.h"
 
-static const int HTTP_PORT = 80; // TODO: #Elric copypasta from digital_watchdog_resource.cpp
+namespace {
+    const QString flipParamId = lit("flipmode1");
+    const QString mirrirParamId = lit("mirrormode1");
+}
 
-QnDwPtzController::QnDwPtzController(const QnPlWatchDogResourcePtr &resource):
+QnDwPtzController::QnDwPtzController(const QnDigitalWatchdogResourcePtr &resource):
     base_type(resource),
     m_resource(resource)
 {
-    connect(resource.data(), &QnPlWatchDogResource::physicalParamChanged, this, &QnDwPtzController::at_physicalParamChanged);
+    connect(resource.data(), &QnDigitalWatchdogResource::physicalParamChanged, this, &QnDwPtzController::at_physicalParamChanged);
     updateFlipState();
 }
 
-void QnDwPtzController::updateFlipState()
-{
-    CLSimpleHTTPClient http(m_resource->getHostAddress(), HTTP_PORT, m_resource->getNetworkTimeout(), m_resource->getAuth());
-    http.doGET(QByteArray("/cgi-bin/getconfig.cgi?action=color"));
-
-    QByteArray data;
-    http.readAll(data);
-
+void QnDwPtzController::updateFlipState() {
     Qt::Orientations flip = 0;
-    if(data.contains("flipmode1: 1"))
-        flip ^= Qt::Vertical | Qt::Horizontal;
-    if(data.contains("mirrormode1: 1"))
-        flip ^= Qt::Horizontal;
-    m_flip = flip;
-}
 
-void QnDwPtzController::at_physicalParamChanged(const QString& name, const QString& value)
-{
-    Q_UNUSED(value)
-    if (name == lit("Flip") || name == lit("Mirror"))
-        QTimer::singleShot(500, this, SLOT(updateFlipState())); // DW cameras doesn't show actual settings if read it immediatly
+    QString flipValue;
+    if(m_resource->getParamPhysical(flipParamId, flipValue)) {
+        if (flipValue.toInt() == 1)
+            flip ^= Qt::Vertical | Qt::Horizontal;
+    } else {
+        return;
+    }
+
+    QString mirrorValue;
+    if (m_resource->getParamPhysical(mirrirParamId, mirrorValue)) {
+        if (mirrorValue.toInt() == 1)
+            flip ^= Qt::Horizontal;
+    } else {
+        return;
+    }
+      
+    m_flip = flip;
 }
 
 QnDwPtzController::~QnDwPtzController() {
@@ -55,5 +57,12 @@ bool QnDwPtzController::getFlip(Qt::Orientations *flip) {
     *flip = m_flip;
     return true;
 }
+
+void QnDwPtzController::at_physicalParamChanged(const QString& id, const QString& value) {
+    Q_UNUSED(value);
+    if (id == flipParamId || id == mirrirParamId)
+        QTimer::singleShot(500, this, SLOT(updateFlipState())); // DW cameras doesn't show actual settings if read it immediately
+}
+
 
 #endif // ENABLE_ONVIF

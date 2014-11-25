@@ -28,6 +28,8 @@ public:
     void setCamera(const QnVirtualCameraResourcePtr &camera);
 
 private:
+    void initSplitter();
+
     void initialize();
     void displayParams();
     void loadValues();

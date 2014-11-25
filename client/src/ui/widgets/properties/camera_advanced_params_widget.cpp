@@ -35,23 +35,6 @@ namespace {
         return result;
     }
 
-    QnCameraAdvancedParameter getParameterById(const QnCameraAdvancedParamGroup &group, const QString &id) {
-        for (const QnCameraAdvancedParamGroup &subGroup: group.groups)
-            if (parameterIds(subGroup).contains(id))
-                return getParameterById(subGroup, id);
-        for (const QnCameraAdvancedParameter &param: group.params)
-            if (param.getId() == id)
-                return param;
-        return QnCameraAdvancedParameter();
-    }
-
-    QnCameraAdvancedParameter getParameterById(const QnCameraAdvancedParams &params, const QString &id) {
-        for (const QnCameraAdvancedParamGroup &group: params.groups) {
-            if (parameterIds(group).contains(id))
-                return getParameterById(group, id);
-        }
-        return QnCameraAdvancedParameter();
-    }
 }
 
 QnCameraAdvancedParamsWidget::QnCameraAdvancedParamsWidget(QWidget* parent /*= NULL*/):
@@ -63,6 +46,7 @@ QnCameraAdvancedParamsWidget::QnCameraAdvancedParamsWidget(QWidget* parent /*= N
     m_state(State::Init)
 {
     ui->setupUi(this);
+    
 
     m_advancedParamWidgetsManager.reset(new QnCameraAdvancedParamWidgetsManager(ui->groupsWidget, ui->contentsWidget));
     connect(m_advancedParamWidgetsManager, &QnCameraAdvancedParamWidgetsManager::paramValueChanged, this, &QnCameraAdvancedParamsWidget::at_advancedParamChanged);
@@ -105,7 +89,16 @@ void QnCameraAdvancedParamsWidget::setCamera(const QnVirtualCameraResourcePtr &c
     initialize();
 }
 
+void QnCameraAdvancedParamsWidget::initSplitter() {
+    QList<int> sizes = ui->splitter->sizes();
+    sizes[0] = 200;
+    sizes[1] = 400;
+    ui->splitter->setSizes(sizes);
+}
+
 void QnCameraAdvancedParamsWidget::initialize() {
+    initSplitter();
+
     updateCameraAvailability();
 
     /* Update the whole widget state. */
@@ -237,7 +230,7 @@ void QnCameraAdvancedParamsWidget::at_advancedParamChanged(const QString &id, co
 
     /* Check parameter validity. */
     auto params = m_advancedParamsReader->params(m_camera);
-    QnCameraAdvancedParameter parameter = getParameterById(params, id);
+    QnCameraAdvancedParameter parameter = params.getParameterById(id);
     if (!parameter.isValid())
         return;
 

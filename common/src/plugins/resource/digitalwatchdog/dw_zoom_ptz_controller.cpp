@@ -6,7 +6,7 @@
 
 #include "digital_watchdog_resource.h"
 
-QnDwZoomPtzController::QnDwZoomPtzController(const QnPlWatchDogResourcePtr &resource):
+QnDwZoomPtzController::QnDwZoomPtzController(const QnDigitalWatchdogResourcePtr &resource):
     base_type(resource),
     m_resource(resource)
 {}
@@ -20,28 +20,18 @@ Qn::PtzCapabilities QnDwZoomPtzController::getCapabilities() {
 }
 
 bool QnDwZoomPtzController::continuousMove(const QVector3D &speed) {
-    CameraSetting setting(
-        QLatin1String("%%Lens%%Zoom"),
-        QLatin1String("Zoom"),
-        CameraSetting::ControlButtonsPair,
-        QString(),
-        QString(),
-        QString(),
-        CameraSettingValue(QLatin1String("zoomOut")),
-        CameraSettingValue(QLatin1String("zoomIn")),
-        CameraSettingValue(QLatin1String("stop")),
-        QString()
-    );
+    const QString paramId = lit("/cgi-bin/ptzctrl.cgi?ptzchannel=0&query=zoom&ptzctrlvalue");
+    QString value;
 
     if(qFuzzyIsNull(speed.z())) {
-        setting.setCurrent(setting.getStep());
+        value = lit("stop");
     } else if(speed.z() < 0.0) {
-        setting.setCurrent(setting.getMin());
+        value = lit("zoomOut");
     } else if(speed.z() > 0.0) {
-        setting.setCurrent(setting.getMax());
+        value = lit("zoomIn");
     }
 
-    m_resource->setParamPhysical(setting.getId(), setting.serializeToStr());
+    m_resource->setParamPhysical(paramId, value);
 
     return true;
 }
