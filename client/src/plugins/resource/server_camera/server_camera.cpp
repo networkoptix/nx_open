@@ -5,6 +5,7 @@
 #include "core/resource/media_server_resource.h"
 #include "api/app_server_connection.h"
 #include "core/resource_management/resource_pool.h"
+#include "core/resource_management/status_dictionary.h"
 
 
 QnServerCamera::QnServerCamera(const QnUuid& resourceTypeId): QnVirtualCameraResource()
@@ -57,12 +58,9 @@ QnAbstractStreamDataProvider* QnServerCamera::createLiveDataProvider()
 
 Qn::ResourceStatus QnServerCamera::getStatus() const
 {
-    QnResourcePtr serverRes = qnResPool->getResourceById(getParentId());
-    if (serverRes) {
-         Qn::ResourceStatus status = serverRes->getStatus();
-         if (status == Qn::Offline || status == Qn::Unauthorized)
-             return Qn::Offline;
-    }
-
+    Qn::ResourceStatus serverStatus = qnStatusDictionary->value(getParentId());
+    if (serverStatus == Qn::Offline || serverStatus == Qn::Unauthorized)
+        return Qn::Offline;
+    
     return QnResource::getStatus();
 }
