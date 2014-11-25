@@ -256,6 +256,11 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     // calling after all nested constructors are finished
     QTimer::singleShot(1, this, SLOT(updateCheckedButtons()));
+
+    connect(this, &QnResourceWidget::rotationChanged, this, [this]() {
+        if (m_enclosingGeometry.isValid())
+            setGeometry(calculateGeometry(m_enclosingGeometry));
+    });
 }
 
 QnResourceWidget::~QnResourceWidget() {
