@@ -526,16 +526,23 @@ bool QnMediaServerResource::isHiddenServer(const QnResourcePtr &resource) {
 
 void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
 {
-    if (getStatus() != newStatus) {
-        QMutexLocker lock(&m_mutex);
-        m_statusTimer.restart();
-    }
-    QnResource::setStatus(newStatus, silenceMode);
-    if (!silenceMode) 
+    if (getStatus() != newStatus) 
     {
-        QnResourceList childList = qnResPool->getResourcesByParentId(getId());
-        for(const QnResourcePtr& res: childList)
-            emit res->statusChanged(res);
+        {
+            QMutexLocker lock(&m_mutex);
+            m_statusTimer.restart();
+        }
+
+        QnResource::setStatus(newStatus, silenceMode);
+        if (!silenceMode) 
+        {
+            QnResourceList childList = qnResPool->getResourcesByParentId(getId());
+            for(const QnResourcePtr& res: childList) 
+            {
+                if (res->hasFlags(Qn::depend_on_parent_status))
+                    emit res->statusChanged(res);
+            }
+        }
     }
 }
 

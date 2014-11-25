@@ -11,7 +11,7 @@
 QnServerCamera::QnServerCamera(const QnUuid& resourceTypeId): QnVirtualCameraResource()
 {
     setTypeId(resourceTypeId);
-    addFlags(Qn::server_live_cam);
+    addFlags(Qn::server_live_cam | Qn::depend_on_parent_status);
 }
 
 QString QnServerCamera::getDriverName() const
