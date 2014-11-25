@@ -29,7 +29,7 @@
 #include <utils/common/checked_cast.h>
 #include "utils/common/warnings.h"
 
-#define TRANSACTION_MESSAGE_BUS_DEBUG
+//#define TRANSACTION_MESSAGE_BUS_DEBUG
 
 namespace ec2
 {
