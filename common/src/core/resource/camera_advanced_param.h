@@ -19,6 +19,17 @@ struct QnCameraAdvancedParamValue {
 };
 #define QnCameraAdvancedParamValue_Fields (id)(value)
 
+class QnCameraAdvancedParamValueMap: public QMap<QString, QString> {
+public:
+    QnCameraAdvancedParamValueMap();
+
+    QnCameraAdvancedParamValueList toValueList() const;
+    void appendValueList(const QnCameraAdvancedParamValueList &list);
+
+    /** Get all values from this map that differs from corresponding values from other map. */
+    QnCameraAdvancedParamValueList difference(const QnCameraAdvancedParamValueMap &other) const;
+};
+
 struct QnCameraAdvancedParameter {
     enum class DataType {
         None,

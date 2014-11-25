@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>660</width>
-    <height>503</height>
+    <width>599</width>
+    <height>549</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,24 +17,13 @@
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
-     <widget class="QWidget" name="cannotLoadPage">
-      <layout class="QVBoxLayout" name="verticalLayout_7">
-       <item>
-        <widget class="QLabel" name="cannotLoadLabel">
-         <property name="text">
-          <string>Advanced settings for this camera cannot be loaded</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
      <widget class="QWidget" name="noSettingsPage">
       <layout class="QVBoxLayout" name="verticalLayout_4">
+       <property name="margin">
+        <number>0</number>
+       </property>
        <item>
         <widget class="QLabel" name="noSettingsLabel">
          <property name="text">
@@ -48,103 +37,20 @@
       </layout>
      </widget>
      <widget class="QWidget" name="manualPage">
-      <layout class="QVBoxLayout" name="verticalLayout">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
+       <property name="margin">
+        <number>0</number>
+       </property>
        <item>
-        <widget class="QStackedWidget" name="manualSettingsWidget">
-         <widget class="QWidget" name="manualLoadingPage">
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <property name="margin">
-            <number>0</number>
-           </property>
-           <item>
-            <spacer name="horizontalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QnProgressWidget" name="manualLoadingWidget" native="true"/>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="manualContentPage">
-          <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,1,0">
-           <property name="margin">
-            <number>0</number>
-           </property>
-           <item>
-            <widget class="QLabel" name="manualWarningLabel">
-             <property name="text">
-              <string>Warning: all changes are applied instantly</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSplitter" name="splitter">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="childrenCollapsible">
-              <bool>false</bool>
-             </property>
-             <widget class="QTreeWidget" name="treeWidget">
-              <column>
-               <property name="text">
-                <string>Category</string>
-               </property>
-              </column>
-             </widget>
-             <widget class="QStackedWidget" name="propertiesStackedWidget"/>
-            </widget>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0">
-             <item>
-              <widget class="QnProgressWidget" name="manualApplyingProgressWidget" native="true"/>
-             </item>
-             <item>
-              <spacer name="verticalSpacer">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>40</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </item>
-          </layout>
-         </widget>
-        </widget>
+        <widget class="QnCameraAdvancedParamsWidget" name="cameraAdvancedParamsWidget" native="true"/>
        </item>
       </layout>
      </widget>
      <widget class="QWidget" name="webPage">
       <layout class="QVBoxLayout" name="verticalLayout_3">
+       <property name="margin">
+        <number>0</number>
+       </property>
        <item>
         <widget class="QWebView" name="webView" native="true">
          <property name="url" stdset="0">
@@ -167,9 +73,9 @@
    <header>QtWebKitWidgets/QWebView</header>
   </customwidget>
   <customwidget>
-   <class>QnProgressWidget</class>
+   <class>QnCameraAdvancedParamsWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/progress_widget.h</header>
+   <header location="global">ui/widgets/properties/camera_advanced_params_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

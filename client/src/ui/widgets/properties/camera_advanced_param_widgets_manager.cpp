@@ -120,6 +120,8 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString &
 		/* Widget is disabled until it receive correct value. */
 		if (QnCameraAdvancedParameter::dataTypeHasValue(param.dataType))
 			widget->setEnabled(false);
+        else 
+            connect(widget, &QnAbstractCameraAdvancedParamWidget::valueChanged, this, &QnCameraAdvancedParamWidgetsManager::paramValueChanged);
 	}
 
 	return groupBox;

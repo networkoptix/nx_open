@@ -16,11 +16,11 @@ public:
 	void displayParams(const QnCameraAdvancedParams &params);
 	void loadValues(const QnCameraAdvancedParamValueList &params);
 
+	void clear();
 signals:
 	void paramValueChanged(const QString &id, const QString &value);
 
 private:
-	void clear();
 
 	/** Check if group has at least one valid value. */
 	bool hasValidValues(const QnCameraAdvancedParamGroup &group) const;

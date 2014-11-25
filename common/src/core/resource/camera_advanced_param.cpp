@@ -39,6 +39,30 @@ QnCameraAdvancedParamValue::QnCameraAdvancedParamValue(const QString &id, const 
 	id(id), value(value)
 {}
 
+QnCameraAdvancedParamValueMap::QnCameraAdvancedParamValueMap():
+    QMap<QString, QString>() {}
+
+QnCameraAdvancedParamValueList QnCameraAdvancedParamValueMap::toValueList() const {
+    QnCameraAdvancedParamValueList result;
+    for (auto iter = this->cbegin(); iter != this->cend(); ++iter)
+        result << QnCameraAdvancedParamValue(iter.key(), iter.value());
+    return result;
+}
+
+QnCameraAdvancedParamValueList QnCameraAdvancedParamValueMap::difference(const QnCameraAdvancedParamValueMap &other) const {
+    QnCameraAdvancedParamValueList result;
+    for (auto iter = this->cbegin(); iter != this->cend(); ++iter) {
+        if (other.contains(iter.key()) && other[iter.key()] == iter.value())
+            continue;
+        result << QnCameraAdvancedParamValue(iter.key(), iter.value());
+    }
+    return result;
+}
+
+void QnCameraAdvancedParamValueMap::appendValueList(const QnCameraAdvancedParamValueList &list) {
+    for (const QnCameraAdvancedParamValue &value: list)
+        insert(value.id, value.value);
+}
 
 QnCameraAdvancedParameter::QnCameraAdvancedParameter():
     dataType(DataType::None),
@@ -52,7 +76,8 @@ QString QnCameraAdvancedParameter::getId() const {
 }
 
 bool QnCameraAdvancedParameter::isValid() const {
-	return !getId().isEmpty();
+	return (dataType != DataType::None) 
+        && (!getId().isEmpty());
 }
 
 QString QnCameraAdvancedParameter::dataTypeToString(DataType value) {
