@@ -17,6 +17,7 @@
 #include "media_server_user_attributes.h"
 #include "../resource_management/resource_pool.h"
 #include "utils/serialization/lexical.h"
+#include "core/resource/security_cam_resource.h"
 
 
 const QString QnMediaServerResource::USE_PROXY = QLatin1String("proxy");
@@ -43,12 +44,34 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
 
     m_primaryIFSelected = false;
     m_statusTimer.restart();
+
+    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnMediaServerResource::onNewResource, Qt::QueuedConnection);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnMediaServerResource::onRemoveResource, Qt::QueuedConnection);
+
+    QnResourceList resList = qnResPool->getResourcesByParentId(getId()).filtered<QnSecurityCamResource>();
+    if (!resList.isEmpty())
+        m_firstCamera = resList.first();
 }
 
 QnMediaServerResource::~QnMediaServerResource()
 {
     QMutexLocker lock(&m_mutex); // TODO: #Elric remove once m_guard hell is removed.
 }
+
+void QnMediaServerResource::onNewResource(const QnResourcePtr &resource)
+{
+    QMutexLocker lock(&m_firstCameraMutex);
+    if (m_firstCamera.isNull() &&  resource->getParentId() == getId() && resource.dynamicCast<QnSecurityCamResource>())
+        m_firstCamera = resource;
+}
+
+void QnMediaServerResource::onRemoveResource(const QnResourcePtr &resource)
+{
+    QMutexLocker lock(&m_firstCameraMutex);
+    if (m_firstCamera && resource->getId() == m_firstCamera->getId())
+        m_firstCamera.clear();
+}
+
 
 QString QnMediaServerResource::getUniqueId() const
 {
@@ -58,6 +81,13 @@ QString QnMediaServerResource::getUniqueId() const
 
 QString QnMediaServerResource::getName() const
 {
+    if (getServerFlags() & Qn::SF_Edge)
+    {
+        QMutexLocker lock(&m_firstCameraMutex);
+        if (m_firstCamera)
+            return m_firstCamera->getName();
+    }
+
     QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
     if( !(*lk)->name.isEmpty() )
         return (*lk)->name;
