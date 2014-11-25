@@ -97,7 +97,7 @@ private:
     void at_clientUpdateInstalled();
 
     void at_mutexLocked();
-    void at_mutexTimeout();
+    void at_mutexTimeout(const QSet<QnUuid> &failedPeers);
 private:
     const QnUuid m_id;
     QnUpdateTarget m_target;
