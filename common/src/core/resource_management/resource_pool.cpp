@@ -37,6 +37,7 @@ QnResourcePool::~QnResourcePool()
     blockSignals(signalsBlocked);
 
     QMutexLocker locker(&m_resourcesMtx);
+    m_adminResource.clear();
     m_resources.clear();
 }
 
@@ -201,7 +202,11 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
         //    removedResources.append(resource);
         
         //have to remove by id, since uniqueId can be MAC and, as a result, not unique among friend and foreign resources
-        QHash<QnUuid, QnResourcePtr>::iterator resIter = m_resources.find(resource->getId());
+        QnUuid resId = resource->getId();
+        QHash<QnUuid, QnResourcePtr>::iterator resIter = m_resources.find(resId);
+        if (m_adminResource && resId == m_adminResource->getId())
+            m_adminResource.clear();
+
         if( resIter != m_resources.end() )
         {
             m_resources.erase( resIter );
@@ -461,11 +466,16 @@ QnResourceList QnResourcePool::getResourcesWithTypeId(QnUuid id) const
 
 QnUserResourcePtr QnResourcePool::getAdministrator() const {
     QMutexLocker locker(&m_resourcesMtx);
+    if (m_adminResource)
+        return m_adminResource;
 
-    for(const QnResourcePtr &resource: m_resources) {
+    for(const QnResourcePtr &resource: m_resources) 
+    {
         QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-        if (user && user->isAdmin())
+        if (user && user->isAdmin()) {
+            m_adminResource = user;
             return user;
+        }
     }
     return QnUserResourcePtr();
 }

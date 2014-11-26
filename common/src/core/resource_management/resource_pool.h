@@ -157,6 +157,7 @@ private:
     QHash<QnUuid, QnResourcePtr> m_incompatibleResources;
     mutable QMutex m_cacheMutex;
     mutable QnMediaServerResourceList m_cachedServerList;
+    mutable QnUserResourcePtr m_adminResource;
     /*!
         \return true, if \a resource has been inserted. false - if updated existing resource
     */
