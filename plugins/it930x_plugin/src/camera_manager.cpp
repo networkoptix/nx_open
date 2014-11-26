@@ -154,6 +154,9 @@ namespace ite
             else
                 open();
 
+            if (! m_device.get())
+                return false;
+
             m_device->lockChannel(freq);
             m_devStream.reset( new It930Stream( *m_device ) );
             m_frequency = freq;

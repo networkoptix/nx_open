@@ -337,7 +337,10 @@ namespace ite
                        scanDevs[i]->rxID(), freq, scanDevs[i]->strength(), scanDevs[i]->present());
 
                 if (scanDevs[i]->present() && scanDevs[i]->strength() > 0) // strength: 0..100
-                    rcShell_.updateDevIDs();
+                {
+                    rcShell_.sendGetIDs();
+                    rcShell_.updateDevsParams();
+                }
                 scanDevs[i]->unlockF();
             }
 

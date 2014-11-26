@@ -464,31 +464,33 @@ bool RCShell::sendGetIDs(int iWaitTime)
     return false;
 }
 
-void RCShell::updateDevIDs()
+void RCShell::updateDevsParams()
 {
     {
         std::lock_guard<std::mutex> lock(mutex_); // LOCK
 
         for (size_t i = 0; i < devs_.size(); ++i)
-            devs_[i]->setOff();
+            devs_[i]->getTransmissionParameters();
     }
 
-    bool ok = sendGetIDs();
-    if (!ok)
-        return;
+    usleep(DeviceInfo::SEND_WAIT_TIME_MS * 1000);
 
     {
         std::lock_guard<std::mutex> lock(mutex_); // LOCK
 
         for (size_t i = 0; i < devs_.size(); ++i)
         {
-            //if (devs_[i]->isOn())
-            //{
-                devs_[i]->getTransmissionParameters();
-                devs_[i]->wait();
-            //}
+            devs_[i]->getDeviceInformation();
+#if 0
+            devs_[i]->getTransmissionParameterCapabilities();
+            devs_[i]->getVideoSources();
+            devs_[i]->getVideoSourceConfigurations();
+            devs_[i]->getVideoEncoderConfigurations();
+#endif
         }
     }
+
+    usleep(DeviceInfo::SEND_WAIT_TIME_MS * 1000);
 }
 
 void RCShell::getDevIDs(std::vector<IDsLink>& outLinks)
