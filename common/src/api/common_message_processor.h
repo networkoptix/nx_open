@@ -84,9 +84,6 @@ public slots:
     void on_licenseRemoved(const QnLicensePtr &license);
 
 private slots:
-    void at_remotePeerFound(ec2::ApiPeerAliveData data);
-    void at_remotePeerLost(ec2::ApiPeerAliveData data);
-
     void on_gotInitialNotification(const ec2::QnFullResourceData &fullData);
     void on_gotDiscoveryData(const ec2::ApiDiscoveryData &discoveryData, bool addInformation);
 

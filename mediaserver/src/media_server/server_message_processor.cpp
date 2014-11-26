@@ -117,14 +117,24 @@ void QnServerMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 
 void QnServerMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data)
 {
-	// If resource in the pool then CommonMessageProcessor changes status to Online
     QnResourcePtr res = qnResPool->getResourceById(data.peer.id);
-    if (!res)
+    if (res)
+        res->setStatus(Qn::Online);
+    else
         m_delayedOnlineStatus << data.peer.id;
 }
 
 void QnServerMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data)
 {
+    QnResourcePtr res = qnResPool->getResourceById(data.peer.id);
+    if (res) {
+        res->setStatus(Qn::Offline);
+        if (data.peer.peerType != Qn::PT_Server) {
+            // This server hasn't own DB
+            for(const QnResourcePtr& camera: qnResPool->getAllCameras(res))
+                camera->setStatus(Qn::Offline);
+        }
+    }
     m_delayedOnlineStatus.remove(data.peer.id);
 }
 
