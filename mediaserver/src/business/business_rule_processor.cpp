@@ -449,12 +449,12 @@ void QnBusinessRuleProcessor::at_actionDeliveryFailed(const QnAbstractBusinessAc
     //TODO: #vasilenko implement me
 }
 
-QImage QnBusinessRuleProcessor::getEventScreenshot(const QnBusinessEventParameters& params, QSize dstSize) const
+QByteArray QnBusinessRuleProcessor::getEventScreenshotEncoded(const QnBusinessEventParameters& params, QSize dstSize) const
 {
     Q_UNUSED(params);
     Q_UNUSED(dstSize);
 
-    return QImage();
+    return QByteArray();
 }
 
 static const unsigned int MS_PER_SEC = 1000;
@@ -568,14 +568,11 @@ bool QnBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPt
     contextMap[tpSystemName] = emailSettings.signature;
     attachments.append(partialInfo.attachments);
 
-    QImage screenshot = this->getEventScreenshot(action->getRuntimeParams(), QSize(640, 480));
-    if (!screenshot.isNull()) {
-        QByteArray screenshotData;
+    QByteArray screenshotData = this->getEventScreenshotEncoded(action->getRuntimeParams(), QSize(640, 480));
+    if (!screenshotData.isNull()) {
         QBuffer screenshotStream(&screenshotData);
-        if (screenshot.save(&screenshotStream, "JPEG")) {
-            attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshot, screenshotStream, lit("image/jpeg"))));
-            contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
-        }
+        attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshot, screenshotStream, lit("image/jpeg"))));
+        contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
     }
 
     QString messageBody = renderTemplateFromFile(lit(":/email_templates"), partialInfo.attrName + lit(".mustache"), contextMap);

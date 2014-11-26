@@ -142,7 +142,7 @@ private slots:
 
 
 protected:
-    virtual QImage getEventScreenshot(const QnBusinessEventParameters& params, QSize dstSize) const;
+    virtual QByteArray getEventScreenshotEncoded(const QnBusinessEventParameters& params, QSize dstSize) const;
     
     bool containResource(const QnResourceList& resList, const QnUuid& resId) const;
     QnAbstractBusinessActionList matchActions(const QnAbstractBusinessEventPtr& bEvent);
