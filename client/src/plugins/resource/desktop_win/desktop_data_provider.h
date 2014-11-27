@@ -50,6 +50,8 @@ public:
 
     QnConstResourceAudioLayoutPtr getAudioLayout();
 
+    bool readyToStop() const;
+
 protected:
     virtual void run() override;
 

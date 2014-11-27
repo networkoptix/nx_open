@@ -836,6 +836,12 @@ void QnDesktopDataProvider::beforeDestroyDataProvider(QnAbstractDataConsumer* co
         pleaseStop();
 }
 
+bool QnDesktopDataProvider::readyToStop() const
+{
+    QMutexLocker lock(&m_startMutex);
+    return QnAbstractMediaStreamDataProvider::needToStop();
+}
+
 /*
 void QnDesktopDataProvider::putData(QnAbstractDataPacketPtr data)
 {
