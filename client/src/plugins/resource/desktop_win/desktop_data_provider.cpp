@@ -839,7 +839,7 @@ void QnDesktopDataProvider::beforeDestroyDataProvider(QnAbstractDataConsumer* co
 bool QnDesktopDataProvider::readyToStop() const
 {
     QMutexLocker lock(&m_startMutex);
-    return QnAbstractMediaStreamDataProvider::needToStop();
+    return processorsCount() == 0;
 }
 
 /*
