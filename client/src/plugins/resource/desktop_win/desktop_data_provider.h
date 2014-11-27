@@ -133,7 +133,7 @@ private:
     const QPixmap m_logo;
     //QSet<void*> m_needKeyData;
     qint64 m_initTime;
-    QMutex m_startMutex;
+    mutable QMutex m_startMutex;
     bool m_started;
     bool m_isInitialized;
 
