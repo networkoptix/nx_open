@@ -37,7 +37,7 @@ signals:
     void physicalParamChanged(const QString& name, const QString& value);
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
-    virtual void fetchAndSetCameraSettings() override;
+    virtual void fetchAndSetImagingOptions() override;
 
 private:
     bool loadPhysicalParams();

@@ -36,7 +36,7 @@ QnAbstractStreamDataProvider* QnArecontPanoramicResource::createLiveDataProvider
 }
 
 
-bool QnArecontPanoramicResource::getParamPhysical(int channel, const QString& name, QVariant &val)
+bool QnArecontPanoramicResource::getParamPhysicalByChannel(int channel, const QString& name, QString &val)
 {
     m_mutex.lock();
     m_mutex.unlock();

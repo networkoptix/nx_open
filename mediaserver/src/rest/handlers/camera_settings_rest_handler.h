@@ -35,9 +35,8 @@
           Content-Type: application/text
           Content-Length: 38
 
-          ok: param1
-          failure: param2
-          ok: param3
+          param1=value1
+          param3=value3
 
     \a res_id - unique id of camera
     If failed to set just one param, response status code is set to 500 (Internal Server Error), in other case - 200 (OK)

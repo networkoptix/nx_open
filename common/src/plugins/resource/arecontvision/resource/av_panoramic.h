@@ -14,7 +14,7 @@ public:
     ~QnArecontPanoramicResource();
     bool getDescription();
 
-    bool getParamPhysical(int channel, const QString& name, QVariant &val);
+    bool getParamPhysicalByChannel(int channel, const QString& name, QString &val);
 
     void updateFlipState();
     virtual bool isAbstractResource() const override { return false; }

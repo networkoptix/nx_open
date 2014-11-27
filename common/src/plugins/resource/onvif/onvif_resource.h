@@ -21,8 +21,6 @@
 #include "utils/network/simple_http_client.h"
 #include "core/datapacket/media_data_packet.h"
 #include "soap_wrapper.h"
-#include "onvif_resource_settings.h"
-
 
 class onvifXsd__AudioEncoderConfigurationOption;
 class onvifXsd__VideoSourceConfigurationOptions;
@@ -42,6 +40,7 @@ class VideoOptionsLocal;
 //first = width, second = height
 
 class QDomElement;
+class OnvifCameraSettingsResp;
 
 template<typename SyncWrapper, typename Request, typename Response>
 class GSoapAsyncCallWrapper;
@@ -248,10 +247,10 @@ protected:
 
     virtual CameraDiagnostics::Result updateResourceCapabilities();
 
-    virtual bool getParamPhysical(const QString &param, QVariant &val);
-    virtual bool setParamPhysical(const QString &param, const QVariant& val);
+    virtual bool getParamPhysical(const QString &id, QString &value) override;
+    virtual bool setParamPhysical(const QString &id, const QString& value) override;
 
-    virtual void fetchAndSetCameraSettings();
+    virtual void fetchAndSetImagingOptions();
 
 private:
     void setMaxFps(int f);

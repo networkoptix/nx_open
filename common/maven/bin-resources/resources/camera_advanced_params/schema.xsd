@@ -9,19 +9,30 @@
 			<xs:enumeration value="Button"/>
 		</xs:restriction>
 	</xs:simpleType>
-  
+	
 	<xs:complexType name="paramType">    
 		<xs:simpleContent>
 				<xs:extension base="xs:string">
-				<xs:attribute type="DataType" name="dataType" use="required"/>				
+				<xs:attribute type="xs:string" name="id" use="required"/>				
+				<xs:attribute type="DataType" name="dataType" use="required"/>
 				<xs:attribute type="xs:string" name="name" use="required"/>
-				<xs:attribute type="xs:string" name="query" use="required"/>
 				<xs:attribute type="xs:string" name="description" use="optional"/>
 				<xs:attribute type="xs:string" name="min" use="optional"/>
 				<xs:attribute type="xs:string" name="max" use="optional"/>
 				<xs:attribute type="xs:string" name="step" use="optional"/>
 				<xs:attribute type="xs:string" name="method" use="optional" default="GET"/>
 				<xs:attribute type="xs:boolean" name="readOnly" use="optional" default="false"/>
+            </xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	
+	<xs:complexType name="boolParamType">
+		<xs:simpleContent>
+				<xs:extension base="paramType">
+				<xs:attribute type="xs:string" name="id" use="required"/>
+				<xs:attribute type="xs:string" name="dataType" use="required" fixed="Bool"/>				
+				<xs:attribute type="xs:string" name="off" use="optional" default="false"/>
+				<xs:attribute type="xs:string" name="on" use="optional" default="true"/>
             </xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -43,14 +54,7 @@
 		</xs:sequence>
 		<xs:attribute type="xs:string" name="name" use="required"/>
 		<xs:attribute type="xs:string" name="description" use="optional"/>
-		<xs:attribute type="xs:string" name="parent" use="optional"/>
 	</xs:complexType>
   
-	<xs:element name="cameras">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element name="camera" maxOccurs="1" minOccurs="1" type="cameraType"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
+	<xs:element name="camera" type="cameraType"/>
 </xs:schema>

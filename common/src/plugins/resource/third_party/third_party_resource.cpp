@@ -11,16 +11,12 @@
 #include <memory>
 
 #include <QtCore/QStringList>
-#include <QtXmlPatterns/QAbstractMessageHandler>
-#include <QtXmlPatterns/QXmlSchema>
-#include <QtXmlPatterns/QXmlSchemaValidator>
 
 #include <core/resource/camera_advanced_param.h>
 
 #include <utils/common/log.h>
 
 #include "api/app_server_connection.h"
-#include "camera_params_description_xml_helper.h"
 #include "motion_data_picture.h"
 #include "plugins/resource/archive/archive_stream_reader.h"
 #include "third_party_archive_delegate.h"
@@ -612,39 +608,16 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         if( paramDescXMLStr != nullptr )
         {
             QByteArray paramDescXML = QByteArray::fromRawData( paramDescXMLStr, strlen(paramDescXMLStr) );
-            //qDebug() << paramDescXML;
-            QUrl schemaUrl( lit("qrc:/camera_settings/camera_settings.xsd") );
+            QBuffer dataSource(&paramDescXML);
 
-            //validating xml
-            QXmlSchema schema;
-            schema.load(schemaUrl);
-            Q_ASSERT( schema.isValid() );
-            ParamsXMLValidationMessageHandler msgHandler;
-            QXmlSchemaValidator validator( schema );
-            validator.setMessageHandler( &msgHandler );
-            if( validator.validate( paramDescXML ) )
-            {
+            if( QnCameraAdvacedParamsXmlParser::validateXml(&dataSource)) {
                 //parsing xml to load param list and get cameraID
-
-                QMutexLocker lk( &m_mutex );
-				QBuffer dataSource;
-				dataSource.setData(paramDescXML);
-				auto paramsTree = QnCameraAdvacedParamsXmlParser::readXml(&dataSource);
-                
-                Q_ASSERT_X(paramsTree.children.size() == 1, Q_FUNC_INFO, "xml should contain one camera");
-
-                if( paramsTree.isEmpty() )
-                {
-                    NX_LOG( lit("Could not parse camera parameters description xml"), cl_logWARNING );
-                }
-                else if( paramsTree.children.size() != 1 )
-                {
-                    NX_LOG( lit("Invalid camera parameters description xml! It contains more than one <camera> element"), cl_logWARNING );
-                }
-                else
-                {
-                    setProperty( Qn::PHYSICAL_CAMERA_SETTINGS_XML_PARAM_NAME, QString::fromUtf8(paramDescXML) );
-                    setProperty( Qn::CAMERA_SETTINGS_ID_PARAM_NAME, paramsTree.children.front().cameraTypeName );
+                QnCameraAdvancedParams params;
+                QString cameraTypeName;
+				if (QnCameraAdvacedParamsXmlParser::readXml(&dataSource, params, cameraTypeName)) {
+                    setProperty(Qn::CAMERA_ADVANCED_PARAMS_XML, QString::fromUtf8(paramDescXML));
+                    setProperty(Qn::CAMERA_ADVANCED_PARAMS_TYPENAME, cameraTypeName);
+                    setProperty(Qn::CAMERA_ADVANCED_PARAMS_SUPPORTED, QStringList(params.allParameterIds().toList()).join(L','));
                 }
             }
             else

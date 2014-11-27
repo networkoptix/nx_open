@@ -10,17 +10,13 @@
 
 static const int HTTP_PORT = 80;
 
-QString getIdSuffixByModel(const QString& cameraModel)
-{
+bool modelHasZoom(const QString& cameraModel) {
     QString tmp = cameraModel.toLower();
     tmp = tmp.replace(QLatin1String(" "), QLatin1String(""));
-
     if (tmp.contains(QLatin1String("fd20")) || tmp.contains(QLatin1String("mpa20m")) || tmp.contains(QLatin1String("mc421"))) {
-        //without focus
-        return lit("-WOFOCUS");
+        return false;
     }
-
-    return lit("-FOCUS");
+    return true;
 }
 
 QnDigitalWatchdogResource::QnDigitalWatchdogResource():
@@ -142,32 +138,17 @@ QnAbstractPtzController *QnDigitalWatchdogResource::createPtzControllerInternal(
     return result.take();
 }
 
-void QnDigitalWatchdogResource::fetchAndSetCameraSettings()
-{
-    //The grandparent "ONVIF" is processed by invoking of parent 'fetchAndSetCameraSettings' method
-    QnPlOnvifResource::fetchAndSetCameraSettings();
-
+void QnDigitalWatchdogResource::fetchAndSetImagingOptions() {
     QString cameraModel = fetchCameraModel();
-    QString baseIdStr = getProperty(Qn::CAMERA_SETTINGS_ID_PARAM_NAME);
-
-    QString suffix = getIdSuffixByModel(cameraModel);
-    if (!suffix.isEmpty()) {
-        if(suffix.endsWith(QLatin1String("-FOCUS")))
-            m_hasZoom = true;
-
-        QString prefix = baseIdStr.split(QLatin1String("-"))[0];
-        QString fullCameraType = prefix + suffix;
-        if (fullCameraType != baseIdStr)
-            setProperty(Qn::CAMERA_SETTINGS_ID_PARAM_NAME, fullCameraType);
-        baseIdStr = prefix;
-    }
+    m_hasZoom = modelHasZoom(cameraModel);
 
     QMutexLocker lock(&m_physicalParamsMutex);
-    //TODO: #GDM global object
-    m_advancedParameters = QnCameraAdvancedParamsReader().params(this->toSharedPointer());
-
     m_cameraProxy.reset(new DWCameraProxy(getHostAddress(), 80, getNetworkTimeout(), getAuth()));
     loadPhysicalParams();
+
+    setProperty(Qn::CAMERA_ADVANCED_PARAMS_TYPENAME, lit("DIGITALWATCHDOG"));
+    setProperty(Qn::CAMERA_ADVANCED_PARAMS_SUPPORTED, QStringList(m_advancedParamsCache.keys()).join(L','));
+    m_advancedParameters = QnCameraAdvancedParamsReader().params(this->toSharedPointer());
 }
 
 QString QnDigitalWatchdogResource::fetchCameraModel()
@@ -228,13 +209,18 @@ bool QnDigitalWatchdogResource::setParamPhysical(const QString &id, const QStrin
         if (!m_cameraProxy)
             return false;
 
-        QnCameraAdvancedParameter parameter = m_advancedParameters.getParameterById(id);
-        Q_ASSERT_X(parameter.isValid(), Q_FUNC_INFO, "parameter id should be correct here by design");
-        if (!parameter.isValid())
+        if (!QnCameraAdvancedParamsReader::allowedParams(this->toSharedPointer()).contains(id)) {
+            Q_ASSERT_X(false, Q_FUNC_INFO, "parameter id should be correct here by design");
             return false;
+        }
+
+        QnCameraAdvancedParameter parameter = m_advancedParameters.getParameterById(id);
+        Q_ASSERT_X(parameter.isValid(), Q_FUNC_INFO, "parameter should be correct here by design");
+
+        QString tag = parameter.method;
 
         m_advancedParamsCache[id] = value;
-        result = m_cameraProxy->setParam(id, value, parameter.method);
+        result = m_cameraProxy->setParam(id, value, tag);
     }
     emit physicalParamChanged(id, value);
     return result;

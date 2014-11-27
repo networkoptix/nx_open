@@ -21,26 +21,8 @@
 
 
 namespace {
-
 	//!max time (milliseconds) to wait for async operation completion
 	static const unsigned long MAX_WAIT_TIMEOUT_MS = 15000;
-
-	QSet<QString> allParameterIds(const QnCameraAdvancedParamGroup& group) {
-		QSet<QString> result;
-		for (const QnCameraAdvancedParamGroup &subGroup: group.groups)
-			result.unite(allParameterIds(subGroup));
-		for (const QnCameraAdvancedParameter &param: group.params)
-			if (!param.getId().isEmpty())
-				result.insert(param.getId());
-		return result;
-	}
-
-	QSet<QString> allParameterIds(const QnCameraAdvancedParams& params) {
-		QSet<QString> result;
-		for (const QnCameraAdvancedParamGroup &group: params.groups)
-			result.unite(allParameterIds(group));
-		return result;
-	}
 }
 
 
@@ -87,11 +69,10 @@ int QnCameraSettingsRestHandler::executeGet(const QString &path, const QnRequest
 	locParams.remove(lit("res_id"));
 
 	/* Filter allowed parameters. */
-	auto allowedParams = m_paramsReader->params(camera);
-	QSet<QString> allowedIds = allParameterIds(allowedParams);
+	auto allowedParams = m_paramsReader->allowedParams(camera);
 
 	for(auto iter = locParams.begin(); iter != locParams.end();) {
-		if (allowedIds.contains(iter.key()))
+		if (allowedParams.contains(iter.key()))
 			++iter;
 		else
 			iter = locParams.erase(iter);

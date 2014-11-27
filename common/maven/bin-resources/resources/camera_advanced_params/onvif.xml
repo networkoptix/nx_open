@@ -1,0 +1,152 @@
+<plugin 
+	name = "ONVIF"
+	version = "1"
+	unique_id = "53148996-d4d8-4e90-985e-24c6c63c5150">
+
+	<group name = "Imaging"
+		   description ="">
+
+	   <param
+		   id = "Imaging_Brightness"	   
+		   name = "Brightness"	   
+		   description = "Image brightness."
+		   dataType = "Number"
+		   min = "0"
+		   max = "100"
+	   />
+
+	  <param name = "Color Saturation"
+			   description = "Color saturation of the image."
+			   dataType = "Number"
+			   query = ""/>
+
+	  <param name = "Contrast"
+			   description = "Contrast of the image."
+			   dataType = "Number"
+			   query = ""/>
+
+	  <param name = "Ir Cut Filter Mode"
+			   description = "Infrared Cutoff Filter settings."
+			   dataType = "Enumeration"
+			   min = "ON,OFF,AUTO"
+			   max = "ON,OFF,AUTO"
+			   query = ""/>
+
+	  <param name = "Sharpness"
+			   description = "Sharpness of the Video image."
+			   dataType = "Number"
+			   query = ""/>
+
+	  <group name = "Backlight Compensation"
+			 description ="">
+		<param name = "Mode"
+			   description = "Enabled/disabled BLC mode (on/off)."
+			   dataType = "Bool"
+			   query = ""/>
+		<param name = "Level"
+			   description = "Level of BLC."
+			   dataType = "Number"
+			   query = ""/>
+	  </group>
+
+	  <group name = "Wide Dynamic Range"
+			 description ="">
+		<param name = "Mode"
+			   description = "Wide dynamic range mode (on/off)."
+			   dataType = "Bool"
+			   query = ""/>
+		<param name = "Level"
+			   description = "Level of wide dynamic range."
+			   dataType = "Number"
+			   query = ""/>
+	  </group>
+
+	  <group name = "White Balance"
+			 description ="">
+		<param name = "Mode"
+			   description = "White Balance (auto/manual)."
+			   dataType = "Enumeration"
+			   values = "Auto,Manual"
+			   setup="index"
+			   query = ""/>
+		<param name = "Yr Gain"
+			   description = "Rgain."
+			   dataType = "Number"
+			   query = ""/>
+		<param name = "Yb Gain"
+			   description = "Bgain."
+			   dataType = "Number"
+			   query = ""/>
+	  </group>
+
+	  <group name = "Exposure"
+			 description ="">
+		<param name = "Mode"
+			   description = "Exposure Mode. Auto – Enabled the exposure algorithm on the device. Manual – Disabled exposure algorithm on the device."
+			   dataType = "Enumeration"
+			   min = "AUTO,MANUAL"
+			   max = "AUTO,MANUAL"
+			   query = ""/>
+		<param name = "Priority"
+			   description = "The exposure priority mode (low noise/framerate)."
+			   dataType = "Enumeration"
+			   min = "LowNoise,FrameRate"
+			   max = "LowNoise,FrameRate"
+			   query = ""/>
+		<param name = "Min Exposure Time"
+			   description = "Minimum value of exposure time range allowed to be used by the algorithm."
+			   dataType = "Number"
+			   query = ""/>
+		<param name = "Max Exposure Time"
+			   description = "Maximum value of exposure time range allowed to be used by the algorithm."
+			   dataType = "Number"
+			   query = ""/>
+		<param name = "Min Gain"
+			   description = "Minimum value of the sensor gain range that is allowed to be used by the algorithm."
+			   dataType = "Number"
+			   query = ""/>
+		<param name = "Max Gain"
+			   description = "Maximum value of the sensor gain range that is allowed to be used by the algorithm."
+			   dataType = "Number"
+			   query = ""/>
+		<param name = "Min Iris"
+			   description = "Minimum value of the iris range allowed to be used by the algorithm."
+			   dataType = "Number"
+			   query = ""/>
+		<param name = "Max Iris"
+			   description = "Maximum value of the iris range allowed to be used by the algorithm."
+			   dataType = "Number"
+			   query = ""/>
+		<param name = "Exposure Time"
+			   description = "The fixed exposure time used by the image sensor (?s)."
+			   dataType = "Number"
+			   query = ""/>
+		<param name = "Gain"
+			   description = "The fixed gain used by the image sensor (dB)."
+			   dataType = "Number"
+			   query = ""/>
+		<param name = "Iris"
+			   description = "The fixed attenuation of input light affected by the iris (dB). 0dB maps to a fully opened iris."
+			   dataType = "Number"
+			   query = ""/>
+	  </group>
+
+	</group>
+
+	<group name = "Maintenance"
+		 description ="">
+	  <param name = "System Reboot"
+			 description = "This operation reboots the device."
+			 dataType = "Button"
+			 query = ""/>
+	  <param name = "Soft System Factory Default"
+			 description = "This operation reloads all parameters on the device to their factory default values, except basic network settings like IP address, subnet and gateway or DHCP settings."
+			 dataType = "Button"
+			 query = ""/>
+	  <param name = "Hard System Factory Default"
+			 description = "This operation reloads all parameters on the device to their factory default values."
+			 dataType = "Button"
+			 query = ""/>
+	</group>
+
+  </plugin>

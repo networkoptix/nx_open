@@ -39,11 +39,11 @@ public:
 	}
 
 	virtual QString value() const override	{
-		return m_checkBox->isChecked() ? lit("true") : lit("false");
+		return m_checkBox->isChecked() ? lit("1") : lit("0");
 	}
 
 	virtual void setValue(const QString &newValue) override	{
-		m_checkBox->setChecked(newValue == lit("true"));
+		m_checkBox->setChecked(newValue == lit("1"));
 	}
 
 private:

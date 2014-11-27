@@ -12,8 +12,6 @@
 
 #include <QSharedPointer>
 
-#include <plugins/resource/camera_settings/camera_settings.h>
-
 #include "core/resource/camera_resource.h"
 #include "../../camera_plugin_qt_wrapper.h"
 

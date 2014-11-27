@@ -1,0 +1,214 @@
+  <camera name = "DIGITALWATCHDOG">
+
+    <group name = "Imaging"
+           description ="">
+
+      <group name = "White Balance"
+           description ="">
+
+        <param name = "Mode"
+             description = "Also known as Color Balance. This gives the camera a reference to 'true white'."
+             dataType = "Enumeration"
+             min = "AUTO,AUTO_H,AUTO_L,PRESET,MANUAL"
+             max = "AUTO,AUTO_H,AUTO_L,PRESET,MANUAL"
+             query = "wbmode1"/>
+
+        <param name = "Kelvin"
+             description = "Determine the warmth of coolness of light."
+             dataType = "Enumeration"
+             min = "LOW,MIDDLE,HIGH"
+             max = "LOW,MIDDLE,HIGH"
+             query = "wbkelvin1"/>
+
+        <param name = "Red"
+             description = "White Balance Red Offset"
+             dataType = "MinMaxStep"
+             min = "0"
+             max = "20"
+             step = "1"
+             query = "wbred1"/>
+
+        <param name = "Blue"
+             description = "White Balance Blue Offset"
+             dataType = "MinMaxStep"
+             min = "0"
+             max = "20"
+             step = "1"
+             query = "wbblue1"/>
+
+      </group>
+
+      <group name = "Exposure"
+           description ="">
+
+        <param name = "Brightness"
+             description = "Select from 0 (darkest) to 20 (brightest)."
+             dataType = "MinMaxStep"
+             min = "0"
+             max = "20"
+             step = "1"
+             query = "brightness1"/>
+
+        <param name = "Shutter Mode"
+             description = "Set the amount of light allowed in the video manually or automatically."
+             dataType = "Enumeration"
+             min = "AUTO,MANUAL"
+             max = "AUTO,MANUAL"
+             query = "dssmode1"/>
+
+        <param name = "Shutter Speed"
+             description = "Select the speed the camera’s shutter will operate—1/30, 1/60, or 1/120."
+             dataType = "Enumeration"
+             min = "1/30,1/60,1/120"
+             max = "1/30,1/60,1/120"
+             query = "shutspeed1"/>
+
+        <param name = "Digital Slow Shutter"
+             description = "Recommended in low light conditions. Turn On or Off."
+             dataType = "Enumeration"
+             min = "OFF,2x,3x,4x"
+             max = "OFF,2x,3x,4x"
+             query = "dsslimit1"/>
+
+        <param name = "AGC Gain"
+             description = "Maximum light gain settings in low light conditions. Select from 0 (least light) to 20 (most light)."
+             dataType = "MinMaxStep"
+             min = "0"
+             max = "20"
+             step = "1"
+             query = "gain1"/>
+             
+        <param name = "WDR/BLC Mode"
+             description = "Back Light Compensation Mode: This setup allows the camera to process an image that is harshly silhouette against a bright light source."
+             dataType = "Enumeration"
+             min = "OFF,WDR,BLC"
+             max = "OFF,WDR,BLC"
+             query = "blcmode1"/>
+
+      </group>
+
+      <group name = "Day &amp; Night"
+           description ="">
+
+        <param name = "Mode"
+             description = "Set the mode to Night, Day, or Auto. If set as Auto, set a desired Color to B/W Level and B/W to Color Level."
+             dataType = "Enumeration"
+             min = "NIGHT(B/W),DAY(COLOR),AUTO"
+             max = "NIGHT(B/W),DAY(COLOR),AUTO"
+             query = "dnmode1"/>
+
+        <param name = "Switching from Color to B/W"
+             description = "The higher the number, the less darker the environment will have to be for the camera to switch from color to B/W."
+             dataType = "MinMaxStep"
+             min = "0"
+             max = "10"
+             step = "1"
+             query = "dnbwlevel1"/>
+
+        <param name = "Switching from B/W to Color"
+             description = "This number should always be lower than the number set to color to B/W."
+             dataType = "MinMaxStep"
+             min = "0"
+             max = "10"
+             step = "1"
+             query = "dncolorlevel1"/>
+
+      </group>
+
+     <group name = "Lens"
+         description ="">
+      
+      <param name = "Lens Mode"
+             description = "Set the camera to indoor/ outdoor lighting environment."
+             dataType = "Enumeration"
+             min = "OUTDOOR,INDOOR"
+             max = "OUTDOOR,INDOOR"
+             query = "lensmode1"/>
+    </group>
+      
+      <group name = "Extra Settings"
+           description ="">
+
+        <param name = "Chroma"
+             description = "Affect the quality of the color in the image. The higher the numbers, the video will have brighter colors."
+             dataType = "MinMaxStep"
+             min = "0"
+             max = "20"
+             step = "1"
+             query = "chroma1"/>
+
+        <param name = "Sharpness"
+             description = "Select from the sharpness of the image."
+             dataType = "MinMaxStep"
+             min = "0"
+             max = "10"
+             step = "1"
+             query = "sharpness1"/>
+
+        <param name = "Mirror"
+             description = "Mirror the image from left to right."
+             dataType = "Bool"
+             query = "mirrormode1"/>
+
+        <param name = "Flip"
+             description = "Flip the image upside down."
+             dataType = "Bool"
+             query = "flipmode1"/>
+
+        <param name = "Digital Noise Reduction"
+             description = "Control the level of noise in the image."
+             dataType = "Enumeration"
+             min = "OFF,LOW,MIDDLE,HIGH"
+             max = "OFF,LOW,MIDDLE,HIGH"
+             query = "nrmode1"/>
+
+      </group>
+
+    </group>
+
+    <group name = "Maintenance"
+         description ="">
+
+      <group name = "Firmware Upgrade"
+         description ="">
+
+        <param name = "Server Address"
+               description = "Upgrade the device’s firmware"
+               dataType = "String"
+               query = "address1"
+               method = "POST"/>
+
+        <param name = "Port"
+               description = "Upgrade the device’s firmware"
+               dataType = "String"
+               query = "port1"
+               method = "POST"/>
+
+        <param name = "User ID"
+               description = "Upgrade the device’s firmware"
+               dataType = "String"
+               query = "username1"
+               method = "POST"/>
+
+        <param name = "Password"
+               description = "Upgrade the device’s firmware"
+               dataType = "String"
+               query = "password1"
+               method = "POST"/>
+
+        <param name = "Directory"
+               description = "Upgrade the device’s firmware"
+               dataType = "String"
+               query = "directory1"
+               method = "POST"/>
+
+        <param name = "Check Upgrade"
+               description = "Upgrade the device’s firmware"
+               dataType = "Button"
+               query = "/cgi-bin/checkFTPupgrade.cgi"
+               method = "POST"/>
+
+      </group>
+    </group>
+
+  </camera>

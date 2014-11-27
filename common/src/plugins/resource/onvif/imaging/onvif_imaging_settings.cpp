@@ -1,159 +1,47 @@
+#include "onvif_imaging_settings.h"
 
 #ifdef ENABLE_ONVIF
 
-#include "onvif_resource_settings.h"
-#include "onvif/soapImagingBindingProxy.h"
-
-#include <QtCore/QDebug>
-
-enum onvifXsd__WideDynamicMode;
-
-//
-// class OnvifCameraSettingsResp
-//
-
-OnvifCameraSettingsResp::OnvifCameraSettingsResp(const std::string& deviceUrl, const std::string& imagingUrl,
-        const QString& login, const QString& passwd, const std::string& videoSrcToken, const QString& uniqId, int _timeDrift):
-    m_deviceSoapWrapper(deviceUrl.empty()? 0: new DeviceSoapWrapper(deviceUrl, login, passwd, _timeDrift)),
-    m_rangesSoapWrapper(imagingUrl.empty()? 0: new ImagingSoapWrapper(imagingUrl, login, passwd, _timeDrift)),
-    m_valsSoapWrapper(imagingUrl.empty()? 0: new ImagingSoapWrapper(imagingUrl, login, passwd, _timeDrift)),
-    m_rangesResponse(new ImagingOptionsResp()),
-    m_valsResponse(new ImagingSettingsResp()),
-    m_videoSrcToken(videoSrcToken),
-    m_uniqId(uniqId)
-{
-    m_rangesResponse->ImagingOptions = 0;
-    m_valsResponse->ImagingSettings = 0;
-}
-
-OnvifCameraSettingsResp::~OnvifCameraSettingsResp()
-{
-    delete m_valsResponse;
-    m_valsResponse = NULL;
-    delete m_rangesResponse;
-    m_rangesResponse = NULL;
-    delete m_valsSoapWrapper;
-    m_valsSoapWrapper = NULL;
-    delete m_rangesSoapWrapper;
-    m_rangesSoapWrapper = NULL;
-    delete m_deviceSoapWrapper;
-    m_deviceSoapWrapper = NULL;
-}
-
-bool OnvifCameraSettingsResp::isEmpty() const
-{ 
-    return !m_rangesResponse->ImagingOptions || !m_valsResponse->ImagingSettings;
-}
-
-CameraDiagnostics::Result OnvifCameraSettingsResp::makeGetRequest()
-{
-    if (!m_rangesSoapWrapper || !m_valsSoapWrapper) {
-        return CameraDiagnostics::UnknownErrorResult();
-    }
-
-    ImagingOptionsReq rangesRequest;
-    rangesRequest.VideoSourceToken = m_videoSrcToken;
-
-    int soapRes = m_rangesSoapWrapper->getOptions(rangesRequest, *m_rangesResponse);
-    if (soapRes != SOAP_OK) {
-        qWarning() << "OnvifCameraSettingsResp::makeGetRequest: can't fetch imaging options. UniqId: " << m_uniqId
-            << ". Reason: SOAP to endpoint " << m_rangesSoapWrapper->getEndpointUrl() << " failed. GSoap error code: "
-            << soapRes << ". " << m_rangesSoapWrapper->getLastError();
-        return CameraDiagnostics::RequestFailedResult(QLatin1String("getOptions"), m_rangesSoapWrapper->getLastError());
-    }
-
-    ImagingSettingsReq valsRequest;
-    valsRequest.VideoSourceToken = m_videoSrcToken;
-
-    soapRes = m_valsSoapWrapper->getImagingSettings(valsRequest, *m_valsResponse);
-    if (soapRes != SOAP_OK) {
-        qWarning() << "OnvifCameraSettingsResp::makeGetRequest: can't fetch imaging settings. UniqId: " << m_uniqId
-            << ". Reason: SOAP to endpoint " << m_valsSoapWrapper->getEndpointUrl() << " failed. GSoap error code: "
-            << soapRes << ". " << m_valsSoapWrapper->getLastError();
-        return CameraDiagnostics::RequestFailedResult(QLatin1String("getImagingSettings"), m_valsSoapWrapper->getLastError());
-    }
-
-    return CameraDiagnostics::NoErrorResult();
-}
-
-bool OnvifCameraSettingsResp::makeSetRequest()
-{
-    if (!m_valsResponse) {
-        return false;
-    }
-
-    QString endpoint = getImagingUrl();
-    if (endpoint.isEmpty()) {
-        return false;
-    }
-
-    QString login = getLogin();
-    QString passwd = getPassword();
-
-    ImagingSoapWrapper soapWrapper(endpoint.toStdString(), login, passwd, getTimeDrift());
-    SetImagingSettingsResp response;
-    SetImagingSettingsReq request;
-    request.ImagingSettings = m_valsResponse->ImagingSettings;
-    request.VideoSourceToken = m_videoSrcToken;
-
-    int soapRes = soapWrapper.setImagingSettings(request, response);
-    if (soapRes != SOAP_OK) {
-        qWarning() << "OnvifCameraSettingsResp::makeSetRequest: can't save imaging options. UniqId: " << m_uniqId
-            << ". Reason: SOAP to endpoint " << m_rangesSoapWrapper->getEndpointUrl() << " failed. GSoap error code: "
-            << soapRes << ". " << m_rangesSoapWrapper->getLastError();
-
-        //Restoring values from camera
-        makeGetRequest();
-
-        return false;
-    }
-
-    return true;
-}
-
-const ImagingOptionsResp& OnvifCameraSettingsResp::getRangesResponse() const
-{
-  return *m_rangesResponse;
-}
-
-const ImagingSettingsResp& OnvifCameraSettingsResp::getValsResponse() const
-{
-  return *m_valsResponse;
-}
-
-QString OnvifCameraSettingsResp::getImagingUrl() const
-{
-    return m_rangesSoapWrapper? m_rangesSoapWrapper->getEndpointUrl(): QString();
-}
-
-QString OnvifCameraSettingsResp::getLogin() const
-{
-    return m_rangesSoapWrapper? m_rangesSoapWrapper->getLogin(): QString();
-}
-
-QString OnvifCameraSettingsResp::getPassword() const
-{
-    return m_rangesSoapWrapper? m_rangesSoapWrapper->getPassword(): QString();
-}
-
-int OnvifCameraSettingsResp::getTimeDrift() const
-{
-    return m_rangesSoapWrapper? m_rangesSoapWrapper->getTimeDrift(): 0;
-}
-
-QString OnvifCameraSettingsResp::getUniqueId() const
-{
-    return m_uniqId;
-}
-
-DeviceSoapWrapper* OnvifCameraSettingsResp::getDeviceSoapWrapper()
-{
-    return m_deviceSoapWrapper;
-}
+//#include "onvif/soapImagingBindingProxy.h"
+#include "onvif/soapStub.h"
 
 //
 // class OnvifCameraSettingOperationAbstract
 // 
+QnAbstractOnvifImagingOperation::QnAbstractOnvifImagingOperation(ImagingSettingsResp* settings):
+    m_settings(settings)
+{}
+
+QnAbstractOnvifImagingOperation::~QnAbstractOnvifImagingOperation() {}
+
+
+QnFloatOnvifImagingOperation::QnFloatOnvifImagingOperation(ImagingSettingsResp* settings, std::function<float* (ImagingSettingsResp* settings)> path):
+    QnAbstractOnvifImagingOperation(settings),
+    m_path(path)
+{}
+
+QnFloatOnvifImagingOperation::~QnFloatOnvifImagingOperation() {}
+
+bool QnFloatOnvifImagingOperation::get(QString& value) const {
+    if (!m_settings->ImagingSettings || !m_path(m_settings))
+        return false;
+    value = QString::number(*(m_path(m_settings)));
+    return true;
+}
+
+bool QnFloatOnvifImagingOperation::set(const QString& value) const {
+    if (!m_settings->ImagingSettings || !m_path(m_settings))
+        return false;
+
+    bool ok;
+    float result = value.toFloat(&ok);
+    if (!ok)
+        return false;
+    *(m_path(m_settings)) = result;
+    return true;
+}
+
+
 
 const QString& CommonStringValues::ON = *(new QString(QLatin1String("On")));
 const QString& CommonStringValues::OFF = *(new QString(QLatin1String("Off")));
@@ -165,71 +53,41 @@ static QHash<QString, QSharedPointer<OnvifCameraSettingOperationAbstract> > crea
 {
     QHash<QString, QSharedPointer<OnvifCameraSettingOperationAbstract> > tmp;
 
-    tmp.insert(lit("%%Imaging%%White Balance%%Yb Gain"),          QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingWhiteBalanceYbGainOperation()));
-    tmp.insert(lit("%%Imaging%%Exposure%%Iris"),                  QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureIrisOperation()));
-    tmp.insert(lit("%%Imaging%%Exposure%%Exposure Time"),         QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureExposureTimeOperation()));
-    tmp.insert(lit("%%Imaging%%Wide Dynamic Range%%Mode"),        QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingWideDynamicRangeModeOperation()));
-    tmp.insert(lit("%%Imaging%%White Balance%%Mode"),             QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingWhiteBalanceModeOperation()));
-    tmp.insert(lit("%%Imaging%%Exposure%%Max Gain"),              QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureMaxGainOperation()));
-    tmp.insert(lit("%%Imaging%%Exposure%%Min Exposure Time"),     QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureMinExposureTimeOperation()));
-    tmp.insert(lit("%%Imaging%%Backlight Compensation%%Level"),   QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingBacklightCompensationLevelOperation()));
-    tmp.insert(lit("%%Imaging%%Contrast"),                        QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingContrastOperation()));
-    tmp.insert(lit("%%Imaging%%Exposure%%Priority"),              QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposurePriorityOperation()));
-    tmp.insert(lit("%%Imaging%%Sharpness"),                       QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingSharpnessOperation()));
-    tmp.insert(lit("%%Imaging%%Ir Cut Filter Mode"),              QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingIrCutFilterModesOperation()));
-    tmp.insert(lit("%%Imaging%%White Balance%%Yr Gain"),          QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingWhiteBalanceYrGainOperation()));
-    tmp.insert(lit("%%Imaging%%Exposure%%Min Gain"),              QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureMinGainOperation()));
-    tmp.insert(lit("%%Imaging%%Exposure%%Gain"),                  QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureGainOperation()));
-    tmp.insert(lit("%%Imaging%%Exposure%%Mode"),                  QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureModeOperation()));
-    tmp.insert(lit("%%Imaging%%Wide Dynamic Range%%Level"),       QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingWideDynamicRangeLevelOperation()));
-    tmp.insert(lit("%%Imaging%%Exposure%%Max Iris"),              QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureMaxIrisOperation()));
-    tmp.insert(lit("%%Imaging%%Brightness"),                      QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingBrightnessOperation()));
-    tmp.insert(lit("%%Imaging%%Exposure%%Min Iris"),              QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureMinIrisOperation()));
-    tmp.insert(lit("%%Imaging%%Backlight Compensation%%Mode"),    QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingBacklightCompensationModeOperation()));
-    tmp.insert(lit("%%Imaging%%Color Saturation"),                QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingColorSaturationOperation()));
-    tmp.insert(lit("%%Imaging%%Exposure%%Max Exposure Time"),     QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureMaxExposureTimeOperation()));
-    tmp.insert(lit("%%Maintenance%%System Reboot"),               QSharedPointer<OnvifCameraSettingOperationAbstract>(new MaintenanceSystemRebootOperation()));
-    tmp.insert(lit("%%Maintenance%%Soft System Factory Default"), QSharedPointer<OnvifCameraSettingOperationAbstract>(new MaintenanceSoftSystemFactoryDefaultOperation()));
-    tmp.insert(lit("%%Maintenance%%Hard System Factory Default"), QSharedPointer<OnvifCameraSettingOperationAbstract>(new MaintenanceHardSystemFactoryDefaultOperation()));
+    tmp.insert(lit("Imaging_WhiteBalance_YbGain"),          QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingWhiteBalanceYbGainOperation()));
+    tmp.insert(lit("Imaging_Exposure_Iris"),                  QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureIrisOperation()));
+    tmp.insert(lit("Imaging_Exposure_ExposureTime"),         QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureExposureTimeOperation()));
+    tmp.insert(lit("Imaging_WideDynamicRange_Mode"),        QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingWideDynamicRangeModeOperation()));
+    tmp.insert(lit("Imaging_WhiteBalance_Mode"),             QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingWhiteBalanceModeOperation()));
+    tmp.insert(lit("Imaging_Exposure_MaxGain"),              QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureMaxGainOperation()));
+    tmp.insert(lit("Imaging_Exposure_MinExposureTime"),     QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureMinExposureTimeOperation()));
+    tmp.insert(lit("Imaging_BacklightCompensation_Level"),   QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingBacklightCompensationLevelOperation()));
+    tmp.insert(lit("Imaging_Contrast"),                        QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingContrastOperation()));
+    tmp.insert(lit("Imaging_Exposure_Priority"),              QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposurePriorityOperation()));
+    tmp.insert(lit("Imaging_Sharpness"),                       QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingSharpnessOperation()));
+    tmp.insert(lit("Imaging_IrCutFilterMode"),              QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingIrCutFilterModesOperation()));
+    tmp.insert(lit("Imaging_WhiteBalance_YrGain"),          QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingWhiteBalanceYrGainOperation()));
+    tmp.insert(lit("Imaging_Exposure_MinGain"),              QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureMinGainOperation()));
+    tmp.insert(lit("Imaging_Exposure_Gain"),                  QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureGainOperation()));
+    tmp.insert(lit("Imaging_Exposure_Mode"),                  QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureModeOperation()));
+    tmp.insert(lit("Imaging_WideDynamicRange_Level"),       QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingWideDynamicRangeLevelOperation()));
+    tmp.insert(lit("Imaging_Exposure_MaxIris"),              QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureMaxIrisOperation()));
+    
+    tmp.insert(lit("Imaging_Exposure_MinIris"),              QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureMinIrisOperation()));
+    tmp.insert(lit("Imaging_BacklightCompensation_Mode"),    QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingBacklightCompensationModeOperation()));
+    tmp.insert(lit("Imaging_ColorSaturation"),                QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingColorSaturationOperation()));
+    tmp.insert(lit("Imaging_Exposure_MaxExposureTime"),     QSharedPointer<OnvifCameraSettingOperationAbstract>(new ImagingExposureMaxExposureTimeOperation()));
+    tmp.insert(lit("Maintenance_SystemReboot"),               QSharedPointer<OnvifCameraSettingOperationAbstract>(new MaintenanceSystemRebootOperation()));
+    tmp.insert(lit("Maintenance_SoftSystemFactoryDefault"), QSharedPointer<OnvifCameraSettingOperationAbstract>(new MaintenanceSoftSystemFactoryDefaultOperation()));
+    tmp.insert(lit("Maintenance_HardSystemFactoryDefault"), QSharedPointer<OnvifCameraSettingOperationAbstract>(new MaintenanceHardSystemFactoryDefaultOperation()));
 
     return tmp;
 }
 
-const QHash<QString, QSharedPointer<OnvifCameraSettingOperationAbstract> > OnvifCameraSettingOperationAbstract::operations = createOnvifCameraSettingOperationAbstract();
 
-template<class T>
-bool OnvifCameraSettingOperationAbstract::compareAndSendToCamera(T* field, const T val, OnvifCameraSettingsResp& src) const
+
+bool ImagingWhiteBalanceYbGainOperation::get(QString &value) const
 {
-    if (*field != val) {
-        *field = val;
-        return src.makeSetRequest();
-    }
-
-    return true;
-}
-
-float OnvifCameraSettingOperationAbstract::calcStep(double min, double max) const
-{
-    if (max - min < 1.0 + 0.1) {
-        return 0.1f;
-    }
-
-    return 1.0f;
-}
-
-bool OnvifCameraSettingOperationEmpty::get(CameraSetting&, OnvifCameraSettingsResp&, bool) const
-{
-    return true;
-}
-
-bool OnvifCameraSettingOperationEmpty::set(const CameraSetting&, OnvifCameraSettingsResp&, bool) const
-{
-    return true;
-}
-
-bool ImagingWhiteBalanceYbGainOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
-{
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingOptionsResp& rangesResp = src.getRangesResponse();
     const ImagingSettingsResp& valsResp = src.getValsResponse();
@@ -250,9 +108,9 @@ bool ImagingWhiteBalanceYbGainOperation::get(CameraSetting& output, OnvifCameraS
     return true;
 }
 
-bool ImagingWhiteBalanceYbGainOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingWhiteBalanceYbGainOperation::set(const QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
@@ -264,9 +122,9 @@ bool ImagingWhiteBalanceYbGainOperation::set(const CameraSetting& input, OnvifCa
     return compareAndSendToCamera(valsResp.ImagingSettings->WhiteBalance->CbGain, static_cast<float>(static_cast<double>(input.getCurrent())), src);
 }
 
-bool ImagingExposureIrisOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingExposureIrisOperation::get(QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingOptionsResp& rangesResp = src.getRangesResponse();
     const ImagingSettingsResp& valsResp = src.getValsResponse();
@@ -285,9 +143,9 @@ bool ImagingExposureIrisOperation::get(CameraSetting& output, OnvifCameraSetting
     return true;
 }
 
-bool ImagingExposureIrisOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingExposureIrisOperation::set(const QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
@@ -299,9 +157,9 @@ bool ImagingExposureIrisOperation::set(const CameraSetting& input, OnvifCameraSe
     return compareAndSendToCamera(valsResp.ImagingSettings->Exposure->Iris, static_cast<float>(static_cast<double>(input.getCurrent())), src);
 }
 
-bool ImagingExposureExposureTimeOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingExposureExposureTimeOperation::get(QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingOptionsResp& rangesResp = src.getRangesResponse();
     const ImagingSettingsResp& valsResp = src.getValsResponse();
@@ -320,9 +178,9 @@ bool ImagingExposureExposureTimeOperation::get(CameraSetting& output, OnvifCamer
     return true;
 }
 
-bool ImagingExposureExposureTimeOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingExposureExposureTimeOperation::set(const QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
@@ -334,9 +192,9 @@ bool ImagingExposureExposureTimeOperation::set(const CameraSetting& input, Onvif
     return compareAndSendToCamera(valsResp.ImagingSettings->Exposure->ExposureTime, static_cast<float>(static_cast<double>(input.getCurrent())), src);
 }
 
-bool ImagingWideDynamicRangeModeOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingWideDynamicRangeModeOperation::get(QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
@@ -352,9 +210,9 @@ bool ImagingWideDynamicRangeModeOperation::get(CameraSetting& output, OnvifCamer
     return true;
 }
 
-bool ImagingWideDynamicRangeModeOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingWideDynamicRangeModeOperation::set(const QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
@@ -371,9 +229,9 @@ const QString& ImagingWhiteBalanceModeOperation::AUTO_STR = *(new QString(QLatin
 const QString& ImagingWhiteBalanceModeOperation::MANUAL_STR = *(new QString(QLatin1String("Manual")));
 const QString& ImagingWhiteBalanceModeOperation::ALL_VALUES_STR = *(new QString(AUTO_STR + CommonStringValues::SEPARATOR + MANUAL_STR));
 
-bool ImagingWhiteBalanceModeOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingWhiteBalanceModeOperation::get(QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
@@ -389,9 +247,9 @@ bool ImagingWhiteBalanceModeOperation::get(CameraSetting& output, OnvifCameraSet
     return true;
 }
 
-bool ImagingWhiteBalanceModeOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingWhiteBalanceModeOperation::set(const QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
@@ -404,9 +262,9 @@ bool ImagingWhiteBalanceModeOperation::set(const CameraSetting& input, OnvifCame
         input.getCurrent() == AUTO_STR? onvifXsd__WhiteBalanceMode__AUTO : onvifXsd__WhiteBalanceMode__MANUAL, src);
 }
 
-bool ImagingExposureMaxGainOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingExposureMaxGainOperation::get(QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingOptionsResp& rangesResp = src.getRangesResponse();
     const ImagingSettingsResp& valsResp = src.getValsResponse();
@@ -425,9 +283,9 @@ bool ImagingExposureMaxGainOperation::get(CameraSetting& output, OnvifCameraSett
     return true;
 }
 
-bool ImagingExposureMaxGainOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingExposureMaxGainOperation::set(const QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
@@ -439,9 +297,9 @@ bool ImagingExposureMaxGainOperation::set(const CameraSetting& input, OnvifCamer
     return compareAndSendToCamera(valsResp.ImagingSettings->Exposure->MaxGain, static_cast<float>(static_cast<double>(input.getCurrent())), src);
 }
 
-bool ImagingExposureMinExposureTimeOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingExposureMinExposureTimeOperation::get(QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingOptionsResp& rangesResp = src.getRangesResponse();
     const ImagingSettingsResp& valsResp = src.getValsResponse();
@@ -460,9 +318,9 @@ bool ImagingExposureMinExposureTimeOperation::get(CameraSetting& output, OnvifCa
     return true;
 }
 
-bool ImagingExposureMinExposureTimeOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingExposureMinExposureTimeOperation::set(const QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
@@ -474,9 +332,9 @@ bool ImagingExposureMinExposureTimeOperation::set(const CameraSetting& input, On
     return compareAndSendToCamera(valsResp.ImagingSettings->Exposure->MinExposureTime, static_cast<float>(static_cast<double>(input.getCurrent())), src);
 }
 
-bool ImagingBacklightCompensationLevelOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingBacklightCompensationLevelOperation::get(QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingOptionsResp& rangesResp = src.getRangesResponse();
     const ImagingSettingsResp& valsResp = src.getValsResponse();
@@ -495,9 +353,9 @@ bool ImagingBacklightCompensationLevelOperation::get(CameraSetting& output, Onvi
     return true;
 }
 
-bool ImagingBacklightCompensationLevelOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingBacklightCompensationLevelOperation::set(const QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
@@ -509,9 +367,9 @@ bool ImagingBacklightCompensationLevelOperation::set(const CameraSetting& input,
     return compareAndSendToCamera(valsResp.ImagingSettings->BacklightCompensation->Level, static_cast<float>(static_cast<double>(input.getCurrent())), src);
 }
 
-bool ImagingContrastOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingContrastOperation::get(QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingOptionsResp& rangesResp = src.getRangesResponse();
     const ImagingSettingsResp& valsResp = src.getValsResponse();
@@ -530,9 +388,9 @@ bool ImagingContrastOperation::get(CameraSetting& output, OnvifCameraSettingsRes
     return true;
 }
 
-bool ImagingContrastOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingContrastOperation::set(const QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
@@ -550,9 +408,9 @@ const QString& ImagingExposurePriorityOperation::LOW_NOISE_STR = *(new QString(Q
 const QString& ImagingExposurePriorityOperation::FRAME_RATE_STR = *(new QString(QLatin1String("FrameRate")));
 const QString& ImagingExposurePriorityOperation::ALL_VALUES_STR = *(new QString(LOW_NOISE_STR + CommonStringValues::SEPARATOR + FRAME_RATE_STR));
 
-bool ImagingExposurePriorityOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingExposurePriorityOperation::get(QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
@@ -568,9 +426,9 @@ bool ImagingExposurePriorityOperation::get(CameraSetting& output, OnvifCameraSet
     return true;
 }
 
-bool ImagingExposurePriorityOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingExposurePriorityOperation::set(const QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
@@ -583,9 +441,9 @@ bool ImagingExposurePriorityOperation::set(const CameraSetting& input, OnvifCame
         input.getCurrent() == LOW_NOISE_STR? onvifXsd__ExposurePriority__LowNoise : onvifXsd__ExposurePriority__FrameRate, src);
 }
 
-bool ImagingSharpnessOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingSharpnessOperation::get(QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingOptionsResp& rangesResp = src.getRangesResponse();
     const ImagingSettingsResp& valsResp = src.getValsResponse();
@@ -604,9 +462,9 @@ bool ImagingSharpnessOperation::get(CameraSetting& output, OnvifCameraSettingsRe
     return true;
 }
 
-bool ImagingSharpnessOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingSharpnessOperation::set(const QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
@@ -622,9 +480,9 @@ const QString& ImagingIrCutFilterModesOperation::AUTO_STR = *(new QString(QLatin
 const QString& ImagingIrCutFilterModesOperation::ALL_VALUES_STR = *(new QString(CommonStringValues::OFF + CommonStringValues::SEPARATOR +
     CommonStringValues::ON + CommonStringValues::SEPARATOR + AUTO_STR));
 
-bool ImagingIrCutFilterModesOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingIrCutFilterModesOperation::get(QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
@@ -638,28 +496,28 @@ bool ImagingIrCutFilterModesOperation::get(CameraSetting& output, OnvifCameraSet
 
     switch (*(valsResp.ImagingSettings->IrCutFilter))
     {
-        case onvifXsd__IrCutFilterMode__ON:
-            output.setCurrent(CommonStringValues::ON);
-            break;
+    case onvifXsd__IrCutFilterMode__ON:
+        output.setCurrent(CommonStringValues::ON);
+        break;
 
-        case onvifXsd__IrCutFilterMode__OFF:
-            output.setCurrent(CommonStringValues::OFF);
-            break;
+    case onvifXsd__IrCutFilterMode__OFF:
+        output.setCurrent(CommonStringValues::OFF);
+        break;
 
-        case onvifXsd__IrCutFilterMode__AUTO:
-            output.setCurrent(AUTO_STR);
-            break;
+    case onvifXsd__IrCutFilterMode__AUTO:
+        output.setCurrent(AUTO_STR);
+        break;
 
-        default:
-            return false;
+    default:
+        return false;
     }
 
     return true;
 }
 
-bool ImagingIrCutFilterModesOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingIrCutFilterModesOperation::set(const QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
@@ -683,9 +541,9 @@ bool ImagingIrCutFilterModesOperation::set(const CameraSetting& input, OnvifCame
     return compareAndSendToCamera(valsResp.ImagingSettings->IrCutFilter, enumVal, src);
 }
 
-bool ImagingWhiteBalanceYrGainOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingWhiteBalanceYrGainOperation::get(QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingOptionsResp& rangesResp = src.getRangesResponse();
     const ImagingSettingsResp& valsResp = src.getValsResponse();
@@ -704,9 +562,9 @@ bool ImagingWhiteBalanceYrGainOperation::get(CameraSetting& output, OnvifCameraS
     return true;
 }
 
-bool ImagingWhiteBalanceYrGainOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingWhiteBalanceYrGainOperation::set(const QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
@@ -718,9 +576,9 @@ bool ImagingWhiteBalanceYrGainOperation::set(const CameraSetting& input, OnvifCa
     return compareAndSendToCamera(valsResp.ImagingSettings->WhiteBalance->CrGain, static_cast<float>(static_cast<double>(input.getCurrent())), src);
 }
 
-bool ImagingExposureMinGainOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingExposureMinGainOperation::get(QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingOptionsResp& rangesResp = src.getRangesResponse();
     const ImagingSettingsResp& valsResp = src.getValsResponse();
@@ -739,9 +597,9 @@ bool ImagingExposureMinGainOperation::get(CameraSetting& output, OnvifCameraSett
     return true;
 }
 
-bool ImagingExposureMinGainOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingExposureMinGainOperation::set(const QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
@@ -753,9 +611,9 @@ bool ImagingExposureMinGainOperation::set(const CameraSetting& input, OnvifCamer
     return compareAndSendToCamera(valsResp.ImagingSettings->Exposure->MinGain, static_cast<float>(static_cast<double>(input.getCurrent())), src);
 }
 
-bool ImagingExposureGainOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingExposureGainOperation::get(QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingOptionsResp& rangesResp = src.getRangesResponse();
     const ImagingSettingsResp& valsResp = src.getValsResponse();
@@ -774,9 +632,9 @@ bool ImagingExposureGainOperation::get(CameraSetting& output, OnvifCameraSetting
     return true;
 }
 
-bool ImagingExposureGainOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingExposureGainOperation::set(const QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
@@ -792,9 +650,9 @@ const QString& ImagingExposureModeOperation::AUTO_STR = *(new QString(QLatin1Str
 const QString& ImagingExposureModeOperation::MANUAL_STR = *(new QString(QLatin1String("Manual")));
 const QString& ImagingExposureModeOperation::ALL_VALUES_STR = *(new QString(AUTO_STR + CommonStringValues::SEPARATOR + MANUAL_STR));
 
-bool ImagingExposureModeOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingExposureModeOperation::get(QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
@@ -810,9 +668,9 @@ bool ImagingExposureModeOperation::get(CameraSetting& output, OnvifCameraSetting
     return true;
 }
 
-bool ImagingExposureModeOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingExposureModeOperation::set(const QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
@@ -825,9 +683,9 @@ bool ImagingExposureModeOperation::set(const CameraSetting& input, OnvifCameraSe
         input.getCurrent() == AUTO_STR? onvifXsd__ExposureMode__AUTO : onvifXsd__ExposureMode__MANUAL, src);
 }
 
-bool ImagingWideDynamicRangeLevelOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingWideDynamicRangeLevelOperation::get(QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingOptionsResp& rangesResp = src.getRangesResponse();
     const ImagingSettingsResp& valsResp = src.getValsResponse();
@@ -846,9 +704,9 @@ bool ImagingWideDynamicRangeLevelOperation::get(CameraSetting& output, OnvifCame
     return true;
 }
 
-bool ImagingWideDynamicRangeLevelOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingWideDynamicRangeLevelOperation::set(const QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
@@ -860,9 +718,9 @@ bool ImagingWideDynamicRangeLevelOperation::set(const CameraSetting& input, Onvi
     return compareAndSendToCamera(valsResp.ImagingSettings->WideDynamicRange->Level, static_cast<float>(static_cast<double>(input.getCurrent())), src);
 }
 
-bool ImagingExposureMaxIrisOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingExposureMaxIrisOperation::get(QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingOptionsResp& rangesResp = src.getRangesResponse();
     const ImagingSettingsResp& valsResp = src.getValsResponse();
@@ -881,9 +739,9 @@ bool ImagingExposureMaxIrisOperation::get(CameraSetting& output, OnvifCameraSett
     return true;
 }
 
-bool ImagingExposureMaxIrisOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingExposureMaxIrisOperation::set(const QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
@@ -895,44 +753,17 @@ bool ImagingExposureMaxIrisOperation::set(const CameraSetting& input, OnvifCamer
     return compareAndSendToCamera(valsResp.ImagingSettings->Exposure->MaxIris, static_cast<float>(static_cast<double>(input.getCurrent())), src);
 }
 
-bool ImagingBrightnessOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
-{
-    if (!reinitSrc(src, reinit)) return false;
+bool ImagingBrightnessOperation::get(QString &value) const {
 
-    const ImagingOptionsResp& rangesResp = src.getRangesResponse();
-    const ImagingSettingsResp& valsResp = src.getValsResponse();
-
-    if (!rangesResp.ImagingOptions || !rangesResp.ImagingOptions->Brightness ||
-        !valsResp.ImagingSettings || !valsResp.ImagingSettings->Brightness)
-    {
-        return false;
-    }
-
-    output.setMin(rangesResp.ImagingOptions->Brightness->Min);
-    output.setMax(rangesResp.ImagingOptions->Brightness->Max);
-    output.setStep(calcStep(output.getMin(), output.getMax()));
-    output.setCurrent(*(valsResp.ImagingSettings->Brightness));
-
-    return true;
 }
 
-bool ImagingBrightnessOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit) const
-{
-    if (!reinitSrc(src, reinit)) return false;
+bool ImagingBrightnessOperation::set(const QString &value) const {
 
-    const ImagingSettingsResp& valsResp = src.getValsResponse();
-
-    if (!valsResp.ImagingSettings || !valsResp.ImagingSettings->Brightness)
-    {
-        return false;
-    }
-
-    return compareAndSendToCamera(valsResp.ImagingSettings->Brightness, static_cast<float>(static_cast<double>(input.getCurrent())), src);
 }
 
-bool ImagingExposureMinIrisOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingExposureMinIrisOperation::get(QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingOptionsResp& rangesResp = src.getRangesResponse();
     const ImagingSettingsResp& valsResp = src.getValsResponse();
@@ -951,9 +782,9 @@ bool ImagingExposureMinIrisOperation::get(CameraSetting& output, OnvifCameraSett
     return true;
 }
 
-bool ImagingExposureMinIrisOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingExposureMinIrisOperation::set(const QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
@@ -965,9 +796,9 @@ bool ImagingExposureMinIrisOperation::set(const CameraSetting& input, OnvifCamer
     return compareAndSendToCamera(valsResp.ImagingSettings->Exposure->MinIris, static_cast<float>(static_cast<double>(input.getCurrent())), src);
 }
 
-bool ImagingBacklightCompensationModeOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingBacklightCompensationModeOperation::get(QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
@@ -983,9 +814,9 @@ bool ImagingBacklightCompensationModeOperation::get(CameraSetting& output, Onvif
     return true;
 }
 
-bool ImagingBacklightCompensationModeOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingBacklightCompensationModeOperation::set(const QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
@@ -998,9 +829,9 @@ bool ImagingBacklightCompensationModeOperation::set(const CameraSetting& input, 
         input.getCurrent() == CommonStringValues::OFF? onvifXsd__BacklightCompensationMode__OFF : onvifXsd__BacklightCompensationMode__ON, src);
 }
 
-bool ImagingColorSaturationOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingColorSaturationOperation::get(QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingOptionsResp& rangesResp = src.getRangesResponse();
     const ImagingSettingsResp& valsResp = src.getValsResponse();
@@ -1019,9 +850,9 @@ bool ImagingColorSaturationOperation::get(CameraSetting& output, OnvifCameraSett
     return true;
 }
 
-bool ImagingColorSaturationOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingColorSaturationOperation::set(const QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
@@ -1033,9 +864,9 @@ bool ImagingColorSaturationOperation::set(const CameraSetting& input, OnvifCamer
     return compareAndSendToCamera(valsResp.ImagingSettings->ColorSaturation, static_cast<float>(static_cast<double>(input.getCurrent())), src);
 }
 
-bool ImagingExposureMaxExposureTimeOperation::get(CameraSetting& output, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingExposureMaxExposureTimeOperation::get(QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingOptionsResp& rangesResp = src.getRangesResponse();
     const ImagingSettingsResp& valsResp = src.getValsResponse();
@@ -1054,9 +885,9 @@ bool ImagingExposureMaxExposureTimeOperation::get(CameraSetting& output, OnvifCa
     return true;
 }
 
-bool ImagingExposureMaxExposureTimeOperation::set(const CameraSetting& input, OnvifCameraSettingsResp& src, bool reinit) const
+bool ImagingExposureMaxExposureTimeOperation::set(const QString &value) const
 {
-    if (!reinitSrc(src, reinit)) return false;
+    
 
     const ImagingSettingsResp& valsResp = src.getValsResponse();
 
@@ -1068,12 +899,12 @@ bool ImagingExposureMaxExposureTimeOperation::set(const CameraSetting& input, On
     return compareAndSendToCamera(valsResp.ImagingSettings->Exposure->MaxExposureTime, static_cast<float>(static_cast<double>(input.getCurrent())), src);
 }
 
-bool MaintenanceSystemRebootOperation::get(CameraSetting& /*output*/, OnvifCameraSettingsResp& /*src*/, bool /*reinit*/) const
+bool MaintenanceSystemRebootOperation::get(QString &value /*output*/, OnvifCameraSettingsResp& /*src*/, bool /*reinit*/) const
 {
     return true;
 }
 
-bool MaintenanceSystemRebootOperation::set(const CameraSetting& /*input*/, OnvifCameraSettingsResp& src, bool /*reinit*/) const
+bool MaintenanceSystemRebootOperation::set(const QString &value /*input*/, bool /*reinit*/) const
 {
     DeviceSoapWrapper* soapWrapper = src.getDeviceSoapWrapper();
     if (!soapWrapper) {
@@ -1094,12 +925,12 @@ bool MaintenanceSystemRebootOperation::set(const CameraSetting& /*input*/, Onvif
     return true;
 }
 
-bool MaintenanceSoftSystemFactoryDefaultOperation::get(CameraSetting& /*output*/, OnvifCameraSettingsResp& /*src*/, bool /*reinit*/) const
+bool MaintenanceSoftSystemFactoryDefaultOperation::get(QString &value /*output*/, OnvifCameraSettingsResp& /*src*/, bool /*reinit*/) const
 {
     return true;
 }
 
-bool MaintenanceSoftSystemFactoryDefaultOperation::set(const CameraSetting& /*input*/, OnvifCameraSettingsResp& src, bool /*reinit*/) const
+bool MaintenanceSoftSystemFactoryDefaultOperation::set(const QString &value /*input*/, bool /*reinit*/) const
 {
     DeviceSoapWrapper* soapWrapper = src.getDeviceSoapWrapper();
     if (!soapWrapper) {
@@ -1120,12 +951,12 @@ bool MaintenanceSoftSystemFactoryDefaultOperation::set(const CameraSetting& /*in
     return true;
 }
 
-bool MaintenanceHardSystemFactoryDefaultOperation::get(CameraSetting& /*output*/, OnvifCameraSettingsResp& /*src*/, bool /*reinit*/) const
+bool MaintenanceHardSystemFactoryDefaultOperation::get(QString &value /*output*/, OnvifCameraSettingsResp& /*src*/, bool /*reinit*/) const
 {
     return true;
 }
 
-bool MaintenanceHardSystemFactoryDefaultOperation::set(const CameraSetting& /*input*/, OnvifCameraSettingsResp& src, bool /*reinit*/) const
+bool MaintenanceHardSystemFactoryDefaultOperation::set(const QString &value /*input*/, bool /*reinit*/) const
 {
     DeviceSoapWrapper* soapWrapper = src.getDeviceSoapWrapper();
     if (!soapWrapper) {
@@ -1147,112 +978,5 @@ bool MaintenanceHardSystemFactoryDefaultOperation::set(const CameraSetting& /*in
 }
 
 
-//
-// class OnvifCameraSetting: public CameraSetting
-// 
+#endif
 
-OnvifCameraSetting::OnvifCameraSetting(
-        const OnvifCameraSettingOperationAbstract& operation, const QString& id, const QString& name, 
-        WIDGET_TYPE type, const QString& query, const QString& description, 
-        const CameraSettingValue min, const CameraSettingValue max, const CameraSettingValue step, const CameraSettingValue current) :
-    CameraSetting(id, name, type, query, QLatin1String(""), description, min, max, step, current),
-    m_operation(&operation)
-{
-
-}
-
-OnvifCameraSetting& OnvifCameraSetting::operator=(const OnvifCameraSetting& rhs)
-{
-    CameraSetting::operator=(rhs);
-    m_operation = rhs.m_operation;
-
-    return *this;
-}
-
-//
-// class OnvifCameraSettingReader
-//
-
-const QString& OnvifCameraSettingReader::IMAGING_GROUP_NAME = *(new QString(QLatin1String("%%Imaging")));
-const QString& OnvifCameraSettingReader::MAINTENANCE_GROUP_NAME = *(new QString(QLatin1String("%%Maintenance")));
-
-OnvifCameraSettingReader::OnvifCameraSettingReader(OnvifCameraSettingsResp& onvifSettings):
-    CameraSettingReader(lit("ONVIF")),
-    m_settings(onvifSettings)
-{
-
-}
-
-OnvifCameraSettingReader::~OnvifCameraSettingReader()
-{
-
-}
-
-bool OnvifCameraSettingReader::isGroupEnabled(const QString& id, const QString& /*parentId*/, const QString& /*name*/)
-{
-    if (m_settings.isEmpty() && id == IMAGING_GROUP_NAME)
-    {
-        //Group is enabled by default, to disable we should make a record, which equals empty object
-        m_settings.getCameraSettings().insert(id, OnvifCameraSetting());
-
-        return false;
-    }
-
-    return true;
-}
-
-bool OnvifCameraSettingReader::isParamEnabled(const QString& /*id*/, const QString& parentId)
-{
-    if (parentId.startsWith(MAINTENANCE_GROUP_NAME)) {
-        //Maintenance group contains only buttons and so we don't need to create object with
-        //values, so returning false to prevent parsing param values. 
-        //But buttons themselves will be enabled
-        return false;
-    }
-
-    return true;
-}
-
-void OnvifCameraSettingReader::paramFound(const CameraSetting& value, const QString& /*parentId*/)
-{
-    QString id = value.getId();
-    QHash<QString, QSharedPointer<OnvifCameraSettingOperationAbstract> >::ConstIterator it;
-
-    CameraSetting currentSetting;
-    switch(value.getType())
-    {
-    case CameraSetting::OnOff: case CameraSetting::MinMaxStep: case CameraSetting::Enumeration: case CameraSetting::TextField: case CameraSetting::ControlButtonsPair:
-            it = OnvifCameraSettingOperationAbstract::operations.find(id);
-            if (it == OnvifCameraSettingOperationAbstract::operations.end()) {
-                //Operations must be defined for all settings
-                Q_ASSERT(false);
-            }
-            it.value()->get(currentSetting, m_settings);
-            m_settings.getCameraSettings().insert(id, 
-                OnvifCameraSetting(*(it.value()), id, value.getName(),
-                value.getType(), value.getQuery(), value.getDescription(), 
-                value.getMin(), value.getMax(), value.getStep(), currentSetting.getCurrent()));
-            return;
-
-        case CameraSetting::Button:
-            //If absent = enabled
-            return;
-
-        default:
-            //XML must contain only valid types
-            Q_ASSERT(false);
-            return;
-    }
-}
-
-void OnvifCameraSettingReader::cleanDataOnFail()
-{
-    m_settings.getCameraSettings().clear();
-}
-
-void OnvifCameraSettingReader::parentOfRootElemFound(const QString& /*parentId*/)
-{
-
-}
-
-#endif //ENABLE_ONVIF

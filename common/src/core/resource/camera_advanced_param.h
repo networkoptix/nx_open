@@ -37,8 +37,7 @@ struct QnCameraAdvancedParameter {
         MinMaxStep,
         Enumeration,
         Button,
-        String,
-        ControlButtonsPair
+        String
     };
 
 	QString getId() const;
@@ -48,10 +47,9 @@ struct QnCameraAdvancedParameter {
     QString description;
     QString query;
     DataType dataType;
-    QString method;
     QString min;
     QString max;
-    QString step;
+    QString tag;
     bool readOnly;
 
     QnCameraAdvancedParameter();
@@ -69,61 +67,48 @@ struct QnCameraAdvancedParamGroup {
     std::vector<QnCameraAdvancedParamGroup> groups;
     std::vector<QnCameraAdvancedParameter> params;
 
-	void merge(const QnCameraAdvancedParamGroup &other);
-
+    QSet<QString> allParameterIds() const;
     QnCameraAdvancedParameter getParameterById(const QString &id) const;
 };
 #define QnCameraAdvancedParamGroup_Fields (name)(description)(groups)(params)
 
 struct QnCameraAdvancedParams {
+    QString name;
+    QString version;
+    QString unique_id;
     std::vector<QnCameraAdvancedParamGroup> groups;
 
-	void merge(const QnCameraAdvancedParams &other);
-
+    QSet<QString> allParameterIds() const;
     QnCameraAdvancedParameter getParameterById(const QString &id) const;
 };
-#define QnCameraAdvancedParams_Fields (groups)
-
-struct QnCameraAdvancedParamsTree {
-	QString cameraTypeName;
-	std::vector<QnCameraAdvancedParamsTree> children;
-
-	QnCameraAdvancedParams params;
-
-	bool isEmpty() const;
-
-	bool containsSubTree(const QString &cameraTypeName) const;
-	QnCameraAdvancedParams flatten(const QString &cameraTypeName = QString()) const;
-};
+#define QnCameraAdvancedParams_Fields (name)(version)(unique_id)(groups)
 
 /** Class for reading camera advanced parameters xml file. */
 class QnCameraAdvancedParamsReader {
 public:
     QnCameraAdvancedParamsReader();
 
-	/** Get parameters tree for the given camera. */
+	/** Get parameters list for the given resource. */
 	QnCameraAdvancedParams params(const QnResourcePtr &resource) const;
+
+    /** Get set of allowed params id's for the given resource. */
+    static QSet<QString> allowedParams(const QnResourcePtr &resource);
 private:
 	/** Get inner camera type that is used in the xml as node id. */
 	QString calculateCameraType(const QnResourcePtr &resource) const;
-
 private:
 	/* Per-camera parameters cache. */
-	mutable QHash<QnUuid, QnCameraAdvancedParams> m_paramsByCameraId;
-
-	/* Default parameters tree. */
-	mutable QnCameraAdvancedParamsTree m_defaultParamsTree;
+	mutable QHash<QString, QnCameraAdvancedParams> m_paramsByCameraType;
 };
 
 class QnCameraAdvacedParamsXmlParser {
 public:
-	static QnCameraAdvancedParamsTree readXml(QIODevice *xmlSource);
+    static bool validateXml(QIODevice *xmlSource);
+	static bool readXml(QIODevice *xmlSource, QnCameraAdvancedParams &result);
 private:
-	static QnCameraAdvancedParams parseCameraXml(const QDomElement &cameraXml);
-	static QnCameraAdvancedParamGroup parseGroupXml(const QDomElement &groupXml);
-	static QnCameraAdvancedParameter parseElementXml(const QDomElement &elementXml);
-
-	static void buildTree(const QMultiMap<QString, QnCameraAdvancedParamsTree> &source, QnCameraAdvancedParamsTree &out);
+	static bool parseCameraXml(const QDomElement &cameraXml, QnCameraAdvancedParams &params);
+	static bool parseGroupXml(const QDomElement &groupXml, QnCameraAdvancedParamGroup &group);
+	static bool parseElementXml(const QDomElement &elementXml, QnCameraAdvancedParameter &param);
 };
 
 #define QnCameraAdvancedParameterTypes (QnCameraAdvancedParamValue)(QnCameraAdvancedParameter)(QnCameraAdvancedParamGroup)(QnCameraAdvancedParams)

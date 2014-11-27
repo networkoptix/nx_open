@@ -60,14 +60,14 @@ QnMetaDataV1Ptr AVPanoramicClientPullSSTFTPStreamreader::getCameraMetadata()
 {
     QnMetaDataV1Ptr motion(new QnMetaDataV1());
     //Andy Tau & Touch Enable feat. Louisa Allen - Sorry (Sean Truby Remix)
-    QVariant mdresult;
+    QString mdresult;
 
     QnArecontPanoramicResourcePtr res = getResource().dynamicCast<QnArecontPanoramicResource>();
 
-    if (!res->getParamPhysical(m_motionData + 1, QLatin1String("mdresult"), mdresult))
+    if (!res->getParamPhysicalByChannel(m_motionData + 1, lit("mdresult"), mdresult))
         return QnMetaDataV1Ptr(0);
 
-    if (mdresult.toString() == QLatin1String("no motion"))
+    if (mdresult == lit("no motion"))
     {
         motion->channelNumber = m_motionData;
         return motion; // no motion detected
@@ -77,7 +77,7 @@ QnMetaDataV1Ptr AVPanoramicClientPullSSTFTPStreamreader::getCameraMetadata()
     QnPlAreconVisionResourcePtr avRes = getResource().dynamicCast<QnPlAreconVisionResource>();
     int zones = avRes->totalMdZones() == 1024 ? 32 : 8;
 
-    QStringList md = mdresult.toString().split(QLatin1Char(' '), QString::SkipEmptyParts);
+    QStringList md = mdresult.split(QLatin1Char(' '), QString::SkipEmptyParts);
     if (md.size() < zones*zones)
         return QnMetaDataV1Ptr(0);
 
