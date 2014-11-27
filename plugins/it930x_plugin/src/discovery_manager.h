@@ -51,7 +51,7 @@ namespace ite
         void updateRxDevices();
         void updateTxLinks(unsigned chan);
 
-        bool setChannel(unsigned short txID, unsigned short rxID, unsigned chan);
+        bool setChannel(unsigned short txID, unsigned chan);
 
     private:
         typedef std::shared_ptr<CameraManager> CameraPtr;
@@ -66,7 +66,6 @@ namespace ite
         RCShell rcShell_;
 
         static void getRxDevNames(std::vector<std::string>& names);
-        void checkLink(unsigned short txID, unsigned short rxID, unsigned frequency);
 
         void addTxLinks(const std::vector<IDsLink>&);
 

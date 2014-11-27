@@ -163,25 +163,39 @@ bool DeviceInfo::wait(int iWaitTime)
     return true;
 }
 
-bool DeviceInfo::setChannel(unsigned channel)
+bool DeviceInfo::setChannel(unsigned channel, bool sendRequest)
 {
-    getTransmissionParameterCapabilities();
-    if (! wait())
-        return false;
+#if 0
+    if (sendRequest)
+    {
+        getTransmissionParameterCapabilities();
+        if (! wait())
+            return false;
 
-    getTransmissionParameters();
-    if (! wait())
-        return false;
+        getTransmissionParameters();
+        if (! wait())
+            return false;
+    }
+#endif
 
     unsigned freq = DeviceInfo::chanFrequency(channel);
-    if (freq < info_.transmissionParameterCapabilities.frequencyMin ||
+
+    if (info_.transmissionParameterCapabilities.frequencyMin > 0 &&
+        freq < info_.transmissionParameterCapabilities.frequencyMin)
+        return false;
+
+    if (info_.transmissionParameterCapabilities.frequencyMax > 0 &&
         freq > info_.transmissionParameterCapabilities.frequencyMax)
         return false;
 
     info_.transmissionParameter.frequency = freq;
-    setTransmissionParameters();
-    if (! wait())
-        return false;
+
+    if (sendRequest)
+    {
+        setTransmissionParameters();
+        if (! wait())
+            return false;
+    }
     return true;
 }
 
@@ -450,31 +464,33 @@ bool RCShell::sendGetIDs(int iWaitTime)
     return false;
 }
 
-void RCShell::updateDevIDs()
+void RCShell::updateDevsParams()
 {
     {
         std::lock_guard<std::mutex> lock(mutex_); // LOCK
 
         for (size_t i = 0; i < devs_.size(); ++i)
-            devs_[i]->setOff();
+            devs_[i]->getTransmissionParameters();
     }
 
-    bool ok = sendGetIDs();
-    if (!ok)
-        return;
+    usleep(DeviceInfo::SEND_WAIT_TIME_MS * 1000);
 
     {
         std::lock_guard<std::mutex> lock(mutex_); // LOCK
 
         for (size_t i = 0; i < devs_.size(); ++i)
         {
-            //if (devs_[i]->isOn())
-            //{
-                devs_[i]->getTransmissionParameters();
-                devs_[i]->wait();
-            //}
+            devs_[i]->getDeviceInformation();
+#if 0
+            devs_[i]->getTransmissionParameterCapabilities();
+            devs_[i]->getVideoSources();
+            devs_[i]->getVideoSourceConfigurations();
+            devs_[i]->getVideoEncoderConfigurations();
+#endif
         }
     }
+
+    usleep(DeviceInfo::SEND_WAIT_TIME_MS * 1000);
 }
 
 void RCShell::getDevIDs(std::vector<IDsLink>& outLinks)
@@ -496,33 +512,6 @@ void RCShell::getDevIDs(std::vector<IDsLink>& outLinks)
     }
 }
 
-bool RCShell::getDevIDsChannel(unsigned channel, std::vector<IDsLink>& outLinks)
-{
-    bool hasOn = false;
-    outLinks.clear();
-    //outLinks.reserve(devs_.size()); Don't reserve, expect 0.
-
-    std::lock_guard<std::mutex> lock(mutex_); // LOCK
-
-    for (unsigned i = 0; i < devs_.size(); ++i)
-    {
-        if (devs_[i]->frequency() == DeviceInfo::chanFrequency(channel))
-        {
-            hasOn |= devs_[i]->isOn();
-
-            IDsLink idl;
-            idl.rxID = devs_[i]->rxID();
-            idl.txID = devs_[i]->txID();
-            idl.frequency = devs_[i]->frequency();
-            idl.isOn = devs_[i]->isOn();
-
-            outLinks.push_back(idl);
-        }
-    }
-
-    return hasOn;
-}
-
 /// @note O(N)
 DeviceInfoPtr RCShell::device(const IDsLink& idl) const
 {
@@ -537,21 +526,17 @@ DeviceInfoPtr RCShell::device(const IDsLink& idl) const
     return DeviceInfoPtr();
 }
 
-bool RCShell::setChannel(const IDsLink& idl, unsigned channel)
+bool RCShell::setChannel(unsigned short txID, unsigned channel)
 {
-    DeviceInfoPtr devInfo = device(idl);
-    if (!devInfo)
-        return false;
+    std::lock_guard<std::mutex> lock(mutex_); // LOCK
 
-    if (devInfo->frequency() == DeviceInfo::chanFrequency(channel))
-        return true;
+    for (unsigned i = 0; i < devs_.size(); ++i)
+    {
+        if (devs_[i]->txID() == txID)
+            devs_[i]->setChannel(channel);
+    }
 
-    std::vector<IDsLink> idls;
-    bool hasOn = getDevIDsChannel(channel, idls);
-    if (hasOn)
-        return false;
-
-    return devInfo->setChannel(channel);
+    return true;
 }
 
 #if 0

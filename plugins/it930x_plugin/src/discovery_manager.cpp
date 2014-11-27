@@ -1,12 +1,10 @@
-#include "camera_manager.h"
-#include "discovery_manager.h"
-
 #include <dirent.h>
+
+#include <cstdio>
 #include <string>
 #include <set>
 
-//#include <utils/common/log.h>
-
+#include "discovery_manager.h"
 #include "camera_manager.h"
 
 extern "C"
@@ -229,7 +227,7 @@ namespace ite
             unsigned frequency;
             parseInfo(info, txID, rxID, frequency);
 
-            checkLink(txID, rxID, frequency);
+            //checkLink(txID, rxID, frequency);
 
             {
                 std::lock_guard<std::mutex> lock( m_contentMutex ); // LOCK
@@ -305,11 +303,6 @@ namespace ite
         }
     }
 
-    void DiscoveryManager::checkLink(unsigned short /*txID*/, unsigned short rxID, unsigned frequency)
-    {
-        // TODO
-    }
-
     void DiscoveryManager::updateTxLinks(unsigned chan)
     {
         std::vector<RxDevicePtr> scanDevs;
@@ -334,11 +327,23 @@ namespace ite
             if (! scanDevs[i]->isOpen())
                 scanDevs[i]->open();
 
-            scanDevs[i]->lockF( nullptr, DeviceInfo::chanFrequency(chan) );
+            unsigned freq = DeviceInfo::chanFrequency(chan);
+            scanDevs[i]->lockF( nullptr, freq );
 
-            rcShell_.updateDevIDs();
+            if (scanDevs[i]->isLocked())
+            {
+                // DEBUG
+                printf("searching TxIDs - rxID: %d; frequency: %d; strength: %d; presence: %d\n",
+                       scanDevs[i]->rxID(), freq, scanDevs[i]->strength(), scanDevs[i]->present());
 
-            scanDevs[i]->unlockF();
+                if (scanDevs[i]->present() && scanDevs[i]->strength() > 0) // strength: 0..100
+                {
+                    rcShell_.sendGetIDs();
+                    rcShell_.updateDevsParams();
+                }
+                scanDevs[i]->unlockF();
+            }
+
             //scanDevs[i]->close();
         }
 
@@ -399,14 +404,9 @@ namespace ite
 
     // Tx parameters
 
-    bool DiscoveryManager::setChannel(unsigned short txID, unsigned short rxID, unsigned chan)
+    bool DiscoveryManager::setChannel(unsigned short txID, unsigned chan)
     {
-        IDsLink idl;
-        idl.txID = txID;
-        idl.rxID = rxID;
-        //idl.frequency = 0;
-
-        rcShell_.setChannel(idl, chan);
+        rcShell_.setChannel(txID, chan);
         return false;
     }
 }

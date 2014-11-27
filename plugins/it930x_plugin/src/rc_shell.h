@@ -1,6 +1,7 @@
 #ifndef RETURN_CHANNEL_SHELL_H
 #define RETURN_CHANNEL_SHELL_H
 
+#include <stdint.h>
 #include <mutex>
 #include <vector>
 #include <memory>
@@ -100,8 +101,52 @@ namespace ite
             return 0xffff;
         }
 
-        bool setChannel(unsigned channel);
+        bool setChannel(unsigned channel, bool sendRequest = true);
+
+        // <encoder>
+
         bool setEncoderCfg(unsigned streamNo, unsigned bitrate, unsigned fps);
+
+        uint8_t encodersCount() const { return info_.videoEncConfig.configListSize; }
+
+        bool resolution(uint8_t encoderNo, uint16_t& width, uint16_t& height) const
+        {
+            if (encoderNo >= encodersCount())
+                return false;
+
+            width = info_.videoEncConfig.configList[encoderNo].width;
+            height = info_.videoEncConfig.configList[encoderNo].height;
+            return true;
+        }
+
+        bool framerate(uint8_t encoderNo, uint8_t& fps) const
+        {
+            if (encoderNo >= encodersCount())
+                return false;
+
+            fps = info_.videoEncConfig.configList[encoderNo].frameRateLimit;
+            return true;
+        }
+
+        bool bitrate(uint8_t encoderNo, uint16_t& bitrate) const
+        {
+            if (encoderNo >= encodersCount())
+                return false;
+
+            bitrate = info_.videoEncConfig.configList[encoderNo].bitrateLimit;
+            return true;
+        }
+
+        bool quality(uint8_t encoderNo, uint16_t& q) const
+        {
+            if (encoderNo >= encodersCount())
+                return false;
+
+            q = info_.videoEncConfig.configList[encoderNo].quality;
+            return true;
+        }
+
+        // </encoder>
 
         static unsigned short input2output(unsigned short command)
         {
@@ -323,7 +368,7 @@ namespace ite
         void stopRcvThread();
         bool isRun() const { return bIsRun_; }
 
-        bool sendGetIDs(int iWaitTime = DeviceInfo::SEND_WAIT_TIME_MS);
+        bool sendGetIDs(int iWaitTime = DeviceInfo::SEND_WAIT_TIME_MS * 2);
 
         bool addDevice(unsigned short rxID, unsigned short txID);
         Error processCommand(Command& cmd);
@@ -333,12 +378,11 @@ namespace ite
 
         void printDevices();
 
-        void updateDevIDs();
-        void getDevIDs(std::vector<IDsLink>& links);
-        bool getDevIDsChannel(unsigned channel, std::vector<IDsLink>& outLinks);
+        void updateDevsParams();
+        void getDevIDs(std::vector<IDsLink>& outLinks);
         DeviceInfoPtr device(const IDsLink& idl) const;
 
-        bool setChannel(const IDsLink& idl, unsigned channel);
+        bool setChannel(unsigned short txID, unsigned channel);
 
     private:
         mutable std::mutex mutex_;
