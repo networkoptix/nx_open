@@ -836,6 +836,15 @@ void QnDesktopDataProvider::beforeDestroyDataProvider(QnAbstractDataConsumer* co
         pleaseStop();
 }
 
+void QnDesktopDataProvider::addDataProcessor(QnAbstractDataConsumer* consumer)
+{
+    QMutexLocker lock(&m_startMutex);
+    if (needToStop())
+        wait(); // wait previous thread instance
+    QnAbstractMediaStreamDataProvider::addDataProcessor(consumer);
+    m_started = false; // now we ready to restart
+}
+
 bool QnDesktopDataProvider::readyToStop() const
 {
     QMutexLocker lock(&m_startMutex);

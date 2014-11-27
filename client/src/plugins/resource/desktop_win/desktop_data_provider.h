@@ -45,6 +45,7 @@ public:
     virtual void start(Priority priority = InheritPriority) override;
 
     void beforeDestroyDataProvider(QnAbstractDataConsumer* dataProviderWrapper);
+    void addDataProcessor(QnAbstractDataConsumer* consumer);
 
     bool isInitialized() const;
 
