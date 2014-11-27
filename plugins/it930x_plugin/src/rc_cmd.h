@@ -29,6 +29,7 @@ namespace ite
         bool isFull() const { return buffer_.size() == RcCmdMaxSize; }
         bool hasLeadingTag() const { return buffer_[0] == leadingTag(); }
         bool hasEndingTag() const { return buffer_[183] == endingTag(); }
+        bool hasTags() const { return hasLeadingTag() && hasEndingTag(); }
 
         bool isOK() const
         {
