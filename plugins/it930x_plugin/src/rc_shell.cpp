@@ -24,9 +24,24 @@ static void RC_Shell_WaitForSet_ThreadParam(RCShell_ThreadParam * pThreadParam)
 #endif
 
 
+void fixReadingPosition(Byte * buf, unsigned bufSize)
+{
+    for (unsigned pos = 0; pos < bufSize-1; ++pos)
+    {
+        if (buf[pos] == Command::endingTag() && buf[pos+1] == Command::leadingTag())
+        {
+            int len;
+            User_returnChannelBusRx(pos+1, buf, &len);
+            break;
+        }
+    }
+}
+
 void * RC_Shell_RecvThread(void * data)
 {
-    Byte replyBuffer[188];
+    const unsigned BUFFER_SIZE = 188;
+
+    Byte replyBuffer[BUFFER_SIZE];
 
     RCShell * pShell = (RCShell*)data;
 
@@ -41,6 +56,8 @@ void * RC_Shell_RecvThread(void * data)
             cmdNext.clear();
             useNext = false;
         }
+
+        memset(replyBuffer, 0, BUFFER_SIZE);
 
         int rxlen;
         User_returnChannelBusRx(Command::maxSize(), replyBuffer, &rxlen);
@@ -71,21 +88,28 @@ void * RC_Shell_RecvThread(void * data)
             debugInfo.totalPKTCount++;
 
             unsigned short curCommand = cmdCurrent.commandID();
-
-            // Register Rx/TxID
-            if (curCommand == CMD_GetTxDeviceAddressIDOutput)
-            {
-                unsigned short rxDeviceID = cmdCurrent.rxDeviceID();
-                unsigned short txDeviceID = cmdCurrent.txDeviceID();
-
-                pShell->addDevice(rxDeviceID, txDeviceID);
-            }
+#if 1 // DEBUG
+            printf("RC cmd: %x; TxID: %d; RxID: %d\n", curCommand, cmdCurrent.txDeviceID(), cmdCurrent.rxDeviceID());
+#endif
+            unsigned short rxID = cmdCurrent.rxDeviceID();
+            unsigned short txID = cmdCurrent.txDeviceID();
+            pShell->addDevice(rxID, txID, (CMD_GetTxDeviceAddressIDOutput == curCommand) );
 
             pShell->processCommand(cmdCurrent);
             cmdCurrent.clear();
         }
         else
-            debugInfo.leadingTagErrorCount++;
+        {
+            if (! cmdCurrent.hasLeadingTag())
+                debugInfo.leadingTagErrorCount++;
+            if (! cmdCurrent.hasEndingTag())
+                debugInfo.endTagErrorCount++;
+            if (! cmdCurrent.isFull())
+                debugInfo.lengthErrorCount++;
+
+            //if (debugInfo.leadingTagErrorCount % 16 == 0)
+            fixReadingPosition(replyBuffer, BUFFER_SIZE);
+        }
     }
 
     return 0;
@@ -110,10 +134,10 @@ void * RC_Shell_WaitTimeOut(void * data)
 
 // DeviceInfo
 
-DeviceInfo::DeviceInfo(unsigned short rxID, unsigned short txID)
+DeviceInfo::DeviceInfo(unsigned short rxID, unsigned short txID, bool active)
 :   waitingCmd_(CMD_GetTxDeviceAddressIDOutput),
     waitingResponse_(false),
-    isOn_(true)
+    isActive_(active)
 {
     //RC_Init_RCHeadInfo(&info_.device, rxID, txID, 0xFFFF);
     info_.device.clientTxDeviceID = txID;
@@ -327,35 +351,6 @@ void RCShell::stopRcvThread()
     }
 }
 
-bool RCShell::addDevice(unsigned short rxID, unsigned short txID)
-{
-    IDsLink idl;
-    idl.rxID = rxID;
-    idl.txID = txID;
-
-    DeviceInfoPtr devInfo = device(idl);
-    if (devInfo)
-    {
-        devInfo->setOn();
-        return false;
-    }
-
-    std::lock_guard<std::mutex> lock(mutex_); // LOCK
-
-    bool found = false;
-    for (size_t i = 0; i < devs_.size(); ++i)
-    {
-        if (devs_[i]->rxID() == rxID && devs_[i]->txID() == txID) {
-            found = true;
-            break;
-        }
-    }
-
-    if (!found)
-        devs_.push_back(std::make_shared<DeviceInfo>(rxID, txID)); // FIXME
-    return true;
-}
-
 RCShell::Error RCShell::processCommand(Command& cmdPart)
 {
     std::lock_guard<std::mutex> lock(mutex_); // LOCK
@@ -506,10 +501,50 @@ void RCShell::getDevIDs(std::vector<IDsLink>& outLinks)
         idl.rxID = devs_[i]->rxID();
         idl.txID = devs_[i]->txID();
         idl.frequency = devs_[i]->frequency();
-        idl.isOn = devs_[i]->isOn();
+        idl.isActive = devs_[i]->isActive();
 
         outLinks.push_back(idl);
     }
+}
+
+bool RCShell::addDevice(unsigned short rxID, unsigned short txID, bool rcActive)
+{
+    IDsLink idl;
+    idl.rxID = rxID;
+    idl.txID = txID;
+
+    DeviceInfoPtr dev = device(idl);
+    if (dev)
+    {
+        // add active flag to created device
+        if (rcActive)
+            dev->setActive();
+#if 1
+        // change frequency for passive device
+        if (! dev->isActive())
+        {
+            std::lock_guard<std::mutex> lock(mutex_); // LOCK
+
+            if (rxID < frequencies_.size() && frequencies_[rxID])
+                dev->setFrequency(frequencies_[rxID]);
+        }
+#endif
+    }
+    else
+    {
+        std::lock_guard<std::mutex> lock(mutex_); // LOCK
+
+        dev = std::make_shared<DeviceInfo>(rxID, txID, rcActive);
+
+        // set frequency for new device
+        if (rxID < frequencies_.size() && frequencies_[rxID])
+            dev->setFrequency(frequencies_[rxID]);
+
+        devs_.push_back(dev);
+        return true;
+    }
+
+    return false;
 }
 
 /// @note O(N)
@@ -539,45 +574,14 @@ bool RCShell::setChannel(unsigned short txID, unsigned channel)
     return true;
 }
 
-#if 0
-void RCShell::waitBlockBcast(Word wCommand, int iWaitTime)
+void RCShell::setRxFrequency(unsigned short rxID, unsigned freq)
 {
-    std::vector<RCShell_ThreadParam> threadParam( deviceInfo_.size() );
-    std::vector<pthread_t> threadHandle( deviceInfo_.size() );
+    std::lock_guard<std::mutex> lock(mutex_); // LOCK
 
-    for (unsigned i = 0; i < deviceInfo_.size(); ++i)
-    {
-        deviceInfo_[i]->setCmdTimeout(wCommand);
+    if (frequencies_.size() <= rxID)
+        frequencies_.resize(rxID+1);
 
-        threadParam[i].pRCShell = this;
-        threadParam[i].dinfo = deviceInfo_[i].get();
-        threadParam[i].wCommand = wCommand;
-        threadParam[i].iWaitTime = iWaitTime;
-        threadParam[i].cbFail = cbFail;
-        threadParam[i].isSet = false;
-    }
-
-    for (unsigned i = 0; i < deviceInfo_.size(); ++i)
-        pthread_create(&threadHandle[i], NULL, RC_Shell_WaitTimeOut, (void*) &threadParam[i]);
-
-    for (unsigned i = 0; i < deviceInfo_.size(); ++i)
-        RC_Shell_WaitForSet_ThreadParam(&threadParam[i]);
-
-    for (unsigned i = 0; i < deviceInfo_.size(); ++i)
-        pthread_join(threadHandle[i], NULL);
-}
-#endif
-
-void RCShell::printDevices()
-{
-    printf("================= Device Info List =================\n");
-
-    for (unsigned i = 0; i < devs_.size(); ++i)
-    {
-        printf("Device No: %d\n", i);
-        devs_[i]->print();
-        printf("\n");
-    }
+    frequencies_[rxID] = freq;
 }
 
 //
@@ -588,6 +592,7 @@ void DebugInfo::reset()
     totalPKTCount = 0;
     leadingTagErrorCount = 0;
     endTagErrorCount = 0;
+    lengthErrorCount = 0;
     checkSumErrorCount = 0;
     sequenceErrorCount = 0;
 }

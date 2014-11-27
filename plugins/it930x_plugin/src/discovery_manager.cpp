@@ -303,6 +303,7 @@ namespace ite
         }
     }
 
+    /// @warning It assumed that rxID from UNIX device name corresponds to rxID from Return Channel data
     void DiscoveryManager::updateTxLinks(unsigned chan)
     {
         std::vector<RxDevicePtr> scanDevs;
@@ -328,7 +329,9 @@ namespace ite
                 scanDevs[i]->open();
 
             unsigned freq = DeviceInfo::chanFrequency(chan);
-            scanDevs[i]->lockF( nullptr, freq );
+
+            rcShell_.setRxFrequency(scanDevs[i]->rxID(), freq); // frequency for new devices
+            scanDevs[i]->lockF(nullptr, freq);
 
             if (scanDevs[i]->isLocked())
             {
@@ -336,14 +339,17 @@ namespace ite
                 printf("searching TxIDs - rxID: %d; frequency: %d; strength: %d; presence: %d\n",
                        scanDevs[i]->rxID(), freq, scanDevs[i]->strength(), scanDevs[i]->present());
 
+                // active devices communication
                 if (scanDevs[i]->present() && scanDevs[i]->strength() > 0) // strength: 0..100
                 {
                     rcShell_.sendGetIDs();
                     rcShell_.updateDevsParams();
                 }
+
                 scanDevs[i]->unlockF();
             }
 
+            rcShell_.setRxFrequency(scanDevs[i]->rxID(), 0);
             //scanDevs[i]->close();
         }
 
@@ -362,9 +368,14 @@ namespace ite
 
             auto it = m_txLinks.find(txID);
             if (it == m_txLinks.end() || it->second.rxID != links[i].rxID)
+            {
                 m_txLinks.insert( std::make_pair(txID, links[i]) );
+            }
             else
+            {
                 it->second.frequency = links[i].frequency;
+                it->second.isActive = links[i].isActive;
+            }
         }
     }
 
