@@ -110,7 +110,20 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
                           .arg(QString::fromLatin1(admin->getDigest()));
 
         status = client.doGET(request);
-        if (status != CL_HTTP_SUCCESS) {
+
+        bool configurationFailed = (status != CL_HTTP_SUCCESS);
+
+        if (!configurationFailed) {
+            QByteArray data;
+            client.readAll(data);
+
+            QnJsonRestResult json;
+            QJson::deserialize(data, &json);
+
+            configurationFailed = (json.error() != QnJsonRestResult::NoError);
+        }
+
+        if (configurationFailed) {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("CONFIGURATION_ERROR"));
             return CODE_OK;
         }
