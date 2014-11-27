@@ -1,6 +1,7 @@
 #ifndef RETURN_CHANNEL_SHELL_H
 #define RETURN_CHANNEL_SHELL_H
 
+#include <stdint.h>
 #include <mutex>
 #include <vector>
 #include <memory>
@@ -43,7 +44,7 @@ namespace ite
             FREQ_CH15 = 473000
         } Frequency;
 
-        DeviceInfo(unsigned short rxID = 0, unsigned short txID = 0);
+        DeviceInfo(unsigned short rxID = 0, unsigned short txID = 0, bool active = false);
         ~DeviceInfo();
 
         RCHostInfo * xPtr() { return &info_; }
@@ -100,8 +101,52 @@ namespace ite
             return 0xffff;
         }
 
-        bool setChannel(unsigned channel);
+        bool setChannel(unsigned channel, bool sendRequest = true);
+
+        // <encoder>
+
         bool setEncoderCfg(unsigned streamNo, unsigned bitrate, unsigned fps);
+
+        uint8_t encodersCount() const { return info_.videoEncConfig.configListSize; }
+
+        bool resolution(uint8_t encoderNo, uint16_t& width, uint16_t& height) const
+        {
+            if (encoderNo >= encodersCount())
+                return false;
+
+            width = info_.videoEncConfig.configList[encoderNo].width;
+            height = info_.videoEncConfig.configList[encoderNo].height;
+            return true;
+        }
+
+        bool framerate(uint8_t encoderNo, uint8_t& fps) const
+        {
+            if (encoderNo >= encodersCount())
+                return false;
+
+            fps = info_.videoEncConfig.configList[encoderNo].frameRateLimit;
+            return true;
+        }
+
+        bool bitrate(uint8_t encoderNo, uint16_t& bitrate) const
+        {
+            if (encoderNo >= encodersCount())
+                return false;
+
+            bitrate = info_.videoEncConfig.configList[encoderNo].bitrateLimit;
+            return true;
+        }
+
+        bool quality(uint8_t encoderNo, uint16_t& q) const
+        {
+            if (encoderNo >= encodersCount())
+                return false;
+
+            q = info_.videoEncConfig.configList[encoderNo].quality;
+            return true;
+        }
+
+        // </encoder>
 
         static unsigned short input2output(unsigned short command)
         {
@@ -115,6 +160,7 @@ namespace ite
         unsigned short txID() const { return info_.device.clientTxDeviceID; }
         unsigned short rxID() const { return info_.device.hostRxDeviceID; }
         unsigned frequency() const { return info_.transmissionParameter.frequency; }
+        void setFrequency(unsigned freq) { info_.transmissionParameter.frequency = freq; }
 
         void setWaiting(bool wr, unsigned short cmd = 0)
         {
@@ -129,9 +175,8 @@ namespace ite
 
         RebuiltCmd& cmd() { return cmd_; }
 
-        bool isOn() const { return isOn_; }
-        void setOn() { isOn_ = true; }
-        void setOff() { isOn_ = false; }
+        bool isActive() const { return isActive_; }
+        void setActive(bool a = true) { isActive_ = a; }
 
         void print() const;
 
@@ -249,7 +294,7 @@ namespace ite
         RebuiltCmd cmd_;
         unsigned short waitingCmd_;
         bool waitingResponse_;
-        bool isOn_;
+        bool isActive_;
 
         void sendCmd(unsigned short command)
         {
@@ -274,6 +319,7 @@ namespace ite
         unsigned totalPKTCount;
         unsigned leadingTagErrorCount;
         unsigned endTagErrorCount;
+        unsigned lengthErrorCount;
         unsigned checkSumErrorCount;
         unsigned sequenceErrorCount;
 
@@ -292,7 +338,7 @@ namespace ite
         unsigned short rxID;
         unsigned short txID;
         unsigned frequency;
-        bool isOn;
+        bool isActive;
     };
 
     ///
@@ -323,26 +369,25 @@ namespace ite
         void stopRcvThread();
         bool isRun() const { return bIsRun_; }
 
-        bool sendGetIDs(int iWaitTime = DeviceInfo::SEND_WAIT_TIME_MS);
+        bool sendGetIDs(int iWaitTime = DeviceInfo::SEND_WAIT_TIME_MS * 2);
 
-        bool addDevice(unsigned short rxID, unsigned short txID);
+        bool addDevice(unsigned short rxID, unsigned short txID, bool rcActive);
         Error processCommand(Command& cmd);
         Error lastError() const { return lastError_; }
 
         DebugInfo& debugInfo() { return debugInfo_; }
 
-        void printDevices();
-
-        void updateDevIDs();
-        void getDevIDs(std::vector<IDsLink>& links);
-        bool getDevIDsChannel(unsigned channel, std::vector<IDsLink>& outLinks);
+        void updateDevsParams();
+        void getDevIDs(std::vector<IDsLink>& outLinks);
         DeviceInfoPtr device(const IDsLink& idl) const;
 
-        bool setChannel(const IDsLink& idl, unsigned channel);
+        bool setChannel(unsigned short txID, unsigned channel);
+        void setRxFrequency(unsigned short rxID, unsigned frequency);
 
     private:
         mutable std::mutex mutex_;
         std::vector<DeviceInfoPtr> devs_;
+        std::vector<unsigned> frequencies_;
         pthread_t rcvThread_;
         Error lastError_;
         bool bIsRun_;

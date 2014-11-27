@@ -89,8 +89,6 @@ namespace ite
             m_camera = nullptr;
         }
 
-        bool stats();
-
         void driverInfo(std::string& driverVersion, std::string& fwVersion, std::string& company, std::string& model) const;
 
         std::mutex& mutex() { return m_mutex; }
@@ -120,6 +118,8 @@ namespace ite
         unsigned m_frequency;
         uint8_t m_strength;
         bool m_present;
+
+        bool stats();
     };
 
     typedef std::shared_ptr<RxDevice> RxDevicePtr;
@@ -229,6 +229,7 @@ namespace ite
             STATE_DEVICE_READY,     // got Rx for Tx
             STATE_STREAM_LOADING,   // loading data streams
             STATE_STREAM_READY,     // got data streams, no readers
+            STATE_STREAM_LOST,      //
             STATE_STREAM_READING    // got readers
         } State;
 
