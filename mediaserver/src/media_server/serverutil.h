@@ -14,5 +14,6 @@ void syncStoragesToSettings(const QnMediaServerResourcePtr &server);
 bool backupDatabase();
 
 bool isLocalAppServer(const QString &host);
+bool changeSystemName(const QString &systemName);
 
 #endif // _SERVER_UTIL_H
