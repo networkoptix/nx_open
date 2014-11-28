@@ -3,7 +3,7 @@
 	<xs:simpleType name="DataType">
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="Bool"/>
-			<xs:enumeration value="MinMaxStep"/>
+			<xs:enumeration value="Number"/>
 			<xs:enumeration value="Enumeration"/>
 			<xs:enumeration value="String"/>
 			<xs:enumeration value="Button"/>
@@ -17,26 +17,13 @@
 				<xs:attribute type="DataType" name="dataType" use="required"/>
 				<xs:attribute type="xs:string" name="name" use="required"/>
 				<xs:attribute type="xs:string" name="description" use="optional"/>
-				<xs:attribute type="xs:string" name="min" use="optional"/>
-				<xs:attribute type="xs:string" name="max" use="optional"/>
-				<xs:attribute type="xs:string" name="step" use="optional"/>
-				<xs:attribute type="xs:string" name="method" use="optional" default="GET"/>
+				<xs:attribute type="xs:string" name="range" use="optional"/>
+				<xs:attribute type="xs:string" name="tag" use="optional"/>
 				<xs:attribute type="xs:boolean" name="readOnly" use="optional" default="false"/>
             </xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
 	
-	<xs:complexType name="boolParamType">
-		<xs:simpleContent>
-				<xs:extension base="paramType">
-				<xs:attribute type="xs:string" name="id" use="required"/>
-				<xs:attribute type="xs:string" name="dataType" use="required" fixed="Bool"/>				
-				<xs:attribute type="xs:string" name="off" use="optional" default="false"/>
-				<xs:attribute type="xs:string" name="on" use="optional" default="true"/>
-            </xs:extension>
-		</xs:simpleContent>
-	</xs:complexType>
-
 	<xs:complexType name="groupType">    
 		<xs:sequence minOccurs="0" maxOccurs="unbounded">
 			<xs:choice>
@@ -48,13 +35,14 @@
 		<xs:attribute type="xs:string" name="description" use="optional"/>
 	</xs:complexType>
 	
-	<xs:complexType name="cameraType">    
+	<xs:complexType name="pluginType">    
 		<xs:sequence minOccurs="0" maxOccurs="unbounded">
 			<xs:element name="group" type="groupType" />
 		</xs:sequence>
 		<xs:attribute type="xs:string" name="name" use="required"/>
-		<xs:attribute type="xs:string" name="description" use="optional"/>
+		<xs:attribute type="xs:string" name="version" use="required"/>
+		<xs:attribute type="xs:string" name="unique_id" use="required"/>
 	</xs:complexType>
   
-	<xs:element name="camera" type="cameraType"/>
+	<xs:element name="plugin" type="pluginType"/>
 </xs:schema>

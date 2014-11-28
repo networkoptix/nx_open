@@ -1,7 +1,9 @@
 ﻿<?xml version="1.0"?>
-<plugin name="ONVIF" version="1" unique_id="53148996-d4d8-4e90-985e-24c6c63c5150">
+<plugin
+		name="ONVIF"
+		version="1" 
+		unique_id="53148996-d4d8-4e90-985e-24c6c63c5150">
 	<group name="Imaging">
-
 		<group name="Backlight Compensation">
 			<param id="ibcMode" 
 					dataType="Enumeration" 
@@ -13,7 +15,6 @@
 					name="Level"
 					description="Level of BLC."/>
 		</group>
-
 		<group name="Exposure">
 			<param id="ieMode"
 					dataType="Enumeration" 
@@ -62,7 +63,6 @@
 					name="Iris"
 					description="The fixed attenuation of input light affected by the iris (dB). 0dB maps to a fully opened iris."/>
 		</group>
-
 		<group name="Focus">
 			<param id = "ifAuto"
 					dataType = "Enumeration"
@@ -79,7 +79,6 @@
 					dataType="Number" 
 					name="Far Limit"/>
 		</group>
-
 		<group name="Wide Dynamic Range">
 			<param id = "iwdrMode"
 					dataType="Enumeration"
@@ -91,7 +90,6 @@
 					name="Level" 
 					description="Level of wide dynamic range." />
 		</group>
-
 		<group name="White Balance">
 			<param id = "iwbMode"
 					dataType="Enumeration"
@@ -105,7 +103,6 @@
 					dataType="Number"
 					name="Yb Gain"/>
 		</group>
-
 		<param id="iBri" 
 				dataType="Number" 
 				name="Brightness" 
@@ -128,7 +125,6 @@
 				name="Sharpness" 
 				description="Sharpness of the Video image." />
 	</group>
-
 	<group name="Maintenance">
 		<param id = "mReboot"
 				dataType="Button"
