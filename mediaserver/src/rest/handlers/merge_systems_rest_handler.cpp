@@ -7,6 +7,9 @@
 #include "core/resource/media_server_resource.h"
 #include "nx_ec/ec_api.h"
 #include "nx_ec/dummy_handler.h"
+#include "nx_ec/data/api_user_data.h"
+#include "nx_ec/data/api_conversion_functions.h"
+#include "nx_ec/ec2_lib.h"
 #include "api/app_server_connection.h"
 #include "common/common_module.h"
 #include "media_server/settings.h"
@@ -30,6 +33,7 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
     QUrl url = params.value(lit("url"));
     QString user = params.value(lit("user"), lit("admin"));
     QString password = params.value(lit("password"));
+    QString currentPassword = params.value(lit("currentPassword"));
     bool takeRemoteSettings = params.value(lit("takeRemoteSettings"), lit("false")) != lit("false");
 
     if (url.isEmpty()) {
@@ -47,6 +51,23 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
     if (password.isEmpty()) {
         result.setError(QnJsonRestResult::MissingParameter);
         result.setErrorString(lit("password"));
+        return CODE_OK;
+    }
+
+    if (!takeRemoteSettings && currentPassword.isEmpty()) {
+        result.setError(QnJsonRestResult::MissingParameter);
+        result.setErrorString(lit("currentPassword"));
+        return CODE_OK;
+    }
+
+    QnUserResourcePtr admin = qnResPool->getAdministrator();
+
+    if (!admin)
+        return CODE_INTERNAL_ERROR;
+
+    if (!admin->checkPassword(currentPassword)) {
+        result.setError(QnJsonRestResult::InvalidParameter);
+        result.setErrorString(lit("currentPassword"));
         return CODE_OK;
     }
 
@@ -98,29 +119,39 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
         }
         changeAdminPassword(password);
     } else {
-        QnUserResourcePtr admin = qnResPool->getAdministrator();
         if (!admin) {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("INTERNAL_ERROR"));
             return CODE_OK;
         }
 
-        QString request = lit("api/configure?systemName=%1&wholeSystem=true&passwordHash=%2&passwordDigest=%3")
-                          .arg(qnCommon->localSystemName())
-                          .arg(QString::fromLatin1(admin->getHash()))
-                          .arg(QString::fromLatin1(admin->getDigest()));
+        bool configurationFailed;
 
-        status = client.doGET(request);
+        QUrl ecUrl = url;
+        ecUrl.setUserName(user);
 
-        bool configurationFailed = (status != CL_HTTP_SUCCESS);
+        {   /* Save current admin inside the remote system */
+            ecUrl.setPassword(password);
+            ec2::AbstractECConnectionPtr ec2Connection;
+            ec2::ErrorCode errorCode = QnAppServerConnectionFactory::ec2ConnectionFactory()->connectSync(ecUrl, &ec2Connection);
+            configurationFailed = (errorCode != ec2::ErrorCode::ok);
 
-        if (!configurationFailed) {
-            QByteArray data;
-            client.readAll(data);
+            if (!configurationFailed) {
+                QnUserResourceList savedUsers;
+                errorCode = ec2Connection->getUserManager()->saveSync(admin, &savedUsers);
+                configurationFailed = (errorCode != ec2::ErrorCode::ok);
+            }
+        }
 
-            QnJsonRestResult json;
-            QJson::deserialize(data, &json);
+        {   /* Change system name of the remote system */
+            ecUrl.setPassword(currentPassword);
+            ec2::AbstractECConnectionPtr ec2Connection;
+            ec2::ErrorCode errorCode = QnAppServerConnectionFactory::ec2ConnectionFactory()->connectSync(ecUrl, &ec2Connection);
+            configurationFailed = (errorCode != ec2::ErrorCode::ok);
 
-            configurationFailed = (json.error() != QnJsonRestResult::NoError);
+            if (!configurationFailed) {
+                errorCode = ec2Connection->getMiscManager()->changeSystemNameSync(qnCommon->localSystemName());
+                configurationFailed = (errorCode != ec2::ErrorCode::ok);
+            }
         }
 
         if (configurationFailed) {
@@ -129,6 +160,7 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
         }
     }
 
+    /* Save additional address if needed */
     if (qnResPool->getResourceById(moduleInformation.id).isNull()) {
         if (!moduleInformation.remoteAddresses.contains(url.host())) {
             QUrl simpleUrl;
