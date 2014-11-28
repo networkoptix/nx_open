@@ -18,7 +18,7 @@ public:
     DWCameraProxy(const QString& host, int port, unsigned int timeout, const QAuthenticator& auth);
 
     QnCameraAdvancedParamValueList getParamsList() const;
-    bool setParam(const QString &id, const QString &value, const QString &method);
+    bool setParam(const QnCameraAdvancedParameter &parameter, const QString &value);
 private:
     QnCameraAdvancedParamValueList fetchParamsFromHttpResponse(const QByteArray& body) const;
     QnCameraAdvancedParamValueList requestParamValues(const QString &request) const;

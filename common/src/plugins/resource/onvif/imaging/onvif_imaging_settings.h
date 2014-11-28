@@ -19,6 +19,8 @@ protected:
     ImagingSettingsResp* m_settings;
 };
 
+typedef QSharedPointer<QnAbstractOnvifImagingOperation> QnAbstractOnvifImagingOperationPtr;
+
 class QnFloatOnvifImagingOperation: public QnAbstractOnvifImagingOperation {
 public:
     typedef std::function<float* (ImagingSettingsResp* settings)> pathFunction;

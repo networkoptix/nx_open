@@ -3,13 +3,12 @@
 
 #ifdef ENABLE_ONVIF
 
-#include <plugins/resource/onvif/soap_wrapper.h>
-
-#include <utils/camera/camera_diagnostics.h>
-
 #include <core/resource/camera_advanced_param.h>
 
-class QnAbstractOnvifImagingOperation;
+#include <plugins/resource/onvif/soap_wrapper.h>
+#include <plugins/resource/onvif/imaging/onvif_imaging_settings.h>
+
+#include <utils/camera/camera_diagnostics.h>
 
 //
 // QnOnvifImagingProxy
@@ -20,19 +19,19 @@ public:
         const QString &passwd, const std::string& videoSrcToken, int _timeDrift);
     ~QnOnvifImagingProxy();
 
+    void initParameters(QnCameraAdvancedParams &parameters);
+    QSet<QString> supportedParameters() const;
+
+    bool setValue(const QString &id, const QString &value);
+    CameraDiagnostics::Result loadValues(QnCameraAdvancedParamValueMap &values);
+private:
+    CameraDiagnostics::Result loadRanges();
     bool makeSetRequest();
+
     QString getImagingUrl() const;
     QString getLogin() const;
     QString getPassword() const;
     int getTimeDrift() const;
-
-    void initParameters(QnCameraAdvancedParams &parameters);
-    QSet<QString> supportedParameters() const;
-
-    CameraDiagnostics::Result loadValues(QnCameraAdvancedParamValueMap &values);
-private:
-    CameraDiagnostics::Result loadRanges();
-    
 
 private:
     ImagingSoapWrapper* m_rangesSoapWrapper;
@@ -41,7 +40,7 @@ private:
     ImagingSettingsResp* m_values;
     const std::string m_videoSrcToken;
 
-    QHash<QString, QSharedPointer<QnAbstractOnvifImagingOperation> > m_supportedOperations;
+    QHash<QString, QnAbstractOnvifImagingOperationPtr > m_supportedOperations;
 };
 
 #endif //ENABLE_ONVIF

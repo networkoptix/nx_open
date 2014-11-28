@@ -29,10 +29,6 @@ public:
     virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const override;
 
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
-
-    virtual bool setParamPhysical(const QString &id, const QString &value) override;
-signals:
-    void physicalParamChanged(const QString& name, const QString& value);
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
     virtual bool loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const override;
@@ -40,7 +36,8 @@ protected:
     virtual QSet<QString> calculateSupportedAdvancedParameters() const override;
     virtual void fetchAndSetAdvancedParameters() override;
 
-    virtual bool loadImagingParams(QnCameraAdvancedParamValueMap &values) override;
+    virtual bool loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap &values) override;
+    virtual bool setAdvancedParameterUnderLock(const QnCameraAdvancedParameter &parameter, const QString &value) override;
 private:
     bool isDualStreamingEnabled(bool& unauth);
     void enableOnvifSecondStream();

@@ -115,7 +115,7 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString &
 		if (param.dataType != QnCameraAdvancedParameter::DataType::Button)
 			label->setText(lit("%1: ").arg(param.name));
 		formLayout->addRow(label, widget);
-		m_paramWidgetsById[param.getId()] = widget;
+		m_paramWidgetsById[param.id] = widget;
 
 		/* Widget is disabled until it receive correct value. */
 		if (QnCameraAdvancedParameter::dataTypeHasValue(param.dataType))

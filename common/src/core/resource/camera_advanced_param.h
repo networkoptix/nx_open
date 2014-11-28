@@ -43,17 +43,18 @@ struct QnCameraAdvancedParameter {
 
 	bool isValid() const;
 
-    QString name;
-    QString description;
     QString id;
     DataType dataType;
-    QString tag;
     QString range;
+    QString name;
+    QString description;
+    QString tag;  
     bool readOnly;
 
     QnCameraAdvancedParameter();
 
     QStringList getRange() const;
+    void getRange(double &min, double &max) const;
     void setRange(int min, int max);
     void setRange(double min, double max);
 
@@ -62,7 +63,7 @@ struct QnCameraAdvancedParameter {
 
 	static bool dataTypeHasValue(DataType value);
 };
-#define QnCameraAdvancedParameter_Fields (name)(description)(query)(dataType)(method)(min)(max)(step)(readOnly)
+#define QnCameraAdvancedParameter_Fields (id)(dataType)(range)(name)(description)(tag)(readOnly)
 
 struct QnCameraAdvancedParamGroup {
     QString name;
@@ -93,22 +94,20 @@ struct QnCameraAdvancedParams {
 };
 #define QnCameraAdvancedParams_Fields (name)(version)(unique_id)(groups)
 
-/** Class for reading camera advanced parameters xml file. */
+/** Class for reading camera advanced parameters. */
 class QnCameraAdvancedParamsReader {
 public:
     QnCameraAdvancedParamsReader();
 
 	/** Get parameters list for the given resource. */
 	QnCameraAdvancedParams params(const QnResourcePtr &resource) const;
+    void setParams(const QnResourcePtr &resource, const QnCameraAdvancedParams &params) const;
 
-    /** Get set of allowed params id's for the given resource. */
-    static QSet<QString> allowedParams(const QnResourcePtr &resource);
-private:
-	/** Get inner camera type that is used in the xml as node id. */
-	QString calculateCameraType(const QnResourcePtr &resource) const;
+    static QnCameraAdvancedParams paramsFromResource(const QnResourcePtr &resource);
+    static void setParamsToResource(const QnResourcePtr &resource, const QnCameraAdvancedParams &params);
 private:
 	/* Per-camera parameters cache. */
-	mutable QHash<QString, QnCameraAdvancedParams> m_paramsByCameraType;
+	mutable QHash<QnUuid, QnCameraAdvancedParams> m_paramsByCameraId;
 };
 
 class QnCameraAdvacedParamsXmlParser {
@@ -116,7 +115,7 @@ public:
     static bool validateXml(QIODevice *xmlSource);
 	static bool readXml(QIODevice *xmlSource, QnCameraAdvancedParams &result);
 private:
-	static bool parseCameraXml(const QDomElement &cameraXml, QnCameraAdvancedParams &params);
+	static bool parsePluginXml(const QDomElement &pluginXml, QnCameraAdvancedParams &params);
 	static bool parseGroupXml(const QDomElement &groupXml, QnCameraAdvancedParamGroup &group);
 	static bool parseElementXml(const QDomElement &elementXml, QnCameraAdvancedParameter &param);
 };

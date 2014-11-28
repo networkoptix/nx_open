@@ -5,8 +5,6 @@
 #include "onvif/soapImagingBindingProxy.h"
 #include "onvif/soapStub.h"
 
-#include <plugins/resource/onvif/imaging/onvif_imaging_settings.h>
-
 //
 // class QnOnvifImagingProxy
 //
@@ -15,8 +13,8 @@ QnOnvifImagingProxy::QnOnvifImagingProxy(const std::string& imagingUrl,
                                                  const QString& passwd, 
                                                  const std::string& videoSrcToken, 
                                                  int _timeDrift):
-    m_rangesSoapWrapper(new ImagingSoapWrapper(imagingUrl, login, passwd, _timeDrift),
-    m_valsSoapWrapper(new ImagingSoapWrapper(imagingUrl, login, passwd, _timeDrift),
+    m_rangesSoapWrapper(new ImagingSoapWrapper(imagingUrl, login, passwd, _timeDrift)),
+    m_valsSoapWrapper(new ImagingSoapWrapper(imagingUrl, login, passwd, _timeDrift)),
     m_ranges(new ImagingOptionsResp()),
     m_values(new ImagingSettingsResp()),
     m_videoSrcToken(videoSrcToken)
@@ -59,7 +57,7 @@ void QnOnvifImagingProxy::initParameters(QnCameraAdvancedParams &parameters) {
         param.setRange(range->Min, range->Max);
         if (!parameters.updateParameter(param))
             return;
-        m_supportedOperations.insert(id, QSharedPointer<QnAbstractOnvifImagingOperation>(new QnFloatOnvifImagingOperation(m_values, path)));
+        m_supportedOperations.insert(id, QnAbstractOnvifImagingOperationPtr(new QnFloatOnvifImagingOperation(m_values, path)));
     };
 
     auto registerEnumParameter = [this, &parameters](const QString &id, QnEnumOnvifImagingOperation::pathFunction path) {
@@ -67,19 +65,19 @@ void QnOnvifImagingProxy::initParameters(QnCameraAdvancedParams &parameters) {
         Q_ASSERT(param.isValid());
         if (!param.isValid())
             return;
-        m_supportedOperations.insert(id, QSharedPointer<QnAbstractOnvifImagingOperation>(new QnEnumOnvifImagingOperation(m_values, param.getRange(), path)));
+        m_supportedOperations.insert(id, QnAbstractOnvifImagingOperationPtr(new QnEnumOnvifImagingOperation(m_values, param.getRange(), path)));
     };
 
     auto blc = ranges->BacklightCompensation;
     if (blc) {
-        registerEnumParameter(lit("ibcMode"),                                   [](ImagingSettingsResp* settings){ return &settings->ImagingSettings->BacklightCompensation->Mode; });
+        registerEnumParameter(lit("ibcMode"),                                   [](ImagingSettingsResp* settings){ return reinterpret_cast<int*>(&settings->ImagingSettings->BacklightCompensation->Mode); });
         registerFloatParameter(lit("ibcLevel"), blc->Level,                     [](ImagingSettingsResp* settings){ return settings->ImagingSettings->BacklightCompensation->Level; });
     }
 
     auto exposure = ranges->Exposure;
     if (exposure) {
-        registerEnumParameter(lit("ieMode"),                                    [](ImagingSettingsResp* settings){ return &settings->ImagingSettings->Exposure->Mode; });
-        registerEnumParameter(lit("iePriority"),                                [](ImagingSettingsResp* settings){ return &settings->ImagingSettings->Exposure->Priority; });
+        registerEnumParameter(lit("ieMode"),                                    [](ImagingSettingsResp* settings){ return reinterpret_cast<int*>(&settings->ImagingSettings->Exposure->Mode); });
+        registerEnumParameter(lit("iePriority"),                                [](ImagingSettingsResp* settings){ return reinterpret_cast<int*>(&settings->ImagingSettings->Exposure->Priority); });
         
         registerFloatParameter(lit("ieMinETime"),   exposure->MinExposureTime,  [](ImagingSettingsResp* settings){ return settings->ImagingSettings->Exposure->MinExposureTime; });
         registerFloatParameter(lit("ieMaxETime"),   exposure->MaxExposureTime,  [](ImagingSettingsResp* settings){ return settings->ImagingSettings->Exposure->MaxExposureTime; });
@@ -96,7 +94,7 @@ void QnOnvifImagingProxy::initParameters(QnCameraAdvancedParams &parameters) {
       
     auto focus = ranges->Focus;
     if (focus) {
-        registerEnumParameter(lit("ifAuto"),                                    [](ImagingSettingsResp* settings){ return &settings->ImagingSettings->Focus->AutoFocusMode; });
+        registerEnumParameter(lit("ifAuto"),                                    [](ImagingSettingsResp* settings){ return reinterpret_cast<int*>(&settings->ImagingSettings->Focus->AutoFocusMode); });
 
         registerFloatParameter(lit("ifSpeed"),      focus->DefaultSpeed,        [](ImagingSettingsResp* settings){ return settings->ImagingSettings->Focus->DefaultSpeed; });
         registerFloatParameter(lit("ifNear"),       focus->NearLimit,           [](ImagingSettingsResp* settings){ return settings->ImagingSettings->Focus->NearLimit; });
@@ -105,18 +103,18 @@ void QnOnvifImagingProxy::initParameters(QnCameraAdvancedParams &parameters) {
 
     auto wdr = ranges->WideDynamicRange;
     if (wdr) {
-        registerEnumParameter(lit("iwdrMode"),                                  [](ImagingSettingsResp* settings){ return &settings->ImagingSettings->WideDynamicRange->Mode; });
+        registerEnumParameter(lit("iwdrMode"),                                  [](ImagingSettingsResp* settings){ return reinterpret_cast<int*>(&settings->ImagingSettings->WideDynamicRange->Mode); });
         registerFloatParameter(lit("iwdrLevel"),    wdr->Level,                 [](ImagingSettingsResp* settings){ return settings->ImagingSettings->WideDynamicRange->Level; });
     }
 
     auto wb = ranges->WhiteBalance;
     if (wb) {
-        registerEnumParameter(lit("iwbMode"),                                   [](ImagingSettingsResp* settings){ return &settings->ImagingSettings->WhiteBalance->Mode; });
+        registerEnumParameter(lit("iwbMode"),                                   [](ImagingSettingsResp* settings){ return reinterpret_cast<int*>(&settings->ImagingSettings->WhiteBalance->Mode); });
         registerFloatParameter(lit("iwbYrGain"),    wb->YrGain,                 [](ImagingSettingsResp* settings){ return settings->ImagingSettings->WhiteBalance->CrGain; });
         registerFloatParameter(lit("iwbYbGain"),    wb->YbGain,                 [](ImagingSettingsResp* settings){ return settings->ImagingSettings->WhiteBalance->CbGain; });
     }
 
-    registerEnumParameter(lit("iIrCut"),                                        [](ImagingSettingsResp* settings){ return &settings->ImagingSettings->IrCutFilter; });
+    registerEnumParameter(lit("iIrCut"),                                        [](ImagingSettingsResp* settings){ return reinterpret_cast<int*>(&settings->ImagingSettings->IrCutFilter); });
 
     registerFloatParameter(lit("iBri"),             ranges->Brightness,         [](ImagingSettingsResp* settings){ return settings->ImagingSettings->Brightness; });
     registerFloatParameter(lit("iCS"),              ranges->ColorSaturation,    [](ImagingSettingsResp* settings){ return settings->ImagingSettings->ColorSaturation; });
@@ -210,5 +208,15 @@ QSet<QString> QnOnvifImagingProxy::supportedParameters() const {
     return m_supportedOperations.keys().toSet();
 }
 
+
+bool QnOnvifImagingProxy::setValue(const QString &id, const QString &value) {
+    if (!m_supportedOperations.contains(id))
+        return false;
+    QnAbstractOnvifImagingOperationPtr operation = m_supportedOperations[id];
+    if (!operation->set(value))
+        return false;
+    
+    return makeSetRequest();
+}
 
 #endif

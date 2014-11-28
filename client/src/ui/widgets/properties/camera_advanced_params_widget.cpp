@@ -24,7 +24,7 @@ namespace {
             result.unite(parameterIds(subGroup));
         for (const QnCameraAdvancedParameter &param: group.params)
             if (parameterHasValue(param))
-                result.insert(param.getId());
+                result.insert(param.id);
         return result;
     }
 
@@ -78,7 +78,7 @@ void QnCameraAdvancedParamsWidget::setCamera(const QnVirtualCameraResourcePtr &c
         connect(m_camera, &QnResource::propertyChanged, this, [this](const QnResourcePtr &resource, const QString &key) {
             if (resource != m_camera)
                 return;
-            if (key == Qn::PHYSICAL_CAMERA_SETTINGS_XML_PARAM_NAME || key == Qn::CAMERA_SETTINGS_ID_PARAM_NAME) {
+            if (key == Qn::CAMERA_ADVANCED_PARAMETERS) {
                 /* Re-init state if key parameter changed. */
                 initialize();
             }

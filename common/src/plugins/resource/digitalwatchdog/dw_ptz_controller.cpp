@@ -12,7 +12,7 @@ QnDwPtzController::QnDwPtzController(const QnDigitalWatchdogResourcePtr &resourc
     base_type(resource),
     m_resource(resource)
 {
-    connect(resource.data(), &QnDigitalWatchdogResource::physicalParamChanged, this, &QnDwPtzController::at_physicalParamChanged);
+    connect(resource.data(), &QnDigitalWatchdogResource::advancedParameterChanged, this, &QnDwPtzController::at_physicalParamChanged);
     updateFlipState();
 }
 

@@ -204,6 +204,8 @@ public:
     void calcTimeDrift(); // calculate clock diff between camera and local clock at seconds
     static int calcTimeDrift(const QString& deviceUrl);
 
+    virtual bool getParamPhysical(const QString &id, QString &value) override;
+    virtual bool setParamPhysical(const QString &id, const QString& value) override;
 
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
     //bool fetchAndSetDeviceInformation(bool performSimpleCheck);
@@ -238,6 +240,8 @@ public:
 
     static QSize findSecondaryResolution(const QSize& primaryRes, const QList<QSize>& secondaryResList, double* matchCoeff = 0);
 
+signals:
+    void advancedParameterChanged(const QString &id, const QString &value);
 protected:
     int strictBitrate(int bitrate) const;
     void setCodec(CODECS c, bool isPrimary);
@@ -250,14 +254,13 @@ protected:
 
     virtual CameraDiagnostics::Result updateResourceCapabilities();
 
-    virtual bool getParamPhysical(const QString &id, QString &value) override;
-    virtual bool setParamPhysical(const QString &id, const QString& value) override;
-
     virtual bool loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const;
     virtual void initAdvancedParametersProviders(QnCameraAdvancedParams &params);
     virtual QSet<QString> calculateSupportedAdvancedParameters() const;
     virtual void fetchAndSetAdvancedParameters();
-    virtual bool loadImagingParams(QnCameraAdvancedParamValueMap &values);
+
+    virtual bool loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap &values);
+    virtual bool setAdvancedParameterUnderLock(const QnCameraAdvancedParameter &parameter, const QString &value);
 
 private:
     void setMaxFps(int f);

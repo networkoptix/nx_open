@@ -69,7 +69,7 @@ int QnCameraSettingsRestHandler::executeGet(const QString &path, const QnRequest
 	locParams.remove(lit("res_id"));
 
 	/* Filter allowed parameters. */
-	auto allowedParams = m_paramsReader->allowedParams(camera);
+	auto allowedParams = m_paramsReader->params(camera).allParameterIds();
 
 	for(auto iter = locParams.begin(); iter != locParams.end();) {
 		if (allowedParams.contains(iter.key()))

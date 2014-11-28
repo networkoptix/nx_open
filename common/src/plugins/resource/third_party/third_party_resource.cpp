@@ -613,15 +613,10 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
             if( QnCameraAdvacedParamsXmlParser::validateXml(&dataSource)) {
                 //parsing xml to load param list and get cameraID
                 QnCameraAdvancedParams params;
-                QString cameraTypeName;
-				if (QnCameraAdvacedParamsXmlParser::readXml(&dataSource, params, cameraTypeName)) {
-                    setProperty(Qn::CAMERA_ADVANCED_PARAMS_XML, QString::fromUtf8(paramDescXML));
-                    setProperty(Qn::CAMERA_ADVANCED_PARAMS_TYPENAME, cameraTypeName);
-                    setProperty(Qn::CAMERA_ADVANCED_PARAMS_SUPPORTED, QStringList(params.allParameterIds().toList()).join(L','));
-                }
+				if (QnCameraAdvacedParamsXmlParser::readXml(&dataSource, params))
+                    QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), params);
             }
-            else
-            {
+            else {
                 NX_LOG( lit("Could not validate camera parameters description xml"), cl_logWARNING );
             }
         }

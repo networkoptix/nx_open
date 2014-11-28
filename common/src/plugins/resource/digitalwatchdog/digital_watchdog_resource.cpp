@@ -140,6 +140,9 @@ QnAbstractPtzController *QnDigitalWatchdogResource::createPtzControllerInternal(
 
 bool QnDigitalWatchdogResource::loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const {
     QFile paramsTemplateFile(lit(":/camera_advanced_params/dw.xml"));
+#ifdef _DEBUG
+    QnCameraAdvacedParamsXmlParser::validateXml(&paramsTemplateFile);
+#endif
     return QnCameraAdvacedParamsXmlParser::readXml(&paramsTemplateFile, params);
 }
 
@@ -183,38 +186,22 @@ QString QnDigitalWatchdogResource::fetchCameraModel() {
 }
 
 
-bool QnDigitalWatchdogResource::loadImagingParams(QnCameraAdvancedParamValueMap &values) {
+bool QnDigitalWatchdogResource::loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap &values) {
+    bool baseResult = base_type::loadAdvancedParamsUnderLock(values);
+
     if (!m_cameraProxy)
-        return false;
+        return baseResult;
     values.appendValueList(m_cameraProxy->getParamsList());
     return true;
 }
 
-bool QnDigitalWatchdogResource::setParamPhysical(const QString &id, const QString &value) {
-    if (m_appStopping)
+bool QnDigitalWatchdogResource::setAdvancedParameterUnderLock(const QnCameraAdvancedParameter &parameter, const QString &value) {
+    bool baseResult = base_type::setAdvancedParameterUnderLock(parameter, value);
+    if (baseResult)
+        return true;
+    if (!m_cameraProxy)
         return false;
-
-    bool result = false;
-    {
-        QMutexLocker lock(&m_physicalParamsMutex);
-        if (!m_cameraProxy)
-            return false;
-
-        if (!QnCameraAdvancedParamsReader::allowedParams(this->toSharedPointer()).contains(id)) {
-            Q_ASSERT_X(false, Q_FUNC_INFO, "parameter id should be correct here by design");
-            return false;
-        }
-
-        QnCameraAdvancedParameter parameter = m_advancedParameters.getParameterById(id);
-        Q_ASSERT_X(parameter.isValid(), Q_FUNC_INFO, "parameter should be correct here by design");
-
-        QString tag = parameter.method;
-
-        m_advancedParamsCache[id] = value;
-        result = m_cameraProxy->setParam(id, value, tag);
-    }
-    emit physicalParamChanged(id, value);
-    return result;
+    return m_cameraProxy->setParam(parameter, value);
 }
 
 #endif //ENABLE_ONVIF

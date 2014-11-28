@@ -2270,10 +2270,9 @@ QnConstResourceAudioLayoutPtr QnPlOnvifResource::getAudioLayout(const QnAbstract
         return QnPhysicalCameraResource::getAudioLayout(dataProvider);
 }
 
-bool QnPlOnvifResource::loadImagingParams(QnCameraAdvancedParamValueMap &values) {
+bool QnPlOnvifResource::loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap &values) {
     m_prevOnvifResultCode = CameraDiagnostics::NoErrorResult();
 
-    QMutexLocker lock(&m_physicalParamsMutex);
     if (!m_imagingParamsProxy) {
         m_prevOnvifResultCode = CameraDiagnostics::UnknownErrorResult();
         return false;
@@ -2285,12 +2284,16 @@ bool QnPlOnvifResource::loadImagingParams(QnCameraAdvancedParamValueMap &values)
 
 
 bool QnPlOnvifResource::getParamPhysical(const QString &id, QString &value) {
+    if (m_appStopping)
+        return false;
+
     //Caching camera values during ADVANCED_SETTINGS_VALID_TIME to avoid multiple excessive 'get' requests 
     //to camera. All values can be get by one request, but our framework do getParamPhysical for every single param.
+    QMutexLocker lock(&m_physicalParamsMutex);
     QDateTime curTime = QDateTime::currentDateTime();
     if (m_advSettingsLastUpdated.isNull() || m_advSettingsLastUpdated.secsTo(curTime) > ADVANCED_SETTINGS_VALID_TIME) {
         m_advancedParamsCache.clear();
-        if (loadImagingParams(m_advancedParamsCache))
+        if (loadAdvancedParamsUnderLock(m_advancedParamsCache))
             m_advSettingsLastUpdated = curTime;
     }
 
@@ -2300,49 +2303,45 @@ bool QnPlOnvifResource::getParamPhysical(const QString &id, QString &value) {
     return true;
 }
 
+bool QnPlOnvifResource::setAdvancedParameterUnderLock(const QnCameraAdvancedParameter &parameter, const QString &value) {
+    if (m_imagingParamsProxy && m_imagingParamsProxy->supportedParameters().contains(parameter.id))
+        return m_imagingParamsProxy->setValue(parameter.id, value);
+
+    if (m_maintenanceProxy && m_maintenanceProxy->supportedParameters().contains(parameter.id))
+        return m_maintenanceProxy->callOperation(parameter.id);
+
+    return false;
+}
+
+
 bool QnPlOnvifResource::setParamPhysical(const QString &id, const QString& value) {
-    QMutexLocker lock(&m_physicalParamsMutex);
-    if (!m_onvifAdditionalSettings)
+    if (m_appStopping)
         return false;
 
-    CameraSetting tmp;
-    tmp.deserializeFromStr(value);
-
-    CameraSettings& settings = m_onvifAdditionalSettings->getCameraSettings();
-    CameraSettings::Iterator it = settings.find(id);
-
-    if (it == settings.end())
+    bool result = false;
     {
-        //Buttons are not contained in CameraSettings
-        if (tmp.getType() != CameraSetting::Button) {
+        QMutexLocker lock(&m_physicalParamsMutex);
+        if (!m_advancedParamsCache.contains(id))
             return false;
-        }
 
-        //For Button - only operation object is required
-        QHash<QString, QSharedPointer<OnvifCameraSettingOperationAbstract> >::ConstIterator opIt =
-            OnvifCameraSettingOperationAbstract::operations.find(id);
-
-        if (opIt == OnvifCameraSettingOperationAbstract::operations.end()) {
+        QnCameraAdvancedParameter parameter = m_advancedParameters.getParameterById(id);
+        if (!parameter.isValid())
             return false;
-        }
 
-        return opIt.value()->set(tmp, *m_onvifAdditionalSettings);
+        result = setAdvancedParameterUnderLock(parameter, value);
+        if (result)
+            m_advancedParamsCache[id] = value;
     }
-
-    CameraSettingValue oldVal = it.value().getCurrent();
-    it.value().setCurrent(tmp.getCurrent());
-
-
-    if (!it.value().setToCamera(*m_onvifAdditionalSettings)) {
-        it.value().setCurrent(oldVal);
-        return false;
-    }
-
-    return true;
+    if (result)
+        emit advancedParameterChanged(id, value);
+    return result;
 }
 
 bool QnPlOnvifResource::loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const {
     QFile paramsTemplateFile(lit(":/camera_advanced_params/onvif.xml"));
+#ifdef _DEBUG
+    QnCameraAdvacedParamsXmlParser::validateXml(&paramsTemplateFile);
+#endif
     return QnCameraAdvacedParamsXmlParser::readXml(&paramsTemplateFile, params);
 }
 
@@ -2370,6 +2369,7 @@ QSet<QString> QnPlOnvifResource::calculateSupportedAdvancedParameters() const {
 }
 
 void QnPlOnvifResource::fetchAndSetAdvancedParameters() {
+    QMutexLocker lock(&m_physicalParamsMutex);
     m_advancedParameters.clear();
 
     QnCameraAdvancedParams params;
@@ -2380,8 +2380,7 @@ void QnPlOnvifResource::fetchAndSetAdvancedParameters() {
 
     QSet<QString> supportedParams = calculateSupportedAdvancedParameters();
     m_advancedParameters = params.filtered(supportedParams);
-    QString serialized = QString::fromUtf8(QJson::serialized(m_advancedParameters));
-    setProperty(Qn::CAMERA_ADVANCED_PARAMETERS, serialized);
+    QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), m_advancedParameters);
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncoder& encoder)
