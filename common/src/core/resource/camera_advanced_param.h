@@ -34,25 +34,28 @@ struct QnCameraAdvancedParameter {
     enum class DataType {
         None,
         Bool,
-        MinMaxStep,
+        Number,
         Enumeration,
         Button,
         String
     };
 
-	QString getId() const;
+
 	bool isValid() const;
 
     QString name;
     QString description;
-    QString query;
+    QString id;
     DataType dataType;
-    QString min;
-    QString max;
     QString tag;
+    QString range;
     bool readOnly;
 
     QnCameraAdvancedParameter();
+
+    QStringList getRange() const;
+    void setRange(int min, int max);
+    void setRange(double min, double max);
 
 	static QString dataTypeToString(DataType value);
 	static DataType stringToDataType(const QString &value);
@@ -67,8 +70,11 @@ struct QnCameraAdvancedParamGroup {
     std::vector<QnCameraAdvancedParamGroup> groups;
     std::vector<QnCameraAdvancedParameter> params;
 
+    bool isEmpty() const;
     QSet<QString> allParameterIds() const;
     QnCameraAdvancedParameter getParameterById(const QString &id) const;
+    bool updateParameter(const QnCameraAdvancedParameter &parameter);
+    QnCameraAdvancedParamGroup filtered(const QSet<QString> &allowedIds) const;
 };
 #define QnCameraAdvancedParamGroup_Fields (name)(description)(groups)(params)
 
@@ -80,6 +86,10 @@ struct QnCameraAdvancedParams {
 
     QSet<QString> allParameterIds() const;
     QnCameraAdvancedParameter getParameterById(const QString &id) const;
+    bool updateParameter(const QnCameraAdvancedParameter &parameter);
+
+    void clear();
+    QnCameraAdvancedParams filtered(const QSet<QString> &allowedIds) const;
 };
 #define QnCameraAdvancedParams_Fields (name)(version)(unique_id)(groups)
 

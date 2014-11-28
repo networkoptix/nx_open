@@ -17,11 +17,11 @@ class DWCameraProxy
 public:
     DWCameraProxy(const QString& host, int port, unsigned int timeout, const QAuthenticator& auth);
 
-    QnCameraAdvancedParamValueList getParamsList();
+    QnCameraAdvancedParamValueList getParamsList() const;
     bool setParam(const QString &id, const QString &value, const QString &method);
 private:
-    QnCameraAdvancedParamValueList fetchParamsFromHttpResponse(const QByteArray& body);
-    QnCameraAdvancedParamValueList requestParamValues(const QString &request);
+    QnCameraAdvancedParamValueList fetchParamsFromHttpResponse(const QByteArray& body) const;
+    QnCameraAdvancedParamValueList requestParamValues(const QString &request) const;
 private:
     QnCameraAdvancedParamValueMap m_valuesCache;
     QnCameraAdvancedParams m_params;

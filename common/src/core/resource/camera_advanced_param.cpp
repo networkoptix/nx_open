@@ -91,13 +91,13 @@ QnCameraAdvancedParameter::QnCameraAdvancedParameter():
 
 }
 
-QString QnCameraAdvancedParameter::getId() const {
+QString QnCameraAdvancedParameter::id const {
 	return query;
 }
 
 bool QnCameraAdvancedParameter::isValid() const {
 	return (dataType != DataType::None) 
-        && (!getId().isEmpty());
+        && (!id.isEmpty());
 }
 
 QString QnCameraAdvancedParameter::dataTypeToString(DataType value) {
@@ -144,10 +144,21 @@ bool QnCameraAdvancedParameter::dataTypeHasValue(DataType value) {
 	return false;
 }
 
-QnCameraAdvancedParameter QnCameraAdvancedParamGroup::getParameterById(const QString &id) const {
+QStringList QnCameraAdvancedParameter::getRange() const {
+    return range.split(L',', QString::SkipEmptyParts);
+}
 
+void QnCameraAdvancedParameter::setRange(int min, int max) {
+    range = lit("%1,%2").arg(min).arg(max);
+}
+
+void QnCameraAdvancedParameter::setRange(double min, double max) {
+    range = lit("%1,%2").arg(min).arg(max);
+}
+
+QnCameraAdvancedParameter QnCameraAdvancedParamGroup::getParameterById(const QString &id) const {
     for (const QnCameraAdvancedParameter &param: params)
-        if (param.getId() == id)
+        if (param.id == id)
             return param;
 
     QnCameraAdvancedParameter result;
@@ -164,9 +175,41 @@ QSet<QString> QnCameraAdvancedParamGroup::allParameterIds() const {
     for (const QnCameraAdvancedParamGroup &subGroup: groups)
         result.unite(subGroup.allParameterIds());
     for (const QnCameraAdvancedParameter &param: params)
-        if (!param.getId().isEmpty())
-            result.insert(param.getId());
+        if (!param.id.isEmpty())
+            result.insert(param.id);
     return result;
+}
+
+bool QnCameraAdvancedParamGroup::updateParameter(const QnCameraAdvancedParameter &parameter) {
+    for (QnCameraAdvancedParameter &param: params) {
+        if (param.id == parameter.id) {
+            param = parameter;
+            return true;
+        }
+    }
+    for (const QnCameraAdvancedParamGroup &group: groups) {
+        if (group.updateParameter(parameter))
+            return true;
+    }
+    return false;
+}
+
+QnCameraAdvancedParamGroup QnCameraAdvancedParamGroup::filtered(const QSet<QString> &allowedIds) const {
+    QnCameraAdvancedParamGroup result;
+    for (const QnCameraAdvancedParamGroup &subGroup: groups) {
+        QnCameraAdvancedParamGroup group = subGroup.filtered(allowedIds);
+        if (!group.isEmpty())
+            result.groups.push_back(group);
+    }
+    for (const QnCameraAdvancedParameter &param: params) {
+        if (param.isValid() && allowedIds.contains(param.id))
+            result.params.push_back(param);
+    }
+    return result;
+}
+
+bool QnCameraAdvancedParamGroup::isEmpty() const {
+    return params.empty() && groups.empty();
 }
 
 QnCameraAdvancedParameter QnCameraAdvancedParams::getParameterById(const QString &id) const {
@@ -184,6 +227,31 @@ QSet<QString> QnCameraAdvancedParams::allParameterIds() const {
     for (const QnCameraAdvancedParamGroup &group: groups)
         result.unite(group.allParameterIds());
     return result;
+}
+
+bool QnCameraAdvancedParams::updateParameter(const QnCameraAdvancedParameter &parameter) {
+    for (const QnCameraAdvancedParamGroup &group: groups) {
+        if (group.updateParameter(parameter))
+            return true;
+    }
+    return false;
+}
+
+void QnCameraAdvancedParams::clear() {
+    groups.clear();
+}
+
+QnCameraAdvancedParams QnCameraAdvancedParams::filtered(const QSet<QString> &allowedIds) const {
+    QnCameraAdvancedParams result;
+    result.name = this->name;
+    result.unique_id = this->unique_id;
+    result.version = this->version;
+    for (const QnCameraAdvancedParamGroup &subGroup: groups) {
+        QnCameraAdvancedParamGroup group = subGroup.filtered(allowedIds);
+        if (!group.isEmpty())
+            result.groups.push_back(group);
+    }
+    return result
 }
 
 QnCameraAdvancedParamsReader::QnCameraAdvancedParamsReader() {
@@ -227,14 +295,6 @@ QnCameraAdvancedParams QnCameraAdvancedParamsReader::params(const QnResourcePtr 
         m_paramsByCameraType[cameraType] = result;
     }
 	return result;
-}
-
-QString QnCameraAdvancedParamsReader::calculateCameraType(const QnResourcePtr &resource) const {
-	return resource->getProperty(Qn::CAMERA_ADVANCED_PARAMS_TYPENAME);
-}
-
-QSet<QString> QnCameraAdvancedParamsReader::allowedParams(const QnResourcePtr &resource) {
-    return resource->getProperty(Qn::CAMERA_ADVANCED_PARAMS_SUPPORTED).split(L',', QString::SkipEmptyParts).toSet();
 }
 
 bool QnCameraAdvacedParamsXmlParser::validateXml(QIODevice *xmlSource) {

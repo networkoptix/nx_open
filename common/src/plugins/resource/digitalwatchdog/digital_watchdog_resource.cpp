@@ -138,21 +138,30 @@ QnAbstractPtzController *QnDigitalWatchdogResource::createPtzControllerInternal(
     return result.take();
 }
 
-void QnDigitalWatchdogResource::fetchAndSetImagingOptions() {
-    QString cameraModel = fetchCameraModel();
-    m_hasZoom = modelHasZoom(cameraModel);
-
-    QMutexLocker lock(&m_physicalParamsMutex);
-    m_cameraProxy.reset(new DWCameraProxy(getHostAddress(), 80, getNetworkTimeout(), getAuth()));
-    loadPhysicalParams();
-
-    setProperty(Qn::CAMERA_ADVANCED_PARAMS_TYPENAME, lit("DIGITALWATCHDOG"));
-    setProperty(Qn::CAMERA_ADVANCED_PARAMS_SUPPORTED, QStringList(m_advancedParamsCache.keys()).join(L','));
-    m_advancedParameters = QnCameraAdvancedParamsReader().params(this->toSharedPointer());
+bool QnDigitalWatchdogResource::loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const {
+    QFile paramsTemplateFile(lit(":/camera_advanced_params/dw.xml"));
+    return QnCameraAdvacedParamsXmlParser::readXml(&paramsTemplateFile, params);
 }
 
-QString QnDigitalWatchdogResource::fetchCameraModel()
-{
+void QnDigitalWatchdogResource::initAdvancedParametersProviders(QnCameraAdvancedParams &params) {
+    base_type::initAdvancedParametersProviders(params);
+    m_cameraProxy.reset(new DWCameraProxy(getHostAddress(), 80, getNetworkTimeout(), getAuth()));
+}
+
+QSet<QString> QnDigitalWatchdogResource::calculateSupportedAdvancedParameters() const {
+    QSet<QString> result = base_type::calculateSupportedAdvancedParameters();
+    for (const QnCameraAdvancedParamValue& value: m_cameraProxy->getParamsList())
+        result.insert(value.id);
+    return result;
+}
+
+void QnDigitalWatchdogResource::fetchAndSetAdvancedParameters() {
+    base_type::fetchAndSetAdvancedParameters();
+    QString cameraModel = fetchCameraModel();
+    m_hasZoom = modelHasZoom(cameraModel);
+}
+
+QString QnDigitalWatchdogResource::fetchCameraModel() {
     QAuthenticator auth(getAuth());
     //TODO: #vasilenko UTF unuse StdString
     DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user(), auth.password(), getTimeDrift());
@@ -174,28 +183,10 @@ QString QnDigitalWatchdogResource::fetchCameraModel()
 }
 
 
-bool QnDigitalWatchdogResource::loadPhysicalParams() {
+bool QnDigitalWatchdogResource::loadImagingParams(QnCameraAdvancedParamValueMap &values) {
     if (!m_cameraProxy)
         return false;
-    m_advancedParamsCache.clear();
-    m_advancedParamsCache.appendValueList(m_cameraProxy->getParamsList());
-    return true;
-}
-
-bool QnDigitalWatchdogResource::getParamPhysical(const QString &id, QString &value) {
-    QMutexLocker lock(&m_physicalParamsMutex);
-
-    //Caching camera values during ADVANCED_SETTINGS_VALID_TIME to avoid multiple excessive 'get' requests 
-    //to camera. All values can be get by one request, but our framework do getParamPhysical for every single param.
-    QDateTime curTime = QDateTime::currentDateTime();
-    if (m_advSettingsLastUpdated.isNull() || m_advSettingsLastUpdated.secsTo(curTime) > ADVANCED_SETTINGS_VALID_TIME) {
-        if (loadPhysicalParams())
-            m_advSettingsLastUpdated = curTime;
-    }
-
-    if (!m_advancedParamsCache.contains(id))
-        return false;
-    value = m_advancedParamsCache[id];
+    values.appendValueList(m_cameraProxy->getParamsList());
     return true;
 }
 

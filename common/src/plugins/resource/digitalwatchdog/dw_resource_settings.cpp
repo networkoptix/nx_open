@@ -19,7 +19,7 @@ DWCameraProxy::DWCameraProxy(const QString& host, int port, unsigned int timeout
     m_auth(auth)
 {}
 
-QnCameraAdvancedParamValueList DWCameraProxy::fetchParamsFromHttpResponse(const QByteArray& body) {
+QnCameraAdvancedParamValueList DWCameraProxy::fetchParamsFromHttpResponse(const QByteArray& body) const {
     QnCameraAdvancedParamValueList result;
 
     //Fetching params sent in JSON format
@@ -64,7 +64,7 @@ bool DWCameraProxy::setParam(const QString &id, const QString &value, const QStr
 }
 
 
-QnCameraAdvancedParamValueList DWCameraProxy::requestParamValues(const QString &request) {
+QnCameraAdvancedParamValueList DWCameraProxy::requestParamValues(const QString &request) const {
     CLSimpleHTTPClient httpClient(m_host, m_port, m_timeout, m_auth);
     CLHttpStatus status = httpClient.doGET(request);
     if (status == CL_HTTP_SUCCESS) 
@@ -77,7 +77,7 @@ QnCameraAdvancedParamValueList DWCameraProxy::requestParamValues(const QString &
     return QnCameraAdvancedParamValueList();
 }
 
-QnCameraAdvancedParamValueList DWCameraProxy::getParamsList() {
+QnCameraAdvancedParamValueList DWCameraProxy::getParamsList() const {
     QnCameraAdvancedParamValueList result;
     result.append(requestParamValues(lit("cgi-bin/getconfig.cgi?action=color")));
     result.append(requestParamValues(lit("cgi-bin/getconfig.cgi?action=ftpUpgradeInfo")));  

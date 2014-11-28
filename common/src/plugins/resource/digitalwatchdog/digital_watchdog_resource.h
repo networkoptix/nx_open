@@ -6,7 +6,6 @@
 #include <core/datapacket/media_data_packet.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/security_cam_resource.h>
-#include <core/resource/camera_advanced_param.h>
 
 #include <plugins/resource/onvif/onvif_resource.h>
 
@@ -31,17 +30,18 @@ public:
 
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
 
-    virtual bool getParamPhysical(const QString &id, QString &value) override;
     virtual bool setParamPhysical(const QString &id, const QString &value) override;
 signals:
     void physicalParamChanged(const QString& name, const QString& value);
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
-    virtual void fetchAndSetImagingOptions() override;
+    virtual bool loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const override;
+    virtual void initAdvancedParametersProviders(QnCameraAdvancedParams &params) override;
+    virtual QSet<QString> calculateSupportedAdvancedParameters() const override;
+    virtual void fetchAndSetAdvancedParameters() override;
 
+    virtual bool loadImagingParams(QnCameraAdvancedParamValueMap &values) override;
 private:
-    bool loadPhysicalParams();
-
     bool isDualStreamingEnabled(bool& unauth);
     void enableOnvifSecondStream();
     QString fetchCameraModel();
@@ -49,8 +49,7 @@ private:
 private:
     bool m_hasZoom;
     QScopedPointer<DWCameraProxy> m_cameraProxy;
-    QnCameraAdvancedParamValueMap m_advancedParamsCache;
-    QnCameraAdvancedParams m_advancedParameters;
+
 };
 
 #endif //ENABLE_ONVIF

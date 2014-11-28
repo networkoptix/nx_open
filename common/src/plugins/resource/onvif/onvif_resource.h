@@ -16,8 +16,10 @@
 #include <QtCore/QWaitCondition>
 #include <QtXml/QXmlDefaultHandler>
 
-#include "core/resource/security_cam_resource.h"
-#include "core/resource/camera_resource.h"
+#include <core/resource/security_cam_resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/camera_advanced_param.h>
+
 #include "utils/network/simple_http_client.h"
 #include "core/datapacket/media_data_packet.h"
 #include "soap_wrapper.h"
@@ -40,7 +42,8 @@ class VideoOptionsLocal;
 //first = width, second = height
 
 class QDomElement;
-class OnvifCameraSettingsResp;
+class QnOnvifImagingProxy;
+class QnOnvifMaintenanceProxy;
 
 template<typename SyncWrapper, typename Request, typename Response>
 class GSoapAsyncCallWrapper;
@@ -250,7 +253,11 @@ protected:
     virtual bool getParamPhysical(const QString &id, QString &value) override;
     virtual bool setParamPhysical(const QString &id, const QString& value) override;
 
-    virtual void fetchAndSetImagingOptions();
+    virtual bool loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const;
+    virtual void initAdvancedParametersProviders(QnCameraAdvancedParams &params);
+    virtual QSet<QString> calculateSupportedAdvancedParameters() const;
+    virtual void fetchAndSetAdvancedParameters();
+    virtual bool loadImagingParams(QnCameraAdvancedParamValueMap &values);
 
 private:
     void setMaxFps(int f);
@@ -286,16 +293,12 @@ private:
 
     QRect getVideoSourceMaxSize(const QString& configToken);
 
-    bool isH264Allowed() const; // block H264 if need for compatble with some onvif devices
+    bool isH264Allowed() const; // block H264 if need for compatible with some onvif devices
     CameraDiagnostics::Result updateVEncoderUsage(QList<VideoOptionsLocal>& optionsList);
 protected:
     std::auto_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
     QList<QSize> m_resolutionList; //Sorted desc
     QList<QSize> m_secondaryResolutionList;
-    std::unique_ptr<OnvifCameraSettingsResp> m_onvifAdditionalSettings;
-
-    mutable QMutex m_physicalParamsMutex;
-    QDateTime m_advSettingsLastUpdated;
 
     virtual bool startInputPortMonitoring() override;
     virtual void stopInputPortMonitoring() override;
@@ -489,6 +492,13 @@ private:
         unsigned int autoResetTimeoutMS );
     CameraDiagnostics::Result fetchAndSetDeviceInformationPriv( bool performSimpleCheck );
     QnAbstractPtzController* createSpecialPtzController();
+
+    mutable QMutex m_physicalParamsMutex;
+    std::unique_ptr<QnOnvifImagingProxy> m_imagingParamsProxy;
+    std::unique_ptr<QnOnvifMaintenanceProxy> m_maintenanceProxy;
+    QDateTime m_advSettingsLastUpdated;
+    QnCameraAdvancedParamValueMap m_advancedParamsCache;
+    QnCameraAdvancedParams m_advancedParameters;
 };
 
 #endif //ENABLE_ONVIF

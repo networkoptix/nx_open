@@ -1,152 +1,146 @@
-<plugin 
-	name = "ONVIF"
-	version = "1"
-	unique_id = "53148996-d4d8-4e90-985e-24c6c63c5150">
+ï»¿<?xml version="1.0"?>
+<plugin name="ONVIF" version="1" unique_id="53148996-d4d8-4e90-985e-24c6c63c5150">
+	<group name="Imaging">
 
-	<group name = "Imaging"
-		   description ="">
+		<group name="Backlight Compensation">
+			<param id="ibcMode" 
+					dataType="Enumeration" 
+					range="Off,On"
+					name="Mode"
+					description="Enable or disable backlight compensation on the device."/>
+			<param id="ibcLevel" 
+					dataType="Number" 
+					name="Level"
+					description="Level of BLC."/>
+		</group>
 
-	   <param
-		   id = "Imaging_Brightness"	   
-		   name = "Brightness"	   
-		   description = "Image brightness."
-		   dataType = "Number"
-		   min = "0"
-		   max = "100"
-	   />
+		<group name="Exposure">
+			<param id="ieMode"
+					dataType="Enumeration" 
+					range="Auto,Manual"
+					name="Mode"
+					description="Exposure Mode. Enable or disable the exposure algorithm on the device."/>
+			<param id="iePriority"
+					dataType="Enumeration"
+					range="LowNoise,FrameRate"
+					name="Priority" 
+					description="The exposure priority mode."/>
+			<param id="ieMinETime"
+					dataType="Number"
+					name="Min Exposure Time"
+					description="Minimum value of exposure time range allowed to be used by the algorithm."/>
+			<param id="ieMaxETime"
+					dataType="Number"
+					name="Max Exposure Time"
+					description="Maximum value of exposure time range allowed to be used by the algorithm."/>
+			<param id = "ieETime"
+					dataType="Number" 
+					name="Exposure Time"
+					description="The fixed exposure time used by the image sensor (?s)."/>					
+			<param id = "ieMinGain"
+					dataType="Number" 
+					name="Min Gain" 
+					description="Minimum value of the sensor gain range that is allowed to be used by the algorithm."/>
+			<param id = "ieMaxGain"
+					dataType="Number" 
+					name="Max Gain" 
+					description="Maximum value of the sensor gain range that is allowed to be used by the algorithm."/>
+			<param id = "ieGain"
+					dataType="Number"
+					name="Gain" 
+					description="The fixed gain used by the image sensor (dB)."/>					
+			<param id = "ieMinIris"
+					dataType="Number" 
+					name="Min Iris"
+					description="Minimum value of the iris range allowed to be used by the algorithm."/>
+			<param id = "ieMaxIris"
+					dataType="Number"
+					name="Max Iris" 
+					description="Maximum value of the iris range allowed to be used by the algorithm."/>
+			<param id = "ieIris"
+					dataType="Number" 
+					name="Iris"
+					description="The fixed attenuation of input light affected by the iris (dB). 0dB maps to a fully opened iris."/>
+		</group>
 
-	  <param name = "Color Saturation"
-			   description = "Color saturation of the image."
-			   dataType = "Number"
-			   query = ""/>
+		<group name="Focus">
+			<param id = "ifAuto"
+					dataType = "Enumeration"
+					range = "Auto,Manual"
+					name = "Auto Focus"
+					description = "Mode of Auto Focus"/>
+			<param id = "ifSpeed"
+					dataType="Number" 
+					name="Default Speed"/>
+			<param id = "ifNear"
+					dataType="Number" 
+					name="Near Limit"/>
+			<param id = "ifFar"
+					dataType="Number" 
+					name="Far Limit"/>
+		</group>
 
-	  <param name = "Contrast"
-			   description = "Contrast of the image."
-			   dataType = "Number"
-			   query = ""/>
+		<group name="Wide Dynamic Range">
+			<param id = "iwdrMode"
+					dataType="Enumeration"
+					range="Off,On"
+					name="Mode" 
+					description="Wide dynamic range mode." />
+			<param id = "iwdrLevel"
+					dataType="Number"
+					name="Level" 
+					description="Level of wide dynamic range." />
+		</group>
 
-	  <param name = "Ir Cut Filter Mode"
-			   description = "Infrared Cutoff Filter settings."
-			   dataType = "Enumeration"
-			   min = "ON,OFF,AUTO"
-			   max = "ON,OFF,AUTO"
-			   query = ""/>
+		<group name="White Balance">
+			<param id = "iwbMode"
+					dataType="Enumeration"
+					range = "Auto,Manual"
+					name="Mode" 
+					description="White Balance."/>
+			<param id = "iwbYrGain"
+					dataType="Number"
+					name="Yr Gain"/>
+			<param id = "iwbYbGain"
+					dataType="Number"
+					name="Yb Gain"/>
+		</group>
 
-	  <param name = "Sharpness"
-			   description = "Sharpness of the Video image."
-			   dataType = "Number"
-			   query = ""/>
-
-	  <group name = "Backlight Compensation"
-			 description ="">
-		<param name = "Mode"
-			   description = "Enabled/disabled BLC mode (on/off)."
-			   dataType = "Bool"
-			   query = ""/>
-		<param name = "Level"
-			   description = "Level of BLC."
-			   dataType = "Number"
-			   query = ""/>
-	  </group>
-
-	  <group name = "Wide Dynamic Range"
-			 description ="">
-		<param name = "Mode"
-			   description = "Wide dynamic range mode (on/off)."
-			   dataType = "Bool"
-			   query = ""/>
-		<param name = "Level"
-			   description = "Level of wide dynamic range."
-			   dataType = "Number"
-			   query = ""/>
-	  </group>
-
-	  <group name = "White Balance"
-			 description ="">
-		<param name = "Mode"
-			   description = "White Balance (auto/manual)."
-			   dataType = "Enumeration"
-			   values = "Auto,Manual"
-			   setup="index"
-			   query = ""/>
-		<param name = "Yr Gain"
-			   description = "Rgain."
-			   dataType = "Number"
-			   query = ""/>
-		<param name = "Yb Gain"
-			   description = "Bgain."
-			   dataType = "Number"
-			   query = ""/>
-	  </group>
-
-	  <group name = "Exposure"
-			 description ="">
-		<param name = "Mode"
-			   description = "Exposure Mode. Auto – Enabled the exposure algorithm on the device. Manual – Disabled exposure algorithm on the device."
-			   dataType = "Enumeration"
-			   min = "AUTO,MANUAL"
-			   max = "AUTO,MANUAL"
-			   query = ""/>
-		<param name = "Priority"
-			   description = "The exposure priority mode (low noise/framerate)."
-			   dataType = "Enumeration"
-			   min = "LowNoise,FrameRate"
-			   max = "LowNoise,FrameRate"
-			   query = ""/>
-		<param name = "Min Exposure Time"
-			   description = "Minimum value of exposure time range allowed to be used by the algorithm."
-			   dataType = "Number"
-			   query = ""/>
-		<param name = "Max Exposure Time"
-			   description = "Maximum value of exposure time range allowed to be used by the algorithm."
-			   dataType = "Number"
-			   query = ""/>
-		<param name = "Min Gain"
-			   description = "Minimum value of the sensor gain range that is allowed to be used by the algorithm."
-			   dataType = "Number"
-			   query = ""/>
-		<param name = "Max Gain"
-			   description = "Maximum value of the sensor gain range that is allowed to be used by the algorithm."
-			   dataType = "Number"
-			   query = ""/>
-		<param name = "Min Iris"
-			   description = "Minimum value of the iris range allowed to be used by the algorithm."
-			   dataType = "Number"
-			   query = ""/>
-		<param name = "Max Iris"
-			   description = "Maximum value of the iris range allowed to be used by the algorithm."
-			   dataType = "Number"
-			   query = ""/>
-		<param name = "Exposure Time"
-			   description = "The fixed exposure time used by the image sensor (?s)."
-			   dataType = "Number"
-			   query = ""/>
-		<param name = "Gain"
-			   description = "The fixed gain used by the image sensor (dB)."
-			   dataType = "Number"
-			   query = ""/>
-		<param name = "Iris"
-			   description = "The fixed attenuation of input light affected by the iris (dB). 0dB maps to a fully opened iris."
-			   dataType = "Number"
-			   query = ""/>
-	  </group>
-
+		<param id="iBri" 
+				dataType="Number" 
+				name="Brightness" 
+				description="Image brightness."/>
+		<param id="iCS" 
+				dataType="Number" 
+				name="Color Saturation" 
+				description="Color saturation of the image."/>
+		<param id="iCon" 
+				dataType="Number" 
+				name="Contrast" 
+				description="Contrast of the image."/>
+		<param id = "iIrCut"
+				dataType="Enumeration"
+				range = "On, Off, Auto"
+				name="Ir Cut Filter Mode"
+				description="Infrared Cutoff Filter settings."/>
+		<param id = "iSha"
+				dataType="Number"
+				name="Sharpness" 
+				description="Sharpness of the Video image." />
 	</group>
 
-	<group name = "Maintenance"
-		 description ="">
-	  <param name = "System Reboot"
-			 description = "This operation reboots the device."
-			 dataType = "Button"
-			 query = ""/>
-	  <param name = "Soft System Factory Default"
-			 description = "This operation reloads all parameters on the device to their factory default values, except basic network settings like IP address, subnet and gateway or DHCP settings."
-			 dataType = "Button"
-			 query = ""/>
-	  <param name = "Hard System Factory Default"
-			 description = "This operation reloads all parameters on the device to their factory default values."
-			 dataType = "Button"
-			 query = ""/>
+	<group name="Maintenance">
+		<param id = "mReboot"
+				dataType="Button"
+				name="System Reboot" 
+				description="This operation reboots the device."/>
+		<param id = "mSoftReset"
+				dataType="Button"
+				name="Soft Factory Reset" 
+				description="This operation reloads all parameters on the device to their factory default values, except basic network settings like IP address, subnet and gateway or DHCP settings."/>
+		<param id="mHardReset"
+				dataType="Button"
+				name="Hard Factory Reset" 
+				description="This operation reloads all parameters on the device to their factory default values." />
 	</group>
-
-  </plugin>
+</plugin>

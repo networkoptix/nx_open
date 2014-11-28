@@ -9,16 +9,16 @@
 
 #include <core/resource/camera_advanced_param.h>
 
-class OnvifCameraSettingOperationAbstract;
+class QnAbstractOnvifImagingOperation;
 
 //
-// OnvifCameraSettingsResp
+// QnOnvifImagingProxy
 //
-class OnvifCameraSettingsResp {
+class QnOnvifImagingProxy {
 public:
-    OnvifCameraSettingsResp(const std::string& imagingUrl, const QString &login,
+    QnOnvifImagingProxy(const std::string& imagingUrl, const QString &login,
         const QString &passwd, const std::string& videoSrcToken, int _timeDrift);
-    ~OnvifCameraSettingsResp();
+    ~QnOnvifImagingProxy();
 
     bool makeSetRequest();
     QString getImagingUrl() const;
@@ -27,10 +27,12 @@ public:
     int getTimeDrift() const;
 
     void initParameters(QnCameraAdvancedParams &parameters);
+    QSet<QString> supportedParameters() const;
 
+    CameraDiagnostics::Result loadValues(QnCameraAdvancedParamValueMap &values);
 private:
     CameraDiagnostics::Result loadRanges();
-    CameraDiagnostics::Result loadValues();
+    
 
 private:
     ImagingSoapWrapper* m_rangesSoapWrapper;
@@ -39,7 +41,7 @@ private:
     ImagingSettingsResp* m_values;
     const std::string m_videoSrcToken;
 
-    QHash<QString, QSharedPointer<OnvifCameraSettingOperationAbstract> > m_supportedOperations;
+    QHash<QString, QSharedPointer<QnAbstractOnvifImagingOperation> > m_supportedOperations;
 };
 
 #endif //ENABLE_ONVIF
