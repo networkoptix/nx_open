@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <mutex>
 #include <vector>
+#include <map>
 #include <memory>
 
 #include "rc_cmd.h"
@@ -44,7 +45,7 @@ namespace ite
             FREQ_CH15 = 473000
         } Frequency;
 
-        DeviceInfo(unsigned short rxID = 0, unsigned short txID = 0, bool active = false);
+        DeviceInfo(unsigned short rxID = 0, unsigned short txID = 0);
         ~DeviceInfo();
 
         RCHostInfo * xPtr() { return &info_; }
@@ -371,23 +372,27 @@ namespace ite
 
         bool sendGetIDs(int iWaitTime = DeviceInfo::SEND_WAIT_TIME_MS * 2);
 
-        bool addDevice(unsigned short rxID, unsigned short txID, bool rcActive);
+        void addDevice(unsigned short rxID, unsigned short txID, bool rcActive);
         Error processCommand(Command& cmd);
         Error lastError() const { return lastError_; }
 
         DebugInfo& debugInfo() { return debugInfo_; }
 
-        void updateDevsParams();
         void getDevIDs(std::vector<IDsLink>& outLinks);
-        DeviceInfoPtr device(const IDsLink& idl) const;
+        DeviceInfoPtr device(unsigned short rxID, unsigned short txID) const;
+
+        void updateDevParams(unsigned short rxID);
+        void updateTransmissionParams(unsigned short rxID);
 
         bool setChannel(unsigned short txID, unsigned channel);
         void setRxFrequency(unsigned short rxID, unsigned frequency);
+        unsigned lastTxFrequency(unsigned short txID) const;
 
     private:
         mutable std::mutex mutex_;
         std::vector<DeviceInfoPtr> devs_;
-        std::vector<unsigned> frequencies_;
+        std::vector<unsigned> frequencies_;                     // RxID as index
+        std::map<unsigned short, unsigned short> lastRx4Tx_;    // {TxID, RxID}
         pthread_t rcvThread_;
         Error lastError_;
         bool bIsRun_;

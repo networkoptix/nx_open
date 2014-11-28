@@ -88,7 +88,7 @@ void * RC_Shell_RecvThread(void * data)
             debugInfo.totalPKTCount++;
 
             unsigned short curCommand = cmdCurrent.commandID();
-#if 1 // DEBUG
+#if 0 // DEBUG
             printf("RC cmd: %x; TxID: %d; RxID: %d\n", curCommand, cmdCurrent.txDeviceID(), cmdCurrent.rxDeviceID());
 #endif
             unsigned short rxID = cmdCurrent.rxDeviceID();
@@ -134,10 +134,10 @@ void * RC_Shell_WaitTimeOut(void * data)
 
 // DeviceInfo
 
-DeviceInfo::DeviceInfo(unsigned short rxID, unsigned short txID, bool active)
+DeviceInfo::DeviceInfo(unsigned short rxID, unsigned short txID)
 :   waitingCmd_(CMD_GetTxDeviceAddressIDOutput),
     waitingResponse_(false),
-    isActive_(active)
+    isActive_(false)
 {
     //RC_Init_RCHeadInfo(&info_.device, rxID, txID, 0xFFFF);
     info_.device.clientTxDeviceID = txID;
@@ -459,33 +459,38 @@ bool RCShell::sendGetIDs(int iWaitTime)
     return false;
 }
 
-void RCShell::updateDevsParams()
+void RCShell::updateTransmissionParams(unsigned short rxID)
 {
+    std::lock_guard<std::mutex> lock(mutex_); // LOCK
+
+    for (size_t i = 0; i < devs_.size(); ++i)
     {
-        std::lock_guard<std::mutex> lock(mutex_); // LOCK
-
-        for (size_t i = 0; i < devs_.size(); ++i)
-            devs_[i]->getTransmissionParameters();
-    }
-
-    usleep(DeviceInfo::SEND_WAIT_TIME_MS * 1000);
-
-    {
-        std::lock_guard<std::mutex> lock(mutex_); // LOCK
-
-        for (size_t i = 0; i < devs_.size(); ++i)
+        if (devs_[i]->rxID() == rxID)
         {
-            devs_[i]->getDeviceInformation();
-#if 0
             devs_[i]->getTransmissionParameterCapabilities();
-            devs_[i]->getVideoSources();
-            devs_[i]->getVideoSourceConfigurations();
-            devs_[i]->getVideoEncoderConfigurations();
-#endif
+            devs_[i]->getTransmissionParameters();
         }
     }
+}
 
-    usleep(DeviceInfo::SEND_WAIT_TIME_MS * 1000);
+void RCShell::updateDevParams(unsigned short rxID)
+{
+    std::lock_guard<std::mutex> lock(mutex_); // LOCK
+
+    for (size_t i = 0; i < devs_.size(); ++i)
+    {
+        if (devs_[i]->rxID() != rxID)
+            continue;
+
+        devs_[i]->getTransmissionParameterCapabilities();
+        devs_[i]->getTransmissionParameters();
+        devs_[i]->getDeviceInformation();
+        devs_[i]->getVideoSources();
+        devs_[i]->getVideoSourceConfigurations();
+        devs_[i]->getVideoEncoderConfigurations();
+
+        // TODO
+    }
 }
 
 void RCShell::getDevIDs(std::vector<IDsLink>& outLinks)
@@ -507,54 +512,41 @@ void RCShell::getDevIDs(std::vector<IDsLink>& outLinks)
     }
 }
 
-bool RCShell::addDevice(unsigned short rxID, unsigned short txID, bool rcActive)
+void RCShell::addDevice(unsigned short rxID, unsigned short txID, bool rcActive)
 {
-    IDsLink idl;
-    idl.rxID = rxID;
-    idl.txID = txID;
+    DeviceInfoPtr dev = device(rxID, txID);
 
-    DeviceInfoPtr dev = device(idl);
-    if (dev)
+    std::lock_guard<std::mutex> lock(mutex_); // LOCK
+
+    if (! dev)
     {
-        // add active flag to created device
-        if (rcActive)
-            dev->setActive();
-#if 1
-        // change frequency for passive device
-        if (! dev->isActive())
-        {
-            std::lock_guard<std::mutex> lock(mutex_); // LOCK
-
-            if (rxID < frequencies_.size() && frequencies_[rxID])
-                dev->setFrequency(frequencies_[rxID]);
-        }
-#endif
+        dev = std::make_shared<DeviceInfo>(rxID, txID);
+        devs_.push_back(dev);
     }
-    else
+
+    // new and passive devices
+    if (! dev->isActive())
     {
-        std::lock_guard<std::mutex> lock(mutex_); // LOCK
-
-        dev = std::make_shared<DeviceInfo>(rxID, txID, rcActive);
-
-        // set frequency for new device
         if (rxID < frequencies_.size() && frequencies_[rxID])
             dev->setFrequency(frequencies_[rxID]);
-
-        devs_.push_back(dev);
-        return true;
     }
 
-    return false;
+    // new, passive + active devices if rcActive set
+    if (rcActive || ! dev->isActive())
+        lastRx4Tx_[txID] = rxID;
+
+    if (rcActive)
+        dev->setActive();
 }
 
 /// @note O(N)
-DeviceInfoPtr RCShell::device(const IDsLink& idl) const
+DeviceInfoPtr RCShell::device(unsigned short rxID, unsigned short txID) const
 {
     std::lock_guard<std::mutex> lock(mutex_); // LOCK
 
     for (unsigned i = 0; i < devs_.size(); ++i)
     {
-        if ((devs_[i]->txID() == idl.txID) && (devs_[i]->rxID() == idl.rxID))
+        if ((devs_[i]->txID() == txID) && (devs_[i]->rxID() == rxID))
             return devs_[i];
     }
 
@@ -582,6 +574,27 @@ void RCShell::setRxFrequency(unsigned short rxID, unsigned freq)
         frequencies_.resize(rxID+1);
 
     frequencies_[rxID] = freq;
+}
+
+unsigned RCShell::lastTxFrequency(unsigned short txID) const
+{
+    unsigned rxID;
+
+    {
+        std::lock_guard<std::mutex> lock(mutex_); // LOCK
+
+        auto it = lastRx4Tx_.find(txID);
+        if (it == lastRx4Tx_.end())
+            return 0;
+
+        rxID = it->second;
+    }
+
+    DeviceInfoPtr dev = device(rxID, txID);
+    if (dev)
+        return dev->frequency();
+
+    return 0;
 }
 
 //

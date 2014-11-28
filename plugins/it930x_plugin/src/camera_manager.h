@@ -11,20 +11,17 @@
 
 #include <plugins/camera_plugin.h>
 
-#include "it930x.h"
 #include "ref_counter.h"
+#include "rx_device.h"
 
 namespace ite
 {
-    class It930x;
-    class It930Stream;
     class MediaEncoder;
     class VideoPacket;
 
     struct LibAV;
     class DevReader;
     class ReadThread;
-    class CameraManager;
 
     typedef std::shared_ptr<VideoPacket> VideoPacketPtr;
 
@@ -35,8 +32,7 @@ namespace ite
         typedef std::deque<VideoPacketPtr> QueueT;
 
         VideoPacketQueue()
-        :
-            m_packetsLost( 0 ),
+        :   m_packetsLost( 0 ),
             m_isLowQ( false )
         {}
 
@@ -58,71 +54,6 @@ namespace ite
         unsigned m_packetsLost;
         bool m_isLowQ;
     };
-
-    //!
-    class RxDevice
-    {
-    public:
-        constexpr static const char * DEVICE_PATTERN = "usb-it930x";
-
-        RxDevice(unsigned id);
-
-        unsigned rxID() const { return m_id; }
-
-        It930x * device() { return m_device.get(); }
-        It930Stream * devStream() { return m_devStream.get(); }
-
-        bool open();
-        bool isOpen() const { return m_device.get(); }
-        void close()
-        {
-            m_devStream.reset();
-            m_device.reset();
-        }
-
-        bool lockF(CameraManager * cam, unsigned freq);
-        bool isLocked() const { return m_devStream.get(); }
-        void unlockF()
-        {
-            m_devStream.reset();
-            m_frequency = 0;
-            m_camera = nullptr;
-        }
-
-        void driverInfo(std::string& driverVersion, std::string& fwVersion, std::string& company, std::string& model) const;
-
-        std::mutex& mutex() { return m_mutex; }
-
-        unsigned frequency() const { return m_frequency; }
-        uint8_t strength() const { return m_strength; }
-        bool present() const { return m_present; }
-
-        static unsigned dev2id(const std::string& devName);
-        static unsigned str2id(const std::string& devName);
-        static unsigned str2id(const char * devName)
-        {
-            std::string name(devName);
-            return str2id(name);
-        }
-
-        static std::string id2str(unsigned id);
-
-        CameraManager * camera() { return m_camera; }
-
-    private:
-        unsigned m_id;
-        std::unique_ptr<It930x> m_device;
-        std::unique_ptr<It930Stream> m_devStream;
-        mutable std::mutex m_mutex;
-        CameraManager * m_camera;
-        unsigned m_frequency;
-        uint8_t m_strength;
-        bool m_present;
-
-        bool stats();
-    };
-
-    typedef std::shared_ptr<RxDevice> RxDevicePtr;
 
     //!
     class CameraManager : public nxcip::BaseCameraManager3
@@ -175,8 +106,6 @@ namespace ite
 
         unsigned short txID() const { return m_txID; }
 
-        unsigned frequency() const { return m_frequency; }
-        void setFrequency(unsigned freq) { m_frequency = freq; }
         void addRxDevice(RxDevicePtr dev);
 
         void openStream(unsigned encNo);
@@ -184,10 +113,9 @@ namespace ite
         bool stopStreams();
 
     private:
-        unsigned short m_txID;
-        unsigned m_frequency;
         mutable std::mutex m_encMutex;
         mutable std::mutex m_reloadMutex;
+        unsigned short m_txID;
         std::vector<std::shared_ptr<MediaEncoder>> m_encoders;
         std::vector<std::shared_ptr<VideoPacketQueue>> m_encQueues;
         std::set<unsigned> m_openedStreams;
@@ -198,7 +126,6 @@ namespace ite
         std::unique_ptr<LibAV> m_libAV;
         ReadThread * m_threadObject;
         std::thread m_readThread;
-        //std::atomic_bool m_hasThread;
         bool m_hasThread;
         bool m_loading;
 
