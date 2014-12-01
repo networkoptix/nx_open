@@ -45,12 +45,14 @@ angular.module('webadminApp')
                                 break;
                             case 'UNAUTHORIZED':
                             case 'password':
+                            case 'PASSWORD':
                                 errorToShow = 'Wrong password.';
                                 break;
                             case 'INCOMPATIBLE':
                                 errorToShow = 'Found system has incompatible version.';
                                 break;
                             case 'url':
+                            case 'URL':
                                 errorToShow = 'Wrong url.';
                                 break;
                         }
@@ -88,6 +90,7 @@ angular.module('webadminApp')
                 switch (errorToShow) {
                     case 'UNAUTHORIZED':
                     case 'password':
+                    case 'PASSWORD':
                         errorToShow = 'Wrong password.';
                 }
                 alert('Error: ' + errorToShow);
