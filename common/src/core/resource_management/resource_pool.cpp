@@ -78,7 +78,7 @@ void QnResourcePool::addResource(const QnResourcePtr &resource)
 
 void QnResourcePool::addResources(const QnResourceList &resources)
 {
-    m_resourcesMtx.lock();
+    QMutexLocker resourcesLock( &m_resourcesMtx );
 
     for (const QnResourcePtr &resource: resources)
     {
@@ -107,7 +107,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
             m_incompatibleResources.remove(resource->getId());
     }
 
-    m_resourcesMtx.unlock();
+    resourcesLock.unlock();
 
     QnResourceList layouts;
     QnResourceList otherResources;
@@ -180,7 +180,7 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
 {
     QnResourceList removedResources;
 
-    m_resourcesMtx.lock();
+    QMutexLocker lk(&m_resourcesMtx);
 
     for (const QnResourcePtr &resource: resources)
     {
@@ -252,7 +252,7 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
         TRACE("RESOURCE REMOVED" << resource->metaObject()->className() << resource->getName());
     }
 
-    m_resourcesMtx.unlock();
+    lk.unlock();
 
     /* Remove resources. */
     for (const QnResourcePtr &resource: removedResources) {
@@ -344,7 +344,7 @@ QnResourceList QnResourcePool::getAllCameras(const QnResourcePtr &mServer, bool 
 
 QnMediaServerResourceList QnResourcePool::getAllServers() const
 {
-    QMutexLocker lock(&m_cacheMutex);
+    QMutexLocker lock(&m_resourcesMtx); //m_resourcesMtx is recursive
     if (m_cachedServerList.isEmpty())
         m_cachedServerList = getResources<QnMediaServerResource>();
     return m_cachedServerList;
@@ -601,6 +601,5 @@ QnVideoWallMatrixIndexList QnResourcePool::getVideoWallMatricesByUuid(const QLis
 
 void QnResourcePool::invalidateCache()
 {
-    QMutexLocker lock(&m_cacheMutex);
     m_cachedServerList.clear();
 }
