@@ -3,7 +3,7 @@
 
 #include "utils/common/singleton.h"
 
-class QnResourceStatusDiscionary: public Singleton<QnResourceStatusDiscionary>
+class QnResourceStatusDictionary: public Singleton<QnResourceStatusDictionary>
 {
 public:
     Qn::ResourceStatus value(const QnUuid& resourceId) const;
@@ -15,6 +15,6 @@ private:
     mutable QMutex m_mutex;
 };
 
-#define qnStatusDictionary QnResourceStatusDiscionary::instance()
+#define qnStatusDictionary QnResourceStatusDictionary::instance()
 
 #endif // __STATUS_DICTIONARY_H
