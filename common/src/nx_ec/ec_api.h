@@ -666,6 +666,16 @@ namespace ec2
             return save( resource, std::static_pointer_cast<impl::AddUserHandler>(
                 std::make_shared<impl::CustomAddUserHandler<TargetType, HandlerType>>(target, handler)) );
         }
+
+        ErrorCode saveSync(const QnUserResourcePtr &userRes, QnUserResourceList * const users) {
+            return impl::doSyncCall<impl::AddUserHandler>(
+                [=](const impl::AddUserHandlerPtr &handler) {
+                    return this->save(userRes, handler);
+                },
+                users
+            );
+        }
+
         /*!
             \param handler Functor with params: (ErrorCode)
         */
@@ -999,6 +1009,14 @@ namespace ec2
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
+        ErrorCode changeSystemNameSync(const QString &systemName) {
+            return impl::doSyncCall<impl::SimpleHandler>(
+                [=](const impl::SimpleHandlerPtr &handler) {
+                    return this->changeSystemName(systemName, handler);
+                }
+            );
+        }
+
         template<class TargetType, class HandlerType> int markLicenseOverflow(bool value, qint64 time, TargetType *target, HandlerType handler) {
             return markLicenseOverflow(value, time, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
@@ -1035,6 +1053,8 @@ namespace ec2
         virtual ~AbstractECConnection() {}
 
         virtual QnConnectionInfo connectionInfo() const = 0;
+
+        virtual QString authInfo() const = 0;
         //!Calling this method starts notifications delivery by emitting corresponding signals of corresponding manager
         /*!
             \note Calling entity MUST connect to all interesting signals prior to calling this method so that received data is consistent

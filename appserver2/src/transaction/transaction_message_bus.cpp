@@ -275,7 +275,7 @@ void QnTransactionMessageBus::removeAlivePeer(const QnUuid& id, bool sendTran, b
         removeAlivePeer(p, true, true);
 }
 
-void QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, QnTransactionTransport* transport)
+bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, QnTransactionTransport* transport)
 {
     QnUuid gotFromPeer;
     if (transport)
@@ -285,7 +285,7 @@ void QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
     NX_LOG( lit("received peerAlive transaction %1 %2").arg(aliveData.peer.id.toString()).arg(aliveData.peer.peerType), cl_logDEBUG1);
 #endif
     if (aliveData.peer.id == m_localPeer.id)
-        return; // ignore himself
+        return false; // ignore himself
 
 #if 1
     if (!aliveData.isAlive && !gotFromPeer.isNull()) 
@@ -304,8 +304,8 @@ void QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
             tran.params = aliveData;
             tran.params.isAlive = true;
             Q_ASSERT(!aliveData.peer.instanceId.isNull());
-            sendTransaction(tran); // resend alive info for that peer
-            return; // ignore peer offline transaction
+            sendTransaction(tran); // resend broadcast alive info for that peer
+            return false; // ignore peer offline transaction
         }
     }
 #endif
@@ -363,13 +363,15 @@ void QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
         }
 
     }
+
+    return true;
 }
 
 void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader& ttHeader)
 {
     Q_ASSERT(tran.peerID != qnCommon->moduleGUID());
-
-    gotAliveData(tran.params, transport);
+    if (!gotAliveData(tran.params, transport))
+        return; // ignore offline alive tran and resend online tran instead
 
     QnTransaction<ApiPeerAliveData> modifiedTran(tran);
     Q_ASSERT(!modifiedTran.params.peer.instanceId.isNull());

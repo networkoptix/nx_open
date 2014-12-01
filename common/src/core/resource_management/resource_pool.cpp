@@ -37,6 +37,7 @@ QnResourcePool::~QnResourcePool()
     blockSignals(signalsBlocked);
 
     QMutexLocker locker(&m_resourcesMtx);
+    m_adminResource.clear();
     m_resources.clear();
 }
 
@@ -77,7 +78,7 @@ void QnResourcePool::addResource(const QnResourcePtr &resource)
 
 void QnResourcePool::addResources(const QnResourceList &resources)
 {
-    m_resourcesMtx.lock();
+    QMutexLocker resourcesLock( &m_resourcesMtx );
 
     for (const QnResourcePtr &resource: resources)
     {
@@ -106,7 +107,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
             m_incompatibleResources.remove(resource->getId());
     }
 
-    m_resourcesMtx.unlock();
+    resourcesLock.unlock();
 
     QnResourceList layouts;
     QnResourceList otherResources;
@@ -179,7 +180,7 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
 {
     QnResourceList removedResources;
 
-    m_resourcesMtx.lock();
+    QMutexLocker lk(&m_resourcesMtx);
 
     for (const QnResourcePtr &resource: resources)
     {
@@ -201,7 +202,11 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
         //    removedResources.append(resource);
         
         //have to remove by id, since uniqueId can be MAC and, as a result, not unique among friend and foreign resources
-        QHash<QnUuid, QnResourcePtr>::iterator resIter = m_resources.find(resource->getId());
+        QnUuid resId = resource->getId();
+        QHash<QnUuid, QnResourcePtr>::iterator resIter = m_resources.find(resId);
+        if (m_adminResource && resId == m_adminResource->getId())
+            m_adminResource.clear();
+
         if( resIter != m_resources.end() )
         {
             m_resources.erase( resIter );
@@ -247,7 +252,7 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
         TRACE("RESOURCE REMOVED" << resource->metaObject()->className() << resource->getName());
     }
 
-    m_resourcesMtx.unlock();
+    lk.unlock();
 
     /* Remove resources. */
     for (const QnResourcePtr &resource: removedResources) {
@@ -339,7 +344,7 @@ QnResourceList QnResourcePool::getAllCameras(const QnResourcePtr &mServer, bool 
 
 QnMediaServerResourceList QnResourcePool::getAllServers() const
 {
-    QMutexLocker lock(&m_cacheMutex);
+    QMutexLocker lock(&m_resourcesMtx); //m_resourcesMtx is recursive
     if (m_cachedServerList.isEmpty())
         m_cachedServerList = getResources<QnMediaServerResource>();
     return m_cachedServerList;
@@ -461,11 +466,16 @@ QnResourceList QnResourcePool::getResourcesWithTypeId(QnUuid id) const
 
 QnUserResourcePtr QnResourcePool::getAdministrator() const {
     QMutexLocker locker(&m_resourcesMtx);
+    if (m_adminResource)
+        return m_adminResource;
 
-    for(const QnResourcePtr &resource: m_resources) {
+    for(const QnResourcePtr &resource: m_resources) 
+    {
         QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-        if (user && user->isAdmin())
+        if (user && user->isAdmin()) {
+            m_adminResource = user;
             return user;
+        }
     }
     return QnUserResourcePtr();
 }
@@ -591,6 +601,5 @@ QnVideoWallMatrixIndexList QnResourcePool::getVideoWallMatricesByUuid(const QLis
 
 void QnResourcePool::invalidateCache()
 {
-    QMutexLocker lock(&m_cacheMutex);
     m_cachedServerList.clear();
 }

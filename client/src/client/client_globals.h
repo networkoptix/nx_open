@@ -247,7 +247,7 @@ namespace Qn {
         LightModeNoZoomWindows      = 0x0400,           /**< Disable zoom windows. */
 
         LightModeVideoWall          = LightModeNoSceneBackground | LightModeNoNotifications | LightModeNoShadows /*| LightModeNoAnimation*/,
-        LightModeFull               = 0xFFFFFFFF
+        LightModeFull               = 0x7FFFFFFF
 
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(LightModeFlag)

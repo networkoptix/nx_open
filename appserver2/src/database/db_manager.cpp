@@ -2841,6 +2841,34 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& userId, ApiUserDataList& user
     return ErrorCode::ok;
 }
 
+//getTransactionLog
+ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t&, ApiTransactionDataList& tranList)
+{
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    query.prepare(QString("SELECT tran_guid, tran_data from transaction_log order by peer_guid, db_guid, sequence"));
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::dbError;
+    }
+    
+    while (query.next()) {
+        ApiTransactionData tran;
+        tran.tranGuid = QnSql::deserialized_field<QnUuid>(query.value(0));
+        QByteArray srcData = query.value(1).toByteArray();
+        QnUbjsonReader<QByteArray> stream(&srcData);
+        if (QnUbjson::deserialize(&stream, &tran.tran)) {
+            tranList.push_back(std::move(tran));
+        }
+        else {
+            qWarning() << "Can' deserialize transaction from transaction log";
+            return ErrorCode::dbError;
+        }
+    }
+
+    return ErrorCode::ok;
+}
+
 //getVideowallList
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDataList& videowallList) {
     QSqlQuery query(m_sdb);

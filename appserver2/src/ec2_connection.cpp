@@ -44,6 +44,11 @@ namespace ec2
         return m_connectionInfo;
     }
 
+    QString Ec2DirectConnection::authInfo() const
+    {
+        return QString();
+    }
+
     void Ec2DirectConnection::startReceivingNotifications() {
         QnTransactionMessageBus::instance()->start();
     }
