@@ -33,6 +33,27 @@ namespace {
     bool parseBooleanXmlValue(const QString &value) {
         return (value == lit("true")) || (value == lit("1"));
     }
+
+    class QnIODeviceRAAI {
+    public:
+        QnIODeviceRAAI(QIODevice *device):
+            m_device(device)
+        {
+                m_valid = device->open(QIODevice::ReadOnly);
+        }
+
+        ~QnIODeviceRAAI() {
+            if (m_valid)
+                m_device->close();
+        }
+
+        bool isValid() const {
+            return m_valid;
+        }
+    private:
+        QIODevice* m_device;
+        bool m_valid;
+    };
 }
 
 QnCameraAdvancedParamsReader::QnCameraAdvancedParamsReader() {}
@@ -79,6 +100,10 @@ void QnCameraAdvancedParamsReader::setEncodedParamsToResource(const QnResourcePt
 }
 
 bool QnCameraAdvacedParamsXmlParser::validateXml(QIODevice *xmlSource) {
+    QnIODeviceRAAI guard(xmlSource);
+    if (!guard.isValid())
+        return false;
+
     QXmlSchema schema;
     if (!schema.load(validatorSchemaUrl))
         return false;
@@ -110,6 +135,10 @@ namespace QnXmlTag {
 }
 
 bool QnCameraAdvacedParamsXmlParser::readXml(QIODevice *xmlSource, QnCameraAdvancedParams &result) {
+
+    QnIODeviceRAAI guard(xmlSource);
+    if (!guard.isValid())
+        return false;
 
 	QDomDocument xmlDom;
 	{
