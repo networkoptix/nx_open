@@ -3,8 +3,8 @@
 angular.module('webadminApp')
     .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,$location,$timeout) {
 
-        mediaserver.getCurrentUser().success(function(result){
-            if(!result.reply.isAdmin && !(result.reply.permissions & Config.globalEditServersPermissions )){
+        mediaserver.getCurrentUser().then(function(result){
+            if(!result.data.reply.isAdmin && !(result.data.reply.permissions & Config.globalEditServersPermissions )){
                 $location.path('/info'); //no admin rights - redirect
                 return;
             }
@@ -151,8 +151,8 @@ angular.module('webadminApp')
             });
         }
 
-        mediaserver.getMediaServers().success(function(data){
-            $scope.mediaServers = _.sortBy(data,function(server){
+        mediaserver.getMediaServers().then(function(data){
+            $scope.mediaServers = _.sortBy(data.data,function(server){
                 return (server.status==='Online'?'0':'1') + server.Name + server.id;
                 // Сортировка: online->name->id
             });
