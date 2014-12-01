@@ -18,7 +18,7 @@
 namespace {
 
     const unsigned defaultPingTimeoutMs = 3000;
-    const unsigned defaultKeepAliveMultiply = 3;
+    const unsigned defaultKeepAliveMultiply = 5;
     const unsigned errorWaitTimeoutMs = 1000;
 
 } // anonymous namespace
