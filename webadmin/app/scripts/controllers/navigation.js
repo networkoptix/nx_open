@@ -6,9 +6,9 @@ angular.module('webadminApp')
             isAdmin: true
         };
 
-        mediaserver.getCurrentUser().success(function(result){
+        mediaserver.getCurrentUser().then(function(result){
             $scope.user = {
-                isAdmin: result.reply.isAdmin || (result.reply.permissions & Config.globalEditServersPermissions)
+                isAdmin: result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalEditServersPermissions)
             };
         });
 
