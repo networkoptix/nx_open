@@ -32,43 +32,49 @@ cp -f ../common/maven/bin-resources/resources/camera_settings/camera_settings.xs
 cp -f ../common/src/plugins/plugin_api.h $TARGET_DIR/include/plugins/
 cp -f ../common/src/plugins/camera_plugin.h $TARGET_DIR/include/plugins/
 
-#Copying AXIS plugin
-mkdir -p $TARGET_DIR/sample/axiscamplugin/src
-cp -f ../plugins/axiscamplugin/*.pro $TARGET_DIR/sample/axiscamplugin/
-cp -f ../plugins/axiscamplugin/*.pro $TARGET_DIR/sample/axiscamplugin/
-cp -f ../plugins/axiscamplugin/src/*.h $TARGET_DIR/sample/axiscamplugin/src/
-cp -f ../plugins/axiscamplugin/src/*.cpp $TARGET_DIR/sample/axiscamplugin/src/
-cp -f ../plugins/axiscamplugin/Doxyfile $TARGET_DIR/sample/axiscamplugin/Doxyfile
+PLUGINS=(axiscamplugin image_library_plugin)
 
-if [ $? -eq 0 ]
-then
-  echo "sources copied"
-else
-  echo "Error occured"
-  exit 1
-fi
+for (( i=0; i<${#PLUGINS[@]}; i++ ))
+do
+    pluginName="${PLUGINS[$i]}"
 
-#Removing unnecessary source files
-rm -rf $TARGET_DIR/sample/axiscamplugin/src/compatibility_info.cpp
+    #Copying plugin
+    mkdir -p $TARGET_DIR/sample/$pluginName/src
+    cp -f ../plugins/$pluginName/*.pro $TARGET_DIR/sample/$pluginName/
+    cp -f ../plugins/$pluginName/src/*.h $TARGET_DIR/sample/$pluginName/src/
+    cp -f ../plugins/$pluginName/src/*.cpp $TARGET_DIR/sample/$pluginName/src/
+    cp -f ../plugins/$pluginName/Doxyfile $TARGET_DIR/sample/$pluginName/Doxyfile
 
-#Modifying paths in Doxyfile 
-sed -i -e 's/common\/src/..\/include/g' ./nx_sdk/sample/axiscamplugin/Doxyfile
+    if [ $? -eq 0 ]
+    then
+        echo "sources copied"
+    else
+        echo "Error occured"
+        exit 1
+    fi
 
-#Generating documentation
-CUR_DIR_BAK=`pwd`
-cd $TARGET_DIR/sample/axiscamplugin/
-doxygen
+    #Removing unnecessary source files
+    rm -rf $TARGET_DIR/sample/$pluginName/src/compatibility_info.cpp
 
-if [ $? -eq 0 ]
-then
-  echo "Doxygen Completed"
-else
-  echo "Doxygen Error occured"
-  exit 1
-fi
+    #Modifying paths in Doxyfile 
+    sed -i -e 's/common\/src/..\/include/g' ./nx_sdk/sample/$pluginName/Doxyfile
 
-cd $CUR_DIR_BAK
-rm -rf $TARGET_DIR/sample/axiscamplugin/Doxyfile
+    #Generating documentation
+    CUR_DIR_BAK=`pwd`
+    cd $TARGET_DIR/sample/$pluginName/
+    doxygen
+
+    if [ $? -eq 0 ]
+    then
+        echo "Doxygen run completed for $pluginName"
+    else
+        echo "Doxygen run failed for $pluginName"
+        exit 1
+    fi
+
+    cd $CUR_DIR_BAK
+    rm -rf $TARGET_DIR/sample/$pluginName/Doxyfile
+done
 
 #packing sdk
 #tar czf $SDK_NAME-$VERSION.tar.gz $TARGET_DIR

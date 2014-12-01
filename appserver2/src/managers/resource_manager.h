@@ -31,6 +31,10 @@ namespace ec2
             emit statusChanged( QnUuid(tran.params.id), tran.params.status );
         }
 
+        void triggerNotification( const QnTransaction<ApiLicenseOverflowData>& tran ) {
+            // nothing to do
+        }
+
         /*
         void triggerNotification( const QnTransaction<ApiSetResourceDisabledData>& tran ) {
             emit disabledChanged( QnUuid(tran.params.id), tran.params.disabled );

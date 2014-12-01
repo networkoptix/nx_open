@@ -105,6 +105,8 @@ public:
     QPair<int, int> saveUpdatedStorages();
 private slots:
     void at_pingResponse(QnHTTPRawResponse, int);
+    void onNewResource(const QnResourcePtr &resource);
+    void onRemoveResource(const QnResourcePtr &resource);
 private:
     void onRequestDone( int reqID, ec2::ErrorCode errorCode );
 signals:
@@ -137,6 +139,9 @@ private:
     // used for client purpose only. Can be moved to separete class
     QnAbstractStorageResourceList m_storagesToUpdate;
     ec2::ApiIdDataList m_storagesToRemove;
+
+    mutable QMutex m_firstCameraMutex;
+    mutable QnResourcePtr m_firstCamera;
 };
 
 class QnMediaServerResourceFactory : public QnResourceFactory

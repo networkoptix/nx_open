@@ -23,7 +23,11 @@ angular.module('webadminApp')
             changePassword: function(password,oldPassword) {
                 return $http.post('/api/configure?password=' + password  + '&oldPassword=' + oldPassword);
             },
-            mergeSystems: function(url,password,keepMySystem){return $http.post('/api/mergeSystems?password=' + password  + '&url=' + encodeURIComponent(url) + '&takeRemoteSettings=' + (!keepMySystem)); },
+            mergeSystems: function(url,password,currentPassword,keepMySystem){
+                return $http.post('/api/mergeSystems?password=' + password
+                    + '&currentPassword=' + currentPassword
+                    + '&url=' + encodeURIComponent(url)
+                    + '&takeRemoteSettings=' + (!keepMySystem)); },
             pingSystem: function(url,password){return $http.post('/api/pingSystem?password=' + password  + '&url=' + encodeURIComponent(url)); },
             restart: function() { return $http.post('/api/restart'); },
             getStorages: function(){ return $http.get('/api/storageSpace'); },
@@ -40,7 +44,7 @@ angular.module('webadminApp')
             saveMediaServer: function(info){return $http.post('/ec2/saveMediaServer',info); },
             statistics:function(url){
                 url = url || '';
-                return $http.get(url + '/api/statistics');
+                return $http.get(url + '/api/statistics?sault=' + (new Date()).getTime() );
             },
             getCurrentUser:function(){
                 if(cacheCurrentUser === null){

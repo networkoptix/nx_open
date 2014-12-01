@@ -11,6 +11,7 @@
 #include "nx_ec/dummy_handler.h"
 #include "common/common_module.h"
 #include "utils/network/module_finder.h"
+#include "client/client_settings.h"
 
 namespace {
 
@@ -48,7 +49,9 @@ void QnMergeSystemsTool::pingSystem(const QUrl &url, const QString &user, const 
 }
 
 void QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &user, const QString &password, bool ownSettings) {
-    proxy->apiConnection()->mergeSystemAsync(url, user, password, ownSettings, this, SLOT(at_mergeSystem_finished(int,QnModuleInformation,int,QString)));
+    QString currentPassword = QnAppServerConnectionFactory::getConnection2()->authInfo();
+    Q_ASSERT_X(!currentPassword.isEmpty(), "currentPassword cannot be empty", Q_FUNC_INFO);
+    proxy->apiConnection()->mergeSystemAsync(url, user, password, currentPassword, ownSettings, this, SLOT(at_mergeSystem_finished(int,QnModuleInformation,int,QString)));
 }
 
 void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInformation &moduleInformation, int handle, const QString &errorString) {

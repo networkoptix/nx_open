@@ -5,6 +5,7 @@ angular.module('webadminApp')
         $scope.settings = {
             url :'',
             password :'',
+            currentPassword:'',
             keepMySystem:true
         };
         $scope.systems = {
@@ -80,7 +81,10 @@ angular.module('webadminApp')
             /*if (!$('#mergeSustemForm').valid()) {
                 return;
             }*/
-            $modalInstance.close({url: $scope.settings.url, password: $scope.settings.password, keepMySystem:$scope.settings.keepMySystem});
+            $modalInstance.close({url: $scope.settings.url,
+                password: $scope.settings.password,
+                keepMySystem:$scope.settings.keepMySystem,
+                currentPassword:$scope.settings.currentPassword});
         };
 
         $scope.selectSystem = function (system){

@@ -104,8 +104,9 @@ void QnServerMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
             this, &QnServerMessageProcessor::at_updateChunkReceived);
     connect(connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateInstallationRequested,
             this, &QnServerMessageProcessor::at_updateInstallationRequested);
+
     connect(connection->getMiscManager().get(), &ec2::AbstractMiscManager::systemNameChangeRequested,
-            this, &QnServerMessageProcessor::at_systemNameChangeRequested);
+            this, [this](const QString &systemName) { changeSystemName(systemName); });
 
     connect( connection, &ec2::AbstractECConnection::remotePeerUnauthorized, this, &QnServerMessageProcessor::at_remotePeerUnauthorized );
 
@@ -117,14 +118,24 @@ void QnServerMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 
 void QnServerMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data)
 {
-	// If resource in the pool then CommonMessageProcessor changes status to Online
     QnResourcePtr res = qnResPool->getResourceById(data.peer.id);
-    if (!res)
+    if (res)
+        res->setStatus(Qn::Online);
+    else
         m_delayedOnlineStatus << data.peer.id;
 }
 
 void QnServerMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data)
 {
+    QnResourcePtr res = qnResPool->getResourceById(data.peer.id);
+    if (res) {
+        res->setStatus(Qn::Offline);
+        if (data.peer.peerType != Qn::PT_Server) {
+            // This server hasn't own DB
+            for(const QnResourcePtr& camera: qnResPool->getAllCameras(res))
+                camera->setStatus(Qn::Offline);
+        }
+    }
     m_delayedOnlineStatus.remove(data.peer.id);
 }
 
@@ -196,22 +207,6 @@ void QnServerMessageProcessor::at_updateChunkReceived(const QString &updateId, c
 
 void QnServerMessageProcessor::at_updateInstallationRequested(const QString &updateId) {
     QnServerUpdateTool::instance()->installUpdate(updateId);
-}
-
-void QnServerMessageProcessor::at_systemNameChangeRequested(const QString &systemName) {
-    if (qnCommon->localSystemName() == systemName)
-        return;
-
-    qnCommon->setLocalSystemName(systemName);
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
-    if (!server) {
-        NX_LOG("Cannot find self server resource!", cl_logERROR);
-        return;
-    }
-
-    MSSettings::roSettings()->setValue("systemName", systemName);
-    server->setSystemName(systemName);
-    m_connection->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
 void QnServerMessageProcessor::at_remotePeerUnauthorized(const QnUuid& id)

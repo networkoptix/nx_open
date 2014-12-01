@@ -214,12 +214,12 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const Qn
     auto updateHistoryItr = m_updateHistory.find(hash);
     if (updateHistoryItr == m_updateHistory.end())
         updateHistoryItr = m_updateHistory.insert(hash, UpdateHistoryData());
-    if ((tran.persistentInfo.timestamp > updateHistoryItr.value().timestamp) ||
-        (tran.persistentInfo.timestamp == updateHistoryItr.value().timestamp && key > updateHistoryItr.value().updatedBy))
-    {
-        updateHistoryItr.value().timestamp = tran.persistentInfo.timestamp;
-        updateHistoryItr.value().updatedBy = key;
-    }
+
+    assert ((tran.persistentInfo.timestamp > updateHistoryItr.value().timestamp) ||
+            (tran.persistentInfo.timestamp == updateHistoryItr.value().timestamp && !(key < updateHistoryItr.value().updatedBy)));
+
+    updateHistoryItr.value().timestamp = tran.persistentInfo.timestamp;
+    updateHistoryItr.value().updatedBy = key;
 
     QMutexLocker lock(&m_timeMutex);
     if (tran.persistentInfo.timestamp > m_currentTime + m_relativeTimer.elapsed()) {

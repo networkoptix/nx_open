@@ -4,7 +4,7 @@ angular.module('webadminApp')
     .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,$location,$timeout) {
 
         mediaserver.getCurrentUser().success(function(result){
-            if(! result.reply.permissions & Config.globalEditServersPermissions ){
+            if(!result.reply.isAdmin && !(result.reply.permissions & Config.globalEditServersPermissions )){
                 $location.path('/info'); //no admin rights - redirect
                 return;
             }
@@ -36,7 +36,7 @@ angular.module('webadminApp')
 
             modalInstance.result.then(function (settings) {
                 $log.info(settings);
-                mediaserver.mergeSystems(settings.url,settings.password,settings.keepMySystem).then(function(r){
+                mediaserver.mergeSystems(settings.url,settings.password,settings.currentPassword,settings.keepMySystem).then(function(r){
                     if(r.data.error!=='0'){
                         var errorToShow = r.data.errorString;
                         switch(errorToShow){
@@ -45,12 +45,14 @@ angular.module('webadminApp')
                                 break;
                             case 'UNAUTHORIZED':
                             case 'password':
+                            case 'PASSWORD':
                                 errorToShow = 'Wrong password.';
                                 break;
                             case 'INCOMPATIBLE':
                                 errorToShow = 'Found system has incompatible version.';
                                 break;
                             case 'url':
+                            case 'URL':
                                 errorToShow = 'Wrong url.';
                                 break;
                         }
@@ -88,6 +90,7 @@ angular.module('webadminApp')
                 switch (errorToShow) {
                     case 'UNAUTHORIZED':
                     case 'password':
+                    case 'PASSWORD':
                         errorToShow = 'Wrong password.';
                 }
                 alert('Error: ' + errorToShow);

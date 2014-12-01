@@ -20,6 +20,7 @@ namespace ec2
         OldEcConnection(const QnConnectionInfo& connectionInfo);
 
         virtual QnConnectionInfo connectionInfo() const override;
+        virtual QString authInfo() const override;
 
         virtual AbstractResourceManagerPtr getResourceManager() override;
         virtual AbstractMediaServerManagerPtr getMediaServerManager() override;

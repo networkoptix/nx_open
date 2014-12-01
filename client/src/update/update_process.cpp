@@ -421,9 +421,10 @@ void QnUpdateProcess::at_mutexLocked() {
     uploadUpdatesToServers();
 }
 
-void QnUpdateProcess::at_mutexTimeout() {
+void QnUpdateProcess::at_mutexTimeout(const QSet<QnUuid> &failedPeers) {
     m_distributedMutex->deleteLater();
     m_distributedMutex = 0;
+    m_failedPeerIds = failedPeers;
     finishUpdate(QnUpdateResult::UploadingFailed);
 }
 

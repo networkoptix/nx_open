@@ -8,7 +8,7 @@ angular.module('webadminApp')
 
         mediaserver.getCurrentUser().success(function(result){
             $scope.user = {
-                isAdmin: result.reply.permissions & Config.globalEditServersPermissions
+                isAdmin: result.reply.isAdmin || (result.reply.permissions & Config.globalEditServersPermissions)
             };
         });
 
