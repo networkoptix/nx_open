@@ -44,7 +44,7 @@ angular.module('webadminApp')
             saveMediaServer: function(info){return $http.post('/ec2/saveMediaServer',info); },
             statistics:function(url){
                 url = url || '';
-                return $http.get(url + '/api/statistics');
+                return $http.get(url + '/api/statistics?sault=' + (new Date()).getTime() );
             },
             getCurrentUser:function(){
                 if(cacheCurrentUser === null){
