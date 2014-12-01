@@ -436,7 +436,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 #endif
 
     QnResourcePropertyDictionary dictionary;
-    QnResourceStatusDiscionary statusDictionary;
+    QnResourceStatusDictionary statusDictionary;
     QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
     QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
     QScopedPointer<QnClientPtzControllerPool> clientPtzPool(new QnClientPtzControllerPool());
