@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('webadminApp').controller('ViewCtrl', function ($scope,$location,$routeParams,mediaserver) {
+angular.module('webadminApp').controller('ViewCtrl', function ($scope,$location,$routeParams,mediaserver,$q) {
 
     $scope.cameraId = $routeParams.cameraId;
     $scope.cameras = {};
@@ -27,11 +27,6 @@ angular.module('webadminApp').controller('ViewCtrl', function ($scope,$location,
         }
         return server.apiUrl.replace('http://','').replace('https://','');
     }
-    function requestCameraRecords(camera){
-        mediaserver.getRecords(getServerUrl(getCamerasServer(camera)),camera.physicalId).then(function(data){
-            console.log(data.data);
-        });
-    }
 
     function updateVideoSource(){
         var cameraId = $scope.activeCamera.physicalId;
@@ -52,12 +47,12 @@ angular.module('webadminApp').controller('ViewCtrl', function ($scope,$location,
         ];
         console.log($scope.acitveVideoSource[0].src);
     }
-
+    $scope.activeVideoRecords = null;
     $scope.selectCamera = function(activeCamera){
         $location.path('/view/' + activeCamera.id, false);
         $scope.activeCamera = activeCamera;
         updateVideoSource();
-        requestCameraRecords( activeCamera );
+        //$scope.activeVideoRecords = new CameraRecordsProvider([activeCamera.physicalId],mediaserver,$q);
         return false;
     };
 
@@ -127,8 +122,6 @@ angular.module('webadminApp').controller('ViewCtrl', function ($scope,$location,
                 };
             });
 
-            console.log('groups',cams[1]);
-
             //6 union cameras back
             cameras = _.union(cams[0],cams[1]);
 
@@ -139,15 +132,11 @@ angular.module('webadminApp').controller('ViewCtrl', function ($scope,$location,
             $scope.cameras = _.groupBy(cameras, function(camera){ return camera.parentId; });
 
             $scope.allcameras = cameras;
-
-            console.log('Cameras',$scope.cameras);
         },function(){
             alert('network problem');
         });
     }
     mediaserver.getMediaServers().then(function(data){
-        console.log('getMediaServers',data.data);
-
         _.each(data.data,function(server){
             server.url = extractDomain(server.url);
             server.collapsed = server.status !== 'Online' && (server.allowAutoRedundancy || server.flags.indexOf('SF_Edge')<0);

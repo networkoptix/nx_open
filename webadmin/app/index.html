@@ -19,6 +19,7 @@
     <!-- endbuild -->
     <!-- build:css({.tmp,app}) styles/main.css -->
     <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/timeline.css">
     <!-- endbuild -->
 
     <link rel="stylesheet" href="customization/styles.css">
@@ -75,6 +76,7 @@
 <script src="scripts/vendor/jquery-file-upload/jquery.iframe-transport.js"></script>
 <script src="scripts/vendor/jquery-file-upload/jquery.fileupload.js"></script>
 <script src="scripts/vendor/jquery-file-upload/jquery.fileupload-process.js"></script>
+<script src="scripts/vendor/date.js"></script>
 
 
 <!-- endbuild -->
@@ -83,20 +85,25 @@
 
 <script src="scripts/config.js"></script>
 <script src="scripts/app.js"></script>
-<script src="scripts/controllers/main.js"></script>
-<script src="scripts/controllers/navigation.js"></script>
-<script src="scripts/directives/navbar.js"></script>
-<script src="scripts/controllers/settings.js"></script>
-<script src="scripts/controllers/join.js"></script>
+
 <script src="scripts/services/mediaserver.js"></script>
-<script src="scripts/directives/pwcheck.js"></script>
-<script src="scripts/controllers/login.js"></script>
+<script src="scripts/services/timelineModels.js"></script>
+<script src="scripts/services/cameraRecords.js"></script>
 <script src="scripts/services/auth.js"></script>
+
+<script src="scripts/directives/navbar.js"></script>
+<script src="scripts/directives/pwcheck.js"></script>
 <script src="scripts/directives/icon.js"></script>
 <script src="scripts/directives/fileupload.js"></script>
 <script src="scripts/directives/vg-quality.js"></script>
-
 <script src="scripts/directives/inplace-edit.js"></script>
+<script src="scripts/directives/timeline.js"></script>
+
+<script src="scripts/controllers/main.js"></script>
+<script src="scripts/controllers/navigation.js"></script>
+<script src="scripts/controllers/settings.js"></script>
+<script src="scripts/controllers/join.js"></script>
+<script src="scripts/controllers/login.js"></script>
 <script src="scripts/controllers/advanced.js"></script>
 <script src="scripts/controllers/info.js"></script>
 <script src="scripts/controllers/restart.js"></script>

@@ -680,7 +680,7 @@
                     </params>
                     <result>
                         <caption>Chunks data in requested format. Chunks are merged for all requested
-                        cameras. Time and duration defined in UTC milliseconds.</caption>
+                        cameras. Time and duration defined in UTC milliseconds. Response contains pairs [begin,duration]. Duration=-1 means last chunk is recording now.</caption>
                     </result>
                 </function>
                 <function>

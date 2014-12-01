@@ -187,7 +187,7 @@ angular.module('webadminApp')
                 }
                 $scope.serverIsOnline = true;
 
-                updateStatisticsDataSets((r.status===200 && r.data.error === "0") ? r.data.reply.statistics:[]);
+                updateStatisticsDataSets((r.status===200 && r.data.error === '0') ? r.data.reply.statistics:[]);
 
                 statisticTimer = $timeout(updateStatistics,$scope.interval);
                 return false;

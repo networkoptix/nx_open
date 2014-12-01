@@ -103,18 +103,29 @@ module.exports = function (grunt) {
 
                 //Evgeniy
 
-                {context: '/api/', host: '192.168.56.101', port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
+                /*{context: '/api/', host: '192.168.56.101', port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
                 {context: '/ec2/', host: '192.168.56.101', port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
                 {context: '/media/', host: '192.168.56.101', port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
                 {context: '/hls/', host: '192.168.56.101',port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
                 {context: '/proxy/', host: '192.168.56.101',port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}}
-
-                //Sergey Yuldashev
-/*                {context: '/api/',      host: '10.0.2.203', port: 8901, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
-                {context: '/ec2/',      host: '10.0.2.203', port: 8901, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
-                {context: '/media/',    host: '10.0.2.203', port: 8901, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
-                {context: '/hls/',      host: '10.0.2.203', port: 8901, headers: {'Authorization': 'Basic YWRtaW46MTIz'}}
 */
+
+
+
+                    //Olga
+                /*{context: '/api/', host: '10.0.2.169', port: 7011,headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
+                {context: '/ec2/', host: '10.0.2.169', port: 7011,headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
+                {context: '/media/', host: '10.0.2.169', port: 7011,headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
+                {context: '/hls/', host: '10.0.2.169',port: 7011,headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
+                {context: '/proxy/', host: '10.0.2.169',port: 7011,headers: {'Authorization': 'Basic YWRtaW46MTIz'}}
+*/
+                //Sergey Yuldashev
+                {context: '/api/',      host: '10.0.2.203', port: 7221, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
+                {context: '/ec2/',      host: '10.0.2.203', port: 7221, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
+                {context: '/media/',    host: '10.0.2.203', port: 7221, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
+                {context: '/hls/',      host: '10.0.2.203', port: 7221, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
+                {context: '/proxy/', host: '10.0.2.203',port: 7221,headers: {'Authorization': 'Basic YWRtaW46MTIz'}}
+
                 // Sasha
                 /*{context: '/api/',      host: '10.0.2.202', port: 7001, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
                 {context: '/ec2/',      host: '10.0.2.202', port: 7001, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
@@ -495,32 +506,6 @@ module.exports = function (grunt) {
             ]
         },
 
-        // By default, your `index.html`'s <!-- Usemin block --> will take care of
-        // minification. These next options are pre-configured if you do not wish
-        // to use the Usemin blocks.
-        //cssmin: {
-        //   dist: {
-        //     files: {
-        //       '<%= yeoman.dist %>/styles/main.css': [
-        //         '.tmp/styles/{,*/}*.css',
-        //         '<%= yeoman.app %>/styles/{,*/}*.css'
-        //       ]
-        //     }
-        //   }
-        //},
-        // uglify: {
-        //   dist: {
-        //     files: {
-        //       '<%= yeoman.dist %>/scripts/scripts.js': [
-        //         '<%= yeoman.dist %>/scripts/scripts.js'
-        //       ]
-        //     }
-        //   }
-        // },
-        // concat: {
-        //   dist: {}
-        // },
-
         // Test settings
         karma: {
             unit: {
@@ -564,7 +549,8 @@ module.exports = function (grunt) {
                 'build',
                 'configureProxies:server',
                 //'connect:livereload',
-                'connect:dist:keepalive']);
+                'connect:dist:keepalive'
+            ]);
         }
 
         grunt.task.run([
