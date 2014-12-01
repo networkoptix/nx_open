@@ -1,0 +1,29 @@
+<script type="text/ng-template"  id="nested_chunks">
+    <div class="chunk" ng-class="{expanded: chunk.expand}" ng-style="{left:chunk.startPosition,width:chunk.width}" title="{{chunk.title}}">
+        <div ng-if="chunk.expand && chunk.children.length !== 0">
+            <ng-include src="'nested_chunks'"
+             ng-repeat="chunk in chunk.children"></ng-include>
+        </div>
+        <div ng-if="template && (!chunk.expand || chunk.children.length === 0)" class="marksContainer" ng-include="template"></div>
+    </div>
+</script>
+
+<script type="text/ng-template"  id="ruler_marks">
+    <div ng-if="chunk.title" class="ruler-label">{{chunk.title}}</div>
+    <div class="small small-hidden"></div>
+    <div ng-repeat-start="small in chunk.marks" class="small fadeIn"></div> <span ng-repeat-end></span>
+    <div class="small small-hidden"></div>
+</script>
+
+<div class="viewport">
+    <div class="timeline-hint"><div class="hint-label">hint</div></div>
+    <div class="frame" ng-style="{width:frameWidth}">
+        <div class="timeline" ng-style="{width:timelineWidth,left:timelineStart}">
+            <!--
+            <div class="events" ng-if="records && records.chunksTree !== null" ng-init="chunk = records.chunksTree; template = false" ng-include="'nested_chunks'"></div>
+            -->
+            <div class="ruler" ng-if="ruler" ng-init="chunk = ruler.marksTree; template = 'ruler_marks'" ng-include="'nested_chunks'"></div>
+            <div class="spacer"></div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,150 @@
+/*Вьюпорт - фиксируем ему ширину и делаем полосу прокрутки.
+Высота - по контенту, чтобы не ограничивать себе размер блоков под евенты (а их может быть много)*/
+.viewport{
+  width:100%;
+  position:relative;
+  overflow-x:scroll;
+  overflow-y:hidden;
+  border:1px solid silver;
+  padding:3px 0;
+
+
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  cursor: default;
+}
+.frame {
+  overflow:hidden;
+}
+.timeline {
+  overflow:visible;
+}
+/* Таймлайн - контейнер. Непосредственно у него мы и фиксируем ширину и меняем её при зуме. Ширина задается декларативно */
+.timeline,.frame{
+  position:relative;
+}
+
+/* Линии в таймлайне разделены отступами */
+.timeline>*{
+  margin-bottom:3px;
+}
+
+/* Линейка */
+.ruler{
+  height:25px;
+  position: relative;
+}
+/* Секция линейки */
+.marksContainer{
+  font-size:initial;
+  display:inline-block;
+  height:15px;
+  width:100%;
+  font-size:1px;
+  border-left: 1px solid silver;
+  vertical-align:top;
+  position:absolute;
+  text-align: justify;
+}
+/* Псевдоэлемент после секций линейки - чтобы сделать "новую строку" и гарантировать растянивание маленьких отметок по ширине */
+.marksContainer:after {
+  width: 100%;
+  height: 0px;
+  visibility: hidden;
+  overflow: hidden;
+  content: '';
+  display: inline-block;
+  position:relative;
+  vertical-align:top;
+}
+/*Маленькие отметки*/
+.ruler .small{
+  height:50%;
+  display: inline-block;
+  vertical-align:top;
+  border-left: 1px solid silver;
+  animation-duration:0.5s !important;
+  -webkit-animation-duration: 0.5s;
+
+}
+/*Скрытые отметки - используются, чтобы правильнее растягивать по ширине - одна в начале секции, одна в конце*/
+.small-hidden{
+  visibility:hidden;
+  width:0px;
+  border:none;
+}
+/*Подпись на линейке*/
+.ruler-label{
+  text-align:center;
+
+  font-size:10px;
+  color:silver;
+  margin-left: -50px;
+  margin-top:15px;
+  width:100px;
+  position: absolute;
+}
+/*
+Линия с событиями. Линий может быть много. Фиксируем для линии высоту
+Задаем позиционирование, чтобы правильно перепозиционировать внутренние блоки
+*/
+.events{
+  height:20px;
+  position:relative;
+}
+.chunk{
+  min-width: 1px !important;
+  position: absolute;
+}
+/*Конкретные события
+У таких событий задается ширина в процентах и отступ слева в процентах, чтобы работал ресайз при изменении таймлайна
+Смещение задается от начала интервала всегда - чтобы не накапливать ошибку
+*/
+.events>*{
+  height:100%;
+  background-color:silver;
+  border-radius:3px;
+  position:absolute;
+}
+
+/*Подсказка, бегающая за мышкой*/
+.timeline-hint{
+  height:100%;
+  width:1px;
+  background-color:red;
+  position:absolute;
+
+  display:none;
+  z-index:100;
+}
+/*Подпись у подсказки, которая бежит за мышкой*/
+.hint-label{
+  position:absolute;
+  right:1px;
+  color:gray;
+  background-color:#eee;
+  text-align:center;
+  border-radius:2px;
+  padding:2px;
+  width:60px;
+  font-size:70%;
+}
+
+
+
+
+/*Отладочный элемент, его можно убрать*/
+.spacer{
+  height:100px;
+  /*display:none;*/
+}
+
+
+ng-include{
+  width:100%;
+}
