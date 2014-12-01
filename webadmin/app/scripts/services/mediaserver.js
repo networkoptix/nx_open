@@ -23,7 +23,11 @@ angular.module('webadminApp')
             changePassword: function(password,oldPassword) {
                 return $http.post('/api/configure?password=' + password  + '&oldPassword=' + oldPassword);
             },
-            mergeSystems: function(url,password,keepMySystem){return $http.post('/api/mergeSystems?password=' + password  + '&url=' + encodeURIComponent(url) + '&takeRemoteSettings=' + (!keepMySystem)); },
+            mergeSystems: function(url,password,currentPassword,keepMySystem){
+                return $http.post('/api/mergeSystems?password=' + password
+                    + '&currentPassword=' + currentPassword
+                    + '&url=' + encodeURIComponent(url)
+                    + '&takeRemoteSettings=' + (!keepMySystem)); },
             pingSystem: function(url,password){return $http.post('/api/pingSystem?password=' + password  + '&url=' + encodeURIComponent(url)); },
             restart: function() { return $http.post('/api/restart'); },
             getStorages: function(){ return $http.get('/api/storageSpace'); },
