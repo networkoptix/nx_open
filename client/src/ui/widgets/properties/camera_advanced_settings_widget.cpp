@@ -88,7 +88,7 @@ void QnCameraAdvancedSettingsWidget::updatePage() {
         if (hasWebPage) 
             return Page::Web;
 
-        if (!m_camera->getProperty( Qn::CAMERA_SETTINGS_ID_PARAM_NAME ).isNull()) 
+        if (!m_camera->getProperty(Qn::CAMERA_ADVANCED_PARAMETERS).isEmpty()) 
             return Page::Manual;
         
         return Page::Empty;
@@ -104,7 +104,7 @@ void QnCameraAdvancedSettingsWidget::reloadData() {
     if (!m_camera || !isStatusValid(m_camera->getStatus()))
         return;
 
-    if (m_page == QnCameraAdvancedSettingsWidget::Page::Web) {
+    if (m_page == Page::Web) {
         QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
         QUrl targetUrl;
         targetUrl.setHost(m_camera->getHostAddress());
@@ -117,6 +117,8 @@ void QnCameraAdvancedSettingsWidget::reloadData() {
         ui->webView->reload();
         ui->webView->load( QNetworkRequest(targetUrl) );
         ui->webView->show();
+    } else if (m_page == Page::Manual) {
+        ui->cameraAdvancedParamsWidget->loadValues();
     }
 }
 

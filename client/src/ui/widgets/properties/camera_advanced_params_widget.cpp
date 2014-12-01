@@ -9,6 +9,8 @@
 
 #include <ui/widgets/properties/camera_advanced_param_widgets_manager.h>
 
+#include <utils/xml/camera_advanced_param_reader.h>
+
 namespace {
     bool parameterHasValue(const QnCameraAdvancedParameter &param) {
         return param.isValid() && QnCameraAdvancedParameter::dataTypeHasValue(param.dataType);
@@ -24,7 +26,7 @@ namespace {
             result.unite(parameterIds(subGroup));
         for (const QnCameraAdvancedParameter &param: group.params)
             if (parameterHasValue(param))
-                result.insert(param.getId());
+                result.insert(param.id);
         return result;
     }
 
@@ -78,7 +80,7 @@ void QnCameraAdvancedParamsWidget::setCamera(const QnVirtualCameraResourcePtr &c
         connect(m_camera, &QnResource::propertyChanged, this, [this](const QnResourcePtr &resource, const QString &key) {
             if (resource != m_camera)
                 return;
-            if (key == Qn::PHYSICAL_CAMERA_SETTINGS_XML_PARAM_NAME || key == Qn::CAMERA_SETTINGS_ID_PARAM_NAME) {
+            if (key == Qn::CAMERA_ADVANCED_PARAMETERS) {
                 /* Re-init state if key parameter changed. */
                 initialize();
             }
@@ -101,9 +103,6 @@ void QnCameraAdvancedParamsWidget::initialize() {
 
     updateCameraAvailability();
 
-    /* Update the whole widget state. */
-    setEnabled(m_cameraAvailable);
-
     /* Clean state. */
     setState(State::Init);
     m_paramRequestHandle = 0;
@@ -114,20 +113,22 @@ void QnCameraAdvancedParamsWidget::initialize() {
     ui->progressWidget->setVisible(false);
 
     /* Reload parameters tree. */
-    if (m_cameraAvailable)
-        displayParams();
-    else
-        m_advancedParamWidgetsManager->clear();
+    displayParams();
 }
 
 void QnCameraAdvancedParamsWidget::displayParams() {
+    if (!m_camera) {
+        m_advancedParamWidgetsManager->clear();
+        return;
+    }
+
     auto params = m_advancedParamsReader->params(m_camera);
     m_advancedParamWidgetsManager->displayParams(params);
 }
 
 void QnCameraAdvancedParamsWidget::loadValues() {
     /* Check that we are in the correct state. */
-    if (state() != State::Init)
+    if (state() != State::Init || !m_cameraAvailable)
         return;
 
     /* Check that there are values to request. */
@@ -151,7 +152,7 @@ void QnCameraAdvancedParamsWidget::loadValues() {
 
 void QnCameraAdvancedParamsWidget::saveSingleValue(const QnCameraAdvancedParamValue &value) {
     /* Check that we are in the correct state. */
-    if (state() != State::Init)
+    if (state() != State::Init || !m_cameraAvailable)
         return;
 
     /* Check that the server and camera are available. */
@@ -170,7 +171,7 @@ void QnCameraAdvancedParamsWidget::saveSingleValue(const QnCameraAdvancedParamVa
 
 void QnCameraAdvancedParamsWidget::saveValues() {
     /* Check that we are in the correct state. */
-    if (state() != State::Init)
+    if (state() != State::Init || !m_cameraAvailable)
         return;
 
     /* Check that the server and camera are available. */
@@ -199,7 +200,14 @@ void QnCameraAdvancedParamsWidget::updateCameraAvailability() {
     if (m_cameraAvailable == cameraAvailable)
         return;
     m_cameraAvailable = cameraAvailable;
-    initialize();
+
+    this->setEnabled(!m_camera.isNull());
+    updateButtonsState();
+}
+
+void QnCameraAdvancedParamsWidget::updateButtonsState() {
+    ui->loadButton->setEnabled(m_cameraAvailable && m_state == State::Init);
+    ui->saveButton->setEnabled(m_cameraAvailable && m_state == State::Init);
 }
 
 
@@ -324,8 +332,7 @@ void QnCameraAdvancedParamsWidget::setState(State newState) {
         return QString();
     };
 
-    ui->loadButton->setEnabled(m_state == State::Init);
-    ui->saveButton->setEnabled(m_state == State::Init);
     ui->progressWidget->setText(textByState(m_state));
     ui->progressWidget->setVisible(m_state != State::Init);
+    updateButtonsState();
 }

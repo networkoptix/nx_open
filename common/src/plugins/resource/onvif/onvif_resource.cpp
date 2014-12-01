@@ -40,6 +40,12 @@
 #include "gsoap_async_call_wrapper.h"
 #include "plugins/resource/d-link/dlink_ptz_controller.h"
 
+#include <plugins/resource/onvif/imaging/onvif_imaging_proxy.h>
+#include <plugins/resource/onvif/onvif_maintenance_proxy.h>
+
+#include <utils/common/model_functions.h>
+#include <utils/xml/camera_advanced_param_reader.h>
+
 //!assumes that camera can only work in bistable mode (true for some (or all?) DW cameras)
 #define SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
 
@@ -293,7 +299,7 @@ QnPlOnvifResource::~QnPlOnvifResource()
 
     stopInputPortMonitoring();
 
-    m_onvifAdditionalSettings.reset();
+    m_imagingParamsProxy.reset();
 }
 
 const QString QnPlOnvifResource::fetchMacAddress(
@@ -537,7 +543,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     //    setStatus(Qn::Online, true); // to avoid infinit status loop in this version
 
     //Additional camera settings
-    fetchAndSetCameraSettings();
+    fetchAndSetAdvancedParameters();
 
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
@@ -1288,6 +1294,13 @@ bool QnPlOnvifResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &sourc
     if (!onvifUrlSource.isEmpty() && getDeviceOnvifUrl() != onvifUrlSource)
     {
         setDeviceOnvifUrl(onvifUrlSource);
+        result = true;
+    }
+
+    QString localParams = QnCameraAdvancedParamsReader::encodedParamsFromResource(this->toSharedPointer());
+    QString sourceParams = QnCameraAdvancedParamsReader::encodedParamsFromResource(source);
+    if (localParams != sourceParams) {
+        QnCameraAdvancedParamsReader::setEncodedParamsToResource(this->toSharedPointer(), sourceParams);
         result = true;
     }
 
@@ -2265,125 +2278,117 @@ QnConstResourceAudioLayoutPtr QnPlOnvifResource::getAudioLayout(const QnAbstract
         return QnPhysicalCameraResource::getAudioLayout(dataProvider);
 }
 
-bool QnPlOnvifResource::getParamPhysical(const QString &param, QVariant &val)
-{
+bool QnPlOnvifResource::loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap &values) {
     m_prevOnvifResultCode = CameraDiagnostics::NoErrorResult();
 
-    QMutexLocker lock(&m_physicalParamsMutex);
-    if (!m_onvifAdditionalSettings) {
+    if (!m_imagingParamsProxy) {
         m_prevOnvifResultCode = CameraDiagnostics::UnknownErrorResult();
         return false;
     }
 
-    CameraSettings& settings = m_onvifAdditionalSettings->getCameraSettings();
-    CameraSettings::Iterator it = settings.find(param);
+    m_prevOnvifResultCode = m_imagingParamsProxy->loadValues(values);
+    return m_prevOnvifResultCode.errorCode == CameraDiagnostics::ErrorCode::noError;
+}
 
-    if (it == settings.end()) {
-        //This is the case when camera doesn't contain Media Service, but the client doesn't know about it and
-        //sends request for param from this service. Can't return false in this case, because our framework stops
-        //fetching physical params after first failed.
-        return true;
-    }
+
+bool QnPlOnvifResource::getParamPhysical(const QString &id, QString &value) {
+    if (m_appStopping)
+        return false;
 
     //Caching camera values during ADVANCED_SETTINGS_VALID_TIME to avoid multiple excessive 'get' requests 
     //to camera. All values can be get by one request, but our framework do getParamPhysical for every single param.
-    QDateTime currTime = QDateTime::currentDateTime();
-    if (m_advSettingsLastUpdated.isNull() || m_advSettingsLastUpdated.secsTo(currTime) > ADVANCED_SETTINGS_VALID_TIME) {
-        m_prevOnvifResultCode = m_onvifAdditionalSettings->makeGetRequest();
-        if( m_prevOnvifResultCode.errorCode != CameraDiagnostics::ErrorCode::noError )
-            return false;
-        m_advSettingsLastUpdated = currTime;
-    }
-
-    if (it.value().getFromCamera(*m_onvifAdditionalSettings)) {
-        val.setValue(it.value().serializeToStr());
-        return true;
-    }
-
-    //If server can't get value from camera, it will be marked in "QVariant &val" as empty m_current param
-    //Completely empty "QVariant &val" means enabled setting with no value (ex: Settings tree element or button)
-    //Can't return false in this case, because our framework stops fetching physical params after first failed.
-    return true;
-}
-
-bool QnPlOnvifResource::setParamPhysical(const QString &param, const QVariant& val )
-{
     QMutexLocker lock(&m_physicalParamsMutex);
-    if (!m_onvifAdditionalSettings)
-        return false;
-
-    CameraSetting tmp;
-    tmp.deserializeFromStr(val.toString());
-
-    CameraSettings& settings = m_onvifAdditionalSettings->getCameraSettings();
-    CameraSettings::Iterator it = settings.find(param);
-
-    if (it == settings.end())
-    {
-        //Buttons are not contained in CameraSettings
-        if (tmp.getType() != CameraSetting::Button) {
-            return false;
-        }
-
-        //For Button - only operation object is required
-        QHash<QString, QSharedPointer<OnvifCameraSettingOperationAbstract> >::ConstIterator opIt =
-            OnvifCameraSettingOperationAbstract::operations.find(param);
-
-        if (opIt == OnvifCameraSettingOperationAbstract::operations.end()) {
-            return false;
-        }
-
-        return opIt.value()->set(tmp, *m_onvifAdditionalSettings);
+    QDateTime curTime = QDateTime::currentDateTime();
+    if (m_advSettingsLastUpdated.isNull() || m_advSettingsLastUpdated.secsTo(curTime) > ADVANCED_SETTINGS_VALID_TIME) {
+        m_advancedParamsCache.clear();
+        if (loadAdvancedParamsUnderLock(m_advancedParamsCache))
+            m_advSettingsLastUpdated = curTime;
     }
 
-    CameraSettingValue oldVal = it.value().getCurrent();
-    it.value().setCurrent(tmp.getCurrent());
-
-
-    if (!it.value().setToCamera(*m_onvifAdditionalSettings)) {
-        it.value().setCurrent(oldVal);
+    if (!m_advancedParamsCache.contains(id))
         return false;
-    }
-
+    value = m_advancedParamsCache[id];
     return true;
 }
 
-void QnPlOnvifResource::fetchAndSetCameraSettings()
-{
-    QString imagingUrl = getImagingUrl();
-    if (imagingUrl.isEmpty()) {
-        NX_LOG(QString(lit("QnPlOnvifResource::fetchAndSetCameraSettings: imaging service is absent on device (URL: %1, UniqId: %2"))
-            .arg(getDeviceOnvifUrl()).arg(getUniqueId()), cl_logDEBUG1);
-    }
+bool QnPlOnvifResource::setAdvancedParameterUnderLock(const QnCameraAdvancedParameter &parameter, const QString &value) {
+    if (m_imagingParamsProxy && m_imagingParamsProxy->supportedParameters().contains(parameter.id))
+        return m_imagingParamsProxy->setValue(parameter.id, value);
 
-    QAuthenticator auth(getAuth());
-    std::unique_ptr<OnvifCameraSettingsResp> settings( new OnvifCameraSettingsResp(
-        getDeviceOnvifUrl().toLatin1().data(), imagingUrl.toLatin1().data(),
-        auth.user(), auth.password(), m_videoSourceToken.toStdString(), getUniqueId(), m_timeDrift) );
+    if (m_maintenanceProxy && m_maintenanceProxy->supportedParameters().contains(parameter.id))
+        return m_maintenanceProxy->callOperation(parameter.id);
 
-    if (!imagingUrl.isEmpty()) {
-        settings->makeGetRequest();
-    }
+    return false;
+}
 
+
+bool QnPlOnvifResource::setParamPhysical(const QString &id, const QString& value) {
     if (m_appStopping)
+        return false;
+
+    bool result = false;
+    {
+        QMutexLocker lock(&m_physicalParamsMutex);
+        if (!m_advancedParamsCache.contains(id))
+            return false;
+
+        QnCameraAdvancedParameter parameter = m_advancedParameters.getParameterById(id);
+        if (!parameter.isValid())
+            return false;
+
+        result = setAdvancedParameterUnderLock(parameter, value);
+        if (result)
+            m_advancedParamsCache[id] = value;
+    }
+    if (result)
+        emit advancedParameterChanged(id, value);
+    return result;
+}
+
+bool QnPlOnvifResource::loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const {
+    QFile paramsTemplateFile(lit(":/camera_advanced_params/onvif.xml"));
+#ifdef _DEBUG
+    QnCameraAdvacedParamsXmlParser::validateXml(&paramsTemplateFile);
+#endif
+    return QnCameraAdvacedParamsXmlParser::readXml(&paramsTemplateFile, params);
+}
+
+void QnPlOnvifResource::initAdvancedParametersProviders(QnCameraAdvancedParams &params) {
+    QAuthenticator auth(getAuth());
+    QString imagingUrl = getImagingUrl();
+    if (!imagingUrl.isEmpty()) {
+        m_imagingParamsProxy.reset(new QnOnvifImagingProxy(imagingUrl.toLatin1().data(),  auth.user(), auth.password(), m_videoSourceToken.toStdString(), m_timeDrift) );
+        m_imagingParamsProxy->initParameters(params);
+    }
+
+    QString maintenanceUrl = getDeviceOnvifUrl();
+    if (!maintenanceUrl.isEmpty()) {
+        m_maintenanceProxy.reset(new QnOnvifMaintenanceProxy(maintenanceUrl, auth, m_videoSourceToken, m_timeDrift));
+    }
+}
+
+QSet<QString> QnPlOnvifResource::calculateSupportedAdvancedParameters() const {
+    QSet<QString> result;
+    if (m_imagingParamsProxy)
+        result.unite(m_imagingParamsProxy->supportedParameters());
+    if (m_maintenanceProxy)
+        result.unite(m_maintenanceProxy->supportedParameters());
+    return result;
+}
+
+void QnPlOnvifResource::fetchAndSetAdvancedParameters() {
+    QMutexLocker lock(&m_physicalParamsMutex);
+    m_advancedParameters.clear();
+
+    QnCameraAdvancedParams params;
+    if (!loadAdvancedParametersTemplate(params))
         return;
 
-    OnvifCameraSettingReader reader(*settings);
+    initAdvancedParametersProviders(params);
 
-    reader.read() && reader.proceed();
-
-    CameraSettings& onvifSettings = settings->getCameraSettings();
-    CameraSettings::ConstIterator it = onvifSettings.begin();
-
-    for (; it != onvifSettings.end(); ++it) {
-        setParamPhysical(it.key(), it.value().serializeToStr());
-        if (m_appStopping)
-            return;
-    }
-
-    QMutexLocker lock(&m_physicalParamsMutex);
-
-    m_onvifAdditionalSettings = std::move(settings);
+    QSet<QString> supportedParams = calculateSupportedAdvancedParameters();
+    m_advancedParameters = params.filtered(supportedParams);
+    QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), m_advancedParameters);
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncoder& encoder)

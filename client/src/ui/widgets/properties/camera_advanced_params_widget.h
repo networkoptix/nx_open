@@ -27,17 +27,19 @@ public:
     QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr &camera);
 
+    void loadValues();
+    void saveValues();
 private:
     void initSplitter();
 
     void initialize();
     void displayParams();
-    void loadValues();
-    void saveSingleValue(const QnCameraAdvancedParamValue &value);
-    void saveValues();
+    
+    void saveSingleValue(const QnCameraAdvancedParamValue &value);  
 
     bool isCameraAvailable() const;
     void updateCameraAvailability();
+    void updateButtonsState();
     QnMediaServerConnectionPtr getServerConnection() const;
 
     void at_advancedParamChanged(const QString &id, const QString &value);

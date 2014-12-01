@@ -177,21 +177,26 @@ namespace ite
             chanEnum += PARAM_CHANNELS[15];
 
             std::string params =
-            "<cameras> "
-                "<camera name=\"it930x\"> "
+            "<?xml version=\"1.0\"?> "
+            "<plugin "
+                "name = \"IT930X\" "
+                "version = \"1\" "
+                "unique_id = \"11761fbb-04f4-40c8-8213-52d9367676c6\"> "
+                "<parameters>"
+                
                     "<group name=\"Transmission\"> "
-                        "<param query=\"{channel}\" name=\"Channel\" dataType=\"Enumeration\" min=\"{chEnum}\" max=\"{chEnum}\" /> "
-                        "<param query=\"{present}\" name=\"Signal Presence\" dataType=\"Bool\" readOnly=\"true\" /> "
-                        "<param query=\"{strength}\" name=\"Signal Strength\" dataType=\"MinMaxStep\" readOnly=\"true\" min=\"0\" max=\"100\" /> "
+                        "<param id=\"{channel}\" name=\"Channel\" dataType=\"Enumeration\" range=\"{chEnum}\" /> "
+                        "<param id=\"{present}\" name=\"Signal Presence\" dataType=\"Bool\" readOnly=\"true\" /> "
+                        "<param id=\"{strength}\" name=\"Signal Strength\" dataType=\"Number\" readOnly=\"true\" range=\"0,100\" /> "
                     "</group> "
 #if 0
                     "<group name=\"Commands\"> "
-                        "<param query=\"{reboot}\"  name=\"Reboot\" dataType=\"Button\" /> "
-                        "<param query=\"{setDefs}\" name=\"Set Defaults\" dataType=\"Button\" /> "
+                        "<param id=\"{reboot}\"  name=\"Reboot\" dataType=\"Button\" /> "
+                        "<param id=\"{setDefs}\" name=\"Set Defaults\" dataType=\"Button\" /> "
                     "</group> "
 #endif
-                "</camera> "
-            "</cameras>";
+                "</parameters> "
+            "</plugin>";
 
             replaceSubstring(params, "{channel}",   PARAM_QUERY_CHANNEL);
             replaceSubstring(params, "{present}",   PARAM_QUERY_PRESENT);

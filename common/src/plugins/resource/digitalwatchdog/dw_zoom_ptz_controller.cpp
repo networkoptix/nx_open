@@ -2,8 +2,6 @@
 
 #include "dw_zoom_ptz_controller.h"
 
-#include <plugins/resource/camera_settings/camera_settings.h>
-
 #include "digital_watchdog_resource.h"
 
 QnDwZoomPtzController::QnDwZoomPtzController(const QnDigitalWatchdogResourcePtr &resource):

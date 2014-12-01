@@ -1,14 +1,16 @@
 #include "camera_advanced_param_widget_factory.h"
 
+#include <QtCore/QObject>
+
 #include <ui/common/read_only.h>
 #include <ui/style/warning_style.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
-#include <QtCore/QObject>
+#include <utils/math/fuzzy.h>
 
 QnAbstractCameraAdvancedParamWidget::QnAbstractCameraAdvancedParamWidget(const QnCameraAdvancedParameter &parameter, QWidget* parent):
 	QWidget(parent),
-	m_id(parameter.getId()),
+	m_id(parameter.id),
 	m_layout(new QHBoxLayout(this))
 {
 	m_layout->setContentsMargins(0, 0, 0, 0);
@@ -56,9 +58,16 @@ public:
 		QnAbstractCameraAdvancedParamWidget(parameter, parent),
 		m_spinBox(new QSpinBox(this))
 	{
-		m_spinBox->setMinimum(parameter.min.toInt());
-		m_spinBox->setMaximum(parameter.max.toInt());
-		m_spinBox->setSingleStep(parameter.step.toInt());
+        double min = 0;
+        double max = 0;
+        parameter.getRange(min, max);
+        bool isInteger = qFuzzyEquals(qRound(min), min) && qFuzzyEquals(qRound(max), max) && (max - min <= 1.0);
+        if (isInteger) {
+            m_spinBox->setMinimum(qRound(min));
+            m_spinBox->setMaximum(qRound(max));
+        }
+        //TODO: #GDM float spinbox
+
 		m_spinBox->setToolTip(parameter.description);
 		setReadOnly(m_spinBox, parameter.readOnly);
 
@@ -87,7 +96,7 @@ public:
 		QnAbstractCameraAdvancedParamWidget(parameter, parent),
 		m_comboBox(new QComboBox(this))
 	{
-		m_comboBox->addItems(parameter.min.split(L',', QString::SkipEmptyParts));
+		m_comboBox->addItems(parameter.getRange());
 		m_comboBox->setToolTip(parameter.description);
 		setReadOnly(m_comboBox, parameter.readOnly);
 
@@ -128,7 +137,7 @@ public:
 	}
 
 	virtual QString value() const override	{ return QString(); }
-	virtual void setValue(const QString &newValue) override	{}
+	virtual void setValue(const QString &newValue) override	{ Q_UNUSED(newValue); }
 };
 
 class QnStringCameraAdvancedParamWidget: public QnAbstractCameraAdvancedParamWidget {
@@ -159,43 +168,6 @@ private:
 	QLineEdit* m_lineEdit;
 };
 
-class QnControlButtonsPairCameraAdvancedParamWidget: public QnAbstractCameraAdvancedParamWidget {
-public:
-	QnControlButtonsPairCameraAdvancedParamWidget(const QnCameraAdvancedParameter &parameter, QWidget* parent):
-		QnAbstractCameraAdvancedParamWidget(parameter, parent)
-	{
-		QPushButton *plusButton = new QPushButton(this);
-		plusButton->setText(lit("+"));
-		plusButton->setToolTip(parameter.description);
-		setReadOnly(plusButton, parameter.readOnly);
-
-		QPushButton *minusButton = new QPushButton(this);
-		minusButton->setText(lit("-"));
-		minusButton->setToolTip(parameter.description);
-		setReadOnly(minusButton, parameter.readOnly);
-
-		m_layout->insertStretch(0);
-		m_layout->insertWidget(0, minusButton);
-		m_layout->insertWidget(0, plusButton);
-
-		connect(plusButton, &QPushButton::clicked, this, [this] {
-			emit valueChanged(m_id, QString());
-		});
-
-		connect(minusButton, &QPushButton::clicked, this, [this] {
-			emit valueChanged(m_id, QString());
-		});
-	}
-
-	virtual QString value() const override	{
-		return QString();
-	}
-
-	virtual void setValue(const QString &newValue) override	{
-		//do nothing
-	}
-};
-
 QnAbstractCameraAdvancedParamWidget* QnCameraAdvancedParamWidgetFactory::createWidget(const QnCameraAdvancedParameter &parameter, QWidget* parent) {
 	if (!parameter.isValid())
 		return NULL;
@@ -207,7 +179,7 @@ QnAbstractCameraAdvancedParamWidget* QnCameraAdvancedParamWidgetFactory::createW
 		return new QnBoolCameraAdvancedParamWidget(parameter, parent);
 
 	/* Slider */
-	case QnCameraAdvancedParameter::DataType::MinMaxStep:
+	case QnCameraAdvancedParameter::DataType::Number:
 		return new QnMinMaxStepCameraAdvancedParamWidget(parameter, parent);
 
 	/* Drop-down box. */
@@ -221,10 +193,6 @@ QnAbstractCameraAdvancedParamWidget* QnCameraAdvancedParamWidgetFactory::createW
 	/* LineEdit  */
 	case QnCameraAdvancedParameter::DataType::String:
 		return new QnStringCameraAdvancedParamWidget(parameter, parent);
-
-	/* Pair of buttons, one with the '+' sign, one with the '-'. */
-	case QnCameraAdvancedParameter::DataType::ControlButtonsPair:
-		return new QnControlButtonsPairCameraAdvancedParamWidget(parameter, parent);
 
 	default:
 		return NULL;

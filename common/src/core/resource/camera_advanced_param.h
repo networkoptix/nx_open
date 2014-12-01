@@ -6,9 +6,6 @@
 #include <core/resource/resource_fwd.h>
 
 #include <utils/common/model_functions_fwd.h>
-#include <utils/common/uuid.h>
-
-class QDomElement;
 
 struct QnCameraAdvancedParamValue {
 	QString id;
@@ -34,34 +31,36 @@ struct QnCameraAdvancedParameter {
     enum class DataType {
         None,
         Bool,
-        MinMaxStep,
+        Number,
         Enumeration,
         Button,
-        String,
-        ControlButtonsPair
+        String
     };
 
-	QString getId() const;
+
 	bool isValid() const;
 
+    QString id;
+    DataType dataType;
+    QString range;
     QString name;
     QString description;
-    QString query;
-    DataType dataType;
-    QString method;
-    QString min;
-    QString max;
-    QString step;
+    QString tag;  
     bool readOnly;
 
     QnCameraAdvancedParameter();
+
+    QStringList getRange() const;
+    void getRange(double &min, double &max) const;
+    void setRange(int min, int max);
+    void setRange(double min, double max);
 
 	static QString dataTypeToString(DataType value);
 	static DataType stringToDataType(const QString &value);
 
 	static bool dataTypeHasValue(DataType value);
 };
-#define QnCameraAdvancedParameter_Fields (name)(description)(query)(dataType)(method)(min)(max)(step)(readOnly)
+#define QnCameraAdvancedParameter_Fields (id)(dataType)(range)(name)(description)(tag)(readOnly)
 
 struct QnCameraAdvancedParamGroup {
     QString name;
@@ -69,62 +68,31 @@ struct QnCameraAdvancedParamGroup {
     std::vector<QnCameraAdvancedParamGroup> groups;
     std::vector<QnCameraAdvancedParameter> params;
 
-	void merge(const QnCameraAdvancedParamGroup &other);
-
+    bool isEmpty() const;
+    QSet<QString> allParameterIds() const;
     QnCameraAdvancedParameter getParameterById(const QString &id) const;
+    bool updateParameter(const QnCameraAdvancedParameter &parameter);
+    QnCameraAdvancedParamGroup filtered(const QSet<QString> &allowedIds) const;
 };
 #define QnCameraAdvancedParamGroup_Fields (name)(description)(groups)(params)
 
 struct QnCameraAdvancedParams {
+    QString name;
+    QString version;
+    QString unique_id;
+    bool packet_mode;
     std::vector<QnCameraAdvancedParamGroup> groups;
 
-	void merge(const QnCameraAdvancedParams &other);
+    QnCameraAdvancedParams();
 
+    QSet<QString> allParameterIds() const;
     QnCameraAdvancedParameter getParameterById(const QString &id) const;
+    bool updateParameter(const QnCameraAdvancedParameter &parameter);
+
+    void clear();
+    QnCameraAdvancedParams filtered(const QSet<QString> &allowedIds) const;
 };
-#define QnCameraAdvancedParams_Fields (groups)
-
-struct QnCameraAdvancedParamsTree {
-	QString cameraTypeName;
-	std::vector<QnCameraAdvancedParamsTree> children;
-
-	QnCameraAdvancedParams params;
-
-	bool isEmpty() const;
-
-	bool containsSubTree(const QString &cameraTypeName) const;
-	QnCameraAdvancedParams flatten(const QString &cameraTypeName = QString()) const;
-};
-
-/** Class for reading camera advanced parameters xml file. */
-class QnCameraAdvancedParamsReader {
-public:
-    QnCameraAdvancedParamsReader();
-
-	/** Get parameters tree for the given camera. */
-	QnCameraAdvancedParams params(const QnResourcePtr &resource) const;
-private:
-	/** Get inner camera type that is used in the xml as node id. */
-	QString calculateCameraType(const QnResourcePtr &resource) const;
-
-private:
-	/* Per-camera parameters cache. */
-	mutable QHash<QnUuid, QnCameraAdvancedParams> m_paramsByCameraId;
-
-	/* Default parameters tree. */
-	mutable QnCameraAdvancedParamsTree m_defaultParamsTree;
-};
-
-class QnCameraAdvacedParamsXmlParser {
-public:
-	static QnCameraAdvancedParamsTree readXml(QIODevice *xmlSource);
-private:
-	static QnCameraAdvancedParams parseCameraXml(const QDomElement &cameraXml);
-	static QnCameraAdvancedParamGroup parseGroupXml(const QDomElement &groupXml);
-	static QnCameraAdvancedParameter parseElementXml(const QDomElement &elementXml);
-
-	static void buildTree(const QMultiMap<QString, QnCameraAdvancedParamsTree> &source, QnCameraAdvancedParamsTree &out);
-};
+#define QnCameraAdvancedParams_Fields (name)(version)(unique_id)(packet_mode)(groups)
 
 #define QnCameraAdvancedParameterTypes (QnCameraAdvancedParamValue)(QnCameraAdvancedParameter)(QnCameraAdvancedParamGroup)(QnCameraAdvancedParams)
 

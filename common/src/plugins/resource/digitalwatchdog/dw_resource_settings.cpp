@@ -19,7 +19,7 @@ DWCameraProxy::DWCameraProxy(const QString& host, int port, unsigned int timeout
     m_auth(auth)
 {}
 
-QnCameraAdvancedParamValueList DWCameraProxy::fetchParamsFromHttpResponse(const QByteArray& body) {
+QnCameraAdvancedParamValueList DWCameraProxy::fetchParamsFromHttpResponse(const QByteArray& body) const {
     QnCameraAdvancedParamValueList result;
 
     //Fetching params sent in JSON format
@@ -30,41 +30,52 @@ QnCameraAdvancedParamValueList DWCameraProxy::fetchParamsFromHttpResponse(const 
         QStringList pairStrs = str.split(L':');
         if (pairStrs.size() == 2) {
             result << QnCameraAdvancedParamValue(pairStrs[0].trimmed(), pairStrs[1].trimmed());
-            qDebug() << "param found" << m_host << pairStrs[0].trimmed() << pairStrs[1].trimmed();
         }
     }
     return result;
 }
 
 
-bool DWCameraProxy::setParam(const QString &id, const QString &value, const QString &method) {
+bool DWCameraProxy::setParam(const QnCameraAdvancedParameter &parameter, const QString &value) {
+
+    QString innerValue = value;
+    if (parameter.dataType == QnCameraAdvancedParameter::DataType::Enumeration) {
+        int idx = parameter.getRange().indexOf(value);
+        if (idx < 0)
+            return false;
+        innerValue = QString::number(idx);
+    } else if (parameter.dataType == QnCameraAdvancedParameter::DataType::Bool) {
+        int idx = value == lit("true") ? 1 : 0;
+        innerValue = QString::number(idx);
+    }
+
     CLSimpleHTTPClient httpClient(m_host, m_port, m_timeout, m_auth);
 
-    if (method == lit("POST")) {     
+    if (parameter.tag == lit("POST")) {     
         QString paramQuery;
         QString query;
 
-        if (id.startsWith(QLatin1String("/"))) {
-            query = id;
+        if (parameter.id.startsWith(QLatin1String("/"))) {
+            query = parameter.id;
             paramQuery = lit("action=all");
         } else {
             query = lit("/cgi-bin/systemsetup.cgi");
-            paramQuery = lit("ftp_upgrade_") + paramQuery + lit("=") + value;
+            paramQuery = lit("ftp_upgrade_") + paramQuery + lit("=") + innerValue;
         }
 
         return httpClient.doPOST(query, paramQuery) == CL_HTTP_SUCCESS;
     } else {
-        QString paramQuery = id;
-        if (!id.startsWith(L'/'))
-            paramQuery = lit("cgi-bin/camerasetup.cgi?") + id;
+        QString paramQuery = parameter.id;
+        if (!parameter.id.startsWith(L'/'))
+            paramQuery = lit("cgi-bin/camerasetup.cgi?") + parameter.id;
         if (!value.isEmpty())
-            paramQuery = paramQuery + L'=' + value;
+            paramQuery = paramQuery + L'=' + innerValue;
         return httpClient.doGET(paramQuery) == CL_HTTP_SUCCESS;
     }
 }
 
 
-QnCameraAdvancedParamValueList DWCameraProxy::requestParamValues(const QString &request) {
+QnCameraAdvancedParamValueList DWCameraProxy::requestParamValues(const QString &request) const {
     CLSimpleHTTPClient httpClient(m_host, m_port, m_timeout, m_auth);
     CLHttpStatus status = httpClient.doGET(request);
     if (status == CL_HTTP_SUCCESS) 
@@ -77,7 +88,7 @@ QnCameraAdvancedParamValueList DWCameraProxy::requestParamValues(const QString &
     return QnCameraAdvancedParamValueList();
 }
 
-QnCameraAdvancedParamValueList DWCameraProxy::getParamsList() {
+QnCameraAdvancedParamValueList DWCameraProxy::getParamsList() const {
     QnCameraAdvancedParamValueList result;
     result.append(requestParamValues(lit("cgi-bin/getconfig.cgi?action=color")));
     result.append(requestParamValues(lit("cgi-bin/getconfig.cgi?action=ftpUpgradeInfo")));  

@@ -78,6 +78,7 @@ void QnCameraAdvancedParamWidgetsManager::createGroupWidgets(const QnCameraAdvan
 	}
 	item->setData(0, Qt::DisplayRole, group.name);
 	item->setData(0, Qt::ToolTipRole, group.description);
+    item->setExpanded(true);
 
 	QWidget* contentsPage = createContentsPage(group.name, group.params);
 	m_contentsWidget->addWidget(contentsPage);
@@ -115,7 +116,7 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString &
 		if (param.dataType != QnCameraAdvancedParameter::DataType::Button)
 			label->setText(lit("%1: ").arg(param.name));
 		formLayout->addRow(label, widget);
-		m_paramWidgetsById[param.getId()] = widget;
+		m_paramWidgetsById[param.id] = widget;
 
 		/* Widget is disabled until it receive correct value. */
 		if (QnCameraAdvancedParameter::dataTypeHasValue(param.dataType))

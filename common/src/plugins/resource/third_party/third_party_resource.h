@@ -12,8 +12,6 @@
 
 #include <QSharedPointer>
 
-#include <plugins/resource/camera_settings/camera_settings.h>
-
 #include "core/resource/camera_resource.h"
 #include "../../camera_plugin_qt_wrapper.h"
 
@@ -24,6 +22,9 @@ class QnThirdPartyResource
     public QnPhysicalCameraResource,
     public nxcip::CameraInputEventHandler
 {
+    Q_OBJECT
+
+    typedef QnPhysicalCameraResource base_type;
 public:
     static const int PRIMARY_ENCODER_INDEX = 0;
     static const int SECONDARY_ENCODER_INDEX = 1;
@@ -42,6 +43,8 @@ public:
     virtual bool getParamPhysical(const QString &id, QString &value) override;
     //!Implementation of QnResource::setParamPhysical
     virtual bool setParamPhysical(const QString &id, const QString &value) override;
+
+    virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) override;
 
     //!Implementation of QnNetworkResource::ping
     /*!
