@@ -5,7 +5,7 @@ angular.module('webadminApp')
 
 
         mediaserver.getCurrentUser().success(function(result){
-            if(!(result.reply.permissions & Config.globalEditServersPermissions )){
+            if(!result.reply.isAdmin && !(result.reply.permissions & Config.globalEditServersPermissions )){
                 $location.path('/info'); //no admin rights - redirect
             }
         });
