@@ -2,8 +2,7 @@
 <plugin
 		name="DIGITALWATCHDOG" 
 		version="1" 
-		unique_id="81b77092-ef38-4021-8c36-52b36b858977"
-		packet_mode="true">
+		unique_id="81b77092-ef38-4021-8c36-52b36b858977">
 	<parameters>
 		<group name = "Imaging">
 			<group name = "White Balance">

@@ -2,8 +2,7 @@
 <plugin
 		name="ONVIF"
 		version="1" 
-		unique_id="53148996-d4d8-4e90-985e-24c6c63c5150"
-		packet_mode="true">
+		unique_id="53148996-d4d8-4e90-985e-24c6c63c5150">
 	<parameters>
 		<group name="Imaging">
 			<group name="Backlight Compensation">

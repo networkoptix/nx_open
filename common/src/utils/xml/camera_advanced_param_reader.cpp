@@ -131,7 +131,7 @@ bool QnCameraAdvacedParamsXmlParser::readXml(QIODevice *xmlSource, QnCameraAdvan
     result.name         = root.attribute(QnXmlTag::pluginName);
     result.version      = root.attribute(QnXmlTag::pluginVersion);
     result.unique_id    = root.attribute(QnXmlTag::pluginUniqueId);
-    result.packet_mode  = parseBooleanXmlValue(root.attribute(QnXmlTag::pluginPacketMode));
+    result.packet_mode  = parseBooleanXmlValue(root.attribute(QnXmlTag::pluginPacketMode, lit("true")));
 	
 	return parsePluginXml(root, result);
 }
