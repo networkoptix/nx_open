@@ -11,4 +11,18 @@
 </script> --><!--[if lt IE 9]>
 <script src="bower_components/es5-shim/es5-shim.js"></script>
 <script src="bower_components/json3/lib/json3.min.js"></script>
-<![endif]--><script src="scripts/ac9360ae.vendor.js"></script><script src="scripts/49370666.scripts.js"></script><script src="customization/config.js"></script>
+<![endif]--><script src="scripts/ac9360ae.vendor.js"></script><script src="scripts/98d0d02c.scripts.js"></script><script src="customization/config.js"></script><script type="text/ng-template" id="offline_modal"><div class="modal-header">
+            <h3 class="modal-title">Server is offline</h3>
+    </div>
+
+    <form class="form" role="form" id="restartDialog">
+            <div class="modal-body" class="col-sm-12">
+            <p>Server can't handle requests now. Trying to reach it again.</p>
+    <progressbar class="progress-striped active" type="info" value="100" id="restartingProgress">{{state}}</progressbar>
+    <p>If nothing happens for a while - you could check server condition manually</p>
+    </div>
+
+    <div class="modal-footer">
+            <button class="btn btn-primary pull-left" name="button" ng-click="refresh()" ng-disabled="form.$invalid">Refresh page</button>
+    </div>
+    </form></script>
