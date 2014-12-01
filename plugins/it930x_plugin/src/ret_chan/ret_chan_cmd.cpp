@@ -731,26 +731,6 @@ Byte Cmd_calChecksum(IN unsigned payload_start_point, IN unsigned payload_end_po
 	return Checksum;
 }
 
-Byte Cmd_checkChecksum(IN unsigned payload_start_point, IN unsigned payload_end_point, IN const Byte * buffer)
-{
-	unsigned i;
-	Byte ret;
-	Word Sum = 0;
-	Byte Checksum = 0;
-
-	for(i = payload_start_point;i <= payload_end_point;i++){
-		Sum = Sum + buffer[i];
-	}
-	Checksum = (Byte)(Sum%256);
-
-	if(Checksum == buffer[payload_end_point + 1])
-		ret = 0;
-	else
-		ret = 0xFE;
-
-	return ret;
-}
-
 //-------------------TS process-------------------------
 
 unsigned TSHeadCheck(Byte* srcbuf, Device* device)

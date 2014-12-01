@@ -318,8 +318,7 @@ namespace ite
     {
         unsigned totalGetBufferCount;
         unsigned totalPKTCount;
-        unsigned leadingTagErrorCount;
-        unsigned endTagErrorCount;
+        unsigned tagErrorCount;
         unsigned lengthErrorCount;
         unsigned checkSumErrorCount;
         unsigned sequenceErrorCount;

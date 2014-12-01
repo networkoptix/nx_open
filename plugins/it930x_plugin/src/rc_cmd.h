@@ -33,7 +33,7 @@ namespace ite
 
         bool isOK() const
         {
-            return isFull() && hasLeadingTag() && hasEndingTag();
+            return isFull() && hasLeadingTag() && hasEndingTag() && checksum();
         }
 
         void clear() { buffer_.clear(); }
@@ -52,15 +52,16 @@ namespace ite
         unsigned short sequenceNum() const { return (buffer_[9]<<8) | buffer_[10]; }
         unsigned short pktLength() const { return (buffer_[11]<<8) | buffer_[12]; }
 
-        Byte checkSum() const { return buffer_[headSize() + pktLength()]; }
+        Byte checkSumValue() const { return buffer_[headSize() + pktLength()]; }
+        bool checksum() const;
 
         bool isBroadcast() const { return txDeviceID() == 0xFFFF; }
 
         const Byte * head() const { return &buffer_[0]; }
         const Byte * data() const { return &buffer_[headSize()]; }
 
-        unsigned headCheck();
-        unsigned deviceCheck(Device * device);
+        unsigned headCheck() const;
+        unsigned deviceCheck(Device * device) const;
 
     private:
         std::vector<Byte> buffer_;
@@ -90,7 +91,6 @@ namespace ite
             isValid_ = false;
         }
 
-        bool isChecksumOK() const;
         bool isValid() const { return isValid_; }
 
         void setValid(bool value = true) { isValid_ = value; }

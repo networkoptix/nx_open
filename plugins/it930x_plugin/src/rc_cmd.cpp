@@ -3,14 +3,8 @@
 namespace ite
 {
 
-unsigned Command::headCheck()
+unsigned Command::headCheck() const
 {
-    if (! isOK())
-        return ReturnChannelError_CMD_SYNTAX_ERROR;
-
-    if (Cmd_checkChecksum(3, 12 + pktLength(), head()) != 0)
-        return ReturnChannelError_CMD_CHECKSUM_ERROR;
-
     Word total_pktNum = totalPktNum();
     if (total_pktNum == 0)
         return ReturnChannelError_CMD_PKTCHECK_ERROR;
@@ -25,7 +19,7 @@ unsigned Command::headCheck()
     return ModulatorError_NO_ERROR;
 }
 
-unsigned Command::deviceCheck(Device * device)
+unsigned Command::deviceCheck(Device * device) const
 {
     if (device->hostRxDeviceID != rxDeviceID())
         return ReturnChannelError_CMD_RXDEVICEID_ERROR;
@@ -42,6 +36,18 @@ unsigned Command::deviceCheck(Device * device)
 
     device->RCCmd_sequence_recv = seqNum;
     return ModulatorError_NO_ERROR;
+}
+
+bool Command::checksum() const
+{
+    // -2 bytes rxID, -1 byte checksum byte
+    unsigned sum = 0;
+    for (unsigned i = 3; i < buffer_.size() && i < headSize() + pktLength(); ++i)
+        sum += buffer_[i];
+    sum &= 0xff;
+
+    Byte value = checkSumValue();
+    return (sum == value);
 }
 
 unsigned RebuiltCmd::add(const Command& cmd)
@@ -82,15 +88,6 @@ unsigned RebuiltCmd::add(const Command& cmd)
         return ReturnChannelError_CMD_PKTCHECK_ERROR;
 
     return ModulatorError_NO_ERROR;
-}
-
-bool RebuiltCmd::isChecksumOK() const
-{
-    unsigned index = 0;
-    unsigned checkByte = 0;
-
-    Cmd_CheckByteIndexRead(data(), index, &checkByte);
-    return Cmd_checkChecksum(index, index + checkByte - 1, data()) == 0;
 }
 
 } // ret_chan

@@ -86,29 +86,36 @@ void * RC_Shell_RecvThread(void * data)
         if (cmdCurrent.isOK())
         {
             debugInfo.totalPKTCount++;
-
-            unsigned short curCommand = cmdCurrent.commandID();
-#if 0 // DEBUG
-            printf("RC cmd: %x; TxID: %d; RxID: %d\n", curCommand, cmdCurrent.txDeviceID(), cmdCurrent.rxDeviceID());
+#if 0
+            unsigned error = cmdCurrent.headCheck();
+            if (error != ModulatorError_NO_ERROR)
+                // TODO
 #endif
+            unsigned short cmdID = cmdCurrent.commandID();
             unsigned short rxID = cmdCurrent.rxDeviceID();
             unsigned short txID = cmdCurrent.txDeviceID();
-            pShell->addDevice(rxID, txID, (CMD_GetTxDeviceAddressIDOutput == curCommand) );
+#if 0 // DEBUG
+            printf("RC cmd: %x; TxID: %d; RxID: %d\n", curCommand, txID, rxID);
+#endif
+            pShell->addDevice(rxID, txID, (CMD_GetTxDeviceAddressIDOutput == cmdID) );
 
             pShell->processCommand(cmdCurrent);
             cmdCurrent.clear();
         }
         else
         {
-            if (! cmdCurrent.hasLeadingTag())
-                debugInfo.leadingTagErrorCount++;
-            if (! cmdCurrent.hasEndingTag())
-                debugInfo.endTagErrorCount++;
+            if (! cmdCurrent.hasTags())
+            {
+                debugInfo.tagErrorCount++;
+                fixReadingPosition(replyBuffer, BUFFER_SIZE);
+                continue;
+            }
+
             if (! cmdCurrent.isFull())
                 debugInfo.lengthErrorCount++;
 
-            //if (debugInfo.leadingTagErrorCount % 16 == 0)
-            fixReadingPosition(replyBuffer, BUFFER_SIZE);
+            if (! cmdCurrent.checksum())
+                debugInfo.checkSumErrorCount++;
         }
     }
 
@@ -358,35 +365,13 @@ RCShell::Error RCShell::processCommand(Command& cmdPart)
     if (devs_.empty())
         return lastError_ = RCERR_NO_DEVICE;
 
-    unsigned error = cmdPart.headCheck();
-    if (error != ModulatorError_NO_ERROR)
-    {
-        if (error == ReturnChannelError_CMD_SYNTAX_ERROR)
-        {
-            if (! cmdPart.hasLeadingTag())
-                debugInfo_.leadingTagErrorCount++;
-            if (! cmdPart.hasEndingTag())
-                debugInfo_.endTagErrorCount++;
-
-            return lastError_ = RCERR_SYNTAX;
-        }
-
-        if (error == ReturnChannelError_CMD_CHECKSUM_ERROR)
-        {
-            debugInfo_.checkSumErrorCount++;
-            return lastError_ = RCERR_CHECKSUM;
-        }
-
-        return lastError_ = RCERR_OTHER;
-    }
-
     DeviceInfoPtr info;
     for (unsigned i = 0; i < devs_.size(); i++)
     {
         info = devs_[i];
         RCHostInfo * deviceInfo = info->xPtr();
 
-        error = cmdPart.deviceCheck(&deviceInfo->device);
+        unsigned error = cmdPart.deviceCheck(&deviceInfo->device);
         if (error == ReturnChannelError_CMD_SEQUENCE_ERROR)
         {
             debugInfo_.sequenceErrorCount++;
@@ -412,10 +397,7 @@ RCShell::Error RCShell::processCommand(Command& cmdPart)
         if (info->cmd().size() < 8)
             return lastError_ = RCERR_WRONG_LENGTH;
 
-        if (!info->cmd().isChecksumOK())
-            return lastError_ = RCERR_CHECKSUM;
-
-        if (info->cmd().returnCode() != 0)
+        if (info->cmd().returnCode() != 0) // TODO: not all cammands
             return lastError_ = RCERR_RET_CODE;
 
         unsigned short command = info->cmd().commandID();
@@ -603,8 +585,7 @@ void DebugInfo::reset()
 {
     totalGetBufferCount = 0;
     totalPKTCount = 0;
-    leadingTagErrorCount = 0;
-    endTagErrorCount = 0;
+    tagErrorCount = 0;
     lengthErrorCount = 0;
     checkSumErrorCount = 0;
     sequenceErrorCount = 0;
@@ -612,14 +593,13 @@ void DebugInfo::reset()
 
 void DebugInfo::print() const
 {
-    printf("\n=== User_DebugInfo_log ===\n");
+    printf("\n=== RC DebugInfo ===\n");
     printf("Total GetBuffer Count   = %u\n", totalGetBufferCount);
-    printf("Leading Tag Error Count = %u\n", leadingTagErrorCount);
+    printf("Tags Error Count        = %u\n", tagErrorCount);
     printf("Total PKT Count         = %u\n", totalPKTCount);
-    printf("End Tag Error Count     = %u\n", endTagErrorCount);
     printf("CheckSum Error Count    = %u\n", checkSumErrorCount);
     printf("Sequence Error Count    = %u\n", sequenceErrorCount);
-    printf("\n=== User_DebugInfo_log ===\n");
+    printf("\n=== RC DebugInfo ===\n");
 }
 
 } // ret_chan

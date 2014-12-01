@@ -1545,8 +1545,6 @@ unsigned Cmd_StringCopy(IN const RCString * srcStr, OUT RCString * dstStr);
 unsigned Cmd_StringSet(IN const Byte * buf, IN unsigned bufferLength, OUT RCString * str);
 unsigned Cmd_StringClear(IN RCString * str);
 
-Byte Cmd_checkChecksum(IN unsigned payload_start_point, IN unsigned payload_end_point, IN const Byte * buffer);
-
 //---------------------General Process------------------------
 
 #endif

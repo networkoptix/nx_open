@@ -49,9 +49,6 @@ unsigned Cmd_HostParser(IN RCHostInfo * deviceInfo, Word command, const Byte * B
             check = Cmd_StringClear(&security.password);
         }
 
-        //if (deviceInfo->cmdConfig.ExpectCmd != command)
-        //    printf("\n Get command %x  BUT IGNORE cause Not expect reply %x \n",command, deviceInfo->cmdConfig.ExpectCmd);
-
 #if 0
 		if ((command == CMD_MetadataStreamOutput)|| ((deviceInfo->cmdConfig.IsTimeOut == 0) && ( deviceInfo->cmdConfig.ExpectCmd == command)))
 #endif
