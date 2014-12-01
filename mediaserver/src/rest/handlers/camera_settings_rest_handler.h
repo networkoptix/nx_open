@@ -15,6 +15,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include <rest/server/json_rest_handler.h>
+#include <utils/common/connective.h>
 
 
 //!Handles requests to set/get camera parameters. All methods are re-enterable
@@ -45,57 +46,39 @@
 struct AwaitedParameters;
 class QnCameraAdvancedParamsReader;
 
-class QnCameraSettingsRestHandler
-:
-    public QnJsonRestHandler
-{
+class QnCameraSettingsRestHandler: public Connective<QnJsonRestHandler> {
     Q_OBJECT
 
-	typedef QnJsonRestHandler base_type;
+	typedef Connective<QnJsonRestHandler> base_type;
 public:
 	QnCameraSettingsRestHandler();
 	virtual ~QnCameraSettingsRestHandler();
 
     //!Implementation of QnJsonRestHandler::executeGet
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
-    //!Implementation of QnRestRequestHandler::description
-    //virtual QString description(TCPSocket* tcpSocket) const;
+private:
+    enum class Operation {
+        GetParam,
+        GetParamsBatch,
+        SetParam,
+        SetParamsBatch
+    };
+
+    void connectToResource(const QnResourcePtr &resource, Operation operation);
+    void disconnectFromResource(const QnResourcePtr &resource, Operation operation);
+    void processOperation(const QnResourcePtr &resource, Operation operation, const QnCameraAdvancedParamValueList &values);
+
+private slots:
+    void asyncParamGetComplete(const QnResourcePtr &resource, const QString &id, const QString &value, bool success);
+    void asyncParamSetComplete(const QnResourcePtr &resource, const QString &id, const QString &value, bool success);
+    void asyncParamsGetComplete(const QnResourcePtr &resource, const QnCameraAdvancedParamValueList &values);
+    void asyncParamsSetComplete(const QnResourcePtr &resource, const QnCameraAdvancedParamValueList &values);
 
 private:
     QMutex m_mutex;
     QWaitCondition m_cond;
     std::set<AwaitedParameters*> m_awaitedParamsSets;
-	QScopedPointer<QnCameraAdvancedParamsReader> m_paramsReader;
-
-
-private slots:
-    void asyncParamGetComplete(const QnResourcePtr &resource, const QString &id, const QString &value, bool success);
-    void asyncParamSetComplete(const QnResourcePtr &resource, const QString &id, const QString &value, bool success);
-};
-
-//!Handles getCameraParam request
-/*!
-    Derived only to allow correct description. All request processing is done in \a QnCameraSettingsHandler class
-*/
-class QnSetCameraParamRestHandler
-:
-    public QnCameraSettingsRestHandler
-{
-    Q_OBJECT
-public:
-};
-
-//!Handles setCameraParam request
-/*!
-    Derived only to allow correct description. All request processing is done in \a QnCameraSettingsHandler class
-*/
-class QnGetCameraParamRestHandler
-:
-    public QnCameraSettingsRestHandler
-{
-    Q_OBJECT
-public:
-    //!Implementation of QnRestRequestHandler::description
+    QScopedPointer<QnCameraAdvancedParamsReader> m_paramsReader;
 };
 
 #endif  //QN_CAMERA_SETTINGS_HANDLER_H

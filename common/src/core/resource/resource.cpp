@@ -13,6 +13,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/model_functions.h>
 
+#include <core/resource/camera_advanced_param.h>
 #include "core/dataprovider/abstract_streamdataprovider.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/ptz/abstract_ptz_controller.h"
@@ -42,7 +43,7 @@ static const qint64 MIN_INIT_INTERVAL = 1000000ll * 30;
 class QnResourceGetParamCommand : public QnResourceCommand
 {
 public:
-    QnResourceGetParamCommand(QnResourcePtr res, const QString& id):
+    QnResourceGetParamCommand(const QnResourcePtr &res, const QString& id):
         QnResourceCommand(res),
         m_id(id)
     {}
@@ -65,16 +66,51 @@ private:
 };
 
 typedef QSharedPointer<QnResourceGetParamCommand> QnResourceGetParamCommandPtr;
-#endif // ENABLE_DATA_PROVIDERS
+
+// -------------------------------------------------------------------------- //
+// QnResourceGetParamsCommand
+// -------------------------------------------------------------------------- //
+class QnResourceGetParamsCommand : public QnResourceCommand
+{
+public:
+    QnResourceGetParamsCommand(const QnResourcePtr &res, const QSet<QString>& ids):
+        QnResourceCommand(res),
+        m_ids(ids)
+    {}
+
+    virtual void beforeDisconnectFromResource(){}
+
+    bool execute()
+    {
+        bool success = isConnectedToTheResource();
+        
+        QnCameraAdvancedParamValueList result;
+        if (success) {
+            for(const QString &id: m_ids) {
+                QString value;
+                if (m_resource->getParamPhysical(id, value))
+                    result << QnCameraAdvancedParamValue(id, value);
+                else
+                    success = false;
+            }
+        }
+        emit m_resource->asyncParamsGetDone(m_resource, result);
+        return success;
+    }
+
+private:
+    QSet<QString> m_ids;
+};
+
+typedef QSharedPointer<QnResourceGetParamsCommand> QnResourceGetParamsCommandPtr;
 
 // -------------------------------------------------------------------------- //
 // QnResourceSetParamCommand
 // -------------------------------------------------------------------------- //
-#ifdef ENABLE_DATA_PROVIDERS
 class QnResourceSetParamCommand : public QnResourceCommand
 {
 public:
-    QnResourceSetParamCommand(QnResourcePtr res, const QString& id, const QString& value):
+    QnResourceSetParamCommand(const QnResourcePtr &res, const QString& id, const QString& value):
         QnResourceCommand(res),
         m_id(id),
         m_value(value)
@@ -84,10 +120,10 @@ public:
 
     bool execute()
     {
-        if (!isConnectedToTheResource())
-            return false;
-
-        bool success = m_resource->setParamPhysical(m_id, m_value);
+        bool success = false;
+        if (isConnectedToTheResource()) {
+            success = m_resource->setParamPhysical(m_id, m_value);
+        }
         emit m_resource->asyncParamSetDone(m_resource, m_id, m_value, success);
         return success;
     }
@@ -97,6 +133,41 @@ private:
     QString m_value;
 };
 typedef QSharedPointer<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
+
+// -------------------------------------------------------------------------- //
+// QnResourceSetParamsCommand
+// -------------------------------------------------------------------------- //
+class QnResourceSetParamsCommand : public QnResourceCommand
+{
+public:
+    QnResourceSetParamsCommand(const QnResourcePtr &res, const QnCameraAdvancedParamValueList &values):
+        QnResourceCommand(res),
+        m_values(values)
+    {}
+
+    virtual void beforeDisconnectFromResource(){}
+
+    bool execute()
+    {
+        bool success = isConnectedToTheResource();
+
+        QnCameraAdvancedParamValueList result;
+        if (success) {
+            for(const QnCameraAdvancedParamValue &value: m_values) {
+                if (m_resource->setParamPhysical(value.id, value.value))
+                    result << value;
+                else
+                    success = false;
+            }
+        }
+        emit m_resource->asyncParamsSetDone(m_resource, result);
+        return success;
+    }
+
+private:
+    QnCameraAdvancedParamValueList m_values;
+};
+typedef QSharedPointer<QnResourceSetParamsCommand> QnResourceSetParamsCommandPtr;
 
 
 #endif // ENABLE_DATA_PROVIDERS
@@ -360,15 +431,23 @@ bool QnResource::setParamPhysical(const QString &id, const QString &value) {
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-void QnResource::setParamPhysicalAsync(const QString& name, const QString& value)
-{
+void QnResource::setParamPhysicalAsync(const QString& name, const QString& value) {
     QnResourceSetParamCommandPtr command(new QnResourceSetParamCommand(toSharedPointer(this), name, value));
     addCommandToProc(command);
 }
 
-void QnResource::getParamPhysicalAsync(const QString& name)
-{
+void QnResource::getParamPhysicalAsync(const QString& name) {
     QnResourceGetParamCommandPtr command(new QnResourceGetParamCommand(toSharedPointer(this), name));
+    addCommandToProc(command);
+}
+
+void QnResource::getParamsPhysicalAsync(const QSet<QString> &ids) {
+    QnResourceGetParamsCommandPtr command(new QnResourceGetParamsCommand(toSharedPointer(this), ids));
+    addCommandToProc(command);
+}
+
+void QnResource::setParamsPhysicalAsync(const QnCameraAdvancedParamValueList &values) {
+    QnResourceSetParamsCommandPtr command(new QnResourceSetParamsCommand(toSharedPointer(this), values));
     addCommandToProc(command);
 }
 

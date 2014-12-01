@@ -44,6 +44,7 @@
 #include <plugins/resource/onvif/onvif_maintenance_proxy.h>
 
 #include <utils/common/model_functions.h>
+#include <utils/xml/camera_advanced_param_reader.h>
 
 //!assumes that camera can only work in bistable mode (true for some (or all?) DW cameras)
 #define SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
@@ -1293,6 +1294,13 @@ bool QnPlOnvifResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &sourc
     if (!onvifUrlSource.isEmpty() && getDeviceOnvifUrl() != onvifUrlSource)
     {
         setDeviceOnvifUrl(onvifUrlSource);
+        result = true;
+    }
+
+    QString localParams = QnCameraAdvancedParamsReader::encodedParamsFromResource(this->toSharedPointer());
+    QString sourceParams = QnCameraAdvancedParamsReader::encodedParamsFromResource(source);
+    if (localParams != sourceParams) {
+        QnCameraAdvancedParamsReader::setEncodedParamsToResource(this->toSharedPointer(), sourceParams);
         result = true;
     }
 

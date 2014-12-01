@@ -7,6 +7,7 @@
 #include "common/common_module.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "newdw_ptz_controller.h"
+#include <utils/xml/camera_advanced_param_reader.h>
 
 static const int HTTP_PORT = 80;
 

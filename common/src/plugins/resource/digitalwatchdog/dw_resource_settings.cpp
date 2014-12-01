@@ -30,7 +30,6 @@ QnCameraAdvancedParamValueList DWCameraProxy::fetchParamsFromHttpResponse(const 
         QStringList pairStrs = str.split(L':');
         if (pairStrs.size() == 2) {
             result << QnCameraAdvancedParamValue(pairStrs[0].trimmed(), pairStrs[1].trimmed());
-            qDebug() << "param found" << m_host << pairStrs[0].trimmed() << pairStrs[1].trimmed();
         }
     }
     return result;

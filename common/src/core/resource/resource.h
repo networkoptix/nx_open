@@ -222,6 +222,8 @@ signals:
         \param success true, if param successfully read, false otherwise
     */
     void asyncParamGetDone(const QnResourcePtr &resource, const QString& paramName, const QString &paramValue, bool success) const;
+
+    void asyncParamsGetDone(const QnResourcePtr &resource, const QnCameraAdvancedParamValueList &values) const;
     
     //!Emitted on completion of every async set started with setParamAsync
     /*!
@@ -229,6 +231,8 @@ signals:
         \param success true, if param successfully set, false otherwise
     */
     void asyncParamSetDone(const QnResourcePtr &resource, const QString& paramName, const QString &paramValue, bool success);
+
+    void asyncParamsSetDone(const QnResourcePtr &resource, const QnCameraAdvancedParamValueList &values) const;
 
     void initAsyncFinished(const QnResourcePtr &resource, bool initialized); // TODO: #Elric remove signal
 
@@ -251,11 +255,15 @@ public:
 
     QnResourcePtr toSharedPointer() const;
 
+    // should just do physical job ( network or so ) do not care about memory domain
     virtual bool getParamPhysical(const QString &id, QString &value);
     virtual bool setParamPhysical(const QString &id, const QString &value);
-    // should just do physical job ( network or so ) do not care about memory domain
-    void setParamPhysicalAsync(const QString &id, const QString &value);
+
     void getParamPhysicalAsync(const QString &id);
+    void setParamPhysicalAsync(const QString &id, const QString &value);
+    
+    void getParamsPhysicalAsync(const QSet<QString> &ids);
+    void setParamsPhysicalAsync(const QnCameraAdvancedParamValueList &values);
 protected:
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields);
 

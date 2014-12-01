@@ -36,6 +36,7 @@ class QnResourceCommand;
 typedef QSharedPointer<QnResourceCommand> QnResourceCommandPtr;
 
 struct QnCameraAdvancedParamValue;
+class QnCameraAdvancedParamValueMap;
 typedef QList<QnCameraAdvancedParamValue> QnCameraAdvancedParamValueList;
 
 // -->

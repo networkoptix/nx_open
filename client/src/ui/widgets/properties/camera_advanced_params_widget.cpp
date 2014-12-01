@@ -9,6 +9,8 @@
 
 #include <ui/widgets/properties/camera_advanced_param_widgets_manager.h>
 
+#include <utils/xml/camera_advanced_param_reader.h>
+
 namespace {
     bool parameterHasValue(const QnCameraAdvancedParameter &param) {
         return param.isValid() && QnCameraAdvancedParameter::dataTypeHasValue(param.dataType);

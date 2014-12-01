@@ -6,9 +6,6 @@
 #include <core/resource/resource_fwd.h>
 
 #include <utils/common/model_functions_fwd.h>
-#include <utils/common/uuid.h>
-
-class QDomElement;
 
 struct QnCameraAdvancedParamValue {
 	QString id;
@@ -83,7 +80,10 @@ struct QnCameraAdvancedParams {
     QString name;
     QString version;
     QString unique_id;
+    bool packet_mode;
     std::vector<QnCameraAdvancedParamGroup> groups;
+
+    QnCameraAdvancedParams();
 
     QSet<QString> allParameterIds() const;
     QnCameraAdvancedParameter getParameterById(const QString &id) const;
@@ -92,33 +92,7 @@ struct QnCameraAdvancedParams {
     void clear();
     QnCameraAdvancedParams filtered(const QSet<QString> &allowedIds) const;
 };
-#define QnCameraAdvancedParams_Fields (name)(version)(unique_id)(groups)
-
-/** Class for reading camera advanced parameters. */
-class QnCameraAdvancedParamsReader {
-public:
-    QnCameraAdvancedParamsReader();
-
-	/** Get parameters list for the given resource. */
-	QnCameraAdvancedParams params(const QnResourcePtr &resource) const;
-    void setParams(const QnResourcePtr &resource, const QnCameraAdvancedParams &params) const;
-
-    static QnCameraAdvancedParams paramsFromResource(const QnResourcePtr &resource);
-    static void setParamsToResource(const QnResourcePtr &resource, const QnCameraAdvancedParams &params);
-private:
-	/* Per-camera parameters cache. */
-	mutable QHash<QnUuid, QnCameraAdvancedParams> m_paramsByCameraId;
-};
-
-class QnCameraAdvacedParamsXmlParser {
-public:
-    static bool validateXml(QIODevice *xmlSource);
-	static bool readXml(QIODevice *xmlSource, QnCameraAdvancedParams &result);
-private:
-	static bool parsePluginXml(const QDomElement &pluginXml, QnCameraAdvancedParams &params);
-	static bool parseGroupXml(const QDomElement &groupXml, QnCameraAdvancedParamGroup &group);
-	static bool parseElementXml(const QDomElement &elementXml, QnCameraAdvancedParameter &param);
-};
+#define QnCameraAdvancedParams_Fields (name)(version)(unique_id)(packet_mode)(groups)
 
 #define QnCameraAdvancedParameterTypes (QnCameraAdvancedParamValue)(QnCameraAdvancedParameter)(QnCameraAdvancedParamGroup)(QnCameraAdvancedParams)
 

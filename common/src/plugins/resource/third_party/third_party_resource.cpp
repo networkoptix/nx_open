@@ -14,14 +14,15 @@
 
 #include <core/resource/camera_advanced_param.h>
 
-#include <utils/common/log.h>
-
 #include "api/app_server_connection.h"
 #include "motion_data_picture.h"
 #include "plugins/resource/archive/archive_stream_reader.h"
 #include "third_party_archive_delegate.h"
 #include "third_party_ptz_controller.h"
 #include "third_party_stream_reader.h"
+
+#include <utils/common/log.h>
+#include <utils/xml/camera_advanced_param_reader.h>
 
 
 static const QString MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
@@ -69,7 +70,6 @@ QnAbstractPtzController* QnThirdPartyResource::createPtzControllerInternal()
 }
 
 bool QnThirdPartyResource::getParamPhysical(const QString& id, QString &value) {
-	qDebug() << "QnThirdPartyResource::getParamPhysical" << id;
     QMutexLocker lk( &m_mutex );
 
     if( !m_cameraManager3 )
@@ -91,7 +91,6 @@ bool QnThirdPartyResource::getParamPhysical(const QString& id, QString &value) {
             case nxcip::NX_NO_ERROR:
             {
                 value = QString::fromUtf8( valueBuf.get(), valueBufSize );
-				qDebug() << "QnThirdPartyResource::getParamPhysical calculated result" << id << value << value.size();
                 return true;
             }
             case nxcip::NX_MORE_DATA:
@@ -102,9 +101,7 @@ bool QnThirdPartyResource::getParamPhysical(const QString& id, QString &value) {
         }
         break;
     }
-
     //TODO #ak return error description
-	qDebug() << "QnThirdPartyResource::getParamPhysical could not calculate result for" << id;
     return false;
 }
 
@@ -117,6 +114,20 @@ bool QnThirdPartyResource::setParamPhysical(const QString& id, const QString &va
         id.toUtf8().constData(),
         value.toUtf8().constData() ) == nxcip::NX_NO_ERROR;
 }
+
+bool QnThirdPartyResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) {
+    bool result = base_type::mergeResourcesIfNeeded(source);
+
+    QString localParams = QnCameraAdvancedParamsReader::encodedParamsFromResource(this->toSharedPointer());
+    QString sourceParams = QnCameraAdvancedParamsReader::encodedParamsFromResource(source);
+    if (localParams != sourceParams) {
+        QnCameraAdvancedParamsReader::setEncodedParamsToResource(this->toSharedPointer(), sourceParams);
+        result = true;
+    }
+
+    return result;
+}
+
 
 bool QnThirdPartyResource::ping()
 {
