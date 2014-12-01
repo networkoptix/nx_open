@@ -5,32 +5,43 @@
     </div>
 
     <div class="modal-body" class="col-sm-12">
-        <div class="form-group">
-            <label for="otherSystemUrl" class="control-label">Other System's URL</label>
-            <div class="">
-                <div class="input-group" dropdown>
-                    <input type="url" ng-model="settings.url" class="form-control" id="otherSystemUrl" placeholder="http(s)://host:port" required />
+        <ng-form name="findSystemForm">
+            <div class="form-group">
+                <label for="otherSystemUrl" class="control-label">Other System's URL</label>
+                <div class="">
+                    <div class="input-group" dropdown>
+                        <input type="url" ng-model="settings.url" class="form-control" id="otherSystemUrl" placeholder="http(s)://host:port" required />
 
-                    <ul class="dropdown-menu" role="menu" id="discoveredUrls">
-                        <li ng-if="systems.discoveredUrls.length == 0" id="no-systems-message"><a>No systems found</a></li>
-                        <li ng-repeat="system in systems.discoveredUrls">
-                            <a href="#" ng-click="selectSystem(system)">{{system.name}} ({{system.ip}}) ({{system.systemName}})</a>
-                        </li>
-                    </ul>
+                        <ul class="dropdown-menu" role="menu" id="discoveredUrls">
+                            <li ng-if="systems.discoveredUrls.length == 0" id="no-systems-message"><a>No systems found</a></li>
+                            <li ng-repeat="system in systems.discoveredUrls">
+                                <a href="#" ng-click="selectSystem(system);$event.stopPropagation();">{{system.name}} ({{system.ip}}) ({{system.systemName}})</a>
+                            </li>
+                        </ul>
 
-                    <span type="button" class="input-group-addon dropdown-toggle">
-                        <span class="caret"></span>
-                    </span>
+                        <span type="button" class="input-group-addon dropdown-toggle">
+                            <span class="caret"></span>
+                        </span>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="form-group">
-            <label for="otherSystemPassword" class="control-label">Other System's Password</label>
+
+            <div class="form-group">
+                <label for="otherSystemPassword" class="control-label">Other System's Password</label>
+                <div class="">
+                    <input type="password" ng-model="settings.password"  class="form-control" id="otherSystemPassword" placeholder="Password" required />
+                </div>
+            </div>
+        </ng-form>
+
+        <div class="form-group" ng-class="{hidden:!systems.systemFound}">
+            <label for="currentSystemPassword" class="control-label">Current System's Password</label>
             <div class="">
-                <input type="password" ng-model="settings.password"  class="form-control" id="otherSystemPassword" placeholder="Password" required />
+                <input type="password" ng-model="settings.currentPassword"  class="form-control" id="currentSystemPassword" placeholder="Password" required />
             </div>
         </div>
-        <div class="form-group"  ng-class="{hidden:!systems.systemFound}">
+
+        <div class="form-group" ng-class="{hidden:!systems.systemFound}">
             <p>You are about to merge the current system <b>{{systems.systemName}}</b> with the system <b>{{systems.joinSystemName}}</b></p>
             <p>
                 The new system will have password and name from the system:<br/>
@@ -40,7 +51,7 @@
         </div>
     </div>
     <div class="modal-footer" >
-        <button class="btn btn-default" ng-class="{'btn-primary':!systems.systemFound}" name="button" ng-click="test()" ng-disabled="form.$invalid"  ng-disabled="form.$invalid">Find system</button>
+        <button class="btn btn-default" ng-class="{'btn-primary':!systems.systemFound}" name="button" ng-click="test()" ng-disabled="findSystemForm.$invalid"  ng-disabled="form.$invalid">Find system</button>
         <button class="btn btn-primary " ng-class="{hidden:!systems.systemFound}" id="merge-systems-button" name="button" ng-click="join()" ng-disabled="form.$invalid">Merge with {{systems.joinSystemName}}</button>
     </div>
 </form>

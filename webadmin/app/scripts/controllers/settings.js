@@ -36,7 +36,7 @@ angular.module('webadminApp')
 
             modalInstance.result.then(function (settings) {
                 $log.info(settings);
-                mediaserver.mergeSystems(settings.url,settings.password,settings.keepMySystem).then(function(r){
+                mediaserver.mergeSystems(settings.url,settings.password,settings.currentPassword,settings.keepMySystem).then(function(r){
                     if(r.data.error!=='0'){
                         var errorToShow = r.data.errorString;
                         switch(errorToShow){
