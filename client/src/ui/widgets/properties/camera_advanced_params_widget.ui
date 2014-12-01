@@ -16,7 +16,7 @@
      <item>
       <widget class="QPushButton" name="loadButton">
        <property name="text">
-        <string>Load</string>
+        <string>Reload</string>
        </property>
       </widget>
      </item>

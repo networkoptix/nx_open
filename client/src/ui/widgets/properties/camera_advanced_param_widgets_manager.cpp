@@ -78,6 +78,7 @@ void QnCameraAdvancedParamWidgetsManager::createGroupWidgets(const QnCameraAdvan
 	}
 	item->setData(0, Qt::DisplayRole, group.name);
 	item->setData(0, Qt::ToolTipRole, group.description);
+    item->setExpanded(true);
 
 	QWidget* contentsPage = createContentsPage(group.name, group.params);
 	m_contentsWidget->addWidget(contentsPage);
