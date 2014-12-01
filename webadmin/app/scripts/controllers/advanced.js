@@ -21,11 +21,9 @@ angular.module('webadminApp')
             $scope.storages = _.sortBy(r.data.reply.storages,function(storage){
                 return formatUrl(storage.url);
             });
-
-            for(var i = 0; i<$scope.storages;i++){
+            for(var i = 0; i<$scope.storages.length;i++){
                 $scope.storages[i].reservedSpaceGb = Math.round($scope.storages[i].reservedSpace / (1024*1024*1024));
                 $scope.storages[i].url = formatUrl($scope.storages[i].url);
-
             }
 
             $scope.$watch(function(){
