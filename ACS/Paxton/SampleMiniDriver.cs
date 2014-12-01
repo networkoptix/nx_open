@@ -10,30 +10,23 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Drawing;
 
-
-
-namespace MyLibVLC
-{
-    
-
+namespace MyLibVLC {
     // http://www.videolan.org/developers/vlc/doc/doxygen/html/group__libvlc.html
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    struct libvlc_exception_t
-    {
+    struct libvlc_exception_t {
         public int b_raised;
         public int i_code;
         [MarshalAs(UnmanagedType.LPStr)]
         public string psz_message;
     }
 
-    static class LibVlc
-    {
+    static class LibVlc {
         const string DLL_FOLDER = "NetworkOptixVLCVideoPlayer";
 
         #region core
 
-        [DllImport(DLL_FOLDER+"\\libvlc.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(DLL_FOLDER + "\\libvlc.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr libvlc_new(int argc, [In] string[] str_array);
 
         //[DllImport("libvlc")]
@@ -90,22 +83,21 @@ namespace MyLibVLC
     }
 }
 
-namespace Company.Product.OemDvrMiniDriver
-{
-    struct Video
-    {
+namespace Company.Product.OemDvrMiniDriver {
+    struct Video {
         public IntPtr instance;
         public IntPtr player;
         public IntPtr media;
         public string cameraId;
+        public string serverId;
         public Button window;
     }
-	/// <summary>
-	/// This is the main point of entry for your DVR system.
-	/// </summary>
-	public class SampleMiniDriver : IOemDvrMiniDriver
-	{
-		private static readonly ILog _logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+    /// <summary>
+    /// This is the main point of entry for your DVR system.
+    /// </summary>
+    public class SampleMiniDriver : IOemDvrMiniDriver {
+        private static readonly ILog _logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static List<Video> m_video;
         private static Panel m_panel;
         private static float m_playerSpeed = 1.0f;
@@ -116,30 +108,26 @@ namespace Company.Product.OemDvrMiniDriver
         private static long m_timeAdvance = 0;
 
 
-		#region Implementation of IDvrMiniDriver
+        #region Implementation of IDvrMiniDriver
 
-		/// <summary>
-		/// Return the string you would expect to see in the Net2 OEM supplier list, that identifies your system.
-		/// </summary>
-		/// <returns></returns>
-		public string GetSupplierIdentity()
-		{
-			const string supplierIdentity = @"Network Optix DVR System";
+        /// <summary>
+        /// Return the string you would expect to see in the Net2 OEM supplier list, that identifies your system.
+        /// </summary>
+        /// <returns></returns>
+        public string GetSupplierIdentity() {
+            const string supplierIdentity = @"Network Optix DVR System";
 
-			_logger.InfoFormat("Queried supplier Oem DVR: {0}", supplierIdentity);
-			return supplierIdentity;
-		}
-        
-		/// <summary>
-		/// Verifies the host and credentials that will be stored in the Net2 database and with which requested footage will be viewed.
-		/// </summary>
-		/// <param name="connectionInfo">A structure identifying the host and user information.</param>
-		/// <returns>OemDvrStatus value. Likely alternatives are : UnknownHost, InvalidUserIdPassword, InsufficientPriviledges</returns>
-		public OemDvrStatus VerifyDvrCredentials(OemDvrConnection connectionInfo)
-		{
-			try
-			{
-                
+            _logger.InfoFormat("Queried supplier Oem DVR: {0}", supplierIdentity);
+            return supplierIdentity;
+        }
+
+        /// <summary>
+        /// Verifies the host and credentials that will be stored in the Net2 database and with which requested footage will be viewed.
+        /// </summary>
+        /// <param name="connectionInfo">A structure identifying the host and user information.</param>
+        /// <returns>OemDvrStatus value. Likely alternatives are : UnknownHost, InvalidUserIdPassword, InsufficientPriviledges</returns>
+        public OemDvrStatus VerifyDvrCredentials(OemDvrConnection connectionInfo) {
+            try {
                 Uri url = new Uri(connectionInfo.HostName);
                 int port = (int)connectionInfo.Port;
                 if (port == 0)
@@ -152,65 +140,55 @@ namespace Company.Product.OemDvrMiniDriver
                 request.Credentials = new System.Net.NetworkCredential(connectionInfo.UserId, connectionInfo.Password);
 
                 WebResponse response = request.GetResponse();
-                
-                return OemDvrStatus.Succeeded;
-			}
-			catch (Exception excp)
-			{
-				_logger.Error(excp);
-			}
 
-			// The more precise the implementation, the better support can be provided.
-			return OemDvrStatus.InsufficientPriviledges;
-		}
-        List<string> ParseString(string str)
-        {
+                return OemDvrStatus.Succeeded;
+            } catch (Exception excp) {
+                _logger.Error(excp);
+            }
+
+            // The more precise the implementation, the better support can be provided.
+            return OemDvrStatus.InsufficientPriviledges;
+        }
+
+        List<string> ParseString(string str) {
             List<string> elements = new List<string>();
             int beginPos = 0;
             int endPos = 0;
-            for (int j = 0; j < str.Length; j++)
-            {
-                if ((str[j] == ',') && (j == 0 || str[j - 1] != '\\'))
-                {
+            for (int j = 0; j < str.Length; j++) {
+                if ((str[j] == ',') && (j == 0 || str[j - 1] != '\\')) {
                     endPos = j;
-                    if (beginPos < endPos)
-                    {
+                    if (beginPos < endPos) {
                         elements.Add(str.Substring(beginPos, endPos - beginPos));
-                    }
-                    else elements.Add("");
+                    } else elements.Add("");
                     beginPos = endPos + 1;
                 }
             };
-            if (beginPos != 0)
-            {
-                if (beginPos < str.Length)
-                {
+            if (beginPos != 0) {
+                if (beginPos < str.Length) {
                     elements.Add(str.Substring(beginPos, str.Length - beginPos));
-                }
-                else elements.Add("");
+                } else elements.Add("");
             }
             return elements;
         }
 
-		/// <summary>
-		/// Obtains a list of available cameras. Expect the credentials used to be the same as for VerifyDvrCredentials.
-		/// </summary>
-		/// <param name="connectionInfo">A structure identifying the host and user information.</param>
-		/// <param name="cameras">An updatable list structure into which the camera detail can be added.</param>
-		/// <returns>OemDvrStatus value. See the enumeration for detail.</returns>
-		public OemDvrStatus GetListOfCameras(OemDvrConnection connectionInfo, List<OemDvrCamera> cameras)
-		{
-            try
-            {
+        /// <summary>
+        /// Obtains a list of available cameras. Expect the credentials used to be the same as for VerifyDvrCredentials.
+        /// </summary>
+        /// <param name="connectionInfo">A structure identifying the host and user information.</param>
+        /// <param name="cameras">An updatable list structure into which the camera detail can be added.</param>
+        /// <returns>OemDvrStatus value. See the enumeration for detail.</returns>
+        public OemDvrStatus GetListOfCameras(OemDvrConnection connectionInfo, List<OemDvrCamera> cameras) {
+            try {
                 // Return other appropriate status values if authentication fails, for example.
                 // Return other appropriate status values if authentication fails, for example.
-                
-                
+
+                MessageBox.Show("Vagina");
+
                 Uri url = new Uri(connectionInfo.HostName);
                 int port = (int)connectionInfo.Port;
                 if (port == 0)
                     port = url.Port;
-                
+
 
                 string url_str = String.Format("http://{0}:{1}/ec2/getCameras?format=csv", url.Host, port);
                 //string url_str = String.Format("http://{0}:{1}/ec2/getCameras?format=csv", "127.0.0.1", 7002);
@@ -234,28 +212,29 @@ namespace Company.Product.OemDvrMiniDriver
 
                 int numId = -1;
                 int numName = -1;
+                int numParentId = -1;
                 List<string> headers = ParseString(rows[0]);
 
-                for (int i = 0; i < headers.Count; i++)
-                {
+                for (int i = 0; i < headers.Count; i++) {
                     if (headers[i] == "physicalId")
                         numId = i;
-                    if (headers[i] == "name")
+                    else if (headers[i] == "name")
                         numName = i;
+                    else if (headers[i] == "parentId")
+                        numParentId = i;
                 };
 
 
-                if (numId != -1 && numName != -1)
-                {
-                    for (int i = 1; i < rows.Length; i++)
-                    {
+                if (numId != -1 && numName != -1) {
+                    for (int i = 1; i < rows.Length; i++) {
                         List<string> elements = ParseString(rows[i]);
-                        if (numId < elements.Count && numName < elements.Count)
-                        {
-                            string name = elements[numId];
-                            name = name.Trim(new Char[] { '{', '}' });
-                            name = name.ToUpper();
-                            cameras.Add(new OemDvrCamera(name, elements[numName]));
+                        if (numId < elements.Count && numName < elements.Count) {
+                            string physicalId = elements[numId];
+                            physicalId = physicalId.Trim(new Char[] { '{', '}' });
+                            physicalId = physicalId.ToUpper();
+
+                            string id = String.Join(" ", new string[] {elements[numParentId], physicalId});
+                            cameras.Add(new OemDvrCamera(id, elements[numName]));
                         }
                     }
                 }
@@ -263,60 +242,56 @@ namespace Company.Product.OemDvrMiniDriver
 
                 _logger.InfoFormat("Found {0} cameras.", cameras.Count);
                 return OemDvrStatus.Succeeded;
+            } catch (Exception excp) {
+                _logger.Error(excp);
             }
-			catch (Exception excp)
-			{
-				_logger.Error(excp);
-			}
 
-			_logger.Error("Could not list cameras.");
-			return OemDvrStatus.FailedToListCameras;
-		}
-		/// <summary>
-		/// Request the playback of footage according to the required speed, direction and cameras using the supplied credentials on the OEM dll.
-		///		The image is to be rendered on the playback surface supplied.
-		/// </summary>
-		/// <param name="cnInfo">The user credentials structure.</param>
-		/// <param name="pbInfo">The structure that holds the details of the footage and the cameras required.</param>
-		/// <param name="pbSurface">A reference to the panel on to which the image is to be rendered.</param>
-		/// <returns>The completion status of the request.</returns>
-		public OemDvrStatus PlayFootage(OemDvrConnection cnInfo, OemDvrFootageRequest pbInfo, Panel pbSurface)
-		{
-            try
-            {
+            _logger.Error("Could not list cameras.");
+            return OemDvrStatus.FailedToListCameras;
+        }
+        /// <summary>
+        /// Request the playback of footage according to the required speed, direction and cameras using the supplied credentials on the OEM dll.
+        ///		The image is to be rendered on the playback surface supplied.
+        /// </summary>
+        /// <param name="cnInfo">The user credentials structure.</param>
+        /// <param name="pbInfo">The structure that holds the details of the footage and the cameras required.</param>
+        /// <param name="pbSurface">A reference to the panel on to which the image is to be rendered.</param>
+        /// <returns>The completion status of the request.</returns>
+        public OemDvrStatus PlayFootage(OemDvrConnection cnInfo, OemDvrFootageRequest pbInfo, Panel pbSurface) {
+            try {
+
+                MessageBox.Show("Penis");
                 //DateTime dt = new DateTime( 2014 ,5, 21 , 19 ,30 , 30);
                 double tick = (pbInfo.StartTimeUtc.ToUniversalTime() - new DateTime(1970, 1, 1)).TotalMilliseconds;
                 m_startTimeinMicroseconds = (long)tick * 1000;
 
-           
-                
+
+
                 Uri url = new Uri(cnInfo.HostName);
                 m_port = cnInfo.Port;
                 if (m_port == 0)
                     m_port = (uint)url.Port;
                 m_host = url.Host;
-                
-             
-                
+
+
+
                 //m_host = "127.0.0.1";
                 //m_port = 7002;
-                
-                if (m_video == null)
-                {
+
+                if (m_video == null) {
                     pbSurface.Resize += PbSurfaceResize;
                     m_video = new List<Video>();
                 }
                 m_panel = pbSurface;
                 m_panel.Controls.Clear();
 
-                
-            
-                for (int i = 0; i < pbInfo.DvrCameras.Length; i++)
-                {
+
+                for (int i = 0; i < pbInfo.DvrCameras.Length; i++) {
+                    OemDvrCamera camera = pbInfo.DvrCameras[i];
                     Video video = new Video();
-                    video.cameraId = pbInfo.DvrCameras[i].CameraId;
-                    if (pbInfo.DvrCameras.Length > 1)
-                    {
+                    video.cameraId = camera.CameraId;
+
+                    if (pbInfo.DvrCameras.Length > 1) {
                         Button dynamicbutton = new Button();
                         dynamicbutton.Visible = true;
                         dynamicbutton.Location = new Point(100 * i, 0);
@@ -325,8 +300,7 @@ namespace Company.Product.OemDvrMiniDriver
                         dynamicbutton.Show();
                         pbSurface.Controls.Add(dynamicbutton);
                         video.window = dynamicbutton;
-                    }
-                    else video.window = null;                   
+                    } else video.window = null;
                     m_video.Add(video);
                 };
 
@@ -337,96 +311,78 @@ namespace Company.Product.OemDvrMiniDriver
                 m_timer.Reset();
                 m_timeAdvance = 0;
 
-                      
 
-			
-				if ((pbInfo.DvrCameras == null) || (pbInfo.DvrCameras.Length <= 0))
-				{
-					_logger.Error("Playback request without cameras.");
-					return OemDvrStatus.CameraListMissing;
-				}
-				if (pbInfo.DvrCameras.Length > 16)
-				{
-					_logger.ErrorFormat("Playback requesting {0} cameras.", pbInfo.DvrCameras.Length);
-					return OemDvrStatus.NumberOfCamerasUnsupported;
-				}
 
-                Load();                               
 
-				switch (pbInfo.PlaybackFunction)
-				{
-					case OemDvrPlaybackFunction.Start:
-						{
+                if ((pbInfo.DvrCameras == null) || (pbInfo.DvrCameras.Length <= 0)) {
+                    _logger.Error("Playback request without cameras.");
+                    return OemDvrStatus.CameraListMissing;
+                }
+                if (pbInfo.DvrCameras.Length > 16) {
+                    _logger.ErrorFormat("Playback requesting {0} cameras.", pbInfo.DvrCameras.Length);
+                    return OemDvrStatus.NumberOfCamerasUnsupported;
+                }
+
+                Load();
+
+                switch (pbInfo.PlaybackFunction) {
+                    case OemDvrPlaybackFunction.Start: {
                             Play();
-							break;
-						}
-					case OemDvrPlaybackFunction.Forward:
-						{
-							break;
-						}
+                            break;
+                        }
+                    case OemDvrPlaybackFunction.Forward: {
+                            break;
+                        }
 
-					case OemDvrPlaybackFunction.Backward:
-						{
-							break;
-						}
-					case OemDvrPlaybackFunction.Pause:
-						{
+                    case OemDvrPlaybackFunction.Backward: {
+                            break;
+                        }
+                    case OemDvrPlaybackFunction.Pause: {
                             Pause();
-							break;
-						}
-					case OemDvrPlaybackFunction.Stop:
-						{
+                            break;
+                        }
+                    case OemDvrPlaybackFunction.Stop: {
                             Stop();
-							break;
-						}
+                            break;
+                        }
 
-					default:
-						{
-							_logger.WarnFormat("Unsupported playback request: {0}", pbInfo.PlaybackFunction);
-							break;
-						}
-				}
+                    default: {
+                            _logger.WarnFormat("Unsupported playback request: {0}", pbInfo.PlaybackFunction);
+                            break;
+                        }
+                }
 
-				return OemDvrStatus.Succeeded;
-			}
-			catch (Exception excp)
-			{
-				_logger.Error(excp);
-			}
+                return OemDvrStatus.Succeeded;
+            } catch (Exception excp) {
+                _logger.Error(excp);
+            }
 
-			return OemDvrStatus.FootagePlaybackFailed;
-		}
+            return OemDvrStatus.FootagePlaybackFailed;
+        }
 
-		/// <summary>
-		/// Control an existing video currently playing back. It must have been originally requested successfuly using PlayFootage.
-		/// </summary>
-		/// <param name="pbFunction">The play back function required.</param>
-		/// <param name="speed">The speed as an index of 100 where motion is involved. 100 is normal speed.</param>
-		/// <returns>The completion status of the request.</returns>
-		public OemDvrStatus ControlFootage(OemDvrPlaybackFunction pbFunction, uint speed)
-		{
-			try
-			{       
-				bool controlOk = false;
-				switch (pbFunction)
-				{
-					case OemDvrPlaybackFunction.Pause:
-                        {
+        /// <summary>
+        /// Control an existing video currently playing back. It must have been originally requested successfuly using PlayFootage.
+        /// </summary>
+        /// <param name="pbFunction">The play back function required.</param>
+        /// <param name="speed">The speed as an index of 100 where motion is involved. 100 is normal speed.</param>
+        /// <returns>The completion status of the request.</returns>
+        public OemDvrStatus ControlFootage(OemDvrPlaybackFunction pbFunction, uint speed) {
+            try {
+                bool controlOk = false;
+                switch (pbFunction) {
+                    case OemDvrPlaybackFunction.Pause: {
                             Pause();
                             controlOk = true;
                             break;
                         }
 
-					case OemDvrPlaybackFunction.Forward:
-					case OemDvrPlaybackFunction.Backward:
-						{
-							float controlSpeed = Convert.ToSingle(speed) / 100F;
-							if (pbFunction == OemDvrPlaybackFunction.Backward)
-							{
-								controlSpeed *= -1F;
-							}
-                            if (controlSpeed != m_playerSpeed)
-                            {
+                    case OemDvrPlaybackFunction.Forward:
+                    case OemDvrPlaybackFunction.Backward: {
+                            float controlSpeed = Convert.ToSingle(speed) / 100F;
+                            if (pbFunction == OemDvrPlaybackFunction.Backward) {
+                                controlSpeed *= -1F;
+                            }
+                            if (controlSpeed != m_playerSpeed) {
                                 Stop();
                                 if (controlSpeed > m_playerSpeed)
                                     m_timeAdvance += 5000000;
@@ -435,46 +391,40 @@ namespace Company.Product.OemDvrMiniDriver
                                 m_playerSpeed = controlSpeed;
                             }
                             Play();
-							controlOk = true;
-							break;
-						}
+                            controlOk = true;
+                            break;
+                        }
 
-					// Close down the session, such that the next actions can be closing the application or starting new session.
-					case OemDvrPlaybackFunction.Stop:
-						{
+                    // Close down the session, such that the next actions can be closing the application or starting new session.
+                    case OemDvrPlaybackFunction.Stop: {
                             Stop();
                             m_video.Clear();
                             m_panel.Controls.Clear();
                             m_timer.Reset();
                             m_timeAdvance = 0;
                             controlOk = true;
-							break;
-						}
+                            break;
+                        }
 
-					default:
-						{
-							_logger.WarnFormat("Playback control {0} unsupported.", pbFunction);
-							break;
-						}
-				}
-				if (controlOk)
-				{
-					return OemDvrStatus.Succeeded;
-				}
-			}
-			catch (Exception excp)
-			{
-				_logger.Error(excp);
-			}
+                    default: {
+                            _logger.WarnFormat("Playback control {0} unsupported.", pbFunction);
+                            break;
+                        }
+                }
+                if (controlOk) {
+                    return OemDvrStatus.Succeeded;
+                }
+            } catch (Exception excp) {
+                _logger.Error(excp);
+            }
 
-			return OemDvrStatus.ControlRequestFailed;
-		}
-        
+            return OemDvrStatus.ControlRequestFailed;
+        }
 
-		#endregion
-        private void Load()
-        {
-            long allTime = m_timer.ElapsedMilliseconds*1000 + m_timeAdvance + m_startTimeinMicroseconds;
+
+        #endregion
+        private void Load() {
+            long allTime = m_timer.ElapsedMilliseconds * 1000 + m_timeAdvance + m_startTimeinMicroseconds;
 
             string[] args = new string[] {
                     "-I", "dummy", "--ignore-config",
@@ -482,11 +432,10 @@ namespace Company.Product.OemDvrMiniDriver
                   };
 
             string mediaFile;
-            for (int i = 0; i < m_video.Count; i++)
-            {
+            for (int i = 0; i < m_video.Count; i++) {
                 Video video = m_video[i];
                 video.instance = MyLibVLC.LibVlc.libvlc_new(args.Length, args);
-                mediaFile = String.Format("rtsp://{0}:{1}/{2}?pos={3}&codec={4}", m_host, m_port, video.cameraId, allTime, "mpeg2video");
+                mediaFile = String.Format("rtsp://{0}:{1}/proxy/{2}/{32}?pos={4}&codec={5}", m_host, m_port, video.serverId, video.cameraId, allTime, "mpeg2video");
                 video.media = MyLibVLC.LibVlc.libvlc_media_new_location(video.instance, mediaFile);
                 video.player = MyLibVLC.LibVlc.libvlc_media_player_new_from_media(video.media);
                 if (video.window != null)
@@ -495,37 +444,31 @@ namespace Company.Product.OemDvrMiniDriver
                 m_video[i] = video;
             }
         }
-        private void Play()
-        {
-            for (int i = 0; i < m_video.Count; i++)
-            {
+
+        private void Play() {
+            for (int i = 0; i < m_video.Count; i++) {
                 MyLibVLC.LibVlc.libvlc_media_player_play(m_video[i].player);
             }
             m_timer.Start();
         }
-        private void Stop()
-        {
-            for (int i = 0; i < m_video.Count; i++)
-            {
+
+        private void Stop() {
+            for (int i = 0; i < m_video.Count; i++) {
                 MyLibVLC.LibVlc.libvlc_media_player_stop(m_video[i].player);
                 MyLibVLC.LibVlc.libvlc_media_player_release(m_video[i].player);
                 MyLibVLC.LibVlc.libvlc_media_release(m_video[i].media);
             }
- 
+
         }
-        private void Pause()
-        {
-            for (int i = 0; i < m_video.Count; i++)
-            {
+        private void Pause() {
+            for (int i = 0; i < m_video.Count; i++) {
                 MyLibVLC.LibVlc.libvlc_media_player_pause(m_video[i].player);
             }
             m_timer.Stop();
-            
+
         }
-        private void Resize(int w, int h)
-        {
-            if (m_video.Count > 1)
-            {
+        private void Resize(int w, int h) {
+            if (m_video.Count > 1) {
                 double value = (Math.Sqrt((double)m_video.Count * (double)h / (double)w));
                 int numY = (int)Math.Round(value);
                 int numX = (int)Math.Round(value * (double)w / ((double)h));
@@ -539,12 +482,9 @@ namespace Company.Product.OemDvrMiniDriver
                 int smallWidth = (int)((double)w / (double)numX);
                 int smallHeight = (int)((double)h / (double)numY);
                 int it = 0;
-                for (int i = 0; i < numY; i++)
-                {
-                    for (int j = 0; j < numX; j++)
-                    {
-                        if (it < m_video.Count)
-                        {
+                for (int i = 0; i < numY; i++) {
+                    for (int j = 0; j < numX; j++) {
+                        if (it < m_video.Count) {
                             m_video[it].window.Location = new Point(smallWidth * j, smallHeight * i);
                             m_video[it].window.Width = smallWidth;
                             m_video[it].window.Height = smallHeight;
@@ -552,13 +492,11 @@ namespace Company.Product.OemDvrMiniDriver
                         }
                     }
                 }
-            }            
+            }
         }
-        private void PbSurfaceResize(object sender, EventArgs e)
-        {
+        private void PbSurfaceResize(object sender, EventArgs e) {
             var frame = sender as Panel;
-            if (frame == null)
-            {
+            if (frame == null) {
                 return;
             }
 
@@ -567,5 +505,5 @@ namespace Company.Product.OemDvrMiniDriver
             if (m_video != null)
                 Resize(vidWidth, vidHeight);
         }
-	}
+    }
 }
