@@ -86,29 +86,36 @@ void * RC_Shell_RecvThread(void * data)
         if (cmdCurrent.isOK())
         {
             debugInfo.totalPKTCount++;
-
-            unsigned short curCommand = cmdCurrent.commandID();
-#if 1 // DEBUG
-            printf("RC cmd: %x; TxID: %d; RxID: %d\n", curCommand, cmdCurrent.txDeviceID(), cmdCurrent.rxDeviceID());
+#if 0
+            unsigned error = cmdCurrent.headCheck();
+            if (error != ModulatorError_NO_ERROR)
+                // TODO
 #endif
+            unsigned short cmdID = cmdCurrent.commandID();
             unsigned short rxID = cmdCurrent.rxDeviceID();
             unsigned short txID = cmdCurrent.txDeviceID();
-            pShell->addDevice(rxID, txID, (CMD_GetTxDeviceAddressIDOutput == curCommand) );
+#if 0 // DEBUG
+            printf("RC cmd: %x; TxID: %d; RxID: %d\n", curCommand, txID, rxID);
+#endif
+            pShell->addDevice(rxID, txID, (CMD_GetTxDeviceAddressIDOutput == cmdID) );
 
             pShell->processCommand(cmdCurrent);
             cmdCurrent.clear();
         }
         else
         {
-            if (! cmdCurrent.hasLeadingTag())
-                debugInfo.leadingTagErrorCount++;
-            if (! cmdCurrent.hasEndingTag())
-                debugInfo.endTagErrorCount++;
+            if (! cmdCurrent.hasTags())
+            {
+                debugInfo.tagErrorCount++;
+                fixReadingPosition(replyBuffer, BUFFER_SIZE);
+                continue;
+            }
+
             if (! cmdCurrent.isFull())
                 debugInfo.lengthErrorCount++;
 
-            //if (debugInfo.leadingTagErrorCount % 16 == 0)
-            fixReadingPosition(replyBuffer, BUFFER_SIZE);
+            if (! cmdCurrent.checksum())
+                debugInfo.checkSumErrorCount++;
         }
     }
 
@@ -134,10 +141,10 @@ void * RC_Shell_WaitTimeOut(void * data)
 
 // DeviceInfo
 
-DeviceInfo::DeviceInfo(unsigned short rxID, unsigned short txID, bool active)
+DeviceInfo::DeviceInfo(unsigned short rxID, unsigned short txID)
 :   waitingCmd_(CMD_GetTxDeviceAddressIDOutput),
     waitingResponse_(false),
-    isActive_(active)
+    isActive_(false)
 {
     //RC_Init_RCHeadInfo(&info_.device, rxID, txID, 0xFFFF);
     info_.device.clientTxDeviceID = txID;
@@ -358,35 +365,13 @@ RCShell::Error RCShell::processCommand(Command& cmdPart)
     if (devs_.empty())
         return lastError_ = RCERR_NO_DEVICE;
 
-    unsigned error = cmdPart.headCheck();
-    if (error != ModulatorError_NO_ERROR)
-    {
-        if (error == ReturnChannelError_CMD_SYNTAX_ERROR)
-        {
-            if (! cmdPart.hasLeadingTag())
-                debugInfo_.leadingTagErrorCount++;
-            if (! cmdPart.hasEndingTag())
-                debugInfo_.endTagErrorCount++;
-
-            return lastError_ = RCERR_SYNTAX;
-        }
-
-        if (error == ReturnChannelError_CMD_CHECKSUM_ERROR)
-        {
-            debugInfo_.checkSumErrorCount++;
-            return lastError_ = RCERR_CHECKSUM;
-        }
-
-        return lastError_ = RCERR_OTHER;
-    }
-
     DeviceInfoPtr info;
     for (unsigned i = 0; i < devs_.size(); i++)
     {
         info = devs_[i];
         RCHostInfo * deviceInfo = info->xPtr();
 
-        error = cmdPart.deviceCheck(&deviceInfo->device);
+        unsigned error = cmdPart.deviceCheck(&deviceInfo->device);
         if (error == ReturnChannelError_CMD_SEQUENCE_ERROR)
         {
             debugInfo_.sequenceErrorCount++;
@@ -412,10 +397,7 @@ RCShell::Error RCShell::processCommand(Command& cmdPart)
         if (info->cmd().size() < 8)
             return lastError_ = RCERR_WRONG_LENGTH;
 
-        if (!info->cmd().isChecksumOK())
-            return lastError_ = RCERR_CHECKSUM;
-
-        if (info->cmd().returnCode() != 0)
+        if (info->cmd().returnCode() != 0) // TODO: not all cammands
             return lastError_ = RCERR_RET_CODE;
 
         unsigned short command = info->cmd().commandID();
@@ -459,33 +441,38 @@ bool RCShell::sendGetIDs(int iWaitTime)
     return false;
 }
 
-void RCShell::updateDevsParams()
+void RCShell::updateTransmissionParams(unsigned short rxID)
 {
+    std::lock_guard<std::mutex> lock(mutex_); // LOCK
+
+    for (size_t i = 0; i < devs_.size(); ++i)
     {
-        std::lock_guard<std::mutex> lock(mutex_); // LOCK
-
-        for (size_t i = 0; i < devs_.size(); ++i)
-            devs_[i]->getTransmissionParameters();
-    }
-
-    usleep(DeviceInfo::SEND_WAIT_TIME_MS * 1000);
-
-    {
-        std::lock_guard<std::mutex> lock(mutex_); // LOCK
-
-        for (size_t i = 0; i < devs_.size(); ++i)
+        if (devs_[i]->rxID() == rxID)
         {
-            devs_[i]->getDeviceInformation();
-#if 0
             devs_[i]->getTransmissionParameterCapabilities();
-            devs_[i]->getVideoSources();
-            devs_[i]->getVideoSourceConfigurations();
-            devs_[i]->getVideoEncoderConfigurations();
-#endif
+            devs_[i]->getTransmissionParameters();
         }
     }
+}
 
-    usleep(DeviceInfo::SEND_WAIT_TIME_MS * 1000);
+void RCShell::updateDevParams(unsigned short rxID)
+{
+    std::lock_guard<std::mutex> lock(mutex_); // LOCK
+
+    for (size_t i = 0; i < devs_.size(); ++i)
+    {
+        if (devs_[i]->rxID() != rxID)
+            continue;
+
+        devs_[i]->getTransmissionParameterCapabilities();
+        devs_[i]->getTransmissionParameters();
+        devs_[i]->getDeviceInformation();
+        devs_[i]->getVideoSources();
+        devs_[i]->getVideoSourceConfigurations();
+        devs_[i]->getVideoEncoderConfigurations();
+
+        // TODO
+    }
 }
 
 void RCShell::getDevIDs(std::vector<IDsLink>& outLinks)
@@ -507,54 +494,41 @@ void RCShell::getDevIDs(std::vector<IDsLink>& outLinks)
     }
 }
 
-bool RCShell::addDevice(unsigned short rxID, unsigned short txID, bool rcActive)
+void RCShell::addDevice(unsigned short rxID, unsigned short txID, bool rcActive)
 {
-    IDsLink idl;
-    idl.rxID = rxID;
-    idl.txID = txID;
+    DeviceInfoPtr dev = device(rxID, txID);
 
-    DeviceInfoPtr dev = device(idl);
-    if (dev)
+    std::lock_guard<std::mutex> lock(mutex_); // LOCK
+
+    if (! dev)
     {
-        // add active flag to created device
-        if (rcActive)
-            dev->setActive();
-#if 1
-        // change frequency for passive device
-        if (! dev->isActive())
-        {
-            std::lock_guard<std::mutex> lock(mutex_); // LOCK
-
-            if (rxID < frequencies_.size() && frequencies_[rxID])
-                dev->setFrequency(frequencies_[rxID]);
-        }
-#endif
+        dev = std::make_shared<DeviceInfo>(rxID, txID);
+        devs_.push_back(dev);
     }
-    else
+
+    // new and passive devices
+    if (! dev->isActive())
     {
-        std::lock_guard<std::mutex> lock(mutex_); // LOCK
-
-        dev = std::make_shared<DeviceInfo>(rxID, txID, rcActive);
-
-        // set frequency for new device
         if (rxID < frequencies_.size() && frequencies_[rxID])
             dev->setFrequency(frequencies_[rxID]);
-
-        devs_.push_back(dev);
-        return true;
     }
 
-    return false;
+    // new, passive + active devices if rcActive set
+    if (rcActive || ! dev->isActive())
+        lastRx4Tx_[txID] = rxID;
+
+    if (rcActive)
+        dev->setActive();
 }
 
 /// @note O(N)
-DeviceInfoPtr RCShell::device(const IDsLink& idl) const
+DeviceInfoPtr RCShell::device(unsigned short rxID, unsigned short txID) const
 {
     std::lock_guard<std::mutex> lock(mutex_); // LOCK
 
     for (unsigned i = 0; i < devs_.size(); ++i)
     {
-        if ((devs_[i]->txID() == idl.txID) && (devs_[i]->rxID() == idl.rxID))
+        if ((devs_[i]->txID() == txID) && (devs_[i]->rxID() == rxID))
             return devs_[i];
     }
 
@@ -584,14 +558,34 @@ void RCShell::setRxFrequency(unsigned short rxID, unsigned freq)
     frequencies_[rxID] = freq;
 }
 
+unsigned RCShell::lastTxFrequency(unsigned short txID) const
+{
+    unsigned rxID;
+
+    {
+        std::lock_guard<std::mutex> lock(mutex_); // LOCK
+
+        auto it = lastRx4Tx_.find(txID);
+        if (it == lastRx4Tx_.end())
+            return 0;
+
+        rxID = it->second;
+    }
+
+    DeviceInfoPtr dev = device(rxID, txID);
+    if (dev)
+        return dev->frequency();
+
+    return 0;
+}
+
 //
 
 void DebugInfo::reset()
 {
     totalGetBufferCount = 0;
     totalPKTCount = 0;
-    leadingTagErrorCount = 0;
-    endTagErrorCount = 0;
+    tagErrorCount = 0;
     lengthErrorCount = 0;
     checkSumErrorCount = 0;
     sequenceErrorCount = 0;
@@ -599,14 +593,13 @@ void DebugInfo::reset()
 
 void DebugInfo::print() const
 {
-    printf("\n=== User_DebugInfo_log ===\n");
+    printf("\n=== RC DebugInfo ===\n");
     printf("Total GetBuffer Count   = %u\n", totalGetBufferCount);
-    printf("Leading Tag Error Count = %u\n", leadingTagErrorCount);
+    printf("Tags Error Count        = %u\n", tagErrorCount);
     printf("Total PKT Count         = %u\n", totalPKTCount);
-    printf("End Tag Error Count     = %u\n", endTagErrorCount);
     printf("CheckSum Error Count    = %u\n", checkSumErrorCount);
     printf("Sequence Error Count    = %u\n", sequenceErrorCount);
-    printf("\n=== User_DebugInfo_log ===\n");
+    printf("\n=== RC DebugInfo ===\n");
 }
 
 } // ret_chan

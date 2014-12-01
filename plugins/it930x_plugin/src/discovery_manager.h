@@ -50,6 +50,7 @@ namespace ite
 
         void updateRxDevices();
         void updateTxLinks(unsigned chan);
+        void updateDevParams(unsigned short rxID) { rcShell_.updateDevParams(rxID); }
 
         bool setChannel(unsigned short txID, unsigned chan);
 
@@ -58,18 +59,17 @@ namespace ite
 
         static DiscoveryManager * Instance;
 
-        mutable std::mutex m_contentMutex;
+        mutable std::mutex m_mutex;
+        std::map<unsigned, CameraPtr> m_cameras;    // {TxID, Camera}
         std::map<unsigned, RxDevicePtr> m_rxDevs;   // {RxID, RxDev}
         std::multimap<unsigned, IDsLink> m_txLinks; // {TxID, RxTxLink}
-        std::map<unsigned, CameraPtr> m_cameras;    // {CamId, Camera}
-        ComPort comPort_;
         RCShell rcShell_;
-
-        static void getRxDevNames(std::vector<std::string>& names);
+        ComPort comPort_;
 
         void addTxLinks(const std::vector<IDsLink>&);
-
         void getRx4Camera(CameraManager * cam);
+
+        static void getRxDevNames(std::vector<std::string>& names);
     };
 }
 

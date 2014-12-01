@@ -180,7 +180,7 @@ namespace ite
             CameraManager * cam = nullptr;
 
             {
-                std::lock_guard<std::mutex> lock( m_contentMutex ); // LOCK
+                std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
                 auto it = m_cameras.find(txID);
                 if (it == m_cameras.end())
@@ -213,7 +213,7 @@ namespace ite
         CameraManager * cam = nullptr;
 
         {
-            std::lock_guard<std::mutex> lock( m_contentMutex ); // LOCK
+            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
             auto it = m_cameras.find(txID);
             if (it != m_cameras.end())
@@ -230,14 +230,12 @@ namespace ite
             //checkLink(txID, rxID, frequency);
 
             {
-                std::lock_guard<std::mutex> lock( m_contentMutex ); // LOCK
+                std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
                 auto sp = std::make_shared<CameraManager>( info );  // create CameraManager
                 m_cameras[txID] = sp;
                 cam = sp.get();
                 cam->addRef();
-
-                cam->setFrequency(frequency);
             }
         }
 
@@ -248,7 +246,7 @@ namespace ite
 
     void DiscoveryManager::getRx4Camera(CameraManager * cam)
     {
-        std::lock_guard<std::mutex> lock( m_contentMutex );
+        std::lock_guard<std::mutex> lock( m_mutex );
 
         auto range = m_txLinks.equal_range( cam->txID() );
         for (auto itTx = range.first; itTx != range.second; ++itTx)
@@ -258,7 +256,6 @@ namespace ite
             {
                 RxDevicePtr dev = itRx->second;
                 cam->addRxDevice(dev);
-                cam->setFrequency(itTx->second.frequency);
             }
         }
     }
@@ -293,11 +290,11 @@ namespace ite
             if (id) // DEBUG: leave one Rx device
                 continue;
 #endif
-            std::lock_guard<std::mutex> lock( m_contentMutex ); // LOCK
+            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
             auto it = m_rxDevs.find(id);
             if (it == m_rxDevs.end())
-                m_rxDevs[id] = std::make_shared<RxDevice>(id);
+                m_rxDevs[id] = std::make_shared<RxDevice>(id, &rcShell_); // create RxDevice
 
             // TODO: remove lost devices (USB)
         }
@@ -309,7 +306,7 @@ namespace ite
         std::vector<RxDevicePtr> scanDevs;
 
         {
-            std::lock_guard<std::mutex> lock( m_contentMutex ); // LOCK
+            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
             for (size_t i = 0; i < m_rxDevs.size(); ++i)
             {
@@ -329,21 +326,23 @@ namespace ite
                 scanDevs[i]->open();
 
             unsigned freq = DeviceInfo::chanFrequency(chan);
+            unsigned short rxID = scanDevs[i]->rxID();
 
-            rcShell_.setRxFrequency(scanDevs[i]->rxID(), freq); // frequency for new devices
-            scanDevs[i]->lockF(nullptr, freq);
+            rcShell_.setRxFrequency(rxID, freq); // frequency for new devices
+            scanDevs[i]->lockF(freq);
 
             if (scanDevs[i]->isLocked())
             {
-                // DEBUG
+#if 0           // DEBUG
                 printf("searching TxIDs - rxID: %d; frequency: %d; strength: %d; presence: %d\n",
                        scanDevs[i]->rxID(), freq, scanDevs[i]->strength(), scanDevs[i]->present());
-
+#endif
                 // active devices communication
                 if (scanDevs[i]->present() && scanDevs[i]->strength() > 0) // strength: 0..100
                 {
                     rcShell_.sendGetIDs();
-                    rcShell_.updateDevsParams();
+                    //rcShell_.updateTransmissionParams(rxID);
+                    usleep(DeviceInfo::SEND_WAIT_TIME_MS * 1000);
                 }
 
                 scanDevs[i]->unlockF();
@@ -360,7 +359,7 @@ namespace ite
 
     void DiscoveryManager::addTxLinks(const std::vector<IDsLink>& links)
     {
-        std::lock_guard<std::mutex> lock( m_contentMutex ); // LOCK
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
         for (size_t i = 0; i < links.size(); ++i)
         {

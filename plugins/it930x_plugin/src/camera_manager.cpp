@@ -1,9 +1,7 @@
 #include <string>
-#include <sstream>
 #include <chrono>
 #include <atomic>
 
-#include "it930x.h"
 #include "camera_manager.h"
 #include "media_encoder.h"
 
@@ -59,22 +57,6 @@ namespace
     const char * PARAM_CHANNEL_14 = "14";
     const char * PARAM_CHANNEL_15 = "15";
 
-    unsigned str2num(std::string& s)
-    {
-        unsigned value;
-        std::stringstream ss;
-        ss << s;
-        ss >> value;
-        return value;
-    }
-
-    std::string num2str(unsigned id)
-    {
-        std::stringstream ss;
-        ss << id;
-        return ss.str();
-    }
-
     CameraParams str2param(const char * paramName)
     {
         if (! strcmp(paramName, PARAM_QUERY_CHANNEL))
@@ -122,123 +104,12 @@ namespace
 
 namespace ite
 {
-    RxDevice::RxDevice(unsigned id)
-    :   m_id(id),
-        m_camera(nullptr),
-        m_frequency(0),
-        m_strength(0),
-        m_present(false)
-    {}
-
-    bool RxDevice::open()
-    {
-        try
-        {
-            m_devStream.reset();
-            m_device.reset(); // dtor first
-            m_device.reset(new It930x(m_id));
-            return true;
-        }
-        catch(const char * msg)
-        {}
-
-        return false;
-    }
-
-    bool RxDevice::lockF(CameraManager * cam, unsigned freq)
-    {
-        try
-        {
-            if (isOpen())
-                unlockF();
-            else
-                open();
-
-            if (! m_device.get())
-                return false;
-
-            m_device->lockChannel(freq);
-            m_devStream.reset( new It930Stream( *m_device ) );
-            m_frequency = freq;
-            m_camera = cam;
-
-            stats();
-            return true;
-        }
-        catch (const char * msg)
-        {}
-
-        return false;
-    }
-
-    bool RxDevice::stats()
-    {
-        try
-        {
-            bool locked = false;
-            uint8_t abortCount = 0;
-            float ber = 0.0f;
-
-            m_present = false;
-            m_strength = 0;
-            m_device->statistic(locked, m_present, m_strength, abortCount, ber);
-            return true;
-        }
-        catch (const char * msg)
-        {}
-
-        return false;
-    }
-
-    void RxDevice::driverInfo(std::string& driverVersion, std::string& fwVersion, std::string& company, std::string& model) const
-    {
-        if (m_device)
-        {
-            char verDriver[32] = "";
-            char verAPI[32] = "";
-            char verFWLink[32] = "";
-            char verFWOFDM[32] = "";
-            char xCompany[32] = "";
-            char xModel[32] = "";
-
-            m_device->info(verDriver, verAPI, verFWLink, verFWOFDM, xCompany, xModel);
-
-            driverVersion = "Driver: " + std::string(verDriver) + " API: " + std::string(verAPI);
-            fwVersion = "FW: " + std::string(verFWLink) + " OFDM: " + std::string(verFWOFDM);
-            company = std::string(xCompany);
-            model = std::string(xModel);
-        }
-    }
-
-    unsigned RxDevice::dev2id(const std::string& nm)
-    {
-        std::string name = nm;
-        name.erase( name.find( DEVICE_PATTERN ), strlen( DEVICE_PATTERN ) );
-
-        return str2id(name);
-    }
-
-    unsigned RxDevice::str2id(const std::string& name)
-    {
-        unsigned num;
-        std::stringstream ss;
-        ss << name;
-        ss >> num;
-        return num;
-    }
-
-    std::string RxDevice::id2str(unsigned id)
-    {
-        return num2str(id);
-    }
-
     //
 
     DEFAULT_REF_COUNTER(CameraManager)
 
     CameraManager::CameraManager(const nxcip::CameraInfo& info)
     :   m_refManager( DiscoveryManager::refManager() ),
-        m_frequency(0),
         m_threadObject( nullptr ),
         m_hasThread( false ),
         m_loading(false),
@@ -247,9 +118,8 @@ namespace ite
         memcpy( &m_info, &info, sizeof(nxcip::CameraInfo) );
 
         unsigned short rxID;
-        DiscoveryManager::parseInfo(info, m_txID, rxID, m_frequency);
-
-        //tryLoad();
+        unsigned frequency;
+        DiscoveryManager::parseInfo(info, m_txID, rxID, frequency);
     }
 
     CameraManager::~CameraManager()
@@ -452,10 +322,7 @@ namespace ite
             return false;
 
         if (stopStreams())
-        {
-            m_frequency = 0;
             return DiscoveryManager::instance()->setChannel(m_txID, chan);
-        }
         return false;
     }
 
@@ -594,11 +461,11 @@ namespace ite
         if (! m_txID)
             return STATE_NO_CAMERA;
 
-        if (! m_frequency)
-            return STATE_NO_FREQUENCY;
-
         if (m_supportedRxDevices.empty() || ! m_rxDevice.get())
             return STATE_NO_RECEIVER;
+
+        if (! m_rxDevice->frequency())
+            return STATE_NO_FREQUENCY;
 
         if (m_rxDevice.get() && ! m_loading && ! m_hasThread)
             return STATE_DEVICE_READY;
@@ -631,7 +498,7 @@ namespace ite
                 bool ok = captureAnyRxDevice();
                 if (! ok)
                 {
-                    DiscoveryManager::updateInfo(m_info, 0xffff, m_frequency);
+                    DiscoveryManager::updateInfo(m_info, 0xffff, 0);
                     break;
                 }
                 // no break
@@ -705,7 +572,7 @@ namespace ite
 
     bool CameraManager::captureAnyRxDevice()
     {
-        if (!m_frequency || m_supportedRxDevices.empty())
+        if (m_supportedRxDevices.empty())
             return false;
 
         if (m_rxDevice.get())
@@ -732,17 +599,18 @@ namespace ite
     {
         std::lock_guard<std::mutex> lock( m_rxDevice->mutex() ); // LOCK
 
-        if (m_rxDevice->isLocked() && m_rxDevice->frequency() == m_frequency)
+        if (m_rxDevice->isLocked() && m_rxDevice->camera() == this)
             return true;
 
         if (!m_rxDevice->isOpen())
             m_rxDevice->open();
 
         m_rxDevice->unlockF();
-        m_rxDevice->lockF(this, m_frequency);
+        m_rxDevice->lockCamera(this);
         if (m_rxDevice->isLocked())
         {
-            DiscoveryManager::updateInfo(m_info, m_rxDevice->rxID(), m_frequency);
+            m_rxDevice->updateDevParams();
+            DiscoveryManager::updateInfo(m_info, m_rxDevice->rxID(), m_rxDevice->frequency());
             return true;
         }
 
@@ -763,11 +631,12 @@ namespace ite
         if (!dev->isOpen())
             dev->open();
 
-        dev->lockF(this, m_frequency);
+        dev->lockCamera(this);
         if (dev->isLocked())
         {
             m_rxDevice = dev; // under lock
-            DiscoveryManager::updateInfo(m_info, m_rxDevice->rxID(), m_frequency);
+            m_rxDevice->updateDevParams();
+            DiscoveryManager::updateInfo(m_info, m_rxDevice->rxID(), m_rxDevice->frequency());
             return true;
         }
 
@@ -780,14 +649,15 @@ namespace ite
 
         CameraManager * cam = dev->camera();
 
-        if (cam->stopStreams())
+        if (cam && cam->stopStreams())
         {
             dev->unlockF();
-            dev->lockF(this, m_frequency);
+            dev->lockCamera(this);
             if (dev->isLocked())
             {
                 m_rxDevice = dev; // under lock
-                DiscoveryManager::updateInfo(m_info, m_rxDevice->rxID(), m_frequency);
+                m_rxDevice->updateDevParams();
+                DiscoveryManager::updateInfo(m_info, m_rxDevice->rxID(), m_rxDevice->frequency());
                 return true;
             }
         }
