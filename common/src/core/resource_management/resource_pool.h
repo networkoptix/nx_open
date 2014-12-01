@@ -148,6 +148,9 @@ signals:
 
     void aboutToBeDestroyed();
 private:
+    /*!
+        \note MUST be called with \a m_resourcesMtx locked
+    */
     void invalidateCache();
 private:
     mutable QMutex m_resourcesMtx;
@@ -155,8 +158,8 @@ private:
     QnResourceList m_tmpResources;
     QHash<QnUuid, QnResourcePtr> m_resources;
     QHash<QnUuid, QnResourcePtr> m_incompatibleResources;
-    mutable QMutex m_cacheMutex;
     mutable QnMediaServerResourceList m_cachedServerList;
+    mutable QnUserResourcePtr m_adminResource;
     /*!
         \return true, if \a resource has been inserted. false - if updated existing resource
     */

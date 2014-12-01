@@ -171,6 +171,9 @@ namespace ec2
 
         //AbstractBusinessEventManager::getBusinessRules
         registerGetFuncHandler<std::nullptr_t, ApiBusinessRuleDataList>( restProcessorPool, ApiCommand::getBusinessRules );
+
+        registerGetFuncHandler<std::nullptr_t, ApiTransactionDataList>( restProcessorPool, ApiCommand::getTransactionLog );
+
         //AbstractBusinessEventManager::save
         registerUpdateFuncHandler<ApiBusinessRuleData>( restProcessorPool, ApiCommand::saveBusinessRule );
         //AbstractBusinessEventManager::deleteRule

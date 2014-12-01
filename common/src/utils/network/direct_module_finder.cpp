@@ -21,7 +21,7 @@ namespace {
     const int defaultMaxConnections = 30;
     const int discoveryCheckIntervalMs = 60 * 1000;
     const int aliveCheckIntervalMs = 7 * 1000;
-    const int maxPingTimeoutMs = 12 * 1000;
+    const int maxPingTimeoutMs = 15 * 1000;
 
     QUrl trimmedUrl(const QUrl &url) {
         QUrl result;

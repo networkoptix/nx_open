@@ -938,6 +938,12 @@
                             <values/>
                         </param>
                         <param>
+                            <name>currentPassword</name>
+                            <description>Admin password of the current system.</description>
+                            <optional>false</optional>
+                            <values/>
+                        </param>
+                        <param>
                             <name>takeRemoteSettings</name>
                             <description>Direction of the merge.</description>
                             <optional>true</optional>

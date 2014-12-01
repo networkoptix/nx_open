@@ -154,7 +154,9 @@ namespace ec2
 			runtimeInfoChanged          = 9004,  /*< ApiRuntimeData */
             dumpDatabase                = 9005,  /*< ApiDatabaseDumpData */
             restoreDatabase             = 9006,  /*< ApiDatabaseDumpData */
-            updatePersistentSequence              = 9009,  /*< ApiUpdateSequenceData*/
+            updatePersistentSequence    = 9009,  /*< ApiUpdateSequenceData*/
+
+            getTransactionLog           = 10000,  /*< QnAbstractTransactionList*/
 
             maxTransactionValue         = 65535
         };
@@ -201,6 +203,7 @@ namespace ec2
         bool isLocal; // do not propagate transactions to other server peers
     };
 
+    typedef std::vector<ec2::QnAbstractTransaction> QnAbstractTransactionList;
     typedef QnAbstractTransaction::PersistentInfo QnAbstractTransaction_PERSISTENT;
 #define QnAbstractTransaction_PERSISTENT_Fields (dbID)(sequence)(timestamp)
 #define QnAbstractTransaction_Fields (command)(peerID)(persistentInfo)(isLocal)
@@ -216,8 +219,8 @@ namespace ec2
         T params;
     };
 
-    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction::PersistentInfo, (json)(ubjson))
-    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction, (json)(ubjson))
+    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction::PersistentInfo, (json)(ubjson)(xml)(csv_record))
+    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction, (json)(ubjson)(xml)(csv_record))
 
     //Binary format functions for QnTransaction<T>
     //template <class T, class Output>
@@ -269,6 +272,15 @@ namespace ec2
             QnUbjson::deserialize(stream,  static_cast<QnAbstractTransaction *>(transaction)) &&
             QnUbjson::deserialize(stream, &transaction->params);
     }
+
+    struct ApiTransactionData: public ApiData
+    {
+        QnUuid tranGuid;
+        QnAbstractTransaction tran;
+    };
+#define ApiTransactionDataFields (tranGuid)(tran)
+QN_FUSION_DECLARE_FUNCTIONS(ApiTransactionData, (json)(ubjson)(xml)(csv_record))
+
 
     int generateRequestID();
 } // namespace ec2

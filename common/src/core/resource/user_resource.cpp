@@ -5,7 +5,6 @@ QnUserResource::QnUserResource():
     m_permissions(0),
     m_isAdmin(false)
 {
-    setStatus(Qn::Online, true);
     addFlags(Qn::user | Qn::remote);
 }
 
@@ -176,4 +175,9 @@ void QnUserResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& m
             modifiedFields << "emailChanged";
         }
     }
+}
+
+Qn::ResourceStatus QnUserResource::getStatus() const
+{
+    return Qn::Online;
 }

@@ -6,6 +6,8 @@
 namespace {
 
     QModelIndex indexUp(const QModelIndex &idx) {
+        if (!idx.isValid())
+            return QModelIndex();
         if (idx.row() > 0) {
             QModelIndex up = idx.sibling(idx.row() - 1, idx.column());
             if (idx.model()->rowCount(up) > 0)
@@ -25,6 +27,8 @@ namespace {
     }
 
     QModelIndex indexDown(const QModelIndex &idx) {
+        if (!idx.isValid())
+            return QModelIndex();
         if (idx.model()->rowCount(idx) > 0)
             return idx.model()->index(0, idx.column(), idx);
         return parentDown(idx);
