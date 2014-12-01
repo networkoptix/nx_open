@@ -424,9 +424,6 @@ void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatu
         init();
 
     emit statusChanged(toSharedPointer(this));
-
-    QDateTime dt = qnSyncTime->currentDateTime();
-    QMutexLocker mutexLocker(&m_mutex);
 }
 
 void QnResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)

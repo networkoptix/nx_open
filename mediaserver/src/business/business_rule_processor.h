@@ -5,6 +5,7 @@
 #include <QtCore/QTimer>
 #include <QtCore/QThread>
 #include <QtCore/QMultiMap>
+#include <QElapsedTimer>
 
 #include <core/resource/resource_fwd.h>
 
@@ -25,28 +26,28 @@ class EmailManagerImpl;
 class QnProcessorAggregationInfo {
 public:
     QnProcessorAggregationInfo():
-        m_timestamp(0),
         m_initialized(false)
-    {}
+    {
+        m_timer.invalidate();
+    }
 
     /** Timestamp when the action should be executed. */
-    qint64 estimatedEnd() {
-        if (!m_initialized)
-            return 0;
-        qint64 period = m_rule->aggregationPeriod()*1000ll*1000ll;
-        return m_timestamp + period;
+    bool isExpired() {
+        if (m_timer.isValid())
+            return m_timer.hasExpired(m_rule->aggregationPeriod()*1000ll);
+        else
+            return true;
     }
-
-    void init(const QnAbstractBusinessEventPtr& event, const QnBusinessEventRulePtr& rule, qint64 timestamp) {
+    
+    void init(const QnAbstractBusinessEventPtr& event, const QnBusinessEventRulePtr& rule) {
         m_event = event;
         m_rule = rule;
-        m_timestamp = timestamp;
         m_initialized = true;
     }
-
+    
     /** Restores the initial state. */
-    void reset(qint64 timestamp){
-        m_timestamp = timestamp;
+    void reset(){
+        m_timer.restart();
         m_info.clear();
         m_initialized = false;
     }
@@ -80,8 +81,8 @@ private:
     QnBusinessEventRulePtr m_rule;
     QnBusinessAggregationInfo m_info;
 
-    /** Timestamp of the first event. */
-    qint64 m_timestamp;
+    /** Agregation timer */
+    QElapsedTimer m_timer;
 
     /** Flag that event and rule are set. */
     bool m_initialized;
@@ -142,7 +143,7 @@ private slots:
 
 
 protected:
-    virtual QImage getEventScreenshot(const QnBusinessEventParameters& params, QSize dstSize) const;
+    virtual QByteArray getEventScreenshotEncoded(const QnBusinessEventParameters& params, QSize dstSize) const;
     
     bool containResource(const QnResourceList& resList, const QnUuid& resId) const;
     QnAbstractBusinessActionList matchActions(const QnAbstractBusinessEventPtr& bEvent);

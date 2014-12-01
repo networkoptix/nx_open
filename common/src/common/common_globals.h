@@ -291,6 +291,7 @@ public:
         desktop_camera = 0x400000,      /**< Desktop Camera resource */
 
         parent_change = 0x800000,       /**< Camera discovery internal purpose */
+        depend_on_parent_status = 0x1000000,   /**< Resource status depend on parent resource status */
 
         local_media = local | media,
         local_layout = local | layout,

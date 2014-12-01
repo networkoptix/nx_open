@@ -35,9 +35,6 @@ public:
 
     static QRect calcVideoRect(double windowWidth, double windowHeight, double textureWidth, double textureHeight);
 
-public slots:
-    virtual void accept() override;
-
 private slots:
     void at_calcSignInProgress(QByteArray sign, int progress);
     void at_gotImageSize(int width, int height);

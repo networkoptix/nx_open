@@ -30,10 +30,6 @@ private slots:
     void at_remotePeerLost(ec2::ApiPeerAliveData data);
     void at_systemNameChangeRequested(const QString &systemName);
 private:
-    void updateServerTmpStatus(const QnUuid& id, Qn::ResourceStatus status);
-    void checkForTmpStatus(const QnResourcePtr& resource);
-
-private:
     QSharedPointer<QnIncompatibleServerWatcher> m_incompatibleServerWatcher;
     bool m_connected;
     bool m_holdConnection;

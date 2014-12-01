@@ -167,6 +167,10 @@ namespace ec2
         m_resourceManager->triggerNotification( tran );
     }
 
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiLicenseOverflowData>& tran ) {
+        m_resourceManager->triggerNotification( tran );
+    }
+
     /*
     void triggerNotification( const QnTransaction<ApiSetResourceDisabledData>& tran ) {
         m_resourceManager->triggerNotification( tran );

@@ -33,7 +33,6 @@ private slots:
     void at_updateChunkReceived(const QString &updateId, const QByteArray &data, qint64 offset);
     void at_updateInstallationRequested(const QString &updateId);
 
-    void at_systemNameChangeRequested(const QString &systemName);
     void at_remotePeerUnauthorized(const QnUuid& id);
     void at_remotePeerFound(ec2::ApiPeerAliveData data);
     void at_remotePeerLost(ec2::ApiPeerAliveData data);

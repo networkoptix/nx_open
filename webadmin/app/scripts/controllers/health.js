@@ -150,31 +150,23 @@ angular.module('webadminApp')
 
         function updateStatisticsDataSets(statistics){
             var datasets = $scope.datasets;
-
             var handler = function(stat){
                 return stat.description === dataset.label;
             };
             for(var i=2; i < datasets.length;i++){
                 var dataset = datasets[i];
-
                 var value = 0;
-
                 var needstat = _.filter(statistics,handler);
 
                 if(needstat && needstat.length > 0){
                     value  = needstat[0].value;
                 }
 
-
                 dataset.data.push(value * 100);
                 if (dataset.data.length > $scope.healthLength) {
                     dataset.data = dataset.data.slice(dataset.data.length - $scope.healthLength, dataset.data.length);
                 }
-
             }
-
-
-            console.log(datasets,statistics);
         }
 
 

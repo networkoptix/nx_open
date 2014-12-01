@@ -2877,7 +2877,7 @@ void QnPlOnvifResource::pullMessages(quint64 /*timerID*/)
             auth.password(),
             m_timeDrift ) );
     soapWrapper->getProxy()->soap->imode |= SOAP_XML_IGNORENS;
-    soap_omode( soapWrapper->getProxy()->soap, SOAP_XML_DEFAULTNS );
+    //soap_omode( soapWrapper->getProxy()->soap, SOAP_XML_DEFAULTNS );
 
     char* buf = (char*)malloc(512);
 

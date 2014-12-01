@@ -1,50 +1,86 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('mediaserver', function ($http) {
+    .factory('mediaserver', function ($http, $modal) {
 
         var cacheModuleInfo = null;
         var cacheCurrentUser = null;
+
+        function getSettings(){
+            return $http.get('/api/moduleInformation?salt=' + (new Date()).getTime());
+        }
+
+        var offlineDialog = null;
+        function offlineHandler(){
+            //1. recheck
+            cacheModuleInfo = null;
+            if(offlineDialog === null) { //Dialog is not displayed
+                getSettings(true).catch(function (error) {
+                    console.log(error);// if server can't handle moduleInformation - it's offline - show dialog alike restart
+                    offlineDialog = $modal.open({
+                        templateUrl: 'offline_modal',
+                        controller: 'OfflineCtrl'
+                    });
+                    offlineDialog.result.then(function (info) {//Dialog closed - means server is online
+                        offlineDialog = null;
+                    });
+                });
+            }
+        }
+        function wrapRequest(request){
+            request.catch(offlineHandler);
+            return request;
+        }
         return {
             getSettings: function(url) {
                 url = url || '';
-
+                if(url === true){//force reload cache
+                    cacheModuleInfo = null;
+                    return getSettings();
+                }
                 if(url===''){// Кешируем данные о сервере, чтобы не запрашивать 10 раз
                     if(cacheModuleInfo === null){
-                        cacheModuleInfo = $http.get(url + '/api/moduleInformation');
+                        cacheModuleInfo = wrapRequest(getSettings());
                     }
+                    // on error - clear object to reload next time
                     return cacheModuleInfo;
                 }
                 return $http.get(url + '/api/moduleInformation',{
                     timeout: 3*1000
                 });
             },
-            saveSettings: function(systemName,port) { return $http.post('/api/configure?systemName=' + systemName + '&port=' + port); },
-            changePassword: function(password,oldPassword) {
-                return $http.post('/api/configure?password=' + password  + '&oldPassword=' + oldPassword);
+            saveSettings: function(systemName,port) {
+                return wrapRequest($http.post('/api/configure?systemName=' + systemName + '&port=' + port));
             },
-            mergeSystems: function(url,password,keepMySystem){return $http.post('/api/mergeSystems?password=' + password  + '&url=' + encodeURIComponent(url) + '&takeRemoteSettings=' + (!keepMySystem)); },
-            pingSystem: function(url,password){return $http.post('/api/pingSystem?password=' + password  + '&url=' + encodeURIComponent(url)); },
-            restart: function() { return $http.post('/api/restart'); },
-            getStorages: function(){ return $http.get('/api/storageSpace'); },
-            saveStorages:function(info){return $http.post('/ec2/saveStorages',info); },
-            discoveredPeers:function(){return $http.get('/api/discoveredPeers'); },
-            getMediaServer: function(id){return $http.get('/ec2/getMediaServersEx?id=' + id.replace('{','').replace('}','')); },
-            getMediaServers: function(){return $http.get('/ec2/getMediaServersEx'); },
+            changePassword: function(password,oldPassword) {
+                return wrapRequest($http.post('/api/configure?password=' + password  + '&oldPassword=' + oldPassword));
+            },
+            mergeSystems: function(url,password,currentPassword,keepMySystem){
+                return wrapRequest($http.post('/api/mergeSystems?password=' + password
+                    + '&currentPassword=' + currentPassword
+                    + '&url=' + encodeURIComponent(url)
+                    + '&takeRemoteSettings=' + (!keepMySystem))); },
+            pingSystem: function(url,password){return wrapRequest($http.post('/api/pingSystem?password=' + password  + '&url=' + encodeURIComponent(url))); },
+            restart: function() { return wrapRequest($http.post('/api/restart')); },
+            getStorages: function(){ return wrapRequest($http.get('/api/storageSpace')); },
+            saveStorages:function(info){return wrapRequest($http.post('/ec2/saveStorages',info)); },
+            discoveredPeers:function(){return wrapRequest($http.get('/api/discoveredPeers')); },
+            getMediaServer: function(id){return wrapRequest($http.get('/ec2/getMediaServersEx?id=' + id.replace('{','').replace('}',''))); },
+            getMediaServers: function(){return wrapRequest($http.get('/ec2/getMediaServersEx')); },
             getCameras:function(id){
                 if(typeof(id)!=='undefined'){
-                    return $http.get('/ec2/getCamerasEx?id=' + id.replace('{','').replace('}',''));
+                    return wrapRequest($http.get('/ec2/getCamerasEx?id=' + id.replace('{','').replace('}','')));
                 }
-                return $http.get('/ec2/getCamerasEx');
+                return wrapRequest($http.get('/ec2/getCamerasEx'));
             },
-            saveMediaServer: function(info){return $http.post('/ec2/saveMediaServer',info); },
+            saveMediaServer: function(info){return wrapRequest($http.post('/ec2/saveMediaServer',info)); },
             statistics:function(url){
                 url = url || '';
-                return $http.get(url + '/api/statistics');
+                return $http.get(url + '/api/statistics?sault=' + (new Date()).getTime() );
             },
             getCurrentUser:function(){
                 if(cacheCurrentUser === null){
-                    cacheCurrentUser = $http.get('/api/getCurrentUser');
+                    cacheCurrentUser = wrapRequest($http.get('/api/getCurrentUser'));
                 }
                 return cacheCurrentUser;
             },

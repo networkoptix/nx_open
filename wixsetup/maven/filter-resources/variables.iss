@@ -6,3 +6,4 @@
 #define AppVersion "${release.version}.${buildNumber}"
 #define ServerUpgradeCode "${customization.upgradeCode}"
 #define ClientUpgradeCode "${customization.clientUpgradeCode}"
+#define Lang "${installer.language}"

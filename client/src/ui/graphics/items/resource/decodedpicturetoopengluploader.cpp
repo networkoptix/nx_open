@@ -1693,6 +1693,11 @@ void DecodedPictureToOpenGLUploader::waitForAllFramesDisplayed()
 
 void DecodedPictureToOpenGLUploader::ensureAllFramesWillBeDisplayed()
 {
+    ensureQueueLessThen(1);
+}
+
+void DecodedPictureToOpenGLUploader::ensureQueueLessThen(int maxSize)
+{
     if( m_hardwareDecoderUsed )
         return; //if hardware decoder is used, waiting can result in bad playback experience
 
@@ -1700,7 +1705,7 @@ void DecodedPictureToOpenGLUploader::ensureAllFramesWillBeDisplayed()
 
 #ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
     //MUST wait till all references to frames, supplied via uploadDecodedPicture are not needed anymore
-    while( !m_terminated && !m_framesWaitingUploadInGUIThread.empty() )
+    while( !m_terminated && m_framesWaitingUploadInGUIThread.size() >= maxSize)
         m_cond.wait( lk.mutex() );
 
     //for( std::deque<AVPacketUploader*>::iterator

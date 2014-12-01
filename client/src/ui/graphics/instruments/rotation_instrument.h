@@ -60,6 +60,7 @@ private:
     qreal m_originAngle;
     qreal m_lastRotation;
     qreal m_rotationItemZValue;
+    QPointF m_sceneOrigin;
 };
 
 #endif // QN_ROTATION_INSTRUMENT_H

@@ -18,7 +18,7 @@
 namespace {
 
     const unsigned defaultPingTimeoutMs = 3000;
-    const unsigned defaultKeepAliveMultiply = 3;
+    const unsigned defaultKeepAliveMultiply = 5;
     const unsigned errorWaitTimeoutMs = 1000;
 
 } // anonymous namespace
@@ -202,7 +202,7 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
     if (response.seed == qnCommon->moduleGUID().toString())
         return true; // ignore requests to himself
 
-    if (response.type != nxMediaServerId)
+    if (response.type != nxMediaServerId && response.type != nxECId)
         return true;
 
     if (!m_compatibilityMode && response.customization.toLower() != qnProductFeatures().customizationName.toLower()) { // TODO: #2.1 #Elric #AK check for "default" VS "Vms"

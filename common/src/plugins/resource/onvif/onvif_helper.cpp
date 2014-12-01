@@ -200,6 +200,8 @@ PasswordHelper::PasswordHelper()
     setPasswordInfo("vista_", "admin", "admin");
     setPasswordInfo("norbain_", "admin", "admin");
 
+    setPasswordInfo("canon", "root", "camera");
+
     // default password list
 
     setPasswordInfo(DEFAULT_MANUFACTURER, "admin", "admin");

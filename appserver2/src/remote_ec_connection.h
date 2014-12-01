@@ -29,6 +29,7 @@ namespace ec2
         virtual ~RemoteEC2Connection();
 
         virtual QnConnectionInfo connectionInfo() const override;
+        virtual QString authInfo() const override;
         virtual void startReceivingNotifications() override;
 
     private:

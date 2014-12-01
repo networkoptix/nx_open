@@ -5,12 +5,15 @@
 #include <QtCore/QEventLoop>
 #include <QtCore/QFile>
 
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <api/app_server_connection.h>
+#include <nx_ec/dummy_handler.h>
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
 #include <utils/common/log.h>
 #include <utils/common/app_info.h>
+#include <common/common_module.h>
 
 static QnMediaServerResourcePtr m_server;
 
@@ -86,6 +89,25 @@ bool backupDatabase() {
 
     file.write(data);
     file.close();
+
+    return true;
+}
+
+
+bool changeSystemName(const QString &systemName) {
+    if (qnCommon->localSystemName() == systemName)
+        return true;
+
+    qnCommon->setLocalSystemName(systemName);
+    QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+    if (!server) {
+        NX_LOG("Cannot find self server resource!", cl_logERROR);
+        return false;
+    }
+
+    MSSettings::roSettings()->setValue("systemName", systemName);
+    server->setSystemName(systemName);
+    QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 
     return true;
 }

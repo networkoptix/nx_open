@@ -55,7 +55,7 @@ void QnDesktopResource::createSharedDataProvider()
 {
     if (m_desktopDataProvider) 
     {
-        if (m_desktopDataProvider->needToStop())
+        if (m_desktopDataProvider->readyToStop())
             delete m_desktopDataProvider; // stop and destroy old instance
         else
             return; // already exists

@@ -1,14 +1,12 @@
 #ifndef ROUTING_INFORMATION_REST_HANDLER_H
 #define ROUTING_INFORMATION_REST_HANDLER_H
 
-#include <rest/server/request_handler.h>
+#include <rest/server/json_rest_handler.h>
 
-class QnRoutingInformationRestHandler : public QnRestRequestHandler {
+class QnRoutingInformationRestHandler : public QnJsonRestHandler {
     Q_OBJECT
 public:
-    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*) override;
-    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, const QByteArray& srcBodyContentType, QByteArray& result, 
-                            QByteArray& resultContentType, const QnRestConnectionProcessor*) override;
+    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor *);
 };
 
 #endif // ROUTING_INFORMATION_REST_HANDLER_H

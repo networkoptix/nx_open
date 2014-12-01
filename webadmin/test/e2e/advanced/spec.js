@@ -18,6 +18,11 @@ describe('Advanced Page', function () {
         expect(storage.element(by.css(".glyphicon")).isDisplayed()).toBe(true);
     });
 
+
+    it("should show reserved space value",function(){
+        expect("test").toBe("written");
+    });
+
     it("should show warning tip",function(){
         expect(p.dangerAlert.isDisplayed()).toBe(true);
     });
