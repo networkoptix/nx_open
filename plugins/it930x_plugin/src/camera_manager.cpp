@@ -40,22 +40,24 @@ namespace
     const char * PARAM_QUERY_REBOOT =        "reboot";
     const char * PARAM_QUERY_SET_DEFAULTS =  "setDefaults";
 
-    const char * PARAM_CHANNEL_0 = "0";
-    const char * PARAM_CHANNEL_1 = "1";
-    const char * PARAM_CHANNEL_2 = "2";
-    const char * PARAM_CHANNEL_3 = "3";
-    const char * PARAM_CHANNEL_4 = "4";
-    const char * PARAM_CHANNEL_5 = "5";
-    const char * PARAM_CHANNEL_6 = "6";
-    const char * PARAM_CHANNEL_7 = "7";
-    const char * PARAM_CHANNEL_8 = "8";
-    const char * PARAM_CHANNEL_9 = "9";
-    const char * PARAM_CHANNEL_10 = "10";
-    const char * PARAM_CHANNEL_11 = "11";
-    const char * PARAM_CHANNEL_12 = "12";
-    const char * PARAM_CHANNEL_13 = "13";
-    const char * PARAM_CHANNEL_14 = "14";
-    const char * PARAM_CHANNEL_15 = "15";
+    const char * PARAM_CHANNELS[] = {
+        "0 (177/6 MHz)",
+        "1 (189/6 MHz)",
+        "2 (201/6 MHz)",
+        "3 (213/6 MHz)",
+        "4 (225/6 MHz)",
+        "5 (237/6 MHz)",
+        "6 (249/6 MHz)",
+        "7 (261/6 MHz)",
+        "8 (273/6 MHz)",
+        "9 (363/6 MHz)",
+        "10 (375/6 MHz)",
+        "11 (387/6 MHz)",
+        "12 (399/6 MHz)",
+        "13 (411/6 MHz)",
+        "14 (423/6 MHz)",
+        "15 (473/6 MHz)"
+    };
 
     CameraParams str2param(const char * paramName)
     {
@@ -157,22 +159,22 @@ namespace ite
         if (! paramsXML.size()) // first time
         {
             std::string chanEnum;
-            chanEnum += PARAM_CHANNEL_0; chanEnum += ',';
-            chanEnum += PARAM_CHANNEL_1; chanEnum += ',';
-            chanEnum += PARAM_CHANNEL_2; chanEnum += ',';
-            chanEnum += PARAM_CHANNEL_3; chanEnum += ',';
-            chanEnum += PARAM_CHANNEL_4; chanEnum += ',';
-            chanEnum += PARAM_CHANNEL_5; chanEnum += ',';
-            chanEnum += PARAM_CHANNEL_6; chanEnum += ',';
-            chanEnum += PARAM_CHANNEL_7; chanEnum += ',';
-            chanEnum += PARAM_CHANNEL_8; chanEnum += ',';
-            chanEnum += PARAM_CHANNEL_9; chanEnum += ',';
-            chanEnum += PARAM_CHANNEL_10; chanEnum += ',';
-            chanEnum += PARAM_CHANNEL_11; chanEnum += ',';
-            chanEnum += PARAM_CHANNEL_12; chanEnum += ',';
-            chanEnum += PARAM_CHANNEL_13; chanEnum += ',';
-            chanEnum += PARAM_CHANNEL_14; chanEnum += ',';
-            chanEnum += PARAM_CHANNEL_15;
+            chanEnum += PARAM_CHANNELS[0]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[1]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[2]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[3]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[4]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[5]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[6]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[7]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[8]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[9]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[10]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[11]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[12]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[13]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[14]; chanEnum += ',';
+            chanEnum += PARAM_CHANNELS[15];
 
             std::string params =
             "<?xml version=\"1.0\"?> "
@@ -299,7 +301,7 @@ namespace ite
         {
             unsigned chan = DeviceInfo::freqChannel(m_rxDevice->frequency());
             if (chan < DeviceInfo::CHANNELS_NUM)
-                s = num2str(chan);
+                s = PARAM_CHANNELS[chan];
         }
     }
 
@@ -322,6 +324,7 @@ namespace ite
 
     bool CameraManager::setParam_Channel(std::string& s)
     {
+        /// @warning need value in front of string
         unsigned chan = str2num(s);
         if (chan >= DeviceInfo::CHANNELS_NUM)
             return false;
@@ -527,9 +530,14 @@ namespace ite
     {
         m_loading = true;
 
+        // try light reload
         stopDevReader();
         if (initDevReader())
             initEncoders();
+
+        // failed - change state to hard reload (next time)
+        if (! m_hasThread)
+            m_rxDevice.reset();
 
         m_loading = false;
     }
