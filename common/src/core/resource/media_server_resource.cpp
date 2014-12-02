@@ -61,7 +61,7 @@ QnMediaServerResource::~QnMediaServerResource()
 void QnMediaServerResource::onNewResource(const QnResourcePtr &resource)
 {
     QMutexLocker lock(&m_mutex);
-    if (m_firstCamera.isNull() &&  resource->getParentId() == getId() && resource.dynamicCast<QnSecurityCamResource>())
+    if (m_firstCamera.isNull() && resource.dynamicCast<QnSecurityCamResource>() &&  resource->getParentId() == getId())
         m_firstCamera = resource;
 }
 
