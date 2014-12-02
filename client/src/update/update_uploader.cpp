@@ -129,7 +129,7 @@ void QnUpdateUploader::at_updateManager_updateUploadProgress(const QString &upda
 
     qint64 wholeProgress = (m_peers.size() - m_progressById.size()) * 100;
     foreach (int progress, m_progressById)
-        wholeProgress += progress;
+        wholeProgress += progress * 100 / m_chunkCount;
     emit progressChanged(wholeProgress / m_peers.size());
 
     if (m_progressById.isEmpty()) {
