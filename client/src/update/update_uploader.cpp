@@ -43,6 +43,7 @@ void QnUpdateUploader::sendPreambule() {
     QString md5 = makeMd5(m_updateFile.data());
     m_updateFile->seek(0);
 
+    m_pendingPeers = m_peers;
     connection2()->getUpdatesManager()->sendUpdatePackageChunk(m_updateId, md5.toLatin1(), -1, m_peers, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 

@@ -131,6 +131,11 @@ void QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByte
         m_updateId = updateId;
     }
 
+    if (offset < 0) {
+        m_fileMd5 = data;
+        m_file.reset();
+    }
+
     if (!m_file) {
         m_file.reset(new QFile(getUpdateFilePath(updateId)));
         if (!m_file->open(QFile::ReadWrite)) {
@@ -139,18 +144,13 @@ void QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByte
             return;
         }
         m_file->seek(m_file->size());
+        sendReply(static_cast<int>(m_file->pos()));
+        return;
     }
 
     /* Closed file means we've already finished downloading. Nothing to do is left. */
     if (!m_file->isOpen() || !m_file->openMode().testFlag(QFile::WriteOnly))
         return;
-
-    /* Reply to preambule */
-    if (offset < 0) {
-        m_fileMd5 = data;
-        sendReply(static_cast<int>(m_file->pos()));
-        return;
-    }
 
     if (!data.isEmpty()) {
         if (m_file->pos() >= offset) {
