@@ -5,14 +5,12 @@ import sys
 import os
 
 base = 'traytool'
-base_lang = 'en_US'
 
 scriptDir = os.path.dirname(os.path.abspath(__file__))
 
 projectFile = os.path.join(scriptDir, '../x64/' + base + '.pro')
 
-baseEntry = ''
-miscEntries = []
+entries = []
 
 for entry in os.listdir(scriptDir):
     path = os.path.join(scriptDir, entry)
@@ -26,18 +24,10 @@ for entry in os.listdir(scriptDir):
     if (not entry.startswith(base)):
         continue;
         
-    if (entry.find(base_lang) > 0):
-        baseEntry = entry
-    else:
-        miscEntries.append(entry)
+    entries.append(entry)
         
-
-baseLangCommand = 'lupdate -no-obsolete -pro ' + projectFile + ' -locations absolute -pluralonly -ts ' + baseEntry
-print baseLangCommand
-subprocess.call(baseLangCommand)
-
-miscLangCommand = 'lupdate -no-obsolete -pro ' + projectFile + ' -locations absolute -ts'
-for lang in miscEntries:
-    miscLangCommand = miscLangCommand + ' ' + lang
-print miscLangCommand
-subprocess.call(miscLangCommand)
+command = 'lupdate -no-obsolete -pro ' + projectFile + ' -locations absolute -ts'
+for lang in entries:
+    command = command + ' ' + lang
+print command
+subprocess.call(command)
