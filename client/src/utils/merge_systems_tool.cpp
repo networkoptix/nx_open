@@ -90,8 +90,12 @@ void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInform
 void QnMergeSystemsTool::at_mergeSystem_finished(int status, const QnModuleInformation &moduleInformation, int handle, const QString &errorString) {
     Q_UNUSED(handle)
 
-    if (status == 0 && errorString.isEmpty() && !m_password.isEmpty())
+    if (status == 0 && errorString.isEmpty() && !m_password.isEmpty()) {
         context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(m_password);
+        QUrl url = QnAppServerConnectionFactory::url();
+        url.setPassword(m_password);
+        QnAppServerConnectionFactory::setUrl(url);
+    }
     m_password.clear();
     context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
     static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance())->setHoldConnection(false);
