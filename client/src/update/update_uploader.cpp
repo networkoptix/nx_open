@@ -89,7 +89,7 @@ void QnUpdateUploader::sendNextChunk() {
             m_pendingPeers.insert(it.key());
     }
 
-    connection2()->getUpdatesManager()->sendUpdatePackageChunk(m_updateId, data, offset, m_peers, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    connection2()->getUpdatesManager()->sendUpdatePackageChunk(m_updateId, data, offset, m_pendingPeers, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 
     m_chunkTimer->start();
 }
