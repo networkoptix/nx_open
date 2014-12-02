@@ -19,7 +19,7 @@ QnWorkbenchUserWatcher::QnWorkbenchUserWatcher(QObject *parent):
 {
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::initialResourcesReceived,    this,   [this] {       
         for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>()) {
-            if ( user->getName().toLower() != m_userName )
+            if ( user->getName().toLower() != m_userName.toLower() )
                 continue;
             setCurrentUser(user);
             return;

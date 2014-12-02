@@ -1393,7 +1393,7 @@ void QnMain::run()
     ec2::AbstractECConnectionPtr ec2Connection;
     QnConnectionInfo connectInfo;
     QnResourcePropertyDictionary dictionary;
-    QnResourceStatusDiscionary statusDict;
+    QnResourceStatusDictionary statusDict;
 
     while (!needToStop())
     {

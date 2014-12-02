@@ -14,8 +14,8 @@ angular.module('webadminApp')
             systemFound: false
         };
 
-        mediaserver.discoveredPeers().success(function (r) {
-            var systems = _.map(r.reply, function(module)
+        mediaserver.discoveredPeers().then(function (r) {
+            var systems = _.map(r.data.reply, function(module)
             {
                 return {
                     url: 'http://' + module.remoteAddresses[0] + ':' + module.port,
@@ -32,8 +32,8 @@ angular.module('webadminApp')
             $scope.systems.discoveredUrls = systems;
         });
 
-        mediaserver.getSettings().success(function (r) {
-            $scope.systems.systemName =  r.reply.systemName;
+        mediaserver.getSettings().then(function (r) {
+            $scope.systems.systemName =  r.data.reply.systemName;
 
             $scope.systems.discoveredUrls = _.filter($scope.systems.discoveredUrls, function(module){
                 return module.systemName !== $scope.systems.systemName;
