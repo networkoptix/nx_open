@@ -321,7 +321,13 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
     m_lastReceiveTimer.restart();
 
     if( errorCode || bytesRead == 0 )   //error or connection closed
+    {
+        if( errorCode == SystemError::timedOut )
+        {
+            NX_LOG( lit("Peer %1 timed out. Disconnecting...").arg(m_remotePeer.id.toString()), cl_logWARNING );
+        }
         return setStateNoLock( State::Error );
+    }
 
     if (m_state == Error)
         return;
