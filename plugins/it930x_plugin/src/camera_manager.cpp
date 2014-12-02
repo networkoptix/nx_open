@@ -535,7 +535,7 @@ namespace ite
         if (initDevReader())
             initEncoders();
 
-        // failed - change state to hard reload (next time)
+        // soft reload failed, change state to hard reload (next time)
         if (! m_hasThread)
             m_rxDevice.reset();
 

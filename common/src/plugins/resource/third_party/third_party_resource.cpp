@@ -120,7 +120,7 @@ bool QnThirdPartyResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &so
 
     QString localParams = QnCameraAdvancedParamsReader::encodedParamsFromResource(this->toSharedPointer());
     QString sourceParams = QnCameraAdvancedParamsReader::encodedParamsFromResource(source);
-    if (localParams != sourceParams) {
+    if (!sourceParams.isEmpty() && localParams != sourceParams) {
         QnCameraAdvancedParamsReader::setEncodedParamsToResource(this->toSharedPointer(), sourceParams);
         result = true;
     }

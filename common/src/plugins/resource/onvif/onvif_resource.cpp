@@ -242,8 +242,6 @@ QnPlOnvifResource::RelayOutputInfo::RelayOutputInfo(
 
 QnPlOnvifResource::QnPlOnvifResource()
 :
-    m_physicalParamsMutex(QMutex::Recursive),
-    m_advSettingsLastUpdated(),
     m_iframeDistance(-1),
     m_minQuality(0),
     m_maxQuality(0),
@@ -265,7 +263,8 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_maxChannels(1),
     m_streamConfCounter(0),
     m_prevRequestSendClock(0),
-    m_asyncPullMessagesCallWrapper(nullptr)
+    m_asyncPullMessagesCallWrapper(nullptr),
+    m_physicalParamsMutex(QMutex::Recursive)
 {
     m_monotonicClock.start();
 }
