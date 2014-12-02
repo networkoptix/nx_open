@@ -5,10 +5,11 @@
 #include <QtNetwork/QHostAddress>
 
 #include <core/resource/resource_fwd.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 struct QnModuleInformation;
 
-class QnMergeSystemsTool : public QObject {
+class QnMergeSystemsTool : public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
 public:
     enum ErrorCode {
@@ -36,6 +37,7 @@ private slots:
 
 private:
     QHash<int, QnMediaServerResourcePtr> m_serverByRequestHandle;
+    QString m_password;
 };
 
 #endif // MERGE_SYSTEMS_TOOL_H

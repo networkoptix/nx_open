@@ -12,6 +12,9 @@
 #include "common/common_module.h"
 #include "utils/network/module_finder.h"
 #include "client/client_settings.h"
+#include "client/client_message_processor.h"
+#include "ui/workbench/workbench_context.h"
+#include "ui/workbench/watchers/workbench_user_watcher.h"
 
 namespace {
 
@@ -33,7 +36,8 @@ namespace {
 } // anonymous namespace
 
 QnMergeSystemsTool::QnMergeSystemsTool(QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    QnWorkbenchContextAware(parent)
 {
 }
 
@@ -51,6 +55,11 @@ void QnMergeSystemsTool::pingSystem(const QUrl &url, const QString &user, const 
 void QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &user, const QString &password, bool ownSettings) {
     QString currentPassword = QnAppServerConnectionFactory::getConnection2()->authInfo();
     Q_ASSERT_X(!currentPassword.isEmpty(), "currentPassword cannot be empty", Q_FUNC_INFO);
+    if (!ownSettings) {
+        context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(false);
+        static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance())->setHoldConnection(true);
+        m_password = password;
+    }
     proxy->apiConnection()->mergeSystemAsync(url, user, password, currentPassword, ownSettings, this, SLOT(at_mergeSystem_finished(int,QnModuleInformation,int,QString)));
 }
 
@@ -80,6 +89,12 @@ void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInform
 
 void QnMergeSystemsTool::at_mergeSystem_finished(int status, const QnModuleInformation &moduleInformation, int handle, const QString &errorString) {
     Q_UNUSED(handle)
+
+    if (status == 0 && errorString.isEmpty() && !m_password.isEmpty())
+        context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(m_password);
+    m_password.clear();
+    context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
+    static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance())->setHoldConnection(false);
 
     if (status != 0)
         emit mergeFinished(InternalError, moduleInformation);
