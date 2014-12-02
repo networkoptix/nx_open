@@ -71,6 +71,7 @@ private slots:
     void at_cameraScheduleWidget_controlsChangesApplied();
 
     void at_enableAudioCheckBox_clicked();
+    void at_fisheyeCheckBox_clicked();
     void at_analogViewCheckBox_clicked();
 
     void updateMaxFPS();

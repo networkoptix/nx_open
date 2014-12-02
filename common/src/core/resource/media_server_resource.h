@@ -140,7 +140,6 @@ private:
     QnAbstractStorageResourceList m_storagesToUpdate;
     ec2::ApiIdDataList m_storagesToRemove;
 
-    mutable QMutex m_firstCameraMutex;
     mutable QnResourcePtr m_firstCamera;
 };
 

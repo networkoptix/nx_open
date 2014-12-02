@@ -1205,7 +1205,6 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::RenameAction).
         flags(Qn::Tree | Qn::SingleTarget |  Qn::ResourceTarget | Qn::VideoWallItemTarget | Qn::VideoWallMatrixTarget).
-        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
         requiredPermissions(Qn::WritePermission | Qn::WriteNamePermission).
         text(tr("Rename")).
         shortcut(tr("F2")).

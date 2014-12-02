@@ -609,6 +609,8 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
             workbench()->removeLayout(layout);
     }
 
+    if(workbench()->layouts().empty())
+        menu()->trigger(Qn::OpenNewTabAction);
 
     submitDelayedDrops();
 }
@@ -644,8 +646,6 @@ void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged() {
 void QnWorkbenchActionHandler::at_workbench_currentLayoutChanged() {
     action(Qn::RadassAutoAction)->setChecked(true);
     qnRedAssController->setMode(Qn::AutoResolution);
-    submitDelayedDrops();
-
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
