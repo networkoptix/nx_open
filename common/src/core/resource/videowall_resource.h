@@ -31,6 +31,8 @@ public:
 
     /** Utility method to get IDs of all online items.  */
     QList<QnUuid> onlineItems() const;
+
+    virtual Qn::ResourceStatus getStatus() const override;
 signals:
     void itemAdded(const QnVideoWallResourcePtr &resource, const QnVideoWallItem &item);
     void itemRemoved(const QnVideoWallResourcePtr &resource, const QnVideoWallItem &item);
