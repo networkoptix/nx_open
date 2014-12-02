@@ -434,8 +434,8 @@ void QnUserSettingsDialog::at_accessRights_changed() {
         return;
 
     setHasChanges(true);
-    selectAccessRightsPreset(readAccessRightsAdvanced());
     updateDependantPermissions();
+    selectAccessRightsPreset(readAccessRightsAdvanced());
 }
 
 void QnUserSettingsDialog::createAccessRightsPresets() {
