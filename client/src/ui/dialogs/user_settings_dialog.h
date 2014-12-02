@@ -83,7 +83,7 @@ protected slots:
     void updateSizeLimits();
     void setHasChanges(bool hasChanges = true);
 
-    void at_accessRights_changed();
+    void at_customCheckBox_clicked();
     void at_advancedButton_toggled();
 
 private:

@@ -429,11 +429,13 @@ void QnUserSettingsDialog::updateDependantPermissions() {
     m_inUpdateDependensies = false;
 }
 
-void QnUserSettingsDialog::at_accessRights_changed() {
+void QnUserSettingsDialog::at_customCheckBox_clicked() {
     if (m_inUpdateDependensies)
         return;
 
     setHasChanges(true);
+    m_accessRightsModified = true;
+
     updateDependantPermissions();
     selectAccessRightsPreset(readAccessRightsAdvanced());
 }
@@ -490,7 +492,7 @@ QCheckBox *QnUserSettingsDialog::createAccessRightCheckBox(QString text, quint64
     if (isReadOnly(ui->accessRightsGroupbox))
         setReadOnly(checkBox, true);
     else
-        connect(checkBox, SIGNAL(clicked()), this, SLOT(at_accessRights_changed()));
+        connect(checkBox, &QCheckBox::clicked, this, &QnUserSettingsDialog::at_customCheckBox_clicked);
     return checkBox;
 }
 
