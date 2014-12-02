@@ -100,6 +100,14 @@ public:
         return !croppedPreview.isNull();
     }
 
+    /** Whether we can crop the image.
+     *  The only case when we cannot - if we open already cropped and saved image.
+     */
+    bool canCropImage() const {
+        bool loadedImageIsCropped = (state == ImageLoaded && croppedPreview.isNull());
+        return !loadedImageIsCropped;
+    }
+
     DialogState state;
 
     /** Path to the selected image (may be path in cache). */
@@ -298,7 +306,10 @@ void QnLayoutSettingsDialog::updateControls() {
     ui->clearButton->setEnabled(imagePresent && !locked);
     ui->opacitySpinBox->setEnabled(imagePresent && !locked);
     ui->selectButton->setEnabled(!locked);
-    ui->cropToMonitorCheckBox->setEnabled(imagePresent && !locked);
+
+    if (!d->canCropImage()) /* Mark image as already cropped. */
+        ui->cropToMonitorCheckBox->setChecked(true);
+    ui->cropToMonitorCheckBox->setEnabled(imagePresent && !locked && d->canCropImage());
 
     QImage image;
     if (!imagePresent) {
@@ -546,8 +557,6 @@ void QnLayoutSettingsDialog::setPreview(const QImage &image) {
     }
     else {
         d->croppedPreview = QImage();
-        if (d->state == ImageLoaded)
-            ui->cropToMonitorCheckBox->setChecked(true);
     }
 
     if (d->state == NewImageLoaded) {
