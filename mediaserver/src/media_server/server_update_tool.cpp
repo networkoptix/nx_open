@@ -48,8 +48,7 @@ namespace {
     }
 
     QString getUpdateFilePath(const QString &updateId) {
-        QString id = updateId.mid(1, updateId.length() - 2);
-        return getUpdatesDir().absoluteFilePath(id + lit(".zip"));
+        return getUpdatesDir().absoluteFilePath(updateId + lit(".zip"));
     }
 
     bool initializeUpdateLog(const QString &targetVersion, QString *logFileName) {
@@ -83,8 +82,7 @@ namespace {
 } // anonymous namespace
 
 QnServerUpdateTool::QnServerUpdateTool() :
-    m_mutex(QMutex::Recursive),
-    m_length(-1)
+    m_mutex(QMutex::Recursive)
 {}
 
 QnServerUpdateTool::~QnServerUpdateTool() {}
@@ -127,40 +125,52 @@ void QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByte
         return;
 
     if (m_updateId != updateId) {
-        m_chunks.clear();
         m_file.reset();
         m_zipExtractor.reset();
-        clearUpdatesLocation();
+        clearUpdatesLocation(updateId);
         m_updateId = updateId;
     }
 
     if (!m_file) {
         m_file.reset(new QFile(getUpdateFilePath(updateId)));
-        if (!m_file->open(QFile::WriteOnly)) {
+        if (!m_file->open(QFile::ReadWrite)) {
             NX_LOG(lit("Could not save update to %1").arg(m_file->fileName()), cl_logERROR);
             m_bannedUpdates.insert(updateId);
             return;
         }
+        m_file->seek(m_file->size());
     }
 
-    // Closed file means we've already finished downloading. Nothing to do is left.
+    /* Closed file means we've already finished downloading. Nothing to do is left. */
     if (!m_file->isOpen() || !m_file->openMode().testFlag(QFile::WriteOnly))
         return;
 
-    if (data.isEmpty()) { // it means we've just got the size of the file
-        m_length = offset;
-    } else {
-        m_file->seek(offset);
-        m_file->write(data);
-        m_chunks.insert(offset, data.size());
-        sendReply(m_chunks.size());
+    /* Reply to preambule */
+    if (offset < 0) {
+        m_fileMd5 = data;
+        sendReply(static_cast<int>(m_file->pos()));
+        return;
     }
 
-    if (isComplete()) {
-        m_file->close();
-        m_file->open(QFile::ReadOnly);
-        processUpdate(updateId, m_file.data());
+    if (!data.isEmpty()) {
+        if (m_file->pos() >= offset) {
+            m_file->seek(offset);
+            m_file->write(data);
+        }
+        /* we work with files < 500 MB, so int type is ok */
+        sendReply(static_cast<int>(m_file->pos()));
+        return;
     }
+
+    /* it means we've just got the size of the file */
+    if (m_file->pos() != offset) {
+        sendReply(static_cast<int>(m_file->pos()));
+        return;
+    }
+
+    m_file->close();
+    m_file->open(QFile::ReadOnly);
+    processUpdate(updateId, m_file.data());
 }
 
 bool QnServerUpdateTool::installUpdate(const QString &updateId) {
@@ -254,23 +264,20 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId) {
     return true;
 }
 
-void QnServerUpdateTool::addChunk(qint64 offset, int length) {
-    m_chunks[offset] = length;
-}
+void QnServerUpdateTool::clearUpdatesLocation(const QString &idToLeave) {
+    QDir dir = getUpdatesDir();
 
-bool QnServerUpdateTool::isComplete() const {
-    if (m_length == -1)
-        return false;
+    QString fileToLeave = idToLeave + ".zip";
 
-    if (m_chunks.size() == 1)
-        return m_chunks.firstKey() == 0 && m_chunks.first() == m_length;
+    for (const QFileInfo &info: dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot)) {
+        if (info.fileName() == fileToLeave)
+            continue;
 
-    int chunkCount = (m_length + m_chunks.first() - 1) / m_chunks.first();
-    return m_chunks.size() == chunkCount;
-}
-
-void QnServerUpdateTool::clearUpdatesLocation() {
-    getUpdatesDir().removeRecursively();
+        if (info.isDir())
+            QDir(info.absoluteFilePath()).removeRecursively();
+        else
+            dir.remove(info.fileName());
+    }
 }
 
 void QnServerUpdateTool::at_zipExtractor_extractionFinished(int error) {
