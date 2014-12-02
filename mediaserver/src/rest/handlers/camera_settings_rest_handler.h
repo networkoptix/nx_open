@@ -44,7 +44,7 @@
 */
 
 struct AwaitedParameters;
-class QnCameraAdvancedParamsReader;
+class QnCachingCameraAdvancedParamsReader;
 
 class QnCameraSettingsRestHandler: public Connective<QnJsonRestHandler> {
     Q_OBJECT
@@ -78,7 +78,7 @@ private:
     QMutex m_mutex;
     QWaitCondition m_cond;
     std::set<AwaitedParameters*> m_awaitedParamsSets;
-    QScopedPointer<QnCameraAdvancedParamsReader> m_paramsReader;
+    QScopedPointer<QnCachingCameraAdvancedParamsReader> m_paramsReader;
 };
 
 #endif  //QN_CAMERA_SETTINGS_HANDLER_H

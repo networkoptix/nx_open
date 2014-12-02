@@ -42,7 +42,7 @@ namespace {
 QnCameraAdvancedParamsWidget::QnCameraAdvancedParamsWidget(QWidget* parent /*= NULL*/):
     base_type(parent),
     ui(new Ui::CameraAdvancedParamsWidget),
-    m_advancedParamsReader(new QnCameraAdvancedParamsReader()),
+    m_advancedParamsReader(new QnCachingCameraAdvancedParamsReader()),
     m_cameraAvailable(false),
     m_paramRequestHandle(0),
     m_state(State::Init)

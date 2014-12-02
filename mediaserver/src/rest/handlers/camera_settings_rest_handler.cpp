@@ -37,7 +37,7 @@ struct AwaitedParameters {
 
 QnCameraSettingsRestHandler::QnCameraSettingsRestHandler():
 	base_type(),
-	m_paramsReader(new QnCameraAdvancedParamsReader())
+	m_paramsReader(new QnCachingCameraAdvancedParamsReader())
 {
 }
 

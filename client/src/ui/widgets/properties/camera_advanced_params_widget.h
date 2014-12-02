@@ -14,7 +14,7 @@ namespace Ui {
     class CameraAdvancedParamsWidget;
 }
 
-class QnCameraAdvancedParamsReader;
+class QnCachingCameraAdvancedParamsReader;
 class QnCameraAdvancedParamWidgetsManager;
 
 class QnCameraAdvancedParamsWidget: public Connective<QWidget> {
@@ -59,7 +59,7 @@ private:
 
 private:
     QScopedPointer<Ui::CameraAdvancedParamsWidget> ui;
-    QScopedPointer<QnCameraAdvancedParamsReader> m_advancedParamsReader;
+    QScopedPointer<QnCachingCameraAdvancedParamsReader> m_advancedParamsReader;
     QScopedPointer<QnCameraAdvancedParamWidgetsManager> m_advancedParamWidgetsManager;
     QnVirtualCameraResourcePtr m_camera;
     bool m_cameraAvailable;
