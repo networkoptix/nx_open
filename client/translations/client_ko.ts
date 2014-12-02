@@ -4380,7 +4380,7 @@ Would you like to restart the Client in compatibility mode?</source>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="246"/>
         <source>Launcher process is not found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">시작프로세서를 찾을 수 없음</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="247"/>
@@ -6935,7 +6935,7 @@ Please wait until update is finished</source>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="338"/>
         <source>Launcher process is not found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">시작프로세서를 찾을 수 없음</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="339"/>

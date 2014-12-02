@@ -3306,7 +3306,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/dialogs/build_number_dialog.ui" line="39"/>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">密码:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/build_number_dialog.cpp" line="47"/>
@@ -4489,7 +4489,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/dialogs/credentials_dialog.ui" line="30"/>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">密码:</translation>
     </message>
 </context>
 <context>
@@ -5073,7 +5073,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="55"/>
         <source>License Key</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">许可密钥</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="56"/>
@@ -5598,7 +5598,7 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.ui" line="85"/>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">密码:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.ui" line="94"/>
@@ -9792,12 +9792,12 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/dialogs/storage_url_dialog.ui" line="59"/>
         <source>Login:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">登录:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/storage_url_dialog.ui" line="72"/>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">密码:</translation>
     </message>
 </context>
 <context>

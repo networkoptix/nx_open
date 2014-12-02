@@ -4341,7 +4341,7 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="68"/>
         <source>Login or password you have entered are incorrect, please try again.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">L&apos;ID ou le mot de passe que vous avez entré est incorrect,  réessayez S.V.P.</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="70"/>
@@ -7013,7 +7013,8 @@ Please wait until update is finished</source>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="339"/>
         <source>Cannot restart the client.
 Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Impossible de redémarrer le client.
+S.V.P, fermer l&apos;application et recommencer en utilisant le raccourci dans le menu Démarrer.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="352"/>

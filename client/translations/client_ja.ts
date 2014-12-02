@@ -6942,7 +6942,8 @@ Please wait until update is finished</source>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="339"/>
         <source>Cannot restart the client.
 Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">クライアントの再起動ができません.
+アプリケーションを閉じて再度起動して下さい.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="352"/>

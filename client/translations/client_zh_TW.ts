@@ -4392,7 +4392,7 @@ Would you like to restart the Client in compatibility mode?</source>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="246"/>
         <source>Launcher process is not found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">找不到啟動程式</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="247"/>
@@ -6944,13 +6944,14 @@ Please wait until update is finished</source>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="338"/>
         <source>Launcher process is not found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">找不到啟動程式</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="339"/>
         <source>Cannot restart the client.
 Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">客戶端無法啟動。
+請關閉程式並從程式集列表裡的捷徑啟動。</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="352"/>
