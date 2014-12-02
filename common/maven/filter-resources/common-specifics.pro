@@ -10,23 +10,6 @@ mac {
   LIBS += -lobjc -framework Foundation -framework AppKit
 }
 
-TRANSLATIONS += ${basedir}/translations/common_en.ts \
-
-#               ${basedir}/translations/common_zh-CN.ts \
-#               ${basedir}/translations/common_fr.ts \
-#               ${basedir}/translations/common_jp.ts \
-#               ${basedir}/translations/qt_ru.ts \
-#               ${basedir}/translations/qt_zh-CN.ts \
-#               ${basedir}/translations/qt_fr.ts \
-#               ${basedir}/translations/qt_jp.ts \
-#               ${basedir}/translations/qt_ko.ts \
-#               ${basedir}/translations/qt_pt-BR.ts \
-
-#               ${basedir}/translations/common_ru.ts \
-#               ${basedir}/translations/common_ko.ts \
-#               ${basedir}/translations/common_pt-BR.ts \
-
-
 !win32 {
   ext_debug2.target  = $(DESTDIR)$(TARGET).debug
   ext_debug2.depends = $(DESTDIR)$(TARGET)

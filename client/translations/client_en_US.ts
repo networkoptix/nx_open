@@ -2,9 +2,76 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="en_US" sourcelanguage="en">
 <context>
+    <name>QTimeSpanPrivate</name>
+    <message numerus="yes">
+        <location filename="../src/utils/common/qtimespan.cpp" line="281"/>
+        <source>%n millisecond(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/utils/common/qtimespan.cpp" line="283"/>
+        <source>%n second(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/utils/common/qtimespan.cpp" line="285"/>
+        <source>%n minute(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/utils/common/qtimespan.cpp" line="287"/>
+        <source>%n hour(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/utils/common/qtimespan.cpp" line="289"/>
+        <source>%n day(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/utils/common/qtimespan.cpp" line="291"/>
+        <source>%n week(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/utils/common/qtimespan.cpp" line="293"/>
+        <source>%n month(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/utils/common/qtimespan.cpp" line="295"/>
+        <source>%n year(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>QnBlinkingImageButtonWidget</name>
     <message numerus="yes">
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="120"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="121"/>
         <source>You have %n notifications</source>
         <translation>
             <numerusform>You have %n notification</numerusform>
@@ -34,8 +101,8 @@
 <context>
     <name>QnBusinessRuleViewModel</name>
     <message numerus="yes">
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="792"/>
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="857"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="823"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="888"/>
         <source>%n Camera(s)</source>
         <translation>
             <numerusform>%n Camera</numerusform>
@@ -43,7 +110,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="787"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="818"/>
         <source>%n Server(s)</source>
         <translation>
             <numerusform>%n Server</numerusform>
@@ -51,43 +118,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <source>%1 of %n cameras</source>
-        <comment>...for</comment>
-        <translation type="obsolete">
-            <numerusform>%1 of %n camera</numerusform>
-            <numerusform>%1 of %n cameras</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>no more than once per %n days</source>
-        <translation type="obsolete">
-            <numerusform>no more than once per day</numerusform>
-            <numerusform>no more than once per %n days</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>no more than once per %n hours</source>
-        <translation type="obsolete">
-            <numerusform>no more than once per hour</numerusform>
-            <numerusform>no more than once per %n hours</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>no more than once per %n minutes</source>
-        <translation type="obsolete">
-            <numerusform>no more than once per minute</numerusform>
-            <numerusform>no more than once per %n minutes</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>no more than once per %n seconds</source>
-        <translation type="obsolete">
-            <numerusform>no more than once per second</numerusform>
-            <numerusform>no more than once per %n seconds</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="874"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="905"/>
         <source>Every %n days</source>
         <translation>
             <numerusform>Every day</numerusform>
@@ -95,7 +126,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="877"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="908"/>
         <source>Every %n hours</source>
         <translation>
             <numerusform>Every hour</numerusform>
@@ -103,7 +134,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="880"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="911"/>
         <source>Every %n minutes</source>
         <translation>
             <numerusform>Every minute</numerusform>
@@ -111,7 +142,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="882"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="913"/>
         <source>Every %n seconds</source>
         <translation>
             <numerusform>Every second</numerusform>
@@ -122,7 +153,7 @@
 <context>
     <name>QnCameraAdditionDialog</name>
     <message numerus="yes">
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="616"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="628"/>
         <source>%n camera(s) added successfully.
 It might take a few moments to populate them in the tree.</source>
         <translation>
@@ -133,14 +164,7 @@ It might take a few seconds for the cameras to populate in the tree.</numerusfor
         </translation>
     </message>
     <message numerus="yes">
-        <source>Error while adding camera(s)</source>
-        <translation type="obsolete">
-            <numerusform>Error while adding a camera</numerusform>
-            <numerusform>Error while adding cameras</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="742"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="754"/>
         <source>Scanning hosts... (%1)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -148,7 +172,7 @@ It might take a few seconds for the cameras to populate in the tree.</numerusfor
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="743"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="755"/>
         <source>%n cameras found</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -156,7 +180,7 @@ It might take a few seconds for the cameras to populate in the tree.</numerusfor
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="624"/>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="636"/>
         <source>Error while adding camera(s).</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -178,7 +202,7 @@ It might take a few seconds for the cameras to populate in the tree.</numerusfor
 <context>
     <name>QnCameraListDialog</name>
     <message numerus="yes">
-        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="93"/>
+        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="99"/>
         <source>Camera List - %n camera(s) found</source>
         <translation>
             <numerusform>Camera List - %n camera found</numerusform>
@@ -186,25 +210,18 @@ It might take a few seconds for the cameras to populate in the tree.</numerusfor
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="95"/>
+        <location filename="../src/ui/dialogs/camera_list_dialog.cpp" line="101"/>
         <source>Camera List for &apos;%1&apos; - %n camera(s) found</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>Camera List for media server &apos;%1&apos; - %n camera(s) found</source>
-        <translation type="obsolete">
-            <numerusform>Camera List for media server &apos;%1&apos; - %n camera found</numerusform>
-            <numerusform>Camera List for media server &apos;%1&apos; - %n cameras found</numerusform>
-        </translation>
-    </message>
 </context>
 <context>
     <name>QnCameraMotionPolicy</name>
     <message numerus="yes">
-        <location filename="../src/business/business_resource_validation.cpp" line="83"/>
+        <location filename="../src/business/business_resource_validation.cpp" line="81"/>
         <source>Recording or motion detection is disabled for %1</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -226,7 +243,7 @@ It might take a few seconds for the cameras to populate in the tree.</numerusfor
 <context>
     <name>QnCameraRecordingPolicy</name>
     <message numerus="yes">
-        <location filename="../src/business/business_resource_validation.cpp" line="93"/>
+        <location filename="../src/business/business_resource_validation.cpp" line="91"/>
         <source>Recording is disabled for %1</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -235,77 +252,18 @@ It might take a few seconds for the cameras to populate in the tree.</numerusfor
     </message>
 </context>
 <context>
-    <name>QnCameraScheduleWidget</name>
+    <name>QnCameraSettingsDialog</name>
     <message numerus="yes">
-        <source>%n digital license(s) are used out of %1.</source>
-        <translation type="obsolete">
-            <numerusform>%n digital license is used out of %1.</numerusform>
-            <numerusform>%n digital licenses are used out of %1.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="632"/>
-        <source>%n analog license(s) are used out of %1.</source>
-        <translation>
-            <numerusform>%n analog license is used out of %1.</numerusform>
-            <numerusform>%n analog licenses are used out of %1.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Activate %n more digital license(s).</source>
-        <translation type="obsolete">
-            <numerusform>Activate %n more digital license.</numerusform>
-            <numerusform>Activate %n more digital licenses.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Activate %1 more analog license(s).</source>
-        <translation type="obsolete">
-            <numerusform>Activate %1 more analog license.</numerusform>
-            <numerusform>Activate %1 more analog licenses.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n more digital license(s) will be used.</source>
-        <translation type="obsolete">
-            <numerusform>%n more digital license will be used.</numerusform>
-            <numerusform>%n more digital licenses will be used.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="664"/>
-        <source>%n more analog license(s) will be used.</source>
-        <translation>
-            <numerusform>%n more analog license will be used.</numerusform>
-            <numerusform>%n more analog licenses will be used.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Activate %n more analog license(s).</source>
-        <translation type="obsolete">
-            <numerusform>Activate %n more analog license.</numerusform>
-            <numerusform>Activate %n more analog licenses.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="623"/>
-        <source>%n license(s) are used out of %1.</source>
+        <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="161"/>
+        <source>Save changes to the following %n camera(s)?</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Save changes to the following camera?</numerusform>
+            <numerusform>Save changes to the following %n cameras?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="655"/>
-        <source>Activate %n more license(s).</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="662"/>
-        <source>%n more license(s) will be used.</source>
+        <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="237"/>
+        <source>Could not save the following %n cameras to Server.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -315,7 +273,7 @@ It might take a few seconds for the cameras to populate in the tree.</numerusfor
 <context>
     <name>QnEventLogDialog</name>
     <message numerus="yes">
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="362"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="360"/>
         <source>Event log for period from %1 to %2 - %n event(s) found</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -323,7 +281,7 @@ It might take a few seconds for the cameras to populate in the tree.</numerusfor
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="366"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="364"/>
         <source>Event log for %1 - %n event(s) found</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -331,58 +289,8 @@ It might take a few seconds for the cameras to populate in the tree.</numerusfor
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="406"/>
+        <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="404"/>
         <source>&lt;%n camera(s)&gt;</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-</context>
-<context>
-    <name>QnExportCameraSettingsDialog</name>
-    <message numerus="yes">
-        <source>%n digital license(s) will be used out of %1.</source>
-        <translation type="obsolete">
-            <numerusform>%n digital license will be used out of %1.</numerusform>
-            <numerusform>%n digital licenses will be used out of %1.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n analog  license(s) will be used out of %1.</source>
-        <translation type="obsolete">
-            <numerusform>%n analog license will be used out of %1.</numerusform>
-            <numerusform>%n analog  licenses will be used out of %1.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n analog license(s) will be used out of %1.</source>
-        <translation type="obsolete">
-            <numerusform>%n analog license will be used out of %1.</numerusform>
-            <numerusform>%n analog licenses will be used out of %1.</numerusform>
-        </translation>
-    </message>
-</context>
-<context>
-    <name>QnExportScheduleResourceSelectionDialogDelegate</name>
-    <message numerus="yes">
-        <source>%n digital license(s) will be used out of %1.</source>
-        <translation type="obsolete">
-            <numerusform>%n digital license will be used out of %1.</numerusform>
-            <numerusform>%n digital licenses will be used out of %1.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="91"/>
-        <source>%n analog license(s) will be used out of %1.</source>
-        <translation>
-            <numerusform>%n analog license will be used out of %1.</numerusform>
-            <numerusform>%n analog licenses will be used out of %1.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="87"/>
-        <source>%n license(s) will be used out of %1.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -392,7 +300,7 @@ It might take a few seconds for the cameras to populate in the tree.</numerusfor
 <context>
     <name>QnLicenseListModel</name>
     <message numerus="yes">
-        <location filename="../src/ui/models/license_list_model.cpp" line="110"/>
+        <location filename="../src/ui/models/license_list_model.cpp" line="123"/>
         <source>In %n days</source>
         <translation>
             <numerusform>In %n day</numerusform>
@@ -401,52 +309,23 @@ It might take a few seconds for the cameras to populate in the tree.</numerusfor
     </message>
 </context>
 <context>
-    <name>QnMultipleCameraSettingsWidget</name>
+    <name>QnLicenseManagerWidget</name>
     <message numerus="yes">
-        <source>%n digital license(s) are used out of %1.</source>
-        <translation type="obsolete">
-            <numerusform>%n digital license is used out of %1.</numerusform>
-            <numerusform>%n digital licenses are used out of %1.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="473"/>
-        <source>%n analog license(s) are used out of %1.</source>
-        <translation type="unfinished">
-            <numerusform>%n analog license is used out of %1.</numerusform>
-            <numerusform>%n analog licenses are used out of %1.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="464"/>
-        <source>%n license(s) are used out of %1.</source>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="135"/>
+        <source>
+At least %n %2 are required</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="496"/>
-        <source>Activate %n more license(s).</source>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="141"/>
+        <source>
+%n %2 are currently in use</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="503"/>
-        <source>%n more license(s) will be used.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="505"/>
-        <source>%n more analog license(s) will be used.</source>
-        <translation type="unfinished">
-            <numerusform>%n more analog license will be used.</numerusform>
-            <numerusform>%n more analog licenses will be used.</numerusform>
         </translation>
     </message>
 </context>
@@ -464,7 +343,7 @@ It might take a few seconds for the cameras to populate in the tree.</numerusfor
 <context>
     <name>QnPtzManageModel</name>
     <message numerus="yes">
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="595"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="548"/>
         <source>This preset will be activated after %n minutes of inactivity</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -472,7 +351,7 @@ It might take a few seconds for the cameras to populate in the tree.</numerusfor
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="705"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="658"/>
         <source>Tour has %n identical positions</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -480,7 +359,7 @@ It might take a few seconds for the cameras to populate in the tree.</numerusfor
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="714"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="667"/>
         <source>about %n minute(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -502,8 +381,8 @@ It might take a few seconds for the cameras to populate in the tree.</numerusfor
 <context>
     <name>QnServerResourceWidget</name>
     <message numerus="yes">
-        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="758"/>
-        <source>%1 %2 (up %n days, %3)</source>
+        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="751"/>
+        <source>%1 (up %n days, %2)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -511,67 +390,52 @@ It might take a few seconds for the cameras to populate in the tree.</numerusfor
     </message>
 </context>
 <context>
-    <name>QnSingleCameraSettingsWidget</name>
+    <name>QnServerUpdatesWidget</name>
     <message numerus="yes">
-        <source>%n digital license(s) are used out of %1.</source>
-        <translation type="obsolete">
-            <numerusform>%n digital license is used out of %1.</numerusform>
-            <numerusform>%n digital licenses are used out of %1.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="855"/>
-        <source>%n analog license(s) are used out of %1.</source>
-        <translation type="unfinished">
-            <numerusform>%n analog license is used out of %1.</numerusform>
-            <numerusform>%n analog licenses are used out of %1.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="846"/>
-        <source>%n license(s) are used out of %1.</source>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="370"/>
+        <source>No free space left on %n servers: %1</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="878"/>
-        <source>Activate %n more license(s).</source>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="376"/>
+        <source>%n servers are not responding: %1</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="885"/>
-        <source>%n more license(s) will be used.</source>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="382"/>
+        <source>%n servers have gone offline: %1</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="887"/>
-        <source>%n more analog license(s) will be used.</source>
-        <translation type="unfinished">
-            <numerusform>%n more analog license will be used.</numerusform>
-            <numerusform>%n more analog licenses will be used.</numerusform>
         </translation>
     </message>
 </context>
 <context>
     <name>QnUserEmailPolicy</name>
     <message numerus="yes">
-        <location filename="../src/business/business_resource_validation.cpp" line="134"/>
-        <source>%n of %1 additional E-Mail addresses are invalid</source>
-        <translation>
-            <numerusform>%n of %1 additional E-Mail address is invalid</numerusform>
-            <numerusform>%n of %1 additional E-Mail addresses are invalid</numerusform>
+        <location filename="../src/business/business_resource_validation.cpp" line="117"/>
+        <source>%n of %1 users have invalid email address</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/business/business_resource_validation.cpp" line="139"/>
+        <location filename="../src/business/business_resource_validation.cpp" line="132"/>
+        <source>%n of %1 additional email addresses are invalid</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/business/business_resource_validation.cpp" line="137"/>
         <source>%n User(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -579,48 +443,29 @@ It might take a few seconds for the cameras to populate in the tree.</numerusfor
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/business/business_resource_validation.cpp" line="141"/>
+        <location filename="../src/business/business_resource_validation.cpp" line="139"/>
         <source>%1, %n additional</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
+</context>
+<context>
+    <name>QnVideowallScreenWidget</name>
     <message numerus="yes">
-        <location filename="../src/business/business_resource_validation.cpp" line="119"/>
-        <source>%n of %1 users have invalid E-Mail address</source>
-        <translation>
-            <numerusform>%n of %1 user has and invalid E-Mail address</numerusform>
-            <numerusform>%n of %1 users have and invalid E-Mail address</numerusform>
+        <location filename="../src/ui/graphics/items/resource/videowall_screen_widget.cpp" line="104"/>
+        <source>Pc %1 - Screens %2</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchActionHandler</name>
     <message numerus="yes">
-        <source>The following %n layout(s) are not saved. Do you want to save them?</source>
-        <translation type="obsolete">
-            <numerusform>The following layout is not saved. Do you want to save it?</numerusform>
-            <numerusform>The following %n layouts are not saved. Do you want to save them?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>The following %n layout(s) are being saved.</source>
-        <translation type="obsolete">
-            <numerusform>The following layout is being saved.</numerusform>
-            <numerusform>The following %n layouts are being saved.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1797"/>
-        <source>Save changes to the following %n camera(s)?</source>
-        <translation>
-            <numerusform>Save changes to the following camera?</numerusform>
-            <numerusform>Save changes to the following %n cameras?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2054"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1592"/>
         <source>Are you sure you want to permanently delete these %n file(s)?</source>
         <translation>
             <numerusform>Are you sure you want to delete this file permanently?</numerusform>
@@ -628,7 +473,7 @@ It might take a few seconds for the cameras to populate in the tree.</numerusfor
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2072"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1610"/>
         <source>Are you sure you want to remove these %n item(s) from layout?</source>
         <translation>
             <numerusform>Are you sure you want to remove this item from layout?</numerusform>
@@ -636,7 +481,27 @@ It might take a few seconds for the cameras to populate in the tree.</numerusfor
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2183"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1870"/>
+        <source>These %n cameras are auto-discovered.
+They may be auto-discovered again after removing.
+Are you sure you want to delete them?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1877"/>
+        <source>%n of these %1 cameras are auto-discovered.
+They may be auto-discovered again after removing.
+Are you sure you want to delete them?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1883"/>
         <source>Do you really want to delete the following %n item(s)?</source>
         <translation>
             <numerusform>Are you sure you want to delete the following item?</numerusform>
@@ -644,36 +509,15 @@ It might take a few seconds for the cameras to populate in the tree.</numerusfor
         </translation>
     </message>
     <message numerus="yes">
-        <source>Exactly one item must be selected for export, but %n item(s) are currently selected.</source>
-        <translation type="obsolete">
-            <numerusform>Exactly one item must be selected for export, but %n item is currently selected.</numerusform>
-            <numerusform>Exactly one item must be selected for export, but %n items are currently selected.</numerusform>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2232"/>
+        <source>Could not save the following %n items.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
-        <translation type="obsolete">
-            <numerusform>Could not save the following layout to Enterprise Controller.</numerusform>
-            <numerusform>Could not save the following %n layouts to Enterprise Controller.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Do you want to restore these %n layout(s)?</source>
-        <translation type="obsolete">
-            <numerusform>Do you want to restore this layout?</numerusform>
-            <numerusform>Do you want to restore these %n layouts?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2569"/>
-        <source>Could not save the following %n items to Enterprise Controller.</source>
-        <translation>
-            <numerusform>Cannot save the following item to Enterprise Controller.</numerusform>
-            <numerusform>Cannot save the following %n items to Enterprise Controller.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2592"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2260"/>
         <source>Could not save changes made to the following %n resource(s).</source>
         <translation>
             <numerusform>Cannot save changes made to the following resource.</numerusform>
@@ -682,40 +526,9 @@ It might take a few seconds for the cameras to populate in the tree.</numerusfor
     </message>
 </context>
 <context>
-    <name>QnWorkbenchEcsHandler</name>
-    <message numerus="yes">
-        <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
-        <translation type="obsolete">
-            <numerusform>Could not save the following layout to Enterprise Controller.</numerusform>
-            <numerusform>Could not save the following %n layouts to Enterprise Controller.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Do you want to restore these %n layout(s)?</source>
-        <translation type="obsolete">
-            <numerusform>Do you want to restore this layout?</numerusform>
-            <numerusform>Do you want to restore these %n layouts?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Could not save the following %n items to Enterprise Controller.</source>
-        <translation type="obsolete">
-            <numerusform>Could not save the following item to Enterprise Controller.</numerusform>
-            <numerusform>Could not save the following %n items to Enterprise Controller.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Could not save changes made to the following %n resource(s).</source>
-        <translation type="obsolete">
-            <numerusform>Could not save changes made to the following resource.</numerusform>
-            <numerusform>Could not save changes made to the following %n resources.</numerusform>
-        </translation>
-    </message>
-</context>
-<context>
     <name>QnWorkbenchExportHandler</name>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="186"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="188"/>
         <source>Exactly one item must be selected for export, but %n item(s) are currently selected.</source>
         <translation type="unfinished">
             <numerusform>Exactly one item must be selected for export, but %n item is currently selected.</numerusform>
@@ -726,7 +539,7 @@ It might take a few seconds for the cameras to populate in the tree.</numerusfor
 <context>
     <name>QnWorkbenchLayoutsHandler</name>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="314"/>
+        <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="356"/>
         <source>The following %n layout(s) are not saved. Do you want to save them?</source>
         <translation type="unfinished">
             <numerusform>The following layout is not saved. Do you want to save it?</numerusform>
@@ -734,7 +547,7 @@ It might take a few seconds for the cameras to populate in the tree.</numerusfor
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="343"/>
+        <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="394"/>
         <source>The following %n layout(s) are being saved.</source>
         <translation type="unfinished">
             <numerusform>The following layout is being saved.</numerusform>
@@ -742,19 +555,46 @@ It might take a few seconds for the cameras to populate in the tree.</numerusfor
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="543"/>
-        <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
-        <translation>
-            <numerusform>Cannot save the following layout to Enterprise Controller.</numerusform>
-            <numerusform>Cannot save the following %n layouts to Enterprise Controller.</numerusform>
+        <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="613"/>
+        <source>Could not save the following %n layout(s) to Server.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="544"/>
+        <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="614"/>
         <source>Do you want to restore these %n layout(s)?</source>
         <translation type="unfinished">
             <numerusform>Do you want to restore this layout?</numerusform>
             <numerusform>Do you want to restore these %n layouts?</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>QnWorkbenchVideoWallHandler</name>
+    <message numerus="yes">
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1255"/>
+        <source>Could not save the following %n items to Server.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1327"/>
+        <source>Are you sure you want to permanently delete these %n item(s)?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1717"/>
+        <source>Are you sure you want to permanently delete these %n matrices?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
