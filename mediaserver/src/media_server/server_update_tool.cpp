@@ -175,8 +175,10 @@ void QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByte
 
     m_file->close();
     m_file->open(QFile::ReadOnly);
-    if (!processUpdate(updateId, m_file.data()))
+    if (!processUpdate(updateId, m_file.data())) {
+        m_file->remove();
         sendReply(ec2::AbstractUpdatesManager::UnknownError);
+    }
 }
 
 bool QnServerUpdateTool::installUpdate(const QString &updateId) {
