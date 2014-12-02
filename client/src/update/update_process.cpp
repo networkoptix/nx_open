@@ -212,9 +212,7 @@ void QnUpdateProcess::at_checkForUpdatesTaskFinished(QnCheckForUpdatesPeerTask* 
         return;
     }
 
-    m_id = qnCommon->moduleGUID().toString();
-    m_id += lit("_");
-    m_id += result.latestVersion.toString();
+    m_id = result.latestVersion.toString();
 
     m_target.version = result.latestVersion; /* Version can be updated if loading from local file or seeking for latest version. */
     m_clientRequiresInstaller = result.clientInstallerRequired;
