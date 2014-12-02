@@ -317,10 +317,15 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
 
                 if (clientUpdated) {
                     message += lit("\n");
-                    if (result.clientInstallerRequired)
-                        message += tr("Now you have to update the client using an installer.");
-                    else
+                    if (result.clientInstallerRequired) {
+#ifdef Q_OS_MAC
+                        message += tr("Now you have to update the client manually.");
+#else
+                        message += tr("Now you have to update the client manually using an installer.");
+#endif
+                    } else {
                         message += tr("The client will be restarted to the updated version.");
+                    }
                 }
 
                 QMessageBox::information(this, tr("Update is successful"), message);
@@ -507,8 +512,15 @@ void QnServerUpdatesWidget::checkForUpdatesLocal() {
 
         switch (result.result) {
         case QnCheckForUpdateResult::UpdateFound:
-            if (!result.latestVersion.isNull() && result.clientInstallerRequired)
-                detail = tr("Newer version found. You will have to update the client manually using an installer.");
+            if (!result.latestVersion.isNull() && result.clientInstallerRequired) {
+                detail = tr("Newer version found.");
+                detail += lit("\n");
+#ifdef Q_OS_MAC
+                detail += tr("You will have to update the client manually.");
+#else
+                detail += tr("You will have to update the client manually using an installer.");
+#endif
+            }
             break;
         case QnCheckForUpdateResult::NoNewerVersion:
             detail = tr("All components in your system are up to date.");
