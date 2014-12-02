@@ -45,8 +45,8 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
     m_primaryIFSelected = false;
     m_statusTimer.restart();
 
-    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnMediaServerResource::onNewResource, Qt::QueuedConnection);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnMediaServerResource::onRemoveResource, Qt::QueuedConnection);
+    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnMediaServerResource::onNewResource, Qt::DirectConnection);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnMediaServerResource::onRemoveResource, Qt::DirectConnection);
 
     QnResourceList resList = qnResPool->getResourcesByParentId(getId()).filtered<QnSecurityCamResource>();
     if (!resList.isEmpty())
@@ -60,14 +60,14 @@ QnMediaServerResource::~QnMediaServerResource()
 
 void QnMediaServerResource::onNewResource(const QnResourcePtr &resource)
 {
-    QMutexLocker lock(&m_firstCameraMutex);
+    QMutexLocker lock(&m_mutex);
     if (m_firstCamera.isNull() &&  resource->getParentId() == getId() && resource.dynamicCast<QnSecurityCamResource>())
         m_firstCamera = resource;
 }
 
 void QnMediaServerResource::onRemoveResource(const QnResourcePtr &resource)
 {
-    QMutexLocker lock(&m_firstCameraMutex);
+    QMutexLocker lock(&m_mutex);
     if (m_firstCamera && resource->getId() == m_firstCamera->getId())
         m_firstCamera.clear();
 }
@@ -83,7 +83,7 @@ QString QnMediaServerResource::getName() const
 {
     if (getServerFlags() & Qn::SF_Edge)
     {
-        QMutexLocker lock(&m_firstCameraMutex);
+        QMutexLocker lock(&m_mutex);
         if (m_firstCamera)
             return m_firstCamera->getName();
     }
