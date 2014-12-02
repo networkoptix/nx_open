@@ -848,10 +848,10 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
     return true;
 }
 
-void QnTransactionMessageBus::connectToPeerLost(const QnTransactionTransport* transport)
+void QnTransactionMessageBus::connectToPeerLost(const QnUuid& id)
 {
-    if (m_alivePeers.contains(transport->remotePeer().id))
-        removeAlivePeer(transport->remotePeer().id, true);
+    if (m_alivePeers.contains(id))
+        removeAlivePeer(id, true);
 }
 
 void QnTransactionMessageBus::connectToPeerEstablished(const ApiPeerData &peer)
@@ -980,7 +980,7 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
         {
             QnTransactionTransportPtr transportPtr = itr.value();
             if (transportPtr == transport) {
-                connectToPeerLost(transport);
+                connectToPeerLost(transport->remotePeer().id);
                 m_connections.erase(itr);
                 break;
             }
@@ -1070,6 +1070,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
     }
 
     // check if some server not accessible any more
+    QSet<QnUuid> lostPeers;
     for (AlivePeersMap::iterator itr = m_alivePeers.begin(); itr != m_alivePeers.end(); ++itr)
     {
         if (itr.value().lastActivity.elapsed() > ALIVE_UPDATE_INTERVAL * 2)
@@ -1092,8 +1093,11 @@ void QnTransactionMessageBus::doPeriodicTasks()
                     transport->setState(QnTransactionTransport::Error);
                 }
             }
+            lostPeers << itr.key();
         }
     }
+    for (const QnUuid& id: lostPeers)
+        connectToPeerLost(id);
 }
 
 void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport, const QnTransactionTransportHeader& transportHeader, const QnTranState& runtimeState)
