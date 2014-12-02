@@ -71,7 +71,7 @@ protected:
         if(status == 0) {
             QnJsonRestResult result;
             bool jsonDeserialized = QJson::deserialize(response.data, &result);
-            if(!jsonDeserialized || !QJson::deserialize(result.reply(), &reply)) {
+            if (!jsonDeserialized || (!result.reply().isNull() && !QJson::deserialize(result.reply(), &reply))) {
 #ifdef JSON_REPLY_DEBUG
                 qnWarning("Error parsing JSON reply:\n%1\n\n", response.data);
 #endif
