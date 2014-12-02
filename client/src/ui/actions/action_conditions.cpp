@@ -318,9 +318,12 @@ Qn::ActionVisibility QnRenameActionCondition::check(const QnActionParameters &pa
     case Qn::EdgeNode:
         return QnEdgeServerCondition::check(parameters.resources());
     case Qn::RecorderNode:
+        return Qn::EnabledAction;
     case Qn::VideoWallItemNode:
     case Qn::VideoWallMatrixNode:
-        return Qn::EnabledAction;
+        return accessController()->hasGlobalPermissions(Qn::GlobalEditVideoWallPermission)
+            ? Qn::EnabledAction
+            : Qn::InvisibleAction;
     default:
         break;
     }
