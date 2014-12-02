@@ -298,12 +298,7 @@ void QnLayoutSettingsDialog::updateControls() {
     ui->clearButton->setEnabled(imagePresent && !locked);
     ui->opacitySpinBox->setEnabled(imagePresent && !locked);
     ui->selectButton->setEnabled(!locked);
-    ui->cropToMonitorCheckBox->setEnabled(imagePresent /*&& d->canChangeAspectRatio()*/ );
-    // image is already cropped to monitor aspect ratio
-    /*
-    if (imagePresent && !d->canChangeAspectRatio())
-        ui->cropToMonitorCheckBox->setChecked(true);
-    */
+    ui->cropToMonitorCheckBox->setEnabled(imagePresent && !locked);
 
     QImage image;
     if (!imagePresent) {
