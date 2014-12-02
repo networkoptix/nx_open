@@ -88,6 +88,11 @@ QnServerUpdateTool::QnServerUpdateTool() :
 QnServerUpdateTool::~QnServerUpdateTool() {}
 
 bool QnServerUpdateTool::processUpdate(const QString &updateId, QIODevice *ioDevice, bool sync) {
+    if (!m_fileMd5.isEmpty() && makeMd5(ioDevice) != m_fileMd5) {
+        NX_LOG(lit("Checksum test failed: %1").arg(getUpdateFilePath(updateId)), cl_logWARNING);
+        return false;
+    }
+
     m_zipExtractor.reset(new QnZipExtractor(ioDevice, getUpdateDir(updateId).absolutePath()));
 
     if (sync) {
@@ -170,7 +175,8 @@ void QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByte
 
     m_file->close();
     m_file->open(QFile::ReadOnly);
-    processUpdate(updateId, m_file.data());
+    if (!processUpdate(updateId, m_file.data()))
+        sendReply(ec2::AbstractUpdatesManager::UnknownError);
 }
 
 bool QnServerUpdateTool::installUpdate(const QString &updateId) {
