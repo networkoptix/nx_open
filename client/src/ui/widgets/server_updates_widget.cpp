@@ -361,7 +361,12 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
             QMessageBox::critical(this, tr("Update failed"), tr("Could not download updates.") + lit("\n") + tr("No free space left on the disk."));
             break;
         case QnUpdateResult::UploadingFailed:
-            QMessageBox::critical(this, tr("Update failed"), tr("Could not push updates to servers."));
+            QString message = tr("Could not push updates to servers.");
+            if (!result.failedPeers.isEmpty()) {
+                message += lit("\n");
+                message += tr("The problem is caused by %n servers: %1", "", result.failedPeers.size()).arg(serverNamesString(result.failedPeers));
+            }
+            QMessageBox::critical(this, tr("Update failed"), message);
             break;
         case QnUpdateResult::UploadingFailed_NoFreeSpace:
             QMessageBox::critical(this, tr("Update failed"),

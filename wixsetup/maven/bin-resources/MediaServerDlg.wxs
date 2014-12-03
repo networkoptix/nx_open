@@ -19,7 +19,7 @@
                                                     <Control Type="Text" Id="PortLabel" Width="108" Height="15" X="82" Y="103" Text="!(loc.MediaServerDlg_AppserverPort)" />
                                                     <Control Type="Edit" Id="Port" Width="111" Height="15" X="194" Y="100" Property="SERVER_PORT" />
                                                     <Control Type="Text" Id="LoginLabel" Width="108" Height="15" X="82" Y="122" Text="!(loc.MediaServerDlg_Login)" />
-                                                    <Control Type="Edit" Id="Login" X="194" Y="120" Width="111" Height="15" Property="SERVER_LOGIN" />
+                                                    <Control Type="Edit" Id="Login" X="194" Y="120" Width="111" Height="15" Property="SERVER_LOGIN" Disabled="yes" />
                                                     <Control Id="passwordLabel" Type="Text" Height="15" Width="108" X="82" Y="142" Text="!(loc.MediaServerDlg_Password)" />
                                                     <Control Id="passwordBox" Type="Edit" Height="15" Width="111" X="194" Y="140" Property="SERVER_PASSWORD" Password="yes" />
                                                     <Control Type="Text" Id="PasswordLabel2" Width="108" Height="15" X="82" Y="161" Text="!(loc.MediaServerDlg_PasswordConfirm)" />

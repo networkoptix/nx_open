@@ -478,6 +478,9 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
     // Rollback the fisheye preview options. Makes no changes if params were not modified. --gdm
     QnResourceWidget* centralWidget = display()->widget(Qn::CentralRole);
+    if (!m_camera || !centralWidget || centralWidget->resource() != m_camera)
+        return;
+
     if (QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget*>(centralWidget)) {
         mediaWidget->setDewarpingParams(mediaWidget->resource()->getDewarpingParams());
     }

@@ -171,7 +171,7 @@ namespace ec2
         void queueSyncRequest(QnTransactionTransport* transport);
 
         void connectToPeerEstablished(const ApiPeerData &peerInfo);
-        void connectToPeerLost(const QnTransactionTransport* transport);
+        void connectToPeerLost(const QnUuid& id);
         void handlePeerAliveChanged(const ApiPeerData& peer, bool isAlive, bool sendTran);
         QnTransaction<ApiModuleDataList> prepareModulesDataTransaction() const;
         bool isPeerUsing(const QUrl& url);

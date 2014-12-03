@@ -808,7 +808,7 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(qnSkin->icon("titlebar/exit.png"));
 
-    factory(Qn::ExitActionDelayed).
+    factory(Qn::DelayedForcedExitAction).
         flags(Qn::NoTarget);
 
     factory(Qn::BeforeExitAction).

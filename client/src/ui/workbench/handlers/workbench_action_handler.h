@@ -244,7 +244,6 @@ protected slots:
     void at_newUserAction_triggered();
 
     void at_adjustVideoAction_triggered();
-    void at_exitAction_triggered();
     void at_beforeExitAction_triggered();
 
     void at_setCurrentLayoutAspectRatio4x3Action_triggered();
@@ -301,6 +300,8 @@ private:
     bool validateResourceName(const QnResourcePtr &resource, const QString &newName) const;
 
     void deleteDialogs();
+
+    void closeApplication(bool force = false);
 private:
     friend class detail::QnResourceStatusReplyProcessor;
 
