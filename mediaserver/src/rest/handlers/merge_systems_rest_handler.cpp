@@ -35,6 +35,9 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
     QString password = params.value(lit("password"));
     QString currentPassword = params.value(lit("currentPassword"));
     bool takeRemoteSettings = params.value(lit("takeRemoteSettings"), lit("false")) != lit("false");
+    bool mergeOneServer = params.value(lit("oneServer"), lit("false")) != lit("false");
+    if (mergeOneServer)
+        takeRemoteSettings = false;
 
     if (url.isEmpty()) {
         result.setError(QnJsonRestResult::MissingParameter);
@@ -128,7 +131,7 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
             return nx_http::StatusCode::ok;
         }
 
-        if (!applyCurrentSettings(url, user, password, currentPassword, admin)) {
+        if (!applyCurrentSettings(url, user, password, currentPassword, admin, mergeOneServer)) {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("CONFIGURATION_ERROR"));
             return nx_http::StatusCode::ok;
         }
@@ -155,9 +158,21 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
     return nx_http::StatusCode::ok;
 }
 
-bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, const QString &user, const QString &password, const QString &currentPassword, const QnUserResourcePtr &admin) {
+bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, const QString &user, const QString &password, const QString &currentPassword, const QnUserResourcePtr &admin, bool oneServer) {
     QUrl ecUrl = remoteUrl;
     ecUrl.setUserName(user);
+
+    /* Change system name of the selected server */
+    if (oneServer) {
+        QAuthenticator authenticator;
+        authenticator.setUser(user);
+        authenticator.setPassword(password);
+        CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
+
+        CLHttpStatus status = client.doGET(lit("/api/configure?systemName=%1").arg(qnCommon->localSystemName()));
+        if (status != CLHttpStatus::CL_HTTP_SUCCESS)
+            return false;
+    }
 
     {   /* Save current admin inside the remote system */
         ecUrl.setPassword(password);
@@ -172,7 +187,8 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, cons
             return false;
     }
 
-    {   /* Change system name of the remote system */
+    /* Change system name of the remote system */
+    if (!oneServer) {
         ecUrl.setPassword(currentPassword);
         ec2::AbstractECConnectionPtr ec2Connection;
         ec2::ErrorCode errorCode = QnAppServerConnectionFactory::ec2ConnectionFactory()->connectSync(ecUrl, &ec2Connection);

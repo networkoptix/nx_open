@@ -52,7 +52,7 @@ void QnMergeSystemsTool::pingSystem(const QUrl &url, const QString &user, const 
     }
 }
 
-void QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &user, const QString &password, bool ownSettings) {
+void QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &user, const QString &password, bool ownSettings, bool oneServer) {
     QString currentPassword = QnAppServerConnectionFactory::getConnection2()->authInfo();
     Q_ASSERT_X(!currentPassword.isEmpty(), "currentPassword cannot be empty", Q_FUNC_INFO);
     if (!ownSettings) {
@@ -60,7 +60,7 @@ void QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, cons
         static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance())->setHoldConnection(true);
         m_password = password;
     }
-    proxy->apiConnection()->mergeSystemAsync(url, user, password, currentPassword, ownSettings, this, SLOT(at_mergeSystem_finished(int,QnModuleInformation,int,QString)));
+    proxy->apiConnection()->mergeSystemAsync(url, user, password, currentPassword, ownSettings, oneServer, this, SLOT(at_mergeSystem_finished(int,QnModuleInformation,int,QString)));
 }
 
 void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInformation &moduleInformation, int handle, const QString &errorString) {

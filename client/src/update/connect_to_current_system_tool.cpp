@@ -115,8 +115,8 @@ void QnConnectToCurrentSystemTool::configureServer() {
     m_currentTask = task;
 
     connect(task, &QnNetworkPeerTask::finished, this, &QnConnectToCurrentSystemTool::at_configureTask_finished);
-    task->setPasswordHash(adminUser->getHash(), adminUser->getDigest());
-    task->setSystemName(qnCommon->localSystemName());
+    task->setUser(m_user);
+    task->setPassword(m_password);
     task->start(m_targets);
 }
 
