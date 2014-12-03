@@ -87,12 +87,27 @@ protected slots:
     void at_advancedButton_toggled();
 
 private:
+    /* Mode of the dialog. */
+    enum class Mode {
+        /* No user is provided. */
+        Invalid,
+        /* Admin creates a new user. */
+        NewUser,
+        /* User edits himself. */
+        OwnUser,
+        /* Admin edits other user. */
+        OtherUser
+    };
+
     void createAccessRightsPresets();
     void createAccessRightsAdvanced();
     QCheckBox *createAccessRightCheckBox(QString text, quint64 right, QWidget *previous);
     void selectAccessRightsPreset(quint64 rights);
     void fillAccessRightsAdvanced(quint64 rights);
     quint64 readAccessRightsAdvanced();
+
+    /* Update placeholders in the password edit fields. */
+    void updatePlaceholders();
 
     /** Utility function to access checkboxes. */
     bool isCheckboxChecked(quint64 right);
@@ -104,6 +119,8 @@ private:
     void setCheckboxEnabled(quint64 right, bool enabled = true);
 
     QScopedPointer<Ui::UserSettingsDialog> ui;
+    Mode m_mode;
+
     QString m_currentPassword;
     QHash<QString, QnResourcePtr> m_userByLogin;
     QnUserResourcePtr m_user;

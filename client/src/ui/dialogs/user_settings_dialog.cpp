@@ -26,9 +26,14 @@ namespace Qn {
     const quint64 ExcludingAdminPermission = GlobalAdminPermissions & ~GlobalAdvancedViewerPermissions;
 }
 
+namespace {
+    const QString defaultPlaceholder(6, L'*');
+}
+
 QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget *parent): 
     base_type(parent),
     ui(new Ui::UserSettingsDialog()),
+    m_mode(Mode::Invalid),
     m_user(0),
     m_hasChanges(false),
     m_inUpdateDependensies(false),
@@ -175,6 +180,16 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user) {
         return;
 
     m_user = user;
+
+    if (!user)
+        m_mode = Mode::Invalid;
+    else if (user->getId().isNull())
+        m_mode = Mode::NewUser;
+    else if (user == context()->user())
+        m_mode = Mode::OwnUser;
+    else
+        m_mode = Mode::OtherUser;
+
     if (accessController()->globalPermissions()) {
         createAccessRightsPresets();
         createAccessRightsAdvanced();
@@ -197,30 +212,21 @@ void QnUserSettingsDialog::updateFromResource() {
     if(!m_user)
         return;
 
-    if(m_user->getId().isNull()) {
+    if(m_mode == Mode::NewUser) {
         ui->loginEdit->clear();
-        ui->currentPasswordEdit->clear();
-        ui->passwordEdit->clear();
-        ui->passwordEdit->setPlaceholderText(QString());
-        ui->confirmPasswordEdit->clear();
-        ui->confirmPasswordEdit->setPlaceholderText(QString());
         ui->emailEdit->clear();
 
         loadAccessRightsToUi(Qn::GlobalLiveViewerPermissions);
     } else {
-        QString placeholder(6, QLatin1Char('*'));
-
         ui->loginEdit->setText(m_user->getName());
-        ui->currentPasswordEdit->clear();
-        ui->passwordEdit->setPlaceholderText(placeholder);
-        ui->passwordEdit->clear();
-        ui->confirmPasswordEdit->setPlaceholderText(placeholder);
-        ui->confirmPasswordEdit->clear();
         ui->emailEdit->setText(m_user->getEmail());
 
         loadAccessRightsToUi(accessController()->globalPermissions(m_user));
-        updatePassword();
     }
+    updatePlaceholders();
+    updateLogin();
+    updatePassword();
+
     setHasChanges(false);
 }
 
@@ -307,33 +313,50 @@ void QnUserSettingsDialog::updateElement(Element element) {
         if(ui->loginEdit->text().trimmed().isEmpty()) {
             hint = tr("Login cannot be empty.");
             valid = false;
-        }
+        } 
         if(m_userByLogin.contains(ui->loginEdit->text().trimmed().toLower()) && m_userByLogin.value(ui->loginEdit->text().trimmed().toLower()) != m_user) {
             hint = tr("User with specified login already exists.");
             valid = false;
         }
+
+        /* Show warning message if we have renamed an existing user */
+        if (m_mode == Mode::OtherUser)
+            updateElement(Password);
         break;
     case CurrentPassword:
-        if((!ui->passwordEdit->text().isEmpty() ||
-            !ui->confirmPasswordEdit->text().isEmpty())
+        /* Current password should be checked only if the user editing himself. */
+        if (m_mode == Mode::OwnUser) {
+            if((!ui->passwordEdit->text().isEmpty() ||
+                !ui->confirmPasswordEdit->text().isEmpty())
                 && !m_currentPassword.isEmpty() && ui->currentPasswordEdit->text() != m_currentPassword) {
-            if(ui->currentPasswordEdit->text().isEmpty()) {
-                hint = tr("To change your password, please enter your current password.");
-                valid = false;
-            } else {
-                hint = tr("Invalid current password.");
-                valid = false;
+                    if(ui->currentPasswordEdit->text().isEmpty()) {
+                        hint = tr("To change your password, please enter your current password.");
+                        valid = false;
+                    } else {
+                        hint = tr("Invalid current password.");
+                        valid = false;
+                    }
             }
         }
         break;
     case Password:
+        /* Show warning message if we have renamed an existing user.. */
+        if (m_mode == Mode::OtherUser && ui->loginEdit->text().trimmed() != m_user->getName()) {
+            /* ..and have not entered new password. */
+            if (ui->passwordEdit->text().isEmpty()) {
+                hint = tr("Password should be updated.");
+                valid = false;
+            }
+        } 
+
+        /* Show warning if password and confirmation do not match. */
         if (ui->passwordEdit->text() != ui->confirmPasswordEdit->text()) {
             hint = tr("Passwords do not match.");
             valid = false;
-        } else if ( (ui->passwordEdit->text().isEmpty() || ui->confirmPasswordEdit->text().isEmpty())
-                    && ui->passwordEdit->placeholderText().isEmpty() // creating new user
-                  )
-        {
+        }
+
+        /* Show warning if have not entered password for the new user. */
+        if (m_mode == Mode::NewUser && ui->passwordEdit->text().isEmpty()) {
             hint = tr("Password cannot be empty.");
             valid = false;
         }
@@ -551,6 +574,21 @@ void QnUserSettingsDialog::at_advancedButton_toggled() {
     updateSizeLimits();
 }
 
+void QnUserSettingsDialog::updatePlaceholders() {
+
+    bool showPlaceholder = m_mode == Mode::OwnUser;
+
+    QString placeholder = showPlaceholder 
+        ? defaultPlaceholder 
+        : QString();
+
+    ui->currentPasswordEdit->clear();
+    ui->passwordEdit->clear();
+    ui->passwordEdit->setPlaceholderText(placeholder);
+    ui->confirmPasswordEdit->clear();
+    ui->confirmPasswordEdit->setPlaceholderText(placeholder);
+}
+
 // Utility functions
 
 bool QnUserSettingsDialog::isCheckboxChecked(quint64 right){
@@ -568,3 +606,4 @@ void QnUserSettingsDialog::setCheckboxEnabled(quint64 right, bool enabled){
         targetCheckBox->setEnabled(enabled);
     }
 }
+

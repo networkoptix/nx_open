@@ -315,6 +315,10 @@ Qn::ActionVisibility QnRenameActionCondition::check(const QnActionParameters &pa
 
     switch (nodeType) {
     case Qn::ResourceNode:
+        /* Renaming users directly from resource tree is disabled due do digest re-generation need. */
+        if (!parameters.resources().filtered<QnUserResource>().isEmpty())
+            return Qn::InvisibleAction;
+        return QnEdgeServerCondition::check(parameters.resources());
     case Qn::EdgeNode:
         return QnEdgeServerCondition::check(parameters.resources());
     case Qn::RecorderNode:
