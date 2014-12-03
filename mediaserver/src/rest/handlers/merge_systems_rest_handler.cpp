@@ -122,8 +122,6 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
             result.setError(QnJsonRestResult::CantProcessRequest, lit("CONFIGURATION_ERROR"));
             return nx_http::StatusCode::ok;
         }
-
-        return nx_http::StatusCode::ok;
     } else {
         if (!admin) {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("INTERNAL_ERROR"));
