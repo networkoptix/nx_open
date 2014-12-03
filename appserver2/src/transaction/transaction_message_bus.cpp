@@ -75,8 +75,10 @@ bool handleTransactionParams(const QByteArray &serializedTransaction, QnUbjsonRe
     }
 
     QnTransaction<T> transaction(abstractTransaction);
-    if (!QnUbjson::deserialize(stream, &transaction.params)) 
+    if (!QnUbjson::deserialize(stream, &transaction.params)) {
+        qWarning() << "Can't deserialize transaction " << toString(abstractTransaction.command);
         return false;
+    }
     if (!abstractTransaction.persistentInfo.isNull())
         QnUbjsonTransactionSerializer::instance()->addToCache(abstractTransaction.persistentInfo, serializedTransaction);
     function(transaction);
