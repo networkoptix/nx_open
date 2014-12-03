@@ -44,6 +44,12 @@ QnTimeServerSelectionWidget::QnTimeServerSelectionWidget(QWidget *parent /*= NUL
     m_model(new QnTimeServerSelectionModel(this))
 {
     ui->setupUi(this);
+    ui->timeSourceLabel->setVisible(false);
+    if (true) {
+        ui->timeSourceLabel->setText(tr("Time is taken from the Internet."));
+    } else {
+        ui->timeSourceLabel->setText(tr("Time is taken from %1."));
+    }
 
     QnSortServersByPriorityProxyModel* sortModel = new QnSortServersByPriorityProxyModel(this);
     sortModel->setSourceModel(m_model);

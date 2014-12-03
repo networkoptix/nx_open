@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="es" sourcelanguage="en">
+<TS version="2.0" language="de" sourcelanguage="en">
 <context>
     <name>QObject</name>
     <message>
@@ -107,16 +107,6 @@ Application will now quit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/systraywindow.cpp" line="468"/>
-        <source>Show &amp;Media Server Log</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/systraywindow.cpp" line="483"/>
-        <source>Media Server Web Page</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/systraywindow.cpp" line="386"/>
         <source>Media server is going to be stopped. Are you sure?</source>
         <translation type="unfinished"></translation>
@@ -127,6 +117,11 @@ Application will now quit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/systraywindow.cpp" line="468"/>
+        <source>Show &amp;Media Server Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/systraywindow.cpp" line="473"/>
         <source>Start Media Server</source>
         <translation type="unfinished"></translation>
@@ -134,6 +129,11 @@ Application will now quit.</source>
     <message>
         <location filename="../src/systraywindow.cpp" line="478"/>
         <source>Stop Media Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/systraywindow.cpp" line="483"/>
+        <source>Media Server Web Page</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
