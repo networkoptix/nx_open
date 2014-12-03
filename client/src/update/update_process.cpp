@@ -56,7 +56,6 @@ QnPeerUpdateInformation::QnPeerUpdateInformation(const QnMediaServerResourcePtr 
 
 QnUpdateProcess::QnUpdateProcess(const QnUpdateTarget &target):
     base_type(),
-    m_id(QnUuid::createUuid()),
     m_target(target),
     m_stage(QnFullUpdateStage::Init),
     m_distributedMutex(NULL),
@@ -213,6 +212,8 @@ void QnUpdateProcess::at_checkForUpdatesTaskFinished(QnCheckForUpdatesPeerTask* 
         return;
     }
 
+    m_id = result.latestVersion.toString();
+
     m_target.version = result.latestVersion; /* Version can be updated if loading from local file or seeking for latest version. */
     m_clientRequiresInstaller = result.clientInstallerRequired;
     m_updateFiles = task->updateFiles();
@@ -333,7 +334,7 @@ void QnUpdateProcess::installIncompatiblePeers() {
     setIncompatiblePeersStage(QnPeerUpdateStage::Install);
 
     QnRestUpdatePeerTask* restUpdatePeerTask = new QnRestUpdatePeerTask();
-    restUpdatePeerTask->setUpdateId(m_id.toString());
+    restUpdatePeerTask->setUpdateId(m_id);
     restUpdatePeerTask->setUpdateFiles(targetFiles);
     restUpdatePeerTask->setVersion(m_target.version);
     connect(restUpdatePeerTask, &QnNetworkPeerTask::finished,                   this,   &QnUpdateProcess::at_restUpdateTask_finished);
@@ -436,7 +437,7 @@ void QnUpdateProcess::uploadUpdatesToServers() {
     setCompatiblePeersStage(QnPeerUpdateStage::Push);
 
     QnUploadUpdatesPeerTask* uploadUpdatesPeerTask = new QnUploadUpdatesPeerTask();
-    uploadUpdatesPeerTask->setUpdateId(m_id.toString());
+    uploadUpdatesPeerTask->setUpdateId(m_id);
     uploadUpdatesPeerTask->setUploads(fileBySystemInformation);
     connect(uploadUpdatesPeerTask,  &QnNetworkPeerTask::finished,             this,     &QnUpdateProcess::at_uploadTask_finished);
     connect(uploadUpdatesPeerTask,  &QnNetworkPeerTask::peerFinished,         this,     [this](const QnUuid &peerId) {
@@ -472,7 +473,7 @@ void QnUpdateProcess::uploadUpdatesToServers() {
 
 void QnUpdateProcess::installUpdatesToServers() {
     QnInstallUpdatesPeerTask* installUpdatesPeerTask = new QnInstallUpdatesPeerTask();
-    installUpdatesPeerTask->setUpdateId(m_id.toString());
+    installUpdatesPeerTask->setUpdateId(m_id);
     installUpdatesPeerTask->setVersion(m_target.version);
     connect(installUpdatesPeerTask, &QnNetworkPeerTask::finished,                   this,   &QnUpdateProcess::at_installTask_finished);
     connect(installUpdatesPeerTask, &QnNetworkPeerTask::peerFinished,               this,   [this](const QnUuid &peerId) {

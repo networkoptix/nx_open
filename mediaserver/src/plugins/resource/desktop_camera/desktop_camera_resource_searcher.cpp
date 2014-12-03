@@ -142,13 +142,12 @@ void QnDesktopCameraResourceSearcher::cleanupConnections()
     }
 }
 
-TCPSocketPtr QnDesktopCameraResourceSearcher::getConnection(const QString& userName)
-{
+TCPSocketPtr QnDesktopCameraResourceSearcher::getConnectionByUserId(const QString& userId) {
     QMutexLocker lock(&m_mutex);
     for (int i = 0; i < m_connections.size(); ++i)
     {
         ClientConnectionInfo& conn = m_connections[i];
-        if (conn.useCount == 0 && conn.userName == userName) {
+        if (conn.useCount == 0 && conn.userId == userId) {
             conn.useCount++;
 
 #ifdef DESKTOP_CAMERA_DEBUG

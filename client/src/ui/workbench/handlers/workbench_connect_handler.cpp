@@ -277,7 +277,7 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
             ? ec2::ErrorCode::incompatiblePeer  /* Substitute value for incompatible peers. */
             : errCode;
     case QnConnectionDiagnosticsHelper::Result::Restart:
-        menu()->trigger(Qn::ExitActionDelayed);
+        menu()->trigger(Qn::DelayedForcedExitAction);
         return ec2::ErrorCode::ok; // to avoid cycle
     default:    //success
         break;

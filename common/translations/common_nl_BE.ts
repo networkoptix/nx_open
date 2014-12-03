@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ja" sourcelanguage="en">
+<TS version="2.0" language="nl_BE" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
         <location filename="../src/translation/translation_manager.cpp" line="153"/>
         <source>Language Name</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
-        <translation>日本語</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/translation/translation_manager.cpp" line="156"/>
         <source>Locale Code</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
-        <translation>ja</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -21,62 +21,62 @@
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="722"/>
         <source>Invalid stack size after program evaluation: %1.</source>
-        <translation>Invalid stack size after program evaluation: %1.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="764"/>
         <source>Could not deduce result type for operation %1(&apos;%2&apos;, &apos;%3&apos;).</source>
-        <translation>Could not deduce result type for operation %1(&apos;%2&apos;, &apos;%3&apos;).</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="792"/>
         <source>Invalid parameter type for operation %1(&apos;%2&apos;, &apos;%2&apos;)</source>
-        <translation>Invalid parameter type for operation %1(&apos;%2&apos;, &apos;%2&apos;)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="802"/>
         <source>Could not deduce arithmetic supertype for type &apos;%1&apos;.</source>
-        <translation>Could not deduce arithmetic supertype for type &apos;%1&apos;.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="824"/>
         <source>Invalid parameter type for operation %1(&apos;%2&apos;)</source>
-        <translation>Invalid parameter type for operation %1(&apos;%2&apos;)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="832"/>
         <source>Argument number for %1 instruction has invalid type &apos;%2&apos;.</source>
-        <translation>%1指示のアーギュメント番号に無効なタイプ%2があります.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="836"/>
         <source>Argument number for %1 instruction is invalid.</source>
-        <translation>%1指示のアーギュメント番号が無効.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="841"/>
         <source>Stack underflow during execution of %1 instruction.</source>
-        <translation>Stack underflow during execution of %1 instruction.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="845"/>
         <source>Function name for %1 instruction has invalid type &apos;%2&apos;.</source>
-        <translation>Function name for %1 instruction has invalid type &apos;%2&apos;.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="856"/>
         <source>Function or variable &apos;%1&apos; is not defined.</source>
-        <translation>Function or variable &apos;%1&apos; is not defined.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="862"/>
         <source>Variable &apos;%1&apos; is not a function and cannot be called.</source>
-        <translation>Variable &apos;%1&apos; is not a function and cannot be called.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="874"/>
         <source>Stack underflow during program evaluation.</source>
-        <translation>Stack underflow during program evaluation.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -84,7 +84,7 @@
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="113"/>
         <source>Unexpected symbol &apos;%1&apos; at position %2.</source>
-        <translation>Unexpected symbol &apos;%1&apos; at position %2.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -93,22 +93,22 @@
         <location filename="../src/utils/common/evaluator.h" line="185"/>
         <location filename="../src/utils/common/evaluator.h" line="192"/>
         <source>Parameter %2 is not specified for function &apos;%1&apos;.</source>
-        <translation>ファンクション%1にパラメーター%2が設定されていません.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.h" line="195"/>
         <source>Parameter %2 of function &apos;%1&apos; is of type &apos;%3&apos;, but type &apos;%4&apos; was expected.</source>
-        <translation>ファンクション%1のパラメーター%2のタイプが%3ですが%4を設定してください.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.h" line="201"/>
         <source>Function &apos;%1&apos; is expected to have %3 arguments, %2 provided.</source>
-        <translation>ファンクション%1に%3因数が必要ですが%2が設定されています.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.h" line="206"/>
         <source>Function &apos;%1&apos; is expected to have %3-%4 arguments, %2 provided.</source>
-        <translation>ファンクション%1に%3-%4因数が必要ですが%2が設定されています.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -116,17 +116,17 @@
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="179"/>
         <source>Unexpected token %1 (&apos;%2&apos;) at position %3.</source>
-        <translation>ポジション%3での予期しないトークン%1(%2).</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="236"/>
         <source>Invalid color constant &apos;%1&apos;.</source>
-        <translation>無効なカラー定数%1.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="281"/>
         <source>Invalid number constant &apos;%1&apos;.</source>
-        <translation>無効な定数%1.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -134,135 +134,50 @@
     <message>
         <location filename="../src/core/resource/abstract_storage_resource.cpp" line="120"/>
         <source>Windows Network Shared Resource</source>
-        <translation>ウィンドウズ・ネットワーク・シェアード・リソース</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/core/resource/abstract_storage_resource.cpp" line="121"/>
         <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
-        <translation>\\&lt;Computer Name&gt;\&lt;Folder&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/core/resource/abstract_storage_resource.cpp" line="125"/>
         <source>Coldstore Network Storage</source>
-        <translation>コールドストアネットワークストレージ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/core/resource/abstract_storage_resource.cpp" line="126"/>
         <source>coldstore://&lt;Address&gt;</source>
-        <translation>コールドストア://&lt;Address&gt;</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnBusinessStringsHelper</name>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="64"/>
-        <source>User Defined (%1)</source>
-        <translation>ユーザー定義 (%1)</translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="68"/>
-        <source>Motion on Camera</source>
-        <translation>カメラの動体検知</translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="69"/>
-        <source>Input Signal on Camera</source>
-        <translation>カメラの入力がON</translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="70"/>
-        <source>Camera Disconnected</source>
-        <translation>カメラ切断</translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="71"/>
-        <source>Storage Failure</source>
-        <translation>ストレージ不良</translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="72"/>
-        <source>Network Issue</source>
-        <translation>ネットワークの問題</translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="73"/>
-        <source>Camera IP Conflict</source>
-        <translation>カメラのIPが競合</translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="95"/>
-        <source>Camera %1 was disconnected</source>
-        <translation>カメラ %1が切断されました</translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="98"/>
-        <source>Input on %1</source>
-        <translation>入力ON %1</translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="101"/>
-        <source>Motion on %1</source>
-        <translation>動体検知ON %1</translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="104"/>
-        <source>Storage Failure at %1</source>
-        <translation>ストレージ不良 %1</translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="107"/>
-        <source>Network Issue at %1</source>
-        <translation>ネットワーク問題発生 %1</translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="113"/>
-        <source>Camera IP Conflict at %1</source>
-        <translation>カメラのIPアドレスが競合・%1</translation>
-    </message>
-    <message>
         <location filename="../src/business/business_strings_helper.cpp" line="45"/>
         <source>Camera output</source>
-        <translation>カメラ出力</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="46"/>
         <source>Camera output for 30 sec</source>
-        <translation>カメラ出力(30秒)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="47"/>
         <source>Bookmark</source>
-        <translation>ブックマーク</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="48"/>
         <source>Camera recording</source>
-        <translation>カメラ録画</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="49"/>
         <source>Panic recording</source>
-        <translation>パニック録画</translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="51"/>
-        <source>Write to log</source>
-        <translation>ログ書込み</translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="52"/>
-        <source>Show notification</source>
-        <translation>通知を表示</translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="54"/>
-        <source>Play sound</source>
-        <translation>サウンド再生</translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="53"/>
-        <source>Repeat sound</source>
-        <translation>サウンド繰返し</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="50"/>
@@ -270,34 +185,69 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="51"/>
+        <source>Write to log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="52"/>
+        <source>Show notification</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="53"/>
+        <source>Repeat sound</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="54"/>
+        <source>Play sound</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/business/business_strings_helper.cpp" line="55"/>
         <source>Speak</source>
-        <translation>スピーク</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="56"/>
         <source>Unknown (%1)</source>
-        <translation>不明 (%1)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="78"/>
-        <source>Any Camera Issue</source>
-        <translation>全てのカメラ異常</translation>
+        <location filename="../src/business/business_strings_helper.cpp" line="64"/>
+        <source>User Defined (%1)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="79"/>
-        <source>Any Server Issue</source>
-        <translation>全てのサーバー異常</translation>
+        <location filename="../src/business/business_strings_helper.cpp" line="68"/>
+        <source>Motion on Camera</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="80"/>
-        <source>Any Event</source>
-        <translation>全てのイベント</translation>
+        <location filename="../src/business/business_strings_helper.cpp" line="69"/>
+        <source>Input Signal on Camera</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="92"/>
-        <source>Undefined event has occurred on %1</source>
-        <translation>%1で定義していないイベント発生</translation>
+        <location filename="../src/business/business_strings_helper.cpp" line="70"/>
+        <source>Camera Disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="71"/>
+        <source>Storage Failure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="72"/>
+        <source>Network Issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="73"/>
+        <source>Camera IP Conflict</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="74"/>
@@ -320,8 +270,58 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="78"/>
+        <source>Any Camera Issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="79"/>
+        <source>Any Server Issue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="80"/>
+        <source>Any Event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="92"/>
+        <source>Undefined event has occurred on %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="95"/>
+        <source>Camera %1 was disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="98"/>
+        <source>Input on %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="101"/>
+        <source>Motion on %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="104"/>
+        <source>Storage Failure at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="107"/>
+        <source>Network Issue at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/business/business_strings_helper.cpp" line="110"/>
         <source>Server &quot;%1&quot; Failure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="113"/>
+        <source>Camera IP Conflict at %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -342,48 +342,86 @@
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="126"/>
         <source>Unknown event has occurred</source>
-        <translation>不明なイベント</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="144"/>
         <source>Event: %1</source>
-        <translation>イベント: %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="147"/>
         <source>Source: %1</source>
-        <translation>ソース:.%1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="151"/>
         <source>Url: %1</source>
-        <translation>URL:・%1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="190"/>
         <source>Input port: %1</source>
-        <translation>入力ポート:・%1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="198"/>
         <source>Reason: %1</source>
-        <translation>理由:・%1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="202"/>
         <source>Conflict address: %1</source>
-        <translation>競合アドレス: %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="207"/>
         <location filename="../src/business/business_strings_helper.cpp" line="223"/>
         <source>Camera #%1 MAC: %2</source>
-        <translation>カメラ %1・MAC: %2</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="219"/>
         <source>Conflicting Server #%1: %2</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="325"/>
+        <source>%2 %1</source>
+        <comment>%1 means time, %2 means date</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/business/business_strings_helper.cpp" line="329"/>
+        <source>%n times, first: %2 %1</source>
+        <comment>%1 means time, %2 means date</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="340"/>
+        <source>Time: %1 on %2</source>
+        <comment>%1 means time, %2 means date</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/business/business_strings_helper.cpp" line="344"/>
+        <source>First occurrence: %1 on %2 (%n times total)</source>
+        <comment>%1 means time, %2 means date</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <location filename="../src/business/business_strings_helper.cpp" line="364"/>
+        <source>No video frame received during last %n seconds.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="370"/>
@@ -396,79 +434,44 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="408"/>
-        <source>Recording on %n camera(s) is disabled: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="325"/>
-        <source>%2 %1</source>
-        <comment>%1 means time, %2 means date</comment>
-        <translation>%2 月日%1時分</translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/business/business_strings_helper.cpp" line="329"/>
-        <source>%n times, first: %2 %1</source>
-        <comment>%1 means time, %2 means date</comment>
-        <translation>
-            <numerusform>%n 時間, 始めの: %2 月日・%1時分</numerusform>
-        </translation>
-    </message>
-    <message>
-        <location filename="../src/business/business_strings_helper.cpp" line="340"/>
-        <source>Time: %1 on %2</source>
-        <comment>%1 means time, %2 means date</comment>
-        <translation>時間: %1 時分 %2・月日</translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/business/business_strings_helper.cpp" line="344"/>
-        <source>First occurrence: %1 on %2 (%n times total)</source>
-        <comment>%1 means time, %2 means date</comment>
-        <translation>
-            <numerusform>最初の発生: %1 時分 %2 月日(%n 時間トータル)</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <location filename="../src/business/business_strings_helper.cpp" line="364"/>
-        <source>No video frame received during last %n seconds.</source>
-        <translation>
-            <numerusform>直近の %n 秒間ビデオフレーム信号を受信していません.</numerusform>
-        </translation>
-    </message>
-    <message>
         <location filename="../src/business/business_strings_helper.cpp" line="378"/>
         <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-        <translation>RTPパケットロスが直前のシーケンス=%1 から次のシーケンス=%2.・迄で検知されました.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="380"/>
         <source>RTP packet loss detected.</source>
-        <translation>RTPパケットロス検知.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="384"/>
         <source>Server terminated.</source>
-        <translation>サーバーが停止しました.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="388"/>
         <source>Server started after crash.</source>
-        <translation>クラッシュ後にサーバーが再開されました.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="393"/>
         <source>I/O error has occurred at %1.</source>
-        <translation>I/O エラーが発生しました %1.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="398"/>
         <source>Not enough HDD/SSD speed for recording to %1.</source>
-        <translation>HDD/SSD・%1.・への書き込み速度が不十分です.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="403"/>
         <source>HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.</source>
-        <translation>HDD/SSDディスク%1の空き容量がなくVMSの管理ができません.</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/business/business_strings_helper.cpp" line="408"/>
+        <source>Recording on %n camera(s) is disabled: </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -476,7 +479,7 @@
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="27"/>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="31"/>
@@ -494,91 +497,86 @@
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="39"/>
         <source>Cannot connect to http port %1.
  Make sure the camera is plugged into the network.</source>
-        <translation>http ポート %1・に接続出来ません.
- カメラがネットワークに接続されているか確認して下さい.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="43"/>
         <source>Cannot open media url %1. Failed to connect to media port %2.
  Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation>メディア URL %1・を開けません. 又メディアポート %2・に接続出来ません .
- ポート %2 がアクセス可能か (フォワード等)確認して下さい. カメラのリブートを試し、その後カメラのWEBページから工場出荷時に戻して下さい.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="48"/>
         <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.
  Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation>メディアURL %1・開けません. Connection to ポート %2 との接続が予期しないで閉じられました.
- カメラがネットワークに接続されているか確認して下さい、カメラをリブートして下さい.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="53"/>
         <source>Could not parse camera response. Url %1, request name %2.
  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation>URL%1 名前%2のカメラ応答を解析できませんでした
-カメラ再起動を行い初期設定に戻した後にファームウェアの更新を行ってください　解決しない場合はサポートに連絡してください.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="58"/>
         <source>No supported media tracks at url %1.
  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation>URL%1　サポートされないメディアトラック
-カメラの再起動後初期設定に戻しファームウェアの更新を行ってください　問題が解決しない場合はサポートに連絡してください.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="63"/>
         <source>Not authorized. Url %1.</source>
-        <translation>・URL・%1.は、承認されていません.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="67"/>
         <source>Cannot open media url %1. Unsupported media protocol %2.
  Please try to restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation>・メディアURL・%1を開けませんでした。・メディアプロトコル・%2・はサポートされていません
-・カメラを再起動してみてください、そしてカメラのウェブページ上から工場出荷時のデフォルト設定を復元し、最後に、ファームウェアをアップデートしてみてください。問題が解決しない場合は、サポートにお問い合わせ下さい.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="72"/>
         <source>Failed to configure parameter %1.
  First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings. If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
-        <translation>パラメータ・%1・を構成出来ません
-・（記録が停止している場合は）始めに記録を開始してみて下さい。そしてカメラ設定画面からFPS（記録コマ数/秒）を減らして下さい。それでも駄目な場合は、カメラのウェブページ上から工場出荷時のデフォルト設定を復元してみてください。問題が解決しない場合は、サポートにお問い合わせ下さい.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="77"/>
         <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.
  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation>カメラは&quot;%1”・をリクエストしましたがエラー・&quot;%2&quot;・にて失敗しました
-カメラを再起動してみてください、そしてカメラのウェブページ上から工場出荷時のデフォルト設定を復元し、最後に、ファームウェアをアップデートしてみてください。問題が解決しない場合は、サポートにお問い合わせ下さい.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="82"/>
         <source>Unknown Camera Issue.
  Please contact support.</source>
-        <translation>不明なカメラトラブル
-サポートにお問い合わせ下さい.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="86"/>
         <source>An input/output error has occurred. OS message: &quot;%1&quot;.
  Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-        <translation>I/Oエラー・OSメッセージ:・&quot;%1&quot;.
-カメラがネットワークに接続されているか確認して下さい、カメラを再起動してみてください.</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="89"/>
+        <source>Server has been stopped.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="93"/>
         <source>Invalid data was received from the camera: %1.</source>
-        <translation>カメラ:・%1・から無効なデータを受信しました.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="96"/>
         <source>Too many media errors. Please open camera issues dialog for more details.</source>
-        <translation>多数のメディアエラーが発生、詳細はカメラ問題ダイアログを開いて下さい.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="99"/>
         <source>Media stream is opened but no media data was received.</source>
-        <translation>メディアストリームが開始されましたがメディアデータは何も受信されませんでした.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="102"/>
@@ -586,26 +584,21 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="115"/>
+        <source>Unknown error. Please contact support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="117"/>
         <source>
 
 Parameters: </source>
-        <translation>・パラメーター:</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="89"/>
-        <source>Server has been stopped.</source>
-        <translation>サーガーが停止しました.</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/camera/camera_diagnostics.cpp" line="115"/>
-        <source>Unknown error. Please contact support.</source>
-        <translation>未知のエラー、・サポートにお問い合わせ下さい.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="130"/>
         <source>(unknown)</source>
-        <translation>（未知）</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -613,12 +606,12 @@ Parameters: </source>
     <message>
         <location filename="../src/utils/common/command_line_parser.cpp" line="154"/>
         <source>No value provided for the &apos;%1&apos; argument.</source>
-        <translation>&apos;%1&apos; の引数に指定した値は返されませんでした.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/common/command_line_parser.cpp" line="166"/>
         <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
-        <translation>&apos;%1&apos; の因数への間違った値 -  &apos;%3&apos;から提供された、想定された %2,.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -626,12 +619,12 @@ Parameters: </source>
     <message>
         <location filename="../src/utils/common/environment.cpp" line="58"/>
         <source>Launching Windows Explorer failed</source>
-        <translation>ウィンドウズエクスプローラーの軌道に失敗しました</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/common/environment.cpp" line="59"/>
         <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
-        <translation>ウィンドウズエクスプローラを起動するパスにexplorer.exeを見つけることができませんでした.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -639,22 +632,22 @@ Parameters: </source>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="53"/>
         <source>Audio context was not specified.</source>
-        <translation>音声コンテンツが指定されていません.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="67"/>
         <source>Could not find encoder for codec %1.</source>
-        <translation>コーデック%1のエンコーダーを見つけられません.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="94"/>
         <source>Could not initialize audio encoder.</source>
-        <translation>音声エンコーダーを初期化出来ません.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="103"/>
         <source>Could not initialize audio decoder.</source>
-        <translation>音声デコーダーを初期化出来ません.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -662,33 +655,33 @@ Parameters: </source>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="176"/>
         <source>Container %1 was not found in FFMPEG library.</source>
-        <translation>FFMPEGライブラリーにコンテナ%1が見つかりません.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="185"/>
         <source>Could not create output context for format %1.</source>
-        <translation>フォーマット・%1・の出力コンテキストを作成出来ません.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="204"/>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="284"/>
         <source>Could not allocate output stream for recording.</source>
-        <translation>録音用の出力ストリームを割り当てることができません.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="245"/>
         <source>Could not perform direct stream copy because frame size is undefined.</source>
-        <translation>フレームサイズが指定されていないのでストリームを直接コピーできません.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="292"/>
         <source>Could not find codec %1.</source>
-        <translation>コーデック%1が見つかりません.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="330"/>
         <source>Video or audio codec is incompatible with container %1.</source>
-        <translation>ビデオ又はオーディオコーデックが・%1・のフォーマットと互換性がありません.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -696,12 +689,12 @@ Parameters: </source>
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="59"/>
         <source>Could not find encoder for codec %1.</source>
-        <translation>コーデック%1のエンコーダーを見つけられません.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="106"/>
         <source>Could not initialize video encoder.</source>
-        <translation>ビデオエンコーダーを初期化出来ません.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -709,17 +702,17 @@ Parameters: </source>
     <message>
         <location filename="../src/licensing/license.cpp" line="151"/>
         <source>Trial</source>
-        <translation>試用</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="152"/>
         <source>Analog</source>
-        <translation>アナログ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="153"/>
         <source>Professional</source>
-        <translation>プロフェッショナル</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="154"/>
@@ -819,12 +812,14 @@ Parameters: </source>
         <source>%n %2 are used out of %1.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/license_usage_helper.cpp" line="94"/>
         <source>%n %2 will be used out of %1.</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -833,12 +828,14 @@ Parameters: </source>
         <source>Activate %n more %2. </source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/license_usage_helper.cpp" line="114"/>
         <source>%n more %2 will be used. </source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -873,7 +870,7 @@ Parameters: </source>
     <message>
         <location filename="../src/core/resource/media_server_resource.cpp" line="43"/>
         <source>Server</source>
-        <translation>サーバー</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -890,7 +887,7 @@ Parameters: </source>
     <message>
         <location filename="../src/utils/common/property_storage.cpp" line="278"/>
         <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
-        <translation>・&apos;%3&apos;の提供した予想される・%2,の因数・&apos;%1&apos;の値が無効です。</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -899,17 +896,7 @@ Parameters: </source>
         <location filename="../src/export/sign_helper.cpp" line="67"/>
         <location filename="../src/export/sign_helper.cpp" line="712"/>
         <source>Unknown</source>
-        <translation>未知の値</translation>
-    </message>
-    <message>
-        <location filename="../src/export/sign_helper.cpp" line="716"/>
-        <source>FREE license</source>
-        <translation>無償ライセンス</translation>
-    </message>
-    <message>
-        <location filename="../src/export/sign_helper.cpp" line="262"/>
-        <source>Hardware ID: </source>
-        <translation>ハードウェアID:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/export/sign_helper.cpp" line="70"/>
@@ -917,14 +904,24 @@ Parameters: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/export/sign_helper.cpp" line="262"/>
+        <source>Hardware ID: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/export/sign_helper.cpp" line="263"/>
         <source>Licensed to: </source>
-        <translation>以下にライセンス:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/export/sign_helper.cpp" line="264"/>
         <source>Watermark: </source>
-        <translation>電子透かし:</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/export/sign_helper.cpp" line="716"/>
+        <source>FREE license</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -932,79 +929,79 @@ Parameters: </source>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="19"/>
         <source>Lowest</source>
-        <translation>最低</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="20"/>
         <source>Low</source>
-        <translation>低い</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="21"/>
         <source>Medium</source>
-        <translation>中間</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="22"/>
         <source>High</source>
-        <translation>高い</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="23"/>
         <source>Best</source>
-        <translation>最高</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="24"/>
         <source>Preset</source>
-        <translation>プリセット</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="25"/>
         <source>Undefined</source>
-        <translation>未定義</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="37"/>
         <source>Lst</source>
         <extracomment>Short for &apos;Lowest&apos;</extracomment>
-        <translation>最低</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="40"/>
         <source>Lo</source>
         <extracomment>Short for &apos;Low&apos;</extracomment>
-        <translation>低</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="43"/>
         <source>Me</source>
         <extracomment>Short for &apos;Medium&apos;</extracomment>
-        <translation>中</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="46"/>
         <source>Hi</source>
         <extracomment>Short for &apos;High&apos;</extracomment>
-        <translation>高</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="49"/>
         <source>Bst</source>
         <extracomment>Short for &apos;Best&apos;</extracomment>
-        <translation>最高</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="52"/>
         <source>Ps</source>
         <extracomment>Short for &apos;Preset&apos;</extracomment>
-        <translation>PS</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="55"/>
         <source>-</source>
         <extracomment>Short for &apos;Undefined&apos;</extracomment>
-        <translation>未</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1012,49 +1009,49 @@ Parameters: </source>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="52"/>
         <source>Corresponding container in FFMPEG library was not found.</source>
-        <translation>FFMPEGライブラリーにコンテナが見つかりません.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="53"/>
         <source>Could not create output file for video recording.</source>
-        <translation>ビデオ記録の為の出力ファイルを作成出来ません..</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="54"/>
         <source>Could not allocate output stream for recording.</source>
-        <translation>録音用の出力ストリームを割り当てることができません.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="55"/>
         <source>Could not allocate output audio stream.</source>
-        <translation>録音用の出力ストリームを割り当てることができません.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="56"/>
         <source>Invalid audio codec information.</source>
-        <translation>無効なオンセイコーデック情報.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="57"/>
         <source>Video or audio codec is incompatible with the selected format.</source>
-        <translation>ビデオまたは音声コーディックは選択したフォーマットと互換性がありません.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/recording/stream_recorder.cpp" line="795"/>
         <source>Error during watermark generation for file &apos;%1&apos;.</source>
-        <translation>ファイル &apos;%1&apos;用の電子透かしの作成中にエラーが発生しました.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnSystemHealthStringsHelper</name>
     <message>
-        <location filename="../src/health/system_health.cpp" line="8"/>
-        <source>No licenses</source>
-        <translation>ライセンス無し</translation>
-    </message>
-    <message>
         <location filename="../src/health/system_health.cpp" line="6"/>
         <source>Email address is not set</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/health/system_health.cpp" line="8"/>
+        <source>No licenses</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1085,17 +1082,17 @@ Parameters: </source>
     <message>
         <location filename="../src/health/system_health.cpp" line="20"/>
         <source>Storages are full</source>
-        <translation>ストレージが一杯です</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="22"/>
         <source>Storages are not configured</source>
-        <translation>ストレージが構成されていません</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="24"/>
         <source>Rebuilding archive index is completed.</source>
-        <translation>アーカイブインデックスのリビルド終了.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="35"/>
@@ -1138,17 +1135,16 @@ They cannot receive system notifications via email.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/health/system_health.cpp" line="57"/>
+        <source>You have no licenses.
+You cannot record video from cameras.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/health/system_health.cpp" line="59"/>
         <source>Rebuilding archive index is completed on the following Server:
 %1.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/health/system_health.cpp" line="57"/>
-        <source>You have no licenses.
-You cannot record video from cameras.</source>
-        <translation>ライセンスが有りません！
-カメラからのビデオを記録出来ません.</translation>
     </message>
 </context>
 <context>
@@ -1156,32 +1152,32 @@ You cannot record video from cameras.</source>
     <message>
         <location filename="../src/utils/network/tcp_connection_processor.cpp" line="238"/>
         <source>OK</source>
-        <translation>OK</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/network/tcp_connection_processor.cpp" line="240"/>
         <source>Not Found</source>
-        <translation>見つかりません</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/network/tcp_connection_processor.cpp" line="242"/>
         <source>Not Implemented</source>
-        <translation>未実装</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/network/tcp_connection_processor.cpp" line="244"/>
         <source>Unsupported Transport</source>
-        <translation>サポートされていない伝送</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/network/tcp_connection_processor.cpp" line="246"/>
         <source>Internal Server Error</source>
-        <translation>内部サーバーエラー</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/network/tcp_connection_processor.cpp" line="248"/>
         <source>Invalid Parameter</source>
-        <translation>無効なパラメータ</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1189,22 +1185,22 @@ You cannot record video from cameras.</source>
     <message>
         <location filename="../src/transcoding/transcoder.cpp" line="272"/>
         <source>OpenCL transcoding is not implemented.</source>
-        <translation>オープンCLトランスコードが実装されていません.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/transcoding/transcoder.cpp" line="275"/>
         <source>Unknown transcoding method.</source>
-        <translation>未知のトランスコード手段.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/transcoding/transcoder.cpp" line="299"/>
         <source>OpenCLTranscode is not implemented</source>
-        <translation>オープンCLトランスコードが実装されていません</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/transcoding/transcoder.cpp" line="302"/>
         <source>Unknown Transcode Method</source>
-        <translation>未知のトランスコード手段</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1212,12 +1208,12 @@ You cannot record video from cameras.</source>
     <message>
         <location filename="../src/translation/translation_list_model.cpp" line="66"/>
         <source>%1 (built-in)</source>
-        <translation>%1 (内蔵)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/translation/translation_list_model.cpp" line="68"/>
         <source>%1 (external)</source>
-        <translation>%1 (外部)</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

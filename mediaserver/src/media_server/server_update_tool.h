@@ -29,9 +29,7 @@ public:
 private:
     bool processUpdate(const QString &updateId, QIODevice *ioDevice, bool sync = false);
     void sendReply(int code);
-    void addChunk(qint64 offset, int m_length);
-    bool isComplete() const;
-    void clearUpdatesLocation();
+    void clearUpdatesLocation(const QString &idToLeave = QString());
 
 private slots:
     void at_zipExtractor_extractionFinished(int error);
@@ -42,8 +40,7 @@ private:
     QString m_updateId;
     QScopedPointer<QFile> m_file;
 
-    qint64 m_length;
-    QMap<qint64, int> m_chunks;
+    QByteArray m_fileMd5;
     qint64 m_replyTime;
 
     QSet<QString> m_bannedUpdates;
