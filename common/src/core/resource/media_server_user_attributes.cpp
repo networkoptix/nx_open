@@ -18,6 +18,9 @@ void QnMediaServerUserAttributes::assign( const QnMediaServerUserAttributes& rig
     if (isRedundancyEnabled != right.isRedundancyEnabled)
         modifiedFields->insert("redundancyChanged");
 
+    if (name != right.name)
+        modifiedFields->insert("nameChanged");
+
     *this = right;
 }
 
