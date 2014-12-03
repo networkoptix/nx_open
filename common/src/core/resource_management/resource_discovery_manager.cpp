@@ -333,9 +333,7 @@ void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList&
     for (auto itr = candidates.begin(); itr != candidates.end(); ++itr)
     {
         QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(qnResPool->getResourceByUniqId(itr.key()));
-        if (!camera)
-            continue;
-        if (!camera->hasFlags(Qn::foreigner) || canTakeForeignCamera(camera, 0))
+        if (!camera || !camera->hasFlags(Qn::foreigner) || canTakeForeignCamera(camera, 0))
             cameras.insert(itr.key(), itr.value());
     }
     
@@ -553,17 +551,17 @@ void QnResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr& resource)
             return;
         if (!m_manualCameraMap.contains(camera->getUrl())) {
             QnResourceTypePtr resType = qnResTypePool->getResourceType(camera->getTypeId());
-            newManualCameras.insert(camera->getUniqueId(), QnManualCameraInfo(QUrl(camera->getUrl()), camera->getAuth(), resType->getName()));
+            newManualCameras.insert(camera->getUrl(), QnManualCameraInfo(QUrl(camera->getUrl()), camera->getAuth(), resType->getName()));
         }
     }
     if (!newManualCameras.isEmpty())
         registerManualCameras(newManualCameras);
 }
 
-bool QnResourceDiscoveryManager::containManualCamera(const QString& physicalId)
+bool QnResourceDiscoveryManager::containManualCamera(const QString& url)
 {
     QMutexLocker lock(&m_searchersListMutex);
-    return m_manualCameraMap.contains(physicalId);
+    return m_manualCameraMap.contains(url);
 }
 
 QnResourceDiscoveryManager::ResourceSearcherList QnResourceDiscoveryManager::plugins() const {
