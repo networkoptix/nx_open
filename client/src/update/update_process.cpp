@@ -372,11 +372,10 @@ void QnUpdateProcess::at_restUpdateTask_finished(int errorCode) {
 void QnUpdateProcess::prepareToUpload() {
     foreach (const QnUuid &target, m_targetPeerIds) {
         QnMediaServerResourcePtr server = qnResPool->getResourceById(target).dynamicCast<QnMediaServerResource>();
-        if (!server || server->getStatus() != Qn::Online) {
+        if (!server || server->getStatus() != Qn::Online)
             m_failedPeerIds.insert(target);
-            return;
-        }
     }
+
     if (!m_failedPeerIds.isEmpty()) {
         finishUpdate(QnUpdateResult::UploadingFailed_Offline);
         return;
