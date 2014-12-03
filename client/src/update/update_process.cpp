@@ -372,11 +372,15 @@ void QnUpdateProcess::at_restUpdateTask_finished(int errorCode) {
 void QnUpdateProcess::prepareToUpload() {
     foreach (const QnUuid &target, m_targetPeerIds) {
         QnMediaServerResourcePtr server = qnResPool->getResourceById(target).dynamicCast<QnMediaServerResource>();
-        if (!server || server->getStatus() != Qn::Online) {
-            finishUpdate(QnUpdateResult::UploadingFailed);
-            return;
-        }
+        if (!server || server->getStatus() != Qn::Online)
+            m_failedPeerIds.insert(target);
     }
+
+    if (!m_failedPeerIds.isEmpty()) {
+        finishUpdate(QnUpdateResult::UploadingFailed_Offline);
+        return;
+    }
+
     lockMutex();
 }
 
@@ -426,7 +430,7 @@ void QnUpdateProcess::at_mutexTimeout(const QSet<QnUuid> &failedPeers) {
     m_distributedMutex->deleteLater();
     m_distributedMutex = 0;
     m_failedPeerIds = failedPeers;
-    finishUpdate(QnUpdateResult::UploadingFailed);
+    finishUpdate(QnUpdateResult::UploadingFailed_Timeout);
 }
 
 void QnUpdateProcess::uploadUpdatesToServers() {

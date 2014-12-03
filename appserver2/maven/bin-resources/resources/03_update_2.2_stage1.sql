@@ -12,9 +12,20 @@ where guid = "";
 DELETE FROM vms_businessrule_action_resources where resource_id in (SELECT id from vms_resource where disabled > 0);
 DELETE FROM vms_businessrule_event_resources where resource_id in (SELECT id from vms_resource where disabled > 0);
 DELETE FROM vms_scheduletask WHERE source_id in (SELECT id from vms_resource where disabled > 0);
+
+UPDATE vms_layoutitem
+   SET resource_id = (SELECT r.id 
+                     FROM vms_camera c1
+		     JOIN vms_camera c2 on c2.physical_id = c1.physical_id
+                     JOIN vms_resource r on r.id = c2.resource_ptr_id and not (disabled > 0)
+                     WHERE c1.resource_ptr_id = vms_layoutitem.resource_id)
+ WHERE resource_id in (SELECT id FROM vms_resource where disabled > 0);
+
 DELETE FROM vms_camera WHERE resource_ptr_id in (SELECT id from vms_resource where disabled > 0);
 DELETE FROM vms_kvpair WHERE resource_id in (SELECT id from vms_resource where disabled > 0);
 DELETE FROM vms_resource WHERE disabled > 0;
+DELETE FROM vms_layoutitem 
+      WHERE not exists (SELECT 1 FROM vms_resource WHERE vms_resource.id = vms_layoutitem.resource_id);
 
 ALTER TABLE "vms_resource" RENAME TO vms_resource_tmp;
 
