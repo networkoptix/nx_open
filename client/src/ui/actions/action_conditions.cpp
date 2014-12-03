@@ -941,7 +941,7 @@ Qn::ActionVisibility QnLightModeCondition::check(const QnActionParameters &param
 
 Qn::ActionVisibility QnEdgeServerCondition::check(const QnResourceList &resources) {
     foreach (const QnResourcePtr &resource, resources)
-        if (m_isEdgeServer ^ QnMediaServerResource::isHiddenServer(resource))
+        if (m_isEdgeServer ^ QnMediaServerResource::isEdgeServer(resource))
             return Qn::InvisibleAction;
     return Qn::EnabledAction;
 }
