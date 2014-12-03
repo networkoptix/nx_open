@@ -344,7 +344,7 @@ void QnUserSettingsDialog::updateElement(Element element) {
         if (m_mode == Mode::OtherUser && ui->loginEdit->text().trimmed() != m_user->getName()) {
             /* ..and have not entered new password. */
             if (ui->passwordEdit->text().isEmpty()) {
-                hint = tr("Password should be updated.");
+                hint = tr("User was renamed. Password must be updated.");
                 valid = false;
             }
         } 
