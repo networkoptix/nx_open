@@ -646,7 +646,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey).
         text(tr("Save Current Layout As...")).
         shortcut(QKeySequence(QKeySequence::SaveAs)).
-        fallbackShortcut(tr("Ctrl+Shift+S")).
+        fallbackShortcut(tr("Ctrl+Alt+S")).
         autoRepeat(false).
         condition(new QnSaveLayoutAsActionCondition(true, this));
 
