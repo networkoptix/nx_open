@@ -320,9 +320,9 @@ namespace Qn {
         ExitAction,
 
         /** 
-         * Closes the client asynchronously.
+         * Forcibly closes the client asynchronously.
          */
-        ExitActionDelayed,
+        DelayedForcedExitAction,
 
         /** 
          * Notifies all modules about client closing.
