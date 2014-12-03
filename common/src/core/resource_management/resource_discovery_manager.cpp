@@ -29,6 +29,9 @@
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 #include <utils/network/ip_range_checker.h>
+#include "common/common_module.h"
+#include "core/resource/media_server_resource.h"
+
 
 
 QnResourceDiscoveryManager* QnResourceDiscoveryManager::m_instance;
@@ -74,10 +77,11 @@ QnResourceDiscoveryManager::QnResourceDiscoveryManager()
 :
     m_ready( false ),
     m_state( InitialSearch ),
-    m_discoveryUpdateIdx(0)
+    m_discoveryUpdateIdx(0),
+    m_serverOfflineTimeout(20 * 1000)
 {
-    connect(QnResourcePool::instance(), SIGNAL(resourceRemoved(const QnResourcePtr&)), this, SLOT(at_resourceDeleted(const QnResourcePtr&)), Qt::DirectConnection);
-    connect(QnResourcePool::instance(), SIGNAL(resourceChanged(const QnResourcePtr&)), this, SLOT(at_resourceChanged(const QnResourcePtr&)), Qt::DirectConnection);
+    connect(QnResourcePool::instance(), &QnResourcePool::resourceRemoved, this, &QnResourceDiscoveryManager::at_resourceDeleted, Qt::DirectConnection);
+    connect(QnResourcePool::instance(), &QnResourcePool::resourceAdded, this, &QnResourceDiscoveryManager::at_resourceAdded, Qt::DirectConnection);
     connect(QnGlobalSettings::instance(), &QnGlobalSettings::disabledVendorsChanged, this, &QnResourceDiscoveryManager::updateSearchersUsage);
 }
 
@@ -277,16 +281,64 @@ void QnResourceDiscoveryManager::updateLocalNetworkInterfaces()
 
 static QnResourceList CheckHostAddrAsync(const QnManualCameraInfo& input) { return input.checkHostAddr(); }
 
+bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourcePtr& camera, int awaitingToMoveCameraCnt)
+{
+    if (!camera)
+        return false;
+
+    QnUuid ownGuid = qnCommon->moduleGUID();
+    QnMediaServerResourcePtr mServer = qnResPool->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(ownGuid).dynamicCast<QnMediaServerResource>();
+    if (!mServer || !ownServer)
+        return false;
+
+#ifdef EDGE_SERVER
+    if (!ownServer->isRedundancy()) 
+    {
+        // return own camera back for edge server
+        char  mac[MAC_ADDR_LEN];
+        char* host = 0;
+        getMacFromPrimaryIF(mac, &host);
+        return (camera->getUniqueId().toLocal8Bit() == QByteArray(mac));
+    }
+#endif
+    if ((mServer->getServerFlags() & Qn::SF_Edge) && !mServer->isRedundancy())
+        return false; // do not transfer cameras from edge server
+
+    if (camera->preferedServerId() == ownGuid)
+        return true;
+    else if (mServer->getStatus() == Qn::Online)
+        return false;
+
+    if (!ownServer->isRedundancy())
+        return false; // redundancy is disabled
+
+    if (qnResPool->getAllCameras(ownServer, true).size() + awaitingToMoveCameraCnt >= ownServer->getMaxCameras())
+        return false;
+
+    return mServer->currentStatusTime() > m_serverOfflineTimeout;
+}
+
 void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList& resources)
 {
+    QnManualCameraInfoMap candidates;
     QnManualCameraInfoMap cameras;
     {
         QMutexLocker locker(&m_searchersListMutex);
-        cameras = m_manualCameraMap;
-        if (cameras.isEmpty())
+        candidates = m_manualCameraMap;
+        if (candidates.isEmpty())
             return;
     }
-
+    
+    for (auto itr = candidates.begin(); itr != candidates.end(); ++itr)
+    {
+        QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(qnResPool->getResourceByUniqId(itr.key()));
+        if (!camera)
+            continue;
+        if (!camera->hasFlags(Qn::foreigner) || canTakeForeignCamera(camera, 0))
+            cameras.insert(itr.key(), itr.value());
+    }
+    
     QFuture<QnResourceList> results = QtConcurrent::mapped(cameras, &CheckHostAddrAsync);
     results.waitForFinished();
     for (QFuture<QnResourceList>::const_iterator itr = results.constBegin(); itr != results.constEnd(); ++itr)
@@ -463,34 +515,27 @@ void QnResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& resourc
     m_recentlyDeleted << resource->getUrl();
 }
 
-void QnResourceDiscoveryManager::at_resourceChanged(const QnResourcePtr& resource)
+void QnResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr& resource)
 {
     QnManualCameraInfoMap newManualCameras;
     {
         QMutexLocker lock(&m_searchersListMutex);
-        if (resource->hasFlags(Qn::foreigner)) {
-            QnManualCameraInfoMap::Iterator itr = m_manualCameraMap.find(resource->getUrl());
-            if (itr != m_manualCameraMap.end())
-                m_manualCameraMap.erase(itr);
-        }
-        else {
-            const QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
-            if (!camera || !camera->isManuallyAdded())
-                return;
-            if (!m_manualCameraMap.contains(camera->getUrl())) {
-                QnResourceTypePtr resType = qnResTypePool->getResourceType(camera->getTypeId());
-                newManualCameras.insert(camera->getUniqueId(), QnManualCameraInfo(QUrl(camera->getUrl()), camera->getAuth(), resType->getName()));
-            }
+        const QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
+        if (!camera || !camera->isManuallyAdded())
+            return;
+        if (!m_manualCameraMap.contains(camera->getUrl())) {
+            QnResourceTypePtr resType = qnResTypePool->getResourceType(camera->getTypeId());
+            newManualCameras.insert(camera->getUniqueId(), QnManualCameraInfo(QUrl(camera->getUrl()), camera->getAuth(), resType->getName()));
         }
     }
     if (!newManualCameras.isEmpty())
         registerManualCameras(newManualCameras);
 }
 
-bool QnResourceDiscoveryManager::containManualCamera(const QString& url)
+bool QnResourceDiscoveryManager::containManualCamera(const QString& physicalId)
 {
     QMutexLocker lock(&m_searchersListMutex);
-    return m_manualCameraMap.contains(url);
+    return m_manualCameraMap.contains(physicalId);
 }
 
 QnResourceDiscoveryManager::ResourceSearcherList QnResourceDiscoveryManager::plugins() const {

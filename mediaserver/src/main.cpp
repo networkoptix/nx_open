@@ -969,7 +969,7 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         QnManualCameraInfoMap manualCameras;
         for(const QnSecurityCamResourcePtr &camera: cameras) {
             messageProcessor->updateResource(camera);
-            if (camera->isManuallyAdded() && camera->getParentId() == m_mediaServer->getId()) {
+            if (camera->isManuallyAdded()) {
                 QnResourceTypePtr resType = qnResTypePool->getResourceType(camera->getTypeId());
                 manualCameras.insert(camera->getUniqueId(), QnManualCameraInfo(QUrl(camera->getUrl()), camera->getAuth(), resType->getName()));
             }
