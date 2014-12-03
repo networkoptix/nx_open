@@ -1580,14 +1580,8 @@ void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered() {
     if (!context()->user())
         return;
 
-    QnVirtualCameraResourcePtr desktopCamera;
-    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::desktop_camera)) {
-        if (resource->getUniqueId() != QnAppServerConnectionFactory::clientGuid())
-            continue;
-        desktopCamera = resource.dynamicCast<QnVirtualCameraResource>();
-        break;
-    }
-    if (!desktopCamera)
+    QnVirtualCameraResourcePtr desktopCamera = qnResPool->getResourceByUniqId(QnAppServerConnectionFactory::clientGuid()).dynamicCast<QnVirtualCameraResource>();
+    if (!desktopCamera || !desktopCamera->hasFlags(Qn::desktop_camera))
         return;
 
     QnActionParameters parameters = menu()->currentParameters(sender());

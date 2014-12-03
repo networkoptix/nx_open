@@ -965,13 +965,12 @@ Qn::ActionVisibility QnDesktopCameraActionCondition::check(const QnActionParamet
     if (!context()->user())
         return Qn::InvisibleAction;
 
-    QString userName = context()->user()->getName();
-    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::desktop_camera)) 
-        if (resource->getUniqueId() == QnAppServerConnectionFactory::clientGuid())
-            return Qn::EnabledAction;
+    /* Do not check real pointer type to speed up check. */
+    QnResourcePtr desktopCamera = qnResPool->getResourceByUniqId(QnAppServerConnectionFactory::clientGuid());
+    if (desktopCamera && desktopCamera->hasFlags(Qn::desktop_camera))
+        return Qn::EnabledAction;
     
-    return Qn::InvisibleAction;
-   
+    return Qn::DisabledAction;  
 #else
     return Qn::InvisibleAction;
 #endif
