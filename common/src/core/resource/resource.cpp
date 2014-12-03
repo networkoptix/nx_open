@@ -215,7 +215,8 @@ void QnResource::update(const QnResourcePtr& other, bool silenceMode) {
         QMutexLocker lk(&m_mutex); 
         if( !m_id.isNull() && !m_locallySavedProperties.empty() )
         {
-            auto locallySavedProperties = std::move(m_locallySavedProperties);
+            std::map<QString, LocalPropertyValue> locallySavedProperties;
+            std::swap( locallySavedProperties, m_locallySavedProperties );
             QnUuid id = m_id;
             lk.unlock();
 
@@ -497,7 +498,8 @@ void QnResource::setId(const QnUuid& id) {
     //QnUuid oldId = m_id;
     m_id = id;
 
-    auto locallySavedProperties = std::move( m_locallySavedProperties );
+    std::map<QString, LocalPropertyValue> locallySavedProperties;
+    std::swap( locallySavedProperties, m_locallySavedProperties );
     mutexLocker.unlock();
 
     for( auto prop: locallySavedProperties )
