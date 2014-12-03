@@ -431,6 +431,34 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     appendManualDiscoveredResources(resources);
     setLastDiscoveredResources(resources);
 
+    //searching and ignoring auto-discovered cameras already manually added to the resource pool
+    for( QnResourceList::iterator
+        it = resources.begin();
+        it != resources.end();
+         )
+    {
+        const QnSecurityCamResource* camRes = dynamic_cast<QnSecurityCamResource*>(it->data());
+        if( !camRes || camRes->isManuallyAdded() )
+        {
+            ++it;
+            continue;
+        }
+
+        //if camera is already in resource pool and it was added manually, then ignoring it...
+        QnNetworkResourcePtr existingRes = qnResPool->getNetResourceByPhysicalId( camRes->getPhysicalId() );
+        if( existingRes )
+        {
+            const QnSecurityCamResource* existingCamRes = dynamic_cast<QnSecurityCamResource*>( existingRes.data() );
+            if( existingCamRes && existingCamRes->isManuallyAdded() )
+            {
+                it = resources.erase( it );
+                continue;
+            }
+        }
+
+        ++it;
+    }
+
     {
         QMutexLocker lock(&m_searchersListMutex);
         for (int i = resources.size()-1; i >= 0; --i)
