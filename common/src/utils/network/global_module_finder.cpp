@@ -142,13 +142,15 @@ void QnGlobalModuleFinder::at_router_connectionAdded(const QnUuid &discovererId,
 	if (!m_moduleFinder && discovererId == qnCommon->moduleGUID())
 		return;
 
-    QMutexLocker lock(&m_mutex);
+    {
+        QMutexLocker lock(&m_mutex);
 
-    QSet<QString> &addresses = m_discoveredAddresses[peerId][discovererId];
-    auto it = addresses.find(host);
-    if (it != addresses.end())
-        return;
-    addresses.insert(host);
+        QSet<QString> &addresses = m_discoveredAddresses[peerId][discovererId];
+        auto it = addresses.find(host);
+        if (it != addresses.end())
+            return;
+        addresses.insert(host);
+    }
     updateAddresses(peerId);
 }
 
@@ -157,14 +159,18 @@ void QnGlobalModuleFinder::at_router_connectionRemoved(const QnUuid &discovererI
 	if (!m_moduleFinder && discovererId == qnCommon->moduleGUID())
 		return;
 
-    QMutexLocker lock(&m_mutex);
+    {
+        QMutexLocker lock(&m_mutex);
 
-    if (!m_discoveredAddresses[peerId][discovererId].remove(host))
-        return;
+        if (!m_discoveredAddresses[peerId][discovererId].remove(host))
+            return;
+    }
     updateAddresses(peerId);
 }
 
 void QnGlobalModuleFinder::updateAddresses(const QnUuid &id) {
+    QMutexLocker lock(&m_mutex);
+
     QnModuleInformation moduleInformation = m_moduleInformationById.value(id);
     if (moduleInformation.id.isNull())
         return;
@@ -175,6 +181,8 @@ void QnGlobalModuleFinder::updateAddresses(const QnUuid &id) {
 
     moduleInformation.remoteAddresses = addresses;
     m_moduleInformationById[id] = moduleInformation;
+
+    lock.unlock();
 
     if (moduleInformation.remoteAddresses.isEmpty()) {
         NX_LOG(lit("QnGlobalModuleFinder. Module %1 is lost").arg(moduleInformation.id.toString()), cl_logDEBUG1);
