@@ -25,3 +25,9 @@ void QnResourceStatusDictionary::clear(const QVector<QnUuid>& idList)
     for(const QnUuid& id: idList)
         m_items.remove(id);
 }
+
+QMap<QnUuid, Qn::ResourceStatus> QnResourceStatusDictionary::values() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_items;
+}

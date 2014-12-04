@@ -387,8 +387,15 @@ void QnCommonMessageProcessor::resetPropertyList(const ec2::ApiResourceParamWith
     }
 }
 
-void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataList& params) {
-    /* Dictionary should not be cleared or we will not receive 'Offline' notification. */
+void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataList& params) 
+{
+    auto keys = qnStatusDictionary->values().keys();
+    qnStatusDictionary->clear();
+    for(const QnUuid& id: keys) {
+        if (QnResourcePtr resource = qnResPool->getResourceById(id))
+            emit resource->statusChanged(resource);
+    }
+
     for(const ec2::ApiResourceStatusData& statusData: params)
         on_resourceStatusChanged(statusData.id , statusData.status);
 }
