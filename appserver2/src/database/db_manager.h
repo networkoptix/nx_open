@@ -196,6 +196,9 @@ namespace ec2
         //getServerUserAttributes
         ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiMediaServerUserAttributesDataList& serverAttrsList);
 
+        //getTransactionLog
+        ErrorCode doQueryNoLock(const std::nullptr_t&, ApiTransactionDataList& tranList);
+
 		// --------- misc -----------------------------
         QnUuid getID() const;
 

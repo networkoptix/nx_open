@@ -5,6 +5,7 @@ angular.module('webadminApp')
         $scope.settings = {
             url :'',
             password :'',
+            currentPassword:'',
             keepMySystem:true
         };
         $scope.systems = {
@@ -13,8 +14,8 @@ angular.module('webadminApp')
             systemFound: false
         };
 
-        mediaserver.discoveredPeers().success(function (r) {
-            var systems = _.map(r.reply, function(module)
+        mediaserver.discoveredPeers().then(function (r) {
+            var systems = _.map(r.data.reply, function(module)
             {
                 return {
                     url: 'http://' + module.remoteAddresses[0] + ':' + module.port,
@@ -31,8 +32,8 @@ angular.module('webadminApp')
             $scope.systems.discoveredUrls = systems;
         });
 
-        mediaserver.getSettings().success(function (r) {
-            $scope.systems.systemName =  r.reply.systemName;
+        mediaserver.getSettings().then(function (r) {
+            $scope.systems.systemName =  r.data.reply.systemName;
 
             $scope.systems.discoveredUrls = _.filter($scope.systems.discoveredUrls, function(module){
                 return module.systemName !== $scope.systems.systemName;
@@ -80,7 +81,10 @@ angular.module('webadminApp')
             /*if (!$('#mergeSustemForm').valid()) {
                 return;
             }*/
-            $modalInstance.close({url: $scope.settings.url, password: $scope.settings.password, keepMySystem:$scope.settings.keepMySystem});
+            $modalInstance.close({url: $scope.settings.url,
+                password: $scope.settings.password,
+                keepMySystem:$scope.settings.keepMySystem,
+                currentPassword:$scope.settings.currentPassword});
         };
 
         $scope.selectSystem = function (system){

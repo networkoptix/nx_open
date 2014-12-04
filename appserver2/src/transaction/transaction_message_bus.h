@@ -177,7 +177,11 @@ namespace ec2
         bool isPeerUsing(const QUrl& url);
         void onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader& ttHeader);
         bool onGotServerRuntimeInfo(const QnTransaction<ApiRuntimeData> &tran, QnTransactionTransport* transport);
-        void gotAliveData(const ApiPeerAliveData &aliveData, QnTransactionTransport* transport);
+
+        /*
+        * Return true if alive transaction accepted or false if it should be ignored (offline data is deprecated)
+        */
+        bool gotAliveData(const ApiPeerAliveData &aliveData, QnTransactionTransport* transport);
 
         QnPeerSet connectedPeers(ApiCommand::Value command) const;
 

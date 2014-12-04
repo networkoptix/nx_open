@@ -41,6 +41,11 @@ namespace ec2
         return m_connectionInfo;
     }
 
+    QString RemoteEC2Connection::authInfo() const
+    {
+        return m_connectionInfo.ecUrl.password();
+    }
+
     void RemoteEC2Connection::startReceivingNotifications() {
 
         // in remote mode we are always working as a client

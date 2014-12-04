@@ -25,6 +25,11 @@ namespace ec2
         return m_connectionInfo;
     }
 
+    QString OldEcConnection::authInfo() const
+    {
+        return m_connectionInfo.ecUrl.password();
+    }
+
     AbstractResourceManagerPtr OldEcConnection::getResourceManager()
     {
         return AbstractResourceManagerPtr();

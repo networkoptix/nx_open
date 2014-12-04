@@ -145,13 +145,13 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
                 autoResetTimeout );
 }
 
-QImage QnMServerBusinessRuleProcessor::getEventScreenshot(const QnBusinessEventParameters& params, QSize dstSize) const 
+QByteArray QnMServerBusinessRuleProcessor::getEventScreenshotEncoded(const QnBusinessEventParameters& params, QSize dstSize) const 
 {
     // By now only motion screenshot is supported
     if (params.getEventType() != QnBusiness::CameraMotionEvent)
-        return QImage();
+        return QByteArray();
 
     const QnResourcePtr& cameraRes = QnResourcePool::instance()->getResourceById(params.getEventResourceId());
     QSharedPointer<CLVideoDecoderOutput> frame = QnGetImageHelper::getImage(cameraRes.dynamicCast<QnVirtualCameraResource>(), DATETIME_NOW, dstSize);
-    return frame ? frame->toImage() : QImage();
+    return frame ? QnGetImageHelper::encodeImage(frame, "jpg") : QByteArray();
 }

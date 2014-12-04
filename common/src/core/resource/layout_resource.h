@@ -79,6 +79,7 @@ public:
     bool locked() const;
     void setLocked(bool value);
 
+    virtual Qn::ResourceStatus getStatus() const override;
 signals:
     void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
     void itemRemoved(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);

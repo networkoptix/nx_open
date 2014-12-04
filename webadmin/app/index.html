@@ -83,20 +83,23 @@
 
 <script src="scripts/config.js"></script>
 <script src="scripts/app.js"></script>
-<script src="scripts/controllers/main.js"></script>
-<script src="scripts/controllers/navigation.js"></script>
-<script src="scripts/directives/navbar.js"></script>
-<script src="scripts/controllers/settings.js"></script>
-<script src="scripts/controllers/join.js"></script>
+
 <script src="scripts/services/mediaserver.js"></script>
-<script src="scripts/directives/pwcheck.js"></script>
-<script src="scripts/controllers/login.js"></script>
 <script src="scripts/services/auth.js"></script>
+
+<script src="scripts/directives/navbar.js"></script>
+<script src="scripts/directives/pwcheck.js"></script>
 <script src="scripts/directives/icon.js"></script>
 <script src="scripts/directives/fileupload.js"></script>
 <script src="scripts/directives/vg-quality.js"></script>
-
 <script src="scripts/directives/inplace-edit.js"></script>
+
+<script src="scripts/controllers/main.js"></script>
+<script src="scripts/controllers/navigation.js"></script>
+<script src="scripts/controllers/settings.js"></script>
+<script src="scripts/controllers/join.js"></script>
+<script src="scripts/controllers/offline.js"></script>
+<script src="scripts/controllers/login.js"></script>
 <script src="scripts/controllers/advanced.js"></script>
 <script src="scripts/controllers/info.js"></script>
 <script src="scripts/controllers/restart.js"></script>
@@ -108,5 +111,27 @@
 
 
 <script src="customization/config.js"></script>
+
+
+
+<script type="text/ng-template" id="offline_modal">
+    <div class="modal-header">
+            <h3 class="modal-title">Server is offline</h3>
+    </div>
+
+    <form class="form" role="form" id="restartDialog">
+            <div class="modal-body" class="col-sm-12">
+            <p>Server can't handle requests now. Trying to reach it again.</p>
+    <progressbar class="progress-striped active" type="info" value="100" id="restartingProgress">{{state}}</progressbar>
+    <p>If nothing happens for a while - you could check server condition manually</p>
+    </div>
+
+    <div class="modal-footer">
+            <button class="btn btn-primary pull-left" name="button" ng-click="refresh()" ng-disabled="form.$invalid">Refresh page</button>
+    </div>
+    </form>
+</script>
+
+
 </body>
 </html>

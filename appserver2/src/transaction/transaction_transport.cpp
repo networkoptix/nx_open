@@ -419,7 +419,7 @@ void QnTransactionTransport::sendHttpKeepAlive()
 bool QnTransactionTransport::isHttpKeepAliveTimeout() const
 {
     QMutexLocker lock(&m_mutex);
-    return m_lastReceiveTimer.elapsed() > TCP_KEEPALIVE_TIMEOUT * 2;
+    return m_lastReceiveTimer.elapsed() > TCP_KEEPALIVE_TIMEOUT * 3;
 }
 
 void QnTransactionTransport::serializeAndSendNextDataBuffer()

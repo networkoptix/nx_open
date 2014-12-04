@@ -236,7 +236,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isPtzPresetInUseWarningDisabled,    setPtzPresetInUseWarningDisabled,   PTZ_PRESET_IN_USE_WARNING_DISABLED, false)
         QN_DECLARE_RW_PROPERTY(Qn::Corner,                  timestampCorner,        setTimestampCorner,         TIMESTAMP_CORNER,           Qn::BottomRightCorner)
         QN_DECLARE_RW_PROPERTY(Qn::LightModeFlags,          lightMode,              setLightMode,               LIGHT_MODE,                 0) 
-        QN_DECLARE_RW_PROPERTY(Qn::LightModeFlags,          lightModeOverride,      setLightModeOverride,       LIGHT_MODE_OVERRIDE,        0)
+        QN_DECLARE_RW_PROPERTY(int,                         lightModeOverride,      setLightModeOverride,       LIGHT_MODE_OVERRIDE,        -1)
         QN_DECLARE_RW_PROPERTY(Qn::ClientSkin,              clientSkin,             setClientSkin,              CLIENT_SKIN,                Qn::DarkSkin)
         QN_DECLARE_RW_PROPERTY(QnClientBackground,          background,             setBackground,              BACKGROUND,                 QnClientBackground())
         QN_DECLARE_RW_PROPERTY(QnUuid,                      pcUuid,                 setPcUuid,                  PC_UUID,                    QnUuid())

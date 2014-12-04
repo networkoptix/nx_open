@@ -18,7 +18,6 @@ QnLayoutResource::QnLayoutResource(const QnResourceTypePool* resTypePool):
     m_backgroundOpacity(0.7),
     m_locked(false)
 {
-    setStatus(Qn::Online, true);
     addFlags(Qn::layout);
     setTypeId(resTypePool->getFixedResourceTypeId(lit("Layout")));
 }
@@ -367,4 +366,9 @@ void QnLayoutResource::setLocked(bool value) {
         m_locked = value;
     }
     emit lockedChanged(::toSharedPointer(this));
+}
+
+Qn::ResourceStatus QnLayoutResource::getStatus() const
+{
+    return Qn::Online;
 }

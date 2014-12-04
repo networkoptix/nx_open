@@ -11,11 +11,94 @@ import string
 import sys
 import Queue
 import socket
+import os.path
+
+
+# Rollback support
+class UnitTestRollback:
+    _rollbackFile=None
+    _removeTemplate = """
+        {
+            "id":"%s"
+        }
+    """
+
+    def __init__(self):
+        # Check if this file is existed, if so we do the rollback automatically
+        if os.path.isfile(".rollback"):
+            self._rollbackFile = open(".rollback","r")
+            self.doRollback()
+
+        self._rollbackFile = open(".rollback","w+")
+
+    def addOperations(self,methodName,serverAddress,resourceId):
+        self._rollbackFile.write(("%s,%s,%s\n")%(methodName,serverAddress,resourceId))
+        self._rollbackFile.flush()
+
+    def _doSingleRollback(self,methodName,serverAddress,resourceId):
+        # this function will do a single rollback
+        req = urllib2.Request("http://%s/ec2/%s" % (serverAddress,"removeResource"), \
+            data=self._removeTemplate%(resourceId), headers={'Content-Type': 'application/json'})
+        response = None
+        try:
+            response = urllib2.urlopen(req)
+        except:
+            return False
+
+        if response.getcode() != 200:
+            response.close()
+            return False
+
+        print response.read()
+
+        response.close()
+        return True
+
+    def doRollback(self):
+        recoverList = []
+        failed = False
+        # set the cursor for the file to the file beg
+        self._rollbackFile.seek(0,0);
+        for line in self._rollbackFile:
+            if line == '\n':
+                continue
+            # python will left the last line break character there
+            # so we need to wipe it out if we find one there
+            l = line.split(',')
+            if l[2][len(l[2])-1] == "\n" :
+                l[2] = l[2][:-1] # remove last character
+            # now we have method,serverAddress,resourceId
+            if self._doSingleRollback(l[0],l[1],l[2]) == False:
+                failed = True
+                # failed for this rollback
+                print ("Cannot rollback for transaction:(MethodName:%s;ServerAddress:%s;ResourceId:%s\n)")% (l[0],l[1],l[2])
+                print  "Or you could run recover later when all the rollback done\n"
+                recoverList.append("%s,%s,%s"%(l[0],l[1],l[2]))
+
+        # close the resource file
+        self._rollbackFile.close()
+        os.remove(".rollback")
+
+        if failed:
+            recoverFile = open(".rollback","w+")
+            for line in recoverList:
+                recoverFile.write(line)
+            recoverFile.close()
+
+    def doRecover(self):
+        if not os.path.isfile(".rollback") :
+            print "Nothing needs to be recovered"
+            return
+        # Do the rollback here
+        self._rollbackFile = open(".rollback","r")
+        self.doRollback()
 
 class ClusterTest():
     clusterTestServerList = []
     clusterTestSleepTime = None
     clusterTestServerUUIDList = []
+    testCaseSize = 2
+    unittestRollback = None
 
     _getterAPIList = ["getResourceTypes",
         "getResourceParams",
@@ -34,6 +117,9 @@ class ClusterTest():
         "getSettings",
         "getFullInfo",
         "getLicenses"]
+
+    def __init__(self):
+        self._setUpPassword()
 
     def _getServerName(self,obj,uuid):
         for s in obj:
@@ -74,6 +160,8 @@ class ClusterTest():
                 return (False,"Cannot fetch server name with UUID:%s" % (uuid))
             else:
                 self.clusterTestServerUUIDList.append((uuid,n))
+
+        response.close()
         return (True,"")
 
     def _checkResultEqual(self,responseList,methodName):
@@ -89,6 +177,9 @@ class ClusterTest():
                     output = response.read()
                     if result != output:
                         return(False,"method:%s return value differs from other" % (methodName))
+                
+                response.close()
+
         return (True,"")
 
     def checkMethodStatusConsistent(self,method):
@@ -112,9 +203,15 @@ class ClusterTest():
         parser.read("ec2_tests.cfg")
         self.clusterTestServerList = parser.get("General","serverList").split(",")
         self.clusterTestSleepTime = parser.getint("General","clusterTestSleepTime")
+        try :
+            self.testCaseSize = parser.getint("General","testCaseSize")
+        except :
+            self.testCaseSize = 2
+
         return (parser.get("General","password"),parser.get("General","username"))
 
-    def init(self):
+
+    def _setUpPassword(self):
         pwd,un = self._loadConfig()
         # configure different domain password strategy
         passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
@@ -122,6 +219,7 @@ class ClusterTest():
             passman.add_password("NetworkOptix","http://%s/ec2/" % (s), un, pwd)
         urllib2.install_opener(urllib2.build_opener(urllib2.HTTPDigestAuthHandler(passman)))
 
+    def init(self):
         # ensure all the server are on the same page
         ret,reason = self._ensureServerListStates(self.clusterTestSleepTime)
 
@@ -133,7 +231,11 @@ class ClusterTest():
         if ret == False:
             return (ret,reason)
 
+        # do the rollback here
+        self.unittestRollback = UnitTestRollback()
         return (True,"")
+
+
 
 clusterTest = ClusterTest()
 
@@ -279,7 +381,7 @@ class CameraDataGenerator(BasicGenerator):
             mac = self.generateMac()
             id = self._generateCameraId(mac)
             name_and_model = self.generateRandomString(6)
-            ret.append(self._template % (self.generateTrueFalse(),
+            ret.append((self._template % (self.generateTrueFalse(),
                     self.generateTrueFalse(),
                     id,
                     mac,
@@ -287,7 +389,7 @@ class CameraDataGenerator(BasicGenerator):
                     name_and_model,
                     mac,
                     self.generateIpV4(),
-                    self.generateRandomString(4)))
+                    self.generateRandomString(4)),id))
 
         return ret
 
@@ -310,12 +412,12 @@ class UserDataGenerator(BasicGenerator):
     def generateUserData(self,number):
         ret = []
         for i in range(number):
+            id = self.generateRandomId()
             un,pwd,digest = self.generateUsernamePasswordAndDigest()
-            ret.append(self._template % (digest,
+            ret.append((self._template % (digest,
                 self.generateEmail(),
                 self.generatePasswordHash(pwd),
-                self.generateRandomId(),
-                un))
+                id,un),id))
 
         return ret
 
@@ -344,12 +446,13 @@ class MediaServerGenerator(BasicGenerator):
     def generateMediaServerData(self,number):
         ret = []
         for i in range(number):
-            ret.append(self._template % (self.generateIpV4Endpoint(),
+            id = self.generateRandomId()
+            ret.append((self._template % (self.generateIpV4Endpoint(),
                    self.generateRandomId(),
-                   self.generateRandomId(),
+                   id,
                    self._generateRandomName(),
                    self._generateRandomName(),
-                   self.generateIpV4Endpoint()))
+                   self.generateIpV4Endpoint()),id))
 
         return ret
 
@@ -395,6 +498,8 @@ class ResourceDataGenerator(BasicGenerator):
             json_obj = json.loads(response.read())
             for ele in json_obj:
                 self._existedResourceList.append((ele["id"],ele["parentId"],ele["typeId"]))
+
+            response.close()
 
         if len(self._existedResourceList) == 0:
             return False
@@ -485,7 +590,7 @@ class CameraConflictionDataGenerator(BasicGenerator):
     _removeTemplate = \
         """
         {
-            id="%s"
+            "id":"%s"
         }
         """
 
@@ -500,6 +605,9 @@ class CameraConflictionDataGenerator(BasicGenerator):
         for obj in json_obj:
             self._existedCameraList.append((obj["id"],obj["mac"],obj["model"],obj["parentId"],
                  obj["typeId"],obj["url"],obj["vendor"]))
+
+        response.close()
+
         return True
 
     def __init__(self):
@@ -544,7 +652,7 @@ class UserConflictionDataGenerator(BasicGenerator):
 
     _removeTemplate = """
         {
-            id="%s"
+            "id":"%s"
         }
     """
 
@@ -561,6 +669,8 @@ class UserConflictionDataGenerator(BasicGenerator):
         for entry in json_obj:
             self._existedUserList.append((entry["digest"],entry["email"],entry["hash"],
                  entry["id"],entry["permissions"]))
+
+        response.close()
 
         return True
 
@@ -609,7 +719,7 @@ class MediaServerConflictionDataGenerator(BasicGenerator):
 
     _removeTemplate = """
         {
-            id="%s"
+            "id":"%s"
         }
     """
 
@@ -626,6 +736,8 @@ class MediaServerConflictionDataGenerator(BasicGenerator):
         for server in json_obj:
             self._existedMediaServerList.append((server["apiUrl"],server["authKey"],server["id"],
                  server["systemName"],server["url"]))
+
+        response.close()
 
         return True
 
@@ -688,6 +800,8 @@ class CameraUserAttributesListDataGenerator(BasicGenerator):
 
         for ele in ret:
             self._existedCameraUUIDList.append((ele["id"],ele["name"]))
+
+        response.close()
 
         return True
 
@@ -806,6 +920,16 @@ class ClusterTestBase(unittest.TestCase):
             ret.append((f,clusterTest.clusterTestServerList[random.randint(0,len(clusterTest.clusterTestServerList) - 1)]))
         return ret
 
+    def _defaultCreateSeq(self,fakeData):
+        ret = []
+        for f in fakeData:
+            serverName = clusterTest.clusterTestServerList[random.randint(0,len(clusterTest.clusterTestServerList)-1)]
+            # add rollback cluster operations
+            clusterTest.unittestRollback.addOperations(self._getMethodName(),serverName,f[1])
+            ret.append((f[0],serverName))
+
+        return ret
+
     def _dumpFailedRequest(self,data,methodName):
         f = open("%s.failed.%.json" % (methodName,threading.active_count()),"w")
         f.write(data)
@@ -819,10 +943,12 @@ class ClusterTestBase(unittest.TestCase):
 
         # Do a sligtly graceful way to dump the sample of failure
         if response.getcode() != 200:
-            self._dumpFailedRequest(d,methodName)
+            self._dumpFailedRequest(d,methodName) 
 
         self.assertTrue(response.getcode() == 200, \
             "%s failed with statusCode %d" % (methodName,response.getcode()))
+
+        response.close()
 
     def test(self):
         postDataList = self._generateModifySeq()
@@ -851,16 +977,20 @@ class ClusterTestBase(unittest.TestCase):
 
 class CameraTest(ClusterTestBase):
     _gen = None
-    _testCase = 2
+    _testCase = clusterTest.testCaseSize
 
     def setTestCase(self,num):
         self._testCase = num
 
     def setUp(self):
+        self._testCase = clusterTest.testCaseSize
         self._gen = CameraDataGenerator()
     
+    
     def _generateModifySeq(self):
-        return self._defaultModifySeq(self._gen.generateCameraData(self._testCase))
+        dataList,idList = self._gen.generateCameraData(self._testCase)
+
+        return self._defaultCreateSeq(self._gen.generateCameraData(self._testCase))
 
     def _getMethodName(self):
         return "saveCameras"
@@ -871,16 +1001,17 @@ class CameraTest(ClusterTestBase):
 
 class UserTest(ClusterTestBase):
     _gen = None
-    _testCase = 2
+    _testCase = clusterTest.testCaseSize
 
     def setTestCase(self,num):
         self._testCase = num
 
     def setUp(self):
+        self._testCase = clusterTest.testCaseSize
         self._gen = UserDataGenerator()
 
     def _generateModifySeq(self):
-        return self._defaultModifySeq(self._gen.generateUserData(self._testCase))
+        return self._defaultCreateSeq(self._gen.generateUserData(self._testCase))
 
     def _getMethodName(self):
         return "saveUser"
@@ -891,16 +1022,17 @@ class UserTest(ClusterTestBase):
 
 class MediaServerTest(ClusterTestBase):
     _gen = None
-    _testCase = 2
+    _testCase = clusterTest.testCaseSize
 
     def setTestCase(self,num):
         self._testCase = num
 
     def setUp(self):
+        self._testCase = clusterTest.testCaseSize
         self._gen = MediaServerGenerator()
 
     def _generateModifySeq(self):
-        return self._defaultModifySeq(self._gen.generateMediaServerData(self._testCase))
+        return self._defaultCreateSeq(self._gen.generateMediaServerData(self._testCase))
 
     def _getMethodName(self):
         return "saveMediaServer"
@@ -910,12 +1042,13 @@ class MediaServerTest(ClusterTestBase):
 
 class ResourceParaTest(ClusterTestBase):
     _gen = None
-    _testCase = 2
+    _testCase = clusterTest.testCaseSize
 
     def setTestCase(self,num):
         self._testCase = num
 
     def setUp(self):
+        self._testCase = clusterTest.testCaseSize
         self._gen = ResourceDataGenerator()
 
     def _generateModifySeq(self):
@@ -930,12 +1063,13 @@ class ResourceParaTest(ClusterTestBase):
 
 class ResourceRemoveTest(ClusterTestBase):
     _gen = None
-    _testCase = 2
+    _testCase = clusterTest.testCaseSize
 
     def setTestCase(self,num):
         self._testCase = num
 
     def setUp(self):
+        self._testCase = clusterTest.testCaseSize
         self._gen = ResourceDataGenerator()
 
     def _generateModifySeq(self):
@@ -950,12 +1084,13 @@ class ResourceRemoveTest(ClusterTestBase):
 
 class CameraUserAttributeListTest(ClusterTestBase):
     _gen = None
-    _testCase = 2
+    _testCase = clusterTest.testCaseSize
 
     def setTestCase(self,num):
         self._testCase = num
 
     def setUp(self):
+        self._testCase = clusterTest.testCaseSize
         self._gen = CameraUserAttributesListDataGenerator()
 
     def _generateModifySeq(self):
@@ -970,12 +1105,13 @@ class CameraUserAttributeListTest(ClusterTestBase):
 
 class ServerUserAttributesListDataTest(ClusterTestBase):
     _gen = None
-    _testCase = 2
+    _testCase = clusterTest.testCaseSize
 
     def setTestCase(self,num):
         self._testCase = num
 
     def setUp(self):
+        self._testCase = clusterTest.testCaseSize
         self._gen = ServerUserAttributesListDataGenerator()
 
     def _generateModifySeq(self):
@@ -990,14 +1126,14 @@ class ServerUserAttributesListDataTest(ClusterTestBase):
 # The following test will issue the modify and remove on different servers to
 # trigger confliction resolving.
 class ResourceConflictionTest(ClusterTestBase):
-    _testCase = 2
-
+    _testCase = clusterTest.testCaseSize
     _conflictList = []
     
     def setTestCase(self,num):
         self._testCase = num
 
     def setUp(self):
+        self._testCase = clusterTest.testCaseSize
         self._conflictList = [("removeResource","saveMediaServer",MediaServerConflictionDataGenerator()),
             ("removeResource","saveUser",UserConflictionDataGenerator()),
             ("removeResource","saveCameras",CameraConflictionDataGenerator())]
@@ -1125,6 +1261,8 @@ class PrepareServerStatus(BasicGenerator):
         if response.getcode() != 200 :
             return (False,"Cannot issue changeSystemName with HTTP code:%d" % (response.getcode()))
 
+        response.close()
+
         return (True,"")
 
     def _setSystemName(self,addr,name):
@@ -1204,6 +1342,8 @@ class MergeTest():
         if response.getcode() != 200 :
             return (False,"Cannot issue changeSystemName with HTTP code:%d" % (response.getcode()))
 
+        response.close()
+
         return (True,"")
 
     def _setToSameSystemName(self):
@@ -1251,6 +1391,7 @@ class PerformanceOperation():
         else:
             print "%s OK\r\n" % (methodName)
 
+        response.close()
 
     def _getUUIDList(self,methodName):
         response = urllib2.urlopen("http://%s/ec2/%s?format=json" % (clusterTest.clusterTestServerList[0],methodName))
@@ -1262,6 +1403,9 @@ class PerformanceOperation():
         ret = []
         for entry in json_obj:
             ret.append(entry["id"])
+
+        response.close()
+
         return ret
 
     def _sendOp(self,methodName,dataList):
@@ -1457,7 +1601,6 @@ class RRRtspTcp:
     def __exit__(self,type,value,trace):
         self._socket.close()
 
-
 class SingleServerRtspTest():
     _testCase = 0 
     """ The RTSP test case number """
@@ -1489,6 +1632,8 @@ class SingleServerRtspTest():
         for c in json_obj:
             self._cameraList.append((c["mac"],c["id"]))
             self._cameraInfoTable[c["id"]] = c
+
+        response.close()
         
     def _checkReply(self,reply):
         idx = reply.find("\r\n")
@@ -1588,6 +1733,12 @@ class CameraOperation(PerformanceOperation):
         self._removeAll(uuidList)
         return True
 
+def DoClearAll():
+    MediaServerOperation().removeAll();
+    UserOperation().removeAll();
+    MediaServerOperation().removeAll()
+
+
 def runPerformanceTest():
     if len(sys.argv) != 3 and len(sys.argv) != 2 :
         return (False,"2 or 1 parameters are needed")
@@ -1631,21 +1782,53 @@ def runPerformanceTest():
         return (False,"Unknown command:%s" % (l[0]))
 
     return True
+
+
+helpStr="Usage:\n" \
+    "--clear: Clear all the Cameras/MediaServers/Users on all the servers \n\n" \
+    "--sync: Test all the servers are on the same page or not \n\n" \
+    "--recover: Recover from last rollback failure \n\n" \
+    "--merge-test: Test server merge. The user needs to specify more than one server in the config file. \n\n" \
+    "--rtsp-test: Test the rtsp streaming. The user needs to specify section [Rtsp] in side of the config file and also " \
+    "testSize attribute in it , eg: \n[Rtsp]\ntestSize=100\n Which represent how many test case performed on EACH server.\n\n" \
+    "--add=Camera/MediaServer/User --count=num: Add a fake Camera/MediaServer/User to the server you sepcify in the list. The --count " \
+    "option MUST be specified , so a working example is like: --add=Camera --count=500 . This will add 500 cameras(fake) into "\
+    "the server.\n\n"\
+    "--remove=Camera/MediaServer/User (--id=id)*: Remove a Camera/MediaServer/User with id OR remove all the resources.The user can "\
+    "specify --id option to enable remove a single resource, eg : --remove=MediaServer --id={SomeGUID} , and --remove=MediaServer will remove " \
+    "all the media server.\nNote: --add/--remove will perform the corresponding operations on a random server in the server list if the server list "\
+    "have more than one server.\n\n" \
+    "If no parameter is specified, the default automatic test will performed, this includes modify the resource and then wait "\
+    "for all the server sync their status and also the confliction test as well.The user could specify testCaseSize in configuration file to set the "\
+    "test case number for each test class. Eg:\n[General]\ntestCaseSize=5\n, for each test class 5 random cases will be issued.Currently specify large number " \
+    "will make the test slow and sometimes cause 401 errors"
+
             
 if __name__ == '__main__':
-    # initialize cluster test environment
-    ret,reason = clusterTest.init()
-    if ret == False:
-        print "Failed to initialize the cluster test object:%s" % (reason)
+    if len(sys.argv) == 2 and sys.argv[1] == '--help':
+        print helpStr
+    elif len(sys.argv) == 2 and sys.argv[1] == '--recover':
+        UnitTestRollback().doRecover()
     else:
-        if len(sys.argv) == 1:
-            unittest.main()
+        # initialize cluster test environment
+        ret,reason = clusterTest.init()
+        if ret == False:
+            print "Failed to initialize the cluster test object:%s" % (reason)
+        elif len(sys.argv) == 2 and sys.argv[1] == '--sync':
+            pass # done here, since we just need to test whether 
+                 # all the servers are on the same page
         else:
-            if sys.argv[1] == '--merge-test':
-                MergeTest().test()
-            elif sys.argv[1] == '--rtsp-test':
-                ServerRtspTest().test()
+            if len(sys.argv) == 1:
+                unittest.main()
+                clusterTest.unittestRollback.DoRollback()
+            elif len(sys.argv) == 2 and sys.argv[1] == '--clear':
+                DoClearAll()
             else:
-                ret = runPerformanceTest()
-                if ret != True:
-                    print ret[1]
+                if sys.argv[1] == '--merge-test':
+                    MergeTest().test()
+                elif sys.argv[1] == '--rtsp-test':
+                    ServerRtspTest().test()
+                else:
+                    ret = runPerformanceTest()
+                    if ret != True:
+                        print ret[1]

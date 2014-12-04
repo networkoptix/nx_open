@@ -57,6 +57,10 @@ describe('Settings Page', function () {
         expect(p.changePasswordButton.isEnabled()).toBe(true);
     });
 
+    it("Change password: should check correction while changing both fields - password and confirmpassword",function(){
+        expect("test").toBe("written");
+    });
+
     it('Change password: should not allow change password without an old password', function () {
         p.setPassword('p12'); // send something to passwords
         p.setConfirmPassword('p12');
