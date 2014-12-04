@@ -302,23 +302,28 @@ int naturalStringCompare( const QString & lhs, const QString & rhs, Qt::CaseSens
         return 0;
 }
 
-bool naturalStringLessThan( const QString & lhs, const QString & rhs )
+bool naturalStringLessThan(const QString & lhs, const QString & rhs, bool enableFloat)
 {
-    return naturalStringCompare( lhs, rhs, Qt::CaseSensitive ) < 0;
+    return naturalStringCompare( lhs, rhs, Qt::CaseSensitive, enableFloat ) < 0;
 }
 
-bool naturalStringCaseInsensitiveLessThan( const QString & lhs, const QString & rhs )
+bool naturalStringCaseInsensitiveLessThan(const QString & lhs, const QString & rhs, bool enableFloat)
 {
-    return naturalStringCompare( lhs, rhs, Qt::CaseInsensitive ) < 0;
+    return naturalStringCompare( lhs, rhs, Qt::CaseInsensitive, enableFloat ) < 0;
 }
 
 QStringList naturalStringSort( const QStringList & list, Qt::CaseSensitivity caseSensitive )
 {
     QStringList retVal = list;
-    if ( caseSensitive == Qt::CaseSensitive )
-        qSort( retVal.begin(), retVal.end(), naturalStringLessThan );
-    else
-        qSort( retVal.begin(), retVal.end(), naturalStringCaseInsensitiveLessThan );
+    if ( caseSensitive == Qt::CaseSensitive ) {
+        qSort( retVal.begin(), retVal.end(), [](const QString &left, const QString &right) {
+            return naturalStringLessThan(left, right);
+        });
+    } else {
+        qSort( retVal.begin(), retVal.end(), [](const QString &left, const QString &right) {
+            return naturalStringCaseInsensitiveLessThan(left, right);
+        });
+    }
     return retVal;
 }
 

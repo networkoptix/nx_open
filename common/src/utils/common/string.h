@@ -60,8 +60,8 @@ QString formatFileSize(qint64 size, int precision = 1, int prefixThreshold = 1, 
 int naturalStringCompare(const QString &lhs, const QString &rhs, Qt::CaseSensitivity caseSensitive = Qt::CaseSensitive , bool enableFloat = true );
 QStringList naturalStringSort(const QStringList &list, Qt::CaseSensitivity caseSensitive = Qt::CaseSensitive);
 
-bool naturalStringLessThan(const QString &lhs, const QString &rhs);
-bool naturalStringCaseInsensitiveLessThan(const QString &lhs, const QString &rhs);
+bool naturalStringLessThan(const QString &lhs, const QString &rhs, bool enableFloat = true);
+bool naturalStringCaseInsensitiveLessThan(const QString &lhs, const QString &rhs, bool enableFloat = true);
 
 void naturalStringCompareTest();
 
