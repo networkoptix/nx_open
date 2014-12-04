@@ -57,7 +57,16 @@ void QnConnectToCurrentSystemTool::start(const QSet<QnUuid> &targets, const QStr
             m_targets.remove(id);
     }
 
-    configureServer();
+    emit progressChanged(0);
+    emit stateChanged(tr("Configuring server(s)"));
+
+    QnConfigurePeerTask *task = new QnConfigurePeerTask(this);
+    task->setUser(m_user);
+    task->setPassword(m_password);
+    m_currentTask = task;
+    connect(task, &QnNetworkPeerTask::finished, this, &QnConnectToCurrentSystemTool::at_configureTask_finished);
+
+    task->start(m_targets);
 }
 
 QSet<QnUuid> QnConnectToCurrentSystemTool::targets() const {
@@ -84,40 +93,7 @@ void QnConnectToCurrentSystemTool::cancel() {
 }
 
 void QnConnectToCurrentSystemTool::finish(ErrorCode errorCode) {
-    revertApiUrls();
     emit finished(errorCode);
-}
-
-void QnConnectToCurrentSystemTool::configureServer() {
-    emit progressChanged(0);
-    emit stateChanged(tr("Configuring server(s)"));
-
-    QnUserResourcePtr adminUser = qnResPool->getAdministrator();
-    if (!adminUser) {
-        finish(ConfigurationFailed);
-        return;
-    }
-
-    foreach (const QnUuid &id, m_targets) {
-        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
-        if (!server)
-            continue;
-
-        QUrl url = server->apiConnection()->url();
-        m_oldUrls.insert(id, url);
-        url.setScheme(lit("http")); // TODO: #dklychkov Fix a bug in QNetworkAccessManager and use https
-        url.setUserName(m_user);
-        url.setPassword(m_password);
-        server->apiConnection()->setUrl(url);
-    }
-
-    QnConfigurePeerTask *task = new QnConfigurePeerTask(this);
-    m_currentTask = task;
-
-    connect(task, &QnNetworkPeerTask::finished, this, &QnConnectToCurrentSystemTool::at_configureTask_finished);
-    task->setUser(m_user);
-    task->setPassword(m_password);
-    task->start(m_targets);
 }
 
 void QnConnectToCurrentSystemTool::waitPeers() {
@@ -147,20 +123,8 @@ void QnConnectToCurrentSystemTool::updatePeers() {
     m_updateTool->startUpdate(QnSoftwareVersion(), true);
 }
 
-void QnConnectToCurrentSystemTool::revertApiUrls() {
-    for (auto it = m_oldUrls.begin(); it != m_oldUrls.end(); ++it) {
-        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(it.key(), true).dynamicCast<QnMediaServerResource>();
-        if (!server)
-            continue;
-
-        server->apiConnection()->setUrl(it.value());
-    }
-    m_oldUrls.clear();
-}
-
 void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, const QSet<QnUuid> &failedPeers) {
     m_currentTask = 0;
-    revertApiUrls();
 
     if (errorCode != 0) {
         if (errorCode == QnConfigurePeerTask::AuthentificationFailed)

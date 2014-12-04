@@ -38,6 +38,7 @@ private:
 
     QSet<QnUuid> m_pendingPeers;
     QSet<QnUuid> m_failedPeers;
+    QHash<QnUuid, QnUuid> m_idByRealId;
 };
 
 #endif // CONFIGURE_PEER_TASK_H

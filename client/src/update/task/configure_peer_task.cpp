@@ -50,7 +50,13 @@ void QnConfigurePeerTask::doStart() {
             continue;
         }
 
-        QnRoute route = router->routeTo(id, qnCommon->remoteGUID());
+        QnUuid realId = QnUuid::fromStringSafe(server->getProperty(lit("guid")));
+        if (realId.isNull())
+            realId = id;
+
+        m_idByRealId[realId] = id;
+
+        QnRoute route = router->routeTo(realId, qnCommon->remoteGUID());
         if (!route.isValid()) {
             m_failedPeers.insert(id);
             continue;
@@ -75,7 +81,9 @@ void QnConfigurePeerTask::doStart() {
 }
 
 void QnConfigurePeerTask::at_mergeTool_mergeFinished(int errorCode, const QnModuleInformation &moduleInformation) {
-    if (m_pendingPeers.remove(moduleInformation.id))
+    QnUuid id = m_idByRealId.value(moduleInformation.id);
+
+    if (!m_pendingPeers.remove(id))
         return;
 
     if (errorCode != QnMergeSystemsTool::NoError) {
@@ -87,7 +95,7 @@ void QnConfigurePeerTask::at_mergeTool_mergeFinished(int errorCode, const QnModu
             m_error = UnknownError;
             break;
         }
-        m_failedPeers.insert(moduleInformation.id);
+        m_failedPeers.insert(id);
         return;
     }
 
