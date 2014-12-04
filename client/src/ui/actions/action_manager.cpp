@@ -70,9 +70,25 @@ public:
     }
 
     QnActionBuilder shortcut(const QKeySequence &shortcut) {
+        if (shortcut.isEmpty())
+            return *this;
+
         QList<QKeySequence> shortcuts = m_action->shortcuts();
         shortcuts.push_back(shortcut);
         m_action->setShortcuts(shortcuts);
+
+        return *this;
+    }
+
+    QnActionBuilder fallbackShortcut(const QKeySequence &shortcut) {
+        if (shortcut.isEmpty())
+            return *this;
+
+        QList<QKeySequence> shortcuts = m_action->shortcuts();
+        if (shortcuts.isEmpty()) {
+            shortcuts.push_back(shortcut);
+            m_action->setShortcuts(shortcuts);
+        }
 
         return *this;
     }
@@ -629,7 +645,8 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::CreateLayoutPermission).
         flags(Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey).
         text(tr("Save Current Layout As...")).
-        shortcut(tr("Ctrl+Alt+S")).
+        shortcut(QKeySequence(QKeySequence::SaveAs)).
+        fallbackShortcut(tr("Ctrl+Alt+S")).
         autoRepeat(false).
         condition(new QnSaveLayoutAsActionCondition(true, this));
 

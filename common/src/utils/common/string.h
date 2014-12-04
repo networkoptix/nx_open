@@ -38,6 +38,14 @@ inline QString replaceNonFileNameCharacters(const QString &string, const QChar &
 }
 
 /**
+ * \param dt                            dateTime
+ * \returns                             Return string dateTime suggestion for saving dialogs
+ */
+inline QString datetimeSaveDialogSuggestion(const QDateTime& dt) {
+    return dt.toString(lit("yyyy-MMM-dd_hh.mm.ss"));
+}
+
+/**
  * \param size                          File size to format. Can be negative.
  * \param precision                     Maximal number of decimal digits after comma.
  * \param prefixThreshold               
