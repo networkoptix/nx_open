@@ -42,10 +42,8 @@ signals:
 
 private:
     void finish(ErrorCode errorCode);
-    void configureServer();
     void waitPeers();
     void updatePeers();
-    void revertApiUrls();
 
 private slots:
     void at_configureTask_finished(int errorCode, const QSet<QnUuid> &failedPeers);
@@ -60,7 +58,6 @@ private:
 
     QSet<QnUuid> m_restartTargets;
     QSet<QnUuid> m_updateTargets;
-    QHash<QnUuid, QUrl> m_oldUrls;
     QHash<QnUuid, QnUuid> m_waitTargets;
     QPointer<QnNetworkPeerTask> m_currentTask;
     QPointer<QnMediaServerUpdateTool> m_updateTool;

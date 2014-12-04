@@ -15,7 +15,8 @@
 
 QnWorkbenchUserWatcher::QnWorkbenchUserWatcher(QObject *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(parent),
+    m_reconnectOnPasswordChange(true)
 {
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::initialResourcesReceived,    this,   [this] {       
         for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>()) {
@@ -72,6 +73,12 @@ void QnWorkbenchUserWatcher::setUserPassword(const QString &password) {
     m_userPasswordHash = QByteArray(); //hash will be recalculated
 }
 
+void QnWorkbenchUserWatcher::setReconnectOnPasswordChange(bool reconnect) {
+    m_reconnectOnPasswordChange = reconnect;
+    if (reconnect && m_user && isReconnectRequired(m_user))
+        emit reconnectRequired();
+}
+
 void QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
     QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
     if(!user || user != m_user)
@@ -85,6 +92,9 @@ bool QnWorkbenchUserWatcher::isReconnectRequired(const QnUserResourcePtr &user) 
 
     if (user->getName().toLower() != m_userName.toLower())
         return true;
+
+    if (!m_reconnectOnPasswordChange)
+        return false;
 
     if (m_userPassword.isEmpty())
         return m_userPasswordHash != user->getHash();

@@ -20,6 +20,7 @@
 #include "utils/network/module_finder.h"
 #include "utils/network/direct_module_finder.h"
 #include "utils/common/app_info.h"
+#include "utils/common/model_functions.h"
 
 namespace {
     ec2::AbstractECConnectionPtr ec2Connection() { return QnAppServerConnectionFactory::getConnection2(); }
@@ -35,6 +36,9 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
     QString password = params.value(lit("password"));
     QString currentPassword = params.value(lit("currentPassword"));
     bool takeRemoteSettings = params.value(lit("takeRemoteSettings"), lit("false")) != lit("false");
+    bool mergeOneServer = params.value(lit("oneServer"), lit("false")) != lit("false");
+    if (mergeOneServer)
+        takeRemoteSettings = false;
 
     if (url.isEmpty()) {
         result.setError(QnJsonRestResult::MissingParameter);
@@ -122,15 +126,13 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
             result.setError(QnJsonRestResult::CantProcessRequest, lit("CONFIGURATION_ERROR"));
             return nx_http::StatusCode::ok;
         }
-
-        return nx_http::StatusCode::ok;
     } else {
         if (!admin) {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("INTERNAL_ERROR"));
             return nx_http::StatusCode::ok;
         }
 
-        if (!applyCurrentSettings(url, user, password, currentPassword, admin)) {
+        if (!applyCurrentSettings(url, user, password, currentPassword, admin, mergeOneServer)) {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("CONFIGURATION_ERROR"));
             return nx_http::StatusCode::ok;
         }
@@ -157,32 +159,39 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
     return nx_http::StatusCode::ok;
 }
 
-bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, const QString &user, const QString &password, const QString &currentPassword, const QnUserResourcePtr &admin) {
-    QUrl ecUrl = remoteUrl;
-    ecUrl.setUserName(user);
+bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, const QString &user, const QString &password, const QString &currentPassword, const QnUserResourcePtr &admin, bool oneServer) {
+    QAuthenticator authenticator;
+    authenticator.setUser(user);
+    authenticator.setPassword(password);
 
-    {   /* Save current admin inside the remote system */
-        ecUrl.setPassword(password);
-        ec2::AbstractECConnectionPtr ec2Connection;
-        ec2::ErrorCode errorCode = QnAppServerConnectionFactory::ec2ConnectionFactory()->connectSync(ecUrl, &ec2Connection);
-        if (errorCode != ec2::ErrorCode::ok)
-            return false;
-
-        QnUserResourceList savedUsers;
-        errorCode = ec2Connection->getUserManager()->saveSync(admin, &savedUsers);
-        if (errorCode != ec2::ErrorCode::ok)
+    /* Change system name of the selected server */
+    if (oneServer) {
+        CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
+        CLHttpStatus status = client.doGET(lit("/api/configure?systemName=%1").arg(qnCommon->localSystemName()));
+        if (status != CLHttpStatus::CL_HTTP_SUCCESS)
             return false;
     }
 
-    {   /* Change system name of the remote system */
-        ecUrl.setPassword(currentPassword);
-        ec2::AbstractECConnectionPtr ec2Connection;
-        ec2::ErrorCode errorCode = QnAppServerConnectionFactory::ec2ConnectionFactory()->connectSync(ecUrl, &ec2Connection);
-        if (errorCode != ec2::ErrorCode::ok)
-            return false;
+    {   /* Save current admin inside the remote system */
+        CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
 
-        errorCode = ec2Connection->getMiscManager()->changeSystemNameSync(qnCommon->localSystemName());
-        if (errorCode != ec2::ErrorCode::ok)
+        ec2::ApiUserData userData;
+        ec2::fromResourceToApi(admin, userData);
+        QByteArray data = QJson::serialized(userData);
+
+        client.addHeader("Content-Type", "application/json");
+        CLHttpStatus status = client.doPOST(lit("/ec2/saveUser"), data);
+
+        if (status != CLHttpStatus::CL_HTTP_SUCCESS)
+            return false;
+    }
+
+    /* Change system name of the remote system */
+    if (!oneServer) {
+        authenticator.setPassword(currentPassword);
+        CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
+        CLHttpStatus status = client.doGET(lit("/api/configure?systemName=%1&wholeSystem=true").arg(qnCommon->localSystemName()));
+        if (status != CLHttpStatus::CL_HTTP_SUCCESS)
             return false;
     }
 
@@ -190,33 +199,46 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, cons
 }
 
 bool QnMergeSystemsRestHandler::applyRemoteSettings(const QUrl &remoteUrl, const QString &systemName, const QString &user, const QString &password, QnUserResourcePtr &admin) {
-    ec2::ErrorCode errorCode;
-
-    QnUserResourceList users;
     {   /* Read admin user from the remote server */
-        QUrl ecUrl = remoteUrl;
-        ecUrl.setUserName(user);
-        ecUrl.setPassword(password);
+        QAuthenticator authenticator;
+        authenticator.setUser(user);
+        authenticator.setPassword(password);
 
-        ec2::AbstractECConnectionPtr ec2Connection;
-        errorCode = QnAppServerConnectionFactory::ec2ConnectionFactory()->connectSync(ecUrl, &ec2Connection);
-        if (errorCode != ec2::ErrorCode::ok)
+        CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
+        CLHttpStatus status = client.doGET(lit("/ec2/getUsers"));
+        if (status != CLHttpStatus::CL_HTTP_SUCCESS)
             return false;
 
-        errorCode = ec2Connection->getUserManager()->getUsersSync(admin->getId(), &users);
-        if (errorCode != ec2::ErrorCode::ok || users.size() != 1)
+        QByteArray data;
+        client.readAll(data);
+
+        ec2::ApiUserDataList users;
+        QJson::deserialize(data, &users);
+
+        QnUserResourcePtr userResource = QnUserResourcePtr(new QnUserResource());
+        for (const ec2::ApiUserData &userData: users) {
+            if (userData.id == admin->getId()) {
+                ec2::fromApiToResource(userData, userResource);
+                break;
+            }
+        }
+        if (userResource->getId() != admin->getId())
             return false;
+
+        admin->update(userResource);
     }
 
-    admin->update(users.first());
-    errorCode = QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(users.first(), &users);
+    ec2::ErrorCode errorCode;
+    QnUserResourceList users;
+
+    errorCode = ec2Connection()->getUserManager()->saveSync(admin, &users);
     if (errorCode != ec2::ErrorCode::ok)
         return false;
 
     if (!changeSystemName(systemName))
         return false;
 
-    errorCode = QnAppServerConnectionFactory::getConnection2()->getMiscManager()->changeSystemNameSync(systemName);
+    errorCode = ec2Connection()->getMiscManager()->changeSystemNameSync(systemName);
     if (errorCode != ec2::ErrorCode::ok)
         return false;
 

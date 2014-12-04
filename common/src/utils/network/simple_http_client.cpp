@@ -134,7 +134,8 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
 
         addExtraHeaders(request);
 
-        request.append("Content-Type: application/x-www-form-urlencoded\r\n");
+        if (!m_header.contains("Content-Type"))
+            request.append("Content-Type: application/x-www-form-urlencoded\r\n");
 
         if (m_auth.user().length()>0 && mNonce.isEmpty())
         {
