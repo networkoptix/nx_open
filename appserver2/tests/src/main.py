@@ -11,12 +11,94 @@ import string
 import sys
 import Queue
 import socket
+import os.path
+
+
+# Rollback support
+class UnitTestRollback:
+    _rollbackFile=None
+    _removeTemplate = """
+        {
+            "id":"%s"
+        }
+    """
+
+    def __init__(self):
+        # Check if this file is existed, if so we do the rollback automatically
+        if os.path.isfile(".rollback"):
+            self._rollbackFile = open(".rollback","r")
+            self.doRollback()
+
+        self._rollbackFile = open(".rollback","w+")
+
+    def addOperations(self,methodName,serverAddress,resourceId):
+        self._rollbackFile.write(("%s,%s,%s\n")%(methodName,serverAddress,resourceId))
+        self._rollbackFile.flush()
+
+    def _doSingleRollback(self,methodName,serverAddress,resourceId):
+        # this function will do a single rollback
+        req = urllib2.Request("http://%s/ec2/%s" % (serverAddress,"removeResource"), \
+            data=self._removeTemplate%(resourceId), headers={'Content-Type': 'application/json'})
+        response = None
+        try:
+            response = urllib2.urlopen(req)
+        except:
+            return False
+
+        if response.getcode() != 200:
+            response.close()
+            return False
+
+        print response.read()
+
+        response.close()
+        return True
+
+    def doRollback(self):
+        recoverList = []
+        failed = False
+        # set the cursor for the file to the file beg
+        self._rollbackFile.seek(0,0);
+        for line in self._rollbackFile:
+            if line == '\n':
+                continue
+            # python will left the last line break character there
+            # so we need to wipe it out if we find one there
+            l = line.split(',')
+            if l[2][len(l[2])-1] == "\n" :
+                l[2] = l[2][:-1] # remove last character
+            # now we have method,serverAddress,resourceId
+            if self._doSingleRollback(l[0],l[1],l[2]) == False:
+                failed = True
+                # failed for this rollback
+                print ("Cannot rollback for transaction:(MethodName:%s;ServerAddress:%s;ResourceId:%s\n)")% (l[0],l[1],l[2])
+                print  "Or you could run recover later when all the rollback done\n"
+                recoverList.append("%s,%s,%s"%(l[0],l[1],l[2]))
+
+        # close the resource file
+        self._rollbackFile.close()
+        os.remove(".rollback")
+
+        if failed:
+            recoverFile = open(".rollback","w+")
+            for line in recoverList:
+                recoverFile.write(line)
+            recoverFile.close()
+
+    def doRecover(self):
+        if not os.path.isfile(".rollback") :
+            print "Nothing needs to be recovered"
+            return
+        # Do the rollback here
+        self._rollbackFile = open(".rollback","r")
+        self.doRollback()
 
 class ClusterTest():
     clusterTestServerList = []
     clusterTestSleepTime = None
     clusterTestServerUUIDList = []
     testCaseSize = 2
+    unittestRollback = None
 
     _getterAPIList = ["getResourceTypes",
         "getResourceParams",
@@ -35,6 +117,9 @@ class ClusterTest():
         "getSettings",
         "getFullInfo",
         "getLicenses"]
+
+    def __init__(self):
+        self._setUpPassword()
 
     def _getServerName(self,obj,uuid):
         for s in obj:
@@ -125,7 +210,8 @@ class ClusterTest():
 
         return (parser.get("General","password"),parser.get("General","username"))
 
-    def init(self):
+
+    def _setUpPassword(self):
         pwd,un = self._loadConfig()
         # configure different domain password strategy
         passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
@@ -133,6 +219,7 @@ class ClusterTest():
             passman.add_password("NetworkOptix","http://%s/ec2/" % (s), un, pwd)
         urllib2.install_opener(urllib2.build_opener(urllib2.HTTPDigestAuthHandler(passman)))
 
+    def init(self):
         # ensure all the server are on the same page
         ret,reason = self._ensureServerListStates(self.clusterTestSleepTime)
 
@@ -144,7 +231,11 @@ class ClusterTest():
         if ret == False:
             return (ret,reason)
 
+        # do the rollback here
+        self.unittestRollback = UnitTestRollback()
         return (True,"")
+
+
 
 clusterTest = ClusterTest()
 
@@ -290,7 +381,7 @@ class CameraDataGenerator(BasicGenerator):
             mac = self.generateMac()
             id = self._generateCameraId(mac)
             name_and_model = self.generateRandomString(6)
-            ret.append(self._template % (self.generateTrueFalse(),
+            ret.append((self._template % (self.generateTrueFalse(),
                     self.generateTrueFalse(),
                     id,
                     mac,
@@ -298,7 +389,7 @@ class CameraDataGenerator(BasicGenerator):
                     name_and_model,
                     mac,
                     self.generateIpV4(),
-                    self.generateRandomString(4)))
+                    self.generateRandomString(4)),id))
 
         return ret
 
@@ -321,12 +412,12 @@ class UserDataGenerator(BasicGenerator):
     def generateUserData(self,number):
         ret = []
         for i in range(number):
+            id = self.generateRandomId()
             un,pwd,digest = self.generateUsernamePasswordAndDigest()
-            ret.append(self._template % (digest,
+            ret.append((self._template % (digest,
                 self.generateEmail(),
                 self.generatePasswordHash(pwd),
-                self.generateRandomId(),
-                un))
+                id,un),id))
 
         return ret
 
@@ -355,12 +446,13 @@ class MediaServerGenerator(BasicGenerator):
     def generateMediaServerData(self,number):
         ret = []
         for i in range(number):
-            ret.append(self._template % (self.generateIpV4Endpoint(),
+            id = self.generateRandomId()
+            ret.append((self._template % (self.generateIpV4Endpoint(),
                    self.generateRandomId(),
-                   self.generateRandomId(),
+                   id,
                    self._generateRandomName(),
                    self._generateRandomName(),
-                   self.generateIpV4Endpoint()))
+                   self.generateIpV4Endpoint()),id))
 
         return ret
 
@@ -498,7 +590,7 @@ class CameraConflictionDataGenerator(BasicGenerator):
     _removeTemplate = \
         """
         {
-            id="%s"
+            "id":"%s"
         }
         """
 
@@ -560,7 +652,7 @@ class UserConflictionDataGenerator(BasicGenerator):
 
     _removeTemplate = """
         {
-            id="%s"
+            "id":"%s"
         }
     """
 
@@ -627,7 +719,7 @@ class MediaServerConflictionDataGenerator(BasicGenerator):
 
     _removeTemplate = """
         {
-            id="%s"
+            "id":"%s"
         }
     """
 
@@ -828,6 +920,16 @@ class ClusterTestBase(unittest.TestCase):
             ret.append((f,clusterTest.clusterTestServerList[random.randint(0,len(clusterTest.clusterTestServerList) - 1)]))
         return ret
 
+    def _defaultCreateSeq(self,fakeData):
+        ret = []
+        for f in fakeData:
+            serverName = clusterTest.clusterTestServerList[random.randint(0,len(clusterTest.clusterTestServerList)-1)]
+            # add rollback cluster operations
+            clusterTest.unittestRollback.addOperations(self._getMethodName(),serverName,f[1])
+            ret.append((f[0],serverName))
+
+        return ret
+
     def _dumpFailedRequest(self,data,methodName):
         f = open("%s.failed.%.json" % (methodName,threading.active_count()),"w")
         f.write(data)
@@ -886,7 +988,9 @@ class CameraTest(ClusterTestBase):
     
     
     def _generateModifySeq(self):
-        return self._defaultModifySeq(self._gen.generateCameraData(self._testCase))
+        dataList,idList = self._gen.generateCameraData(self._testCase)
+
+        return self._defaultCreateSeq(self._gen.generateCameraData(self._testCase))
 
     def _getMethodName(self):
         return "saveCameras"
@@ -907,7 +1011,7 @@ class UserTest(ClusterTestBase):
         self._gen = UserDataGenerator()
 
     def _generateModifySeq(self):
-        return self._defaultModifySeq(self._gen.generateUserData(self._testCase))
+        return self._defaultCreateSeq(self._gen.generateUserData(self._testCase))
 
     def _getMethodName(self):
         return "saveUser"
@@ -928,7 +1032,7 @@ class MediaServerTest(ClusterTestBase):
         self._gen = MediaServerGenerator()
 
     def _generateModifySeq(self):
-        return self._defaultModifySeq(self._gen.generateMediaServerData(self._testCase))
+        return self._defaultCreateSeq(self._gen.generateMediaServerData(self._testCase))
 
     def _getMethodName(self):
         return "saveMediaServer"
@@ -1497,7 +1601,6 @@ class RRRtspTcp:
     def __exit__(self,type,value,trace):
         self._socket.close()
 
-
 class SingleServerRtspTest():
     _testCase = 0 
     """ The RTSP test case number """
@@ -1630,6 +1733,12 @@ class CameraOperation(PerformanceOperation):
         self._removeAll(uuidList)
         return True
 
+def DoClearAll():
+    MediaServerOperation().removeAll();
+    UserOperation().removeAll();
+    MediaServerOperation().removeAll()
+
+
 def runPerformanceTest():
     if len(sys.argv) != 3 and len(sys.argv) != 2 :
         return (False,"2 or 1 parameters are needed")
@@ -1676,6 +1785,9 @@ def runPerformanceTest():
 
 
 helpStr="Usage:\n" \
+    "--clear: Clear all the Cameras/MediaServers/Users on all the servers \n\n" \
+    "--sync: Test all the servers are on the same page or not \n\n" \
+    "--recover: Recover from last rollback failure \n\n" \
     "--merge-test: Test server merge. The user needs to specify more than one server in the config file. \n\n" \
     "--rtsp-test: Test the rtsp streaming. The user needs to specify section [Rtsp] in side of the config file and also " \
     "testSize attribute in it , eg: \n[Rtsp]\ntestSize=100\n Which represent how many test case performed on EACH server.\n\n" \
@@ -1695,14 +1807,22 @@ helpStr="Usage:\n" \
 if __name__ == '__main__':
     if len(sys.argv) == 2 and sys.argv[1] == '--help':
         print helpStr
+    elif len(sys.argv) == 2 and sys.argv[1] == '--recover':
+        UnitTestRollback().doRecover()
     else:
         # initialize cluster test environment
         ret,reason = clusterTest.init()
         if ret == False:
             print "Failed to initialize the cluster test object:%s" % (reason)
+        elif len(sys.argv) == 2 and sys.argv[1] == '--sync':
+            pass # done here, since we just need to test whether 
+                 # all the servers are on the same page
         else:
             if len(sys.argv) == 1:
                 unittest.main()
+                clusterTest.unittestRollback.DoRollback()
+            elif len(sys.argv) == 2 and sys.argv[1] == '--clear':
+                DoClearAll()
             else:
                 if sys.argv[1] == '--merge-test':
                     MergeTest().test()
