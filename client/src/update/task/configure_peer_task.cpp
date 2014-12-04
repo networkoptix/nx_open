@@ -56,11 +56,15 @@ void QnConfigurePeerTask::doStart() {
 
         m_idByRealId[realId] = id;
 
+        /* Find the server to call marge and URL of the peer to be merged.
+           We need to guarantee the route will go through a server from our system.
+           For that we build route via our EC */
         QnRoute route = router->routeTo(realId, qnCommon->remoteGUID());
         if (!route.isValid()) {
             m_failedPeers.insert(id);
             continue;
         }
+        /* Route will always has at least two points: EC and target */
         QnMediaServerResourcePtr proxy = qnResPool->getResourceById(route.points[route.points.size() - 2].peerId).dynamicCast<QnMediaServerResource>();
         if (!proxy) {
             m_failedPeers.insert(id);
