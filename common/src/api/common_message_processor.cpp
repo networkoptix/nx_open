@@ -388,7 +388,7 @@ void QnCommonMessageProcessor::resetPropertyList(const ec2::ApiResourceParamWith
 }
 
 void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataList& params) {
-    qnStatusDictionary->clear();
+    /* Dictionary should not be cleared or we will not receive 'Offline' notification. */
     for(const ec2::ApiResourceStatusData& statusData: params)
         on_resourceStatusChanged(statusData.id , statusData.status);
 }
@@ -436,17 +436,7 @@ QMap<QnUuid, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() c
     return m_rules;
 }
 
-void QnCommonMessageProcessor::updateResource(const QnResourcePtr &resource) 
-{
-#if 0
-    if (dynamic_cast<const QnMediaServerResource*>(resource.data()))
-    {
-        if (QnRuntimeInfoManager::instance()->hasItem(resource->getId()))
-            resource->setStatus(Qn::Online);
-        else
-            resource->setStatus(Qn::Offline);
-    }
-#endif
+void QnCommonMessageProcessor::updateResource(const QnResourcePtr &resource) {
     if (resource->getId() == qnCommon->moduleGUID()) {
         QnModuleInformation moduleInformation = qnCommon->moduleInformation();
         moduleInformation.name = resource->getName();
