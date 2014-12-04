@@ -83,7 +83,9 @@ void QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr
     QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
     if(!user || user != m_user)
         return;
-    setCurrentUser(QnUserResourcePtr()); /* Assume there are no users with duplicate names. */
+
+    setCurrentUser(QnUserResourcePtr());
+    menu()->trigger(Qn::DisconnectAction, QnActionParameters().withArgument(Qn::ForceRole, true));
 }
 
 bool QnWorkbenchUserWatcher::isReconnectRequired(const QnUserResourcePtr &user) {
