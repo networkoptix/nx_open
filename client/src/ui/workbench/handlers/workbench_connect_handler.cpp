@@ -91,7 +91,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /*= 0*/):
         if(!watcher->hasMismatches())
             return;
 
-        if (!(accessController()->globalPermissions(context()->user()) & Qn::GlobalProtectedPermission))
+        if (!accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission))
             return;
 
         menu()->trigger(Qn::VersionMismatchMessageAction);
