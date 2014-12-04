@@ -35,9 +35,9 @@ public:
 
     void updateItem(const QnUuid &itemUuid, const QnLayoutItemData &item);
 
-    qreal cellAspectRatio() const;
+    float cellAspectRatio() const;
 
-    void setCellAspectRatio(qreal cellAspectRatio);
+    void setCellAspectRatio(float cellAspectRatio);
 
     bool hasCellAspectRatio() const;
 
@@ -105,7 +105,7 @@ private:
 
 private:
     QnLayoutItemDataMap m_itemByUuid;
-    qreal m_cellAspectRatio;
+    float m_cellAspectRatio;
     QSizeF m_cellSpacing;
     QHash<int, QVariant> m_dataByRole;
     QnTimePeriod m_localRange;

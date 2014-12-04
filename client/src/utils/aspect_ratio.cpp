@@ -20,8 +20,8 @@ QnAspectRatio::QnAspectRatio(int width, int height) :
     m_height(height)
 {}
 
-qreal QnAspectRatio::toReal() const {
-    return static_cast<qreal>(m_width) / m_height;
+float QnAspectRatio::toFloat() const {
+    return static_cast<float>(m_width) / m_height;
 }
 
 QString QnAspectRatio::toString() const {
@@ -32,12 +32,12 @@ QList<QnAspectRatio> QnAspectRatio::standardRatios() {
     return ::standardRatios;
 }
 
-QnAspectRatio QnAspectRatio::closestStandardRatio(qreal aspectRatio) {
+QnAspectRatio QnAspectRatio::closestStandardRatio(float aspectRatio) {
     QnAspectRatio closest = ::standardRatios.first();
-    qreal diff = qAbs(aspectRatio - ::standardRatios.first().toReal());
+    qreal diff = qAbs(aspectRatio - ::standardRatios.first().toFloat());
 
     foreach (const QnAspectRatio &ratio, ::standardRatios) {
-        qreal d = qAbs(aspectRatio - ratio.toReal());
+        qreal d = qAbs(aspectRatio - ratio.toFloat());
         if (d < diff) {
             diff = d;
             closest = ratio;
@@ -56,7 +56,7 @@ bool QnAspectRatio::isRotated90(qreal angle) {
 Qn::ActionId QnAspectRatio::aspectRatioActionId(const QnAspectRatio &aspectRatio) {
     int index = ::standardRatios.indexOf(aspectRatio);
     if (index == -1)
-        index = ::standardRatios.indexOf(closestStandardRatio(aspectRatio.toReal()));
+        index = ::standardRatios.indexOf(closestStandardRatio(aspectRatio.toFloat()));
     return ratioActions[index];
 }
 

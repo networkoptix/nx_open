@@ -10,11 +10,11 @@ class QnAspectRatio
 public:
     QnAspectRatio(int width = 1, int height = 1);
 
-    qreal toReal() const;
+    float toFloat() const;
     QString toString() const;
 
     static QList<QnAspectRatio> standardRatios();
-    static QnAspectRatio closestStandardRatio(qreal aspectRatio);
+    static QnAspectRatio closestStandardRatio(float aspectRatio);
 
     static bool isRotated90(qreal angle);
     static Qn::ActionId aspectRatioActionId(const QnAspectRatio &aspectRatio);

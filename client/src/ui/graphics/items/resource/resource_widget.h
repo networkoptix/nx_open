@@ -147,11 +147,11 @@ public:
      *                                  Negative value will be returned if this
      *                                  widget does not have aspect ratio.
      */
-    qreal aspectRatio() const {
+    float aspectRatio() const {
         return m_aspectRatio;
     }
 
-    void setAspectRatio(qreal aspectRatio);
+    void setAspectRatio(float aspectRatio);
 
     /**
      * \returns                         Whether this widget has an aspect ratio.
@@ -340,7 +340,7 @@ protected:
 
     Q_SLOT virtual void at_itemDataChanged(int role);
 
-    qreal defaultAspectRatio() const;
+    float defaultAspectRatio() const;
 private:
     void setTitleTextInternal(const QString &titleText);
     void setInfoTextInternal(const QString &infoText);
@@ -371,7 +371,7 @@ private:
     QnConstResourceVideoLayoutPtr m_channelsLayout;
 
     /** Aspect ratio. Negative value means that aspect ratio is not enforced. */
-    qreal m_aspectRatio;
+    float m_aspectRatio;
 
     /** Virtual enclosing rectangle. */
     QRectF m_enclosingGeometry;
