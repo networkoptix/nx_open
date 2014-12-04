@@ -771,7 +771,7 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
         if (count > 0) {
             midAspectRatio /= count;
             QnAspectRatio cellAspectRatio = QnAspectRatio::closestStandardRatio(midAspectRatio);
-            layout->setCellAspectRatio(cellAspectRatio.toReal());
+            layout->setCellAspectRatio(cellAspectRatio.toFloat());
         } else if (workbenchLayout->items().size() > 1) {
             layout->setCellAspectRatio(qnGlobals->defaultLayoutCellAspectRatio());
         }

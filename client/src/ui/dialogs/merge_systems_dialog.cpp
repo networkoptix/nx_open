@@ -15,6 +15,7 @@
 
 QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
     QDialog(parent),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::QnMergeSystemsDialog),
     m_mergeTool(new QnMergeSystemsTool(this))
 {

@@ -78,7 +78,7 @@ void QnNetworkResource::setMAC(const QnMacAddress &mac)
     QMutexLocker mutexLocker(&m_mutex);
     m_macAddress = mac;
 
-    if (m_physicalId.isEmpty())
+    if (m_physicalId.isEmpty() && !mac.isNull())
         m_physicalId = mac.toString();
 }
 

@@ -141,6 +141,7 @@ void QnCheckForUpdatesPeerTask::checkOnlineUpdates() {
     m_releaseNotesUrl.clear();
 
     m_targetMustBeNewer = m_target.version.isNull();
+    m_checkLatestVersion = m_target.version.isNull();
 
     nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
     httpClient->setResponseReadTimeoutMs(httpResponseTimeoutMs);
@@ -197,10 +198,9 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply *
     }
 
 
-    if (m_target.version.isNull()) {
+    if (m_target.version.isNull())
         m_target.version = latestVersion;
-        m_checkLatestVersion = true;
-    }
+
     m_updateLocationPrefix = updatesPrefix;
     m_releaseNotesUrl = QUrl(map.value(lit("release_notes")).toString());
 

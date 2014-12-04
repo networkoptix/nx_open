@@ -95,7 +95,7 @@ bool QnResourceSearchProxyModel::lessThan(const QModelIndex &left, const QModelI
     if( leftData.type() == QVariant::String && rightData.type() == QVariant::String ) {
         QString ls = leftData.toString();
         QString rs = rightData.toString();
-        return naturalStringCompare(ls,rs,Qt::CaseInsensitive,false) >0;
+        return naturalStringCaseInsensitiveLessThan(ls, rs, false);
     } else {
         // Throw the rest situation to base class to handle 
         return QSortFilterProxyModel::lessThan(left,right);

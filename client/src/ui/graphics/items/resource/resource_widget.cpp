@@ -68,7 +68,7 @@ namespace {
 
     const QColor overlayTextColor = QColor(255, 255, 255, 160); // TODO: #Elric #customization
 
-    const qreal noAspectRatio = -1.0;
+    const float noAspectRatio = -1.0;
 
     //Q_GLOBAL_STATIC(QnDefaultResourceVideoLayout, qn_resourceWidget_defaultContentLayout);
     QSharedPointer<QnDefaultResourceVideoLayout> qn_resourceWidget_defaultContentLayout( new QnDefaultResourceVideoLayout() ); // TODO: #Elric get rid of this
@@ -326,7 +326,7 @@ void QnResourceWidget::setFrameColors(const QnResourceWidgetFrameColors &frameCo
     m_frameColors = frameColors;
 }
 
-void QnResourceWidget::setAspectRatio(qreal aspectRatio) {
+void QnResourceWidget::setAspectRatio(float aspectRatio) {
     if(qFuzzyCompare(m_aspectRatio, aspectRatio))
         return;
 
@@ -808,7 +808,7 @@ void QnResourceWidget::paintSelection(QPainter *painter, const QRectF &rect) {
     painter->fillRect(rect, palette().color(QPalette::Highlight));
 }
 
-qreal QnResourceWidget::defaultAspectRatio() const {
+float QnResourceWidget::defaultAspectRatio() const {
     if (item())
         return item()->data(Qn::ItemAspectRatioRole, noAspectRatio);
     return noAspectRatio;

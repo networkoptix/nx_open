@@ -7,7 +7,7 @@ QnAbstractArchiveResource::QnAbstractArchiveResource()
     QnMediaResource::initMediaResource();
 
     addFlags(Qn::ARCHIVE);
-    setStatus(Qn::Online, true);
+    m_localStatus = Qn::Online;
 }
 
 QnAbstractArchiveResource::~QnAbstractArchiveResource()
@@ -23,13 +23,6 @@ QString QnAbstractArchiveResource::getUniqueId() const
 void QnAbstractArchiveResource::setUniqId(const QString& value)
 {
     setUrl(value);
-}
-
-
-void QnAbstractArchiveResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
-{
-    QnResource::setStatus(newStatus, silenceMode);
-    return;
 }
 
 const QnResource* QnAbstractArchiveResource::toResource() const
@@ -57,5 +50,16 @@ void QnAbstractArchiveResource::updateInner(const QnResourcePtr &other, QSet<QBy
     QnResource::updateInner(other, modifiedFields);
     QnMediaResource::updateInner(other, modifiedFields);
 }
+
+Qn::ResourceStatus QnAbstractArchiveResource::getStatus() const
+{
+    return m_localStatus;
+}
+
+void QnAbstractArchiveResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
+{
+    m_localStatus = newStatus;
+}
+
 
 #endif // ENABLE_ARCHIVE

@@ -387,8 +387,15 @@ void QnCommonMessageProcessor::resetPropertyList(const ec2::ApiResourceParamWith
     }
 }
 
-void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataList& params) {
+void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataList& params) 
+{
+    auto keys = qnStatusDictionary->values().keys();
     qnStatusDictionary->clear();
+    for(const QnUuid& id: keys) {
+        if (QnResourcePtr resource = qnResPool->getResourceById(id))
+            emit resource->statusChanged(resource);
+    }
+
     for(const ec2::ApiResourceStatusData& statusData: params)
         on_resourceStatusChanged(statusData.id , statusData.status);
 }
@@ -436,17 +443,7 @@ QMap<QnUuid, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() c
     return m_rules;
 }
 
-void QnCommonMessageProcessor::updateResource(const QnResourcePtr &resource) 
-{
-#if 0
-    if (dynamic_cast<const QnMediaServerResource*>(resource.data()))
-    {
-        if (QnRuntimeInfoManager::instance()->hasItem(resource->getId()))
-            resource->setStatus(Qn::Online);
-        else
-            resource->setStatus(Qn::Offline);
-    }
-#endif
+void QnCommonMessageProcessor::updateResource(const QnResourcePtr &resource) {
     if (resource->getId() == qnCommon->moduleGUID()) {
         QnModuleInformation moduleInformation = qnCommon->moduleInformation();
         moduleInformation.name = resource->getName();

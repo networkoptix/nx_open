@@ -100,15 +100,19 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
             QString olderComponent = connectionInfo.nxClusterProtoVersion < nx_ec::EC2_PROTO_VERSION
                 ? tr("Server")
                 : tr("Client");
+            QString message = tr("You are about to connect to Server which has a different version:\n"
+                " - Client version: %1.\n"
+                " - Server version: %2.\n"
+                "These versions are not compatible. Please update your %3"
+                ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()).arg(olderComponent);
+#ifdef _DEBUG
+            message += lit("\nClient Proto: %1\nServer Proto: %2").arg(nx_ec::EC2_PROTO_VERSION).arg(connectionInfo.nxClusterProtoVersion);
+#endif
             QnMessageBox::warning(
                 parentWidget,
                 Qn::VersionMismatch_Help,
                 tr("Could not connect to Server"),
-                tr("You are about to connect to Server which has a different version:\n"
-                " - Client version: %1.\n"
-                " - Server version: %2.\n"
-                "These versions are not compatible. Please update your %3"
-                ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()).arg(olderComponent),
+                message,
                 QMessageBox::Ok
                 );
             return Result::Failure;

@@ -110,12 +110,6 @@ void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data)
         return;
     }
 
-    /*
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(data.peer.id).staticCast<QnMediaServerResource>();
-    if (server)
-        server->setStatus(Qn::Online);
-    */
-
     if (data.peer.id != qnCommon->remoteGUID())
         return;
 
@@ -132,17 +126,16 @@ void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data)
         return;
     }
 
-    /*
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(data.peer.id).staticCast<QnMediaServerResource>();
-    if (server)
-        server->setStatus(Qn::Offline);
-    */
-
     if (data.peer.id != qnCommon->remoteGUID())
         return;
 
 
     Q_ASSERT_X(m_connected, Q_FUNC_INFO, "m_connected");
+
+    /* Mark server as offline, so user will understand why is he reconnecting. */
+    QnMediaServerResourcePtr server = qnResPool->getResourceById(data.peer.id).staticCast<QnMediaServerResource>();
+    if (server)
+        server->setStatus(Qn::Offline);
 
     m_connected = false;
 

@@ -39,7 +39,7 @@ void QnServerConnector::at_moduleFinder_moduleUrlFound(const QnModuleInformation
                    .arg(moduleInformation.version.toString()),
                    cl_logINFO);
         }
-        at_moduleFinder_moduleUrlLost(moduleInformation, url);
+        removeConnection(moduleInformation, url);
         return;
     }
 

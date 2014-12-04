@@ -56,6 +56,7 @@ struct OnvifResExtInfo
     QString firmware;
     QString vendor;
     QString hardwareId;
+    QString serial;
     QString mac;
 };
 
