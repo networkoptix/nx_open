@@ -800,8 +800,12 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation()
             setMAC(QnMacAddress(extInfo.mac));
         if (getVendor() == lit("ONVIF") && !extInfo.vendor.isNull())
             setVendor(extInfo.vendor); // update default vendor
-        if (getPhysicalId().isEmpty())
-            setPhysicalId(extInfo.hardwareId);
+        if (getPhysicalId().isEmpty()) {
+            QString id = extInfo.hardwareId;
+            if (!extInfo.serial.isEmpty())
+                id += QString(L'_') + extInfo.serial;
+            setPhysicalId(id);
+        }
     }
     return result;
 }
@@ -839,6 +843,7 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation(const QString
         extInfo->firmware = QString::fromStdString(response.FirmwareVersion);
         extInfo->vendor = QString::fromStdString(response.Manufacturer);
         extInfo->hardwareId = QString::fromStdString(response.HardwareId);
+        extInfo->serial = QString::fromStdString(response.SerialNumber);
     }
 
     if (m_appStopping)
