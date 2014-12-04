@@ -265,13 +265,9 @@ public:
         /* Scene viewport center at the end of the last tick. */
         QPointF oldCenter = m_sceneViewportCenter;
         
-        /* Scene to viewport transform at the end of the last tick. */
-        //QTransform oldSceneToViewport = m_sceneToViewport;
-
+        /* Check if we are currently zooming in. */
         if (m_view->viewportTransform().m11() > m_sceneToViewport.m11())
             m_zoomInStopTimeMs = time;
-
-        /* Correct. */
 
         /* Calculate old scale. */
         qreal logOldScale = 1.0;
