@@ -175,6 +175,18 @@ private:
     QnResourceWidget::Option m_optionToCheck;
 };
 
+class ResourceWidgetNotRaisedCondition : public InstrumentItemCondition, public QnWorkbenchContextAware {
+public:
+    ResourceWidgetNotRaisedCondition(QnWorkbenchContext *context) :
+        QnWorkbenchContextAware(context)
+    {}
+
+    virtual bool operator()(QGraphicsItem *item, Instrument *instrument) const {
+        Q_UNUSED(instrument)
+        return item != display()->widget(Qn::RaisedRole);
+    }
+};
+
 QnWorkbenchController::QnWorkbenchController(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -242,6 +254,10 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_rubberBandInstrument->setRubberBandZValue(display()->layerZValue(Qn::EffectsLayer));
     m_rotationInstrument->setRotationItemZValue(display()->layerZValue(Qn::EffectsLayer));
     m_resizingInstrument->setEffectRadius(8);
+
+    m_moveInstrument->addItemCondition(new ResourceWidgetNotRaisedCondition(context()));
+    m_resizingInstrument->addItemCondition(new ResourceWidgetNotRaisedCondition(context()));
+    m_resizingInstrument->resizeHoverInstrument()->addItemCondition(new ResourceWidgetNotRaisedCondition(context()));
 
     m_rotationInstrument->addItemCondition(new InstrumentItemConditionAdaptor<IsInstanceOf<QnResourceWidget> >());
     m_rotationInstrument->addItemCondition(new ResourceWidgetHasNoOptionCondition( QnResourceWidget::WindowRotationForbidden ));
