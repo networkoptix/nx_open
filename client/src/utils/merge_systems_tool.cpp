@@ -90,11 +90,13 @@ void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInform
 void QnMergeSystemsTool::at_mergeSystem_finished(int status, const QnModuleInformation &moduleInformation, int handle, const QString &errorString) {
     Q_UNUSED(handle)
 
+    bool reconnect = false;
     if (status == 0 && errorString.isEmpty() && !m_password.isEmpty()) {
         context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(m_password);
         QUrl url = QnAppServerConnectionFactory::url();
         url.setPassword(m_password);
         QnAppServerConnectionFactory::setUrl(url);
+        reconnect = true;
     }
     m_password.clear();
     context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
@@ -104,5 +106,6 @@ void QnMergeSystemsTool::at_mergeSystem_finished(int status, const QnModuleInfor
     else
         emit mergeFinished(errorStringToErrorCode(errorString), moduleInformation);
 
-    menu()->action(Qn::ReconnectAction)->trigger();
+    if (reconnect)
+        menu()->action(Qn::ReconnectAction)->trigger();
 }
