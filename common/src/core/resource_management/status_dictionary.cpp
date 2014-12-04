@@ -9,6 +9,7 @@ Qn::ResourceStatus QnResourceStatusDictionary::value(const QnUuid& resourceId) c
 
 void QnResourceStatusDictionary::setValue(const QnUuid& resourceId, Qn::ResourceStatus status)
 {
+    assert(!resourceId.isNull());
     QMutexLocker lock(&m_mutex);
     m_items[resourceId] = status;
 }

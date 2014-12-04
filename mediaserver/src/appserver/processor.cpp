@@ -55,10 +55,6 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
         // previous comment: camera MUST be in the pool already;
         // but now (new version) camera NOT in resource pool!
-        resource->setStatus(Qn::Online, true); // set status in silence mode. Do not send any signals e.t.c
-
-        QString password = cameraResource->getAuth().password();
-
 
         if (cameraResource->isManuallyAdded() && !QnResourceDiscoveryManager::instance()->containManualCamera(cameraResource->getUrl()))
             continue; //race condition. manual camera just deleted
