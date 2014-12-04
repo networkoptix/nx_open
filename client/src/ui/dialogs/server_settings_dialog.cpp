@@ -535,10 +535,12 @@ void QnServerSettingsDialog::updateRebuildUi(RebuildState newState, int progress
      ui->rebuildStartButton->setEnabled(newState == RebuildState::Ready);
      ui->rebuildStopButton->setEnabled(newState == RebuildState::InProgress);
 
-     if (oldState == RebuildState::InProgress && newState == RebuildState::Ready)
+     if (oldState == RebuildState::InProgress && newState == RebuildState::Ready) {
+         emit rebuildArchiveDone();
          QMessageBox::information(this,
          tr("Finished"),
          tr("Rebuilding archive index is completed."));
+     }
 
      ui->stackedWidget->setCurrentIndex(newState == RebuildState::InProgress || newState == RebuildState::InProgressFastScan
          ? ui->stackedWidget->indexOf(ui->rebuildProgressPage)

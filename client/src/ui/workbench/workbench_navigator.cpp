@@ -676,6 +676,12 @@ void QnWorkbenchNavigator::stepBackward() {
     emit positionChanged();
 }
 
+void QnWorkbenchNavigator::at_clearLoaderCache()
+{
+    for (QnCachingCameraDataLoader* loader: m_loaderByResource)
+        loader->discardCachedData();
+}
+
 void QnWorkbenchNavigator::stepForward() {
     if(!m_currentMediaWidget)
         return;
