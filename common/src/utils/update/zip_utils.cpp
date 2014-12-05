@@ -8,6 +8,7 @@ namespace {
     const int maxSymlinkLength = readBufferSize;
 
     bool isSymlink(const QuaZipFileInfo &info) {
+        /* According to zip format specifications the higher 4 bits contain file type. Symlink is 0xA. */
         return (info.externalAttr >> 28) == 0xA;
     }
 }
