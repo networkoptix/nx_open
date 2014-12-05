@@ -554,7 +554,7 @@ WidgetAnimator *QnWorkbenchDisplay::animator(QnResourceWidget *widget) {
     /* Create if it's not there.
      *
      * Note that widget is set as animator's parent. */
-    animator = new WidgetAnimator(widget, "enclosingGeometry", "rotation", widget); // ANIMATION: items.
+    animator = new WidgetAnimator(widget, "geometry", "rotation", widget); // ANIMATION: items.
     animator->setAbsoluteMovementSpeed(0.0);
     animator->setRelativeMovementSpeed(8.0);
     animator->setScalingSpeed(128.0);
@@ -1376,8 +1376,9 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
 
     /* Move! */
     WidgetAnimator *animator = this->animator(widget);
-    if(animate && enclosingGeometry != widget->enclosingGeometry()) {
-        animator->moveTo(enclosingGeometry, rotation);
+    if(animate) {
+        widget->setEnclosingGeometry(enclosingGeometry, false);
+        animator->moveTo(widget->calculateGeometry(enclosingGeometry), rotation);
     } else {
         animator->stop();
         widget->setRotation(rotation);

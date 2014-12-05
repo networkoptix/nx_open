@@ -339,22 +339,28 @@ void QnResourceWidget::setAspectRatio(float aspectRatio) {
     emit aspectRatioChanged();
 }
 
-QRectF QnResourceWidget::enclosingGeometry() const {
-    QRectF rect = m_enclosingGeometry;
-    rect.moveCenter(geometry().center());
-    return rect;
+float QnResourceWidget::defaultVisualAspectRatio() const {
+    if (m_enclosingGeometry.isNull())
+        return defaultAspectRatio();
+
+    return m_enclosingGeometry.width() / m_enclosingGeometry.height();
 }
 
-void QnResourceWidget::setEnclosingGeometry(const QRectF &enclosingGeometry) {
+QRectF QnResourceWidget::enclosingGeometry() const {
+    return m_enclosingGeometry;
+}
+
+void QnResourceWidget::setEnclosingGeometry(const QRectF &enclosingGeometry, bool updateGeometry) {
     m_enclosingGeometry = enclosingGeometry;
-    setGeometry(calculateGeometry(enclosingGeometry));
+    if (updateGeometry)
+        setGeometry(calculateGeometry(enclosingGeometry));
 }
 
 QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry) const {
     if (!enclosingGeometry.isEmpty()) {
         /* Calculate bounds of the rotated item. */
 
-        qreal aspectRatio = hasAspectRatio() ? m_aspectRatio : enclosingGeometry.width() / enclosingGeometry.height();
+        qreal aspectRatio = hasAspectRatio() ? m_aspectRatio : defaultVisualAspectRatio();
 
         /* 1. Take a rectangle with our aspect ratio */
         QRectF geom = expanded(aspectRatio, enclosingGeometry, Qt::KeepAspectRatio);
@@ -374,9 +380,7 @@ QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry) cons
         qreal scale = QnGeometry::scaleFactor(rotated.size(), scaledSize, Qt::KeepAspectRatio);
 
         /* 5. Scale original non-rotated geometry */
-        qreal xdiff = geom.width() / 2.0 * (1.0 - scale);
-        qreal ydiff = geom.height() / 2.0 * (1.0 - scale);
-        geom.adjust(xdiff, ydiff, -xdiff, -ydiff);
+        geom = scaled(geom, scale, geom.center());
 
         return geom;
     } else {
@@ -546,6 +550,11 @@ bool QnResourceWidget::isLocalActive() const {
 
 void QnResourceWidget::setLocalActive(bool localActive) {
     m_localActive = localActive;
+}
+
+void QnResourceWidget::setGeometry(const QRectF &geom) {
+    qDebug() << "set geom" << geom;
+    base_type::setGeometry(geom);
 }
 
 QnResourceWidget::Buttons QnResourceWidget::checkedButtons() const {
