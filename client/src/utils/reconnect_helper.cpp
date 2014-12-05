@@ -39,7 +39,7 @@ QnReconnectHelper::QnReconnectHelper(QObject *parent /*= NULL*/):
         m_allServers << m_currentServer;
 
     qSort(m_allServers.begin(), m_allServers.end(), [](const QnMediaServerResourcePtr &left, const QnMediaServerResourcePtr &right) {
-        return naturalStringCaseInsensitiveLessThan(getResourceName(left), getResourceName(right), false);
+        return naturalStringLess(getResourceName(left), getResourceName(right));
     });
 
     if (!m_currentServer && !m_allServers.isEmpty())

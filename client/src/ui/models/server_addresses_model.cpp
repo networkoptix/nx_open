@@ -300,5 +300,5 @@ bool QnSortedServerAddressesModel::lessThan(const QModelIndex &left, const QMode
     if (lmanual != rmanual)
         return rmanual;
 
-    return naturalStringCaseInsensitiveLessThan(left.data().toString(), right.data().toString(), false);
+    return naturalStringLess(left.data().toString(), right.data().toString());
 }
