@@ -11,14 +11,14 @@ namespace ite
 #else
     unsigned int MediaEncoder::addRef()
     {
-        ++m_DEBUG_refCounter;
-        return m_refManager.addRef();
+        unsigned count = m_refManager.addRef();
+        return count;
     }
 
     unsigned int MediaEncoder::releaseRef()
     {
-        --m_DEBUG_refCounter;
-        return m_refManager.releaseRef();
+        unsigned count = m_refManager.releaseRef();
+        return count;
     }
 #endif
 
@@ -26,7 +26,6 @@ namespace ite
     :   m_refManager( this ),
         m_cameraManager( cameraManager ),
         m_encoderNumber( encoderNumber )
-        //m_DEBUG_refCounter(0)
     {
     }
 
@@ -51,7 +50,8 @@ namespace ite
             addRef();
             return static_cast<nxpl::PluginInterface*>(this);
         }
-        return NULL;
+
+        return nullptr;
     }
 
     int MediaEncoder::getMediaUrl( char* urlBuf ) const
@@ -94,11 +94,9 @@ namespace ite
 
     nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
     {
-        if (!m_streamReader.get())
-            m_streamReader.reset( new StreamReader( &m_refManager, m_cameraManager, m_encoderNumber ) );
-
-        m_streamReader->addRef();
-        return m_streamReader.get();
+        StreamReader * stream = new StreamReader(m_cameraManager, m_encoderNumber);
+        //stream->addRef();
+        return stream;
     }
 
     int MediaEncoder::getAudioFormat( nxcip::AudioFormat* /*audioFormat*/ ) const

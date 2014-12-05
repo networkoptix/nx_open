@@ -3,39 +3,21 @@
 namespace ite
 {
 
-unsigned Command::headCheck() const
+bool Command::checkSequence(Device * device) const
 {
-    Word total_pktNum = totalPktNum();
-    if (total_pktNum == 0)
-        return ReturnChannelError_CMD_PKTCHECK_ERROR;
+    Word expected = device->RCCmd_sequence_recv + 1;
+    device->RCCmd_sequence_recv = sequenceNum();
 
-    Word pktNum = paketNum();
-    if (pktNum == 0)
-        return ReturnChannelError_CMD_PKTCHECK_ERROR;
-
-    if (total_pktNum < pktNum)
-        return ReturnChannelError_CMD_PKTCHECK_ERROR;
-
-    return ModulatorError_NO_ERROR;
+    return sequenceNum() == expected;
 }
 
-unsigned Command::deviceCheck(Device * device) const
+bool Command::checkPacketCount()
 {
-    if (device->hostRxDeviceID != rxDeviceID())
-        return ReturnChannelError_CMD_RXDEVICEID_ERROR;
-
-    if ((device->clientTxDeviceID != txDeviceID()) && ! isBroadcast())
-        return ReturnChannelError_CMD_TXDEVICEID_ERROR;
-
-    Word seqNum = sequenceNum();
-    if (device->RCCmd_sequence_recv != (seqNum-1))
-    {
-        device->RCCmd_sequence_recv = seqNum;
-        return ReturnChannelError_CMD_SEQUENCE_ERROR;
-    }
-
-    device->RCCmd_sequence_recv = seqNum;
-    return ModulatorError_NO_ERROR;
+    if (! totalPktNum())
+        return false;
+    if (! paketNum())
+        return false;
+    return paketNum() <= totalPktNum();
 }
 
 bool Command::checksum() const

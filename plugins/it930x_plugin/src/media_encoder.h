@@ -44,10 +44,8 @@ namespace ite
 
     private:
         CameraManager * m_cameraManager;
-        std::unique_ptr<StreamReader> m_streamReader;
         int m_encoderNumber;
         nxcip::ResolutionInfo m_resolution;
-        //unsigned m_DEBUG_refCounter;
     };
 }
 

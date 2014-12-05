@@ -17,7 +17,7 @@ namespace ite
         DEF_REF_COUNTER
 
     public:
-        StreamReader(nxpt::CommonRefManager* refManager, CameraManager* cameraManager, int encoderNumber);
+        StreamReader(CameraManager * cameraManager, int encoderNumber);
         virtual ~StreamReader();
 
         // nxcip::StreamReader
@@ -30,7 +30,6 @@ namespace ite
     private:
         CameraManager* m_cameraManager;
         int m_encoderNumber;
-        //unsigned m_DEBUG_refCounter;
     };
 }
 

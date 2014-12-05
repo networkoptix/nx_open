@@ -23,7 +23,8 @@ namespace ite
 
         RxDevice(unsigned id, RCShell * rc);
 
-        unsigned rxID() const { return m_rxID; }
+        unsigned short rxID() const { return m_rxID; }
+        unsigned short txID() const { return m_txID; }
 
         It930x * device() { return m_device.get(); }
         It930Stream * devStream() { return m_devStream.get(); }
@@ -36,14 +37,14 @@ namespace ite
             m_device.reset();
         }
 
-        bool lockCamera(CameraManager * cam);
+        bool lockCamera(unsigned short txID);
         bool lockF(unsigned freq);
         bool isLocked() const { return m_devStream.get(); }
         void unlockF()
         {
             m_devStream.reset();
             m_frequency = 0;
-            m_camera = nullptr;
+            m_txID = 0;
         }
 
         void driverInfo(std::string& driverVersion, std::string& fwVersion, std::string& company, std::string& model) const;
@@ -64,19 +65,19 @@ namespace ite
 
         static std::string id2str(unsigned id);
 
-        CameraManager * camera() { return m_camera; }
-
         /// @note async
         void updateDevParams() { m_rcShell->updateDevParams(m_rxID); }
         void updateTransmissionParams() { m_rcShell->updateTransmissionParams(m_rxID); }
+
+        bool setChannel(unsigned short txID, unsigned chan);
 
     private:
         mutable std::mutex m_mutex;
         std::unique_ptr<It930x> m_device;
         std::unique_ptr<It930Stream> m_devStream;
-        unsigned m_rxID;
+        unsigned short m_rxID;
+        unsigned short m_txID; // locked camera txID or 0
         RCShell * m_rcShell;
-        CameraManager * m_camera;
 
         // TODO
         unsigned m_frequency;

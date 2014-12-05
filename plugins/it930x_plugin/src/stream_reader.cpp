@@ -11,23 +11,22 @@ namespace ite
 #else
     unsigned int StreamReader::addRef()
     {
-        ++m_DEBUG_refCounter;
-        return m_refManager.addRef();
+        unsigned count = m_refManager.addRef();
+        return count;
     }
 
     unsigned int StreamReader::releaseRef()
     {
-        --m_DEBUG_refCounter;
-        return m_refManager.releaseRef();
+        unsigned count = m_refManager.releaseRef();
+        return count;
     }
 #endif
 
-    StreamReader::StreamReader(nxpt::CommonRefManager* refManager, CameraManager* cameraManager, int encoderNumber)
+    StreamReader::StreamReader(CameraManager * cameraManager, int encoderNumber)
     :
-        m_refManager( refManager ),
+        m_refManager( this ),
         m_cameraManager( cameraManager ),
         m_encoderNumber( encoderNumber )
-        //m_DEBUG_refCounter(0)
     {
         m_cameraManager->openStream(m_encoderNumber);
     }
@@ -67,6 +66,5 @@ namespace ite
 
     void StreamReader::interrupt()
     {
-        m_cameraManager->closeStream(m_encoderNumber);
     }
 }

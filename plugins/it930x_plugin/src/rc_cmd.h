@@ -30,11 +30,7 @@ namespace ite
         bool hasLeadingTag() const { return buffer_[0] == leadingTag(); }
         bool hasEndingTag() const { return buffer_[183] == endingTag(); }
         bool hasTags() const { return hasLeadingTag() && hasEndingTag(); }
-
-        bool isOK() const
-        {
-            return isFull() && hasLeadingTag() && hasEndingTag() && checksum();
-        }
+        bool isOK() const { return isFull() && hasTags() && checksum(); }
 
         void clear() { buffer_.clear(); }
         void swap(Command& cmd) { buffer_.swap(cmd.buffer_); }
@@ -61,7 +57,11 @@ namespace ite
         const Byte * data() const { return &buffer_[headSize()]; }
 
         unsigned headCheck() const;
-        unsigned deviceCheck(Device * device) const;
+
+        bool checkRxID(const Device * device) const { return device->hostRxDeviceID == rxDeviceID(); }
+        bool checkTxID(const Device * device) const { return device->clientTxDeviceID == txDeviceID(); }
+        bool checkSequence(Device * device) const;
+        bool checkPacketCount();
 
     private:
         std::vector<Byte> buffer_;
@@ -82,7 +82,7 @@ namespace ite
 
         const Byte * data() const { return &cmd_[0]; }
         unsigned size() const { return cmd_.size(); }
-        bool isOK() { return cmd_.size() == expectedSize_; }
+        bool isOK() const { return cmd_.size() == expectedSize_; }
 
         void clear()
         {
@@ -92,7 +92,6 @@ namespace ite
         }
 
         bool isValid() const { return isValid_; }
-
         void setValid(bool value = true) { isValid_ = value; }
 
         unsigned short commandID() const { return (cmd_[4]<<8) | cmd_[5]; }

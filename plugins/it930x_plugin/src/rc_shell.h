@@ -16,6 +16,21 @@
 
 namespace ite
 {
+    typedef enum
+    {
+        RCERR_NO_ERROR = 0,
+        RCERR_NO_DEVICE,
+        RCERR_SYNTAX,
+        RCERR_CHECKSUM,
+        RCERR_SEQUENCE,
+        RCERR_WRONG_LENGTH,
+        RCERR_RET_CODE,
+        RCERR_NOT_PARSED,
+        RCERR_WRONG_CMD,
+        RCERR_METADATA,
+        RCERR_OTHER
+    } RCError;
+
     ///
     class DeviceInfo
     {
@@ -102,7 +117,7 @@ namespace ite
             return 0xffff;
         }
 
-        bool setChannel(unsigned channel, bool sendRequest = true);
+        bool setChannel(unsigned channel);
 
         // <encoder>
 
@@ -175,6 +190,7 @@ namespace ite
         bool wait(int iWaitTime = SEND_WAIT_TIME_MS);
 
         RebuiltCmd& cmd() { return cmd_; }
+        RCError parseCommand();
 
         bool isActive() const { return isActive_; }
         void setActive(bool a = true) { isActive_ = a; }
@@ -345,23 +361,6 @@ namespace ite
     class RCShell
     {
     public:
-        typedef enum
-        {
-            RCERR_NO_ERROR = 0,
-            RCERR_NO_DEVICE,
-            RCERR_SYNTAX,
-            RCERR_CHECKSUM,
-            RCERR_SEQUENCE,
-            RCERR_WRONG_LENGTH,
-            RCERR_RET_CODE,
-            RCERR_NOT_PARSED,
-            RCERR_WRONG_CMD,
-            RCERR_METADATA,
-            RCERR_OTHER
-        } Error;
-
-        static const char * getErrorStr(Error e);
-
         RCShell();
         ~RCShell();
 
@@ -372,20 +371,22 @@ namespace ite
         bool sendGetIDs(int iWaitTime = DeviceInfo::SEND_WAIT_TIME_MS * 2);
 
         void addDevice(unsigned short rxID, unsigned short txID, bool rcActive);
-        Error processCommand(Command& cmd);
-        Error lastError() const { return lastError_; }
+        void removeDevice(unsigned short txID);
 
         DebugInfo& debugInfo() { return debugInfo_; }
 
         void getDevIDs(std::vector<IDsLink>& outLinks);
         DeviceInfoPtr device(unsigned short rxID, unsigned short txID) const;
+        DeviceInfoPtr device4cmd(const Command& );
 
         void updateDevParams(unsigned short rxID);
         void updateTransmissionParams(unsigned short rxID);
 
-        bool setChannel(unsigned short txID, unsigned channel);
+        bool setChannel(unsigned short rxID, unsigned short txID, unsigned channel);
         void setRxFrequency(unsigned short rxID, unsigned frequency);
         unsigned lastTxFrequency(unsigned short txID) const;
+
+        void processCommand(DeviceInfoPtr dev, unsigned short cmdID);
 
     private:
         mutable std::mutex mutex_;
@@ -393,7 +394,6 @@ namespace ite
         std::vector<unsigned> frequencies_;                     // RxID as index
         std::map<unsigned short, unsigned short> lastRx4Tx_;    // {TxID, RxID}
         pthread_t rcvThread_;
-        Error lastError_;
         bool bIsRun_;
 
         DebugInfo debugInfo_;

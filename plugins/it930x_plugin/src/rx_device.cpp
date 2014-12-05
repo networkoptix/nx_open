@@ -25,12 +25,16 @@ namespace ite
 
     RxDevice::RxDevice(unsigned id, RCShell * rc)
     :   m_rxID(id),
+        m_txID(0),
         m_rcShell(rc),
-        m_camera(nullptr),
         m_frequency(0),
         m_strength(0),
         m_present(false)
-    {}
+    {
+        // HACK: close device if it's open
+        m_device.reset(new It930x(m_rxID));
+        m_device.reset(); // dtor
+    }
 
     bool RxDevice::open()
     {
@@ -47,18 +51,25 @@ namespace ite
         return false;
     }
 
-    bool RxDevice::lockCamera(CameraManager * cam)
+    bool RxDevice::setChannel(unsigned short txID, unsigned chan)
     {
-        if (!cam)
+        if (isLocked())
+            return m_rcShell->setChannel(rxID(), txID, chan);
+        return false;
+    }
+
+    bool RxDevice::lockCamera(unsigned short txID)
+    {
+        if (!txID)
             return false;
 
-        unsigned freq = m_rcShell->lastTxFrequency(cam->txID());
+        unsigned freq = m_rcShell->lastTxFrequency(txID);
         if (!freq)
             return false;
 
         if (lockF(freq))
         {
-            m_camera = cam;
+            m_txID = txID;
             return true;
         }
 
@@ -74,7 +85,7 @@ namespace ite
             else
                 open();
 
-            if (! m_device.get())
+            if (! m_device)
                 return false;
 
             m_device->lockChannel(freq);

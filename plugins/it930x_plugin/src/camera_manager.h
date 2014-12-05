@@ -1,6 +1,8 @@
 #ifndef ITE_CAMERA_MANAGER_H
 #define ITE_CAMERA_MANAGER_H
 
+#include <ctime>
+
 #include <vector>
 #include <deque>
 #include <set>
@@ -89,28 +91,43 @@ namespace ite
         virtual int getParamValue(const char * paramName, char * valueBuf, int * valueBufSize) const override;
         virtual int setParamValue(const char * paramName, const char * value) override;
 
-        //
 
-        const nxcip::CameraInfo& info() const { return m_info; }
-        VideoPacket * nextPacket( unsigned encoderNumber );
+        // for ReadThread
+
+        DevReader * devReader() { return m_devReader.get(); }
+        void setThreadObj(ReadThread * ptr) { m_threadObject = ptr; }
 
         std::shared_ptr<VideoPacketQueue> queue(unsigned num) const;
 
-        void setThreadObj(ReadThread * ptr)
-        {
-            m_threadObject = ptr;
-            //m_hasThread = (ptr != nullptr);
-        }
+        // for StreamReader
 
-        DevReader * devReader() { return m_devReader.get(); }
-
-        unsigned short txID() const { return m_txID; }
-
-        void addRxDevice(RxDevicePtr dev);
+        VideoPacket * nextPacket( unsigned encoderNumber );
 
         void openStream(unsigned encNo);
         void closeStream(unsigned encNo);
-        bool stopStreams();
+
+        // for DiscoveryManager
+
+        unsigned short txID() const { return m_txID; }
+        const nxcip::CameraInfo& info() const { return m_info; }
+
+        void addRxDevice(RxDevicePtr dev);
+
+        bool stopIfNeeds()
+        {
+            static const unsigned WAIT_TO_STOP_S = 30;
+
+            if (m_waitStop)
+            {
+                if (! m_stopTime)
+                    m_stopTime = time(NULL);
+
+                if ((time(NULL) - m_stopTime) > WAIT_TO_STOP_S)
+                    return stopStreams();
+            }
+
+            return false;
+        }
 
     private:
         mutable std::mutex m_encMutex;
@@ -119,6 +136,8 @@ namespace ite
         std::vector<std::shared_ptr<MediaEncoder>> m_encoders;
         std::vector<std::shared_ptr<VideoPacketQueue>> m_encQueues;
         std::set<unsigned> m_openedStreams;
+        std::atomic_bool m_waitStop;
+        time_t m_stopTime;
 
         RxDevicePtr m_rxDevice;
         std::vector<RxDevicePtr> m_supportedRxDevices;
@@ -133,9 +152,8 @@ namespace ite
         nxcip::CameraInfo m_info;
 
         bool captureAnyRxDevice();
-        bool captureSameRxDevice();
+        bool captureSameRxDevice(RxDevicePtr);
         bool captureFreeRxDevice(RxDevicePtr);
-        bool captureOpenedRxDevice(RxDevicePtr);
 
         bool initDevReader();
         void stopDevReader();
@@ -145,6 +163,19 @@ namespace ite
 
         void reloadMedia();
         void tryLoad();
+
+        bool stopStreams(bool force = false);
+
+        void freeDevice()
+        {
+            if (m_rxDevice)
+            {
+                m_rxDevice->unlockF();
+                m_rxDevice.reset();
+            }
+            m_waitStop = false;
+            m_stopTime = 0;
+        }
 
         std::unique_ptr<VideoPacket> nextDevPacket(unsigned& streamNum);
 

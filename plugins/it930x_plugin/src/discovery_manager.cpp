@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <string>
 #include <set>
+#include <atomic>
 
 #include "discovery_manager.h"
 #include "camera_manager.h"
@@ -196,9 +197,14 @@ namespace ite
 
             if (cam)
             {
+                foundTx.insert(txID);
+
+                // deplayed receivers release
+                if (cam->stopIfNeeds())
+                    continue; // HACK: hide camera once
+
                 getRx4Camera(cam);
 
-                foundTx.insert(txID);
                 cam->getCameraInfo( &info );
                 ++cameraNum;
             }
@@ -246,16 +252,25 @@ namespace ite
 
     void DiscoveryManager::getRx4Camera(CameraManager * cam)
     {
+        std::vector<RxDevicePtr> rxs;
+        getRx4Tx(cam->txID(), rxs);
+
+        for (auto it = rxs.begin(); it != rxs.end(); ++it)
+             cam->addRxDevice(*it);
+    }
+
+    void DiscoveryManager::getRx4Tx(unsigned short txID, std::vector<RxDevicePtr>& out)
+    {
         std::lock_guard<std::mutex> lock( m_mutex );
 
-        auto range = m_txLinks.equal_range( cam->txID() );
+        auto range = m_txLinks.equal_range( txID );
         for (auto itTx = range.first; itTx != range.second; ++itTx)
         {
             auto itRx = m_rxDevs.find(itTx->second.rxID);
             if (itRx != m_rxDevs.end())
             {
                 RxDevicePtr dev = itRx->second;
-                cam->addRxDevice(dev);
+                out.push_back(dev);
             }
         }
     }
@@ -317,7 +332,7 @@ namespace ite
 
         for (size_t i = 0; i < scanDevs.size(); ++i)
         {
-            std::lock_guard<std::mutex> lock( scanDevs[i]->mutex() );
+            std::lock_guard<std::mutex> lock( scanDevs[i]->mutex() ); // LOCK device
 
             if (scanDevs[i]->isLocked())
                 continue;
@@ -333,7 +348,7 @@ namespace ite
 
             if (scanDevs[i]->isLocked())
             {
-#if 0           // DEBUG
+#if 1           // DEBUG
                 printf("searching TxIDs - rxID: %d; frequency: %d; strength: %d; presence: %d\n",
                        scanDevs[i]->rxID(), freq, scanDevs[i]->strength(), scanDevs[i]->present());
 #endif
@@ -341,7 +356,6 @@ namespace ite
                 if (scanDevs[i]->present() && scanDevs[i]->strength() > 0) // strength: 0..100
                 {
                     rcShell_.sendGetIDs();
-                    //rcShell_.updateTransmissionParams(rxID);
                     usleep(DeviceInfo::SEND_WAIT_TIME_MS * 1000);
                 }
 
@@ -414,9 +428,26 @@ namespace ite
 
     // Tx parameters
 
+    /// @warning could fail if Tx moved to another Rx and RxID-TxID link still exists
     bool DiscoveryManager::setChannel(unsigned short txID, unsigned chan)
     {
-        rcShell_.setChannel(txID, chan);
+        unsigned freq = DeviceInfo::chanFrequency(chan);
+
+        std::vector<RxDevicePtr> rxs;
+        getRx4Tx(txID, rxs);
+
+        for (auto it = rxs.begin(); it != rxs.end(); ++it)
+        {
+            RxDevicePtr dev = *it;
+
+            if (! dev->isLocked())
+            {
+                dev->lockF(freq);
+                if (rcShell_.setChannel(dev->rxID(), txID, chan))
+                    return true;
+            }
+        }
+
         return false;
     }
 }
