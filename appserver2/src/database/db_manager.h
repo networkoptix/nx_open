@@ -129,7 +129,7 @@ namespace ec2
 
         //dumpDatabase
         ErrorCode doQuery(const std::nullptr_t& /*dummy*/, ApiDatabaseDumpData& data);
-        ErrorCode doQuery(const ApiStoredFilePath& path, size_t& dumpFileSize);
+        ErrorCode doQuery(const ApiStoredFilePath& path, qint64& dumpFileSize);
 
         //listDirectory
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredDirContents& data);
