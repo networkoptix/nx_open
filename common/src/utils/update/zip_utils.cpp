@@ -5,6 +5,11 @@
 
 namespace {
     const int readBufferSize = 1024 * 16;
+    const int maxSymlinkLength = readBufferSize;
+
+    bool isSymlink(const QuaZipFileInfo &info) {
+        return (info.externalAttr >> 28) == 0xA;
+    }
 }
 
 QnZipExtractor::QnZipExtractor(const QString &fileName, const QDir &targetDir) :
@@ -65,6 +70,8 @@ QnZipExtractor::Error QnZipExtractor::extractZip() {
     if (!m_zip->open(QuaZip::mdUnzip))
         return BrokenZip;
 
+    QList<QPair<QString, QString>> symlinks;
+
     QuaZipFile file(m_zip);
     for (bool more = m_zip->goToFirstFile(); more && !m_needStop; more = m_zip->goToNextFile()) {
         QuaZipFileInfo info;
@@ -75,6 +82,20 @@ QnZipExtractor::Error QnZipExtractor::extractZip() {
 
         if (!path.isEmpty() && !m_dir.exists(path) && !m_dir.mkpath(path))
             return OtherError;
+
+        if (isSymlink(info)) {
+            if (!file.open(QuaZipFile::ReadOnly))
+                return BrokenZip;
+
+            if (file.size() > maxSymlinkLength)
+                return OtherError;
+
+            QString linkTarget = QString::fromLatin1(file.readAll());
+            file.close();
+            symlinks.append(QPair<QString, QString>(info.name, linkTarget));
+
+            continue;
+        }
 
         if (!info.name.endsWith(lit("/"))) {
             QFile destFile(m_dir.absoluteFilePath(info.name));
@@ -97,6 +118,13 @@ QnZipExtractor::Error QnZipExtractor::extractZip() {
 
             destFile.setPermissions(info.getPermissions());
         }
+    }
+
+    for (const QPair<QString, QString> &symlink: symlinks) {
+        QString link = m_dir.absoluteFilePath(symlink.first);
+        QString target = symlink.second;
+        if (!QFile::link(target, link))
+            return OtherError;
     }
 
     if (m_needStop)
