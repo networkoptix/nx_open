@@ -175,7 +175,7 @@ protected slots:
 
 protected slots:
     void at_context_userChanged(const QnUserResourcePtr &user);
-    void at_workbench_layoutsChanged();
+
     void at_workbench_cellAspectRatioChanged();
     void at_workbench_cellSpacingChanged();
     void at_workbench_currentLayoutChanged();

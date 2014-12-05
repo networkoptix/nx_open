@@ -201,8 +201,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)), Qt::QueuedConnection);
     
-    /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
-    connect(workbench(),                                        SIGNAL(layoutsChanged()),                       this,   SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
     connect(workbench(),                                        SIGNAL(itemChanged(Qn::ItemRole)),              this,   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
     connect(workbench(),                                        SIGNAL(cellAspectRatioChanged()),               this,   SLOT(at_workbench_cellAspectRatioChanged()));
     connect(workbench(),                                        SIGNAL(cellSpacingChanged()),                   this,   SLOT(at_workbench_cellSpacingChanged()));
@@ -615,13 +613,6 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
         menu()->trigger(Qn::OpenNewTabAction);
 
     submitDelayedDrops();
-}
-
-void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
-    if(!workbench()->layouts().empty())
-        return;
-
-    menu()->trigger(Qn::OpenNewTabAction);
 }
 
 void QnWorkbenchActionHandler::at_workbench_cellAspectRatioChanged() {
