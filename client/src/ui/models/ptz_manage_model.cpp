@@ -650,34 +650,34 @@ QnPtzManageModel::TourState QnPtzManageModel::tourState(const QnPtzTourItemModel
         if (stateString)
             *stateString = tr("Tour should contain at least 2 positions");
         return IncompleteTour;
-    } else {
-        const QnPtzTourSpotList &spots = tourModel.tour.spots;
-        for (int i = 0; i < spots.size(); ++i) {
-            int j;
-            for(j = (i + 1) % spots.size(); j != i; j = (j + 1) % spots.size())
-                if(spots[i].presetId != spots[j].presetId)
-                    break;
-
-            int count = i < j ? j - i : j - i + spots.size();
-            if(count >= 2) {
-                if (stateString)
-                    *stateString = tr("Tour has %n identical positions", 0, count);
-                return DuplicatedLinesTour;
-            }
-        }
     }
 
-    if (tourIsValid(tourModel)) {
-        if (stateString) {
-            qint64 time = estimatedTimeSecs(tourModel.tour);
-            *stateString = tr("Tour time: %1").arg((time < 60) ? tr("less than a minute") : tr("about %n minute(s)", 0, time / 60));
-        }
-        return ValidTour;
-    } else {
+    if (!tourIsValid(tourModel)) {
         if (stateString)
             *stateString = tr("Invalid tour");
         return OtherInvalidTour;
     }
+
+    const QnPtzTourSpotList &spots = tourModel.tour.spots;
+    for (int i = 0; i < spots.size(); ++i) {
+        int j;
+        for(j = (i + 1) % spots.size(); j != i; j = (j + 1) % spots.size())
+            if(spots[i].presetId != spots[j].presetId)
+                break;
+
+        int count = i < j ? j - i : j - i + spots.size();
+        if(count >= 2) {
+            if (stateString)
+                *stateString = tr("Tour has %n identical positions", 0, count);
+            return DuplicatedLinesTour;
+        }
+    }
+
+    if (stateString) {
+        qint64 time = estimatedTimeSecs(tourModel.tour);
+        *stateString = tr("Tour time: %1").arg((time < 60) ? tr("less than a minute") : tr("about %n minute(s)", 0, time / 60));
+    }
+    return ValidTour;
 }
 
 void QnPtzManageModel::updatePresetsCache() {
