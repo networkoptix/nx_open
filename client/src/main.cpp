@@ -717,6 +717,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     QnAppServerConnectionFactory::setEc2Connection( ec2::AbstractECConnectionPtr() );
 
+    QNetworkProxyFactory::setApplicationProxyFactory(0);
+
     /* Write out settings. */
     qnSettings->setAudioVolume(QtvAudioDevice::instance()->volume());
     av_lockmgr_register(NULL);
