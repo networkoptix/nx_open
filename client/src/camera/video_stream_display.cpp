@@ -144,6 +144,8 @@ QnFrameScaler::DownscaleFactor QnVideoStreamDisplay::determineScaleFactor(QnAbst
     if (force_factor==QnFrameScaler::factor_any) // if nobody pushing lets peek it
     {
         QSize on_screen = render->sizeOnScreen(channelNumber);
+        if (on_screen.isEmpty())
+            return QnFrameScaler::factor_1; // unknown size
 
         m_scaleFactor = findScaleFactor(srcWidth, srcHeight, on_screen.width(), on_screen.height());
 
