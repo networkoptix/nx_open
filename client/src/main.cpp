@@ -631,41 +631,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         QnAppInfo::beta())
         context->action(Qn::BetaVersionMessageAction)->trigger();
 
-    /* If no input files were supplied --- open connection settings dialog. */
-    
-    /* 
-     * Do not try to connect in the following cases:
-     * * we were not connected and clicked "Open in new window"
-     * * we have opened exported exe-file 
-     * Otherwise we should try to connect or show Login Dialog.
-     */    
-    if (instantDrop.isEmpty() && !haveInputFiles) {
-        /* Set authentication parameters from command line. */
-        QUrl appServerUrl = QUrl::fromUserInput(authenticationString);
-        if (!videowallGuid.isNull()) {
-            Q_ASSERT(appServerUrl.isValid());
-            if (!appServerUrl.isValid()) {
-                return -1;
-            }
-            appServerUrl.setUserName(videowallGuid.toString());
-        }
-        context->menu()->trigger(Qn::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, appServerUrl));
-    }
-
-    if (!videowallGuid.isNull()) {
-        context->menu()->trigger(Qn::DelayedOpenVideoWallItemAction, QnActionParameters()
-                             .withArgument(Qn::VideoWallGuidRole, videowallGuid)
-                             .withArgument(Qn::VideoWallItemGuidRole, videowallInstanceGuid));
-    } else if(!delayedDrop.isEmpty()) { /* Drop resources if needed. */
-        Q_ASSERT(instantDrop.isEmpty());
-
-        QByteArray data = QByteArray::fromBase64(delayedDrop.toLatin1());
-        context->menu()->trigger(Qn::DelayedDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
-    } else if (!instantDrop.isEmpty()){
-        QByteArray data = QByteArray::fromBase64(instantDrop.toLatin1());
-        context->menu()->trigger(Qn::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
-    }
-
 #ifdef _DEBUG
     /* Show FPS in debug. */
     context->menu()->trigger(Qn::ShowFpsAction);
@@ -700,6 +665,43 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     QnResourceDiscoveryManager::instance()->setReady(true);
     QnResourceDiscoveryManager::instance()->start();
+
+
+    /* If no input files were supplied --- open connection settings dialog. */
+
+    /*
+     * Do not try to connect in the following cases:
+     * * we were not connected and clicked "Open in new window"
+     * * we have opened exported exe-file
+     * Otherwise we should try to connect or show Login Dialog.
+     */
+    if (instantDrop.isEmpty() && !haveInputFiles) {
+        /* Set authentication parameters from command line. */
+        QUrl appServerUrl = QUrl::fromUserInput(authenticationString);
+        if (!videowallGuid.isNull()) {
+            Q_ASSERT(appServerUrl.isValid());
+            if (!appServerUrl.isValid()) {
+                return -1;
+            }
+            appServerUrl.setUserName(videowallGuid.toString());
+        }
+        context->menu()->trigger(Qn::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, appServerUrl));
+    }
+
+    if (!videowallGuid.isNull()) {
+        context->menu()->trigger(Qn::DelayedOpenVideoWallItemAction, QnActionParameters()
+                             .withArgument(Qn::VideoWallGuidRole, videowallGuid)
+                             .withArgument(Qn::VideoWallItemGuidRole, videowallInstanceGuid));
+    } else if(!delayedDrop.isEmpty()) { /* Drop resources if needed. */
+        Q_ASSERT(instantDrop.isEmpty());
+
+        QByteArray data = QByteArray::fromBase64(delayedDrop.toLatin1());
+        context->menu()->trigger(Qn::DelayedDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
+    } else if (!instantDrop.isEmpty()){
+        QByteArray data = QByteArray::fromBase64(instantDrop.toLatin1());
+        context->menu()->trigger(Qn::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
+    }
+
 
     result = application->exec();
 
