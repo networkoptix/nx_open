@@ -354,9 +354,7 @@ QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry) cons
     if (!enclosingGeometry.isEmpty()) {
         /* Calculate bounds of the rotated item. */
 
-        qreal aspectRatio = hasAspectRatio() ? m_aspectRatio : item()->layout()->cellAspectRatio();
-        if (aspectRatio < 0)
-            aspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
+        qreal aspectRatio = hasAspectRatio() ? m_aspectRatio : enclosingGeometry.width() / enclosingGeometry.height();
 
         /* 1. Take a rectangle with our aspect ratio */
         QRectF geom = expanded(aspectRatio, enclosingGeometry, Qt::KeepAspectRatio);
