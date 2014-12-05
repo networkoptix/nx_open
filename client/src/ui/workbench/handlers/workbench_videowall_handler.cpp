@@ -563,15 +563,17 @@ void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr
         return;
     }
 
-    workbench()->clear();
-
     QnVideoWallItem item = videoWall->items()->getItem(m_videoWallMode.instanceGuid);
+    updateMainWindowGeometry(item.screenSnaps); //TODO: #GDM check if it is needed at all
 
     QnLayoutResourcePtr layout = qnResPool->getResourceById(item.layout).dynamicCast<QnLayoutResource>();
-    if (layout)
-        menu()->trigger(Qn::OpenSingleLayoutAction, layout);
 
-    updateMainWindowGeometry(item.screenSnaps);
+    if (workbench()->currentLayout() && workbench()->currentLayout()->resource() == layout)
+        return;
+
+    workbench()->clear();
+    if (layout)
+        menu()->trigger(Qn::OpenSingleLayoutAction, layout);  
 }
 
 void QnWorkbenchVideoWallHandler::closeInstanceDelayed() {
