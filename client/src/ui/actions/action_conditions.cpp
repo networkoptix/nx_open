@@ -310,24 +310,30 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
 }
 
 
-Qn::ActionVisibility QnRenameActionCondition::check(const QnActionParameters &parameters) {
+Qn::ActionVisibility QnRenameResourceActionCondition::check(const QnActionParameters &parameters) {
     Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
+    QnResourcePtr target = parameters.resource();
+    if (!target)
+        return Qn::InvisibleAction;
 
     switch (nodeType) {
     case Qn::ResourceNode:
         /* Renaming users directly from resource tree is disabled due do digest re-generation need. */
-        if (!parameters.resources().filtered<QnUserResource>().isEmpty())
+        if (target->hasFlags(Qn::user))
             return Qn::InvisibleAction;
-        return QnEdgeServerCondition::check(parameters.resources());
+
+        /* Edge servers renaming is forbidden. */
+        if (QnMediaServerResource::isEdgeServer(target))
+            return Qn::InvisibleAction;
+
+        /* Incompatible resources cannot be renamed */
+        if (target->getStatus() == Qn::Incompatible)
+            return Qn::InvisibleAction;
+
+        return Qn::EnabledAction;
     case Qn::EdgeNode:
-        return QnEdgeServerCondition::check(parameters.resources());
     case Qn::RecorderNode:
         return Qn::EnabledAction;
-    case Qn::VideoWallItemNode:
-    case Qn::VideoWallMatrixNode:
-        return accessController()->hasGlobalPermissions(Qn::GlobalEditVideoWallPermission)
-            ? Qn::EnabledAction
-            : Qn::InvisibleAction;
     default:
         break;
     }

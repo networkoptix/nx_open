@@ -287,9 +287,9 @@ private:
 /**
  * Condition for resource rename.
  */
-class QnRenameActionCondition: public QnEdgeServerCondition {
+class QnRenameResourceActionCondition: public QnEdgeServerCondition {
 public:
-    QnRenameActionCondition(QObject *parent = NULL): QnEdgeServerCondition(false, parent) {}
+    QnRenameResourceActionCondition(QObject *parent = NULL): QnEdgeServerCondition(false, parent) {}
 
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
