@@ -351,11 +351,15 @@ void QnResourceWidget::setEnclosingGeometry(const QRectF &enclosingGeometry) {
 }
 
 QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry) const {
-    if (hasAspectRatio() && !enclosingGeometry.isEmpty()) {
+    if (!enclosingGeometry.isEmpty()) {
         /* Calculate bounds of the rotated item. */
 
+        qreal aspectRatio = hasAspectRatio() ? m_aspectRatio : item()->layout()->cellAspectRatio();
+        if (aspectRatio < 0)
+            aspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
+
         /* 1. Take a rectangle with our aspect ratio */
-        QRectF geom = expanded(m_aspectRatio, enclosingGeometry, Qt::KeepAspectRatio);
+        QRectF geom = expanded(aspectRatio, enclosingGeometry, Qt::KeepAspectRatio);
 
         /* 2. Rotate it */
         QPointF c = geom.center();
