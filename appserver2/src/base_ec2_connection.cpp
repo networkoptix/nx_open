@@ -163,10 +163,10 @@ namespace ec2
         ApiStoredFilePath dumpFilePathData;
         dumpFilePathData.path = dumpFilePath;
 
-        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, size_t /*dumpFileSize*/ ) {
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, qint64 /*dumpFileSize*/ ) {
             handler->done( reqID, errorCode );
         };
-        m_queryProcessor->template processQueryAsync<ApiStoredFilePath, size_t, decltype(queryDoneHandler)> ( 
+        m_queryProcessor->template processQueryAsync<ApiStoredFilePath, qint64, decltype(queryDoneHandler)> ( 
             ApiCommand::dumpDatabaseToFile, dumpFilePathData, queryDoneHandler );
 
         return reqID;
