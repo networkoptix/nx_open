@@ -57,11 +57,10 @@ inline QString datetimeSaveDialogSuggestion(const QDateTime& dt) {
  */
 QString formatFileSize(qint64 size, int precision = 1, int prefixThreshold = 1, Qn::MetricPrefix minPrefix = Qn::NoPrefix, Qn::MetricPrefix maxPrefix = Qn::YottaPrefix, bool useBinaryPrefixes = true, const QString pattern = QLatin1String("%1 %2"));
 
-int naturalStringCompare(const QString &lhs, const QString &rhs, Qt::CaseSensitivity caseSensitive = Qt::CaseSensitive , bool enableFloat = true );
+int naturalStringCompare(const QString &lhs, const QString &rhs, Qt::CaseSensitivity caseSensitive = Qt::CaseSensitive, bool enableFloat = false);
 QStringList naturalStringSort(const QStringList &list, Qt::CaseSensitivity caseSensitive = Qt::CaseSensitive);
 
-bool naturalStringLessThan(const QString &lhs, const QString &rhs, bool enableFloat = true);
-bool naturalStringCaseInsensitiveLessThan(const QString &lhs, const QString &rhs, bool enableFloat = true);
+bool naturalStringLess(const QString &lhs, const QString &rhs);
 
 void naturalStringCompareTest();
 

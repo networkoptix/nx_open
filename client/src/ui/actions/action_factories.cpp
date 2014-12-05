@@ -28,7 +28,7 @@ QList<QAction *> QnOpenCurrentUserLayoutActionFactory::newActions(const QnAction
         layouts.append(resourcePool()->getResourcesWithParentId(context()->user()->getId()).filtered<QnLayoutResource>());
     
     qSort(layouts.begin(), layouts.end(), [](const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r) {
-        return naturalStringCaseInsensitiveLessThan(l->getName(), r->getName());
+        return naturalStringLess(l->getName(), r->getName());
     });
 
     QList<QAction *> result;
@@ -75,10 +75,10 @@ QList<QAction *> QnPtzPresetsToursActionFactory::newActions(const QnActionParame
     widget->ptzController()->getActiveObject(&activeObject);
 
     qSort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
-        return naturalStringCaseInsensitiveLessThan(l.name, r.name);
+        return naturalStringLess(l.name, r.name);
     });
     qSort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {
-        return naturalStringCaseInsensitiveLessThan(l.name, r.name);
+        return naturalStringLess(l.name, r.name);
     });
 
     QnPtzHotkeysResourcePropertyAdaptor adaptor;

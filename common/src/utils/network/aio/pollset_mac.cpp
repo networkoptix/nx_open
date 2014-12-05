@@ -328,11 +328,6 @@ namespace aio
         endIter.m_impl->currentIndex = m_impl->receivedEventCount;
         return endIter;
     }
-
-    unsigned int PollSet::maxPollSetSize()
-    {
-        return std::numeric_limits<unsigned int>::max();
-    }
 }
 
 #endif  //defined(__APPLE__) || defined(__FreeBSD__)

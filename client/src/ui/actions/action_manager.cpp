@@ -1220,16 +1220,20 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::Tree).
         separator();
 
-    factory(Qn::RenameAction).
-        flags(Qn::Tree | Qn::SingleTarget |  Qn::ResourceTarget | Qn::VideoWallItemTarget | Qn::VideoWallMatrixTarget).
+    factory(Qn::RenameResourceAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::IntentionallyAmbiguous).
         requiredPermissions(Qn::WritePermission | Qn::WriteNamePermission).
         text(tr("Rename")).
         shortcut(tr("F2")).
         autoRepeat(false).
-        condition(new QnConjunctionActionCondition(
-                      new QnRenameActionCondition(this),
-                      new QnNegativeActionCondition(new QnResourceStatusActionCondition(Qn::Incompatible, true, this), this),
-                      this));
+        condition(new QnRenameResourceActionCondition(this));
+
+    factory(Qn::RenameVideowallEntityAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::VideoWallItemTarget | Qn::VideoWallMatrixTarget | Qn::IntentionallyAmbiguous).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
+        text(tr("Rename")).
+        shortcut(tr("F2")).
+        autoRepeat(false);
 
     factory().
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).

@@ -359,7 +359,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         connect(action(Qn::DeleteVideoWallItemAction),      &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered);
         connect(action(Qn::StartVideoWallAction),           &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_startVideoWallAction_triggered);
         connect(action(Qn::StopVideoWallAction),            &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered);
-        connect(action(Qn::RenameAction),                   &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_renameAction_triggered);
+        connect(action(Qn::RenameVideowallEntityAction),    &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_renameAction_triggered);
         connect(action(Qn::IdentifyVideoWallAction),        &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_identifyVideoWallAction_triggered);
         connect(action(Qn::StartVideoWallControlAction),    &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_startVideoWallControlAction_triggered);
         connect(action(Qn::OpenVideoWallsReviewAction),     &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered);
@@ -563,15 +563,17 @@ void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr
         return;
     }
 
-    workbench()->clear();
-
     QnVideoWallItem item = videoWall->items()->getItem(m_videoWallMode.instanceGuid);
+    updateMainWindowGeometry(item.screenSnaps); //TODO: #GDM check if it is needed at all
 
     QnLayoutResourcePtr layout = qnResPool->getResourceById(item.layout).dynamicCast<QnLayoutResource>();
-    if (layout)
-        menu()->trigger(Qn::OpenSingleLayoutAction, layout);
 
-    updateMainWindowGeometry(item.screenSnaps);
+    if (workbench()->currentLayout() && workbench()->currentLayout()->resource() == layout)
+        return;
+
+    workbench()->clear();
+    if (layout)
+        menu()->trigger(Qn::OpenSingleLayoutAction, layout);  
 }
 
 void QnWorkbenchVideoWallHandler::closeInstanceDelayed() {

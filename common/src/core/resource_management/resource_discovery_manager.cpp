@@ -449,6 +449,18 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             const QnSecurityCamResource* existingCamRes = dynamic_cast<QnSecurityCamResource*>( existingRes.data() );
             if( existingCamRes && existingCamRes->isManuallyAdded() )
             {
+#ifdef EDGE_SERVER
+                char  mac[MAC_ADDR_LEN];
+                char* host = 0;
+                getMacFromPrimaryIF(mac, &host);
+                if( existingCamRes->getUniqueId().toLocal8Bit() == QByteArray(mac) )
+                {
+                    //on edge server always discovering camera to be able to move it to the edge server if needed
+                    ++it;
+                    continue;
+                }
+#endif
+
                 it = resources.erase( it );
                 continue;
             }

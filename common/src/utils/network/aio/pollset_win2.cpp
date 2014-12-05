@@ -517,11 +517,6 @@ namespace aio
         _end.m_impl->fdIndex = m_impl->exceptfds->fd_count;
         return _end;
     }
-
-    unsigned int PollSet::maxPollSetSize()
-    {
-        return std::numeric_limits<unsigned int>::max();
-    }
 }
 
 #endif

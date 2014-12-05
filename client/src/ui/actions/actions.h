@@ -752,7 +752,17 @@ namespace Qn {
          * <tt>QString ResourceNameRole</tt> --- new name for the resource. If not
          * supplied, name dialog will pop up.
          */
-        RenameAction,
+        RenameResourceAction,
+
+         /**
+         * Changes resource name.
+         *
+         * Parameters:
+         *
+         * <tt>QString ResourceNameRole</tt> --- new name for the entity. If not
+         * supplied, name dialog will pop up.
+         */
+        RenameVideowallEntityAction,
 
         /**
          * Opens a user creation dialog.

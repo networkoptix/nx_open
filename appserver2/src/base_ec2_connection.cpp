@@ -156,6 +156,23 @@ namespace ec2
     }
 
     template<class T>
+    int BaseEc2Connection<T>::dumpDatabaseToFileAsync( const QString& dumpFilePath, impl::SimpleHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+
+        ApiStoredFilePath dumpFilePathData;
+        dumpFilePathData.path = dumpFilePath;
+
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, size_t /*dumpFileSize*/ ) {
+            handler->done( reqID, errorCode );
+        };
+        m_queryProcessor->template processQueryAsync<ApiStoredFilePath, size_t, decltype(queryDoneHandler)> ( 
+            ApiCommand::dumpDatabaseToFile, dumpFilePathData, queryDoneHandler );
+
+        return reqID;
+    }
+
+    template<class T>
     int BaseEc2Connection<T>::restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
