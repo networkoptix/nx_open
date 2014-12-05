@@ -3032,6 +3032,19 @@ ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiDatabaseDumpData& 
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& dumpFilePath, size_t& dumpFileSize)
+{
+    QWriteLocker lock(&m_mutex);
+
+    if( !QFile::copy( m_sdb.databaseName(), dumpFilePath.path ) )
+        return ErrorCode::ioError;
+
+    QFileInfo dumpFileInfo( dumpFilePath.path );
+    dumpFileSize = dumpFileInfo.size();
+
+    return ErrorCode::ok;
+}
+
 
 // ApiFullInfo
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& data)
