@@ -108,7 +108,7 @@ namespace aio
         void remove( Pollable* const sock, EventType eventType );
         //!Returns number of sockets in pollset
         /*!
-            Returned value should only be used for compare with \a maxPollSetSize()
+            Returned value should only be used for comparision against size of another \a PollSet instance
         */
         size_t size() const;
         /*!
@@ -123,9 +123,6 @@ namespace aio
         const_iterator begin() const;
         //!Returns iterator pointing to next element after last socket, which state has been changed in previous \a poll call
         const_iterator end() const;
-
-        //!Returns maximum possible poll set size (depends on OS)
-        static unsigned int maxPollSetSize();
 
     private:
         PollSetImpl* m_impl;
