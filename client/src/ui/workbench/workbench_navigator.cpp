@@ -738,6 +738,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
                 updateItemDataFromSlider(widget); //TODO: #GDM #Common ask #elric: should it be done at every selection change?
         else
             updateItemDataFromSlider(m_currentWidget);
+        disconnect(m_currentWidget->resource(), NULL, this, NULL);
     } else {
         m_sliderDataInvalid = true;
         m_sliderWindowInvalid = true;
@@ -753,6 +754,9 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
         m_currentWidget = widget;
         m_currentMediaWidget = mediaWidget;
     }
+
+    if (m_currentWidget)
+        connect(m_currentWidget->resource(), &QnResource::nameChanged, this, &QnWorkbenchNavigator::updateLines);
 
     m_pausedOverride = false;
     m_currentWidgetLoaded = false;
