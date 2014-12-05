@@ -125,7 +125,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                 ipsList[ips].insert(newNetRes);
         }
 
-        bool isForeign = rpResource->hasFlags(Qn::foreigner);
+        const bool isForeign = rpResource->hasFlags(Qn::foreigner);
         QnVirtualCameraResourcePtr existCamRes = rpNetRes.dynamicCast<QnVirtualCameraResource>();
         if (existCamRes)
         {
@@ -134,7 +134,11 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             if (rpNetRes->mergeResourcesIfNeeded(newNetRes) || isForeign || updateTypeId)
             {
                 if (isForeign || updateTypeId) {
+                    //preserving "manuallyAdded" flag
+                    const bool isDiscoveredManually = newCamRes->isManuallyAdded();
                     newNetRes->update(existCamRes);
+                    newCamRes->setManuallyAdded( isDiscoveredManually );
+
                     newNetRes->setParentId(qnCommon->moduleGUID());
                     newNetRes->setFlags(existCamRes->flags() & ~Qn::foreigner);
                     newNetRes->setId(existCamRes->getId());
