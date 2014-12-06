@@ -1119,6 +1119,9 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(const QSharedPointer<A
         return;
     }
 
+    if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(remotePeer.id))
+        return; // accept only allowed peers
+
     QnTransactionTransportPtr transport(new QnTransactionTransport(m_localPeer, socket));
     transport->setRemotePeer(remotePeer);
     connect(transport.data(), &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);

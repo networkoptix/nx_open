@@ -1650,14 +1650,13 @@ void QnMain::run()
     m_moduleFinder->setCompatibilityMode(compatibilityMode);
     ec2ConnectionFactory->setCompatibilityMode(compatibilityMode);
     if (!cmdLineArguments.allowedDiscoveryPeers.isEmpty()) {
-        QList<QnUuid> allowedPeers;
+        QSet<QnUuid> allowedPeers;
         for (const QString &peer: cmdLineArguments.allowedDiscoveryPeers.split(";")) {
             QnUuid peerId(peer);
             if (!peerId.isNull())
                 allowedPeers << peerId;
         }
-        if (!allowedPeers.isEmpty())
-            m_moduleFinder->setAllowedPeers(allowedPeers);
+        qnCommon->setAllowedPeers(allowedPeers);
     }
 
     QScopedPointer<QnServerConnector> serverConnector(new QnServerConnector(m_moduleFinder));
