@@ -9446,7 +9446,7 @@ You&apos;ll have to start it again manually.</translation>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="164"/>
         <source>Storages</source>
-        <translation></translation>
+        <translation>Storage</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="201"/>

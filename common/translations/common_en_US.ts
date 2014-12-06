@@ -1086,12 +1086,12 @@ Parameters: </source>
     <message>
         <location filename="../src/health/system_health.cpp" line="20"/>
         <source>Storages are full</source>
-        <translation></translation>
+        <translation>Storage is full</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="22"/>
         <source>Storages are not configured</source>
-        <translation></translation>
+        <translation>Storage is not configured</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="24"/>
