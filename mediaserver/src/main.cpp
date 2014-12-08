@@ -578,15 +578,6 @@ QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connecti
         return QnMediaServerResourcePtr();
     }
 
-    /*
-    rez = ec2Connection->getResourceManager()->setResourceStatusSync(serverPtr->getId(), Qn::Online);
-    if (rez != ec2::ErrorCode::ok)
-    {
-        qDebug() << "registerServer(): Call to change server status failed. Reason: " << ec2::toString(rez);
-        return QnMediaServerResourcePtr();
-    }
-    */
-
     return savedServer;
 }
 
@@ -1616,7 +1607,7 @@ void QnMain::run()
     do {
         if (needToStop())
             return;
-    } while (ec2Connection->getResourceManager()->setResourceStatusSync(m_mediaServer->getId(), Qn::Online) != ec2::ErrorCode::ok);
+    } while (ec2Connection->getResourceManager()->setResourceStatusLocalSync(m_mediaServer->getId(), Qn::Online) != ec2::ErrorCode::ok);
 
 
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
