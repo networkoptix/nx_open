@@ -84,13 +84,15 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
     CLHttpStatus status;
-    int port = QUrl(getUrl()).port(80);
-    QByteArray reslst = downloadFile(status, QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.ResolutionList"),  getHostAddress(), port, 3000, getAuth());
+    int port = QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT);
+    QByteArray reslst = downloadFile(
+        status, QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.ResolutionList"),
+        getHostAddress(), port, QnISDStreamReader::ISD_HTTP_REQUEST_TIMEOUT_MS, getAuth());
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
         setStatus(Qn::Unauthorized);
-        return CameraDiagnostics::UnknownErrorResult();
+        return CameraDiagnostics::NotAuthorisedResult( lit("http://%1:%2/%3").arg(getHostAddress()).arg(port) );
     }
 
     QStringList vals = getValues(QLatin1String(reslst));
@@ -108,7 +110,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
     }
 
     if (resolutions.size() < 1 )
-        return CameraDiagnostics::UnknownErrorResult();
+        return CameraDiagnostics::CameraInvalidParams(lit("resolution"));
 
 
 
@@ -170,7 +172,9 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
 
 
     /*
-    QByteArray reslst2 = downloadFile(status, "api/param.cgi?req=VideoInput.1.h264.2.ResolutionList",  getHostAddress(), port, 3000, getAuth());
+    QByteArray reslst2 = downloadFile(
+        status, "api/param.cgi?req=VideoInput.1.h264.2.ResolutionList",
+        getHostAddress(), port, QnISDStreamReader::ISD_HTTP_REQUEST_TIMEOUT_MS, getAuth());
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
@@ -180,7 +184,9 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
     */
 
 
-    QByteArray fpses = downloadFile(status, QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.FrameRateList"),  getHostAddress(), port, 3000, getAuth());
+    QByteArray fpses = downloadFile(
+        status, QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.FrameRateList"),
+        getHostAddress(), port, QnISDStreamReader::ISD_HTTP_REQUEST_TIMEOUT_MS, getAuth());
 
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
