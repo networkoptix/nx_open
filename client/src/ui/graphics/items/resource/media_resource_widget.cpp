@@ -779,6 +779,15 @@ float QnMediaResourceWidget::defaultVisualAspectRatio() const {
     return qnGlobals->defaultLayoutCellAspectRatio();
 }
 
+Qn::WindowFrameSections QnMediaResourceWidget::windowFrameSectionsAt(const QRectF &region) const {
+    Qn::WindowFrameSections result = base_type::windowFrameSectionsAt(region);
+
+    /* QnMediaResourceWidget cannot be resized by sides. */
+    result &= ~Qn::SideSections;
+
+    return result;
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers

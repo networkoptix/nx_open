@@ -127,6 +127,7 @@ signals:
     void dewarpingParamsChanged();
 
 protected:
+    virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
     virtual int helpTopicAt(const QPointF &pos) const override;
 
     virtual void channelLayoutChangedNotify() override;

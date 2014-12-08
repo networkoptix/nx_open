@@ -254,9 +254,6 @@ public:
     bool isLocalActive() const;
     void setLocalActive(bool localActive);
 
-    virtual void setGeometry(const QRectF &geom) override;
-
-
     using base_type::mapRectToScene;
 
 signals:
@@ -271,7 +268,6 @@ signals:
     void rotationStopRequested();
 
 protected:
-    virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
     virtual QCursor windowCursorAt(Qn::WindowFrameSection section) const override;
     virtual int helpTopicAt(const QPointF &pos) const override;
 

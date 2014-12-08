@@ -552,11 +552,6 @@ void QnResourceWidget::setLocalActive(bool localActive) {
     m_localActive = localActive;
 }
 
-void QnResourceWidget::setGeometry(const QRectF &geom) {
-    qDebug() << "set geom" << geom;
-    base_type::setGeometry(geom);
-}
-
 QnResourceWidget::Buttons QnResourceWidget::checkedButtons() const {
     return static_cast<Buttons>(buttonBar()->checkedButtons());
 }
@@ -589,16 +584,6 @@ void QnResourceWidget::updateButtonsVisibility() {
         calculateButtonsVisibility() & 
         ~(item() ? item()->data<int>(Qn::ItemDisabledButtonsRole, 0): 0)
     );
-}
-
-Qn::WindowFrameSections QnResourceWidget::windowFrameSectionsAt(const QRectF &region) const {
-    Qn::WindowFrameSections result = base_type::windowFrameSectionsAt(region);
-
-    /* This widget has no side frame sections if aspect ratio is set. */
-    if(hasAspectRatio())
-        result &= ~Qn::SideSections;
-
-    return result;
 }
 
 QCursor QnResourceWidget::windowCursorAt(Qn::WindowFrameSection section) const {
