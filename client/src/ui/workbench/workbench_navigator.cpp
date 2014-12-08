@@ -678,8 +678,10 @@ void QnWorkbenchNavigator::stepBackward() {
 
 void QnWorkbenchNavigator::at_clearLoaderCache()
 {
-    for (QnCachingCameraDataLoader* loader: m_loaderByResource)
-        loader->discardCachedData();
+    for (QnCachingCameraDataLoader* loader: m_loaderByResource) {
+        if (loader)
+            loader->discardCachedData();
+    }
 }
 
 void QnWorkbenchNavigator::stepForward() {
