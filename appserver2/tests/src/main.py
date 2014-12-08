@@ -904,6 +904,8 @@ class ClusterWorker():
 
 
 class ClusterTestBase(unittest.TestCase):
+    _Lock = threading.Lock()
+
     def _generateModifySeq(self):
         return None
 
@@ -938,6 +940,7 @@ class ClusterTestBase(unittest.TestCase):
     def _sendRequest(self,methodName,d,server):
         req = urllib2.Request("http://%s/ec2/%s" % (server,methodName), \
             data=d, headers={'Content-Type': 'application/json'})
+        response = None
 
         response = urllib2.urlopen(req)
 
