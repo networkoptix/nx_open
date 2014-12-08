@@ -991,8 +991,6 @@ class CameraTest(ClusterTestBase):
     
     
     def _generateModifySeq(self):
-        dataList,idList = self._gen.generateCameraData(self._testCase)
-
         return self._defaultCreateSeq(self._gen.generateCameraData(self._testCase))
 
     def _getMethodName(self):
@@ -1822,8 +1820,10 @@ if __name__ == '__main__':
                  # all the servers are on the same page
         else:
             if len(sys.argv) == 1:
-                unittest.main()
-                clusterTest.unittestRollback.DoRollback()
+				try:
+					unittest.main()
+				except:
+					clusterTest.unittestRollback.doRollback()
             elif len(sys.argv) == 2 and sys.argv[1] == '--clear':
                 DoClearAll()
             else:
