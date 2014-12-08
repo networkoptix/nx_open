@@ -139,7 +139,7 @@ void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, cons
         if (!server)
             continue;
 
-        if (!isCompatible(server->getVersion(), qnCommon->engineVersion())) {
+        if (!server->getModuleInformation().hasCompatibleVersion()) {
             m_updateTargets.insert(server->getId());
         } else {
             QnUuid originalId = QnUuid(server->getProperty(lit("guid")));

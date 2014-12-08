@@ -18,6 +18,7 @@
 #include "../resource_management/resource_pool.h"
 #include "utils/serialization/lexical.h"
 #include "core/resource/security_cam_resource.h"
+#include "nx_ec/ec_proto_version.h"
 
 
 const QString QnMediaServerResource::USE_PROXY = QLatin1String("proxy");
@@ -509,6 +510,9 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
         moduleInformation.remoteAddresses.insert(address.toString());
     moduleInformation.id = getId();
     moduleInformation.sslAllowed = false;
+    moduleInformation.protoVersion = getProperty(lit("protoVersion")).toInt();
+    if (moduleInformation.protoVersion == 0)
+        moduleInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
     return moduleInformation;
 }
 
