@@ -59,6 +59,7 @@ namespace ec2
         virtual AbstractTimeManagerPtr getTimeManager() override;
 
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) override;
+        virtual int dumpDatabaseToFileAsync( const QString& dumpFilePath, impl::SimpleHandlerPtr handler ) override;
         virtual int restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, impl::SimpleHandlerPtr handler ) override;
 
         virtual void addRemotePeer(const QUrl& url) override;

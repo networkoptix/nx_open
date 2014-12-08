@@ -61,7 +61,6 @@ private:
     QHash<QnUuid, QnModuleInformation> m_foundModules;
     QMultiHash<QnUuid, QUrl> m_multicastFoundUrls;
     QMultiHash<QnUuid, QUrl> m_directFoundUrls;
-    QList<QnUuid> m_allowedPeers;
 };
 
 #endif  //NETWORKOPTIXMODULEFINDER_H

@@ -103,6 +103,14 @@ namespace ec2
         return reqID;
     }
 
+    int OldEcConnection::dumpDatabaseToFileAsync( const QString& /*dumpFilePath*/, ec2::impl::SimpleHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+        QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());
+        QnConcurrent::run(Ec2ThreadPool::instance(), std::bind(&impl::SimpleHandler::done, handler, reqID, ec2::ErrorCode::notImplemented));
+        return reqID;
+    }
+
     int OldEcConnection::restoreDatabaseAsync(const ApiDatabaseDumpData& /*dbFile*/, impl::SimpleHandlerPtr handler)
     {
         const int reqID = generateRequestID();

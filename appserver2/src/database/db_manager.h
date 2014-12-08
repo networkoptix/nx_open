@@ -129,6 +129,7 @@ namespace ec2
 
         //dumpDatabase
         ErrorCode doQuery(const std::nullptr_t& /*dummy*/, ApiDatabaseDumpData& data);
+        ErrorCode doQuery(const ApiStoredFilePath& path, qint64& dumpFileSize);
 
         //listDirectory
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredDirContents& data);
@@ -474,7 +475,7 @@ namespace ec2
 
         ErrorCode insertOrReplaceStoredFile(const QString &fileName, const QByteArray &fileContents);
 
-        bool createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2);
+        bool createDatabase();
         bool migrateBusinessEvents();
         bool doRemap(int id, int newVal, const QString& fieldName);
         
@@ -529,6 +530,7 @@ namespace ec2
         bool m_needResyncLog;
         bool m_needResyncLicenses;
         bool m_needResyncFiles;
+        bool m_dbJustCreated;
     };
 };
 

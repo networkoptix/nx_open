@@ -139,6 +139,8 @@ namespace ec2
             REGISTER_COMMAND(dumpDatabase),
             REGISTER_COMMAND(restoreDatabase),
             REGISTER_COMMAND(updatePersistentSequence),
+            REGISTER_COMMAND(dumpDatabaseToFile),
+
             REGISTER_COMMAND(markLicenseOverflow),
             REGISTER_COMMAND(getSettings),
 

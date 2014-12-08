@@ -34,11 +34,13 @@
 
 #include <utils/common/counter.h>
 #include <utils/common/event_processors.h>
+#include <utils/common/scoped_value_rollback.h>
 
 QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent) :
     QObject(parent),
     QnWorkbenchContextAware(parent),
-    m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnWorkbenchLayoutsHandler>(this))
+    m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnWorkbenchLayoutsHandler>(this)),
+    m_closingLayouts(false)
 {
     connect(action(Qn::NewUserLayoutAction),                &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered);
     connect(action(Qn::SaveLayoutAction),                   &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveLayoutAction_triggered);
@@ -48,6 +50,9 @@ QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent) :
     connect(action(Qn::SaveCurrentLayoutAsAction),          &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveCurrentLayoutAsAction_triggered);
     connect(action(Qn::CloseLayoutAction),                  &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_closeLayoutAction_triggered);
     connect(action(Qn::CloseAllButThisLayoutAction),        &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_closeAllButThisLayoutAction_triggered);
+
+    /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
+    connect(workbench(),                             &QnWorkbench::layoutsChanged,  this,   &QnWorkbenchLayoutsHandler::at_workbench_layoutsChanged, Qt::QueuedConnection);
 }
 
 QnWorkbenchLayoutsHandler::~QnWorkbenchLayoutsHandler() {
@@ -322,6 +327,8 @@ bool QnWorkbenchLayoutsHandler::closeLayouts(const QnWorkbenchLayoutList &layout
 }
 
 bool QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resources, bool waitForReply, bool force) {
+    QN_SCOPED_VALUE_ROLLBACK(&m_closingLayouts, true);
+
     if(resources.empty())
         return true;
 
@@ -592,6 +599,16 @@ void QnWorkbenchLayoutsHandler::at_closeAllButThisLayoutAction_triggered() {
         layoutsToClose.removeOne(layout);
 
     closeLayouts(layoutsToClose);
+}
+
+void QnWorkbenchLayoutsHandler::at_workbench_layoutsChanged() {
+    if (m_closingLayouts)
+        return;
+
+    if(!workbench()->layouts().empty())
+        return;
+
+    menu()->trigger(Qn::OpenNewTabAction);
 }
 
 void QnWorkbenchLayoutsHandler::at_layouts_saved(int status, const QnResourceList &resources, int handle) {
