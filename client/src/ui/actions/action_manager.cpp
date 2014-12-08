@@ -1385,7 +1385,10 @@ QnActionManager::QnActionManager(QObject *parent):
     factory().
         flags(Qn::Scene | Qn::NoTarget).
         text(tr("Change Cell Aspect Ratio...")).
-        condition(new QnVideoWallReviewModeCondition(true, this));
+        condition(new QnConjunctionActionCondition(
+            new QnVideoWallReviewModeCondition(true, this),
+            new QnLightModeCondition(Qn::LightModeSingleItem, this),
+            this));
 
     factory.beginSubMenu(); {
         factory.beginGroup();
@@ -1423,7 +1426,8 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).
-        text(tr("Change Cell Spacing..."));
+        text(tr("Change Cell Spacing...")).
+        condition(new QnLightModeCondition(Qn::LightModeSingleItem, this));
 
     factory.beginSubMenu(); {
         factory.beginGroup();
