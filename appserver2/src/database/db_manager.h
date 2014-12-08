@@ -475,7 +475,7 @@ namespace ec2
 
         ErrorCode insertOrReplaceStoredFile(const QString &fileName, const QByteArray &fileContents);
 
-        bool createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2);
+        bool createDatabase();
         bool migrateBusinessEvents();
         bool doRemap(int id, int newVal, const QString& fieldName);
         
@@ -530,6 +530,7 @@ namespace ec2
         bool m_needResyncLog;
         bool m_needResyncLicenses;
         bool m_needResyncFiles;
+        bool m_dbJustCreated;
     };
 };
 

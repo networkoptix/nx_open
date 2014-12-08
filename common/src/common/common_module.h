@@ -68,6 +68,9 @@ public:
 
     bool isTranscodeDisabled() const { return m_transcodingDisabled; }
     void setTranscodeDisabled(bool value) { m_transcodingDisabled = value; }
+
+    inline void setAllowedPeers(const QSet<QnUuid> &peerList) { m_allowedPeers = peerList; }
+    inline QSet<QnUuid> allowedPeers() const { return m_allowedPeers; }
 signals:
     void systemNameChanged(const QString &systemName);
     void remoteIdChanged(const QnUuid &id);
@@ -90,6 +93,7 @@ private:
     QnModuleInformation m_moduleInformation;
     mutable QMutex m_mutex;
     bool m_transcodingDisabled;
+    QSet<QnUuid> m_allowedPeers;
 };
 
 #define qnCommon (QnCommonModule::instance())

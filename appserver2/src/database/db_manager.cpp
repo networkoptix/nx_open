@@ -258,7 +258,8 @@ QnDbManager::QnDbManager()
     m_tranStatic(m_sdbStatic, m_mutexStatic),
     m_needResyncLog(false),
     m_needResyncLicenses(false),
-    m_needResyncFiles(false)
+    m_needResyncFiles(false),
+    m_dbJustCreated(false)
 {
 	Q_ASSERT(!globalInstance);
 	globalInstance = this;
@@ -308,9 +309,7 @@ bool QnDbManager::init(
         }
     }
 
-    bool dbJustCreated = false;
-    bool isMigrationFrom2_2 = false;
-    if( !createDatabase( &dbJustCreated, &isMigrationFrom2_2 ) )
+    if( !createDatabase() )
     {
         // create tables is DB is empty
         qWarning() << "can't create tables for sqlLite database!";
@@ -936,7 +935,8 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         updateResourceTypeGuids();
     }
     else if (updateName == lit(":/updates/20_adding_camera_user_attributes.sql")) {
-        m_needResyncLog = true;
+        if (!m_dbJustCreated)
+            m_needResyncLog = true;
     }    
     else if (updateName == lit(":/updates/21_new_dw_cam.sql")) {
         updateResourceTypeGuids();
@@ -949,18 +949,17 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     return true;
 }
 
-bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
+bool QnDbManager::createDatabase()
 {
     QnDbTransactionLocker lock(&m_tran);
 
-    *dbJustCreated = false;
-    *isMigrationFrom2_2 = false;
+    m_dbJustCreated = false;
 
     if (!isObjectExists(lit("table"), lit("vms_resource"), m_sdb))
     {
         NX_LOG(QString("Create new database"), cl_logINFO);
 
-        *dbJustCreated = true;
+        m_dbJustCreated = true;
 
         if (!execSQLFile(lit(":/01_createdb.sql"), m_sdb))
             return false;
@@ -974,7 +973,7 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
 		NX_LOG(QString("Update database to v 2.3"), cl_logINFO);
         if (!migrateBusinessEvents())
             return false;
-        if (!(*dbJustCreated)) {
+        if (!m_dbJustCreated) {
             m_needResyncLog = true;
             if (!execSQLFile(lit(":/02_migration_from_2_2.sql"), m_sdb))
                 return false;
@@ -1015,7 +1014,7 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
         //if (!execSQLQuery("drop table vms_license", m_sdb))
         //    return false;
     }
-    else if (*dbJustCreated) {
+    else if (m_dbJustCreated) {
         m_needResyncLicenses = true;
     }
 
