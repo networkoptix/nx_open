@@ -73,7 +73,7 @@ class UnitTestRollback:
                 # failed for this rollback
                 print ("Cannot rollback for transaction:(MethodName:%s;ServerAddress:%s;ResourceId:%s\n)")% (l[0],l[1],l[2])
                 print  "Or you could run recover later when all the rollback done\n"
-                recoverList.append("%s,%s,%s"%(l[0],l[1],l[2]))
+                recoverList.append("%s,%s,%s\n"%(l[0],l[1],l[2]))
 
         # close the resource file
         self._rollbackFile.close()
@@ -942,7 +942,8 @@ class ClusterTestBase(unittest.TestCase):
             data=d, headers={'Content-Type': 'application/json'})
         response = None
 
-        response = urllib2.urlopen(req)
+        with self._Lock:
+            response = urllib2.urlopen(req)
 
         # Do a sligtly graceful way to dump the sample of failure
         if response.getcode() != 200:
@@ -1820,10 +1821,10 @@ if __name__ == '__main__':
                  # all the servers are on the same page
         else:
             if len(sys.argv) == 1:
-				try:
-					unittest.main()
-				except:
-					clusterTest.unittestRollback.doRollback()
+                try:
+                    unittest.main()
+                except:
+                    clusterTest.unittestRollback.doRollback()
             elif len(sys.argv) == 2 and sys.argv[1] == '--clear':
                 DoClearAll()
             else:
