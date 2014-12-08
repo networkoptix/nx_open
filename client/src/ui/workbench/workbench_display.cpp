@@ -1322,13 +1322,8 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
 
     QRectF enclosingGeometry = itemEnclosingGeometry(item);
 
-    /* Remove cell spacing for raized widget */
-    if (widget == raisedWidget)
-        enclosingGeometry = dilated(enclosingGeometry, workbench()->mapper()->spacing());
-
     /* Adjust for raise. */
     if(widget == raisedWidget && widget != zoomedWidget && m_view != NULL) {
-
         QRectF originGeometry = enclosingGeometry;
         if (widget->hasAspectRatio())
             originGeometry = expanded(widget->aspectRatio(), originGeometry, Qt::KeepAspectRatio);
