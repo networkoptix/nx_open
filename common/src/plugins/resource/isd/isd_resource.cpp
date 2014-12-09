@@ -83,37 +83,23 @@ void QnPlIsdResource::setIframeDistance(int /*frames*/, int /*timems*/)
 CameraDiagnostics::Result QnPlIsdResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
-    //CLHttpStatus status;
-    const int port = QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT);
 
-    int statusCode = nx_http::StatusCode::ok;
     QUrl apiRequestUrl;
     apiRequestUrl.setScheme( lit("http") );
     apiRequestUrl.setUserName( getAuth().user() );
     apiRequestUrl.setPassword( getAuth().password() );
     apiRequestUrl.setHost( getHostAddress() );
-    apiRequestUrl.setPort( port );
+    apiRequestUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
 
 
     //reading resolution list
+    CameraDiagnostics::Result result;
 
-    apiRequestUrl.setPath( lit("/api/param.cgi?req=VideoInput.1.h264.1.ResolutionList") );
+    apiRequestUrl.setPath( lit("/api/param.cgi?req=VideoInput.1.h264.1.ResolutionList" ) );
     QByteArray reslst;
-    SystemError::ErrorCode errorCode = nx_http::downloadFileSync(
-        apiRequestUrl,
-        &statusCode,
-        &reslst );
-    if( errorCode != SystemError::noError )
-        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult( getHostAddress(), port );
-    if( statusCode == nx_http::StatusCode::unauthorized )
-    {
-        setStatus(Qn::Unauthorized);
-        return CameraDiagnostics::NotAuthorisedResult( apiRequestUrl.toString() );
-    }
-    else if( statusCode != nx_http::StatusCode::ok )
-    {
-        return CameraDiagnostics::CameraResponseParseErrorResult( apiRequestUrl.toString(), apiRequestUrl.path() );
-    }
+    result = doISDApiRequest( apiRequestUrl, &reslst );
+    if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
+        return result;
 
     QStringList vals = getValues(QLatin1String(reslst));
 
@@ -191,22 +177,9 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
 
     apiRequestUrl.setPath( lit("/api/param.cgi?req=VideoInput.1.h264.1.FrameRateList") );
     QByteArray fpses;
-    errorCode = nx_http::downloadFileSync(
-        apiRequestUrl,
-        &statusCode,
-        &fpses );
-    if( errorCode != SystemError::noError )
-        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult( getHostAddress(), port );
-    if( statusCode == nx_http::StatusCode::unauthorized )
-    {
-        setStatus(Qn::Unauthorized);
-        return CameraDiagnostics::NotAuthorisedResult( apiRequestUrl.toString() );
-    }
-    else if( statusCode != nx_http::StatusCode::ok )
-    {
-        return CameraDiagnostics::CameraResponseParseErrorResult( apiRequestUrl.toString(), apiRequestUrl.path() );
-    }
-
+    result = doISDApiRequest( apiRequestUrl, &fpses );
+    if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
+        return result;
 
     vals = getValues(QLatin1String(fpses));
 
@@ -232,21 +205,9 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
 
     apiRequestUrl.setPath( lit("/api/param.cgi?req=General.FirmwareVersion") );
     QByteArray cameraFirmwareVersion;
-    errorCode = nx_http::downloadFileSync(
-        apiRequestUrl,
-        &statusCode,
-        &cameraFirmwareVersion );
-    if( errorCode != SystemError::noError )
-        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult( getHostAddress(), port );
-    if( statusCode == nx_http::StatusCode::unauthorized )
-    {
-        setStatus(Qn::Unauthorized);
-        return CameraDiagnostics::NotAuthorisedResult( apiRequestUrl.toString() );
-    }
-    else if( statusCode != nx_http::StatusCode::ok )
-    {
-        return CameraDiagnostics::CameraResponseParseErrorResult( apiRequestUrl.toString(), apiRequestUrl.path() );
-    }
+    result = doISDApiRequest( apiRequestUrl, &cameraFirmwareVersion );
+    if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
+        return result;
 
     const int sepPos = cameraFirmwareVersion.indexOf('=');
     setFirmware( QLatin1String( sepPos != -1 ? cameraFirmwareVersion.mid( sepPos+1 ) : cameraFirmwareVersion ) );
@@ -304,6 +265,29 @@ QnConstResourceAudioLayoutPtr QnPlIsdResource::getAudioLayout(const QnAbstractSt
 void QnPlIsdResource::setMaxFps(int f)
 {
     setProperty(MAX_FPS_PARAM_NAME, f);
+}
+
+CameraDiagnostics::Result QnPlIsdResource::doISDApiRequest( const QUrl& apiRequestUrl, QByteArray* const msgBody )
+{
+    int statusCode = nx_http::StatusCode::ok;
+
+    SystemError::ErrorCode errorCode = nx_http::downloadFileSync(
+        apiRequestUrl,
+        &statusCode,
+        msgBody );
+    if( errorCode != SystemError::noError )
+        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult( apiRequestUrl.host(), apiRequestUrl.port() );
+    if( statusCode == nx_http::StatusCode::unauthorized )
+    {
+        setStatus(Qn::Unauthorized);
+        return CameraDiagnostics::NotAuthorisedResult( apiRequestUrl.toString() );
+    }
+    else if( statusCode != nx_http::StatusCode::ok )
+    {
+        return CameraDiagnostics::CameraResponseParseErrorResult( apiRequestUrl.toString(), apiRequestUrl.path() );
+    }
+
+    return CameraDiagnostics::NoErrorResult();
 }
 
 #endif // #ifdef ENABLE_ISD
