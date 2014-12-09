@@ -25,7 +25,8 @@ void QnGridWidgetHelper::exportToFile(QTableView *grid, QWidget *parent, const Q
                                                       previousDir,
                                                       tr("HTML file (*.html);;Spread Sheet (CSV) File(*.csv)")));
         dialog->setAcceptMode(QFileDialog::AcceptSave);
-        dialog->exec();
+        if (dialog->exec() != QDialog::Accepted)
+            return;
 
         fileName = dialog->selectedFile();
         if (fileName.isEmpty())
