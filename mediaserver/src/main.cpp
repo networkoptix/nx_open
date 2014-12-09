@@ -1895,6 +1895,8 @@ void QnMain::run()
 
     delete QnResourcePool::instance();
     QnResourcePool::initStaticInstance( NULL );
+
+    m_mediaServer.clear();
 }
 
 void QnMain::changePort(quint16 port) {
