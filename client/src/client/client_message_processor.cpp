@@ -75,24 +75,10 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
 
     QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId());
 
-    if (ownResource.isNull()) {
+    if (ownResource.isNull())
         qnResPool->addResource(resource);
-    } else {
+    else
         ownResource->update(resource);
-
-#if 0
-        if (QnMediaServerResourcePtr mediaServer = ownResource.dynamicCast<QnMediaServerResource>()) {
-            /* Handling a case when an incompatible server is changing its systemName at runtime and becoming compatible. */
-            if (resource->getStatus() == Qn::NotDefined && mediaServer->getStatus() == Qn::Incompatible) {
-                if (QnMediaServerResourcePtr updatedServer = resource.dynamicCast<QnMediaServerResource>()) {
-                    if (isCompatible(qnCommon->engineVersion(), updatedServer->getVersion())) {
-                        mediaServer->setStatus(Qn::Online);
-                    }
-                }
-            }
-        }
-#endif
-    }
 
     // TODO: #Elric #2.3 don't update layout if we're re-reading resources, 
     // this leads to unsaved layouts spontaneously rolling back to last saved state.
