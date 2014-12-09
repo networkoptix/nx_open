@@ -36,23 +36,23 @@ angular.module('webadminApp')
                     var zoomLevel = Math.pow(timelineConfig.zoomStep,scope.actualZoomLevel);
                     var initialWidth = viewportWidth * zoomLevel;
 
-                    console.log("interval to show",new Date(scope.start),new Date(scope.end));
+                    //console.log("interval to show",new Date(scope.start),new Date(scope.end));
 
                     scope.timelineWidth = initialWidth * (scope.ruler.end -  scope.ruler.start)/(scope.end-scope.start) + 'px';
 
                     scope.timelineStart = initialWidth * (scope.ruler.start - scope.start)/(scope.end-scope.start) + 'px';
 
-                    console.log(scope.timelineStart,scope.timelineWidth);
+                    //console.log(scope.timelineStart,scope.timelineWidth);
 
                     console.warn("Update frameWidth with time");
                     scope.frameWidth = scope.timelineWidth;//initialWidth + 'px';
 
-                    console.log(
+                    /*console.log(
                         scope.ruler.end, scope.ruler.start,
                         scope.end, scope.start,
                         scope.ruler.end -  scope.ruler.start ,  scope.end-scope.start,
                         (scope.ruler.end -  scope.ruler.start)/(scope.end-scope.start),
-                        scope.timelineWidth );
+                        scope.timelineWidth );*/
 
 
                     //2. Calculate active boundaries for detailization
@@ -69,16 +69,16 @@ angular.module('webadminApp')
                         }
                     }
 
-                    console.log("test level", i, RulerModel.levels[i].name,
-                            RulerModel.levels[i].interval.getSeconds() / RulerModel.levels[i].width, secondsPerPixel);
+                    //console.log("test level", i, RulerModel.levels[i].name,
+                    //        RulerModel.levels[i].interval.getSeconds() / RulerModel.levels[i].width, secondsPerPixel);
 
                     scope.actualLevel = i-1;
 
-                    console.log("level",scope.actualLevel, RulerModel.levels[scope.actualLevel].name,
-                        RulerModel.levels[scope.actualLevel].interval.getSeconds() / RulerModel.levels[scope.actualLevel].width, secondsPerPixel);
+                    //console.log("level",scope.actualLevel, RulerModel.levels[scope.actualLevel].name,
+                    //    RulerModel.levels[scope.actualLevel].interval.getSeconds() / RulerModel.levels[scope.actualLevel].width, secondsPerPixel);
 
                     //4. Set interval for events
-                    console.warn("Set interval for events", scope.actualLevel);
+                    //console.warn("Set interval for events", scope.actualLevel);
 
                     //5. Set interval for ruler
                     scope.ruler.setInterval(start,end,scope.actualLevel);

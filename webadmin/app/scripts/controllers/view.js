@@ -1,8 +1,7 @@
 'use strict';
 
-angular.module('webadminApp').controller('ViewCtrl', function ($scope,$location,$routeParams,mediaserver,$q) {
+angular.module('webadminApp').controller('ViewCtrl', function ($scope,$rootScope,$location,$routeParams,mediaserver,$q) {
 
-    $scope.cameraId = $routeParams.cameraId;
     $scope.cameras = {};
     $scope.activeCamera = null;
 
@@ -35,7 +34,6 @@ angular.module('webadminApp').controller('ViewCtrl', function ($scope,$location,
         if( $scope.settings.id !== server.id.replace('{','').replace('}','')){
             serverUrl = '/proxy/' + getServerUrl(server);
         }
-
         $scope.acitveVideoSource = [
             { src: serverUrl + '/media/' + cameraId + '.webm?resolution='   +  $scope.activeResolution, type:'video/webm' },
             { src: serverUrl + '/media/' + cameraId + '.mp4?resolution='    +  $scope.activeResolution, type:'video/mp4' },
@@ -45,16 +43,34 @@ angular.module('webadminApp').controller('ViewCtrl', function ($scope,$location,
             { src: serverUrl + '/media/' + cameraId + '.3gp?resolution='    +  $scope.activeResolution },
             { src: serverUrl + '/media/' + cameraId + '.mpjpeg?resolution=' +  $scope.activeResolution }
         ];
-        console.log($scope.acitveVideoSource[0].src);
+
+        console.log("changeSource", $scope.acitveVideoSource[0].src);
     }
     $scope.activeVideoRecords = null;
+
+    $scope.selectCameraById = function(cameraId){
+
+        $scope.cameraId = cameraId || $scope.cameraId;
+
+        console.log("selectCameraById" , $scope.cameraId );
+
+        $scope.activeCamera = _.find($scope.allcameras,function(camera){
+            return camera.id === $scope.cameraId;
+        });
+
+        if(!!$scope.activeCamera)
+            updateVideoSource();
+    };
     $scope.selectCamera = function(activeCamera){
         $location.path('/view/' + activeCamera.id, false);
-        $scope.activeCamera = activeCamera;
-        updateVideoSource();
-        //$scope.activeVideoRecords = new CameraRecordsProvider([activeCamera.physicalId],mediaserver,$q);
         return false;
     };
+
+    $rootScope.$on('$routeChangeStart', function (event, next, current) {
+        console.log('$routeChangeStart',event, next, current);
+
+        $scope.selectCameraById(next.params.cameraId);
+    });
 
     function extractDomain(url) {
         url = url.split('/')[2] || url.split('/')[0];
@@ -67,10 +83,6 @@ angular.module('webadminApp').controller('ViewCtrl', function ($scope,$location,
 
             function cameraSorter(camera){
                 camera.url = extractDomain(camera.url);
-
-                if(camera.id === $scope.cameraId){
-                    $scope.selectCamera(camera);
-                }
 
                 var num = 0;
                 try {
@@ -133,9 +145,20 @@ angular.module('webadminApp').controller('ViewCtrl', function ($scope,$location,
 
             $scope.allcameras = cameras;
         },function(){
+
+
+            if(camera.id === $scope.cameraId){
+                $scope.selectCamera(camera);
+            }
+
+
+
             alert('network problem');
         });
     }
+
+    $scope.$watch("allcameras",function(){$scope.selectCameraById();});
+
     mediaserver.getMediaServers().then(function(data){
         _.each(data.data,function(server){
             server.url = extractDomain(server.url);
@@ -143,6 +166,7 @@ angular.module('webadminApp').controller('ViewCtrl', function ($scope,$location,
         });
         $scope.mediaServers = data.data;
         getCameras();
+        $scope.selectCameraById ( $routeParams.cameraId);
     },function(){
         alert('network problem');
     });
