@@ -5,6 +5,7 @@
 #ifndef STREAMINGCHUNK_H
 #define STREAMINGCHUNK_H
 
+#include <fstream>
 #include <memory>
 
 #include <QByteArray>
@@ -18,6 +19,8 @@
 #include <utils/network/http/httptypes.h>
 
 #include "streaming_chunk_cache_key.h"
+
+//#define DUMP_CHUNK_TO_FILE
 
 
 class StreamingChunk;
@@ -129,6 +132,9 @@ private:
     bool m_isOpenedForModification;
     mutable QMutex m_signalEmitMutex;
     QWaitCondition m_cond;
+#ifdef DUMP_CHUNK_TO_FILE
+    std::ofstream m_dumpFile;
+#endif
 };
 
 

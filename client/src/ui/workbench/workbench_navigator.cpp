@@ -1419,7 +1419,7 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
     if(m_currentMediaWidget && !m_updatingSliderFromReader) {
         if (QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader()){
             if (value == DATETIME_NOW) {
-                reader->jumpToPreviousFrame(DATETIME_NOW);
+                reader->jumpTo(DATETIME_NOW, 0);
             } else {
                 if (m_preciseNextSeek) {
                     reader->jumpTo(value * 1000, value * 1000); /* Precise seek. */

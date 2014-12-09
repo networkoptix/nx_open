@@ -4,6 +4,8 @@
 
 #include "streaming_chunk.h"
 
+#include <atomic>
+
 #include <QMutexLocker>
 
 
@@ -62,6 +64,11 @@ bool StreamingChunk::tryRead( SequentialReadingContext* const ctx, nx::Buffer* c
     return true;
 }
 
+#ifdef DUMP_CHUNK_TO_FILE
+static std::atomic<int> fileNumber = 1;
+static QString filePathBase( lit("c:\\tmp\\chunks\\%1_%2.ts").arg(rand()) );
+#endif
+
 //!Only one thread is allowed to modify chunk data at a time
 bool StreamingChunk::openForModification()
 {
@@ -69,6 +76,13 @@ bool StreamingChunk::openForModification()
     if( m_isOpenedForModification )
         return false;
     m_isOpenedForModification = true;
+
+#ifdef DUMP_CHUNK_TO_FILE
+    m_dumpFile.open(
+        filePathBase.arg( ++fileNumber ).toStdString(),
+        std::ios_base::binary | std::ios_base::out );
+#endif
+
     return true;
 }
 
@@ -84,6 +98,10 @@ void StreamingChunk::appendData( const nx::Buffer& data )
         m_data.append( data );
     }
 
+#ifdef DUMP_CHUNK_TO_FILE
+    m_dumpFile.write( data.constData(), data.size() );
+#endif
+
     QMutexLocker lk( &m_signalEmitMutex );
     emit newDataIsAvailable( shared_from_this(), data.size() );
 }
@@ -96,6 +114,10 @@ void StreamingChunk::doneModification( StreamingChunk::ResultCode /*result*/ )
         m_isOpenedForModification = false;
         m_cond.wakeAll();
     }
+
+#ifdef DUMP_CHUNK_TO_FILE
+    m_dumpFile.close();
+#endif
 
     QMutexLocker lk( &m_signalEmitMutex );
     emit newDataIsAvailable( shared_from_this(), 0 );
