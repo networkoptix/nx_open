@@ -4,17 +4,16 @@
 <context>
     <name>Language</name>
     <message>
+        <location filename="../src/translation/translation_manager.cpp" line="153"/>
+        <source>Language Name</source>
+        <translation>Русский</translation>
+    </message>
+    <message>
         <location filename="../src/translation/translation_manager.cpp" line="156"/>
         <source>Locale Code</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
         <translation>ru</translation>
-    </message>
-    <message>
-        <location filename="../src/translation/translation_manager.cpp" line="153"/>
-        <source>Language Name</source>
-        <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
-        <translation>Русский</translation>
-    </message>
+    </message>    
 </context>
 <context>
     <name>Qee::Evaluator</name>

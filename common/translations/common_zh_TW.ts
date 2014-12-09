@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="en_US" sourcelanguage="en">
+<TS version="2.0" language="zh_TW" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
         <location filename="../src/translation/translation_manager.cpp" line="153"/>
         <source>Language Name</source>
-        <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
         <translation>繁体中文</translation>
     </message>
     <message>
