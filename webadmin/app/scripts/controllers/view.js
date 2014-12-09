@@ -43,16 +43,12 @@ angular.module('webadminApp').controller('ViewCtrl', function ($scope,$rootScope
             { src: serverUrl + '/media/' + cameraId + '.3gp?resolution='    +  $scope.activeResolution },
             { src: serverUrl + '/media/' + cameraId + '.mpjpeg?resolution=' +  $scope.activeResolution }
         ];
-
-        console.log("changeSource", $scope.acitveVideoSource[0].src);
     }
     $scope.activeVideoRecords = null;
 
     $scope.selectCameraById = function(cameraId){
 
         $scope.cameraId = cameraId || $scope.cameraId;
-
-        console.log("selectCameraById" , $scope.cameraId );
 
         $scope.activeCamera = _.find($scope.allcameras,function(camera){
             return camera.id === $scope.cameraId;
@@ -67,8 +63,6 @@ angular.module('webadminApp').controller('ViewCtrl', function ($scope,$rootScope
     };
 
     $rootScope.$on('$routeChangeStart', function (event, next, current) {
-        console.log('$routeChangeStart',event, next, current);
-
         $scope.selectCameraById(next.params.cameraId);
     });
 
