@@ -29,8 +29,9 @@ private slots:
     void at_remotePeerFound(ec2::ApiPeerAliveData data);
     void at_remotePeerLost(ec2::ApiPeerAliveData data);
     void at_systemNameChangeRequested(const QString &systemName);
+
 private:
-    QSharedPointer<QnIncompatibleServerWatcher> m_incompatibleServerWatcher;
+    QnIncompatibleServerWatcher *m_incompatibleServerWatcher;
     bool m_connected;
     bool m_holdConnection;
 };

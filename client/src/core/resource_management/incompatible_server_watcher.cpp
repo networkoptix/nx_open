@@ -59,18 +59,38 @@ bool isSuitable(const QnModuleInformation &moduleInformation) {
 QnIncompatibleServerWatcher::QnIncompatibleServerWatcher(QObject *parent) :
     QObject(parent)
 {
+}
+
+QnIncompatibleServerWatcher::~QnIncompatibleServerWatcher() {
+    stop();
+}
+
+void QnIncompatibleServerWatcher::start() {
     connect(QnGlobalModuleFinder::instance(),   &QnGlobalModuleFinder::peerChanged, this,   &QnIncompatibleServerWatcher::at_peerChanged);
     connect(QnGlobalModuleFinder::instance(),   &QnGlobalModuleFinder::peerLost,    this,   &QnIncompatibleServerWatcher::at_peerLost);
     connect(qnResPool,                          &QnResourcePool::resourceAdded,     this,   &QnIncompatibleServerWatcher::at_resourcePool_resourceChanged);
     connect(qnResPool,                          &QnResourcePool::resourceChanged,   this,   &QnIncompatibleServerWatcher::at_resourcePool_resourceChanged);
 
-    // fill resource pool with already found modules
+    /* fill resource pool with already found modules */
     foreach (const QnModuleInformation &moduleInformation, QnGlobalModuleFinder::instance()->foundModules())
         at_peerChanged(moduleInformation);
 }
 
-QnIncompatibleServerWatcher::~QnIncompatibleServerWatcher() {
-    foreach (const QnUuid &id, m_fakeUuidByServerUuid) {
+void QnIncompatibleServerWatcher::stop() {
+    if (QnGlobalModuleFinder::instance())
+        QnGlobalModuleFinder::instance()->disconnect(this);
+
+    qnResPool->disconnect(this);
+
+    QList<QnUuid> ids;
+    {
+        QMutexLocker lock(&m_mutex);
+        ids = m_fakeUuidByServerUuid.values();
+        m_fakeUuidByServerUuid.clear();
+        m_serverUuidByFakeUuid.clear();
+    }
+
+    for (const QnUuid &id: ids) {
         QnResourcePtr resource = qnResPool->getIncompatibleResourceById(id, true);
         if (resource)
             qnResPool->removeResource(resource);
@@ -81,21 +101,25 @@ void QnIncompatibleServerWatcher::at_peerChanged(const QnModuleInformation &modu
     bool compatible = moduleInformation.isCompatibleToCurrentSystem();
     bool authorized = moduleInformation.authHash == qnCommon->moduleInformation().authHash;
 
+    QnUuid id = getFakeId(moduleInformation.id);
+
     QnResourcePtr resource = qnResPool->getResourceById(moduleInformation.id);
     if ((compatible && (authorized || resource)) || (resource && resource->getStatus() == Qn::Online)) {
-        removeResource(m_fakeUuidByServerUuid.value(moduleInformation.id));
+        removeResource(id);
         return;
     }
 
-    QnUuid id = m_fakeUuidByServerUuid.value(moduleInformation.id);
     if (id.isNull()) {
         // add a resource
         if (!isSuitable(moduleInformation))
             return;
 
         QnMediaServerResourcePtr server = makeResource(moduleInformation, (compatible && !authorized) ? Qn::Unauthorized : Qn::Incompatible);
-        m_fakeUuidByServerUuid[moduleInformation.id] = server->getId();
-        m_serverUuidByFakeUuid[server->getId()] = moduleInformation.id;
+        {
+            QMutexLocker lock(&m_mutex);
+            m_fakeUuidByServerUuid[moduleInformation.id] = server->getId();
+            m_serverUuidByFakeUuid[server->getId()] = moduleInformation.id;
+        }
         qnResPool->addResource(server);
 
 		NX_LOG(lit("QnIncompatibleServerWatcher: Add incompatible server %1 at %2 [%3]")
@@ -118,7 +142,7 @@ void QnIncompatibleServerWatcher::at_peerChanged(const QnModuleInformation &modu
 }
 
 void QnIncompatibleServerWatcher::at_peerLost(const QnModuleInformation &moduleInformation) {
-    removeResource(m_fakeUuidByServerUuid.value(moduleInformation.id));
+    removeResource(getFakeId(moduleInformation.id));
 }
 
 void QnIncompatibleServerWatcher::at_resourcePool_resourceChanged(const QnResourcePtr &resource) {
@@ -128,23 +152,30 @@ void QnIncompatibleServerWatcher::at_resourcePool_resourceChanged(const QnResour
 
     QnUuid id = server->getId();
 
-    if (m_serverUuidByFakeUuid.contains(id))
-        return;
+    {
+        QMutexLocker lock(&m_mutex);
+        if (m_serverUuidByFakeUuid.contains(id))
+            return;
+    }
 
     Qn::ResourceStatus status = server->getStatus();
     if (status != Qn::Offline && server->getModuleInformation().isCompatibleToCurrentSystem())
-        removeResource(m_fakeUuidByServerUuid.value(id));
+        removeResource(getFakeId(id));
 }
 
 void QnIncompatibleServerWatcher::removeResource(const QnUuid &id) {
     if (id.isNull())
         return;
 
-    QnUuid serverId = m_serverUuidByFakeUuid.take(id);
-    if (serverId.isNull())
-        return;
+    QnUuid serverId;
+    {
+        QMutexLocker lock(&m_mutex);
+        serverId = m_serverUuidByFakeUuid.take(id);
+        if (serverId.isNull())
+            return;
 
-    m_fakeUuidByServerUuid.remove(serverId);
+        m_fakeUuidByServerUuid.remove(serverId);
+    }
 
     QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
     if (server) {
@@ -155,4 +186,9 @@ void QnIncompatibleServerWatcher::removeResource(const QnUuid &id) {
 
         qnResPool->removeResource(server);
     }
+}
+
+QnUuid QnIncompatibleServerWatcher::getFakeId(const QnUuid &realId) const {
+    QMutexLocker lock(&m_mutex);
+    return m_fakeUuidByServerUuid.value(realId);
 }
