@@ -823,6 +823,11 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
     }
 }
 
+QSizeF QnMediaResourceWidget::constrainedSize(const QSizeF constraint) const {
+    float aspectRatio = hasAspectRatio() ? this->aspectRatio() : defaultVisualAspectRatio();
+    return expanded(aspectRatio, constraint, Qt::KeepAspectRatioByExpanding);
+}
+
 void QnMediaResourceWidget::channelLayoutChangedNotify() {
     base_type::channelLayoutChangedNotify();
 
