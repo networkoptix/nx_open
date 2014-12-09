@@ -6,7 +6,7 @@
     <message>
         <location filename="../src/translation/translation_manager.cpp" line="153"/>
         <source>Language Name</source>
-        <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
+        <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
         <translation>简体中文</translation>
     </message>
     <message>
@@ -878,7 +878,7 @@ Parameters: </source>
 <context>
     <name>QnMediaServerResource</name>
     <message>
-        <location filename="../src/core/resource/media_server_resource.cpp" line="43"/>
+        <location filename="../src/core/resource/media_server_resource.cpp" line="44"/>
         <source>Server</source>
         <translation>服务器</translation>
     </message>

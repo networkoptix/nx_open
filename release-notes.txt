@@ -1,4 +1,8 @@
 ----------------------------------------------2.3.0.xxxx-------------------------------------------
+Known Issues:
+#4452
+#4453
+
 Features:
 
 Video Wall. Allows users to control unlimited number of monitors in the realtime mode. Requires Video Wall Licenses. To activate the feature it is necessary to have 5 licenses. Each license allows one operator to cotrol VW.

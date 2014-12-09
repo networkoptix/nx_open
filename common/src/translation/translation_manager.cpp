@@ -149,7 +149,7 @@ QnTranslation QnTranslationManager::loadTranslationInternal(const QString &trans
 
     /* Note that '//:' denotes a comment for translators that will appear in TS files. */
 
-    //: Internal. Please don't change existing translation.
+    //: Language name that will be displayed to user. Must not be empty.
     QString languageName = translator.translate("Language", "Language Name");
 
     //: Internal. Please don't change existing translation.

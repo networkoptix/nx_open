@@ -4,16 +4,16 @@
 <context>
     <name>Language</name>
     <message>
+        <location filename="../src/translation/translation_manager.cpp" line="153"/>
+        <source>Language Name</source>
+        <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
+        <translation>Русский</translation>
+    </message>
+    <message>
         <location filename="../src/translation/translation_manager.cpp" line="156"/>
         <source>Locale Code</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
         <translation>ru</translation>
-    </message>
-    <message>
-        <location filename="../src/translation/translation_manager.cpp" line="153"/>
-        <source>Language Name</source>
-        <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
-        <translation>Русский</translation>
     </message>
 </context>
 <context>
@@ -884,7 +884,7 @@ Parameters: </source>
 <context>
     <name>QnMediaServerResource</name>
     <message>
-        <location filename="../src/core/resource/media_server_resource.cpp" line="43"/>
+        <location filename="../src/core/resource/media_server_resource.cpp" line="44"/>
         <source>Server</source>
         <translation>Сервер</translation>
     </message>
