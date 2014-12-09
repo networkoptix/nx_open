@@ -6,6 +6,7 @@
     <message>
         <location filename="../src/translation/translation_manager.cpp" line="153"/>
         <source>Language Name</source>
+        <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
         <translation>Français</translation>
     </message>
     <message>
@@ -880,7 +881,7 @@ Paramètres: </translation>
 <context>
     <name>QnMediaServerResource</name>
     <message>
-        <location filename="../src/core/resource/media_server_resource.cpp" line="43"/>
+        <location filename="../src/core/resource/media_server_resource.cpp" line="44"/>
         <source>Server</source>
         <translation>Serveur</translation>
     </message>

@@ -12,7 +12,7 @@
     <message>
         <location filename="../src/translation/translation_manager.cpp" line="153"/>
         <source>Language Name</source>
-        <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
+        <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
         <translation>Português do Brasil</translation>
     </message>
 </context>
@@ -880,7 +880,7 @@ Confira se a câmera esta ligada na rede.</translation>
 <context>
     <name>QnMediaServerResource</name>
     <message>
-        <location filename="../src/core/resource/media_server_resource.cpp" line="43"/>
+        <location filename="../src/core/resource/media_server_resource.cpp" line="44"/>
         <source>Server</source>
         <translation>Servidor</translation>
     </message>

@@ -6,6 +6,7 @@
     <message>
         <location filename="../src/translation/translation_manager.cpp" line="153"/>
         <source>Language Name</source>
+        <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
         <translation>繁体中文</translation>
     </message>
     <message>
@@ -411,7 +412,6 @@
         <comment>%1 means time, %2 means date</comment>
         <translation>
             <numerusform>%n 時間，第一：%2 %1</numerusform>
-            <numerusform>%n 時間，第一：%2 %1</numerusform>
         </translation>
     </message>
     <message>
@@ -426,14 +426,12 @@
         <comment>%1 means time, %2 means date</comment>
         <translation>
             <numerusform>第一次出現: %1 在 %2 ( %n 出現 次)</numerusform>
-            <numerusform>第一次發生於：%1在%2。(共發生%n次)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_strings_helper.cpp" line="364"/>
         <source>No video frame received during last %n seconds.</source>
         <translation>
-            <numerusform>在過去的 %n 秒 無接收的影像</numerusform>
             <numerusform>在過去的 %n 秒 無接收的影像</numerusform>
         </translation>
     </message>
@@ -821,14 +819,12 @@ Parameters: </source>
         <source>%n %2 are used out of %1.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/license_usage_helper.cpp" line="94"/>
         <source>%n %2 will be used out of %1.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -837,14 +833,12 @@ Parameters: </source>
         <source>Activate %n more %2. </source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/license_usage_helper.cpp" line="114"/>
         <source>%n more %2 will be used. </source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -877,7 +871,7 @@ Parameters: </source>
 <context>
     <name>QnMediaServerResource</name>
     <message>
-        <location filename="../src/core/resource/media_server_resource.cpp" line="43"/>
+        <location filename="../src/core/resource/media_server_resource.cpp" line="44"/>
         <source>Server</source>
         <translation>伺服器</translation>
     </message>
