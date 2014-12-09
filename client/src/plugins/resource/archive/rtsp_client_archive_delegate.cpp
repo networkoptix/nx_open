@@ -459,11 +459,12 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
             rtpChannelNum = m_rtpData->getMediaSocket()->getLocalAddress().port;
         }
         const QString format = m_rtspSession.getTrackFormatByRtpChannelNum(rtpChannelNum).toLower();
+        qint64 parserPosition = AV_NOPTS_VALUE;
         if (format.isEmpty()) {
             //qWarning() << Q_FUNC_INFO << __LINE__ << "RTP track" << rtpChannelNum << "not found";
         }
         else if (format == QLatin1String("ffmpeg")) {
-            result = qSharedPointerDynamicCast<QnAbstractMediaData>(processFFmpegRtpPayload(data, blockSize, rtpChannelNum/2));
+            result = qSharedPointerDynamicCast<QnAbstractMediaData>(processFFmpegRtpPayload(data, blockSize, rtpChannelNum/2, &parserPosition));
             if (!result && m_frameCnt == 0 && receiveTimer.elapsed() > 4000)
                 emit dataDropped(m_reader); // if client can't receive first frame too long inform that stream is slow
         }
@@ -475,6 +476,8 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
 
         if (result && m_sendedCSec != result->opaque)
             result.clear(); // ignore old archive data
+        if (parserPosition != AV_NOPTS_VALUE)
+            m_position = parserPosition;
         /*
         if (result && m_waitBOF)
         {
@@ -648,7 +651,7 @@ void QnRtspClientArchiveDelegate::processMetadata(const quint8* data, int dataSi
         emit dataDropped(m_reader);
 }
 
-QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(quint8* data, int dataSize, int channelNum)
+QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(quint8* data, int dataSize, int channelNum, qint64* parserPosition)
 {
     QMutexLocker lock(&m_mutex);
 
@@ -660,7 +663,7 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(qui
     QnFfmpegRtpParserPtr parser = itr.value();
     bool gotData = false;
     parser->processData(data, 0, dataSize, RtspStatistic(), gotData);
-    m_position = parser->position();
+    *parserPosition = parser->position();
     if (gotData) {
         result = parser->nextData();
         if (result)
