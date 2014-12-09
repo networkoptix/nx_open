@@ -47,6 +47,7 @@ angular.module('webadminApp').controller('ViewCtrl', function ($scope,$rootScope
     }
 
     $scope.selectCameraById = function(cameraId){
+
         $scope.cameraId = cameraId || $scope.cameraId;
 
         $scope.activeCamera = _.find($scope.allcameras,function(camera){
@@ -57,11 +58,13 @@ angular.module('webadminApp').controller('ViewCtrl', function ($scope,$rootScope
     };
 
     $rootScope.$on('$routeChangeStart', function (event, next, current) {
+
         $scope.selectCameraById(next.params.cameraId);
     });
 
     $scope.selectCamera = function(activeCamera){
         $location.path('/view/' + activeCamera.id, false);
+        $scope.selectCameraById(activeCamera.id);
     };
 
     function extractDomain(url) {
