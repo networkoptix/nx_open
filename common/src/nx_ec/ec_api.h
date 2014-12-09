@@ -112,6 +112,11 @@ namespace ec2
             int(AbstractResourceManager::*fn)(const QnUuid&, Qn::ResourceStatus, impl::SetResourceStatusHandlerPtr) = &AbstractResourceManager::setResourceStatus;
             return impl::doSyncCall<impl::SetResourceStatusHandler>( std::bind(fn, this, id, status, std::placeholders::_1), &rezId );
         }
+        ErrorCode setResourceStatusLocalSync( const QnUuid& id, Qn::ResourceStatus status) {
+            QnUuid rezId;
+            int(AbstractResourceManager::*fn)(const QnUuid&, Qn::ResourceStatus, impl::SetResourceStatusHandlerPtr) = &AbstractResourceManager::setResourceStatusLocal;
+            return impl::doSyncCall<impl::SetResourceStatusHandler>( std::bind(fn, this, id, status, std::placeholders::_1), &rezId );
+        }
 
         /*!
             \param handler Functor with params: (ErrorCode, const ApiResourceParamWithRefDataList&)

@@ -923,6 +923,31 @@ bool QnDbManager::beforeInstallUpdate(const QString& /*updateName*/)
     return true;
 }
 
+bool QnDbManager::removeServerStatusFromTransactionLog()
+{
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    query.prepare("SELECT r.guid from vms_server s JOIN vms_resource r on r.id = s.resource_ptr_id");
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << __LINE__ << query.lastError();
+        return false;
+    }
+    QSqlQuery delQuery(m_sdb);
+    delQuery.prepare("DELETE from transaction_log WHERE tran_guid = ?");
+    while (query.next()) {
+        ApiResourceStatusData data;
+        data.id = QnUuid::fromRfc4122(query.value(0).toByteArray());
+        QnUuid hash = transactionLog->transactionHash(data);
+        delQuery.bindValue(0, QnSql::serialized_field(hash));
+        if (!delQuery.exec()) {
+            qWarning() << Q_FUNC_INFO << __LINE__ << delQuery.lastError();
+            return false;
+        }
+    }
+
+    return true;
+}
+
 bool QnDbManager::afterInstallUpdate(const QString& updateName)
 {
     if (updateName == lit(":/updates/07_videowall.sql")) 
@@ -943,6 +968,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     }
     else if (updateName == lit(":/updates/24_insert_default_stored_files.sql")) {
         addStoredFiles(lit(":/vms_storedfiles/"));
+    }
+    else if (updateName == lit(":/updates/26_remove_server_status.sql")) {
+        return removeServerStatusFromTransactionLog();
     }
 
 

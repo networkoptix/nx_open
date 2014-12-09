@@ -1072,7 +1072,6 @@ void QnTransactionMessageBus::doPeriodicTasks()
     }
 
     // check if some server not accessible any more
-    QSet<QnUuid> lostPeers;
     for (AlivePeersMap::iterator itr = m_alivePeers.begin(); itr != m_alivePeers.end(); ++itr)
     {
         if (itr.value().lastActivity.elapsed() > ALIVE_UPDATE_INTERVAL * 2)
@@ -1095,11 +1094,8 @@ void QnTransactionMessageBus::doPeriodicTasks()
                     transport->setState(QnTransactionTransport::Error);
                 }
             }
-            lostPeers << itr.key();
         }
     }
-    for (const QnUuid& id: lostPeers)
-        connectToPeerLost(id);
 }
 
 void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport, const QnTransactionTransportHeader& transportHeader, const QnTranState& runtimeState)
@@ -1118,9 +1114,6 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(const QSharedPointer<A
         qWarning() << "This peer connected to remote Server. Ignoring incoming connection";
         return;
     }
-
-    if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(remotePeer.id))
-        return; // accept only allowed peers
 
     QnTransactionTransportPtr transport(new QnTransactionTransport(m_localPeer, socket));
     transport->setRemotePeer(remotePeer);

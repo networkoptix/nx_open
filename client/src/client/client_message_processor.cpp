@@ -80,6 +80,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
     } else {
         ownResource->update(resource);
 
+#if 0
         if (QnMediaServerResourcePtr mediaServer = ownResource.dynamicCast<QnMediaServerResource>()) {
             /* Handling a case when an incompatible server is changing its systemName at runtime and becoming compatible. */
             if (resource->getStatus() == Qn::NotDefined && mediaServer->getStatus() == Qn::Incompatible) {
@@ -90,6 +91,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
                 }
             }
         }
+#endif
     }
 
     // TODO: #Elric #2.3 don't update layout if we're re-reading resources, 

@@ -509,6 +509,7 @@ namespace ec2
         ErrorCode getScheduleTasks(const QnUuid& cameraId, std::vector<ApiScheduleTaskWithRefData>& scheduleTaskList);
         void addResourceTypesFromXML(ApiResourceTypeDataList& data);
         void loadResourceTypeXML(const QString& fileName, ApiResourceTypeDataList& data);
+        bool removeServerStatusFromTransactionLog();
     private:
         QnResourceFactory* m_resourceFactory;
         QnUuid m_storageTypeId;

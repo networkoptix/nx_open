@@ -35,6 +35,7 @@ void updateServer(const QnMediaServerResourcePtr &server, const QnModuleInformat
     server->setVersion(moduleInformation.version);
     server->setSystemInfo(moduleInformation.systemInformation);
     server->setSystemName(moduleInformation.systemName);
+    server->setProperty(lit("protoVersion"), QString::number(moduleInformation.protoVersion));
 }
 
 QnMediaServerResourcePtr makeResource(const QnModuleInformation &moduleInformation, Qn::ResourceStatus initialStatus) {
@@ -131,7 +132,7 @@ void QnIncompatibleServerWatcher::at_resourcePool_resourceChanged(const QnResour
         return;
 
     Qn::ResourceStatus status = server->getStatus();
-    if (status != Qn::Offline && server->getModuleInformation().isCompatibleToCurrentSystem(true))
+    if (status != Qn::Offline && server->getModuleInformation().isCompatibleToCurrentSystem())
         removeResource(m_fakeUuidByServerUuid.value(id));
 }
 
