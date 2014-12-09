@@ -36,7 +36,7 @@ namespace ec2
 
 static const int RECONNECT_TIMEOUT = 1000 * 5;
 static const int ALIVE_UPDATE_INTERVAL = 1000 * 60;
-static const int ALIVE_UPDATE_TIMEOUT = 1000 * 130;
+static const int ALIVE_UPDATE_TIMEOUT = ALIVE_UPDATE_INTERVAL*2 + 10*1000;
 static const int DISCOVERED_PEER_TIMEOUT = 1000 * 60 * 3;
 
 struct GotTransactionFuction {
