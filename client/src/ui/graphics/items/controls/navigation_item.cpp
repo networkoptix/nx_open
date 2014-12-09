@@ -493,6 +493,9 @@ void QnNavigationItem::at_syncButton_clicked() {
 }
 
 void QnNavigationItem::at_stepBackwardButton_clicked() {
+    if (!m_stepBackwardButton->isEnabled())
+        return;
+
     if(m_playButton->isChecked()) {
         m_speedSlider->speedDown();
         if(qFuzzyIsNull(m_speedSlider->speed()))
@@ -503,6 +506,9 @@ void QnNavigationItem::at_stepBackwardButton_clicked() {
 }
 
 void QnNavigationItem::at_stepForwardButton_clicked() {
+    if (!m_stepForwardButton->isEnabled())
+        return;
+
     if(m_playButton->isChecked()) {
         m_speedSlider->speedUp();
         if(qFuzzyIsNull(m_speedSlider->speed()))
