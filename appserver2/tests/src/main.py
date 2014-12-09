@@ -497,6 +497,8 @@ class ResourceDataGenerator(BasicGenerator):
                 continue
             json_obj = json.loads(response.read())
             for ele in json_obj:
+                if "isAdmin" in ele and ele["isAdmin"] == True:
+                    continue # skip admin
                 self._existedResourceList.append((ele["id"],ele["parentId"],ele["typeId"]))
 
             response.close()
@@ -667,6 +669,8 @@ class UserConflictionDataGenerator(BasicGenerator):
         json_obj = json.loads(response.read())
 
         for entry in json_obj:
+            if entry["isAdmin"] == True:
+                continue # skip admin
             self._existedUserList.append((entry["digest"],entry["email"],entry["hash"],
                  entry["id"],entry["permissions"]))
 
@@ -1063,7 +1067,7 @@ class ResourceParaTest(ClusterTestBase):
         return "getResourceParams?format=json"
 
 
-class ResourceRemoveTest():
+class ResourceRemoveTest(ClusterTestBase):
     _gen = None
     _testCase = clusterTest.testCaseSize
 
@@ -1127,7 +1131,7 @@ class ServerUserAttributesListDataTest(ClusterTestBase):
 
 # The following test will issue the modify and remove on different servers to
 # trigger confliction resolving.
-class ResourceConflictionTest(ClusterTestBase):
+class ResourceConflictionTest():
     _testCase = clusterTest.testCaseSize
     _conflictList = []
     
