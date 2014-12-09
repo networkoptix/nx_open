@@ -16,7 +16,7 @@ angular.module('webadminApp')
                     }
                 }
                 scope.$watch(attrs.nxEqualEx, updateValidity);
-                scope.$watch("$viewValue", updateValidity);
+                scope.$watch('$viewValue', updateValidity);
 
                 model.$parsers.push(function (value) {
                     // Mute the nxEqual error if the second ctrl is empty.

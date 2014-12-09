@@ -59,7 +59,7 @@ angular.module('webadminApp').controller('ViewCtrl', function ($scope,$rootScope
     };
     $scope.selectCamera = function(activeCamera){
         $location.path('/view/' + activeCamera.id, false);
-        return false;
+        $scope.selectCameraById(activeCamera.id);
     };
 
     $rootScope.$on('$routeChangeStart', function (event, next, current) {

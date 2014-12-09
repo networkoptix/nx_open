@@ -133,8 +133,6 @@ function RulerModel(start,end){
     //3. Init intervals tree
     this.setInterval(this.start, this.end, level);
     this.setInterval(this.start, this.end, level+1);
-
-    console.log('intervals tree',this.marksTree);
 }
 
 /**
@@ -186,8 +184,6 @@ RulerModel.getLevelIndex = function(searchdetailization){
 // request better detailization
 RulerModel.prototype.setInterval = function (start,end,level){
 
-    console.log("setInterval",start,end,level,(new Date()).getTime());
-
     if(level > RulerModel.levels.length - 1) {
         level = RulerModel.levels.length - 1;
     }
@@ -203,8 +199,6 @@ RulerModel.prototype.setInterval = function (start,end,level){
             {marks: Array.apply(null, {length: RulerModel.levels[level].marks - 1}).map(Number.call, Number),
             expand:true});
     }
-
-    console.log("updateSplice",start,end,level,(new Date()).getTime());
 
     //3. Splice cache for existing interval, store it as local cache
     this.updateSplice();
@@ -237,7 +231,6 @@ RulerModel.prototype.updateSplice = function(){
 RulerModel.prototype.splice = function(start, end, level, parent){
     parent = parent || this.marksTree;
     if(parent.level === level) {
-        console.log("collapse");
         parent.expand = false;
         return;
     }
@@ -371,7 +364,6 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
             parent.children.push(chunk);
             return;
         }
-        console.log('we need to go deeper!',chunk.start,chunk.end,parent.level+1, RulerModel.levels[parent.level+1].name);
         parent.children.push(new Chunk(parent,chunk.start,chunk.end,parent.level+1));
         this.addChunk(chunk,parent.children[0]);
     } else {
