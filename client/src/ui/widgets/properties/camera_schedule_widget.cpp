@@ -244,6 +244,12 @@ QnCameraScheduleWidget::~QnCameraScheduleWidget() {
     return;
 }
 
+bool QnCameraScheduleWidget::hasHeightForWidth() const {
+    return false;   //TODO: #GDM temporary fix to handle string freeze
+                    // all labels with word-wrap should be replaced by QnWordWrappedLabel. 
+                    // This widget has 5 of them (label_4.._8, exportWarningLabel)
+}
+
 void QnCameraScheduleWidget::connectToGridWidget()
 {
     connect(ui->gridWidget, SIGNAL(cellValueChanged(const QPoint &)), this, SIGNAL(scheduleTasksChanged()));

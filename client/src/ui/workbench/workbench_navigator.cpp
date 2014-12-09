@@ -678,8 +678,10 @@ void QnWorkbenchNavigator::stepBackward() {
 
 void QnWorkbenchNavigator::at_clearLoaderCache()
 {
-    for (QnCachingCameraDataLoader* loader: m_loaderByResource)
-        loader->discardCachedData();
+    for (QnCachingCameraDataLoader* loader: m_loaderByResource) {
+        if (loader)
+            loader->discardCachedData();
+    }
 }
 
 void QnWorkbenchNavigator::stepForward() {
@@ -1350,7 +1352,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
         if(!m_timeSlider->isSelectionValid())
             return;
 
-        m_timeSlider->setValue((m_timeSlider->selectionStart(), m_timeSlider->selectionEnd()) / 2, false);
+        m_timeSlider->setValue((m_timeSlider->selectionStart() + m_timeSlider->selectionEnd()) / 2, false);
         m_timeSlider->finishAnimations();
         m_timeSlider->setWindow(m_timeSlider->selectionStart(), m_timeSlider->selectionEnd(), true);
     }

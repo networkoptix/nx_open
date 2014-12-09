@@ -36,6 +36,7 @@ namespace ec2
 
 static const int RECONNECT_TIMEOUT = 1000 * 5;
 static const int ALIVE_UPDATE_INTERVAL = 1000 * 60;
+static const int ALIVE_UPDATE_TIMEOUT = ALIVE_UPDATE_INTERVAL*2 + 10*1000;
 static const int DISCOVERED_PEER_TIMEOUT = 1000 * 60 * 3;
 
 struct GotTransactionFuction {
@@ -1075,7 +1076,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
     QSet<QnUuid> lostPeers;
     for (AlivePeersMap::iterator itr = m_alivePeers.begin(); itr != m_alivePeers.end(); ++itr)
     {
-        if (itr.value().lastActivity.elapsed() > ALIVE_UPDATE_INTERVAL * 2)
+        if (itr.value().lastActivity.elapsed() > ALIVE_UPDATE_TIMEOUT)
         {
             itr.value().lastActivity.restart();
             for(const QnTransactionTransportPtr& transport: m_connectingConnections) {

@@ -39,8 +39,8 @@ private:
 };
 
 
-QnLicensesUsageWidget::QnLicensesUsageWidget(QWidget *parent) {
-}
+QnLicensesUsageWidget::QnLicensesUsageWidget(QWidget *parent): 
+    QWidget(parent) {}
 
 QnLicensesUsageWidget::~QnLicensesUsageWidget() {
 

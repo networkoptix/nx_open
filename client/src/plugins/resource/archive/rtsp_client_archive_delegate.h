@@ -60,7 +60,7 @@ public:
 
     void setPlayNowModeAllowed(bool value);
 
-    void checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server);
+    void checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, qint64* result);
 signals:
     void dataDropped(QnArchiveStreamReader* reader);
 private:

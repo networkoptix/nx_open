@@ -118,6 +118,8 @@ public:
     QnMediaDewarpingParams dewarpingParams() const;
     void setDewarpingParams(const QnMediaDewarpingParams &params);
 
+    virtual float defaultVisualAspectRatio() const override;
+
 signals:
     void motionSelectionChanged();
     void displayChanged();
@@ -125,7 +127,10 @@ signals:
     void dewarpingParamsChanged();
 
 protected:
+    virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
     virtual int helpTopicAt(const QPointF &pos) const override;
+
+    virtual QSizeF constrainedSize(const QSizeF constraint) const override;
 
     virtual void channelLayoutChangedNotify() override;
     virtual void channelScreenSizeChangedNotify() override;

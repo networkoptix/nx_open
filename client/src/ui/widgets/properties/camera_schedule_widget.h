@@ -21,6 +21,8 @@ public:
     QnCameraScheduleWidget(QWidget *parent = 0);
     virtual ~QnCameraScheduleWidget();
 
+    virtual bool hasHeightForWidth() const override;
+
     /**
      * @brief beginUpdate           Begin component update process. Inner update signals are not called while in update.
      */
