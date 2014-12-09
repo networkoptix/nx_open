@@ -1063,7 +1063,7 @@ class ResourceParaTest(ClusterTestBase):
         return "getResourceParams?format=json"
 
 
-class ResourceRemoveTest(ClusterTestBase):
+class ResourceRemoveTest():
     _gen = None
     _testCase = clusterTest.testCaseSize
 
