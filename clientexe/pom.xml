@@ -16,7 +16,7 @@
     <groupId>com.networkoptix.hdwitness</groupId>
     <version>2.3.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>client</artifactId>
+    <artifactId>clientexe</artifactId>
     <packaging>pom</packaging>
     <name>HD Witness Client</name>
 
@@ -26,7 +26,7 @@
         <!--Global libs-->
         <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>
         <!-- ATTENTION!!! -lestbase should be the LATEST in the list!!! Required for Linux -->
-        <global.libs>-lcommon -lappserver2 -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lFestival -lestools -leststring -lestbase -lquazip</global.libs>
+        <global.libs>-lcommon -lappserver2 -lclient -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lFestival -lestools -leststring -lestbase -lquazip</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -lDxErr -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar</windows.oslibs>
         <windows.oslibs.release/>
@@ -39,43 +39,8 @@
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
         <linux.defines/>
         <mac.defines/>
-	<buildLib>sharedlib</buildLib>
     </properties>   
     <profiles>
-        <profile>
-            <id>windows</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
-            </activation>
-            <build>
-                <plugins>                   
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <version>1.1.1</version>
-                        <executions>
-                            <execution>
-                                <id>launcher-compile</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>build-${arch}.bat</executable>
-                                    <workingDirectory>${basedir}/launcher</workingDirectory>        
-                                    <arguments>
-                                        <commandlineArgs>${build.configuration}</commandlineArgs>
-                                    </arguments>
-                                </configuration>
-                            </execution>                            
-                        </executions>
-                    </plugin>   
-                </plugins>
-            </build>
-        </profile>  
-
         <profile>
             <id>webkit-win</id>
             <activation>
@@ -91,17 +56,5 @@
                 <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>
             </properties>
         </profile>  
-
-        <profile>
-            <id>windows-staticlib</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
-            </activation>            
-            <properties>
-                <buildLib>staticlib</buildLib>
-            </properties>
-        </profile>
     </profiles>
 </project>

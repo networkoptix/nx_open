@@ -1,0 +1,10 @@
+[
+  uuid(E1BF369C-188A-4046-A814-F7773204E825),
+  version(1.0)
+]
+interface ItemControl {
+    void play();
+    void pause();
+    void nextFrame();
+    void prevFrame();
+};

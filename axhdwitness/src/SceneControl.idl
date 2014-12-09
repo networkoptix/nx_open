@@ -1,0 +1,10 @@
+[
+  uuid(D959B968-A618-45A0-A397-DB32B0596496),
+  version(1.0)
+]
+interface SceneControl {
+    void clear();
+    void addToCurrentLayout([in] BSTR uniqueId);
+    void removeFromCurrentLayout([in] BSTR uniqueId);
+    BSTR resourceListXml();
+};
