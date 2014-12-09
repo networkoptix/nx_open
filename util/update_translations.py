@@ -23,11 +23,11 @@ def update(project, translationDir, projectFile):
         if (not entry.startswith(project)):
             continue;
             
-        entries.append(entry)
+        entries.append(path)
             
     command = 'lupdate -no-obsolete -pro ' + projectFile + ' -locations absolute -ts'
-    for lang in entries:
-        command = command + ' ' + lang
+    for path in entries:
+        command = command + ' ' + path
     print command
     subprocess.call(command)
 
