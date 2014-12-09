@@ -476,7 +476,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
 
         if (result && m_sendedCSec != result->opaque)
             result.clear(); // ignore old archive data
-        if (parserPosition != AV_NOPTS_VALUE)
+        if (result && parserPosition != AV_NOPTS_VALUE)
             m_position = parserPosition;
         /*
         if (result && m_waitBOF)
