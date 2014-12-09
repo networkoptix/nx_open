@@ -12,6 +12,8 @@ import sys
 import Queue
 import socket
 import os.path
+import signal
+import sys
 
 
 # Rollback support
@@ -74,6 +76,8 @@ class UnitTestRollback:
                 print ("Cannot rollback for transaction:(MethodName:%s;ServerAddress:%s;ResourceId:%s\n)")% (l[0],l[1],l[2])
                 print  "Or you could run recover later when all the rollback done\n"
                 recoverList.append("%s,%s,%s\n"%(l[0],l[1],l[2]))
+            else:
+                print "Transaction done"
 
         # close the resource file
         self._rollbackFile.close()
@@ -393,6 +397,20 @@ class CameraDataGenerator(BasicGenerator):
 
         return ret
 
+    def generateUpdateData(self,id):
+        mac = self.generateMac()
+        name_and_model = self.generateRandomString(6)
+        return (self._template % (self.generateTrueFalse(),
+                self.generateTrueFalse(),
+                id,
+                mac,
+                name_and_model,
+                name_and_model,
+                mac,
+                self.generateIpV4(),
+                self.generateRandomString(4)),id)
+
+
 class UserDataGenerator(BasicGenerator):
     _template = """
     {
@@ -420,6 +438,13 @@ class UserDataGenerator(BasicGenerator):
                 id,un),id))
 
         return ret
+
+    def generateUpdateData(self,id):
+        un,pwd,digest = self.generateUsernamePasswordAndDigest()
+        return (self._template % (digest,
+                self.generateEmail(),
+                self.generatePasswordHash(pwd),
+                id,un),id)
 
 class MediaServerGenerator(BasicGenerator):
     _template = """
@@ -1260,20 +1285,17 @@ class ResourceConflictionTest(ClusterTestBase):
         print "Test:ResourceConfliction finish!\n"
         print "===================================\n"
 
-
-
 # ========================================
 # Server Merge Automatic Test
 # ========================================
-
 
 # This class represents a single server with a UNIQUE system name.
 # After we initialize this server, we will make it executes certain
 # type of random data generation, after such generation, the server
 # will have different states with other servers
 class PrepareServerStatus(BasicGenerator):
-    _minData = 2
-    _maxData = 8
+    _minData = 10
+    _maxData = 20
     _systemNameTemplate = """
     {
         "systemName":"%s"
@@ -1286,6 +1308,11 @@ class PrepareServerStatus(BasicGenerator):
         "getUsers",
         "getServerUserAttributes",
         "getCameraUserAttributes"]
+
+    _mergeTest = None
+    
+    def __init__(self,mt):
+        self._mergeTest  = mt
 
     # Function to generate method and class matching
     def _generateDataAndAPIList(self):
@@ -1302,34 +1329,20 @@ class PrepareServerStatus(BasicGenerator):
             gen = MediaServerGenerator()
             return gen.generateMediaServerData(num)
 
-        def resourceParAddFunc(num):
-            gen = ResourceDataGenerator()
-            return gen.generateResourceParams(num)
-
-        def cameraUserAttributesListFunc(num):
-            gen = CameraUserAttributesListDataGenerator()
-            return gen.generateCameraUserAttribute(num)
-
-        def serverUserAttributesListFunc(num):
-            gen = ServerUserAttributesListDataGenerator()
-            return gen.generateServerUserAttributesList(num)
-
         return [("saveCameras",cameraFunc),
-            ("saveUser",userFunc),
-            ("saveMediaServer",mediaServerFunc),
-            ("setResourceParams",resourceParAddFunc),
-            ("saveServerUserAttributesList",serverUserAttributesListFunc),
-            ("saveCameraUserAttributesList",cameraUserAttributesListFunc)]
+                ("saveUser",userFunc),
+                ("saveMediaServer",mediaServerFunc)]
 
     def _sendRequest(self,addr,method,d):
         req = urllib2.Request("http://%s/ec2/%s" % (addr,method), \
               data=d, 
               headers={'Content-Type': 'application/json'})
-
-        response = urllib2.urlopen(req)
+        
+        with self._mergeTest._lock:
+            response = urllib2.urlopen(req)
 
         if response.getcode() != 200 :
-            return (False,"Cannot issue changeSystemName with HTTP code:%d" % (response.getcode()))
+            return (False,"Cannot issue %s with HTTP code:%d" % (method,response.getcode()))
 
         response.close()
 
@@ -1348,7 +1361,7 @@ class PrepareServerStatus(BasicGenerator):
                 ret,reason = self._sendRequest(addr,api[0],data[0])
                 if ret == False:
                     return (ret,reason)
-                clusterTest.unittestRollback.addOperations(api[0],addr,api[1])
+                clusterTest.unittestRollback.addOperations(api[0],addr,data[1])
 
         return (True,"")
 
@@ -1362,13 +1375,35 @@ class PrepareServerStatus(BasicGenerator):
     
 # This class is used to control the whole merge test
 class MergeTest():
-    _phase1WaitTime = 5
+    _phase1WaitTime = 8
     _systemName = "mergeTest"
     _gen = BasicGenerator()
     _systemNameTemplate = """
     {
         "systemName":"%s"
     }"""
+
+    _lock = threading.Lock()
+
+    _serverOldSystemNameList=[]
+
+
+    def _prolog(self):
+        for s in clusterTest.clusterTestServerList:
+            response = urllib2.urlopen("http://%s/ec2/testConnection"%(s))
+            if response.getcode() != 200:
+                return False
+            jobj = json.loads( response.read() )
+            self._serverOldSystemNameList.append(jobj["systemName"])
+            response.close()
+
+        return True
+    
+    def _epilog(self):
+        idx = 0
+        for s in clusterTest.clusterTestServerList:
+            self._setSystemName(s,self._serverOldSystemNameList[idx])
+            idx = idx+1
 
     # This function will ENSURE that the random system name is unique
     def _generateRandomSystemName(self):
@@ -1394,7 +1429,7 @@ class MergeTest():
         worker = ClusterWorker(32,len(testList))
 
         for entry in testList:
-            worker.enqueue(PrepareServerStatus().main,
+            worker.enqueue(PrepareServerStatus(self).main,
                 (entry[0],entry[1],))
 
         worker.join()
@@ -1403,10 +1438,10 @@ class MergeTest():
     # Second phase will make each server has the same system
     # name which triggers server merge operations there.
 
-    def _setSystemName(self,addr):
+    def _setSystemName(self,addr,name):
 
         req = urllib2.Request("http://%s/ec2/changeSystemName" % (addr), \
-              data=self._systemNameTemplate % (self._systemName), 
+              data=self._systemNameTemplate % (name), 
               headers={'Content-Type': 'application/json'})
 
         response = urllib2.urlopen(req)
@@ -1421,7 +1456,7 @@ class MergeTest():
     def _setToSameSystemName(self):
         worker = ClusterWorker(32,len(clusterTest.clusterTestServerList))
         for entry in  clusterTest.clusterTestServerList:
-            worker.enqueue(self._setSystemName,(entry,))
+            worker.enqueue(self._setSystemName,(entry,self._systemName,))
         worker.join()
 
     def _phase2(self):
@@ -1439,71 +1474,13 @@ class MergeTest():
         print "================================\n"
         print "Server Merge Test Start\n"
 
+        self._prolog()
         self._phase1()
         self._phase2()
+        self._epilog()
 
         print "Server Merge Test End\n"
         print "================================\n"
-
-
-# Performance test function
-# only support add/remove ,value can only be user and media server
-class PerformanceOperation():
-    def _sendRequest(self,methodName,d,server):
-        req = urllib2.Request("http://%s/ec2/%s" % (server,methodName), \
-        data=d, headers={'Content-Type': 'application/json'})
-        response = urllib2.urlopen(req)
-
-        # Do a sligtly graceful way to dump the sample of failure
-        if response.getcode() != 200:
-            self._dumpFailedRequest(d,methodName)
-
-        if response.getcode() != 200:
-            print "%s failed with statusCode %d" % (methodName,response.getcode())
-        else:
-            print "%s OK\r\n" % (methodName)
-
-        response.close()
-
-    def _getUUIDList(self,methodName):
-        response = urllib2.urlopen("http://%s/ec2/%s?format=json" % (clusterTest.clusterTestServerList[0],methodName))
-
-        if response.getcode() != 200:
-            return None
-
-        json_obj = json.loads(response.read())
-        ret = []
-        for entry in json_obj:
-            ret.append(entry["id"])
-
-        response.close()
-
-        return ret
-
-    def _sendOp(self,methodName,dataList):
-        worker = ClusterWorker(32,len(dataList))
-        for d in dataList:
-            worker.enqueue(self._sendRequest,
-                (methodName,d,
-                    clusterTest.clusterTestServerList[random.randint(0,len(clusterTest.clusterTestServerList) - 1)]))
-
-        worker.join()
-
-    _resourceRemoveTemplate = """
-        {
-            "id":"%s"
-        }
-    """
-    def _removeAll(self,uuidList):
-        data = []
-        for uuid in uuidList:
-            data.append(self._resourceRemoveTemplate % (uuid))
-        self._sendOp("removeResource",data)
-
-    def _remove(self,uuid):
-        self._removeAll([uuid])
-
-
 
 # ===================================
 # RTSP test
@@ -1752,6 +1729,71 @@ class ServerRtspTest:
             SingleServerRtspTest(serverAddr,serverAddrGUID,self._testCase,
                               self._username,self._password).run()
 
+
+# Performance test function
+# only support add/remove ,value can only be user and media server
+class PerformanceOperation():
+    _lock = threading.Lock()
+
+    def _sendRequest(self,methodName,d,server):
+        req = urllib2.Request("http://%s/ec2/%s" % (server,methodName), \
+        data=d, headers={'Content-Type': 'application/json'})
+
+        with self._lock:
+            response = urllib2.urlopen(req)
+
+        # Do a sligtly graceful way to dump the sample of failure
+        if response.getcode() != 200:
+            self._dumpFailedRequest(d,methodName)
+
+        if response.getcode() != 200:
+            print "%s failed with statusCode %d" % (methodName,response.getcode())
+        else:
+            print "%s OK\r\n" % (methodName)
+
+        response.close()
+
+    def _getUUIDList(self,methodName):
+        response = urllib2.urlopen("http://%s/ec2/%s?format=json" % (clusterTest.clusterTestServerList[0],methodName))
+
+        if response.getcode() != 200:
+            return None
+
+        json_obj = json.loads(response.read())
+        ret = []
+        for entry in json_obj:
+            if "isAdmin" in entry and entry["isAdmin"] == True:
+                continue # Skip the admin
+            ret.append(entry["id"])
+
+        response.close()
+
+        return ret
+
+    def _sendOp(self,methodName,dataList):
+        worker = ClusterWorker(32,len(dataList))
+        for d in dataList:
+            worker.enqueue(self._sendRequest,
+                (methodName,d,
+                    clusterTest.clusterTestServerList[random.randint(0,len(clusterTest.clusterTestServerList) - 1)]))
+
+        worker.join()
+
+    _resourceRemoveTemplate = """
+        {
+            "id":"%s"
+        }
+    """
+    def _removeAll(self,uuidList):
+        data = []
+        for uuid in uuidList:
+            data.append(self._resourceRemoveTemplate % (uuid))
+        self._sendOp("removeResource",data)
+
+    def _remove(self,uuid):
+        self._removeAll([uuid])
+
+
 class UserOperation(PerformanceOperation):
     def add(self,num):
         gen = UserDataGenerator()
@@ -1805,11 +1847,234 @@ class CameraOperation(PerformanceOperation):
         self._removeAll(uuidList)
         return True
 
-def DoClearAll():
+def doClearAll():
     MediaServerOperation().removeAll();
     UserOperation().removeAll();
     MediaServerOperation().removeAll()
 
+
+# ===================================
+# Perf Test
+# ===================================
+
+class PerfTest:
+    _initialCreationSize = 20
+    _frequency = 0
+    _newUserList = []
+    _newCameraList=[]
+    _exit = False
+    _queue= None
+    _threadPool=[]
+
+    # statistics
+    _userCreateNeg = 0
+    _userCreatePos = 0
+    _cameraCreateNeg=0
+    _cameraCreatePos=0
+    _userUpdateNeg=0
+    _userUpdatePos=0
+    _cameraUpdateNeg=0
+    _cameraUpdatePos=0
+
+    _creationProb = 0.3
+
+    _lock = threading.Lock()
+
+    def _onInterrupt(self,a,b):
+        self._exit = True
+
+    # prepare the data for the performance test. This serves as the initial
+    # pool where we start our testing 
+
+    def _doCreate(self,addr,d,id,methodName):
+        req = urllib2.Request("http://%s/ec2/%s" % (addr,methodName),
+                        data=d, headers={'Content-Type': 'application/json'})
+
+        response = None
+
+        with self._lock:
+            response = urllib2.urlopen(req)
+
+        if response.getcode() != 200:
+            # failed 
+            return False
+        else:
+            if id != None:
+                clusterTest.unittestRollback.addOperations(methodName,addr,id)
+        return True
+
+    def _prepareData(self,dataList,methodName):
+        for d in dataList:
+            for s in clusterTest.clusterTestServerList:
+                if not self._doCreate(s,d[0],d[1],methodName):
+                    return False
+        return True
+
+    def _prepare(self,num):
+        userList = UserDataGenerator().generateUserData(num)
+        cameraList=CameraDataGenerator().generateCameraData(num)
+        if not ( self._prepareData(userList, "saveUser" ) and self._prepareData(cameraList, "saveCameras" ) ):
+            return False
+
+        self._userCreatePos  = num
+        self._cameraCreatePos= num
+
+        for u in userList:
+            self._newUserList.append(u[1])
+
+        for c in cameraList:
+            self._newCameraList.append(c[1])
+
+        return True
+
+    def _takePlace(self,prob):
+        if random.random() <= prob:
+            return True
+        else:
+            return False
+
+    def _threadMain(self):
+        uGen = UserDataGenerator()
+        cGen = CameraDataGenerator()
+
+        while not self._exit:
+            try:
+                _ = self._queue.get(True,1)
+            except:
+                continue
+            if self._takePlace(self._creationProb):
+                if random.randint(0,1) == 0:
+                    failed = False
+                    for s in clusterTest.clusterTestServerList:
+                        d = uGen.generateUserData(1)
+                        if not self._doCreate(s,d[0][0],d[0][1],"saveUser"):
+                            failed = True
+                        else:
+                            self._newUserList.append(d[0][1])
+
+                    if failed:
+                        self._userCreateNeg = self._userCreateNeg+1
+                    else:
+                        self._userCreatePos = self._userCreatePos+1
+
+                else:
+                    failed = False
+                    for s in clusterTest.clusterTestServerList:
+                        d = cGen.generateCameraData(1)
+                        if not self._doCreate(s,d[0][0],d[0][1],"saveCameras"):
+                            failed = True
+                        else:
+                            self._newCameraList.append(d[0][1])
+
+                    if failed:
+                        self._cameraCreateNeg = self._cameraCreateNeg+1
+                    else:
+                        self._cameraCreatePos = self._cameraCreatePos+1
+
+            else:
+                if random.randint(0,1) == 0:
+                    failed = False
+                    for s in clusterTest.clusterTestServerList:
+                        id = self._newUserList[random.randint(0,len(self._newUserList)-1)]
+                        d = uGen.generateUpdateData(id)
+                        if not self._doCreate(s,d[0][0],None,"saveUser"):
+                            failed = True
+                        else:
+                            failed = False
+
+                    if failed:
+                        self._userUpdateNeg = self._userUpdateNeg+1
+                    else:
+                        self._userUpdatePos = self._userUpdatePos+1
+                else:
+                    failed = False
+                    for s in clusterTest.clusterTestServerList:
+                        id = self._newCameraList[random.randint(0,len(self._newCameraList)-1)]
+                        d = cGen.generateUpdateData(id)
+                        if not self._doCreate(s,d[0][0],None,"saveCameras"):
+                            failed = True
+                        else:
+                            failed = False
+
+                    if failed:
+                        self._cameraUpdateNeg = self._cameraUpdateNeg+1
+                    else:
+                        self._cameraUpdatePos = self._cameraUpdatePos+1
+
+    def _initThreadPool(self,num):
+        expectedQueueSize = self._frequency * 10;
+        self._queue = Queue.Queue(expectedQueueSize)
+
+        for _ in range(num):
+            th = threading.Thread(target=self._threadMain)
+            th.start()
+            self._threadPool.append(th)
+
+    def _pollOnce(self):
+        start = time.time()
+        for _ in range(self._frequency):
+            while True:
+                try:
+                    self._queue.put((),True,1)
+                except:
+                    if self._exit:
+                        return True
+                    else:
+                        continue
+        end = time.time()
+        if end-start < 1.0:
+                time.sleep(1.0-(end-start))
+
+    def start(self):
+        print "Start to prepare performance test, do not interrupt"
+        # prepare the initial stage
+        if not self._prepare(self._initialCreationSize):
+            print "The performance test initialization cannot be done, check server status"
+            return False
+        # install the signal handler , thread pool and configuration
+        cfg_parser = ConfigParser.RawConfigParser()
+        cfg_parser.read("ec2_tests.cfg")
+        self._frequency = cfg_parser.getint("PerfTest","frequency")
+
+        try:
+            self._creationProb = float(cfg_parser.get("PerfTest","createProb"))
+        except:
+            pass
+
+        self._initThreadPool(16)
+        signal.signal(signal.SIGINT,self._onInterrupt)
+        
+        print "Performance test start"
+        loop_start = time.time()
+        # start the loop here and recording the time
+        while not self._exit:
+            if self._pollOnce() :
+                break
+
+        # join all the threads
+        for th in self._threadPool:
+            th.join()
+
+        loop_end = time.time()
+
+        print "=============================== Perf test done ======================================"
+        print "Successful camera creation:%d"%(self._cameraCreatePos)
+        print "Failed camera creation:%d"%(self._cameraCreateNeg)
+        print "Successful camera update:%d"%(self._cameraUpdatePos)
+        print "Failed camera update:%d"%(self._cameraUpdateNeg)
+        print "Successful user creation:%d"%(self._userCreatePos)
+        print "Failed user creation:%d"%(self._userCreateNeg)
+        print "Successful user update:%d"%(self._userUpdatePos)
+        print "Failed user update:%d"%(self._userUpdateNeg)
+        print "Total execution time:%d seconds"%(loop_end-loop_start)
+        print "======================================================================================"
+
+        try:
+            raw_input("Press any key to continue rollback...")
+        except:
+            return True
+
+        return True
 
 def runPerformanceTest():
     if len(sys.argv) != 3 and len(sys.argv) != 2 :
@@ -1855,12 +2120,18 @@ def runPerformanceTest():
 
     return True
 
-
-helpStr="Usage:\n" \
-    "--clear: Clear all the Cameras/MediaServers/Users on all the servers \n\n" \
-    "--sync: Test all the servers are on the same page or not \n\n" \
-    "--recover: Recover from last rollback failure \n\n" \
-    "--merge-test: Test server merge. The user needs to specify more than one server in the config file. \n\n" \
+helpStr="Usage:\n\n" \
+    "--perf : Start performance test.User can use ctrl+c to interrupt the perf test and statistic will be displayed.User can also specify configuration parameters " \
+    "for performance test. In ec2_tests.cfg file,\n[PerfTest]\nfrequency=1000\ncreateProb=0.5\n, the frequency means at most how many operations will be issued on each" \
+    "server in one seconds(not guaranteed,bottleneck is CPU/Bandwidth for running this script);and createProb=0.5 means the creation operation will be performed as 0.5 "\
+    "probability, and it implicitly means the modification operation will be performed as 0.5 probability \n\n" \
+    "--clear: Clear all the Cameras/MediaServers/Users on all the servers.It will not delete admin user. \n\n" \
+    "--sync: Test all the servers are on the same page or not.This test will perform regarding the existed ec2 REST api, for example " \
+    ", no layout API is supported, then this test cannot test whether 2 servers has exactly same layouts  \n\n" \
+    "--recover: Recover from last rollback failure. If you see rollback failed for the last run, you can run this option next time to recover from " \
+    "the last rollback error specifically. Or you could run any other cases other than --help/--recover,the recover will be performed automatically as well. \n\n" \
+    "--merge-test: Test server merge. The user needs to specify more than one server in the config file. This test will temporarilly change the server system name," \
+    "currently I assume such change will NOT modify the server states. Once the merge test finished, the system name for each server will be recover automatically.\n\n" \
     "--rtsp-test: Test the rtsp streaming. The user needs to specify section [Rtsp] in side of the config file and also " \
     "testSize attribute in it , eg: \n[Rtsp]\ntestSize=100\n Which represent how many test case performed on EACH server.\n\n" \
     "--add=Camera/MediaServer/User --count=num: Add a fake Camera/MediaServer/User to the server you sepcify in the list. The --count " \
@@ -1870,11 +2141,18 @@ helpStr="Usage:\n" \
     "specify --id option to enable remove a single resource, eg : --remove=MediaServer --id={SomeGUID} , and --remove=MediaServer will remove " \
     "all the media server.\nNote: --add/--remove will perform the corresponding operations on a random server in the server list if the server list "\
     "have more than one server.\n\n" \
-    "If no parameter is specified, the default automatic test will performed, this includes modify the resource and then wait "\
-    "for all the server sync their status and also the confliction test as well.The user could specify testCaseSize in configuration file to set the "\
-    "test case number for each test class. Eg:\n[General]\ntestCaseSize=5\n, for each test class 5 random cases will be issued.Currently specify large number " \
-    "will make the test slow and sometimes cause 401 errors"
+    "If no parameter is specified, the default automatic test will performed.This includes add/update/remove Cameras/MediaServer/Users and also add/update " \
+    "user attributes list , server attributes list and resource parameter list. Additionally , the confliction test will be performed as well, it includes " \
+    "modify a resource on one server and delete the same resource on another server to trigger confliction.Totally 9 different test cases will be performed in this " \
+    "run.Currently, all the modification/deletion will only happened on fake data, and after the whole testing finished, the fake data will be wiped out so " \
+    "the old database should not be modified.The user can specify configuration parameter in ec2_tests.cfg file, eg:\n[General]\ntestCaseSize=200\nclusterTestSleepTime=10\n "\
+    "this options will make each test case in 9 cases run on each server 200 times. Additionally clusterTestSleepTime represent after every 200 operations, how long should I "\
+    "wait and then perform sync operation to check whether all the server get the notification"
 
+def doCleanUp():
+    print "Now do the rollback, do not close the program!"
+    clusterTest.unittestRollback.doRollback()
+    print "Rollback done!"
             
 if __name__ == '__main__':
     if len(sys.argv) == 2 and sys.argv[1] == '--help':
@@ -1882,6 +2160,7 @@ if __name__ == '__main__':
     elif len(sys.argv) == 2 and sys.argv[1] == '--recover':
         UnitTestRollback().doRecover()
     else:
+        print "The automatic test starts,please wait for checking cluster status and do proper recover first ..."
         # initialize cluster test environment
         ret,reason = clusterTest.init()
         if ret == False:
@@ -1894,18 +2173,17 @@ if __name__ == '__main__':
                 try:
                     unittest.main()
                 except:
-                    print "Now do the rollback, do not close the program"
-                    clusterTest.unittestRollback.doRollback()
-                    print "Autotest done"
+                    doCleanUp()
 
             elif len(sys.argv) == 2 and sys.argv[1] == '--clear':
-                DoClearAll()
+                doClearAll()
+            elif len(sys.argv) == 2 and sys.argv[1] == '--perf':
+                PerfTest().start()
+                doCleanUp()
             else:
                 if sys.argv[1] == '--merge-test':
                     MergeTest().test()
-                    print "Now do the rollback, do not close the program"
-                    clusterTest.unittestRollback.doRollback()
-                    print "Autotest done"
+                    doCleanUp()
 
                 elif sys.argv[1] == '--rtsp-test':
                     ServerRtspTest().test()
