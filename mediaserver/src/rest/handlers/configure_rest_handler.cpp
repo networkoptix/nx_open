@@ -148,11 +148,6 @@ int QnConfigureRestHandler::changePort(int port) {
 }
 
 void QnConfigureRestHandler::resetConnections() {
-    if (qnTransactionBus) {
-        qDebug() << "Dropping connections";
-        qnTransactionBus->dropConnections();
-    }
-
     if (QnServerConnector::instance())
         QnServerConnector::instance()->reconnect();
 }

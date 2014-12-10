@@ -37,6 +37,8 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
     QString currentPassword = params.value(lit("currentPassword"));
     bool takeRemoteSettings = params.value(lit("takeRemoteSettings"), lit("false")) != lit("false");
     bool mergeOneServer = params.value(lit("oneServer"), lit("false")) != lit("false");
+    bool ignoreIncompatible = params.value(lit("ignoreIncompatible"), lit("false")) != lit("false");
+
     if (mergeOneServer)
         takeRemoteSettings = false;
 
@@ -58,7 +60,7 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
         return nx_http::StatusCode::ok;
     }
 
-    if (!takeRemoteSettings && currentPassword.isEmpty()) {
+    if (!takeRemoteSettings && !mergeOneServer && currentPassword.isEmpty()) {
         result.setError(QnJsonRestResult::MissingParameter);
         result.setErrorString(lit("currentPassword"));
         return nx_http::StatusCode::ok;
@@ -69,7 +71,7 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
     if (!admin)
         return nx_http::StatusCode::internalServerError;
 
-    if (!admin->checkPassword(currentPassword)) {
+    if (!takeRemoteSettings && !mergeOneServer && !admin->checkPassword(currentPassword)) {
         result.setError(QnJsonRestResult::InvalidParameter);
         result.setErrorString(lit("currentPassword"));
         return nx_http::StatusCode::ok;
@@ -111,7 +113,9 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
     bool customizationOK = moduleInformation.customization == QnAppInfo::customizationName() ||
                            moduleInformation.customization.isEmpty() ||
                            QnModuleFinder::instance()->isCompatibilityMode();
-    if (!moduleInformation.hasCompatibleVersion() || !customizationOK) {
+    bool compatible = !moduleInformation.hasCompatibleVersion();
+
+    if ((!ignoreIncompatible && !compatible) || !customizationOK) {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("INCOMPATIBLE"));
         return nx_http::StatusCode::ok;
     }
@@ -151,7 +155,8 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
         QnModuleFinder::instance()->directModuleFinder()->checkUrl(url);
     }
 
-    if (QnServerConnector::instance())
+    /* Connect to server if it is compatible */
+    if (compatible && QnServerConnector::instance())
         QnServerConnector::instance()->addConnection(moduleInformation, url);
 
     result.setReply(moduleInformation);

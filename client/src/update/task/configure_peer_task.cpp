@@ -74,7 +74,7 @@ void QnConfigurePeerTask::doStart() {
         url.setHost(route.points.last().host);
         url.setPort(route.points.last().port);
 
-        int handle = m_mergeTool->mergeSystem(proxy, url, m_user, m_password, true, true);
+        int handle = m_mergeTool->configureIncompatibleServer(proxy, url, m_user, m_password);
         m_pendingPeers.insert(id);
         m_peerIdByHandle[handle] = id;
     }

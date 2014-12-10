@@ -25,7 +25,8 @@ public:
     explicit QnMergeSystemsTool(QObject *parent = 0);
 
     void pingSystem(const QUrl &url, const QString &user, const QString &password);
-    int mergeSystem(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &user, const QString &password, bool ownSettings, bool oneServer = false);
+    int mergeSystem(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &user, const QString &password, bool ownSettings);
+    int configureIncompatibleServer(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &user, const QString &password);
 
 signals:
     void systemFound(const QnModuleInformation &moduleInformation, const QnMediaServerResourcePtr &discoverer, int errorCode);
