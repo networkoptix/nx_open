@@ -77,7 +77,7 @@ public:
         action->setShortcutContext(Qt::WindowShortcut);
     }
 
-    QnActionBuilder shortcut(const QKeySequence &keySequence, ActionPlatform platform = AllPlatforms, bool append = false) {
+    QnActionBuilder shortcut(const QKeySequence &keySequence, ActionPlatform platform = AllPlatforms, bool append = true) {
         if (keySequence.isEmpty())
             return *this;
 
@@ -114,8 +114,8 @@ public:
 
         return *this;
     }
-    QnActionBuilder addShortcut(const QKeySequence &keySequence, ActionPlatform platform = AllPlatforms) {
-        return shortcut(keySequence, platform, true);
+    QnActionBuilder resetShortcut(const QKeySequence &keySequence, ActionPlatform platform = AllPlatforms) {
+        return shortcut(keySequence, platform, false);
     }
 
     QnActionBuilder shortcutContext(Qt::ShortcutContext context) {
@@ -669,7 +669,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey).
         text(tr("Save Current Layout As...")).
         shortcut(tr("Ctrl+Shift+S")).
-        shortcut(tr("Ctrl+Alt+S"), QnActionBuilder::Windows).
+        resetShortcut(tr("Ctrl+Alt+S"), QnActionBuilder::Windows).
         autoRepeat(false).
         condition(new QnSaveLayoutAsActionCondition(true, this));
 
@@ -694,7 +694,7 @@ QnActionManager::QnActionManager(QObject *parent):
             text(tr("Start Screen Recording")).
             toggledText(tr("Stop Screen Recording")).
             shortcut(tr("Alt+R")).
-            addShortcut(Qt::Key_MediaRecord).
+            shortcut(Qt::Key_MediaRecord).
             shortcutContext(Qt::ApplicationShortcut).
             autoRepeat(false).
             icon(qnSkin->icon("titlebar/recording.png", "titlebar/recording.png")).
@@ -735,8 +735,8 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::GlobalHotkey).
         autoRepeat(false).
         shortcut(tr("Alt+Enter")).
-        addShortcut(tr("Alt+Return")).
-        shortcut(tr("Ctrl+F"), QnActionBuilder::Mac).
+        shortcut(tr("Alt+Return")).
+        resetShortcut(tr("Ctrl+F"), QnActionBuilder::Mac).
         shortcutContext(Qt::ApplicationShortcut);
 
 
@@ -931,7 +931,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Open Containing Folder")).
         shortcut(tr("Ctrl+Enter")).
-        addShortcut(tr("Ctrl+Return")).
+        shortcut(tr("Ctrl+Return")).
         autoRepeat(false).
         condition(new QnOpenInFolderActionCondition(this));
 
@@ -981,6 +981,7 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
         text(tr("Delete")).
         shortcut(tr("Del")).
+        resetShortcut(Qt::Key_Backspace, QnActionBuilder::Mac).
         autoRepeat(false);
 
     factory(Qn::ResetVideoWallLayoutAction).
@@ -1040,7 +1041,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::SingleTarget).
         text(tr("Maximize Item")).
         shortcut(tr("Enter")).
-        addShortcut(tr("Return")).
+        shortcut(tr("Return")).
         autoRepeat(false).
         condition(new QnItemZoomedActionCondition(false, this));
 
@@ -1048,7 +1049,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::SingleTarget).
         text(tr("Restore Item")).
         shortcut(tr("Enter")).
-        addShortcut(tr("Return")).
+        shortcut(tr("Return")).
         autoRepeat(false).
         condition(new QnItemZoomedActionCondition(true, this));
 
@@ -1216,7 +1217,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::LayoutItemTarget | Qn::IntentionallyAmbiguous).
         text(tr("Remove from Layout")).
         shortcut(tr("Del")).
-        shortcut(Qt::Key_Backspace, QnActionBuilder::Mac).
+        resetShortcut(Qt::Key_Backspace, QnActionBuilder::Mac).
         autoRepeat(false).
         condition(new QnLayoutItemRemovalActionCondition(this));
 
@@ -1225,7 +1226,7 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::RemovePermission).
         text(tr("Delete")).
         shortcut(tr("Del")).
-        shortcut(Qt::Key_Backspace, QnActionBuilder::Mac).
+        resetShortcut(Qt::Key_Backspace, QnActionBuilder::Mac).
         autoRepeat(false).
         condition(new QnResourceRemovalActionCondition(this));
 
