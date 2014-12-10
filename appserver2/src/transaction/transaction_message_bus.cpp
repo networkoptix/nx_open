@@ -406,6 +406,7 @@ void QnTransactionMessageBus::at_gotTransaction(const QByteArray &serializedTran
         {
             NX_LOG(lit("Ignoring transaction with seq %1 from peer %2 having state %3").
                 arg(transportHeader.sequence).arg(sender->remotePeer().id.toString()).arg(sender->getState()), cl_logDEBUG1);
+            sender->transactionProcessed();
         }
         else
         {
@@ -419,6 +420,9 @@ void QnTransactionMessageBus::at_gotTransaction(const QByteArray &serializedTran
     using namespace std::placeholders;
     if(!handleTransaction(serializedTran, std::bind(GotTransactionFuction(), this, _1, sender, transportHeader), [](Qn::SerializationFormat, const QByteArray& ) { return false; } ))
         sender->setState(QnTransactionTransport::Error);
+
+    //TODO #ak is it garanteed that sender is alive?
+    sender->transactionProcessed();
 }
 
 

@@ -1,5 +1,7 @@
 #include "transaction_transport.h"
 
+#include <atomic>
+
 #include <QtCore/QUrlQuery>
 #include <QtCore/QTimer>
 
@@ -19,6 +21,9 @@
 #include "database/db_manager.h"
 
 #define TRANSACTION_MESSAGE_BUS_DEBUG
+
+
+static const int MAX_TRANS_TO_POST_AT_A_TIME = 64;
 
 namespace ec2
 {
@@ -43,7 +48,9 @@ QnTransactionTransport::QnTransactionTransport(const ApiPeerData &localPeer, con
     m_chunkLen(0), 
     m_sendOffset(0), 
     m_connected(false),
-    m_prevGivenHandlerID(0)
+    m_prevGivenHandlerID(0),
+    m_postedTranCount(0),
+    m_asyncReadScheduled(false)
 {
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_sendTimer.restart();
@@ -112,10 +119,17 @@ void QnTransactionTransport::startListening()
         m_chunkHeaderLen = 0;
         using namespace std::placeholders;
         if( !m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) ) )
+        {
             setState( Error );
+            return;
+        }
         if( m_remotePeer.isServer() )
             if( !m_socket->registerTimer( TCP_KEEPALIVE_TIMEOUT, std::bind(&QnTransactionTransport::sendHttpKeepAlive, this) ) )
+            {
                 setState( Error );
+                return;
+            }
+        m_lastReceiveTimer.restart();
     }
 }
 
@@ -318,7 +332,7 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
 {
     QMutexLocker lock(&m_mutex);
 
-    m_lastReceiveTimer.restart();
+    m_asyncReadScheduled = false;
 
     if( errorCode || bytesRead == 0 )   //error or connection closed
     {
@@ -387,6 +401,7 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
             assert( !transportHeader.processedPeers.empty() );
             NX_LOG(lit("QnTransactionTransport::onSomeBytesRead. Got transaction with seq %1 from %2").arg(transportHeader.sequence).arg(m_remotePeer.id.toString()), cl_logDEBUG1);
             emit gotTransaction(serializedTran, transportHeader);
+            ++m_postedTranCount;
         }
         readBufPos += fullChunkSize;
         m_chunkHeaderLen = 0;
@@ -398,15 +413,49 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
         }
     }
 
+    if( m_postedTranCount >= MAX_TRANS_TO_POST_AT_A_TIME )
+        return; //not reading futher while that much transactions are not processed yet
+
     using namespace std::placeholders;
     if( !m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) ) )
+    {
         setStateNoLock( State::Error );
+    }
+    else
+    {
+        m_lastReceiveTimer.restart();
+        m_asyncReadScheduled = true;
+    }
 }
 
 bool QnTransactionTransport::hasUnsendData() const
 {
     QMutexLocker lock(&m_mutex);
     return !m_dataToSend.empty();
+}
+
+void QnTransactionTransport::transactionProcessed()
+{
+    QMutexLocker lock(&m_mutex);
+
+    --m_postedTranCount;
+    if( m_postedTranCount >= MAX_TRANS_TO_POST_AT_A_TIME ||     //not reading futher while that much transactions are not processed yet
+        m_asyncReadScheduled ||      //async read is ongoing already, overlapping reads are not supported by sockets api
+        m_state == Error )
+    {
+        return;
+    }
+
+    using namespace std::placeholders;
+    if( !m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) ) )
+    {
+        setStateNoLock( State::Error );
+    }
+    else
+    {
+        m_lastReceiveTimer.restart();
+        m_asyncReadScheduled = true;
+    }
 }
 
 void QnTransactionTransport::sendHttpKeepAlive()
@@ -566,7 +615,6 @@ void QnTransactionTransport::at_httpClientDone( const nx_http::AsyncHttpClientPt
 
 void QnTransactionTransport::processTransactionData(const QByteArray& data)
 {
-    m_lastReceiveTimer.restart();
     m_chunkHeaderLen = 0;
 
     const quint8* buffer = (const quint8*) data.constData();
@@ -589,6 +637,7 @@ void QnTransactionTransport::processTransactionData(const QByteArray& data)
                 assert( !transportHeader.processedPeers.empty() );
                 NX_LOG(lit("QnTransactionTransport::processTransactionData. Got transaction with seq %1 from %2").arg(transportHeader.sequence).arg(m_remotePeer.id.toString()), cl_logDEBUG1);
                 emit gotTransaction(serializedTran, transportHeader);
+                ++m_postedTranCount;
             }
             
 

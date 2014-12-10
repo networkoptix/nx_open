@@ -146,6 +146,9 @@ public:
     void setRemotePeer(const ApiPeerData& value) { m_remotePeer = value; }
     bool isHttpKeepAliveTimeout() const;
     bool hasUnsendData() const;
+
+    void transactionProcessed();
+
 private:
     struct DataToSend
     {
@@ -192,6 +195,9 @@ private:
     QTime m_lastReceiveTimer;
     QTime m_sendTimer;
     QByteArray m_emptyChunkData;
+    int m_postedTranCount;
+    bool m_asyncReadScheduled;
+
 private:
     void sendHttpKeepAlive();
     //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
