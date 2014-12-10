@@ -141,7 +141,7 @@ function RulerModel(start,end){
  */
 RulerModel.levels = [
     { name:'Век', format:'yyyy', interval:  new Interval(0,0,0,0,0,100), marks: 10, width: 25 }, // root
-    { name:'Только год', format:'yyyy', interval:  new Interval(0,0,0,0,0,1), marks: 0, width: 25 },
+    { name:'Только год', format:'yyyy', interval:  new Interval(0,0,0,0,0,1), marks: 1, width: 25 },
     {
         name:'Год/месяц', //Года
         format:'yyyy',//Строка для форматирования даты или функция
@@ -150,7 +150,7 @@ RulerModel.levels = [
         marks: 12,//Сколько маленьких рисок используем на данном масштабе
         width: 40//Минимальная ширина подписи в пикселях. Можем подгонять ширину так, чтобы подписи не пересекались и показывались как только достаточно масштаба для этой подписи + должны помещаться риски
     },
-    { name:'Месяц - краткий', format:'NNN', interval:  new Interval(0,0,0,0,1,0), marks: 0, width: 25 },
+    { name:'Месяц - краткий', format:'NNN', interval:  new Interval(0,0,0,0,1,0), marks: 1, width: 25 },
     { name:'Месяц - полный/неделя(примерно)', format:'MMM', interval:  new Interval(0,0,0,0,1,0), marks: 4, width: 50 },
     { name:'Неделя/день' , format:'dd.MM.yy', interval:  new Interval(0,0,0,7,0,0), marks: 7, width: 50,
         alignToPast:function (date){ // Выравнивание даты по неделям - Ищем ближайшее предшествующее воскресенье
@@ -163,15 +163,15 @@ RulerModel.levels = [
             return dateToRet;
         }
     },
-    { name:'День/6 часов', format:'dd.MM.yy', interval:  new Interval(0,0,0,1,0,0), marks: 4, width: 50 },
-    { name:'6 часов/час', format:'HH:mm', interval:  new Interval(0,0,6,0,0,0), marks: 6, width: 40 },
-    { name:'Час/10 минут', format:'HH:mm', interval:  new Interval(0,0,1,0,0,0), marks: 6, width: 40 },
-    { name:'Полчаса/5 минут', format:'HH:mm', interval:  new Interval(0,30,0,0,0,0), marks: 6, width: 40 },
-    { name:'10 минут/минута', format:'HH:mm', interval:  new Interval(0,10,0,0,0,0), marks: 10, width: 40 },
-    { name:'минута/10 секунд', format:'HH:mm', interval:  new Interval(0,1,0,0,0,0), marks: 6, width: 40 },
-    { name:'10 секунд/секунда', format:'HH:mm:ss', interval:  new Interval(10,0,0,0,0,0), marks: 10, width: 50 },
-    { name:'1 секундa/100 мс', format:'HH:mm:ss', interval:  new Interval(1,0,0,0,0,0), marks: 10, width: 50 },
-    { name:'1 секундa/10 мс', format:'HH:mm:ss', interval:  new Interval(1,0,0,0,0,0), marks: 100, width: 300 }
+    { name:'День/6 часов'       , format:'dd.MM.yy'     , interval:  new Interval(0,0,0,1,0,0)  , marks: 4  , width: 50 },
+    { name:'6 часов/час'        , format:'HH:mm'        , interval:  new Interval(0,0,6,0,0,0)  , marks: 6  , width: 40 },
+    { name:'Час/10 минут'       , format:'HH:mm'        , interval:  new Interval(0,0,1,0,0,0)  , marks: 6  , width: 40 },
+    { name:'Полчаса/5 минут'    , format:'HH:mm'        , interval:  new Interval(0,30,0,0,0,0) , marks: 6  , width: 40 },
+    { name:'10 минут/минута'    , format:'HH:mm'        , interval:  new Interval(0,10,0,0,0,0) , marks: 10 , width: 40 },
+    { name:'минута/10 секунд'   , format:'HH:mm'        , interval:  new Interval(0,1,0,0,0,0)  , marks: 6  , width: 40 },
+    { name:'10 секунд/секунда'  , format:'HH:mm\'ss"'   , interval:  new Interval(10,0,0,0,0,0) , marks: 10 , width: 50 },
+    { name:'1 секундa/100 мс'   , format:'HH:mm\'ss"'   , interval:  new Interval(1,0,0,0,0,0)  , marks: 10 , width: 50 },
+    { name:'1 секундa/10 мс'    , format:'HH:mm\'ss"'   , interval:  new Interval(1,0,0,0,0,0)  , marks: 100, width: 500 }
 ];
 
 RulerModel.getLevelIndex = function(searchdetailization){
@@ -229,13 +229,14 @@ RulerModel.prototype.updateSplice = function(){
  * @param result - heap for recursive call
  */
 RulerModel.prototype.splice = function(start, end, level, parent){
+
     parent = parent || this.marksTree;
     if(parent.level === level) {
         parent.expand = false;
         return;
     }
 
-    if(parent.children.length  === 0 && parent.level < RulerModel.levels.length-1){
+    if(parent.children.length  === 0 && parent.level < RulerModel.levels.length - 1){
         //create new level of detailization here!
         var newLevel = RulerModel.levels[parent.level + 1];
 
@@ -253,11 +254,10 @@ RulerModel.prototype.splice = function(start, end, level, parent){
         var currentChunk = parent.children[i];
         if(currentChunk.end <= start || currentChunk.start>=end || currentChunk.level === level || level === RulerModel.levels.length - 1){
             currentChunk.expand = false;
-            continue;
+        }else {
+            currentChunk.expand = true;
+            this.splice(start, end, level, currentChunk);
         }
-
-        currentChunk.expand = true;
-        this.splice(start, end, level, currentChunk);
     }
 };
 

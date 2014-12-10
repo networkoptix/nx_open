@@ -11,7 +11,7 @@
 <script type="text/ng-template"  id="ruler_marks">
     <div ng-if="chunk.title" class="ruler-label">{{chunk.title}}</div>
     <div class="small small-hidden"></div>
-    <div ng-repeat-start="small in chunk.marks" class="small fadeIn"></div> <span ng-repeat-end></span>
+    <div ng-repeat-start="small in chunk.marks" class="small"></div> <span ng-repeat-end></span>
     <div class="small small-hidden"></div>
 </script>
 
@@ -32,8 +32,8 @@
 
 <div class="viewport">
     <div class="timeline-hint"><div class="hint-label">hint</div></div>
-    <div class="frame" ng-style="{width:frameWidth}">
-        <div class="timeline" ng-style="{width:timelineWidth,left:timelineStart}">
+    <div class="frame" >
+        <div class="timeline" >
             <!--
             <div class="events" ng-if="records && records.chunksTree !== null" ng-init="chunk = records.chunksTree; template = false" ng-include="'nested_chunks'"></div>
             -->
