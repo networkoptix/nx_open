@@ -31,6 +31,9 @@
 
 #include <redass/redass_controller.h>
 
+#include <ui/actions/action_manager.h>
+#include <ui/actions/action_target_provider.h>
+
 #include <ui/common/notification_levels.h>
 
 #include <ui/animation/viewport_animator.h>
@@ -333,6 +336,7 @@ void QnWorkbenchDisplay::deinitSceneView() {
 
     disconnect(m_scene, NULL, this, NULL);
     disconnect(m_scene, NULL, context()->action(Qn::SelectionChangeAction), NULL);
+    disconnect(action(Qn::SelectionChangeAction), NULL, this, NULL);
 
     /* Clear curtain. */
     if(!m_curtainItem.isNull()) {
@@ -380,6 +384,8 @@ void QnWorkbenchDisplay::initSceneView() {
     connect(m_scene,                SIGNAL(selectionChanged()),                     context()->action(Qn::SelectionChangeAction), SLOT(trigger()));
     connect(m_scene,                SIGNAL(selectionChanged()),                     this,                   SLOT(at_scene_selectionChanged()));
     connect(m_scene,                SIGNAL(destroyed()),                            this,                   SLOT(at_scene_destroyed()));
+
+    connect(action(Qn::SelectionChangeAction), &QAction::triggered,                 this,                   &QnWorkbenchDisplay::updateSelectionFromTree);
 
     /* Scene indexing will only slow everything down. */
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
@@ -739,6 +745,21 @@ void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout) {
         raisedConeItem(raisedWidget)->setEffectEnabled(!layout->backgroundImageFilename().isEmpty());
     }
 }
+
+void QnWorkbenchDisplay::updateSelectionFromTree() {
+    QnActionTargetProvider *provider = menu()->targetProvider();
+    if(!provider)
+        return;
+
+    Qn::ActionScope scope = provider->currentScope();
+    if (scope != Qn::TreeScope)
+        return; 
+
+    /* Just deselect all items for now. See #4480. */
+    foreach (QGraphicsItem *item, scene()->selectedItems())
+        item->setSelected(false);
+}
+
 
 QList<QnResourceWidget *> QnWorkbenchDisplay::widgets() const {
     return m_widgets;

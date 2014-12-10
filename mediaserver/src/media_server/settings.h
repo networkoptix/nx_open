@@ -70,6 +70,9 @@ namespace nx_ms_conf
     static const QLatin1String ALLOW_SSL_CONNECTIONS( "allowSslConnections" );
     static const bool DEFAULT_ALLOW_SSL_CONNECTIONS = true;
 
+    static const QLatin1String CREATE_FULL_CRASH_DUMP( "createFullCrashDump" );
+    static const bool DEFAULT_CREATE_FULL_CRASH_DUMP = false;
+
     /** Semicolon-separated list of servers to get public ip. */
     static const QLatin1String PUBLIC_IP_SERVERS( "publicIPServers" );
 }
