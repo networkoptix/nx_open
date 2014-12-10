@@ -6,8 +6,8 @@
 #include <core/resource_management/resource_pool.h>
 
 namespace {
-    const int checkTimeout = 10 * 60 * 1000;
-    const int shortTimeout = 5 * 1000;
+    const int checkTimeout = 15 * 60 * 1000;
+    const int shortTimeout = 60 * 1000;
 }
 
 QnRestUpdatePeerTask::QnRestUpdatePeerTask(QObject *parent) :
@@ -90,7 +90,7 @@ void QnRestUpdatePeerTask::installNextUpdate() {
 
     QnMediaServerResourcePtr server = m_currentServers.first();
     m_targetId = QnUuid(server->getProperty(lit("guid")));
-    Q_ASSERT_X(!m_targetId.isNull(), "Each incompatible server resource should has 'guid' property!", Q_FUNC_INFO);
+    Q_ASSERT_X(!m_targetId.isNull(), Q_FUNC_INFO, "Each incompatible server resource should has 'guid' property!");
     server->apiConnection()->installUpdate(m_updateId, m_currentData, this, SLOT(at_updateInstalled(int,int)));
 }
 
@@ -118,6 +118,7 @@ void QnRestUpdatePeerTask::at_updateInstalled(int status, int handle) {
 
     connect(qnResPool,  &QnResourcePool::resourceChanged,   this,   &QnRestUpdatePeerTask::at_resourceChanged);
     connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnRestUpdatePeerTask::at_resourceChanged);
+    connect(qnResPool,  &QnResourcePool::statusChanged,     this,   &QnRestUpdatePeerTask::at_resourceChanged);
     m_timer->start(checkTimeout);
 }
 
@@ -132,14 +133,17 @@ void QnRestUpdatePeerTask::at_resourceChanged(const QnResourcePtr &resource) {
     if (!server)
         return;
 
-    if (server->getStatus() != Qn::Offline && server->getStatus() != Qn::Incompatible) {
+    if (server->getStatus() == Qn::Offline || server->getStatus() == Qn::Incompatible)
+        return;
+
+    if (server->getVersion() != m_version) {
         /* The situation is the same as in QnInstallUpdatesPeerTask.
            If the server has gone online we should get resource update soon, so we don't have to wait minutes before we know the new version. */
         m_timer->start(shortTimeout);
-
-        if (server->getVersion() == m_version)
-            finishPeer();
+        return;
     }
+
+    finishPeer();
 }
 
 void QnRestUpdatePeerTask::at_timer_timeout() {
