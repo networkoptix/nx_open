@@ -2065,22 +2065,22 @@ void QnWorkbenchActionHandler::at_currentLayoutSettingsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio4x3Action_triggered() {
-    workbench()->currentLayout()->resource()->setCellAspectRatio(4.0 / 3.0);
+    workbench()->currentLayout()->resource()->setCellAspectRatio(4.0f / 3.0f);
     action(Qn::SetCurrentLayoutAspectRatio4x3Action)->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio16x9Action_triggered() {
-    workbench()->currentLayout()->resource()->setCellAspectRatio(16.0 / 9.0);
+    workbench()->currentLayout()->resource()->setCellAspectRatio(16.0f / 9.0f);
     action(Qn::SetCurrentLayoutAspectRatio16x9Action)->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio3x4Action_triggered() {
-    workbench()->currentLayout()->resource()->setCellAspectRatio(3.0 / 4.0);
+    workbench()->currentLayout()->resource()->setCellAspectRatio(3.0f / 4.0f);
     action(Qn::SetCurrentLayoutAspectRatio3x4Action)->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio9x16Action_triggered() {
-    workbench()->currentLayout()->resource()->setCellAspectRatio(9.0 / 16.0);
+    workbench()->currentLayout()->resource()->setCellAspectRatio(9.0f / 16.0f);
     action(Qn::SetCurrentLayoutAspectRatio9x16Action)->setChecked(true);
 }
 
