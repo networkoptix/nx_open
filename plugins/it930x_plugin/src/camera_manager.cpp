@@ -26,23 +26,37 @@ namespace
     typedef enum
     {
         ITE_PARAM_NONE,
-        ITE_PARAM_RXID,
+        //
         ITE_PARAM_CHANNEL,
         ITE_PARAM_PRESENT,
         ITE_PARAM_STRENGTH,
         ITE_PARAM_QUALITY,
-        // ...
+        //
+        ITE_PARAM_RX_ID,
+        ITE_PARAM_RX_COMPANY,
+        ITE_PARAM_RX_MODEL,
+        ITE_PARAM_RX_DRIVER_VER,
+        ITE_PARAM_RX_API_VER,
+        ITE_PARAM_RX_FW_VER,
+        //
         ITE_PARAM_REBOOT,
         ITE_PARAM_SET_DEFAULTS
     } CameraParams;
 
-    const char * PARAM_QUERY_RXID =          "rxID";
-    const char * PARAM_QUERY_CHANNEL =       "channel";
-    const char * PARAM_QUERY_PRESENT =       "present";
-    const char * PARAM_QUERY_STRENGTH =      "strength";
-    const char * PARAM_QUERY_QUALITY =       "quality";
-    const char * PARAM_QUERY_REBOOT =        "reboot";
-    const char * PARAM_QUERY_SET_DEFAULTS =  "setDefaults";
+    const char * PARAM_SIGNAL_CHANNEL =         "channel";
+    const char * PARAM_SIGNAL_PRESENT =         "present";
+    const char * PARAM_SIGNAL_STRENGTH =        "strength";
+    const char * PARAM_SIGNAL_QUALITY =         "quality";
+
+    const char * PARAM_RX_ID =                  "rxID";
+    const char * PARAM_RX_COMPANY =             "rxCompany";
+    const char * PARAM_RX_MODEL =               "rxModel";
+    const char * PARAM_RX_DRIVER_VER =          "rxDriverVer";
+    const char * PARAM_RX_API_VER =             "rxAPIVer";
+    const char * PARAM_RX_FW_VER =              "rxFWVer";
+
+    const char * PARAM_COMMAND_REBOOT =         "reboot";
+    const char * PARAM_COMMAND_SET_DEFAULTS =   "setDefaults";
 
     const char * PARAM_CHANNELS[] = {
         "0 (177/6 MHz)",
@@ -65,20 +79,31 @@ namespace
 
     CameraParams str2param(const char * paramName)
     {
-        if (! strcmp(paramName, PARAM_QUERY_RXID))
-            return ITE_PARAM_RXID;
-        if (! strcmp(paramName, PARAM_QUERY_CHANNEL))
+        if (! strcmp(paramName, PARAM_SIGNAL_CHANNEL))
             return ITE_PARAM_CHANNEL;
-        if (! strcmp(paramName, PARAM_QUERY_PRESENT))
+        if (! strcmp(paramName, PARAM_SIGNAL_PRESENT))
             return ITE_PARAM_PRESENT;
-        if (! strcmp(paramName, PARAM_QUERY_STRENGTH))
+        if (! strcmp(paramName, PARAM_SIGNAL_STRENGTH))
             return ITE_PARAM_STRENGTH;
-        if (! strcmp(paramName, PARAM_QUERY_QUALITY))
+        if (! strcmp(paramName, PARAM_SIGNAL_QUALITY))
             return ITE_PARAM_QUALITY;
 
-        if (! strcmp(paramName, PARAM_QUERY_REBOOT))
+        if (! strcmp(paramName, PARAM_RX_ID))
+            return ITE_PARAM_RX_ID;
+        if (! strcmp(paramName, PARAM_RX_COMPANY))
+            return ITE_PARAM_RX_COMPANY;
+        if (! strcmp(paramName, PARAM_RX_MODEL))
+            return ITE_PARAM_RX_MODEL;
+        if (! strcmp(paramName, PARAM_RX_DRIVER_VER))
+            return ITE_PARAM_RX_DRIVER_VER;
+        if (! strcmp(paramName, PARAM_RX_API_VER))
+            return ITE_PARAM_RX_API_VER;
+        if (! strcmp(paramName, PARAM_RX_FW_VER))
+            return ITE_PARAM_RX_FW_VER;
+
+        if (! strcmp(paramName, PARAM_COMMAND_REBOOT))
             return ITE_PARAM_REBOOT;
-        if (! strcmp(paramName, PARAM_QUERY_SET_DEFAULTS))
+        if (! strcmp(paramName, PARAM_COMMAND_SET_DEFAULTS))
             return ITE_PARAM_SET_DEFAULTS;
 
         return ITE_PARAM_NONE;
@@ -195,10 +220,17 @@ namespace ite
                 "<parameters>"
                     "<group name=\"Signal\"> "
                         "<param id=\"{channel}\" name=\"Channel\" dataType=\"Enumeration\" range=\"{chEnum}\" /> "
-                        "<param id=\"{rxID}\" name=\"DTV Receiver\" dataType=\"Number\" readOnly=\"true\" range=\"0,256\" /> "
                         "<param id=\"{present}\" name=\"Signal Presence\" dataType=\"Bool\" readOnly=\"true\" /> "
                         "<param id=\"{strength}\" name=\"Signal Strength\" dataType=\"Number\" readOnly=\"true\" range=\"0,100\" /> "
                         "<param id=\"{quality}\" name=\"Signal Quality\" dataType=\"Number\" readOnly=\"true\" range=\"0,100\" /> "
+                    "</group> "
+                    "<group name=\"Receiver\"> "
+                        "<param id=\"{rxID}\" name=\"Receiver ID\" dataType=\"Number\" readOnly=\"true\" range=\"0,255\" /> "
+                        "<param id=\"{rxCompany}\" name=\"Company\" dataType=\"String\" readOnly=\"true\" /> "
+                        "<param id=\"{rxModel}\" name=\"Model\" dataType=\"String\" readOnly=\"true\" /> "
+                        "<param id=\"{rxDriverVer}\" name=\"Driver Version\" dataType=\"String\" readOnly=\"true\" /> "
+                        "<param id=\"{rxAPIVer}\" name=\"API Version\" dataType=\"String\" readOnly=\"true\" /> "
+                        "<param id=\"{rxFWVer}\" name=\"Firmware Version\" dataType=\"String\" readOnly=\"true\" /> "
                     "</group> "
 #if 0
                     "<group name=\"Commands\"> "
@@ -209,13 +241,21 @@ namespace ite
                 "</parameters> "
             "</plugin>";
 
-            replaceSubstring(params, "{rxID}",      PARAM_QUERY_RXID);
-            replaceSubstring(params, "{channel}",   PARAM_QUERY_CHANNEL);
-            replaceSubstring(params, "{present}",   PARAM_QUERY_PRESENT);
-            replaceSubstring(params, "{strength}",  PARAM_QUERY_STRENGTH);
-            replaceSubstring(params, "{quality}",   PARAM_QUERY_QUALITY);
-            replaceSubstring(params, "{reboot}",    PARAM_QUERY_REBOOT);
-            replaceSubstring(params, "{setDefs}",   PARAM_QUERY_SET_DEFAULTS);
+            replaceSubstring(params, "{channel}",   PARAM_SIGNAL_CHANNEL);
+            replaceSubstring(params, "{present}",   PARAM_SIGNAL_PRESENT);
+            replaceSubstring(params, "{strength}",  PARAM_SIGNAL_STRENGTH);
+            replaceSubstring(params, "{quality}",   PARAM_SIGNAL_QUALITY);
+
+            replaceSubstring(params, "{rxID}",          PARAM_RX_ID);
+            replaceSubstring(params, "{rxCompany}",     PARAM_RX_COMPANY);
+            replaceSubstring(params, "{rxModel}",       PARAM_RX_MODEL);
+            replaceSubstring(params, "{rxDriverVer}",   PARAM_RX_DRIVER_VER);
+            replaceSubstring(params, "{rxAPIVer}",      PARAM_RX_API_VER);
+            replaceSubstring(params, "{rxFWVer}",       PARAM_RX_FW_VER);
+
+            replaceSubstring(params, "{reboot}",    PARAM_COMMAND_REBOOT);
+            replaceSubstring(params, "{setDefs}",   PARAM_COMMAND_SET_DEFAULTS);
+
             replaceSubstring(params, std::string("{chEnum}"), chanEnum);
 
             // TODO: thread safety
@@ -232,9 +272,6 @@ namespace ite
 
         switch (str2param(paramName))
         {
-            case ITE_PARAM_RXID:
-                getParamStr_RxID(strValue);
-                break;
             case ITE_PARAM_CHANNEL:
                 getParamStr_Channel(strValue);
                 break;
@@ -248,8 +285,26 @@ namespace ite
                 getParamStr_Quality(strValue);
                 break;
 
-            case ITE_PARAM_REBOOT:
+            case ITE_PARAM_RX_ID:
+                getParamStr_RxID(strValue);
                 break;
+            case ITE_PARAM_RX_COMPANY:
+                getParamStr_RxCompany(strValue);
+                break;
+            case ITE_PARAM_RX_MODEL:
+                getParamStr_RxModel(strValue);
+                break;
+            case ITE_PARAM_RX_DRIVER_VER:
+                getParamStr_RxDriverVer(strValue);
+                break;
+            case ITE_PARAM_RX_API_VER:
+                getParamStr_RxAPIVer(strValue);
+                break;
+            case ITE_PARAM_RX_FW_VER:
+                getParamStr_RxFWVer(strValue);
+                break;
+
+            case ITE_PARAM_REBOOT:
             case ITE_PARAM_SET_DEFAULTS:
                 break;
 
@@ -296,10 +351,16 @@ namespace ite
                 break;
             }
 
-            case ITE_PARAM_RXID:
             case ITE_PARAM_PRESENT:
             case ITE_PARAM_STRENGTH:
             case ITE_PARAM_QUALITY:
+            //
+            case ITE_PARAM_RX_ID:
+            case ITE_PARAM_RX_COMPANY:
+            case ITE_PARAM_RX_MODEL:
+            case ITE_PARAM_RX_DRIVER_VER:
+            case ITE_PARAM_RX_API_VER:
+            case ITE_PARAM_RX_FW_VER:
                 return nxcip::NX_PARAM_READ_ONLY;
 
             case ITE_PARAM_REBOOT:
@@ -881,23 +942,4 @@ namespace ite
 
         return nullptr;
     }
-#if 0
-    void CameraManager::fillInfo(nxcip::CameraInfo& info) const
-    {
-        std::string driver, firmware, company, model;
-        m_rxDevice->driverInfo( driver, firmware, company, model );
-
-        driver += " ";
-        driver += firmware;
-
-        unsigned modelSize = std::min( model.size(), sizeof(info.modelName)-1 );
-        unsigned fwareSize = std::min( driver.size(), sizeof(info.firmware)-1 );
-
-        strncpy( info.modelName, model.c_str(), modelSize );
-        strncpy( info.firmware, driver.c_str(), fwareSize );
-
-        info.modelName[modelSize] = '\0';
-        info.firmware[fwareSize] = '\0';
-    }
-#endif
 }

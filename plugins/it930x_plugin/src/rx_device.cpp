@@ -44,6 +44,8 @@ namespace ite
             m_devStream.reset();
             m_device.reset(); // dtor first
             m_device.reset(new It930x(m_rxID));
+
+            getDriverInfo();
             return true;
         }
         catch(const char * msg)
@@ -119,24 +121,10 @@ namespace ite
         return false;
     }
 
-    void RxDevice::driverInfo(std::string& driverVersion, std::string& fwVersion, std::string& company, std::string& model) const
+    void RxDevice::getDriverInfo()
     {
         if (m_device)
-        {
-            char verDriver[32] = "";
-            char verAPI[32] = "";
-            char verFWLink[32] = "";
-            char verFWOFDM[32] = "";
-            char xCompany[32] = "";
-            char xModel[32] = "";
-
-            m_device->info(verDriver, verAPI, verFWLink, verFWOFDM, xCompany, xModel);
-
-            driverVersion = "Driver: " + std::string(verDriver) + " API: " + std::string(verAPI);
-            fwVersion = "FW: " + std::string(verFWLink) + " OFDM: " + std::string(verFWOFDM);
-            company = std::string(xCompany);
-            model = std::string(xModel);
-        }
+            m_device->info(m_driverInfo);
     }
 
     unsigned RxDevice::dev2id(const std::string& nm)

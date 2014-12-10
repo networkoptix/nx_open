@@ -195,11 +195,25 @@ namespace ite
 
         //
 
-        void getParamStr_RxID(std::string& s) const;
         void getParamStr_Channel(std::string& s) const;
         void getParamStr_Present(std::string& s) const;
         void getParamStr_Strength(std::string& s) const;
         void getParamStr_Quality(std::string& s) const;
+
+        void getParamStr_RxID(std::string& s) const;
+        void getParamStr_RxCompany(std::string& s) const { if (m_rxDevice) s = m_rxDevice->driverInfo().company; }
+        void getParamStr_RxModel(std::string& s) const { if (m_rxDevice) s = m_rxDevice->driverInfo().supportHWInfo; }
+        void getParamStr_RxDriverVer(std::string& s) const { if (m_rxDevice) s = m_rxDevice->driverInfo().driverVersion; }
+        void getParamStr_RxAPIVer(std::string& s) const { if (m_rxDevice) s = m_rxDevice->driverInfo().APIVersion; }
+        void getParamStr_RxFWVer(std::string& s) const
+        {
+            if (m_rxDevice)
+            {
+                s = m_rxDevice->driverInfo().fwVersionLink;
+                s += "-";
+                s += m_rxDevice->driverInfo().fwVersionOFDM;
+            }
+        }
 
         bool setParam_Channel(std::string& s);
     };

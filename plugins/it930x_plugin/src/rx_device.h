@@ -47,7 +47,7 @@ namespace ite
             m_txID = 0;
         }
 
-        void driverInfo(std::string& driverVersion, std::string& fwVersion, std::string& company, std::string& model) const;
+        const IteDriverInfo& driverInfo() const { return m_driverInfo; }
 
         std::mutex& mutex() { return m_mutex; }
 
@@ -85,10 +85,12 @@ namespace ite
         uint8_t m_strength;
         uint8_t m_quality;
         bool m_present;
+        IteDriverInfo m_driverInfo;
 
         // TODO: info from RC
 
         bool stats();
+        void getDriverInfo();
     };
 
     typedef std::shared_ptr<RxDevice> RxDevicePtr;

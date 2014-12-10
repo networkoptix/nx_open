@@ -10,6 +10,16 @@ namespace ite
 {
     class It930Stream;
 
+    struct IteDriverInfo
+    {
+        char driverVersion[16];
+        char APIVersion[32];
+        char fwVersionLink[16];
+        char fwVersionOFDM[16];
+        char company[8];
+        char supportHWInfo[32];
+    };
+
     /// ITE DVB-T reciver
     ///
     /// RX Setting (from driver readme):
@@ -124,19 +134,21 @@ namespace ite
             locked = statisic.signalLocked;
         }
 
-        void info(char* verDriver, char* verAPI, char* verFWLink, char* verFWOFDM, char* company, char* model)
+        void info(IteDriverInfo& info)
         {
+            memset(&info, 0, sizeof(IteDriverInfo));
+
             DemodDriverInfo driverInfo;
             int result = DTV_GetDriverInformation(handle_, &driverInfo);
             if (result)
                 return;
 
-            strncpy(verDriver,  (const char *)driverInfo.DriverVersion, 16);
-            strncpy(verAPI,     (const char *)driverInfo.APIVersion, 32);
-            strncpy(verFWLink,  (const char *)driverInfo.FWVersionLink, 16);
-            strncpy(verFWOFDM,  (const char *)driverInfo.FWVersionOFDM, 16);
-            strncpy(company,    (const char *)driverInfo.Company, 8);
-            strncpy(model,      (const char *)driverInfo.SupportHWInfo, 32);
+            strncpy(info.driverVersion, (const char *)driverInfo.DriverVersion, 16);
+            strncpy(info.APIVersion,    (const char *)driverInfo.APIVersion, 32);
+            strncpy(info.fwVersionLink, (const char *)driverInfo.FWVersionLink, 16);
+            strncpy(info.fwVersionOFDM, (const char *)driverInfo.FWVersionOFDM, 16);
+            strncpy(info.company,       (const char *)driverInfo.Company, 8);
+            strncpy(info.supportHWInfo, (const char *)driverInfo.SupportHWInfo, 32);
         }
 
     private:
