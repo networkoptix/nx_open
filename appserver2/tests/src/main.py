@@ -27,10 +27,7 @@ class UnitTestRollback:
 
     def __init__(self):
         # Check if this file is existed, if so we do the rollback automatically
-        if os.path.isfile(".rollback"):
-            self._rollbackFile = open(".rollback","r")
-            self.doRollback()
-
+        self.doRecover()
         self._rollbackFile = open(".rollback","w+")
 
     def addOperations(self,methodName,serverAddress,resourceId):
@@ -93,9 +90,12 @@ class UnitTestRollback:
         if not os.path.isfile(".rollback") :
             print "Nothing needs to be recovered"
             return
+        else:
+            print "Start to recover from previous failed rollback transaction"
         # Do the rollback here
         self._rollbackFile = open(".rollback","r")
         self.doRollback()
+        print "Recover done..."
 
 class ClusterTest():
     clusterTestServerList = []
@@ -2013,17 +2013,18 @@ class PerfTest:
     def _pollOnce(self):
         start = time.time()
         for _ in range(self._frequency):
-            while True:
-                try:
-                    self._queue.put((),True,1)
-                except:
-                    if self._exit:
-                        return True
-                    else:
-                        continue
+            try:
+                self._queue.put((),True,1)
+            except:
+                pass
+            if self._exit :
+                return True
         end = time.time()
         if end-start < 1.0:
+            try:
                 time.sleep(1.0-(end-start))
+            except:
+                pass # interruption 
 
     def start(self):
         print "Start to prepare performance test, do not interrupt"
@@ -2044,7 +2045,7 @@ class PerfTest:
         self._initThreadPool(16)
         signal.signal(signal.SIGINT,self._onInterrupt)
         
-        print "Performance test start"
+        print "Performance test start,press ctrl+c to stop"
         loop_start = time.time()
         # start the loop here and recording the time
         while not self._exit:
