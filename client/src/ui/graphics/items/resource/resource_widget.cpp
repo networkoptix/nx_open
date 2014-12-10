@@ -136,6 +136,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_headerRightLabel->setAcceptedMouseButtons(0);
     m_headerRightLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
 
+    auto checkedButtons = static_cast<Buttons>(item->data(Qn::ItemCheckedButtonsRole).toInt());
+
     QnImageButtonWidget *closeButton = new QnImageButtonWidget();
     closeButton->setIcon(qnSkin->icon("item/close.png"));
     closeButton->setProperty(Qn::NoBlockMotionSelection, true);
@@ -146,6 +148,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     QnImageButtonWidget *infoButton = new QnImageButtonWidget();
     infoButton->setIcon(qnSkin->icon("item/info.png"));
     infoButton->setCheckable(true);
+    infoButton->setChecked(checkedButtons & InfoButton);
     infoButton->setProperty(Qn::NoBlockMotionSelection, true);
     infoButton->setToolTip(tr("Information"));
     connect(infoButton, &QnImageButtonWidget::toggled, this, &QnResourceWidget::at_infoButton_toggled);
@@ -250,12 +253,10 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     connect(videowallLicenseHelper, &QnLicenseUsageHelper::licensesChanged, this, &QnResourceWidget::updateStatusOverlay);
 
     /* Run handlers. */
+    setInfoVisible(infoButton->isChecked(), false);
     updateTitleText();
     updateButtonsVisibility();
     updateCursor();
-
-    // calling after all nested constructors are finished
-    QTimer::singleShot(1, this, SLOT(updateCheckedButtons()));
 
     connect(this, &QnResourceWidget::rotationChanged, this, [this]() {
         if (m_enclosingGeometry.isValid())
