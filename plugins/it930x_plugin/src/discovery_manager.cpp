@@ -330,6 +330,8 @@ namespace ite
             }
         }
 
+        unsigned freq = DeviceInfo::chanFrequency(chan);
+
         for (size_t i = 0; i < scanDevs.size(); ++i)
         {
             std::lock_guard<std::mutex> lock( scanDevs[i]->mutex() ); // LOCK device
@@ -340,7 +342,6 @@ namespace ite
             if (! scanDevs[i]->isOpen())
                 scanDevs[i]->open();
 
-            unsigned freq = DeviceInfo::chanFrequency(chan);
             unsigned short rxID = scanDevs[i]->rxID();
 
             rcShell_.setRxFrequency(rxID, freq); // frequency for new devices

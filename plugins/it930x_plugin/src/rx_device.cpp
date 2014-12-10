@@ -26,9 +26,10 @@ namespace ite
     RxDevice::RxDevice(unsigned id, RCShell * rc)
     :   m_rxID(id),
         m_txID(0),
-        m_rcShell(rc),
         m_frequency(0),
+        m_rcShell(rc),
         m_strength(0),
+        m_quality(0),
         m_present(false)
     {
         // HACK: close device if it's open
@@ -105,13 +106,11 @@ namespace ite
     {
         try
         {
-            bool locked = false;
-            uint8_t abortCount = 0;
-            float ber = 0.0f;
-
-            m_present = false;
+            m_quality = 0;
             m_strength = 0;
-            m_device->statistic(locked, m_present, m_strength, abortCount, ber);
+            m_present = false;
+            bool locked = false;
+            m_device->statistic(m_quality, m_strength, m_present, locked);
             return true;
         }
         catch (const char * msg)

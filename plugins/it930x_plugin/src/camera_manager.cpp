@@ -26,17 +26,21 @@ namespace
     typedef enum
     {
         ITE_PARAM_NONE,
+        ITE_PARAM_RXID,
         ITE_PARAM_CHANNEL,
         ITE_PARAM_PRESENT,
         ITE_PARAM_STRENGTH,
+        ITE_PARAM_QUALITY,
         // ...
         ITE_PARAM_REBOOT,
         ITE_PARAM_SET_DEFAULTS
     } CameraParams;
 
+    const char * PARAM_QUERY_RXID =          "rxID";
     const char * PARAM_QUERY_CHANNEL =       "channel";
     const char * PARAM_QUERY_PRESENT =       "present";
     const char * PARAM_QUERY_STRENGTH =      "strength";
+    const char * PARAM_QUERY_QUALITY =       "quality";
     const char * PARAM_QUERY_REBOOT =        "reboot";
     const char * PARAM_QUERY_SET_DEFAULTS =  "setDefaults";
 
@@ -61,12 +65,16 @@ namespace
 
     CameraParams str2param(const char * paramName)
     {
+        if (! strcmp(paramName, PARAM_QUERY_RXID))
+            return ITE_PARAM_RXID;
         if (! strcmp(paramName, PARAM_QUERY_CHANNEL))
             return ITE_PARAM_CHANNEL;
         if (! strcmp(paramName, PARAM_QUERY_PRESENT))
             return ITE_PARAM_PRESENT;
         if (! strcmp(paramName, PARAM_QUERY_STRENGTH))
             return ITE_PARAM_STRENGTH;
+        if (! strcmp(paramName, PARAM_QUERY_QUALITY))
+            return ITE_PARAM_QUALITY;
 
         if (! strcmp(paramName, PARAM_QUERY_REBOOT))
             return ITE_PARAM_REBOOT;
@@ -185,11 +193,12 @@ namespace ite
                 "version = \"1\" "
                 "unique_id = \"11761fbb-04f4-40c8-8213-52d9367676c6\"> "
                 "<parameters>"
-                
-                    "<group name=\"Transmission\"> "
+                    "<group name=\"Signal\"> "
                         "<param id=\"{channel}\" name=\"Channel\" dataType=\"Enumeration\" range=\"{chEnum}\" /> "
+                        "<param id=\"{rxID}\" name=\"DTV Receiver\" dataType=\"Number\" readOnly=\"true\" range=\"0,256\" /> "
                         "<param id=\"{present}\" name=\"Signal Presence\" dataType=\"Bool\" readOnly=\"true\" /> "
                         "<param id=\"{strength}\" name=\"Signal Strength\" dataType=\"Number\" readOnly=\"true\" range=\"0,100\" /> "
+                        "<param id=\"{quality}\" name=\"Signal Quality\" dataType=\"Number\" readOnly=\"true\" range=\"0,100\" /> "
                     "</group> "
 #if 0
                     "<group name=\"Commands\"> "
@@ -200,9 +209,11 @@ namespace ite
                 "</parameters> "
             "</plugin>";
 
+            replaceSubstring(params, "{rxID}",      PARAM_QUERY_RXID);
             replaceSubstring(params, "{channel}",   PARAM_QUERY_CHANNEL);
             replaceSubstring(params, "{present}",   PARAM_QUERY_PRESENT);
             replaceSubstring(params, "{strength}",  PARAM_QUERY_STRENGTH);
+            replaceSubstring(params, "{quality}",   PARAM_QUERY_QUALITY);
             replaceSubstring(params, "{reboot}",    PARAM_QUERY_REBOOT);
             replaceSubstring(params, "{setDefs}",   PARAM_QUERY_SET_DEFAULTS);
             replaceSubstring(params, std::string("{chEnum}"), chanEnum);
@@ -221,17 +232,22 @@ namespace ite
 
         switch (str2param(paramName))
         {
+            case ITE_PARAM_RXID:
+                getParamStr_RxID(strValue);
+                break;
             case ITE_PARAM_CHANNEL:
-            {
                 getParamStr_Channel(strValue);
                 break;
-            }
             case ITE_PARAM_PRESENT:
                 getParamStr_Present(strValue);
                 break;
             case ITE_PARAM_STRENGTH:
                 getParamStr_Strength(strValue);
                 break;
+            case ITE_PARAM_QUALITY:
+                getParamStr_Quality(strValue);
+                break;
+
             case ITE_PARAM_REBOOT:
                 break;
             case ITE_PARAM_SET_DEFAULTS:
@@ -280,8 +296,10 @@ namespace ite
                 break;
             }
 
+            case ITE_PARAM_RXID:
             case ITE_PARAM_PRESENT:
             case ITE_PARAM_STRENGTH:
+            case ITE_PARAM_QUALITY:
                 return nxcip::NX_PARAM_READ_ONLY;
 
             case ITE_PARAM_REBOOT:
@@ -307,6 +325,12 @@ namespace ite
         }
     }
 
+    void CameraManager::getParamStr_RxID(std::string& s) const
+    {
+        if (m_rxDevice)
+            s = num2str(m_rxDevice->rxID());
+    }
+
     void CameraManager::getParamStr_Present(std::string& s) const
     {
         if (m_rxDevice)
@@ -322,6 +346,12 @@ namespace ite
     {
         if (m_rxDevice)
             s = num2str(m_rxDevice->strength());
+    }
+
+    void CameraManager::getParamStr_Quality(std::string& s) const
+    {
+        if (m_rxDevice)
+            s = num2str(m_rxDevice->quality());
     }
 
     bool CameraManager::setParam_Channel(std::string& s)

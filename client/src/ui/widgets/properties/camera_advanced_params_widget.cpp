@@ -264,9 +264,10 @@ void QnCameraAdvancedParamsWidget::at_advancedSettingsLoaded(int status, const Q
         return;
 
     /* Show error if something was not correct. */
-    if (params.isEmpty() || status != 0) {
+    if (status != 0) {
         qWarning() << "QnCameraAdvancedParamsWidget::at_advancedSettingsLoaded: http status code is not OK: " << status
             << ". Camera id: " << m_camera->getUniqueId();
+        setState(State::Init);
         return;
     }
 

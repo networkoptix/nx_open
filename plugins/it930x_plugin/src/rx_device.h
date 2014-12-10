@@ -53,6 +53,7 @@ namespace ite
 
         unsigned frequency() const { return m_frequency; }
         uint8_t strength() const { return m_strength; }
+        uint8_t quality() const { return m_quality; }
         bool present() const { return m_present; }
 
         static unsigned dev2id(const std::string& devName);
@@ -77,12 +78,15 @@ namespace ite
         std::unique_ptr<It930Stream> m_devStream;
         unsigned short m_rxID;
         unsigned short m_txID; // locked camera txID or 0
+        unsigned m_frequency;
         RCShell * m_rcShell;
 
-        // TODO
-        unsigned m_frequency;
+        // info from DTV receiver
         uint8_t m_strength;
+        uint8_t m_quality;
         bool m_present;
+
+        // TODO: info from RC
 
         bool stats();
     };

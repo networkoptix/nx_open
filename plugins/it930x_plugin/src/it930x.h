@@ -111,21 +111,17 @@ namespace ite
             return !result && (locked == True);
         }
 
-        void statistic(bool& locked, bool& presented, uint8_t& strength, uint8_t& abortCount, float& ber) const
+        void statistic(uint8_t& quality, uint8_t& strength, bool& presented, bool& locked) const
         {
             DTVStatistic statisic;
-
             unsigned result = DTV_GetStatistic(handle_, &statisic);
             if (result)
                 throw "DTV_GetStatistic";
 
-            locked = statisic.signalLocked;
-            presented = statisic.signalPresented;
+            quality = statisic.signalQuality;
             strength = statisic.signalStrength;
-            abortCount = statisic.abortCount;
-            ber = statisic.postVitErrorCount;
-            if( statisic.postVitBitCount )
-                ber /= statisic.postVitBitCount;
+            presented = statisic.signalPresented;
+            locked = statisic.signalLocked;
         }
 
         void info(char* verDriver, char* verAPI, char* verFWLink, char* verFWOFDM, char* company, char* model)

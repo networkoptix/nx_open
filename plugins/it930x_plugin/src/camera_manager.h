@@ -195,9 +195,11 @@ namespace ite
 
         //
 
+        void getParamStr_RxID(std::string& s) const;
         void getParamStr_Channel(std::string& s) const;
         void getParamStr_Present(std::string& s) const;
         void getParamStr_Strength(std::string& s) const;
+        void getParamStr_Quality(std::string& s) const;
 
         bool setParam_Channel(std::string& s);
     };
