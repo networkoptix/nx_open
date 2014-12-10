@@ -54,8 +54,6 @@ void QnConfigurePeerTask::doStart() {
         if (realId.isNull())
             realId = id;
 
-        m_idByRealId[realId] = id;
-
         /* Find the server to call marge and URL of the peer to be merged.
            We need to guarantee the route will go through a server from our system.
            For that we build route via our EC */
@@ -76,18 +74,21 @@ void QnConfigurePeerTask::doStart() {
         url.setHost(route.points.last().host);
         url.setPort(route.points.last().port);
 
-        m_mergeTool->mergeSystem(proxy, url, m_user, m_password, true, true);
+        int handle = m_mergeTool->mergeSystem(proxy, url, m_user, m_password, true, true);
         m_pendingPeers.insert(id);
+        m_peerIdByHandle[handle] = id;
     }
 
     if (m_pendingPeers.isEmpty())
         finish(m_failedPeers.isEmpty() ? NoError : UnknownError, m_failedPeers);
 }
 
-void QnConfigurePeerTask::at_mergeTool_mergeFinished(int errorCode, const QnModuleInformation &moduleInformation) {
-    QnUuid id = m_idByRealId.value(moduleInformation.id);
+void QnConfigurePeerTask::at_mergeTool_mergeFinished(int errorCode, const QnModuleInformation &moduleInformation, int handle) {
+    Q_UNUSED(moduleInformation)
 
-    if (!m_pendingPeers.remove(id))
+    QnUuid id = m_peerIdByHandle.take(handle);
+
+    if (id.isNull() || !m_pendingPeers.remove(id))
         return;
 
     if (errorCode != QnMergeSystemsTool::NoError) {
@@ -100,7 +101,6 @@ void QnConfigurePeerTask::at_mergeTool_mergeFinished(int errorCode, const QnModu
             break;
         }
         m_failedPeers.insert(id);
-        return;
     }
 
     if (m_pendingPeers.isEmpty())

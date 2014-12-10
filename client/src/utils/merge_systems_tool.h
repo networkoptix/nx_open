@@ -25,11 +25,11 @@ public:
     explicit QnMergeSystemsTool(QObject *parent = 0);
 
     void pingSystem(const QUrl &url, const QString &user, const QString &password);
-    void mergeSystem(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &user, const QString &password, bool ownSettings, bool oneServer = false);
+    int mergeSystem(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &user, const QString &password, bool ownSettings, bool oneServer = false);
 
 signals:
     void systemFound(const QnModuleInformation &moduleInformation, const QnMediaServerResourcePtr &discoverer, int errorCode);
-    void mergeFinished(int errorCode, const QnModuleInformation &moduleInformation);
+    void mergeFinished(int errorCode, const QnModuleInformation &moduleInformation, int requestHandle);
 
 private slots:
     void at_pingSystem_finished(int status, const QnModuleInformation &moduleInformation, int handle, const QString &errorString);

@@ -53,14 +53,14 @@ void QnMergeSystemsTool::pingSystem(const QUrl &url, const QString &user, const 
     }
 }
 
-void QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &user, const QString &password, bool ownSettings, bool oneServer) {
+int QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &user, const QString &password, bool ownSettings, bool oneServer) {
     QString currentPassword = QnAppServerConnectionFactory::getConnection2()->authInfo();
     Q_ASSERT_X(!currentPassword.isEmpty(), "currentPassword cannot be empty", Q_FUNC_INFO);
     if (!ownSettings) {
         context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(false);
         m_password = password;
     }
-    proxy->apiConnection()->mergeSystemAsync(url, user, password, currentPassword, ownSettings, oneServer, this, SLOT(at_mergeSystem_finished(int,QnModuleInformation,int,QString)));
+    return proxy->apiConnection()->mergeSystemAsync(url, user, password, currentPassword, ownSettings, oneServer, this, SLOT(at_mergeSystem_finished(int,QnModuleInformation,int,QString)));
 }
 
 void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInformation &moduleInformation, int handle, const QString &errorString) {
@@ -88,8 +88,6 @@ void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInform
 }
 
 void QnMergeSystemsTool::at_mergeSystem_finished(int status, const QnModuleInformation &moduleInformation, int handle, const QString &errorString) {
-    Q_UNUSED(handle)
-
     bool reconnect = false;
     if (status == 0 && errorString.isEmpty() && !m_password.isEmpty()) {
         context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(m_password);
@@ -102,9 +100,9 @@ void QnMergeSystemsTool::at_mergeSystem_finished(int status, const QnModuleInfor
     context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
 
     if (status != 0)
-        emit mergeFinished(InternalError, moduleInformation);
+        emit mergeFinished(InternalError, moduleInformation, handle);
     else
-        emit mergeFinished(errorStringToErrorCode(errorString), moduleInformation);
+        emit mergeFinished(errorStringToErrorCode(errorString), moduleInformation, handle);
 
     if (reconnect)
         menu()->action(Qn::ReconnectAction)->trigger();
