@@ -77,7 +77,7 @@ public:
         action->setShortcutContext(Qt::WindowShortcut);
     }
 
-    QnActionBuilder shortcut(const QKeySequence &keySequence, ActionPlatform platform = AllPlatforms, bool append = true) {
+    QnActionBuilder shortcut(const QKeySequence &keySequence, ActionPlatform platform, bool replaceExisting) {
         if (keySequence.isEmpty())
             return *this;
 
@@ -106,7 +106,7 @@ public:
 
         if (set) {
             QList<QKeySequence> shortcuts = m_action->shortcuts();
-            if (!append)
+            if (replaceExisting)
                 shortcuts.clear();
             shortcuts.append(keySequence);
             m_action->setShortcuts(shortcuts);
@@ -114,8 +114,8 @@ public:
 
         return *this;
     }
-    QnActionBuilder resetShortcut(const QKeySequence &keySequence, ActionPlatform platform = AllPlatforms) {
-        return shortcut(keySequence, platform, false);
+    QnActionBuilder shortcut(const QKeySequence &keySequence) {
+        return shortcut(keySequence, AllPlatforms, false);
     }
 
     QnActionBuilder shortcutContext(Qt::ShortcutContext context) {
@@ -541,7 +541,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::MainMenuAction).
         flags(Qn::GlobalHotkey).
         text(tr("Main Menu")).
-        shortcut(tr("Alt+Space"), QnActionBuilder::Mac).
+        shortcut(tr("Alt+Space"), QnActionBuilder::Mac, true).
         autoRepeat(false).
         icon(qnSkin->icon("titlebar/main_menu.png"));
 
@@ -669,7 +669,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey).
         text(tr("Save Current Layout As...")).
         shortcut(tr("Ctrl+Shift+S")).
-        resetShortcut(tr("Ctrl+Alt+S"), QnActionBuilder::Windows).
+        shortcut(tr("Ctrl+Alt+S"), QnActionBuilder::Windows, true).
         autoRepeat(false).
         condition(new QnSaveLayoutAsActionCondition(true, this));
 
@@ -736,7 +736,7 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         shortcut(tr("Alt+Enter")).
         shortcut(tr("Alt+Return")).
-        resetShortcut(tr("Ctrl+F"), QnActionBuilder::Mac).
+        shortcut(tr("Ctrl+F"), QnActionBuilder::Mac, true).
         shortcutContext(Qt::ApplicationShortcut);
 
 
@@ -981,7 +981,7 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
         text(tr("Delete")).
         shortcut(tr("Del")).
-        resetShortcut(Qt::Key_Backspace, QnActionBuilder::Mac).
+        shortcut(Qt::Key_Backspace, QnActionBuilder::Mac, true).
         autoRepeat(false);
 
     factory(Qn::ResetVideoWallLayoutAction).
@@ -1217,7 +1217,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::LayoutItemTarget | Qn::IntentionallyAmbiguous).
         text(tr("Remove from Layout")).
         shortcut(tr("Del")).
-        resetShortcut(Qt::Key_Backspace, QnActionBuilder::Mac).
+        shortcut(Qt::Key_Backspace, QnActionBuilder::Mac, true).
         autoRepeat(false).
         condition(new QnLayoutItemRemovalActionCondition(this));
 
@@ -1226,7 +1226,7 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::RemovePermission).
         text(tr("Delete")).
         shortcut(tr("Del")).
-        resetShortcut(Qt::Key_Backspace, QnActionBuilder::Mac).
+        shortcut(Qt::Key_Backspace, QnActionBuilder::Mac, true).
         autoRepeat(false).
         condition(new QnResourceRemovalActionCondition(this));
 
