@@ -832,7 +832,7 @@ void QnMain::updateDisabledVendorsIfNeeded()
         return;
 
     if (!admin->hasProperty(DV_PROPERTY)) {
-        QnGlobalSettings *settings = QnGlobalSettings::instance();
+        QnGlobalSettings* settings = QnGlobalSettings::instance();
         settings->setDisabledVendors(disabledVendors);
         MSSettings::roSettings()->remove(DV_PROPERTY);
     }
@@ -1258,6 +1258,12 @@ QHostAddress QnMain::getPublicAddress()
 
 void QnMain::run()
 {
+#ifdef _WIN32
+    win32_exception::setCreateFullCrashDump( MSSettings::roSettings()->value(
+        nx_ms_conf::CREATE_FULL_CRASH_DUMP,
+        nx_ms_conf::DEFAULT_CREATE_FULL_CRASH_DUMP ).toBool() );
+#endif
+
     QString sslCertPath = MSSettings::roSettings()->value( nx_ms_conf::SSL_CERTIFICATE_PATH, getDataDirectory() + lit( "/ssl/cert.pem" ) ).toString();
     QFile f(sslCertPath);
     if (!f.open(QIODevice::ReadOnly)) {
@@ -2184,7 +2190,6 @@ int main(int argc, char* argv[])
         MSSettings::initializeROSettingsFromConfFile( configFilePath );
     if( !rwConfigFilePath.isEmpty() )
         MSSettings::initializeRunTimeSettingsFromConfFile( rwConfigFilePath );
-
 
     QnVideoService service( argc, argv );
 
