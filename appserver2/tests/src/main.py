@@ -31,7 +31,8 @@ class UnitTestRollback:
         self._rollbackFile = open(".rollback","w+")
 
     def addOperations(self,methodName,serverAddress,resourceId):
-        self._rollbackFile.write(("%s,%s,%s\n")%(methodName,serverAddress,resourceId))
+        for s in  clusterTest.clusterTestServerList:
+            self._rollbackFile.write(("%s,%s,%s\n")%(methodName,s,resourceId))
         self._rollbackFile.flush()
 
     def _doSingleRollback(self,methodName,serverAddress,resourceId):
@@ -43,13 +44,9 @@ class UnitTestRollback:
             response = urllib2.urlopen(req)
         except:
             return False
-
         if response.getcode() != 200:
             response.close()
             return False
-
-        print response.read()
-
         response.close()
         return True
 
@@ -259,8 +256,6 @@ class ClusterTest():
         # do the rollback here
         self.unittestRollback = UnitTestRollback()
         return (True,"")
-
-
 
 clusterTest = ClusterTest()
 
