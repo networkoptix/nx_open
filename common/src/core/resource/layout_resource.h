@@ -17,6 +17,9 @@ class QnLayoutResource: public QnResource {
 public:
     QnLayoutResource(const QnResourceTypePool* resTypePool);
 
+    virtual QString getUniqueId() const override;
+    virtual Qn::ResourceStatus getStatus() const override;
+
     QnLayoutResourcePtr clone() const;
 
     void setItems(const QnLayoutItemDataList &items);
@@ -78,8 +81,6 @@ public:
     /** Locked state - locked layout cannot be modified in any way */
     bool locked() const;
     void setLocked(bool value);
-
-    virtual Qn::ResourceStatus getStatus() const override;
 signals:
     void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
     void itemRemoved(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
