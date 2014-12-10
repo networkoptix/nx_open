@@ -773,7 +773,7 @@ float QnMediaResourceWidget::defaultVisualAspectRatio() const {
     if (!item())
         return base_type::defaultVisualAspectRatio();
 
-    if (item()->layout()->hasCellAspectRatio())
+    if (item()->layout() && item()->layout()->hasCellAspectRatio())
         return item()->layout()->cellAspectRatio();
 
     return qnGlobals->defaultLayoutCellAspectRatio();
