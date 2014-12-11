@@ -5,6 +5,7 @@ namespace {
             QList<QnAspectRatio>()
                 << QnAspectRatio(4, 3)
                 << QnAspectRatio(16, 9)
+                << QnAspectRatio(1, 1)
                 << QnAspectRatio(3, 4)
                 << QnAspectRatio(9, 16);
 }
