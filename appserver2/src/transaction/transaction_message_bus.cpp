@@ -344,7 +344,7 @@ bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
                 qDebug() << "DETECT transaction GAP via update message. Resync with peer" << transport->remotePeer().id;
                 qDebug() << "peer state:";
-                printTranState(aliveData.persistentState);
+                printTranState(aliveData.persistentState, true);
 #endif
                 if (!transport->remotePeer().isClient() && !m_localPeer.isClient())
                     queueSyncRequest(transport);
@@ -682,10 +682,14 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
     emit transactionProcessed(tran);
 };
 
-void QnTransactionMessageBus::printTranState(const QnTranState& tranState)
+void QnTransactionMessageBus::printTranState(const QnTranState& tranState, bool printToStdOut)
 {
     for(auto itr = tranState.values.constBegin(); itr != tranState.values.constEnd(); ++itr)
-        qDebug() << "key=" << itr.key().peerID << "(dbID=" << itr.key().dbID << ") need after=" << itr.value();
+    {
+        if( printToStdOut )
+            qDebug() << "key=" << itr.key().peerID << "(dbID=" << itr.key().dbID << ") need after=" << itr.value();
+        NX_LOG( lit("key=%1 (dbID=%2) need after=%3").arg(itr.key().peerID).arg(itr.key().dbID).arg(itr.value()), cl_logDEBUG1 );
+    }
 }
 
 void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport* sender, const QnTransaction<ApiSyncRequestData> &tran)
@@ -708,7 +712,7 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
     {
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
         NX_LOG( lit("got sync request from peer %1. Need transactions after:").arg(sender->remotePeer().id.toString()), cl_logDEBUG1);
-        printTranState(tran.params.persistentState);
+        printTranState(tran.params.persistentState, false);
         NX_LOG( lit("exist %1 new transactions").arg(serializedTransactions.size()), cl_logDEBUG1);
 #endif
         QnTransaction<QnTranStateResponse> tranSyncResponse(ApiCommand::tranSyncResponse);
@@ -910,7 +914,7 @@ QnTransaction<ApiModuleDataList> QnTransactionMessageBus::prepareModulesDataTran
     return transaction;
 }
 
-//TODO #ak use SocketAddress instead of this function. It will reduce QString instanciation count
+//TODO #ak use SocketAddress instead of this function. It will reduce QString instanciations and make code more clear
 static QString getUrlAddr(const QUrl& url) { return url.host() + QString::number(url.port()); }
 
 bool QnTransactionMessageBus::isPeerUsing(const QUrl& url)
@@ -1072,7 +1076,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
     NX_LOG( "Current transaction state:", cl_logDEBUG1 );
     if (transactionLog)
-        printTranState(transactionLog->getTransactionsState());
+        printTranState(transactionLog->getTransactionsState(), false);
 #endif
     }
 

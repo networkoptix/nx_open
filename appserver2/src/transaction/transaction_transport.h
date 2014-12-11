@@ -4,8 +4,8 @@
 #include <deque>
 
 #include <QByteArray>
+#include <QElapsedTimer>
 #include <QSet>
-#include <QTime>
 
 #include <transaction/transaction.h>
 #include <transaction/binary_transaction_serializer.h>
@@ -192,8 +192,7 @@ private:
 
     QByteArray m_extraData;
     bool m_authByKey;
-    QTime m_lastReceiveTimer;
-    QTime m_sendTimer;
+    QElapsedTimer m_lastReceiveTimer;
     QByteArray m_emptyChunkData;
     int m_postedTranCount;
     bool m_asyncReadScheduled;

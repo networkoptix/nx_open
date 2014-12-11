@@ -248,7 +248,12 @@ QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTran
     QnTranStateKey key (tran.peerID, tran.persistentInfo.dbID);
     Q_ASSERT(tran.persistentInfo.sequence != 0);
     if (m_state.values.value(key) >= tran.persistentInfo.sequence) {
-        qDebug() << "Transaction log contains transaction " << ApiCommand::toString(tran.command) << "because of precessed seq:" << m_state.values.value(key) << ">=" << tran.persistentInfo.sequence;
+#ifdef _DEBUG
+        qDebug() << "Transaction log contains transaction " << ApiCommand::toString(tran.command) << 
+            "because of precessed seq:" << m_state.values.value(key) << ">=" << tran.persistentInfo.sequence;
+#endif
+        NX_LOG( lit("Transaction log contains transaction %1 because of precessed seq: %2 >= %3").
+            arg(ApiCommand::toString(tran.command)).arg(m_state.values.value(key)).arg(tran.persistentInfo.sequence), cl_logDEBUG1 );
         return Reason_Sequence;
     }
     auto itr = m_updateHistory.find(hash);
@@ -260,7 +265,12 @@ QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTran
     if (lastTime == tran.persistentInfo.timestamp)
         rez = key < itr.value().updatedBy;
     if (rez) {
-        qDebug() << "Transaction log contains transaction " << ApiCommand::toString(tran.command) << "because of timestamp:" << lastTime << ">=" << tran.persistentInfo.timestamp;
+#ifdef _DEBUG
+        qDebug() << "Transaction log contains transaction " << ApiCommand::toString(tran.command) << 
+            "because of timestamp:" << lastTime << ">=" << tran.persistentInfo.timestamp;
+#endif
+        NX_LOG( lit("Transaction log contains transaction %1 because of timestamp: %2 >= %3").
+            arg(ApiCommand::toString(tran.command)).arg(lastTime).arg(tran.persistentInfo.timestamp), cl_logDEBUG1 );
         return Reason_Timestamp;
     }
     else {
