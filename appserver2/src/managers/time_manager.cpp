@@ -268,6 +268,8 @@ namespace ec2
 
     TimeSynchronizationManager::~TimeSynchronizationManager()
     {
+        //TODO #ak removing subscription to QnTransactionTransport events
+
         assert( TimeManager_instance.load(std::memory_order_relaxed) == this );
         TimeManager_instance.store( nullptr, std::memory_order_relaxed );
 

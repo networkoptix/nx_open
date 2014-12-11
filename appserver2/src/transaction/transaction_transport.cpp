@@ -411,7 +411,8 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
                 assert( false );
             }
             assert( !transportHeader.processedPeers.empty() );
-            NX_LOG(lit("QnTransactionTransport::onSomeBytesRead. Got transaction with seq %1 from %2").arg(transportHeader.sequence).arg(m_remotePeer.id.toString()), cl_logDEBUG1);
+            NX_LOG(lit("QnTransactionTransport::onSomeBytesRead. Got transaction with seq %1 from %2").
+                arg(transportHeader.sequence).arg(m_remotePeer.id.toString()), cl_logDEBUG1);
             emit gotTransaction(serializedTran, transportHeader);
             ++m_postedTranCount;
         }
@@ -656,7 +657,8 @@ void QnTransactionTransport::processTransactionData(const QByteArray& data)
                 QnTransactionTransportHeader transportHeader;
                 QnUbjsonTransactionSerializer::deserializeTran(buffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
                 assert( !transportHeader.processedPeers.empty() );
-                NX_LOG(lit("QnTransactionTransport::processTransactionData. Got transaction with seq %1 from %2").arg(transportHeader.sequence).arg(m_remotePeer.id.toString()), cl_logDEBUG1);
+                NX_LOG(lit("QnTransactionTransport::processTransactionData. Got transaction with seq %1 from %2").
+                    arg(transportHeader.sequence).arg(m_remotePeer.id.toString()), cl_logDEBUG1);
                 emit gotTransaction(serializedTran, transportHeader);
                 ++m_postedTranCount;
             }
