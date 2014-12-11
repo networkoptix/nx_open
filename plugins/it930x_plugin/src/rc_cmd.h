@@ -40,8 +40,8 @@ namespace ite
         static Byte endingTag() { return 0x0d; }
         static unsigned short maxSize() { return RcCmdMaxSize; }
 
-        unsigned short rxDeviceID() const { return ((buffer_[1])<<8) | buffer_[2]; }
-        unsigned short txDeviceID() const { return (buffer_[3]<<8) | buffer_[4]; }
+        unsigned short rxID() const { return ((buffer_[1])<<8) | buffer_[2]; }
+        unsigned short txID() const { return (buffer_[3]<<8) | buffer_[4]; }
         unsigned short commandID() const { return (buffer_[17]<<8) | buffer_[18]; }
         unsigned short totalPktNum() const { return (buffer_[5]<<8) | buffer_[6]; }
         unsigned short paketNum() const { return (buffer_[7]<<8) | buffer_[8]; }
@@ -51,16 +51,13 @@ namespace ite
         Byte checkSumValue() const { return buffer_[headSize() + pktLength()]; }
         bool checksum() const;
 
-        bool isBroadcast() const { return txDeviceID() == 0xFFFF; }
+        bool isBroadcast() const { return txID() == 0xFFFF; }
 
         const Byte * head() const { return &buffer_[0]; }
         const Byte * data() const { return &buffer_[headSize()]; }
 
         unsigned headCheck() const;
 
-        bool checkRxID(const Device * device) const { return device->hostRxDeviceID == rxDeviceID(); }
-        bool checkTxID(const Device * device) const { return device->clientTxDeviceID == txDeviceID(); }
-        bool checkSequence(Device * device) const;
         bool checkPacketCount();
 
     private:

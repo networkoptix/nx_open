@@ -3,14 +3,6 @@
 namespace ite
 {
 
-bool Command::checkSequence(Device * device) const
-{
-    Word expected = device->RCCmd_sequence_recv + 1;
-    device->RCCmd_sequence_recv = sequenceNum();
-
-    return sequenceNum() == expected;
-}
-
 bool Command::checkPacketCount()
 {
     if (! totalPktNum())

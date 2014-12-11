@@ -5,25 +5,6 @@
 namespace ite
 {
 
-#if 0
-typedef struct
-{
-    RCShell * pRCShell;
-    DeviceInfo * dinfo;
-    int iWaitTime;
-    bool isSet;
-} RCShell_ThreadParam;
-
-
-static void RC_Shell_WaitForSet_ThreadParam(RCShell_ThreadParam * pThreadParam)
-{
-    while (1)
-        if (pThreadParam->isSet) // TODO: short sleep
-            break;
-}
-#endif
-
-
 void fixReadingPosition(Byte * buf, unsigned bufSize)
 {
     for (unsigned pos = 0; pos < bufSize-1; ++pos)
@@ -86,29 +67,28 @@ void * RC_Shell_RecvThread(void * data)
         if (cmdCurrent.isOK())
         {
             debugInfo.totalPKTCount++;
-#if 0
-            unsigned error = cmdCurrent.headCheck();
-            if (error != ModulatorError_NO_ERROR)
-                // TODO
-#endif
+
             unsigned short cmdID = cmdCurrent.commandID();
-            unsigned short rxID = cmdCurrent.rxDeviceID();
-            unsigned short txID = cmdCurrent.txDeviceID();
+            unsigned short rxID = cmdCurrent.rxID();
+            unsigned short txID = cmdCurrent.txID();
 #if 1 // DEBUG
             printf("RC cmd: %x; TxID: %d; RxID: %d\n", cmdID, txID, rxID);
 #endif
-            pShell->addDevice(rxID, txID, (CMD_GetTxDeviceAddressIDOutput == cmdID));
-
-            DeviceInfoPtr info = pShell->device4cmd(cmdCurrent);
-            if (info)
+            DeviceInfoPtr dev = pShell->addDevice(rxID, txID, (CMD_GetTxDeviceAddressIDOutput == cmdID));
+            if (dev)
             {
-                unsigned error = info->cmd().add(cmdCurrent); // rebuild fragments of command
+                unsigned short seqNo = cmdCurrent.sequenceNum();
+                if (seqNo != dev->sequenceRecv() + 1)
+                    debugInfo.sequenceErrorCount++;
+                dev->setSequenceRecv(seqNo);
+
+                unsigned error = dev->cmd().add(cmdCurrent); // rebuild fragments of command
                 if (error == ModulatorError_NO_ERROR)
                 {
-                    if (info->cmd().isOK())
+                    if (dev->cmd().isOK())
                     {
-                        info->parseCommand();                                   // save data: cmd -> deviceInfo
-                        pShell->processCommand(info, info->cmd().commandID());  // process data from deviceInfo using command ID
+                        dev->parseCommand();                                    // save data: cmd -> deviceInfo
+                        pShell->processCommand(dev, dev->cmd().commandID());    // process data from deviceInfo using command ID
                     }
                 }
             }
@@ -134,23 +114,6 @@ void * RC_Shell_RecvThread(void * data)
 
     return 0;
 }
-
-#if 0
-void * RC_Shell_WaitTimeOut(void * data)
-{
-    RCShell_ThreadParam * pThreadParam = (RCShell_ThreadParam *) data;
-
-    RCShell_ThreadParam threadInfo;
-    threadInfo.pRCShell = pThreadParam->pRCShell;
-    threadInfo.dinfo = pThreadParam->dinfo;
-    threadInfo.wCommand = pThreadParam->wCommand;
-    threadInfo.iWaitTime = pThreadParam->iWaitTime;
-    pThreadParam->isSet = true;
-
-    threadInfo.pRCShell->checkTimeOut(*threadInfo.dinfo, threadInfo.iWaitTime);
-    return 0;
-}
-#endif
 
 // DeviceInfo
 
@@ -324,38 +287,6 @@ void DeviceInfo::print() const
 
 // RCShell
 
-#if 0
-const char * RCShell::getErrorStr(Error e)
-{
-    switch (e)
-    {
-        case RCERR_NO_ERROR:
-        case RCERR_METADATA:
-            return "";
-        case RCERR_NO_DEVICE:
-            return "no device";
-        case RCERR_SYNTAX:
-            return "command syntax error";
-        case RCERR_CHECKSUM:
-            return "wrong checksum";
-        case RCERR_SEQUENCE:
-            return "sequence error";
-        case RCERR_WRONG_LENGTH:
-            return "command wrong length";
-        case RCERR_RET_CODE:
-            return "comand returns error code";
-        case RCERR_WRONG_CMD:
-            return "unsupported command";
-        case RCERR_NOT_PARSED:
-            return "can't parse command";
-        default:
-            break;
-    }
-
-    return "other error";
-}
-#endif
-
 RCShell::RCShell()
 :    bIsRun_(false)
 {
@@ -383,26 +314,6 @@ void RCShell::stopRcvThread()
         bIsRun_ = false;
         pthread_join(rcvThread_, NULL);
     }
-}
-
-DeviceInfoPtr RCShell::device4cmd(const Command& cmdPart)
-{
-    std::lock_guard<std::mutex> lock(mutex_); // LOCK
-
-    for (unsigned i = 0; i < devs_.size(); i++)
-    {
-        Device * d = &devs_[i]->xPtr()->device;
-
-        if (cmdPart.checkRxID(d) && cmdPart.checkTxID(d))
-        {
-            if (! cmdPart.checkSequence(d))
-                debugInfo_.sequenceErrorCount++;
-
-            return devs_[i];
-        }
-    }
-
-    return DeviceInfoPtr();
 }
 
 void RCShell::processCommand(DeviceInfoPtr dev, unsigned short commandID)
@@ -496,7 +407,7 @@ void RCShell::getDevIDs(std::vector<IDsLink>& outLinks)
     }
 }
 
-void RCShell::addDevice(unsigned short rxID, unsigned short txID, bool rcActive)
+DeviceInfoPtr RCShell::addDevice(unsigned short rxID, unsigned short txID, bool rcActive)
 {
     DeviceInfoPtr dev = device(rxID, txID);
 
@@ -521,6 +432,8 @@ void RCShell::addDevice(unsigned short rxID, unsigned short txID, bool rcActive)
 
     if (rcActive)
         dev->setActive();
+
+    return dev;
 }
 
 /// @note O(N)

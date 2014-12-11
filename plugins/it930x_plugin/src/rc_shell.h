@@ -31,6 +31,15 @@ namespace ite
         RCERR_OTHER
     } RCError;
 
+    struct TxManufactureInfo
+    {
+        std::string companyName;
+        std::string modelName;
+        std::string firmwareVersion;
+        std::string serialNumber;
+        std::string hardwareId;
+    };
+
     ///
     class DeviceInfo
     {
@@ -173,6 +182,9 @@ namespace ite
 
         void resetCmd() { cmd_.clear(); }
 
+        unsigned short sequenceRecv() const { return info_.device.RCCmd_sequence_recv; }
+        void setSequenceRecv(unsigned short value) { info_.device.RCCmd_sequence_recv = value; }
+
         unsigned short txID() const { return info_.device.clientTxDeviceID; }
         unsigned short rxID() const { return info_.device.hostRxDeviceID; }
         unsigned frequency() const { return info_.transmissionParameter.frequency; }
@@ -306,6 +318,18 @@ namespace ite
         void modifyRule()                           { sendCmd(CMD_ModifyRuleInput); }
         void deleteRule()                           { sendCmd(CMD_DeleteRuleInput); }
 
+
+        // info
+
+        void deviceInfo(TxManufactureInfo& mInfo) const
+        {
+            mInfo.companyName = rcStr2str(info_.manufactureInfo.manufactureName);
+            mInfo.modelName = rcStr2str(info_.manufactureInfo.modelName);
+            mInfo.firmwareVersion = rcStr2str(info_.manufactureInfo.firmwareVersion);
+            mInfo.serialNumber = rcStr2str(info_.manufactureInfo.serialNumber);
+            mInfo.hardwareId = rcStr2str(info_.manufactureInfo.hardwareId);
+        }
+
     private:
         RCHostInfo info_;
         RebuiltCmd cmd_;
@@ -322,6 +346,8 @@ namespace ite
             if (error)
                 throw "Can't send cmd";
         }
+
+        static std::string rcStr2str(const RCString& s) { return std::string((const char *)s.stringData, s.stringLength); }
 
         DeviceInfo(const DeviceInfo& );
         DeviceInfo& operator = (const DeviceInfo& );
@@ -370,14 +396,13 @@ namespace ite
 
         bool sendGetIDs(int iWaitTime = DeviceInfo::SEND_WAIT_TIME_MS * 2);
 
-        void addDevice(unsigned short rxID, unsigned short txID, bool rcActive);
+        DeviceInfoPtr addDevice(unsigned short rxID, unsigned short txID, bool rcActive);
         void removeDevice(unsigned short txID);
 
         DebugInfo& debugInfo() { return debugInfo_; }
 
         void getDevIDs(std::vector<IDsLink>& outLinks);
         DeviceInfoPtr device(unsigned short rxID, unsigned short txID) const;
-        DeviceInfoPtr device4cmd(const Command& );
 
         void updateDevParams(unsigned short rxID);
         void updateTransmissionParams(unsigned short rxID);

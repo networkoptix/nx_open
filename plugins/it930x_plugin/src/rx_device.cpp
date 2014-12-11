@@ -44,8 +44,8 @@ namespace ite
             m_devStream.reset();
             m_device.reset(); // dtor first
             m_device.reset(new It930x(m_rxID));
-
-            getDriverInfo();
+            if (m_device)
+                m_device->info(m_rxInfo);
             return true;
         }
         catch(const char * msg)
@@ -73,6 +73,9 @@ namespace ite
         if (lockF(freq))
         {
             m_txID = txID;
+            m_txInfo = m_rcShell->device(m_rxID, m_txID);
+            if (m_txInfo)
+                m_txInfo->deviceInfo(m_txDriverInfo);
             return true;
         }
 
@@ -104,6 +107,14 @@ namespace ite
         return false;
     }
 
+    void RxDevice::unlockF()
+    {
+        m_devStream.reset();
+        m_txInfo.reset();
+        m_frequency = 0;
+        m_txID = 0;
+    }
+
     bool RxDevice::stats()
     {
         try
@@ -119,12 +130,6 @@ namespace ite
         {}
 
         return false;
-    }
-
-    void RxDevice::getDriverInfo()
-    {
-        if (m_device)
-            m_device->info(m_driverInfo);
     }
 
     unsigned RxDevice::dev2id(const std::string& nm)

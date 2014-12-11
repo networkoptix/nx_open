@@ -150,7 +150,7 @@ namespace ite
             }
 #endif
             m_buf.resize(m_size);
-            int ret = m_stream->read( &m_buf[0], m_size );
+            int ret = m_stream->read( &(*m_buf.begin()), m_buf.size() );
             if (ret < 0) {
                 m_buf.clear();
                 m_pos = 0;

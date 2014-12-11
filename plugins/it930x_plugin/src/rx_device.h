@@ -40,14 +40,10 @@ namespace ite
         bool lockCamera(unsigned short txID);
         bool lockF(unsigned freq);
         bool isLocked() const { return m_devStream.get(); }
-        void unlockF()
-        {
-            m_devStream.reset();
-            m_frequency = 0;
-            m_txID = 0;
-        }
+        void unlockF();
 
-        const IteDriverInfo& driverInfo() const { return m_driverInfo; }
+        const IteDriverInfo& rxDriverInfo() const { return m_rxInfo; }
+        const TxManufactureInfo& txDriverInfo() const { return m_txDriverInfo; }
 
         std::mutex& mutex() { return m_mutex; }
 
@@ -85,12 +81,13 @@ namespace ite
         uint8_t m_strength;
         uint8_t m_quality;
         bool m_present;
-        IteDriverInfo m_driverInfo;
+        IteDriverInfo m_rxInfo;
 
-        // TODO: info from RC
+        // info from RC
+        DeviceInfoPtr m_txInfo;
+        TxManufactureInfo m_txDriverInfo;
 
         bool stats();
-        void getDriverInfo();
     };
 
     typedef std::shared_ptr<RxDevice> RxDevicePtr;

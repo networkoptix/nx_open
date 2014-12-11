@@ -39,6 +39,13 @@ namespace
         ITE_PARAM_RX_API_VER,
         ITE_PARAM_RX_FW_VER,
         //
+        ITE_PARAM_TX_ID,
+        ITE_PARAM_TX_HWID,
+        ITE_PARAM_TX_COMPANY,
+        ITE_PARAM_TX_MODEL,
+        ITE_PARAM_TX_SERIAL,
+        ITE_PARAM_TX_FW_VER,
+        //
         ITE_PARAM_REBOOT,
         ITE_PARAM_SET_DEFAULTS
     } CameraParams;
@@ -54,6 +61,13 @@ namespace
     const char * PARAM_RX_DRIVER_VER =          "rxDriverVer";
     const char * PARAM_RX_API_VER =             "rxAPIVer";
     const char * PARAM_RX_FW_VER =              "rxFWVer";
+
+    const char * PARAM_TX_ID =                  "txID";
+    const char * PARAM_TX_HWID =                "txHwID";
+    const char * PARAM_TX_COMPANY =             "txCompany";
+    const char * PARAM_TX_MODEL =               "txModel";
+    const char * PARAM_TX_SERIAL =              "txSerial";
+    const char * PARAM_TX_FW_VER =              "txFWVer";
 
     const char * PARAM_COMMAND_REBOOT =         "reboot";
     const char * PARAM_COMMAND_SET_DEFAULTS =   "setDefaults";
@@ -100,6 +114,19 @@ namespace
             return ITE_PARAM_RX_API_VER;
         if (! strcmp(paramName, PARAM_RX_FW_VER))
             return ITE_PARAM_RX_FW_VER;
+
+        if (! strcmp(paramName, PARAM_TX_ID))
+            return ITE_PARAM_TX_ID;
+        if (! strcmp(paramName, PARAM_TX_HWID))
+            return ITE_PARAM_TX_HWID;
+        if (! strcmp(paramName, PARAM_TX_COMPANY))
+            return ITE_PARAM_TX_COMPANY;
+        if (! strcmp(paramName, PARAM_TX_MODEL))
+            return ITE_PARAM_TX_MODEL;
+        if (! strcmp(paramName, PARAM_TX_SERIAL))
+            return ITE_PARAM_TX_SERIAL;
+        if (! strcmp(paramName, PARAM_TX_FW_VER))
+            return ITE_PARAM_TX_FW_VER;
 
         if (! strcmp(paramName, PARAM_COMMAND_REBOOT))
             return ITE_PARAM_REBOOT;
@@ -233,6 +260,16 @@ namespace ite
                         "<param id=\"{rxFWVer}\" name=\"Firmware Version\" dataType=\"String\" readOnly=\"true\" /> "
                     "</group> "
 #if 0
+                    "<group name=\"Camera\"> "
+                        "<param id=\"{txID}\" name=\"Camera ID\" dataType=\"Number\" readOnly=\"true\" range=\"0,65535\" /> "
+                        "<param id=\"{txHwID}\" name=\"Camera HWID\" dataType=\"String\" readOnly=\"true\" /> "
+                        "<param id=\"{txCompany}\" name=\"Company\" dataType=\"String\" readOnly=\"true\" /> "
+                        "<param id=\"{txModel}\" name=\"Model\" dataType=\"String\" readOnly=\"true\" /> "
+                        "<param id=\"{txSerial}\" name=\"Serial Number\" dataType=\"String\" readOnly=\"true\" /> "
+                        "<param id=\"{txFWVer}\" name=\"Firmware Version\" dataType=\"String\" readOnly=\"true\" /> "
+                    "</group> "
+#endif
+#if 0
                     "<group name=\"Commands\"> "
                         "<param id=\"{reboot}\"  name=\"Reboot\" dataType=\"Button\" /> "
                         "<param id=\"{setDefs}\" name=\"Set Defaults\" dataType=\"Button\" /> "
@@ -253,6 +290,13 @@ namespace ite
             replaceSubstring(params, "{rxAPIVer}",      PARAM_RX_API_VER);
             replaceSubstring(params, "{rxFWVer}",       PARAM_RX_FW_VER);
 
+            replaceSubstring(params, "{txID}",          PARAM_TX_ID);
+            replaceSubstring(params, "{txHwID}",        PARAM_TX_HWID);
+            replaceSubstring(params, "{txCompany}",     PARAM_TX_COMPANY);
+            replaceSubstring(params, "{txModel}",       PARAM_TX_MODEL);
+            replaceSubstring(params, "{txSerial}",      PARAM_TX_SERIAL);
+            replaceSubstring(params, "{txFWVer}",       PARAM_TX_FW_VER);
+
             replaceSubstring(params, "{reboot}",    PARAM_COMMAND_REBOOT);
             replaceSubstring(params, "{setDefs}",   PARAM_COMMAND_SET_DEFAULTS);
 
@@ -272,6 +316,8 @@ namespace ite
 
         switch (str2param(paramName))
         {
+            // Signal
+
             case ITE_PARAM_CHANNEL:
                 getParamStr_Channel(strValue);
                 break;
@@ -284,6 +330,8 @@ namespace ite
             case ITE_PARAM_QUALITY:
                 getParamStr_Quality(strValue);
                 break;
+
+            // Receiver
 
             case ITE_PARAM_RX_ID:
                 getParamStr_RxID(strValue);
@@ -301,8 +349,31 @@ namespace ite
                 getParamStr_RxAPIVer(strValue);
                 break;
             case ITE_PARAM_RX_FW_VER:
-                getParamStr_RxFWVer(strValue);
+                getParamStr_RxFwVer(strValue);
                 break;
+
+            // Camera
+
+            case ITE_PARAM_TX_ID:
+                strValue = num2str(m_txID);
+                break;
+            case ITE_PARAM_TX_HWID:
+                getParamStr_TxHwID(strValue);
+                break;
+            case ITE_PARAM_TX_COMPANY:
+                getParamStr_TxCompany(strValue);
+                break;
+            case ITE_PARAM_TX_MODEL:
+                getParamStr_TxModel(strValue);
+                break;
+            case ITE_PARAM_TX_SERIAL:
+                getParamStr_TxSerial(strValue);
+                break;
+            case ITE_PARAM_TX_FW_VER:
+                getParamStr_TxFwVer(strValue);
+                break;
+
+            // Command
 
             case ITE_PARAM_REBOOT:
             case ITE_PARAM_SET_DEFAULTS:
@@ -361,6 +432,13 @@ namespace ite
             case ITE_PARAM_RX_DRIVER_VER:
             case ITE_PARAM_RX_API_VER:
             case ITE_PARAM_RX_FW_VER:
+            //
+            case ITE_PARAM_TX_ID:
+            case ITE_PARAM_TX_HWID:
+            case ITE_PARAM_TX_COMPANY:
+            case ITE_PARAM_TX_MODEL:
+            case ITE_PARAM_TX_SERIAL:
+            case ITE_PARAM_TX_FW_VER:
                 return nxcip::NX_PARAM_READ_ONLY;
 
             case ITE_PARAM_REBOOT:

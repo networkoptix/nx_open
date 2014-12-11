@@ -201,19 +201,25 @@ namespace ite
         void getParamStr_Quality(std::string& s) const;
 
         void getParamStr_RxID(std::string& s) const;
-        void getParamStr_RxCompany(std::string& s) const { if (m_rxDevice) s = m_rxDevice->driverInfo().company; }
-        void getParamStr_RxModel(std::string& s) const { if (m_rxDevice) s = m_rxDevice->driverInfo().supportHWInfo; }
-        void getParamStr_RxDriverVer(std::string& s) const { if (m_rxDevice) s = m_rxDevice->driverInfo().driverVersion; }
-        void getParamStr_RxAPIVer(std::string& s) const { if (m_rxDevice) s = m_rxDevice->driverInfo().APIVersion; }
-        void getParamStr_RxFWVer(std::string& s) const
+        void getParamStr_RxCompany(std::string& s) const { if (m_rxDevice) s = m_rxDevice->rxDriverInfo().company; }
+        void getParamStr_RxModel(std::string& s) const { if (m_rxDevice) s = m_rxDevice->rxDriverInfo().supportHWInfo; }
+        void getParamStr_RxDriverVer(std::string& s) const { if (m_rxDevice) s = m_rxDevice->rxDriverInfo().driverVersion; }
+        void getParamStr_RxAPIVer(std::string& s) const { if (m_rxDevice) s = m_rxDevice->rxDriverInfo().APIVersion; }
+        void getParamStr_RxFwVer(std::string& s) const
         {
             if (m_rxDevice)
             {
-                s = m_rxDevice->driverInfo().fwVersionLink;
+                s = m_rxDevice->rxDriverInfo().fwVersionLink;
                 s += "-";
-                s += m_rxDevice->driverInfo().fwVersionOFDM;
+                s += m_rxDevice->rxDriverInfo().fwVersionOFDM;
             }
         }
+
+        void getParamStr_TxHwID(std::string& s) const { if (m_rxDevice) s = m_rxDevice->txDriverInfo().hardwareId; }
+        void getParamStr_TxCompany(std::string& s) const { if (m_rxDevice) s = m_rxDevice->txDriverInfo().companyName; }
+        void getParamStr_TxModel(std::string& s) const { if (m_rxDevice) s = m_rxDevice->txDriverInfo().modelName; }
+        void getParamStr_TxSerial(std::string& s) const { if (m_rxDevice) s = m_rxDevice->txDriverInfo().serialNumber; }
+        void getParamStr_TxFwVer(std::string& s) const { if (m_rxDevice) s = m_rxDevice->txDriverInfo().firmwareVersion; }
 
         bool setParam_Channel(std::string& s);
     };
