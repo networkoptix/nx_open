@@ -4,8 +4,8 @@
 #include <deque>
 
 #include <QByteArray>
+#include <QElapsedTimer>
 #include <QSet>
-#include <QTime>
 
 #include <transaction/transaction.h>
 #include <transaction/binary_transaction_serializer.h>
@@ -146,6 +146,9 @@ public:
     void setRemotePeer(const ApiPeerData& value) { m_remotePeer = value; }
     bool isHttpKeepAliveTimeout() const;
     bool hasUnsendData() const;
+
+    void transactionProcessed();
+
 private:
     struct DataToSend
     {
@@ -189,9 +192,11 @@ private:
 
     QByteArray m_extraData;
     bool m_authByKey;
-    QTime m_lastReceiveTimer;
-    QTime m_sendTimer;
+    QElapsedTimer m_lastReceiveTimer;
     QByteArray m_emptyChunkData;
+    int m_postedTranCount;
+    bool m_asyncReadScheduled;
+
 private:
     void sendHttpKeepAlive();
     //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
