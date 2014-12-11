@@ -7,12 +7,6 @@ namespace {
                 << QnAspectRatio(16, 9)
                 << QnAspectRatio(3, 4)
                 << QnAspectRatio(9, 16);
-    const QList<Qn::ActionId> ratioActions =
-            QList<Qn::ActionId>()
-                << Qn::SetCurrentLayoutAspectRatio4x3Action
-                << Qn::SetCurrentLayoutAspectRatio16x9Action
-                << Qn::SetCurrentLayoutAspectRatio3x4Action
-                << Qn::SetCurrentLayoutAspectRatio9x16Action;
 }
 
 QnAspectRatio::QnAspectRatio(int width, int height) :
@@ -51,13 +45,6 @@ bool QnAspectRatio::isRotated90(qreal angle) {
     while (angle > 180)
         angle -= 180;
     return qAbs(90 - qAbs(angle)) < 45;
-}
-
-Qn::ActionId QnAspectRatio::aspectRatioActionId(const QnAspectRatio &aspectRatio) {
-    int index = ::standardRatios.indexOf(aspectRatio);
-    if (index == -1)
-        index = ::standardRatios.indexOf(closestStandardRatio(aspectRatio.toFloat()));
-    return ratioActions[index];
 }
 
 bool QnAspectRatio::operator ==(const QnAspectRatio &other) const {

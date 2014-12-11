@@ -272,10 +272,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::AdjustVideoAction),                      SIGNAL(triggered()),    this,   SLOT(at_adjustVideoAction_triggered()));
     connect(action(Qn::ExitAction),                             &QAction::triggered,    this,   &QnWorkbenchActionHandler::closeApplication);
     connect(action(Qn::ThumbnailsSearchAction),                 SIGNAL(triggered()),    this,   SLOT(at_thumbnailsSearchAction_triggered()));
-    connect(action(Qn::SetCurrentLayoutAspectRatio4x3Action),   SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio4x3Action_triggered()));
-    connect(action(Qn::SetCurrentLayoutAspectRatio16x9Action),  SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio16x9Action_triggered()));
-    connect(action(Qn::SetCurrentLayoutAspectRatio3x4Action),   SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio3x4Action_triggered()));
-    connect(action(Qn::SetCurrentLayoutAspectRatio9x16Action),  SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio9x16Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing0Action),     SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing0Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing10Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing10Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing20Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing20Action_triggered()));
@@ -613,14 +609,6 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
         menu()->trigger(Qn::OpenNewTabAction);
 
     submitDelayedDrops();
-}
-
-void QnWorkbenchActionHandler::at_workbench_cellAspectRatioChanged() {
-    qreal value = workbench()->currentLayout()->hasCellAspectRatio()
-                  ? workbench()->currentLayout()->cellAspectRatio()
-                  : qnGlobals->defaultLayoutCellAspectRatio();
-
-    action(QnAspectRatio::aspectRatioActionId(QnAspectRatio::closestStandardRatio(value)))->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged() {
@@ -2062,26 +2050,6 @@ void QnWorkbenchActionHandler::at_layoutSettingsAction_triggered() {
 
 void QnWorkbenchActionHandler::at_currentLayoutSettingsAction_triggered() {
     openLayoutSettingsDialog(workbench()->currentLayout()->resource());
-}
-
-void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio4x3Action_triggered() {
-    workbench()->currentLayout()->resource()->setCellAspectRatio(4.0f / 3.0f);
-    action(Qn::SetCurrentLayoutAspectRatio4x3Action)->setChecked(true);
-}
-
-void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio16x9Action_triggered() {
-    workbench()->currentLayout()->resource()->setCellAspectRatio(16.0f / 9.0f);
-    action(Qn::SetCurrentLayoutAspectRatio16x9Action)->setChecked(true);
-}
-
-void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio3x4Action_triggered() {
-    workbench()->currentLayout()->resource()->setCellAspectRatio(3.0f / 4.0f);
-    action(Qn::SetCurrentLayoutAspectRatio3x4Action)->setChecked(true);
-}
-
-void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio9x16Action_triggered() {
-    workbench()->currentLayout()->resource()->setCellAspectRatio(9.0f / 16.0f);
-    action(Qn::SetCurrentLayoutAspectRatio9x16Action)->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing0Action_triggered() {
