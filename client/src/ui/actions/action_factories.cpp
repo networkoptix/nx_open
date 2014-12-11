@@ -172,7 +172,7 @@ QList<QAction *> QnAspectRatioActionFactory::newActions(const QnActionParameters
     QnAspectRatio currentAspectRatio;
 
     if (currentLayout) {
-        float current = workbench()->currentLayout()->cellAspectRatio();
+        float current = currentLayout->cellAspectRatio();
         if (current <= 0)
             current = qnGlobals->defaultLayoutCellAspectRatio();
         currentAspectRatio = QnAspectRatio::closestStandardRatio(current);
