@@ -21,7 +21,7 @@ def main():
     for project in projects:
         projectDir = os.path.join(rootDir, project)
         translationDir = os.path.join(projectDir, 'translations')
-        template = os.path.join(translationDir, 'template.ts')
+        template = os.path.join(translationDir, 'template.xml')
         target = os.path.join(translationDir, project + '_' + language + '.ts')
         
         with open(template, "r") as src, open(target, "w") as tgt:

@@ -64,7 +64,7 @@ public:
 signals:
     void dataDropped(QnArchiveStreamReader* reader);
 private:
-    QnAbstractDataPacketPtr processFFmpegRtpPayload(quint8* data, int dataSize, int channelNum);
+    QnAbstractDataPacketPtr processFFmpegRtpPayload(quint8* data, int dataSize, int channelNum, qint64* parserPosition);
     void processMetadata(const quint8* data, int dataSize);
     bool openInternal();
     void reopen();
