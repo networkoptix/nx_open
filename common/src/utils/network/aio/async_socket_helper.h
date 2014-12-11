@@ -193,6 +193,7 @@ public:
         assert( buf.size() > 0 );
 
 #ifdef _DEBUG
+        //assert does not stop all threads immediately, so performing segmentation fault
         if( m_asyncSendIssued )
             *((int*)nullptr) = 12;
         assert( !m_asyncSendIssued );
