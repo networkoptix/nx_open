@@ -31,7 +31,8 @@ class UnitTestRollback:
         self._rollbackFile = open(".rollback","w+")
 
     def addOperations(self,methodName,serverAddress,resourceId):
-        self._rollbackFile.write(("%s,%s,%s\n")%(methodName,serverAddress,resourceId))
+        for s in  clusterTest.clusterTestServerList:
+            self._rollbackFile.write(("%s,%s,%s\n")%(methodName,s,resourceId))
         self._rollbackFile.flush()
 
     def _doSingleRollback(self,methodName,serverAddress,resourceId):
@@ -43,13 +44,9 @@ class UnitTestRollback:
             response = urllib2.urlopen(req)
         except:
             return False
-
         if response.getcode() != 200:
             response.close()
             return False
-
-        print response.read()
-
         response.close()
         return True
 
@@ -74,7 +71,7 @@ class UnitTestRollback:
                 print  "Or you could run recover later when all the rollback done\n"
                 recoverList.append("%s,%s,%s\n"%(l[0],l[1],l[2]))
             else:
-                print "Transaction done"
+                print "*"
 
         # close the resource file
         self._rollbackFile.close()
@@ -104,7 +101,13 @@ class ClusterTest():
     testCaseSize = 2
     unittestRollback = None
 
-    _getterAPIList = ["getResourceTypes",
+    _getterAPIList = [
+        "getResourceParams",
+        "getMediaServersEx",
+        "getCamerasEx",
+        "getUsers"]
+
+    _ec2GetRequests = ["getResourceTypes",
         "getResourceParams",
         "getMediaServers",
         "getMediaServersEx",
@@ -119,8 +122,19 @@ class ClusterTest():
         "listDirectory",
         "getStoredFile",
         "getSettings",
+        "getCurrentTime",
         "getFullInfo",
         "getLicenses"]
+
+    def _callAllGetters(self):
+        print "Test all ec2 get request status"
+        for s in clusterTest.clusterTestServerList:
+            for reqName in self._ec2GetRequests:
+                response = urllib2.urlopen("http://%s/ec2/%s" % (s,reqName))
+                if response.getcode() != 200:
+                    return (False,"%s failed with statusCode %d" % (reqName,response.getcode()))
+        print "All ec2 get requests work well"
+        return (True,"Server:%s test for all getter pass" % (s))
 
     def __init__(self):
         self._setUpPassword()
@@ -235,41 +249,15 @@ class ClusterTest():
         if ret == False:
             return (ret,reason)
 
+        ret,reason = self._callAllGetters()
+        if ret == False:
+            return (ret,reason)
+
         # do the rollback here
         self.unittestRollback = UnitTestRollback()
         return (True,"")
 
-
-
 clusterTest = ClusterTest()
-
-class EnumerateAllEC2GetCallsTest():
-    _ec2GetRequests = ["getResourceTypes",
-        "getResourceParams",
-        "getMediaServers",
-        "getMediaServersEx",
-        "getCameras",
-        "getCamerasEx",
-        "getCameraHistoryItems",
-        "getCameraBookmarkTags",
-        "getBusinessRules",
-        "getUsers",
-        "getVideowalls",
-        "getLayouts",
-        "listDirectory",
-        "getStoredFile",
-        "getSettings",
-        "getCurrentTime",
-        "getFullInfo",
-        "getLicenses"]
-
-    def test_callAllGetters(self):
-        for s in clusterTest.clusterTestServerList:
-            for reqName in ec2GetRequests:
-                response = urllib2.urlopen("http://%s/ec2/%s" % (s,reqName))
-                self.assertTrue(response.getcode() == 200, \
-                    "%s failed with statusCode %d" % (reqName,response.getcode()))
-            print "Server:%s test for all getter pass" % (s)
 
 
 class BasicGenerator():
@@ -1062,8 +1050,15 @@ class ClusterTestBase(unittest.TestCase):
         workerQueue.join()
                 
         time.sleep(clusterTest.clusterTestSleepTime)
-        ret , reason = clusterTest.checkMethodStatusConsistent(self._getObserverName())
-        self.assertTrue(ret,reason)
+        observer = self._getObserverName()
+
+        if isinstance(observer,(list)):
+            for m in observer:
+                ret,reason = clusterTest.checkMethodStatusConsistent(m)
+                self.assertTrue(ret,reason)
+        else:
+            ret , reason = clusterTest.checkMethodStatusConsistent(observer)
+            self.assertTrue(ret,reason)
 
         print "Test:%s finish!\n" % (self._getMethodName())
         print "===================================\n"
@@ -1171,7 +1166,7 @@ class ResourceRemoveTest(ClusterTestBase):
         return "removeResource"
 
     def _getObserverName(self):
-        return "getResourceTypes?format=json"
+        return ["getMediaServersEx?format=json","getUsers?format=json","getCameras?format=json"]
 
 
 class CameraUserAttributeListTest(ClusterTestBase):
@@ -2174,6 +2169,11 @@ if __name__ == '__main__':
                 try:
                     unittest.main()
                 except:
+                    try :
+                        raw_input("Press any key to continue Rollback ...")
+                    except:
+                        pass
+
                     doCleanUp()
 
             elif len(sys.argv) == 2 and sys.argv[1] == '--clear':

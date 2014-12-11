@@ -6,14 +6,14 @@
     <message>
         <location filename="../src/translation/translation_manager.cpp" line="153"/>
         <source>Language Name</source>
-        <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-        <translation>English (US)</translation>
+        <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/translation/translation_manager.cpp" line="156"/>
         <source>Locale Code</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
-        <translation>en_US</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -120,7 +120,7 @@
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="236"/>
-        <source>Invalid color constant &apos;%1&apos;.</source>
+        <source>Invalid colour constant &apos;%1&apos;.</source>
         <translation></translation>
     </message>
     <message>
@@ -420,7 +420,6 @@
         <source>No video frame received during last %n seconds.</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -466,7 +465,7 @@
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="403"/>
         <source>HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.</source>
-        <translation type="unfinished">Disk %1 is full. Disk contains too mcuh data.</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="408"/>
@@ -530,7 +529,7 @@ Please try to reboot the camera, restore factory defaults on the camdera, or upd
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="63"/>
-        <source>Not authorized. Url %1.</source>
+        <source>Not authorised. Url %1.</source>
         <translation></translation>
     </message>
     <message>
@@ -649,12 +648,12 @@ Parameters: </source>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="94"/>
-        <source>Could not initialize audio encoder.</source>
+        <source>Could not initialise audio encoder.</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="103"/>
-        <source>Could not initialize audio decoder.</source>
+        <source>Could not initialise audio decoder.</source>
         <translation></translation>
     </message>
 </context>
@@ -701,7 +700,7 @@ Parameters: </source>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="106"/>
-        <source>Could not initialize video encoder.</source>
+        <source>Could not initialise video encoder.</source>
         <translation></translation>
     </message>
 </context>
@@ -828,7 +827,6 @@ Parameters: </source>
         <source>%n %2 will be used out of %1.</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -836,14 +834,12 @@ Parameters: </source>
         <source>Activate %n more %2. </source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/license_usage_helper.cpp" line="114"/>
         <source>%n more %2 will be used. </source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -876,7 +872,7 @@ Parameters: </source>
 <context>
     <name>QnMediaServerResource</name>
     <message>
-        <location filename="../src/core/resource/media_server_resource.cpp" line="44"/>
+        <location filename="../src/core/resource/media_server_resource.cpp" line="43"/>
         <source>Server</source>
         <translation></translation>
     </message>
@@ -1131,7 +1127,7 @@ and will not receive system notifications via email.</translation>
     <message>
         <location filename="../src/health/system_health.cpp" line="51"/>
         <source>Multiple servers have different time and correct time could not be detected automatically.</source>
-        <translation>Server times are not synchronized and a common time could not be detected automatically.</translation>
+        <translation>Server times are not synchronised and a common time could not be detected automatically.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="53"/>

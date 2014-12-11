@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<meta name="viewport" content="width=device-width" />
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Уведомление от {{productName}}</title>
+</head>
+ 
+<body bgcolor="#FFFFFF" topmargin="0" leftmargin="0" marginheight="0" marginwidth="0">
+
+<style>
+{{>style_css}}
+</style>   
+
+<table class="head-wrap" bgcolor="#999999">
+    <tr>
+        <td></td>
+        <td class="header container" align="">
+            <div class="content logodiv">
+                <table bgcolor="#999999" >
+                    <tr>
+                        <td><img src="{{productLogoFilename}}"/></td>
+                        <td align="right"><h6 class="collapse">Системное Уведомление</h6></td>
+                    </tr>
+                </table>
+            </div>
+            
+        </td>
+        <td></td>
+    </tr>
+</table>
+
+<table class="body-wrap" > <!-- bgcolor="#FFFFFF" -->
+    <tr>
+        <td></td>
+        <td class="container" align="" > <!-- bgcolor="#FFFFFF" -->
+            
+            <!-- content -->
+            <div class="content">
+                <table>
+                    <tr>
+                        <td>
+                            
+                            <h3>Уважаемый пользователь {{productName}},</h3>
+                            <p class="lead">Следующие события произошли в вашей системе {{#systemName}}: <i>{{systemName}}</i>{{/systemName}}{{^systemName}}.{{/systemName}}
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </div><!-- /content -->
+            <!-- content -->
+            <div class="content">
+                <table > <!-- bgcolor="#FFFFFF" -->
+                    <tr>
+                        <td class="small" width="20%" style="vertical-align: top; padding-right:10px;"><img src="{{eventLogoFilename}}" height="75"/></td>
+                        <td>
+                            <h5>{{event}}: {{source}}</h5>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            {{>body}}
+
+            <div class="content">
+                <table > <!-- bgcolor="#FFFFFF" -->
+                    <tr>
+                        <td>
+                            
+                            <table  class="social" width="100%"> <!-- bgcolor="#FFFFFF" -->
+                                <tr>
+                                    <td>
+                                        
+                                        <div class="column">
+                                            <table  cellpadding="" align="left"> <!-- bgcolor="#FFFFFF" -->
+                                        <tr>
+                                            <td>                
+                                                <h5 class="">Техническая поддержка:</h5>
+                                                <p>Web: <strong><a href="{{companyUrl}}">{{companyUrl}}</a></strong></p>
+                                                <p>E-mail: <strong><a href="mailto:{{supportEmail}}">{{supportEmail}}</a></strong></p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                        </div>
+                                        <div class="clear"></div>
+    
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            
+
+        </td>
+        <td></td>
+    </tr>
+</table>
+
+</body>
+</html>
