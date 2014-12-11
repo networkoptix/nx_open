@@ -28,7 +28,7 @@ protected:
     virtual void doStart() override;
 
 private slots:
-    void at_mergeTool_mergeFinished(int errorCode, const QnModuleInformation &moduleInformation);
+    void at_mergeTool_mergeFinished(int errorCode, const QnModuleInformation &moduleInformation, int handle);
 
 private:
     QnMergeSystemsTool *m_mergeTool;
@@ -38,7 +38,7 @@ private:
 
     QSet<QnUuid> m_pendingPeers;
     QSet<QnUuid> m_failedPeers;
-    QHash<QnUuid, QnUuid> m_idByRealId;
+    QHash<int, QnUuid> m_peerIdByHandle;
 };
 
 #endif // CONFIGURE_PEER_TASK_H

@@ -71,8 +71,8 @@ CameraDiagnostics::Result QnISDStreamReader::openStream()
             t << "VideoInput.1.h264.2.BitRate=" << constantBitrateToSetKbps << "\r\n";
 #else
             t << "VideoInput.1.h264.2.BitrateControl=vbr\r\n";
-            t << "VideoInput.1.h264.2.BitrateVariableMin=" << desiredBitrateKbps * BYTES_PER_KB / 5 << "\r\n";
-            t << "VideoInput.1.h264.2.BitrateVariableMax=" << desiredBitrateKbps * BYTES_PER_KB / 5 * 6 << "\r\n";    //*1.2
+            t << "VideoInput.1.h264.2.BitrateVariableMin=" << desiredBitrateKbps / 5 << "\r\n";
+            t << "VideoInput.1.h264.2.BitrateVariableMax=" << desiredBitrateKbps / 5 * 6 << "\r\n";    //*1.2
 #endif
         }
         else
@@ -91,8 +91,8 @@ CameraDiagnostics::Result QnISDStreamReader::openStream()
 #else
             //TODO #ak ISD recommends switching to VBR
             t << "VideoInput.1.h264.1.BitrateControl=vbr\r\n";
-            t << "VideoInput.1.h264.1.BitrateVariableMin=" << desiredBitrateKbps * BYTES_PER_KB / 5 << "\r\n";
-            t << "VideoInput.1.h264.1.BitrateVariableMax=" << desiredBitrateKbps * BYTES_PER_KB / 5 * 6 << "\r\n";    //*1.2
+            t << "VideoInput.1.h264.1.BitrateVariableMin=" << desiredBitrateKbps / 5 << "\r\n";
+            t << "VideoInput.1.h264.1.BitrateVariableMax=" << desiredBitrateKbps / 5 * 6 << "\r\n";    //*1.2
 #endif
         }
         t.flush();

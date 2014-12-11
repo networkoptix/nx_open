@@ -419,7 +419,7 @@ Qn::MotionTypes QnSecurityCamResource::supportedMotionType() const {
 }
 
 bool QnSecurityCamResource::hasMotion() const {
-    Qn::MotionType motionType = getMotionType();
+    Qn::MotionType motionType = getDefaultMotionType();
     if (motionType == Qn::MT_SoftwareGrid)
         return hasDualStreaming2() || (getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability);
     else
@@ -428,10 +428,13 @@ bool QnSecurityCamResource::hasMotion() const {
 
 Qn::MotionType QnSecurityCamResource::getMotionType() const {
     QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
-    if ((*userAttributesLock)->motionType == Qn::MT_Default || !(supportedMotionType() & (*userAttributesLock)->motionType))
+    Qn::MotionType value = (*userAttributesLock)->motionType;
+    if (value == Qn::MT_NoMotion)
+        return value;
+    if (value == Qn::MT_Default || !(supportedMotionType() & value))
         return getDefaultMotionType();
     else
-        return (*userAttributesLock)->motionType;
+        return value;
 }
 
 void QnSecurityCamResource::setMotionType(Qn::MotionType value) {

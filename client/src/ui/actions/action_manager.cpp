@@ -77,7 +77,7 @@ public:
         action->setShortcutContext(Qt::WindowShortcut);
     }
 
-    QnActionBuilder shortcut(const QKeySequence &keySequence, ActionPlatform platform = AllPlatforms, bool append = false) {
+    QnActionBuilder shortcut(const QKeySequence &keySequence, ActionPlatform platform, bool replaceExisting) {
         if (keySequence.isEmpty())
             return *this;
 
@@ -106,7 +106,7 @@ public:
 
         if (set) {
             QList<QKeySequence> shortcuts = m_action->shortcuts();
-            if (!append)
+            if (replaceExisting)
                 shortcuts.clear();
             shortcuts.append(keySequence);
             m_action->setShortcuts(shortcuts);
@@ -114,8 +114,8 @@ public:
 
         return *this;
     }
-    QnActionBuilder addShortcut(const QKeySequence &keySequence, ActionPlatform platform = AllPlatforms) {
-        return shortcut(keySequence, platform, true);
+    QnActionBuilder shortcut(const QKeySequence &keySequence) {
+        return shortcut(keySequence, AllPlatforms, false);
     }
 
     QnActionBuilder shortcutContext(Qt::ShortcutContext context) {
@@ -541,7 +541,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::MainMenuAction).
         flags(Qn::GlobalHotkey).
         text(tr("Main Menu")).
-        shortcut(tr("Alt+Space"), QnActionBuilder::Mac).
+        shortcut(tr("Alt+Space"), QnActionBuilder::Mac, true).
         autoRepeat(false).
         icon(qnSkin->icon("titlebar/main_menu.png"));
 
@@ -669,7 +669,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey).
         text(tr("Save Current Layout As...")).
         shortcut(tr("Ctrl+Shift+S")).
-        shortcut(tr("Ctrl+Alt+S"), QnActionBuilder::Windows).
+        shortcut(tr("Ctrl+Alt+S"), QnActionBuilder::Windows, true).
         autoRepeat(false).
         condition(new QnSaveLayoutAsActionCondition(true, this));
 
@@ -694,7 +694,7 @@ QnActionManager::QnActionManager(QObject *parent):
             text(tr("Start Screen Recording")).
             toggledText(tr("Stop Screen Recording")).
             shortcut(tr("Alt+R")).
-            addShortcut(Qt::Key_MediaRecord).
+            shortcut(Qt::Key_MediaRecord).
             shortcutContext(Qt::ApplicationShortcut).
             autoRepeat(false).
             icon(qnSkin->icon("titlebar/recording.png", "titlebar/recording.png")).
@@ -735,8 +735,8 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::GlobalHotkey).
         autoRepeat(false).
         shortcut(tr("Alt+Enter")).
-        addShortcut(tr("Alt+Return")).
-        shortcut(tr("Ctrl+F"), QnActionBuilder::Mac).
+        shortcut(tr("Alt+Return")).
+        shortcut(tr("Ctrl+F"), QnActionBuilder::Mac, true).
         shortcutContext(Qt::ApplicationShortcut);
 
 
@@ -931,7 +931,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Open Containing Folder")).
         shortcut(tr("Ctrl+Enter")).
-        addShortcut(tr("Ctrl+Return")).
+        shortcut(tr("Ctrl+Return")).
         autoRepeat(false).
         condition(new QnOpenInFolderActionCondition(this));
 
@@ -981,6 +981,7 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
         text(tr("Delete")).
         shortcut(tr("Del")).
+        shortcut(Qt::Key_Backspace, QnActionBuilder::Mac, true).
         autoRepeat(false);
 
     factory(Qn::ResetVideoWallLayoutAction).
@@ -1033,14 +1034,13 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget | Qn::IntentionallyAmbiguous).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
         text(tr("Delete")).
-        shortcut(tr("Del")).
         autoRepeat(false);
 
     factory(Qn::MaximizeItemAction).
         flags(Qn::Scene | Qn::SingleTarget).
         text(tr("Maximize Item")).
         shortcut(tr("Enter")).
-        addShortcut(tr("Return")).
+        shortcut(tr("Return")).
         autoRepeat(false).
         condition(new QnItemZoomedActionCondition(false, this));
 
@@ -1048,7 +1048,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::SingleTarget).
         text(tr("Restore Item")).
         shortcut(tr("Enter")).
-        addShortcut(tr("Return")).
+        shortcut(tr("Return")).
         autoRepeat(false).
         condition(new QnItemZoomedActionCondition(true, this));
 
@@ -1216,7 +1216,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::LayoutItemTarget | Qn::IntentionallyAmbiguous).
         text(tr("Remove from Layout")).
         shortcut(tr("Del")).
-        shortcut(Qt::Key_Backspace, QnActionBuilder::Mac).
+        shortcut(Qt::Key_Backspace, QnActionBuilder::Mac, true).
         autoRepeat(false).
         condition(new QnLayoutItemRemovalActionCondition(this));
 
@@ -1225,7 +1225,7 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::RemovePermission).
         text(tr("Delete")).
         shortcut(tr("Del")).
-        shortcut(Qt::Key_Backspace, QnActionBuilder::Mac).
+        shortcut(Qt::Key_Backspace, QnActionBuilder::Mac, true).
         autoRepeat(false).
         condition(new QnResourceRemovalActionCondition(this));
 
@@ -1384,45 +1384,12 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).
+        childFactory(new QnAspectRatioActionFactory(this)).
         text(tr("Change Cell Aspect Ratio...")).
         condition(new QnConjunctionActionCondition(
             new QnVideoWallReviewModeCondition(true, this),
             new QnLightModeCondition(Qn::LightModeSingleItem, this),
             this));
-
-    factory.beginSubMenu(); {
-        factory.beginGroup();
-
-        factory(Qn::SetCurrentLayoutAspectRatio4x3Action).
-            flags(Qn::Scene | Qn::NoTarget).
-            requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
-            text(tr("4:3")).
-            checkable().
-            checked(qnGlobals->defaultLayoutCellAspectRatio() == 4.0/3.0);
-
-        factory(Qn::SetCurrentLayoutAspectRatio16x9Action).
-            flags(Qn::Scene | Qn::NoTarget).
-            requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
-            text(tr("16:9")).
-            checkable().
-            checked(qnGlobals->defaultLayoutCellAspectRatio() == 16.0/9.0);
-
-        factory(Qn::SetCurrentLayoutAspectRatio3x4Action).
-            flags(Qn::Scene | Qn::NoTarget).
-            requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
-            text(tr("3:4")).
-            checkable().
-            checked(qnGlobals->defaultLayoutCellAspectRatio() == 3.0/4.0);
-
-        factory(Qn::SetCurrentLayoutAspectRatio9x16Action).
-            flags(Qn::Scene | Qn::NoTarget).
-            requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
-            text(tr("9:16")).
-            checkable().
-            checked(qnGlobals->defaultLayoutCellAspectRatio() == 9.0/16.0);
-
-        factory.endGroup();
-    } factory.endSubMenu();
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).

@@ -384,6 +384,9 @@ protected slots:
     void updateCurtainedCursor();
     void updateBackground(const QnLayoutResourcePtr &layout);
 
+    /** Mark item on the scene selected as it was selected in the tree. */
+    void updateSelectionFromTree();
+
     void at_scene_destroyed();
     void at_scene_selectionChanged();
 

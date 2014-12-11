@@ -237,8 +237,9 @@ void QnUpdateProcess::at_checkForUpdatesTaskFinished(QnCheckForUpdatesPeerTask* 
 
         QnUuid peerId = server->getId();
 
-        m_targetPeerIds.insert(peerId);
-        if (incompatible)
+        if (!incompatible)
+            m_targetPeerIds.insert(peerId);
+        else
             m_incompatiblePeerIds.insert(peerId);
 
         QnPeerUpdateInformation info(server);
@@ -361,7 +362,7 @@ void QnUpdateProcess::at_restUpdateTask_finished(int errorCode) {
         return;
     }
 
-    if ((m_targetPeerIds - m_incompatiblePeerIds).isEmpty()) {
+    if (m_targetPeerIds.isEmpty()) {
         finishUpdate(QnUpdateResult::Successful);
         return;
     }
@@ -453,7 +454,7 @@ void QnUpdateProcess::uploadUpdatesToServers() {
     });
     connect(uploadUpdatesPeerTask,  &QnNetworkPeerTask::finished,             uploadUpdatesPeerTask,     &QObject::deleteLater);
     m_currentTask = uploadUpdatesPeerTask;
-    uploadUpdatesPeerTask->start(m_targetPeerIds - m_incompatiblePeerIds);
+    uploadUpdatesPeerTask->start(m_targetPeerIds);
 
     QPointer<QnUploadUpdatesPeerTask> uploadUpdatesPeerTaskPtr(uploadUpdatesPeerTask);
 
@@ -490,7 +491,7 @@ void QnUpdateProcess::installUpdatesToServers() {
     connect(installUpdatesPeerTask, &QnNetworkPeerTask::finished,                   installUpdatesPeerTask,   &QObject::deleteLater);
     setStage(QnFullUpdateStage::Servers);
     setCompatiblePeersStage(QnPeerUpdateStage::Install);
-    installUpdatesPeerTask->start(m_targetPeerIds - m_incompatiblePeerIds);
+    installUpdatesPeerTask->start(m_targetPeerIds);
 }
 
 void QnUpdateProcess::at_uploadTask_finished(int errorCode, const QSet<QnUuid> &failedPeers) {

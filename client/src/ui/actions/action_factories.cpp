@@ -4,6 +4,7 @@
 
 #include <utils/common/string.h>
 #include <utils/resource_property_adaptors.h>
+#include <utils/aspect_ratio.h>
 
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_preset.h>
@@ -21,6 +22,8 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench.h>
+#include <ui/style/globals.h>
 
 QList<QAction *> QnOpenCurrentUserLayoutActionFactory::newActions(const QnActionParameters &, QObject *parent) {
     QnLayoutResourceList layouts = resourcePool()->getResourcesWithParentId(QnUuid()).filtered<QnLayoutResource>(); /* Multi-videos will go here. */
@@ -159,4 +162,43 @@ QMenu* QnEdgeNodeActionFactory::newMenu(const QnActionParameters &parameters, QW
         return NULL;
 
     return menu()->newMenu(Qn::NoAction, Qn::TreeScope, parentWidget, QnActionParameters(edgeCamera->getParentResource()));
+}
+
+
+QList<QAction *> QnAspectRatioActionFactory::newActions(const QnActionParameters &parameters, QObject *parent) {
+    QActionGroup *actionGroup = new QActionGroup(parent);
+
+    QnWorkbenchLayout *currentLayout = workbench()->currentLayout();
+    QnAspectRatio currentAspectRatio;
+
+    if (currentLayout) {
+        float current = currentLayout->cellAspectRatio();
+        if (current <= 0)
+            current = qnGlobals->defaultLayoutCellAspectRatio();
+        currentAspectRatio = QnAspectRatio::closestStandardRatio(current);
+    }
+
+    for (const QnAspectRatio &aspectRatio: QnAspectRatio::standardRatios()) {
+        QAction *action = new QAction(parent);
+        action->setText(aspectRatio.toString());
+        action->setData(QVariant::fromValue(
+            QnActionParameters(parameters).withArgument(Qn::LayoutCellAspectRatioRole, aspectRatio.toFloat())
+        ));
+        action->setCheckable(true);
+        action->setChecked(aspectRatio == currentAspectRatio);
+        actionGroup->addAction(action);
+    }
+
+    connect(actionGroup, &QActionGroup::triggered, this, &QnAspectRatioActionFactory::at_action_triggered);
+
+    return actionGroup->actions();
+}
+
+void QnAspectRatioActionFactory::at_action_triggered(QAction *action) {
+    QnWorkbenchLayout *currentLayout = workbench()->currentLayout();
+    if (!currentLayout)
+        return;
+
+    float aspectRatio = action->data().value<QnActionParameters>().argument(Qn::LayoutCellAspectRatioRole).toFloat();
+    currentLayout->setCellAspectRatio(aspectRatio);
 }

@@ -6,7 +6,7 @@
     <message>
         <location filename="../src/translation/translation_manager.cpp" line="153"/>
         <source>Language Name</source>
-        <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
+        <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
         <translation></translation>
     </message>
     <message>
@@ -120,8 +120,8 @@
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="236"/>
-        <source>Invalid colour constant &apos;%1&apos;.</source>
-        <translation></translation>
+        <source>Invalid color constant &apos;%1&apos;.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="281"/>
@@ -420,6 +420,7 @@
         <source>No video frame received during last %n seconds.</source>
         <translation>
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -529,8 +530,8 @@ Please try to reboot the camera, restore factory defaults on the camdera, or upd
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="63"/>
-        <source>Not authorised. Url %1.</source>
-        <translation></translation>
+        <source>Not authorized. Url %1.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="67"/>
@@ -648,13 +649,13 @@ Parameters: </source>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="94"/>
-        <source>Could not initialise audio encoder.</source>
-        <translation></translation>
+        <source>Could not initialize audio encoder.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="103"/>
-        <source>Could not initialise audio decoder.</source>
-        <translation></translation>
+        <source>Could not initialize audio decoder.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -700,8 +701,8 @@ Parameters: </source>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="106"/>
-        <source>Could not initialise video encoder.</source>
-        <translation></translation>
+        <source>Could not initialize video encoder.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -827,6 +828,7 @@ Parameters: </source>
         <source>%n %2 will be used out of %1.</source>
         <translation>
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -834,12 +836,14 @@ Parameters: </source>
         <source>Activate %n more %2. </source>
         <translation>
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/license_usage_helper.cpp" line="114"/>
         <source>%n more %2 will be used. </source>
         <translation>
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -872,7 +876,7 @@ Parameters: </source>
 <context>
     <name>QnMediaServerResource</name>
     <message>
-        <location filename="../src/core/resource/media_server_resource.cpp" line="43"/>
+        <location filename="../src/core/resource/media_server_resource.cpp" line="44"/>
         <source>Server</source>
         <translation></translation>
     </message>
