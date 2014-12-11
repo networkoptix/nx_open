@@ -879,7 +879,7 @@ Qn::ActionVisibility QnIdentifyVideoWallActionCondition::check(const QnActionPar
             if (index.item().runtimeStatus.online)
                 return Qn::EnabledAction;
         }
-        return Qn::DisabledAction;
+        return Qn::InvisibleAction;
     }
     return QnActionCondition::check(parameters);
 }
