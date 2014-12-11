@@ -816,14 +816,6 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
     /* Calculate integer size. */
     QSizeF gridSizeF = gridRectF.size();
     QSize gridSize = mapper()->mapToGrid(widget->size());
-    if (dynamic_cast<QnMediaResourceWidget*>(widget)) {
-        qreal aspectRatio = widget->hasAspectRatio() ? widget->aspectRatio() : widget->defaultVisualAspectRatio();
-        if (aspectRatio > 1.0) {
-            gridSize = bestSingleBoundedSize(mapper(), gridSize.width(), Qt::Horizontal, aspectRatio);
-        } else {
-            gridSize = bestSingleBoundedSize(mapper(), gridSize.height(), Qt::Vertical, aspectRatio);
-        }
-    }
 
     if (gridSize.isEmpty())
         gridSize = gridSize.expandedTo(QSize(1, 1));

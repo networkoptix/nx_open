@@ -5,6 +5,7 @@
 
 #include "constrained_geometrically.h"
 #include "geometry.h"
+#include "frame_section.h"
 
 /**
  * This class is a workaround for a lack of mechanisms that would allow to 
@@ -40,31 +41,31 @@ public:
      * \param constraint                Constraint for the result. Must be a valid size.
      * \returns                         Preferred size for the given constraint.
      */
-    virtual QSizeF constrainedSize(const QSizeF constraint) const = 0;
+    virtual QSizeF constrainedSize(const QSizeF constraint, Qt::WindowFrameSection pinSection) const = 0;
 
-    static QRectF constrainedGeometry(const QRectF &geometry, Qn::Corner pinCorner, const QPointF &pinPoint, const QSizeF &constrainedSize) {
+    static QRectF constrainedGeometry(const QRectF &geometry, Qt::WindowFrameSection pinSection, const QPointF &pinPoint, const QSizeF &constrainedSize) {
         if(qFuzzyEquals(constrainedSize, geometry.size()))
             return geometry;
 
-        if(pinCorner == Qn::NoCorner)
+        if(pinSection == Qt::NoSection)
             return QnGeometry::scaled(geometry, constrainedSize, pinPoint, Qt::IgnoreAspectRatio);
 
-        QPointF pinCornerPoint = QnGeometry::corner(geometry, pinCorner);
+        QPointF pinSectionPoint = Qn::calculatePinPoint(geometry, pinSection);
         QRectF result(
-            pinCornerPoint - QnGeometry::cwiseMul(QnGeometry::cwiseDiv(pinCornerPoint - geometry.topLeft(), geometry.size()), constrainedSize),
+            pinSectionPoint - QnGeometry::cwiseMul(QnGeometry::cwiseDiv(pinSectionPoint - geometry.topLeft(), geometry.size()), constrainedSize),
             constrainedSize
         );
 
         /* Handle zero size so that we don't return NaNs. */
         if(qFuzzyIsNull(geometry.width())) {
-            if(pinCorner == Qn::TopLeftCorner || pinCorner == Qn::BottomLeftCorner) {
+            if(pinSection == Qt::TopLeftSection || pinSection == Qt::BottomLeftSection || pinSection == Qt::LeftSection) {
                 result.moveLeft(geometry.left());
             } else {
                 result.moveLeft(geometry.left() - result.width());
             }
         }
         if(qFuzzyIsNull(geometry.height())) {
-            if(pinCorner == Qn::TopLeftCorner || pinCorner == Qn::TopRightCorner) {
+            if(pinSection == Qt::TopLeftSection || pinSection == Qt::TopRightSection || pinSection == Qt::TopSection) {
                 result.moveTop(geometry.top());
             } else {
                 result.moveTop(geometry.top() - result.height());
@@ -75,8 +76,8 @@ public:
     }
 
 protected:
-    virtual QRectF constrainedGeometry(const QRectF &geometry, Qn::Corner pinCorner, const QPointF &pinPoint = QPointF()) const override {
-        return constrainedGeometry(geometry, pinCorner, pinPoint, constrainedSize(geometry.size()));
+    virtual QRectF constrainedGeometry(const QRectF &geometry, Qt::WindowFrameSection pinSection, const QPointF &pinPoint = QPointF()) const override {
+        return constrainedGeometry(geometry, pinSection, pinPoint, constrainedSize(geometry.size(), pinSection));
     }
 };
 

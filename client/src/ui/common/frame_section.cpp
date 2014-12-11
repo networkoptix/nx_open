@@ -271,19 +271,19 @@ namespace {
          * This is why these methods are not used here. */ // TODO: #Elric comment says they are not used, but they are used!!!
         switch(section) {
         case Qt::LeftSection:
-            return rect.topRight();
+            return Point(rect.right(), rect.top() + rect.height() / 2);
         case Qt::TopLeftSection:
             return rect.bottomRight();
         case Qt::TopSection:
-            return rect.bottomLeft();
+            return Point(rect.left() + rect.width() / 2, rect.bottom());
         case Qt::TopRightSection:
             return rect.bottomLeft();
         case Qt::RightSection:
-            return rect.topLeft();
+            return Point(rect.left(), rect.top() + rect.height() / 2);
         case Qt::BottomRightSection:
             return rect.topLeft();
         case Qt::BottomSection:
-            return rect.topLeft();
+            return Point(rect.left() + rect.width() / 2, rect.top());
         case Qt::BottomLeftSection:
             return rect.topRight();
         case Qt::TitleBarArea:

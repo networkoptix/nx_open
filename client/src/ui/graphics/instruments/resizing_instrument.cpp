@@ -209,7 +209,7 @@ void ResizingInstrument::dragMove(DragInfo *info) {
     }
 
     if(m_constrained != NULL) {
-        QRectF newRect = m_constrained->constrainedGeometry(QRectF(newPos, newSize), Qn::calculatePinPoint(m_section));
+        QRectF newRect = m_constrained->constrainedGeometry(QRectF(newPos, newSize), m_section);
         newPos = newRect.topLeft();
         newSize = newRect.size();
     }

@@ -470,11 +470,27 @@ void QnResourceWidget::updateCursor() {
         setCursor(newCursor);
 }
 
-QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint) const {
-    if(!hasAspectRatio())
+QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint, Qt::WindowFrameSection pinSection) const {
+    if (!hasAspectRatio())
         return constraint;
 
-    return expanded(m_aspectRatio, constraint, Qt::KeepAspectRatioByExpanding);
+    QSizeF result = constraint;
+
+    switch (pinSection) {
+    case Qt::TopSection:
+    case Qt::BottomSection:
+        result.setWidth(constraint.height() * m_aspectRatio);
+        break;
+    case Qt::LeftSection:
+    case Qt::RightSection:
+        result.setHeight(constraint.width() / m_aspectRatio);
+        break;
+    default:
+        result = expanded(m_aspectRatio, constraint, Qt::KeepAspectRatioByExpanding);
+        break;
+    }
+
+    return result;
 }
 
 void QnResourceWidget::updateCheckedButtons() {

@@ -779,15 +779,6 @@ float QnMediaResourceWidget::defaultVisualAspectRatio() const {
     return qnGlobals->defaultLayoutCellAspectRatio();
 }
 
-Qn::WindowFrameSections QnMediaResourceWidget::windowFrameSectionsAt(const QRectF &region) const {
-    Qn::WindowFrameSections result = base_type::windowFrameSectionsAt(region);
-
-    /* QnMediaResourceWidget cannot be resized by sides. */
-    result &= ~Qn::SideSections;
-
-    return result;
-}
-
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -821,11 +812,6 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
     } else {
         return Qn::MainWindow_MediaItem_Help;
     }
-}
-
-QSizeF QnMediaResourceWidget::constrainedSize(const QSizeF constraint) const {
-    float aspectRatio = hasAspectRatio() ? this->aspectRatio() : defaultVisualAspectRatio();
-    return expanded(aspectRatio, constraint, Qt::KeepAspectRatioByExpanding);
 }
 
 void QnMediaResourceWidget::channelLayoutChangedNotify() {

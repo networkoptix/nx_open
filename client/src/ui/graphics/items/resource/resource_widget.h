@@ -283,7 +283,7 @@ protected:
     
     void paintSelection(QPainter *painter, const QRectF &rect);
 
-    virtual QSizeF constrainedSize(const QSizeF constraint) const override;
+    virtual QSizeF constrainedSize(const QSizeF constraint, Qt::WindowFrameSection pinSection) const override;
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const override;
 
     const QSize &channelScreenSize() const;
