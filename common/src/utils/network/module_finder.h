@@ -27,7 +27,7 @@ public:
 
     QList<QnModuleInformation> foundModules() const;
 
-    QnModuleInformation moduleInformation(const QString &moduleId) const;
+    QnModuleInformation moduleInformation(const QnUuid &moduleId) const;
 
     QnMulticastModuleFinder *multicastModuleFinder() const;
     QnDirectModuleFinder *directModuleFinder() const;

@@ -149,5 +149,5 @@ int QnConfigureRestHandler::changePort(int port) {
 
 void QnConfigureRestHandler::resetConnections() {
     if (QnServerConnector::instance())
-        QnServerConnector::instance()->reconnect();
+        QnServerConnector::instance()->restart();
 }

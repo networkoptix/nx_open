@@ -49,7 +49,7 @@ QList<QnModuleInformation> QnModuleFinder::foundModules() const {
     return m_foundModules.values();
 }
 
-QnModuleInformation QnModuleFinder::moduleInformation(const QString &moduleId) const {
+QnModuleInformation QnModuleFinder::moduleInformation(const QnUuid &moduleId) const {
     return m_foundModules.value(moduleId);
 }
 
