@@ -84,7 +84,7 @@
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="113"/>
         <source>Unexpected symbol &apos;%1&apos; at position %2.</source>
-        <translation>Unexpected symbol &apos;%1&apos; at position %2.</translation>
+        <translation>予期しないシンボル &apos;%1&apos; ポジション %2.</translation>
     </message>
 </context>
 <context>

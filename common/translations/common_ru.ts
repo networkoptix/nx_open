@@ -4,16 +4,16 @@
 <context>
     <name>Language</name>
     <message>
-        <location filename="../src/translation/translation_manager.cpp" line="153"/>
-        <source>Language Name</source>
-        <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-        <translation>Русский</translation>
-    </message>
-    <message>
         <location filename="../src/translation/translation_manager.cpp" line="156"/>
         <source>Locale Code</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
         <translation>ru</translation>
+    </message>
+    <message>
+        <location filename="../src/translation/translation_manager.cpp" line="153"/>
+        <source>Language Name</source>
+        <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
+        <translation>Русский</translation>
     </message>
 </context>
 <context>
@@ -21,62 +21,62 @@
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="722"/>
         <source>Invalid stack size after program evaluation: %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Некорректный размер стека после оценки программы: %1.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="764"/>
         <source>Could not deduce result type for operation %1(&apos;%2&apos;, &apos;%3&apos;).</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно сделать вывод о типе результата операции %1(&apos;%2&apos;, &apos;%3&apos;).</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="792"/>
         <source>Invalid parameter type for operation %1(&apos;%2&apos;, &apos;%2&apos;)</source>
-        <translation type="unfinished"></translation>
+        <translation>Некорректный тип параметра операции %1(&apos;%2&apos;, &apos;%2&apos;)</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="802"/>
         <source>Could not deduce arithmetic supertype for type &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно определить арифметический супертип для типа &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="824"/>
         <source>Invalid parameter type for operation %1(&apos;%2&apos;)</source>
-        <translation type="unfinished"></translation>
+        <translation>Некорректный тип параметра операции %1(&apos;%2&apos;)</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="832"/>
         <source>Argument number for %1 instruction has invalid type &apos;%2&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Число аргументов для %1 инструкций имеет недопустимый тип &apos;%2&apos;.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="836"/>
         <source>Argument number for %1 instruction is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>Некорректное число аргументов для %1 инструкций.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="841"/>
         <source>Stack underflow during execution of %1 instruction.</source>
-        <translation type="unfinished"></translation>
+        <translation>Обращение к несуществующей области стека при выполнении %1 инструкции.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="845"/>
         <source>Function name for %1 instruction has invalid type &apos;%2&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя функции для %1 инструкции имеет недопустимый тип &apos;%2&apos;.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="856"/>
         <source>Function or variable &apos;%1&apos; is not defined.</source>
-        <translation type="unfinished"></translation>
+        <translation>Функция или переменная &apos;%1&apos; не определена.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="862"/>
         <source>Variable &apos;%1&apos; is not a function and cannot be called.</source>
-        <translation type="unfinished"></translation>
+        <translation>Переменная &apos;%1&apos; не является функцией и не может быть вызвана.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="874"/>
         <source>Stack underflow during program evaluation.</source>
-        <translation type="unfinished"></translation>
+        <translation>Обращение к несуществующей области стека при оценки программы.</translation>
     </message>
 </context>
 <context>
@@ -84,7 +84,7 @@
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="113"/>
         <source>Unexpected symbol &apos;%1&apos; at position %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Недопустимый символ &apos;%1&apos; в позиции %2.</translation>
     </message>
 </context>
 <context>
@@ -93,22 +93,22 @@
         <location filename="../src/utils/common/evaluator.h" line="185"/>
         <location filename="../src/utils/common/evaluator.h" line="192"/>
         <source>Parameter %2 is not specified for function &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Параметр %2 не определён для функции &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.h" line="195"/>
         <source>Parameter %2 of function &apos;%1&apos; is of type &apos;%3&apos;, but type &apos;%4&apos; was expected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Параметр %2 функции &apos;%1&apos; имеет тип &apos;%3&apos; вместо типа &apos;%4&apos;.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.h" line="201"/>
         <source>Function &apos;%1&apos; is expected to have %3 arguments, %2 provided.</source>
-        <translation type="unfinished"></translation>
+        <translation>Функция &apos;%1&apos; должна получать %3 аргумента, а задано %2.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.h" line="206"/>
         <source>Function &apos;%1&apos; is expected to have %3-%4 arguments, %2 provided.</source>
-        <translation type="unfinished"></translation>
+        <translation>Функция &apos;%1&apos; должна получать %3-%4 аргумента, а задано %2.</translation>
     </message>
 </context>
 <context>
@@ -116,17 +116,17 @@
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="179"/>
         <source>Unexpected token %1 (&apos;%2&apos;) at position %3.</source>
-        <translation type="unfinished"></translation>
+        <translation>Недопустимая метка %1 (&apos;%2&apos;) в позиции %3.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="236"/>
         <source>Invalid color constant &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Недопустимая цветовая константа &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="281"/>
         <source>Invalid number constant &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Недопустимая числовая константа &apos;%1&apos;.</translation>
     </message>
 </context>
 <context>

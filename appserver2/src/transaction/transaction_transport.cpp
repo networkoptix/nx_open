@@ -507,6 +507,8 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
 
     using namespace std::placeholders;
     assert( !dataCtx.encodedSourceData.isEmpty() );
+    NX_LOG( lit("Sending data buffer (%1 bytes) to the peer %2").
+        arg(dataCtx.encodedSourceData.size()).arg(m_remotePeer.id.toString()), cl_logDEBUG2 );
     if( !m_socket->sendAsync( dataCtx.encodedSourceData, std::bind( &QnTransactionTransport::onDataSent, this, _1, _2 ) ) )
         return setStateNoLock( State::Error );
 }
@@ -516,7 +518,12 @@ void QnTransactionTransport::onDataSent( SystemError::ErrorCode errorCode, size_
     QMutexLocker lk( &m_mutex );
 
     if( errorCode )
+    {
+        NX_LOG( lit("Failed to send %1 bytes to %2. %3").arg(m_dataToSend.front().encodedSourceData.size()).
+            arg(m_remotePeer.id.toString()).arg(SystemError::toString(errorCode)), cl_logWARNING );
+        m_dataToSend.pop_front();
         return setStateNoLock( State::Error );
+    }
     assert( bytesSent == (size_t)m_dataToSend.front().encodedSourceData.size() );
 
     m_dataToSend.pop_front();

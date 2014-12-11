@@ -1385,45 +1385,12 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).
+        childFactory(new QnAspectRatioActionFactory(this)).
         text(tr("Change Cell Aspect Ratio...")).
         condition(new QnConjunctionActionCondition(
             new QnVideoWallReviewModeCondition(true, this),
             new QnLightModeCondition(Qn::LightModeSingleItem, this),
             this));
-
-    factory.beginSubMenu(); {
-        factory.beginGroup();
-
-        factory(Qn::SetCurrentLayoutAspectRatio4x3Action).
-            flags(Qn::Scene | Qn::NoTarget).
-            requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
-            text(tr("4:3")).
-            checkable().
-            checked(qnGlobals->defaultLayoutCellAspectRatio() == 4.0/3.0);
-
-        factory(Qn::SetCurrentLayoutAspectRatio16x9Action).
-            flags(Qn::Scene | Qn::NoTarget).
-            requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
-            text(tr("16:9")).
-            checkable().
-            checked(qnGlobals->defaultLayoutCellAspectRatio() == 16.0/9.0);
-
-        factory(Qn::SetCurrentLayoutAspectRatio3x4Action).
-            flags(Qn::Scene | Qn::NoTarget).
-            requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
-            text(tr("3:4")).
-            checkable().
-            checked(qnGlobals->defaultLayoutCellAspectRatio() == 3.0/4.0);
-
-        factory(Qn::SetCurrentLayoutAspectRatio9x16Action).
-            flags(Qn::Scene | Qn::NoTarget).
-            requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
-            text(tr("9:16")).
-            checkable().
-            checked(qnGlobals->defaultLayoutCellAspectRatio() == 9.0/16.0);
-
-        factory.endGroup();
-    } factory.endSubMenu();
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).

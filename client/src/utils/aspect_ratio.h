@@ -1,10 +1,6 @@
 #ifndef ASPECT_RATIO_H
 #define ASPECT_RATIO_H
 
-#include <QtCore/QString>
-
-#include <ui/actions/actions.h>
-
 class QnAspectRatio
 {
 public:
@@ -17,7 +13,6 @@ public:
     static QnAspectRatio closestStandardRatio(float aspectRatio);
 
     static bool isRotated90(qreal angle);
-    static Qn::ActionId aspectRatioActionId(const QnAspectRatio &aspectRatio);
 
     bool operator ==(const QnAspectRatio &other) const;
 

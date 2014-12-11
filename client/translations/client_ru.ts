@@ -1954,7 +1954,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="480"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1279"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1280"/>
         <source>Check Camera Issues...</source>
         <translation>Просмотр ошибок камеры...</translation>
     </message>
@@ -1992,7 +1992,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="528"/>
         <source>Activate PTZ object</source>
-        <translation type="unfinished"></translation>
+        <translation>Активировать объект PTZ</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="535"/>
@@ -2194,9 +2194,34 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="739"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1724"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1725"/>
         <source>Ctrl+F</source>
         <translation></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1714"/>
+        <source>Ctrl+Alt+T</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1715"/>
+        <source>Disable Background Animation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1716"/>
+        <source>Enable Background Animation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1723"/>
+        <source>Show Search Panel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1724"/>
+        <source>Hide Search Panel</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="737"/>
@@ -2207,31 +2232,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <location filename="../src/ui/actions/action_manager.cpp" line="738"/>
         <source>Alt+Return</source>
         <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1713"/>
-        <source>Ctrl+Alt+T</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1714"/>
-        <source>Disable Background Animation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1715"/>
-        <source>Enable Background Animation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1722"/>
-        <source>Show Search Panel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1723"/>
-        <source>Hide Search Panel</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="711"/>
@@ -2289,17 +2289,17 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1495"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1496"/>
         <source>Close</source>
         <translation>Закрыть</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1496"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1497"/>
         <source>Ctrl+W</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1501"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1502"/>
         <source>Close All But This</source>
         <translation>Закрыть все кроме этой</translation>
     </message>
@@ -2439,117 +2439,117 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="988"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="989"/>
         <source>Update Layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="999"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1000"/>
         <source>Stop Video Wall</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1006"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1007"/>
         <source>Detach Layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1115"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1116"/>
         <source>Manage...</source>
         <translation>Настроить...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1288"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1289"/>
         <source>Camera Rules...</source>
         <translation>Правила для камеры...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1317"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1318"/>
         <source>Video Wall Settings...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1351"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1352"/>
         <source>Server Logs...</source>
         <translation>Журнал сервера...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1376"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1377"/>
         <source>Connect to the Current System...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1413"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1414"/>
         <source>3:4</source>
         <translation type="unfinished">3:4</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1420"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1421"/>
         <source>9:16</source>
         <translation type="unfinished">9:16</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1531"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1532"/>
         <source>Bookmark Selection...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1536"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1537"/>
         <source>Edit Bookmark...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1541"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1542"/>
         <source>Remove Bookmark...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1562"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1563"/>
         <source>Preview Search...</source>
         <translation>Поиск по интервалам...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1584"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1585"/>
         <source>Calibrate PTZ</source>
         <translation>Калибровка PTZ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1685"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1686"/>
         <source>Show Title Bar</source>
         <translation>Показать заголовок</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1686"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1687"/>
         <source>Hide Title Bar</source>
         <translation>Скрыть заголовок</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1691"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1692"/>
         <source>Pin Tree</source>
         <translation>Прикрепить дерево</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1692"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1693"/>
         <source>Unpin Tree</source>
         <translation>Открепить дерево</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1697"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1698"/>
         <source>Show Tree</source>
         <translation>Показать дерево</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1698"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1699"/>
         <source>Hide Tree</source>
         <translation>Скрыть дерево</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1703"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1704"/>
         <source>Show Timeline</source>
         <translation>Показать шкалу времени</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1704"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1705"/>
         <source>Hide Timeline</source>
         <translation>Скрыть шкалу времени</translation>
     </message>
@@ -2610,88 +2610,88 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>Открыть раскладк(и)</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1013"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1014"/>
         <source>Save Layout</source>
         <translation>Сохранить раскладку</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1019"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1025"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1020"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1026"/>
         <source>Save Layout As...</source>
         <translation>Сохранить раскладку как...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1041"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1042"/>
         <source>Maximize Item</source>
         <translation>Видео на полный экран</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1042"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1050"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1043"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1051"/>
         <source>Enter</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1043"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1051"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1044"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1052"/>
         <source>Return</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1049"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1050"/>
         <source>Restore Item</source>
         <translation>Видео в режим сетки</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1057"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1058"/>
         <source>Show Info</source>
         <translation>Показать информацию</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1058"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1064"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1070"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1130"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1059"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1065"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1071"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1131"/>
         <source>Alt+I</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1063"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1064"/>
         <source>Hide Info</source>
         <translation>Скрыть информацию</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1069"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1070"/>
         <source>Toggle Info</source>
         <translation>Показать/скрыть информацию</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1075"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1076"/>
         <source>Change Resolution...</source>
         <translation>Изменить разрешение...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1082"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1083"/>
         <source>Auto</source>
         <translation>Авто</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1088"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1089"/>
         <source>Low</source>
         <translation>Низкое</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1093"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1094"/>
         <source>High</source>
         <translation>Высокое</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1101"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1102"/>
         <source>PTZ...</source>
         <translation>PTZ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1109"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1110"/>
         <source>Save Current Position...</source>
         <translation>Записать позицию...</translation>
     </message>
@@ -2706,227 +2706,227 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>Показывать предупреждение о Beta версии</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1123"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1124"/>
         <source>Calibrate Fisheye</source>
         <translation>Калибровка камер &quot;Рыбий глаз&quot;</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1129"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1130"/>
         <source>Toggle Resolution Mode</source>
         <translation>Переключение разрешения</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1136"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1137"/>
         <source>Show Motion/Smart Search</source>
         <translation>Показать движение/поиск по движению</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1137"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1138"/>
         <source>Show Motion</source>
         <translation>Показать движение</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1138"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1145"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1156"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1139"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1146"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1157"/>
         <source>Alt+G</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1143"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1144"/>
         <source>Hide Motion/Smart Search</source>
         <translation>Скрыть движение/поиск по движению</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1144"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1145"/>
         <source>Hide Motion</source>
         <translation>Скрыть движение</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1150"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1151"/>
         <source>Clear Motion Selection</source>
         <translation>Очистить регион поиска движения</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1155"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1156"/>
         <source>Toggle Smart Search</source>
         <translation>Переключение в режим поиска движения</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1161"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1162"/>
         <source>Check File Watermark</source>
         <translation>Проверить целостность файла</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1162"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1163"/>
         <source>Alt+C</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1168"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1169"/>
         <source>Take Screenshot</source>
         <translation>Сделать стоп-кадр</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1169"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1170"/>
         <source>Alt+S</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1175"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1176"/>
         <source>Image Enhancement...</source>
         <translation>Коррекция изображения...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1176"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1177"/>
         <source>Alt+J</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1182"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1183"/>
         <source>Create Zoom Window</source>
         <translation>Создать окно приближения</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1187"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1188"/>
         <source>Rotate to...</source>
         <translation>Повернуть на...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1192"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1193"/>
         <source>0 degrees</source>
         <translation>0 градусов</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1197"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1198"/>
         <source>90 degrees</source>
         <translation>90 градусов</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1202"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1203"/>
         <source>180 degrees</source>
         <translation>180 градусов</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1207"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1208"/>
         <source>270 degrees</source>
         <translation>270 градусов</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1217"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1218"/>
         <source>Remove from Layout</source>
         <translation>Убрать с раскладки</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="983"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1036"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1218"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1227"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1037"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1219"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1228"/>
         <source>Del</source>
         <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="982"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1035"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1226"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1036"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1227"/>
         <source>Delete</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1240"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1248"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1241"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1249"/>
         <source>Rename</source>
         <translation>Переименовать</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1241"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1249"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1242"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1250"/>
         <source>F2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1265"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1266"/>
         <source>Set as Layout Background</source>
         <translation>Установить как фон на раскладку</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1306"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1307"/>
         <source>Picture Settings...</source>
         <translation>Настройки изображения...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1311"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1485"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1312"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1486"/>
         <source>Layout Settings...</source>
         <translation>Настройки раскладки...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1329"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1330"/>
         <source>Add Camera(s)...</source>
         <translation>Добавить камеры...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1338"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1339"/>
         <source>Camera(s) List by Server...</source>
         <translation>Список камер по серверам...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1347"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1348"/>
         <source>Ping...</source>
         <translation>Пинг...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1359"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1360"/>
         <source>Server Diagnostics...</source>
         <translation>Диагностика сервера...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1387"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1388"/>
         <source>Change Cell Aspect Ratio...</source>
         <translation>Соотношение сторон ячеек...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1429"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1430"/>
         <source>Change Cell Spacing...</source>
         <translation>Расстояние между ячейками...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1474"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1475"/>
         <source>Alt+T</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1526"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1527"/>
         <source>Zoom to Selection</source>
         <translation>Приблизить выделенный фрагмент</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1588"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1589"/>
         <source>Get PTZ Position</source>
         <translation>Получить позицию PTZ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1592"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1593"/>
         <source>Ctrl+Alt+Shift+D</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1593"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1594"/>
         <source>Debug Control Panel</source>
         <translation>Панель управления отладкой</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1708"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1709"/>
         <source>Pin Notifications</source>
         <translation>Прикрепить панель оповещений</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1709"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1710"/>
         <source>Unpin Notifications</source>
         <translation>Открепить панель оповещений</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1258"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1259"/>
         <source>Delete from Disk</source>
         <translation>Удалить с диска</translation>
     </message>
@@ -2936,132 +2936,132 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>Отсоединиться от сервера</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1274"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1275"/>
         <source>User Settings...</source>
         <translation>Настройки пользователя...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1297"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1298"/>
         <source>Camera Settings...</source>
         <translation>Настройки камер...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1325"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1326"/>
         <source>Open in Camera Settings Dialog</source>
         <translation>Открыть в диалоге настройки камер</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1367"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1368"/>
         <source>Server Settings...</source>
         <translation>Настройки сервера...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1399"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1400"/>
         <source>4:3</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1406"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1407"/>
         <source>16:9</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1438"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1439"/>
         <source>None</source>
         <translation>Нет</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1445"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1446"/>
         <source>Small</source>
         <translation>Маленькое</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1452"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1453"/>
         <source>Medium</source>
         <translation>Среднее</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1459"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1460"/>
         <source>Large</source>
         <translation>Большое</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1472"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1473"/>
         <source>Start Tour</source>
         <translation>Начать тур</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1473"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1474"/>
         <source>Stop Tour</source>
         <translation>Закончить тур</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1507"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1508"/>
         <source>Mark Selection Start</source>
         <translation>Отметить начало выделения</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1508"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1509"/>
         <source>[</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1514"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1515"/>
         <source>Mark Selection End</source>
         <translation>Отметить конец выделения</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1515"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1516"/>
         <source>]</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1521"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1522"/>
         <source>Clear Selection</source>
         <translation>Очистить выделение</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1675"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1676"/>
         <source>Show Thumbnails</source>
         <translation>Показать миниатюры</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1676"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1677"/>
         <source>Hide Thumbnails</source>
         <translation>Скрыть миниатюры</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1598"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1599"/>
         <source>Play</source>
         <translation>Воспроизведение</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1599"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1600"/>
         <source>Pause</source>
         <translation>Пауза</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1664"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1665"/>
         <source>Synchronize Streams</source>
         <translation>Сонхронизация видео</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1665"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1666"/>
         <source>Disable Stream Synchronization</source>
         <translation>Отключить синхронизацию видео</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1680"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1681"/>
         <source>Show Calendar</source>
         <translation>Показать календарь</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1681"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1682"/>
         <source>Hide Calendar</source>
         <translation>Скрыть календарь</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1569"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1570"/>
         <source>Ctrl+Alt+Shift++</source>
         <translation></translation>
     </message>
@@ -3071,147 +3071,147 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>Открыть в браузере...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1550"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1551"/>
         <source>Export Selected Area...</source>
         <translation>Экспорт выбранного фрагмента...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1556"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1557"/>
         <source>Export Multi-Video...</source>
         <translation>Мульти-Видео Экспорт...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1570"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1571"/>
         <source>Increment Debug Counter</source>
         <translation>Инкрементный отладочный счетчик</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1574"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1575"/>
         <source>Ctrl+Alt+Shift+-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1575"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1576"/>
         <source>Decrement Debug Counter</source>
         <translation>Декрементный отладочный счетчик</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1579"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1580"/>
         <source>Ctrl+Alt+Shift+R</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1580"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1581"/>
         <source>Show Resource Pool</source>
         <translation>Показать хранилище ресурсов</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1597"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1598"/>
         <source>Space</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1604"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1605"/>
         <source>Ctrl+-</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1605"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1606"/>
         <source>Speed Down</source>
         <translation>Замедлить</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1610"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1611"/>
         <source>Ctrl++</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1611"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1612"/>
         <source>Speed Up</source>
         <translation>Ускорить</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1616"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1617"/>
         <source>Ctrl+Left</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1617"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1618"/>
         <source>Previous Frame</source>
         <translation>Предыдущий кадр</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1622"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1623"/>
         <source>Ctrl+Right</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1623"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1624"/>
         <source>Next Frame</source>
         <translation>Следующий кадр</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1628"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1629"/>
         <source>Z</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1629"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1630"/>
         <source>To Start</source>
         <translation>В начало</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1634"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1635"/>
         <source>X</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1635"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1636"/>
         <source>To End</source>
         <translation>В конец</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1645"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1646"/>
         <source>Ctrl+Down</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1641"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1642"/>
         <source>Volume Down</source>
         <translation>Тише</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1640"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1641"/>
         <source>Ctrl+Up</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1646"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1647"/>
         <source>Volume Up</source>
         <translation>Громче</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1650"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1651"/>
         <source>M</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1651"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1652"/>
         <source>Toggle Mute</source>
         <translation>Вкл/Выкл заук</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1656"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1657"/>
         <source>L</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1657"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1658"/>
         <source>Jump to Live</source>
         <translation>Видео в реальном времени</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1663"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1664"/>
         <source>S</source>
         <translation></translation>
     </message>
@@ -4346,7 +4346,7 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="68"/>
         <source>Login or password you have entered are incorrect, please try again.</source>
-        <translation type="unfinished">Введенные имя пользователя или пароль некорректны, пожалуйста, попробуйте снова.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="70"/>
@@ -4400,14 +4400,6 @@ Compatibility mode for versions lower than %3 is not supported.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="165"/>
-        <source>Selected Server has a different version:
- - Client version: %1.
- - Server version: %2.
-An error has occurred while trying to restart in compatibility mode.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="145"/>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="177"/>
         <source>Selected Server has a different version:
@@ -4417,9 +4409,17 @@ The other version of the Client is needed in order to establish the connection t
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="165"/>
+        <source>Selected Server has a different version:
+ - Client version: %1.
+ - Server version: %2.
+An error has occurred while trying to restart in compatibility mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="196"/>
         <source>Could not connect to Enterprise Controller</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Не удалось соединиться с Enterprise Controller&apos;ом</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="197"/>
@@ -4837,18 +4837,19 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/models/event_log_model.cpp" line="410"/>
         <source>Motion video</source>
-        <translation type="unfinished"></translation>
+        <translation>Движение в видео</translation>
     </message>
     <message>
         <location filename="../src/ui/models/event_log_model.cpp" line="413"/>
         <source>
 </source>
-        <translation type="unfinished"></translation>
+        <translation>\n</translation>
     </message>
     <message>
         <location filename="../src/ui/models/event_log_model.cpp" line="419"/>
         <source> (%1 times)</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>it would be better to have a plural here</translatorcomment>
+        <translation>(%1 раз)</translation>
     </message>
     <message>
         <location filename="../src/ui/models/event_log_model.cpp" line="481"/>
@@ -6608,17 +6609,17 @@ These tours will become invalid if you remove it.</source>
 <context>
     <name>QnResourceWidget</name>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="142"/>
+        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="144"/>
         <source>Close</source>
         <translation>Закрыть</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="150"/>
+        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="153"/>
         <source>Information</source>
         <translation>Информация</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="156"/>
+        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="159"/>
         <source>Rotate</source>
         <translation>Повернуть</translation>
     </message>
@@ -8387,43 +8388,43 @@ Error description: &apos;%2&apos;</source>
 <context>
     <name>QnWorkbenchController</name>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="645"/>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="673"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="643"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="671"/>
         <source>Warning</source>
         <translation>Предупреждение</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="645"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="643"/>
         <source>Can&apos;t start recording due to the following error: %1</source>
         <translation>Невозможно начать запись из-за следующей ошибки: %1</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="609"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="607"/>
         <source>Recording in...%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="651"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="649"/>
         <source>Recorded Video</source>
         <translation>Записанное видео</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="656"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="654"/>
         <source>Save Recording As...</source>
         <translation>Сохранить запись как...</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="658"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="656"/>
         <source>AVI (Audio/Video Interleaved) (*.avi)</source>
         <translation>AVI (Audio/Video Interleaved) (*.avi)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="671"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="669"/>
         <source>Could not overwrite file &apos;%1&apos;. Please try another name.</source>
         <translation>Невозможно перезаписать файл &apos;%1&apos;. Попробуйте другое имя.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="1424"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="1422"/>
         <source>Press any key to stop the tour</source>
         <translation>Нажмите любую кнопку, чтобы остановить тур</translation>
     </message>

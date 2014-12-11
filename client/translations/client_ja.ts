@@ -100,7 +100,7 @@
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="51"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;When&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;When&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;日時&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="79"/>
@@ -126,7 +126,7 @@
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="202"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Do&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Do&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;実行&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="231"/>
@@ -357,7 +357,7 @@
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="17"/>
         <source>I have read the manual and understand the risks</source>
-        <translation type="unfinished">私はマニュアルを読みリスクを理解しました</translation>
+        <translation type="unfinished">マニュアルを読みリスクを理解しました</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="30"/>
@@ -392,7 +392,7 @@
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="127"/>
         <source>Low quality</source>
-        <translation type="unfinished">低解像度</translation>
+        <translation type="unfinished">低画質</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="150"/>
@@ -402,12 +402,12 @@
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="173"/>
         <source>High quality</source>
-        <translation type="unfinished">高解像度</translation>
+        <translation type="unfinished">高画質</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="192"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;注意! 低画質は低解像度になります.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message utf8="true">
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="199"/>
@@ -557,7 +557,7 @@
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="112"/>
         <source>Note: Recording Schedule is based on Server Time</source>
-        <translation>注：録画スケジュールはサーバー時間を使用します</translation>
+        <translation>注：録画スケジュールはサーバー時間を使用</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="138"/>
@@ -1322,7 +1322,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="73"/>
         <source>Skin:</source>
-        <translation type="unfinished">Skin:</translation>
+        <translation type="unfinished">表示:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="80"/>
@@ -1858,22 +1858,22 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
         <location filename="../src/ui/actions/action_manager.cpp" line="400"/>
         <location filename="../src/ui/actions/action_manager.cpp" line="685"/>
         <source>Drop Resources</source>
-        <translation>Drop Resources</translation>
+        <translation>リソース解放</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="404"/>
         <source>Drop Resources into a New Layout</source>
-        <translation>Drop Resources into a New Layout</translation>
+        <translation>新規レイアウトでリソース解放</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="412"/>
         <source>Delayed Drop Resources</source>
-        <translation>Delayed Drop Resources</translation>
+        <translation>リソース解放遅延</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="416"/>
         <source>Instant Drop Resources</source>
-        <translation>Instant Drop Resources</translation>
+        <translation>一時的リソース解放</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="421"/>
@@ -1937,7 +1937,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="480"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1279"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1280"/>
         <source>Check Camera Issues...</source>
         <translation>カメラ障害を確認...</translation>
     </message>
@@ -2125,6 +2125,11 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
         <translation>名前を付けてレイアウトを保存...</translation>
     </message>
     <message>
+        <location filename="../src/ui/actions/action_manager.cpp" line="671"/>
+        <source>Ctrl+Shift+S</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="672"/>
         <source>Ctrl+Alt+S</source>
         <translation>Ctrl+Alt+S</translation>
@@ -2172,7 +2177,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="739"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1724"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1725"/>
         <source>Ctrl+F</source>
         <translation>Ctrl+F</translation>
     </message>
@@ -2267,17 +2272,17 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
         <translation>Alt+F4</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1495"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1496"/>
         <source>Close</source>
         <translation>閉じる</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1496"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1497"/>
         <source>Ctrl+W</source>
         <translation>Ctrl+W</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1501"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1502"/>
         <source>Close All But This</source>
         <translation>全てを閉じる</translation>
     </message>
@@ -2448,105 +2453,105 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="988"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="989"/>
         <source>Update Layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="999"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1000"/>
         <source>Stop Video Wall</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1006"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1007"/>
         <source>Detach Layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1013"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1014"/>
         <source>Save Layout</source>
         <translation>レイアウトを保存</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1019"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1025"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1020"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1026"/>
         <source>Save Layout As...</source>
         <translation>名前を付けてレイアウトを保存...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1041"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1042"/>
         <source>Maximize Item</source>
         <translation>最大化</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1042"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1050"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1043"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1051"/>
         <source>Enter</source>
         <translation>Enter</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1043"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1051"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1044"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1052"/>
         <source>Return</source>
         <translation>戻る</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1049"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1050"/>
         <source>Restore Item</source>
         <translation>元に戻す</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1057"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1058"/>
         <source>Show Info</source>
         <translation>情報を表示する</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1058"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1064"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1070"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1130"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1059"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1065"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1071"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1131"/>
         <source>Alt+I</source>
         <translation>Alt+I</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1063"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1064"/>
         <source>Hide Info</source>
         <translation>情報を非表示にする</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1069"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1070"/>
         <source>Toggle Info</source>
         <translation>情報表示の切換え</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1075"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1076"/>
         <source>Change Resolution...</source>
         <translation>解像度変更...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1082"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1083"/>
         <source>Auto</source>
         <translation>自動</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1088"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1089"/>
         <source>Low</source>
         <translation>低</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1093"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1094"/>
         <source>High</source>
         <translation>高</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1101"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1102"/>
         <source>PTZ...</source>
         <translation>PTZ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1109"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1110"/>
         <source>Save Current Position...</source>
-        <translation>現在のポジションを保存する...</translation>
+        <translation>現在のポジションを保存...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="516"/>
@@ -2561,7 +2566,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="528"/>
         <source>Activate PTZ object</source>
-        <translation type="unfinished"></translation>
+        <translation>アクティブPTZオブジェクト</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="753"/>
@@ -2569,632 +2574,627 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
         <translation>ベータバージョン警告メッセージ表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1115"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1116"/>
         <source>Manage...</source>
         <translation>管理...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1123"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1124"/>
         <source>Calibrate Fisheye</source>
         <translation>魚眼レンズカメラ キャリブレート</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1129"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1130"/>
         <source>Toggle Resolution Mode</source>
         <translation>解像度の切換え</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1136"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1137"/>
         <source>Show Motion/Smart Search</source>
         <translation>モーション/スマート検索の表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1137"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1138"/>
         <source>Show Motion</source>
         <translation>モーション表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1138"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1145"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1156"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1139"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1146"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1157"/>
         <source>Alt+G</source>
         <translation>Alt+G</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1143"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1144"/>
         <source>Hide Motion/Smart Search</source>
         <translation>モーション/スマート検索の非表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1144"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1145"/>
         <source>Hide Motion</source>
         <translation>モーション非表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1150"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1151"/>
         <source>Clear Motion Selection</source>
         <translation>モーション選択の削除</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1155"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1156"/>
         <source>Toggle Smart Search</source>
         <translation>スマート検索の切換え</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1161"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1162"/>
         <source>Check File Watermark</source>
         <translation>ファイルウォーターマーク確認</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1162"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1163"/>
         <source>Alt+C</source>
         <translation>Alt+C</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1168"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1169"/>
         <source>Take Screenshot</source>
         <translation>スクリーンショット</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1169"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1170"/>
         <source>Alt+S</source>
         <translation>Alt+S</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1175"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1176"/>
         <source>Image Enhancement...</source>
         <translation>イメージ拡張...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1176"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1177"/>
         <source>Alt+J</source>
         <translation>Alt+J</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1182"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1183"/>
         <source>Create Zoom Window</source>
         <translation>ズーム画面作成</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1187"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1188"/>
         <source>Rotate to...</source>
         <translation>回転...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1192"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1193"/>
         <source>0 degrees</source>
         <translation>0 度</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1197"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1198"/>
         <source>90 degrees</source>
         <translation>90 度</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1202"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1203"/>
         <source>180 degrees</source>
         <translation>180 度</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1207"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1208"/>
         <source>270 degrees</source>
         <translation>270 度</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1217"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1218"/>
         <source>Remove from Layout</source>
         <translation>レイアウトから削除</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="983"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1036"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1218"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1227"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1037"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1219"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1228"/>
         <source>Del</source>
         <translation>削除</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="671"/>
-        <source>Ctrl+Shift+S</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="982"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1035"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1226"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1036"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1227"/>
         <source>Delete</source>
         <translation>削除</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1240"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1248"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1241"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1249"/>
         <source>Rename</source>
         <translation>名前の変更</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1241"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1249"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1242"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1250"/>
         <source>F2</source>
         <translation>F2</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1258"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1259"/>
         <source>Delete from Disk</source>
         <translation>ディスクから削除</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1265"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1266"/>
         <source>Set as Layout Background</source>
         <translation>レイアウト背景として保存</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1274"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1275"/>
         <source>User Settings...</source>
         <translation>ユーザー設定...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1288"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1289"/>
         <source>Camera Rules...</source>
         <translation>カメラルール...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1297"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1298"/>
         <source>Camera Settings...</source>
         <translation>カメラ設定...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1306"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1307"/>
         <source>Picture Settings...</source>
         <translation>画像設定...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1311"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1485"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1312"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1486"/>
         <source>Layout Settings...</source>
         <translation>レイアウト設定...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1317"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1318"/>
         <source>Video Wall Settings...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1325"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1326"/>
         <source>Open in Camera Settings Dialog</source>
         <translation>カメラ設定画面を開く</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1329"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1330"/>
         <source>Add Camera(s)...</source>
         <translation>カメラの追加...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1338"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1339"/>
         <source>Camera(s) List by Server...</source>
         <translation>サーバー毎のカメラリスト...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1347"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1348"/>
         <source>Ping...</source>
         <translation>Ping...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1351"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1352"/>
         <source>Server Logs...</source>
         <translation>サーバーログ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1359"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1360"/>
         <source>Server Diagnostics...</source>
         <translation>サーバー診断...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1367"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1368"/>
         <source>Server Settings...</source>
         <translation>サーバー設定...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1376"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1377"/>
         <source>Connect to the Current System...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1387"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1388"/>
         <source>Change Cell Aspect Ratio...</source>
         <translation>セルのアスペクトレシオ比を変更...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1399"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1400"/>
         <source>4:3</source>
         <translation>4:3</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1406"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1407"/>
         <source>16:9</source>
         <translation>16:9</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1413"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1414"/>
         <source>3:4</source>
         <translation type="unfinished">3:4</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1420"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1421"/>
         <source>9:16</source>
         <translation type="unfinished">9:16</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1429"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1430"/>
         <source>Change Cell Spacing...</source>
         <translation>セルスペースの変更...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1438"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1439"/>
         <source>None</source>
         <translation>なし</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1445"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1446"/>
         <source>Small</source>
         <translation>小</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1452"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1453"/>
         <source>Medium</source>
         <translation>中</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1459"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1460"/>
         <source>Large</source>
         <translation>大</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1472"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1473"/>
         <source>Start Tour</source>
         <translation>ツアー開始</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1473"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1474"/>
         <source>Stop Tour</source>
         <translation>ツアー停止</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1474"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1475"/>
         <source>Alt+T</source>
         <translation>Alt+T</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1507"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1508"/>
         <source>Mark Selection Start</source>
         <translation>開始位置の選択</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1508"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1509"/>
         <source>[</source>
         <translation>[</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1514"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1515"/>
         <source>Mark Selection End</source>
         <translation>終了位置の選択</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1515"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1516"/>
         <source>]</source>
         <translation>]</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1521"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1522"/>
         <source>Clear Selection</source>
         <translation>選択クリア</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1526"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1527"/>
         <source>Zoom to Selection</source>
         <translation>選択エリアのズーム</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1531"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1532"/>
         <source>Bookmark Selection...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1536"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1537"/>
         <source>Edit Bookmark...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1541"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1542"/>
         <source>Remove Bookmark...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1550"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1551"/>
         <source>Export Selected Area...</source>
         <translation>単一ビデオのエクスポート...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1556"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1557"/>
         <source>Export Multi-Video...</source>
         <translation>複数ビデオのエクスポート...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1562"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1563"/>
         <source>Preview Search...</source>
         <translation>検索表示...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1569"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1570"/>
         <source>Ctrl+Alt+Shift++</source>
         <translation>Ctrl+Alt+Shift++</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1570"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1571"/>
         <source>Increment Debug Counter</source>
         <translation>デバッグカウンターの加算</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1574"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1575"/>
         <source>Ctrl+Alt+Shift+-</source>
         <translation>Ctrl+Alt+Shift+-</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1575"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1576"/>
         <source>Decrement Debug Counter</source>
         <translation>デバッグカウンターの減算</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1579"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1580"/>
         <source>Ctrl+Alt+Shift+R</source>
         <translation>Ctrl+Alt+Shift+R</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1580"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1581"/>
         <source>Show Resource Pool</source>
         <translation>リソースプールの表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1584"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1585"/>
         <source>Calibrate PTZ</source>
         <translation>PTZの調整</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1588"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1589"/>
         <source>Get PTZ Position</source>
         <translation>PTZポジション取得</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1592"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1593"/>
         <source>Ctrl+Alt+Shift+D</source>
         <translation>Ctrl+Alt+Shift+D</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1593"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1594"/>
         <source>Debug Control Panel</source>
         <translation>デバッグコントロールパネル</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1597"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1598"/>
         <source>Space</source>
         <translation>スペース</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1598"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1599"/>
         <source>Play</source>
         <translation>再生</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1599"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1600"/>
         <source>Pause</source>
         <translation>一時停止</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1604"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1605"/>
         <source>Ctrl+-</source>
         <translation>Ctrl+-</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1605"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1606"/>
         <source>Speed Down</source>
         <translation>スロー再生</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1610"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1611"/>
         <source>Ctrl++</source>
         <translation>Ctrl++</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1611"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1612"/>
         <source>Speed Up</source>
         <translation>早送り再生</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1616"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1617"/>
         <source>Ctrl+Left</source>
         <translation>Ctrl+Left</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1617"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1618"/>
         <source>Previous Frame</source>
         <translation>前のフレーム</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1622"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1623"/>
         <source>Ctrl+Right</source>
         <translation>Ctrl+Right</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1623"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1624"/>
         <source>Next Frame</source>
         <translation>次のフレーム</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1628"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1629"/>
         <source>Z</source>
         <translation>Z</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1629"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1630"/>
         <source>To Start</source>
         <translation>開始</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1634"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1635"/>
         <source>X</source>
         <translation>X</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1635"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1636"/>
         <source>To End</source>
         <translation>終了</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1640"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1641"/>
         <source>Ctrl+Up</source>
         <translation>Ctrl+Up</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1641"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1642"/>
         <source>Volume Down</source>
         <translation>ボリュームを下げる</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1645"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1646"/>
         <source>Ctrl+Down</source>
         <translation>Ctrl+Down</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1646"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1647"/>
         <source>Volume Up</source>
         <translation>ボリュームを上げる</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1650"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1651"/>
         <source>M</source>
         <translation>M</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1651"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1652"/>
         <source>Toggle Mute</source>
         <translation>ミュート切換え</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1656"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1657"/>
         <source>L</source>
         <translation>L</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1657"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1658"/>
         <source>Jump to Live</source>
         <translation>ライブ表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1663"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1664"/>
         <source>S</source>
         <translation>S</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1664"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1665"/>
         <source>Synchronize Streams</source>
         <translation>ストレームの同期</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1665"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1666"/>
         <source>Disable Stream Synchronization</source>
         <translation>ストリームの同期無効</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1675"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1676"/>
         <source>Show Thumbnails</source>
         <translation>サムネイル表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1676"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1677"/>
         <source>Hide Thumbnails</source>
         <translation>サムネイル非表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1680"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1681"/>
         <source>Show Calendar</source>
         <translation>カレンダー表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1681"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1682"/>
         <source>Hide Calendar</source>
         <translation>カレンダー非表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1685"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1686"/>
         <source>Show Title Bar</source>
         <translation>タイトルバー表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1686"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1687"/>
         <source>Hide Title Bar</source>
         <translation>タイトルバー非表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1691"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1692"/>
         <source>Pin Tree</source>
         <translation>ツリーを固定で表示する</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1692"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1693"/>
         <source>Unpin Tree</source>
         <translation>ツリーを自動的に隠す</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1697"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1698"/>
         <source>Show Tree</source>
         <translation>ツリーを表示する</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1698"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1699"/>
         <source>Hide Tree</source>
         <translation>ツリーを隠す</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1703"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1704"/>
         <source>Show Timeline</source>
         <translation>タイムラインを表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1704"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1705"/>
         <source>Hide Timeline</source>
         <translation>タイムラインを非表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1708"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1709"/>
         <source>Pin Notifications</source>
         <translation>通知を固定表示する</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1709"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1710"/>
         <source>Unpin Notifications</source>
         <translation>通知を固定表示しない</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1713"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1714"/>
         <source>Ctrl+Alt+T</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1714"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1715"/>
         <source>Disable Background Animation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1715"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1716"/>
         <source>Enable Background Animation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1722"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1723"/>
         <source>Show Search Panel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1723"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1724"/>
         <source>Hide Search Panel</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3253,12 +3253,12 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/tests/auto_tester.cpp" line="31"/>
         <source>Time to wait before finishing the test, in milliseconds. Default is %1.</source>
-        <translation>Time to wait before finishing the test, in milliseconds. Default is %1.</translation>
+        <translation>テスト終了前の待機時間（ms). 初期値 %1.</translation>
     </message>
     <message>
         <location filename="../src/tests/auto_tester.cpp" line="32"/>
         <source>Substring that must be present in one of the resources.</source>
-        <translation>Substring that must be present in one of the resources.</translation>
+        <translation>リソース何れかにサブストリングが必要.</translation>
     </message>
     <message>
         <location filename="../src/tests/auto_tester.cpp" line="33"/>
@@ -3275,7 +3275,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
         <location filename="../src/tests/auto_tester.cpp" line="89"/>
         <source>Test for resource substring &apos;%1&apos; failed.
 </source>
-        <translation>Test for resource substring &apos;%1&apos; failed.</translation>
+        <translation>リソースサブストリングテスト &apos;%1&apos; 失敗.</translation>
     </message>
 </context>
 <context>
@@ -3542,8 +3542,8 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="211"/>
         <source>Are you sure you want to reset rules to the defaults?
 This action CANNOT be undone!</source>
-        <translation>Are you sure you want to reset rules to the defaults?
-This action CANNOT be undone!</translation>
+        <translation>ルールを初期設定に戻しますか?
+このアクションは元に戻せません!</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="229"/>
@@ -3745,6 +3745,11 @@ It might take a few moments to populate them in the tree.</source>
         </translation>
     </message>
     <message>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="810"/>
+        <source>Select target server...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="684"/>
         <source>Server went offline, search aborted.</source>
         <translation>サーバーオフライン　検索は異常終了しました.</translation>
@@ -3787,11 +3792,6 @@ It might take a few moments to populate them in the tree.</source>
         <translation>
             <numerusform>%n カメラ検出</numerusform>
         </translation>
-    </message>
-    <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="810"/>
-        <source>Select target server...</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4046,17 +4046,17 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="190"/>
         <source>Maximum number of motion windows for current camera is %1, but %2 motion windows are currently selected.</source>
-        <translation>Maximum number of motion windows for current camera is %1, but %2 motion windows are currently selected.</translation>
+        <translation>カメラのモーション画面の最大は %1, ですが %2 のモーション画面を選択しています.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="199"/>
         <source>Maximum number of different motion sensitivities for current camera is %1, but %2 motion sensitivities are currently selected.</source>
-        <translation>Maximum number of different motion sensitivities for current camera is %1, but %2 motion sensitivities are currently selected.</translation>
+        <translation>異なる感度のモーション検知の最大は %1, ですが %2 のモーション検知が選択されています.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="208"/>
         <source>Maximum number of motion mask windows for current camera is %1, but %2 motion mask windows are currently selected.</source>
-        <translation>Maximum number of motion mask windows for current camera is %1, but %2 motion mask windows are currently selected.</translation>
+        <translation>モーションマスクの最大は %1, ですが %2 のモーションマスクが選択されています.</translation>
     </message>
 </context>
 <context>
@@ -4123,7 +4123,7 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="611"/>
         <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation>For software motion 2. fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2. </translation>
+        <translation>ソフトウェアモーションでは 2. fps が2番目のストリームで使用されます . 現在のFPS %1. は次の数値になります %2. </translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="849"/>
@@ -4136,7 +4136,7 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="849"/>
         <source>Motion Recording is disabled or not supported by some of the selected cameras. Please go to the cameras&apos; motion setup page to ensure it is supported and enabled.</source>
-        <translation>Motion Recording is disabled or not supported by some of the selected cameras. Please go to the cameras&apos; motion setup page to ensure it is supported and enabled.</translation>
+        <translation>モーション録画無効またはサポートされないカメラです　カメラ設定画面で確認してください.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="852"/>
@@ -4232,7 +4232,7 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/ui/widgets/properties/camera_settings_widget.cpp" line="22"/>
         <source>Cannot edit properties for items of different types.</source>
-        <translation>Cannot edit properties for items of different types.</translation>
+        <translation>アイテムのプロパティが編集できません.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_settings_widget.cpp" line="26"/>
@@ -4341,14 +4341,6 @@ Compatibility mode for versions lower than %3 is not supported.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="165"/>
-        <source>Selected Server has a different version:
- - Client version: %1.
- - Server version: %2.
-An error has occurred while trying to restart in compatibility mode.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="145"/>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="177"/>
         <source>Selected Server has a different version:
@@ -4358,9 +4350,17 @@ The other version of the Client is needed in order to establish the connection t
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="165"/>
+        <source>Selected Server has a different version:
+ - Client version: %1.
+ - Server version: %2.
+An error has occurred while trying to restart in compatibility mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="196"/>
         <source>Could not connect to Enterprise Controller</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">エンタープライズコントローラーに接続できません</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="197"/>
@@ -4514,7 +4514,7 @@ These versions are not compatible. Please update your %3</source>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="52"/>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="109"/>
         <source>Database Backup Files (*.db)</source>
-        <translation>Database Backup Files (*.db)</translation>
+        <translation>バックアップファイル (*.db)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="70"/>
@@ -4713,7 +4713,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="99"/>
         <source>Filter Similar Rows</source>
-        <translation>Filter Similar Rows</translation>
+        <translation>同様な列にフィルター</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="101"/>
@@ -4739,7 +4739,7 @@ These versions are not compatible. Please update your %3</source>
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="360"/>
         <source>Event log for period from %1 to %2 - %n event(s) found</source>
         <translation>
-            <numerusform>Event log for period from %1 to %2 - %n event(s) found</numerusform>
+            <numerusform> %1 ～ %2 - %n イベント検出</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -4772,18 +4772,18 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/models/event_log_model.cpp" line="410"/>
         <source>Motion video</source>
-        <translation type="unfinished"></translation>
+        <translation>モーションビデオ</translation>
     </message>
     <message>
         <location filename="../src/ui/models/event_log_model.cpp" line="413"/>
         <source>
 </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/models/event_log_model.cpp" line="419"/>
         <source> (%1 times)</source>
-        <translation type="unfinished"></translation>
+        <translation> (%1 時間)</translation>
     </message>
     <message>
         <location filename="../src/ui/models/event_log_model.cpp" line="481"/>
@@ -5547,7 +5547,7 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="209"/>
         <source>Dewarping</source>
-        <translation>Dewarping</translation>
+        <translation>歪み補正</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="218"/>
@@ -6531,17 +6531,17 @@ These tours will become invalid if you remove it.</source>
 <context>
     <name>QnResourceWidget</name>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="142"/>
+        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="144"/>
         <source>Close</source>
         <translation>閉じる</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="150"/>
+        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="153"/>
         <source>Information</source>
         <translation>情報</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="156"/>
+        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="159"/>
         <source>Rotate</source>
         <translation>回転</translation>
     </message>
@@ -6713,7 +6713,7 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="542"/>
         <source>Rebuilding archive index is completed.</source>
-        <translation>アーカイブインデックスの再リビルド終了</translation>
+        <translation>アーカイブインデックスの再リビルド終了.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="554"/>
@@ -6943,8 +6943,7 @@ Please wait until update is finished</source>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="322"/>
         <source>Cannot restart the client.
 Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished">クライアントの再起動ができません.
-アプリケーションを閉じて再度起動して下さい.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="335"/>
@@ -8276,43 +8275,43 @@ Please close the application and start it again using the shortcut in the start 
 <context>
     <name>QnWorkbenchController</name>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="645"/>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="673"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="643"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="671"/>
         <source>Warning</source>
         <translation>警告</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="645"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="643"/>
         <source>Can&apos;t start recording due to the following error: %1</source>
         <translation>エラー: %1の為に録画が開始されません</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="609"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="607"/>
         <source>Recording in...%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="651"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="649"/>
         <source>Recorded Video</source>
         <translation>ビデオ録画</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="656"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="654"/>
         <source>Save Recording As...</source>
         <translation>名前を付けて保存...</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="658"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="656"/>
         <source>AVI (Audio/Video Interleaved) (*.avi)</source>
         <translation>AVI (Audio/Video Interleaved) (*.avi)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="671"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="669"/>
         <source>Could not overwrite file &apos;%1&apos;. Please try another name.</source>
         <translation>ファイル%1の上書きができません　他の名前を使用してください.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="1424"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="1422"/>
         <source>Press any key to stop the tour</source>
         <translation>何かのキーでツアー停止</translation>
     </message>
@@ -9641,7 +9640,7 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="582"/>
         <source>Dewarping</source>
-        <translation>Dewarping</translation>
+        <translation>歪み補正</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="604"/>
