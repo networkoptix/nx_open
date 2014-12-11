@@ -974,18 +974,9 @@ QRect QnVideowallManageWidgetPrivate::calculateProposedMoveGeometry(const BaseMo
     if (multiScreen)
         *multiScreen = screenCount > 1;
 
-    auto checkedAR = [&item, valid](const QRect &proposed) -> QRect {
-        bool isSameAr = (item.geometry.width() * proposed.height() == item.geometry.height() * proposed.width());
-        if (valid)
-            *valid &= isSameAr;
-        if (isSameAr)
-            return proposed;
-        return QRect();
-    };
-
     QList<ModelScreen> bestScreens = bestMatchingGeometry(m_screens, geometry, screenCount);
     if (screenCount > 1 || !item.isPartOfScreen())
-        return checkedAR(unitedGeometry(bestScreens, valid));
+        return unitedGeometry(bestScreens, valid);
 
     int screenIdx = bestScreens[0].snaps.left().screenIndex;
     int partCount = [](const QnScreenSnaps &snaps) {
@@ -995,8 +986,7 @@ QRect QnVideowallManageWidgetPrivate::calculateProposedMoveGeometry(const BaseMo
     }(item.snaps);
 
     QList<ModelScreenPart> bestParts = bestMatchingGeometry(m_screens[screenIdx].parts, geometry, partCount);
-    return checkedAR(unitedGeometry(bestParts, valid));
-
+    return unitedGeometry(bestParts, valid);
 }
 
 void QnVideowallManageWidgetPrivate::processItemStart(BaseModelItem &item, calculateProposedGeometryFunction proposedGeometry) {
