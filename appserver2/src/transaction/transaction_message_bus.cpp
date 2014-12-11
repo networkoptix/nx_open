@@ -688,7 +688,7 @@ void QnTransactionMessageBus::printTranState(const QnTranState& tranState, bool 
     {
         if( printToStdOut )
             qDebug() << "key=" << itr.key().peerID << "(dbID=" << itr.key().dbID << ") need after=" << itr.value();
-        NX_LOG( lit("key=%1 (dbID=%2) need after=%3").arg(itr.key().peerID).arg(itr.key().dbID).arg(itr.value()), cl_logDEBUG1 );
+        NX_LOG( lit("key=%1 (dbID=%2) need after=%3").arg(itr.key().peerID.toString()).arg(itr.key().dbID.toString()).arg(itr.value()), cl_logDEBUG1 );
     }
 }
 
