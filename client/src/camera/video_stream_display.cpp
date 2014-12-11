@@ -1033,6 +1033,11 @@ CLVideoDecoderOutputPtr QnVideoStreamDisplay::getScreenshot(bool anyQuality)
     if (!anyQuality && (m_lastDisplayedFrame->flags & QnAbstractMediaData::MediaFlags_LowQuality))
         return CLVideoDecoderOutputPtr();    //screenshot will be received from the server
 
+    /* Do not take local screenshot if displayed frame has different size. 
+       Checking only height because width can be modified by forced AR. */
+    if (!anyQuality && m_lastDisplayedFrame->height != m_imageSize.height())
+        return CLVideoDecoderOutputPtr();    //screenshot will be received from the server      
+
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     CLVideoDecoderOutput::copy(m_lastDisplayedFrame.data(), outFrame.data());
     return outFrame;
