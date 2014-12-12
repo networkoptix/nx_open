@@ -1,19 +1,20 @@
 SETLOCAL
-call "%VS100COMNTOOLS%\..\..\VC\vcvarsall.bat"
+call "%VS110COMNTOOLS%\..\..\VC\vcvarsall.bat"
 
 set CONFIG=%1
 echo config = %CONFIG%
 
-set TARGETPATH=%2
-if [%2] == [] set TARGETPATH=
+set ARCH=%2
+if [%2] == [] set ARCH=
 
 if [%CONFIG%] == [debug] set OTHER=release
 if [%CONFIG%] == [release] set OTHER=debug
 
 set AXHDW=%~dp0
-set PATH=%AXHDW%\%TARGETPATH%\bin\%CONFIG%;%PATH%
+set bebin_path=..\build_environment\target\x64\bin
+set PATH=%bebin_path%\%CONFIG%;%PATH%
 
-idc %AXHDW%\%TARGETPATH%\bin\%CONFIG%\axhdwitness.dll /idl %TARGETPATH%\build\%CONFIG%\axhdwitness.idl -version 1.0
-midl %TARGETPATH%\build\%CONFIG%\axhdwitness.idl /nologo /tlb %TARGETPATH%\build\%CONFIG%\axhdwitness.tlb
-idc %AXHDW%\%TARGETPATH%\bin\%CONFIG%\axhdwitness.dll /tlb %TARGETPATH%\build\%CONFIG%\axhdwitness.tlb
+%bebin_path%\idc %bebin_path%\%CONFIG%\axhdwitness.dll /idl %bebin_path%\%CONFIG%\axhdwitness.idl -version 1.0
+midl %bebin_path%\%CONFIG%\axhdwitness.idl /nologo /tlb %bebin_path%\%CONFIG%\axhdwitness.tlb
+%bebin_path%\idc %bebin_path%\%CONFIG%\axhdwitness.dll /tlb %bebin_path%\%CONFIG%\axhdwitness.tlb
 ENDLOCAL

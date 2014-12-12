@@ -35,6 +35,7 @@ Q_CORE_EXPORT const QVariant::Handler *qcoreVariantHandler();
 
 QApplication *qn_application = NULL;
 static int qn_argc = 0; /* This one must be static as QApplication stores a reference to it. */
+static char **qn_argv;
 
 QAxFactory *qax_instantiate() {
     QAxFactory *result = hdw::qax_instantiate();
@@ -47,7 +48,13 @@ QAxFactory *qax_instantiate() {
         const QVariant::Handler *oldHandler = *currentHandler;
         *currentHandler = qcoreVariantHandler();*/
         
-        qn_application = new QApplication(qn_argc, NULL);
+		LPWSTR *szArgsList = CommandLineToArgvW(GetCommandLineW(), &qn_argc);
+		qn_argv = new char*[qn_argc];
+		for (int i = 0; i < qn_argc; ++i) {
+			qn_argv[i] = "";
+		}
+
+		qn_application = new QApplication(qn_argc, qn_argv);
 
         /* Roll back if QApplication constructor didn't behave as expected. */
         /* if(*currentHandler == qcoreVariantHandler()) {

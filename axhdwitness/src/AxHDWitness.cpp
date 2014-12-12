@@ -4,6 +4,8 @@
 #include "api/session_manager.h"
 #include "core/resource_management/resource_discovery_manager.h"
 
+#include "common/common_module.h"
+
 #include "ui/workbench/workbench_navigator.h"
 #include "ui/workbench/workbench_context.h"
 #include "ui/workbench/workbench.h"
@@ -35,6 +37,7 @@
 // ax23 #include "ui/device_settings/dlg_factory.h"
 #include "ui/actions/action_manager.h"
 #include "ui/style/skin.h"
+#include "ui/style/globals.h"
 #include "decoders/video/abstractdecoder.h"
 // ax23 #include "device_plugins/desktop/device/desktop_device_server.h"
 #include "libavformat/avio.h"
@@ -365,27 +368,42 @@ void AxHDWitness::slidePanelsOut() {
 
 bool AxHDWitness::doInitialize()
 {
-    QTextStream out(stdout);
-    QThread::currentThread()->setPriority(QThread::HighestPriority);
+	// DebugBreak();
 
-    AllowSetForegroundWindow(ASFW_ANY);
+	AllowSetForegroundWindow(ASFW_ANY);
 
-    /* Set up application parameters so that QSettings know where to look for settings. */
-    QApplication::setOrganizationName(QnAppInfo::organizationName());
-    QApplication::setApplicationName(lit(QN_APPLICATION_NAME));
-    QApplication::setApplicationVersion(QnAppInfo::applicationVersion());
+	int argc = 0;
 
+    QStringList pluginDirs = QCoreApplication::libraryPaths();
+    pluginDirs << QCoreApplication::applicationDirPath();
+    QCoreApplication::setLibraryPaths( pluginDirs );
+
+	m_clientModule.reset(new QnClientModule(argc, NULL));
+//x	QnResourcePool::initStaticInstance( new QnResourcePool() );
 
     /* Create application instance. */
     QApplication* application = qApp;
 
+//x	QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin ? lit(":/skin_light") : lit(":/skin_dark");
+
+//x    skin.reset(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
+
+//x    QnCustomization customization;
+    //xcustomization.add(QnCustomization(skin->path("customization_common.json")));
+    //xcustomization.add(QnCustomization(skin->path("customization_base.json")));
+    //xcustomization.add(QnCustomization(skin->path("customization_child.json")));
+
+    //xcustomizer.reset(new QnCustomizer(customization));
+    //xcustomizer->customize(qnGlobals);
+
+	
     application->setQuitOnLastWindowClosed(true);
-    application->setWindowIcon(qnSkin->icon("logo_tray.png"));
+//x    application->setWindowIcon(qnSkin->icon("logo_tray.png"));
 
     /* Initialize connections. */
     // initAppServerConnection();
-    qnSettings->save();
-    cl_log.log(QLatin1String("Using ") + qnSettings->mediaFolder() + QLatin1String(" as media root directory"), cl_logALWAYS);
+    //xqnSettings->save();
+//x    cl_log.log(QLatin1String("Using ") + qnSettings->mediaFolder() + QLatin1String(" as media root directory"), cl_logALWAYS);
 
 
     /* Initialize application instance. */
@@ -408,7 +426,6 @@ bool AxHDWitness::doInitialize()
     if (!cl_log.create(dataLocation + QLatin1String("/log/ax_log_file") + base, 1024*1024*10, 5, cl_logDEBUG1))
         return false;
 
-
     QnLog::initLog(QString());
     cl_log.log(lit(QN_APPLICATION_NAME), " started", cl_logALWAYS);
     cl_log.log("Software version: ", QnAppInfo::applicationVersion(), cl_logALWAYS);
@@ -418,41 +435,38 @@ bool AxHDWitness::doInitialize()
 
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
 
-	ffmpegInit();
+	QnSessionManager::instance()->start();
+//x	ffmpegInit();
 
-    // Create and start SessionManager
-    QnSessionManager *sm = QnSessionManager::instance();
-    QThread *thread = new QThread();
-    sm->moveToThread(thread);
-    QObject::connect(sm, SIGNAL(destroyed()), thread, SLOT(quit()));
-    QObject::connect(thread , SIGNAL(finished()), thread, SLOT(deleteLater()));
-    thread->start();
-    sm->start();
+//x    QnResourcePool::instance(); // to initialize net state;
 
-    QnResourcePool::instance(); // to initialize net state;
-    ffmpegInit();
-    OpenSSL_add_all_digests(); // open SSL init
+//x    OpenSSL_add_all_digests(); // open SSL init
 
     //===========================================================================
 
     CLVideoDecoderFactory::setCodecManufacture(CLVideoDecoderFactory::FFMPEG);
     
-    QnResourceDiscoveryManager::instance()->setResourceProcessor(&m_clientResourceProcessor);
-
     //============================
     //QnResourceDirectoryBrowser
-    QnResourceDirectoryBrowser::instance().setLocal(true);
+/*    QnResourceDirectoryBrowser::instance().setLocal(true);
     QStringList dirs;
     dirs << qnSettings->mediaFolder();
     dirs << qnSettings->extraMediaFolders();
-    QnResourceDirectoryBrowser::instance().setPathCheckList(dirs);
-    QnResourceDiscoveryManager::instance()->addDeviceServer(&QnResourceDirectoryBrowser::instance());
+    QnResourceDirectoryBrowser::instance().setPathCheckList(dirs); */
 
-    QnResourceDiscoveryManager::instance()->start();
+    /************************************************************************/
+    /* Initializing resource searchers                                      */
+    /************************************************************************/
+/*    QnResourceDiscoveryManager::init(new QnResourceDiscoveryManager());
+    m_clientResourceProcessor.moveToThread( QnResourceDiscoveryManager::instance() );
+	QnResourceDiscoveryManager::instance()->setResourceProcessor(&m_clientResourceProcessor);
 
-    // CLDeviceSettingsDlgFactory::initialize();
+    QnResourceDiscoveryManager::instance()->setReady(true);
+    QnResourceDiscoveryManager::instance()->start(); */
 
-	qApp->setStyle(qnSkin->newStyle());
+//x	qApp->setStyle(qnSkin->newStyle());
+
+	qApp->processEvents();
 
     return true;
 }
@@ -464,13 +478,20 @@ void AxHDWitness::doFinalize()
         m_mainWindow = 0;
     }
 
-    // QnClientMessageProcessor::instance()->stop();
-    QnSessionManager::instance()->stop();
+	QnSessionManager::instance()->stop();
+	delete QnCommonModule::instance();
+	m_clientModule.reset(0);
 
-    QnResource::stopCommandProc();
+    // QnClientMessageProcessor::instance()->stop();
+    //xQnSessionManager::instance()->stop();
+
+    // QnResource::stopCommandProc();
     //QnResourceDiscoveryManager::instance().stop();
 
     qInstallMessageHandler(defaultMsgHandler);
+
+    //xdelete QnResourcePool::instance();
+    //xQnResourcePool::initStaticInstance( NULL );
 }
 
 void AxHDWitness::createMainWindow() {

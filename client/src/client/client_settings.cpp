@@ -114,7 +114,7 @@ QnClientSettings::QnClientSettings(QObject *parent):
 }
 
 QnClientSettings::~QnClientSettings() {
-    return;
+	delete m_accessManager;
 }
 
 QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) {

@@ -5,7 +5,6 @@
 #include <common/common_module.h>
 
 #include "client_meta_types.h"
-#include "client_settings.h"
 
 #include <utils/common/app_info.h>
 
@@ -28,7 +27,7 @@ QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject
 
     /* Init singletons. */
     QnCommonModule *common = new QnCommonModule(argc, argv, this);
-    common->instance<QnClientSettings>();
+	common->instance<QnClientSettings>();
     common->setModuleGUID(QnUuid::createUuid());
 }
 

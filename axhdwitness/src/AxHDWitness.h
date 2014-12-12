@@ -7,6 +7,11 @@
 
 #include "client/client_resource_processor.h"
 #include "ui/widgets/main_window.h"
+#include "ui/style/skin.h"
+#include <client/client_module.h>
+#include "ui/style/noptix_style.h"
+#include "ui/customization/customizer.h"
+
 
 class AxHDWitness : public QWidget
 {
@@ -61,6 +66,9 @@ private:
     QnClientResourceProcessor m_clientResourceProcessor;
 
     QScopedPointer<QnWorkbenchContext> m_context;
+	QScopedPointer<QnSkin> skin;
+	QScopedPointer<QnCustomizer> customizer;
+	QScopedPointer<QnClientModule> m_clientModule;
     QnMainWindow *m_mainWindow;
 };
 
