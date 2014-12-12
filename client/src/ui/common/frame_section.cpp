@@ -350,7 +350,7 @@ Qt::WindowFrameSection Qn::rotateSection(Qt::WindowFrameSection section, qreal r
     if (section == Qt::NoSection || section == Qt::TitleBarArea)
         return section;
 
-    int intRotation = std::round(rotation); /* we don't need qreal precision */
+    int intRotation = qRound(rotation); /* we don't need qreal precision */
 
     if (intRotation < 0)
         intRotation += 360;
