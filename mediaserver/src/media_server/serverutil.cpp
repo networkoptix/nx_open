@@ -64,31 +64,11 @@ bool backupDatabase() {
             break;
     }
 
-    QFile file(fileName);
-    if (!file.open(QFile::WriteOnly))
-        return false;
-
-    QByteArray data;
-    ec2::ErrorCode errorCode;
-
-    QEventLoop loop;
-    auto dumpDatabaseHandler =
-        [&loop, &errorCode, &data] (int /*reqID*/, ec2::ErrorCode _errorCode, const ec2::ApiDatabaseDumpData &dumpData) {
-            errorCode = _errorCode;
-            data = dumpData.data;
-            loop.quit();
-    };
-
-    QnAppServerConnectionFactory::getConnection2()->dumpDatabaseAsync(&loop, dumpDatabaseHandler);
-    loop.exec();
-
+    const ec2::ErrorCode errorCode = QnAppServerConnectionFactory::getConnection2()->dumpDatabaseToFileSync( fileName );
     if (errorCode != ec2::ErrorCode::ok) {
         NX_LOG(lit("Failed to dump EC database: %1").arg(ec2::toString(errorCode)), cl_logERROR);
         return false;
     }
-
-    file.write(data);
-    file.close();
 
     return true;
 }

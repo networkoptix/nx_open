@@ -168,10 +168,10 @@ void QnPtzManageDialog::loadData(const QnPtzData &data) {
     QnPtzPresetList presets = data.presets;
     QnPtzTourList tours = data.tours;
     qSort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
-        return naturalStringCaseInsensitiveLessThan(l.name, r.name);
+        return naturalStringLess(l.name, r.name);
     });
     qSort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {
-        return naturalStringCaseInsensitiveLessThan(l.name, r.name);
+        return naturalStringLess(l.name, r.name);
     });
 
     m_model->setTours(tours);
@@ -309,7 +309,7 @@ void QnPtzManageDialog::updateFields(Qn::PtzDataFields fields) {
         QnPtzPresetList presets;
         if (controller()->getPresets(&presets)) {
             qSort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
-                return naturalStringCaseInsensitiveLessThan(l.name, r.name);
+                return naturalStringLess(l.name, r.name);
             });
             m_model->setPresets(presets);
         }
@@ -319,7 +319,7 @@ void QnPtzManageDialog::updateFields(Qn::PtzDataFields fields) {
         QnPtzTourList tours;
         if (controller()->getTours(&tours)) {
             qSort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {
-                return naturalStringCaseInsensitiveLessThan(l.name, r.name);
+                return naturalStringLess(l.name, r.name);
             });
             m_model->setTours(tours);
         }

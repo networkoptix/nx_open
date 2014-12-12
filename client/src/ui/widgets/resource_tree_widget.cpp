@@ -103,7 +103,7 @@ protected:
         /* Sort by name. */
         QString leftDisplay = left.data(Qt::DisplayRole).toString();
         QString rightDisplay = right.data(Qt::DisplayRole).toString();
-        int result = naturalStringCompare(leftDisplay, rightDisplay, Qt::CaseInsensitive , false );
+        int result = naturalStringCompare(leftDisplay, rightDisplay, Qt::CaseInsensitive);
         if(result != 0)
             return result < 0;
 

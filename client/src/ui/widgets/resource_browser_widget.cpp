@@ -315,9 +315,9 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint &pos, bool ignoreSe
 
     if(currentTreeWidget() == ui->searchTreeWidget) {
         /* Disable rename action for search view. */
-        manager->redirectAction(menu.data(), Qn::RenameAction, NULL);
+        manager->redirectAction(menu.data(), Qn::RenameResourceAction, NULL);
     } else {
-        manager->redirectAction(menu.data(), Qn::RenameAction, m_renameAction);
+        manager->redirectAction(menu.data(), Qn::RenameResourceAction, m_renameAction);
     }
 
     if(menu->isEmpty())

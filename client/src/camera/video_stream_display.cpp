@@ -144,6 +144,11 @@ QnFrameScaler::DownscaleFactor QnVideoStreamDisplay::determineScaleFactor(QnAbst
     if (force_factor==QnFrameScaler::factor_any) // if nobody pushing lets peek it
     {
         QSize on_screen = render->sizeOnScreen(channelNumber);
+        /* Check if item size is not calculated yet. */
+        if (on_screen.isEmpty()) {  
+            on_screen.setHeight(srcHeight);
+            on_screen.setWidth(srcWidth);
+        }
 
         m_scaleFactor = findScaleFactor(srcWidth, srcHeight, on_screen.width(), on_screen.height());
 
@@ -1027,6 +1032,11 @@ CLVideoDecoderOutputPtr QnVideoStreamDisplay::getScreenshot(bool anyQuality)
     // feature #2563
     if (!anyQuality && (m_lastDisplayedFrame->flags & QnAbstractMediaData::MediaFlags_LowQuality))
         return CLVideoDecoderOutputPtr();    //screenshot will be received from the server
+
+    /* Do not take local screenshot if displayed frame has different size. 
+       Checking only height because width can be modified by forced AR. */
+    if (!anyQuality && m_lastDisplayedFrame->height != m_imageSize.height())
+        return CLVideoDecoderOutputPtr();    //screenshot will be received from the server      
 
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     CLVideoDecoderOutput::copy(m_lastDisplayedFrame.data(), outFrame.data());

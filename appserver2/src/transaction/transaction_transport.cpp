@@ -112,7 +112,10 @@ void QnTransactionTransport::startListening()
         m_chunkHeaderLen = 0;
         using namespace std::placeholders;
         if( !m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) ) )
+        {
             setState( Error );
+            return;
+        }
         if( m_remotePeer.isServer() )
             if( !m_socket->registerTimer( TCP_KEEPALIVE_TIMEOUT, std::bind(&QnTransactionTransport::sendHttpKeepAlive, this) ) )
                 setState( Error );
@@ -321,7 +324,13 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
     m_lastReceiveTimer.restart();
 
     if( errorCode || bytesRead == 0 )   //error or connection closed
+    {
+        if( errorCode == SystemError::timedOut )
+        {
+            NX_LOG( lit("Peer %1 timed out. Disconnecting...").arg(m_remotePeer.id.toString()), cl_logWARNING );
+        }
         return setStateNoLock( State::Error );
+    }
 
     if (m_state == Error)
         return;
@@ -438,6 +447,8 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
 
     using namespace std::placeholders;
     assert( !dataCtx.encodedSourceData.isEmpty() );
+    NX_LOG( lit("Sending data buffer (%1 bytes) to the peer %2").
+        arg(dataCtx.encodedSourceData.size()).arg(m_remotePeer.id.toString()), cl_logDEBUG2 );
     if( !m_socket->sendAsync( dataCtx.encodedSourceData, std::bind( &QnTransactionTransport::onDataSent, this, _1, _2 ) ) )
         return setStateNoLock( State::Error );
 }
@@ -447,7 +458,12 @@ void QnTransactionTransport::onDataSent( SystemError::ErrorCode errorCode, size_
     QMutexLocker lk( &m_mutex );
 
     if( errorCode )
+    {
+        NX_LOG( lit("Failed to send %1 bytes to %2. %3").arg(m_dataToSend.front().encodedSourceData.size()).
+            arg(m_remotePeer.id.toString()).arg(SystemError::toString(errorCode)), cl_logWARNING );
+        m_dataToSend.pop_front();
         return setStateNoLock( State::Error );
+    }
     assert( bytesSent == (size_t)m_dataToSend.front().encodedSourceData.size() );
 
     m_dataToSend.pop_front();

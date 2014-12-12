@@ -359,7 +359,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         connect(action(Qn::DeleteVideoWallItemAction),      &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered);
         connect(action(Qn::StartVideoWallAction),           &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_startVideoWallAction_triggered);
         connect(action(Qn::StopVideoWallAction),            &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered);
-        connect(action(Qn::RenameAction),                   &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_renameAction_triggered);
+        connect(action(Qn::RenameVideowallEntityAction),    &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_renameAction_triggered);
         connect(action(Qn::IdentifyVideoWallAction),        &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_identifyVideoWallAction_triggered);
         connect(action(Qn::StartVideoWallControlAction),    &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_startVideoWallControlAction_triggered);
         connect(action(Qn::OpenVideoWallsReviewAction),     &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered);
@@ -432,19 +432,19 @@ void QnWorkbenchVideoWallHandler::swapLayouts(const QnVideoWallItemIndex firstIn
         return;
 
     QnLayoutResourceList unsavedLayouts;
-    if (snapshotManager()->isLocal(firstLayout) || snapshotManager()->isModified(firstLayout))
+    if (firstLayout && snapshotManager()->isLocal(firstLayout) || snapshotManager()->isModified(firstLayout))
         unsavedLayouts << firstLayout;
 
-    if (snapshotManager()->isLocal(secondLayout) || snapshotManager()->isModified(secondLayout))
+    if (secondLayout && snapshotManager()->isLocal(secondLayout) || snapshotManager()->isModified(secondLayout))
         unsavedLayouts << secondLayout;
 
     auto swap = [this](const QnVideoWallItemIndex firstIndex, const QnLayoutResourcePtr &firstLayout, const QnVideoWallItemIndex &secondIndex, const QnLayoutResourcePtr &secondLayout) {
         QnVideoWallItem firstItem = firstIndex.item();
-        firstItem.layout = firstLayout->getId();
+        firstItem.layout = firstLayout? firstLayout->getId() : QnUuid();
         firstIndex.videowall()->items()->updateItem(firstItem);
 
         QnVideoWallItem secondItem = secondIndex.item();
-        secondItem.layout = secondLayout->getId();
+        secondItem.layout = secondLayout ? secondLayout->getId() : QnUuid();
         secondIndex.videowall()->items()->updateItem(secondItem);
 
         saveVideowalls(QSet<QnVideoWallResourcePtr>() << firstIndex.videowall() << secondIndex.videowall());
@@ -563,19 +563,21 @@ void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr
         return;
     }
 
-    workbench()->clear();
-
     QnVideoWallItem item = videoWall->items()->getItem(m_videoWallMode.instanceGuid);
+    updateMainWindowGeometry(item.screenSnaps); //TODO: #GDM check if it is needed at all
 
     QnLayoutResourcePtr layout = qnResPool->getResourceById(item.layout).dynamicCast<QnLayoutResource>();
-    if (layout)
-        menu()->trigger(Qn::OpenSingleLayoutAction, layout);
 
-    updateMainWindowGeometry(item.screenSnaps);
+    if (workbench()->currentLayout() && workbench()->currentLayout()->resource() == layout)
+        return;
+
+    workbench()->clear();
+    if (layout)
+        menu()->trigger(Qn::OpenSingleLayoutAction, layout);  
 }
 
 void QnWorkbenchVideoWallHandler::closeInstanceDelayed() {
-    menu()->trigger(Qn::ExitActionDelayed);
+    menu()->trigger(Qn::DelayedForcedExitAction);
 }
 
 void QnWorkbenchVideoWallHandler::sendMessage(QnVideoWallControlMessage message, bool cached) {
@@ -1538,14 +1540,18 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered() {
     QnVideoWallItemIndex targetIndex = qnResPool->getVideoWallItemByUuid(targetUuid);
     if (targetIndex.isNull())
         return;
+
+    /* Layout that is currently on the drop-target item. */
     QnLayoutResourcePtr currentLayout = qnResPool->getResourceById(targetIndex.item().layout).dynamicCast<QnLayoutResource>();
 
     Qt::KeyboardModifiers keyboardModifiers = parameters.argument<Qt::KeyboardModifiers>(Qn::KeyboardModifiersRole);
-    QnVideoWallItemIndexList videoWallItems = parameters.videoWallItems();
-    QnResourceList resources = parameters.resources();
 
-    QnResourceList targetResources;
+    /* Case of dropping from one screen to another. */
+    QnVideoWallItemIndexList videoWallItems = parameters.videoWallItems();
     QnVideoWallItemIndex sourceIndex;
+
+    /* Resources that are being dropped (if dropped from tree or other screen). */
+    QnResourceList targetResources;
 
     if (!videoWallItems.isEmpty()) {
         foreach (const QnVideoWallItemIndex &index, videoWallItems) {
@@ -1555,39 +1561,57 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered() {
                 targetResources << layout;
         }
 
-        // dragging single videowall item causing swap (if Shift is not pressed)
-        if (videoWallItems.size() == 1 && !videoWallItems.first().isNull() && !(Qt::ShiftModifier & keyboardModifiers) && currentLayout)
+        /* Dragging single videowall item causing swap (if Shift is not pressed). */
+        if (videoWallItems.size() == 1 && !videoWallItems.first().isNull() && !(Qt::ShiftModifier & keyboardModifiers))
             sourceIndex = videoWallItems.first();
     } else {
-        targetResources = resources;
+        targetResources = parameters.resources();
     }
 
-    // if Control pressed, add items to current layout
+    enum class Action {
+        NoAction,
+        AddAction,
+        SwapAction,
+        SetAction
+    };
+    Action dropAction = Action::NoAction;
+
+    /* If Control pressed, add items to current layout. */
     if (Qt::ControlModifier & keyboardModifiers && currentLayout) {
-            targetResources << currentLayout;
+        targetResources << currentLayout;
+        dropAction = Action::AddAction;
+    } 
+    /* Check if we are dragging from another screen. */
+    else if (!sourceIndex.isNull()) {
+        dropAction = Action::SwapAction;
+    } else {
+        dropAction = Action::SetAction;
     }
     
     QnLayoutResourcePtr targetLayout = constructLayout(targetResources);
+    Q_ASSERT_X(targetLayout, Q_FUNC_INFO, "function must always return valid layout");
+    if (!targetLayout)
+        return;
 
-    if (currentLayout && !sourceIndex.isNull() && targetLayout)
-        swapLayouts(targetIndex, targetLayout, sourceIndex, currentLayout);
-    else if (targetLayout)
+    switch (dropAction) {
+    case Action::AddAction:
+    case Action::SetAction:
         resetLayout(QnVideoWallItemIndexList() << targetIndex, targetLayout);
-
+        break;
+    case Action::SwapAction:
+        swapLayouts(targetIndex, targetLayout, sourceIndex, currentLayout);
+        break;
+    default:
+        break;
+    }
 }
 
 void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered() {
     if (!context()->user())
         return;
 
-    QnVirtualCameraResourcePtr desktopCamera;
-    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::desktop_camera)) {
-        if (resource->getUniqueId() != QnAppServerConnectionFactory::clientGuid())
-            continue;
-        desktopCamera = resource.dynamicCast<QnVirtualCameraResource>();
-        break;
-    }
-    if (!desktopCamera)
+    QnVirtualCameraResourcePtr desktopCamera = qnResPool->getResourceByUniqId(QnAppServerConnectionFactory::clientGuid()).dynamicCast<QnVirtualCameraResource>();
+    if (!desktopCamera || !desktopCamera->hasFlags(Qn::desktop_camera))
         return;
 
     QnActionParameters parameters = menu()->currentParameters(sender());

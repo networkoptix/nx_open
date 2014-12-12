@@ -7,8 +7,11 @@ QnVideoWallResource::QnVideoWallResource() :
     m_pcs(new QnThreadsafeItemStorage<QnVideoWallPcData>(&m_mutex, this)),
     m_matrices(new QnThreadsafeItemStorage<QnVideoWallMatrix>(&m_mutex, this))
 {
-    setStatus(Qn::Online, true);
     addFlags(Qn::videowall | Qn::remote);
+}
+
+Qn::ResourceStatus QnVideoWallResource::getStatus() const {
+    return Qn::Online;
 }
 
 QnThreadsafeItemStorage<QnVideoWallItem> * QnVideoWallResource::items() const {
@@ -131,3 +134,4 @@ QList<QnUuid> QnVideoWallResource::onlineItems() const {
     }
     return result;
 }
+

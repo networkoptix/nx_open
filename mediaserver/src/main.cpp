@@ -578,15 +578,6 @@ QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connecti
         return QnMediaServerResourcePtr();
     }
 
-    /*
-    rez = ec2Connection->getResourceManager()->setResourceStatusSync(serverPtr->getId(), Qn::Online);
-    if (rez != ec2::ErrorCode::ok)
-    {
-        qDebug() << "registerServer(): Call to change server status failed. Reason: " << ec2::toString(rez);
-        return QnMediaServerResourcePtr();
-    }
-    */
-
     return savedServer;
 }
 
@@ -841,7 +832,7 @@ void QnMain::updateDisabledVendorsIfNeeded()
         return;
 
     if (!admin->hasProperty(DV_PROPERTY)) {
-        QnGlobalSettings *settings = QnGlobalSettings::instance();
+        QnGlobalSettings* settings = QnGlobalSettings::instance();
         settings->setDisabledVendors(disabledVendors);
         MSSettings::roSettings()->remove(DV_PROPERTY);
     }
@@ -969,9 +960,9 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         QnManualCameraInfoMap manualCameras;
         for(const QnSecurityCamResourcePtr &camera: cameras) {
             messageProcessor->updateResource(camera);
-            if (camera->isManuallyAdded() && camera->getParentId() == m_mediaServer->getId()) {
+            if (camera->isManuallyAdded()) {
                 QnResourceTypePtr resType = qnResTypePool->getResourceType(camera->getTypeId());
-                manualCameras.insert(camera->getUniqueId(), QnManualCameraInfo(QUrl(camera->getUrl()), camera->getAuth(), resType->getName()));
+                manualCameras.insert(camera->getUrl(), QnManualCameraInfo(QUrl(camera->getUrl()), camera->getAuth(), resType->getName()));
             }
         }
         QnResourceDiscoveryManager::instance()->registerManualCameras(manualCameras);
@@ -1267,6 +1258,12 @@ QHostAddress QnMain::getPublicAddress()
 
 void QnMain::run()
 {
+#ifdef _WIN32
+    win32_exception::setCreateFullCrashDump( MSSettings::roSettings()->value(
+        nx_ms_conf::CREATE_FULL_CRASH_DUMP,
+        nx_ms_conf::DEFAULT_CREATE_FULL_CRASH_DUMP ).toBool() );
+#endif
+
     QString sslCertPath = MSSettings::roSettings()->value( nx_ms_conf::SSL_CERTIFICATE_PATH, getDataDirectory() + lit( "/ssl/cert.pem" ) ).toString();
     QFile f(sslCertPath);
     if (!f.open(QIODevice::ReadOnly)) {
@@ -1616,7 +1613,7 @@ void QnMain::run()
     do {
         if (needToStop())
             return;
-    } while (ec2Connection->getResourceManager()->setResourceStatusSync(m_mediaServer->getId(), Qn::Online) != ec2::ErrorCode::ok);
+    } while (ec2Connection->getResourceManager()->setResourceStatusLocalSync(m_mediaServer->getId(), Qn::Online) != ec2::ErrorCode::ok);
 
 
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
@@ -1650,14 +1647,13 @@ void QnMain::run()
     m_moduleFinder->setCompatibilityMode(compatibilityMode);
     ec2ConnectionFactory->setCompatibilityMode(compatibilityMode);
     if (!cmdLineArguments.allowedDiscoveryPeers.isEmpty()) {
-        QList<QnUuid> allowedPeers;
+        QSet<QnUuid> allowedPeers;
         for (const QString &peer: cmdLineArguments.allowedDiscoveryPeers.split(";")) {
             QnUuid peerId(peer);
             if (!peerId.isNull())
                 allowedPeers << peerId;
         }
-        if (!allowedPeers.isEmpty())
-            m_moduleFinder->setAllowedPeers(allowedPeers);
+        qnCommon->setAllowedPeers(allowedPeers);
     }
 
     QScopedPointer<QnServerConnector> serverConnector(new QnServerConnector(m_moduleFinder));
@@ -1905,6 +1901,8 @@ void QnMain::run()
 
     delete QnResourcePool::instance();
     QnResourcePool::initStaticInstance( NULL );
+
+    m_mediaServer.clear();
 }
 
 void QnMain::changePort(quint16 port) {
@@ -2157,8 +2155,8 @@ int main(int argc, char* argv[])
             "INFO"
 #endif
             );
-    commandLineParser.addParameter(&cmdLineArguments.msgLogLevel, "--msg-log-level", NULL,
-        "Log value for msg_log.log. Supported values same as above. Default is none (no logging)", "none");
+    commandLineParser.addParameter(&cmdLineArguments.msgLogLevel, "--http-log-level", NULL,
+        "Log value for http_log.log. Supported values same as above. Default is none (no logging)", "none");
     commandLineParser.addParameter(&cmdLineArguments.rebuildArchive, "--rebuild", NULL,
         lit("Rebuild archive index. Supported values: all (high & low quality), hq (only high), lq (only low)"), "all");
     commandLineParser.addParameter(&cmdLineArguments.devModeKey, "--dev-mode-key", NULL, QString());
@@ -2192,7 +2190,6 @@ int main(int argc, char* argv[])
         MSSettings::initializeROSettingsFromConfFile( configFilePath );
     if( !rwConfigFilePath.isEmpty() )
         MSSettings::initializeRunTimeSettingsFromConfFile( rwConfigFilePath );
-
 
     QnVideoService service( argc, argv );
 

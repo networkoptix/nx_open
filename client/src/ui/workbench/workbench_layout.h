@@ -228,7 +228,7 @@ public:
     /**
      * \returns                         Cell aspect ratio of this layout.
      */
-    qreal cellAspectRatio() const {
+    float cellAspectRatio() const {
         return m_cellAspectRatio;
     }
 
@@ -242,7 +242,7 @@ public:
     /**
      * \param cellAspectRatio           New aspect ratio for cells of this layout.
      */
-    void setCellAspectRatio(qreal cellAspectRatio);
+    void setCellAspectRatio(float cellAspectRatio);
 
     /**
      * \returns                         Spacing between cells of this layout,
@@ -412,7 +412,7 @@ private:
     QHash<QString, QSet<QnWorkbenchItem *> > m_itemsByUid;
 
     /** Aspect ratio of a single cell. */
-    qreal m_cellAspectRatio;
+    float m_cellAspectRatio;
 
     /** Spacing between cells, relative to cell width. */
     QSizeF m_cellSpacing;

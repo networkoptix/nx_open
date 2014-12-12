@@ -36,6 +36,7 @@ namespace ec2
 
 static const int RECONNECT_TIMEOUT = 1000 * 5;
 static const int ALIVE_UPDATE_INTERVAL = 1000 * 60;
+static const int ALIVE_UPDATE_TIMEOUT = ALIVE_UPDATE_INTERVAL*2 + 10*1000;
 static const int DISCOVERED_PEER_TIMEOUT = 1000 * 60 * 3;
 
 struct GotTransactionFuction {
@@ -75,8 +76,10 @@ bool handleTransactionParams(const QByteArray &serializedTransaction, QnUbjsonRe
     }
 
     QnTransaction<T> transaction(abstractTransaction);
-    if (!QnUbjson::deserialize(stream, &transaction.params)) 
+    if (!QnUbjson::deserialize(stream, &transaction.params)) {
+        qWarning() << "Can't deserialize transaction " << toString(abstractTransaction.command);
         return false;
+    }
     if (!abstractTransaction.persistentInfo.isNull())
         QnUbjsonTransactionSerializer::instance()->addToCache(abstractTransaction.persistentInfo, serializedTransaction);
     function(transaction);
@@ -848,10 +851,10 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
     return true;
 }
 
-void QnTransactionMessageBus::connectToPeerLost(const QnTransactionTransport* transport)
+void QnTransactionMessageBus::connectToPeerLost(const QnUuid& id)
 {
-    if (m_alivePeers.contains(transport->remotePeer().id))
-        removeAlivePeer(transport->remotePeer().id, true);
+    if (m_alivePeers.contains(id))
+        removeAlivePeer(id, true);
 }
 
 void QnTransactionMessageBus::connectToPeerEstablished(const ApiPeerData &peer)
@@ -980,7 +983,7 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
         {
             QnTransactionTransportPtr transportPtr = itr.value();
             if (transportPtr == transport) {
-                connectToPeerLost(transport);
+                connectToPeerLost(transport->remotePeer().id);
                 m_connections.erase(itr);
                 break;
             }
@@ -1070,9 +1073,10 @@ void QnTransactionMessageBus::doPeriodicTasks()
     }
 
     // check if some server not accessible any more
+    QSet<QnUuid> lostPeers;
     for (AlivePeersMap::iterator itr = m_alivePeers.begin(); itr != m_alivePeers.end(); ++itr)
     {
-        if (itr.value().lastActivity.elapsed() > ALIVE_UPDATE_INTERVAL * 2)
+        if (itr.value().lastActivity.elapsed() > ALIVE_UPDATE_TIMEOUT)
         {
             itr.value().lastActivity.restart();
             for(const QnTransactionTransportPtr& transport: m_connectingConnections) {
@@ -1092,8 +1096,11 @@ void QnTransactionMessageBus::doPeriodicTasks()
                     transport->setState(QnTransactionTransport::Error);
                 }
             }
+            lostPeers << itr.key();
         }
     }
+    for (const QnUuid& id: lostPeers)
+        connectToPeerLost(id);
 }
 
 void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport, const QnTransactionTransportHeader& transportHeader, const QnTranState& runtimeState)

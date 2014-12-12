@@ -43,6 +43,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_state_manager.h>
+#include <ui/workbench/workbench_access_controller.h>
 
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/workbench/watchers/workbench_user_watcher.h>
@@ -88,6 +89,9 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /*= 0*/):
 
         QnWorkbenchVersionMismatchWatcher *watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
         if(!watcher->hasMismatches())
+            return;
+
+        if (!accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission))
             return;
 
         menu()->trigger(Qn::VersionMismatchMessageAction);
@@ -277,7 +281,7 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
             ? ec2::ErrorCode::incompatiblePeer  /* Substitute value for incompatible peers. */
             : errCode;
     case QnConnectionDiagnosticsHelper::Result::Restart:
-        menu()->trigger(Qn::ExitActionDelayed);
+        menu()->trigger(Qn::DelayedForcedExitAction);
         return ec2::ErrorCode::ok; // to avoid cycle
     default:    //success
         break;

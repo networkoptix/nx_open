@@ -158,7 +158,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     ui->qualityComboBox->addItem(toDisplayString(Qn::QualityNormal), Qn::QualityNormal);
     ui->qualityComboBox->addItem(toDisplayString(Qn::QualityHigh), Qn::QualityHigh);
     ui->qualityComboBox->addItem(toDisplayString(Qn::QualityHighest), Qn::QualityHighest);
-    ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->count() - 1);
+    ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData(Qn::QualityHigh));
 
     setHelpTopic(ui->exportScheduleButton, Qn::CameraSettings_Recording_Export_Help);
 
@@ -242,6 +242,12 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
 
 QnCameraScheduleWidget::~QnCameraScheduleWidget() {
     return;
+}
+
+bool QnCameraScheduleWidget::hasHeightForWidth() const {
+    return false;   //TODO: #GDM temporary fix to handle string freeze
+                    // all labels with word-wrap should be replaced by QnWordWrappedLabel. 
+                    // This widget has 5 of them (label_4.._8, exportWarningLabel)
 }
 
 void QnCameraScheduleWidget::connectToGridWidget()

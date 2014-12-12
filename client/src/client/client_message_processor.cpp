@@ -15,6 +15,7 @@
 
 QnClientMessageProcessor::QnClientMessageProcessor():
     base_type(),
+    m_incompatibleServerWatcher(new QnIncompatibleServerWatcher(this)),
     m_connected(false),
     m_holdConnection(false)
 {
@@ -37,7 +38,7 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
         data.peer.id = qnCommon->remoteGUID();
         qnCommon->setRemoteGUID(QnUuid());
         m_connected = false;
-        m_incompatibleServerWatcher.reset();
+        m_incompatibleServerWatcher->stop();
         emit connectionClosed();
     } else if (!qnCommon->remoteGUID().isNull()) { // we are trying to reconnect to server now
         qnCommon->setRemoteGUID(QnUuid());
@@ -51,7 +52,7 @@ void QnClientMessageProcessor::setHoldConnection(bool holdConnection) {
     m_holdConnection = holdConnection;
 
     if (!m_holdConnection && !m_connected && !qnCommon->remoteGUID().isNull()) {
-        m_incompatibleServerWatcher.reset();
+        m_incompatibleServerWatcher->stop();
         emit connectionClosed();
     }
 }
@@ -75,22 +76,10 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
 
     QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId());
 
-    if (ownResource.isNull()) {
+    if (ownResource.isNull())
         qnResPool->addResource(resource);
-    } else {
+    else
         ownResource->update(resource);
-
-        if (QnMediaServerResourcePtr mediaServer = ownResource.dynamicCast<QnMediaServerResource>()) {
-            /* Handling a case when an incompatible server is changing its systemName at runtime and becoming compatible. */
-            if (resource->getStatus() == Qn::NotDefined && mediaServer->getStatus() == Qn::Incompatible) {
-                if (QnMediaServerResourcePtr updatedServer = resource.dynamicCast<QnMediaServerResource>()) {
-                    if (isCompatible(qnCommon->engineVersion(), updatedServer->getVersion())) {
-                        mediaServer->setStatus(Qn::Online);
-                    }
-                }
-            }
-        }
-    }
 
     // TODO: #Elric #2.3 don't update layout if we're re-reading resources, 
     // this leads to unsaved layouts spontaneously rolling back to last saved state.
@@ -110,12 +99,6 @@ void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data)
         return;
     }
 
-    /*
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(data.peer.id).staticCast<QnMediaServerResource>();
-    if (server)
-        server->setStatus(Qn::Online);
-    */
-
     if (data.peer.id != qnCommon->remoteGUID())
         return;
 
@@ -132,23 +115,22 @@ void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data)
         return;
     }
 
-    /*
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(data.peer.id).staticCast<QnMediaServerResource>();
-    if (server)
-        server->setStatus(Qn::Offline);
-    */
-
     if (data.peer.id != qnCommon->remoteGUID())
         return;
 
 
     Q_ASSERT_X(m_connected, Q_FUNC_INFO, "m_connected");
 
+    /* Mark server as offline, so user will understand why is he reconnecting. */
+    QnMediaServerResourcePtr server = qnResPool->getResourceById(data.peer.id).staticCast<QnMediaServerResource>();
+    if (server)
+        server->setStatus(Qn::Offline);
+
     m_connected = false;
 
     if (!m_holdConnection) {
         emit connectionClosed();
-        m_incompatibleServerWatcher.reset();
+        m_incompatibleServerWatcher->stop();
     }
 }
 
@@ -162,6 +144,6 @@ void QnClientMessageProcessor::at_systemNameChangeRequested(const QString &syste
 void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
 {
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
-    m_incompatibleServerWatcher.reset();
-    m_incompatibleServerWatcher.reset(new QnIncompatibleServerWatcher(this));
+    m_incompatibleServerWatcher->stop();
+    m_incompatibleServerWatcher->start();
 }

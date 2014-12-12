@@ -55,7 +55,7 @@ namespace {
 QString QnScreenshotParameters::timeString() const {
     qint64 timeMSecs = time / 1000;
     if (isUtc)
-        return QDateTime::fromMSecsSinceEpoch(timeMSecs).toString(lit("yyyy-MMM-dd_hh.mm.ss"));
+        return datetimeSaveDialogSuggestion(QDateTime::fromMSecsSinceEpoch(timeMSecs));
     return QTime().addMSecs(timeMSecs).toString(lit("hh.mm.ss"));
 }
 

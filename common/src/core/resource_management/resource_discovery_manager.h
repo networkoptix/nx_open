@@ -124,7 +124,9 @@ signals:
 
 protected slots:
     void at_resourceDeleted(const QnResourcePtr& resource);
-    void at_resourceChanged(const QnResourcePtr& resource);
+    void at_resourceAdded(const QnResourcePtr& resource);
+protected:
+    bool canTakeForeignCamera(const QnSecurityCamResourcePtr& camera, int awaitingToMoveCameraCnt);
 private:
     void updateLocalNetworkInterfaces();
 
@@ -161,6 +163,8 @@ private:
     mutable QMutex m_resListMutex;
     QnResourceList m_lastDiscoveredResources[6];
     int m_discoveryUpdateIdx;
+protected:
+    int m_serverOfflineTimeout;
 };
 
 #endif //QN_RESOURCE_DISCOVERY_MANAGER_H

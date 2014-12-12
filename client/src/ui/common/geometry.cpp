@@ -326,7 +326,13 @@ QRectF QnGeometry::scaled(const QRectF &rect, const QSizeF &size, const QPointF 
     return QRectF(
         fixedPoint - cwiseMul(cwiseDiv(fixedPoint - rect.topLeft(), rect.size()), newSize),
         newSize
-    );
+                );
+}
+
+QRectF QnGeometry::scaled(const QRectF &rect, qreal scale, const QPointF &fixedPoint) {
+    QSizeF newSize = rect.size() * scale;
+
+    return QRectF(fixedPoint - cwiseMul(cwiseDiv(fixedPoint - rect.topLeft(), rect.size()), newSize), newSize);
 }
 
 namespace {

@@ -302,24 +302,21 @@ int naturalStringCompare( const QString & lhs, const QString & rhs, Qt::CaseSens
         return 0;
 }
 
-bool naturalStringLessThan( const QString & lhs, const QString & rhs )
+bool naturalStringLess(const QString &lhs, const QString &rhs)
 {
-    return naturalStringCompare( lhs, rhs, Qt::CaseSensitive ) < 0;
+    return naturalStringCompare(lhs, rhs, Qt::CaseInsensitive) < 0;
 }
 
-bool naturalStringCaseInsensitiveLessThan( const QString & lhs, const QString & rhs )
+QStringList naturalStringSort(const QStringList &list, Qt::CaseSensitivity caseSensitive)
 {
-    return naturalStringCompare( lhs, rhs, Qt::CaseInsensitive ) < 0;
-}
-
-QStringList naturalStringSort( const QStringList & list, Qt::CaseSensitivity caseSensitive )
-{
-    QStringList retVal = list;
-    if ( caseSensitive == Qt::CaseSensitive )
-        qSort( retVal.begin(), retVal.end(), naturalStringLessThan );
+    QStringList result = list;
+    if (caseSensitive == Qt::CaseSensitive)
+        qSort(result.begin(), result.end(), [](const QString &left, const QString &right) {
+            return naturalStringCompare(left, right, Qt::CaseSensitive) < 0;
+        });
     else
-        qSort( retVal.begin(), retVal.end(), naturalStringCaseInsensitiveLessThan );
-    return retVal;
+        qSort(result.begin(), result.end(), naturalStringLess);
+    return result;
 }
 
 void naturalStringCompareTestCase(const QString &l, const QString &r, int value) {

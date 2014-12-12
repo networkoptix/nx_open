@@ -257,6 +257,7 @@ namespace ec2
         registerGetFuncHandler<std::nullptr_t, ApiLicenseDataList>( restProcessorPool, ApiCommand::getLicenses );
 
         registerGetFuncHandler<std::nullptr_t, ApiDatabaseDumpData>( restProcessorPool, ApiCommand::dumpDatabase );
+        registerGetFuncHandler<ApiStoredFilePath, qint64>( restProcessorPool, ApiCommand::dumpDatabaseToFile );
 
         //AbstractECConnectionFactory
         registerFunctorHandler<ApiLoginData, QnConnectionInfo>( restProcessorPool, ApiCommand::connect,
@@ -400,7 +401,7 @@ namespace ec2
     {
         //TODO #ak async ssl is working now, make async request to old ec here
 
-        if( errorCode != ErrorCode::ok )
+        if( (errorCode != ErrorCode::ok) && (errorCode != ErrorCode::unauthorized) )
         {
             //checking for old EC
             QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());
@@ -427,6 +428,7 @@ namespace ec2
             );
             return;
         }
+
         QnConnectionInfo connectionInfoCopy(connectionInfo);
         connectionInfoCopy.ecUrl = ecURL;
         connectionInfoCopy.ecUrl.setScheme( connectionInfoCopy.allowSslConnections ? lit("https") : lit("http") );
@@ -451,7 +453,7 @@ namespace ec2
         const QUrl& ecURL,
         impl::TestConnectionHandlerPtr handler )
     {
-        if( errorCode == ErrorCode::ok )
+        if( errorCode == ErrorCode::ok || errorCode == ErrorCode::unauthorized )
         {
             handler->done( reqID, errorCode, connectionInfo );
             QMutexLocker lk( &m_mutex );

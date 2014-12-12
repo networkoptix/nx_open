@@ -453,12 +453,6 @@ namespace aio
         _end.m_impl->pollSetImpl = m_impl;
         return _end;
     }
-
-    unsigned int PollSet::maxPollSetSize()
-    {
-        //epoll can accept unlimited descriptors, but total number of available descriptors is limited by system
-        return std::numeric_limits<unsigned int>::max();
-    }
 }
 
 #endif  //__linux__

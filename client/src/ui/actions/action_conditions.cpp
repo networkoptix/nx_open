@@ -310,16 +310,29 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
 }
 
 
-Qn::ActionVisibility QnRenameActionCondition::check(const QnActionParameters &parameters) {
+Qn::ActionVisibility QnRenameResourceActionCondition::check(const QnActionParameters &parameters) {
     Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
+    QnResourcePtr target = parameters.resource();
+    if (!target)
+        return Qn::InvisibleAction;
 
     switch (nodeType) {
     case Qn::ResourceNode:
+        /* Renaming users directly from resource tree is disabled due do digest re-generation need. */
+        if (target->hasFlags(Qn::user))
+            return Qn::InvisibleAction;
+
+        /* Edge servers renaming is forbidden. */
+        if (QnMediaServerResource::isEdgeServer(target))
+            return Qn::InvisibleAction;
+
+        /* Incompatible resources cannot be renamed */
+        if (target->getStatus() == Qn::Incompatible)
+            return Qn::InvisibleAction;
+
+        return Qn::EnabledAction;
     case Qn::EdgeNode:
-        return QnEdgeServerCondition::check(parameters.resources());
     case Qn::RecorderNode:
-    case Qn::VideoWallItemNode:
-    case Qn::VideoWallMatrixNode:
         return Qn::EnabledAction;
     default:
         break;
@@ -866,7 +879,7 @@ Qn::ActionVisibility QnIdentifyVideoWallActionCondition::check(const QnActionPar
             if (index.item().runtimeStatus.online)
                 return Qn::EnabledAction;
         }
-        return Qn::DisabledAction;
+        return Qn::InvisibleAction;
     }
     return QnActionCondition::check(parameters);
 }
@@ -938,7 +951,7 @@ Qn::ActionVisibility QnLightModeCondition::check(const QnActionParameters &param
 
 Qn::ActionVisibility QnEdgeServerCondition::check(const QnResourceList &resources) {
     foreach (const QnResourcePtr &resource, resources)
-        if (m_isEdgeServer ^ QnMediaServerResource::isHiddenServer(resource))
+        if (m_isEdgeServer ^ QnMediaServerResource::isEdgeServer(resource))
             return Qn::InvisibleAction;
     return Qn::EnabledAction;
 }
@@ -962,13 +975,12 @@ Qn::ActionVisibility QnDesktopCameraActionCondition::check(const QnActionParamet
     if (!context()->user())
         return Qn::InvisibleAction;
 
-    QString userName = context()->user()->getName();
-    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::desktop_camera)) 
-        if (resource->getUniqueId() == QnAppServerConnectionFactory::clientGuid())
-            return Qn::EnabledAction;
+    /* Do not check real pointer type to speed up check. */
+    QnResourcePtr desktopCamera = qnResPool->getResourceByUniqId(QnAppServerConnectionFactory::clientGuid());
+    if (desktopCamera && desktopCamera->hasFlags(Qn::desktop_camera))
+        return Qn::EnabledAction;
     
-    return Qn::InvisibleAction;
-   
+    return Qn::DisabledAction;  
 #else
     return Qn::InvisibleAction;
 #endif

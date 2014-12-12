@@ -66,6 +66,15 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     bool focusEnabled       = data.value<bool>(lit("onvifPtzFocusEnabled"),         false);
     bool presetsEnabled     = data.value<bool>(lit("onvifPtzPresetsEnabled"),       false);
 
+    QString ptzUrl = m_resource->getPtzUrl();
+    if(ptzUrl.isEmpty())
+        return;
+
+    Qn::PtzCapabilities overridedCaps;
+    if(data.value(lit("ptzCapabilities"), &overridedCaps))
+        m_capabilities = overridedCaps;
+
+
     m_capabilities |= initMove();
     if(absoluteMoveBroken)
         m_capabilities &= ~(Qn::AbsolutePtzCapabilities | Qn::DevicePositioningPtzCapability);
@@ -83,8 +92,6 @@ QnOnvifPtzController::~QnOnvifPtzController() {
 
 Qn::PtzCapabilities QnOnvifPtzController::initMove() {
     QString ptzUrl = m_resource->getPtzUrl();
-    if(ptzUrl.isEmpty())
-        return Qn::NoPtzCapabilities;
 
     QAuthenticator auth = m_resource->getAuth();
     PtzSoapWrapper ptz(ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());

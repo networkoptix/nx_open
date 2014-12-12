@@ -72,6 +72,9 @@ QList<QNetworkProxy> QnNetworkProxyFactory::queryProxy(const QNetworkProxyQuery 
 }
 
 QNetworkProxy QnNetworkProxyFactory::proxyToResource(const QnResourcePtr &resource) {
+    if (!QnRouter::instance())
+        return QNetworkProxy(QNetworkProxy::NoProxy);
+
     QnMediaServerResourcePtr server;
     QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
     if (camera) {

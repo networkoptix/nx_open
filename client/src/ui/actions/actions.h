@@ -320,9 +320,9 @@ namespace Qn {
         ExitAction,
 
         /** 
-         * Closes the client asynchronously.
+         * Forcibly closes the client asynchronously.
          */
-        ExitActionDelayed,
+        DelayedForcedExitAction,
 
         /** 
          * Notifies all modules about client closing.
@@ -752,7 +752,17 @@ namespace Qn {
          * <tt>QString ResourceNameRole</tt> --- new name for the resource. If not
          * supplied, name dialog will pop up.
          */
-        RenameAction,
+        RenameResourceAction,
+
+         /**
+         * Changes resource name.
+         *
+         * Parameters:
+         *
+         * <tt>QString ResourceNameRole</tt> --- new name for the entity. If not
+         * supplied, name dialog will pop up.
+         */
+        RenameVideowallEntityAction,
 
         /**
          * Opens a user creation dialog.
@@ -823,26 +833,6 @@ namespace Qn {
          * Opens a layout creation dialog.
          */
         NewUserLayoutAction,
-
-        /**
-         * Sets aspect ratio of current layout's cells to 16x9.
-         */
-        SetCurrentLayoutAspectRatio16x9Action,
-
-        /**
-         * Sets aspect ratio of current layout's cells to 4x3.
-         */
-        SetCurrentLayoutAspectRatio4x3Action,
-
-        /**
-         * Sets aspect ratio of current layout's cells to 9x16.
-         */
-        SetCurrentLayoutAspectRatio9x16Action,
-
-        /**
-         * Sets aspect ratio of current layout's cells to 3x4.
-         */
-        SetCurrentLayoutAspectRatio3x4Action,
 
         /**
          * Sets spacing of current layout's cells to 0%.
