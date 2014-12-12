@@ -156,6 +156,7 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource) {
         QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QnUuid::createUuid(), this);
         item->setPinned(true);
         item->setGeometry(QRect(0, 0, 1, 1));
+        item->setRotation(0);
 
         QnResourceWidget::Options forcedOptions = 
             QnResourceWidget::DisplayMotionSensitivity | 
