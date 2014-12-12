@@ -115,7 +115,7 @@ Application will now quit.</source>
     <message>
         <location filename="../src/systraywindow.cpp" line="483"/>
         <source>Media Server Web Page</source>
-        <translation type="unfinished"></translation>
+        <translation>メディアアーバーウェブページ</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="386"/>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="en_US" sourcelanguage="en">
+<TS version="2.1" language="en_US" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -409,7 +409,7 @@
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation></translation>
     </message>
-    <message utf8="true">
+    <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="199"/>
         <source>Warning! High quality may result in Server’s CPU overload, network connection errors and other issues.</source>
         <translation>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</translation>
@@ -501,7 +501,7 @@
     <message>
         <location filename="../src/ui/widgets/settings/camera_management_widget.ui" line="43"/>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation type="unfinished">Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2249,7 +2249,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="671"/>
         <source>Ctrl+Shift+S</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="738"/>

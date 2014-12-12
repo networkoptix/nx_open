@@ -193,8 +193,8 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
                 QnMessageBox::warning(
                     parentWidget,
                     Qn::VersionMismatch_Help,
-                    tr("Could not connect to Enterprise Controller"),
-                    tr("Selected Enterprise controller has a different version:\n"
+                    tr("Could not connect to Server"),
+                    tr("Selected Server has a different version:\n"
                         " - Client version: %1.\n"
                         " - EC version: %2.\n"
                         "You need to download client %3 to connect"

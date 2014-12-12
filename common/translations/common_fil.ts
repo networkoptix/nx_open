@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="fil" sourcelanguage="en">
+<TS version="2.1" language="fil" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -397,6 +397,7 @@
         <comment>%1 means time, %2 means date</comment>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -411,12 +412,14 @@
         <comment>%1 means time, %2 means date</comment>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_strings_helper.cpp" line="364"/>
         <source>No video frame received during last %n seconds.</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -809,12 +812,14 @@ Parameters: </source>
         <source>%n %2 are used out of %1.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/license_usage_helper.cpp" line="94"/>
         <source>%n %2 will be used out of %1.</source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -823,12 +828,14 @@ Parameters: </source>
         <source>Activate %n more %2. </source>
         <translation type="unfinished">
             <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/license_usage_helper.cpp" line="114"/>
         <source>%n more %2 will be used. </source>
         <translation type="unfinished">
+            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>

@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="en_US" sourcelanguage="en">
+<TS version="2.1" language="en_US" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
         <location filename="../src/translation/translation_manager.cpp" line="153"/>
         <source>Language Name</source>
         <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-        <translation></translation>
+        <translation>English (US)</translation>
     </message>
     <message>
         <location filename="../src/translation/translation_manager.cpp" line="156"/>
         <source>Locale Code</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
-        <translation></translation>
+        <translation>en_US</translation>
     </message>
 </context>
 <context>
@@ -121,7 +121,7 @@
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="236"/>
         <source>Invalid color constant &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Invalid colour constant &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="281"/>
@@ -531,7 +531,7 @@ Please try to reboot the camera, restore factory defaults on the camdera, or upd
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="63"/>
         <source>Not authorized. Url %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Not authorised. Url %1.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="67"/>
@@ -650,12 +650,12 @@ Parameters: </source>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="94"/>
         <source>Could not initialize audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Could not initialise audio encoder.</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="103"/>
         <source>Could not initialize audio decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Could not initialise audio decoder.</translation>
     </message>
 </context>
 <context>
@@ -702,7 +702,7 @@ Parameters: </source>
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="106"/>
         <source>Could not initialize video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Could not initialise video encoder.</translation>
     </message>
 </context>
 <context>
