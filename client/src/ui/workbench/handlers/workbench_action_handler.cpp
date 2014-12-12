@@ -1400,7 +1400,7 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     QnVirtualCameraResourceList cameras = menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>();
 
     QnNonModalDialogConstructor<QnCameraSettingsDialog> dialogConstructor(m_cameraSettingsDialog, mainWindow());
-    dialogConstructor.setDontRaise(true);
+    dialogConstructor.setDontFocus(true);
 
     cameraSettingsDialog()->setCameras(cameras);
 }
