@@ -268,16 +268,16 @@ namespace {
     template<class Point, class Rect>
     Point calculatePinPointInternal(const Rect &rect, Qt::WindowFrameSection section) {
         /* Note that QRect::right & QRect::bottom return not what is expected (see Qt docs).
-         * This is why these methods are not used here. */ // TODO: #Elric comment says they are not used, but they are used!!!
+         * This is why these methods are not used here. */
         switch(section) {
         case Qt::LeftSection:
-            return Point(rect.right(), rect.top() + rect.height() / 2);
+            return Point(rect.left() + rect.width(), rect.top() + rect.height() / 2);
         case Qt::TopLeftSection:
-            return rect.bottomRight();
+            return Point(rect.left() + rect.width(), rect.top() + rect.height());
         case Qt::TopSection:
-            return Point(rect.left() + rect.width() / 2, rect.bottom());
+            return Point(rect.left() + rect.width() / 2, rect.top() + rect.height());
         case Qt::TopRightSection:
-            return rect.bottomLeft();
+            return Point(rect.left(), rect.top() + rect.height());
         case Qt::RightSection:
             return Point(rect.left(), rect.top() + rect.height() / 2);
         case Qt::BottomRightSection:
@@ -285,7 +285,7 @@ namespace {
         case Qt::BottomSection:
             return Point(rect.left() + rect.width() / 2, rect.top());
         case Qt::BottomLeftSection:
-            return rect.topRight();
+            return Point(rect.left() + rect.width(), rect.top());
         case Qt::TitleBarArea:
             return Point();
         default:
