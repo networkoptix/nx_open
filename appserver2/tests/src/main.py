@@ -182,11 +182,11 @@ class ClusterTest():
         response.close()
         return (True,"")
 
-    def _checkResultEqual(self,responseList,methodName):
+    def _checkResultEqual(self,responseList,methodName,address):
         result = None
         for response in responseList:
             if response.getcode() != 200:
-                return(False,"method:%s http request failed with code:%d" % (methodName,response.getcode))
+                return(False,"Server:%s method:%s http request failed with code:%d" % (address,methodName,response.getcode))
             else:
                 # painfully slow, just bulk string comparison here
                 if result == None:
@@ -194,7 +194,7 @@ class ClusterTest():
                 else:
                     output = response.read()
                     if result != output:
-                        return(False,"method:%s return value differs from other" % (methodName))
+                        return(False,"Server:%s method:%s return value differs from other" % (address,methodName))
                 
                 response.close()
 
@@ -206,7 +206,7 @@ class ClusterTest():
                 responseList.append((urllib2.urlopen("http://%s/ec2/%s" % (server, method))))
 
             # checking the last response validation
-            return self._checkResultEqual(responseList,method)
+            return self._checkResultEqual(responseList,method,server)
 
     def _ensureServerListStates(self,sleep_timeout):
         time.sleep(sleep_timeout)
@@ -2115,6 +2115,7 @@ def runPerformanceTest():
         return (False,"Unknown command:%s" % (l[0]))
 
     return True
+
 
 helpStr="Usage:\n\n" \
     "--perf : Start performance test.User can use ctrl+c to interrupt the perf test and statistic will be displayed.User can also specify configuration parameters " \
