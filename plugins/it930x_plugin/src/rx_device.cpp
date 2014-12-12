@@ -32,20 +32,16 @@ namespace ite
         m_quality(0),
         m_present(false)
     {
-        // HACK: close device if it's open
-        m_device.reset(new It930x(m_rxID));
-        m_device.reset(); // dtor
+        open();
     }
 
     bool RxDevice::open()
     {
         try
         {
-            m_devStream.reset();
             m_device.reset(); // dtor first
             m_device.reset(new It930x(m_rxID));
-            if (m_device)
-                m_device->info(m_rxInfo);
+            m_device->info(m_rxInfo);
             return true;
         }
         catch(const char * msg)
@@ -70,7 +66,7 @@ namespace ite
         if (!freq)
             return false;
 
-        if (lockF(freq))
+        if (tryLockF(freq))
         {
             m_txID = txID;
             m_txInfo = m_rcShell->device(m_rxID, m_txID);
@@ -82,20 +78,17 @@ namespace ite
         return false;
     }
 
-    bool RxDevice::lockF(unsigned freq)
+    bool RxDevice::tryLockF(unsigned freq)
     {
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+        // prevent double locking at all (even with the same frequency)
+        if (isLockedUnsafe())
+            return false;
+
         try
         {
-            if (isOpen())
-                unlockF();
-            else
-                open();
-
-            if (! m_device)
-                return false;
-
             m_device->lockChannel(freq);
-            m_devStream.reset( new It930Stream( *m_device ) );
             m_frequency = freq;
 
             stats();
@@ -109,10 +102,19 @@ namespace ite
 
     void RxDevice::unlockF()
     {
-        m_devStream.reset();
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+        m_device->closeStream();
         m_txInfo.reset();
         m_frequency = 0;
         m_txID = 0;
+    }
+
+    bool RxDevice::isLocked() const
+    {
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+        return isLockedUnsafe();
     }
 
     bool RxDevice::stats()

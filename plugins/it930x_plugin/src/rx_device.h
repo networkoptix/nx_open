@@ -27,25 +27,14 @@ namespace ite
         unsigned short txID() const { return m_txID; }
 
         It930x * device() { return m_device.get(); }
-        It930Stream * devStream() { return m_devStream.get(); }
-
-        bool open();
-        bool isOpen() const { return m_device.get(); }
-        void close()
-        {
-            m_devStream.reset();
-            m_device.reset();
-        }
 
         bool lockCamera(unsigned short txID);
-        bool lockF(unsigned freq);
-        bool isLocked() const { return m_devStream.get(); }
+        bool tryLockF(unsigned freq);
+        bool isLocked() const;
         void unlockF();
 
         const IteDriverInfo& rxDriverInfo() const { return m_rxInfo; }
         const TxManufactureInfo& txDriverInfo() const { return m_txDriverInfo; }
-
-        std::mutex& mutex() { return m_mutex; }
 
         unsigned frequency() const { return m_frequency; }
         uint8_t strength() const { return m_strength; }
@@ -71,9 +60,8 @@ namespace ite
     private:
         mutable std::mutex m_mutex;
         std::unique_ptr<It930x> m_device;
-        std::unique_ptr<It930Stream> m_devStream;
         unsigned short m_rxID;
-        unsigned short m_txID; // locked camera txID or 0
+        unsigned short m_txID; // captured camera txID or 0
         unsigned m_frequency;
         RCShell * m_rcShell;
 
@@ -87,6 +75,9 @@ namespace ite
         DeviceInfoPtr m_txInfo;
         TxManufactureInfo m_txDriverInfo;
 
+        bool isLockedUnsafe() const { return m_device.get() && m_device->hasStream(); }
+
+        bool open();
         bool stats();
     };
 

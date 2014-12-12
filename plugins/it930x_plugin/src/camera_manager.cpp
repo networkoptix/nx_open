@@ -511,7 +511,7 @@ namespace ite
             if (! stopStreams(true))
                 return false;
 
-            if (freq && dev->lockF(freq))
+            if (freq && dev->tryLockF(freq))
                 return dev->setChannel(m_txID, chan);
         }
 
@@ -791,13 +791,6 @@ namespace ite
         for (size_t i = 0; i < m_supportedRxDevices.size(); ++i)
         {
             RxDevicePtr dev = m_supportedRxDevices[i];
-            if (captureSameRxDevice(dev))
-                return true;
-        }
-
-        for (size_t i = 0; i < m_supportedRxDevices.size(); ++i)
-        {
-            RxDevicePtr dev = m_supportedRxDevices[i];
             if (captureFreeRxDevice(dev))
                 return true;
         }
@@ -807,29 +800,11 @@ namespace ite
 
     bool CameraManager::captureSameRxDevice(RxDevicePtr dev)
     {
-        if (! dev.get())
-            return false;
-
-        std::lock_guard<std::mutex> lock( dev->mutex() ); // LOCK
-
-        if (dev->isLocked() && dev->txID() == m_txID)
+        if (dev && dev->isLocked() && dev->txID() == m_txID)
         {
             if (dev != m_rxDevice)
                 m_rxDevice = dev;
-            return true;
-        }
-
-        if (!dev->isOpen())
-            dev->open();
-
-        dev->unlockF();
-        dev->lockCamera(m_txID);
-        if (dev->isLocked())
-        {
-            if (dev != m_rxDevice)
-                m_rxDevice = dev;
-            m_rxDevice->updateDevParams();
-            DiscoveryManager::updateInfo(m_info, m_rxDevice->rxID(), m_rxDevice->frequency());
+            stopTimer();
             return true;
         }
 
@@ -838,27 +813,25 @@ namespace ite
 
     bool CameraManager::captureFreeRxDevice(RxDevicePtr dev)
     {
-        if (! dev.get())
-            return false;
-
-        std::lock_guard<std::mutex> lock( dev->mutex() ); // LOCK
-
-        if (dev->isLocked()) // device is busy
-            return false;
-
-        if (!dev->isOpen())
-            dev->open();
-
-        dev->lockCamera(m_txID);
-        if (dev->isLocked())
+        if (dev.get() && dev->lockCamera(m_txID))
         {
-            m_rxDevice = dev; // under lock
+            m_rxDevice = dev;
             m_rxDevice->updateDevParams();
             DiscoveryManager::updateInfo(m_info, m_rxDevice->rxID(), m_rxDevice->frequency());
             return true;
         }
 
         return false;
+    }
+
+    void CameraManager::freeDevice()
+    {
+        if (m_rxDevice)
+        {
+            m_rxDevice->unlockF();
+            m_rxDevice.reset();
+        }
+        stopTimer();
     }
 
     bool CameraManager::initDevReader()
@@ -868,7 +841,7 @@ namespace ite
 
         static const unsigned DEFAULT_FRAME_SIZE = It930x::DEFAULT_PACKETS_NUM * It930x::MPEG_TS_PACKET_SIZE;
 
-        m_devReader.reset( new DevReader( m_rxDevice->devStream(), DEFAULT_FRAME_SIZE ) );
+        m_devReader.reset( new DevReader( m_rxDevice->device(), DEFAULT_FRAME_SIZE ) );
         return true;
     }
 

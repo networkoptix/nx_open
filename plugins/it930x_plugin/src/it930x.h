@@ -1,6 +1,8 @@
 #ifndef ITE_DEVICE_H
 #define ITE_DEVICE_H
 
+#include <memory>
+
 extern "C"
 {
 #include "DTVAPI.h"
@@ -8,8 +10,6 @@ extern "C"
 
 namespace ite
 {
-    class It930Stream;
-
     struct IteDriverInfo
     {
         char driverVersion[16];
@@ -29,8 +29,6 @@ namespace ite
     ///
     class It930x
     {
-        friend class It930Stream;
-
     public:
         static const unsigned MPEG_TS_PACKET_SIZE = 188;
         static const unsigned DEFAULT_PACKETS_NUM = 816; // or 348
@@ -42,6 +40,34 @@ namespace ite
             Bandwidth_7M = 7000,    // Signal bandwidth is 7MHz
             Bandwidth_8M = 8000     // Signal bandwidth is 8MHz
         } Bandwidth;
+
+        class It930Stream
+        {
+        public:
+            It930Stream(const It930x * p)
+            :   parent_(p)
+            {
+                if (DTV_StartCapture(parent_->handle_))
+                    throw "DTV_StartCapture";
+            }
+
+            ~It930Stream()
+            {
+                DTV_StopCapture(parent_->handle_);
+            }
+
+            ///
+            /// \return -1 error
+            /// \return 0 no data
+            ///
+            int read(uint8_t * buf, int size)
+            {
+                return DTV_GetData(parent_->handle_, size, buf);
+            }
+
+        private:
+            const It930x * parent_;
+        };
 
         ///
         typedef enum
@@ -63,7 +89,8 @@ namespace ite
 
         ~It930x()
         {
-           DTV_DeviceClose(handle_);
+            m_devStream.reset();
+            DTV_DeviceClose(handle_);
         }
 
         void enable(Option opt)
@@ -104,6 +131,8 @@ namespace ite
         // both in KHz
         void lockChannel(unsigned frequency, unsigned bandwidth = Bandwidth_6M)
         {
+            closeStream();
+
             unsigned result = DTV_AcquireChannel(handle_, frequency, bandwidth);
             if (result)
                 throw "DTV_AcquireChannel";
@@ -112,6 +141,8 @@ namespace ite
             result = DTV_IsLocked(handle_, &isLocked);
             if (result)
                 throw "DTV_IsLocked";
+
+            openStream();
         }
 
         bool isLocked() const
@@ -151,9 +182,16 @@ namespace ite
             strncpy(info.supportHWInfo, (const char *)driverInfo.SupportHWInfo, 32);
         }
 
+        int read(uint8_t * buf, int size) { return m_devStream->read(buf, size); }
+        bool hasStream() const { return m_devStream.get(); }
+        void openStream() { m_devStream.reset( new It930Stream(this) ); }
+        void closeStream() { m_devStream.reset(); }
+
     private:
         int handle_;
-#if 0
+        std::unique_ptr<It930Stream> m_devStream;
+
+#if 0 // TODO: use it instead of ID from unix device name
         void getDeviceID() const
         {
             Word rxDeviceID = 0xFFFF;
@@ -173,35 +211,6 @@ namespace ite
             if (result)
                 throw "NULL Packet Filter";
         }
-    };
-
-    ///
-    class It930Stream
-    {
-    public:
-        It930Stream(const It930x& p)
-        :   parent_(&p)
-        {
-            if (DTV_StartCapture(parent_->handle_))
-                throw "DTV_StartCapture";
-        }
-
-        ~It930Stream()
-        {
-            DTV_StopCapture(parent_->handle_);
-        }
-
-        ///
-        /// \return -1 error
-        /// \return 0 no data
-        ///
-        int read(uint8_t * buf, int size)
-        {
-            return DTV_GetData(parent_->handle_, size, buf);
-        }
-
-    private:
-        const It930x * parent_;
     };
 }
 

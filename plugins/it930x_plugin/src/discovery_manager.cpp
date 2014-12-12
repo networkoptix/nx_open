@@ -334,22 +334,12 @@ namespace ite
 
         for (size_t i = 0; i < scanDevs.size(); ++i)
         {
-            std::lock_guard<std::mutex> lock( scanDevs[i]->mutex() ); // LOCK device
-
-            if (scanDevs[i]->isLocked())
-                continue;
-
-            if (! scanDevs[i]->isOpen())
-                scanDevs[i]->open();
-
-            unsigned short rxID = scanDevs[i]->rxID();
-
-            rcShell_.setRxFrequency(rxID, freq); // frequency for new devices
-            scanDevs[i]->lockF(freq);
-
-            if (scanDevs[i]->isLocked())
+            if (scanDevs[i]->tryLockF(freq))
             {
-#if 1           // DEBUG
+                unsigned short rxID = scanDevs[i]->rxID();
+                rcShell_.setRxFrequency(rxID, freq); // frequency for new devices
+
+#if 1 // DEBUG
                 printf("searching TxIDs - rxID: %d; frequency: %d; strength: %d; presence: %d\n",
                        scanDevs[i]->rxID(), freq, scanDevs[i]->strength(), scanDevs[i]->present());
 #endif
@@ -361,10 +351,9 @@ namespace ite
                 }
 
                 scanDevs[i]->unlockF();
-            }
 
-            rcShell_.setRxFrequency(scanDevs[i]->rxID(), 0);
-            //scanDevs[i]->close();
+                rcShell_.setRxFrequency(scanDevs[i]->rxID(), 0);
+            }
         }
 
         std::vector<IDsLink> links;
@@ -441,9 +430,8 @@ namespace ite
         {
             RxDevicePtr dev = *it;
 
-            if (! dev->isLocked())
+            if (dev->tryLockF(freq))
             {
-                dev->lockF(freq);
                 if (rcShell_.setChannel(dev->rxID(), txID, chan))
                     return true;
             }

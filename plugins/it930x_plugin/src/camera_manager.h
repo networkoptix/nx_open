@@ -154,6 +154,7 @@ namespace ite
         bool captureAnyRxDevice();
         bool captureSameRxDevice(RxDevicePtr);
         bool captureFreeRxDevice(RxDevicePtr);
+        void freeDevice();
 
         bool initDevReader();
         void stopDevReader();
@@ -165,14 +166,8 @@ namespace ite
         void tryLoad();
 
         bool stopStreams(bool force = false);
-
-        void freeDevice()
+        void stopTimer()
         {
-            if (m_rxDevice)
-            {
-                m_rxDevice->unlockF();
-                m_rxDevice.reset();
-            }
             m_waitStop = false;
             m_stopTime = 0;
         }

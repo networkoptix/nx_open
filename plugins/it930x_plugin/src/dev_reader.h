@@ -71,8 +71,8 @@ namespace ite
     class DevReader
     {
     public:
-        DevReader(It930Stream * s, size_t size)
-        :   m_stream(s),
+        DevReader(It930x * dev, size_t size)
+        :   m_device(dev),
             m_size(size),
             m_pos(0),
             m_timerStarted( false ),
@@ -126,7 +126,7 @@ namespace ite
         bool timerAlive() const { return m_timerStarted && !m_timerFinished; }
 
     private:
-        It930Stream * m_stream;
+        It930x * m_device;
         std::vector<uint8_t> m_buf;
         const size_t m_size;
         size_t m_pos;
@@ -150,7 +150,7 @@ namespace ite
             }
 #endif
             m_buf.resize(m_size);
-            int ret = m_stream->read( &(*m_buf.begin()), m_buf.size() );
+            int ret = m_device->read( &(*m_buf.begin()), m_buf.size() );
             if (ret < 0) {
                 m_buf.clear();
                 m_pos = 0;
