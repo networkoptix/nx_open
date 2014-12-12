@@ -159,6 +159,15 @@ public:
         return m_aspectRatio > 0.0;
     }
 
+    /**
+     * \returns                         Aspect ratio of this widget taking its rotation into account.
+     */
+    float visualAspectRatio() const;
+
+    /**
+     * \return                          Default visual aspect ratio for widgets of this type.
+     *                                  Visual aspect ratio differs from aspect ratio in that it is always valid.
+     */
     virtual float defaultVisualAspectRatio() const;
 
     /**

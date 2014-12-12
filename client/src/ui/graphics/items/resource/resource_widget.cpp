@@ -41,6 +41,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
+#include <utils/aspect_ratio.h>
 
 #include <utils/license_usage_helper.h>
 
@@ -338,6 +339,13 @@ void QnResourceWidget::setAspectRatio(float aspectRatio) {
     setEnclosingGeometry(enclosingGeometry);
 
     emit aspectRatioChanged();
+}
+
+float QnResourceWidget::visualAspectRatio() const {
+    if (!hasAspectRatio())
+        return -1;
+
+    return QnAspectRatio::isRotated90(rotation()) ? 1 / m_aspectRatio : m_aspectRatio;
 }
 
 float QnResourceWidget::defaultVisualAspectRatio() const {
