@@ -31,7 +31,7 @@
     <message>
         <location filename="../src/ui/dialogs/about_dialog.ui" line="156"/>
         <source>Support</source>
-        <translation type="unfinished"></translation>
+        <translation>サポート</translation>
     </message>
 </context>
 <context>
@@ -77,12 +77,12 @@
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.ui" line="42"/>
         <source>Interval of action :</source>
-        <translation>アクション間隔:</translation>
+        <translation>アクションインターバル:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.ui" line="64"/>
         <source>No more than once per</source>
-        <translation>実行間隔</translation>
+        <translation>間隔</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.ui" line="100"/>
@@ -100,13 +100,13 @@
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="51"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;When&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;日時&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;イベント&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="79"/>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="224"/>
         <source>at</source>
-        <translation></translation>
+        <translation>カメラ</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="86"/>
@@ -126,7 +126,7 @@
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="202"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Do&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;実行&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;アクション&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui" line="231"/>
@@ -169,7 +169,7 @@
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.ui" line="85"/>
         <source>Filter by cameras...</source>
-        <translation>フィルター　カメラ毎...</translation>
+        <translation>フィルター...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.ui" line="92"/>
@@ -187,17 +187,17 @@
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="125"/>
         <source>IP, hostname, RTSP link...</source>
-        <translation>IP, ホスト名, RTSP リンク...</translation>
+        <translation>IPアドレス,　 ホスト名,　 RTSPのURL等...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="143"/>
         <source>S&amp;tart IP:</source>
-        <translation>開始IP(&amp;T):</translation>
+        <translation>開始 IP(&amp;T):</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="160"/>
         <source>&amp;End IP:</source>
-        <translation>終了IP(&amp;E):</translation>
+        <translation>終了 IP(&amp;E):</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="183"/>
@@ -227,7 +227,7 @@
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="343"/>
         <source>&amp;Discovery Port:</source>
-        <translation>検索ポート(&amp;D):</translation>
+        <translation>ポート(&amp;D):</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="495"/>
@@ -237,12 +237,12 @@
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="524"/>
         <source>&amp;Scan</source>
-        <translation>スキャン(&amp;S)</translation>
+        <translation>検索(&amp;S)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="488"/>
         <source>Scanning...</source>
-        <translation>スキャン中...</translation>
+        <translation>検索中...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="391"/>
@@ -287,7 +287,7 @@
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="557"/>
         <source>&amp;Add selected</source>
-        <translation>複数選択追加(&amp;A)</translation>
+        <translation>選択追加(&amp;A)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="564"/>
@@ -300,27 +300,27 @@
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui" line="27"/>
         <source>Advanced settings for this camera cannot be loaded</source>
-        <translation type="unfinished"></translation>
+        <translation>このカメラのアドバンス設定がロードできません</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui" line="41"/>
         <source>This camera has no advanced settings</source>
-        <translation type="unfinished"></translation>
+        <translation>このカメラはアドバンス設定がありません</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui" line="116"/>
         <source>Warning: all changes are applied instantly</source>
-        <translation type="unfinished"></translation>
+        <translation>注意　変更内容は即時に適応されます</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui" line="131"/>
         <source>Category</source>
-        <translation type="unfinished"></translation>
+        <translation>カテゴリー</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui" line="172"/>
         <source>about:blank</source>
-        <translation type="unfinished"></translation>
+        <translation>about:blank</translation>
     </message>
 </context>
 <context>
@@ -328,7 +328,7 @@
     <message>
         <location filename="../src/camera/camera_diagnose_tool.cpp" line="160"/>
         <source>No connection to Server %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバー %1に接続できません.</translation>
     </message>
 </context>
 <context>
@@ -357,112 +357,112 @@
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="17"/>
         <source>I have read the manual and understand the risks</source>
-        <translation type="unfinished">マニュアルを読みリスクを理解しました</translation>
+        <translation>エキスパート設定を有効にする</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="30"/>
         <source>Camera Settings Control</source>
-        <translation type="unfinished">カメラ設定コントロール</translation>
+        <translation>カメラ設定コントロール</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="36"/>
         <source>Keep camera streams&apos; and profiles&apos; settings</source>
-        <translation type="unfinished">カメラストリームとプロファイル設定を変更しない</translation>
+        <translation>カメラストリームとプロファイル設定を変更しない</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="49"/>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation type="unfinished">注意　録画スケジュールのFPSと画質設定は有効ではありません!</translation>
+        <translation>注意　録画スケジュールのFPSと画質設定は適応されません!</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="69"/>
         <source>Secondary Stream Control</source>
-        <translation type="unfinished">2番目のストリームコントロール</translation>
+        <translation>2番目のストリームコントロール</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="75"/>
         <source>Override secondary stream quality</source>
-        <translation type="unfinished"></translation>
+        <translation>ストリーム設定</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="107"/>
         <source>Don&apos;t use</source>
-        <translation type="unfinished">使用しない</translation>
+        <translation>使用しない</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="127"/>
         <source>Low quality</source>
-        <translation type="unfinished">低画質</translation>
+        <translation>低画質</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="150"/>
         <source>Medium quality</source>
-        <translation type="unfinished">標準画質</translation>
+        <translation>標準画質</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="173"/>
         <source>High quality</source>
-        <translation type="unfinished">高画質</translation>
+        <translation>高画質</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="192"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;注意! 低画質は低解像度になります.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;低画質は低解像度になります.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message utf8="true">
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="199"/>
         <source>Warning! High quality may result in Server’s CPU overload, network connection errors and other issues.</source>
-        <translation type="unfinished"></translation>
+        <translation>高画質はサーバーのCPU負荷およびネットワーク負荷を考慮してください.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="219"/>
         <source>Archive control</source>
-        <translation type="unfinished"></translation>
+        <translation>アーカイブコントロール</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="225"/>
         <source>Do not archive primary stream</source>
-        <translation type="unfinished"></translation>
+        <translation>プライマリーストリームのアーカイブを行わない</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="232"/>
         <source>Do not archive secondary stream</source>
-        <translation type="unfinished"></translation>
+        <translation>セカンダリーストリームのアーカイブを行わない</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="242"/>
         <source>Media streaming control</source>
-        <translation type="unfinished"></translation>
+        <translation>メディアストリームコントロール</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="248"/>
         <source>RTP transport:</source>
-        <translation type="unfinished"></translation>
+        <translation>RTP:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="256"/>
         <source>Auto</source>
-        <translation type="unfinished">自動</translation>
+        <translation>Auto</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="261"/>
         <source>TCP</source>
-        <translation type="unfinished"></translation>
+        <translation>TCP</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="266"/>
         <source>UDP</source>
-        <translation type="unfinished"></translation>
+        <translation>UDP</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="327"/>
         <source>Warning! Please read documentation before changing these settings!</source>
-        <translation type="unfinished">設定変更前にマニュアルを確認して下さい!</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="347"/>
         <source>Restore Defaults</source>
-        <translation type="unfinished">初期設定に戻す</translation>
+        <translation>初期設定に戻す</translation>
     </message>
 </context>
 <context>
@@ -496,12 +496,12 @@
     <message>
         <location filename="../src/ui/widgets/settings/camera_management_widget.ui" line="30"/>
         <source>Allow system to optimize camera settings (Recommended)</source>
-        <translation type="unfinished"></translation>
+        <translation>システムによるカメラ設定最適化 (推奨)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/camera_management_widget.ui" line="43"/>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation type="unfinished">注意　録画スケジュールのFPSと画質設定は有効ではありません!</translation>
+        <translation>注意　録画スケジュールのFPSと画質設定は適応されません!</translation>
     </message>
 </context>
 <context>
@@ -557,7 +557,7 @@
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="112"/>
         <source>Note: Recording Schedule is based on Server Time</source>
-        <translation>注：録画スケジュールはサーバー時間を使用</translation>
+        <translation>注：録画スケジュールはサーバー時間を使用します</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="138"/>
@@ -597,28 +597,28 @@
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="429"/>
         <source>Fixed Archive Length</source>
-        <translation type="unfinished"></translation>
+        <translation>アーカイブ保持期間</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="447"/>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="491"/>
         <source>Auto</source>
-        <translation type="unfinished">自動</translation>
+        <translation>自動</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="467"/>
         <source>Warning! High value may prevent other cameras from recording!</source>
-        <translation type="unfinished"></translation>
+        <translation>注意　最低日数が長い場合、他カメラの記録を停止する可能性があります!</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="513"/>
         <source>Min days:</source>
-        <translation type="unfinished"></translation>
+        <translation>最低(日):</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="520"/>
         <source>Max days:</source>
-        <translation type="unfinished"></translation>
+        <translation>最大(日):</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="534"/>
@@ -688,17 +688,17 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/dialogs/connection_name_dialog.ui" line="14"/>
         <source>Save connection as...</source>
-        <translation type="unfinished">名前を付けて保存...</translation>
+        <translation>名前を付けて保存...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_name_dialog.ui" line="26"/>
         <source>Enter name:</source>
-        <translation type="unfinished">名前入力:</translation>
+        <translation>名前:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_name_dialog.ui" line="36"/>
         <source>Save password</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワードを保存する</translation>
     </message>
 </context>
 <context>
@@ -719,12 +719,12 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.ui" line="38"/>
         <source>Create Backup...</source>
-        <translation>バックアップ作成...</translation>
+        <translation>バックアップ...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.ui" line="45"/>
         <source>Restore from Backup...</source>
-        <translation>バックアップのリストア...</translation>
+        <translation>リストア...</translation>
     </message>
 </context>
 <context>
@@ -762,7 +762,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.ui" line="268"/>
         <source>All Servers are offline. Logs are not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>全サーバーがオフラインの為ログが表示できません.</translation>
     </message>
 </context>
 <context>
@@ -770,17 +770,17 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/properties/fisheye_settings_widget.ui" line="32"/>
         <source>Horizontal mount (camera on the wall)</source>
-        <translation>水平マウント（カメラ壁設置)</translation>
+        <translation>水平マウント（壁設置)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/fisheye_settings_widget.ui" line="42"/>
         <source>Vertical mount (camera on the floor)</source>
-        <translation>垂直マウント（カメラ床設置）</translation>
+        <translation>垂直マウント（床設置）</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/fisheye_settings_widget.ui" line="22"/>
         <source>Vertical mount (camera on the ceiling)</source>
-        <translation>垂直マウント（カメラ天井設置）</translation>
+        <translation>垂直マウント（天井設置）</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/fisheye_settings_widget.ui" line="53"/>
@@ -823,7 +823,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="149"/>
         <source>Auto pause video:</source>
-        <translation type="unfinished"></translation>
+        <translation>自動一時停止:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="140"/>
@@ -839,12 +839,12 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="124"/>
         <source>Downmix audio from 5.1 to 2.1:</source>
-        <translation>5.1～2.1までのダウンミックスオーディオ:</translation>
+        <translation>5.1ch→2.1chへオーディオ変換:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="180"/>
         <source>after</source>
-        <translation></translation>
+        <translation>　</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="200"/>
@@ -854,12 +854,12 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="239"/>
         <source>Double buffering:</source>
-        <translation type="unfinished"></translation>
+        <translation>ダブルバッファリング:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="277"/>
         <source>Disable only if the client takes too much CPU.</source>
-        <translation type="unfinished"></translation>
+        <translation>クライアントのCPU負荷が高い場合のみ無効にしてください.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="302"/>
@@ -882,72 +882,72 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="17"/>
         <source>Administration</source>
-        <translation type="unfinished"></translation>
+        <translation>アドミニストレーション</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="29"/>
         <source>&amp;Alarm/Event Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>アラーム/イベントルール(&amp;A)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="32"/>
         <source>Ctrl+E</source>
-        <translation type="unfinished">Ctrl+E</translation>
+        <translation>Ctrl+E</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="45"/>
         <source>&amp;Event Log</source>
-        <translation type="unfinished"></translation>
+        <translation>イベントログ(&amp;E)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="48"/>
         <source>Ctrl+L</source>
-        <translation type="unfinished">Ctrl+L</translation>
+        <translation>Ctrl+L</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="55"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Alarm/Event Rules Management (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+E&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;アラーム/イベントログ管理を開く (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+E&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="62"/>
         <source>&amp;Camera List</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラリスト(&amp;C)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="65"/>
         <source>Ctrl+M</source>
-        <translation type="unfinished">Ctrl+M</translation>
+        <translation>Ctrl+M</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="72"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Event Log (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+L&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;イベントログを開く (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+L&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="79"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Camera List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+M&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;カメラリストを開く (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+M&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="86"/>
         <source>&amp;Health Monitoring</source>
-        <translation type="unfinished"></translation>
+        <translation>ヘルスモニター(&amp;H)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="93"/>
         <source>Open all servers statistics on one layout</source>
-        <translation type="unfinished"></translation>
+        <translation>全サーバーの統計を表示する</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="103"/>
         <source>Camera Management</source>
-        <translation type="unfinished">カメラ管理</translation>
+        <translation>カメラ管理</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="115"/>
         <source>System Configuration Backup and Restore</source>
-        <translation type="unfinished">システム構成 バックアップとリストア</translation>
+        <translation>システム構成 バックアップとリストア</translation>
     </message>
 </context>
 <context>
@@ -1036,7 +1036,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="14"/>
         <source>Layout Settings</source>
-        <translation type="unfinished">レイアウト設定</translation>
+        <translation>レイアウト設定</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="20"/>
@@ -1115,32 +1115,32 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.ui" line="23"/>
         <source>License Details</source>
-        <translation type="unfinished">ライセンス詳細</translation>
+        <translation>ライセンス詳細</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.ui" line="35"/>
         <source>Generic</source>
-        <translation type="unfinished"></translation>
+        <translation>一般</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.ui" line="43"/>
         <source>License Type:</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスタイプ:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.ui" line="57"/>
         <source>License Key:</source>
-        <translation type="unfinished">ライセンスキー:</translation>
+        <translation>ライセンスキー:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.ui" line="71"/>
         <source>Locked to Hardware ID:</source>
-        <translation type="unfinished"></translation>
+        <translation>ハードウェアID:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.ui" line="86"/>
         <source>Features</source>
-        <translation type="unfinished"></translation>
+        <translation>機能</translation>
     </message>
 </context>
 <context>
@@ -1153,7 +1153,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.ui" line="44"/>
         <source>Remove</source>
-        <translation type="unfinished">削除</translation>
+        <translation>削除</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.ui" line="51"/>
@@ -1209,28 +1209,28 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="78"/>
         <source>Paste from Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>クリップボードから貼付け</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="87"/>
         <source>License key is invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>無効なライセンスキー</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="156"/>
         <source>Copy to Clipboard</source>
-        <translation type="unfinished">クリップボードにコピー</translation>
+        <translation>クリップボードにコピー</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="174"/>
         <source>Select license file...</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスファイル選択...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="220"/>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="233"/>
         <source>License will be bound to the current server</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスは既存のサーバーに統合されます</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="223"/>
@@ -1279,7 +1279,7 @@ Short for &quot;seconds&quot;</extracomment>
         <location filename="../src/ui/dialogs/login_dialog.ui" line="68"/>
         <source>Connect to Server</source>
         <comment>Groupbox Title</comment>
-        <translation type="unfinished"></translation>
+        <translation>接続サーバー</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.ui" line="159"/>
@@ -1302,111 +1302,112 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="20"/>
         <source>Look and Feel</source>
-        <translation type="unfinished"></translation>
+        <translation>表示</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="46"/>
         <source>Timeline mode:</source>
-        <translation type="unfinished">タイムラインモード:</translation>
+        <translation>タイムラインモード:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="53"/>
         <source>Language:</source>
-        <translation type="unfinished">言語:</translation>
+        <translation>言語:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="63"/>
         <source>Show IP in tree:</source>
-        <translation type="unfinished">IPをツリーに表示する:</translation>
+        <translation>IPアドレス表示:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="73"/>
         <source>Skin:</source>
-        <translation type="unfinished">表示:</translation>
+        <translation>背景:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="80"/>
         <source>Tour sequence cycle time:</source>
-        <translation type="unfinished">ツアーシーケンス時間:</translation>
+        <translation>ツアーシーケンス:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="108"/>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="153"/>
         <source>Restart required.</source>
-        <translation type="unfinished">要再起動.</translation>
+        <translation>要再起動.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="126"/>
         <source> seconds</source>
-        <translation type="unfinished">秒</translation>
+        <translation>秒</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="169"/>
         <source>This option will not affect Recording Schedule.
 Recording Schedule is always based on Server Time.</source>
-        <translation type="unfinished"></translation>
+        <translation>このオプションは録画スケジュースには影響しません.
+録画スケジュールはサーバー時間が適応されます.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="180"/>
         <source>Background Animation</source>
-        <translation type="unfinished"></translation>
+        <translation>アニメーション背景</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="186"/>
         <source>Enable Background Animation</source>
-        <translation type="unfinished"></translation>
+        <translation>アニメーション背景有効</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="211"/>
         <source>Color:</source>
-        <translation type="unfinished"></translation>
+        <translation>色:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="223"/>
         <source>Select color...</source>
-        <translation type="unfinished"></translation>
+        <translation>色選択...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="245"/>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="377"/>
         <source>Intensity:</source>
-        <translation type="unfinished"></translation>
+        <translation>透過:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="254"/>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="386"/>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="291"/>
         <source>Background Image</source>
-        <translation type="unfinished"></translation>
+        <translation>背景イメージ</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="297"/>
         <source>Enable Background Image</source>
-        <translation type="unfinished"></translation>
+        <translation>背景イメージ有効</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="322"/>
         <source>Image:</source>
-        <translation type="unfinished"></translation>
+        <translation>イメージ:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="334"/>
         <source>&lt;No image&gt;</source>
-        <translation type="unfinished">&lt;No image&gt;</translation>
+        <translation>&lt;No image&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="341"/>
         <source>Browse...</source>
-        <translation type="unfinished">参照...</translation>
+        <translation>参照...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="370"/>
         <source>Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>モード:</translation>
     </message>
 </context>
 <context>
@@ -1419,7 +1420,7 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="60"/>
         <source>Image Control</source>
-        <translation type="unfinished"></translation>
+        <translation>イメージコントロール</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="134"/>
@@ -1454,7 +1455,7 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="124"/>
         <source>Default rotation:</source>
-        <translation type="unfinished"></translation>
+        <translation>回転初期値:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="142"/>
@@ -1469,7 +1470,7 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="190"/>
         <source>This is a fish-eye lens camera</source>
-        <translation type="unfinished">魚眼レンズカメラ</translation>
+        <translation>魚眼レンズカメラ</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="214"/>
@@ -1536,7 +1537,7 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="14"/>
         <source>Local Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>ローカル設定</translation>
     </message>
 </context>
 <context>
@@ -1597,32 +1598,32 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/graphics/instruments/ptz_instrument_p.h" line="210"/>
         <source>Zoom In</source>
-        <translation type="unfinished"></translation>
+        <translation>ズームイン</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/instruments/ptz_instrument_p.h" line="214"/>
         <source>Zoom Out</source>
-        <translation type="unfinished"></translation>
+        <translation>ズームアウト</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/instruments/ptz_instrument_p.h" line="218"/>
         <source>Focus Far</source>
-        <translation type="unfinished"></translation>
+        <translation>フォーカス遠距離</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/instruments/ptz_instrument_p.h" line="224"/>
         <source>Focus Near</source>
-        <translation type="unfinished"></translation>
+        <translation>フォーカス近距離</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/instruments/ptz_instrument_p.h" line="230"/>
         <source>Auto Focus</source>
-        <translation type="unfinished"></translation>
+        <translation>オートフォーカス</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/instruments/ptz_instrument_p.h" line="234"/>
         <source>Change Dewarping Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>歪み補正モード変更</translation>
     </message>
 </context>
 <context>
@@ -1688,7 +1689,7 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/customization/customizer.cpp" line="215"/>
         <source>Parameter 1 is null.</source>
-        <translation type="unfinished"></translation>
+        <translation>パラメーター1が空白.</translation>
     </message>
 </context>
 <context>
@@ -1696,57 +1697,57 @@ Recording Schedule is always based on Server Time.</source>
     <message numerus="yes">
         <location filename="../src/utils/common/qtimespan.cpp" line="281"/>
         <source>%n millisecond(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 秒(ms)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/common/qtimespan.cpp" line="283"/>
         <source>%n second(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 秒(s)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/common/qtimespan.cpp" line="285"/>
         <source>%n minute(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 分(s)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/common/qtimespan.cpp" line="287"/>
         <source>%n hour(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 時(s)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/common/qtimespan.cpp" line="289"/>
         <source>%n day(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 日(s)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/common/qtimespan.cpp" line="291"/>
         <source>%n week(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 週(s)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/common/qtimespan.cpp" line="293"/>
         <source>%n month(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 月(s)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/common/qtimespan.cpp" line="295"/>
         <source>%n year(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 年(s)</numerusform>
         </translation>
     </message>
 </context>
@@ -1768,12 +1769,12 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="102"/>
         <source>Server at %2: v%1&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバー %2: v%1&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="139"/>
         <source>&lt;b&gt;Client&lt;/b&gt; is not connected to &lt;b&gt;Server&lt;/b&gt;.&lt;br&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Client&lt;/b&gt; is not connected to &lt;b&gt;Server&lt;/b&gt;.&lt;br&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="142"/>
@@ -1786,7 +1787,14 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
 &lt;b&gt;SIGAR %7&lt;/b&gt; - Copyright (c) 2004-2011 VMware Inc.&lt;br/&gt;
 &lt;b&gt;Boost %8&lt;/b&gt; - Copyright (c) 2000-2012 Boost developers.&lt;br/&gt;
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;%1 %2&lt;/b&gt; uses the following external libraries:&lt;br/&gt;
+&lt;br /&gt;
+&lt;b&gt;Qt v.%3&lt;/b&gt; - Copyright (c) 2012 Nokia Corporation.&lt;br/&gt;
+&lt;b&gt;FFMpeg %4&lt;/b&gt; - Copyright (c) 2000-2012 FFmpeg developers.&lt;br/&gt;
+&lt;b&gt;LAME 3.99.0&lt;/b&gt; - Copyright (c) 1998-2012 LAME developers.&lt;br/&gt;
+&lt;b&gt;OpenAL %5&lt;/b&gt; - Copyright (c) 2000-2006 %6.&lt;br/&gt;
+&lt;b&gt;SIGAR %7&lt;/b&gt; - Copyright (c) 2004-2011 VMware Inc.&lt;br/&gt;
+&lt;b&gt;Boost %8&lt;/b&gt; - Copyright (c) 2000-2012 Boost developers.&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="162"/>
@@ -1808,7 +1816,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="191"/>
         <source>&lt;b&gt;Support&lt;/b&gt;: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;サポート&lt;/b&gt;: %1</translation>
     </message>
 </context>
 <context>
@@ -1858,22 +1866,22 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
         <location filename="../src/ui/actions/action_manager.cpp" line="400"/>
         <location filename="../src/ui/actions/action_manager.cpp" line="685"/>
         <source>Drop Resources</source>
-        <translation>リソース解放</translation>
+        <translation>Drop Resources</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="404"/>
         <source>Drop Resources into a New Layout</source>
-        <translation>新規レイアウトでリソース解放</translation>
+        <translation>Drop Resources into a New Layout</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="412"/>
         <source>Delayed Drop Resources</source>
-        <translation>リソース解放遅延</translation>
+        <translation>Delayed Drop Resources</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="416"/>
         <source>Instant Drop Resources</source>
-        <translation>一時的リソース解放</translation>
+        <translation>Instant Drop Resources</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="421"/>
@@ -1937,7 +1945,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="480"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1280"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1279"/>
         <source>Check Camera Issues...</source>
         <translation>カメラ障害を確認...</translation>
     </message>
@@ -1950,12 +1958,12 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="497"/>
         <source>Control Video Wall</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオウォールコントロール</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="503"/>
         <source>Push my screen</source>
-        <translation type="unfinished"></translation>
+        <translation>スクリーン表示</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="508"/>
@@ -1965,7 +1973,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="512"/>
         <source>Select time server</source>
-        <translation type="unfinished"></translation>
+        <translation>タイムサーバー選択</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="535"/>
@@ -1985,12 +1993,12 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="550"/>
         <source>Connect to Server...</source>
-        <translation type="unfinished">サーバーに接続....</translation>
+        <translation>サーバーに接続....</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="551"/>
         <source>Ctrl+Shift+C</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="557"/>
@@ -2070,12 +2078,12 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="618"/>
         <source>Video Wall...</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオウォール...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="619"/>
         <source>New Video Wall...</source>
-        <translation type="unfinished"></translation>
+        <translation>新規ビデオウォール...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="626"/>
@@ -2125,11 +2133,6 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
         <translation>名前を付けてレイアウトを保存...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="671"/>
-        <source>Ctrl+Shift+S</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="672"/>
         <source>Ctrl+Alt+S</source>
         <translation>Ctrl+Alt+S</translation>
@@ -2138,7 +2141,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
         <location filename="../src/ui/actions/action_manager.cpp" line="678"/>
         <location filename="../src/ui/actions/action_manager.cpp" line="961"/>
         <source>Save Video Wall View</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオウォールの保存</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="694"/>
@@ -2177,7 +2180,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="739"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1725"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1724"/>
         <source>Ctrl+F</source>
         <translation>Ctrl+F</translation>
     </message>
@@ -2272,17 +2275,17 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
         <translation>Alt+F4</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1496"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1495"/>
         <source>Close</source>
         <translation>閉じる</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1497"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1496"/>
         <source>Ctrl+W</source>
         <translation>Ctrl+W</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1502"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1501"/>
         <source>Close All But This</source>
         <translation>全てを閉じる</translation>
     </message>
@@ -2294,63 +2297,63 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="393"/>
         <source>Show Debug</source>
-        <translation type="unfinished"></translation>
+        <translation>デバッグ表示</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="394"/>
         <source>Hide Debug</source>
-        <translation type="unfinished"></translation>
+        <translation>デバッグ非表示</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="395"/>
         <source>Ctrl+Alt+D</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+Alt+D</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="408"/>
         <source>Delayed Open Video Wall</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオウォール表示遅延</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="458"/>
         <source>Filter...</source>
-        <translation type="unfinished">フィルター...</translation>
+        <translation>フィルター...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="487"/>
         <location filename="../src/ui/actions/action_manager.cpp" line="800"/>
         <source>Event Log...</source>
-        <translation type="unfinished"></translation>
+        <translation>イベントロヅ...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="761"/>
         <source>System Administration...</source>
-        <translation type="unfinished"></translation>
+        <translation>システムアドミニストレーション...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="762"/>
         <source>Ctrl+Alt+A</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+Alt+A</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="775"/>
         <source>System Update...</source>
-        <translation type="unfinished"></translation>
+        <translation>システム更新...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="780"/>
         <source>Local Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>ローカル設定...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="814"/>
         <source>Merge Systems...</source>
-        <translation type="unfinished"></translation>
+        <translation>システム統合...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="857"/>
         <source>Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバー...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="874"/>
@@ -2410,7 +2413,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="927"/>
         <source>Open Video Wall(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオウォールを開く</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="932"/>
@@ -2430,128 +2433,128 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="941"/>
         <source>Identify</source>
-        <translation type="unfinished"></translation>
+        <translation>ID</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="948"/>
         <source>Attach to Video Wall...</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオウォールに割当て...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="955"/>
         <source>Switch to Video Wall mode...</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオウォールモードに変更...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="970"/>
         <source>Save Current Matrix</source>
-        <translation type="unfinished"></translation>
+        <translation>マトリックスの保存</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="977"/>
         <source>Load Matrix</source>
-        <translation type="unfinished"></translation>
+        <translation>マトリックスのロード</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="989"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="988"/>
         <source>Update Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>レイアウト更新</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1000"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="999"/>
         <source>Stop Video Wall</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオウォール停止</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1007"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1006"/>
         <source>Detach Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>レイアウト削除</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1014"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1013"/>
         <source>Save Layout</source>
         <translation>レイアウトを保存</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1020"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1026"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1019"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1025"/>
         <source>Save Layout As...</source>
         <translation>名前を付けてレイアウトを保存...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1042"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1041"/>
         <source>Maximize Item</source>
         <translation>最大化</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1043"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1051"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1042"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1050"/>
         <source>Enter</source>
         <translation>Enter</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1044"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1052"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1043"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1051"/>
         <source>Return</source>
         <translation>戻る</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1050"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1049"/>
         <source>Restore Item</source>
         <translation>元に戻す</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1058"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1057"/>
         <source>Show Info</source>
         <translation>情報を表示する</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1059"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1065"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1071"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1131"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1058"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1064"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1070"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1130"/>
         <source>Alt+I</source>
         <translation>Alt+I</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1064"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1063"/>
         <source>Hide Info</source>
         <translation>情報を非表示にする</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1070"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1069"/>
         <source>Toggle Info</source>
         <translation>情報表示の切換え</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1076"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1075"/>
         <source>Change Resolution...</source>
         <translation>解像度変更...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1083"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1082"/>
         <source>Auto</source>
         <translation>自動</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1089"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1088"/>
         <source>Low</source>
         <translation>低</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1094"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1093"/>
         <source>High</source>
         <translation>高</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1102"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1101"/>
         <source>PTZ...</source>
         <translation>PTZ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1110"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1109"/>
         <source>Save Current Position...</source>
-        <translation>現在のポジションを保存...</translation>
+        <translation>現在のポジションを保存する...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="516"/>
@@ -2566,7 +2569,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="528"/>
         <source>Activate PTZ object</source>
-        <translation>アクティブPTZオブジェクト</translation>
+        <translation>PTZオブジェクト有効</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="753"/>
@@ -2574,629 +2577,634 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
         <translation>ベータバージョン警告メッセージ表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1116"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1115"/>
         <source>Manage...</source>
         <translation>管理...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1124"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1123"/>
         <source>Calibrate Fisheye</source>
         <translation>魚眼レンズカメラ キャリブレート</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1130"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1129"/>
         <source>Toggle Resolution Mode</source>
         <translation>解像度の切換え</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1137"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1136"/>
         <source>Show Motion/Smart Search</source>
         <translation>モーション/スマート検索の表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1138"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1137"/>
         <source>Show Motion</source>
         <translation>モーション表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1139"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1146"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1157"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1138"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1145"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1156"/>
         <source>Alt+G</source>
         <translation>Alt+G</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1144"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1143"/>
         <source>Hide Motion/Smart Search</source>
         <translation>モーション/スマート検索の非表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1145"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1144"/>
         <source>Hide Motion</source>
         <translation>モーション非表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1151"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1150"/>
         <source>Clear Motion Selection</source>
         <translation>モーション選択の削除</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1156"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1155"/>
         <source>Toggle Smart Search</source>
         <translation>スマート検索の切換え</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1162"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1161"/>
         <source>Check File Watermark</source>
         <translation>ファイルウォーターマーク確認</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1163"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1162"/>
         <source>Alt+C</source>
         <translation>Alt+C</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1169"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1168"/>
         <source>Take Screenshot</source>
         <translation>スクリーンショット</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1170"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1169"/>
         <source>Alt+S</source>
         <translation>Alt+S</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1176"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1175"/>
         <source>Image Enhancement...</source>
         <translation>イメージ拡張...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1177"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1176"/>
         <source>Alt+J</source>
         <translation>Alt+J</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1183"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1182"/>
         <source>Create Zoom Window</source>
         <translation>ズーム画面作成</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1188"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1187"/>
         <source>Rotate to...</source>
         <translation>回転...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1193"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1192"/>
         <source>0 degrees</source>
         <translation>0 度</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1198"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1197"/>
         <source>90 degrees</source>
         <translation>90 度</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1203"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1202"/>
         <source>180 degrees</source>
         <translation>180 度</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1208"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1207"/>
         <source>270 degrees</source>
         <translation>270 度</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1218"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1217"/>
         <source>Remove from Layout</source>
         <translation>レイアウトから削除</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="983"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1037"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1219"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1228"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1036"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1218"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1227"/>
         <source>Del</source>
         <translation>削除</translation>
     </message>
     <message>
+        <location filename="../src/ui/actions/action_manager.cpp" line="671"/>
+        <source>Ctrl+Shift+S</source>
+        <translation>Ctrl+Shift+S</translation>
+    </message>
+    <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="982"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1036"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1227"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1035"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1226"/>
         <source>Delete</source>
         <translation>削除</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1241"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1249"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1240"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1248"/>
         <source>Rename</source>
         <translation>名前の変更</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1242"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1250"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1241"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1249"/>
         <source>F2</source>
         <translation>F2</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1259"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1258"/>
         <source>Delete from Disk</source>
         <translation>ディスクから削除</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1266"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1265"/>
         <source>Set as Layout Background</source>
         <translation>レイアウト背景として保存</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1275"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1274"/>
         <source>User Settings...</source>
         <translation>ユーザー設定...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1289"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1288"/>
         <source>Camera Rules...</source>
         <translation>カメラルール...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1298"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1297"/>
         <source>Camera Settings...</source>
         <translation>カメラ設定...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1307"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1306"/>
         <source>Picture Settings...</source>
         <translation>画像設定...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1312"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1486"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1311"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1485"/>
         <source>Layout Settings...</source>
         <translation>レイアウト設定...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1318"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1317"/>
         <source>Video Wall Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオウォール設定...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1326"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1325"/>
         <source>Open in Camera Settings Dialog</source>
         <translation>カメラ設定画面を開く</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1330"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1329"/>
         <source>Add Camera(s)...</source>
         <translation>カメラの追加...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1339"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1338"/>
         <source>Camera(s) List by Server...</source>
         <translation>サーバー毎のカメラリスト...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1348"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1347"/>
         <source>Ping...</source>
         <translation>Ping...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1352"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1351"/>
         <source>Server Logs...</source>
         <translation>サーバーログ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1360"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1359"/>
         <source>Server Diagnostics...</source>
         <translation>サーバー診断...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1368"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1367"/>
         <source>Server Settings...</source>
         <translation>サーバー設定...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1377"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1376"/>
         <source>Connect to the Current System...</source>
-        <translation type="unfinished"></translation>
+        <translation>システムに接続...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1388"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1387"/>
         <source>Change Cell Aspect Ratio...</source>
         <translation>セルのアスペクトレシオ比を変更...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1400"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1399"/>
         <source>4:3</source>
         <translation>4:3</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1407"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1406"/>
         <source>16:9</source>
         <translation>16:9</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1414"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1413"/>
         <source>3:4</source>
-        <translation type="unfinished">3:4</translation>
+        <translation>3:4</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1421"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1420"/>
         <source>9:16</source>
-        <translation type="unfinished">9:16</translation>
+        <translation>9:16</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1430"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1429"/>
         <source>Change Cell Spacing...</source>
         <translation>セルスペースの変更...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1439"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1438"/>
         <source>None</source>
         <translation>なし</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1446"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1445"/>
         <source>Small</source>
         <translation>小</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1453"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1452"/>
         <source>Medium</source>
         <translation>中</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1460"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1459"/>
         <source>Large</source>
         <translation>大</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1473"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1472"/>
         <source>Start Tour</source>
         <translation>ツアー開始</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1474"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1473"/>
         <source>Stop Tour</source>
         <translation>ツアー停止</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1475"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1474"/>
         <source>Alt+T</source>
         <translation>Alt+T</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1508"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1507"/>
         <source>Mark Selection Start</source>
         <translation>開始位置の選択</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1509"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1508"/>
         <source>[</source>
         <translation>[</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1515"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1514"/>
         <source>Mark Selection End</source>
         <translation>終了位置の選択</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1516"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1515"/>
         <source>]</source>
         <translation>]</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1522"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1521"/>
         <source>Clear Selection</source>
         <translation>選択クリア</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1527"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1526"/>
         <source>Zoom to Selection</source>
         <translation>選択エリアのズーム</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1532"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1531"/>
         <source>Bookmark Selection...</source>
-        <translation type="unfinished"></translation>
+        <translation>ブックマーク選択...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1537"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1536"/>
         <source>Edit Bookmark...</source>
-        <translation type="unfinished"></translation>
+        <translation>ブックマーク編集...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1542"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1541"/>
         <source>Remove Bookmark...</source>
-        <translation type="unfinished"></translation>
+        <translation>ブックマーク削除...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1551"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1550"/>
         <source>Export Selected Area...</source>
         <translation>単一ビデオのエクスポート...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1557"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1556"/>
         <source>Export Multi-Video...</source>
         <translation>複数ビデオのエクスポート...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1563"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1562"/>
         <source>Preview Search...</source>
         <translation>検索表示...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1570"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1569"/>
         <source>Ctrl+Alt+Shift++</source>
         <translation>Ctrl+Alt+Shift++</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1571"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1570"/>
         <source>Increment Debug Counter</source>
         <translation>デバッグカウンターの加算</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1575"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1574"/>
         <source>Ctrl+Alt+Shift+-</source>
         <translation>Ctrl+Alt+Shift+-</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1576"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1575"/>
         <source>Decrement Debug Counter</source>
         <translation>デバッグカウンターの減算</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1580"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1579"/>
         <source>Ctrl+Alt+Shift+R</source>
         <translation>Ctrl+Alt+Shift+R</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1581"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1580"/>
         <source>Show Resource Pool</source>
         <translation>リソースプールの表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1585"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1584"/>
         <source>Calibrate PTZ</source>
         <translation>PTZの調整</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1589"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1588"/>
         <source>Get PTZ Position</source>
         <translation>PTZポジション取得</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1593"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1592"/>
         <source>Ctrl+Alt+Shift+D</source>
         <translation>Ctrl+Alt+Shift+D</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1594"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1593"/>
         <source>Debug Control Panel</source>
         <translation>デバッグコントロールパネル</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1598"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1597"/>
         <source>Space</source>
         <translation>スペース</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1599"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1598"/>
         <source>Play</source>
         <translation>再生</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1600"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1599"/>
         <source>Pause</source>
         <translation>一時停止</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1605"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1604"/>
         <source>Ctrl+-</source>
         <translation>Ctrl+-</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1606"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1605"/>
         <source>Speed Down</source>
         <translation>スロー再生</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1611"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1610"/>
         <source>Ctrl++</source>
         <translation>Ctrl++</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1612"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1611"/>
         <source>Speed Up</source>
         <translation>早送り再生</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1617"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1616"/>
         <source>Ctrl+Left</source>
         <translation>Ctrl+Left</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1618"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1617"/>
         <source>Previous Frame</source>
         <translation>前のフレーム</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1623"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1622"/>
         <source>Ctrl+Right</source>
         <translation>Ctrl+Right</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1624"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1623"/>
         <source>Next Frame</source>
         <translation>次のフレーム</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1629"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1628"/>
         <source>Z</source>
         <translation>Z</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1630"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1629"/>
         <source>To Start</source>
         <translation>開始</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1635"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1634"/>
         <source>X</source>
         <translation>X</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1636"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1635"/>
         <source>To End</source>
         <translation>終了</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1641"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1640"/>
         <source>Ctrl+Up</source>
         <translation>Ctrl+Up</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1642"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1641"/>
         <source>Volume Down</source>
         <translation>ボリュームを下げる</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1646"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1645"/>
         <source>Ctrl+Down</source>
         <translation>Ctrl+Down</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1647"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1646"/>
         <source>Volume Up</source>
         <translation>ボリュームを上げる</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1651"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1650"/>
         <source>M</source>
         <translation>M</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1652"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1651"/>
         <source>Toggle Mute</source>
         <translation>ミュート切換え</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1657"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1656"/>
         <source>L</source>
         <translation>L</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1658"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1657"/>
         <source>Jump to Live</source>
         <translation>ライブ表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1664"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1663"/>
         <source>S</source>
         <translation>S</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1665"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1664"/>
         <source>Synchronize Streams</source>
         <translation>ストレームの同期</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1666"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1665"/>
         <source>Disable Stream Synchronization</source>
         <translation>ストリームの同期無効</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1676"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1675"/>
         <source>Show Thumbnails</source>
         <translation>サムネイル表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1677"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1676"/>
         <source>Hide Thumbnails</source>
         <translation>サムネイル非表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1681"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1680"/>
         <source>Show Calendar</source>
         <translation>カレンダー表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1682"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1681"/>
         <source>Hide Calendar</source>
         <translation>カレンダー非表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1686"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1685"/>
         <source>Show Title Bar</source>
         <translation>タイトルバー表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1687"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1686"/>
         <source>Hide Title Bar</source>
         <translation>タイトルバー非表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1692"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1691"/>
         <source>Pin Tree</source>
         <translation>ツリーを固定で表示する</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1693"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1692"/>
         <source>Unpin Tree</source>
         <translation>ツリーを自動的に隠す</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1698"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1697"/>
         <source>Show Tree</source>
         <translation>ツリーを表示する</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1699"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1698"/>
         <source>Hide Tree</source>
         <translation>ツリーを隠す</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1704"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1703"/>
         <source>Show Timeline</source>
         <translation>タイムラインを表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1705"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1704"/>
         <source>Hide Timeline</source>
         <translation>タイムラインを非表示</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1709"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1708"/>
         <source>Pin Notifications</source>
         <translation>通知を固定表示する</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1710"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1709"/>
         <source>Unpin Notifications</source>
         <translation>通知を固定表示しない</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1714"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1713"/>
         <source>Ctrl+Alt+T</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+Alt+T</translation>
+    </message>
+    <message>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1714"/>
+        <source>Disable Background Animation</source>
+        <translation>アニメーション背景無効</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1715"/>
-        <source>Disable Background Animation</source>
-        <translation type="unfinished"></translation>
+        <source>Enable Background Animation</source>
+        <translation>アニメーション背景有効</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1716"/>
-        <source>Enable Background Animation</source>
-        <translation type="unfinished"></translation>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1722"/>
+        <source>Show Search Panel</source>
+        <translation>検索パネル表示</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1723"/>
-        <source>Show Search Panel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1724"/>
         <source>Hide Search Panel</source>
-        <translation type="unfinished"></translation>
+        <translation>検索パネル非表示</translation>
     </message>
 </context>
 <context>
@@ -3240,12 +3248,12 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/ui/dialogs/attach_to_videowall_dialog.ui" line="14"/>
         <source>Attach to Video Wall...</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオウォールに割当て...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/attach_to_videowall_dialog.ui" line="20"/>
         <source>Preview</source>
-        <translation type="unfinished">プレビュー</translation>
+        <translation>プレビュー</translation>
     </message>
 </context>
 <context>
@@ -3253,12 +3261,12 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/tests/auto_tester.cpp" line="31"/>
         <source>Time to wait before finishing the test, in milliseconds. Default is %1.</source>
-        <translation>テスト終了前の待機時間（ms). 初期値 %1.</translation>
+        <translation>Time to wait before finishing the test, in milliseconds. Default is %1.</translation>
     </message>
     <message>
         <location filename="../src/tests/auto_tester.cpp" line="32"/>
         <source>Substring that must be present in one of the resources.</source>
-        <translation>リソース何れかにサブストリングが必要.</translation>
+        <translation>Substring that must be present in one of the resources.</translation>
     </message>
     <message>
         <location filename="../src/tests/auto_tester.cpp" line="33"/>
@@ -3275,7 +3283,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
         <location filename="../src/tests/auto_tester.cpp" line="89"/>
         <source>Test for resource substring &apos;%1&apos; failed.
 </source>
-        <translation>リソースサブストリングテスト &apos;%1&apos; 失敗.</translation>
+        <translation>Test for resource substring &apos;%1&apos; failed.</translation>
     </message>
 </context>
 <context>
@@ -3298,32 +3306,32 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/ui/dialogs/build_number_dialog.ui" line="14"/>
         <source>Install specific build</source>
-        <translation type="unfinished"></translation>
+        <translation>インストールビルド</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/build_number_dialog.ui" line="22"/>
         <source>Build number:</source>
-        <translation type="unfinished"></translation>
+        <translation>ビルド番号:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/build_number_dialog.ui" line="29"/>
         <source>99990</source>
-        <translation type="unfinished">99990</translation>
+        <translation>99990</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/build_number_dialog.ui" line="39"/>
         <source>Password:</source>
-        <translation type="unfinished">パスワード:</translation>
+        <translation>パスワード:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/build_number_dialog.cpp" line="47"/>
         <source>Error</source>
-        <translation type="unfinished">エラー</translation>
+        <translation>エラー</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/build_number_dialog.cpp" line="47"/>
         <source>The password you have entered is invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>入力したパスワードは無効です</translation>
     </message>
 </context>
 <context>
@@ -3542,8 +3550,8 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="211"/>
         <source>Are you sure you want to reset rules to the defaults?
 This action CANNOT be undone!</source>
-        <translation>ルールを初期設定に戻しますか?
-このアクションは元に戻せません!</translation>
+        <translation>Are you sure you want to reset rules to the defaults?
+This action CANNOT be undone!</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="229"/>
@@ -3745,11 +3753,6 @@ It might take a few moments to populate them in the tree.</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="810"/>
-        <source>Select target server...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="684"/>
         <source>Server went offline, search aborted.</source>
         <translation>サーバーオフライン　検索は異常終了しました.</translation>
@@ -3793,6 +3796,11 @@ It might take a few moments to populate them in the tree.</source>
             <numerusform>%n カメラ検出</numerusform>
         </translation>
     </message>
+    <message>
+        <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="810"/>
+        <source>Select target server...</source>
+        <translation>ターゲットサーバー選択...</translation>
+    </message>
 </context>
 <context>
     <name>QnCameraAdvancedSettingsWidget</name>
@@ -3800,33 +3808,33 @@ It might take a few moments to populate them in the tree.</source>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.cpp" line="51"/>
         <source>Please wait while settings are being loaded.
 This can take a lot of time.</source>
-        <translation type="unfinished"></translation>
+        <translation>設定がロードされるまでお待ちください.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.cpp" line="259"/>
         <source>Applying settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>設定適応...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.cpp" line="341"/>
         <source>Possibly, appropriate camera&apos;s service is unavailable now</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラのサービスが有効でない可能性があります</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.cpp" line="342"/>
         <source>Server returned the following error code : </source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーより次のエラーコードが返されました : </translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.cpp" line="357"/>
         <source>Could not save parameters</source>
-        <translation type="unfinished">パラメーターを保存できません</translation>
+        <translation>パラメーターを保存できません</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.cpp" line="358"/>
         <source>Failed to save the following parameters (%1):
 %2</source>
-        <translation type="unfinished">次のパラメーターを保存できません (%1):
+        <translation>次のパラメーターを保存できません (%1):
 %2</translation>
     </message>
 </context>
@@ -3835,57 +3843,57 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui" line="14"/>
         <source>Bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>ブックマーク</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui" line="25"/>
         <source>&amp;Name</source>
-        <translation type="unfinished"></translation>
+        <translation>名前(&amp;N)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui" line="38"/>
         <source>&amp;Description</source>
-        <translation type="unfinished"></translation>
+        <translation>説明(&amp;D)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui" line="51"/>
         <source>&amp;Timeout</source>
-        <translation type="unfinished"></translation>
+        <translation>タイムアウト(&amp;T)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui" line="64"/>
         <source>T&amp;ags</source>
-        <translation type="unfinished"></translation>
+        <translation>タグ(&amp;a)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui" line="89"/>
         <source>List of tags divided by commas or spaces</source>
-        <translation type="unfinished"></translation>
+        <translation>タグリストはカンマまたはスペースで区切られます</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.cpp" line="70"/>
         <source>Do not lock archive</source>
-        <translation type="unfinished"></translation>
+        <translation>アーカイブを保持しない</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.cpp" line="71"/>
         <source>1 month</source>
-        <translation type="unfinished"></translation>
+        <translation>1ヶ月間</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.cpp" line="72"/>
         <source>3 month</source>
-        <translation type="unfinished"></translation>
+        <translation>3ヶ月間</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.cpp" line="73"/>
         <source>6 month</source>
-        <translation type="unfinished"></translation>
+        <translation>6ヶ月間</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.cpp" line="74"/>
         <source>year</source>
-        <translation type="unfinished"></translation>
+        <translation>年</translation>
     </message>
 </context>
 <context>
@@ -3903,7 +3911,7 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="114"/>
         <source>Checking Server availability</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーをチェック</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="116"/>
@@ -4026,7 +4034,7 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/ui/models/camera_list_model.cpp" line="130"/>
         <source>MAC address</source>
-        <translation type="unfinished"></translation>
+        <translation>MAC アドレス</translation>
     </message>
     <message>
         <location filename="../src/ui/models/camera_list_model.cpp" line="131"/>
@@ -4046,17 +4054,17 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="190"/>
         <source>Maximum number of motion windows for current camera is %1, but %2 motion windows are currently selected.</source>
-        <translation>カメラのモーション画面の最大は %1, ですが %2 のモーション画面を選択しています.</translation>
+        <translation>Maximum number of motion windows for current camera is %1, but %2 motion windows are currently selected.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="199"/>
         <source>Maximum number of different motion sensitivities for current camera is %1, but %2 motion sensitivities are currently selected.</source>
-        <translation>異なる感度のモーション検知の最大は %1, ですが %2 のモーション検知が選択されています.</translation>
+        <translation>Maximum number of different motion sensitivities for current camera is %1, but %2 motion sensitivities are currently selected.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="208"/>
         <source>Maximum number of motion mask windows for current camera is %1, but %2 motion mask windows are currently selected.</source>
-        <translation>モーションマスクの最大は %1, ですが %2 のモーションマスクが選択されています.</translation>
+        <translation>Maximum number of motion mask windows for current camera is %1, but %2 motion mask windows are currently selected.</translation>
     </message>
 </context>
 <context>
@@ -4123,7 +4131,7 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="611"/>
         <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
-        <translation>ソフトウェアモーションでは 2. fps が2番目のストリームで使用されます . 現在のFPS %1. は次の数値になります %2. </translation>
+        <translation>For software motion 2. fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2. </translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="849"/>
@@ -4136,7 +4144,7 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="849"/>
         <source>Motion Recording is disabled or not supported by some of the selected cameras. Please go to the cameras&apos; motion setup page to ensure it is supported and enabled.</source>
-        <translation>モーション録画無効またはサポートされないカメラです　カメラ設定画面で確認してください.</translation>
+        <translation>Motion Recording is disabled or not supported by some of the selected cameras. Please go to the cameras&apos; motion setup page to ensure it is supported and enabled.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="852"/>
@@ -4179,51 +4187,51 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="160"/>
         <source>Camera(s) not Saved</source>
-        <translation type="unfinished">カメラが保存されていません</translation>
+        <translation>カメラが保存されていません</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="161"/>
         <source>Save changes to the following %n camera(s)?</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform> %n カメラの変更を保存しますか?</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="175"/>
         <source>Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.</source>
-        <translation type="unfinished"></translation>
+        <translation>録画設定変更は保存されませんでした　録画タイプ、FPS、画質をスケジュール設定してください.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="176"/>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="185"/>
         <source>Changes are not applied</source>
-        <translation type="unfinished">変更は適用されません</translation>
+        <translation>変更は適用されません</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="184"/>
         <source>Actual motion sensitivity was not changed. To change motion sensitivity draw rectangles on the image.</source>
-        <translation type="unfinished">モーション感度は変更されません　変更するにはイメージ中で四角のエリアを指定してください.</translation>
+        <translation>モーション感度は変更されません　変更するにはイメージ中でエリアを指定してください.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="220"/>
         <source>Licenses limit exceeded. The changes will be saved, but will not take effect.</source>
-        <translation type="unfinished">ライセンスを超過しています　変更は保存されますが適用されません.</translation>
+        <translation>ライセンスを超過しています　変更は保存されますが適用されません.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="221"/>
         <source>Could not apply changes</source>
-        <translation type="unfinished">変更を適用をできません</translation>
+        <translation>変更を適用をできません</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="236"/>
         <source>Error</source>
-        <translation type="unfinished">エラー</translation>
+        <translation>エラー</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="237"/>
         <source>Could not save the following %n cameras to Server.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform> %n カメラの保存ができません.</numerusform>
         </translation>
     </message>
 </context>
@@ -4232,7 +4240,7 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/ui/widgets/properties/camera_settings_widget.cpp" line="22"/>
         <source>Cannot edit properties for items of different types.</source>
-        <translation>アイテムのプロパティが編集できません.</translation>
+        <translation>Cannot edit properties for items of different types.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_settings_widget.cpp" line="26"/>
@@ -4261,12 +4269,12 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/ui/graphics/items/controls/clock_label.cpp" line="92"/>
         <source>Server time</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバー時間</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/clock_label.cpp" line="94"/>
         <source>Local system time</source>
-        <translation type="unfinished"></translation>
+        <translation>ローカルシステム時間</translation>
     </message>
 </context>
 <context>
@@ -4274,12 +4282,12 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/update/connect_to_current_system_tool.cpp" line="61"/>
         <source>Configuring server(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバー構成</translation>
     </message>
     <message>
         <location filename="../src/update/connect_to_current_system_tool.cpp" line="115"/>
         <source>Updating server(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバー更新</translation>
     </message>
 </context>
 <context>
@@ -4287,7 +4295,7 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="68"/>
         <source>Login or password you have entered are incorrect, please try again.</source>
-        <translation type="unfinished">入力したログイン情報は無効です.</translation>
+        <translation>入力したログイン情報は無効です.</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="70"/>
@@ -4295,12 +4303,15 @@ This can take a lot of time.</source>
 Connection details that you have entered are incorrect, please try again.
 
 If this error persists, please contact your VMS administrator.</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーとの通信が確立できません.
+接続設定が間違っています.
+
+解決できない場合は管理者にお問い合わせください.</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="74"/>
         <source>You are trying to connect to incompatible Server.</source>
-        <translation type="unfinished"></translation>
+        <translation>互換性のないサーバーに接続を試みています.</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="81"/>
@@ -4312,17 +4323,17 @@ If this error persists, please contact your VMS administrator.</source>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="210"/>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="235"/>
         <source>Could not connect to Server</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーに接続できません</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="101"/>
         <source>Server</source>
-        <translation type="unfinished">サーバー</translation>
+        <translation>サーバー</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="102"/>
         <source>Client</source>
-        <translation type="unfinished"></translation>
+        <translation>クライアント</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="103"/>
@@ -4330,7 +4341,10 @@ If this error persists, please contact your VMS administrator.</source>
  - Client version: %1.
  - Server version: %2.
 These versions are not compatible. Please update your %3</source>
-        <translation type="unfinished"></translation>
+        <translation>異なったバージョンのサーバーに接続しています:
+ - クライアントバージョン: %1.
+ - サーバーバージョン: %2.
+これらのバージョンとは互換性がありません。　%3 を更新してください </translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="129"/>
@@ -4338,7 +4352,21 @@ These versions are not compatible. Please update your %3</source>
  - Client version: %1.
  - Server version: %2.
 Compatibility mode for versions lower than %3 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation>異なったバージョンのサーバーに接続しています:
+ - クライアントバージョン: %1.
+ - サーバーバージョン: %2.
+バージョン%3 以下のバージョンでは互換性はありません.</translation>
+    </message>
+    <message>
+        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="165"/>
+        <source>Selected Server has a different version:
+ - Client version: %1.
+ - Server version: %2.
+An error has occurred while trying to restart in compatibility mode.</source>
+        <translation>選択したサーバーのバージョンが異なります:
+ - クライアントバージョン: %1.
+ - サーバーバージョン: %2.
+互換性モードで再起動中にエラーが発生しました.</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="145"/>
@@ -4347,20 +4375,15 @@ Compatibility mode for versions lower than %3 is not supported.</source>
  - Client version: %1.
  - Server version: %2.
 The other version of the Client is needed in order to establish the connection to this Server.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="165"/>
-        <source>Selected Server has a different version:
- - Client version: %1.
- - Server version: %2.
-An error has occurred while trying to restart in compatibility mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>選択したサーバーのバージョンが異なります:
+ - クライアントバージョン: %1.
+ - サーバーバージョン: %2.
+サーバーとの接続には他のバージョンのクライアントが必要です.</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="196"/>
         <source>Could not connect to Enterprise Controller</source>
-        <translation type="unfinished">エンタープライズコントローラーに接続できません</translation>
+        <translation>エンタープライズコントローラーに接続できません</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="197"/>
@@ -4368,7 +4391,10 @@ An error has occurred while trying to restart in compatibility mode.</source>
  - Client version: %1.
  - EC version: %2.
 You need to download client %3 to connect</source>
-        <translation type="unfinished"></translation>
+        <translation>選択したエンタープライズコントローラーのバージョンが異なります:
+ - クライアントバージョン: %1.
+ - EC バージョン: %2.
+接続するにはバージョン %3 をダウンロードしてください</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="211"/>
@@ -4377,7 +4403,11 @@ You need to download client %3 to connect</source>
  - Server version: %2.
 Client version %3 is required to connect to this Server.
 Download version %3?</source>
-        <translation type="unfinished"></translation>
+        <translation>異なるバージョンのサーバーに接続しています:
+ - クライアントバージョン: %1.
+ - サーバーバージョン: %2.
+サーバーとの接続にはクライアントバージョン %3 が必要です.
+バージョン %3　をダウンロードしますか?</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="236"/>
@@ -4385,29 +4415,34 @@ Download version %3?</source>
  - Client version: %1.
  - Server version: %2.
 Would you like to restart the Client in compatibility mode?</source>
-        <translation type="unfinished"></translation>
+        <translation>異なるバージョンのサーバーに接続しています:
+ - クライアントバージョン: %1.
+ - サーバーバージョン: %2.
+クライアントを互換性モードで再起動しますか?</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="255"/>
         <source>Launcher process is not found</source>
-        <translation type="unfinished">起動プロセスが見つかりません</translation>
+        <translation>起動プロセスが見つかりません</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="256"/>
         <source>Cannot restart the Client in compatibility mode.
 Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>互換性モードでクライアントを再起動できませんでした.
+プログラムを停止して、再度スタートメニューより起動してください.</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="267"/>
         <source>Failure</source>
-        <translation type="unfinished">エラー</translation>
+        <translation>エラー</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="268"/>
         <source>Failed to launch compatibility version %1
 Try to restore version %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>バージョン %1 起動エラー
+バージョン %1 に戻しますか?</translation>
     </message>
 </context>
 <context>
@@ -4428,12 +4463,15 @@ Try to restore version %1?</source>
 Connection details that you have entered are incorrect, please try again.
 
 If this error persists, please contact your VMS administrator.</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーとの通信を確立できません.
+接続設定が間違っています.
+
+解決できない場合は管理者にお問合せ下さい.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="117"/>
         <source>You are trying to connect to incompatible Server.</source>
-        <translation type="unfinished"></translation>
+        <translation>互換性のサーバーに接続を試みています.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="123"/>
@@ -4441,7 +4479,10 @@ If this error persists, please contact your VMS administrator.</source>
  - Client version: %1.
  - Server version: %2.
 Compatibility mode for versions lower than %3 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation>異なるバージョン:
+ - クライアントバージョン: %1.
+ - サーバーバージョン: %2.
+バージョン %3 以下のバージョンでは互換性がありません.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="133"/>
@@ -4449,17 +4490,20 @@ Compatibility mode for versions lower than %3 is not supported.</source>
  - Client version: %1.
  - Server version: %2.
 You will be asked to restart the client in compatibility mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>異なるバージョン:
+ - クライアントバージョン: %1.
+ - サーバーバージョン: %2.
+互換性モードで再起動を行ってください.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="144"/>
         <source>Server</source>
-        <translation type="unfinished">サーバー</translation>
+        <translation>サーバー</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="145"/>
         <source>Client</source>
-        <translation type="unfinished"></translation>
+        <translation>クライアント</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="146"/>
@@ -4467,7 +4511,10 @@ You will be asked to restart the client in compatibility mode.</source>
  - Client version: %1.
  - Server version: %2.
 These versions are not compatible. Please update your %3</source>
-        <translation type="unfinished"></translation>
+        <translation>異なるバージョン:
+ - クライアントバージョン: %1.
+ - サーバーバージョン: %2.
+このバージョンは互換性がありません　 %3 を更新してください</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="158"/>
@@ -4485,17 +4532,17 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/dialogs/credentials_dialog.ui" line="14"/>
         <source>Enter user name and password...</source>
-        <translation type="unfinished"></translation>
+        <translation>名前とパスワード入力...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/credentials_dialog.ui" line="20"/>
         <source>User:</source>
-        <translation type="unfinished">ﾕｰｻﾞｰ:</translation>
+        <translation>ﾕｰｻﾞｰ:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/credentials_dialog.ui" line="30"/>
         <source>Password:</source>
-        <translation type="unfinished">パスワード:</translation>
+        <translation>パスワード:</translation>
     </message>
 </context>
 <context>
@@ -4503,7 +4550,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="34"/>
         <source>You can create a backup for system configurations that can be restored in case of failure.</source>
-        <translation type="unfinished">障害が起きる前にリストア可能なバックアップを作成できます.</translation>
+        <translation>障害が起きる前にリストア可能なバックアップを作成できます.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="50"/>
@@ -4514,7 +4561,7 @@ These versions are not compatible. Please update your %3</source>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="52"/>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="109"/>
         <source>Database Backup Files (*.db)</source>
-        <translation>バックアップファイル (*.db)</translation>
+        <translation>Database Backup Files (*.db)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="70"/>
@@ -4549,7 +4596,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="98"/>
         <source>Failed to dump Server database to &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーデータベースを &apos;%1&apos; にダンプ失敗</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="105"/>
@@ -4589,17 +4636,17 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="153"/>
         <source>You need to connect to a server before doing backup</source>
-        <translation type="unfinished"></translation>
+        <translation>バックアップ前にサーバーに接続してくだだい</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="165"/>
         <source>Database was successfully restored from file &apos;%1&apos;. Media server will be restarted.</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル &apos;%1&apos;.より正常にリストアされました　メディアサーバーは再起動を行います.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="169"/>
         <source>An error has occurred while restoring the database from file &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル &apos;%1&apos;. のリストア中にエラーが発生しました.</translation>
     </message>
 </context>
 <context>
@@ -4713,7 +4760,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="99"/>
         <source>Filter Similar Rows</source>
-        <translation>同様な列にフィルター</translation>
+        <translation>Filter Similar Rows</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="101"/>
@@ -4739,7 +4786,7 @@ These versions are not compatible. Please update your %3</source>
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="360"/>
         <source>Event log for period from %1 to %2 - %n event(s) found</source>
         <translation>
-            <numerusform> %1 ～ %2 - %n イベント検出</numerusform>
+            <numerusform>Event log for period from %1 to %2 - %n event(s) found</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -4783,7 +4830,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/models/event_log_model.cpp" line="419"/>
         <source> (%1 times)</source>
-        <translation> (%1 時間)</translation>
+        <translation> (%1 回)</translation>
     </message>
     <message>
         <location filename="../src/ui/models/event_log_model.cpp" line="481"/>
@@ -4831,7 +4878,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="64"/>
         <source>Copy archive length settings</source>
-        <translation type="unfinished"></translation>
+        <translation>アーカイブ設定のコピー</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="71"/>
@@ -4854,7 +4901,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/widgets/fisheye/fisheye_calibration_widget.cpp" line="30"/>
         <source>Loading preview, please wait...</source>
-        <translation type="unfinished"></translation>
+        <translation>ローディング中　お待ちください...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/fisheye/fisheye_calibration_widget.cpp" line="152"/>
@@ -4865,12 +4912,12 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/widgets/fisheye/fisheye_calibration_widget.cpp" line="152"/>
         <source>Auto calibration failed. Image is not round.</source>
-        <translation type="unfinished"></translation>
+        <translation>自動キャリブレーションエラー.　イメージは円ではありません.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/fisheye/fisheye_calibration_widget.cpp" line="155"/>
         <source>Auto calibration failed. The image might be too dim.</source>
-        <translation type="unfinished"></translation>
+        <translation>自動キャリブレーションエラー　イメージが薄暗すぎます.</translation>
     </message>
 </context>
 <context>
@@ -4907,18 +4954,18 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/dialogs/generic_tabbed_dialog.cpp" line="155"/>
         <source>* %1</source>
-        <translation type="unfinished"></translation>
+        <translation>* %1</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/generic_tabbed_dialog.cpp" line="158"/>
         <source>Confirm exit</source>
-        <translation type="unfinished">確認して終了</translation>
+        <translation>確認して終了</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/generic_tabbed_dialog.cpp" line="159"/>
         <source>Unsaved changes will be lost. Save the following pages?
 </source>
-        <translation type="unfinished"></translation>
+        <translation>保存していない変更は反映されません　保存しますか?</translation>
     </message>
 </context>
 <context>
@@ -4998,12 +5045,12 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/workbench/extensions/workbench_layout_export_tool.cpp" line="93"/>
         <source>Could not create output file %1</source>
-        <translation type="unfinished">出力ファイルを作成できません %1</translation>
+        <translation>出力ファイルを作成できません %1</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/extensions/workbench_layout_export_tool.cpp" line="329"/>
         <source>Exporting to &quot;%2&quot;...</source>
-        <translation type="unfinished">エクスポート中 &quot;%1&quot;... {2&quot;?}</translation>
+        <translation>&quot;%2&quot;にエクスポート中...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/extensions/workbench_layout_export_tool.cpp" line="382"/>
@@ -5032,7 +5079,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="506"/>
         <source>Select file...</source>
-        <translation type="unfinished">ファイル選択...</translation>
+        <translation>ファイル選択...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="508"/>
@@ -5046,49 +5093,49 @@ These versions are not compatible. Please update your %3</source>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="26"/>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="60"/>
         <source>Screens Allowed:</source>
-        <translation type="unfinished"></translation>
+        <translation>許可スクリーン:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="27"/>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="61"/>
         <source>Control Sessions Allowed:</source>
-        <translation type="unfinished"></translation>
+        <translation>コントロールセッション許可:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="29"/>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="63"/>
         <source>Archive Streams Allowed:</source>
-        <translation type="unfinished"></translation>
+        <translation>アーカイブストリーム許可:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="35"/>
         <source>Copy to Clipboard</source>
-        <translation type="unfinished">クリップボードにコピー</translation>
+        <translation>クリップボードにコピー</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="53"/>
         <source>Generic:</source>
-        <translation type="unfinished"></translation>
+        <translation>一般:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="54"/>
         <source>License Type</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスタイプ</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="55"/>
         <source>License Key</source>
-        <translation type="unfinished">ライセンスキー</translation>
+        <translation>ライセンスキー</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="56"/>
         <source>Locked to Hardware ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ハードウェアID</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="58"/>
         <source>Features:</source>
-        <translation type="unfinished"></translation>
+        <translation>機能:</translation>
     </message>
 </context>
 <context>
@@ -5111,17 +5158,17 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/models/license_list_model.cpp" line="68"/>
         <source>Amount</source>
-        <translation type="unfinished"></translation>
+        <translation>合計</translation>
     </message>
     <message>
         <location filename="../src/ui/models/license_list_model.cpp" line="71"/>
         <source>Status</source>
-        <translation type="unfinished"></translation>
+        <translation>ステータス</translation>
     </message>
     <message>
         <location filename="../src/ui/models/license_list_model.cpp" line="72"/>
         <source>Server</source>
-        <translation type="unfinished">サーバー</translation>
+        <translation>サーバー</translation>
     </message>
     <message>
         <location filename="../src/ui/models/license_list_model.cpp" line="97"/>
@@ -5153,12 +5200,12 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/models/license_list_model.cpp" line="127"/>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../src/ui/models/license_list_model.cpp" line="142"/>
         <source>&lt;Server not found&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Server not found&gt;</translation>
     </message>
 </context>
 <context>
@@ -5166,51 +5213,54 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="114"/>
         <source>The software is licensed to: </source>
-        <translation type="unfinished"></translation>
+        <translation>ソフトウェアライセンス: </translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="125"/>
         <source>
 %1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>
+%1 %2</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="135"/>
         <source>
 At least %n %2 are required</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>最低でも %n %2 が必要</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="141"/>
         <source>
 %n %2 are currently in use</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n %2  が使用されています</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="148"/>
         <source>Obtaining licenses from Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーからライセンス取得...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="152"/>
         <source>You do not have a valid license installed.
 Please activate your commercial or trial license.</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスがインストールされていません.
+正規ライセンスまたはトライアルライセンスをアクティベートしてください.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="153"/>
         <source>You do not have a valid license installed.
 Please activate your commercial license.</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスがインストールされていません.
+正規ライセンスをアクティベートしてください.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="172"/>
         <source>Copy to Clipboard</source>
-        <translation type="unfinished">クリップボードにコピー</translation>
+        <translation>クリップボードにコピー</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="188"/>
@@ -5226,52 +5276,52 @@ Please activate your commercial license.</source>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="285"/>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="477"/>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation>無効なライセンスキーをアクティベートしようとしています.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="328"/>
         <source>There was a problem activating your license key. Network error has occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスのアクティベート中にネットワークエラーが発生しました.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="351"/>
         <source>License Activation </source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスアクティベート</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="352"/>
         <source>Network error has occurred during automatic license activation. Please contact support team to activate your license key manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスの自動アクティベーション中にネットワークエラーが発生しました.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="393"/>
         <source>License activation</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンスアクティベーション</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="393"/>
         <source>Can&apos;t activate license:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンス %1 をアクティベートできません</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="446"/>
         <source>Remove license</source>
-        <translation type="unfinished"></translation>
+        <translation>ライセンス削除</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="446"/>
         <source>Can&apos;t remove license from server:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバー %1 からライセンスを削除できません</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="468"/>
         <source>The manual activation key file you have selected is invalid. Select correct manual activation key file. If problem continues, please contact support team.</source>
-        <translation type="unfinished"></translation>
+        <translation>選択したマニュアルアクティベーションキーは無効です.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="472"/>
         <source>This license key has been previously activated to hardware id %1. Please contact support team to get a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation>このライセンスキーはハードウェアID %1. で既に使用されています.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="290"/>
@@ -5296,7 +5346,7 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/dialogs/license_notification_dialog.cpp" line="41"/>
         <source>Some of your licenses are unavailable.</source>
-        <translation type="unfinished"></translation>
+        <translation>幾つかのライセンスは有効ではありません.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_notification_dialog.cpp" line="43"/>
@@ -5319,17 +5369,17 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="42"/>
         <source>Please send email with the Serial Key and the Hardware ID provided to &lt;a href=&quot;mailto:%1&quot;&gt;%1&lt;/a&gt;. Then we&apos;ll send you an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation>シリアルキーおよびハードウェアID &lt;a href=&quot;mailto:%1&quot;&gt;%1&lt;/a&gt;をEmailで送信してください　アクティベーションキーが後で返信されます.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="65"/>
         <source>Success</source>
-        <translation type="unfinished">成功</translation>
+        <translation>成功</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="65"/>
         <source>Hardware ID copied to clipboard.</source>
-        <translation type="unfinished"></translation>
+        <translation>クリップボードにハードウェアIDをコピー.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="136"/>
@@ -5354,12 +5404,12 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="178"/>
         <source>Error</source>
-        <translation type="unfinished">エラー</translation>
+        <translation>エラー</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="178"/>
         <source>Could not open the file %1</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル %1 を開けません</translation>
     </message>
 </context>
 <context>
@@ -5397,17 +5447,17 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="82"/>
         <source>Connect to Server...</source>
-        <translation type="unfinished">サーバーに接続....</translation>
+        <translation>サーバーに接続....</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="89"/>
         <source>Version %1</source>
-        <translation type="unfinished"></translation>
+        <translation>バージョン %1</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="123"/>
         <source>Auto-Discovered Servers</source>
-        <translation type="unfinished"></translation>
+        <translation>自動検索されたサーバー</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="400"/>
@@ -5459,72 +5509,72 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="180"/>
         <source>Select file...</source>
-        <translation type="unfinished">ファイル選択...</translation>
+        <translation>ファイル選択...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="182"/>
         <source>Pictures %1</source>
-        <translation type="unfinished">ピクチャ %1</translation>
+        <translation>ピクチャ %1</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="201"/>
         <source>Preparing Image...</source>
-        <translation type="unfinished"></translation>
+        <translation>イメージ準備...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="202"/>
         <source>Please wait while image is being prepared...</source>
-        <translation type="unfinished"></translation>
+        <translation>イメージが準備されるまでお待ちください...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="238"/>
         <source>Dark</source>
-        <translation type="unfinished">暗い</translation>
+        <translation>暗い</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="239"/>
         <source>Light</source>
-        <translation type="unfinished">明るい</translation>
+        <translation>明るい</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="249"/>
         <source>Server Time</source>
-        <translation type="unfinished">サーバー時間</translation>
+        <translation>サーバー時間</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="250"/>
         <source>Client Time</source>
-        <translation type="unfinished">クライアント時間</translation>
+        <translation>クライアント時間</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="260"/>
         <source>Default</source>
-        <translation type="unfinished"></translation>
+        <translation>初期設定</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="261"/>
         <source>Rainbow</source>
-        <translation type="unfinished"></translation>
+        <translation>レインボー</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="262"/>
         <source>Custom...</source>
-        <translation type="unfinished">カスタム...</translation>
+        <translation>カスタム...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="264"/>
         <source>Stretch</source>
-        <translation type="unfinished"></translation>
+        <translation>モニターサイズに合す</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="265"/>
         <source>Fit</source>
-        <translation type="unfinished"></translation>
+        <translation>縦に合す</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="266"/>
         <source>Crop</source>
-        <translation type="unfinished"></translation>
+        <translation>横に合す</translation>
     </message>
 </context>
 <context>
@@ -5547,7 +5597,7 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="209"/>
         <source>Dewarping</source>
-        <translation>歪み補正</translation>
+        <translation>Dewarping</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="218"/>
@@ -5567,17 +5617,17 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="902"/>
         <source>Lo-Res</source>
-        <translation type="unfinished"></translation>
+        <translation>低解像度</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="902"/>
         <source>Hi-Res</source>
-        <translation type="unfinished"></translation>
+        <translation>高解像度</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="925"/>
         <source>%1x%2 %3fps @ %4Mbps%5 %6	%7</source>
-        <translation type="unfinished">%1x%2 %3fps @ %4Mbps%5 %6	%7 {1x?} {2 %3f?} {4M?}</translation>
+        <translation>%1x%2 %3fps @ %4Mbps%5 %6	%7</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="919"/>
@@ -5595,27 +5645,27 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.ui" line="14"/>
         <source>Merge Systems...</source>
-        <translation type="unfinished"></translation>
+        <translation>システム統合...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.ui" line="55"/>
         <source>Server URL:</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバー URL:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.ui" line="85"/>
         <source>Password:</source>
-        <translation type="unfinished">パスワード:</translation>
+        <translation>パスワード:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.ui" line="94"/>
         <source>Find System</source>
-        <translation type="unfinished"></translation>
+        <translation>システム検索</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.ui" line="142"/>
         <source>The new system will have password and name from the system:</source>
-        <translation type="unfinished"></translation>
+        <translation>新規システムには既存システムより名前とパスワードが引継がれます:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.ui" line="193"/>
@@ -5623,94 +5673,97 @@ Try to activate your license manually.</source>
 
 The system was configured successfully.
 The servers from the remote system should appear in your system soon.</source>
-        <translation type="unfinished"></translation>
+        <translation>成功!
+
+システムは正常に構成されました.
+このシステムに表示されるようになります.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="23"/>
         <source>http(s)://host:port</source>
-        <translation type="unfinished"></translation>
+        <translation>http(s)://host:port</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="82"/>
         <source>You are about to merge the current system %1 with the system</source>
-        <translation type="unfinished"></translation>
+        <translation>システム %1 との統合</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="83"/>
         <source>%1 (current)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (現在)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="123"/>
         <source>The URL is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>無効なURL.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="129"/>
         <source>The password cannot be empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワードを入力してください.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="138"/>
         <source>testing...</source>
-        <translation type="unfinished"></translation>
+        <translation>テスト中...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="151"/>
         <source>merging systems...</source>
-        <translation type="unfinished"></translation>
+        <translation>システム統合...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="162"/>
         <source>Use a specific hostname or IP address rather than %1.</source>
-        <translation type="unfinished"></translation>
+        <translation> %1.よりも具体的なホスト名またはIPアドレスを使用してください.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="164"/>
         <source>This is the current system URL.</source>
-        <translation type="unfinished"></translation>
+        <translation>既存のシステムURL.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="169"/>
         <source>Merge with %1</source>
-        <translation type="unfinished"></translation>
+        <translation> %1 と統合</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="176"/>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="204"/>
         <source>The password is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>無効なパスワード.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="179"/>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="207"/>
         <source>The found system %1 has an incompatible version %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>検索されたシステム %1 は互換性のバージョン %2.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="182"/>
         <source>The system was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>システムは検出されませんでした.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="210"/>
         <source>Could not create a backup of the server database.</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーデータベースのバックアップができませんでした.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="213"/>
         <source>System was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>システムは検出されませんでした.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="222"/>
         <source>Error</source>
-        <translation type="unfinished">エラー</translation>
+        <translation>エラー</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="222"/>
         <source>Cannot merge systems.</source>
-        <translation type="unfinished"></translation>
+        <translation>システム統合できません.</translation>
     </message>
 </context>
 <context>
@@ -5733,32 +5786,32 @@ The servers from the remote system should appear in your system soon.</source>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="102"/>
         <source>0 degrees</source>
-        <translation type="unfinished">0 度</translation>
+        <translation>0 度</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="103"/>
         <source>90 degrees</source>
-        <translation type="unfinished">90 度</translation>
+        <translation>90 度</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="104"/>
         <source>180 degrees</source>
-        <translation type="unfinished">180 度</translation>
+        <translation>180 度</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="105"/>
         <source>270 degrees</source>
-        <translation type="unfinished">270 度</translation>
+        <translation>270 度</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="284"/>
         <source>Invalid schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>無効なスケジュール</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="285"/>
         <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラの2番目のストリームが有効ではありません　モーション+常時低解像度は適応されません　常時録画に変更するか2番目のストリームを有効に変更してください.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="460"/>
@@ -5994,7 +6047,7 @@ The servers from the remote system should appear in your system soon.</source>
     <message>
         <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="439"/>
         <source>SMTP Settin gs</source>
-        <translation type="unfinished"></translation>
+        <translation>SMTP設定</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="475"/>
@@ -6053,7 +6106,7 @@ The servers from the remote system should appear in your system soon.</source>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="30"/>
         <source>Look and Feel</source>
-        <translation type="unfinished"></translation>
+        <translation>表示</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="33"/>
@@ -6063,7 +6116,7 @@ The servers from the remote system should appear in your system soon.</source>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="75"/>
         <source>Some changes will take effect only after application restart. Do you want to restart the application now?</source>
-        <translation type="unfinished">変更した内容は再起動後に有効になります　再起動を行いますか?</translation>
+        <translation>変更した内容は再起動後に有効になります　再起動を行いますか?</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="43"/>
@@ -6082,7 +6135,7 @@ All changes will be lost after program exit.</translation>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="74"/>
         <source>Information</source>
-        <translation type="unfinished">情報</translation>
+        <translation>情報</translation>
     </message>
 </context>
 <context>
@@ -6276,22 +6329,22 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/delegates/ptz_preset_hotkey_item_delegate.cpp" line="102"/>
         <source>This hotkey is used by preset &quot;%1&quot;</source>
-        <translation type="unfinished">ホットキーはプリセット%1で使用されています</translation>
+        <translation>ホットキーはプリセット%1で使用されています</translation>
     </message>
     <message>
         <location filename="../src/ui/delegates/ptz_preset_hotkey_item_delegate.cpp" line="103"/>
         <source>This hotkey is used by tour &quot;%1&quot;</source>
-        <translation type="unfinished">ホットキーはツアー%1で使用されています</translation>
+        <translation>ホットキーはツアー%1で使用されています</translation>
     </message>
     <message>
         <location filename="../src/ui/delegates/ptz_preset_hotkey_item_delegate.cpp" line="105"/>
         <source>Change hotkey</source>
-        <translation type="unfinished">ホットキー変更</translation>
+        <translation>ホットキー変更</translation>
     </message>
     <message>
         <location filename="../src/ui/delegates/ptz_preset_hotkey_item_delegate.cpp" line="106"/>
         <source>Reassign</source>
-        <translation type="unfinished">再割当て</translation>
+        <translation>再割当て</translation>
     </message>
 </context>
 <context>
@@ -6374,7 +6427,7 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/dialogs/reconnect_info_dialog.cpp" line="33"/>
         <source>Canceling...</source>
-        <translation type="unfinished"></translation>
+        <translation>キャンセル...</translation>
     </message>
 </context>
 <context>
@@ -6462,33 +6515,33 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/models/resource_pool_model_node.cpp" line="46"/>
         <source>Root</source>
-        <translation type="unfinished">Root</translation>
+        <translation>ルート</translation>
     </message>
     <message>
         <location filename="../src/ui/models/resource_pool_model_node.cpp" line="49"/>
         <source>Local</source>
-        <translation type="unfinished">ローカル</translation>
+        <translation>ローカル</translation>
     </message>
     <message>
         <location filename="../src/ui/models/resource_pool_model_node.cpp" line="53"/>
         <source>System</source>
-        <translation type="unfinished">システム</translation>
+        <translation>システム</translation>
     </message>
     <message>
         <location filename="../src/ui/models/resource_pool_model_node.cpp" line="57"/>
         <source>Other Systems</source>
-        <translation type="unfinished"></translation>
+        <translation>他システム</translation>
     </message>
     <message>
         <location filename="../src/ui/models/resource_pool_model_node.cpp" line="62"/>
         <source>Users</source>
-        <translation type="unfinished">ユーザー</translation>
+        <translation>ユーザー</translation>
     </message>
     <message>
         <location filename="../src/ui/models/resource_pool_model_node.cpp" line="217"/>
         <source>%1&apos;s Screen</source>
         <comment>%1 means user&apos;s name</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1&apos; スクリーン</translation>
     </message>
 </context>
 <context>
@@ -6531,17 +6584,17 @@ These tours will become invalid if you remove it.</source>
 <context>
     <name>QnResourceWidget</name>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="144"/>
+        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="142"/>
         <source>Close</source>
         <translation>閉じる</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="153"/>
+        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="150"/>
         <source>Information</source>
         <translation>情報</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="159"/>
+        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="156"/>
         <source>Rotate</source>
         <translation>回転</translation>
     </message>
@@ -6551,52 +6604,52 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.ui" line="17"/>
         <source>Available Server Addresses</source>
-        <translation type="unfinished"></translation>
+        <translation>選択可能なサーバーアドレス</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.ui" line="40"/>
         <source>Add URL</source>
-        <translation type="unfinished"></translation>
+        <translation>URL追加</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.ui" line="57"/>
         <source>Remove</source>
-        <translation type="unfinished">削除</translation>
+        <translation>削除</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.ui" line="91"/>
         <source>Removing this connection option could lead to system malfunction.</source>
-        <translation type="unfinished"></translation>
+        <translation>この接続オプションを削除するとシステム誤動作の可能性があります.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.cpp" line="313"/>
         <source>Enter URL</source>
-        <translation type="unfinished"></translation>
+        <translation>URL入力</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.cpp" line="313"/>
         <source>URL</source>
-        <translation type="unfinished">URL</translation>
+        <translation>URL</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.cpp" line="395"/>
         <source>Error</source>
-        <translation type="unfinished">エラー</translation>
+        <translation>エラー</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.cpp" line="395"/>
         <source>You have entered an invalid URL.</source>
-        <translation type="unfinished"></translation>
+        <translation>入力したURLは無効です.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.cpp" line="398"/>
         <source>Warning</source>
-        <translation type="unfinished">警告</translation>
+        <translation>警告</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.cpp" line="398"/>
         <source>This URL is already in the address list.</source>
-        <translation type="unfinished"></translation>
+        <translation>このURLは既にアドレスリストにあります.</translation>
     </message>
 </context>
 <context>
@@ -6612,17 +6665,17 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/widgets/search_line_edit.cpp" line="135"/>
         <source>Search</source>
-        <translation type="unfinished">検索</translation>
+        <translation>検索</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/search_line_edit.cpp" line="139"/>
         <source>Previous</source>
-        <translation type="unfinished"></translation>
+        <translation>前</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/search_line_edit.cpp" line="143"/>
         <source>Next</source>
-        <translation type="unfinished"></translation>
+        <translation>次</translation>
     </message>
 </context>
 <context>
@@ -6630,12 +6683,12 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/models/server_addresses_model.cpp" line="213"/>
         <source>Address</source>
-        <translation type="unfinished">アドレス</translation>
+        <translation>アドレス</translation>
     </message>
     <message>
         <location filename="../src/ui/models/server_addresses_model.cpp" line="215"/>
         <source>In Use</source>
-        <translation type="unfinished">使用</translation>
+        <translation>使用</translation>
     </message>
 </context>
 <context>
@@ -6653,14 +6706,14 @@ These tours will become invalid if you remove it.</source>
     <message numerus="yes">
         <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="754"/>
         <source>%1 (up %n days, %2)</source>
-        <translation type="unfinished">
-            <numerusform>%1 %2 (最大 %n 日, %3) {1 ?} {2)?}</numerusform>
+        <translation>
+            <numerusform>%1 (最大 %n 日, %2)</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="758"/>
         <source>%1</source>
-        <translation type="unfinished">%1% {1?}</translation>
+        <translation>%1</translation>
     </message>
 </context>
 <context>
@@ -6673,7 +6726,7 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="169"/>
         <source>Open Web Page...</source>
-        <translation type="unfinished"></translation>
+        <translation>ウェブページを開く...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="223"/>
@@ -6698,12 +6751,12 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="530"/>
         <source>Rebuild archive index</source>
-        <translation type="unfinished">アーカイブインデックスのリビルド</translation>
+        <translation>アーカイブインデックスのリビルド</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="532"/>
         <source>Fast initial scan in progress</source>
-        <translation type="unfinished"></translation>
+        <translation>イニシャルスキャン処理中</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="541"/>
@@ -6718,17 +6771,17 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="554"/>
         <source>At least two servers are required for this feature.</source>
-        <translation type="unfinished"></translation>
+        <translation>この機能には最低2台のサーバーが必要です.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="557"/>
         <source>This server already has more than max cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>このサーバーには既に最大のカメラが登録されています</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="560"/>
         <source>To avoid malfunction adjust max number of cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラ誤動作を回避する</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="605"/>
@@ -6746,12 +6799,12 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/models/server_updates_model.cpp" line="122"/>
         <source>Server</source>
-        <translation type="unfinished">サーバー</translation>
+        <translation>サーバー</translation>
     </message>
     <message>
         <location filename="../src/ui/models/server_updates_model.cpp" line="124"/>
         <source>Status</source>
-        <translation type="unfinished"></translation>
+        <translation>ステータス</translation>
     </message>
 </context>
 <context>
@@ -6759,201 +6812,203 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="60"/>
         <source>Cannot check updates via the internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>インターネット経由で確認できません.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="209"/>
         <source>Available version:</source>
-        <translation type="unfinished"></translation>
+        <translation>有効なバージョン:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="222"/>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>不明</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="229"/>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="397"/>
         <source>Update</source>
-        <translation type="unfinished"></translation>
+        <translation>更新</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="236"/>
         <source>&lt;a href=&apos;notes&apos;&gt;release notes&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;a href=&apos;notes&apos;&gt;リリースノート&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="282"/>
         <source>Update from file:</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルから更新:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="303"/>
         <source>Archive url:</source>
-        <translation type="unfinished"></translation>
+        <translation>アーカイブURL:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="310"/>
         <source>Copy to Clipboard</source>
-        <translation type="unfinished">クリップボードにコピー</translation>
+        <translation>クリップボードにコピー</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="320"/>
         <source>To update manually, download an archive with the following link:</source>
-        <translation type="unfinished"></translation>
+        <translation>マニュアル更新を行うには次のリンクよりアーカイブをダウンロード:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="354"/>
         <source>...</source>
-        <translation type="unfinished">...</translation>
+        <translation>...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="444"/>
         <source>&lt;a href=&apos;spec&apos;&gt;I want specific build&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;a href=&apos;spec&apos;&gt;既存ビルド&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="451"/>
         <source>&lt;a href=&apos;latest&apos;&gt;I want latest version&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;a href=&apos;latest&apos;&gt;最新バージョン&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="477"/>
         <source>Cancel</source>
-        <translation type="unfinished">キャンセル</translation>
+        <translation>キャンセル</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="501"/>
         <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
-        <translation type="unfinished"></translation>
+        <translation>通常より時間を要しますがお待ちください.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="90"/>
         <source>Select Update File...</source>
-        <translation type="unfinished"></translation>
+        <translation>更新ファイル選択...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="91"/>
         <source>Update Files (*.zip)</source>
-        <translation type="unfinished"></translation>
+        <translation>更新ファイル (*.zip)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="109"/>
         <source>As a general rule for the sake of better support, we do not recommend to make system updates at the end of the week.</source>
-        <translation type="unfinished"></translation>
+        <translation>今週末まで更新は推奨されません.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="156"/>
         <source>Update from Internet...</source>
-        <translation type="unfinished"></translation>
+        <translation>インターネット経由で更新...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="157"/>
         <source>Update from local source...</source>
-        <translation type="unfinished"></translation>
+        <translation>ローカルソースより更新...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="166"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="185"/>
         <source>Update from Internet</source>
-        <translation type="unfinished"></translation>
+        <translation>インターネット経由で更新</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="194"/>
         <source>Update from local source</source>
-        <translation type="unfinished"></translation>
+        <translation>ローカルソースより更新</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="202"/>
         <source>Success</source>
-        <translation type="unfinished">成功</translation>
+        <translation>成功</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="202"/>
         <source>URL copied to clipboard.</source>
-        <translation type="unfinished"></translation>
+        <translation>URLをクリップボードにコピー.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="226"/>
         <source>Latest version:</source>
-        <translation type="unfinished"></translation>
+        <translation>最新バージョン:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="244"/>
         <source>Target version:</source>
-        <translation type="unfinished"></translation>
+        <translation>ターゲットバージョン:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="273"/>
         <source>Information</source>
-        <translation type="unfinished">情報</translation>
+        <translation>情報</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="273"/>
         <source>Update is in process now.</source>
-        <translation type="unfinished"></translation>
+        <translation>更新プロセス中.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="282"/>
         <source>Error</source>
-        <translation type="unfinished">エラー</translation>
+        <translation>エラー</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="282"/>
         <source>Cannot cancel update at this state.
 Please wait until update is finished</source>
-        <translation type="unfinished"></translation>
+        <translation>この段階では更新をキャンセルできません.
+更新が終了するまでお待ちください</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="291"/>
         <source>Update finished... 100%</source>
-        <translation type="unfinished"></translation>
+        <translation>更新終了... 100%</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="297"/>
         <source>Update has been successfully finished.</source>
-        <translation type="unfinished"></translation>
+        <translation>更新は正常に終了しました.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="305"/>
         <source>Now you have to update the client manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>クライアントをマニュアルで更新してください.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="307"/>
         <source>Now you have to update the client manually using an installer.</source>
-        <translation type="unfinished"></translation>
+        <translation>クライアントをマニュアルで更新してください.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="310"/>
         <source>The client will be restarted to the updated version.</source>
-        <translation type="unfinished"></translation>
+        <translation>クライアントは更新後、再起動を行います.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="314"/>
         <source>Update is successful</source>
-        <translation type="unfinished"></translation>
+        <translation>更新は正常に終了</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="321"/>
         <source>Launcher process is not found</source>
-        <translation type="unfinished">起動プロセスが見つかりません</translation>
+        <translation>起動プロセスが見つかりません</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="322"/>
         <source>Cannot restart the client.
 Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>クライアントの再起動ができません.
+アプリケーションを閉じて再度起動して下さい.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="335"/>
         <source>Update cancelled</source>
-        <translation type="unfinished"></translation>
+        <translation>更新キャンセル</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="335"/>
         <source>Update has been cancelled.</source>
-        <translation type="unfinished"></translation>
+        <translation>更新はキャンセルされました.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="338"/>
@@ -6966,24 +7021,24 @@ Please close the application and start it again using the shortcut in the start 
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="382"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="386"/>
         <source>Update failed</source>
-        <translation type="unfinished"></translation>
+        <translation>更新エラー</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="338"/>
         <source>Someone has already started an update.</source>
-        <translation type="unfinished"></translation>
+        <translation>既に更新が開始されています.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="341"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="344"/>
         <source>Could not download updates.</source>
-        <translation type="unfinished"></translation>
+        <translation>更新ファイルがダウンロードされません.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="344"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="542"/>
         <source>No free space left on the disk.</source>
-        <translation type="unfinished"></translation>
+        <translation>ディスクに空き容量がありません.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="347"/>
@@ -6991,134 +7046,134 @@ Please close the application and start it again using the shortcut in the start 
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="367"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="375"/>
         <source>Could not push updates to servers.</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーに更新ができません.</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="350"/>
         <source>The problem is caused by %n servers:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>問題の原因は %n サーバー:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="361"/>
         <source>No free space left on %n servers:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>サーバー %n に空き容量がありません:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="369"/>
         <source>%n servers are not responding:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n サーバー応答なし:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="377"/>
         <source>%n servers have gone offline:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n サーバーオフライン:</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="382"/>
         <source>Could not install an update to the client.</source>
-        <translation type="unfinished"></translation>
+        <translation>クライアントを更新できませｄん.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="386"/>
         <source>Could not install updates on one or more servers.</source>
-        <translation type="unfinished"></translation>
+        <translation>1台か複数台のサーバーの更新ができません.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="416"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="502"/>
         <source>Checking for updates...</source>
-        <translation type="unfinished"></translation>
+        <translation>更新確認...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="443"/>
         <source>Internet connection problem</source>
-        <translation type="unfinished"></translation>
+        <translation>インターネット接続問題</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="448"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="526"/>
         <source>There is no such build on the update server</source>
-        <translation type="unfinished"></translation>
+        <translation>そのようなビルドは更新サーバーにありません</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="454"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="530"/>
         <source>Cannot start update. An update for one or more servers was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>更新が開始できません　1台か複数台のサーバーが見つかりません.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="459"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="534"/>
         <source>Cannot start update. An update for the client was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>更新が開始できません　クライアントが見つかりません.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="513"/>
         <source>Newer version found.</source>
-        <translation type="unfinished"></translation>
+        <translation>新しいバージョンを検出しました.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="516"/>
         <source>You will have to update the client manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>クライアントをマニュアルで更新してください.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="518"/>
         <source>You will have to update the client manually using an installer.</source>
-        <translation type="unfinished"></translation>
+        <translation>クライアントをマニュアルで更新してください.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="523"/>
         <source>All components in your system are up to date.</source>
-        <translation type="unfinished"></translation>
+        <translation>全てのコンポーネントは最新です.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="538"/>
         <source>Cannot update from this file.</source>
-        <translation type="unfinished"></translation>
+        <translation>このファイルから更新できません.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="542"/>
         <source>Cannot extract the update file.</source>
-        <translation type="unfinished"></translation>
+        <translation>更新ファイルが見つかりません.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="622"/>
         <source>Checking for updates... %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>更新確認... %1%</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="625"/>
         <source>Downloading updates... %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>更新ダウンロード.. %1%　</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="628"/>
         <source>Installing client update... %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>クライアント更新中... %1%</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="631"/>
         <source>Installing updates to incompatible servers... %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>互換性のないサーバーを更新中... %1%</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="634"/>
         <source>Pushing updates to servers... %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>更新確認中... %1%</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="637"/>
         <source>Installing updates... %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>更新インストール中.. %1%</translation>
     </message>
 </context>
 <context>
@@ -7164,22 +7219,22 @@ Please close the application and start it again using the shortcut in the start 
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="148"/>
         <source>0 degrees</source>
-        <translation type="unfinished">0 度</translation>
+        <translation>0 度</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="149"/>
         <source>90 degrees</source>
-        <translation type="unfinished">90 度</translation>
+        <translation>90 度</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="150"/>
         <source>180 degrees</source>
-        <translation type="unfinished">180 度</translation>
+        <translation>180 度</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="151"/>
         <source>270 degrees</source>
-        <translation type="unfinished">270 度</translation>
+        <translation>270 度</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="420"/>
@@ -7194,23 +7249,23 @@ Please close the application and start it again using the shortcut in the start 
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="636"/>
         <source>Invalid schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>無効なスケジュール</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="637"/>
         <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>カメラの2番目のストリームが有効ではありません　モーション+常時低解像度は適応されません　常時録画に変更するか2番目のストリームを有効に変更してください.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="775"/>
         <source>Confirm motion regions reset</source>
-        <translation type="unfinished"></translation>
+        <translation>モーションエリアのリセット</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="776"/>
         <source>Are you sure you want to reset motion regions to the defaults?
 This action CANNOT be undone!</source>
-        <translation type="unfinished"></translation>
+        <translation>モーションエリアを初期設定に戻しますか?</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="759"/>
@@ -7245,17 +7300,17 @@ This action CANNOT be undone!</source>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="320"/>
         <source>Network Error</source>
-        <translation type="unfinished"></translation>
+        <translation>ネットワークエラー</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="320"/>
         <source>Could not perform a test. None of your servers is connected to the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーがインターネットに接続されていないのでテストできません.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="357"/>
         <source>Failed</source>
-        <translation type="unfinished">失敗</translation>
+        <translation>失敗</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="362"/>
@@ -7270,13 +7325,13 @@ This action CANNOT be undone!</source>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="387"/>
         <source>No preset found. Use &apos;Advanced&apos; option</source>
-        <translation type="unfinished"></translation>
+        <translation>プリセットが見つかりません　アドバンスオプションを使用してください</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="393"/>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="414"/>
         <source>Support email is not valid</source>
-        <translation type="unfinished"></translation>
+        <translation>サポートEmailが有効ではありません</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="332"/>
@@ -7347,7 +7402,7 @@ This action CANNOT be undone!</source>
     <message>
         <location filename="../src/ui/graphics/items/overlays/resource_status_overlay_widget.cpp" line="64"/>
         <source>Activate Video Wall license to remove this message</source>
-        <translation type="unfinished"></translation>
+        <translation>アクティベートビデオウォールライセンス</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/overlays/resource_status_overlay_widget.cpp" line="65"/>
@@ -7391,57 +7446,57 @@ This action CANNOT be undone!</source>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.ui" line="14"/>
         <source>System Administration</source>
-        <translation type="unfinished"></translation>
+        <translation>システムアドミニストレーション</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="29"/>
         <source>General</source>
-        <translation type="unfinished">一般</translation>
+        <translation>一般</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="30"/>
         <source>Licenses</source>
-        <translation type="unfinished">ライセンス</translation>
+        <translation>ライセンス</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="31"/>
         <source>Email</source>
-        <translation type="unfinished"></translation>
+        <translation>Email</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="32"/>
         <source>Updates</source>
-        <translation type="unfinished"></translation>
+        <translation>更新</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="33"/>
         <source>Routing Management</source>
-        <translation type="unfinished"></translation>
+        <translation>ルート管理</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="34"/>
         <source>Time Synchronization</source>
-        <translation type="unfinished"></translation>
+        <translation>時刻同期</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="43"/>
         <source>Error</source>
-        <translation type="unfinished">エラー</translation>
+        <translation>エラー</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="43"/>
         <source>Cannot cancel update at this state.</source>
-        <translation type="unfinished"></translation>
+        <translation>この段階ではキャンセルできません.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="51"/>
         <source>Information</source>
-        <translation type="unfinished">情報</translation>
+        <translation>情報</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="51"/>
         <source>Update is in process now.</source>
-        <translation type="unfinished"></translation>
+        <translation>更新中.</translation>
     </message>
 </context>
 <context>
@@ -7451,22 +7506,22 @@ This action CANNOT be undone!</source>
         <location filename="../src/ui/models/time_server_selection_model.cpp" line="208"/>
         <location filename="../src/ui/models/time_server_selection_model.cpp" line="312"/>
         <source>Server</source>
-        <translation type="unfinished">サーバー</translation>
+        <translation>サーバー</translation>
     </message>
     <message>
         <location filename="../src/ui/models/time_server_selection_model.cpp" line="185"/>
         <source>Server Time</source>
-        <translation type="unfinished">サーバー時間</translation>
+        <translation>サーバー時間</translation>
     </message>
     <message>
         <location filename="../src/ui/models/time_server_selection_model.cpp" line="187"/>
         <source>Offset</source>
-        <translation type="unfinished"></translation>
+        <translation>オフセット</translation>
     </message>
     <message>
         <location filename="../src/ui/models/time_server_selection_model.cpp" line="221"/>
         <source>Synchronizing...</source>
-        <translation type="unfinished"></translation>
+        <translation>同期中...</translation>
     </message>
 </context>
 <context>
@@ -7474,12 +7529,12 @@ This action CANNOT be undone!</source>
     <message>
         <location filename="../src/ui/widgets/settings/time_server_selection_widget.cpp" line="49"/>
         <source>Time is taken from the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>インターネット経由で時刻取得.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/time_server_selection_widget.cpp" line="51"/>
         <source>Time is taken from %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>時刻を %1. から取得.</translation>
     </message>
 </context>
 <context>
@@ -7649,7 +7704,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/dialogs/update_dialog.ui" line="14"/>
         <source>Update Servers</source>
-        <translation type="unfinished"></translation>
+        <translation>更新サーバー</translation>
     </message>
 </context>
 <context>
@@ -7657,7 +7712,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/delegates/update_status_item_delegate.cpp" line="45"/>
         <source>%1%</source>
-        <translation type="unfinished">%1%</translation>
+        <translation>%1%</translation>
     </message>
 </context>
 <context>
@@ -7675,26 +7730,26 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message numerus="yes">
         <location filename="../src/business/business_resource_validation.cpp" line="117"/>
         <source>%n of %1 users have invalid email address</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n / %1 ユーザが無効なアドレス設定</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/business/business_resource_validation.cpp" line="131"/>
         <source>Invalid email address %1</source>
-        <translation type="unfinished"></translation>
+        <translation>無効なEmailアドレス %1</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_resource_validation.cpp" line="132"/>
         <source>%n of %1 additional email addresses are invalid</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n / %1 追加Emailアドレス無効</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/business/business_resource_validation.cpp" line="135"/>
         <source>Send email to %1</source>
-        <translation type="unfinished"></translation>
+        <translation> %1 にメール送信</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_resource_validation.cpp" line="137"/>
@@ -7736,7 +7791,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="333"/>
         <source>To change your password, please enter your current password.</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワード変更を行うには既存のパスワードを入力してください.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="336"/>
@@ -7746,7 +7801,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="347"/>
         <source>User was renamed. Password must be updated.</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザーは変更されました　パスワードを更新してください.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="354"/>
@@ -7823,7 +7878,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="504"/>
         <source>Can edit Video Walls</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオウォ－ルの編集有効</translation>
     </message>
 </context>
 <context>
@@ -7831,7 +7886,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/graphics/items/resource/videowall_item_widget.cpp" line="121"/>
         <source>Information</source>
-        <translation type="unfinished">情報</translation>
+        <translation>情報</translation>
     </message>
 </context>
 <context>
@@ -7839,32 +7894,32 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/widgets/videowall_manage_widget_p.cpp" line="342"/>
         <source>Desktop %1</source>
-        <translation type="unfinished"></translation>
+        <translation>デスクトップ %1</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/videowall_manage_widget_p.cpp" line="574"/>
         <source>Screen</source>
-        <translation type="unfinished"></translation>
+        <translation>スクリーン</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/videowall_manage_widget_p.cpp" line="574"/>
         <source>Screen %1</source>
-        <translation type="unfinished"></translation>
+        <translation>スクリーン %1</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/videowall_manage_widget_p.cpp" line="717"/>
         <source>New Item</source>
-        <translation type="unfinished"></translation>
+        <translation>新規アイテム</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/videowall_manage_widget_p.cpp" line="736"/>
         <source>Delete Screen</source>
-        <translation type="unfinished"></translation>
+        <translation>スクリーン削除</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/videowall_manage_widget_p.cpp" line="737"/>
         <source>Are you sure you want to delete %1?</source>
-        <translation type="unfinished"></translation>
+        <translation> %1 を削除しますか?</translation>
     </message>
 </context>
 <context>
@@ -7872,12 +7927,12 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/graphics/items/resource/videowall_screen_widget.cpp" line="94"/>
         <source>Pc %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Pc %1</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/graphics/items/resource/videowall_screen_widget.cpp" line="104"/>
         <source>Pc %1 - Screens %2</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -7887,17 +7942,17 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/dialogs/videowall_settings_dialog.ui" line="14"/>
         <source>Video Wall Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオウォール設定</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/videowall_settings_dialog.ui" line="20"/>
         <source>Start Video Wall when the Windows starts</source>
-        <translation type="unfinished"></translation>
+        <translation>Windows起動時にビデオウォール開始</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/videowall_settings_dialog.ui" line="27"/>
         <source>Shortcut on the desktop</source>
-        <translation type="unfinished"></translation>
+        <translation>デスクトップにショートカット</translation>
     </message>
 </context>
 <context>
@@ -7958,12 +8013,12 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="855"/>
         <source>Can&apos;t move camera(s) to other server. Server %1 doesn&apos;t answer to request.</source>
-        <translation type="unfinished"></translation>
+        <translation>他サーバーにカメラを移動できません　サーバー %1 より応答がありません.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="878"/>
         <source>Server %1 cannot discover these cameras so far. Are you sure you want to move them?</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバー %1 はカメラを検索できません. カメラを移動しますか?</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1032"/>
@@ -8048,22 +8103,22 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1654"/>
         <source>User already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザーは既に存在します.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1655"/>
         <source>Video Wall already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオウォールは既に存在します</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1658"/>
         <source>User with the same name already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>同じ名前のユーザーが既に存在します</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1659"/>
         <source>Video Wall with the same name already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>同じ名前のビデオウォールが既に存在します</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1708"/>
@@ -8080,8 +8135,10 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <source>These %n cameras are auto-discovered.
 They may be auto-discovered again after removing.
 Are you sure you want to delete them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform> %n カメラが自動検索されました.
+削除後も自動検索されます.
+削除しますか?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -8089,8 +8146,10 @@ Are you sure you want to delete them?</source>
         <source>%n of these %1 cameras are auto-discovered.
 They may be auto-discovered again after removing.
 Are you sure you want to delete them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n / %1 カメラが自動検索されました.
+削除後も自動検索されます.
+削除しますか?</numerusform>
         </translation>
     </message>
     <message>
@@ -8101,8 +8160,8 @@ Are you sure you want to delete them?</source>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2228"/>
         <source>Could not save the following %n items.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform> %n アイテムを保存できません.</numerusform>
         </translation>
     </message>
     <message>
@@ -8110,32 +8169,34 @@ Are you sure you want to delete them?</source>
         <source>An error has occurred while trying to delete a resource from Server. 
 
 Error description: &apos;%2&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>リソース削除中にエラーが発生しました. 
+
+エラー詳細: &apos;%2&apos;</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2397"/>
         <source>Server v%1 at %2&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバー v%1 at %2&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2399"/>
         <source>Server v%1&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバー v%1&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2425"/>
         <source>Some components of the system are not updated:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please update all components to the latest version %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>コンポーネントの幾つかが更新されていません:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;全てのポンポーネントを最新バージョンに更新してください %2.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2441"/>
         <source>Update...</source>
-        <translation type="unfinished"></translation>
+        <translation>更新...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2451"/>
         <source>Beta version %1</source>
-        <translation type="unfinished"></translation>
+        <translation>ベタバージョン %1</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1878"/>
@@ -8216,37 +8277,37 @@ Please close the application and start it again using the shortcut in the start 
         <location filename="../src/ui/workbench/handlers/workbench_bookmarks_handler.cpp" line="136"/>
         <location filename="../src/ui/workbench/handlers/workbench_bookmarks_handler.cpp" line="163"/>
         <source>Error</source>
-        <translation type="unfinished">エラー</translation>
+        <translation>エラー</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_bookmarks_handler.cpp" line="104"/>
         <source>Bookmark can only be added to an online server.</source>
-        <translation type="unfinished"></translation>
+        <translation>ブックマークはオンラインサーバーのみ追加可能.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_bookmarks_handler.cpp" line="110"/>
         <source>Bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>ブックマーク</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_bookmarks_handler.cpp" line="137"/>
         <source>Bookmark can only be edited on an online server.</source>
-        <translation type="unfinished"></translation>
+        <translation>ブックマークはオンラインサーバーのみ編集可能.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_bookmarks_handler.cpp" line="164"/>
         <source>Bookmark can only be deleted from an online server.</source>
-        <translation type="unfinished"></translation>
+        <translation>ブックマークはオンラインサーバーのみ削除可能.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_bookmarks_handler.cpp" line="169"/>
         <source>Confirm delete</source>
-        <translation type="unfinished"></translation>
+        <translation>削除確認</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_bookmarks_handler.cpp" line="170"/>
         <source>Are you sure you want to delete this bookmark %1?</source>
-        <translation type="unfinished"></translation>
+        <translation> %1 ブックマークを削除しますか?</translation>
     </message>
 </context>
 <context>
@@ -8254,64 +8315,64 @@ Please close the application and start it again using the shortcut in the start 
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_connect_handler.cpp" line="128"/>
         <source>Connect to Another Server...</source>
-        <translation type="unfinished">他のサーバーに接続...</translation>
+        <translation>他のサーバーに接続...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_connect_handler.cpp" line="188"/>
         <source>Could not connect to server. Closing in %1...</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーに接続できません. 切断 %1...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_connect_handler.cpp" line="257"/>
         <source>Connecting...</source>
-        <translation type="unfinished"></translation>
+        <translation>接続中...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_connect_handler.cpp" line="358"/>
         <source>Connect to Server...</source>
-        <translation type="unfinished">サーバーに接続....</translation>
+        <translation>サーバーに接続....</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchController</name>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="643"/>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="671"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="645"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="673"/>
         <source>Warning</source>
         <translation>警告</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="643"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="645"/>
         <source>Can&apos;t start recording due to the following error: %1</source>
         <translation>エラー: %1の為に録画が開始されません</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="607"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="609"/>
         <source>Recording in...%1</source>
-        <translation type="unfinished"></translation>
+        <translation>録画...%1</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="649"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="651"/>
         <source>Recorded Video</source>
         <translation>ビデオ録画</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="654"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="656"/>
         <source>Save Recording As...</source>
         <translation>名前を付けて保存...</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="656"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="658"/>
         <source>AVI (Audio/Video Interleaved) (*.avi)</source>
         <translation>AVI (Audio/Video Interleaved) (*.avi)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="669"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="671"/>
         <source>Could not overwrite file &apos;%1&apos;. Please try another name.</source>
         <translation>ファイル%1の上書きができません　他の名前を使用してください.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="1422"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="1424"/>
         <source>Press any key to stop the tour</source>
         <translation>何かのキーでツアー停止</translation>
     </message>
@@ -8427,12 +8488,12 @@ Do you want to continue?</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="288"/>
         <source>Transcode video to guarantee WYSIWYG</source>
-        <translation type="unfinished"></translation>
+        <translation>WYSIWYGを保障しているトランスコードビデオ</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="488"/>
         <source>Current layout contains local files. Local files are not allowed for Multi-Video export.</source>
-        <translation type="unfinished"></translation>
+        <translation>レイアウトにローカルファイルが含まれています　ローカルファイルは複数ビデオのエクスポートで許可されません.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="322"/>
@@ -8547,59 +8608,61 @@ Do you want to continue?</source>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="116"/>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="119"/>
         <source>Error</source>
-        <translation type="unfinished">エラー</translation>
+        <translation>エラー</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="29"/>
         <source>Please, wait before the previously requested servers will be added to your system.</source>
-        <translation type="unfinished"></translation>
+        <translation>前にリクエストしたサーバーが追加されるまでお待ちください.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="54"/>
         <source>Enter Password...</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワード入力...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="55"/>
         <source>Administrator Password</source>
-        <translation type="unfinished"></translation>
+        <translation>アドミニストレーターパスワード</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="65"/>
         <source>Password cannot be empty!</source>
-        <translation type="unfinished"></translation>
+        <translation>パスワードを入力してください!</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="75"/>
         <source>Connecting to the current system...</source>
-        <translation type="unfinished"></translation>
+        <translation>システムに接続...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="104"/>
         <source>Information</source>
-        <translation type="unfinished">情報</translation>
+        <translation>情報</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="104"/>
         <source>The selected servers has been successfully connected to your system!</source>
-        <translation type="unfinished"></translation>
+        <translation>選択したサーバーは正常にシステムに接続されました！</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="107"/>
         <source>Authentification failed.
 Please, check the password you have entered.</source>
-        <translation type="unfinished"></translation>
+        <translation>認証エラー.
+入力したパスワードを確認してください.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="116"/>
         <source>Could not configure the selected servers.</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーの構成ができません.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="119"/>
         <source>Could not update the selected servers.
 You can try to update the servers again in the System Administration.</source>
-        <translation type="unfinished"></translation>
+        <translation>サーバーの更新ができません.
+システムアドミニストレーション権限で再度更新を行ってください.</translation>
     </message>
 </context>
 <context>
@@ -8694,8 +8757,8 @@ You can try to update the servers again in the System Administration.</source>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="630"/>
         <source>Could not save the following %n layout(s) to Server.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>レイアウト %n を保存できません.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -8851,7 +8914,7 @@ Please wait for the camera to go online.</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="310"/>
         <source>Saving %1</source>
-        <translation type="unfinished"></translation>
+        <translation>保存 %1</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="357"/>
@@ -8866,7 +8929,7 @@ Please wait for the camera to go online.</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="369"/>
         <source>Saving Screenshot...</source>
-        <translation type="unfinished"></translation>
+        <translation>スクリーンショット保存...</translation>
     </message>
 </context>
 <context>
@@ -8874,44 +8937,44 @@ Please wait for the camera to go online.</source>
     <message>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="70"/>
         <source>Newer version is available</source>
-        <translation type="unfinished"></translation>
+        <translation>新規バージョンに更新できます</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="71"/>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="76"/>
         <source>New version &lt;b&gt;%1&lt;/b&gt; is available.</source>
-        <translation type="unfinished"></translation>
+        <translation>新規バージョン &lt;b&gt;%1&lt;/b&gt; に更新できます.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="73"/>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="82"/>
         <source>Would you like to update?</source>
-        <translation type="unfinished"></translation>
+        <translation>更新しますか?</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="75"/>
         <source>Update is recommended</source>
-        <translation type="unfinished"></translation>
+        <translation>更新を推奨</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="78"/>
         <source>Major issues have been fixed.</source>
-        <translation type="unfinished"></translation>
+        <translation>修正された不具合.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="80"/>
         <source>Update is strongly recommended.</source>
-        <translation type="unfinished"></translation>
+        <translation>更新を推奨します.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="89"/>
         <source>Don&apos;t notify again about this update.</source>
-        <translation type="unfinished">更新につて再度通知を行わない.</translation>
+        <translation>更新の通知を行わない.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="94"/>
         <source>Release Notes</source>
-        <translation type="unfinished"></translation>
+        <translation>リリースノート</translation>
     </message>
 </context>
 <context>
@@ -8920,14 +8983,15 @@ Please wait for the camera to go online.</source>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="328"/>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="919"/>
         <source>Control session is already running</source>
-        <translation type="unfinished"></translation>
+        <translation>コントロールセッションは既に起動しています</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="329"/>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="920"/>
         <source>Could not start control session.
 Another user is already controlling this screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>コントロールセッションが起動できません.
+他ユーザーが既にコントロールしています.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="420"/>
@@ -8935,156 +8999,157 @@ Another user is already controlling this screen.</source>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="507"/>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1256"/>
         <source>Error</source>
-        <translation type="unfinished">エラー</translation>
+        <translation>エラー</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="420"/>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="460"/>
         <source>Unexpected error has occurred. Changes cannot be saved.</source>
-        <translation type="unfinished"></translation>
+        <translation>予期せぬエラーが発生しました　設定は保存されません.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="508"/>
         <source>There are no offline videowall items attached to this pc.</source>
-        <translation type="unfinished"></translation>
+        <translation>オフラインのビデオウォールアイテムはありません.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="515"/>
         <source>Switch to Video Wall Mode...</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオウォールモードに変更...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="516"/>
         <source>Video Wall will be started now. Do you want to close this %1 Client instance?</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオウォールが開始されます　 %1 クライアントを終了しますか？</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="901"/>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1203"/>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="2559"/>
         <source>More licenses required</source>
-        <translation type="unfinished"></translation>
+        <translation>追加ライセンスが必要</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="902"/>
         <source>To enable the feature please activate at least one Video Wall license.</source>
-        <translation type="unfinished"></translation>
+        <translation>有効にするにはビデオウォールライセンスを有効にしてください.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="907"/>
         <source>Could not start Video Wall control session.</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオウォールコントロールを開始できません.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1165"/>
         <source>%1 (%2)</source>
-        <translation type="unfinished">%1 (%2)</translation>
+        <translation>%1 (%2)</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1170"/>
         <source>New layout</source>
-        <translation type="unfinished">新規レイアウト</translation>
+        <translation>新規レイアウト</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1170"/>
         <source>New layout %1</source>
-        <translation type="unfinished">新規レイアウト%1</translation>
+        <translation>新規レイアウト%1</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1204"/>
         <source>To enable the feature please activate at least one Video Wall license</source>
-        <translation type="unfinished"></translation>
+        <translation>有効にするにはビデオウォールライセンスを有効にしてください.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1213"/>
         <source>Video Wall</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオウォール</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1213"/>
         <source>Video Wall %1</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオウォール l %1</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1216"/>
         <source>New Video Wall...</source>
-        <translation type="unfinished"></translation>
+        <translation>新規ビデオウォール...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1217"/>
         <source>Enter the name of the Video Wall to create:</source>
-        <translation type="unfinished"></translation>
+        <translation>登録するビデオウォールの名前入力:</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1232"/>
         <source>Video Wall already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオウォールは既に存在します</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1233"/>
         <source>Video Wall with the same name already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>同じ名前のビデオウォールが既に存在します</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1257"/>
         <source>Could not save the following %n items to Server.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform> %n アイテムを保存できません.</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1328"/>
         <source>Delete Items</source>
-        <translation type="unfinished"></translation>
+        <translation>アイテム削除</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1329"/>
         <source>Are you sure you want to permanently delete these %n item(s)?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform> %n アイテムを削除しますか？</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1351"/>
         <source>Could not start Video Wall.</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオウォールを開始できません.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1363"/>
         <source>Confirm Video Wall stop</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオウォール停止確認</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1364"/>
         <source>Are you sure you want to stop the Video Wall?
 You&apos;ll have to start it manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオウォールを停止しますか?
+マニュアルでの開始が必要です.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1631"/>
         <source>New Matrix %1</source>
-        <translation type="unfinished"></translation>
+        <translation>次のマトリックス %1</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1642"/>
         <source>Invalid matrix</source>
-        <translation type="unfinished"></translation>
+        <translation>無効なマトリックス</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1643"/>
         <source>You have no layouts on the screens. Matrix cannot be saved.</source>
-        <translation type="unfinished"></translation>
+        <translation>スクリーンにレイアウトがありません　マトリックスは保存されません.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1712"/>
         <source>Delete Matrices</source>
-        <translation type="unfinished"></translation>
+        <translation>マトリックス削除</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1713"/>
         <source>Are you sure you want to permanently delete these %n matrices?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform> %n マトリックスを削除しますか？</numerusform>
         </translation>
     </message>
 </context>
@@ -9093,12 +9158,12 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/dialogs/reconnect_info_dialog.ui" line="17"/>
         <source>Reconnecting...</source>
-        <translation type="unfinished"></translation>
+        <translation>再接続...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/reconnect_info_dialog.ui" line="26"/>
         <source>Please wait while connection is being restored...</source>
-        <translation type="unfinished"></translation>
+        <translation>接続がリストアされるまでお待ちください...</translation>
     </message>
 </context>
 <context>
@@ -9236,7 +9301,7 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="234"/>
         <source>Average</source>
-        <translation>平均</translation>
+        <translation>標準</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui" line="239"/>
@@ -9300,7 +9365,7 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/dialogs/resource_list_dialog.ui" line="59"/>
         <source>Never suggest saving layouts</source>
-        <translation type="unfinished"></translation>
+        <translation>レイアウト保存を確認しない</translation>
     </message>
 </context>
 <context>
@@ -9374,17 +9439,17 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="88"/>
         <source>Failover</source>
-        <translation type="unfinished"></translation>
+        <translation>フェイルオーバー</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="97"/>
         <source>Enable failover (server will take cameras automatically from offline servers)</source>
-        <translation type="unfinished"></translation>
+        <translation>フェイルオーバー有効（オフラインサーバーより自動でカメラ接続先サーバーの切替)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="122"/>
         <source>Max. cameras on this server:</source>
-        <translation type="unfinished"></translation>
+        <translation>最大接続台数:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="164"/>
@@ -9409,17 +9474,17 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="216"/>
         <source>Login</source>
-        <translation type="unfinished"></translation>
+        <translation>ログイン</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="221"/>
         <source>Password</source>
-        <translation type="unfinished">パスワード</translation>
+        <translation>パスワード</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="226"/>
         <source>Space</source>
-        <translation type="unfinished">スペース</translation>
+        <translation>スペース</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="237"/>
@@ -9490,12 +9555,12 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="209"/>
         <source>Image Control</source>
-        <translation type="unfinished"></translation>
+        <translation>イメージコントロール</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="246"/>
         <source>Default rotation:</source>
-        <translation type="unfinished"></translation>
+        <translation>回転初期値:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="280"/>
@@ -9515,7 +9580,7 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="422"/>
         <source>Software (Max FPS may be slightly decreased on Server)</source>
-        <translation type="unfinished"></translation>
+        <translation>ソフトウェア</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="73"/>
@@ -9640,7 +9705,7 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="582"/>
         <source>Dewarping</source>
-        <translation>歪み補正</translation>
+        <translation>Dewarping</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="604"/>
@@ -9668,12 +9733,12 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="20"/>
         <source>Outgoing Email Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>送信Email 設定</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="99"/>
         <source>&amp;Email:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Email:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="112"/>
@@ -9697,7 +9762,7 @@ You&apos;ll have to start it manually.</source>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="146"/>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="348"/>
         <source>Support Signature:</source>
-        <translation type="unfinished"></translation>
+        <translation>サポートサイ:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="199"/>
@@ -9712,7 +9777,7 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="242"/>
         <source>Email:</source>
-        <translation type="unfinished"></translation>
+        <translation>Email:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="256"/>
@@ -9814,12 +9879,12 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/dialogs/storage_url_dialog.ui" line="59"/>
         <source>Login:</source>
-        <translation type="unfinished">ログイン:</translation>
+        <translation>ログイン:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/storage_url_dialog.ui" line="72"/>
         <source>Password:</source>
-        <translation type="unfinished">パスワード:</translation>
+        <translation>パスワード:</translation>
     </message>
 </context>
 <context>
@@ -9827,17 +9892,17 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/widgets/settings/time_server_selection_widget.ui" line="25"/>
         <source>Current system time:</source>
-        <translation type="unfinished"></translation>
+        <translation>現在のシステム時間:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/time_server_selection_widget.ui" line="38"/>
         <source>Synchronizing...</source>
-        <translation type="unfinished"></translation>
+        <translation>同期中...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/time_server_selection_widget.ui" line="54"/>
         <source>Choose the server which is going to be used as a time server if the system has no internet access:</source>
-        <translation type="unfinished"></translation>
+        <translation>インターネットアクセスができない場合、タイムサーバーとして使用するサーバーを選択してください:</translation>
     </message>
 </context>
 <context>
