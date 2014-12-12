@@ -1138,6 +1138,10 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
     if(widget == NULL)
         return;
 
+    /* Don't raise if there's only one item in the layout. */
+    if (workbench()->currentLayout() && workbench()->currentLayout()->items().size() == 1)
+        return;
+
     QnWorkbenchItem *workbenchItem = widget->item();
     workbench()->setItem(Qn::RaisedRole, workbench()->item(Qn::RaisedRole) == workbenchItem ? NULL : workbenchItem);
 }
