@@ -51,7 +51,8 @@ template<typename T>
 class QnNonModalDialogConstructor: public QnShowDialogHelper {
 public:
     
-    QnNonModalDialogConstructor<T>(QPointer<T> &dialog, QWidget* parent)
+    QnNonModalDialogConstructor<T>(QPointer<T> &dialog, QWidget* parent) :
+        m_dontRaise(true)
     {
         if (!dialog) {
             dialog = new T(parent);
@@ -80,6 +81,9 @@ public:
         }
 
         /* Or show it immediately if no modal windows are visible. */
+        if (m_dialog->isVisible() && m_dontRaise)
+            return;
+
         show(m_dialog, m_targetGeometry);
     }
 
@@ -88,10 +92,14 @@ public:
         m_targetGeometry = QRect();
     }
 
+    void setDontRaise(bool f) {
+        m_dontRaise = f;
+    }
 
 private:
     QRect m_targetGeometry;
     QPointer<T> m_dialog;
+    bool m_dontRaise;
 };
 
 #endif //QN_NON_MODAL_DIALOG_CONSTRUCTOR_H
