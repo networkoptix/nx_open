@@ -206,10 +206,10 @@ bool AxHDWitness::event(QEvent *event) {
 void AxHDWitness::initialize()
 {
     if (!m_isInitialized) {
-        doInitialize();
-
-        if(UnhookWindowsHookEx(qax_hhook))
-            qax_hhook = SetWindowsHookEx(WH_GETMESSAGE, qn_FilterProc, 0, GetCurrentThreadId());
+         doInitialize();
+ 
+         if(UnhookWindowsHookEx(qax_hhook))
+             qax_hhook = SetWindowsHookEx(WH_GETMESSAGE, qn_FilterProc, 0, GetCurrentThreadId());
 
         m_isInitialized = true;
     }
@@ -381,23 +381,17 @@ bool AxHDWitness::doInitialize()
 	m_clientModule.reset(new QnClientModule(argc, NULL));
 //x	QnResourcePool::initStaticInstance( new QnResourcePool() );
 
-    /* Create application instance. */
-    QApplication* application = qApp;
+    QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin ? lit(":/skin_light") : lit(":/skin_dark");
+    skin.reset(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
 
-//x	QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin ? lit(":/skin_light") : lit(":/skin_dark");
+    QnCustomization customization;
+    customization.add(QnCustomization(skin->path("customization_common.json")));
+    customization.add(QnCustomization(skin->path("customization_base.json")));
+    customization.add(QnCustomization(skin->path("customization_child.json")));
 
-//x    skin.reset(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
+    customizer.reset(new QnCustomizer(customization));
+    customizer->customize(qnGlobals);
 
-//x    QnCustomization customization;
-    //xcustomization.add(QnCustomization(skin->path("customization_common.json")));
-    //xcustomization.add(QnCustomization(skin->path("customization_base.json")));
-    //xcustomization.add(QnCustomization(skin->path("customization_child.json")));
-
-    //xcustomizer.reset(new QnCustomizer(customization));
-    //xcustomizer->customize(qnGlobals);
-
-	
-    application->setQuitOnLastWindowClosed(true);
 //x    application->setWindowIcon(qnSkin->icon("logo_tray.png"));
 
     /* Initialize connections. */
@@ -407,7 +401,7 @@ bool AxHDWitness::doInitialize()
 
 
     /* Initialize application instance. */
-    application->setStartDragDistance(20);
+    QApplication::setStartDragDistance(20);
     
 
 //ax23    QnToolTip::instance();
@@ -429,6 +423,8 @@ bool AxHDWitness::doInitialize()
     QnLog::initLog(QString());
     cl_log.log(lit(QN_APPLICATION_NAME), " started", cl_logALWAYS);
     cl_log.log("Software version: ", QnAppInfo::applicationVersion(), cl_logALWAYS);
+
+
 #if 0 // AXFIXME
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 #endif
@@ -444,7 +440,7 @@ bool AxHDWitness::doInitialize()
 
     //===========================================================================
 
-    CLVideoDecoderFactory::setCodecManufacture(CLVideoDecoderFactory::FFMPEG);
+//    CLVideoDecoderFactory::setCodecManufacture(CLVideoDecoderFactory::FFMPEG);
     
     //============================
     //QnResourceDirectoryBrowser
@@ -464,7 +460,7 @@ bool AxHDWitness::doInitialize()
     QnResourceDiscoveryManager::instance()->setReady(true);
     QnResourceDiscoveryManager::instance()->start(); */
 
-//x	qApp->setStyle(qnSkin->newStyle());
+//	qApp->setStyle(qnSkin->newStyle());
 
 	qApp->processEvents();
 
@@ -489,6 +485,8 @@ void AxHDWitness::doFinalize()
     //QnResourceDiscoveryManager::instance().stop();
 
     qInstallMessageHandler(defaultMsgHandler);
+
+    qApp->processEvents();
 
     //xdelete QnResourcePool::instance();
     //xQnResourcePool::initStaticInstance( NULL );

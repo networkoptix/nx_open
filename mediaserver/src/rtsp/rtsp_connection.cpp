@@ -260,16 +260,6 @@ void QnRtspConnectionProcessor::parseRequest()
             d->codecId = CODEC_ID_NONE;
     };
 
-    QString codec = urlQuery.queryItemValue("codec");
-    if (!codec.isEmpty())
-    {
-        AVOutputFormat* format = av_guess_format(codec.toLatin1().data(),NULL,NULL);
-        if (format)
-            d->codecId = format->video_codec;
-        else
-            d->codecId = CODEC_ID_NONE;
-    };
-
     QString pos = urlQuery.queryItemValue("pos").split('/')[0];
     if (pos.isEmpty())
         processRangeHeader();

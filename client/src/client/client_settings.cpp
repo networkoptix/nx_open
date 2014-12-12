@@ -276,7 +276,7 @@ bool QnClientSettings::isWritable() const {
 }
 
 void QnClientSettings::loadFromWebsite() {
-    m_accessManager->get(QNetworkRequest(settingsUrl()));
+ //   m_accessManager->get(QNetworkRequest(settingsUrl()));
 }
 
 void QnClientSettings::at_accessManager_finished(QNetworkReply *reply) {

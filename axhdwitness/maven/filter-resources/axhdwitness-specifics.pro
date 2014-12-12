@@ -22,7 +22,9 @@ CONFIG(release, debug|release) {
 }
 
 win32 {
-  CONFIG += qaxserver dll qaxserver_no_postlink 
+  QT += axserver
+  CONFIG += dll qaxserver_no_postlink 
+  CONFIG -= console
 }
 
 # IDL_FILES = $$PWD/ItemControl.idl $$PWD/SceneControl.idl 

@@ -21,17 +21,20 @@ QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject
     QApplication::setApplicationDisplayName(lit(QN_APPLICATION_DISPLAY_NAME));    
     if (QApplication::applicationVersion().isEmpty())
         QApplication::setApplicationVersion(QnAppInfo::applicationVersion());
-
-    /* We don't want changes in desktop color settings to mess up our custom style. */
-    QApplication::setDesktopSettingsAware(false);
-
-    /* Init singletons. */
-    QnCommonModule *common = new QnCommonModule(argc, argv, this);
-	common->instance<QnClientSettings>();
-    common->setModuleGUID(QnUuid::createUuid());
+ 
+     /* We don't want changes in desktop color settings to mess up our custom style. */
+     QApplication::setDesktopSettingsAware(false);
+ 
+     /* Init singletons. */
+     QnCommonModule *common = new QnCommonModule(argc, argv, this);
+     common->instance<QnClientSettings>();
+     common->setModuleGUID(QnUuid::createUuid());
 }
 
 QnClientModule::~QnClientModule() {
-    return;
+    QApplication::setOrganizationName(QString());
+    QApplication::setApplicationName(QString());
+    QApplication::setApplicationDisplayName(QString());
+    QApplication::setApplicationVersion(QString());     
 }
 

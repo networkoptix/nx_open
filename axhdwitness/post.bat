@@ -14,7 +14,7 @@ set AXHDW=%~dp0
 set bebin_path=..\build_environment\target\x64\bin
 set PATH=%bebin_path%\%CONFIG%;%PATH%
 
-%bebin_path%\idc %bebin_path%\%CONFIG%\axhdwitness.dll /idl %bebin_path%\%CONFIG%\axhdwitness.idl -version 1.0
-midl %bebin_path%\%CONFIG%\axhdwitness.idl /nologo /tlb %bebin_path%\%CONFIG%\axhdwitness.tlb
-%bebin_path%\idc %bebin_path%\%CONFIG%\axhdwitness.dll /tlb %bebin_path%\%CONFIG%\axhdwitness.tlb
+echo %bebin_path%\idc %bebin_path%\%CONFIG%\axhdwitness.dll /idl %bebin_path%\%CONFIG%\axhdwitness.idl -version 1.0
+echo midl %bebin_path%\%CONFIG%\axhdwitness.idl /nologo /tlb %bebin_path%\%CONFIG%\axhdwitness.tlb
+echo %bebin_path%\idc %bebin_path%\%CONFIG%\axhdwitness.dll /tlb %bebin_path%\%CONFIG%\axhdwitness.tlb
 ENDLOCAL
