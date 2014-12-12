@@ -146,7 +146,7 @@ CameraDiagnostics::Result QnPlSonyResource::initInternal()
     return CameraDiagnostics::NoErrorResult();
 }
 
-bool QnPlSonyResource::startInputPortMonitoring()
+bool QnPlSonyResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
 {
     QMutexLocker lk( &m_inputPortMutex );
 
@@ -180,7 +180,7 @@ bool QnPlSonyResource::startInputPortMonitoring()
     return m_inputMonitorHttpClient->doGet( requestUrl );
 }
 
-void QnPlSonyResource::stopInputPortMonitoring()
+void QnPlSonyResource::stopInputPortMonitoringAsync()
 {
     std::shared_ptr<nx_http::AsyncHttpClient> inputMonitorHttpClient = m_inputMonitorHttpClient;
     {
@@ -203,7 +203,7 @@ void QnPlSonyResource::onMonitorResponseReceived( AsyncHttpClientPtr httpClient 
 {
     QMutexLocker lk( &m_inputPortMutex );
 
-    if( m_inputMonitorHttpClient != httpClient )    //this can happen just after stopInputPortMonitoring() call
+    if( m_inputMonitorHttpClient != httpClient )    //this can happen just after stopInputPortMonitoringAsync() call
         return;
 
     if( (m_inputMonitorHttpClient->response()->statusLine.statusCode / 100) * 100 != StatusCode::ok )

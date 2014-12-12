@@ -41,7 +41,7 @@ QnAbstractPtzController *QnVistaResource::createPtzControllerInternal() {
     return new QnVistaFocusPtzController(QnPtzControllerPtr(result.take()));
 }
 
-bool QnVistaResource::startInputPortMonitoring()
+bool QnVistaResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
 {
     if( hasFlags(Qn::foreigner) )     //we do not own camera
     {

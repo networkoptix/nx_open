@@ -57,7 +57,7 @@ QnThirdPartyResource::~QnThirdPartyResource()
         m_cameraManager3 = nullptr;
     }
 
-    stopInputPortMonitoring();
+    stopInputPortMonitoringAsync();
 }
 
 QnAbstractPtzController* QnThirdPartyResource::createPtzControllerInternal()
@@ -679,7 +679,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     return CameraDiagnostics::NoErrorResult();
 }
 
-bool QnThirdPartyResource::startInputPortMonitoring()
+bool QnThirdPartyResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
 {
     if( !m_relayIOManager.get() )
         return false;
@@ -687,7 +687,7 @@ bool QnThirdPartyResource::startInputPortMonitoring()
     return m_relayIOManager->startInputPortMonitoring() == nxcip::NX_NO_ERROR;
 }
 
-void QnThirdPartyResource::stopInputPortMonitoring()
+void QnThirdPartyResource::stopInputPortMonitoringAsync()
 {
     if( m_relayIOManager.get() )
     {

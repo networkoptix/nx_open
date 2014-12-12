@@ -17,7 +17,7 @@ public:
 
 protected:
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
-    virtual bool startInputPortMonitoring() override;
+    virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;
 };
 
 #endif //ENABLE_ONVIF
