@@ -110,12 +110,15 @@ void QnTransactionTransport::setState(State state)
 
 void QnTransactionTransport::processExtraData()
 {
+    QMutexLocker lock(&m_mutex);
     processTransactionData(m_extraData);
     m_extraData.clear();
 }
 
 void QnTransactionTransport::startListening()
 {
+    QMutexLocker lock(&m_mutex);
+
     assert( m_socket );
 
     if( m_socket )
@@ -129,14 +132,14 @@ void QnTransactionTransport::startListening()
         if( !m_socket->readSomeAsync( &m_readBuffer, std::bind( &QnTransactionTransport::onSomeBytesRead, this, _1, _2 ) ) )
         {
             m_lastReceiveTimer.invalidate();
-            setState( Error );
+            setStateNoLock( Error );
             return;
         }
         if( m_remotePeer.isServer() )
             if( !m_socket->registerTimer( TCP_KEEPALIVE_TIMEOUT, std::bind(&QnTransactionTransport::sendHttpKeepAlive, this) ) )
             {
                 m_lastReceiveTimer.invalidate();
-                setState( Error );
+                setStateNoLock( Error );
                 return;
             }
     }
