@@ -262,11 +262,9 @@ bool QnRecordingManager::stopForcedRecording(const QnSecurityCamResourcePtr& cam
 
 bool QnRecordingManager::startOrStopRecording(const QnResourcePtr& res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes)
 {
-    QnLiveStreamProviderPtr providerHi = camera->getLiveReader(QnServer::HiQualityCatalog);
-    QnLiveStreamProviderPtr providerLow = camera->getLiveReader(QnServer::LowQualityCatalog);
     QnSecurityCamResourcePtr cameraRes = res.dynamicCast<QnSecurityCamResource>();
-
-    if (!cameraRes->isInitialized() && !cameraRes->hasFlags(Qn::foreigner) && !cameraRes->isScheduleDisabled()) {
+    bool needRecordCamera = !isResourceDisabled(res) && !cameraRes->isDtsBased();
+    if (!cameraRes->isInitialized() && needRecordCamera) {
         cameraRes->initAsync(true);
         return false; // wait for initialization
     }
@@ -274,8 +272,11 @@ bool QnRecordingManager::startOrStopRecording(const QnResourcePtr& res, QnVideoC
     bool someRecordingIsPresent = false;
 
     //QnStorageManager* storageMan = QnStorageManager::instance();
-    if (!isResourceDisabled(res) && !cameraRes->isDtsBased() && res->getStatus() != Qn::Offline /* && storageMan->rebuildState() == QnStorageManager::RebuildState_None*/)
+    if (needRecordCamera && res->getStatus() != Qn::Offline /* && storageMan->rebuildState() == QnStorageManager::RebuildState_None*/)
     {
+        QnLiveStreamProviderPtr providerHi = camera->getLiveReader(QnServer::HiQualityCatalog);
+        QnLiveStreamProviderPtr providerLow = camera->getLiveReader(QnServer::LowQualityCatalog);
+
         someRecordingIsPresent = true;
 
         if (providerHi)
