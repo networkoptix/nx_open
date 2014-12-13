@@ -31,8 +31,10 @@ protected:
     virtual QString manufacture() const;
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
 private:
+    friend class QnPlVmax480Resource;
+
     QMap<int, QByteArray> getCamNames(const QByteArray& answer);
-    bool vmaxAuthenticate(CLSimpleHTTPClient& client, const QAuthenticator& auth);
+    static bool vmaxAuthenticate(CLSimpleHTTPClient& client, const QAuthenticator& auth);
     QByteArray readDescriptionPage(CLSimpleHTTPClient& client);
     int getApiPort(const QByteArray& answer) const;
 };
