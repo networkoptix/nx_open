@@ -39,6 +39,7 @@ private:
     QMap<QnUuid, QnResourcePropertyList> m_modifiedItems;
     QMap<int, ec2::ApiResourceParamWithRefDataList> m_requestInProgress;
     mutable QMutex m_mutex;
+    mutable QMutex m_requestMutex;
 };
 
 #define propertyDictionary QnResourcePropertyDictionary::instance()
