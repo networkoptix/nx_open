@@ -644,4 +644,23 @@ private:
     Qn::LightModeFlags m_lightModeFlags;
 };
 
+class QnItemsCountActionCondition: public QnActionCondition {
+public:
+    enum Count {
+        MultipleItems = -1,
+        NoItems = 0,
+        OneItem = 1
+    };
+
+    QnItemsCountActionCondition(int count, QObject *parent = NULL):
+        QnActionCondition(parent),
+        m_count(count)
+    {}
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+
+private:
+    int m_count;
+};
+
 #endif // QN_ACTION_CONDITIONS_H

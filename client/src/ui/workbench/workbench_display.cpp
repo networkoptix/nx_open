@@ -128,17 +128,6 @@ namespace {
         *deltaEnd = newEnd - end;
     }
 
-    QRectF rotated(const QRectF &rect, qreal degrees) {
-        QPointF c = rect.center();
-
-        QTransform transform;
-        transform.translate(c.x(), c.y());
-        transform.rotate(degrees);
-        transform.translate(-c.x(), -c.y());
-
-        return transform.mapRect(rect);
-    }
-
     /** Size multiplier for raised widgets. */
     const qreal focusExpansion = 100.0;
 

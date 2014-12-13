@@ -1389,6 +1389,7 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnConjunctionActionCondition(
             new QnVideoWallReviewModeCondition(true, this),
             new QnLightModeCondition(Qn::LightModeSingleItem, this),
+            new QnItemsCountActionCondition(QnItemsCountActionCondition::MultipleItems, this),
             this));
 
     factory().

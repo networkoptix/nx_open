@@ -522,4 +522,21 @@ qint64 QnGeometry::area(const QRect &rect) {
     return rect.width() * rect.height();
 }
 
+QRectF QnGeometry::rotated(const QRectF &rect, qreal degrees) {
+    QPointF c = rect.center();
 
+    QTransform transform;
+    transform.translate(c.x(), c.y());
+    transform.rotate(degrees);
+    transform.translate(-c.x(), -c.y());
+
+    return transform.mapRect(rect);
+}
+
+QPointF QnGeometry::rotated(const QPointF &point, const QPointF &center, qreal degrees) {
+    QTransform transform;
+    transform.translate(center.x(), center.y());
+    transform.rotate(degrees);
+    transform.translate(-center.x(), -center.y());
+    return transform.map(point);
+}

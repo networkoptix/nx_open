@@ -226,7 +226,7 @@ public:
     bool sendPlay(qint64 startPos, qint64 endPos, double scale);
     bool sendPause();
     bool sendSetParameter(const QByteArray& paramName, const QByteArray& paramValue);
-    bool sendTeardown();
+    bool sendTeardown() const;
 
     int lastSendedCSeq() const { return m_csec-1; }
 
@@ -375,6 +375,7 @@ private:
     int m_additionalReadBufferPos;
     int m_additionalReadBufferSize;
     HttpAuthenticationClientContext m_rtspAuthCtx;
+    mutable QMutex m_sockSendMutex;
 
     /*!
         \param readSome if \a true, returns as soon as some data has been read. Otherwise, blocks till all \a bufSize bytes has been read
@@ -387,6 +388,7 @@ private:
         \return error description
     */
     bool sendRequestAndReceiveResponse( nx_http::Request&& request, QByteArray& responce );
+    int sendDataInternalSync(const void* data, unsigned int dataSize) const;
 };
 
 #endif //rtp_session_h_1935_h

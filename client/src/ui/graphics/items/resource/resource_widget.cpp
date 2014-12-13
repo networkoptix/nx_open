@@ -41,6 +41,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
+#include <utils/aspect_ratio.h>
 
 #include <utils/license_usage_helper.h>
 
@@ -340,6 +341,13 @@ void QnResourceWidget::setAspectRatio(float aspectRatio) {
     emit aspectRatioChanged();
 }
 
+float QnResourceWidget::visualAspectRatio() const {
+    if (!hasAspectRatio())
+        return -1;
+
+    return QnAspectRatio::isRotated90(rotation()) ? 1 / m_aspectRatio : m_aspectRatio;
+}
+
 float QnResourceWidget::defaultVisualAspectRatio() const {
     if (m_enclosingGeometry.isNull())
         return defaultAspectRatio();
@@ -470,11 +478,27 @@ void QnResourceWidget::updateCursor() {
         setCursor(newCursor);
 }
 
-QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint) const {
-    if(!hasAspectRatio())
+QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint, Qt::WindowFrameSection pinSection) const {
+    if (!hasAspectRatio())
         return constraint;
 
-    return expanded(m_aspectRatio, constraint, Qt::KeepAspectRatioByExpanding);
+    QSizeF result = constraint;
+
+    switch (pinSection) {
+    case Qt::TopSection:
+    case Qt::BottomSection:
+        result.setWidth(constraint.height() * m_aspectRatio);
+        break;
+    case Qt::LeftSection:
+    case Qt::RightSection:
+        result.setHeight(constraint.width() / m_aspectRatio);
+        break;
+    default:
+        result = expanded(m_aspectRatio, constraint, Qt::KeepAspectRatioByExpanding);
+        break;
+    }
+
+    return result;
 }
 
 void QnResourceWidget::updateCheckedButtons() {
