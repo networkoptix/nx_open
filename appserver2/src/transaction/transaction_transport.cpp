@@ -67,11 +67,7 @@ QnTransactionTransport::~QnTransactionTransport()
     if( m_httpClient )
         m_httpClient->terminate();
 
-    {
-        QMutexLocker lk( &m_mutex );
-        m_state = Closed;
-    }
-    closeSocket();
+    close();
 
     if (m_connected)
         connectDone(m_remotePeer.id);
@@ -358,7 +354,7 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
         return setStateNoLock( State::Error );
     }
 
-    if (m_state == Error)
+    if (m_state >= QnTransactionTransport::Closed)
         return;
 
     assert( m_state == ReadyForStreaming );
