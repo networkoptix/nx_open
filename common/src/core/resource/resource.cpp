@@ -195,8 +195,12 @@ void QnResource::update(const QnResourcePtr& other, bool silenceMode) {
         Q_FUNC_INFO,
         "Trying to update " + QByteArray(this->metaObject()->className()) + " with " + QByteArray(other->metaObject()->className()));
     */
-    for (QnResourceConsumer *consumer: m_consumers)
-        consumer->beforeUpdate();
+    {
+        QMutexLocker locker(&m_consumersMtx);
+        for (QnResourceConsumer *consumer: m_consumers)
+            consumer->beforeUpdate();
+    }
+
     QSet<QByteArray> modifiedFields;
     {
         QMutex *m1 = &m_mutex, *m2 = &other->m_mutex;
@@ -238,7 +242,8 @@ void QnResource::update(const QnResourcePtr& other, bool silenceMode) {
     //silently ignoring missing properties because of removeProperty method lack
     for (const ec2::ApiResourceParamData &param: other->getProperties())
         emitPropertyChanged(param.name);   //here "propertyChanged" will be called
-    
+
+    QMutexLocker locker(&m_consumersMtx);
     for (QnResourceConsumer *consumer: m_consumers)
         consumer->afterUpdate();
 }
