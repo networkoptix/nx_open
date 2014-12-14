@@ -205,8 +205,8 @@ bool QnAuthHelper::authenticate(
             &request->headers,
             nx_http::parseHeader( CLSimpleHTTPClient::digestAccess(
                 auth,
-                QLatin1String(authenticationCtx->authenticateHeader.get().params.value("realm")),
-                QLatin1String(authenticationCtx->authenticateHeader.get().params.value("nonce")),
+                QLatin1String(authenticationCtx->authenticateHeader.get().params["realm"]),
+                QLatin1String(authenticationCtx->authenticateHeader.get().params["nonce"]),
                 QLatin1String(request->requestLine.method),
                 request->requestLine.url.toString(),
                 authenticationCtx->responseStatusCode == nx_http::StatusCode::proxyAuthenticationRequired ).toLatin1() ) );
