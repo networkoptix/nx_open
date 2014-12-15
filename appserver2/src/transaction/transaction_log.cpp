@@ -97,7 +97,7 @@ qint64 QnTransactionLog::getTimeStamp()
 int QnTransactionLog::currentSequenceNoLock() const
 {
     QnTranStateKey key (qnCommon->moduleGUID(), m_dbManager->getID());
-    return m_state.values.value(key);
+    return qMax(m_state.values.value(key), m_commitData.state.values.value(key));
 }
 
 QnTransactionLog* QnTransactionLog::instance()
