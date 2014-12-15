@@ -401,7 +401,7 @@ static int TCP_READ_BUFFER_SIZE = 512*1024;
 
 RTPSession::TransportType QnMulticodecRtpReader::getRtpTransport() const
 {
-   RTPSession::TransportType result = RTPSession::TRANSPORT_AUTO;
+    RTPSession::TransportType result = RTPSession::TRANSPORT_AUTO;
     if (!m_resource)
         return result;
 
