@@ -1732,7 +1732,7 @@ class PerformanceOperation():
 
     def _sendRequest(self,methodName,d,server):
         req = urllib2.Request("http://%s/ec2/%s" % (server,methodName), \
-        data=d, headers={'Content-Type': 'application/json'})
+        data=d[0], headers={'Content-Type': 'application/json'})
 
         with self._lock:
             response = urllib2.urlopen(req)
