@@ -141,21 +141,23 @@ QnUuid QnTransactionLog::makeHash(const QString &extraData, const ApiDiscoveryDa
 
 ErrorCode QnTransactionLog::updateSequence(const ApiUpdateSequenceData& data)
 {
-    QnDbManager::Locker locker(dbManager);
+    QnDbManager::QnDbTransactionLocker locker(dbManager->getTransaction());
     for(const ApiSyncMarkerRecord& record: data.markers) 
     {
         ErrorCode result = updateSequenceNoLock(record.peerID, record.dbID, record.sequence);
         if (result != ErrorCode::ok)
             return result;
     }
-    locker.commit();
-    return ErrorCode::ok;
+    if (locker.commit())
+        return ErrorCode::ok;
+    else
+        return ErrorCode::dbError;
 }
 
 ErrorCode QnTransactionLog::updateSequenceNoLock(const QnUuid& peerID, const QnUuid& dbID, int sequence)
 {
     QnTranStateKey key(peerID, dbID);
-    if (m_state.values[key] >= sequence)
+    if (m_state.values.value(key) >= sequence)
         return ErrorCode::ok;
 
     QSqlQuery query(m_dbManager->getDB());
@@ -168,8 +170,7 @@ ErrorCode QnTransactionLog::updateSequenceNoLock(const QnUuid& peerID, const QnU
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::failure;
     }
-    m_state.values[key] = sequence;
-
+    m_commitData.state.values[key] = sequence;
     return ErrorCode::ok;
 }
 
@@ -211,6 +212,7 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const Qn
     if (code != ErrorCode::ok)
         return code;
 
+    /*
     auto updateHistoryItr = m_updateHistory.find(hash);
     if (updateHistoryItr == m_updateHistory.end())
         updateHistoryItr = m_updateHistory.insert(hash, UpdateHistoryData());
@@ -220,6 +222,8 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const Qn
 
     updateHistoryItr.value().timestamp = tran.persistentInfo.timestamp;
     updateHistoryItr.value().updatedBy = key;
+    */
+    m_commitData.updateHistory[hash] = UpdateHistoryData(key, tran.persistentInfo.timestamp);
 
     QMutexLocker lock(&m_timeMutex);
     if (tran.persistentInfo.timestamp > m_currentTime + m_relativeTimer.elapsed()) {
@@ -228,6 +232,27 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const Qn
     }
 
     return ErrorCode::ok;
+}
+
+void QnTransactionLog::beginTran()
+{
+    m_commitData.clear();
+}
+
+void QnTransactionLog::commit()
+{
+    for (auto itr = m_commitData.state.values.constBegin(); itr != m_commitData.state.values.constEnd(); ++itr)
+        m_state.values[itr.key()] = itr.value();
+
+    for (auto itr = m_commitData.updateHistory.constBegin(); itr != m_commitData.updateHistory.constEnd(); ++itr)
+        m_updateHistory[itr.key()] = itr.value();
+    
+    m_commitData.clear();
+}
+
+void QnTransactionLog::rollback()
+{
+    m_commitData.clear();
 }
 
 QnTranState QnTransactionLog::getTransactionsState()
@@ -256,8 +281,8 @@ QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTran
             arg(ApiCommand::toString(tran.command)).arg(m_state.values.value(key)).arg(tran.persistentInfo.sequence), cl_logDEBUG1 );
         return Reason_Sequence;
     }
-    auto itr = m_updateHistory.find(hash);
-    if (itr == m_updateHistory.end())
+    const auto itr = m_updateHistory.find(hash);
+    if (itr == m_updateHistory.constEnd())
         return Reason_None;
 
     const qint64 lastTime = itr.value().timestamp;

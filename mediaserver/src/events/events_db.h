@@ -41,6 +41,8 @@ public:
 
     bool createDatabase();
     static void migrate();
+
+    virtual QnDbTransaction* getTransaction() override;
 protected:
     QnEventsDB();
 private:
@@ -55,6 +57,7 @@ private:
     qint64 m_lastCleanuptime;
     qint64 m_eventKeepPeriod;
     static QnEventsDB* m_instance;
+    QnDbTransaction m_tran;
 };
 
 #define qnEventsDB QnEventsDB::instance()

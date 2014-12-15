@@ -47,6 +47,7 @@ public:
     bool addOrUpdateCameraBookmark(const QnCameraBookmark &bookmark, const QString& cameraUniqueId);
     bool deleteCameraBookmark(const QnCameraBookmark &bookmark);
     bool getBookmarks(const QString& cameraUniqueId, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);
+    virtual QnDbTransaction* getTransaction() override;
 private:
     void flushRecordsNoLock();
     bool initializeBookmarksFtsTable();
@@ -76,10 +77,11 @@ private:
         DeviceFileCatalog::Chunk chunk;
     };
 
-    mutable QMutex m_mutex;
+    mutable QMutex m_syncMutex;
     QVector<DelayedData> m_delayedData;
     QVector<DeleteRecordInfo> m_recordsToDelete;
     QMutex m_delMutex;
+    QnDbTransaction m_tran;
 };
 
 typedef QSharedPointer<QnStorageDb> QnStorageDbPtr;

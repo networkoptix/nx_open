@@ -29,9 +29,10 @@ bool QnDbHelper::QnDbTransaction::commit()
 {
     QSqlQuery query(m_database);
     bool rez = query.exec(lit("COMMIT"));
-    if (!rez)
-        qWarning() << "Commit failed:" << query.lastError();
-    m_mutex.unlock();
+    if (rez)
+        m_mutex.unlock();
+    else
+        qWarning() << "Commit failed:" << query.lastError(); // do not unlock mutex. Rollback is expected
     return rez;
 }
 
@@ -50,14 +51,11 @@ QnDbHelper::QnDbTransactionLocker::~QnDbTransactionLocker()
 
 bool QnDbHelper::QnDbTransactionLocker::commit()
 {
-    m_committed = true;
-    return m_tran->commit();
+    m_committed = m_tran->commit();
+    return m_committed;
 }
 
-
-
-QnDbHelper::QnDbHelper():
-    m_tran(m_sdb, m_mutex)
+QnDbHelper::QnDbHelper()
 {
 
 }
@@ -125,16 +123,6 @@ bool QnDbHelper::execSQLFile(const QString& fileName, QSqlDatabase& database)
     return true;
 }
 
-QnDbHelper::QnDbTransaction* QnDbHelper::getTransaction()
-{
-    return &m_tran;
-}
-
-const QnDbHelper::QnDbTransaction* QnDbHelper::getTransaction() const
-{
-    return &m_tran;
-}
-
 bool QnDbHelper::isObjectExists(const QString& objectType, const QString& objectName, QSqlDatabase& database)
 {
     QSqlQuery tableList(database);
@@ -148,21 +136,6 @@ bool QnDbHelper::isObjectExists(const QString& objectType, const QString& object
         return false;
     QString value = tableList.value(fieldNo).toString();
     return !value.isEmpty();
-}
-
-void QnDbHelper::beginTran()
-{
-    m_tran.beginTran();
-}
-
-void QnDbHelper::rollback()
-{
-    m_tran.rollback();
-}
-
-void QnDbHelper::commit()
-{
-    m_tran.commit();
 }
 
 void QnDbHelper::addDatabase(const QString& fileName, const QString& dbname)

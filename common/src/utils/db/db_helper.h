@@ -13,17 +13,16 @@ public:
     {
     public:
         QnDbTransaction(QSqlDatabase& database, QReadWriteLock& mutex);
-
-    private:
+    protected:
+        virtual void beginTran();
+        virtual void rollback();
+        virtual bool commit();
+    protected:
         friend class QnDbTransactionLocker;
         friend class QnDbHelper;
 
         QSqlDatabase& m_database;
         QReadWriteLock& m_mutex;
-
-        void beginTran();
-        void rollback();
-        bool commit();
     };
 
     class QnDbTransactionLocker
@@ -42,8 +41,8 @@ public:
 
     bool execSQLFile(const QString& fileName, QSqlDatabase& database);
     bool execSQLQuery(const QString& query, QSqlDatabase& database);
-    QnDbTransaction* getTransaction();
-    const QnDbTransaction* getTransaction() const;
+    virtual QnDbTransaction* getTransaction() = 0;
+    //const QnDbTransaction* getTransaction() const;
 
 protected:
     bool isObjectExists(const QString& objectType, const QString& objectName, QSqlDatabase& database);
@@ -51,13 +50,8 @@ protected:
 
 protected:
     QSqlDatabase m_sdb;
-    QnDbTransaction m_tran;
+    //QnDbTransaction m_tran;
     mutable QReadWriteLock m_mutex;
-
-private:
-    void beginTran();
-    void rollback();
-    void commit();
 };
 
 #endif // __QN_DB_HELPER_H__
