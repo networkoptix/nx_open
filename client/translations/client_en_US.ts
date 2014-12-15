@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="en_US" sourcelanguage="en">
+<TS version="2.0" language="en_US" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -1698,14 +1698,12 @@ Recording Schedule is always based on Server Time.</source>
         <source>%n millisecond(s)</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/common/qtimespan.cpp" line="283"/>
         <source>%n second(s)</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -1714,14 +1712,12 @@ Recording Schedule is always based on Server Time.</source>
         <source>%n minute(s)</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/common/qtimespan.cpp" line="287"/>
         <source>%n hour(s)</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -1730,14 +1726,12 @@ Recording Schedule is always based on Server Time.</source>
         <source>%n day(s)</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/common/qtimespan.cpp" line="291"/>
         <source>%n week(s)</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -1746,14 +1740,12 @@ Recording Schedule is always based on Server Time.</source>
         <source>%n month(s)</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/common/qtimespan.cpp" line="295"/>
         <source>%n year(s)</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3760,14 +3752,12 @@ It might take a few seconds for the cameras to populate in the tree.</numerusfor
         <source>Scanning hosts... (%1)</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="755"/>
         <source>%n cameras found</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3806,7 +3796,6 @@ It might take a few seconds for the cameras to populate in the tree.</numerusfor
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="643"/>
         <source>Error while adding camera(s).</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -4001,7 +3990,6 @@ This can take a lot of time.</source>
         <source>Camera List for &apos;%1&apos; - %n camera(s) found</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -4084,7 +4072,6 @@ This can take a lot of time.</source>
         <location filename="../src/business/business_resource_validation.cpp" line="81"/>
         <source>Recording or motion detection is disabled for %1</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -4247,7 +4234,6 @@ This can take a lot of time.</source>
         <source>Could not save the following %n cameras to Server.</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -4399,7 +4385,7 @@ Please make sure you have a compatible client to connect to this server.</transl
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="196"/>
         <source>Could not connect to Enterprise Controller</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="197"/>
@@ -4407,7 +4393,7 @@ Please make sure you have a compatible client to connect to this server.</transl
  - Client version: %1.
  - EC version: %2.
 You need to download client %3 to connect</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="211"/>
@@ -4796,14 +4782,12 @@ These versions are not compatible. Please update your %3</translation>
         <source>Event log for period from %1 to %2 - %n event(s) found</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="364"/>
         <source>Event log for %1 - %n event(s) found</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -4816,7 +4800,6 @@ These versions are not compatible. Please update your %3</translation>
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="404"/>
         <source>&lt;%n camera(s)&gt;</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -5240,7 +5223,6 @@ These versions are not compatible. Please update your %3</translation>
 At least %n %2 are required</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -5248,7 +5230,6 @@ At least %n %2 are required</source>
         <source>
 %n %2 are currently in use</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -6274,7 +6255,6 @@ These tours will become invalid if you remove it.</source>
         <source>This preset will be activated after %n minutes of inactivity</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -6406,7 +6386,6 @@ These tours will become invalid if you remove it.</source>
         <location filename="../src/ui/models/ptz_tour_spots_model.cpp" line="90"/>
         <source>%n seconds</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -6989,33 +6968,33 @@ Please close the application and start it again using the shortcut in the start 
     <message numerus="yes">
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="350"/>
         <source>The problem is caused by %n servers:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>The problem is caused by %n server:</numerusform>
+            <numerusform>The problem is caused by %n servers:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="361"/>
         <source>No free space left on %n servers:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>No free space left on %n server:</numerusform>
+            <numerusform>No free space left on %n servers:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="369"/>
         <source>%n servers are not responding:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n server is not responding:</numerusform>
+            <numerusform>%n servers are not responding:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="377"/>
         <source>%n servers have gone offline:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n server has gone offline:</numerusform>
+            <numerusform>%n servers have gone offline:</numerusform>
         </translation>
     </message>
     <message>
@@ -7758,7 +7737,6 @@ AVAILABLE</source>
         <source>%n of %1 additional email addresses are invalid</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -7771,14 +7749,12 @@ AVAILABLE</source>
         <source>%n User(s)</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_resource_validation.cpp" line="139"/>
         <source>%1, %n additional</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -7818,7 +7794,7 @@ AVAILABLE</source>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="347"/>
         <source>User was renamed. Password must be updated.</source>
-        <translation type="unfinished"></translation>
+        <translation>User has been renamed. Password must be updated.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="354"/>
@@ -8220,7 +8196,6 @@ Are you sure you want to delete them?</numerusform>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2228"/>
         <source>Could not save the following %n items.</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -8790,7 +8765,6 @@ Try to update the servers again in the System Administration menu.</translation>
         <source>Could not save the following %n layout(s) to Server.</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -9140,7 +9114,6 @@ Another user is already controlling this screen.</translation>
         <source>Are you sure you want to permanently delete these %n item(s)?</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -9184,7 +9157,6 @@ You&apos;ll have to start it again manually.</translation>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1713"/>
         <source>Are you sure you want to permanently delete these %n matrices?</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
