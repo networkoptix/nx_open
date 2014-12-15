@@ -358,7 +358,7 @@ class CameraDataGenerator(BasicGenerator):
             "secondaryStreamQuality": "SSQualityLow",
             "status": "Unauthorized",
             "statusFlags": "CSF_NoFlags",
-            "typeId": "{1657647e-f6e4-bc39-d5e8-563c93cb5e1c}",
+            "typeId": "{4b888081-31c6-a2b4-f92f-409d273b64c7}",
             "url": "%s",
             "vendor": "%s"
         }
@@ -1703,7 +1703,7 @@ class SingleServerRtspTest():
         worker = ClusterWorker(16 , self._testCase)
         for _ in range(self._testCase):
             worker.enqueue(self._testMain,())
-        worker.join()	
+        worker.join()   
 
 class ServerRtspTest:
     _testCase = 0
