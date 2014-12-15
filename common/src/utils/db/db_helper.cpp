@@ -4,6 +4,8 @@
 #include <QFile>
 #include <QSqlError>
 
+//TODO #AK QnDbTransaction is a bad name for this class since it actually lives beyond DB transaction 
+    //and no concurrent transactions supported. Maybe QnDbConnection?
 QnDbHelper::QnDbTransaction::QnDbTransaction(QSqlDatabase& database, QReadWriteLock& mutex): 
     m_database(database),
     m_mutex(mutex)
@@ -12,36 +14,32 @@ QnDbHelper::QnDbTransaction::QnDbTransaction(QSqlDatabase& database, QReadWriteL
 
 QnDbHelper::QnDbTransaction::~QnDbTransaction()
 {
-    if( m_writeLocker )
-        rollback();
 }
 
 bool QnDbHelper::QnDbTransaction::beginTran()
 {
-    assert( !m_writeLocker );
-    m_writeLocker.reset( new QWriteLocker(&m_mutex) );
+    m_mutex.lockForWrite();
     if( !m_database.transaction() )
     {
-        m_writeLocker.reset();
-        return false;
+        //TODO #ak ignoring this error since calling party thinks it always succeeds
+        //m_mutex.unlock();
+        //return false;
     }
     return true;
 }
 
 void QnDbHelper::QnDbTransaction::rollback()
 {
-    assert( m_writeLocker );
     m_database.rollback();
     //TODO #ak handle rollback error?
-    m_writeLocker.reset();
+    m_mutex.unlock();
 }
 
 bool QnDbHelper::QnDbTransaction::commit()
 {
-    assert( m_writeLocker );
     bool rez = m_database.commit();
     if (rez)
-        m_writeLocker.reset();
+        m_mutex.unlock();
     else
         qWarning() << "Commit failed:" << m_database.lastError(); // do not unlock mutex. Rollback is expected
     return rez;

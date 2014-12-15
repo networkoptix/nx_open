@@ -1,8 +1,6 @@
 #ifndef __QN_DB_HELPER_H__
 #define __QN_DB_HELPER_H__
 
-#include <memory>
-
 #include <QSqlDatabase>
 #include <QReadWriteLock>
 
@@ -25,9 +23,6 @@ public:
         friend class QnDbHelper;
 
         QSqlDatabase& m_database;
-        std::unique_ptr<QWriteLocker> m_writeLocker;
-
-    private:
         QReadWriteLock& m_mutex;
     };
 

@@ -238,7 +238,7 @@ bool QnDbManager::QnDbTransactionExt::commit()
     const bool rez = m_database.commit();
     if (rez) {
         transactionLog->commit();
-        m_writeLocker.reset();
+        m_mutex.unlock();
     }
     else {
         qWarning() << "Commit failed:" << m_database.lastError(); // do not unlock mutex. Rollback is expected
