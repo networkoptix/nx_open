@@ -39,10 +39,6 @@ namespace ec2
         m_discoveryManager( new QnDiscoveryManager<T>(m_queryProcessor) ),
         m_timeManager( new QnTimeManager<T>(m_queryProcessor) )
     {
-        connect(QnTransactionMessageBus::instance(),    &QnTransactionMessageBus::peerFound,                this,   &BaseEc2Connection<T>::remotePeerFound);
-        connect(QnTransactionMessageBus::instance(),    &QnTransactionMessageBus::peerLost,                 this,   &BaseEc2Connection<T>::remotePeerLost);
-        connect(QnTransactionMessageBus::instance(),    &QnTransactionMessageBus::remotePeerUnauthorized,   this,   &BaseEc2Connection<T>::remotePeerUnauthorized);
-
         m_notificationManager.reset(
             new ECConnectionNotificationManager(
                 m_resCtx,
@@ -59,6 +55,18 @@ namespace ec2
                 m_updatesManager.get(),
                 m_miscManager.get(),
                 m_discoveryManager.get() ) );
+    }
+
+    template<class T>
+    void BaseEc2Connection<T>::startReceivingNotifications() {
+        connect(QnTransactionMessageBus::instance(),    &QnTransactionMessageBus::peerFound,                this,   &BaseEc2Connection<T>::remotePeerFound,         Qt::DirectConnection);
+        connect(QnTransactionMessageBus::instance(),    &QnTransactionMessageBus::peerLost,                 this,   &BaseEc2Connection<T>::remotePeerLost,          Qt::DirectConnection);
+        connect(QnTransactionMessageBus::instance(),    &QnTransactionMessageBus::remotePeerUnauthorized,   this,   &BaseEc2Connection<T>::remotePeerUnauthorized,  Qt::DirectConnection);
+    }
+
+    template<class T>
+    void BaseEc2Connection<T>::stopReceivingNotifications() {
+        disconnect(QnTransactionMessageBus::instance(), NULL, this, NULL);
     }
 
     template<class T>

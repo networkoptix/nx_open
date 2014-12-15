@@ -134,4 +134,9 @@ namespace ec2
     void OldEcConnection::startReceivingNotifications()
     {
     }
+
+    void OldEcConnection::stopReceivingNotifications()
+    {
+    }
+
 }
