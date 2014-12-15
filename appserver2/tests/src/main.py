@@ -182,11 +182,11 @@ class ClusterTest():
         response.close()
         return (True,"")
 
-    def _checkResultEqual(self,responseList,methodName):
+    def _checkResultEqual(self,responseList,methodName,address):
         result = None
         for response in responseList:
             if response.getcode() != 200:
-                return(False,"method:%s http request failed with code:%d" % (methodName,response.getcode))
+                return(False,"Server:%s method:%s http request failed with code:%d" % (address,methodName,response.getcode))
             else:
                 # painfully slow, just bulk string comparison here
                 if result == None:
@@ -194,7 +194,7 @@ class ClusterTest():
                 else:
                     output = response.read()
                     if result != output:
-                        return(False,"method:%s return value differs from other" % (methodName))
+                        return(False,"Server:%s method:%s return value differs from other" % (address,methodName))
                 
                 response.close()
 
@@ -206,7 +206,7 @@ class ClusterTest():
                 responseList.append((urllib2.urlopen("http://%s/ec2/%s" % (server, method))))
 
             # checking the last response validation
-            return self._checkResultEqual(responseList,method)
+            return self._checkResultEqual(responseList,method,server)
 
     def _ensureServerListStates(self,sleep_timeout):
         time.sleep(sleep_timeout)
@@ -2116,7 +2116,141 @@ def runPerformanceTest():
 
     return True
 
+class SystemNameTest:
+    _serverList=[]
+    _guidDict=dict()
+    _oldSystemName=None
+    _syncTime=2
+    _systemNameTemplate = """
+    {
+        "systemName":"%s"
+    }"""
+
+    def _setUpAuth(self,user,pwd):
+        passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
+        for s in self._serverList:
+            passman.add_password("NetworkOptix","http://%s/ec2/" % (s), user, pwd)
+        urllib2.install_opener(urllib2.build_opener(urllib2.HTTPDigestAuthHandler(passman)))
+
+    def _doGet(self,addr,methodName):
+        ret = None
+        response = None
+
+        response = urllib2.urlopen("http://%s/ec2/%s"%(addr,methodName))
+
+        if response.getcode() != 200:
+            response.close()
+            return None
+
+        else:
+            ret = response.read()
+            response.close()
+            return ret
+
+    def _doPost(self,addr,methodName,d):
+        response = None
+        req = urllib2.Request("http://%s/ec2/%s" % (addr,methodName), \
+            data=d, headers={'Content-Type': 'application/json'})
+
+        response = urllib2.urlopen(req)
+
+        if response.getcode() != 200:
+            response.close()
+            return False
+        else:
+            response.close()
+            return True
+
+    def _changeSystemName(self,addr,name):
+        return self._doPost(addr,"changeSystemName",
+                            self._systemNameTemplate%(name))
+
+
+    def _ensureServerSystemName(self):
+        systemName = None
+
+        for s in self._serverList:
+            ret = self._doGet(s,"testConnection")
+            if ret == None:
+                return (False,"Server:%s cannot perform testConnection REST call"%(s))
+            obj = json.loads(ret)
+
+            if systemName != None:
+                if systemName != obj["systemName"]:
+                    return (False,"Server:%s has systemName:%s which is different with others:%s"%(s,obj["systemName"],systemName))
+            else:
+                systemName=obj["systemName"]
+
+            self._guidDict[s] = obj["ecsGuid"]
+
+        self._oldSystemName = systemName
+        return (True,"")
+
+
+    def _loadConfig(self):
+        configParser = ConfigParser.RawConfigParser()
+        configParser.read("ec2_tests.cfg")
+        username = configParser.get("General","username")
+        passwd = configParser.get("General","password")
+        sl = configParser.get("General","serverList")
+        self._serverList = sl.split(",")
+        self._syncTime = configParser.get("General","clusterTestSleepTime")
+        return (username,passwd)
+
+
+    def _doSingleTest(self,s):
+        thisGUID = self._guidDict[s]
+        self._changeSystemName(s,BasicGenerator().generateRandomString(20))
+        # wait for the time to sync
+        time.sleep(self._syncTime)
+        # issue a getMediaServerEx request to test whether all the servers in
+        # the list has the expected offline/online status
+        ret = self._doGet(s,"getMediaServersEx")
+        if ret == None:
+            return (False,"Server:%s cannot doGet on getMediaServersEx"%(s))
+        obj = json.loads(ret)
+        for ele in obj:
+            if ele["id"] == thisGUID:
+                if ele["status"] == "Offline":
+                    return (False,"This server:%s with GUID:%s should be Online"%(s,thisGUID))
+            else:
+                if ele["status"] == "Online":
+                    return (False,"The server:%s should be Offline when login on Server:%s"%(ele["apiUrl"],s))
+        return (True,"")
+    
+    def _doTest(self):
+        for s in self._serverList:
+            ret,reason = self._doSingleTest(s)
+            if ret != True:
+                return (ret,reason)
+        return (True,"")
+
+    def _doRollback(self):
+        for s in self._serverList:
+            self._changeSystemName(s,self._oldSystemName)
+
+    def run(self):
+        user,pwd = self._loadConfig()
+        self._setUpAuth(user,pwd)
+
+        ret,reason = self._ensureServerSystemName()
+
+        if not ret:
+            print reason
+            return False
+        
+        print "Start to test SystemName for server lists"
+        ret,reason = self._doTest()
+        if not ret:
+            print reason
+            return False
+        print "SystemName test finished"
+        print "Rollback"
+        self._doRollback()
+        print "Rollback done"
+
 helpStr="Usage:\n\n" \
+    "--sys-name: Start the system name test. This test will move server one by one from the existed system name cluster, and then check each server status information. \n\n" \
     "--perf : Start performance test.User can use ctrl+c to interrupt the perf test and statistic will be displayed.User can also specify configuration parameters " \
     "for performance test. In ec2_tests.cfg file,\n[PerfTest]\nfrequency=1000\ncreateProb=0.5\n, the frequency means at most how many operations will be issued on each" \
     "server in one seconds(not guaranteed,bottleneck is CPU/Bandwidth for running this script);and createProb=0.5 means the creation operation will be performed as 0.5 "\
@@ -2155,6 +2289,8 @@ if __name__ == '__main__':
         print helpStr
     elif len(sys.argv) == 2 and sys.argv[1] == '--recover':
         UnitTestRollback().doRecover()
+    elif len(sys.argv) == 2 and sys.argv[1] == '--sys-name':
+        SystemNameTest().run()
     else:
         print "The automatic test starts,please wait for checking cluster status and do proper recover first ..."
         # initialize cluster test environment

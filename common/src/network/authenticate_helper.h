@@ -111,7 +111,7 @@ public:
     bool authenticate(
         const QAuthenticator& auth,
         nx_http::Request* const request,
-        HttpAuthenticationClientContext* const authenticationCtx );
+        const HttpAuthenticationClientContext* const authenticationCtx );
     bool authenticate(const QString& login, const QByteArray& digest) const;
 
     QnAuthMethodRestrictionList* restrictionList();

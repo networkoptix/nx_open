@@ -67,7 +67,13 @@ QnTransactionTransport::~QnTransactionTransport()
     if( m_httpClient )
         m_httpClient->terminate();
 
-    close();
+    {
+        QMutexLocker lk( &m_mutex );
+        m_state = Closed;
+    }
+    closeSocket();
+    //not calling QnTransactionTransport::close since it will emit stateChanged, 
+        //which can potentially lead to some trouble
 
     if (m_connected)
         connectDone(m_remotePeer.id);
