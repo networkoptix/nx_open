@@ -21,6 +21,8 @@ namespace ec2
     :
         public BaseEc2Connection<FixedUrlClientQueryProcessor>
     {
+    typedef public BaseEc2Connection<FixedUrlClientQueryProcessor> base_type;
+
     public:
         RemoteEC2Connection(
             const FixedUrlClientQueryProcessorPtr& queryProcessor,

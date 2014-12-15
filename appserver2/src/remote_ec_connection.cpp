@@ -18,7 +18,7 @@ namespace ec2
         const ResourceContext& resCtx,
         const QnConnectionInfo& connectionInfo )
     :
-        BaseEc2Connection<FixedUrlClientQueryProcessor>( queryProcessor.get(), resCtx ),
+        base_type( queryProcessor.get(), resCtx ),
         m_queryProcessor( queryProcessor ),
         m_connectionInfo( connectionInfo )
     {
@@ -47,6 +47,8 @@ namespace ec2
     }
 
     void RemoteEC2Connection::startReceivingNotifications() {
+
+        base_type::startReceivingNotifications();
 
         // in remote mode we are always working as a client
         ApiPeerData localPeer(qnCommon->moduleGUID(), qnCommon->runningInstanceGUID(), Qn::PT_DesktopClient);
