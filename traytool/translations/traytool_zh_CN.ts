@@ -6,14 +6,14 @@
     <message>
         <location filename="../src/main.cpp" line="21"/>
         <source>System Tray</source>
-        <translation>系统托盘</translation>
+        <translation>系统托盘工具</translation>
     </message>
     <message>
         <location filename="../src/main.cpp" line="22"/>
         <source>There is no system tray on this system.
 Application will now quit.</source>
-        <translation>这个系统上没有系统托盘。
-应用程序现在将退出。</translation>
+        <translation>此系统上没有系统托盘。
+应用程序将退出。</translation>
     </message>
 </context>
 <context>
@@ -21,12 +21,12 @@ Application will now quit.</source>
     <message>
         <location filename="../src/systraywindow.cpp" line="425"/>
         <source>Insufficient privileges to manage services</source>
-        <translation>没有足够的权限来管理服务</translation>
+        <translation>未获得管理服务权限</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="425"/>
         <source>UAC must be enabled to request privileges for non-admin users</source>
-        <translation>必须启用UAC来请求非管理员用户的权限</translation>
+        <translation>非管理员用户必须通过账户控制来获取权限</translation>
     </message>
 </context>
 <context>
@@ -89,12 +89,12 @@ Application will now quit.</source>
     <message>
         <location filename="../src/systraywindow.cpp" line="386"/>
         <source>Media server is going to be stopped. Are you sure?</source>
-        <translation>媒体服务器將停止。确定?</translation>
+        <translation>媒体服务器将被停止，是否确定?</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="157"/>
         <source>Access denied.</source>
-        <translation>访问被拒绝。</translation>
+        <translation>访问被拒绝！</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="160"/>
@@ -126,7 +126,7 @@ Application will now quit.</source>
     <message>
         <location filename="../src/systraywindow.cpp" line="483"/>
         <source>Media Server Web Page</source>
-        <translation type="unfinished"></translation>
+        <translation>媒体服务网页访问</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="473"/>
