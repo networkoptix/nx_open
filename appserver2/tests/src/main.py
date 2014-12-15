@@ -386,7 +386,7 @@ class CameraDataGenerator(BasicGenerator):
             "motionMask": "",
             "motionType": "MT_Default",
             "name": "%s",
-            "parentId": "{47bf37a0-72a6-2890-b967-5da9c390d28a}",
+            "parentId": "%s",
             "physicalId": "%s",
             "preferedServerId": "{00000000-0000-0000-0000-000000000000}",
             "scheduleEnabled": false,
@@ -394,7 +394,7 @@ class CameraDataGenerator(BasicGenerator):
             "secondaryStreamQuality": "SSQualityLow",
             "status": "Unauthorized",
             "statusFlags": "CSF_NoFlags",
-            "typeId": "{4b888081-31c6-a2b4-f92f-409d273b64c7}",
+            "typeId": "{7d2af20d-04f2-149f-ef37-ad585281e3b7}",
             "url": "%s",
             "vendor": "%s"
         }
@@ -403,7 +403,20 @@ class CameraDataGenerator(BasicGenerator):
     def _generateCameraId(self,mac):
         return self.generateUUIdFromMd5(mac)
 
-    def generateCameraData(self,number):
+    def _getServerUUID(self,addr):
+        if addr == None:
+            return "{2571646a-7313-4324-8308-c3523825e639}"
+        i = 0
+
+        for s in  clusterTest.clusterTestServerList:
+            if addr == s:
+                break
+            else:
+                i = i +1
+
+        return clusterTest.clusterTestServerUUIDList[i][0]
+
+    def generateCameraData(self,number,mediaServer):
         ret = []
         for i in range(number):
             mac = self.generateMac()
@@ -415,13 +428,14 @@ class CameraDataGenerator(BasicGenerator):
                     mac,
                     name_and_model,
                     name_and_model,
+                    self._getServerUUID(mediaServer),
                     mac,
                     self.generateIpV4(),
                     self.generateRandomString(4)),id))
 
         return ret
 
-    def generateUpdateData(self,id):
+    def generateUpdateData(self,id,mediaServer):
         mac = self.generateMac()
         name_and_model = self.generateCameraName()
         return (self._template % (self.generateTrueFalse(),
@@ -430,6 +444,7 @@ class CameraDataGenerator(BasicGenerator):
                 mac,
                 name_and_model,
                 name_and_model,
+                self._getServerUUID(mediaServer),
                 mac,
                 self.generateIpV4(),
                 self.generateRandomString(4)),id)
@@ -531,9 +546,26 @@ class ConflictionDataGenerator(BasicGenerator):
 
         return True
 
+    def _prepareCameraData(self,op,num,methodName,l):
+        for _ in range(num):
+            for s in clusterTest.clusterTestServerList:
+                d = op(1,s)[0]
+                req = urllib2.Request("http://%s/ec2/%s" % (s,methodName),
+                      data=d[0], headers={'Content-Type': 'application/json'})
+                response = urllib2.urlopen(req)
+
+                if response.getcode() != 200:
+                    # failed 
+                    return False
+                else:
+                    clusterTest.unittestRollback.addOperations(methodName,s,d[1])
+                    l.append(d[0])
+
+        return True
+
     def prepare(self,num):
         return \
-            self._prepareData(CameraDataGenerator().generateCameraData(num),"saveCameras",self.conflictCameraList) and \
+            self._prepareCameraData(CameraDataGenerator().generateCameraData,num,"saveCameras",self.conflictCameraList) and \
             self._prepareData(UserDataGenerator().generateUserData(num),"saveUser",self.conflictUserList) and \
             self._prepareData(MediaServerGenerator().generateMediaServerData(num),"saveMediaServer",self.conflictMediaServerList)
 
@@ -852,9 +884,10 @@ class CameraUserAttributesListDataGenerator(BasicGenerator):
         if self._fetchExistedCameraUUIDList(prepareNum) == False:
             raise Exception("Cannot initialize camera list attribute test data")
 
-    def _prepareData(self,dataList,methodName,l):
-        for d in dataList:
+    def _prepareData(self,op,num,methodName,l):
+        for _ in range(num):
             for s in clusterTest.clusterTestServerList:
+                d = op(1,s)[0]
                 req = urllib2.Request("http://%s/ec2/%s" % (s,methodName),
                         data=d[0], headers={'Content-Type': 'application/json'})
                 response = urllib2.urlopen(req)
@@ -874,7 +907,7 @@ class CameraUserAttributesListDataGenerator(BasicGenerator):
         # then do the test by so.
         json_list = []
 
-        if not self._prepareData( CameraDataGenerator().generateCameraData(num),"saveCameras",json_list):
+        if not self._prepareData( CameraDataGenerator().generateCameraData,num,"saveCameras",json_list):
             return False
 
         for entry in json_list:
@@ -1113,7 +1146,13 @@ class CameraTest(ClusterTestBase):
     
     
     def _generateModifySeq(self):
-        return self._defaultCreateSeq(self._gen.generateCameraData(self._testCase))
+        ret = []
+        for _ in range(self._testCase):
+            s = clusterTest.clusterTestServerList[random.randint(0,len(clusterTest.clusterTestServerList)-1)]
+            data = self._gen.generateCameraData(1,s)[0]
+            clusterTest.unittestRollback.addOperations(self._getMethodName(),s,data[1])
+            ret.append((data[0],s))
+        return ret
 
     def _getMethodName(self):
         return "saveCameras"
@@ -1342,11 +1381,11 @@ class PrepareServerStatus(BasicGenerator):
         self._mergeTest  = mt
 
     # Function to generate method and class matching
-    def _generateDataAndAPIList(self):
+    def _generateDataAndAPIList(self,addr):
 
         def cameraFunc(num):
             gen = CameraDataGenerator()
-            return gen.generateCameraData(num)
+            return gen.generateCameraData(num,addr)
 
         def userFunc(num):
             gen = UserDataGenerator()
@@ -1390,7 +1429,7 @@ class PrepareServerStatus(BasicGenerator):
         return (True,"")
 
     def _generateRandomStates(self,addr):
-        api_list = self._generateDataAndAPIList()
+        api_list = self._generateDataAndAPIList(addr)
         for api in api_list:
             num = random.randint(self._minData,self._maxData)
             data_list = api[1](num)
@@ -1475,7 +1514,6 @@ class MergeTest():
 
         response = urllib2.urlopen(
             "http://%s/api/configure?%s"%(addr,urllib.urlencode({"systemName":name})))
-        response = urllib2.urlopen(req)
 
         if response.getcode() != 200 :
             return (False,"Cannot issue changeSystemName with HTTP code:%d to server:%s" % (response.getcode()),addr)
@@ -1785,28 +1823,31 @@ class PerformanceOperation():
         response.close()
 
     def _getUUIDList(self,methodName):
-        response = urllib2.urlopen("http://%s/ec2/%s?format=json" % (clusterTest.clusterTestServerList[0],methodName))
-
-        if response.getcode() != 200:
-            return None
-
-        json_obj = json.loads(response.read())
         ret = []
-        for entry in json_obj:
-            if "isAdmin" in entry and entry["isAdmin"] == True:
-                continue # Skip the admin
-            ret.append(entry["id"])
+        for s in clusterTest.clusterTestServerList:
+            data = []
 
-        response.close()
+            response = urllib2.urlopen("http://%s/ec2/%s?format=json" % (s,methodName))
+
+            if response.getcode() != 200:
+                return None
+
+            json_obj = json.loads(response.read())
+            for entry in json_obj:
+                if "isAdmin" in entry and entry["isAdmin"] == True:
+                    continue # Skip the admin
+                data.append(entry["id"])
+
+            response.close()
+
+            ret.append((s,data))
 
         return ret
 
-    def _sendOp(self,methodName,dataList):
+    def _sendOp(self,methodName,dataList,addr):
         worker = ClusterWorker(32,len(dataList))
         for d in dataList:
-            worker.enqueue(self._sendRequest,
-                (methodName,d,
-                    clusterTest.clusterTestServerList[random.randint(0,len(clusterTest.clusterTestServerList) - 1)]))
+            worker.enqueue(self._sendRequest,(methodName,d,addr))
 
         worker.join()
 
@@ -1817,18 +1858,21 @@ class PerformanceOperation():
     """
     def _removeAll(self,uuidList):
         data = []
-        for uuid in uuidList:
-            data.append(self._resourceRemoveTemplate % (uuid))
-        self._sendOp("removeResource",data)
+        for entry in uuidList:
+            for uuid in entry[1]:
+                data.append(self._resourceRemoveTemplate % (uuid))
+            self._sendOp("removeResource",data,entry[0])
 
     def _remove(self,uuid):
-        self._removeAll([uuid])
+        self._removeAll([("127.0.0.1:7001",[uuid])])
 
 
 class UserOperation(PerformanceOperation):
     def add(self,num):
         gen = UserDataGenerator()
-        self._sendOp("saveUser",gen.generateUserData(num))
+        for s in clusterTest.clusterTestServerList:
+            self._sendOp("saveUser",gen.generateUserData(num),s)
+
         return True
 
     def remove(self,who):
@@ -1845,8 +1889,9 @@ class UserOperation(PerformanceOperation):
 class MediaServerOperation(PerformanceOperation):
     def add(self,num):
         gen = MediaServerGenerator()
-        self._sendOp("saveMediaServer",
-                     gen.generateMediaServerData(num))
+        for s in clusterTest.clusterTestServerList:
+            self._sendOp("saveMediaServer",
+                         gen.generateMediaServerData(num),s)
         return True
 
     def remove(self,uuid):
@@ -1863,8 +1908,9 @@ class MediaServerOperation(PerformanceOperation):
 class CameraOperation(PerformanceOperation):
     def add(self,num):
         gen = CameraDataGenerator()
-        self._sendOp("saveCameras",
-            gen.generateCameraData(num))
+        for s in clusterTest.clusterTestServerList:
+            self._sendOp("saveCameras",
+                         gen.generateCameraData(num,s),s)
         return True
 
     def remove(self,uuid):
@@ -1934,18 +1980,26 @@ class PerfTest:
                 clusterTest.unittestRollback.addOperations(methodName,addr,id)
         return True
 
-    def _prepareData(self,dataList,methodName):
-        for d in dataList:
-            for s in clusterTest.clusterTestServerList:
-                if not self._doCreate(s,d[0],d[1],methodName):
-                    return False
+    def _prepareData(self,d,methodName,addr):
+        if not self._doCreate(addr,d[0],d[1],methodName):
+            return False
         return True
 
     def _prepare(self,num):
         userList = UserDataGenerator().generateUserData(num)
-        cameraList=CameraDataGenerator().generateCameraData(num)
-        if not ( self._prepareData(userList, "saveUser" ) and self._prepareData(cameraList, "saveCameras" ) ):
-            return False
+        cameraList=[]
+        for s in clusterTest.clusterTestServerList:
+            for d in userList:
+                if not self._prepareData(d,"saveUser",s):
+                    return False
+
+        cameraGen = CameraDataGenerator()
+        for s in clusterTest.clusterTestServerList:
+           for _ in range(num):
+               c = cameraGen.generateCameraData(1,s)[0]
+               cameraList.append(c)
+               if not self._prepareData(c,"saveCameras",s):
+                   return False
 
         self._userCreatePos  = num
         self._cameraCreatePos= num
@@ -1991,7 +2045,7 @@ class PerfTest:
                 else:
                     failed = False
                     for s in clusterTest.clusterTestServerList:
-                        d = cGen.generateCameraData(1)
+                        d = cGen.generateCameraData(1,s)
                         if not self._doCreate(s,d[0][0],d[0][1],"saveCameras"):
                             failed = True
                         else:
@@ -2021,7 +2075,7 @@ class PerfTest:
                     failed = False
                     for s in clusterTest.clusterTestServerList:
                         id = self._newCameraList[random.randint(0,len(self._newCameraList)-1)]
-                        d = cGen.generateUpdateData(id)
+                        d = cGen.generateUpdateData(id,s)
                         if not self._doCreate(s,d[0][0],None,"saveCameras"):
                             failed = True
                         else:
