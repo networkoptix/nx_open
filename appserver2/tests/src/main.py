@@ -364,7 +364,7 @@ class BasicGenerator():
         global _uniqueSessionNumber
         global _uniqueMediaServerSeedNumber
 
-        ret = "ec2_test_user_%s_%s"%(_uniqueSessionNumber,_uniqueMediaServerSeedNumber)
+        ret = "ec2_test_media_server_%s_%s"%(_uniqueSessionNumber,_uniqueMediaServerSeedNumber)
         _uniqueMediaServerSeedNumber = _uniqueMediaServerSeedNumber + 1
         return ret
 
