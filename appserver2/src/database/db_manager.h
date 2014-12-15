@@ -478,7 +478,7 @@ namespace ec2
         public:
             QnDbTransactionExt(QSqlDatabase& database, QReadWriteLock& mutex): QnDbTransaction(database, mutex) {}
 
-            virtual void beginTran() override;
+            virtual bool beginTran() override;
             virtual void rollback() override;
             virtual bool commit() override;
         };

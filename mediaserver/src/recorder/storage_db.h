@@ -47,8 +47,8 @@ public:
     bool addOrUpdateCameraBookmark(const QnCameraBookmark &bookmark, const QString& cameraUniqueId);
     bool deleteCameraBookmark(const QnCameraBookmark &bookmark);
     bool getBookmarks(const QString& cameraUniqueId, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);
-    virtual QnDbTransaction* getTransaction() override;
 private:
+    virtual QnDbTransaction* getTransaction() override;
     void flushRecordsNoLock();
     bool initializeBookmarksFtsTable();
 

@@ -219,10 +219,12 @@ void mergeObjectListData(
 
 // --------------------------------------- QnDbTransactionExt -----------------------------------------
 
-void QnDbManager::QnDbTransactionExt::beginTran()
+bool QnDbManager::QnDbTransactionExt::beginTran()
 {
-    QnDbTransaction::beginTran();
+    if( !QnDbTransaction::beginTran() )
+        return false;
     transactionLog->beginTran();
+    return true;
 }
 
 void QnDbManager::QnDbTransactionExt::rollback()
@@ -233,14 +235,13 @@ void QnDbManager::QnDbTransactionExt::rollback()
 
 bool QnDbManager::QnDbTransactionExt::commit()
 {
-    QSqlQuery query(m_database);
-    bool rez = query.exec(lit("COMMIT"));
+    const bool rez = m_database.commit();
     if (rez) {
         transactionLog->commit();
-        m_mutex.unlock();
+        m_writeLocker.reset();
     }
     else {
-        qWarning() << "Commit failed:" << query.lastError(); // do not unlock mutex. Rollback is expected
+        qWarning() << "Commit failed:" << m_database.lastError(); // do not unlock mutex. Rollback is expected
     }
     return rez;
 }

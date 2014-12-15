@@ -8,31 +8,42 @@ QnDbHelper::QnDbTransaction::QnDbTransaction(QSqlDatabase& database, QReadWriteL
     m_database(database),
     m_mutex(mutex)
 {
-
 }
 
-void QnDbHelper::QnDbTransaction::beginTran()
+QnDbHelper::QnDbTransaction::~QnDbTransaction()
 {
-    m_mutex.lockForWrite();
-    QSqlQuery query(m_database);
-    query.exec(lit("BEGIN TRANSACTION"));
+    if( m_writeLocker )
+        rollback();
+}
+
+bool QnDbHelper::QnDbTransaction::beginTran()
+{
+    assert( !m_writeLocker );
+    m_writeLocker.reset( new QWriteLocker(&m_mutex) );
+    if( !m_database.transaction() )
+    {
+        m_writeLocker.reset();
+        return false;
+    }
+    return true;
 }
 
 void QnDbHelper::QnDbTransaction::rollback()
 {
-    QSqlQuery query(m_database);
-    query.exec(lit("ROLLBACK"));
-    m_mutex.unlock();
+    assert( m_writeLocker );
+    m_database.rollback();
+    //TODO #ak handle rollback error?
+    m_writeLocker.reset();
 }
 
 bool QnDbHelper::QnDbTransaction::commit()
 {
-    QSqlQuery query(m_database);
-    bool rez = query.exec(lit("COMMIT"));
+    assert( m_writeLocker );
+    bool rez = m_database.commit();
     if (rez)
-        m_mutex.unlock();
+        m_writeLocker.reset();
     else
-        qWarning() << "Commit failed:" << query.lastError(); // do not unlock mutex. Rollback is expected
+        qWarning() << "Commit failed:" << m_database.lastError(); // do not unlock mutex. Rollback is expected
     return rez;
 }
 
