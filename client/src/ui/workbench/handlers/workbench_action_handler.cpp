@@ -2316,10 +2316,18 @@ void QnWorkbenchActionHandler::at_workbench_itemChanged(Qn::ItemRole role) {
 }
 
 void QnWorkbenchActionHandler::at_whatsThisAction_triggered() {
-    QWhatsThis::enterWhatsThisMode();
+    if (QWhatsThis::inWhatsThisMode()) 
+        QWhatsThis::leaveWhatsThisMode();
+    else
+        QWhatsThis::enterWhatsThisMode();
 }
 
 void QnWorkbenchActionHandler::at_escapeHotkeyAction_triggered() {
+    if (QWhatsThis::inWhatsThisMode()) {
+        QWhatsThis::leaveWhatsThisMode();
+        return;
+    }
+
     if (action(Qn::ToggleTourModeAction)->isChecked())
         menu()->trigger(Qn::ToggleTourModeAction);
 }
