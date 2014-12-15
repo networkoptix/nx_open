@@ -50,6 +50,7 @@ namespace ec2
     }
 
     void Ec2DirectConnection::startReceivingNotifications() {
+        BaseEc2Connection<ServerQueryProcessor>::startReceivingNotifications();
         QnTransactionMessageBus::instance()->start();
     }
 }
