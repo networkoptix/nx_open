@@ -15,7 +15,6 @@ import os.path
 import signal
 import sys
 
-
 # Rollback support
 class UnitTestRollback:
     _rollbackFile=None
@@ -235,6 +234,8 @@ class ClusterTest():
         passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
         for s in self.clusterTestServerList:
             passman.add_password("NetworkOptix","http://%s/ec2/" % (s), un, pwd)
+            passman.add_password("NetworkOptix","http://%s/api/" % (s), un, pwd)
+
         urllib2.install_opener(urllib2.build_opener(urllib2.HTTPDigestAuthHandler(passman)))
 
     def init(self):
@@ -259,8 +260,18 @@ class ClusterTest():
 
 clusterTest = ClusterTest()
 
+_uniqueSessionNumber = None
+_uniqueCameraSeedNumber =0
+_uniqueUserSeedNumber =0
+_uniqueMediaServerSeedNumber =0
 
 class BasicGenerator():
+    def __init__(self):
+        global _uniqueSessionNumber
+        if _uniqueSessionNumber == None:
+            # generate unique session number
+            _uniqueSessionNumber = str(random.randint(1,1000000))
+
     # generate MAC address of the object
     def generateMac(self):
         l = []
@@ -312,11 +323,10 @@ class BasicGenerator():
         idx = random.randint(0,len(args) - 1)
         return args[idx]
 
-    def generateUsernamePasswordAndDigest(self):
-        un_len = random.randint(4,12)
+    def generateUsernamePasswordAndDigest(self,namegen):
         pwd_len = random.randint(8,20)
 
-        un = self.generateRandomString(un_len)
+        un = namegen()
         pwd = self.generateRandomString(pwd_len)
 
         m = md5.new()
@@ -332,6 +342,32 @@ class BasicGenerator():
         m.update(pwd)
         md5_digest = ''.join('%02x' % ord(i) for i in m.digest())
         return "md5$%s$%s" % (salt,md5_digest)
+
+
+    def generateCameraName(self):
+        global _uniqueSessionNumber
+        global _uniqueCameraSeedNumber
+
+        ret = "ec2_test_cam_%s_%s"%(_uniqueSessionNumber,_uniqueCameraSeedNumber)
+        _uniqueCameraSeedNumber = _uniqueCameraSeedNumber +1
+        return ret
+
+    def generateUserName(self):
+        global _uniqueSessionNumber
+        global _uniqueUserSeedNumber
+
+        ret = "ec2_test_user_%s_%s"%(_uniqueSessionNumber,_uniqueUserSeedNumber)
+        _uniqueUserSeedNumber = _uniqueUserSeedNumber + 1
+        return ret
+
+    def generateMediaServerName(self):
+        global _uniqueSessionNumber
+        global _uniqueMediaServerSeedNumber
+
+        ret = "ec2_test_user_%s_%s"%(_uniqueSessionNumber,_uniqueMediaServerSeedNumber)
+        _uniqueMediaServerSeedNumber = _uniqueMediaServerSeedNumber + 1
+        return ret
+
 
 class CameraDataGenerator(BasicGenerator):
     _template = """[
@@ -372,7 +408,7 @@ class CameraDataGenerator(BasicGenerator):
         for i in range(number):
             mac = self.generateMac()
             id = self._generateCameraId(mac)
-            name_and_model = self.generateRandomString(6)
+            name_and_model = self.generateCameraName()
             ret.append((self._template % (self.generateTrueFalse(),
                     self.generateTrueFalse(),
                     id,
@@ -387,7 +423,7 @@ class CameraDataGenerator(BasicGenerator):
 
     def generateUpdateData(self,id):
         mac = self.generateMac()
-        name_and_model = self.generateRandomString(6)
+        name_and_model = self.generateCameraName()
         return (self._template % (self.generateTrueFalse(),
                 self.generateTrueFalse(),
                 id,
@@ -419,7 +455,7 @@ class UserDataGenerator(BasicGenerator):
         ret = []
         for i in range(number):
             id = self.generateRandomId()
-            un,pwd,digest = self.generateUsernamePasswordAndDigest()
+            un,pwd,digest = self.generateUsernamePasswordAndDigest(self.generateUserName)
             ret.append((self._template % (digest,
                 self.generateEmail(),
                 self.generatePasswordHash(pwd),
@@ -428,7 +464,7 @@ class UserDataGenerator(BasicGenerator):
         return ret
 
     def generateUpdateData(self,id):
-        un,pwd,digest = self.generateUsernamePasswordAndDigest()
+        un,pwd,digest = self.generateUsernamePasswordAndDigest(self.generateUserName)
         return (self._template % (digest,
                 self.generateEmail(),
                 self.generatePasswordHash(pwd),
@@ -463,7 +499,7 @@ class MediaServerGenerator(BasicGenerator):
             ret.append((self._template % (self.generateIpV4Endpoint(),
                    self.generateRandomId(),
                    id,
-                   self._generateRandomName(),
+                   self.generateMediaServerName(),
                    self._generateRandomName(),
                    self.generateIpV4Endpoint()),id))
 
@@ -1291,10 +1327,6 @@ class ResourceConflictionTest(ClusterTestBase):
 class PrepareServerStatus(BasicGenerator):
     _minData = 10
     _maxData = 20
-    _systemNameTemplate = """
-    {
-        "systemName":"%s"
-    }"""
 
     getterAPI = ["getResourceParams",
         "getMediaServers",
@@ -1337,15 +1369,25 @@ class PrepareServerStatus(BasicGenerator):
             response = urllib2.urlopen(req)
 
         if response.getcode() != 200 :
-            return (False,"Cannot issue %s with HTTP code:%d" % (method,response.getcode()))
+            return (False,"Cannot issue %s with HTTP code:%d to server:%s" % (method,response.getcode(),addr))
 
         response.close()
 
         return (True,"")
 
     def _setSystemName(self,addr,name):
-        return self._sendRequest(addr,"changeSystemName",
-                                 self._systemNameTemplate % (name))
+        query = { "systemName":name }
+        response = None
+
+        with self._mergeTest._lock:
+            response = urllib2.urlopen("http://%s/api/configure?%s"%(addr,
+                                                                            urllib.urlencode(query)))
+        if response.getcode() != 200:
+            return (False,"Cannot issue changeSystemName request to server:%s"%(addr))
+
+        response.close()
+
+        return (True,"")
 
     def _generateRandomStates(self,addr):
         api_list = self._generateDataAndAPIList()
@@ -1373,10 +1415,6 @@ class MergeTest():
     _phase1WaitTime = 8
     _systemName = "mergeTest"
     _gen = BasicGenerator()
-    _systemNameTemplate = """
-    {
-        "systemName":"%s"
-    }"""
 
     _lock = threading.Lock()
 
@@ -1435,14 +1473,12 @@ class MergeTest():
 
     def _setSystemName(self,addr,name):
 
-        req = urllib2.Request("http://%s/ec2/changeSystemName" % (addr), \
-              data=self._systemNameTemplate % (name), 
-              headers={'Content-Type': 'application/json'})
-
+        response = urllib2.urlopen(
+            "http://%s/api/configure?%s"%(addr,urllib.urlencode({"systemName":name})))
         response = urllib2.urlopen(req)
 
         if response.getcode() != 200 :
-            return (False,"Cannot issue changeSystemName with HTTP code:%d" % (response.getcode()))
+            return (False,"Cannot issue changeSystemName with HTTP code:%d to server:%s" % (response.getcode()),addr)
 
         response.close()
 
@@ -1703,7 +1739,7 @@ class SingleServerRtspTest():
         worker = ClusterWorker(16 , self._testCase)
         for _ in range(self._testCase):
             worker.enqueue(self._testMain,())
-        worker.join()   
+        worker.join()	
 
 class ServerRtspTest:
     _testCase = 0
@@ -2121,15 +2157,13 @@ class SystemNameTest:
     _guidDict=dict()
     _oldSystemName=None
     _syncTime=2
-    _systemNameTemplate = """
-    {
-        "systemName":"%s"
-    }"""
 
     def _setUpAuth(self,user,pwd):
         passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
         for s in self._serverList:
             passman.add_password("NetworkOptix","http://%s/ec2/" % (s), user, pwd)
+            passman.add_password("NetworkOptix","http://%s/api/" % (s), user, pwd)
+
         urllib2.install_opener(urllib2.build_opener(urllib2.HTTPDigestAuthHandler(passman)))
 
     def _doGet(self,addr,methodName):
@@ -2162,9 +2196,12 @@ class SystemNameTest:
             return True
 
     def _changeSystemName(self,addr,name):
-        return self._doPost(addr,"changeSystemName",
-                            self._systemNameTemplate%(name))
-
+        response = urllib2.urlopen("http://%s/api/configure?%s"%(addr,urllib.urlencode({"systemName":name})))
+        if response.getcode() != 200:
+            response.close()
+            return False
+        else:
+            return True
 
     def _ensureServerSystemName(self):
         systemName = None
@@ -2194,7 +2231,7 @@ class SystemNameTest:
         passwd = configParser.get("General","password")
         sl = configParser.get("General","serverList")
         self._serverList = sl.split(",")
-        self._syncTime = configParser.get("General","clusterTestSleepTime")
+        self._syncTime = configParser.getint("General","clusterTestSleepTime")
         return (username,passwd)
 
 
@@ -2243,14 +2280,13 @@ class SystemNameTest:
         ret,reason = self._doTest()
         if not ret:
             print reason
-            return False
+
         print "SystemName test finished"
         print "Rollback"
         self._doRollback()
         print "Rollback done"
 
 helpStr="Usage:\n\n" \
-    "--sys-name: Start the system name test. This test will move server one by one from the existed system name cluster, and then check each server status information. \n\n" \
     "--perf : Start performance test.User can use ctrl+c to interrupt the perf test and statistic will be displayed.User can also specify configuration parameters " \
     "for performance test. In ec2_tests.cfg file,\n[PerfTest]\nfrequency=1000\ncreateProb=0.5\n, the frequency means at most how many operations will be issued on each" \
     "server in one seconds(not guaranteed,bottleneck is CPU/Bandwidth for running this script);and createProb=0.5 means the creation operation will be performed as 0.5 "\
@@ -2312,6 +2348,12 @@ if __name__ == '__main__':
 
                     doCleanUp()
 
+                    print "=================================="
+                    print "Perform System Name Test At Last"
+                    SystemNameTest().run()
+                    print "All Test Cases Finished"
+                    print "=================================="
+
             elif len(sys.argv) == 2 and sys.argv[1] == '--clear':
                 doClearAll()
             elif len(sys.argv) == 2 and sys.argv[1] == '--perf':
@@ -2326,5 +2368,6 @@ if __name__ == '__main__':
                     ServerRtspTest().test()
                 else:
                     ret = runPerformanceTest()
+                    doCleanUp()
                     if ret != True:
                         print ret[1]
