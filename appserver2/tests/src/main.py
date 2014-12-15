@@ -2380,7 +2380,11 @@ if __name__ == '__main__':
     elif len(sys.argv) == 2 and sys.argv[1] == '--recover':
         UnitTestRollback().doRecover()
     elif len(sys.argv) == 2 and sys.argv[1] == '--sys-name':
+        print "=================================="
+        print "Perform System Name Test At Last"
         SystemNameTest().run()
+        print "All Test Cases Finished"
+        print "=================================="
     else:
         print "The automatic test starts,please wait for checking cluster status and do proper recover first ..."
         # initialize cluster test environment
