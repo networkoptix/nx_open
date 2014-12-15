@@ -2399,6 +2399,13 @@ if __name__ == '__main__':
                 try:
                     unittest.main()
                 except:
+
+                    print "=================================="
+                    print "Perform Merge Test"
+                    MergeTest().test()
+                    print "Merge Test Done"
+                    print "=================================="
+
                     try :
                         raw_input("Press any key to continue Rollback ...")
                     except:
