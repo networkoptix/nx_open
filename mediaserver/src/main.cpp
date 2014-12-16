@@ -1933,6 +1933,9 @@ void QnMain::run()
     QnResourcePool::initStaticInstance( NULL );
 
     m_mediaServer.clear();
+
+    //TODO #ak this is an ugly workaround for non-stopping server
+    connect(this, SIGNAL(finished()),   this, SLOT(at_finished()), Qt::DirectConnection);
 }
 
 void QnMain::changePort(quint16 port) {
