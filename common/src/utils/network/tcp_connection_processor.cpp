@@ -14,7 +14,11 @@
 #endif
 
 // we need enough size for updates
-static const int MAX_REQUEST_SIZE = 1024*1024*100;
+#ifdef __arm__
+    static const int MAX_REQUEST_SIZE = 1024*1024*16;
+#else
+    static const int MAX_REQUEST_SIZE = 1024*1024*256;
+#endif
 
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket):
