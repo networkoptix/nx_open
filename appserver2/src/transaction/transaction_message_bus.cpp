@@ -186,9 +186,9 @@ QnTransactionMessageBus* QnTransactionMessageBus::instance()
     return m_globalInstance;
 }
 
-QnTransactionMessageBus::QnTransactionMessageBus()
+QnTransactionMessageBus::QnTransactionMessageBus(Qn::PeerType peerType)
 : 
-    m_localPeer(qnCommon->moduleGUID(), qnCommon->runningInstanceGUID(), Qn::PT_Server),
+    m_localPeer(qnCommon->moduleGUID(), qnCommon->runningInstanceGUID(), peerType),
     //m_binaryTranSerializer(new QnBinaryTransactionSerializer()),
     m_jsonTranSerializer(new QnJsonTransactionSerializer()),
     m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
@@ -1218,10 +1218,6 @@ QnTransactionMessageBus::AlivePeersMap QnTransactionMessageBus::aliveClientPeers
     }
 
     return result;
-}
-
-void QnTransactionMessageBus::setLocalPeer(const ApiPeerData localPeer) {
-    m_localPeer = localPeer;
 }
 
 ec2::ApiPeerData QnTransactionMessageBus::localPeer() const {

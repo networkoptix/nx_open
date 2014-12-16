@@ -50,16 +50,6 @@ namespace ec2
 
         base_type::startReceivingNotifications();
 
-        // in remote mode we are always working as a client
-        ApiPeerData localPeer(qnCommon->moduleGUID(), qnCommon->runningInstanceGUID(), Qn::PT_DesktopClient);
-
-        QnUuid videowallGuid = QnAppServerConnectionFactory::videowallGuid();
-        if (!videowallGuid.isNull())
-            localPeer.peerType = Qn::PT_VideowallClient;
-        
-        QnTransactionMessageBus::instance()->setLocalPeer(localPeer);
-        QnTransactionMessageBus::instance()->start();
-
         QUrl url(m_queryProcessor->getUrl());
         url.setScheme( m_connectionInfo.allowSslConnections ? lit("https") : lit("http") );
         url.setPath("ec2/events");
@@ -70,4 +60,5 @@ namespace ec2
         m_peerUrl = url;
         QnTransactionMessageBus::instance()->addConnectionToPeer(url);
     }
+
 }

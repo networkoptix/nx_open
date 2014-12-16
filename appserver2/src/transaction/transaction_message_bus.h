@@ -8,6 +8,7 @@
 
 #include <nx_ec/ec_api.h>
 #include "nx_ec/data/api_lock_data.h"
+#include <nx_ec/data/api_peer_data.h>
 #include "transaction.h"
 #include "utils/network/http/asynchttpclient.h"
 #include "transaction_transport.h"
@@ -28,7 +29,7 @@ namespace ec2
     {
         Q_OBJECT
     public:
-        QnTransactionMessageBus();
+        QnTransactionMessageBus(Qn::PeerType peerType );
         virtual ~QnTransactionMessageBus();
 
         static QnTransactionMessageBus* instance();
@@ -38,7 +39,6 @@ namespace ec2
         void gotConnectionFromRemotePeer(const QSharedPointer<AbstractStreamSocket>& socket, const ApiPeerData &remotePeer);
         void dropConnections();
         
-        void setLocalPeer(const ApiPeerData localPeer);
         ApiPeerData localPeer() const;
 
         void start();
@@ -203,8 +203,8 @@ namespace ec2
         void at_peerIdDiscovered(const QUrl& url, const QnUuid& id);
         void at_runtimeDataUpdated(const QnTransaction<ApiRuntimeData>& data);
     private:
-        /** Info about us. Should be set before start(). */
-        ApiPeerData m_localPeer;
+        /** Info about us. */
+        const ApiPeerData m_localPeer;
 
         //QScopedPointer<QnBinaryTransactionSerializer> m_binaryTranSerializer;
         QScopedPointer<QnJsonTransactionSerializer> m_jsonTranSerializer;
