@@ -20,14 +20,18 @@ public:
     void setHoldConnection(bool holdConnection);
 
 protected:
+    virtual void connectToConnection(const ec2::AbstractECConnectionPtr &connection) override;
+    virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) override;
+
     virtual void onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) override;
     virtual void updateResource(const QnResourcePtr &resource) override;
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData) override;
     virtual void resetResources(const QnResourceList& resources) override;
 
+    virtual void handleRemovePeerFound(const ec2::ApiPeerAliveData &data) override;
+    virtual void handleRemovePeerLost(const ec2::ApiPeerAliveData &data) override;
+
 private slots:
-    void at_remotePeerFound(ec2::ApiPeerAliveData data);
-    void at_remotePeerLost(ec2::ApiPeerAliveData data);
     void at_systemNameChangeRequested(const QString &systemName);
 
 private:

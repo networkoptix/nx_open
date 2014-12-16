@@ -65,6 +65,12 @@ signals:
     void peerTimeChanged(const QnUuid &peerId, qint64 syncTime, qint64 peerTime);
     void timeServerSelectionRequired();
 protected:
+    virtual void connectToConnection(const ec2::AbstractECConnectionPtr &connection);
+    virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection);
+
+    virtual void handleRemovePeerFound(const ec2::ApiPeerAliveData &data);
+    virtual void handleRemovePeerLost(const ec2::ApiPeerAliveData &data);
+
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData);
     virtual void onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) = 0;
     virtual void execBusinessActionInternal(const QnAbstractBusinessActionPtr& /*action*/) {}
@@ -78,6 +84,7 @@ protected:
     virtual bool canRemoveResource(const QnUuid& resourceId);
     virtual void removeResourceIgnored(const QnUuid& resourceId);
 
+
 public slots:
     void on_businessEventAddedOrUpdated(const QnBusinessEventRulePtr &rule);
     void on_licenseChanged(const QnLicensePtr &license);
@@ -86,6 +93,9 @@ public slots:
 private slots:
     void on_gotInitialNotification(const ec2::QnFullResourceData &fullData);
     void on_gotDiscoveryData(const ec2::ApiDiscoveryData &discoveryData, bool addInformation);
+
+    void on_remotePeerFound(const ec2::ApiPeerAliveData &data);
+    void on_remotePeerLost(const ec2::ApiPeerAliveData &data);
 
     void on_resourceStatusChanged(const QnUuid &resourceId, Qn::ResourceStatus status );
     void on_resourceParamChanged(const ec2::ApiResourceParamWithRefData& param );

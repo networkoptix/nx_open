@@ -21,6 +21,12 @@ public:
     virtual void updateResource(const QnResourcePtr &resource) override;
     bool isProxy(const nx_http::Request& request) const;
 protected:
+    virtual void connectToConnection(const ec2::AbstractECConnectionPtr &connection) override;
+    virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) override;
+
+    virtual void handleRemovePeerFound(const ec2::ApiPeerAliveData &data) override;
+    virtual void handleRemovePeerLost(const ec2::ApiPeerAliveData &data) override;
+
     virtual void onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus ) override;
     virtual void init(const ec2::AbstractECConnectionPtr& connection) override;
     virtual void afterRemovingResource(const QnUuid& id) override;
@@ -34,8 +40,6 @@ private slots:
     void at_updateInstallationRequested(const QString &updateId);
 
     void at_remotePeerUnauthorized(const QnUuid& id);
-    void at_remotePeerFound(ec2::ApiPeerAliveData data);
-    void at_remotePeerLost(ec2::ApiPeerAliveData data);
 private:
     mutable QMutex m_mutexAddrList;
     const int m_serverPort;
