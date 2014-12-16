@@ -31,6 +31,9 @@
 
 #include <redass/redass_controller.h>
 
+#include <ui/actions/action_manager.h>
+#include <ui/actions/action_target_provider.h>
+
 #include <ui/common/notification_levels.h>
 
 #include <ui/animation/viewport_animator.h>
@@ -123,17 +126,6 @@ namespace {
 
         *deltaStart = newStart - start;
         *deltaEnd = newEnd - end;
-    }
-
-    QRectF rotated(const QRectF &rect, qreal degrees) {
-        QPointF c = rect.center();
-
-        QTransform transform;
-        transform.translate(c.x(), c.y());
-        transform.rotate(degrees);
-        transform.translate(-c.x(), -c.y());
-
-        return transform.mapRect(rect);
     }
 
     /** Size multiplier for raised widgets. */
@@ -333,6 +325,7 @@ void QnWorkbenchDisplay::deinitSceneView() {
 
     disconnect(m_scene, NULL, this, NULL);
     disconnect(m_scene, NULL, context()->action(Qn::SelectionChangeAction), NULL);
+    disconnect(action(Qn::SelectionChangeAction), NULL, this, NULL);
 
     /* Clear curtain. */
     if(!m_curtainItem.isNull()) {
@@ -380,6 +373,8 @@ void QnWorkbenchDisplay::initSceneView() {
     connect(m_scene,                SIGNAL(selectionChanged()),                     context()->action(Qn::SelectionChangeAction), SLOT(trigger()));
     connect(m_scene,                SIGNAL(selectionChanged()),                     this,                   SLOT(at_scene_selectionChanged()));
     connect(m_scene,                SIGNAL(destroyed()),                            this,                   SLOT(at_scene_destroyed()));
+
+    connect(action(Qn::SelectionChangeAction), &QAction::triggered,                 this,                   &QnWorkbenchDisplay::updateSelectionFromTree);
 
     /* Scene indexing will only slow everything down. */
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
@@ -554,7 +549,7 @@ WidgetAnimator *QnWorkbenchDisplay::animator(QnResourceWidget *widget) {
     /* Create if it's not there.
      *
      * Note that widget is set as animator's parent. */
-    animator = new WidgetAnimator(widget, "enclosingGeometry", "rotation", widget); // ANIMATION: items.
+    animator = new WidgetAnimator(widget, "geometry", "rotation", widget); // ANIMATION: items.
     animator->setAbsoluteMovementSpeed(0.0);
     animator->setRelativeMovementSpeed(8.0);
     animator->setScalingSpeed(128.0);
@@ -739,6 +734,21 @@ void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout) {
         raisedConeItem(raisedWidget)->setEffectEnabled(!layout->backgroundImageFilename().isEmpty());
     }
 }
+
+void QnWorkbenchDisplay::updateSelectionFromTree() {
+    QnActionTargetProvider *provider = menu()->targetProvider();
+    if(!provider)
+        return;
+
+    Qn::ActionScope scope = provider->currentScope();
+    if (scope != Qn::TreeScope)
+        return; 
+
+    /* Just deselect all items for now. See #4480. */
+    foreach (QGraphicsItem *item, scene()->selectedItems())
+        item->setSelected(false);
+}
+
 
 QList<QnResourceWidget *> QnWorkbenchDisplay::widgets() const {
     return m_widgets;
@@ -1322,13 +1332,8 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
 
     QRectF enclosingGeometry = itemEnclosingGeometry(item);
 
-    /* Remove cell spacing for raized widget */
-    if (widget == raisedWidget)
-        enclosingGeometry = dilated(enclosingGeometry, workbench()->mapper()->spacing());
-
     /* Adjust for raise. */
     if(widget == raisedWidget && widget != zoomedWidget && m_view != NULL) {
-
         QRectF originGeometry = enclosingGeometry;
         if (widget->hasAspectRatio())
             originGeometry = expanded(widget->aspectRatio(), originGeometry, Qt::KeepAspectRatio);
@@ -1376,8 +1381,9 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
 
     /* Move! */
     WidgetAnimator *animator = this->animator(widget);
-    if(animate && enclosingGeometry != widget->enclosingGeometry()) {
-        animator->moveTo(enclosingGeometry, rotation);
+    if(animate) {
+        widget->setEnclosingGeometry(enclosingGeometry, false);
+        animator->moveTo(widget->calculateGeometry(enclosingGeometry), rotation);
     } else {
         animator->stop();
         widget->setRotation(rotation);

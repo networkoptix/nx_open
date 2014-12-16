@@ -153,14 +153,14 @@ void QnSecurityCamResource::initializationDone()
 {
     QnNetworkResource::initializationDone();
     if( m_inputPortListenerCount.load() > 0 )
-        startInputPortMonitoring();
+        startInputPortMonitoringAsync( std::function<void(bool)>() );
 }
 
-bool QnSecurityCamResource::startInputPortMonitoring() {
+bool QnSecurityCamResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ ) {
     return false;
 }
 
-void QnSecurityCamResource::stopInputPortMonitoring() {
+void QnSecurityCamResource::stopInputPortMonitoringAsync() {
 }
 
 bool QnSecurityCamResource::isInputPortMonitored() const {
@@ -323,7 +323,7 @@ void QnSecurityCamResource::inputPortListenerAttached() {
 
     //if camera is not initialized yet, delayed input monitoring will start on initialization completion
     if( m_inputPortListenerCount.fetchAndAddOrdered( 1 ) == 0 )
-        startInputPortMonitoring();
+        startInputPortMonitoringAsync( std::function<void(bool)>() );
 }
 
 void QnSecurityCamResource::inputPortListenerDetached() {
@@ -334,7 +334,7 @@ void QnSecurityCamResource::inputPortListenerDetached() {
 
     int result = m_inputPortListenerCount.fetchAndAddOrdered( -1 );
     if( result == 1 )
-        stopInputPortMonitoring();
+        stopInputPortMonitoringAsync();
     else if( result <= 0 )
         m_inputPortListenerCount.fetchAndAddOrdered( 1 );   //no reduce below 0
 }
@@ -342,9 +342,7 @@ void QnSecurityCamResource::inputPortListenerDetached() {
 void QnSecurityCamResource::at_parentIdChanged() 
 {
     if(getParentId() != qnCommon->moduleGUID())
-        stopInputPortMonitoring();
-    else
-        startInputPortMonitoring();
+        stopInputPortMonitoringAsync();  //camera moved to different server, stopping input monitoring
 }
 
 int QnSecurityCamResource::motionWindowCount() const 
@@ -419,7 +417,7 @@ Qn::MotionTypes QnSecurityCamResource::supportedMotionType() const {
 }
 
 bool QnSecurityCamResource::hasMotion() const {
-    Qn::MotionType motionType = getMotionType();
+    Qn::MotionType motionType = getDefaultMotionType();
     if (motionType == Qn::MT_SoftwareGrid)
         return hasDualStreaming2() || (getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability);
     else
@@ -428,10 +426,13 @@ bool QnSecurityCamResource::hasMotion() const {
 
 Qn::MotionType QnSecurityCamResource::getMotionType() const {
     QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
-    if ((*userAttributesLock)->motionType == Qn::MT_Default || !(supportedMotionType() & (*userAttributesLock)->motionType))
+    Qn::MotionType value = (*userAttributesLock)->motionType;
+    if (value == Qn::MT_NoMotion)
+        return value;
+    if (value == Qn::MT_Default || !(supportedMotionType() & value))
         return getDefaultMotionType();
     else
-        return (*userAttributesLock)->motionType;
+        return value;
 }
 
 void QnSecurityCamResource::setMotionType(Qn::MotionType value) {

@@ -16,6 +16,21 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QStandardPaths>
 
+
+class GlobalCrashDumpSettings
+{
+public:
+    bool dumpFullMemory;
+
+    GlobalCrashDumpSettings()
+    :
+        dumpFullMemory( false )
+    {
+    }
+};
+
+static GlobalCrashDumpSettings globalCrashDumpSettingsInstance;
+
 typedef BOOL (*pfMiniDumpWriteDump) (
     HANDLE,
     DWORD,
@@ -25,10 +40,7 @@ typedef BOOL (*pfMiniDumpWriteDump) (
     PMINIDUMP_USER_STREAM_INFORMATION ,
     PMINIDUMP_CALLBACK_INFORMATION );
 
-
-
-static
-void LegacyDump( HANDLE );
+static void LegacyDump( HANDLE );
 
 static int GetBaseName( const char* name , DWORD len ) {
     for( DWORD i = len-1 ; i >= 0 ; --i ) {
@@ -111,6 +123,12 @@ void WriteDump( HANDLE hThread , PEXCEPTION_POINTERS ex ) {
                                                 MiniDumpWithHandleData | 
                                                 MiniDumpWithThreadInfo | 
                                             MiniDumpWithUnloadedModules ); 
+    if( globalCrashDumpSettingsInstance.dumpFullMemory )
+    {
+        sMDumpType = (MINIDUMP_TYPE)( sMDumpType |
+            MiniDumpWithFullMemory | MiniDumpWithCodeSegs | 
+            MiniDumpWithDataSegs | MiniDumpWithProcessThreadData | MiniDumpWithFullAuxiliaryState);
+    }
 
     MiniDumpWriteDumpAddress( 
         ::GetCurrentProcess(),
@@ -204,264 +222,10 @@ void win32_exception::installThreadSpecificUnhandledExceptionHandler()
     _set_se_translator( translate );
 }
 
-#if 0
-
-#define SYMSIZE 10000
-#define MAXTEXT 5000
-
-static char *prregs( char *str, PCONTEXT cr )
+void win32_exception::setCreateFullCrashDump( bool isFull )
 {
-    char *cp= str;
-#ifndef _WIN64
-    sprintf(cp, "\t%s:%08x", "Eax", cr->Eax); cp += strlen(cp);
-    sprintf(cp, " %s:%08x",  "Ebx", cr->Ebx); cp += strlen(cp);
-    sprintf(cp, " %s:%08x",  "Ecx", cr->Ecx); cp += strlen(cp);
-    sprintf(cp, " %s:%08x\n","Edx", cr->Edx); cp += strlen(cp);
-    sprintf(cp, "\t%s:%08x", "Esi", cr->Esi); cp += strlen(cp);
-    sprintf(cp, " %s:%08x",  "Edi", cr->Edi); cp += strlen(cp);
-    sprintf(cp, " %s:%08x",  "Esp", cr->Esp); cp += strlen(cp);
-    sprintf(cp, " %s:%08x\n","Ebp", cr->Ebp); cp += strlen(cp);
-#else
-    //TODO/IMPL print x86_64 registers
-#endif
-    
-    return str;
+    globalCrashDumpSettingsInstance.dumpFullMemory = isFull;
 }
-
-static int getword(
-    FILE *fp, 
-    char *word, 
-    int n )
-{
-    int c;
-    int k = 0;
-    while( (c= getc(fp)) != EOF )
-    {
-        if(c<'0' || c>'z')
-        {
-            if( k>0 )
-                break;
-        }
-        else if( --n<=0 )
-        {
-            break;
-        }
-        else
-        {
-            ++k;
-            *word++= c;
-        }
-    }
-    *word++= 0;
-    return c!=EOF;
-}
-
-static int isnum( char *cp )
-{
-    int k;
-    for( k = 0; cp[k]; ++k )
-        if( !isxdigit(cp[k]) )
-            return 0;
-    return k==8;
-}
-
-static char *trmap(
-    unsigned long addr, 
-    const char *mapname, 
-    DWORD64 *offset )
-{
-    char word[512];
-    char lastword[512];
-    static char wbest[512];
-    unsigned long ubest= 0;
-    FILE *fp = fopen( mapname, "rt" );
-    if( !fp )
-        return 0;
-    while( getword(fp, word, sizeof(word)) )
-    {
-        if( isnum(word) )
-        {
-            char *endc;
-            unsigned long u = strtoul( word, &endc, 16 );
-            if( u<=addr && u>ubest )
-            {
-                strcpy( wbest, lastword );
-                ubest= u;
-            }
-        }
-        else
-        {
-            strcpy(lastword, word);
-        }
-    }
-    fclose(fp);
-    if( offset )
-        *offset = addr - ubest;
-
-    return wbest[0]? wbest:0;
-}
-
-//static string getExecutableFileFullName()
-//{
-//    char buf[MAX_PATH]; 
-//
-//    if( !GetModuleFileName( NULL, buf, MAX_PATH ) )
-//        return string();
-//
-//    string path = buf;
-//    replace( path.begin(), path.end(), '\\', '/' );
-//    return path;
-//}
-
-static std::string getCallStack(
-    HANDLE threadID,
-    PEXCEPTION_RECORD exceptionRecord,
-    PCONTEXT contextRecord )
-{
-    STACKFRAME64 sf;
-    BOOL ok;
-    PIMAGEHLP_SYMBOL64 pSym;
-    IMAGEHLP_MODULE64 Mod;
-    DWORD64 Disp;
-    BYTE *bp;
-    char *ou, *outstr;
-
-    SymSetOptions( SYMOPT_UNDNAME );
-
-    pSym = (PIMAGEHLP_SYMBOL64)GlobalAlloc( GMEM_FIXED, SYMSIZE+MAXTEXT );
-    ou = outstr = ((char *)pSym)+SYMSIZE;
-    *ou = '\0';
-    if( exceptionRecord )
-    {
-        sprintf(ou, " at %08p:", bp = (BYTE *)(exceptionRecord->ExceptionAddress));
-        try
-        {
-            for( int k = 0; k<12; ++k )
-            {
-                ou += strlen(ou);
-                sprintf(ou, " %02x", *bp++);
-            }
-        }
-        catch( unsigned int w )
-        {
-            /* Fails if bp is invalid address */
-            w= 0;
-            ou += strlen(ou);
-            sprintf(ou, " Invalid Address");
-        }
-    }
-    ou += strlen(ou);
-    sprintf(ou, "\n");
-    if( contextRecord )
-        prregs( ou+strlen(ou), contextRecord );
-    Mod.SizeOfStruct = sizeof(Mod);
-
-    ZeroMemory(&sf, sizeof(sf));
-#ifdef _WIN64
-    //TODO/IMPL #ak
-#else
-    if( contextRecord )
-    {
-        sf.AddrPC.Offset = contextRecord->Eip;
-        sf.AddrStack.Offset = contextRecord->Esp;
-        sf.AddrFrame.Offset = contextRecord->Ebp;
-    }
-#endif
-    sf.AddrPC.Mode = AddrModeFlat;
-    sf.AddrStack.Mode = AddrModeFlat;
-    sf.AddrFrame.Mode = AddrModeFlat;
-
-    ok = SymInitialize(GetCurrentProcess(), NULL, TRUE);
-    ou += strlen(ou);
-    sprintf( ou, "Stack Trace:\n" );
-    for( int i = 0; ; ++i )
-    {
-        ok = StackWalk64(
-#ifndef _WIN64
-            IMAGE_FILE_MACHINE_I386,
-#else
-            IMAGE_FILE_MACHINE_AMD64,
-#endif
-            GetCurrentProcess(),
-            threadID,
-            &sf,
-            contextRecord,
-            NULL,
-            SymFunctionTableAccess64,
-            SymGetModuleBase64,
-            NULL );
-
-        if(!ok || sf.AddrFrame.Offset == 0)
-        {
-            if( i == 0 )
-                sprintf( ou, "StackWalk64 failed\n ");
-            break;
-        }
-        ou += strlen(ou);
-        if( ou>outstr + MAXTEXT-1000 )
-        {
-            sprintf(ou, "No more room for trace\n");
-            break;
-        }
-        sprintf(ou, "%08x:", sf.AddrPC.Offset);
-        DWORD dwModBase = SymGetModuleBase64(GetCurrentProcess(), sf.AddrPC.Offset);
-        ou += strlen(ou);
-        if( dwModBase && SymGetModuleInfo64(GetCurrentProcess(), sf.AddrPC.Offset, &Mod) )
-        {
-            sprintf(ou, " %s", Mod.ModuleName);
-            ou += strlen(ou);
-        }
-        pSym->SizeOfStruct = SYMSIZE;
-        pSym->MaxNameLength = SYMSIZE - sizeof(IMAGEHLP_SYMBOL);
-        if( SymGetSymFromAddr64(GetCurrentProcess(), sf.AddrPC.Offset, &Disp, pSym) )
-        {
-            sprintf(ou, " %s() + 0x%x\n", pSym->Name, Disp);
-        }
-        //else if( dwModBase )
-        //{
-        //    sprintf(ou, ": 0x%x\n", sf.AddrPC.Offset - dwModBase);
-        //}
-        else
-        {
-            //generating map-file name
-            QFileInfo exeFileInfo( QCoreApplication::applicationFilePath() );
-
-            //std::string executableNameExt = getExecutableFileFullName();
-            //// ex.: /usr/local/ipsoft/bin/radius
-            //string executablePath;        // "/usr/local/ipsoft/bin"
-            //string executableFullName;    // "radius"
-            //string executableName;        // "radius"
-            //string executableExt;        // ""
-            //parsePath( executableNameExt, &executablePath, &executableFullName );
-            //parseFileName( executableFullName, &executableName, &executableExt );
-            //std::string mapFileName = executablePath + "/" + executableName + ".map";
-
-            QString mapFileName = exeFileInfo.absoluteDir().absolutePath() + QLatin1String("/") + exeFileInfo.baseName() + QLatin1String(".map");
-
-            char *cp = trmap( sf.AddrPC.Offset, mapFileName.toLatin1().constData(), &Disp );
-            if( cp )
-            {
-                if( *cp == '?' )
-                {
-                    UnDecorateSymbolName( cp, pSym->Name, pSym->MaxNameLength, UNDNAME_COMPLETE );
-                    sprintf(ou, " %s + 0x%x\n", pSym->Name, Disp);
-                }
-                else
-                {
-                    sprintf(ou, " %s() + 0x%x\n", cp, Disp);
-                }
-            }
-        }
-    }
-    //printf("%s", outstr);
-    SymCleanup(GetCurrentProcess());
-    std::string out( outstr );
-    GlobalFree(pSym);
-
-    return out;
-}
-#endif 
-
 
 #define MAX_SYMBOL_SIZE 1024
 

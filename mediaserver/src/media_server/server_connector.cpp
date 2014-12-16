@@ -31,7 +31,12 @@ void QnServerConnector::at_moduleFinder_moduleUrlFound(const QnModuleInformation
     QUrl trimmed = trimmedUrl(url);
 
     if (!moduleInformation.isCompatibleToCurrentSystem()) {
-        if (m_usedUrls.contains(trimmed)) {
+        bool used;
+        {
+            QMutexLocker lock(&m_mutex);
+            used = m_usedUrls.contains(trimmed);
+        }
+        if (used) {
             NX_LOG(lit("QnServerConnector: Module %1 has become incompatible. Url = %2, System name = %3, version = %4")
                    .arg(moduleInformation.id.toString())
                    .arg(url.toString())
@@ -39,7 +44,7 @@ void QnServerConnector::at_moduleFinder_moduleUrlFound(const QnModuleInformation
                    .arg(moduleInformation.version.toString()),
                    cl_logINFO);
         }
-        at_moduleFinder_moduleUrlLost(moduleInformation, url);
+        removeConnection(moduleInformation, url);
         return;
     }
 
@@ -71,48 +76,49 @@ void QnServerConnector::at_moduleFinder_moduleChanged(const QnModuleInformation 
 void QnServerConnector::addConnection(const QnModuleInformation &moduleInformation, const QUrl &url) {
     QUrl trimmed = trimmedUrl(url);
 
-    if (m_usedUrls.contains(trimmed)) {
-        NX_LOG(lit("QnServerConnector: Url %1 is already used.").arg(trimmed.toString()), cl_logINFO);
-        return;
+    UrlInfo urlInfo;
+
+    {
+        QMutexLocker lock(&m_mutex);
+
+        if (m_usedUrls.contains(trimmed)) {
+            NX_LOG(lit("QnServerConnector: Url %1 is already used.").arg(trimmed.toString()), cl_logINFO);
+            return;
+        }
+
+        QUrl moduleUrl = trimmed;
+        moduleUrl.setScheme(moduleInformation.sslAllowed ? lit("https") : lit("http"));
+        urlInfo.urlString = moduleUrl.toString();
+        urlInfo.peerId = moduleInformation.id;
+        m_usedUrls.insert(trimmed, urlInfo);
     }
 
-    QUrl moduleUrl = trimmed;
-    moduleUrl.setScheme(moduleInformation.sslAllowed ? lit("https") : lit("http"));
-    QString urlStr = moduleUrl.toString();
-    m_usedUrls.insert(trimmed, urlStr);
-
-    NX_LOG(lit("QnServerConnector: Adding connection to module %1. Url = %2").arg(moduleInformation.id.toString()).arg(urlStr), cl_logINFO);
+    NX_LOG(lit("QnServerConnector: Adding connection to module %1. Url = %2").arg(moduleInformation.id.toString()).arg(urlInfo.urlString), cl_logINFO);
 
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-    ec2Connection->addRemotePeer(urlStr);
+    ec2Connection->addRemotePeer(urlInfo.urlString);
 }
 
 void QnServerConnector::removeConnection(const QnModuleInformation &moduleInformation, const QUrl &url) {
     QUrl trimmed = trimmedUrl(url);
-    QString urlStr = m_usedUrls.take(trimmed);
-    if (urlStr.isEmpty())
+
+    QMutexLocker lock(&m_mutex);
+    UrlInfo urlInfo = m_usedUrls.take(trimmed);
+    lock.unlock();
+    if (urlInfo.peerId.isNull())
         return;
 
-    NX_LOG(lit("QnServerConnector: Removing connection from module %1. Url = %2").arg(moduleInformation.id.toString()).arg(urlStr), cl_logINFO);
+    NX_LOG(lit("QnServerConnector: Removing connection from module %1. Url = %2").arg(moduleInformation.id.toString()).arg(urlInfo.urlString), cl_logINFO);
 
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-    ec2Connection->deleteRemotePeer(urlStr);
-
-    QHostAddress host(url.host());
-    int port = moduleInformation.port;
+    ec2Connection->deleteRemotePeer(urlInfo.urlString);
 
     QnResourcePtr mServer = qnResPool->getResourceById(moduleInformation.id);
     if (mServer && mServer->getStatus() == Qn::Unauthorized)
         mServer->setStatus(Qn::Offline);
 }
 
-void QnServerConnector::reconnect() {
-    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-
-    for (const QString &urlStr: m_usedUrls)
-        ec2Connection->deleteRemotePeer(urlStr);
-    m_usedUrls.clear();
-
+void QnServerConnector::start() {
     for (const QnModuleInformation &moduleInformation: m_moduleFinder->foundModules()) {
         if (!moduleInformation.isCompatibleToCurrentSystem())
             continue;
@@ -124,4 +130,25 @@ void QnServerConnector::reconnect() {
             addConnection(moduleInformation, url);
         }
     }
+}
+
+void QnServerConnector::stop() {
+    QHash<QUrl, UrlInfo> usedUrls;
+    {
+        QMutexLocker lock(&m_mutex);
+        usedUrls = m_usedUrls;
+    }
+
+    for (auto it = usedUrls.begin(); it != usedUrls.end(); ++it)
+        removeConnection(m_moduleFinder->moduleInformation(it->peerId), it.key());
+
+    {
+        QMutexLocker lock(&m_mutex);
+        m_usedUrls.clear();
+    }
+}
+
+void QnServerConnector::restart() {
+    stop();
+    start();
 }

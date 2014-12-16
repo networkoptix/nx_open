@@ -258,7 +258,8 @@ QnDbManager::QnDbManager()
     m_tranStatic(m_sdbStatic, m_mutexStatic),
     m_needResyncLog(false),
     m_needResyncLicenses(false),
-    m_needResyncFiles(false)
+    m_needResyncFiles(false),
+    m_dbJustCreated(false)
 {
 	Q_ASSERT(!globalInstance);
 	globalInstance = this;
@@ -308,9 +309,7 @@ bool QnDbManager::init(
         }
     }
 
-    bool dbJustCreated = false;
-    bool isMigrationFrom2_2 = false;
-    if( !createDatabase( &dbJustCreated, &isMigrationFrom2_2 ) )
+    if( !createDatabase() )
     {
         // create tables is DB is empty
         qWarning() << "can't create tables for sqlLite database!";
@@ -924,6 +923,31 @@ bool QnDbManager::beforeInstallUpdate(const QString& /*updateName*/)
     return true;
 }
 
+bool QnDbManager::removeServerStatusFromTransactionLog()
+{
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    query.prepare("SELECT r.guid from vms_server s JOIN vms_resource r on r.id = s.resource_ptr_id");
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << __LINE__ << query.lastError();
+        return false;
+    }
+    QSqlQuery delQuery(m_sdb);
+    delQuery.prepare("DELETE from transaction_log WHERE tran_guid = ?");
+    while (query.next()) {
+        ApiResourceStatusData data;
+        data.id = QnUuid::fromRfc4122(query.value(0).toByteArray());
+        QnUuid hash = transactionLog->transactionHash(data);
+        delQuery.bindValue(0, QnSql::serialized_field(hash));
+        if (!delQuery.exec()) {
+            qWarning() << Q_FUNC_INFO << __LINE__ << delQuery.lastError();
+            return false;
+        }
+    }
+
+    return true;
+}
+
 bool QnDbManager::afterInstallUpdate(const QString& updateName)
 {
     if (updateName == lit(":/updates/07_videowall.sql")) 
@@ -936,7 +960,8 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         updateResourceTypeGuids();
     }
     else if (updateName == lit(":/updates/20_adding_camera_user_attributes.sql")) {
-        m_needResyncLog = true;
+        if (!m_dbJustCreated)
+            m_needResyncLog = true;
     }    
     else if (updateName == lit(":/updates/21_new_dw_cam.sql")) {
         updateResourceTypeGuids();
@@ -944,23 +969,25 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     else if (updateName == lit(":/updates/24_insert_default_stored_files.sql")) {
         addStoredFiles(lit(":/vms_storedfiles/"));
     }
+    else if (updateName == lit(":/updates/26_remove_server_status.sql")) {
+        return removeServerStatusFromTransactionLog();
+    }
 
 
     return true;
 }
 
-bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
+bool QnDbManager::createDatabase()
 {
     QnDbTransactionLocker lock(&m_tran);
 
-    *dbJustCreated = false;
-    *isMigrationFrom2_2 = false;
+    m_dbJustCreated = false;
 
     if (!isObjectExists(lit("table"), lit("vms_resource"), m_sdb))
     {
         NX_LOG(QString("Create new database"), cl_logINFO);
 
-        *dbJustCreated = true;
+        m_dbJustCreated = true;
 
         if (!execSQLFile(lit(":/01_createdb.sql"), m_sdb))
             return false;
@@ -974,7 +1001,7 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
 		NX_LOG(QString("Update database to v 2.3"), cl_logINFO);
         if (!migrateBusinessEvents())
             return false;
-        if (!(*dbJustCreated)) {
+        if (!m_dbJustCreated) {
             m_needResyncLog = true;
             if (!execSQLFile(lit(":/02_migration_from_2_2.sql"), m_sdb))
                 return false;
@@ -1015,7 +1042,7 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
         //if (!execSQLQuery("drop table vms_license", m_sdb))
         //    return false;
     }
-    else if (*dbJustCreated) {
+    else if (m_dbJustCreated) {
         m_needResyncLicenses = true;
     }
 
@@ -2949,7 +2976,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
             matrix.guid as id, \
             matrix.name, \
             matrix.videowall_guid as videowallGuid \
-        FROM vms_videowall_matrix matrix ORDER BY videowallGuid\
+        FROM vms_videowall_matrix matrix ORDER BY matrix.guid\
     ");
     if (!queryMatrices.exec()) {
         qWarning() << Q_FUNC_INFO << queryMatrices.lastError().text();
@@ -2958,7 +2985,9 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
     std::vector<ApiVideowallMatrixWithRefData> matrices;
     QnSql::fetch_many(queryMatrices, &matrices);
     mergeObjectListData(matrices, matrixItems, &ApiVideowallMatrixData::items, &ApiVideowallMatrixItemWithRefData::matrixGuid);
-
+    qSort(matrices.begin(), matrices.end(), [] (const ApiVideowallMatrixWithRefData& data1, const ApiVideowallMatrixWithRefData& data2) {
+        return data1.videowallGuid.toRfc4122() < data2.videowallGuid.toRfc4122();
+    });
     mergeObjectListData(videowallList, matrices, &ApiVideowallData::matrices, &ApiVideowallMatrixWithRefData::videowallGuid);
 
     return ErrorCode::ok;
@@ -3029,6 +3058,19 @@ ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiDatabaseDumpData& 
     if (!f.open(QFile::ReadOnly))
         return ErrorCode::failure;
     data.data = f.readAll();
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& dumpFilePath, qint64& dumpFileSize)
+{
+    QWriteLocker lock(&m_mutex);
+
+    if( !QFile::copy( m_sdb.databaseName(), dumpFilePath.path ) )
+        return ErrorCode::ioError;
+
+    QFileInfo dumpFileInfo( dumpFilePath.path );
+    dumpFileSize = dumpFileInfo.size();
+
     return ErrorCode::ok;
 }
 

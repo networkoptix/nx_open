@@ -102,10 +102,10 @@ public:
 protected:
     //!Implementation of QnResource::initInternal
     virtual CameraDiagnostics::Result initInternal() override;
-    //!Implementation of QnSecurityCamResource::startInputPortMonitoring
-    virtual bool startInputPortMonitoring() override;
-    //!Implementation of QnSecurityCamResource::stopInputPortMonitoring
-    virtual void stopInputPortMonitoring() override;
+    //!Implementation of QnSecurityCamResource::startInputPortMonitoringAsync
+    virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;
+    //!Implementation of QnSecurityCamResource::stopInputPortMonitoringAsync
+    virtual void stopInputPortMonitoringAsync() override;
     //!Implementation of QnSecurityCamResource::isInputPortMonitored
     virtual bool isInputPortMonitored() const override;
     //!Implementation of QnSecurityCamResource::setMotionMaskPhysical

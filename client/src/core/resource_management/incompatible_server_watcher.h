@@ -14,6 +14,9 @@ public:
     explicit QnIncompatibleServerWatcher(QObject *parent = 0);
     ~QnIncompatibleServerWatcher();
 
+    void start();
+    void stop();
+
 private slots:
     void at_peerChanged(const QnModuleInformation &moduleInformation);
     void at_peerLost(const QnModuleInformation &moduleInformation);
@@ -21,8 +24,10 @@ private slots:
 
 private:
     void removeResource(const QnUuid &id);
+    QnUuid getFakeId(const QnUuid &realId) const;
 
 private:
+    mutable QMutex m_mutex;
     QHash<QnUuid, QnUuid> m_fakeUuidByServerUuid;
     QHash<QnUuid, QnUuid> m_serverUuidByFakeUuid;
 };

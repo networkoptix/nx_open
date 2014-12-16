@@ -10,6 +10,7 @@ public:
     void setValue(const QnUuid& resourceId, Qn::ResourceStatus status);
     void clear();
     void clear(const QVector<QnUuid>& idList);
+    QMap<QnUuid, Qn::ResourceStatus> values() const;
 private:
     QMap<QnUuid, Qn::ResourceStatus> m_items;
     mutable QMutex m_mutex;

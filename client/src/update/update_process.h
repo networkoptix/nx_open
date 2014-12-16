@@ -99,7 +99,7 @@ private:
     void at_mutexLocked();
     void at_mutexTimeout(const QSet<QnUuid> &failedPeers);
 private:
-    const QnUuid m_id;
+    QString m_id;
     QnUpdateTarget m_target;
     QPointer<QnNetworkPeerTask> m_currentTask;
     QnFullUpdateStage m_stage;

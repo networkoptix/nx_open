@@ -55,7 +55,7 @@ namespace {
 QString QnScreenshotParameters::timeString() const {
     qint64 timeMSecs = time / 1000;
     if (isUtc)
-        return QDateTime::fromMSecsSinceEpoch(timeMSecs).toString(lit("yyyy-MMM-dd_hh.mm.ss"));
+        return datetimeSaveDialogSuggestion(QDateTime::fromMSecsSinceEpoch(timeMSecs));
     return QTime().addMSecs(timeMSecs).toString(lit("hh.mm.ss"));
 }
 
@@ -275,7 +275,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
                 QMessageBox::StandardButton button = QMessageBox::information(
                     mainWindow(),
                     tr("Save As"),
-                    tr("File '%1' already exists. Do you want to overwrite it?").arg(QFileInfo(fileName).completeBaseName()),
+                    tr("File '%1' already exists. Do you want to overwrite it?").arg(QFileInfo(fileName).fileName()),
                     QMessageBox::Ok | QMessageBox::Cancel
                 );
                 if(button == QMessageBox::Cancel)
@@ -292,7 +292,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
             QMessageBox::critical(
                 mainWindow(),
                 tr("Could not overwrite file"),
-                tr("File '%1' is used by another process. Please enter another name.").arg(QFileInfo(fileName).completeBaseName()),
+                tr("File '%1' is used by another process. Please enter another name.").arg(QFileInfo(fileName).fileName()),
                 QMessageBox::Ok
             );
             return;
@@ -307,7 +307,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         parameters.timestampPosition = static_cast<Qn::Corner>(comboBox->itemData(comboBox->currentIndex()).value<int>());
         loader->setParameters(parameters); //update changed fields
 
-        showProgressDelayed(tr("Saving %1").arg(QFileInfo(fileName).completeBaseName()));
+        showProgressDelayed(tr("Saving %1").arg(QFileInfo(fileName).fileName()));
         connect(m_screenshotProgressDialog, &QnProgressDialog::canceled, loader, &QnScreenshotLoader::deleteLater);
     }
     m_canceled = false;
@@ -355,7 +355,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         QMessageBox::critical(
             mainWindow(),
             tr("Could not save screenshot"),
-            tr("An error has occurred while saving screenshot '%1'.").arg(QFileInfo(filename).completeBaseName())
+            tr("An error has occurred while saving screenshot '%1'.").arg(QFileInfo(filename).fileName())
         );
         return;
     }

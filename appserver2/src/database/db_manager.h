@@ -109,8 +109,10 @@ namespace ec2
             Q_ASSERT_X(!tran.persistentInfo.isNull(), Q_FUNC_INFO, "You must register transaction command in persistent command list!");
             Locker lock(this);
             ErrorCode result = executeTransactionNoLock(tran, serializedTran);
-            if (result == ErrorCode::ok)
-                lock.commit();
+            if (result == ErrorCode::ok) {
+                if (!lock.commit())
+                    return ErrorCode::dbError;
+            }
             return result;
         }
 
@@ -129,6 +131,7 @@ namespace ec2
 
         //dumpDatabase
         ErrorCode doQuery(const std::nullptr_t& /*dummy*/, ApiDatabaseDumpData& data);
+        ErrorCode doQuery(const ApiStoredFilePath& path, qint64& dumpFileSize);
 
         //listDirectory
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredDirContents& data);
@@ -474,7 +477,7 @@ namespace ec2
 
         ErrorCode insertOrReplaceStoredFile(const QString &fileName, const QByteArray &fileContents);
 
-        bool createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2);
+        bool createDatabase();
         bool migrateBusinessEvents();
         bool doRemap(int id, int newVal, const QString& fieldName);
         
@@ -508,6 +511,7 @@ namespace ec2
         ErrorCode getScheduleTasks(const QnUuid& cameraId, std::vector<ApiScheduleTaskWithRefData>& scheduleTaskList);
         void addResourceTypesFromXML(ApiResourceTypeDataList& data);
         void loadResourceTypeXML(const QString& fileName, ApiResourceTypeDataList& data);
+        bool removeServerStatusFromTransactionLog();
     private:
         QnResourceFactory* m_resourceFactory;
         QnUuid m_storageTypeId;
@@ -529,6 +533,7 @@ namespace ec2
         bool m_needResyncLog;
         bool m_needResyncLicenses;
         bool m_needResyncFiles;
+        bool m_dbJustCreated;
     };
 };
 

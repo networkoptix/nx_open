@@ -195,7 +195,7 @@ void QnLoginDialog::accept() {
         case QnConnectionDiagnosticsHelper::Result::Failure:
             return;
         case QnConnectionDiagnosticsHelper::Result::Restart:
-            menu()->trigger(Qn::ExitActionDelayed);
+            menu()->trigger(Qn::DelayedForcedExitAction);
             break; // to avoid cycle
         default:    //success
             menu()->trigger(Qn::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, url));

@@ -41,6 +41,8 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
 
     m_resourcePool = resourcePool;
 
+    /* Layout watcher should be instantiated before snapshot manager because it can modify layout on adding. */
+    m_layoutWatcher = instance<QnWorkbenchLayoutWatcher>();
     m_snapshotManager.reset(new QnWorkbenchLayoutSnapshotManager(this));
 
     /* 
@@ -51,7 +53,7 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
 
     m_workbench.reset(new QnWorkbench(this));
 
-    m_layoutWatcher = instance<QnWorkbenchLayoutWatcher>();
+    
     m_userWatcher = instance<QnWorkbenchUserWatcher>();
 #ifdef Q_OS_WIN
     instance<QnWorkbenchDesktopCameraWatcher>();

@@ -300,7 +300,5 @@ bool QnSortedServerAddressesModel::lessThan(const QModelIndex &left, const QMode
     if (lmanual != rmanual)
         return rmanual;
 
-    int result = naturalStringCompare(left.data().toString(), right.data().toString(), Qt::CaseInsensitive, false);
-
-    return result < 0;
+    return naturalStringLess(left.data().toString(), right.data().toString());
 }

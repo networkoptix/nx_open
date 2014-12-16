@@ -6,6 +6,7 @@
 #include "multicast_module_finder.h"
 #include "direct_module_finder.h"
 #include "direct_module_finder_helper.h"
+#include "common/common_module.h"
 
 namespace {
     QUrl trimmedUrl(const QUrl &url) {
@@ -48,7 +49,7 @@ QList<QnModuleInformation> QnModuleFinder::foundModules() const {
     return m_foundModules.values();
 }
 
-QnModuleInformation QnModuleFinder::moduleInformation(const QString &moduleId) const {
+QnModuleInformation QnModuleFinder::moduleInformation(const QnUuid &moduleId) const {
     return m_foundModules.value(moduleId);
 }
 
@@ -64,10 +65,6 @@ QnModuleFinderHelper *QnModuleFinder::directModuleFinderHelper() const {
     return m_directModuleFinderHelper;
 }
 
-void QnModuleFinder::setAllowedPeers(const QList<QnUuid> &peerList) {
-    m_allowedPeers = peerList;
-}
-
 void QnModuleFinder::start() {
     m_multicastModuleFinder->start();
     m_directModuleFinder->start();
@@ -79,7 +76,7 @@ void QnModuleFinder::pleaseStop() {
 }
 
 void QnModuleFinder::at_moduleAddressFound(const QnModuleInformation &moduleInformation, const QnNetworkAddress &address) {
-    if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(moduleInformation.id))
+    if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(moduleInformation.id))
         return;
 
     QUrl url = address.toUrl();
@@ -100,7 +97,7 @@ void QnModuleFinder::at_moduleAddressFound(const QnModuleInformation &moduleInfo
 }
 
 void QnModuleFinder::at_moduleAddressLost(const QnModuleInformation &moduleInformation, const QnNetworkAddress &address) {
-    if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(moduleInformation.id))
+    if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(moduleInformation.id))
         return;
 
     QUrl url = address.toUrl();
@@ -120,7 +117,7 @@ void QnModuleFinder::at_moduleAddressLost(const QnModuleInformation &moduleInfor
 }
 
 void QnModuleFinder::at_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &foundUrl) {
-    if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(moduleInformation.id))
+    if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(moduleInformation.id))
         return;
 
     QUrl url = trimmedUrl(foundUrl);
@@ -140,7 +137,7 @@ void QnModuleFinder::at_moduleUrlFound(const QnModuleInformation &moduleInformat
 }
 
 void QnModuleFinder::at_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &foundUrl) {
-    if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(moduleInformation.id))
+    if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(moduleInformation.id))
         return;
 
     QUrl url = trimmedUrl(foundUrl);
@@ -159,7 +156,7 @@ void QnModuleFinder::at_moduleUrlLost(const QnModuleInformation &moduleInformati
 }
 
 void QnModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInformation) {
-    if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(moduleInformation.id))
+    if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(moduleInformation.id))
         return;
 
     QnModuleInformation updatedModuleInformation = moduleInformation;

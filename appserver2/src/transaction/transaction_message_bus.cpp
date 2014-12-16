@@ -36,6 +36,7 @@ namespace ec2
 
 static const int RECONNECT_TIMEOUT = 1000 * 5;
 static const int ALIVE_UPDATE_INTERVAL = 1000 * 60;
+static const int ALIVE_UPDATE_TIMEOUT = ALIVE_UPDATE_INTERVAL*2 + 10*1000;
 static const int DISCOVERED_PEER_TIMEOUT = 1000 * 60 * 3;
 
 struct GotTransactionFuction {
@@ -75,8 +76,10 @@ bool handleTransactionParams(const QByteArray &serializedTransaction, QnUbjsonRe
     }
 
     QnTransaction<T> transaction(abstractTransaction);
-    if (!QnUbjson::deserialize(stream, &transaction.params)) 
+    if (!QnUbjson::deserialize(stream, &transaction.params)) {
+        qWarning() << "Can't deserialize transaction " << toString(abstractTransaction.command);
         return false;
+    }
     if (!abstractTransaction.persistentInfo.isNull())
         QnUbjsonTransactionSerializer::instance()->addToCache(abstractTransaction.persistentInfo, serializedTransaction);
     function(transaction);
@@ -341,7 +344,7 @@ bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
                 qDebug() << "DETECT transaction GAP via update message. Resync with peer" << transport->remotePeer().id;
                 qDebug() << "peer state:";
-                printTranState(aliveData.persistentState);
+                printTranState(aliveData.persistentState, true);
 #endif
                 if (!transport->remotePeer().isClient() && !m_localPeer.isClient())
                     queueSyncRequest(transport);
@@ -403,6 +406,7 @@ void QnTransactionMessageBus::at_gotTransaction(const QByteArray &serializedTran
         {
             NX_LOG(lit("Ignoring transaction with seq %1 from peer %2 having state %3").
                 arg(transportHeader.sequence).arg(sender->remotePeer().id.toString()).arg(sender->getState()), cl_logDEBUG1);
+            sender->transactionProcessed();
         }
         else
         {
@@ -416,6 +420,9 @@ void QnTransactionMessageBus::at_gotTransaction(const QByteArray &serializedTran
     using namespace std::placeholders;
     if(!handleTransaction(serializedTran, std::bind(GotTransactionFuction(), this, _1, sender, transportHeader), [](Qn::SerializationFormat, const QByteArray& ) { return false; } ))
         sender->setState(QnTransactionTransport::Error);
+
+    //TODO #ak is it garanteed that sender is alive?
+    sender->transactionProcessed();
 }
 
 
@@ -675,10 +682,14 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
     emit transactionProcessed(tran);
 };
 
-void QnTransactionMessageBus::printTranState(const QnTranState& tranState)
+void QnTransactionMessageBus::printTranState(const QnTranState& tranState, bool printToStdOut)
 {
     for(auto itr = tranState.values.constBegin(); itr != tranState.values.constEnd(); ++itr)
-        qDebug() << "key=" << itr.key().peerID << "(dbID=" << itr.key().dbID << ") need after=" << itr.value();
+    {
+        if( printToStdOut )
+            qDebug() << "key=" << itr.key().peerID << "(dbID=" << itr.key().dbID << ") need after=" << itr.value();
+        NX_LOG( lit("key=%1 (dbID=%2) need after=%3").arg(itr.key().peerID.toString()).arg(itr.key().dbID.toString()).arg(itr.value()), cl_logDEBUG1 );
+    }
 }
 
 void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport* sender, const QnTransaction<ApiSyncRequestData> &tran)
@@ -701,7 +712,7 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
     {
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
         NX_LOG( lit("got sync request from peer %1. Need transactions after:").arg(sender->remotePeer().id.toString()), cl_logDEBUG1);
-        printTranState(tran.params.persistentState);
+        printTranState(tran.params.persistentState, false);
         NX_LOG( lit("exist %1 new transactions").arg(serializedTransactions.size()), cl_logDEBUG1);
 #endif
         QnTransaction<QnTranStateResponse> tranSyncResponse(ApiCommand::tranSyncResponse);
@@ -848,10 +859,10 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
     return true;
 }
 
-void QnTransactionMessageBus::connectToPeerLost(const QnTransactionTransport* transport)
+void QnTransactionMessageBus::connectToPeerLost(const QnUuid& id)
 {
-    if (m_alivePeers.contains(transport->remotePeer().id))
-        removeAlivePeer(transport->remotePeer().id, true);
+    if (m_alivePeers.contains(id))
+        removeAlivePeer(id, true);
 }
 
 void QnTransactionMessageBus::connectToPeerEstablished(const ApiPeerData &peer)
@@ -903,7 +914,7 @@ QnTransaction<ApiModuleDataList> QnTransactionMessageBus::prepareModulesDataTran
     return transaction;
 }
 
-//TODO #ak use SocketAddress instead of this function. It will reduce QString instanciation count
+//TODO #ak use SocketAddress instead of this function. It will reduce QString instanciations and make code more clear
 static QString getUrlAddr(const QUrl& url) { return url.host() + QString::number(url.port()); }
 
 bool QnTransactionMessageBus::isPeerUsing(const QUrl& url)
@@ -980,7 +991,7 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
         {
             QnTransactionTransportPtr transportPtr = itr.value();
             if (transportPtr == transport) {
-                connectToPeerLost(transport);
+                connectToPeerLost(transport->remotePeer().id);
                 m_connections.erase(itr);
                 break;
             }
@@ -1065,14 +1076,15 @@ void QnTransactionMessageBus::doPeriodicTasks()
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
     NX_LOG( "Current transaction state:", cl_logDEBUG1 );
     if (transactionLog)
-        printTranState(transactionLog->getTransactionsState());
+        printTranState(transactionLog->getTransactionsState(), false);
 #endif
     }
 
     // check if some server not accessible any more
+    QSet<QnUuid> lostPeers;
     for (AlivePeersMap::iterator itr = m_alivePeers.begin(); itr != m_alivePeers.end(); ++itr)
     {
-        if (itr.value().lastActivity.elapsed() > ALIVE_UPDATE_INTERVAL * 2)
+        if (itr.value().lastActivity.elapsed() > ALIVE_UPDATE_TIMEOUT)
         {
             itr.value().lastActivity.restart();
             for(const QnTransactionTransportPtr& transport: m_connectingConnections) {
@@ -1092,8 +1104,11 @@ void QnTransactionMessageBus::doPeriodicTasks()
                     transport->setState(QnTransactionTransport::Error);
                 }
             }
+            lostPeers << itr.key();
         }
     }
+    for (const QnUuid& id: lostPeers)
+        connectToPeerLost(id);
 }
 
 void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport, const QnTransactionTransportHeader& transportHeader, const QnTranState& runtimeState)

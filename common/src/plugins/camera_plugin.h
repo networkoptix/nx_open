@@ -5,7 +5,7 @@
 #include "plugin_api.h"
 
 
-//!Network Optix Camera Integration Plugin API (c++)
+//!VMS Camera Integration Plugin API (c++)
 /*!
     Contains structures and abstract classes to be implemented in real plugin.
     

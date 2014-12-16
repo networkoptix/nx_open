@@ -50,6 +50,8 @@ private:
     void checkForUpdatesInternet(bool autoSwitch = false, bool autoStart = false);
     void checkForUpdatesLocal();
 
+    QString serverNamesString(const QSet<QnUuid> &serverIds);
+
 private:
     enum UpdateSource {
         InternetSource,
