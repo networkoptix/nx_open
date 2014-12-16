@@ -69,6 +69,11 @@ QnDbHelper::QnDbHelper()
 
 }
 
+QnDbHelper::~QnDbHelper()
+{
+
+}
+
 QList<QByteArray> quotedSplit(const QByteArray& data)
 {
     QList<QByteArray> result;

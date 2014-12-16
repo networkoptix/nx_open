@@ -39,6 +39,7 @@ public:
     };
 
     QnDbHelper();
+    virtual ~QnDbHelper();
 
     bool execSQLFile(const QString& fileName, QSqlDatabase& database);
     bool execSQLQuery(const QString& query, QSqlDatabase& database);
