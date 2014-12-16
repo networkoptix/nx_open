@@ -97,6 +97,7 @@ class ClusterTest():
     clusterTestServerList = []
     clusterTestSleepTime = None
     clusterTestServerUUIDList = []
+    threadNumber = 32
     testCaseSize = 2
     unittestRollback = None
 
@@ -181,19 +182,50 @@ class ClusterTest():
         response.close()
         return (True,"")
 
-    def _checkResultEqual(self,responseList,methodName,address):
+    def _seeDiff(self,lhs,rhs):
+        if len(rhs) == 0 or len(lhs) == 0:
+            print "The difference is showing bellow:"
+            if len(lhs) == 0:
+                print "<empty string>"
+            else:
+                print rhs[0:min(128,len(rhs))]
+            if len(rhs) == 0:
+                print "<empty string>"
+            else:
+                print rhs[0:min(128,len(rhs))]
+
+            print "One of the string is empty!"
+            return
+
+        for i in range(max(len(rhs),len(lhs))):
+            if i >= len(rhs) or i >= len(lhs) or lhs[i] != rhs[i]:
+                # print the difference from current position
+                start = max(0,i-64)
+                end = min(64,min(len(rhs)-i,len(lhs)-i))+i
+                print "The difference is showing bellow:"
+                print "\n\n%s^^^%s^^^%s"%(lhs[start:max(0,i)],lhs[i],lhs[i+1:end])
+                print "\n%s^^^%s^^^%s\n\n"%(rhs[start:max(0,i)],rhs[i],rhs[i+1:end])
+                print "The first different character is at location:%d"%(i+1)
+                return
+
+    def _checkResultEqual(self,responseList,methodName):
         result = None
-        for response in responseList:
+        resultAddr = None
+        for entry in responseList:
+            response = entry[0]
+            address = entry[1]
             if response.getcode() != 200:
                 return(False,"Server:%s method:%s http request failed with code:%d" % (address,methodName,response.getcode))
             else:
                 # painfully slow, just bulk string comparison here
                 if result == None:
+                    resultAddr = address
                     result = response.read()
                 else:
                     output = response.read()
                     if result != output:
-                        return(False,"Server:%s method:%s return value differs from other" % (address,methodName))
+                        self._seeDiff(result,output)
+                        return(False,"Server:%s returned value differs from server:%s on method:%s."% (address,resultAddr,methodName))
                 
                 response.close()
 
@@ -202,10 +234,10 @@ class ClusterTest():
     def checkMethodStatusConsistent(self,method):
             responseList = []
             for server in self.clusterTestServerList:
-                responseList.append((urllib2.urlopen("http://%s/ec2/%s" % (server, method))))
+                responseList.append((urllib2.urlopen("http://%s/ec2/%s" % (server, method)),server))
 
             # checking the last response validation
-            return self._checkResultEqual(responseList,method,server)
+            return self._checkResultEqual(responseList,method)
 
     def _ensureServerListStates(self,sleep_timeout):
         time.sleep(sleep_timeout)
@@ -220,6 +252,7 @@ class ClusterTest():
         parser.read("ec2_tests.cfg")
         self.clusterTestServerList = parser.get("General","serverList").split(",")
         self.clusterTestSleepTime = parser.getint("General","clusterTestSleepTime")
+        self.threadNumber = parser.getint("General","threadNumber")
         try :
             self.testCaseSize = parser.getint("General","testCaseSize")
         except :
@@ -1108,7 +1141,7 @@ class ClusterTestBase(unittest.TestCase):
         if postDataList == None:
             return
 
-        workerQueue = ClusterWorker(32,len(postDataList))
+        workerQueue = ClusterWorker(clusterTest.threadNumber,len(postDataList))
 
         print "===================================\n"
         print "Test:%s start!\n" % (self._getMethodName())
@@ -1333,7 +1366,7 @@ class ResourceConflictionTest(ClusterTestBase):
 
     # Overwrite the test function since the base method doesn't work here
     def test(self):
-        workerQueue = ClusterWorker(32,self._testCase * 2)
+        workerQueue = ClusterWorker(clusterTest.threadNumber,self._testCase * 2)
 
         print "===================================\n"
         print "Test:ResourceConfliction start!\n"
@@ -1498,7 +1531,7 @@ class MergeTest():
 
     def _phase1(self):
         testList = self._generateRandomSystemName()
-        worker = ClusterWorker(32,len(testList))
+        worker = ClusterWorker(clusterTest.threadNumber,len(testList))
 
         for entry in testList:
             worker.enqueue(PrepareServerStatus(self).main,
@@ -1523,7 +1556,7 @@ class MergeTest():
         return (True,"")
 
     def _setToSameSystemName(self):
-        worker = ClusterWorker(32,len(clusterTest.clusterTestServerList))
+        worker = ClusterWorker(clusterTest.threadNumber,len(clusterTest.clusterTestServerList))
         for entry in  clusterTest.clusterTestServerList:
             worker.enqueue(self._setSystemName,(entry,self._systemName,))
         worker.join()
@@ -1774,7 +1807,7 @@ class SingleServerRtspTest():
             assert self._checkReply(reply),"Server:%s RTSP failed, with reply:%s" % (self._serverEndpoint,reply)
 
     def run(self):
-        worker = ClusterWorker(16 , self._testCase)
+        worker = ClusterWorker(clusterTest.threadNumber , self._testCase)
         for _ in range(self._testCase):
             worker.enqueue(self._testMain,())
         worker.join()	
@@ -1845,7 +1878,7 @@ class PerformanceOperation():
         return ret
 
     def _sendOp(self,methodName,dataList,addr):
-        worker = ClusterWorker(32,len(dataList))
+        worker = ClusterWorker(clusterTest.threadNumber,len(dataList))
         for d in dataList:
             worker.enqueue(self._sendRequest,(methodName,d,addr))
 
