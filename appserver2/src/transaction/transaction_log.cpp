@@ -13,6 +13,8 @@
 #include "nx_ec/data/api_discovery_data.h"
 #include "nx_ec/data/api_camera_bookmark_data.h"
 
+#define TRANSACTION_MESSAGE_BUS_DEBUG
+
 namespace ec2
 {
 
