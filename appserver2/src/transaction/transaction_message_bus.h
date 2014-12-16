@@ -31,7 +31,7 @@ namespace ec2
     class QnTransactionMessageBus
     :
         public QObject,
-        public EnableMultiThreadDirectConnection
+        public EnableMultiThreadDirectConnection<QnTransactionMessageBus>
     {
         Q_OBJECT
     public:

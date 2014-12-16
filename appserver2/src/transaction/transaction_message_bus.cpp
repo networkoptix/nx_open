@@ -187,7 +187,6 @@ QnTransactionMessageBus* QnTransactionMessageBus::instance()
 
 QnTransactionMessageBus::QnTransactionMessageBus(Qn::PeerType peerType)
 : 
-    EnableMultiThreadDirectConnection( this ),
     m_localPeer(qnCommon->moduleGUID(), qnCommon->runningInstanceGUID(), peerType),
     //m_binaryTranSerializer(new QnBinaryTransactionSerializer()),
     m_jsonTranSerializer(new QnJsonTransactionSerializer()),

@@ -11,27 +11,31 @@
 
 
 //!QObject's successors which allow using Qt::DirectConnection to connect object living in different thread should inherit this class
+template<class Derived>
 class EnableMultiThreadDirectConnection
 {
 public:
-    /*!
-        \param pObject pointer to object emitting signals. Typically, pointer to class inheriting this one and QObject
-    */
-    EnableMultiThreadDirectConnection( QObject* pObject );
-    virtual ~EnableMultiThreadDirectConnection();
+    EnableMultiThreadDirectConnection()
+    :
+        m_signalEmitMutex( QMutex::Recursive )
+    {
+    }
+
+    virtual ~EnableMultiThreadDirectConnection() {}
 
     //!Disconnects \a receiver from all signals of this class and waits for issued \a emit calls connected to \a receiver to return
     /*!
         Can be called from any thread
     */
-    void disconnectAndJoin( QObject* receiver );
+    void disconnectAndJoin( QObject* receiver )
+    {
+        QObject::disconnect( static_cast<Derived*>(this), nullptr, receiver, nullptr );
+        QMutexLocker lk( &m_signalEmitMutex );  //waiting for signals to be emitted in other threads to be processed
+    }
 
 protected:
     //!Successors have to lock this mutex for emiting signal which allows to be connected to directly
     QMutex m_signalEmitMutex;
-
-private:
-    QObject* m_pObject;
 };
 
 #endif  //ENABLE_MULTI_THREAD_DIRECT_CONNECTION_H

@@ -210,7 +210,7 @@ static const int DEFAULT_MAX_CAMERAS = 1;
 static const int DEFAULT_MAX_CAMERAS = 128;
 #endif
 
-//!TODO: #ak have to do something with settings
+//TODO #ak have to do something with settings
 class CmdLineArguments
 {
 public:
@@ -231,8 +231,7 @@ public:
             lit("INFO")
 #endif
         ),
-        msgLogLevel( lit("none") ),
-        ec2TranLogLevel( lit("none") )
+        msgLogLevel( lit("none") )
     {
     }
 };
@@ -670,6 +669,12 @@ int serverMain(int argc, char *argv[])
             DEFAULT_MAX_LOG_FILE_SIZE,
             DEFAULT_MSG_LOG_ARCHIVE_SIZE,
             QnLog::logLevelFromString(cmdLineArguments.msgLogLevel) );
+
+    //preparing transaction log
+    if( cmdLineArguments.ec2TranLogLevel.isEmpty() )
+        cmdLineArguments.ec2TranLogLevel = MSSettings::roSettings()->value(
+            nx_ms_conf::EC2_TRAN_LOG_LEVEL,
+            nx_ms_conf::DEFAULT_EC2_TRAN_LOG_LEVEL ).toString();
 
     if( cmdLineArguments.ec2TranLogLevel != lit("none") )
     {
@@ -1503,11 +1508,10 @@ void QnMain::run()
 
     QnResourcePool::instance(); // to initialize net state;
 
-    QnRestProcessorPool restProcessorPool;
-    QnRestProcessorPool::initStaticInstance( &restProcessorPool );
+    std::unique_ptr<QnRestProcessorPool> restProcessorPool( new QnRestProcessorPool() );
 
     if( QnAppServerConnectionFactory::url().scheme().toLower() == lit("file") )
-        ec2ConnectionFactory->registerRestHandlers( &restProcessorPool );
+        ec2ConnectionFactory->registerRestHandlers( restProcessorPool.get() );
 
     std::unique_ptr<nx_hls::HLSSessionPool> hlsSessionPool( new nx_hls::HLSSessionPool() );
 
@@ -1857,7 +1861,7 @@ void QnMain::run()
     delete QnRecordingManager::instance();
     QnRecordingManager::initStaticInstance( NULL );
 
-    QnRestProcessorPool::initStaticInstance( nullptr );
+    restProcessorPool.reset();
 
     delete QnMServerResourceSearcher::instance();
     QnMServerResourceSearcher::initStaticInstance( NULL );
@@ -2233,7 +2237,6 @@ int main(int argc, char* argv[])
     if (restartFlag && res == 0)
         return 1;
     return 0;
-    //return res;
 }
 
 static void printVersion()
