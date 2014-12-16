@@ -322,6 +322,8 @@ bool QnDbManager::init(
         return false;
     }
 
+    QnDbManager::QnDbTransactionLocker locker( getTransaction() );
+
     if( !qnCommon->obsoleteServerGuid().isNull() )
     {
         {
@@ -507,6 +509,7 @@ bool QnDbManager::init(
     if (!queryCameras.exec()) {
         qWarning() << Q_FUNC_INFO << __LINE__ << queryCameras.lastError();
         Q_ASSERT( 0 );
+        return false;
     }
     while( queryCameras.next() )
     {
@@ -514,8 +517,12 @@ bool QnDbManager::init(
         transactionLog->fillPersistentInfo(tran);
         tran.params.id = QnUuid::fromRfc4122(queryCameras.value(0).toByteArray());
         tran.params.status = Qn::Offline;
-        executeTransactionNoLock( tran, QnUbjson::serialized( tran ) );
+        if (executeTransactionNoLock( tran, QnUbjson::serialized( tran ) ) != ErrorCode::ok)
+            return false;
     }
+
+    if (!locker.commit())
+        return false;
 
     emit initialized();
     m_initialized = true;
