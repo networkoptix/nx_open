@@ -38,6 +38,9 @@ QnClientConnectionStatus::QnClientConnectionStatus():
     m_allowedTransactions.insert(QnConnectionState::Connecting,     QnConnectionState::Disconnected);
     m_allowedTransactions.insert(QnConnectionState::Connected,      QnConnectionState::Disconnected);
     m_allowedTransactions.insert(QnConnectionState::Reconnecting,   QnConnectionState::Disconnected);
+
+    /* Double-checked disconnect is allowed. */
+    m_allowedTransactions.insert(QnConnectionState::Disconnected,   QnConnectionState::Disconnected);
 }
 
 QnConnectionState QnClientConnectionStatus::state() const {
@@ -48,11 +51,6 @@ void QnClientConnectionStatus::setState(QnConnectionState state) {
 #ifdef STRICT_STATE_CONTROL
     qDebug() << "QnClientConnectionStatus::setState" << stateToString(state);
 #endif
-
-    if (m_state == state) {
-        warn(lit("Duplicated setState %1").arg(stateToString(state)));
-        return;
-    }
 
     if (!m_allowedTransactions.values(m_state).contains(state))
         warn(lit("Invalid state transaction %1 -> %2").arg(stateToString(m_state)).arg(stateToString(state)));
