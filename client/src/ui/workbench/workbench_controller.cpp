@@ -789,7 +789,7 @@ void QnWorkbenchController::at_scene_focusIn(QGraphicsScene *, QEvent *event) {
     *focusEvent = QFocusEvent(focusEvent->type(), Qt::OtherFocusReason);
 }
 
-void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget *item, ResizingInfo *) {
+void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget *item, ResizingInfo *info) {
     TRACE("RESIZING STARTED");
 
     m_resizedWidget = qobject_cast<QnResourceWidget *>(item);
@@ -808,17 +808,18 @@ void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget 
     opacityAnimator(display()->gridItem())->animateTo(1.0);
     opacityAnimator(m_resizedWidget)->animateTo(widgetManipulationOpacity);
 
-    m_widgetInitialGeometry = mapper()->mapToGrid(rotated(m_resizedWidget->geometry(), m_resizedWidget->rotation()));
+    /* Calculate snap point */
+    Qt::WindowFrameSection grabbedSection = Qn::rotateSection(info->frameSection(), item->rotation());
+    QRect initialGeometry = m_resizedWidget->item()->geometry();
+    QRect widgetInitialGeometry = mapper()->mapToGrid(rotated(m_resizedWidget->geometry(), m_resizedWidget->rotation()));
+    m_resizingSnapPoint = Qn::calculatePinPoint(initialGeometry.intersected(widgetInitialGeometry), grabbedSection);
 }
 
 void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, ResizingInfo *info) {
     if(m_resizedWidget != item || item == NULL)
         return;
 
-    QnResourceWidget *widget = m_resizedWidget;
-
-    QRect initialGeometry = widget->item()->geometry();
-    QRectF widgetGeometry = rotated(widget->geometry(), widget->rotation());
+    QRectF widgetGeometry = rotated(m_resizedWidget->geometry(), m_resizedWidget->rotation());
     
     /* Calculate integer size. */
     QSize gridSize = mapper()->mapToGrid(widgetGeometry).size();
@@ -827,44 +828,43 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
 
     /* Correct grabbed section according to item rotation. */
     Qt::WindowFrameSection grabbedSection = Qn::rotateSection(info->frameSection(), item->rotation());
-    QPoint snapPoint = Qn::calculatePinPoint(initialGeometry.intersected(m_widgetInitialGeometry), grabbedSection);
 
     /* Calculate new item position .*/
     QPoint newPosition;
     switch (grabbedSection) {
     case Qt::TopSection:
-        newPosition = QPoint(snapPoint.x() - gridSize.width() / 2, snapPoint.y() - gridSize.height());
+        newPosition = QPoint(m_resizingSnapPoint.x() - gridSize.width() / 2, m_resizingSnapPoint.y() - gridSize.height());
         break;
     case Qt::LeftSection:
-        newPosition = QPoint(snapPoint.x() - gridSize.width(), snapPoint.y() - gridSize.height() / 2);
+        newPosition = QPoint(m_resizingSnapPoint.x() - gridSize.width(), m_resizingSnapPoint.y() - gridSize.height() / 2);
         break;
     case Qt::TopLeftSection:
-        newPosition = QPoint(snapPoint.x() - gridSize.width(), snapPoint.y() - gridSize.height());
+        newPosition = QPoint(m_resizingSnapPoint.x() - gridSize.width(), m_resizingSnapPoint.y() - gridSize.height());
         break;
     case Qt::BottomSection:
-        newPosition = QPoint(snapPoint.x() - gridSize.width() / 2, snapPoint.y());
+        newPosition = QPoint(m_resizingSnapPoint.x() - gridSize.width() / 2, m_resizingSnapPoint.y());
         break;
     case Qt::RightSection:
-        newPosition = QPoint(snapPoint.x(), snapPoint.y() - gridSize.height() / 2);
+        newPosition = QPoint(m_resizingSnapPoint.x(), m_resizingSnapPoint.y() - gridSize.height() / 2);
         break;
     case Qt::BottomRightSection:
-        newPosition = snapPoint;
+        newPosition = m_resizingSnapPoint;
         break;
     case Qt::TopRightSection:
-        newPosition = QPoint(snapPoint.x(), snapPoint.y() - gridSize.height());
+        newPosition = QPoint(m_resizingSnapPoint.x(), m_resizingSnapPoint.y() - gridSize.height());
         break;
     case Qt::BottomLeftSection:
-        newPosition = QPoint(snapPoint.x() - gridSize.width(), snapPoint.y());
+        newPosition = QPoint(m_resizingSnapPoint.x() - gridSize.width(), m_resizingSnapPoint.y());
         break;
     default:
-        newPosition = snapPoint;
+        newPosition = m_resizingSnapPoint;
     }
 
     QRect newResizingWidgetRect(newPosition, gridSize);
 
     if(newResizingWidgetRect != m_resizedWidgetRect) {
         QnWorkbenchLayout::Disposition disposition;
-        widget->item()->layout()->canMoveItem(widget->item(), newResizingWidgetRect, &disposition);
+        m_resizedWidget->item()->layout()->canMoveItem(m_resizedWidget->item(), newResizingWidgetRect, &disposition);
 
         display()->gridItem()->setCellState(m_resizedWidgetRect, QnGridItem::Initial);
         display()->gridItem()->setCellState(disposition.free, QnGridItem::Allowed);

@@ -284,7 +284,8 @@ private:
     /** Current grid rect of the widget being resized. */
     QRect m_resizedWidgetRect;
 
-    QRect m_widgetInitialGeometry;
+    /** Snap point for the current resize process. */
+    QPoint m_resizingSnapPoint;
 
 
 
