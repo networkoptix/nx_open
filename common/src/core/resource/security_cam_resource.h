@@ -250,14 +250,16 @@ protected:
     //!MUST be overridden for camera with input port. Default implementation does nothing
     /*!
         \warning Excess calls of this method is legal and MUST be correctly handled in implementation
-        \return true, if started input port monitoring
+        \return true, if async request has been started successfully
+        \note \a completionHandler is not called yet (support will emerge in 2.4)
     */
-    virtual bool startInputPortMonitoring();
+    virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler );
     //!MUST be overridden for camera with input port. Default implementation does nothing
     /*!
         \warning Excess calls of this method is legal and MUST be correctly handled in implementation
+        \note This method has no right to fail
     */
-    virtual void stopInputPortMonitoring();
+    virtual void stopInputPortMonitoringAsync();
     virtual bool isInputPortMonitored() const;
 
 private:

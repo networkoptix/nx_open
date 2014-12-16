@@ -8,6 +8,8 @@
 #include "core/resource_management/resource_pool.h"
 
 #include <QtCore/QUrlQuery>
+#include "utils/network/simple_http_client.h"
+#include "vmax480_resource_searcher.h"
 
 QMutex QnPlVmax480Resource::m_chunkReaderMutex;
 QMap<QString, QnVMax480ChunkReader*> QnPlVmax480Resource::m_chunkReaderMap;
@@ -127,6 +129,16 @@ QnAbstractArchiveDelegate* QnPlVmax480Resource::createArchiveDelegate()
 
 CameraDiagnostics::Result QnPlVmax480Resource::initInternal()
 {
+    QUrl url = getUrl();
+    int httpPort = url.port(80);
+    QString httpPortStr = QUrlQuery(url.query()).queryItemValue(lit("http_port"));
+    if (!httpPortStr.isEmpty())
+        httpPort = httpPortStr.toInt();
+
+    CLSimpleHTTPClient client(url.host(), httpPort, 3000, QAuthenticator());
+    if (!QnPlVmax480ResourceSearcher::vmaxAuthenticate(client, getAuth()))
+        return CameraDiagnostics::CannotEstablishConnectionResult(httpPort);
+
     QnPhysicalCameraResource::initInternal();
     Qn::CameraCapabilities addFlags = Qn::PrimaryStreamSoftMotionCapability;
     setCameraCapabilities(getCameraCapabilities() | addFlags);

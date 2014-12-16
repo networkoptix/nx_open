@@ -291,7 +291,7 @@ QnPlOnvifResource::~QnPlOnvifResource()
         }
     }
 
-    stopInputPortMonitoring();
+    stopInputPortMonitoringAsync();
 
     m_onvifAdditionalSettings.reset();
 }
@@ -2566,7 +2566,7 @@ QnAbstractPtzController *QnPlOnvifResource::createPtzControllerInternal()
     return result.take();
 }
 
-bool QnPlOnvifResource::startInputPortMonitoring()
+bool QnPlOnvifResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
 {
     if( hasFlags(Qn::foreigner) )     //we do not own camera
     {
@@ -2589,7 +2589,7 @@ bool QnPlOnvifResource::startInputPortMonitoring()
         return false;
 }
 
-void QnPlOnvifResource::stopInputPortMonitoring()
+void QnPlOnvifResource::stopInputPortMonitoringAsync()
 {
     quint64 localTimerID = 0;
     quint64 localRenewSubscriptionTaskID = 0;

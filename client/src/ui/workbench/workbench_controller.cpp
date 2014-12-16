@@ -811,49 +811,51 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
         return;
 
     QnResourceWidget *widget = m_resizedWidget;
-    QRectF gridRectF = mapper()->mapToGridF(widget->geometry());
+    QRectF widgetGeometry = rotated(widget->geometry(), widget->rotation());
+
+    QPointF pinPoint = Qn::calculatePinPoint(widget->geometry(), info->frameSection());
+    pinPoint = rotated(pinPoint, widgetGeometry.center(), widget->rotation());
+    QPoint snapPoint = mapper()->mapToGrid(pinPoint);
     
     /* Calculate integer size. */
-    QSizeF gridSizeF = gridRectF.size();
-    QSize gridSize = mapper()->mapToGrid(widget->size());
-    if (dynamic_cast<QnMediaResourceWidget*>(widget)) {
-        qreal aspectRatio = widget->hasAspectRatio() ? widget->aspectRatio() : widget->defaultVisualAspectRatio();
-        if (aspectRatio > 1.0) {
-            gridSize = bestSingleBoundedSize(mapper(), gridSize.width(), Qt::Horizontal, aspectRatio);
-        } else {
-            gridSize = bestSingleBoundedSize(mapper(), gridSize.height(), Qt::Vertical, aspectRatio);
-        }
-    }
+    QSize gridSize = mapper()->mapToGrid(widgetGeometry.size());
 
     if (gridSize.isEmpty())
         gridSize = gridSize.expandedTo(QSize(1, 1));
 
-    /* Calculate integer position. */
-    QPointF gridPosF;
-    switch (info->frameSection()) {
+    QRect newResizingWidgetRect;
+
+    /* Correct grabbed section according to item rotation. */
+    Qt::WindowFrameSection grabbedSection = Qn::rotateSection(info->frameSection(), item->rotation());
+    switch (grabbedSection) {
     case Qt::TopSection:
+        newResizingWidgetRect = QRect(QPoint(snapPoint.x() - gridSize.width() / 2, snapPoint.y() - gridSize.height() + 1), gridSize);
+        break;
     case Qt::LeftSection:
+        newResizingWidgetRect = QRect(QPoint(snapPoint.x() - gridSize.width() + 1, snapPoint.y() - gridSize.height() / 2), gridSize);
+        break;
     case Qt::TopLeftSection:
-        gridPosF = gridRectF.bottomRight() - toPoint(gridSize);
+        newResizingWidgetRect = QRect(QPoint(snapPoint.x() - gridSize.width() + 1, snapPoint.y() - gridSize.height() + 1), gridSize);
         break;
     case Qt::BottomSection:
+        newResizingWidgetRect = QRect(QPoint(snapPoint.x() - gridSize.width() / 2, snapPoint.y()), gridSize);
+        break;
     case Qt::RightSection:
+        newResizingWidgetRect = QRect(QPoint(snapPoint.x(), snapPoint.y() - gridSize.height() / 2), gridSize);
+        break;
     case Qt::BottomRightSection:
-        gridPosF = gridRectF.topLeft();
+        newResizingWidgetRect = QRect(snapPoint, gridSize);
         break;
     case Qt::TopRightSection:
-        gridPosF = QPointF(gridRectF.left(), gridRectF.bottom() - gridSize.height());
+        newResizingWidgetRect = QRect(QPoint(snapPoint.x(), snapPoint.y() - gridSize.height() + 1), gridSize);
         break;
     case Qt::BottomLeftSection:
-        gridPosF = QPointF(gridRectF.right() - gridSize.width(), gridRectF.top());
+        newResizingWidgetRect = QRect(QPoint(snapPoint.x() - gridSize.width() + 1, snapPoint.y()), gridSize);
         break;
     default:
-        gridPosF = gridRectF.topLeft() + toPoint(gridSizeF - gridSize) / 2;
+        newResizingWidgetRect = QRect(snapPoint, gridSize);
     }
-    QPoint gridPos = gridPosF.toPoint(); /* QPointF::toPoint() uses qRound() internally. */
 
-    /* Calculate new grid rect based on the dragged frame section. */
-    QRect newResizingWidgetRect = QRect(gridPos, gridSize);
     if(newResizingWidgetRect != m_resizedWidgetRect) {
         QnWorkbenchLayout::Disposition disposition;
         widget->item()->layout()->canMoveItem(widget->item(), newResizingWidgetRect, &disposition);
@@ -1134,6 +1136,10 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
 
     QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
     if(widget == NULL)
+        return;
+
+    /* Don't raise if there's only one item in the layout. */
+    if (workbench()->currentLayout() && workbench()->currentLayout()->items().size() == 1)
         return;
 
     QnWorkbenchItem *workbenchItem = widget->item();

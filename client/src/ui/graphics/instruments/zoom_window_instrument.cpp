@@ -115,7 +115,7 @@ protected:
                 fixedPoint,
                 Qt::IgnoreAspectRatio
             ),
-            Qn::NoCorner,
+            Qt::NoSection,
             fixedPoint
         );
 
@@ -124,7 +124,7 @@ protected:
         event->accept();
     }
 
-    virtual QRectF constrainedGeometry(const QRectF &geometry, Qn::Corner pinCorner, const QPointF &pinPoint = QPointF()) const override;
+    virtual QRectF constrainedGeometry(const QRectF &geometry, Qt::WindowFrameSection pinSection, const QPointF &pinPoint = QPointF()) const override;
 
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override {
         qreal l, t, r, b;
@@ -274,7 +274,7 @@ ZoomWindowWidget::~ZoomWindowWidget() {
         overlay()->removeWidget(this);
 }
 
-QRectF ZoomWindowWidget::constrainedGeometry(const QRectF &geometry, Qn::Corner pinCorner, const QPointF &pinPoint) const {
+QRectF ZoomWindowWidget::constrainedGeometry(const QRectF &geometry, Qt::WindowFrameSection pinSection, const QPointF &pinPoint) const {
     ZoomOverlayWidget *overlayWidget = this->overlay();
     QRectF result = geometry;
 
@@ -282,13 +282,13 @@ QRectF ZoomWindowWidget::constrainedGeometry(const QRectF &geometry, Qn::Corner 
     QSizeF maxSize = geometry.size();
     if(overlayWidget)
         maxSize = QnGeometry::cwiseMax(QnGeometry::cwiseMin(maxSize, overlayWidget->size() * zoomWindowMaxSize), overlayWidget->size() * zoomWindowMinSize);
-    result = ConstrainedResizable::constrainedGeometry(geometry, pinCorner, pinPoint, QnGeometry::expanded(QnGeometry::aspectRatio(size()), maxSize, Qt::KeepAspectRatio));
+    result = ConstrainedResizable::constrainedGeometry(geometry, pinSection, pinPoint, QnGeometry::expanded(QnGeometry::aspectRatio(size()), maxSize, Qt::KeepAspectRatio));
 
     /* Position constraints go next. */
     if(overlayWidget) {
-        if(pinCorner != Qn::NoCorner) {
+        if(pinSection != Qt::NoSection) {
             QRectF constraint = overlayWidget->rect();
-            QPointF pinPoint = QnGeometry::corner(geometry, pinCorner);
+            QPointF pinPoint = Qn::calculatePinPoint(geometry, pinSection);
 
             qreal xScaleFactor = 1.0;
             if(result.left() < constraint.left() && !qFuzzyCompare(result.left(), pinPoint.x())) {
@@ -305,7 +305,7 @@ QRectF ZoomWindowWidget::constrainedGeometry(const QRectF &geometry, Qn::Corner 
             }
 
             qreal scaleFactor = qMin(xScaleFactor, yScaleFactor);
-            result = ConstrainedResizable::constrainedGeometry(result, pinCorner, pinPoint, result.size() * scaleFactor);
+            result = ConstrainedResizable::constrainedGeometry(result, pinSection, pinPoint, result.size() * scaleFactor);
         } else {
             result = QnGeometry::movedInto(result, overlayWidget->rect());
         }

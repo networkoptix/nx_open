@@ -37,12 +37,15 @@ namespace ec2
     Ec2DirectConnectionFactory::Ec2DirectConnectionFactory( Qn::PeerType peerType )
     :
         m_dbManager( peerType == Qn::PT_Server ? new QnDbManager() : nullptr ),   //dbmanager is initialized by direct connection
-        m_transactionMessageBus( new ec2::QnTransactionMessageBus() ),
         m_timeSynchronizationManager( new TimeSynchronizationManager(peerType) ),
+        m_transactionMessageBus( new ec2::QnTransactionMessageBus() ),
         m_terminated( false ),
         m_runningRequests( 0 ),
         m_sslEnabled( false )
     {
+        m_timeSynchronizationManager->start();  //unfortunately cannot do it in TimeSynchronizationManager 
+            //constructor to keep valid object destruction order
+
         srand( ::time(NULL) );
 
         //registering ec2 types with Qt meta types system
@@ -56,6 +59,9 @@ namespace ec2
     {
         pleaseStop();
         join();
+
+        m_timeSynchronizationManager->pleaseStop(); //have to do it before m_transactionMessageBus destruction 
+            //since TimeSynchronizationManager uses QnTransactionMessageBus
 
         ec2::QnDistributedMutexManager::initStaticInstance(0);
     }

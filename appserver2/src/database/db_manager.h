@@ -109,8 +109,10 @@ namespace ec2
             Q_ASSERT_X(!tran.persistentInfo.isNull(), Q_FUNC_INFO, "You must register transaction command in persistent command list!");
             Locker lock(this);
             ErrorCode result = executeTransactionNoLock(tran, serializedTran);
-            if (result == ErrorCode::ok)
-                lock.commit();
+            if (result == ErrorCode::ok) {
+                if (!lock.commit())
+                    return ErrorCode::dbError;
+            }
             return result;
         }
 

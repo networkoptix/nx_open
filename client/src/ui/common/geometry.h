@@ -361,6 +361,9 @@ public:
 
     static QPointF closestPoint(const QRectF &rect, const QPointF &point);
     static QPointF closestPoint(const QPointF &a, const QPointF &b, const QPointF &point, qreal *t);
+
+    static QRectF rotated(const QRectF &rect, qreal degrees);
+    static QPointF rotated(const QPointF &point, const QPointF &center, qreal degrees);
 };
 
 #endif // QN_GEOMETRY_H

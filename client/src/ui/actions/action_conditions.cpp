@@ -1022,3 +1022,14 @@ Qn::ActionVisibility QnDisjunctionActionCondition::check(const QnActionParameter
 
     return result;
 }
+
+Qn::ActionVisibility QnItemsCountActionCondition::check(const QnActionParameters &parameters) {
+    Q_UNUSED(parameters)
+
+    if (!workbench()->currentLayout())
+        return Qn::InvisibleAction;
+
+    int count = workbench()->currentLayout()->items().size();
+
+    return (m_count == MultipleItems && count > 1) || (m_count == count) ? Qn::EnabledAction : Qn::InvisibleAction;
+}
