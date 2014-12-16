@@ -8,10 +8,10 @@ namespace {
         switch (state) {
         case QnConnectionState::Invalid:                return lit("Invalid");
         case QnConnectionState::Disconnected:           return lit("Disconnected");
-        case QnConnectionState::Connecting:             return lit("Invalid");
+        case QnConnectionState::Connecting:             return lit("Connecting");
         case QnConnectionState::Connected:              return lit("Connected");
-        case QnConnectionState::Reconnecting:           return lit("Invalid");
-        case QnConnectionState::Ready:                  return lit("Connected");
+        case QnConnectionState::Reconnecting:           return lit("Reconnecting");
+        case QnConnectionState::Ready:                  return lit("Ready");
         }
         qWarning() << "invalid state" << QString::number(static_cast<int>(state));
         return QString();
@@ -37,6 +37,7 @@ QnClientConnectionStatus::QnClientConnectionStatus():
     /* Cancelled connect. */
     m_allowedTransactions.insert(QnConnectionState::Connecting,     QnConnectionState::Disconnected);
     m_allowedTransactions.insert(QnConnectionState::Connected,      QnConnectionState::Disconnected);
+    m_allowedTransactions.insert(QnConnectionState::Reconnecting,   QnConnectionState::Disconnected);
 }
 
 QnConnectionState QnClientConnectionStatus::state() const {
