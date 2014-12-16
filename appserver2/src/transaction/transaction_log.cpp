@@ -13,7 +13,6 @@
 #include "nx_ec/data/api_discovery_data.h"
 #include "nx_ec/data/api_camera_bookmark_data.h"
 
-#define TRANSACTION_MESSAGE_BUS_DEBUG
 
 namespace ec2
 {
@@ -181,10 +180,9 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const Qn
     if (tran.isLocal)
         return ErrorCode::ok; // local transactions just changes DB without logging
 
-#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-    NX_LOG( lit("add transaction to log %1 command=%2 db seq=%3 timestamp=%4 hash=%5").arg(tran.peerID.toString()).arg(ApiCommand::toString(tran.command)).
+    NX_LOG( QnLog::EC2_TRAN_LOG, lit("add transaction to log %1 command=%2 db seq=%3 timestamp=%4 hash=%5").
+        arg(tran.peerID.toString()).arg(ApiCommand::toString(tran.command)).
         arg(tran.persistentInfo.sequence).arg(tran.persistentInfo.timestamp).arg(hash.toString()), cl_logDEBUG1 );
-#endif
 
     Q_ASSERT_X(!tran.peerID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
     Q_ASSERT_X(!tran.persistentInfo.dbID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
