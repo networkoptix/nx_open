@@ -5,12 +5,15 @@
 namespace {
 
     QString stateToString(QnConnectionState state) {
-
         switch (state) {
         case QnConnectionState::Invalid:                return lit("Invalid");
         case QnConnectionState::Disconnected:           return lit("Disconnected");
+        case QnConnectionState::Connecting:             return lit("Invalid");
         case QnConnectionState::Connected:              return lit("Connected");
+        case QnConnectionState::Reconnecting:           return lit("Invalid");
+        case QnConnectionState::Ready:                  return lit("Connected");
         }
+        qWarning() << "invalid state" << QString::number(static_cast<int>(state));
         return QString();
     }
 
@@ -19,9 +22,21 @@ namespace {
 QnClientConnectionStatus::QnClientConnectionStatus():
     m_state(QnConnectionState::Invalid)
 {
-    m_allowedTransactions.insert(QnConnectionState::Invalid, QnConnectionState::Disconnected);
-    m_allowedTransactions.insert(QnConnectionState::Disconnected, QnConnectionState::Connected);
-    m_allowedTransactions.insert(QnConnectionState::Connected, QnConnectionState::Disconnected);
+    /* Default way. */
+    m_allowedTransactions.insert(QnConnectionState::Invalid,        QnConnectionState::Disconnected);
+    m_allowedTransactions.insert(QnConnectionState::Disconnected,   QnConnectionState::Connecting);
+    m_allowedTransactions.insert(QnConnectionState::Connecting,     QnConnectionState::Connected);
+    m_allowedTransactions.insert(QnConnectionState::Connected,      QnConnectionState::Ready);
+    m_allowedTransactions.insert(QnConnectionState::Ready,          QnConnectionState::Disconnected);
+
+    /* Auto-reconnect. */
+    m_allowedTransactions.insert(QnConnectionState::Ready,          QnConnectionState::Reconnecting);
+    m_allowedTransactions.insert(QnConnectionState::Connected,      QnConnectionState::Reconnecting);
+    m_allowedTransactions.insert(QnConnectionState::Reconnecting,   QnConnectionState::Connected);
+
+    /* Cancelled connect. */
+    m_allowedTransactions.insert(QnConnectionState::Connecting,     QnConnectionState::Disconnected);
+    m_allowedTransactions.insert(QnConnectionState::Connected,      QnConnectionState::Disconnected);
 }
 
 QnConnectionState QnClientConnectionStatus::state() const {
@@ -29,6 +44,10 @@ QnConnectionState QnClientConnectionStatus::state() const {
 }
 
 void QnClientConnectionStatus::setState(QnConnectionState state) {
+#ifdef STRICT_STATE_CONTROL
+    qDebug() << "QnClientConnectionStatus::setState" << stateToString(state);
+#endif
+
     if (m_state == state) {
         warn(lit("Duplicated setState %1").arg(stateToString(state)));
         return;

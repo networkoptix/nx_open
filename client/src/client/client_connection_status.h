@@ -4,7 +4,11 @@
 enum class QnConnectionState {
     Invalid,
     Disconnected,
-    Connected
+    Connecting,
+    Connected,
+    Reconnecting,
+    Ready
+
 };
 
 class QnClientConnectionStatus {

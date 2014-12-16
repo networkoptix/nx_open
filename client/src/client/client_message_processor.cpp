@@ -6,6 +6,9 @@
 #include "core/resource/layout_resource.h"
 #include "core/resource_management/resource_discovery_manager.h"
 #include <core/resource_management/incompatible_server_watcher.h>
+
+#include <nx_ec/ec_api.h>
+
 #include "utils/common/synctime.h"
 #include "common/common_module.h"
 #include "plugins/resource/server_camera/server_camera.h"
@@ -23,12 +26,13 @@ QnClientMessageProcessor::QnClientMessageProcessor():
     m_status.setState(QnConnectionState::Disconnected);
 }
 
-void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connection)
-{
-    QnCommonMessageProcessor::init(connection);
+void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connection) {
+
+    m_status.setState(connection
+        ? QnConnectionState::Connecting
+        : QnConnectionState::Disconnected);
+
     if (connection) {
-       // Q_ASSERT(!m_connected);                   //TODO: #GDM fails in auto-reconnect method
-       // assert(qnCommon->remoteGUID().isNull());  //TODO: #GDM fails in auto-reconnect method
         qnCommon->setRemoteGUID(QnUuid(connection->connectionInfo().ecsGuid));
 
     } else if (m_connected) { // double init by null is allowed
@@ -42,6 +46,8 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     } else if (!qnCommon->remoteGUID().isNull()) { // we are trying to reconnect to server now
         qnCommon->setRemoteGUID(QnUuid());
     }
+
+    QnCommonMessageProcessor::init(connection);
 }
 
 void QnClientMessageProcessor::setHoldConnection(bool holdConnection) {
@@ -112,8 +118,7 @@ void QnClientMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData
     if (data.peer.id != qnCommon->remoteGUID())
         return;
 
-    //Q_ASSERT(!m_connected);
-
+    m_status.setState(QnConnectionState::Connected);
     m_connected = true;
     emit connectionOpened();
 }
@@ -128,7 +133,7 @@ void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData 
     if (data.peer.id != qnCommon->remoteGUID())
         return;
 
-
+    m_status.setState(QnConnectionState::Reconnecting);
     Q_ASSERT_X(m_connected, Q_FUNC_INFO, "m_connected");
 
     /* Mark server as offline, so user will understand why is he reconnecting. */
@@ -156,4 +161,5 @@ void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
     m_incompatibleServerWatcher->stop();
     m_incompatibleServerWatcher->start();
+    m_status.setState(QnConnectionState::Ready);
 }
