@@ -365,7 +365,7 @@ void QnResourceWidget::setEnclosingGeometry(const QRectF &enclosingGeometry, boo
         setGeometry(calculateGeometry(enclosingGeometry));
 }
 
-QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry) const {
+QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry, qreal rotation) const {
     if (!enclosingGeometry.isEmpty()) {
         /* Calculate bounds of the rotated item. */
 
@@ -378,7 +378,7 @@ QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry) cons
         QPointF c = geom.center();
         QTransform transform;
         transform.translate(c.x(), c.y());
-        transform.rotate(rotation());
+        transform.rotate(rotation);
         transform.translate(-c.x(), -c.y());
         QRectF rotated = transform.mapRect(geom);
 
@@ -395,6 +395,10 @@ QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry) cons
     } else {
         return enclosingGeometry;
     }
+}
+
+QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry) const {
+    return calculateGeometry(enclosingGeometry, this->rotation());
 }
 
 QString QnResourceWidget::titleText() const {
