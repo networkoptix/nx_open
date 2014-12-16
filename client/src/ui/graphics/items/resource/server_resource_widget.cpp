@@ -479,6 +479,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     m_pointsLimit = m_manager->pointsLimit();
     m_manager->registerConsumer(m_resource, this, SLOT(at_statistics_received()));
     m_updatePeriod = m_manager->updatePeriod(m_resource);
+    setOption(QnResourceWidget::WindowRotationForbidden);
 
     /* Note that this slot is already connected to nameChanged signal in
      * base class's constructor.*/

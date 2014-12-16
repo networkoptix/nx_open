@@ -1,10 +1,14 @@
 #include "client_message_processor.h"
+
 #include "core/resource_management/resource_pool.h"
 #include "api/app_server_connection.h"
 #include "core/resource/media_server_resource.h"
 #include "core/resource/layout_resource.h"
 #include "core/resource_management/resource_discovery_manager.h"
 #include <core/resource_management/incompatible_server_watcher.h>
+
+#include <nx_ec/ec_api.h>
+
 #include "utils/common/synctime.h"
 #include "common/common_module.h"
 #include "plugins/resource/server_camera/server_camera.h"
@@ -19,19 +23,18 @@ QnClientMessageProcessor::QnClientMessageProcessor():
     m_connected(false),
     m_holdConnection(false)
 {
+    m_status.setState(QnConnectionState::Disconnected);
 }
 
-void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connection)
-{
-    QnCommonMessageProcessor::init(connection);
+void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connection) {
+
+    m_status.setState(connection
+        ? QnConnectionState::Connecting
+        : QnConnectionState::Disconnected);
+
     if (connection) {
-       // Q_ASSERT(!m_connected);                   //TODO: #GDM fails in auto-reconnect method
-       // assert(qnCommon->remoteGUID().isNull());  //TODO: #GDM fails in auto-reconnect method
         qnCommon->setRemoteGUID(QnUuid(connection->connectionInfo().ecsGuid));
-        connect( connection, &ec2::AbstractECConnection::remotePeerFound, this, &QnClientMessageProcessor::at_remotePeerFound);
-        connect( connection, &ec2::AbstractECConnection::remotePeerLost, this, &QnClientMessageProcessor::at_remotePeerLost);
-        connect( connection->getMiscManager(), &ec2::AbstractMiscManager::systemNameChangeRequested,
-                 this, &QnClientMessageProcessor::at_systemNameChangeRequested );
+
     } else if (m_connected) { // double init by null is allowed
         Q_ASSERT(!qnCommon->remoteGUID().isNull());
         ec2::ApiPeerAliveData data;
@@ -43,6 +46,8 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     } else if (!qnCommon->remoteGUID().isNull()) { // we are trying to reconnect to server now
         qnCommon->setRemoteGUID(QnUuid());
     }
+
+    QnCommonMessageProcessor::init(connection);
 }
 
 void QnClientMessageProcessor::setHoldConnection(bool holdConnection) {
@@ -55,6 +60,17 @@ void QnClientMessageProcessor::setHoldConnection(bool holdConnection) {
         m_incompatibleServerWatcher->stop();
         emit connectionClosed();
     }
+}
+
+void QnClientMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection) {
+    base_type::connectToConnection(connection);
+    connect( connection->getMiscManager(), &ec2::AbstractMiscManager::systemNameChangeRequested,
+        this, &QnClientMessageProcessor::at_systemNameChangeRequested );
+}
+
+void QnClientMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) {
+    base_type::disconnectFromConnection(connection);
+    connection->getMiscManager()->disconnect(this);
 }
 
 void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) {
@@ -92,8 +108,8 @@ void QnClientMessageProcessor::resetResources(const QnResourceList& resources) {
     QnCommonMessageProcessor::resetResources(resources);
 }
 
-void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data)
-{
+void QnClientMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData &data) {
+    base_type::handleRemotePeerFound(data);
     if (qnCommon->remoteGUID().isNull()) {
         qWarning() << "at_remotePeerFound received while disconnected";
         return;
@@ -102,14 +118,13 @@ void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data)
     if (data.peer.id != qnCommon->remoteGUID())
         return;
 
-    //Q_ASSERT(!m_connected);
-    
+    m_status.setState(QnConnectionState::Connected);
     m_connected = true;
     emit connectionOpened();
 }
 
-void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data)
-{
+void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData &data) {
+    base_type::handleRemotePeerLost(data);
     if (qnCommon->remoteGUID().isNull()) {
         qWarning() << "at_remotePeerLost received while disconnected";
         return;
@@ -118,7 +133,7 @@ void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data)
     if (data.peer.id != qnCommon->remoteGUID())
         return;
 
-
+    m_status.setState(QnConnectionState::Reconnecting);
     Q_ASSERT_X(m_connected, Q_FUNC_INFO, "m_connected");
 
     /* Mark server as offline, so user will understand why is he reconnecting. */
@@ -146,4 +161,5 @@ void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
     m_incompatibleServerWatcher->stop();
     m_incompatibleServerWatcher->start();
+    m_status.setState(QnConnectionState::Ready);
 }

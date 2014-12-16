@@ -1383,7 +1383,7 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     WidgetAnimator *animator = this->animator(widget);
     if(animate) {
         widget->setEnclosingGeometry(enclosingGeometry, false);
-        animator->moveTo(widget->calculateGeometry(enclosingGeometry), rotation);
+        animator->moveTo(widget->calculateGeometry(enclosingGeometry, rotation), rotation);
     } else {
         animator->stop();
         widget->setRotation(rotation);

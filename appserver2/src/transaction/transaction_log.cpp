@@ -13,6 +13,7 @@
 #include "nx_ec/data/api_discovery_data.h"
 #include "nx_ec/data/api_camera_bookmark_data.h"
 
+
 namespace ec2
 {
 
@@ -97,7 +98,7 @@ qint64 QnTransactionLog::getTimeStamp()
 int QnTransactionLog::currentSequenceNoLock() const
 {
     QnTranStateKey key (qnCommon->moduleGUID(), m_dbManager->getID());
-    return m_state.values.value(key);
+    return qMax(m_state.values.value(key), m_commitData.state.values.value(key));
 }
 
 QnTransactionLog* QnTransactionLog::instance()
@@ -141,21 +142,23 @@ QnUuid QnTransactionLog::makeHash(const QString &extraData, const ApiDiscoveryDa
 
 ErrorCode QnTransactionLog::updateSequence(const ApiUpdateSequenceData& data)
 {
-    QnDbManager::Locker locker(dbManager);
+    QnDbManager::QnDbTransactionLocker locker(dbManager->getTransaction());
     for(const ApiSyncMarkerRecord& record: data.markers) 
     {
         ErrorCode result = updateSequenceNoLock(record.peerID, record.dbID, record.sequence);
         if (result != ErrorCode::ok)
             return result;
     }
-    locker.commit();
-    return ErrorCode::ok;
+    if (locker.commit())
+        return ErrorCode::ok;
+    else
+        return ErrorCode::dbError;
 }
 
 ErrorCode QnTransactionLog::updateSequenceNoLock(const QnUuid& peerID, const QnUuid& dbID, int sequence)
 {
     QnTranStateKey key(peerID, dbID);
-    if (m_state.values[key] >= sequence)
+    if (m_state.values.value(key) >= sequence)
         return ErrorCode::ok;
 
     QSqlQuery query(m_dbManager->getDB());
@@ -168,8 +171,7 @@ ErrorCode QnTransactionLog::updateSequenceNoLock(const QnUuid& peerID, const QnU
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::failure;
     }
-    m_state.values[key] = sequence;
-
+    m_commitData.state.values[key] = sequence;
     return ErrorCode::ok;
 }
 
@@ -178,10 +180,9 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const Qn
     if (tran.isLocal)
         return ErrorCode::ok; // local transactions just changes DB without logging
 
-#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-    NX_LOG( lit("add transaction to log %1 command=%2 db seq=%3 timestamp=%4").arg(tran.peerID.toString()).arg(ApiCommand::toString(tran.command)).
-        arg(tran.persistentInfo.sequence).arg(tran.persistentInfo.timestamp), cl_logDEBUG1 );
-#endif
+    NX_LOG( QnLog::EC2_TRAN_LOG, lit("add transaction to log %1 command=%2 db seq=%3 timestamp=%4 hash=%5").
+        arg(tran.peerID.toString()).arg(ApiCommand::toString(tran.command)).
+        arg(tran.persistentInfo.sequence).arg(tran.persistentInfo.timestamp).arg(hash.toString()), cl_logDEBUG1 );
 
     Q_ASSERT_X(!tran.peerID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
     Q_ASSERT_X(!tran.persistentInfo.dbID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
@@ -211,6 +212,7 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const Qn
     if (code != ErrorCode::ok)
         return code;
 
+    /*
     auto updateHistoryItr = m_updateHistory.find(hash);
     if (updateHistoryItr == m_updateHistory.end())
         updateHistoryItr = m_updateHistory.insert(hash, UpdateHistoryData());
@@ -220,6 +222,8 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const Qn
 
     updateHistoryItr.value().timestamp = tran.persistentInfo.timestamp;
     updateHistoryItr.value().updatedBy = key;
+    */
+    m_commitData.updateHistory[hash] = UpdateHistoryData(key, tran.persistentInfo.timestamp);
 
     QMutexLocker lock(&m_timeMutex);
     if (tran.persistentInfo.timestamp > m_currentTime + m_relativeTimer.elapsed()) {
@@ -228,6 +232,27 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const Qn
     }
 
     return ErrorCode::ok;
+}
+
+void QnTransactionLog::beginTran()
+{
+    m_commitData.clear();
+}
+
+void QnTransactionLog::commit()
+{
+    for (auto itr = m_commitData.state.values.constBegin(); itr != m_commitData.state.values.constEnd(); ++itr)
+        m_state.values[itr.key()] = itr.value();
+
+    for (auto itr = m_commitData.updateHistory.constBegin(); itr != m_commitData.updateHistory.constEnd(); ++itr)
+        m_updateHistory[itr.key()] = itr.value();
+    
+    m_commitData.clear();
+}
+
+void QnTransactionLog::rollback()
+{
+    m_commitData.clear();
 }
 
 QnTranState QnTransactionLog::getTransactionsState()
@@ -256,8 +281,8 @@ QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTran
             arg(ApiCommand::toString(tran.command)).arg(m_state.values.value(key)).arg(tran.persistentInfo.sequence), cl_logDEBUG1 );
         return Reason_Sequence;
     }
-    auto itr = m_updateHistory.find(hash);
-    if (itr == m_updateHistory.end())
+    const auto itr = m_updateHistory.find(hash);
+    if (itr == m_updateHistory.constEnd())
         return Reason_None;
 
     const qint64 lastTime = itr.value().timestamp;

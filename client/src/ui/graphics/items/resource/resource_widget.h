@@ -186,6 +186,7 @@ public:
      * Calculate real item geometry according to the specified enclosing geometry.
      * \see setEnclosingGeometry
      */
+    QRectF calculateGeometry(const QRectF &enclosingGeometry, qreal rotation) const;
     QRectF calculateGeometry(const QRectF &enclosingGeometry) const;
 
     /**

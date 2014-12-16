@@ -217,22 +217,34 @@ void mergeObjectListData(
         [subDataListField]( MainData& mergeTo, SubData& mergeWhat ){ (mergeTo.*subDataListField).push_back(mergeWhat); } );
 }
 
-QnDbManager::Locker::Locker(QnDbManager* db)
-: 
-    m_db(db),
-    m_scopedTran( db->getTransaction() )
+// --------------------------------------- QnDbTransactionExt -----------------------------------------
+
+bool QnDbManager::QnDbTransactionExt::beginTran()
 {
+    if( !QnDbTransaction::beginTran() )
+        return false;
+    transactionLog->beginTran();
+    return true;
 }
 
-QnDbManager::Locker::~Locker()
+void QnDbManager::QnDbTransactionExt::rollback()
 {
+    transactionLog->rollback();
+    QnDbTransaction::rollback();
 }
 
-bool QnDbManager::Locker::commit()
+bool QnDbManager::QnDbTransactionExt::commit()
 {
-    return m_scopedTran.commit();
+    const bool rez = m_database.commit();
+    if (rez) {
+        transactionLog->commit();
+        m_mutex.unlock();
+    }
+    else {
+        qWarning() << "Commit failed:" << m_database.lastError(); // do not unlock mutex. Rollback is expected
+    }
+    return rez;
 }
-
 
 // --------------------------------------- QnDbManager -----------------------------------------
 
@@ -255,6 +267,7 @@ QnDbManager::QnDbManager()
 :
     m_licenseOverflowMarked(false),
     m_initialized(false),
+    m_tran(m_sdb, m_mutex),
     m_tranStatic(m_sdbStatic, m_mutexStatic),
     m_needResyncLog(false),
     m_needResyncLicenses(false),
@@ -300,14 +313,7 @@ bool QnDbManager::init(
     }
 
     //tuning DB
-    {
-        QSqlQuery enableWalQuery(m_sdb);
-        enableWalQuery.prepare("PRAGMA journal_mode = WAL");
-        if( !enableWalQuery.exec() )
-        {
-            qWarning() << "Failed to enable WAL mode on sqlLite database!" << enableWalQuery.lastError().text();
-        }
-    }
+    tuneDBAfterOpen();
 
     if( !createDatabase() )
     {
@@ -315,6 +321,8 @@ bool QnDbManager::init(
         qWarning() << "can't create tables for sqlLite database!";
         return false;
     }
+
+    QnDbManager::QnDbTransactionLocker locker( getTransaction() );
 
     if( !qnCommon->obsoleteServerGuid().isNull() )
     {
@@ -501,6 +509,7 @@ bool QnDbManager::init(
     if (!queryCameras.exec()) {
         qWarning() << Q_FUNC_INFO << __LINE__ << queryCameras.lastError();
         Q_ASSERT( 0 );
+        return false;
     }
     while( queryCameras.next() )
     {
@@ -508,8 +517,12 @@ bool QnDbManager::init(
         transactionLog->fillPersistentInfo(tran);
         tran.params.id = QnUuid::fromRfc4122(queryCameras.value(0).toByteArray());
         tran.params.status = Qn::Offline;
-        executeTransactionNoLock( tran, QnUbjson::serialized( tran ) );
+        if (executeTransactionNoLock( tran, QnUbjson::serialized( tran ) ) != ErrorCode::ok)
+            return false;
     }
+
+    if (!locker.commit())
+        return false;
 
     emit initialized();
     m_initialized = true;
@@ -945,6 +958,18 @@ bool QnDbManager::removeServerStatusFromTransactionLog()
         }
     }
 
+    return true;
+}
+
+bool QnDbManager::tuneDBAfterOpen()
+{
+    QSqlQuery enableWalQuery(m_sdb);
+    enableWalQuery.prepare("PRAGMA journal_mode = WAL");
+    if( !enableWalQuery.exec() )
+    {
+        qWarning() << "Failed to enable WAL mode on sqlLite database!" << enableWalQuery.lastError().text();
+        return false;
+    }
     return true;
 }
 
@@ -2205,7 +2230,7 @@ ApiObjectInfoList QnDbManager::getNestedObjects(const ApiObjectInfo& parentObjec
 
 bool QnDbManager::saveMiscParam( const QByteArray& name, const QByteArray& value )
 {
-    QnDbManager::Locker locker( this );
+    QnDbManager::QnDbTransactionLocker locker( getTransaction() );
 
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT OR REPLACE INTO misc_data (key, data) values (?,?)");
@@ -3054,10 +3079,34 @@ ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiTimeData& currentT
 ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiDatabaseDumpData& data)
 {
     QWriteLocker lock(&m_mutex);
+
+    //have to close/open DB to dump journals to .db file
+    m_sdb.close();
+    m_sdbStatic.close();
+
+    //creating dump
     QFile f(m_sdb.databaseName());
     if (!f.open(QFile::ReadOnly))
-        return ErrorCode::failure;
+        return ErrorCode::ioError;
     data.data = f.readAll();
+
+    //TODO #ak add license db to backup
+
+    if( !m_sdb.open() )
+    {
+        NX_LOG( lit("Can't reopen ec2 DB (%1). Error %2").arg(m_sdb.databaseName()).arg(m_sdb.lastError().text()), cl_logWARNING );
+        return ErrorCode::dbError;
+    }
+
+    if( !m_sdbStatic.open() )
+    {
+        NX_LOG( lit("Can't reopen ec2 license DB (%1). Error %2").arg(m_sdbStatic.databaseName()).arg(m_sdbStatic.lastError().text()), cl_logWARNING );
+        return ErrorCode::dbError;
+    }
+
+    //tuning DB
+    tuneDBAfterOpen();
+
     return ErrorCode::ok;
 }
 
@@ -3065,11 +3114,32 @@ ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& dumpFilePath, qint64& du
 {
     QWriteLocker lock(&m_mutex);
 
+    //have to close/open DB to dump journals to .db file
+    m_sdb.close();
+    m_sdbStatic.close();
+
     if( !QFile::copy( m_sdb.databaseName(), dumpFilePath.path ) )
         return ErrorCode::ioError;
 
+    //TODO #ak add license db to backup
+
     QFileInfo dumpFileInfo( dumpFilePath.path );
     dumpFileSize = dumpFileInfo.size();
+
+    if( !m_sdb.open() )
+    {
+        NX_LOG( lit("Can't reopen ec2 DB (%1). Error %2").arg(m_sdb.databaseName()).arg(m_sdb.lastError().text()), cl_logWARNING );
+        return ErrorCode::dbError;
+    }
+
+    if( !m_sdbStatic.open() )
+    {
+        NX_LOG( lit("Can't reopen ec2 license DB (%1). Error %2").arg(m_sdbStatic.databaseName()).arg(m_sdbStatic.lastError().text()), cl_logWARNING );
+        return ErrorCode::dbError;
+    }
+
+    //tuning DB
+    tuneDBAfterOpen();
 
     return ErrorCode::ok;
 }
@@ -3619,6 +3689,11 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicense
 QnUuid QnDbManager::getID() const
 {
     return m_dbInstanceId;
+}
+
+QnDbManager::QnDbTransaction* QnDbManager::getTransaction()
+{
+    return &m_tran;
 }
 
 }

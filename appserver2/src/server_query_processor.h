@@ -78,12 +78,12 @@ namespace ec2
             QMutexLocker lock(&m_updateDataMutex);
 
             //starting transaction
-            std::unique_ptr<QnDbManager::Locker> dbTran;
+            std::unique_ptr<QnDbManager::QnDbTransactionLocker> dbTran;
             std::list<std::function<void()>> transactionsToSend;
 
             if( ApiCommand::isPersistent(tran.command) )
             {
-                dbTran.reset(new QnDbManager::Locker(dbManager));
+                dbTran.reset(new QnDbManager::QnDbTransactionLocker(dbManager->getTransaction()));
                 errorCode = syncFunction( tran, &transactionsToSend );
                 if( errorCode != ErrorCode::ok )
                     return;

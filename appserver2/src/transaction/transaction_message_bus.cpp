@@ -29,7 +29,6 @@
 #include <utils/common/checked_cast.h>
 #include "utils/common/warnings.h"
 
-#define TRANSACTION_MESSAGE_BUS_DEBUG
 
 namespace ec2
 {
@@ -186,9 +185,9 @@ QnTransactionMessageBus* QnTransactionMessageBus::instance()
     return m_globalInstance;
 }
 
-QnTransactionMessageBus::QnTransactionMessageBus()
+QnTransactionMessageBus::QnTransactionMessageBus(Qn::PeerType peerType)
 : 
-    m_localPeer(qnCommon->moduleGUID(), qnCommon->runningInstanceGUID(), Qn::PT_Server),
+    m_localPeer(qnCommon->moduleGUID(), qnCommon->runningInstanceGUID(), peerType),
     //m_binaryTranSerializer(new QnBinaryTransactionSerializer()),
     m_jsonTranSerializer(new QnJsonTransactionSerializer()),
     m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
@@ -245,11 +244,19 @@ void QnTransactionMessageBus::addAlivePeerInfo(ApiPeerData peerData, const QnUui
         currentValue.proxyVia << gotFromPeer;
 }
 
+void QnTransactionMessageBus::removeTTSequenceForPeer(const QnUuid& id)
+{
+    QnTranStateKey key(id, QnUuid());
+    auto itr = m_lastTransportSeq.lowerBound(key);
+    while (itr != m_lastTransportSeq.end() && itr.key().peerID == id)
+        itr = m_lastTransportSeq.erase(itr);
+}
+
+
 void QnTransactionMessageBus::removeAlivePeer(const QnUuid& id, bool sendTran, bool isRecursive)
 {
     // 1. remove peer from alivePeers map
-
-    m_lastTransportSeq.remove(id);
+    removeTTSequenceForPeer(id);
 
     runtimeTransactionLog->clearRuntimeData(id);
 
@@ -284,9 +291,8 @@ bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
     if (transport)
         gotFromPeer = transport->remotePeer().id;
 
-#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-    NX_LOG( lit("received peerAlive transaction %1 %2").arg(aliveData.peer.id.toString()).arg(aliveData.peer.peerType), cl_logDEBUG1);
-#endif
+    NX_LOG( QnLog::EC2_TRAN_LOG, lit("received peerAlive transaction %1 %2").
+        arg(aliveData.peer.id.toString()).arg(aliveData.peer.peerType), cl_logDEBUG1);
     if (aliveData.peer.id == m_localPeer.id)
         return false; // ignore himself
 
@@ -319,7 +325,10 @@ bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
     {
         addAlivePeerInfo(ApiPeerData(aliveData.peer.id, aliveData.peer.instanceId, aliveData.peer.peerType), gotFromPeer);
         if (!isPeerExist) 
+        {
+            QMutexLocker lk( &m_signalEmitMutex );
             emit peerFound(aliveData);
+        }
     }
     else 
     {
@@ -341,11 +350,10 @@ bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
             // check current persistent state
             if (!transactionLog->contains(aliveData.persistentState)) 
             {
-#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-                qDebug() << "DETECT transaction GAP via update message. Resync with peer" << transport->remotePeer().id;
-                qDebug() << "peer state:";
-                printTranState(aliveData.persistentState, true);
-#endif
+                NX_LOG( QnLog::EC2_TRAN_LOG, lit("DETECT transaction GAP via update message. Resync with peer %1").
+                    arg(transport->remotePeer().id.toString()), cl_logDEBUG1 );
+                NX_LOG( QnLog::EC2_TRAN_LOG, lit("peer state:"), cl_logDEBUG1 );
+                printTranState(aliveData.persistentState);
                 if (!transport->remotePeer().isClient() && !m_localPeer.isClient())
                     queueSyncRequest(transport);
                 else
@@ -458,15 +466,14 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
         return true; // old version, nothing to check
 
     // 1. check transport sequence
-    int transportSeq = m_lastTransportSeq[transportHeader.sender];
+    QnTranStateKey ttSenderKey(transportHeader.sender, transportHeader.senderRuntimeID);
+    int transportSeq = m_lastTransportSeq[ttSenderKey];
     if (transportSeq >= transportHeader.sequence) {
-#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        NX_LOG( lit("Ignore transaction %1 from peer %2 received via %3 because of transport sequence: %4 <= %5").
+        NX_LOG( QnLog::EC2_TRAN_LOG, lit("Ignore transaction %1 from peer %2 received via %3 because of transport sequence: %4 <= %5").
             arg(toString(tran.command)).arg(tran.peerID.toString()).arg(transportHeader.sender.toString()).arg(transportHeader.sequence).arg(transportSeq), cl_logDEBUG1 );
-#endif
         return false; // already processed
     }
-    m_lastTransportSeq[transportHeader.sender] = transportHeader.sequence;
+    m_lastTransportSeq[ttSenderKey] = transportHeader.sequence;
 
     // 2. check persistent sequence
     if (tran.persistentInfo.isNull() || !transactionLog)
@@ -475,22 +482,20 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
     QnTranStateKey persistentKey(tran.peerID, tran.persistentInfo.dbID);
     int persistentSeq = transactionLog->getLatestSequence(persistentKey);
 
-#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-    if (!transport->isSyncDone() && transport->isReadSync(ApiCommand::NotDefined) && transportHeader.sender != transport->remotePeer().id) 
-    {
-        NX_LOG( lit("Got transcaction from peer %1 while sync with peer %2 in progress").arg(transportHeader.sender.toString()).arg(transport->remotePeer().id.toString()), cl_logWARNING );
-    }
-#endif
+    if( QnLog::instance(QnLog::EC2_TRAN_LOG)->logLevel() >= cl_logWARNING )
+        if (!transport->isSyncDone() && transport->isReadSync(ApiCommand::NotDefined) && transportHeader.sender != transport->remotePeer().id) 
+        {
+            NX_LOG( QnLog::EC2_TRAN_LOG, lit("Got transcaction from peer %1 while sync with peer %2 in progress").
+                arg(transportHeader.sender.toString()).arg(transport->remotePeer().id.toString()), cl_logWARNING );
+        }
 
-    if (persistentSeq && tran.persistentInfo.sequence > persistentSeq + 1) 
+    if (tran.persistentInfo.sequence > persistentSeq + 1) 
     {
         if (transport->isSyncDone()) 
         {
         // gap in persistent data detect, do resync
-#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-            NX_LOG( lit("GAP in persistent data detected! for peer %1 Expected seq=%2, but got seq=%3").
+            NX_LOG( QnLog::EC2_TRAN_LOG, lit("GAP in persistent data detected! for peer %1 Expected seq=%2, but got seq=%3").
                 arg(tran.peerID.toString()).arg(persistentSeq + 1).arg(tran.persistentInfo.sequence), cl_logDEBUG1 );
-#endif
 
             if (!transport->remotePeer().isClient() && !m_localPeer.isClient())
                 queueSyncRequest(transport);
@@ -499,10 +504,8 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
             return false;
         }
         else {
-#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-            NX_LOG( lit("GAP in persistent data, but sync in progress %1. Expected seq=%2, but got seq=%3").
+            NX_LOG( QnLog::EC2_TRAN_LOG, lit("GAP in persistent data, but sync in progress %1. Expected seq=%2, but got seq=%3").
                 arg(tran.peerID.toString()).arg(persistentSeq + 1).arg(tran.persistentInfo.sequence), cl_logDEBUG1 );
-#endif
         }
     }
     return true;
@@ -540,20 +543,17 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         return;
 
     if (!sender->isReadSync(tran.command)) {
-#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        NX_LOG( lit("reject transaction %1 from %2 tt seq=%3 time=%4 db seq=%5 via %6").
+        NX_LOG( QnLog::EC2_TRAN_LOG, lit("reject transaction %1 from %2 tt seq=%3 time=%4 db seq=%5 via %6").
             arg(ApiCommand::toString(tran.command)).arg(tran.peerID.toString()).arg(transportHeader.sequence).
             arg(tran.persistentInfo.timestamp).arg(tran.persistentInfo.sequence).arg(sender->remotePeer().id.toString()), cl_logDEBUG1);
-#endif
         return;
     }
 
 
     if (transportHeader.dstPeers.isEmpty() || transportHeader.dstPeers.contains(m_localPeer.id)) {
-#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        NX_LOG( lit("got transaction %1 from %2 tt seq=%3 time=%4 db seq=%5 via %6").arg(ApiCommand::toString(tran.command)).arg(tran.peerID.toString()).
-            arg(transportHeader.sequence).arg(tran.persistentInfo.timestamp).arg(tran.persistentInfo.sequence).arg(sender->remotePeer().id.toString()), cl_logDEBUG1);
-#endif
+        NX_LOG( QnLog::EC2_TRAN_LOG, lit("got transaction %1 from %2 tt seq=%3 time=%4 db seq=%5 via %6").
+            arg(ApiCommand::toString(tran.command)).arg(tran.peerID.toString()).arg(transportHeader.sequence).
+            arg(tran.persistentInfo.timestamp).arg(tran.persistentInfo.sequence).arg(sender->remotePeer().id.toString()), cl_logDEBUG1);
         // process system transactions
         switch(tran.command) {
         case ApiCommand::lockRequest:
@@ -621,15 +621,13 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         }
     }
     else {
-#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        if( cl_log.logLevel() >= cl_logDEBUG1 )
+        if( QnLog::instance(QnLog::EC2_TRAN_LOG)->logLevel() >= cl_logDEBUG1 )
         {
             QString dstPeersStr;
             for( const QnUuid& peer: transportHeader.dstPeers )
                 dstPeersStr += peer.toString();
-            NX_LOG( lit("skip transaction %1 for peers %2").arg(ApiCommand::toString(tran.command)).arg(dstPeersStr), cl_logDEBUG1);
+            NX_LOG( QnLog::EC2_TRAN_LOG, lit("skip transaction %1 for peers %2").arg(ApiCommand::toString(tran.command)).arg(dstPeersStr), cl_logDEBUG1);
         }
-#endif
     }
 
     proxyTransaction(tran, transportHeader);
@@ -650,9 +648,7 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
     newHeader.sequence = transportHeader.sequence;
     newHeader.sender = transportHeader.sender;
 
-#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
     QSet<QnUuid> proxyList;
-#endif
     for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr) 
     {
         QnTransactionTransportPtr transport = *itr;
@@ -661,33 +657,28 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
 
         //Q_ASSERT(transport->remotePeer().id != tran.peerID);
         transport->sendTransaction(tran, newHeader);
-#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
         proxyList << transport->remotePeer().id;
-#endif
     }
 
-#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-    if (!proxyList.isEmpty())
-    {
-        if( cl_log.logLevel() >= cl_logDEBUG1 )
+    if( QnLog::instance(QnLog::EC2_TRAN_LOG)->logLevel() >= cl_logDEBUG1 )
+        if (!proxyList.isEmpty())
         {
             QString proxyListStr;
             for( const QnUuid& peer: proxyList )
                 proxyListStr += " " + peer.toString();
-            NX_LOG( lit("proxy transaction %1 to (%2)").arg(ApiCommand::toString(tran.command)).arg(proxyListStr), cl_logDEBUG1);
+            NX_LOG( QnLog::EC2_TRAN_LOG, lit("proxy transaction %1 to (%2)").arg(ApiCommand::toString(tran.command)).arg(proxyListStr), cl_logDEBUG1);
         }
-    }
-#endif
 
     emit transactionProcessed(tran);
 };
 
-void QnTransactionMessageBus::printTranState(const QnTranState& tranState, bool printToStdOut)
+void QnTransactionMessageBus::printTranState(const QnTranState& tranState)
 {
+    if( QnLog::instance(QnLog::EC2_TRAN_LOG)->logLevel() < cl_logDEBUG1 )
+        return;
+
     for(auto itr = tranState.values.constBegin(); itr != tranState.values.constEnd(); ++itr)
     {
-        if( printToStdOut )
-            qDebug() << "key=" << itr.key().peerID << "(dbID=" << itr.key().dbID << ") need after=" << itr.value();
         NX_LOG( lit("key=%1 (dbID=%2) need after=%3").arg(itr.key().peerID.toString()).arg(itr.key().dbID.toString()).arg(itr.value()), cl_logDEBUG1 );
     }
 }
@@ -710,11 +701,10 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
     const ErrorCode errorCode = transactionLog->getTransactionsAfter(tran.params.persistentState, serializedTransactions);
     if (errorCode == ErrorCode::ok) 
     {
-#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        NX_LOG( lit("got sync request from peer %1. Need transactions after:").arg(sender->remotePeer().id.toString()), cl_logDEBUG1);
-        printTranState(tran.params.persistentState, false);
-        NX_LOG( lit("exist %1 new transactions").arg(serializedTransactions.size()), cl_logDEBUG1);
-#endif
+        NX_LOG( QnLog::EC2_TRAN_LOG, lit("got sync request from peer %1. Need transactions after:").arg(sender->remotePeer().id.toString()), cl_logDEBUG1);
+        printTranState(tran.params.persistentState);
+        NX_LOG( QnLog::EC2_TRAN_LOG, lit("exist %1 new transactions").arg(serializedTransactions.size()), cl_logDEBUG1);
+
         QnTransaction<QnTranStateResponse> tranSyncResponse(ApiCommand::tranSyncResponse);
         tranSyncResponse.params.result = 0;
         sender->sendTransaction(tranSyncResponse, ttUnicast);
@@ -887,14 +877,13 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
             tran.params.runtimeState = runtimeTransactionLog->getTransactionsState();
         }
         sendTransaction(tran);
-#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        NX_LOG( lit("sending peerAlive info %1 %2").arg(peer.id.toString()).arg(peer.peerType), cl_logDEBUG1);
-#endif
+        NX_LOG( QnLog::EC2_TRAN_LOG, lit("sending peerAlive info %1 %2").arg(peer.id.toString()).arg(peer.peerType), cl_logDEBUG1);
     }
 
     if( peer.id == qnCommon->moduleGUID() )
         return; //sending keep-alive
 
+    QMutexLocker lk( &m_signalEmitMutex );
     if (isAlive)
         emit peerFound(aliveData);
     else
@@ -962,7 +951,7 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
             }
         }
         Q_ASSERT(found);
-        m_lastTransportSeq.remove(transport->remotePeer().id);
+        removeTTSequenceForPeer(transport->remotePeer().id);
         transport->setState(QnTransactionTransport::ReadyForStreaming);
 
         transport->processExtraData();
@@ -1060,7 +1049,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
             QnTransactionTransportPtr transport(new QnTransactionTransport(m_localPeer));
             connect(transport.data(), &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
             connect(transport.data(), &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);
-            connect(transport.data(), &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::remotePeerUnauthorized,  Qt::DirectConnection);
+            connect(transport.data(), &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::emitRemotePeerUnauthorized,  Qt::DirectConnection);
             connect(transport.data(), &QnTransactionTransport::peerIdDiscovered, this, &QnTransactionMessageBus::at_peerIdDiscovered,  Qt::QueuedConnection);
             transport->doOutgoingConnect(url);
             m_connectingConnections << transport;
@@ -1073,11 +1062,9 @@ void QnTransactionMessageBus::doPeriodicTasks()
     if (m_aliveSendTimer.elapsed() > ALIVE_UPDATE_INTERVAL) {
         m_aliveSendTimer.restart();
         handlePeerAliveChanged(m_localPeer, true, true);
-#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-    NX_LOG( "Current transaction state:", cl_logDEBUG1 );
+    NX_LOG( QnLog::EC2_TRAN_LOG, "Current transaction state:", cl_logDEBUG1 );
     if (transactionLog)
-        printTranState(transactionLog->getTransactionsState(), false);
-#endif
+        printTranState(transactionLog->getTransactionsState());
     }
 
     // check if some server not accessible any more
@@ -1132,7 +1119,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(const QSharedPointer<A
     transport->setRemotePeer(remotePeer);
     connect(transport.data(), &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
     connect(transport.data(), &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);
-    connect(transport.data(), &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::remotePeerUnauthorized,  Qt::DirectConnection);
+    connect(transport.data(), &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::emitRemotePeerUnauthorized, Qt::DirectConnection );
 
     QMutexLocker lock(&m_mutex);
     m_connectingConnections << transport;
@@ -1220,10 +1207,6 @@ QnTransactionMessageBus::AlivePeersMap QnTransactionMessageBus::aliveClientPeers
     return result;
 }
 
-void QnTransactionMessageBus::setLocalPeer(const ApiPeerData localPeer) {
-    m_localPeer = localPeer;
-}
-
 ec2::ApiPeerData QnTransactionMessageBus::localPeer() const {
     return m_localPeer;
 }
@@ -1235,5 +1218,10 @@ void QnTransactionMessageBus::at_runtimeDataUpdated(const QnTransaction<ApiRunti
         m_handler->triggerNotification(tran);
 }
 
+void QnTransactionMessageBus::emitRemotePeerUnauthorized(const QnUuid& id)
+{
+    QMutexLocker lk( &m_signalEmitMutex );
+    emit remotePeerUnauthorized( id );
 }
 
+}

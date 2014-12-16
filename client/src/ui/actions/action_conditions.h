@@ -103,7 +103,7 @@ public:
         m_hide(hide)
     {}
 protected:
-    bool isPreviewSearchMode() const;
+    bool isPreviewSearchMode(const QnActionParameters &parameters) const;
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 private:
     /** Flag that describes if action should be visible or hidden in videowall review mode. */

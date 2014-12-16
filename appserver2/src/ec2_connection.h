@@ -32,8 +32,6 @@ namespace ec2
         virtual QnConnectionInfo connectionInfo() const override;
         //!Implementation of ec2::AbstractECConnection::authInfo
         virtual QString authInfo() const override;
-        //!Implementation of ec2::AbstractECConnection::startReceivingNotifications
-        virtual void startReceivingNotifications() override;
 
     private:
         std::unique_ptr<QnTransactionLog> m_transactionLog;

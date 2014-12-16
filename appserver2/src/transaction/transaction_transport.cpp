@@ -20,8 +20,6 @@
 #include "api/global_settings.h"
 #include "database/db_manager.h"
 
-#define TRANSACTION_MESSAGE_BUS_DEBUG
-
 
 /*!
     Real transaction posted to the QnTransactionMessageBus can be greater 
@@ -67,7 +65,13 @@ QnTransactionTransport::~QnTransactionTransport()
     if( m_httpClient )
         m_httpClient->terminate();
 
-    close();
+    {
+        QMutexLocker lk( &m_mutex );
+        m_state = Closed;
+    }
+    closeSocket();
+    //not calling QnTransactionTransport::close since it will emit stateChanged, 
+        //which can potentially lead to some trouble
 
     if (m_connected)
         connectDone(m_remotePeer.id);
@@ -767,13 +771,14 @@ bool QnTransactionTransport::sendSerializedTransaction(Qn::SerializationFormat s
         break;
     case Qn::UbjsonFormat: {
 
-#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        QnAbstractTransaction abtractTran;
-        QnUbjsonReader<QByteArray> stream(&serializedTran);
-        QnUbjson::deserialize(&stream, &abtractTran);
-        NX_LOG( lit("send direct transaction to peer %1 command=%2 tt seq=%3 db seq=%4 timestamp=%5").arg(remotePeer().id.toString()).
-            arg(ApiCommand::toString(abtractTran.command)).arg(header.sequence).arg(abtractTran.persistentInfo.sequence).arg(abtractTran.persistentInfo.timestamp), cl_logDEBUG1 );
-#endif
+        if( QnLog::instance(QnLog::EC2_TRAN_LOG)->logLevel() >= cl_logDEBUG1 )
+        {
+            QnAbstractTransaction abtractTran;
+            QnUbjsonReader<QByteArray> stream(&serializedTran);
+            QnUbjson::deserialize(&stream, &abtractTran);
+            NX_LOG( QnLog::EC2_TRAN_LOG, lit("send direct transaction to peer %1 command=%2 tt seq=%3 db seq=%4 timestamp=%5").arg(remotePeer().id.toString()).
+                arg(ApiCommand::toString(abtractTran.command)).arg(header.sequence).arg(abtractTran.persistentInfo.sequence).arg(abtractTran.persistentInfo.timestamp), cl_logDEBUG1 );
+        }
 
         addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));
         break;

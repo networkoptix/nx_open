@@ -41,6 +41,7 @@ namespace ec2
         virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) override;
 
         virtual void startReceivingNotifications() override;
+        virtual void stopReceivingNotifications() override;
 
     protected:
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) override;

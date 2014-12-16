@@ -189,8 +189,14 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
         }
     }
 
-    if(m_condition)
-        return m_condition.data()->check(parameters);
+    if(m_condition) {
+        if (parameters.scope() == Qn::InvalidScope) {
+            QnActionParameters scopedParameters(parameters);
+            scopedParameters.setScope(scope);
+            return m_condition->check(scopedParameters);
+        }
+        return m_condition->check(parameters);
+    }
 
     return Qn::EnabledAction;
 }

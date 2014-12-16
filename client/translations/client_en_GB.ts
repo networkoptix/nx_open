@@ -9027,7 +9027,7 @@ Another user is already controlling this screen.</translation>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="516"/>
         <source>Video Wall will be started now. Do you want to close this %1 Client instance?</source>
-        <translation>Video wall is about to start. Would you like to close this client instance?</translation>
+        <translation>Video wall is about to start. Would you like to close this %1 Client instance?</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="901"/>
@@ -9373,7 +9373,7 @@ You&apos;ll have to start it again manually.</translation>
     <message>
         <location filename="../src/ui/dialogs/resource_list_dialog.ui" line="59"/>
         <source>Never suggest saving layouts</source>
-        <translation>never suggest saving layouts</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
