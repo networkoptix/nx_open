@@ -180,8 +180,8 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const Qn
         return ErrorCode::ok; // local transactions just changes DB without logging
 
 #ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-    NX_LOG( lit("add transaction to log %1 command=%2 db seq=%3 timestamp=%4").arg(tran.peerID.toString()).arg(ApiCommand::toString(tran.command)).
-        arg(tran.persistentInfo.sequence).arg(tran.persistentInfo.timestamp), cl_logDEBUG1 );
+    NX_LOG( lit("add transaction to log %1 command=%2 db seq=%3 timestamp=%4 hash=%5").arg(tran.peerID.toString()).arg(ApiCommand::toString(tran.command)).
+        arg(tran.persistentInfo.sequence).arg(tran.persistentInfo.timestamp).arg(hash.toString()), cl_logDEBUG1 );
 #endif
 
     Q_ASSERT_X(!tran.peerID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
