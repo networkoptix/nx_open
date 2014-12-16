@@ -245,11 +245,19 @@ void QnTransactionMessageBus::addAlivePeerInfo(ApiPeerData peerData, const QnUui
         currentValue.proxyVia << gotFromPeer;
 }
 
+void QnTransactionMessageBus::removeTTSequenceForPeer(const QnUuid& id)
+{
+    QnTranStateKey key(id, QnUuid());
+    auto itr = m_lastTransportSeq.lowerBound(key);
+    while (itr != m_lastTransportSeq.end() && itr.key().peerID == id)
+        itr = m_lastTransportSeq.erase(itr);
+}
+
+
 void QnTransactionMessageBus::removeAlivePeer(const QnUuid& id, bool sendTran, bool isRecursive)
 {
     // 1. remove peer from alivePeers map
-
-    m_lastTransportSeq.remove(id);
+    removeTTSequenceForPeer(id);
 
     runtimeTransactionLog->clearRuntimeData(id);
 
@@ -459,13 +467,14 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
         return true; // old version, nothing to check
 
     // 1. check transport sequence
-    int transportSeq = m_lastTransportSeq[transportHeader.sender];
+    QnTranStateKey ttSenderKey(transportHeader.sender, transportHeader.senderRuntimeID);
+    int transportSeq = m_lastTransportSeq[ttSenderKey];
     if (transportSeq >= transportHeader.sequence) {
         NX_LOG( QnLog::EC2_TRAN_LOG, lit("Ignore transaction %1 from peer %2 received via %3 because of transport sequence: %4 <= %5").
             arg(toString(tran.command)).arg(tran.peerID.toString()).arg(transportHeader.sender.toString()).arg(transportHeader.sequence).arg(transportSeq), cl_logDEBUG1 );
         return false; // already processed
     }
-    m_lastTransportSeq[transportHeader.sender] = transportHeader.sequence;
+    m_lastTransportSeq[ttSenderKey] = transportHeader.sequence;
 
     // 2. check persistent sequence
     if (tran.persistentInfo.isNull() || !transactionLog)
@@ -943,7 +952,7 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
             }
         }
         Q_ASSERT(found);
-        m_lastTransportSeq.remove(transport->remotePeer().id);
+        removeTTSequenceForPeer(transport->remotePeer().id);
         transport->setState(QnTransactionTransport::ReadyForStreaming);
 
         transport->processExtraData();

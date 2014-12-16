@@ -200,6 +200,7 @@ namespace ec2
         template <class T> void proxyTransaction(const QnTransaction<T> &tran, const QnTransactionTransportHeader &transportHeader);
         void updatePersistentMarker(const QnTransaction<ApiUpdateSequenceData>& tran, QnTransactionTransport* transport);
         void proxyFillerTransaction(const QnAbstractTransaction& tran, const QnTransactionTransportHeader& transportHeader);
+        void removeTTSequenceForPeer(const QnUuid& id);
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();
@@ -234,7 +235,7 @@ namespace ec2
         AlivePeersMap m_alivePeers;
         QVector<QSharedPointer<QnTransactionTransport>> m_connectingConnections;
 
-        QMap<QnUuid, int> m_lastTransportSeq;
+        QMap<QnTranStateKey, int> m_lastTransportSeq;
 
         // alive control
         QElapsedTimer m_aliveSendTimer;
