@@ -796,6 +796,9 @@ void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget 
     if(m_resizedWidget == NULL)
         return;
 
+    if(m_resizedWidget->item() == NULL)
+        return;
+
     m_selectionOverlayHackInstrumentDisabled = true;
     display()->selectionOverlayHackInstrument()->recursiveDisable();
 
@@ -811,31 +814,29 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
         return;
 
     QnResourceWidget *widget = m_resizedWidget;
-    QRectF widgetGeometry = rotated(widget->geometry(), widget->rotation());
 
-    QPointF pinPoint = Qn::calculatePinPoint(widget->geometry(), info->frameSection());
-    pinPoint = rotated(pinPoint, widgetGeometry.center(), widget->rotation());
-    QPoint snapPoint = mapper()->mapToGrid(pinPoint);
+    QRect initialGeometry = widget->item()->geometry();
+    QRectF widgetGeometry = rotated(widget->geometry(), widget->rotation());
     
     /* Calculate integer size. */
     QSize gridSize = mapper()->mapToGrid(widgetGeometry.size());
-
     if (gridSize.isEmpty())
         gridSize = gridSize.expandedTo(QSize(1, 1));
 
-    QRect newResizingWidgetRect;
-
     /* Correct grabbed section according to item rotation. */
     Qt::WindowFrameSection grabbedSection = Qn::rotateSection(info->frameSection(), item->rotation());
+    QPoint snapPoint = Qn::calculatePinPoint(initialGeometry, grabbedSection);
+
+    QRect newResizingWidgetRect;
     switch (grabbedSection) {
     case Qt::TopSection:
-        newResizingWidgetRect = QRect(QPoint(snapPoint.x() - gridSize.width() / 2, snapPoint.y() - gridSize.height() + 1), gridSize);
+        newResizingWidgetRect = QRect(QPoint(snapPoint.x() - gridSize.width() / 2, snapPoint.y() - gridSize.height()), gridSize);
         break;
     case Qt::LeftSection:
-        newResizingWidgetRect = QRect(QPoint(snapPoint.x() - gridSize.width() + 1, snapPoint.y() - gridSize.height() / 2), gridSize);
+        newResizingWidgetRect = QRect(QPoint(snapPoint.x() - gridSize.width(), snapPoint.y() - gridSize.height() / 2), gridSize);
         break;
     case Qt::TopLeftSection:
-        newResizingWidgetRect = QRect(QPoint(snapPoint.x() - gridSize.width() + 1, snapPoint.y() - gridSize.height() + 1), gridSize);
+        newResizingWidgetRect = QRect(QPoint(snapPoint.x() - gridSize.width(), snapPoint.y() - gridSize.height()), gridSize);
         break;
     case Qt::BottomSection:
         newResizingWidgetRect = QRect(QPoint(snapPoint.x() - gridSize.width() / 2, snapPoint.y()), gridSize);
@@ -847,10 +848,10 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
         newResizingWidgetRect = QRect(snapPoint, gridSize);
         break;
     case Qt::TopRightSection:
-        newResizingWidgetRect = QRect(QPoint(snapPoint.x(), snapPoint.y() - gridSize.height() + 1), gridSize);
+        newResizingWidgetRect = QRect(QPoint(snapPoint.x(), snapPoint.y() - gridSize.height()), gridSize);
         break;
     case Qt::BottomLeftSection:
-        newResizingWidgetRect = QRect(QPoint(snapPoint.x() - gridSize.width() + 1, snapPoint.y()), gridSize);
+        newResizingWidgetRect = QRect(QPoint(snapPoint.x() - gridSize.width(), snapPoint.y()), gridSize);
         break;
     default:
         newResizingWidgetRect = QRect(snapPoint, gridSize);
