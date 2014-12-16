@@ -164,12 +164,12 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &
 }
 
 void QnCommonMessageProcessor::on_remotePeerFound(const ec2::ApiPeerAliveData &data) {
-    handleRemovePeerFound(data);
+    handleRemotePeerFound(data);
     emit remotePeerFound(data);
 }
 
 void QnCommonMessageProcessor::on_remotePeerLost(const ec2::ApiPeerAliveData &data) {
-    handleRemovePeerLost(data);
+    handleRemotePeerLost(data);
     emit remotePeerLost(data);
 }
 
@@ -369,10 +369,10 @@ void QnCommonMessageProcessor::removeResourceIgnored(const QnUuid &)
 {
 }
 
-void QnCommonMessageProcessor::handleRemovePeerFound(const ec2::ApiPeerAliveData &data) {
+void QnCommonMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData &data) {
 }
 
-void QnCommonMessageProcessor::handleRemovePeerLost(const ec2::ApiPeerAliveData &data) {  
+void QnCommonMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData &data) {  
 }
 
 

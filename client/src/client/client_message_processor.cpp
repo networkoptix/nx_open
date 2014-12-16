@@ -102,8 +102,8 @@ void QnClientMessageProcessor::resetResources(const QnResourceList& resources) {
     QnCommonMessageProcessor::resetResources(resources);
 }
 
-void QnClientMessageProcessor::handleRemovePeerFound(const ec2::ApiPeerAliveData &data) {
-    base_type::handleRemovePeerFound(data);
+void QnClientMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData &data) {
+    base_type::handleRemotePeerFound(data);
     if (qnCommon->remoteGUID().isNull()) {
         qWarning() << "at_remotePeerFound received while disconnected";
         return;
@@ -118,8 +118,8 @@ void QnClientMessageProcessor::handleRemovePeerFound(const ec2::ApiPeerAliveData
     emit connectionOpened();
 }
 
-void QnClientMessageProcessor::handleRemovePeerLost(const ec2::ApiPeerAliveData &data) {
-    base_type::handleRemovePeerLost(data);
+void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData &data) {
+    base_type::handleRemotePeerLost(data);
     if (qnCommon->remoteGUID().isNull()) {
         qWarning() << "at_remotePeerLost received while disconnected";
         return;

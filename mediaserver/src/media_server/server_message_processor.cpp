@@ -122,8 +122,8 @@ void QnServerMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
     connection->getMiscManager()->disconnect(this);
 }
 
-void QnServerMessageProcessor::handleRemovePeerFound(const ec2::ApiPeerAliveData &data) {
-    base_type::handleRemovePeerFound(data);
+void QnServerMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData &data) {
+    base_type::handleRemotePeerFound(data);
     QnResourcePtr res = qnResPool->getResourceById(data.peer.id);
     if (res)
         res->setStatus(Qn::Online);
@@ -131,8 +131,8 @@ void QnServerMessageProcessor::handleRemovePeerFound(const ec2::ApiPeerAliveData
         m_delayedOnlineStatus << data.peer.id;
 }
 
-void QnServerMessageProcessor::handleRemovePeerLost(const ec2::ApiPeerAliveData &data) {
-    base_type::handleRemovePeerLost(data);
+void QnServerMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData &data) {
+    base_type::handleRemotePeerLost(data);
     QnResourcePtr res = qnResPool->getResourceById(data.peer.id);
     if (res) {
         res->setStatus(Qn::Offline);

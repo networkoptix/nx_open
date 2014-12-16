@@ -68,8 +68,8 @@ protected:
     virtual void connectToConnection(const ec2::AbstractECConnectionPtr &connection);
     virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection);
 
-    virtual void handleRemovePeerFound(const ec2::ApiPeerAliveData &data);
-    virtual void handleRemovePeerLost(const ec2::ApiPeerAliveData &data);
+    virtual void handleRemotePeerFound(const ec2::ApiPeerAliveData &data);
+    virtual void handleRemotePeerLost(const ec2::ApiPeerAliveData &data);
 
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData);
     virtual void onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) = 0;

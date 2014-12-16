@@ -30,8 +30,8 @@ protected:
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData) override;
     virtual void resetResources(const QnResourceList& resources) override;
 
-    virtual void handleRemovePeerFound(const ec2::ApiPeerAliveData &data) override;
-    virtual void handleRemovePeerLost(const ec2::ApiPeerAliveData &data) override;
+    virtual void handleRemotePeerFound(const ec2::ApiPeerAliveData &data) override;
+    virtual void handleRemotePeerLost(const ec2::ApiPeerAliveData &data) override;
 
 private slots:
     void at_systemNameChangeRequested(const QString &systemName);
