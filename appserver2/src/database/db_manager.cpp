@@ -313,14 +313,7 @@ bool QnDbManager::init(
     }
 
     //tuning DB
-    {
-        QSqlQuery enableWalQuery(m_sdb);
-        enableWalQuery.prepare("PRAGMA journal_mode = WAL");
-        if( !enableWalQuery.exec() )
-        {
-            qWarning() << "Failed to enable WAL mode on sqlLite database!" << enableWalQuery.lastError().text();
-        }
-    }
+    tuneDBAfterOpen();
 
     if( !createDatabase() )
     {
@@ -958,6 +951,18 @@ bool QnDbManager::removeServerStatusFromTransactionLog()
         }
     }
 
+    return true;
+}
+
+bool QnDbManager::tuneDBAfterOpen()
+{
+    QSqlQuery enableWalQuery(m_sdb);
+    enableWalQuery.prepare("PRAGMA journal_mode = WAL");
+    if( !enableWalQuery.exec() )
+    {
+        qWarning() << "Failed to enable WAL mode on sqlLite database!" << enableWalQuery.lastError().text();
+        return false;
+    }
     return true;
 }
 
@@ -3067,10 +3072,34 @@ ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiTimeData& currentT
 ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiDatabaseDumpData& data)
 {
     QWriteLocker lock(&m_mutex);
+
+    //have to close/open DB to dump journals to .db file
+    m_sdb.close();
+    m_sdbStatic.close();
+
+    //creating dump
     QFile f(m_sdb.databaseName());
     if (!f.open(QFile::ReadOnly))
-        return ErrorCode::failure;
+        return ErrorCode::ioError;
     data.data = f.readAll();
+
+    //TODO #ak add license db to backup
+
+    if( !m_sdb.open() )
+    {
+        NX_LOG( lit("Can't reopen ec2 DB (%1). Error %2").arg(m_sdb.databaseName()).arg(m_sdb.lastError().text()), cl_logWARNING );
+        return ErrorCode::dbError;
+    }
+
+    if( !m_sdbStatic.open() )
+    {
+        NX_LOG( lit("Can't reopen ec2 license DB (%1). Error %2").arg(m_sdbStatic.databaseName()).arg(m_sdbStatic.lastError().text()), cl_logWARNING );
+        return ErrorCode::dbError;
+    }
+
+    //tuning DB
+    tuneDBAfterOpen();
+
     return ErrorCode::ok;
 }
 
@@ -3078,11 +3107,32 @@ ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& dumpFilePath, qint64& du
 {
     QWriteLocker lock(&m_mutex);
 
+    //have to close/open DB to dump journals to .db file
+    m_sdb.close();
+    m_sdbStatic.close();
+
     if( !QFile::copy( m_sdb.databaseName(), dumpFilePath.path ) )
         return ErrorCode::ioError;
 
+    //TODO #ak add license db to backup
+
     QFileInfo dumpFileInfo( dumpFilePath.path );
     dumpFileSize = dumpFileInfo.size();
+
+    if( !m_sdb.open() )
+    {
+        NX_LOG( lit("Can't reopen ec2 DB (%1). Error %2").arg(m_sdb.databaseName()).arg(m_sdb.lastError().text()), cl_logWARNING );
+        return ErrorCode::dbError;
+    }
+
+    if( !m_sdbStatic.open() )
+    {
+        NX_LOG( lit("Can't reopen ec2 license DB (%1). Error %2").arg(m_sdbStatic.databaseName()).arg(m_sdbStatic.lastError().text()), cl_logWARNING );
+        return ErrorCode::dbError;
+    }
+
+    //tuning DB
+    tuneDBAfterOpen();
 
     return ErrorCode::ok;
 }

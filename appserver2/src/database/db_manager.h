@@ -506,6 +506,7 @@ namespace ec2
         void addResourceTypesFromXML(ApiResourceTypeDataList& data);
         void loadResourceTypeXML(const QString& fileName, ApiResourceTypeDataList& data);
         bool removeServerStatusFromTransactionLog();
+        bool tuneDBAfterOpen();
     private:
         QnResourceFactory* m_resourceFactory;
         QnUuid m_storageTypeId;
