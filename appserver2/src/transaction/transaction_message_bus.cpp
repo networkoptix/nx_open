@@ -477,7 +477,7 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
                 arg(transportHeader.sender.toString()).arg(transport->remotePeer().id.toString()), cl_logWARNING );
         }
 
-    if (persistentSeq && tran.persistentInfo.sequence > persistentSeq + 1) 
+    if (tran.persistentInfo.sequence > persistentSeq + 1) 
     {
         if (transport->isSyncDone()) 
         {
