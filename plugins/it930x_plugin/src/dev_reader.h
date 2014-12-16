@@ -38,8 +38,7 @@ namespace ite
         //typedef ClockRDTSC Clock;
 
         Timer()
-        :
-            m_finished( true )
+        :   m_finished(false)
         {
         }
 

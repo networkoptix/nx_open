@@ -218,11 +218,13 @@ bool DeviceInfo::setChannel(unsigned channel)
     return true;
 }
 
-bool DeviceInfo::setEncoderCfg(unsigned streamNo, unsigned bitrate, unsigned fps)
+bool DeviceInfo::setVideoEncConfig(unsigned streamNo, const TxVideoEncConfig& conf)
 {
+#if 0
     getVideoEncoderConfigurations();
     if (! wait())
         return false;
+#endif
 
     if (info_.videoEncConfig.configListSize < streamNo)
         return false;
@@ -253,10 +255,14 @@ bool DeviceInfo::setEncoderCfg(unsigned streamNo, unsigned bitrate, unsigned fps
     info_.videoEncConfigSetParam.aspectRatio        = info_.videoEncConfig.configList[streamNo].aspectRatio;
     info_.videoEncConfigSetParam.forcePersistence   = info_.videoEncConfig.configList[streamNo].forcePersistence;
 
-    if (bitrate)
-        info_.videoEncConfigSetParam.bitrateLimit = bitrate;
-    if (fps)
-        info_.videoEncConfigSetParam.frameRateLimit = fps;
+    if (conf.width)
+        info_.videoEncConfigSetParam.width = conf.width;
+    if (conf.height)
+        info_.videoEncConfigSetParam.height = conf.height;
+    if (conf.bitrateLimit)
+        info_.videoEncConfigSetParam.bitrateLimit = conf.bitrateLimit;
+    if (conf.frameRateLimit)
+        info_.videoEncConfigSetParam.frameRateLimit = conf.frameRateLimit;
 
     setVideoEncoderConfiguration();
     if (! wait())
@@ -340,10 +346,10 @@ void RCShell::processCommand(DeviceInfoPtr dev, unsigned short commandID)
 bool RCShell::sendGetIDs(int iWaitTime)
 {
     DeviceInfo devInfo;
-    RCHostInfo * deviceInfo = devInfo.xPtr();
-    deviceInfo->cmdSendConfig.bIsCmdBroadcast = True;
+    RCHostInfo * rcHost = devInfo.rcHost();
+    rcHost->cmdSendConfig.bIsCmdBroadcast = True;
 
-    unsigned error = Cmd_Send(deviceInfo, CMD_GetTxDeviceAddressIDInput);
+    unsigned error = Cmd_Send(rcHost, CMD_GetTxDeviceAddressIDInput);
     if (error == ModulatorError_NO_ERROR)
     {
         if (iWaitTime)
@@ -354,37 +360,18 @@ bool RCShell::sendGetIDs(int iWaitTime)
     return false;
 }
 
-void RCShell::updateTransmissionParams(unsigned short rxID)
+void RCShell::updateTxParams(DeviceInfoPtr dev)
 {
-    std::lock_guard<std::mutex> lock(mutex_); // LOCK
-
-    for (size_t i = 0; i < devs_.size(); ++i)
+    if (dev)
     {
-        if (devs_[i]->rxID() == rxID)
-        {
-            devs_[i]->getTransmissionParameterCapabilities();
-            devs_[i]->getTransmissionParameters();
-        }
-    }
-}
+        dev->getTransmissionParameterCapabilities();
+        dev->getTransmissionParameters();
+        dev->getDeviceInformation();
+        dev->getVideoSources();
+        dev->getVideoSourceConfigurations();
+        dev->getVideoEncoderConfigurations();
 
-void RCShell::updateDevParams(unsigned short rxID)
-{
-    std::lock_guard<std::mutex> lock(mutex_); // LOCK
-
-    for (size_t i = 0; i < devs_.size(); ++i)
-    {
-        if (devs_[i]->rxID() != rxID)
-            continue;
-
-        devs_[i]->getTransmissionParameterCapabilities();
-        devs_[i]->getTransmissionParameters();
-        devs_[i]->getDeviceInformation();
-        devs_[i]->getVideoSources();
-        devs_[i]->getVideoSourceConfigurations();
-        devs_[i]->getVideoEncoderConfigurations();
-
-        // TODO
+        dev->wait();
     }
 }
 

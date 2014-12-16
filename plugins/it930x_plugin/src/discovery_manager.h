@@ -22,6 +22,8 @@ namespace ite
         DEF_REF_COUNTER
 
     public:
+        typedef std::shared_ptr<CameraManager> CameraPtr;
+
         DiscoveryManager();
         virtual ~DiscoveryManager();
 
@@ -45,7 +47,7 @@ namespace ite
         static DiscoveryManager * instance() { return Instance; }
 
         static void makeInfo(nxcip::CameraInfo& cameraInfo, unsigned short txID, unsigned short rxID, unsigned frequency);
-        static void updateInfo(nxcip::CameraInfo& cameraInfo, unsigned short rxID, unsigned frequency);
+        static void updateInfo(nxcip::CameraInfo& cameraInfo, unsigned short txID, unsigned short rxID, unsigned frequency);
         static void parseInfo(const nxcip::CameraInfo& cameraInfo, unsigned short& txID, unsigned short& rxID, unsigned& frequency);
 
         bool setChannel(unsigned short txID, unsigned chan);
@@ -53,17 +55,33 @@ namespace ite
         // public for RC update devs thread
         void updateRxDevices();
         void updateTxLinks(unsigned chan);
-        void updateDevParams(unsigned short rxID) { rcShell_.updateDevParams(rxID); }
+        void updateOneTxLink(RxDevicePtr dev, unsigned frequency);
+
+        void getRestored(std::vector<CameraPtr>& out)
+        {
+            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+            out.swap(m_restored);
+        }
+
+        RxDevicePtr rxDev(unsigned short rxID) const
+        {
+            std::lock_guard<std::mutex> lock( m_mutex );
+
+            auto it = m_rxDevs.find(rxID);
+            if (it != m_rxDevs.end())
+                return it->second;
+            return RxDevicePtr();
+        }
 
     private:
-        typedef std::shared_ptr<CameraManager> CameraPtr;
-
         static DiscoveryManager * Instance;
 
         mutable std::mutex m_mutex;
-        std::map<unsigned, CameraPtr> m_cameras;    // {TxID, Camera}
-        std::map<unsigned, RxDevicePtr> m_rxDevs;   // {RxID, RxDev}
-        std::multimap<unsigned, IDsLink> m_txLinks; // {TxID, RxTxLink}
+        std::map<unsigned short, CameraPtr> m_cameras;          // {TxID, Camera}
+        std::map<unsigned short, RxDevicePtr> m_rxDevs;         // {RxID, RxDev}
+        std::multimap<unsigned short, IDsLink> m_txLinks;       // {TxID, RxTxLink}
+        std::vector<CameraPtr> m_restored;
         RCShell rcShell_;
         ComPort comPort_;
 

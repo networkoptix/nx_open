@@ -689,10 +689,7 @@ namespace ite
             {
                 bool ok = captureAnyRxDevice();
                 if (! ok)
-                {
-                    DiscoveryManager::updateInfo(m_info, 0xffff, 0);
                     break;
-                }
                 // no break
             }
 
@@ -717,11 +714,13 @@ namespace ite
         // try light reload
         stopDevReader();
         if (initDevReader())
+        {
             initEncoders();
 
-        // soft reload failed, change state to hard reload (next time)
-        if (! m_hasThread)
-            freeDevice();
+            // soft reload failed, change state to hard reload (next time)
+            if (! m_hasThread)
+                freeDevice();
+        }
 
         m_loading = false;
     }
@@ -816,8 +815,7 @@ namespace ite
         if (dev.get() && dev->lockCamera(m_txID))
         {
             m_rxDevice = dev;
-            m_rxDevice->updateDevParams();
-            DiscoveryManager::updateInfo(m_info, m_rxDevice->rxID(), m_rxDevice->frequency());
+            DiscoveryManager::updateInfo(m_info, m_txID, m_rxDevice->rxID(), m_rxDevice->frequency());
             return true;
         }
 
@@ -856,8 +854,8 @@ namespace ite
         stopEncoders();
 
         static const float HARDCODED_FPS = 30.0f;
-        static const unsigned WAIT_LIBAV_INIT_DURATION_S = 10;
-        static std::chrono::seconds dura( WAIT_LIBAV_INIT_DURATION_S );
+        static const unsigned WAIT_LIBAV_INIT_S = 15;
+        static std::chrono::seconds dura( WAIT_LIBAV_INIT_S );
 
         m_devReader->clear();
         m_devReader->startTimer( dura );

@@ -40,6 +40,23 @@ namespace ite
         std::string hardwareId;
     };
 
+    struct TxVideoEncConfig
+    {
+        uint16_t width;
+        uint16_t height;
+        uint16_t bitrateLimit;
+        uint8_t  frameRateLimit;
+        uint8_t  quality;
+
+        TxVideoEncConfig()
+        :   width(0),
+            height(0),
+            bitrateLimit(0),
+            frameRateLimit(0),
+            quality(0)
+        {}
+    };
+
     ///
     class DeviceInfo
     {
@@ -72,7 +89,7 @@ namespace ite
         DeviceInfo(unsigned short rxID = 0, unsigned short txID = 0);
         ~DeviceInfo();
 
-        RCHostInfo * xPtr() { return &info_; }
+        RCHostInfo * rcHost() { return &info_; }
 
         static Frequency chanFrequency(unsigned channel)
         {
@@ -127,51 +144,6 @@ namespace ite
         }
 
         bool setChannel(unsigned channel);
-
-        // <encoder>
-
-        bool setEncoderCfg(unsigned streamNo, unsigned bitrate, unsigned fps);
-
-        uint8_t encodersCount() const { return info_.videoEncConfig.configListSize; }
-
-        bool resolution(uint8_t encoderNo, uint16_t& width, uint16_t& height) const
-        {
-            if (encoderNo >= encodersCount())
-                return false;
-
-            width = info_.videoEncConfig.configList[encoderNo].width;
-            height = info_.videoEncConfig.configList[encoderNo].height;
-            return true;
-        }
-
-        bool framerate(uint8_t encoderNo, uint8_t& fps) const
-        {
-            if (encoderNo >= encodersCount())
-                return false;
-
-            fps = info_.videoEncConfig.configList[encoderNo].frameRateLimit;
-            return true;
-        }
-
-        bool bitrate(uint8_t encoderNo, uint16_t& bitrate) const
-        {
-            if (encoderNo >= encodersCount())
-                return false;
-
-            bitrate = info_.videoEncConfig.configList[encoderNo].bitrateLimit;
-            return true;
-        }
-
-        bool quality(uint8_t encoderNo, uint16_t& q) const
-        {
-            if (encoderNo >= encodersCount())
-                return false;
-
-            q = info_.videoEncConfig.configList[encoderNo].quality;
-            return true;
-        }
-
-        // </encoder>
 
         static unsigned short input2output(unsigned short command)
         {
@@ -321,14 +293,36 @@ namespace ite
 
         // info
 
-        void deviceInfo(TxManufactureInfo& mInfo) const
+        TxManufactureInfo txDeviceInfo() const
         {
+            TxManufactureInfo mInfo;
             mInfo.companyName = rcStr2str(info_.manufactureInfo.manufactureName);
             mInfo.modelName = rcStr2str(info_.manufactureInfo.modelName);
             mInfo.firmwareVersion = rcStr2str(info_.manufactureInfo.firmwareVersion);
             mInfo.serialNumber = rcStr2str(info_.manufactureInfo.serialNumber);
             mInfo.hardwareId = rcStr2str(info_.manufactureInfo.hardwareId);
+            return mInfo;
         }
+
+        // encoder
+
+        uint8_t encodersCount() const { return info_.videoEncConfig.configListSize; }
+
+        TxVideoEncConfig txVideoEncConfig(uint8_t encoderNo)
+        {
+            if (encoderNo >= encodersCount())
+                return TxVideoEncConfig();
+
+            TxVideoEncConfig conf;
+            conf.width = info_.videoEncConfig.configList[encoderNo].width;
+            conf.height = info_.videoEncConfig.configList[encoderNo].height;
+            conf.bitrateLimit = info_.videoEncConfig.configList[encoderNo].bitrateLimit;
+            conf.frameRateLimit = info_.videoEncConfig.configList[encoderNo].frameRateLimit;
+            conf.quality = info_.videoEncConfig.configList[encoderNo].quality;
+            return conf;
+        }
+
+        bool setVideoEncConfig(unsigned streamNo, const TxVideoEncConfig& conf);
 
     private:
         RCHostInfo info_;
@@ -404,8 +398,7 @@ namespace ite
         void getDevIDs(std::vector<IDsLink>& outLinks);
         DeviceInfoPtr device(unsigned short rxID, unsigned short txID) const;
 
-        void updateDevParams(unsigned short rxID);
-        void updateTransmissionParams(unsigned short rxID);
+        void updateTxParams(DeviceInfoPtr dev);
 
         bool setChannel(unsigned short rxID, unsigned short txID, unsigned channel);
         void setRxFrequency(unsigned short rxID, unsigned frequency);

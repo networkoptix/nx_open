@@ -20,7 +20,7 @@ namespace ite
         char supportHWInfo[32];
     };
 
-    /// ITE DVB-T reciver
+    /// ITE DVB-T receiver
     ///
     /// RX Setting (from driver readme):
     /// URB_COUNT   4

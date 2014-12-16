@@ -4,6 +4,7 @@
 #include <string>
 #include <set>
 #include <atomic>
+#include <sstream>
 
 #include "discovery_manager.h"
 #include "camera_manager.h"
@@ -44,11 +45,12 @@ namespace ite
 
         void operator () ()
         {
-            static const unsigned WAIT_RC_TIMEOUT_S = 4;
-            static std::chrono::seconds dura( WAIT_RC_TIMEOUT_S );
-            static std::chrono::milliseconds ms10(10);
+            static std::chrono::seconds s1(1);
+            static std::chrono::seconds s10(10);
 
             updateThreadObj = this;
+
+            std::this_thread::sleep_for(s10);
 
             while (!m_stopMe)
             {
@@ -56,11 +58,30 @@ namespace ite
 
                 for (size_t ch = 0; ch < DeviceInfo::CHANNELS_NUM; ++ch)
                 {
+                    // check restored devices
+                    {
+                        std::vector<DiscoveryManager::CameraPtr> restored;
+                        m_discovery->getRestored(restored);
+
+                        for (size_t i = 0; i < restored.size(); ++i)
+                        {
+                            nxcip::CameraInfo info;
+                            restored[i]->getCameraInfo(&info);
+
+                            IDsLink link;
+                            m_discovery->parseInfo(info, link.txID, link.rxID, link.frequency);
+
+                            RxDevicePtr dev = m_discovery->rxDev(link.rxID);
+                            if (dev && link.frequency)
+                                m_discovery->updateOneTxLink(dev, link.frequency);
+                        }
+                    }
+#if 0
                     m_discovery->updateTxLinks(ch);
-                    std::this_thread::sleep_for(ms10); // free devices for a while
+#endif
                 }
 
-                std::this_thread::sleep_for(dura);
+                std::this_thread::sleep_for(s1);
             }
 
             updateThreadObj = nullptr;
@@ -176,7 +197,7 @@ namespace ite
                 continue;
 
             nxcip::CameraInfo& info = cameras[cameraNum];
-            makeInfo(info, txID, 0xffff, it->second.frequency);
+            makeInfo(info, txID, it->second.rxID, it->second.frequency);
 
             CameraManager * cam = nullptr;
 
@@ -199,7 +220,7 @@ namespace ite
             {
                 foundTx.insert(txID);
 
-                // deplayed receivers release
+                // delayed receivers release
                 if (cam->stopIfNeeds())
                     continue; // HACK: hide camera once
 
@@ -229,12 +250,6 @@ namespace ite
         // before findCameras() on restart, use saved info from DB
         if (!cam)
         {
-            unsigned short rxID;
-            unsigned frequency;
-            parseInfo(info, txID, rxID, frequency);
-
-            //checkLink(txID, rxID, frequency);
-
             {
                 std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
@@ -242,6 +257,8 @@ namespace ite
                 m_cameras[txID] = sp;
                 cam = sp.get();
                 cam->addRef();
+
+                m_restored.push_back(sp);
             }
         }
 
@@ -333,32 +350,35 @@ namespace ite
         unsigned freq = DeviceInfo::chanFrequency(chan);
 
         for (size_t i = 0; i < scanDevs.size(); ++i)
-        {
-            if (scanDevs[i]->tryLockF(freq))
-            {
-                unsigned short rxID = scanDevs[i]->rxID();
-                rcShell_.setRxFrequency(rxID, freq); // frequency for new devices
-
-#if 1 // DEBUG
-                printf("searching TxIDs - rxID: %d; frequency: %d; strength: %d; presence: %d\n",
-                       scanDevs[i]->rxID(), freq, scanDevs[i]->strength(), scanDevs[i]->present());
-#endif
-                // active devices communication
-                if (scanDevs[i]->present() && scanDevs[i]->strength() > 0) // strength: 0..100
-                {
-                    rcShell_.sendGetIDs();
-                    usleep(DeviceInfo::SEND_WAIT_TIME_MS * 1000);
-                }
-
-                scanDevs[i]->unlockF();
-
-                rcShell_.setRxFrequency(scanDevs[i]->rxID(), 0);
-            }
-        }
+            updateOneTxLink(scanDevs[i], freq);
 
         std::vector<IDsLink> links;
         rcShell_.getDevIDs(links);
         addTxLinks(links);
+    }
+
+    void DiscoveryManager::updateOneTxLink(RxDevicePtr dev, unsigned freq)
+    {
+        if (dev->tryLockF(freq))
+        {
+            unsigned short rxID = dev->rxID();
+            rcShell_.setRxFrequency(rxID, freq); // frequency for new devices
+
+#if 1 // DEBUG
+            printf("searching TxIDs - rxID: %d; frequency: %d; quality: %d; strength: %d; presence: %d\n",
+                   dev->rxID(), freq, dev->quality(), dev->strength(), dev->present());
+#endif
+            // active devices communication
+            if (dev->present() && dev->strength() > 0) // strength: 0..100
+            {
+                rcShell_.sendGetIDs();
+                usleep(DeviceInfo::SEND_WAIT_TIME_MS * 1000);
+            }
+
+            dev->unlockF();
+
+            rcShell_.setRxFrequency(dev->rxID(), 0);
+        }
     }
 
     void DiscoveryManager::addTxLinks(const std::vector<IDsLink>& links)
@@ -394,26 +414,25 @@ namespace ite
         strncpy( info.url, strTxID.c_str(), std::min(strTxID.size(), sizeof(nxcip::CameraInfo::url)-1) );
         strncpy( info.uid, strTxID.c_str(), std::min(strTxID.size(), sizeof(nxcip::CameraInfo::uid)-1) );
 
-        unsigned shift = sizeof(unsigned short);
-        memcpy(info.auxiliaryData, &txID, shift);
-        memcpy(info.auxiliaryData + shift, &rxID, shift);
-        memcpy(info.auxiliaryData + shift*2, &frequency, sizeof(unsigned));
+        updateInfo(info, txID, rxID, frequency);
     }
 
-    void DiscoveryManager::updateInfo(nxcip::CameraInfo& info, unsigned short rxID, unsigned frequency)
+    void DiscoveryManager::updateInfo(nxcip::CameraInfo& info, unsigned short txID, unsigned short rxID, unsigned frequency)
     {
-        unsigned shift = sizeof(unsigned short);
-        //memcpy(info.auxiliaryData, &txID, shift);
-        memcpy(info.auxiliaryData + shift, &rxID, shift);
-        memcpy(info.auxiliaryData + shift*2, &frequency, sizeof(unsigned));
+        std::stringstream ss;
+        ss << txID << ' ' << frequency << ' ' << rxID;
+
+        strncpy(info.auxiliaryData, ss.str().c_str(), std::min(ss.str().size(), sizeof(nxcip::CameraInfo::auxiliaryData)-1) );
     }
 
     void DiscoveryManager::parseInfo(const nxcip::CameraInfo& info, unsigned short& txID, unsigned short& rxID, unsigned& frequency)
     {
-        unsigned shift = sizeof(unsigned short);
-        memcpy(&txID, info.auxiliaryData, shift);
-        memcpy(&rxID, info.auxiliaryData + shift, shift);
-        memcpy(&frequency, info.auxiliaryData + shift*2, sizeof(unsigned));
+        if (info.auxiliaryData[0])
+        {
+            std::stringstream ss;
+            ss << std::string(info.auxiliaryData);
+            ss >> txID >> frequency >> rxID;
+        }
     }
 
     // Tx parameters

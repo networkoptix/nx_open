@@ -20,6 +20,7 @@ namespace ite
     {
     public:
         constexpr static const char * DEVICE_PATTERN = "usb-it930x";
+        static const unsigned MAX_ENCODERS = 4;
 
         RxDevice(unsigned id, RCShell * rc);
 
@@ -33,13 +34,14 @@ namespace ite
         bool isLocked() const;
         void unlockF();
 
-        const IteDriverInfo& rxDriverInfo() const { return m_rxInfo; }
-        const TxManufactureInfo& txDriverInfo() const { return m_txDriverInfo; }
+        const IteDriverInfo rxDriverInfo() const { return m_rxInfo; }
+        const TxManufactureInfo txDriverInfo() const { return m_txInfo->txDeviceInfo(); }
+        const TxVideoEncConfig txVideoEncConfig(uint8_t encNo) const { return m_txInfo->txVideoEncConfig(encNo); }
 
         unsigned frequency() const { return m_frequency; }
-        uint8_t strength() const { return m_strength; }
-        uint8_t quality() const { return m_quality; }
-        bool present() const { return m_present; }
+        uint8_t strength() const { return m_signalStrength; }
+        uint8_t quality() const { return m_signalQuality; }
+        bool present() const { return m_signalPresent; }
 
         static unsigned dev2id(const std::string& devName);
         static unsigned str2id(const std::string& devName);
@@ -50,10 +52,6 @@ namespace ite
         }
 
         static std::string id2str(unsigned id);
-
-        /// @note async
-        void updateDevParams() { m_rcShell->updateDevParams(m_rxID); }
-        void updateTransmissionParams() { m_rcShell->updateTransmissionParams(m_rxID); }
 
         bool setChannel(unsigned short txID, unsigned chan);
 
@@ -66,19 +64,19 @@ namespace ite
         RCShell * m_rcShell;
 
         // info from DTV receiver
-        uint8_t m_strength;
-        uint8_t m_quality;
-        bool m_present;
+        uint8_t m_signalQuality;
+        uint8_t m_signalStrength;
+        bool m_signalPresent;
         IteDriverInfo m_rxInfo;
 
         // info from RC
         DeviceInfoPtr m_txInfo;
-        TxManufactureInfo m_txDriverInfo;
 
         bool isLockedUnsafe() const { return m_device.get() && m_device->hasStream(); }
 
         bool open();
         bool stats();
+        void updateTxParams();
     };
 
     typedef std::shared_ptr<RxDevice> RxDevicePtr;

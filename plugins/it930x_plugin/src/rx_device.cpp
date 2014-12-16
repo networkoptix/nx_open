@@ -28,9 +28,9 @@ namespace ite
         m_txID(0),
         m_frequency(0),
         m_rcShell(rc),
-        m_strength(0),
-        m_quality(0),
-        m_present(false)
+        m_signalQuality(0),
+        m_signalStrength(0),
+        m_signalPresent(false)
     {
         open();
     }
@@ -69,9 +69,7 @@ namespace ite
         if (tryLockF(freq))
         {
             m_txID = txID;
-            m_txInfo = m_rcShell->device(m_rxID, m_txID);
-            if (m_txInfo)
-                m_txInfo->deviceInfo(m_txDriverInfo);
+            updateTxParams();
             return true;
         }
 
@@ -121,17 +119,27 @@ namespace ite
     {
         try
         {
-            m_quality = 0;
-            m_strength = 0;
-            m_present = false;
+            m_signalQuality = 0;
+            m_signalStrength = 0;
+            m_signalPresent = false;
             bool locked = false;
-            m_device->statistic(m_quality, m_strength, m_present, locked);
+            m_device->statistic(m_signalQuality, m_signalStrength, m_signalPresent, locked);
             return true;
         }
         catch (const char * msg)
         {}
 
         return false;
+    }
+
+    void RxDevice::updateTxParams()
+    {
+        m_txInfo = m_rcShell->device(m_rxID, m_txID);
+        if (m_txInfo)
+        {
+            /// @note async
+            m_rcShell->updateTxParams(m_txInfo);
+        }
     }
 
     unsigned RxDevice::dev2id(const std::string& nm)
