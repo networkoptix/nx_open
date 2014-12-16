@@ -76,7 +76,7 @@ namespace ite
                                 m_discovery->updateOneTxLink(dev, link.frequency);
                         }
                     }
-#if 0
+#if 1
                     m_discovery->updateTxLinks(ch);
 #endif
                 }
