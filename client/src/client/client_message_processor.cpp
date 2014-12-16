@@ -20,6 +20,7 @@ QnClientMessageProcessor::QnClientMessageProcessor():
     m_connected(false),
     m_holdConnection(false)
 {
+    m_status.setState(QnConnectionState::Disconnected);
 }
 
 void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connection)

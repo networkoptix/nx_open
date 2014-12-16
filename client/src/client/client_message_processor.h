@@ -3,6 +3,8 @@
 
 #include <api/common_message_processor.h>
 
+#include <client/client_connection_status.h>
+
 #include <core/resource/camera_history.h>
 #include <core/resource/resource_fwd.h>
 
@@ -36,6 +38,7 @@ private slots:
 
 private:
     QnIncompatibleServerWatcher *m_incompatibleServerWatcher;
+    QnClientConnectionStatus m_status;
     bool m_connected;
     bool m_holdConnection;
 };
