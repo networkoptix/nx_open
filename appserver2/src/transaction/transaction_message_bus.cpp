@@ -187,6 +187,7 @@ QnTransactionMessageBus* QnTransactionMessageBus::instance()
 
 QnTransactionMessageBus::QnTransactionMessageBus(Qn::PeerType peerType)
 : 
+    EnableMultiThreadDirectConnection( this ),
     m_localPeer(qnCommon->moduleGUID(), qnCommon->runningInstanceGUID(), peerType),
     //m_binaryTranSerializer(new QnBinaryTransactionSerializer()),
     m_jsonTranSerializer(new QnJsonTransactionSerializer()),
@@ -317,7 +318,10 @@ bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
     {
         addAlivePeerInfo(ApiPeerData(aliveData.peer.id, aliveData.peer.instanceId, aliveData.peer.peerType), gotFromPeer);
         if (!isPeerExist) 
+        {
+            QMutexLocker lk( &m_signalEmitMutex );
             emit peerFound(aliveData);
+        }
     }
     else 
     {
@@ -871,6 +875,7 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
     if( peer.id == qnCommon->moduleGUID() )
         return; //sending keep-alive
 
+    QMutexLocker lk( &m_signalEmitMutex );
     if (isAlive)
         emit peerFound(aliveData);
     else
@@ -1036,7 +1041,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
             QnTransactionTransportPtr transport(new QnTransactionTransport(m_localPeer));
             connect(transport.data(), &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
             connect(transport.data(), &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);
-            connect(transport.data(), &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::remotePeerUnauthorized,  Qt::DirectConnection);
+            connect(transport.data(), &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::emitRemotePeerUnauthorized,  Qt::DirectConnection);
             connect(transport.data(), &QnTransactionTransport::peerIdDiscovered, this, &QnTransactionMessageBus::at_peerIdDiscovered,  Qt::QueuedConnection);
             transport->doOutgoingConnect(url);
             m_connectingConnections << transport;
@@ -1106,7 +1111,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(const QSharedPointer<A
     transport->setRemotePeer(remotePeer);
     connect(transport.data(), &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
     connect(transport.data(), &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);
-    connect(transport.data(), &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::remotePeerUnauthorized,  Qt::DirectConnection);
+    connect(transport.data(), &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::emitRemotePeerUnauthorized, Qt::DirectConnection );
 
     QMutexLocker lock(&m_mutex);
     m_connectingConnections << transport;
@@ -1205,5 +1210,10 @@ void QnTransactionMessageBus::at_runtimeDataUpdated(const QnTransaction<ApiRunti
         m_handler->triggerNotification(tran);
 }
 
+void QnTransactionMessageBus::emitRemotePeerUnauthorized(const QnUuid& id)
+{
+    QMutexLocker lk( &m_signalEmitMutex );
+    emit remotePeerUnauthorized( id );
 }
 
+}

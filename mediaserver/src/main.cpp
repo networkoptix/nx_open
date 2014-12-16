@@ -1901,6 +1901,8 @@ void QnMain::run()
 
     ptzPool.reset();
 
+
+    messageProcessor.reset();
     
     //disconnecting from EC2
     QnAppServerConnectionFactory::setEc2Connection( ec2::AbstractECConnectionPtr() );

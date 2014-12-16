@@ -6,6 +6,9 @@
 #include <QtCore/QElapsedTimer>
 #include <QTime>
 
+#include <common/common_module.h>
+#include <utils/common/enable_multi_thread_direct_connection.h>
+
 #include <nx_ec/ec_api.h>
 #include "nx_ec/data/api_lock_data.h"
 #include <nx_ec/data/api_peer_data.h>
@@ -13,11 +16,11 @@
 #include "utils/network/http/asynchttpclient.h"
 #include "transaction_transport.h"
 #include <transaction/transaction_log.h>
-#include "common/common_module.h"
 #include "runtime_transaction_log.h"
 
 #include <transaction/binary_transaction_serializer.h>
 #include <transaction/json_transaction_serializer.h>
+
 
 class QTimer;
 
@@ -25,7 +28,10 @@ namespace ec2
 {
     class ECConnectionNotificationManager;
 
-    class QnTransactionMessageBus: public QObject
+    class QnTransactionMessageBus
+    :
+        public QObject,
+        public EnableMultiThreadDirectConnection
     {
         Q_OBJECT
     public:
@@ -202,6 +208,7 @@ namespace ec2
         bool checkSequence(const QnTransactionTransportHeader& transportHeader, const QnAbstractTransaction& tran, QnTransactionTransport* transport);
         void at_peerIdDiscovered(const QUrl& url, const QnUuid& id);
         void at_runtimeDataUpdated(const QnTransaction<ApiRuntimeData>& data);
+        void emitRemotePeerUnauthorized(const QnUuid& id);
     private:
         /** Info about us. */
         const ApiPeerData m_localPeer;

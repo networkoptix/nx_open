@@ -43,6 +43,7 @@ namespace ec2
         BaseEc2Connection(
             QueryProcessorType* queryProcessor,
             const ResourceContext& resCtx );
+        virtual ~BaseEc2Connection();
 
         virtual AbstractResourceManagerPtr getResourceManager() override;
         virtual AbstractMediaServerManagerPtr getMediaServerManager() override;

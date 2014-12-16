@@ -58,6 +58,12 @@ namespace ec2
     }
 
     template<class T>
+    BaseEc2Connection<T>::~BaseEc2Connection()
+    {
+        QnTransactionMessageBus::instance()->disconnectAndJoin( this );
+    }
+
+    template<class T>
     void BaseEc2Connection<T>::startReceivingNotifications() {
         connect(QnTransactionMessageBus::instance(),    &QnTransactionMessageBus::peerFound,                this,   &BaseEc2Connection<T>::remotePeerFound,         Qt::DirectConnection);
         connect(QnTransactionMessageBus::instance(),    &QnTransactionMessageBus::peerLost,                 this,   &BaseEc2Connection<T>::remotePeerLost,          Qt::DirectConnection);
