@@ -284,6 +284,8 @@ private:
     /** Current grid rect of the widget being resized. */
     QRect m_resizedWidgetRect;
 
+    QRect m_widgetInitialGeometry;
+
 
 
     /* Dragging-related state. */
