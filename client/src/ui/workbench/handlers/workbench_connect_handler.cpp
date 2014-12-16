@@ -316,8 +316,8 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
 
     QnGlobalModuleFinder::instance()->setConnection(NULL);
     QnClientMessageProcessor::instance()->init(NULL);
-    QnAppServerConnectionFactory::setUrl(QUrl());
     QnAppServerConnectionFactory::setEc2Connection(NULL);
+    QnAppServerConnectionFactory::setUrl(QUrl());
     QnAppServerConnectionFactory::setCurrentVersion(QnSoftwareVersion());
     QnSessionManager::instance()->stop();
     QnResource::stopCommandProc();
