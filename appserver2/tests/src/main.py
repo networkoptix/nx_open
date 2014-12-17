@@ -97,7 +97,7 @@ class ClusterTest():
     clusterTestServerList = []
     clusterTestSleepTime = None
     clusterTestServerUUIDList = []
-    threadNumber = 32
+    threadNumber = 16
     testCaseSize = 2
     unittestRollback = None
 
@@ -334,6 +334,46 @@ _uniqueSessionNumber = None
 _uniqueCameraSeedNumber =0
 _uniqueUserSeedNumber =0
 _uniqueMediaServerSeedNumber =0
+
+
+
+# Thread queue for multi-task.  This is useful since if the user
+# want too many data to be sent to the server, then there maybe
+# thousands of threads to be created, which is not something we
+# want it.  This is not a real-time queue, but a push-sync-join
+class ClusterWorker():
+    _queue = None
+    _threadList = None
+    _threadNum = 1
+
+    def __init__(self,num,element_size):
+        self._queue = Queue.Queue(element_size)
+        self._threadList = []
+        self._threadNum = num
+        if element_size < num:
+            self._threadNum = element_size
+
+    def _worker(self):
+        while not self._queue.empty():
+            t,a = self._queue.get(True)
+            t(*a)
+
+    def _initializeThreadWorker(self):
+        for _ in xrange(self._threadNum):
+            t = threading.Thread(target=self._worker)
+            t.start()
+            self._threadList.append(t)
+
+    def join(self):
+        # We delay the real operation until we call join
+        self._initializeThreadWorker()
+        # Now we safely join the thread since the queue
+        # will utimatly be empty after execution
+        for t in self._threadList:
+            t.join()
+
+    def enqueue(self,task,args):
+        self._queue.put((task,args),True)
 
 class BasicGenerator():
     def __init__(self):
@@ -599,45 +639,69 @@ class ConflictionDataGenerator(BasicGenerator):
     conflictCameraList=[]
     conflictUserList=[]
     conflictMediaServerList=[]
+    _lock = threading.Lock()
+    _listLock = threading.Lock()
     
     def _prepareData(self,dataList,methodName,l):
+        worker = ClusterWorker(8,len(clusterTest.clusterTestServerList)*len(dataList))
+
         for d in dataList:
             for s in clusterTest.clusterTestServerList:
 
-                print "Connection to http://%s/ec2/%s"%(s,methodName)
-                req = urllib2.Request("http://%s/ec2/%s" % (s,methodName),
-                      data=d[0], headers={'Content-Type': 'application/json'})
-                response = urllib2.urlopen(req)
+                def task(lock,list,list_lock,post_data,server):
 
-                if response.getcode() != 200:
-                    # failed 
-                    return False
-                else:
-                    clusterTest.unittestRollback.addOperations(methodName,s,d[1])
-                    l.append(d[0])
-                response.close()
+                    req = urllib2.Request("http://%s/ec2/%s" % (server,methodName),
+                      data=post_data[0], headers={'Content-Type': 'application/json'})
 
+                    response = None
+
+                    with lock:
+                        response = urllib2.urlopen(req)
+
+                    if response.getcode() != 200:
+                        response.close()
+                        print "Failed to connect to http://%s/ec2/%s"%(server,methodName)
+                    else:
+                        clusterTest.unittestRollback.addOperations(methodName,server,post_data[1])
+                        with list_lock:
+                            list.append(post_data[0])
+                    response.close() 
+
+                worker.enqueue(task,(self._lock,l,self._listLock,d,s,))
+
+        worker.join()
         return True
 
     def _prepareCameraData(self,op,num,methodName,l):
+        worker = ClusterWorker(8,len(clusterTest.clusterTestServerList)*num)
+
         for _ in xrange(num):
             for s in clusterTest.clusterTestServerList:
                 d = op(1,s)[0]
 
-                print "Connection to http://%s/ec2/%s"%(s,methodName)
-                req = urllib2.Request("http://%s/ec2/%s" % (s,methodName),
-                      data=d[0], headers={'Content-Type': 'application/json'})
-                response = urllib2.urlopen(req)
+                def task(lock,list,list_lock,post_data,server):
+                    req = urllib2.Request("http://%s/ec2/%s" % (server,methodName),
+                          data=post_data[0], headers={'Content-Type': 'application/json'})
 
-                if response.getcode() != 200:
-                    # failed 
-                    return False
-                else:
-                    clusterTest.unittestRollback.addOperations(methodName,s,d[1])
-                    l.append(d[0])
+                    response = None
 
-                response.close()
+                    with lock:
+                        response = urllib2.urlopen(req)
 
+                    if response.getcode() != 200:
+                        # failed 
+                        response.close()
+                        print "Failed to connect to http://%s/ec2/%s"%(server,methodName)
+                    else:
+                        clusterTest.unittestRollback.addOperations(methodName,server,post_data[1])
+                        with list_lock:
+                            list.append(d[0])
+
+                    response.close()
+
+                worker.enqueue(task,(self._lock,l,self._listLock,d,s,))
+
+        worker.join()
         return True
 
     def prepare(self,num):
@@ -957,27 +1021,40 @@ class CameraUserAttributesListDataGenerator(BasicGenerator):
 
     _existedCameraUUIDList = []
 
+    _lock = threading.Lock()
+    _listLock = threading.Lock()
+
     def __init__(self,prepareNum):
         if self._fetchExistedCameraUUIDList(prepareNum) == False:
             raise Exception("Cannot initialize camera list attribute test data")
 
     def _prepareData(self,op,num,methodName,l):
+        worker = ClusterWorker(8,num*len(clusterTest.clusterTestServerList))
+
         for _ in xrange(num):
             for s in clusterTest.clusterTestServerList:
-                d = op(1,s)[0]
-                req = urllib2.Request("http://%s/ec2/%s" % (s,methodName),
-                        data=d[0], headers={'Content-Type': 'application/json'})
-                response = urllib2.urlopen(req)
 
-                if response.getcode() != 200:
-                    # failed 
-                    return False
-                else:
-                    clusterTest.unittestRollback.addOperations(methodName,s,d[1])
-                    l.append(d[0])
+                def task(lock,list,listLock,server,mname,oper):
 
-                response.close()
+                    with lock:
+                        d = oper(1,s)[0]
+                        req = urllib2.Request("http://%s/ec2/%s" % (server,mname),
+                                data=d[0], headers={'Content-Type': 'application/json'})
+                        response = urllib2.urlopen(req)
 
+                    if response.getcode() != 200:
+                        print "Failed to connect http://%s/ec2/%s"%(server,mname)
+                        return
+                    else:
+                        clusterTest.unittestRollback.addOperations(mname,server,d[1])
+                        with listLock:
+                            list.append(d[0])
+
+                    response.close()
+
+                worker.enqueue(task,(self._lock,l,self._listLock,s,methodName,op,))
+
+        worker.join()
         return True
 
     def _fetchExistedCameraUUIDList(self,num):
@@ -1041,22 +1118,35 @@ class ServerUserAttributesListDataGenerator(BasicGenerator):
 
     _existedFakeServerList=[]
 
+    _lock = threading.Lock()
+    _listLock = threading.Lock()
+
     def _prepareData(self,dataList,methodName,l):
+        worker = ClusterWorker(8,len(dataList)*len(clusterTest.clusterTestServerList))
+
         for d in dataList:
             for s in clusterTest.clusterTestServerList:
-                req = urllib2.Request("http://%s/ec2/%s" % (s,methodName),
-                        data=d[0], headers={'Content-Type': 'application/json'})
-                response = urllib2.urlopen(req)
+                
+                def task(lock,list,listLock,post_data,mname,server):
+                    req = urllib2.Request("http://%s/ec2/%s" % (server,mname),
+                        data=post_data[0], headers={'Content-Type': 'application/json'})
 
-                if response.getcode() != 200:
-                    # failed 
-                    return False
-                else:
-                    clusterTest.unittestRollback.addOperations(methodName,s,d[1])
-                    l.append(d[0])
+                    with lock:
+                        response = urllib2.urlopen(req)
 
-                response.close()
+                    if response.getcode() != 200:
+                        print "Failed to connect http://%s/ec2/%s"%(server,mname)
+                        return
+                    else:
+                        clusterTest.unittestRollback.addOperations(methodName,server,post_data[1])
+                        with listLock:
+                            list.append(d[0])
 
+                    response.close()
+
+                worker.enqueue(task,(self._lock,l,self._listLock,d,methodName,s,))        
+                               
+        worker.join()
         return True
 
 
@@ -1090,45 +1180,6 @@ class ServerUserAttributesListDataGenerator(BasicGenerator):
                     uuid,name))
         return ret
 
-
-
-# Thread queue for multi-task.  This is useful since if the user
-# want too many data to be sent to the server, then there maybe
-# thousands of threads to be created, which is not something we
-# want it.  This is not a real-time queue, but a push-sync-join
-class ClusterWorker():
-    _queue = None
-    _threadList = None
-    _threadNum = 1
-
-    def __init__(self,num,element_size):
-        self._queue = Queue.Queue(element_size)
-        self._threadList = []
-        self._threadNum = num
-        if element_size < num:
-            self._threadNum = element_size
-
-    def _worker(self):
-        while not self._queue.empty():
-            t,a = self._queue.get(True)
-            t(*a)
-
-    def _initializeThreadWorker(self):
-        for _ in xrange(self._threadNum):
-            t = threading.Thread(target=self._worker)
-            t.start()
-            self._threadList.append(t)
-
-    def join(self):
-        # We delay the real operation until we call join
-        self._initializeThreadWorker()
-        # Now we safely join the thread since the queue
-        # will utimatly be empty after execution
-        for t in self._threadList:
-            t.join()
-
-    def enqueue(self,task,args):
-        self._queue.put((task,args),True)
 
 
 class ClusterTestBase(unittest.TestCase):
@@ -1169,9 +1220,10 @@ class ClusterTestBase(unittest.TestCase):
         req = urllib2.Request("http://%s/ec2/%s" % (server,methodName), \
             data=d, headers={'Content-Type': 'application/json'})
         response = None
+        
+        print "Connection to http://%s/ec2/%s"%(server,methodName)
 
         with self._Lock:
-            print "Connection to http://%s/ec2/%s"%(server,methodName)
             response = urllib2.urlopen(req)
 
         # Do a sligtly graceful way to dump the sample of failure
