@@ -4297,7 +4297,7 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="68"/>
         <source>Login or password you have entered are incorrect, please try again.</source>
-        <translation>The username or password you have entered is incorrect - try again.</translation>
+        <translation type="unfinished">The username or password you have entered is incorrect. Please try again.</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="70"/>
@@ -4325,7 +4325,7 @@ If this error persists, please contact your system administrator.</translation>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="210"/>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="235"/>
         <source>Could not connect to Server</source>
-        <translation>Unable to connect to the server.</translation>
+        <translation>Unable to connect to the server</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="101"/>
@@ -9027,7 +9027,7 @@ Another user is already controlling this screen.</translation>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="516"/>
         <source>Video Wall will be started now. Do you want to close this %1 Client instance?</source>
-        <translation>Video wall is about to start. Would you like to close this %1 Client instance?</translation>
+        <translation>Video wall is about to start. Would you like to close this client instance?</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="901"/>
@@ -9373,7 +9373,7 @@ You&apos;ll have to start it again manually.</translation>
     <message>
         <location filename="../src/ui/dialogs/resource_list_dialog.ui" line="59"/>
         <source>Never suggest saving layouts</source>
-        <translation></translation>
+        <translation>never suggest saving layouts</translation>
     </message>
 </context>
 <context>
@@ -9643,7 +9643,7 @@ You&apos;ll have to start it again manually.</translation>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="330"/>
         <source>This is a fish-eye lens camera</source>
-        <translation>This camera has a fisheye lens.</translation>
+        <translation>This camera has a fisheye lens</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="351"/>
