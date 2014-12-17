@@ -18,7 +18,10 @@ void fixReadingPosition(Byte * buf, unsigned bufSize)
     }
 }
 
-void * RC_Shell_RecvThread(void * data)
+
+static const unsigned RC_SLEEP_TIME_MS = 20000;
+
+void * RC_RecvThread(void * data)
 {
     const unsigned BUFFER_SIZE = 188;
 
@@ -49,7 +52,7 @@ void * RC_Shell_RecvThread(void * data)
             cmdNext.clear();
             useNext = false;
 
-            usleep(50000);
+            usleep(RC_SLEEP_TIME_MS);
             continue;
         }
 
@@ -68,30 +71,10 @@ void * RC_Shell_RecvThread(void * data)
         {
             debugInfo.totalPKTCount++;
 
-            unsigned short cmdID = cmdCurrent.commandID();
-            unsigned short rxID = cmdCurrent.rxID();
-            unsigned short txID = cmdCurrent.txID();
-#if 1 // DEBUG
-            printf("RC cmd: %x; TxID: %d; RxID: %d\n", cmdID, txID, rxID);
-#endif
-            DeviceInfoPtr dev = pShell->addDevice(rxID, txID, (CMD_GetTxDeviceAddressIDOutput == cmdID));
-            if (dev)
-            {
-                unsigned short seqNo = cmdCurrent.sequenceNum();
-                if (seqNo != dev->sequenceRecv() + 1)
-                    debugInfo.sequenceErrorCount++;
-                dev->setSequenceRecv(seqNo);
+            RCShell::CommandPtr cmd = std::make_shared<Command>();
+            cmd->swap(cmdCurrent);
 
-                unsigned error = dev->cmd().add(cmdCurrent); // rebuild fragments of command
-                if (error == ModulatorError_NO_ERROR)
-                {
-                    if (dev->cmd().isOK())
-                    {
-                        dev->parseCommand();                                    // save data: cmd -> deviceInfo
-                        pShell->processCommand(dev, dev->cmd().commandID());    // process data from deviceInfo using command ID
-                    }
-                }
-            }
+            pShell->push_back(cmd); // <
 
             cmdCurrent.clear();
         }
@@ -114,6 +97,50 @@ void * RC_Shell_RecvThread(void * data)
 
     return 0;
 }
+
+void * RC_ParseThread(void * data)
+{
+    RCShell * pShell = (RCShell*)data;
+
+    while (pShell->isRun())
+    {
+        RCShell::CommandPtr cmd = pShell->pop_front(); // <
+
+        if (! cmd)
+        {
+            usleep(RC_SLEEP_TIME_MS);
+            continue;
+        }
+
+        unsigned short cmdID = cmd->commandID();
+        unsigned short rxID = cmd->rxID();
+        unsigned short txID = cmd->txID();
+#if 1 // DEBUG
+        printf("RC cmd: %x; TxID: %d; RxID: %d\n", cmdID, txID, rxID);
+#endif
+        DeviceInfoPtr dev = pShell->addDevice(rxID, txID, (CMD_GetTxDeviceAddressIDOutput == cmdID));
+        if (dev)
+        {
+            unsigned short seqNo = cmd->sequenceNum();
+            if (seqNo != dev->sequenceRecv() + 1)
+                pShell->debugInfo().sequenceErrorCount++;
+            dev->setSequenceRecv(seqNo);
+
+            unsigned error = dev->cmd().add(*cmd); // rebuild fragments of command
+            if (error == ModulatorError_NO_ERROR)
+            {
+                if (dev->cmd().isOK())
+                {
+                    dev->parseCommand();                                    // save data: cmd -> deviceInfo
+                    pShell->processCommand(dev, dev->cmd().commandID());    // process data from deviceInfo using command ID
+                }
+            }
+        }
+    }
+
+    return 0;
+}
+
 
 // DeviceInfo
 
@@ -310,7 +337,8 @@ void RCShell::startRcvThread()
     debugInfo_.reset();
 
     bIsRun_ = true;
-    pthread_create(&rcvThread_, NULL, RC_Shell_RecvThread, (void*) this);
+    pthread_create(&rcvThread_, NULL, RC_RecvThread, (void*) this);
+    pthread_create(&parseThread_, NULL, RC_ParseThread, (void*) this);
 }
 
 void RCShell::stopRcvThread()
@@ -319,7 +347,29 @@ void RCShell::stopRcvThread()
     {
         bIsRun_ = false;
         pthread_join(rcvThread_, NULL);
+        pthread_join(parseThread_, NULL);
     }
+}
+
+void RCShell::push_back(CommandPtr cmd)
+{
+    std::lock_guard<std::mutex> lock(mutexUART_); // LOCK
+
+    cmds_.push_back(cmd);
+}
+
+RCShell::CommandPtr RCShell::pop_front()
+{
+    std::lock_guard<std::mutex> lock(mutexUART_); // LOCK
+
+    CommandPtr cmd;
+    if (cmds_.size())
+    {
+        cmd = cmds_.front();
+        cmds_.pop_front();
+    }
+
+    return cmd;
 }
 
 void RCShell::processCommand(DeviceInfoPtr dev, unsigned short commandID)

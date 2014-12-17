@@ -46,11 +46,9 @@ namespace ite
         static nxpt::CommonRefManager * refManager() { return &(Instance->m_refManager); }
         static DiscoveryManager * instance() { return Instance; }
 
-        static void makeInfo(nxcip::CameraInfo& cameraInfo, unsigned short txID, unsigned short rxID, unsigned frequency);
-        static void updateInfo(nxcip::CameraInfo& cameraInfo, unsigned short txID, unsigned short rxID, unsigned frequency);
-        static void parseInfo(const nxcip::CameraInfo& cameraInfo, unsigned short& txID, unsigned short& rxID, unsigned& frequency);
-
-        bool setChannel(unsigned short txID, unsigned chan);
+        static void makeInfo(nxcip::CameraInfo& cameraInfo, unsigned short txID, unsigned frequency, const std::vector<unsigned short>& rxIDs);
+        static void updateInfoAux(nxcip::CameraInfo& cameraInfo, unsigned short txID, unsigned frequency, const std::vector<unsigned short>& rxIDs);
+        static void parseInfo(const nxcip::CameraInfo& cameraInfo, unsigned short& txID, unsigned& frequency, std::vector<unsigned short>& outRxIDs);
 
         // public for RC update devs thread
         void updateRxDevices();
@@ -86,7 +84,6 @@ namespace ite
         ComPort comPort_;
 
         void addTxLinks(const std::vector<IDsLink>&);
-        void getRx4Camera(CameraManager * cam);
         void getRx4Tx(unsigned short txID, std::vector<RxDevicePtr>& out);
 
         static void getRxDevNames(std::vector<std::string>& names);

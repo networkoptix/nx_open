@@ -181,9 +181,9 @@ namespace ite
     {
         memcpy( &m_info, &info, sizeof(nxcip::CameraInfo) );
 
-        unsigned short rxID;
         unsigned frequency;
-        DiscoveryManager::parseInfo(info, m_txID, rxID, frequency);
+        std::vector<unsigned short> rxIDs;
+        DiscoveryManager::parseInfo(info, m_txID, frequency, rxIDs);
     }
 
     CameraManager::~CameraManager()
@@ -505,17 +505,17 @@ namespace ite
             //std::lock_guard<std::mutex> lock( m_rxDevice->mutex() ); // LOCK device
 
             RxDevicePtr dev = m_rxDevice;
-            unsigned freq = m_rxDevice->frequency();
+            unsigned curFreq = m_rxDevice->frequency();
 
             /// @warning locks m_reloadMutex inside (possible deadlock if we lock device)
             if (! stopStreams(true))
                 return false;
 
-            if (freq && dev->tryLockF(freq))
+            if (curFreq && dev->tryLockF(curFreq))
                 return dev->setChannel(m_txID, chan);
         }
 
-        return DiscoveryManager::instance()->setChannel(m_txID, chan);
+        return false;
     }
 
     //
@@ -759,6 +759,22 @@ namespace ite
         return true;
     }
 
+    void CameraManager::updateCameraInfo(unsigned frequency)
+    {
+        std::vector<unsigned short> rxIDs;
+        rxIDs.reserve(m_supportedRxDevices.size());
+        for (size_t i = 0; i < m_supportedRxDevices.size(); ++i)
+            rxIDs.push_back(m_supportedRxDevices[i]->rxID());
+
+        DiscoveryManager::updateInfoAux(m_info, m_txID, frequency, rxIDs);
+    }
+
+    void CameraManager::addRxDevices(const std::vector<RxDevicePtr>& devs)
+    {
+        for (auto it = devs.begin(); it != devs.end(); ++it)
+            addRxDevice(*it);
+    }
+
     void CameraManager::addRxDevice(RxDevicePtr dev)
     {
         bool found = false;
@@ -815,7 +831,6 @@ namespace ite
         if (dev.get() && dev->lockCamera(m_txID))
         {
             m_rxDevice = dev;
-            DiscoveryManager::updateInfo(m_info, m_txID, m_rxDevice->rxID(), m_rxDevice->frequency());
             return true;
         }
 

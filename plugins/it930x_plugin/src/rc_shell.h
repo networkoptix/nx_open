@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <mutex>
 #include <vector>
+#include <deque>
 #include <map>
 #include <memory>
 
@@ -381,6 +382,8 @@ namespace ite
     class RCShell
     {
     public:
+        typedef std::shared_ptr<Command> CommandPtr;
+
         RCShell();
         ~RCShell();
 
@@ -406,12 +409,18 @@ namespace ite
 
         void processCommand(DeviceInfoPtr dev, unsigned short cmdID);
 
+        void push_back(CommandPtr cmd);
+        CommandPtr pop_front();
+
     private:
         mutable std::mutex mutex_;
+        mutable std::mutex mutexUART_;
+        std::deque<CommandPtr> cmds_;
         std::vector<DeviceInfoPtr> devs_;
         std::vector<unsigned> frequencies_;                     // RxID as index
         std::map<unsigned short, unsigned short> lastRx4Tx_;    // {TxID, RxID}
         pthread_t rcvThread_;
+        pthread_t parseThread_;
         bool bIsRun_;
 
         DebugInfo debugInfo_;

@@ -62,6 +62,9 @@ namespace ite
 
     private:
         std::vector<Byte> buffer_;
+
+        Command(const Command& );
+        Command& operator = (const Command&);
     };
 
     ///

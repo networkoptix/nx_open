@@ -68,12 +68,17 @@ namespace ite
                             nxcip::CameraInfo info;
                             restored[i]->getCameraInfo(&info);
 
-                            IDsLink link;
-                            m_discovery->parseInfo(info, link.txID, link.rxID, link.frequency);
+                            unsigned short txID;
+                            unsigned frequency;
+                            std::vector<unsigned short> rxIDs;
+                            m_discovery->parseInfo(info, txID, frequency, rxIDs);
 
-                            RxDevicePtr dev = m_discovery->rxDev(link.rxID);
-                            if (dev && link.frequency)
-                                m_discovery->updateOneTxLink(dev, link.frequency);
+                            for (size_t i = 0; i < rxIDs.size(); ++i)
+                            {
+                                RxDevicePtr dev = m_discovery->rxDev(rxIDs[i]);
+                                if (dev && frequency)
+                                    m_discovery->updateOneTxLink(dev, frequency);
+                            }
                         }
                     }
 #if 1
@@ -197,23 +202,25 @@ namespace ite
                 continue;
 
             nxcip::CameraInfo& info = cameras[cameraNum];
-            makeInfo(info, txID, it->second.rxID, it->second.frequency);
-
             CameraManager * cam = nullptr;
 
             {
                 std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
-                auto it = m_cameras.find(txID);
-                if (it == m_cameras.end())
+                auto itCam = m_cameras.find(txID);
+                if (itCam == m_cameras.end())
                 {
+                    std::vector<unsigned short> rxIDs;
+                    rxIDs.push_back(it->second.rxID);
+                    makeInfo(info, txID, it->second.frequency, rxIDs);
+
                     auto sp = std::make_shared<CameraManager>( info ); // create CameraManager
                     m_cameras[txID] = sp;
                     cam = sp.get();
                     cam->addRef();
                 }
                 else
-                    cam = it->second.get();
+                    cam = itCam->second.get();
             }
 
             if (cam)
@@ -224,9 +231,13 @@ namespace ite
                 if (cam->stopIfNeeds())
                     continue; // HACK: hide camera once
 
-                getRx4Camera(cam);
+                std::vector<RxDevicePtr> rxs;
+                getRx4Tx(cam->txID(), rxs);
+                cam->addRxDevices(rxs);
 
-                cam->getCameraInfo( &info );
+                unsigned freq = rcShell_.lastTxFrequency(cam->txID());
+                cam->updateCameraInfo(freq);
+                cam->getCameraInfo(&info);
                 ++cameraNum;
             }
         }
@@ -265,15 +276,6 @@ namespace ite
         if (cam)
             cam->addRef();
         return cam;
-    }
-
-    void DiscoveryManager::getRx4Camera(CameraManager * cam)
-    {
-        std::vector<RxDevicePtr> rxs;
-        getRx4Tx(cam->txID(), rxs);
-
-        for (auto it = rxs.begin(); it != rxs.end(); ++it)
-             cam->addRxDevice(*it);
     }
 
     void DiscoveryManager::getRx4Tx(unsigned short txID, std::vector<RxDevicePtr>& out)
@@ -404,8 +406,7 @@ namespace ite
 
     // CameraInfo stuff
 
-    // rxID = 0xffff means "no rxID set"
-    void DiscoveryManager::makeInfo(nxcip::CameraInfo& info, unsigned short txID, unsigned short rxID, unsigned frequency)
+    void DiscoveryManager::makeInfo(nxcip::CameraInfo& info, unsigned short txID, unsigned frequency, const std::vector<unsigned short>& rxIDs)
     {
         std::string strTxID = RxDevice::id2str(txID);
 
@@ -414,48 +415,34 @@ namespace ite
         strncpy( info.url, strTxID.c_str(), std::min(strTxID.size(), sizeof(nxcip::CameraInfo::url)-1) );
         strncpy( info.uid, strTxID.c_str(), std::min(strTxID.size(), sizeof(nxcip::CameraInfo::uid)-1) );
 
-        updateInfo(info, txID, rxID, frequency);
+        updateInfoAux(info, txID, frequency, rxIDs);
     }
 
-    void DiscoveryManager::updateInfo(nxcip::CameraInfo& info, unsigned short txID, unsigned short rxID, unsigned frequency)
+    void DiscoveryManager::updateInfoAux(nxcip::CameraInfo& info, unsigned short txID, unsigned frequency, const std::vector<unsigned short>& rxIDs)
     {
         std::stringstream ss;
-        ss << txID << ' ' << frequency << ' ' << rxID;
+        ss << txID << ' ' << frequency;
+
+        for (size_t i = 0; i < rxIDs.size(); ++i)
+            ss << ' ' << rxIDs[i];
 
         strncpy(info.auxiliaryData, ss.str().c_str(), std::min(ss.str().size(), sizeof(nxcip::CameraInfo::auxiliaryData)-1) );
     }
 
-    void DiscoveryManager::parseInfo(const nxcip::CameraInfo& info, unsigned short& txID, unsigned short& rxID, unsigned& frequency)
+    void DiscoveryManager::parseInfo(const nxcip::CameraInfo& info, unsigned short& txID, unsigned& frequency, std::vector<unsigned short>& outRxIDs)
     {
         if (info.auxiliaryData[0])
         {
             std::stringstream ss;
             ss << std::string(info.auxiliaryData);
-            ss >> txID >> frequency >> rxID;
-        }
-    }
+            ss >> txID >> frequency;
 
-    // Tx parameters
-
-    /// @warning could fail if Tx moved to another Rx and RxID-TxID link still exists
-    bool DiscoveryManager::setChannel(unsigned short txID, unsigned chan)
-    {
-        unsigned freq = DeviceInfo::chanFrequency(chan);
-
-        std::vector<RxDevicePtr> rxs;
-        getRx4Tx(txID, rxs);
-
-        for (auto it = rxs.begin(); it != rxs.end(); ++it)
-        {
-            RxDevicePtr dev = *it;
-
-            if (dev->tryLockF(freq))
+            while (ss.rdbuf()->in_avail())
             {
-                if (rcShell_.setChannel(dev->rxID(), txID, chan))
-                    return true;
+                unsigned short rxID;
+                ss >> rxID;
+                outRxIDs.push_back(rxID);
             }
         }
-
-        return false;
     }
 }

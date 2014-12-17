@@ -111,7 +111,9 @@ namespace ite
         unsigned short txID() const { return m_txID; }
         const nxcip::CameraInfo& info() const { return m_info; }
 
-        void addRxDevice(RxDevicePtr dev);
+        void addRxDevices(const std::vector<RxDevicePtr>& devs);
+        void addRxDevice(RxDevicePtr devs);
+        void updateCameraInfo(unsigned frequency);
 
         bool stopIfNeeds()
         {
