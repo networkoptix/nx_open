@@ -216,7 +216,7 @@ class ClusterTest():
             print "One of the string is empty!"
             return
 
-        for i in range(max(len(rhs),len(lhs))):
+        for i in xrange(max(len(rhs),len(lhs))):
             if i >= len(rhs) or i >= len(lhs) or lhs[i] != rhs[i]:
                 print "The difference is showing bellow:"
                 self._dumpDiffStr(lhs,i)
@@ -345,7 +345,7 @@ class BasicGenerator():
     # generate MAC address of the object
     def generateMac(self):
         l = []
-        for i in range(0,5):
+        for i in xrange(0,5):
             l.append(str(random.randint(0,255)) + '-')
         l.append(str(random.randint(0,255)))
         return ''.join(l)
@@ -358,7 +358,7 @@ class BasicGenerator():
 
     def generateRandomString(self,length):
         chars = string.ascii_uppercase + string.digits
-        return ''.join(random.choice(chars) for _ in range(length))
+        return ''.join(random.choice(chars) for _ in xrange(length))
 
     def generateUUIdFromMd5(self,salt):
         m = md5.new()
@@ -488,7 +488,7 @@ class CameraDataGenerator(BasicGenerator):
 
     def generateCameraData(self,number,mediaServer):
         ret = []
-        for i in range(number):
+        for i in xrange(number):
             mac = self.generateMac()
             id = self._generateCameraId(mac)
             name_and_model = self.generateCameraName()
@@ -538,7 +538,7 @@ class UserDataGenerator(BasicGenerator):
 
     def generateUserData(self,number):
         ret = []
-        for i in range(number):
+        for i in xrange(number):
             id = self.generateRandomId()
             un,pwd,digest = self.generateUsernamePasswordAndDigest(self.generateUserName)
             ret.append((self._template % (digest,
@@ -579,7 +579,7 @@ class MediaServerGenerator(BasicGenerator):
 
     def generateMediaServerData(self,number):
         ret = []
-        for i in range(number):
+        for i in xrange(number):
             id = self.generateRandomId()
             ret.append((self._template % (self.generateIpV4Endpoint(),
                    self.generateRandomId(),
@@ -620,7 +620,7 @@ class ConflictionDataGenerator(BasicGenerator):
         return True
 
     def _prepareCameraData(self,op,num,methodName,l):
-        for _ in range(num):
+        for _ in xrange(num):
             for s in clusterTest.clusterTestServerList:
                 d = op(1,s)[0]
 
@@ -718,7 +718,7 @@ class ResourceDataGenerator(BasicGenerator):
         uuid = self._getRandomResourceUUID()
         kv_list = ["["]
         num = random.randint(2,20)
-        for i in range(num - 1):
+        for i in xrange(num - 1):
             num = random.randint(2,20)
             kv_list.append(self._generateKeyValue(uuid))
             kv_list.append(",")
@@ -730,13 +730,13 @@ class ResourceDataGenerator(BasicGenerator):
     
     def generateResourceParams(self,number):
         ret = []
-        for i in range(number):
+        for i in xrange(number):
             ret.append(self._generateOneResourceParams())
         return ret
 
     def generateRemoveResource(self,number):
         ret = []
-        for i in range(number):
+        for i in xrange(number):
             ret.append(self._resourceRemoveTemplate % (self._getRandomResourceUUID()))
         return ret
 
@@ -962,7 +962,7 @@ class CameraUserAttributesListDataGenerator(BasicGenerator):
             raise Exception("Cannot initialize camera list attribute test data")
 
     def _prepareData(self,op,num,methodName,l):
-        for _ in range(num):
+        for _ in xrange(num):
             for s in clusterTest.clusterTestServerList:
                 d = op(1,s)[0]
                 req = urllib2.Request("http://%s/ec2/%s" % (s,methodName),
@@ -1016,7 +1016,7 @@ class CameraUserAttributesListDataGenerator(BasicGenerator):
     def generateCameraUserAttribute(self,number):
         ret = []
 
-        for i in range(number):
+        for i in xrange(number):
             uuid , name = self._getRandomCameraUUIDAndName()
             ret.append(self._template % (self.generateTrueFalse(),
                     uuid,name,
@@ -1083,7 +1083,7 @@ class ServerUserAttributesListDataGenerator(BasicGenerator):
 
     def generateServerUserAttributesList(self,number):
         ret = []
-        for i in range(number):
+        for i in xrange(number):
             uuid,name = self._getRandomServer()
             ret.append(self._template % (self.generateTrueFalse(),
                     random.randint(0,200),
@@ -1114,7 +1114,7 @@ class ClusterWorker():
             t(*a)
 
     def _initializeThreadWorker(self):
-        for _ in range(self._threadNum):
+        for _ in xrange(self._threadNum):
             t = threading.Thread(target=self._worker)
             t.start()
             self._threadList.append(t)
@@ -1229,7 +1229,7 @@ class CameraTest(ClusterTestBase):
     
     def _generateModifySeq(self):
         ret = []
-        for _ in range(self._testCase):
+        for _ in xrange(self._testCase):
             s = clusterTest.clusterTestServerList[random.randint(0,len(clusterTest.clusterTestServerList)-1)]
             data = self._gen.generateCameraData(1,s)[0]
             clusterTest.unittestRollback.addOperations(self._getMethodName(),s,data[1])
@@ -1424,7 +1424,7 @@ class ResourceConflictionTest(ClusterTestBase):
         print "===================================\n"
         print "Test:ResourceConfliction start!\n"
 
-        for _ in range(self._testCase):
+        for _ in xrange(self._testCase):
             conf = self._generateResourceConfliction()
             s1,s2 = self._generateRandomServerPair()
             data = conf[2].generateData()
@@ -1572,7 +1572,7 @@ class MergeTest():
     def _generateRandomSystemName(self):
         ret = []
         s = set()
-        for i in range(len(clusterTest.clusterTestServerList)):
+        for i in xrange(len(clusterTest.clusterTestServerList)):
             length = random.randint(16,30)
             while True:
                 name = self._gen.generateRandomString(length)
@@ -1872,7 +1872,7 @@ class SingleServerRtspTest():
 
     def run(self):
         worker = ClusterWorker(clusterTest.threadNumber , self._testCase)
-        for _ in range(self._testCase):
+        for _ in xrange(self._testCase):
             worker.enqueue(self._testMain,())
         worker.join()	
 
@@ -1889,7 +1889,7 @@ class ServerRtspTest:
         self._password = p.get("General","password")
         
     def test(self):
-        for i in range(len(clusterTest.clusterTestServerList)):
+        for i in xrange(len(clusterTest.clusterTestServerList)):
             serverAddr = clusterTest.clusterTestServerList[i]
             serverAddrGUID = clusterTest.clusterTestServerUUIDList[i][0]
             SingleServerRtspTest(serverAddr,serverAddrGUID,self._testCase,
@@ -2095,7 +2095,7 @@ class PerfTest:
 
         cameraGen = CameraDataGenerator()
         for s in clusterTest.clusterTestServerList:
-           for _ in range(num):
+           for _ in xrange(num):
                c = cameraGen.generateCameraData(1,s)[0]
                cameraList.append(c)
                if not self._prepareData(c,"saveCameras",s):
@@ -2190,14 +2190,14 @@ class PerfTest:
         expectedQueueSize = self._frequency * 10;
         self._queue = Queue.Queue(expectedQueueSize)
 
-        for _ in range(num):
+        for _ in xrange(num):
             th = threading.Thread(target=self._threadMain)
             th.start()
             self._threadPool.append(th)
 
     def _pollOnce(self):
         start = time.time()
-        for _ in range(self._frequency):
+        for _ in xrange(self._frequency):
             try:
                 self._queue.put((),True,1)
             except:
@@ -2355,6 +2355,7 @@ class SystemNameTest:
             response.close()
             return False
         else:
+            response.close()
             return True
 
     def _ensureServerSystemName(self):
