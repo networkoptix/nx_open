@@ -182,6 +182,20 @@ class ClusterTest():
         response.close()
         return (True,"")
 
+    def _safePrint(self,str,i):
+        if len(str) == 0:
+            print "<empty string>"
+        else:
+            start = max(0,i-64)
+            end = min(64,len(str)-i)
+            comp1 = str[start:i]
+            comp2 = str[i]
+            if i+1 >= len(str):
+                comp3 = ""
+            else:
+                comp3 = str[i+1:end]
+            print "%s^^^%s^^^%s"%(comp1,comp2,comp3)
+
     def _seeDiff(self,lhs,rhs):
         if len(rhs) == 0 or len(lhs) == 0:
             print "The difference is showing bellow:"
@@ -199,14 +213,22 @@ class ClusterTest():
 
         for i in range(max(len(rhs),len(lhs))):
             if i >= len(rhs) or i >= len(lhs) or lhs[i] != rhs[i]:
-                # print the difference from current position
-                start = max(0,i-64)
-                end = min(64,min(len(rhs)-i,len(lhs)-i))+i
                 print "The difference is showing bellow:"
-                print "\n\n%s^^^%s^^^%s"%(lhs[start:max(0,i)],lhs[i],lhs[i+1:end])
-                print "\n%s^^^%s^^^%s\n\n"%(rhs[start:max(0,i)],rhs[i],rhs[i+1:end])
+                self._safePrint(lhs,i)
+                self._safePrint(rhs,i)
                 print "The first different character is at location:%d"%(i+1)
                 return
+
+
+    def _testConnection(self):
+        for s in self.clusterTestServerList:
+            print "Try to connect to server:%s"%(s)
+            response = urllib2.urlopen("http://%s/ec2/testConnection"%(s))
+            if response.getcode() != 200:
+                return False
+            print "Connection test OK"
+
+        return True
 
     def _checkResultEqual(self,responseList,methodName):
         result = None
@@ -224,8 +246,9 @@ class ClusterTest():
                 else:
                     output = response.read()
                     if result != output:
+                        print "Server:%s returned value differs from server:%s on method:%s."% (address,resultAddr,methodName)
                         self._seeDiff(result,output)
-                        return(False,"Server:%s returned value differs from server:%s on method:%s."% (address,resultAddr,methodName))
+                        return(False,"")
                 
                 response.close()
 
@@ -272,6 +295,9 @@ class ClusterTest():
         urllib2.install_opener(urllib2.build_opener(urllib2.HTTPDigestAuthHandler(passman)))
 
     def init(self):
+        if not self._testConnection():
+            return (False,"Cannot pass the connection test")
+
         # ensure all the server are on the same page
         ret,reason = self._ensureServerListStates(self.clusterTestSleepTime)
 
