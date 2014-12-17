@@ -163,6 +163,7 @@ class ClusterTest():
                 return (False,"testConnection response with error code:%d" % (response.getcode()))
             json_obj = json.loads(response.read())
             server_id_list.append(self._patchUUID(json_obj["ecsGuid"]))
+            response.close()
 
         # We still need to get the server name since this is useful for
         # the SaveServerAttributeList test (required in its post data)
@@ -614,6 +615,7 @@ class ConflictionDataGenerator(BasicGenerator):
                 else:
                     clusterTest.unittestRollback.addOperations(methodName,s,d[1])
                     l.append(d[0])
+                response.close()
 
         return True
 
@@ -633,6 +635,8 @@ class ConflictionDataGenerator(BasicGenerator):
                 else:
                     clusterTest.unittestRollback.addOperations(methodName,s,d[1])
                     l.append(d[0])
+
+                response.close()
 
         return True
 
@@ -972,6 +976,8 @@ class CameraUserAttributesListDataGenerator(BasicGenerator):
                     clusterTest.unittestRollback.addOperations(methodName,s,d[1])
                     l.append(d[0])
 
+                response.close()
+
         return True
 
     def _fetchExistedCameraUUIDList(self,num):
@@ -1048,6 +1054,8 @@ class ServerUserAttributesListDataGenerator(BasicGenerator):
                 else:
                     clusterTest.unittestRollback.addOperations(methodName,s,d[1])
                     l.append(d[0])
+
+                response.close()
 
         return True
 
@@ -2067,6 +2075,9 @@ class PerfTest:
         else:
             if id != None:
                 clusterTest.unittestRollback.addOperations(methodName,addr,id)
+
+        response.close()
+
         return True
 
     def _prepareData(self,d,methodName,addr):
