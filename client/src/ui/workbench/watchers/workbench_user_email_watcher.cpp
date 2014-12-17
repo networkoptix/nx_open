@@ -25,10 +25,16 @@ QnWorkbenchUserEmailWatcher::~QnWorkbenchUserEmailWatcher() {
 }
 
 void QnWorkbenchUserEmailWatcher::forceCheck(const QnUserResourcePtr &user) {
+    if (!context()->user())
+        return;
+
     emit userEmailValidityChanged(user, m_emailValidByUser.value(user, QnEmailAddress::isValid(user->getEmail())));
 }
 
 void QnWorkbenchUserEmailWatcher::forceCheckAll() {
+    if (!context()->user())
+        return;
+
     QHash<QnUserResourcePtr, bool>::const_iterator iter = m_emailValidByUser.constBegin();
     while (iter != m_emailValidByUser.constEnd()) {
         emit userEmailValidityChanged(iter.key(), iter.value());
@@ -42,7 +48,6 @@ void QnWorkbenchUserEmailWatcher::at_resourcePool_resourceAdded(const QnResource
         return;
 
     connect(user, &QnUserResource::emailChanged, this, &QnWorkbenchUserEmailWatcher::at_user_emailChanged);
-
     at_user_emailChanged(user);
 }
 
@@ -69,5 +74,8 @@ void QnWorkbenchUserEmailWatcher::at_user_emailChanged(const QnResourcePtr &reso
         return;
 
     m_emailValidByUser[user] = valid;
+
+    if (!context()->user())
+        return;
     emit userEmailValidityChanged(user, valid);
 }
