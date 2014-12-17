@@ -10,9 +10,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 
-#include <mutex/distributed_mutex_manager.h>
-#include <mutex/distributed_mutex.h>
-
 #include <update/task/check_update_peer_task.h>
 #include <update/task/download_updates_peer_task.h>
 #include <update/task/rest_update_peer_task.h>
@@ -58,7 +55,6 @@ QnUpdateProcess::QnUpdateProcess(const QnUpdateTarget &target):
     base_type(),
     m_target(target),
     m_stage(QnFullUpdateStage::Init),
-    m_distributedMutex(NULL),
     m_clientRequiresInstaller(true),
     m_updateResult(QnUpdateResult::Cancelled)
 {
@@ -92,7 +88,7 @@ void QnUpdateProcess::run() {
         setAllPeersStage(QnPeerUpdateStage::Init);
     }
 
-    unlockMutex();
+    QnRuntimeInfoManager::instance()->disconnect(this);
     clearUpdateFlag();
 
     QnUpdateResult result(m_updateResult);
@@ -327,6 +323,14 @@ void QnUpdateProcess::at_clientUpdateInstalled() {
     installIncompatiblePeers();
 }
 
+void QnUpdateProcess::at_runtimeInfoChanged(const QnPeerRuntimeInfo &data) {
+    if (data.uuid == qnCommon->moduleGUID())
+        return;
+
+    if (data.data.updateStarted)
+        finishUpdate(QnUpdateResult::UploadingFailed);
+}
+
 void QnUpdateProcess::installIncompatiblePeers() {
     QHash<QnSystemInformation, QString> targetFiles;
     for (auto it = m_updateFiles.begin(); it != m_updateFiles.end(); ++it)
@@ -371,6 +375,8 @@ void QnUpdateProcess::at_restUpdateTask_finished(int errorCode) {
 }
 
 void QnUpdateProcess::prepareToUpload() {
+    setStage(QnFullUpdateStage::Push);
+
     foreach (const QnUuid &target, m_targetPeerIds) {
         QnMediaServerResourcePtr server = qnResPool->getResourceById(target).dynamicCast<QnMediaServerResource>();
         if (!server || server->getStatus() != Qn::Online)
@@ -382,24 +388,27 @@ void QnUpdateProcess::prepareToUpload() {
         return;
     }
 
-    lockMutex();
-}
+    connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoAdded,    this,   &QnUpdateProcess::at_runtimeInfoChanged);
+    connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoChanged,  this,   &QnUpdateProcess::at_runtimeInfoChanged);
 
-void QnUpdateProcess::lockMutex() {
-    setStage(QnFullUpdateStage::Push);
-
-    m_distributedMutex = ec2::QnDistributedMutexManager::instance()->createMutex(mutexName);
-    connect(m_distributedMutex, &ec2::QnDistributedMutex::locked,        this,   &QnUpdateProcess::at_mutexLocked, Qt::QueuedConnection);
-    connect(m_distributedMutex, &ec2::QnDistributedMutex::lockTimeout,   this,   &QnUpdateProcess::at_mutexTimeout, Qt::QueuedConnection);
-    m_distributedMutex->lockAsync();
-}
-
-void QnUpdateProcess::unlockMutex() {
-    if (m_distributedMutex) {
-        m_distributedMutex->unlock();
-        m_distributedMutex->deleteLater();
-        m_distributedMutex = 0;
+    if (!setUpdateFlag()) {
+        finishUpdate(QnUpdateResult::LockFailed);
+        return;
     }
+
+    uploadUpdatesToServers();
+}
+
+bool QnUpdateProcess::setUpdateFlag() {
+    QnRuntimeInfoManager *runtimeInfoManager = QnRuntimeInfoManager::instance();
+    foreach (const QnPeerRuntimeInfo &runtimeInfo, runtimeInfoManager->items()->getItems()) {
+        if (runtimeInfo.data.updateStarted)
+            return false;
+    }
+    QnPeerRuntimeInfo localInfo = runtimeInfoManager->localInfo();
+    localInfo.data.updateStarted = true;
+    runtimeInfoManager->updateLocalItem(localInfo);
+    return true;
 }
 
 void QnUpdateProcess::clearUpdateFlag() {
@@ -408,30 +417,6 @@ void QnUpdateProcess::clearUpdateFlag() {
         runtimeInfo.data.updateStarted = false;
         QnRuntimeInfoManager::instance()->updateLocalItem(runtimeInfo);
     }
-}
-
-void QnUpdateProcess::at_mutexLocked() {
-    QnRuntimeInfoManager *runtimeInfoManager = QnRuntimeInfoManager::instance();
-    foreach (const QnPeerRuntimeInfo &runtimeInfo, runtimeInfoManager->items()->getItems()) {
-        if (runtimeInfo.data.updateStarted) {
-            unlockMutex();
-            finishUpdate(QnUpdateResult::LockFailed);
-            return;
-        }
-    }
-    QnPeerRuntimeInfo localInfo = runtimeInfoManager->localInfo();
-    localInfo.data.updateStarted = true;
-    runtimeInfoManager->updateLocalItem(localInfo);
-    unlockMutex();
-
-    uploadUpdatesToServers();
-}
-
-void QnUpdateProcess::at_mutexTimeout(const QSet<QnUuid> &failedPeers) {
-    m_distributedMutex->deleteLater();
-    m_distributedMutex = 0;
-    m_failedPeerIds = failedPeers;
-    finishUpdate(QnUpdateResult::UploadingFailed_Timeout);
 }
 
 void QnUpdateProcess::uploadUpdatesToServers() {
