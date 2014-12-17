@@ -22,9 +22,6 @@ QnServerConnector::QnServerConnector(QnModuleFinder *moduleFinder, QObject *pare
     QObject(parent),
     m_moduleFinder(moduleFinder)
 {
-    connect(m_moduleFinder,     &QnModuleFinder::moduleUrlFound,    this,   &QnServerConnector::at_moduleFinder_moduleUrlFound);
-    connect(m_moduleFinder,     &QnModuleFinder::moduleUrlLost,     this,   &QnServerConnector::at_moduleFinder_moduleUrlLost);
-    connect(m_moduleFinder,     &QnModuleFinder::moduleChanged,     this,   &QnServerConnector::at_moduleFinder_moduleChanged);
 }
 
 void QnServerConnector::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url) {
@@ -130,9 +127,15 @@ void QnServerConnector::start() {
             addConnection(moduleInformation, url);
         }
     }
+
+    connect(m_moduleFinder,     &QnModuleFinder::moduleUrlFound,    this,   &QnServerConnector::at_moduleFinder_moduleUrlFound);
+    connect(m_moduleFinder,     &QnModuleFinder::moduleUrlLost,     this,   &QnServerConnector::at_moduleFinder_moduleUrlLost);
+    connect(m_moduleFinder,     &QnModuleFinder::moduleChanged,     this,   &QnServerConnector::at_moduleFinder_moduleChanged);
 }
 
 void QnServerConnector::stop() {
+    m_moduleFinder->disconnect(this);
+
     QHash<QUrl, UrlInfo> usedUrls;
     {
         QMutexLocker lock(&m_mutex);
