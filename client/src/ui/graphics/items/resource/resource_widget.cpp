@@ -324,11 +324,8 @@ void QnResourceWidget::setAspectRatio(float aspectRatio) {
     if(qFuzzyCompare(m_aspectRatio, aspectRatio))
         return;
 
-    QRectF enclosingGeometry = this->enclosingGeometry();
     m_aspectRatio = aspectRatio;
-
     updateGeometry(); /* Discard cached size hints. */
-    setEnclosingGeometry(enclosingGeometry);
 
     emit aspectRatioChanged();
 }

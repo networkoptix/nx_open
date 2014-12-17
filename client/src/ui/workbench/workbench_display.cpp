@@ -922,7 +922,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     if(item->hasFlag(Qn::PendingGeometryAdjustment))
         adjustGeometryLater(item, animate); /* Changing item flags here may confuse the callee, so we do it through the event loop. */
 
-    connect(widget,                     SIGNAL(aboutToBeDestroyed()),   this,   SLOT(at_widget_aboutToBeDestroyed()));
+    connect(widget,     &QnResourceWidget::aboutToBeDestroyed,      this,   &QnWorkbenchDisplay::at_widget_aboutToBeDestroyed);
+    connect(widget,     &QnResourceWidget::aspectRatioChanged,      this,   &QnWorkbenchDisplay::at_widget_aspectRatioChanged);
 
     QColor frameColor = item->data(Qn::ItemFrameDistinctionColorRole).value<QColor>();
     if(frameColor.isValid())
@@ -1870,9 +1871,14 @@ void QnWorkbenchDisplay::at_widgetActivityInstrument_activityStarted() {
         widget->setOption(QnResourceWidget::DisplayActivity, false);
 }
 
+void QnWorkbenchDisplay::at_widget_aspectRatioChanged() {
+    synchronizeGeometry(static_cast<QnResourceWidget*>(sender()), true);
+}
+
 void QnWorkbenchDisplay::at_widget_aboutToBeDestroyed() {
     QnResourceWidget *widget = checked_cast<QnResourceWidget *>(sender());
     if (widget && widget->item()) {
+        widget->QObject::disconnect(this);
         /* We can get here only when the widget is destroyed directly
          * (not by destroying or removing its corresponding item).
          * Therefore the widget's item must be destroyed. */
