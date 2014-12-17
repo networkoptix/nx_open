@@ -1559,6 +1559,7 @@ class PrepareServerStatus(BasicGenerator):
 
         with self._mergeTest._lock:
             response = urllib2.urlopen("http://%s/api/configure?%s"%(addr,urllib.urlencode(query)))
+
         if response.getcode() != 200:
             return (False,"Cannot issue changeSystemName request to server:%s"%(addr))
 
@@ -1658,8 +1659,10 @@ class MergeTest():
     def _setSystemName(self,addr,name):
 
         print "Connection to http://%s/api/configure"%(addr)
-        response = urllib2.urlopen(
-            "http://%s/api/configure?%s"%(addr,urllib.urlencode({"systemName":name})))
+
+        with self._lock:
+            response = urllib2.urlopen(
+                "http://%s/api/configure?%s"%(addr,urllib.urlencode({"systemName":name})))
 
         if response.getcode() != 200 :
             return (False,"Cannot issue changeSystemName with HTTP code:%d to server:%s" % (response.getcode()),addr)
