@@ -70,7 +70,7 @@ class UnitTestRollback:
                 print  "Or you could run recover later when all the rollback done\n"
                 recoverList.append("%s,%s,%s\n"%(l[0],l[1],l[2]))
             else:
-                print "*"
+                print "..rollback done.."
 
         # close the resource file
         self._rollbackFile.close()
@@ -130,6 +130,7 @@ class ClusterTest():
         print "Test all ec2 get request status"
         for s in clusterTest.clusterTestServerList:
             for reqName in self._ec2GetRequests:
+                print "Connection tot http://%s/ec2/%s"%(s,reqName)
                 response = urllib2.urlopen("http://%s/ec2/%s" % (s,reqName))
                 if response.getcode() != 200:
                     return (False,"%s failed with statusCode %d" % (reqName,response.getcode()))
@@ -182,7 +183,7 @@ class ClusterTest():
         response.close()
         return (True,"")
 
-    def _safePrint(self,str,i):
+    def _dumpDiffStr(self,str,i):
         if len(str) == 0:
             print "<empty string>"
         else:
@@ -190,11 +191,13 @@ class ClusterTest():
             end = min(64,len(str)-i)
             comp1 = str[start:i]
             comp2 = str[i]
+            comp3 = ""
             if i+1 >= len(str):
                 comp3 = ""
             else:
                 comp3 = str[i+1:end]
             print "%s^^^%s^^^%s"%(comp1,comp2,comp3)
+
 
     def _seeDiff(self,lhs,rhs):
         if len(rhs) == 0 or len(lhs) == 0:
@@ -214,20 +217,25 @@ class ClusterTest():
         for i in range(max(len(rhs),len(lhs))):
             if i >= len(rhs) or i >= len(lhs) or lhs[i] != rhs[i]:
                 print "The difference is showing bellow:"
-                self._safePrint(lhs,i)
-                self._safePrint(rhs,i)
+                self._dumpDiffStr(lhs,i)
+                self._dumpDiffStr(rhs,i)
                 print "The first different character is at location:%d"%(i+1)
                 return
 
 
     def _testConnection(self):
+        print "=================================================="
+        print "Test connection on each server in the server list "
         for s in self.clusterTestServerList:
             print "Try to connect to server:%s"%(s)
             response = urllib2.urlopen("http://%s/ec2/testConnection"%(s))
             if response.getcode() != 200:
                 return False
+            response.close()
             print "Connection test OK"
 
+        print "Connection Test Pass"
+        print "==================================================="
         return True
 
     def _checkResultEqual(self,responseList,methodName):
@@ -257,6 +265,7 @@ class ClusterTest():
     def checkMethodStatusConsistent(self,method):
             responseList = []
             for server in self.clusterTestServerList:
+                print "Connection tot http://%s/ec2/%s"%(server, method)
                 responseList.append((urllib2.urlopen("http://%s/ec2/%s" % (server, method)),server))
 
             # checking the last response validation
@@ -296,7 +305,7 @@ class ClusterTest():
 
     def init(self):
         if not self._testConnection():
-            return (False,"Cannot pass the connection test")
+            return (False,"Connection test failed")
 
         # ensure all the server are on the same page
         ret,reason = self._ensureServerListStates(self.clusterTestSleepTime)
@@ -592,6 +601,8 @@ class ConflictionDataGenerator(BasicGenerator):
     def _prepareData(self,dataList,methodName,l):
         for d in dataList:
             for s in clusterTest.clusterTestServerList:
+
+                print "Connection to http://%s/ec2/%s"%(s,methodName)
                 req = urllib2.Request("http://%s/ec2/%s" % (s,methodName),
                       data=d[0], headers={'Content-Type': 'application/json'})
                 response = urllib2.urlopen(req)
@@ -609,6 +620,8 @@ class ConflictionDataGenerator(BasicGenerator):
         for _ in range(num):
             for s in clusterTest.clusterTestServerList:
                 d = op(1,s)[0]
+
+                print "Connection to http://%s/ec2/%s"%(s,methodName)
                 req = urllib2.Request("http://%s/ec2/%s" % (s,methodName),
                       data=d[0], headers={'Content-Type': 'application/json'})
                 response = urllib2.urlopen(req)
@@ -1149,6 +1162,7 @@ class ClusterTestBase(unittest.TestCase):
         response = None
 
         with self._Lock:
+            print "Connection to http://%s/ec2/%s"%(server,methodName)
             response = urllib2.urlopen(req)
 
         # Do a sligtly graceful way to dump the sample of failure
@@ -1355,7 +1369,11 @@ class ResourceConflictionTest(ClusterTestBase):
 
     def setUp(self):
         dataGen = ConflictionDataGenerator()
+
+        print "Start confliction data preparation, this will generate Cameras/Users/MediaServers"
         dataGen.prepare(clusterTest.testCaseSize)
+        print "Confilication data generation done"
+
         self._testCase = clusterTest.testCaseSize
         self._conflictList = [
             ("removeResource","saveMediaServer",MediaServerConflictionDataGenerator(dataGen)),
@@ -1464,6 +1482,7 @@ class PrepareServerStatus(BasicGenerator):
               headers={'Content-Type': 'application/json'})
         
         with self._mergeTest._lock:
+            print "Connection to http://%s/ec2/%s"%(addr,method)
             response = urllib2.urlopen(req)
 
         if response.getcode() != 200 :
@@ -1478,8 +1497,7 @@ class PrepareServerStatus(BasicGenerator):
         response = None
 
         with self._mergeTest._lock:
-            response = urllib2.urlopen("http://%s/api/configure?%s"%(addr,
-                                                                            urllib.urlencode(query)))
+            response = urllib2.urlopen("http://%s/api/configure?%s"%(addr,urllib.urlencode(query)))
         if response.getcode() != 200:
             return (False,"Cannot issue changeSystemName request to server:%s"%(addr))
 
@@ -1520,7 +1538,9 @@ class MergeTest():
 
 
     def _prolog(self):
+        print "Merge test prolog : Test whether all servers you specify has the identical system name"
         for s in clusterTest.clusterTestServerList:
+            print "Connection to http://%s/ec2/testConnection"%(s)
             response = urllib2.urlopen("http://%s/ec2/testConnection"%(s))
             if response.getcode() != 200:
                 return False
@@ -1528,13 +1548,16 @@ class MergeTest():
             self._serverOldSystemNameList.append(jobj["systemName"])
             response.close()
 
+        print "Merge test prolog pass"
         return True
     
     def _epilog(self):
+        print "Merge test epilog, change all servers system name back to its original one"
         idx = 0
         for s in clusterTest.clusterTestServerList:
             self._setSystemName(s,self._serverOldSystemNameList[idx])
             idx = idx+1
+        print "Merge test epilog done"
 
     # This function will ENSURE that the random system name is unique
     def _generateRandomSystemName(self):
@@ -1556,6 +1579,7 @@ class MergeTest():
     # and also its unique system name there
 
     def _phase1(self):
+        print "Merge test phase1: generate UNIQUE system name for each server and do modification"
         testList = self._generateRandomSystemName()
         worker = ClusterWorker(clusterTest.threadNumber,len(testList))
 
@@ -1564,6 +1588,7 @@ class MergeTest():
                 (entry[0],entry[1],))
 
         worker.join()
+        print "Merge test phase1 done, now sleep and wait for sync"
         time.sleep(self._phase1WaitTime)
 
     # Second phase will make each server has the same system
@@ -1571,6 +1596,7 @@ class MergeTest():
 
     def _setSystemName(self,addr,name):
 
+        print "Connection to http://%s/api/configure"%(addr)
         response = urllib2.urlopen(
             "http://%s/api/configure?%s"%(addr,urllib.urlencode({"systemName":name})))
 
@@ -1588,7 +1614,9 @@ class MergeTest():
         worker.join()
 
     def _phase2(self):
+        print "Merge test phase2: set ALL the servers with system name :mergeTest"
         self._setToSameSystemName()
+        print "Merge test phase2: wait for sync"
         # Wait until the synchronization time out expires
         time.sleep(clusterTest.clusterTestSleepTime)
         # Do the status checking of _ALL_ API
@@ -1596,6 +1624,7 @@ class MergeTest():
             ret , reason = clusterTest.checkMethodStatusConsistent("%s?format=json" % (api))
             if ret == False:
                 return (ret,reason)
+        print "Merge test phase2 done"
         return (True,"")
 
     def test(self):
@@ -2282,7 +2311,7 @@ class SystemNameTest:
     def _doGet(self,addr,methodName):
         ret = None
         response = None
-
+        print "Connection to http://%s/ec2/%s"%(addr,methodName)
         response = urllib2.urlopen("http://%s/ec2/%s"%(addr,methodName))
 
         if response.getcode() != 200:
@@ -2299,6 +2328,7 @@ class SystemNameTest:
         req = urllib2.Request("http://%s/ec2/%s" % (addr,methodName), \
             data=d, headers={'Content-Type': 'application/json'})
 
+        print "Connection to http://%s/ec2/%s"%(addr,methodName)
         response = urllib2.urlopen(req)
 
         if response.getcode() != 200:
@@ -2365,7 +2395,8 @@ class SystemNameTest:
                     return (False,"This server:%s with GUID:%s should be Online"%(s,thisGUID))
             else:
                 if ele["status"] == "Online":
-                    return (False,"The server:%s should be Offline when login on Server:%s"%(ele["apiUrl"],s))
+                    return (False,"The server that has IP address:%s and GUID:%s \
+                    should be Offline when login on Server:%s"%(ele["networkAddresses"],ele["id"],s))
         return (True,"")
     
     def _doTest(self):
