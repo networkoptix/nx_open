@@ -227,8 +227,8 @@ void QnWorkbenchPtzHandler::at_ptzManageAction_triggered() {
     if (dialog->isVisible() && !dialog->tryClose(false))
         return;
 
-    dialog->setController(widget->ptzController());
     dialog->setResource(widget->resource()->toResourcePtr());
+    dialog->setController(widget->ptzController());
     dialog->show();
 }
 
