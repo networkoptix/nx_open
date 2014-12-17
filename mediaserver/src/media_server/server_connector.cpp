@@ -116,6 +116,10 @@ void QnServerConnector::removeConnection(const QnModuleInformation &moduleInform
 }
 
 void QnServerConnector::start() {
+    connect(m_moduleFinder,     &QnModuleFinder::moduleUrlFound,    this,   &QnServerConnector::at_moduleFinder_moduleUrlFound);
+    connect(m_moduleFinder,     &QnModuleFinder::moduleUrlLost,     this,   &QnServerConnector::at_moduleFinder_moduleUrlLost);
+    connect(m_moduleFinder,     &QnModuleFinder::moduleChanged,     this,   &QnServerConnector::at_moduleFinder_moduleChanged);
+
     for (const QnModuleInformation &moduleInformation: m_moduleFinder->foundModules()) {
         if (!moduleInformation.isCompatibleToCurrentSystem())
             continue;
@@ -127,10 +131,6 @@ void QnServerConnector::start() {
             addConnection(moduleInformation, url);
         }
     }
-
-    connect(m_moduleFinder,     &QnModuleFinder::moduleUrlFound,    this,   &QnServerConnector::at_moduleFinder_moduleUrlFound);
-    connect(m_moduleFinder,     &QnModuleFinder::moduleUrlLost,     this,   &QnServerConnector::at_moduleFinder_moduleUrlLost);
-    connect(m_moduleFinder,     &QnModuleFinder::moduleChanged,     this,   &QnServerConnector::at_moduleFinder_moduleChanged);
 }
 
 void QnServerConnector::stop() {
