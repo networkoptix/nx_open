@@ -54,9 +54,6 @@ namespace {
      * but also over its extension. */
     const qreal frameExtensionMultiplier = 1.0;
 
-    /** Default shadow displacement, in scene coordinates. */
-    const QPointF defaultShadowDisplacement = QPointF(qnGlobals->workbenchUnitSize(), qnGlobals->workbenchUnitSize()) * 0.05;
-
     /** Default timeout before the video is displayed as "loading", in milliseconds. */
 #ifdef QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
     const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION;
@@ -115,9 +112,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 {
     setAcceptHoverEvents(true);
     setTransformOrigin(Center);
-
-    /* Set up shadow. */
-    setShadowDisplacement(defaultShadowDisplacement);
 
     /* Set up frame. */
     setFrameWidth(0.0);
@@ -303,8 +297,6 @@ void QnResourceWidget::setFrameWidth(qreal frameWidth) {
     m_frameWidth = frameWidth;
     qreal extendedFrameWidth = m_frameWidth * (1.0 + frameExtensionMultiplier);
     setWindowFrameMargins(extendedFrameWidth, extendedFrameWidth, extendedFrameWidth, extendedFrameWidth);
-
-    invalidateShadowShape();
 }
 
 QColor QnResourceWidget::frameDistinctionColor() const {
