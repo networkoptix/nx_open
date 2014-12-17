@@ -134,6 +134,7 @@ class ClusterTest():
                 response = urllib2.urlopen("http://%s/ec2/%s" % (s,reqName))
                 if response.getcode() != 200:
                     return (False,"%s failed with statusCode %d" % (reqName,response.getcode()))
+                response.close()
         print "All ec2 get requests work well"
         return (True,"Server:%s test for all getter pass" % (s))
 
@@ -2317,7 +2318,6 @@ class SystemNameTest:
         if response.getcode() != 200:
             response.close()
             return None
-
         else:
             ret = response.read()
             response.close()
