@@ -190,7 +190,7 @@ class ClusterTest():
             print "<empty string>"
         else:
             start = max(0,i-64)
-            end = min(64,len(str)-i)
+            end = min(64,len(str)-i)+i
             comp1 = str[start:i]
             comp2 = str[i]
             comp3 = ""
