@@ -28,6 +28,7 @@
 
 #include <utils/common/checked_cast.h>
 #include "utils/common/warnings.h"
+#include "transaction/runtime_transaction_log.h"
 
 
 namespace ec2
@@ -194,7 +195,8 @@ QnTransactionMessageBus::QnTransactionMessageBus(Qn::PeerType peerType)
 	m_handler(nullptr),
     m_timer(nullptr), 
     m_mutex(QMutex::Recursive),
-    m_thread(nullptr)
+    m_thread(nullptr),
+    m_runtimeTransactionLog(new QnRuntimeTransactionLog())
 {
     if (m_thread)
         return;
@@ -210,14 +212,26 @@ QnTransactionMessageBus::QnTransactionMessageBus(Qn::PeerType peerType)
 
     assert( m_globalInstance == nullptr );
     m_globalInstance = this;
+    connect(QnRuntimeTransactionLog::instance(), &QnRuntimeTransactionLog::runtimeDataUpdated, this, &QnTransactionMessageBus::at_runtimeDataUpdated);
 }
 
 void QnTransactionMessageBus::start()
 {
-    assert(!m_localPeer.id.isNull());
     if (!m_thread->isRunning())
         m_thread->start();
-    connect(QnRuntimeTransactionLog::instance(), &QnRuntimeTransactionLog::runtimeDataUpdated, this, &QnTransactionMessageBus::at_runtimeDataUpdated);
+}
+
+void QnTransactionMessageBus::stop()
+{
+    m_thread->exit();
+    m_thread->wait();
+    
+    m_runtimeTransactionLog->clearRuntimeData();
+    m_lastTransportSeq.clear();
+    m_connectingConnections.clear();
+    m_alivePeers.clear();
+    m_connections.clear();
+    m_remoteUrls.clear();
 }
 
 QnTransactionMessageBus::~QnTransactionMessageBus()

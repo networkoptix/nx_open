@@ -625,6 +625,12 @@ void QnPtzManageDialog::setResource(const QnResourcePtr &resource) {
     if (m_resource == resource)
         return;
     
+    if (m_resource) {
+        if (!tryClose(false))
+            return;
+        clear();
+    }
+    
     m_resource = resource;
     m_adaptor->setResource(resource);
 

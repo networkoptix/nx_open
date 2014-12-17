@@ -23,7 +23,6 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/graphics/instruments/instrumented.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
-#include <ui/graphics/items/shadow/shaded.h>
 
 class QGraphicsLinearLayout;
 
@@ -36,17 +35,16 @@ class QnImageButtonBar;
 
 class GraphicsLabel;
 
-class QnResourceWidget: public Overlayed<Shaded<Animated<Instrumented<Connective<GraphicsWidget>>>>>, public QnWorkbenchContextAware, public ConstrainedResizable, public HelpTopicQueryable, protected QnGeometry {
+class QnResourceWidget: public Overlayed<Animated<Instrumented<Connective<GraphicsWidget>>>>, public QnWorkbenchContextAware, public ConstrainedResizable, public HelpTopicQueryable, protected QnGeometry {
     Q_OBJECT
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity)
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth)
     Q_PROPERTY(QnResourceWidgetFrameColors frameColors READ frameColors WRITE setFrameColors)
     Q_PROPERTY(QColor frameDistinctionColor READ frameDistinctionColor WRITE setFrameDistinctionColor NOTIFY frameDistinctionColorChanged)
-    Q_PROPERTY(QPointF shadowDisplacement READ shadowDisplacement WRITE setShadowDisplacement)
     Q_PROPERTY(bool localActive READ isLocalActive WRITE setLocalActive)
     Q_FLAGS(Options Option)
 
-    typedef Overlayed<Shaded<Animated<Instrumented<Connective<GraphicsWidget>>>>> base_type;
+    typedef Overlayed<Animated<Instrumented<Connective<GraphicsWidget>>>> base_type;
 
 public:
     enum Option {

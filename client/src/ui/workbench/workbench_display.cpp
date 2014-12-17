@@ -530,10 +530,6 @@ void QnWorkbenchDisplay::setLayer(QGraphicsItem *item, Qn::ItemLayer layer) {
      * z order. Hence the fmod. */
     item->setData(ITEM_LAYER_KEY, static_cast<int>(layer));
     item->setZValue(layer * layerZSize + std::fmod(item->zValue(), layerZSize));
-
-    QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
-    if(widget && widget->shadowItem()) /* Shadow may already be destroyed. */
-        widget->shadowItem()->setZValue(shadowLayer(layer) * layerZSize);
 }
 
 void QnWorkbenchDisplay::setLayer(const QList<QGraphicsItem *> &items, Qn::ItemLayer layer) {

@@ -161,6 +161,10 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
         button->setCached(true);
         if (helpTopicId >= 0)
             setHelpTopic(button, helpTopicId);
+        connect(this->context(), &QnWorkbenchContext::userChanged, this, [this, button, actionId] {
+            button->setVisible(this->menu()->canTrigger(actionId));
+        });
+        button->setVisible(this->menu()->canTrigger(actionId));
         return button;
     };
 
@@ -169,6 +173,8 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
     controlsLayout->setSpacing(2.0);
     controlsLayout->setContentsMargins(2.0, margin, 2.0, margin);
     controlsLayout->addStretch();
+
+#ifdef _DEBUG
     if(qnSettings->isDevMode()) {
         QnImageButtonWidget *debugButton = new QnImageButtonWidget(m_headerWidget);
         debugButton->setIcon(qnSkin->icon("item/search.png"));
@@ -178,6 +184,7 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
         connect(debugButton, &QnImageButtonWidget::clicked, this, &QnNotificationsCollectionWidget::at_debugButton_clicked);
         controlsLayout->addItem(debugButton);
     }
+#endif // DEBUG
         
     controlsLayout->addItem(newButton(Qn::BusinessEventsLogAction, Qn::MainWindow_Notifications_EventLog_Help));
     controlsLayout->addItem(newButton(Qn::BusinessEventsAction, -1));

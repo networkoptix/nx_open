@@ -114,6 +114,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 }
 
 void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) {
+    connection->stopReceivingNotifications();
     connection->disconnect(this);
     connection->getResourceManager()->disconnect(this);
     connection->getMediaServerManager()->disconnect(this);
