@@ -57,11 +57,15 @@ QnTransactionTransport::QnTransactionTransport(const ApiPeerData &localPeer, con
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_lastReceiveTimer.invalidate();
     m_emptyChunkData = QnChunkedTransferEncoder::serializedTransaction(QByteArray(), std::vector<nx_http::ChunkExtension>());
+
+    NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG1);
 }
 
 
 QnTransactionTransport::~QnTransactionTransport()
 {
+    NX_LOG(QnLog::EC2_TRAN_LOG, lit("~QnTransactionTransport for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG1);
+
     if( m_httpClient )
         m_httpClient->terminate();
 

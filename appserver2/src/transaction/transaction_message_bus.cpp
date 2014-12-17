@@ -422,17 +422,20 @@ bool QnTransactionMessageBus::onGotServerRuntimeInfo(const QnTransaction<ApiRunt
 void QnTransactionMessageBus::at_gotTransaction(const QByteArray &serializedTran, const QnTransactionTransportHeader &transportHeader)
 {
     QnTransactionTransport* sender = checked_cast<QnTransactionTransport*>(this->sender());
+
+    NX_LOG(QnLog::EC2_TRAN_LOG, lit("Got transaction sender = %1").arg((size_t) sender,  0, 16), cl_logDEBUG1);
+
     if( !sender || sender->getState() != QnTransactionTransport::ReadyForStreaming )
     {
         if( sender )
         {
-            NX_LOG(lit("Ignoring transaction with seq %1 from peer %2 having state %3").
+            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Ignoring transaction with seq %1 from peer %2 having state %3").
                 arg(transportHeader.sequence).arg(sender->remotePeer().id.toString()).arg(sender->getState()), cl_logDEBUG1);
             sender->transactionProcessed();
         }
         else
         {
-            NX_LOG(lit("Ignoring transaction with seq %1 from unknown peer").arg(transportHeader.sequence), cl_logDEBUG1);
+            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Ignoring transaction with seq %1 from unknown peer").arg(transportHeader.sequence), cl_logDEBUG1);
         }
         return;
     }
