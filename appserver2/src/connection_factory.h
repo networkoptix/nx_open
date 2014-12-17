@@ -23,8 +23,6 @@
 
 namespace ec2
 {
-    class QnRuntimeTransactionLog;
-
     class Ec2DirectConnectionFactory
     :
         public AbstractECConnectionFactory,
@@ -60,7 +58,6 @@ namespace ec2
         bool m_terminated;
         int m_runningRequests;
         bool m_sslEnabled;
-        std::unique_ptr<QnRuntimeTransactionLog> m_runtimeTransactionLog;
 
         int establishDirectConnection(const QUrl& url, impl::ConnectHandlerPtr handler);
         int establishConnectionToRemoteServer( const QUrl& addr, impl::ConnectHandlerPtr handler );

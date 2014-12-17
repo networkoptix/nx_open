@@ -23,6 +23,7 @@
 
 
 class QTimer;
+class QnRuntimeTransactionLog;
 
 namespace ec2
 {
@@ -48,6 +49,7 @@ namespace ec2
         ApiPeerData localPeer() const;
 
         void start();
+        void stop();
 
         /*!
             \param handler Control of life-time of this object is out of scope of this class
@@ -239,6 +241,7 @@ namespace ec2
 
         // alive control
         QElapsedTimer m_aliveSendTimer;
+        std::unique_ptr<QnRuntimeTransactionLog> m_runtimeTransactionLog;
     };
 }
 #define qnTransactionBus ec2::QnTransactionMessageBus::instance()

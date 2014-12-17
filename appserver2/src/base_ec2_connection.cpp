@@ -68,11 +68,13 @@ namespace ec2
         connect(QnTransactionMessageBus::instance(),    &QnTransactionMessageBus::peerFound,                this,   &BaseEc2Connection<T>::remotePeerFound,         Qt::DirectConnection);
         connect(QnTransactionMessageBus::instance(),    &QnTransactionMessageBus::peerLost,                 this,   &BaseEc2Connection<T>::remotePeerLost,          Qt::DirectConnection);
         connect(QnTransactionMessageBus::instance(),    &QnTransactionMessageBus::remotePeerUnauthorized,   this,   &BaseEc2Connection<T>::remotePeerUnauthorized,  Qt::DirectConnection);
+        QnTransactionMessageBus::instance()->start();
     }
 
     template<class T>
     void BaseEc2Connection<T>::stopReceivingNotifications() {
         disconnect(QnTransactionMessageBus::instance(), NULL, this, NULL);
+        QnTransactionMessageBus::instance()->stop();
     }
 
     template<class T>
