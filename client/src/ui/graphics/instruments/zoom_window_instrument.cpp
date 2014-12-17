@@ -115,7 +115,7 @@ protected:
                 fixedPoint,
                 Qt::IgnoreAspectRatio
             ),
-            Qt::NoSection,
+            Qt::TitleBarArea,
             fixedPoint
         );
 
@@ -285,8 +285,8 @@ QRectF ZoomWindowWidget::constrainedGeometry(const QRectF &geometry, Qt::WindowF
     result = ConstrainedResizable::constrainedGeometry(geometry, pinSection, pinPoint, QnGeometry::expanded(QnGeometry::aspectRatio(size()), maxSize, Qt::KeepAspectRatio));
 
     /* Position constraints go next. */
-    if(overlayWidget) {
-        if(pinSection != Qt::NoSection) {
+    if (overlayWidget) {
+        if (pinSection != Qt::NoSection && pinSection != Qt::TitleBarArea) {
             QRectF constraint = overlayWidget->rect();
             QPointF pinPoint = Qn::calculatePinPoint(geometry, pinSection);
 
