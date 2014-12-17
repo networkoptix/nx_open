@@ -1679,6 +1679,7 @@ void QnMain::run()
     }
 
     QScopedPointer<QnServerConnector> serverConnector(new QnServerConnector(m_moduleFinder));
+    serverConnector->start();
 
     QUrl url = ec2Connection->connectionInfo().ecUrl;
 #if 1
