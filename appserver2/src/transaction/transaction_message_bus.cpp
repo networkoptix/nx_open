@@ -552,6 +552,10 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
     QnTransactionTransportPtr directConnection = m_connections.value(transportHeader.sender);
     if (directConnection && directConnection->getState() == QnTransactionTransport::ReadyForStreaming && sender != directConnection.data()) 
     {
+        QnTranStateKey ttSenderKey(transportHeader.sender, transportHeader.senderRuntimeID);
+        const int currentTransportSeq = m_lastTransportSeq.value(ttSenderKey);
+        assert( !currentTransportSeq || (currentTransportSeq > transportHeader.sequence) );
+
         NX_LOG( QnLog::EC2_TRAN_LOG, lit("reject transaction %1 from %2 tt seq=%3 time=%4 db seq=%5 via %6 because direct connection is exist").
             arg(ApiCommand::toString(tran.command)).arg(tran.peerID.toString()).arg(transportHeader.sequence).
             arg(tran.persistentInfo.timestamp).arg(tran.persistentInfo.sequence).arg(sender->remotePeer().id.toString()), cl_logDEBUG1);
@@ -728,6 +732,8 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
         printTranState(tran.params.persistentState);
         NX_LOG( QnLog::EC2_TRAN_LOG, lit("exist %1 new transactions").arg(serializedTransactions.size()), cl_logDEBUG1);
 
+        assert( m_connections.contains(sender->remotePeer().id) );
+        assert( sender->getState() >= QnTransactionTransport::ReadyForStreaming );
         QnTransaction<QnTranStateResponse> tranSyncResponse(ApiCommand::tranSyncResponse);
         tranSyncResponse.params.result = 0;
         sender->sendTransaction(tranSyncResponse, ttUnicast);
