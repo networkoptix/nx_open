@@ -625,11 +625,8 @@ void QnPtzManageDialog::setResource(const QnResourcePtr &resource) {
     if (m_resource == resource)
         return;
     
-    if (m_resource) {
-        if (!tryClose(false))
-            return;
+    if (m_resource)
         clear();
-    }
     
     m_resource = resource;
     m_adaptor->setResource(resource);
@@ -674,12 +671,21 @@ bool QnPtzManageDialog::tryClose(bool force) {
     }
 
     show();
+    return askToSaveChanges();
+}
+
+bool QnPtzManageDialog::askToSaveChanges(bool cancelIsAllowed /*= true*/) {
+
+    QMessageBox::StandardButtons allowedButtons = QnMessageBox::Yes | QnMessageBox::No;
+    if (cancelIsAllowed)
+        allowedButtons |= QnMessageBox::Cancel;
+
     QnMessageBox::StandardButton button = QnMessageBox::question(
         this, 
         0,
         tr("PTZ configuration is not saved"),
         tr("Changes are not saved. Do you want to save them?"),
-        QnMessageBox::Yes | QnMessageBox::No | QnMessageBox::Cancel, 
+        allowedButtons, 
         QnMessageBox::Yes);
 
     switch (button) {
@@ -687,7 +693,9 @@ bool QnPtzManageDialog::tryClose(bool force) {
         saveChanges();
         return true;
     case QnMessageBox::Cancel:
-        return false;
+        if (cancelIsAllowed)
+            return false;
+        return true;
     default:
         return true;
     }
