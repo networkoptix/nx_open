@@ -52,7 +52,6 @@ namespace ec2
         QnTransactionLog(QnDbManager* db);
 
         static QnTransactionLog* instance();
-        void initStaticInstance(QnTransactionLog* value);
 
         ErrorCode getTransactionsAfter(const QnTranState& state, QList<QByteArray>& result);
         QnTranState getTransactionsState();
