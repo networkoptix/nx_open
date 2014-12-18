@@ -223,20 +223,11 @@ void QnTransactionMessageBus::start()
 
 void QnTransactionMessageBus::stop()
 {
+    dropConnections();
+
     m_thread->exit();
     m_thread->wait();
-    
-    for (auto transport: m_connectingConnections) 
-        delete transport;
-    for (auto transport: m_connections) 
-        delete transport;
 
-    m_runtimeTransactionLog->clearRuntimeData();
-    m_lastTransportSeq.clear();
-    m_connectingConnections.clear();
-    m_alivePeers.clear();
-    m_connections.clear();
-    m_remoteUrls.clear();
     m_aliveSendTimer.invalidate();
 }
 
@@ -1192,6 +1183,8 @@ void QnTransactionMessageBus::dropConnections()
         qWarning() << "Disconnected from peer" << transport->remoteAddr();
         transport->setState(QnTransactionTransport::Error);
     }
+    for (auto transport: m_connectingConnections) 
+        transport->setState(ec2::QnTransactionTransport::Error);
 }
 
 QnTransactionMessageBus::AlivePeersMap QnTransactionMessageBus::alivePeers() const
