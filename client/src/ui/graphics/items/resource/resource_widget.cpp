@@ -344,6 +344,17 @@ float QnResourceWidget::defaultVisualAspectRatio() const {
     return m_enclosingGeometry.width() / m_enclosingGeometry.height();
 }
 
+float QnResourceWidget::visualChannelAspectRatio() const {
+    if (!channelLayout())
+        return visualAspectRatio();
+
+    qreal layoutAspectRatio = QnGeometry::aspectRatio(channelLayout()->size());
+    if (QnAspectRatio::isRotated90(rotation()))
+        return visualAspectRatio() * layoutAspectRatio;
+    else
+        return visualAspectRatio() / layoutAspectRatio;
+}
+
 QRectF QnResourceWidget::enclosingGeometry() const {
     return m_enclosingGeometry;
 }

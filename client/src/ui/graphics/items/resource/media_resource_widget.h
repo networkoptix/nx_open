@@ -118,6 +118,7 @@ public:
     QnMediaDewarpingParams dewarpingParams() const;
     void setDewarpingParams(const QnMediaDewarpingParams &params);
 
+    virtual float visualAspectRatio() const;
     virtual float defaultVisualAspectRatio() const override;
 
 signals:

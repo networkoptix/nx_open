@@ -25,8 +25,6 @@ private:
     void watchCurrentLayout();
     void unwatchCurrentLayout();
 
-    float channelAspectRatio(QnResourceWidget *widget) const;
-
 private:
     QnWorkbenchRenderWatcher *m_renderWatcher;
     QnWorkbenchLayout *m_watchedLayout;

@@ -34,7 +34,7 @@ void QnWorkbenchLayoutAspectRatioWatcher::at_renderWatcher_widgetChanged(QnResou
 
     bool hasAspectRatio = widget->hasAspectRatio();
     if (hasAspectRatio)
-        m_watchedLayout->setCellAspectRatio(QnAspectRatio::closestStandardRatio(channelAspectRatio(widget)).toFloat());
+        m_watchedLayout->setCellAspectRatio(QnAspectRatio::closestStandardRatio(widget->visualChannelAspectRatio()).toFloat());
 
     if (m_monitoring || !hasAspectRatio) {
         m_watchedWidgets.insert(widget);
@@ -60,7 +60,7 @@ void QnWorkbenchLayoutAspectRatioWatcher::at_resourceWidget_aspectRatioChanged()
     if (m_watchedLayout->items().size() > 1 && m_watchedLayout->hasCellAspectRatio())
         return;
 
-    m_watchedLayout->setCellAspectRatio(QnAspectRatio::closestStandardRatio(channelAspectRatio(widget)).toFloat());
+    m_watchedLayout->setCellAspectRatio(QnAspectRatio::closestStandardRatio(widget->visualChannelAspectRatio()).toFloat());
 }
 
 void QnWorkbenchLayoutAspectRatioWatcher::at_resourceWidget_destroyed() {
@@ -100,8 +100,4 @@ void QnWorkbenchLayoutAspectRatioWatcher::unwatchCurrentLayout() {
     for (QnResourceWidget *widget: m_watchedWidgets)
         widget->QObject::disconnect(this);
     m_watchedWidgets.clear();
-}
-
-float QnWorkbenchLayoutAspectRatioWatcher::channelAspectRatio(QnResourceWidget *widget) const {
-    return widget->visualAspectRatio() / QnGeometry::aspectRatio(widget->channelLayout()->size());
 }

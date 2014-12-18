@@ -731,18 +731,15 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
         } else {
             foreach (QnWorkbenchItem *item, workbenchLayout->items()) {
                 QnResourceWidget *widget = context()->display()->widget(item);
-                if (widget && widget->hasAspectRatio()) {
-                    qreal aspectRatio = widget->aspectRatio();
+                if (!widget)
+                    continue;
 
-                    QString customAspectRatio = widget->resource()->getProperty(QnMediaResource::customAspectRatioKey());
-                    if (!customAspectRatio.isEmpty())
-                        aspectRatio = customAspectRatio.toDouble();
+                float aspectRatio = widget->visualChannelAspectRatio();
+                if (aspectRatio <= 0)
+                    continue;
 
-                    if (QnAspectRatio::isRotated90(item->rotation()))
-                        aspectRatio = 1.0 / aspectRatio;
-                    midAspectRatio += aspectRatio;
-                    ++count;
-                }
+                midAspectRatio += aspectRatio;
+                ++count;
             }
         }
 

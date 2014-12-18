@@ -1514,16 +1514,14 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
             synchronizeGeometry(widget, false);
     }
 
-    QnConstResourceVideoLayoutPtr videoLayout = widget->channelLayout();
-    qreal widgetAspectRatio;
-    if (widget->hasAspectRatio()) {
-        widgetAspectRatio = widget->aspectRatio();
-    } else {
+    qreal widgetAspectRatio = widget->visualAspectRatio();
+    if (widgetAspectRatio <= 0) {
+        QnConstResourceVideoLayoutPtr videoLayout = widget->channelLayout();
         /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
         widgetAspectRatio = aspectRatio(videoLayout->size()) * (item->zoomRect().isNull() ? 1.0 : aspectRatio(item->zoomRect())) * (4.0 / 3.0);
+        if (QnAspectRatio::isRotated90(item->rotation()))
+            widgetAspectRatio = 1 / widgetAspectRatio;
     }
-    if (QnAspectRatio::isRotated90(item->rotation()))
-        widgetAspectRatio = 1 / widgetAspectRatio;
     const Qt::Orientation orientation = widgetAspectRatio > 1.0 ? Qt::Vertical : Qt::Horizontal;
     const QSize size = bestSingleBoundedSize(workbench()->mapper(), 1, orientation, widgetAspectRatio);
 
