@@ -72,7 +72,7 @@ public:
             //Q_ASSERT(peer != qnCommon->moduleGUID());
         }
 #endif
-
+        Q_ASSERT_X(!transaction.isLocal || m_remotePeer.isClient(), Q_FUNC_INFO, "Invalid transaction type to send!");
         NX_LOG( QnLog::EC2_TRAN_LOG, lit("send transaction %1 to peer %2").arg(transaction.toString()).arg(remotePeer().id.toString()), cl_logDEBUG1 );
 
         switch (m_remotePeer.dataFormat) {

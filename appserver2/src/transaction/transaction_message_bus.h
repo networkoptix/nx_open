@@ -150,7 +150,7 @@ namespace ec2
             }
 
             // some dst is not accessible directly, send broadcast (to all connected peers except of just sent)
-            if (!toSendRest.isEmpty()) 
+            if (!toSendRest.isEmpty() && !tran.isLocal)
             {
                 for (QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
                 {
