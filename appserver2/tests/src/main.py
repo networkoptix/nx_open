@@ -34,8 +34,10 @@ class UnitTestRollback:
                 print "Do you want to run Recover NOW?\n"
                 selection = raw_input("Press r to RUN RECOVER at first or press Enter to SKIP RECOVER and run the test")
             except:
-                if len(selection) == 0 or selection[0] == 'r':
-                    self.doRecover()
+                pass
+
+            if len(selection) != 0 and selection[0] == 'r':
+                self.doRecover()
 
         self._rollbackFile = open(".rollback","w+")
 
