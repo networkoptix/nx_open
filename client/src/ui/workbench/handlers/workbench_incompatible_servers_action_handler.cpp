@@ -10,6 +10,7 @@
 #include <ui/actions/action_parameter_types.h>
 #include <ui/dialogs/merge_systems_dialog.h>
 #include <ui/dialogs/progress_dialog.h>
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
 
 #include <update/connect_to_current_system_tool.h>
 #include <utils/merge_systems_tool.h>
@@ -92,7 +93,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_mergeSystemsAction_triggere
         return;
     }
 
-    m_mergeDialog = new QnMergeSystemsDialog(mainWindow());
+    m_mergeDialog = new QnWorkbenchStateDependentDialog<QnMergeSystemsDialog>(mainWindow());
     m_mergeDialog->exec();
     delete m_mergeDialog;
 }

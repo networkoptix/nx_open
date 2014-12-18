@@ -17,8 +17,7 @@ QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
     QDialog(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::QnMergeSystemsDialog),
-    m_mergeTool(new QnMergeSystemsTool(this)),
-    m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnMergeSystemsDialog>(this))
+    m_mergeTool(new QnMergeSystemsTool(this))
 {
     ui->setupUi(this);
     ui->urlComboBox->lineEdit()->setPlaceholderText(tr("http(s)://host:port"));
@@ -46,15 +45,6 @@ QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
 }
 
 QnMergeSystemsDialog::~QnMergeSystemsDialog() {}
-
-bool QnMergeSystemsDialog::tryClose(bool force) {
-    Q_UNUSED(force)
-    close();
-    return true;
-}
-
-void QnMergeSystemsDialog::forcedUpdate() {
-}
 
 QUrl QnMergeSystemsDialog::url() const {
     /* filter unnecessary information from the URL */

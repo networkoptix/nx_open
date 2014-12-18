@@ -21,9 +21,6 @@ public:
     explicit QnMergeSystemsDialog(QWidget *parent = 0);
     ~QnMergeSystemsDialog();
 
-    bool tryClose(bool force);
-    void forcedUpdate();
-
     QUrl url() const;
     QString password() const;
 
@@ -51,8 +48,6 @@ private:
     QUrl m_url;
     QString m_user;
     QString m_password;
-
-    QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;
 };
 
 #endif // MERGE_SYSTEMS_DIALOG_H
