@@ -10,7 +10,7 @@ angular.module('webadminApp')
                 //end:   '=',
             },
             templateUrl: 'views/components/timeline2.html',
-            link: function (scope, element, attrs) {
+            link: function (scope, element/*, attrs*/) {
                 var timelineConfig = {
                     initialInterval: 1000*60*60*24*365, // no records - show last hour
                     futureInterval: 1000*60*60*24, // 24 hour to future - for timeline
@@ -24,14 +24,13 @@ angular.module('webadminApp')
                     rulerFontSize: 10, // Размер надписи на линейке
                     rulerBasicSize: 5, //Базовая высота штриха на линейке
                     rulerLabelPadding: 5, // Отступ в линейке над надписью
-                    minimumMarkWidth: 3 // Ширина, при которой появлется новый уровень отметок на линейке
+                    minimumMarkWidth: 5 // Ширина, при которой появлется новый уровень отметок на линейке
                 };
 
                 var viewportWidth = element.find('.viewport').width();
                 scope.actualWidth = viewportWidth;
 
                 var canvas = element.find('canvas').get(0);
-
                 canvas.width  = viewportWidth;
                 canvas.height = element.find('canvas').height();
 
@@ -67,6 +66,7 @@ angular.module('webadminApp')
                     return (scope.end - scope.start) / initialWidth() / 1000;
                 }
                 function updateActualLevel(){
+                    var oldLevel = scope.actualLevel;
                     //3. Select actual level
                     var secsPerPixel = secondsPerPixel();
                     for(var i=1; i < RulerModel.levels.length ; i ++ ){
@@ -75,7 +75,9 @@ angular.module('webadminApp')
                         }
                     }
                     scope.actualLevel = i-1;
-
+                    if(oldLevel !== scope.actualLevel){
+                        // Level up - run animation for appearance of new level
+                    }
                 }
 
                 function positionToDate(position){
@@ -94,13 +96,12 @@ angular.module('webadminApp')
                     return positionToDate(position + viewPortScroll());
                 }
 
-
                 function updateDetailization(){
-                    var scrollStart = viewPortScroll();
+                    /*var scrollStart = viewPortScroll();
 
                     var start = positionToDate (Math.max(0,scrollStart));
                     var end = positionToDate (Math.min(scope.frameEnd,scrollStart + viewportWidth));
-
+*/
                     //4. Set interval for events
                     //TODO: Set interval for events
                     //console.warn('Set interval for events', new Date(start), new Date(end), scope.actualLevel);
@@ -108,7 +109,6 @@ angular.module('webadminApp')
                     //5. Set interval for ruler
                     //scope.ruler.setInterval(start,end,scope.actualLevel);
                 }
-
 
                 function drawMark(context, coordinate, level, label){
 
@@ -133,10 +133,10 @@ angular.module('webadminApp')
                 function drawRuler(){
 
                     //1. Создаем контекст рисования
-                    var context = canvas.getContext("2d");
+                    var context = canvas.getContext('2d');
                     context.fillStyle = timelineConfig.rulerColor;
                     context.strokeStyle = timelineConfig.rulerColor;
-                    context.font = timelineConfig.rulerFontSize + "px";
+                    context.font = timelineConfig.rulerFontSize + 'px';
 
                     context.clearRect(0, 0, canvas.width, canvas.height);
                     var secsPerPixel  = secondsPerPixel();
@@ -148,17 +148,19 @@ angular.module('webadminApp')
                     var end = level.interval.alignToFuture (positionToDate (scrollStart + viewportWidth));
                     var position = level.interval.alignToPast(positionToDate (Math.max(0,scrollStart)));
 
+
+                    var findLevel = function(level){
+                        return level.interval.checkDate(position);
+                    };
                     while(position<end){
                         var screenPosition = dateToScreenPosition(position);
 
                         //Detect the best level for this position
-                        var markLevel = _.find(RulerModel.levels,function(level){
-                            return level.interval.checkDate(position);
-                        });
+                        var markLevel = _.find(RulerModel.levels,findLevel);
 
                         var markLevelIndex = RulerModel.levels.indexOf(markLevel);
 
-                        var label = ((markLevel.interval.getSeconds() / secsPerPixel) < markLevel.width )? '' : formatDate(new Date(position), markLevel.format);
+                        var label = ((markLevel.interval.getSeconds() / secsPerPixel) < markLevel.width )? '' : dateFormat(new Date(position), markLevel.format);
 
                         //3. Draw a mark
                         drawMark(context, screenPosition, scope.actualLevel - markLevelIndex , label);
@@ -180,7 +182,7 @@ angular.module('webadminApp')
                     drawRuler();
 
                     if(oldframe !== scope.frameWidth) {
-                        element.find(".frame").stop(true, false).animate({
+                        element.find('.frame').stop(true, false).animate({
                             width: scope.frameWidth
                         }, doAnimate ? timelineConfig.animationDuration : 0);
                     }
@@ -198,7 +200,7 @@ angular.module('webadminApp')
                     speed = speed || 1;
                     if(!targetScrollTime){
                         targetScrollTime = positionToDate(viewPortScroll() + viewportWidth/2);
-                        targetScrollTimePosition = 0.5
+                        targetScrollTimePosition = 0.5;
                     }
 
                     var targetZoom = scope.actualZoomLevel;
@@ -227,14 +229,12 @@ angular.module('webadminApp')
 
                     scope.disableZoomOut =  targetZoom <= 0;
 
-                    console.warn("fix disablezoomin calculation");
+                    console.warn('fix disablezoomin calculation');
 
                     scope.disableZoomIn = scope.timelineWidth >= timelineConfig.maxTimeLineWidth || scope.actualLevel >= RulerModel.levels.length-1;
                 };
 
                 scope.$watch('records',initTimeline);
-
-
 
                 window.animationFrame = (function(callback) {
                     return window.requestAnimationFrame ||
@@ -247,7 +247,6 @@ angular.module('webadminApp')
                         };
                 })();
 
-
                 var runAnimation = true;
                 function animationFunction(){
                     updateView();
@@ -258,7 +257,6 @@ angular.module('webadminApp')
                 initTimeline();
                 animationFunction();
                 scope.$on('$destroy', function() { runAnimation = false; });
-
             }
         };
     }]);

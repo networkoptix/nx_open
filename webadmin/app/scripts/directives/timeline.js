@@ -10,7 +10,7 @@ angular.module('webadminApp')
                 //end:   '=',
             },
             templateUrl: 'views/components/timeline.html',
-            link: function (scope, element, attrs) {
+            link: function (scope, element/*, attrs*/) {
                 var timelineConfig = {
                     initialInterval: 1000*60*60*24*365, // no records - show last hour
                     futureInterval: 1000*60*60*24, // 24 hour to future - for timeline
@@ -93,13 +93,13 @@ angular.module('webadminApp')
                     scope.frameWidth = Math.round(initialWidth * (scope.frameEnd -  scope.start)/(scope.end - scope.start));
 
                     if(oldwidth !== scope.timelineWidth || oldstart !== scope.timelineStart) {
-                        element.find(".timeline").stop(true, false).animate({
+                        element.find('.timeline').stop(true, false).animate({
                             width: scope.timelineWidth,
                             left: scope.timelineStart
                         }, doAnimate ? timelineConfig.animationDuration : 0);
                     }
                     if(oldframe !== scope.frameWidth) {
-                        element.find(".frame").stop(true, false).animate({
+                        element.find('.frame').stop(true, false).animate({
                             width: scope.frameWidth
                         }, doAnimate ? timelineConfig.animationDuration : 0);
                     }
@@ -117,7 +117,7 @@ angular.module('webadminApp')
                     speed = speed || 1;
                     if(!targetScrollTime){
                         targetScrollTime = positionToDate(viewPortScroll() + viewportWidth/2);
-                        targetScrollTimePosition = 0.5
+                        targetScrollTimePosition = 0.5;
                     }
 
                     if(zoomIn && !scope.disableZoomIn) {
@@ -135,7 +135,7 @@ angular.module('webadminApp')
 
                     updateView(true);
 
-                    element.find(".viewport").stop(true,false).animate({
+                    element.find('.viewport').stop(true,false).animate({
                         scrollLeft:newScrollPosition
                     },timelineConfig.animationDuration);
 

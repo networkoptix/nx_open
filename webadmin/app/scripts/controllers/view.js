@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('webadminApp').controller('ViewCtrl', function ($scope,$rootScope,$location,$routeParams,mediaserver,$q) {
+angular.module('webadminApp').controller('ViewCtrl', function ($scope,$rootScope,$location,$routeParams,mediaserver) {
 
     $scope.cameras = {};
     $scope.activeCamera = null;
@@ -54,15 +54,16 @@ angular.module('webadminApp').controller('ViewCtrl', function ($scope,$rootScope
             return camera.id === $scope.cameraId;
         });
 
-        if(!!$scope.activeCamera)
+        if(!!$scope.activeCamera) {
             updateVideoSource();
+        }
     };
     $scope.selectCamera = function(activeCamera){
         $location.path('/view/' + activeCamera.id, false);
         $scope.selectCameraById(activeCamera.id);
     };
 
-    $rootScope.$on('$routeChangeStart', function (event, next, current) {
+    $rootScope.$on('$routeChangeStart', function (event, next/*, current*/) {
         $scope.selectCameraById(next.params.cameraId);
     });
 
@@ -141,9 +142,9 @@ angular.module('webadminApp').controller('ViewCtrl', function ($scope,$rootScope
         },function(){
 
 
-            if(camera.id === $scope.cameraId){
+            /*if(camera.id === $scope.cameraId){
                 $scope.selectCamera(camera);
-            }
+            }*/
 
 
 
@@ -151,7 +152,7 @@ angular.module('webadminApp').controller('ViewCtrl', function ($scope,$rootScope
         });
     }
 
-    $scope.$watch("allcameras",function(){$scope.selectCameraById();});
+    $scope.$watch('allcameras',function(){$scope.selectCameraById();});
 
     mediaserver.getMediaServers().then(function(data){
         _.each(data.data,function(server){

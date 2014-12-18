@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('animateScope', function (mediaserver) {
+    .factory('animateScope', function () {
 
         var animations = [];
         function Animation(scope,value,target,duration,handler){
@@ -27,7 +27,7 @@ angular.module('webadminApp')
             var delta = (Math.sin(time/duration * Math.PI - Math.PI / 2) + 1)/2;
             return start + (stop - start) *delta ;
         };
-        Animation.prototype.update = function(apply) {
+        Animation.prototype.update = function() {
             if( this.isFinished){
                 return;
             }
@@ -36,21 +36,14 @@ angular.module('webadminApp')
             if(typeof(this.handler)!=='undefined'){
                 this.handler( this.scope[this.value] );
             }
-            /*if (apply && !this.scope.$$phase) {
-                this.scope.$apply();
-            }*/
             this.isFinished = time > this.duration;
         };
 
         return {
             process:function(){
-                var scopes = [];
                 var finished = [];
 
                 _.forEach(animations,function(animation){
-                    /*if(scopes.indexOf(animation.scope)<0){
-                       scopes.push(animation.scope);
-                    }*/
                     animation.update();
                     if(animation.isFinished){
                         finished.push(animation);
@@ -60,13 +53,6 @@ angular.module('webadminApp')
                 _.forEach(finished,function(animation){ // Remove all finished animations
                     animations.splice(animations.indexOf(animation),1);
                 });
-
-                /*_.forEach(scopes,function(scope){
-                    if(!scope.$$phase) {
-                        console.log(scope.$$phase);
-                        scope.$apply();
-                    }
-                });*/
             },
             animate:function(scope,value,target,duration,handler){
 

@@ -21,7 +21,7 @@ angular.module('webadminApp')
                         templateUrl: 'offline_modal',
                         controller: 'OfflineCtrl'
                     });
-                    offlineDialog.result.then(function (info) {//Dialog closed - means server is online
+                    offlineDialog.result.then(function () {//Dialog closed - means server is online
                         offlineDialog = null;
                     });
                 });
@@ -59,7 +59,8 @@ angular.module('webadminApp')
                 return wrapRequest($http.post('/api/mergeSystems?password=' + password +
                     '&currentPassword=' + currentPassword +
                     '&url=' + encodeURIComponent(url) +
-                    '&takeRemoteSettings=' + (!keepMySystem))); },
+                    '&takeRemoteSettings=' + (!keepMySystem)));
+            },
             pingSystem: function(url,password){return wrapRequest($http.post('/api/pingSystem?password=' + password  + '&url=' + encodeURIComponent(url))); },
             restart: function() { return wrapRequest($http.post('/api/restart')); },
             getStorages: function(){ return wrapRequest($http.get('/api/storageSpace')); },

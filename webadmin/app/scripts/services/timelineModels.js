@@ -19,7 +19,7 @@ function Chunk(boundaries,start,end,level,title,extension){
     }
 
     var format = 'MM/dd/yy HH:mm:ss';
-    this.title = (typeof(title) === 'undefined' || title === null) ? formatDate(start,format) + ' - ' + formatDate(end,format):title ;
+    this.title = (typeof(title) === 'undefined' || title === null) ? dateFormat(start,format) + ' - ' + dateFormat(end,format):title ;
 
 
     this.children = [];
@@ -116,7 +116,6 @@ Interval.prototype.checkDate = function(date){
         date = new Date(date);
     }
 
-    var aligned = this.alignToPast(date);
     return this.alignToPast(date).getTime() === date.getTime();
 };
 //Выравнивание даты по интервалу в будущее
@@ -251,7 +250,7 @@ RulerModel.prototype.splice = function(start, end, level, parent){
         while(start1 < parent.end){
             //create marks by adding chunks with step of level's interval
             var end1 = Math.min(newLevel.interval.addToDate(start1).getTime(),parent.end);
-            parent.children.push(new Chunk(parent,start1,end1,parent.level + 1,formatDate(start1,RulerModel.levels[parent.level + 1].format),
+            parent.children.push(new Chunk(parent,start1,end1,parent.level + 1,dateFormat(start1,RulerModel.levels[parent.level + 1].format),
                 {marks: Array.apply(null, {length: RulerModel.levels[parent.level + 1].marks - 1}).map(Number.call, Number)}));
             start1 = end1;
         }

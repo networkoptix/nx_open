@@ -13,7 +13,7 @@ angular.module('com.2fdevs.videogular.plugins.controls')
                 current: '=',
                 list: '='
             },
-            link: function (scope, elem, attr, API) {
+            link: function (/*scope, elem, attr, API*/) {
 
             }
         };
