@@ -2,6 +2,7 @@
 #define RETURN_CHANNEL_CMD_X_H
 
 #include <vector>
+#include <utility>
 
 #include "ret_chan/ret_chan_cmd.h"
 #include "ret_chan/ret_chan_cmd_host.h"
@@ -15,6 +16,7 @@ namespace ite
     {
     public:
         Command()
+        :   frequency_(0)
         {
             buffer_.reserve(RcCmdMaxSize);
         }
@@ -32,8 +34,12 @@ namespace ite
         bool hasTags() const { return hasLeadingTag() && hasEndingTag(); }
         bool isOK() const { return isFull() && hasTags() && checksum(); }
 
-        void clear() { buffer_.clear(); }
-        void swap(Command& cmd) { buffer_.swap(cmd.buffer_); }
+        void clear() { buffer_.clear(); frequency_ = 0; }
+        void swap(Command& cmd)
+        {
+            buffer_.swap(cmd.buffer_);
+            std::swap(frequency_, cmd.frequency_);
+        }
 
         static unsigned short headSize() { return 13; }
         static Byte leadingTag() { return '#'; }
@@ -60,8 +66,13 @@ namespace ite
 
         bool checkPacketCount();
 
+        //
+        unsigned frequency() const { return frequency_; }
+        void setFrequency(unsigned freq) { frequency_ = freq; }
+
     private:
         std::vector<Byte> buffer_;
+        unsigned frequency_;
 
         Command(const Command& );
         Command& operator = (const Command&);

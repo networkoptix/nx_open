@@ -11,7 +11,6 @@
 
 #include "ref_counter.h"
 #include "camera_manager.h"
-#include "rc_com.h"
 #include "rc_shell.h"
 
 namespace ite
@@ -80,8 +79,7 @@ namespace ite
         std::map<unsigned short, RxDevicePtr> m_rxDevs;         // {RxID, RxDev}
         std::multimap<unsigned short, IDsLink> m_txLinks;       // {TxID, RxTxLink}
         std::vector<CameraPtr> m_restored;
-        RCShell rcShell_;
-        ComPort comPort_;
+        RCShell m_rcShell;
 
         void addTxLinks(const std::vector<IDsLink>&);
         void getRx4Tx(unsigned short txID, std::vector<RxDevicePtr>& out);

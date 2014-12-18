@@ -115,10 +115,11 @@ void * RC_ParseThread(void * data)
         unsigned short cmdID = cmd->commandID();
         unsigned short rxID = cmd->rxID();
         unsigned short txID = cmd->txID();
+        unsigned frequency = cmd->frequency();
 #if 1 // DEBUG
-        printf("RC cmd: %x; TxID: %d; RxID: %d\n", cmdID, txID, rxID);
+        printf("RC cmd: %x; TxID: %d; RxID: %d; freq: %d\n", cmdID, txID, rxID, frequency);
 #endif
-        DeviceInfoPtr dev = pShell->addDevice(rxID, txID, (CMD_GetTxDeviceAddressIDOutput == cmdID));
+        DeviceInfoPtr dev = pShell->addDevice(rxID, txID, frequency, (CMD_GetTxDeviceAddressIDOutput == cmdID));
         if (dev)
         {
             unsigned short seqNo = cmd->sequenceNum();
@@ -321,8 +322,11 @@ void DeviceInfo::print() const
 // RCShell
 
 RCShell::RCShell()
-:    bIsRun_(false)
+:   bIsRun_(false),
+    comPort_("/dev/tnt0", 9600)
 {
+    ComPort::Instance = &comPort_;
+
     User_mutex_init();
 }
 
@@ -351,11 +355,28 @@ void RCShell::stopRcvThread()
     }
 }
 
+void RCShell::setRxFrequency(unsigned short rxID, unsigned freq)
+{
+    std::lock_guard<std::mutex> lock(mutexUART_); // LOCK
+
+    if (frequencies_.size() <= rxID)
+        frequencies_.resize(rxID+1);
+
+    frequencies_[rxID] = freq;
+}
+
 void RCShell::push_back(CommandPtr cmd)
 {
     std::lock_guard<std::mutex> lock(mutexUART_); // LOCK
 
-    cmds_.push_back(cmd);
+    // do not add commands without frequency - interferences
+    // could lose some valid commands that recieved after frequencies_[rxID] reset (in another thread)
+    unsigned short rxID = cmd->rxID();
+    if (rxID < frequencies_.size() && frequencies_[rxID])
+    {
+        cmd->setFrequency(frequencies_[rxID]);
+        cmds_.push_back(cmd);
+    }
 }
 
 RCShell::CommandPtr RCShell::pop_front()
@@ -444,7 +465,7 @@ void RCShell::getDevIDs(std::vector<IDsLink>& outLinks)
     }
 }
 
-DeviceInfoPtr RCShell::addDevice(unsigned short rxID, unsigned short txID, bool rcActive)
+DeviceInfoPtr RCShell::addDevice(unsigned short rxID, unsigned short txID, unsigned frequency, bool rcActive)
 {
     DeviceInfoPtr dev = device(rxID, txID);
 
@@ -457,11 +478,8 @@ DeviceInfoPtr RCShell::addDevice(unsigned short rxID, unsigned short txID, bool 
     }
 
     // new and passive devices
-    if (! dev->isActive())
-    {
-        if (rxID < frequencies_.size() && frequencies_[rxID])
-            dev->setFrequency(frequencies_[rxID]);
-    }
+    if (! dev->isActive() && frequency)
+        dev->setFrequency(frequency);
 
     // new, passive + active devices if rcActive set
     if (rcActive || ! dev->isActive())
@@ -517,16 +535,6 @@ bool RCShell::setChannel(unsigned short rxID, unsigned short txID, unsigned chan
     }
 
     return false;
-}
-
-void RCShell::setRxFrequency(unsigned short rxID, unsigned freq)
-{
-    std::lock_guard<std::mutex> lock(mutex_); // LOCK
-
-    if (frequencies_.size() <= rxID)
-        frequencies_.resize(rxID+1);
-
-    frequencies_[rxID] = freq;
 }
 
 unsigned RCShell::lastTxFrequency(unsigned short txID) const

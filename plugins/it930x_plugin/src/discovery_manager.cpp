@@ -24,20 +24,20 @@ namespace ite
 {
     static const char * VENDOR_NAME = "ITE";
 
-    class RCUpdateDevsThread;
-    static RCUpdateDevsThread * updateThreadObj = nullptr;
+    class RC_DiscoveryThread;
+    static RC_DiscoveryThread * updateThreadObj = nullptr;
     static std::thread updateThread;
 
-    class RCUpdateDevsThread
+    class RC_DiscoveryThread
     {
     public:
-        RCUpdateDevsThread(DiscoveryManager * discovery, RCShell * shell)
+        RC_DiscoveryThread(DiscoveryManager * discovery, RCShell * shell)
         :   m_stopMe(false),
             m_discovery(discovery),
             m_rcShell(shell)
         {}
 
-        RCUpdateDevsThread(const RCUpdateDevsThread& rct)
+        RC_DiscoveryThread(const RC_DiscoveryThread& rct)
         :   m_stopMe(false),
             m_discovery(rct.m_discovery),
             m_rcShell(rct.m_rcShell)
@@ -107,17 +107,15 @@ namespace ite
     DiscoveryManager * DiscoveryManager::Instance;
 
     DiscoveryManager::DiscoveryManager()
-    :   m_refManager( this ),
-        comPort_("/dev/tnt0", 9600)
+    :   m_refManager( this )
     {
-        ComPort::Instance = &comPort_;
-        rcShell_.startRcvThread();
+        m_rcShell.startRcvThread();
 
         Instance = this;
 
         try
         {
-            updateThread = std::thread( RCUpdateDevsThread(this, &rcShell_) );
+            updateThread = std::thread( RC_DiscoveryThread(this, &m_rcShell) );
         }
         catch (std::system_error& )
         {}
@@ -189,7 +187,7 @@ namespace ite
             return nxcip::NX_IO_ERROR;
 
         std::vector<IDsLink> links;
-        rcShell_.getDevIDs(links);
+        m_rcShell.getDevIDs(links);
         addTxLinks(links);
 
         unsigned cameraNum = 0;
@@ -235,7 +233,7 @@ namespace ite
                 getRx4Tx(cam->txID(), rxs);
                 cam->addRxDevices(rxs);
 
-                unsigned freq = rcShell_.lastTxFrequency(cam->txID());
+                unsigned freq = m_rcShell.lastTxFrequency(cam->txID());
                 cam->updateCameraInfo(freq);
                 cam->getCameraInfo(&info);
                 ++cameraNum;
@@ -328,7 +326,7 @@ namespace ite
 
             auto it = m_rxDevs.find(id);
             if (it == m_rxDevs.end())
-                m_rxDevs[id] = std::make_shared<RxDevice>(id, &rcShell_); // create RxDevice
+                m_rxDevs[id] = std::make_shared<RxDevice>(id, &m_rcShell); // create RxDevice
 
             // TODO: remove lost devices (USB)
         }
@@ -355,7 +353,7 @@ namespace ite
             updateOneTxLink(scanDevs[i], freq);
 
         std::vector<IDsLink> links;
-        rcShell_.getDevIDs(links);
+        m_rcShell.getDevIDs(links);
         addTxLinks(links);
     }
 
@@ -364,7 +362,7 @@ namespace ite
         if (dev->tryLockF(freq))
         {
             unsigned short rxID = dev->rxID();
-            rcShell_.setRxFrequency(rxID, freq); // frequency for new devices
+            m_rcShell.setRxFrequency(rxID, freq); // frequency for new DeviceInfo
 
 #if 1 // DEBUG
             printf("searching TxIDs - rxID: %d; frequency: %d; quality: %d; strength: %d; presence: %d\n",
@@ -373,13 +371,13 @@ namespace ite
             // active devices communication
             if (dev->present() && dev->strength() > 0) // strength: 0..100
             {
-                rcShell_.sendGetIDs();
+                m_rcShell.sendGetIDs();
                 usleep(DeviceInfo::SEND_WAIT_TIME_MS * 1000);
             }
 
             dev->unlockF();
 
-            rcShell_.setRxFrequency(dev->rxID(), 0);
+            m_rcShell.setRxFrequency(dev->rxID(), 0);
         }
     }
 

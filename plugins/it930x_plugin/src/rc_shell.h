@@ -9,6 +9,7 @@
 #include <memory>
 
 #include "rc_cmd.h"
+#include "rc_com.h"
 
 #include "ret_chan/ret_chan_cmd.h"
 #include "ret_chan/ret_chan_user.h"
@@ -393,7 +394,7 @@ namespace ite
 
         bool sendGetIDs(int iWaitTime = DeviceInfo::SEND_WAIT_TIME_MS * 2);
 
-        DeviceInfoPtr addDevice(unsigned short rxID, unsigned short txID, bool rcActive);
+        DeviceInfoPtr addDevice(unsigned short rxID, unsigned short txID, unsigned frequency, bool rcActive);
         void removeDevice(unsigned short txID);
 
         DebugInfo& debugInfo() { return debugInfo_; }
@@ -422,6 +423,7 @@ namespace ite
         pthread_t rcvThread_;
         pthread_t parseThread_;
         bool bIsRun_;
+        ComPort comPort_;
 
         DebugInfo debugInfo_;
         //void waitBlockBcast(Word command, int waitTime);
