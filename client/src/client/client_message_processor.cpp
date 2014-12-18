@@ -125,12 +125,21 @@ void QnClientMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData
 
 void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData &data) {
     base_type::handleRemotePeerLost(data);
+
     if (qnCommon->remoteGUID().isNull()) {
         qWarning() << "at_remotePeerLost received while disconnected";
         return;
     }
 
     if (data.peer.id != qnCommon->remoteGUID())
+        return;
+
+    /* 
+        RemotePeerLost signal during connect is perfectly OK. We are receiving old notifications
+        that were not sent as TransactionMessageBus was stopped. Peer id is the same if we are
+        connecting to the same server we are already connected to (and just disconnected).
+    */
+    if (m_status.state() == QnConnectionState::Connecting)
         return;
 
     m_status.setState(QnConnectionState::Reconnecting);
