@@ -130,7 +130,7 @@ class ClusterTest():
         print "Test all ec2 get request status"
         for s in clusterTest.clusterTestServerList:
             for reqName in self._ec2GetRequests:
-                print "Connection tot http://%s/ec2/%s"%(s,reqName)
+                print "Connection to http://%s/ec2/%s"%(s,reqName)
                 response = urllib2.urlopen("http://%s/ec2/%s" % (s,reqName))
                 if response.getcode() != 200:
                     return (False,"%s failed with statusCode %d" % (reqName,response.getcode()))
@@ -282,7 +282,7 @@ class ClusterTest():
     def checkMethodStatusConsistent(self,method):
             responseList = []
             for server in self.clusterTestServerList:
-                print "Connection tot http://%s/ec2/%s"%(server, method)
+                print "Connection to http://%s/ec2/%s"%(server, method)
                 responseList.append((urllib2.urlopen("http://%s/ec2/%s" % (server, method)),server))
 
             # checking the last response validation
@@ -1232,9 +1232,8 @@ class ClusterTestBase(unittest.TestCase):
             data=d, headers={'Content-Type': 'application/json'})
         response = None
         
-        print "Connection to http://%s/ec2/%s"%(server,methodName)
-
         with self._Lock:
+            print "Connection to http://%s/ec2/%s"%(server,methodName)
             response = urllib2.urlopen(req)
 
         # Do a sligtly graceful way to dump the sample of failure
