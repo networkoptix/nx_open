@@ -324,11 +324,8 @@ void QnResourceWidget::setAspectRatio(float aspectRatio) {
     if(qFuzzyCompare(m_aspectRatio, aspectRatio))
         return;
 
-    QRectF enclosingGeometry = this->enclosingGeometry();
     m_aspectRatio = aspectRatio;
-
     updateGeometry(); /* Discard cached size hints. */
-    setEnclosingGeometry(enclosingGeometry);
 
     emit aspectRatioChanged();
 }
@@ -345,6 +342,17 @@ float QnResourceWidget::defaultVisualAspectRatio() const {
         return defaultAspectRatio();
 
     return m_enclosingGeometry.width() / m_enclosingGeometry.height();
+}
+
+float QnResourceWidget::visualChannelAspectRatio() const {
+    if (!channelLayout())
+        return visualAspectRatio();
+
+    qreal layoutAspectRatio = QnGeometry::aspectRatio(channelLayout()->size());
+    if (QnAspectRatio::isRotated90(rotation()))
+        return visualAspectRatio() * layoutAspectRatio;
+    else
+        return visualAspectRatio() / layoutAspectRatio;
 }
 
 QRectF QnResourceWidget::enclosingGeometry() const {

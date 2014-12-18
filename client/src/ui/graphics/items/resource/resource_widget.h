@@ -160,13 +160,18 @@ public:
     /**
      * \returns                         Aspect ratio of this widget taking its rotation into account.
      */
-    float visualAspectRatio() const;
+    virtual float visualAspectRatio() const;
 
     /**
      * \return                          Default visual aspect ratio for widgets of this type.
      *                                  Visual aspect ratio differs from aspect ratio in that it is always valid.
      */
     virtual float defaultVisualAspectRatio() const;
+
+    /**
+     * \return                          Aspect ratio of one channel.
+     */
+    float visualChannelAspectRatio() const;
 
     /**
      * \returns                         Geometry of the enclosing rectangle for this widget.

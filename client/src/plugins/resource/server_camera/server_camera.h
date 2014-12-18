@@ -24,6 +24,7 @@ public:
     virtual Qn::ResourceStatus getStatus() const override;
 
     virtual Qn::ResourceFlags flags() const override;
+    virtual void setParentId(const QnUuid& parent) override;
 protected:
     virtual QnAbstractStreamDataProvider *createLiveDataProvider() override;
 

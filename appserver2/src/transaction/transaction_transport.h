@@ -221,7 +221,6 @@ private slots:
     void repeatDoGet();
 };
 
-typedef QSharedPointer<QnTransactionTransport> QnTransactionTransportPtr;
 }
 
 Q_DECLARE_METATYPE(ec2::QnTransactionTransport::State);

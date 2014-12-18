@@ -57,11 +57,15 @@ QnTransactionTransport::QnTransactionTransport(const ApiPeerData &localPeer, con
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_lastReceiveTimer.invalidate();
     m_emptyChunkData = QnChunkedTransferEncoder::serializedTransaction(QByteArray(), std::vector<nx_http::ChunkExtension>());
+
+    NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG1);
 }
 
 
 QnTransactionTransport::~QnTransactionTransport()
 {
+    NX_LOG(QnLog::EC2_TRAN_LOG, lit("~QnTransactionTransport for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG1);
+
     if( m_httpClient )
         m_httpClient->terminate();
 
@@ -414,7 +418,7 @@ void QnTransactionTransport::onSomeBytesRead( SystemError::ErrorCode errorCode, 
                 assert( false );
             }
             assert( !transportHeader.processedPeers.empty() );
-            NX_LOG(lit("QnTransactionTransport::onSomeBytesRead. Got transaction with seq %1 from %2").
+            NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport::onSomeBytesRead. Got transaction with seq %1 from %2").
                 arg(transportHeader.sequence).arg(m_remotePeer.id.toString()), cl_logDEBUG1);
             emit gotTransaction(serializedTran, transportHeader);
             ++m_postedTranCount;
@@ -660,7 +664,7 @@ void QnTransactionTransport::processTransactionData(const QByteArray& data)
                 QnTransactionTransportHeader transportHeader;
                 QnUbjsonTransactionSerializer::deserializeTran(buffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
                 assert( !transportHeader.processedPeers.empty() );
-                NX_LOG(lit("QnTransactionTransport::processTransactionData. Got transaction with seq %1 from %2").
+                NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransport::processTransactionData. Got transaction with seq %1 from %2").
                     arg(transportHeader.sequence).arg(m_remotePeer.id.toString()), cl_logDEBUG1);
                 emit gotTransaction(serializedTran, transportHeader);
                 ++m_postedTranCount;

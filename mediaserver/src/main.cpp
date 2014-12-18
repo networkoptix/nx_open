@@ -1679,6 +1679,7 @@ void QnMain::run()
     }
 
     QScopedPointer<QnServerConnector> serverConnector(new QnServerConnector(m_moduleFinder));
+    serverConnector->start();
 
     QUrl url = ec2Connection->connectionInfo().ecUrl;
 #if 1
@@ -1917,9 +1918,6 @@ void QnMain::run()
 
     av_lockmgr_register(NULL);
 
-    // First disconnect eventManager from all slots, to not try to reconnect on connection close
-    disconnect(QnServerMessageProcessor::instance());
-
     // This method will set flag on message channel to threat next connection close as normal
     //appServerConnection->disconnectSync();
     MSSettings::runTimeSettings()->setValue("lastRunningTime", 0);
@@ -1933,9 +1931,6 @@ void QnMain::run()
     QnResourcePool::initStaticInstance( NULL );
 
     m_mediaServer.clear();
-
-    //TODO #ak this is an ugly workaround for non-stopping server
-    connect(this, SIGNAL(finished()),   this, SLOT(at_finished()), Qt::DirectConnection);
 }
 
 void QnMain::changePort(quint16 port) {

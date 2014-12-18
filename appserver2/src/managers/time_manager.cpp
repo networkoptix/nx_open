@@ -534,7 +534,7 @@ namespace ec2
         }
     }
 
-    void TimeSynchronizationManager::onNewConnectionEstablished( const QnTransactionTransportPtr& transport )
+    void TimeSynchronizationManager::onNewConnectionEstablished(QnTransactionTransport* transport )
     {
         using namespace std::placeholders;
         transport->getSocket()->toggleStatisticsCollection( true );
