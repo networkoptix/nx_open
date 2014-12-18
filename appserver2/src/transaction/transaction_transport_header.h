@@ -27,6 +27,8 @@ namespace ec2 {
 
     QN_FUSION_DECLARE_FUNCTIONS(QnTransactionTransportHeader, (json)(ubjson))
 
+    QString toString(const QnTransactionTransportHeader& header);
+
 } // namespace ec2
 
 #ifndef QN_NO_QT

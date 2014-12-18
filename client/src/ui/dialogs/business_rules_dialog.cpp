@@ -275,6 +275,7 @@ void QnBusinessRulesDialog::at_model_dataChanged(const QModelIndex &topLeft, con
     Q_UNUSED(bottomRight)
     if (topLeft.column() <= QnBusiness::ModifiedColumn && bottomRight.column() >= QnBusiness::ModifiedColumn)
         updateControlButtons();
+    updateFilter();
 }
 
 void QnBusinessRulesDialog::toggleAdvancedMode() {

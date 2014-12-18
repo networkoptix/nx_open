@@ -32,11 +32,21 @@ QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QnWorkbenchContext *c
     base_type(parent),
     QnWorkbenchContextAware(context),
     m_currentTask(0),
-    m_updateTool(0)
+    m_updateTool(0),
+    m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnConnectToCurrentSystemTool>(this))
 {
 }
 
 QnConnectToCurrentSystemTool::~QnConnectToCurrentSystemTool() {}
+
+bool QnConnectToCurrentSystemTool::tryClose(bool force) {
+    Q_UNUSED(force)
+    cancel();
+    return true;
+}
+
+void QnConnectToCurrentSystemTool::forcedUpdate() {
+}
 
 void QnConnectToCurrentSystemTool::start(const QSet<QnUuid> &targets, const QString &adminUser, const QString &password) {
     if (targets.isEmpty()) {
@@ -100,10 +110,10 @@ void QnConnectToCurrentSystemTool::waitPeers() {
     QnWaitCompatibleServersPeerTask *task = new QnWaitCompatibleServersPeerTask(this);
     m_currentTask = task;
 
+    emit progressChanged(configureProgress);
+
     connect(task, &QnNetworkPeerTask::finished, this, &QnConnectToCurrentSystemTool::at_waitTask_finished);
     task->start(QSet<QnUuid>::fromList(m_waitTargets.values()));
-
-    emit progressChanged(configureProgress);
 }
 
 void QnConnectToCurrentSystemTool::updatePeers() {
@@ -114,10 +124,10 @@ void QnConnectToCurrentSystemTool::updatePeers() {
 
     emit stateChanged(tr("Updating server(s)"));
     emit progressChanged(waitProgress);
-    at_updateTool_progressChanged(0);
 
     m_updateTool = new QnMediaServerUpdateTool(this);
-    connect(m_updateTool, &QnMediaServerUpdateTool::updateFinished, this, &QnConnectToCurrentSystemTool::at_updateTool_finished);
+    connect(m_updateTool,   &QnMediaServerUpdateTool::updateFinished,           this,   &QnConnectToCurrentSystemTool::at_updateTool_finished);
+    connect(m_updateTool,   &QnMediaServerUpdateTool::stageProgressChanged,     this,   &QnConnectToCurrentSystemTool::at_updateTool_stageProgressChanged);
 
     m_updateTool->setTargets(m_updateTargets);
     m_updateTool->startUpdate(QnSoftwareVersion(), true);
@@ -173,6 +183,7 @@ void QnConnectToCurrentSystemTool::at_updateTool_finished(const QnUpdateResult &
     }
 }
 
-void QnConnectToCurrentSystemTool::at_updateTool_progressChanged(int progress) {
-    emit progressChanged(waitProgress + progress * static_cast<int>(QnFullUpdateStage::Count) / 100 / 2);
+void QnConnectToCurrentSystemTool::at_updateTool_stageProgressChanged(QnFullUpdateStage stage, int progress) {
+    int updateProgress = (static_cast<int>(stage) * 100 + progress) / static_cast<int>(QnFullUpdateStage::Count);
+    emit progressChanged(waitProgress + updateProgress * (100 - waitProgress) / 100);
 }

@@ -73,9 +73,7 @@ public:
         }
 #endif
 
-        NX_LOG( QnLog::EC2_TRAN_LOG, lit("send transaction to peer %1 command=%2 tt seq=%3 db seq=%4 timestamp=%5").
-            arg(remotePeer().id.toString()).arg(ApiCommand::toString(transaction.command)).arg(header.sequence).
-            arg(transaction.persistentInfo.sequence).arg(transaction.persistentInfo.timestamp), cl_logDEBUG1 );
+        NX_LOG( QnLog::EC2_TRAN_LOG, lit("send transaction %1 to peer %2").arg(transaction.toString()).arg(remotePeer().id.toString()), cl_logDEBUG1 );
 
         switch (m_remotePeer.dataFormat) {
         case Qn::JsonFormat:

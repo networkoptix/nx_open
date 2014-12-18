@@ -780,8 +780,7 @@ bool QnTransactionTransport::sendSerializedTransaction(Qn::SerializationFormat s
             QnAbstractTransaction abtractTran;
             QnUbjsonReader<QByteArray> stream(&serializedTran);
             QnUbjson::deserialize(&stream, &abtractTran);
-            NX_LOG( QnLog::EC2_TRAN_LOG, lit("send direct transaction to peer %1 command=%2 tt seq=%3 db seq=%4 timestamp=%5").arg(remotePeer().id.toString()).
-                arg(ApiCommand::toString(abtractTran.command)).arg(header.sequence).arg(abtractTran.persistentInfo.sequence).arg(abtractTran.persistentInfo.timestamp), cl_logDEBUG1 );
+            NX_LOG( QnLog::EC2_TRAN_LOG, lit("send direct transaction %1 to peer %2").arg(abtractTran.toString()).arg(remotePeer().id.toString()), cl_logDEBUG1 );
         }
 
         addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));

@@ -497,7 +497,10 @@ private:
             {
                 //TODO #ak distinguish read and write
                 SystemError::ErrorCode sockErrorCode = SystemError::notConnected;
-                this->m_socket->getLastError( &sockErrorCode );
+                if( !this->m_socket->getLastError( &sockErrorCode ) )
+                    sockErrorCode = SystemError::notConnected;
+                else if( sockErrorCode == SystemError::noError )
+                    sockErrorCode = SystemError::notConnected;  //MUST report some error
                 if( m_connectHandler )
                 {
                     m_connectSendHandlerTerminatedFlag = &terminated;
