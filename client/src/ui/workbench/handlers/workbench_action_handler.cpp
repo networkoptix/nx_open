@@ -202,7 +202,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)), Qt::QueuedConnection);
     
     connect(workbench(),                                        SIGNAL(itemChanged(Qn::ItemRole)),              this,   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
-    connect(workbench(),                                        SIGNAL(cellAspectRatioChanged()),               this,   SLOT(at_workbench_cellAspectRatioChanged()));
     connect(workbench(),                                        SIGNAL(cellSpacingChanged()),                   this,   SLOT(at_workbench_cellSpacingChanged()));
     connect(workbench(),                                        SIGNAL(currentLayoutChanged()),                 this,   SLOT(at_workbench_currentLayoutChanged()));
 
@@ -732,18 +731,15 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
         } else {
             foreach (QnWorkbenchItem *item, workbenchLayout->items()) {
                 QnResourceWidget *widget = context()->display()->widget(item);
-                if (widget && widget->hasAspectRatio()) {
-                    qreal aspectRatio = widget->aspectRatio();
+                if (!widget)
+                    continue;
 
-                    QString customAspectRatio = widget->resource()->getProperty(QnMediaResource::customAspectRatioKey());
-                    if (!customAspectRatio.isEmpty())
-                        aspectRatio = customAspectRatio.toDouble();
+                float aspectRatio = widget->visualChannelAspectRatio();
+                if (aspectRatio <= 0)
+                    continue;
 
-                    if (QnAspectRatio::isRotated90(item->rotation()))
-                        aspectRatio = 1.0 / aspectRatio;
-                    midAspectRatio += aspectRatio;
-                    ++count;
-                }
+                midAspectRatio += aspectRatio;
+                ++count;
             }
         }
 
@@ -1390,6 +1386,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission));
     layout->setData(Qn::LayoutSearchStateRole, QVariant::fromValue<QnThumbnailsSearchState>(QnThumbnailsSearchState(period, step)));
     layout->setData(Qn::LayoutCellAspectRatioRole, desiredCellAspectRatio);
+    layout->setCellAspectRatio(desiredCellAspectRatio);
     layout->setLocalRange(period);
 
     resourcePool()->addResource(layout);
@@ -2316,10 +2313,18 @@ void QnWorkbenchActionHandler::at_workbench_itemChanged(Qn::ItemRole role) {
 }
 
 void QnWorkbenchActionHandler::at_whatsThisAction_triggered() {
-    QWhatsThis::enterWhatsThisMode();
+    if (QWhatsThis::inWhatsThisMode()) 
+        QWhatsThis::leaveWhatsThisMode();
+    else
+        QWhatsThis::enterWhatsThisMode();
 }
 
 void QnWorkbenchActionHandler::at_escapeHotkeyAction_triggered() {
+    if (QWhatsThis::inWhatsThisMode()) {
+        QWhatsThis::leaveWhatsThisMode();
+        return;
+    }
+
     if (action(Qn::ToggleTourModeAction)->isChecked())
         menu()->trigger(Qn::ToggleTourModeAction);
 }

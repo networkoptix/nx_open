@@ -325,7 +325,7 @@ QnUuid QnResource::getParentId() const
     return m_parentId;
 }
 
-void QnResource::setParentId(QnUuid parent)
+void QnResource::setParentId(const QnUuid& parent)
 {
     bool initializedChanged = false;
     QnUuid oldParentId;

@@ -70,7 +70,7 @@ class UnitTestRollback:
                 print  "Or you could run recover later when all the rollback done\n"
                 recoverList.append("%s,%s,%s\n"%(l[0],l[1],l[2]))
             else:
-                print "*"
+                print "..rollback done.."
 
         # close the resource file
         self._rollbackFile.close()
@@ -97,6 +97,7 @@ class ClusterTest():
     clusterTestServerList = []
     clusterTestSleepTime = None
     clusterTestServerUUIDList = []
+    threadNumber = 16
     testCaseSize = 2
     unittestRollback = None
 
@@ -129,9 +130,11 @@ class ClusterTest():
         print "Test all ec2 get request status"
         for s in clusterTest.clusterTestServerList:
             for reqName in self._ec2GetRequests:
+                print "Connection to http://%s/ec2/%s"%(s,reqName)
                 response = urllib2.urlopen("http://%s/ec2/%s" % (s,reqName))
                 if response.getcode() != 200:
                     return (False,"%s failed with statusCode %d" % (reqName,response.getcode()))
+                response.close()
         print "All ec2 get requests work well"
         return (True,"Server:%s test for all getter pass" % (s))
 
@@ -160,6 +163,7 @@ class ClusterTest():
                 return (False,"testConnection response with error code:%d" % (response.getcode()))
             json_obj = json.loads(response.read())
             server_id_list.append(self._patchUUID(json_obj["ecsGuid"]))
+            response.close()
 
         # We still need to get the server name since this is useful for
         # the SaveServerAttributeList test (required in its post data)
@@ -181,31 +185,125 @@ class ClusterTest():
         response.close()
         return (True,"")
 
-    def _checkResultEqual(self,responseList,methodName,address):
-        result = None
-        for response in responseList:
+    def _dumpDiffStr(self,str,i):
+        if len(str) == 0:
+            print "<empty string>"
+        else:
+            start = max(0,i-64)
+            end = min(64,len(str)-i)+i
+            comp1 = str[start:i]
+            comp2 = str[i]
+            comp3 = ""
+            if i+1 >= len(str):
+                comp3 = ""
+            else:
+                comp3 = str[i+1:end]
+            print "%s^^^%s^^^%s"%(comp1,comp2,comp3)
+
+
+    def _seeDiff(self,lhs,rhs):
+        if len(rhs) == 0 or len(lhs) == 0:
+            print "The difference is showing bellow:"
+            if len(lhs) == 0:
+                print "<empty string>"
+            else:
+                print rhs[0:min(128,len(rhs))]
+            if len(rhs) == 0:
+                print "<empty string>"
+            else:
+                print rhs[0:min(128,len(rhs))]
+
+            print "One of the string is empty!"
+            return
+
+        for i in xrange(max(len(rhs),len(lhs))):
+            if i >= len(rhs) or i >= len(lhs) or lhs[i] != rhs[i]:
+                print "The difference is showing bellow:"
+                self._dumpDiffStr(lhs,i)
+                self._dumpDiffStr(rhs,i)
+                print "The first different character is at location:%d"%(i+1)
+                return
+
+
+    def _testConnection(self):
+        print "=================================================="
+        print "Test connection on each server in the server list "
+        for s in self.clusterTestServerList:
+            print "Try to connect to server:%s"%(s)
+            response = urllib2.urlopen("http://%s/ec2/testConnection"%(s))
+            if response.getcode() != 200:
+                return False
+            response.close()
+            print "Connection test OK"
+
+        print "Connection Test Pass"
+        print "==================================================="
+        return True
+
+    # This checkResultEqual function will categorize the return value from each server
+    # and report the difference status of this
+
+    def _reportDetailDiff(self,key_list):
+        print "\n\n"
+        print "Detail difference with each group is listed below:"
+        for i in xrange(len(key_list)):
+            for k in xrange(i+1,len(key_list)):
+                print "-----------------------------------------"
+                print "Group __%d__ compared with Group __%d__"%(i+1,k+1)
+                self._seeDiff(key_list[i],key_list[k])
+                print "-----------------------------------------"
+        print "Detail list done\n\n"
+
+    def _reportDiff(self,statusDict,methodName):
+        print "=============================================="
+        print "For method:%s cluster has different status"%(methodName)
+        print "The server inside of the same group will have same status,but each group has different status with others"
+        i = 1
+        key_list = []
+        for key in statusDict:
+            list = statusDict[key]
+            print "Group %d:(%s)"%(i,','.join(list))
+            i = i +1
+            key_list.append(key)
+
+
+        self._reportDetailDiff(key_list)
+        print "=============================================="
+
+    def _checkResultEqual(self,responseList,methodName):
+        statusDict = dict()
+
+        for entry in responseList:
+            response = entry[0]
+            address = entry[1]
+            failed = False
+
             if response.getcode() != 200:
                 return(False,"Server:%s method:%s http request failed with code:%d" % (address,methodName,response.getcode))
             else:
-                # painfully slow, just bulk string comparison here
-                if result == None:
-                    result = response.read()
+                content = response.read()
+                if content in statusDict:
+                    statusDict[content].append(address)
                 else:
-                    output = response.read()
-                    if result != output:
-                        return(False,"Server:%s method:%s return value differs from other" % (address,methodName))
-                
+                    statusDict[content]=[address]
+                    if len(statusDict) != 1:
+                        failed = True
                 response.close()
+
+        if failed:
+            self._reportDiff(statusDict,methodName)
+            return (False,"One or more server has different status")
 
         return (True,"")
 
     def checkMethodStatusConsistent(self,method):
             responseList = []
             for server in self.clusterTestServerList:
-                responseList.append((urllib2.urlopen("http://%s/ec2/%s" % (server, method))))
+                print "Connection to http://%s/ec2/%s"%(server, method)
+                responseList.append((urllib2.urlopen("http://%s/ec2/%s" % (server, method)),server))
 
             # checking the last response validation
-            return self._checkResultEqual(responseList,method,server)
+            return self._checkResultEqual(responseList,method)
 
     def _ensureServerListStates(self,sleep_timeout):
         time.sleep(sleep_timeout)
@@ -220,6 +318,7 @@ class ClusterTest():
         parser.read("ec2_tests.cfg")
         self.clusterTestServerList = parser.get("General","serverList").split(",")
         self.clusterTestSleepTime = parser.getint("General","clusterTestSleepTime")
+        self.threadNumber = parser.getint("General","threadNumber")
         try :
             self.testCaseSize = parser.getint("General","testCaseSize")
         except :
@@ -239,6 +338,9 @@ class ClusterTest():
         urllib2.install_opener(urllib2.build_opener(urllib2.HTTPDigestAuthHandler(passman)))
 
     def init(self):
+        if not self._testConnection():
+            return (False,"Connection test failed")
+
         # ensure all the server are on the same page
         ret,reason = self._ensureServerListStates(self.clusterTestSleepTime)
 
@@ -265,6 +367,46 @@ _uniqueCameraSeedNumber =0
 _uniqueUserSeedNumber =0
 _uniqueMediaServerSeedNumber =0
 
+
+
+# Thread queue for multi-task.  This is useful since if the user
+# want too many data to be sent to the server, then there maybe
+# thousands of threads to be created, which is not something we
+# want it.  This is not a real-time queue, but a push-sync-join
+class ClusterWorker():
+    _queue = None
+    _threadList = None
+    _threadNum = 1
+
+    def __init__(self,num,element_size):
+        self._queue = Queue.Queue(element_size)
+        self._threadList = []
+        self._threadNum = num
+        if element_size < num:
+            self._threadNum = element_size
+
+    def _worker(self):
+        while not self._queue.empty():
+            t,a = self._queue.get(True)
+            t(*a)
+
+    def _initializeThreadWorker(self):
+        for _ in xrange(self._threadNum):
+            t = threading.Thread(target=self._worker)
+            t.start()
+            self._threadList.append(t)
+
+    def join(self):
+        # We delay the real operation until we call join
+        self._initializeThreadWorker()
+        # Now we safely join the thread since the queue
+        # will utimatly be empty after execution
+        for t in self._threadList:
+            t.join()
+
+    def enqueue(self,task,args):
+        self._queue.put((task,args),True)
+
 class BasicGenerator():
     def __init__(self):
         global _uniqueSessionNumber
@@ -275,7 +417,7 @@ class BasicGenerator():
     # generate MAC address of the object
     def generateMac(self):
         l = []
-        for i in range(0,5):
+        for i in xrange(0,5):
             l.append(str(random.randint(0,255)) + '-')
         l.append(str(random.randint(0,255)))
         return ''.join(l)
@@ -288,7 +430,7 @@ class BasicGenerator():
 
     def generateRandomString(self,length):
         chars = string.ascii_uppercase + string.digits
-        return ''.join(random.choice(chars) for _ in range(length))
+        return ''.join(random.choice(chars) for _ in xrange(length))
 
     def generateUUIdFromMd5(self,salt):
         m = md5.new()
@@ -418,7 +560,7 @@ class CameraDataGenerator(BasicGenerator):
 
     def generateCameraData(self,number,mediaServer):
         ret = []
-        for i in range(number):
+        for i in xrange(number):
             mac = self.generateMac()
             id = self._generateCameraId(mac)
             name_and_model = self.generateCameraName()
@@ -468,7 +610,7 @@ class UserDataGenerator(BasicGenerator):
 
     def generateUserData(self,number):
         ret = []
-        for i in range(number):
+        for i in xrange(number):
             id = self.generateRandomId()
             un,pwd,digest = self.generateUsernamePasswordAndDigest(self.generateUserName)
             ret.append((self._template % (digest,
@@ -509,7 +651,7 @@ class MediaServerGenerator(BasicGenerator):
 
     def generateMediaServerData(self,number):
         ret = []
-        for i in range(number):
+        for i in xrange(number):
             id = self.generateRandomId()
             ret.append((self._template % (self.generateIpV4Endpoint(),
                    self.generateRandomId(),
@@ -529,38 +671,69 @@ class ConflictionDataGenerator(BasicGenerator):
     conflictCameraList=[]
     conflictUserList=[]
     conflictMediaServerList=[]
+    _lock = threading.Lock()
+    _listLock = threading.Lock()
     
     def _prepareData(self,dataList,methodName,l):
+        worker = ClusterWorker(8,len(clusterTest.clusterTestServerList)*len(dataList))
+
         for d in dataList:
             for s in clusterTest.clusterTestServerList:
-                req = urllib2.Request("http://%s/ec2/%s" % (s,methodName),
-                      data=d[0], headers={'Content-Type': 'application/json'})
-                response = urllib2.urlopen(req)
 
-                if response.getcode() != 200:
-                    # failed 
-                    return False
-                else:
-                    clusterTest.unittestRollback.addOperations(methodName,s,d[1])
-                    l.append(d[0])
+                def task(lock,list,list_lock,post_data,server):
 
+                    req = urllib2.Request("http://%s/ec2/%s" % (server,methodName),
+                      data=post_data[0], headers={'Content-Type': 'application/json'})
+
+                    response = None
+
+                    with lock:
+                        response = urllib2.urlopen(req)
+
+                    if response.getcode() != 200:
+                        response.close()
+                        print "Failed to connect to http://%s/ec2/%s"%(server,methodName)
+                    else:
+                        clusterTest.unittestRollback.addOperations(methodName,server,post_data[1])
+                        with list_lock:
+                            list.append(post_data[0])
+                    response.close() 
+
+                worker.enqueue(task,(self._lock,l,self._listLock,d,s,))
+
+        worker.join()
         return True
 
     def _prepareCameraData(self,op,num,methodName,l):
-        for _ in range(num):
+        worker = ClusterWorker(8,len(clusterTest.clusterTestServerList)*num)
+
+        for _ in xrange(num):
             for s in clusterTest.clusterTestServerList:
                 d = op(1,s)[0]
-                req = urllib2.Request("http://%s/ec2/%s" % (s,methodName),
-                      data=d[0], headers={'Content-Type': 'application/json'})
-                response = urllib2.urlopen(req)
 
-                if response.getcode() != 200:
-                    # failed 
-                    return False
-                else:
-                    clusterTest.unittestRollback.addOperations(methodName,s,d[1])
-                    l.append(d[0])
+                def task(lock,list,list_lock,post_data,server):
+                    req = urllib2.Request("http://%s/ec2/%s" % (server,methodName),
+                          data=post_data[0], headers={'Content-Type': 'application/json'})
 
+                    response = None
+
+                    with lock:
+                        response = urllib2.urlopen(req)
+
+                    if response.getcode() != 200:
+                        # failed 
+                        response.close()
+                        print "Failed to connect to http://%s/ec2/%s"%(server,methodName)
+                    else:
+                        clusterTest.unittestRollback.addOperations(methodName,server,post_data[1])
+                        with list_lock:
+                            list.append(d[0])
+
+                    response.close()
+
+                worker.enqueue(task,(self._lock,l,self._listLock,d,s,))
+
+        worker.join()
         return True
 
     def prepare(self,num):
@@ -641,7 +814,7 @@ class ResourceDataGenerator(BasicGenerator):
         uuid = self._getRandomResourceUUID()
         kv_list = ["["]
         num = random.randint(2,20)
-        for i in range(num - 1):
+        for i in xrange(num - 1):
             num = random.randint(2,20)
             kv_list.append(self._generateKeyValue(uuid))
             kv_list.append(",")
@@ -653,19 +826,15 @@ class ResourceDataGenerator(BasicGenerator):
     
     def generateResourceParams(self,number):
         ret = []
-        for i in range(number):
+        for i in xrange(number):
             ret.append(self._generateOneResourceParams())
         return ret
 
     def generateRemoveResource(self,number):
         ret = []
-        for i in range(number):
+        for i in xrange(number):
             ret.append(self._resourceRemoveTemplate % (self._getRandomResourceUUID()))
         return ret
-
-
-
-
 
 # This class is used to generate data for simulating resource confliction
 
@@ -880,25 +1049,40 @@ class CameraUserAttributesListDataGenerator(BasicGenerator):
 
     _existedCameraUUIDList = []
 
+    _lock = threading.Lock()
+    _listLock = threading.Lock()
+
     def __init__(self,prepareNum):
         if self._fetchExistedCameraUUIDList(prepareNum) == False:
             raise Exception("Cannot initialize camera list attribute test data")
 
     def _prepareData(self,op,num,methodName,l):
-        for _ in range(num):
+        worker = ClusterWorker(8,num*len(clusterTest.clusterTestServerList))
+
+        for _ in xrange(num):
             for s in clusterTest.clusterTestServerList:
-                d = op(1,s)[0]
-                req = urllib2.Request("http://%s/ec2/%s" % (s,methodName),
-                        data=d[0], headers={'Content-Type': 'application/json'})
-                response = urllib2.urlopen(req)
 
-                if response.getcode() != 200:
-                    # failed 
-                    return False
-                else:
-                    clusterTest.unittestRollback.addOperations(methodName,s,d[1])
-                    l.append(d[0])
+                def task(lock,list,listLock,server,mname,oper):
 
+                    with lock:
+                        d = oper(1,s)[0]
+                        req = urllib2.Request("http://%s/ec2/%s" % (server,mname),
+                                data=d[0], headers={'Content-Type': 'application/json'})
+                        response = urllib2.urlopen(req)
+
+                    if response.getcode() != 200:
+                        print "Failed to connect http://%s/ec2/%s"%(server,mname)
+                        return
+                    else:
+                        clusterTest.unittestRollback.addOperations(mname,server,d[1])
+                        with listLock:
+                            list.append(d[0])
+
+                    response.close()
+
+                worker.enqueue(task,(self._lock,l,self._listLock,s,methodName,op,))
+
+        worker.join()
         return True
 
     def _fetchExistedCameraUUIDList(self,num):
@@ -937,7 +1121,7 @@ class CameraUserAttributesListDataGenerator(BasicGenerator):
     def generateCameraUserAttribute(self,number):
         ret = []
 
-        for i in range(number):
+        for i in xrange(number):
             uuid , name = self._getRandomCameraUUIDAndName()
             ret.append(self._template % (self.generateTrueFalse(),
                     uuid,name,
@@ -962,20 +1146,35 @@ class ServerUserAttributesListDataGenerator(BasicGenerator):
 
     _existedFakeServerList=[]
 
+    _lock = threading.Lock()
+    _listLock = threading.Lock()
+
     def _prepareData(self,dataList,methodName,l):
+        worker = ClusterWorker(8,len(dataList)*len(clusterTest.clusterTestServerList))
+
         for d in dataList:
             for s in clusterTest.clusterTestServerList:
-                req = urllib2.Request("http://%s/ec2/%s" % (s,methodName),
-                        data=d[0], headers={'Content-Type': 'application/json'})
-                response = urllib2.urlopen(req)
+                
+                def task(lock,list,listLock,post_data,mname,server):
+                    req = urllib2.Request("http://%s/ec2/%s" % (server,mname),
+                        data=post_data[0], headers={'Content-Type': 'application/json'})
 
-                if response.getcode() != 200:
-                    # failed 
-                    return False
-                else:
-                    clusterTest.unittestRollback.addOperations(methodName,s,d[1])
-                    l.append(d[0])
+                    with lock:
+                        response = urllib2.urlopen(req)
 
+                    if response.getcode() != 200:
+                        print "Failed to connect http://%s/ec2/%s"%(server,mname)
+                        return
+                    else:
+                        clusterTest.unittestRollback.addOperations(methodName,server,post_data[1])
+                        with listLock:
+                            list.append(d[0])
+
+                    response.close()
+
+                worker.enqueue(task,(self._lock,l,self._listLock,d,methodName,s,))        
+                               
+        worker.join()
         return True
 
 
@@ -1002,52 +1201,13 @@ class ServerUserAttributesListDataGenerator(BasicGenerator):
 
     def generateServerUserAttributesList(self,number):
         ret = []
-        for i in range(number):
+        for i in xrange(number):
             uuid,name = self._getRandomServer()
             ret.append(self._template % (self.generateTrueFalse(),
                     random.randint(0,200),
                     uuid,name))
         return ret
 
-
-
-# Thread queue for multi-task.  This is useful since if the user
-# want too many data to be sent to the server, then there maybe
-# thousands of threads to be created, which is not something we
-# want it.  This is not a real-time queue, but a push-sync-join
-class ClusterWorker():
-    _queue = None
-    _threadList = None
-    _threadNum = 1
-
-    def __init__(self,num,element_size):
-        self._queue = Queue.Queue(element_size)
-        self._threadList = []
-        self._threadNum = num
-        if element_size < num:
-            self._threadNum = element_size
-
-    def _worker(self):
-        while not self._queue.empty():
-            t,a = self._queue.get(True)
-            t(*a)
-
-    def _initializeThreadWorker(self):
-        for _ in range(self._threadNum):
-            t = threading.Thread(target=self._worker)
-            t.start()
-            self._threadList.append(t)
-
-    def join(self):
-        # We delay the real operation until we call join
-        self._initializeThreadWorker()
-        # Now we safely join the thread since the queue
-        # will utimatly be empty after execution
-        for t in self._threadList:
-            t.join()
-
-    def enqueue(self,task,args):
-        self._queue.put((task,args),True)
 
 
 class ClusterTestBase(unittest.TestCase):
@@ -1088,8 +1248,9 @@ class ClusterTestBase(unittest.TestCase):
         req = urllib2.Request("http://%s/ec2/%s" % (server,methodName), \
             data=d, headers={'Content-Type': 'application/json'})
         response = None
-
+        
         with self._Lock:
+            print "Connection to http://%s/ec2/%s"%(server,methodName)
             response = urllib2.urlopen(req)
 
         # Do a sligtly graceful way to dump the sample of failure
@@ -1108,7 +1269,7 @@ class ClusterTestBase(unittest.TestCase):
         if postDataList == None:
             return
 
-        workerQueue = ClusterWorker(32,len(postDataList))
+        workerQueue = ClusterWorker(clusterTest.threadNumber,len(postDataList))
 
         print "===================================\n"
         print "Test:%s start!\n" % (self._getMethodName())
@@ -1147,7 +1308,7 @@ class CameraTest(ClusterTestBase):
     
     def _generateModifySeq(self):
         ret = []
-        for _ in range(self._testCase):
+        for _ in xrange(self._testCase):
             s = clusterTest.clusterTestServerList[random.randint(0,len(clusterTest.clusterTestServerList)-1)]
             data = self._gen.generateCameraData(1,s)[0]
             clusterTest.unittestRollback.addOperations(self._getMethodName(),s,data[1])
@@ -1296,7 +1457,11 @@ class ResourceConflictionTest(ClusterTestBase):
 
     def setUp(self):
         dataGen = ConflictionDataGenerator()
+
+        print "Start confliction data preparation, this will generate Cameras/Users/MediaServers"
         dataGen.prepare(clusterTest.testCaseSize)
+        print "Confilication data generation done"
+
         self._testCase = clusterTest.testCaseSize
         self._conflictList = [
             ("removeResource","saveMediaServer",MediaServerConflictionDataGenerator(dataGen)),
@@ -1333,12 +1498,12 @@ class ResourceConflictionTest(ClusterTestBase):
 
     # Overwrite the test function since the base method doesn't work here
     def test(self):
-        workerQueue = ClusterWorker(32,self._testCase * 2)
+        workerQueue = ClusterWorker(clusterTest.threadNumber,self._testCase * 2)
 
         print "===================================\n"
         print "Test:ResourceConfliction start!\n"
 
-        for _ in range(self._testCase):
+        for _ in xrange(self._testCase):
             conf = self._generateResourceConfliction()
             s1,s2 = self._generateRandomServerPair()
             data = conf[2].generateData()
@@ -1405,6 +1570,7 @@ class PrepareServerStatus(BasicGenerator):
               headers={'Content-Type': 'application/json'})
         
         with self._mergeTest._lock:
+            print "Connection to http://%s/ec2/%s"%(addr,method)
             response = urllib2.urlopen(req)
 
         if response.getcode() != 200 :
@@ -1419,8 +1585,8 @@ class PrepareServerStatus(BasicGenerator):
         response = None
 
         with self._mergeTest._lock:
-            response = urllib2.urlopen("http://%s/api/configure?%s"%(addr,
-                                                                            urllib.urlencode(query)))
+            response = urllib2.urlopen("http://%s/api/configure?%s"%(addr,urllib.urlencode(query)))
+
         if response.getcode() != 200:
             return (False,"Cannot issue changeSystemName request to server:%s"%(addr))
 
@@ -1451,17 +1617,18 @@ class PrepareServerStatus(BasicGenerator):
     
 # This class is used to control the whole merge test
 class MergeTest():
-    _phase1WaitTime = 8
     _systemName = "mergeTest"
     _gen = BasicGenerator()
 
     _lock = threading.Lock()
 
     _serverOldSystemNameList=[]
-
+    _mergeTestTimeout = 1
 
     def _prolog(self):
+        print "Merge test prolog : Test whether all servers you specify has the identical system name"
         for s in clusterTest.clusterTestServerList:
+            print "Connection to http://%s/ec2/testConnection"%(s)
             response = urllib2.urlopen("http://%s/ec2/testConnection"%(s))
             if response.getcode() != 200:
                 return False
@@ -1469,19 +1636,22 @@ class MergeTest():
             self._serverOldSystemNameList.append(jobj["systemName"])
             response.close()
 
+        print "Merge test prolog pass"
         return True
     
     def _epilog(self):
+        print "Merge test epilog, change all servers system name back to its original one"
         idx = 0
         for s in clusterTest.clusterTestServerList:
             self._setSystemName(s,self._serverOldSystemNameList[idx])
             idx = idx+1
+        print "Merge test epilog done"
 
     # This function will ENSURE that the random system name is unique
     def _generateRandomSystemName(self):
         ret = []
         s = set()
-        for i in range(len(clusterTest.clusterTestServerList)):
+        for i in xrange(len(clusterTest.clusterTestServerList)):
             length = random.randint(16,30)
             while True:
                 name = self._gen.generateRandomString(length)
@@ -1497,23 +1667,28 @@ class MergeTest():
     # and also its unique system name there
 
     def _phase1(self):
+        print "Merge test phase1: generate UNIQUE system name for each server and do modification"
         testList = self._generateRandomSystemName()
-        worker = ClusterWorker(32,len(testList))
+        worker = ClusterWorker(clusterTest.threadNumber,len(testList))
 
         for entry in testList:
             worker.enqueue(PrepareServerStatus(self).main,
                 (entry[0],entry[1],))
 
         worker.join()
-        time.sleep(self._phase1WaitTime)
+        print "Merge test phase1 done, now sleep and wait for sync"
+        time.sleep(self._mergeTestTimeout)
 
     # Second phase will make each server has the same system
     # name which triggers server merge operations there.
 
     def _setSystemName(self,addr,name):
 
-        response = urllib2.urlopen(
-            "http://%s/api/configure?%s"%(addr,urllib.urlencode({"systemName":name})))
+        print "Connection to http://%s/api/configure"%(addr)
+
+        with self._lock:
+            response = urllib2.urlopen(
+                "http://%s/api/configure?%s"%(addr,urllib.urlencode({"systemName":name})))
 
         if response.getcode() != 200 :
             return (False,"Cannot issue changeSystemName with HTTP code:%d to server:%s" % (response.getcode()),addr)
@@ -1523,21 +1698,29 @@ class MergeTest():
         return (True,"")
 
     def _setToSameSystemName(self):
-        worker = ClusterWorker(32,len(clusterTest.clusterTestServerList))
+        worker = ClusterWorker(clusterTest.threadNumber,len(clusterTest.clusterTestServerList))
         for entry in  clusterTest.clusterTestServerList:
             worker.enqueue(self._setSystemName,(entry,self._systemName,))
         worker.join()
 
     def _phase2(self):
+        print "Merge test phase2: set ALL the servers with system name :mergeTest"
         self._setToSameSystemName()
+        print "Merge test phase2: wait for sync"
         # Wait until the synchronization time out expires
-        time.sleep(clusterTest.clusterTestSleepTime)
+        time.sleep(self._mergeTestTimeout)
         # Do the status checking of _ALL_ API
         for api in PrepareServerStatus.getterAPI:
             ret , reason = clusterTest.checkMethodStatusConsistent("%s?format=json" % (api))
             if ret == False:
                 return (ret,reason)
+        print "Merge test phase2 done"
         return (True,"")
+
+    def _loadConfig(self):
+        config_parser = ConfigParser.RawConfigParser()
+        config_parser.read("ec2_tests.cfg")
+        self._mergeTestTimeout = config_parser.getint("General","mergeTestTimeout")
 
     def test(self):
         print "================================\n"
@@ -1774,8 +1957,8 @@ class SingleServerRtspTest():
             assert self._checkReply(reply),"Server:%s RTSP failed, with reply:%s" % (self._serverEndpoint,reply)
 
     def run(self):
-        worker = ClusterWorker(16 , self._testCase)
-        for _ in range(self._testCase):
+        worker = ClusterWorker(clusterTest.threadNumber , self._testCase)
+        for _ in xrange(self._testCase):
             worker.enqueue(self._testMain,())
         worker.join()	
 
@@ -1792,7 +1975,7 @@ class ServerRtspTest:
         self._password = p.get("General","password")
         
     def test(self):
-        for i in range(len(clusterTest.clusterTestServerList)):
+        for i in xrange(len(clusterTest.clusterTestServerList)):
             serverAddr = clusterTest.clusterTestServerList[i]
             serverAddrGUID = clusterTest.clusterTestServerUUIDList[i][0]
             SingleServerRtspTest(serverAddr,serverAddrGUID,self._testCase,
@@ -1845,7 +2028,7 @@ class PerformanceOperation():
         return ret
 
     def _sendOp(self,methodName,dataList,addr):
-        worker = ClusterWorker(32,len(dataList))
+        worker = ClusterWorker(clusterTest.threadNumber,len(dataList))
         for d in dataList:
             worker.enqueue(self._sendRequest,(methodName,d,addr))
 
@@ -1978,6 +2161,9 @@ class PerfTest:
         else:
             if id != None:
                 clusterTest.unittestRollback.addOperations(methodName,addr,id)
+
+        response.close()
+
         return True
 
     def _prepareData(self,d,methodName,addr):
@@ -1995,7 +2181,7 @@ class PerfTest:
 
         cameraGen = CameraDataGenerator()
         for s in clusterTest.clusterTestServerList:
-           for _ in range(num):
+           for _ in xrange(num):
                c = cameraGen.generateCameraData(1,s)[0]
                cameraList.append(c)
                if not self._prepareData(c,"saveCameras",s):
@@ -2090,14 +2276,14 @@ class PerfTest:
         expectedQueueSize = self._frequency * 10;
         self._queue = Queue.Queue(expectedQueueSize)
 
-        for _ in range(num):
+        for _ in xrange(num):
             th = threading.Thread(target=self._threadMain)
             th.start()
             self._threadPool.append(th)
 
     def _pollOnce(self):
         start = time.time()
-        for _ in range(self._frequency):
+        for _ in xrange(self._frequency):
             try:
                 self._queue.put((),True,1)
             except:
@@ -2223,13 +2409,12 @@ class SystemNameTest:
     def _doGet(self,addr,methodName):
         ret = None
         response = None
-
+        print "Connection to http://%s/ec2/%s"%(addr,methodName)
         response = urllib2.urlopen("http://%s/ec2/%s"%(addr,methodName))
 
         if response.getcode() != 200:
             response.close()
             return None
-
         else:
             ret = response.read()
             response.close()
@@ -2240,6 +2425,7 @@ class SystemNameTest:
         req = urllib2.Request("http://%s/ec2/%s" % (addr,methodName), \
             data=d, headers={'Content-Type': 'application/json'})
 
+        print "Connection to http://%s/ec2/%s"%(addr,methodName)
         response = urllib2.urlopen(req)
 
         if response.getcode() != 200:
@@ -2255,6 +2441,7 @@ class SystemNameTest:
             response.close()
             return False
         else:
+            response.close()
             return True
 
     def _ensureServerSystemName(self):
@@ -2306,7 +2493,8 @@ class SystemNameTest:
                     return (False,"This server:%s with GUID:%s should be Online"%(s,thisGUID))
             else:
                 if ele["status"] == "Online":
-                    return (False,"The server:%s should be Offline when login on Server:%s"%(ele["apiUrl"],s))
+                    return (False,"The server that has IP address:%s and GUID:%s \
+                    should be Offline when login on Server:%s"%(ele["networkAddresses"],ele["id"],s))
         return (True,"")
     
     def _doTest(self):
@@ -2406,19 +2594,17 @@ if __name__ == '__main__':
                     print "Merge Test Done"
                     print "=================================="
 
-                    try :
-                        raw_input("Press any key to continue Rollback ...")
-                    except:
-                        pass
-
-                    doCleanUp()
-
                     print "=================================="
                     print "Perform System Name Test At Last"
                     SystemNameTest().run()
                     print "All Test Cases Finished"
                     print "=================================="
 
+                    try :
+                        raw_input("Press any key to continue Rollback ...")
+                    except:
+                        pass
+                    doCleanUp()
             elif len(sys.argv) == 2 and sys.argv[1] == '--clear':
                 doClearAll()
             elif len(sys.argv) == 2 and sys.argv[1] == '--perf':

@@ -22,9 +22,8 @@ class QnThirdPartyResource
     public QnPhysicalCameraResource,
     public nxcip::CameraInputEventHandler
 {
-    Q_OBJECT
-
     typedef QnPhysicalCameraResource base_type;
+
 public:
     static const int PRIMARY_ENCODER_INDEX = 0;
     static const int SECONDARY_ENCODER_INDEX = 1;
@@ -51,6 +50,8 @@ public:
         At the moment always returns \a true
     */
     virtual bool ping() override;
+    //!Implementation of QnNetworkResource::mergeResourcesIfNeeded
+    virtual bool mergeResourcesIfNeeded( const QnNetworkResourcePtr& source ) override;
     //!Implementation of QnSecurityCamResource::manufacture
     virtual QString getDriverName() const override;
     //!Implementation of QnSecurityCamResource::setIframeDistance

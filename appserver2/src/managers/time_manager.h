@@ -235,7 +235,7 @@ namespace ec2
         void peerSystemTimeReceivedNonSafe( const ApiPeerSystemTimeData& tran );
 
     private slots:
-        void onNewConnectionEstablished( const QnTransactionTransportPtr& transport );
+        void onNewConnectionEstablished(QnTransactionTransport* transport );
         void onPeerLost( ApiPeerAliveData data );
         void onDbManagerInitialized();
     };

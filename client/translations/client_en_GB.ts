@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="en_GB" sourcelanguage="en">
+<TS version="2.0" language="en_US" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -4297,7 +4297,7 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="68"/>
         <source>Login or password you have entered are incorrect, please try again.</source>
-        <translation>The username or password you have entered is incorrect - try again.</translation>
+        <translation>The username or password you have entered is incorrect. Please try again.</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="70"/>
@@ -4325,7 +4325,7 @@ If this error persists, please contact your system administrator.</translation>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="210"/>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="235"/>
         <source>Could not connect to Server</source>
-        <translation>Unable to connect to the server.</translation>
+        <translation>Unable to connect to the server</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="101"/>
@@ -9643,7 +9643,7 @@ You&apos;ll have to start it again manually.</translation>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="330"/>
         <source>This is a fish-eye lens camera</source>
-        <translation>This camera has a fisheye lens.</translation>
+        <translation type="unfinished">This camera has a fisheye lens</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="351"/>

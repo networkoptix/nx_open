@@ -58,7 +58,7 @@ public:
 
     int totalMdZones() const;
     bool isH264() const;
-
+    int getZoneSite() const;
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
 
@@ -80,6 +80,7 @@ protected:
 
 private:
     int m_totalMdZones;
+    int m_zoneSite;
 };
 
 typedef QnSharedResourcePointer<QnPlAreconVisionResource> QnPlAreconVisionResourcePtr;

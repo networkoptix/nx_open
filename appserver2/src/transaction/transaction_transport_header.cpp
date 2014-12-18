@@ -12,6 +12,7 @@ namespace ec2
         if (sequence == 0) {
             sequence = qn_transportHeader_sequence.fetchAndAddAcquire(1);
             sender = qnCommon->moduleGUID();
+            senderRuntimeID = qnCommon->runningInstanceGUID();
         }
     }
 

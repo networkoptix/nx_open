@@ -135,6 +135,23 @@ bool QnThirdPartyResource::ping()
     return true;
 }
 
+bool QnThirdPartyResource::mergeResourcesIfNeeded( const QnNetworkResourcePtr& source )
+{
+    //TODO #ak antipattern: calling virtual function from base class
+    bool mergedSomething = base_type::mergeResourcesIfNeeded( source );
+
+    //TODO #ak to make minimal influence on existing code, merging only one property. 
+        //But, perharps, other properties should be processed too (in QnResource)
+    const auto newAuxData = source->getProperty( AUX_DATA_PARAM_NAME );
+    if( getProperty(AUX_DATA_PARAM_NAME) != newAuxData )
+    {
+        setProperty( AUX_DATA_PARAM_NAME, newAuxData );
+        mergedSomething = true;
+    }
+
+    return mergedSomething;
+}
+
 QString QnThirdPartyResource::getDriverName() const
 {
     return m_discoveryManager.getVendorName();

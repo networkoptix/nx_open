@@ -187,7 +187,7 @@ QnUuid QnResourceTypePool::getResourceTypeId(const QString& manufacture, const Q
     }
 
     if (showWarning)
-        qWarning() << "Cannot find such resource type!!!!: " << manufacture << name;
+        qDebug() << "Cannot find resource type for manufacturer:" << manufacture << "model name:" << name;
 
     // Q_ASSERT(false);
     return QnUuid();

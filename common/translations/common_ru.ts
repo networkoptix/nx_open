@@ -4,16 +4,16 @@
 <context>
     <name>Language</name>
     <message>
-        <location filename="../src/translation/translation_manager.cpp" line="156"/>
-        <source>Locale Code</source>
-        <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
-        <translation>ru</translation>
-    </message>
-    <message>
         <location filename="../src/translation/translation_manager.cpp" line="153"/>
         <source>Language Name</source>
         <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
         <translation>Русский</translation>
+    </message>
+    <message>
+        <location filename="../src/translation/translation_manager.cpp" line="156"/>
+        <source>Locale Code</source>
+        <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
+        <translation>ru</translation>
     </message>
 </context>
 <context>
@@ -21,47 +21,47 @@
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="722"/>
         <source>Invalid stack size after program evaluation: %1.</source>
-        <translation>Некорректный размер стека после оценки программы: %1.</translation>
+        <translation>Неправильный размер стека после оценки программы: %1.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="764"/>
         <source>Could not deduce result type for operation %1(&apos;%2&apos;, &apos;%3&apos;).</source>
-        <translation>Невозможно сделать вывод о типе результата операции %1(&apos;%2&apos;, &apos;%3&apos;).</translation>
+        <translation>Не получается вывести тип результата для операции %1(&apos;%2&apos;, &apos;%3&apos;).</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="792"/>
         <source>Invalid parameter type for operation %1(&apos;%2&apos;, &apos;%2&apos;)</source>
-        <translation>Некорректный тип параметра операции %1(&apos;%2&apos;, &apos;%2&apos;)</translation>
+        <translation>Неверный тип параметра для операции %1(&apos;%2&apos;, &apos;%2&apos;)</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="802"/>
         <source>Could not deduce arithmetic supertype for type &apos;%1&apos;.</source>
-        <translation>Невозможно определить арифметический супертип для типа &apos;%1&apos;.</translation>
+        <translation>Не получается вывести арифметический супертип для типа &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="824"/>
         <source>Invalid parameter type for operation %1(&apos;%2&apos;)</source>
-        <translation>Некорректный тип параметра операции %1(&apos;%2&apos;)</translation>
+        <translation>Неправильный тип параметра для операции %1(&apos;%2&apos;)</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="832"/>
         <source>Argument number for %1 instruction has invalid type &apos;%2&apos;.</source>
-        <translation>Число аргументов для %1 инструкций имеет недопустимый тип &apos;%2&apos;.</translation>
+        <translation>Количество аргументов для инструкции %1 имеет неверный тип &apos;%2&apos;.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="836"/>
         <source>Argument number for %1 instruction is invalid.</source>
-        <translation>Некорректное число аргументов для %1 инструкций.</translation>
+        <translation>Неверное количество аргументов для инструкции %1.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="841"/>
         <source>Stack underflow during execution of %1 instruction.</source>
-        <translation>Обращение к несуществующей области стека при выполнении %1 инструкции.</translation>
+        <translation>Недостаточно элементов в стеке во время выполнения инструкции %1.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="845"/>
         <source>Function name for %1 instruction has invalid type &apos;%2&apos;.</source>
-        <translation>Имя функции для %1 инструкции имеет недопустимый тип &apos;%2&apos;.</translation>
+        <translation>Имя функции в инструкции %1 имеет неверный тип &apos;%2&apos;.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="856"/>
@@ -76,7 +76,7 @@
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="874"/>
         <source>Stack underflow during program evaluation.</source>
-        <translation>Обращение к несуществующей области стека при оценки программы.</translation>
+        <translation>Недостаточное элементов в стеке во время выполнения программы.</translation>
     </message>
 </context>
 <context>
@@ -84,7 +84,7 @@
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="113"/>
         <source>Unexpected symbol &apos;%1&apos; at position %2.</source>
-        <translation>Недопустимый символ &apos;%1&apos; в позиции %2.</translation>
+        <translation>Непредвиденный символ &apos;%1&apos; в позиции %2.</translation>
     </message>
 </context>
 <context>
@@ -93,22 +93,22 @@
         <location filename="../src/utils/common/evaluator.h" line="185"/>
         <location filename="../src/utils/common/evaluator.h" line="192"/>
         <source>Parameter %2 is not specified for function &apos;%1&apos;.</source>
-        <translation>Параметр %2 не определён для функции &apos;%1&apos;.</translation>
+        <translation>Параметр %2 не указан для функции &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.h" line="195"/>
         <source>Parameter %2 of function &apos;%1&apos; is of type &apos;%3&apos;, but type &apos;%4&apos; was expected.</source>
-        <translation>Параметр %2 функции &apos;%1&apos; имеет тип &apos;%3&apos; вместо типа &apos;%4&apos;.</translation>
+        <translation>Параметр %2 функции &apos;%1&apos; имеет тип &apos;%3&apos;, но ожидается тип &apos;%4&apos;.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.h" line="201"/>
         <source>Function &apos;%1&apos; is expected to have %3 arguments, %2 provided.</source>
-        <translation>Функция &apos;%1&apos; должна получать %3 аргумента, а задано %2.</translation>
+        <translation>Ожидаемое количество аргументов функции &apos;%1&apos; - %3. Передано %2.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.h" line="206"/>
         <source>Function &apos;%1&apos; is expected to have %3-%4 arguments, %2 provided.</source>
-        <translation>Функция &apos;%1&apos; должна получать %3-%4 аргумента, а задано %2.</translation>
+        <translation>Ожидаемое количество аргументов функции &apos;%1&apos; - %3...%4. Передано %2.</translation>
     </message>
 </context>
 <context>
@@ -116,17 +116,17 @@
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="179"/>
         <source>Unexpected token %1 (&apos;%2&apos;) at position %3.</source>
-        <translation>Недопустимая метка %1 (&apos;%2&apos;) в позиции %3.</translation>
+        <translation>Непредвиденный токен %1(&apos;%2&apos;) в позиции %3.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="236"/>
         <source>Invalid color constant &apos;%1&apos;.</source>
-        <translation>Недопустимая цветовая константа &apos;%1&apos;.</translation>
+        <translation>Некорректная цветовая константа &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="281"/>
         <source>Invalid number constant &apos;%1&apos;.</source>
-        <translation>Недопустимая числовая константа &apos;%1&apos;.</translation>
+        <translation>Некорректная цифровая константа &apos;%1&apos;.</translation>
     </message>
 </context>
 <context>
@@ -267,7 +267,7 @@
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="50"/>
         <source>Send email</source>
-        <translation type="unfinished"></translation>
+        <translation>Отправить email</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="55"/>
@@ -302,42 +302,42 @@
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="74"/>
         <source>Server Failure</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка сервера</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="75"/>
         <source>Server Conflict</source>
-        <translation type="unfinished"></translation>
+        <translation>Конфликт сервера</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="76"/>
         <source>Server Started</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер запущен</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="77"/>
         <source>License Issue</source>
-        <translation type="unfinished"></translation>
+        <translation>Проблема с лицензией</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="110"/>
         <source>Server &quot;%1&quot; Failure</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка серверa &quot;%1&quot;</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="116"/>
         <source>Server &quot;%1&quot; Conflict</source>
-        <translation type="unfinished"></translation>
+        <translation>Конфликт серверa &quot;%1&quot;</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="119"/>
         <source>Server &quot;%1&quot; Started</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер &quot;%1&quot; запущен</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="121"/>
         <source>Server &quot;%1&quot; had license issue</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер &quot;%1&quot; имеет проблемы с лицензией</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="126"/>
@@ -383,22 +383,22 @@
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="219"/>
         <source>Conflicting Server #%1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Конфликтующий сервер #%1:%2</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="370"/>
         <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Соединение с камерой (первичный поток) неожиданно закрылось.</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="372"/>
         <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Соединение с камерой (вторичный поток) неожиданно закрылось.</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="408"/>
         <source>Recording on %n camera(s) is disabled: </source>
-        <translation type="unfinished"></translation>
+        <translation>Запись на %n камерах отключена:</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="325"/>
@@ -493,13 +493,15 @@
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="31"/>
         <source>Server %1 is not available.
  Check that Server is up and running.</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер %1 недоступен.
+Проверьте, что сервер включен и запущен.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="35"/>
         <source>Received bad response from Server %1: &quot;%2&quot;.
  Check if Server is up and has the proper version.</source>
-        <translation type="unfinished"></translation>
+        <translation>Принят некорректный ответ от сервера %1: &quot;%2&quot;.
+Проверьте, что сервер включен и имеет правильную версию.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="39"/>
@@ -593,7 +595,7 @@
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="102"/>
         <source>Camera initialization process in progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Происходит инициализация камер</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="117"/>
@@ -729,92 +731,92 @@ Parameters: </source>
     <message>
         <location filename="../src/licensing/license.cpp" line="154"/>
         <source>Edge</source>
-        <translation type="unfinished"></translation>
+        <translation>Edge</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="155"/>
         <source>Vmax</source>
-        <translation type="unfinished"></translation>
+        <translation>Vmax</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="156"/>
         <source>Analog encoder</source>
-        <translation type="unfinished"></translation>
+        <translation>Аналоговый энкодер</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="157"/>
         <source>Video Wall</source>
-        <translation type="unfinished"></translation>
+        <translation>Видеостена</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="170"/>
         <source>Trial licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Временная лицензия</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="171"/>
         <source>Analog licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Лицензия на аналоговую камеру</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="172"/>
         <source>Professional licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Профессиональная лицензия</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="173"/>
         <source>Edge licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Лицензия Edge</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="174"/>
         <source>Vmax licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Лицензия Vmax</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="175"/>
         <source>Analog encoder licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Лицензии на аналоговые энкодеры</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="176"/>
         <source>Video Wall licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Лицензии на видеостены</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="343"/>
         <source>Invalid signature</source>
-        <translation type="unfinished"></translation>
+        <translation>Неверная подпись</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="345"/>
         <source>Server with necessary hardware ID is not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер с необходимым аппаратным ID не найден</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="347"/>
         <source>Invalid customization</source>
-        <translation type="unfinished"></translation>
+        <translation>Неверная кастомизация</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="349"/>
         <source>Expired</source>
-        <translation type="unfinished"></translation>
+        <translation>Истек</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="351"/>
         <source>Invalid type</source>
-        <translation type="unfinished"></translation>
+        <translation>Неверный тип</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="353"/>
         <source>Only single license is allowed for this device</source>
-        <translation type="unfinished"></translation>
+        <translation>Для этого устройства доступны только одиночные лицензии</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="355"/>
         <source>Unknown error</source>
-        <translation type="unfinished"></translation>
+        <translation>Неизвестная ошибка</translation>
     </message>
 </context>
 <context>
@@ -822,63 +824,63 @@ Parameters: </source>
     <message numerus="yes">
         <location filename="../src/utils/license_usage_helper.cpp" line="75"/>
         <source>%n %2 are used out of %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n %2 использована из %1.</numerusform>
+            <numerusform>%n %2 использованы из %1.</numerusform>
+            <numerusform>%n %2 использовано из %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/license_usage_helper.cpp" line="94"/>
         <source>%n %2 will be used out of %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n %2 будет использована из %1.</numerusform>
+            <numerusform>%n %2 будут использованы из %1.</numerusform>
+            <numerusform>%n %2 будет использовано из %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/license_usage_helper.cpp" line="112"/>
         <source>Activate %n more %2. </source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Активировать еще %n %2.</numerusform>
+            <numerusform>Активировать еще %n %2.</numerusform>
+            <numerusform>Активировать еще %n %2.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/license_usage_helper.cpp" line="114"/>
         <source>%n more %2 will be used. </source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Еще %n %2 будет использована.</numerusform>
+            <numerusform>Еще %n %2 будет использовано.</numerusform>
+            <numerusform>Еще %n %2 будет использовано.</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/utils/license_usage_helper.cpp" line="186"/>
         <source>There was a problem activating your license key. Database error has occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation>Проблема при активации лицензионного ключа. Произошла ошибка базы данных.</translation>
     </message>
     <message>
         <location filename="../src/utils/license_usage_helper.cpp" line="188"/>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>Проблема при активации лицензионного ключа. Приняты некорректные данные. Пожалуйста, свяжитесь с командой поддержки.</translation>
     </message>
     <message>
         <location filename="../src/utils/license_usage_helper.cpp" line="190"/>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation>Лицензионный ключ, введенный вами, неверен. Пожалуйста, проверьте, что вы правильно ввели лицензионный ключ. Если проблема не исчезла обратитесь в службу поддержки, стобы подтвердить правильность лицензионного ключа либо для получения верного лицензионного ключа.</translation>
     </message>
     <message>
         <location filename="../src/utils/license_usage_helper.cpp" line="193"/>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation>Вы пытаетесь активировать несовместимую с вашим программным обеспечением лицензию. Обратитесь в службу поддержки для получения правильного лицензионного ключа.</translation>
     </message>
     <message>
         <location filename="../src/utils/license_usage_helper.cpp" line="195"/>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to get a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation>Этот лицензионный ключ был активирован {{time}} для аппаратного ID {{hwid}}. Пожалуйста, обратитесь в службу поддержки для получения правильного лицензионного ключа.</translation>
     </message>
 </context>
 <context>
@@ -895,7 +897,7 @@ Parameters: </source>
         <location filename="../src/plugins/resource/digitalwatchdog/newdw_ptz_controller.cpp" line="111"/>
         <location filename="../src/plugins/resource/digitalwatchdog/newdw_ptz_controller.cpp" line="155"/>
         <source>Preset #</source>
-        <translation type="unfinished"></translation>
+        <translation>Пресет #</translation>
     </message>
 </context>
 <context>
@@ -917,7 +919,7 @@ Parameters: </source>
     <message>
         <location filename="../src/export/sign_helper.cpp" line="70"/>
         <source>Trial license</source>
-        <translation type="unfinished"></translation>
+        <translation>Временная лицензия</translation>
     </message>
     <message>
         <location filename="../src/export/sign_helper.cpp" line="262"/>
@@ -1068,32 +1070,32 @@ Parameters: </source>
     <message>
         <location filename="../src/health/system_health.cpp" line="6"/>
         <source>Email address is not set</source>
-        <translation type="unfinished"></translation>
+        <translation>Не указан email</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="10"/>
         <source>Email server is not set</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер электронной почты не указан</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="12"/>
         <source>Some users have not set their email addresses</source>
-        <translation type="unfinished"></translation>
+        <translation>Некоторые пользователи не указали их email</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="14"/>
         <source>Connection to server lost</source>
-        <translation type="unfinished"></translation>
+        <translation>Потеряно соединение с сервером</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="16"/>
         <source>Select server for others to synchronise time with</source>
-        <translation type="unfinished"></translation>
+        <translation>Выберите сервер, с которым будут синхронизировать время остальные сервера</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="18"/>
         <source>Error while sending email</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка во время отправки email</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="20"/>
@@ -1113,48 +1115,48 @@ Parameters: </source>
     <message>
         <location filename="../src/health/system_health.cpp" line="35"/>
         <source>Email address is not set for user %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Не указан email для пользователя %1</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="45"/>
         <source>Email address is not set.
 You cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не указан email. Вы не сможете получать системные уведомления по электронной почте.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="47"/>
         <source>Email server is not set.
 You cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер электронной почты не указан. Вы не сможете получать системные уведомления по электронной почте.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="49"/>
         <source>Some users have not set their email addresses.
 They cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>Некоторые пользователи не указали их email. Они не смогут получать системные уведомления по электронной почте.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="51"/>
         <source>Multiple servers have different time and correct time could not be detected automatically.</source>
-        <translation type="unfinished"></translation>
+        <translation>На нескольких серверах настроенно разное время. Корректное время не может быть определено автоматически.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="53"/>
         <source>Storages are full on the following Server:
 %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Хранилище полностью заполнено на сервере: %1.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="55"/>
         <source>Storages are not configured on the following Server:
 %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Хранилище не настроено на сервере: %1.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="59"/>
         <source>Rebuilding archive index is completed on the following Server:
 %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Индекс архива перестроен на сервере: %1.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="57"/>

@@ -31,6 +31,8 @@ public:
     bool isModified() const;
 
     virtual bool tryClose(bool force) override;
+
+    bool askToSaveChanges(bool cancelIsAllowed = true);
 protected:
     virtual void loadData(const QnPtzData &data) override;
     virtual void saveData() override;

@@ -530,10 +530,6 @@ void QnWorkbenchDisplay::setLayer(QGraphicsItem *item, Qn::ItemLayer layer) {
      * z order. Hence the fmod. */
     item->setData(ITEM_LAYER_KEY, static_cast<int>(layer));
     item->setZValue(layer * layerZSize + std::fmod(item->zValue(), layerZSize));
-
-    QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
-    if(widget && widget->shadowItem()) /* Shadow may already be destroyed. */
-        widget->shadowItem()->setZValue(shadowLayer(layer) * layerZSize);
 }
 
 void QnWorkbenchDisplay::setLayer(const QList<QGraphicsItem *> &items, Qn::ItemLayer layer) {
@@ -926,7 +922,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     if(item->hasFlag(Qn::PendingGeometryAdjustment))
         adjustGeometryLater(item, animate); /* Changing item flags here may confuse the callee, so we do it through the event loop. */
 
-    connect(widget,                     SIGNAL(aboutToBeDestroyed()),   this,   SLOT(at_widget_aboutToBeDestroyed()));
+    connect(widget,     &QnResourceWidget::aboutToBeDestroyed,      this,   &QnWorkbenchDisplay::at_widget_aboutToBeDestroyed);
+    connect(widget,     &QnResourceWidget::aspectRatioChanged,      this,   &QnWorkbenchDisplay::at_widget_aspectRatioChanged);
 
     QColor frameColor = item->data(Qn::ItemFrameDistinctionColorRole).value<QColor>();
     if(frameColor.isValid())
@@ -1383,7 +1380,7 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     WidgetAnimator *animator = this->animator(widget);
     if(animate) {
         widget->setEnclosingGeometry(enclosingGeometry, false);
-        animator->moveTo(widget->calculateGeometry(enclosingGeometry), rotation);
+        animator->moveTo(widget->calculateGeometry(enclosingGeometry, rotation), rotation);
     } else {
         animator->stop();
         widget->setRotation(rotation);
@@ -1517,13 +1514,16 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
             synchronizeGeometry(widget, false);
     }
 
-    /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
-    QnConstResourceVideoLayoutPtr videoLayout = widget->channelLayout();
-    qreal estimatedAspectRatio = aspectRatio(videoLayout->size()) * (item->zoomRect().isNull() ? 1.0 : aspectRatio(item->zoomRect())) * (4.0 / 3.0);
-    if (QnAspectRatio::isRotated90(item->rotation()))
-        estimatedAspectRatio = 1 / estimatedAspectRatio;
-    const Qt::Orientation orientation = estimatedAspectRatio > 1.0 ? Qt::Vertical : Qt::Horizontal;
-    const QSize size = bestSingleBoundedSize(workbench()->mapper(), 1, orientation, estimatedAspectRatio);
+    qreal widgetAspectRatio = widget->visualAspectRatio();
+    if (widgetAspectRatio <= 0) {
+        QnConstResourceVideoLayoutPtr videoLayout = widget->channelLayout();
+        /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
+        widgetAspectRatio = aspectRatio(videoLayout->size()) * (item->zoomRect().isNull() ? 1.0 : aspectRatio(item->zoomRect())) * (4.0 / 3.0);
+        if (QnAspectRatio::isRotated90(item->rotation()))
+            widgetAspectRatio = 1 / widgetAspectRatio;
+    }
+    const Qt::Orientation orientation = widgetAspectRatio > 1.0 ? Qt::Vertical : Qt::Horizontal;
+    const QSize size = bestSingleBoundedSize(workbench()->mapper(), 1, orientation, widgetAspectRatio);
 
     /* Adjust item's geometry for the new size. */
     if(size != item->geometry().size()) {
@@ -1874,8 +1874,14 @@ void QnWorkbenchDisplay::at_widgetActivityInstrument_activityStarted() {
         widget->setOption(QnResourceWidget::DisplayActivity, false);
 }
 
+void QnWorkbenchDisplay::at_widget_aspectRatioChanged() {
+    synchronizeGeometry(static_cast<QnResourceWidget*>(sender()), true);
+}
+
 void QnWorkbenchDisplay::at_widget_aboutToBeDestroyed() {
     QnResourceWidget *widget = checked_cast<QnResourceWidget *>(sender());
+    if (widget)
+        disconnect(widget, NULL, this, NULL);
     if (widget && widget->item()) {
         /* We can get here only when the widget is destroyed directly
          * (not by destroying or removing its corresponding item).

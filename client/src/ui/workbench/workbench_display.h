@@ -417,6 +417,7 @@ protected slots:
     void at_widgetActivityInstrument_activityStopped();
     void at_widgetActivityInstrument_activityStarted();
 
+    void at_widget_aspectRatioChanged();
     void at_widget_aboutToBeDestroyed();
 
     void at_view_destroyed();

@@ -53,6 +53,7 @@ signals:
     void delayedFileDeleted(const QString& filename, bool ok);
 
     void fileListReceived(const QStringList& filenames, bool ok);
+    void delayedFileListReceived(const QStringList& filenames, bool ok);
 private slots:
     void at_fileLoaded( int handle, ec2::ErrorCode errorCode, const QByteArray& data );
     void at_fileUploaded(int handle, ec2::ErrorCode errorCode);

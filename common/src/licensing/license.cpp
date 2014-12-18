@@ -298,7 +298,7 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
     bool isEdgeBox = checkForEdgeBox(info.data.box);
     if (isEdgeBox && !licenseTypeInfo[type()].allowedForEdge)
         return gotError(errCode, InvalidType); // strict allowed license type for EDGE devices
-
+#if 0
     if (isEdgeBox && type() == Qn::LC_Edge) 
     {
         for(const QnLicensePtr& license: qnLicensePool->getLicenses()) {
@@ -311,7 +311,7 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
             }
         }
     }
-
+#endif
     return gotError(errCode, NoError);
 }
 

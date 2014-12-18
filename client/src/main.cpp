@@ -717,7 +717,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance()->stop();
 
-    QnAppServerConnectionFactory::setEc2Connection( ec2::AbstractECConnectionPtr() );
+    QnAppServerConnectionFactory::setEc2Connection(NULL);
+    QnAppServerConnectionFactory::setUrl(QUrl());
 
     QNetworkProxyFactory::setApplicationProxyFactory(0);
 

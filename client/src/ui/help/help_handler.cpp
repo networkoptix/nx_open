@@ -115,8 +115,10 @@ bool QnHelpHandler::eventFilter(QObject *watched, QEvent *event) {
     case QEvent::MouseButtonPress: {
         QMouseEvent *e = static_cast<QMouseEvent *>(event);
         
-        if(e->button() == Qt::RightButton)
+        if(e->button() == Qt::RightButton && QWhatsThis::inWhatsThisMode()) {
             QWhatsThis::leaveWhatsThisMode();
+            return true;
+        }
 
         return false;
     }

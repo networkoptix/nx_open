@@ -54,9 +54,6 @@ namespace {
      * but also over its extension. */
     const qreal frameExtensionMultiplier = 1.0;
 
-    /** Default shadow displacement, in scene coordinates. */
-    const QPointF defaultShadowDisplacement = QPointF(qnGlobals->workbenchUnitSize(), qnGlobals->workbenchUnitSize()) * 0.05;
-
     /** Default timeout before the video is displayed as "loading", in milliseconds. */
 #ifdef QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
     const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION;
@@ -115,9 +112,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 {
     setAcceptHoverEvents(true);
     setTransformOrigin(Center);
-
-    /* Set up shadow. */
-    setShadowDisplacement(defaultShadowDisplacement);
 
     /* Set up frame. */
     setFrameWidth(0.0);
@@ -303,8 +297,6 @@ void QnResourceWidget::setFrameWidth(qreal frameWidth) {
     m_frameWidth = frameWidth;
     qreal extendedFrameWidth = m_frameWidth * (1.0 + frameExtensionMultiplier);
     setWindowFrameMargins(extendedFrameWidth, extendedFrameWidth, extendedFrameWidth, extendedFrameWidth);
-
-    invalidateShadowShape();
 }
 
 QColor QnResourceWidget::frameDistinctionColor() const {
@@ -332,11 +324,8 @@ void QnResourceWidget::setAspectRatio(float aspectRatio) {
     if(qFuzzyCompare(m_aspectRatio, aspectRatio))
         return;
 
-    QRectF enclosingGeometry = this->enclosingGeometry();
     m_aspectRatio = aspectRatio;
-
     updateGeometry(); /* Discard cached size hints. */
-    setEnclosingGeometry(enclosingGeometry);
 
     emit aspectRatioChanged();
 }
@@ -355,6 +344,17 @@ float QnResourceWidget::defaultVisualAspectRatio() const {
     return m_enclosingGeometry.width() / m_enclosingGeometry.height();
 }
 
+float QnResourceWidget::visualChannelAspectRatio() const {
+    if (!channelLayout())
+        return visualAspectRatio();
+
+    qreal layoutAspectRatio = QnGeometry::aspectRatio(channelLayout()->size());
+    if (QnAspectRatio::isRotated90(rotation()))
+        return visualAspectRatio() * layoutAspectRatio;
+    else
+        return visualAspectRatio() / layoutAspectRatio;
+}
+
 QRectF QnResourceWidget::enclosingGeometry() const {
     return m_enclosingGeometry;
 }
@@ -365,7 +365,7 @@ void QnResourceWidget::setEnclosingGeometry(const QRectF &enclosingGeometry, boo
         setGeometry(calculateGeometry(enclosingGeometry));
 }
 
-QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry) const {
+QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry, qreal rotation) const {
     if (!enclosingGeometry.isEmpty()) {
         /* Calculate bounds of the rotated item. */
 
@@ -378,7 +378,7 @@ QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry) cons
         QPointF c = geom.center();
         QTransform transform;
         transform.translate(c.x(), c.y());
-        transform.rotate(rotation());
+        transform.rotate(rotation);
         transform.translate(-c.x(), -c.y());
         QRectF rotated = transform.mapRect(geom);
 
@@ -395,6 +395,10 @@ QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry) cons
     } else {
         return enclosingGeometry;
     }
+}
+
+QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry) const {
+    return calculateGeometry(enclosingGeometry, this->rotation());
 }
 
 QString QnResourceWidget::titleText() const {

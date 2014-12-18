@@ -75,6 +75,9 @@ namespace nx_ms_conf
 
     /** Semicolon-separated list of servers to get public ip. */
     static const QLatin1String PUBLIC_IP_SERVERS( "publicIPServers" );
+
+    static const QLatin1String EC2_TRAN_LOG_LEVEL( "tranLogLevel" );
+    static const QLatin1String DEFAULT_EC2_TRAN_LOG_LEVEL( "none" );
 }
 
 /*!

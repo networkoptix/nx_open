@@ -866,8 +866,8 @@ namespace aio
                 : (nextPeriodicEventClock < curClock ? 0 : nextPeriodicEventClock - curClock);
 
             //if there are posted calls, just checking sockets state in non-blocking mode
-            const int triggeredSocketCount = m_impl->pollSet.poll(
-                m_impl->postedCalls.empty() ? millisToTheNextPeriodicEvent : 0 );
+            const int pollTimeout = m_impl->postedCalls.empty() ? millisToTheNextPeriodicEvent : 0;
+            const int triggeredSocketCount = m_impl->pollSet.poll( pollTimeout );
 
             if( needToStop() )
                 break;
