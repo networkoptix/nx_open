@@ -148,3 +148,20 @@
 ng-include{
   width:100%;
 }
+
+
+.viewport > .scroll{
+  width:100%;
+  overflow-x:auto;
+  overflow-y:auto;
+}
+.viewport > canvas{
+  width:100%;
+  position:absolute;
+}
+
+
+.viewport > canvas,
+.viewport > .scroll > .frame{
+  height:50px;
+}

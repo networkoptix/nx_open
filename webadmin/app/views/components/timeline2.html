@@ -1,0 +1,25 @@
+
+
+<div class="timeline-info">
+    <div class="btn-group">
+        <button type="button" class="btn btn-xs"
+                ng-click="zoom(false)"
+                ng-disabled="disableZoomOut"
+                data-bind="click:zoomOut,attr:{disabled:canZoomOut}"><span class="glyphicon glyphicon-minus"></span></button>
+        <button type="button" class="btn btn-xs"
+                ng-click="zoom(true)"
+                ng-disabled="disableZoomIn"
+                data-bind="click:zoomIn,attr:{disabled:canZoomIn}"><span class="glyphicon glyphicon-plus"></span></button>
+    </div>
+</div>
+
+
+<div class="viewport">
+    <canvas></canvas>
+
+    <div class="scroll">
+        <div class="frame">&nbsp;</div>
+    </div>
+
+    <div class="spacer"></div>
+</div>

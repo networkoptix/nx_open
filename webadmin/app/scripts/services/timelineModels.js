@@ -12,13 +12,13 @@ function Chunk(boundaries,start,end,level,title,extension){
     var parentWidth = (boundaries.end - boundaries.start);
     this.startPosition = 100 * (start - boundaries.start)/parentWidth  + '%';
 
-    if(typeof(end)=='undefined'){
+    if(typeof(end)==='undefined'){
         this.width = '1px';
     }else{
         this.width = 100 * (end - start) / parentWidth + '%';
     }
 
-    var format = "MM/dd/yy HH:mm:ss";
+    var format = 'MM/dd/yy HH:mm:ss';
     this.title = (typeof(title) === 'undefined' || title === null) ? formatDate(start,format) + ' - ' + formatDate(end,format):title ;
 
 
@@ -107,6 +107,18 @@ Interval.prototype.alignToPast = function(dateToAlign){
     return date;
 };
 
+
+//Check if current date aligned by interval
+Interval.prototype.checkDate = function(date){
+
+
+    if(Number.isInteger(date)) {
+        date = new Date(date);
+    }
+
+    var aligned = this.alignToPast(date);
+    return this.alignToPast(date).getTime() === date.getTime();
+};
 //Выравнивание даты по интервалу в будущее
 //Работает просто: добавляет интервал и выравнивает в прошлое
 Interval.prototype.alignToFuture = function(date){
@@ -141,37 +153,32 @@ function RulerModel(start,end){
  */
 RulerModel.levels = [
     { name:'Век', format:'yyyy', interval:  new Interval(0,0,0,0,0,100), marks: 10, width: 25 }, // root
-    { name:'Только год', format:'yyyy', interval:  new Interval(0,0,0,0,0,1), marks: 1, width: 25 },
+    { name:'Декада', format:'yyyy', interval:  new Interval(0,0,0,0,0,10), marks: 10, width: 25 },
     {
-        name:'Год/месяц', //Года
+        name:'Год', //Года
         format:'yyyy',//Строка для форматирования даты или функция
         //Используем http://www.mattkruse.com/javascript/date/date.js для форматирования
         interval:  new Interval(0,0,0,0,0,1),//Интервал для определения больших рисок (подписей)
         marks: 12,//Сколько маленьких рисок используем на данном масштабе
-        width: 40//Минимальная ширина подписи в пикселях. Можем подгонять ширину так, чтобы подписи не пересекались и показывались как только достаточно масштаба для этой подписи + должны помещаться риски
+        width: 25//Минимальная ширина подписи в пикселях. Можем подгонять ширину так, чтобы подписи не пересекались и показывались как только достаточно масштаба для этой подписи + должны помещаться риски
     },
-    { name:'Месяц - краткий', format:'NNN', interval:  new Interval(0,0,0,0,1,0), marks: 1, width: 25 },
-    { name:'Месяц - полный/неделя(примерно)', format:'MMM', interval:  new Interval(0,0,0,0,1,0), marks: 4, width: 50 },
-    { name:'Неделя/день' , format:'dd.MM.yy', interval:  new Interval(0,0,0,7,0,0), marks: 7, width: 50,
-        alignToPast:function (date){ // Выравнивание даты по неделям - Ищем ближайшее предшествующее воскресенье
-            var dateToRet = new Date(date);
-            dateToRet.setDate(dateToRet.getDate()-dateToRet.getDay());
-            dateToRet.setMinutes(0);
-            dateToRet.setHours(0);
-            dateToRet.setSeconds(0);
-            dateToRet.setMilliseconds(0);
-            return dateToRet;
-        }
-    },
-    { name:'День/6 часов'       , format:'dd.MM.yy'     , interval:  new Interval(0,0,0,1,0,0)  , marks: 4  , width: 50 },
-    { name:'6 часов/час'        , format:'HH:mm'        , interval:  new Interval(0,0,6,0,0,0)  , marks: 6  , width: 40 },
-    { name:'Час/10 минут'       , format:'HH:mm'        , interval:  new Interval(0,0,1,0,0,0)  , marks: 6  , width: 40 },
-    { name:'Полчаса/5 минут'    , format:'HH:mm'        , interval:  new Interval(0,30,0,0,0,0) , marks: 6  , width: 40 },
-    { name:'10 минут/минута'    , format:'HH:mm'        , interval:  new Interval(0,10,0,0,0,0) , marks: 10 , width: 40 },
-    { name:'минута/10 секунд'   , format:'HH:mm'        , interval:  new Interval(0,1,0,0,0,0)  , marks: 6  , width: 40 },
-    { name:'10 секунд/секунда'  , format:'HH:mm\'ss"'   , interval:  new Interval(10,0,0,0,0,0) , marks: 10 , width: 50 },
-    { name:'1 секундa/100 мс'   , format:'HH:mm\'ss"'   , interval:  new Interval(1,0,0,0,0,0)  , marks: 10 , width: 50 },
-    { name:'1 секундa/10 мс'    , format:'HH:mm\'ss"'   , interval:  new Interval(1,0,0,0,0,0)  , marks: 100, width: 500 }
+    { name:'Месяц'      , format:'mmmm'      , interval:  new Interval(0,0,0,0,1,0)  , marks: 4  , width: 40 },
+    { name:'День'       , format:'dd mmmm'   , interval:  new Interval(0,0,0,1,0,0)  , marks: 2  , width: 50 },
+
+    { name:'12 часов'   , format:'HH"h"'      , interval:  new Interval(0,0,12,0,0,0) , marks: 2  , width: 30 },
+    { name:'6 часов'    , format:'HH"h"'      , interval:  new Interval(0,0,6,0,0,0)  , marks: 2  , width: 30 },
+    { name:'3 часа'     , format:'HH"h"'      , interval:  new Interval(0,0,3,0,0,0)  , marks: 3  , width: 30 },
+    { name:'Час'        , format:'HH"h"'      , interval:  new Interval(0,0,1,0,0,0)  , marks: 2  , width: 30 },
+
+    { name:'30 минут'   , format:'MM"m"'    , interval:  new Interval(0,30,0,0,0,0) , marks: 3  , width: 30 },
+    { name:'10 минут'   , format:'MM"m"'    , interval:  new Interval(0,10,0,0,0,0) , marks: 2  , width: 30 },
+    { name:'5 минут'    , format:'MM"m"'    , interval:  new Interval(0,5,0,0,0,0)  , marks: 5  , width: 30 },
+    { name:'1 минута'   , format:'MM"m"'    , interval:  new Interval(0,1,0,0,0,0)  , marks: 2  , width: 30 },
+
+    { name:'30 секунд'  , format:'ss"s"'    , interval:  new Interval(30,0,0,0,0,0) , marks: 3 , width: 30 },
+    { name:'10 секунд'  , format:'ss"s"'    , interval:  new Interval(10,0,0,0,0,0) , marks: 2 , width: 30 },
+    { name:'5 секунд'   , format:'ss"s"'    , interval:  new Interval(5,0,0,0,0,0)  , marks: 5 , width: 30 },
+    { name:'1 секундa'  , format:'ss"s"'    , interval:  new Interval(1,0,0,0,0,0)  , marks: 2 , width: 30 }
 ];
 
 RulerModel.getLevelIndex = function(searchdetailization){
@@ -329,7 +336,7 @@ CameraRecordsProvider.prototype.setInterval = function (start,end,level){
                 if(data.data[i][1] === -1){
                     endChunk = (new Date()).getTime();// some date in future
                 }
-                console.error("this is wrong");
+                console.error('this is wrong');
                 self.addChunk(new Chunk(data.data[i][0],endChunk,level));
             }
 
