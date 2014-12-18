@@ -309,8 +309,8 @@ bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
     if (transport)
         gotFromPeer = transport->remotePeer().id;
 
-    NX_LOG( QnLog::EC2_TRAN_LOG, lit("received peerAlive transaction %1 %2").
-        arg(aliveData.peer.id.toString()).arg(aliveData.peer.peerType), cl_logDEBUG1);
+    NX_LOG( QnLog::EC2_TRAN_LOG, lit("received peerAlive transaction. id=%1 type=%2 isAlive=%3").
+        arg(aliveData.peer.id.toString()).arg(aliveData.peer.peerType).arg(aliveData.isAlive), cl_logDEBUG1);
     if (aliveData.peer.id == m_localPeer.id)
         return false; // ignore himself
 
@@ -584,6 +584,12 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
 
     if (!sender->isReadSync(tran.command)) {
         NX_LOG( QnLog::EC2_TRAN_LOG, printTransaction("reject transaction (no readSync)", tran, transportHeader, sender), cl_logDEBUG1);
+        return;
+    }
+
+    if (tran.isLocal && m_localPeer.isServer())
+    {
+        NX_LOG( QnLog::EC2_TRAN_LOG, printTransaction("reject local transaction", tran, transportHeader, sender), cl_logDEBUG1);
         return;
     }
 
@@ -916,7 +922,7 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
             tran.params.runtimeState = m_runtimeTransactionLog->getTransactionsState();
         }
         sendTransaction(tran);
-        NX_LOG( QnLog::EC2_TRAN_LOG, lit("sending peerAlive info %1 %2").arg(peer.id.toString()).arg(peer.peerType), cl_logDEBUG1);
+        NX_LOG( QnLog::EC2_TRAN_LOG, lit("sending peerAlive info. id=%1 type=%2 isAlive=%3").arg(peer.id.toString()).arg(peer.peerType).arg(isAlive), cl_logDEBUG1);
     }
 
     if( peer.id == qnCommon->moduleGUID() )
