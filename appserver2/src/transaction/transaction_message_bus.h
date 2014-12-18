@@ -110,7 +110,7 @@ namespace ec2
         //!Emitted when a new peer has joined cluster or became online
         void peerFound(ApiPeerAliveData data);
         //!Emitted on a new direct connection to a remote peer has been established
-        void newDirectConnectionEstablished(const QnTransactionTransportPtr& transport);
+        void newDirectConnectionEstablished(QnTransactionTransport* transport);
 
         void gotLockRequest(ApiLockData);
         //void gotUnlockRequest(ApiLockData);
@@ -126,7 +126,7 @@ namespace ec2
         bool isExists(const QnUuid& removeGuid) const;
         bool isConnecting(const QnUuid& removeGuid) const;
 
-        typedef QMap<QnUuid, QnTransactionTransportPtr> QnConnectionMap;
+        typedef QMap<QnUuid, QnTransactionTransport*> QnConnectionMap;
 
     private:
         template<class T>
@@ -137,7 +137,7 @@ namespace ec2
 
             for (QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
             {
-                QnTransactionTransportPtr transport = *itr;
+                QnTransactionTransport* transport = *itr;
                 if (!sendToAll && !header.dstPeers.contains(transport->remotePeer().id)) 
                     continue;
 
@@ -154,7 +154,7 @@ namespace ec2
             {
                 for (QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
                 {
-                    QnTransactionTransportPtr transport = *itr;
+                    QnTransactionTransport* transport = *itr;
                     if (!transport->isReadyToSend(tran.command))
                         continue;;
 
@@ -235,7 +235,7 @@ namespace ec2
         QnConnectionMap m_connections;
 
         AlivePeersMap m_alivePeers;
-        QVector<QSharedPointer<QnTransactionTransport>> m_connectingConnections;
+        QVector<QnTransactionTransport*> m_connectingConnections;
 
         QMap<QnTranStateKey, int> m_lastTransportSeq;
 

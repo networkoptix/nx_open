@@ -226,12 +226,18 @@ void QnTransactionMessageBus::stop()
     m_thread->exit();
     m_thread->wait();
     
+    for (auto transport: m_connectingConnections) 
+        delete transport;
+    for (auto transport: m_connections) 
+        delete transport;
+
     m_runtimeTransactionLog->clearRuntimeData();
     m_lastTransportSeq.clear();
     m_connectingConnections.clear();
     m_alivePeers.clear();
     m_connections.clear();
     m_remoteUrls.clear();
+    m_aliveSendTimer.invalidate();
 }
 
 QnTransactionMessageBus::~QnTransactionMessageBus()
@@ -317,7 +323,7 @@ bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
         auto itr = m_connections.find(aliveData.peer.id);
         if (itr != m_connections.end()) 
         {
-            QnTransactionTransportPtr transport = itr.value();
+            QnTransactionTransport* transport = itr.value();
             if (transport->getState() == QnTransactionTransport::ReadyForStreaming)
                 isPeerActuallyAlive = true;
         }
@@ -552,22 +558,15 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
 {
     QMutexLocker lock(&m_mutex);
 
-    QnTransactionTransportPtr directConnection = m_connections.value(transportHeader.sender);
+    QnTransactionTransport* directConnection = m_connections.value(transportHeader.sender);
     if (directConnection && directConnection->getState() == QnTransactionTransport::ReadyForStreaming) 
     {
         QnTranStateKey ttSenderKey(transportHeader.sender, transportHeader.senderRuntimeID);
         const int currentTransportSeq = m_lastTransportSeq.value(ttSenderKey);
-        if (sender != directConnection.data()) {
+        if (sender != directConnection)
             assert( !currentTransportSeq || (currentTransportSeq > transportHeader.sequence) );
-
-            NX_LOG( QnLog::EC2_TRAN_LOG, lit("reject transaction %1 from %2 tt seq=%3 time=%4 db seq=%5 via %6 because direct connection is exist").
-                arg(ApiCommand::toString(tran.command)).arg(tran.peerID.toString()).arg(transportHeader.sequence).
-                arg(tran.persistentInfo.timestamp).arg(tran.persistentInfo.sequence).arg(sender->remotePeer().id.toString()), cl_logDEBUG1);
-            return;
-        }
-        else {
+        else
             assert(currentTransportSeq < transportHeader.sequence);
-        }
     }
 
     AlivePeersMap:: iterator itr = m_alivePeers.find(transportHeader.sender);
@@ -686,7 +685,7 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
     QSet<QnUuid> proxyList;
     for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr) 
     {
-        QnTransactionTransportPtr transport = *itr;
+        QnTransactionTransport* transport = *itr;
         if (transportHeader.processedPeers.contains(transport->remotePeer().id) || !transport->isReadyToSend(tran.command)) 
             continue;
 
@@ -953,7 +952,7 @@ bool QnTransactionMessageBus::isPeerUsing(const QUrl& url)
             return true;
     }
     for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr) {
-        QnTransactionTransportPtr transport =  itr.value();
+        QnTransactionTransport* transport =  itr.value();
         if (getUrlAddr(transport->remoteAddr()) == addr1)
             return true;
     }
@@ -964,9 +963,6 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
 {
     QMutexLocker lock(&m_mutex);
     QnTransactionTransport* transport = (QnTransactionTransport*) sender();
-    if (!transport)
-        return; // already removed
-    
 
     switch (transport->getState()) 
     {
@@ -1006,7 +1002,7 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
     case QnTransactionTransport::Closed:
         for (int i = m_connectingConnections.size() -1; i >= 0; --i) 
         {
-            QnTransactionTransportPtr transportPtr = m_connectingConnections[i];
+            QnTransactionTransport* transportPtr = m_connectingConnections[i];
             if (transportPtr == transport) {
                 m_connectingConnections.removeAt(i);
                 return;
@@ -1015,14 +1011,14 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
 
         for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
         {
-            QnTransactionTransportPtr transportPtr = itr.value();
+            QnTransactionTransport* transportPtr = itr.value();
             if (transportPtr == transport) {
                 connectToPeerLost(transport->remotePeer().id);
                 m_connections.erase(itr);
                 break;
             }
         }
-
+        transport->deleteLater();
         break;
 
     default:
@@ -1052,7 +1048,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
     // send HTTP level keep alive (empty chunk) for server <---> server connections
     if (!m_localPeer.isClient()) 
     {
-        for(const QnTransactionTransportPtr& transport: m_connections.values()) 
+        for(QnTransactionTransport* transport: m_connections.values()) 
         {
             if (transport->getState() == QnTransactionTransport::ReadyForStreaming && !transport->remotePeer().isClient()) 
             {
@@ -1083,11 +1079,11 @@ void QnTransactionMessageBus::doPeriodicTasks()
             }
 
             itr.value().lastConnectedTime.restart();
-            QnTransactionTransportPtr transport(new QnTransactionTransport(m_localPeer));
-            connect(transport.data(), &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
-            connect(transport.data(), &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);
-            connect(transport.data(), &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::emitRemotePeerUnauthorized,  Qt::DirectConnection);
-            connect(transport.data(), &QnTransactionTransport::peerIdDiscovered, this, &QnTransactionMessageBus::at_peerIdDiscovered,  Qt::QueuedConnection);
+            QnTransactionTransport* transport = new QnTransactionTransport(m_localPeer);
+            connect(transport, &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
+            connect(transport, &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);
+            connect(transport, &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::emitRemotePeerUnauthorized,  Qt::DirectConnection);
+            connect(transport, &QnTransactionTransport::peerIdDiscovered, this, &QnTransactionMessageBus::at_peerIdDiscovered,  Qt::QueuedConnection);
             transport->doOutgoingConnect(url);
             m_connectingConnections << transport;
         }
@@ -1111,7 +1107,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
         if (itr.value().lastActivity.elapsed() > ALIVE_UPDATE_TIMEOUT)
         {
             itr.value().lastActivity.restart();
-            for(const QnTransactionTransportPtr& transport: m_connectingConnections) {
+            for(QnTransactionTransport* transport: m_connectingConnections) {
                 if (transport->getState() == QnTransactionTransport::Closed)
                     continue; // it's going to close soon
                 if (transport->remotePeer().id == itr.key()) {
@@ -1120,7 +1116,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
                 }
             }
 
-            for(const QnTransactionTransportPtr& transport: m_connections.values()) {
+            for(QnTransactionTransport* transport: m_connections.values()) {
                 if (transport->getState() == QnTransactionTransport::Closed)
                     continue; // it's going to close soon
                 if (transport->remotePeer().id == itr.key() && transport->remotePeer().peerType == Qn::PT_Server) {
@@ -1152,13 +1148,14 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(const QSharedPointer<A
         return;
     }
 
-    QnTransactionTransportPtr transport(new QnTransactionTransport(m_localPeer, socket));
+    QnTransactionTransport* transport = new QnTransactionTransport(m_localPeer, socket);
     transport->setRemotePeer(remotePeer);
-    connect(transport.data(), &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
-    connect(transport.data(), &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);
-    connect(transport.data(), &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::emitRemotePeerUnauthorized, Qt::DirectConnection );
+    connect(transport, &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
+    connect(transport, &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);
+    connect(transport, &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::emitRemotePeerUnauthorized, Qt::DirectConnection );
 
     QMutexLocker lock(&m_mutex);
+    transport->moveToThread(thread());
     m_connectingConnections << transport;
     transport->setState(QnTransactionTransport::Connected);
     Q_ASSERT(!m_connections.contains(remotePeer.id));
@@ -1178,7 +1175,7 @@ void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& url)
     QMutexLocker lock(&m_mutex);
     m_remoteUrls.remove(url);
     QString urlStr = getUrlAddr(url);
-    for(const QnTransactionTransportPtr& transport: m_connections.values())
+    for(QnTransactionTransport* transport: m_connections.values())
     {
         if (getUrlAddr(transport->remoteAddr()) == urlStr) {
             qWarning() << "Disconnected from peer" << url;
@@ -1191,7 +1188,7 @@ void QnTransactionMessageBus::dropConnections()
 {
     QMutexLocker lock(&m_mutex);
     m_remoteUrls.clear();
-    for(const QnTransactionTransportPtr &transport: m_connections) {
+    for(QnTransactionTransport* transport: m_connections) {
         qWarning() << "Disconnected from peer" << transport->remoteAddr();
         transport->setState(QnTransactionTransport::Error);
     }
@@ -1208,7 +1205,7 @@ QnPeerSet QnTransactionMessageBus::connectedPeers(ApiCommand::Value command) con
     QnPeerSet result;
     for(QnConnectionMap::const_iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
     {
-        QnTransactionTransportPtr transport = *itr;
+        QnTransactionTransport* transport = *itr;
         if (transport->isReadyToSend(command))
             result << transport->remotePeer().id;
     }
