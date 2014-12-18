@@ -1880,7 +1880,8 @@ void QnWorkbenchDisplay::at_widget_aspectRatioChanged() {
 
 void QnWorkbenchDisplay::at_widget_aboutToBeDestroyed() {
     QnResourceWidget *widget = checked_cast<QnResourceWidget *>(sender());
-    disconnect(widget, NULL, this, NULL);
+    if (widget)
+        disconnect(widget, NULL, this, NULL);
     if (widget && widget->item()) {
         /* We can get here only when the widget is destroyed directly
          * (not by destroying or removing its corresponding item).
