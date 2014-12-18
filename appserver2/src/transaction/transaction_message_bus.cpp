@@ -564,9 +564,9 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         QnTranStateKey ttSenderKey(transportHeader.sender, transportHeader.senderRuntimeID);
         const int currentTransportSeq = m_lastTransportSeq.value(ttSenderKey);
         if (sender != directConnection)
-            assert( !currentTransportSeq || (currentTransportSeq > transportHeader.sequence) );
+            Q_ASSERT_X( !currentTransportSeq || (currentTransportSeq > transportHeader.sequence), Q_FUNC_INFO, "Invalid transaction sequence, queued connetion" );
         else
-            assert(currentTransportSeq < transportHeader.sequence);
+            Q_ASSERT_X(currentTransportSeq < transportHeader.sequence, Q_FUNC_INFO, "Invalid transaction sequence, direct connetion" );
     }
 
     AlivePeersMap:: iterator itr = m_alivePeers.find(transportHeader.sender);
