@@ -490,8 +490,8 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
     QnTranStateKey ttSenderKey(transportHeader.sender, transportHeader.senderRuntimeID);
     int transportSeq = m_lastTransportSeq[ttSenderKey];
     if (transportSeq >= transportHeader.sequence) {
-        NX_LOG( QnLog::EC2_TRAN_LOG, lit("Ignore transaction %1 from peer %2 received via %3 because of transport sequence: %4 <= %5").
-            arg(toString(tran.command)).arg(tran.peerID.toString()).arg(transportHeader.sender.toString()).arg(transportHeader.sequence).arg(transportSeq), cl_logDEBUG1 );
+        NX_LOG( QnLog::EC2_TRAN_LOG, lit("Ignore transaction %1 %2 received via %3 because of transport sequence: %4 <= %5").
+            arg(tran.toString()).arg(toString(transportHeader)).arg(transport->remotePeer().id.toString()).arg(transportHeader.sequence).arg(transportSeq), cl_logDEBUG1 );
         return false; // already processed
     }
     m_lastTransportSeq[ttSenderKey] = transportHeader.sequence;
@@ -557,7 +557,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
     QMutexLocker lock(&m_mutex);
 
     QnTransactionTransport* directConnection = m_connections.value(transportHeader.sender);
-    if (directConnection && directConnection->getState() == QnTransactionTransport::ReadyForStreaming) 
+    if (directConnection && directConnection->getState() == QnTransactionTransport::ReadyForStreaming && directConnection->isReadSync(ApiCommand::NotDefined)) 
     {
         QnTranStateKey ttSenderKey(transportHeader.sender, transportHeader.senderRuntimeID);
         const int currentTransportSeq = m_lastTransportSeq.value(ttSenderKey);
