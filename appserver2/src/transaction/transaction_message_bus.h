@@ -6,29 +6,37 @@
 #include <QtCore/QElapsedTimer>
 #include <QTime>
 
+#include <common/common_module.h>
+#include <utils/common/enable_multi_thread_direct_connection.h>
+
 #include <nx_ec/ec_api.h>
 #include "nx_ec/data/api_lock_data.h"
+#include <nx_ec/data/api_peer_data.h>
 #include "transaction.h"
 #include "utils/network/http/asynchttpclient.h"
 #include "transaction_transport.h"
 #include <transaction/transaction_log.h>
-#include "common/common_module.h"
 #include "runtime_transaction_log.h"
 
 #include <transaction/binary_transaction_serializer.h>
 #include <transaction/json_transaction_serializer.h>
 
+
 class QTimer;
+class QnRuntimeTransactionLog;
 
 namespace ec2
 {
     class ECConnectionNotificationManager;
 
-    class QnTransactionMessageBus: public QObject
+    class QnTransactionMessageBus
+    :
+        public QObject,
+        public EnableMultiThreadDirectConnection<QnTransactionMessageBus>
     {
         Q_OBJECT
     public:
-        QnTransactionMessageBus();
+        QnTransactionMessageBus(Qn::PeerType peerType );
         virtual ~QnTransactionMessageBus();
 
         static QnTransactionMessageBus* instance();
@@ -38,10 +46,10 @@ namespace ec2
         void gotConnectionFromRemotePeer(const QSharedPointer<AbstractStreamSocket>& socket, const ApiPeerData &remotePeer);
         void dropConnections();
         
-        void setLocalPeer(const ApiPeerData localPeer);
         ApiPeerData localPeer() const;
 
         void start();
+        void stop();
 
         /*!
             \param handler Control of life-time of this object is out of scope of this class
@@ -102,7 +110,7 @@ namespace ec2
         //!Emitted when a new peer has joined cluster or became online
         void peerFound(ApiPeerAliveData data);
         //!Emitted on a new direct connection to a remote peer has been established
-        void newDirectConnectionEstablished(const QnTransactionTransportPtr& transport);
+        void newDirectConnectionEstablished(QnTransactionTransport* transport);
 
         void gotLockRequest(ApiLockData);
         //void gotUnlockRequest(ApiLockData);
@@ -118,7 +126,7 @@ namespace ec2
         bool isExists(const QnUuid& removeGuid) const;
         bool isConnecting(const QnUuid& removeGuid) const;
 
-        typedef QMap<QnUuid, QnTransactionTransportPtr> QnConnectionMap;
+        typedef QMap<QnUuid, QnTransactionTransport*> QnConnectionMap;
 
     private:
         template<class T>
@@ -129,7 +137,7 @@ namespace ec2
 
             for (QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
             {
-                QnTransactionTransportPtr transport = *itr;
+                QnTransactionTransport* transport = *itr;
                 if (!sendToAll && !header.dstPeers.contains(transport->remotePeer().id)) 
                     continue;
 
@@ -146,7 +154,7 @@ namespace ec2
             {
                 for (QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
                 {
-                    QnTransactionTransportPtr transport = *itr;
+                    QnTransactionTransport* transport = *itr;
                     if (!transport->isReadyToSend(tran.command))
                         continue;;
 
@@ -190,10 +198,11 @@ namespace ec2
         void addAlivePeerInfo(ApiPeerData peerData, const QnUuid& gotFromPeer = QnUuid());
         void removeAlivePeer(const QnUuid& id, bool sendTran, bool isRecursive = false);
         bool sendInitialData(QnTransactionTransport* transport);
-        void printTranState(const QnTranState& tranState, bool printToStdOut);
+        void printTranState(const QnTranState& tranState);
         template <class T> void proxyTransaction(const QnTransaction<T> &tran, const QnTransactionTransportHeader &transportHeader);
         void updatePersistentMarker(const QnTransaction<ApiUpdateSequenceData>& tran, QnTransactionTransport* transport);
         void proxyFillerTransaction(const QnAbstractTransaction& tran, const QnTransactionTransportHeader& transportHeader);
+        void removeTTSequenceForPeer(const QnUuid& id);
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();
@@ -202,9 +211,10 @@ namespace ec2
         bool checkSequence(const QnTransactionTransportHeader& transportHeader, const QnAbstractTransaction& tran, QnTransactionTransport* transport);
         void at_peerIdDiscovered(const QUrl& url, const QnUuid& id);
         void at_runtimeDataUpdated(const QnTransaction<ApiRuntimeData>& data);
+        void emitRemotePeerUnauthorized(const QnUuid& id);
     private:
-        /** Info about us. Should be set before start(). */
-        ApiPeerData m_localPeer;
+        /** Info about us. */
+        const ApiPeerData m_localPeer;
 
         //QScopedPointer<QnBinaryTransactionSerializer> m_binaryTranSerializer;
         QScopedPointer<QnJsonTransactionSerializer> m_jsonTranSerializer;
@@ -225,12 +235,13 @@ namespace ec2
         QnConnectionMap m_connections;
 
         AlivePeersMap m_alivePeers;
-        QVector<QSharedPointer<QnTransactionTransport>> m_connectingConnections;
+        QVector<QnTransactionTransport*> m_connectingConnections;
 
-        QMap<QnUuid, int> m_lastTransportSeq;
+        QMap<QnTranStateKey, int> m_lastTransportSeq;
 
         // alive control
         QElapsedTimer m_aliveSendTimer;
+        std::unique_ptr<QnRuntimeTransactionLog> m_runtimeTransactionLog;
     };
 }
 #define qnTransactionBus ec2::QnTransactionMessageBus::instance()

@@ -95,14 +95,16 @@ Qn::ActionVisibility QnVideoWallReviewModeCondition::check(const QnActionParamet
 }
 
 
-bool QnPreviewSearchModeCondition::isPreviewSearchMode() const {
-    return context()->workbench()->currentLayout()->data().contains(Qn::LayoutSearchStateRole);
+bool QnPreviewSearchModeCondition::isPreviewSearchMode(const QnActionParameters &parameters) const {
+    return
+        parameters.scope() == Qn::SceneScope &&
+        context()->workbench()->currentLayout()->data().contains(Qn::LayoutSearchStateRole);
 }
 
 Qn::ActionVisibility QnPreviewSearchModeCondition::check(const QnActionParameters &parameters) {
     Q_UNUSED(parameters)
-        if (m_hide == isPreviewSearchMode())
-            return Qn::InvisibleAction;
+    if (m_hide == isPreviewSearchMode(parameters))
+        return Qn::InvisibleAction;
     return Qn::EnabledAction;
 }
 

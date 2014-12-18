@@ -99,7 +99,7 @@ namespace {
             if (m_motionUsed){
                 foreach (const QnVirtualCameraResourcePtr &camera, cameras)
                 {
-                    bool hasMotion = camera->hasMotion();
+                    bool hasMotion = (camera->getMotionType() != Qn::MT_NoMotion);
                     if (!hasMotion) {
                         motionOk = false;
                         break;

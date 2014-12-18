@@ -41,17 +41,6 @@ const QnRestProcessorPool::Handlers& QnRestProcessorPool::handlers() const
     return m_handlers;
 }
 
-static QnRestProcessorPool* QnRestProcessorPool_instance = nullptr;
-
-void QnRestProcessorPool::initStaticInstance( QnRestProcessorPool* _instance )
-{
-    QnRestProcessorPool_instance = _instance;
-}
-
-QnRestProcessorPool* QnRestProcessorPool::instance()
-{
-    return QnRestProcessorPool_instance;
-}
 
 
 class QnRestConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate

@@ -29,8 +29,6 @@
 #include "http/ec2_transaction_tcp_listener.h"
 #include <utils/common/app_info.h>
 #include "mutex/distributed_mutex_manager.h"
-#include "transaction/runtime_transaction_log.h"
-
 
 namespace ec2
 {
@@ -38,7 +36,7 @@ namespace ec2
     :
         m_dbManager( peerType == Qn::PT_Server ? new QnDbManager() : nullptr ),   //dbmanager is initialized by direct connection
         m_timeSynchronizationManager( new TimeSynchronizationManager(peerType) ),
-        m_transactionMessageBus( new ec2::QnTransactionMessageBus() ),
+        m_transactionMessageBus( new ec2::QnTransactionMessageBus(peerType) ),
         m_terminated( false ),
         m_runningRequests( 0 ),
         m_sslEnabled( false )
@@ -52,7 +50,8 @@ namespace ec2
         qRegisterMetaType<QnTransactionTransportHeader>( "QnTransactionTransportHeader" ); // TODO: #Elric #EC2 register in a proper place!
 
         ec2::QnDistributedMutexManager::initStaticInstance( new ec2::QnDistributedMutexManager() );
-        m_runtimeTransactionLog.reset(new QnRuntimeTransactionLog());
+
+        //m_transactionMessageBus->start();
     }
 
     Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()

@@ -5,7 +5,7 @@ QRectF ConstrainedResizable::constrainedGeometry(const QRectF &geometry, Qt::Win
     if(qFuzzyEquals(constrainedSize, geometry.size()))
         return geometry;
 
-    if(pinSection == Qt::NoSection)
+    if(pinSection == Qt::NoSection || pinSection == Qt::TitleBarArea)
         return QnGeometry::scaled(geometry, constrainedSize, pinPoint, Qt::IgnoreAspectRatio);
 
     QPointF pinSectionPoint = Qn::calculatePinPoint(geometry, pinSection);

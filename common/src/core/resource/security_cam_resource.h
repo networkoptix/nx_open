@@ -206,7 +206,7 @@ public:
         int detailLevel );
     
     // in some cases I just want to update couple of field from just discovered resource
-    virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source);
+    virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) override;
 
 public slots:
     virtual void inputPortListenerAttached();

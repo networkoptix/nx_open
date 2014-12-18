@@ -18,7 +18,7 @@ namespace ec2
         const ResourceContext& resCtx,
         const QnConnectionInfo& connectionInfo )
     :
-        BaseEc2Connection<FixedUrlClientQueryProcessor>( queryProcessor.get(), resCtx ),
+        base_type( queryProcessor.get(), resCtx ),
         m_queryProcessor( queryProcessor ),
         m_connectionInfo( connectionInfo )
     {
@@ -48,15 +48,7 @@ namespace ec2
 
     void RemoteEC2Connection::startReceivingNotifications() {
 
-        // in remote mode we are always working as a client
-        ApiPeerData localPeer(qnCommon->moduleGUID(), qnCommon->runningInstanceGUID(), Qn::PT_DesktopClient);
-
-        QnUuid videowallGuid = QnAppServerConnectionFactory::videowallGuid();
-        if (!videowallGuid.isNull())
-            localPeer.peerType = Qn::PT_VideowallClient;
-        
-        QnTransactionMessageBus::instance()->setLocalPeer(localPeer);
-        QnTransactionMessageBus::instance()->start();
+        base_type::startReceivingNotifications();
 
         QUrl url(m_queryProcessor->getUrl());
         url.setScheme( m_connectionInfo.allowSslConnections ? lit("https") : lit("http") );
@@ -68,4 +60,5 @@ namespace ec2
         m_peerUrl = url;
         QnTransactionMessageBus::instance()->addConnectionToPeer(url);
     }
+
 }

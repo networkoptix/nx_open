@@ -5,6 +5,7 @@
 
 #include <utils/common/id.h>
 #include <utils/common/connective.h>
+#include <update/updates_common.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnNetworkPeerTask;
@@ -49,7 +50,7 @@ private slots:
     void at_configureTask_finished(int errorCode, const QSet<QnUuid> &failedPeers);
     void at_waitTask_finished(int errorCode);
     void at_updateTool_finished(const QnUpdateResult &result);
-    void at_updateTool_progressChanged(int progress);
+    void at_updateTool_stageProgressChanged(QnFullUpdateStage stage, int progress);
 
 private:
     QSet<QnUuid> m_targets;

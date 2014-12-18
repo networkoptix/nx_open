@@ -180,6 +180,10 @@ void QnBusinessRulesViewModel::addRules(const QnBusinessEventRuleList &businessR
 }
 
 void QnBusinessRulesViewModel::addRule(const QnBusinessEventRulePtr &rule) {
+    /* System rules are not to be added into any visual models. */
+    if (rule->isSystem())
+        return;
+
     QnBusinessRuleViewModel* ruleModel = new QnBusinessRuleViewModel(this);
     if (rule)
         ruleModel->loadFromRule(rule);

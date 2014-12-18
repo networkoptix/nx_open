@@ -34,7 +34,7 @@
 #include "core/resource/camera_user_attribute_pool.h"
 
 
-static const qint64 LICENSE_RECORDING_STOP_TIME = 60 * 24 * 7;
+static const qint64 LICENSE_RECORDING_STOP_TIME = 60 * 24 * 30;
 static const QString LICENSE_OVERFLOW_LOCK_NAME(lit("__LICENSE_OVERFLOW__"));
 
 class QnServerDataProviderFactory: public QnDataProviderFactory
