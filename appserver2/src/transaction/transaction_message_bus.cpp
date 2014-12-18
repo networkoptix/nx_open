@@ -41,7 +41,7 @@ static const int DISCOVERED_PEER_TIMEOUT = 1000 * 60 * 3;
 
 QString printTransaction(const char* prefix, const QnAbstractTransaction& tran, const QnTransactionTransportHeader &transportHeader, QnTransactionTransport* sender)
 {
-    return lit("%1 %2 ttHeader=%3 gotVia=%4").arg(prefix).arg(tran.toString()).arg(toString(transportHeader)).arg(sender->remotePeer().id.toString());
+    return lit("%1 %2 %3 gotVia=%4").arg(prefix).arg(tran.toString()).arg(toString(transportHeader)).arg(sender->remotePeer().id.toString());
 }
 
 struct GotTransactionFuction {
@@ -262,6 +262,8 @@ void QnTransactionMessageBus::addAlivePeerInfo(ApiPeerData peerData, const QnUui
 
 void QnTransactionMessageBus::removeTTSequenceForPeer(const QnUuid& id)
 {
+    NX_LOG( QnLog::EC2_TRAN_LOG, lit("Clear transportSequence for peer %1").arg(id.toString()), cl_logDEBUG1);
+
     QnTranStateKey key(id, QnUuid());
     auto itr = m_lastTransportSeq.lowerBound(key);
     while (itr != m_lastTransportSeq.end() && itr.key().peerID == id)
@@ -561,10 +563,16 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
     {
         QnTranStateKey ttSenderKey(transportHeader.sender, transportHeader.senderRuntimeID);
         const int currentTransportSeq = m_lastTransportSeq.value(ttSenderKey);
+        bool cond;
         if (sender != directConnection)
-            Q_ASSERT_X( !currentTransportSeq || (currentTransportSeq > transportHeader.sequence), Q_FUNC_INFO, "Invalid transaction sequence, queued connetion" );
+            cond = !currentTransportSeq || (currentTransportSeq > transportHeader.sequence), Q_FUNC_INFO, "Invalid transaction sequence, queued connetion";
         else
-            Q_ASSERT_X(currentTransportSeq < transportHeader.sequence, Q_FUNC_INFO, "Invalid transaction sequence, direct connetion" );
+            cond = currentTransportSeq < transportHeader.sequence, Q_FUNC_INFO, "Invalid transaction sequence, direct connetion";
+
+        if (!cond) {
+            NX_LOG( QnLog::EC2_TRAN_LOG, printTransaction("Got unexpected transaction", tran, transportHeader, sender), cl_logDEBUG1);
+            Q_ASSERT_X( cond, Q_FUNC_INFO, "Invalid transaction sequence, queued connetion" );
+        }
     }
 
     AlivePeersMap:: iterator itr = m_alivePeers.find(transportHeader.sender);
