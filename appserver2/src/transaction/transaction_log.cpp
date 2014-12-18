@@ -145,7 +145,7 @@ ErrorCode QnTransactionLog::updateSequence(const ApiUpdateSequenceData& data)
     QnDbManager::QnDbTransactionLocker locker(dbManager->getTransaction());
     for(const ApiSyncMarkerRecord& record: data.markers) 
     {
-        NX_LOG( QnLog::EC2_TRAN_LOG, lit("update transaction sequence in log. key=%1 dbID=%2 dbSeq=%4").arg(record.peerID).arg(record.dbID).arg(record.sequence), cl_logDEBUG1);
+        NX_LOG( QnLog::EC2_TRAN_LOG, lit("update transaction sequence in log. key=%1 dbID=%2 dbSeq=%3").arg(record.peerID.toString()).arg(record.dbID.toString()).arg(record.sequence), cl_logDEBUG1);
         ErrorCode result = updateSequenceNoLock(record.peerID, record.dbID, record.sequence);
         if (result != ErrorCode::ok)
             return result;
