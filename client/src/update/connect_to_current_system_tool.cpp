@@ -32,11 +32,21 @@ QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QnWorkbenchContext *c
     base_type(parent),
     QnWorkbenchContextAware(context),
     m_currentTask(0),
-    m_updateTool(0)
+    m_updateTool(0),
+    m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnConnectToCurrentSystemTool>(this))
 {
 }
 
 QnConnectToCurrentSystemTool::~QnConnectToCurrentSystemTool() {}
+
+bool QnConnectToCurrentSystemTool::tryClose(bool force) {
+    Q_UNUSED(force)
+    cancel();
+    return true;
+}
+
+void QnConnectToCurrentSystemTool::forcedUpdate() {
+}
 
 void QnConnectToCurrentSystemTool::start(const QSet<QnUuid> &targets, const QString &adminUser, const QString &password) {
     if (targets.isEmpty()) {

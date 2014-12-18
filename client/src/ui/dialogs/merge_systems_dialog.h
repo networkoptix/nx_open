@@ -5,6 +5,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include <ui/workbench/workbench_state_manager.h>
 
 namespace Ui {
     class QnMergeSystemsDialog;
@@ -19,6 +20,9 @@ class QnMergeSystemsDialog : public QDialog, public QnWorkbenchContextAware {
 public:
     explicit QnMergeSystemsDialog(QWidget *parent = 0);
     ~QnMergeSystemsDialog();
+
+    bool tryClose(bool force);
+    void forcedUpdate();
 
     QUrl url() const;
     QString password() const;
@@ -47,6 +51,8 @@ private:
     QUrl m_url;
     QString m_user;
     QString m_password;
+
+    QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;
 };
 
 #endif // MERGE_SYSTEMS_DIALOG_H
