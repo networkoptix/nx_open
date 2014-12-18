@@ -243,15 +243,31 @@ class ClusterTest():
     # This checkResultEqual function will categorize the return value from each server
     # and report the difference status of this
 
+    def _reportDetailDiff(self,key_list):
+        print "\n\n"
+        print "Detail difference with each group is listed below:"
+        for i in xrange(len(key_list)):
+            for k in xrange(i+1,len(key_list)):
+                print "-----------------------------------------"
+                print "Group __%d__ compared with Group __%d__"%(i+1,k+1)
+                self._seeDiff(key_list[i],key_list[k])
+                print "-----------------------------------------"
+        print "Detail list done\n\n"
+
     def _reportDiff(self,statusDict,methodName):
         print "=============================================="
         print "For method:%s cluster has different status"%(methodName)
         print "The server inside of the same group will have same status,but each group has different status with others"
         i = 1
+        key_list = []
         for key in statusDict:
             list = statusDict[key]
             print "Group %d:(%s)"%(i,','.join(list))
             i = i +1
+            key_list.append(key)
+
+
+        self._reportDetailDiff(key_list)
         print "=============================================="
 
     def _checkResultEqual(self,responseList,methodName):
@@ -265,10 +281,11 @@ class ClusterTest():
             if response.getcode() != 200:
                 return(False,"Server:%s method:%s http request failed with code:%d" % (address,methodName,response.getcode))
             else:
-                if response in statusDict:
-                    statusDict[response].append(address)
+                content = response.read()
+                if content in statusDict:
+                    statusDict[content].append(address)
                 else:
-                    statusDict[response]=[address]
+                    statusDict[content]=[address]
                     if len(statusDict) != 1:
                         failed = True
                 response.close()
