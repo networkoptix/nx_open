@@ -14,6 +14,7 @@ import socket
 import os.path
 import signal
 import sys
+import difflib
 
 # Rollback support
 class UnitTestRollback:
@@ -25,8 +26,17 @@ class UnitTestRollback:
     """
 
     def __init__(self):
-        # Check if this file is existed, if so we do the rollback automatically
-        self.doRecover()
+        if os.path.isfile(".rollback"):
+            selection = None
+            try :
+                print "+++++++++++++++++++++++++++++++++++++++++++WARNING!!!++++++++++++++++++++++++++++++++"
+                print "The .rollback file has been detected, if continues to run test the previous rollback information will be lost!\n"
+                print "Do you want to run Recover NOW?\n"
+                selection = raw_input("Press r to RUN RECOVER at first or press Enter to SKIP RECOVER and run the test")
+            except:
+                if len(selection) == 0 or selection[0] == 'r':
+                    self.doRecover()
+
         self._rollbackFile = open(".rollback","w+")
 
     def addOperations(self,methodName,serverAddress,resourceId):
@@ -127,6 +137,7 @@ class ClusterTest():
         "getLicenses"]
 
     def _callAllGetters(self):
+        print "======================================"
         print "Test all ec2 get request status"
         for s in clusterTest.clusterTestServerList:
             for reqName in self._ec2GetRequests:
@@ -136,6 +147,7 @@ class ClusterTest():
                     return (False,"%s failed with statusCode %d" % (reqName,response.getcode()))
                 response.close()
         print "All ec2 get requests work well"
+        print "======================================"
         return (True,"Server:%s test for all getter pass" % (s))
 
     def __init__(self):
@@ -198,12 +210,12 @@ class ClusterTest():
                 comp3 = ""
             else:
                 comp3 = str[i+1:end]
-            print "%s^^^%s^^^%s"%(comp1,comp2,comp3)
+            print "%s^^^%s^^^%s\n"%(comp1,comp2,comp3)
 
 
     def _seeDiff(self,lhs,rhs):
         if len(rhs) == 0 or len(lhs) == 0:
-            print "The difference is showing bellow:"
+            print "The difference is showing bellow:\n"
             if len(lhs) == 0:
                 print "<empty string>"
             else:
@@ -226,49 +238,56 @@ class ClusterTest():
 
 
     def _testConnection(self):
-        print "=================================================="
+        print "==================================================\n"
         print "Test connection on each server in the server list "
         for s in self.clusterTestServerList:
             print "Try to connect to server:%s"%(s)
-            response = urllib2.urlopen("http://%s/ec2/testConnection"%(s))
+            try:
+                response = urllib2.urlopen("http://%s/ec2/testConnection"%(s),timeout=5)
+            except urllib2.URLError , e:
+                print "The connection will be issued with a 5 seconds timeout"
+                print "However connection failed with error:%r"%(e)
+                print "Connection test failed"
+                return False
+
             if response.getcode() != 200:
                 return False
             response.close()
-            print "Connection test OK"
+            print "Connection test OK\n"
 
         print "Connection Test Pass"
-        print "==================================================="
+        print "\n==================================================="
         return True
 
     # This checkResultEqual function will categorize the return value from each server
     # and report the difference status of this
 
     def _reportDetailDiff(self,key_list):
-        print "\n\n"
-        print "Detail difference with each group is listed below:"
         for i in xrange(len(key_list)):
             for k in xrange(i+1,len(key_list)):
                 print "-----------------------------------------"
-                print "Group __%d__ compared with Group __%d__"%(i+1,k+1)
+                print "Group %d compared with Group %d\n"%(i+1,k+1)
                 self._seeDiff(key_list[i],key_list[k])
                 print "-----------------------------------------"
-        print "Detail list done\n\n"
 
     def _reportDiff(self,statusDict,methodName):
-        print "=============================================="
-        print "For method:%s cluster has different status"%(methodName)
-        print "The server inside of the same group will have same status,but each group has different status with others"
+        print "\n\n**************************************************\n\n"
+        print "Report each server status of method:%s\n"%(methodName)
+        print "The server will be categorized as group,each server within the same group has same status,while different groups have different status\n"
+        print "The total group number is:%d\n"%(len(statusDict))
+        if len(statusDict) == 1:
+            print "The status check passed!\n"
         i = 1
         key_list = []
         for key in statusDict:
             list = statusDict[key]
-            print "Group %d:(%s)"%(i,','.join(list))
+            print "Group %d:(%s)\n"%(i,','.join(list))
             i = i +1
             key_list.append(key)
 
 
         self._reportDetailDiff(key_list)
-        print "=============================================="
+        print "\n\n**************************************************\n\n"
 
     def _checkResultEqual(self,responseList,methodName):
         statusDict = dict()
@@ -276,24 +295,48 @@ class ClusterTest():
         for entry in responseList:
             response = entry[0]
             address = entry[1]
-            failed = False
 
             if response.getcode() != 200:
-                return(False,"Server:%s method:%s http request failed with code:%d" % (address,methodName,response.getcode))
+                return(False,"Server:%s method:%s http request failed with code:%d" % (address,methodName,response.getcode()))
             else:
                 content = response.read()
                 if content in statusDict:
                     statusDict[content].append(address)
                 else:
                     statusDict[content]=[address]
-                    if len(statusDict) != 1:
-                        failed = True
                 response.close()
 
-        if failed:
-            self._reportDiff(statusDict,methodName)
-            return (False,"One or more server has different status")
+        self._reportDiff(statusDict,methodName)
 
+        if len(statusDict) > 1:
+            return (False,"")
+
+        return (True,"")
+
+    def _checkResultEqual_Deprecated(self,responseList,methodName):
+        print "------------------------------------------\n"
+        print "Test sync status on method:%s"%(methodName)
+        result = None
+        resultAddr = None
+        for entry in responseList:
+            response = entry[0]
+            address  = entry[1]
+
+            if response.getcode() != 200:
+                return (False,"Server:%s method:%s http request failed with code:%d"%(address,methodName,response.getcode()))
+            else:
+                content = response.read()
+                if result == None:
+                    result = content
+                    resultAddr = address
+                else:
+                    if content != result:
+                        print "Server:%s has different status with server:%s on method:%s"%(address,resultAddr,methodName)
+                        self._seeDiff(content,result)
+                        return (False,"Failed to sync")
+            response.close()
+        print "Method:%s is sync in cluster"%(methodName)
+        print "\n------------------------------------------"
         return (True,"")
 
     def checkMethodStatusConsistent(self,method):
@@ -303,7 +346,7 @@ class ClusterTest():
                 responseList.append((urllib2.urlopen("http://%s/ec2/%s" % (server, method)),server))
 
             # checking the last response validation
-            return self._checkResultEqual(responseList,method)
+            return self._checkResultEqual_Deprecated(responseList,method)
 
     def _ensureServerListStates(self,sleep_timeout):
         time.sleep(sleep_timeout)
@@ -1402,7 +1445,9 @@ class ResourceRemoveTest(ClusterTestBase):
         return "removeResource"
 
     def _getObserverName(self):
-        return ["getMediaServersEx?format=json","getUsers?format=json","getCameras?format=json"]
+        return ["getMediaServersEx?format=json",
+                "getUsers?format=json",
+                "getCameras?format=json"]
 
 
 class CameraUserAttributeListTest(ClusterTestBase):
@@ -1616,7 +1661,7 @@ class PrepareServerStatus(BasicGenerator):
             raise Exception("Cannot generate random states:%s" % (reason))
     
 # This class is used to control the whole merge test
-class MergeTest():
+class MergeTest:
     _systemName = "mergeTest"
     _gen = BasicGenerator()
 
@@ -1987,9 +2032,17 @@ class ServerRtspTest:
 class PerformanceOperation():
     _lock = threading.Lock()
 
+    def _filterOutId(self,list):
+        ret = []
+        for i in list:
+            ret.append(i[0])
+        return ret
+
     def _sendRequest(self,methodName,d,server):
         req = urllib2.Request("http://%s/ec2/%s" % (server,methodName), \
-        data=d[0], headers={'Content-Type': 'application/json'})
+        data=d, headers={'Content-Type': 'application/json'})
+
+        response = None
 
         with self._lock:
             response = urllib2.urlopen(req)
@@ -2054,7 +2107,8 @@ class UserOperation(PerformanceOperation):
     def add(self,num):
         gen = UserDataGenerator()
         for s in clusterTest.clusterTestServerList:
-            self._sendOp("saveUser",gen.generateUserData(num),s)
+            self._sendOp("saveUser",
+                         self._filterOutId(gen.generateUserData(num)),s)
 
         return True
 
@@ -2074,7 +2128,7 @@ class MediaServerOperation(PerformanceOperation):
         gen = MediaServerGenerator()
         for s in clusterTest.clusterTestServerList:
             self._sendOp("saveMediaServer",
-                         gen.generateMediaServerData(num),s)
+                         self._filterOutId(gen.generateMediaServerData(num)),s)
         return True
 
     def remove(self,uuid):
@@ -2093,7 +2147,7 @@ class CameraOperation(PerformanceOperation):
         gen = CameraDataGenerator()
         for s in clusterTest.clusterTestServerList:
             self._sendOp("saveCameras",
-                         gen.generateCameraData(num,s),s)
+                         self._filterOutId(gen.generateCameraData(num,s)),s)
         return True
 
     def remove(self,uuid):
@@ -2518,15 +2572,18 @@ class SystemNameTest:
             print reason
             return False
         
+        print "========================================="
         print "Start to test SystemName for server lists"
         ret,reason = self._doTest()
         if not ret:
             print reason
 
         print "SystemName test finished"
-        print "Rollback"
+        print "Start SystemName test rollback"
         self._doRollback()
-        print "Rollback done"
+        print "SystemName test rollback done"
+        print "========================================="
+
 
 helpStr="Usage:\n\n" \
     "--perf : Start performance test.User can use ctrl+c to interrupt the perf test and statistic will be displayed.User can also specify configuration parameters " \
@@ -2558,9 +2615,18 @@ helpStr="Usage:\n\n" \
     "wait and then perform sync operation to check whether all the server get the notification"
 
 def doCleanUp():
-    print "Now do the rollback, do not close the program!"
-    clusterTest.unittestRollback.doRollback()
-    print "Rollback done!"
+    selection = None
+    try :
+        selection = raw_input("Press Enter to continue ROLLBACK or press x to SKIP it...")
+    except:
+        pass
+
+    if len(selection) == 0 or selection[0] != "x":
+        print "Now do the rollback, do not close the program!"
+        clusterTest.unittestRollback.doRollback()
+        print "++++++++++++++++++ROLLBACK DONE+++++++++++++++++++++++"
+    else:
+        print "Skip ROLLBACK,you could use --recover to perform manually rollback"
             
 if __name__ == '__main__':
     if len(sys.argv) == 2 and sys.argv[1] == '--help':
@@ -2568,13 +2634,9 @@ if __name__ == '__main__':
     elif len(sys.argv) == 2 and sys.argv[1] == '--recover':
         UnitTestRollback().doRecover()
     elif len(sys.argv) == 2 and sys.argv[1] == '--sys-name':
-        print "=================================="
-        print "Perform System Name Test At Last"
         SystemNameTest().run()
-        print "All Test Cases Finished"
-        print "=================================="
     else:
-        print "The automatic test starts,please wait for checking cluster status and do proper recover first ..."
+        print "The automatic test starts,please wait for checking cluster status,test connection and APIs..."
         # initialize cluster test environment
         ret,reason = clusterTest.init()
         if ret == False:
@@ -2587,24 +2649,12 @@ if __name__ == '__main__':
                 try:
                     unittest.main()
                 except:
-
-                    print "=================================="
-                    print "Perform Merge Test"
                     MergeTest().test()
-                    print "Merge Test Done"
-                    print "=================================="
-
-                    print "=================================="
-                    print "Perform System Name Test At Last"
                     SystemNameTest().run()
-                    print "All Test Cases Finished"
-                    print "=================================="
 
-                    try :
-                        raw_input("Press any key to continue Rollback ...")
-                    except:
-                        pass
+                    print "\n\nALL AUTOMATIC TEST ARE DONE\n\n"
                     doCleanUp()
+
             elif len(sys.argv) == 2 and sys.argv[1] == '--clear':
                 doClearAll()
             elif len(sys.argv) == 2 and sys.argv[1] == '--perf':
