@@ -240,27 +240,42 @@ class ClusterTest():
         print "==================================================="
         return True
 
+    # This checkResultEqual function will categorize the return value from each server
+    # and report the difference status of this
+
+    def _reportDiff(self,statusDict,methodName):
+        print "=============================================="
+        print "For method:%s cluster has different status"%(methodName)
+        print "The server inside of the same group will have same status,but each group has different status with others"
+        i = 1
+        for key in statusDict:
+            list = statusDict[key]
+            print "Group %d:(%s)"%(i,','.join(list))
+            i = i +1
+        print "=============================================="
+
     def _checkResultEqual(self,responseList,methodName):
-        result = None
-        resultAddr = None
+        statusDict = dict()
+
         for entry in responseList:
             response = entry[0]
             address = entry[1]
+            failed = False
+
             if response.getcode() != 200:
                 return(False,"Server:%s method:%s http request failed with code:%d" % (address,methodName,response.getcode))
             else:
-                # painfully slow, just bulk string comparison here
-                if result == None:
-                    resultAddr = address
-                    result = response.read()
+                if response in statusDict:
+                    statusDict[response].append(address)
                 else:
-                    output = response.read()
-                    if result != output:
-                        print "Server:%s returned value differs from server:%s on method:%s."% (address,resultAddr,methodName)
-                        self._seeDiff(result,output)
-                        return(False,"")
-                
+                    statusDict[response]=[address]
+                    if len(statusDict) != 1:
+                        failed = True
                 response.close()
+
+        if failed:
+            self._reportDiff(statusDict,methodName)
+            return (False,"One or more server has different status")
 
         return (True,"")
 
@@ -803,10 +818,6 @@ class ResourceDataGenerator(BasicGenerator):
         for i in xrange(number):
             ret.append(self._resourceRemoveTemplate % (self._getRandomResourceUUID()))
         return ret
-
-
-
-
 
 # This class is used to generate data for simulating resource confliction
 
@@ -1590,14 +1601,13 @@ class PrepareServerStatus(BasicGenerator):
     
 # This class is used to control the whole merge test
 class MergeTest():
-    _phase1WaitTime = 8
     _systemName = "mergeTest"
     _gen = BasicGenerator()
 
     _lock = threading.Lock()
 
     _serverOldSystemNameList=[]
-
+    _mergeTestTimeout = 1
 
     def _prolog(self):
         print "Merge test prolog : Test whether all servers you specify has the identical system name"
@@ -1651,7 +1661,7 @@ class MergeTest():
 
         worker.join()
         print "Merge test phase1 done, now sleep and wait for sync"
-        time.sleep(self._phase1WaitTime)
+        time.sleep(self._mergeTestTimeout)
 
     # Second phase will make each server has the same system
     # name which triggers server merge operations there.
@@ -1682,7 +1692,7 @@ class MergeTest():
         self._setToSameSystemName()
         print "Merge test phase2: wait for sync"
         # Wait until the synchronization time out expires
-        time.sleep(clusterTest.clusterTestSleepTime)
+        time.sleep(self._mergeTestTimeout)
         # Do the status checking of _ALL_ API
         for api in PrepareServerStatus.getterAPI:
             ret , reason = clusterTest.checkMethodStatusConsistent("%s?format=json" % (api))
@@ -1690,6 +1700,11 @@ class MergeTest():
                 return (ret,reason)
         print "Merge test phase2 done"
         return (True,"")
+
+    def _loadConfig(self):
+        config_parser = ConfigParser.RawConfigParser()
+        config_parser.read("ec2_tests.cfg")
+        self._mergeTestTimeout = config_parser.getint("General","mergeTestTimeout")
 
     def test(self):
         print "================================\n"
@@ -2563,19 +2578,17 @@ if __name__ == '__main__':
                     print "Merge Test Done"
                     print "=================================="
 
-                    try :
-                        raw_input("Press any key to continue Rollback ...")
-                    except:
-                        pass
-
-                    doCleanUp()
-
                     print "=================================="
                     print "Perform System Name Test At Last"
                     SystemNameTest().run()
                     print "All Test Cases Finished"
                     print "=================================="
 
+                    try :
+                        raw_input("Press any key to continue Rollback ...")
+                    except:
+                        pass
+                    doCleanUp()
             elif len(sys.argv) == 2 and sys.argv[1] == '--clear':
                 doClearAll()
             elif len(sys.argv) == 2 and sys.argv[1] == '--perf':
