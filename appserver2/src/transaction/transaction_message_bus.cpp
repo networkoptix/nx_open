@@ -344,6 +344,7 @@ bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
         addAlivePeerInfo(ApiPeerData(aliveData.peer.id, aliveData.peer.instanceId, aliveData.peer.peerType), gotFromPeer);
         if (!isPeerExist) 
         {
+            NX_LOG( QnLog::EC2_TRAN_LOG, lit("emit peerFound. id=%1").arg(aliveData.peer.id.toString()), cl_logDEBUG1);
             QMutexLocker lk( &m_signalEmitMutex );
             emit peerFound(aliveData);
         }
@@ -927,6 +928,13 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
 
     if( peer.id == qnCommon->moduleGUID() )
         return; //sending keep-alive
+
+    if (isAlive) {
+        NX_LOG( QnLog::EC2_TRAN_LOG, lit("emit peerFound. id=%1").arg(aliveData.peer.id.toString()), cl_logDEBUG1);
+    }
+    else {
+        NX_LOG( QnLog::EC2_TRAN_LOG, lit("emit peerLost. id=%1").arg(aliveData.peer.id.toString()), cl_logDEBUG1);
+    }
 
     QMutexLocker lk( &m_signalEmitMutex );
     if (isAlive)
