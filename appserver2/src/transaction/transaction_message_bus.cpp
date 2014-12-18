@@ -681,9 +681,9 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
 
     QnPeerSet processedPeers = transportHeader.processedPeers + connectedPeers(tran.command);
     processedPeers << m_localPeer.id;
-    QnTransactionTransportHeader newHeader(processedPeers, transportHeader.dstPeers);
-    newHeader.sequence = transportHeader.sequence;
-    newHeader.sender = transportHeader.sender;
+    QnTransactionTransportHeader newHeader(transportHeader);
+    newHeader.processedPeers = processedPeers;
+    newHeader.dstPeers = transportHeader.dstPeers;
 
     QSet<QnUuid> proxyList;
     for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr) 
