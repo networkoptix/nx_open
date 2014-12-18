@@ -587,6 +587,12 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         return;
     }
 
+    if (tran.isLocal && m_localPeer.isServer())
+    {
+        NX_LOG( QnLog::EC2_TRAN_LOG, printTransaction("reject local transaction", tran, transportHeader, sender), cl_logDEBUG1);
+        return;
+    }
+
 
     if (transportHeader.dstPeers.isEmpty() || transportHeader.dstPeers.contains(m_localPeer.id)) 
     {
