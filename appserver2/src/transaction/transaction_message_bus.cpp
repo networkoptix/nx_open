@@ -565,9 +565,9 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         const int currentTransportSeq = m_lastTransportSeq.value(ttSenderKey);
         bool cond;
         if (sender != directConnection)
-            cond = !currentTransportSeq || (currentTransportSeq > transportHeader.sequence), Q_FUNC_INFO, "Invalid transaction sequence, queued connetion";
+            cond = !currentTransportSeq || (currentTransportSeq > transportHeader.sequence);
         else
-            cond = currentTransportSeq < transportHeader.sequence, Q_FUNC_INFO, "Invalid transaction sequence, direct connetion";
+            cond = currentTransportSeq < transportHeader.sequence;
 
         if (!cond) {
             NX_LOG( QnLog::EC2_TRAN_LOG, printTransaction("Got unexpected transaction", tran, transportHeader, sender), cl_logDEBUG1);
