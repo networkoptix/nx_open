@@ -19,20 +19,22 @@ angular.module('webadminApp')
                     // TODO: support changing boundaries on huge detailization
                     initialZoom: 0, // Начальный масштаб (степень) 0 - чтобы увидеть весь таймлайн.
                     updateInterval: 20, // Интервал обновления таймлайна
-                    animationDuration: 200, // Скорость анимации
+                    animationDuration: 300, // Скорость анимации
                     rulerColor:'#bbbbbb', //Цвет линейки и подписи
-                    rulerFontSize: 10, // Размер надписи на линейке
+                    rulerFontSize: 9, // Размер надписи на линейке
+                    rulerFontStep: 1, // Шаг увеличения надписи на линейке
                     rulerBasicSize: 5, //Базовая высота штриха на линейке
-                    rulerLabelPadding: 5, // Отступ в линейке над надписью
+                    rulerStepSize: 4,// Шаг увеличения штрихов
+                    rulerLabelPadding: 0.3, // Отступ в линейке над надписью
                     minimumMarkWidth: 5 // Ширина, при которой появлется новый уровень отметок на линейке
                 };
 
                 var viewportWidth = element.find('.viewport').width();
-                scope.actualWidth = viewportWidth;
-
                 var canvas = element.find('canvas').get(0);
                 canvas.width  = viewportWidth;
                 canvas.height = element.find('canvas').height();
+
+                var frame = element.find('.frame');
 
                 function initTimeline(){
                     var now = (new Date()).getTime();
@@ -44,8 +46,9 @@ angular.module('webadminApp')
                     updateView();
                 }
 
+                var scroll = element.find('.scroll');
                 function viewPortScroll(value){
-                    return value?element.find('.scroll').scrollLeft(value):element.find('.scroll').scrollLeft();
+                    return value?scroll.scrollLeft(value):scroll.scrollLeft();
                 }
 
                 function zoomLevel(zoom){
@@ -75,8 +78,14 @@ angular.module('webadminApp')
                         }
                     }
                     scope.actualLevel = i-1;
-                    if(oldLevel !== scope.actualLevel){
+                    if(oldLevel < scope.actualLevel){
+
                         // Level up - run animation for appearance of new level
+                        scope.levelAppearance = 0;
+                        animateScope.animate(scope,'levelAppearance',1,timelineConfig.animationDuration);
+                    }else if(oldLevel < scope.actualLevel){
+                        scope.levelDisappearance = 0;
+                        animateScope.animate(scope,'levelDisappearance ',1,timelineConfig.animationDuration);
                     }
                 }
 
@@ -116,7 +125,21 @@ angular.module('webadminApp')
                         return;
                     }
 
-                    var size = Math.min(level+1,4) * timelineConfig.rulerBasicSize;
+                    var size = timelineConfig.rulerBasicSize;
+
+                    if(level === 0){
+                        size = timelineConfig.rulerBasicSize * scope.levelAppearance;
+                    }else{
+                        if(level<0){
+                            size = timelineConfig.rulerBasicSize * (1-scope.levelDisappearance);
+                        }else {
+                            size = (Math.min(level, 2) + scope.levelEncreasing) * timelineConfig.rulerStepSize + timelineConfig.rulerBasicSize;
+                        }
+                    }
+
+                    if(size <= 0){
+                        return;
+                    }
 
                     context.beginPath();
                     context.moveTo(coordinate, 0);
@@ -124,9 +147,21 @@ angular.module('webadminApp')
                     context.stroke();
 
                     if(typeof(label)!=='undefined'){
-                        var textSize = context.measureText(label);
-                        var width = textSize.width;
-                        context.fillText(label,coordinate - width/2, size + timelineConfig.rulerFontSize + timelineConfig.rulerLabelPadding);
+
+                        var fontSize = timelineConfig.rulerFontSize + timelineConfig.rulerFontStep * Math.min(level,3);
+                        /*if(level === 0){
+                            fontSize = timelineConfig.rulerBasicSize * scope.levelAppearance;
+                        }else{
+                            fontSize = (Math.min(level,2) + scope.levelEncreasing) * timelineConfig.rulerStepSize + timelineConfig.rulerBasicSize ;
+                        }*/
+
+
+                        context.font = fontSize  + 'px sans-serif';
+
+                        var width =  context.measureText(label).width;
+
+
+                        context.fillText(label,coordinate - width/2, size + fontSize*(1 + timelineConfig.rulerLabelPadding));
                     }
                 }
 
@@ -136,7 +171,6 @@ angular.module('webadminApp')
                     var context = canvas.getContext('2d');
                     context.fillStyle = timelineConfig.rulerColor;
                     context.strokeStyle = timelineConfig.rulerColor;
-                    context.font = timelineConfig.rulerFontSize + 'px';
 
                     context.clearRect(0, 0, canvas.width, canvas.height);
                     var secsPerPixel  = secondsPerPixel();
@@ -165,10 +199,22 @@ angular.module('webadminApp')
                         //3. Draw a mark
                         drawMark(context, screenPosition, scope.actualLevel - markLevelIndex , label);
 
+                        if(scope.levelDisappearance<1){
+                            var smallposition = position;
+
+                            var nextposition =level.interval.addToDate(position );
+                            var smallLevel = RulerModel.levels[scope.actualLevel+1];
+                            while(smallposition <nextposition ){
+                                smallposition = smallLevel.interval.addToDate(smallposition);
+                                screenPosition = dateToScreenPosition(smallposition);
+                                drawMark(context, screenPosition, -1); // Draw hiding position
+                            }
+                        }
+
                         position = level.interval.addToDate(position );
                     }
                 }
-                function updateView(doAnimate){
+                function updateView(){
                     animateScope.process();
 
                     updateActualLevel();
@@ -182,9 +228,7 @@ angular.module('webadminApp')
                     drawRuler();
 
                     if(oldframe !== scope.frameWidth) {
-                        element.find('.frame').stop(true, false).animate({
-                            width: scope.frameWidth
-                        }, doAnimate ? timelineConfig.animationDuration : 0);
+                        frame.width(scope.frameWidth);
                     }
 
                     updateDetailization();
@@ -194,6 +238,15 @@ angular.module('webadminApp')
                 scope.actualZoomLevel = timelineConfig.initialZoom;
                 scope.disableZoomOut = true;
                 scope.disableZoomIn = false;
+
+
+                //animation parameters
+                scope.scrollPosition = 0;
+                scope.actualWidth = viewportWidth;
+                scope.levelAppearance = 1; // Appearing new marks level
+                scope.levelDisappearance = 1;// Hiding mark from oldlevel
+                scope.levelEncreasing = 1; // Encreasing existing mark level
+                scope.labelAppearance = 1; // Labels become visible smoothly
 
                 scope.zoom = function(zoomIn, speed, targetScrollTime, targetScrollTimePosition){
 

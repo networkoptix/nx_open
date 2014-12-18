@@ -63,7 +63,6 @@ angular.module('webadminApp')
                     targetAnimation.isFinished = true; // Disable old animation
                 }
                 animations.push(new Animation(scope,value,target,duration,handler));
-
             }
         };
     });
