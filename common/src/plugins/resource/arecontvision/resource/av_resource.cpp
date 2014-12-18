@@ -302,7 +302,7 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
     setFirmware(firmwareVersion);
     saveParams();
 
-    setParamPhysical(lit("mdzonesite"), zone_size);
+    setParamPhysical(lit("mdzonesite"), QString::number(zone_size));
     m_zoneSite = zone_size;
     setMotionMaskPhysical(0);
 

@@ -115,19 +115,6 @@ bool QnThirdPartyResource::setParamPhysical(const QString& id, const QString &va
         value.toUtf8().constData() ) == nxcip::NX_NO_ERROR;
 }
 
-bool QnThirdPartyResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) {
-    bool result = base_type::mergeResourcesIfNeeded(source);
-
-    QString localParams = QnCameraAdvancedParamsReader::encodedParamsFromResource(this->toSharedPointer());
-    QString sourceParams = QnCameraAdvancedParamsReader::encodedParamsFromResource(source);
-    if (!sourceParams.isEmpty() && localParams != sourceParams) {
-        QnCameraAdvancedParamsReader::setEncodedParamsToResource(this->toSharedPointer(), sourceParams);
-        result = true;
-    }
-
-    return result;
-}
-
 
 bool QnThirdPartyResource::ping()
 {
@@ -139,6 +126,13 @@ bool QnThirdPartyResource::mergeResourcesIfNeeded( const QnNetworkResourcePtr& s
 {
     //TODO #ak antipattern: calling virtual function from base class
     bool mergedSomething = base_type::mergeResourcesIfNeeded( source );
+
+    QString localParams = QnCameraAdvancedParamsReader::encodedParamsFromResource(this->toSharedPointer());
+    QString sourceParams = QnCameraAdvancedParamsReader::encodedParamsFromResource(source);
+    if (!sourceParams.isEmpty() && localParams != sourceParams) {
+        QnCameraAdvancedParamsReader::setEncodedParamsToResource(this->toSharedPointer(), sourceParams);
+        mergedSomething = true;
+    }
 
     //TODO #ak to make minimal influence on existing code, merging only one property. 
         //But, perharps, other properties should be processed too (in QnResource)

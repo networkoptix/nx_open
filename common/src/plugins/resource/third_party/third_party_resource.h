@@ -43,8 +43,6 @@ public:
     //!Implementation of QnResource::setParamPhysical
     virtual bool setParamPhysical(const QString &id, const QString &value) override;
 
-    virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) override;
-
     //!Implementation of QnNetworkResource::ping
     /*!
         At the moment always returns \a true
