@@ -424,7 +424,10 @@ namespace ite
         for (size_t i = 0; i < rxIDs.size(); ++i)
             ss << ' ' << rxIDs[i];
 
-        strncpy(info.auxiliaryData, ss.str().c_str(), std::min(ss.str().size(), sizeof(nxcip::CameraInfo::auxiliaryData)-1) );
+        //memset(&info.auxiliaryData, 0, sizeof(nxcip::CameraInfo::auxiliaryData));
+        unsigned len = std::min(ss.str().size(), sizeof(nxcip::CameraInfo::auxiliaryData)-1);
+        strncpy(info.auxiliaryData, ss.str().c_str(), len);
+        info.auxiliaryData[len] = 0;
     }
 
     void DiscoveryManager::parseInfo(const nxcip::CameraInfo& info, unsigned short& txID, unsigned& frequency, std::vector<unsigned short>& outRxIDs)
