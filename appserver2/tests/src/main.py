@@ -2056,17 +2056,21 @@ class SingleServerRtspTestBase:
                 print "Camera Physical Id:%s"%(c[0])
                 print "Camera Id:%s"%(c[1])
 
-                self._log.write("-------------------------------------------")
-                self._log.write("RTSP request on Server:%s failed"%(self._serverEndpoint))
-                self._log.write("RTSP request URL:%s issued"%(reply[1]))
-                self._log.write("Camera name:%s"%(c[2]))
-                self._log.write("Camera Physical Id:%s"%(c[0]))
-                self._log.write("Camera Id:%s"%(c[1]))
-                self._log.write("Detail RTSP reply protocol:\n\n%s"%(reply[0]))
-                self._log.write("-------------------------------------------")
-                self._log.flush()
+                self._log.writeFail("-------------------------------------------")
+                self._log.writeFail("RTSP request on Server:%s failed"%(self._serverEndpoint))
+                self._log.writeFail("RTSP request URL:%s issued"%(reply[1]))
+                self._log.writeFail("Camera name:%s"%(c[2]))
+                self._log.writeFail("Camera Physical Id:%s"%(c[0]))
+                self._log.writeFail("Camera Id:%s"%(c[1]))
+                self._log.writeFail("Detail RTSP reply protocol:\n\n%s"%(reply[0]))
+                self._log.writeFail("-------------------------------------------")
+                self._log.flushFail()
                 ret = False
             else:
+                self._log.writeOK("-------------------------------------")
+                self._log.writeOK("RTSP request on Server:%s with URL:%s passed!"%(self._serverEndpoint,reply[1]))
+                self._log.writeOK("-------------------------------------")
+                self._log.flushOK()
                 print "Rtsp Test Passed!"
                 ret = True
             print "-----------------------------------------------------"
@@ -2121,19 +2125,28 @@ class FiniteSingleServerRtspTest(SingleServerRtspTestBase):
             self._testMain()
 
 class RtspLog:
-    _file = None
+    _fileOK = None
+    _fileFail=None
 
     def __init__(self):
-        self._file = open("rtsp.log","w+")
+        self._fileOK = open("rtsp.ok.log","w+")
+        self._fileFail = open("rtsp.fail.log","w+")
 
-    def write(self,msg):
-        self._file.write("%s\n"%(msg))
+    def writeOK(self,msg):
+        self._fileOK.write("%s\n"%(msg))
+
+    def writeFailed(self,msg):
+        self._fileFail.write("%s\n"%(msg))
     
-    def flush(self):
-        self._file.flush()
+    def flushOK(self):
+        self._fileOK.flush()
+
+    def flushFail(self):
+        self._fileFail.flush()
 
     def close(self):
-        self._file.close()
+        self._fileOK.close()
+        self._fileFail.close()
 
 class FiniteRtspTest:
     _testCase = 0
