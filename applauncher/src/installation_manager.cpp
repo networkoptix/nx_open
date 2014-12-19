@@ -41,6 +41,16 @@ QString InstallationManager::defaultDirectoryForInstallations()
     return defaultDirectoryForNewInstallations;
 }
 
+void InstallationManager::removeInstallation(const QnSoftwareVersion &version)
+{
+    QDir installationDir = installationDirForVersion(version);
+    if (installationDir.exists())
+        installationDir.removeRecursively();
+
+    std::unique_lock<std::mutex> lock(m_mutex);
+    m_installationByVersion.remove(version);
+}
+
 InstallationManager::InstallationManager(QObject *parent): QObject(parent)
 {
     //TODO/IMPL disguise writable install directories for different modules
