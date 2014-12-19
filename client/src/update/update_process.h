@@ -38,7 +38,7 @@ struct QnPeerUpdateInformation {
 class QnNetworkPeerTask;
 class QnDownloadUpdatesPeerTask;
 class QnCheckForUpdatesPeerTask;
-class QnPeerRuntimeInfo;
+struct QnPeerRuntimeInfo;
 
 class QnUpdateProcess: public QnLongRunnable {
     Q_OBJECT
