@@ -39,20 +39,56 @@ angular.module('webadminApp')
             this.isFinished = time > this.duration;
         };
 
+        var animationRunning = false;
+
+
+        window.animationFrame = (function(callback) {
+            return window.requestAnimationFrame ||
+                window.webkitRequestAnimationFrame ||
+                window.mozRequestAnimationFrame ||
+                window.oRequestAnimationFrame ||
+                window.msRequestAnimationFrame ||
+                function(callback) {
+                    window.setTimeout(callback, timelineConfig.updateInterval);
+                };
+        })();
+
+        var animationHandler = null;
+
+        function process() {
+            var finished = [];
+
+            _.forEach(animations,function(animation){
+                animation.update();
+                if(animation.isFinished){
+                    finished.push(animation);
+                }
+            });
+
+            _.forEach(finished,function(animation){ // Remove all finished animations
+                animations.splice(animations.indexOf(animation),1);
+            });
+        }
+        function animationFunction(){
+            if(!animationRunning) {
+                return;
+            }
+            process();
+            if(typeof(animationHandler)!=='undefined' && animationHandler !== null && animationHandler !== false) {
+                animationHandler();
+            }
+            window.animationFrame(animationFunction);
+        }
+
         return {
-            process:function(){
-                var finished = [];
+            start:function(handler){
 
-                _.forEach(animations,function(animation){
-                    animation.update();
-                    if(animation.isFinished){
-                        finished.push(animation);
-                    }
-                });
-
-                _.forEach(finished,function(animation){ // Remove all finished animations
-                    animations.splice(animations.indexOf(animation),1);
-                });
+                animationRunning = true;
+                animationHandler = handler;
+                animationFunction();
+            },
+            stop:function(){
+                animationRunning = false;
             },
             animate:function(scope,value,target,duration,handler){
 
@@ -63,6 +99,10 @@ angular.module('webadminApp')
                     targetAnimation.isFinished = true; // Disable old animation
                 }
                 animations.push(new Animation(scope,value,target,duration,handler));
+            },
+            progress:function(scope,value,duration,handler){ // Animate progress from 0 to 1
+                scope[value] = 0;
+                this.animate(scope,value,1,duration,handler);
             }
         };
     });

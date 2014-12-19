@@ -161,18 +161,18 @@ RulerModel.levels = [
         marks: 12,//Сколько маленьких рисок используем на данном масштабе
         width: 25//Минимальная ширина подписи в пикселях. Можем подгонять ширину так, чтобы подписи не пересекались и показывались как только достаточно масштаба для этой подписи + должны помещаться риски
     },
-    { name:'Месяц'      , format:'mmmm'      , interval:  new Interval(0,0,0,0,1,0)  , marks: 4  , width: 40 },
-    { name:'День'       , format:'dd mmmm'   , interval:  new Interval(0,0,0,1,0,0)  , marks: 2  , width: 50 },
+    { name:'Месяц'      , format:'mmmm'      , interval:  new Interval(0,0,0,0,1,0)  , marks: 4  , width: 50 },
+    { name:'День'       , format:'dd mmmm'   , interval:  new Interval(0,0,0,1,0,0)  , marks: 2  , width: 60 },
 
-    { name:'12 часов'   , format:'HH"h"'      , interval:  new Interval(0,0,12,0,0,0) , marks: 2  , width: 30 },
-    { name:'6 часов'    , format:'HH"h"'      , interval:  new Interval(0,0,6,0,0,0)  , marks: 2  , width: 30 },
-    { name:'3 часа'     , format:'HH"h"'      , interval:  new Interval(0,0,3,0,0,0)  , marks: 3  , width: 30 },
-    { name:'Час'        , format:'HH"h"'      , interval:  new Interval(0,0,1,0,0,0)  , marks: 2  , width: 30 },
+    { name:'12 часов'   , format:'HH"h"'      , interval:  new Interval(0,0,12,0,0,0) , marks: 2  , width: 60 },
+    { name:'6 часов'    , format:'HH"h"'      , interval:  new Interval(0,0,6,0,0,0)  , marks: 2  , width: 60 },
+    { name:'3 часа'     , format:'HH"h"'      , interval:  new Interval(0,0,3,0,0,0)  , marks: 3  , width: 60 },
+    { name:'Час'        , format:'HH"h"'      , interval:  new Interval(0,0,1,0,0,0)  , marks: 2  , width: 60 },
 
-    { name:'30 минут'   , format:'MM"m"'    , interval:  new Interval(0,30,0,0,0,0) , marks: 3  , width: 30 },
-    { name:'10 минут'   , format:'MM"m"'    , interval:  new Interval(0,10,0,0,0,0) , marks: 2  , width: 30 },
-    { name:'5 минут'    , format:'MM"m"'    , interval:  new Interval(0,5,0,0,0,0)  , marks: 5  , width: 30 },
-    { name:'1 минута'   , format:'MM"m"'    , interval:  new Interval(0,1,0,0,0,0)  , marks: 2  , width: 30 },
+    { name:'30 минут'   , format:'MM"m"'    , interval:  new Interval(0,30,0,0,0,0) , marks: 3  , width: 60 },
+    { name:'10 минут'   , format:'MM"m"'    , interval:  new Interval(0,10,0,0,0,0) , marks: 2  , width: 60 },
+    { name:'5 минут'    , format:'MM"m"'    , interval:  new Interval(0,5,0,0,0,0)  , marks: 5  , width: 60 },
+    { name:'1 минута'   , format:'MM"m"'    , interval:  new Interval(0,1,0,0,0,0)  , marks: 2  , width: 60 },
 
     { name:'30 секунд'  , format:'ss"s"'    , interval:  new Interval(30,0,0,0,0,0) , marks: 3 , width: 30 },
     { name:'10 секунд'  , format:'ss"s"'    , interval:  new Interval(10,0,0,0,0,0) , marks: 2 , width: 30 },

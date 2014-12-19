@@ -19,12 +19,12 @@ angular.module('webadminApp')
                     // TODO: support changing boundaries on huge detailization
                     initialZoom: 0, // Начальный масштаб (степень) 0 - чтобы увидеть весь таймлайн.
                     updateInterval: 20, // Интервал обновления таймлайна
-                    animationDuration: 300, // Скорость анимации
-                    rulerColor:'#bbbbbb', //Цвет линейки и подписи
+                    animationDuration: 400, // Скорость анимации, 200-400 прикольно
+                    rulerColor:[187,187,187], //Цвет линейки и подписи
                     rulerFontSize: 9, // Размер надписи на линейке
                     rulerFontStep: 1, // Шаг увеличения надписи на линейке
-                    rulerBasicSize: 5, //Базовая высота штриха на линейке
-                    rulerStepSize: 4,// Шаг увеличения штрихов
+                    rulerBasicSize: 6, //Базовая высота штриха на линейке
+                    rulerStepSize: 3,// Шаг увеличения штрихов
                     rulerLabelPadding: 0.3, // Отступ в линейке над надписью
                     minimumMarkWidth: 5 // Ширина, при которой появлется новый уровень отметок на линейке
                 };
@@ -51,6 +51,15 @@ angular.module('webadminApp')
                     return value?scroll.scrollLeft(value):scroll.scrollLeft();
                 }
 
+                function formatColor(color,alpha){
+                    var color =  'rgba(' +
+                        Math.round(color[0] /* * alpha + 255 * (1 - alpha) */) + ',' +
+                        Math.round(color[1] /* * alpha + 255 * (1 - alpha) */) + ',' +
+                        Math.round(color[2] /* * alpha + 255 * (1 - alpha) */) + ',' +
+                        alpha + ')';
+
+                    return color;
+                }
                 function zoomLevel(zoom){
                     if(typeof(zoom)==='undefined') {
                         zoom = scope.actualZoomLevel;
@@ -70,22 +79,32 @@ angular.module('webadminApp')
                 }
                 function updateActualLevel(){
                     var oldLevel = scope.actualLevel;
+                    var oldLabelLevel = scope.visibleLabelsLevel;
+
                     //3. Select actual level
                     var secsPerPixel = secondsPerPixel();
                     for(var i=1; i < RulerModel.levels.length ; i ++ ){
-                        if((RulerModel.levels[i].interval.getSeconds() / secsPerPixel) < timelineConfig.minimumMarkWidth){
+                        var level = RulerModel.levels[i];
+
+                        if((level.interval.getSeconds() / secsPerPixel) >= level.width){
+                            scope.visibleLabelsLevel = i;
+                        }
+
+                        if((level.interval.getSeconds() / secsPerPixel) < timelineConfig.minimumMarkWidth){
                             break;
                         }
                     }
                     scope.actualLevel = i-1;
-                    if(oldLevel < scope.actualLevel){
-
-                        // Level up - run animation for appearance of new level
-                        scope.levelAppearance = 0;
-                        animateScope.animate(scope,'levelAppearance',1,timelineConfig.animationDuration);
+                    if(oldLevel < scope.actualLevel){ // Level up - run animation for appearance of new level
+                        animateScope.progress(scope,'levelAppearance',timelineConfig.animationDuration);
                     }else if(oldLevel < scope.actualLevel){
-                        scope.levelDisappearance = 0;
-                        animateScope.animate(scope,'levelDisappearance ',1,timelineConfig.animationDuration);
+                        animateScope.progress(scope,'levelDisappearance ',timelineConfig.animationDuration);
+                    }
+
+                    if(oldLabelLevel < scope.visibleLabelsLevel){ //Visible label level changed
+                        animateScope.progress(scope,'labelAppearance',timelineConfig.animationDuration);
+                    }else if(oldLabelLevel > scope.visibleLabelsLevel){
+                        animateScope.progress(scope,'labelDisappearance',timelineConfig.animationDuration);
                     }
                 }
 
@@ -119,7 +138,7 @@ angular.module('webadminApp')
                     //scope.ruler.setInterval(start,end,scope.actualLevel);
                 }
 
-                function drawMark(context, coordinate, level, label){
+                function drawMark(context, coordinate, level, labelLevel, label){
 
                     if(coordinate<0) {
                         return;
@@ -133,7 +152,7 @@ angular.module('webadminApp')
                         if(level<0){
                             size = timelineConfig.rulerBasicSize * (1-scope.levelDisappearance);
                         }else {
-                            size = (Math.min(level, 2) + scope.levelEncreasing) * timelineConfig.rulerStepSize + timelineConfig.rulerBasicSize;
+                            size = (Math.min(level, 4) + scope.levelEncreasing) * timelineConfig.rulerStepSize + timelineConfig.rulerBasicSize;
                         }
                     }
 
@@ -141,6 +160,9 @@ angular.module('webadminApp')
                         return;
                     }
 
+
+                    var color = formatColor(timelineConfig.rulerColor,1);
+                    context.strokeStyle = color;
                     context.beginPath();
                     context.moveTo(coordinate, 0);
                     context.lineTo(coordinate, size);
@@ -149,18 +171,23 @@ angular.module('webadminApp')
                     if(typeof(label)!=='undefined'){
 
                         var fontSize = timelineConfig.rulerFontSize + timelineConfig.rulerFontStep * Math.min(level,3);
+
+                        if(scope.labelAppearance < 1 && labelLevel === 0) {
+                            color = formatColor(timelineConfig.rulerColor, scope.labelAppearance);
+                        }else if(scope.labelDisappearance < 1 && labelLevel < 0){
+                            color = formatColor(timelineConfig.rulerColor, 1 - scope.labelDisappearance);
+                        }
+
                         /*if(level === 0){
                             fontSize = timelineConfig.rulerBasicSize * scope.levelAppearance;
                         }else{
                             fontSize = (Math.min(level,2) + scope.levelEncreasing) * timelineConfig.rulerStepSize + timelineConfig.rulerBasicSize ;
                         }*/
 
-
                         context.font = fontSize  + 'px sans-serif';
+                        context.fillStyle = color;
 
                         var width =  context.measureText(label).width;
-
-
                         context.fillText(label,coordinate - width/2, size + fontSize*(1 + timelineConfig.rulerLabelPadding));
                     }
                 }
@@ -169,11 +196,9 @@ angular.module('webadminApp')
 
                     //1. Создаем контекст рисования
                     var context = canvas.getContext('2d');
-                    context.fillStyle = timelineConfig.rulerColor;
-                    context.strokeStyle = timelineConfig.rulerColor;
+                    context.fillStyle = formatColor(timelineConfig.rulerColor,1);
 
                     context.clearRect(0, 0, canvas.width, canvas.height);
-                    var secsPerPixel  = secondsPerPixel();
 
                     //2. C учетом масштаба квантуем видимый интервал (выраваниваем начало назад, потом добавляем интервал сколько нужно раз - отрицательные координаты пропускаем)
                     var level = RulerModel.levels[scope.actualLevel];
@@ -194,10 +219,11 @@ angular.module('webadminApp')
 
                         var markLevelIndex = RulerModel.levels.indexOf(markLevel);
 
-                        var label = ((markLevel.interval.getSeconds() / secsPerPixel) < markLevel.width )? '' : dateFormat(new Date(position), markLevel.format);
+                        var label = (markLevelIndex > scope.visibleLabelsLevel && !(scope.labelDisappearance<1 && markLevelIndex === scope.visibleLabelsLevel + 1))?
+                            '' : dateFormat(new Date(position), markLevel.format);
 
                         //3. Draw a mark
-                        drawMark(context, screenPosition, scope.actualLevel - markLevelIndex , label);
+                        drawMark(context, screenPosition, scope.actualLevel - markLevelIndex, scope.visibleLabelsLevel - markLevelIndex,label);
 
                         if(scope.levelDisappearance<1){
                             var smallposition = position;
@@ -215,7 +241,6 @@ angular.module('webadminApp')
                     }
                 }
                 function updateView(){
-                    animateScope.process();
 
                     updateActualLevel();
 
@@ -246,10 +271,11 @@ angular.module('webadminApp')
                 scope.levelAppearance = 1; // Appearing new marks level
                 scope.levelDisappearance = 1;// Hiding mark from oldlevel
                 scope.levelEncreasing = 1; // Encreasing existing mark level
+                scope.levelDecreasing = 1; // Encreasing existing mark level
                 scope.labelAppearance = 1; // Labels become visible smoothly
+                scope.labelDisappearance = 1; // Labels become visible smoothly
 
                 scope.zoom = function(zoomIn, speed, targetScrollTime, targetScrollTimePosition){
-
                     speed = speed || 1;
                     if(!targetScrollTime){
                         targetScrollTime = positionToDate(viewPortScroll() + viewportWidth/2);
@@ -289,27 +315,10 @@ angular.module('webadminApp')
 
                 scope.$watch('records',initTimeline);
 
-                window.animationFrame = (function(callback) {
-                    return window.requestAnimationFrame ||
-                        window.webkitRequestAnimationFrame ||
-                        window.mozRequestAnimationFrame ||
-                        window.oRequestAnimationFrame ||
-                        window.msRequestAnimationFrame ||
-                        function(callback) {
-                            window.setTimeout(callback, timelineConfig.updateInterval);
-                        };
-                })();
-
-                var runAnimation = true;
-                function animationFunction(){
-                    updateView();
-                    if(runAnimation) {
-                        window.animationFrame(animationFunction);
-                    }
-                }
                 initTimeline();
-                animationFunction();
-                scope.$on('$destroy', function() { runAnimation = false; });
+
+                animateScope.start(updateView);
+                scope.$on('$destroy', function() { animateScope.stop(); });
             }
         };
     }]);
