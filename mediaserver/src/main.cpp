@@ -1845,7 +1845,7 @@ void QnMain::run()
     at_timer();
     QTimer timer;
     connect(&timer, SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
-    at_connectionOpened();
+    QTimer::singleShot(3000, this, SLOT(at_connectionOpened()));
     timer.start(60 * 1000);
 
 

@@ -78,14 +78,6 @@ extern "C"
 // TODO: #AK maybe it's time to remove them?
 //preceding bunch of macro will be removed after this functionality has been tested and works as expected
 
-//#define QN_DECODED_PICTURE_TO_OPENGL_UPLOADER_DEBUG
-#ifdef QN_DECODED_PICTURE_TO_OPENGL_UPLOADER_DEBUG
-#   define glCheckError glCheckError
-#else
-#   define glCheckError(...)
-#endif
-
-
 namespace
 {
     const int ROUND_COEFF = 8;
@@ -2136,28 +2128,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 #else
 				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,qPower2Ceil(r_w_i,ROUND_COEFF),h[i],GL_LUMINANCE, GL_UNSIGNED_BYTE, NULL);
 #endif
-/*
-            glTexSubImage2D(GL_TEXTURE_2D, 0,
-                            0, 0,
-                            qPower2Ceil(r_w_i,ROUND_COEFF),
-#ifdef PARTIAL_FRAME_UPLOAD
-                            1,
-#else
-                            h[i],
-#endif
-                            GL_LUMINANCE, GL_UNSIGNED_BYTE,
-#ifndef USE_PBO
-                            planes[i]
-#else
-                            NULL
-#endif
-                            );*/
-
-            glCheckError("glTexSubImage2D");
-
             bitrateCalculator.bytesProcessed( qPower2Ceil(r_w[i],ROUND_COEFF)*h[i] );
-//            glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-            glCheckError("glPixelStorei");
 
 #ifdef USE_PBO
             d->glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, 0 );

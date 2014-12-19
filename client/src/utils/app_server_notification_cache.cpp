@@ -25,6 +25,7 @@ QnAppServerNotificationCache::QnAppServerNotificationCache(QObject *parent) :
     connect(QnClientMessageProcessor::instance(),               SIGNAL(fileAdded(QString)),     this, SLOT(at_fileAddedEvent(QString)));
     connect(QnClientMessageProcessor::instance(),               SIGNAL(fileUpdated(QString)),   this, SLOT(at_fileUpdatedEvent(QString)));
     connect(QnClientMessageProcessor::instance(),               SIGNAL(fileRemoved(QString)),   this, SLOT(at_fileRemovedEvent(QString)));
+    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::initialResourcesReceived,    this,   &QnAppServerNotificationCache::getFileList);
 
     connect(this, SIGNAL(fileListReceived(QStringList,bool)),   this, SLOT(at_fileListReceived(QStringList,bool)));
     connect(this, SIGNAL(fileDownloaded(QString,bool)),         this, SLOT(at_fileAdded(QString,bool)));
