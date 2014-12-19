@@ -24,6 +24,10 @@ class DummyResource
 {
 public:
     virtual QString getUniqueId() const { return QString(); }
+
+    virtual Qn::ResourceStatus getStatus() const override {
+        return Qn::Online;
+    }
 };
 
 FileTranscoder::FileTranscoder()
@@ -294,7 +298,6 @@ bool FileTranscoder::openFiles()
 
     QnResourcePtr res( new DummyResource() );
     res->setUrl( m_srcFilePath );
-    res->setStatus( Qn::Online );
     if( !mediaFileReader->open( res ) )
         return false;
 
