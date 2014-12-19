@@ -565,7 +565,7 @@ template <class T>
 void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader) 
 {
     QMutexLocker lock(&m_mutex);
-
+#if 0
     QnTransactionTransport* directConnection = m_connections.value(transportHeader.sender);
     if (directConnection && directConnection->getState() == QnTransactionTransport::ReadyForStreaming && directConnection->isReadSync(ApiCommand::NotDefined)) 
     {
@@ -582,7 +582,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             Q_ASSERT_X( cond, Q_FUNC_INFO, "Invalid transaction sequence, queued connetion" );
         }
     }
-
+#endif
     AlivePeersMap:: iterator itr = m_alivePeers.find(transportHeader.sender);
     if (itr != m_alivePeers.end())
         itr.value().lastActivity.restart();
