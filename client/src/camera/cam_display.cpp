@@ -415,8 +415,8 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     // adaptive delay will not solve all problems => need to minus little appendix based on queue size
     qint32 needToSleep;
 
-    if ((vd->flags & QnAbstractMediaData::MediaFlags_BOF) || isPrebuffering)
-        m_lastSleepInterval = needToSleep = 0;
+    if (isPrebuffering)
+        m_lastSleepInterval = 0;
 
     if (vd->flags & AV_REVERSE_BLOCK_START)
     {
@@ -818,6 +818,7 @@ void QnCamDisplay::afterJump(QnAbstractMediaDataPtr media)
     //m_previousVideoDisplayedTime = 0;
     m_totalFrames = 0;
     m_iFrames = 0;
+    m_lastSleepInterval = 0;
     if (!m_afterJump && m_skippingFramesTime == AV_NOPTS_VALUE) // if not more (not handled yet) jumps expected
     {
         for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
