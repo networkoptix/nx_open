@@ -2135,7 +2135,7 @@ class RtspLog:
     def writeOK(self,msg):
         self._fileOK.write("%s\n"%(msg))
 
-    def writeFailed(self,msg):
+    def writeFail(self,msg):
         self._fileFail.write("%s\n"%(msg))
     
     def flushOK(self):
