@@ -1840,7 +1840,7 @@ void QnMain::run()
 
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(localInterfacesChanged()), this, SLOT(at_localInterfacesChanged()));
 
-    m_firstRunningTime = MSSettings::roSettings()->value("lastRunningTime").toLongLong();
+    m_firstRunningTime = MSSettings::runTimeSettings()->value("lastRunningTime").toLongLong();
 
     at_timer();
     QTimer timer;
