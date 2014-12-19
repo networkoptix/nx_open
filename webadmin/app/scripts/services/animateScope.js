@@ -82,7 +82,6 @@ angular.module('webadminApp')
 
         return {
             start:function(handler){
-
                 animationRunning = true;
                 animationHandler = handler;
                 animationFunction();
@@ -91,7 +90,6 @@ angular.module('webadminApp')
                 animationRunning = false;
             },
             animate:function(scope,value,target,duration,handler){
-
                 var targetAnimation = _.find(animations,function(anim){ // Try to find,if there
                     return anim.scope === scope && anim.value === value;
                 });
