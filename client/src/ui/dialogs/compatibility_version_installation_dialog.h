@@ -10,8 +10,10 @@
 
 #include <utils/common/software_version.h>
 #include <utils/common/connective.h>
+#include <update/updates_common.h>
 
 class QnCompatibilityVersionInstallationTool;
+class QnMediaServerUpdateTool;
 
 namespace Ui {
     class QnCompatibilityVersionInstallationDialog;
@@ -34,6 +36,7 @@ public slots:
 
 private slots:
     void at_compatibilityTool_statusChanged(int status);
+    void at_updateTool_updateFinished(QnUpdateResult result);
 
 private:
     int installCompatibilityVersion();
@@ -44,6 +47,7 @@ private:
 
     QnSoftwareVersion m_versionToInstall;
     QScopedPointer<QnCompatibilityVersionInstallationTool> m_compatibilityTool;
+    QScopedPointer<QnMediaServerUpdateTool> m_updateTool;
 
     bool m_installationOk;
 };

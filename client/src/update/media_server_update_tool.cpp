@@ -209,6 +209,11 @@ void QnMediaServerUpdateTool::startUpdate(const QString &fileName) {
     startUpdate(target);
 }
 
+void QnMediaServerUpdateTool::startOnlineClientUpdate(const QnSoftwareVersion &version) {
+    QnUpdateTarget target(QSet<QnUuid>(), version, !m_enableClientUpdates || qnSettings->isClientUpdateDisabled());
+    startUpdate(target);
+}
+
 bool QnMediaServerUpdateTool::cancelUpdate() {
     if (!m_updateProcess)
         return true;
