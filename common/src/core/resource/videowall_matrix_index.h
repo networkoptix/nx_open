@@ -18,25 +18,20 @@ public:
         m_videowall(videowall), m_uuid(uuid)
     {}
 
-    const QnVideoWallResourcePtr &videowall() const {
-        return m_videowall;
-    }
+    QnVideoWallResourcePtr videowall() const;
+    void setVideoWall(const QnVideoWallResourcePtr &videowall);
 
-    void setVideoWall(const QnVideoWallResourcePtr &videowall) {
-        m_videowall = videowall;
-    }
+    QnUuid uuid() const;
+    void setUuid(const QnUuid &uuid);
 
-    const QnUuid &uuid() const {
-        return m_uuid;
-    }
+    /** \return true if the index is not initialized. */
+    bool isNull() const;
 
-    void setUuid(const QnUuid &uuid) {
-        m_uuid = uuid;
-    }
+    /** \return true if the index contains valid videowall matrix data. */
+    bool isValid() const;
 
-    bool isNull() const {
-        return m_videowall.isNull() || m_uuid.isNull();
-    }
+    QnVideoWallMatrix matrix() const;
+
 
 private:
     QnVideoWallResourcePtr m_videowall;
