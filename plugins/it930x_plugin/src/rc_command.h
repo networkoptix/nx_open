@@ -12,10 +12,10 @@
 namespace ite
 {
     ///
-    class Command
+    class RCCommand
     {
     public:
-        Command()
+        RCCommand()
         :   frequency_(0)
         {
             buffer_.reserve(RcCmdMaxSize);
@@ -35,7 +35,7 @@ namespace ite
         bool isOK() const { return isFull() && hasTags() && checksum(); }
 
         void clear() { buffer_.clear(); frequency_ = 0; }
-        void swap(Command& cmd)
+        void swap(RCCommand& cmd)
         {
             buffer_.swap(cmd.buffer_);
             std::swap(frequency_, cmd.frequency_);
@@ -74,8 +74,8 @@ namespace ite
         std::vector<Byte> buffer_;
         unsigned frequency_;
 
-        Command(const Command& );
-        Command& operator = (const Command&);
+        RCCommand(const RCCommand& );
+        RCCommand& operator = (const RCCommand&);
     };
 
     ///
@@ -89,7 +89,7 @@ namespace ite
             isValid_(false)
         {}
 
-        unsigned add(const Command&);
+        unsigned add(const RCCommand&);
 
         const Byte * data() const { return &cmd_[0]; }
         unsigned size() const { return cmd_.size(); }

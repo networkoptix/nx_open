@@ -1,9 +1,9 @@
-#include "rc_cmd.h"
+#include "rc_command.h"
 
 namespace ite
 {
 
-bool Command::checkPacketCount()
+bool RCCommand::checkPacketCount()
 {
     if (! totalPktNum())
         return false;
@@ -12,7 +12,7 @@ bool Command::checkPacketCount()
     return paketNum() <= totalPktNum();
 }
 
-bool Command::checksum() const
+bool RCCommand::checksum() const
 {
     // -2 bytes rxID, -1 byte checksum byte
     unsigned sum = 0;
@@ -24,7 +24,7 @@ bool Command::checksum() const
     return (sum == value);
 }
 
-unsigned RebuiltCmd::add(const Command& cmd)
+unsigned RebuiltCmd::add(const RCCommand& cmd)
 {
     const Byte * buffer = cmd.data();
     unsigned short bufferSize = cmd.pktLength();
