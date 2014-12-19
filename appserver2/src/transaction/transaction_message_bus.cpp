@@ -489,6 +489,9 @@ void QnTransactionMessageBus::sendTransactionToTransport(const QnTransaction<T> 
 
 bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& transportHeader, const QnAbstractTransaction& tran, QnTransactionTransport* transport)
 {
+    if (m_localPeer.isClient())
+        return true;
+
     if (transportHeader.sender.isNull())
         return true; // old version, nothing to check
 
@@ -682,8 +685,19 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
 }
 
 template <class T>
-void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, const QnTransactionTransportHeader &transportHeader) 
+void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, const QnTransactionTransportHeader &_transportHeader) 
 {
+    if (m_localPeer.isClient())
+        return;
+
+    QnTransactionTransportHeader transportHeader(_transportHeader);
+    if (transportHeader.flags & TT_ProxyToClient) {
+        QnPeerSet clients = qnTransactionBus->aliveClientPeers().keys().toSet();
+        if (clients.isEmpty())
+            return;
+        transportHeader.dstPeers = clients;
+    }
+
     // proxy incoming transaction to other peers.
     if (!transportHeader.dstPeers.isEmpty() && (transportHeader.dstPeers - transportHeader.processedPeers).isEmpty()) {
         emit transactionProcessed(tran);
@@ -738,13 +752,9 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
     QnTransactionTransportHeader ttUnicast;
     ttUnicast.processedPeers << sender->remotePeer().id << m_localPeer.id;
     ttUnicast.dstPeers << sender->remotePeer().id;
-/*
-    QnTransactionTransportHeader ttBroadcast(ttUnicast.processedPeers);
-    for(auto itr = m_connections.constBegin(); itr != m_connections.constEnd(); ++itr) {
-        if (itr.value()->isReadyToSend(ApiCommand::NotDefined))
-            ttBroadcast.processedPeers << itr.key(); // dst peer should not proxy transactions to already connected peers
-    }
-*/
+    QnTransactionTransportHeader ttBroadcast(ttUnicast);
+    ttBroadcast.flags |= TT_ProxyToClient;
+
     QList<QByteArray> serializedTransactions;
     const ErrorCode errorCode = transactionLog->getTransactionsAfter(tran.params.persistentState, serializedTransactions);
     if (errorCode == ErrorCode::ok) 
@@ -759,13 +769,13 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
         tranSyncResponse.params.result = 0;
         sender->sendTransaction(tranSyncResponse, ttUnicast);
 
-        sendRuntimeInfo(sender, ttUnicast, tran.params.runtimeState);
+        sendRuntimeInfo(sender, ttBroadcast, tran.params.runtimeState);
 
         using namespace std::placeholders;
         for(const QByteArray& serializedTran: serializedTransactions)
             if(!handleTransaction(serializedTran, 
-                                  std::bind(SendTransactionToTransportFuction(), this, _1, sender, ttUnicast), 
-                                  std::bind(SendTransactionToTransportFastFuction(), this, _1, _2, sender, ttUnicast)))
+                                  std::bind(SendTransactionToTransportFuction(), this, _1, sender, ttBroadcast), 
+                                  std::bind(SendTransactionToTransportFastFuction(), this, _1, _2, sender, ttBroadcast)))
                                   sender->setState(QnTransactionTransport::Error);
 
         QnTransaction<ApiTranSyncDoneData> tranSyncDone(ApiCommand::tranSyncDone);
