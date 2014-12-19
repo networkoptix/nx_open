@@ -171,6 +171,7 @@ private:
     void restoreVideoQueue(QnCompressedVideoDataPtr incoming, QnCompressedVideoDataPtr vd, int channel);
     template <class T> void markIgnoreBefore(const T& queue, qint64 time);
     bool needBuffering(qint64 vTime) const;
+    void processSkippingFramesTime();
 protected:
     QnVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
     QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
@@ -224,7 +225,7 @@ protected:
     int m_emptyPacketCounter;
     bool m_isStillImage;
     bool m_isLongWaiting;
-    bool m_skippingFramesStarted;
+    qint64 m_skippingFramesTime;
     
     bool m_executingChangeSpeed;
     bool m_eofSignalSended;
