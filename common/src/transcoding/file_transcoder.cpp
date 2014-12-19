@@ -28,6 +28,11 @@ public:
     virtual Qn::ResourceStatus getStatus() const override {
         return Qn::Online;
     }
+
+    virtual Qn::ResourceStatus setStatus(Qn::ResourceStatus status) {
+        Q_UNUSED(status)
+        //do nothing
+    }
 };
 
 FileTranscoder::FileTranscoder()
