@@ -67,7 +67,7 @@ bool FileTranscoder::setDestFile( const QString& filePath )
 
 bool FileTranscoder::setContainer( const QString& containerName )
 {
-    return m_transcoder.setContainer( containerName ) == 0;
+    return m_transcoder.setContainer( containerName ) == QnTranscoder::OperationResult::Success;
 }
 
 bool FileTranscoder::addTag( const QString& name, const QString& value )
@@ -83,14 +83,14 @@ bool FileTranscoder::setVideoCodec(
     int bitrate,
     QnCodecParams::Value params )
 {
-    return m_transcoder.setVideoCodec( codec, transcodeMethod, quality, resolution, bitrate, params ) == 0;
+    return m_transcoder.setVideoCodec( codec, transcodeMethod, quality, resolution, bitrate, params ) == QnTranscoder::OperationResult::Success;
 }
 
 bool FileTranscoder::setAudioCodec(
     CodecID codec,
     QnTranscoder::TranscodeMethod transcodeMethod )
 {
-    return m_transcoder.setAudioCodec( codec, transcodeMethod );
+    return m_transcoder.setAudioCodec( codec, transcodeMethod ) == QnTranscoder::OperationResult::Success;
 }
 
 void FileTranscoder::setTranscodeDurationLimit( unsigned int lengthToReadMS )

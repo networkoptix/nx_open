@@ -146,6 +146,11 @@ public:
 
     enum TranscodeMethod {TM_DirectStreamCopy, TM_FfmpegTranscode, TM_QuickSyncTranscode, TM_OpenCLTranscode, TM_Dummy};
 
+    enum OperationResult {
+        Success = 0,
+        Error = -1
+    };
+
     /*
     * Set ffmpeg container by name
     * @return Returns 0 if no error or error code
@@ -155,7 +160,7 @@ public:
 
     /*
     * Set ffmpeg video codec and params
-    * @return Returns 0 if no error or error code
+    * @return Returns OperationResult::Success if no error or error code otherwise
     * @param codec codec to transcode
     * @param method how to transcode: no transcode, software, GPU e.t.c
     * @resolution output resolution. Not used if transcode method TM_NoTranscode
@@ -173,7 +178,7 @@ public:
 
     /*
     * Set ffmpeg audio codec and params
-    * @return Returns 0 if no error or error code
+    * @return Returns OperationResult::Success if no error or error code otherwise
     * @param codec codec to transcode
     * @param directStreamCopy if true - do not transcode audio data, only put it to destination container
     * @param bitrate Bitrate after transcode. By default bitrate is autodetected
@@ -184,7 +189,7 @@ public:
     /*
     * Transcode media data and write it to specified QnByteArray
     * @param result transcoded data block. If NULL, only decoding is done
-    * @return Returns 0 if no error or error code
+    * @return Returns OperationResult::Success if no error or error code otherwise
     */
     int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result);
     //!Adds tag to the file. Maximum langth of tags and allowed names are format dependent
@@ -222,7 +227,7 @@ protected:
     /*
     *  Prepare to transcode. If 'direct stream copy' is used, function got not empty video and audio data
     * Destionation codecs MUST be used from source data codecs. If 'direct stream copy' is false, video or audio may be empty
-    * @return true if successfull opened
+    * @return Returns OperationResult::Success if no error or error code otherwise
     */
     virtual int open(const QnConstCompressedVideoDataPtr& video, const QnConstCompressedAudioDataPtr& audio) = 0;
 
