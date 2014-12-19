@@ -602,10 +602,6 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     }
     saveParams();
 
-//#ifdef _DEBUG
-//    startInputPortMonitoring();
-//#endif
-
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -2860,6 +2856,8 @@ void QnPlOnvifResource::pullMessages(quint64 /*timerID*/)
 
     QMutexLocker lk(&m_ioPortMutex);
 
+    m_timerID = 0;
+
     if( !m_inputMonitored )
         return;
 
@@ -3020,8 +3018,8 @@ bool QnPlOnvifResource::fetchRelayOutputs( std::vector<RelayOutputInfo>* const r
     if( relayOutputs )
         *relayOutputs = m_relayOutputInfo;
 
-    NX_LOG( lit("Successfully got device (%1) IO ports info. Found %2 digital input and %3 relay output").
-        arg(QString::fromLatin1(soapWrapper.endpoint())).arg(0).arg(m_relayOutputInfo.size()), cl_logDEBUG1 );
+    NX_LOG( lit("Successfully got device (%1) output ports info. Found %2 relay output").
+        arg(QString::fromLatin1(soapWrapper.endpoint())).arg(m_relayOutputInfo.size()), cl_logDEBUG1 );
 
     return true;
 }
