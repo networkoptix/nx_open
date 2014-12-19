@@ -29,8 +29,9 @@ public:
         return Qn::Online;
     }
 
-    virtual Qn::ResourceStatus setStatus(Qn::ResourceStatus status) {
-        Q_UNUSED(status)
+    virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode) override {
+        Q_UNUSED(newStatus);
+        Q_UNUSED(silenceMode);
         //do nothing
     }
 };
