@@ -583,10 +583,6 @@ void ApplauncherProcess::onInstallationDone( InstallationProcess* installationPr
                 &response );
         }
     }
-    else
-    {
-        m_installationManager->removeInstallation(installationProcess->getVersion());
-    }
 }
 
 static const int INSTALLATION_CHECK_TIMEOUT_MS = 1000;

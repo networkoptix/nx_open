@@ -93,6 +93,9 @@ void InstallationManager::updateInstalledVersionsInformation()
         if (installation.isNull())
             continue;
 
+        if (!installation->verify())
+            continue;
+
         installation->setVersion(QnSoftwareVersion(entry));
         installations.insert(installation->version(), installation);
 
