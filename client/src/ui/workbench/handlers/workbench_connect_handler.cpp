@@ -127,8 +127,6 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened() {
     action(Qn::OpenLoginDialogAction)->setIcon(qnSkin->icon("titlebar/connected.png"));
     action(Qn::OpenLoginDialogAction)->setText(tr("Connect to Another Server...")); // TODO: #GDM #Common use conditional texts?
 
-    context()->instance<QnAppServerNotificationCache>()->getFileList();
-
     hideMessageBox();
 
     connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoChanged,  this, [this](const QnPeerRuntimeInfo &info) 
@@ -384,7 +382,6 @@ void QnWorkbenchConnectHandler::clearConnection() {
     }
 
     qnLicensePool->reset();
-    context()->instance<QnAppServerNotificationCache>()->clear();
     qnCommon->setLocalSystemName(QString());
 }
 
@@ -409,7 +406,9 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
     /* Here we will wait for the reconnect or cancel. */
     while (reconnectInfoDialog && !reconnectInfoDialog->wasCanceled()) {
         reconnectInfoDialog->setCurrentServer(reconnectHelper->currentServer());
-        ec2::ErrorCode errCode = connectToServer(reconnectHelper->currentUrl(), true); /* Here inner event loop will be started. */
+
+        /* Here inner event loop will be started. */
+        ec2::ErrorCode errCode = connectToServer(reconnectHelper->currentUrl(), true); 
         if (errCode == ec2::ErrorCode::ok) {
             success = true;
             break;
