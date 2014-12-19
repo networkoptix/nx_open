@@ -68,7 +68,9 @@ namespace ec2
         TimePriorityKey();
 
         bool operator==( const TimePriorityKey& right ) const;
+        bool operator!=( const TimePriorityKey& right ) const;
         bool operator<( const TimePriorityKey& right ) const;
+        bool operator<=( const TimePriorityKey& right ) const;
         bool operator>( const TimePriorityKey& right ) const;
         quint64 toUInt64() const;
         void fromUInt64( quint64 val );
@@ -233,6 +235,7 @@ namespace ec2
 
         void updateRuntimeInfoPriority(quint64 priority);
         void peerSystemTimeReceivedNonSafe( const ApiPeerSystemTimeData& tran );
+        qint64 getSyncTimeNonSafe() const;
 
     private slots:
         void onNewConnectionEstablished(QnTransactionTransport* transport );
