@@ -278,7 +278,7 @@ int QnTranscoder::setVideoCodec(
     return OperationResult::Success;
 }
 
-int QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
+QnTranscoder::OperationResult QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
 {
     m_audioCodec = codec;
     switch (method)
