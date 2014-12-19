@@ -2128,9 +2128,10 @@ class RtspLog:
     _fileOK = None
     _fileFail=None
 
-    def __init__(self):
-        self._fileOK = open("rtsp.ok.log","w+")
-        self._fileFail = open("rtsp.fail.log","w+")
+    def __init__(self,serverAddr):
+        l = serverAddr.split(":")
+        self._fileOK = open("%s_%s.rtsp.ok.log"%(l[0],l[1]),"w+")
+        self._fileFail = open("%s_%s.rtsp.fail.log"%(l[0],l[1]),"w+")
 
     def writeOK(self,msg):
         self._fileOK.write("%s\n"%(msg))
@@ -2154,7 +2155,6 @@ class FiniteRtspTest:
     _password = None
     _archiveMax = 360
     _archiveMin = 60
-    _log = RtspLog()
     _lock = threading.Lock()
     
     def __init__(self,testSize,userName,passWord,archiveMax,archiveMin):
@@ -2173,22 +2173,22 @@ class FiniteRtspTest:
         for i in xrange(len(clusterTest.clusterTestServerList)):
             serverAddr = clusterTest.clusterTestServerList[i]
             serverAddrGUID = clusterTest.clusterTestServerUUIDList[i][0]
+            log = RtspLog(serverAddr)
 
             tar = FiniteSingleServerRtspTest(self._archiveMax,self._archiveMin,serverAddr,serverAddrGUID,self._testCase,
-                                             self._username,self._password,self._log,self._lock);
+                                             self._username,self._password,log,self._lock);
 
             th = threading.Thread(target = tar.run)
             th.start()
-            thPool.append(th)
+            thPool.append((th,log))
 
         # Join the thread
         for t in thPool:
-            t.join()
+            t[0].join()
+            t[1].close()
             
-        self._log.close()
         print "Finite RTSP test ends"
         print "-----------------------------------"
-        self._log.close()
 
 
 class InfiniteSingleServerRtspTest(SingleServerRtspTestBase):
@@ -2246,7 +2246,6 @@ class InfiniteRtspTest:
     _password = None
     _archiveMax = 360
     _archiveMin = 60
-    _log = RtspLog()
     _flag = True
     _lock = threading.Lock()
 
@@ -2277,6 +2276,7 @@ class InfiniteRtspTest:
 
             serverAddr = clusterTest.clusterTestServerList[i]
             serverAddrGUID = clusterTest.clusterTestServerUUIDList[i][0]
+            log = RtspLog(serverAddr)
 
             tar = InfiniteSingleServerRtspTest(self._archiveMax,
                                                self._archiveMin,
@@ -2284,13 +2284,13 @@ class InfiniteRtspTest:
                                                serverAddrGUID,
                                                self._username,
                                                self._password,
-                                               self._log,
+                                               log,
                                                self._lock,
                                                self)
 
             th = threading.Thread(target=tar.run)
             th.start()
-            thPool.append(th)
+            thPool.append((th,log))
 
 
         # This is a UGLY work around that to allow python get the interruption
@@ -2304,11 +2304,11 @@ class InfiniteRtspTest:
 
         # Afterwards join them
         for t in thPool:
-            t.join()
+            t[0].join()
+            t[1].close()
 
         print "Infinite RTSP test ends"
         print "-------------------------------------------"
-        self._log.close()
 
 
 def runRtspTest():
