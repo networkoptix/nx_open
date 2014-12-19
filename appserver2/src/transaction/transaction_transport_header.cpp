@@ -21,5 +21,5 @@ namespace ec2
         return lit("ttSeq=%1 sender=%2:%3").arg(header.sequence).arg(header.sender.toString()).arg(header.senderRuntimeID.toString());
     }
 
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnTransactionTransportHeader, (json)(ubjson), QnTransactionTransportHeader_Fields);
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnTransactionTransportHeader, (ubjson), QnTransactionTransportHeader_Fields);
 }

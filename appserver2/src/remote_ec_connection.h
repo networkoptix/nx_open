@@ -34,6 +34,7 @@ namespace ec2
         virtual QString authInfo() const override;
 
         virtual void startReceivingNotifications() override;
+        virtual void stopReceivingNotifications() override;
     private:
         FixedUrlClientQueryProcessorPtr m_queryProcessor;
         const QnConnectionInfo m_connectionInfo;

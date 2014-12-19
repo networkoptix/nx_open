@@ -475,7 +475,10 @@ void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTranspor
 
 void QnTransactionMessageBus::onGotTransactionSyncDone(QnTransactionTransport* sender, const QnTransaction<ApiTranSyncDoneData> &tran) {
     Q_UNUSED(tran)
-        sender->setSyncDone(true);
+    sender->setSyncDone(true);
+    // propagate new data to other peers. Aka send current state, other peers should request update if need
+    handlePeerAliveChanged(m_localPeer, true, true); 
+    m_aliveSendTimer.restart();
 }
 
 template <class T>
@@ -486,6 +489,9 @@ void QnTransactionMessageBus::sendTransactionToTransport(const QnTransaction<T> 
 
 bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& transportHeader, const QnAbstractTransaction& tran, QnTransactionTransport* transport)
 {
+    if (m_localPeer.isClient())
+        return true;
+
     if (transportHeader.sender.isNull())
         return true; // old version, nothing to check
 
@@ -544,7 +550,8 @@ void QnTransactionMessageBus::updatePersistentMarker(const QnTransaction<ApiUpda
 void QnTransactionMessageBus::proxyFillerTransaction(const QnAbstractTransaction& tran, const QnTransactionTransportHeader& transportHeader)
 {
     // proxy filler transaction to avoid gaps in the persistent sequence
-    QnTransaction<ApiUpdateSequenceData> fillerTran(ApiCommand::updatePersistentSequence);
+    QnTransaction<ApiUpdateSequenceData> fillerTran(tran);
+    fillerTran.command = ApiCommand::updatePersistentSequence;
     ApiSyncMarkerRecord record;
     record.peerID = tran.peerID;
     record.dbID = tran.persistentInfo.dbID;
@@ -558,7 +565,7 @@ template <class T>
 void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader) 
 {
     QMutexLocker lock(&m_mutex);
-
+#if 0
     QnTransactionTransport* directConnection = m_connections.value(transportHeader.sender);
     if (directConnection && directConnection->getState() == QnTransactionTransport::ReadyForStreaming && directConnection->isReadSync(ApiCommand::NotDefined)) 
     {
@@ -575,7 +582,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             Q_ASSERT_X( cond, Q_FUNC_INFO, "Invalid transaction sequence, queued connetion" );
         }
     }
-
+#endif
     AlivePeersMap:: iterator itr = m_alivePeers.find(transportHeader.sender);
     if (itr != m_alivePeers.end())
         itr.value().lastActivity.restart();
@@ -678,8 +685,19 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
 }
 
 template <class T>
-void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, const QnTransactionTransportHeader &transportHeader) 
+void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, const QnTransactionTransportHeader &_transportHeader) 
 {
+    if (m_localPeer.isClient())
+        return;
+
+    QnTransactionTransportHeader transportHeader(_transportHeader);
+    if (transportHeader.flags & TT_ProxyToClient) {
+        QnPeerSet clients = qnTransactionBus->aliveClientPeers().keys().toSet();
+        if (clients.isEmpty())
+            return;
+        transportHeader.dstPeers = clients;
+    }
+
     // proxy incoming transaction to other peers.
     if (!transportHeader.dstPeers.isEmpty() && (transportHeader.dstPeers - transportHeader.processedPeers).isEmpty()) {
         emit transactionProcessed(tran);
@@ -734,12 +752,8 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
     QnTransactionTransportHeader ttUnicast;
     ttUnicast.processedPeers << sender->remotePeer().id << m_localPeer.id;
     ttUnicast.dstPeers << sender->remotePeer().id;
-
-    QnTransactionTransportHeader ttBroadcast(ttUnicast.processedPeers);
-    for(auto itr = m_connections.constBegin(); itr != m_connections.constEnd(); ++itr) {
-        if (itr.value()->isReadyToSend(ApiCommand::NotDefined))
-            ttBroadcast.processedPeers << itr.key(); // dst peer should not proxy transactions to already connected peers
-    }
+    QnTransactionTransportHeader ttBroadcast(ttUnicast);
+    ttBroadcast.flags |= TT_ProxyToClient;
 
     QList<QByteArray> serializedTransactions;
     const ErrorCode errorCode = transactionLog->getTransactionsAfter(tran.params.persistentState, serializedTransactions);
@@ -755,7 +769,7 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
         tranSyncResponse.params.result = 0;
         sender->sendTransaction(tranSyncResponse, ttUnicast);
 
-        sendRuntimeInfo(sender, ttBroadcast, tran.params.runtimeState); // send as broadcast
+        sendRuntimeInfo(sender, ttBroadcast, tran.params.runtimeState);
 
         using namespace std::placeholders;
         for(const QByteArray& serializedTran: serializedTransactions)
