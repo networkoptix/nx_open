@@ -16,6 +16,7 @@ import signal
 import sys
 import difflib
 import datetime
+import time
 
 # Rollback support
 class UnitTestRollback:
@@ -141,7 +142,8 @@ class ClusterTest():
         "getSettings",
         "getCurrentTime",
         "getFullInfo",
-        "getLicenses"]
+        "getLicenses",
+        "getTransactionLog"]
 
     def _callAllGetters(self):
         print "======================================"
@@ -346,7 +348,8 @@ class ClusterTest():
         print "\n------------------------------------------"
         return (True,"")
 
-    def checkMethodStatusConsistent(self,method):
+
+    def _checkSingleMethodStatusConsistent(self,method):
             responseList = []
             for server in self.clusterTestServerList:
                 print "Connection to http://%s/ec2/%s"%(server, method)
@@ -355,13 +358,24 @@ class ClusterTest():
             # checking the last response validation
             return self._checkResultEqual_Deprecated(responseList,method)
 
+    # Checking transaction log 
+    def _checkTransactionLog(self):
+        return self._checkSingleMethodStatusConsistent("getTransactionLog")
+
+    def checkMethodStatusConsistent(self,method):
+            ret,reason = self._checkSingleMethodStatusConsistent(method)
+            if ret:
+                return self._checkTransactionLog()
+            else:
+                return (ret,reason)
+
     def _ensureServerListStates(self,sleep_timeout):
         time.sleep(sleep_timeout)
         for method in self._getterAPIList:
-            ret,reason = self.checkMethodStatusConsistent(method)
+            ret,reason = self._checkSingleMethodStatusConsistent(method)
             if ret == False:
                 return (ret,reason)
-        return (True,"")
+        return self._checkTransactionLog()
 
     def _loadConfig(self):
         parser = ConfigParser.RawConfigParser()
@@ -526,6 +540,12 @@ class BasicGenerator():
         d = m.digest()
 
         return (un,pwd,''.join('%02x' % ord(i) for i in d))
+
+    def generateDigest(self,uname,pwd):
+        m = md5.new()
+        m.update("%s:NetworkOptix:%s"%(uname,pwd))
+        d = m.digest()
+        return ''.join("%02x"%(ord(i) for i in d))
     
     def generatePasswordHash(self,pwd):
         salt = "%x" % (random.randint(0,4294967295))
@@ -1312,6 +1332,43 @@ class ClusterTestBase(unittest.TestCase):
 
         response.close()
 
+    def run(self, result=None):
+        if result is None: result = self.defaultTestResult()
+        result.startTest(self)
+        testMethod = getattr(self, self._testMethodName)
+        try:
+            try:
+                self.setUp()
+            except KeyboardInterrupt:
+                raise
+            except:
+                result.addError(self, self._exc_info())
+                return
+
+            ok = False
+            try:
+                testMethod()
+                ok = True
+            except self.failureException:
+                result.addFailure(self, self._exc_info())
+                result.stop()
+            except KeyboardInterrupt:
+                raise
+            except:
+                result.addError(self, self._exc_info())
+                result.stop()
+
+            try:
+                self.tearDown()
+            except KeyboardInterrupt:
+                raise
+            except:
+                result.addError(self, self._exc_info())
+                ok = False
+            if ok: result.addSuccess(self)
+        finally:
+            result.stopTest(self)
+
     def test(self):
         postDataList = self._generateModifySeq()
 
@@ -1575,6 +1632,72 @@ class ResourceConflictionTest(ClusterTestBase):
 # ========================================
 # Server Merge Automatic Test
 # ========================================
+class MergeTestBase:
+    _systemName = []
+    _oldSystemName=[]
+    _mergeTestSystemName = "mergeTest"
+    _mergeTestTimeout = 1
+
+    def __init__(self):
+        config_parser = ConfigParser.RawConfigParser()
+        config_parser.read("ec2_tests.cfg")
+        self._mergeTestTimeout = config_parser.getint("General","mergeTestTimeout")
+
+    # This function is used to generate unique system name but random. It 
+    # will gaurantee that the generated name is UNIQUE inside of the system
+    def _generateRandomSystemName(self):
+        gen = BasicGenerator()
+        ret = []
+        s = set()
+        for i in xrange(len(clusterTest.clusterTestServerList)):
+            length = random.randint(16,30)
+            while True:
+                name = gen.generateRandomString(length)
+                if name in s or name == self._mergeTestSystemName:
+                    continue
+                else:
+                    s.add(name)
+                    ret.append(name)
+                    break
+        return ret
+
+    # This function is used to store the old system name of each server in
+    # the clusters
+    def _storeClusterOldSystemName(self):
+        for s in clusterTest.clusterTestServerList:
+            print "Connection to http://%s/ec2/testConnection"%(s)
+            response = urllib2.urlopen("http://%s/ec2/testConnection"%(s))
+            if response.getcode() != 200:
+                return False
+            jobj = json.loads( response.read() )
+            self._oldSystemName.append(jobj["systemName"])
+            response.close()
+        return True
+
+    def _setSystemName(self,addr,name):
+        print "Connection to http://%s/api/configure"%(addr)
+        response = urllib2.urlopen(
+            "http://%s/api/configure?%s"%(addr,urllib.urlencode({"systemName":name})))
+        if response.getcode() != 200 :
+            return (False,"Cannot issue changeSystemName with HTTP code:%d to server:%s" % (response.getcode()),addr)
+        response.close()
+        return (True,"")
+
+    # This function is used to set the system name to randome
+    def _setClusterSystemRandom(self):
+        # Store the old system name here
+        self._storeClusterOldSystemName()
+        testList = self._generateRandomSystemName()
+        for i in xrange(len(clusterTest.clusterTestServerList)):
+            self._setSystemName(clusterTest.clusterTestServerList[i],testList[i])
+
+    def _setClusterToMerge(self):
+        for s in clusterTest.clusterTestServerList:
+            self._setSystemName(s,self._mergeTestSystemName)
+
+    def _rollbackSystemName(self):
+        for i in xrange(len(clusterTest.clusterTestServerList)):
+            self._setSystemName(clusterTest.clusterTestServerList[i],self._oldSystemName[i])
 
 # This class represents a single server with a UNIQUE system name.
 # After we initialize this server, we will make it executes certain
@@ -1632,20 +1755,6 @@ class PrepareServerStatus(BasicGenerator):
 
         return (True,"")
 
-    def _setSystemName(self,addr,name):
-        query = { "systemName":name }
-        response = None
-
-        with self._mergeTest._lock:
-            response = urllib2.urlopen("http://%s/api/configure?%s"%(addr,urllib.urlencode(query)))
-
-        if response.getcode() != 200:
-            return (False,"Cannot issue changeSystemName request to server:%s"%(addr))
-
-        response.close()
-
-        return (True,"")
-
     def _generateRandomStates(self,addr):
         api_list = self._generateDataAndAPIList(addr)
         for api in api_list:
@@ -1659,33 +1768,39 @@ class PrepareServerStatus(BasicGenerator):
 
         return (True,"")
 
-    def main(self,addr,name):
-        # 1, change the system name
-        self._setSystemName(addr,name)
-        # 2, generate random data to this server
+    def main(self,addr):
         ret,reason = self._generateRandomStates(addr)
         if ret == False:
             raise Exception("Cannot generate random states:%s" % (reason))
     
 # This class is used to control the whole merge test
-class MergeTest:
-    _systemName = "mergeTest"
+class MergeTest(MergeTestBase):
     _gen = BasicGenerator()
-
     _lock = threading.Lock()
-
-    _serverOldSystemNameList=[]
-    _mergeTestTimeout = 1
 
     def _prolog(self):
         print "Merge test prolog : Test whether all servers you specify has the identical system name"
+        oldSystemName = None
+        oldSystemNameAddr = None
+
+        # Testing whether all the cluster server has identical system name
         for s in clusterTest.clusterTestServerList:
             print "Connection to http://%s/ec2/testConnection"%(s)
             response = urllib2.urlopen("http://%s/ec2/testConnection"%(s))
             if response.getcode() != 200:
                 return False
             jobj = json.loads( response.read() )
-            self._serverOldSystemNameList.append(jobj["systemName"])
+            if oldSystemName == None:
+                oldSystemName = jobj["systemName"]
+                oldSystemNameAddr = s
+            else:
+                systemName = jobj["systemName"]
+                if systemName != oldSystemName:
+                    print "The merge test cannot start!"
+                    print "Server:%s has system name:%s"%(oldSystemName,oldSystemNameAddr)
+                    print "Server:%s has system name:%s"%(s,jobj["systemName"])
+                    print "Please make all the server has identical system name before running merge test"
+                    return False
             response.close()
 
         print "Merge test prolog pass"
@@ -1693,71 +1808,31 @@ class MergeTest:
     
     def _epilog(self):
         print "Merge test epilog, change all servers system name back to its original one"
-        idx = 0
-        for s in clusterTest.clusterTestServerList:
-            self._setSystemName(s,self._serverOldSystemNameList[idx])
-            idx = idx+1
+        self._rollbackSystemName()
         print "Merge test epilog done"
-
-    # This function will ENSURE that the random system name is unique
-    def _generateRandomSystemName(self):
-        ret = []
-        s = set()
-        for i in xrange(len(clusterTest.clusterTestServerList)):
-            length = random.randint(16,30)
-            while True:
-                name = self._gen.generateRandomString(length)
-                if name in s or name == self._systemName:
-                    continue
-                else:
-                    s.add(name)
-                    ret.append((clusterTest.clusterTestServerList[i],name))
-                    break
-        return ret
 
     # First phase will make each server has its own status
     # and also its unique system name there
 
     def _phase1(self):
         print "Merge test phase1: generate UNIQUE system name for each server and do modification"
-        testList = self._generateRandomSystemName()
-        worker = ClusterWorker(clusterTest.threadNumber,len(testList))
+        # 1. Set cluster system name to random name
+        self._setClusterSystemRandom()
 
-        for entry in testList:
-            worker.enqueue(PrepareServerStatus(self).main,
-                (entry[0],entry[1],))
+        # 2. Start to generate server status and data
+        worker = ClusterWorker(clusterTest.threadNumber,len(clusterTest.clusterTestServerList))
+
+        for s in clusterTest.clusterTestServerList:
+            worker.enqueue(PrepareServerStatus(self).main,(s,))
 
         worker.join()
         print "Merge test phase1 done, now sleep and wait for sync"
         time.sleep(self._mergeTestTimeout)
 
-    # Second phase will make each server has the same system
-    # name which triggers server merge operations there.
-
-    def _setSystemName(self,addr,name):
-
-        print "Connection to http://%s/api/configure"%(addr)
-
-        with self._lock:
-            response = urllib2.urlopen(
-                "http://%s/api/configure?%s"%(addr,urllib.urlencode({"systemName":name})))
-
-        if response.getcode() != 200 :
-            return (False,"Cannot issue changeSystemName with HTTP code:%d to server:%s" % (response.getcode()),addr)
-
-        response.close()
-
-        return (True,"")
-
-    def _setToSameSystemName(self):
-        worker = ClusterWorker(clusterTest.threadNumber,len(clusterTest.clusterTestServerList))
-        for entry in  clusterTest.clusterTestServerList:
-            worker.enqueue(self._setSystemName,(entry,self._systemName,))
-        worker.join()
 
     def _phase2(self):
         print "Merge test phase2: set ALL the servers with system name :mergeTest"
-        self._setToSameSystemName()
+        self._setClusterToMerge()
         print "Merge test phase2: wait for sync"
         # Wait until the synchronization time out expires
         time.sleep(self._mergeTestTimeout)
@@ -1768,11 +1843,6 @@ class MergeTest:
                 return (ret,reason)
         print "Merge test phase2 done"
         return (True,"")
-
-    def _loadConfig(self):
-        config_parser = ConfigParser.RawConfigParser()
-        config_parser.read("ec2_tests.cfg")
-        self._mergeTestTimeout = config_parser.getint("General","mergeTestTimeout")
 
     def test(self):
         print "================================\n"
@@ -1785,6 +1855,7 @@ class MergeTest:
 
         print "Server Merge Test End\n"
         print "================================\n"
+
 
 # ===================================
 # RTSP test
@@ -1998,7 +2069,6 @@ class RRRtspTcpBasic:
     def __exit__(self,type,value,trace):
         self._socket.close()
 
-
 class SingleServerRtspTestBase:
     _serverEndpoint = None
     _serverGUID = None
@@ -2033,6 +2103,8 @@ class SingleServerRtspTestBase:
         json_obj = json.loads(response.read())
 
         for c in json_obj:
+            if c["typeId"] == "{1657647e-f6e4-bc39-d5e8-563c93cb5e1c}":
+                continue # Skip desktop
             self._cameraList.append((c["physicalId"],c["id"],c["name"]))
             self._cameraInfoTable[c["id"]] = c
 
@@ -2296,7 +2368,7 @@ class InfiniteRtspTest:
         # This is a UGLY work around that to allow python get the interruption
         # while execution. If I block into the join, python seems never get 
         # interruption there.
-        while True:
+        while self.isOn():
             try:
                 time.sleep(1)
             except:
@@ -2327,6 +2399,219 @@ def runRtspTest():
 
     # We don't need it
     clusterTest.unittestRollback.removeRollbackDB()
+
+# ======================================================
+# RTSP performance Operations
+# ======================================================
+
+class SingleServerRtspPerf(SingleServerRtspTestBase):
+    _timeoutMax = 0
+    _timeoutMin = 0
+    _diffMax = 0
+    _diffMin = 0
+    _lock = None
+    _perfLog = None
+    _threadNum = 0
+    _exitFlag = None
+    _threadPool= []
+
+    _archiveNumOK = 0
+    _archiveNumFail=0
+    _streamNumOK = 0
+    _streamNumFail=0
+
+    def __init__(self,archiveMax,archiveMin,serverEndpoint,guid,username,password,timeoutMax,timeoutMin,threadNum,flag,lock):
+        SingleServerRtspTestBase.__init__(self,
+                                          archiveMax,
+                                          archiveMin,
+                                          serverEndpoint,
+                                          guid,
+                                          username,
+                                          password,
+                                          RtspLog(serverEndpoint),
+                                          lock)
+        self._threadNum = threadNum
+        self._exitFlag = flag
+        self._lock = lock
+        self._timeoutMax = timeoutMax
+        self._timeoutMin = timeoutMin
+        # Initialize the performance log
+        l = serverEndpoint.split(":")
+        self._perfLog = open("%s_%s.perf.rtsp.log"%(l[0],l[1]),"w+")
+
+    def _dump(self,c,tcp_rtsp,timeout):
+        elapsed = 0
+        while True:
+            begin = time.clock()
+            # Recv 1 MB
+            data = None
+            try:
+                data = tcp_rtsp._socket.recv(1024*16)
+            except:
+                pass
+            if not data:
+                with self._lock:
+                    print "--------------------------------------------"
+                    print "The RTSP url:%s manully close the connection"%(tcp_rtsp._url)
+                    print "--------------------------------------------"
+                    self._perfLog.write("--------------------------------------------\n")
+                    self._perfLog.write("This is an exceptional case,the server _SHOULD_ not terminate the connection\n")
+                    self._perfLog.write("The RTSP/RTP url:%s manully close the connection\n"%(tcp_rtsp._url))
+                    self._perfLog.write("Camera name:%s\n"%(c[2]))
+                    self._perfLog.write("Camera Physical Id:%s\n"%(c[0]))
+                    self._perfLog.write("Camera Id:%s\n"%(c[1]))
+                    self._perfLog.write("--------------------------------------------\n")
+                    self._perfLog.flush()
+                return
+
+            end = time.clock()
+            elapsed = elapsed + (end-begin)
+
+            if elapsed >= timeout:
+                with self._lock:
+                    print "--------------------------------------------"
+                    print "The RTP sink normally timeout with:%d on RTSP url:%s"%(timeout,tcp_rtsp._url)
+                    print "--------------------------------------------"
+                return
+
+    # Represent a streaming TASK on the camera
+    def _main_streaming(self,c):
+        l = self._serverEndpoint.split(':')
+        obj = RRRtspTcpBasic(l[0],int(l[1]),
+                     c[0],
+                     c[1],
+                     self._serverGUID,
+                     self._username,
+                     self._password,
+                     RtspStreamURLGenerator(l[0],int(l[1]),c[0]))
+
+        with obj as reply:
+            # 1. Check the reply here
+            if self._checkRtspRequest(c,reply):
+                self._dump(c,obj,random.randint(self._timeoutMin,self._timeoutMax))
+                self._streamNumOK = self._streamNumOK+1
+            else:
+                self._streamNumFail = self._streamNumFail+1
+
+
+    def _main_archive(self,c):
+        l = self._serverEndpoint.split(':')
+        obj = RRRtspTcpBasic(l[0],int(l[1]),
+                             c[0],
+                             c[1],
+                             self._serverGUID,
+                             self._username,
+                             self._password,
+                             RtspArchiveURLGenerator(self._archiveMax,self._archiveMin,l[0],int(l[1]),c[0]))
+        with obj as reply:
+            # 1. Check the reply here
+           if self._checkRtspRequest(c,reply):
+                self._dump(c,obj,random.randint(self._timeoutMin,self._timeoutMax))
+                self._archiveNumOK = self._archiveNumOK+1
+           else:
+               self._archiveNumFail = self._archiveNumFail+1
+
+    def _threadMain(self):
+        while self._exitFlag.isOn():
+            # choose a random camera in the server list
+            c = self._cameraList[random.randint(0,len(self._cameraList)-1)]
+            if random.randint(0,1) == 0:
+                self._main_streaming(c)
+            else:
+                self._main_archive(c)
+
+    def join(self):
+        for th in self._threadPool:
+            th.join()
+        self._perfLog.close()
+        print "======================================="
+        print "Server:%s:"%(self._serverEndpoint)
+        print "Archive Success Number:%d"%(self._archiveNumOK)
+        print "Archive Failed Number:%d"%(self._archiveNumFail)
+        print "Stream Success Number:%d"%(self._streamNumOK)
+        print "Stream Failed Number:%d"%(self._streamNumFail)
+        print "======================================="
+
+    def run(self):
+        for _ in xrange(self._threadNum):
+            th = threading.Thread(target=self._threadMain)
+            th.start()
+            self._threadPool.append(th)
+
+class RtspPerf:
+    _perfServer = []
+    _lock = threading.Lock()
+    _exit = False
+
+    def isOn(self):
+        return not self._exit
+
+    def _onInterrupt(self,a,b):
+        self._exit = True
+
+    def _loadConfig(self):
+        config_parser = ConfigParser.RawConfigParser()
+        config_parser.read("ec2_tests.cfg")
+        threadNumbers= config_parser.get("Rtsp","threadNumbers").split(",")
+        if len(threadNumbers) != len(clusterTest.clusterTestServerList):
+            print "The threadNumbers in Rtsp section doesn't match the size of the servers in serverList"
+            print "Every server MUST be assigned with a correct thread Numbers"
+            print "RTSP Pressure test failed"
+            return False
+
+        archiveMax = config_parser.getint("Rtsp","archiveDiffMax")
+        archiveMin = config_parser.getint("Rtsp","archiveDiffMin")
+        timeoutMax = config_parser.getint("Rtsp","timeoutMax")
+        timeoutMin = config_parser.getint("Rtsp","timeoutMin")
+        username = config_parser.get("General","username")
+        password = config_parser.get("General","password")
+
+        # Let's add those RtspSinglePerf
+        for i in xrange(len(clusterTest.clusterTestServerList)):
+            serverAddr = clusterTest.clusterTestServerList[i]
+            serverGUID = clusterTest.clusterTestServerUUIDList[i][0]
+            serverThreadNum = int(threadNumbers[i])
+            
+            self._perfServer.append(
+                SingleServerRtspPerf(
+                    archiveMax,archiveMin,serverAddr,serverGUID,username,password,
+                    timeoutMax,timeoutMin,serverThreadNum,self,self._lock)
+                )
+
+        return True
+            
+    def run(self):
+        if not self._loadConfig():
+            return False
+        else:
+            print "---------------------------------------------"
+            print "Start to run RTSP pressure test now!"
+            print "Press CTRL+C to interrupt the test!"
+            print "The exceptional cases are stored inside of server_end_point.rtsp.perf.log"
+            
+            # Add the signal handler
+            signal.signal(signal.SIGINT,self._onInterrupt)
+
+            for e in self._perfServer:
+                e.run()
+
+            while self.isOn():
+                try:
+                    time.sleep(0)
+                except:
+                    break
+
+            for e in self._perfServer:
+                e.join()
+
+            print "RTSP performance test done,see log for detail"
+            print "---------------------------------------------"
+
+
+def runRtspPerf():
+    RtspPerf().run()
+    clusterTest.unittestRollback.removeRollbackDB()
+
 
 # Performance test function
 # only support add/remove ,value can only be user and media server
@@ -2380,6 +2665,29 @@ class PerformanceOperation():
             ret.append((s,data))
 
         return ret
+    
+    # This function will retrieve data that has name prefixed with ec2_test as prefix
+    # This sort of resources are generated by our software .
+
+    def _getFakeUUIDList(self,methodName):
+        ret = []
+        for s in clusterTest.clusterTestServerList:
+            data = []
+
+            response = urllib2.urlopen("http://%s/ec2/%s?format=json" % (s,methodName))
+
+            if response.getcode() != 200:
+                return None
+
+            json_obj = json.loads(response.read())
+            for entry in json_obj:
+                if "name" in entry and entry["name"].startswith("ec2_test"):
+                    if "isAdmin" in entry and entry["isAdmin"] == True:
+                        continue
+                    data.append(entry["id"])
+            response.close()
+            ret.append((s,data))
+        return ret
 
     def _sendOp(self,methodName,dataList,addr):
         worker = ClusterWorker(clusterTest.threadNumber,len(dataList))
@@ -2403,7 +2711,6 @@ class PerformanceOperation():
     def _remove(self,uuid):
         self._removeAll([("127.0.0.1:7001",[uuid])])
 
-
 class UserOperation(PerformanceOperation):
     def add(self,num):
         gen = UserDataGenerator()
@@ -2419,6 +2726,13 @@ class UserOperation(PerformanceOperation):
 
     def removeAll(self):
         uuidList = self._getUUIDList("getUsers?format=json")
+        if uuidList == None:
+            return False
+        self._removeAll(uuidList)
+        return True
+
+    def removeAllFake(self):
+        uuidList = self._getFakeUUIDList("getUsers?format=json")
         if uuidList == None:
             return False
         self._removeAll(uuidList)
@@ -2443,6 +2757,13 @@ class MediaServerOperation(PerformanceOperation):
         self._removeAll(uuidList)
         return True
 
+    def removeAllFake(self):
+        uuidList = self._getFakeUUIDList("getMediaServersEx?format=json")
+        if uuidList == None:
+            return False
+        self._removeAll(uuidList)
+        return True
+
 class CameraOperation(PerformanceOperation):
     def add(self,num):
         gen = CameraDataGenerator()
@@ -2462,10 +2783,70 @@ class CameraOperation(PerformanceOperation):
         self._removeAll(uuidList)
         return True
 
-def doClearAll():
-    MediaServerOperation().removeAll();
-    UserOperation().removeAll();
-    MediaServerOperation().removeAll()
+    def removeAllFake(self):
+        uuidList = self._getFakeUUIDList("getCameras?format=json")
+        if uuidList == None:
+            return False
+        self._removeAll(uuidList)
+        return True
+
+def doClearAll(fake = False):
+    if fake:
+        CameraOperation().removeAllFake()
+        UserOperation().removeAllFake()
+        MediaServerOperation().removeAllFake()
+    else:
+        CameraOperation().removeAll()
+        UserOperation().removeAll()
+        MediaServerOperation().removeAll()
+
+    
+def runPerformanceTest():
+    if len(sys.argv) != 3 and len(sys.argv) != 2 :
+        return (False,"2/1 parameters are needed")
+
+    l = sys.argv[1].split('=')
+    
+    if l[0] != '--add' and l[0] != '--remove':
+        return (False,"Unknown first parameter options")
+
+    t = globals()["%sOperation" % (l[1])]
+
+    if t == None:
+        return (False,"Unknown target operations:%s" % (l[1]))
+    else:
+        t = t()
+    
+    if l[0] == '--add':
+        if len(sys.argv) != 3 :
+            return (False,"--add must have --count option")
+        l = sys.argv[2].split('=')
+        if l[0] == '--count':
+            num = int(l[1])
+            if num <= 0 :
+                return (False,"--count must be positive integer")
+            if t.add(num) == False:
+                return (False,"cannot perform add operation")
+        else:
+            return (False,"--add can only have --count options")
+    elif l[0] == '--remove':
+        if len(sys.argv) == 3:
+            l = sys.argv[2].split('=')
+            if l[0] == '--id':
+                if t.remove(l[1]) == False:
+                    return (False,"cannot perform remove UID operation")
+            elif l[0] == '--fake':
+                if t.removeAllFake() == False:
+                    return (False,"cannot perform remove UID operation")
+            else:
+                return (False,"--remove can only have --id options")
+        elif len(sys.argv) == 2:
+            if t.removeAll() == False:
+                return (False,"cannot perform remove all operation")
+    else:
+        return (False,"Unknown command:%s" % (l[0]))
+
+    return True
 
 
 # ===================================
@@ -2488,12 +2869,20 @@ class PerfTest:
     _cameraCreatePos=0
     _userUpdateNeg=0
     _userUpdatePos=0
+    _userRemove =0
+
     _cameraUpdateNeg=0
     _cameraUpdatePos=0
 
     _creationProb = 0.3
 
     _lock = threading.Lock()
+
+    _removeTemplate = """
+        {
+            "id":"%s"
+        }
+    """
 
     def _onInterrupt(self,a,b):
         self._exit = True
@@ -2521,6 +2910,20 @@ class PerfTest:
 
         return True
 
+    def _doDelete(self,addr,id):
+        req = urllib2.Request("http://%s/ec2/removeResource" % (addr),
+                        data=self._removeTemplate%(id), headers={'Content-Type': 'application/json'})
+        response = None
+
+        response = urllib2.urlopen(req)
+
+        if response.getcode() != 200:
+            # failed 
+            return False
+
+        response.close()
+        return True
+
     def _prepareData(self,d,methodName,addr):
         if not self._doCreate(addr,d[0],d[1],methodName):
             return False
@@ -2528,28 +2931,16 @@ class PerfTest:
 
     def _prepare(self,num):
         userList = UserDataGenerator().generateUserData(num)
-        cameraList=[]
         for s in clusterTest.clusterTestServerList:
             for d in userList:
                 if not self._prepareData(d,"saveUser",s):
                     return False
 
-        cameraGen = CameraDataGenerator()
-        for s in clusterTest.clusterTestServerList:
-           for _ in xrange(num):
-               c = cameraGen.generateCameraData(1,s)[0]
-               cameraList.append(c)
-               if not self._prepareData(c,"saveCameras",s):
-                   return False
 
         self._userCreatePos  = num
-        self._cameraCreatePos= num
 
         for u in userList:
             self._newUserList.append(u[1])
-
-        for c in cameraList:
-            self._newCameraList.append(c[1])
 
         return True
 
@@ -2561,7 +2952,6 @@ class PerfTest:
 
     def _threadMain(self):
         uGen = UserDataGenerator()
-        cGen = CameraDataGenerator()
 
         while not self._exit:
             try:
@@ -2569,39 +2959,26 @@ class PerfTest:
             except:
                 continue
             if self._takePlace(self._creationProb):
-                if random.randint(0,1) == 0:
-                    failed = False
-                    for s in clusterTest.clusterTestServerList:
-                        d = uGen.generateUserData(1)
-                        if not self._doCreate(s,d[0][0],d[0][1],"saveUser"):
-                            failed = True
-                        else:
-                            self._newUserList.append(d[0][1])
+                failed = False
+                d = uGen.generateUserData(1)
+                for s in clusterTest.clusterTestServerList:
+                    if not self._doCreate(s,d[0][0],d[0][1],"saveUser"):
+                        failed = True
 
-                    if failed:
-                        self._userCreateNeg = self._userCreateNeg+1
-                    else:
-                        self._userCreatePos = self._userCreatePos+1
-
+                if failed:
+                    self._userCreateNeg = self._userCreateNeg+1
                 else:
-                    failed = False
-                    for s in clusterTest.clusterTestServerList:
-                        d = cGen.generateCameraData(1,s)
-                        if not self._doCreate(s,d[0][0],d[0][1],"saveCameras"):
-                            failed = True
-                        else:
-                            self._newCameraList.append(d[0][1])
-
-                    if failed:
-                        self._cameraCreateNeg = self._cameraCreateNeg+1
-                    else:
-                        self._cameraCreatePos = self._cameraCreatePos+1
-
+                    with self._lock:
+                        self._newUserList.append(d[0][1])
+                    self._userCreatePos = self._userCreatePos+1
             else:
-                if random.randint(0,1) == 0:
+                if self._takePlace(0.5):
                     failed = False
                     for s in clusterTest.clusterTestServerList:
-                        id = self._newUserList[random.randint(0,len(self._newUserList)-1)]
+                        with self._lock:
+                            if len(self._newUserList) == 0:
+                                continue
+                            id = self._newUserList[random.randint(0,len(self._newUserList)-1)]
                         d = uGen.generateUpdateData(id)
                         if not self._doCreate(s,d[0][0],None,"saveUser"):
                             failed = True
@@ -2613,19 +2990,23 @@ class PerfTest:
                     else:
                         self._userUpdatePos = self._userUpdatePos+1
                 else:
+                    # do deletion of the users
                     failed = False
-                    for s in clusterTest.clusterTestServerList:
-                        id = self._newCameraList[random.randint(0,len(self._newCameraList)-1)]
-                        d = cGen.generateUpdateData(id,s)
-                        if not self._doCreate(s,d[0][0],None,"saveCameras"):
-                            failed = True
+                    with self._lock:
+                        if len(self._newUserList) == 0:
+                            continue
+                        idx = random.randint(0,len(self._newUserList)-1)
+                        id = self._newUserList[idx]
+                        for s in clusterTest.clusterTestServerList:
+                            if not self._doDelete(s,id):
+                                failed = True
+                            else:
+                                failed = False
+                        if failed:
+                            self._userUpdateNeg = self._userUpdateNeg+1
                         else:
-                            failed = False
-
-                    if failed:
-                        self._cameraUpdateNeg = self._cameraUpdateNeg+1
-                    else:
-                        self._cameraUpdatePos = self._cameraUpdatePos+1
+                            del self._newUserList[idx]
+                            self._userRemove = self._userRemove+1
 
     def _initThreadPool(self,num):
         expectedQueueSize = self._frequency * 10;
@@ -2685,14 +3066,11 @@ class PerfTest:
         loop_end = time.time()
 
         print "=============================== Perf test done ======================================"
-        print "Successful camera creation:%d"%(self._cameraCreatePos)
-        print "Failed camera creation:%d"%(self._cameraCreateNeg)
-        print "Successful camera update:%d"%(self._cameraUpdatePos)
-        print "Failed camera update:%d"%(self._cameraUpdateNeg)
         print "Successful user creation:%d"%(self._userCreatePos)
         print "Failed user creation:%d"%(self._userCreateNeg)
         print "Successful user update:%d"%(self._userUpdatePos)
         print "Failed user update:%d"%(self._userUpdateNeg)
+        print "Remove user:%d"%(self._userRemove)
         print "Total execution time:%d seconds"%(loop_end-loop_start)
         print "======================================================================================"
 
@@ -2702,50 +3080,6 @@ class PerfTest:
             return True
 
         return True
-
-def runPerformanceTest():
-    if len(sys.argv) != 3 and len(sys.argv) != 2 :
-        return (False,"2 or 1 parameters are needed")
-
-    l = sys.argv[1].split('=')
-    
-    if l[0] != '--add' and l[0] != '--remove':
-        return (False,"Unknown first parameter options")
-
-    t = globals()["%sOperation" % (l[1])]
-
-    if t == None:
-        return (False,"Unknown target operations:%s" % (l[1]))
-    else:
-        t = t()
-    
-    if l[0] == '--add':
-        if len(sys.argv) != 3 :
-            return (False,"--add must have --count option")
-        l = sys.argv[2].split('=')
-        if l[0] == '--count':
-            num = int(l[1])
-            if num <= 0 :
-                return (False,"--count must be positive integer")
-            if t.add(num) == False:
-                return (False,"cannot perform add operation")
-        else:
-            return (False,"--add can only have --count options")
-    elif l[0] == '--remove':
-        if len(sys.argv) == 3:
-            l = sys.argv[2].split('=')
-            if l[0] == '--id':
-                if t.remove(l[1]) == False:
-                    return (False,"cannot perform remove UID operation")
-            else:
-                return (False,"--remove can only have --id options")
-        elif len(sys.argv) == 2:
-            if t.removeAll() == False:
-                return (False,"cannot perform remove all operation")
-    else:
-        return (False,"Unknown command:%s" % (l[0]))
-
-    return True
 
 class SystemNameTest:
     _serverList=[]
@@ -2891,7 +3225,8 @@ helpStr="Usage:\n\n" \
     "for performance test. In ec2_tests.cfg file,\n[PerfTest]\nfrequency=1000\ncreateProb=0.5\n, the frequency means at most how many operations will be issued on each" \
     "server in one seconds(not guaranteed,bottleneck is CPU/Bandwidth for running this script);and createProb=0.5 means the creation operation will be performed as 0.5 "\
     "probability, and it implicitly means the modification operation will be performed as 0.5 probability \n\n" \
-    "--clear: Clear all the Cameras/MediaServers/Users on all the servers.It will not delete admin user. \n\n" \
+    "--clear: Clear all the Cameras/MediaServers/Users on all the servers.It will not delete admin user. You could specify --fake option as second parameter, eg:" \
+    "--clear --fake. This will remove all the resources that has name prefixed with ec2_test which is the generated data name pattern\n\n" \
     "--sync: Test all the servers are on the same page or not.This test will perform regarding the existed ec2 REST api, for example " \
     ", no layout API is supported, then this test cannot test whether 2 servers has exactly same layouts  \n\n" \
     "--recover: Recover from last rollback failure. If you see rollback failed for the last run, you can run this option next time to recover from " \
@@ -2906,7 +3241,8 @@ helpStr="Usage:\n\n" \
     "--remove=Camera/MediaServer/User (--id=id)*: Remove a Camera/MediaServer/User with id OR remove all the resources.The user can "\
     "specify --id option to enable remove a single resource, eg : --remove=MediaServer --id={SomeGUID} , and --remove=MediaServer will remove " \
     "all the media server.\nNote: --add/--remove will perform the corresponding operations on a random server in the server list if the server list "\
-    "have more than one server.\n\n" \
+    "have more than one server.You could specify the --fake as the second option,eg: --remove=Camera --fake .This will remove all the cameras that " \
+    "has name prefixed with ec2_test which is name pattern for generated cameras\n\n" \
     "If no parameter is specified, the default automatic test will performed.This includes add/update/remove Cameras/MediaServer/Users and also add/update " \
     "user attributes list , server attributes list and resource parameter list. Additionally , the confliction test will be performed as well, it includes " \
     "modify a resource on one server and delete the same resource on another server to trigger confliction.Totally 9 different test cases will be performed in this " \
@@ -2956,8 +3292,14 @@ if __name__ == '__main__':
                     print "\n\nALL AUTOMATIC TEST ARE DONE\n\n"
                     doCleanUp()
 
-            elif len(sys.argv) == 2 and sys.argv[1] == '--clear':
-                doClearAll()
+            elif (len(sys.argv) == 2 or len(sys.argv) == 3) and sys.argv[1] == '--clear':
+                if len(sys.argv) == 3:
+                    if sys.argv[2] == '--fake':
+                        doClearAll(True)
+                    else:
+                        print "Unknown option:%s in --clear"%(sys.argv[2])
+                else:
+                    doClearAll(False)
                 clusterTest.unittestRollback.removeRollbackDB()
             elif len(sys.argv) == 2 and sys.argv[1] == '--perf':
                 PerfTest().start()
@@ -2969,6 +3311,8 @@ if __name__ == '__main__':
 
                 elif sys.argv[1] == '--rtsp-test':
                     runRtspTest()
+                elif sys.argv[1] == '--rtsp-perf':
+                    runRtspPerf()
                 else:
                     ret = runPerformanceTest()
                     if ret != True:
