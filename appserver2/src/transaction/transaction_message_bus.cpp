@@ -677,7 +677,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             QString dstPeersStr;
             for( const QnUuid& peer: transportHeader.dstPeers )
                 dstPeersStr += peer.toString();
-            NX_LOG( QnLog::EC2_TRAN_LOG, lit("skip transaction %1 for peers %2").arg(tran.toString()).arg(dstPeersStr), cl_logDEBUG1);
+            NX_LOG( QnLog::EC2_TRAN_LOG, lit("skip transaction %1 %2 for peers %3").arg(tran.toString()).arg(toString(transportHeader)).arg(dstPeersStr), cl_logDEBUG1);
         }
     }
 
@@ -696,6 +696,13 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
         if (clients.isEmpty())
             return;
         transportHeader.dstPeers = clients;
+        transportHeader.processedPeers += clients;
+        for(QnTransactionTransport* transport: m_connections)
+        {
+            if (transport->remotePeer().isClient() && transport->isReadyToSend(tran.command)) 
+                transport->sendTransaction(tran, transportHeader);
+        }
+        return;
     }
 
     // proxy incoming transaction to other peers.
@@ -708,7 +715,6 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
     processedPeers << m_localPeer.id;
     QnTransactionTransportHeader newHeader(transportHeader);
     newHeader.processedPeers = processedPeers;
-    newHeader.dstPeers = transportHeader.dstPeers;
 
     QSet<QnUuid> proxyList;
     for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr) 
@@ -797,6 +803,9 @@ void QnTransactionMessageBus::queueSyncRequest(QnTransactionTransport* transport
     QnTransaction<ApiSyncRequestData> requestTran(ApiCommand::tranSyncRequest);
     requestTran.params.persistentState = transactionLog->getTransactionsState();
     requestTran.params.runtimeState = m_runtimeTransactionLog->getTransactionsState();
+
+    NX_LOG( QnLog::EC2_TRAN_LOG, lit("send syncRequest to peer %1").arg(transport->remotePeer().id.toString()), cl_logDEBUG1 );
+    printTranState(requestTran.params.persistentState);
     transport->sendTransaction(requestTran, QnPeerSet() << transport->remotePeer().id << m_localPeer.id);
 }
 
