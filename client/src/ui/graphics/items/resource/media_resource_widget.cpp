@@ -774,11 +774,11 @@ float QnMediaResourceWidget::visualAspectRatio() const {
     if (!resource())
         return base_type::visualAspectRatio();
 
-    QString customAspectRatio = QnResourceWidget::resource()->getProperty(QnMediaResource::customAspectRatioKey());
-    if (customAspectRatio.isEmpty())
+    float customAspectRatio = QnResourceWidget::resource()->getProperty(QnMediaResource::customAspectRatioKey()).toFloat();
+    if (qFuzzyIsNull(customAspectRatio))
         return base_type::visualAspectRatio();
 
-    qreal aspectRatio = customAspectRatio.toDouble() * QnGeometry::aspectRatio(channelLayout()->size());
+    qreal aspectRatio = customAspectRatio * QnGeometry::aspectRatio(channelLayout()->size());
     return QnAspectRatio::isRotated90(rotation()) ? 1 / aspectRatio : aspectRatio;
 }
 
