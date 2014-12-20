@@ -496,11 +496,16 @@ void QnMediaServerResource::setSystemName(const QString &systemName) {
 }
 
 QnModuleInformation QnMediaServerResource::getModuleInformation() const {
-    QMutexLocker lock(&m_mutex);
-
     QnModuleInformation moduleInformation;
     moduleInformation.type = nxMediaServerId;
     moduleInformation.customization = QnAppInfo::customizationName();
+    moduleInformation.sslAllowed = false;
+    moduleInformation.protoVersion = getProperty(lit("protoVersion")).toInt();
+    if (moduleInformation.protoVersion == 0)
+        moduleInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
+    
+    QMutexLocker lock(&m_mutex);
+
     moduleInformation.version = m_version;
     moduleInformation.systemInformation = m_systemInfo;
     moduleInformation.systemName = m_systemName;
@@ -509,10 +514,7 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     for (const QHostAddress &address: m_netAddrList)
         moduleInformation.remoteAddresses.insert(address.toString());
     moduleInformation.id = getId();
-    moduleInformation.sslAllowed = false;
-    moduleInformation.protoVersion = getProperty(lit("protoVersion")).toInt();
-    if (moduleInformation.protoVersion == 0)
-        moduleInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
+
     return moduleInformation;
 }
 
