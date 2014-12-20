@@ -700,6 +700,7 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
             return;
         transportHeader.dstPeers = clients;
         transportHeader.processedPeers += clients;
+        transportHeader.processedPeers << m_localPeer.id;
         for(QnTransactionTransport* transport: m_connections)
         {
             if (transport->remotePeer().isClient() && transport->isReadyToSend(tran.command)) 
