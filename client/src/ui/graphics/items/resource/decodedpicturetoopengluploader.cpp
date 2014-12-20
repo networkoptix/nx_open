@@ -305,7 +305,7 @@ public:
 
         ensureAllocated();
 
-        QSize contentSize = QSize(width, height);
+        QSize contentSize = QSize(stride, height);
 
         if( m_contentSize == contentSize
             && m_pixelSize == pixelSize
