@@ -20,6 +20,24 @@
     <packaging>pom</packaging>
     <name>HD Witness Client</name>
 
+    <dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>common</artifactId>
+			<version>${project.version}</version>
+			<type>pom</type> 
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>appserver2</artifactId>
+			<version>${project.version}</version>
+			<type>pom</type> 
+			<scope>compile</scope>
+		</dependency>			
+    </dependencies>	
+	
     <properties>  
         <product.title>${client.name}</product.title>
         <product.display.title>${client.display.name}</product.display.title>
