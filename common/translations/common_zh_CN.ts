@@ -85,7 +85,7 @@
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="113"/>
         <source>Unexpected symbol &apos;%1&apos; at position %2.</source>
-        <translation>未知符号&apos;％1&apos;在位置％2。</translation>
+        <translation>未知符号&apos;%1&apos;在位置%2。</translation>
     </message>
 </context>
 <context>
@@ -94,7 +94,7 @@
         <location filename="../src/utils/common/evaluator.h" line="185"/>
         <location filename="../src/utils/common/evaluator.h" line="192"/>
         <source>Parameter %2 is not specified for function &apos;%1&apos;.</source>
-        <translation>参数％2不是函数&apos;％1&apos;指定</translation>
+        <translation>参数%2不是函数&apos;%1&apos;指定</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.h" line="195"/>

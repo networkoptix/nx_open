@@ -86,7 +86,7 @@ bool handleTransactionParams(const QByteArray &serializedTransaction, QnUbjsonRe
         return false;
     }
     if (!abstractTransaction.persistentInfo.isNull())
-        QnUbjsonTransactionSerializer::instance()->addToCache(abstractTransaction.persistentInfo, serializedTransaction);
+        QnUbjsonTransactionSerializer::instance()->addToCache(abstractTransaction.persistentInfo, abstractTransaction.command, serializedTransaction);
     function(transaction);
     return true;
 }
@@ -244,6 +244,12 @@ QnTransactionMessageBus::~QnTransactionMessageBus()
         m_thread->exit();
         m_thread->wait();
     }
+
+    for(QnTransactionTransport* transport: m_connections)
+        delete transport;
+    for(QnTransactionTransport* transport: m_connectingConnections)
+        delete transport;
+
     delete m_thread;
     delete m_timer;
 }
