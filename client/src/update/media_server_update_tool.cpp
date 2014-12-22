@@ -44,9 +44,13 @@ QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
     m_updateProcess(NULL),
     m_enableClientUpdates(defaultEnableClientUpdates)
 {
-    auto targetsWatcher = [this] {
+    auto targetsWatcher = [this](const QnResourcePtr &resource) {
+        if (!resource->hasFlags(Qn::server))
+            return;
+
         if (!m_targets.isEmpty())
             return;
+
         emit targetsChanged(actualTargetIds());
     };
     connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   targetsWatcher);
