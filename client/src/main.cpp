@@ -263,16 +263,40 @@ void initAppServerConnection(const QnUuid &videowallGuid, const QnUuid &videowal
 }
 
 /** Initialize log. */
-void initLog(const QString &logLevel, const QString fileNameSuffix) {
+void initLog(
+    const QString &logLevel,
+    const QString fileNameSuffix,
+    const QString& ec2TranLogLevel)
+{
+    static const int DEFAULT_MAX_LOG_FILE_SIZE = 10*1024*1024;
+    static const int DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
+
     QnLog::initLog(logLevel);
     const QString dataLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     QString logFileLocation = dataLocation + QLatin1String("/log");
     QString logFileName = logFileLocation + QLatin1String("/log_file") + fileNameSuffix;
     if (!QDir().mkpath(logFileLocation))
         cl_log.log(lit("Could not create log folder: ") + logFileLocation, cl_logALWAYS);
-    if (!cl_log.create(logFileName, 1024*1024*10, 5, cl_logDEBUG1))
+    if (!cl_log.create(logFileName, DEFAULT_MAX_LOG_FILE_SIZE, DEFAULT_MSG_LOG_ARCHIVE_SIZE, cl_logDEBUG1))
         cl_log.log(lit("Could not create log file") + logFileName, cl_logALWAYS);
     cl_log.log(QLatin1String("================================================================================="), cl_logALWAYS);
+
+
+    //preparing transaction log
+    if( ec2TranLogLevel != lit("none") )
+    {
+        QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
+            dataLocation + QLatin1String("/log/ec2_tran"),
+            DEFAULT_MAX_LOG_FILE_SIZE,
+            DEFAULT_MSG_LOG_ARCHIVE_SIZE,
+            QnLog::logLevelFromString(ec2TranLogLevel) );
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS );
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
+    }
 }
 
 static QtMessageHandler defaultMsgHandler = 0;
@@ -319,6 +343,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     bool noSingleApplication = false;
     int screen = -1;
     QString authenticationString, delayedDrop, instantDrop, logLevel;
+    QString ec2TranLogLevel = lit("none");
     QString translationPath;
     QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin ? lit(":/skin_light") : lit(":/skin_dark");
     bool skipMediaFolderScan = false;
@@ -342,6 +367,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&delayedDrop,            "--delayed-drop",               NULL,   QString());
     commandLineParser.addParameter(&instantDrop,            "--instant-drop",               NULL,   QString());
     commandLineParser.addParameter(&logLevel,               "--log-level",                  NULL,   QString());
+    commandLineParser.addParameter(&ec2TranLogLevel,        "--ec2-tran-log-level",
+        "Log value for ec2_tran.log. Supported values same as above. Default is none (no logging)", lit("none"));
 #ifdef ENABLE_DYNAMIC_TRANSLATION
     commandLineParser.addParameter(&translationPath,        "--translation",                NULL,   QString());
 #endif
@@ -393,7 +420,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         logFileNameSuffix.replace(QRegExp(lit("[{}]")), lit("_"));
     }
 
-    initLog(logLevel, logFileNameSuffix);
+    initLog(logLevel, logFileNameSuffix, ec2TranLogLevel);
 
 	// TODO: #Elric why QString???
     if (!lightMode.isEmpty()) {
@@ -737,6 +764,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
 #include <QtCore/QStandardPaths>
 #include <QtCore/QString>
+
 
 int main(int argc, char **argv)
 {

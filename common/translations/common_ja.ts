@@ -592,7 +592,9 @@
         <source>
 
 Parameters: </source>
-        <translation>・パラメーター:</translation>
+        <translation>
+
+・パラメーター:</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="89"/>

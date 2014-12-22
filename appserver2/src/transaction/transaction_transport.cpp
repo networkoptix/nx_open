@@ -19,6 +19,7 @@
 #include "core/resource/user_resource.h"
 #include "api/global_settings.h"
 #include "database/db_manager.h"
+#include "http/custom_headers.h"
 
 
 /*!
@@ -249,6 +250,10 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnTransactionTransport::at_httpClientDone, Qt::DirectConnection);
     
     fillAuthInfo();
+    if( m_localPeer.isServer() )
+        m_httpClient->addRequestHeader(
+            nx_ec::EC2_SYSTEM_NAME_HEADER_NAME,
+            QnCommonModule::instance()->localSystemName().toUtf8() );
 
     if (!remoteAddr.userName().isEmpty())
     {

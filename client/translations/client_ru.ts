@@ -8264,7 +8264,7 @@ Are you sure you want to delete them?</source>
 They may be auto-discovered again after removing.
 Are you sure you want to delete them?</source>
         <translation>
-            <numerusform>%n  из этих камер найдена автоматически. Она может быть снова найдена после удаления. Вы точно хотите удалить её?</numerusform>
+            <numerusform>%n из этих %1 камер найдена автоматически. Она может быть снова найдена после удаления. Вы точно хотите удалить её?</numerusform>
             <numerusform>%n из этих %1 камер найдены автоматически. Они могут быть снова найдены после удаления. Вы точно хотите удалить их?</numerusform>
             <numerusform>%n из этих %1 камер найдены автоматически. Они могут быть снова найдены после удаления. Вы точно хотите удалить их?</numerusform>
         </translation>
