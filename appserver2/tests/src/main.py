@@ -17,6 +17,7 @@ import sys
 import difflib
 import datetime
 import time
+import select
 
 # Rollback support
 class UnitTestRollback:
@@ -2439,6 +2440,18 @@ class SingleServerRtspPerf(SingleServerRtspTestBase):
         l = serverEndpoint.split(":")
         self._perfLog = open("%s_%s.perf.rtsp.log"%(l[0],l[1]),"w+")
 
+
+    def _timeoutRecv(self,socket,len,timeout):
+        socket.setblocking(0)
+        ready = select.select([socket], [], [], timeout)
+        if ready[0]:
+            data = socket.recv(len)
+            socket.setblocking(1)
+            return data
+        else:
+            socket.setblocking(1)
+            return None
+
     def _dump(self,c,tcp_rtsp,timeout):
         elapsed = 0
         while True:
@@ -2446,10 +2459,25 @@ class SingleServerRtspPerf(SingleServerRtspTestBase):
             # Recv 1 MB
             data = None
             try:
-                data = tcp_rtsp._socket.recv(1024*16)
+                data = self._timeoutRecv(tcp_rtsp._socket,1024*16,3)
             except:
-                pass
-            if not data:
+                continue
+
+            if data == None:
+                with self._lock:
+                    print "--------------------------------------------"
+                    print "The RTSP url:%s 3 seconds not response with any data"%(tcp_rtsp._url)
+                    print "--------------------------------------------"
+                    self._perfLog.write("--------------------------------------------\n")
+                    self._perfLog.write("This is an exceptional case,the server _SHOULD_ not terminate the connection\n")
+                    self._perfLog.write("The RTSP/RTP url:%s 3 seconds not response with any data\n"%(tcp_rtsp._url))
+                    self._perfLog.write("Camera name:%s\n"%(c[2]))
+                    self._perfLog.write("Camera Physical Id:%s\n"%(c[0]))
+                    self._perfLog.write("Camera Id:%s\n"%(c[1]))
+                    self._perfLog.write("--------------------------------------------\n")
+                    self._perfLog.flush()
+                return
+            elif not data:
                 with self._lock:
                     print "--------------------------------------------"
                     print "The RTSP url:%s manully close the connection"%(tcp_rtsp._url)
@@ -2853,6 +2881,21 @@ def runPerformanceTest():
 # Perf Test
 # ===================================
 
+class SingleResourcePerfGenerator:
+    def generateUpdate(self,id):
+        pass
+
+    def generateCreation(self):
+        pass
+
+    def saveAPI(self):
+        pass
+    
+    def updateAPI(self):
+        pass
+
+    def getAPI(self):
+        pass
 class PerfTest:
     _initialCreationSize = 20
     _frequency = 0
