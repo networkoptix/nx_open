@@ -4,6 +4,7 @@
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx_ec/ec_proto_version.h>
 
 namespace {
     const int checkTimeout = 15 * 60 * 1000;
@@ -126,22 +127,34 @@ void QnRestUpdatePeerTask::at_resourceChanged(const QnResourcePtr &resource) {
     if (m_currentServers.isEmpty())
         return;
 
-    if (m_targetId != resource->getId())
-        return;
-
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (!server)
         return;
 
-    if (server->getStatus() == Qn::Offline || server->getStatus() == Qn::Incompatible)
+    QnUuid id = QnUuid::fromStringSafe(server->getProperty(lit("guid")));
+    if (id.isNull())
+        id = server->getId();
+
+    if (m_targetId != id)
+        return;
+
+    Qn::ResourceStatus status = server->getStatus();
+
+    if (status == Qn::Offline)
         return;
 
     if (server->getVersion() != m_version) {
-        /* The situation is the same as in QnInstallUpdatesPeerTask.
-           If the server has gone online we should get resource update soon, so we don't have to wait minutes before we know the new version. */
-        m_timer->start(shortTimeout);
+        if (status == Qn::Online || status == Qn::Unauthorized) {
+            /* The situation is the same as in QnInstallUpdatesPeerTask.
+             * If the server has gone online we should get resource update soon, so we don't have to wait minutes before we know the new version. */
+            m_timer->start(shortTimeout);
+        }
         return;
     }
+
+    /* Keep waiting the server to be connected if its proto version matches our but it's still incompatible. */
+    if (status == Qn::Incompatible && server->getModuleInformation().protoVersion == nx_ec::EC2_PROTO_VERSION)
+        return;
 
     finishPeer();
 }
