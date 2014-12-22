@@ -565,6 +565,21 @@ template <class T>
 void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader) 
 {
     QMutexLocker lock(&m_mutex);
+
+    // do not perform any logic (aka sequence update) for foreign transaction. Just proxy
+    if (!transportHeader.dstPeers.isEmpty() && !transportHeader.dstPeers.contains(m_localPeer.id))
+    {
+        if( QnLog::instance(QnLog::EC2_TRAN_LOG)->logLevel() >= cl_logDEBUG1 )
+        {
+            QString dstPeersStr;
+            for( const QnUuid& peer: transportHeader.dstPeers )
+                dstPeersStr += peer.toString();
+            NX_LOG( QnLog::EC2_TRAN_LOG, lit("skip transaction %1 %2 for peers %3").arg(tran.toString()).arg(toString(transportHeader)).arg(dstPeersStr), cl_logDEBUG1);
+        }
+        proxyTransaction(tran, transportHeader);
+        return;
+    }
+
 #if 0
     QnTransactionTransport* directConnection = m_connections.value(transportHeader.sender);
     if (directConnection && directConnection->getState() == QnTransactionTransport::ReadyForStreaming && directConnection->isReadSync(ApiCommand::NotDefined)) 
@@ -602,83 +617,71 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
     }
 
 
-    if (transportHeader.dstPeers.isEmpty() || transportHeader.dstPeers.contains(m_localPeer.id)) 
-    {
-        NX_LOG( QnLog::EC2_TRAN_LOG, printTransaction("got transaction", tran, transportHeader, sender), cl_logDEBUG1);
-        // process system transactions
-        switch(tran.command) {
-        case ApiCommand::lockRequest:
-        case ApiCommand::lockResponse:
-        case ApiCommand::unlockRequest: 
-            onGotDistributedMutexTransaction(tran);
-            break;
-        case ApiCommand::tranSyncRequest:
-            onGotTransactionSyncRequest(sender, tran);
-            return; // do not proxy
-        case ApiCommand::tranSyncResponse:
-            onGotTransactionSyncResponse(sender, tran);
-            return; // do not proxy
-        case ApiCommand::tranSyncDone:
-            onGotTransactionSyncDone(sender, tran);
-            return; // do not proxy
-        case ApiCommand::peerAliveInfo:
-            onGotServerAliveInfo(tran, sender, transportHeader);
-            return; // do not proxy. this call contains built in proxy
-        case ApiCommand::forcePrimaryTimeServer:
-            TimeSynchronizationManager::instance()->primaryTimeServerChanged( tran );
-            break;
-        case ApiCommand::broadcastPeerSystemTime:
-            TimeSynchronizationManager::instance()->peerSystemTimeReceived( tran );
-            break;
-        case ApiCommand::getKnownPeersSystemTime:
-            TimeSynchronizationManager::instance()->knownPeersSystemTimeReceived( tran );
-            break;
-        case ApiCommand::runtimeInfoChanged:
-            if (!onGotServerRuntimeInfo(tran, sender))
-                return; // already processed. do not proxy and ignore transaction
-            if( m_handler )
-                m_handler->triggerNotification(tran);
-            break;
-        case ApiCommand::updatePersistentSequence:
-            updatePersistentMarker(tran, sender);
-            break;
-        default:
-            // general transaction
-            if (!tran.persistentInfo.isNull() && dbManager)
-            {
-                QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
-                ErrorCode errorCode = dbManager->executeTransaction( tran, serializedTran );
-                switch(errorCode) {
-                    case ErrorCode::ok:
-                        break;
-                    case ErrorCode::containsBecauseTimestamp:
-                        proxyFillerTransaction(tran, transportHeader);
-                    case ErrorCode::containsBecauseSequence:
-                        return; // do not proxy if transaction already exists
-                    default:
-                        qWarning() << "Can't handle transaction" << ApiCommand::toString(tran.command) << "reopen connection";
-                        sender->setState(QnTransactionTransport::Error);
-                        return;
-                }
-            }
-
-            if( m_handler )
-                m_handler->triggerNotification(tran);
-
-            // this is required to allow client place transactions directly into transaction message bus
-            if (tran.command == ApiCommand::getFullInfo)
-                sender->setWriteSync(true);
-            break;
-        }
-    }
-    else {
-        if( QnLog::instance(QnLog::EC2_TRAN_LOG)->logLevel() >= cl_logDEBUG1 )
+    NX_LOG( QnLog::EC2_TRAN_LOG, printTransaction("got transaction", tran, transportHeader, sender), cl_logDEBUG1);
+    // process system transactions
+    switch(tran.command) {
+    case ApiCommand::lockRequest:
+    case ApiCommand::lockResponse:
+    case ApiCommand::unlockRequest: 
+        onGotDistributedMutexTransaction(tran);
+        break;
+    case ApiCommand::tranSyncRequest:
+        onGotTransactionSyncRequest(sender, tran);
+        return; // do not proxy
+    case ApiCommand::tranSyncResponse:
+        onGotTransactionSyncResponse(sender, tran);
+        return; // do not proxy
+    case ApiCommand::tranSyncDone:
+        onGotTransactionSyncDone(sender, tran);
+        return; // do not proxy
+    case ApiCommand::peerAliveInfo:
+        onGotServerAliveInfo(tran, sender, transportHeader);
+        return; // do not proxy. this call contains built in proxy
+    case ApiCommand::forcePrimaryTimeServer:
+        TimeSynchronizationManager::instance()->primaryTimeServerChanged( tran );
+        break;
+    case ApiCommand::broadcastPeerSystemTime:
+        TimeSynchronizationManager::instance()->peerSystemTimeReceived( tran );
+        break;
+    case ApiCommand::getKnownPeersSystemTime:
+        TimeSynchronizationManager::instance()->knownPeersSystemTimeReceived( tran );
+        break;
+    case ApiCommand::runtimeInfoChanged:
+        if (!onGotServerRuntimeInfo(tran, sender))
+            return; // already processed. do not proxy and ignore transaction
+        if( m_handler )
+            m_handler->triggerNotification(tran);
+        break;
+    case ApiCommand::updatePersistentSequence:
+        updatePersistentMarker(tran, sender);
+        break;
+    default:
+        // general transaction
+        if (!tran.persistentInfo.isNull() && dbManager)
         {
-            QString dstPeersStr;
-            for( const QnUuid& peer: transportHeader.dstPeers )
-                dstPeersStr += peer.toString();
-            NX_LOG( QnLog::EC2_TRAN_LOG, lit("skip transaction %1 for peers %2").arg(tran.toString()).arg(dstPeersStr), cl_logDEBUG1);
+            QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
+            ErrorCode errorCode = dbManager->executeTransaction( tran, serializedTran );
+            switch(errorCode) {
+                case ErrorCode::ok:
+                    break;
+                case ErrorCode::containsBecauseTimestamp:
+                    proxyFillerTransaction(tran, transportHeader);
+                case ErrorCode::containsBecauseSequence:
+                    return; // do not proxy if transaction already exists
+                default:
+                    qWarning() << "Can't handle transaction" << ApiCommand::toString(tran.command) << "reopen connection";
+                    sender->setState(QnTransactionTransport::Error);
+                    return;
+            }
         }
+
+        if( m_handler )
+            m_handler->triggerNotification(tran);
+
+        // this is required to allow client place transactions directly into transaction message bus
+        if (tran.command == ApiCommand::getFullInfo)
+            sender->setWriteSync(true);
+        break;
     }
 
     proxyTransaction(tran, transportHeader);
@@ -696,6 +699,14 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
         if (clients.isEmpty())
             return;
         transportHeader.dstPeers = clients;
+        transportHeader.processedPeers += clients;
+        transportHeader.processedPeers << m_localPeer.id;
+        for(QnTransactionTransport* transport: m_connections)
+        {
+            if (transport->remotePeer().isClient() && transport->isReadyToSend(tran.command)) 
+                transport->sendTransaction(tran, transportHeader);
+        }
+        return;
     }
 
     // proxy incoming transaction to other peers.
@@ -708,7 +719,6 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
     processedPeers << m_localPeer.id;
     QnTransactionTransportHeader newHeader(transportHeader);
     newHeader.processedPeers = processedPeers;
-    newHeader.dstPeers = transportHeader.dstPeers;
 
     QSet<QnUuid> proxyList;
     for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr) 
@@ -797,6 +807,9 @@ void QnTransactionMessageBus::queueSyncRequest(QnTransactionTransport* transport
     QnTransaction<ApiSyncRequestData> requestTran(ApiCommand::tranSyncRequest);
     requestTran.params.persistentState = transactionLog->getTransactionsState();
     requestTran.params.runtimeState = m_runtimeTransactionLog->getTransactionsState();
+
+    NX_LOG( QnLog::EC2_TRAN_LOG, lit("send syncRequest to peer %1").arg(transport->remotePeer().id.toString()), cl_logDEBUG1 );
+    printTranState(requestTran.params.persistentState);
     transport->sendTransaction(requestTran, QnPeerSet() << transport->remotePeer().id << m_localPeer.id);
 }
 

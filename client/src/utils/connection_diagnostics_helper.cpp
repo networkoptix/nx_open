@@ -229,8 +229,8 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
                 QMessageBox::Cancel
                 );
             if( selectedButton == QMessageBox::Yes ) {
-                QScopedPointer<QnCompatibilityVersionInstallationDialog> installationDialog(
-                            new QnCompatibilityVersionInstallationDialog(connectionInfo.version, parentWidget));
+                QScopedPointer<CompatibilityVersionInstallationDialog> installationDialog(
+                            new CompatibilityVersionInstallationDialog(connectionInfo.version, parentWidget));
                 //starting installation
                 installationDialog->exec();
                 if (installationDialog->installationSucceeded())
@@ -284,7 +284,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
                     );
                 if( selectedButton == QMessageBox::Ok ) {
                     //starting installation
-                    QScopedPointer<QnCompatibilityVersionInstallationDialog> installationDialog(new QnCompatibilityVersionInstallationDialog(connectionInfo.version, parentWidget));
+                    QScopedPointer<CompatibilityVersionInstallationDialog> installationDialog(new CompatibilityVersionInstallationDialog(connectionInfo.version, parentWidget));
                     installationDialog->exec();
                     if (installationDialog->installationSucceeded())
                         continue;   //offering to start newly-installed compatibility version
