@@ -19,13 +19,14 @@ namespace Ui {
     class QnCompatibilityVersionInstallationDialog;
 }
 
-class QnCompatibilityVersionInstallationDialog : public Connective<QDialog> {
+//TODO: #dklychkov rename class in 2.4
+class CompatibilityVersionInstallationDialog : public Connective<QDialog> {
     Q_OBJECT
 
     typedef Connective<QDialog> base_type;
 public:
-    QnCompatibilityVersionInstallationDialog(const QnSoftwareVersion &version, QWidget *parent = 0);
-    virtual ~QnCompatibilityVersionInstallationDialog();
+    CompatibilityVersionInstallationDialog(const QnSoftwareVersion &version, QWidget *parent = 0);
+    virtual ~CompatibilityVersionInstallationDialog();
 
     bool installationSucceeded() const;
 

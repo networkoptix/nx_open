@@ -10,7 +10,7 @@
 #include "common/common_module.h"
 
 
-QnCompatibilityVersionInstallationDialog::QnCompatibilityVersionInstallationDialog(const QnSoftwareVersion &version, QWidget *parent) :
+CompatibilityVersionInstallationDialog::CompatibilityVersionInstallationDialog(const QnSoftwareVersion &version, QWidget *parent) :
     base_type(parent),
     m_ui(new Ui::QnCompatibilityVersionInstallationDialog),
     m_versionToInstall(version)
@@ -18,23 +18,23 @@ QnCompatibilityVersionInstallationDialog::QnCompatibilityVersionInstallationDial
     m_ui->setupUi(this);
 }
 
-QnCompatibilityVersionInstallationDialog::~QnCompatibilityVersionInstallationDialog() {
+CompatibilityVersionInstallationDialog::~CompatibilityVersionInstallationDialog() {
     if (m_compatibilityTool)
         m_compatibilityTool->cancel();
 }
 
-bool QnCompatibilityVersionInstallationDialog::installationSucceeded() const {
+bool CompatibilityVersionInstallationDialog::installationSucceeded() const {
     return m_installationOk;
 }
 
-int QnCompatibilityVersionInstallationDialog::exec() {
+int CompatibilityVersionInstallationDialog::exec() {
     if (m_versionToInstall < qnCommon->engineVersion())
         return installCompatibilityVersion();
     else
         return installUpdate();
 }
 
-void QnCompatibilityVersionInstallationDialog::reject() {
+void CompatibilityVersionInstallationDialog::reject() {
     if (m_compatibilityTool && m_compatibilityTool->isRunning()) {
         m_compatibilityTool->cancel();
         return;
@@ -48,7 +48,7 @@ void QnCompatibilityVersionInstallationDialog::reject() {
     QDialog::reject();
 }
 
-void QnCompatibilityVersionInstallationDialog::at_compatibilityTool_statusChanged(int status) {
+void CompatibilityVersionInstallationDialog::at_compatibilityTool_statusChanged(int status) {
     QDialogButtonBox::StandardButton button = QDialogButtonBox::Close;
 
     switch (status) {
@@ -88,7 +88,7 @@ void QnCompatibilityVersionInstallationDialog::at_compatibilityTool_statusChange
     m_ui->buttonBox->button(button)->setEnabled(status != QnCompatibilityVersionInstallationTool::Canceling);
 }
 
-void QnCompatibilityVersionInstallationDialog::at_updateTool_updateFinished(QnUpdateResult result) {
+void CompatibilityVersionInstallationDialog::at_updateTool_updateFinished(QnUpdateResult result) {
     /* Prevent final status jumping */
     disconnect(m_updateTool, NULL, this, NULL);
     m_ui->progressBar->setValue(100);
@@ -113,12 +113,12 @@ void QnCompatibilityVersionInstallationDialog::at_updateTool_updateFinished(QnUp
     m_ui->buttonBox->button(button)->setFocus();
 }
 
-int QnCompatibilityVersionInstallationDialog::installCompatibilityVersion() {
+int CompatibilityVersionInstallationDialog::installCompatibilityVersion() {
     m_installationOk = false;
 
     m_compatibilityTool.reset(new QnCompatibilityVersionInstallationTool(m_versionToInstall));
     connect(m_compatibilityTool,    &QnCompatibilityVersionInstallationTool::progressChanged,   m_ui->progressBar,  &QProgressBar::setValue);
-    connect(m_compatibilityTool,    &QnCompatibilityVersionInstallationTool::statusChanged,     this,               &QnCompatibilityVersionInstallationDialog::at_compatibilityTool_statusChanged);
+    connect(m_compatibilityTool,    &QnCompatibilityVersionInstallationTool::statusChanged,     this,               &CompatibilityVersionInstallationDialog::at_compatibilityTool_statusChanged);
     m_compatibilityTool->start();
 
     int result = base_type::exec();
@@ -128,11 +128,11 @@ int QnCompatibilityVersionInstallationDialog::installCompatibilityVersion() {
     return result;
 }
 
-int QnCompatibilityVersionInstallationDialog::installUpdate() {
+int CompatibilityVersionInstallationDialog::installUpdate() {
     m_installationOk = false;
 
     m_updateTool.reset(new QnMediaServerUpdateTool());
-    connect(m_updateTool,   &QnMediaServerUpdateTool::updateFinished,           this,   &QnCompatibilityVersionInstallationDialog::at_updateTool_updateFinished);
+    connect(m_updateTool,   &QnMediaServerUpdateTool::updateFinished,           this,   &CompatibilityVersionInstallationDialog::at_updateTool_updateFinished);
     connect(m_updateTool,   &QnMediaServerUpdateTool::stageProgressChanged,     this,   [this](QnFullUpdateStage stage, int progress) {
         m_ui->progressBar->setValue((static_cast<int>(stage) * 100 + progress) / static_cast<int>(QnFullUpdateStage::Count));
     });
