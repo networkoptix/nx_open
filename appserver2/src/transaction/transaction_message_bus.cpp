@@ -86,7 +86,7 @@ bool handleTransactionParams(const QByteArray &serializedTransaction, QnUbjsonRe
         return false;
     }
     if (!abstractTransaction.persistentInfo.isNull())
-        QnUbjsonTransactionSerializer::instance()->addToCache(abstractTransaction.persistentInfo, serializedTransaction);
+        QnUbjsonTransactionSerializer::instance()->addToCache(abstractTransaction.persistentInfo, abstractTransaction.command, serializedTransaction);
     function(transaction);
     return true;
 }
