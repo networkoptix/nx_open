@@ -1469,7 +1469,6 @@ void QnMain::run()
              QnSyncTime::instance(), (void(QnSyncTime::*)(qint64))&QnSyncTime::updateTime );
 
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
-    QnMServerResourceSearcher::instance()->setAppPServerGuid(connectInfo.ecsGuid.toUtf8());
     QnMServerResourceSearcher::instance()->start();
 
     //Initializing plugin manager

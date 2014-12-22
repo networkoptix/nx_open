@@ -216,10 +216,13 @@ public slots:
     virtual void recordingEventDetached();
 
 signals:
+    /* All ::changed signals must have the same profile to be dynamically called from base ::updateInner method. */
     void scheduleDisabledChanged(const QnResourcePtr &resource);
     void scheduleTasksChanged(const QnResourcePtr &resource);
-    void groupNameChanged(const QnSecurityCamResourcePtr &resource);
+    void groupIdChanged(const QnResourcePtr &resource);
+    void groupNameChanged(const QnResourcePtr &resource);
     void motionRegionChanged(const QnResourcePtr &resource);
+
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonParamsEncoded);
 
     //!Emitted on camera input port state has been changed

@@ -74,6 +74,7 @@ void QnPtzManageModel::removeTour(const QString &id) {
 
     beginRemoveRows(QModelIndex(), firstRow, lastRow);
     m_removedTours << m_tours.takeAt(idx).tour.id;
+    cleanHotkeys();
     endRemoveRows();
 }
 

@@ -1138,7 +1138,6 @@ and will not receive system notifications via email.</translation>
         <source>Storages are full on the following Server:
 %1.</source>
         <translation>Storage is full on the following server:
-
 %1.</translation>
     </message>
     <message>
@@ -1146,7 +1145,6 @@ and will not receive system notifications via email.</translation>
         <source>Storages are not configured on the following Server:
 %1.</source>
         <translation>Storage is not configured on the following server:
-
 %1.</translation>
     </message>
     <message>
