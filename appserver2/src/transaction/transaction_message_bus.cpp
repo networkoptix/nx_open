@@ -244,6 +244,12 @@ QnTransactionMessageBus::~QnTransactionMessageBus()
         m_thread->exit();
         m_thread->wait();
     }
+
+    for(QnTransactionTransport* transport: m_connections)
+        delete transport;
+    for(QnTransactionTransport* transport: m_connectingConnections)
+        delete transport;
+
     delete m_thread;
     delete m_timer;
 }
