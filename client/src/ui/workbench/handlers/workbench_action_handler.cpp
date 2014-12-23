@@ -344,8 +344,10 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     if (layout->getItems().size() >= maxItems)
         return;
 
+#ifndef DESKTOP_CAMERA_DEBUG
     if (resource->hasFlags(Qn::desktop_camera))
         return;
+#endif
 
     {
         //TODO: #GDM #Common refactor duplicated code

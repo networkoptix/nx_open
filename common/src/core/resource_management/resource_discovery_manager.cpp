@@ -292,6 +292,9 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
     if (!mServer || !ownServer)
         return false;
 
+    if (camera->hasFlags(Qn::desktop_camera))
+        return true;
+
 #ifdef EDGE_SERVER
     if (!ownServer->isRedundancy()) 
     {

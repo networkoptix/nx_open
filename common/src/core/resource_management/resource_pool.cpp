@@ -17,8 +17,6 @@
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 
-//#define DESKTOP_CAMERA_DEBUG
-
 #ifdef QN_RESOURCE_POOL_DEBUG
 #   define TRACE(...) qDebug << __VA_ARGS__;
 #else

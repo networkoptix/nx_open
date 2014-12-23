@@ -9,8 +9,6 @@ namespace {
     const int keepAliveInterval = 5 * 1000;
 }
 
-//#define DESKTOP_CAMERA_DEBUG
-
 QnDesktopCameraResourceSearcher::QnDesktopCameraResourceSearcher():
     base_type()
 { }
