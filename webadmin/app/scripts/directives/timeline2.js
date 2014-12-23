@@ -20,7 +20,7 @@ angular.module('webadminApp')
                     initialZoom: 0, // Initial zoom step 0 - to see whole timeline without scroll.
                     updateInterval: 20, // Animation interval
                     animationDuration: 400, // 200-400 for smooth animation
-                    rulerColor:[187,187,187], //Color for ruler marks and labels
+                    rulerColor:[0,0,0], //Color for ruler marks and labels
                     rulerFontSize: 9, // Smallest font size for labels
                     rulerFontStep: 1, // Step for increasing font size
                     rulerBasicSize: 6, // Size for smallest mark on ruler
@@ -28,7 +28,8 @@ angular.module('webadminApp')
                     rulerLabelPadding: 0.3, // Padding between marks and labels (according to font size)
                     minimumMarkWidth: 5, // Minimum available width for smallest marks on ruler
                     increasedMarkWidth: 10,// Minimum width for encreasing marks size
-                    maximumScrollScale: 20// Maximum scale for scroll frame inside viewport - according to viewport width
+                    maximumScrollScale: 20,// Maximum scale for scroll frame inside viewport - according to viewport width
+                    colorLevels: 6 // Number of different color levels
                 };
 
                 var viewportWidth = element.find('.viewport').width();
@@ -60,14 +61,22 @@ angular.module('webadminApp')
                 }
 
 
-                function formatColor(color,alpha){
-                    var color =  'rgba(' +
-                        Math.round(color[0] /* * alpha + 255 * (1 - alpha) */) + ',' +
-                        Math.round(color[1] /* * alpha + 255 * (1 - alpha) */) + ',' +
-                        Math.round(color[2] /* * alpha + 255 * (1 - alpha) */) + ',' +
+                function blurColor(color,alpha){
+                    /*
+                    var colorString =  'rgba(' +
+                        Math.round(color[0]) + ',' +
+                        Math.round(color[1]) + ',' +
+                        Math.round(color[2]) + ',' +
                         alpha + ')';
+                    */
+                    if(alpha>1)
+                        alpha = 1;
+                    var colorString =  'rgb(' +
+                        Math.round(color[0] * alpha + 255 * (1 - alpha)) + ',' +
+                        Math.round(color[1] * alpha + 255 * (1 - alpha)) + ',' +
+                        Math.round(color[2] * alpha + 255 * (1 - alpha)) + ')';
 
-                    return color;
+                    return colorString;
                 }
 
                 function zoomLevel(){
@@ -158,11 +167,14 @@ angular.module('webadminApp')
                     }
 
                     var size = timelineConfig.rulerBasicSize;
+                    var colorBlur = 0;
 
                     if(level === 0){
                         size = timelineConfig.rulerBasicSize * scope.levelAppearance;
+                        colorBlur = scope.levelAppearance / timelineConfig.colorLevels;
                     }else if(level<0){
                         size = timelineConfig.rulerBasicSize * (1 - scope.levelDisappearance);
+                        colorBlur =  (1 - scope.levelDisappearance) / timelineConfig.colorLevels;
                     }else {
                         var animationModifier = 1;
                         if(scope.levelAppearance < 1 ){
@@ -170,7 +182,7 @@ angular.module('webadminApp')
                         }else if( scope.levelDisappearance < 1){
                             animationModifier = 2 - scope.levelDisappearance;
                         }
-
+                        colorBlur = (Math.min(level, timelineConfig.colorLevels - 1) + animationModifier) / timelineConfig.colorLevels;
                         size = (Math.min(level, 4) + animationModifier ) * timelineConfig.rulerStepSize + timelineConfig.rulerBasicSize;
                     }
 
@@ -180,7 +192,7 @@ angular.module('webadminApp')
                     }
 
 
-                    var color = formatColor(timelineConfig.rulerColor,1);
+                    var color = blurColor(timelineConfig.rulerColor,colorBlur);
                     context.strokeStyle = color;
                     context.beginPath();
                     context.moveTo(coordinate, 0);
@@ -192,9 +204,9 @@ angular.module('webadminApp')
                         var fontSize = timelineConfig.rulerFontSize + timelineConfig.rulerFontStep * Math.min(level,3);
 
                         if(scope.labelAppearance < 1 && labelLevel === 0) {
-                            color = formatColor(timelineConfig.rulerColor, scope.labelAppearance);
+                            color = blurColor(timelineConfig.rulerColor, scope.labelAppearance * colorBlur);
                         }else if(scope.labelDisappearance < 1 && labelLevel < 0){
-                            color = formatColor(timelineConfig.rulerColor, 1 - scope.labelDisappearance);
+                            color = blurColor(timelineConfig.rulerColor, (1 - scope.labelDisappearance) * colorBlur);
                         }
 
                         /*if(level === 0){
@@ -214,7 +226,7 @@ angular.module('webadminApp')
                 function drawRuler(){
                     //1. Create context for drawing
                     var context = canvas.getContext('2d');
-                    context.fillStyle = formatColor(timelineConfig.rulerColor,1);
+                    context.fillStyle = blurColor(timelineConfig.rulerColor,1);
 
                     context.clearRect(0, 0, canvas.width, canvas.height);
 
