@@ -8,7 +8,6 @@
 
 namespace {
     const int checkTimeout = 15 * 60 * 1000;
-    const int shortTimeout = 60 * 1000;
 }
 
 QnRestUpdatePeerTask::QnRestUpdatePeerTask(QObject *parent) :
@@ -102,22 +101,7 @@ void QnRestUpdatePeerTask::at_resourceChanged(const QnResourcePtr &resource) {
     if (!m_serverByRealId.contains(id))
         return;
 
-    Qn::ResourceStatus status = server->getStatus();
-
-    if (status == Qn::Offline)
-        return;
-
-    if (server->getVersion() != m_version) {
-        if (status == Qn::Online || status == Qn::Unauthorized) {
-            /* The situation is the same as in QnInstallUpdatesPeerTask.
-             * If the server has gone online we should get resource update soon, so we don't have to wait minutes before we know the new version. */
-            m_timer->start(shortTimeout);
-        }
-        return;
-    }
-
-    /* Keep waiting the server to be connected if its proto version matches our but it's still incompatible. */
-    if (status == Qn::Incompatible && server->getModuleInformation().protoVersion == nx_ec::EC2_PROTO_VERSION)
+    if (server->getVersion() != m_version)
         return;
 
     finishPeer(id);
