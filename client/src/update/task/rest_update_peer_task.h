@@ -21,7 +21,6 @@ public:
 
     explicit QnRestUpdatePeerTask(QObject *parent = 0);
 
-    void setUpdateFiles(const QHash<QnSystemInformation, QString> &updateFiles);
     void setUpdateId(const QString &updateId);
     void setVersion(const QnSoftwareVersion &version);
 
@@ -34,23 +33,18 @@ protected:
 
 private:
     void installNextUpdate();
-    void finishPeer();
+    void finishPeer(const QnUuid &id);
 
 private slots:
     void at_updateInstalled(int status, int handle);
     void at_resourceChanged(const QnResourcePtr &resource);
     void at_timer_timeout();
-    void at_finished();
 
 private:
     QString m_updateId;
     QnSoftwareVersion m_version;
-    QHash<QnSystemInformation, QString> m_updateFiles;
-    QMultiHash<QnSystemInformation, QnMediaServerResourcePtr> m_serverBySystemInformation;
-
-    QByteArray m_currentData;
-    QList<QnMediaServerResourcePtr> m_currentServers;
-    QnUuid m_targetId;
+    QHash<int, QnMediaServerResourcePtr> m_serverByRequest;
+    QHash<QnUuid, QnMediaServerResourcePtr> m_serverByRealId;
     QTimer *m_timer;
 };
 

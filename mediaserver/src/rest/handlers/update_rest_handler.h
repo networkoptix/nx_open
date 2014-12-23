@@ -8,6 +8,9 @@ class QnUpdateRestHandler : public QnJsonRestHandler {
 public:
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
     virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
+
+private:
+    int handlePartialUpdate(const QString &updateId, const QByteArray &data, qint64 offset, QnJsonRestResult &result);
 };
 
 #endif // UPDATE_REST_HANDLER_H

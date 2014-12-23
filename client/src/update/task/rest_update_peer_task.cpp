@@ -19,12 +19,9 @@ QnRestUpdatePeerTask::QnRestUpdatePeerTask(QObject *parent) :
 
     connect(m_timer, &QTimer::timeout, this, &QnRestUpdatePeerTask::at_timer_timeout);
 
-    // after finish we ought to do some cleanup
-    connect(this,   &QnRestUpdatePeerTask::finished,    this,   &QnRestUpdatePeerTask::at_finished);
-}
-
-void QnRestUpdatePeerTask::setUpdateFiles(const QHash<QnSystemInformation, QString> &updateFiles) {
-    m_updateFiles = updateFiles;
+    connect(this, &QnRestUpdatePeerTask::finished, this, [this]() {
+        disconnect(qnResPool, NULL, this, NULL);
+    });
 }
 
 void QnRestUpdatePeerTask::setUpdateId(const QString &updateId) {
@@ -36,84 +33,23 @@ void QnRestUpdatePeerTask::setVersion(const QnSoftwareVersion &version) {
 }
 
 void QnRestUpdatePeerTask::doCancel() {
-    if (!m_currentServers.isEmpty()) {
-        QnMediaServerResourcePtr server = m_currentServers.first();
-        disconnect(server.data(), &QnMediaServerResource::resourceChanged, this, &QnRestUpdatePeerTask::at_resourceChanged);
-    }
-
-    m_serverBySystemInformation.clear();
-    m_currentServers.clear();
-    m_currentData.clear();
     m_timer->stop();
+    m_serverByRealId.clear();
+    m_serverByRequest.clear();
 }
 
 void QnRestUpdatePeerTask::doStart() {
-    m_currentServers.clear();
-    m_serverBySystemInformation.clear();
-
     foreach (const QnUuid &id, peers()) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
         Q_ASSERT_X(server, "An incompatible server resource is expected here.", Q_FUNC_INFO);
 
-        if (!m_updateFiles.contains(server->getSystemInfo())) {
-            finish(ParametersError);
-            return;
-        }
-
-        m_serverBySystemInformation.insert(server->getSystemInfo(), server);
+        int handle = server->apiConnection()->installUpdate(m_updateId, this, SLOT(at_updateInstalled(int,int)));
+        m_serverByRequest[handle] = server;
+        m_serverByRealId.insert(QnUuid::fromStringSafe(server->getProperty(lit("guid"))), server);
     }
 
-    installNextUpdate();
-}
-
-void QnRestUpdatePeerTask::installNextUpdate() {
-    m_timer->stop();
-
-    if (m_currentServers.isEmpty()) {
-        if (m_serverBySystemInformation.isEmpty()) {
-            finish(NoError);
-            return;
-        }
-
-        auto it = m_serverBySystemInformation.begin();
-
-        QnSystemInformation systemInformation = it.key();
-        m_currentServers = m_serverBySystemInformation.values(systemInformation);
-
-        QFile file(m_updateFiles[systemInformation]);
-        if (!file.open(QFile::ReadOnly)) {
-            finish(FileError);
-            return;
-        }
-        m_currentData = file.readAll();
-        file.close();
-    }
-
-    QnMediaServerResourcePtr server = m_currentServers.first();
-    m_targetId = QnUuid(server->getProperty(lit("guid")));
-    Q_ASSERT_X(!m_targetId.isNull(), Q_FUNC_INFO, "Each incompatible server resource should have 'guid' property!");
-    server->apiConnection()->installUpdate(m_updateId, m_currentData, this, SLOT(at_updateInstalled(int,int)));
-}
-
-void QnRestUpdatePeerTask::finishPeer() {
-    qnResPool->disconnect(this);
-    QnMediaServerResourcePtr server = m_currentServers.takeFirst();
-    emit peerFinished(server->getId());
-    emit peerUpdateFinished(server->getId(), QnUuid(server->getProperty(lit("guid"))));
-    if (m_currentServers.isEmpty())
-        m_serverBySystemInformation.erase(m_serverBySystemInformation.begin());
-    installNextUpdate();
-}
-
-void QnRestUpdatePeerTask::at_updateInstalled(int status, int handle) {
-    Q_UNUSED(handle)
-
-    // it means the task was cancelled
-    if (m_currentServers.isEmpty())
-        return;
-
-    if (status != 0) {
-        finish(UploadError);
+    if (m_serverByRequest.isEmpty()) {
+        finish(NoError);
         return;
     }
 
@@ -123,8 +59,36 @@ void QnRestUpdatePeerTask::at_updateInstalled(int status, int handle) {
     m_timer->start(checkTimeout);
 }
 
+void QnRestUpdatePeerTask::finishPeer(const QnUuid &id) {
+    QnMediaServerResourcePtr server = m_serverByRealId.take(id);
+    if (!server)
+        return;
+
+    emit peerFinished(server->getId());
+    emit peerUpdateFinished(server->getId(), QnUuid(server->getProperty(lit("guid"))));
+
+    if (m_serverByRealId.isEmpty())
+        finish(NoError);
+}
+
+void QnRestUpdatePeerTask::at_updateInstalled(int status, int handle) {
+    Q_UNUSED(handle)
+
+    if (m_serverByRealId.isEmpty())
+        return;
+
+    QnMediaServerResourcePtr server = m_serverByRequest.take(handle);
+    if (!server)
+        return;
+
+    if (status != 0) {
+        finish(UploadError, QSet<QnUuid>() << server->getId());
+        return;
+    }
+}
+
 void QnRestUpdatePeerTask::at_resourceChanged(const QnResourcePtr &resource) {
-    if (m_currentServers.isEmpty())
+    if (m_serverByRealId.isEmpty())
         return;
 
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
@@ -135,7 +99,7 @@ void QnRestUpdatePeerTask::at_resourceChanged(const QnResourcePtr &resource) {
     if (id.isNull())
         id = server->getId();
 
-    if (m_targetId != id)
+    if (!m_serverByRealId.contains(id))
         return;
 
     Qn::ResourceStatus status = server->getStatus();
@@ -156,16 +120,12 @@ void QnRestUpdatePeerTask::at_resourceChanged(const QnResourcePtr &resource) {
     if (status == Qn::Incompatible && server->getModuleInformation().protoVersion == nx_ec::EC2_PROTO_VERSION)
         return;
 
-    finishPeer();
+    finishPeer(id);
 }
 
 void QnRestUpdatePeerTask::at_timer_timeout() {
-    if (m_currentServers.isEmpty())
+    if (m_serverByRealId.isEmpty())
         return;
 
-    finish(InstallationError);
-}
-
-void QnRestUpdatePeerTask::at_finished() {
-    m_currentData.clear();
+    finish(InstallationError, QSet<QnUuid>::fromList(m_serverByRealId.keys()));
 }
