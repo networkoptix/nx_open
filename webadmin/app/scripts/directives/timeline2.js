@@ -27,6 +27,7 @@ angular.module('webadminApp')
                     rulerStepSize: 3,// Step for increasing marks
                     rulerLabelPadding: 0.3, // Padding between marks and labels (according to font size)
                     minimumMarkWidth: 5, // Minimum available width for smallest marks on ruler
+                    increasedMarkWidth: 10,// Minimum width for encreasing marks size
                     maximumScrollScale: 20// Maximum scale for scroll frame inside viewport - according to viewport width
                 };
 
@@ -80,17 +81,23 @@ angular.module('webadminApp')
                 function updateActualLevel(){
                     var oldLevel = scope.actualLevel;
                     var oldLabelLevel = scope.visibleLabelsLevel;
+                    var oldEncreasedLevel = scope.increasedLevel;
 
                     //3. Select actual level
                     var secsPerPixel = secondsPerPixel();
                     for(var i=1; i < RulerModel.levels.length ; i ++ ){
                         var level = RulerModel.levels[i];
 
-                        if((level.interval.getSeconds() / secsPerPixel) >= level.width){
+                        var secondsPerLevel =(level.interval.getSeconds() / secsPerPixel);
+                        if(secondsPerLevel >= level.width){
                             scope.visibleLabelsLevel = i;
                         }
 
-                        if((level.interval.getSeconds() / secsPerPixel) < timelineConfig.minimumMarkWidth){
+                        if(secondsPerLevel > timelineConfig.increasedMarkWidth){
+                            scope.increasedLevel = i;
+                        }
+
+                        if(secondsPerLevel < timelineConfig.minimumMarkWidth){
                             break;
                         }
                     }
@@ -99,8 +106,14 @@ angular.module('webadminApp')
 
                     if(oldLevel < scope.actualLevel){ // Level up - run animation for appearance of new level
                         animateScope.progress(scope,'levelAppearance',timelineConfig.animationDuration);
-                    }else if(oldLevel < scope.actualLevel){
-                        animateScope.progress(scope,'levelDisappearance ',timelineConfig.animationDuration);
+                    }else if(oldLevel > scope.actualLevel){
+                        animateScope.progress(scope,'levelDisappearance',timelineConfig.animationDuration);
+                    }
+
+                    if(oldEncreasedLevel < scope.increasedLevel){
+                        animateScope.progress(scope,'levelEncreasing',timelineConfig.animationDuration);
+                    }else if(oldEncreasedLevel > scope.increasedLevel){
+                        animateScope.progress(scope,'levelDecreasing',timelineConfig.animationDuration);
                     }
 
                     if(oldLabelLevel < scope.visibleLabelsLevel){ //Visible label level changed
@@ -148,13 +161,19 @@ angular.module('webadminApp')
 
                     if(level === 0){
                         size = timelineConfig.rulerBasicSize * scope.levelAppearance;
-                    }else{
-                        if(level<0){
-                            size = timelineConfig.rulerBasicSize * (1-scope.levelDisappearance);
-                        }else {
-                            size = (Math.min(level, 4) + scope.levelEncreasing) * timelineConfig.rulerStepSize + timelineConfig.rulerBasicSize;
+                    }else if(level<0){
+                        size = timelineConfig.rulerBasicSize * (1 - scope.levelDisappearance);
+                    }else {
+                        var animationModifier = 1;
+                        if(scope.levelAppearance < 1 ){
+                            animationModifier = scope.levelAppearance;
+                        }else if( scope.levelDisappearance < 1){
+                            animationModifier = 2 - scope.levelDisappearance;
                         }
+
+                        size = (Math.min(level, 4) + animationModifier ) * timelineConfig.rulerStepSize + timelineConfig.rulerBasicSize;
                     }
+
 
                     if(size <= 0){
                         return;
