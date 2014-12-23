@@ -3733,7 +3733,7 @@ if __name__ == '__main__':
                 if sys.argv[1] == '--merge-test':
                     MergeTest().test()
                     doCleanUp()
-                elif sys.argv[2] == '--merge-admin':
+                elif sys.argv[1] == '--merge-admin':
                     MergeTest_AdminPassword().test()
                     clusterTest.unittestRollback.removeRollbackDB()
                 elif sys.argv[1] == '--rtsp-test':
