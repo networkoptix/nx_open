@@ -115,7 +115,7 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_emptyPacketCounter(0),
     m_isStillImage(false),
     m_isLongWaiting(false),
-    m_skippingFramesStarted(false),
+    m_skippingFramesTime(AV_NOPTS_VALUE),
     m_executingChangeSpeed(false),
     m_eofSignalSended(false),
     m_videoQueueDuration(0),
@@ -415,8 +415,8 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     // adaptive delay will not solve all problems => need to minus little appendix based on queue size
     qint32 needToSleep;
 
-    if ((vd->flags & QnAbstractMediaData::MediaFlags_BOF) || isPrebuffering)
-        m_lastSleepInterval = needToSleep = 0;
+    if (isPrebuffering)
+        m_lastSleepInterval = 0;
 
     if (vd->flags & AV_REVERSE_BLOCK_START)
     {
@@ -629,7 +629,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 m_nextReverseTime[channel] = m_display[channel]->nextReverseTime();
 
             m_timeMutex.lock();
-            if (m_buffering && m_executingJump == 0 && !m_afterJump && !m_skippingFramesStarted)
+            if (m_buffering && m_executingJump == 0 && !m_afterJump && m_skippingFramesTime == AV_NOPTS_VALUE)
             {
                 m_buffering &= ~(1 << vd->channelNumber);
                 m_timeMutex.unlock();
@@ -685,13 +685,10 @@ void QnCamDisplay::onSkippingFrames(qint64 time)
     m_dataQueue.lock();
     markIgnoreBefore(m_dataQueue, time);
     m_dataQueue.unlock();
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        markIgnoreBefore(m_videoQueue[i], time);
-
     QMutexLocker lock(&m_timeMutex);
     m_singleShotQuantProcessed = false;
     m_buffering = getBufferingMask();
-    m_skippingFramesStarted = true;
+    m_skippingFramesTime = time;
 
     if (m_speed >= 0)
         blockTimeValue(qMax(time, getCurrentTime()));
@@ -821,7 +818,8 @@ void QnCamDisplay::afterJump(QnAbstractMediaDataPtr media)
     //m_previousVideoDisplayedTime = 0;
     m_totalFrames = 0;
     m_iFrames = 0;
-    if (!m_afterJump && !m_skippingFramesStarted) // if not more (not handled yet) jumps expected
+    m_lastSleepInterval = 0;
+    if (!m_afterJump && m_skippingFramesTime == AV_NOPTS_VALUE) // if not more (not handled yet) jumps expected
     {
         for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
             if (media && !(media->flags & QnAbstractMediaData::MediaFlags_Ignore)) {
@@ -1000,6 +998,18 @@ bool QnCamDisplay::needBuffering(qint64 vTime) const
     //return m_audioDisplay->isBuffering() && !flushCurrentBuffer;
 }
 
+void QnCamDisplay::processSkippingFramesTime()
+{
+    QMutexLocker lock(&m_timeMutex);
+    if (m_skippingFramesTime != AV_NOPTS_VALUE)
+    {
+        for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+            markIgnoreBefore(m_videoQueue[i], m_skippingFramesTime);
+        m_skippingFramesTime = AV_NOPTS_VALUE;
+    }
+}
+
+
 bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
 {
 
@@ -1040,9 +1050,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
         m_prevSpeed = speed;
     }
 
-    m_timeMutex.lock();
-    m_skippingFramesStarted = false;
-    m_timeMutex.unlock();
+    processSkippingFramesTime();
 
     if (vd)
     {

@@ -19,6 +19,7 @@
 #include "core/resource/user_resource.h"
 #include "api/global_settings.h"
 #include "database/db_manager.h"
+#include "http/custom_headers.h"
 
 
 /*!
@@ -249,6 +250,10 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnTransactionTransport::at_httpClientDone, Qt::DirectConnection);
     
     fillAuthInfo();
+    if( m_localPeer.isServer() )
+        m_httpClient->addRequestHeader(
+            nx_ec::EC2_SYSTEM_NAME_HEADER_NAME,
+            QnCommonModule::instance()->localSystemName().toUtf8() );
 
     if (!remoteAddr.userName().isEmpty())
     {
@@ -780,8 +785,7 @@ bool QnTransactionTransport::sendSerializedTransaction(Qn::SerializationFormat s
             QnAbstractTransaction abtractTran;
             QnUbjsonReader<QByteArray> stream(&serializedTran);
             QnUbjson::deserialize(&stream, &abtractTran);
-            NX_LOG( QnLog::EC2_TRAN_LOG, lit("send direct transaction to peer %1 command=%2 tt seq=%3 db seq=%4 timestamp=%5").arg(remotePeer().id.toString()).
-                arg(ApiCommand::toString(abtractTran.command)).arg(header.sequence).arg(abtractTran.persistentInfo.sequence).arg(abtractTran.persistentInfo.timestamp), cl_logDEBUG1 );
+            NX_LOG( QnLog::EC2_TRAN_LOG, lit("send direct transaction %1 to peer %2").arg(abtractTran.toString()).arg(remotePeer().id.toString()), cl_logDEBUG1 );
         }
 
         addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));

@@ -282,6 +282,7 @@ QRectF ZoomWindowWidget::constrainedGeometry(const QRectF &geometry, Qt::WindowF
     QSizeF maxSize = geometry.size();
     if(overlayWidget)
         maxSize = QnGeometry::cwiseMax(QnGeometry::cwiseMin(maxSize, overlayWidget->size() * zoomWindowMaxSize), overlayWidget->size() * zoomWindowMinSize);
+
     result = ConstrainedResizable::constrainedGeometry(geometry, pinSection, pinPoint, QnGeometry::expanded(QnGeometry::aspectRatio(size()), maxSize, Qt::KeepAspectRatio));
 
     /* Position constraints go next. */
@@ -305,7 +306,12 @@ QRectF ZoomWindowWidget::constrainedGeometry(const QRectF &geometry, Qt::WindowF
             }
 
             qreal scaleFactor = qMin(xScaleFactor, yScaleFactor);
-            result = ConstrainedResizable::constrainedGeometry(result, pinSection, pinPoint, result.size() * scaleFactor);
+
+            if (scaleFactor < 0 || qFuzzyIsNull(scaleFactor)) {
+                result = QnGeometry::movedInto(result, overlayWidget->rect());
+            } else {
+                result = ConstrainedResizable::constrainedGeometry(result, pinSection, pinPoint, result.size() * scaleFactor);
+            }
         } else {
             result = QnGeometry::movedInto(result, overlayWidget->rect());
         }

@@ -106,6 +106,12 @@ void QnSecurityCamResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
     {
         QnConstResourceVideoLayoutPtr layout = getVideoLayout();
 
+        if (other_casted->m_groupId != m_groupId)
+            modifiedFields << "groupIdChanged";
+
+        if (other_casted->m_groupName != m_groupName)
+            modifiedFields << "groupNameChanged";
+
         m_groupId = other_casted->m_groupId;
         m_groupName = other_casted->m_groupName;
         m_statusFlags = other_casted->m_statusFlags;
@@ -489,7 +495,14 @@ QString QnSecurityCamResource::getGroupId() const {
 }
 
 void QnSecurityCamResource::setGroupId(const QString& value) {
-    SAFE(m_groupId = value)
+    {
+        QMutexLocker locker(&m_mutex);
+        if(m_groupId == value)
+            return;
+        m_groupId = value;
+    }
+
+    emit groupIdChanged(::toSharedPointer(this));   
 }
 
 QString QnSecurityCamResource::getModel() const {

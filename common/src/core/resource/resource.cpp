@@ -184,6 +184,11 @@ void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modif
     if (m_parentId != other->m_parentId) {
         m_parentId = other->m_parentId;
         modifiedFields << "parentIdChanged";
+        if( m_initialized )
+        {
+            m_initialized = false;
+            modifiedFields << "initializedChanged";
+        }
     }
 
     m_locallySavedProperties = other->m_locallySavedProperties;

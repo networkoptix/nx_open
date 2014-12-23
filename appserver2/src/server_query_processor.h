@@ -27,7 +27,17 @@ namespace ec2
     {
         template<class T> 
         void operator()(const QnTransaction<T> &tran) const {
-            qnTransactionBus->sendTransaction( tran, tran.isLocal ? qnTransactionBus->aliveClientPeers().keys().toSet() : QnPeerSet());
+            /* Local transactions (such as setStatus for servers) should only be sent to clients. */
+            if (tran.isLocal) {
+                QnPeerSet clients = qnTransactionBus->aliveClientPeers().keys().toSet();
+                /* Important check! Empty target means 'send to all peers'. */
+                if (!clients.isEmpty())
+                    qnTransactionBus->sendTransaction( tran, clients );
+            }
+            else {
+                /* Send transaction to all peers. */
+                qnTransactionBus->sendTransaction(tran);
+            }
         }
     };
 

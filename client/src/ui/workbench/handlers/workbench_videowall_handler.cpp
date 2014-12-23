@@ -1388,39 +1388,54 @@ void QnWorkbenchVideoWallHandler::at_renameAction_triggered() {
     Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
     QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
 
-    QSet<QnVideoWallResourcePtr> videoWalls;
+    bool valid = false;
+    switch (nodeType) {
+    case Qn::VideoWallItemNode:
+        valid = parameters.videoWallItems().size() == 1 && parameters.videoWallItems().first().isValid();
+        break;
+    case Qn::VideoWallMatrixNode:
+        valid = parameters.videoWallMatrices().size() == 1 && parameters.videoWallMatrices().first().isValid();
+        break;
+    }
+
+    Q_ASSERT_X(valid, Q_FUNC_INFO, "Data should correspond to action profile.");
+    if (!valid)
+        return;
+
+    QString oldName;
+    switch (nodeType) {
+    case Qn::VideoWallItemNode:
+        oldName = parameters.videoWallItems().first().item().name;
+        break;
+    case Qn::VideoWallMatrixNode:
+        oldName = parameters.videoWallMatrices().first().matrix().name;
+        break;
+    }
+
+    if (name.isEmpty() || name == oldName)
+        return;
+
     switch (nodeType) {
     case Qn::VideoWallItemNode:
         {
-            foreach (const QnVideoWallItemIndex &index, parameters.videoWallItems()) {
-                if (!index.isValid())
-                    continue;
-
-                QnVideoWallItem existingItem = index.item();
-                existingItem.name = name;
-                index.videowall()->items()->updateItem(existingItem);
-                videoWalls << index.videowall();
-            }
+            QnVideoWallItemIndex index = parameters.videoWallItems().first();
+            QnVideoWallItem existingItem = index.item();
+            existingItem.name = name;
+            index.videowall()->items()->updateItem(existingItem);
+            saveVideowall(index.videowall());
         }
         break;
     case Qn::VideoWallMatrixNode:
         {
-            foreach (const QnVideoWallMatrixIndex &matrix, parameters.videoWallMatrices()) {
-                if (!matrix.videowall())
-                    continue;
-
-                QnVideoWallMatrix existingMatrix = matrix.videowall()->matrices()->getItem(matrix.uuid());
-                existingMatrix.name = name;
-                matrix.videowall()->matrices()->updateItem(existingMatrix);
-                videoWalls << matrix.videowall();
-            }
+            QnVideoWallMatrixIndex index = parameters.videoWallMatrices().first();
+            QnVideoWallMatrix existingMatrix = index.matrix();
+            existingMatrix.name = name;
+            index.videowall()->matrices()->updateItem(existingMatrix);
+            saveVideowall(index.videowall());
         }
         break;
-    default:
-        return;
     }
 
-    saveVideowalls(videoWalls);
 }
 
 void QnWorkbenchVideoWallHandler::at_identifyVideoWallAction_triggered() {

@@ -44,9 +44,13 @@ QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
     m_updateProcess(NULL),
     m_enableClientUpdates(defaultEnableClientUpdates)
 {
-    auto targetsWatcher = [this] {
+    auto targetsWatcher = [this](const QnResourcePtr &resource) {
+        if (!resource->hasFlags(Qn::server))
+            return;
+
         if (!m_targets.isEmpty())
             return;
+
         emit targetsChanged(actualTargetIds());
     };
     connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   targetsWatcher);
@@ -206,6 +210,11 @@ void QnMediaServerUpdateTool::startUpdate(const QnSoftwareVersion &version /*= Q
 
 void QnMediaServerUpdateTool::startUpdate(const QString &fileName) {
     QnUpdateTarget target(actualTargetIds(), fileName, !m_enableClientUpdates || qnSettings->isClientUpdateDisabled());
+    startUpdate(target);
+}
+
+void QnMediaServerUpdateTool::startOnlineClientUpdate(const QnSoftwareVersion &version) {
+    QnUpdateTarget target(QSet<QnUuid>(), version, !m_enableClientUpdates || qnSettings->isClientUpdateDisabled());
     startUpdate(target);
 }
 

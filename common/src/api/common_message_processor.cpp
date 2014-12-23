@@ -378,6 +378,7 @@ void QnCommonMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData 
 
 void QnCommonMessageProcessor::resetServerUserAttributesList( const QnMediaServerUserAttributesList& serverUserAttributesList )
 {
+    QnMediaServerUserAttributesPool::instance()->clear();
     for( const QnMediaServerUserAttributesPtr& serverAttrs: serverUserAttributesList )
     {
         QnMediaServerUserAttributesPool::ScopedLock userAttributesLock( QnMediaServerUserAttributesPool::instance(), serverAttrs->serverID );
@@ -387,6 +388,7 @@ void QnCommonMessageProcessor::resetServerUserAttributesList( const QnMediaServe
 
 void QnCommonMessageProcessor::resetCameraUserAttributesList( const QnCameraUserAttributesList& cameraUserAttributesList )
 {
+    QnCameraUserAttributePool::instance()->clear();
     for( const QnCameraUserAttributesPtr& cameraAttrs: cameraUserAttributesList )
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), cameraAttrs->cameraID );

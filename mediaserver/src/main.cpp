@@ -1469,7 +1469,6 @@ void QnMain::run()
              QnSyncTime::instance(), (void(QnSyncTime::*)(qint64))&QnSyncTime::updateTime );
 
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
-    QnMServerResourceSearcher::instance()->setAppPServerGuid(connectInfo.ecsGuid.toUtf8());
     QnMServerResourceSearcher::instance()->start();
 
     //Initializing plugin manager
@@ -1840,12 +1839,12 @@ void QnMain::run()
 
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(localInterfacesChanged()), this, SLOT(at_localInterfacesChanged()));
 
-    m_firstRunningTime = MSSettings::roSettings()->value("lastRunningTime").toLongLong();
+    m_firstRunningTime = MSSettings::runTimeSettings()->value("lastRunningTime").toLongLong();
 
     at_timer();
     QTimer timer;
     connect(&timer, SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
-    at_connectionOpened();
+    QTimer::singleShot(3000, this, SLOT(at_connectionOpened()));
     timer.start(60 * 1000);
 
 

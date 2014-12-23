@@ -4445,7 +4445,7 @@ Please close the application and start it again using the shortcut in the start 
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="268"/>
         <source>Failed to launch compatibility version %1
 Try to restore version %1?</source>
-        <translation>未能与当前版本兼容成功。
+        <translation type="unfinished">未能与当前版本兼容成功。
 请尝试恢复版本。</translation>
     </message>
 </context>
@@ -5053,7 +5053,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/workbench/extensions/workbench_layout_export_tool.cpp" line="329"/>
         <source>Exporting to &quot;%2&quot;...</source>
-        <translation>导出至 &quot;%1&quot;... {2&quot;?}</translation>
+        <translation>导出至 &quot;%2&quot;...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/extensions/workbench_layout_export_tool.cpp" line="382"/>
@@ -5599,7 +5599,7 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="939"/>
         <source>%1 (Tour &quot;%2&quot; is active)</source>
-        <translation>%1轮巡</translation>
+        <translation type="unfinished">%1轮巡</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="218"/>
@@ -5629,7 +5629,7 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="925"/>
         <source>%1x%2 %3fps @ %4Mbps%5 %6	%7</source>
-        <translation>%1x%2 %3fps @ %4Mbps%5 %6	%7 {1x?} {2 %3f?} {4M?}</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="209"/>
@@ -6202,7 +6202,7 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="631"/>
         <source>Manage PTZ for %1</source>
-        <translation>摄像机云台管理</translation>
+        <translation type="unfinished">摄像机云台管理</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="674"/>
@@ -6215,7 +6215,7 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/models/ptz_manage_model.cpp" line="53"/>
         <source>New tour %1</source>
-        <translation>新轮巡</translation>
+        <translation type="unfinished">新轮巡%1</translation>
     </message>
     <message>
         <location filename="../src/ui/models/ptz_manage_model.cpp" line="116"/>
@@ -6705,7 +6705,7 @@ These tours will become invalid if you remove it.</source>
     <message numerus="yes">
         <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="754"/>
         <source>%1 (up %n days, %2)</source>
-        <translation>
+        <translation type="unfinished">
             <numerusform>%1 %2 (上 %n 天 %3) {1 ?} {2)?}</numerusform>
         </translation>
     </message>
@@ -7762,7 +7762,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/business/business_resource_validation.cpp" line="116"/>
         <source>User %1 has invalid email address</source>
-        <translation>用户 %1 拥有无效的邮件地址：%2</translation>
+        <translation type="unfinished">用户 %1 拥有无效的邮件地址</translation>
     </message>
 </context>
 <context>
@@ -8251,7 +8251,7 @@ Please close the application and start it again using the shortcut in the start 
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2425"/>
         <source>Some components of the system are not updated:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please update all components to the latest version %2.</source>
-        <translation>系统部分组件未更新:&lt; br / &gt; &lt; br / &gt; % 1 &lt; br / &gt;,请更新到最新版本% 2所有组件。</translation>
+        <translation type="unfinished">系统部分组件未更新:&lt; br / &gt; &lt; br / &gt; %1 &lt; br / &gt;,请更新到最新版本%2所有组件。</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2441"/>
@@ -8592,7 +8592,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="542"/>
         <source>%1 Media File (*.nov)</source>
-        <translation>媒体文件(*.nov)</translation>
+        <translation type="unfinished">%1 媒体文件(*.nov)</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="673"/>

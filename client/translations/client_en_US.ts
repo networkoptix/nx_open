@@ -7986,7 +7986,7 @@ AVAILABLE</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="855"/>
         <source>Can&apos;t move camera(s) to other server. Server %1 doesn&apos;t answer to request.</source>
-        <translation>Cannot move camera(s) to server. Server is unresponsive.</translation>
+        <translation>Cannot move camera(s) to server %1. Server is unresponsive.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="878"/>
@@ -9027,7 +9027,7 @@ Another user is already controlling this screen.</translation>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="516"/>
         <source>Video Wall will be started now. Do you want to close this %1 Client instance?</source>
-        <translation>Video wall is about to start. Would you like to close this client instance?</translation>
+        <translation>Video Wall is about to start. Would you like to close this %1 Client instance?</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="901"/>
