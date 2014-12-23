@@ -122,6 +122,10 @@ static qint64 actsTimeToUTCMillis( const char* actsStr )
     sscanf( actsStr, "%d %d-%d-%d %d:%d:%d %d %d %d %f", 
         &mjd, &curTime.tm_year, &curTime.tm_mon, &curTime.tm_mday, 
         &curTime.tm_hour, &curTime.tm_min, &curTime.tm_sec, &curTime.tm_isdst, &leap, &health, &msADV );
+
+    if( curTime.tm_year == 0 )
+        return -1; // Server doesn't return correct time
+
     curTime.tm_mon -= 1;    //must be from 0 to 11
     curTime.tm_year += 100; //current year minus 1900
     curTime.tm_isdst = 0;   //we have UTC in curTime and there is no DST in UTC

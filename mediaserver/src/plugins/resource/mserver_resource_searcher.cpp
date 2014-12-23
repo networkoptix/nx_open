@@ -262,7 +262,7 @@ void QnMServerResourceSearcher::readSocketInternal(AbstractDatagramSocket* socke
         if (datagramSize > 0) {
             QByteArray responseData((const char*) tmpBuffer, datagramSize);
             DiscoveryPacket packet(responseData);
-            if (packet.isValidPacket() && packet.systemName() != qnCommon->localSystemName()) {
+            if (packet.isValidPacket() && QString::fromUtf8(packet.systemName()) != qnCommon->localSystemName()) {
                 QStringList cameras = conflictList.camerasByServer.contains(packet.appServerHost())
                     ? conflictList.camerasByServer[packet.appServerHost()]
                     : QStringList();
