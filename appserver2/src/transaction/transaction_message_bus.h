@@ -8,6 +8,7 @@
 
 #include <common/common_module.h>
 #include <utils/common/enable_multi_thread_direct_connection.h>
+#include <utils/common/enable_safe_callback_support.h>
 
 #include <nx_ec/ec_api.h>
 #include "nx_ec/data/api_lock_data.h"
@@ -53,16 +54,14 @@ namespace ec2
 
         /*!
             \param handler Control of life-time of this object is out of scope of this class
+            \return handler ID used to remove handler
         */
-        void setHandler(ECConnectionNotificationManager* handler) { 
-            QMutexLocker lock(&m_mutex);
-            m_handler = handler;
+        qint64 addHandler(ECConnectionNotificationManager* handler) { 
+            return m_notificationCallbackManager.registerReceiver( handler );
         }
 
-        void removeHandler(ECConnectionNotificationManager* handler) { 
-            QMutexLocker lock(&m_mutex);
-            if( m_handler == handler )
-                m_handler = nullptr;
+        void removeHandler(qint64 handlerID) { 
+            m_notificationCallbackManager.unregisterReceiverAndJoin( handlerID );
         }
 
         template<class T>
@@ -242,6 +241,8 @@ namespace ec2
         // alive control
         QElapsedTimer m_aliveSendTimer;
         std::unique_ptr<QnRuntimeTransactionLog> m_runtimeTransactionLog;
+        //!Holds transaction notification receivers
+        EnableSafeCallbackSupport<ECConnectionNotificationManager*> m_notificationCallbackManager;
     };
 }
 #define qnTransactionBus ec2::QnTransactionMessageBus::instance()

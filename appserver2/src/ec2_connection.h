@@ -36,6 +36,7 @@ namespace ec2
     private:
         std::unique_ptr<QnTransactionLog> m_transactionLog;
         const QnConnectionInfo m_connectionInfo;
+        qint64 m_notificationReceiverID;
     };
     typedef std::shared_ptr<Ec2DirectConnection> Ec2DirectConnectionPtr;
 }
