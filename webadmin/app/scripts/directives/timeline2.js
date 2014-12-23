@@ -17,16 +17,17 @@ angular.module('webadminApp')
                     zoomStep: 1.3, // Zoom speed
                     maxTimeLineWidth: 30000000, // maximum width for timeline, which browser can handle
                     // TODO: support changing boundaries on huge detailization
-                    initialZoom: 0, // Начальный масштаб (степень) 0 - чтобы увидеть весь таймлайн.
-                    updateInterval: 20, // Интервал обновления таймлайна
-                    animationDuration: 400, // Скорость анимации, 200-400 прикольно
-                    rulerColor:[187,187,187], //Цвет линейки и подписи
-                    rulerFontSize: 9, // Размер надписи на линейке
-                    rulerFontStep: 1, // Шаг увеличения надписи на линейке
-                    rulerBasicSize: 6, //Базовая высота штриха на линейке
-                    rulerStepSize: 3,// Шаг увеличения штрихов
-                    rulerLabelPadding: 0.3, // Отступ в линейке над надписью
-                    minimumMarkWidth: 5 // Ширина, при которой появлется новый уровень отметок на линейке
+                    initialZoom: 0, // Initial zoom step 0 - to see whole timeline without scroll.
+                    updateInterval: 20, // Animation interval
+                    animationDuration: 400, // 200-400 for smooth animation
+                    rulerColor:[187,187,187], //Color for ruler marks and labels
+                    rulerFontSize: 9, // Smallest font size for labels
+                    rulerFontStep: 1, // Step for increasing font size
+                    rulerBasicSize: 6, // Size for smallest mark on ruler
+                    rulerStepSize: 3,// Step for increasing marks
+                    rulerLabelPadding: 0.3, // Padding between marks and labels (according to font size)
+                    minimumMarkWidth: 5, // Minimum available width for smallest marks on ruler
+                    maximumScrollScale: 20// Maximum scale for scroll frame inside viewport - according to viewport width
                 };
 
                 var viewportWidth = element.find('.viewport').width();
@@ -40,16 +41,23 @@ angular.module('webadminApp')
                     var now = (new Date()).getTime();
                     scope.start = scope.records? scope.records.start : (now - timelineConfig.initialInterval);
                     scope.end = now;
-                    //scope.ruler = new RulerModel(scope.start, scope.end + timelineConfig.futureInterval);
-                    //scope.start = scope.ruler.start;
-
                     updateView();
                 }
 
                 var scroll = element.find('.scroll');
-                function viewPortScroll(value){
-                    return value?scroll.scrollLeft(value):scroll.scrollLeft();
+
+
+                function viewPortScrollRelative(value){
+                    var currentScrollScale = scope.scrollWidth / viewportWidth;
+                    if(typeof(value) ==='undefined') {
+                        var position = scroll.scrollLeft() + viewportWidth/2;
+                        return position / scope.scrollWidth;
+                    } else {
+                        var setValue = Math.round(Math.max(value * scope.scrollWidth - viewportWidth/2,0));
+                        scroll.scrollLeft(setValue);
+                    }
                 }
+
 
                 function formatColor(color,alpha){
                     var color =  'rgba(' +
@@ -60,23 +68,15 @@ angular.module('webadminApp')
 
                     return color;
                 }
-                function zoomLevel(zoom){
-                    if(typeof(zoom)==='undefined') {
-                        zoom = scope.actualZoomLevel;
-                    }
-                    return Math.pow(timelineConfig.zoomStep,zoom);
-                }
 
-                function initialWidth(zoom){
-                    if(typeof(zoom) === 'undefined'){
-                        return scope.actualWidth;
-                    }
-                    return viewportWidth * zoomLevel(zoom);
+                function zoomLevel(){
+                    return Math.pow(timelineConfig.zoomStep,scope.actualZoomLevel);
                 }
 
                 function secondsPerPixel () {
-                    return (scope.end - scope.start) / initialWidth() / 1000;
+                    return (scope.end - scope.start) / scope.actualWidth / 1000;
                 }
+
                 function updateActualLevel(){
                     var oldLevel = scope.actualLevel;
                     var oldLabelLevel = scope.visibleLabelsLevel;
@@ -94,7 +94,9 @@ angular.module('webadminApp')
                             break;
                         }
                     }
+
                     scope.actualLevel = i-1;
+
                     if(oldLevel < scope.actualLevel){ // Level up - run animation for appearance of new level
                         animateScope.progress(scope,'levelAppearance',timelineConfig.animationDuration);
                     }else if(oldLevel < scope.actualLevel){
@@ -106,36 +108,34 @@ angular.module('webadminApp')
                     }else if(oldLabelLevel > scope.visibleLabelsLevel){
                         animateScope.progress(scope,'labelDisappearance',timelineConfig.animationDuration);
                     }
+
                 }
 
-                function positionToDate(position){
-                    return Math.round(scope.start + (scope.frameEnd - scope.start) * position / scope.frameWidth);
-                }
 
-                function dateToPosition(date,zoom){
-                    return (date - scope.start) * initialWidth(zoom) / (scope.end - scope.start);
+
+
+                function screenStartPosition(){
+                    return viewPortScrollRelative() * scope.frameWidth - viewportWidth/2;
                 }
 
                 function dateToScreenPosition(date){
-                    return dateToPosition(date) - viewPortScroll();
+                    var position = (date - scope.start) * scope.frameWidth / (scope.frameEnd - scope.start);
+                    return position - screenStartPosition(0);
                 }
 
+
                 function screenPositionToDate(position){
-                    return positionToDate(position + viewPortScroll());
+                    //1. Get Relative Position and calculate it's date, related to frame
+                    var totalInterval = (scope.frameEnd - scope.start);
+                    var currentZoom = scope.actualWidth / viewportWidth;
+                    var toret = scope.start +  totalInterval * (viewPortScrollRelative() + (position - 0.5) / currentZoom);
+                    return Math.round(toret);
                 }
 
                 function updateDetailization(){
-                    /*var scrollStart = viewPortScroll();
-
-                    var start = positionToDate (Math.max(0,scrollStart));
-                    var end = positionToDate (Math.min(scope.frameEnd,scrollStart + viewportWidth));
-*/
                     //4. Set interval for events
                     //TODO: Set interval for events
                     //console.warn('Set interval for events', new Date(start), new Date(end), scope.actualLevel);
-
-                    //5. Set interval for ruler
-                    //scope.ruler.setInterval(start,end,scope.actualLevel);
                 }
 
                 function drawMark(context, coordinate, level, labelLevel, label){
@@ -193,20 +193,17 @@ angular.module('webadminApp')
                 }
 
                 function drawRuler(){
-
-                    //1. Создаем контекст рисования
+                    //1. Create context for drawing
                     var context = canvas.getContext('2d');
                     context.fillStyle = formatColor(timelineConfig.rulerColor,1);
 
                     context.clearRect(0, 0, canvas.width, canvas.height);
 
-                    //2. C учетом масштаба квантуем видимый интервал (выраваниваем начало назад, потом добавляем интервал сколько нужно раз - отрицательные координаты пропускаем)
+                    //2. Align visible interval to current level (start to past, end to future)
                     var level = RulerModel.levels[scope.actualLevel];
-                    var scrollStart = viewPortScroll();
 
-                    var end = level.interval.alignToFuture (positionToDate (scrollStart + viewportWidth));
-                    var position = level.interval.alignToPast(positionToDate (Math.max(0,scrollStart)));
-
+                    var end = level.interval.alignToFuture (screenPositionToDate(1));
+                    var position = level.interval.alignToPast(screenPositionToDate(0));
 
                     var findLevel = function(level){
                         return level.interval.checkDate(position);
@@ -230,32 +227,22 @@ angular.module('webadminApp')
 
                             var nextposition =level.interval.addToDate(position );
                             var smallLevel = RulerModel.levels[scope.actualLevel+1];
-                            while(smallposition <nextposition ){
+                            while(smallposition < nextposition ){
                                 smallposition = smallLevel.interval.addToDate(smallposition);
                                 screenPosition = dateToScreenPosition(smallposition);
                                 drawMark(context, screenPosition, -1); // Draw hiding position
                             }
                         }
-
-                        position = level.interval.addToDate(position );
+                        position = level.interval.addToDate(position);
                     }
                 }
                 function updateView(){
+                    // Update boundaries to current moment
+                    scope.frameEnd = (new Date()).getTime();
+                    scope.frameWidth = Math.round(scope.actualWidth * (scope.frameEnd -  scope.start)/(scope.end - scope.start));
 
                     updateActualLevel();
-
-                    var oldframe = scope.frameWidth;
-                    scope.frameEnd = (new Date()).getTime();
-
-                    scope.frameWidth = Math.round(initialWidth() * (scope.frameEnd -  scope.start)/(scope.end - scope.start));
-
-                    //Draw ruler
                     drawRuler();
-
-                    if(oldframe !== scope.frameWidth) {
-                        frame.width(scope.frameWidth);
-                    }
-
                     updateDetailization();
                 }
 
@@ -268,7 +255,8 @@ angular.module('webadminApp')
                 //animation parameters
                 scope.scrollPosition = 0;
                 scope.actualWidth = viewportWidth;
-                scope.levelAppearance = 1; // Appearing new marks level
+                scope.scrollWidth = viewportWidth;
+                scope.levelAppearance   = 1; // Appearing new marks level
                 scope.levelDisappearance = 1;// Hiding mark from oldlevel
                 scope.levelEncreasing = 1; // Encreasing existing mark level
                 scope.levelDecreasing = 1; // Encreasing existing mark level
@@ -277,36 +265,35 @@ angular.module('webadminApp')
 
                 scope.zoom = function(zoomIn, speed, targetScrollTime, targetScrollTimePosition){
                     speed = speed || 1;
-                    if(!targetScrollTime){
-                        targetScrollTime = positionToDate(viewPortScroll() + viewportWidth/2);
-                        targetScrollTimePosition = 0.5;
-                    }
-
-                    var targetZoom = scope.actualZoomLevel;
 
                     if(zoomIn && !scope.disableZoomIn) {
-                        targetZoom += speed;
+                        scope.actualZoomLevel += speed;
                     }
 
                     if(!zoomIn && !scope.disableZoomOut ) {
-                        targetZoom -= speed;
-                        if(targetZoom <= 0) {
-                            targetZoom = 0;
+                        scope.actualZoomLevel -= speed;
+                        if(scope.actualZoomLevel <= 0) {
+                            scope.actualZoomLevel = 0;
                         }
                     }
 
-                    scope.actualZoomLevel = targetZoom;
-
-                    var targetWidth = initialWidth(targetZoom);
-
-                    scope.scrollPosition = viewPortScroll();
-                    var newScrollPosition = dateToPosition(targetScrollTime,targetZoom) - viewportWidth * targetScrollTimePosition;
+                    var targetWidth = viewportWidth * zoomLevel();
                     animateScope.animate(scope,'actualWidth',targetWidth,timelineConfig.animationDuration);
-                    animateScope.animate(scope,'scrollPosition',newScrollPosition,timelineConfig.animationDuration,function(position){
-                        viewPortScroll(position);
+
+                    //We should keep relative position during resizing width
+                    var scrollRelativePosition = viewPortScrollRelative();
+                    animateScope.progress(scope,'scrollPosition',timelineConfig.animationDuration,function(){
+                        var oldframe = scope.scrollWidth;
+                        scope.scrollWidth = Math.round(Math.min( scope.frameWidth, timelineConfig.maximumScrollScale * viewportWidth));
+
+                        if(oldframe !== scope.scrollWidth) {
+                            frame.width(scope.scrollWidth);
+                            viewPortScrollRelative(scrollRelativePosition);
+                        }
                     });
 
-                    scope.disableZoomOut =  targetZoom <= 0;
+
+                    scope.disableZoomOut =  scope.actualZoomLevel <= 0;
 
                     console.warn('fix disablezoomin calculation');
 

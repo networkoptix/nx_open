@@ -49,7 +49,7 @@ angular.module('webadminApp')
                 window.oRequestAnimationFrame ||
                 window.msRequestAnimationFrame ||
                 function(callback) {
-                    window.setTimeout(callback, timelineConfig.updateInterval);
+                    window.setTimeout(callback, 1000/50); // target: 50fps
                 };
         })();
 
