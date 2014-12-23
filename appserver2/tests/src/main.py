@@ -546,7 +546,7 @@ class BasicGenerator():
         m = md5.new()
         m.update("%s:NetworkOptix:%s" % (uname,pwd))
         d = m.digest()
-        return ''.join("%02x" % (ord(i) for i in d))
+        return ''.join("%02x" % ord(i) for i in d)
     
     def generatePasswordHash(self,pwd):
         salt = "%x" % (random.randint(0,4294967295))
@@ -670,7 +670,7 @@ class UserDataGenerator(BasicGenerator):
         "email": "%s",
         "hash": "%s",
         "id": "%s",
-        "isAdmin": false,
+        "isAdmin": %s,
         "name": "%s",
         "parentId": "{00000000-0000-0000-0000-000000000000}",
         "permissions": "255",
@@ -687,7 +687,7 @@ class UserDataGenerator(BasicGenerator):
             ret.append((self._template % (digest,
                 self.generateEmail(),
                 self.generatePasswordHash(pwd),
-                id,un),id))
+                id,"false",un),id))
 
         return ret
 
@@ -696,7 +696,18 @@ class UserDataGenerator(BasicGenerator):
         return (self._template % (digest,
                 self.generateEmail(),
                 self.generatePasswordHash(pwd),
-                id,un),id)
+                id,"false",un),id)
+
+    def createManualUpdateData(self,id,username,password,admin,email):
+        digest = self.generateDigest(username,password)
+        hash = self.generatePasswordHash(password)
+        if admin:
+            admin = "true"
+        else:
+            admin = "false"
+        return self._template%(digest,
+                                email,
+                                hash,id,admin,username)
 
 class MediaServerGenerator(BasicGenerator):
     _template = """
@@ -1774,7 +1785,7 @@ class PrepareServerStatus(BasicGenerator):
             raise Exception("Cannot generate random states:%s" % (reason))
     
 # This class is used to control the whole merge test
-class MergeTest(MergeTestBase):
+class MergeTest_Resource(MergeTestBase):
     _gen = BasicGenerator()
     _lock = threading.Lock()
 
@@ -1846,16 +1857,348 @@ class MergeTest(MergeTestBase):
 
     def test(self):
         print "================================\n"
-        print "Server Merge Test Start\n"
+        print "Server Merge Test:Resource Start\n"
 
         self._prolog()
         self._phase1()
         self._phase2()
         self._epilog()
 
-        print "Server Merge Test End\n"
+        print "Server Merge Test:Resource End\n"
         print "================================\n"
 
+# This merge test is used to test admin's password 
+# Steps:
+# Change _EACH_ server into different system name
+# Modify _EACH_ server's password into a different one 
+# Reconnect to _EACH_ server with _NEW_ password and change its system name back to mergeTest
+# Check _EACH_ server's status that with a possible password in the list and check getMediaServer's Status
+# also _ALL_ the server must be Online
+
+# NOTES:
+# I found a very radiculous truth, that if one urllib2.urlopen failed with authentication error, then the
+# opener will be screwed up, and you have to reinstall that openner again. This is really stupid truth .
+
+class MergeTest_AdminPassword(MergeTestBase):
+    _newPasswordList = dict() # list contains key:serverAddr , value:password
+    _oldClusterPassword = None # old cluster user password , it should be 123 always
+    _username = None # User name for cluster, it should be admin
+    _clusterSharedPassword = None
+    _adminList = dict() # The dictionary for admin user on each server
+
+    def __init__(self):
+        # load the configuration file for username and oldClusterPassword
+        config_parser = ConfigParser.RawConfigParser()
+        config_parser.read("ec2_tests.cfg")
+        self._oldClusterPassword = config_parser.get("General","password")
+        self._username = config_parser.get("General","username")
+
+    def _generateUniquePassword(self):
+        ret = []
+        s = set()
+        gen = BasicGenerator()
+        for server in clusterTest.clusterTestServerList:
+            # Try to generate a unique password
+            pwd = gen.generateRandomString(20)
+            if pwd in s:
+                continue
+            else:
+                # The password is new password
+                ret.append((server,pwd))
+                self._newPasswordList[server]=pwd
+
+        return ret
+    # This function MUST be called after you change each server's
+    # password since we need to update the installer of URLLIB2
+
+    def _setUpNewAuthentication(self,pwdlist):
+        passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
+        for entry in pwdlist:
+            passman.add_password("NetworkOptix","http://%s/ec2" % (entry[0]), self._username, entry[1])
+            passman.add_password("NetworkOptix","http://%s/api" % (entry[0]), self._username, entry[1])
+        urllib2.install_opener(urllib2.build_opener(urllib2.HTTPDigestAuthHandler(passman)))
+
+    def _setUpClusterAuthentication(self,password):
+        passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
+        for s in clusterTest.clusterTestServerList:
+            passman.add_password("NetworkOptix","http://%s/ec2" % (s), self._username, password)
+            passman.add_password("NetworkOptix","http://%s/api" % (s), self._username, password)
+        urllib2.install_opener(urllib2.build_opener(urllib2.HTTPDigestAuthHandler(passman)))
+
+    def _restoreAuthentication(self):
+        self._setUpClusterAuthentication(self._oldClusterPassword)
+
+    def _merge(self):
+        self._setClusterToMerge()
+        time.sleep(self._mergeTestTimeout)
+
+    def _checkPassword(self,pwd,old_server,login_server):
+        print "Password:%s that initially modified on server:%s can log on to server:%s in new cluster"%(pwd,old_server,login_server)
+        print "Notes,the above server can be the same one, however since this test is after merge, it still makes sense"
+        print "Now test whether it works on the cluster"
+        for s in clusterTest.clusterTestServerList:
+            if s == login_server:
+                continue
+            else:
+                response = None
+                try:
+                    response = urllib2.urlopen("http://%s/ec2/testConnection"%(s))
+                except urllib2.URLError,e:
+                    print "This password cannot log on server:%s"%(s)
+                    print "This means this password can be used partially on cluster which is not supposed to happen"
+                    print "The cluster is not synchronized after merge"
+                    print "Error:%s"%(e)
+                    return False
+
+        print "This password can be used on the whole cluster"
+        return True
+        
+    # This function is used to probe the correct password that _CAN_ be used to log on each server
+    def _probePassword(self):
+        possiblePWD = None
+        for entry in self._newPasswordList:
+            pwd = self._newPasswordList[entry]
+            # Set Up the Authencation here
+            self._setUpClusterAuthentication(pwd)
+            for server in clusterTest.clusterTestServerList:
+                response = None
+                try:
+                    response = urllib2.urlopen("http://%s/ec2/testConnection"%(server))
+                except urllib2.URLError,e:
+                    # Every failed urllib2.urlopen will screw up the opener 
+                    self._setUpClusterAuthentication(pwd)
+                    continue # This password doesn't work
+
+                if response.getcode() != 200:
+                    response.close()
+                    continue
+                else:
+                    possiblePWD = pwd
+                    break
+            if possiblePWD != None:
+                if self._checkPassword(possiblePWD,entry,server):
+                    self._clusterSharedPassword = possiblePWD
+                    return True
+                else:
+                    return False
+        print "No password is found while probing the cluster"
+        print "This means after the merge,all the password originally on each server CANNOT be used to log on any server after merge"
+        print "This means cluster is not synchronized"
+        return False
+
+    # This function is used to test whether all the server gets the exactly same status
+    def _checkAllServerStatus(self):
+        self._setUpClusterAuthentication(self._clusterSharedPassword)
+        # Now we need to set up the check
+        ret,reason = clusterTest.checkMethodStatusConsistent("getMediaServersEx?format=json")
+        if not ret:
+            print reason
+            return False
+        else:
+            return True
+
+    def _checkOnline(self,uidset,response,serverAddr):
+        obj = json.loads(response)
+        for ele in obj:
+            if ele["id"] in uidset:
+                if ele["status"] != "Online":
+                    # report the status
+                    print "Login at server:%s"%(serverAddr)
+                    print "The server:(%s) with name:%s and id:%s status is Offline"%(ele["networkAddresses"],ele["name"],ele["id"])
+                    print "It should be Online after the merge"
+                    print "Status check failed"
+                    return False
+        print "Status check for server:%s pass!"%(serverAddr)
+        return True
+
+    def _checkAllOnline(self):
+        uidSet = set()
+        # Set up the UID set for each registered server
+        for uid in clusterTest.clusterTestServerUUIDList:
+            uidSet.add(uid[0])
+
+        # For each server test whether they work or not
+        for s in clusterTest.clusterTestServerList:
+            print "Connection to http://%s/ec2/getMediaServersEx?format=json"%(s)
+            response = urllib2.urlopen("http://%s/ec2/getMediaServersEx?format=json"%(s))
+            if response.getcode() != 200:
+                print "Connection failed with HTTP code:%d"%(response.getcode())
+                return False
+            if not self._checkOnline(uidSet,response.read(),s):
+                return False
+
+        return True
+
+    def _fetchAdmin(self):
+        for s in clusterTest.clusterTestServerList:
+            response = urllib2.urlopen("http://%s/ec2/getUsers"%(s))
+            obj = json.loads(response.read())
+            for entry in obj:
+                if entry["isAdmin"]:
+                    self._adminList[s] = (entry["id"],entry["name"],entry["email"])
+
+    def _setAdminPassword(self,ser,pwd,verbose=True):
+        oldAdmin = self._adminList[ser]
+        d = UserDataGenerator().createManualUpdateData(oldAdmin[0],oldAdmin[1],pwd,True,oldAdmin[2])
+        req = urllib2.Request("http://%s/ec2/saveUser" % (ser), \
+                data=d, headers={'Content-Type': 'application/json'})
+        try:
+            response =urllib2.urlopen(req)
+        except:
+            if verbose:
+                print "Connection http://%s/ec2/saveUsers failed"%(ser)
+                print "Cannot set admin password:%s to server:%s"%(pwd,ser)
+            return False
+
+        if response.getcode() != 200:
+            response.close()
+            if verbose:
+                print "Connection http://%s/ec2/saveUsers failed"%(ser)
+                print "Cannot set admin password:%s to server:%s"%(pwd,ser)
+            return False
+        else:
+            response.close()
+            return True
+
+    # This rollback is bit of tricky since it NEEDS to rollback partial password change
+    def _rollbackPartialPasswordChange(self,pwdlist):
+        # Now rollback the newAuth part of the list
+        for entry in pwdlist:
+            if not self._setAdminPassword(entry[0],self._oldClusterPassword):
+                print "----------------------------------------------------------------------------------"
+                print "+++++++++++++++++++++++++++++++++++ IMPORTANT ++++++++++++++++++++++++++++++++++++"
+                print "Server:%s admin password cannot rollback,please set it back manually!"%(entry[0])
+                print "It's current password is:%s"%(entry[1])
+                print "It's old password is:%s"(self._oldClusterPassword)
+                print "----------------------------------------------------------------------------------"
+        # Now set back the authentcation 
+        self._restoreAuthentication()
+
+    # This function is used to change admin's password on each server
+    def _changePassword(self):
+        pwdlist = self._generateUniquePassword()
+        uGen = UserDataGenerator()
+        idx = 0
+        for entry in pwdlist:
+            pwd = entry[1]
+            ser = entry[0]
+            if self._setAdminPassword(ser,pwd):
+                idx = idx+1
+            else:
+                # Before rollback we need to setup the authentication
+                partialList = pwdlist[:idx]
+                self._setUpNewAuthentication(partialList)
+                # Rollback the password paritally
+                self._rollbackPartialPasswordChange(partialList)
+                return False
+        # Set Up New Authentication
+        self._setUpNewAuthentication(pwdlist)
+        return True
+
+    def _rollback(self):
+        # rollback the password to the old states
+        self._rollbackPartialPasswordChange(
+            [(s,self._oldClusterPassword) for s in clusterTest.clusterTestServerList])
+
+        # rollback the system name 
+        self._rollbackSystemName()
+
+    def _failRollbackPassword(self):
+        # The current problem is that we don't know which password works so
+        # we use a very conservative way to do the job. We use every password
+        # that may work to change the whole cluster
+        addrSet = set()
+
+        for server in self._newPasswordList:
+            pwd = self._newPasswordList[server]
+            authList = [(s,pwd) for s in clusterTest.clusterTestServerList]
+            self._setUpNewAuthentication(authList)
+
+            # Now try to login on to the server and then set back the admin
+            check = False
+            for ser in clusterTest.clusterTestServerList:
+                if ser in addrSet:
+                    continue
+                check = True
+                if self._setAdminPassword(ser,self._oldClusterPassword,False):
+                    addrSet.add(ser)
+                else:
+                    self._setUpNewAuthentication(authList)
+
+            if not check:
+                return True
+
+        if len(addrSet) != len(clusterTest.clusterTestServerList):
+            print "There're some server's admin password I cannot prob and rollback"
+            print "Since it is a failover rollback,I cannot guarantee that I can rollback the whole cluster"
+            print "There're possible bugs in the cluster that make the automatic rollback impossible"
+            print "The following server has _UNKNOWN_ password now"
+            for ser in clusterTest.clusterTestServerList:
+                if ser not in addrSet:
+                    print "The server:%s has _UNKNOWN_ password for admin"%(ser)
+            return False
+        else:
+            return True
+
+    def _failRollback(self):
+        print "==========================================="
+        print "Start Failover Rollback"
+        print "This rollback will _ONLY_ happen when the merge test failed"
+        print "This rollback cannot guarantee that it will rollback everything"
+        print "Detail information will be reported during the rollback"
+        if self._failRollbackPassword():
+            self._restoreAuthentication()
+            self._rollbackSystemName()
+            print "Failover Rollback Done!"
+        else:
+            print "Failover Rollback Failed!"
+        print "==========================================="
+
+    def test(self):
+        print "==========================================="
+        print "Merge Test:Admin Password Test Start!"
+        # At first, we fetch each system's admin information
+        self._fetchAdmin()
+        # Change each system into different system name
+        print "Now set each server node into different and UNIQUE system name\n"
+        self._setClusterSystemRandom()
+        # Change the password of _EACH_ servers
+        print "Now change each server node's admin password to a UNIQUE password\n"
+        if not self._changePassword():
+            print "Merge Test:Admin Password Test Failed"
+            return False
+        print "Now set the system name back to mergeTest and wait for the merge\n"
+        self._merge()
+        # Now start to probing the password
+        print "Start to prob one of the possible password that can be used to LOG to the cluster\n"
+        if not self._probePassword():
+            print "Merge Test:Admin Password Test Failed"
+            self._failRollback()
+            return False
+        print "Check all the server status\n"
+        # Now start to check the status
+        if not self._checkAllServerStatus():
+            print "Merge Test:Admin Password Test Failed"
+            self._failRollback()
+            return False
+        print "Check all server is Online or not"
+        if not self._checkAllOnline():
+            print "Merge Test:Admin Password Test Failed"
+            self._failRollback()
+            return False
+
+        print "Lastly we do rollback\n"
+        self._rollback()
+
+        print "Merge Test:Admin Password Test Pass!"
+        print "==========================================="
+
+class MergeTest:
+    def test(self):
+        MergeTest_Resource().test()
+        # The following merge test ALWAYS fail and I don't know it is my problem or not
+        # Current it is disabled and you could use a seperate command line to run it 
+        #MergeTest_AdminPassword().test()
 
 # ===================================
 # RTSP test
@@ -2629,7 +2972,6 @@ def runRtspPerf():
     RtspPerf().run()
     clusterTest.unittestRollback.removeRollbackDB()
 
-
 # Performance test function
 # only support add/remove ,value can only be user and media server
 class PerformanceOperation():
@@ -3391,7 +3733,9 @@ if __name__ == '__main__':
                 if sys.argv[1] == '--merge-test':
                     MergeTest().test()
                     doCleanUp()
-
+                elif sys.argv[2] == '--merge-admin':
+                    MergeTest_AdminPassword().test()
+                    clusterTest.unittestRollback.removeRollbackDB()
                 elif sys.argv[1] == '--rtsp-test':
                     runRtspTest()
                 elif sys.argv[1] == '--rtsp-perf':
