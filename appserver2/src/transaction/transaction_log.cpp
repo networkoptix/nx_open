@@ -145,6 +145,7 @@ ErrorCode QnTransactionLog::updateSequence(const ApiUpdateSequenceData& data)
     QnDbManager::QnDbTransactionLocker locker(dbManager->getTransaction());
     for(const ApiSyncMarkerRecord& record: data.markers) 
     {
+        NX_LOG( QnLog::EC2_TRAN_LOG, lit("update transaction sequence in log. key=%1 dbID=%2 dbSeq=%3").arg(record.peerID.toString()).arg(record.dbID.toString()).arg(record.sequence), cl_logDEBUG1);
         ErrorCode result = updateSequenceNoLock(record.peerID, record.dbID, record.sequence);
         if (result != ErrorCode::ok)
             return result;
@@ -180,9 +181,7 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const Qn
     if (tran.isLocal)
         return ErrorCode::ok; // local transactions just changes DB without logging
 
-    NX_LOG( QnLog::EC2_TRAN_LOG, lit("add transaction to log %1 command=%2 db seq=%3 timestamp=%4 hash=%5").
-        arg(tran.peerID.toString()).arg(ApiCommand::toString(tran.command)).
-        arg(tran.persistentInfo.sequence).arg(tran.persistentInfo.timestamp).arg(hash.toString()), cl_logDEBUG1 );
+    NX_LOG( QnLog::EC2_TRAN_LOG, lit("add transaction to log: %1 hash=%2").arg(tran.toString()).arg(hash.toString()), cl_logDEBUG1);
 
     Q_ASSERT_X(!tran.peerID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
     Q_ASSERT_X(!tran.persistentInfo.dbID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
@@ -274,11 +273,11 @@ QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTran
     Q_ASSERT(tran.persistentInfo.sequence != 0);
     if (m_state.values.value(key) >= tran.persistentInfo.sequence) {
 #ifdef _DEBUG
-        qDebug() << "Transaction log contains transaction " << ApiCommand::toString(tran.command) << 
+        qDebug() << "Transaction log contains transaction " << tran.toString() << 
             "because of precessed seq:" << m_state.values.value(key) << ">=" << tran.persistentInfo.sequence;
 #endif
         NX_LOG( lit("Transaction log contains transaction %1 because of precessed seq: %2 >= %3").
-            arg(ApiCommand::toString(tran.command)).arg(m_state.values.value(key)).arg(tran.persistentInfo.sequence), cl_logDEBUG1 );
+            arg(tran.toString()).arg(m_state.values.value(key)).arg(tran.persistentInfo.sequence), cl_logDEBUG1 );
         return Reason_Sequence;
     }
     const auto itr = m_updateHistory.find(hash);
@@ -291,11 +290,11 @@ QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTran
         rez = key < itr.value().updatedBy;
     if (rez) {
 #ifdef _DEBUG
-        qDebug() << "Transaction log contains transaction " << ApiCommand::toString(tran.command) << 
+        qDebug() << "Transaction log contains transaction " << tran.toString() << 
             "because of timestamp:" << lastTime << ">=" << tran.persistentInfo.timestamp;
 #endif
         NX_LOG( lit("Transaction log contains transaction %1 because of timestamp: %2 >= %3").
-            arg(ApiCommand::toString(tran.command)).arg(lastTime).arg(tran.persistentInfo.timestamp), cl_logDEBUG1 );
+            arg(tran.toString()).arg(lastTime).arg(tran.persistentInfo.timestamp), cl_logDEBUG1 );
         return Reason_Timestamp;
     }
     else {

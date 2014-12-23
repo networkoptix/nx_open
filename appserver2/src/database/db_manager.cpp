@@ -994,7 +994,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     else if (updateName == lit(":/updates/24_insert_default_stored_files.sql")) {
         addStoredFiles(lit(":/vms_storedfiles/"));
     }
-    else if (updateName == lit(":/updates/26_remove_server_status.sql")) {
+    else if (updateName == lit(":/updates/27_remove_server_status.sql")) {
         return removeServerStatusFromTransactionLog();
     }
 

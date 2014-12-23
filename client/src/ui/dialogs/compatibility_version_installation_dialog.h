@@ -6,79 +6,51 @@
 #ifndef COMPATIBILITY_VERSION_INSTALLATION_DIALOG_H
 #define COMPATIBILITY_VERSION_INSTALLATION_DIALOG_H
 
-#include <mutex>
-
-#include <QtCore/QScopedPointer>
 #include <QtWidgets/QDialog>
-#include <QtWidgets/QWidget>
 
 #include <utils/common/software_version.h>
-#include <utils/common/stoppable.h>
-#include <utils/common/timermanager.h>
-#include <api/applauncher_api.h>
+#include <utils/common/connective.h>
+#include <update/updates_common.h>
 
+class QnCompatibilityVersionInstallationTool;
+class QnMediaServerUpdateTool;
 
 namespace Ui {
-    class CompatibilityVersionInstallationDialog;
+    class QnCompatibilityVersionInstallationDialog;
 }
 
-class CompatibilityVersionInstallationDialog
-:
-    public QDialog,
-    public TimerEventHandler,
-    public QnStoppable
-{
+//TODO: #dklychkov rename class in 2.4
+class CompatibilityVersionInstallationDialog : public Connective<QDialog> {
     Q_OBJECT
 
+    typedef Connective<QDialog> base_type;
 public:
-    CompatibilityVersionInstallationDialog( QWidget* parent = NULL );
+    CompatibilityVersionInstallationDialog(const QnSoftwareVersion &version, QWidget *parent = 0);
     virtual ~CompatibilityVersionInstallationDialog();
 
-    //!Implementation of TimerEventHandler::onTimer
-    virtual void onTimer( const quint64& timerID ) override;
-    //!Implementation of QnStoppable::pleaseStop
-    virtual void pleaseStop() override;
-
-    void setVersionToInstall( const QnSoftwareVersion& version );
-
     bool installationSucceeded() const;
+
+    virtual int exec() override;
 
 public slots:
     virtual void reject() override;
 
-protected:
-    virtual void showEvent(QShowEvent *event) override;
-    virtual void hideEvent(QHideEvent *event) override;
+private slots:
+    void at_compatibilityTool_statusChanged(int status);
+    void at_updateTool_updateFinished(QnUpdateResult result);
 
 private:
-    // TODO: #Elric #enum
-    enum class State
-    {
-        init,
-        installing,
-        cancelRequested,
-        cancelling,
-        succeeded,
-        failed,
-        cancelled
-    };
+    int installCompatibilityVersion();
+    int installUpdate();
 
-    QScopedPointer<Ui::CompatibilityVersionInstallationDialog> ui;
+private:
+    QScopedPointer<Ui::QnCompatibilityVersionInstallationDialog> m_ui;
+
     QnSoftwareVersion m_versionToInstall;
-    unsigned int m_installationID;
-    State m_state;
-    quint64 m_timerID;
-    mutable std::mutex m_mutex;
-    bool m_terminated;
+    QScopedPointer<QnCompatibilityVersionInstallationTool> m_compatibilityTool;
+    QScopedPointer<QnMediaServerUpdateTool> m_updateTool;
 
-    void launchInstallation();
-
-private slots:
-    void onInstallationFailed( int resultInt );
-    void onCancelFailed( int resultInt );
-    void onInstallationSucceeded();
-    void updateInstallationProgress( float progress );
-    void onCancelDone();
+    bool m_installationOk;
 };
 
 #endif  //COMPATIBILITY_VERSION_INSTALLATION_DIALOG_H

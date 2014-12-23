@@ -20,6 +20,16 @@
     <packaging>pom</packaging>
     <name>HD Witness Tray Assistant</name>  
 
+    <dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>common</artifactId>
+			<version>${project.version}</version>
+			<type>pom</type> 
+			<scope>compile</scope>
+		</dependency>			
+    </dependencies>		
+	
     <properties>
         <product.title>${traytool.name}</product.title>
         <product.display.title>${traytool.display.name}</product.display.title>

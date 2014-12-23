@@ -58,6 +58,8 @@ public:
 
     static QString defaultDirectoryForInstallations();
 
+    void removeInstallation(const QnSoftwareVersion &version);
+
 private:
     mutable QMap<QnSoftwareVersion, QnClientInstallationPtr> m_installationByVersion;
     QDir m_installationsDir;

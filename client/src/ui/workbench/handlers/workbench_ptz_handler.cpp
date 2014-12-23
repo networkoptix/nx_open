@@ -168,6 +168,25 @@ void QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered() {
     if(id.isEmpty())
         return;
 
+    /* Check if tour exists and is valid. */
+    { 
+        QnPtzTourList tours;
+        if (!widget->ptzController()->getTours(&tours))
+            return;
+
+        QnPtzPresetList presets;
+        if (!widget->ptzController()->getPresets(&presets))
+            return;
+
+        int tourIdx = qnIndexOf(tours, [&id](const QnPtzTour &tour) {return id == tour.id; });
+        if (tourIdx < 0)
+            return;
+
+        QnPtzTour tour = tours[tourIdx];
+        if (!tour.isValid(presets))
+            return;
+    }
+
     if (widget->dewarpingParams().enabled) {
         QnItemDewarpingParams params = widget->item()->dewarpingParams();
         params.enabled = true;

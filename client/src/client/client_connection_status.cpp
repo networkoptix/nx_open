@@ -32,7 +32,8 @@ QnClientConnectionStatus::QnClientConnectionStatus():
     /* Auto-reconnect. */
     m_allowedTransactions.insert(QnConnectionState::Ready,          QnConnectionState::Reconnecting);
     m_allowedTransactions.insert(QnConnectionState::Connected,      QnConnectionState::Reconnecting);
-    m_allowedTransactions.insert(QnConnectionState::Reconnecting,   QnConnectionState::Connected);
+    m_allowedTransactions.insert(QnConnectionState::Reconnecting,   QnConnectionState::Connected);      /*< Reconnected to current server. */
+    m_allowedTransactions.insert(QnConnectionState::Reconnecting,   QnConnectionState::Connecting);     /*< Trying another server. */
 
     /* Cancelled connect. */
     m_allowedTransactions.insert(QnConnectionState::Connecting,     QnConnectionState::Disconnected);

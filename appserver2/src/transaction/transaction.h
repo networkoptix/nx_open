@@ -202,7 +202,10 @@ namespace ec2
         PersistentInfo persistentInfo;
         
         bool isLocal; // do not propagate transactions to other server peers
+
+        QString toString() const;
     };
+    
 
     typedef std::vector<ec2::QnAbstractTransaction> QnAbstractTransactionList;
     typedef QnAbstractTransaction::PersistentInfo QnAbstractTransaction_PERSISTENT;

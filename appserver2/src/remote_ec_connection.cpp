@@ -26,15 +26,7 @@ namespace ec2
     }
 
     RemoteEC2Connection::~RemoteEC2Connection()
-    {
-        if (QnTransactionMessageBus::instance()) {
-            QnTransactionMessageBus::instance()->removeConnectionFromPeer( m_peerUrl );
-            QnTransactionMessageBus::instance()->removeHandler( notificationManager() );
-        }
-
-        //TODO #ak next call can be placed here just because we always have just one connection to EC
-        TimeSynchronizationManager::instance()->forgetSynchronizedTime();
-    }
+    {}
 
     QnConnectionInfo RemoteEC2Connection::connectionInfo() const
     {
@@ -59,6 +51,17 @@ namespace ec2
         url.setQuery(q);
         m_peerUrl = url;
         QnTransactionMessageBus::instance()->addConnectionToPeer(url);
+    }
+
+    void RemoteEC2Connection::stopReceivingNotifications() {
+        base_type::stopReceivingNotifications();
+        if (QnTransactionMessageBus::instance()) {
+            QnTransactionMessageBus::instance()->removeConnectionFromPeer( m_peerUrl );
+            QnTransactionMessageBus::instance()->removeHandler( notificationManager() );
+        }
+
+        //TODO #ak next call can be placed here just because we always have just one connection to EC
+        TimeSynchronizationManager::instance()->forgetSynchronizedTime();
     }
 
 }

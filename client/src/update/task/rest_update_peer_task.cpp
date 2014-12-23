@@ -90,7 +90,7 @@ void QnRestUpdatePeerTask::installNextUpdate() {
 
     QnMediaServerResourcePtr server = m_currentServers.first();
     m_targetId = QnUuid(server->getProperty(lit("guid")));
-    Q_ASSERT_X(!m_targetId.isNull(), Q_FUNC_INFO, "Each incompatible server resource should has 'guid' property!");
+    Q_ASSERT_X(!m_targetId.isNull(), Q_FUNC_INFO, "Each incompatible server resource should have 'guid' property!");
     server->apiConnection()->installUpdate(m_updateId, m_currentData, this, SLOT(at_updateInstalled(int,int)));
 }
 

@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
+	<!--
     Example pom for delegating maven goals to msbuild so it builds the "solution"
  
     A solution can be a group of projects, but here we only have one.
@@ -20,41 +20,41 @@
 	<packaging>pom</packaging>
 	<name>HD Witness New Enterprise Controller</name>    
 
-    <properties>
-        <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
-        <product.title>${appserver2.name}</product.title>  
-        <!--Global libs-->		
-        <qt.libs>core network xml sql concurrent</qt.libs>
-        <global.libs>-lcommon -lpostproc</global.libs>
-        <!--Specific os libs used-->
-        <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm -lssleay32 -llibeay32</windows.oslibs>
-        <linux.oslibs>-lssl -lcrypto</linux.oslibs>
-        <windows.oslibs.release></windows.oslibs.release>
-        <windows.oslibs.debug></windows.oslibs.debug>                
-        <mac.oslibs>-lssl -lcrypto -lbz2 -lz -framework IOKit -framework CoreServices</mac.oslibs>
-        <!--Global defines-->
-        <global.defines></global.defines>
-        <!--Specific os defines-->
-        <windows.defines>EC2_LIB_API=__declspec(dllexport)</windows.defines>
-        <linux.defines/>
-        <mac.defines/>      
+	<properties>
+		<release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
+		<product.title>${appserver2.name}</product.title>  
+		<!--Global libs-->		
+		<qt.libs>core network xml sql concurrent</qt.libs>
+		<global.libs>-lcommon -lpostproc</global.libs>
+		<!--Specific os libs used-->
+		<windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm -lssleay32 -llibeay32</windows.oslibs>
+		<linux.oslibs>-lssl -lcrypto</linux.oslibs>
+		<windows.oslibs.release/>
+		<windows.oslibs.debug/>                
+		<mac.oslibs>-lssl -lcrypto -lbz2 -lz -framework IOKit -framework CoreServices</mac.oslibs>
+		<!--Global defines-->
+		<global.defines/>
+		<!--Specific os defines-->
+		<windows.defines>EC2_LIB_API=__declspec(dllexport)</windows.defines>
+		<linux.defines/>
+		<mac.defines/>      
 
-	<buildLib>sharedlib</buildLib>
+		<buildLib>sharedlib</buildLib>
 
-    </properties>	
+	</properties>	
 
-    <profiles>
-        <profile>
-            <id>windows</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
-            </activation>            
-            <properties>
-                <buildLib>staticlib</buildLib>
-            </properties>
-        </profile>
-    </profiles>
+	<profiles>
+		<profile>
+			<id>windows</id>
+			<activation>
+				<os>
+					<family>Windows</family>
+				</os>
+			</activation>            
+			<properties>
+				<buildLib>staticlib</buildLib>
+			</properties>
+		</profile>
+	</profiles>
 
 </project>
