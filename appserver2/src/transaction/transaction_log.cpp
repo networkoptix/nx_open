@@ -73,7 +73,7 @@ void QnTransactionLog::init()
         }     
     }
 
-    m_lastTimestamp = QDateTime::currentMSecsSinceEpoch();
+    m_lastTimestamp = qnSyncTime->currentMSecsSinceEpoch();
     QSqlQuery queryTime(m_dbManager->getDB());
     queryTime.prepare("SELECT max(timestamp) FROM transaction_log");
     if (queryTime.exec() && queryTime.next()) {
