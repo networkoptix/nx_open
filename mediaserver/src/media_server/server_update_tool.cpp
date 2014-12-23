@@ -26,7 +26,6 @@ namespace {
     const QString updatesDirSuffix = lit("mediaserver/updates");
     const QString updateInfoFileName = lit("update.json");
     const QString updateLogFileName = lit("update.log");
-    const int replyDelay = 200;
 
     QDir getUpdatesDir() {
         const QString& dataDir = MSSettings::roSettings()->value( "dataDir" ).toString();
@@ -141,6 +140,7 @@ qint64 QnServerUpdateTool::addUpdateFileChunkSync(const QString &updateId, const
         Q_ASSERT_X(reply >= 0, Q_FUNC_INFO, "wrong reply code");
         if (reply >= 0)
             return reply;
+        return UnknownError;
     }
 }
 
