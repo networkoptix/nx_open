@@ -890,6 +890,7 @@ namespace nx_http
         auto requestCompletionFunc = [httpClientCaptured, completionHandler]
             ( nx_http::AsyncHttpClientPtr httpClient ) mutable
         {
+            httpClientCaptured->disconnect( nullptr, (const char*)nullptr );
             httpClientCaptured.reset();
 
             if( httpClient->failed() )
