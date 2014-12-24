@@ -18,7 +18,7 @@
 //TODO #ak try multiple servers in case of error or empty string (it happens pretty often)
 
 static const unsigned int SECONDS_FROM_1900_01_01_TO_1970_01_01 = 2208988800L;
-static const size_t MAX_TIME_STR_LENGTH = 256; 
+static const size_t MAX_TIME_STR_LENGTH = sizeof(time_t); 
 static const char* DEFAULT_NIST_SERVER = "time.nist.gov";
 static const unsigned short DAYTIME_PROTOCOL_DEFAULT_PORT = 37;     //time protocol
 static const int SOCKET_READ_TIMEOUT = 7000;
