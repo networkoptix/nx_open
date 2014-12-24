@@ -25,6 +25,17 @@
         <root.dir>${basedir}/..</root.dir>
     </properties>
 
+    <dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>client</artifactId>
+			<version>${project.version}</version>
+			<type>pom</type> 
+			<scope>system</scope>
+	                <systemPath>${root.dir}/client/pom.xml</systemPath>
+		</dependency>			
+    </dependencies>		
+	
     <build>
         <plugins>	
             <plugin>
