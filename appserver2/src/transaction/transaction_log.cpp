@@ -85,7 +85,8 @@ void QnTransactionLog::init()
 
 qint64 QnTransactionLog::getTimeStamp()
 {
-    qint64 newTime = qnSyncTime->currentMSecsSinceEpoch();
+    qint64 absoluteTime = qnSyncTime->currentMSecsSinceEpoch();
+    qint64 newTime = absoluteTime;
 
     QMutexLocker lock(&m_timeMutex);
     if (newTime > m_lastTimestamp)
@@ -95,9 +96,15 @@ qint64 QnTransactionLog::getTimeStamp()
     }
     else 
     {
+        static const int TIME_SHIFT_DELTA = 1000;
         newTime = m_baseTime + m_relativeTimer.elapsed();
         if (newTime > m_lastTimestamp)
         {
+            if (newTime > m_lastTimestamp + TIME_SHIFT_DELTA && newTime > absoluteTime + TIME_SHIFT_DELTA) {
+                newTime -= TIME_SHIFT_DELTA; // try to reach absolute time
+                m_baseTime = newTime;
+                m_relativeTimer.restart();
+            }
             m_lastTimestamp = newTime;
         }
         else {

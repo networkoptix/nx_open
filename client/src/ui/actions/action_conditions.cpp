@@ -979,6 +979,11 @@ Qn::ActionVisibility QnDesktopCameraActionCondition::check(const QnActionParamet
 
     /* Do not check real pointer type to speed up check. */
     QnResourcePtr desktopCamera = qnResPool->getResourceByUniqId(QnAppServerConnectionFactory::clientGuid());
+#ifdef DESKTOP_CAMERA_DEBUG
+    Q_ASSERT_X(!desktopCamera || (desktopCamera->hasFlags(Qn::desktop_camera) && desktopCamera->getParentId() == qnCommon->remoteGUID()), 
+        Q_FUNC_INFO, 
+        "Desktop camera must have correct flags and parent (if exists)");
+#endif
     if (desktopCamera && desktopCamera->hasFlags(Qn::desktop_camera))
         return Qn::EnabledAction;
     

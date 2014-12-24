@@ -1691,6 +1691,11 @@ void RTPSession::setAudioEnabled(bool value)
     m_isAudioEnabled = value;
 }
 
+bool RTPSession::isAudioEnabled() const
+{
+    return m_isAudioEnabled;
+}
+
 void RTPSession::setProxyAddr(const QString& addr, int port)
 {
     m_proxyAddr = addr;

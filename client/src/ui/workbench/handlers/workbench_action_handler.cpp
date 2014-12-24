@@ -344,8 +344,10 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     if (layout->getItems().size() >= maxItems)
         return;
 
+#ifndef DESKTOP_CAMERA_DEBUG
     if (resource->hasFlags(Qn::desktop_camera))
         return;
+#endif
 
     {
         //TODO: #GDM #Common refactor duplicated code
@@ -1486,7 +1488,7 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
         return;
 
     QScopedPointer<QnServerSettingsDialog> dialog(new QnServerSettingsDialog(server, mainWindow()));
-    connect(dialog.data(), &QnServerSettingsDialog::rebuildArchiveDone, context()->navigator(), &QnWorkbenchNavigator::at_clearLoaderCache);
+    connect(dialog.data(), &QnServerSettingsDialog::rebuildArchiveDone, context()->navigator(), &QnWorkbenchNavigator::clearLoaderCache);
 
     dialog->setWindowModality(Qt::ApplicationModal);
     if(!dialog->exec())

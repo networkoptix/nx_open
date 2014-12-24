@@ -37,6 +37,11 @@ QnPlaySoundBusinessActionWidget::QnPlaySoundBusinessActionWidget(QWidget *parent
     connect(ui->manageButton, SIGNAL(clicked()), this, SLOT(at_manageButton_clicked()));
     connect(ui->volumeSlider, SIGNAL(valueChanged(int)), this, SLOT(at_volumeSlider_valueChanged(int)));
 
+    connect(QtvAudioDevice::instance(), &QtvAudioDevice::volumeChanged, this, [this] {
+        QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+        ui->volumeSlider->setValue(qRound(QtvAudioDevice::instance()->volume() * 100));
+    });
+
     setHelpTopic(this, Qn::EventsActions_PlaySound_Help);
 }
 
@@ -119,5 +124,8 @@ void QnPlaySoundBusinessActionWidget::at_soundModel_itemChanged(const QString &f
 }
 
 void QnPlaySoundBusinessActionWidget::at_volumeSlider_valueChanged(int value) {
+    if (m_updating)
+        return;
+
     QtvAudioDevice::instance()->setVolume((qreal)value * 0.01);
 }

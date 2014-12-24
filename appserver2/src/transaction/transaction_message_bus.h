@@ -54,16 +54,9 @@ namespace ec2
         /*!
             \param handler Control of life-time of this object is out of scope of this class
         */
-        void setHandler(ECConnectionNotificationManager* handler) { 
-            QMutexLocker lock(&m_mutex);
-            m_handler = handler;
-        }
+        void setHandler(ECConnectionNotificationManager* handler);
 
-        void removeHandler(ECConnectionNotificationManager* handler) { 
-            QMutexLocker lock(&m_mutex);
-            if( m_handler == handler )
-                m_handler = nullptr;
-        }
+        void removeHandler(ECConnectionNotificationManager* handler);
 
         template<class T>
         void sendTransaction(const QnTransaction<T>& tran, const QnPeerSet& dstPeers = QnPeerSet())

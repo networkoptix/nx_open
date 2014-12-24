@@ -36,7 +36,19 @@
         <mac.defines/>
         <!--Specific os defines-->
         <windows.defines>WIN32_LEAN_AND_MEAN</windows.defines>
-    </properties>  
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>build_environment</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/build_environment/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
+
     <profiles>
         <profile>
             <id>linux</id>

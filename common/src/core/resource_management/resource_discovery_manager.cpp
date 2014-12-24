@@ -292,6 +292,9 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
     if (!mServer || !ownServer)
         return false;
 
+    if (camera->hasFlags(Qn::desktop_camera))
+        return true;
+
 #ifdef EDGE_SERVER
     if (!ownServer->isRedundancy()) 
     {
@@ -304,14 +307,14 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
 #endif
     if ((mServer->getServerFlags() & Qn::SF_Edge) && !mServer->isRedundancy())
         return false; // do not transfer cameras from edge server
-    if (!ownServer->isRedundancy())
-        return false; // redundancy is disabled
 
     if (camera->preferedServerId() == ownGuid)
         return true;
     else if (mServer->getStatus() == Qn::Online)
         return false;
 
+    if (!ownServer->isRedundancy())
+        return false; // redundancy is disabled
 
     if (qnResPool->getAllCameras(ownServer, true).size() + awaitingToMoveCameraCnt >= ownServer->getMaxCameras())
         return false;

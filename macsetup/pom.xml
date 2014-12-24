@@ -28,26 +28,11 @@
     <dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>common</artifactId>
-			<version>${project.version}</version>
-			<type>pom</type> 
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>appserver2</artifactId>
-			<version>${project.version}</version>
-			<type>pom</type> 
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>${project.groupId}</groupId>
 			<artifactId>client</artifactId>
 			<version>${project.version}</version>
 			<type>pom</type> 
-			<scope>compile</scope>
+			<scope>system</scope>
+	                <systemPath>${root.dir}/client/pom.xml</systemPath>
 		</dependency>			
     </dependencies>		
 	
