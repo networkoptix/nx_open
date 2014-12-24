@@ -253,6 +253,7 @@ public:
     int getLastResponseCode() const;
 
     void setAudioEnabled(bool value);
+    bool isAudioEnabled() const;
 
     /*
     * Demuxe RTSP binary data

@@ -59,9 +59,7 @@ namespace ec2
 
     template<class T>
     BaseEc2Connection<T>::~BaseEc2Connection()
-    {
-        QnTransactionMessageBus::instance()->disconnectAndJoin( this );
-    }
+    {}
 
     template<class T>
     void BaseEc2Connection<T>::startReceivingNotifications() {
@@ -73,7 +71,7 @@ namespace ec2
 
     template<class T>
     void BaseEc2Connection<T>::stopReceivingNotifications() {
-        disconnect(QnTransactionMessageBus::instance(), NULL, this, NULL);
+        QnTransactionMessageBus::instance()->disconnectAndJoin( this );
         QnTransactionMessageBus::instance()->stop();
     }
 

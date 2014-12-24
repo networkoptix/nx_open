@@ -60,6 +60,8 @@
         <compile.option2/>
         <compile.option3/>
         <compile.options>${compile.option1}${compile.option2}${compile.option3}</compile.options>
+        <!-- Used for cross-compilation to add -m32 on Linux to compile x86 on x64 -->
+        <compiler.arguments />
 
         <libdir>${root.dir}/build_environment/target</libdir>        
         <ClientHelpSourceDir>${environment.dir}/help/2.2.0/${customization}</ClientHelpSourceDir>
@@ -280,7 +282,6 @@
             </activation>
             <modules>
                 <module>build_variables</module>
-                <module>build_environment</module>
                 <module>common</module>
                 <!-- <module>hole_punching_mediator</module> -->
                 <module>appserver2</module>
@@ -618,6 +619,7 @@
             </activation>
             <properties>
                 <arch>x64</arch>
+                <arch.dir>/usr/lib/x86_64-linux-gnu/</arch.dir>
             </properties>
         </profile>
         <profile>
@@ -635,6 +637,7 @@
             </activation>
             <properties>
                 <arch>x86</arch>
+                <arch.dir>/usr/lib/x86_64-linux-gnu/</arch.dir>
             </properties>
         </profile>  
         <profile>
@@ -651,7 +654,9 @@
                 </property>
             </activation>
             <properties>
+                <compiler.arguments>-m32</compiler.arguments>
                 <qt.spec>linux-g++-32</qt.spec>
+                <arch.dir>/usr/lib/x86_64-linux-gnu/</arch.dir>
             </properties>
         </profile>          
         <profile>

@@ -592,6 +592,23 @@ void QnMain::saveStorages(ec2::AbstractECConnectionPtr ec2Connection, const QnAb
     }
 }
 
+static const int SYSTEM_USAGE_DUMP_TIMEOUT = 7*60*1000;
+
+void QnMain::dumpSystemUsageStats()
+{
+    qnPlatform->monitor()->totalCpuUsage();
+    qnPlatform->monitor()->totalRamUsage();
+    qnPlatform->monitor()->totalHddLoad();
+    qnPlatform->monitor()->totalNetworkLoad();
+
+    QMutexLocker lk( &m_mutex );
+    if( m_dumpSystemResourceUsageTaskID == 0 )  //monitoring cancelled
+        return;
+    m_dumpSystemResourceUsageTaskID = TimerManager::instance()->addTimer(
+        std::bind( &QnMain::dumpSystemUsageStats, this ),
+        SYSTEM_USAGE_DUMP_TIMEOUT );
+}
+
 #ifdef Q_OS_WIN
 #include <windows.h>
 #include <stdio.h>
@@ -785,6 +802,7 @@ void initAppServerConnection(QSettings &settings)
     QnAppServerConnectionFactory::setDefaultFactory(QnResourceDiscoveryManager::instance());
 }
 
+
 QnMain::QnMain(int argc, char* argv[])
 :
     m_argc(argc),
@@ -792,7 +810,8 @@ QnMain::QnMain(int argc, char* argv[])
     m_startMessageSent(false),
     m_firstRunningTime(0),
     m_moduleFinder(0),
-    m_universalTcpListener(0)
+    m_universalTcpListener(0),
+    m_dumpSystemResourceUsageTaskID(0)
 {
     serviceMainInstance = this;
 }
@@ -1849,7 +1868,24 @@ void QnMain::run()
 
 
     QTimer::singleShot(0, this, SLOT(at_appStarted()));
+
+
+    m_dumpSystemResourceUsageTaskID = TimerManager::instance()->addTimer(
+        std::bind( &QnMain::dumpSystemUsageStats, this ),
+        SYSTEM_USAGE_DUMP_TIMEOUT );
+
     exec();
+
+    //cancelling dumping system usage
+    quint64 dumpSystemResourceUsageTaskID = 0;
+    {
+        QMutexLocker lk( &m_mutex );
+        dumpSystemResourceUsageTaskID = m_dumpSystemResourceUsageTaskID;
+        m_dumpSystemResourceUsageTaskID = 0;
+    }
+    TimerManager::instance()->joinAndDeleteTimer( dumpSystemResourceUsageTaskID );
+
+
     QnResourceDiscoveryManager::instance()->pleaseStop();
     QnResource::pleaseStopAsyncTasks();
     stopObjects();
@@ -1905,7 +1941,7 @@ void QnMain::run()
 
     ptzPool.reset();
 
-
+    QnServerMessageProcessor::instance()->init(NULL); // stop receiving notifications
     messageProcessor.reset();
     
     //disconnecting from EC2

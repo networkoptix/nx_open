@@ -248,7 +248,7 @@ float QnFileStorageResource::getAvarageWritingUsage() const
 
 void QnFileStorageResource::setStorageBitrateCoeff(float value)
 {
-    qDebug() << "QnFileStorageResource " << getPath() << "coeff " << value;
+    NX_LOG(lit("QnFileStorageResource %1 coeff %2").arg(getPath()).arg(value), cl_logDEBUG2);
     m_storageBitrateCoeff = value;
 }
 

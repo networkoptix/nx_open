@@ -50,6 +50,9 @@
 namespace {
     const int showProgressDelay = 1500; // 1.5 sec
     const int minProgressDisplayTime = 1000; // 1 sec
+
+    /* Parameter value to load latest available screenshot. */
+    const qint64 latestScreenshotTime = -1;
 }
 
 QString QnScreenshotParameters::timeString() const {
@@ -183,7 +186,9 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     }
 
     QnScreenshotParameters parameters;
-    parameters.time = display->camDisplay()->getCurrentTime();
+    parameters.time = display->camDisplay()->isRealTimeSource()
+        ? latestScreenshotTime
+        : display->camDisplay()->getCurrentTime();
     parameters.isUtc = widget->resource()->toResource()->flags() & Qn::utc;
     parameters.filename = actionParameters.argument<QString>(Qn::FileNameRole);
     parameters.timestampPosition = qnSettings->timestampCorner();
@@ -197,13 +202,19 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     if (parameters.itemDewarpingParams.enabled && parameters.mediaDewarpingParams.viewMode == QnMediaDewarpingParams::VerticalDown)
         parameters.rotationAngle -= 180;
 
-		// ----------------------------------------------------- 
-		// This localOffset is used to fix the issue : Bug #2988 
-		// ----------------------------------------------------- 
-		qint64 localOffset = 0;
-		if(qnSettings->timeMode() == Qn::ServerTimeMode && parameters.isUtc)
-			localOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0);
-		parameters.time += localOffset*1000;
+    // ----------------------------------------------------- 
+    // This localOffset is used to fix the issue : Bug #2988 
+    // ----------------------------------------------------- 
+    qint64 localOffset = 0;
+    if(qnSettings->timeMode() == Qn::ServerTimeMode && parameters.isUtc)
+        localOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0);
+
+    if (parameters.time != latestScreenshotTime && parameters.time != AV_NOPTS_VALUE)
+        parameters.time += localOffset*1000;
+
+    /* If timestamp is invalid, request latest screenshot. */
+    if (parameters.time == AV_NOPTS_VALUE)
+        parameters.time = latestScreenshotTime;
 
     QnImageProvider* imageProvider = getLocalScreenshotProvider(parameters, display.data());
     if (!imageProvider)

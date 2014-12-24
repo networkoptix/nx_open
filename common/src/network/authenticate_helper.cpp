@@ -359,8 +359,12 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
         {
             if (server->getId().toString().toUtf8().toLower() == userName)
             {
+                QString ha1Data = lit("%1:%2:%3").arg(server->getId().toString()).arg(REALM).arg(server->getAuthKey());
+                QCryptographicHash ha1( QCryptographicHash::Md5 );
+                ha1.addData(ha1Data.toUtf8());
+
                 QCryptographicHash md5Hash( QCryptographicHash::Md5 );
-                md5Hash.addData(server->getAuthKey().toUtf8());
+                md5Hash.addData(ha1.result().toHex());
                 md5Hash.addData(":");
                 md5Hash.addData(nonce);
                 md5Hash.addData(":");
