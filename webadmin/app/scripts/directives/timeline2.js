@@ -50,9 +50,21 @@ angular.module('webadminApp')
 
 
                 function viewPortScrollRelative(value){
-                    var currentScrollScale = scope.scrollWidth / viewportWidth;
+
                     if(typeof(value) ==='undefined') {
-                        var position = scroll.scrollLeft() + viewportWidth/2;
+                        var scrollPosition = scroll.scrollLeft();
+                        var position = scrollPosition + viewportWidth/2;
+                        // Here if scroll is attached to edge - we should return 100%.
+
+                        /*
+                        if(scrollPosition === 0){
+                            return 0;
+                        }
+                        if(scrollPosition + viewportWidth === scope.scrollWidth){
+                            return 1;
+                        }
+                        */
+
                         return position / scope.scrollWidth;
                     } else {
                         var setValue = Math.round(Math.max(value * scope.scrollWidth - viewportWidth/2,0));
@@ -69,8 +81,8 @@ angular.module('webadminApp')
                         Math.round(color[2]) + ',' +
                         alpha + ')';
                     */
-                    if(alpha>1)
-                        alpha = 1;
+                    if(alpha > 1) // Not so good. It's hack. Somewhere
+                        console.error("bad value",alpha);
                     var colorString =  'rgb(' +
                         Math.round(color[0] * alpha + 255 * (1 - alpha)) + ',' +
                         Math.round(color[1] * alpha + 255 * (1 - alpha)) + ',' +
@@ -267,11 +279,37 @@ angular.module('webadminApp')
                         position = level.interval.addToDate(position);
                     }
                 }
-                function updateView(){
+
+
+                function updateBoundariesAndScroller(){
+                    var timePosition = screenPositionToDate(0.5); // Keep current timeposition for scrolling
+
                     // Update boundaries to current moment
-                    scope.frameEnd = (new Date()).getTime();
+                    scope.frameEnd = scope.end;//(new Date()).getTime();
                     scope.frameWidth = Math.round(scope.actualWidth * (scope.frameEnd -  scope.start)/(scope.end - scope.start));
 
+
+                    //1. Update scroller width
+                    var oldframe = scope.scrollWidth;
+                    scope.scrollWidth = Math.round(Math.min( scope.frameWidth, timelineConfig.maximumScrollScale * viewportWidth));
+                    if(oldframe !== scope.scrollWidth) { // Do not affect DOM if it is not neccessary
+                        frame.width(scope.scrollWidth);
+                    }
+
+                    // Keep time position
+                    // TODO: In live mode - scroll right
+
+                    var newPosition = (timePosition - scope.start)/(scope.frameEnd - scope.start);
+
+                    console.log("position",(timePosition/1000).toFixed(0),newPosition - viewPortScrollRelative());
+                    // Here we have a problem:we should scroll left a bit if it is not .
+
+                    viewPortScrollRelative(newPosition);
+                }
+
+                function updateView(){
+
+                    updateBoundariesAndScroller();
                     updateActualLevel();
                     drawRuler();
                     updateDetailization();
@@ -312,17 +350,7 @@ angular.module('webadminApp')
                     animateScope.animate(scope,'actualWidth',targetWidth,timelineConfig.animationDuration);
 
                     //We should keep relative position during resizing width
-                    var scrollRelativePosition = viewPortScrollRelative();
-                    animateScope.progress(scope,'scrollPosition',timelineConfig.animationDuration,function(){
-                        var oldframe = scope.scrollWidth;
-                        scope.scrollWidth = Math.round(Math.min( scope.frameWidth, timelineConfig.maximumScrollScale * viewportWidth));
-
-                        if(oldframe !== scope.scrollWidth) {
-                            frame.width(scope.scrollWidth);
-                            viewPortScrollRelative(scrollRelativePosition);
-                        }
-                    });
-
+                    animateScope.progress(scope,'scrollPosition',timelineConfig.animationDuration);
 
                     scope.disableZoomOut =  scope.actualZoomLevel <= 0;
 
