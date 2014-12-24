@@ -1941,7 +1941,7 @@ void QnMain::run()
 
     ptzPool.reset();
 
-
+    QnServerMessageProcessor::instance()->init(NULL); // stop receiving notifications
     messageProcessor.reset();
     
     //disconnecting from EC2

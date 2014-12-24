@@ -22,7 +22,6 @@ namespace ec2
         m_queryProcessor( queryProcessor ),
         m_connectionInfo( connectionInfo )
     {
-        QnTransactionMessageBus::instance()->setHandler( notificationManager() );
     }
 
     RemoteEC2Connection::~RemoteEC2Connection()
@@ -39,6 +38,8 @@ namespace ec2
     }
 
     void RemoteEC2Connection::startReceivingNotifications() {
+
+        QnTransactionMessageBus::instance()->setHandler( notificationManager() );
 
         base_type::startReceivingNotifications();
 
