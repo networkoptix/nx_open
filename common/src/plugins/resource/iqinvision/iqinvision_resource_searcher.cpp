@@ -132,6 +132,9 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
     //response.fromDatagram(responseData);
 
     smac = smac.toUpper();
+    QnMacAddress macAddress(smac);
+    if (macAddress.isNull())
+        return local_results;
 
     for(const QnResourcePtr& res: result)
     {
@@ -158,7 +161,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
     resource->setTypeId(rt);
     resource->setName(name);
     resource->setModel(name);
-    resource->setMAC(QnMacAddress(smac));
+    resource->setMAC(macAddress);
 
     local_results.push_back(resource);
 
