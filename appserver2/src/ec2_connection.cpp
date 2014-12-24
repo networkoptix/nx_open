@@ -22,24 +22,20 @@ namespace ec2
     :
         BaseEc2Connection<ServerQueryProcessor>( queryProcessor, resCtx ),
         m_transactionLog( new QnTransactionLog(QnDbManager::instance()) ),
-        m_connectionInfo( connectionInfo ),
-        m_notificationReceiverID( 0 )
+        m_connectionInfo( connectionInfo )
     {
         QnDbManager::instance()->init(
             resCtx.resFactory,
             dbUrl.toLocalFile(),
             QUrlQuery(dbUrl.query()).queryItemValue("staticdb_path") );
 
-        m_notificationReceiverID = QnTransactionMessageBus::instance()->addHandler( notificationManager() );
+        QnTransactionMessageBus::instance()->setHandler( notificationManager() );
     }
 
     Ec2DirectConnection::~Ec2DirectConnection()
     {
-        if( QnTransactionMessageBus::instance() && m_notificationReceiverID > 0 )
-        {
-            QnTransactionMessageBus::instance()->removeHandler( m_notificationReceiverID );
-            m_notificationReceiverID = 0;
-        }
+        if (QnTransactionMessageBus::instance())
+            QnTransactionMessageBus::instance()->removeHandler( notificationManager() );
     }
 
     QnConnectionInfo Ec2DirectConnection::connectionInfo() const

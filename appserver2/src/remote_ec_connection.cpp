@@ -20,20 +20,13 @@ namespace ec2
     :
         base_type( queryProcessor.get(), resCtx ),
         m_queryProcessor( queryProcessor ),
-        m_connectionInfo( connectionInfo ),
-        m_notificationReceiverID( 0 )
+        m_connectionInfo( connectionInfo )
     {
-        m_notificationReceiverID = QnTransactionMessageBus::instance()->addHandler( notificationManager() );
+        QnTransactionMessageBus::instance()->setHandler( notificationManager() );
     }
 
     RemoteEC2Connection::~RemoteEC2Connection()
-    {
-        if( QnTransactionMessageBus::instance() && m_notificationReceiverID > 0 )
-        {
-            QnTransactionMessageBus::instance()->removeHandler( m_notificationReceiverID );
-            m_notificationReceiverID = 0;
-        }
-    }
+    {}
 
     QnConnectionInfo RemoteEC2Connection::connectionInfo() const
     {
@@ -64,11 +57,7 @@ namespace ec2
         base_type::stopReceivingNotifications();
         if (QnTransactionMessageBus::instance()) {
             QnTransactionMessageBus::instance()->removeConnectionFromPeer( m_peerUrl );
-            if( m_notificationReceiverID > 0 )
-            {
-                QnTransactionMessageBus::instance()->removeHandler( m_notificationReceiverID );
-                m_notificationReceiverID = 0;
-            }
+            QnTransactionMessageBus::instance()->removeHandler( notificationManager() );
         }
 
         //TODO #ak next call can be placed here just because we always have just one connection to EC

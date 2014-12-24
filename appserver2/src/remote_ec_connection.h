@@ -39,7 +39,6 @@ namespace ec2
         FixedUrlClientQueryProcessorPtr m_queryProcessor;
         const QnConnectionInfo m_connectionInfo;
         QUrl m_peerUrl;
-        qint64 m_notificationReceiverID;
     };
 }
 

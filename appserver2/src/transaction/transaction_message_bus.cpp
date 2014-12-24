@@ -1,8 +1,6 @@
 
 #include "transaction_message_bus.h"
 
-#include <functional>
-
 #include <QtCore/QTimer>
 #include <QTextStream>
 
@@ -657,11 +655,8 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
     case ApiCommand::runtimeInfoChanged:
         if (!onGotServerRuntimeInfo(tran, sender))
             return; // already processed. do not proxy and ignore transaction
-        m_notificationCallbackManager.executeCallback( std::bind(
-            static_cast<void (ECConnectionNotificationManager::*)
-                (const QnTransaction<T>&)>(&ECConnectionNotificationManager::triggerNotification),
-            std::placeholders::_1,
-            tran) );
+        if( m_handler )
+            m_handler->triggerNotification(tran);
         break;
     case ApiCommand::updatePersistentSequence:
         updatePersistentMarker(tran, sender);
@@ -686,11 +681,8 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             }
         }
 
-        m_notificationCallbackManager.executeCallback( std::bind(
-            static_cast<void (ECConnectionNotificationManager::*)
-                (const QnTransaction<T>&)>(&ECConnectionNotificationManager::triggerNotification),
-            std::placeholders::_1,
-            tran) );
+        if( m_handler )
+            m_handler->triggerNotification(tran);
 
         // this is required to allow client place transactions directly into transaction message bus
         if (tran.command == ApiCommand::getFullInfo)
@@ -1308,11 +1300,8 @@ ec2::ApiPeerData QnTransactionMessageBus::localPeer() const {
 void QnTransactionMessageBus::at_runtimeDataUpdated(const QnTransaction<ApiRuntimeData>& tran)
 {
     // data was changed by local transaction log (old data instance for same peer was removed), emit notification to apply new data version outside
-    m_notificationCallbackManager.executeCallback( std::bind(
-        static_cast<void (ECConnectionNotificationManager::*)
-            (const QnTransaction<ApiRuntimeData>&)>(&ECConnectionNotificationManager::triggerNotification),
-        std::placeholders::_1,
-        tran) );
+    if( m_handler )
+        m_handler->triggerNotification(tran);
 }
 
 void QnTransactionMessageBus::emitRemotePeerUnauthorized(const QnUuid& id)
