@@ -11,7 +11,7 @@ if [%CONFIG%] == [debug] set OTHER=release
 if [%CONFIG%] == [release] set OTHER=debug
 
 set AXHDW=%~dp0
-set bebin_path=..\build_environment\target\x64\bin
+set bebin_path=%AXHDW%\..\build_environment\target\%ARCH%\bin
 set PATH=%bebin_path%\%CONFIG%;%PATH%
 
 echo %bebin_path%\idc %bebin_path%\%CONFIG%\axhdwitness.dll /idl %bebin_path%\%CONFIG%\axhdwitness.idl -version 1.0

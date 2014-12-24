@@ -340,6 +340,7 @@
                 <!--<module>vmaxproxy</module>  -->                   
                 <module>client</module>                     
                 <module>clientexe</module>                     
+                <module>axhdwitness</module>                     
                 <module>wixsetup</module>
             </modules>
             <properties>

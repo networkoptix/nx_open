@@ -647,6 +647,9 @@ void QnWorkbenchUi::tick(int deltaMSecs) {
 }
 
 void QnWorkbenchUi::at_freespaceAction_triggered() {
+	// ax 23
+	return;
+
     QAction *fullScreenAction = action(Qn::EffectiveMaximizeAction);
 
     bool isFullscreen = fullScreenAction->isChecked();

@@ -3,6 +3,9 @@
 #include "client/client_message_processor.h"
 #include "api/session_manager.h"
 #include "core/resource_management/resource_discovery_manager.h"
+#include "core/ptz/client_ptz_controller_pool.h"
+#include <api/global_settings.h>
+#include "api/runtime_info_manager.h"
 
 #include "common/common_module.h"
 
@@ -32,51 +35,42 @@
 
 #include "decoders/video/ipp_h264_decoder.h"
 
+#include "utils/network/module_finder.h"
+#include "utils/network/global_module_finder.h"
+#include "utils/network/router.h"
 #include <utils/common/command_line_parser.h>
 #include <utils/common/app_info.h>
-// ax23 #include "ui/device_settings/dlg_factory.h"
+#include <utils/common/synctime.h>
+
+#include "utils/server_interface_watcher.h"
 #include "ui/actions/action_manager.h"
 #include "ui/style/skin.h"
 #include "ui/style/globals.h"
 #include "decoders/video/abstractdecoder.h"
-// ax23 #include "device_plugins/desktop/device/desktop_device_server.h"
 #include "libavformat/avio.h"
 #include "utils/common/util.h"
-// ax23 #include "plugins/resources/archive/avi_files/avi_resource.h"
-// ax23 #include "core/resourcemanagment/resource_pool.h"
-// ax23 #include "utils/client_util.h"
-// ax23 #include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
-// ax23 #include "api/app_server_connection.h"
-// ax23 #include "device_plugins/server_camera/appserver.h"
-// ax23 #include "utils/util.h"
 
-// ax23 #include "core/resource/video_server.h"
+#include "platform/platform_abstraction.h"
+
 #include "core/resource/storage_resource.h"
 
-// ax23 #include "plugins/resources/axis/axis_resource_searcher.h"
 #include "core/resource/resource_directory_browser.h"
+#include "core/resource_management/resource_properties.h"
+#include "core/resource_management/status_dictionary.h"
 
 #include "tests/auto_tester.h"
-// ax23 #include "plugins/resources/d-link/dlink_resource_searcher.h"
-// ax23 #include "plugins/resources/droid/droid_resource_searcher.h"
-// ax23 #include "ui/actions/action_manager.h"
-// ax23 #include "ui/tooltips/tool_tip.h"
-// ax23 #include "plugins/resources/iqinvision/iqinvision_resource_searcher.h"
-// ax23 #include "plugins/resources/droid_ipwebcam/ipwebcam_droid_resource_searcher.h"
-// ax23 #include "plugins/resources/isd/isd_resource_searcher.h"
-// ax23 #include "plugins/resources/onvif/onvif_resource_searcher_wsdd.h"
 #include "utils/network/socket.h"
 #include <openssl/evp.h>
 
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
 #include "core/resource/camera_history.h"
-//ax23 #include "clientmain.h"
-//ax23 #include "utils/settings.h"
 #include <utils/common/log.h>
+
+
 
 #include "ui/workbench/workbench_item.h"
 #include "ui/workbench/workbench_display.h"
-
+#include "ui/workaround/fglrx_full_screen.h"
 #include <QtCore/private/qthread_p.h>
 
 #include <QXmlStreamWriter>
@@ -379,7 +373,19 @@ bool AxHDWitness::doInitialize()
     QCoreApplication::setLibraryPaths( pluginDirs );
 
 	m_clientModule.reset(new QnClientModule(argc, NULL));
-//x	QnResourcePool::initStaticInstance( new QnResourcePool() );
+	m_syncTime.reset(new QnSyncTime());
+
+	QnResourcePool::initStaticInstance( new QnResourcePool() );
+
+    m_dictionary.reset(new QnResourcePropertyDictionary());
+    m_statusDictionary.reset(new QnResourceStatusDictionary());
+
+    m_platform.reset(new QnPlatformAbstraction());
+    m_runnablePool.reset(new QnLongRunnablePool());
+    m_clientPtzPool.reset(new QnClientPtzControllerPool());
+    m_globalSettings.reset(new QnGlobalSettings());
+    m_clientMessageProcessor.reset(new QnClientMessageProcessor());
+    m_runtimeInfoManager.reset(new QnRuntimeInfoManager());
 
     QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin ? lit(":/skin_light") : lit(":/skin_dark");
     skin.reset(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
@@ -432,9 +438,21 @@ bool AxHDWitness::doInitialize()
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
 
 	QnSessionManager::instance()->start();
-//x	ffmpegInit();
 
-//x    QnResourcePool::instance(); // to initialize net state;
+    ffmpegInit();
+
+    m_moduleFinder.reset(new QnModuleFinder(true));
+    m_moduleFinder->setCompatibilityMode(qnSettings->isDevMode());
+    m_moduleFinder->start();
+
+    m_router.reset(new QnRouter(m_moduleFinder.data(), true));
+    m_globalModuleFinder.reset(new QnGlobalModuleFinder());
+    m_serverInterfaceWatcher.reset(new QnServerInterfaceWatcher(m_router.data()));
+
+    //===========================================================================
+
+    CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::AUTO );
+
 
 //x    OpenSSL_add_all_digests(); // open SSL init
 
@@ -474,6 +492,9 @@ void AxHDWitness::doFinalize()
         m_mainWindow = 0;
     }
 
+    qApp->processEvents();
+
+	m_moduleFinder->stop();
 	QnSessionManager::instance()->stop();
 	delete QnCommonModule::instance();
 	m_clientModule.reset(0);
@@ -486,7 +507,8 @@ void AxHDWitness::doFinalize()
 
     qInstallMessageHandler(defaultMsgHandler);
 
-    qApp->processEvents();
+    delete QnResourcePool::instance();
+    QnResourcePool::initStaticInstance( NULL );
 
     //xdelete QnResourcePool::instance();
     //xQnResourcePool::initStaticInstance( NULL );
@@ -496,6 +518,11 @@ void AxHDWitness::createMainWindow() {
     assert(m_mainWindow == NULL);
 
     m_context.reset(new QnWorkbenchContext(qnResPool));
+	m_context->instance<QnFglrxFullScreen>();
+
+	Qn::ActionId effectiveMaximizeActionId = Qn::FullscreenAction;
+	m_context->menu()->registerAlias(Qn::EffectiveMaximizeAction, effectiveMaximizeActionId);
+
     m_mainWindow = new QnMainWindow(m_context.data());
     m_mainWindow->setOptions(m_mainWindow->options() & ~(QnMainWindow::TitleBarDraggable | QnMainWindow::WindowButtonsVisible));
 

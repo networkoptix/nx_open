@@ -12,6 +12,20 @@
 #include "ui/style/noptix_style.h"
 #include "ui/customization/customizer.h"
 
+class QnLongRunnablePool;
+class QnSyncTime;
+class QnPlatformAbstraction;
+class QnClientPtzControllerPool;
+class QnClientPtzControllerPool;
+class QnGlobalSettings;
+class QnRuntimeInfoManager;
+class QnClientMessageProcessor;
+class QnModuleFinder;
+class QnRouter;
+class QnGlobalModuleFinder;
+class QnServerInterfaceWatcher;
+class QnResourcePropertyDictionary;
+class QnResourceStatusDictionary;
 
 class AxHDWitness : public QWidget
 {
@@ -69,6 +83,23 @@ private:
 	QScopedPointer<QnSkin> skin;
 	QScopedPointer<QnCustomizer> customizer;
 	QScopedPointer<QnClientModule> m_clientModule;
+	QScopedPointer<QnSyncTime> m_syncTime;
+
+	QScopedPointer<QnPlatformAbstraction> m_platform;
+    QScopedPointer<QnLongRunnablePool> m_runnablePool;
+    QScopedPointer<QnClientPtzControllerPool> m_clientPtzPool;
+    QScopedPointer<QnGlobalSettings> m_globalSettings;
+    QScopedPointer<QnClientMessageProcessor> m_clientMessageProcessor;
+    QScopedPointer<QnRuntimeInfoManager> m_runtimeInfoManager;
+
+    QScopedPointer<QnModuleFinder> m_moduleFinder;
+	QScopedPointer<QnRouter> m_router;
+	QScopedPointer<QnGlobalModuleFinder> m_globalModuleFinder;
+	QScopedPointer<QnServerInterfaceWatcher> m_serverInterfaceWatcher;
+
+    QScopedPointer<QnResourcePropertyDictionary> m_dictionary;
+    QScopedPointer<QnResourceStatusDictionary> m_statusDictionary;
+
     QnMainWindow *m_mainWindow;
 };
 
