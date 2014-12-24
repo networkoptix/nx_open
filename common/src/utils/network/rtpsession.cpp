@@ -396,7 +396,7 @@ RTPSession::RTPSession():
 
 RTPSession::~RTPSession()
 {
-    m_tcpSock->close();
+    stop();
     delete [] m_responseBuffer;
 
     delete[] m_additionalReadBuffer;
@@ -639,7 +639,7 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
     QByteArray response;
     if( !sendRequestAndReceiveResponse( createDescribeRequest(), response ) )
     {
-        m_tcpSock->close();
+        stop();
         return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(url, destinationPort);
     }
 
@@ -660,17 +660,17 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
             break;
         case CL_HTTP_AUTH_REQUIRED:
         case nx_http::StatusCode::proxyAuthenticationRequired:
-            m_tcpSock->close();
+            stop();
             return CameraDiagnostics::NotAuthorisedResult( url );
         default:
-            m_tcpSock->close();
+            stop();
             return CameraDiagnostics::RequestFailedResult( lit("DESCRIBE %1").arg(url), m_reasonPhrase );
     }
 
     int sdp_index = response.indexOf(QLatin1String("\r\n\r\n"));
 
     if (sdp_index  < 0 || sdp_index+4 >= response.size()) {
-        m_tcpSock->close();
+        stop();
         return CameraDiagnostics::NoMediaTrackResult( url );
     }
 
@@ -678,7 +678,7 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
     parseSDP();
 
     if (m_sdpTracks.size()<=0) {
-        m_tcpSock->close();
+        stop();
         result = CameraDiagnostics::NoMediaTrackResult( url );
     }
 
@@ -704,8 +704,7 @@ RTPSession::TrackMap RTPSession::play(qint64 positionStart, qint64 positionEnd, 
 
 bool RTPSession::stop()
 {
-    //delete m_tcpSock;
-    //m_tcpSock = 0;
+    QMutexLocker lock(&m_sockMutex);
     m_tcpSock->close();
     return true;
 }
@@ -1156,7 +1155,7 @@ bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
     nx_http::Request request = createPlayRequest( startPos, endPos );
     if( !sendRequestAndReceiveResponse( std::move(request), response ) )
     {
-        m_tcpSock->close();
+        stop();
         return false;
     }
 
