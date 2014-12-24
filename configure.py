@@ -91,9 +91,6 @@ if __name__ == '__main__':
             donotrebuild('false')        
     else:
         if arch == build_arch and box == build_box and branch == build_branch and os.path.isfile('%s/donotrebuild' % targetdir):
-            print arch,build_arch
-            print box,build_box
-            print branch,build_branch
             donotrebuild('true')
         else:
             donotrebuild('false')    

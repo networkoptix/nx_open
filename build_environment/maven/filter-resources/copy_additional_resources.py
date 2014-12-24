@@ -54,10 +54,6 @@ if __name__ == '__main__':
     if os.path.exists(buildenv): 
         os.unlink(buildenv)
 
-    buildvar = join('${root.dir}/build_variables/target', 'donotrebuild')
-    if os.path.exists(buildvar): 
-        os.unlink(buildvar)
-
     print '+++++++++++++++++++++ EXPANDING LIBS +++++++++++++++++++++'
             
     for file in os.listdir('.'):
@@ -171,5 +167,3 @@ if __name__ == '__main__':
                     shutil.copytree(join(plugin_source_dir, qtplugin), target)                          
     if not os.path.exists(buildenv): 
         open(buildenv, 'w').close() 
-    if not os.path.exists(buildvar): 
-        open(buildvar, 'w').close() 
