@@ -23,26 +23,11 @@
     <dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>common</artifactId>
-			<version>${project.version}</version>
-			<type>pom</type> 
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>appserver2</artifactId>
-			<version>${project.version}</version>
-			<type>pom</type> 
-			<scope>compile</scope>
-		</dependency>	
-
-		<dependency>
-			<groupId>${project.groupId}</groupId>
 			<artifactId>mediaserver</artifactId>
 			<version>${project.version}</version>
 			<type>pom</type> 
-			<scope>compile</scope>
+			<scope>system</scope>
+	                <systemPath>${root.dir}/mediaserver/pom.xml</systemPath>
 		</dependency>			
     </dependencies>		
 	
