@@ -917,7 +917,13 @@ namespace nx_http
             httpClientCaptured.get(), requestCompletionFunc,
             Qt::DirectConnection );
 
-        return httpClientCaptured->doGet( url );
+        if( !httpClientCaptured->doGet( url ) )
+        {
+            //if we do not disconnect, http client object will not be destroyed
+            httpClientCaptured->disconnect( nullptr, (const char*)nullptr );
+            return false;
+        }
+        return true;
     }
 
     SystemError::ErrorCode downloadFileSync(
