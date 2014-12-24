@@ -334,7 +334,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(const QnStorageResourc
         }
 
         //chunk = Chunk(startTimeMs, storage->getIndex(), fileIndex, endTimeMs - startTimeMs, currentTimeZone()/60);
-        chunk = Chunk(startTimeMs, storage->getIndex(), fileIndex, endTimeMs - startTimeMs, detectTimeZone(startTimeMs, fileName));
+        chunk = Chunk(startTimeMs, qnStorageMan->getStorageIndex(storage), fileIndex, endTimeMs - startTimeMs, detectTimeZone(startTimeMs, fileName));
     }
     delete avi;
     return chunk;
