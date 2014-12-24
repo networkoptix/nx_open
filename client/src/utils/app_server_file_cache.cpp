@@ -19,10 +19,22 @@ QnAppServerFileCache::QnAppServerFileCache(const QString &folderName, QObject *p
     m_folderName(folderName),
     m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnAppServerFileCache>(this))
 {
-    connect(this, &QnAppServerFileCache::delayedFileDownloaded,     this,   &QnAppServerFileCache::fileDownloaded,      Qt::QueuedConnection);
-    connect(this, &QnAppServerFileCache::delayedFileUploaded,       this,   &QnAppServerFileCache::fileUploaded,        Qt::QueuedConnection);
-    connect(this, &QnAppServerFileCache::delayedFileDeleted,        this,   &QnAppServerFileCache::fileDeleted,         Qt::QueuedConnection);
-    connect(this, &QnAppServerFileCache::delayedFileListReceived,   this,   &QnAppServerFileCache::fileListReceived,    Qt::QueuedConnection);
+    connect(this, &QnAppServerFileCache::delayedFileDownloaded,     this,   [this](const QString &filename, bool ok) {
+        auto connection = QnAppServerConnectionFactory::getConnection2();
+        emit fileDownloaded(filename, ok && static_cast<bool>(connection));
+    }, Qt::QueuedConnection);
+    connect(this, &QnAppServerFileCache::delayedFileUploaded,     this,   [this](const QString &filename, bool ok) {
+        auto connection = QnAppServerConnectionFactory::getConnection2();
+        emit fileUploaded(filename, ok && static_cast<bool>(connection));
+    }, Qt::QueuedConnection);
+    connect(this, &QnAppServerFileCache::delayedFileDeleted,     this,   [this](const QString &filename, bool ok) {
+        auto connection = QnAppServerConnectionFactory::getConnection2();
+        emit fileDeleted(filename, ok && static_cast<bool>(connection));
+    }, Qt::QueuedConnection);
+    connect(this, &QnAppServerFileCache::delayedFileListReceived,     this,   [this](const QStringList &files, bool ok) {
+        auto connection = QnAppServerConnectionFactory::getConnection2();
+        emit fileListReceived(files, ok && static_cast<bool>(connection));
+    }, Qt::QueuedConnection);
 }
 
 QnAppServerFileCache::~QnAppServerFileCache(){}
