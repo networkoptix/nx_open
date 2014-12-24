@@ -88,9 +88,35 @@
                             </arguments>
                             <workingDirectory>${root.dir}</workingDirectory>		
                         </configuration>
+                    </execution>  
+                    <execution>
+                        <id>build_environment</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>mvn</executable>
+                            <environmentVariables>
+                                <PATH>${path}</PATH>
+                            </environmentVariables>                            
+                            <arguments>
+                                <argument>-U</argument>
+                                <argument>compile</argument>
+                                <argument>-Dhelp.customization=${help.customization}</argument>
+                                <argument>-Dcustomization=${customization}</argument>
+                                <argument>-Darch=${arch}</argument>
+                                <argument>-Dbox=${box}</argument>
+                                <argument>-Dplatform=${platform}</argument>                             
+                                <argument>-Denvironment.dir=${environment.dir}</argument>								
+                                <argument>-Dmaven.repo.local=${environment.dir}/maven/repository</argument>		
+                                <argument>-Drsync.skip=${rsync.skip}</argument>
+                            </arguments>
+                            <workingDirectory>${root.dir}/build_environment</workingDirectory>		
+                        </configuration>
                     </execution>                                         
                 </executions>
-            </plugin>
+            </plugin>     
         </plugins>
     </build> 
     <profiles>
