@@ -1488,7 +1488,7 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
         return;
 
     QScopedPointer<QnServerSettingsDialog> dialog(new QnServerSettingsDialog(server, mainWindow()));
-    connect(dialog.data(), &QnServerSettingsDialog::rebuildArchiveDone, context()->navigator(), &QnWorkbenchNavigator::at_clearLoaderCache);
+    connect(dialog.data(), &QnServerSettingsDialog::rebuildArchiveDone, context()->navigator(), &QnWorkbenchNavigator::clearLoaderCache);
 
     dialog->setWindowModality(Qt::ApplicationModal);
     if(!dialog->exec())
