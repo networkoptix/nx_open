@@ -454,6 +454,7 @@ class ClusterWorker():
         while not self._queue.empty():
             t,a = self._queue.get(True)
             t(*a)
+            self._queue.task_done()
 
     def _initializeThreadWorker(self):
         for _ in xrange(self._threadNum):
@@ -464,6 +465,8 @@ class ClusterWorker():
     def join(self):
         # We delay the real operation until we call join
         self._initializeThreadWorker()
+        # Second we call queue join to join the queue
+        self._queue.join()
         # Now we safely join the thread since the queue
         # will utimatly be empty after execution
         for t in self._threadList:
@@ -1840,7 +1843,6 @@ class MergeTest_Resource(MergeTestBase):
         print "Merge test phase1 done, now sleep and wait for sync"
         time.sleep(self._mergeTestTimeout)
 
-
     def _phase2(self):
         print "Merge test phase2: set ALL the servers with system name :mergeTest"
         self._setClusterToMerge()
@@ -1858,14 +1860,16 @@ class MergeTest_Resource(MergeTestBase):
     def test(self):
         print "================================\n"
         print "Server Merge Test:Resource Start\n"
-
-        self._prolog()
+        if not self._prolog():
+            return False
         self._phase1()
-        self._phase2()
+        ret,reason = self._phase2()
+        if not ret:
+            print reason
         self._epilog()
-
         print "Server Merge Test:Resource End\n"
         print "================================\n"
+        return ret
 
 # This merge test is used to test admin's password 
 # Steps:
@@ -2192,13 +2196,17 @@ class MergeTest_AdminPassword(MergeTestBase):
 
         print "Merge Test:Admin Password Test Pass!"
         print "==========================================="
+        return True
 
 class MergeTest:
     def test(self):
-        MergeTest_Resource().test()
+        if not MergeTest_Resource().test():
+            return False
         # The following merge test ALWAYS fail and I don't know it is my problem or not
         # Current it is disabled and you could use a seperate command line to run it 
         #MergeTest_AdminPassword().test()
+
+        return True
 
 # ===================================
 # RTSP test
@@ -3160,7 +3168,7 @@ def doClearAll(fake=False):
         UserOperation().removeAll()
         MediaServerOperation().removeAll()
 
-def runPerformanceTest():
+def runMiscFunction():
     if len(sys.argv) != 3 and len(sys.argv) != 2 :
         return (False,"2/1 parameters are needed")
 
@@ -3499,7 +3507,7 @@ class PerfTest:
             print "---------------------------------"
         print "===================================="
                         
-def runPerformanceTest():
+def runPerfTest():
     options = sys.argv[2]
     l = options.split('=')
     PerfTest().run(l[1])
@@ -3643,38 +3651,38 @@ class SystemNameTest:
         print "SystemName test rollback done"
         print "========================================="
 
-helpStr = "Usage:\n\n" \
-    "--perf --type=type-list: Start performance test.User can use ctrl+c to interrupt the perf test and statistic will be displayed.User can also specify configuration parameters " \
-    "for performance test. You also _NEED_ specify option as --type=Camera,User to indicate what to test.Eg --perf --type=User will only test User performance, while " \
-    "--perf --type=User,Camera will test User/Camera both in terms of the performance on each server"\
-    "In ec2_tests.cfg file,\n[PerfTest]\nfrequency=1000\ncreateProb=0.5\n, the frequency means at most how many operations will be issued on each" \
-    "server in one seconds(not guaranteed,bottleneck is CPU/Bandwidth for running this script);and createProb=0.5 means the creation operation will be performed as 0.5 "\
-    "probability, and it implicitly means the modification operation will be performed as 0.5 probability \n\n" \
-    "--clear: Clear all the Cameras/MediaServers/Users on all the servers.It will not delete admin user. You could specify --fake option as second parameter, eg:" \
-    "--clear --fake. This will remove all the resources that has name prefixed with ec2_test which is the generated data name pattern\n\n" \
-    "--sync: Test all the servers are on the same page or not.This test will perform regarding the existed ec2 REST api, for example " \
-    ", no layout API is supported, then this test cannot test whether 2 servers has exactly same layouts  \n\n" \
-    "--recover: Recover from last rollback failure. If you see rollback failed for the last run, you can run this option next time to recover from " \
-    "the last rollback error specifically. Or you could run any other cases other than --help/--recover,the recover will be performed automatically as well. \n\n" \
-    "--merge-test: Test server merge. The user needs to specify more than one server in the config file. This test will temporarilly change the server system name," \
-    "currently I assume such change will NOT modify the server states. Once the merge test finished, the system name for each server will be recover automatically.\n\n" \
-    "--rtsp-test: Test the rtsp streaming. The user needs to specify section [Rtsp] in side of the config file and also " \
-    "testSize attribute in it , eg: \n[Rtsp]\ntestSize=100\n Which represent how many test case performed on EACH server.\n\n" \
-    "--add=Camera/MediaServer/User --count=num: Add a fake Camera/MediaServer/User to the server you sepcify in the list. The --count " \
-    "option MUST be specified , so a working example is like: --add=Camera --count=500 . This will add 500 cameras(fake) into "\
-    "the server.\n\n"\
-    "--remove=Camera/MediaServer/User (--id=id)*: Remove a Camera/MediaServer/User with id OR remove all the resources.The user can "\
-    "specify --id option to enable remove a single resource, eg : --remove=MediaServer --id={SomeGUID} , and --remove=MediaServer will remove " \
-    "all the media server.\nNote: --add/--remove will perform the corresponding operations on a random server in the server list if the server list "\
-    "have more than one server.You could specify the --fake as the second option,eg: --remove=Camera --fake .This will remove all the cameras that " \
-    "has name prefixed with ec2_test which is name pattern for generated cameras\n\n" \
-    "If no parameter is specified, the default automatic test will performed.This includes add/update/remove Cameras/MediaServer/Users and also add/update " \
-    "user attributes list , server attributes list and resource parameter list. Additionally , the confliction test will be performed as well, it includes " \
-    "modify a resource on one server and delete the same resource on another server to trigger confliction.Totally 9 different test cases will be performed in this " \
-    "run.Currently, all the modification/deletion will only happened on fake data, and after the whole testing finished, the fake data will be wiped out so " \
-    "the old database should not be modified.The user can specify configuration parameter in ec2_tests.cfg file, eg:\n[General]\ntestCaseSize=200\nclusterTestSleepTime=10\n "\
-    "this options will make each test case in 9 cases run on each server 200 times. Additionally clusterTestSleepTime represent after every 200 operations, how long should I "\
-    "wait and then perform sync operation to check whether all the server get the notification"
+helpStr = ("Usage:\n\n"
+    "--perf --type=type-list: Start performance test.User can use ctrl+c to interrupt the perf test and statistic will be displayed.User can also specify configuration parameters " 
+    "for performance test. You also _NEED_ specify option as --type=Camera,User to indicate what to test.Eg --perf --type=User will only test User performance, while " 
+    "--perf --type=User,Camera will test User/Camera both in terms of the performance on each server"
+    "In ec2_tests.cfg file,\n[PerfTest]\nfrequency=1000\ncreateProb=0.5\n, the frequency means at most how many operations will be issued on each" 
+    "server in one seconds(not guaranteed,bottleneck is CPU/Bandwidth for running this script);and createProb=0.5 means the creation operation will be performed as 0.5 "
+    "probability, and it implicitly means the modification operation will be performed as 0.5 probability \n\n" 
+    "--clear: Clear all the Cameras/MediaServers/Users on all the servers.It will not delete admin user. You could specify --fake option as second parameter, eg:" 
+    "--clear --fake. This will remove all the resources that has name prefixed with ec2_test which is the generated data name pattern\n\n" 
+    "--sync: Test all the servers are on the same page or not.This test will perform regarding the existed ec2 REST api, for example " 
+    ", no layout API is supported, then this test cannot test whether 2 servers has exactly same layouts  \n\n" 
+    "--recover: Recover from last rollback failure. If you see rollback failed for the last run, you can run this option next time to recover from " 
+    "the last rollback error specifically. Or you could run any other cases other than --help/--recover,the recover will be performed automatically as well. \n\n" 
+    "--merge-test: Test server merge. The user needs to specify more than one server in the config file. This test will temporarilly change the server system name," 
+    "currently I assume such change will NOT modify the server states. Once the merge test finished, the system name for each server will be recover automatically.\n\n" 
+    "--rtsp-test: Test the rtsp streaming. The user needs to specify section [Rtsp] in side of the config file and also " 
+    "testSize attribute in it , eg: \n[Rtsp]\ntestSize=100\n Which represent how many test case performed on EACH server.\n\n" 
+    "--add=Camera/MediaServer/User --count=num: Add a fake Camera/MediaServer/User to the server you sepcify in the list. The --count " 
+    "option MUST be specified , so a working example is like: --add=Camera --count=500 . This will add 500 cameras(fake) into "
+    "the server.\n\n"
+    "--remove=Camera/MediaServer/User (--id=id)*: Remove a Camera/MediaServer/User with id OR remove all the resources.The user can "
+    "specify --id option to enable remove a single resource, eg : --remove=MediaServer --id={SomeGUID} , and --remove=MediaServer will remove " 
+    "all the media server.\nNote: --add/--remove will perform the corresponding operations on a random server in the server list if the server list "
+    "have more than one server.You could specify the --fake as the second option,eg: --remove=Camera --fake .This will remove all the cameras that " 
+    "has name prefixed with ec2_test which is name pattern for generated cameras\n\n" 
+    "If no parameter is specified, the default automatic test will performed.This includes add/update/remove Cameras/MediaServer/Users and also add/update " 
+    "user attributes list , server attributes list and resource parameter list. Additionally , the confliction test will be performed as well, it includes " 
+    "modify a resource on one server and delete the same resource on another server to trigger confliction.Totally 9 different test cases will be performed in this " 
+    "run.Currently, all the modification/deletion will only happened on fake data, and after the whole testing finished, the fake data will be wiped out so " 
+    "the old database should not be modified.The user can specify configuration parameter in ec2_tests.cfg file, eg:\n[General]\ntestCaseSize=200\nclusterTestSleepTime=10\n "
+    "this options will make each test case in 9 cases run on each server 200 times. Additionally clusterTestSleepTime represent after every 200 operations, how long should I "
+    "wait and then perform sync operation to check whether all the server get the notification")
 
 def doCleanUp():
     selection = None
@@ -3708,11 +3716,13 @@ if __name__ == '__main__':
                  # all the servers are on the same page
         else:
             if len(sys.argv) == 1:
+                ret = None
                 try:
-                    unittest.main()
-                except:
-                    MergeTest().test()
-                    SystemNameTest().run()
+                    ret = unittest.main()
+                except SystemExit,e:
+                    if not e.code:
+                        if MergeTest().test():
+                            SystemNameTest().run()
 
                     print "\n\nALL AUTOMATIC TEST ARE DONE\n\n"
                     doCleanUp()
@@ -3741,6 +3751,6 @@ if __name__ == '__main__':
                 elif sys.argv[1] == '--rtsp-perf':
                     runRtspPerf()
                 elif len(sys.argv) == 3 and sys.argv[1] == '--perf':
-                    runPerformanceTest()
+                    runPerfTest()
                 else:
-                    print "Unknown command parameter"
+                    runMiscFunction()
