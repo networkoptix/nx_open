@@ -202,6 +202,9 @@ namespace nx_http
         //!Composes request with authorization header based on \a response
         bool resendRequestWithAuthorization( const nx_http::Response& response );
 
+        AsyncHttpClient( const AsyncHttpClient& );
+        AsyncHttpClient& operator=( const AsyncHttpClient& );
+
         static const char* toString( State state );
     };
 
