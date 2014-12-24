@@ -11,5 +11,6 @@
                 <param name = "MaxFPS"
                 default_value ="30"/>
             </params>
+        </resource>
     </oem>
 </resources>

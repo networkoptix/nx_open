@@ -1522,7 +1522,9 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
         if (QnAspectRatio::isRotated90(item->rotation()))
             widgetAspectRatio = 1 / widgetAspectRatio;
     }
-    const Qt::Orientation orientation = widgetAspectRatio > 1.0 ? Qt::Vertical : Qt::Horizontal;
+    Qt::Orientation orientation = widgetAspectRatio > 1.0 ? Qt::Vertical : Qt::Horizontal;
+    if (qFuzzyEquals(widgetAspectRatio, 1.0))
+        orientation = QnGeometry::aspectRatio(workbench()->mapper()->cellSize()) > 1.0 ? Qt::Horizontal : Qt::Vertical;
     const QSize size = bestSingleBoundedSize(workbench()->mapper(), 1, orientation, widgetAspectRatio);
 
     /* Adjust item's geometry for the new size. */

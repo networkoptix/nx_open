@@ -494,6 +494,7 @@ void QnActiResource::stopInputPortMonitoringAsync()
     //TODO #ak do not use DummyHandler here. httpClient->doGet should accept functor
     connect( httpClient.get(), &nx_http::AsyncHttpClient::done,
         ec2::DummyHandler::instance(), [httpClient](nx_http::AsyncHttpClientPtr) mutable {
+            httpClient->disconnect( nullptr, (const char*)nullptr );
             httpClient.reset();
         },
         Qt::DirectConnection );
