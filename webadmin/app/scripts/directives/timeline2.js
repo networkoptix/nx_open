@@ -52,9 +52,12 @@ angular.module('webadminApp')
                 var oldSetValue = 0;
                 var oldScrollValue = 0;
                 function viewPortScrollRelative(value){
+
+
                     var availableWidth = scope.scrollWidth - viewportWidth;
                     var onePixelScroll = scope.scrollWidth/viewportWidth;
                     if(typeof(value) ==='undefined') {
+
                         if(availableWidth < 1){
                             return 0.5;
                         }
@@ -65,6 +68,8 @@ angular.module('webadminApp')
                         var result = Math.min(scrollPos/availableWidth,1);
                         return result;
                     } else {
+                        value = Math.min(Math.max(value,0),1);
+
                         oldSetValue = Math.min(value,1);
                         oldScrollValue = Math.round(value * availableWidth);
                         //console.log(oldScrollValue, availableWidth, value);
@@ -72,13 +77,13 @@ angular.module('webadminApp')
 
                         // Delta between oldScrollValue and availableWidth should be less, that one pixel of scroll
 
-                        if(availableWidth - oldScrollValue < onePixelScroll && value < 1){
+                        /*if(availableWidth - oldScrollValue < onePixelScroll && value < 1){
                             oldScrollValue -= onePixelScroll;
                         }
 
                         if(oldScrollValue < onePixelScroll && value > 0){
                             oldScrollValue += onePixelScroll;
-                        }
+                        }*/
 
 
                         scroll.scrollLeft(oldScrollValue);
@@ -275,7 +280,7 @@ angular.module('webadminApp')
                     var level = RulerModel.levels[scope.actualLevel];
 
                     var end = level.interval.alignToFuture (screenRelativePositionToDate(1));
-                    var position = level.interval.alignToPast(screenRelativePositionToDate(0));
+                    var position = level.interval.alignToFuture(screenRelativePositionToDate(0));
 
                     var findLevel = function(level){
                         return level.interval.checkDate(position);
