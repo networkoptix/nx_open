@@ -1407,6 +1407,8 @@ void QnMain::run()
 
     qnCommon->setModuleGUID(serverGuid());
     qnCommon->setLocalSystemName(settings->value("systemName").toString());
+    qint64 systemIdentityTime = MSSettings::roSettings()->value("systemIndentityTime").toLongLong();
+    qnCommon->setSystemIdentityTime(systemIdentityTime);
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory( Qn::PT_Server ));
 

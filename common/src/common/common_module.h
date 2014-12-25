@@ -44,7 +44,15 @@ public:
 
     void setObsoleteServerGuid(const QnUuid& guid) { m_obsoleteUuid = guid; }
     QnUuid obsoleteServerGuid() const{ return m_obsoleteUuid; }
-    
+
+    /*
+    * This timestamp is using for database backup/restore operation.
+    * Server has got systemIdentity time after DB restore operation
+    * This time help pushing database from current server to all others
+    */
+    void setSystemIdentityTime(qint64 value) { m_systemIdentityTime = value; }
+    qint64 systemIdentityTime() const { return m_systemIdentityTime; }
+
     void setRemoteGUID(const QnUuid& guid);
     QnUuid remoteGUID() const;
 
@@ -94,6 +102,7 @@ private:
     mutable QMutex m_mutex;
     bool m_transcodingDisabled;
     QSet<QnUuid> m_allowedPeers;
+    qint64 m_systemIdentityTime;
 };
 
 #define qnCommon (QnCommonModule::instance())

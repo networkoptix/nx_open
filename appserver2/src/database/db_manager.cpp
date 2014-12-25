@@ -36,6 +36,7 @@
 #include "utils/common/log.h"
 #include "nx_ec/data/api_camera_data_ex.h"
 #include "restype_xml_parser.h"
+#include "../../mediaserver/src/media_server/settings.h"
 
 using std::nullptr_t;
 
@@ -292,8 +293,16 @@ bool QnDbManager::init(
     QString backupDbFileName = dbFileName + QString::fromLatin1(".backup");
     if (QFile::exists(backupDbFileName)) {
         QFile::remove(dbFileName);
-        QFile::rename(backupDbFileName, dbFileName);
-        m_needResyncLog = true;
+        if (QFile::rename(backupDbFileName, dbFileName)) {
+            m_needResyncLog = true;
+            qint64 backupDbTime = MSSettings::roSettings()->value("dbBackupFileTime").toLongLong();
+            qint64 systemIdentityTime = qMax(MSSettings::roSettings()->value("systemIndentityTime").toLongLong() + 1, backupDbTime);
+            MSSettings::roSettings()->setValue("systemIndentityTime", systemIdentityTime);
+            qnCommon->setSystemIdentityTime(backupDbTime);
+        }
+        else {
+            qWarning() << "Can't rename database file from" << backupDbFileName << "to" << dbFileName << "Database restore operation canceled";
+        }
     }
 
     m_sdbStatic = QSqlDatabase::addDatabase("QSQLITE", "QnDbManagerStatic");
@@ -1459,8 +1468,6 @@ ErrorCode QnDbManager::updateCameraSchedule(const std::vector<ApiScheduleTaskDat
     return ErrorCode::ok;
 }
 
-void restartServer();
-
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiDatabaseDumpData>& tran)
 {
     m_sdb.close();
@@ -1476,7 +1483,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiDatabas
         QFile::remove(f.fileName());
         return ErrorCode::dbError; // invalid back file
     }
-
+    MSSettings::roSettings()->setValue("dbBackupFileTime", qnSyncTime->currentMSecsSinceEpoch());
     return ErrorCode::ok;
 }
 

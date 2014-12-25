@@ -29,6 +29,7 @@
 #include <utils/common/checked_cast.h>
 #include "utils/common/warnings.h"
 #include "transaction/runtime_transaction_log.h"
+#include "../../mediaserver/src/media_server/settings.h"
 
 
 namespace ec2
@@ -1037,6 +1038,16 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
         }
         Q_ASSERT(found);
         removeTTSequenceForPeer(transport->remotePeer().id);
+
+        if (m_localPeer.isServer() && transport->remoteIdentityTime() > qnCommon->systemIdentityTime() )
+        {
+            // swith to new time
+            transport->setState(QnTransactionTransport::Error);
+            MSSettings::roSettings()->setValue("systemIndentityTime", transport->remoteIdentityTime());
+            m_handler->databaseReplaceRequired();
+            return;
+        }
+
         transport->setState(QnTransactionTransport::ReadyForStreaming);
 
         transport->processExtraData();
@@ -1213,8 +1224,21 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(const QSharedPointer<A
     Q_ASSERT(!m_connections.contains(remotePeer.id));
 }
 
-void QnTransactionMessageBus::addConnectionToPeer(const QUrl& url)
+QUrl addCurrentPeerInfo(const QUrl& srcUrl)
 {
+    QUrl url(srcUrl);
+    QUrlQuery q(url.query());
+
+    q.addQueryItem("guid", qnCommon->moduleGUID().toString());
+    q.addQueryItem("runtime-guid", qnCommon->runningInstanceGUID().toString());
+    q.addQueryItem("system-identity-time", QString::number(qnCommon->systemIdentityTime()));
+    url.setQuery(q);
+    return url;
+}
+
+void QnTransactionMessageBus::addConnectionToPeer(const QUrl& _url)
+{
+    QUrl url = addCurrentPeerInfo(_url);
     QMutexLocker lock(&m_mutex);
     if (!m_remoteUrls.contains(url)) {
         m_remoteUrls.insert(url, RemoteUrlConnectInfo());
@@ -1222,8 +1246,10 @@ void QnTransactionMessageBus::addConnectionToPeer(const QUrl& url)
     }
 }
 
-void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& url)
+void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& _url)
 {
+    QUrl url = addCurrentPeerInfo(_url);
+
     QMutexLocker lock(&m_mutex);
     m_remoteUrls.remove(url);
     QString urlStr = getUrlAddr(url);
