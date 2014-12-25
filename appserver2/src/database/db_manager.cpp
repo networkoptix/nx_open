@@ -292,10 +292,14 @@ bool QnDbManager::init(
     QString backupDbFileName = dbFileName + QString::fromLatin1(".backup");
     if (QFile::exists(backupDbFileName)) {
         QFile::remove(dbFileName);
-        if (QFile::rename(backupDbFileName, dbFileName))
+        if (QFile::rename(backupDbFileName, dbFileName)) {
             m_needResyncLog = true;
-        else
+            QFile::remove(dbFileName + lit("-shm"));
+            QFile::remove(dbFileName + lit("-wal"));
+        }
+        else {
             qWarning() << "Can't rename database file from" << backupDbFileName << "to" << dbFileName << "Database restore operation canceled";
+        }
     }
 
     m_sdbStatic = QSqlDatabase::addDatabase("QSQLITE", "QnDbManagerStatic");
@@ -310,7 +314,7 @@ bool QnDbManager::init(
 
 
     QSqlQuery identityTimeQuery(m_sdb);
-    identityTimeQuery.prepare("SELECT value FROM misc_data WHERE key = ?");
+    identityTimeQuery.prepare("SELECT data FROM misc_data WHERE key = ?");
     identityTimeQuery.addBindValue("gotDbDumpTime");
     if (identityTimeQuery.exec() && identityTimeQuery.next()) 
     {
@@ -1497,14 +1501,14 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiDatabas
         return ErrorCode::dbError; // invalid back file
     }
     QSqlQuery testDbQuery(testDB);
-    testDbQuery.prepare("INSERT OR REPLACE INTO misc_data SET key = ?, value = ? WHERE key = ?");
+    testDbQuery.prepare("INSERT OR REPLACE INTO misc_data (key, data) VALUES (?, ?)");
     testDbQuery.addBindValue("gotDbDumpTime");
     testDbQuery.addBindValue(qnSyncTime->currentMSecsSinceEpoch());
-    testDbQuery.addBindValue("gotDbDumpTime");
     if (!testDbQuery.exec()) {
         qWarning() << "Skipping bad database dump file";
         return ErrorCode::dbError; // invalid back file
     }
+    testDB.close();
     return ErrorCode::ok;
 }
 
