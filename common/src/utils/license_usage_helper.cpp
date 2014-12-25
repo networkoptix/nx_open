@@ -215,15 +215,24 @@ QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(const QnVirtualCameraResourceLi
 }
 
 void QnCamLicenseUsageHelper::init() {
+    /* Call update if server or camera was changed. */
     auto updateIfNeeded = [this](const QnResourcePtr &resource) {
-        if (!resource.dynamicCast<QnMediaServerResource>())
-            return;
-        update();
+        if (resource.dynamicCast<QnMediaServerResource>() || resource.dynamicCast<QnVirtualCameraResource>())
+            update();
     };
 
     connect(qnResPool, &QnResourcePool::resourceAdded,   this,   updateIfNeeded);
     connect(qnResPool, &QnResourcePool::resourceRemoved, this,   updateIfNeeded);
     connect(qnResPool, &QnResourcePool::statusChanged,   this,   updateIfNeeded);
+
+    connect(qnResPool, &QnResourcePool::resourceAdded,   this,   [this](const QnResourcePtr &resource) {
+        if (const QnVirtualCameraResourcePtr &camera = resource.dynamicCast<QnVirtualCameraResource>())
+            connect(camera, &QnVirtualCameraResource::scheduleDisabledChanged, this, &QnLicenseUsageHelper::update);
+    });
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this,   [this](const QnResourcePtr &resource) {
+        if (const QnVirtualCameraResourcePtr &camera = resource.dynamicCast<QnVirtualCameraResource>())
+            disconnect(camera, NULL, this, NULL);
+    });
 }
 
 void QnCamLicenseUsageHelper::propose(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable) {
