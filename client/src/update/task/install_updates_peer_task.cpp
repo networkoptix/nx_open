@@ -13,7 +13,7 @@
 
 namespace {
     const int checkTimeout = 15 * 60 * 1000;
-    const int startPingTimeout = 2 * 60 * 1000;
+    const int startPingTimeout = 1 * 60 * 1000;
     const int pingInterval = 10 * 1000;
     const int shortTimeout = 60 * 1000;
 
@@ -154,7 +154,11 @@ void QnInstallUpdatesPeerTask::at_checkTimer_timeout() {
 
 void QnInstallUpdatesPeerTask::at_pingTimer_timeout() {
     m_pingTimer->setInterval(pingInterval);
+
+    auto connection = m_ecServer->apiConnection();
+    connection->setOfflineRequestsEnabled(true);
     m_ecServer->apiConnection()->modulesInformation(this, SLOT(at_gotModuleInformation(int,QList<QnModuleInformation>,int)));
+    connection->setOfflineRequestsEnabled(false);
 }
 
 void QnInstallUpdatesPeerTask::at_gotModuleInformation(int status, const QList<QnModuleInformation> &modules, int handle) {

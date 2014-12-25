@@ -40,6 +40,8 @@ public:
     QnMediaServerConnection(QnMediaServerResource* mserver, const QnUuid& videowallGuid = QnUuid(), QObject *parent = NULL);
     virtual ~QnMediaServerConnection();
 
+    void setOfflineRequestsEnabled(bool enable);
+
     int getTimePeriodsAsync(
         const QnNetworkResourceList &list,
         qint64 startTimeMs, 
@@ -223,6 +225,7 @@ protected:
 private:
     QString m_proxyAddr;
     int m_proxyPort;
+    bool m_enableOfflineRequests;
 };
 
 
