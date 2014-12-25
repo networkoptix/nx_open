@@ -295,10 +295,10 @@ bool QnDbManager::init(
         QFile::remove(dbFileName);
         if (QFile::rename(backupDbFileName, dbFileName)) {
             m_needResyncLog = true;
-            qint64 backupDbTime = MSSettings::roSettings()->value("dbBackupFileTime").toLongLong();
-            qint64 systemIdentityTime = qMax(MSSettings::roSettings()->value("systemIndentityTime").toLongLong() + 1, backupDbTime);
+            qint64 dumpTime = MSSettings::roSettings()->value("gotDbDumpTime").toLongLong();
+            qint64 systemIdentityTime = qMax(MSSettings::roSettings()->value("systemIndentityTime").toLongLong() + 1, dumpTime);
             MSSettings::roSettings()->setValue("systemIndentityTime", systemIdentityTime);
-            qnCommon->setSystemIdentityTime(backupDbTime);
+            qnCommon->setSystemIdentityTime(systemIdentityTime);
         }
         else {
             qWarning() << "Can't rename database file from" << backupDbFileName << "to" << dbFileName << "Database restore operation canceled";
@@ -1483,7 +1483,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiDatabas
         QFile::remove(f.fileName());
         return ErrorCode::dbError; // invalid back file
     }
-    MSSettings::roSettings()->setValue("dbBackupFileTime", qnSyncTime->currentMSecsSinceEpoch());
+    MSSettings::roSettings()->setValue("gotDbDumpTime", qnSyncTime->currentMSecsSinceEpoch());
     return ErrorCode::ok;
 }
 
