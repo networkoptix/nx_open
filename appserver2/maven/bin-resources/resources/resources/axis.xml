@@ -6,7 +6,7 @@
                 default_value = "16"/>
             </params>
         </resource>
-        <resource name = "AXISP1428E" public = "AXIS_COMMON"/>
+        <resource name = "AXISP1428E" public = "AXIS_COMMON">
             <params>
                 <param name = "MaxFPS"
                 default_value ="30"/>
