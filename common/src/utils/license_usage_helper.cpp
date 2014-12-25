@@ -168,6 +168,11 @@ int QnLicenseUsageHelper::usedLicense(Qn::LicenseType licenseType) const {
     return m_usedLicenses[licenseType];
 }
 
+int QnLicenseUsageHelper::requiredLicenses(Qn::LicenseType licenseType) const {
+    return m_overflowLicenses[licenseType];
+}
+
+
 QList<Qn::LicenseType> QnLicenseUsageHelper::licenseTypes() const {
     if (m_licenseTypes.isEmpty())
         m_licenseTypes = calculateLicenseTypes();

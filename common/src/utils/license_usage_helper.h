@@ -50,8 +50,14 @@ public:
      */
     QString getProposedUsageText() const;
 
+    /** Number of valid licenses of the selected type. */
     int totalLicense(Qn::LicenseType licenseType) const;
+
+    /** Number of licenses of the selected type currently in use. */
     int usedLicense(Qn::LicenseType licenseType) const;
+
+    /** Number of licenses of the selected type lacking for system to work. */
+    int requiredLicenses(Qn::LicenseType licenseType) const;
 
     virtual QList<Qn::LicenseType> licenseTypes() const;
 
