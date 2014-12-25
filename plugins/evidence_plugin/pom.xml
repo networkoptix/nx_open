@@ -6,14 +6,14 @@
     It should also be possible to have one maven project per solution project, 
     and have a parent pom to deletegate the build.
   -->
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<artifactId>plugins</artifactId>
-		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>2.2.1-SNAPSHOT</version>
-		<relativePath>..</relativePath>
-	</parent>
-    
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>plugins</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>2.2.1-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
     <groupId>com.networkoptix.hdwitness</groupId>
     <version>1.5.0-SNAPSHOT</version>
     <artifactId>evidencecamplugin</artifactId>
@@ -27,8 +27,8 @@
         <global.libs/>
         <!--Specific os libs used-->
         <windows.oslibs/>
-        <windows.oslibs.release></windows.oslibs.release>
-        <windows.oslibs.debug></windows.oslibs.debug>        
+        <windows.oslibs.release/>
+        <windows.oslibs.debug/>        
         <!--Global defines-->
         <global.defines/>
         <mac.defines/>
@@ -36,18 +36,16 @@
         <!--Specific os defines-->
         <windows.defines>WIN32_LEAN_AND_MEAN</windows.defines>
     </properties>  
-
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>build_environment</artifactId>
             <version>${project.version}</version>
-            <type>pom</type>
+            <type>pom</type> 
             <scope>system</scope>
-            <systemPath>${root.dir}/common/pom.xml</systemPath>
+            <systemPath>${root.dir}/build_environment/pom.xml</systemPath>            
         </dependency>
-    </dependencies>
-
+    </dependencies>  
     <profiles>
         <profile>
             <id>linux</id>
@@ -61,5 +59,15 @@
                 <buildLib>sharedlib</buildLib>
             </properties>
         </profile>	
+        <dependencies>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>common</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>system</scope>
+                <systemPath>${root.dir}/common/pom.xml</systemPath>
+            </dependency>
+        </dependencies>        
     </profiles>	
 </project>
