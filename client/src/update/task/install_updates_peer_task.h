@@ -5,6 +5,7 @@
 #include <update/task/network_peer_task.h>
 #include <utils/common/software_version.h>
 #include <utils/network/module_information.h>
+#include <api/api_fwd.h>
 
 class QTimer;
 
@@ -36,6 +37,7 @@ private:
 private:
     QString m_updateId;
     QnMediaServerResourcePtr m_ecServer;
+    QnMediaServerConnectionPtr m_ecConnection;
     QnSoftwareVersion m_version;
     QSet<QnUuid> m_stoppingPeers;
     QSet<QnUuid> m_restartingPeers;
