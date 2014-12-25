@@ -437,6 +437,51 @@
             <build>
                 <directory>${arch}-${box}</directory>
             </build>
-        </profile>      
+        </profile>
+        <profile>
+            <id>linux-x86-on-x64</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                    <arch>amd64</arch>
+                </os>
+                <property>
+                    <name>arch</name>
+                    <value>x86</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>                   
+                    <plugin>
+                        <groupId>com.google.code.maven-replacer-plugin</groupId>
+                        <artifactId>replacer</artifactId>
+                        <version>1.5.2</version>
+                        <executions>
+                            <execution>
+                                <id>fix-makefile-Linux-new</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>replace</goal>
+                                </goals>
+                                <configuration>
+   				    <escape>true</escape>
+    				    <regex>false</regex>
+                                    <encoding>utf-8</encoding>
+                                    <file>${project.build.directory}/Makefile.release</file>
+                                    <ignoreMissingFile>true</ignoreMissingFile>                                    
+                                    <replacements>
+                                        <replacement>
+                                            <token> /usr/include/c++/4.8</token>
+                                            <value> </value>
+                                        </replacement>         
+                                    </replacements>
+                                </configuration>                                   
+                            </execution>                          
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>         
     </profiles> 
 </project>
