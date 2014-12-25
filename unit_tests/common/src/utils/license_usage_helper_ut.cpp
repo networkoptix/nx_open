@@ -7,6 +7,7 @@
 
 #include <utils/license_usage_helper.h>
 
+/** Initial test. Check if empty helper is valid. */
 TEST( QnCamLicenseUsageHelperTest, init )
 {
     QnLicensePoolScaffold licPoolScaffold;
@@ -16,22 +17,73 @@ TEST( QnCamLicenseUsageHelperTest, init )
     ASSERT_TRUE( helper.isValid() );
 }
 
-TEST( QnCamLicenseUsageHelperTest, testProfessionalLicenses )
+/** Basic test for single license type. */
+TEST( QnCamLicenseUsageHelperTest, singleLicenseType )
 {
     QnLicensePoolScaffold licPoolScaffold;
 
     QnResourcePoolScaffold resPoolScaffold;
-    resPoolScaffold.addCamera()->setScheduleDisabled(false);
+    resPoolScaffold.addCamera();
 
     QnCamLicenseUsageHelper helper;
     ASSERT_FALSE( helper.isValid() );
 
-    licPoolScaffold.addLicense(Qn::LC_Professional, 2);
+    licPoolScaffold.addLicenses(Qn::LC_Professional, 2);
     ASSERT_TRUE( helper.isValid() );
 
-    resPoolScaffold.addCamera()->setScheduleDisabled(false);
+    resPoolScaffold.addCamera();
     ASSERT_TRUE( helper.isValid() );
 
-    resPoolScaffold.addCamera()->setScheduleDisabled(false);
+    resPoolScaffold.addCamera();
     ASSERT_FALSE( helper.isValid() );
+}
+
+/** Basic test for license borrowing. */
+TEST( QnCamLicenseUsageHelperTest, borrowTrialLicenses )
+{
+    QnLicensePoolScaffold licPoolScaffold;
+    QnResourcePoolScaffold resPoolScaffold;
+
+    QnCamLicenseUsageHelper helper;
+
+    resPoolScaffold.addCamera(Qn::LC_VMAX);
+    resPoolScaffold.addCamera(Qn::LC_AnalogEncoder);
+    resPoolScaffold.addCamera(Qn::LC_Analog);
+    resPoolScaffold.addCamera(Qn::LC_Professional);
+    resPoolScaffold.addCamera(Qn::LC_Edge);
+
+    ASSERT_FALSE( helper.isValid() );
+ 
+    /* Trial licenses can be used instead of all other types. */
+    licPoolScaffold.addLicenses(Qn::LC_Trial, 5);
+    ASSERT_TRUE( helper.isValid() );
+
+    resPoolScaffold.addCamera(Qn::LC_VMAX);
+    ASSERT_FALSE( helper.isValid() );
+
+    /* Now we should have 5 trial and 1 edge licenses for 2 vmax cameras and 1 of each other type. */
+    licPoolScaffold.addLicenses(Qn::LC_Edge, 1);
+    ASSERT_TRUE( helper.isValid() );
+}
+
+/** Advanced test for license borrowing. */
+TEST( QnCamLicenseUsageHelperTest, borrowTrialAndEdgeLicenses )
+{
+    QnLicensePoolScaffold licPoolScaffold;
+    QnResourcePoolScaffold resPoolScaffold;
+
+    QnCamLicenseUsageHelper helper;
+
+    resPoolScaffold.addCameras(Qn::LC_VMAX, 2);
+    resPoolScaffold.addCameras(Qn::LC_AnalogEncoder, 2);
+    resPoolScaffold.addCameras(Qn::LC_Analog, 2);
+    resPoolScaffold.addCameras(Qn::LC_Professional, 2);
+    resPoolScaffold.addCameras(Qn::LC_Edge, 2);
+
+    ASSERT_FALSE( helper.isValid() );
+
+    /* Trial licenses can be used instead of all other types. */
+    licPoolScaffold.addLicenses(Qn::LC_Trial, 5);
+    licPoolScaffold.addLicenses(Qn::LC_Edge, 5);
+    ASSERT_TRUE( helper.isValid() );
 }

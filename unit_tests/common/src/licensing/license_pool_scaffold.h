@@ -9,7 +9,8 @@ public:
     QnLicensePoolScaffold();
     ~QnLicensePoolScaffold();
 
-    void addLicense(Qn::LicenseType licenseType, int count);
+    void addLicense(Qn::LicenseType licenseType);
+    void addLicenses(Qn::LicenseType licenseType, int count);
 };
 
 #endif QN_LICENSE_POOL_SCAFFOLD

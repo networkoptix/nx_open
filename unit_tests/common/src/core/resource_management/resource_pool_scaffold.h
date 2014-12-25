@@ -16,7 +16,8 @@ public:
     QnResourcePoolScaffold();
     ~QnResourcePoolScaffold();
 
-    QnVirtualCameraResourcePtr addCamera(Qn::LicenseType cameraType = Qn::LC_Professional);
+    QnVirtualCameraResourcePtr addCamera(Qn::LicenseType cameraType = Qn::LC_Professional, bool recordingEnabled = true);
+    QnVirtualCameraResourceList addCameras(Qn::LicenseType cameraType = Qn::LC_Professional, int count = 1, bool recordingEnabled = true);
 private:
     QnResourcePropertyDictionary* m_propertyDictionary;
     QnResourceStatusDictionary* m_statusDictionary;

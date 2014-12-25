@@ -10,6 +10,10 @@ QnLicensePoolScaffold::~QnLicensePoolScaffold() {
     qnLicensePool->reset();
 }
 
-void QnLicensePoolScaffold::addLicense(Qn::LicenseType licenseType, int count) {
+void QnLicensePoolScaffold::addLicenses(Qn::LicenseType licenseType, int count) {
     qnLicensePool->addLicense(QnLicensePtr(new QnLicenseStub(licenseType, count)));
+}
+
+void QnLicensePoolScaffold::addLicense(Qn::LicenseType licenseType) {
+    addLicenses(licenseType, 1);
 }
