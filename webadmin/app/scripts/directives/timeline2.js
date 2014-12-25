@@ -49,7 +49,7 @@ angular.module('webadminApp')
                 var scroll = element.find('.scroll');
 
 
-                //var oldSetValue = 0;
+                var oldSetValue = 0;
                 function viewPortScrollRelative(value){
                     var availableWidth = scope.scrollWidth - viewportWidth;
                     if(typeof(value) ==='undefined') {
@@ -58,13 +58,18 @@ angular.module('webadminApp')
                         }
                         var result = Math.min(scroll.scrollLeft()/availableWidth,1);
 
-                        /*if(Math.abs(result - oldSetValue)<0.001) {
+                        if(Math.abs(result - oldSetValue)<0.001) {
                             return oldSetValue;
-                        }*/
+                        }
                         return result;
                     } else {
-                        //oldSetValue = value;
-                        scroll.scrollLeft(Math.round(value * availableWidth));
+                        oldSetValue = value;
+                        var targetScroll = Math.round(value * availableWidth);
+                        /*if(value != 1){
+
+                        }*/
+
+                        scroll.scrollLeft(targetScroll);
                     }
                 }
 
