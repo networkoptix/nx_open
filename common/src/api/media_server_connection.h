@@ -37,7 +37,7 @@ class QnMediaServerConnection: public QnAbstractConnection {
     typedef QnAbstractConnection base_type;
 
 public:
-    QnMediaServerConnection(QnMediaServerResource* mserver, const QnUuid& videowallGuid = QnUuid(), QObject *parent = NULL);
+    QnMediaServerConnection(QnMediaServerResource* mserver, const QnUuid& videowallGuid = QnUuid(), bool enableOfflineRequests = false, QObject *parent = NULL);
     virtual ~QnMediaServerConnection();
 
     int getTimePeriodsAsync(
@@ -204,7 +204,8 @@ public:
     int deleteBookmarkAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
     int getBookmarksAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmarkSearchFilter &filter, QObject *target, const char *slot);
 
-    int installUpdate(const QString &updateId, const QByteArray &data, QObject *target, const char *slot);
+    int installUpdate(const QString &updateId, QObject *target, const char *slot);
+    int uploadUpdateChunk(const QString &updateId, const QByteArray &data, qint64 offset, QObject *target, const char *slot);
 
     int restart(QObject *target, const char *slot);
 
@@ -223,6 +224,7 @@ protected:
 private:
     QString m_proxyAddr;
     int m_proxyPort;
+    bool m_enableOfflineRequests;
 };
 
 

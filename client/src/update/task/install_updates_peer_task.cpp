@@ -10,10 +10,11 @@
 #include <core/resource/media_server_resource.h>
 #include <client/client_message_processor.h>
 #include <common/common_module.h>
+#include <utils/common/delete_later.h>
 
 namespace {
     const int checkTimeout = 15 * 60 * 1000;
-    const int startPingTimeout = 2 * 60 * 1000;
+    const int startPingTimeout = 1 * 60 * 1000;
     const int pingInterval = 10 * 1000;
     const int shortTimeout = 60 * 1000;
 
@@ -46,6 +47,7 @@ void QnInstallUpdatesPeerTask::setVersion(const QnSoftwareVersion &version) {
 
 void QnInstallUpdatesPeerTask::finish(int errorCode) {
     qnResPool->disconnect(this);
+    m_ecConnection.reset();
     /* There's no need to unhold connection now if we can't connect to the server */
     if (!m_protoProblemDetected)
         static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance())->setHoldConnection(false);
@@ -108,7 +110,7 @@ void QnInstallUpdatesPeerTask::at_resourceChanged(const QnResourcePtr &resource)
     QnUuid peerId = resource->getId();
 
     /* Stop ping timer if the main server has appeared online */
-    if (resource == m_ecServer && !m_stoppingPeers.contains(peerId) && resource->getStatus() == Qn::Online)
+    if (resource->getId() == m_ecServer->getId() && !m_stoppingPeers.contains(peerId) && resource->getStatus() == Qn::Online)
         m_pingTimer->stop();
 
     if (!m_pendingPeers.contains(peerId))
@@ -154,7 +156,11 @@ void QnInstallUpdatesPeerTask::at_checkTimer_timeout() {
 
 void QnInstallUpdatesPeerTask::at_pingTimer_timeout() {
     m_pingTimer->setInterval(pingInterval);
-    m_ecServer->apiConnection()->modulesInformation(this, SLOT(at_gotModuleInformation(int,QList<QnModuleInformation>,int)));
+
+    if (!m_ecConnection)
+        m_ecConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(m_ecServer.data(), QnUuid(), true), &qnDeleteLater);
+
+    m_ecConnection->modulesInformation(this, SLOT(at_gotModuleInformation(int,QList<QnModuleInformation>,int)));
 }
 
 void QnInstallUpdatesPeerTask::at_gotModuleInformation(int status, const QList<QnModuleInformation> &modules, int handle) {

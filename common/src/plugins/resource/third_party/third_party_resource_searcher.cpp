@@ -253,17 +253,34 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     nxcip_qt::CameraDiscoveryManager* const discoveryManager,
     const nxcip::CameraInfo& cameraInfo )
 {
+    const QString vendor = discoveryManager->getVendorName();
+
+    if( strlen(cameraInfo.uid) == 0 )
+    {
+        NX_LOG( lit("THIRD_PARTY. Plugin %1 returned camera with empty uid. This is forbidden").
+            arg(vendor), cl_logDEBUG1 );
+        return QnThirdPartyResourcePtr();
+    }
+    if( strlen(cameraInfo.url) == 0 )
+    {
+        NX_LOG( lit("THIRD_PARTY. Plugin %1 returned camera with empty url. This is forbidden").
+            arg(vendor), cl_logDEBUG1 );
+        return QnThirdPartyResourcePtr();
+    }
+
     QnUuid typeId = qnResTypePool->getResourceTypeId(manufacture(), THIRD_PARTY_MODEL_NAME);
     if( typeId.isNull() )
         return QnThirdPartyResourcePtr();
 
     nxcip::BaseCameraManager* camManager = discoveryManager->createCameraManager( cameraInfo );
     if( !camManager )
+    {
+        NX_LOG( lit("THIRD_PARTY. Plugin %1 could not create BaseCameraManager").arg(vendor), cl_logDEBUG1 );
         return QnThirdPartyResourcePtr();
+    }
 
     discoveryManager->getRef()->addRef();   //this ref will be released by QnThirdPartyResource
 
-    QString vendor = discoveryManager->getVendorName();
     bool vendorIsRtsp = vendor == lit("GENERIC_RTSP");  //TODO #ak remove this!
 
     QnThirdPartyResourcePtr resource(new QnThirdPartyResource(cameraInfo, camManager, discoveryManager->getRef()));
