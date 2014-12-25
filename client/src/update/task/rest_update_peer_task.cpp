@@ -9,6 +9,10 @@
 
 namespace {
     const int checkTimeout = 15 * 60 * 1000;
+
+    QnUuid getGuid(const QnResourcePtr &resource) {
+        return QnUuid::fromStringSafe(resource->getProperty(lit("guid")));
+    }
 }
 
 QnRestUpdatePeerTask::QnRestUpdatePeerTask(QObject *parent) :
@@ -45,13 +49,32 @@ void QnRestUpdatePeerTask::doStart() {
 
         int handle = server->apiConnection()->installUpdate(m_updateId, this, SLOT(at_updateInstalled(int,QnUploadUpdateReply,int)));
         m_serverByRequest[handle] = server;
-        m_serverByRealId.insert(QnUuid::fromStringSafe(server->getProperty(lit("guid"))), server);
+        m_serverByRealId.insert(getGuid(server), server);
     }
 
     if (m_serverByRequest.isEmpty()) {
         finish(NoError);
         return;
     }
+
+    connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   [this](const QnResourcePtr &resource) {
+        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+        if (!server)
+            return;
+
+        if (!m_serverByRealId.contains(getGuid(server)))
+            return;
+
+        connect(server.data(), &QnMediaServerResource::versionChanged, this, &QnRestUpdatePeerTask::at_resourceChanged);
+    });
+
+    connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   [this](const QnResourcePtr &resource) {
+        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+        if (!server)
+            return;
+
+        disconnect(server.data(), NULL, this, NULL);
+    });
 
     connect(qnResPool,  &QnResourcePool::resourceChanged,   this,   &QnRestUpdatePeerTask::at_resourceChanged);
     connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnRestUpdatePeerTask::at_resourceChanged);
@@ -65,7 +88,7 @@ void QnRestUpdatePeerTask::finishPeer(const QnUuid &id) {
         return;
 
     emit peerFinished(server->getId());
-    emit peerUpdateFinished(server->getId(), QnUuid(server->getProperty(lit("guid"))));
+    emit peerUpdateFinished(server->getId(), getGuid(server));
 
     if (m_serverByRealId.isEmpty())
         finish(NoError);
@@ -95,7 +118,7 @@ void QnRestUpdatePeerTask::at_resourceChanged(const QnResourcePtr &resource) {
     if (!server)
         return;
 
-    QnUuid id = QnUuid::fromStringSafe(server->getProperty(lit("guid")));
+    QnUuid id = getGuid(server);
     if (id.isNull())
         id = server->getId();
 
