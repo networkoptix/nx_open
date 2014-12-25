@@ -414,6 +414,9 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
             break;
         }
 
+        //TODO: #dklychkov #GDM When client tries to reconnect to a single server very often we can get "unauthorized" reply,
+        //      because we try to connect before the server initialized its auth classes.
+
         if (errCode == ec2::ErrorCode::incompatiblePeer || errCode == ec2::ErrorCode::unauthorized)
             reconnectHelper->markServerAsInvalid(reconnectHelper->currentServer());
 

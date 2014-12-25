@@ -357,9 +357,15 @@ QString QnStorageManager::toCanonicalPath(const QString& path)
     return result;
 }
 
+int QnStorageManager::getStorageIndex(const QnStorageResourcePtr& storage)
+{
+    return detectStorageIndex(storage->getPath());
+}
+
 // determine storage index (aka 16 bit hash)
 int QnStorageManager::detectStorageIndex(const QString& p)
 {
+    QMutexLocker lock(&m_mutexStorages);
     QString path = toCanonicalPath(p);
 
     if (m_storageIndexes.contains(path))
@@ -404,7 +410,7 @@ QnStorageDbPtr QnStorageManager::getSDB(const QnStorageResourcePtr &storage)
         if (QFile::exists(oldFileName) && !QFile::exists(fileName))
             QFile::rename(oldFileName, fileName);
 
-        sdb = m_chunksDB[storage->getPath()] = QnStorageDbPtr(new QnStorageDb(storage->getIndex()));
+        sdb = m_chunksDB[storage->getPath()] = QnStorageDbPtr(new QnStorageDb(getStorageIndex(storage)));
         if (!sdb->open(fileName))
         {
             qWarning() << "can't initialize sqlLite database! Actions log is not created!";
@@ -417,7 +423,7 @@ QnStorageDbPtr QnStorageManager::getSDB(const QnStorageResourcePtr &storage)
 void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
 {
     {
-        storage->setIndex(detectStorageIndex(storage->getPath()));
+        int storageIndex = detectStorageIndex(storage->getPath());
         QMutexLocker lock(&m_mutexStorages);
         m_storagesStatisticsReady = false;
     
@@ -427,7 +433,7 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
         //QnStorageResourcePtr oldStorage = removeStorage(storage); // remove existing storage record if exists
         //if (oldStorage)
         //    storage->addWritedSpace(oldStorage->getWritedSpace());
-        m_storageRoots.insert(storage->getIndex(), storage);
+        m_storageRoots.insert(storageIndex, storage);
         if (storage->isStorageAvailable())
             storage->setStatus(Qn::Online);
 
@@ -1078,7 +1084,7 @@ DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QString& cameraUniqu
 void QnStorageManager::replaceChunks(const QnTimePeriod& rebuildPeriod, const QnStorageResourcePtr &storage, const DeviceFileCatalogPtr &newCatalog, const QString& cameraUniqueId, QnServer::ChunksCatalog catalog)
 {
     QMutexLocker lock(&m_mutexCatalog);
-    int storageIndex = storage->getIndex();
+    int storageIndex = getStorageIndex(storage);
     
     // add new recorded chunks to scan data
     qint64 scannedDataLastTime = newCatalog->m_chunks.empty() ? 0 : newCatalog->m_chunks[newCatalog->m_chunks.size()-1].startTimeMs;
@@ -1147,7 +1153,7 @@ QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIn
             int idPos = root.length() + qualityLen;
             uniqueId = fileName.mid(idPos+1, fileName.indexOf(separator, idPos+1) - idPos-1);
 
-            storageIndex = itr.value()->getIndex();
+            storageIndex = getStorageIndex(itr.value());
             return *itr;
         }
     }

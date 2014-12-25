@@ -890,6 +890,7 @@ namespace nx_http
         auto requestCompletionFunc = [httpClientCaptured, completionHandler]
             ( nx_http::AsyncHttpClientPtr httpClient ) mutable
         {
+            httpClientCaptured->disconnect( nullptr, (const char*)nullptr );
             httpClientCaptured.reset();
 
             if( httpClient->failed() )
@@ -917,7 +918,13 @@ namespace nx_http
             httpClientCaptured.get(), requestCompletionFunc,
             Qt::DirectConnection );
 
-        return httpClientCaptured->doGet( url );
+        if( !httpClientCaptured->doGet( url ) )
+        {
+            //if we do not disconnect, http client object will not be destroyed
+            httpClientCaptured->disconnect( nullptr, (const char*)nullptr );
+            return false;
+        }
+        return true;
     }
 
     SystemError::ErrorCode downloadFileSync(

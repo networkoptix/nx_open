@@ -196,13 +196,13 @@ namespace ec2
 #ifdef _DEBUG
     static const size_t LOCAL_SYSTEM_TIME_BROADCAST_PERIOD_MS = 10*MILLIS_PER_SEC;
     static const size_t MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS = 60*MILLIS_PER_SEC;
-    static const size_t INTERNET_SYNC_TIME_PERIOD_SEC = 30;
+    static const size_t INTERNET_SYNC_TIME_PERIOD_SEC = 60;
 #else
     static const size_t LOCAL_SYSTEM_TIME_BROADCAST_PERIOD_MS = 10*60*MILLIS_PER_SEC;
     //!Once per 10 minutes checking if manual time server selection is required
     static const size_t MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS = 10*60*MILLIS_PER_SEC;
     //!Accurate time is fetched from internet with this period
-    static const size_t INTERNET_SYNC_TIME_PERIOD_SEC = 600;
+    static const size_t INTERNET_SYNC_TIME_PERIOD_SEC = 24*60*60;
 #endif
     //!If time synchronization with internet failes, period is multiplied on this value, but it cannot exceed \a MAX_PUBLIC_SYNC_TIME_PERIOD_SEC
     static const size_t INTERNET_SYNC_TIME_FAILURE_PERIOD_GROW_COEFF = 2;
@@ -715,7 +715,8 @@ namespace ec2
 
             if( millisFromEpoch > 0 )
             {
-                NX_LOG( lit("TimeSynchronizationManager. Received time %1 from the internet").arg(QDateTime::fromMSecsSinceEpoch(millisFromEpoch).toString(Qt::ISODate)), cl_logDEBUG1 );
+                NX_LOG( lit("TimeSynchronizationManager. Received time %1 from the internet").
+                    arg(QDateTime::fromMSecsSinceEpoch(millisFromEpoch).toString(Qt::ISODate)), cl_logDEBUG1 );
 
                 m_internetTimeSynchronizationPeriod = INTERNET_SYNC_TIME_PERIOD_SEC;
 
@@ -783,7 +784,8 @@ namespace ec2
         m_internetSynchronizationTaskID = TimerManager::instance()->addTimer(
             std::bind( &TimeSynchronizationManager::syncTimeWithInternet, this, _1 ),
             m_internetTimeSynchronizationPeriod * MILLIS_PER_SEC );
-        NX_LOG( lit( "TimeSynchronizationManager. Added time sync task %1, delay %2" ).arg( m_internetSynchronizationTaskID ).arg( m_internetTimeSynchronizationPeriod * MILLIS_PER_SEC ), cl_logDEBUG2 );
+        NX_LOG( lit( "TimeSynchronizationManager. Added time sync task %1, delay %2" ).
+            arg( m_internetSynchronizationTaskID ).arg( m_internetTimeSynchronizationPeriod * MILLIS_PER_SEC ), cl_logDEBUG2 );
     }
 
     qint64 TimeSynchronizationManager::currentMSecsSinceEpoch() const
