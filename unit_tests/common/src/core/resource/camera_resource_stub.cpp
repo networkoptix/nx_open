@@ -1,6 +1,7 @@
 #include "camera_resource_stub.h"
 
-QnCameraResourceStub::QnCameraResourceStub()
+QnCameraResourceStub::QnCameraResourceStub(Qn::LicenseType cameraType):
+    m_cameraType(cameraType)
 {
     setId(QnUuid::createUuid());
     //setTypeId(qnResTypePool->);
@@ -20,4 +21,8 @@ QnAbstractStreamDataProvider * QnCameraResourceStub::createLiveDataProvider() {
 
 Qn::ResourceStatus QnCameraResourceStub::getStatus() const {
     return Qn::Online;
+}
+
+Qn::LicenseType QnCameraResourceStub::licenseType() const {
+    return m_cameraType;
 }
