@@ -79,8 +79,6 @@ QString QnLicenseUsageHelper::getUsageText() const
 {
     QString licenseText;
     for(Qn::LicenseType lt: licenseTypes()) {
-//         if (totalLicense(lt) == 0)
-//             continue;
         if (!licenseText.isEmpty())
             licenseText += lit("\n");
         licenseText += getUsageText(lt);
@@ -262,7 +260,17 @@ QList<Qn::LicenseType> QnCamLicenseUsageHelper::calculateLicenseTypes() const {
 }
 
 int QnCamLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType licenseType) const {
-    return qnResPool->activeCamerasByLicenseType(licenseType);
+    int count = 0;
+
+    for (const QnVirtualCameraResourcePtr &camera: qnResPool->getResources<QnVirtualCameraResource>()) {
+        if (camera->isScheduleDisabled() || camera->licenseType() != licenseType) 
+            continue;
+
+        QnMediaServerResourcePtr server = camera->getParentResource().dynamicCast<QnMediaServerResource>();
+        if (server && server->getStatus() == Qn::Online)
+            count++;
+    }
+    return count;
 }
 
 /************************************************************************/
@@ -333,6 +341,9 @@ int QnVideoWallLicenseUsageHelper::licensesForScreens(int screens) {
     return (screens + 1) / 2;
 }
 
+/************************************************************************/
+/* QnVideoWallLicenseUsageProposer                                      */
+/************************************************************************/
 QnVideoWallLicenseUsageProposer::QnVideoWallLicenseUsageProposer(QnVideoWallLicenseUsageHelper* helper, int screenCount, int controlSessionsCount):
     m_helper(helper),
     m_count(0)

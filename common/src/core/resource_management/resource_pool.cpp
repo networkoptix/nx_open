@@ -322,17 +322,17 @@ QnNetworkResourcePtr QnResourcePool::getResourceByMacAddress(const QString &mac)
     return QnNetworkResourcePtr(0);
 }
 
-QnResourceList QnResourcePool::getAllCameras(const QnResourcePtr &mServer, bool ignoreDesktopCameras) const 
+QnVirtualCameraResourceList QnResourcePool::getAllCameras(const QnResourcePtr &mServer, bool ignoreDesktopCameras) const 
 {
     QnUuid parentId = mServer ? mServer->getId() : QnUuid();
-    QnResourceList result;
+    QnVirtualCameraResourceList result;
     QMutexLocker locker(&m_resourcesMtx);
     for (const QnResourcePtr &resource: m_resources) 
     {
         if (ignoreDesktopCameras && resource->hasFlags(Qn::desktop_camera))
             continue;
 
-        QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
+        QnVirtualCameraResourcePtr camResource = resource.dynamicCast<QnVirtualCameraResource>();
         if (camResource && (parentId.isNull() || camResource->getParentId() == parentId))
             result << camResource;
     }
@@ -487,26 +487,6 @@ QStringList QnResourcePool::allTags() const
         result << resource->getTags();
 
     return result;
-}
-
-int QnResourcePool::activeCamerasByLicenseType(Qn::LicenseType licenseType) const
-{
-    int count = 0;
-
-    QMutexLocker locker(&m_resourcesMtx);
-    for (const QnResourcePtr &resource: m_resources) {
-        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-        if (camera && !camera->isScheduleDisabled()) 
-        {
-            QnMediaServerResourcePtr mServer = getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
-            if (mServer && mServer->getStatus() != Qn::Offline)
-            {
-                if (camera->licenseType() == licenseType)
-                    count++;
-            }
-        }
-    }
-    return count;
 }
 
 void QnResourcePool::clear()

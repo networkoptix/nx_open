@@ -559,15 +559,14 @@ void QnRecordingManager::onTimer()
     }
 }
 
-QnResourceList QnRecordingManager::getLocalControlledCameras()
+QnVirtualCameraResourceList QnRecordingManager::getLocalControlledCameras() const
 {
     // return own cameras + cameras from servers without DB (remote connected servers)
-    QnResourceList cameras = qnResPool->getAllCameras(QnResourcePtr());
-    QnResourceList result;
-    for(const QnResourcePtr &camRes: cameras)
+    QnVirtualCameraResourceList cameras = qnResPool->getAllCameras(QnResourcePtr());
+    QnVirtualCameraResourceList result;
+    for(const QnVirtualCameraResourcePtr &camRes: cameras)
     {
-        const QnResourcePtr& parentRes = camRes->getParentResource();
-        const QnMediaServerResource* mServer = dynamic_cast<const QnMediaServerResource*>(parentRes.data());
+        QnMediaServerResourcePtr mServer = camRes->getParentResource().dynamicCast<QnMediaServerResource>();
         if (!mServer)
             continue;
         if (mServer->getId() == qnCommon->moduleGUID() || (mServer->getServerFlags() | Qn::SF_RemoteEC))
@@ -599,10 +598,9 @@ void QnRecordingManager::at_checkLicenses()
         }
 
         // Too many licenses. check if server has own recording cameras and force to disable recording
-        QnResourceList ownCameras = getLocalControlledCameras();
-        for(const QnResourcePtr& camRes: ownCameras)
+        QnVirtualCameraResourceList ownCameras = getLocalControlledCameras();
+        for(const QnVirtualCameraResourcePtr& camera: ownCameras)
         {
-            QnVirtualCameraResourcePtr camera = camRes.dynamicCast<QnVirtualCameraResource>();
             if (helper.isOverflowForCamera(camera))
             {
                 // found. remove recording from some of them
@@ -630,13 +628,12 @@ void QnRecordingManager::at_licenseMutexLocked()
     QString disabledCameras;
     
     // Too many licenses. check if server has own recording cameras and force to disable recording
-    const QnResourceList& ownCameras = getLocalControlledCameras();
-    for(const QnResourcePtr& camRes: ownCameras)
+    const QnVirtualCameraResourceList& ownCameras = getLocalControlledCameras();
+    for(const QnVirtualCameraResourcePtr& camera: ownCameras)
     {
         if (helper.isValid())
             break;
 
-        QnVirtualCameraResourcePtr camera = camRes.dynamicCast<QnVirtualCameraResource>();
         if (helper.isOverflowForCamera(camera))
         {
             camera->setScheduleDisabled(true);
