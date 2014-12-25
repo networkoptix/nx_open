@@ -10,6 +10,7 @@
 #ifdef _POSIX_C_SOURCE
 #include <unistd.h>
 #endif
+#include <iostream>
 #include <cstdio>
 
 #include "camera_manager.h"
