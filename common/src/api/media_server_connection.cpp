@@ -301,10 +301,10 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
 // -------------------------------------------------------------------------- //
 // QnMediaServerConnection
 // -------------------------------------------------------------------------- //
-QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver, const QnUuid &videowallGuid, QObject *parent):
+QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver, const QnUuid &videowallGuid, bool enableOfflineRequests, QObject *parent):
     base_type(parent, mserver),
     m_proxyPort(0),
-    m_enableOfflineRequests(false)
+    m_enableOfflineRequests(enableOfflineRequests)
 {
     setUrl(mserver->getApiUrl());
     setSerializer(QnLexical::newEnumSerializer<RequestObject, int>());
@@ -831,10 +831,4 @@ int QnMediaServerConnection::modulesInformation(QObject *target, const char *slo
     QnRequestParamList params;
     params << QnRequestParam("allModules", lit("true"));
     return sendAsyncGetRequest(ModulesInformationObject, params, QN_STRINGIZE_TYPE(QList<QnModuleInformation>), target, slot);
-}
-
-
-void QnMediaServerConnection::setOfflineRequestsEnabled(bool enable)
-{
-    m_enableOfflineRequests = enable;
 }

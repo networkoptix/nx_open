@@ -37,10 +37,8 @@ class QnMediaServerConnection: public QnAbstractConnection {
     typedef QnAbstractConnection base_type;
 
 public:
-    QnMediaServerConnection(QnMediaServerResource* mserver, const QnUuid& videowallGuid = QnUuid(), QObject *parent = NULL);
+    QnMediaServerConnection(QnMediaServerResource* mserver, const QnUuid& videowallGuid = QnUuid(), bool enableOfflineRequests = false, QObject *parent = NULL);
     virtual ~QnMediaServerConnection();
-
-    void setOfflineRequestsEnabled(bool enable);
 
     int getTimePeriodsAsync(
         const QnNetworkResourceList &list,
