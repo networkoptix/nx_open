@@ -285,6 +285,12 @@ int QnCamLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType licenseType) 
         if (server && server->getStatus() == Qn::Online)
             count++;
     }
+
+    if (licenseType == Qn::LC_AnalogEncoder)
+        return count == 0 
+        ? 0
+        : ((count - 1) / QnLicensePool::camerasPerAnalogEncoder()) + 1;
+
     return count;
 }
 
