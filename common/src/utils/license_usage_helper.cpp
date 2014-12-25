@@ -21,6 +21,7 @@ struct LicenseCompatibility
     Qn::LicenseType child;
 };
 
+/* Compatibility tree: Trial -> Edge -> Professional -> Analog -> (Edge, AnalogEncoder) */
 static std::array<LicenseCompatibility, 14> compatibleLicenseType =
 {
     LicenseCompatibility(Qn::LC_Edge,    Qn::LC_Professional),
