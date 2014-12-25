@@ -3,6 +3,7 @@
 QnLicenseStub::QnLicenseStub(Qn::LicenseType licenseType, int count):
     m_type(licenseType)
 {
+   setKey(QnUuid::createUuid().toByteArray());
    setCameraCount(count);
 }
 
