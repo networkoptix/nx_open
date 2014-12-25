@@ -277,20 +277,24 @@ QList<Qn::LicenseType> QnCamLicenseUsageHelper::calculateLicenseTypes() const {
 int QnCamLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType licenseType) const {
     int count = 0;
 
+    QHash<QString, int> m_camerasByGroupId;
+
     for (const QnVirtualCameraResourcePtr &camera: qnResPool->getResources<QnVirtualCameraResource>()) {
         if (camera->isScheduleDisabled() || camera->licenseType() != licenseType) 
             continue;
 
         QnMediaServerResourcePtr server = camera->getParentResource().dynamicCast<QnMediaServerResource>();
-        if (server && server->getStatus() == Qn::Online)
+        if (!server || server->getStatus() != Qn::Online)
+            continue;
+
+        if (licenseType == Qn::LC_AnalogEncoder) {
+            if (m_camerasByGroupId[camera->getGroupId()] % QnLicensePool::camerasPerAnalogEncoder() == 0)
+                count++;
+            m_camerasByGroupId[camera->getGroupId()]++;
+        } else {
             count++;
+        }          
     }
-
-    if (licenseType == Qn::LC_AnalogEncoder)
-        return count == 0 
-        ? 0
-        : ((count - 1) / QnLicensePool::camerasPerAnalogEncoder()) + 1;
-
     return count;
 }
 
