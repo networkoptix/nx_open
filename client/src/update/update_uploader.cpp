@@ -120,6 +120,8 @@ void QnUpdateUploader::sendNextChunk() {
     }
 
     for (const QnMediaServerResourcePtr &server: m_restTargets) {
+        if (!m_pendingPeers.contains(server->getId()))
+            continue;
         int handle = server->apiConnection()->uploadUpdateChunk(m_updateId, data, offset, this, SLOT(at_restReply_finished(int,QnUploadUpdateReply,int)));
         m_restRequsts[handle] = server;
     }

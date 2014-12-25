@@ -5,6 +5,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx_ec/ec_proto_version.h>
+#include <api/model/upload_update_reply.h>
 
 namespace {
     const int checkTimeout = 15 * 60 * 1000;
@@ -42,7 +43,7 @@ void QnRestUpdatePeerTask::doStart() {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
         Q_ASSERT_X(server, "An incompatible server resource is expected here.", Q_FUNC_INFO);
 
-        int handle = server->apiConnection()->installUpdate(m_updateId, this, SLOT(at_updateInstalled(int,int)));
+        int handle = server->apiConnection()->installUpdate(m_updateId, this, SLOT(at_updateInstalled(int,QnUploadUpdateReply,int)));
         m_serverByRequest[handle] = server;
         m_serverByRealId.insert(QnUuid::fromStringSafe(server->getProperty(lit("guid"))), server);
     }
@@ -70,7 +71,7 @@ void QnRestUpdatePeerTask::finishPeer(const QnUuid &id) {
         finish(NoError);
 }
 
-void QnRestUpdatePeerTask::at_updateInstalled(int status, int handle) {
+void QnRestUpdatePeerTask::at_updateInstalled(int status, const QnUploadUpdateReply &reply, int handle) {
     Q_UNUSED(handle)
 
     if (m_serverByRealId.isEmpty())
@@ -80,7 +81,7 @@ void QnRestUpdatePeerTask::at_updateInstalled(int status, int handle) {
     if (!server)
         return;
 
-    if (status != 0) {
+    if (status != 0 || reply.offset != ec2::AbstractUpdatesManager::NoError) {
         finish(UploadError, QSet<QnUuid>() << server->getId());
         return;
     }

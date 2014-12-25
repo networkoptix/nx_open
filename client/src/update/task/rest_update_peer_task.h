@@ -8,6 +8,8 @@
 
 #include <utils/common/software_version.h>
 
+struct QnUploadUpdateReply;
+
 class QnRestUpdatePeerTask : public QnNetworkPeerTask {
     Q_OBJECT
 public:
@@ -36,7 +38,7 @@ private:
     void finishPeer(const QnUuid &id);
 
 private slots:
-    void at_updateInstalled(int status, int handle);
+    void at_updateInstalled(int status, const QnUploadUpdateReply &reply, int handle);
     void at_resourceChanged(const QnResourcePtr &resource);
     void at_timer_timeout();
 

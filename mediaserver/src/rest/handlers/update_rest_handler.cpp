@@ -11,19 +11,14 @@
 #include <common/common_module.h>
 #include <api/model/upload_update_reply.h>
 
-int QnUpdateRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+int QnUpdateRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor *processor)
 {
-    Q_UNUSED(path)
-    Q_UNUSED(params)
-    Q_UNUSED(result)
-
-    return nx_http::StatusCode::ok;
+    return executePost(path, params, QByteArray(), result, processor);
 }
 
 int QnUpdateRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path)
-    Q_UNUSED(result)
 
     qint64 offset = params.value(lit("offset")).toLongLong();
     QString updateId = params.value(lit("updateId"));
