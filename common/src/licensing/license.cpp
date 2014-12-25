@@ -33,6 +33,9 @@ namespace {
         "vtLsDeNC9eU2aLCt0Ba4KLnuVnDDWSXQ9914i8s0KXXTM+GOHpvrChUCAwEAAQ==\n"
         "-----END PUBLIC KEY-----";
 
+    /* One analog encoder requires one license to maintain this number of cameras. */
+    const int camerasPerAnalogEncoderCount = 8;
+
     bool isSignatureMatch(const QByteArray &data, const QByteArray &signature, const QByteArray &publicKey)
     {
 #ifdef ENABLE_SSL
@@ -625,4 +628,8 @@ QByteArray QnLicensePool::currentHardwareId() const {
     return hwIds.isEmpty() 
         ? QByteArray() 
         : hwIds.last();
+}
+
+int QnLicensePool::camerasPerAnalogEncoder() {
+    return camerasPerAnalogEncoderCount;
 }

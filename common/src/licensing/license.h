@@ -162,6 +162,9 @@ class QnLicensePool : public QObject
 public:
     static QnLicensePool* instance();
 
+    /** Number of cameras per analog encoder that require 1 license. */
+    static int camerasPerAnalogEncoder();
+
     QnLicenseList getLicenses() const;
 
     void addLicense(const QnLicensePtr &license);

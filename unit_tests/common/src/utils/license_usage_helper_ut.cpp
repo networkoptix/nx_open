@@ -111,3 +111,20 @@ TEST( QnCamLicenseUsageHelperTest, borrowDifferentLicenses )
     licPoolScaffold.addLicenses(Qn::LC_VMAX, 3);
     ASSERT_TRUE( helper.isValid() );
 }
+
+/** Test for analog encoders politics. */
+TEST( QnCamLicenseUsageHelperTest, analogEncoderSimple )
+{
+    QnLicensePoolScaffold licPoolScaffold;
+    QnResourcePoolScaffold resPoolScaffold;
+
+    QnCamLicenseUsageHelper helper;
+
+    for (int i = 0; i < qnLicensePool->camerasPerAnalogEncoder(); ++i) {
+        resPoolScaffold.addCamera(Qn::LC_AnalogEncoder);
+        ASSERT_TRUE( helper.isValid() );
+    }
+    resPoolScaffold.addCamera(Qn::LC_AnalogEncoder);
+    ASSERT_FALSE( helper.isValid() );
+}
+
