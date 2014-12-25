@@ -36,7 +36,6 @@
 #include "utils/common/log.h"
 #include "nx_ec/data/api_camera_data_ex.h"
 #include "restype_xml_parser.h"
-#include "../../mediaserver/src/media_server/settings.h"
 
 using std::nullptr_t;
 
@@ -293,16 +292,10 @@ bool QnDbManager::init(
     QString backupDbFileName = dbFileName + QString::fromLatin1(".backup");
     if (QFile::exists(backupDbFileName)) {
         QFile::remove(dbFileName);
-        if (QFile::rename(backupDbFileName, dbFileName)) {
+        if (QFile::rename(backupDbFileName, dbFileName))
             m_needResyncLog = true;
-            qint64 dumpTime = MSSettings::roSettings()->value("gotDbDumpTime").toLongLong();
-            qint64 systemIdentityTime = qMax(MSSettings::roSettings()->value("systemIndentityTime").toLongLong() + 1, dumpTime);
-            MSSettings::roSettings()->setValue("systemIndentityTime", systemIdentityTime);
-            qnCommon->setSystemIdentityTime(systemIdentityTime);
-        }
-        else {
+        else
             qWarning() << "Can't rename database file from" << backupDbFileName << "to" << dbFileName << "Database restore operation canceled";
-        }
     }
 
     m_sdbStatic = QSqlDatabase::addDatabase("QSQLITE", "QnDbManagerStatic");
@@ -313,6 +306,25 @@ bool QnDbManager::init(
     {
         qWarning() << "can't initialize Server sqlLite database " << m_sdb.databaseName() << ". Error: " << m_sdb.lastError().text();
         return false;
+    }
+
+
+    QSqlQuery identityTimeQuery(m_sdb);
+    identityTimeQuery.prepare("SELECT value FROM misc_data WHERE key = ?");
+    identityTimeQuery.addBindValue("gotDbDumpTime");
+    if (identityTimeQuery.exec() && identityTimeQuery.next()) 
+    {
+        qint64 dbRestoreTime = identityTimeQuery.value(0).toLongLong();
+        if (dbRestoreTime) 
+        {
+            identityTimeQuery.prepare("DELETE FROM misc_data WHERE key = ?");
+            identityTimeQuery.addBindValue("gotDbDumpTime");
+            if (!identityTimeQuery.exec())
+                return false;
+
+            qint64 currentIdentityTime = qnCommon->systemIdentityTime();
+            qnCommon->setSystemIdentityTime(qMax(currentIdentityTime + 1, dbRestoreTime), qnCommon->moduleGUID());
+        }
     }
 
     if( !m_sdbStatic.open() )
@@ -1481,9 +1493,18 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiDatabas
     testDB.setDatabaseName( f.fileName());
     if (!testDB.open() || !isObjectExists(lit("table"), lit("transaction_log"), testDB)) {
         QFile::remove(f.fileName());
+        qWarning() << "Skipping bad database dump file";
         return ErrorCode::dbError; // invalid back file
     }
-    MSSettings::roSettings()->setValue("gotDbDumpTime", qnSyncTime->currentMSecsSinceEpoch());
+    QSqlQuery testDbQuery(testDB);
+    testDbQuery.prepare("INSERT OR REPLACE INTO misc_data SET key = ?, value = ? WHERE key = ?");
+    testDbQuery.addBindValue("gotDbDumpTime");
+    testDbQuery.addBindValue(qnSyncTime->currentMSecsSinceEpoch());
+    testDbQuery.addBindValue("gotDbDumpTime");
+    if (!testDbQuery.exec()) {
+        qWarning() << "Skipping bad database dump file";
+        return ErrorCode::dbError; // invalid back file
+    }
     return ErrorCode::ok;
 }
 

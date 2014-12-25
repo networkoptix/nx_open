@@ -50,8 +50,8 @@ public:
     * Server has got systemIdentity time after DB restore operation
     * This time help pushing database from current server to all others
     */
-    void setSystemIdentityTime(qint64 value) { m_systemIdentityTime = value; }
-    qint64 systemIdentityTime() const { return m_systemIdentityTime; }
+    void setSystemIdentityTime(qint64 value, const QnUuid& sender);
+    qint64 systemIdentityTime() const;
 
     void setRemoteGUID(const QnUuid& guid);
     QnUuid remoteGUID() const;
@@ -82,7 +82,7 @@ public:
 signals:
     void systemNameChanged(const QString &systemName);
     void remoteIdChanged(const QnUuid &id);
-
+    void systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
 protected:
     static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
 

@@ -827,6 +827,13 @@ void QnMain::at_restartServerRequired()
     restartServer();
 }
 
+void QnMain::at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender)
+{
+    MSSettings::roSettings()->setValue("systemIndentityTime", value);
+    if (sender != qnCommon->moduleGUID())
+        restartServer();
+}
+
 void QnMain::stopSync()
 {
     if (serviceMainInstance) {
@@ -1408,7 +1415,8 @@ void QnMain::run()
     qnCommon->setModuleGUID(serverGuid());
     qnCommon->setLocalSystemName(settings->value("systemName").toString());
     qint64 systemIdentityTime = MSSettings::roSettings()->value("systemIndentityTime").toLongLong();
-    qnCommon->setSystemIdentityTime(systemIdentityTime);
+    qnCommon->setSystemIdentityTime(systemIdentityTime, qnCommon->moduleGUID());
+    connect(qnCommon, &QnCommonModule::systemIdentityTimeChanged, this, &QnMain::at_systemIdentityTimeChanged, Qt::QueuedConnection);
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory( Qn::PT_Server ));
 

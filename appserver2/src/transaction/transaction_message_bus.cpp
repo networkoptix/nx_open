@@ -1042,9 +1042,9 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
         if (m_localPeer.isServer() && transport->remoteIdentityTime() > qnCommon->systemIdentityTime() )
         {
             // swith to new time
+            NX_LOG( lit("Remote peer %1 has database restore time greater then current peer. Restarting and resync database with remote peer").arg(transport->remotePeer().id.toString()), cl_logINFO );
             transport->setState(QnTransactionTransport::Error);
-            MSSettings::roSettings()->setValue("systemIndentityTime", transport->remoteIdentityTime());
-            m_handler->databaseReplaceRequired();
+            qnCommon->setSystemIdentityTime(transport->remoteIdentityTime(), transport->remotePeer().id);
             return;
         }
 

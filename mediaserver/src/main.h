@@ -53,6 +53,7 @@ private slots:
     void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
     void at_emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);
     void at_restartServerRequired();
+    void at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
     void at_updatePublicAddress(const QHostAddress& publicIP);
 private:
     void updateDisabledVendorsIfNeeded();
