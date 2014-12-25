@@ -21,21 +21,21 @@
     <name>HD Witness Tray Assistant</name>  
 
     <dependencies>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>common</artifactId>
-			<version>${project.version}</version>
-			<type>pom</type> 
-			<scope>system</scope>
-	                <systemPath>${root.dir}/common/pom.xml</systemPath>
-		</dependency>			
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/common/pom.xml</systemPath>
+        </dependency>			
     </dependencies>		
-	
+
     <properties>
         <product.title>${traytool.name}</product.title>
         <product.display.title>${traytool.display.name}</product.display.title>
         <!--Global libs-->
-        <global.libs></global.libs>
+        <global.libs/>
         <!--Specific os libs used-->
         <qt.libs>core gui widgets</qt.libs>
         <windows.oslibs>DbgHelp.lib</windows.oslibs>
