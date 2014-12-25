@@ -49,26 +49,24 @@ angular.module('webadminApp')
                 var scroll = element.find('.scroll');
 
 
+                var oldSetValue = 0;
                 function viewPortScrollRelative(value){
-
+                    var availableWidth = scope.scrollWidth - viewportWidth;
                     if(typeof(value) ==='undefined') {
-                        var scrollPosition = scroll.scrollLeft();
-                        var position = scrollPosition + viewportWidth/2;
-                        // Here if scroll is attached to edge - we should return 100%.
-
-                        /*
-                        if(scrollPosition === 0){
-                            return 0;
+                        if(availableWidth < 1){
+                            return 0.5;
                         }
-                        if(scrollPosition + viewportWidth === scope.scrollWidth){
-                            return 1;
-                        }
-                        */
+                        var result = Math.min(scroll.scrollLeft()/availableWidth,1);
 
-                        return position / scope.scrollWidth;
+                        //if(result != oldSetValue) console.log("scroll",result, oldSetValue,Math.abs(result - oldSetValue)<0.001);
+
+                        if(Math.abs(result - oldSetValue)<0.001)
+                            return oldSetValue;
+
+                        return result;
                     } else {
-                        var setValue = Math.round(Math.max(value * scope.scrollWidth - viewportWidth/2,0));
-                        scroll.scrollLeft(setValue);
+                        oldSetValue = value;
+                        scroll.scrollLeft(Math.round(value * availableWidth));
                     }
                 }
 
@@ -149,22 +147,38 @@ angular.module('webadminApp')
 
 
                 function screenStartPosition(){
-                    return viewPortScrollRelative() * scope.frameWidth - viewportWidth/2;
+                    return viewPortScrollRelative() * (scope.frameWidth - viewportWidth);
                 }
 
                 function dateToScreenPosition(date){
-                    var position = (date - scope.start) * scope.frameWidth / (scope.frameEnd - scope.start);
-                    return position - screenStartPosition(0);
+                    var position = scope.frameWidth * (date - scope.start) / (scope.frameEnd - scope.start);
+                    return position - screenStartPosition();
+                }
+
+                function screenRelativePositionToDate(position){
+                    var globalPosition = screenStartPosition() + position*viewportWidth;
+                    return Math.round(scope.start + (scope.frameEnd - scope.start)*globalPosition/scope.frameWidth);
+                }
+
+                function screenRelativePositionAndDateToRelativePositionForScroll(date,screenRelativePosition){
+
+                    if(scope.frameWidth == viewportWidth){
+                        return 0;
+                    }
+
+                    var dateRelativePosition = (date - scope.start)/(scope.frameEnd - scope.start);
+
+                    var datePosition = dateRelativePosition * scope.frameWidth;
+
+                    var startPosition = datePosition - viewportWidth * screenRelativePosition;
+
+                    var screenStartRelativePos = startPosition / (scope.frameWidth-viewportWidth);
+
+                    return screenStartRelativePos;
                 }
 
 
-                function screenPositionToDate(position){
-                    //1. Get Relative Position and calculate it's date, related to frame
-                    var totalInterval = (scope.frameEnd - scope.start);
-                    var currentZoom = scope.actualWidth / viewportWidth;
-                    var toret = scope.start +  totalInterval * (viewPortScrollRelative() + (position - 0.5) / currentZoom);
-                    return Math.round(toret);
-                }
+
 
                 function updateDetailization(){
                     //4. Set interval for events
@@ -245,8 +259,8 @@ angular.module('webadminApp')
                     //2. Align visible interval to current level (start to past, end to future)
                     var level = RulerModel.levels[scope.actualLevel];
 
-                    var end = level.interval.alignToFuture (screenPositionToDate(1));
-                    var position = level.interval.alignToPast(screenPositionToDate(0));
+                    var end = level.interval.alignToFuture (screenRelativePositionToDate(1));
+                    var position = level.interval.alignToPast(screenRelativePositionToDate(0));
 
                     var findLevel = function(level){
                         return level.interval.checkDate(position);
@@ -282,7 +296,7 @@ angular.module('webadminApp')
 
 
                 function updateBoundariesAndScroller(){
-                    var timePosition = screenPositionToDate(0.5); // Keep current timeposition for scrolling
+                    var keepDate = screenRelativePositionToDate(0.5); // Keep current timeposition for scrolling
 
                     // Update boundaries to current moment
                     scope.frameEnd = scope.end;//(new Date()).getTime();
@@ -299,9 +313,8 @@ angular.module('webadminApp')
                     // Keep time position
                     // TODO: In live mode - scroll right
 
-                    var newPosition = (timePosition - scope.start)/(scope.frameEnd - scope.start);
+                    var newPosition = screenRelativePositionAndDateToRelativePositionForScroll(keepDate,0.5);
 
-                    console.log("position",(timePosition/1000).toFixed(0),newPosition - viewPortScrollRelative());
                     // Here we have a problem:we should scroll left a bit if it is not .
 
                     viewPortScrollRelative(newPosition);
