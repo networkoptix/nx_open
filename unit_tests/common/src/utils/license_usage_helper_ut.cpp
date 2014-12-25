@@ -119,10 +119,11 @@ TEST( QnCamLicenseUsageHelperTest, analogEncoderSimple )
     QnResourcePoolScaffold resPoolScaffold;
 
     QnCamLicenseUsageHelper helper;
+    licPoolScaffold.addLicenses(Qn::LC_AnalogEncoder, 1);
 
     for (int i = 0; i < qnLicensePool->camerasPerAnalogEncoder(); ++i) {
         resPoolScaffold.addCamera(Qn::LC_AnalogEncoder);
-        ASSERT_TRUE( helper.isValid() );
+        ASSERT_TRUE( helper.isValid() ) << "Error at index " << i;
     }
     resPoolScaffold.addCamera(Qn::LC_AnalogEncoder);
     ASSERT_FALSE( helper.isValid() );
