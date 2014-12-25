@@ -50,6 +50,8 @@ void QnRestUpdatePeerTask::doStart() {
         int handle = server->apiConnection()->installUpdate(m_updateId, this, SLOT(at_updateInstalled(int,QnUploadUpdateReply,int)));
         m_serverByRequest[handle] = server;
         m_serverByRealId.insert(getGuid(server), server);
+
+        connect(server.data(), &QnMediaServerResource::versionChanged, this, &QnRestUpdatePeerTask::at_resourceChanged);
     }
 
     if (m_serverByRequest.isEmpty()) {
