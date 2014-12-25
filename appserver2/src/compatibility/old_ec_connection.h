@@ -47,7 +47,7 @@ namespace ec2
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) override;
         virtual int dumpDatabaseToFileAsync( const QString& dumpFilePath, ec2::impl::SimpleHandlerPtr handler ) override;
         virtual int restoreDatabaseAsync( const ApiDatabaseDumpData& dbFile, impl::SimpleHandlerPtr handler ) override;
-
+        virtual bool removeDatabaseFile() override { return false; }
     private:
         QnConnectionInfo m_connectionInfo;
     };

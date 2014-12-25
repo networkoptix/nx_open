@@ -1118,6 +1118,7 @@ namespace ec2
         */
         //virtual void cancelRequest( int requestID ) = 0;
 
+        virtual bool removeDatabaseFile();
     signals:
         //!Delivers all resources found in Server
         /*!

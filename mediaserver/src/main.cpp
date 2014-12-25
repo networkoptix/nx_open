@@ -1956,6 +1956,9 @@ void QnMain::run()
     
     //disconnecting from EC2
     QnAppServerConnectionFactory::setEc2Connection( ec2::AbstractECConnectionPtr() );
+
+    ec2Connection->removeDatabaseFile();
+
     ec2Connection.reset();
     QnAppServerConnectionFactory::setEC2ConnectionFactory( nullptr );
     ec2ConnectionFactory.reset();
