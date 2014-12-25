@@ -208,7 +208,7 @@ void QnServerMessageProcessor::execBusinessActionInternal(const QnAbstractBusine
 }
 
 void QnServerMessageProcessor::at_updateChunkReceived(const QString &updateId, const QByteArray &data, qint64 offset) {
-    QnServerUpdateTool::instance()->addUpdateFileChunk(updateId, data, offset);
+    QnServerUpdateTool::instance()->addUpdateFileChunkAsync(updateId, data, offset);
 }
 
 void QnServerMessageProcessor::at_updateInstallationRequested(const QString &updateId) {

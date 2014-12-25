@@ -35,6 +35,7 @@
 #include "nx_ec/data/api_conversion_functions.h"
 #include "model/camera_list_reply.h"
 #include "model/configure_reply.h"
+#include "model/upload_update_reply.h"
 
 namespace {
     QN_DEFINE_LEXICAL_ENUM(RequestObject,
@@ -272,7 +273,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         processJsonReply<QnCameraBookmarkList>(this, response, handle);
         break;
     case InstallUpdateObject:
-        emitFinished(this, response.status, handle);
+        processJsonReply<QnUploadUpdateReply>(this, response, handle);
         break;
     case Restart:
         emitFinished(this, response.status, handle);
@@ -781,11 +782,19 @@ int QnMediaServerConnection::getBookmarksAsync(const QnNetworkResourcePtr &camer
     return sendAsyncGetRequest(BookmarksGetObject, headers, params, QN_STRINGIZE_TYPE(QnCameraBookmarkList), target, slot);
 }
 
-int QnMediaServerConnection::installUpdate(const QString &updateId, const QByteArray &data, QObject *target, const char *slot) {
+int QnMediaServerConnection::installUpdate(const QString &updateId, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("updateId", updateId);
 
-    return sendAsyncPostRequest(InstallUpdateObject, params, data, NULL, target, slot);
+    return sendAsyncGetRequest(InstallUpdateObject, params, QN_STRINGIZE_TYPE(QnUploadUpdateReply), target, slot);
+}
+
+int QnMediaServerConnection::uploadUpdateChunk(const QString &updateId, const QByteArray &data, qint64 offset, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("updateId", updateId);
+    params << QnRequestParam("offset", offset);
+
+    return sendAsyncPostRequest(InstallUpdateObject, params, data, QN_STRINGIZE_TYPE(QnUploadUpdateReply), target, slot);
 }
 
 int QnMediaServerConnection::restart(QObject *target, const char *slot) {
