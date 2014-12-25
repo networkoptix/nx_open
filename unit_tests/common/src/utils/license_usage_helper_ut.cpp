@@ -129,3 +129,20 @@ TEST( QnCamLicenseUsageHelperTest, analogEncoderSimple )
     ASSERT_FALSE( helper.isValid() );
 }
 
+/** Test for analog encoders with different group ids. */
+TEST( QnCamLicenseUsageHelperTest, analogEncoderGroups )
+{
+    QnLicensePoolScaffold licPoolScaffold;
+    QnResourcePoolScaffold resPoolScaffold;
+
+    QnCamLicenseUsageHelper helper;
+    licPoolScaffold.addLicenses(Qn::LC_AnalogEncoder, 1);
+
+    auto firstEncoder = resPoolScaffold.addCamera(Qn::LC_AnalogEncoder);
+    firstEncoder->setGroupId(lit("firstEncoder"));
+    ASSERT_TRUE( helper.isValid() );
+
+    auto secondEncoder = resPoolScaffold.addCamera(Qn::LC_AnalogEncoder);
+    secondEncoder->setGroupId(lit("secondEncoder"));
+    ASSERT_FALSE( helper.isValid() );
+}
