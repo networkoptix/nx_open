@@ -194,12 +194,12 @@ QnUuid QnLicense::serverId() const {
     return QnUuid();
 }
 
-const QString &QnLicense::name() const
+QString QnLicense::name() const
 {
     return m_name;
 }
 
-const QByteArray &QnLicense::key() const
+QByteArray QnLicense::key() const
 {
     return m_key;
 }
@@ -214,12 +214,16 @@ qint32 QnLicense::cameraCount() const
     return m_cameraCount;
 }
 
-const QByteArray &QnLicense::hardwareId() const
+void QnLicense::setCameraCount(qint32 count) {
+    m_cameraCount = count;
+}
+
+QByteArray QnLicense::hardwareId() const
 {
     return m_hardwareId;
 }
 
-const QByteArray &QnLicense::signature() const
+QByteArray QnLicense::signature() const
 {
     if (m_isValid2)
         return m_signature2;
@@ -227,27 +231,27 @@ const QByteArray &QnLicense::signature() const
     return m_signature;
 }
 
-const QString &QnLicense::xclass() const
+QString QnLicense::xclass() const
 {
     return m_class;
 }
 
-const QString &QnLicense::version() const
+QString QnLicense::version() const
 {
     return m_version;
 }
 
-const QString &QnLicense::brand() const
+QString QnLicense::brand() const
 {
     return m_brand;
 }
 
-const QString &QnLicense::expiration() const
+QString QnLicense::expiration() const
 {
     return m_expiration;
 }
 
-const QByteArray& QnLicense::rawLicense() const
+QByteArray QnLicense::rawLicense() const
 {
     return m_rawLicense;
 }
@@ -443,7 +447,6 @@ void QnLicense::verify( const QByteArray& v1LicenseBlock, const QByteArray& v2Li
         m_isValid1 = true;
     }
 }
-
 
 // -------------------------------------------------------------------------- //
 // QnLicenseListHelper
