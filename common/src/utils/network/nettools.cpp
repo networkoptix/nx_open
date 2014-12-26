@@ -669,11 +669,11 @@ int getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host)
 #include <sys/types.h>
 #include <sys/socket.h>
 
-void getMacFromPrimaryIF(char MAC_str[MAC_ADDR_LEN], char** host)
+int getMacFromPrimaryIF(char MAC_str[MAC_ADDR_LEN], char** host)
 {
     struct ifaddrs* ifap = nullptr;
     if (getifaddrs(&ifap) != 0)
-        return;
+        return -1;
 
     std::map<std::string, std::string> ifNameToLinkAddress;
     std::map<std::string, std::string> ifNameToInetAddress;
@@ -705,13 +705,15 @@ void getMacFromPrimaryIF(char MAC_str[MAC_ADDR_LEN], char** host)
     freeifaddrs(ifap);
 
     if( ifNameToInetAddress.empty() )
-        return;	//no ipv4 address
+        return -1;	//no ipv4 address
     auto hwIter = ifNameToLinkAddress.find( ifNameToInetAddress.begin()->first );
     if( hwIter == ifNameToLinkAddress.end() )
-        return;	//ipv4 interface has no link-level address
+        return -1;	//ipv4 interface has no link-level address
 
     strncpy( MAC_str, hwIter->second.c_str(), sizeof(MAC_str)-1 );
     if( host )
         *host = nullptr;
+
+    return 0;
 }
 #endif

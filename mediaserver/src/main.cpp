@@ -1372,7 +1372,6 @@ void QnMain::run()
     QSettings* settings = MSSettings::roSettings();
 
     std::unique_ptr<QnMServerResourceDiscoveryManager> mserverResourceDiscoveryManager( new QnMServerResourceDiscoveryManager() );
-    QnResourceDiscoveryManager::init( mserverResourceDiscoveryManager.get() );
     initAppServerConnection(*settings);
 
     QnMulticodecRtpReader::setDefaultTransport( MSSettings::roSettings()->value(QLatin1String("rtspTransport"), RtpTransport::_auto).toString().toUpper() );
@@ -1903,9 +1902,6 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance()->stop();
     QnResource::stopAsyncTasks();
 
-    QnResourceDiscoveryManager::init( NULL );
-    mserverResourceDiscoveryManager.reset();
-
     //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
         //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required
     serverResourceProcessor.reset();
@@ -1945,6 +1941,7 @@ void QnMain::run()
     QnAppServerConnectionFactory::setEC2ConnectionFactory( nullptr );
     ec2ConnectionFactory.reset();
 
+    mserverResourceDiscoveryManager.reset();
 
     av_lockmgr_register(NULL);
 
