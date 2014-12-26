@@ -43,6 +43,7 @@ QnSecurityCamResource::QnSecurityCamResource():
     addFlags(Qn::live_cam);
 
     connect(this, &QnResource::parentIdChanged, this, &QnSecurityCamResource::at_parentIdChanged, Qt::DirectConnection);
+    connect(this, SIGNAL(motionRegionChanged(const QnResourcePtr &)), this, SLOT(at_motionRegionChanged()), Qt::DirectConnection);
 
     QnMediaResource::initMediaResource();
 
@@ -349,6 +350,20 @@ void QnSecurityCamResource::at_parentIdChanged()
 {
     if(getParentId() != qnCommon->moduleGUID())
         stopInputPortMonitoringAsync();  //camera moved to different server, stopping input monitoring
+}
+
+void QnSecurityCamResource::at_motionRegionChanged()
+{
+    if (flags() & Qn::foreigner)
+        return;
+
+    if (getMotionType() == Qn::MT_HardwareGrid || getMotionType() == Qn::MT_MotionWindow) 
+    {
+    	QnConstResourceVideoLayoutPtr layout = getVideoLayout();
+    	int numChannels = layout->channelCount();
+        for (int i = 0; i < numChannels; ++i)
+            setMotionMaskPhysical(i);
+    }
 }
 
 int QnSecurityCamResource::motionWindowCount() const 
