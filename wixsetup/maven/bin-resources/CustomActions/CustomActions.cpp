@@ -325,6 +325,8 @@ UINT __stdcall DeleteDatabaseFile(MSIHANDLE hInstall)
     {
         CString fileToDelete = GetProperty(hInstall, L"CustomActionData");
         DeleteFile(fileToDelete);
+        DeleteFile(fileToDelete + L"-shm");
+        DeleteFile(fileToDelete + L"-wal");
     }
 
 LExit:

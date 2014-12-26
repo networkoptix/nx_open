@@ -18,7 +18,7 @@ namespace ec2
         const ResourceContext& resCtx,
         const QnConnectionInfo& connectionInfo )
     :
-        BaseEc2Connection<FixedUrlClientQueryProcessor>( queryProcessor.get(), resCtx ),
+        base_type( queryProcessor.get(), resCtx ),
         m_queryProcessor( queryProcessor ),
         m_connectionInfo( connectionInfo )
     {
@@ -26,15 +26,7 @@ namespace ec2
     }
 
     RemoteEC2Connection::~RemoteEC2Connection()
-    {
-        if (QnTransactionMessageBus::instance()) {
-            QnTransactionMessageBus::instance()->removeConnectionFromPeer( m_peerUrl );
-            QnTransactionMessageBus::instance()->removeHandler( notificationManager() );
-        }
-
-        //TODO #ak next call can be placed here just because we always have just one connection to EC
-        TimeSynchronizationManager::instance()->forgetSynchronizedTime();
-    }
+    {}
 
     QnConnectionInfo RemoteEC2Connection::connectionInfo() const
     {
@@ -48,15 +40,7 @@ namespace ec2
 
     void RemoteEC2Connection::startReceivingNotifications() {
 
-        // in remote mode we are always working as a client
-        ApiPeerData localPeer(qnCommon->moduleGUID(), qnCommon->runningInstanceGUID(), Qn::PT_DesktopClient);
-
-        QnUuid videowallGuid = QnAppServerConnectionFactory::videowallGuid();
-        if (!videowallGuid.isNull())
-            localPeer.peerType = Qn::PT_VideowallClient;
-        
-        QnTransactionMessageBus::instance()->setLocalPeer(localPeer);
-        QnTransactionMessageBus::instance()->start();
+        base_type::startReceivingNotifications();
 
         QUrl url(m_queryProcessor->getUrl());
         url.setScheme( m_connectionInfo.allowSslConnections ? lit("https") : lit("http") );
@@ -68,4 +52,16 @@ namespace ec2
         m_peerUrl = url;
         QnTransactionMessageBus::instance()->addConnectionToPeer(url);
     }
+
+    void RemoteEC2Connection::stopReceivingNotifications() {
+        base_type::stopReceivingNotifications();
+        if (QnTransactionMessageBus::instance()) {
+            QnTransactionMessageBus::instance()->removeConnectionFromPeer( m_peerUrl );
+            QnTransactionMessageBus::instance()->removeHandler( notificationManager() );
+        }
+
+        //TODO #ak next call can be placed here just because we always have just one connection to EC
+        TimeSynchronizationManager::instance()->forgetSynchronizedTime();
+    }
+
 }

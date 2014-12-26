@@ -210,13 +210,14 @@ static const int DEFAULT_MAX_CAMERAS = 1;
 static const int DEFAULT_MAX_CAMERAS = 128;
 #endif
 
-//!TODO: #ak have to do something with settings
+//TODO #ak have to do something with settings
 class CmdLineArguments
 {
 public:
     QString logLevel;
     //!Log level of http requests log
     QString msgLogLevel;
+    QString ec2TranLogLevel;
     QString rebuildArchive;
     QString devModeKey;
     QString allowedDiscoveryPeers;
@@ -578,15 +579,6 @@ QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connecti
         return QnMediaServerResourcePtr();
     }
 
-    /*
-    rez = ec2Connection->getResourceManager()->setResourceStatusSync(serverPtr->getId(), Qn::Online);
-    if (rez != ec2::ErrorCode::ok)
-    {
-        qDebug() << "registerServer(): Call to change server status failed. Reason: " << ec2::toString(rez);
-        return QnMediaServerResourcePtr();
-    }
-    */
-
     return savedServer;
 }
 
@@ -677,6 +669,28 @@ int serverMain(int argc, char *argv[])
             DEFAULT_MAX_LOG_FILE_SIZE,
             DEFAULT_MSG_LOG_ARCHIVE_SIZE,
             QnLog::logLevelFromString(cmdLineArguments.msgLogLevel) );
+
+    //preparing transaction log
+    if( cmdLineArguments.ec2TranLogLevel.isEmpty() )
+        cmdLineArguments.ec2TranLogLevel = MSSettings::roSettings()->value(
+            nx_ms_conf::EC2_TRAN_LOG_LEVEL,
+            nx_ms_conf::DEFAULT_EC2_TRAN_LOG_LEVEL ).toString();
+
+    if( cmdLineArguments.ec2TranLogLevel != lit("none") )
+    {
+        QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
+            dataLocation + QLatin1String("/log/ec2_tran"),
+            DEFAULT_MAX_LOG_FILE_SIZE,
+            DEFAULT_MSG_LOG_ARCHIVE_SIZE,
+            QnLog::logLevelFromString(cmdLineArguments.ec2TranLogLevel) );
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("================================================================================="), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("%1 started").arg(qApp->applicationName()), cl_logALWAYS );
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software version: %1").arg(QCoreApplication::applicationVersion()), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("binary path: %1").arg(QFile::decodeName(argv[0])), cl_logALWAYS);
+    }
 
     if (cmdLineArguments.rebuildArchive == "all")
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_All);
@@ -841,7 +855,7 @@ void QnMain::updateDisabledVendorsIfNeeded()
         return;
 
     if (!admin->hasProperty(DV_PROPERTY)) {
-        QnGlobalSettings *settings = QnGlobalSettings::instance();
+        QnGlobalSettings* settings = QnGlobalSettings::instance();
         settings->setDisabledVendors(disabledVendors);
         MSSettings::roSettings()->remove(DV_PROPERTY);
     }
@@ -969,9 +983,9 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         QnManualCameraInfoMap manualCameras;
         for(const QnSecurityCamResourcePtr &camera: cameras) {
             messageProcessor->updateResource(camera);
-            if (camera->isManuallyAdded() && camera->getParentId() == m_mediaServer->getId()) {
+            if (camera->isManuallyAdded()) {
                 QnResourceTypePtr resType = qnResTypePool->getResourceType(camera->getTypeId());
-                manualCameras.insert(camera->getUniqueId(), QnManualCameraInfo(QUrl(camera->getUrl()), camera->getAuth(), resType->getName()));
+                manualCameras.insert(camera->getUrl(), QnManualCameraInfo(QUrl(camera->getUrl()), camera->getAuth(), resType->getName()));
             }
         }
         QnResourceDiscoveryManager::instance()->registerManualCameras(manualCameras);
@@ -1267,6 +1281,12 @@ QHostAddress QnMain::getPublicAddress()
 
 void QnMain::run()
 {
+#ifdef _WIN32
+    win32_exception::setCreateFullCrashDump( MSSettings::roSettings()->value(
+        nx_ms_conf::CREATE_FULL_CRASH_DUMP,
+        nx_ms_conf::DEFAULT_CREATE_FULL_CRASH_DUMP ).toBool() );
+#endif
+
     QString sslCertPath = MSSettings::roSettings()->value( nx_ms_conf::SSL_CERTIFICATE_PATH, getDataDirectory() + lit( "/ssl/cert.pem" ) ).toString();
     QFile f(sslCertPath);
     if (!f.open(QIODevice::ReadOnly)) {
@@ -1449,7 +1469,6 @@ void QnMain::run()
              QnSyncTime::instance(), (void(QnSyncTime::*)(qint64))&QnSyncTime::updateTime );
 
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
-    QnMServerResourceSearcher::instance()->setAppPServerGuid(connectInfo.ecsGuid.toUtf8());
     QnMServerResourceSearcher::instance()->start();
 
     //Initializing plugin manager
@@ -1488,11 +1507,10 @@ void QnMain::run()
 
     QnResourcePool::instance(); // to initialize net state;
 
-    QnRestProcessorPool restProcessorPool;
-    QnRestProcessorPool::initStaticInstance( &restProcessorPool );
+    std::unique_ptr<QnRestProcessorPool> restProcessorPool( new QnRestProcessorPool() );
 
     if( QnAppServerConnectionFactory::url().scheme().toLower() == lit("file") )
-        ec2ConnectionFactory->registerRestHandlers( &restProcessorPool );
+        ec2ConnectionFactory->registerRestHandlers( restProcessorPool.get() );
 
     std::unique_ptr<nx_hls::HLSSessionPool> hlsSessionPool( new nx_hls::HLSSessionPool() );
 
@@ -1616,7 +1634,7 @@ void QnMain::run()
     do {
         if (needToStop())
             return;
-    } while (ec2Connection->getResourceManager()->setResourceStatusSync(m_mediaServer->getId(), Qn::Online) != ec2::ErrorCode::ok);
+    } while (ec2Connection->getResourceManager()->setResourceStatusLocalSync(m_mediaServer->getId(), Qn::Online) != ec2::ErrorCode::ok);
 
 
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
@@ -1650,17 +1668,17 @@ void QnMain::run()
     m_moduleFinder->setCompatibilityMode(compatibilityMode);
     ec2ConnectionFactory->setCompatibilityMode(compatibilityMode);
     if (!cmdLineArguments.allowedDiscoveryPeers.isEmpty()) {
-        QList<QnUuid> allowedPeers;
+        QSet<QnUuid> allowedPeers;
         for (const QString &peer: cmdLineArguments.allowedDiscoveryPeers.split(";")) {
             QnUuid peerId(peer);
             if (!peerId.isNull())
                 allowedPeers << peerId;
         }
-        if (!allowedPeers.isEmpty())
-            m_moduleFinder->setAllowedPeers(allowedPeers);
+        qnCommon->setAllowedPeers(allowedPeers);
     }
 
     QScopedPointer<QnServerConnector> serverConnector(new QnServerConnector(m_moduleFinder));
+    serverConnector->start();
 
     QUrl url = ec2Connection->connectionInfo().ecUrl;
 #if 1
@@ -1821,12 +1839,12 @@ void QnMain::run()
 
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(localInterfacesChanged()), this, SLOT(at_localInterfacesChanged()));
 
-    m_firstRunningTime = MSSettings::roSettings()->value("lastRunningTime").toLongLong();
+    m_firstRunningTime = MSSettings::runTimeSettings()->value("lastRunningTime").toLongLong();
 
     at_timer();
     QTimer timer;
     connect(&timer, SIGNAL(timeout()), this, SLOT(at_timer()), Qt::DirectConnection);
-    at_connectionOpened();
+    QTimer::singleShot(3000, this, SLOT(at_connectionOpened()));
     timer.start(60 * 1000);
 
 
@@ -1843,7 +1861,7 @@ void QnMain::run()
     delete QnRecordingManager::instance();
     QnRecordingManager::initStaticInstance( NULL );
 
-    QnRestProcessorPool::initStaticInstance( nullptr );
+    restProcessorPool.reset();
 
     delete QnMServerResourceSearcher::instance();
     QnMServerResourceSearcher::initStaticInstance( NULL );
@@ -1887,12 +1905,17 @@ void QnMain::run()
 
     ptzPool.reset();
 
+
+    messageProcessor.reset();
+    
+    //disconnecting from EC2
     QnAppServerConnectionFactory::setEc2Connection( ec2::AbstractECConnectionPtr() );
+    ec2Connection.reset();
+    QnAppServerConnectionFactory::setEC2ConnectionFactory( nullptr );
+    ec2ConnectionFactory.reset();
+
 
     av_lockmgr_register(NULL);
-
-    // First disconnect eventManager from all slots, to not try to reconnect on connection close
-    disconnect(QnServerMessageProcessor::instance());
 
     // This method will set flag on message channel to threat next connection close as normal
     //appServerConnection->disconnectSync();
@@ -1905,6 +1928,8 @@ void QnMain::run()
 
     delete QnResourcePool::instance();
     QnResourcePool::initStaticInstance( NULL );
+
+    m_mediaServer.clear();
 }
 
 void QnMain::changePort(quint16 port) {
@@ -2157,8 +2182,10 @@ int main(int argc, char* argv[])
             "INFO"
 #endif
             );
-    commandLineParser.addParameter(&cmdLineArguments.msgLogLevel, "--msg-log-level", NULL,
-        "Log value for msg_log.log. Supported values same as above. Default is none (no logging)", "none");
+    commandLineParser.addParameter(&cmdLineArguments.msgLogLevel, "--http-log-level", NULL,
+        "Log value for http_log.log. Supported values same as above. Default is none (no logging)", "none");
+    commandLineParser.addParameter(&cmdLineArguments.ec2TranLogLevel, "--ec2-tran-log-level", NULL,
+        "Log value for ec2_tran.log. Supported values same as above. Default is none (no logging)", "none");
     commandLineParser.addParameter(&cmdLineArguments.rebuildArchive, "--rebuild", NULL,
         lit("Rebuild archive index. Supported values: all (high & low quality), hq (only high), lq (only low)"), "all");
     commandLineParser.addParameter(&cmdLineArguments.devModeKey, "--dev-mode-key", NULL, QString());
@@ -2193,7 +2220,6 @@ int main(int argc, char* argv[])
     if( !rwConfigFilePath.isEmpty() )
         MSSettings::initializeRunTimeSettingsFromConfFile( rwConfigFilePath );
 
-
     QnVideoService service( argc, argv );
 
     if (!engineVersion.isEmpty()) {
@@ -2208,7 +2234,6 @@ int main(int argc, char* argv[])
     if (restartFlag && res == 0)
         return 1;
     return 0;
-    //return res;
 }
 
 static void printVersion()

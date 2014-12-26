@@ -96,25 +96,34 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
 
     if (compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(qnCommon->engineVersion().toString()), QLatin1String("ECS"), connectionInfo.version)) {
 
+#if 0
         if (connectionInfo.nxClusterProtoVersion != nx_ec::EC2_PROTO_VERSION) {
             QString olderComponent = connectionInfo.nxClusterProtoVersion < nx_ec::EC2_PROTO_VERSION
                 ? tr("Server")
                 : tr("Client");
+            QString message = tr("You are about to connect to Server which has a different version:\n"
+                " - Client version: %1.\n"
+                " - Server version: %2.\n"
+                "These versions are not compatible. Please update your %3"
+                ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()).arg(olderComponent);
+#ifdef _DEBUG
+            message += lit("\nClient Proto: %1\nServer Proto: %2").arg(nx_ec::EC2_PROTO_VERSION).arg(connectionInfo.nxClusterProtoVersion);
+#endif
             QnMessageBox::warning(
                 parentWidget,
                 Qn::VersionMismatch_Help,
                 tr("Could not connect to Server"),
-                tr("You are about to connect to Server which has a different version:\n"
-                " - Client version: %1.\n"
-                " - Server version: %2.\n"
-                "These versions are not compatible. Please update your %3"
-                ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()).arg(olderComponent),
+                message,
                 QMessageBox::Ok
                 );
             return Result::Failure;
         }
 
         return Result::Success;
+#endif
+
+        if (connectionInfo.nxClusterProtoVersion == nx_ec::EC2_PROTO_VERSION)
+            return Result::Success;
     }
 
     if (connectionInfo.version < minSupportedVersion) {
@@ -132,20 +141,8 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
         return Result::Failure;
     }
 
+#ifdef Q_OS_MACX
     if (connectionInfo.version > QnSoftwareVersion(qnCommon->engineVersion().toString())) {
-#ifndef Q_OS_MACX
-        QnMessageBox::warning(
-            parentWidget,
-            Qn::VersionMismatch_Help,
-            tr("Could not connect to Server"),
-            tr("Selected Server has a different version:\n"
-            " - Client version: %1.\n"
-            " - Server version: %2.\n"
-            "An error has occurred while trying to restart in compatibility mode."
-            ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()),
-            QMessageBox::Ok
-            );
-#else
         QnMessageBox::warning(
             parentWidget,
             Qn::VersionMismatch_Help,
@@ -157,10 +154,9 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
             ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()),
             QMessageBox::Ok
             );
-#endif
         return Result::Failure;
     }
-
+#endif
 
     while (true) {
         bool isInstalled = false;
@@ -195,6 +191,28 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
         }
 
         if (!isInstalled) {
+#if 0
+            //updating using compatibility functionality is forbidden
+            if( connectionInfo.version > qnCommon->engineVersion() )
+            {
+                //forbidding installing newer version by compatibility
+                QnMessageBox::warning(
+                    parentWidget,
+                    Qn::VersionMismatch_Help,
+                    tr("Could not connect to Server"),
+                    tr("Selected Server has a different version:\n"
+                        " - Client version: %1.\n"
+                        " - EC version: %2.\n"
+                        "You need to download client %3 to connect"
+                    ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()).arg(qnCommon->engineVersion().toString()),
+                    QMessageBox::Ok
+                );
+                return Result::Failure;
+            }
+#endif
+
+            bool updating = qnCommon->engineVersion() < connectionInfo.version;
+
             int selectedButton = QnMessageBox::warning(
                 parentWidget,
                 Qn::VersionMismatch_Help,
@@ -204,16 +222,18 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
                 " - Server version: %2.\n"
                 "Client version %3 is required to connect to this Server.\n"
                 "Download version %3?"
-                ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()).arg(connectionInfo.version.toString(QnSoftwareVersion::MinorFormat)),
-                QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
+                ).arg(qnCommon->engineVersion().toString())
+                .arg(connectionInfo.version.toString())
+                .arg(connectionInfo.version.toString(updating ? QnSoftwareVersion::FullFormat : QnSoftwareVersion::MinorFormat)),
+                QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::Cancel),
                 QMessageBox::Cancel
                 );
-            if( selectedButton == QMessageBox::Ok ) {
-                QScopedPointer<CompatibilityVersionInstallationDialog> installationDialog(new CompatibilityVersionInstallationDialog(parentWidget));
+            if( selectedButton == QMessageBox::Yes ) {
+                QScopedPointer<CompatibilityVersionInstallationDialog> installationDialog(
+                            new CompatibilityVersionInstallationDialog(connectionInfo.version, parentWidget));
                 //starting installation
-                installationDialog->setVersionToInstall( connectionInfo.version );
                 installationDialog->exec();
-                if( installationDialog->installationSucceeded() )
+                if (installationDialog->installationSucceeded())
                     continue;   //offering to start newly-installed compatibility version
             }
             return Result::Failure;
@@ -264,10 +284,9 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
                     );
                 if( selectedButton == QMessageBox::Ok ) {
                     //starting installation
-                    QScopedPointer<CompatibilityVersionInstallationDialog> installationDialog(new CompatibilityVersionInstallationDialog(parentWidget));
-                    installationDialog->setVersionToInstall( connectionInfo.version );
+                    QScopedPointer<CompatibilityVersionInstallationDialog> installationDialog(new CompatibilityVersionInstallationDialog(connectionInfo.version, parentWidget));
                     installationDialog->exec();
-                    if( installationDialog->installationSucceeded() )
+                    if (installationDialog->installationSucceeded())
                         continue;   //offering to start newly-installed compatibility version
                 }
                 return Result::Failure;

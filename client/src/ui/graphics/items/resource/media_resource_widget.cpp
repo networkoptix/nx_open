@@ -54,6 +54,7 @@
 #include <ui/workbench/watchers/workbench_render_watcher.h>
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
+#include <utils/aspect_ratio.h>
 
 #include "resource_widget_renderer.h"
 #include "resource_widget.h"
@@ -767,6 +768,28 @@ void QnMediaResourceWidget::setDewarpingParams(const QnMediaDewarpingParams &par
     m_dewarpingParams = params;
 
     emit dewarpingParamsChanged();
+}
+
+float QnMediaResourceWidget::visualAspectRatio() const {
+    if (!resource())
+        return base_type::visualAspectRatio();
+
+    float customAspectRatio = QnResourceWidget::resource()->getProperty(QnMediaResource::customAspectRatioKey()).toFloat();
+    if (qFuzzyIsNull(customAspectRatio))
+        return base_type::visualAspectRatio();
+
+    qreal aspectRatio = customAspectRatio * QnGeometry::aspectRatio(channelLayout()->size());
+    return QnAspectRatio::isRotated90(rotation()) ? 1 / aspectRatio : aspectRatio;
+}
+
+float QnMediaResourceWidget::defaultVisualAspectRatio() const {
+    if (!item())
+        return base_type::defaultVisualAspectRatio();
+
+    if (item()->layout() && item()->layout()->hasCellAspectRatio())
+        return item()->layout()->cellAspectRatio();
+
+    return qnGlobals->defaultLayoutCellAspectRatio();
 }
 
 

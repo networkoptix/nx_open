@@ -139,6 +139,8 @@ namespace ec2
             REGISTER_COMMAND(dumpDatabase),
             REGISTER_COMMAND(restoreDatabase),
             REGISTER_COMMAND(updatePersistentSequence),
+            REGISTER_COMMAND(dumpDatabaseToFile),
+
             REGISTER_COMMAND(markLicenseOverflow),
             REGISTER_COMMAND(getSettings),
 
@@ -237,9 +239,19 @@ namespace ec2
         return ++requestID;
     }
 
+    QString QnAbstractTransaction::toString() const
+    {
+        return lit("command=%1 time=%2 peer=%3 dbId=%4 dbSeq=%5")
+            .arg(ApiCommand::toString(command))
+            .arg(persistentInfo.timestamp)
+            .arg(peerID.toString())
+            .arg(persistentInfo.dbID.toString())
+            .arg(persistentInfo.sequence);
+    }
+    
     QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction::PersistentInfo,    (json)(ubjson)(xml)(csv_record),   QnAbstractTransaction_PERSISTENT_Fields)
     QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction,                    (json)(ubjson)(xml)(csv_record),   QnAbstractTransaction_Fields)
     QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ApiTransactionData,                    (json)(ubjson)(xml)(csv_record),   ApiTransactionDataFields)
-	
+
 } // namespace ec2
 

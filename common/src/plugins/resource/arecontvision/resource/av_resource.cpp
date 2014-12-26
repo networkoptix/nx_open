@@ -27,7 +27,8 @@ const QString QnPlAreconVisionResource::MANUFACTURE(lit("ArecontVision"));
 
 
 QnPlAreconVisionResource::QnPlAreconVisionResource()
-    : m_totalMdZones(64)
+    : m_totalMdZones(64),
+      m_zoneSite(8)
 {
     setVendor(lit("ArecontVision"));
 }
@@ -301,9 +302,15 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
     saveParams();
 
     setParamPhysical(lit("mdzonesite"), zone_size);
+    m_zoneSite = zone_size;
     setMotionMaskPhysical(0);
 
     return CameraDiagnostics::NoErrorResult();
+}
+
+int QnPlAreconVisionResource::getZoneSite() const
+{
+    return m_zoneSite;
 }
 
 QString QnPlAreconVisionResource::getDriverName() const

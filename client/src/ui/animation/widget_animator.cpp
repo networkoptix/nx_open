@@ -43,13 +43,11 @@ void WidgetAnimator::moveTo(const QRectF &geometry, qreal rotation, const QEasin
 
     pause();
 
-    /* Rotation must be set first. It's needed to calculate item geometry according to enclosing geometry. */
+    m_geometryAnimator->setTargetValue(geometry);
+    m_geometryAnimator->setEasingCurve(curve);
 
     m_rotationAnimator->setTargetValue(rotation);
     m_rotationAnimator->setEasingCurve(curve);
-
-    m_geometryAnimator->setTargetValue(geometry);
-    m_geometryAnimator->setEasingCurve(curve);
 
     start();
 }

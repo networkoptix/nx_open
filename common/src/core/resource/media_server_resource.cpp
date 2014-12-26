@@ -18,6 +18,7 @@
 #include "../resource_management/resource_pool.h"
 #include "utils/serialization/lexical.h"
 #include "core/resource/security_cam_resource.h"
+#include "nx_ec/ec_proto_version.h"
 
 
 const QString QnMediaServerResource::USE_PROXY = QLatin1String("proxy");
@@ -45,12 +46,12 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
     m_primaryIFSelected = false;
     m_statusTimer.restart();
 
-    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnMediaServerResource::onNewResource, Qt::QueuedConnection);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnMediaServerResource::onRemoveResource, Qt::QueuedConnection);
-
     QnResourceList resList = qnResPool->getResourcesByParentId(getId()).filtered<QnSecurityCamResource>();
     if (!resList.isEmpty())
         m_firstCamera = resList.first();
+
+    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnMediaServerResource::onNewResource, Qt::DirectConnection);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnMediaServerResource::onRemoveResource, Qt::DirectConnection);
 }
 
 QnMediaServerResource::~QnMediaServerResource()
@@ -60,14 +61,14 @@ QnMediaServerResource::~QnMediaServerResource()
 
 void QnMediaServerResource::onNewResource(const QnResourcePtr &resource)
 {
-    QMutexLocker lock(&m_firstCameraMutex);
-    if (m_firstCamera.isNull() &&  resource->getParentId() == getId() && resource.dynamicCast<QnSecurityCamResource>())
+    QMutexLocker lock(&m_mutex);
+    if (m_firstCamera.isNull() && resource.dynamicCast<QnSecurityCamResource>() &&  resource->getParentId() == getId())
         m_firstCamera = resource;
 }
 
 void QnMediaServerResource::onRemoveResource(const QnResourcePtr &resource)
 {
-    QMutexLocker lock(&m_firstCameraMutex);
+    QMutexLocker lock(&m_mutex);
     if (m_firstCamera && resource->getId() == m_firstCamera->getId())
         m_firstCamera.clear();
 }
@@ -83,7 +84,7 @@ QString QnMediaServerResource::getName() const
 {
     if (getServerFlags() & Qn::SF_Edge)
     {
-        QMutexLocker lock(&m_firstCameraMutex);
+        QMutexLocker lock(&m_mutex);
         if (m_firstCamera)
             return m_firstCamera->getName();
     }
@@ -495,11 +496,16 @@ void QnMediaServerResource::setSystemName(const QString &systemName) {
 }
 
 QnModuleInformation QnMediaServerResource::getModuleInformation() const {
-    QMutexLocker lock(&m_mutex);
-
     QnModuleInformation moduleInformation;
     moduleInformation.type = nxMediaServerId;
     moduleInformation.customization = QnAppInfo::customizationName();
+    moduleInformation.sslAllowed = false;
+    moduleInformation.protoVersion = getProperty(lit("protoVersion")).toInt();
+    if (moduleInformation.protoVersion == 0)
+        moduleInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
+    
+    QMutexLocker lock(&m_mutex);
+
     moduleInformation.version = m_version;
     moduleInformation.systemInformation = m_systemInfo;
     moduleInformation.systemName = m_systemName;
@@ -508,7 +514,7 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     for (const QHostAddress &address: m_netAddrList)
         moduleInformation.remoteAddresses.insert(address.toString());
     moduleInformation.id = getId();
-    moduleInformation.sslAllowed = false;
+
     return moduleInformation;
 }
 

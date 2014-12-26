@@ -10,14 +10,19 @@
 
 #include <api/app_server_connection.h>
 
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_state_manager.h>
 
-QnAppServerFileCache::QnAppServerFileCache(QString folderName, QObject *parent) :
+QnAppServerFileCache::QnAppServerFileCache(const QString &folderName, QObject *parent) :
     QObject(parent),
-    m_folderName(folderName)
+    QnWorkbenchContextAware(parent),
+    m_folderName(folderName),
+    m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnAppServerFileCache>(this))
 {
-    connect(this, SIGNAL(delayedFileDownloaded(QString,bool)),  this, SIGNAL(fileDownloaded(QString,bool)), Qt::QueuedConnection);
-    connect(this, SIGNAL(delayedFileUploaded(QString,bool)),    this, SIGNAL(fileUploaded(QString,bool)), Qt::QueuedConnection);
-    connect(this, SIGNAL(delayedFileDeleted(QString,bool)),     this, SIGNAL(fileDeleted(QString,bool)), Qt::QueuedConnection);
+    connect(this, &QnAppServerFileCache::delayedFileDownloaded,     this,   &QnAppServerFileCache::fileDownloaded,      Qt::QueuedConnection);
+    connect(this, &QnAppServerFileCache::delayedFileUploaded,       this,   &QnAppServerFileCache::fileUploaded,        Qt::QueuedConnection);
+    connect(this, &QnAppServerFileCache::delayedFileDeleted,        this,   &QnAppServerFileCache::fileDeleted,         Qt::QueuedConnection);
+    connect(this, &QnAppServerFileCache::delayedFileListReceived,   this,   &QnAppServerFileCache::fileListReceived,    Qt::QueuedConnection);
 }
 
 QnAppServerFileCache::~QnAppServerFileCache(){}
@@ -56,8 +61,10 @@ void QnAppServerFileCache::clearLocalCache() {
 
 void QnAppServerFileCache::getFileList() {
     auto connection = QnAppServerConnectionFactory::getConnection2();
-    if (!connection)
+    if (!connection) {
+        emit delayedFileListReceived(QStringList(), false);
         return;
+    }
 
     connection->getStoredFileManager()->listDirectory(m_folderName, this, [this](int handle, ec2::ErrorCode errorCode, const QStringList& filenames) {
         Q_UNUSED(handle);
@@ -68,6 +75,12 @@ void QnAppServerFileCache::getFileList() {
 // -------------- Download File methods ----------
 
 void QnAppServerFileCache::downloadFile(const QString &filename) {
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection) {
+        emit delayedFileDownloaded(filename, false);
+        return;
+    }
+
     if (filename.isEmpty()) {
         emit delayedFileDownloaded(filename, false);
         return;
@@ -86,10 +99,6 @@ void QnAppServerFileCache::downloadFile(const QString &filename) {
 
     if (m_loading.values().contains(filename))
       return;
-
-    auto connection = QnAppServerConnectionFactory::getConnection2();
-    if (!connection)
-        return;
 
     int handle = connection->getStoredFileManager()->getStoredFile(
                 m_folderName + QLatin1Char('/') + filename,
@@ -128,6 +137,12 @@ void QnAppServerFileCache::at_fileLoaded( int handle, ec2::ErrorCode errorCode, 
 
 
 void QnAppServerFileCache::uploadFile(const QString &filename) {
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection) {
+        emit delayedFileUploaded(filename, false);
+        return;
+    }
+
     if (m_uploading.values().contains(filename))
         return;
 
@@ -136,10 +151,6 @@ void QnAppServerFileCache::uploadFile(const QString &filename) {
         emit delayedFileUploaded(filename, false);
         return;
     }
-
-    auto connection = QnAppServerConnectionFactory::getConnection2();
-    if (!connection)
-        return;
 
     QByteArray data = file.readAll();
     file.close();
@@ -168,6 +179,12 @@ void QnAppServerFileCache::at_fileUploaded( int handle, ec2::ErrorCode errorCode
 // -------------- Deleting methods ----------------
 
 void QnAppServerFileCache::deleteFile(const QString &filename) {
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection) {
+        emit delayedFileDeleted(filename, false);
+        return;
+    }
+
     if (filename.isEmpty()) {
         emit delayedFileDeleted(filename, false);
         return;
@@ -185,10 +202,6 @@ void QnAppServerFileCache::deleteFile(const QString &filename) {
 
     if (m_deleting.values().contains(filename))
       return;
-
-    auto connection = QnAppServerConnectionFactory::getConnection2();
-    if (!connection)
-        return;
 
     int handle = connection->getStoredFileManager()->deleteStoredFile(
                     m_folderName + QLatin1Char('/') +filename,
@@ -214,4 +227,14 @@ void QnAppServerFileCache::clear() {
     m_loading.clear();
     m_uploading.clear();
     m_deleting.clear();
+}
+
+bool QnAppServerFileCache::tryClose(bool force) {
+    Q_UNUSED(force);
+    clear();
+    return true;
+}
+
+void QnAppServerFileCache::forcedUpdate() {
+    getFileList();
 }

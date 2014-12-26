@@ -326,7 +326,8 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
                                     customAr,
                                     itemData.rotation);
 
-    emit stageChanged(tr("Exporting to \"%2\"...").arg(m_targetFilename));
+    //TODO: #GDM #TR Fix after string freeze
+    emit stageChanged(tr("Exporting to \"%2\"...").arg(QString()).arg(m_targetFilename));
     return true;
 }
 

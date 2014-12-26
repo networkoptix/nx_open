@@ -206,7 +206,7 @@ public:
         int detailLevel );
     
     // in some cases I just want to update couple of field from just discovered resource
-    virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source);
+    virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) override;
 
 public slots:
     virtual void inputPortListenerAttached();
@@ -216,10 +216,13 @@ public slots:
     virtual void recordingEventDetached();
 
 signals:
+    /* All ::changed signals must have the same profile to be dynamically called from base ::updateInner method. */
     void scheduleDisabledChanged(const QnResourcePtr &resource);
     void scheduleTasksChanged(const QnResourcePtr &resource);
-    void groupNameChanged(const QnSecurityCamResourcePtr &resource);
+    void groupIdChanged(const QnResourcePtr &resource);
+    void groupNameChanged(const QnResourcePtr &resource);
     void motionRegionChanged(const QnResourcePtr &resource);
+
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonParamsEncoded);
 
     //!Emitted on camera input port state has been changed
@@ -250,14 +253,16 @@ protected:
     //!MUST be overridden for camera with input port. Default implementation does nothing
     /*!
         \warning Excess calls of this method is legal and MUST be correctly handled in implementation
-        \return true, if started input port monitoring
+        \return true, if async request has been started successfully
+        \note \a completionHandler is not called yet (support will emerge in 2.4)
     */
-    virtual bool startInputPortMonitoring();
+    virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler );
     //!MUST be overridden for camera with input port. Default implementation does nothing
     /*!
         \warning Excess calls of this method is legal and MUST be correctly handled in implementation
+        \note This method has no right to fail
     */
-    virtual void stopInputPortMonitoring();
+    virtual void stopInputPortMonitoringAsync();
     virtual bool isInputPortMonitored() const;
 
 private:

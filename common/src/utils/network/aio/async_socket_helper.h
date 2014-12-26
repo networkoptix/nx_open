@@ -193,6 +193,7 @@ public:
         assert( buf.size() > 0 );
 
 #ifdef _DEBUG
+        //assert does not stop all threads immediately, so performing segmentation fault
         if( m_asyncSendIssued )
             *((int*)nullptr) = 12;
         assert( !m_asyncSendIssued );
@@ -496,7 +497,10 @@ private:
             {
                 //TODO #ak distinguish read and write
                 SystemError::ErrorCode sockErrorCode = SystemError::notConnected;
-                this->m_socket->getLastError( &sockErrorCode );
+                if( !this->m_socket->getLastError( &sockErrorCode ) )
+                    sockErrorCode = SystemError::notConnected;
+                else if( sockErrorCode == SystemError::noError )
+                    sockErrorCode = SystemError::notConnected;  //MUST report some error
                 if( m_connectHandler )
                 {
                     m_connectSendHandlerTerminatedFlag = &terminated;

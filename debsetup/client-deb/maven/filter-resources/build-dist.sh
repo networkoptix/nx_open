@@ -86,7 +86,7 @@ cp -r $CLIENT_PLATFORMS_PATH $BINSTAGE
 rm -f $LIBSTAGE/*.debug
 
 #'libstdc++.so.6 is needed on some machines
-cp -r /usr/lib/*-linux-gnu/libstdc++.so.6* $LIBSTAGE
+cp -r ${arch.dir}/libstdc++.so.6* $LIBSTAGE
 
 find $PKGSTAGE -type d -print0 | xargs -0 chmod 755
 find $PKGSTAGE -type f -print0 | xargs -0 chmod 644

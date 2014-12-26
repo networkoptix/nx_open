@@ -226,6 +226,17 @@
         </InstallExecuteSequence>
 
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
+        <Media Id="2" Cabinet="media2.cab" EmbedCab="yes" />
+        <Media Id="3" Cabinet="media3.cab" EmbedCab="yes" />
+        <Media Id="4" Cabinet="media4.cab" EmbedCab="yes" />
+        <Media Id="5" Cabinet="media5.cab" EmbedCab="yes" />
+        <Media Id="6" Cabinet="media6.cab" EmbedCab="yes" />
+        <Media Id="7" Cabinet="media7.cab" EmbedCab="yes" />
+        <Media Id="8" Cabinet="media8.cab" EmbedCab="yes" />
+        <Media Id="9" Cabinet="media9.cab" EmbedCab="yes" />
+        <Media Id="10" Cabinet="media10.cab" EmbedCab="yes" />
+        <Media Id="11" Cabinet="media11.cab" EmbedCab="yes" />
+        <Media Id="12" Cabinet="media12.cab" EmbedCab="yes" />
 
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="$(var.SystemFolderActual)">

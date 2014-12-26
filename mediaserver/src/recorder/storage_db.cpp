@@ -11,7 +11,8 @@ static const int COMMIT_INTERVAL = 1000 * 60 * 5;
 
 QnStorageDb::QnStorageDb(int storageIndex):
     QnDbHelper(),
-    m_storageIndex(storageIndex)
+    m_storageIndex(storageIndex),
+    m_tran(m_sdb, m_mutex)
 {
     m_lastTranTime.restart();
 }
@@ -69,7 +70,7 @@ bool QnStorageDb::deleteRecordsInternal(const DeleteRecordInfo& delRecord)
 
 void QnStorageDb::addRecord(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk)
 {
-    QMutexLocker locker(&m_mutex);
+    QMutexLocker locker(&m_syncMutex);
 
     if (chunk.durationMs <= 0)
         return;
@@ -83,7 +84,7 @@ void QnStorageDb::addRecord(const QString& cameraUniqueId, QnServer::ChunksCatal
 
 void QnStorageDb::flushRecords()
 {
-    QMutexLocker locker(&m_mutex);
+    QMutexLocker locker(&m_syncMutex);
     flushRecordsNoLock();
 }
 
@@ -487,4 +488,9 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadBookmarksFileCatalog() {
     }
 
     return result;
+}
+
+QnStorageDb::QnDbTransaction* QnStorageDb::getTransaction()
+{
+    return &m_tran;
 }

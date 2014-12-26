@@ -29,33 +29,38 @@
 #include "http/ec2_transaction_tcp_listener.h"
 #include <utils/common/app_info.h>
 #include "mutex/distributed_mutex_manager.h"
-#include "transaction/runtime_transaction_log.h"
-
 
 namespace ec2
 {
     Ec2DirectConnectionFactory::Ec2DirectConnectionFactory( Qn::PeerType peerType )
     :
         m_dbManager( peerType == Qn::PT_Server ? new QnDbManager() : nullptr ),   //dbmanager is initialized by direct connection
-        m_transactionMessageBus( new ec2::QnTransactionMessageBus() ),
         m_timeSynchronizationManager( new TimeSynchronizationManager(peerType) ),
+        m_transactionMessageBus( new ec2::QnTransactionMessageBus(peerType) ),
         m_terminated( false ),
         m_runningRequests( 0 ),
         m_sslEnabled( false )
     {
+        m_timeSynchronizationManager->start();  //unfortunately cannot do it in TimeSynchronizationManager 
+            //constructor to keep valid object destruction order
+
         srand( ::time(NULL) );
 
         //registering ec2 types with Qt meta types system
         qRegisterMetaType<QnTransactionTransportHeader>( "QnTransactionTransportHeader" ); // TODO: #Elric #EC2 register in a proper place!
 
         ec2::QnDistributedMutexManager::initStaticInstance( new ec2::QnDistributedMutexManager() );
-        m_runtimeTransactionLog.reset(new QnRuntimeTransactionLog());
+
+        //m_transactionMessageBus->start();
     }
 
     Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()
     {
         pleaseStop();
         join();
+
+        m_timeSynchronizationManager->pleaseStop(); //have to do it before m_transactionMessageBus destruction 
+            //since TimeSynchronizationManager uses QnTransactionMessageBus
 
         ec2::QnDistributedMutexManager::initStaticInstance(0);
     }
@@ -215,7 +220,7 @@ namespace ec2
         //AbstractStoredFileManager::updateStoredFile
         registerUpdateFuncHandler<ApiStoredFileData>( restProcessorPool, ApiCommand::updateStoredFile );
         //AbstractStoredFileManager::deleteStoredFile
-        registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeStoredFile );
+        registerUpdateFuncHandler<ApiStoredFilePath>( restProcessorPool, ApiCommand::removeStoredFile );
 
         //AbstractUpdatesManager::uploadUpdate
         registerUpdateFuncHandler<ApiUpdateUploadData>( restProcessorPool, ApiCommand::uploadUpdate );
@@ -257,6 +262,7 @@ namespace ec2
         registerGetFuncHandler<std::nullptr_t, ApiLicenseDataList>( restProcessorPool, ApiCommand::getLicenses );
 
         registerGetFuncHandler<std::nullptr_t, ApiDatabaseDumpData>( restProcessorPool, ApiCommand::dumpDatabase );
+        registerGetFuncHandler<ApiStoredFilePath, qint64>( restProcessorPool, ApiCommand::dumpDatabaseToFile );
 
         //AbstractECConnectionFactory
         registerFunctorHandler<ApiLoginData, QnConnectionInfo>( restProcessorPool, ApiCommand::connect,
@@ -400,7 +406,7 @@ namespace ec2
     {
         //TODO #ak async ssl is working now, make async request to old ec here
 
-        if( errorCode != ErrorCode::ok )
+        if( (errorCode != ErrorCode::ok) && (errorCode != ErrorCode::unauthorized) )
         {
             //checking for old EC
             QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());
@@ -427,6 +433,7 @@ namespace ec2
             );
             return;
         }
+
         QnConnectionInfo connectionInfoCopy(connectionInfo);
         connectionInfoCopy.ecUrl = ecURL;
         connectionInfoCopy.ecUrl.setScheme( connectionInfoCopy.allowSslConnections ? lit("https") : lit("http") );
@@ -451,7 +458,7 @@ namespace ec2
         const QUrl& ecURL,
         impl::TestConnectionHandlerPtr handler )
     {
-        if( errorCode == ErrorCode::ok )
+        if( errorCode == ErrorCode::ok || errorCode == ErrorCode::unauthorized )
         {
             handler->done( reqID, errorCode, connectionInfo );
             QMutexLocker lk( &m_mutex );

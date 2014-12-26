@@ -22,6 +22,17 @@ QnLayoutResource::QnLayoutResource(const QnResourceTypePool* resTypePool):
     setTypeId(resTypePool->getFixedResourceTypeId(lit("Layout")));
 }
 
+QString QnLayoutResource::getUniqueId() const {
+    if (hasFlags(Qn::local | Qn::url))
+        return getUrl();
+    return base_type::getUniqueId();
+}
+
+Qn::ResourceStatus QnLayoutResource::getStatus() const {
+    return Qn::Online;
+}
+
+
 QnLayoutResourcePtr QnLayoutResource::clone() const {
     QMutexLocker locker(&m_mutex);
 
@@ -245,12 +256,12 @@ QHash<int, QVariant> QnLayoutResource::data() const {
 /********* Properties getters and setters **********/
 
 /********* Cell aspect ratio propert **********/
-qreal QnLayoutResource::cellAspectRatio() const {
+float QnLayoutResource::cellAspectRatio() const {
     QMutexLocker locker(&m_mutex);
     return m_cellAspectRatio;
 }
 
-void QnLayoutResource::setCellAspectRatio(qreal cellAspectRatio) {
+void QnLayoutResource::setCellAspectRatio(float cellAspectRatio) {
     {
         QMutexLocker locker(&m_mutex);
         if(qFuzzyCompare(m_cellAspectRatio, cellAspectRatio))
@@ -368,7 +379,3 @@ void QnLayoutResource::setLocked(bool value) {
     emit lockedChanged(::toSharedPointer(this));
 }
 
-Qn::ResourceStatus QnLayoutResource::getStatus() const
-{
-    return Qn::Online;
-}

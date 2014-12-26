@@ -98,26 +98,32 @@ void QnServerMessageProcessor::afterRemovingResource(const QnUuid& id)
     QnCommonMessageProcessor::afterRemovingResource(id);
 }
 
-void QnServerMessageProcessor::init(const ec2::AbstractECConnectionPtr& connection)
-{
-    connect(connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateChunkReceived,
-            this, &QnServerMessageProcessor::at_updateChunkReceived);
-    connect(connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateInstallationRequested,
-            this, &QnServerMessageProcessor::at_updateInstallationRequested);
-
-    connect(connection->getMiscManager().get(), &ec2::AbstractMiscManager::systemNameChangeRequested,
-            this, [this](const QString &systemName) { changeSystemName(systemName); });
-
-    connect( connection, &ec2::AbstractECConnection::remotePeerUnauthorized, this, &QnServerMessageProcessor::at_remotePeerUnauthorized );
-
-    connect(connection, &ec2::AbstractECConnection::remotePeerFound,                this, &QnServerMessageProcessor::at_remotePeerFound );
-    connect(connection, &ec2::AbstractECConnection::remotePeerLost,                 this, &QnServerMessageProcessor::at_remotePeerLost );
-
+void QnServerMessageProcessor::init(const ec2::AbstractECConnectionPtr& connection) {
     QnCommonMessageProcessor::init(connection);
 }
 
-void QnServerMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data)
-{
+void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection) {
+    base_type::connectToConnection(connection);
+
+    connect(connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateChunkReceived,
+        this, &QnServerMessageProcessor::at_updateChunkReceived);
+    connect(connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateInstallationRequested,
+        this, &QnServerMessageProcessor::at_updateInstallationRequested);
+
+    connect( connection, &ec2::AbstractECConnection::remotePeerUnauthorized, this, &QnServerMessageProcessor::at_remotePeerUnauthorized );
+
+    connect(connection->getMiscManager().get(), &ec2::AbstractMiscManager::systemNameChangeRequested,
+        this, [this](const QString &systemName) { changeSystemName(systemName); });
+}
+
+void QnServerMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) {
+    base_type::disconnectFromConnection(connection);
+    connection->getUpdatesManager()->disconnect(this);
+    connection->getMiscManager()->disconnect(this);
+}
+
+void QnServerMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData &data) {
+    base_type::handleRemotePeerFound(data);
     QnResourcePtr res = qnResPool->getResourceById(data.peer.id);
     if (res)
         res->setStatus(Qn::Online);
@@ -125,8 +131,8 @@ void QnServerMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data)
         m_delayedOnlineStatus << data.peer.id;
 }
 
-void QnServerMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data)
-{
+void QnServerMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData &data) {
+    base_type::handleRemotePeerLost(data);
     QnResourcePtr res = qnResPool->getResourceById(data.peer.id);
     if (res) {
         res->setStatus(Qn::Offline);
@@ -144,7 +150,7 @@ void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &reso
     if (resource->getId() == qnCommon->moduleGUID() && status != Qn::Online)
     {
         // it's own server. change status to online
-        QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusSync(resource->getId(), Qn::Online);
+        QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusLocalSync(resource->getId(), Qn::Online);
         resource->setStatus(Qn::Online, true);
     }
     else {
@@ -239,7 +245,7 @@ void QnServerMessageProcessor::removeResourceIgnored(const QnUuid& resourceId)
     if (isOwnServer) {
         QnMediaServerResourcePtr savedServer;
         QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveSync(mServer, &savedServer);
-        QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusSync(mServer->getId(), Qn::Online);
+        QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusLocalSync(mServer->getId(), Qn::Online);
     }
     else if (isOwnStorage && !storage->isExternal()) {
         QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveStoragesSync(QnAbstractStorageResourceList() << storage);

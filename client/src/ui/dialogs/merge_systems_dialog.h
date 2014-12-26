@@ -4,6 +4,8 @@
 #include <QtWidgets/QDialog>
 
 #include <core/resource/resource_fwd.h>
+#include <ui/workbench/workbench_context_aware.h>
+#include <ui/workbench/workbench_state_manager.h>
 
 namespace Ui {
     class QnMergeSystemsDialog;
@@ -12,7 +14,7 @@ namespace Ui {
 class QnMergeSystemsTool;
 struct QnModuleInformation;
 
-class QnMergeSystemsDialog : public QDialog {
+class QnMergeSystemsDialog : public QDialog, public QnWorkbenchContextAware {
     Q_OBJECT
 
 public:

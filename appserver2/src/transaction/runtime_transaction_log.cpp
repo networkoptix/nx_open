@@ -3,19 +3,9 @@
 namespace ec2
 {
 
-static QnRuntimeTransactionLog* globalInstance = 0;
-
-
-QnRuntimeTransactionLog* QnRuntimeTransactionLog::instance()
-{
-    return globalInstance;
-}
-
-QnRuntimeTransactionLog::QnRuntimeTransactionLog()
-{
-    Q_ASSERT(!globalInstance);
-    globalInstance = this;
-    
+QnRuntimeTransactionLog::QnRuntimeTransactionLog(QObject* parent):
+    QObject(parent)
+{ 
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &QnRuntimeTransactionLog::at_runtimeInfoChanged, Qt::DirectConnection);
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnRuntimeTransactionLog::at_runtimeInfoChanged, Qt::DirectConnection);
 }

@@ -17,6 +17,9 @@ class QnLayoutResource: public QnResource {
 public:
     QnLayoutResource(const QnResourceTypePool* resTypePool);
 
+    virtual QString getUniqueId() const override;
+    virtual Qn::ResourceStatus getStatus() const override;
+
     QnLayoutResourcePtr clone() const;
 
     void setItems(const QnLayoutItemDataList &items);
@@ -35,9 +38,9 @@ public:
 
     void updateItem(const QnUuid &itemUuid, const QnLayoutItemData &item);
 
-    qreal cellAspectRatio() const;
+    float cellAspectRatio() const;
 
-    void setCellAspectRatio(qreal cellAspectRatio);
+    void setCellAspectRatio(float cellAspectRatio);
 
     bool hasCellAspectRatio() const;
 
@@ -78,8 +81,6 @@ public:
     /** Locked state - locked layout cannot be modified in any way */
     bool locked() const;
     void setLocked(bool value);
-
-    virtual Qn::ResourceStatus getStatus() const override;
 signals:
     void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
     void itemRemoved(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
@@ -105,7 +106,7 @@ private:
 
 private:
     QnLayoutItemDataMap m_itemByUuid;
-    qreal m_cellAspectRatio;
+    float m_cellAspectRatio;
     QSizeF m_cellSpacing;
     QHash<int, QVariant> m_dataByRole;
     QnTimePeriod m_localRange;

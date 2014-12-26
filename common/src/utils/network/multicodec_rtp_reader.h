@@ -90,6 +90,7 @@ private:
     void processTcpRtcp(RTPIODevice* ioDevice, quint8* buffer, int bufferSize, int bufferCapacity);
     void buildClientRTCPReport(quint8 chNumber);
     QnAbstractMediaDataPtr getNextDataInternal();
+    RTPSession::TransportType getRtpTransport() const;
 private slots:
     void at_packetLost(quint32 prev, quint32 next);
     void at_propertyChanged(const QnResourcePtr & res, const QString & key);

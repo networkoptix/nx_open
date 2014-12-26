@@ -82,7 +82,7 @@ bool RevealResponse::serialize(quint8 **const bufStart, const quint8 *bufEnd) {
     map[lit("sslAllowed")] = sslAllowed;
     map[lit("port")] = port;
     map[lit("remoteAddresses")] = remoteAddresses;
-    map[lit("authHash")] = authHash;
+    map[lit("authHash")] = authHash.toBase64();
     map[lit("protoVersion")] = protoVersion;
 
     QByteArray data = QJsonDocument::fromVariant(map).toJson(QJsonDocument::Compact);
@@ -110,7 +110,7 @@ bool RevealResponse::deserialize(const quint8 **bufStart, const quint8 *bufEnd) 
     sslAllowed = map.value(lit("sslAllowed")).toBool();
     port = static_cast<quint16>(map.value(lit("port")).toUInt());
     remoteAddresses = map.value(lit("remoteAddresses")).toStringList();
-    authHash = map.value(lit("authHash")).toByteArray();
+    authHash = QByteArray::fromBase64(map.value(lit("authHash")).toByteArray());
     protoVersion = map.value(lit("protoVersion"), nx_ec::INITIAL_EC2_PROTO_VERSION).toInt();
 
     return !type.isEmpty() && !version.isEmpty();

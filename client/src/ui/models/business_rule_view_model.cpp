@@ -178,8 +178,6 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
         }
 
     case Qt::TextColorRole:
-        if (m_system)
-            return QBrush(Qt::yellow);
         break;
 
     case Qt::BackgroundRole:

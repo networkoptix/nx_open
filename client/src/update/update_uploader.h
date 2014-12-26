@@ -36,6 +36,7 @@ signals:
     void finished(int errorCode, const QSet<QnUuid> &failedPeers);
 
 private slots:
+    void sendPreambule();
     void sendNextChunk();
     void at_updateManager_updateUploadProgress(const QString &updateId, const QnUuid &peerId, int chunks);
     void at_chunkTimer_timeout();

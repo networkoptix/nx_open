@@ -149,6 +149,9 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
     setWarningStyle(ui->serverOfflineLabel);
     ui->serverOfflineLabel->setVisible(false);
 
+    setWarningStyle(ui->serverStatusLabel);
+    ui->serverStatusLabel->setVisible(false);
+
     ui->progressWidget->setVisible(false);
 
     resize(width(), 1); // set widget height to minimal possible
@@ -180,6 +183,7 @@ void QnCameraAdditionDialog::setServer(const QnMediaServerResourcePtr &server) {
     } else {
         setState(NoServer);
     }
+    clearServerStatus();
     updateTitle();
 }
 
@@ -194,6 +198,9 @@ QnCameraAdditionDialog::State QnCameraAdditionDialog::state() const {
 }
 
 void QnCameraAdditionDialog::setState(QnCameraAdditionDialog::State state) {
+    if (m_state == state)
+        return;
+
     m_state = state;
 
     ui->validateLabelSearch->setVisible(false);         // hide on every state change
@@ -666,6 +673,7 @@ void QnCameraAdditionDialog::at_server_statusChanged(const QnResourcePtr &resour
     if (resource != m_server)
         return;
 
+    clearServerStatus();
     if (resource->getStatus() == Qn::Offline) {
         switch (m_state) {
         case Initial:
@@ -673,16 +681,12 @@ void QnCameraAdditionDialog::at_server_statusChanged(const QnResourcePtr &resour
             break;
         case Searching:
             setState(InitialOffline);
-            QMessageBox::information(this,
-                                     tr("Server went offline"),
-                                     tr("Server went offline, search aborted."));
+            updateServerStatus(tr("Server went offline, search aborted."));
             break;
         case CamerasFound:
         case Adding:
             setState(CamerasOffline);
-            QMessageBox::information(this,
-                                     tr("Server went offline"),
-                                     tr("Server went offline, cameras can be added when the server will be available."));
+            updateServerStatus(tr("Server went offline, cameras can be added when the server will be available."));
             break;
         default:
             break;
@@ -708,15 +712,11 @@ void QnCameraAdditionDialog::at_resPool_resourceRemoved(const QnResourcePtr &res
     setServer(QnMediaServerResourcePtr());
     switch (oldState) {
     case Searching:
-        QMessageBox::information(this,
-                                 tr("Server was removed"),
-                                 tr("Server was removed, search aborted."));
+        updateServerStatus(tr("Server was removed, search aborted."));
         break;
     case CamerasFound:
     case Adding:
-        QMessageBox::information(this,
-                                 tr("Server was removed"),
-                                 tr("Server was removed, cameras cannot be added anymore."));
+        updateServerStatus(tr("Server was removed, cameras cannot be added anymore."));
         break;
     default:
         break;
@@ -810,3 +810,14 @@ void QnCameraAdditionDialog::updateTitle() {
         ui->serverNameLabel->setText(tr("Select target server..."));
     }
 }
+
+
+void QnCameraAdditionDialog::clearServerStatus() {
+    updateServerStatus(QString());
+}
+
+void QnCameraAdditionDialog::updateServerStatus(const QString &errorMessage) {
+    ui->serverStatusLabel->setText(errorMessage);
+    ui->serverStatusLabel->setVisible(!errorMessage.isEmpty());
+}
+

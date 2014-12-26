@@ -58,19 +58,6 @@ namespace ec2
         QnDbManager();
         virtual ~QnDbManager();
 
-
-        class Locker
-        {
-        public:
-            Locker(QnDbManager* db);
-            ~Locker();
-            bool commit();
-
-        private:
-            QnDbManager* m_db;
-            QnDbHelper::QnDbTransactionLocker m_scopedTran;
-        };
-
         bool init(
             QnResourceFactory* factory,
             const QString& dbFilePath,
@@ -107,10 +94,12 @@ namespace ec2
         ErrorCode executeTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
             Q_ASSERT_X(!tran.persistentInfo.isNull(), Q_FUNC_INFO, "You must register transaction command in persistent command list!");
-            Locker lock(this);
+            QnDbTransactionLocker lock(getTransaction());
             ErrorCode result = executeTransactionNoLock(tran, serializedTran);
-            if (result == ErrorCode::ok)
-                lock.commit();
+            if (result == ErrorCode::ok) {
+                if (!lock.commit())
+                    return ErrorCode::dbError;
+            }
             return result;
         }
 
@@ -129,6 +118,7 @@ namespace ec2
 
         //dumpDatabase
         ErrorCode doQuery(const std::nullptr_t& /*dummy*/, ApiDatabaseDumpData& data);
+        ErrorCode doQuery(const ApiStoredFilePath& path, qint64& dumpFileSize);
 
         //listDirectory
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredDirContents& data);
@@ -211,6 +201,7 @@ namespace ec2
         //!Reads settings (properties of user 'admin')
         ErrorCode readSettings(ApiResourceParamDataList& settings);
 
+        virtual QnDbTransaction* getTransaction() override;
     signals:
         //!Emitted after \a QnDbManager::init was successfully executed
         void initialized();
@@ -474,18 +465,24 @@ namespace ec2
 
         ErrorCode insertOrReplaceStoredFile(const QString &fileName, const QByteArray &fileContents);
 
-        bool createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2);
+        bool createDatabase();
         bool migrateBusinessEvents();
         bool doRemap(int id, int newVal, const QString& fieldName);
         
         qint32 getResourceInternalId( const QnUuid& guid );
         QnUuid getResourceGuid(const qint32 &internalId);
         qint32 getBusinessRuleInternalId( const QnUuid& guid );
-
-        //void beginTran();
-        //void commit();
-        //void rollback();
     private:
+        class QnDbTransactionExt: public QnDbTransaction
+        {
+        public:
+            QnDbTransactionExt(QSqlDatabase& database, QReadWriteLock& mutex): QnDbTransaction(database, mutex) {}
+
+            virtual bool beginTran() override;
+            virtual void rollback() override;
+            virtual bool commit() override;
+        };
+
         enum GuidConversionMethod {CM_Default, CM_Binary, CM_MakeHash, CM_String, CM_INT};
 
         QMap<int, QnUuid> getGuidList(const QString& request, GuidConversionMethod method, const QByteArray& intHashPostfix = QByteArray());
@@ -508,6 +505,8 @@ namespace ec2
         ErrorCode getScheduleTasks(const QnUuid& cameraId, std::vector<ApiScheduleTaskWithRefData>& scheduleTaskList);
         void addResourceTypesFromXML(ApiResourceTypeDataList& data);
         void loadResourceTypeXML(const QString& fileName, ApiResourceTypeDataList& data);
+        bool removeServerStatusFromTransactionLog();
+        bool tuneDBAfterOpen();
     private:
         QnResourceFactory* m_resourceFactory;
         QnUuid m_storageTypeId;
@@ -524,11 +523,13 @@ namespace ec2
         * So, only atomic SQL updates are allowed. m_mutexStatic is used for createDB only. Common mutex/transaction is sharing for both DB
         */
         QSqlDatabase m_sdbStatic;
+        QnDbTransactionExt m_tran;
         QnDbTransaction m_tranStatic;
         mutable QReadWriteLock m_mutexStatic;
         bool m_needResyncLog;
         bool m_needResyncLicenses;
         bool m_needResyncFiles;
+        bool m_dbJustCreated;
     };
 };
 

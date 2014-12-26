@@ -188,7 +188,7 @@ void QnBusinessRulesDialog::at_message_ruleDeleted(const QnUuid &id) {
 }
 
 void QnBusinessRulesDialog::at_newRuleButton_clicked() {
-    m_rulesViewModel->addRule(QnBusinessEventRulePtr());
+    m_rulesViewModel->createRule();
 
     ui->tableView->setCurrentIndex(m_rulesViewModel->index(m_rulesViewModel->rowCount() - 1, 0));
 }
@@ -275,6 +275,7 @@ void QnBusinessRulesDialog::at_model_dataChanged(const QModelIndex &topLeft, con
     Q_UNUSED(bottomRight)
     if (topLeft.column() <= QnBusiness::ModifiedColumn && bottomRight.column() >= QnBusiness::ModifiedColumn)
         updateControlButtons();
+    updateFilter();
 }
 
 void QnBusinessRulesDialog::toggleAdvancedMode() {

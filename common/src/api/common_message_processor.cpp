@@ -32,25 +32,21 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 {
     if (m_connection) {
         /* Safety check in case connection will not be deleted instantly. */
-        m_connection->disconnect(this);
-        m_connection->getResourceManager()->disconnect(this);
-        m_connection->getMediaServerManager()->disconnect(this);
-        m_connection->getCameraManager()->disconnect(this);
-        m_connection->getLicenseManager()->disconnect(this);
-        m_connection->getBusinessEventManager()->disconnect(this);
-        m_connection->getUserManager()->disconnect(this);
-        m_connection->getLayoutManager()->disconnect(this);
-        m_connection->getStoredFileManager()->disconnect(this);
-        m_connection->getDiscoveryManager()->disconnect(this);
-        m_connection->getTimeManager()->disconnect(this);
+        disconnectFromConnection(m_connection);
     }
     m_connection = connection;
 
     if (!connection)
         return;
 
-    connect(connection, &ec2::AbstractECConnection::remotePeerFound,                this, &QnCommonMessageProcessor::remotePeerFound );
-    connect(connection, &ec2::AbstractECConnection::remotePeerLost,                 this, &QnCommonMessageProcessor::remotePeerLost );
+    connectToConnection(connection);
+    connection->startReceivingNotifications();
+}
+
+
+void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection) {
+    connect(connection, &ec2::AbstractECConnection::remotePeerFound,                this, &QnCommonMessageProcessor::on_remotePeerFound );
+    connect(connection, &ec2::AbstractECConnection::remotePeerLost,                 this, &QnCommonMessageProcessor::on_remotePeerLost );
     connect(connection, &ec2::AbstractECConnection::initNotification,               this, &QnCommonMessageProcessor::on_gotInitialNotification );
     connect(connection, &ec2::AbstractECConnection::runtimeInfoChanged,             this, &QnCommonMessageProcessor::runtimeInfoChanged );
 
@@ -115,8 +111,21 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 
     connect( connection->getDiscoveryManager(), &ec2::AbstractDiscoveryManager::discoveryInformationChanged,
         this, &QnCommonMessageProcessor::on_gotDiscoveryData );
+}
 
-    connection->startReceivingNotifications();
+void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) {
+    connection->stopReceivingNotifications();
+    connection->disconnect(this);
+    connection->getResourceManager()->disconnect(this);
+    connection->getMediaServerManager()->disconnect(this);
+    connection->getCameraManager()->disconnect(this);
+    connection->getLicenseManager()->disconnect(this);
+    connection->getBusinessEventManager()->disconnect(this);
+    connection->getUserManager()->disconnect(this);
+    connection->getLayoutManager()->disconnect(this);
+    connection->getStoredFileManager()->disconnect(this);
+    connection->getDiscoveryManager()->disconnect(this);
+    connection->getTimeManager()->disconnect(this);
 }
 
 void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResourceData &fullData)
@@ -124,7 +133,6 @@ void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResour
     onGotInitialNotification(fullData);
     on_businessRuleReset(fullData.bRules);
 }
-
 
 void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &data, bool addInformation)
 {
@@ -154,6 +162,17 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &
     server->setAdditionalUrls(additionalUrls);
     server->setIgnoredUrls(ignoredUrls);
 }
+
+void QnCommonMessageProcessor::on_remotePeerFound(const ec2::ApiPeerAliveData &data) {
+    handleRemotePeerFound(data);
+    emit remotePeerFound(data);
+}
+
+void QnCommonMessageProcessor::on_remotePeerLost(const ec2::ApiPeerAliveData &data) {
+    handleRemotePeerLost(data);
+    emit remotePeerLost(data);
+}
+
 
 void QnCommonMessageProcessor::on_resourceStatusChanged( const QnUuid& resourceId, Qn::ResourceStatus status )
 {
@@ -350,8 +369,16 @@ void QnCommonMessageProcessor::removeResourceIgnored(const QnUuid &)
 {
 }
 
+void QnCommonMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData &data) {
+}
+
+void QnCommonMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData &data) {  
+}
+
+
 void QnCommonMessageProcessor::resetServerUserAttributesList( const QnMediaServerUserAttributesList& serverUserAttributesList )
 {
+    QnMediaServerUserAttributesPool::instance()->clear();
     for( const QnMediaServerUserAttributesPtr& serverAttrs: serverUserAttributesList )
     {
         QnMediaServerUserAttributesPool::ScopedLock userAttributesLock( QnMediaServerUserAttributesPool::instance(), serverAttrs->serverID );
@@ -361,6 +388,7 @@ void QnCommonMessageProcessor::resetServerUserAttributesList( const QnMediaServe
 
 void QnCommonMessageProcessor::resetCameraUserAttributesList( const QnCameraUserAttributesList& cameraUserAttributesList )
 {
+    QnCameraUserAttributePool::instance()->clear();
     for( const QnCameraUserAttributesPtr& cameraAttrs: cameraUserAttributesList )
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), cameraAttrs->cameraID );
@@ -387,8 +415,15 @@ void QnCommonMessageProcessor::resetPropertyList(const ec2::ApiResourceParamWith
     }
 }
 
-void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataList& params) {
+void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataList& params) 
+{
+    auto keys = qnStatusDictionary->values().keys();
     qnStatusDictionary->clear();
+    for(const QnUuid& id: keys) {
+        if (QnResourcePtr resource = qnResPool->getResourceById(id))
+            emit resource->statusChanged(resource);
+    }
+
     for(const ec2::ApiResourceStatusData& statusData: params)
         on_resourceStatusChanged(statusData.id , statusData.status);
 }
@@ -436,17 +471,7 @@ QMap<QnUuid, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() c
     return m_rules;
 }
 
-void QnCommonMessageProcessor::updateResource(const QnResourcePtr &resource) 
-{
-#if 0
-    if (dynamic_cast<const QnMediaServerResource*>(resource.data()))
-    {
-        if (QnRuntimeInfoManager::instance()->hasItem(resource->getId()))
-            resource->setStatus(Qn::Online);
-        else
-            resource->setStatus(Qn::Offline);
-    }
-#endif
+void QnCommonMessageProcessor::updateResource(const QnResourcePtr &resource) {
     if (resource->getId() == qnCommon->moduleGUID()) {
         QnModuleInformation moduleInformation = qnCommon->moduleInformation();
         moduleInformation.name = resource->getName();

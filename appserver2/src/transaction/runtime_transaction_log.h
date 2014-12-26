@@ -19,10 +19,8 @@ namespace ec2
         Q_OBJECT
     public:
 
-        QnRuntimeTransactionLog();
+        QnRuntimeTransactionLog(QObject* parent = NULL);
 		~QnRuntimeTransactionLog();
-
-        static QnRuntimeTransactionLog* instance();
 
         void clearOldRuntimeData(const QnTranStateKey& key);
         void clearRuntimeData(const QnUuid& id);
@@ -48,7 +46,5 @@ private slots:
         mutable QMutex m_mutex;
     };
 };
-
-#define runtimeTransactionLog QnRuntimeTransactionLog::instance()
 
 #endif // __TRANSACTION_LOG_H_

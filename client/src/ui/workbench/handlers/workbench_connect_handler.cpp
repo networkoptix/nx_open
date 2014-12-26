@@ -43,6 +43,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_state_manager.h>
+#include <ui/workbench/workbench_access_controller.h>
 
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 #include <ui/workbench/watchers/workbench_user_watcher.h>
@@ -90,6 +91,9 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /*= 0*/):
         if(!watcher->hasMismatches())
             return;
 
+        if (!accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission))
+            return;
+
         menu()->trigger(Qn::VersionMismatchMessageAction);
     });
 
@@ -122,8 +126,6 @@ QnLoginDialog * QnWorkbenchConnectHandler::loginDialog() const {
 void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened() {
     action(Qn::OpenLoginDialogAction)->setIcon(qnSkin->icon("titlebar/connected.png"));
     action(Qn::OpenLoginDialogAction)->setText(tr("Connect to Another Server...")); // TODO: #GDM #Common use conditional texts?
-
-    context()->instance<QnAppServerNotificationCache>()->getFileList();
 
     hideMessageBox();
 
@@ -277,7 +279,7 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
             ? ec2::ErrorCode::incompatiblePeer  /* Substitute value for incompatible peers. */
             : errCode;
     case QnConnectionDiagnosticsHelper::Result::Restart:
-        menu()->trigger(Qn::ExitActionDelayed);
+        menu()->trigger(Qn::DelayedForcedExitAction);
         return ec2::ErrorCode::ok; // to avoid cycle
     default:    //success
         break;
@@ -312,8 +314,8 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
 
     QnGlobalModuleFinder::instance()->setConnection(NULL);
     QnClientMessageProcessor::instance()->init(NULL);
-    QnAppServerConnectionFactory::setUrl(QUrl());
     QnAppServerConnectionFactory::setEc2Connection(NULL);
+    QnAppServerConnectionFactory::setUrl(QUrl());
     QnAppServerConnectionFactory::setCurrentVersion(QnSoftwareVersion());
     QnSessionManager::instance()->stop();
     QnResource::stopCommandProc();
@@ -380,7 +382,6 @@ void QnWorkbenchConnectHandler::clearConnection() {
     }
 
     qnLicensePool->reset();
-    context()->instance<QnAppServerNotificationCache>()->clear();
     qnCommon->setLocalSystemName(QString());
 }
 
@@ -405,7 +406,9 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
     /* Here we will wait for the reconnect or cancel. */
     while (reconnectInfoDialog && !reconnectInfoDialog->wasCanceled()) {
         reconnectInfoDialog->setCurrentServer(reconnectHelper->currentServer());
-        ec2::ErrorCode errCode = connectToServer(reconnectHelper->currentUrl(), true); /* Here inner event loop will be started. */
+
+        /* Here inner event loop will be started. */
+        ec2::ErrorCode errCode = connectToServer(reconnectHelper->currentUrl(), true); 
         if (errCode == ec2::ErrorCode::ok) {
             success = true;
             break;

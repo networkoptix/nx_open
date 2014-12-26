@@ -78,7 +78,7 @@ void QnNetworkResource::setMAC(const QnMacAddress &mac)
     QMutexLocker mutexLocker(&m_mutex);
     m_macAddress = mac;
 
-    if (m_physicalId.isEmpty())
+    if (m_physicalId.isEmpty() && !mac.isNull())
         m_physicalId = mac.toString();
 }
 
@@ -212,18 +212,19 @@ void QnNetworkResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>
 
 bool QnNetworkResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source )
 {
+    bool mergedSomething = false;
     if (source->getUrl() != getUrl())
     {
         setUrl(source->getUrl());
-        return true;
+        mergedSomething = true;
     }
     if (source->getMAC() != getMAC())
     {
         setMAC(source->getMAC());
-        return true;
+        mergedSomething = true;
     }
 
-    return false;
+    return mergedSomething;
 }
 
 

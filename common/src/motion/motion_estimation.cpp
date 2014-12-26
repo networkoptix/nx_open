@@ -753,28 +753,27 @@ void QnMotionEstimation::reallocateMask(int width, int height)
     m_lastImgWidth = width;
     m_lastImgHeight = height;
     // calculate scaled image size and allocate memory
+#if !defined(DEBUG_CPU_MODE) && (defined(__i386) || defined(__amd64) || defined(_WIN32))
     for (m_xStep = 8; m_lastImgWidth/m_xStep > MD_WIDTH; m_xStep += 8);
     if (m_lastImgWidth/m_xStep <= (MD_WIDTH*3)/4 && m_xStep > 8)
         m_xStep -= 8;
     m_scaledWidth = m_lastImgWidth / m_xStep;
     if (m_lastImgWidth > m_scaledWidth*m_xStep)
         m_scaledWidth++;
+#else
+    m_scaledWidth = MD_WIDTH;
+#endif
 
     int swUp = m_scaledWidth+1; // reserve one extra column because of analize_frame function for x8 width can write 1 extra byte
     m_scaledMask = (quint8*) qMallocAligned(MD_HEIGHT * swUp, 32);
     m_linkedNums = (int*) qMallocAligned(MD_HEIGHT * swUp * sizeof(int), 32);
     m_motionSensScaledMask = (quint8*) qMallocAligned(MD_HEIGHT * swUp, 32);
-	m_frameDeltaBuffer = (uint8_t*) qMallocAligned(MD_HEIGHT * MD_WIDTH, 32);
+	m_frameDeltaBuffer = (uint8_t*) qMallocAligned(MD_HEIGHT * swUp, 32);
 
-	#if !defined(DEBUG_CPU_MODE) && (defined(__i386) || defined(__amd64) || defined(_WIN32))
-		m_frameBuffer[0] = (quint8*) qMallocAligned(MD_HEIGHT * swUp, 32);
-		m_frameBuffer[1] = (quint8*) qMallocAligned(MD_HEIGHT * swUp, 32);
-	#else
-		m_frameBuffer[0] = (quint8*) qMallocAligned(MD_HEIGHT * MD_WIDTH, 32);
-		m_frameBuffer[1] = (quint8*) qMallocAligned(MD_HEIGHT * MD_WIDTH, 32);
-		memset(m_frameBuffer[0], 0, MD_HEIGHT * MD_WIDTH);
-		memset(m_frameBuffer[1], 0, MD_HEIGHT * MD_WIDTH);
-	#endif
+	m_frameBuffer[0] = (quint8*) qMallocAligned(MD_HEIGHT * swUp, 32);
+	m_frameBuffer[1] = (quint8*) qMallocAligned(MD_HEIGHT * swUp, 32);
+	memset(m_frameBuffer[0], 0, MD_HEIGHT * swUp);
+	memset(m_frameBuffer[1], 0, MD_HEIGHT * swUp);
 
 	m_filteredFrame = (quint8*) qMallocAligned(MD_HEIGHT * swUp, 32);
     m_resultMotion = new quint32[MD_HEIGHT/4 * swUp];

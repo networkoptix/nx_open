@@ -34,10 +34,12 @@ public:
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
     void clear();
-    void addRules(const QnBusinessEventRuleList &businessRules);
-    void addRule(const QnBusinessEventRulePtr &rule);
 
-    void updateRule(const QnBusinessEventRulePtr &rule);
+    /** Create new rule. */
+    void createRule();
+
+    /** Add existing rule to the model. */
+    void addOrUpdateRule(const QnBusinessEventRulePtr &rule);
 
     void deleteRule(QnBusinessRuleViewModel* ruleModel);
     void deleteRule(const QnUuid &id);
@@ -51,6 +53,8 @@ protected:
 private:
     QString columnTitle(QnBusiness::Columns column) const;
     QSize columnSizeHint(QnBusiness::Columns column) const;
+
+    void addRuleModelInternal(QnBusinessRuleViewModel* ruleModel);
 
 private slots:
     void at_rule_dataChanged(QnBusinessRuleViewModel* source, QnBusiness::Fields fields);

@@ -5,10 +5,12 @@
 #include <functional>
 #include <memory>
 
+#include <business/business_event_rule.h>
+#include <nx_ec/dummy_handler.h>
+
 #include "api/app_server_connection.h"
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "acti_stream_reader.h"
-#include <business/business_event_rule.h>
 #include "utils/common/synctime.h"
 #include "acti_ptz_controller.h"
 #include "rest/server/rest_connection_processor.h"
@@ -371,7 +373,7 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     return CameraDiagnostics::NoErrorResult();
 }
 
-bool QnActiResource::startInputPortMonitoring()
+bool QnActiResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
 {
     if( actiEventPort == 0 )
         return false;   //no http listener is present
@@ -470,7 +472,7 @@ bool QnActiResource::startInputPortMonitoring()
     return true;
 }
 
-void QnActiResource::stopInputPortMonitoring()
+void QnActiResource::stopInputPortMonitoringAsync()
 {
     if( actiEventPort == 0 )
         return;   //no http listener is present
@@ -483,13 +485,20 @@ void QnActiResource::stopInputPortMonitoring()
             registerEventRequestStr += QLatin1String("&");
         registerEventRequestStr += lit("EVENT_CONFIG=%1,0,1234567,00:00,24:00,DI%1,CMD%1").arg(i);
     }
-    CLHttpStatus responseStatusCode = CL_HTTP_SUCCESS;
-    makeActiRequest(
-        QLatin1String("encoder"),
-        registerEventRequestStr,
-        responseStatusCode );
-
     m_inputMonitored = false;
+
+    const QAuthenticator auth = getAuth();
+    QUrl url = getUrl();
+    url.setPath( lit("/cgi-bin/%1?USER=%2&PWD=%3&%4").arg(lit("encoder")).arg(auth.user()).arg(auth.password()).arg(registerEventRequestStr) );
+    nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+    //TODO #ak do not use DummyHandler here. httpClient->doGet should accept functor
+    connect( httpClient.get(), &nx_http::AsyncHttpClient::done,
+        ec2::DummyHandler::instance(), [httpClient](nx_http::AsyncHttpClientPtr) mutable {
+            httpClient.reset();
+        },
+        Qt::DirectConnection );
+    if( !httpClient->doGet( url ) )
+        disconnect( httpClient.get(), nullptr, ec2::DummyHandler::instance(), nullptr );
 }
 
 bool QnActiResource::isInputPortMonitored() const

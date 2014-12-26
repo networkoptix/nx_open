@@ -180,6 +180,8 @@ namespace aio
     //////////////////////////////////////////////////////////
     // PollSet
     //////////////////////////////////////////////////////////
+    static const int USER_EVENT_IDENT = 11;
+
     PollSet::PollSet()
     :
         m_impl( new PollSetImpl() )
@@ -190,7 +192,7 @@ namespace aio
 
         //registering filter for interrupting poll
         struct kevent _newEvent;
-        EV_SET( &_newEvent, 0, EVFILT_USER, EV_ADD | EV_ENABLE, 0, 0, NULL );
+        EV_SET( &_newEvent, USER_EVENT_IDENT, EVFILT_USER, EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, NULL );
         kevent( m_impl->kqueueFD, &_newEvent, 1, NULL, 0, NULL );
     }
 
@@ -217,7 +219,7 @@ namespace aio
     void PollSet::interrupt()
     {
         struct kevent _newEvent;
-        EV_SET( &_newEvent, 0, EVFILT_USER, 0, NOTE_TRIGGER, 0, NULL );
+        EV_SET( &_newEvent, USER_EVENT_IDENT, EVFILT_USER, EV_CLEAR, NOTE_TRIGGER, 0, NULL );
         kevent( m_impl->kqueueFD, &_newEvent, 1, NULL, 0, NULL );
     }
 
@@ -307,6 +309,13 @@ namespace aio
             return result;
 
         m_impl->receivedEventCount = result;
+        //not reporting event used to interrupt blocking poll
+        for( int i = 0; i < result; ++i )
+        {
+            if( m_impl->receivedEventlist[i].filter == EVFILT_USER )
+                --result;
+        }
+
         return result;
     }
 
@@ -327,11 +336,6 @@ namespace aio
         endIter.m_impl->pollSetImpl = m_impl;
         endIter.m_impl->currentIndex = m_impl->receivedEventCount;
         return endIter;
-    }
-
-    unsigned int PollSet::maxPollSetSize()
-    {
-        return std::numeric_limits<unsigned int>::max();
     }
 }
 

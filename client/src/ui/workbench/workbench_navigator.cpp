@@ -676,6 +676,14 @@ void QnWorkbenchNavigator::stepBackward() {
     emit positionChanged();
 }
 
+void QnWorkbenchNavigator::at_clearLoaderCache()
+{
+    for (QnCachingCameraDataLoader* loader: m_loaderByResource) {
+        if (loader)
+            loader->discardCachedData();
+    }
+}
+
 void QnWorkbenchNavigator::stepForward() {
     if(!m_currentMediaWidget)
         return;
@@ -732,6 +740,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
                 updateItemDataFromSlider(widget); //TODO: #GDM #Common ask #elric: should it be done at every selection change?
         else
             updateItemDataFromSlider(m_currentWidget);
+        disconnect(m_currentWidget->resource(), NULL, this, NULL);
     } else {
         m_sliderDataInvalid = true;
         m_sliderWindowInvalid = true;
@@ -747,6 +756,9 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
         m_currentWidget = widget;
         m_currentMediaWidget = mediaWidget;
     }
+
+    if (m_currentWidget)
+        connect(m_currentWidget->resource(), &QnResource::nameChanged, this, &QnWorkbenchNavigator::updateLines);
 
     m_pausedOverride = false;
     m_currentWidgetLoaded = false;
@@ -1340,7 +1352,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
         if(!m_timeSlider->isSelectionValid())
             return;
 
-        m_timeSlider->setValue((m_timeSlider->selectionStart(), m_timeSlider->selectionEnd()) / 2, false);
+        m_timeSlider->setValue((m_timeSlider->selectionStart() + m_timeSlider->selectionEnd()) / 2, false);
         m_timeSlider->finishAnimations();
         m_timeSlider->setWindow(m_timeSlider->selectionStart(), m_timeSlider->selectionEnd(), true);
     }
@@ -1407,7 +1419,7 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
     if(m_currentMediaWidget && !m_updatingSliderFromReader) {
         if (QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader()){
             if (value == DATETIME_NOW) {
-                reader->jumpToPreviousFrame(DATETIME_NOW);
+                reader->jumpTo(DATETIME_NOW, 0);
             } else {
                 if (m_preciseNextSeek) {
                     reader->jumpTo(value * 1000, value * 1000); /* Precise seek. */

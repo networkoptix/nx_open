@@ -29,8 +29,8 @@ CameraDiagnostics::Result QnDesktopCameraStreamReader::openStream()
         if (!QnDesktopCameraResourceSearcher::instance())
             return CameraDiagnostics::CannotEstablishConnectionResult(0);
 
-        QString userName = m_resource->getName();
-        m_socket = QnDesktopCameraResourceSearcher::instance()->getConnection(userName);
+        QString userId = m_resource->getUniqueId();
+        m_socket = QnDesktopCameraResourceSearcher::instance()->getConnectionByUserId(userId);
         if (!m_socket)
             return CameraDiagnostics::CannotEstablishConnectionResult(0);
         quint32 cseq = QnDesktopCameraResourceSearcher::instance()->incCSeq(m_socket);

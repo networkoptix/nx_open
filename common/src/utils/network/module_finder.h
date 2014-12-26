@@ -27,7 +27,7 @@ public:
 
     QList<QnModuleInformation> foundModules() const;
 
-    QnModuleInformation moduleInformation(const QString &moduleId) const;
+    QnModuleInformation moduleInformation(const QnUuid &moduleId) const;
 
     QnMulticastModuleFinder *multicastModuleFinder() const;
     QnDirectModuleFinder *directModuleFinder() const;
@@ -61,7 +61,6 @@ private:
     QHash<QnUuid, QnModuleInformation> m_foundModules;
     QMultiHash<QnUuid, QUrl> m_multicastFoundUrls;
     QMultiHash<QnUuid, QUrl> m_directFoundUrls;
-    QList<QnUuid> m_allowedPeers;
 };
 
 #endif  //NETWORKOPTIXMODULEFINDER_H

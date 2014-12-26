@@ -112,6 +112,11 @@ namespace ec2
             int(AbstractResourceManager::*fn)(const QnUuid&, Qn::ResourceStatus, impl::SetResourceStatusHandlerPtr) = &AbstractResourceManager::setResourceStatus;
             return impl::doSyncCall<impl::SetResourceStatusHandler>( std::bind(fn, this, id, status, std::placeholders::_1), &rezId );
         }
+        ErrorCode setResourceStatusLocalSync( const QnUuid& id, Qn::ResourceStatus status) {
+            QnUuid rezId;
+            int(AbstractResourceManager::*fn)(const QnUuid&, Qn::ResourceStatus, impl::SetResourceStatusHandlerPtr) = &AbstractResourceManager::setResourceStatusLocal;
+            return impl::doSyncCall<impl::SetResourceStatusHandler>( std::bind(fn, this, id, status, std::placeholders::_1), &rezId );
+        }
 
         /*!
             \param handler Functor with params: (ErrorCode, const ApiResourceParamWithRefDataList&)
@@ -1060,6 +1065,8 @@ namespace ec2
             \note Calling entity MUST connect to all interesting signals prior to calling this method so that received data is consistent
         */
         virtual void startReceivingNotifications() = 0;
+        virtual void stopReceivingNotifications() = 0;
+
         virtual void addRemotePeer(const QUrl& url) = 0;
         virtual void deleteRemotePeer(const QUrl& url) = 0;
         virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) = 0;
@@ -1079,14 +1086,25 @@ namespace ec2
         virtual AbstractTimeManagerPtr getTimeManager() = 0;
 
         /*!
-            \param handler Functor with params: (ErrorCode, QByteArray dbFile)
+            \param handler Functor with params: (requestID, ErrorCode, QByteArray dbFile)
         */
         template<class TargetType, class HandlerType> int dumpDatabaseAsync( TargetType* target, HandlerType handler ) {
             return dumpDatabaseAsync( std::static_pointer_cast<impl::DumpDatabaseHandler>(
                 std::make_shared<impl::CustomDumpDatabaseHandler<TargetType, HandlerType>>(target, handler)) );
         }
         /*!
-            \param handler Functor with params: (ErrorCode)
+            \param handler Functor with params: (requestID, ErrorCode)
+        */
+        template<class TargetType, class HandlerType> int dumpDatabaseToFileAsync( const QString& dumpFilePath, TargetType* target, HandlerType handler ) {
+            return dumpDatabaseToFileAsync( std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(dumpFilePath, target, handler)) );
+        }
+        ErrorCode dumpDatabaseToFileSync( const QString& dumpFilePath ) {
+            int(AbstractECConnection::*fn)(const QString&, impl::SimpleHandlerPtr) = &AbstractECConnection::dumpDatabaseToFileAsync;
+            return impl::doSyncCall<impl::SimpleHandler>(std::bind(fn, this, dumpFilePath, std::placeholders::_1));
+        }
+        /*!
+            \param handler Functor with params: (requestID, ErrorCode)
         */
         template<class TargetType, class HandlerType> int restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, TargetType* target, HandlerType handler ) {
             return restoreDatabaseAsync( data,
@@ -1124,6 +1142,7 @@ namespace ec2
 
     protected:
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) = 0;
+        virtual int dumpDatabaseToFileAsync( const QString& dumpFilePath, impl::SimpleHandlerPtr handler ) = 0;
         virtual int restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, impl::SimpleHandlerPtr handler ) = 0;
     };  
 

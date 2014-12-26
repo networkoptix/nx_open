@@ -64,3 +64,13 @@ Qn::ResourceStatus QnServerCamera::getStatus() const
     
     return QnResource::getStatus();
 }
+
+void QnServerCamera::setParentId(const QnUuid& parent)
+{
+    QnUuid oldValue = getParentId();
+    if (oldValue != parent) {
+        base_type::setParentId(parent);
+        if (!oldValue.isNull())
+            emit statusChanged(toSharedPointer(this));
+    }
+}

@@ -258,7 +258,7 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_renewSubscriptionTaskID(0),
     m_maxChannels(1),
     m_streamConfCounter(0),
-    m_prevRequestSendClock(0),
+    m_prevPullMessageResponseClock(0),
     m_asyncPullMessagesCallWrapper(nullptr)
 {
     m_monotonicClock.start();
@@ -291,7 +291,7 @@ QnPlOnvifResource::~QnPlOnvifResource()
         }
     }
 
-    stopInputPortMonitoring();
+    stopInputPortMonitoringAsync();
 
     m_onvifAdditionalSettings.reset();
 }
@@ -595,16 +595,12 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     
     QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
     bool forcedAR = resourceData.value<bool>(lit("forceArFromPrimaryStream"), false);
-    if (forcedAR && getProperty(QnMediaResource::customAspectRatioKey()).isNull()) 
+    if (forcedAR && getProperty(QnMediaResource::customAspectRatioKey()).isEmpty()) 
     {
         qreal ar = m_primaryResolution.width() / (qreal) m_primaryResolution.height();
         setProperty(QnMediaResource::customAspectRatioKey(), QString::number(ar));
     }
     saveParams();
-
-//#ifdef _DEBUG
-//    startInputPortMonitoring();
-//#endif
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -800,8 +796,12 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation()
             setMAC(QnMacAddress(extInfo.mac));
         if (getVendor() == lit("ONVIF") && !extInfo.vendor.isNull())
             setVendor(extInfo.vendor); // update default vendor
-        if (getPhysicalId().isEmpty())
-            setPhysicalId(extInfo.hardwareId);
+        if (getPhysicalId().isEmpty()) {
+            QString id = extInfo.hardwareId;
+            if (!extInfo.serial.isEmpty())
+                id += QString(L'_') + extInfo.serial;
+            setPhysicalId(id);
+        }
     }
     return result;
 }
@@ -839,6 +839,7 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation(const QString
         extInfo->firmware = QString::fromStdString(response.FirmwareVersion);
         extInfo->vendor = QString::fromStdString(response.Manufacturer);
         extInfo->hardwareId = QString::fromStdString(response.HardwareId);
+        extInfo->serial = QString::fromStdString(response.SerialNumber);
     }
 
     if (m_appStopping)
@@ -2440,7 +2441,7 @@ void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 /*timerID*/)
     request.TerminationTime = &initialTerminationTime;
     if( !m_onvifNotificationSubscriptionID.isEmpty() )
     {
-        sprintf( buf, "<dom0:SubscriptionId xmlns:dom0=\"(null)\">%s</dom0:SubscriptionId>", m_onvifNotificationSubscriptionID.toLatin1().data() );
+        sprintf( buf, "<dom0:SubscriptionId xmlns:dom0=\"http://www.onvifplus.org/event\">%s</dom0:SubscriptionId>", m_onvifNotificationSubscriptionID.toLatin1().data() );
         request.__any.push_back( buf );
     }
     _oasisWsnB2__RenewResponse response;
@@ -2561,7 +2562,7 @@ QnAbstractPtzController *QnPlOnvifResource::createPtzControllerInternal()
     return result.take();
 }
 
-bool QnPlOnvifResource::startInputPortMonitoring()
+bool QnPlOnvifResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
 {
     if( hasFlags(Qn::foreigner) )     //we do not own camera
     {
@@ -2584,7 +2585,7 @@ bool QnPlOnvifResource::startInputPortMonitoring()
         return false;
 }
 
-void QnPlOnvifResource::stopInputPortMonitoring()
+void QnPlOnvifResource::stopInputPortMonitoringAsync()
 {
     quint64 localTimerID = 0;
     quint64 localRenewSubscriptionTaskID = 0;
@@ -2827,7 +2828,7 @@ bool QnPlOnvifResource::createPullPointSubscription()
             : renewSubsciptionTimeoutSec)*MS_PER_SECOND );
 
     m_eventMonitorType = emtPullPoint;
-    m_prevRequestSendClock = m_monotonicClock.elapsed();
+    m_prevPullMessageResponseClock = m_monotonicClock.elapsed();
 
     m_timerID = TimerManager::instance()->addTimer(
         std::bind(&QnPlOnvifResource::pullMessages, this, _1),
@@ -2851,7 +2852,11 @@ _NumericInt roundUp( _NumericInt val, _NumericInt step, typename std::enable_if<
 
 void QnPlOnvifResource::pullMessages(quint64 /*timerID*/)
 {
+    static const int MAX_MESSAGES_TO_PULL = 10;
+
     QMutexLocker lk(&m_ioPortMutex);
+
+    m_timerID = 0;
 
     if( !m_inputMonitored )
         return;
@@ -2877,28 +2882,43 @@ void QnPlOnvifResource::pullMessages(quint64 /*timerID*/)
             auth.password(),
             m_timeDrift ) );
     soapWrapper->getProxy()->soap->imode |= SOAP_XML_IGNORENS;
-    //soap_omode( soapWrapper->getProxy()->soap, SOAP_XML_DEFAULTNS );
+
+    std::vector<void*> memToFreeOnResponseDone;
+    memToFreeOnResponseDone.reserve(3); //we have 3 memory allocation below
 
     char* buf = (char*)malloc(512);
+    memToFreeOnResponseDone.push_back(buf);
 
     _onvifEvents__PullMessages request;
-    sprintf(buf, "PT%dS", PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC);
+    sprintf( buf, "PT%dS", roundUp<qint64>(m_monotonicClock.elapsed() - m_prevPullMessageResponseClock, MS_PER_SECOND) / MS_PER_SECOND );
     request.Timeout = buf;
-    request.MessageLimit = 1024;
+    request.MessageLimit = MAX_MESSAGES_TO_PULL;
     QByteArray onvifNotificationSubscriptionIDLatin1 = m_onvifNotificationSubscriptionID.toLatin1();
     strcpy(buf, onvifNotificationSubscriptionIDLatin1.data());
     struct SOAP_ENV__Header* header = (struct SOAP_ENV__Header*)malloc(sizeof(SOAP_ENV__Header));
+    memToFreeOnResponseDone.push_back(header);
     memset( header, 0, sizeof(*header) );
     soapWrapper->getProxy()->soap->header = header;
     soapWrapper->getProxy()->soap->header->subscriptionID = buf;
+    //TODO #ak move away check for "Samsung"
+    if( !m_onvifNotificationSubscriptionReference.isEmpty() && !getVendor().contains(lit("Samsung")) )
+    {
+        const QByteArray& onvifNotificationSubscriptionReferenceUtf8 = m_onvifNotificationSubscriptionReference.toUtf8();
+        char* buf = (char*)malloc(onvifNotificationSubscriptionReferenceUtf8.size()+1);
+        memToFreeOnResponseDone.push_back(buf);
+        strcpy( buf, onvifNotificationSubscriptionReferenceUtf8.constData() );
+        soapWrapper->getProxy()->soap->header->wsa__To = buf;
+    }
     _onvifEvents__PullMessagesResponse response;
 
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> asyncPullMessagesCallWrapper(
         new GSoapAsyncPullMessagesCallWrapper(
             std::move(soapWrapper),
             &PullPointSubscriptionWrapper::pullMessages ),
-        [buf, header](GSoapAsyncPullMessagesCallWrapper* ptr){
-            ::free(buf); ::free(header); delete ptr;
+        [memToFreeOnResponseDone](GSoapAsyncPullMessagesCallWrapper* ptr){
+            for( void* ptr: memToFreeOnResponseDone )
+                ::free( ptr );
+            delete ptr;
         }
     );
 
@@ -2953,7 +2973,7 @@ void QnPlOnvifResource::onPullMessagesResponseReceived(
         return /*false*/;
     }
 
-    const time_t minNotificationTime = response.CurrentTime - roundUp<qint64>(m_monotonicClock.elapsed() - m_prevRequestSendClock, 1000) / 1000;
+    const time_t minNotificationTime = response.CurrentTime - roundUp<qint64>(m_monotonicClock.elapsed() - m_prevPullMessageResponseClock, MS_PER_SECOND) / MS_PER_SECOND;
     if( response.oasisWsnB2__NotificationMessage.size() > 0 )
     {
         for( size_t i = 0;
@@ -2964,7 +2984,7 @@ void QnPlOnvifResource::onPullMessagesResponseReceived(
         }
     }
 
-    m_prevRequestSendClock = currentRequestSendClock;
+    m_prevPullMessageResponseClock = currentRequestSendClock;
 }
 
 bool QnPlOnvifResource::fetchRelayOutputs( std::vector<RelayOutputInfo>* const relayOutputs )
@@ -2998,8 +3018,8 @@ bool QnPlOnvifResource::fetchRelayOutputs( std::vector<RelayOutputInfo>* const r
     if( relayOutputs )
         *relayOutputs = m_relayOutputInfo;
 
-    NX_LOG( lit("Successfully got device (%1) IO ports info. Found %2 digital input and %3 relay output").
-        arg(QString::fromLatin1(soapWrapper.endpoint())).arg(0).arg(m_relayOutputInfo.size()), cl_logDEBUG1 );
+    NX_LOG( lit("Successfully got device (%1) output ports info. Found %2 relay output").
+        arg(QString::fromLatin1(soapWrapper.endpoint())).arg(m_relayOutputInfo.size()), cl_logDEBUG1 );
 
     return true;
 }
@@ -3137,10 +3157,6 @@ void QnPlOnvifResource::setRelayOutputStateNonSafe(
         auth.user(),
         auth.password(),
         m_timeDrift );
-
-    //omitting namespace prefix in request
-    //TODO #ak do it for every request?
-    soap_omode( soapWrapper.getProxy()->soap, SOAP_XML_DEFAULTNS );
     
     _onvifDevice__SetRelayOutputState request;
     request.RelayOutputToken = relayOutputInfo.token;

@@ -10,6 +10,9 @@
 
 #include "isd_resource.h"
 
+
+const int QnISDStreamReader::ISD_HTTP_REQUEST_TIMEOUT_MS = 5000;
+
 extern QString getValueFromString(const QString& line);
 
 QnISDStreamReader::QnISDStreamReader(const QnResourcePtr& res):
@@ -24,6 +27,9 @@ QnISDStreamReader::~QnISDStreamReader()
     stop();
 }
 
+static const int BYTES_PER_KB = 1024;
+
+#define USE_VBR
 
 CameraDiagnostics::Result QnISDStreamReader::openStream()
 {
@@ -35,8 +41,8 @@ CameraDiagnostics::Result QnISDStreamReader::openStream()
     QnPlIsdResourcePtr res = getResource().dynamicCast<QnPlIsdResource>();
     CLHttpStatus status;
 
-    int port = QUrl(res->getUrl()).port(80);
-    CLSimpleHTTPClient http (res->getHostAddress(), port, 3000, res->getAuth());
+    int port = QUrl(res->getUrl()).port(nx_http::DEFAULT_HTTP_PORT);
+    CLSimpleHTTPClient http (res->getHostAddress(), port, ISD_HTTP_REQUEST_TIMEOUT_MS, res->getAuth());
 
     if (!isCameraControlDisabled())
     {
@@ -44,17 +50,50 @@ CameraDiagnostics::Result QnISDStreamReader::openStream()
         QString result;
         QTextStream t(&result);
 
+        //const QnSecurityCamResource* cameraRes = dynamic_cast<const QnSecurityCamResource*>(m_resource.data());
+        //Q_ASSERT( cameraRes );
+        //const bool isAmbarellaFirmware = cameraRes->getModel().indexOf(lit("4K")) != -1;
+        const bool isAmbarellaChipset = true; 
+
         if (role == Qn::CR_SecondaryLiveVideo)
         {
-            t << "VideoInput.1.h264.2.Resolution=" << res->getSecondaryResolution().width() << "x" << res->getSecondaryResolution().height() << "\r\n";
-            t << "VideoInput.1.h264.2.FrameRate=5" << "\r\n";
-            t << "VideoInput.1.h264.2.BitRate=128" << "\r\n";
+            const float fps = 5.0;
+            const int desiredBitrateKbps = 512;
+
+            t << "VideoInput.1.h264.2.Resolution=" << res->getSecondaryResolution().width() << 
+                "x" << res->getSecondaryResolution().height() << "\r\n";
+            t << "VideoInput.1.h264.2.FrameRate=" << fps << "\r\n";
+#ifndef USE_VBR
+            int constantBitrateToSetKbps = isAmbarellaChipset
+                ? desiredBitrateKbps * 30 / fps     //constant bitrate MUST be multiplied by 30/fps
+                : desiredBitrateKbps;
+            t << "VideoInput.1.h264.2.BitrateControl=cbr\r\n";
+            t << "VideoInput.1.h264.2.BitRate=" << constantBitrateToSetKbps << "\r\n";
+#else
+            t << "VideoInput.1.h264.2.BitrateControl=vbr\r\n";
+            t << "VideoInput.1.h264.2.BitrateVariableMin=" << desiredBitrateKbps / 5 << "\r\n";
+            t << "VideoInput.1.h264.2.BitrateVariableMax=" << desiredBitrateKbps / 5 * 6 << "\r\n";    //*1.2
+#endif
         }
         else
         {
-            t << "VideoInput.1.h264.1.Resolution=" << res->getPrimaryResolution().width() << "x" << res->getPrimaryResolution().height() << "\r\n";
-            t << "VideoInput.1.h264.1.FrameRate=" << getFps() << "\r\n";
-            t << "VideoInput.1.h264.1.BitRate=" << res->suggestBitrateKbps(getQuality(), res->getPrimaryResolution(), getFps()) << "\r\n";
+            const float fps = getFps();
+            const QSize resolution = res->getPrimaryResolution();
+            const int desiredBitrateKbps = res->suggestBitrateKbps(getQuality(), resolution, fps);
+            t << "VideoInput.1.h264.1.Resolution=" << resolution.width() << "x" << resolution.height() << "\r\n";
+            t << "VideoInput.1.h264.1.FrameRate=" << fps << "\r\n";
+#ifndef USE_VBR
+            int constantBitrateToSetKbps = isAmbarellaChipset
+                ? desiredBitrateKbps * 30 / fps
+                : desiredBitrateKbps;
+            t << "VideoInput.1.h264.1.BitrateControl=cbr\r\n";
+            t << "VideoInput.1.h264.1.BitRate=" << constantBitrateToSetKbps << "\r\n";
+#else
+            //TODO #ak ISD recommends switching to VBR
+            t << "VideoInput.1.h264.1.BitrateControl=vbr\r\n";
+            t << "VideoInput.1.h264.1.BitrateVariableMin=" << desiredBitrateKbps / 5 << "\r\n";
+            t << "VideoInput.1.h264.1.BitrateVariableMax=" << desiredBitrateKbps / 5 * 6 << "\r\n";    //*1.2
+#endif
         }
         t.flush();
 
@@ -68,7 +107,7 @@ CameraDiagnostics::Result QnISDStreamReader::openStream()
         ? QLatin1String("api/param.cgi?req=VideoInput.1.h264.2.Rtsp.AbsolutePath")
         : QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.Rtsp.AbsolutePath");
 
-    QByteArray reslst = downloadFile(status, urlrequest,  res->getHostAddress(), port, 3000, res->getAuth());
+    QByteArray reslst = downloadFile(status, urlrequest,  res->getHostAddress(), port, ISD_HTTP_REQUEST_TIMEOUT_MS, res->getAuth());
     if (status == CL_HTTP_AUTH_REQUIRED)
     {
         res->setStatus(Qn::Unauthorized);

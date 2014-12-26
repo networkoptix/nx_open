@@ -48,6 +48,8 @@ protected:
 
         emit derived->finished(status, reply, handle, errorString);
         emit finished(status, m_reply, handle, errorString);
+        emit finished(status, handle, errorString);
+        emit finished(status, handle);
     }
 
     template<class Derived>
@@ -58,8 +60,9 @@ protected:
         m_reply = QVariant();
         m_errorString = errorString;
 
-        emit finished(status, handle, errorString);
         emit finished(status, m_reply, handle, errorString);
+        emit finished(status, handle, errorString);
+        emit finished(status, handle);
     }
 
     template<class T, class Derived>
