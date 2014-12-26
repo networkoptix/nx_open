@@ -667,7 +667,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     /* Initializing resource searchers                                      */
     /************************************************************************/
     QnClientResourceProcessor resourceProcessor;
-    QnResourceDiscoveryManager::init(new QnResourceDiscoveryManager());
+    std::unique_ptr<QnResourceDiscoveryManager> resourceDiscoveryManager( new QnResourceDiscoveryManager() );
     resourceProcessor.moveToThread( QnResourceDiscoveryManager::instance() );
     QnResourceDiscoveryManager::instance()->setResourceProcessor(&resourceProcessor);
 
