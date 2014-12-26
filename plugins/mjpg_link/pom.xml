@@ -39,35 +39,11 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>build_variables</artifactId>
+            <artifactId>common</artifactId>
             <version>${project.version}</version>
             <type>pom</type> 
             <scope>system</scope>
-            <systemPath>${root.dir}/build_variables/pom.xml</systemPath>            
+            <systemPath>${root.dir}/common/pom.xml</systemPath>            
         </dependency>
     </dependencies>  
-    <profiles>
-        <profile>
-            <id>linux</id>
-            <activation>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>
-            </activation>
-            <properties>
-                <buildLib>sharedlib</buildLib>
-            </properties>
-            <dependencies>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>common</artifactId>
-                    <version>${project.version}</version>
-                    <type>pom</type>
-                    <scope>system</scope>
-                    <systemPath>${root.dir}/common/pom.xml</systemPath>
-                </dependency>
-            </dependencies>
-        </profile>	
-    </profiles>	
 </project>
