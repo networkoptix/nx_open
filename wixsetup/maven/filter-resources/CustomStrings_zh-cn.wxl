@@ -89,7 +89,9 @@
     <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">系统控制器</String>
     <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">媒体服务器配置</String>
     <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">媒体服务器</String>  
-
+    <String Id="MediaServerDlg_SystemName"                          Overridable="yes">系统名称</String>  
+    <String Id="MediaServerDlg_PasswordConfirm"                     Overridable="yes">确认密码</String>  
+    
     <!-- MyExitDialog -->
 
     <!-- MyFeaturesDlg -->
