@@ -112,7 +112,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
             QString message = tr("You are about to connect to Server which has a different version:\n"
                 " - Client version: %1.\n"
                 " - Server version: %2.\n"
-                "These versions are not compatible. Please update your %3"
+                "These versions are not compatible. Please update your %3" // TODO: #TR after string freeze add period to the end ("... your %3.")
                 ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()).arg(olderComponent);
 #ifdef _DEBUG
             message += lit("\nClient Proto: %1\nServer Proto: %2").arg(nx_ec::EC2_PROTO_VERSION).arg(connectionInfo.nxClusterProtoVersion);
