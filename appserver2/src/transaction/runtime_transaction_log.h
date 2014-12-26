@@ -20,10 +20,9 @@ namespace ec2
     public:
 
         QnRuntimeTransactionLog();
+		~QnRuntimeTransactionLog();
 
         static QnRuntimeTransactionLog* instance();
-        void initStaticInstance(QnRuntimeTransactionLog* value);
-
 
         void clearOldRuntimeData(const QnTranStateKey& key);
         void clearRuntimeData(const QnUuid& id);

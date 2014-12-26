@@ -140,13 +140,6 @@ void TimerManager::joinAndDeleteTimer( const quint64& timerID )
     m_impl->deleteTaskNonSafe( timerID );
 }
 
-Q_GLOBAL_STATIC( TimerManager, staticInstance );
-
-TimerManager* TimerManager::instance()
-{
-    return staticInstance();
-}
-
 static const unsigned int ERROR_SKIP_TIMEOUT_MS = 3000;
 
 void TimerManager::run()

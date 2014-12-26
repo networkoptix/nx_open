@@ -10,6 +10,7 @@
 
 #include <QtCore/QThread>
 
+#include <utils/common/singleton.h>
 
 //!Interface of receiver of timer events
 class TimerEventHandler
@@ -33,9 +34,7 @@ class TimerManagerImpl;
     \note This timer require nor event loop (as QTimer), nor it's thread-dependent (as SystemTimer), but it delivers timer events to internal thread,
         so additional synchronization in timer event handler may be required
 */
-class TimerManager
-:
-    public QThread
+class TimerManager : public QThread, public Singleton<TimerManager>
 {
 public:
     /*!
@@ -72,8 +71,6 @@ public:
         \note If this method is called from \a TimerEventHandler::onTimer to delete timer being executed, nothing is done
     */
     void joinAndDeleteTimer( const quint64& timerID );
-
-    static TimerManager* instance();
 
 protected:
     virtual void run();

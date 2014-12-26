@@ -24,78 +24,77 @@ QnWorkbenchContextAware::QnWorkbenchContextAware(QObject *parent, QnWorkbenchCon
         Q_ASSERT(parent);
         init(parent);
     }
-   }
- 
-v oid QnWorkbenchContextAware::init(QObject *parent) {
-     while(true) {
-         Q_ASSERT(parent);
-		  
-        Qn WorkbenchContextAware *contextAware = dynamic_cast<QnWorkbenchContextAware *>(parent);
-        if( contextAware != NULL) {
-             m_context = contextAware->context();
-            r eturn;
-        } 
-		 
-        Q nWorkbenchContext *context = dynamic_cast<QnWorkbenchContext *>(parent);
-        if (context != NULL) {
-             m_context = context;
-             return;
-        } 
-		 
-        i f(parent->parent()) {
-             parent = parent->parent();
-        } e lse {
-             if(QGraphicsItem *parentItem = dynamic_cast<QGraphicsItem *>(parent)) {
-                 parent = parentItem->scene();
-            }  else {
-                 parent = NULL;
-            } 
-        } 
-    } 
-} 
- 
-v oid QnWorkbenchContextAware::init(QnWorkbenchContext *context) {
-     Q_ASSERT(context);
-     m_context = context;
-} 
- 
-Q Action *QnWorkbenchContextAware::action(const Qn::ActionId id) const {
-     return context()->action(id);
-} 
- 
-Q nActionManager *QnWorkbenchContextAware::menu() const {
-     return context()->menu();
-} 
- 
-Q nWorkbench *QnWorkbenchContextAware::workbench() const {
-     return context()->workbench();
-} 
- 
-Q nResourcePool *QnWorkbenchContextAware::resourcePool() const {
-     return context()->resourcePool();
-} 
- 
-Q nWorkbenchSynchronizer *QnWorkbenchContextAware::synchronizer() const {
-     return context()->synchronizer();
-} 
- 
-Q nWorkbenchLayoutSnapshotManager *QnWorkbenchContextAware::snapshotManager() const {
-     return context()->snapshotManager();
-} 
- 
-Q nWorkbenchAccessController *QnWorkbenchContextAware::accessController() const {
-     return context()->accessController();
-} 
- 
-Q nWorkbenchDisplay *QnWorkbenchContextAware::display() const {
-     return context()->display();
-} 
- 
-Q nWorkbenchNavigator *QnWorkbenchContextAware::navigator() const {
-     return context()->navigator();
-} 
- 
-Q Widget *QnWorkbenchContextAware::mainWindow() const {
-     return context()->mainWindow();
-} 
-                                                   
+}
+
+void QnWorkbenchContextAware::init(QObject *parent) {
+    while(true) {
+        Q_ASSERT(parent);
+
+        QnWorkbenchContextAware *contextAware = dynamic_cast<QnWorkbenchContextAware *>(parent);
+        if(contextAware != NULL) {
+            m_context = contextAware->context();
+            return;
+        }
+
+        QnWorkbenchContext *context = dynamic_cast<QnWorkbenchContext *>(parent);
+        if(context != NULL) {
+            m_context = context;
+            return;
+        }
+
+        if(parent->parent()) {
+            parent = parent->parent();
+        } else {
+            if(QGraphicsItem *parentItem = dynamic_cast<QGraphicsItem *>(parent)) {
+                parent = parentItem->scene();
+            } else {
+                parent = NULL;
+            }
+        }
+    }
+}
+
+void QnWorkbenchContextAware::init(QnWorkbenchContext *context) {
+    Q_ASSERT(context);
+    m_context = context;
+}
+
+QAction *QnWorkbenchContextAware::action(const Qn::ActionId id) const {
+    return context()->action(id);
+}
+
+QnActionManager *QnWorkbenchContextAware::menu() const {
+    return context()->menu();
+}
+
+QnWorkbench *QnWorkbenchContextAware::workbench() const {
+    return context()->workbench();
+}
+
+QnResourcePool *QnWorkbenchContextAware::resourcePool() const {
+    return context()->resourcePool();
+}
+
+QnWorkbenchSynchronizer *QnWorkbenchContextAware::synchronizer() const {
+    return context()->synchronizer();
+}
+
+QnWorkbenchLayoutSnapshotManager *QnWorkbenchContextAware::snapshotManager() const {
+    return context()->snapshotManager();
+}
+
+QnWorkbenchAccessController *QnWorkbenchContextAware::accessController() const {
+    return context()->accessController();
+}
+
+QnWorkbenchDisplay *QnWorkbenchContextAware::display() const {
+    return context()->display();
+}
+
+QnWorkbenchNavigator *QnWorkbenchContextAware::navigator() const {
+    return context()->navigator();
+}
+
+QWidget *QnWorkbenchContextAware::mainWindow() const {
+    return context()->mainWindow();
+}

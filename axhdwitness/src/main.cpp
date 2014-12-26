@@ -8,11 +8,11 @@
 #include <QThreadPool>
 
 
-namespace hdw {
+// namespace hdw {
 QAXFACTORY_BEGIN("{817D1E50-BFBA-4691-B331-1B8AA838A745}", "{49D52858-E6F3-441A-A5F7-24A3B3E056AF}")
     QAXCLASS(AxHDWitness)
 QAXFACTORY_END()
-} // namespace hdw
+// } // namespace hdw
 
 
 // ### Qt5: remove this hack, the bug is fixed there.
@@ -37,6 +37,7 @@ QApplication *qn_application = NULL;
 static int qn_argc = 0; /* This one must be static as QApplication stores a reference to it. */
 static char **qn_argv;
 
+#if 0
 QAxFactory *qax_instantiate() {
     QAxFactory *result = hdw::qax_instantiate();
 
@@ -79,4 +80,4 @@ void qax_uninstantiate() {
 
 Q_DESTRUCTOR_FUNCTION(qax_uninstantiate);
 
-
+#endif

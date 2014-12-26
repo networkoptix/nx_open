@@ -245,6 +245,8 @@ namespace Qn {
         LightModeNoNewWindow        = 0x0100,           /**< Disable opening of new windows. */
         LightModeNoLayoutBackground = 0x0200,           /**< Disable layout background. */
         LightModeNoZoomWindows      = 0x0400,           /**< Disable zoom windows. */
+		LightModeNoTree             = 0x0800,           /**< Disable tree panel. */
+		LightModeNoTitle            = 0x1000,           /**< Disable title widget. */
 
         LightModeVideoWall          = LightModeNoSceneBackground | LightModeNoNotifications | LightModeNoShadows /*| LightModeNoAnimation*/,
         LightModeFull               = 0x7FFFFFFF

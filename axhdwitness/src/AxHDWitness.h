@@ -11,6 +11,7 @@
 #include <client/client_module.h>
 #include "ui/style/noptix_style.h"
 #include "ui/customization/customizer.h"
+#include "nx_ec/ec_api.h"
 
 class QnLongRunnablePool;
 class QnSyncTime;
@@ -26,6 +27,9 @@ class QnGlobalModuleFinder;
 class QnServerInterfaceWatcher;
 class QnResourcePropertyDictionary;
 class QnResourceStatusDictionary;
+class QnCameraUserAttributePool;
+class QnMediaServerUserAttributesPool;
+class TimerManager;
 
 class AxHDWitness : public QWidget
 {
@@ -77,6 +81,8 @@ private:
 
 private:
     bool m_isInitialized;
+
+	QScopedPointer<ec2::AbstractECConnectionFactory> m_ec2ConnectionFactory;
     QnClientResourceProcessor m_clientResourceProcessor;
 
     QScopedPointer<QnWorkbenchContext> m_context;
@@ -99,6 +105,11 @@ private:
 
     QScopedPointer<QnResourcePropertyDictionary> m_dictionary;
     QScopedPointer<QnResourceStatusDictionary> m_statusDictionary;
+
+    QScopedPointer<QnCameraUserAttributePool> m_cameraUserAttributePool;
+	QScopedPointer<QnMediaServerUserAttributesPool> m_mediaServerUserAttributesPool;
+
+	QScopedPointer<TimerManager> m_timerManager;
 
     QnMainWindow *m_mainWindow;
 };

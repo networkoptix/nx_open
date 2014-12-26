@@ -192,6 +192,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_view->setAutoFillBackground(true);
 
     /* Set up model & control machinery. */
+	int gg = qnSettings->lightModeOverride();
     display()->setLightMode(qnSettings->lightMode());
     display()->setScene(m_scene.data());
     display()->setView(m_view.data());

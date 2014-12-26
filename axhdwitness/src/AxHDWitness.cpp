@@ -6,6 +6,8 @@
 #include "core/ptz/client_ptz_controller_pool.h"
 #include <api/global_settings.h>
 #include "api/runtime_info_manager.h"
+#include "api/app_server_connection.h"
+#include <nx_ec/ec2_lib.h>
 
 #include "common/common_module.h"
 
@@ -22,6 +24,8 @@
 #include "core/resource/layout_resource.h"
 #include "core/resource/media_resource.h"
 #include "core/resource/network_resource.h"
+#include <core/resource/camera_user_attribute_pool.h>
+#include <core/resource/media_server_user_attributes.h>
 
 #include <fstream>
 
@@ -41,6 +45,7 @@
 #include <utils/common/command_line_parser.h>
 #include <utils/common/app_info.h>
 #include <utils/common/synctime.h>
+#include <utils/common/timermanager.h>
 
 #include "utils/server_interface_watcher.h"
 #include "ui/actions/action_manager.h"
@@ -62,6 +67,7 @@
 #include "utils/network/socket.h"
 #include <openssl/evp.h>
 
+#include <plugins/resource/server_camera/server_camera_factory.h>
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
 #include "core/resource/camera_history.h"
 #include <utils/common/log.h>
@@ -132,6 +138,7 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 
 extern HHOOK qax_hhook;
 
+#if 1
 extern LRESULT QT_WIN_CALLBACK axs_FilterProc(int nCode, WPARAM wParam, LPARAM lParam);
 
 LRESULT QT_WIN_CALLBACK qn_FilterProc(int nCode, WPARAM wParam, LPARAM lParam)
@@ -143,6 +150,7 @@ LRESULT QT_WIN_CALLBACK qn_FilterProc(int nCode, WPARAM wParam, LPARAM lParam)
         return CallNextHookEx(qax_hhook, nCode, wParam, lParam);
     }
 }
+#endif
 
 AxHDWitness::AxHDWitness(QWidget* parent, const char* name)
     : m_mainWindow(0), m_isInitialized(false)
@@ -332,12 +340,7 @@ QString AxHDWitness::resourceListXml() {
 }
 
 void AxHDWitness::reconnect(const QString &url) {
-    QnConnectionData data;
-    data.url = url.isEmpty() ? QLatin1String("https://localhost:31338") : url;
-
-    qnSettings->setLastUsedConnection(data);
-
-    m_context->menu()->trigger(Qn::ReconnectAction);
+	m_context->menu()->trigger(Qn::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, url));
 }
 
 void AxHDWitness::maximizeItem(const QString &uniqueId) {
@@ -360,8 +363,14 @@ void AxHDWitness::slidePanelsOut() {
     m_context->menu()->trigger(Qn::MaximizeAction);
 }
 
+// int counter = 0;
 bool AxHDWitness::doInitialize()
 {
+/*	counter++;
+
+	if (counter != 3)
+		return true; */
+
 	// DebugBreak();
 
 	AllowSetForegroundWindow(ASFW_ANY);
@@ -372,8 +381,13 @@ bool AxHDWitness::doInitialize()
     pluginDirs << QCoreApplication::applicationDirPath();
     QCoreApplication::setLibraryPaths( pluginDirs );
 
+	m_timerManager.reset(new TimerManager());
+
 	m_clientModule.reset(new QnClientModule(argc, NULL));
 	m_syncTime.reset(new QnSyncTime());
+
+	m_cameraUserAttributePool.reset(new QnCameraUserAttributePool());
+	m_mediaServerUserAttributesPool.reset(new QnMediaServerUserAttributesPool());
 
 	QnResourcePool::initStaticInstance( new QnResourcePool() );
 
@@ -387,6 +401,7 @@ bool AxHDWitness::doInitialize()
     m_clientMessageProcessor.reset(new QnClientMessageProcessor());
     m_runtimeInfoManager.reset(new QnRuntimeInfoManager());
 
+	qnSettings->setLightMode(Qn::LightModeFull);
     QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin ? lit(":/skin_light") : lit(":/skin_dark");
     skin.reset(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
 
@@ -398,11 +413,20 @@ bool AxHDWitness::doInitialize()
     customizer.reset(new QnCustomizer(customization));
     customizer->customize(qnGlobals);
 
+    QnAppServerConnectionFactory::setClientGuid(QnUuid::createUuid().toString());
+    QnAppServerConnectionFactory::setDefaultFactory(QnServerCameraFactory::instance());
+
+	m_ec2ConnectionFactory.reset(getConnectionFactory(Qn::PT_DesktopClient));
+
+    ec2::ResourceContext resCtx(QnServerCameraFactory::instance(), qnResPool, qnResTypePool);
+	m_ec2ConnectionFactory->setContext( resCtx );
+	QnAppServerConnectionFactory::setEC2ConnectionFactory( m_ec2ConnectionFactory.data() );
+
 //x    application->setWindowIcon(qnSkin->icon("logo_tray.png"));
 
     /* Initialize connections. */
     // initAppServerConnection();
-    //xqnSettings->save();
+    // qnSettings->save();
 //x    cl_log.log(QLatin1String("Using ") + qnSettings->mediaFolder() + QLatin1String(" as media root directory"), cl_logALWAYS);
 
 
@@ -487,31 +511,89 @@ bool AxHDWitness::doInitialize()
 
 void AxHDWitness::doFinalize()
 {
-    if(m_mainWindow) {
+/*	counter++;
+
+	return; */
+
+	//if (counter != 4)
+	//	return;
+
+	qApp->processEvents();
+
+    if (m_mainWindow) {
         delete m_mainWindow;
         m_mainWindow = 0;
     }
 
-    qApp->processEvents();
+	m_ec2ConnectionFactory.reset(NULL);
 
+	m_context.reset(NULL);
+
+    m_serverInterfaceWatcher.reset(NULL);
+    m_globalModuleFinder.reset(NULL);
+    m_router.reset(NULL);
+
+    m_moduleFinder->stop();
+    m_moduleFinder.reset(NULL);
+
+    // ffmpegInit(); deinit ?
+
+    QnSessionManager::instance()->stop();
+
+    qInstallMessageHandler(defaultMsgHandler);
+    customizer.reset(NULL);
+
+    skin.reset(NULL);
+    m_runtimeInfoManager.reset(NULL);
+    m_clientMessageProcessor.reset(NULL);
+    m_globalSettings.reset(NULL);
+    m_clientPtzPool.reset(NULL);
+    m_runnablePool.reset(NULL);
+    m_platform.reset(NULL);
+
+    m_statusDictionary.reset(NULL);
+    m_dictionary.reset(NULL);
+
+    QnResourcePool::initStaticInstance(NULL);
+
+	m_mediaServerUserAttributesPool.reset(NULL);
+	m_cameraUserAttributePool.reset(NULL);
+
+    m_syncTime.reset(NULL);
+    m_clientModule.reset(NULL);
+
+	m_timerManager.reset(NULL);
+
+	// qApp->deleteLater();
+
+
+
+
+	/*
 	m_moduleFinder->stop();
 	QnSessionManager::instance()->stop();
 	delete QnCommonModule::instance();
 	m_clientModule.reset(0);
+
+
+    qInstallMessageHandler(defaultMsgHandler);
+
+	m_context.reset();
+
+    delete QnResourcePool::instance();
+    QnResourcePool::initStaticInstance( NULL ); */
+
+	// qApp->deleteLater();
 
     // QnClientMessageProcessor::instance()->stop();
     //xQnSessionManager::instance()->stop();
 
     // QnResource::stopCommandProc();
     //QnResourceDiscoveryManager::instance().stop();
-
-    qInstallMessageHandler(defaultMsgHandler);
-
-    delete QnResourcePool::instance();
-    QnResourcePool::initStaticInstance( NULL );
-
     //xdelete QnResourcePool::instance();
     //xQnResourcePool::initStaticInstance( NULL );
+
+	// QThread::msleep(1000);
 }
 
 void AxHDWitness::createMainWindow() {
