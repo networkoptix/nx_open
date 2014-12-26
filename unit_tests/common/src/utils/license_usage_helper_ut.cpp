@@ -182,3 +182,22 @@ TEST( QnCamLicenseUsageHelperTest, analogEncoderBorrowing )
     ASSERT_TRUE( helper.isValid() );
 }
 
+/** 
+ *  Test for calculating required licenses for analog encoders. 
+ *  For up to camerasPerAnalogEncoder cameras we should require only 1 analog encoder license.
+ */
+TEST( QnCamLicenseUsageHelperTest, analogEncoderRequiredLicenses )
+{
+    QnResourcePoolScaffold resPoolScaffold;
+
+    QnCamLicenseUsageHelper helper;
+
+    for (int i = 0; i < camerasPerAnalogEncoder; ++i) {
+        resPoolScaffold.addCamera(Qn::LC_AnalogEncoder);
+        ASSERT_EQ(helper.requiredLicenses(Qn::LC_AnalogEncoder), 1) << "Error at index " << i;
+    }
+    resPoolScaffold.addCamera(Qn::LC_AnalogEncoder);
+    ASSERT_EQ(helper.requiredLicenses(Qn::LC_AnalogEncoder), 2);
+}
+
+    
