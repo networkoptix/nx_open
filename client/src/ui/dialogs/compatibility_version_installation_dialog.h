@@ -32,6 +32,8 @@ public:
 
     virtual int exec() override;
 
+    static bool useUpdate(const QnSoftwareVersion &version);
+
 public slots:
     virtual void reject() override;
 
