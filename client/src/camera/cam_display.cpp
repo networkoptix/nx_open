@@ -32,6 +32,7 @@ static const int REDASS_DELAY_INTERVAL = 2 * 1000*1000ll; // if archive frame de
 static const int INITIAL_LIVE_MEDIA_LEN_THRESHOLD = 300*1000ll;   // do not sleep in live mode if queue is large
 static const int MAX_LIVE_MEDIA_LEN_THRESHOLD = 1000*1000ll;   // do not sleep in live mode if queue is large
 static const int REALTIME_AUDIO_PREBUFFER = 75; // at ms, prebuffer 
+static const int MAX_METADATA_QUEUE_SIZE = 50; // max metadata fps is 7 for current version
 
 static void updateActivity()
 {
@@ -832,6 +833,7 @@ void QnCamDisplay::afterJump(QnAbstractMediaDataPtr media)
     m_audioDisplay->clearAudioBuffer();
     m_firstAfterJumpTime = AV_NOPTS_VALUE;
     m_prevLQ = -1;
+    clearMetaDataInfo();
 }
 
 void QnCamDisplay::onReaderPaused()
@@ -1009,6 +1011,26 @@ void QnCamDisplay::processSkippingFramesTime()
     }
 }
 
+void QnCamDisplay::clearMetaDataInfo()
+{
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+        m_lastMetadata->clear();
+}
+
+void QnCamDisplay::mapMetadataFrame(const QnCompressedVideoDataPtr& video)
+{
+    auto & queue = m_lastMetadata[video->channelNumber];
+    if (queue.empty())
+        return;
+    auto itr = queue.upper_bound(video->timestamp);
+    if (itr != queue.begin())
+        --itr;
+
+    const QnMetaDataV1Ptr& metadata = itr->second;
+    if (metadata->containTime(video->timestamp))
+        video->motion = metadata;
+    queue.erase(queue.begin(), itr);
+}
 
 bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
 {
@@ -1019,7 +1041,10 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
 
     QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(data);
     if (metadata) {
-        m_lastMetadata[metadata->channelNumber] = metadata;
+        int ch = metadata->channelNumber;
+        m_lastMetadata[ch][metadata->timestamp] = metadata;
+        if (m_lastMetadata[ch].size() > MAX_METADATA_QUEUE_SIZE)
+            m_lastMetadata[ch].erase(m_lastMetadata[ch].begin());
         return true;
     }
 
@@ -1055,8 +1080,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
     if (vd)
     {
         m_ignoringVideo = vd->flags & QnAbstractMediaData::MediaFlags_Ignore;
-        if (m_lastMetadata[vd->channelNumber] && m_lastMetadata[vd->channelNumber]->containTime(vd->timestamp))
-            vd->motion = m_lastMetadata[vd->channelNumber];
+        mapMetadataFrame(vd);
     }
     
     bool oldIsStillImage = m_isStillImage;

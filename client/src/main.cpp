@@ -277,7 +277,7 @@ void initLog(
     QString logFileName = logFileLocation + QLatin1String("/log_file") + fileNameSuffix;
     if (!QDir().mkpath(logFileLocation))
         cl_log.log(lit("Could not create log folder: ") + logFileLocation, cl_logALWAYS);
-    if (!cl_log.create(logFileName, DEFAULT_MAX_LOG_FILE_SIZE, DEFAULT_MSG_LOG_ARCHIVE_SIZE, cl_logDEBUG1))
+    if (!cl_log.create(logFileName, DEFAULT_MAX_LOG_FILE_SIZE, DEFAULT_MSG_LOG_ARCHIVE_SIZE, QnLog::instance()->logLevel()))
         cl_log.log(lit("Could not create log file") + logFileName, cl_logALWAYS);
     cl_log.log(QLatin1String("================================================================================="), cl_logALWAYS);
 
@@ -667,7 +667,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     /* Initializing resource searchers                                      */
     /************************************************************************/
     QnClientResourceProcessor resourceProcessor;
-    QnResourceDiscoveryManager::init(new QnResourceDiscoveryManager());
+    std::unique_ptr<QnResourceDiscoveryManager> resourceDiscoveryManager( new QnResourceDiscoveryManager() );
     resourceProcessor.moveToThread( QnResourceDiscoveryManager::instance() );
     QnResourceDiscoveryManager::instance()->setResourceProcessor(&resourceProcessor);
 

@@ -307,7 +307,7 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
     setFirmware(firmwareVersion.toString());
     saveParams();
 
-    setParamPhysical(lit("mdzonesite"), zone_size);
+    setParamPhysical(lit("mdzonesize"), zone_size);
     m_zoneSite = zone_size;
     setMotionMaskPhysical(0);
 
@@ -488,7 +488,7 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
         
         if (!region.getRegionBySens(sens).isEmpty())
         {
-            setParamPhysicalAsync(lit("mdtotalzones"), sensToLevelThreshold[sens]);
+            setParamPhysicalAsync(lit("mdlevelthreshold"), sensToLevelThreshold[sens]);
             break; // only 1 sensitivity for all frame is supported
         }
     }

@@ -265,54 +265,60 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
 
         dialog->addWidget(tr("Timestamp:"), comboBox);
 
-        if (!dialog->exec())
-            return;
+        QString fileName;
 
-        /* Check if we were disconnected (server shut down) while the dialog was open. 
-         * Skip this check if we were not logged in before. */
-        if (wasLoggedIn && !context()->user())
-            return;
+        forever {
+            if (!dialog->exec())
+                return;
 
-        QString fileName = dialog->selectedFile();
-        if (fileName.isEmpty())
-            return;
+            /* Check if we were disconnected (server shut down) while the dialog was open.
+             * Skip this check if we were not logged in before. */
+            if (wasLoggedIn && !context()->user())
+                return;
 
-        QString selectedExtension = dialog->selectedExtension();
+            fileName = dialog->selectedFile();
+            if (fileName.isEmpty())
+                return;
 
-        if (!fileName.toLower().endsWith(selectedExtension)) {
-            fileName += selectedExtension;
+            QString selectedExtension = dialog->selectedExtension();
 
-            if (QFile::exists(fileName)) {
-                QMessageBox::StandardButton button = QMessageBox::information(
-                    mainWindow(),
-                    tr("Save As"),
-                    tr("File '%1' already exists. Do you want to overwrite it?").arg(QFileInfo(fileName).fileName()),
-                    QMessageBox::Ok | QMessageBox::Cancel
-                );
-                if(button == QMessageBox::Cancel)
-                    return;
+            if (!fileName.toLower().endsWith(selectedExtension)) {
+                fileName += selectedExtension;
+
+                if (QFile::exists(fileName)) {
+                    QMessageBox::StandardButton button = QMessageBox::information(
+                                                             mainWindow(),
+                                                             tr("Save As"),
+                                                             tr("File '%1' already exists. Do you want to overwrite it?").arg(QFileInfo(fileName).fileName()),
+                                                             QMessageBox::Yes | QMessageBox::No
+                                                             );
+                    if (button == QMessageBox::No)
+                        continue;
+                }
             }
+
+            /* Check if we were disconnected (server shut down) while the dialog was open.
+             * Skip this check if we were not logged in before. */
+            if (wasLoggedIn && !context()->user())
+                return;
+
+            if (QFile::exists(fileName) && !QFile::remove(fileName)) {
+                QMessageBox::critical(
+                    mainWindow(),
+                    tr("Could not overwrite file"),
+                    tr("File '%1' is used by another process. Please enter another name.").arg(QFileInfo(fileName).fileName()),
+                    QMessageBox::Ok
+                );
+                continue;
+            }
+
+            /* Check if we were disconnected (server shut down) while the dialog was open.
+             * Skip this check if we were not logged in before. */
+            if (wasLoggedIn && !context()->user())
+                return; //TODO: #GDM triple check...
+
+            break;
         }
-
-        /* Check if we were disconnected (server shut down) while the dialog was open. 
-         * Skip this check if we were not logged in before. */
-        if (wasLoggedIn && !context()->user())
-            return;
-
-        if (QFile::exists(fileName) && !QFile::remove(fileName)) {
-            QMessageBox::critical(
-                mainWindow(),
-                tr("Could not overwrite file"),
-                tr("File '%1' is used by another process. Please enter another name.").arg(QFileInfo(fileName).fileName()),
-                QMessageBox::Ok
-            );
-            return;
-        }
-
-        /* Check if we were disconnected (server shut down) while the dialog was open. 
-         * Skip this check if we were not logged in before. */
-        if (wasLoggedIn && !context()->user())
-            return; //TODO: #GDM triple check...
 
         parameters.filename = fileName;
         parameters.timestampPosition = static_cast<Qn::Corner>(comboBox->itemData(comboBox->currentIndex()).value<int>());
@@ -321,6 +327,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         showProgressDelayed(tr("Saving %1").arg(QFileInfo(fileName).fileName()));
         connect(m_screenshotProgressDialog, &QnProgressDialog::canceled, loader, &QnScreenshotLoader::deleteLater);
     }
+
     m_canceled = false;
     loader->loadAsync();
 
