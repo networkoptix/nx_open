@@ -112,6 +112,12 @@ QnMediaServerResourceList QnMediaServerUpdateTool::targets() const {
 
 void QnMediaServerUpdateTool::setTargets(const QSet<QnUuid> &targets, bool client) {
     m_targets.clear();
+    m_enableClientUpdates = client;
+
+    if (targets.isEmpty()) {
+        emit targetsChanged(actualTargetIds());
+        return;
+    }
 
     QSet<QnUuid> suitableTargets;
 
@@ -122,8 +128,6 @@ void QnMediaServerUpdateTool::setTargets(const QSet<QnUuid> &targets, bool clien
         m_targets.append(server);
         suitableTargets.insert(id);
     }
-
-    m_enableClientUpdates = client;
 
     emit targetsChanged(suitableTargets);
 }
