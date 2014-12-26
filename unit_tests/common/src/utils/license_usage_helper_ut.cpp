@@ -200,4 +200,19 @@ TEST( QnCamLicenseUsageHelperTest, analogEncoderRequiredLicenses )
     ASSERT_EQ(helper.requiredLicenses(Qn::LC_AnalogEncoder), 2);
 }
 
+/** Basic test for single license type proposing. */
+TEST( QnCamLicenseUsageHelperTest, proposeSingleLicenseType )
+{
+    QnResourcePoolScaffold resPoolScaffold;
+    auto cameras = resPoolScaffold.addCameras(Qn::LC_Professional, 2, false);
+
+    QnCamLicenseUsageHelper helper;
+    ASSERT_TRUE( helper.isValid() );
+
+    QnLicensePoolScaffold licPoolScaffold;
+    licPoolScaffold.addLicenses(Qn::LC_Professional, 2);
     
+    helper.propose(cameras, true);
+    ASSERT_EQ(helper.usedLicense(Qn::LC_Professional), 2);
+    ASSERT_TRUE( helper.isValid() );   
+}
