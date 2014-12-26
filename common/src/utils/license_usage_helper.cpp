@@ -110,9 +110,8 @@ QString QnLicenseUsageHelper::getProposedUsageText() const
     return licenseText;
 }
 
-
 QString QnLicenseUsageHelper::getRequiredLicenseMsg(Qn::LicenseType licenseType) const {
-    if (!isValid() && m_overflowLicenses[licenseType] > 0) 
+    if (m_overflowLicenses[licenseType] > 0) 
         return tr("Activate %n more %2. ", "", m_overflowLicenses[licenseType]).arg(QnLicense::longDisplayName(licenseType));
     if (isValid() && m_proposedLicenses[licenseType] > 0)        
         return tr("%n more %2 will be used. ", "", m_proposedLicenses[licenseType]).arg(QnLicense::longDisplayName(licenseType));
