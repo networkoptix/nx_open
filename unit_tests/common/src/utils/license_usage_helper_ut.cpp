@@ -7,6 +7,10 @@
 
 #include <utils/license_usage_helper.h>
 
+namespace {
+    const int camerasPerAnalogEncoder = QnLicensePool::camerasPerAnalogEncoder();
+}
+
 /** Initial test. Check if empty helper is valid. */
 TEST( QnCamLicenseUsageHelperTest, init )
 {
@@ -112,7 +116,10 @@ TEST( QnCamLicenseUsageHelperTest, borrowDifferentLicenses )
     ASSERT_TRUE( helper.isValid() );
 }
 
-/** Test for analog encoders politics. */
+/** 
+ *  Test for analog encoders politics.
+ *  One analog encoder license should allow to record up to camerasPerAnalogEncoder cameras.
+ */
 TEST( QnCamLicenseUsageHelperTest, analogEncoderSimple )
 {
     QnLicensePoolScaffold licPoolScaffold;
@@ -121,7 +128,7 @@ TEST( QnCamLicenseUsageHelperTest, analogEncoderSimple )
     QnCamLicenseUsageHelper helper;
     licPoolScaffold.addLicenses(Qn::LC_AnalogEncoder, 1);
 
-    for (int i = 0; i < qnLicensePool->camerasPerAnalogEncoder(); ++i) {
+    for (int i = 0; i < camerasPerAnalogEncoder; ++i) {
         resPoolScaffold.addCamera(Qn::LC_AnalogEncoder);
         ASSERT_TRUE( helper.isValid() ) << "Error at index " << i;
     }
@@ -129,7 +136,11 @@ TEST( QnCamLicenseUsageHelperTest, analogEncoderSimple )
     ASSERT_FALSE( helper.isValid() );
 }
 
-/** Test for analog encoders with different group ids. */
+/** 
+ *  Test for analog encoders with different group ids.
+ *  One license should allow to record up to camerasPerAnalogEncoder cameras 
+ *  if and only if they are on the same encoder.
+ */
 TEST( QnCamLicenseUsageHelperTest, analogEncoderGroups )
 {
     QnLicensePoolScaffold licPoolScaffold;
@@ -147,7 +158,10 @@ TEST( QnCamLicenseUsageHelperTest, analogEncoderGroups )
     ASSERT_FALSE( helper.isValid() );
 }
 
-/** Test for borrowing licenses for analog encoders. */
+/** 
+ *  Test for borrowing licenses for analog encoders. 
+ *  All cameras that missing the analog encoder license should borrow other licenses one-to-one.
+ */
 TEST( QnCamLicenseUsageHelperTest, analogEncoderBorrowing )
 {
     QnLicensePoolScaffold licPoolScaffold;
@@ -156,12 +170,14 @@ TEST( QnCamLicenseUsageHelperTest, analogEncoderBorrowing )
     QnCamLicenseUsageHelper helper;
     licPoolScaffold.addLicenses(Qn::LC_AnalogEncoder, 1);
 
-    resPoolScaffold.addCameras(Qn::LC_AnalogEncoder, 10);
+    resPoolScaffold.addCameras(Qn::LC_AnalogEncoder, camerasPerAnalogEncoder + 2);
     ASSERT_FALSE( helper.isValid() );
 
     licPoolScaffold.addLicense(Qn::LC_Professional);
     ASSERT_FALSE( helper.isValid() );
 
+    /* At this moment we will have 1 analog encoder license for camerasPerAnalogEncoder cameras 
+       and 2 prof licenses for other cameras. */
     licPoolScaffold.addLicense(Qn::LC_Professional);
     ASSERT_TRUE( helper.isValid() );
 }
