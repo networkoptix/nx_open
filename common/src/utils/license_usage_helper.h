@@ -71,10 +71,12 @@ signals:
      void licensesChanged();
 
 protected:
-    void borrowLicenseFromClass(int& srcUsed, int srcTotal, int& dstUsed, int dstTotal);
+    void borrowLicenseFromClass(int& srcUsed, int srcTotal, int& dstUsed, int dstTotal, int& borrowed);
     virtual int calculateUsedLicenses(Qn::LicenseType licenseType, int totalLicenses) const = 0;
-    virtual QList<Qn::LicenseType> calculateLicenseTypes() const = 0;
+    virtual int calculateOverflowLicenses(Qn::LicenseType licenseType, int totalLicenses, int borrowedLicenses) const;
 
+    virtual QList<Qn::LicenseType> calculateLicenseTypes() const = 0;
+    
     QnLicenseListHelper m_licenses;
     mutable QList<Qn::LicenseType> m_licenseTypes;
 
@@ -85,6 +87,8 @@ protected:
 
 class QnCamLicenseUsageHelper: public QnLicenseUsageHelper {
     Q_OBJECT
+
+    typedef QnLicenseUsageHelper base_type;
 public:
     QnCamLicenseUsageHelper(QObject *parent = NULL);
     QnCamLicenseUsageHelper(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable, QObject *parent = NULL);
@@ -94,6 +98,7 @@ public:
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
     virtual int calculateUsedLicenses(Qn::LicenseType licenseType, int totalLicenses) const override;
+    virtual int calculateOverflowLicenses(Qn::LicenseType licenseType, int totalLicenses, int borrowedLicenses) const override;
 private:
     void init();
 };

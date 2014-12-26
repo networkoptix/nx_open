@@ -63,14 +63,14 @@ QnLicenseUsageHelper::QnLicenseUsageHelper(QObject *parent):
     connect(qnLicensePool, &QnLicensePool::licensesChanged, this, &QnLicenseUsageHelper::update);
 }
 
-void QnLicenseUsageHelper::borrowLicenseFromClass(int& srcUsed, int srcTotal, int& dstUsed, int dstTotal)
+void QnLicenseUsageHelper::borrowLicenseFromClass(int& srcUsed, int srcTotal, int& dstUsed, int dstTotal, int& borrowed)
 {
     if (dstUsed > dstTotal) {
         int donatorRest = srcTotal - srcUsed;
         if (donatorRest > 0) {
-            int moveCnt = qMin(donatorRest, dstUsed - dstTotal);
-            srcUsed += moveCnt;
-            dstUsed -= moveCnt;
+            borrowed = qMin(donatorRest, dstUsed - dstTotal);
+            srcUsed += borrowed;
+            dstUsed -= borrowed;
         }
     }
 }
@@ -135,6 +135,11 @@ void QnLicenseUsageHelper::update() {
     m_licenses.update(qnLicensePool->getLicenses());
 
     int totalLicenses[Qn::LC_Count];
+    memset(totalLicenses, 0, sizeof(totalLicenses));
+
+    int borrowedLicenses[Qn::LC_Count];
+    memset(borrowedLicenses, 0, sizeof(borrowedLicenses));
+
     for (Qn::LicenseType lt: licenseTypes())
         totalLicenses[lt] = m_licenses.totalLicenseByType(lt);
 
@@ -144,14 +149,19 @@ void QnLicenseUsageHelper::update() {
     for (Qn::LicenseType lt: licenseTypes()) {
         for(const LicenseCompatibility& c: compatibleLicenseType) {
             if (c.child == lt)
-                borrowLicenseFromClass(m_usedLicenses[c.master], totalLicenses[c.master], m_usedLicenses[lt], totalLicenses[lt]);
+                borrowLicenseFromClass(m_usedLicenses[c.master], totalLicenses[c.master], m_usedLicenses[lt], totalLicenses[lt], borrowedLicenses[lt]);
         }
     }
 
     for (Qn::LicenseType lt: licenseTypes())
-        m_overflowLicenses[lt] = qMax(0, m_usedLicenses[lt] - totalLicenses[lt]);
+        m_overflowLicenses[lt] = calculateOverflowLicenses(lt, totalLicenses[lt], borrowedLicenses[lt]);
 
     emit licensesChanged();
+}
+
+int QnLicenseUsageHelper::calculateOverflowLicenses(Qn::LicenseType licenseType, int totalLicenses, int borrowedLicenses) const {
+    Q_UNUSED(borrowedLicenses);
+    return qMax(0, m_usedLicenses[licenseType] - totalLicenses);
 }
 
 bool QnLicenseUsageHelper::isValid() const {
@@ -210,14 +220,14 @@ QString QnLicenseUsageHelper::activationMessage(const QJsonObject& errorMessage)
 /* QnCamLicenseUsageHelper                                              */
 /************************************************************************/
 QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(QObject *parent):
-    QnLicenseUsageHelper(parent)
+    base_type(parent)
 {
     init();
     update();
 }
 
 QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable, QObject *parent):
-    QnLicenseUsageHelper(parent)
+    base_type(parent)
 {
     init();
     // update will be called inside
@@ -301,7 +311,7 @@ int QnCamLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType licenseType, 
     if (licenseType == Qn::LC_AnalogEncoder) {
         int limit = QnLicensePool::camerasPerAnalogEncoder();
 
-        std::vector<int> cameraSets;
+        QList<int> cameraSets;
 
         /* Calculate how many encoders use full set of cameras. */
         for (int camerasInGroup: m_camerasByGroupId) {
@@ -309,11 +319,11 @@ int QnCamLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType licenseType, 
             int remainder = camerasInGroup % limit;
 
             for (int i = 0; i < fullSets; ++i)
-                cameraSets.push_back(limit);
+                cameraSets << limit;
 
             /* Get all encoders that require license for non-full set of cameras. */
             if (remainder > 0)
-                cameraSets.push_back(remainder);
+                cameraSets << remainder;
         }
 
         /* If we have enough licenses for all the encoders, return max value. */
@@ -327,6 +337,60 @@ int QnCamLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType licenseType, 
     }
 
     return count;
+}
+
+int QnCamLicenseUsageHelper::calculateOverflowLicenses(Qn::LicenseType licenseType, int totalLicenses, int borrowedLicenses) const {
+    if (licenseType != Qn::LC_AnalogEncoder)
+        return base_type::calculateOverflowLicenses(licenseType, totalLicenses, borrowedLicenses);
+
+    QHash<QString, int> m_camerasByGroupId;
+
+    for (const QnVirtualCameraResourcePtr &camera: qnResPool->getResources<QnVirtualCameraResource>()) {
+        if (camera->isScheduleDisabled() || camera->licenseType() != licenseType) 
+            continue;
+
+        QnMediaServerResourcePtr server = camera->getParentResource().dynamicCast<QnMediaServerResource>();
+        if (!server || server->getStatus() != Qn::Online)
+            continue;
+        m_camerasByGroupId[camera->getGroupId()]++;
+    }
+
+    int limit = QnLicensePool::camerasPerAnalogEncoder();
+
+    QList<int> cameraSets;
+
+    /* Calculate how many encoders use full set of cameras. */
+    for (int camerasInGroup: m_camerasByGroupId) {
+        int fullSets = camerasInGroup / limit;
+        int remainder = camerasInGroup % limit;
+
+        for (int i = 0; i < fullSets; ++i)
+            cameraSets << limit;
+
+        /* Get all encoders that require license for non-full set of cameras. */
+        if (remainder > 0)
+            cameraSets << remainder;
+    }
+
+    /* If we have enough licenses for all the encoders, return max value. */
+    int required = cameraSets.size();
+    if (required <= totalLicenses)
+        return 0;
+
+    boost::sort(cameraSets | boost::adaptors::reversed);
+
+    /* Count existing licenses. */
+    for (int i = 0; i < totalLicenses; ++i)
+        cameraSets.removeFirst();
+  
+    /* Check how many licenses are borrowed. */
+    int borrowed = borrowedLicenses;
+
+    /* Use borrowed licenses for the maximum possible sets of cameras. */    
+    while (!cameraSets.empty() && borrowed >= cameraSets.last())
+        borrowed -= cameraSets.takeLast();
+
+    return cameraSets.size();
 }
 
 /************************************************************************/
