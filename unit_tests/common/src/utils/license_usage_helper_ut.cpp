@@ -214,6 +214,7 @@ TEST( QnCamLicenseUsageHelperTest, proposeSingleLicenseType )
     
     helper.propose(cameras, true);
     ASSERT_EQ(helper.usedLicenses(Qn::LC_Professional), 2);
+    ASSERT_EQ(helper.proposedLicenses(Qn::LC_Professional), 2);
     ASSERT_TRUE( helper.isValid() );   
 }
 
@@ -231,5 +232,6 @@ TEST( QnCamLicenseUsageHelperTest, proposeSingleLicenseTypeWithBorrowing )
 
     helper.propose(cameras, true);
     ASSERT_EQ(helper.usedLicenses(Qn::LC_Trial), 2);
+    ASSERT_EQ(helper.proposedLicenses(Qn::LC_Trial), 2);
     ASSERT_TRUE( helper.isValid() );   
 }
