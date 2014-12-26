@@ -114,22 +114,15 @@ void QnMediaServerUpdateTool::setTargets(const QSet<QnUuid> &targets, bool clien
     m_targets.clear();
     m_enableClientUpdates = client;
 
-    if (targets.isEmpty()) {
-        emit targetsChanged(actualTargetIds());
-        return;
-    }
-
-    QSet<QnUuid> suitableTargets;
-
     foreach (const QnUuid &id, targets) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
+
         m_targets.append(server);
-        suitableTargets.insert(id);
     }
 
-    emit targetsChanged(suitableTargets);
+    emit targetsChanged(actualTargetIds());
 }
 
 QnMediaServerResourceList QnMediaServerUpdateTool::actualTargets() const {
