@@ -174,11 +174,11 @@ bool QnLicenseUsageHelper::isValid(Qn::LicenseType licenseType) const {
     return m_overflowLicenses[licenseType] == 0;
 }
 
-int QnLicenseUsageHelper::totalLicense(Qn::LicenseType licenseType) const {
+int QnLicenseUsageHelper::totalLicenses(Qn::LicenseType licenseType) const {
     return m_licenses.totalLicenseByType(licenseType);
 }
 
-int QnLicenseUsageHelper::usedLicense(Qn::LicenseType licenseType) const {
+int QnLicenseUsageHelper::usedLicenses(Qn::LicenseType licenseType) const {
     return m_usedLicenses[licenseType];
 }
 
@@ -186,6 +186,9 @@ int QnLicenseUsageHelper::requiredLicenses(Qn::LicenseType licenseType) const {
     return m_overflowLicenses[licenseType];
 }
 
+int QnLicenseUsageHelper::proposedLicenses(Qn::LicenseType licenseType) const {
+    return m_proposedLicenses[licenseType];
+}
 
 QList<Qn::LicenseType> QnLicenseUsageHelper::licenseTypes() const {
     if (m_licenseTypes.isEmpty())
