@@ -55,7 +55,7 @@
     <!-- ClientDlg -->
     <String Id="ClientDlg_Shortcut"                                 Overridable="yes">快捷方式</String>
     <String Id="ClientDlg_InstallShortcut"                          Overridable="yes">请创建桌面快捷方式。</String>    
-    
+
     <!-- DowngradeWarningDlg -->
     <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">已安装 [ProductName]软件的一个版本.</String> 
 
@@ -134,13 +134,13 @@
     <String Id="UninstallOptionsDlg_RemoveDatabase"                 Overridable="yes">移除 ${display.product.name} 数据库</String>
     <String Id="UninstallOptionsDlg_Current"                        Overridable="yes">当前版本</String>  
     <String Id="UninstallOptionsDlgVersionToKeep"                   Overridable="yes">已安装版本:</String>   
-    
+
     <!-- UpgradeDlg -->
     <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">发现已安装版本</String>    
     <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">安装方式</String>    
     <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">系统将开始更新！</String>    
     <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">您的数据库被破坏，无法恢复。新的数据库已经安装。要访问该系统请使用登录名“admin”和密码“admin”。请在首次登录后更改凭据。</String>    
-    
+
     <!-- WixSchedFirewallExceptions -->
     <String Id="msierrFirewallCannotConnect"                        Overridable="yes">不能连接到windows防火墙。  ([2]   [3]   [4]   [5])</String>    
     <String Id="WixSchedFirewallExceptionsInstall"                  Overridable="yes">配置windows防火墙</String>    
