@@ -2,6 +2,9 @@
 
 #include <numeric>
 
+#include <boost/range/algorithm/sort.hpp>
+#include <boost/range/adaptor/reversed.hpp>
+
 #include <api/runtime_info_manager.h>
 
 #include <core/resource/resource.h>
@@ -319,7 +322,7 @@ int QnCamLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType licenseType, 
             return required;
 
         /* Use licenses for the maximum possible number of cameras. */ 
-        std::sort( cameraSets.begin(), cameraSets.end(), [](int l, int r) { return r < l; });
+        boost::sort(cameraSets | boost::adaptors::reversed);
         return totalLicenses + std::accumulate(cameraSets.cbegin() + totalLicenses, cameraSets.cend(), 0);
     }
 
