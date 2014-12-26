@@ -424,6 +424,8 @@ void QnLiveStreamProvider::updateStreamResolution( int channelNumber, const QSiz
     }
 
     m_softMotionRole = Qn::CR_Default;    //it will be auto-detected on the next frame
+    QMutexLocker mtx(&m_livemutex);
+    updateSoftwareMotion();
 }
 
 void QnLiveStreamProvider::updateSoftwareMotionStreamNum()
