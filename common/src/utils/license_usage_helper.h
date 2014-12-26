@@ -101,6 +101,15 @@ protected:
     virtual int calculateOverflowLicenses(Qn::LicenseType licenseType, int totalLicenses, int borrowedLicenses) const override;
 private:
     void init();
+
+    /** 
+     *  Utility function to get sets of analog cameras numbers, distributed by the following rules:
+     *  - Each set must contain cameras from the same encoder
+     *  - Each set must contain no more than QnLicensePool::camerasPerAnalogEncoder cameras
+     *  Camera sets then reduced to just number of cameras in the set.
+     *  Result is sorted in reversed order (from biggest sets to smallest).
+     */
+    QList<int> analogEncoderCameraSets() const;
 };
 
 class QnVideoWallLicenseUsageHelper: public QnLicenseUsageHelper {
