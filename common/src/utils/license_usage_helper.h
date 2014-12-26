@@ -72,7 +72,7 @@ signals:
 
 protected:
     void borrowLicenseFromClass(int& srcUsed, int srcTotal, int& dstUsed, int dstTotal);
-    virtual int calculateUsedLicenses(Qn::LicenseType licenseType) const = 0;
+    virtual int calculateUsedLicenses(Qn::LicenseType licenseType, int totalLicenses) const = 0;
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const = 0;
 
     QnLicenseListHelper m_licenses;
@@ -93,7 +93,7 @@ public:
     bool isOverflowForCamera(const QnVirtualCameraResourcePtr &camera);
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
-    virtual int calculateUsedLicenses(Qn::LicenseType licenseType) const override;
+    virtual int calculateUsedLicenses(Qn::LicenseType licenseType, int totalLicenses) const override;
 private:
     void init();
 };
@@ -110,7 +110,7 @@ public:
     static int licensesForScreens(int screens);
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
-    virtual int calculateUsedLicenses(Qn::LicenseType licenseType) const override;
+    virtual int calculateUsedLicenses(Qn::LicenseType licenseType, int totalLicenses) const override;
 };
 
 /** Utility RAAA class to propose some licenses usage. */

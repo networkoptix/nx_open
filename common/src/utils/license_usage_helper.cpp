@@ -1,5 +1,7 @@
 #include "license_usage_helper.h"
 
+#include <numeric>
+
 #include <api/runtime_info_manager.h>
 
 #include <core/resource/resource.h>
@@ -129,23 +131,22 @@ QString QnLicenseUsageHelper::getRequiredLicenseMsg() const
 void QnLicenseUsageHelper::update() {
     m_licenses.update(qnLicensePool->getLicenses());
 
-    int maxTotal = 0;
-    int maxLicenses[Qn::LC_Count];
-    for (Qn::LicenseType lt: licenseTypes()) {
-        m_usedLicenses[lt] = calculateUsedLicenses(lt) + m_proposedLicenses[lt];
-        maxLicenses[lt] = m_licenses.totalLicenseByType(lt);
-        maxTotal += maxLicenses[lt];
-    }
+    int totalLicenses[Qn::LC_Count];
+    for (Qn::LicenseType lt: licenseTypes())
+        totalLicenses[lt] = m_licenses.totalLicenseByType(lt);
+
+    for (Qn::LicenseType lt: licenseTypes()) 
+        m_usedLicenses[lt] = calculateUsedLicenses(lt, totalLicenses[lt]) + m_proposedLicenses[lt];
 
     for (Qn::LicenseType lt: licenseTypes()) {
         for(const LicenseCompatibility& c: compatibleLicenseType) {
             if (c.child == lt)
-                borrowLicenseFromClass(m_usedLicenses[c.master], maxLicenses[c.master], m_usedLicenses[lt], maxLicenses[lt]);
+                borrowLicenseFromClass(m_usedLicenses[c.master], totalLicenses[c.master], m_usedLicenses[lt], totalLicenses[lt]);
         }
     }
 
     for (Qn::LicenseType lt: licenseTypes())
-        m_overflowLicenses[lt] = qMax(0, m_usedLicenses[lt] - maxLicenses[lt]);
+        m_overflowLicenses[lt] = qMax(0, m_usedLicenses[lt] - totalLicenses[lt]);
 
     emit licensesChanged();
 }
@@ -274,7 +275,7 @@ QList<Qn::LicenseType> QnCamLicenseUsageHelper::calculateLicenseTypes() const {
         ;
 }
 
-int QnCamLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType licenseType) const {
+int QnCamLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType licenseType, int totalLicenses) const {
     int count = 0;
 
     QHash<QString, int> m_camerasByGroupId;
@@ -288,13 +289,40 @@ int QnCamLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType licenseType) 
             continue;
 
         if (licenseType == Qn::LC_AnalogEncoder) {
-            if (m_camerasByGroupId[camera->getGroupId()] % QnLicensePool::camerasPerAnalogEncoder() == 0)
-                count++;
             m_camerasByGroupId[camera->getGroupId()]++;
         } else {
             count++;
         }          
     }
+
+    if (licenseType == Qn::LC_AnalogEncoder) {
+        int limit = QnLicensePool::camerasPerAnalogEncoder();
+
+        std::vector<int> cameraSets;
+
+        /* Calculate how many encoders use full set of cameras. */
+        for (int camerasInGroup: m_camerasByGroupId) {
+            int fullSets = camerasInGroup / limit;
+            int remainder = camerasInGroup % limit;
+
+            for (int i = 0; i < fullSets; ++i)
+                cameraSets.push_back(limit);
+
+            /* Get all encoders that require license for non-full set of cameras. */
+            if (remainder > 0)
+                cameraSets.push_back(remainder);
+        }
+
+        /* If we have enough licenses for all the encoders, return max value. */
+        int required = cameraSets.size();
+        if (required <= totalLicenses)
+            return required;
+
+        /* Use licenses for the maximum possible number of cameras. */ 
+        std::sort( cameraSets.begin(), cameraSets.end(), [](int l, int r) { return r < l; });
+        return totalLicenses + std::accumulate(cameraSets.cbegin() + totalLicenses, cameraSets.cend(), 0);
+    }
+
     return count;
 }
 
@@ -338,8 +366,9 @@ QList<Qn::LicenseType> QnVideoWallLicenseUsageHelper::calculateLicenseTypes() co
     return QList<Qn::LicenseType>() << Qn::LC_VideoWall;
 }
 
-int QnVideoWallLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType licenseType) const {
+int QnVideoWallLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType licenseType, int totalLicenses) const {
     Q_ASSERT(licenseType == Qn::LC_VideoWall);
+    Q_UNUSED(totalLicenses);
     
     /* Calculating running control sessions. */
     int controlSessions = 0;
