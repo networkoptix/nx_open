@@ -28,10 +28,14 @@ bool CompatibilityVersionInstallationDialog::installationSucceeded() const {
 }
 
 int CompatibilityVersionInstallationDialog::exec() {
-    if (m_versionToInstall < qnCommon->engineVersion())
-        return installCompatibilityVersion();
-    else
+    if (useUpdate(m_versionToInstall))
         return installUpdate();
+    else
+        return installCompatibilityVersion();
+}
+
+bool CompatibilityVersionInstallationDialog::useUpdate(const QnSoftwareVersion &version) {
+    return version >= QnSoftwareVersion(2, 3);
 }
 
 void CompatibilityVersionInstallationDialog::reject() {
