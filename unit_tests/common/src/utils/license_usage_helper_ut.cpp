@@ -216,3 +216,20 @@ TEST( QnCamLicenseUsageHelperTest, proposeSingleLicenseType )
     ASSERT_EQ(helper.usedLicense(Qn::LC_Professional), 2);
     ASSERT_TRUE( helper.isValid() );   
 }
+
+/** Basic test for single license type proposing with borrowing. */
+TEST( QnCamLicenseUsageHelperTest, proposeSingleLicenseTypeWithBorrowing )
+{
+    QnResourcePoolScaffold resPoolScaffold;
+    auto cameras = resPoolScaffold.addCameras(Qn::LC_Professional, 2, false);
+
+    QnCamLicenseUsageHelper helper;
+    ASSERT_TRUE( helper.isValid() );
+
+    QnLicensePoolScaffold licPoolScaffold;
+    licPoolScaffold.addLicenses(Qn::LC_Trial, 2);
+
+    helper.propose(cameras, true);
+    ASSERT_EQ(helper.usedLicense(Qn::LC_Trial), 2);
+    ASSERT_TRUE( helper.isValid() );   
+}
