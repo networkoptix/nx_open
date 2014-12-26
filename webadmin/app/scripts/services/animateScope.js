@@ -1,10 +1,10 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('animateScope', function () {
+    .factory('animateScope', ['$q',function ($q) {
 
         var animations = [];
-        function Animation(scope,value,target,duration,handler){
+        function Animation(scope,value,target,duration){
             this.scope = scope;
             this.value = value;
             this.targetValue = target;
@@ -12,7 +12,9 @@ angular.module('webadminApp')
             this.started = (new Date()).getTime();
             this.initialValue = scope[value];
             this.isFinished = false;
-            this.handler = handler;
+
+            this.deferred = $q.defer();
+
         }
         Animation.prototype.linear = function(start,stop,time,duration){
             if(time > duration) {
@@ -27,16 +29,22 @@ angular.module('webadminApp')
             var delta = (Math.sin(time/duration * Math.PI - Math.PI / 2) + 1)/2;
             return start + (stop - start) *delta ;
         };
+        Animation.prototype.break = function(){
+            this.isFinished = true;
+
+            this.deferred.reject(this.scope[this.value]);
+        };
         Animation.prototype.update = function() {
             if( this.isFinished){
                 return;
             }
             var time = (new Date()).getTime() - this.started;
             this.scope[this.value] = this.linear(this.initialValue, this.targetValue, time, this.duration);
-            if(typeof(this.handler)!=='undefined'){
-                this.handler( this.scope[this.value] );
-            }
+            this.deferred.notify(this.scope[this.value]);
             this.isFinished = time > this.duration;
+            if(this.isFinished){
+                this.deferred.resolve(this.scope[this.value]);
+            }
         };
 
         var animationRunning = false;
@@ -79,7 +87,7 @@ angular.module('webadminApp')
             }
             window.animationFrame(animationFunction);
         }
-
+        var defaultDuration = 1000;
         return {
             start:function(handler){
                 animationRunning = true;
@@ -89,18 +97,28 @@ angular.module('webadminApp')
             stop:function(){
                 animationRunning = false;
             },
-            animate:function(scope,value,target,duration,handler){
+            animate:function(scope,value,target,duration){
+                if(typeof(duration) =='undefined')
+                {
+                    duration = defaultDuration;
+                }
+
                 var targetAnimation = _.find(animations,function(anim){ // Try to find,if there
                     return anim.scope === scope && anim.value === value;
                 });
                 if(!!targetAnimation){
-                    targetAnimation.isFinished = true; // Disable old animation
+                    targetAnimation.break();
                 }
-                animations.push(new Animation(scope,value,target,duration,handler));
+                var animation = new Animation(scope,value,target,duration);
+                animations.push(animation);
+                return animation.deferred.promise;
             },
-            progress:function(scope,value,duration,handler){ // Animate progress from 0 to 1
+            progress:function(scope,value,duration){ // Animate progress from 0 to 1
                 scope[value] = 0;
-                this.animate(scope,value,1,duration,handler);
+                return this.animate(scope,value,1,duration);
+            },
+            setDuration:function(duration){
+                defaultDuration = duration;
             }
         };
-    });
+    }]);

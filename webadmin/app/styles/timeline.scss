@@ -3,8 +3,7 @@
 .viewport{
   width:100%;
   position:relative;
-  overflow-x:scroll;
-  overflow-y:hidden;
+  overflow:hidden;
   border:1px solid silver;
   padding:3px 0;
 
@@ -164,4 +163,44 @@ ng-include{
 .viewport > canvas,
 .viewport > .scroll > .frame{
   height:50px;
+}
+
+
+.scroll-btn{
+  position:absolute;
+
+
+  background-color: transparent;
+  color: transparent;
+  transition: color 0.5s, background-color 1s;
+
+
+  width:16px;
+  top:0px;
+  height: 100%;
+}
+
+.scroll-btn:hover{
+  background: -webkit-linear-gradient(left, rgba(216,216,216,0.5),transparent); /* For Safari 5.1 to 6.0 */
+  background: -o-linear-gradient(right, rgba(216,216,216,0.5),transparent); /* For Opera 11.1 to 12.0 */
+  background: -moz-linear-gradient(right, rgba(216,216,216,0.5),transparent); /* For Firefox 3.6 to 15 */
+  background: linear-gradient(to right,rgba(216,216,216,0.5),transparent);
+  color: rgba(128,128,128,0.5);
+}
+.scroll-btn.right:hover{
+  background: -webkit-linear-gradient(right, rgba(216,216,216,0.5),transparent); /* For Safari 5.1 to 6.0 */
+  background: -o-linear-gradient(left, rgba(216,216,216,0.5),transparent); /* For Opera 11.1 to 12.0 */
+  background: -moz-linear-gradient(left, rgba(216,216,216,0.5),transparent); /* For Firefox 3.6 to 15 */
+  background: linear-gradient(to left,rgba(216,216,216,0.5),transparent);
+  color: rgba(128,128,128,0.5);
+}
+
+.scroll-btn.right{
+  right:0px;
+}
+.scroll-btn .glyphicon{
+  position:absolute;
+  top: 50%;
+  height: 16px;
+  margin-top: -8px;
 }

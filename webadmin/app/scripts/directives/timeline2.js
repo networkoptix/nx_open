@@ -29,7 +29,8 @@ angular.module('webadminApp')
                     minimumMarkWidth: 5, // Minimum available width for smallest marks on ruler
                     increasedMarkWidth: 10,// Minimum width for encreasing marks size
                     maximumScrollScale: 20,// Maximum scale for scroll frame inside viewport - according to viewport width
-                    colorLevels: 6 // Number of different color levels
+                    colorLevels: 6, // Number of different color levels
+                    scrollingSpeed: 0.5// One click to scroll buttons - scroll timeline by half of the screen
                 };
 
                 var viewportWidth = element.find('.viewport').width();
@@ -37,6 +38,7 @@ angular.module('webadminApp')
                 canvas.width  = viewportWidth;
                 canvas.height = element.find('canvas').height();
 
+                animateScope.setDuration(timelineConfig.animationDuration);
                 var frame = element.find('.frame');
 
                 function initTimeline(){
@@ -56,6 +58,8 @@ angular.module('webadminApp')
 
                     var availableWidth = scope.scrollWidth - viewportWidth;
                     var onePixelScroll = scope.scrollWidth/viewportWidth;
+                    var correctionPrecision = 0.000001;// precision for value - to detect boundaries
+                    var correctionPixels = 5;//How many pixels if scroll we must probide near bounaries
                     if(typeof(value) ==='undefined') {
 
                         if(availableWidth < 1){
@@ -70,23 +74,24 @@ angular.module('webadminApp')
                     } else {
                         value = Math.min(Math.max(value,0),1);
 
-                        oldSetValue = Math.min(value,1);
+                        oldSetValue = value;
                         oldScrollValue = Math.round(value * availableWidth);
-                        //console.log(oldScrollValue, availableWidth, value);
 
-
+                        var correction = 0;
+                        /*
                         // Delta between oldScrollValue and availableWidth should be less, that one pixel of scroll
-
-                        /*if(availableWidth - oldScrollValue < onePixelScroll && value < 1){
-                            oldScrollValue -= onePixelScroll;
+                        if(availableWidth - oldScrollValue < onePixelScroll && value < 1 - correctionPrecision){
+                             correction = -correctionPixels * onePixelScroll;
                         }
+                        if(oldScrollValue < onePixelScroll && value > correctionPrecision){
+                            correction = correctionPixels * onePixelScroll;
+                        }
+                        if(correction!=0) {
+                            console.log("correction", correction,value);
+                        }
+                        */
 
-                        if(oldScrollValue < onePixelScroll && value > 0){
-                            oldScrollValue += onePixelScroll;
-                        }*/
-
-
-                        scroll.scrollLeft(oldScrollValue);
+                        scroll.scrollLeft(oldScrollValue + correction);
                     }
                 }
 
@@ -144,21 +149,21 @@ angular.module('webadminApp')
                     scope.actualLevel = i-1;
 
                     if(oldLevel < scope.actualLevel){ // Level up - run animation for appearance of new level
-                        animateScope.progress(scope,'levelAppearance',timelineConfig.animationDuration);
+                        animateScope.progress(scope,'levelAppearance');
                     }else if(oldLevel > scope.actualLevel){
-                        animateScope.progress(scope,'levelDisappearance',timelineConfig.animationDuration);
+                        animateScope.progress(scope,'levelDisappearance');
                     }
 
                     if(oldEncreasedLevel < scope.increasedLevel){
-                        animateScope.progress(scope,'levelEncreasing',timelineConfig.animationDuration);
+                        animateScope.progress(scope,'levelEncreasing');
                     }else if(oldEncreasedLevel > scope.increasedLevel){
-                        animateScope.progress(scope,'levelDecreasing',timelineConfig.animationDuration);
+                        animateScope.progress(scope,'levelDecreasing');
                     }
 
                     if(oldLabelLevel < scope.visibleLabelsLevel){ //Visible label level changed
-                        animateScope.progress(scope,'labelAppearance',timelineConfig.animationDuration);
+                        animateScope.progress(scope,'labelAppearance');
                     }else if(oldLabelLevel > scope.visibleLabelsLevel){
-                        animateScope.progress(scope,'labelDisappearance',timelineConfig.animationDuration);
+                        animateScope.progress(scope,'labelDisappearance');
                     }
 
                 }
@@ -333,7 +338,13 @@ angular.module('webadminApp')
                     // Keep time position
                     // TODO: In live mode - scroll right
 
-                    var newPosition = screenRelativePositionAndDateToRelativePositionForScroll(keepDate,0.5);
+
+                    var newPosition = 0;
+                    if(scope.scrolling < 1){ // animating scroll - should scroll
+                        newPosition = scope.targetScrollPosition/ (scope.frameWidth - viewportWidth);
+                    }else { // Otherwise - keep current position in case of changing width
+                        newPosition = screenRelativePositionAndDateToRelativePositionForScroll(keepDate, 0.5);
+                    }
 
                     // Here we have a problem:we should scroll left a bit if it is not .
 
@@ -353,6 +364,9 @@ angular.module('webadminApp')
                 scope.disableZoomOut = true;
                 scope.disableZoomIn = false;
 
+                scope.disableScrollRight = false;
+                scope.disableScrollLeft = false;
+
 
                 //animation parameters
                 scope.scrollPosition = 0;
@@ -364,6 +378,51 @@ angular.module('webadminApp')
                 scope.levelDecreasing = 1; // Encreasing existing mark level
                 scope.labelAppearance = 1; // Labels become visible smoothly
                 scope.labelDisappearance = 1; // Labels become visible smoothly
+                scope.scrolling = 1;//Scrolling to some position
+                scope.targetScrollPosition = 0;
+
+                scope.scroll = function(right,value){
+                    if(scope.scrolling >= 1){
+                        scope.targetScrollPosition = screenStartPosition();// Set up initial scroll position
+                    }
+
+                    var newPosition = scope.targetScrollPosition + (right ? 1 : -1) * value * viewportWidth;
+                    // Here we have a problem:we should scroll left a bit if it is not .
+
+                    newPosition = Math.min(Math.max(newPosition,0),scope.frameWidth - viewportWidth);
+
+                    animateScope.animate(scope,"targetScrollPosition",newPosition);
+                    return animateScope.progress(scope,"scrolling");
+                };
+
+                // Collect scrolling value?
+
+                scope.scrollClick = function(right){
+                    console.log("scrollClick",right);
+                    //scope.scroll(right,0.5);
+                };
+                scope.scrollDblClick = function(right){
+                    console.log("dblclick");
+                };
+
+
+                var scrollingNow = false;
+                function scrollingProcess(right){
+                    scope.scroll(right,timelineConfig.scrollingSpeed).then(function(){
+                        if(scrollingNow){
+                            scrollingProcess(right);
+                        }
+                    })
+                }
+
+                scope.scrollStart = function(right){
+                    // Run animation by animation.
+                    scrollingNow = true;
+                    scrollingProcess(right);
+                };
+                scope.scrollEnd = function(right){
+                    scrollingNow = false;
+                };
 
                 scope.zoom = function(zoomIn, speed, targetScrollTime, targetScrollTimePosition){
                     speed = speed || 1;
@@ -380,10 +439,10 @@ angular.module('webadminApp')
                     }
 
                     var targetWidth = viewportWidth * zoomLevel();
-                    animateScope.animate(scope,'actualWidth',targetWidth,timelineConfig.animationDuration);
+                    animateScope.animate(scope,'actualWidth',targetWidth);
 
                     //We should keep relative position during resizing width
-                    animateScope.progress(scope,'scrollPosition',timelineConfig.animationDuration);
+                    animateScope.progress(scope,'scrollPosition');
 
                     scope.disableZoomOut =  scope.actualZoomLevel <= 0;
 

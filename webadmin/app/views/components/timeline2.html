@@ -4,12 +4,10 @@
     <div class="btn-group">
         <button type="button" class="btn btn-xs"
                 ng-click="zoom(false)"
-                ng-disabled="disableZoomOut"
-                data-bind="click:zoomOut,attr:{disabled:canZoomOut}"><span class="glyphicon glyphicon-minus"></span></button>
+                ng-disabled="disableZoomOut"><span class="glyphicon glyphicon-minus"></span></button>
         <button type="button" class="btn btn-xs"
                 ng-click="zoom(true)"
-                ng-disabled="disableZoomIn"
-                data-bind="click:zoomIn,attr:{disabled:canZoomIn}"><span class="glyphicon glyphicon-plus"></span></button>
+                ng-disabled="disableZoomIn"><span class="glyphicon glyphicon-plus"></span></button>
     </div>
 </div>
 
@@ -21,5 +19,24 @@
         <div class="frame">&nbsp;</div>
     </div>
 
-    <div class="spacer"></div>
+    <div class="scroll-btn left"
+         ng-click="scrollClick(false)"
+         ng-dblclick="scrollDblClick(false)"
+         ng-mousedown="scrollStart(false)"
+         ng-mouseup="scrollEnd(false)"
+         ng-mouseleave="scrollEnd(false)"
+         ng-class="{hidden:disableScrollLeft}">
+        <span class="glyphicon glyphicon-chevron-left"></span>
+    </div>
+
+    <div class="scroll-btn right"
+         ng-click="scrollClick(true)"
+         ng-dblclick="scrollDblClick(true)"
+         ng-mousedown="scrollStart(true)"
+         ng-mouseup="scrollEnd(true)"
+         ng-mouseleave="scrollEnd(true)"
+         ng-class="{hidden:disableScrollRight}">
+        <span class="glyphicon glyphicon-chevron-right"></span>
+    </div>
+
 </div>
