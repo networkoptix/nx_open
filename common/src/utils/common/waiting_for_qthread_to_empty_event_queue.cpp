@@ -1,0 +1,39 @@
+/**********************************************************
+* 27 dec 2014
+* a.kolesnikov
+***********************************************************/
+
+#include "waiting_for_qthread_to_empty_event_queue.h"
+
+#include <QMutexLocker>
+
+
+WaitingForQThreadToEmptyEventQueue::WaitingForQThreadToEmptyEventQueue( QThread* thread, int howManyTimesToWait )
+:
+    m_howManyTimesToWait( howManyTimesToWait ),
+    m_waitsDone( 0 )
+{
+    moveToThread( thread );
+    metaObject()->invokeMethod( this, "doneWaiting", Qt::QueuedConnection );
+}
+
+void WaitingForQThreadToEmptyEventQueue::join()
+{
+    QMutexLocker lk( &m_mutex );
+    while( m_waitsDone < m_howManyTimesToWait )
+        m_condVar.wait( lk.mutex() );
+}
+
+void WaitingForQThreadToEmptyEventQueue::doneWaiting()
+{
+    QMutexLocker lk( &m_mutex );
+
+    ++m_waitsDone;
+    if( m_waitsDone < m_howManyTimesToWait )
+    {
+        metaObject()->invokeMethod( this, "doneWaiting", Qt::QueuedConnection );
+        return;
+    }
+
+    m_condVar.wakeAll();
+}
