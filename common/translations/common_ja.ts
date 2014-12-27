@@ -592,9 +592,7 @@
         <source>
 
 Parameters: </source>
-        <translation>
-
-・パラメーター:</translation>
+        <translation>・パラメーター:</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="89"/>
@@ -946,7 +944,7 @@ Parameters: </source>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="21"/>
         <source>Medium</source>
-        <translation>中間</translation>
+        <translation>標準</translation>
     </message>
     <message>
         <location filename="../src/core/resource/media_resource.cpp" line="22"/>

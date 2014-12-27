@@ -637,7 +637,7 @@
             </activation>
             <properties>
                 <arch>x86</arch>
-                <arch.dir>/usr/lib/x86_64-linux-gnu/</arch.dir>
+                <arch.dir>/usr/lib/i386-linux-gnu/</arch.dir>
             </properties>
         </profile>  
         <profile>
@@ -656,7 +656,7 @@
             <properties>
                 <compiler.arguments>-m32</compiler.arguments>
                 <qt.spec>linux-g++-32</qt.spec>
-                <arch.dir>/usr/lib/x86_64-linux-gnu/</arch.dir>
+                <arch.dir>/usr/lib/i386-linux-gnu/</arch.dir>
             </properties>
         </profile>          
         <profile>

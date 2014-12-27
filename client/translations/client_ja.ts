@@ -1623,7 +1623,7 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/graphics/instruments/ptz_instrument_p.h" line="234"/>
         <source>Change Dewarping Mode</source>
-        <translation>歪み補正モード変更</translation>
+        <translation>歪み補正モード</translation>
     </message>
 </context>
 <context>
@@ -1963,7 +1963,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="503"/>
         <source>Push my screen</source>
-        <translation>スクリーン表示</translation>
+        <translation>PC画面を表示</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="508"/>
@@ -2433,17 +2433,17 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="941"/>
         <source>Identify</source>
-        <translation>ID</translation>
+        <translation>識別</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="948"/>
         <source>Attach to Video Wall...</source>
-        <translation>ビデオウォールに割当て...</translation>
+        <translation>ビデオウォールモニター設定...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="955"/>
         <source>Switch to Video Wall mode...</source>
-        <translation>ビデオウォールモードに変更...</translation>
+        <translation>ビデオウォール開始...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="970"/>
@@ -2468,7 +2468,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1006"/>
         <source>Detach Layout</source>
-        <translation>レイアウト削除</translation>
+        <translation>レイアウト表示のクリア</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1013"/>
@@ -3248,7 +3248,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/ui/dialogs/attach_to_videowall_dialog.ui" line="14"/>
         <source>Attach to Video Wall...</source>
-        <translation>ビデオウォールに割当て...</translation>
+        <translation>ビデオウォールレイアウト設定...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/attach_to_videowall_dialog.ui" line="20"/>
@@ -5597,7 +5597,7 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="209"/>
         <source>Dewarping</source>
-        <translation>Dewarping</translation>
+        <translation>歪み補正</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="218"/>
@@ -6781,7 +6781,7 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="560"/>
         <source>To avoid malfunction adjust max number of cameras</source>
-        <translation>カメラ誤動作を回避する</translation>
+        <translation>問題を避ける為、最大の接続台数を調整してください</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="605"/>
@@ -7947,12 +7947,12 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/dialogs/videowall_settings_dialog.ui" line="20"/>
         <source>Start Video Wall when the Windows starts</source>
-        <translation>Windows起動時にビデオウォール開始</translation>
+        <translation>Windows起動時にビデオウォールを開始する</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/videowall_settings_dialog.ui" line="27"/>
         <source>Shortcut on the desktop</source>
-        <translation>デスクトップにショートカット</translation>
+        <translation>デスクトップにショートカットを作成する</translation>
     </message>
 </context>
 <context>
@@ -9015,7 +9015,7 @@ Another user is already controlling this screen.</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="515"/>
         <source>Switch to Video Wall Mode...</source>
-        <translation>ビデオウォールモードに変更...</translation>
+        <translation>ビデオウォール開始...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="516"/>
@@ -9032,7 +9032,7 @@ Another user is already controlling this screen.</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="902"/>
         <source>To enable the feature please activate at least one Video Wall license.</source>
-        <translation>有効にするにはビデオウォールライセンスを有効にしてください.</translation>
+        <translation>有効にするにはビデオウォールライセンスをアクティベートしてください.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="907"/>
@@ -9057,7 +9057,7 @@ Another user is already controlling this screen.</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1204"/>
         <source>To enable the feature please activate at least one Video Wall license</source>
-        <translation>有効にするにはビデオウォールライセンスを有効にしてください.</translation>
+        <translation>有効にするにはビデオウォールライセンスをアクティベートしてください</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1213"/>
@@ -9122,8 +9122,7 @@ Another user is already controlling this screen.</source>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1364"/>
         <source>Are you sure you want to stop the Video Wall?
 You&apos;ll have to start it manually.</source>
-        <translation>ビデオウォールを停止しますか?
-マニュアルでの開始が必要です.</translation>
+        <translation>ビデオウォールを停止しますか?.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1631"/>
@@ -9444,7 +9443,7 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="97"/>
         <source>Enable failover (server will take cameras automatically from offline servers)</source>
-        <translation>フェイルオーバー有効（オフラインサーバーより自動でカメラ接続先サーバーの切替)</translation>
+        <translation>フェイルオーバー（オフラインサーバーから自動でカメラ接続先サーバーの切替)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="122"/>
@@ -9705,7 +9704,7 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="582"/>
         <source>Dewarping</source>
-        <translation>Dewarping</translation>
+        <translation>歪み補正</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="604"/>
@@ -9762,7 +9761,7 @@ You&apos;ll have to start it manually.</source>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="146"/>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="348"/>
         <source>Support Signature:</source>
-        <translation>サポートサイ:</translation>
+        <translation>サポート:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="199"/>

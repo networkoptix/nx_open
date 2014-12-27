@@ -27,6 +27,7 @@
                 <include>wrap_oal.dll</include>
                 <include>zlibwapi.dll</include>
                 <include>${product.name}*.exe</include>
+                <include>vcredist*.exe</include>
             </includes>		
         </fileSet>			
 		<fileSet>
