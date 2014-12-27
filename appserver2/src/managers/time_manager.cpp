@@ -369,7 +369,7 @@ namespace ec2
                         currentMSecsSinceEpoch(),
                         m_localTimePriorityKey );
                     NX_LOG( lit("TimeSynchronizationManager. Received primary time server change transaction. New synchronized time %1, new priority key 0x%2").
-                        arg(QDateTime::fromMSecsSinceEpoch(m_usedTimeSyncInfo.syncTime).toString(Qt::ISODate)).arg(m_localTimePriorityKey.toUInt64(), 0, 16), cl_logWARNING );
+                        arg(QDateTime::fromMSecsSinceEpoch(m_usedTimeSyncInfo.syncTime).toString(Qt::ISODate)).arg(m_localTimePriorityKey.toUInt64(), 0, 16), cl_logINFO );
                     m_timeSynchronized = true;
                     //saving synchronized time to DB
                     if( QnDbManager::instance() && QnDbManager::instance()->isInitialized() )
@@ -518,7 +518,7 @@ namespace ec2
             "peer's time priority key 0x%3. Local peer id %4, used priority key 0x%5. Accepting peer's synchronized time").
             arg(remotePeerID.toString()).arg(QDateTime::fromMSecsSinceEpoch(remotePeerSyncTime).toString(Qt::ISODate)).
             arg(remotePeerTimePriorityKey.toUInt64(), 0, 16).arg(qnCommon->moduleGUID().toString()).
-            arg(m_usedTimeSyncInfo.timePriorityKey.toUInt64(), 0, 16), cl_logWARNING );
+            arg(m_usedTimeSyncInfo.timePriorityKey.toUInt64(), 0, 16), cl_logINFO );
         //taking new synchronization data
         m_usedTimeSyncInfo = TimeSyncInfo(
             localMonotonicClock,
@@ -861,7 +861,7 @@ namespace ec2
             {
                 m_usedTimeSyncInfo.syncTime = QDateTime::currentMSecsSinceEpoch() - timeDeltaStr.toLongLong();
                 NX_LOG( lit("TimeSynchronizationManager. Successfully restored synchronized time %1 (delta %2) from DB").
-                    arg(QDateTime::fromMSecsSinceEpoch(m_usedTimeSyncInfo.syncTime).toString(Qt::ISODate)).arg(timeDeltaStr.toLongLong()), cl_logWARNING );
+                    arg(QDateTime::fromMSecsSinceEpoch(m_usedTimeSyncInfo.syncTime).toString(Qt::ISODate)).arg(timeDeltaStr.toLongLong()), cl_logINFO );
             }
         }
 
