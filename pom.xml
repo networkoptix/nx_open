@@ -619,7 +619,7 @@
             </activation>
             <properties>
                 <arch>x64</arch>
-                <arch.dir>/usr/lib/x86_64-linux-gnu/</arch.dir>
+                <arch.dir>x86_64-linux-gnu/</arch.dir>
             </properties>
         </profile>
         <profile>
@@ -637,7 +637,7 @@
             </activation>
             <properties>
                 <arch>x86</arch>
-                <arch.dir>/usr/lib/i386-linux-gnu/</arch.dir>
+                <arch.dir>i386-linux-gnu/</arch.dir>
             </properties>
         </profile>  
         <profile>
