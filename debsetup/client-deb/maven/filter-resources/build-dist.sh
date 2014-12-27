@@ -85,6 +85,8 @@ cp -r $CLIENT_VOX_PATH $BINSTAGE
 cp -r $CLIENT_PLATFORMS_PATH $BINSTAGE
 rm -f $LIBSTAGE/*.debug
 
+cp -r ${arch.dir}/libpng12.so $LIBSTAGE
+cp -r ${arch.dir}/libopenal.so.1* $LIBSTAGE
 #'libstdc++.so.6 is needed on some machines
 cp -r ${arch.dir}/libstdc++.so.6* $LIBSTAGE
 
