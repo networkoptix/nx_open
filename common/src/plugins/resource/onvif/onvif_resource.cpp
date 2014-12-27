@@ -2892,7 +2892,7 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
     memToFreeOnResponseDone.push_back(buf);
 
     _onvifEvents__PullMessages request;
-    sprintf( buf, "PT%dS", roundUp<qint64>(m_monotonicClock.elapsed() - m_prevPullMessageResponseClock, MS_PER_SECOND) / MS_PER_SECOND );
+    sprintf( buf, "PT%lldS", roundUp<qint64>(m_monotonicClock.elapsed() - m_prevPullMessageResponseClock, MS_PER_SECOND) / MS_PER_SECOND );
     request.Timeout = buf;
     request.MessageLimit = MAX_MESSAGES_TO_PULL;
     QByteArray onvifNotificationSubscriptionIDLatin1 = m_onvifNotificationSubscriptionID.toLatin1();
