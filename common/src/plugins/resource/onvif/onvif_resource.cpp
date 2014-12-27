@@ -2830,6 +2830,12 @@ bool QnPlOnvifResource::createPullPointSubscription()
     m_eventMonitorType = emtPullPoint;
     m_prevPullMessageResponseClock = m_monotonicClock.elapsed();
 
+    if( m_timerID != 0 )
+    {
+        TimerManager::instance()->deleteTimer( m_timerID );
+        m_timerID = 0;
+    }
+
     m_timerID = TimerManager::instance()->addTimer(
         std::bind(&QnPlOnvifResource::pullMessages, this, _1),
         PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND);
@@ -2850,26 +2856,22 @@ _NumericInt roundUp( _NumericInt val, _NumericInt step, typename std::enable_if<
     return (val + step - 1) / step * step;
 }
 
-void QnPlOnvifResource::pullMessages(quint64 /*timerID*/)
+void QnPlOnvifResource::pullMessages(quint64 timerID)
 {
     static const int MAX_MESSAGES_TO_PULL = 10;
 
     QMutexLocker lk(&m_ioPortMutex);
 
+    if( timerID != m_timerID )
+        return; //not expected event. This can actually happen if we call
+                //startInputPortMonitoring, stopInputPortMonitoring, startInputPortMonitoring really quick
     m_timerID = 0;
 
     if( !m_inputMonitored )
         return;
 
     if( m_asyncPullMessagesCallWrapper )
-    {
-        //previous request is still running
-        using namespace std::placeholders;
-        m_timerID = TimerManager::instance()->addTimer(
-            std::bind(&QnPlOnvifResource::pullMessages, this, _1),
-            PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND);
-        return;
-    }
+        return; //previous request is still running, new timer will be added within completion handler
 
     const QAuthenticator& auth = getAuth();
 
@@ -2933,6 +2935,7 @@ void QnPlOnvifResource::pullMessages(quint64 /*timerID*/)
     {
         using namespace std::placeholders;
         //will try later
+        assert( m_timerID == 0 );
         m_timerID = TimerManager::instance()->addTimer(
             std::bind(&QnPlOnvifResource::pullMessages, this, _1),
             PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND);
@@ -2944,6 +2947,16 @@ void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* as
     onPullMessagesResponseReceived(asyncWrapper->syncWrapper(), resultCode, asyncWrapper->response());
 
     QMutexLocker lk(&m_ioPortMutex);
+
+    if( !m_inputMonitored )
+        return;
+
+    using namespace std::placeholders;
+    assert( m_timerID == 0 );
+    m_timerID = TimerManager::instance()->addTimer(
+        std::bind(&QnPlOnvifResource::pullMessages, this, _1),
+        PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND);
+
     m_asyncPullMessagesCallWrapper.clear();
 }
 
@@ -2955,17 +2968,6 @@ void QnPlOnvifResource::onPullMessagesResponseReceived(
     m_prevSoapCallResult = resultCode;
 
     const qint64 currentRequestSendClock = m_monotonicClock.elapsed();
-
-    {
-        QMutexLocker lk(&m_ioPortMutex);
-        if( !m_inputMonitored )
-            return;
-
-        using namespace std::placeholders;
-        m_timerID = TimerManager::instance()->addTimer(
-            std::bind(&QnPlOnvifResource::pullMessages, this, _1),
-            PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND);
-    }
 
     if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )
     {
