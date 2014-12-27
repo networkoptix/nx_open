@@ -1653,7 +1653,6 @@ void QnMain::run()
 
 
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
-    QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);
 
     bool compatibilityMode = cmdLineArguments.devModeKey == lit("razrazraz");
@@ -1861,6 +1860,7 @@ void QnMain::run()
         std::bind( &QnMain::dumpSystemUsageStats, this ),
         SYSTEM_USAGE_DUMP_TIMEOUT );
     
+    QnRecordingManager::instance()->start();
     QnMServerResourceSearcher::instance()->start();
     m_universalTcpListener->start();
 	serverConnector->start();
