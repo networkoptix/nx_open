@@ -158,7 +158,7 @@
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="64"/>
         <source>User Defined (%1)</source>
-        <translation>Défini par l&apos;utilisateur (%1)</translation>
+        <translation>Défini par l&apos;usager (%1)</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="68"/>
@@ -268,7 +268,7 @@
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="50"/>
         <source>Send email</source>
-        <translation type="unfinished"></translation>
+        <translation>Envoyer Courriel</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="55"/>
@@ -303,42 +303,42 @@
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="74"/>
         <source>Server Failure</source>
-        <translation type="unfinished"></translation>
+        <translation>Échec Serveur</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="75"/>
         <source>Server Conflict</source>
-        <translation type="unfinished"></translation>
+        <translation>Conflit Serveur</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="76"/>
         <source>Server Started</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveur Démarré</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="77"/>
         <source>License Issue</source>
-        <translation type="unfinished"></translation>
+        <translation>Problème Licence</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="110"/>
         <source>Server &quot;%1&quot; Failure</source>
-        <translation type="unfinished"></translation>
+        <translation>Défaillance Serveur &quot;%1&quot;</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="116"/>
         <source>Server &quot;%1&quot; Conflict</source>
-        <translation type="unfinished"></translation>
+        <translation>Conflit Serveur &quot;%1&quot;</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="119"/>
         <source>Server &quot;%1&quot; Started</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveur &quot;%1&quot; Démarré</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="121"/>
         <source>Server &quot;%1&quot; had license issue</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveur &quot;%1&quot; a un problème de licence</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="126"/>
@@ -384,22 +384,22 @@
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="219"/>
         <source>Conflicting Server #%1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Conflit de serveur#%1: %2</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="370"/>
         <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Connexion à la caméra (flux primaire) a été fermée de manière inattendue.</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="372"/>
         <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Connexion à la caméra (flux secondaire) a été fermée de manière inattendue.</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="408"/>
         <source>Recording on %n camera(s) is disabled: </source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrement sur %n camera(s) désactivé: </translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="325"/>
@@ -491,13 +491,15 @@
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="31"/>
         <source>Server %1 is not available.
  Check that Server is up and running.</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveur %1 n&apos;est pas disponible.
+Vérifier que le serveur est opérationnel.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="35"/>
         <source>Received bad response from Server %1: &quot;%2&quot;.
  Check if Server is up and has the proper version.</source>
-        <translation type="unfinished"></translation>
+        <translation>Reçue mauvaise réponse du serveur %1: &quot;%2&quot;.
+Vérifier si le serveur est opérationnel et a la bonne version.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="39"/>
@@ -592,7 +594,7 @@ Assurez-vous que la caméra est branchée sur le réseau. Essayez de redémarrer
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="102"/>
         <source>Camera initialization process in progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Processus d&apos;initialisation de la caméra en cours</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="117"/>
@@ -730,92 +732,92 @@ Paramètres: </translation>
     <message>
         <location filename="../src/licensing/license.cpp" line="154"/>
         <source>Edge</source>
-        <translation type="unfinished"></translation>
+        <translation>Edge</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="155"/>
         <source>Vmax</source>
-        <translation type="unfinished"></translation>
+        <translation>Vmax</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="156"/>
         <source>Analog encoder</source>
-        <translation type="unfinished"></translation>
+        <translation>Encodeur Analogue</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="157"/>
         <source>Video Wall</source>
-        <translation type="unfinished"></translation>
+        <translation>Mur Vidéo</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="170"/>
         <source>Trial licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Licences d&apos;essaie</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="171"/>
         <source>Analog licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Licences Analogue</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="172"/>
         <source>Professional licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Licences Professionnel</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="173"/>
         <source>Edge licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Licences Edge</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="174"/>
         <source>Vmax licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Licences Vmax</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="175"/>
         <source>Analog encoder licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Licenses d&apos;encodeur vidéo</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="176"/>
         <source>Video Wall licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Licences de mur vidéo</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="343"/>
         <source>Invalid signature</source>
-        <translation type="unfinished"></translation>
+        <translation>Signature Invalide</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="345"/>
         <source>Server with necessary hardware ID is not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveur avec l&apos;ID matériel nécessaire ne peut être trouvé</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="347"/>
         <source>Invalid customization</source>
-        <translation type="unfinished"></translation>
+        <translation>Personnalisation invalide</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="349"/>
         <source>Expired</source>
-        <translation type="unfinished"></translation>
+        <translation>Expiré</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="351"/>
         <source>Invalid type</source>
-        <translation type="unfinished"></translation>
+        <translation>Type invalide</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="353"/>
         <source>Only single license is allowed for this device</source>
-        <translation type="unfinished"></translation>
+        <translation>Seulement une licence simple est autorisée pour ce périphérique</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="355"/>
         <source>Unknown error</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur inconnue</translation>
     </message>
 </context>
 <context>
@@ -823,59 +825,59 @@ Paramètres: </translation>
     <message numerus="yes">
         <location filename="../src/utils/license_usage_helper.cpp" line="75"/>
         <source>%n %2 are used out of %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n %2 est utilisée sur %1.</numerusform>
+            <numerusform>%n %2 sont utilisées sur %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/license_usage_helper.cpp" line="94"/>
         <source>%n %2 will be used out of %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n %2 sera utilisée sur %1.</numerusform>
+            <numerusform>%n %2 seront utilisées sur %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/license_usage_helper.cpp" line="112"/>
         <source>Activate %n more %2. </source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Activer %n plus %2. </numerusform>
+            <numerusform>Activer %n plus %2. </numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/license_usage_helper.cpp" line="114"/>
         <source>%n more %2 will be used. </source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n plus %2 va être utilisé. </numerusform>
+            <numerusform>%n plus %2 vont être utilisés. </numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/utils/license_usage_helper.cpp" line="186"/>
         <source>There was a problem activating your license key. Database error has occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation>Il a eu un problème d&apos;activation de votre clé de licence. Une erreur de base de données s&apos;est produite.</translation>
     </message>
     <message>
         <location filename="../src/utils/license_usage_helper.cpp" line="188"/>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>Il a eu un problème d&apos;activation de votre licence. Données invalides reçues. S.V.P., contactez l’assistance technique pour signaler cette erreur.</translation>
     </message>
     <message>
         <location filename="../src/utils/license_usage_helper.cpp" line="190"/>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation>La clé de licence que vous avez entrée est invalide. S.V.P., vérifiez que la licence est correctement entrée. Si le problème persiste, S.V.P. contactez l&apos;assistance technique pour confirmer que la licence est valide ou pour obtenir une licence valide.</translation>
     </message>
     <message>
         <location filename="../src/utils/license_usage_helper.cpp" line="193"/>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous essayez d&apos;activer une licence incompatible avec votre logiciel. S.V.P, contactez l&apos;assistance technique pour obtenir une licence valide.</translation>
     </message>
     <message>
         <location filename="../src/utils/license_usage_helper.cpp" line="195"/>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to get a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation>La licence à déjà été activé sur l&apos;ID matériel {{hwid}} le {{time}}. S.V.P, contactez l&apos;assistance technique pour obtenir une licence valide.</translation>
     </message>
 </context>
 <context>
@@ -892,7 +894,7 @@ Paramètres: </translation>
         <location filename="../src/plugins/resource/digitalwatchdog/newdw_ptz_controller.cpp" line="111"/>
         <location filename="../src/plugins/resource/digitalwatchdog/newdw_ptz_controller.cpp" line="155"/>
         <source>Preset #</source>
-        <translation type="unfinished"></translation>
+        <translation>Préréglage #</translation>
     </message>
 </context>
 <context>
@@ -914,7 +916,7 @@ Paramètres: </translation>
     <message>
         <location filename="../src/export/sign_helper.cpp" line="70"/>
         <source>Trial license</source>
-        <translation type="unfinished"></translation>
+        <translation>Licence d&apos;essaie</translation>
     </message>
     <message>
         <location filename="../src/export/sign_helper.cpp" line="262"/>
@@ -1065,32 +1067,32 @@ Paramètres: </translation>
     <message>
         <location filename="../src/health/system_health.cpp" line="6"/>
         <source>Email address is not set</source>
-        <translation type="unfinished"></translation>
+        <translation>Adresse courriel non définie</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="10"/>
         <source>Email server is not set</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveur de courriel non défini</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="12"/>
         <source>Some users have not set their email addresses</source>
-        <translation type="unfinished"></translation>
+        <translation>Certains usagers n&apos;ont pas défini leurs adresses courriel</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="14"/>
         <source>Connection to server lost</source>
-        <translation type="unfinished"></translation>
+        <translation>Connexion au serveur perdu</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="16"/>
         <source>Select server for others to synchronise time with</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner un serveur sur lequel les autres vont synchroniser l&apos;heure</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="18"/>
         <source>Error while sending email</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur lors de l&apos;envoi de courriel</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="20"/>
@@ -1110,48 +1112,54 @@ Paramètres: </translation>
     <message>
         <location filename="../src/health/system_health.cpp" line="35"/>
         <source>Email address is not set for user %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Adresse courriel non définie pour l&apos;usager %1</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="45"/>
         <source>Email address is not set.
 You cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>Adresse courriel non définie.
+Vous ne pouvez pas recevoir des notifications système par courriel.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="47"/>
         <source>Email server is not set.
 You cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveur courriel non définie.
+Vous ne pouvez pas recevoir des notifications système par courriel.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="49"/>
         <source>Some users have not set their email addresses.
 They cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>Certains usagers n&apos;ont pas défini leurs adresses courriel.
+Ils ne pourront pas recevoir de notification système par courriel.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="51"/>
         <source>Multiple servers have different time and correct time could not be detected automatically.</source>
-        <translation type="unfinished"></translation>
+        <translation>Plusieurs serveurs ont l&apos;heure différente et la bonne heure ne peut pas être détectée automatiquement.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="53"/>
         <source>Storages are full on the following Server:
 %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Stockages plein sur le serveur suivant :
+%1.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="55"/>
         <source>Storages are not configured on the following Server:
 %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Stockages non configurés sur le serveur suivant :
+%1.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="59"/>
         <source>Rebuilding archive index is completed on the following Server:
 %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Reconstruction de l&apos;index d&apos;archive est complétée sur le serveur suivant:
+%1.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="57"/>
