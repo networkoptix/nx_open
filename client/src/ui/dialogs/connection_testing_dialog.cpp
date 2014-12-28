@@ -143,10 +143,10 @@ void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode
         QString olderComponent = connectionInfo.nxClusterProtoVersion < nx_ec::EC2_PROTO_VERSION
             ? tr("Server")
             : tr("Client");
-       detail = tr("Server has a different version:\n"
+        detail = tr("Server has a different version:\n"
             " - Client version: %1.\n"
             " - Server version: %2.\n"
-            "These versions are not compatible. Please update your %3"
+            "These versions are not compatible. Please update your %3" // TODO: #TR after string freeze replace with "You will be asked to update your %3."
             ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()).arg(olderComponent);
         helpTopicId = Qn::VersionMismatch_Help;
     }
