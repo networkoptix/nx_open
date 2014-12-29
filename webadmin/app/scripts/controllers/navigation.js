@@ -13,10 +13,8 @@ angular.module('webadminApp')
         });
 
         mediaserver.getSettings().then(function (r) {
-            $scope.settings = {
-                name:r.data.reply.name,
-                remoteAddresses:r.data.reply.remoteAddresses.join('\n')
-            };
+            $scope.settings = r.data.reply;
+            $scope.settings.remoteAddresses = $scope.settings.remoteAddresses.join('\n');
         });
         $scope.isActive = function (path) {
             var currentPath = $location.path().split('/')[1];
