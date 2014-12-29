@@ -40,7 +40,7 @@ public:
     QnMulticastModuleFinder(
         bool clientOnly,
         const QHostAddress &multicastGroupAddress = defaultModuleRevealMulticastGroup,
-        const unsigned int multicastGroupPort = defaultModuleRevealMulticastGroupPort,
+        const quint16 multicastGroupPort = defaultModuleRevealMulticastGroupPort,
         const unsigned int pingTimeoutMillis = 0,
         const unsigned int keepAliveMultiply = 0);
 
@@ -79,6 +79,7 @@ protected:
 private:
     bool processDiscoveryRequest(UDPSocket *udpSocket);
     bool processDiscoveryResponse(UDPSocket *udpSocket);
+    QList<UDPSocket *> findNewInterfaces();
 
 private:
     struct ModuleContext {
@@ -90,15 +91,18 @@ private:
 
     mutable QMutex m_mutex;
     aio::PollSet m_pollSet;
-    QList<UDPSocket*> m_clientSockets;
+    QHash<QHostAddress, UDPSocket*> m_clientSockets;
     UDPSocket *m_serverSocket;
     const unsigned int m_pingTimeoutMillis;
     const unsigned int m_keepAliveMultiply;
     quint64 m_prevPingClock;
+    quint64 m_lastInterfacesCheckMs;
     bool m_compatibilityMode;
     QHash<QnNetworkAddress, ModuleContext> m_foundAddresses;
     QHash<QnUuid, QnModuleInformation> m_foundModules;
     QMultiHash<QnNetworkAddress, QnUuid> m_ignoredModules;
+    QHostAddress m_multicastGroupAddress;
+    quint16 m_multicastGroupPort;
 };
 
 #endif // MULTICAST_MODULE_FINDER_H

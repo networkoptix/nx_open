@@ -14,19 +14,19 @@
 #include "system_socket.h"
 #include "common/common_module.h"
 
-
 namespace {
 
     const unsigned defaultPingTimeoutMs = 3000;
     const unsigned defaultKeepAliveMultiply = 5;
     const unsigned errorWaitTimeoutMs = 1000;
+    const unsigned checkInterfacesTimeoutMs = 60 * 1000;
 
 } // anonymous namespace
 
 QnMulticastModuleFinder::QnMulticastModuleFinder(
     bool clientOnly,
     const QHostAddress &multicastGroupAddress,
-    const unsigned int multicastGroupPort,
+    const quint16 multicastGroupPort,
     const unsigned int pingTimeoutMillis,
     const unsigned int keepAliveMultiply)
 :
@@ -34,31 +34,15 @@ QnMulticastModuleFinder::QnMulticastModuleFinder(
     m_pingTimeoutMillis(pingTimeoutMillis == 0 ? defaultPingTimeoutMs : pingTimeoutMillis),
     m_keepAliveMultiply(keepAliveMultiply == 0 ? defaultKeepAliveMultiply : keepAliveMultiply),
     m_prevPingClock(0),
-    m_compatibilityMode(false)
+    m_lastInterfacesCheckMs(0),
+    m_compatibilityMode(false),
+    m_multicastGroupAddress(multicastGroupAddress),
+    m_multicastGroupPort(multicastGroupPort)
 {
     if (!clientOnly) {
         m_serverSocket = new UDPSocket();
         m_serverSocket->setReuseAddrFlag(true);
         m_serverSocket->bind(SocketAddress(HostAddress::anyHost, multicastGroupPort));
-    }
-
-    for (const QHostAddress &address: QNetworkInterface::allAddresses()) {
-        if (address.protocol() != QAbstractSocket::IPv4Protocol)
-            continue;
-
-        try {
-            //if( addressToUse == QHostAddress(lit("127.0.0.1")) )
-            //    continue;
-            std::unique_ptr<UDPSocket> sock( new UDPSocket() );
-            sock->bind(SocketAddress(address.toString(), 0));
-            sock->getLocalAddress();    //requesting local address. During this call local port is assigned to socket
-            sock->setDestAddr(multicastGroupAddress.toString(), multicastGroupPort);
-            m_clientSockets.push_back(sock.release());
-            if (m_serverSocket)
-                m_serverSocket->joinGroup(multicastGroupAddress.toString(), address.toString());
-        } catch(const std::exception &e) {
-            NX_LOG(lit("Failed to create socket on local address %1. %2").arg(address.toString()).arg(QString::fromLatin1(e.what())), cl_logERROR);
-        }
     }
 }
 
@@ -80,6 +64,35 @@ bool QnMulticastModuleFinder::isCompatibilityMode() const {
 
 void QnMulticastModuleFinder::setCompatibilityMode(bool compatibilityMode) {
     m_compatibilityMode = compatibilityMode;
+}
+
+QList<UDPSocket*> QnMulticastModuleFinder::findNewInterfaces() {
+    QList<UDPSocket*> result;
+
+    /* This function only adds interfaces to the list. */
+    for (const QHostAddress &address: QNetworkInterface::allAddresses()) {
+        if (address.protocol() != QAbstractSocket::IPv4Protocol)
+            continue;
+
+        if (m_clientSockets.contains(address))
+            continue;
+
+        try {
+            //if( addressToUse == QHostAddress(lit("127.0.0.1")) )
+            //    continue;
+            std::unique_ptr<UDPSocket> sock( new UDPSocket() );
+            sock->bind(SocketAddress(address.toString(), 0));
+            sock->getLocalAddress();    //requesting local address. During this call local port is assigned to socket
+            sock->setDestAddr(m_multicastGroupAddress.toString(), m_multicastGroupPort);
+            auto it = m_clientSockets.insert(address, sock.release());
+            result.append(it.value());
+            if (m_serverSocket)
+                m_serverSocket->joinGroup(m_multicastGroupAddress.toString(), address.toString());
+        } catch(const std::exception &e) {
+            NX_LOG(lit("Failed to create socket on local address %1. %2").arg(address.toString()).arg(QString::fromLatin1(e.what())), cl_logERROR);
+        }
+    }
+    return result;
 }
 
 QnModuleInformation QnMulticastModuleFinder::moduleInformation(const QnUuid &moduleId) const {
@@ -283,10 +296,6 @@ void QnMulticastModuleFinder::run() {
         Q_ASSERT(false);
 
     //TODO #ak currently PollSet is designed for internal usage in aio, that's why we have to use socket->implementationDelegate()
-    for (UDPSocket *socket: m_clientSockets) {
-        if( !m_pollSet.add( socket->implementationDelegate(), aio::etRead, socket ) )
-            Q_ASSERT(false);
-    }
     if (m_serverSocket) {
         if( !m_pollSet.add( m_serverSocket->implementationDelegate(), aio::etRead, m_serverSocket ) )
             Q_ASSERT(false);
@@ -294,6 +303,18 @@ void QnMulticastModuleFinder::run() {
 
     while(!needToStop()) {
         quint64 currentClock = QDateTime::currentMSecsSinceEpoch();
+
+        if (currentClock - m_lastInterfacesCheckMs >= checkInterfacesTimeoutMs) {
+            QList<UDPSocket*> newSockets = findNewInterfaces();
+            for (UDPSocket *socket: newSockets) {
+                if (!m_pollSet.add(socket->implementationDelegate(), aio::etRead, socket))
+                    Q_ASSERT(false);
+            }
+            m_lastInterfacesCheckMs = currentClock;
+        }
+
+        currentClock = QDateTime::currentMSecsSinceEpoch();
+
         if (currentClock - m_prevPingClock >= m_pingTimeoutMillis) {
             //sending request via each socket
             for (UDPSocket *socket: m_clientSockets) {
