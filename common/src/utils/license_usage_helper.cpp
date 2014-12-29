@@ -5,6 +5,7 @@
 #include <boost/range/algorithm/sort.hpp>
 #include <boost/range/algorithm/fill.hpp>
 #include <boost/range/adaptor/reversed.hpp>
+#include <boost/range/adaptor/filtered.hpp>
 
 #include <api/runtime_info_manager.h>
 
@@ -159,13 +160,9 @@ void QnLicenseUsageHelper::update() {
         m_usedLicenses[lt] = calculateUsedLicenses(lt, true);
     }
 
-    for (Qn::LicenseType lt: licenseTypes()) {
-        for(const LicenseCompatibility& c: compatibleLicenseType) {
-            if (c.child == lt) {
-                basicBorrowedLicenses[lt] += borrowLicenses(c, basicUsedLicenses);
-                borrowedLicenses[lt]      += borrowLicenses(c, m_usedLicenses);
-            }
-        }
+    for(const LicenseCompatibility& c: compatibleLicenseType) {
+        basicBorrowedLicenses[c.child] += borrowLicenses(c, basicUsedLicenses);
+        borrowedLicenses[c.child]      += borrowLicenses(c, m_usedLicenses);
     }
 
     for (Qn::LicenseType lt: licenseTypes()) {
