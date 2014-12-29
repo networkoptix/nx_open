@@ -2259,7 +2259,7 @@ class RtspBackOffTimer:
     _timerLock = threading.Lock()
     _globalTimerTable= dict()
 
-    MAX_TIMEOUT = 32.0
+    MAX_TIMEOUT = 4.0
     MIN_TIMEOUT = 0.01
 
     def increase(self,url):
