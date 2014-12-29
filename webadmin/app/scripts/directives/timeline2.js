@@ -19,7 +19,7 @@ angular.module('webadminApp')
                     // TODO: support changing boundaries on huge detailization
                     initialZoom: 0, // Initial zoom step 0 - to see whole timeline without scroll.
                     updateInterval: 20, // Animation interval
-                    animationDuration: 400, // 200-400 for smooth animation
+                    animationDuration: 300, // 200-400 for smooth animation
                     rulerColor:[0,0,0], //Color for ruler marks and labels
                     rulerFontSize: 9, // Smallest font size for labels
                     rulerFontStep: 1, // Step for increasing font size
@@ -30,7 +30,7 @@ angular.module('webadminApp')
                     increasedMarkWidth: 10,// Minimum width for encreasing marks size
                     maximumScrollScale: 20,// Maximum scale for scroll frame inside viewport - according to viewport width
                     colorLevels: 6, // Number of different color levels
-                    scrollingSpeed: 0.5// One click to scroll buttons - scroll timeline by half of the screen
+                    scrollingSpeed: 0.25// One click to scroll buttons - scroll timeline by half of the screen
                 };
 
                 var viewportWidth = element.find('.viewport').width();
@@ -39,6 +39,7 @@ angular.module('webadminApp')
                 canvas.height = element.find('canvas').height();
 
                 animateScope.setDuration(timelineConfig.animationDuration);
+                animateScope.setScope(scope);
                 var frame = element.find('.frame');
 
                 function initTimeline(){
@@ -53,12 +54,13 @@ angular.module('webadminApp')
 
                 var oldSetValue = 0;
                 var oldScrollValue = 0;
+                var correctionPrecision = 0.000001;// precision for value - to detect boundaries
+
                 function viewPortScrollRelative(value){
 
 
                     var availableWidth = scope.scrollWidth - viewportWidth;
                     var onePixelScroll = scope.scrollWidth/viewportWidth;
-                    var correctionPrecision = 0.000001;// precision for value - to detect boundaries
                     var correctionPixels = 5;//How many pixels if scroll we must probide near bounaries
                     if(typeof(value) ==='undefined') {
 
@@ -72,8 +74,6 @@ angular.module('webadminApp')
                         var result = Math.min(scrollPos/availableWidth,1);
                         return result;
                     } else {
-                        value = Math.min(Math.max(value,0),1);
-
                         oldSetValue = value;
                         oldScrollValue = Math.round(value * availableWidth);
 
@@ -335,24 +335,25 @@ angular.module('webadminApp')
                         frame.width(scope.scrollWidth);
                     }
 
-                    // Keep time position
-                    // TODO: In live mode - scroll right
-
 
                     var newPosition = 0;
-                    if(scope.scrolling < 1){ // animating scroll - should scroll
+                    if(scope.scrolling < 1){ // animating scroll at the moment- should scroll
                         newPosition = scope.targetScrollPosition/ (scope.frameWidth - viewportWidth);
                     }else { // Otherwise - keep current position in case of changing width
                         newPosition = screenRelativePositionAndDateToRelativePositionForScroll(keepDate, 0.5);
-                    }
 
-                    // Here we have a problem:we should scroll left a bit if it is not .
+                        // TODO: In live mode - scroll right
+                        // TODO: disable live if view was scrolled
+                    }
+                    newPosition = Math.min(Math.max(newPosition,0),1);
+
+                    scope.disableScrollRight = newPosition > 1 - correctionPrecision;
+                    scope.disableScrollLeft = newPosition < correctionPrecision;
 
                     viewPortScrollRelative(newPosition);
                 }
 
                 function updateView(){
-
                     updateBoundariesAndScroller();
                     updateActualLevel();
                     drawRuler();
@@ -364,8 +365,8 @@ angular.module('webadminApp')
                 scope.disableZoomOut = true;
                 scope.disableZoomIn = false;
 
-                scope.disableScrollRight = false;
-                scope.disableScrollLeft = false;
+                scope.disableScrollRight = true;
+                scope.disableScrollLeft = true;
 
 
                 //animation parameters
@@ -445,10 +446,7 @@ angular.module('webadminApp')
                     animateScope.progress(scope,'scrollPosition');
 
                     scope.disableZoomOut =  scope.actualZoomLevel <= 0;
-
-                    console.warn('fix disablezoomin calculation');
-
-                    scope.disableZoomIn = scope.timelineWidth >= timelineConfig.maxTimeLineWidth || scope.actualLevel >= RulerModel.levels.length-1;
+                    scope.disableZoomIn = scope.actualLevel >= RulerModel.levels.length-1;
                 };
 
                 scope.$watch('records',initTimeline);

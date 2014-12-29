@@ -4,6 +4,9 @@ angular.module('webadminApp')
     .factory('animateScope', ['$q',function ($q) {
 
         var animations = [];
+
+        var defaultDuration = 1000;
+        var defaultScope = null;
         function Animation(scope,value,target,duration){
             this.scope = scope;
             this.value = value;
@@ -66,8 +69,12 @@ angular.module('webadminApp')
         function process() {
             var finished = [];
 
+            var scopes = [];
             _.forEach(animations,function(animation){
                 animation.update();
+                if(scopes.indexOf(animation.scope)<0 && animation.scope !== defaultScope) {
+                    scopes.push(animation.scope);
+                }
                 if(animation.isFinished){
                     finished.push(animation);
                 }
@@ -76,8 +83,13 @@ angular.module('webadminApp')
             _.forEach(finished,function(animation){ // Remove all finished animations
                 animations.splice(animations.indexOf(animation),1);
             });
+
+            _.forEach(scopes,function(scope){
+                console.log("scope",scope);
+                scope.$apply();
+            });
         }
-        function animationFunction(){
+        function animationFunction(digestContext){
             if(!animationRunning) {
                 return;
             }
@@ -85,14 +97,19 @@ angular.module('webadminApp')
             if(typeof(animationHandler)!=='undefined' && animationHandler !== null && animationHandler !== false) {
                 animationHandler();
             }
+            if(defaultScope.$root.$$phase && !digestContext ){
+                console.error("wrong phase",defaultScope.$root.$$phase);
+            }
+            if(defaultScope!=null && !digestContext) {
+                defaultScope.$apply();
+            }
             window.animationFrame(animationFunction);
         }
-        var defaultDuration = 1000;
         return {
             start:function(handler){
                 animationRunning = true;
                 animationHandler = handler;
-                animationFunction();
+                animationFunction(true);
             },
             stop:function(){
                 animationRunning = false;
@@ -119,6 +136,9 @@ angular.module('webadminApp')
             },
             setDuration:function(duration){
                 defaultDuration = duration;
+            },
+            setScope:function(scope){
+                defaultScope = scope;
             }
         };
     }]);

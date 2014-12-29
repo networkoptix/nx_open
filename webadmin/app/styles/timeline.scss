@@ -4,10 +4,7 @@
   width:100%;
   position:relative;
   overflow:hidden;
-  border:1px solid silver;
-  padding:3px 0;
-
-
+  border:1px solid rgb(216,216,216);
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -175,7 +172,7 @@ ng-include{
   transition: color 0.5s, background-color 1s;
 
 
-  width:16px;
+  width:24px;
   top:0px;
   height: 100%;
 }
@@ -201,6 +198,9 @@ ng-include{
 .scroll-btn .glyphicon{
   position:absolute;
   top: 50%;
+  left: 50%;
   height: 16px;
+  width: 16px;
+  margin-left: -8px;
   margin-top: -8px;
 }
