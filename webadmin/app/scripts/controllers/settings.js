@@ -102,6 +102,8 @@ angular.module('webadminApp')
                 alert('Settings saved');
                 if( $scope.settings.port !==  window.location.port ) {
                     window.location.href = window.location.protocol + '//' + window.location.hostname + ':' + $scope.settings.port;
+                }else{
+                    window.location.reload();
                 }
             }
         }
