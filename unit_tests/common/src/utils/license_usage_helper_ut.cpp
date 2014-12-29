@@ -22,7 +22,7 @@ TEST( QnCamLicenseUsageHelperTest, init )
 }
 
 /** Basic test for single license type. */
-TEST( QnCamLicenseUsageHelperTest, singleLicenseType )
+TEST( QnCamLicenseUsageHelperTest, checkSingleLicenseType )
 {
     QnLicensePoolScaffold licPoolScaffold;
 
@@ -120,7 +120,7 @@ TEST( QnCamLicenseUsageHelperTest, borrowDifferentLicenses )
  *  Test for analog encoders politics.
  *  One analog encoder license should allow to record up to camerasPerAnalogEncoder cameras.
  */
-TEST( QnCamLicenseUsageHelperTest, analogEncoderSimple )
+TEST( QnCamLicenseUsageHelperTest, checkAnalogEncoderSimple )
 {
     QnLicensePoolScaffold licPoolScaffold;
     QnResourcePoolScaffold resPoolScaffold;
@@ -141,7 +141,7 @@ TEST( QnCamLicenseUsageHelperTest, analogEncoderSimple )
  *  One license should allow to record up to camerasPerAnalogEncoder cameras 
  *  if and only if they are on the same encoder.
  */
-TEST( QnCamLicenseUsageHelperTest, analogEncoderGroups )
+TEST( QnCamLicenseUsageHelperTest, checkAnalogEncoderGroups )
 {
     QnLicensePoolScaffold licPoolScaffold;
     QnResourcePoolScaffold resPoolScaffold;
@@ -162,7 +162,7 @@ TEST( QnCamLicenseUsageHelperTest, analogEncoderGroups )
  *  Test for borrowing licenses for analog encoders. 
  *  All cameras that missing the analog encoder license should borrow other licenses one-to-one.
  */
-TEST( QnCamLicenseUsageHelperTest, analogEncoderBorrowing )
+TEST( QnCamLicenseUsageHelperTest, borrowForAnalogEncoder )
 {
     QnLicensePoolScaffold licPoolScaffold;
     QnResourcePoolScaffold resPoolScaffold;
@@ -186,7 +186,7 @@ TEST( QnCamLicenseUsageHelperTest, analogEncoderBorrowing )
  *  Test for calculating required licenses for analog encoders. 
  *  For up to camerasPerAnalogEncoder cameras we should require only 1 analog encoder license.
  */
-TEST( QnCamLicenseUsageHelperTest, analogEncoderRequiredLicenses )
+TEST( QnCamLicenseUsageHelperTest, calculateRequiredLicensesForAnalogEncoder )
 {
     QnResourcePoolScaffold resPoolScaffold;
 
