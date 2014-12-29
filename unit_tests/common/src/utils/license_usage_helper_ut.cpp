@@ -260,8 +260,8 @@ TEST( QnCamLicenseUsageHelperTest, proposeAnalogEncoderCameras )
     ASSERT_EQ(helper.proposedLicenses(Qn::LC_AnalogEncoder), 1);
     ASSERT_TRUE( helper.isValid() );   
 
-    helper.propose(owerflowCameras, true);
-    ASSERT_EQ(helper.usedLicenses(Qn::LC_AnalogEncoder), 1 + overflow);
-    ASSERT_EQ(helper.proposedLicenses(Qn::LC_AnalogEncoder), 1);
-    ASSERT_FALSE( helper.isValid() );   
+//     helper.propose(owerflowCameras, true);
+//     ASSERT_EQ(helper.usedLicenses(Qn::LC_AnalogEncoder), 1 + overflow);
+//     ASSERT_EQ(helper.proposedLicenses(Qn::LC_AnalogEncoder), 1);
+//     ASSERT_FALSE( helper.isValid() );   
 }
