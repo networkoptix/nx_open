@@ -150,7 +150,8 @@ bool QnPlSonyResource::startInputPortMonitoringAsync( std::function<void(bool)>&
 {
     QMutexLocker lk( &m_inputPortMutex );
 
-    if( hasFlags(Qn::foreigner) )     //we do not own camera
+    if( hasFlags(Qn::foreigner) ||      //we do not own camera
+        !hasCameraCapabilities(Qn::RelayInputCapability) )
     {
         return false;
     }
