@@ -111,6 +111,10 @@ QnLicense::QnLicense(const QByteArray &licenseBlock)
     loadLicenseBlock( licenseBlock );
 }
 
+QnLicense::~QnLicense()
+{
+}
+
 bool QnLicense::isInfoMode() const
 {
     return m_signature.isEmpty() && m_signature2.isEmpty();
