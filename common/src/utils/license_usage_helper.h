@@ -116,6 +116,8 @@ protected:
 private:
     void init();
 
+    bool cameraRequiresLicense(const QnVirtualCameraResourcePtr &camera, Qn::LicenseType licenseType, bool countProposed) const;
+
     /** 
      *  Utility function to get sets of analog cameras numbers, distributed by the following rules:
      *  - Each set must contain cameras from the same encoder

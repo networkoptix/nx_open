@@ -272,6 +272,22 @@ void QnCamLicenseUsageHelper::init() {
     });
 }
 
+bool QnCamLicenseUsageHelper::cameraRequiresLicense(const QnVirtualCameraResourcePtr &camera, Qn::LicenseType licenseType, bool countProposed) const {
+    if (camera->licenseType() != licenseType) 
+        return false;
+
+    QnMediaServerResourcePtr server = camera->getParentResource().dynamicCast<QnMediaServerResource>();
+    if (!server || server->getStatus() != Qn::Online)
+        return false;
+
+    bool requiresLicense = !camera->isScheduleDisabled();
+    if (countProposed) {
+        requiresLicense &= !m_proposedToDisable.contains(camera);
+        requiresLicense |= m_proposedToEnable.contains(camera);
+    }
+    return requiresLicense;
+}
+
 void QnCamLicenseUsageHelper::propose(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable) {
     if (proposedEnable) {
         m_proposedToEnable.unite(proposedCameras.toSet());
@@ -315,19 +331,7 @@ int QnCamLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType licenseType, 
     } else {
         int count = 0;
         for (const QnVirtualCameraResourcePtr &camera: qnResPool->getResources<QnVirtualCameraResource>()) {
-            if (camera->licenseType() != licenseType) 
-                continue;
-
-            QnMediaServerResourcePtr server = camera->getParentResource().dynamicCast<QnMediaServerResource>();
-            if (!server || server->getStatus() != Qn::Online)
-                continue;
-
-            bool requiresLicense = !camera->isScheduleDisabled();
-            if (countProposed) {
-                requiresLicense &= !m_proposedToDisable.contains(camera);
-                requiresLicense |= m_proposedToEnable.contains(camera);
-            }
-            if (requiresLicense)
+            if (cameraRequiresLicense(camera, licenseType, countProposed))
                 count++;
         }
         return count;
@@ -364,20 +368,7 @@ QList<int> QnCamLicenseUsageHelper::analogEncoderCameraSets(bool countProposed) 
     QHash<QString, int> m_camerasByGroupId;
 
     for (const QnVirtualCameraResourcePtr &camera: qnResPool->getResources<QnVirtualCameraResource>()) {
-        if (camera->licenseType() != Qn::LC_AnalogEncoder) 
-            continue;
-
-        QnMediaServerResourcePtr server = camera->getParentResource().dynamicCast<QnMediaServerResource>();
-        if (!server || server->getStatus() != Qn::Online)
-            continue;
-
-        bool requiresLicense = !camera->isScheduleDisabled();
-        if (countProposed) {
-            requiresLicense &= !m_proposedToDisable.contains(camera);
-            requiresLicense |= m_proposedToEnable.contains(camera);
-        }
-
-        if (requiresLicense)
+        if (cameraRequiresLicense(camera, Qn::LC_AnalogEncoder, countProposed))
             m_camerasByGroupId[camera->getGroupId()]++;
     }
 
@@ -402,6 +393,7 @@ QList<int> QnCamLicenseUsageHelper::analogEncoderCameraSets(bool countProposed) 
 
     return cameraSets;
 }
+
 
 /************************************************************************/
 /* QnVideoWallLicenseUsageHelper                                        */
