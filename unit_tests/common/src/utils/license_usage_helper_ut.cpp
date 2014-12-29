@@ -164,13 +164,16 @@ TEST( QnCamLicenseUsageHelperTest, checkAnalogEncoderGroups )
  */
 TEST( QnCamLicenseUsageHelperTest, borrowForAnalogEncoder )
 {
+    int overflow = 2;
+    ASSERT_LT(overflow, camerasPerAnalogEncoder);   //assert test correctness
+
     QnLicensePoolScaffold licPoolScaffold;
     QnResourcePoolScaffold resPoolScaffold;
 
     QnCamLicenseUsageHelper helper;
     licPoolScaffold.addLicenses(Qn::LC_AnalogEncoder, 1);
 
-    resPoolScaffold.addCameras(Qn::LC_AnalogEncoder, camerasPerAnalogEncoder + 2);
+    resPoolScaffold.addCameras(Qn::LC_AnalogEncoder, camerasPerAnalogEncoder + overflow);
     ASSERT_FALSE( helper.isValid() );
 
     licPoolScaffold.addLicense(Qn::LC_Professional);
@@ -234,4 +237,31 @@ TEST( QnCamLicenseUsageHelperTest, proposeSingleLicenseTypeWithBorrowing )
     ASSERT_EQ(helper.usedLicenses(Qn::LC_Trial), 2);
     ASSERT_EQ(helper.proposedLicenses(Qn::LC_Trial), 2);
     ASSERT_TRUE( helper.isValid() );   
+}
+
+/** Basic test for analog encoder proposing. */
+TEST( QnCamLicenseUsageHelperTest, proposeAnalogEncoderCameras )
+{
+    int overflow = 2;
+    ASSERT_LT(overflow, camerasPerAnalogEncoder);   //assert test correctness
+
+    QnResourcePoolScaffold resPoolScaffold;
+    auto cameras = resPoolScaffold.addCameras(Qn::LC_AnalogEncoder, camerasPerAnalogEncoder, false);
+    auto owerflowCameras = resPoolScaffold.addCameras(Qn::LC_AnalogEncoder, overflow, false);
+
+    QnCamLicenseUsageHelper helper;
+    ASSERT_TRUE( helper.isValid() );
+
+    QnLicensePoolScaffold licPoolScaffold;
+    licPoolScaffold.addLicenses(Qn::LC_AnalogEncoder, 1);
+
+    helper.propose(cameras, true);
+    ASSERT_EQ(helper.usedLicenses(Qn::LC_AnalogEncoder), 1);
+    ASSERT_EQ(helper.proposedLicenses(Qn::LC_AnalogEncoder), 1);
+    ASSERT_TRUE( helper.isValid() );   
+
+    helper.propose(owerflowCameras, true);
+    ASSERT_EQ(helper.usedLicenses(Qn::LC_AnalogEncoder), 1 + overflow);
+    ASSERT_EQ(helper.proposedLicenses(Qn::LC_AnalogEncoder), 1);
+    ASSERT_FALSE( helper.isValid() );   
 }
