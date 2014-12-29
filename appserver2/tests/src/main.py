@@ -2394,7 +2394,10 @@ class RRRtspTcpBasic:
     def _response(self):
         ret = ""
         while True:
-            data = self._socket.recv(1024)
+            try:
+                data = self._socket.recv(1024)
+            except socket.error,e:
+                return "This is not RTSP error but socket error:%s"%(e)
             if not data:
                 return ret
             else:
@@ -2821,7 +2824,7 @@ class SingleServerRtspPerf(SingleServerRtspTestBase):
                 socket.setblocking(1)
                 return None
 
-    def _dumpHelper(self,c,tcp_rtsp,timeout,dump,rate):
+    def _dumpArchiveHelper(self,c,tcp_rtsp,timeout,dump,rate):
         for _ in xrange(timeout):
             try:
                 data = self._timeoutRecv(tcp_rtsp._socket,rate,3)
@@ -2866,6 +2869,58 @@ class SingleServerRtspPerf(SingleServerRtspTestBase):
             print "--------------------------------------------"
         return
 
+
+    def _dumpStreamHelper(self,c,tcp_rtsp,timeout,dump,rate):
+        elapsed = 0.0
+        while True:
+            begin = time.clock()
+            try:
+                data = self._timeoutRecv(tcp_rtsp._socket,rate,3)
+                if dump is not None:
+                    dump.write(data)
+                    dump.flush
+            except:
+                continue
+            
+            if data == None:
+                with self._lock:
+                    print "--------------------------------------------"
+                    print "The RTSP url:%s 3 seconds not response with any data" % (tcp_rtsp._url)
+                    print "--------------------------------------------"
+                    self._perfLog.write("--------------------------------------------\n")
+                    self._perfLog.write("This is an exceptional case,the server _SHOULD_ not terminate the connection\n")
+                    self._perfLog.write("The RTSP/RTP url:%s 3 seconds not response with any data\n" % (tcp_rtsp._url))
+                    self._perfLog.write("Camera name:%s\n" % (c[2]))
+                    self._perfLog.write("Camera Physical Id:%s\n" % (c[0]))
+                    self._perfLog.write("Camera Id:%s\n" % (c[1]))
+                    self._perfLog.write("--------------------------------------------\n")
+                    self._perfLog.flush()
+                return
+            elif not data:
+                with self._lock:
+                    print "--------------------------------------------"
+                    print "The RTSP url:%s manully close the connection" % (tcp_rtsp._url)
+                    print "--------------------------------------------"
+                    self._perfLog.write("--------------------------------------------\n")
+                    self._perfLog.write("This is an exceptional case,the server _SHOULD_ not terminate the connection\n")
+                    self._perfLog.write("The RTSP/RTP url:%s manully close the connection\n" % (tcp_rtsp._url))
+                    self._perfLog.write("Camera name:%s\n" % (c[2]))
+                    self._perfLog.write("Camera Physical Id:%s\n" % (c[0]))
+                    self._perfLog.write("Camera Id:%s\n" % (c[1]))
+                    self._perfLog.write("--------------------------------------------\n")
+                    self._perfLog.flush()
+                return
+
+            end = time.clock()
+            elapsed += (end-begin)
+
+            if elapsed >= timeout:
+                with self._lock:
+                    print "--------------------------------------------"
+                    print "The RTP sink normally timeout with:%d on RTSP url:%s" % (timeout,tcp_rtsp._url)
+                    print "--------------------------------------------"
+                return
+
     def _buildUrlPath(self,url):
         l = len(url)
         buf = []
@@ -2886,12 +2941,12 @@ class SingleServerRtspPerf(SingleServerRtspTestBase):
 
         return ''.join(buf)
 
-    def _dump(self,c,tcp_rtsp,timeout,dump,rate):
+    def _dump(self,c,tcp_rtsp,timeout,dump,rate,helper):
         if dump :
             with open(self._buildUrlPath(tcp_rtsp._url),"w+") as f:
-                self._dumpHelper(c,tcp_rtsp,timeout,f,rate)
+                helper(c,tcp_rtsp,timeout,f,rate)
         else:
-            self._dumpHelper(c,tcp_rtsp,timeout,None,rate)
+            helper(c,tcp_rtsp,timeout,None,rate)
 
     # Represent a streaming TASK on the camera
     def _main_streaming(self,c,dump):
@@ -2907,7 +2962,7 @@ class SingleServerRtspPerf(SingleServerRtspTestBase):
         with obj as reply:
             # 1.  Check the reply here
             if self._checkRtspRequest(c,reply):
-                self._dump(c,obj,random.randint(self._timeoutMin,self._timeoutMax),dump,-1)
+                self._dump(c,obj,random.randint(self._timeoutMin,self._timeoutMax),dump,-1,self._dumpStreamHelper)
                 self._streamNumOK = self._streamNumOK + 1
             else:
                 self._streamNumFail = self._streamNumFail + 1
@@ -2925,7 +2980,7 @@ class SingleServerRtspPerf(SingleServerRtspTestBase):
         with obj as reply:
             # 1.  Check the reply here
            if self._checkRtspRequest(c,reply):
-                self._dump(c,obj,random.randint(self._timeoutMin,self._timeoutMax),dump,self.ARCHIVE_STREAM_RATE)
+                self._dump(c,obj,random.randint(self._timeoutMin,self._timeoutMax),dump,self.ARCHIVE_STREAM_RATE,self._dumpArchiveHelper)
                 self._archiveNumOK = self._archiveNumOK + 1
            else:
                self._archiveNumFail = self._archiveNumFail + 1
