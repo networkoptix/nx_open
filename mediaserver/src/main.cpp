@@ -182,6 +182,7 @@ static const quint64 DEFAULT_MAX_LOG_FILE_SIZE = 10*1024*1024;
 static const quint64 DEFAULT_LOG_ARCHIVE_SIZE = 25;
 static const quint64 DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
+static const QString REMOVE_DB_PARAM_NAME(lit("removeDbOnStartup"));
 
 class QnMain;
 static QnMain* serviceMainInstance = 0;
@@ -763,6 +764,12 @@ void initAppServerConnection(QSettings &settings)
         if (!staticDBPath.isEmpty()) {
             params.addQueryItem("staticdb_path", staticDBPath);
 		}
+        if (MSSettings::roSettings()->value(REMOVE_DB_PARAM_NAME).toBool())
+        {
+            QUrlQuery urlQuery(appServerUrl.query());
+            urlQuery.addQueryItem("cleanupDb", QString());
+            appServerUrl.setQuery(urlQuery);
+        }
     }
 
     // TODO: Actually appserverPassword is always empty. Remove?
@@ -830,8 +837,10 @@ void QnMain::at_restartServerRequired()
 void QnMain::at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender)
 {
     MSSettings::roSettings()->setValue("systemIndentityTime", value);
-    if (sender != qnCommon->moduleGUID())
+    if (sender != qnCommon->moduleGUID()) {
+        MSSettings::roSettings()->setValue(REMOVE_DB_PARAM_NAME, "1");
         restartServer();
+    }
 }
 
 void QnMain::stopSync()
@@ -1457,6 +1466,8 @@ void QnMain::run()
         NX_LOG( QString::fromLatin1("Can't connect to local EC2. %1").arg(ec2::toString(errorCode)), cl_logERROR );
         QnSleep::msleep(3000);
     }
+    MSSettings::roSettings()->setValue(REMOVE_DB_PARAM_NAME, "0");
+
     connect(ec2Connection.get(), &ec2::AbstractECConnection::databaseDumped, this, &QnMain::at_restartServerRequired);
     qnCommon->setRemoteGUID(QnUuid(connectInfo.ecsGuid));
     MSSettings::roSettings()->sync();
@@ -1956,8 +1967,6 @@ void QnMain::run()
     
     //disconnecting from EC2
     QnAppServerConnectionFactory::setEc2Connection( ec2::AbstractECConnectionPtr() );
-
-    ec2Connection->removeDatabaseFile();
 
     ec2Connection.reset();
     QnAppServerConnectionFactory::setEC2ConnectionFactory( nullptr );

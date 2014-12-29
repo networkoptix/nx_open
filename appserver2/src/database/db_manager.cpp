@@ -290,7 +290,9 @@ bool QnDbManager::init(
     m_sdb.setDatabaseName( dbFileName);
 
     QString backupDbFileName = dbFileName + QString::fromLatin1(".backup");
-    if (QFile::exists(backupDbFileName)) {
+    bool needCleanup = true;
+    if (QFile::exists(backupDbFileName) || needCleanup) 
+    {
         QFile::remove(dbFileName);
         if (QFile::rename(backupDbFileName, dbFileName)) {
             m_needResyncLog = true;

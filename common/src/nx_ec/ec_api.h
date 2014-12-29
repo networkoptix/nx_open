@@ -1117,8 +1117,6 @@ namespace ec2
             \warning Request handler may still be called after return of this method, since request could already have been completed and resulte posted to handler
         */
         //virtual void cancelRequest( int requestID ) = 0;
-
-        virtual bool removeDatabaseFile();
     signals:
         //!Delivers all resources found in Server
         /*!

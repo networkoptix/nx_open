@@ -35,8 +35,6 @@ namespace ec2
 
         virtual void startReceivingNotifications() override;
         virtual void stopReceivingNotifications() override;
-    protected:
-        virtual bool removeDatabaseFile() override { return false; }
     private:
         FixedUrlClientQueryProcessorPtr m_queryProcessor;
         const QnConnectionInfo m_connectionInfo;
