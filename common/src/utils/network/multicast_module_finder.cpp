@@ -55,6 +55,7 @@ QnMulticastModuleFinder::~QnMulticastModuleFinder() {
 }
 
 bool QnMulticastModuleFinder::isValid() const {
+    QMutexLocker lk(&m_mutex);
     return !m_clientSockets.empty();
 }
 
@@ -67,6 +68,8 @@ void QnMulticastModuleFinder::setCompatibilityMode(bool compatibilityMode) {
 }
 
 void QnMulticastModuleFinder::updateInterfaces() {
+    QMutexLocker lk(&m_mutex);
+
     QList<QHostAddress> addressesToRemove = m_clientSockets.keys();
 
     /* This function only adds interfaces to the list. */
@@ -239,10 +242,10 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
     QnModuleInformation moduleInformation = response.toModuleInformation();
     QnNetworkAddress address(QHostAddress(remoteAddressStr), moduleInformation.port);
 
+    QMutexLocker lk(&m_mutex);
+
     if (m_ignoredModules.contains(address, moduleInformation.id))
         return false;
-
-    QMutexLocker lk(&m_mutex);
 
     QnModuleInformation &oldModuleInformation = m_foundModules[moduleInformation.id];
 
@@ -343,6 +346,8 @@ void QnMulticastModuleFinder::run() {
         currentClock = QDateTime::currentMSecsSinceEpoch();
 
         if (currentClock - m_prevPingClock >= m_pingTimeoutMillis) {
+            QMutexLocker lk(&m_mutex);
+
             //sending request via each socket
             for (UDPSocket *socket: m_clientSockets) {
                 if (!socket->send(searchPacket, searchPacketBufStart - searchPacket)) {
@@ -411,6 +416,7 @@ void QnMulticastModuleFinder::run() {
         }
     }
 
+    QMutexLocker lk(&m_mutex);
     for (UDPSocket *socket: m_clientSockets)
         m_pollSet.remove( socket->implementationDelegate(), aio::etRead );
     if (m_serverSocket)
