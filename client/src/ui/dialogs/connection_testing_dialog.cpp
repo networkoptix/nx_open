@@ -139,7 +139,6 @@ void QnConnectionTestingDialog::at_ecConnection_result(int reqID, ec2::ErrorCode
             helpTopicId = Qn::VersionMismatch_Help;
         }
     } else if (connectionInfo.nxClusterProtoVersion != nx_ec::EC2_PROTO_VERSION) {
-        success = false;
         QString olderComponent = connectionInfo.nxClusterProtoVersion < nx_ec::EC2_PROTO_VERSION
             ? tr("Server")
             : tr("Client");
