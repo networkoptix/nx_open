@@ -234,7 +234,10 @@ TEST( QnCamLicenseUsageHelperTest, proposeSingleLicenseTypeWithBorrowing )
     ASSERT_TRUE( helper.isValid() );   
 }
 
-/** Basic test for analog encoder proposing. */
+/** 
+ *  Basic test for analog encoder proposing. 
+ *  Valid helper should have correct proposedLicenses count.
+ */
 TEST( QnCamLicenseUsageHelperTest, proposeAnalogEncoderCameras )
 {
     QnResourcePoolScaffold resPoolScaffold;
@@ -250,7 +253,10 @@ TEST( QnCamLicenseUsageHelperTest, proposeAnalogEncoderCameras )
     ASSERT_TRUE( helper.isValid() );   
 }
 
-/** Basic test for analog encoder proposing with overflow. */
+/** 
+ *  Basic test for analog encoder proposing with overflow. 
+ *  Invalid helper should have correct requiredLicenses count.
+ */
 TEST( QnCamLicenseUsageHelperTest, proposeAnalogEncoderCamerasOverflow )
 {
     int overflow = 2;

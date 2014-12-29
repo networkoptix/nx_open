@@ -28,12 +28,12 @@ public:
      *  Get text "Activate %n more licenses" or "%n more licenses will be used" if valid for the selected type.
      */
 
-    QString getRequiredLicenseMsg(Qn::LicenseType licenseType) const;
+    QString getRequiredText(Qn::LicenseType licenseType) const;
 
     /** 
      *  Get text "Activate %n more licenses" or "%n more licenses will be used" if valid for all types.
      */
-    QString getRequiredLicenseMsg() const;
+    QString getRequiredMsg() const;
 
     /**
      *  Get text "%n licenses are used out of %n." for the selected type.
@@ -43,7 +43,7 @@ public:
     /**
      *  Get text "%n licenses are used out of %n." for all types.
      */
-    QString getUsageText() const;
+    QString getUsageMsg() const;
 
     /**
      *  Get text "%n licenses will be used out of %n." for the selected type.
@@ -53,18 +53,24 @@ public:
     /**
      *  Get text "%n licenses will be used out of %n." for all types.
      */
-    QString getProposedUsageText() const;
+    QString getProposedUsageMsg() const;
 
     /** Number of valid licenses of the selected type. */
     int totalLicenses(Qn::LicenseType licenseType) const;
 
-    /** Number of licenses of the selected type currently in use. */
+    /** Number of licenses of the selected type currently in use (including proposed). */
     int usedLicenses(Qn::LicenseType licenseType) const;
 
-    /** Number of licenses of the selected type lacking for system to work. */
+    /** 
+     *  Number of licenses of the selected type lacking for system to work. 
+     *  Always equals to 0 of the helper is valid.
+     */
     int requiredLicenses(Qn::LicenseType licenseType) const;
 
-    /** Number of licenses that are proposed to be used. */
+    /**
+     *  Number of licenses that are proposed to be used.
+     *  Makes no sense if the helper is NOT valid.
+     */
     int proposedLicenses(Qn::LicenseType licenseType) const;
 
     virtual QList<Qn::LicenseType> licenseTypes() const;
@@ -86,7 +92,6 @@ protected:
     
 private:
     int borrowLicenses(const LicenseCompatibility &compat, licensesArray &licenses);
-    int borrowLicenseFromClass(int& srcUsed, int srcTotal, int& dstUsed, int dstTotal);
 
 private:
     QnLicenseListHelper m_licenses;
