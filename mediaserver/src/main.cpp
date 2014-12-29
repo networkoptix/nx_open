@@ -1271,8 +1271,6 @@ bool QnMain::initTcpListener()
     m_universalTcpListener->addHandler<QnDesktopCameraRegistrator>("HTTP", "desktop_camera");
 #endif   //ENABLE_DESKTOP_CAMERA
 
-    m_universalTcpListener->start();
-
     return true;
 }
 
@@ -1482,7 +1480,6 @@ void QnMain::run()
              QnSyncTime::instance(), (void(QnSyncTime::*)(qint64))&QnSyncTime::updateTime );
 
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
-    QnMServerResourceSearcher::instance()->start();
 
     //Initializing plugin manager
     PluginManager::instance()->loadPlugins();
@@ -1651,7 +1648,6 @@ void QnMain::run()
 
 
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
-    QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);
 
     bool compatibilityMode = cmdLineArguments.devModeKey == lit("razrazraz");
@@ -1691,16 +1687,7 @@ void QnMain::run()
     }
 
     QScopedPointer<QnServerConnector> serverConnector(new QnServerConnector(m_moduleFinder));
-    serverConnector->start();
 
-    QUrl url = ec2Connection->connectionInfo().ecUrl;
-#if 1
-    if (url.scheme() == "file") {
-        // Connect to local database. Start peer-to-peer sync (enter to cluster mode)
-        qnCommon->setCloudMode(true);
-        m_moduleFinder->start();
-    }
-#endif
     // ------------------------------------------
 
     QScopedPointer<QnRouter> router(new QnRouter(m_moduleFinder, false));
@@ -1867,6 +1854,18 @@ void QnMain::run()
     m_dumpSystemResourceUsageTaskID = TimerManager::instance()->addTimer(
         std::bind( &QnMain::dumpSystemUsageStats, this ),
         SYSTEM_USAGE_DUMP_TIMEOUT );
+    
+    QnRecordingManager::instance()->start();
+    QnMServerResourceSearcher::instance()->start();
+    m_universalTcpListener->start();
+	serverConnector->start();
+#if 1
+    if (ec2Connection->connectionInfo().ecUrl.scheme() == "file") {
+        // Connect to local database. Start peer-to-peer sync (enter to cluster mode)
+        qnCommon->setCloudMode(true);
+        m_moduleFinder->start();
+    }
+#endif
 
     exec();
 

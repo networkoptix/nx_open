@@ -277,7 +277,7 @@ void initLog(
     QString logFileName = logFileLocation + QLatin1String("/log_file") + fileNameSuffix;
     if (!QDir().mkpath(logFileLocation))
         cl_log.log(lit("Could not create log folder: ") + logFileLocation, cl_logALWAYS);
-    if (!cl_log.create(logFileName, DEFAULT_MAX_LOG_FILE_SIZE, DEFAULT_MSG_LOG_ARCHIVE_SIZE, cl_logDEBUG1))
+    if (!cl_log.create(logFileName, DEFAULT_MAX_LOG_FILE_SIZE, DEFAULT_MSG_LOG_ARCHIVE_SIZE, QnLog::instance()->logLevel()))
         cl_log.log(lit("Could not create log file") + logFileName, cl_logALWAYS);
     cl_log.log(QLatin1String("================================================================================="), cl_logALWAYS);
 

@@ -159,9 +159,6 @@ class ClusterTest():
         print "======================================"
         return (True,"Server:%s test for all getter pass" % (s))
 
-    def __init__(self):
-        self._setUpPassword()
-
     def _getServerName(self,obj,uuid):
         for s in obj:
             if s["id"] == uuid:
@@ -403,6 +400,8 @@ class ClusterTest():
         urllib2.install_opener(urllib2.build_opener(urllib2.HTTPDigestAuthHandler(passman)))
 
     def init(self):
+        self._setUpPassword()
+
         if not self._testConnection():
             return (False,"Connection test failed")
 
@@ -3651,38 +3650,129 @@ class SystemNameTest:
         print "SystemName test rollback done"
         print "========================================="
 
-helpStr = ("Usage:\n\n"
-    "--perf --type=type-list: Start performance test.User can use ctrl+c to interrupt the perf test and statistic will be displayed.User can also specify configuration parameters " 
-    "for performance test. You also _NEED_ specify option as --type=Camera,User to indicate what to test.Eg --perf --type=User will only test User performance, while " 
-    "--perf --type=User,Camera will test User/Camera both in terms of the performance on each server"
-    "In ec2_tests.cfg file,\n[PerfTest]\nfrequency=1000\ncreateProb=0.5\n, the frequency means at most how many operations will be issued on each" 
-    "server in one seconds(not guaranteed,bottleneck is CPU/Bandwidth for running this script);and createProb=0.5 means the creation operation will be performed as 0.5 "
-    "probability, and it implicitly means the modification operation will be performed as 0.5 probability \n\n" 
-    "--clear: Clear all the Cameras/MediaServers/Users on all the servers.It will not delete admin user. You could specify --fake option as second parameter, eg:" 
-    "--clear --fake. This will remove all the resources that has name prefixed with ec2_test which is the generated data name pattern\n\n" 
-    "--sync: Test all the servers are on the same page or not.This test will perform regarding the existed ec2 REST api, for example " 
-    ", no layout API is supported, then this test cannot test whether 2 servers has exactly same layouts  \n\n" 
-    "--recover: Recover from last rollback failure. If you see rollback failed for the last run, you can run this option next time to recover from " 
-    "the last rollback error specifically. Or you could run any other cases other than --help/--recover,the recover will be performed automatically as well. \n\n" 
-    "--merge-test: Test server merge. The user needs to specify more than one server in the config file. This test will temporarilly change the server system name," 
-    "currently I assume such change will NOT modify the server states. Once the merge test finished, the system name for each server will be recover automatically.\n\n" 
-    "--rtsp-test: Test the rtsp streaming. The user needs to specify section [Rtsp] in side of the config file and also " 
-    "testSize attribute in it , eg: \n[Rtsp]\ntestSize=100\n Which represent how many test case performed on EACH server.\n\n" 
-    "--add=Camera/MediaServer/User --count=num: Add a fake Camera/MediaServer/User to the server you sepcify in the list. The --count " 
-    "option MUST be specified , so a working example is like: --add=Camera --count=500 . This will add 500 cameras(fake) into "
-    "the server.\n\n"
-    "--remove=Camera/MediaServer/User (--id=id)*: Remove a Camera/MediaServer/User with id OR remove all the resources.The user can "
-    "specify --id option to enable remove a single resource, eg : --remove=MediaServer --id={SomeGUID} , and --remove=MediaServer will remove " 
-    "all the media server.\nNote: --add/--remove will perform the corresponding operations on a random server in the server list if the server list "
-    "have more than one server.You could specify the --fake as the second option,eg: --remove=Camera --fake .This will remove all the cameras that " 
-    "has name prefixed with ec2_test which is name pattern for generated cameras\n\n" 
-    "If no parameter is specified, the default automatic test will performed.This includes add/update/remove Cameras/MediaServer/Users and also add/update " 
-    "user attributes list , server attributes list and resource parameter list. Additionally , the confliction test will be performed as well, it includes " 
-    "modify a resource on one server and delete the same resource on another server to trigger confliction.Totally 9 different test cases will be performed in this " 
-    "run.Currently, all the modification/deletion will only happened on fake data, and after the whole testing finished, the fake data will be wiped out so " 
-    "the old database should not be modified.The user can specify configuration parameter in ec2_tests.cfg file, eg:\n[General]\ntestCaseSize=200\nclusterTestSleepTime=10\n "
-    "this options will make each test case in 9 cases run on each server 200 times. Additionally clusterTestSleepTime represent after every 200 operations, how long should I "
-    "wait and then perform sync operation to check whether all the server get the notification")
+def showHelp():
+    helpMenu = {
+        "perf":("Run performance test",(
+            "Usage: python main.py --perf --type=... \n\n"
+            "This command line will start built-in performance test\n"
+            "The --type option is used to specify what kind of resource you want to profile.\n"
+            "Currently you could specify Camera and User, eg : --type=Camera,User will test on Camera and User both;\n"
+            "--type=User will only do performance test on User resources")),
+        "clear":("Clear resources",(
+            "Usage: python main.py --clear \npython main.py --fake\n\n"
+            "This command is used to clear the resource in server list.\n"
+            "The resource includes Camera,MediaServer and Users.\n"
+            "The --fake option is a flag to tell the command _ONLY_ clear\n "
+            "resource that has name prefixed with \"ec2_test\".\n"
+            "This name pattern typically means the data generated by the automatic test\n")),
+        "sync":("Test cluster is sycnchronized or not",(
+            "Usage: python main.py --sync \n\n"
+            "This command is used to test whether the cluster has synchronized states or not.")),
+        "recover":("Recover from previous fail rollback",(
+            "Usage: python main.py --recover \n\n"
+            "This command is used to try to recover from previous failed rollback.\n"
+            "Each rollback will based on a file .rollback.However rollback may failed.\n"
+            "The failed rollback transaction will be recorded in side of .rollback file as well.\n"
+            "Every time you restart this program, you could specify this command to try\n "
+            "to recover the failed rollback transaction.\n"
+            "If you are running automatic test,the recover will be detected automatically and \n"
+            "prompt for you to choose whether recover or not")),
+        "merge-test":("Run merge test",(
+            "Usage: python main.py --merge-test \n\n"
+            "This command is used to run merge test speicifically.\n"
+            "This command will run admin user password merge test and resource merge test.\n")),
+        "merge-admin":("Run merge admin user password test",(
+            "Usage: python main.py --merge-admin \n\n"
+            "This command is used to run run admin user password merge test directly.\n"
+            "This command will be removed later on")),
+        "rtsp-test":("Run rtsp test",(
+            "Usage: python main.py --rtsp-test \n\n"
+            "This command is used to run RTSP Test test.It means it will issue RTSP play command,\n"
+            "and wait for the reply to check the status code.\n"
+            "User needs to set up section in ec2_tests.cfg file: [Rtsp]\ntestSize=40\n"
+            "The testSize is configuration parameter that tell rtsp the number that it needs to perform \n"
+            "RTSP test on _EACH_ server.Therefore,the above example means 40 random RTSP test on each server.\n")),
+        "add":("Resource creation",(
+            "Usage: python main.py --add=... --count=... \n\n"
+            "This command is used to add different generated resources to servers.\n"
+            "3 types of resource is available: MediaServer,Camera,User. \n"
+            "The --add parameter needs to be specified the resource type. Eg: --add=Camera \n"
+            "means add camera into the server, --add=User means add user to the server.\n"
+            "The --count option is used to tell the size that you wish to generate that resources.\n"
+            "Eg: main.py --add=Camera --count=100           Add 100 cameras to each server in server list.\n")),
+        "remove":("Resource remove",(
+            "Usage: python main.py --remove=Camera --id=... \n"
+            "Usage: python main.py --remove=Camera --fake \n\n"
+            "This command is used to remove resource on each servers.\n"
+            "The --remove needs to be specified required resource type.\n"
+            "3 types of resource is available: MediaServer,Camera,User. \n"
+            "The --id option is optinoal, if it appears, you need to specify a valid id following.\n"
+            "It is used to delete specific resource. \n"
+            "Optionally, you could specify --fake flag , if this flag is on, then the remove will only "
+            "remove resource that has name prefixed with ec2_test which typically means fake resource")),
+        "auto-test":("Automatic test",(
+            "Usage: python main.py \n\n"
+            "This command is used to run built-in automatic test.\n"
+            "The automatic test includes 11 types of test and they will be runed automatically."
+            "The configuration parameter is as follow: \n"
+            "threadNumber                  The thread number that will be used to fire operations\n"
+            "mergeTestTimeout              The timeout for merge test\n"
+            "clusterTestSleepTime          The timeout for other auto test\n"
+            "All the above configuration parameters needs to be defined in the General section.\n"
+            "The test will try to rollback afterwards and try to recover at first.\n"
+            "Also the sync operation will be performed before any test\n")),
+        "rtsp-perf":("Rtsp performance test",(
+            "Usage: python main.py --rtsp-perf \n\n"
+            "This command is used to run rtsp performance test.\n"
+            "The test will try to check RTSP status and then connect to the server \n"
+            "and main the connection to receive RTP packet for several times. The request \n"
+            "includes archive and real time streaming.\n"
+            "The configuration parameter is listed below:"
+            "threadNumbers    A comma separate list to specify how many list each server is required \n"
+            "The component number must be the same as component in serverList. Eg: threadNumbers=10,2,3 \n"
+            "This means that the first server in serverList will have 10 threads,second server 2,third 3.\n\n"
+            "archiveDiffMax       The time difference upper bound for archive request, in minutes \n"
+            "archiveDiffMin       The time difference lower bound for archive request, in minutes \n"
+            "timeoutMax           The timeout upper bound for each RTP receiving, in seconds. \n"
+            "timeoutMin           The timeout lower bound for each RTP receiving, in seconds. \n"
+            "Notes: All the above parameters needs to be specified in configuration file:ec2_tests.cfg under \n"
+            "section Rtsp.\nEg:[Rtsp]\nthreadNumbers=10,2\narchiveDiffMax=..\nardchiveDiffMin=....\n"
+            )),
+        "sys-name":("System name test",(
+            "Usage: python main.py --sys-name \n\n"
+            "This command will perform system name test for each server.\n"
+            "The system name test is , change each server in cluster to another system name,\n"
+            "and check each server that whether all the other server is offline and only this server is online.\n"
+            ))
+        }
+
+    if len(sys.argv) == 2:
+        helpStrHeader=("Help for auto test tool\n\n"
+                 "*****************************************\n"
+                 "**************Function Menu**************\n"
+                 "*****************************************\n"
+                 "Entry            Introduction            \n")
+
+        print helpStrHeader
+
+        for k,v in helpMenu.iteritems():
+            print "%s:\t%s"%(k,v[0])
+
+        helpStrFooter = ("\n\nTo see detail help information,run command:\n"
+               "python main.py --help EntryName\n"
+               "Eg: python main.py --help auto-test\n"
+               "This will list detail information about auto-test\n")
+
+        print helpStrFooter
+    else:
+        option = sys.argv[2]
+        if option in helpMenu:
+            print "==================================="
+            print option
+            print "===================================\n\n"
+            print helpMenu[option][1]
+        else:
+            print "Option:%s is not found !"%(option)
 
 def doCleanUp():
     selection = None
@@ -3699,8 +3789,8 @@ def doCleanUp():
         print "Skip ROLLBACK,you could use --recover to perform manually rollback"
             
 if __name__ == '__main__':
-    if len(sys.argv) == 2 and sys.argv[1] == '--help':
-        print helpStr
+    if len(sys.argv) >= 2 and sys.argv[1] == '--help':
+        showHelp()
     elif len(sys.argv) == 2 and sys.argv[1] == '--recover':
         UnitTestRollback().doRecover()
     elif len(sys.argv) == 2 and sys.argv[1] == '--sys-name':
