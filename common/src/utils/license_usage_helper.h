@@ -1,6 +1,7 @@
 #ifndef LICENSE_USAGE_HELPER_H
 #define LICENSE_USAGE_HELPER_H
 
+#include <array>
 #include <core/resource/resource_fwd.h>
 #include <licensing/license.h>
 
@@ -8,10 +9,14 @@
 
 static const QString QN_LICENSE_URL(lit("http://licensing.networkoptix.com/nxlicensed/activate.php"));
 
+struct LicenseCompatibility;
+
 class QnLicenseUsageHelper: public Connective<QObject>
 {
     Q_OBJECT
     typedef  Connective<QObject> base_type;
+
+    typedef std::array<int, Qn::LC_Count> licensesArray;
 public:
     QnLicenseUsageHelper(QObject *parent = NULL);
 
@@ -74,20 +79,23 @@ signals:
      void licensesChanged();
 
 protected:
-    void borrowLicenseFromClass(int& srcUsed, int srcTotal, int& dstUsed, int dstTotal, int& borrowed);
-    virtual int calculateUsedLicenses(Qn::LicenseType licenseType, int totalLicenses, bool countProposed = true) const = 0;
-    virtual int calculateOverflowLicenses(Qn::LicenseType licenseType, int totalLicenses, int borrowedLicenses) const;
-    virtual int calculateProposedLicenses(Qn::LicenseType licenseType) const = 0;
+    virtual int calculateUsedLicenses(Qn::LicenseType licenseType, bool countProposed = true) const = 0;
+    virtual int calculateOverflowLicenses(Qn::LicenseType licenseType, int borrowedLicenses) const;
 
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const = 0;
     
 private:
+    int borrowLicenses(const LicenseCompatibility &compat, licensesArray &licenses);
+    int borrowLicenseFromClass(int& srcUsed, int srcTotal, int& dstUsed, int dstTotal);
+
+private:
     QnLicenseListHelper m_licenses;
     mutable QList<Qn::LicenseType> m_licenseTypes;
 
-    int m_usedLicenses[Qn::LC_Count];
-    int m_proposedLicenses[Qn::LC_Count];
-    int m_overflowLicenses[Qn::LC_Count];
+    licensesArray m_totalLicenses;
+    licensesArray m_usedLicenses;
+    licensesArray m_proposedLicenses;
+    licensesArray m_overflowLicenses;
 };
 
 class QnCamLicenseUsageHelper: public QnLicenseUsageHelper {
@@ -102,9 +110,8 @@ public:
     bool isOverflowForCamera(const QnVirtualCameraResourcePtr &camera);
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
-    virtual int calculateUsedLicenses(Qn::LicenseType licenseType, int totalLicenses, bool countProposed = true) const override;
-    virtual int calculateOverflowLicenses(Qn::LicenseType licenseType, int totalLicenses, int borrowedLicenses) const override;
-    virtual int calculateProposedLicenses(Qn::LicenseType licenseType) const override;
+    virtual int calculateUsedLicenses(Qn::LicenseType licenseType, bool countProposed = true) const override;
+    virtual int calculateOverflowLicenses(Qn::LicenseType licenseType, int borrowedLicenses) const override;
 
 private:
     void init();
@@ -134,8 +141,7 @@ public:
     static int licensesForScreens(int screens);
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
-    virtual int calculateUsedLicenses(Qn::LicenseType licenseType, int totalLicenses, bool countProposed = true) const override;
-    virtual int calculateProposedLicenses(Qn::LicenseType licenseType) const override;
+    virtual int calculateUsedLicenses(Qn::LicenseType licenseType, bool countProposed = true) const override;
 
 private:
     int m_proposed;
