@@ -123,7 +123,7 @@ private:
      *  Camera sets then reduced to just number of cameras in the set.
      *  Result is sorted in reversed order (from biggest sets to smallest).
      */
-    QList<int> analogEncoderCameraSets() const;
+    QList<int> analogEncoderCameraSets(bool countProposed) const;
 
     QSet<QnVirtualCameraResourcePtr> m_proposedToEnable;
     QSet<QnVirtualCameraResourcePtr> m_proposedToDisable;

@@ -302,7 +302,7 @@ QList<Qn::LicenseType> QnCamLicenseUsageHelper::calculateLicenseTypes() const {
 int QnCamLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType licenseType, bool countProposed) const {
     if (licenseType == Qn::LC_AnalogEncoder) {
 
-        QList<int> cameraSets = analogEncoderCameraSets();
+        QList<int> cameraSets = analogEncoderCameraSets(countProposed);
         int total = totalLicenses(licenseType);
 
         /* If we have enough licenses for all the encoders, return max value. */
@@ -338,7 +338,7 @@ int QnCamLicenseUsageHelper::calculateOverflowLicenses(Qn::LicenseType licenseTy
     if (licenseType != Qn::LC_AnalogEncoder)
         return base_type::calculateOverflowLicenses(licenseType, borrowedLicenses);
 
-    QList<int> cameraSets = analogEncoderCameraSets();
+    QList<int> cameraSets = analogEncoderCameraSets(true);
     int total = totalLicenses(licenseType);
 
     /* If we have enough licenses for all the encoders, return max value. */
@@ -360,17 +360,25 @@ int QnCamLicenseUsageHelper::calculateOverflowLicenses(Qn::LicenseType licenseTy
     return cameraSets.size();
 }
 
-QList<int> QnCamLicenseUsageHelper::analogEncoderCameraSets() const {
+QList<int> QnCamLicenseUsageHelper::analogEncoderCameraSets(bool countProposed) const {
     QHash<QString, int> m_camerasByGroupId;
 
     for (const QnVirtualCameraResourcePtr &camera: qnResPool->getResources<QnVirtualCameraResource>()) {
-        if (camera->isScheduleDisabled() || camera->licenseType() != Qn::LC_AnalogEncoder) 
+        if (camera->licenseType() != Qn::LC_AnalogEncoder) 
             continue;
 
         QnMediaServerResourcePtr server = camera->getParentResource().dynamicCast<QnMediaServerResource>();
         if (!server || server->getStatus() != Qn::Online)
             continue;
-        m_camerasByGroupId[camera->getGroupId()]++;
+
+        bool requiresLicense = !camera->isScheduleDisabled();
+        if (countProposed) {
+            requiresLicense &= !m_proposedToDisable.contains(camera);
+            requiresLicense |= m_proposedToEnable.contains(camera);
+        }
+
+        if (requiresLicense)
+            m_camerasByGroupId[camera->getGroupId()]++;
     }
 
     int limit = QnLicensePool::camerasPerAnalogEncoder();
