@@ -4,6 +4,7 @@
   width:100%;
   position:relative;
   overflow:hidden;
+  height:50px;
   border:1px solid rgb(216,216,216);
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -148,8 +149,9 @@ ng-include{
 
 .viewport > .scroll{
   width:100%;
-  overflow-x:auto;
-  overflow-y:auto;
+  height: 100%;
+  overflow-x:scroll;
+  overflow-y:scroll;
 }
 .viewport > canvas{
   width:100%;
@@ -157,11 +159,12 @@ ng-include{
 }
 
 
-.viewport > canvas,
-.viewport > .scroll > .frame{
-  height:50px;
+.viewport > canvas{
+  height:100%;
 }
-
+.viewport > .scroll > .frame{
+  height:5000px;
+}
 
 .scroll-btn{
   position:absolute;

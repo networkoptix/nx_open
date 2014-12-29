@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .directive('timeline2', ['$interval','animateScope', function ($interval,animateScope) {
+    .directive('timeline', ['$interval','animateScope', function ($interval,animateScope) {
         return {
             restrict: 'E',
             scope: {
@@ -9,12 +9,12 @@ angular.module('webadminApp')
                 //start: '=',
                 //end:   '=',
             },
-            templateUrl: 'views/components/timeline2.html',
+            templateUrl: 'views/components/timeline.html',
             link: function (scope, element/*, attrs*/) {
                 var timelineConfig = {
                     initialInterval: 1000*60*60*24*365, // no records - show last hour
                     futureInterval: 1000*60*60*24, // 24 hour to future - for timeline
-                    zoomStep: 1.3, // Zoom speed
+                    zoomStep: 1.5, // Zoom speed
                     maxTimeLineWidth: 30000000, // maximum width for timeline, which browser can handle
                     // TODO: support changing boundaries on huge detailization
                     initialZoom: 0, // Initial zoom step 0 - to see whole timeline without scroll.
@@ -42,12 +42,6 @@ angular.module('webadminApp')
                 animateScope.setScope(scope);
                 var frame = element.find('.frame');
 
-                function initTimeline(){
-                    var now = (new Date()).getTime();
-                    scope.start = scope.records? scope.records.start : (now - timelineConfig.initialInterval);
-                    scope.end = now;
-                    updateView();
-                }
 
                 var scroll = element.find('.scroll');
 
@@ -55,13 +49,76 @@ angular.module('webadminApp')
                 var oldSetValue = 0;
                 var oldScrollValue = 0;
                 var correctionPrecision = 0.000001;// precision for value - to detect boundaries
+                var zoomScrollPrecision = 0.01;// precision for zooming
+
+
+                // set up scroll up-down for zoom
+                function getScrollbarWidth() {
+                    var outer = document.createElement("div");
+                    outer.style.visibility = "hidden";
+                    outer.style.width = "100px";
+                    outer.style.msOverflowStyle = "scrollbar"; // needed for WinJS apps
+
+                    document.body.appendChild(outer);
+
+                    var widthNoScroll = outer.offsetWidth;
+                    // force scrollbars
+                    outer.style.overflow = "scroll";
+
+                    // add innerdiv
+                    var inner = document.createElement("div");
+                    inner.style.width = "100%";
+                    outer.appendChild(inner);
+
+                    var widthWithScroll = inner.offsetWidth;
+
+                    // remove divs
+                    outer.parentNode.removeChild(outer);
+
+                    return widthNoScroll - widthWithScroll;
+                }
+                scroll.width(viewportWidth + getScrollbarWidth()); // Hide verical scroll
+                var availableScrolltop = scroll.get(0).scrollHeight - scroll.height();
+                var oldVerticalScrollValue = 0;
+
+                scroll.scroll(function(){
+                    if(scope.zooming<1){ // zoom animation progress - do not handle scroll
+                        oldVerticalScrollValue = verticalScrollRelative();
+                        return;
+                    }
+
+                    var newVerticalScrollValue = verticalScrollRelative();
+                    if(Math.abs(oldVerticalScrollValue - newVerticalScrollValue) > zoomScrollPrecision) {
+                        oldVerticalScrollValue = newVerticalScrollValue;
+                        var targetZoomLevel = scope.maxZoomLevel * newVerticalScrollValue;
+
+                        //console.log("zoom!", scope.actualZoomLevel, verticalScrollRelative(), newVerticalScrollValue);
+                        //var targetZoomLevel = 1;
+                        animateScope.animate(scope,'actualZoomLevel',targetZoomLevel);
+
+                    }
+                });
+
+                function verticalScrollRelative(value){
+                    if(typeof(value) ==='undefined') {
+                        return scroll.scrollTop()/availableScrolltop;
+                    }else{
+                        scroll.scrollTop(value * availableScrolltop);
+                    }
+                }
+
+                function maxZoomLevel(){
+                    var maxLevel = RulerModel.levels[RulerModel.levels.length-1];
+                    var targetSecPerPixel =  maxLevel.interval.getSeconds()/maxLevel.width;
+                    var totalSeconds = (scope.end - scope.start) / 1000;
+                    var maxLevelValue = totalSeconds / targetSecPerPixel / viewportWidth;
+                    var maxZoomLevel = Math.ceil(Math.log(maxLevelValue) / Math.log(timelineConfig.zoomStep));
+                    return maxZoomLevel;
+                }
 
                 function viewPortScrollRelative(value){
-
-
                     var availableWidth = scope.scrollWidth - viewportWidth;
                     var onePixelScroll = scope.scrollWidth/viewportWidth;
-                    var correctionPixels = 5;//How many pixels if scroll we must probide near bounaries
                     if(typeof(value) ==='undefined') {
 
                         if(availableWidth < 1){
@@ -76,25 +133,9 @@ angular.module('webadminApp')
                     } else {
                         oldSetValue = value;
                         oldScrollValue = Math.round(value * availableWidth);
-
-                        var correction = 0;
-                        /*
-                        // Delta between oldScrollValue and availableWidth should be less, that one pixel of scroll
-                        if(availableWidth - oldScrollValue < onePixelScroll && value < 1 - correctionPrecision){
-                             correction = -correctionPixels * onePixelScroll;
-                        }
-                        if(oldScrollValue < onePixelScroll && value > correctionPrecision){
-                            correction = correctionPixels * onePixelScroll;
-                        }
-                        if(correction!=0) {
-                            console.log("correction", correction,value);
-                        }
-                        */
-
-                        scroll.scrollLeft(oldScrollValue + correction);
+                        scroll.scrollLeft(oldScrollValue);
                     }
                 }
-
 
                 function blurColor(color,alpha){
                     /*
@@ -123,6 +164,7 @@ angular.module('webadminApp')
                 }
 
                 function updateActualLevel(){
+
                     var oldLevel = scope.actualLevel;
                     var oldLabelLevel = scope.visibleLabelsLevel;
                     var oldEncreasedLevel = scope.increasedLevel;
@@ -148,6 +190,10 @@ angular.module('webadminApp')
 
                     scope.actualLevel = i-1;
 
+                    scope.disableZoomIn  = Math.ceil(scope.actualZoomLevel) >= scope.maxZoomLevel;//scope.actualLevel >= RulerModel.levels.length-1;
+                    scope.disableZoomOut = scope.actualZoomLevel <= 0;
+
+
                     if(oldLevel < scope.actualLevel){ // Level up - run animation for appearance of new level
                         animateScope.progress(scope,'levelAppearance');
                     }else if(oldLevel > scope.actualLevel){
@@ -166,10 +212,8 @@ angular.module('webadminApp')
                         animateScope.progress(scope,'labelDisappearance');
                     }
 
+
                 }
-
-
-
 
                 function screenStartPosition(){
                     return viewPortScrollRelative() * (scope.frameWidth - viewportWidth);
@@ -201,9 +245,6 @@ angular.module('webadminApp')
 
                     return screenStartRelativePos;
                 }
-
-
-
 
                 function updateDetailization(){
                     //4. Set interval for events
@@ -319,9 +360,10 @@ angular.module('webadminApp')
                     }
                 }
 
-
                 function updateBoundariesAndScroller(){
                     var keepDate = screenRelativePositionToDate(0.5); // Keep current timeposition for scrolling
+
+                    scope.actualWidth = viewportWidth * zoomLevel();
 
                     // Update boundaries to current moment
                     scope.frameEnd = /*scope.end;//*/(new Date()).getTime();
@@ -344,6 +386,7 @@ angular.module('webadminApp')
 
                         // TODO: In live mode - scroll right
                         // TODO: disable live if view was scrolled
+
                     }
                     newPosition = Math.min(Math.max(newPosition,0),1);
 
@@ -360,17 +403,23 @@ angular.module('webadminApp')
                     updateDetailization();
                 }
 
+                function initTimeline(){
+                    var now = (new Date()).getTime();
+                    scope.start = scope.records? scope.records.start : (now - timelineConfig.initialInterval);
+                    scope.end = now;
+                    scope.maxZoomLevel = maxZoomLevel();
+                    updateView();
+                }
+
+
                 scope.levels = RulerModel.levels;
                 scope.actualZoomLevel = timelineConfig.initialZoom;
                 scope.disableZoomOut = true;
                 scope.disableZoomIn = false;
-
                 scope.disableScrollRight = true;
                 scope.disableScrollLeft = true;
 
-
                 //animation parameters
-                scope.scrollPosition = 0;
                 scope.actualWidth = viewportWidth;
                 scope.scrollWidth = viewportWidth;
                 scope.levelAppearance   = 1; // Appearing new marks level
@@ -379,6 +428,7 @@ angular.module('webadminApp')
                 scope.levelDecreasing = 1; // Encreasing existing mark level
                 scope.labelAppearance = 1; // Labels become visible smoothly
                 scope.labelDisappearance = 1; // Labels become visible smoothly
+                scope.zooming = 1; //zoom animation progress
                 scope.scrolling = 1;//Scrolling to some position
                 scope.targetScrollPosition = 0;
 
@@ -395,17 +445,13 @@ angular.module('webadminApp')
                     animateScope.animate(scope,"targetScrollPosition",newPosition);
                     return animateScope.progress(scope,"scrolling");
                 };
-
-                // Collect scrolling value?
-
                 scope.scrollClick = function(right){
                     console.log("scrollClick",right);
                     //scope.scroll(right,0.5);
                 };
                 scope.scrollDblClick = function(right){
-                    console.log("dblclick");
+                    console.log("dblclick",right);
                 };
-
 
                 var scrollingNow = false;
                 function scrollingProcess(right){
@@ -415,7 +461,6 @@ angular.module('webadminApp')
                         }
                     })
                 }
-
                 scope.scrollStart = function(right){
                     // Run animation by animation.
                     scrollingNow = true;
@@ -425,28 +470,26 @@ angular.module('webadminApp')
                     scrollingNow = false;
                 };
 
-                scope.zoom = function(zoomIn, speed, targetScrollTime, targetScrollTimePosition){
+
+
+                scope.zoom = function(zoomIn, speed){
                     speed = speed || 1;
 
+                    var targetZoomLevel = scope.actualZoomLevel;
                     if(zoomIn && !scope.disableZoomIn) {
-                        scope.actualZoomLevel += speed;
+                        targetZoomLevel += speed;
+                        console.log("zoom",targetZoomLevel,scope.maxZoomLevel);
+                        targetZoomLevel = Math.min(targetZoomLevel,scope.maxZoomLevel);
                     }
 
                     if(!zoomIn && !scope.disableZoomOut ) {
-                        scope.actualZoomLevel -= speed;
-                        if(scope.actualZoomLevel <= 0) {
-                            scope.actualZoomLevel = 0;
-                        }
+                        targetZoomLevel -= speed;
+                        targetZoomLevel = Math.max(targetZoomLevel,0);
                     }
 
-                    var targetWidth = viewportWidth * zoomLevel();
-                    animateScope.animate(scope,'actualWidth',targetWidth);
+                    animateScope.animate(scope,'actualZoomLevel',targetZoomLevel);
+                    animateScope.progress(scope,'zooming');
 
-                    //We should keep relative position during resizing width
-                    animateScope.progress(scope,'scrollPosition');
-
-                    scope.disableZoomOut =  scope.actualZoomLevel <= 0;
-                    scope.disableZoomIn = scope.actualLevel >= RulerModel.levels.length-1;
                 };
 
                 scope.$watch('records',initTimeline);
