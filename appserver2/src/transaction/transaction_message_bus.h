@@ -235,6 +235,7 @@ namespace ec2
         // alive control
         QElapsedTimer m_aliveSendTimer;
         std::unique_ptr<QnRuntimeTransactionLog> m_runtimeTransactionLog;
+        bool m_restartPending;
     };
 }
 #define qnTransactionBus ec2::QnTransactionMessageBus::instance()

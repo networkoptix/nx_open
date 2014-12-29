@@ -202,7 +202,8 @@ QnTransactionMessageBus::QnTransactionMessageBus(Qn::PeerType peerType)
     m_timer(nullptr), 
     m_mutex(QMutex::Recursive),
     m_thread(nullptr),
-    m_runtimeTransactionLog(new QnRuntimeTransactionLog())
+    m_runtimeTransactionLog(new QnRuntimeTransactionLog()),
+    m_restartPending(false)
 {
     if (m_thread)
         return;
@@ -1043,8 +1044,12 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
         {
             // swith to new time
             NX_LOG( lit("Remote peer %1 has database restore time greater then current peer. Restarting and resync database with remote peer").arg(transport->remotePeer().id.toString()), cl_logINFO );
-            transport->setState(QnTransactionTransport::Error);
+            for (QnTransactionTransport* t: m_connections)
+                t->setState(QnTransactionTransport::Error);
+            for (QnTransactionTransport* t: m_connectingConnections)
+                t->setState(QnTransactionTransport::Error);
             qnCommon->setSystemIdentityTime(transport->remoteIdentityTime(), transport->remotePeer().id);
+            m_restartPending = true;
             return;
         }
 
@@ -1129,7 +1134,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
         const QUrl& url = itr.key();
         RemoteUrlConnectInfo& connectInfo = itr.value();
         bool isTimeout = !connectInfo.lastConnectedTime.isValid() || connectInfo.lastConnectedTime.hasExpired(RECONNECT_TIMEOUT);
-        if (isTimeout && !isPeerUsing(url)) 
+        if (isTimeout && !isPeerUsing(url) && !m_restartPending)
         {
             if (!connectInfo.discoveredPeer.isNull() ) 
             {
@@ -1210,6 +1215,9 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(const QSharedPointer<A
         qWarning() << "This peer connected to remote Server. Ignoring incoming connection";
         return;
     }
+
+    if (m_restartPending)
+        return; // reject incoming connection because of media server is about to restart
 
     QnTransactionTransport* transport = new QnTransactionTransport(m_localPeer, socket);
     transport->setRemotePeer(remotePeer);
