@@ -2748,6 +2748,7 @@ def runRtspTest():
 # RTSP performance Operations
 # ======================================================
 class SingleServerRtspPerf(SingleServerRtspTestBase):
+    ARCHIVE_STREAM_RATE = 1024*1024*10 # 10 MB/Sec
     _timeoutMax = 0
     _timeoutMin = 0
     _diffMax = 0
@@ -2783,28 +2784,53 @@ class SingleServerRtspPerf(SingleServerRtspTestBase):
         self._perfLog = open("%s_%s.perf.rtsp.log" % (l[0],l[1]),"w+")
 
 
-    def _timeoutRecv(self,socket,len,timeout):
+    # This function will blocked on socket to recv data in a fashion of _RATE_
+    # 
+    def _timeoutRecv(self,socket,rate,timeout):
         socket.setblocking(0)
-        ready = select.select([socket], [], [], timeout)
-        if ready[0]:
-            data = socket.recv(len)
-            socket.setblocking(1)
-            return data
-        else:
-            socket.setblocking(1)
-            return None
-
-    def _dump(self,c,tcp_rtsp,timeout):
         elapsed = 0
+        buf = []
+        last_packet_sz = 0
+
         while True:
+            # recording the time for fetching an event
             begin = time.clock()
-            # Recv 1 MB
-            data = None
+            ready = select.select([socket], [], [], timeout)
+            if ready[0]:
+                d= None
+                if rate <0:
+                    d = socket.recv(1024*16)
+                else:
+                    d = socket.recv(rate)
+                last_packet_sz = len(d)
+                buf.append(d)
+                end = time.clock()
+                elapsed = end-begin
+                # compensate the rate of packet size here
+                if rate != -1:
+                    if len(data) >= rate:
+                        time.sleep(1.0-elapsed)
+                        socket.setblocking(1)
+                        return ''.join(buf)
+                    else:
+                        rate -= last_packet_sz
+                else:
+                    return d
+            else:
+                # timeout reached
+                socket.setblocking(1)
+                return None
+
+    def _dumpHelper(self,c,tcp_rtsp,timeout,dump,rate):
+        for _ in xrange(timeout):
             try:
-                data = self._timeoutRecv(tcp_rtsp._socket,1024 * 16,3)
+                data = self._timeoutRecv(tcp_rtsp._socket,rate,3)
+                if dump is not None:
+                    dump.write(data)
+                    dump.flush
             except:
                 continue
-
+            
             if data == None:
                 with self._lock:
                     print "--------------------------------------------"
@@ -2834,18 +2860,41 @@ class SingleServerRtspPerf(SingleServerRtspTestBase):
                     self._perfLog.flush()
                 return
 
-            end = time.clock()
-            elapsed = elapsed + (end - begin)
+        with self._lock:
+            print "--------------------------------------------"
+            print "The RTP sink normally timeout with:%d on RTSP url:%s" % (timeout,tcp_rtsp._url)
+            print "--------------------------------------------"
+        return
 
-            if elapsed >= timeout:
-                with self._lock:
-                    print "--------------------------------------------"
-                    print "The RTP sink normally timeout with:%d on RTSP url:%s" % (timeout,tcp_rtsp._url)
-                    print "--------------------------------------------"
-                return
+    def _buildUrlPath(self,url):
+        l = len(url)
+        buf = []
+        for i in xrange(l):
+            if url[i] == ':':
+                buf.append('$')
+            elif url[i] == '/':
+                buf.append('%')
+            elif url[i] == '?':
+                buf.append('#')
+            else:
+                buf.append(url[i])
+
+        # generate a random postfix
+        buf.append("_")
+        for _ in xrange(12):
+            buf.append(str(random.randint(0,9)))
+
+        return ''.join(buf)
+
+    def _dump(self,c,tcp_rtsp,timeout,dump,rate):
+        if dump :
+            with open(self._buildUrlPath(tcp_rtsp._url),"w+") as f:
+                self._dumpHelper(c,tcp_rtsp,timeout,f,rate)
+        else:
+            self._dumpHelper(c,tcp_rtsp,timeout,None,rate)
 
     # Represent a streaming TASK on the camera
-    def _main_streaming(self,c):
+    def _main_streaming(self,c,dump):
         l = self._serverEndpoint.split(':')
         obj = RRRtspTcpBasic(l[0],int(l[1]),
                      c[0],
@@ -2858,13 +2907,13 @@ class SingleServerRtspPerf(SingleServerRtspTestBase):
         with obj as reply:
             # 1.  Check the reply here
             if self._checkRtspRequest(c,reply):
-                self._dump(c,obj,random.randint(self._timeoutMin,self._timeoutMax))
+                self._dump(c,obj,random.randint(self._timeoutMin,self._timeoutMax),dump,-1)
                 self._streamNumOK = self._streamNumOK + 1
             else:
                 self._streamNumFail = self._streamNumFail + 1
 
 
-    def _main_archive(self,c):
+    def _main_archive(self,c,dump):
         l = self._serverEndpoint.split(':')
         obj = RRRtspTcpBasic(l[0],int(l[1]),
                              c[0],
@@ -2876,19 +2925,19 @@ class SingleServerRtspPerf(SingleServerRtspTestBase):
         with obj as reply:
             # 1.  Check the reply here
            if self._checkRtspRequest(c,reply):
-                self._dump(c,obj,random.randint(self._timeoutMin,self._timeoutMax))
+                self._dump(c,obj,random.randint(self._timeoutMin,self._timeoutMax),dump,self.ARCHIVE_STREAM_RATE)
                 self._archiveNumOK = self._archiveNumOK + 1
            else:
                self._archiveNumFail = self._archiveNumFail + 1
 
-    def _threadMain(self):
+    def _threadMain(self,dump):
         while self._exitFlag.isOn():
             # choose a random camera in the server list
             c = self._cameraList[random.randint(0,len(self._cameraList) - 1)]
             if random.randint(0,1) == 0:
-                self._main_streaming(c)
+                self._main_streaming(c,dump)
             else:
-                self._main_archive(c)
+                self._main_archive(c,dump)
 
     def join(self):
         for th in self._threadPool:
@@ -2903,10 +2952,21 @@ class SingleServerRtspPerf(SingleServerRtspTestBase):
         print "======================================="
 
     def run(self):
+        dump = False
+        if len(sys.argv) == 3 and sys.argv[2] == '--dump':
+            dump = True
+
+        if len(self._cameraList) == 0:
+            print "The camera list on server:%s is empty!"%(self._serverEndpoint)
+            print "Do nothing and abort!"
+            return False
+
         for _ in xrange(self._threadNum):
-            th = threading.Thread(target=self._threadMain)
+            th = threading.Thread(target=self._threadMain,args=(dump,))
             th.start()
             self._threadPool.append(th)
+
+        return True
 
 class RtspPerf:
     _perfServer = []
@@ -2960,7 +3020,8 @@ class RtspPerf:
             signal.signal(signal.SIGINT,self._onInterrupt)
 
             for e in self._perfServer:
-                e.run()
+                if not e.run():
+                    return
 
             while self.isOn():
                 try:
@@ -3723,10 +3784,15 @@ def showHelp():
             "Also the sync operation will be performed before any test\n")),
         "rtsp-perf":("Rtsp performance test",(
             "Usage: python main.py --rtsp-perf \n\n"
+            "Usage: python main.py --rtsp-perf --dump \n\n"
             "This command is used to run rtsp performance test.\n"
             "The test will try to check RTSP status and then connect to the server \n"
             "and maintain the connection to receive RTP packet for several seconds. The request \n"
             "includes archive and real time streaming.\n"
+            "Additionally,an optional option --dump may be specified.If this flag is on, the data will be \n"
+            "dumped into a file, the file stores raw RTP data and also the file is named with following:\n"
+            "{Part1}_{Part2}, Part1 is the URL ,the character \"/\" \":\" and \"?\" will be escaped to %,$,#\n"
+            "Part2 is a random session number which has 12 digits\n"
             "The configuration parameter is listed below:\n\n"
             "threadNumbers    A comma separate list to specify how many list each server is required \n"
             "The component number must be the same as component in serverList. Eg: threadNumbers=10,2,3 \n"
