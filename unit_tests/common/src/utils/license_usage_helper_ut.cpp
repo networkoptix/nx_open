@@ -192,7 +192,6 @@ TEST( QnCamLicenseUsageHelperTest, borrowForAnalogEncoder )
 TEST( QnCamLicenseUsageHelperTest, calculateRequiredLicensesForAnalogEncoder )
 {
     QnResourcePoolScaffold resPoolScaffold;
-
     QnCamLicenseUsageHelper helper;
 
     for (int i = 0; i < camerasPerAnalogEncoder; ++i) {
@@ -210,8 +209,6 @@ TEST( QnCamLicenseUsageHelperTest, proposeSingleLicenseType )
     auto cameras = resPoolScaffold.addCameras(Qn::LC_Professional, 2, false);
 
     QnCamLicenseUsageHelper helper;
-    ASSERT_TRUE( helper.isValid() );
-
     QnLicensePoolScaffold licPoolScaffold;
     licPoolScaffold.addLicenses(Qn::LC_Professional, 2);
     
@@ -228,8 +225,6 @@ TEST( QnCamLicenseUsageHelperTest, proposeSingleLicenseTypeWithBorrowing )
     auto cameras = resPoolScaffold.addCameras(Qn::LC_Professional, 2, false);
 
     QnCamLicenseUsageHelper helper;
-    ASSERT_TRUE( helper.isValid() );
-
     QnLicensePoolScaffold licPoolScaffold;
     licPoolScaffold.addLicenses(Qn::LC_Trial, 2);
 
@@ -242,16 +237,10 @@ TEST( QnCamLicenseUsageHelperTest, proposeSingleLicenseTypeWithBorrowing )
 /** Basic test for analog encoder proposing. */
 TEST( QnCamLicenseUsageHelperTest, proposeAnalogEncoderCameras )
 {
-    int overflow = 2;
-    ASSERT_LT(overflow, camerasPerAnalogEncoder);   //assert test correctness
-
     QnResourcePoolScaffold resPoolScaffold;
     auto cameras = resPoolScaffold.addCameras(Qn::LC_AnalogEncoder, camerasPerAnalogEncoder, false);
-    auto owerflowCameras = resPoolScaffold.addCameras(Qn::LC_AnalogEncoder, overflow, false);
 
     QnCamLicenseUsageHelper helper;
-    ASSERT_TRUE( helper.isValid() );
-
     QnLicensePoolScaffold licPoolScaffold;
     licPoolScaffold.addLicenses(Qn::LC_AnalogEncoder, 1);
 
@@ -259,9 +248,23 @@ TEST( QnCamLicenseUsageHelperTest, proposeAnalogEncoderCameras )
     ASSERT_EQ(helper.usedLicenses(Qn::LC_AnalogEncoder), 1);
     ASSERT_EQ(helper.proposedLicenses(Qn::LC_AnalogEncoder), 1);
     ASSERT_TRUE( helper.isValid() );   
+}
 
-//     helper.propose(owerflowCameras, true);
-//     ASSERT_EQ(helper.usedLicenses(Qn::LC_AnalogEncoder), 1 + overflow);
-//     ASSERT_EQ(helper.proposedLicenses(Qn::LC_AnalogEncoder), 1);
-//     ASSERT_FALSE( helper.isValid() );   
+/** Basic test for analog encoder proposing with overflow. */
+TEST( QnCamLicenseUsageHelperTest, proposeAnalogEncoderCamerasOverflow )
+{
+    int overflow = 2;
+    ASSERT_LT(overflow, camerasPerAnalogEncoder);   //assert test correctness
+
+    QnResourcePoolScaffold resPoolScaffold;
+    auto cameras = resPoolScaffold.addCameras(Qn::LC_AnalogEncoder, camerasPerAnalogEncoder + overflow, false);
+
+    QnCamLicenseUsageHelper helper;
+    QnLicensePoolScaffold licPoolScaffold;
+    licPoolScaffold.addLicenses(Qn::LC_AnalogEncoder, 1);
+
+    helper.propose(cameras, true);
+    ASSERT_EQ(helper.usedLicenses(Qn::LC_AnalogEncoder), 1 + overflow);
+    ASSERT_EQ(helper.proposedLicenses(Qn::LC_AnalogEncoder), 1);
+    ASSERT_FALSE( helper.isValid() );   
 }
