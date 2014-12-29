@@ -75,11 +75,13 @@ signals:
 
 protected:
     void borrowLicenseFromClass(int& srcUsed, int srcTotal, int& dstUsed, int dstTotal, int& borrowed);
-    virtual int calculateUsedLicenses(Qn::LicenseType licenseType, int totalLicenses) const = 0;
+    virtual int calculateUsedLicenses(Qn::LicenseType licenseType, int totalLicenses, bool countProposed = true) const = 0;
     virtual int calculateOverflowLicenses(Qn::LicenseType licenseType, int totalLicenses, int borrowedLicenses) const;
+    virtual int calculateProposedLicenses(Qn::LicenseType licenseType) const = 0;
 
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const = 0;
     
+private:
     QnLicenseListHelper m_licenses;
     mutable QList<Qn::LicenseType> m_licenseTypes;
 
@@ -100,8 +102,10 @@ public:
     bool isOverflowForCamera(const QnVirtualCameraResourcePtr &camera);
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
-    virtual int calculateUsedLicenses(Qn::LicenseType licenseType, int totalLicenses) const override;
+    virtual int calculateUsedLicenses(Qn::LicenseType licenseType, int totalLicenses, bool countProposed = true) const override;
     virtual int calculateOverflowLicenses(Qn::LicenseType licenseType, int totalLicenses, int borrowedLicenses) const override;
+    virtual int calculateProposedLicenses(Qn::LicenseType licenseType) const override;
+
 private:
     void init();
 
@@ -113,6 +117,9 @@ private:
      *  Result is sorted in reversed order (from biggest sets to smallest).
      */
     QList<int> analogEncoderCameraSets() const;
+
+    QSet<QnVirtualCameraResourcePtr> m_proposedToEnable;
+    QSet<QnVirtualCameraResourcePtr> m_proposedToDisable;
 };
 
 class QnVideoWallLicenseUsageHelper: public QnLicenseUsageHelper {
@@ -127,7 +134,11 @@ public:
     static int licensesForScreens(int screens);
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
-    virtual int calculateUsedLicenses(Qn::LicenseType licenseType, int totalLicenses) const override;
+    virtual int calculateUsedLicenses(Qn::LicenseType licenseType, int totalLicenses, bool countProposed = true) const override;
+    virtual int calculateProposedLicenses(Qn::LicenseType licenseType) const override;
+
+private:
+    int m_proposed;
 };
 
 /** Utility RAAA class to propose some licenses usage. */
