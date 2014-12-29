@@ -2253,6 +2253,39 @@ class RtspArchiveURLGenerator:
                                          self._mac,
                                          self._generateUTC())
 
+# RTSP global backoff timer, this is used to solve too many connection to server
+# which makes the server think it is suffering DOS attack
+class RtspBackOffTimer:
+    _timerLock = threading.Lock()
+    _globalTimerTable= dict()
+
+    MAX_TIMEOUT = 32.0
+    MIN_TIMEOUT = 0.01
+
+    def increase(self,url):
+        with self._timerLock:
+            if url in self._globalTimerTable:
+                self._globalTimerTable[url] *= 2.0
+                if self._globalTimerTable[url] >= self.MAX_TIMEOUT:
+                    self._globalTimerTable[url] = self.MAX_TIMEOUT
+                time.sleep(self._globalTimerTable[url])
+            else:
+                self._globalTimerTable[url] = 0.01
+                time.sleep(0.01)
+    def decrease(self,url):
+        with self._timerLock:
+            if url not in self._globalTimerTable:
+                return
+            else:
+                if self._globalTimerTable[url] <= self.MIN_TIMEOUT:
+                    self._globalTimerTable[url] = self.MIN_TIMEOUT
+                    return
+                else:
+                    self._globalTimerTable[url] /= 2.0
+
+
+_rtspBackOffTimer = RtspBackOffTimer()
+
 class RRRtspTcpBasic:
     _socket = None
     _addr = None
@@ -2392,12 +2425,18 @@ class RRRtspTcpBasic:
                 data = data[sz:] 
             
     def _response(self):
+        global _rtspBackOffTimer
+
         ret = ""
         while True:
             try:
                 data = self._socket.recv(1024)
             except socket.error,e:
+                _rtspBackOffTimer.increase("%s:%d"%(self._addr,self._port))
                 return "This is not RTSP error but socket error:%s"%(e)
+
+            _rtspBackOffTimer.decrease("%s:%d"%(self._addr,self._port))
+
             if not data:
                 return ret
             else:
