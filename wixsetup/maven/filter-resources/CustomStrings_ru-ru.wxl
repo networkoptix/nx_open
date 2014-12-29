@@ -89,6 +89,8 @@
     <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">Enterprise Controller</String>
     <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">Параметры Медиа Сервера</String>
     <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">Медиа Сервер</String>  
+    <String Id="MediaServerDlg_SystemName"                          Overridable="yes">Имя Системы</String>  
+    <String Id="MediaServerDlg_PasswordConfirm"                     Overridable="yes">Подтверждение пароля</String>  
 
     <!-- MyExitDialog -->
 

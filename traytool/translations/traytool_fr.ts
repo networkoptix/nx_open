@@ -26,7 +26,7 @@ L&apos;application va être fermée.</translation>
     <message>
         <location filename="../src/systraywindow.cpp" line="425"/>
         <source>UAC must be enabled to request privileges for non-admin users</source>
-        <translation>Le contrôle UAC doit être activé pour une demande de privilèges avec un utilisateur sans droit administrateur</translation>
+        <translation>Le contrôle UAC doit être activé pour une demande de privilèges avec un usager sans droit administrateur</translation>
     </message>
 </context>
 <context>
@@ -126,7 +126,7 @@ L&apos;application va être fermée.</translation>
     <message>
         <location filename="../src/systraywindow.cpp" line="483"/>
         <source>Media Server Web Page</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir la page web Media Serveur</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="473"/>
