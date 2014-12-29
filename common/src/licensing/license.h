@@ -50,23 +50,26 @@ public:
     /**
      * Check if signature matches other fields, also check hardwareId and brand
      */
-    bool isValid(ErrorCode* errCode = 0, ValidationMode mode = VM_Regular) const;
+    virtual bool isValid(ErrorCode* errCode = 0, ValidationMode mode = VM_Regular) const;
 
     static QString errorMessage(ErrorCode errCode);
 
-    const QString &name() const;
-    const QByteArray &key() const;
-    void setKey(const QByteArray& value);
+    QString name() const;
+    QByteArray key() const;
+    void setKey(const QByteArray &value);
+
     qint32 cameraCount() const;
-    const QByteArray &hardwareId() const;
-    const QByteArray &signature() const;
+    void setCameraCount(qint32 count);
 
-    const QString &xclass() const;
-    const QString &version() const;
-    const QString &brand() const;
-    const QString &expiration() const; // TODO: #Ivan Passing date as a string is totally evil. Please make sure your code is easy to use!!!
+    QByteArray hardwareId() const;
+    QByteArray signature() const;
 
-    const QByteArray& rawLicense() const;
+    QString xclass() const;
+    QString version() const;
+    QString brand() const;
+    QString expiration() const; // TODO: #Ivan Passing date as a string is totally evil. Please make sure your code is easy to use!!!
+
+    QByteArray rawLicense() const;
 
     QByteArray toString() const; 
 
@@ -75,7 +78,8 @@ public:
      *                                  or -1 if this license never expires.
      */
     qint64 expirationTime() const;
-    Qn::LicenseType type() const; 
+
+    virtual Qn::LicenseType type() const;
 
     bool isInfoMode() const;
 
@@ -88,6 +92,19 @@ public:
 
     /** Id of the server this license attached to (if it is present in the current system). */
     QnUuid serverId() const;
+
+private:
+    void parseLicenseBlock(
+        const QByteArray& licenseBlock,
+        QByteArray* const v1LicenseBlock,
+        QByteArray* const v2LicenseBlock );
+    void licenseBlockFromData(
+        QByteArray* const v1LicenseBlock,
+        QByteArray* const v2LicenseBlock );
+    void verify( const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock );
+
+    bool gotError(ErrorCode* errCode, ErrorCode errorCode) const;
+
 private:
     QByteArray m_rawLicense;
 
@@ -108,17 +125,6 @@ private:
 
     // Is full license valid (signature2 is used)
     bool m_isValid2;
-
-    void parseLicenseBlock(
-        const QByteArray& licenseBlock,
-        QByteArray* const v1LicenseBlock,
-        QByteArray* const v2LicenseBlock );
-    void licenseBlockFromData(
-        QByteArray* const v1LicenseBlock,
-        QByteArray* const v2LicenseBlock );
-    void verify( const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock );
-
-    bool gotError(ErrorCode* errCode, ErrorCode errorCode) const;
 };
 
 Q_DECLARE_METATYPE(QnLicensePtr)
@@ -155,6 +161,9 @@ class QnLicensePool : public QObject
 
 public:
     static QnLicensePool* instance();
+
+    /** Number of cameras per analog encoder that require 1 license. */
+    static int camerasPerAnalogEncoder();
 
     QnLicenseList getLicenses() const;
 

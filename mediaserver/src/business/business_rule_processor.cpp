@@ -720,39 +720,33 @@ void QnBusinessRuleProcessor::notifyResourcesAboutEventIfNeccessary( const QnBus
     {
         if( businessRule->eventType() == QnBusiness::CameraInputEvent)
         {
-            QnResourceList resList = businessRule->eventResourceObjects();
+            QnVirtualCameraResourceList resList = businessRule->eventResourceObjects().filtered<QnVirtualCameraResource>();
             if (resList.isEmpty()) {
                 const QnResourcePtr& mServer = qnResPool->getResourceById(qnCommon->moduleGUID());
                 resList = qnResPool->getAllCameras(mServer, true);
             }
 
-            for( QnResourceList::const_iterator it = resList.constBegin(); it != resList.constEnd(); ++it )
+            for(const QnVirtualCameraResourcePtr camera: resList)
             {
-                QnSecurityCamResource* securityCam = dynamic_cast<QnSecurityCamResource*>(it->data());
-                if( !securityCam )
-                    continue;
                 if( isRuleAdded )
-                    securityCam->inputPortListenerAttached();
+                    camera->inputPortListenerAttached();
                 else
-                    securityCam->inputPortListenerDetached();
+                    camera->inputPortListenerDetached();
             }
         }
     }
 
     //notifying resources about recording action
     {
-        const QnResourceList& resList = businessRule->actionResourceObjects();
+        QnVirtualCameraResourceList resList = businessRule->actionResourceObjects().filtered<QnVirtualCameraResource>();
         if( businessRule->actionType() == QnBusiness::CameraRecordingAction)
         {
-            for( QnResourceList::const_iterator it = resList.begin(); it != resList.end(); ++it )
+            for(const QnVirtualCameraResourcePtr camera: resList)
             {
-                QnSecurityCamResource* securityCam = dynamic_cast<QnSecurityCamResource*>(it->data());
-                if( !securityCam )
-                    continue;
                 if( isRuleAdded )
-                    securityCam->recordingEventAttached();
+                    camera->recordingEventAttached();
                 else
-                    securityCam->recordingEventDetached();
+                    camera->recordingEventDetached();
             }
         }
     }

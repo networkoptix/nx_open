@@ -1174,13 +1174,8 @@ void QnMain::at_timer()
 {
     MSSettings::runTimeSettings()->setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
     QnResourcePtr mServer = qnResPool->getResourceById(qnCommon->moduleGUID());
-    for(const QnResourcePtr& res: qnResPool->getAllCameras(mServer))
-    {
-        QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
-        if (cam)
-            cam->noCameraIssues(); // decrease issue counter
-    }
-
+    for(const QnVirtualCameraResourcePtr& camera: qnResPool->getAllCameras(mServer))
+        camera->noCameraIssues(); // decrease issue counter
 }
 
 void QnMain::at_storageManager_noStoragesAvailable() {

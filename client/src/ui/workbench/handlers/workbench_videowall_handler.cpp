@@ -2601,7 +2601,7 @@ bool QnWorkbenchVideoWallHandler::validateLicenses(const QString &detail) const 
         QMessageBox::warning(mainWindow(),
             tr("More licenses required"),
             detail + L'\n' +
-            m_licensesHelper->getRequiredLicenseMsg(Qn::LC_VideoWall));
+            m_licensesHelper->getRequiredText(Qn::LC_VideoWall));
         return false;
     }
     return true;
