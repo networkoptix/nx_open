@@ -66,11 +66,13 @@ void QnMulticastModuleFinder::setCompatibilityMode(bool compatibilityMode) {
     m_compatibilityMode = compatibilityMode;
 }
 
-QList<UDPSocket*> QnMulticastModuleFinder::findNewInterfaces() {
-    QList<UDPSocket*> result;
+void QnMulticastModuleFinder::updateInterfaces() {
+    QList<QHostAddress> addressesToRemove = m_clientSockets.keys();
 
     /* This function only adds interfaces to the list. */
     for (const QHostAddress &address: QNetworkInterface::allAddresses()) {
+        addressesToRemove.removeOne(address);
+
         if (address.protocol() != QAbstractSocket::IPv4Protocol)
             continue;
 
@@ -85,14 +87,20 @@ QList<UDPSocket*> QnMulticastModuleFinder::findNewInterfaces() {
             sock->getLocalAddress();    //requesting local address. During this call local port is assigned to socket
             sock->setDestAddr(m_multicastGroupAddress.toString(), m_multicastGroupPort);
             auto it = m_clientSockets.insert(address, sock.release());
-            result.append(it.value());
             if (m_serverSocket)
                 m_serverSocket->joinGroup(m_multicastGroupAddress.toString(), address.toString());
+
+            if (!m_pollSet.add(it.value()->implementationDelegate(), aio::etRead, it.value()))
+                Q_ASSERT(false);
         } catch(const std::exception &e) {
             NX_LOG(lit("Failed to create socket on local address %1. %2").arg(address.toString()).arg(QString::fromLatin1(e.what())), cl_logERROR);
         }
     }
-    return result;
+
+    for (const QHostAddress &address: addressesToRemove) {
+        UDPSocket *socket = m_clientSockets.take(address);
+        m_pollSet.remove(socket->implementationDelegate(), aio::etRead);
+    }
 }
 
 QnModuleInformation QnMulticastModuleFinder::moduleInformation(const QnUuid &moduleId) const {
@@ -305,11 +313,7 @@ void QnMulticastModuleFinder::run() {
         quint64 currentClock = QDateTime::currentMSecsSinceEpoch();
 
         if (currentClock - m_lastInterfacesCheckMs >= checkInterfacesTimeoutMs) {
-            QList<UDPSocket*> newSockets = findNewInterfaces();
-            for (UDPSocket *socket: newSockets) {
-                if (!m_pollSet.add(socket->implementationDelegate(), aio::etRead, socket))
-                    Q_ASSERT(false);
-            }
+            updateInterfaces();
             m_lastInterfacesCheckMs = currentClock;
         }
 

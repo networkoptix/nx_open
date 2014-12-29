@@ -79,7 +79,7 @@ protected:
 private:
     bool processDiscoveryRequest(UDPSocket *udpSocket);
     bool processDiscoveryResponse(UDPSocket *udpSocket);
-    QList<UDPSocket *> findNewInterfaces();
+    void updateInterfaces();
 
 private:
     struct ModuleContext {
