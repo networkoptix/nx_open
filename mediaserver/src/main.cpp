@@ -888,7 +888,7 @@ void QnMain::updateAllowCameraCHangesIfNeed()
     if (!allowCameraChanges.isEmpty())
     {
         QnGlobalSettings *settings = QnGlobalSettings::instance();
-        settings->setCameraSettingsOptimizationEnabled(allowCameraChanges.toLower() == lit("true") || allowCameraChanges == lit("1"));
+        settings->setCameraSettingsOptimizationEnabled(allowCameraChanges.toLower() == lit("yes") || allowCameraChanges.toLower() == lit("true") || allowCameraChanges == lit("1"));
         MSSettings::roSettings()->setValue(DV_PROPERTY, "");
     }
 }
