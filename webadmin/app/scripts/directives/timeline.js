@@ -49,7 +49,7 @@ angular.module('webadminApp')
                 var oldSetValue = 0;
                 var oldScrollValue = 0;
                 var correctionPrecision = 0.000001;// precision for value - to detect boundaries
-                var zoomScrollPrecision = 0.01;// precision for zooming
+                var zoomScrollPrecision = 0.0001;// precision for zooming
 
 
                 // set up scroll up-down for zoom
@@ -92,9 +92,8 @@ angular.module('webadminApp')
                         oldVerticalScrollValue = newVerticalScrollValue;
                         var targetZoomLevel = scope.maxZoomLevel * newVerticalScrollValue;
 
-                        //console.log("zoom!", scope.actualZoomLevel, verticalScrollRelative(), newVerticalScrollValue);
                         //var targetZoomLevel = 1;
-                        animateScope.animate(scope,'actualZoomLevel',targetZoomLevel);
+                        animateScope.animate(scope,'actualZoomLevel',targetZoomLevel,newVerticalScrollValue);
 
                     }
                 });
