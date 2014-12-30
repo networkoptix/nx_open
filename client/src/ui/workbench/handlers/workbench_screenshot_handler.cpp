@@ -69,7 +69,7 @@ QString QnScreenshotParameters::timeString() const {
     qint64 timeMSecs = time / 1000;
     if (isUtc)
         return datetimeSaveDialogSuggestion(QDateTime::fromMSecsSinceEpoch(timeMSecs));
-    return QTime().addMSecs(timeMSecs).toString(lit("hh.mm.ss"));
+    return QTime(0, 0, 0, 0).addMSecs(timeMSecs).toString(lit("hh.mm.ss"));
 }
 
 
