@@ -12,7 +12,7 @@ class QnResourceVideoLayout;
 class QnTimeImageFilter: public QnAbstractImageFilter
 {
 public:
-    QnTimeImageFilter(const QSharedPointer<const QnResourceVideoLayout>& videoLayout, Qn::Corner datePos, qint64 timeOffsetMs);
+    QnTimeImageFilter(const QSharedPointer<const QnResourceVideoLayout>& videoLayout, Qn::Corner datePos, qint64 timeOffsetMs, qint64 timeMsec);
     virtual ~QnTimeImageFilter();
     CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) override;
     virtual QSize updatedResolution(const QSize& srcSize) override { return srcSize; }
@@ -31,6 +31,7 @@ private:
     Qn::Corner m_dateTextPos;
     bool m_checkHash;
     qint64 m_hash;
+    qint64 m_timeMsec;
 };
 
 #endif // ENABLE_DATA_PROVIDER

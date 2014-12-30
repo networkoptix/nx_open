@@ -19,8 +19,8 @@ float QnAspectRatio::toFloat() const {
     return static_cast<float>(m_width) / m_height;
 }
 
-QString QnAspectRatio::toString() const {
-    return lit("%1:%2").arg(m_width).arg(m_height);
+QString QnAspectRatio::toString(const QString fmt) const {
+    return fmt.arg(m_width).arg(m_height);
 }
 
 QList<QnAspectRatio> QnAspectRatio::standardRatios() {

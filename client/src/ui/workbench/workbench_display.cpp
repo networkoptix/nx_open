@@ -1735,7 +1735,9 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
                 displayTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0); // TODO: #Elric do offset adjustments in one place
 
             // TODO: #Elric move out, common code, another copy is in QnWorkbenchScreenshotHandler
-            QString timeString = (widget->resource()->toResource()->flags() & Qn::utc) ? QDateTime::fromMSecsSinceEpoch(displayTime).toString(lit("yyyy MMM dd hh:mm:ss")) : QTime().addMSecs(displayTime).toString(lit("hh:mm:ss"));
+            QString timeString = (widget->resource()->toResource()->flags() & Qn::utc) 
+                ? QDateTime::fromMSecsSinceEpoch(displayTime).toString(lit("yyyy MMM dd hh:mm:ss")) 
+                : QTime(0, 0, 0, 0).addMSecs(displayTime).toString(lit("hh:mm:ss.zzz"));
             widget->setTitleTextFormat(QLatin1String("%1\t") + timeString);
         }
 
