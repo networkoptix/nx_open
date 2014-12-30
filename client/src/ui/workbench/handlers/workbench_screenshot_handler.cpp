@@ -460,11 +460,15 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
     hideProgressDelayed();
 
     QnScreenshotParameters parameters = loader->parameters();
+    qint64 timeMsec = parameters.time == latestScreenshotTime 
+        ? QDateTime::currentMSecsSinceEpoch()
+        : parameters.time / 1000;
+    
     QnImageFilterHelper transcodeParams;
     // Doing heavy filters only. This filters doesn't supported on server side for screenshots
     transcodeParams.setDewarpingParams(parameters.mediaDewarpingParams, parameters.itemDewarpingParams);
     transcodeParams.setContrastParams(parameters.imageCorrectionParams);
-    transcodeParams.setTimeCorner(parameters.timestampPosition, 0);
+    transcodeParams.setTimeCorner(parameters.timestampPosition, 0, timeMsec);
     transcodeParams.setRotation(parameters.rotationAngle);
     transcodeParams.setSrcRect(parameters.zoomRect);
     QList<QnAbstractImageFilterPtr> filters = transcodeParams.createFilterChain(image.size());

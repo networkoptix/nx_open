@@ -18,7 +18,7 @@ static const int TEXT_HEIGHT_IN_FRAME_PARTS = 25;
 static const int MIN_TEXT_HEIGHT = 14;
 static const double FPS_EPS = 1e-8;
 
-QnTimeImageFilter::QnTimeImageFilter(const QSharedPointer<const QnResourceVideoLayout>& videoLayout, Qn::Corner datePos, qint64 timeOffsetMs):
+QnTimeImageFilter::QnTimeImageFilter(const QSharedPointer<const QnResourceVideoLayout>& videoLayout, Qn::Corner datePos, qint64 timeOffsetMs, qint64 timeMsec):
     m_dateTimeXOffs(0),
     m_dateTimeYOffs(0),
     m_bufXOffs(0),
@@ -28,7 +28,8 @@ QnTimeImageFilter::QnTimeImageFilter(const QSharedPointer<const QnResourceVideoL
     m_imageBuffer(0),
     m_dateTextPos(datePos),
     m_checkHash(videoLayout && videoLayout->channelCount() > 1),
-    m_hash(-1)
+    m_hash(-1),
+    m_timeMsec(timeMsec)
 {
 }
 
@@ -100,11 +101,16 @@ CLVideoDecoderOutputPtr QnTimeImageFilter::updateImage(const CLVideoDecoderOutpu
 {
 
     QString timeStr;
-    qint64 displayTime = frame->pts/1000 + m_onscreenDateOffset;
-    if (frame->pts >= UTC_TIME_DETECTION_THRESHOLD)
+    qint64 displayTime = m_timeMsec > 0
+        ? m_timeMsec
+        : frame->pts / 1000;
+
+    displayTime += m_onscreenDateOffset;
+
+    if (m_timeMsec * 1000 >= UTC_TIME_DETECTION_THRESHOLD)
         timeStr = QDateTime::fromMSecsSinceEpoch(displayTime).toString(QLatin1String("yyyy-MMM-dd hh:mm:ss"));
     else
-        timeStr = QTime().addMSecs(displayTime).toString(QLatin1String("hh:mm:ss.zzz"));
+        timeStr = QTime(0, 0, 0, 0).addMSecs(displayTime).toString(QLatin1String("hh:mm:ss.zzz"));
 
     if (m_timeImg == 0)
         initTimeDrawing(frame, timeStr);
