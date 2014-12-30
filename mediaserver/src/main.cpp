@@ -663,7 +663,6 @@ int serverMain(int argc, char *argv[])
     SetConsoleCtrlHandler(stopServer_WIN, true);
 #endif
     signal(SIGINT, stopServer);
-    //signal(SIGABRT, stopServer);
     signal(SIGTERM, stopServer);
 
 //    av_log_set_callback(decoderLogCallback);
@@ -829,6 +828,7 @@ void QnMain::at_restartServerRequired()
 
 void QnMain::stopSync()
 {
+    qWarning()<<"Stopping server";
     if (serviceMainInstance) {
         serviceMainInstance->pleaseStop();
         serviceMainInstance->exit();
@@ -1869,6 +1869,8 @@ void QnMain::run()
 
     exec();
 
+    qWarning()<<"QnMain event loop has returned. Destroying objects...";
+
     //cancelling dumping system usage
     quint64 dumpSystemResourceUsageTaskID = 0;
     {
@@ -2147,11 +2149,12 @@ private:
     QnSoftwareVersion m_overrideVersion;
 };
 
-void stopServer(int signal)
+void stopServer(int /*signal*/)
 {
     restartFlag = false;
     if (serviceMainInstance) {
-        qWarning() << "got signal" << signal << "stop server!";
+        //output to console from signal handler can cause deadlock
+        //qWarning() << "got signal" << signal << "stop server!";
         serviceMainInstance->stopAsync();
     }
 }
