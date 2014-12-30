@@ -20,8 +20,8 @@
     </div>
 
     <div class="scroll-btn left"
-         ng-click="scrollClick(false)"
-         ng-dblclick="scrollDblClick(false)"
+         ng-mouseenter="checkRightLeftVisibility(false)"
+         ng-dblclick="scrollToEnd(false)"
          ng-mousedown="scrollStart(false)"
          ng-mouseup="scrollEnd(false)"
          ng-mouseleave="scrollEnd(false)"
@@ -30,8 +30,8 @@
     </div>
 
     <div class="scroll-btn right"
-         ng-click="scrollClick(true)"
-         ng-dblclick="scrollDblClick(true)"
+         ng-mouseenter="checkRightLeftVisibility(true)"
+         ng-dblclick="scrollToEnd(true)"
          ng-mousedown="scrollStart(true)"
          ng-mouseup="scrollEnd(true)"
          ng-mouseleave="scrollEnd(true)"

@@ -127,6 +127,8 @@ angular.module('webadminApp')
                         viewPortScrollRelative(horScroll);
                     }
 
+                    scope.$apply();
+
                 });
 
                 function maxZoomLevel(){
@@ -391,11 +393,8 @@ angular.module('webadminApp')
 
                     }
                     newPosition = bound(0,newPosition,1);
-
-                    scope.disableScrollRight = newPosition > 1 - timelineConfig.scrollBoundariesPrecision;
-                    scope.disableScrollLeft = newPosition < timelineConfig.scrollBoundariesPrecision;
-
                     viewPortScrollRelative(newPosition);
+                    scope.checkRightLeftVisibility();
                 }
 
                 function updateView(){
@@ -445,14 +444,29 @@ angular.module('webadminApp')
                     newPosition = bound(0,newPosition,scope.frameWidth - viewportWidth);
 
                     animateScope.animate(scope,"targetScrollPosition",newPosition);
-                    return animateScope.progress(scope,"scrolling");
+                    var animation = animateScope.progress(scope,"scrolling");
+                    animation.then(function(){
+                        scope.checkRightLeftVisibility(right);
+                    });
+                    return animation;
                 };
-                scope.scrollClick = function(right){
-                    console.log("scrollClick",right);
-                    //scope.scroll(right,0.5);
+                scope.scrollToEnd = function(right){
+                    animateScope.animate(scope,"targetScrollPosition",right?scope.frameWidth:-scope.frameWidth);
+                    var animation = animateScope.progress(scope,"scrolling");
+                    animation.then(function(){
+                        scope.checkRightLeftVisibility(right);
+                    });
+                    return animation;
                 };
-                scope.scrollDblClick = function(right){
-                    console.log("dblclick",right);
+
+                scope.checkRightLeftVisibility = function(right){
+                    var scroll = viewPortScrollRelative();
+                    if(right || typeof(right) === 'undefined') {
+                        scope.disableScrollRight = scroll > 1 - timelineConfig.scrollBoundariesPrecision || scope.frameWidth === viewportWidth;
+                    }
+                    if(!right){
+                        scope.disableScrollLeft = scroll < timelineConfig.scrollBoundariesPrecision || scope.frameWidth === viewportWidth;
+                    }
                 };
 
                 var scrollingNow = false;
