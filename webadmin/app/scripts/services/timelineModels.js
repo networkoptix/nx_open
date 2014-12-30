@@ -50,12 +50,17 @@ Interval.prototype.addToDate = function(date, count){
     if(typeof(count)==='undefined') {
         count = 1;
     }
-    return new Date(date.getFullYear() + count*this.years,
-            date.getMonth() + count*this.months,
-            date.getDate() +  count*this.days,
-            date.getHours() + count*this.hours,
-            date.getMinutes() + count*this.minutes,
-            date.getSeconds() + count*this.seconds);
+    try {
+        return new Date(date.getFullYear() + count * this.years,
+                date.getMonth() + count * this.months,
+                date.getDate() + count * this.days,
+                date.getHours() + count * this.hours,
+                date.getMinutes() + count * this.minutes,
+                date.getSeconds() + count * this.seconds);
+    }catch(error){
+        console.log(date);
+        throw error;
+    }
 };
 
 Interval.secondsBetweenDates = function(date1,date2){

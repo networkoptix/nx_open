@@ -20,7 +20,8 @@
     "videogular-buffering": "~0.7.0",
     "videogular-dash": "~0.7.0",
     "videogular-controls": "~0.7.0",
-    "videogular-poster": "~0.7.0"
+    "videogular-poster": "~0.7.0",
+    "jquery-mousewheel": "~3.1.12"
   },
   "devDependencies": {
     "angular-mocks": "1.2.6",

@@ -12,80 +12,9 @@
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-
   cursor: default;
 }
-.frame {
-  overflow:hidden;
-}
-.timeline {
-  overflow:visible;
-}
-/* Таймлайн - контейнер. Непосредственно у него мы и фиксируем ширину и меняем её при зуме. Ширина задается декларативно */
-.timeline,.frame{
-  position:relative;
-}
 
-/* Линии в таймлайне разделены отступами */
-.timeline>*{
-  margin-bottom:3px;
-}
-
-/* Линейка */
-.ruler{
-  height:25px;
-  position: relative;
-}
-/* Секция линейки */
-.marksContainer{
-  font-size:initial;
-  display:inline-block;
-  height:15px;
-  width:100%;
-  font-size:1px;
-  border-left: 1px solid silver;
-  vertical-align:top;
-  position:absolute;
-  text-align: justify;
-}
-/* Псевдоэлемент после секций линейки - чтобы сделать "новую строку" и гарантировать растянивание маленьких отметок по ширине */
-.marksContainer:after {
-  width: 100%;
-  height: 0px;
-  visibility: hidden;
-  overflow: hidden;
-  content: '';
-  display: inline-block;
-  position:relative;
-  vertical-align:top;
-}
-/*Маленькие отметки*/
-.ruler .small{
-  height:50%;
-  display: inline-block;
-  vertical-align:top;
-  border-left: 1px solid silver;
-  /*animation-duration:0.5s !important;
-  -webkit-animation-duration: 0.5s;*/
-
-}
-/*Скрытые отметки - используются, чтобы правильнее растягивать по ширине - одна в начале секции, одна в конце*/
-.small-hidden{
-  visibility:hidden;
-  width:0px;
-  border:none;
-}
-/*Подпись на линейке*/
-.ruler-label{
-  text-align:center;
-
-  font-size:10px;
-  color:silver;
-  margin-left: -50px;
-  margin-top:15px;
-  width:100px;
-  position: absolute;
-}
 /*
 Линия с событиями. Линий может быть много. Фиксируем для линии высоту
 Задаем позиционирование, чтобы правильно перепозиционировать внутренние блоки
@@ -147,23 +76,14 @@ ng-include{
 }
 
 
-.viewport > .scroll{
-  width:100%;
-  height: 100%;
-  overflow-x:scroll;
-  overflow-y:scroll;
-}
-.viewport > canvas{
-  width:100%;
+.viewport > .scroll,.viewport > canvas{
+  width: 100%;
+  height: 50px;
   position:absolute;
 }
-
-
-.viewport > canvas{
-  height:100%;
-}
-.viewport > .scroll > .frame{
-  height:5000px;
+.viewport > .scroll{
+  overflow-x:scroll;
+  overflow-y:hidden;
 }
 
 .scroll-btn{

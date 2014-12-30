@@ -23,14 +23,19 @@ angular.module('webadminApp')
             if(time > duration) {
                 time = duration;
             }
-            return start + (stop-start)*time/duration;
+            var result = start + (stop-start)*time/duration;
+            if(isNaN(result)){
+                console.log("linear-error",result,start,stop,time,duration);
+            }
+            return  result;
         };
         Animation.prototype.smooth = function(start,stop,time,duration){
             if(time > duration) {
                 time = duration;
             }
             var delta = (Math.sin(time/duration * Math.PI - Math.PI / 2) + 1)/2;
-            return start + (stop - start) *delta ;
+            var result =start + (stop - start) *delta;
+            return  result;
         };
         Animation.prototype.break = function(){
             this.isFinished = true;
@@ -43,6 +48,7 @@ angular.module('webadminApp')
             }
             var time = (new Date()).getTime() - this.started;
             this.scope[this.value] = this.linear(this.initialValue, this.targetValue, time, this.duration);
+
             this.deferred.notify(this.scope[this.value]);
             this.isFinished = time > this.duration;
             if(this.isFinished){
