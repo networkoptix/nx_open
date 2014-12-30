@@ -970,6 +970,15 @@ bool QnDbManager::tuneDBAfterOpen()
         qWarning() << "Failed to enable WAL mode on sqlLite database!" << enableWalQuery.lastError().text();
         return false;
     }
+
+    QSqlQuery enableFKQuery(m_sdb);
+    enableFKQuery.prepare("PRAGMA foreign_keys = ON");
+    if( !enableFKQuery.exec() )
+    {
+        qWarning() << "Failed to enable FK support on sqlLite database!" << enableFKQuery.lastError().text();
+        return false;
+    }
+
     return true;
 }
 
