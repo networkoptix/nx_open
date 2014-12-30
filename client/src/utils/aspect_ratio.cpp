@@ -19,7 +19,7 @@ float QnAspectRatio::toFloat() const {
     return static_cast<float>(m_width) / m_height;
 }
 
-QString QnAspectRatio::toString(const QString fmt) const {
+QString QnAspectRatio::toString(const QString &fmt) const {
     return fmt.arg(m_width).arg(m_height);
 }
 
