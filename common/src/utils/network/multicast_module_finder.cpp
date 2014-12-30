@@ -122,30 +122,6 @@ void QnMulticastModuleFinder::addIgnoredModule(const QnNetworkAddress &address, 
         return;
 
     m_ignoredModules.insert(address, id);
-
-    auto it = m_foundAddresses.find(address);
-    if (it == m_foundAddresses.end())
-        return;
-
-    auto moduleIt = m_foundModules.find(id);
-    if (moduleIt == m_foundModules.end())
-        return;
-
-    if (!moduleIt->remoteAddresses.remove(address.host().toString()))
-        return;
-
-    if (it->moduleId == id)
-        m_foundAddresses.erase(it);
-
-    QnModuleInformation moduleInformation = *moduleIt;
-
-    lk.unlock();
-
-    NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Module address (%2:%3) of remote server %1 is lost").
-        arg(id.toString()).arg(address.host().toString()).arg(address.port()), cl_logDEBUG1);
-    emit moduleAddressLost(moduleInformation, address);
-    NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Module %1 has changed.").arg(id.toString()), cl_logDEBUG1);
-    emit moduleChanged(moduleInformation);
 }
 
 void QnMulticastModuleFinder::removeIgnoredModule(const QnNetworkAddress &address, const QnUuid &id) {
