@@ -35,19 +35,20 @@ angular.module('webadminApp')
                     scrollBoundariesPrecision: 0.000001 // Where we should disable right and left scroll buttons
                 };
 
-
-                var viewportWidth = element.find('.viewport').width();
-                var canvas = element.find('canvas').get(0);
-                canvas.width  = viewportWidth;
-                canvas.height = element.find('canvas').height();
-
                 animateScope.setDuration(timelineConfig.animationDuration);
                 animateScope.setScope(scope);
+
+                var viewportWidth = element.find('.viewport').width();
+                var scrollBarWidth = getScrollbarWidth();
+                var containerHeight = element.find('.viewport').height();
+
                 var frame = element.find('.frame');
-
-
                 var scroll = element.find('.scroll');
 
+                var canvas = element.find('canvas').get(0);
+                canvas.width  = viewportWidth;
+                canvas.height = containerHeight - scrollBarWidth;
+                element.find('canvas').height(containerHeight - scrollBarWidth);
 
 
                 function bound(min,value,max){
@@ -137,8 +138,6 @@ angular.module('webadminApp')
                     return maxZoomLevel;
                 }
 
-
-
                 function blurColor(color,alpha){
                     /*
                     var colorString =  'rgba(' +
@@ -158,7 +157,6 @@ angular.module('webadminApp')
                 }
 
                 function zoomLevel(){
-
                     return Math.pow(timelineConfig.zoomStep,scope.actualZoomLevel);
                 }
 
