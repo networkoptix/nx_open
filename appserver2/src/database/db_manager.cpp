@@ -2005,15 +2005,7 @@ ErrorCode QnDbManager::removeCamera(const QnUuid& guid)
 {
     qint32 id = getResourceInternalId(guid);
 
-    //ErrorCode err = deleteAddParams(id);
-    //if (err != ErrorCode::ok)
-    //    return err;
-
-    ErrorCode err = removeCameraSchedule(id);
-    if (err != ErrorCode::ok)
-        return err;
-
-    err = deleteTableRecord(guid, "vms_businessrule_action_resources", "resource_guid");
+    ErrorCode err = deleteTableRecord(guid, "vms_businessrule_action_resources", "resource_guid");
     if (err != ErrorCode::ok)
         return err;
 
