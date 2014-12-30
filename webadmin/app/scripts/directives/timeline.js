@@ -111,8 +111,10 @@ angular.module('webadminApp')
                 scroll.mousewheel(function(event){
                     event.preventDefault();
 
-                    if(Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
-                        if (scope.zooming == 1) { // zoom animation scope.actualVerticalScrollForZoom
+                    if(Math.abs(event.deltaY) > Math.abs(event.deltaX)) { // Zoom or scroll - not both
+                        if (scope.zooming == 1) { // if zoom animation is not going yet
+
+                            scope.positionToKeep = event.offsetX/viewportWidth;
 
                             var actualVerticalScrollForZoom = scope.actualZoomLevel / scope.maxZoomLevel;
                             actualVerticalScrollForZoom -= event.deltaY / timelineConfig.maxVerticalScrollForZoom;
@@ -363,9 +365,8 @@ angular.module('webadminApp')
                         position = level.interval.addToDate(position);
                     }
                 }
-
                 function updateBoundariesAndScroller(){
-                    var keepDate = screenRelativePositionToDate(0.5); // Keep current timeposition for scrolling
+                    var keepDate = screenRelativePositionToDate(scope.positionToKeep); // Keep current timeposition for scrolling
 
                     scope.actualWidth = viewportWidth * zoomLevel();
 
@@ -386,7 +387,7 @@ angular.module('webadminApp')
                         newPosition = scope.targetScrollPosition/ (scope.frameWidth - viewportWidth);
 
                     }else { // Otherwise - keep current position in case of changing width
-                        newPosition = screenRelativePositionAndDateToRelativePositionForScroll(keepDate, 0.5);
+                        newPosition = screenRelativePositionAndDateToRelativePositionForScroll(keepDate, scope.positionToKeep);
 
                         // TODO: In live mode - scroll right
                         // TODO: disable live if view was scrolled
@@ -413,6 +414,8 @@ angular.module('webadminApp')
                 }
 
 
+
+                scope.positionToKeep = 0.5;//Position on screen to keep while zooming
                 scope.levels = RulerModel.levels;
                 scope.actualZoomLevel = timelineConfig.initialZoom;
                 scope.disableZoomOut = true;
@@ -489,6 +492,7 @@ angular.module('webadminApp')
 
 
                 scope.zoom = function(zoomIn, speed){
+                    scope.positionToKeep = 0.5;
                     speed = speed || 1;
 
                     var targetZoomLevel = scope.actualZoomLevel;
