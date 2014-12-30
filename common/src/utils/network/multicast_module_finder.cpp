@@ -367,23 +367,47 @@ void QnMulticastModuleFinder::run() {
         QMutexLocker lk(&m_mutex);
         //checking for expired known hosts...
         for (auto it = m_foundAddresses.begin(); it != m_foundAddresses.end(); /* no inc */) {
-            if(it->prevResponseReceiveClock + m_pingTimeoutMillis*m_keepAliveMultiply > currentClock) {
+            QnUuid id = it->moduleId;
+            QnNetworkAddress address = it.key();
+
+            if (m_ignoredModules.contains(address, id)) {
+                auto moduleIt = m_foundModules.find(id);
+                if (moduleIt != m_foundModules.end() && moduleIt->remoteAddresses.remove(address.host().toString())) {
+                    it = m_foundAddresses.erase(it);
+
+                    QnModuleInformation moduleInformation = *moduleIt;
+
+                    lk.unlock();
+
+                    NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Module address (%2:%3) of remote server %1 is lost").
+                           arg(id.toString()).arg(address.host().toString()).arg(address.port()), cl_logDEBUG1);
+                    emit moduleAddressLost(moduleInformation, address);
+                    NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Module %1 has changed.").arg(id.toString()), cl_logDEBUG1);
+                    emit moduleChanged(moduleInformation);
+
+                    lk.relock();
+
+                    continue;
+                }
+            }
+
+            if (it->prevResponseReceiveClock + m_pingTimeoutMillis * m_keepAliveMultiply > currentClock) {
                 ++it;
                 continue;
             }
 
-            QnModuleInformation &moduleInformation = m_foundModules[it->moduleId];
-            moduleInformation.remoteAddresses.remove(it.key().host().toString());
+            QnModuleInformation &moduleInformation = m_foundModules[id];
+            moduleInformation.remoteAddresses.remove(address.host().toString());
 
             QnModuleInformation moduleInformationCopy = moduleInformation;
 
             lk.unlock();
 
             NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Module address (%2:%3) of remote server %1 is lost").
-                arg(moduleInformationCopy.id.toString()).arg(it.key().host().toString()).arg(it.key().port()), cl_logDEBUG1);
-            emit moduleAddressLost(moduleInformationCopy, it.key());
+                arg(id.toString()).arg(address.host().toString()).arg(address.port()), cl_logDEBUG1);
+            emit moduleAddressLost(moduleInformationCopy, address);
 
-            NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Module %1 has changed.").arg(moduleInformationCopy.id.toString()), cl_logDEBUG1);
+            NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Module %1 has changed.").arg(id.toString()), cl_logDEBUG1);
             emit moduleChanged(moduleInformationCopy);
 
             lk.relock();
