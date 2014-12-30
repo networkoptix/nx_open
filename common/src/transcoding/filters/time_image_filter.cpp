@@ -45,7 +45,7 @@ void QnTimeImageFilter::initTimeDrawing(const CLVideoDecoderOutputPtr& frame, co
     m_timeFont.setPixelSize(qMax(MIN_TEXT_HEIGHT, frame->height / TEXT_HEIGHT_IN_FRAME_PARTS));
     QFontMetrics metric(m_timeFont);
     
-    while (metric.width(timeStr) >= frame->width - metric.averageCharWidth() && m_timeFont.pixelSize() > 0)
+    while (metric.width(timeStr) >= frame->width - metric.averageCharWidth() && m_timeFont.pixelSize() > MIN_TEXT_HEIGHT)
     {
         m_timeFont.setPixelSize(m_timeFont.pixelSize()-1);
         metric = QFontMetrics(m_timeFont);
