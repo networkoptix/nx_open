@@ -50,6 +50,10 @@ angular.module('webadminApp')
 
 
 
+                function bound(min,value,max){
+                    return Math.max(min,Math.min(value,max));
+                }
+
                 // set up scroll up-down for zoom
                 function getScrollbarWidth() {
                     var outer = document.createElement("div");
@@ -112,12 +116,7 @@ angular.module('webadminApp')
                             var actualVerticalScrollForZoom = scope.actualZoomLevel / scope.maxZoomLevel;
                             actualVerticalScrollForZoom -= event.deltaY / timelineConfig.maxVerticalScrollForZoom;
 
-                            if (actualVerticalScrollForZoom > 1) {
-                                actualVerticalScrollForZoom = 1;
-                            }
-                            if (actualVerticalScrollForZoom < 0) {
-                                actualVerticalScrollForZoom = 0;
-                            }
+                            actualVerticalScrollForZoom = bound(0,actualVerticalScrollForZoom,1);
 
                             scope.actualZoomLevel = scope.maxZoomLevel * actualVerticalScrollForZoom;
                         }
@@ -393,7 +392,7 @@ angular.module('webadminApp')
                         // TODO: disable live if view was scrolled
 
                     }
-                    newPosition = Math.min(Math.max(newPosition,0),1);
+                    newPosition = bound(0,newPosition,1);
 
                     scope.disableScrollRight = newPosition > 1 - timelineConfig.scrollBoundariesPrecision;
                     scope.disableScrollLeft = newPosition < timelineConfig.scrollBoundariesPrecision;
@@ -445,7 +444,7 @@ angular.module('webadminApp')
                     var newPosition = scope.targetScrollPosition + (right ? 1 : -1) * value * viewportWidth;
                     // Here we have a problem:we should scroll left a bit if it is not .
 
-                    newPosition = Math.min(Math.max(newPosition,0),scope.frameWidth - viewportWidth);
+                    newPosition = bound(0,newPosition,scope.frameWidth - viewportWidth);
 
                     animateScope.animate(scope,"targetScrollPosition",newPosition);
                     return animateScope.progress(scope,"scrolling");
@@ -483,14 +482,13 @@ angular.module('webadminApp')
                     var targetZoomLevel = scope.actualZoomLevel;
                     if(zoomIn && !scope.disableZoomIn) {
                         targetZoomLevel += speed;
-                        targetZoomLevel = Math.min(targetZoomLevel,scope.maxZoomLevel);
                     }
 
                     if(!zoomIn && !scope.disableZoomOut ) {
                         targetZoomLevel -= speed;
-                        targetZoomLevel = Math.max(targetZoomLevel,0);
                     }
 
+                    targetZoomLevel = bound(0,targetZoomLevel,scope.maxZoomLevel);
                     animateScope.animate(scope,'actualZoomLevel',targetZoomLevel);
                     animateScope.progress(scope,'zooming');
 
