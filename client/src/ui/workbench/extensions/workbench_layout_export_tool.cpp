@@ -186,9 +186,9 @@ bool QnLayoutExportTool::start() {
         bool exportedLayout = snapshotManager()->isFile(m_layout);  // we have changed background to an exported layout
         QScopedPointer<QnAppServerImageCache> cache;
         if (exportedLayout)
-            cache.reset(new QnLocalFileCache());
+            cache.reset(new QnLocalFileCache(this));
         else
-            cache.reset(new QnAppServerImageCache());
+            cache.reset(new QnAppServerImageCache(this));
 
         QImage background(cache->getFullPath(m_layout->backgroundImageFilename()));
         if (!background.isNull()) {

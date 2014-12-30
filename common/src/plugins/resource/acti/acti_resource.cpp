@@ -375,6 +375,12 @@ CameraDiagnostics::Result QnActiResource::initInternal()
 
 bool QnActiResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
 {
+    if( hasFlags(Qn::foreigner) ||      //we do not own camera
+        !hasCameraCapabilities(Qn::RelayInputCapability) )
+    {
+        return false;
+    }
+
     if( actiEventPort == 0 )
         return false;   //no http listener is present
 

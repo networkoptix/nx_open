@@ -663,7 +663,6 @@ int serverMain(int argc, char *argv[])
     SetConsoleCtrlHandler(stopServer_WIN, true);
 #endif
     signal(SIGINT, stopServer);
-    //signal(SIGABRT, stopServer);
     signal(SIGTERM, stopServer);
 
 //    av_log_set_callback(decoderLogCallback);
@@ -829,6 +828,7 @@ void QnMain::at_restartServerRequired()
 
 void QnMain::stopSync()
 {
+    qWarning()<<"Stopping server";
     if (serviceMainInstance) {
         serviceMainInstance->pleaseStop();
         serviceMainInstance->exit();
@@ -888,7 +888,7 @@ void QnMain::updateAllowCameraCHangesIfNeed()
     if (!allowCameraChanges.isEmpty())
     {
         QnGlobalSettings *settings = QnGlobalSettings::instance();
-        settings->setCameraSettingsOptimizationEnabled(allowCameraChanges.toLower() == lit("true") || allowCameraChanges == lit("1"));
+        settings->setCameraSettingsOptimizationEnabled(allowCameraChanges.toLower() == lit("yes") || allowCameraChanges.toLower() == lit("true") || allowCameraChanges == lit("1"));
         MSSettings::roSettings()->setValue(DV_PROPERTY, "");
     }
 }
@@ -1174,13 +1174,8 @@ void QnMain::at_timer()
 {
     MSSettings::runTimeSettings()->setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
     QnResourcePtr mServer = qnResPool->getResourceById(qnCommon->moduleGUID());
-    for(const QnResourcePtr& res: qnResPool->getAllCameras(mServer))
-    {
-        QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
-        if (cam)
-            cam->noCameraIssues(); // decrease issue counter
-    }
-
+    for(const QnVirtualCameraResourcePtr& camera: qnResPool->getAllCameras(mServer))
+        camera->noCameraIssues(); // decrease issue counter
 }
 
 void QnMain::at_storageManager_noStoragesAvailable() {
@@ -1874,6 +1869,8 @@ void QnMain::run()
 
     exec();
 
+    qWarning()<<"QnMain event loop has returned. Destroying objects...";
+
     //cancelling dumping system usage
     quint64 dumpSystemResourceUsageTaskID = 0;
     {
@@ -2152,11 +2149,12 @@ private:
     QnSoftwareVersion m_overrideVersion;
 };
 
-void stopServer(int signal)
+void stopServer(int /*signal*/)
 {
     restartFlag = false;
     if (serviceMainInstance) {
-        qWarning() << "got signal" << signal << "stop server!";
+        //output to console from signal handler can cause deadlock
+        //qWarning() << "got signal" << signal << "stop server!";
         serviceMainInstance->stopAsync();
     }
 }

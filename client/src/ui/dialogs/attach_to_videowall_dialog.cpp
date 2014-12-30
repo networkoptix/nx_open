@@ -59,7 +59,7 @@ void QnAttachToVideowallDialog::updateLicencesUsage() {
     QString licenseUsage = helper.getProposedUsageText(Qn::LC_VideoWall);
     if(!licensesOk) {
         setWarningStyle(&palette);
-        licenseUsage += L'\n' + helper.getRequiredLicenseMsg(Qn::LC_VideoWall);
+        licenseUsage += L'\n' + helper.getRequiredText(Qn::LC_VideoWall);
     }
     ui->licensesLabel->setText(licenseUsage);
     ui->licensesLabel->setPalette(palette);

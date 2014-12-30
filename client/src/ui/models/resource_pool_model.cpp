@@ -783,10 +783,7 @@ void QnResourcePoolModel::at_server_redundancyChanged(const QnResourcePtr &resou
     bool isHidden = QnMediaServerResource::isHiddenServer(resource);
     QnResourcePoolModelNode *camerasParentNode = isHidden ? m_rootNodes[Qn::ServersNode] : node;
 
-    foreach (const QnResourcePtr &cameraResource, qnResPool->getAllCameras(resource, true)) {
-        if (!cameraResource.dynamicCast<QnVirtualCameraResource>())
-            continue;
-
+    for (const QnVirtualCameraResourcePtr &cameraResource: qnResPool->getAllCameras(resource, true)) {
         this->node(cameraResource)->setParent(camerasParentNode);
     }
 

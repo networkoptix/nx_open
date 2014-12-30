@@ -250,7 +250,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     QString namePart = replaceNonFileNameCharacters(widget->resource()->toResourcePtr()->getName(), L'_');
     QString timePart = (widget->resource()->toResource()->flags() & Qn::utc)
             ? QDateTime::fromMSecsSinceEpoch(period.startTimeMs).toString(lit("yyyy_MMM_dd_hh_mm_ss"))
-            : QTime().addMSecs(period.startTimeMs).toString(lit("hh_mm_ss"));
+            : QTime(0, 0, 0, 0).addMSecs(period.startTimeMs).toString(lit("hh_mm_ss"));
     QString suggestion = QnEnvironment::getUniqueFileName(previousDir, namePart + lit("_") + timePart);
 
     while (true) {
