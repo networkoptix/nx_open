@@ -68,7 +68,7 @@ public:
     QnWorkbenchScreenshotHandler(QObject *parent = NULL);
 
 private:
-    QnImageProvider* getLocalScreenshotProvider(const QnScreenshotParameters &parameters, QnResourceDisplay* display) const;
+    QnImageProvider* getLocalScreenshotProvider(QnMediaResourceWidget *widget, const QnScreenshotParameters &parameters) const;
 
 private slots:
     void at_takeScreenshotAction_triggered();
@@ -85,6 +85,7 @@ private:
     void takeDebugScreenshotsSet(QnMediaResourceWidget *widget);
 
     qint64 screenshotTime(QnMediaResourceWidget *widget);
+    void takeScreenshot(QnMediaResourceWidget *widget, const QnScreenshotParameters &parameters);
 
 private:
     QnProgressDialog *m_screenshotProgressDialog;

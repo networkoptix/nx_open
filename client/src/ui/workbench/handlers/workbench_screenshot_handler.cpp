@@ -36,6 +36,8 @@
 #include <utils/common/string.h>
 #include <utils/common/environment.h>
 #include <utils/common/warnings.h>
+#include <utils/aspect_ratio.h>
+
 #include "transcoding/filters/fisheye_image_filter.h"
 #include "transcoding/filters/filter_helper.h"
 #include "transcoding/filters/abstract_image_filter.h"
@@ -142,9 +144,8 @@ QnWorkbenchScreenshotHandler::QnWorkbenchScreenshotHandler(QObject *parent):
     connect(action(Qn::TakeScreenshotAction), &QAction::triggered, this, &QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered);
 }
 
-QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(const QnScreenshotParameters &parameters, QnResourceDisplay *display) const {
-    if (!display)
-        return NULL;
+QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMediaResourceWidget *widget, const QnScreenshotParameters &parameters) const {
+    QnResourceDisplayPtr display = widget->display();
 
     TRACE("SCREENSHOT DEWARPING" << parameters.itemDewarpingParams.enabled << parameters.itemDewarpingParams.xAngle << parameters.itemDewarpingParams.yAngle << parameters.itemDewarpingParams.fov);
 
@@ -199,82 +200,127 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
     keyStack.push(qnSettings->lastScreenshotDir() + lit("/"));
     keyStack.push(widget->resource()->toResource()->getName());
 
+    struct Key {
+        Key(QStack<QString> &stack, const QString &value):
+            m_stack(stack)
+        {
+            m_stack.push(value);
+        }
+
+        ~Key() {
+            m_stack.pop();
+        }
+
+        QStack<QString> &m_stack;
+    };
+
     auto path = [&keyStack]() {
         QString result;
         for (const QString &e: keyStack.toList())
             result += e;
         return result;
     };
-
-    auto makeScreenshot = [&](const QnScreenshotParameters &parameters) {
-
-        QnScreenshotParameters localParameters = parameters;
-        qDebug() << parameters.filename;
-
-        // Revert UI has 'hack'. VerticalDown fisheye option is emulated by additional rotation. But filter has built-in support for that option.
-        if (localParameters.itemDewarpingParams.enabled && localParameters.mediaDewarpingParams.viewMode == QnMediaDewarpingParams::VerticalDown)
-            localParameters.rotationAngle -= 180;
-
-        QnImageProvider* imageProvider = getLocalScreenshotProvider(parameters, widget->display().data());
-        if (imageProvider) {
-            // avoiding post-processing duplication
-            localParameters.imageCorrectionParams.enabled = false;
-            localParameters.mediaDewarpingParams.enabled = false;
-            localParameters.itemDewarpingParams.enabled = false;
-            localParameters.zoomRect = QRectF();
-            localParameters.customAspectRatio = 0.0;
-            localParameters.rotationAngle = 0;
-        } else {
-            imageProvider = QnSingleThumbnailLoader::newInstance(widget->resource()->toResourcePtr(), parameters.time, 0);
-        }
-
-        QnScreenshotLoader* loader = new QnScreenshotLoader(localParameters, this);
-        connect(loader, &QnImageProvider::imageChanged, this,   &QnWorkbenchScreenshotHandler::at_imageLoaded);
-        loader->setBaseProvider(imageProvider); // preload screenshot here
-
-        showProgressDelayed(tr("Saving %1").arg(QFileInfo(localParameters.filename).fileName()));
-        connect(m_screenshotProgressDialog, &QnProgressDialog::canceled, loader, &QnScreenshotLoader::deleteLater);
-
-        m_canceled = false;
-        loader->loadAsync();
-    };
     
+    int count = 1;
+    int current = 0;
+
     QList<QString> formats;
     formats << lit(".png");
     if (QImageWriter::supportedImageFormats().contains("jpg"))
         formats << lit(".jpg");
+    count *= formats.size();
+
+    typedef QPair<QString, float> ar_type;
+    QList<ar_type> ars;
+    ars << ar_type(QString(), 0.0);
+    for (const QnAspectRatio &ar: QnAspectRatio::standardRatios())
+        ars << ar_type(ar.toString(lit("_%1x%2")), ar.toFloat());
+    count*= ars.size();
+
+    QList<int> rotations;
+    for(int rotation = 0; rotation < 360; rotation += 90)
+        rotations << rotation;
+    count *= rotations.size();
+
+    QList<ImageCorrectionParams> imageCorrList;
+    {
+        auto params = widget->item()->imageEnhancement();
+        imageCorrList << params;
+        params.enabled = !params.enabled;
+        imageCorrList << params;
+    }
+    count *= imageCorrList.size();
+
+    typedef QPair<QString, Qn::Corner> crn_type;
+    QList<crn_type> tsCorners;
+    tsCorners 
+        << crn_type(lit("_nots"), Qn::NoCorner) 
+        << crn_type(lit("_topLeft"), Qn::TopLeftCorner)
+        << crn_type(lit("_topRight"), Qn::TopRightCorner)
+        << crn_type(lit("_btmLeft"), Qn::BottomLeftCorner)
+        << crn_type(lit("_btmRight"), Qn::BottomRightCorner);
+    count *= tsCorners.size();   
 
     QnResourceDisplayPtr display = widget->display();
 
+    QScopedPointer<QnProgressDialog> dialog(new QnProgressDialog(mainWindow()));
+    dialog->setMaximum(count);
+    dialog->setValue(current);
+    dialog->setMinimumWidth(600);
+    dialog->show();
+
+    qint64 startTime = QDateTime::currentMSecsSinceEpoch();
+
     QnScreenshotParameters parameters;
-    {
+    {       
         parameters.time = screenshotTime(widget);
-        keyStack.push(lit("_") + parameters.timeString());
-
         parameters.isUtc = widget->resource()->toResource()->flags() & Qn::utc;
-        parameters.timestampPosition = qnSettings->timestampCorner();
+        Key timeKey(keyStack, lit("_") + parameters.timeString());
+       
         parameters.itemDewarpingParams = widget->item()->dewarpingParams();
-        parameters.mediaDewarpingParams = widget->dewarpingParams();
-        parameters.imageCorrectionParams = widget->item()->imageEnhancement();
+        parameters.mediaDewarpingParams = widget->dewarpingParams();       
         parameters.zoomRect = parameters.itemDewarpingParams.enabled ? QRectF() : widget->zoomRect();
-        parameters.customAspectRatio = display->camDisplay()->overridenAspectRatio();
+        
+        for (const ImageCorrectionParams &imageCorr: imageCorrList) {
+            Key imageCorrKey(keyStack, imageCorr.enabled ? lit("_enh") : QString());
+            parameters.imageCorrectionParams = imageCorr;
 
-        for(int rotation = 0; rotation < 360; rotation += 90) {
-            keyStack.push(lit("_rot%1").arg(rotation));
-            parameters.rotationAngle = rotation;
+            for (const ar_type &ar: ars) {
+                Key arKey(keyStack, ar.first);
+                parameters.customAspectRatio = ar.second;
 
-            for (const QString &fmt: formats) {
-                keyStack.push(fmt);
-                parameters.filename = path();
-                makeScreenshot(parameters);
-                keyStack.pop();
+                for(int rotation: rotations) {
+                    Key rotKey(keyStack, lit("_rot%1").arg(rotation));
+                    parameters.rotationAngle = rotation;
+
+                    for (const crn_type &crn: tsCorners) {
+                        Key tsKey(keyStack, crn.first);
+                        parameters.timestampPosition = crn.second;
+
+                        for (const QString &fmt: formats) {
+                            Key fmtKey(keyStack, fmt);
+                            parameters.filename = path();
+
+                            {
+                                dialog->setValue(current);
+                                current++;
+                                dialog->setLabelText(lit("%1 (%2 of %3)").arg(parameters.filename).arg(current).arg(count));
+                                qApp->processEvents();
+                                if (dialog->wasCanceled())
+                                    return;
+                                takeScreenshot(widget, parameters);
+                                
+                            }
+                        }
+                    }
+                }
             }
-            keyStack.pop();
         }
-        keyStack.pop();
     }
 
-  
+    dialog->hide();
+    qint64 endTime = QDateTime::currentMSecsSinceEpoch();
+    QMessageBox::information(mainWindow(), lit("Success"), lit("%1 screenshots done for %2 seconds").arg(count).arg((endTime - startTime) / 1000));
 }
 
 
@@ -308,40 +354,8 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     parameters.zoomRect = parameters.itemDewarpingParams.enabled ? QRectF() : widget->zoomRect();
     parameters.customAspectRatio = display->camDisplay()->overridenAspectRatio();
     parameters.rotationAngle = widget->rotation();
-    // Revert UI has 'hack'. VerticalDown fisheye option is emulated by additional rotation. But filter has built-in support for that option.
-    if (parameters.itemDewarpingParams.enabled && parameters.mediaDewarpingParams.viewMode == QnMediaDewarpingParams::VerticalDown)
-        parameters.rotationAngle -= 180;
 
-    QnImageProvider* imageProvider = getLocalScreenshotProvider(parameters, display.data());
-    if (imageProvider) {
-        // avoiding post-processing duplication
-        parameters.imageCorrectionParams.enabled = false;
-        parameters.mediaDewarpingParams.enabled = false;
-        parameters.itemDewarpingParams.enabled = false;
-        parameters.zoomRect = QRectF();
-        parameters.customAspectRatio = 0.0;
-        parameters.rotationAngle = 0;
-    } else {
-        imageProvider = QnSingleThumbnailLoader::newInstance(widget->resource()->toResourcePtr(), parameters.time, 0);
-    }
-
-    QnScreenshotLoader* loader = new QnScreenshotLoader(parameters, this);
-    connect(loader, &QnImageProvider::imageChanged, this,   &QnWorkbenchScreenshotHandler::at_imageLoaded);
-    loader->setBaseProvider(imageProvider); // preload screenshot here
-
-    if(parameters.filename.isEmpty()) {
-        parameters.filename = widget->resource()->toResource()->getName();  /*< suggested name */
-        if (!updateParametersFromDialog(parameters))
-            return;
-        loader->setParameters(parameters); //update changed fields
-        qnSettings->setLastScreenshotDir(QFileInfo(parameters.filename).absolutePath());
-        qnSettings->setTimestampCorner(parameters.timestampPosition);
-    }
-
-    showProgressDelayed(tr("Saving %1").arg(QFileInfo(parameters.filename).fileName()));
-    connect(m_screenshotProgressDialog, &QnProgressDialog::canceled, loader, &QnScreenshotLoader::deleteLater);
-    m_canceled = false;
-    loader->loadAsync();
+    takeScreenshot(widget, parameters);
 }
 
 bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParameters &parameters) {
@@ -547,4 +561,46 @@ void QnWorkbenchScreenshotHandler::hideProgress() {
 
 void QnWorkbenchScreenshotHandler::cancelLoading() {
     m_canceled = true;
+}
+
+void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget, const QnScreenshotParameters &parameters) {
+    QnScreenshotParameters localParameters = parameters;
+
+    // Revert UI has 'hack'. VerticalDown fisheye option is emulated by additional rotation. But filter has built-in support for that option.
+    if (localParameters.itemDewarpingParams.enabled && localParameters.mediaDewarpingParams.viewMode == QnMediaDewarpingParams::VerticalDown)
+        localParameters.rotationAngle -= 180;
+
+    QnResourceDisplayPtr display = widget->display();
+    QnImageProvider* imageProvider = getLocalScreenshotProvider(widget, localParameters);
+    if (imageProvider) {
+        // avoiding post-processing duplication
+        localParameters.imageCorrectionParams.enabled = false;
+        localParameters.mediaDewarpingParams.enabled = false;
+        localParameters.itemDewarpingParams.enabled = false;
+        localParameters.zoomRect = QRectF();
+        localParameters.customAspectRatio = 0.0;
+        localParameters.rotationAngle = 0;
+    } else {
+        imageProvider = QnSingleThumbnailLoader::newInstance(widget->resource()->toResourcePtr(), localParameters.time, 0);
+    }
+
+    QnScreenshotLoader* loader = new QnScreenshotLoader(localParameters, this);
+    connect(loader, &QnImageProvider::imageChanged, this,   &QnWorkbenchScreenshotHandler::at_imageLoaded);
+    loader->setBaseProvider(imageProvider); // preload screenshot here
+
+    /* Check if name is already given - that usually means silent mode. */
+    if(localParameters.filename.isEmpty()) {
+        localParameters.filename = widget->resource()->toResource()->getName();  /*< suggested name */
+        if (!updateParametersFromDialog(localParameters))
+            return;
+        loader->setParameters(localParameters); //update changed fields
+        qnSettings->setLastScreenshotDir(QFileInfo(localParameters.filename).absolutePath());
+        qnSettings->setTimestampCorner(localParameters.timestampPosition);
+
+        showProgressDelayed(tr("Saving %1").arg(QFileInfo(localParameters.filename).fileName()));
+        connect(m_screenshotProgressDialog, &QnProgressDialog::canceled, loader, &QnScreenshotLoader::deleteLater);
+    }
+
+    m_canceled = false;
+    loader->loadAsync();
 }
