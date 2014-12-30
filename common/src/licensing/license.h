@@ -44,6 +44,7 @@ public:
 
     QnLicense();
     QnLicense(const QByteArray& licenseBlock);
+    virtual ~QnLicense();
 
     void loadLicenseBlock( const QByteArray& licenseBlock );
 
