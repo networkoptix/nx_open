@@ -45,7 +45,9 @@ namespace ite
             return true;
         }
         catch(const char * msg)
-        {}
+        {
+            m_device.reset();
+        }
 
         return false;
     }
@@ -57,20 +59,25 @@ namespace ite
         return false;
     }
 
-    bool RxDevice::lockCamera(unsigned short txID)
+    bool RxDevice::lockCamera(unsigned short txID, unsigned freq)
     {
-        if (!txID)
-            return false;
+        static const unsigned DELAY_MS = 20;
+        static const unsigned TIMES = (DeviceInfo::SEND_WAIT_TIME_MS * 2) / DELAY_MS;
 
-        unsigned freq = m_rcShell->lastTxFrequency(txID);
-        if (!freq)
-            return false;
-
-        if (tryLockF(freq))
+        // could be locked in discovery thread: waiting
+        for (unsigned i = 0; i < TIMES; ++i)
         {
-            m_txID = txID;
-            updateTxParams();
-            return true;
+            if (m_txInfo) // locked by another camera
+                return false;
+
+            if (tryLockF(freq))
+            {
+                m_txID = txID;
+                updateTxParams();
+                return true;
+            }
+
+            usleep(DELAY_MS * 1000);
         }
 
         return false;
@@ -84,6 +91,9 @@ namespace ite
         if (isLockedUnsafe())
             return false;
 
+        if (!m_device && !open())
+            return false;
+
         try
         {
             m_device->lockChannel(freq);
@@ -93,7 +103,9 @@ namespace ite
             return true;
         }
         catch (const char * msg)
-        {}
+        {
+            m_device.reset();
+        }
 
         return false;
     }
@@ -101,6 +113,9 @@ namespace ite
     void RxDevice::unlockF()
     {
         std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+        if (!m_device)
+            return;
 
         m_device->closeStream();
         m_txInfo.reset();
@@ -117,6 +132,9 @@ namespace ite
 
     bool RxDevice::stats()
     {
+        if (!m_device)
+            return false;
+
         try
         {
             m_signalQuality = 0;
@@ -127,7 +145,9 @@ namespace ite
             return true;
         }
         catch (const char * msg)
-        {}
+        {
+            m_device.reset();
+        }
 
         return false;
     }

@@ -113,7 +113,6 @@ namespace ite
 
         void addRxDevices(const std::vector<RxDevicePtr>& devs);
         void addRxDevice(RxDevicePtr devs);
-        void updateCameraInfo(unsigned frequency);
 
         bool stopIfNeeds()
         {
@@ -143,6 +142,7 @@ namespace ite
 
         RxDevicePtr m_rxDevice;
         std::vector<RxDevicePtr> m_supportedRxDevices;
+        std::vector<RxDevicePtr> m_newRxDevices;
         std::unique_ptr<DevReader> m_devReader;
         std::unique_ptr<LibAV> m_libAV;
         ReadThread * m_threadObject;
@@ -153,9 +153,10 @@ namespace ite
         mutable const char * m_errorStr;
         nxcip::CameraInfo m_info;
 
+        void updateCameraInfo(unsigned frequency);
+        void updateRxDevices(unsigned frequency);
         bool captureAnyRxDevice();
-        bool captureSameRxDevice(RxDevicePtr);
-        bool captureFreeRxDevice(RxDevicePtr);
+        RxDevicePtr captureFreeRxDevice(unsigned frequency);
         void freeDevice();
 
         bool initDevReader();

@@ -17,7 +17,7 @@ void fixReadingPosition(Byte * buf, unsigned bufSize)
 }
 
 
-static const unsigned RC_SLEEP_TIME_MS = 20000;
+static const unsigned RC_SLEEP_TIME_US = 20000;
 
 void * RC_RecvThread(void * data)
 {
@@ -50,7 +50,7 @@ void * RC_RecvThread(void * data)
             cmdNext.clear();
             useNext = false;
 
-            usleep(RC_SLEEP_TIME_MS);
+            usleep(RC_SLEEP_TIME_US);
             continue;
         }
 
@@ -106,7 +106,7 @@ void * RC_ParseThread(void * data)
 
         if (! cmd)
         {
-            usleep(RC_SLEEP_TIME_MS);
+            usleep(RC_SLEEP_TIME_US);
             continue;
         }
 
@@ -236,8 +236,10 @@ void RCShell::processCommand(DeviceInfoPtr dev, unsigned short commandID)
     }
 }
 
+//#define ENABLE_SEND2RC 1
 bool RCShell::sendGetIDs(int iWaitTime)
 {
+#if ENABLE_SEND2RC
     DeviceInfo devInfo;
     RCHostInfo * rcHost = devInfo.rcHost();
     rcHost->cmdSendConfig.bIsCmdBroadcast = True;
@@ -249,12 +251,13 @@ bool RCShell::sendGetIDs(int iWaitTime)
             usleep(iWaitTime * 1000);
         return true;
     }
-
+#endif
     return false;
 }
 
 void RCShell::updateTxParams(DeviceInfoPtr dev)
 {
+#if ENABLE_SEND2RC
     if (dev)
     {
         dev->getTransmissionParameterCapabilities();
@@ -266,6 +269,7 @@ void RCShell::updateTxParams(DeviceInfoPtr dev)
 
         dev->wait();
     }
+#endif
 }
 
 void RCShell::getDevIDs(std::vector<IDsLink>& outLinks)

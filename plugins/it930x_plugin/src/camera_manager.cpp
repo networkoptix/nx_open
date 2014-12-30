@@ -762,79 +762,140 @@ namespace ite
     void CameraManager::updateCameraInfo(unsigned frequency)
     {
         std::vector<unsigned short> rxIDs;
-        rxIDs.reserve(m_supportedRxDevices.size());
+        rxIDs.reserve(m_supportedRxDevices.size() + m_newRxDevices.size());
+
         for (size_t i = 0; i < m_supportedRxDevices.size(); ++i)
             rxIDs.push_back(m_supportedRxDevices[i]->rxID());
+
+        for (size_t i = 0; i < m_newRxDevices.size(); ++i)
+            rxIDs.push_back(m_newRxDevices[i]->rxID());
 
         DiscoveryManager::updateInfoAux(m_info, m_txID, frequency, rxIDs);
     }
 
+    // from DiscoveryManager.findCameras() thread
     void CameraManager::addRxDevices(const std::vector<RxDevicePtr>& devs)
     {
-        for (auto it = devs.begin(); it != devs.end(); ++it)
-            addRxDevice(*it);
+        if (devs.empty())
+            return;
+
+        if (m_reloadMutex.try_lock()) // LOCK
+        {
+            for (auto it = devs.begin(); it != devs.end(); ++it)
+                addRxDevice(*it);
+
+            m_reloadMutex.unlock();
+        }
     }
 
     void CameraManager::addRxDevice(RxDevicePtr dev)
     {
-        bool found = false;
         for (auto it = m_supportedRxDevices.begin(); it != m_supportedRxDevices.end(); ++it)
         {
-            if ((*it)->rxID() == dev->rxID()) {
-                found = true;
-                break;
+            if ((*it)->rxID() == dev->rxID())
+                return;
+        }
+
+        for (auto it = m_newRxDevices.begin(); it != m_newRxDevices.end(); ++it)
+        {
+            if ((*it)->rxID() == dev->rxID())
+                return;
+        }
+
+        m_newRxDevices.push_back(dev);
+    }
+
+    void CameraManager::updateRxDevices(unsigned freq)
+    {
+        for (auto it = m_newRxDevices.begin(); it != m_newRxDevices.end(); ++it)
+        {
+            if ((*it)->tryLockF(freq))
+            {
+                if ((*it)->good())
+                    m_supportedRxDevices.push_back(*it);
+
+                (*it)->unlockF();
             }
         }
 
-        if (!found)
-            m_supportedRxDevices.push_back(dev);
+        m_newRxDevices.clear();
     }
 
     bool CameraManager::captureAnyRxDevice()
     {
-        if (m_supportedRxDevices.empty())
+        // HACK: need camera's frequency (channel)
+        unsigned freq = 0;
+        if (m_supportedRxDevices.size())
+            freq = m_supportedRxDevices[0]->freq4tx(m_txID);
+        else if (m_newRxDevices.size())
+            freq = m_newRxDevices[0]->freq4tx(m_txID);
+        if (freq == 0)
             return false;
 
+        updateRxDevices(freq);
+        updateCameraInfo(freq); // add new
+
+        // reopen same device
         if (m_rxDevice)
         {
-            if (captureSameRxDevice(m_rxDevice))
+            if (m_rxDevice->isLocked() && m_rxDevice->txID() == m_txID)
+            {
+                stopTimer();
                 return true;
+            }
             //else
             freeDevice();
         }
 
-        for (size_t i = 0; i < m_supportedRxDevices.size(); ++i)
-        {
-            RxDevicePtr dev = m_supportedRxDevices[i];
-            if (captureFreeRxDevice(dev))
-                return true;
-        }
+        RxDevicePtr dev = captureFreeRxDevice(freq);
+        updateCameraInfo(freq); // remove old
 
-        return false;
-    }
-
-    bool CameraManager::captureSameRxDevice(RxDevicePtr dev)
-    {
-        if (dev && dev->isLocked() && dev->txID() == m_txID)
-        {
-            if (dev != m_rxDevice)
-                m_rxDevice = dev;
-            stopTimer();
-            return true;
-        }
-
-        return false;
-    }
-
-    bool CameraManager::captureFreeRxDevice(RxDevicePtr dev)
-    {
-        if (dev.get() && dev->lockCamera(m_txID))
+        if (dev)
         {
             m_rxDevice = dev;
             return true;
         }
 
         return false;
+    }
+
+    RxDevicePtr CameraManager::captureFreeRxDevice(unsigned freq)
+    {
+#define REMOVE_RX_DEVS 1
+#if REMOVE_RX_DEVS
+        std::vector<RxDevicePtr> good;
+        good.reserve(m_supportedRxDevices.size());
+#endif
+        RxDevicePtr best;
+        for (size_t i = 0; i < m_supportedRxDevices.size(); ++i)
+        {
+            RxDevicePtr dev = m_supportedRxDevices[i];
+
+            bool isGood = true;
+            if (dev->lockCamera(m_txID, freq)) // delay inside
+            {
+                isGood = dev->good();
+                if (isGood)
+                {
+                    if (!best || dev->strength() > best->strength())
+                        best.swap(dev);
+                }
+
+                // unlock all but best
+                if (dev)
+                    dev->unlockF();
+            }
+#if REMOVE_RX_DEVS
+            if (isGood)
+                good.push_back(dev);
+#endif
+        }
+
+#if REMOVE_RX_DEVS
+        if (good.size() < m_supportedRxDevices.size())
+            m_supportedRxDevices.swap(good);
+#endif
+        return best;
     }
 
     void CameraManager::freeDevice()

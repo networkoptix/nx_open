@@ -81,12 +81,9 @@ namespace ite
                             }
                         }
                     }
-#if 1
-                    m_discovery->updateTxLinks(ch);
-#endif
-                }
 
-                std::this_thread::sleep_for(s1);
+                    m_discovery->updateTxLinks(ch);
+                }
             }
 
             updateThreadObj = nullptr;
@@ -233,8 +230,6 @@ namespace ite
                 getRx4Tx(cam->txID(), rxs);
                 cam->addRxDevices(rxs);
 
-                unsigned freq = m_rcShell.lastTxFrequency(cam->txID());
-                cam->updateCameraInfo(freq);
                 cam->getCameraInfo(&info);
                 ++cameraNum;
             }
@@ -340,10 +335,10 @@ namespace ite
         {
             std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
-            for (size_t i = 0; i < m_rxDevs.size(); ++i)
+            for (auto it = m_rxDevs.begin(); it != m_rxDevs.end(); ++it)
             {
-                if (m_rxDevs[i].get() && ! m_rxDevs[i]->isLocked())
-                    scanDevs.push_back(m_rxDevs[i]);
+                if (it->second.get() && ! it->second->isLocked())
+                    scanDevs.push_back(it->second);
             }
         }
 

@@ -29,7 +29,9 @@ namespace ite
 
         It930x * device() { return m_device.get(); }
 
-        bool lockCamera(unsigned short txID);
+        unsigned freq4tx(unsigned short txID) const { return m_rcShell->lastTxFrequency(txID); }
+
+        bool lockCamera(unsigned short txID, unsigned frequency);
         bool tryLockF(unsigned freq);
         bool isLocked() const;
         void unlockF();
@@ -42,6 +44,7 @@ namespace ite
         uint8_t strength() const { return m_signalStrength; }
         uint8_t quality() const { return m_signalQuality; }
         bool present() const { return m_signalPresent; }
+        bool good() const { return present() && (strength() > 0); }
 
         static unsigned dev2id(const std::string& devName);
         static unsigned str2id(const std::string& devName);
