@@ -77,7 +77,7 @@
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.ui" line="42"/>
         <source>Interval of action :</source>
-        <translation>动作时间间隔：</translation>
+        <translation>动作时间间隔:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.ui" line="64"/>
@@ -187,7 +187,7 @@
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="143"/>
         <source>S&amp;tart IP:</source>
-        <translation>开始IP:</translation>
+        <translation>&amp;开始IP:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="160"/>
@@ -197,7 +197,7 @@
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="183"/>
         <source>S&amp;ubnet scan</source>
-        <translation>子网搜索</translation>
+        <translation>&amp;子网搜索</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="209"/>
@@ -232,7 +232,7 @@
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="446"/>
         <source>Manuf.</source>
-        <translation>制造商</translation>
+        <translation>制造商.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="456"/>
@@ -300,17 +300,17 @@
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui" line="27"/>
         <source>Advanced settings for this camera cannot be loaded</source>
-        <translation>摄像机高级设置无法加载。</translation>
+        <translation>摄像机高级设置无法加载</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui" line="41"/>
         <source>This camera has no advanced settings</source>
-        <translation>摄像机未提供高级设置。</translation>
+        <translation>摄像机未提供高级设置</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui" line="116"/>
         <source>Warning: all changes are applied instantly</source>
-        <translation>警告：所有改动立刻生效！</translation>
+        <translation>警告：所有改动立刻生效</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui" line="131"/>
@@ -357,7 +357,7 @@
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="17"/>
         <source>I have read the manual and understand the risks</source>
-        <translation>我已阅读使用手册，并了解风险。</translation>
+        <translation>我已阅读使用手册，并了解风险</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="30"/>
@@ -437,7 +437,7 @@
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="248"/>
         <source>RTP transport:</source>
-        <translation>RTP传输</translation>
+        <translation>RTP传输:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="256"/>
@@ -617,17 +617,17 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="467"/>
         <source>Warning! High value may prevent other cameras from recording!</source>
-        <translation>提示！摄像机设置较高参数可能导致其他摄像机的录像效率。</translation>
+        <translation>提示!摄像机设置较高参数可能导致其他摄像机的录像效率!</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="513"/>
         <source>Min days:</source>
-        <translation>最小天数</translation>
+        <translation>最小天数:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="520"/>
         <source>Max days:</source>
-        <translation>最大天数</translation>
+        <translation>最大天数:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="534"/>
@@ -693,7 +693,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/dialogs/connection_name_dialog.ui" line="26"/>
         <source>Enter name:</source>
-        <translation>输入名称</translation>
+        <translation>输入名称:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_name_dialog.ui" line="36"/>
@@ -823,7 +823,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="149"/>
         <source>Auto pause video:</source>
-        <translation>自动暂停视频</translation>
+        <translation>自动暂停视频:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="118"/>
@@ -854,12 +854,12 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="225"/>
         <source>Run application when PC boots up:</source>
-        <translation>开机自动启动</translation>
+        <translation>开机自动启动:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="239"/>
         <source>Double buffering:</source>
-        <translation>双缓冲区</translation>
+        <translation>双缓冲区:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="277"/>
@@ -1125,7 +1125,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.ui" line="43"/>
         <source>License Type:</source>
-        <translation>授权类型</translation>
+        <translation>授权类型:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.ui" line="57"/>
@@ -1135,7 +1135,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.ui" line="71"/>
         <source>Locked to Hardware ID:</source>
-        <translation>硬件ID绑定</translation>
+        <translation>硬件ID绑定:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.ui" line="86"/>
@@ -1253,7 +1253,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.ui" line="240"/>
         <source>P&amp;ort:</source>
-        <translation>端口:</translation>
+        <translation>&amp;端口:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.ui" line="130"/>
@@ -1361,7 +1361,7 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="211"/>
         <source>Color:</source>
-        <translation>颜色</translation>
+        <translation>颜色:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="223"/>
@@ -1372,7 +1372,7 @@ Recording Schedule is always based on Server Time.</source>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="245"/>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="377"/>
         <source>Intensity:</source>
-        <translation>对比度</translation>
+        <translation>对比度:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="254"/>
@@ -1426,7 +1426,7 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="124"/>
         <source>Default rotation:</source>
-        <translation>默认角度</translation>
+        <translation>默认角度:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="180"/>
@@ -1451,7 +1451,7 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="117"/>
         <source>Force aspect ratio to:</source>
-        <translation>强制长宽比例</translation>
+        <translation>强制长宽比例:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="142"/>
@@ -1825,7 +1825,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/dialogs/abstract_ptz_dialog.cpp" line="52"/>
         <source>Loading...</source>
-        <translation>加载中</translation>
+        <translation>加载中...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/abstract_ptz_dialog.cpp" line="210"/>
@@ -2302,12 +2302,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="948"/>
         <source>Attach to Video Wall...</source>
-        <translation>连接到电视墙</translation>
+        <translation>连接到电视墙...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="955"/>
         <source>Switch to Video Wall mode...</source>
-        <translation>切换电视墙模式</translation>
+        <translation>切换电视墙模式...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="970"/>
@@ -3165,7 +3165,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="824"/>
         <source>How-to Videos and FAQ...</source>
-        <translation>视频教程及常见问题解答</translation>
+        <translation>视频教程及常见问题解答...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="753"/>
@@ -3249,7 +3249,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/dialogs/attach_to_videowall_dialog.ui" line="14"/>
         <source>Attach to Video Wall...</source>
-        <translation>关联电视墙</translation>
+        <translation>关联电视墙...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/attach_to_videowall_dialog.ui" line="20"/>
@@ -3312,7 +3312,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/dialogs/build_number_dialog.ui" line="22"/>
         <source>Build number:</source>
-        <translation>版本号</translation>
+        <translation>版本号:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/build_number_dialog.ui" line="29"/>
@@ -3592,7 +3592,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="211"/>
         <source>Are you sure you want to reset rules to the defaults?
 This action CANNOT be undone!</source>
-        <translation>请确认是否重置到默认规则？
+        <translation>请确认是否重置到默认规则?
 </translation>
     </message>
     <message>
@@ -3745,12 +3745,12 @@ It might take a few moments to populate them in the tree.</source>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="715"/>
         <source>Server was removed, search aborted.</source>
-        <translation>服务器已被移除, 搜索中止</translation>
+        <translation>服务器已被移除, 搜索中止.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="719"/>
         <source>Server was removed, cameras cannot be added anymore.</source>
-        <translation>服务器已被移除, 无法添加摄像机</translation>
+        <translation>服务器已被移除, 无法添加摄像机.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="734"/>
@@ -3766,7 +3766,7 @@ It might take a few moments to populate them in the tree.</source>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="754"/>
         <source>Scanning hosts... (%1)</source>
         <translation>
-            <numerusform>搜索中... (%1)</numerusform>
+            <numerusform>搜索主机中... (%1)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -3784,7 +3784,7 @@ It might take a few moments to populate them in the tree.</source>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="550"/>
         <source>First address in range is greater than the last one.</source>
-        <translation>区间内的起始地址大于结束地址</translation>
+        <translation>区间内的起始地址大于结束地址.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="556"/>
@@ -3810,7 +3810,7 @@ It might take a few moments to populate them in the tree.</source>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.cpp" line="51"/>
         <source>Please wait while settings are being loaded.
 This can take a lot of time.</source>
-        <translation>请稍后，参数正在保存中...
+        <translation>请稍后，参数正在保存中.
 可能需要一些时间。</translation>
     </message>
     <message>
@@ -3821,7 +3821,7 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.cpp" line="341"/>
         <source>Possibly, appropriate camera&apos;s service is unavailable now</source>
-        <translation>指定的摄像机服务可能无法使用。</translation>
+        <translation>指定的摄像机服务可能无法使用</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.cpp" line="342"/>
@@ -3850,12 +3850,12 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui" line="25"/>
         <source>&amp;Name</source>
-        <translation>名称</translation>
+        <translation>&amp;名称</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui" line="38"/>
         <source>&amp;Description</source>
-        <translation>描述</translation>
+        <translation>&amp;描述</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui" line="51"/>
@@ -3960,7 +3960,7 @@ This can take a lot of time.</source>
         <location filename="../src/business/business_resource_validation.cpp" line="61"/>
         <source>%1 have no input ports</source>
         <translation>
-            <numerusform>%1无报警输入</numerusform>
+            <numerusform>%1 无报警输入</numerusform>
         </translation>
     </message>
 </context>
@@ -4051,7 +4051,7 @@ This can take a lot of time.</source>
         <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="198"/>
         <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="207"/>
         <source>Too many motion windows</source>
-        <translation>过多的移动侦测窗口。</translation>
+        <translation>过多的移动侦测窗口</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="190"/>
@@ -4075,7 +4075,7 @@ This can take a lot of time.</source>
         <location filename="../src/business/business_resource_validation.cpp" line="81"/>
         <source>Recording or motion detection is disabled for %1</source>
         <translation>
-            <numerusform>%1 录像或移动侦测功能是禁用的</numerusform>
+            <numerusform> %1 录像或移动侦测功能已禁用</numerusform>
         </translation>
     </message>
 </context>
@@ -4093,7 +4093,7 @@ This can take a lot of time.</source>
         <location filename="../src/business/business_resource_validation.cpp" line="71"/>
         <source>%1 have no output relays</source>
         <translation>
-            <numerusform>%1无报警输出</numerusform>
+            <numerusform>%1 无报警输出</numerusform>
         </translation>
     </message>
 </context>
@@ -4103,7 +4103,7 @@ This can take a lot of time.</source>
         <location filename="../src/business/business_resource_validation.cpp" line="91"/>
         <source>Recording is disabled for %1</source>
         <translation>
-            <numerusform>%1 录像功能关闭</numerusform>
+            <numerusform>%1 的录像功能关闭</numerusform>
         </translation>
     </message>
 </context>
@@ -4156,7 +4156,7 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="605"/>
         <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
-        <translation>日程网格中当前为每秒 %1帧。每秒帧数降到最大每秒 %2帧</translation>
+        <translation>日程网格中当前为每秒 %1帧。每秒帧数降到最大每秒 %2帧。</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="611"/>
@@ -4343,10 +4343,10 @@ If this error persists, please contact your VMS administrator.</source>
  - Client version: %1.
  - Server version: %2.
 These versions are not compatible. Please update your %3</source>
-        <translation>正在连接的服务器版本与当前不一致：
+        <translation>正在连接的服务器版本与当前不一致:
  - 客户端版本: %1.
  - 服务器版本: %2.
-此版本不兼容，请升级您的版本到 %3。</translation>
+此版本不兼容，请升级您的版本到 %3</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="129"/>
@@ -4354,11 +4354,10 @@ These versions are not compatible. Please update your %3</source>
  - Client version: %1.
  - Server version: %2.
 Compatibility mode for versions lower than %3 is not supported.</source>
-        <translation>正在连接的服务器版本与当前不一致：
+        <translation>正在连接的服务器版本与当前不一致:
  - 客户端版本: %1.
  - 服务器版本: %2.
-兼容模式不支持版本低于 %3
-</translation>
+兼容模式不支持版本低于 %3.</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="165"/>
@@ -4410,8 +4409,8 @@ Download version %3?</source>
         <translation>正在连接的服务器版本与当前不一致：
  - 客户端版本: %1.
  - 服务器版本: %2.
-客户端版本 %3 正在请求连接到此服务器。
-请下载版本 %3</translation>
+客户端版本 %3 正在请求连接到此服务器.
+是否下载版本 %3?</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="236"/>
@@ -4419,10 +4418,10 @@ Download version %3?</source>
  - Client version: %1.
  - Server version: %2.
 Would you like to restart the Client in compatibility mode?</source>
-        <translation>正在连接的服务器版本与当前不一致：
+        <translation>正在连接的服务器版本与当前不一致:
  - 客户端版本: %1.
  - 服务器版本: %2.
-是否需要重启客户端进入兼容模式？</translation>
+是否需要重启客户端进入兼容模式?</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="255"/>
@@ -4445,8 +4444,8 @@ Please close the application and start it again using the shortcut in the start 
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="268"/>
         <source>Failed to launch compatibility version %1
 Try to restore version %1?</source>
-        <translation type="unfinished">未能与当前版本兼容成功。
-请尝试恢复版本。</translation>
+        <translation>未能与当前版本%1兼容成功。
+是否尝试恢复版本%1?</translation>
     </message>
 </context>
 <context>
@@ -4457,14 +4456,14 @@ Try to restore version %1?</source>
 Connection details that you have entered are incorrect, please try again.
 
 If this error persists, please contact your VMS administrator.</source>
-        <translation>无法建立与服务器连接
-输入的信息认证不通过，请重新输入。
-如果问题仍存在，请联系VMS管理员。</translation>
+        <translation>无法建立与服务器连接.
+输入的信息认证不通过，请重新输入.
+如果问题仍存在，请联系VMS管理员.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="117"/>
         <source>You are trying to connect to incompatible Server.</source>
-        <translation>正在尝试连接到不兼容的服务器...</translation>
+        <translation>正在尝试连接到不兼容的服务器.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="123"/>
@@ -4507,7 +4506,7 @@ These versions are not compatible. Please update your %3</source>
         <translation>服务器上已运行不同版本:
  - 客户端版本: %1.
  - 服务器版本: %2.
-以上版本无法兼容，请升级版本至 %3。</translation>
+以上版本无法兼容，请升级版本至 %3</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="158"/>
@@ -4586,7 +4585,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="79"/>
         <source>Database backup is being downloaded from the server. Please wait.</source>
-        <translation>数据库备份正从服务器中下载，请稍候...</translation>
+        <translation>数据库备份正从服务器中下载.请稍候.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="98"/>
@@ -4639,7 +4638,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="153"/>
         <source>You need to connect to a server before doing backup</source>
-        <translation>在进行备份前，请连接到服务器。</translation>
+        <translation>在进行备份前,请连接到服务器</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="165"/>
@@ -4657,7 +4656,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/plugins/resource/desktop_win/desktop_data_provider.cpp" line="248"/>
         <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
-        <translation>音频采集设备不支持44.1Khz和48Khz音频格式，请在屏幕录像设置中选择其他的音频设备或空白。</translation>
+        <translation>音频采集设备不支持44.1Khz和48Khz音频格式,请在屏幕录像设置中选择其他的音频设备或空白</translation>
     </message>
     <message>
         <location filename="../src/plugins/resource/desktop_win/desktop_data_provider.cpp" line="394"/>
@@ -4672,7 +4671,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/plugins/resource/desktop_win/desktop_data_provider.cpp" line="476"/>
         <source>Could not initialize video encoder.</source>
-        <translation>无法找使用视频编码器</translation>
+        <translation>无法找使用视频编码器.</translation>
     </message>
     <message>
         <location filename="../src/plugins/resource/desktop_win/desktop_data_provider.cpp" line="495"/>
@@ -4682,7 +4681,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/plugins/resource/desktop_win/desktop_data_provider.cpp" line="514"/>
         <source>Could not initialize audio encoder.</source>
-        <translation>无法找使用视频编码器</translation>
+        <translation>无法找使用视频编码器.</translation>
     </message>
     <message>
         <location filename="../src/plugins/resource/desktop_win/desktop_data_provider.cpp" line="522"/>
@@ -4692,7 +4691,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/plugins/resource/desktop_win/desktop_data_provider.cpp" line="543"/>
         <source>Could not start primary audio device.</source>
-        <translation>无法启动主音频设备</translation>
+        <translation>无法启动主音频设备.</translation>
     </message>
 </context>
 <context>
@@ -4700,7 +4699,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/plugins/resource/desktop_win/desktop_file_encoder.cpp" line="317"/>
         <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings.</source>
-        <translation>音频采集设备不支持44.1Khz和48Khz音频格式，请在屏幕录像设置中选择其他的音频设备或空白</translation>
+        <translation>音频采集设备不支持44.1Khz和48Khz音频格式，请在屏幕录像设置中选择其他的音频设备或空白.</translation>
     </message>
     <message>
         <location filename="../src/plugins/resource/desktop_win/desktop_file_encoder.cpp" line="484"/>
@@ -4725,12 +4724,12 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/plugins/resource/desktop_win/desktop_file_encoder.cpp" line="596"/>
         <source>Could not initialize video encoder.</source>
-        <translation>无法找使用视频编码器</translation>
+        <translation>无法找使用视频编码器.</translation>
     </message>
     <message>
         <location filename="../src/plugins/resource/desktop_win/desktop_file_encoder.cpp" line="620"/>
         <source>Could not allocate output audio stream.</source>
-        <translation>无法分配输出音频流</translation>
+        <translation>无法分配输出音频流.</translation>
     </message>
     <message>
         <location filename="../src/plugins/resource/desktop_win/desktop_file_encoder.cpp" line="628"/>
@@ -4740,7 +4739,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/plugins/resource/desktop_win/desktop_file_encoder.cpp" line="646"/>
         <source>Could not initialize audio encoder.</source>
-        <translation>无法找使用视频编码器</translation>
+        <translation>无法找使用视频编码器.</translation>
     </message>
     <message>
         <location filename="../src/plugins/resource/desktop_win/desktop_file_encoder.cpp" line="654"/>
@@ -4750,7 +4749,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/plugins/resource/desktop_win/desktop_file_encoder.cpp" line="677"/>
         <source>Could not start primary audio device.</source>
-        <translation>无法启动主音频设备</translation>
+        <translation>无法启动主音频设备.</translation>
     </message>
 </context>
 <context>
@@ -4949,7 +4948,7 @@ These versions are not compatible. Please update your %3</source>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="125"/>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.cpp" line="138"/>
         <source>Select folder...</source>
-        <translation>选择文件夹</translation>
+        <translation>选择文件夹...</translation>
     </message>
 </context>
 <context>
@@ -4968,7 +4967,7 @@ These versions are not compatible. Please update your %3</source>
         <location filename="../src/ui/dialogs/generic_tabbed_dialog.cpp" line="159"/>
         <source>Unsaved changes will be lost. Save the following pages?
 </source>
-        <translation>当前更改未进行保存，是否保存？</translation>
+        <translation>当前更改未进行保存,是否保存?</translation>
     </message>
 </context>
 <context>
@@ -5096,19 +5095,19 @@ These versions are not compatible. Please update your %3</source>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="26"/>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="60"/>
         <source>Screens Allowed:</source>
-        <translation>电视墙已授权</translation>
+        <translation>电视墙已授权:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="27"/>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="61"/>
         <source>Control Sessions Allowed:</source>
-        <translation>控制已授权：</translation>
+        <translation>控制已授权:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="29"/>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="63"/>
         <source>Archive Streams Allowed:</source>
-        <translation>存储已授权：</translation>
+        <translation>存储已授权:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="35"/>
@@ -5118,7 +5117,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="53"/>
         <source>Generic:</source>
-        <translation>一般：</translation>
+        <translation>一般:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="54"/>
@@ -5138,7 +5137,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="58"/>
         <source>Features:</source>
-        <translation>功能：</translation>
+        <translation>功能:</translation>
     </message>
 </context>
 <context>
@@ -5216,7 +5215,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="114"/>
         <source>The software is licensed to: </source>
-        <translation>软件的授权为：</translation>
+        <translation>软件的授权为:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="125"/>
@@ -5239,13 +5238,13 @@ At least %n %2 are required</source>
 %n %2 are currently in use</source>
         <translation>
             <numerusform>
-%n %2 正在使用。</numerusform>
+%n %2 正在使用</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="148"/>
         <source>Obtaining licenses from Server...</source>
-        <translation>从服务器获取许可</translation>
+        <translation>从服务器获取许可...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="152"/>
@@ -5349,7 +5348,7 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/dialogs/license_notification_dialog.cpp" line="41"/>
         <source>Some of your licenses are unavailable.</source>
-        <translation>部分授权许可无效</translation>
+        <translation>部分授权许可无效.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_notification_dialog.cpp" line="43"/>
@@ -5402,7 +5401,7 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="178"/>
         <source>Could not open the file %1</source>
-        <translation>无法打开文件%1。</translation>
+        <translation>无法打开文件%1</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="38"/>
@@ -5477,7 +5476,7 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="449"/>
         <source>Connection already exists</source>
-        <translation>连接已存在。</translation>
+        <translation>连接已存在</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="490"/>
@@ -5503,7 +5502,7 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="450"/>
         <source>Connection with this name already exists. Do you want to overwrite it?</source>
-        <translation>连接名称已存在，是否覆盖？</translation>
+        <translation>连接名称已存在,是否覆盖?</translation>
     </message>
 </context>
 <context>
@@ -5526,7 +5525,7 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="202"/>
         <source>Please wait while image is being prepared...</source>
-        <translation>图片正在准备中...请稍后。</translation>
+        <translation>图片正在准备中...请稍后...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="238"/>
@@ -5599,7 +5598,7 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="939"/>
         <source>%1 (Tour &quot;%2&quot; is active)</source>
-        <translation type="unfinished">%1轮巡</translation>
+        <translation>%1 (轮巡 &quot;%2&quot; 已生效)</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="218"/>
@@ -5647,7 +5646,7 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.ui" line="14"/>
         <source>Merge Systems...</source>
-        <translation>联网设置</translation>
+        <translation>联网设置...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.ui" line="55"/>
@@ -5667,7 +5666,7 @@ Try to activate your license manually.</source>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.ui" line="142"/>
         <source>The new system will have password and name from the system:</source>
-        <translation>新系统需要新的用户名和密码</translation>
+        <translation>新系统需要新的用户名和密码:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.ui" line="193"/>
@@ -5688,7 +5687,7 @@ The servers from the remote system should appear in your system soon.</source>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="82"/>
         <source>You are about to merge the current system %1 with the system</source>
-        <translation>正在将服务器%1连接到服务器。</translation>
+        <translation>正在将服务器%1连接到服务器</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="83"/>
@@ -5698,12 +5697,12 @@ The servers from the remote system should appear in your system soon.</source>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="123"/>
         <source>The URL is invalid.</source>
-        <translation>URL不可用</translation>
+        <translation>URL不可用.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="129"/>
         <source>The password cannot be empty.</source>
-        <translation>密码不能为空</translation>
+        <translation>密码不能为空.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="138"/>
@@ -5723,7 +5722,7 @@ The servers from the remote system should appear in your system soon.</source>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="164"/>
         <source>This is the current system URL.</source>
-        <translation>当前系统URL</translation>
+        <translation>当前系统URL.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="169"/>
@@ -5734,7 +5733,7 @@ The servers from the remote system should appear in your system soon.</source>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="176"/>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="204"/>
         <source>The password is invalid.</source>
-        <translation>密码输入错误</translation>
+        <translation>密码输入错误.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="179"/>
@@ -5745,17 +5744,17 @@ The servers from the remote system should appear in your system soon.</source>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="182"/>
         <source>The system was not found.</source>
-        <translation>系统无法搜索到</translation>
+        <translation>系统无法搜索到.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="210"/>
         <source>Could not create a backup of the server database.</source>
-        <translation>无法为服务器创建数据库</translation>
+        <translation>无法为服务器创建数据库.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="213"/>
         <source>System was not found.</source>
-        <translation>没有搜索到系统</translation>
+        <translation>没有搜索到系统.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="222"/>
@@ -5765,7 +5764,7 @@ The servers from the remote system should appear in your system soon.</source>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="222"/>
         <source>Cannot merge systems.</source>
-        <translation>无法进行系统联网</translation>
+        <translation>无法进行系统联网.</translation>
     </message>
 </context>
 <context>
@@ -5877,7 +5876,7 @@ The servers from the remote system should appear in your system soon.</source>
         <location filename="../src/ui/graphics/items/notifications/notification_list_widget.cpp" line="178"/>
         <source>%n more item(s)</source>
         <translation>
-            <numerusform>更多项</numerusform>
+            <numerusform>%n更多项</numerusform>
         </translation>
     </message>
 </context>
@@ -5952,17 +5951,17 @@ The servers from the remote system should appear in your system soon.</source>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="111"/>
         <source>New title could not be set.</source>
-        <translation>新标题无法设定</translation>
+        <translation>新标题无法设定.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="128"/>
         <source>Are you sure you want to delete &apos;%1&apos;?</source>
-        <translation>确认要删除%1？</translation>
+        <translation>确认要删除%1?</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="71"/>
         <source>Custom Title:</source>
-        <translation>自定义标题</translation>
+        <translation>自定义标题:</translation>
     </message>
 </context>
 <context>
@@ -6187,7 +6186,8 @@ Please wait for the camera to go online.</source>
         <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="493"/>
         <source>This preset is used in some tours.
 These tours will become invalid if you remove it.</source>
-        <translation>此预置位已用于部分轮巡中，若删除，则会导致部分轮巡无效，</translation>
+        <translation>此预置位已用于部分轮巡中.
+若删除，则会导致部分轮巡无效.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="675"/>
@@ -6197,12 +6197,12 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="494"/>
         <source>Do not show again.</source>
-        <translation>不再显示</translation>
+        <translation>不再显示.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="631"/>
         <source>Manage PTZ for %1</source>
-        <translation type="unfinished">摄像机云台管理</translation>
+        <translation>摄像机云台管理%1</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="674"/>
@@ -6215,7 +6215,7 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/models/ptz_manage_model.cpp" line="53"/>
         <source>New tour %1</source>
-        <translation type="unfinished">新轮巡%1</translation>
+        <translation>新轮巡 %1</translation>
     </message>
     <message>
         <location filename="../src/ui/models/ptz_manage_model.cpp" line="116"/>
@@ -6638,7 +6638,7 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.cpp" line="395"/>
         <source>You have entered an invalid URL.</source>
-        <translation>请输入有效URL</translation>
+        <translation>请输入有效URL.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.cpp" line="398"/>
@@ -6648,7 +6648,7 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.cpp" line="398"/>
         <source>This URL is already in the address list.</source>
-        <translation>当前URL已存在地址列表中</translation>
+        <translation>当前URL已存在地址列表中.</translation>
     </message>
 </context>
 <context>
@@ -6705,8 +6705,8 @@ These tours will become invalid if you remove it.</source>
     <message numerus="yes">
         <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="754"/>
         <source>%1 (up %n days, %2)</source>
-        <translation type="unfinished">
-            <numerusform>%1 %2 (上 %n 天 %3) {1 ?} {2)?}</numerusform>
+        <translation>
+            <numerusform>%1 (上 %n 天, %2)</numerusform>
         </translation>
     </message>
     <message>
@@ -6725,7 +6725,7 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="169"/>
         <source>Open Web Page...</source>
-        <translation>打开web页面</translation>
+        <translation>打开web页面...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="223"/>
@@ -6755,7 +6755,7 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="542"/>
         <source>Rebuilding archive index is completed.</source>
-        <translation>重建录像索引完成</translation>
+        <translation>重建录像索引完成.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="554"/>
@@ -6765,7 +6765,7 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="557"/>
         <source>This server already has more than max cameras</source>
-        <translation>服务器摄像机数量已超出限定范围。</translation>
+        <translation>服务器摄像机数量已超出限定范围</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="560"/>
@@ -6791,7 +6791,7 @@ These tours will become invalid if you remove it.</source>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="498"/>
         <source>You are about to launch the archive re-synchronization routine. ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours. This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data. Continue?</source>
         <translation>正在尝试对录像库重新同步。注意！硬盘使用情况将在重新同步过程会增加负荷！根据录像库规模，重建可能需要几个小时。建议在录像文件夹已被移动，重命名或替换，才进行此操作！
-是否继续重建？</translation>
+是否继续重建?</translation>
     </message>
 </context>
 <context>
@@ -6812,12 +6812,12 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="60"/>
         <source>Cannot check updates via the internet.</source>
-        <translation>不能通过互联网检查更新</translation>
+        <translation>不能通过互联网检查更新.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="209"/>
         <source>Available version:</source>
-        <translation>可用版本</translation>
+        <translation>可用版本:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="222"/>
@@ -6838,12 +6838,12 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="282"/>
         <source>Update from file:</source>
-        <translation>从文件升级：</translation>
+        <translation>从文件升级:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="303"/>
         <source>Archive url:</source>
-        <translation>可用RUL：</translation>
+        <translation>可用RUL:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="310"/>
@@ -6853,7 +6853,7 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="320"/>
         <source>To update manually, download an archive with the following link:</source>
-        <translation>执行手动升级，从以下链接下载：</translation>
+        <translation>执行手动升级,从以下链接下载:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="354"/>
@@ -6929,12 +6929,12 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="226"/>
         <source>Latest version:</source>
-        <translation>最新版本：</translation>
+        <translation>最新版本:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="244"/>
         <source>Target version:</source>
-        <translation>目标版本：</translation>
+        <translation>目标版本:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="273"/>
@@ -6944,7 +6944,7 @@ These tours will become invalid if you remove it.</source>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="273"/>
         <source>Update is in process now.</source>
-        <translation>升级正在进行...</translation>
+        <translation>升级正在进行.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="282"/>
@@ -6955,8 +6955,8 @@ These tours will become invalid if you remove it.</source>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="282"/>
         <source>Cannot cancel update at this state.
 Please wait until update is finished</source>
-        <translation>不能取消更新，
-请等待更新结束。</translation>
+        <translation>不能取消更新.
+请等待更新结束</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="291"/>
@@ -6966,12 +6966,12 @@ Please wait until update is finished</source>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="297"/>
         <source>Update has been successfully finished.</source>
-        <translation>已升级成功</translation>
+        <translation>已升级成功.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="305"/>
         <source>Now you have to update the client manually.</source>
-        <translation>需要手动升级客户端</translation>
+        <translation>需要手动升级客户端.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="307"/>
@@ -7046,20 +7046,20 @@ Please close the application and start it again using the shortcut in the start 
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="367"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="375"/>
         <source>Could not push updates to servers.</source>
-        <translation>无法在此服务器上推送更新</translation>
+        <translation>无法在此服务器上推送更新.</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="350"/>
         <source>The problem is caused by %n servers:</source>
         <translation>
-            <numerusform>问题发生 %n 服务器：</numerusform>
+            <numerusform>问题发生 %n 服务器:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="361"/>
         <source>No free space left on %n servers:</source>
         <translation>
-            <numerusform>服务器 %n上没有更多空间。</numerusform>
+            <numerusform>服务器 %n上没有更多空间:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -7118,7 +7118,7 @@ Please close the application and start it again using the shortcut in the start 
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="513"/>
         <source>Newer version found.</source>
-        <translation>发现更新的版本</translation>
+        <translation>发现更新的版本.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="516"/>
@@ -7143,7 +7143,7 @@ Please close the application and start it again using the shortcut in the start 
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="542"/>
         <source>Cannot extract the update file.</source>
-        <translation>不能提取更新文件</translation>
+        <translation>不能提取更新文件.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="622"/>
@@ -7350,7 +7350,7 @@ This action CANNOT be undone!</source>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="387"/>
         <source>No preset found. Use &apos;Advanced&apos; option</source>
-        <translation>无预置位信息，请使用“高级”选项。</translation>
+        <translation>无预置位信息,请使用“高级”选项</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="393"/>
@@ -7486,7 +7486,7 @@ This action CANNOT be undone!</source>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="43"/>
         <source>Cannot cancel update at this state.</source>
-        <translation>不能取消升级</translation>
+        <translation>不能取消升级.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="51"/>
@@ -7496,7 +7496,7 @@ This action CANNOT be undone!</source>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="51"/>
         <source>Update is in process now.</source>
-        <translation>升级正在进行</translation>
+        <translation>升级正在进行.</translation>
     </message>
 </context>
 <context>
@@ -7529,7 +7529,7 @@ This action CANNOT be undone!</source>
     <message>
         <location filename="../src/ui/widgets/settings/time_server_selection_widget.cpp" line="49"/>
         <source>Time is taken from the Internet.</source>
-        <translation>时间来自于网络</translation>
+        <translation>时间来自于网络.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/time_server_selection_widget.cpp" line="51"/>
@@ -7658,7 +7658,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/dialogs/two_step_file_dialog.ui" line="47"/>
         <source>Folder:</source>
-        <translation>文件夹...</translation>
+        <translation>文件夹:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/two_step_file_dialog.ui" line="66"/>
@@ -7670,7 +7670,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <location filename="../src/ui/dialogs/two_step_file_dialog.ui" line="75"/>
         <location filename="../src/ui/dialogs/two_step_file_dialog.ui" line="126"/>
         <source>Filename:</source>
-        <translation>文件名称：</translation>
+        <translation>文件名称:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/two_step_file_dialog.ui" line="85"/>
@@ -7690,7 +7690,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/dialogs/two_step_file_dialog.cpp" line="188"/>
         <source>Select folder...</source>
-        <translation>选择文件夹</translation>
+        <translation>选择文件夹...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/two_step_file_dialog.cpp" line="199"/>
@@ -7762,7 +7762,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/business/business_resource_validation.cpp" line="116"/>
         <source>User %1 has invalid email address</source>
-        <translation type="unfinished">用户 %1 拥有无效的邮件地址</translation>
+        <translation>用户 %1 拥有无效的邮件地址</translation>
     </message>
 </context>
 <context>
@@ -7801,7 +7801,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="333"/>
         <source>To change your password, please enter your current password.</source>
-        <translation>修改密码前请先输入当前密码</translation>
+        <translation>修改密码前请先输入当前密码.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="336"/>
@@ -8042,7 +8042,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1654"/>
         <source>User already exists.</source>
-        <translation>用户已存在</translation>
+        <translation>用户已存在.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1655"/>
@@ -8077,7 +8077,7 @@ Are you sure you want to delete them?</source>
         <translation>
             <numerusform>自动搜索到 %n 摄像机。
 移除后也将会被自动搜索添加。
-请确认是否删除？</numerusform>
+请确认是否删除?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -8088,7 +8088,7 @@ Are you sure you want to delete them?</source>
         <translation>
             <numerusform>自动搜索到%n 中 %1 摄像机.
 移除后仍然会自动添加.
-请确认是否需要删除它们？</numerusform>
+请确认是否需要删除它们?</numerusform>
         </translation>
     </message>
     <message>
@@ -8179,7 +8179,7 @@ Are you sure you want to delete them?</source>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2228"/>
         <source>Could not save the following %n items.</source>
         <translation>
-            <numerusform>无法保存以下%n项：</numerusform>
+            <numerusform>无法保存以下%n项.</numerusform>
         </translation>
     </message>
     <message>
@@ -8204,12 +8204,12 @@ Error description: &apos;%2&apos;</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1484"/>
         <source>Process is in progress</source>
-        <translation>处理中...</translation>
+        <translation>处理中</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1485"/>
         <source>Camera addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation>增加摄像机已经进行，请确定是否要取消当前进度？</translation>
+        <translation>增加摄像机已经进行,请确定是否要取消当前进度?</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2477"/>
@@ -8226,7 +8226,7 @@ Please close the application and start it again using the shortcut in the start 
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1067"/>
         <source>Select folder...</source>
-        <translation>选择文件夹</translation>
+        <translation>选择文件夹...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="855"/>
@@ -8236,7 +8236,7 @@ Please close the application and start it again using the shortcut in the start 
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="878"/>
         <source>Server %1 cannot discover these cameras so far. Are you sure you want to move them?</source>
-        <translation>服务器 %1 未能搜索到这些摄像机，请确认是否需要删除？</translation>
+        <translation>服务器 %1 未能搜索到这些摄像机,请确认是否需要删除?</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2397"/>
@@ -8251,7 +8251,7 @@ Please close the application and start it again using the shortcut in the start 
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2425"/>
         <source>Some components of the system are not updated:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please update all components to the latest version %2.</source>
-        <translation type="unfinished">系统部分组件未更新:&lt; br / &gt; &lt; br / &gt; %1 &lt; br / &gt;,请更新到最新版本%2所有组件。</translation>
+        <translation>系统部分组件未更新:&lt; br / &gt; &lt; br / &gt; %1 &lt; br / &gt;,请更新到最新版本%2所有组件。</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2441"/>
@@ -8452,7 +8452,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="282"/>
         <source>Timestamps:</source>
-        <translation>时间戳</translation>
+        <translation>时间戳:</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="488"/>
@@ -8570,18 +8570,17 @@ Do you want to continue?</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="288"/>
         <source>Transcode video to guarantee WYSIWYG</source>
-        <translation>视频进行转码中.</translation>
+        <translation>视频进行转码中</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="323"/>
         <source>AVI format is not recommended for export of non-continuous recording when audio track is present.Do you want to continue?</source>
-        <translation>不推荐带音频的摄像机使用AVI格式，将存在不连续记录。
-点击&apos;是&apos;继续导出或&apos;否&apos;选择其他格式。</translation>
+        <translation>不推荐带音频的摄像机使用AVI格式，将存在不连续记录?点击&apos;是&apos;导出或&apos;否&apos;选择其他格式.是否继续?</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="337"/>
         <source>You are about to export video with filters that require transcoding, which can take a long time. Do you want to continue?</source>
-        <translation>导出的视频需转码，转码可能需要一点时间,是否继续？</translation>
+        <translation>导出的视频需转码，转码可能需要一点时间,是否继续?</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="359"/>
@@ -8592,12 +8591,12 @@ Do you want to continue?</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="542"/>
         <source>%1 Media File (*.nov)</source>
-        <translation type="unfinished">%1 媒体文件(*.nov)</translation>
+        <translation>%1 媒体文件(*.nov)</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="673"/>
         <source>Export successfully finished.</source>
-        <translation>导出成功</translation>
+        <translation>导出成功.</translation>
     </message>
 </context>
 <context>
@@ -8629,7 +8628,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="65"/>
         <source>Password cannot be empty!</source>
-        <translation>密码不能为空！</translation>
+        <translation>密码不能为空!</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="75"/>
@@ -8644,7 +8643,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="104"/>
         <source>The selected servers has been successfully connected to your system!</source>
-        <translation>选定的服务器已成功连接到您的系统！</translation>
+        <translation>选定的服务器已成功连接到您的系统!</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="107"/>
@@ -8908,7 +8907,7 @@ Please wait for the camera to go online.</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="255"/>
         <source>Timestamp:</source>
-        <translation>时间戳</translation>
+        <translation>时间戳:</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="278"/>
@@ -8928,7 +8927,7 @@ Please wait for the camera to go online.</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="369"/>
         <source>Saving Screenshot...</source>
-        <translation>保存截图</translation>
+        <translation>保存截图...</translation>
     </message>
 </context>
 <context>
@@ -8936,7 +8935,7 @@ Please wait for the camera to go online.</source>
     <message>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="70"/>
         <source>Newer version is available</source>
-        <translation>有可用的更新八本。</translation>
+        <translation>有可用的更新八本</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="71"/>
@@ -8948,12 +8947,12 @@ Please wait for the camera to go online.</source>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="73"/>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="82"/>
         <source>Would you like to update?</source>
-        <translation>是否需要升级？</translation>
+        <translation>是否需要升级?</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="75"/>
         <source>Update is recommended</source>
-        <translation>建议更新。</translation>
+        <translation>建议更新</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="78"/>
@@ -9019,7 +9018,7 @@ Another user is already controlling this screen.</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="516"/>
         <source>Video Wall will be started now. Do you want to close this %1 Client instance?</source>
-        <translation>电视墙将重启，是否需要关闭%1 客户端？</translation>
+        <translation>电视墙将重启，是否需要关闭%1 客户端?</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="901"/>
@@ -9036,7 +9035,7 @@ Another user is already controlling this screen.</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="907"/>
         <source>Could not start Video Wall control session.</source>
-        <translation>无法启动电视墙控制任务</translation>
+        <translation>无法启动电视墙控制任务.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1165"/>
@@ -9056,7 +9055,7 @@ Another user is already controlling this screen.</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1204"/>
         <source>To enable the feature please activate at least one Video Wall license</source>
-        <translation>需要使用此功能，请激活至少一个电视墙授权。</translation>
+        <translation>需要使用此功能,请激活至少一个电视墙授权</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1213"/>
@@ -9076,7 +9075,7 @@ Another user is already controlling this screen.</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1217"/>
         <source>Enter the name of the Video Wall to create:</source>
-        <translation>输入创建的电视墙名称</translation>
+        <translation>输入创建的电视墙名称:</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1232"/>
@@ -9104,13 +9103,13 @@ Another user is already controlling this screen.</source>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1329"/>
         <source>Are you sure you want to permanently delete these %n item(s)?</source>
         <translation>
-            <numerusform>是否需要永久删除 %n 项？</numerusform>
+            <numerusform>是否需要永久删除 %n 项?</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1351"/>
         <source>Could not start Video Wall.</source>
-        <translation>开始电视墙失败</translation>
+        <translation>开始电视墙失败.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1363"/>
@@ -9148,7 +9147,7 @@ You&apos;ll have to start it manually.</source>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1713"/>
         <source>Are you sure you want to permanently delete these %n matrices?</source>
         <translation>
-            <numerusform>是否需要永久删除 %n 矩阵？</numerusform>
+            <numerusform>是否需要永久删除 %n 矩阵?</numerusform>
         </translation>
     </message>
 </context>
@@ -9468,7 +9467,7 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="122"/>
         <source>Max. cameras on this server:</source>
-        <translation>允许管理的最大摄像机数量</translation>
+        <translation>允许管理的最大摄像机数量:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="216"/>
@@ -9498,7 +9497,7 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="305"/>
         <source>Rebuild progress</source>
-        <translation>重建进行中...</translation>
+        <translation>重建进行中</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="322"/>
@@ -9521,7 +9520,7 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/dialogs/sign_dialog.ui" line="44"/>
         <source>Check result:</source>
-        <translation>检查结果：</translation>
+        <translation>检查结果:</translation>
     </message>
 </context>
 <context>
@@ -9584,12 +9583,12 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="215"/>
         <source>Force aspect ratio to:</source>
-        <translation>强制长宽比例</translation>
+        <translation>强制长宽比例:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="246"/>
         <source>Default rotation:</source>
-        <translation>默认角度</translation>
+        <translation>默认角度:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="351"/>
@@ -9714,7 +9713,7 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="73"/>
         <source>Vendor:</source>
-        <translation>厂商</translation>
+        <translation>厂商:</translation>
     </message>
 </context>
 <context>
@@ -9761,7 +9760,7 @@ You&apos;ll have to start it manually.</source>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="146"/>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="348"/>
         <source>Support Signature:</source>
-        <translation>技术支持方式：</translation>
+        <translation>技术支持方式:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="199"/>
@@ -9776,12 +9775,12 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="242"/>
         <source>Email:</source>
-        <translation>邮箱：</translation>
+        <translation>邮箱:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="256"/>
         <source>P&amp;ort:</source>
-        <translation>端口:</translation>
+        <translation>&amp;端口:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="280"/>
@@ -9891,7 +9890,7 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/widgets/settings/time_server_selection_widget.ui" line="25"/>
         <source>Current system time:</source>
-        <translation>当前系统时间：</translation>
+        <translation>当前系统时间:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/time_server_selection_widget.ui" line="38"/>
@@ -9901,7 +9900,7 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/widgets/settings/time_server_selection_widget.ui" line="54"/>
         <source>Choose the server which is going to be used as a time server if the system has no internet access:</source>
-        <translation>选择的服务器将作为时间服务器。</translation>
+        <translation>选择的服务器将作为时间服务器:</translation>
     </message>
 </context>
 <context>
@@ -9929,7 +9928,7 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.ui" line="75"/>
         <source>C&amp;urrent Password:</source>
-        <translation>当前密码:</translation>
+        <translation>&amp;当前密码:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.ui" line="88"/>
