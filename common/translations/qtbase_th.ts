@@ -1,19 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.0" language="th">
-<context>
-    <name>Language</name>
-    <message>
-        <source>Language Name</source>
-        <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-        <translation>ภาษาไทย</translation>
-    </message>
-    <message>
-        <source>Locale Code</source>
-        <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
-        <translation>th</translation>
-    </message>
-</context>
 <context>
     <name>CloseButton</name>
     <message>
