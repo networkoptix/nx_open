@@ -559,15 +559,17 @@ void QnWorkbenchActionHandler::submitInstantDrop() {
 // -------------------------------------------------------------------------- //
 
 void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &user) {
-    if (!user) {
-        context()->instance<QnWorkbenchUpdateWatcher>()->stop();
-        return;
-    }
+	if (!(qnSettings->lightMode() & Qn::LightModeNoPopups)) {
+		if (!user) {
+	        context()->instance<QnWorkbenchUpdateWatcher>()->stop();
+			return;
+		}
 
-    if (user->isAdmin())
-        context()->instance<QnWorkbenchUpdateWatcher>()->start();
-    else
-        context()->instance<QnWorkbenchUpdateWatcher>()->stop();
+		if (user->isAdmin())
+	        context()->instance<QnWorkbenchUpdateWatcher>()->start();
+	    else
+			context()->instance<QnWorkbenchUpdateWatcher>()->stop();
+	}
 
     /* Open all user's layouts. */
     //if(qnSettings->isLayoutsOpenedOnLogin()) {

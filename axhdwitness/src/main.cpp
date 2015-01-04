@@ -29,7 +29,7 @@ QAXFACTORY_END()
  * situation when it is not possible to properly restore the old handler.
  * 
  * If there is some QVariant usage in QtCore static deinitializers, then we're 
- * in trouble. So we hack.
+ * in trouble. So we ha ck.
  */
 Q_CORE_EXPORT const QVariant::Handler *qcoreVariantHandler();
 

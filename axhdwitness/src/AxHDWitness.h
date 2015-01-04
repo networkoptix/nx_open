@@ -30,6 +30,7 @@ class QnResourceStatusDictionary;
 class QnCameraUserAttributePool;
 class QnMediaServerUserAttributesPool;
 class TimerManager;
+class QnServerCameraFactory;
 
 class AxHDWitness : public QWidget
 {
@@ -84,6 +85,8 @@ private:
 
 	QScopedPointer<ec2::AbstractECConnectionFactory> m_ec2ConnectionFactory;
     QnClientResourceProcessor m_clientResourceProcessor;
+
+    QScopedPointer<QnServerCameraFactory> m_serverCameraFactory;
 
     QScopedPointer<QnWorkbenchContext> m_context;
 	QScopedPointer<QnSkin> skin;

@@ -126,6 +126,7 @@ extern "C"
 #include "api/runtime_info_manager.h"
 #include "core/resource_management/resource_properties.h"
 #include "core/resource_management/status_dictionary.h"
+#include <utils/common/timermanager.h>
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -416,6 +417,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     qnSettings->setClientUpdateDisabled(noClientUpdate);
 
+	QScopedPointer<TimerManager> timerManager(new TimerManager());
     QScopedPointer<QnSkin> skin(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
 
     QnCustomization customization;

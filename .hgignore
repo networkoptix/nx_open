@@ -311,3 +311,5 @@ webadmin/.tmp
 webadmin/.idea
 webadmin/.sass-cache
 app/bower_components
+
+ACS/Paxton/packages
