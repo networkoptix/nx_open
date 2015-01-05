@@ -278,30 +278,26 @@ QnDbManager::QnDbManager()
 	globalInstance = this;
 }
 
-bool QnDbManager::init(
-    QnResourceFactory* factory,
-    const QString& dbFilePath,
-    const QString& dbFilePathStatic )
+bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
 {
     m_resourceFactory = factory;
+    const QString dbFilePath = dbUrl.toLocalFile();
+    const QString dbFilePathStatic = QUrlQuery(dbUrl.query()).queryItemValue("staticdb_path");
 
     m_sdb = QSqlDatabase::addDatabase("QSQLITE", "QnDbManager");
     QString dbFileName = closeDirPath(dbFilePath) + QString::fromLatin1("ecs.sqlite");
     m_sdb.setDatabaseName( dbFileName);
 
     QString backupDbFileName = dbFileName + QString::fromLatin1(".backup");
-    bool needCleanup = true;
+    bool needCleanup = QUrlQuery(dbUrl.query()).hasQueryItem("cleanupDb");
     if (QFile::exists(backupDbFileName) || needCleanup) 
     {
         QFile::remove(dbFileName);
-        if (QFile::rename(backupDbFileName, dbFileName)) {
-            m_needResyncLog = true;
-            QFile::remove(dbFileName + lit("-shm"));
-            QFile::remove(dbFileName + lit("-wal"));
-        }
-        else {
+        QFile::remove(dbFileName + lit("-shm"));
+        QFile::remove(dbFileName + lit("-wal"));
+        m_needResyncLog = true;
+        if (QFile::exists(backupDbFileName) && !QFile::rename(backupDbFileName, dbFileName))
             qWarning() << "Can't rename database file from" << backupDbFileName << "to" << dbFileName << "Database restore operation canceled";
-        }
     }
 
     m_sdbStatic = QSqlDatabase::addDatabase("QSQLITE", "QnDbManagerStatic");

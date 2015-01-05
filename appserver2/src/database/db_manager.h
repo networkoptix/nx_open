@@ -58,10 +58,7 @@ namespace ec2
         QnDbManager();
         virtual ~QnDbManager();
 
-        bool init(
-            QnResourceFactory* factory,
-            const QString& dbFilePath,
-            const QString& dbFilePathStatic );
+        bool init(QnResourceFactory* factory, const QUrl& dbUrl);
         bool isInitialized() const;
 
         static QnDbManager* instance();
