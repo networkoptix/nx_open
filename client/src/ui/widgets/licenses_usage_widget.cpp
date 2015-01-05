@@ -68,7 +68,7 @@ void QnLicensesUsageWidget::loadData(QnLicenseUsageHelper* helper) {
         if (licenseText.isEmpty())
             continue;
 
-        QString requiredText = helper->getRequiredLicenseMsg(lt);
+        QString requiredText = helper->getRequiredText(lt);
         //ui->enableRecordingCheckBox->checkState() == Qt::Checked
         //    : QString();
         row->setValues(licenseText, requiredText);

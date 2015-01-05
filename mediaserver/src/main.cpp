@@ -664,7 +664,6 @@ int serverMain(int argc, char *argv[])
     SetConsoleCtrlHandler(stopServer_WIN, true);
 #endif
     signal(SIGINT, stopServer);
-    //signal(SIGABRT, stopServer);
     signal(SIGTERM, stopServer);
 
 //    av_log_set_callback(decoderLogCallback);
@@ -845,6 +844,7 @@ void QnMain::at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender)
 
 void QnMain::stopSync()
 {
+    qWarning()<<"Stopping server";
     if (serviceMainInstance) {
         serviceMainInstance->pleaseStop();
         serviceMainInstance->exit();
@@ -904,7 +904,7 @@ void QnMain::updateAllowCameraCHangesIfNeed()
     if (!allowCameraChanges.isEmpty())
     {
         QnGlobalSettings *settings = QnGlobalSettings::instance();
-        settings->setCameraSettingsOptimizationEnabled(allowCameraChanges.toLower() == lit("true") || allowCameraChanges == lit("1"));
+        settings->setCameraSettingsOptimizationEnabled(allowCameraChanges.toLower() == lit("yes") || allowCameraChanges.toLower() == lit("true") || allowCameraChanges == lit("1"));
         MSSettings::roSettings()->setValue(DV_PROPERTY, "");
     }
 }
@@ -1190,13 +1190,8 @@ void QnMain::at_timer()
 {
     MSSettings::runTimeSettings()->setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
     QnResourcePtr mServer = qnResPool->getResourceById(qnCommon->moduleGUID());
-    for(const QnResourcePtr& res: qnResPool->getAllCameras(mServer))
-    {
-        QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
-        if (cam)
-            cam->noCameraIssues(); // decrease issue counter
-    }
-
+    for(const QnVirtualCameraResourcePtr& camera: qnResPool->getAllCameras(mServer))
+        camera->noCameraIssues(); // decrease issue counter
 }
 
 void QnMain::at_storageManager_noStoragesAvailable() {
@@ -1291,8 +1286,6 @@ bool QnMain::initTcpListener()
 #ifdef ENABLE_DESKTOP_CAMERA
     m_universalTcpListener->addHandler<QnDesktopCameraRegistrator>("HTTP", "desktop_camera");
 #endif   //ENABLE_DESKTOP_CAMERA
-
-    m_universalTcpListener->start();
 
     return true;
 }
@@ -1393,7 +1386,6 @@ void QnMain::run()
     QSettings* settings = MSSettings::roSettings();
 
     std::unique_ptr<QnMServerResourceDiscoveryManager> mserverResourceDiscoveryManager( new QnMServerResourceDiscoveryManager() );
-    QnResourceDiscoveryManager::init( mserverResourceDiscoveryManager.get() );
     initAppServerConnection(*settings);
 
     QnMulticodecRtpReader::setDefaultTransport( MSSettings::roSettings()->value(QLatin1String("rtspTransport"), RtpTransport::_auto).toString().toUpper() );
@@ -1509,7 +1501,6 @@ void QnMain::run()
              QnSyncTime::instance(), (void(QnSyncTime::*)(qint64))&QnSyncTime::updateTime );
 
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
-    QnMServerResourceSearcher::instance()->start();
 
     //Initializing plugin manager
     PluginManager::instance()->loadPlugins();
@@ -1678,7 +1669,6 @@ void QnMain::run()
 
 
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
-    QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);
 
     bool compatibilityMode = cmdLineArguments.devModeKey == lit("razrazraz");
@@ -1718,16 +1708,7 @@ void QnMain::run()
     }
 
     QScopedPointer<QnServerConnector> serverConnector(new QnServerConnector(m_moduleFinder));
-    serverConnector->start();
 
-    QUrl url = ec2Connection->connectionInfo().ecUrl;
-#if 1
-    if (url.scheme() == "file") {
-        // Connect to local database. Start peer-to-peer sync (enter to cluster mode)
-        qnCommon->setCloudMode(true);
-        m_moduleFinder->start();
-    }
-#endif
     // ------------------------------------------
 
     QScopedPointer<QnRouter> router(new QnRouter(m_moduleFinder, false));
@@ -1894,8 +1875,22 @@ void QnMain::run()
     m_dumpSystemResourceUsageTaskID = TimerManager::instance()->addTimer(
         std::bind( &QnMain::dumpSystemUsageStats, this ),
         SYSTEM_USAGE_DUMP_TIMEOUT );
+    
+    QnRecordingManager::instance()->start();
+    QnMServerResourceSearcher::instance()->start();
+    m_universalTcpListener->start();
+	serverConnector->start();
+#if 1
+    if (ec2Connection->connectionInfo().ecUrl.scheme() == "file") {
+        // Connect to local database. Start peer-to-peer sync (enter to cluster mode)
+        qnCommon->setCloudMode(true);
+        m_moduleFinder->start();
+    }
+#endif
 
     exec();
+
+    qWarning()<<"QnMain event loop has returned. Destroying objects...";
 
     //cancelling dumping system usage
     quint64 dumpSystemResourceUsageTaskID = 0;
@@ -1928,9 +1923,6 @@ void QnMain::run()
 
     QnResourceDiscoveryManager::instance()->stop();
     QnResource::stopAsyncTasks();
-
-    QnResourceDiscoveryManager::init( NULL );
-    mserverResourceDiscoveryManager.reset();
 
     //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
         //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required
@@ -1972,6 +1964,7 @@ void QnMain::run()
     QnAppServerConnectionFactory::setEC2ConnectionFactory( nullptr );
     ec2ConnectionFactory.reset();
 
+    mserverResourceDiscoveryManager.reset();
 
     av_lockmgr_register(NULL);
 
@@ -2178,11 +2171,12 @@ private:
     QnSoftwareVersion m_overrideVersion;
 };
 
-void stopServer(int signal)
+void stopServer(int /*signal*/)
 {
     restartFlag = false;
     if (serviceMainInstance) {
-        qWarning() << "got signal" << signal << "stop server!";
+        //output to console from signal handler can cause deadlock
+        //qWarning() << "got signal" << signal << "stop server!";
         serviceMainInstance->stopAsync();
     }
 }

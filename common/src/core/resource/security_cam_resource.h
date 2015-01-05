@@ -240,7 +240,7 @@ signals:
 
 protected slots:
     virtual void at_parentIdChanged();
-
+    virtual void at_motionRegionChanged();
 protected:
     void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 

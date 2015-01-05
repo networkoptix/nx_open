@@ -17,6 +17,8 @@ angular.module('webadminApp')
                 port: r.data.reply.port,
                 id: r.data.reply.id
             };
+
+            $scope.oldSystemName = r.data.reply.systemName;
         });
 
         $scope.password = '';
@@ -102,13 +104,22 @@ angular.module('webadminApp')
                 alert('Settings saved');
                 if( $scope.settings.port !==  window.location.port ) {
                     window.location.href = window.location.protocol + '//' + window.location.hostname + ':' + $scope.settings.port;
+                }else{
+                    window.location.reload();
                 }
             }
         }
 
         $scope.save = function () {
 
+
             if($scope.settingsForm.$valid) {
+                if($scope.oldSystemName !== $scope.settings.systemName &&
+                    !confirm('If there are others servers in local network with "' + $scope.settings.systemName +
+                        '" system name then it could lead to this server settings loss. Continue?')){
+                    $scope.settings.systemName = $scope.oldSystemName;
+                }
+
                 mediaserver.saveSettings($scope.settings.systemName, $scope.settings.port).then(resultHandler,errorHandler);
             }else{
                 alert('form is not valid');

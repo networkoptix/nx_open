@@ -186,9 +186,9 @@ bool QnLayoutExportTool::start() {
         bool exportedLayout = snapshotManager()->isFile(m_layout);  // we have changed background to an exported layout
         QScopedPointer<QnAppServerImageCache> cache;
         if (exportedLayout)
-            cache.reset(new QnLocalFileCache());
+            cache.reset(new QnLocalFileCache(this));
         else
-            cache.reset(new QnAppServerImageCache());
+            cache.reset(new QnAppServerImageCache(this));
 
         QImage background(cache->getFullPath(m_layout->backgroundImageFilename()));
         if (!background.isNull()) {
@@ -327,7 +327,7 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
                                     itemData.rotation);
 
     //TODO: #GDM #TR Fix after string freeze
-    emit stageChanged(tr("Exporting to \"%2\"...").arg(QString()).arg(m_targetFilename));
+    emit stageChanged(tr("Exporting to \"%2\"...").arg(QFileInfo(m_targetFilename).fileName()));
     return true;
 }
 

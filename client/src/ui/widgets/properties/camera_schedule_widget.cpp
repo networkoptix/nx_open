@@ -87,10 +87,10 @@ namespace {
 
             QPalette palette = m_parentPalette;
             bool licensesOk = helper.isValid();
-            QString licenseUsage = helper.getProposedUsageText();
+            QString licenseUsage = helper.getProposedUsageMsg();
             if(!licensesOk) {
                 setWarningStyle(&palette);
-                licenseUsage += L'\n' + helper.getRequiredLicenseMsg();
+                licenseUsage += L'\n' + helper.getRequiredMsg();
             }
             m_licensesLabel->setText(licenseUsage);
             m_licensesLabel->setPalette(palette);

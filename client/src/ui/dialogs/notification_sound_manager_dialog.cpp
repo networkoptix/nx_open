@@ -7,7 +7,6 @@
 
 #include <client/client_settings.h>
 
-#include <ui/common/read_only.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/workbench_state_dependent_dialog.h>
 #include <ui/models/notification_sound_model.h>
@@ -23,7 +22,6 @@ QnNotificationSoundManagerDialog::QnNotificationSoundManagerDialog(QWidget *pare
     ui->setupUi(this);
 
     ui->listView->setModel(context()->instance<QnAppServerNotificationCache>()->persistentGuiModel());
-    setReadOnly(ui->listView, true);
 
     connect(ui->playButton,     SIGNAL(clicked()), this, SLOT(at_playButton_clicked()));
     connect(ui->addButton,      SIGNAL(clicked()), this, SLOT(at_addButton_clicked()));

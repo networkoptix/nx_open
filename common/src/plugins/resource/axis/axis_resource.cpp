@@ -91,8 +91,9 @@ void QnPlAxisResource::setCroppingPhysical(QRect /*cropping*/)
 
 bool QnPlAxisResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
 {
-    if( hasFlags(Qn::foreigner)      //we do not own camera
-        || m_inputPortNameToIndex.empty() )
+    if( hasFlags(Qn::foreigner) ||      //we do not own camera
+        !hasCameraCapabilities(Qn::RelayInputCapability) ||
+        m_inputPortNameToIndex.empty() )    //camera report no inputs
     {
         return false;
     }

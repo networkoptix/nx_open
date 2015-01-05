@@ -131,15 +131,20 @@ void QnDirectModuleFinder::start() {
 }
 
 void QnDirectModuleFinder::stop() {
-    m_discoveryCheckTimer->stop();
     m_aliveCheckTimer->stop();
-    m_requestQueue.clear();
-    m_activeRequests.clear();
+    pleaseStop();
+    //TODO #dklychkov this method looks redundant, or, maybe, some kind if wait is needed here?
 }
 
 void QnDirectModuleFinder::pleaseStop() {
+    //TODO #dklychkov shouldn't we call m_aliveCheckTimer->stop()?
     m_discoveryCheckTimer->stop();
     m_requestQueue.clear();
+    for( QnAsyncHttpClientReply* reply: m_activeRequests )
+    {
+        reply->asyncHttpClient()->terminate();
+        reply->deleteLater();
+    }
     m_activeRequests.clear();
 }
 
@@ -177,15 +182,16 @@ void QnDirectModuleFinder::activateRequests() {
         QUrl url = m_requestQueue.dequeue();
 
         nx_http::AsyncHttpClientPtr client = std::make_shared<nx_http::AsyncHttpClient>();
+        std::unique_ptr<QnAsyncHttpClientReply> reply( new QnAsyncHttpClientReply(client, this) );
+        connect(reply.get(), &QnAsyncHttpClientReply::finished, this, &QnDirectModuleFinder::at_reply_finished);
 
         if (!client->doGet(url)) {
             processFailedReply(trimmedUrl(url));
             return;
         }
 
-		QnAsyncHttpClientReply *reply = new QnAsyncHttpClientReply(client, this);
-		connect(reply, &QnAsyncHttpClientReply::finished, this, &QnDirectModuleFinder::at_reply_finished);
-		m_activeRequests.insert(url);
+        Q_ASSERT_X( !m_activeRequests.contains(url), "Duplicate request issued", Q_FUNC_INFO );
+        m_activeRequests.insert(url, reply.release());
     }
 }
 
@@ -193,8 +199,11 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
     reply->deleteLater();
 
     QUrl url = reply->url();
-    if (!m_activeRequests.remove(url))
-        Q_ASSERT_X(0, "Reply that is not in the set of active requests has finished!", Q_FUNC_INFO);
+    const auto replyIter = m_activeRequests.find( url );
+    Q_ASSERT_X(replyIter != m_activeRequests.end(), "Reply that is not in the set of active requests has finished! (1)", Q_FUNC_INFO);
+    Q_ASSERT_X(replyIter.value() == reply, "Reply that is not in the set of active requests has finished! (2)", Q_FUNC_INFO);
+    if( replyIter != m_activeRequests.end() )
+        m_activeRequests.erase(replyIter);
 
     activateRequests();
 

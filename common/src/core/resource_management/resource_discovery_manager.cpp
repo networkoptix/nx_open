@@ -34,8 +34,6 @@
 
 
 
-QnResourceDiscoveryManager* QnResourceDiscoveryManager::m_instance;
-
 // ------------------------------------ QnManualCameraInfo -----------------------------
 
 QnManualCameraInfo::QnManualCameraInfo(const QUrl& url, const QAuthenticator& auth, const QString& resType)
@@ -95,22 +93,10 @@ void QnResourceDiscoveryManager::setReady(bool ready)
     m_ready = ready;
 }
 
-void QnResourceDiscoveryManager::init(QnResourceDiscoveryManager* instance)
-{
-    m_instance = instance;
-}
-
 void QnResourceDiscoveryManager::start( Priority priority )
 {
     QnLongRunnable::start( priority );
     //moveToThread( this );
-}
-
-QnResourceDiscoveryManager* QnResourceDiscoveryManager::instance()
-{
-    Q_ASSERT_X(m_instance, "QnResourceDiscoveryManager::init MUST be called first!", Q_FUNC_INFO);
-    //return *qnResourceDiscoveryManagerInstance();
-    return m_instance;
 }
 
 void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* serv)

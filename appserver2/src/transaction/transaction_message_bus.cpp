@@ -1073,7 +1073,7 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
             QnTransactionTransport* transportPtr = m_connectingConnections[i];
             if (transportPtr == transport) {
                 m_connectingConnections.removeAt(i);
-                return;
+                break;
             }
         }
 

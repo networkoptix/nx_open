@@ -26,7 +26,6 @@ namespace {
     const QString updatesDirSuffix = lit("mediaserver/updates");
     const QString updateInfoFileName = lit("update.json");
     const QString updateLogFileName = lit("update.log");
-    const int replyDelay = 200;
 
     QDir getUpdatesDir() {
         const QString& dataDir = MSSettings::roSettings()->value( "dataDir" ).toString();
@@ -87,10 +86,10 @@ QnServerUpdateTool::QnServerUpdateTool() :
 
 QnServerUpdateTool::~QnServerUpdateTool() {}
 
-bool QnServerUpdateTool::processUpdate(const QString &updateId, QIODevice *ioDevice, bool sync) {
+QnServerUpdateTool::ReplyCode QnServerUpdateTool::processUpdate(const QString &updateId, QIODevice *ioDevice, bool sync) {
     if (!m_fileMd5.isEmpty() && makeMd5(ioDevice) != m_fileMd5) {
         NX_LOG(lit("Checksum test failed: %1").arg(getUpdateFilePath(updateId)), cl_logWARNING);
-        return false;
+        return UnknownError;
     }
 
     m_zipExtractor.reset(new QnZipExtractor(ioDevice, getUpdateDir(updateId).absolutePath()));
@@ -104,12 +103,15 @@ bool QnServerUpdateTool::processUpdate(const QString &updateId, QIODevice *ioDev
             NX_LOG(lit("Could not extract update package. Error message: %1").arg(QnZipExtractor::errorToString(static_cast<QnZipExtractor::Error>(m_zipExtractor->error()))), cl_logWARNING);
         }
         m_zipExtractor.reset();
-        return ok;
+        if (ok)
+            return UploadFinished;
+        else
+            return m_zipExtractor->error() == QnZipExtractor::NoFreeSpace ? NoFreeSpace : UnknownError;
     } else {
         connect(m_zipExtractor.data(), &QnZipExtractor::finished, this, &QnServerUpdateTool::at_zipExtractor_extractionFinished);
         m_zipExtractor->start();
     }
-    return true;
+    return NoReply;
 }
 
 void QnServerUpdateTool::sendReply(int code) {
@@ -125,9 +127,52 @@ bool QnServerUpdateTool::addUpdateFile(const QString &updateId, const QByteArray
     return processUpdate(updateId, &buffer, true);
 }
 
-void QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByteArray &data, qint64 offset) {
-    if (m_bannedUpdates.contains(updateId))
+qint64 QnServerUpdateTool::addUpdateFileChunkSync(const QString &updateId, const QByteArray &data, qint64 offset) {
+    qint64 reply = addUpdateFileChunkInternal(updateId, data, offset);
+
+    switch (reply) {
+    case UploadFinished:
+        return processUpdate(updateId, m_file.data(), true);
+    case UnknownError:
+    case NoReply:
+        return UnknownError;
+    default:
+        Q_ASSERT_X(reply >= 0, Q_FUNC_INFO, "wrong reply code");
+        if (reply >= 0)
+            return reply;
+        return UnknownError;
+    }
+}
+
+void QnServerUpdateTool::addUpdateFileChunkAsync(const QString &updateId, const QByteArray &data, qint64 offset) {
+    qint64 reply = addUpdateFileChunkInternal(updateId, data, offset);
+
+    switch (reply) {
+    case UploadFinished:
+        if (processUpdate(updateId, m_file.data(), false) != NoReply) {
+            m_file->remove();
+            sendReply(ec2::AbstractUpdatesManager::UnknownError);
+            return;
+        }
+        break;
+    case NoReply:
         return;
+    case UnknownError:
+        sendReply(ec2::AbstractUpdatesManager::UnknownError);
+        break;
+    default:
+        Q_ASSERT_X(reply >= 0, Q_FUNC_INFO, "wrong reply code");
+        if (reply >= 0) {
+            /* we work with files < 500 MB, so int type is ok */
+            sendReply(static_cast<int>(reply));
+        }
+        break;
+    }
+}
+
+qint64 QnServerUpdateTool::addUpdateFileChunkInternal(const QString &updateId, const QByteArray &data, qint64 offset) {
+    if (m_bannedUpdates.contains(updateId))
+        return NoReply;
 
     if (m_updateId != updateId) {
         m_file.reset();
@@ -146,39 +191,32 @@ void QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByte
         if (!m_file->open(QFile::ReadWrite)) {
             NX_LOG(lit("Could not save update to %1").arg(m_file->fileName()), cl_logERROR);
             m_bannedUpdates.insert(updateId);
-            return;
+            return UnknownError;
         }
         m_file->seek(m_file->size());
-        sendReply(static_cast<int>(m_file->pos()));
-        return;
+        return m_file->pos();
     }
 
     /* Closed file means we've already finished downloading. Nothing to do is left. */
     if (!m_file->isOpen() || !m_file->openMode().testFlag(QFile::WriteOnly))
-        return;
+        return NoReply;
 
     if (!data.isEmpty()) {
         if (m_file->pos() >= offset) {
             m_file->seek(offset);
             m_file->write(data);
         }
-        /* we work with files < 500 MB, so int type is ok */
-        sendReply(static_cast<int>(m_file->pos()));
-        return;
+        return m_file->pos();
     }
 
     /* it means we've just got the size of the file */
-    if (m_file->pos() != offset) {
-        sendReply(static_cast<int>(m_file->pos()));
-        return;
-    }
+    if (m_file->pos() != offset)
+        return m_file->pos();
 
     m_file->close();
     m_file->open(QFile::ReadOnly);
-    if (!processUpdate(updateId, m_file.data())) {
-        m_file->remove();
-        sendReply(ec2::AbstractUpdatesManager::UnknownError);
-    }
+
+    return UploadFinished;
 }
 
 bool QnServerUpdateTool::installUpdate(const QString &updateId) {

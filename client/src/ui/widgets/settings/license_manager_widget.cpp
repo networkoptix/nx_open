@@ -121,8 +121,8 @@ void QnLicenseManagerWidget::updateLicenses() {
 
         foreach (QnLicenseUsageHelper* helper, helpers) {
             foreach (Qn::LicenseType lt, helper->licenseTypes()) {
-                if (helper->totalLicense(lt) > 0)
-                    msg += tr("\n%1 %2").arg(helper->totalLicense(lt)).arg(QnLicense::longDisplayName(lt));
+                if (helper->totalLicenses(lt) > 0)
+                    msg += tr("\n%1 %2").arg(helper->totalLicenses(lt)).arg(QnLicense::longDisplayName(lt));
             }
         }
 
@@ -131,14 +131,14 @@ void QnLicenseManagerWidget::updateLicenses() {
             {
                 useRedLabel = true;
                 foreach (Qn::LicenseType lt, helper->licenseTypes()) {
-                    if (helper->usedLicense(lt) > 0)
-                        msg += tr("\nAt least %n %2 are required", "", helper->usedLicense(lt)).arg(QnLicense::longDisplayName(lt));
+                    if (helper->usedLicenses(lt) > 0)
+                        msg += tr("\nAt least %n %2 are required", "", helper->usedLicenses(lt)).arg(QnLicense::longDisplayName(lt));
                 }
             }
             else {
                 foreach (Qn::LicenseType lt, helper->licenseTypes()) {
-                    if (helper->usedLicense(lt) > 0)
-                        msg += tr("\n%n %2 are currently in use", "", helper->usedLicense(lt)).arg(QnLicense::longDisplayName(lt));
+                    if (helper->usedLicenses(lt) > 0)
+                        msg += tr("\n%n %2 are currently in use", "", helper->usedLicenses(lt)).arg(QnLicense::longDisplayName(lt));
                 }
             }
         }
