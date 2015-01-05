@@ -58,7 +58,7 @@ void QnTransactionTcpProcessor::run()
     bool isMobileClient = query.hasQueryItem("isMobile");
     QnUuid remoteGuid  = QnUuid(query.queryItemValue("guid"));
     QnUuid remoteRuntimeGuid  = QnUuid(query.queryItemValue("runtime-guid"));
-    qint64 systemIdentityTime  = query.queryItemValue("system-identity-time").toLongLong();
+    qint64 remoteSystemIdentityTime  = query.queryItemValue("system-identity-time").toLongLong();
     if (remoteGuid.isNull())
         remoteGuid = QnUuid::createUuid();
     QnUuid videowallGuid = QnUuid(query.queryItemValue("videowallGuid"));
@@ -143,7 +143,7 @@ void QnTransactionTcpProcessor::run()
         QnTransactionTransport::connectingCanceled(remoteGuid, false);
     }
     else {
-        QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, remotePeer);
+        QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, remotePeer, remoteSystemIdentityTime);
         d->socket.clear();
     }
 }

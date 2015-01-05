@@ -1208,7 +1208,7 @@ void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
     transport->sendTransaction(prepareModulesDataTransaction(), transportHeader);
 }
 
-void QnTransactionMessageBus::gotConnectionFromRemotePeer(const QSharedPointer<AbstractStreamSocket>& socket, const ApiPeerData &remotePeer)
+void QnTransactionMessageBus::gotConnectionFromRemotePeer(const QSharedPointer<AbstractStreamSocket>& socket, const ApiPeerData &remotePeer, qint64 remoteSystemIdentityTime)
 {
     if (!dbManager)
     {
@@ -1221,6 +1221,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(const QSharedPointer<A
 
     QnTransactionTransport* transport = new QnTransactionTransport(m_localPeer, socket);
     transport->setRemotePeer(remotePeer);
+    transport->setRemoteIdentityTime(remoteSystemIdentityTime);
     connect(transport, &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
     connect(transport, &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);
     connect(transport, &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::emitRemotePeerUnauthorized, Qt::DirectConnection );
