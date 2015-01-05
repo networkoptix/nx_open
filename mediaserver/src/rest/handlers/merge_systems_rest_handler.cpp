@@ -170,7 +170,6 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, cons
     authenticator.setUser(user);
     authenticator.setPassword(password);
 
-    if (!oneServer)
     {   /* Save current admin inside the remote system */
         CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
 
