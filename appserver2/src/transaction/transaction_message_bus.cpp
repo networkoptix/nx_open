@@ -1017,6 +1017,8 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
 {
     QMutexLocker lock(&m_mutex);
     QnTransactionTransport* transport = (QnTransactionTransport*) sender();
+    if (!transport)
+        return;
 
     switch (transport->getState()) 
     {
