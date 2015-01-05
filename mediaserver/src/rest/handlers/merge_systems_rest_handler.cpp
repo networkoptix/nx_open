@@ -238,11 +238,10 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(const QUrl &remoteUrl, const
             QByteArray data;
             client.readAll(data);
 
+            QnJsonRestResult result;
             QnPingReply reply;
-            if (QJson::deserialize(data, &reply))
+            if (QJson::deserialize(data, &result) && QJson::deserialize(result.reply(), &reply))
                 remoteSysTime = reply.sysIdTime;
-            QnJsonContext ctx;
-
         }
 
         QnUserResourcePtr userResource = QnUserResourcePtr(new QnUserResource());
