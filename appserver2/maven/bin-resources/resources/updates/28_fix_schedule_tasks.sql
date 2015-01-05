@@ -14,6 +14,8 @@ CREATE TABLE "vms_scheduletask" (
     FOREIGN KEY(camera_attrs_id)    REFERENCES vms_camera_user_attributes(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+DELETE FROM vms_scheduletask_tmp WHERE NOT EXISTS (SELECT 1 FROM vms_camera_user_attributes WHERE vms_camera_user_attributes.id = camera_attrs_id);
+
 INSERT INTO vms_scheduletask
    SELECT
     id,
