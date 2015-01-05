@@ -21,6 +21,7 @@
 #include "utils/network/direct_module_finder.h"
 #include "utils/common/app_info.h"
 #include "utils/common/model_functions.h"
+#include "api/model/ping_reply.h"
 
 namespace {
     ec2::AbstractECConnectionPtr ec2Connection() { return QnAppServerConnectionFactory::getConnection2(); }
@@ -169,14 +170,7 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, cons
     authenticator.setUser(user);
     authenticator.setPassword(password);
 
-    /* Change system name of the selected server */
-    if (oneServer) {
-        CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
-        CLHttpStatus status = client.doGET(lit("/api/configure?systemName=%1").arg(qnCommon->localSystemName()));
-        if (status != CLHttpStatus::CL_HTTP_SUCCESS)
-            return false;
-    }
-
+    if (!oneServer)
     {   /* Save current admin inside the remote system */
         CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
 
@@ -191,34 +185,54 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, cons
             return false;
     }
 
-    /* Change system name of the remote system */
-    if (!oneServer) {
-        authenticator.setPassword(currentPassword);
-        CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
-        CLHttpStatus status = client.doGET(lit("/api/configure?systemName=%1&wholeSystem=true").arg(qnCommon->localSystemName()));
-        if (status != CLHttpStatus::CL_HTTP_SUCCESS)
-            return false;
-    }
+    /* Change system name of the remote system or server */
+    authenticator.setPassword(currentPassword);
+    CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
+    CLHttpStatus status = client.doGET(lit("/api/configure?systemName=%1&wholeSystem=%2&sysIdTime=%3")
+        .arg(qnCommon->localSystemName())
+        .arg(oneServer ? "false" : "true")
+        .arg(qnCommon->systemIdentityTime()));
+    if (status != CLHttpStatus::CL_HTTP_SUCCESS)
+        return false;
 
     return true;
 }
 
-bool QnMergeSystemsRestHandler::applyRemoteSettings(const QUrl &remoteUrl, const QString &systemName, const QString &user, const QString &password, QnUserResourcePtr &admin) {
+bool QnMergeSystemsRestHandler::applyRemoteSettings(const QUrl &remoteUrl, const QString &systemName, const QString &user, const QString &password, QnUserResourcePtr &admin) 
+{
+    qint64 remoteSysTime = 0;
     {   /* Read admin user from the remote server */
         QAuthenticator authenticator;
         authenticator.setUser(user);
         authenticator.setPassword(password);
 
-        CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
-        CLHttpStatus status = client.doGET(lit("/ec2/getUsers"));
-        if (status != CLHttpStatus::CL_HTTP_SUCCESS)
-            return false;
-
-        QByteArray data;
-        client.readAll(data);
-
         ec2::ApiUserDataList users;
-        QJson::deserialize(data, &users);
+        {
+            CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
+            CLHttpStatus status = client.doGET(lit("/ec2/getUsers"));
+            if (status != CLHttpStatus::CL_HTTP_SUCCESS)
+                return false;
+
+            QByteArray data;
+            client.readAll(data);
+
+            QJson::deserialize(data, &users);
+        }
+        {
+            CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
+            CLHttpStatus status = client.doGET(lit("/api/ping"));
+            if (status != CLHttpStatus::CL_HTTP_SUCCESS)
+                return false;
+
+            QByteArray data;
+            client.readAll(data);
+
+            QnPingReply reply;
+            if (QJson::deserialize(data, &reply))
+                remoteSysTime = reply.sysIdTime;
+            QnJsonContext ctx;
+
+        }
 
         QnUserResourcePtr userResource = QnUserResourcePtr(new QnUserResource());
         for (const ec2::ApiUserData &userData: users) {
@@ -240,10 +254,10 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(const QUrl &remoteUrl, const
     if (errorCode != ec2::ErrorCode::ok)
         return false;
 
-    if (!changeSystemName(systemName))
+    if (!changeSystemName(systemName, remoteSysTime))
         return false;
 
-    errorCode = ec2Connection()->getMiscManager()->changeSystemNameSync(systemName);
+    errorCode = ec2Connection()->getMiscManager()->changeSystemNameSync(systemName, remoteSysTime);
     if (errorCode != ec2::ErrorCode::ok)
         return false;
 

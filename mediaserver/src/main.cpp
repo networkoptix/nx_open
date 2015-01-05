@@ -183,6 +183,7 @@ static const quint64 DEFAULT_LOG_ARCHIVE_SIZE = 25;
 static const quint64 DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
 static const QString REMOVE_DB_PARAM_NAME(lit("removeDbOnStartup"));
+static const QByteArray SYSTEM_IDENTITY_TIME("sysIdTime");
 
 class QnMain;
 static QnMain* serviceMainInstance = 0;
@@ -831,7 +832,7 @@ void QnMain::at_restartServerRequired()
 
 void QnMain::at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender)
 {
-    MSSettings::roSettings()->setValue("systemIndentityTime", value);
+    MSSettings::roSettings()->setValue(SYSTEM_IDENTITY_TIME, value);
     if (sender != qnCommon->moduleGUID()) {
         MSSettings::roSettings()->setValue(REMOVE_DB_PARAM_NAME, "1");
         restartServer();
@@ -1411,7 +1412,7 @@ void QnMain::run()
 
     qnCommon->setModuleGUID(serverGuid());
     qnCommon->setLocalSystemName(settings->value("systemName").toString());
-    qint64 systemIdentityTime = MSSettings::roSettings()->value("systemIndentityTime").toLongLong();
+    qint64 systemIdentityTime = MSSettings::roSettings()->value(SYSTEM_IDENTITY_TIME).toLongLong();
     qnCommon->setSystemIdentityTime(systemIdentityTime, qnCommon->moduleGUID());
     connect(qnCommon, &QnCommonModule::systemIdentityTimeChanged, this, &QnMain::at_systemIdentityTimeChanged, Qt::QueuedConnection);
 

@@ -18,6 +18,7 @@ int QnChangeSystemNameRestHandler::executeGet(const QString &path, const QnReque
 
     if (qnCommon->localSystemName() != systemName) {
         MSSettings::roSettings()->setValue("systemName", systemName);
+        qnCommon->setSystemIdentityTime(0, qnCommon->moduleGUID());
         restartServer();
     }
 
