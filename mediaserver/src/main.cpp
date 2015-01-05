@@ -764,11 +764,7 @@ void initAppServerConnection(QSettings &settings)
             params.addQueryItem("staticdb_path", staticDBPath);
 		}
         if (MSSettings::roSettings()->value(REMOVE_DB_PARAM_NAME).toBool())
-        {
-            QUrlQuery urlQuery(appServerUrl.query());
-            urlQuery.addQueryItem("cleanupDb", QString());
-            appServerUrl.setQuery(urlQuery);
-        }
+            params.addQueryItem("cleanupDb", QString());
     }
 
     // TODO: Actually appserverPassword is always empty. Remove?
