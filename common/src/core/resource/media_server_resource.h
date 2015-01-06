@@ -40,7 +40,7 @@ public:
     QString getApiUrl() const;
 
     void setNetAddrList(const QList<QHostAddress>&);
-    const QList<QHostAddress>& getNetAddrList() const;
+    QList<QHostAddress> getNetAddrList() const;
 
     void setAdditionalUrls(const QList<QUrl> &urls);
     QList<QUrl> getAdditionalUrls() const;
