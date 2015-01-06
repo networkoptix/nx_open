@@ -140,9 +140,9 @@ extern "C" {
 #endif
 
 QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags): 
-    base_type(parent, flags | Qt::Window
-#ifndef Q_OS_MACX
-    | Qt::CustomizeWindowHint
+    base_type(parent, flags | Qt::Window | Qt::CustomizeWindowHint
+#ifdef Q_OS_MACX
+    | Qt::WindowTitleHint | Qt::WindowCloseButtonHint | Qt::WindowMinMaxButtonsHint
 #endif
     ),
     QnWorkbenchContextAware(context),
