@@ -174,14 +174,9 @@ bool QnRecordingManager::updateCameraHistory(const QnResourcePtr& res)
 {
     const QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
 
-    if (m_cameraHistoryDone.contains(res->getId()))
+    QnMediaServerResourcePtr currentServer = QnCameraHistoryPool::instance()->getMediaServerOnTime(netRes, qnSyncTime->currentMSecsSinceEpoch(), true);
+    if (currentServer && currentServer->getId() == qnCommon->moduleGUID())
         return true; // camera history already inserted. skip
-    m_cameraHistoryDone << res->getId();
-
-    QnMediaServerResourcePtr currentServer = QnCameraHistoryPool::instance()->getMediaServerOnTime(netRes, DATETIME_NOW, true);
-    if (currentServer && currentServer->getId() == qnCommon->moduleGUID()) {
-        return true; // camera history already inserted. skip
-    }
 
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     QnCameraHistoryItem cameraHistoryItem(netRes->getUniqueId(), currentTime, qnCommon->moduleGUID());
@@ -190,7 +185,6 @@ bool QnRecordingManager::updateCameraHistory(const QnResourcePtr& res)
     ec2::ErrorCode errCode = appServerConnection->getCameraManager()->addCameraHistoryItemSync(cameraHistoryItem);
     if (errCode != ec2::ErrorCode::ok) {
         qCritical() << "ECS server error during execute method addCameraHistoryItem: " << ec2::toString(errCode);
-        m_cameraHistoryDone.remove(res->getId());
         return false;
     }
     QnCameraHistoryPool::instance()->addCameraHistoryItem(cameraHistoryItem);
@@ -430,8 +424,7 @@ void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr &resource
     bool ownResource = !camera->hasFlags(Qn::foreigner);
     if (ownResource && !camera->isInitialized())
         camera->initAsync(false);
-    if (!ownResource)
-        m_cameraHistoryDone.remove(camera->getId());
+
     updateCamera(camera);
 
     // no need mutex here because of readOnly access from other threads and m_recordMap modified only from current thread

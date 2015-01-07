@@ -88,7 +88,6 @@ private:
     ec2::QnDistributedMutex* m_licenseMutex;
     int m_tooManyRecordingCnt;
     qint64 m_recordingStopTime;
-    QSet<QnUuid> m_cameraHistoryDone;
 };
 
 #define qnRecordingManager QnRecordingManager::instance()

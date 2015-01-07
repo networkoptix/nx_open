@@ -85,19 +85,25 @@ namespace ec2
     //!Implementation of AbstractECConnectionFactory::testConnectionAsync
     int Ec2DirectConnectionFactory::testConnectionAsync( const QUrl& addr, impl::TestConnectionHandlerPtr handler )
     {
-        if( addr.isEmpty() )
-            return testDirectConnection( addr, handler );
+        QUrl url = addr;
+        url.setUserName(url.userName().toLower());
+
+        if (url.isEmpty())
+            return testDirectConnection(url, handler);
         else
-            return testRemoteConnection( addr, handler );
+            return testRemoteConnection(url, handler);
     }
 
     //!Implementation of AbstractECConnectionFactory::connectAsync
     int Ec2DirectConnectionFactory::connectAsync( const QUrl& addr, impl::ConnectHandlerPtr handler )
     {
-        if( addr.scheme() == "file" )
-            return establishDirectConnection(addr, handler );
+        QUrl url = addr;
+        url.setUserName(url.userName().toLower());
+
+        if (url.scheme() == "file")
+            return establishDirectConnection(url, handler);
         else
-            return establishConnectionToRemoteServer( addr, handler );
+            return establishConnectionToRemoteServer(url, handler);
     }
 
     void Ec2DirectConnectionFactory::registerTransactionListener( QnUniversalTcpListener* universalTcpListener )
