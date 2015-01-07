@@ -120,12 +120,12 @@
         <CustomAction Id="GenerateSystemName" BinaryKey="CustomActions.dll" DllEntry="GenerateSystemName"/>
         <CustomAction Id="DetectIfSystemIsStandalone" BinaryKey="CustomActions.dll" DllEntry="DetectIfSystemIsStandalone"/>
         
-        <CustomAction Id="CopyDatabaseFile_Cmd" Property="CopyDatabaseFile" Execute="immediate" Impersonate="yes"
-            Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\db\ecs.db;[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\${mediaserver.name}\ecs.sqlite"/>
+        <CustomAction Id="CopyDatabaseFile_Cmd" Property="CopyDatabaseFile" Execute="immediate" Impersonate="no"
+            Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\db\ecs.db;#LocalAppDataFolder#\${company.name}\${mediaserver.name}\ecs.sqlite"/>
         <CustomAction Id="CopyDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="CopyDatabaseFile" Execute="deferred" Impersonate="no"/>
 
-        <CustomAction Id="CopyHostedFiles_Cmd" Property="CopyHostedFiles" Execute="immediate" Impersonate="yes"
-            Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\hostedfiles;[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\${mediaserver.name}\vms_storedfiles"/>
+        <CustomAction Id="CopyHostedFiles_Cmd" Property="CopyHostedFiles" Execute="immediate" Impersonate="no"
+            Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\hostedfiles;#LocalAppDataFolder#\${company.name}\${mediaserver.name}\vms_storedfiles"/>
         <CustomAction Id="CopyHostedFiles" BinaryKey="CustomActions.dll" DllEntry="CopyHostedFiles" Execute="deferred" Impersonate="no"/>
 
         <CustomAction Id="DeleteOldMediaserverSettings_Cmd" Property="DeleteOldMediaserverSettings" Value="$(var.ServerRegPath)" Execute="immediate" Impersonate="yes"/>
@@ -156,8 +156,8 @@
         <CustomAction Id="SyncDatabaseAction" BinaryKey="CustomActions.dll" DllEntry="CAQuitExecAndWarn"
                       Execute="deferred" Return="check" Impersonate="no" />
 
-        <CustomAction Id="DeleteDatabaseFile_Cmd" Property="DeleteDatabaseFile" Execute="immediate" Impersonate="yes"
-                      Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\${mediaserver.name}\ecs.sqlite"/>
+        <CustomAction Id="DeleteDatabaseFile_Cmd" Property="DeleteDatabaseFile" Execute="immediate" Impersonate="no"
+                      Value="#LocalAppDataFolder#\${company.name}\${mediaserver.name}\ecs.sqlite"/>
 
         <CustomAction Id="LaunchTrayTool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" Directory="${customization}TrayToolDir" ExeCommand="[${customization}TrayToolDir]traytool.exe"/>
 
@@ -239,11 +239,7 @@
         <Media Id="12" Cabinet="media12.cab" EmbedCab="yes" />
 
         <Directory Id="TARGETDIR" Name="SourceDir">
-            <Directory Id="$(var.SystemFolderActual)">
-                <Directory Id="sysfoconfig" Name="config">
-                    <Directory Id="sysfoprofile" Name="systemprofile">
-                        <Directory Id="sysfoappda" Name="AppData">
-                            <Directory Id="sysfolocal" Name="Local">
+            <Directory Id="LocalAppDataFolder">
                                 <Directory Id="sysfocona" Name="${company.name}">
                                     <Component Id="sysfomediaservercomponent">
                                         <CreateFolder Directory="sysfocona"/>
@@ -251,10 +247,6 @@
                                     </Component>
                                 </Directory>
                             </Directory>
-                        </Directory>
-                    </Directory>
-                </Directory>
-            </Directory>
 
             <Directory Id="MyPicturesFolder">
                 <Directory Id="${customization}BgDir" Name="$(var.ProductName) Backgrounds"/>
