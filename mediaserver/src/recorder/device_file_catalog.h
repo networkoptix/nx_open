@@ -123,7 +123,6 @@ public:
     static QSet<void*> m_pauseList;
 
     bool doRebuildArchive(const QnStorageResourcePtr &storage, const QnTimePeriod& period);
-    bool isLastRecordRecording() const { return m_lastRecordRecording; }
     qint64 getLatRecordingTime() const;
     void setLatRecordingTime(qint64 value);
 
@@ -184,7 +183,6 @@ private:
     int m_lastAddIndex; // last added record index. In most cases it is last record
     QMutex m_IOMutex;
     static RebuildMethod m_rebuildArchive;
-    bool m_lastRecordRecording;
 };
 
 typedef QSharedPointer<DeviceFileCatalog> DeviceFileCatalogPtr;

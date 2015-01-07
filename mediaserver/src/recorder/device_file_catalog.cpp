@@ -81,8 +81,7 @@ DeviceFileCatalog::DeviceFileCatalog(const QString &cameraUniqueId, QnServer::Ch
     m_mutex(QMutex::Recursive),
     m_cameraUniqueId(cameraUniqueId),
     m_catalog(catalog),
-    m_lastAddIndex(-1),
-    m_lastRecordRecording(false)
+    m_lastAddIndex(-1)
 {
 }
 
@@ -545,12 +544,10 @@ void DeviceFileCatalog::setLatRecordingTime(qint64 value)
 {
     QMutexLocker lock(&m_mutex);
     m_lastAddIndex = -1;
-    m_lastRecordRecording = false;
     for (size_t i = 0; i < m_chunks.size(); ++i)
     {
         if (m_chunks[i].startTimeMs == value) {
             m_lastAddIndex = i;
-            m_lastRecordRecording = true;
             break;
         }
     }
@@ -567,7 +564,6 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::updateDuration(int durationMs, qint6
     Q_ASSERT(durationMs < 1000 * 1000);
     QMutexLocker lock(&m_mutex);
     //m_chunks.last().durationMs = durationMs;
-    m_lastRecordRecording = false;
     if (m_lastAddIndex >= 0) {
         m_chunks[m_lastAddIndex].durationMs = durationMs;
         m_chunks[m_lastAddIndex].setFileSize(fileSize);
