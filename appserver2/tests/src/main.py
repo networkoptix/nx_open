@@ -18,6 +18,7 @@ import difflib
 import datetime
 import time
 import select
+import errno
 
 # Rollback support
 class UnitTestRollback:
@@ -2272,6 +2273,7 @@ class RtspBackOffTimer:
             else:
                 self._globalTimerTable[url] = 0.01
                 time.sleep(0.01)
+
     def decrease(self,url):
         with self._timerLock:
             if url not in self._globalTimerTable:
@@ -2322,8 +2324,11 @@ class RRRtspTcpBasic:
         x-server-guid: %s\r\n\r\n"
 
     _digestAuthTemplate = "Authorization:Digest username=\"%s\",realm=\"%s\",nonce=\"%s\",uri=\"%s\",response=\"%s\",algorithm=\"MD5\""
+
+    _lock = None
+    _log  = None
     
-    def __init__(self,addr,port,mac,cid,sid,uname,pwd,urlGen):
+    def __init__(self,addr,port,mac,cid,sid,uname,pwd,urlGen,lock = None ,log = None):
         self._port = port
         self._addr = addr
         self._urlGen = urlGen
@@ -2337,6 +2342,8 @@ class RRRtspTcpBasic:
         self._mac = mac
         self._uname = uname
         self._pwd = pwd
+        self._lock = lock
+        self._log = log
 
     def _checkEOF(self,data):
         return data.find("\r\n\r\n") > 0
@@ -2444,6 +2451,58 @@ class RRRtspTcpBasic:
                 if self._checkEOF(ret):
                     return ret
 
+    def _dumpError(self,err):
+        if self._lock:
+            with self._lock:
+                print "--------------------------------------------"
+                print "Graceful shutdown error , it may be caused by the server improper behavior"
+                print err
+                print "ServerEndpoint:%s:%d"%(self._addr,self._port)
+                print "Address:%s"%(self._url)
+                print "---------------------------------------------"
+
+                self._log.write("----------------------------------------")
+                self._log.write("Graceful shutdown error , it may be caused by the server improper behavior")
+                self._log.write("select error:%s"%(err))
+                self._log.write("ServerEndpoint:%s:%d"%(self._addr,self._port))
+                self._log.write("Address:%s"%(self._url))
+                self._log.write("---------------------------------------------")
+
+    def _gracefulShutdown(self):
+        # This shutdown will issue a FIN on the peer side therefore, the peer side (if it recv blocks)
+        # will recv EOF on that socket fd. And it should behave properly regarding that problem there.
+        self._socket.shutdown(socket.SHUT_WR)
+        # Now if the peer server behaves properly it will definitly 
+        # close that connection and I will be able to read an EOF 
+        while True:
+            # Now we block on a timeout select
+            try :
+                ready = select.select([self._socket], [], [], 5)
+            except socket.error,e:
+                self._dumpError("select:%s"%(e))
+                return
+                   
+            if ready[0]:
+                # Now we get some data , read it and then try to read to EOF
+                try :
+                    buf = self._socket.recv(1024)
+                    if buf is None or len(buf) == 0:
+                        # The server performance gracefully and close that connection now
+                        return
+
+                except socket.error , e:
+                    if e.errno == errno.EAGAIN or e.errno == errno.EWOULDBLOCK or e == errno.WSAEWOULDBLOCK:
+                        pass
+                    else:
+                       self._dumpError("socket::recv : %s"%(e))
+                       return
+            else:
+                # Timeout reached 
+                self._dumpError( ("The server doesn't try to send me data or shutdown the connection for about 5 seconds\n"
+                                  "However,I have issued the shutdown for read side,so the server _SHOULD_ close the connection\n") )
+                return
+
+
     def __enter__(self):
         self._socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         self._socket.connect((self._addr,self._port))
@@ -2455,6 +2514,8 @@ class RRRtspTcpBasic:
             return (reply,self._url)
         
     def __exit__(self,type,value,trace):
+        # Do graceful closing here
+        self._gracefulShutdown()
         self._socket.close()
 
 class SingleServerRtspTestBase:
@@ -2827,7 +2888,6 @@ class SingleServerRtspPerf(SingleServerRtspTestBase):
 
 
     # This function will blocked on socket to recv data in a fashion of _RATE_
-    # 
     def _timeoutRecv(self,socket,rate,timeout):
         socket.setblocking(0)
         elapsed = 0
@@ -2996,7 +3056,8 @@ class SingleServerRtspPerf(SingleServerRtspTestBase):
                      self._serverGUID,
                      self._username,
                      self._password,
-                     RtspStreamURLGenerator(l[0],int(l[1]),c[0]))
+                     RtspStreamURLGenerator(l[0],int(l[1]),c[0]),
+                     self._lock,self._perfLog)
 
         with obj as reply:
             # 1.  Check the reply here
@@ -3015,7 +3076,8 @@ class SingleServerRtspPerf(SingleServerRtspTestBase):
                              self._serverGUID,
                              self._username,
                              self._password,
-                             RtspArchiveURLGenerator(self._archiveMax,self._archiveMin,l[0],int(l[1]),c[0]))
+                             RtspArchiveURLGenerator(self._archiveMax,self._archiveMin,l[0],int(l[1]),c[0]),
+                             self._lock,self._perfLog)
         with obj as reply:
             # 1.  Check the reply here
            if self._checkRtspRequest(c,reply):
@@ -3119,7 +3181,7 @@ class RtspPerf:
 
             while self.isOn():
                 try:
-                    time.sleep(0)
+                    time.sleep(1)
                 except:
                     break
 
@@ -3128,6 +3190,7 @@ class RtspPerf:
 
             print "RTSP performance test done,see log for detail"
             print "---------------------------------------------"
+
 
 
 def runRtspPerf():
