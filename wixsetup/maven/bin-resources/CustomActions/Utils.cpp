@@ -5,15 +5,6 @@
 #include "Utils.h"
 #include "portchecker.h"
 
-Error::Error(LPCWSTR msg) 
-    : _msg(msg) {}
-
-LPCWSTR Error::msg() const {
-    return (LPCWSTR)_msg; 
-}
-
-#define VERIFY(exp, msg) ( if((exp) != ERROR_SUCCESS) { throw Error(msg); } )
-
 CString GenerateGuid()
 {
     static const int MAX_GUID_SIZE = 50;
@@ -566,32 +557,4 @@ bool isStandaloneSystem(const char* host) {
     std::set_intersection(host_addresses.begin(), host_addresses.end(), local_addresses.begin(), local_addresses.end(), std::back_inserter(intersection));
     return !intersection.empty();
 
-}
-
-bool IsVistaOrLater() {
-    OSVERSIONINFO osvi;
-
-    ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
-    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-
-    GetVersionEx(&osvi);
-
-    return osvi.dwMajorVersion > 5;
-}
-
-CString GetAppDataLocalFolderPath() {
-    TCHAR buffer[MAX_PATH*2] = { 0 };
-    DWORD size = MAX_PATH * 2;
-
-    CAtlString result;
-
-    if (IsVistaOrLater()) {
-        SHGetFolderPath(NULL, CSIDL_SYSTEM, NULL, SHGFP_TYPE_CURRENT, buffer);
-        result.Format(L"%s\\config\\systemprofile\\AppData\\Local", buffer);
-    } else {
-        GetProfilesDirectory(buffer, &size);
-        result.Format(L"%s\\LocalService\\Local Settings\\Application Data", buffer);
-    }
-
-    return result;
 }

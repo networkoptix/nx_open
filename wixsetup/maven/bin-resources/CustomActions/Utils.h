@@ -1,16 +1,6 @@
 #ifndef _CUSTOM_ACTIONS_UTILS_H_
 #define _CUSTOM_ACTIONS_UTILS_H_
 
-class Error {
-public:
-    Error(LPCWSTR msg);
-
-    LPCWSTR msg() const;
-
-private:
-    CAtlString _msg;
-};
-
 LPCWSTR GetProperty(MSIHANDLE hInstall, LPCWSTR name);
 
 CString GenerateGuid();
@@ -30,7 +20,5 @@ void fixPath(CString& path);
 
 void QuitExecAndWarn(const LPWSTR commandLine, int status, const LPWSTR warningMsg);
 bool isStandaloneSystem(const char* host);
-
-CString GetAppDataLocalFolderPath();
 
 #endif // _CUSTOM_ACTIONS_UTILS_H_
