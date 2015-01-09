@@ -47,7 +47,7 @@ private:
     
     Qn::PtzCapabilities initMove();
     Qn::PtzCapabilities initContinuousFocus();
-    Qn::PtzCapabilities initPresets();
+    bool readBuiltinPresets();
 
     bool stopInternal();
     bool moveInternal(const QVector3D &speed);
@@ -63,6 +63,7 @@ private:
     QnPtzLimits m_limits;
     QMap<QString, QString> m_presetTokenById;
     QMap<QString, QString> m_presetNameByToken;
+    bool m_ptzPresetsReaded;
 };
 
 #endif //ENABLE_ONVIF

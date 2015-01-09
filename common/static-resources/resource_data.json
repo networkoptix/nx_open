@@ -123,6 +123,7 @@
             "keys": [
                 "VISTA|VK2-ENCODER",
                 "VISTA|VK2-1080PTZ",
+                "VISTA|VK2-600PTZ",
                 "*|DW-CP04"
             ],
             "onvifPtzPresetsEnabled": true
@@ -139,7 +140,7 @@
                 "VISTA|VK2-1080PTZ",
                 "VISTA|VK2-ENCODER"
             ],
-            "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability"
+            "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability|PresetsPtzCapability"
         },
         {
             "keys": [
