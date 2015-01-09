@@ -590,6 +590,9 @@ void fixDiscoveredName(QString& name, QString& manufacturer, const QString& loca
         name = manufacturer;
         manufacturer = lit("VISTA");
     }
+    else if(lowerName.startsWith(lit("axis "))) {
+        manufacturer = lit("AXIS");
+    }
 }
 
 template <class T> 
