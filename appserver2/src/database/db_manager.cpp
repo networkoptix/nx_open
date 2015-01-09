@@ -2784,7 +2784,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerData
     //reading properties
     QnQueryFilter filter;
     if( !mServerId.isNull() )
-        filter.fields.insert( RES_ID_FIELD, mServerId.toString() );
+        filter.fields.insert( RES_ID_FIELD, QVariant::fromValue(mServerId) );
     filter.fields.insert( RES_TYPE_FIELD, RES_TYPE_MSERVER );
     ApiResourceParamWithRefDataList params;
     result = fetchResourceParams( filter, params );
