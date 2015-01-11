@@ -8,6 +8,7 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QToolButton>
+#include <QtWidgets/QDesktopWidget>
 #include <QtGui/QFileOpenEvent>
 #include <QtNetwork/QNetworkReply>
 
@@ -74,6 +75,7 @@
 #include <client/client_settings.h>
 
 #include <utils/common/scoped_value_rollback.h>
+#include <utils/screen_manager.h>
 
 #include "resource_browser_widget.h"
 #include "layout_tab_bar.h"
@@ -480,6 +482,11 @@ void QnMainWindow::skipDoubleClick() {
     m_skipDoubleClick = true;
 }
 
+void QnMainWindow::updateScreenInfo() {
+    int screen = qApp->desktop()->screenNumber(this);
+    context()->instance<QnScreenManager>()->setCurrentScreens(QSet<int>() << screen);
+}
+
 void QnMainWindow::minimize() {
     showMinimized();
 }
@@ -757,6 +764,12 @@ void QnMainWindow::keyPressEvent(QKeyEvent *event) {
 
 void QnMainWindow::resizeEvent(QResizeEvent *event) {
     base_type::resizeEvent(event);
+    updateScreenInfo();
+}
+
+void QnMainWindow::moveEvent(QMoveEvent *event) {
+    base_type::moveEvent(event);
+    updateScreenInfo();
 }
 
 bool QnMainWindow::nativeEvent(const QByteArray &eventType, void *message, long *result) {

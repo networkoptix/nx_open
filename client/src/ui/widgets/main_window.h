@@ -72,6 +72,7 @@ protected:
     virtual void mouseDoubleClickEvent(QMouseEvent *event) override;
     virtual void keyPressEvent(QKeyEvent *event) override;
     virtual void resizeEvent(QResizeEvent *event) override;
+    virtual void moveEvent(QMoveEvent *event) override;
 
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPoint &pos) const override;
 
@@ -96,6 +97,9 @@ private:
     void showNormal();
 
     void skipDoubleClick();
+
+    void updateScreenInfo();
+
 private:
     /* Note that destruction order is important here, so we use scoped pointers. */
     QScopedPointer<QnGraphicsView> m_view;
