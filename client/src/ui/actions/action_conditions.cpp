@@ -883,7 +883,12 @@ Qn::ActionVisibility QnIdentifyVideoWallActionCondition::check(const QnActionPar
         }
         return Qn::InvisibleAction;
     }
-    return QnActionCondition::check(parameters);
+
+    /* 'Identify' action should not be displayed as disabled anyway. */
+    Qn::ActionVisibility baseResult = QnActionCondition::check(parameters);
+    if (baseResult != Qn::EnabledAction)
+        return Qn::InvisibleAction;
+    return Qn::EnabledAction;
 }
 
 Qn::ActionVisibility QnResetVideoWallLayoutActionCondition::check(const QnActionParameters &parameters) {

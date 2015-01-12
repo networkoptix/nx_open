@@ -206,7 +206,7 @@
                 <![CDATA[ (NOT $(var.VmsUpgrading)) AND $(var.InstallServer) AND REMOVE <> "ALL" ]]></Custom>
 
             <Custom Action="SyncDatabaseAction" After="CertGenAction">
-                <![CDATA[ $(var.InstallServer) AND REMOVE <> "ALL" ]]></Custom>
+                <![CDATA[ $(var.InstallServer) AND REMOVE <> "ALL" AND $(var.VmsUpgrading) ]]></Custom>
 
             <Custom Action="DeleteOldMediaserverSettings_Cmd" After="WriteRegistryValues">$(var.VmsUpgrading)</Custom>
             <Custom Action="DeleteOldMediaserverSettings" After="DeleteOldMediaserverSettings_Cmd">$(var.VmsUpgrading)</Custom>

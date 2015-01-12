@@ -42,6 +42,19 @@ QList<QnResourcePtr> QnDesktopCameraResourceSearcher::checkHostAddr(const QUrl& 
     return QList<QnResourcePtr>();
 }
 
+bool QnDesktopCameraResourceSearcher::isCameraConnected(const QnVirtualCameraResourcePtr &camera) {
+    cleanupConnections();
+
+    QString userId = camera->getUniqueId();
+
+    QMutexLocker lock(&m_mutex);
+    for (int i = 0; i < m_connections.size(); ++i) {
+        if (m_connections[i].userId == userId)
+            return true;
+    }
+    return false;
+}
+
 QnResourceList QnDesktopCameraResourceSearcher::findResources(void)
 {
     cleanupConnections();

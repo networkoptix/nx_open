@@ -119,8 +119,6 @@ public:
     static QByteArray createUserPasswordDigest( const QString& userName, const QString& password );
     static QByteArray createHttpQueryAuthParam( const QString& userName, const QString& password );
 
-    void setSessionKey(const QByteArray& value);
-
     static QByteArray symmetricalEncode(const QByteArray& data);
 signals:
     void emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);
@@ -132,9 +130,9 @@ private:
     void addAuthHeader(nx_http::Response& responseHeaders, bool isProxy);
     QByteArray getNonce();
     bool isNonceValid(const QByteArray& nonce) const;
-    bool doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy, QnUuid* authUserId);
+    bool doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy, QnUuid* authUserId, char delimiter);
     bool doBasicAuth(const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
-    bool doCustomAuthorization(const QByteArray& authData, nx_http::Response& response, const QByteArray& sesionKey);
+    bool doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
 
     mutable QMutex m_mutex;
     static QnAuthHelper* m_instance;
@@ -142,10 +140,6 @@ private:
     QMap<QnUuid, QnUserResourcePtr> m_users;
     QMap<QnUuid, QnMediaServerResourcePtr> m_servers;
     QnAuthMethodRestrictionList m_authMethodRestrictionList;
-
-    QByteArray m_sessionKey;
-    QByteArray m_prevSessionKey;
-    QMutex m_sessionKeyMutex;
 };
 
 #define qnAuthHelper QnAuthHelper::instance()

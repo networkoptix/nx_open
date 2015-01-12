@@ -1109,10 +1109,7 @@ void QnStorageManager::replaceChunks(const QnTimePeriod& rebuildPeriod, const Qn
         }
     }
 
-    qint64 recordingTime = ownCatalog->getLatRecordingTime();
     ownCatalog->replaceChunks(storageIndex, newCatalog->m_chunks);
-    if (recordingTime > 0)
-        ownCatalog->setLatRecordingTime(recordingTime);
 
     QnStorageDbPtr sdb = getSDB(storage);
     if (sdb)

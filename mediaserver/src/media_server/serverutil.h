@@ -5,7 +5,7 @@
 
 // TODO: #Elric this belongs together with server_settings
 
-QString authKey();
+QByteArray decodeAuthKey(const QByteArray&);
 QnUuid serverGuid();
 void setUseAlternativeGuid(bool value);
 

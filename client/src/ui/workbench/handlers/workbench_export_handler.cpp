@@ -482,6 +482,10 @@ bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layo
         return false;
     }
     else if (hasLocal) {
+        /* Always allow export selected area. */
+        if (layout->getItems().size() == 1)
+            return true;
+
         QMessageBox::critical(
             mainWindow(),
             tr("Could not save a layout"),

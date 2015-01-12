@@ -19,6 +19,7 @@ angular.module('webadminApp')
             };
 
             $scope.oldSystemName = r.data.reply.systemName;
+            $scope.oldPort = r.data.reply.port;
         });
 
         $scope.password = '';
@@ -120,7 +121,9 @@ angular.module('webadminApp')
                     $scope.settings.systemName = $scope.oldSystemName;
                 }
 
-                mediaserver.saveSettings($scope.settings.systemName, $scope.settings.port).then(resultHandler,errorHandler);
+                if($scope.oldSystemName !== $scope.settings.systemName  || $scope.oldPort !== $scope.settings.port ) {
+                    mediaserver.saveSettings($scope.settings.systemName, $scope.settings.port).then(resultHandler, errorHandler);
+                }
             }else{
                 alert('form is not valid');
             }

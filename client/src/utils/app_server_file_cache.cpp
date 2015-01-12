@@ -10,14 +10,9 @@
 
 #include <api/app_server_connection.h>
 
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_state_manager.h>
-
 QnAppServerFileCache::QnAppServerFileCache(const QString &folderName, QObject *parent) :
     QObject(parent),
-    QnWorkbenchContextAware(parent),
-    m_folderName(folderName),
-    m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnAppServerFileCache>(this))
+    m_folderName(folderName)
 {
     connect(this, &QnAppServerFileCache::delayedFileDownloaded,     this,   [this](const QString &filename, bool ok) {
         auto connection = QnAppServerConnectionFactory::getConnection2();
@@ -68,6 +63,9 @@ void QnAppServerFileCache::clearLocalCache() {
     removeDir(dir);
 }
 
+bool QnAppServerFileCache::isConnectedToServer() const {
+    return QnAppServerConnectionFactory::getConnection2() != NULL;
+}
 
 // -------------- File List loading methods -----
 
@@ -126,7 +124,7 @@ void QnAppServerFileCache::at_fileLoaded( int handle, ec2::ErrorCode errorCode, 
     QString filename = m_loading[handle];
     m_loading.remove(handle);
 
-    if (errorCode != ec2::ErrorCode::ok) {
+    if (errorCode != ec2::ErrorCode::ok || !isConnectedToServer()) {
         emit fileDownloaded(filename, false);
         return;
     }
@@ -182,6 +180,12 @@ void QnAppServerFileCache::at_fileUploaded( int handle, ec2::ErrorCode errorCode
 
     QString filename = m_uploading[handle];
     m_uploading.remove(handle);
+
+    if (!isConnectedToServer()) {
+        emit fileUploaded(filename, false);
+        return;
+    }
+
     const bool ok = errorCode == ec2::ErrorCode::ok;
     if (!ok)
         QFile::remove(getFullPath(filename));
@@ -227,6 +231,9 @@ void QnAppServerFileCache::at_fileDeleted( int handle, ec2::ErrorCode errorCode 
     if (!m_deleting.contains(handle))
         return;
 
+    if (!isConnectedToServer())
+        return;
+
     QString filename = m_deleting[handle];
     m_deleting.remove(handle);
     const bool ok = errorCode == ec2::ErrorCode::ok;
@@ -239,14 +246,4 @@ void QnAppServerFileCache::clear() {
     m_loading.clear();
     m_uploading.clear();
     m_deleting.clear();
-}
-
-bool QnAppServerFileCache::tryClose(bool force) {
-    Q_UNUSED(force);
-    clear();
-    return true;
-}
-
-void QnAppServerFileCache::forcedUpdate() {
-    getFileList();
 }

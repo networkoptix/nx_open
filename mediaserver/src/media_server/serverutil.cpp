@@ -14,12 +14,20 @@
 #include <utils/common/log.h>
 #include <utils/common/app_info.h>
 #include <common/common_module.h>
+#include <network/authenticate_helper.h>
 
 static QnMediaServerResourcePtr m_server;
 
-QString authKey()
-{
-    return MSSettings::roSettings()->value("authKey").toString();
+QByteArray decodeAuthKey(const QByteArray& authKey) {
+    // convert from v2.2 format and encode value
+    QByteArray prefix("SK_");
+    if (authKey.startsWith(prefix)) {
+        QByteArray authKeyEncoded = QByteArray::fromHex(authKey.mid(prefix.length()));
+        QByteArray authKeyDecoded = QnAuthHelper::symmetricalEncode(authKeyEncoded);
+        return QnUuid::fromRfc4122(authKeyDecoded).toByteArray();
+    } else {
+        return authKey;
+    }
 }
 
 QnUuid serverGuid() {

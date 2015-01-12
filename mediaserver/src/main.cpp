@@ -768,7 +768,7 @@ void initAppServerConnection(QSettings &settings)
     QString userName = settings.value("appserverLogin", QLatin1String("admin")).toString();
     QString password = settings.value("appserverPassword", QLatin1String("")).toString();
     QByteArray authKey = settings.value("authKey").toByteArray();
-    QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
+    QString appserverHostString = settings.value("appserverHost").toString();
     if (!authKey.isEmpty() && !isLocalAppServer(appserverHostString))
     {
         // convert from v2.2 format and encode value
@@ -780,9 +780,7 @@ void initAppServerConnection(QSettings &settings)
             settings.setValue(lit("authKey"), prefix + authKeyEncoded); // encode and update in settings
         }
         else {
-            QByteArray authKeyEncoded = QByteArray::fromHex(authKey.mid(prefix.length()));
-            QByteArray authKeyDecoded = QnAuthHelper::symmetricalEncode(authKeyEncoded);
-            authKey = QnUuid::fromRfc4122(authKeyDecoded).toByteArray();
+            authKey = decodeAuthKey(authKey);
         }
 
         userName = serverGuid().toString();
@@ -1351,6 +1349,7 @@ void QnMain::run()
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/camera_event*"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/showLog*"), AuthMethod::urlQueryParam );
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/moduleInformation"), AuthMethod::noAuth );
+    QnAuthHelper::instance()->restrictionList()->allow( lit("/static/*"), AuthMethod::noAuth );
 
     QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
     QnEventsDB::init();
@@ -1613,7 +1612,9 @@ void QnMain::run()
             isModified = true;
         }
         if (needUpdateAuthKey) {
-            server->setAuthKey(QnUuid::createUuid().toString());
+            QByteArray authKey = MSSettings::roSettings()->value("authKey").toString().toLatin1();
+            authKey = !authKey.isEmpty() ? decodeAuthKey(authKey) : QnUuid::createUuid().toString().toLatin1(); 
+            server->setAuthKey(authKey);
             isModified = true;
         }
 
