@@ -1056,8 +1056,10 @@ bool QnDbManager::createDatabase()
         if (!execSQLFile(lit(":/05_staticdb_add_license_table.sql"), m_sdbStatic))
             return false;
     }
+    else if (m_dbJustCreated)
+        m_needResyncLicenses = true;
+    
     // move license table to static DB
-
     ec2::ApiLicenseDataList licenses;
     QSqlQuery query(m_sdb);
     query.prepare(lit("SELECT license_key as key, license_block as licenseBlock from vms_license"));
