@@ -48,6 +48,8 @@ public:
 protected:
     void ensureCacheFolder();
     QString folderName() const;
+
+    bool isConnectedToServer() const;
 signals:
     void fileDownloaded(const QString& filename, bool ok);
     void delayedFileDownloaded(const QString& filename, bool ok);

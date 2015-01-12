@@ -68,6 +68,9 @@ void QnAppServerFileCache::clearLocalCache() {
     removeDir(dir);
 }
 
+bool QnAppServerFileCache::isConnectedToServer() const {
+    return QnAppServerConnectionFactory::getConnection2() != NULL;
+}
 
 // -------------- File List loading methods -----
 
@@ -126,7 +129,7 @@ void QnAppServerFileCache::at_fileLoaded( int handle, ec2::ErrorCode errorCode, 
     QString filename = m_loading[handle];
     m_loading.remove(handle);
 
-    if (errorCode != ec2::ErrorCode::ok) {
+    if (errorCode != ec2::ErrorCode::ok || !isConnectedToServer()) {
         emit fileDownloaded(filename, false);
         return;
     }
@@ -182,6 +185,12 @@ void QnAppServerFileCache::at_fileUploaded( int handle, ec2::ErrorCode errorCode
 
     QString filename = m_uploading[handle];
     m_uploading.remove(handle);
+
+    if (!isConnectedToServer()) {
+        emit fileUploaded(filename, false);
+        return;
+    }
+
     const bool ok = errorCode == ec2::ErrorCode::ok;
     if (!ok)
         QFile::remove(getFullPath(filename));
@@ -225,6 +234,9 @@ void QnAppServerFileCache::deleteFile(const QString &filename) {
 
 void QnAppServerFileCache::at_fileDeleted( int handle, ec2::ErrorCode errorCode ) {
     if (!m_deleting.contains(handle))
+        return;
+
+    if (!isConnectedToServer())
         return;
 
     QString filename = m_deleting[handle];

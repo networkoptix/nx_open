@@ -143,7 +143,6 @@ void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData 
         return;
 
     m_status.setState(QnConnectionState::Reconnecting);
-    Q_ASSERT_X(m_connected, Q_FUNC_INFO, "m_connected");
 
     /* Mark server as offline, so user will understand why is he reconnecting. */
     QnMediaServerResourcePtr server = qnResPool->getResourceById(data.peer.id).staticCast<QnMediaServerResource>();
