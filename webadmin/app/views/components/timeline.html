@@ -12,12 +12,12 @@
 </div>
 
 
-<div class="viewport"
-     ng-dblcick="zoomToPoint(event.offsetX)">
-    <canvas></canvas>
+<div class="viewport">
+    <canvas ></canvas>
 
     <div class="scroll">
-        <div class="frame">&nbsp;</div>
+        <div class="frame"
+             ng-dblclick="zoomToPoint($event.offsetX);">&nbsp;</div>
     </div>
 
     <div class="scroll-btn left"

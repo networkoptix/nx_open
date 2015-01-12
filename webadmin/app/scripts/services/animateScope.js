@@ -25,7 +25,7 @@ angular.module('webadminApp')
             }
             var result = start + (stop-start)*time/duration;
             if(isNaN(result)){
-                console.log("linear-error",result,start,stop,time,duration);
+                console.log('linear-error',result,start,stop,time,duration);
             }
             return  result;
         };
@@ -59,7 +59,7 @@ angular.module('webadminApp')
         var animationRunning = false;
 
 
-        window.animationFrame = (function(callback) {
+        window.animationFrame = (function() {
             return window.requestAnimationFrame ||
                 window.webkitRequestAnimationFrame ||
                 window.mozRequestAnimationFrame ||
@@ -91,7 +91,6 @@ angular.module('webadminApp')
             });
 
             _.forEach(scopes,function(scope){
-                console.log("scope",scope);
                 scope.$apply();
             });
         }
@@ -104,9 +103,9 @@ angular.module('webadminApp')
                 animationHandler();
             }
             if(defaultScope.$root.$$phase && !digestContext ){
-                console.error("wrong phase",defaultScope.$root.$$phase);
+                console.error('wrong phase',defaultScope.$root.$$phase);
             }
-            if(defaultScope!=null && !digestContext) {
+            if(defaultScope !== null && !digestContext) {
                 defaultScope.$apply();
             }
             window.animationFrame(animationFunction);
@@ -121,7 +120,7 @@ angular.module('webadminApp')
                 animationRunning = false;
             },
             animate:function(scope,value,target,duration){
-                if(typeof(duration) =='undefined')
+                if(typeof(duration) === 'undefined')
                 {
                     duration = defaultDuration;
                 }
