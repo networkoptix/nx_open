@@ -36,6 +36,21 @@ angular.module('webadminApp')
                     dblClckZoomSpeed:2// Zoom speed for dbl click
                 };
 
+                animateScope.setDuration(timelineConfig.animationDuration);
+                animateScope.setScope(scope);
+
+                var viewportWidth = element.find('.viewport').width();
+                var containerHeight = element.find('.viewport').height();
+
+                var frame = element.find('.frame');
+                var scroll = element.find('.scroll');
+
+                var canvas = element.find('canvas').get(0);
+                canvas.width  = viewportWidth;
+
+                var scrollBarWidth = getScrollbarWidth();
+                canvas.height = containerHeight - scrollBarWidth;
+                element.find('canvas').height(containerHeight - scrollBarWidth);
 
                 // set up scroll up-down for zoom
                 function getScrollbarWidth() {
@@ -62,24 +77,6 @@ angular.module('webadminApp')
 
                     return widthNoScroll - widthWithScroll;
                 }
-
-
-
-                animateScope.setDuration(timelineConfig.animationDuration);
-                animateScope.setScope(scope);
-
-                var viewportWidth = element.find('.viewport').width();
-                var scrollBarWidth = getScrollbarWidth();
-                var containerHeight = element.find('.viewport').height();
-
-                var frame = element.find('.frame');
-                var scroll = element.find('.scroll');
-
-                var canvas = element.find('canvas').get(0);
-                canvas.width  = viewportWidth;
-                canvas.height = containerHeight - scrollBarWidth;
-                element.find('canvas').height(containerHeight - scrollBarWidth);
-
 
                 function bound(min,value,max){
                     return Math.max(min,Math.min(value,max));
@@ -502,8 +499,6 @@ angular.module('webadminApp')
                     scrollingNow = false;
                 };
 
-
-
                 scope.zoom = function(zoomIn,speed,keep){
                     scope.positionToKeep = keep || 0.5;
                     speed = speed || 1;
@@ -525,6 +520,27 @@ angular.module('webadminApp')
 
                 scope.zoomToPoint = function(offsetX){
                     scope.zoom(true,timelineConfig.dblClckZoomSpeed,(offsetX - scroll.scrollLeft())/ viewportWidth);
+                };
+
+                var draggingPosition = null;
+                scope.dragStart = function(event) {
+                    var offsetX = event.offsetX;
+                    var screenRelativePosition = (offsetX - scroll.scrollLeft())/ viewportWidth;
+                    draggingPosition  = screenRelativePositionToDate(screenRelativePosition);
+                };
+                scope.drag = function(event) {
+                    if(draggingPosition === null){
+                        return;
+                    }
+                    var offsetX = event.offsetX;
+                    var screenRelativePosition = (offsetX - scroll.scrollLeft())/ viewportWidth;
+                    var newPosition = screenRelativePositionAndDateToRelativePositionForScroll(draggingPosition, screenRelativePosition);
+                    newPosition = bound(0,newPosition,1);
+                    viewPortScrollRelative(newPosition);
+                    scope.checkRightLeftVisibility();
+                };
+                scope.dragEnd = function(event) {
+                    draggingPosition = null;
                 };
 
                 scope.$watch('records',initTimeline);

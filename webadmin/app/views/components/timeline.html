@@ -17,7 +17,12 @@
 
     <div class="scroll">
         <div class="frame"
-             ng-dblclick="zoomToPoint($event.offsetX);">&nbsp;</div>
+             ng-dblclick="zoomToPoint($event.offsetX)"
+             ng-mousedown="dragStart($event)"
+             ng-mousemove="drag($event)"
+             ng-mouseup="dragEnd($event)"
+             ng-mouseleave="dragEnd($event)"
+                >&nbsp;</div>
     </div>
 
     <div class="scroll-btn left"
