@@ -285,7 +285,7 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
         break;
     }
 
-    QnAppServerConnectionFactory::setUrl(appServerUrl);
+    QnAppServerConnectionFactory::setUrl(connectionInfo.ecUrl);
     QnAppServerConnectionFactory::setEc2Connection(result.connection());
     QnAppServerConnectionFactory::setCurrentVersion(connectionInfo.version);
 
