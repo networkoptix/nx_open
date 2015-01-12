@@ -137,6 +137,7 @@ void TestConnection::onDataReceived( SystemError::ErrorCode errorCode, size_t by
         return m_handler( this, errorCode );
     }
 
+    m_totalBytesReceived += bytesRead;
     m_readBuffer.clear();
     m_readBuffer.reserve( READ_BUF_SIZE );
 
@@ -162,6 +163,14 @@ void TestConnection::onDataSent( SystemError::ErrorCode errorCode, size_t bytesW
     {
         m_socket->cancelAsyncIO();
         return m_handler( this, errorCode );
+    }
+
+    m_totalBytesSent += bytesWritten;
+    if( m_totalBytesSent >= m_bytesToSendThrough )
+    {
+        m_socket->cancelAsyncIO();
+        m_handler( this, SystemError::getLastOSErrorCode() );
+        return;
     }
 
     using namespace std::placeholders;

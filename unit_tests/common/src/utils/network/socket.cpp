@@ -21,13 +21,13 @@ namespace
 */
 TEST( SocketAsyncModeTest, AsyncOperationCancellation )
 {
-    static const int TEST_DURATION_SECONDS = 1;
-    static const int TEST_RUNS = 20;
+    static const int TEST_DURATION_SECONDS = 2;
+    static const int TEST_RUNS = 50000;
 
     for( int i = 0; i < TEST_RUNS; ++i )
     {
         static const int MAX_SIMULTANEOUS_CONNECTIONS = 100;
-        static const int BYTES_TO_SEND_THROUGH_CONNECTION = 100*1024*1024;
+        static const int BYTES_TO_SEND_THROUGH_CONNECTION = 1*1024*1024;
 
         RandomDataTcpServer server( BYTES_TO_SEND_THROUGH_CONNECTION );
         ASSERT_TRUE( server.start() );
@@ -51,7 +51,7 @@ TEST( SocketAsyncModeTest, AsyncOperationCancellation )
     std::this_thread::sleep_for( std::chrono::seconds( SECONDS_TO_WAIT_AFTER_TEST ) );
 }
 
-TEST( SocketAsyncModeTest, AsyncOperationCancellation2 )
+TEST( SocketAsyncModeTest, ServerSocketAsyncCancellation )
 {
     static const int TEST_RUNS = 47;
 
