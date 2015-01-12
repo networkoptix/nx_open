@@ -8,9 +8,7 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnWorkbenchStateDelegate;
-
-class QnAppServerFileCache : public QObject, public QnWorkbenchContextAware
+class QnAppServerFileCache : public QObject
 {
     Q_OBJECT
 public:
@@ -43,8 +41,6 @@ public:
 
     static void clearLocalCache();
 
-    bool tryClose(bool force);
-    void forcedUpdate();
 protected:
     void ensureCacheFolder();
     QString folderName() const;
@@ -71,7 +67,6 @@ private:
     QHash<int, QString> m_loading;
     QHash<int, QString> m_uploading;
     QHash<int, QString> m_deleting;
-    QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;
 };
 
 #endif // APP_SERVER_FILE_CACHE_H

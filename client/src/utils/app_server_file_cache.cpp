@@ -10,14 +10,9 @@
 
 #include <api/app_server_connection.h>
 
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_state_manager.h>
-
 QnAppServerFileCache::QnAppServerFileCache(const QString &folderName, QObject *parent) :
     QObject(parent),
-    QnWorkbenchContextAware(parent),
-    m_folderName(folderName),
-    m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnAppServerFileCache>(this))
+    m_folderName(folderName)
 {
     connect(this, &QnAppServerFileCache::delayedFileDownloaded,     this,   [this](const QString &filename, bool ok) {
         auto connection = QnAppServerConnectionFactory::getConnection2();
@@ -251,14 +246,4 @@ void QnAppServerFileCache::clear() {
     m_loading.clear();
     m_uploading.clear();
     m_deleting.clear();
-}
-
-bool QnAppServerFileCache::tryClose(bool force) {
-    Q_UNUSED(force);
-    clear();
-    return true;
-}
-
-void QnAppServerFileCache::forcedUpdate() {
-    getFileList();
 }
