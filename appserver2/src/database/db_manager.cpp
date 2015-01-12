@@ -1072,13 +1072,11 @@ bool QnDbManager::createDatabase()
     {
         if (saveLicense(data) != ErrorCode::ok)
             return false;
+        m_needResyncLicenses = true;
     }
     if (!execSQLQuery("DELETE FROM vms_license", m_sdb))
         return false;
 
-    else if (m_dbJustCreated) {
-        m_needResyncLicenses = true;
-    }
 
     if (!applyUpdates())
         return false;
