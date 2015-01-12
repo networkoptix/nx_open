@@ -32,7 +32,8 @@ angular.module('webadminApp')
                     colorLevels: 6, // Number of different color levels
                     scrollingSpeed: 0.25,// One click to scroll buttons - scroll timeline by half of the screen
                     maxVerticalScrollForZoom: 5000, // value for adjusting zoom
-                    scrollBoundariesPrecision: 0.000001 // Where we should disable right and left scroll buttons
+                    scrollBoundariesPrecision: 0.000001, // Where we should disable right and left scroll buttons
+                    dblClckZoomSpeed:2// Zoom speed for dbl click
                 };
 
                 animateScope.setDuration(timelineConfig.animationDuration);
@@ -108,20 +109,31 @@ angular.module('webadminApp')
                     var availableWidth = scope.scrollWidth - viewportWidth;
                     viewPortScrollRelative(scrollPos/availableWidth);
                 });
+
+                var targetZoomLevel = 1;
+
                 scroll.mousewheel(function(event){
                     event.preventDefault();
 
                     if(Math.abs(event.deltaY) > Math.abs(event.deltaX)) { // Zoom or scroll - not both
                         if (scope.zooming == 1) { // if zoom animation is not going yet
-
                             scope.positionToKeep = event.offsetX/viewportWidth;
 
-                            var actualVerticalScrollForZoom = scope.actualZoomLevel / scope.maxZoomLevel;
+                            var actualZoomLevel = (scope.scrollZooming==1)?scope.actualZoomLevel:targetZoomLevel;
+                            // if(scrollZooming==1){}
+                            var actualVerticalScrollForZoom = actualZoomLevel / scope.maxZoomLevel;
                             actualVerticalScrollForZoom -= event.deltaY / timelineConfig.maxVerticalScrollForZoom;
 
                             actualVerticalScrollForZoom = bound(0,actualVerticalScrollForZoom,1);
 
-                            scope.actualZoomLevel = scope.maxZoomLevel * actualVerticalScrollForZoom;
+                            //scope.actualZoomLevel = targetZoomLevel;
+
+                            targetZoomLevel = scope.maxZoomLevel * actualVerticalScrollForZoom;
+
+                            animateScope.animate(scope,"actualZoomLevel",targetZoomLevel);
+                            animateScope.progress(scope,"scrollZooming");
+
+                            //scope.actualZoomLevel = scope.maxZoomLevel * actualVerticalScrollForZoom;
                         }
                     }else {
                         var horScroll = viewPortScrollRelative();
@@ -435,6 +447,7 @@ angular.module('webadminApp')
                 scope.zooming = 1; //zoom animation progress
                 scope.scrolling = 1;//Scrolling to some position
                 scope.targetScrollPosition = 0;
+                scope.scrollZooming = 1; //Animate zoom while scroll
 
                 scope.scroll = function(right,value){
                     if(scope.scrolling >= 1){
@@ -491,8 +504,8 @@ angular.module('webadminApp')
 
 
 
-                scope.zoom = function(zoomIn, speed){
-                    scope.positionToKeep = 0.5;
+                scope.zoom = function(zoomIn,speed,keep){
+                    scope.positionToKeep = keep || 0.5;
                     speed = speed || 1;
 
                     var targetZoomLevel = scope.actualZoomLevel;
@@ -508,6 +521,10 @@ angular.module('webadminApp')
                     animateScope.animate(scope,'actualZoomLevel',targetZoomLevel);
                     animateScope.progress(scope,'zooming');
 
+                };
+
+                scope.zoomToPoint = function(offsetX){
+                    scope.zoom(true,timelineConfig.dblClckZoomSpeed,offsetX/viewportWidth);
                 };
 
                 scope.$watch('records',initTimeline);
