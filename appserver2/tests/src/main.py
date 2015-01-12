@@ -2544,8 +2544,22 @@ class SingleServerRtspTestBase:
 
         self._fetchCameraList()
 
+    def _getServerGUID(self):
+        response = urllib2.urlopen("http://%s/ec2/testConnection"%(self._serverEndpoint))
+        if response.getcode() != 200:
+            return False
+        obj = json.loads(response.read())
+        response.close()
+        guid = obj["ecsGuid"]
+        if guid[0] == '{':
+            return guid
+        else:
+            return "{" + obj["ecsGuid"] + "}" 
+
     def _fetchCameraList(self):
-        response = urllib2.urlopen("http://%s/ec2/getCameras" % (self._serverEndpoint))
+        # Get this server's GUID and filter out the only cameras that should be used on this server
+        guid = self._getServerGUID()
+        response = urllib2.urlopen("http://%s/ec2/getCameras?id=%s" % (self._serverEndpoint,guid))
 
         if response.getcode() != 200:
             raise Exception("Cannot connect to server:%s using getCameras" % (self._serverEndpoint))
