@@ -12,17 +12,16 @@
 </div>
 
 
-<div class="viewport">
+<div class="viewport"
+     ng-mouseup="dragEnd()"
+     ng-mouseleave="dragEnd();">
     <canvas ></canvas>
 
     <div class="scroll">
         <div class="frame"
              ng-dblclick="zoomToPoint($event.offsetX)"
-             ng-mousedown="dragStart($event)"
-             ng-mousemove="drag($event)"
-             ng-mouseup="dragEnd($event)"
-             ng-mouseleave="dragEnd($event)"
-                >&nbsp;</div>
+             ng-mousedown="dragStart($event.offsetX)"
+             ng-mousemove="drag($event.offsetX)">&nbsp;</div>
     </div>
 
     <div class="scroll-btn left"

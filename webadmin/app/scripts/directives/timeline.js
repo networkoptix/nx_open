@@ -523,23 +523,22 @@ angular.module('webadminApp')
                 };
 
                 var draggingPosition = null;
-                scope.dragStart = function(event) {
-                    var offsetX = event.offsetX;
+                scope.dragStart = function(offsetX) {
                     var screenRelativePosition = (offsetX - scroll.scrollLeft())/ viewportWidth;
                     draggingPosition  = screenRelativePositionToDate(screenRelativePosition);
                 };
-                scope.drag = function(event) {
+                scope.drag = function(offsetX) {
                     if(draggingPosition === null){
                         return;
                     }
-                    var offsetX = event.offsetX;
                     var screenRelativePosition = (offsetX - scroll.scrollLeft())/ viewportWidth;
                     var newPosition = screenRelativePositionAndDateToRelativePositionForScroll(draggingPosition, screenRelativePosition);
                     newPosition = bound(0,newPosition,1);
                     viewPortScrollRelative(newPosition);
                     scope.checkRightLeftVisibility();
                 };
-                scope.dragEnd = function(event) {
+                scope.dragEnd = function() {
+                    console.log("dragEnd");
                     draggingPosition = null;
                 };
 
