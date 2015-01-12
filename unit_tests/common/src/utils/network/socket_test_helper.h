@@ -6,6 +6,8 @@
 #ifndef SOCKET_TEST_HELPER_H
 #define SOCKET_TEST_HELPER_H
 
+#if 0
+
 #include <list>
 #include <memory>
 #include <mutex>
@@ -100,5 +102,7 @@ private:
 
     void onConnectionFinished( ConnectionsContainer::iterator connectionIter );
 };
+
+#endif
 
 #endif  //SOCKET_TEST_HELPER_H

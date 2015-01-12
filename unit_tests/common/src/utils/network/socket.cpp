@@ -8,6 +8,7 @@
 #include <gtest/gtest.h>
 
 
+#if 0
 /*!
     This test verifies that AbstractCommunicatingSocket::cancelAsyncIO method works fine
 */
@@ -34,3 +35,4 @@ TEST( SocketAsyncModeTest, AsyncOperationCancellation )
     server.pleaseStop();
     server.join();
 }
+#endif

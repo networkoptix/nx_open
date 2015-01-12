@@ -6,6 +6,7 @@
 #include "socket_test_helper.h"
 
 
+#if 0
 TestConnection::TestConnection( std::unique_ptr<AbstractStreamSocket> connection, size_t bytesToSendThrough )
 :
     m_connection( std::move( connection ) ),
@@ -198,3 +199,4 @@ void ConnectionsGenerator::onConnectionFinished( ConnectionsContainer::iterator 
     connection->setDoneHandler( std::bind(&ConnectionsGenerator::onConnectionFinished, this, m_connections.rbegin().base()) );
     assert( connection->start() );  //not processing error for now
 }
+#endif
