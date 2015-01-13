@@ -323,8 +323,8 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
                                     itemData.zoomRect,
                                     itemData.contrastParams,
                                     itemData.dewarpingParams,
-                                    customAr,
-                                    itemData.rotation);
+                                    itemData.rotation,
+                                    customAr);
 
     //TODO: #GDM #TR Fix after string freeze
     emit stageChanged(tr("Exporting to \"%2\"...").arg(QFileInfo(m_targetFilename).fileName()));
