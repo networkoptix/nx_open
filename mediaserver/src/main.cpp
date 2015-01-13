@@ -737,6 +737,13 @@ int serverMain(int argc, char *argv[])
 
 void initAppServerConnection(QSettings &settings)
 {
+    // migrate appserverPort settings from version 2.2 if exist
+    if (!MSSettings::roSettings()->value("appserverPort").isNull()) 
+    {
+        MSSettings::roSettings()->setValue("port", MSSettings::roSettings()->value("appserverPort"));
+        MSSettings::roSettings()->remove("appserverPort");
+    }
+
     QUrl appServerUrl;
     QUrlQuery params;
 
@@ -752,7 +759,7 @@ void initAppServerConnection(QSettings &settings)
     }
     else {
         appServerUrl.setScheme(settings.value("secureAppserverConnection", true).toBool() ? QLatin1String("https") : QLatin1String("http"));
-        int port = settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt();
+        int port = settings.value("port", DEFAULT_APPSERVER_PORT).toInt();
         appServerUrl.setHost(host);
         appServerUrl.setPort(port);
     }
@@ -1445,7 +1452,6 @@ void QnMain::run()
         NX_LOG( QString::fromLatin1("Switching to cluster mode and restarting..."), cl_logWARNING );
         MSSettings::roSettings()->setValue("systemName", connectInfo.systemName);
         MSSettings::roSettings()->remove("appserverHost");
-        MSSettings::roSettings()->remove("appserverPort");
         MSSettings::roSettings()->remove("appserverLogin");
         MSSettings::roSettings()->setValue("appserverPassword", "");
         MSSettings::roSettings()->remove(PENDING_SWITCH_TO_CLUSTER_MODE);
