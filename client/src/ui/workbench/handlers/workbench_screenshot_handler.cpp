@@ -55,15 +55,6 @@ namespace {
 
     /* Parameter value to load latest available screenshot. */
     const qint64 latestScreenshotTime = -1;
-
-    QString timeString(qint64 time, bool useDate) {
-        if (time == latestScreenshotTime)
-            return QDateTime::currentDateTime().toString(lit("hh.mm.ss"));
-
-        if (useDate)
-            return datetimeSaveDialogSuggestion(QDateTime::fromMSecsSinceEpoch(time));
-        return QTime(0, 0, 0, 0).addMSecs(time).toString(lit("hh.mm.ss"));
-    }
 }
 
 QnScreenshotParameters::QnScreenshotParameters():
@@ -72,6 +63,16 @@ QnScreenshotParameters::QnScreenshotParameters():
     customAspectRatio(0.0),
     rotationAngle(0.0)
 {}
+
+QString QnScreenshotParameters::timeString() const {
+    if (time == latestScreenshotTime)
+        return QDateTime::currentDateTime().toString(lit("hh.mm.ss"));
+
+    qint64 timeMSecs = time / 1000;
+    if (isUtc)
+        return datetimeSaveDialogSuggestion(QDateTime::fromMSecsSinceEpoch(timeMSecs));
+    return QTime(0, 0, 0, 0).addMSecs(timeMSecs).toString(lit("hh.mm.ss"));
+}
 
 
 // -------------------------------------------------------------------------- //
@@ -274,7 +275,7 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
     {       
         parameters.time = screenshotTime(widget);
         parameters.isUtc = widget->resource()->toResource()->flags() & Qn::utc;
-        Key timeKey(keyStack, lit("_") + timeString(parameters.time, parameters.isUtc));
+        Key timeKey(keyStack, lit("_") + parameters.timeString());
        
         parameters.itemDewarpingParams = widget->item()->dewarpingParams();
         parameters.mediaDewarpingParams = widget->dewarpingParams();       
@@ -343,7 +344,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     }
 
     QnScreenshotParameters parameters;
-    parameters.time = widget->display()->camDisplay()->getCurrentTime();
+    parameters.time = screenshotTime(widget);
     parameters.isUtc = widget->resource()->toResource()->flags() & Qn::utc;
     parameters.filename = filename;
     parameters.timestampPosition = qnSettings->timestampCorner();
@@ -362,7 +363,7 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
     if (previousDir.isEmpty())
         previousDir = qnSettings->mediaFolder();
     QString suggestion = replaceNonFileNameCharacters(parameters.filename, QLatin1Char('_'))
-        + QLatin1Char('_') + timeString(parameters.time, parameters.isUtc);
+        + QLatin1Char('_') + parameters.timeString();
     suggestion = QnEnvironment::getUniqueFileName(previousDir, suggestion);
 
     QString filterSeparator = lit(";;");

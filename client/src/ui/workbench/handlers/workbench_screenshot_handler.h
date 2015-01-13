@@ -31,6 +31,8 @@ struct QnScreenshotParameters
     QRectF zoomRect;
     qreal customAspectRatio;
     qreal rotationAngle;
+
+    QString timeString() const;
 };
 
 class QnScreenshotLoader: public QnImageProvider {
