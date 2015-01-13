@@ -2568,6 +2568,8 @@ class SingleServerRtspTestBase:
         for c in json_obj:
             if c["typeId"] == "{1657647e-f6e4-bc39-d5e8-563c93cb5e1c}":
                 continue # Skip desktop
+            if "name" in c and c["name"].startswith("ec2_test"):
+                continue # Skip fake camera
             self._cameraList.append((c["physicalId"],c["id"],c["name"]))
             self._cameraInfoTable[c["id"]] = c
 
