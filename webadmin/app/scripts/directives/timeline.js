@@ -36,8 +36,8 @@ angular.module('webadminApp')
                     dblClckZoomSpeed:2,// Zoom speed for dbl click
                     topLabelBorderColor: 'silver', // Color for borders for top labels
                     topLabelTextColor: 'rgb(128,128,128)', // Color for text for top labels
-                    topLabelHeight: 15, // Size for top label text
-                    topLabelPadding: 3, // Padding around top label
+                    topLabelHeight: 12, // Size for top label text
+                    topLabelPadding: 2, // Padding around top label
 
                     font:'sans-serif',
                     evenColor: 'rgb(200,200,255)',
