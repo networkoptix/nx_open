@@ -156,34 +156,26 @@ function RulerModel(start,end){
  * @type {{detailization: number}[]}
  */
 RulerModel.levels = [
-    { name:'Век', format:'yyyy', interval:  new Interval(0,0,0,0,0,100), marks: 10, width: 25 }, // root
-    { name:'Декада', format:'yyyy', interval:  new Interval(0,0,0,0,0,10), marks: 10, width: 25 },
+    { name:'Age'        , format:'yyyy'     , interval:  new Interval( 0, 0, 0, 0, 0, 100), width: 25, topWidth: 0, topFormat:'' }, // root
+    { name:'Decade'     , format:'yyyy'     , interval:  new Interval( 0, 0, 0, 0, 0, 10) , width: 25 },
     {
-        name:'Год', //Года
-        format:'yyyy',//Строка для форматирования даты или функция
-        //Используем http://www.mattkruse.com/javascript/date/date.js для форматирования
-        interval:  new Interval(0,0,0,0,0,1),//Интервал для определения больших рисок (подписей)
-        marks: 12,//Сколько маленьких рисок используем на данном масштабе
-        width: 25//Минимальная ширина подписи в пикселях. Можем подгонять ширину так, чтобы подписи не пересекались и показывались как только достаточно масштаба для этой подписи + должны помещаться риски
+        name:'Year', //Years
+        format:'yyyy',//Format string for date
+        interval:  new Interval(0,0,0,0,0,1),// Interval for marks
+        width: 25, // Minimal width for label. We should choose minimal width in order to not intresect labels on timeline
+        topWidth: 100, // minimal width for label above timeline
+        topFormat:'yyyy'//Format string for label above timeline
     },
-    { name:'Месяц'      , format:'mmmm'      , interval:  new Interval(0,0,0,0,1,0)  , marks: 4  , width: 50 },
-    { name:'День'       , format:'dd mmmm'   , interval:  new Interval(0,0,0,1,0,0)  , marks: 2  , width: 60 },
-
-    //{ name:'12 часов'   , format:'HH"h"'      , interval:  new Interval(0,0,12,0,0,0) , marks: 2  , width: 60 },
-    { name:'6 часов'    , format:'HH"h"'      , interval:  new Interval(0,0,6,0,0,0)  , marks: 2  , width: 60 },
-    //{ name:'3 часа'     , format:'HH"h"'      , interval:  new Interval(0,0,3,0,0,0)  , marks: 3  , width: 60 },
-    { name:'Час'        , format:'HH"h"'      , interval:  new Interval(0,0,1,0,0,0)  , marks: 2  , width: 60 },
-
-    //{ name:'30 минут'   , format:'MM"m"'    , interval:  new Interval(0,30,0,0,0,0) , marks: 3  , width: 60 },
-    { name:'10 минут'   , format:'MM"m"'    , interval:  new Interval(0,10,0,0,0,0) , marks: 2  , width: 60 },
-    //{ name:'5 минут'    , format:'MM"m"'    , interval:  new Interval(0,5,0,0,0,0)  , marks: 5  , width: 60 },
-    { name:'1 минута'   , format:'MM"m"'    , interval:  new Interval(0,1,0,0,0,0)  , marks: 2  , width: 60 },
-
-    //{ name:'30 секунд'  , format:'ss"s"'    , interval:  new Interval(30,0,0,0,0,0) , marks: 3 , width: 30 },
-    { name:'10 секунд'  , format:'ss"s"'    , interval:  new Interval(10,0,0,0,0,0) , marks: 2 , width: 30 },
-    //{ name:'5 секунд'   , format:'ss"s"'    , interval:  new Interval(5,0,0,0,0,0)  , marks: 5 , width: 30 },
-    { name:'1 секундa'  , format:'ss"s"'    , interval:  new Interval(1,0,0,0,0,0)  , marks: 2 , width: 30 }
+    { name:'Month'      , format:'mmmm'     , interval:  new Interval( 0, 0, 0, 0, 1, 0)  , width: 50, topWidth: 300, topFormat:'mmmm yyyy'},
+    { name:'Day'        , format:'dd mmmm'  , interval:  new Interval( 0, 0, 0, 1, 0, 0)  , width: 60, topWidth: 300, topFormat:'dd mmmm yyyy' },
+    { name:'6 hours'    , format:'HH"h"'    , interval:  new Interval( 0, 0, 6, 0, 0, 0)  , width: 60 },
+    { name:'Hour'       , format:'HH"h"'    , interval:  new Interval( 0, 0, 1, 0, 0, 0)  , width: 60, topWidth: 300, topFormat:'dd mmmm yyyy HH:MM' },
+    { name:'10 minutes' , format:'MM"m"'    , interval:  new Interval( 0,10, 0, 0, 0, 0)  , width: 60 },
+    { name:'1 minute'   , format:'MM"m"'    , interval:  new Interval( 0, 1, 0, 0, 0, 0)  , width: 60, topWidth: 300, topFormat:'dd mmmm yyyy HH:MM' },
+    { name:'10 seconds' , format:'ss"s"'    , interval:  new Interval(10, 0, 0, 0, 0, 0)  , width: 30 },
+    { name:'1 second'   , format:'ss"s"'    , interval:  new Interval( 1, 0, 0, 0, 0, 0)  , width: 30 }
 ];
+
 
 RulerModel.getLevelIndex = function(searchdetailization){
     var targetLevel = _.find(RulerModel.levels, function(level){

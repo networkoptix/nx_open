@@ -25,7 +25,7 @@ angular.module('webadminApp')
                     rulerFontStep: 1, // Step for increasing font size
                     rulerBasicSize: 6, // Size for smallest mark on ruler
                     rulerStepSize: 3,// Step for increasing marks
-                    rulerLabelPadding: 0.3, // Padding between marks and labels (according to font size)
+                    labelsPadding: 0.3, // Padding between marks and labels (according to font size)
                     minimumMarkWidth: 5, // Minimum available width for smallest marks on ruler
                     increasedMarkWidth: 10,// Minimum width for encreasing marks size
                     maximumScrollScale: 20,// Maximum scale for scroll frame inside viewport - according to viewport width
@@ -33,7 +33,14 @@ angular.module('webadminApp')
                     scrollingSpeed: 0.25,// One click to scroll buttons - scroll timeline by half of the screen
                     maxVerticalScrollForZoom: 5000, // value for adjusting zoom
                     scrollBoundariesPrecision: 0.000001, // Where we should disable right and left scroll buttons
-                    dblClckZoomSpeed:2// Zoom speed for dbl click
+                    dblClckZoomSpeed:2,// Zoom speed for dbl click
+
+                    topLabelHeight: 15, // Size for top label text
+                    topLabelPadding: 3, // Padding around top label
+
+                    font:'sans-serif',
+                    evenColor: 'rgb(128,128,255)',
+                    oddColor: 'rgb(0,0,255)'
                 };
 
                 animateScope.setDuration(timelineConfig.animationDuration);
@@ -189,6 +196,12 @@ angular.module('webadminApp')
                         var level = RulerModel.levels[i];
 
                         var secondsPerLevel =(level.interval.getSeconds() / secsPerPixel);
+
+                        if(typeof(level.topWidth)!=='undefined' &&
+                            secondsPerLevel >= level.topWidth){
+                            scope.topLabelsLevel = i;
+                        }
+
                         if(secondsPerLevel >= level.width){
                             scope.visibleLabelsLevel = i;
                         }
@@ -245,19 +258,13 @@ angular.module('webadminApp')
                 }
 
                 function screenRelativePositionAndDateToRelativePositionForScroll(date,screenRelativePosition){
-
                     if(scope.frameWidth === viewportWidth){
                         return 0;
                     }
-
                     var dateRelativePosition = (date - scope.start)/(scope.frameEnd - scope.start);
-
                     var datePosition = dateRelativePosition * scope.frameWidth;
-
                     var startPosition = datePosition - viewportWidth * screenRelativePosition;
-
                     var screenStartRelativePos = startPosition / (scope.frameWidth-viewportWidth);
-
                     return screenStartRelativePos;
                 }
 
@@ -302,8 +309,8 @@ angular.module('webadminApp')
                     var color = blurColor(timelineConfig.rulerColor,colorBlur);
                     context.strokeStyle = color;
                     context.beginPath();
-                    context.moveTo(coordinate, 0);
-                    context.lineTo(coordinate, size);
+                    context.moveTo(coordinate, timelineConfig.topLabelHeight);
+                    context.lineTo(coordinate, size + timelineConfig.topLabelHeight);
                     context.stroke();
 
                     if(typeof(label)!=='undefined'){
@@ -322,12 +329,55 @@ angular.module('webadminApp')
                             fontSize = (Math.min(level,2) + scope.levelEncreasing) * timelineConfig.rulerStepSize + timelineConfig.rulerBasicSize ;
                         }*/
 
-                        context.font = fontSize  + 'px sans-serif';
+                        context.font = fontSize  + 'px ' + timelineConfig.font;
                         context.fillStyle = color;
 
                         var width =  context.measureText(label).width;
-                        context.fillText(label,coordinate - width/2, size + fontSize*(1 + timelineConfig.rulerLabelPadding));
+                        context.fillText(label,coordinate - width/2, size + fontSize*(1 + timelineConfig.labelsPadding) + timelineConfig.topLabelHeight);
                     }
+                }
+
+                function drawTopLabel(context, startCoordinate, endCoordinate, label, odd){
+
+                    startCoordinate = Math.max(startCoordinate,0);
+                    endCoordinate = Math.min(endCoordinate,viewportWidth);
+
+
+                    console.log('drawTopLabel', startCoordinate, endCoordinate-startCoordinate, label, odd);
+
+                    context.fillStyle = odd? timelineConfig.oddColor:timelineConfig.evenColor;
+
+
+                    context.fillRect(startCoordinate, 0 , endCoordinate - startCoordinate, timelineConfig.topLabelHeight);
+                    context.stroke();
+
+                    context.beginPath();
+                    context.moveTo(endCoordinate, timelineConfig.topLabelHeight);
+                    context.lineTo(startCoordinate, timelineConfig.topLabelHeight);
+                    context.lineTo(startCoordinate, 0);
+                    context.stroke();
+
+                    var textSize = timelineConfig.topLabelHeight - timelineConfig.topLabelPadding;
+
+                    context.font = textSize  + 'px ' + timelineConfig.font;
+                    context.fillStyle = blurColor(timelineConfig.rulerColor, 1);
+                    var width =  context.measureText(label).width;
+
+                    var coordinate = (startCoordinate + endCoordinate - width) / 2 ;
+
+                    if(coordinate < 0){
+                        coordinate = 0;
+                    }
+                    if(coordinate + width > endCoordinate - timelineConfig.topLabelPadding && endCoordinate < viewportWidth){
+                        coordinate = endCoordinate - width - timelineConfig.topLabelPadding;
+                    }
+
+                    if(coordinate < startCoordinate + timelineConfig.topLabelPadding && startCoordinate > 0){
+                        coordinate = startCoordinate + timelineConfig.topLabelPadding;
+                    }
+
+                    context.fillText(label, coordinate, timelineConfig.topLabelHeight - timelineConfig.topLabelPadding );
+
                 }
 
                 function drawRuler(){
@@ -337,16 +387,33 @@ angular.module('webadminApp')
 
                     context.clearRect(0, 0, canvas.width, canvas.height);
 
-                    //2. Align visible interval to current level (start to past, end to future)
-                    var level = RulerModel.levels[scope.actualLevel];
 
-                    var end = level.interval.alignToFuture (screenRelativePositionToDate(1));
-                    var position = level.interval.alignToFuture(screenRelativePositionToDate(0));
+                    //1. Drop top labels
+                    var level = RulerModel.levels[scope.topLabelsLevel];
+                    var end = level.interval.alignToFuture(screenRelativePositionToDate(1));
+                    var position = level.interval.alignToPast(screenRelativePositionToDate(0));
+
+
+                    while(position<end){ // Draw labels above marks
+                        var endPosition = level.interval.addToDate(position);
+                        var screenStartPosition = dateToScreenPosition(position);
+                        var screenEndPosition = dateToScreenPosition(endPosition);
+                        var label = dateFormat(new Date(position), level.topFormat);
+                        drawTopLabel(context, screenStartPosition, screenEndPosition, label, Math.round((position / 1000 / level.interval.getSeconds())) % 2 === 1);
+                        position = endPosition;
+                    }
+
+                    //2. Align visible interval to current level (start to past, end to future)
+
+                    level = RulerModel.levels[scope.actualLevel];
+                    end = level.interval.alignToFuture(screenRelativePositionToDate(1));
+                    position = level.interval.alignToFuture(screenRelativePositionToDate(0));
 
                     var findLevel = function(level){
                         return level.interval.checkDate(position);
                     };
-                    while(position<end){
+
+                    while(position<end){ // Draw marks
                         var screenPosition = dateToScreenPosition(position);
 
                         //Detect the best level for this position
