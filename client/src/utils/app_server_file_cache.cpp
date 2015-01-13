@@ -2,22 +2,20 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
-#include <utils/common/uuid.h>
 #include <QtCore/QTimer>
 #include <QtCore/QStandardPaths>
 
-#include <utils/common/util.h> /* For removeDir. */
-
 #include <api/app_server_connection.h>
 
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_state_manager.h>
+#include <common/common_module.h>
+
+#include <utils/common/util.h> /* For removeDir. */
+#include <utils/common/uuid.h>
+#include <utils/common/string.h>
 
 QnAppServerFileCache::QnAppServerFileCache(const QString &folderName, QObject *parent) :
     QObject(parent),
-    QnWorkbenchContextAware(parent),
-    m_folderName(folderName),
-    m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnAppServerFileCache>(this))
+    m_folderName(folderName)
 {
     connect(this, &QnAppServerFileCache::delayedFileDownloaded,     this,   [this](const QString &filename, bool ok) {
         auto connection = QnAppServerConnectionFactory::getConnection2();
@@ -43,11 +41,11 @@ QnAppServerFileCache::~QnAppServerFileCache(){}
 
 QString QnAppServerFileCache::getFullPath(const QString &filename) const {
     QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-    QUrl url = QnAppServerConnectionFactory::url();
-    return QDir::toNativeSeparators(QString(QLatin1String("%1/cache/%2_%3/%4/%5"))
+    QString systemName = replaceNonFileNameCharacters(qnCommon->localSystemName(), L'_');
+    Q_ASSERT_X(!systemName.isEmpty(), Q_FUNC_INFO, "Method should be called only when we are connected to server");
+    return QDir::toNativeSeparators(QString(lit("%1/cache/%2/%3/%4"))
                                     .arg(path)
-                                    .arg(url.host(QUrl::FullyEncoded))
-                                    .arg(url.port())
+                                    .arg(systemName)
                                     .arg(m_folderName)
                                     .arg(filename)
                                     );
@@ -64,10 +62,13 @@ QString QnAppServerFileCache::folderName() const {
 
 void QnAppServerFileCache::clearLocalCache() {
     QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-    QString dir = QDir::toNativeSeparators(QString(QLatin1String("%1/cache/")).arg(path));
+    QString dir = QDir::toNativeSeparators(QString(lit("%1/cache/")).arg(path));
     removeDir(dir);
 }
 
+bool QnAppServerFileCache::isConnectedToServer() const {
+    return QnAppServerConnectionFactory::getConnection2() != NULL;
+}
 
 // -------------- File List loading methods -----
 
@@ -126,7 +127,7 @@ void QnAppServerFileCache::at_fileLoaded( int handle, ec2::ErrorCode errorCode, 
     QString filename = m_loading[handle];
     m_loading.remove(handle);
 
-    if (errorCode != ec2::ErrorCode::ok) {
+    if (errorCode != ec2::ErrorCode::ok || !isConnectedToServer()) {
         emit fileDownloaded(filename, false);
         return;
     }
@@ -182,6 +183,12 @@ void QnAppServerFileCache::at_fileUploaded( int handle, ec2::ErrorCode errorCode
 
     QString filename = m_uploading[handle];
     m_uploading.remove(handle);
+
+    if (!isConnectedToServer()) {
+        emit fileUploaded(filename, false);
+        return;
+    }
+
     const bool ok = errorCode == ec2::ErrorCode::ok;
     if (!ok)
         QFile::remove(getFullPath(filename));
@@ -227,6 +234,9 @@ void QnAppServerFileCache::at_fileDeleted( int handle, ec2::ErrorCode errorCode 
     if (!m_deleting.contains(handle))
         return;
 
+    if (!isConnectedToServer())
+        return;
+
     QString filename = m_deleting[handle];
     m_deleting.remove(handle);
     const bool ok = errorCode == ec2::ErrorCode::ok;
@@ -239,14 +249,4 @@ void QnAppServerFileCache::clear() {
     m_loading.clear();
     m_uploading.clear();
     m_deleting.clear();
-}
-
-bool QnAppServerFileCache::tryClose(bool force) {
-    Q_UNUSED(force);
-    clear();
-    return true;
-}
-
-void QnAppServerFileCache::forcedUpdate() {
-    getFileList();
 }

@@ -64,6 +64,8 @@ private:
     QMap<QString, QString> m_presetTokenById;
     QMap<QString, QString> m_presetNameByToken;
     bool m_ptzPresetsReaded;
+
+    mutable QMutex m_mutex;
 };
 
 #endif //ENABLE_ONVIF

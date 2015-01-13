@@ -2588,26 +2588,23 @@ bool QnPlOnvifResource::startInputPortMonitoringAsync( std::function<void(bool)>
 
 void QnPlOnvifResource::stopInputPortMonitoringAsync()
 {
+    //TODO #ak this method MUST become asynchronous
     quint64 localTimerID = 0;
     quint64 localRenewSubscriptionTaskID = 0;
     {
         QMutexLocker lk(&m_ioPortMutex);
         m_inputMonitored = false;
         localTimerID = m_timerID;
+        m_timerID = 0;
         localRenewSubscriptionTaskID = m_renewSubscriptionTaskID;
+        m_renewSubscriptionTaskID = 0;
     }
 
     //removing timer
     if( localTimerID > 0 )
-    {
         TimerManager::instance()->joinAndDeleteTimer(localTimerID);
-        m_timerID = 0;
-    }
     if( localRenewSubscriptionTaskID > 0 )
-    {
         TimerManager::instance()->joinAndDeleteTimer(localRenewSubscriptionTaskID);
-        m_renewSubscriptionTaskID = 0;
-    }
     //TODO #ak removing device event registration
         //if we do not remove event registration, camera will do it for us in some timeout
 
@@ -2936,7 +2933,7 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
     {
         using namespace std::placeholders;
         //will try later
-        assert( m_timerID == 0 );
+        Q_ASSERT( m_timerID == 0 );
         m_timerID = TimerManager::instance()->addTimer(
             std::bind(&QnPlOnvifResource::pullMessages, this, _1),
             PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND);
@@ -2953,7 +2950,7 @@ void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* as
         return;
 
     using namespace std::placeholders;
-    assert( m_timerID == 0 );
+    Q_ASSERT( m_timerID == 0 );
     m_timerID = TimerManager::instance()->addTimer(
         std::bind(&QnPlOnvifResource::pullMessages, this, _1),
         PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND);

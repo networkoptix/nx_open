@@ -1514,18 +1514,26 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
             synchronizeGeometry(widget, false);
     }
 
-    qreal widgetAspectRatio = widget->visualAspectRatio();
-    if (widgetAspectRatio <= 0) {
-        QnConstResourceVideoLayoutPtr videoLayout = widget->channelLayout();
-        /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
-        widgetAspectRatio = aspectRatio(videoLayout->size()) * (item->zoomRect().isNull() ? 1.0 : aspectRatio(item->zoomRect())) * (4.0 / 3.0);
-        if (QnAspectRatio::isRotated90(item->rotation()))
-            widgetAspectRatio = 1 / widgetAspectRatio;
+    /* Calculate items size. */
+    QSize size;
+    if (item->layout()->items().size() == 1) {
+        /* Layout containing only one item (current) is supposed to have the same AR as the item.
+         * So we just set item size to its video layout size. */
+        size = widget->channelLayout()->size();
+    } else {
+        qreal widgetAspectRatio = widget->visualAspectRatio();
+        if (widgetAspectRatio <= 0) {
+            QnConstResourceVideoLayoutPtr videoLayout = widget->channelLayout();
+            /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
+            widgetAspectRatio = aspectRatio(videoLayout->size()) * (item->zoomRect().isNull() ? 1.0 : aspectRatio(item->zoomRect())) * (4.0 / 3.0);
+            if (QnAspectRatio::isRotated90(item->rotation()))
+                widgetAspectRatio = 1 / widgetAspectRatio;
+        }
+        Qt::Orientation orientation = widgetAspectRatio > 1.0 ? Qt::Vertical : Qt::Horizontal;
+        if (qFuzzyEquals(widgetAspectRatio, 1.0))
+            orientation = QnGeometry::aspectRatio(workbench()->mapper()->cellSize()) > 1.0 ? Qt::Horizontal : Qt::Vertical;
+        size = bestSingleBoundedSize(workbench()->mapper(), 1, orientation, widgetAspectRatio);
     }
-    Qt::Orientation orientation = widgetAspectRatio > 1.0 ? Qt::Vertical : Qt::Horizontal;
-    if (qFuzzyEquals(widgetAspectRatio, 1.0))
-        orientation = QnGeometry::aspectRatio(workbench()->mapper()->cellSize()) > 1.0 ? Qt::Horizontal : Qt::Vertical;
-    const QSize size = bestSingleBoundedSize(workbench()->mapper(), 1, orientation, widgetAspectRatio);
 
     /* Adjust item's geometry for the new size. */
     if(size != item->geometry().size()) {

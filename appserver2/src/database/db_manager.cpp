@@ -1056,8 +1056,10 @@ bool QnDbManager::createDatabase()
         if (!execSQLFile(lit(":/05_staticdb_add_license_table.sql"), m_sdbStatic))
             return false;
     }
+    else if (m_dbJustCreated)
+        m_needResyncLicenses = true;
+    
     // move license table to static DB
-
     ec2::ApiLicenseDataList licenses;
     QSqlQuery query(m_sdb);
     query.prepare(lit("SELECT license_key as key, license_block as licenseBlock from vms_license"));
@@ -1072,13 +1074,11 @@ bool QnDbManager::createDatabase()
     {
         if (saveLicense(data) != ErrorCode::ok)
             return false;
+        m_needResyncLicenses = true;
     }
     if (!execSQLQuery("DELETE FROM vms_license", m_sdb))
         return false;
 
-    else if (m_dbJustCreated) {
-        m_needResyncLicenses = true;
-    }
 
     if (!applyUpdates())
         return false;
@@ -1244,11 +1244,21 @@ ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 inter
     }
 
     QSqlQuery insQuery2(m_sdb);
-    if (!data.digest.isEmpty())
-        insQuery2.prepare("INSERT OR REPLACE INTO vms_userprofile (user_id, resource_ptr_id, digest, rights) VALUES (:internalId, :internalId, :digest, :permissions)");
-    else
-        insQuery2.prepare("UPDATE vms_userprofile SET rights=:permissions WHERE user_id=:internalId");
+    insQuery2.prepare("INSERT OR REPLACE INTO vms_userprofile (user_id, resource_ptr_id, digest, rights) VALUES (:internalId, :internalId, :digest, :permissions)");
     QnSql::bind(data, &insQuery2);
+    if (data.digest.isEmpty())
+    {
+        // keep current digest value if exists
+        QSqlQuery digestQuery(m_sdb);
+        digestQuery.prepare("SELECT digest FROM vms_userprofile WHERE user_id = ?");
+        digestQuery.addBindValue(internalId);
+        if (!digestQuery.exec()) {
+            qWarning() << Q_FUNC_INFO << digestQuery.lastError().text();
+            return ErrorCode::dbError;
+        }
+        if (digestQuery.next())
+            insQuery2.bindValue(":digest", digestQuery.value(0).toByteArray());
+    }
     insQuery2.bindValue(":internalId", internalId);
     if (!insQuery2.exec())
     {
@@ -2679,7 +2689,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& cameraId, ApiCameraDataExList
     //reading resource properties
     QnQueryFilter filter;
     if( !cameraId.isNull() )
-        filter.fields.insert( RES_ID_FIELD, QVariant::fromValue(cameraId) );
+        filter.fields.insert( RES_ID_FIELD, QVariant::fromValue(cameraId) );    //TODO #ak use QnSql::serialized_field
     filter.fields.insert( RES_TYPE_FIELD, RES_TYPE_CAMERA );
     ApiResourceParamWithRefDataList params;
     ErrorCode result = fetchResourceParams( filter, params );
