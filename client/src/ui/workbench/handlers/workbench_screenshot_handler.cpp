@@ -68,7 +68,7 @@ QString QnScreenshotParameters::timeString() const {
     if (time == latestScreenshotTime)
         return QDateTime::currentDateTime().toString(lit("hh.mm.ss"));
 
-    qint64 timeMSecs = time / 1000;
+    qint64 timeMSecs = adjustedTime / 1000;
     if (isUtc)
         return datetimeSaveDialogSuggestion(QDateTime::fromMSecsSinceEpoch(timeMSecs));
     return QTime(0, 0, 0, 0).addMSecs(timeMSecs).toString(lit("hh.mm.ss"));
@@ -175,7 +175,7 @@ QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMedi
     return new QnBasicImageProvider(screenshot);
 }
 
-qint64 QnWorkbenchScreenshotHandler::screenshotTime(QnMediaResourceWidget *widget) {
+qint64 QnWorkbenchScreenshotHandler::screenshotTime(QnMediaResourceWidget *widget, bool adjust) {
     QnResourceDisplayPtr display = widget->display();
 
     if (display->camDisplay()->isRealTimeSource())
@@ -184,6 +184,9 @@ qint64 QnWorkbenchScreenshotHandler::screenshotTime(QnMediaResourceWidget *widge
     qint64 time = display->camDisplay()->getCurrentTime();
     if (time == AV_NOPTS_VALUE)
         return latestScreenshotTime;
+
+    if (!adjust)
+        return time;
 
     bool isUtc = widget->resource()->toResource()->flags() & Qn::utc;
     qint64 localOffset = 0;
@@ -275,6 +278,7 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
     {       
         parameters.time = screenshotTime(widget);
         parameters.isUtc = widget->resource()->toResource()->flags() & Qn::utc;
+        parameters.adjustedTime = screenshotTime(widget, true);
         Key timeKey(keyStack, lit("_") + parameters.timeString());
        
         parameters.itemDewarpingParams = widget->item()->dewarpingParams();
@@ -346,6 +350,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     QnScreenshotParameters parameters;
     parameters.time = screenshotTime(widget);
     parameters.isUtc = widget->resource()->toResource()->flags() & Qn::utc;
+    parameters.adjustedTime = screenshotTime(widget, true);
     parameters.filename = filename;
     parameters.timestampPosition = qnSettings->timestampCorner();
     parameters.itemDewarpingParams = widget->item()->dewarpingParams();
