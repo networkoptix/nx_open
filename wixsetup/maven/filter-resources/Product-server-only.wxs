@@ -240,13 +240,13 @@
 
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="LocalAppDataFolder">
-                <Directory Id="sysfocona" Name="${company.name}">
-                    <Component Id="sysfomediaservercomponent">
-                        <CreateFolder Directory="sysfocona"/>
-                        <RegistryValue Root='HKLM' Key='Software\[Manufacturer]\version' Type='string' Value='${release.version}.${buildNumber}' KeyPath='yes' />
-                    </Component>
-                </Directory>
-            </Directory>
+                                <Directory Id="sysfocona" Name="${company.name}">
+                                    <Component Id="sysfomediaservercomponent">
+                                        <CreateFolder Directory="sysfocona"/>
+                                        <RegistryValue Root='HKLM' Key='Software\[Manufacturer]\version' Type='string' Value='${release.version}.${buildNumber}' KeyPath='yes' />
+                                    </Component>
+                                </Directory>
+                            </Directory>
 
             <Directory Id="MyPicturesFolder">
                 <Directory Id="${customization}BgDir" Name="$(var.ProductName) Backgrounds"/>

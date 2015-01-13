@@ -6,13 +6,14 @@
     <message>
         <location filename="../src/main.cpp" line="21"/>
         <source>System Tray</source>
-        <translation type="unfinished"></translation>
+        <translation>Bandeja del sistema</translation>
     </message>
     <message>
         <location filename="../src/main.cpp" line="22"/>
         <source>There is no system tray on this system.
 Application will now quit.</source>
-        <translation type="unfinished"></translation>
+        <translation>No hay ninguna bandeja de sistema en este sistema.
+Aplicación se cerrará.</translation>
     </message>
 </context>
 <context>
@@ -20,12 +21,12 @@ Application will now quit.</source>
     <message>
         <location filename="../src/systraywindow.cpp" line="425"/>
         <source>Insufficient privileges to manage services</source>
-        <translation type="unfinished"></translation>
+        <translation>Privilegios insuficientes para administrar servicios</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="425"/>
         <source>UAC must be enabled to request privileges for non-admin users</source>
-        <translation type="unfinished"></translation>
+        <translation>UAC debe ser activado para solicitar privilegios para los usuarios no-admin</translation>
     </message>
 </context>
 <context>
@@ -33,108 +34,109 @@ Application will now quit.</source>
     <message>
         <location filename="../src/systraywindow.cpp" line="157"/>
         <source>Access denied.</source>
-        <translation type="unfinished"></translation>
+        <translation>Acceso denegado.</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="160"/>
         <source>Specified database does not exist.</source>
-        <translation type="unfinished"></translation>
+        <translation>Base de datos especificada no existe.</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="163"/>
         <source>Specified parameter is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>Parámetro especificado no es válido.</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="167"/>
         <source>Could not access installed services</source>
-        <translation type="unfinished"></translation>
+        <translation>No se pudo acceder a los servicios instalados</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="167"/>
         <source>An error has occurred while trying to access installed services:
  %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Se ha producido un error al intentar acceder a los servicios instalados:
+.%1</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="180"/>
         <source>No %1 services installed</source>
-        <translation type="unfinished"></translation>
+        <translation>No hay servicios instalados %1</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="279"/>
         <source>Media server has been stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>Servidor de medios se ha detenido</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="286"/>
         <source>Media server has been started</source>
-        <translation type="unfinished"></translation>
+        <translation>Servidor de medios se ha iniciado</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="310"/>
         <source> (stopped)</source>
-        <translation type="unfinished"></translation>
+        <translation> (detenido)</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="318"/>
         <source> (starting)</source>
-        <translation type="unfinished"></translation>
+        <translation> (iniciando)</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="326"/>
         <source> (stopping)</source>
-        <translation type="unfinished"></translation>
+        <translation> (parando)</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="334"/>
         <source> (started)</source>
-        <translation type="unfinished"></translation>
+        <translation> (iniciado)</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="342"/>
         <source> (resuming)</source>
-        <translation type="unfinished"></translation>
+        <translation> (reanudación)</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="350"/>
         <source> (paused)</source>
-        <translation type="unfinished"></translation>
+        <translation> (pausa)</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="358"/>
         <source> (pausing)</source>
-        <translation type="unfinished"></translation>
+        <translation>(pausa)</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="468"/>
         <source>Show &amp;Media Server Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar registro de servidor de los &amp;medios de comunicación</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="483"/>
         <source>Media Server Web Page</source>
-        <translation type="unfinished"></translation>
+        <translation>Página Web del servidor de medios</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="386"/>
         <source>Media server is going to be stopped. Are you sure?</source>
-        <translation type="unfinished"></translation>
+        <translation>Servidor de medios se va a detener. ¿Está seguro?</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="465"/>
         <source>&amp;Quit</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Abandonar</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="473"/>
         <source>Start Media Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Iniciar servidor de medios</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="478"/>
         <source>Stop Media Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Detener el servidor de medios</translation>
     </message>
 </context>
 </TS>
