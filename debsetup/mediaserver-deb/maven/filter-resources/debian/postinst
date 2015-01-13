@@ -186,8 +186,18 @@ case "$1" in
             ALLOW_CAMERA_CHANGES=$(ask_for_value allowCameraChanges "$ALLOW_CAMERA_CHANGES")
             $CFG_HELPER allowCameraChanges "$ALLOW_CAMERA_CHANGES"
         else
+            PORT="$($CFG_HELPER port)"
+            [ -z "$PORT" ] && PORT="$($EC_CFG_HELPER port)"
+            [ -z "$PORT" ] && PORT=$(find_free_port $PORT_DEFAULT)
+            $CFG_HELPER port "$PORT"
+
+            SYSTEM_NAME="$($CFG_HELPER systemName)"
             [ -z "$SYSTEM_NAME" ] && $CFG_HELPER systemName "$SYSTEM_NAME_DEFAULT"
 
+            ALLOW_CAMERA_CHANGES="$($CFG_HELPER allowCameraChanges)"
+            [ -z "$ALLOW_CAMERA_CHANGES" ] && ALLOW_CAMERA_CHANGES=$($EC_CFG_HELPER allowCameraChanges)
+            [ -z "$ALLOW_CAMERA_CHANGES" ] && ALLOW_CAMERA_CHANGES=$ALLOW_CAMERA_CHANGES_DEFAULT
+            $CFG_HELPER allowCameraChanges "$ALLOW_CAMERA_CHANGES"
         fi
 
         "$CERTGEN" -i
