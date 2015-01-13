@@ -34,13 +34,14 @@ angular.module('webadminApp')
                     maxVerticalScrollForZoom: 5000, // value for adjusting zoom
                     scrollBoundariesPrecision: 0.000001, // Where we should disable right and left scroll buttons
                     dblClckZoomSpeed:2,// Zoom speed for dbl click
-
+                    topLabelBorderColor: 'silver', // Color for borders for top labels
+                    topLabelTextColor: 'rgb(128,128,128)', // Color for text for top labels
                     topLabelHeight: 15, // Size for top label text
                     topLabelPadding: 3, // Padding around top label
 
                     font:'sans-serif',
-                    evenColor: 'rgb(128,128,255)',
-                    oddColor: 'rgb(0,0,255)'
+                    evenColor: 'rgb(200,200,255)',
+                    oddColor: 'white'
                 };
 
                 animateScope.setDuration(timelineConfig.animationDuration);
@@ -342,25 +343,16 @@ angular.module('webadminApp')
                     startCoordinate = Math.max(startCoordinate,0);
                     endCoordinate = Math.min(endCoordinate,viewportWidth);
 
-
-                    console.log('drawTopLabel', startCoordinate, endCoordinate-startCoordinate, label, odd);
-
                     context.fillStyle = odd? timelineConfig.oddColor:timelineConfig.evenColor;
-
 
                     context.fillRect(startCoordinate, 0 , endCoordinate - startCoordinate, timelineConfig.topLabelHeight);
                     context.stroke();
 
-                    context.beginPath();
-                    context.moveTo(endCoordinate, timelineConfig.topLabelHeight);
-                    context.lineTo(startCoordinate, timelineConfig.topLabelHeight);
-                    context.lineTo(startCoordinate, 0);
-                    context.stroke();
 
                     var textSize = timelineConfig.topLabelHeight - timelineConfig.topLabelPadding;
 
                     context.font = textSize  + 'px ' + timelineConfig.font;
-                    context.fillStyle = blurColor(timelineConfig.rulerColor, 1);
+                    context.fillStyle = timelineConfig.topLabelTextColor;
                     var width =  context.measureText(label).width;
 
                     var coordinate = (startCoordinate + endCoordinate - width) / 2 ;
@@ -388,7 +380,16 @@ angular.module('webadminApp')
                     context.clearRect(0, 0, canvas.width, canvas.height);
 
 
-                    //1. Drop top labels
+                    //1. Drow top labels
+
+
+                    context.strokeStyle = timelineConfig.topLabelBorderColor;
+
+                    context.beginPath();
+                    context.moveTo(0, timelineConfig.topLabelHeight);
+                    context.lineTo(viewportWidth, timelineConfig.topLabelHeight);
+                    context.stroke();
+
                     var level = RulerModel.levels[scope.topLabelsLevel];
                     var end = level.interval.alignToFuture(screenRelativePositionToDate(1));
                     var position = level.interval.alignToPast(screenRelativePositionToDate(0));

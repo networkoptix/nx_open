@@ -4,7 +4,7 @@
   width:100%;
   position:relative;
   overflow:hidden;
-  height:65px;
+  height:80px;
   border:1px solid rgb(216,216,216);
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -15,28 +15,6 @@
   cursor: default;
 }
 
-/*
-Линия с событиями. Линий может быть много. Фиксируем для линии высоту
-Задаем позиционирование, чтобы правильно перепозиционировать внутренние блоки
-*/
-.events{
-  height:20px;
-  position:relative;
-}
-.chunk{
-  min-width: 1px !important;
-  position: absolute;
-}
-/*Конкретные события
-У таких событий задается ширина в процентах и отступ слева в процентах, чтобы работал ресайз при изменении таймлайна
-Смещение задается от начала интервала всегда - чтобы не накапливать ошибку
-*/
-.events>*{
-  height:100%;
-  background-color:silver;
-  border-radius:3px;
-  position:absolute;
-}
 
 /*Подсказка, бегающая за мышкой*/
 .timeline-hint{
