@@ -39,7 +39,6 @@ fi
 PORT_DEFAULT="7001"
 TRANSPORT_DEAULT="auto"
 PUBLIC_IP_ENABLED_DEFAULT="auto"
-SYSTEM_NAME_DEFAULT=$COMPANY_NAME
 ALLOW_CAMERA_CHANGES_DEFAULT=true
 
 function is_local_addr {
@@ -142,6 +141,10 @@ function find_free_port {
 
 case "$1" in
     configure)
+        ECS_GUID="$($EC_CFG_HELPER ecsGuid)"
+        SYSTEM_NAME_SUFFIX=$(echo $ECS_GUID | sed 's/{*\([^{-]\+\)-.*/\1/')
+        SYSTEM_NAME_DEFAULT=System_${SYSTEM_NAME_SUFFIX:-$RANDOM}
+
         ECS_HOST="$($CFG_HELPER appserverHost)"
         if [ -n "$ECS_HOST" ]; then
             if is_local_addr "$ECS_HOST"; then
@@ -182,6 +185,9 @@ case "$1" in
             [ -z "$ALLOW_CAMERA_CHANGES" ] && ALLOW_CAMERA_CHANGES=$ALLOW_CAMERA_CHANGES_DEFAULT
             ALLOW_CAMERA_CHANGES=$(ask_for_value allowCameraChanges "$ALLOW_CAMERA_CHANGES")
             $CFG_HELPER allowCameraChanges "$ALLOW_CAMERA_CHANGES"
+        else
+            [ -z "$SYSTEM_NAME" ] && $CFG_HELPER systemName "$SYSTEM_NAME_DEFAULT"
+
         fi
 
         "$CERTGEN" -i
