@@ -2,13 +2,16 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
-#include <utils/common/uuid.h>
 #include <QtCore/QTimer>
 #include <QtCore/QStandardPaths>
 
-#include <utils/common/util.h> /* For removeDir. */
-
 #include <api/app_server_connection.h>
+
+#include <common/common_module.h>
+
+#include <utils/common/util.h> /* For removeDir. */
+#include <utils/common/uuid.h>
+#include <utils/common/string.h>
 
 QnAppServerFileCache::QnAppServerFileCache(const QString &folderName, QObject *parent) :
     QObject(parent),
@@ -38,11 +41,11 @@ QnAppServerFileCache::~QnAppServerFileCache(){}
 
 QString QnAppServerFileCache::getFullPath(const QString &filename) const {
     QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-    QUrl url = QnAppServerConnectionFactory::url();
-    return QDir::toNativeSeparators(QString(QLatin1String("%1/cache/%2_%3/%4/%5"))
+    QString systemName = replaceNonFileNameCharacters(qnCommon->localSystemName(), L'_');
+    Q_ASSERT_X(!systemName.isEmpty(), Q_FUNC_INFO, "Method should be called only when we are connected to server");
+    return QDir::toNativeSeparators(QString(lit("%1/cache/%2/%3/%4"))
                                     .arg(path)
-                                    .arg(url.host(QUrl::FullyEncoded))
-                                    .arg(url.port())
+                                    .arg(systemName)
                                     .arg(m_folderName)
                                     .arg(filename)
                                     );
@@ -59,7 +62,7 @@ QString QnAppServerFileCache::folderName() const {
 
 void QnAppServerFileCache::clearLocalCache() {
     QString path = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-    QString dir = QDir::toNativeSeparators(QString(QLatin1String("%1/cache/")).arg(path));
+    QString dir = QDir::toNativeSeparators(QString(lit("%1/cache/")).arg(path));
     removeDir(dir);
 }
 
