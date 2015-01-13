@@ -17,6 +17,7 @@
 #include <core/resource/file_processor.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/media_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <transcoding/filters/contrast_image_filter.h>
@@ -586,7 +587,8 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
         localParameters.customAspectRatio = 0.0;
         localParameters.rotationAngle = 0;
     } else {
-        imageProvider = QnSingleThumbnailLoader::newInstance(widget->resource()->toResourcePtr(), localParameters.time, 0);
+        QnVirtualCameraResourcePtr camera = widget->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
+        imageProvider = QnSingleThumbnailLoader::newInstance(camera, localParameters.time, 0);
     }
 
     QnScreenshotLoader* loader = new QnScreenshotLoader(localParameters, this);
