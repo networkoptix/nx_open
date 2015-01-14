@@ -103,7 +103,7 @@ Interval.prototype.alignToPast = function(dateToAlign){
         return date;
     }
     if(this.months === 0){
-        date.setMonth(1);
+        date.setMonth(0);
     }else{
         date.setMonth( Math.floor(date.getMonth() / this.months) * this.months );
         return date;

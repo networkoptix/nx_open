@@ -422,6 +422,11 @@ angular.module('webadminApp')
 
                         var markLevelIndex = RulerModel.levels.indexOf(markLevel);
 
+                        if(markLevelIndex == 2){
+                            console.log('break here');
+                            _.find(RulerModel.levels,findLevel);
+                        }
+
                         var label = (markLevelIndex > scope.visibleLabelsLevel && !(scope.labelDisappearance<1 && markLevelIndex === scope.visibleLabelsLevel + 1))?
                             '' : dateFormat(new Date(position), markLevel.format);
 
