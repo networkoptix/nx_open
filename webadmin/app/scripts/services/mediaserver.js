@@ -7,6 +7,7 @@ angular.module('webadminApp')
         var cacheCurrentUser = null;
 
         $cookies.Authorization = 'Digest';
+        $cookies.response = null;
 
         function getSettings(){
             return $http.get('/api/moduleInformation?salt=' + (new Date()).getTime());
@@ -97,7 +98,7 @@ angular.module('webadminApp')
             saveMediaServer: function(info){return wrapRequest($http.post('/ec2/saveMediaServer',info)); },
             statistics:function(url){
                 url = url || '';
-                return $http.get(url + '/api/statistics?sault=' + (new Date()).getTime() );
+                return wrapRequest($http.get(url + '/api/statistics?sault=' + (new Date()).getTime()));
             },
             getCurrentUser:function(forcereload){
                 if(cacheCurrentUser === null || forcereload){
@@ -125,12 +126,12 @@ angular.module('webadminApp')
                     serverUrl = '/proxy/'+ serverUrl + '/';
                 }
                 //RecordedTimePeriods
-                return $http.get(serverUrl + 'api/RecordedTimePeriods' +
+                return wrapRequest($http.get(serverUrl + 'api/RecordedTimePeriods' +
                     '?physicalId=' + physicalId +
                     '&startTime=' + startTime +
                     '&endTime=' + endTime +
                     '&detail=' + detail +
-                    '&periodsType=' + periodsType);
+                    '&periodsType=' + periodsType));
             }
         };
     });
