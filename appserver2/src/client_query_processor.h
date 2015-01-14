@@ -91,7 +91,6 @@ namespace ec2
             QMutexLocker lk( &m_mutex );
             if( !httpClient->doPost(requestUrl, Qn::serializationFormatToHttpContentType(format), tranBuffer) )
             {
-                QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
                 QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, ErrorCode::failure ) );
                 return;
             }
@@ -131,7 +130,6 @@ namespace ec2
             QMutexLocker lk( &m_mutex );
             if( !httpClient->doGet( requestUrl ) )
             {
-                QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
                 QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, ErrorCode::failure, OutputData() ) );
                 return;
             }
