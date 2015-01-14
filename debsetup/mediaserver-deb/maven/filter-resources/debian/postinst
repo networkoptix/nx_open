@@ -6,7 +6,7 @@ COMPANY_NAME=${deb.customization.company.name}
 
 if [ -n "$DEBIAN_SCRIPT_DEBUG" ]; then set -v -x; DEBIAN_SCRIPT_TRACE=1; fi
 ${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
- 
+
 export PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin
 
 BASE_DIR="/opt/$COMPANY_NAME/mediaserver"
@@ -27,7 +27,7 @@ EC_CFG_HELPER="$BIN_DIR/config_helper.py $EC_CONFIG_FILE"
 DBSYNC="$BASE_DIR/share/dbsync-2.2/bin/dbsync"
 CERTGEN="$BASE_DIR/share/dbsync-2.2/bin/certgen"
 
-# This is necessary because changed configuration options should take effect 
+# This is necessary because changed configuration options should take effect
 # immediately.
 if status $COMPANY_NAME-mediaserver | grep "start/running" > /dev/null; then
   stop $COMPANY_NAME-mediaserver
@@ -61,11 +61,11 @@ function to_int {
 function port_is_ok {
     local port="$1"
     local -i port_num=$(to_int "${port}" 2>/dev/null)
- 
+
     if (( $port_num < 1 || $port_num > 65535 )) ; then
         return 1
     fi
- 
+
     return 0
 }
 
@@ -81,10 +81,10 @@ function ask_for_value {
     local full_name="$COMPANY_NAME-mediaserver/$varname"
     local error_message="${full_name}_invalid"
 
-    # Support unattened install
+    # Support unattended install
     db_get $full_name
     if [ "$RET" = "" ]; then
-        [ -n "$default" ] && db_set $full_name $default 
+        db_set $full_name $default
     fi
 
     db_input high $full_name || true
@@ -93,7 +93,7 @@ function ask_for_value {
     while :
     do
         db_get $full_name
-        { validate_$varname $RET 2> /dev/null; STATUS=$?; } || true        
+        { validate_$varname $RET 2> /dev/null; STATUS=$?; } || true
         [ $STATUS -eq 0 ] && break # validation passes
         [ $STATUS -ne 1 ] && break # no validation function or invalid
 
@@ -128,7 +128,7 @@ function find_free_port {
     while :
     do
         netstat -nl4t | awk '{print $4;}' | grep ":$port" > /dev/null 2>&1
-        if [ $? -ne 0 ] 
+        if [ $? -ne 0 ]
         then
             echo $port
             return
