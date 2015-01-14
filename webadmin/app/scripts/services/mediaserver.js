@@ -25,7 +25,9 @@ angular.module('webadminApp')
                 if (loginDialog === null) { //Dialog is not displayed
                     loginDialog = $modal.open({
                         templateUrl: '/views/login.html',
-                        controller: 'LoginCtrl'
+                        controller: 'LoginCtrl',
+                        keyboard:false,
+                        backdrop:'static'
                     });
                     loginDialog.result.then(function () {
                         loginDialog = null;
@@ -41,7 +43,9 @@ angular.module('webadminApp')
                     console.log(error);// if server can't handle moduleInformation - it's offline - show dialog alike restart
                     offlineDialog = $modal.open({
                         templateUrl: 'offline_modal',
-                        controller: 'OfflineCtrl'
+                        controller: 'OfflineCtrl',
+                        keyboard:false,
+                        backdrop:'static'
                     });
                     offlineDialog.result.then(function (info) {//Dialog closed - means server is online
                         offlineDialog = null;
