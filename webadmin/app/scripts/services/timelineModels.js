@@ -327,6 +327,7 @@ CameraRecordsProvider.prototype.setInterval = function (start,end,level){
     this.mediaserver.getRecords('/',this.cameras[0],start,end,RulerModel.levels[level].interval.getSeconds()*1000)
         .then(function(data){
 
+            console.log("records",data);
             for(var i = 0; i <data.data.length;i++){
                 var endChunk = data.data[i][0] + data.data[i][1];
                 if(data.data[i][1] === -1){
