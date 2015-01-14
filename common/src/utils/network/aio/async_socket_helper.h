@@ -225,10 +225,14 @@ public:
     {
         if( eventType == aio::etNone )
         {
-            cancelAsyncIO( aio::etRead, waitForRunningHandlerCompletion );
-            cancelAsyncIO( aio::etWrite, waitForRunningHandlerCompletion );
-            cancelAsyncIO( aio::etTimedOut, waitForRunningHandlerCompletion );
-            aio::AIOService::instance()->cancelPostedCalls( this->m_socket, waitForRunningHandlerCompletion );
+            //TODO #ak underlying loop is a work-around. Must add method to aio::AIOService which cancels all operation atomically
+            while( aio::AIOService::instance()->isSocketBeingWatched( this->m_socket ) )
+            {
+                cancelAsyncIO( aio::etRead, waitForRunningHandlerCompletion );
+                cancelAsyncIO( aio::etWrite, waitForRunningHandlerCompletion );
+                cancelAsyncIO( aio::etTimedOut, waitForRunningHandlerCompletion );
+                aio::AIOService::instance()->cancelPostedCalls( this->m_socket, waitForRunningHandlerCompletion );
+            }
             return;
         }
 
