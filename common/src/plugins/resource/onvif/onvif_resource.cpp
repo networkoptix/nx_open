@@ -595,7 +595,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     
     QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
     bool forcedAR = resourceData.value<bool>(lit("forceArFromPrimaryStream"), false);
-    if (forcedAR && getProperty(QnMediaResource::customAspectRatioKey()).isEmpty()) 
+    if (forcedAR && getProperty(QnMediaResource::customAspectRatioKey()).isEmpty() && m_primaryResolution.height() > 0) 
     {
         qreal ar = m_primaryResolution.width() / (qreal) m_primaryResolution.height();
         setProperty(QnMediaResource::customAspectRatioKey(), QString::number(ar));
