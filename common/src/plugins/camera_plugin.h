@@ -5,7 +5,7 @@
 #include "plugin_api.h"
 
 
-//!Network Optix Camera Integration Plugin API (c++)
+//!VMS Camera Integration Plugin API (c++)
 /*!
     Contains structures and abstract classes to be implemented in real plugin.
     
@@ -64,7 +64,7 @@ namespace nxcip
         char modelName[256];
         //!Firmware version in any human readable format. Optional
         char firmware[256];
-        //!Camera's unique identifier. MAC address can be used
+        //!Camera's unique identifier. MAC address can be used. MUST NOT be empty
         char uid[256];
         //!Camera management url. Can contain just address. MUST NOT be empty
         char url[MAX_TEXT_LEN];

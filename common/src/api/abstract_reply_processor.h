@@ -48,6 +48,8 @@ protected:
 
         emit derived->finished(status, reply, handle, errorString);
         emit finished(status, m_reply, handle, errorString);
+        emit finished(status, handle, errorString);
+        emit finished(status, handle);
     }
 
     template<class Derived>
@@ -58,8 +60,9 @@ protected:
         m_reply = QVariant();
         m_errorString = errorString;
 
-        emit finished(status, handle, errorString);
         emit finished(status, m_reply, handle, errorString);
+        emit finished(status, handle, errorString);
+        emit finished(status, handle);
     }
 
     template<class T, class Derived>
@@ -71,7 +74,7 @@ protected:
         if(status == 0) {
             QnJsonRestResult result;
             bool jsonDeserialized = QJson::deserialize(response.data, &result);
-            if(!jsonDeserialized || !QJson::deserialize(result.reply(), &reply)) {
+            if (!jsonDeserialized || (!result.reply().isNull() && !QJson::deserialize(result.reply(), &reply))) {
 #ifdef JSON_REPLY_DEBUG
                 qnWarning("Error parsing JSON reply:\n%1\n\n", response.data);
 #endif

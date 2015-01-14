@@ -95,14 +95,16 @@ Qn::ActionVisibility QnVideoWallReviewModeCondition::check(const QnActionParamet
 }
 
 
-bool QnPreviewSearchModeCondition::isPreviewSearchMode() const {
-    return context()->workbench()->currentLayout()->data().contains(Qn::LayoutSearchStateRole);
+bool QnPreviewSearchModeCondition::isPreviewSearchMode(const QnActionParameters &parameters) const {
+    return
+        parameters.scope() == Qn::SceneScope &&
+        context()->workbench()->currentLayout()->data().contains(Qn::LayoutSearchStateRole);
 }
 
 Qn::ActionVisibility QnPreviewSearchModeCondition::check(const QnActionParameters &parameters) {
     Q_UNUSED(parameters)
-        if (m_hide == isPreviewSearchMode())
-            return Qn::InvisibleAction;
+    if (m_hide == isPreviewSearchMode(parameters))
+        return Qn::InvisibleAction;
     return Qn::EnabledAction;
 }
 
@@ -310,16 +312,29 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
 }
 
 
-Qn::ActionVisibility QnRenameActionCondition::check(const QnActionParameters &parameters) {
+Qn::ActionVisibility QnRenameResourceActionCondition::check(const QnActionParameters &parameters) {
     Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
+    QnResourcePtr target = parameters.resource();
+    if (!target)
+        return Qn::InvisibleAction;
 
     switch (nodeType) {
     case Qn::ResourceNode:
+        /* Renaming users directly from resource tree is disabled due do digest re-generation need. */
+        if (target->hasFlags(Qn::user))
+            return Qn::InvisibleAction;
+
+        /* Edge servers renaming is forbidden. */
+        if (QnMediaServerResource::isEdgeServer(target))
+            return Qn::InvisibleAction;
+
+        /* Incompatible resources cannot be renamed */
+        if (target->getStatus() == Qn::Incompatible)
+            return Qn::InvisibleAction;
+
+        return Qn::EnabledAction;
     case Qn::EdgeNode:
-        return QnEdgeServerCondition::check(parameters.resources());
     case Qn::RecorderNode:
-    case Qn::VideoWallItemNode:
-    case Qn::VideoWallMatrixNode:
         return Qn::EnabledAction;
     default:
         break;
@@ -866,9 +881,14 @@ Qn::ActionVisibility QnIdentifyVideoWallActionCondition::check(const QnActionPar
             if (index.item().runtimeStatus.online)
                 return Qn::EnabledAction;
         }
-        return Qn::DisabledAction;
+        return Qn::InvisibleAction;
     }
-    return QnActionCondition::check(parameters);
+
+    /* 'Identify' action should not be displayed as disabled anyway. */
+    Qn::ActionVisibility baseResult = QnActionCondition::check(parameters);
+    if (baseResult != Qn::EnabledAction)
+        return Qn::InvisibleAction;
+    return Qn::EnabledAction;
 }
 
 Qn::ActionVisibility QnResetVideoWallLayoutActionCondition::check(const QnActionParameters &parameters) {
@@ -938,7 +958,7 @@ Qn::ActionVisibility QnLightModeCondition::check(const QnActionParameters &param
 
 Qn::ActionVisibility QnEdgeServerCondition::check(const QnResourceList &resources) {
     foreach (const QnResourcePtr &resource, resources)
-        if (m_isEdgeServer ^ QnMediaServerResource::isHiddenServer(resource))
+        if (m_isEdgeServer ^ QnMediaServerResource::isEdgeServer(resource))
             return Qn::InvisibleAction;
     return Qn::EnabledAction;
 }
@@ -962,13 +982,17 @@ Qn::ActionVisibility QnDesktopCameraActionCondition::check(const QnActionParamet
     if (!context()->user())
         return Qn::InvisibleAction;
 
-    QString userName = context()->user()->getName();
-    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(Qn::desktop_camera)) 
-        if (resource->getUniqueId() == QnAppServerConnectionFactory::clientGuid())
-            return Qn::EnabledAction;
+    /* Do not check real pointer type to speed up check. */
+    QnResourcePtr desktopCamera = qnResPool->getResourceByUniqId(QnAppServerConnectionFactory::clientGuid());
+#ifdef DESKTOP_CAMERA_DEBUG
+    Q_ASSERT_X(!desktopCamera || (desktopCamera->hasFlags(Qn::desktop_camera) && desktopCamera->getParentId() == qnCommon->remoteGUID()), 
+        Q_FUNC_INFO, 
+        "Desktop camera must have correct flags and parent (if exists)");
+#endif
+    if (desktopCamera && desktopCamera->hasFlags(Qn::desktop_camera))
+        return Qn::EnabledAction;
     
-    return Qn::InvisibleAction;
-   
+    return Qn::DisabledAction;  
 #else
     return Qn::InvisibleAction;
 #endif
@@ -1009,4 +1033,15 @@ Qn::ActionVisibility QnDisjunctionActionCondition::check(const QnActionParameter
         result = qMax(result, condition->check(parameters));
 
     return result;
+}
+
+Qn::ActionVisibility QnItemsCountActionCondition::check(const QnActionParameters &parameters) {
+    Q_UNUSED(parameters)
+
+    if (!workbench()->currentLayout())
+        return Qn::InvisibleAction;
+
+    int count = workbench()->currentLayout()->items().size();
+
+    return (m_count == MultipleItems && count > 1) || (m_count == count) ? Qn::EnabledAction : Qn::InvisibleAction;
 }

@@ -14,12 +14,20 @@
 #include <utils/common/log.h>
 #include <utils/common/app_info.h>
 #include <common/common_module.h>
+#include <network/authenticate_helper.h>
 
 static QnMediaServerResourcePtr m_server;
 
-QString authKey()
-{
-    return MSSettings::roSettings()->value("authKey").toString();
+QByteArray decodeAuthKey(const QByteArray& authKey) {
+    // convert from v2.2 format and encode value
+    QByteArray prefix("SK_");
+    if (authKey.startsWith(prefix)) {
+        QByteArray authKeyEncoded = QByteArray::fromHex(authKey.mid(prefix.length()));
+        QByteArray authKeyDecoded = QnAuthHelper::symmetricalEncode(authKeyEncoded);
+        return QnUuid::fromRfc4122(authKeyDecoded).toByteArray();
+    } else {
+        return authKey;
+    }
 }
 
 QnUuid serverGuid() {
@@ -64,31 +72,11 @@ bool backupDatabase() {
             break;
     }
 
-    QFile file(fileName);
-    if (!file.open(QFile::WriteOnly))
-        return false;
-
-    QByteArray data;
-    ec2::ErrorCode errorCode;
-
-    QEventLoop loop;
-    auto dumpDatabaseHandler =
-        [&loop, &errorCode, &data] (int /*reqID*/, ec2::ErrorCode _errorCode, const ec2::ApiDatabaseDumpData &dumpData) {
-            errorCode = _errorCode;
-            data = dumpData.data;
-            loop.quit();
-    };
-
-    QnAppServerConnectionFactory::getConnection2()->dumpDatabaseAsync(&loop, dumpDatabaseHandler);
-    loop.exec();
-
+    const ec2::ErrorCode errorCode = QnAppServerConnectionFactory::getConnection2()->dumpDatabaseToFileSync( fileName );
     if (errorCode != ec2::ErrorCode::ok) {
         NX_LOG(lit("Failed to dump EC database: %1").arg(ec2::toString(errorCode)), cl_logERROR);
         return false;
     }
-
-    file.write(data);
-    file.close();
 
     return true;
 }

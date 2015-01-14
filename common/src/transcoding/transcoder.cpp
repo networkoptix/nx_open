@@ -270,17 +270,16 @@ int QnTranscoder::setVideoCodec(
             */
         case TM_OpenCLTranscode:
             m_lastErrMessage = tr("OpenCL transcoding is not implemented.");
-            return -1;
+            return OperationResult::Error;
         default:
             m_lastErrMessage = tr("Unknown transcoding method.");
-            return -1;
+            return OperationResult::Error;
     }
-    return 0;
+    return OperationResult::Success;
 }
 
-int QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
+QnTranscoder::OperationResult QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
 {
-    Q_UNUSED(method);
     m_audioCodec = codec;
     switch (method)
     {
@@ -302,7 +301,9 @@ int QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
             m_lastErrMessage = tr("Unknown Transcode Method");
             break;
     }
-    return m_lastErrMessage.isEmpty() ? 0 : 1;
+    return m_lastErrMessage.isEmpty() 
+        ? OperationResult::Success 
+        : OperationResult::Error;
 }
 
 int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result)
@@ -345,7 +346,7 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
 
     if( result )
         result->clear();
-    int errCode = 0;
+    int errCode = OperationResult::Success;
     while (!m_delayedVideoQueue.isEmpty()) {
         errCode = transcodePacketInternal(m_delayedVideoQueue.dequeue(), result);
         if (errCode != 0)
@@ -366,7 +367,7 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
     if( result )
         result->write(m_internalBuffer.data(), m_internalBuffer.size());
     
-    return 0;
+    return OperationResult::Success;
 }
 
 bool QnTranscoder::addTag( const QString& /*name*/, const QString& /*value*/ )

@@ -253,12 +253,14 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         return;
 
     if (hasDbChanges()) {
-        m_camera->setCameraName(ui->nameEdit->text());
+        QString name = ui->nameEdit->text().trimmed();
+        if (!name.isEmpty())
+            m_camera->setCameraName(name);  //TODO: #GDM warning message should be displayed on nameEdit textChanged, Ok/Apply buttons should be blocked.
         m_camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());
         //m_camera->setUrl(ui->ipAddressEdit->text());
         QAuthenticator loginEditAuth;
-        loginEditAuth.setUser( ui->loginEdit->text() );
-        loginEditAuth.setPassword( ui->passwordEdit->text() );
+        loginEditAuth.setUser( ui->loginEdit->text().trimmed() );
+        loginEditAuth.setPassword( ui->passwordEdit->text().trimmed() );
         if( m_camera->getAuth() != loginEditAuth )
             m_camera->setAuth( loginEditAuth );
 
@@ -478,6 +480,9 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
     // Rollback the fisheye preview options. Makes no changes if params were not modified. --gdm
     QnResourceWidget* centralWidget = display()->widget(Qn::CentralRole);
+    if (!m_camera || !centralWidget || centralWidget->resource() != m_camera)
+        return;
+
     if (QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget*>(centralWidget)) {
         mediaWidget->setDewarpingParams(mediaWidget->resource()->getDewarpingParams());
     }

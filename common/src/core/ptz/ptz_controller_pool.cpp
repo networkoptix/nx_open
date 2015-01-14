@@ -6,6 +6,8 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
+#include <utils/common/log.h>
+#include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
 
 #include "abstract_ptz_controller.h"
 #include "proxy_ptz_controller.h"
@@ -60,10 +62,11 @@ QnPtzControllerPool::QnPtzControllerPool(QObject *parent):
     d->resourcePool = qnResPool;
 
     d->executorThread = new QThread(this);
+    d->executorThread->setObjectName( lit("PTZExecutorThread") );
     d->executorThread->start();
 
     d->commandThreadPool = new QThreadPool(this);
-    d->commandThreadPool->setMaxThreadCount(128); /* This should be enough. */
+    d->commandThreadPool->setMaxThreadCount(128); /* This should be enough. TODO #ak this is certainly enough to kill mediaserver on some ARM-based platform */
 
     connect(d->resourcePool,    &QnResourcePool::resourceAdded,             this,   &QnPtzControllerPool::registerResource);
     connect(d->resourcePool,    &QnResourcePool::resourceRemoved,           this,   &QnPtzControllerPool::unregisterResource);
@@ -74,6 +77,11 @@ QnPtzControllerPool::QnPtzControllerPool(QObject *parent):
 QnPtzControllerPool::~QnPtzControllerPool() {
     while(!d->controllerByResource.isEmpty())
         unregisterResource(d->controllerByResource.begin().key());
+
+    //have to wait until all posted events have been processed, deleteLater can be called 
+        //within event slot, that's why we specify second parameter
+    WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed( d->executorThread, 3 );
+    waitingForObjectsToBeFreed.join();
 
     d->executorThread->exit();
     d->executorThread->wait();

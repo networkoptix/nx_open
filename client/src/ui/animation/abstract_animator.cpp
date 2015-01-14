@@ -44,6 +44,8 @@ void AbstractAnimator::ensureDuration() const {
         m_duration = estimatedDuration();
         if(m_timeLimitMSec >= 0)
             m_duration = qMin(m_duration, m_timeLimitMSec);
+        if (m_duration <= 0)
+            m_duration = minimalDurationMSec;
     }
     m_durationValid = true;
 }
@@ -142,8 +144,8 @@ void AbstractAnimator::updateState(State newState) {
     case Running: /* Paused -> Running. */
         m_currentTime = 0;
         startListening();
-        if(duration() < minimalDurationMSec)
-            tick(duration());
+        if(duration() <= minimalDurationMSec)
+            tick(minimalDurationMSec);
         break;
     default:
         break;

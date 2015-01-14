@@ -201,10 +201,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)), Qt::QueuedConnection);
     
-    /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
-    connect(workbench(),                                        SIGNAL(layoutsChanged()),                       this,   SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
     connect(workbench(),                                        SIGNAL(itemChanged(Qn::ItemRole)),              this,   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
-    connect(workbench(),                                        SIGNAL(cellAspectRatioChanged()),               this,   SLOT(at_workbench_cellAspectRatioChanged()));
     connect(workbench(),                                        SIGNAL(cellSpacingChanged()),                   this,   SLOT(at_workbench_cellSpacingChanged()));
     connect(workbench(),                                        SIGNAL(currentLayoutChanged()),                 this,   SLOT(at_workbench_currentLayoutChanged()));
 
@@ -265,19 +262,15 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::RemoveLayoutItemAction),                 SIGNAL(triggered()),    this,   SLOT(at_removeLayoutItemAction_triggered()));
     connect(action(Qn::RemoveFromServerAction),                 SIGNAL(triggered()),    this,   SLOT(at_removeFromServerAction_triggered()));
     connect(action(Qn::NewUserAction),                          SIGNAL(triggered()),    this,   SLOT(at_newUserAction_triggered()));
-    connect(action(Qn::RenameAction),                           SIGNAL(triggered()),    this,   SLOT(at_renameAction_triggered()));
+    connect(action(Qn::RenameResourceAction),                   SIGNAL(triggered()),    this,   SLOT(at_renameAction_triggered()));
     connect(action(Qn::DropResourcesAction),                    SIGNAL(triggered()),    this,   SLOT(at_dropResourcesAction_triggered()));
     connect(action(Qn::DelayedDropResourcesAction),             SIGNAL(triggered()),    this,   SLOT(at_delayedDropResourcesAction_triggered()));
     connect(action(Qn::InstantDropResourcesAction),             SIGNAL(triggered()),    this,   SLOT(at_instantDropResourcesAction_triggered()));
     connect(action(Qn::DropResourcesIntoNewLayoutAction),       SIGNAL(triggered()),    this,   SLOT(at_dropResourcesIntoNewLayoutAction_triggered()));
     connect(action(Qn::MoveCameraAction),                       SIGNAL(triggered()),    this,   SLOT(at_moveCameraAction_triggered()));
     connect(action(Qn::AdjustVideoAction),                      SIGNAL(triggered()),    this,   SLOT(at_adjustVideoAction_triggered()));
-    connect(action(Qn::ExitAction),                             SIGNAL(triggered()),    this,   SLOT(at_exitAction_triggered()));
+    connect(action(Qn::ExitAction),                             &QAction::triggered,    this,   &QnWorkbenchActionHandler::closeApplication);
     connect(action(Qn::ThumbnailsSearchAction),                 SIGNAL(triggered()),    this,   SLOT(at_thumbnailsSearchAction_triggered()));
-    connect(action(Qn::SetCurrentLayoutAspectRatio4x3Action),   SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio4x3Action_triggered()));
-    connect(action(Qn::SetCurrentLayoutAspectRatio16x9Action),  SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio16x9Action_triggered()));
-    connect(action(Qn::SetCurrentLayoutAspectRatio3x4Action),   SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio3x4Action_triggered()));
-    connect(action(Qn::SetCurrentLayoutAspectRatio9x16Action),  SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio9x16Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing0Action),     SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing0Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing10Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing10Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing20Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing20Action_triggered()));
@@ -297,7 +290,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::BrowseUrlAction),                        SIGNAL(triggered()),    this,   SLOT(at_browseUrlAction_triggered()));
     connect(action(Qn::VersionMismatchMessageAction),           SIGNAL(triggered()),    this,   SLOT(at_versionMismatchMessageAction_triggered()));
     connect(action(Qn::BetaVersionMessageAction),               SIGNAL(triggered()),    this,   SLOT(at_betaVersionMessageAction_triggered()));
-    connect(action(Qn::QueueAppRestartAction),                  SIGNAL(triggered()),    this,   SLOT(at_queueAppRestartAction_triggered()), Qt::QueuedConnection);
+    connect(action(Qn::QueueAppRestartAction),                  SIGNAL(triggered()),    this,   SLOT(at_queueAppRestartAction_triggered()));
     connect(action(Qn::SelectTimeServerAction),                 SIGNAL(triggered()),    this,   SLOT(at_selectTimeServerAction_triggered()));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
@@ -305,7 +298,9 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     //connect(context()->instance<QnWorkbenchPanicWatcher>(),     SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
     connect(context()->instance<QnWorkbenchScheduleWatcher>(),  SIGNAL(scheduleEnabledChanged()),   this,   SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
 
-    connect(action(Qn::ExitActionDelayed), &QAction::triggered, action(Qn::ExitAction), &QAction::trigger, Qt::QueuedConnection);
+    /* Connect through lambda to handle forced parameter. */
+    connect(action(Qn::DelayedForcedExitAction),                &QAction::triggered,    this,   [this] {  closeApplication(true);    }, Qt::QueuedConnection);
+
     connect(action(Qn::BeforeExitAction),  &QAction::triggered, this, &QnWorkbenchActionHandler::at_beforeExitAction_triggered);
 
 
@@ -349,8 +344,10 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     if (layout->getItems().size() >= maxItems)
         return;
 
+#ifndef DESKTOP_CAMERA_DEBUG
     if (resource->hasFlags(Qn::desktop_camera))
         return;
+#endif
 
     {
         //TODO: #GDM #Common refactor duplicated code
@@ -609,23 +606,10 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
             workbench()->removeLayout(layout);
     }
 
+    if(workbench()->layouts().empty())
+        menu()->trigger(Qn::OpenNewTabAction);
 
     submitDelayedDrops();
-}
-
-void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
-    if(!workbench()->layouts().empty())
-        return;
-
-    menu()->trigger(Qn::OpenNewTabAction);
-}
-
-void QnWorkbenchActionHandler::at_workbench_cellAspectRatioChanged() {
-    qreal value = workbench()->currentLayout()->hasCellAspectRatio()
-                  ? workbench()->currentLayout()->cellAspectRatio()
-                  : qnGlobals->defaultLayoutCellAspectRatio();
-
-    action(QnAspectRatio::aspectRatioActionId(QnAspectRatio::closestStandardRatio(value)))->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged() {
@@ -644,8 +628,6 @@ void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged() {
 void QnWorkbenchActionHandler::at_workbench_currentLayoutChanged() {
     action(Qn::RadassAutoAction)->setChecked(true);
     qnRedAssController->setMode(Qn::AutoResolution);
-    submitDelayedDrops();
-
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
@@ -751,25 +733,22 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
         } else {
             foreach (QnWorkbenchItem *item, workbenchLayout->items()) {
                 QnResourceWidget *widget = context()->display()->widget(item);
-                if (widget && widget->hasAspectRatio()) {
-                    qreal aspectRatio = widget->aspectRatio();
+                if (!widget)
+                    continue;
 
-                    QString customAspectRatio = widget->resource()->getProperty(QnMediaResource::customAspectRatioKey());
-                    if (!customAspectRatio.isEmpty())
-                        aspectRatio = customAspectRatio.toDouble();
+                float aspectRatio = widget->visualChannelAspectRatio();
+                if (aspectRatio <= 0)
+                    continue;
 
-                    if (QnAspectRatio::isRotated90(item->rotation()))
-                        aspectRatio = 1.0 / aspectRatio;
-                    midAspectRatio += aspectRatio;
-                    ++count;
-                }
+                midAspectRatio += aspectRatio;
+                ++count;
             }
         }
 
         if (count > 0) {
             midAspectRatio /= count;
             QnAspectRatio cellAspectRatio = QnAspectRatio::closestStandardRatio(midAspectRatio);
-            layout->setCellAspectRatio(cellAspectRatio.toReal());
+            layout->setCellAspectRatio(cellAspectRatio.toFloat());
         } else if (workbenchLayout->items().size() > 1) {
             layout->setCellAspectRatio(qnGlobals->defaultLayoutCellAspectRatio());
         }
@@ -1409,6 +1388,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission));
     layout->setData(Qn::LayoutSearchStateRole, QVariant::fromValue<QnThumbnailsSearchState>(QnThumbnailsSearchState(period, step)));
     layout->setData(Qn::LayoutCellAspectRatioRole, desiredCellAspectRatio);
+    layout->setCellAspectRatio(desiredCellAspectRatio);
     layout->setLocalRange(period);
 
     resourcePool()->addResource(layout);
@@ -1419,6 +1399,7 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     QnVirtualCameraResourceList cameras = menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>();
 
     QnNonModalDialogConstructor<QnCameraSettingsDialog> dialogConstructor(m_cameraSettingsDialog, mainWindow());
+    dialogConstructor.setDontFocus(true);
 
     cameraSettingsDialog()->setCameras(cameras);
 }
@@ -1507,6 +1488,8 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
         return;
 
     QScopedPointer<QnServerSettingsDialog> dialog(new QnServerSettingsDialog(server, mainWindow()));
+    connect(dialog.data(), &QnServerSettingsDialog::rebuildArchiveDone, context()->navigator(), &QnWorkbenchNavigator::clearLoaderCache);
+
     dialog->setWindowModality(Qt::ApplicationModal);
     if(!dialog->exec())
         return;
@@ -1925,8 +1908,9 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     user->setPassword(QString()); // forget the password now
 }
 
-void QnWorkbenchActionHandler::at_exitAction_triggered() {
-    if (!context()->instance<QnWorkbenchStateManager>()->tryClose(false))
+void QnWorkbenchActionHandler::closeApplication(bool force) {
+    /* Try close, if force - exit anyway. */
+    if (!context()->instance<QnWorkbenchStateManager>()->tryClose(force) && !force)
         return;
 
     menu()->trigger(Qn::BeforeExitAction);
@@ -2040,10 +2024,14 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(newPassword);
 
     QnAppServerConnectionFactory::setUrl(url);
+
+    /* QnAppServerConnectionFactory::url() contains user name in lower case. We'd better use the original name for UI. */
+    url.setUserName(user->getName());
+
     QnConnectionDataList savedConnections = qnSettings->customConnections();
     if (!savedConnections.isEmpty() 
         && !savedConnections.first().url.password().isEmpty() 
-        && qnUrlEqual(savedConnections.first().url, url)) 
+        && qnUrlEqual(savedConnections.first().url, url))
     {
         QnConnectionData current = savedConnections.takeFirst();
         current.url = url;
@@ -2056,7 +2044,6 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
         lastUsed.url = url;
         qnSettings->setLastUsedConnection(lastUsed);
     }
-
 }
 
 void QnWorkbenchActionHandler::at_layoutSettingsAction_triggered() {
@@ -2066,26 +2053,6 @@ void QnWorkbenchActionHandler::at_layoutSettingsAction_triggered() {
 
 void QnWorkbenchActionHandler::at_currentLayoutSettingsAction_triggered() {
     openLayoutSettingsDialog(workbench()->currentLayout()->resource());
-}
-
-void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio4x3Action_triggered() {
-    workbench()->currentLayout()->resource()->setCellAspectRatio(4.0 / 3.0);
-    action(Qn::SetCurrentLayoutAspectRatio4x3Action)->setChecked(true);
-}
-
-void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio16x9Action_triggered() {
-    workbench()->currentLayout()->resource()->setCellAspectRatio(16.0 / 9.0);
-    action(Qn::SetCurrentLayoutAspectRatio16x9Action)->setChecked(true);
-}
-
-void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio3x4Action_triggered() {
-    workbench()->currentLayout()->resource()->setCellAspectRatio(3.0 / 4.0);
-    action(Qn::SetCurrentLayoutAspectRatio3x4Action)->setChecked(true);
-}
-
-void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio9x16Action_triggered() {
-    workbench()->currentLayout()->resource()->setCellAspectRatio(9.0 / 16.0);
-    action(Qn::SetCurrentLayoutAspectRatio9x16Action)->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing0Action_triggered() {
@@ -2351,10 +2318,18 @@ void QnWorkbenchActionHandler::at_workbench_itemChanged(Qn::ItemRole role) {
 }
 
 void QnWorkbenchActionHandler::at_whatsThisAction_triggered() {
-    QWhatsThis::enterWhatsThisMode();
+    if (QWhatsThis::inWhatsThisMode()) 
+        QWhatsThis::leaveWhatsThisMode();
+    else
+        QWhatsThis::enterWhatsThisMode();
 }
 
 void QnWorkbenchActionHandler::at_escapeHotkeyAction_triggered() {
+    if (QWhatsThis::inWhatsThisMode()) {
+        QWhatsThis::leaveWhatsThisMode();
+        return;
+    }
+
     if (action(Qn::ToggleTourModeAction)->isChecked())
         menu()->trigger(Qn::ToggleTourModeAction);
 }
@@ -2484,8 +2459,7 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
                     );
         return;
     }
-    menu()->trigger(Qn::ExitActionDelayed);
-    applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
+    menu()->trigger(Qn::DelayedForcedExitAction);
 }
 
 void QnWorkbenchActionHandler::at_selectTimeServerAction_triggered() {

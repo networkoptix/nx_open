@@ -23,7 +23,6 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/graphics/instruments/instrumented.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
-#include <ui/graphics/items/shadow/shaded.h>
 
 class QGraphicsLinearLayout;
 
@@ -36,18 +35,16 @@ class QnImageButtonBar;
 
 class GraphicsLabel;
 
-class QnResourceWidget: public Overlayed<Shaded<Animated<Instrumented<Connective<GraphicsWidget>>>>>, public QnWorkbenchContextAware, public ConstrainedResizable, public HelpTopicQueryable, protected QnGeometry {
+class QnResourceWidget: public Overlayed<Animated<Instrumented<Connective<GraphicsWidget>>>>, public QnWorkbenchContextAware, public ConstrainedResizable, public HelpTopicQueryable, protected QnGeometry {
     Q_OBJECT
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity)
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth)
     Q_PROPERTY(QnResourceWidgetFrameColors frameColors READ frameColors WRITE setFrameColors)
     Q_PROPERTY(QColor frameDistinctionColor READ frameDistinctionColor WRITE setFrameDistinctionColor NOTIFY frameDistinctionColorChanged)
-    Q_PROPERTY(QPointF shadowDisplacement READ shadowDisplacement WRITE setShadowDisplacement)
-    Q_PROPERTY(QRectF enclosingGeometry READ enclosingGeometry WRITE setEnclosingGeometry)
     Q_PROPERTY(bool localActive READ isLocalActive WRITE setLocalActive)
     Q_FLAGS(Options Option)
 
-    typedef Overlayed<Shaded<Animated<Instrumented<Connective<GraphicsWidget>>>>> base_type;
+    typedef Overlayed<Animated<Instrumented<Connective<GraphicsWidget>>>> base_type;
 
 public:
     enum Option {
@@ -147,11 +144,11 @@ public:
      *                                  Negative value will be returned if this
      *                                  widget does not have aspect ratio.
      */
-    qreal aspectRatio() const {
+    float aspectRatio() const {
         return m_aspectRatio;
     }
 
-    void setAspectRatio(qreal aspectRatio);
+    void setAspectRatio(float aspectRatio);
 
     /**
      * \returns                         Whether this widget has an aspect ratio.
@@ -159,6 +156,22 @@ public:
     bool hasAspectRatio() const {
         return m_aspectRatio > 0.0;
     }
+
+    /**
+     * \returns                         Aspect ratio of this widget taking its rotation into account.
+     */
+    virtual float visualAspectRatio() const;
+
+    /**
+     * \return                          Default visual aspect ratio for widgets of this type.
+     *                                  Visual aspect ratio differs from aspect ratio in that it is always valid.
+     */
+    virtual float defaultVisualAspectRatio() const;
+
+    /**
+     * \return                          Aspect ratio of one channel.
+     */
+    float visualChannelAspectRatio() const;
 
     /**
      * \returns                         Geometry of the enclosing rectangle for this widget.
@@ -170,12 +183,13 @@ public:
      * Item will be inscribed even if it is rotated.
      * \param enclosingGeometry         Geometry of the enclosing rectangle for this widget.
      */
-    void setEnclosingGeometry(const QRectF &enclosingGeometry);
+    void setEnclosingGeometry(const QRectF &enclosingGeometry, bool updateGeometry = true);
 
     /**
      * Calculate real item geometry according to the specified enclosing geometry.
      * \see setEnclosingGeometry
      */
+    QRectF calculateGeometry(const QRectF &enclosingGeometry, qreal rotation) const;
     QRectF calculateGeometry(const QRectF &enclosingGeometry) const;
 
     /**
@@ -253,7 +267,6 @@ public:
     bool isLocalActive() const;
     void setLocalActive(bool localActive);
 
-
     using base_type::mapRectToScene;
 
 signals:
@@ -268,7 +281,6 @@ signals:
     void rotationStopRequested();
 
 protected:
-    virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
     virtual QCursor windowCursorAt(Qn::WindowFrameSection section) const override;
     virtual int helpTopicAt(const QPointF &pos) const override;
 
@@ -284,7 +296,7 @@ protected:
     
     void paintSelection(QPainter *painter, const QRectF &rect);
 
-    virtual QSizeF constrainedSize(const QSizeF constraint) const override;
+    virtual QSizeF constrainedSize(const QSizeF constraint, Qt::WindowFrameSection pinSection) const override;
     virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint) const override;
 
     const QSize &channelScreenSize() const;
@@ -340,7 +352,7 @@ protected:
 
     Q_SLOT virtual void at_itemDataChanged(int role);
 
-    qreal defaultAspectRatio() const;
+    float defaultAspectRatio() const;
 private:
     void setTitleTextInternal(const QString &titleText);
     void setInfoTextInternal(const QString &infoText);
@@ -371,7 +383,7 @@ private:
     QnConstResourceVideoLayoutPtr m_channelsLayout;
 
     /** Aspect ratio. Negative value means that aspect ratio is not enforced. */
-    qreal m_aspectRatio;
+    float m_aspectRatio;
 
     /** Virtual enclosing rectangle. */
     QRectF m_enclosingGeometry;

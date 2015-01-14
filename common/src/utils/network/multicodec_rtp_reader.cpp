@@ -50,8 +50,9 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(const QnResourcePtr& res):
 
     QnSecurityCamResourcePtr camRes = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
     if (camRes)
-        connect(this, &QnMulticodecRtpReader::networkIssue, camRes.data(), &QnSecurityCamResource::networkIssue, Qt::DirectConnection);
-    connect(res.data(), SIGNAL(propertyChanged(const QnResourcePtr &, const QString &)),          this, SLOT(at_propertyChanged(const QnResourcePtr &, const QString &)));
+        connect(this,       &QnMulticodecRtpReader::networkIssue, camRes.data(), &QnSecurityCamResource::networkIssue,              Qt::DirectConnection);
+    connect(res.data(),     &QnResource::propertyChanged,         this,          &QnMulticodecRtpReader::at_propertyChanged,        Qt::DirectConnection);
+    connect(camRes.data(),  &QnResource::resourceChanged,         this,          &QnMulticodecRtpReader::at_camera_resourceChanged, Qt::DirectConnection);
 }
 
 QnMulticodecRtpReader::~QnMulticodecRtpReader()
@@ -379,8 +380,15 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
 
 void QnMulticodecRtpReader::at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key)
 {
-    if (key == QnMediaResource::rtpTransportKey())
-        closeStream();
+    if (key == QnMediaResource::rtpTransportKey() && getRtpTransport() != m_RtpSession.getTransport())
+        pleaseStop();
+}
+
+void QnMulticodecRtpReader::at_camera_resourceChanged(const QnResourcePtr& res)
+{
+    QnSecurityCamResourcePtr camRes = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
+    if (camRes && m_RtpSession.isAudioEnabled() != camRes->isAudioEnabled())
+        pleaseStop();
 }
 
 void QnMulticodecRtpReader::at_packetLost(quint32 prev, quint32 next)
@@ -399,6 +407,24 @@ void QnMulticodecRtpReader::at_packetLost(quint32 prev, quint32 next)
 
 static int TCP_READ_BUFFER_SIZE = 512*1024;
 
+RTPSession::TransportType QnMulticodecRtpReader::getRtpTransport() const
+{
+    RTPSession::TransportType result = RTPSession::TRANSPORT_AUTO;
+    if (!m_resource)
+        return result;
+
+    QString transportStr = m_resource->getProperty(QnMediaResource::rtpTransportKey());
+    if (transportStr.isEmpty())
+        transportStr = defaultTransportToUse; // if not defined, try transport from registry
+    transportStr = transportStr.toUpper().trimmed();
+    if (transportStr == RtpTransport::udp)
+        result = RTPSession::TRANSPORT_UDP;
+    else if (transportStr == RtpTransport::tcp)
+        result = RTPSession::TRANSPORT_TCP;
+
+    return result;
+}
+
 CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
 {
     m_pleaseStop = false;
@@ -407,20 +433,8 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
         return CameraDiagnostics::NoErrorResult();
     //m_timeHelper.reset();
     m_gotSomeFrame = false;
-    QString transport = m_resource->getProperty(QnMediaResource::rtpTransportKey());
-    if (transport.isEmpty())
-        transport = m_resource->getProperty(QnMediaResource::rtpTransportKey());
-
-    if (transport.isEmpty()) {
-        // if not defined, try transport from registry
-        transport = defaultTransportToUse;
-    }
-
-    if (transport != RtpTransport::_auto && transport != RtpTransport::udp && transport != RtpTransport::tcp)
-        transport = RtpTransport::_auto;
-
-    m_RtpSession.setTransport(transport);
-    if (transport != RtpTransport::udp)
+    m_RtpSession.setTransport(getRtpTransport());
+    if (m_RtpSession.getTransport() != RTPSession::TRANSPORT_UDP)
         m_RtpSession.setTCPReadBufferSize(TCP_READ_BUFFER_SIZE);
 
 

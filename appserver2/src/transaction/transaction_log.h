@@ -52,7 +52,6 @@ namespace ec2
         QnTransactionLog(QnDbManager* db);
 
         static QnTransactionLog* instance();
-        void initStaticInstance(QnTransactionLog* value);
 
         ErrorCode getTransactionsAfter(const QnTranState& state, QList<QByteArray>& result);
         QnTranState getTransactionsState();
@@ -211,6 +210,10 @@ namespace ec2
 
         ErrorCode updateSequence(const ApiUpdateSequenceData& data);
         void fillPersistentInfo(QnAbstractTransaction& tran);
+
+        void beginTran();
+        void commit();
+        void rollback();
     private:
         friend class QnDbManager;
 
@@ -223,8 +226,6 @@ namespace ec2
         ErrorCode saveToDB(const QnAbstractTransaction& tranID, const QnUuid& hash, const QByteArray& data);
         ErrorCode updateSequenceNoLock(const QnUuid& peerID, const QnUuid& dbID, int sequence);
     private:
-        QnDbManager* m_dbManager;
-        QnTranState m_state;
         struct UpdateHistoryData
         {
             UpdateHistoryData(): timestamp(0) {}
@@ -232,14 +233,24 @@ namespace ec2
             QnTranStateKey updatedBy;
             qint64 timestamp;
         };
+        struct CommitData
+        {
+            CommitData() {}
+            void clear() { state.values.clear(); updateHistory.clear(); }
 
+            QnTranState state;
+            QMap<QnUuid, UpdateHistoryData> updateHistory;
+        };
+    private:
+        QnDbManager* m_dbManager;
+        QnTranState m_state;
         QMap<QnUuid, UpdateHistoryData> m_updateHistory;
         
         mutable QMutex m_timeMutex;
         QElapsedTimer m_relativeTimer;
-        qint64 m_currentTime;
+        qint64 m_baseTime;
         qint64 m_lastTimestamp;
-        //QMap<QnTranStateKey, QnAbstractTransaction::PersistentInfo> m_fillerInfo;
+        CommitData m_commitData;
     };
 };
 

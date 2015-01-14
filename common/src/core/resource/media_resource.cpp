@@ -158,6 +158,8 @@ void QnMediaResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>&m
     }
 }
 
+//TODO #ak change following to static const
+
 QString QnMediaResource::customAspectRatioKey() {
     return lit("overrideAr");
 }

@@ -10,13 +10,16 @@
 #include <ui/actions/action_parameter_types.h>
 #include <ui/dialogs/merge_systems_dialog.h>
 #include <ui/dialogs/progress_dialog.h>
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
 
 #include <update/connect_to_current_system_tool.h>
 #include <utils/merge_systems_tool.h>
 
 QnWorkbenchIncompatibleServersActionHandler::QnWorkbenchIncompatibleServersActionHandler(QObject *parent) :
     base_type(parent),
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(parent),
+    m_connectTool(0),
+    m_mergeDialog(0)
 {
     connect(action(Qn::ConnectToCurrentSystem),         SIGNAL(triggered()),    this,   SLOT(at_connectToCurrentSystemAction_triggered()));
     connect(action(Qn::MergeSystems),                   SIGNAL(triggered()),    this,   SLOT(at_mergeSystemsAction_triggered()));
@@ -90,7 +93,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_mergeSystemsAction_triggere
         return;
     }
 
-    m_mergeDialog = new QnMergeSystemsDialog(mainWindow());
+    m_mergeDialog = new QnWorkbenchStateDependentDialog<QnMergeSystemsDialog>(mainWindow());
     m_mergeDialog->exec();
     delete m_mergeDialog;
 }

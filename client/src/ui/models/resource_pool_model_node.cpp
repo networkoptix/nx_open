@@ -322,9 +322,11 @@ bool QnResourcePoolModelNode::calculateBastard() const {
             if (layout->data().contains(Qn::LayoutSearchStateRole))
                 return true;
         } else {
+#ifndef DESKTOP_CAMERA_DEBUG
             /* Hide desktop camera resources from the tree. */
             if ((m_flags & Qn::desktop_camera) == Qn::desktop_camera)
                 return true;
+#endif
 
             /* Hide local server resource. */
             if ((m_flags & Qn::local_server) == Qn::local_server)
@@ -440,7 +442,7 @@ Qt::ItemFlags QnResourcePoolModelNode::flags(int column) const {
         switch(m_type) {
         case Qn::ResourceNode:
         case Qn::EdgeNode:
-            m_editable.value = m_model->context()->menu()->canTrigger(Qn::RenameAction, QnActionParameters(m_resource)); //TODO: #GDM #VW make this context-aware?
+            m_editable.value = m_model->context()->menu()->canTrigger(Qn::RenameResourceAction, QnActionParameters(m_resource)); //TODO: #GDM #VW make this context-aware?
             break;
         case Qn::VideoWallItemNode:
         case Qn::VideoWallMatrixNode:
@@ -565,16 +567,19 @@ bool QnResourcePoolModelNode::setData(const QVariant &value, int role, int colum
         return false;
 
     QnActionParameters parameters;
+    bool isVideoWallEntity = false;
     if (m_type == Qn::VideoWallItemNode) {
         QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(m_uuid);
         if (index.isNull())
             return false;
         parameters = QnActionParameters(QnVideoWallItemIndexList() << index);
+        isVideoWallEntity = true;
     } else if (m_type == Qn::VideoWallMatrixNode) {
         QnVideoWallMatrixIndex index = qnResPool->getVideoWallMatrixByUuid(m_uuid);
         if (index.isNull())
             return false;
         parameters = QnActionParameters(QnVideoWallMatrixIndexList() << index);
+        isVideoWallEntity = true;
     } else if (m_type == Qn::RecorderNode) {
         //sending first camera to get groupId and check WriteName permission
         if (this->children().isEmpty())
@@ -589,7 +594,10 @@ bool QnResourcePoolModelNode::setData(const QVariant &value, int role, int colum
     parameters.setArgument(Qn::ResourceNameRole, value.toString());
     parameters.setArgument(Qn::NodeTypeRole, m_type);
 
-    m_model->context()->menu()->trigger(Qn::RenameAction, parameters);
+    if (isVideoWallEntity)
+        m_model->context()->menu()->trigger(Qn::RenameVideowallEntityAction, parameters);
+    else
+        m_model->context()->menu()->trigger(Qn::RenameResourceAction, parameters);
     return true;
 }
 

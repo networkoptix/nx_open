@@ -28,6 +28,7 @@ typedef QSharedPointer<QnLicense> QnLicensePtr;
 typedef QList<QnLicensePtr> QnLicenseList;
 
 class QnVideoWallItem;
+class QnVideoWallMatrix;
 class QnVideoWallControlMessage;
 
 class QnLayoutItemData;

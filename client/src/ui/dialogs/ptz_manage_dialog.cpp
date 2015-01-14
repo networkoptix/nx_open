@@ -168,10 +168,10 @@ void QnPtzManageDialog::loadData(const QnPtzData &data) {
     QnPtzPresetList presets = data.presets;
     QnPtzTourList tours = data.tours;
     qSort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
-        return naturalStringCaseInsensitiveLessThan(l.name, r.name);
+        return naturalStringLess(l.name, r.name);
     });
     qSort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {
-        return naturalStringCaseInsensitiveLessThan(l.name, r.name);
+        return naturalStringLess(l.name, r.name);
     });
 
     m_model->setTours(tours);
@@ -309,7 +309,7 @@ void QnPtzManageDialog::updateFields(Qn::PtzDataFields fields) {
         QnPtzPresetList presets;
         if (controller()->getPresets(&presets)) {
             qSort(presets.begin(), presets.end(), [](const QnPtzPreset &l, const QnPtzPreset &r) {
-                return naturalStringCaseInsensitiveLessThan(l.name, r.name);
+                return naturalStringLess(l.name, r.name);
             });
             m_model->setPresets(presets);
         }
@@ -319,7 +319,7 @@ void QnPtzManageDialog::updateFields(Qn::PtzDataFields fields) {
         QnPtzTourList tours;
         if (controller()->getTours(&tours)) {
             qSort(tours.begin(), tours.end(), [](const QnPtzTour &l, const QnPtzTour &r) {
-                return naturalStringCaseInsensitiveLessThan(l.name, r.name);
+                return naturalStringLess(l.name, r.name);
             });
             m_model->setTours(tours);
         }
@@ -625,6 +625,9 @@ void QnPtzManageDialog::setResource(const QnResourcePtr &resource) {
     if (m_resource == resource)
         return;
     
+    if (m_resource)
+        clear();
+    
     m_resource = resource;
     m_adaptor->setResource(resource);
 
@@ -668,12 +671,21 @@ bool QnPtzManageDialog::tryClose(bool force) {
     }
 
     show();
+    return askToSaveChanges();
+}
+
+bool QnPtzManageDialog::askToSaveChanges(bool cancelIsAllowed /*= true*/) {
+
+    QMessageBox::StandardButtons allowedButtons = QnMessageBox::Yes | QnMessageBox::No;
+    if (cancelIsAllowed)
+        allowedButtons |= QnMessageBox::Cancel;
+
     QnMessageBox::StandardButton button = QnMessageBox::question(
         this, 
         0,
         tr("PTZ configuration is not saved"),
         tr("Changes are not saved. Do you want to save them?"),
-        QnMessageBox::Yes | QnMessageBox::No | QnMessageBox::Cancel, 
+        allowedButtons, 
         QnMessageBox::Yes);
 
     switch (button) {
@@ -681,7 +693,9 @@ bool QnPtzManageDialog::tryClose(bool force) {
         saveChanges();
         return true;
     case QnMessageBox::Cancel:
-        return false;
+        if (cancelIsAllowed)
+            return false;
+        return true;
     default:
         return true;
     }

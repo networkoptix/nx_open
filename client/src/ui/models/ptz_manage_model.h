@@ -173,10 +173,13 @@ private:
     int tourIndex(const QString &id) const;
 
     void setHomePositionInternal(const QString &homePosition, bool setChanged);
+    bool setHotkeyInternal(int hotkey, const QString &id);
 
     QStringList collectTourNames() const;
     QStringList collectPresetNames() const;
 
+    /** Check if some hotkeys are not valid anymore and clean them from inner structure. */
+    void cleanHotkeys();
 private:
     QnPtzManageModelColors m_colors;
 

@@ -42,6 +42,8 @@ public:
         return m_user;
     }
 
+    void setReconnectOnPasswordChange(bool reconnect);
+
 signals:
     void userChanged(const QnUserResourcePtr &user);
     void reconnectRequired();
@@ -62,6 +64,7 @@ private:
     Qn::Permissions m_userPermissions;
     QPointer<QnWorkbenchPermissionsNotifier> m_permissionsNotifier;
     QnUserResourcePtr m_user;
+    bool m_reconnectOnPasswordChange;
 };
 
 #endif // QN_WORKBENCH_USER_WATCHER_H

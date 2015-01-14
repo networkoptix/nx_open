@@ -41,6 +41,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
+#include <utils/aspect_ratio.h>
 
 #include <utils/license_usage_helper.h>
 
@@ -52,9 +53,6 @@ namespace {
      * Frame events are processed not only when hovering over the frame itself,
      * but also over its extension. */
     const qreal frameExtensionMultiplier = 1.0;
-
-    /** Default shadow displacement, in scene coordinates. */
-    const QPointF defaultShadowDisplacement = QPointF(qnGlobals->workbenchUnitSize(), qnGlobals->workbenchUnitSize()) * 0.05;
 
     /** Default timeout before the video is displayed as "loading", in milliseconds. */
 #ifdef QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
@@ -68,7 +66,7 @@ namespace {
 
     const QColor overlayTextColor = QColor(255, 255, 255, 160); // TODO: #Elric #customization
 
-    const qreal noAspectRatio = -1.0;
+    const float noAspectRatio = -1.0;
 
     //Q_GLOBAL_STATIC(QnDefaultResourceVideoLayout, qn_resourceWidget_defaultContentLayout);
     QSharedPointer<QnDefaultResourceVideoLayout> qn_resourceWidget_defaultContentLayout( new QnDefaultResourceVideoLayout() ); // TODO: #Elric get rid of this
@@ -115,9 +113,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     setAcceptHoverEvents(true);
     setTransformOrigin(Center);
 
-    /* Set up shadow. */
-    setShadowDisplacement(defaultShadowDisplacement);
-
     /* Set up frame. */
     setFrameWidth(0.0);
 
@@ -136,6 +131,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_headerRightLabel->setAcceptedMouseButtons(0);
     m_headerRightLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
 
+    auto checkedButtons = static_cast<Buttons>(item->data(Qn::ItemCheckedButtonsRole).toInt());
+
     QnImageButtonWidget *closeButton = new QnImageButtonWidget();
     closeButton->setIcon(qnSkin->icon("item/close.png"));
     closeButton->setProperty(Qn::NoBlockMotionSelection, true);
@@ -146,6 +143,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     QnImageButtonWidget *infoButton = new QnImageButtonWidget();
     infoButton->setIcon(qnSkin->icon("item/info.png"));
     infoButton->setCheckable(true);
+    infoButton->setChecked(checkedButtons & InfoButton);
     infoButton->setProperty(Qn::NoBlockMotionSelection, true);
     infoButton->setToolTip(tr("Information"));
     connect(infoButton, &QnImageButtonWidget::toggled, this, &QnResourceWidget::at_infoButton_toggled);
@@ -250,12 +248,10 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     connect(videowallLicenseHelper, &QnLicenseUsageHelper::licensesChanged, this, &QnResourceWidget::updateStatusOverlay);
 
     /* Run handlers. */
+    setInfoVisible(infoButton->isChecked(), false);
     updateTitleText();
     updateButtonsVisibility();
     updateCursor();
-
-    // calling after all nested constructors are finished
-    QTimer::singleShot(1, this, SLOT(updateCheckedButtons()));
 
     connect(this, &QnResourceWidget::rotationChanged, this, [this]() {
         if (m_enclosingGeometry.isValid())
@@ -301,8 +297,6 @@ void QnResourceWidget::setFrameWidth(qreal frameWidth) {
     m_frameWidth = frameWidth;
     qreal extendedFrameWidth = m_frameWidth * (1.0 + frameExtensionMultiplier);
     setWindowFrameMargins(extendedFrameWidth, extendedFrameWidth, extendedFrameWidth, extendedFrameWidth);
-
-    invalidateShadowShape();
 }
 
 QColor QnResourceWidget::frameDistinctionColor() const {
@@ -326,42 +320,65 @@ void QnResourceWidget::setFrameColors(const QnResourceWidgetFrameColors &frameCo
     m_frameColors = frameColors;
 }
 
-void QnResourceWidget::setAspectRatio(qreal aspectRatio) {
+void QnResourceWidget::setAspectRatio(float aspectRatio) {
     if(qFuzzyCompare(m_aspectRatio, aspectRatio))
         return;
 
-    QRectF enclosingGeometry = this->enclosingGeometry();
     m_aspectRatio = aspectRatio;
-
     updateGeometry(); /* Discard cached size hints. */
-    setEnclosingGeometry(enclosingGeometry);
 
     emit aspectRatioChanged();
 }
 
+float QnResourceWidget::visualAspectRatio() const {
+    if (!hasAspectRatio())
+        return -1;
+
+    return QnAspectRatio::isRotated90(rotation()) ? 1 / m_aspectRatio : m_aspectRatio;
+}
+
+float QnResourceWidget::defaultVisualAspectRatio() const {
+    if (m_enclosingGeometry.isNull())
+        return defaultAspectRatio();
+
+    return m_enclosingGeometry.width() / m_enclosingGeometry.height();
+}
+
+float QnResourceWidget::visualChannelAspectRatio() const {
+    if (!channelLayout())
+        return visualAspectRatio();
+
+    qreal layoutAspectRatio = QnGeometry::aspectRatio(channelLayout()->size());
+    if (QnAspectRatio::isRotated90(rotation()))
+        return visualAspectRatio() * layoutAspectRatio;
+    else
+        return visualAspectRatio() / layoutAspectRatio;
+}
+
 QRectF QnResourceWidget::enclosingGeometry() const {
-    QRectF rect = m_enclosingGeometry;
-    rect.moveCenter(geometry().center());
-    return rect;
+    return m_enclosingGeometry;
 }
 
-void QnResourceWidget::setEnclosingGeometry(const QRectF &enclosingGeometry) {
+void QnResourceWidget::setEnclosingGeometry(const QRectF &enclosingGeometry, bool updateGeometry) {
     m_enclosingGeometry = enclosingGeometry;
-    setGeometry(calculateGeometry(enclosingGeometry));
+    if (updateGeometry)
+        setGeometry(calculateGeometry(enclosingGeometry));
 }
 
-QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry) const {
-    if (hasAspectRatio() && !enclosingGeometry.isEmpty()) {
+QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry, qreal rotation) const {
+    if (!enclosingGeometry.isEmpty()) {
         /* Calculate bounds of the rotated item. */
 
+        qreal aspectRatio = hasAspectRatio() ? m_aspectRatio : defaultVisualAspectRatio();
+
         /* 1. Take a rectangle with our aspect ratio */
-        QRectF geom = expanded(m_aspectRatio, enclosingGeometry, Qt::KeepAspectRatio);
+        QRectF geom = expanded(aspectRatio, enclosingGeometry, Qt::KeepAspectRatio);
 
         /* 2. Rotate it */
         QPointF c = geom.center();
         QTransform transform;
         transform.translate(c.x(), c.y());
-        transform.rotate(rotation());
+        transform.rotate(rotation);
         transform.translate(-c.x(), -c.y());
         QRectF rotated = transform.mapRect(geom);
 
@@ -372,14 +389,16 @@ QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry) cons
         qreal scale = QnGeometry::scaleFactor(rotated.size(), scaledSize, Qt::KeepAspectRatio);
 
         /* 5. Scale original non-rotated geometry */
-        qreal xdiff = geom.width() / 2.0 * (1.0 - scale);
-        qreal ydiff = geom.height() / 2.0 * (1.0 - scale);
-        geom.adjust(xdiff, ydiff, -xdiff, -ydiff);
+        geom = scaled(geom, scale, geom.center());
 
         return geom;
     } else {
         return enclosingGeometry;
     }
+}
+
+QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry) const {
+    return calculateGeometry(enclosingGeometry, this->rotation());
 }
 
 QString QnResourceWidget::titleText() const {
@@ -463,11 +482,27 @@ void QnResourceWidget::updateCursor() {
         setCursor(newCursor);
 }
 
-QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint) const {
-    if(!hasAspectRatio())
+QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint, Qt::WindowFrameSection pinSection) const {
+    if (!hasAspectRatio())
         return constraint;
 
-    return expanded(m_aspectRatio, constraint, Qt::KeepAspectRatioByExpanding);
+    QSizeF result = constraint;
+
+    switch (pinSection) {
+    case Qt::TopSection:
+    case Qt::BottomSection:
+        result.setWidth(constraint.height() * m_aspectRatio);
+        break;
+    case Qt::LeftSection:
+    case Qt::RightSection:
+        result.setHeight(constraint.width() / m_aspectRatio);
+        break;
+    default:
+        result = expanded(m_aspectRatio, constraint, Qt::KeepAspectRatioByExpanding);
+        break;
+    }
+
+    return result;
 }
 
 void QnResourceWidget::updateCheckedButtons() {
@@ -578,16 +613,6 @@ void QnResourceWidget::updateButtonsVisibility() {
         calculateButtonsVisibility() & 
         ~(item() ? item()->data<int>(Qn::ItemDisabledButtonsRole, 0): 0)
     );
-}
-
-Qn::WindowFrameSections QnResourceWidget::windowFrameSectionsAt(const QRectF &region) const {
-    Qn::WindowFrameSections result = base_type::windowFrameSectionsAt(region);
-
-    /* This widget has no side frame sections if aspect ratio is set. */
-    if(hasAspectRatio())
-        result &= ~Qn::SideSections;
-
-    return result;
 }
 
 QCursor QnResourceWidget::windowCursorAt(Qn::WindowFrameSection section) const {
@@ -808,7 +833,7 @@ void QnResourceWidget::paintSelection(QPainter *painter, const QRectF &rect) {
     painter->fillRect(rect, palette().color(QPalette::Highlight));
 }
 
-qreal QnResourceWidget::defaultAspectRatio() const {
+float QnResourceWidget::defaultAspectRatio() const {
     if (item())
         return item()->data(Qn::ItemAspectRatioRole, noAspectRatio);
     return noAspectRatio;

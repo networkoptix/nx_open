@@ -45,6 +45,11 @@ QString HostAddress::toString() const
     return m_addrStr.get();
 }
 
+bool HostAddress::operator==( const HostAddress& right ) const
+{
+    return memcmp( &m_sinAddr, &right.m_sinAddr, sizeof(m_sinAddr) ) == 0;
+}
+
 struct in_addr HostAddress::inAddr() const
 {
     return m_sinAddr;

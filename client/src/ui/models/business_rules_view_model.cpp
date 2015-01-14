@@ -166,27 +166,9 @@ QSize QnBusinessRulesViewModel::columnSizeHint(QnBusiness::Columns column) const
     return QSize(m_forcedWidthByColumn[column], 1);
 }
 
-
-void QnBusinessRulesViewModel::clear() {
-    beginResetModel();
-    m_rules.clear();
-    endResetModel();
-}
-
-void QnBusinessRulesViewModel::addRules(const QnBusinessEventRuleList &businessRules) {
-    foreach (QnBusinessEventRulePtr rule, businessRules) {
-        addRule(rule);
-    }
-}
-
-void QnBusinessRulesViewModel::addRule(const QnBusinessEventRulePtr &rule) {
-    QnBusinessRuleViewModel* ruleModel = new QnBusinessRuleViewModel(this);
-    if (rule)
-        ruleModel->loadFromRule(rule);
-    else
-        ruleModel->setModified(true);
+void QnBusinessRulesViewModel::addRuleModelInternal(QnBusinessRuleViewModel* ruleModel) {
     connect(ruleModel, SIGNAL(dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)),
-            this, SLOT(at_rule_dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)));
+        this, SLOT(at_rule_dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)));
 
     int row = m_rules.size();
     beginInsertRows(QModelIndex(), row, row);
@@ -196,12 +178,33 @@ void QnBusinessRulesViewModel::addRule(const QnBusinessEventRulePtr &rule) {
     emit dataChanged(index(row, 0), index(row, QnBusiness::allColumns().last()));
 }
 
-void QnBusinessRulesViewModel::updateRule(const QnBusinessEventRulePtr &rule) {
+void QnBusinessRulesViewModel::clear() {
+    beginResetModel();
+    m_rules.clear();
+    endResetModel();
+}
+
+void QnBusinessRulesViewModel::createRule() {
+    QnBusinessRuleViewModel* ruleModel = new QnBusinessRuleViewModel(this);
+    ruleModel->setModified(true);
+    addRuleModelInternal(ruleModel);
+}
+
+void QnBusinessRulesViewModel::addOrUpdateRule(const QnBusinessEventRulePtr &rule) {
+    Q_ASSERT_X(rule, Q_FUNC_INFO, "Rule must exist");
+    if (!rule)
+        return;
+
+    /* System rules are not to be added into any visual models. */
+    if (rule->isSystem())
+        return;
+
     QnBusinessRuleViewModel* ruleModel = ruleModelById(rule->id());
-    if (ruleModel)
-        ruleModel->loadFromRule(rule);
-    else
-        addRule(rule);
+    if (!ruleModel) {
+        ruleModel = new QnBusinessRuleViewModel(this);
+        addRuleModelInternal(ruleModel);
+    }
+    ruleModel->loadFromRule(rule);
 }
 
 void QnBusinessRulesViewModel::deleteRule(QnBusinessRuleViewModel *ruleModel) {

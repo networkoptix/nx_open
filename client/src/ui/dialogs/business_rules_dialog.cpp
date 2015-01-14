@@ -16,6 +16,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
+#include <core/resource/camera_resource.h>
 
 #include <nx_ec/dummy_handler.h>
 #include <ui/help/help_topic_accessor.h>
@@ -188,7 +189,7 @@ void QnBusinessRulesDialog::at_message_ruleDeleted(const QnUuid &id) {
 }
 
 void QnBusinessRulesDialog::at_newRuleButton_clicked() {
-    m_rulesViewModel->addRule(QnBusinessEventRulePtr());
+    m_rulesViewModel->createRule();
 
     ui->tableView->setCurrentIndex(m_rulesViewModel->index(m_rulesViewModel->rowCount() - 1, 0));
 }
@@ -275,6 +276,7 @@ void QnBusinessRulesDialog::at_model_dataChanged(const QModelIndex &topLeft, con
     Q_UNUSED(bottomRight)
     if (topLeft.column() <= QnBusiness::ModifiedColumn && bottomRight.column() >= QnBusiness::ModifiedColumn)
         updateControlButtons();
+    updateFilter();
 }
 
 void QnBusinessRulesDialog::toggleAdvancedMode() {
@@ -424,11 +426,12 @@ void QnBusinessRulesDialog::updateFilter() {
 
     filter = filter.trimmed();
     bool anyCameraPassFilter = false;
-    foreach (const QnResourcePtr camera, qnResPool->getAllCameras(QnResourcePtr(), true))  {
+    for (const QnVirtualCameraResourcePtr &camera: qnResPool->getAllCameras(QnResourcePtr(), true))  {
         anyCameraPassFilter = camera->toSearchString().contains(filter, Qt::CaseInsensitive);
         if (anyCameraPassFilter)
             break;
     }
+    
 
     for (int i = 0; i < m_rulesViewModel->rowCount(); ++i) {
         QnBusinessRuleViewModel *ruleModel = m_rulesViewModel->getRuleModel(i);

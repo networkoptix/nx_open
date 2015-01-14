@@ -1,6 +1,7 @@
 #ifndef LICENSE_USAGE_HELPER_H
 #define LICENSE_USAGE_HELPER_H
 
+#include <array>
 #include <core/resource/resource_fwd.h>
 #include <licensing/license.h>
 
@@ -8,10 +9,14 @@
 
 static const QString QN_LICENSE_URL(lit("http://licensing.networkoptix.com/nxlicensed/activate.php"));
 
+struct LicenseCompatibility;
+
 class QnLicenseUsageHelper: public Connective<QObject>
 {
     Q_OBJECT
     typedef  Connective<QObject> base_type;
+
+    typedef std::array<int, Qn::LC_Count> licensesArray;
 public:
     QnLicenseUsageHelper(QObject *parent = NULL);
 
@@ -23,12 +28,12 @@ public:
      *  Get text "Activate %n more licenses" or "%n more licenses will be used" if valid for the selected type.
      */
 
-    QString getRequiredLicenseMsg(Qn::LicenseType licenseType) const;
+    QString getRequiredText(Qn::LicenseType licenseType) const;
 
     /** 
      *  Get text "Activate %n more licenses" or "%n more licenses will be used" if valid for all types.
      */
-    QString getRequiredLicenseMsg() const;
+    QString getRequiredMsg() const;
 
     /**
      *  Get text "%n licenses are used out of %n." for the selected type.
@@ -38,7 +43,7 @@ public:
     /**
      *  Get text "%n licenses are used out of %n." for all types.
      */
-    QString getUsageText() const;
+    QString getUsageMsg() const;
 
     /**
      *  Get text "%n licenses will be used out of %n." for the selected type.
@@ -48,10 +53,25 @@ public:
     /**
      *  Get text "%n licenses will be used out of %n." for all types.
      */
-    QString getProposedUsageText() const;
+    QString getProposedUsageMsg() const;
 
-    int totalLicense(Qn::LicenseType licenseType) const;
-    int usedLicense(Qn::LicenseType licenseType) const;
+    /** Number of valid licenses of the selected type. */
+    int totalLicenses(Qn::LicenseType licenseType) const;
+
+    /** Number of licenses of the selected type currently in use (including proposed). */
+    int usedLicenses(Qn::LicenseType licenseType) const;
+
+    /** 
+     *  Number of licenses of the selected type lacking for system to work. 
+     *  Always equals to 0 of the helper is valid.
+     */
+    int requiredLicenses(Qn::LicenseType licenseType) const;
+
+    /**
+     *  Number of licenses that are proposed to be used.
+     *  Makes no sense if the helper is NOT valid.
+     */
+    int proposedLicenses(Qn::LicenseType licenseType) const;
 
     virtual QList<Qn::LicenseType> licenseTypes() const;
 
@@ -65,20 +85,28 @@ signals:
      void licensesChanged();
 
 protected:
-    void borrowLicenseFromClass(int& srcUsed, int srcTotal, int& dstUsed, int dstTotal);
-    virtual int calculateUsedLicenses(Qn::LicenseType licenseType) const = 0;
-    virtual QList<Qn::LicenseType> calculateLicenseTypes() const = 0;
+    virtual int calculateUsedLicenses(Qn::LicenseType licenseType, bool countProposed = true) const = 0;
+    virtual int calculateOverflowLicenses(Qn::LicenseType licenseType, int borrowedLicenses) const;
 
+    virtual QList<Qn::LicenseType> calculateLicenseTypes() const = 0;
+    
+private:
+    int borrowLicenses(const LicenseCompatibility &compat, licensesArray &licenses);
+
+private:
     QnLicenseListHelper m_licenses;
     mutable QList<Qn::LicenseType> m_licenseTypes;
 
-    int m_usedLicenses[Qn::LC_Count];
-    int m_proposedLicenses[Qn::LC_Count];
-    int m_overflowLicenses[Qn::LC_Count];
+    licensesArray m_totalLicenses;
+    licensesArray m_usedLicenses;
+    licensesArray m_proposedLicenses;
+    licensesArray m_overflowLicenses;
 };
 
 class QnCamLicenseUsageHelper: public QnLicenseUsageHelper {
     Q_OBJECT
+
+    typedef QnLicenseUsageHelper base_type;
 public:
     QnCamLicenseUsageHelper(QObject *parent = NULL);
     QnCamLicenseUsageHelper(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable, QObject *parent = NULL);
@@ -87,9 +115,25 @@ public:
     bool isOverflowForCamera(const QnVirtualCameraResourcePtr &camera);
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
-    virtual int calculateUsedLicenses(Qn::LicenseType licenseType) const override;
+    virtual int calculateUsedLicenses(Qn::LicenseType licenseType, bool countProposed = true) const override;
+    virtual int calculateOverflowLicenses(Qn::LicenseType licenseType, int borrowedLicenses) const override;
+
 private:
     void init();
+
+    bool cameraRequiresLicense(const QnVirtualCameraResourcePtr &camera, Qn::LicenseType licenseType, bool countProposed) const;
+
+    /** 
+     *  Utility function to get sets of analog cameras numbers, distributed by the following rules:
+     *  - Each set must contain cameras from the same encoder
+     *  - Each set must contain no more than QnLicensePool::camerasPerAnalogEncoder cameras
+     *  Camera sets then reduced to just number of cameras in the set.
+     *  Result is sorted in reversed order (from biggest sets to smallest).
+     */
+    QList<int> analogEncoderCameraSets(bool countProposed) const;
+
+    QSet<QnVirtualCameraResourcePtr> m_proposedToEnable;
+    QSet<QnVirtualCameraResourcePtr> m_proposedToDisable;
 };
 
 class QnVideoWallLicenseUsageHelper: public QnLicenseUsageHelper {
@@ -104,7 +148,10 @@ public:
     static int licensesForScreens(int screens);
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
-    virtual int calculateUsedLicenses(Qn::LicenseType licenseType) const override;
+    virtual int calculateUsedLicenses(Qn::LicenseType licenseType, bool countProposed = true) const override;
+
+private:
+    int m_proposed;
 };
 
 /** Utility RAAA class to propose some licenses usage. */

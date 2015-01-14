@@ -26,7 +26,7 @@ bool QnSortedServerUpdatesModel::lessThan(const QModelIndex &left, const QModelI
     QString lname = left.data(Qt::DisplayRole).toString();
     QString rname = right.data(Qt::DisplayRole).toString();
 
-    int result = naturalStringCompare(lname, rname, Qt::CaseInsensitive, false);
+    int result = naturalStringCompare(lname, rname, Qt::CaseInsensitive);
     if(result != 0)
         return result < 0;
 

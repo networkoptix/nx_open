@@ -32,7 +32,8 @@ class QnServerSettingsDialog: public QnWorkbenchStateDependentButtonBoxDialog {
 public:
     explicit QnServerSettingsDialog(const QnMediaServerResourcePtr &server, QWidget *parent = NULL);
     virtual ~QnServerSettingsDialog();
-
+signals:
+    void rebuildArchiveDone();
 public slots:
     virtual void accept() override;
     virtual void reject() override;

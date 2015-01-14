@@ -7,6 +7,8 @@
 
 
 class QnRestProcessorPool
+:
+    public Singleton<QnRestProcessorPool>
 {
 public:
     typedef QMap<QString, QnRestRequestHandlerPtr> Handlers;
@@ -17,9 +19,6 @@ public:
     void registerHandler( const QString& path, QnRestRequestHandler* handler );
     QnRestRequestHandlerPtr findHandler( QString path ) const;
     const Handlers& handlers() const;
-
-    static void initStaticInstance( QnRestProcessorPool* _instance );
-    static QnRestProcessorPool* instance();
 
 private:
     Handlers m_handlers;

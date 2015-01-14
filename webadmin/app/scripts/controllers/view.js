@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('webadminApp').controller('ViewCtrl', function ($scope,$rootScope,$location,$routeParams,mediaserver,cameraRecords) {
+angular.module('webadminApp').controller('ViewCtrl', function ($scope,$rootScope,$location,$routeParams,$cookies,mediaserver,cameraRecords) {
 
     $scope.cameras = {};
     $scope.activeCamera = null;

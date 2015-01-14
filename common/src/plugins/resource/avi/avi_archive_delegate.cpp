@@ -419,7 +419,8 @@ QnResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
             AVDictionaryEntry* customInfo = av_dict_get(m_formatContext->metadata,getTagName(CustomTag, format), 0, 0);
             if (customInfo) {
                 QnAviArchiveCustomData data = QJson::deserialized<QnAviArchiveCustomData>(customInfo->value);
-                m_resource->setProperty(QnMediaResource::customAspectRatioKey(), QString::number(data.overridenAr));
+                if (!qFuzzyIsNull(data.overridenAr))
+                    m_resource->setProperty(QnMediaResource::customAspectRatioKey(), QString::number(data.overridenAr));
             }
 
         }

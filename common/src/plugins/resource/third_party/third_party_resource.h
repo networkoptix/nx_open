@@ -24,6 +24,8 @@ class QnThirdPartyResource
     public QnPhysicalCameraResource,
     public nxcip::CameraInputEventHandler
 {
+    typedef QnPhysicalCameraResource base_type;
+
 public:
     static const int PRIMARY_ENCODER_INDEX = 0;
     static const int SECONDARY_ENCODER_INDEX = 1;
@@ -47,6 +49,8 @@ public:
         At the moment always returns \a true
     */
     virtual bool ping() override;
+    //!Implementation of QnNetworkResource::mergeResourcesIfNeeded
+    virtual bool mergeResourcesIfNeeded( const QnNetworkResourcePtr& source ) override;
     //!Implementation of QnSecurityCamResource::manufacture
     virtual QString getDriverName() const override;
     //!Implementation of QnSecurityCamResource::setIframeDistance
@@ -98,10 +102,10 @@ public:
 protected:
     //!Implementation of QnResource::initInternal
     virtual CameraDiagnostics::Result initInternal() override;
-    //!Implementation of QnSecurityCamResource::startInputPortMonitoring
-    virtual bool startInputPortMonitoring() override;
-    //!Implementation of QnSecurityCamResource::stopInputPortMonitoring
-    virtual void stopInputPortMonitoring() override;
+    //!Implementation of QnSecurityCamResource::startInputPortMonitoringAsync
+    virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;
+    //!Implementation of QnSecurityCamResource::stopInputPortMonitoringAsync
+    virtual void stopInputPortMonitoringAsync() override;
     //!Implementation of QnSecurityCamResource::isInputPortMonitored
     virtual bool isInputPortMonitored() const override;
     //!Implementation of QnSecurityCamResource::setMotionMaskPhysical

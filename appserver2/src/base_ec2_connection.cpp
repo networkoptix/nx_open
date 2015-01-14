@@ -39,10 +39,6 @@ namespace ec2
         m_discoveryManager( new QnDiscoveryManager<T>(m_queryProcessor) ),
         m_timeManager( new QnTimeManager<T>(m_queryProcessor) )
     {
-        connect (QnTransactionMessageBus::instance(), &QnTransactionMessageBus::peerFound, this, &BaseEc2Connection<T>::remotePeerFound, Qt::DirectConnection);
-        connect (QnTransactionMessageBus::instance(), &QnTransactionMessageBus::peerLost,  this, &BaseEc2Connection<T>::remotePeerLost, Qt::DirectConnection);
-        connect (QnTransactionMessageBus::instance(), &QnTransactionMessageBus::remotePeerUnauthorized,  this, &BaseEc2Connection<T>::remotePeerUnauthorized, Qt::DirectConnection);
-
         m_notificationManager.reset(
             new ECConnectionNotificationManager(
                 m_resCtx,
@@ -59,6 +55,24 @@ namespace ec2
                 m_updatesManager.get(),
                 m_miscManager.get(),
                 m_discoveryManager.get() ) );
+    }
+
+    template<class T>
+    BaseEc2Connection<T>::~BaseEc2Connection()
+    {}
+
+    template<class T>
+    void BaseEc2Connection<T>::startReceivingNotifications() {
+        connect(QnTransactionMessageBus::instance(),    &QnTransactionMessageBus::peerFound,                this,   &BaseEc2Connection<T>::remotePeerFound,         Qt::DirectConnection);
+        connect(QnTransactionMessageBus::instance(),    &QnTransactionMessageBus::peerLost,                 this,   &BaseEc2Connection<T>::remotePeerLost,          Qt::DirectConnection);
+        connect(QnTransactionMessageBus::instance(),    &QnTransactionMessageBus::remotePeerUnauthorized,   this,   &BaseEc2Connection<T>::remotePeerUnauthorized,  Qt::DirectConnection);
+        QnTransactionMessageBus::instance()->start();
+    }
+
+    template<class T>
+    void BaseEc2Connection<T>::stopReceivingNotifications() {
+        QnTransactionMessageBus::instance()->disconnectAndJoin( this );
+        QnTransactionMessageBus::instance()->stop();
     }
 
     template<class T>
@@ -152,6 +166,23 @@ namespace ec2
         };
         m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiDatabaseDumpData, decltype(queryDoneHandler)> ( 
             ApiCommand::dumpDatabase, nullptr, queryDoneHandler);
+        return reqID;
+    }
+
+    template<class T>
+    int BaseEc2Connection<T>::dumpDatabaseToFileAsync( const QString& dumpFilePath, impl::SimpleHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+
+        ApiStoredFilePath dumpFilePathData;
+        dumpFilePathData.path = dumpFilePath;
+
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, qint64 /*dumpFileSize*/ ) {
+            handler->done( reqID, errorCode );
+        };
+        m_queryProcessor->template processQueryAsync<ApiStoredFilePath, qint64, decltype(queryDoneHandler)> ( 
+            ApiCommand::dumpDatabaseToFile, dumpFilePathData, queryDoneHandler );
+
         return reqID;
     }
 

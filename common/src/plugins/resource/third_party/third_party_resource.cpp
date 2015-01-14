@@ -57,7 +57,7 @@ QnThirdPartyResource::~QnThirdPartyResource()
         m_cameraManager3 = nullptr;
     }
 
-    stopInputPortMonitoring();
+    stopInputPortMonitoringAsync();
 }
 
 QnAbstractPtzController* QnThirdPartyResource::createPtzControllerInternal()
@@ -144,6 +144,23 @@ bool QnThirdPartyResource::ping()
 {
     //TODO: should check if camera supports http and, if supports, check http port
     return true;
+}
+
+bool QnThirdPartyResource::mergeResourcesIfNeeded( const QnNetworkResourcePtr& source )
+{
+    //TODO #ak antipattern: calling virtual function from base class
+    bool mergedSomething = base_type::mergeResourcesIfNeeded( source );
+
+    //TODO #ak to make minimal influence on existing code, merging only one property. 
+        //But, perharps, other properties should be processed too (in QnResource)
+    const auto newAuxData = source->getProperty( AUX_DATA_PARAM_NAME );
+    if( getProperty(AUX_DATA_PARAM_NAME) != newAuxData )
+    {
+        setProperty( AUX_DATA_PARAM_NAME, newAuxData );
+        mergedSomething = true;
+    }
+
+    return mergedSomething;
 }
 
 QString QnThirdPartyResource::getDriverName() const
@@ -679,7 +696,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     return CameraDiagnostics::NoErrorResult();
 }
 
-bool QnThirdPartyResource::startInputPortMonitoring()
+bool QnThirdPartyResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
 {
     if( !m_relayIOManager.get() )
         return false;
@@ -687,7 +704,7 @@ bool QnThirdPartyResource::startInputPortMonitoring()
     return m_relayIOManager->startInputPortMonitoring() == nxcip::NX_NO_ERROR;
 }
 
-void QnThirdPartyResource::stopInputPortMonitoring()
+void QnThirdPartyResource::stopInputPortMonitoringAsync()
 {
     if( m_relayIOManager.get() )
     {

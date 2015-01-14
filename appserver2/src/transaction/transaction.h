@@ -155,6 +155,7 @@ namespace ec2
             dumpDatabase                = 9005,  /*< ApiDatabaseDumpData */
             restoreDatabase             = 9006,  /*< ApiDatabaseDumpData */
             updatePersistentSequence    = 9009,  /*< ApiUpdateSequenceData*/
+            dumpDatabaseToFile          = 9010,  /*< ApiStoredFilePath, size_t (dump size) */
 
             getTransactionLog           = 10000,  /*< QnAbstractTransactionList*/
 
@@ -201,7 +202,10 @@ namespace ec2
         PersistentInfo persistentInfo;
         
         bool isLocal; // do not propagate transactions to other server peers
+
+        QString toString() const;
     };
+    
 
     typedef std::vector<ec2::QnAbstractTransaction> QnAbstractTransactionList;
     typedef QnAbstractTransaction::PersistentInfo QnAbstractTransaction_PERSISTENT;

@@ -32,20 +32,6 @@
 #endif
 #include "utils/color_space/image_correction.h"
 
-/**
- * \def QN_GL_RENDERER_DEBUG
- * 
- * Enable OpenGL error reporting. Note that this will result in a LOT of
- * redundant <tt>glGetError</tt> calls, which may affect performance.
- */
-//#define QN_GL_RENDERER_DEBUG
-
-#ifdef QN_GL_RENDERER_DEBUG
-#   define glCheckError glCheckError
-#else
-#   define glCheckError(...)
-#endif
-
 namespace {
     const int ROUND_COEFF = 8;
 
@@ -295,7 +281,7 @@ void QnGLRenderer::drawVideoTextureDirectly(
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex0ID);
-    DEBUG_CODE(glCheckError("glBindTexture"));
+    glCheckError("glBindTexture");
 
     auto renderer = QnOpenGLRendererManager::instance(QGLContext::currentContext());
     auto shader = renderer->getTextureShader();
@@ -412,13 +398,13 @@ void QnGLRenderer::drawYV12VideoTexture(
     }
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, tex2ID);
-    DEBUG_CODE(glCheckError("glBindTexture"));
+    glCheckError("glBindTexture");
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, tex1ID);
-    DEBUG_CODE(glCheckError("glBindTexture"));
+    glCheckError("glBindTexture");
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex0ID);
-    DEBUG_CODE(glCheckError("glBindTexture"));
+    glCheckError("glBindTexture");
 
     drawBindedTexture( shader, v_array, tx_array );
 
@@ -468,7 +454,7 @@ void QnGLRenderer::drawFisheyeRGBVideoTexture(
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex0ID);
-    DEBUG_CODE(glCheckError("glBindTexture"));
+    glCheckError("glBindTexture");
 
     drawBindedTexture( fisheyeShader, v_array, tx_array );
 
@@ -509,19 +495,19 @@ void QnGLRenderer::drawYVA12VideoTexture(
 
     glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_2D, tex3ID);
-    DEBUG_CODE(glCheckError("glBindTexture"));
+    glCheckError("glBindTexture");
 
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, tex2ID);
-    DEBUG_CODE(glCheckError("glBindTexture"));
+    glCheckError("glBindTexture");
 
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, tex1ID);
-    DEBUG_CODE(glCheckError("glBindTexture"));
+    glCheckError("glBindTexture");
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex0ID);
-    DEBUG_CODE(glCheckError("glBindTexture"));
+    glCheckError("glBindTexture");
 
     drawBindedTexture( m_shaders->yv12ToRgba, v_array, tx_array );
 
@@ -550,11 +536,11 @@ void QnGLRenderer::drawNV12VideoTexture(
 
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, yPlaneTexID);
-    DEBUG_CODE(glCheckError("glBindTexture"));
+    glCheckError("glBindTexture");
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, uvPlaneTexID);
-    DEBUG_CODE(glCheckError("glBindTexture"));
+    glCheckError("glBindTexture");
 
     drawBindedTexture( m_shaders->nv12ToRgb, v_array, tx_array );
 

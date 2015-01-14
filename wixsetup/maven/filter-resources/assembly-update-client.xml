@@ -1,7 +1,7 @@
  <assembly>
 	<id>${box}-${arch}-${release.version}.${buildNumber}</id>
 	<formats>
-		<format>zip</format>
+		<format>dir</format>
 	</formats>
 	<includeBaseDirectory>false</includeBaseDirectory>
 	<fileSets>
@@ -27,6 +27,7 @@
                 <include>wrap_oal.dll</include>
                 <include>zlibwapi.dll</include>
                 <include>${product.name}*.exe</include>
+                <include>vcredist*.exe</include>
             </includes>		
         </fileSet>			
 		<fileSet>

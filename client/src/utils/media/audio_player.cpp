@@ -24,6 +24,8 @@ class LocalAudioFileResource
 {
 public:
     virtual QString getUniqueId() const { return QString(); }
+    virtual void setStatus(Qn::ResourceStatus, bool silenceMode ) override {}
+    virtual Qn::ResourceStatus getStatus() const override { return Qn::Online; }
 };
 
 
@@ -304,7 +306,6 @@ bool AudioPlayer::openNonSafe( QIODevice* dataSource )
 
     QnResourcePtr res( new LocalAudioFileResource() );
     res->setUrl( temporaryResUrl );
-    res->setStatus( Qn::Online );
     if( !mediaFileReader->open( res ) )
     {
         m_storage->removeFile( temporaryFilePath );

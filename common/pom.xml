@@ -38,6 +38,17 @@
         <qt.libs>core gui network xml multimedia sql</qt.libs>
     </properties>   
 
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>build_variables</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/build_variables/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
+
     <build>
     </build>
 

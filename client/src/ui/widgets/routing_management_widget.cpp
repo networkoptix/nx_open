@@ -28,7 +28,7 @@ namespace {
         bool lessThan(const QModelIndex &left, const QModelIndex &right) const override {
             QString leftString = left.data(sortRole()).toString();
             QString rightString = right.data(sortRole()).toString();
-            return naturalStringLessThan(leftString, rightString);
+            return naturalStringLess(leftString, rightString);
         }
     };
 

@@ -27,7 +27,17 @@ namespace ec2
     {
         template<class T> 
         void operator()(const QnTransaction<T> &tran) const {
-            qnTransactionBus->sendTransaction( tran, tran.isLocal ? qnTransactionBus->aliveClientPeers().keys().toSet() : QnPeerSet());
+            /* Local transactions (such as setStatus for servers) should only be sent to clients. */
+            if (tran.isLocal) {
+                QnPeerSet clients = qnTransactionBus->aliveClientPeers().keys().toSet();
+                /* Important check! Empty target means 'send to all peers'. */
+                if (!clients.isEmpty())
+                    qnTransactionBus->sendTransaction( tran, clients );
+            }
+            else {
+                /* Send transaction to all peers. */
+                qnTransactionBus->sendTransaction(tran);
+            }
         }
     };
 
@@ -78,12 +88,12 @@ namespace ec2
             QMutexLocker lock(&m_updateDataMutex);
 
             //starting transaction
-            std::unique_ptr<QnDbManager::Locker> dbTran;
+            std::unique_ptr<QnDbManager::QnDbTransactionLocker> dbTran;
             std::list<std::function<void()>> transactionsToSend;
 
             if( ApiCommand::isPersistent(tran.command) )
             {
-                dbTran.reset(new QnDbManager::Locker(dbManager));
+                dbTran.reset(new QnDbManager::QnDbTransactionLocker(dbManager->getTransaction()));
                 errorCode = syncFunction( tran, &transactionsToSend );
                 if( errorCode != ErrorCode::ok )
                     return;

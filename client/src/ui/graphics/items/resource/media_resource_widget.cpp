@@ -54,6 +54,7 @@
 #include <ui/workbench/watchers/workbench_render_watcher.h>
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
+#include <utils/aspect_ratio.h>
 
 #include "resource_widget_renderer.h"
 #include "resource_widget.h"
@@ -178,62 +179,85 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
 
     /* Set up buttons. */
 
-    QnImageButtonWidget *screenshotButton = new QnImageButtonWidget();
-    screenshotButton->setIcon(qnSkin->icon("item/screenshot.png"));
-    screenshotButton->setCheckable(false);
-    screenshotButton->setProperty(Qn::NoBlockMotionSelection, true);
-    screenshotButton->setToolTip(tr("Screenshot"));
-    setHelpTopic(screenshotButton, Qn::MainWindow_MediaItem_Screenshot_Help);
-    connect(screenshotButton, &QnImageButtonWidget::clicked, this, &QnMediaResourceWidget::at_screenshotButton_clicked);
+    {
+        QnImageButtonWidget *screenshotButton = new QnImageButtonWidget();
+        screenshotButton->setIcon(qnSkin->icon("item/screenshot.png"));
+        screenshotButton->setCheckable(false);
+        screenshotButton->setProperty(Qn::NoBlockMotionSelection, true);
+        screenshotButton->setToolTip(tr("Screenshot"));
+        setHelpTopic(screenshotButton, Qn::MainWindow_MediaItem_Screenshot_Help);
+        connect(screenshotButton, &QnImageButtonWidget::clicked, this, &QnMediaResourceWidget::at_screenshotButton_clicked);
+        buttonBar()->addButton(ScreenshotButton, screenshotButton);
+    }
 
-    QnImageButtonWidget *searchButton = new QnImageButtonWidget();
-    searchButton->setIcon(qnSkin->icon("item/search.png"));
-    searchButton->setCheckable(true);
-    searchButton->setProperty(Qn::NoBlockMotionSelection, true);
-    searchButton->setToolTip(tr("Smart Search"));
-    setHelpTopic(searchButton, Qn::MainWindow_MediaItem_SmartSearch_Help);
-    connect(searchButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_searchButton_toggled);
+    {
+        QnImageButtonWidget *searchButton = new QnImageButtonWidget();
+        searchButton->setIcon(qnSkin->icon("item/search.png"));
+        searchButton->setCheckable(true);
+        searchButton->setProperty(Qn::NoBlockMotionSelection, true);
+        searchButton->setToolTip(tr("Smart Search"));
+        setHelpTopic(searchButton, Qn::MainWindow_MediaItem_SmartSearch_Help);
+        connect(searchButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_searchButton_toggled);
+        buttonBar()->addButton(MotionSearchButton, searchButton);
+    }
 
-    QnImageButtonWidget *ptzButton = new QnImageButtonWidget();
-    ptzButton->setIcon(qnSkin->icon("item/ptz.png"));
-    ptzButton->setCheckable(true);
-    ptzButton->setProperty(Qn::NoBlockMotionSelection, true);
-    ptzButton->setToolTip(tr("PTZ"));
-    setHelpTopic(ptzButton, Qn::MainWindow_MediaItem_Ptz_Help);
-    connect(ptzButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_ptzButton_toggled);
+    {
+        QnImageButtonWidget *ptzButton = new QnImageButtonWidget();
+        ptzButton->setIcon(qnSkin->icon("item/ptz.png"));
+        ptzButton->setCheckable(true);
+        ptzButton->setProperty(Qn::NoBlockMotionSelection, true);
+        ptzButton->setToolTip(tr("PTZ"));
+        setHelpTopic(ptzButton, Qn::MainWindow_MediaItem_Ptz_Help);
+        connect(ptzButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_ptzButton_toggled);
+        buttonBar()->addButton(PtzButton, ptzButton);
+    }
 
-    QnImageButtonWidget *fishEyeButton = new QnImageButtonWidget();
-    fishEyeButton->setIcon(qnSkin->icon("item/fisheye.png"));
-    fishEyeButton->setCheckable(true);
-    fishEyeButton->setProperty(Qn::NoBlockMotionSelection, true);
-    fishEyeButton->setToolTip(tr("Dewarping"));
-    fishEyeButton->setChecked(item->dewarpingParams().enabled);
-    setHelpTopic(fishEyeButton, Qn::MainWindow_MediaItem_Dewarping_Help);
-    connect(fishEyeButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_fishEyeButton_toggled);
+    {
+        QnImageButtonWidget *fishEyeButton = new QnImageButtonWidget();
+        fishEyeButton->setIcon(qnSkin->icon("item/fisheye.png"));
+        fishEyeButton->setCheckable(true);
+        fishEyeButton->setProperty(Qn::NoBlockMotionSelection, true);
+        fishEyeButton->setToolTip(tr("Dewarping"));
+        fishEyeButton->setChecked(item->dewarpingParams().enabled);
+        setHelpTopic(fishEyeButton, Qn::MainWindow_MediaItem_Dewarping_Help);
+        connect(fishEyeButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_fishEyeButton_toggled);
+        buttonBar()->addButton(FishEyeButton, fishEyeButton);
+    }
 
-    QnImageButtonWidget *zoomWindowButton = new QnImageButtonWidget();
-    zoomWindowButton->setIcon(qnSkin->icon("item/zoom_window.png"));
-    zoomWindowButton->setCheckable(true);
-    zoomWindowButton->setProperty(Qn::NoBlockMotionSelection, true);
-    zoomWindowButton->setToolTip(tr("Create Zoom Window"));
-    setHelpTopic(zoomWindowButton, Qn::MainWindow_MediaItem_ZoomWindows_Help);
-    connect(zoomWindowButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_zoomWindowButton_toggled);
+    {
+        QnImageButtonWidget *zoomWindowButton = new QnImageButtonWidget();
+        zoomWindowButton->setIcon(qnSkin->icon("item/zoom_window.png"));
+        zoomWindowButton->setCheckable(true);
+        zoomWindowButton->setProperty(Qn::NoBlockMotionSelection, true);
+        zoomWindowButton->setToolTip(tr("Create Zoom Window"));
+        setHelpTopic(zoomWindowButton, Qn::MainWindow_MediaItem_ZoomWindows_Help);
+        connect(zoomWindowButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_zoomWindowButton_toggled);
+        buttonBar()->addButton(ZoomWindowButton, zoomWindowButton);
+    }
 
-    QnImageButtonWidget *enhancementButton = new QnImageButtonWidget();
-    enhancementButton->setIcon(qnSkin->icon("item/image_enhancement.png"));
-    enhancementButton->setCheckable(true);
-    enhancementButton->setProperty(Qn::NoBlockMotionSelection, true);
-    enhancementButton->setToolTip(tr("Image Enhancement"));
-    enhancementButton->setChecked(item->imageEnhancement().enabled);
-    setHelpTopic(enhancementButton, Qn::MainWindow_MediaItem_ImageEnhancement_Help);
-    connect(enhancementButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_histogramButton_toggled);
+    {
+        QnImageButtonWidget *enhancementButton = new QnImageButtonWidget();
+        enhancementButton->setIcon(qnSkin->icon("item/image_enhancement.png"));
+        enhancementButton->setCheckable(true);
+        enhancementButton->setProperty(Qn::NoBlockMotionSelection, true);
+        enhancementButton->setToolTip(tr("Image Enhancement"));
+        enhancementButton->setChecked(item->imageEnhancement().enabled);
+        setHelpTopic(enhancementButton, Qn::MainWindow_MediaItem_ImageEnhancement_Help);
+        connect(enhancementButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_histogramButton_toggled);
+        buttonBar()->addButton(EnhancementButton, enhancementButton);
+    }
 
-    buttonBar()->addButton(ScreenshotButton,    screenshotButton);
-    buttonBar()->addButton(MotionSearchButton,  searchButton);
-    buttonBar()->addButton(PtzButton,           ptzButton);
-    buttonBar()->addButton(FishEyeButton,       fishEyeButton);
-    buttonBar()->addButton(ZoomWindowButton,    zoomWindowButton);
-    buttonBar()->addButton(EnhancementButton,   enhancementButton);
+    if (qnSettings->isDevMode()) {
+        QnImageButtonWidget *debugScreenshotButton = new QnImageButtonWidget();
+        debugScreenshotButton->setIcon(qnSkin->icon("item/screenshot.png"));
+        debugScreenshotButton->setCheckable(false);
+        debugScreenshotButton->setProperty(Qn::NoBlockMotionSelection, true);
+        debugScreenshotButton->setToolTip(lit("Debug set of screenshots"));
+        connect(debugScreenshotButton, &QnImageButtonWidget::clicked, this, [this] {
+            menu()->trigger(Qn::TakeScreenshotAction, QnActionParameters(this).withArgument<QString>(Qn::FileNameRole, lit("_DEBUG_SCREENSHOT_KEY_")));
+        });
+        buttonBar()->addButton(DbgScreenshotButton, debugScreenshotButton);
+    }
 
     if(m_camera) {
         QTimer *timer = new QTimer(this);
@@ -254,8 +278,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(context->instance<QnWorkbenchRenderWatcher>(), &QnWorkbenchRenderWatcher::widgetChanged, this, &QnMediaResourceWidget::at_renderWatcher_widgetChanged);
 
     at_camDisplay_liveChanged();
-    at_ptzButton_toggled(ptzButton->isChecked());
-    at_histogramButton_toggled(enhancementButton->isChecked());
+    at_ptzButton_toggled(false);
+    at_histogramButton_toggled(item->imageEnhancement().enabled);
     updateButtonsVisibility();
     updateIconButton();
 
@@ -769,6 +793,28 @@ void QnMediaResourceWidget::setDewarpingParams(const QnMediaDewarpingParams &par
     emit dewarpingParamsChanged();
 }
 
+float QnMediaResourceWidget::visualAspectRatio() const {
+    if (!resource())
+        return base_type::visualAspectRatio();
+
+    float customAspectRatio = QnResourceWidget::resource()->getProperty(QnMediaResource::customAspectRatioKey()).toFloat();
+    if (qFuzzyIsNull(customAspectRatio))
+        return base_type::visualAspectRatio();
+
+    qreal aspectRatio = customAspectRatio * QnGeometry::aspectRatio(channelLayout()->size());
+    return QnAspectRatio::isRotated90(rotation()) ? 1 / aspectRatio : aspectRatio;
+}
+
+float QnMediaResourceWidget::defaultVisualAspectRatio() const {
+    if (!item())
+        return base_type::defaultVisualAspectRatio();
+
+    if (item()->layout() && item()->layout()->hasCellAspectRatio())
+        return item()->layout()->cellAspectRatio();
+
+    return qnGlobals->defaultLayoutCellAspectRatio();
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -920,6 +966,9 @@ QString QnMediaResourceWidget::calculateTitleText() const {
 
 QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() const {
     Buttons result = base_type::calculateButtonsVisibility();
+
+    if (qnSettings->isDevMode())
+        result |= DbgScreenshotButton;
 
     if(!(resource()->toResource()->flags() & Qn::still_image))
         result |= ScreenshotButton;

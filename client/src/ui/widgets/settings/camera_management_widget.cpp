@@ -1,10 +1,11 @@
 #include "camera_management_widget.h"
 #include "ui_camera_management_widget.h"
 
+#include <api/global_settings.h>
+
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-
-#include <api/global_settings.h>
+#include <ui/style/warning_style.h>
 
 QnCameraManagementWidget::QnCameraManagementWidget(QWidget *parent):
     QnAbstractPreferencesWidget(parent),
@@ -13,8 +14,12 @@ QnCameraManagementWidget::QnCameraManagementWidget(QWidget *parent):
     ui->setupUi(this);
 
     setHelpTopic(ui->autoDiscoveryCheckBox, Qn::SystemSettings_Server_CameraAutoDiscovery_Help);
+    setWarningStyle(ui->settingsWarningLabel);
 
-    connect(ui->autoDiscoveryCheckBox,    SIGNAL(clicked()),                      this,   SLOT(at_autoDiscoveryCheckBox_clicked()));
+    connect(ui->autoDiscoveryCheckBox,  &QCheckBox::clicked,  this,  &QnCameraManagementWidget::at_autoDiscoveryCheckBox_clicked);
+    connect(ui->autoSettingsCheckBox,   &QCheckBox::clicked,  this,  [this]{
+        ui->settingsWarningLabel->setVisible(!ui->autoSettingsCheckBox->isChecked());
+    });
 }
 
 QnCameraManagementWidget::~QnCameraManagementWidget() {
@@ -41,6 +46,7 @@ void QnCameraManagementWidget::updateFromSettings() {
         ui->autoDiscoveryCheckBox->setCheckState(Qt::CheckState::PartiallyChecked);
 
     ui->autoSettingsCheckBox->setChecked(settings->isCameraSettingsOptimizationEnabled());
+    ui->settingsWarningLabel->setVisible(false);
 }
 
 void QnCameraManagementWidget::submitToSettings() {
@@ -52,6 +58,7 @@ void QnCameraManagementWidget::submitToSettings() {
         settings->setDisabledVendors(lit("all=partial"));
 
     settings->setCameraSettingsOptimizationEnabled(ui->autoSettingsCheckBox->isChecked());
+    ui->settingsWarningLabel->setVisible(false);
 }
 
 bool QnCameraManagementWidget::hasChanges() const  {

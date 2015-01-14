@@ -19,19 +19,27 @@ class QnZipExtractor;
 class QnServerUpdateTool : public QObject, public Singleton<QnServerUpdateTool> {
     Q_OBJECT
 public:
+    enum ReplyCode {
+        NoReply = -1,
+        UploadFinished = -2,
+        NoError = -3,
+        UnknownError = -4,
+        NoFreeSpace = -5
+    };
+
     QnServerUpdateTool();
     ~QnServerUpdateTool();
 
     bool addUpdateFile(const QString &updateId, const QByteArray &data);
-    void addUpdateFileChunk(const QString &updateId, const QByteArray &data, qint64 offset);
+    qint64 addUpdateFileChunkSync(const QString &updateId, const QByteArray &data, qint64 offset);
+    void addUpdateFileChunkAsync(const QString &updateId, const QByteArray &data, qint64 offset);
     bool installUpdate(const QString &updateId);
 
 private:
-    bool processUpdate(const QString &updateId, QIODevice *ioDevice, bool sync = false);
+    qint64 addUpdateFileChunkInternal(const QString &updateId, const QByteArray &data, qint64 offset);
+    ReplyCode processUpdate(const QString &updateId, QIODevice *ioDevice, bool sync);
     void sendReply(int code);
-    void addChunk(qint64 offset, int m_length);
-    bool isComplete() const;
-    void clearUpdatesLocation();
+    void clearUpdatesLocation(const QString &idToLeave = QString());
 
 private slots:
     void at_zipExtractor_extractionFinished(int error);
@@ -42,8 +50,7 @@ private:
     QString m_updateId;
     QScopedPointer<QFile> m_file;
 
-    qint64 m_length;
-    QMap<qint64, int> m_chunks;
+    QByteArray m_fileMd5;
     qint64 m_replyTime;
 
     QSet<QString> m_bannedUpdates;
