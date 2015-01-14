@@ -598,7 +598,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     if (forcedAR && getProperty(QnMediaResource::customAspectRatioKey()).isEmpty() && m_primaryResolution.height() > 0) 
     {
         qreal ar = m_primaryResolution.width() / (qreal) m_primaryResolution.height();
-        setProperty(QnMediaResource::customAspectRatioKey(), QString::number(ar));
+        setCustomAspectRatio(ar);
     }
     saveParams();
 

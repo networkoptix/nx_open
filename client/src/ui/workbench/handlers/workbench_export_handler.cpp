@@ -245,7 +245,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     QnItemDewarpingParams dewarpingParams = itemData.dewarpingParams;
     int rotation = itemData.rotation;
     QRectF zoomRect = itemData.zoomRect;
-    qreal customAr = widget->resource()->toResource()->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
+    qreal customAr = widget->resource()->customAspectRatio();
 
     int timeOffset = 0;
     if (qnSettings->timeMode() == Qn::ServerTimeMode) {
