@@ -189,7 +189,7 @@ class QnMain;
 static QnMain* serviceMainInstance = 0;
 void stopServer(int signal);
 bool restartFlag = false;
-void restartServer();
+void restartServer(int restartTimeout);
 
 namespace {
     const QString YES = lit("yes");
@@ -827,7 +827,7 @@ QnMain::~QnMain()
 
 void QnMain::at_restartServerRequired()
 {
-    restartServer();
+    restartServer(500);
 }
 
 void QnMain::at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender)
@@ -835,7 +835,7 @@ void QnMain::at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender)
     MSSettings::roSettings()->setValue(SYSTEM_IDENTITY_TIME, value);
     if (sender != qnCommon->moduleGUID()) {
         MSSettings::roSettings()->setValue(REMOVE_DB_PARAM_NAME, "1");
-        restartServer();
+        restartServer(0);
     }
 }
 
@@ -2178,12 +2178,12 @@ void stopServer(int /*signal*/)
     }
 }
 
-void restartServer()
+void restartServer(int restartTimeout)
 {
     restartFlag = true;
     if (serviceMainInstance) {
         qWarning() << "restart requested!";
-        QTimer::singleShot(0, serviceMainInstance, SLOT(stopAsync()));
+        QTimer::singleShot(restartTimeout, serviceMainInstance, SLOT(stopAsync()));
     }
 }
 

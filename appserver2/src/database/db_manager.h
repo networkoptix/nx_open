@@ -527,6 +527,7 @@ namespace ec2
         bool m_needResyncLicenses;
         bool m_needResyncFiles;
         bool m_dbJustCreated;
+        bool m_isBackupRestore;
     };
 };
 
