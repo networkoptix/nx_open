@@ -1,17 +1,41 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('mediaserver', function ($http, $modal) {
+    .factory('mediaserver', function ($http, $modal, $cookies) {
 
         var cacheModuleInfo = null;
         var cacheCurrentUser = null;
+
+        $cookies.Authorization = 'Digest';
+        $cookies.response = null;
 
         function getSettings(){
             return $http.get('/api/moduleInformation?salt=' + (new Date()).getTime());
         }
 
         var offlineDialog = null;
-        function offlineHandler(){
+        var loginDialog = null;
+        function offlineHandler(error){
+
+            console.log(error);
+
+            // Check 401 against offline
+
+            if(error.status === 401) {
+                if (loginDialog === null) { //Dialog is not displayed
+                    loginDialog = $modal.open({
+                        templateUrl: '/views/login.html',
+                        controller: 'LoginCtrl',
+                        keyboard:false,
+                        backdrop:'static'
+                    });
+                    loginDialog.result.then(function () {
+                        loginDialog = null;
+                    });
+                }
+                return;
+            }
+
             //1. recheck
             cacheModuleInfo = null;
             if(offlineDialog === null) { //Dialog is not displayed
@@ -19,7 +43,9 @@ angular.module('webadminApp')
                     console.log(error);// if server can't handle moduleInformation - it's offline - show dialog alike restart
                     offlineDialog = $modal.open({
                         templateUrl: 'offline_modal',
-                        controller: 'OfflineCtrl'
+                        controller: 'OfflineCtrl',
+                        keyboard:false,
+                        backdrop:'static'
                     });
                     offlineDialog.result.then(function (info) {//Dialog closed - means server is online
                         offlineDialog = null;
@@ -76,10 +102,10 @@ angular.module('webadminApp')
             saveMediaServer: function(info){return wrapRequest($http.post('/ec2/saveMediaServer',info)); },
             statistics:function(url){
                 url = url || '';
-                return $http.get(url + '/api/statistics?sault=' + (new Date()).getTime() );
+                return wrapRequest($http.get(url + '/api/statistics?sault=' + (new Date()).getTime()));
             },
-            getCurrentUser:function(){
-                if(cacheCurrentUser === null){
+            getCurrentUser:function(forcereload){
+                if(cacheCurrentUser === null || forcereload){
                     cacheCurrentUser = wrapRequest($http.get('/api/getCurrentUser'));
                 }
                 return cacheCurrentUser;
@@ -104,12 +130,12 @@ angular.module('webadminApp')
                     serverUrl = '/proxy/'+ serverUrl + '/';
                 }
                 //RecordedTimePeriods
-                return $http.get(serverUrl + 'api/RecordedTimePeriods' +
+                return wrapRequest($http.get(serverUrl + 'api/RecordedTimePeriods' +
                     '?physicalId=' + physicalId +
                     '&startTime=' + startTime +
                     '&endTime=' + endTime +
                     '&detail=' + detail +
-                    '&periodsType=' + periodsType);
+                    '&periodsType=' + periodsType));
             }
         };
     });
