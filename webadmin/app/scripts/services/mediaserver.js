@@ -1,17 +1,38 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('mediaserver', function ($http, $modal) {
+    .factory('mediaserver', function ($http, $modal, $cookies) {
 
         var cacheModuleInfo = null;
         var cacheCurrentUser = null;
+
+        $cookies.Authorization = 'Digest';
 
         function getSettings(){
             return $http.get('/api/moduleInformation?salt=' + (new Date()).getTime());
         }
 
         var offlineDialog = null;
-        function offlineHandler(){
+        var loginDialog = null;
+        function offlineHandler(error){
+
+            console.log(error);
+
+            // Check 401 against offline
+
+            if(error.status === 401) {
+                if (loginDialog === null) { //Dialog is not displayed
+                    loginDialog = $modal.open({
+                        templateUrl: '/views/login.html',
+                        controller: 'LoginCtrl'
+                    });
+                    loginDialog.result.then(function () {
+                        loginDialog = null;
+                    });
+                }
+                return;
+            }
+
             //1. recheck
             cacheModuleInfo = null;
             if(offlineDialog === null) { //Dialog is not displayed
@@ -78,8 +99,8 @@ angular.module('webadminApp')
                 url = url || '';
                 return $http.get(url + '/api/statistics?sault=' + (new Date()).getTime() );
             },
-            getCurrentUser:function(){
-                if(cacheCurrentUser === null){
+            getCurrentUser:function(forcereload){
+                if(cacheCurrentUser === null || forcereload){
                     cacheCurrentUser = wrapRequest($http.get('/api/getCurrentUser'));
                 }
                 return cacheCurrentUser;
