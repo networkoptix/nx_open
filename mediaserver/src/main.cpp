@@ -878,7 +878,7 @@ void QnMain::updateDisabledVendorsIfNeeded()
     if (!admin)
         return;
 
-    if (!admin->hasProperty(DV_PROPERTY)) {
+    if (!disabledVendors.isNull()) {
         QnGlobalSettings* settings = QnGlobalSettings::instance();
         settings->setDisabledVendors(disabledVendors);
         MSSettings::roSettings()->remove(DV_PROPERTY);
