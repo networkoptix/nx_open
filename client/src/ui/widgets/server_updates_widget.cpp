@@ -328,7 +328,7 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
                 }
 
                 if (unholdConnection)
-                    static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance())->setHoldConnection(false);
+                    qnClientMessageProcessor->setHoldConnection(false);
             }
             break;
         case QnUpdateResult::Cancelled:

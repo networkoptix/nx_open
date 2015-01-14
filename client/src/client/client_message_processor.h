@@ -21,6 +21,7 @@ public:
 
     void setHoldConnection(bool holdConnection);
 
+    QnConnectionState connectionState() const;
 protected:
     virtual void connectToConnection(const ec2::AbstractECConnectionPtr &connection) override;
     virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) override;
@@ -42,5 +43,7 @@ private:
     bool m_connected;
     bool m_holdConnection;
 };
+
+#define qnClientMessageProcessor static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance())
 
 #endif // _client_event_manager_h

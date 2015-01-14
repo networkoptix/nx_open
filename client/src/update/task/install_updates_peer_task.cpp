@@ -50,7 +50,7 @@ void QnInstallUpdatesPeerTask::finish(int errorCode) {
     m_ecConnection.reset();
     /* There's no need to unhold connection now if we can't connect to the server */
     if (!m_protoProblemDetected)
-        static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance())->setHoldConnection(false);
+        qnClientMessageProcessor->setHoldConnection(false);
     QnNetworkPeerTask::finish(errorCode);
 }
 
@@ -67,7 +67,7 @@ void QnInstallUpdatesPeerTask::doStart() {
     m_stoppingPeers = m_restartingPeers = m_pendingPeers = peers();
 
     m_protoProblemDetected = false;
-    static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance())->setHoldConnection(true);
+    qnClientMessageProcessor->setHoldConnection(true);
 
     connection2()->getUpdatesManager()->installUpdate(m_updateId, m_pendingPeers,
                                                       this, [this](int, ec2::ErrorCode){});
