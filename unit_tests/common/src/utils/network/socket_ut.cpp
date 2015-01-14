@@ -22,7 +22,7 @@ namespace
 TEST( SocketAsyncModeTest, AsyncOperationCancellation )
 {
     static const int TEST_DURATION_SECONDS = 2;
-    static const int TEST_RUNS = 50000;
+    static const int TEST_RUNS = 5;
 
     for( int i = 0; i < TEST_RUNS; ++i )
     {
