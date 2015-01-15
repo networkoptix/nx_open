@@ -455,6 +455,8 @@ namespace aio
                 if( handlingData->timeout > 0 )
                     handlingData->updatedPeriodicTaskClock = curClock + handlingData->timeout;
                 --handlingData->beingProcessed;
+                //NOTE element, this iterator points to, could be removed in eventTriggered call, 
+                    //but it is still safe to increment this iterator
                 ++it;
             }
         }

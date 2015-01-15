@@ -25,9 +25,11 @@ public:
         m_maxSimultaneousRequestsCount( 100 ),
         m_maxRequestsToPerform( 1000*1000 )
     {
-        m_requestUrl = QUrl( lit("http://127.0.0.1:7001/ec2/getCamerasEx") );
-        m_requestUrl.setUserName( lit("admin") );
-        m_requestUrl.setPassword( lit("123") );
+    }
+
+    void setUrl( const QUrl& url )
+    {
+        m_requestUrl = url;
     }
 
     void setMaxRequestsToPerform( int maxRequestsToPerform )
@@ -50,6 +52,7 @@ public:
             connect( newClient.get(), &nx_http::AsyncHttpClient::done, 
                      this, &RequestsGenerator::startAnotherClient,
                      Qt::DirectConnection );
+            newClient->setResponseReadTimeoutMs( 60*1000 );
             if( newClient->doGet( getUrl() ) )
             {
                 ++m_requestsStarted;
@@ -107,9 +110,15 @@ private:
 #if 0
 TEST( Ec2APITest, randomGet )
 {
+    //QUrl requestUrl( lit("http://127.0.0.1:7001/ec2/getCamerasEx") );
+    QUrl requestUrl( lit("http://127.0.0.1:7001/ec2/getMediaServersEx") );
+    //QUrl requestUrl( lit("http://192.168.0.71:7001/ec2/getMediaServersEx") );
+    requestUrl.setUserName( lit("admin") );
+    requestUrl.setPassword( lit("123") );
     RequestsGenerator reqGen;
-    reqGen.setMaxRequestsToPerform( 10*1000 );
-    reqGen.setMaxSimultaneousRequestsCount( 100 );
+    reqGen.setUrl( requestUrl );
+    reqGen.setMaxRequestsToPerform( 700 );
+    reqGen.setMaxSimultaneousRequestsCount( 30 );
     reqGen.start();
     reqGen.wait();
 }

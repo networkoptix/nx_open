@@ -50,6 +50,10 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
     QnCommonMessageProcessor::init(connection);
 }
 
+QnConnectionState QnClientMessageProcessor::connectionState() const {
+    return m_status.state();
+}
+
 void QnClientMessageProcessor::setHoldConnection(bool holdConnection) {
     if (m_holdConnection == holdConnection)
         return;

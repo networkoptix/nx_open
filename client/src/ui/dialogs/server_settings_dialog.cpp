@@ -132,6 +132,9 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
 
     setWarningStyle(ui->failoverWarningLabel);
 
+    /* Edge servers cannot be renamed. */
+    ui->nameLineEdit->setReadOnly(QnMediaServerResource::isEdgeServer(server));
+
     m_removeAction = new QAction(tr("Remove Storage"), this);
 
     QnSingleEventSignalizer *signalizer = new QnSingleEventSignalizer(this);

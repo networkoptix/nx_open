@@ -17,6 +17,7 @@
 #include <core/resource/file_processor.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/media_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <transcoding/filters/contrast_image_filter.h>
@@ -42,13 +43,6 @@
 #include "transcoding/filters/filter_helper.h"
 #include "transcoding/filters/abstract_image_filter.h"
 
-//#define QN_SCREENSHOT_DEBUG
-#ifdef QN_SCREENSHOT_DEBUG
-#   define TRACE(...) qDebug() << __VA_ARGS__
-#else
-#   define TRACE(...)
-#endif
-
 namespace {
     const int showProgressDelay = 1500; // 1.5 sec
     const int minProgressDisplayTime = 1000; // 1 sec
@@ -68,7 +62,7 @@ QString QnScreenshotParameters::timeString() const {
     if (time == latestScreenshotTime)
         return QDateTime::currentDateTime().toString(lit("hh.mm.ss"));
 
-    qint64 timeMSecs = time / 1000;
+    qint64 timeMSecs = adjustedTime / 1000;
     if (isUtc)
         return datetimeSaveDialogSuggestion(QDateTime::fromMSecsSinceEpoch(timeMSecs));
     return QTime(0, 0, 0, 0).addMSecs(timeMSecs).toString(lit("hh.mm.ss"));
@@ -147,8 +141,6 @@ QnWorkbenchScreenshotHandler::QnWorkbenchScreenshotHandler(QObject *parent):
 QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMediaResourceWidget *widget, const QnScreenshotParameters &parameters) const {
     QnResourceDisplayPtr display = widget->display();
 
-    TRACE("SCREENSHOT DEWARPING" << parameters.itemDewarpingParams.enabled << parameters.itemDewarpingParams.xAngle << parameters.itemDewarpingParams.yAngle << parameters.itemDewarpingParams.fov);
-
     QnConstResourceVideoLayoutPtr layout = display->videoLayout();
     bool anyQuality = layout->channelCount() > 1;   // screenshots for panoramic cameras will be done locally
 
@@ -175,15 +167,15 @@ QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMedi
     return new QnBasicImageProvider(screenshot);
 }
 
-qint64 QnWorkbenchScreenshotHandler::screenshotTime(QnMediaResourceWidget *widget) {
+qint64 QnWorkbenchScreenshotHandler::screenshotTime(QnMediaResourceWidget *widget, bool adjust) {
     QnResourceDisplayPtr display = widget->display();
-
-    if (display->camDisplay()->isRealTimeSource())
-        return latestScreenshotTime;
 
     qint64 time = display->camDisplay()->getCurrentTime();
     if (time == AV_NOPTS_VALUE)
         return latestScreenshotTime;
+
+    if (!adjust)
+        return time;
 
     bool isUtc = widget->resource()->toResource()->flags() & Qn::utc;
     qint64 localOffset = 0;
@@ -275,6 +267,7 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
     {       
         parameters.time = screenshotTime(widget);
         parameters.isUtc = widget->resource()->toResource()->flags() & Qn::utc;
+        parameters.adjustedTime = screenshotTime(widget, true);
         Key timeKey(keyStack, lit("_") + parameters.timeString());
        
         parameters.itemDewarpingParams = widget->item()->dewarpingParams();
@@ -346,6 +339,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     QnScreenshotParameters parameters;
     parameters.time = screenshotTime(widget);
     parameters.isUtc = widget->resource()->toResource()->flags() & Qn::utc;
+    parameters.adjustedTime = screenshotTime(widget, true);
     parameters.filename = filename;
     parameters.timestampPosition = qnSettings->timestampCorner();
     parameters.itemDewarpingParams = widget->item()->dewarpingParams();
@@ -581,7 +575,8 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
         localParameters.customAspectRatio = 0.0;
         localParameters.rotationAngle = 0;
     } else {
-        imageProvider = QnSingleThumbnailLoader::newInstance(widget->resource()->toResourcePtr(), localParameters.time, 0);
+        QnVirtualCameraResourcePtr camera = widget->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
+        imageProvider = QnSingleThumbnailLoader::newInstance(camera, localParameters.time, 0);
     }
 
     QnScreenshotLoader* loader = new QnScreenshotLoader(localParameters, this);

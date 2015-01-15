@@ -39,7 +39,6 @@ namespace ec2
     int QnTimeManager<QueryProcessorType>::getCurrentTimeImpl( impl::CurrentTimeHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
         QnConcurrent::run(
             Ec2ThreadPool::instance(),
             std::bind( &impl::CurrentTimeHandler::done, handler, reqID, ec2::ErrorCode::ok, TimeSynchronizationManager::instance()->getSyncTime() ) );

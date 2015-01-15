@@ -60,6 +60,7 @@ public:
     void setMotionIODevice(QSharedPointer<QBuffer>, int channel);
     QSharedPointer<QBuffer> motionIODevice(int channel);
 
+    //TODO: #GDM Refactor parameter set to the structure
     void exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName, const QString& format, 
                                  QnStorageResourcePtr storage = QnStorageResourcePtr(), QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport, 
                                  Qn::Corner timestamps = Qn::NoCorner,

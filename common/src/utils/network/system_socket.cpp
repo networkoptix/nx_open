@@ -602,7 +602,7 @@ CommunicatingSocket::~CommunicatingSocket()
 
 void CommunicatingSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
 {
-    m_aioHelper->terminateAsyncIO();
+    m_aioHelper->terminateAsyncIO();    //all futher async operations will be ignored
     m_aioHelper->cancelAsyncIO( aio::etNone, waitForRunningHandlerCompletion );
 }
 

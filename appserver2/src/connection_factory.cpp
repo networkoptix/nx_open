@@ -299,7 +299,6 @@ namespace ec2
                 m_directConnection.reset( new Ec2DirectConnection( &m_serverQueryProcessor, m_resCtx, connectionInfo, url ) );
             }
         }
-        QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
         QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( &impl::ConnectHandler::done, handler, reqID, ec2::ErrorCode::ok, m_directConnection ) );
         return reqID;
     }
@@ -415,7 +414,6 @@ namespace ec2
         if( (errorCode != ErrorCode::ok) && (errorCode != ErrorCode::unauthorized) )
         {
             //checking for old EC
-            QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());
             QnConcurrent::run(
                 Ec2ThreadPool::instance(),
                 [this, ecURL, handler, reqID]() {
@@ -473,7 +471,6 @@ namespace ec2
         }
 
         //checking for old EC
-        QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());
         QnConcurrent::run(
             Ec2ThreadPool::instance(),
             [this, ecURL, handler, reqID]() {
@@ -502,7 +499,6 @@ namespace ec2
         const int reqID = generateRequestID();
         QnConnectionInfo connectionInfo;
         fillConnectionInfo( ApiLoginData(), &connectionInfo );
-        QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
         QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( &impl::TestConnectionHandler::done, handler, reqID, ec2::ErrorCode::ok, connectionInfo ) );
         return reqID;
     }

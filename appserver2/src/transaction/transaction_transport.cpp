@@ -53,7 +53,8 @@ QnTransactionTransport::QnTransactionTransport(const ApiPeerData &localPeer, con
     m_connected(false),
     m_prevGivenHandlerID(0),
     m_postedTranCount(0),
-    m_asyncReadScheduled(false)
+    m_asyncReadScheduled(false),
+    m_remoteIdentityTime(0)
 {
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_lastReceiveTimer.invalidate();
@@ -570,6 +571,9 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
 
     nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find("guid");
     nx_http::HttpHeaders::const_iterator itrRuntimeGuid = client->response()->headers.find("runtime-guid");
+    nx_http::HttpHeaders::const_iterator itrSystemIdentityTime = client->response()->headers.find("system-identity-time");
+    if (itrSystemIdentityTime != client->response()->headers.end())
+        setRemoteIdentityTime(itrSystemIdentityTime->second.toLongLong());
 
     if (itrGuid == client->response()->headers.end())
     {
@@ -798,6 +802,16 @@ bool QnTransactionTransport::sendSerializedTransaction(Qn::SerializationFormat s
     }
 
     return true;
+}
+
+void QnTransactionTransport::setRemoteIdentityTime(qint64 time)
+{
+    m_remoteIdentityTime = time;
+}
+
+qint64 QnTransactionTransport::remoteIdentityTime() const
+{
+    return m_remoteIdentityTime;
 }
 
 }

@@ -42,26 +42,26 @@ struct LicenseCompatibility
     Qn::LicenseType child;
 };
 
-/* Compatibility tree: Trial -> Edge -> Professional -> Analog -> (Edge, AnalogEncoder) */
+/* Compatibility tree: Trial -> Edge -> Professional -> Analog -> (VMAX, AnalogEncoder) */
 static std::array<LicenseCompatibility, 14> compatibleLicenseType =
 {
-    LicenseCompatibility(Qn::LC_Edge,    Qn::LC_Professional),
-    LicenseCompatibility(Qn::LC_Professional, Qn::LC_Analog),
-    LicenseCompatibility(Qn::LC_Edge,    Qn::LC_Analog),
+    LicenseCompatibility(Qn::LC_Analog,         Qn::LC_VMAX),
+    LicenseCompatibility(Qn::LC_Analog,         Qn::LC_AnalogEncoder),
 
-    LicenseCompatibility(Qn::LC_Analog,    Qn::LC_VMAX),
-    LicenseCompatibility(Qn::LC_Professional, Qn::LC_VMAX),
-    LicenseCompatibility(Qn::LC_Edge, Qn::LC_VMAX),
+    LicenseCompatibility(Qn::LC_Professional,   Qn::LC_Analog),
+    LicenseCompatibility(Qn::LC_Professional,   Qn::LC_VMAX),
+    LicenseCompatibility(Qn::LC_Professional,   Qn::LC_AnalogEncoder),
 
-    LicenseCompatibility(Qn::LC_Analog,    Qn::LC_AnalogEncoder),
-    LicenseCompatibility(Qn::LC_Professional, Qn::LC_AnalogEncoder),
-    LicenseCompatibility(Qn::LC_Edge, Qn::LC_AnalogEncoder),
+    LicenseCompatibility(Qn::LC_Edge,           Qn::LC_Professional),
+    LicenseCompatibility(Qn::LC_Edge,           Qn::LC_Analog),
+    LicenseCompatibility(Qn::LC_Edge,           Qn::LC_VMAX),
+    LicenseCompatibility(Qn::LC_Edge,           Qn::LC_AnalogEncoder),
 
-    LicenseCompatibility(Qn::LC_Trial,    Qn::LC_Edge),
-    LicenseCompatibility(Qn::LC_Trial,    Qn::LC_Professional),
-    LicenseCompatibility(Qn::LC_Trial,    Qn::LC_Analog),
-    LicenseCompatibility(Qn::LC_Trial,    Qn::LC_VMAX),
-    LicenseCompatibility(Qn::LC_Trial,    Qn::LC_AnalogEncoder)
+    LicenseCompatibility(Qn::LC_Trial,          Qn::LC_Edge),
+    LicenseCompatibility(Qn::LC_Trial,          Qn::LC_Professional),
+    LicenseCompatibility(Qn::LC_Trial,          Qn::LC_Analog),
+    LicenseCompatibility(Qn::LC_Trial,          Qn::LC_VMAX),
+    LicenseCompatibility(Qn::LC_Trial,          Qn::LC_AnalogEncoder)
 };
 
 /************************************************************************/

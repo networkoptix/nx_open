@@ -42,6 +42,7 @@
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/license_usage_helper.h>
+#include <utils/aspect_ratio.h>
 
 #include "client/client_settings.h"
 
@@ -136,9 +137,9 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->forceArCheckBox,        &QCheckBox::stateChanged,               this,   [this](int state){ ui->forceArComboBox->setEnabled(state == Qt::Checked);} );
     connect(ui->forceArCheckBox,        &QCheckBox::stateChanged,               this,   &QnSingleCameraSettingsWidget::at_dbDataChanged);
 
-    ui->forceArComboBox->addItem(tr("4:3"),  4.0 / 3);
-    ui->forceArComboBox->addItem(tr("16:9"), 16.0 / 9);
-    ui->forceArComboBox->addItem(tr("1:1"),  1.0);
+    ui->forceArComboBox->addItem(tr("4:3"),  4.0f / 3);
+    ui->forceArComboBox->addItem(tr("16:9"), 16.0f / 9);
+    ui->forceArComboBox->addItem(tr("1:1"),  1.0f);
     ui->forceArComboBox->setCurrentIndex(0);
     connect(ui->forceArComboBox,        QnComboboxCurrentIndexChanged,          this,   &QnSingleCameraSettingsWidget::at_dbDataChanged);
 
@@ -293,9 +294,9 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         }
 
         if (ui->forceArCheckBox->isChecked())
-            m_camera->setProperty(QnMediaResource::customAspectRatioKey(), QString::number(ui->forceArComboBox->currentData().toDouble()));
+            m_camera->setCustomAspectRatio(ui->forceArComboBox->currentData().toFloat());
         else
-            m_camera->setProperty(QnMediaResource::customAspectRatioKey(), QString());
+            m_camera->clearCustomAspectRatio();
 
         if(ui->forceRotationCheckBox->isChecked()) 
             m_camera->setProperty(QnMediaResource::rotationKey(), QString::number(ui->forceRotationComboBox->currentData().toInt()));
@@ -380,12 +381,12 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->analogGroupBox->setVisible(m_camera->isDtsBased());
         ui->analogViewCheckBox->setChecked(!m_camera->isScheduleDisabled());
 
-        QString arOverride = m_camera->getProperty(QnMediaResource::customAspectRatioKey());
-        ui->forceArCheckBox->setChecked(!arOverride.isEmpty());
-        if (!arOverride.isEmpty()) 
+        qreal arOverride = m_camera->customAspectRatio();
+        ui->forceArCheckBox->setChecked(!qFuzzyIsNull(arOverride));
+        if (!qFuzzyIsNull(arOverride)) 
         {
-            // float is important here
-            float ar = arOverride.toFloat();
+            /* Float is important here. */
+            float ar = QnAspectRatio::closestStandardRatio(arOverride).toFloat();
             int idx = -1;
             for (int i = 0; i < ui->forceArComboBox->count(); ++i) {
                 if (qFuzzyEquals(ar, ui->forceArComboBox->itemData(i).toFloat())) {
