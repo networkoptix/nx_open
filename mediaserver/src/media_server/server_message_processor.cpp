@@ -113,7 +113,7 @@ void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect( connection, &ec2::AbstractECConnection::remotePeerUnauthorized, this, &QnServerMessageProcessor::at_remotePeerUnauthorized );
 
     connect(connection->getMiscManager().get(), &ec2::AbstractMiscManager::systemNameChangeRequested,
-        this, [this](const QString &systemName) { changeSystemName(systemName); });
+        this, [this](const QString &systemName, qint64 sysIdTime) { changeSystemName(systemName, sysIdTime); });
 }
 
 void QnServerMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) {

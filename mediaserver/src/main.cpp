@@ -182,12 +182,14 @@ static const quint64 DEFAULT_MAX_LOG_FILE_SIZE = 10*1024*1024;
 static const quint64 DEFAULT_LOG_ARCHIVE_SIZE = 25;
 static const quint64 DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
+static const QString REMOVE_DB_PARAM_NAME(lit("removeDbOnStartup"));
+static const QByteArray SYSTEM_IDENTITY_TIME("sysIdTime");
 
 class QnMain;
 static QnMain* serviceMainInstance = 0;
 void stopServer(int signal);
 bool restartFlag = false;
-void restartServer();
+void restartServer(int restartTimeout);
 
 namespace {
     const QString YES = lit("yes");
@@ -769,6 +771,8 @@ void initAppServerConnection(QSettings &settings)
         if (!staticDBPath.isEmpty()) {
             params.addQueryItem("staticdb_path", staticDBPath);
 		}
+        if (MSSettings::roSettings()->value(REMOVE_DB_PARAM_NAME).toBool())
+            params.addQueryItem("cleanupDb", QString());
     }
 
     // TODO: Actually appserverPassword is always empty. Remove?
@@ -828,7 +832,16 @@ QnMain::~QnMain()
 
 void QnMain::at_restartServerRequired()
 {
-    restartServer();
+    restartServer(500);
+}
+
+void QnMain::at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender)
+{
+    MSSettings::roSettings()->setValue(SYSTEM_IDENTITY_TIME, value);
+    if (sender != qnCommon->moduleGUID()) {
+        MSSettings::roSettings()->setValue(REMOVE_DB_PARAM_NAME, "1");
+        restartServer(0);
+    }
 }
 
 void QnMain::stopSync()
@@ -1405,6 +1418,9 @@ void QnMain::run()
 
     qnCommon->setModuleGUID(serverGuid());
     qnCommon->setLocalSystemName(settings->value("systemName").toString());
+    qint64 systemIdentityTime = MSSettings::roSettings()->value(SYSTEM_IDENTITY_TIME).toLongLong();
+    qnCommon->setSystemIdentityTime(systemIdentityTime, qnCommon->moduleGUID());
+    connect(qnCommon, &QnCommonModule::systemIdentityTimeChanged, this, &QnMain::at_systemIdentityTimeChanged, Qt::QueuedConnection);
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory( Qn::PT_Server ));
 
@@ -1445,6 +1461,8 @@ void QnMain::run()
         NX_LOG( QString::fromLatin1("Can't connect to local EC2. %1").arg(ec2::toString(errorCode)), cl_logERROR );
         QnSleep::msleep(3000);
     }
+    MSSettings::roSettings()->setValue(REMOVE_DB_PARAM_NAME, "0");
+
     connect(ec2Connection.get(), &ec2::AbstractECConnection::databaseDumped, this, &QnMain::at_restartServerRequired);
     qnCommon->setRemoteGUID(QnUuid(connectInfo.ecsGuid));
     MSSettings::roSettings()->sync();
@@ -1945,6 +1963,7 @@ void QnMain::run()
     
     //disconnecting from EC2
     QnAppServerConnectionFactory::setEc2Connection( ec2::AbstractECConnectionPtr() );
+
     ec2Connection.reset();
     QnAppServerConnectionFactory::setEC2ConnectionFactory( nullptr );
     ec2ConnectionFactory.reset();
@@ -2166,12 +2185,12 @@ void stopServer(int /*signal*/)
     }
 }
 
-void restartServer()
+void restartServer(int restartTimeout)
 {
     restartFlag = true;
     if (serviceMainInstance) {
         qWarning() << "restart requested!";
-        QTimer::singleShot(0, serviceMainInstance, SLOT(stopAsync()));
+        QTimer::singleShot(restartTimeout, serviceMainInstance, SLOT(stopAsync()));
     }
 }
 

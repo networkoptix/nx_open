@@ -183,10 +183,7 @@ qreal QnMediaResource::customAspectRatio() const {
 }
 
 void QnMediaResource::setCustomAspectRatio(qreal value) {
-    if (qIsNaN(value) || qIsInf(value) || value < 0)
-        return;
-
-    if (qFuzzyEquals(value, noCustomAspectRatio))
+    if (qIsNaN(value) || qIsInf(value) || value < 0 || qFuzzyEquals(value, noCustomAspectRatio))
         clearCustomAspectRatio();
     else
         this->toResource()->setProperty(::customAspectRatioKey, QString::number(value));

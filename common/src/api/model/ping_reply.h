@@ -16,9 +16,11 @@ class QnPingReply
 {
 public:
     QnUuid moduleGuid;
+    QString systemName;
+    qint64 sysIdTime;
 };
 
-#define QnPingReply_Fields (moduleGuid)
+#define QnPingReply_Fields (moduleGuid)(systemName)(sysIdTime)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnPingReply, (json))
 
