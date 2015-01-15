@@ -170,6 +170,9 @@ bool QnStorageDb::createDatabase()
 
     }
 
+    if (!applyUpdates(":/updates"))
+        return false;
+
     tran.commit();
 
     m_lastTranTime.restart();
