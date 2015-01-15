@@ -39,7 +39,7 @@ fi
 PORT_DEFAULT="7001"
 TRANSPORT_DEAULT="auto"
 PUBLIC_IP_ENABLED_DEFAULT="auto"
-ALLOW_CAMERA_CHANGES_DEFAULT=true
+CAMERA_SETTINGS_OPTIMIZATION_DEFAULT=true
 
 function is_local_addr {
     local hostname=$1;
@@ -180,11 +180,11 @@ case "$1" in
             SYSTEM_NAME=$(ask_for_value systemName "$SYSTEM_NAME")
             $CFG_HELPER systemName "$SYSTEM_NAME"
 
-            ALLOW_CAMERA_CHANGES="$($CFG_HELPER allowCameraChanges)"
-            [ -z "$ALLOW_CAMERA_CHANGES" ] && ALLOW_CAMERA_CHANGES=$($EC_CFG_HELPER allowCameraChanges)
-            [ -z "$ALLOW_CAMERA_CHANGES" ] && ALLOW_CAMERA_CHANGES=$ALLOW_CAMERA_CHANGES_DEFAULT
-            ALLOW_CAMERA_CHANGES=$(ask_for_value allowCameraChanges "$ALLOW_CAMERA_CHANGES")
-            $CFG_HELPER allowCameraChanges "$ALLOW_CAMERA_CHANGES"
+            CAMERA_SETTINGS_OPTIMIZATION="$($CFG_HELPER cameraSettingsOptimization)"
+            [ -z "$CAMERA_SETTINGS_OPTIMIZATION" ] && CAMERA_SETTINGS_OPTIMIZATION=$($EC_CFG_HELPER allowCameraChanges)
+            [ -z "$CAMERA_SETTINGS_OPTIMIZATION" ] && CAMERA_SETTINGS_OPTIMIZATION=$CAMERA_SETTINGS_OPTIMIZATION_DEFAULT
+            CAMERA_SETTINGS_OPTIMIZATION=$(ask_for_value cameraSettingsOptimization "$CAMERA_SETTINGS_OPTIMIZATION")
+            $CFG_HELPER cameraSettingsOptimization "$CAMERA_SETTINGS_OPTIMIZATION"
         else
             PORT="$($CFG_HELPER port)"
             [ -z "$PORT" ] && PORT="$($EC_CFG_HELPER port)"
@@ -194,10 +194,10 @@ case "$1" in
             SYSTEM_NAME="$($CFG_HELPER systemName)"
             [ -z "$SYSTEM_NAME" ] && $CFG_HELPER systemName "$SYSTEM_NAME_DEFAULT"
 
-            ALLOW_CAMERA_CHANGES="$($CFG_HELPER allowCameraChanges)"
-            [ -z "$ALLOW_CAMERA_CHANGES" ] && ALLOW_CAMERA_CHANGES=$($EC_CFG_HELPER allowCameraChanges)
-            [ -z "$ALLOW_CAMERA_CHANGES" ] && ALLOW_CAMERA_CHANGES=$ALLOW_CAMERA_CHANGES_DEFAULT
-            $CFG_HELPER allowCameraChanges "$ALLOW_CAMERA_CHANGES"
+            CAMERA_SETTINGS_OPTIMIZATION="$($CFG_HELPER allowCameraChanges)"
+            [ -z "$CAMERA_SETTINGS_OPTIMIZATION" ] && CAMERA_SETTINGS_OPTIMIZATION=$($EC_CFG_HELPER allowCameraChanges)
+            [ -z "$CAMERA_SETTINGS_OPTIMIZATION" ] && CAMERA_SETTINGS_OPTIMIZATION=$CAMERA_SETTINGS_OPTIMIZATION_DEFAULT
+            $CFG_HELPER allowCameraChanges "$CAMERA_SETTINGS_OPTIMIZATION"
         fi
 
         "$CERTGEN" -i
