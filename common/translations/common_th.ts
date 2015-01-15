@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.0" language="th" sourcelanguage="en">
 <context>
@@ -7,7 +7,7 @@
         <location filename="../src/translation/translation_manager.cpp" line="153"/>
         <source>Language Name</source>
         <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-        <translation type="unfinished">ภาษาไทย</translation>
+        <translation>ภาษาไทย</translation>
     </message>
     <message>
         <location filename="../src/translation/translation_manager.cpp" line="156"/>

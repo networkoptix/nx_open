@@ -426,7 +426,7 @@ protected slots:
     void at_mapper_cellSizeChanged();
     void at_mapper_spacingChanged();
 
-    void at_loader_thumbnailLoaded(const QnThumbnail &thumbnail);
+    void at_previewSearch_thumbnailLoaded(const QnThumbnail &thumbnail);
 
     void at_notificationsHandler_businessActionAdded(const QnAbstractBusinessActionPtr &businessAction);
     void at_notificationTimer_timeout(const QVariant &resource, const QVariant &type);

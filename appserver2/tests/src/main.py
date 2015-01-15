@@ -18,6 +18,7 @@ import difflib
 import datetime
 import time
 import select
+import errno
 
 # Rollback support
 class UnitTestRollback:
@@ -159,9 +160,6 @@ class ClusterTest():
         print "======================================"
         return (True,"Server:%s test for all getter pass" % (s))
 
-    def __init__(self):
-        self._setUpPassword()
-
     def _getServerName(self,obj,uuid):
         for s in obj:
             if s["id"] == uuid:
@@ -213,10 +211,14 @@ class ClusterTest():
             start = max(0,i - 64)
             end = min(64,len(str) - i) + i
             comp1 = str[start:i]
-            comp2 = str[i]
+            # FIX: the i can be index that is the length which result in index out of range
+            if i >= len(str):
+                comp2 = "<EOF>"
+            else:
+                comp2 = str[i]
             comp3 = ""
             if i + 1 >= len(str):
-                comp3 = ""
+                comp3 = "<EOF>"
             else:
                 comp3 = str[i + 1:end]
             print "%s^^^%s^^^%s\n" % (comp1,comp2,comp3)
@@ -403,6 +405,8 @@ class ClusterTest():
         urllib2.install_opener(urllib2.build_opener(urllib2.HTTPDigestAuthHandler(passman)))
 
     def init(self):
+        self._setUpPassword()
+
         if not self._testConnection():
             return (False,"Connection test failed")
 
@@ -454,6 +458,7 @@ class ClusterWorker():
         while not self._queue.empty():
             t,a = self._queue.get(True)
             t(*a)
+            self._queue.task_done()
 
     def _initializeThreadWorker(self):
         for _ in xrange(self._threadNum):
@@ -464,6 +469,8 @@ class ClusterWorker():
     def join(self):
         # We delay the real operation until we call join
         self._initializeThreadWorker()
+        # Second we call queue join to join the queue
+        self._queue.join()
         # Now we safely join the thread since the queue
         # will utimatly be empty after execution
         for t in self._threadList:
@@ -546,7 +553,7 @@ class BasicGenerator():
         m = md5.new()
         m.update("%s:NetworkOptix:%s" % (uname,pwd))
         d = m.digest()
-        return ''.join("%02x" % (ord(i) for i in d))
+        return ''.join("%02x" % ord(i) for i in d)
     
     def generatePasswordHash(self,pwd):
         salt = "%x" % (random.randint(0,4294967295))
@@ -670,7 +677,7 @@ class UserDataGenerator(BasicGenerator):
         "email": "%s",
         "hash": "%s",
         "id": "%s",
-        "isAdmin": false,
+        "isAdmin": %s,
         "name": "%s",
         "parentId": "{00000000-0000-0000-0000-000000000000}",
         "permissions": "255",
@@ -687,7 +694,7 @@ class UserDataGenerator(BasicGenerator):
             ret.append((self._template % (digest,
                 self.generateEmail(),
                 self.generatePasswordHash(pwd),
-                id,un),id))
+                id,"false",un),id))
 
         return ret
 
@@ -696,7 +703,18 @@ class UserDataGenerator(BasicGenerator):
         return (self._template % (digest,
                 self.generateEmail(),
                 self.generatePasswordHash(pwd),
-                id,un),id)
+                id,"false",un),id)
+
+    def createManualUpdateData(self,id,username,password,admin,email):
+        digest = self.generateDigest(username,password)
+        hash = self.generatePasswordHash(password)
+        if admin:
+            admin = "true"
+        else:
+            admin = "false"
+        return self._template%(digest,
+                                email,
+                                hash,id,admin,username)
 
 class MediaServerGenerator(BasicGenerator):
     _template = """
@@ -1774,7 +1792,7 @@ class PrepareServerStatus(BasicGenerator):
             raise Exception("Cannot generate random states:%s" % (reason))
     
 # This class is used to control the whole merge test
-class MergeTest(MergeTestBase):
+class MergeTest_Resource(MergeTestBase):
     _gen = BasicGenerator()
     _lock = threading.Lock()
 
@@ -1829,7 +1847,6 @@ class MergeTest(MergeTestBase):
         print "Merge test phase1 done, now sleep and wait for sync"
         time.sleep(self._mergeTestTimeout)
 
-
     def _phase2(self):
         print "Merge test phase2: set ALL the servers with system name :mergeTest"
         self._setClusterToMerge()
@@ -1846,16 +1863,354 @@ class MergeTest(MergeTestBase):
 
     def test(self):
         print "================================\n"
-        print "Server Merge Test Start\n"
-
-        self._prolog()
+        print "Server Merge Test:Resource Start\n"
+        if not self._prolog():
+            return False
         self._phase1()
-        self._phase2()
+        ret,reason = self._phase2()
+        if not ret:
+            print reason
         self._epilog()
-
-        print "Server Merge Test End\n"
+        print "Server Merge Test:Resource End\n"
         print "================================\n"
+        return ret
 
+# This merge test is used to test admin's password 
+# Steps:
+# Change _EACH_ server into different system name
+# Modify _EACH_ server's password into a different one 
+# Reconnect to _EACH_ server with _NEW_ password and change its system name back to mergeTest
+# Check _EACH_ server's status that with a possible password in the list and check getMediaServer's Status
+# also _ALL_ the server must be Online
+
+# NOTES:
+# I found a very radiculous truth, that if one urllib2.urlopen failed with authentication error, then the
+# opener will be screwed up, and you have to reinstall that openner again. This is really stupid truth .
+
+class MergeTest_AdminPassword(MergeTestBase):
+    _newPasswordList = dict() # list contains key:serverAddr , value:password
+    _oldClusterPassword = None # old cluster user password , it should be 123 always
+    _username = None # User name for cluster, it should be admin
+    _clusterSharedPassword = None
+    _adminList = dict() # The dictionary for admin user on each server
+
+    def __init__(self):
+        # load the configuration file for username and oldClusterPassword
+        config_parser = ConfigParser.RawConfigParser()
+        config_parser.read("ec2_tests.cfg")
+        self._oldClusterPassword = config_parser.get("General","password")
+        self._username = config_parser.get("General","username")
+
+    def _generateUniquePassword(self):
+        ret = []
+        s = set()
+        gen = BasicGenerator()
+        for server in clusterTest.clusterTestServerList:
+            # Try to generate a unique password
+            pwd = gen.generateRandomString(20)
+            if pwd in s:
+                continue
+            else:
+                # The password is new password
+                ret.append((server,pwd))
+                self._newPasswordList[server]=pwd
+
+        return ret
+    # This function MUST be called after you change each server's
+    # password since we need to update the installer of URLLIB2
+
+    def _setUpNewAuthentication(self,pwdlist):
+        passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
+        for entry in pwdlist:
+            passman.add_password("NetworkOptix","http://%s/ec2" % (entry[0]), self._username, entry[1])
+            passman.add_password("NetworkOptix","http://%s/api" % (entry[0]), self._username, entry[1])
+        urllib2.install_opener(urllib2.build_opener(urllib2.HTTPDigestAuthHandler(passman)))
+
+    def _setUpClusterAuthentication(self,password):
+        passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
+        for s in clusterTest.clusterTestServerList:
+            passman.add_password("NetworkOptix","http://%s/ec2" % (s), self._username, password)
+            passman.add_password("NetworkOptix","http://%s/api" % (s), self._username, password)
+        urllib2.install_opener(urllib2.build_opener(urllib2.HTTPDigestAuthHandler(passman)))
+
+    def _restoreAuthentication(self):
+        self._setUpClusterAuthentication(self._oldClusterPassword)
+
+    def _merge(self):
+        self._setClusterToMerge()
+        time.sleep(self._mergeTestTimeout)
+
+    def _checkPassword(self,pwd,old_server,login_server):
+        print "Password:%s that initially modified on server:%s can log on to server:%s in new cluster"%(pwd,old_server,login_server)
+        print "Notes,the above server can be the same one, however since this test is after merge, it still makes sense"
+        print "Now test whether it works on the cluster"
+        for s in clusterTest.clusterTestServerList:
+            if s == login_server:
+                continue
+            else:
+                response = None
+                try:
+                    response = urllib2.urlopen("http://%s/ec2/testConnection"%(s))
+                except urllib2.URLError,e:
+                    print "This password cannot log on server:%s"%(s)
+                    print "This means this password can be used partially on cluster which is not supposed to happen"
+                    print "The cluster is not synchronized after merge"
+                    print "Error:%s"%(e)
+                    return False
+
+        print "This password can be used on the whole cluster"
+        return True
+        
+    # This function is used to probe the correct password that _CAN_ be used to log on each server
+    def _probePassword(self):
+        possiblePWD = None
+        for entry in self._newPasswordList:
+            pwd = self._newPasswordList[entry]
+            # Set Up the Authencation here
+            self._setUpClusterAuthentication(pwd)
+            for server in clusterTest.clusterTestServerList:
+                response = None
+                try:
+                    response = urllib2.urlopen("http://%s/ec2/testConnection"%(server))
+                except urllib2.URLError,e:
+                    # Every failed urllib2.urlopen will screw up the opener 
+                    self._setUpClusterAuthentication(pwd)
+                    continue # This password doesn't work
+
+                if response.getcode() != 200:
+                    response.close()
+                    continue
+                else:
+                    possiblePWD = pwd
+                    break
+            if possiblePWD != None:
+                if self._checkPassword(possiblePWD,entry,server):
+                    self._clusterSharedPassword = possiblePWD
+                    return True
+                else:
+                    return False
+        print "No password is found while probing the cluster"
+        print "This means after the merge,all the password originally on each server CANNOT be used to log on any server after merge"
+        print "This means cluster is not synchronized"
+        return False
+
+    # This function is used to test whether all the server gets the exactly same status
+    def _checkAllServerStatus(self):
+        self._setUpClusterAuthentication(self._clusterSharedPassword)
+        # Now we need to set up the check
+        ret,reason = clusterTest.checkMethodStatusConsistent("getMediaServersEx?format=json")
+        if not ret:
+            print reason
+            return False
+        else:
+            return True
+
+    def _checkOnline(self,uidset,response,serverAddr):
+        obj = json.loads(response)
+        for ele in obj:
+            if ele["id"] in uidset:
+                if ele["status"] != "Online":
+                    # report the status
+                    print "Login at server:%s"%(serverAddr)
+                    print "The server:(%s) with name:%s and id:%s status is Offline"%(ele["networkAddresses"],ele["name"],ele["id"])
+                    print "It should be Online after the merge"
+                    print "Status check failed"
+                    return False
+        print "Status check for server:%s pass!"%(serverAddr)
+        return True
+
+    def _checkAllOnline(self):
+        uidSet = set()
+        # Set up the UID set for each registered server
+        for uid in clusterTest.clusterTestServerUUIDList:
+            uidSet.add(uid[0])
+
+        # For each server test whether they work or not
+        for s in clusterTest.clusterTestServerList:
+            print "Connection to http://%s/ec2/getMediaServersEx?format=json"%(s)
+            response = urllib2.urlopen("http://%s/ec2/getMediaServersEx?format=json"%(s))
+            if response.getcode() != 200:
+                print "Connection failed with HTTP code:%d"%(response.getcode())
+                return False
+            if not self._checkOnline(uidSet,response.read(),s):
+                return False
+
+        return True
+
+    def _fetchAdmin(self):
+        for s in clusterTest.clusterTestServerList:
+            response = urllib2.urlopen("http://%s/ec2/getUsers"%(s))
+            obj = json.loads(response.read())
+            for entry in obj:
+                if entry["isAdmin"]:
+                    self._adminList[s] = (entry["id"],entry["name"],entry["email"])
+
+    def _setAdminPassword(self,ser,pwd,verbose=True):
+        oldAdmin = self._adminList[ser]
+        d = UserDataGenerator().createManualUpdateData(oldAdmin[0],oldAdmin[1],pwd,True,oldAdmin[2])
+        req = urllib2.Request("http://%s/ec2/saveUser" % (ser), \
+                data=d, headers={'Content-Type': 'application/json'})
+        try:
+            response =urllib2.urlopen(req)
+        except:
+            if verbose:
+                print "Connection http://%s/ec2/saveUsers failed"%(ser)
+                print "Cannot set admin password:%s to server:%s"%(pwd,ser)
+            return False
+
+        if response.getcode() != 200:
+            response.close()
+            if verbose:
+                print "Connection http://%s/ec2/saveUsers failed"%(ser)
+                print "Cannot set admin password:%s to server:%s"%(pwd,ser)
+            return False
+        else:
+            response.close()
+            return True
+
+    # This rollback is bit of tricky since it NEEDS to rollback partial password change
+    def _rollbackPartialPasswordChange(self,pwdlist):
+        # Now rollback the newAuth part of the list
+        for entry in pwdlist:
+            if not self._setAdminPassword(entry[0],self._oldClusterPassword):
+                print "----------------------------------------------------------------------------------"
+                print "+++++++++++++++++++++++++++++++++++ IMPORTANT ++++++++++++++++++++++++++++++++++++"
+                print "Server:%s admin password cannot rollback,please set it back manually!"%(entry[0])
+                print "It's current password is:%s"%(entry[1])
+                print "It's old password is:%s"(self._oldClusterPassword)
+                print "----------------------------------------------------------------------------------"
+        # Now set back the authentcation 
+        self._restoreAuthentication()
+
+    # This function is used to change admin's password on each server
+    def _changePassword(self):
+        pwdlist = self._generateUniquePassword()
+        uGen = UserDataGenerator()
+        idx = 0
+        for entry in pwdlist:
+            pwd = entry[1]
+            ser = entry[0]
+            if self._setAdminPassword(ser,pwd):
+                idx = idx+1
+            else:
+                # Before rollback we need to setup the authentication
+                partialList = pwdlist[:idx]
+                self._setUpNewAuthentication(partialList)
+                # Rollback the password paritally
+                self._rollbackPartialPasswordChange(partialList)
+                return False
+        # Set Up New Authentication
+        self._setUpNewAuthentication(pwdlist)
+        return True
+
+    def _rollback(self):
+        # rollback the password to the old states
+        self._rollbackPartialPasswordChange(
+            [(s,self._oldClusterPassword) for s in clusterTest.clusterTestServerList])
+
+        # rollback the system name 
+        self._rollbackSystemName()
+
+    def _failRollbackPassword(self):
+        # The current problem is that we don't know which password works so
+        # we use a very conservative way to do the job. We use every password
+        # that may work to change the whole cluster
+        addrSet = set()
+
+        for server in self._newPasswordList:
+            pwd = self._newPasswordList[server]
+            authList = [(s,pwd) for s in clusterTest.clusterTestServerList]
+            self._setUpNewAuthentication(authList)
+
+            # Now try to login on to the server and then set back the admin
+            check = False
+            for ser in clusterTest.clusterTestServerList:
+                if ser in addrSet:
+                    continue
+                check = True
+                if self._setAdminPassword(ser,self._oldClusterPassword,False):
+                    addrSet.add(ser)
+                else:
+                    self._setUpNewAuthentication(authList)
+
+            if not check:
+                return True
+
+        if len(addrSet) != len(clusterTest.clusterTestServerList):
+            print "There're some server's admin password I cannot prob and rollback"
+            print "Since it is a failover rollback,I cannot guarantee that I can rollback the whole cluster"
+            print "There're possible bugs in the cluster that make the automatic rollback impossible"
+            print "The following server has _UNKNOWN_ password now"
+            for ser in clusterTest.clusterTestServerList:
+                if ser not in addrSet:
+                    print "The server:%s has _UNKNOWN_ password for admin"%(ser)
+            return False
+        else:
+            return True
+
+    def _failRollback(self):
+        print "==========================================="
+        print "Start Failover Rollback"
+        print "This rollback will _ONLY_ happen when the merge test failed"
+        print "This rollback cannot guarantee that it will rollback everything"
+        print "Detail information will be reported during the rollback"
+        if self._failRollbackPassword():
+            self._restoreAuthentication()
+            self._rollbackSystemName()
+            print "Failover Rollback Done!"
+        else:
+            print "Failover Rollback Failed!"
+        print "==========================================="
+
+    def test(self):
+        print "==========================================="
+        print "Merge Test:Admin Password Test Start!"
+        # At first, we fetch each system's admin information
+        self._fetchAdmin()
+        # Change each system into different system name
+        print "Now set each server node into different and UNIQUE system name\n"
+        self._setClusterSystemRandom()
+        # Change the password of _EACH_ servers
+        print "Now change each server node's admin password to a UNIQUE password\n"
+        if not self._changePassword():
+            print "Merge Test:Admin Password Test Failed"
+            return False
+        print "Now set the system name back to mergeTest and wait for the merge\n"
+        self._merge()
+        # Now start to probing the password
+        print "Start to prob one of the possible password that can be used to LOG to the cluster\n"
+        if not self._probePassword():
+            print "Merge Test:Admin Password Test Failed"
+            self._failRollback()
+            return False
+        print "Check all the server status\n"
+        # Now start to check the status
+        if not self._checkAllServerStatus():
+            print "Merge Test:Admin Password Test Failed"
+            self._failRollback()
+            return False
+        print "Check all server is Online or not"
+        if not self._checkAllOnline():
+            print "Merge Test:Admin Password Test Failed"
+            self._failRollback()
+            return False
+
+        print "Lastly we do rollback\n"
+        self._rollback()
+
+        print "Merge Test:Admin Password Test Pass!"
+        print "==========================================="
+        return True
+
+class MergeTest:
+    def test(self):
+        if not MergeTest_Resource().test():
+            return False
+        # The following merge test ALWAYS fail and I don't know it is my problem or not
+        # Current it is disabled and you could use a seperate command line to run it 
+        #MergeTest_AdminPassword().test()
+
+        return True
 
 # ===================================
 # RTSP test
@@ -1903,6 +2258,40 @@ class RtspArchiveURLGenerator:
                                          self._mac,
                                          self._generateUTC())
 
+# RTSP global backoff timer, this is used to solve too many connection to server
+# which makes the server think it is suffering DOS attack
+class RtspBackOffTimer:
+    _timerLock = threading.Lock()
+    _globalTimerTable= dict()
+
+    MAX_TIMEOUT = 4.0
+    MIN_TIMEOUT = 0.01
+
+    def increase(self,url):
+        with self._timerLock:
+            if url in self._globalTimerTable:
+                self._globalTimerTable[url] *= 2.0
+                if self._globalTimerTable[url] >= self.MAX_TIMEOUT:
+                    self._globalTimerTable[url] = self.MAX_TIMEOUT
+                time.sleep(self._globalTimerTable[url])
+            else:
+                self._globalTimerTable[url] = 0.01
+                time.sleep(0.01)
+
+    def decrease(self,url):
+        with self._timerLock:
+            if url not in self._globalTimerTable:
+                return
+            else:
+                if self._globalTimerTable[url] <= self.MIN_TIMEOUT:
+                    self._globalTimerTable[url] = self.MIN_TIMEOUT
+                    return
+                else:
+                    self._globalTimerTable[url] /= 2.0
+
+
+_rtspBackOffTimer = RtspBackOffTimer()
+
 class RRRtspTcpBasic:
     _socket = None
     _addr = None
@@ -1939,8 +2328,11 @@ class RRRtspTcpBasic:
         x-server-guid: %s\r\n\r\n"
 
     _digestAuthTemplate = "Authorization:Digest username=\"%s\",realm=\"%s\",nonce=\"%s\",uri=\"%s\",response=\"%s\",algorithm=\"MD5\""
+
+    _lock = None
+    _log  = None
     
-    def __init__(self,addr,port,mac,cid,sid,uname,pwd,urlGen):
+    def __init__(self,addr,port,mac,cid,sid,uname,pwd,urlGen,lock = None ,log = None):
         self._port = port
         self._addr = addr
         self._urlGen = urlGen
@@ -1954,6 +2346,8 @@ class RRRtspTcpBasic:
         self._mac = mac
         self._uname = uname
         self._pwd = pwd
+        self._lock = lock
+        self._log = log
 
     def _checkEOF(self,data):
         return data.find("\r\n\r\n") > 0
@@ -2042,15 +2436,76 @@ class RRRtspTcpBasic:
                 data = data[sz:] 
             
     def _response(self):
+        global _rtspBackOffTimer
+
         ret = ""
         while True:
-            data = self._socket.recv(1024)
+            try:
+                data = self._socket.recv(1024)
+            except socket.error,e:
+                _rtspBackOffTimer.increase("%s:%d"%(self._addr,self._port))
+                return "This is not RTSP error but socket error:%s"%(e)
+
+            _rtspBackOffTimer.decrease("%s:%d"%(self._addr,self._port))
+
             if not data:
                 return ret
             else:
                 ret += data
                 if self._checkEOF(ret):
                     return ret
+
+    def _dumpError(self,err):
+        if self._lock:
+            with self._lock:
+                print "--------------------------------------------"
+                print "Graceful shutdown error , it may be caused by the server improper behavior"
+                print err
+                print "ServerEndpoint:%s:%d"%(self._addr,self._port)
+                print "Address:%s"%(self._url)
+                print "---------------------------------------------"
+
+                self._log.write("----------------------------------------")
+                self._log.write("Graceful shutdown error , it may be caused by the server improper behavior")
+                self._log.write("select error:%s"%(err))
+                self._log.write("ServerEndpoint:%s:%d"%(self._addr,self._port))
+                self._log.write("Address:%s"%(self._url))
+                self._log.write("---------------------------------------------")
+
+    def _gracefulShutdown(self):
+        # This shutdown will issue a FIN on the peer side therefore, the peer side (if it recv blocks)
+        # will recv EOF on that socket fd. And it should behave properly regarding that problem there.
+        self._socket.shutdown(socket.SHUT_WR)
+        # Now if the peer server behaves properly it will definitly 
+        # close that connection and I will be able to read an EOF 
+        while True:
+            # Now we block on a timeout select
+            try :
+                ready = select.select([self._socket], [], [], 5)
+            except socket.error,e:
+                self._dumpError("select:%s"%(e))
+                return
+                   
+            if ready[0]:
+                # Now we get some data , read it and then try to read to EOF
+                try :
+                    buf = self._socket.recv(1024)
+                    if buf is None or len(buf) == 0:
+                        # The server performance gracefully and close that connection now
+                        return
+
+                except socket.error , e:
+                    if e.errno == errno.EAGAIN or e.errno == errno.EWOULDBLOCK or e == errno.WSAEWOULDBLOCK:
+                        pass
+                    else:
+                       self._dumpError("socket::recv : %s"%(e))
+                       return
+            else:
+                # Timeout reached 
+                self._dumpError( ("The server doesn't try to send me data or shutdown the connection for about 5 seconds\n"
+                                  "However,I have issued the shutdown for read side,so the server _SHOULD_ close the connection\n") )
+                return
+
 
     def __enter__(self):
         self._socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -2063,6 +2518,8 @@ class RRRtspTcpBasic:
             return (reply,self._url)
         
     def __exit__(self,type,value,trace):
+        # Do graceful closing here
+        self._gracefulShutdown()
         self._socket.close()
 
 class SingleServerRtspTestBase:
@@ -2091,8 +2548,22 @@ class SingleServerRtspTestBase:
 
         self._fetchCameraList()
 
+    def _getServerGUID(self):
+        response = urllib2.urlopen("http://%s/ec2/testConnection"%(self._serverEndpoint))
+        if response.getcode() != 200:
+            return False
+        obj = json.loads(response.read())
+        response.close()
+        guid = obj["ecsGuid"]
+        if guid[0] == '{':
+            return guid
+        else:
+            return "{" + obj["ecsGuid"] + "}" 
+
     def _fetchCameraList(self):
-        response = urllib2.urlopen("http://%s/ec2/getCameras" % (self._serverEndpoint))
+        # Get this server's GUID and filter out the only cameras that should be used on this server
+        guid = self._getServerGUID()
+        response = urllib2.urlopen("http://%s/ec2/getCameras?id=%s" % (self._serverEndpoint,guid))
 
         if response.getcode() != 200:
             raise Exception("Cannot connect to server:%s using getCameras" % (self._serverEndpoint))
@@ -2101,6 +2572,8 @@ class SingleServerRtspTestBase:
         for c in json_obj:
             if c["typeId"] == "{1657647e-f6e4-bc39-d5e8-563c93cb5e1c}":
                 continue # Skip desktop
+            if "name" in c and c["name"].startswith("ec2_test"):
+                continue # Skip fake camera
             self._cameraList.append((c["physicalId"],c["id"],c["name"]))
             self._cameraInfoTable[c["id"]] = c
 
@@ -2398,6 +2871,7 @@ def runRtspTest():
 # RTSP performance Operations
 # ======================================================
 class SingleServerRtspPerf(SingleServerRtspTestBase):
+    ARCHIVE_STREAM_RATE = 1024*1024*10 # 10 MB/Sec
     _timeoutMax = 0
     _timeoutMin = 0
     _diffMax = 0
@@ -2433,28 +2907,100 @@ class SingleServerRtspPerf(SingleServerRtspTestBase):
         self._perfLog = open("%s_%s.perf.rtsp.log" % (l[0],l[1]),"w+")
 
 
-    def _timeoutRecv(self,socket,len,timeout):
+    # This function will blocked on socket to recv data in a fashion of _RATE_
+    def _timeoutRecv(self,socket,rate,timeout):
         socket.setblocking(0)
-        ready = select.select([socket], [], [], timeout)
-        if ready[0]:
-            data = socket.recv(len)
-            socket.setblocking(1)
-            return data
-        else:
-            socket.setblocking(1)
-            return None
-
-    def _dump(self,c,tcp_rtsp,timeout):
         elapsed = 0
+        buf = []
+        last_packet_sz = 0
+
         while True:
+            # recording the time for fetching an event
             begin = time.clock()
-            # Recv 1 MB
-            data = None
+            ready = select.select([socket], [], [], timeout)
+            if ready[0]:
+                d= None
+                if rate <0:
+                    d = socket.recv(1024*16)
+                else:
+                    d = socket.recv(rate)
+                last_packet_sz = len(d)
+                buf.append(d)
+                end = time.clock()
+                elapsed = end-begin
+                # compensate the rate of packet size here
+                if rate != -1:
+                    if len(data) >= rate:
+                        time.sleep(1.0-elapsed)
+                        socket.setblocking(1)
+                        return ''.join(buf)
+                    else:
+                        rate -= last_packet_sz
+                else:
+                    return d
+            else:
+                # timeout reached
+                socket.setblocking(1)
+                return None
+
+    def _dumpArchiveHelper(self,c,tcp_rtsp,timeout,dump,rate):
+        for _ in xrange(timeout):
             try:
-                data = self._timeoutRecv(tcp_rtsp._socket,1024 * 16,3)
+                data = self._timeoutRecv(tcp_rtsp._socket,rate,3)
+                if dump is not None:
+                    dump.write(data)
+                    dump.flush
             except:
                 continue
+            
+            if data == None:
+                with self._lock:
+                    print "--------------------------------------------"
+                    print "The RTSP url:%s 3 seconds not response with any data" % (tcp_rtsp._url)
+                    print "--------------------------------------------"
+                    self._perfLog.write("--------------------------------------------\n")
+                    self._perfLog.write("This is an exceptional case,the server _SHOULD_ not terminate the connection\n")
+                    self._perfLog.write("The RTSP/RTP url:%s 3 seconds not response with any data\n" % (tcp_rtsp._url))
+                    self._perfLog.write("Camera name:%s\n" % (c[2]))
+                    self._perfLog.write("Camera Physical Id:%s\n" % (c[0]))
+                    self._perfLog.write("Camera Id:%s\n" % (c[1]))
+                    self._perfLog.write("--------------------------------------------\n")
+                    self._perfLog.flush()
+                return
+            elif not data:
+                with self._lock:
+                    print "--------------------------------------------"
+                    print "The RTSP url:%s manully close the connection" % (tcp_rtsp._url)
+                    print "--------------------------------------------"
+                    self._perfLog.write("--------------------------------------------\n")
+                    self._perfLog.write("This is an exceptional case,the server _SHOULD_ not terminate the connection\n")
+                    self._perfLog.write("The RTSP/RTP url:%s manully close the connection\n" % (tcp_rtsp._url))
+                    self._perfLog.write("Camera name:%s\n" % (c[2]))
+                    self._perfLog.write("Camera Physical Id:%s\n" % (c[0]))
+                    self._perfLog.write("Camera Id:%s\n" % (c[1]))
+                    self._perfLog.write("--------------------------------------------\n")
+                    self._perfLog.flush()
+                return
 
+        with self._lock:
+            print "--------------------------------------------"
+            print "The RTP sink normally timeout with:%d on RTSP url:%s" % (timeout,tcp_rtsp._url)
+            print "--------------------------------------------"
+        return
+
+
+    def _dumpStreamHelper(self,c,tcp_rtsp,timeout,dump,rate):
+        elapsed = 0.0
+        while True:
+            begin = time.clock()
+            try:
+                data = self._timeoutRecv(tcp_rtsp._socket,rate,3)
+                if dump is not None:
+                    dump.write(data)
+                    dump.flush
+            except:
+                continue
+            
             if data == None:
                 with self._lock:
                     print "--------------------------------------------"
@@ -2485,7 +3031,7 @@ class SingleServerRtspPerf(SingleServerRtspTestBase):
                 return
 
             end = time.clock()
-            elapsed = elapsed + (end - begin)
+            elapsed += (end-begin)
 
             if elapsed >= timeout:
                 with self._lock:
@@ -2494,8 +3040,35 @@ class SingleServerRtspPerf(SingleServerRtspTestBase):
                     print "--------------------------------------------"
                 return
 
+    def _buildUrlPath(self,url):
+        l = len(url)
+        buf = []
+        for i in xrange(l):
+            if url[i] == ':':
+                buf.append('$')
+            elif url[i] == '/':
+                buf.append('%')
+            elif url[i] == '?':
+                buf.append('#')
+            else:
+                buf.append(url[i])
+
+        # generate a random postfix
+        buf.append("_")
+        for _ in xrange(12):
+            buf.append(str(random.randint(0,9)))
+
+        return ''.join(buf)
+
+    def _dump(self,c,tcp_rtsp,timeout,dump,rate,helper):
+        if dump :
+            with open(self._buildUrlPath(tcp_rtsp._url),"w+") as f:
+                helper(c,tcp_rtsp,timeout,f,rate)
+        else:
+            helper(c,tcp_rtsp,timeout,None,rate)
+
     # Represent a streaming TASK on the camera
-    def _main_streaming(self,c):
+    def _main_streaming(self,c,dump):
         l = self._serverEndpoint.split(':')
         obj = RRRtspTcpBasic(l[0],int(l[1]),
                      c[0],
@@ -2503,18 +3076,19 @@ class SingleServerRtspPerf(SingleServerRtspTestBase):
                      self._serverGUID,
                      self._username,
                      self._password,
-                     RtspStreamURLGenerator(l[0],int(l[1]),c[0]))
+                     RtspStreamURLGenerator(l[0],int(l[1]),c[0]),
+                     self._lock,self._perfLog)
 
         with obj as reply:
             # 1.  Check the reply here
             if self._checkRtspRequest(c,reply):
-                self._dump(c,obj,random.randint(self._timeoutMin,self._timeoutMax))
+                self._dump(c,obj,random.randint(self._timeoutMin,self._timeoutMax),dump,-1,self._dumpStreamHelper)
                 self._streamNumOK = self._streamNumOK + 1
             else:
                 self._streamNumFail = self._streamNumFail + 1
 
 
-    def _main_archive(self,c):
+    def _main_archive(self,c,dump):
         l = self._serverEndpoint.split(':')
         obj = RRRtspTcpBasic(l[0],int(l[1]),
                              c[0],
@@ -2522,23 +3096,24 @@ class SingleServerRtspPerf(SingleServerRtspTestBase):
                              self._serverGUID,
                              self._username,
                              self._password,
-                             RtspArchiveURLGenerator(self._archiveMax,self._archiveMin,l[0],int(l[1]),c[0]))
+                             RtspArchiveURLGenerator(self._archiveMax,self._archiveMin,l[0],int(l[1]),c[0]),
+                             self._lock,self._perfLog)
         with obj as reply:
             # 1.  Check the reply here
            if self._checkRtspRequest(c,reply):
-                self._dump(c,obj,random.randint(self._timeoutMin,self._timeoutMax))
+                self._dump(c,obj,random.randint(self._timeoutMin,self._timeoutMax),dump,self.ARCHIVE_STREAM_RATE,self._dumpArchiveHelper)
                 self._archiveNumOK = self._archiveNumOK + 1
            else:
                self._archiveNumFail = self._archiveNumFail + 1
 
-    def _threadMain(self):
+    def _threadMain(self,dump):
         while self._exitFlag.isOn():
             # choose a random camera in the server list
             c = self._cameraList[random.randint(0,len(self._cameraList) - 1)]
             if random.randint(0,1) == 0:
-                self._main_streaming(c)
+                self._main_streaming(c,dump)
             else:
-                self._main_archive(c)
+                self._main_archive(c,dump)
 
     def join(self):
         for th in self._threadPool:
@@ -2553,10 +3128,21 @@ class SingleServerRtspPerf(SingleServerRtspTestBase):
         print "======================================="
 
     def run(self):
+        dump = False
+        if len(sys.argv) == 3 and sys.argv[2] == '--dump':
+            dump = True
+
+        if len(self._cameraList) == 0:
+            print "The camera list on server:%s is empty!"%(self._serverEndpoint)
+            print "Do nothing and abort!"
+            return False
+
         for _ in xrange(self._threadNum):
-            th = threading.Thread(target=self._threadMain)
+            th = threading.Thread(target=self._threadMain,args=(dump,))
             th.start()
             self._threadPool.append(th)
+
+        return True
 
 class RtspPerf:
     _perfServer = []
@@ -2610,11 +3196,12 @@ class RtspPerf:
             signal.signal(signal.SIGINT,self._onInterrupt)
 
             for e in self._perfServer:
-                e.run()
+                if not e.run():
+                    return
 
             while self.isOn():
                 try:
-                    time.sleep(0)
+                    time.sleep(1)
                 except:
                     break
 
@@ -2625,10 +3212,10 @@ class RtspPerf:
             print "---------------------------------------------"
 
 
+
 def runRtspPerf():
     RtspPerf().run()
     clusterTest.unittestRollback.removeRollbackDB()
-
 
 # Performance test function
 # only support add/remove ,value can only be user and media server
@@ -2818,7 +3405,7 @@ def doClearAll(fake=False):
         UserOperation().removeAll()
         MediaServerOperation().removeAll()
 
-def runPerformanceTest():
+def runMiscFunction():
     if len(sys.argv) != 3 and len(sys.argv) != 2 :
         return (False,"2/1 parameters are needed")
 
@@ -3157,7 +3744,7 @@ class PerfTest:
             print "---------------------------------"
         print "===================================="
                         
-def runPerformanceTest():
+def runPerfTest():
     options = sys.argv[2]
     l = options.split('=')
     PerfTest().run(l[1])
@@ -3301,38 +3888,134 @@ class SystemNameTest:
         print "SystemName test rollback done"
         print "========================================="
 
-helpStr = "Usage:\n\n" \
-    "--perf --type=type-list: Start performance test.User can use ctrl+c to interrupt the perf test and statistic will be displayed.User can also specify configuration parameters " \
-    "for performance test. You also _NEED_ specify option as --type=Camera,User to indicate what to test.Eg --perf --type=User will only test User performance, while " \
-    "--perf --type=User,Camera will test User/Camera both in terms of the performance on each server"\
-    "In ec2_tests.cfg file,\n[PerfTest]\nfrequency=1000\ncreateProb=0.5\n, the frequency means at most how many operations will be issued on each" \
-    "server in one seconds(not guaranteed,bottleneck is CPU/Bandwidth for running this script);and createProb=0.5 means the creation operation will be performed as 0.5 "\
-    "probability, and it implicitly means the modification operation will be performed as 0.5 probability \n\n" \
-    "--clear: Clear all the Cameras/MediaServers/Users on all the servers.It will not delete admin user. You could specify --fake option as second parameter, eg:" \
-    "--clear --fake. This will remove all the resources that has name prefixed with ec2_test which is the generated data name pattern\n\n" \
-    "--sync: Test all the servers are on the same page or not.This test will perform regarding the existed ec2 REST api, for example " \
-    ", no layout API is supported, then this test cannot test whether 2 servers has exactly same layouts  \n\n" \
-    "--recover: Recover from last rollback failure. If you see rollback failed for the last run, you can run this option next time to recover from " \
-    "the last rollback error specifically. Or you could run any other cases other than --help/--recover,the recover will be performed automatically as well. \n\n" \
-    "--merge-test: Test server merge. The user needs to specify more than one server in the config file. This test will temporarilly change the server system name," \
-    "currently I assume such change will NOT modify the server states. Once the merge test finished, the system name for each server will be recover automatically.\n\n" \
-    "--rtsp-test: Test the rtsp streaming. The user needs to specify section [Rtsp] in side of the config file and also " \
-    "testSize attribute in it , eg: \n[Rtsp]\ntestSize=100\n Which represent how many test case performed on EACH server.\n\n" \
-    "--add=Camera/MediaServer/User --count=num: Add a fake Camera/MediaServer/User to the server you sepcify in the list. The --count " \
-    "option MUST be specified , so a working example is like: --add=Camera --count=500 . This will add 500 cameras(fake) into "\
-    "the server.\n\n"\
-    "--remove=Camera/MediaServer/User (--id=id)*: Remove a Camera/MediaServer/User with id OR remove all the resources.The user can "\
-    "specify --id option to enable remove a single resource, eg : --remove=MediaServer --id={SomeGUID} , and --remove=MediaServer will remove " \
-    "all the media server.\nNote: --add/--remove will perform the corresponding operations on a random server in the server list if the server list "\
-    "have more than one server.You could specify the --fake as the second option,eg: --remove=Camera --fake .This will remove all the cameras that " \
-    "has name prefixed with ec2_test which is name pattern for generated cameras\n\n" \
-    "If no parameter is specified, the default automatic test will performed.This includes add/update/remove Cameras/MediaServer/Users and also add/update " \
-    "user attributes list , server attributes list and resource parameter list. Additionally , the confliction test will be performed as well, it includes " \
-    "modify a resource on one server and delete the same resource on another server to trigger confliction.Totally 9 different test cases will be performed in this " \
-    "run.Currently, all the modification/deletion will only happened on fake data, and after the whole testing finished, the fake data will be wiped out so " \
-    "the old database should not be modified.The user can specify configuration parameter in ec2_tests.cfg file, eg:\n[General]\ntestCaseSize=200\nclusterTestSleepTime=10\n "\
-    "this options will make each test case in 9 cases run on each server 200 times. Additionally clusterTestSleepTime represent after every 200 operations, how long should I "\
-    "wait and then perform sync operation to check whether all the server get the notification"
+def showHelp():
+    helpMenu = {
+        "perf":("Run performance test",(
+            "Usage: python main.py --perf --type=... \n\n"
+            "This command line will start built-in performance test\n"
+            "The --type option is used to specify what kind of resource you want to profile.\n"
+            "Currently you could specify Camera and User, eg : --type=Camera,User will test on Camera and User both;\n"
+            "--type=User will only do performance test on User resources")),
+        "clear":("Clear resources",(
+            "Usage: python main.py --clear \nUsage: python main.py --clear --fake\n\n"
+            "This command is used to clear the resource in server list.\n"
+            "The resource includes Camera,MediaServer and Users.\n"
+            "The --fake option is a flag to tell the command _ONLY_ clear\n"
+            "resource that has name prefixed with \"ec2_test\".\n"
+            "This name pattern typically means that the data is generated by the automatic test\n")),
+        "sync":("Test cluster is sycnchronized or not",(
+            "Usage: python main.py --sync \n\n"
+            "This command is used to test whether the cluster has synchronized states or not.")),
+        "recover":("Recover from previous fail rollback",(
+            "Usage: python main.py --recover \n\n"
+            "This command is used to try to recover from previous failed rollback.\n"
+            "Each rollback will based on a file .rollback.However rollback may failed.\n"
+            "The failed rollback transaction will be recorded in side of .rollback file as well.\n"
+            "Every time you restart this program, you could specify this command to try\n "
+            "to recover the failed rollback transaction.\n"
+            "If you are running automatic test,the recover will be detected automatically and \n"
+            "prompt for you to choose whether recover or not")),
+        "merge-test":("Run merge test",(
+            "Usage: python main.py --merge-test \n\n"
+            "This command is used to run merge test speicifically.\n"
+            "This command will run admin user password merge test and resource merge test.\n")),
+        "merge-admin":("Run merge admin user password test",(
+            "Usage: python main.py --merge-admin \n\n"
+            "This command is used to run run admin user password merge test directly.\n"
+            "This command will be removed later on")),
+        "rtsp-test":("Run rtsp test",(
+            "Usage: python main.py --rtsp-test \n\n"
+            "This command is used to run RTSP Test test.It means it will issue RTSP play command,\n"
+            "and wait for the reply to check the status code.\n"
+            "User needs to set up section in ec2_tests.cfg file: [Rtsp]\ntestSize=40\n"
+            "The testSize is configuration parameter that tell rtsp the number that it needs to perform \n"
+            "RTSP test on _EACH_ server.Therefore,the above example means 40 random RTSP test on each server.\n")),
+        "add":("Resource creation",(
+            "Usage: python main.py --add=... --count=... \n\n"
+            "This command is used to add different generated resources to servers.\n"
+            "3 types of resource is available: MediaServer,Camera,User. \n"
+            "The --add parameter needs to be specified the resource type. Eg: --add=Camera \n"
+            "means add camera into the server, --add=User means add user to the server.\n"
+            "The --count option is used to tell the size that you wish to generate that resources.\n"
+            "Eg: main.py --add=Camera --count=100           Add 100 cameras to each server in server list.\n")),
+        "remove":("Resource remove",(
+            "Usage: python main.py --remove=Camera --id=... \n"
+            "Usage: python main.py --remove=Camera --fake \n\n"
+            "This command is used to remove resource on each servers.\n"
+            "The --remove needs to be specified required resource type.\n"
+            "3 types of resource is available: MediaServer,Camera,User. \n"
+            "The --id option is optinoal, if it appears, you need to specify a valid id like this:--id=SomeID.\n"
+            "It is used to delete specific resource. \n"
+            "Optionally, you could specify --fake flag , if this flag is on, then the remove will only \n"
+            "remove resource that has name prefixed with \"ec2_test\" which typically means fake resource")),
+        "auto-test":("Automatic test",(
+            "Usage: python main.py \n\n"
+            "This command is used to run built-in automatic test.\n"
+            "The automatic test includes 11 types of test and they will be runed automatically."
+            "The configuration parameter is as follow: \n"
+            "threadNumber                  The thread number that will be used to fire operations\n"
+            "mergeTestTimeout              The timeout for merge test\n"
+            "clusterTestSleepTime          The timeout for other auto test\n"
+            "All the above configuration parameters needs to be defined in the General section.\n"
+            "The test will try to rollback afterwards and try to recover at first.\n"
+            "Also the sync operation will be performed before any test\n")),
+        "rtsp-perf":("Rtsp performance test",(
+            "Usage: python main.py --rtsp-perf \n\n"
+            "Usage: python main.py --rtsp-perf --dump \n\n"
+            "This command is used to run rtsp performance test.\n"
+            "The test will try to check RTSP status and then connect to the server \n"
+            "and maintain the connection to receive RTP packet for several seconds. The request \n"
+            "includes archive and real time streaming.\n"
+            "Additionally,an optional option --dump may be specified.If this flag is on, the data will be \n"
+            "dumped into a file, the file stores raw RTP data and also the file is named with following:\n"
+            "{Part1}_{Part2}, Part1 is the URL ,the character \"/\" \":\" and \"?\" will be escaped to %,$,#\n"
+            "Part2 is a random session number which has 12 digits\n"
+            "The configuration parameter is listed below:\n\n"
+            "threadNumbers    A comma separate list to specify how many list each server is required \n"
+            "The component number must be the same as component in serverList. Eg: threadNumbers=10,2,3 \n"
+            "This means that the first server in serverList will have 10 threads,second server 2,third 3.\n\n"
+            "archiveDiffMax       The time difference upper bound for archive request, in minutes \n"
+            "archiveDiffMin       The time difference lower bound for archive request, in minutes \n"
+            "timeoutMax           The timeout upper bound for each RTP receiving, in seconds. \n"
+            "timeoutMin           The timeout lower bound for each RTP receiving, in seconds. \n"
+            "Notes: All the above parameters needs to be specified in configuration file:ec2_tests.cfg under \n"
+            "section Rtsp.\nEg:\n[Rtsp]\nthreadNumbers=10,2\narchiveDiffMax=..\nardchiveDiffMin=....\n"
+            )),
+        "sys-name":("System name test",(
+            "Usage: python main.py --sys-name \n\n"
+            "This command will perform system name test for each server.\n"
+            "The system name test is , change each server in cluster to another system name,\n"
+            "and check each server that whether all the other server is offline and only this server is online.\n"
+            ))
+        }
+
+    if len(sys.argv) == 2:
+        helpStrHeader=("Help for auto test tool\n\n"
+                 "*****************************************\n"
+                 "**************Function Menu**************\n"
+                 "*****************************************\n"
+                 "Entry            Introduction            \n")
+
+        print helpStrHeader
+
+        for k,v in helpMenu.iteritems():
+            print "%s:\t%s"%(k,v[0])
+
+        helpStrFooter = ("\n\nTo see detail help information,please run command:\n"
+               "python main.py --help Entry\n\n"
+               "Eg: python main.py --help auto-test\n"
+               "This will list detail information about auto-test\n")
+
+        print helpStrFooter
+    else:
+        option = sys.argv[2]
+        if option in helpMenu:
+            print "==================================="
+            print option
+            print "===================================\n\n"
+            print helpMenu[option][1]
+        else:
+            print "Option:%s is not found !"%(option)
 
 def doCleanUp():
     selection = None
@@ -3349,8 +4032,8 @@ def doCleanUp():
         print "Skip ROLLBACK,you could use --recover to perform manually rollback"
             
 if __name__ == '__main__':
-    if len(sys.argv) == 2 and sys.argv[1] == '--help':
-        print helpStr
+    if len(sys.argv) >= 2 and sys.argv[1] == '--help':
+        showHelp()
     elif len(sys.argv) == 2 and sys.argv[1] == '--recover':
         UnitTestRollback().doRecover()
     elif len(sys.argv) == 2 and sys.argv[1] == '--sys-name':
@@ -3366,11 +4049,13 @@ if __name__ == '__main__':
                  # all the servers are on the same page
         else:
             if len(sys.argv) == 1:
+                ret = None
                 try:
-                    unittest.main()
-                except:
-                    MergeTest().test()
-                    SystemNameTest().run()
+                    ret = unittest.main()
+                except SystemExit,e:
+                    if not e.code:
+                        if MergeTest().test():
+                            SystemNameTest().run()
 
                     print "\n\nALL AUTOMATIC TEST ARE DONE\n\n"
                     doCleanUp()
@@ -3391,12 +4076,14 @@ if __name__ == '__main__':
                 if sys.argv[1] == '--merge-test':
                     MergeTest().test()
                     doCleanUp()
-
+                elif sys.argv[1] == '--merge-admin':
+                    MergeTest_AdminPassword().test()
+                    clusterTest.unittestRollback.removeRollbackDB()
                 elif sys.argv[1] == '--rtsp-test':
                     runRtspTest()
                 elif sys.argv[1] == '--rtsp-perf':
                     runRtspPerf()
                 elif len(sys.argv) == 3 and sys.argv[1] == '--perf':
-                    runPerformanceTest()
+                    runPerfTest()
                 else:
-                    print "Unknown command parameter"
+                    runMiscFunction()

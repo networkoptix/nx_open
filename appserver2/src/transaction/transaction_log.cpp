@@ -24,7 +24,7 @@ QnTransactionLog::QnTransactionLog(QnDbManager* db): m_dbManager(db)
     Q_ASSERT(!globalInstance);
     globalInstance = this;
     m_lastTimestamp = 0;
-    m_currentTime = 0;
+    m_baseTime = 0;
 }
 
 void QnTransactionLog::init()
@@ -73,26 +73,47 @@ void QnTransactionLog::init()
         }     
     }
 
-    m_currentTime = QDateTime::currentMSecsSinceEpoch();
+    m_lastTimestamp = qnSyncTime->currentMSecsSinceEpoch();
     QSqlQuery queryTime(m_dbManager->getDB());
     queryTime.prepare("SELECT max(timestamp) FROM transaction_log");
     if (queryTime.exec() && queryTime.next()) {
-        m_currentTime = qMax(m_currentTime, queryTime.value(0).toLongLong());
+        m_lastTimestamp = qMax(m_lastTimestamp, queryTime.value(0).toLongLong());
     }
-    m_lastTimestamp = m_currentTime;
+    m_baseTime = m_lastTimestamp;
     m_relativeTimer.start();
 }
 
 qint64 QnTransactionLog::getTimeStamp()
 {
+    qint64 absoluteTime = qnSyncTime->currentMSecsSinceEpoch();
+    qint64 newTime = absoluteTime;
+
     QMutexLocker lock(&m_timeMutex);
-    qint64 timestamp = m_currentTime + m_relativeTimer.elapsed();
-    if (timestamp <= m_lastTimestamp) {
-        m_currentTime = timestamp = m_lastTimestamp + 1;
+    if (newTime > m_lastTimestamp)
+    {
+        m_baseTime = m_lastTimestamp = newTime;
         m_relativeTimer.restart();
     }
-    m_lastTimestamp = timestamp;
-    return timestamp;
+    else 
+    {
+        static const int TIME_SHIFT_DELTA = 1000;
+        newTime = m_baseTime + m_relativeTimer.elapsed();
+        if (newTime > m_lastTimestamp)
+        {
+            if (newTime > m_lastTimestamp + TIME_SHIFT_DELTA && newTime > absoluteTime + TIME_SHIFT_DELTA) {
+                newTime -= TIME_SHIFT_DELTA; // try to reach absolute time
+                m_baseTime = newTime;
+                m_relativeTimer.restart();
+            }
+            m_lastTimestamp = newTime;
+        }
+        else {
+            m_lastTimestamp++;
+            m_baseTime = m_lastTimestamp;
+            m_relativeTimer.restart();
+        }
+    }
+    return m_lastTimestamp;
 }
 
 int QnTransactionLog::currentSequenceNoLock() const
@@ -225,11 +246,7 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const Qn
     m_commitData.updateHistory[hash] = UpdateHistoryData(key, tran.persistentInfo.timestamp);
 
     QMutexLocker lock(&m_timeMutex);
-    if (tran.persistentInfo.timestamp > m_currentTime + m_relativeTimer.elapsed()) {
-        m_currentTime = m_lastTimestamp = tran.persistentInfo.timestamp;
-        m_relativeTimer.restart();
-    }
-
+    m_lastTimestamp = qMax(m_lastTimestamp, tran.persistentInfo.timestamp);
     return ErrorCode::ok;
 }
 

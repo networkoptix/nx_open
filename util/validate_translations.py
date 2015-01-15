@@ -47,13 +47,17 @@ def symbolText(symbol):
     return symbol
 
 def checkText(source, target, location, result, verbose):
+
+    filename = location.get('filename') if location is not None else 'unknown'
+    line = location.get('line') if location is not None else 'unknown'
+
     for symbol in critical:
         occurences = source.count(symbol)
         if target.count(symbol) != occurences:
             err(u'Invalid translation string, error on {0} count:\nLocation: {1} line {2}\nSource: {3}\nTarget: {4}'
                 .format(
                     symbolText(symbol),
-                    location.get('filename'), location.get('line'),
+                    filename, line,
                     source, target))
             result.error += 1
             break
@@ -65,7 +69,7 @@ def checkText(source, target, location, result, verbose):
                 warn(u'Invalid translation string, error on {0} count:\nLocation: {1} line {2}\nSource: {3}\nTarget: {4}'
                     .format(
                         symbolText(symbol),
-                        location.get('filename'), location.get('line'),
+                        filename, line,
                         source, target))
                 result.warned += 1
                 break

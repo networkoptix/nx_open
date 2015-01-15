@@ -69,7 +69,7 @@ private:
     QnServerStreamRecorder* createRecorder(const QnResourcePtr &res, QnVideoCamera* camera, QnServer::ChunksCatalog catalog);
     bool startOrStopRecording(const QnResourcePtr& res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes);
     bool isResourceDisabled(const QnResourcePtr& res) const;
-    QnResourceList getLocalControlledCameras();
+    QnVirtualCameraResourceList getLocalControlledCameras() const;
 
     void beforeDeleteRecorder(const Recorders& recorders);
     void stopRecorder(const Recorders& recorders);
@@ -88,7 +88,6 @@ private:
     ec2::QnDistributedMutex* m_licenseMutex;
     int m_tooManyRecordingCnt;
     qint64 m_recordingStopTime;
-    QSet<QnUuid> m_cameraHistoryDone;
 };
 
 #define qnRecordingManager QnRecordingManager::instance()

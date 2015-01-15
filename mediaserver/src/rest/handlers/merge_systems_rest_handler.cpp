@@ -113,7 +113,7 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
     bool customizationOK = moduleInformation.customization == QnAppInfo::customizationName() ||
                            moduleInformation.customization.isEmpty() ||
                            QnModuleFinder::instance()->isCompatibilityMode();
-    bool compatible = !moduleInformation.hasCompatibleVersion();
+    bool compatible = moduleInformation.hasCompatibleVersion();
 
     if ((!ignoreIncompatible && !compatible) || !customizationOK) {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("INCOMPATIBLE"));

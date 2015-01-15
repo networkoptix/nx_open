@@ -592,6 +592,23 @@ void QnMain::saveStorages(ec2::AbstractECConnectionPtr ec2Connection, const QnAb
     }
 }
 
+static const int SYSTEM_USAGE_DUMP_TIMEOUT = 7*60*1000;
+
+void QnMain::dumpSystemUsageStats()
+{
+    qnPlatform->monitor()->totalCpuUsage();
+    qnPlatform->monitor()->totalRamUsage();
+    qnPlatform->monitor()->totalHddLoad();
+    qnPlatform->monitor()->totalNetworkLoad();
+
+    QMutexLocker lk( &m_mutex );
+    if( m_dumpSystemResourceUsageTaskID == 0 )  //monitoring cancelled
+        return;
+    m_dumpSystemResourceUsageTaskID = TimerManager::instance()->addTimer(
+        std::bind( &QnMain::dumpSystemUsageStats, this ),
+        SYSTEM_USAGE_DUMP_TIMEOUT );
+}
+
 #ifdef Q_OS_WIN
 #include <windows.h>
 #include <stdio.h>
@@ -646,7 +663,6 @@ int serverMain(int argc, char *argv[])
     SetConsoleCtrlHandler(stopServer_WIN, true);
 #endif
     signal(SIGINT, stopServer);
-    //signal(SIGABRT, stopServer);
     signal(SIGTERM, stopServer);
 
 //    av_log_set_callback(decoderLogCallback);
@@ -721,6 +737,13 @@ int serverMain(int argc, char *argv[])
 
 void initAppServerConnection(QSettings &settings)
 {
+    // migrate appserverPort settings from version 2.2 if exist
+    if (!MSSettings::roSettings()->value("appserverPort").isNull()) 
+    {
+        MSSettings::roSettings()->setValue("port", MSSettings::roSettings()->value("appserverPort"));
+        MSSettings::roSettings()->remove("appserverPort");
+    }
+
     QUrl appServerUrl;
     QUrlQuery params;
 
@@ -736,7 +759,7 @@ void initAppServerConnection(QSettings &settings)
     }
     else {
         appServerUrl.setScheme(settings.value("secureAppserverConnection", true).toBool() ? QLatin1String("https") : QLatin1String("http"));
-        int port = settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt();
+        int port = settings.value("port", DEFAULT_APPSERVER_PORT).toInt();
         appServerUrl.setHost(host);
         appServerUrl.setPort(port);
     }
@@ -752,7 +775,7 @@ void initAppServerConnection(QSettings &settings)
     QString userName = settings.value("appserverLogin", QLatin1String("admin")).toString();
     QString password = settings.value("appserverPassword", QLatin1String("")).toString();
     QByteArray authKey = settings.value("authKey").toByteArray();
-    QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
+    QString appserverHostString = settings.value("appserverHost").toString();
     if (!authKey.isEmpty() && !isLocalAppServer(appserverHostString))
     {
         // convert from v2.2 format and encode value
@@ -764,9 +787,7 @@ void initAppServerConnection(QSettings &settings)
             settings.setValue(lit("authKey"), prefix + authKeyEncoded); // encode and update in settings
         }
         else {
-            QByteArray authKeyEncoded = QByteArray::fromHex(authKey.mid(prefix.length()));
-            QByteArray authKeyDecoded = QnAuthHelper::symmetricalEncode(authKeyEncoded);
-            authKey = QnUuid::fromRfc4122(authKeyDecoded).toByteArray();
+            authKey = decodeAuthKey(authKey);
         }
 
         userName = serverGuid().toString();
@@ -785,6 +806,7 @@ void initAppServerConnection(QSettings &settings)
     QnAppServerConnectionFactory::setDefaultFactory(QnResourceDiscoveryManager::instance());
 }
 
+
 QnMain::QnMain(int argc, char* argv[])
 :
     m_argc(argc),
@@ -792,7 +814,8 @@ QnMain::QnMain(int argc, char* argv[])
     m_startMessageSent(false),
     m_firstRunningTime(0),
     m_moduleFinder(0),
-    m_universalTcpListener(0)
+    m_universalTcpListener(0),
+    m_dumpSystemResourceUsageTaskID(0)
 {
     serviceMainInstance = this;
 }
@@ -810,6 +833,7 @@ void QnMain::at_restartServerRequired()
 
 void QnMain::stopSync()
 {
+    qWarning()<<"Stopping server";
     if (serviceMainInstance) {
         serviceMainInstance->pleaseStop();
         serviceMainInstance->exit();
@@ -854,7 +878,7 @@ void QnMain::updateDisabledVendorsIfNeeded()
     if (!admin)
         return;
 
-    if (!admin->hasProperty(DV_PROPERTY)) {
+    if (!disabledVendors.isNull()) {
         QnGlobalSettings* settings = QnGlobalSettings::instance();
         settings->setDisabledVendors(disabledVendors);
         MSSettings::roSettings()->remove(DV_PROPERTY);
@@ -869,7 +893,7 @@ void QnMain::updateAllowCameraCHangesIfNeed()
     if (!allowCameraChanges.isEmpty())
     {
         QnGlobalSettings *settings = QnGlobalSettings::instance();
-        settings->setCameraSettingsOptimizationEnabled(allowCameraChanges.toLower() == lit("true") || allowCameraChanges == lit("1"));
+        settings->setCameraSettingsOptimizationEnabled(allowCameraChanges.toLower() == lit("yes") || allowCameraChanges.toLower() == lit("true") || allowCameraChanges == lit("1"));
         MSSettings::roSettings()->setValue(DV_PROPERTY, "");
     }
 }
@@ -1155,13 +1179,8 @@ void QnMain::at_timer()
 {
     MSSettings::runTimeSettings()->setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
     QnResourcePtr mServer = qnResPool->getResourceById(qnCommon->moduleGUID());
-    for(const QnResourcePtr& res: qnResPool->getAllCameras(mServer))
-    {
-        QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
-        if (cam)
-            cam->noCameraIssues(); // decrease issue counter
-    }
-
+    for(const QnVirtualCameraResourcePtr& camera: qnResPool->getAllCameras(mServer))
+        camera->noCameraIssues(); // decrease issue counter
 }
 
 void QnMain::at_storageManager_noStoragesAvailable() {
@@ -1257,8 +1276,6 @@ bool QnMain::initTcpListener()
     m_universalTcpListener->addHandler<QnDesktopCameraRegistrator>("HTTP", "desktop_camera");
 #endif   //ENABLE_DESKTOP_CAMERA
 
-    m_universalTcpListener->start();
-
     return true;
 }
 
@@ -1339,6 +1356,7 @@ void QnMain::run()
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/camera_event*"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/showLog*"), AuthMethod::urlQueryParam );
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/moduleInformation"), AuthMethod::noAuth );
+    QnAuthHelper::instance()->restrictionList()->allow( lit("/static/*"), AuthMethod::noAuth );
 
     QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
     QnEventsDB::init();
@@ -1358,7 +1376,6 @@ void QnMain::run()
     QSettings* settings = MSSettings::roSettings();
 
     std::unique_ptr<QnMServerResourceDiscoveryManager> mserverResourceDiscoveryManager( new QnMServerResourceDiscoveryManager() );
-    QnResourceDiscoveryManager::init( mserverResourceDiscoveryManager.get() );
     initAppServerConnection(*settings);
 
     QnMulticodecRtpReader::setDefaultTransport( MSSettings::roSettings()->value(QLatin1String("rtspTransport"), RtpTransport::_auto).toString().toUpper() );
@@ -1435,7 +1452,6 @@ void QnMain::run()
         NX_LOG( QString::fromLatin1("Switching to cluster mode and restarting..."), cl_logWARNING );
         MSSettings::roSettings()->setValue("systemName", connectInfo.systemName);
         MSSettings::roSettings()->remove("appserverHost");
-        MSSettings::roSettings()->remove("appserverPort");
         MSSettings::roSettings()->remove("appserverLogin");
         MSSettings::roSettings()->setValue("appserverPassword", "");
         MSSettings::roSettings()->remove(PENDING_SWITCH_TO_CLUSTER_MODE);
@@ -1469,7 +1485,6 @@ void QnMain::run()
              QnSyncTime::instance(), (void(QnSyncTime::*)(qint64))&QnSyncTime::updateTime );
 
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
-    QnMServerResourceSearcher::instance()->start();
 
     //Initializing plugin manager
     PluginManager::instance()->loadPlugins();
@@ -1603,7 +1618,9 @@ void QnMain::run()
             isModified = true;
         }
         if (needUpdateAuthKey) {
-            server->setAuthKey(QnUuid::createUuid().toString());
+            QByteArray authKey = MSSettings::roSettings()->value("authKey").toString().toLatin1();
+            authKey = !authKey.isEmpty() ? decodeAuthKey(authKey) : QnUuid::createUuid().toString().toLatin1(); 
+            server->setAuthKey(authKey);
             isModified = true;
         }
 
@@ -1638,7 +1655,6 @@ void QnMain::run()
 
 
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
-    QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);
 
     bool compatibilityMode = cmdLineArguments.devModeKey == lit("razrazraz");
@@ -1678,16 +1694,7 @@ void QnMain::run()
     }
 
     QScopedPointer<QnServerConnector> serverConnector(new QnServerConnector(m_moduleFinder));
-    serverConnector->start();
 
-    QUrl url = ec2Connection->connectionInfo().ecUrl;
-#if 1
-    if (url.scheme() == "file") {
-        // Connect to local database. Start peer-to-peer sync (enter to cluster mode)
-        qnCommon->setCloudMode(true);
-        m_moduleFinder->start();
-    }
-#endif
     // ------------------------------------------
 
     QScopedPointer<QnRouter> router(new QnRouter(m_moduleFinder, false));
@@ -1849,7 +1856,38 @@ void QnMain::run()
 
 
     QTimer::singleShot(0, this, SLOT(at_appStarted()));
+
+
+    m_dumpSystemResourceUsageTaskID = TimerManager::instance()->addTimer(
+        std::bind( &QnMain::dumpSystemUsageStats, this ),
+        SYSTEM_USAGE_DUMP_TIMEOUT );
+    
+    QnRecordingManager::instance()->start();
+    QnMServerResourceSearcher::instance()->start();
+    m_universalTcpListener->start();
+	serverConnector->start();
+#if 1
+    if (ec2Connection->connectionInfo().ecUrl.scheme() == "file") {
+        // Connect to local database. Start peer-to-peer sync (enter to cluster mode)
+        qnCommon->setCloudMode(true);
+        m_moduleFinder->start();
+    }
+#endif
+
     exec();
+
+    qWarning()<<"QnMain event loop has returned. Destroying objects...";
+
+    //cancelling dumping system usage
+    quint64 dumpSystemResourceUsageTaskID = 0;
+    {
+        QMutexLocker lk( &m_mutex );
+        dumpSystemResourceUsageTaskID = m_dumpSystemResourceUsageTaskID;
+        m_dumpSystemResourceUsageTaskID = 0;
+    }
+    TimerManager::instance()->joinAndDeleteTimer( dumpSystemResourceUsageTaskID );
+
+
     QnResourceDiscoveryManager::instance()->pleaseStop();
     QnResource::pleaseStopAsyncTasks();
     stopObjects();
@@ -1871,9 +1909,6 @@ void QnMain::run()
 
     QnResourceDiscoveryManager::instance()->stop();
     QnResource::stopAsyncTasks();
-
-    QnResourceDiscoveryManager::init( NULL );
-    mserverResourceDiscoveryManager.reset();
 
     //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
         //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required
@@ -1905,7 +1940,7 @@ void QnMain::run()
 
     ptzPool.reset();
 
-
+    QnServerMessageProcessor::instance()->init(NULL); // stop receiving notifications
     messageProcessor.reset();
     
     //disconnecting from EC2
@@ -1914,6 +1949,7 @@ void QnMain::run()
     QnAppServerConnectionFactory::setEC2ConnectionFactory( nullptr );
     ec2ConnectionFactory.reset();
 
+    mserverResourceDiscoveryManager.reset();
 
     av_lockmgr_register(NULL);
 
@@ -2120,11 +2156,12 @@ private:
     QnSoftwareVersion m_overrideVersion;
 };
 
-void stopServer(int signal)
+void stopServer(int /*signal*/)
 {
     restartFlag = false;
     if (serviceMainInstance) {
-        qWarning() << "got signal" << signal << "stop server!";
+        //output to console from signal handler can cause deadlock
+        //qWarning() << "got signal" << signal << "stop server!";
         serviceMainInstance->stopAsync();
     }
 }

@@ -498,7 +498,7 @@ void QnProgressiveDownloadingConsumer::run()
                 rotation = decodedUrlQuery.queryItemValue("rotation").toInt();
             else
                 rotation = mediaRes->toResource()->getProperty(QnMediaResource::rotationKey()).toInt();
-            qreal customAR = mediaRes->toResource()->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
+            qreal customAR = mediaRes->customAspectRatio();
             extraParams.setRotation(rotation);
             extraParams.setCustomAR(customAR);
             

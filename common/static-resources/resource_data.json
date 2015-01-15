@@ -99,7 +99,8 @@
 		        "VISTA|VK2-1080VFD3V9F",
 		        "VISTA|VK2-1080BIR3V9F",
 		        "VISTA|VK2-720VZMI",
-		        "VISTA|VK2-720VZMX"
+		        "VISTA|VK2-720VZMX",
+		        "VISTA|VK2-1080VRDIR3V9F"
             ],
             "ptzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability"
         },
@@ -122,6 +123,7 @@
             "keys": [
                 "VISTA|VK2-ENCODER",
                 "VISTA|VK2-1080PTZ",
+                "VISTA|VK2-600PTZ",
                 "*|DW-CP04"
             ],
             "onvifPtzPresetsEnabled": true
@@ -138,11 +140,12 @@
                 "VISTA|VK2-1080PTZ",
                 "VISTA|VK2-ENCODER"
             ],
-            "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability"
+            "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability|PresetsPtzCapability"
         },
         {
             "keys": [
-                "VISTA|VK2-1080VRD*"
+                "VISTA|VK2-1080VRD",
+				"VISTA|VK2-1080VRD3V9"
             ],
 			"ptzCapabilities": ""
         },

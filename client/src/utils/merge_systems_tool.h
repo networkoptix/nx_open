@@ -18,7 +18,6 @@ public:
         VersionError,
         AuthentificationError,
         BackupError,
-        MergeError,
         NotFoundError
     };
 

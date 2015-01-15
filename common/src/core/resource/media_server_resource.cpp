@@ -130,7 +130,7 @@ void QnMediaServerResource::setNetAddrList(const QList<QHostAddress>& netAddrLis
     m_netAddrList = netAddrList;
 }
 
-const QList<QHostAddress>& QnMediaServerResource::getNetAddrList() const
+QList<QHostAddress> QnMediaServerResource::getNetAddrList() const
 {
     QMutexLocker lock(&m_mutex);
     return m_netAddrList;

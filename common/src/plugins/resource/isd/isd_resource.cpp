@@ -133,7 +133,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
 
 
 
-        int bestIndex = -1;
+        int bestIndex = 0;
         double bestMatchCoeff = maxResolutionSquare / requestSquare;
 
         float bestAspectRatio = getResolutionAspectRatio(m_resolution1);

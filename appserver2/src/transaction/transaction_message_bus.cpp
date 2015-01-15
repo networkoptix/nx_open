@@ -222,12 +222,14 @@ QnTransactionMessageBus::QnTransactionMessageBus(Qn::PeerType peerType)
 
 void QnTransactionMessageBus::start()
 {
+    Q_ASSERT(!m_thread->isRunning());
     if (!m_thread->isRunning())
         m_thread->start();
 }
 
 void QnTransactionMessageBus::stop()
 {
+    Q_ASSERT(m_thread->isRunning());
     dropConnections();
 
     m_thread->exit();
@@ -1013,6 +1015,8 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
 {
     QMutexLocker lock(&m_mutex);
     QnTransactionTransport* transport = (QnTransactionTransport*) sender();
+    if (!transport)
+        return;
 
     switch (transport->getState()) 
     {
@@ -1055,7 +1059,7 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
             QnTransactionTransport* transportPtr = m_connectingConnections[i];
             if (transportPtr == transport) {
                 m_connectingConnections.removeAt(i);
-                return;
+                break;
             }
         }
 
@@ -1308,6 +1312,21 @@ void QnTransactionMessageBus::emitRemotePeerUnauthorized(const QnUuid& id)
 {
     QMutexLocker lk( &m_signalEmitMutex );
     emit remotePeerUnauthorized( id );
+}
+
+void QnTransactionMessageBus::setHandler(ECConnectionNotificationManager* handler) {
+    QMutexLocker lock(&m_mutex);
+    Q_ASSERT(!m_thread->isRunning());
+    Q_ASSERT_X(m_handler == NULL, Q_FUNC_INFO, "Previous handler must be removed at this time");
+    m_handler = handler;
+}
+
+void QnTransactionMessageBus::removeHandler(ECConnectionNotificationManager* handler) {
+    QMutexLocker lock(&m_mutex);
+    Q_ASSERT(!m_thread->isRunning());
+    Q_ASSERT_X(m_handler == handler, Q_FUNC_INFO, "We must remove only current handler");
+    if( m_handler == handler )
+        m_handler = nullptr;
 }
 
 }

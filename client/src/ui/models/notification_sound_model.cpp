@@ -1,7 +1,7 @@
 #include "notification_sound_model.h"
 
 QnNotificationSoundModel::QnNotificationSoundModel(QObject *parent) :
-    QStandardItemModel(parent)
+    base_type(parent)
 {
     init();
 }
@@ -90,12 +90,17 @@ bool QnNotificationSoundModel::loaded() const {
     return m_loaded;
 }
 
+Qt::ItemFlags QnNotificationSoundModel::flags(const QModelIndex &index) const {
+    Qt::ItemFlags result = base_type::flags(index);
+    return result &~ Qt::ItemIsEditable;
+}
+
 void QnNotificationSoundModel::sort(int column, Qt::SortOrder order) {
     if (rowCount() > 0) {
         QList<QStandardItem*> noSoundRow = takeRow(0);
-        QStandardItemModel::sort(column, order);
+        base_type::sort(column, order);
         insertRow(0, noSoundRow);
     } else {
-        QStandardItemModel::sort(column, order);
+        base_type::sort(column, order);
     }
 }

@@ -208,6 +208,12 @@ public:
     // in some cases I just want to update couple of field from just discovered resource
     virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) override;
 
+    //TODO: #rvasilenko #High #2.4 get rid of this temporary solution
+    /**
+     * Temporary solution to correctly detach desktop cameras when user reconnects from one server to another.
+     * Implemented in QnDesktopCameraResource.
+     */
+    virtual bool isReadyToDetach() const {return true;}
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
@@ -240,7 +246,7 @@ signals:
 
 protected slots:
     virtual void at_parentIdChanged();
-
+    virtual void at_motionRegionChanged();
 protected:
     void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 

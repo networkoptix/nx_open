@@ -89,7 +89,7 @@ public:
     QnNetworkResourceList getAllNetResourceByPhysicalId(const QString &mac) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QString &hostAddress) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QHostAddress &hostAddress) const;
-    QnResourceList getAllCameras(const QnResourcePtr &mServer, bool ignoreDesktopCameras = false) const;
+    QnVirtualCameraResourceList getAllCameras(const QnResourcePtr &mServer, bool ignoreDesktopCameras = false) const;
     QnMediaServerResourceList getAllServers() const;
     QnResourceList getResourcesByParentId(const QnUuid& parentId) const;
 
@@ -134,8 +134,6 @@ public:
     QnVideoWallMatrixIndexList getVideoWallMatricesByUuid(const QList<QnUuid> &uuids) const;
 
     QStringList allTags() const;
-
-    int activeCamerasByLicenseType(Qn::LicenseType licenseType) const;
 
     //!Empties all internal dictionaries. Needed for correct destruction order at application stop
     void clear();

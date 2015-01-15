@@ -34,8 +34,6 @@
 
 
 
-QnResourceDiscoveryManager* QnResourceDiscoveryManager::m_instance;
-
 // ------------------------------------ QnManualCameraInfo -----------------------------
 
 QnManualCameraInfo::QnManualCameraInfo(const QUrl& url, const QAuthenticator& auth, const QString& resType)
@@ -95,22 +93,10 @@ void QnResourceDiscoveryManager::setReady(bool ready)
     m_ready = ready;
 }
 
-void QnResourceDiscoveryManager::init(QnResourceDiscoveryManager* instance)
-{
-    m_instance = instance;
-}
-
 void QnResourceDiscoveryManager::start( Priority priority )
 {
     QnLongRunnable::start( priority );
     //moveToThread( this );
-}
-
-QnResourceDiscoveryManager* QnResourceDiscoveryManager::instance()
-{
-    Q_ASSERT_X(m_instance, "QnResourceDiscoveryManager::init MUST be called first!", Q_FUNC_INFO);
-    //return *qnResourceDiscoveryManagerInstance();
-    return m_instance;
 }
 
 void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* serv)
@@ -292,6 +278,9 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
     if (!mServer || !ownServer)
         return false;
 
+    if (camera->hasFlags(Qn::desktop_camera))
+        return true;
+
 #ifdef EDGE_SERVER
     if (!ownServer->isRedundancy()) 
     {
@@ -304,14 +293,14 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
 #endif
     if ((mServer->getServerFlags() & Qn::SF_Edge) && !mServer->isRedundancy())
         return false; // do not transfer cameras from edge server
-    if (!ownServer->isRedundancy())
-        return false; // redundancy is disabled
 
     if (camera->preferedServerId() == ownGuid)
         return true;
     else if (mServer->getStatus() == Qn::Online)
         return false;
 
+    if (!ownServer->isRedundancy())
+        return false; // redundancy is disabled
 
     if (qnResPool->getAllCameras(ownServer, true).size() + awaitingToMoveCameraCnt >= ownServer->getMaxCameras())
         return false;

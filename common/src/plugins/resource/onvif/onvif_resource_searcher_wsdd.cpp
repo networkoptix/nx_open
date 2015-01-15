@@ -586,9 +586,12 @@ void fixDiscoveredName(QString& name, QString& manufacturer, const QString& loca
         name = manufacturer;
         manufacturer = lit("DLink");
     }
-    else if(lowerName.startsWith(lit("vista_")) && manufacturer.toLower().startsWith(lit("vk2-"))) {
+    else if( (lowerName.startsWith(lit("vista_")) || lowerName.startsWith(lit("norbain_"))) && manufacturer.toLower().startsWith(lit("vk2-"))) {
         name = manufacturer;
         manufacturer = lit("VISTA");
+    }
+    else if(lowerName.startsWith(lit("axis "))) {
+        manufacturer = lit("AXIS");
     }
 }
 

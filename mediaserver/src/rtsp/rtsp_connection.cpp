@@ -529,7 +529,7 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbst
     else
         rotation = res->getProperty(QnMediaResource::rotationKey()).toInt();
 
-    qreal customAR = res->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
+    qreal customAR = getResource()->customAspectRatio();
 
     QnImageFilterHelper extraTranscodeParams;
     extraTranscodeParams.setVideoLayout(vLayout);

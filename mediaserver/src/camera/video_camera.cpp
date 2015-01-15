@@ -178,7 +178,7 @@ QnConstCompressedVideoDataPtr QnVideoCameraGopKeeper::GetIFrameByTime(qint64 tim
     }
 
     //TODO #ak looks like std::lower_bound will do fine here
-    for (int i = 0; i < (int)m_lastKeyFrames[channel].size(); ++i)
+    for (size_t i = 0; i < m_lastKeyFrames[channel].size(); ++i)
     {
         if (m_lastKeyFrames[channel][i]->timestamp >= time) {
             if (iFrameAfterTime || m_lastKeyFrames[channel][i]->timestamp == time || i == 0)

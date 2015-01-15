@@ -43,7 +43,8 @@ QnAbstractPtzController *QnVistaResource::createPtzControllerInternal() {
 
 bool QnVistaResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
 {
-    if( hasFlags(Qn::foreigner) )     //we do not own camera
+    if( hasFlags(Qn::foreigner) ||      //we do not own camera
+        !hasCameraCapabilities(Qn::RelayInputCapability) )
     {
         return false;
     }

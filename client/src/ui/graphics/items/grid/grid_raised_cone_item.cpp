@@ -150,12 +150,16 @@ void QnGridRaisedConeItem::updateGeometry() {
               ? qBound(0.0, m_targetRect.width() / m_originRect.width() - 1.0, 1.0)
               : 0.0
               : 0.0;
+#if 0
     qreal widgetOpacity = m_effectEnabled
             ? 1.0 - (1.0 - qnGlobals->raisedWigdetOpacity())*coneOpacity
             : 1.0;
+#endif
 
     opacityAnimator(this)->animateTo(coneOpacity);
+#if 0
     opacityAnimator(m_widget)->animateTo(widgetOpacity);
+#endif
 }
 
 

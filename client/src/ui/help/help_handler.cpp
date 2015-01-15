@@ -23,6 +23,12 @@ namespace {
         }
     }
 
+#ifdef Q_OS_MAC
+    const QString relativeHelpRootPath = lit("/help");
+#else
+    const QString relativeHelpRootPath = lit("/../help");
+#endif
+
     /** If the help could not be loaded, try again in 30 seconds. */
     const int defaultHelpRetryPeriodMSec = 30*1000;
 
@@ -37,7 +43,7 @@ QnHelpHandler::QnHelpHandler(QObject *parent):
     m_topic(Qn::Empty_Help),
     m_helpRetryPeriodMSec(defaultHelpRetryPeriodMSec)
 {
-    m_helpRoot = qApp->applicationDirPath() + QLatin1String("/../help");
+    m_helpRoot = qApp->applicationDirPath() + relativeHelpRootPath;
 
     QnOnlineHelpDetector *helpDetector = new QnOnlineHelpDetector(this);
     connect(helpDetector,   &QnOnlineHelpDetector::urlFetched,  this,   [this, helpDetector](const QString &helpUrl) {

@@ -29,9 +29,6 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     QObject(parent),
     m_userWatcher(NULL),
     m_layoutWatcher(NULL)
-#ifdef Q_OS_WIN
-    ,m_desktopCameraWatcher(NULL)
-#endif
 {
     if(resourcePool == NULL) {
         qnNullWarning(resourcePool);
@@ -81,9 +78,6 @@ QnWorkbenchContext::~QnWorkbenchContext() {
     QnInstanceStorage::clear();
     m_userWatcher = NULL;
     m_layoutWatcher = NULL;
-#ifdef Q_OS_WIN
-    m_desktopCameraWatcher = NULL;
-#endif
 
     /* Destruction order of these objects is important. */
     m_navigator.reset();

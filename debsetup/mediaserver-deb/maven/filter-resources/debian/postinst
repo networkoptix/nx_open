@@ -7,6 +7,8 @@ COMPANY_NAME=${deb.customization.company.name}
 if [ -n "$DEBIAN_SCRIPT_DEBUG" ]; then set -v -x; DEBIAN_SCRIPT_TRACE=1; fi
 ${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
 
+UPGRADING=${2:+yes}
+
 export PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin
 
 BASE_DIR="/opt/$COMPANY_NAME/mediaserver"
@@ -37,7 +39,6 @@ fi
 PORT_DEFAULT="7001"
 TRANSPORT_DEAULT="auto"
 PUBLIC_IP_ENABLED_DEFAULT="auto"
-SYSTEM_NAME_DEFAULT=$COMPANY_NAME
 ALLOW_CAMERA_CHANGES_DEFAULT=true
 
 function is_local_addr {
@@ -81,10 +82,10 @@ function ask_for_value {
     local full_name="$COMPANY_NAME-mediaserver/$varname"
     local error_message="${full_name}_invalid"
 
-    # Support unattended install
+    # Support unattened install
     db_get $full_name
     if [ "$RET" = "" ]; then
-        db_set $full_name $default
+        [ -n "$default" ] && db_set $full_name $default
     fi
 
     db_input high $full_name || true
@@ -140,6 +141,10 @@ function find_free_port {
 
 case "$1" in
     configure)
+        ECS_GUID="$($EC_CFG_HELPER ecsGuid)"
+        SYSTEM_NAME_SUFFIX=$(echo $ECS_GUID | sed 's/{*\([^{-]\+\)-.*/\1/')
+        SYSTEM_NAME_DEFAULT=System_${SYSTEM_NAME_SUFFIX:-$RANDOM}
+
         ECS_HOST="$($CFG_HELPER appserverHost)"
         if [ -n "$ECS_HOST" ]; then
             if is_local_addr "$ECS_HOST"; then
@@ -153,31 +158,47 @@ case "$1" in
             fi
         fi
 
-        PORT="$($CFG_HELPER port)"
-        [ -z "$PORT" ] && PORT="$($EC_CFG_HELPER port)"
-        [ -z "$PORT" ] && PORT=`find_free_port $PORT_DEFAULT`
-        PORT=$(ask_for_value port "$PORT")
-        $CFG_HELPER port "$PORT"
+        if [ -z "$UPGRADING" ]
+        then
+            PORT="$($CFG_HELPER port)"
+            [ -z "$PORT" ] && PORT="$($EC_CFG_HELPER port)"
+            [ -z "$PORT" ] && PORT=$(find_free_port $PORT_DEFAULT)
+            PORT=$(ask_for_value port "$PORT")
+            $CFG_HELPER port "$PORT"
 
-        if [ ! -f $DB_PATH -a ! -f $OLD_DB_PATH ]; then
-            APPSERVER_PASSWORD=$(ask_for_value appserverPassword "$APPSERVER_PASSWORD")
-            $CFG_HELPER appserverPassword "$APPSERVER_PASSWORD"
+            if [ ! -f $DB_PATH -a ! -f $OLD_DB_PATH ]; then
+                APPSERVER_PASSWORD=$(ask_for_value appserverPassword "$APPSERVER_PASSWORD")
+                $CFG_HELPER appserverPassword "$APPSERVER_PASSWORD"
+            fi
+
+            TRANSPORT="$($CFG_HELPER rtspTransport)"
+            [ -z "$TRANSPORT" ] && TRANSPORT=$TRANSPORT_DEFAULT
+            $CFG_HELPER rtspTransport "$TRANSPORT"
+
+            SYSTEM_NAME="$($CFG_HELPER systemName)"
+            [ -z "$SYSTEM_NAME" ] && SYSTEM_NAME=$SYSTEM_NAME_DEFAULT
+            SYSTEM_NAME=$(ask_for_value systemName "$SYSTEM_NAME")
+            $CFG_HELPER systemName "$SYSTEM_NAME"
+
+            ALLOW_CAMERA_CHANGES="$($CFG_HELPER allowCameraChanges)"
+            [ -z "$ALLOW_CAMERA_CHANGES" ] && ALLOW_CAMERA_CHANGES=$($EC_CFG_HELPER allowCameraChanges)
+            [ -z "$ALLOW_CAMERA_CHANGES" ] && ALLOW_CAMERA_CHANGES=$ALLOW_CAMERA_CHANGES_DEFAULT
+            ALLOW_CAMERA_CHANGES=$(ask_for_value allowCameraChanges "$ALLOW_CAMERA_CHANGES")
+            $CFG_HELPER allowCameraChanges "$ALLOW_CAMERA_CHANGES"
+        else
+            PORT="$($CFG_HELPER port)"
+            [ -z "$PORT" ] && PORT="$($EC_CFG_HELPER port)"
+            [ -z "$PORT" ] && PORT=$(find_free_port $PORT_DEFAULT)
+            $CFG_HELPER port "$PORT"
+
+            SYSTEM_NAME="$($CFG_HELPER systemName)"
+            [ -z "$SYSTEM_NAME" ] && $CFG_HELPER systemName "$SYSTEM_NAME_DEFAULT"
+
+            ALLOW_CAMERA_CHANGES="$($CFG_HELPER allowCameraChanges)"
+            [ -z "$ALLOW_CAMERA_CHANGES" ] && ALLOW_CAMERA_CHANGES=$($EC_CFG_HELPER allowCameraChanges)
+            [ -z "$ALLOW_CAMERA_CHANGES" ] && ALLOW_CAMERA_CHANGES=$ALLOW_CAMERA_CHANGES_DEFAULT
+            $CFG_HELPER allowCameraChanges "$ALLOW_CAMERA_CHANGES"
         fi
-
-        TRANSPORT="$($CFG_HELPER rtspTransport)"
-        [ -z "$TRANSPORT" ] && TRANSPORT=$TRANSPORT_DEFAULT
-        $CFG_HELPER rtspTransport "$TRANSPORT"
-
-        SYSTEM_NAME="$($CFG_HELPER systemName)"
-        [ -z "$SYSTEM_NAME" ] && SYSTEM_NAME=$SYSTEM_NAME_DEFAULT
-        SYSTEM_NAME=$(ask_for_value systemName "$SYSTEM_NAME")
-        $CFG_HELPER systemName "$SYSTEM_NAME"
-
-        ALLOW_CAMERA_CHANGES="$($CFG_HELPER allowCameraChanges)"
-        [ -z "$ALLOW_CAMERA_CHANGES" ] && ALLOW_CAMERA_CHANGES=$($EC_CFG_HELPER allowCameraChanges)
-        [ -z "$ALLOW_CAMERA_CHANGES" ] && ALLOW_CAMERA_CHANGES=$ALLOW_CAMERA_CHANGES_DEFAULT
-        ALLOW_CAMERA_CHANGES=$(ask_for_value allowCameraChanges "$ALLOW_CAMERA_CHANGES")
-        $CFG_HELPER allowCameraChanges "$ALLOW_CAMERA_CHANGES"
 
         "$CERTGEN" -i
 

@@ -322,9 +322,11 @@ bool QnResourcePoolModelNode::calculateBastard() const {
             if (layout->data().contains(Qn::LayoutSearchStateRole))
                 return true;
         } else {
+#ifndef DESKTOP_CAMERA_DEBUG
             /* Hide desktop camera resources from the tree. */
             if ((m_flags & Qn::desktop_camera) == Qn::desktop_camera)
                 return true;
+#endif
 
             /* Hide local server resource. */
             if ((m_flags & Qn::local_server) == Qn::local_server)

@@ -59,6 +59,11 @@ QN_EXPORT int strEqualAmount(const char* str1, const char* str2);
 QN_EXPORT bool isNewDiscoveryAddressBetter(const QString& host, const QString& newAddress, const QString& oldAddress);
 
 static const int MAC_ADDR_LEN = 18;
-QN_EXPORT void getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host);
+/*!
+    \param host If function succeeds \a *host contains pointer to statically-allocated buffer, 
+        so it MUST NOT be freed!
+    \return 0 on success, -1 in case of error. Use errno to get error code
+*/
+QN_EXPORT int getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host);
 
 #endif //cl_net_tools_1232
