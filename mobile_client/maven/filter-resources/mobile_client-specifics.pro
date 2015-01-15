@@ -15,6 +15,8 @@ INCLUDEPATH +=  ${root.dir}/appserver2/src/
 QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
 
 android {
+    Qt += androidextras
+
 # TODO: #dklychkov make this not hardcoded
     PRE_TARGETDEPS += \
         $$OUTPUT_PATH/lib/$$CONFIGURATION/libcommon.a \
