@@ -484,14 +484,17 @@ bool QnDbManager::init(
     {
         QnUserResourcePtr userResource( new QnUserResource() );
         fromApiToResource( users[0], userResource );
-        userResource->setPassword( defaultAdminPassword );
-        userResource->generateHash();
 
-        QnTransaction<ApiUserData> userTransaction( ApiCommand::saveUser );
+        if (!userResource->checkPassword(defaultAdminPassword)) {
+            userResource->setPassword( defaultAdminPassword );
+            userResource->generateHash();
 
-        transactionLog->fillPersistentInfo(userTransaction);
-        fromResourceToApi( userResource, userTransaction.params );
-        executeTransactionNoLock( userTransaction, QnUbjson::serialized( userTransaction ) );
+            QnTransaction<ApiUserData> userTransaction( ApiCommand::saveUser );
+
+            transactionLog->fillPersistentInfo(userTransaction);
+            fromResourceToApi( userResource, userTransaction.params );
+            executeTransactionNoLock( userTransaction, QnUbjson::serialized( userTransaction ) );
+        }
     }
 
     QSqlQuery queryCameras( m_sdb );
