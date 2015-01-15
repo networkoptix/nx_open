@@ -211,10 +211,14 @@ class ClusterTest():
             start = max(0,i - 64)
             end = min(64,len(str) - i) + i
             comp1 = str[start:i]
-            comp2 = str[i]
+            # FIX: the i can be index that is the length which result in index out of range
+            if i >= len(str):
+                comp2 = "<EOF>"
+            else:
+                comp2 = str[i]
             comp3 = ""
             if i + 1 >= len(str):
-                comp3 = ""
+                comp3 = "<EOF>"
             else:
                 comp3 = str[i + 1:end]
             print "%s^^^%s^^^%s\n" % (comp1,comp2,comp3)
@@ -2568,6 +2572,8 @@ class SingleServerRtspTestBase:
         for c in json_obj:
             if c["typeId"] == "{1657647e-f6e4-bc39-d5e8-563c93cb5e1c}":
                 continue # Skip desktop
+            if "name" in c and c["name"].startswith("ec2_test"):
+                continue # Skip fake camera
             self._cameraList.append((c["physicalId"],c["id"],c["name"]))
             self._cameraInfoTable[c["id"]] = c
 
