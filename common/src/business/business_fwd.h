@@ -42,7 +42,7 @@ namespace QnBusiness
 {
 #ifdef Q_MOC_RUN
     Q_GADGET
-    Q_ENUMS(EventReason EventState EventType ActionType)
+    Q_ENUMS(EventReason EventState EventType ActionType UserGroup)
 public:
 #else
     Q_NAMESPACE
@@ -60,6 +60,7 @@ public:
         StorageFullReason,
         LicenseRemoved
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventReason)
 
     enum EventState {
         InactiveState = 0,
@@ -170,8 +171,21 @@ public:
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ActionType)
 
+    enum UserGroup {
+        EveryOne  = 0,
+        AdminOnly = 1,
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(UserGroup)
+
 } // namespace QnBusiness
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnBusiness::EventReason)(QnBusiness::EventState)(QnBusiness::EventType)(QnBusiness::ActionType), (metatype)(lexical))
+#define QN_BUSINESS_ENUM_TYPES \
+    (QnBusiness::EventReason)\
+    (QnBusiness::EventState)\
+    (QnBusiness::EventType)\
+    (QnBusiness::ActionType)\
+    (QnBusiness::UserGroup)\
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(QN_BUSINESS_ENUM_TYPES, (metatype)(numeric)(lexical))
 
 #endif // QN_BUSINESS_FWD_H

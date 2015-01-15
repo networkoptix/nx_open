@@ -95,10 +95,10 @@ QnBusinessAggregationInfo::QnBusinessAggregationInfo() {
 
 int QnBusinessAggregationInfo::totalCount() const {
     int result = 0;
-    QMap<QString, QnInfoDetail>::const_iterator itr = m_details.constBegin();
+    auto itr = m_details.constBegin();
     while (itr != m_details.end())
     {
-        result += itr.value().count();
+        result += itr->count();
         ++itr;
     }
     return result;
@@ -116,7 +116,7 @@ void QnBusinessAggregationInfo::append(
     const QnBusinessEventParameters &runtimeParams,
     const QnBusinessAggregationInfo& subAggregationData )
 {
-    QString key = runtimeParams.getParamsKey();
+    QnUuid key = runtimeParams.getParamsHash();
     QnInfoDetail& info = m_details[key];
     if (info.count() == 0) //not initialized
     {

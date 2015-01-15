@@ -20,3 +20,10 @@ CREATE UNIQUE INDEX idx_bookmark_guid ON storage_bookmark(guid);
 
 -- Index for faster duration-based requests
 CREATE INDEX idx_bookmark_duration ON storage_bookmark(duration);
+
+-- FTS table for quick bookmarks search
+CREATE VIRTUAL TABLE fts_bookmarks USING fts3(
+    name,                                                   -- contents of the name field
+    description,                                            -- contents of the description field
+    tags                                                    -- joined tags text
+);

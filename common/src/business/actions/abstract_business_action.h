@@ -109,8 +109,8 @@ public:
     void setAggregationCount(int value) { m_aggregationCount = value; }
     int getAggregationCount() const { return m_aggregationCount; }
 
-    qint64 timestamp() const { return m_runtimeParams.getEventTimestamp(); }
-    QnBusiness::EventType eventType() const { return m_runtimeParams.getEventType(); }
+    qint64 timestamp() const { return m_runtimeParams.eventTimestamp; }
+    QnBusiness::EventType eventType() const { return m_runtimeParams.eventType; }
 
     void setCompareString(const QString& value) { m_compareString = value; }
     const QString& compareString() const { return m_compareString; }
