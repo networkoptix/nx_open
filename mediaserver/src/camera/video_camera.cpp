@@ -48,6 +48,7 @@ public:
     QnConstCompressedVideoDataPtr GetIFrameByTime(qint64 time, bool iFrameAfterTime, int channel) const;
     QnConstCompressedAudioDataPtr getLastAudioFrame() const;
     void updateCameraActivity();
+    virtual bool needConfigureProvider() const override { return false; }
 private:
     mutable QMutex m_queueMtx;
     int m_lastKeyFrameChannel;
@@ -202,8 +203,12 @@ void QnVideoCameraGopKeeper::updateCameraActivity()
             lastKeyTime = m_lastKeyFrame[0]->timestamp;
     }
     if (!m_resource->hasFlags(Qn::foreigner) && m_resource->isInitialized() &&
-       (lastKeyTime == AV_NOPTS_VALUE || qnSyncTime->currentUSecsSinceEpoch() - lastKeyTime > CAMERA_UPDATE_INTERNVAL))
+       (lastKeyTime == AV_NOPTS_VALUE || qnSyncTime->currentUSecsSinceEpoch() - lastKeyTime > CAMERA_UPDATE_INTERNVAL) &&
+       m_catalog == QnServer::HiQualityCatalog)
     {
+        if (m_nextMinTryTime == 0)
+            m_nextMinTryTime = usecTime + (rand()%5000 + 5000) * 1000ll; // get first screenshot after minor delay
+
         if (!m_activityStarted && usecTime > m_nextMinTryTime) {
             m_activityStarted = true;
             m_activityStartTime = usecTime;

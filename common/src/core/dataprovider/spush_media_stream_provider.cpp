@@ -9,6 +9,7 @@
 
 #include <core/resource/camera_resource.h>
 
+static const qint64 CAM_NEED_CONTROL_CHECK_TIME = 1000 * 1;
 
 CLServerPushStreamReader::CLServerPushStreamReader(const QnResourcePtr& dev ):
     QnLiveStreamProvider(dev),
@@ -16,7 +17,8 @@ CLServerPushStreamReader::CLServerPushStreamReader(const QnResourcePtr& dev ):
     m_cameraAudioEnabled(false),
     m_openStreamResult(CameraDiagnostics::ErrorCode::unknown),
     m_openStreamCounter(0),
-    m_FrameCnt(0)
+    m_FrameCnt(0),
+    m_cameraControlRequired(false)
 {
     const QnPhysicalCameraResource* camera = dynamic_cast<QnPhysicalCameraResource*>(dev.data());
     if (camera) 
@@ -67,8 +69,10 @@ void CLServerPushStreamReader::run()
                 if (m_openStreamResult == CameraDiagnostics::NoErrorResult())
                     m_openStreamResult = openStreamResult;
             }
-            else
+            else {
                 m_openStreamResult = openStreamResult = openStream();
+                m_needControlTimer.restart();
+            }
 
             {
                 QMutexLocker lk( &m_openStreamMutex );
@@ -99,6 +103,14 @@ void CLServerPushStreamReader::run()
                 }
 
                 continue;
+            }
+            else {
+                if (m_needControlTimer.elapsed() > CAM_NEED_CONTROL_CHECK_TIME) 
+                {
+                    if (isCameraControlRequired() && !m_cameraControlRequired)
+                        pleaseReOpen();
+                    m_needControlTimer.restart();
+                }
             }
         }
 

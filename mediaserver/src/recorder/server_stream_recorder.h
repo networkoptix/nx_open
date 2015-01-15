@@ -43,6 +43,7 @@ public:
     void stopForcedRecording();
 
     int getFRAfterThreshold() const;
+    bool needConfigureProvider() const;
 signals:
     void fpsChanged(QnServerStreamRecorder* recorder, float value);
     void motionDetected(QnResourcePtr resource, bool value, qint64 time, QnConstAbstractDataPacketPtr motion);

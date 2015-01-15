@@ -27,6 +27,11 @@ public:
             Data provider should use \a canAcceptData method to find out whether it is possible
     */
     virtual void putData( const QnAbstractDataPacketPtr& data ) = 0;
+
+    /*!
+        \note DataReceptor is required that provider should be fully configured
+    */
+    virtual bool needConfigureProvider() const { return true; }
 };
 
 #endif // ENABLE_DATA_PROVIDERS

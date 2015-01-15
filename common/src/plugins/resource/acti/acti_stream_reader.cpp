@@ -61,8 +61,8 @@ CameraDiagnostics::Result QnActiStreamReader::openStream()
     QString bitrateStr = formatBitrateStr(bitrate);
     QString encoderStr(QLatin1String("H264"));
     QString audioStr = m_actiRes->isAudioEnabled() ? QLatin1String("1") : QLatin1String("0");
-
-    if (!isCameraControlDisabled())
+    m_cameraControlRequired = isCameraControlRequired();
+    if (m_cameraControlRequired)
     {
         CLHttpStatus status;
         QByteArray result = m_actiRes->makeActiRequest(QLatin1String("encoder"), SET_FPS.arg(ch).arg(fps), status);
