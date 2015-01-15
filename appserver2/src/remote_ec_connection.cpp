@@ -47,8 +47,6 @@ namespace ec2
         url.setScheme( m_connectionInfo.allowSslConnections ? lit("https") : lit("http") );
         url.setPath("ec2/events");
         QUrlQuery q;
-        q.addQueryItem("guid", qnCommon->moduleGUID().toString());
-        q.addQueryItem("runtime-guid", qnCommon->runningInstanceGUID().toString());
         url.setQuery(q);
         m_peerUrl = url;
         QnTransactionMessageBus::instance()->addConnectionToPeer(url);

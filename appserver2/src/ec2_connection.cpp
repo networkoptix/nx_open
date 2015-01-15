@@ -26,8 +26,8 @@ namespace ec2
     {
         QnDbManager::instance()->init(
             resCtx.resFactory,
-            dbUrl.toLocalFile(),
-            QUrlQuery(dbUrl.query()).queryItemValue("staticdb_path") );
+            dbUrl
+            );
 
         QnTransactionMessageBus::instance()->setHandler( notificationManager() );
     }

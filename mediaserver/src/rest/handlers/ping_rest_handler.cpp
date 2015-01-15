@@ -14,7 +14,9 @@ int QnPingRestHandler::executeGet(const QString &path, const QnRequestParams &pa
 
     QnPingReply reply;
     reply.moduleGuid = qnCommon->moduleGUID();
-
+    reply.systemName = qnCommon->localSystemName();
+    reply.sysIdTime = qnCommon->systemIdentityTime();
+    
     result.setReply( reply );
     return nx_http::StatusCode::ok;
 }

@@ -43,7 +43,7 @@ namespace ec2
 
         void addConnectionToPeer(const QUrl& url);
         void removeConnectionFromPeer(const QUrl& url);
-        void gotConnectionFromRemotePeer(const QSharedPointer<AbstractStreamSocket>& socket, const ApiPeerData &remotePeer);
+        void gotConnectionFromRemotePeer(const QSharedPointer<AbstractStreamSocket>& socket, const ApiPeerData &remotePeer, qint64 remoteSystemIdentityTime);
         void dropConnections();
         
         ApiPeerData localPeer() const;
@@ -235,6 +235,7 @@ namespace ec2
         // alive control
         QElapsedTimer m_aliveSendTimer;
         std::unique_ptr<QnRuntimeTransactionLog> m_runtimeTransactionLog;
+        bool m_restartPending;
     };
 }
 #define qnTransactionBus ec2::QnTransactionMessageBus::instance()
