@@ -25,17 +25,15 @@ bool QnSortFilterPlainResourceModel::lessThan(const QModelIndex &left, const QMo
         QString leftName = left.data(Qn::ServerNameRole).toString();
         QString rightName = right.data(Qn::ServerNameRole).toString();
 
-        qDebug() << naturalStringLessThan(leftName, rightName);
-        return naturalStringLessThan(leftName, rightName);
+        return naturalStringLess(leftName, rightName);
     }
 
     if (leftType != rightType) {
-        qDebug() << (leftType == QnPlainResourceModel::ServerNode);
         return leftType == QnPlainResourceModel::ServerNode;
     }
 
     QString leftName = left.data(Qt::DisplayRole).toString();
     QString rightName = right.data(Qt::DisplayRole).toString();
 
-    return naturalStringLessThan(leftName, rightName);
+    return naturalStringLess(leftName, rightName);
 }
