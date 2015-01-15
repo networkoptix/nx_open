@@ -345,8 +345,8 @@ FocusScope {
         anchors {
             bottom: parent.bottom
             bottomMargin: parent.width / 6
+            right: parent.right
             rightMargin: parent.width / 6
-            horizontalCenter: loginDialog.horizontalCenter
         }
 
         QnRoundButton {
@@ -375,6 +375,14 @@ FocusScope {
 
             onClicked: LoginDialogFunctions.connectToServer()
         }
+
+        Behavior on rotation {
+            RotationAnimation {
+                easing.type: Easing.OutQuad
+                duration: 200
+                direction: RotationAnimation.Counterclockwise
+            }
+        }
     }
 
     states: [
@@ -384,14 +392,13 @@ FocusScope {
                 target: savedSessions
                 x: 0
             }
-            AnchorChanges {
-                target: fab
-                anchors.horizontalCenter: loginDialog.horizontalCenter
-                anchors.right: undefined
-            }
             PropertyChanges {
                 target: actionBar
                 state: "HIDDEN"
+            }
+            PropertyChanges {
+                target: fab
+                rotation: -180.0
             }
         },
         State {
@@ -400,14 +407,13 @@ FocusScope {
                 target: savedSessions
                 x: -loginDialog.width
             }
-            AnchorChanges {
-                target: fab
-                anchors.horizontalCenter: undefined
-                anchors.right: loginDialog.right
-            }
             PropertyChanges {
                 target: actionBar
                 state: "EDIT"
+            }
+            PropertyChanges {
+                target: fab
+                rotation: 0.0
             }
         }
     ]
@@ -423,10 +429,6 @@ FocusScope {
                 easing.type: Easing.OutQuad
                 duration: 200
             }
-            AnchorAnimation {
-                easing.type: Easing.OutQuad
-                duration: 200
-            }
         },
         Transition {
             from: "EDIT"
@@ -435,10 +437,6 @@ FocusScope {
             NumberAnimation {
                 target: savedSessions
                 property: "x"
-                easing.type: Easing.OutQuad
-                duration: 200
-            }
-            AnchorAnimation {
                 easing.type: Easing.OutQuad
                 duration: 200
             }
