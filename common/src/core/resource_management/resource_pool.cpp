@@ -17,8 +17,6 @@
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 
-//#define DESKTOP_CAMERA_DEBUG
-
 #ifdef QN_RESOURCE_POOL_DEBUG
 #   define TRACE(...) qDebug << __VA_ARGS__;
 #else
@@ -37,6 +35,7 @@ QnResourcePool::~QnResourcePool()
     blockSignals(signalsBlocked);
 
     QMutexLocker locker(&m_resourcesMtx);
+    m_adminResource.clear();
     m_resources.clear();
 }
 
@@ -77,7 +76,7 @@ void QnResourcePool::addResource(const QnResourcePtr &resource)
 
 void QnResourcePool::addResources(const QnResourceList &resources)
 {
-    m_resourcesMtx.lock();
+    QMutexLocker resourcesLock( &m_resourcesMtx );
 
     for (const QnResourcePtr &resource: resources)
     {
@@ -106,7 +105,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
             m_incompatibleResources.remove(resource->getId());
     }
 
-    m_resourcesMtx.unlock();
+    resourcesLock.unlock();
 
     QnResourceList layouts;
     QnResourceList otherResources;
@@ -179,13 +178,13 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
 {
     QnResourceList removedResources;
 
-    m_resourcesMtx.lock();
+    QMutexLocker lk(&m_resourcesMtx);
 
     for (const QnResourcePtr &resource: resources)
     {
         if (!resource)
             continue;
-
+        resource->setRemovedFromPool(true);
         if(resource->resourcePool() != this)
             qnWarning("Given resource '%1' is not in the pool", resource->metaObject()->className());
 
@@ -201,10 +200,15 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
         //    removedResources.append(resource);
         
         //have to remove by id, since uniqueId can be MAC and, as a result, not unique among friend and foreign resources
-        QHash<QnUuid, QnResourcePtr>::iterator resIter = m_resources.find(resource->getId());
+        QnUuid resId = resource->getId();
+        QHash<QnUuid, QnResourcePtr>::iterator resIter = m_resources.find(resId);
+        if (m_adminResource && resId == m_adminResource->getId())
+            m_adminResource.clear();
+
         if( resIter != m_resources.end() )
         {
             m_resources.erase( resIter );
+            invalidateCache();
             removedResources.append(resource);
         }
         else
@@ -213,6 +217,7 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
             if (resIter != m_incompatibleResources.end())
             {
                 m_incompatibleResources.erase(resIter);
+                invalidateCache();
                 removedResources.append(resource);
             }
         }
@@ -245,7 +250,7 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
         TRACE("RESOURCE REMOVED" << resource->metaObject()->className() << resource->getName());
     }
 
-    m_resourcesMtx.unlock();
+    lk.unlock();
 
     /* Remove resources. */
     for (const QnResourcePtr &resource: removedResources) {
@@ -317,17 +322,17 @@ QnNetworkResourcePtr QnResourcePool::getResourceByMacAddress(const QString &mac)
     return QnNetworkResourcePtr(0);
 }
 
-QnResourceList QnResourcePool::getAllCameras(const QnResourcePtr &mServer, bool ignoreDesktopCameras) const 
+QnVirtualCameraResourceList QnResourcePool::getAllCameras(const QnResourcePtr &mServer, bool ignoreDesktopCameras) const 
 {
     QnUuid parentId = mServer ? mServer->getId() : QnUuid();
-    QnResourceList result;
+    QnVirtualCameraResourceList result;
     QMutexLocker locker(&m_resourcesMtx);
     for (const QnResourcePtr &resource: m_resources) 
     {
         if (ignoreDesktopCameras && resource->hasFlags(Qn::desktop_camera))
             continue;
 
-        QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
+        QnVirtualCameraResourcePtr camResource = resource.dynamicCast<QnVirtualCameraResource>();
         if (camResource && (parentId.isNull() || camResource->getParentId() == parentId))
             result << camResource;
     }
@@ -335,18 +340,12 @@ QnResourceList QnResourcePool::getAllCameras(const QnResourcePtr &mServer, bool 
     return result;
 }
 
-QnMediaServerResourceList QnResourcePool::getAllServers() const 
+QnMediaServerResourceList QnResourcePool::getAllServers() const
 {
-    QMutexLocker locker(&m_resourcesMtx);
-    QnMediaServerResourceList result;
-    for (const QnResourcePtr &resource: m_resources) 
-    {
-        QnMediaServerResourcePtr mServer = resource.dynamicCast<QnMediaServerResource>();
-        if (mServer)
-            result << mServer;
-    }
-
-    return result;
+    QMutexLocker lock(&m_resourcesMtx); //m_resourcesMtx is recursive
+    if (m_cachedServerList.isEmpty())
+        m_cachedServerList = getResources<QnMediaServerResource>();
+    return m_cachedServerList;
 }
 
 QnResourceList QnResourcePool::getResourcesByParentId(const QnUuid& parentId) const
@@ -465,11 +464,16 @@ QnResourceList QnResourcePool::getResourcesWithTypeId(QnUuid id) const
 
 QnUserResourcePtr QnResourcePool::getAdministrator() const {
     QMutexLocker locker(&m_resourcesMtx);
+    if (m_adminResource)
+        return m_adminResource;
 
-    for(const QnResourcePtr &resource: m_resources) {
+    for(const QnResourcePtr &resource: m_resources) 
+    {
         QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-        if (user && user->isAdmin())
+        if (user && user->isAdmin()) {
+            m_adminResource = user;
             return user;
+        }
     }
     return QnUserResourcePtr();
 }
@@ -483,26 +487,6 @@ QStringList QnResourcePool::allTags() const
         result << resource->getTags();
 
     return result;
-}
-
-int QnResourcePool::activeCamerasByLicenseType(Qn::LicenseType licenseType) const
-{
-    int count = 0;
-
-    QMutexLocker locker(&m_resourcesMtx);
-    for (const QnResourcePtr &resource: m_resources) {
-        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-        if (camera && !camera->isScheduleDisabled()) 
-        {
-            QnMediaServerResourcePtr mServer = getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
-            if (mServer && mServer->getStatus() != Qn::Offline)
-            {
-                if (camera->licenseType() == licenseType)
-                    count++;
-            }
-        }
-    }
-    return count;
 }
 
 void QnResourcePool::clear()
@@ -519,6 +503,7 @@ bool QnResourcePool::insertOrUpdateResource( const QnResourcePtr &resource, QHas
     if (itr == resourcePool->end()) {
         // new resource
         resourcePool->insert(id, resource);
+        invalidateCache();
         return true;
     }
     else {
@@ -590,4 +575,9 @@ QnVideoWallMatrixIndexList QnResourcePool::getVideoWallMatricesByUuid(const QLis
             result << index;
     }
     return result;
+}
+
+void QnResourcePool::invalidateCache()
+{
+    m_cachedServerList.clear();
 }

@@ -20,8 +20,29 @@
     <packaging>pom</packaging>
     <name>HD Witness Client</name>
 
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/common/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>appserver2</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/appserver2/pom.xml</systemPath>
+        </dependency>			
+    </dependencies>	
+
     <properties>  
         <product.title>${client.name}</product.title>
+        <product.display.title>${client.display.name}</product.display.title>
         <!--Global libs-->
         <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>
         <!-- ATTENTION!!! -lestbase should be the LATEST in the list!!! Required for Linux -->

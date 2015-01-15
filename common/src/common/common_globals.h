@@ -291,6 +291,7 @@ public:
         desktop_camera = 0x400000,      /**< Desktop Camera resource */
 
         parent_change = 0x800000,       /**< Camera discovery internal purpose */
+        depend_on_parent_status = 0x1000000,   /**< Resource status depend on parent resource status */
 
         local_media = local | media,
         local_layout = local | layout,
@@ -414,7 +415,6 @@ public:
         ItemAspectRatioRole,                        /**< Role for item's aspect ratio. Value of type qreal. */
 
         ItemTimeRole,                               /**< Role for item's playback position, in milliseconds. Value of type qint64. Default value is -1. */
-        ItemThumbnailTimestampRole,                 /**< Role for item's loaded thumbnail timestamp, in milliseconds. Used in thumbnails search. Value of type qint64. */
         ItemPausedRole,                             /**< Role for item's paused state. Value of type bool. */
         ItemSpeedRole,                              /**< Role for item's playback speed. Value of type qreal. */
         ItemSliderWindowRole,                       /**< Role for slider window that is displayed when the item is active. Value of type QnTimePeriod. */

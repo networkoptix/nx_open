@@ -13,6 +13,7 @@
 #include "api/model/rebuild_archive_reply.h"
 
 #include <ui/dialogs/workbench_state_dependent_dialog.h>
+#include "nx_ec/data/api_fwd.h"
 
 class QLabel;
 
@@ -31,7 +32,8 @@ class QnServerSettingsDialog: public QnWorkbenchStateDependentButtonBoxDialog {
 public:
     explicit QnServerSettingsDialog(const QnMediaServerResourcePtr &server, QWidget *parent = NULL);
     virtual ~QnServerSettingsDialog();
-
+signals:
+    void rebuildArchiveDone();
 public slots:
     virtual void accept() override;
     virtual void reject() override;
@@ -84,6 +86,7 @@ private:
     bool m_maxCamerasAdjusted;
 
     RebuildState m_rebuildState;
+    ec2::ApiIdDataList m_storagesToRemove;
 };
 
 #endif // SERVER_SETTINGS_DIALOG_H

@@ -106,7 +106,7 @@ def main(app_path, bindir, libdir, helpdir):
     for binary in prepare(client_binary, bindir, tlibdir):
         fix_binary(binary, bindir, libdir, qlibdir, tlibdir)
 
-    shutil.copytree(helpdir, "{app_path}/Contents/help".format(app_path=app_path))
+    shutil.copytree(helpdir, "{app_path}/Contents/MacOS/help".format(app_path=app_path))
 
 if __name__ == '__main__':
     _, appdir, bindir, libdir, helpdir = sys.argv

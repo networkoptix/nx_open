@@ -42,6 +42,10 @@ QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget *widget):
     updateLimits();
 }
 
+qreal QnFisheyePtzController::customAR() const {
+    return m_widget->resource()->customAspectRatio();
+}
+
 QnFisheyePtzController::~QnFisheyePtzController() {
     /* We must be deleted from our thread because of the renderer access below. */
     assert(thread() == QThread::currentThread());

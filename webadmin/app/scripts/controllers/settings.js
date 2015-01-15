@@ -3,9 +3,9 @@
 angular.module('webadminApp')
     .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,$location,$timeout) {
 
-        mediaserver.getCurrentUser().success(function(result){
-            if(!result.reply.isAdmin){
-                $location.path("/info"); //no admin rights - redirect
+        mediaserver.getCurrentUser().then(function(result){
+            if(!result.data.reply.isAdmin && !(result.data.reply.permissions & Config.globalEditServersPermissions)){
+                $location.path('/info'); //no admin rights - redirect
                 return;
             }
         });
@@ -17,6 +17,9 @@ angular.module('webadminApp')
                 port: r.data.reply.port,
                 id: r.data.reply.id
             };
+
+            $scope.oldSystemName = r.data.reply.systemName;
+            $scope.oldPort = r.data.reply.port;
         });
 
         $scope.password = '';
@@ -36,27 +39,29 @@ angular.module('webadminApp')
 
             modalInstance.result.then(function (settings) {
                 $log.info(settings);
-                mediaserver.mergeSystems(settings.url,settings.password,settings.keepMySystem).then(function(r){
-                    if(r.data.error!=0){
+                mediaserver.mergeSystems(settings.url,settings.password,settings.currentPassword,settings.keepMySystem).then(function(r){
+                    if(r.data.error!=='0'){
                         var errorToShow = r.data.errorString;
                         switch(errorToShow){
                             case 'FAIL':
-                                errorToShow = "System is unreachable or doesn't exist.";
+                                errorToShow = 'System is unreachable or doesn\'t exist.';
                                 break;
                             case 'UNAUTHORIZED':
                             case 'password':
-                                errorToShow = "Wrong password.";
+                            case 'PASSWORD':
+                                errorToShow = 'Wrong password.';
                                 break;
                             case 'INCOMPATIBLE':
-                                errorToShow = "Found system has incompatible version.";
+                                errorToShow = 'Found system has incompatible version.';
                                 break;
                             case 'url':
-                                errorToShow = "Wrong url.";
+                            case 'URL':
+                                errorToShow = 'Wrong url.';
                                 break;
                         }
-                        alert("Merge failed: " + errorToShow);
+                        alert('Merge failed: ' + errorToShow);
                     }else {
-                        alert("Merge succeed.");
+                        alert('Merge succeed.');
                         window.location.reload();
                     }
                 });
@@ -75,76 +80,94 @@ angular.module('webadminApp')
             });
         }
 
-        function errorHandler(r){
-            alert ("Connection error")
+        function errorHandler(){
+            alert ('Connection error');
             return false;
         }
         function resultHandler (r){
-            if(r.error!=0) {
-                var errorToShow = r.errorString;
+            var data = r.data;
+
+            if(data.error!=='0') {
+                console.log('some error',data);
+                var errorToShow = data.errorString;
                 switch (errorToShow) {
                     case 'UNAUTHORIZED':
                     case 'password':
-                        errorToShow = "Wrong password.";
+                    case 'PASSWORD':
+                        errorToShow = 'Wrong password.';
                 }
-                alert("Error: " + errorToShow);
-            }else if (r.reply.restartNeeded) {
-                if (confirm("All changes saved. New settings will be applied after restart. \n Do you want to restart server now?")) {
+                alert('Error: ' + errorToShow);
+            }else if (data.reply.restartNeeded) {
+                if (confirm('All changes saved. New settings will be applied after restart. \n Do you want to restart server now?')) {
                     restartServer(true);
                 }
             } else {
-                alert("Settings saved");
-                if( $scope.settings.port !=  window.location.port )
-                    window.location.href =  window.location.protocol + "//" + window.location.hostname + ":" + $scope.settings.port;
+                alert('Settings saved');
+                if( $scope.settings.port !==  window.location.port ) {
+                    window.location.href = window.location.protocol + '//' + window.location.hostname + ':' + $scope.settings.port;
+                }else{
+                    window.location.reload();
+                }
             }
         }
 
         $scope.save = function () {
 
+
             if($scope.settingsForm.$valid) {
-                mediaserver.saveSettings($scope.settings.systemName, $scope.settings.port).success(resultHandler).error(errorHandler);
+                if($scope.oldSystemName !== $scope.settings.systemName &&
+                    !confirm('If there are others servers in local network with "' + $scope.settings.systemName +
+                        '" system name then it could lead to this server settings loss. Continue?')){
+                    $scope.settings.systemName = $scope.oldSystemName;
+                }
+
+                if($scope.oldSystemName !== $scope.settings.systemName  || $scope.oldPort !== $scope.settings.port ) {
+                    mediaserver.saveSettings($scope.settings.systemName, $scope.settings.port).then(resultHandler, errorHandler);
+                }
             }else{
-               alert("form is not valid");
+                alert('form is not valid');
             }
         };
 
         $scope.changePassword = function () {
-            if($scope.password == $scope.confirmPassword)
-                mediaserver.changePassword($scope.password,$scope.oldPassword).success(resultHandler).error(errorHandler);
+            if($scope.password === $scope.confirmPassword) {
+                mediaserver.changePassword($scope.password, $scope.oldPassword).then(resultHandler, errorHandler);
+            }
         };
 
         $scope.restart = function () {
-            if(confirm("Do you want to restart server now?")){
+            if(confirm('Do you want to restart server now?')){
                 restartServer(false);
             }
         };
 
         function checkServersIp(server,i){
             var ips = server.networkAddresses.split(';');
-            var port = server.apiUrl.substring(server.apiUrl.lastIndexOf(":"));
-            var url = "http://" + ips[i] + port;
-
-
-            console.log("checkServersIp", url, server);
+            var port = server.apiUrl.substring(server.apiUrl.lastIndexOf(':'));
+            var url = 'http://' + ips[i] + port;
 
             mediaserver.getSettings(url).then(function(){
                 server.apiUrl = url;
+            },function(){
+                if(i < ips.length-1) {
+                    checkServersIp(server, i + 1);
+                }
+                else {
+                    server.status = 'Unavailable';
 
-                console.log("checkServersIp success", url, server);
+                    $scope.mediaServers = _.sortBy($scope.mediaServers,function(server){
+                        return (server.status==='Online'?'0':'1') + server.Name + server.id;
+                        // Сортировка: online->name->id
+                    });
 
-            }).catch(function(){
-                console.log("fail again " + url);
-                if(i < ips.length-1)
-                    checkServersIp (server,i+1);
-                else
-                    server.status = "Unavailable";
+                }
                 return false;
             });
         }
 
-        mediaserver.getMediaServers().success(function(data){
-            $scope.mediaServers = _.sortBy(data,function(server){
-                return (server.status=='Online'?'0':'1') + server.Name + server.id;
+        mediaserver.getMediaServers().then(function(data){
+            $scope.mediaServers = _.sortBy(data.data,function(server){
+                return (server.status==='Online'?'0':'1') + server.Name + server.id;
                 // Сортировка: online->name->id
             });
             $timeout(function() {

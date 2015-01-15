@@ -33,6 +33,9 @@ namespace {
         "vtLsDeNC9eU2aLCt0Ba4KLnuVnDDWSXQ9914i8s0KXXTM+GOHpvrChUCAwEAAQ==\n"
         "-----END PUBLIC KEY-----";
 
+    /* One analog encoder requires one license to maintain this number of cameras. */
+    const int camerasPerAnalogEncoderCount = 8;
+
     bool isSignatureMatch(const QByteArray &data, const QByteArray &signature, const QByteArray &publicKey)
     {
 #ifdef ENABLE_SSL
@@ -108,6 +111,10 @@ QnLicense::QnLicense(const QByteArray &licenseBlock)
     loadLicenseBlock( licenseBlock );
 }
 
+QnLicense::~QnLicense()
+{
+}
+
 bool QnLicense::isInfoMode() const
 {
     return m_signature.isEmpty() && m_signature2.isEmpty();
@@ -180,12 +187,26 @@ QString QnLicense::longDisplayName(Qn::LicenseType licenseType) {
     return QString();
 }
 
-const QString &QnLicense::name() const
+QnUuid QnLicense::serverId() const {
+    for(const QnPeerRuntimeInfo& info: QnRuntimeInfoManager::instance()->items()->getItems())
+    {
+        if (info.data.peer.peerType != Qn::PT_Server)
+            continue;
+
+        bool hwKeyOK = info.data.mainHardwareIds.contains(m_hardwareId) || info.data.compatibleHardwareIds.contains(m_hardwareId);
+        bool brandOK = m_brand.isEmpty() || (m_brand == info.data.brand);
+        if (hwKeyOK && brandOK)
+            return info.uuid;
+    }
+    return QnUuid();
+}
+
+QString QnLicense::name() const
 {
     return m_name;
 }
 
-const QByteArray &QnLicense::key() const
+QByteArray QnLicense::key() const
 {
     return m_key;
 }
@@ -200,12 +221,16 @@ qint32 QnLicense::cameraCount() const
     return m_cameraCount;
 }
 
-const QByteArray &QnLicense::hardwareId() const
+void QnLicense::setCameraCount(qint32 count) {
+    m_cameraCount = count;
+}
+
+QByteArray QnLicense::hardwareId() const
 {
     return m_hardwareId;
 }
 
-const QByteArray &QnLicense::signature() const
+QByteArray QnLicense::signature() const
 {
     if (m_isValid2)
         return m_signature2;
@@ -213,44 +238,29 @@ const QByteArray &QnLicense::signature() const
     return m_signature;
 }
 
-const QString &QnLicense::xclass() const
+QString QnLicense::xclass() const
 {
     return m_class;
 }
 
-const QString &QnLicense::version() const
+QString QnLicense::version() const
 {
     return m_version;
 }
 
-const QString &QnLicense::brand() const
+QString QnLicense::brand() const
 {
     return m_brand;
 }
 
-const QString &QnLicense::expiration() const
+QString QnLicense::expiration() const
 {
     return m_expiration;
 }
 
-const QByteArray& QnLicense::rawLicense() const
+QByteArray QnLicense::rawLicense() const
 {
     return m_rawLicense;
-}
-
-QnUuid QnLicense::findRuntimeDataByLicense() const
-{
-    for(const QnPeerRuntimeInfo& info: QnRuntimeInfoManager::instance()->items()->getItems())
-    {
-        if (info.data.peer.peerType != Qn::PT_Server)
-            continue;
-
-        bool hwKeyOK = info.data.mainHardwareIds.contains(m_hardwareId) || info.data.compatibleHardwareIds.contains(m_hardwareId);
-        bool brandOK = m_brand.isEmpty() || (m_brand == info.data.brand);
-        if (hwKeyOK && brandOK)
-            return info.uuid;
-    }
-    return QnUuid();
 }
 
 bool QnLicense::gotError(ErrorCode* errCode, ErrorCode errorCode) const
@@ -286,7 +296,7 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
     if (!m_isValid1 && !m_isValid2 && mode != VM_CheckInfo)
         return gotError(errCode, InvalidSignature);
     
-    QnPeerRuntimeInfo info = QnRuntimeInfoManager::instance()->items()->getItem(mode == VM_Regular ? findRuntimeDataByLicense() : qnCommon->remoteGUID());
+    QnPeerRuntimeInfo info = QnRuntimeInfoManager::instance()->items()->getItem(mode == VM_Regular ? serverId() : qnCommon->remoteGUID());
     if (info.uuid.isNull())
         return gotError(errCode, InvalidHardwareID); // peer where license was activated not found
 
@@ -299,7 +309,7 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
     bool isEdgeBox = checkForEdgeBox(info.data.box);
     if (isEdgeBox && !licenseTypeInfo[type()].allowedForEdge)
         return gotError(errCode, InvalidType); // strict allowed license type for EDGE devices
-
+#if 0
     if (isEdgeBox && type() == Qn::LC_Edge) 
     {
         for(const QnLicensePtr& license: qnLicensePool->getLicenses()) {
@@ -312,7 +322,7 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
             }
         }
     }
-
+#endif
     return gotError(errCode, NoError);
 }
 
@@ -444,7 +454,6 @@ void QnLicense::verify( const QByteArray& v1LicenseBlock, const QByteArray& v2Li
         m_isValid1 = true;
     }
 }
-
 
 // -------------------------------------------------------------------------- //
 // QnLicenseListHelper
@@ -623,4 +632,8 @@ QByteArray QnLicensePool::currentHardwareId() const {
     return hwIds.isEmpty() 
         ? QByteArray() 
         : hwIds.last();
+}
+
+int QnLicensePool::camerasPerAnalogEncoder() {
+    return camerasPerAnalogEncoderCount;
 }

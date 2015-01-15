@@ -59,7 +59,7 @@ namespace aio
         };
 
         //!map<fd, pair<events mask, user data> >
-        typedef std::map<Socket*, SockData> MonitoredEventMap;
+        typedef std::map<Pollable*, SockData> MonitoredEventMap;
 
         int epollSetFD;
         MonitoredEventMap monitoredEvents;
@@ -223,12 +223,12 @@ namespace aio
         return *this;
     }
 
-    const Socket* PollSet::const_iterator::socket() const
+    const Pollable* PollSet::const_iterator::socket() const
     {
         return static_cast<PollSetImpl::MonitoredEventMap::const_pointer>(m_impl->pollSetImpl->epollEventsArray[m_impl->currentIndex].data.ptr)->first;
     }
 
-    Socket* PollSet::const_iterator::socket()
+    Pollable* PollSet::const_iterator::socket()
     {
         return static_cast<PollSetImpl::MonitoredEventMap::const_pointer>(m_impl->pollSetImpl->epollEventsArray[m_impl->currentIndex].data.ptr)->first;
     }
@@ -320,7 +320,7 @@ namespace aio
     }
 
     //!Add socket to set. Does not take socket ownership
-    bool PollSet::add( Socket* const sock, EventType eventType, void* userData )
+    bool PollSet::add( Pollable* const sock, EventType eventType, void* userData )
     {
         const int epollEventType = eventType == etRead ? EPOLLIN : EPOLLOUT;
 
@@ -367,7 +367,7 @@ namespace aio
     }
 
     //!Remove socket from set
-    void PollSet::remove( Socket* const sock, EventType eventType )
+    void PollSet::remove( Pollable* const sock, EventType eventType )
     {
         const int epollEventType = eventType == etRead ? EPOLLIN : EPOLLOUT;
         PollSetImpl::MonitoredEventMap::iterator it = m_impl->monitoredEvents.find( sock );
@@ -455,12 +455,6 @@ namespace aio
         _end.m_impl->currentIndex = m_impl->signalledSockCount;
         _end.m_impl->pollSetImpl = m_impl;
         return _end;
-    }
-
-    unsigned int PollSet::maxPollSetSize()
-    {
-        //epoll can accept unlimited descriptors, but total number of available descriptors is limited by system
-        return std::numeric_limits<unsigned int>::max();
     }
 }
 

@@ -94,7 +94,7 @@
                                 <value>
                                     <name>mediaStreamIntegrity</name>
                                     <description>Checks additional media stream
-                                        valueeters</description>
+                                        parameters</description>
                                 </value>
                             </values>
                         </param>
@@ -106,7 +106,7 @@
                 <function>
                     <name>setCameraParam</name>
                     <description>Sets values of several camera parameters. This parameters are used
-                        on a advanced Tab in camera settings. For instance: brigthness, contrast
+                        on a advanced Tab in camera settings. For instance: brightness, contrast
                         e.t.c.</description>
                     <method>POST</method>
                     <params>
@@ -131,7 +131,7 @@
                 </function>
                 <function>
                     <name>getCameraParam</name>
-                    <description>Read camera parameters. For instance: brigthness, contrast e.t.c.
+                    <description>Read camera parameters. For instance: brightness, contrast e.t.c.
                         Parameters to read should be specified.</description>
                     <method>GET</method>
                     <params>
@@ -295,7 +295,7 @@
                         </param>
                         <param>
                             <name>port</name>
-                            <description>Camera(s) port to chek. Port is autodetected if parameter
+                            <description>Camera(s) port to check. Port is autodetected if parameter
                                 is absent.</description>
                             <optional>true</optional>
                             <values/>
@@ -324,7 +324,7 @@
                     <params>
                         <param>
                             <name>uuid</name>
-                            <description>Process uuid.</description>
+                            <description>Process unique ID.</description>
                             <optional>false</optional>
                             <values/>
                         </param>
@@ -340,7 +340,7 @@
                     <params>
                         <param>
                             <name>uuid</name>
-                            <description>Process uuid.</description>
+                            <description>Process unique ID.</description>
                             <optional>false</optional>
                             <values/>
                         </param>
@@ -390,7 +390,7 @@
                     <method>GET</method>
                     <params/>
                     <result>
-                        <caption>XML with PONG message.</caption>
+                        <caption>JSON with error code, error string and module unique ID in case of successful ping.</caption>
                     </result>
                 </function>
                 <function>
@@ -412,11 +412,11 @@
                         </param>
                     </params>
                     <result>
-                        <caption>JSON with error code, error string and module information in case of successfull ping.
+                        <caption>JSON with error code, error string and module information in case of successful ping.
                             Error string could be
                             empty in case of successful ping,
-                            "FAIL" if the specified system is unrechable or there is no any system,
-                            "UNAUTHORIZED" if the authentification credentials are invalid, and
+                            "FAIL" if the specified system is unreachable or there is no any system,
+                            "UNAUTHORIZED" if the authentication credentials are invalid, and
                             "INCOMPATIBLE" if the found system has incompatible version or different customization.
                         </caption>
                     </result>
@@ -524,7 +524,7 @@
                 </function>
                 <function>
                     <name>ptz/calibrate</name>
-                    <description>calibrate moving speed (addition speed coeff)</description>
+                    <description>calibrate moving speed (addition speed coefficient)</description>
                     <method>POST</method>
                     <params>
                         <param>
@@ -569,7 +569,7 @@
                         </param>
                     </params>
                     <result>
-                        <caption>XML with calibration coeffecients.</caption>
+                        <caption>XML with calibration coefficients.</caption>
                     </result>
                 </function>
                 <function>
@@ -658,6 +658,25 @@
                             <optional>false</optional>
                             <values/>
                         </param>
+                        <param>
+                            <name>periodsType</name>
+                            <description>Chunk type.</description>
+                            <optional>false</optional>
+                            <values>
+                                <value>
+                                    <name>0</name>
+                                    <description>All records</description>
+                                </value>
+                                <value>
+                                    <name>1</name>
+                                    <description>Only chunk with motion (parameter motionRegions required)</description>
+                                </value>
+                                <value>
+                                    <name>2</name>
+                                    <description>Bookmarks (reserverd for future use)</description>
+                                </value>
+                            </values>
+                        </param>
                     </params>
                     <result>
                         <caption>Chunks data in requested format. Chunks are merged for all requested
@@ -711,7 +730,8 @@
                 </function>
                 <function>
                     <name>activateLicense</name>
-                    <description>Activate new license and return license json data if success</description>
+                    <description>Activate new license and return license JSON data if success</description>
+                    <method>GET</method>
                     <params>
                         <param>
                             <name>key</name>
@@ -720,8 +740,6 @@
                             <values/>
                         </param>
                     </params>
-                    <method>GET</method>
-                    <params/>
                     <result>
                         <caption>JSON data.</caption>
                     </result>
@@ -732,13 +750,13 @@
                     <method>POST</method>
                     <params/>
                     <result>
-                        <caption>JSON with error code</caption>
+                        <caption>JSON with error code
                         When all is OK errorString will be empty. In case of error errorString will contain:
                         UP_TO_DATE if the provided version is already installed;
                         INVALID_FILE if the provided file cannot be opened as a ZIP archive;
                         INCOMPATIBLE_SYSTEM if the update file is targeted for another system;
                         EXTRACTION_ERROR if some extraction problems were found (e.g. not enough space);
-                        INSTALLATION_ERROR if the server couldn't execute installation script.
+                        INSTALLATION_ERROR if the server couldn't execute installation script.</caption>
                     </result>
                 </function>
                 <function>
@@ -754,7 +772,7 @@
                     <description>Returns a list of the discovered peers.</description>
                     <method>GET</method>
                     <params/>
-                    <result>JSON with a list of the discovered peers</result>
+                    <result><caption>JSON with a list of the discovered peers</caption></result>
                 </function>
                 <function>
                     <name>restart</name>
@@ -765,7 +783,7 @@
                 </function>
                 <function>
                     <name>installUpdate</name>
-                    <description>Install update from zip package wich should be in the request body.</description>
+                    <description>Install update from zip package which should be in the request body.</description>
                     <method>POST</method>
                     <params/>
                     <result/>
@@ -774,14 +792,21 @@
                     <name>moduleInformation</name>
                     <description>Get information about the server.</description>
                     <method>GET</method>
-                    <params/>
+                    <params>
+                        <param>
+                            <name>allModules</name>
+                            <description>Set it to true to get all modules from the system.</description>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
+                    </params>
                     <result>
                         <caption>JSON object with module information.</caption>
                     </result>
                 </function>
                 <function>
                     <name>moduleInformationAuthenticated</name>
-                    <description>The same as moduleInformation but requires authentication. Useful to test connectibility.</description>
+                    <description>The same as moduleInformation but requires authentication. Useful to test connection.</description>
                     <method>GET</method>
                     <params/>
                     <result>
@@ -790,20 +815,34 @@
                 </function>
                 <function>
                     <name>routingInformation/connections</name>
-                    <description>Get all connections established in the current system.</description>
+                    <description>Get all connections found  in the current system.</description>
                     <method>GET</method>
-                    <params/>
+                    <params>
+                        <param>
+                            <name>target</name>
+                            <description>Show connections from this peer</description>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
+                    </params>
                     <result>
-                        <caption>HTML with connection list.</caption>
+                        <caption>JSON with connection list.</caption>
                     </result>
                 </function>
                 <function>
-                    <name>routingInformation/routes</name>
-                    <description>Get all routes to all peers in the current system.</description>
+                    <name>routingInformation/cachedRoutes</name>
+                    <description>Get a list of cached routes.</description>
                     <method>GET</method>
-                    <params/>
+                    <params>
+                        <param>
+                            <name>target</name>
+                            <description>Show to this peer</description>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
+                    </params>
                     <result>
-                        <caption>HTML with route list.</caption>
+                        <caption>JSON with route list.</caption>
                     </result>
                 </function>
                 <function>
@@ -819,7 +858,23 @@
                         </param>
                     </params>
                     <result>
-                        <caption>HTML with route.</caption>
+                        <caption>JSON with route.</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>routingInformation/rules</name>
+                    <description>Get routing rules.</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>target</name>
+                            <description>Show rules for the specified peer.</description>
+                            <optional>false</optional>
+                            <values/>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>JSON with rules.</caption>
                     </result>
                 </function>
                 <function>
@@ -833,24 +888,18 @@
                             <optional>true</optional>
                             <values/>
                         </param>
-                    </params>
-                    <params>
                         <param>
                             <name>wholeSystem</name>
                             <description>Flag shows if the specified system name must be set to the all servers in the system.</description>
                             <optional>true</optional>
                             <values/>
                         </param>
-                    </params>
-                    <params>
                         <param>
                             <name>port</name>
                             <description>New listening port.</description>
                             <optional>true</optional>
                             <values/>
                         </param>
-                    </params>
-                    <params>
                         <param>
                             <name>password</name>
                             <description>New admin password.</description>
@@ -865,7 +914,10 @@
                         </param>
                     </params>
                     <result>
-                        <caption>JSON with error code and flag "restartNeeded" that shows if the server must be restarted to apply settings.</caption>
+                        <caption>
+                            JSON with error code and flag "restartNeeded" that shows if the server must be restarted to apply settings.
+                            Error string contains a hint to identify a problem: SYSTEM_NAME, PORT or PASSWORD.
+                        </caption>
                     </result>
                 </function>
                 <function>
@@ -886,8 +938,14 @@
                             <values/>
                         </param>
                         <param>
+                            <name>currentPassword</name>
+                            <description>Admin password of the current system.</description>
+                            <optional>false</optional>
+                            <values/>
+                        </param>
+                        <param>
                             <name>takeRemoteSettings</name>
-                            <description>Sime kind of merge direction.</description>
+                            <description>Direction of the merge.</description>
                             <optional>true</optional>
                             <values>
                                 <value>
@@ -905,8 +963,8 @@
                         <caption>JSON with error code and error string.
                             Error string could be
                             empty in case of successful ping,
-                            "FAIL" if the specified system is unrechable or there is no any system,
-                            "UNAUTHORIZED" if the authentification credentials are invalid,
+                            "FAIL" if the specified system is unreachable or there is no any system,
+                            "UNAUTHORIZED" if the authentication credentials are invalid,
                             "INCOMPATIBLE" if the found system has incompatible version or different customization, and
                             "BACKUP_ERROR" if database backup could not been created.
                         </caption>
@@ -932,7 +990,7 @@
                 <function>
                     <name>getResourceTypes</name>
                     <description>Read all resource types. Resource type contain object type such as
-                        'Server', 'Camera' e.t.c. Also, reosource types contain addition information
+                        'Server', 'Camera' e.t.c. Also, resource types contain addition information
                         for cameras such as maximum fps, resolution e.t.c</description>
                     <method>GET</method>
                     <params>
@@ -943,7 +1001,7 @@
                             <values>
                                 <value>
                                     <name>ubjson</name>
-                                    <description>binary json data format</description>
+                                    <description>universal binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -955,7 +1013,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CVS data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical data only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -979,7 +1037,7 @@
                             <values>
                                 <value>
                                     <name>ubjson</name>
-                                    <description>binary json data format</description>
+                                    <description>universal binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -991,14 +1049,14 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CVS data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical data only
                                         top level data will be provided</description>
                                 </value>
                             </values>
                         </param>
                         <param>
                             <name>id</name>
-                            <description>Resource guid</description>
+                            <description>Resource unique ID</description>
                             <optional>false</optional>
                             <values/>
                         </param>
@@ -1008,7 +1066,7 @@
                     </result>
                 </function>
                 <function>
-                    <name>getMediaServers</name>
+                    <name>getMediaServersEx</name>
                     <description>Return media server list</description>
                     <method>GET</method>
                     <params>
@@ -1019,7 +1077,7 @@
                             <values>
                                 <value>
                                     <name>ubjson</name>
-                                    <description>binary json data format</description>
+                                    <description>universal binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -1031,7 +1089,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CVS data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical data only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -1042,7 +1100,7 @@
                     </result>
                 </function>
                 <function>
-                    <name>getCameras</name>
+                    <name>getCamerasEx</name>
                     <description>Read camera list</description>
                     <method>GET</method>
                     <params>
@@ -1053,7 +1111,7 @@
                             <values>
                                 <value>
                                     <name>ubjson</name>
-                                    <description>binary json data format</description>
+                                    <description>universal binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -1065,14 +1123,14 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CVS data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical data only
                                         top level data will be provided</description>
                                 </value>
                             </values>
                         </param>
                         <param>
                             <name>id</name>
-                            <description>Media server guid</description>
+                            <description>Media server unique ID</description>
                             <optional>true</optional>
                             <values/>
                         </param>
@@ -1083,18 +1141,18 @@
 							    <attribute> <name>addParams</name> <description>List of addition parameters for camera. This list can contain such information as full ONVIF url, camera maximum fps e.t.c</description>  </attribute>
 							    <attribute> <name>audioEnabled</name> <description>Media server will push audio stream from a camera if parameter is true</description></attribute>
 							    <attribute> <name>controlEnabled</name> <description>Media server will manage camera (change resolution, fps, create profiles e.t.c) if parameter if true</description></attribute> 
-								<attribute><name>dewarpingParams</name> <description>Json string with devarping parameters</description></attribute> 
-								<attribute><name>groupId</name> <description>Internal group identifier. It is used for grouping channels for multu-channels cameras together. </description></attribute> 
+								<attribute><name>dewarpingParams</name> <description>Json string with dewarping parameters</description></attribute> 
+								<attribute><name>groupId</name> <description>Internal group identifier. It is used for grouping channels for multi-channels cameras together. </description></attribute> 
 								<attribute><name>groupName</name> <description>Group name. This name can be changed by user</description></attribute> 
 								<attribute><name>id</name> <description>Object ID. All ID for all objects in a system is GUIDs</description></attribute> 
 								<attribute><name>login</name> <description>Login for camera authentication</description></attribute> 
 								<attribute><name>mac</name> <description>camera MAC address</description></attribute> 
 								<attribute><name>manuallyAdded</name> <description>True if user added camera manually</description></attribute> 
-								<attribute><name>maxArchiveDays</name> <description>Maxumum archive duration in days for this camera. If value less or equal to zerro, it is not used</description></attribute> 
-								<attribute><name>minArchiveDays</name> <description>Minimum archive duration in days for this camera. If value less or equal to zerro, it is not used</description></attribute> 
+								<attribute><name>maxArchiveDays</name> <description>Maximum archive duration in days for this camera. If value less or equal to zero, it is not used</description></attribute> 
+								<attribute><name>minArchiveDays</name> <description>Minimum archive duration in days for this camera. If value less or equal to zero, it is not used</description></attribute> 
 								<attribute><name>model</name> <description>Camera model</description></attribute> 
-								<attribute><name>motionMask</name> <description>Camera's motion mask. This string defines several rects via ':' delimeter. Each rect is described by 5 digits: sensitivity, x,y(for left top corner), width, height</description></attribute> 
-								<attribute><name>motionType</name> <description>If value is 'MT_SoftwareGrid' then media server determine mition, otherwise camera built-in motion will be used</description></attribute> 
+								<attribute><name>motionMask</name> <description>Camera's motion mask. This string defines several rects via ':' delimiter. Each rect is described by 5 digits: sensitivity, x,y(for left top corner), width, height</description></attribute> 
+								<attribute><name>motionType</name> <description>If value is 'MT_SoftwareGrid' then media server determine motion, otherwise camera built-in motion will be used</description></attribute> 
 								<attribute><name>name</name> <description>Camera name</description></attribute> 
 								<attribute><name>parentId</name> <description>Camera's server ID</description></attribute> 
 								<attribute><name>physicalId</name> <description>Camera unique identifier. This identifier is used in all requests related to a camera. For instance, in RTSP requests</description></attribute> 
@@ -1103,8 +1161,8 @@
 								<attribute><name>scheduleTasks</name> <description>List of 'scheduleTask' objects with camera recording schedule.</description></attribute> 
 								<attribute><name>secondaryStreamQuality</name> <description>Secondary stream quality. Possible values:'SSQualityLow', 'SSQualityMedium', 'SSQualityHigh', 'SSQualityDontUse' </description></attribute> 
 								<attribute><name>status</name> <description>Camera status. Possible values are: 'Offline', 'Online', 'Recording'</description></attribute> 
-								<attribute><name>statusFlags</name> <description>Usually this field is zerro. Non zerro value is used to mark that a lot of network issues was occured with this camera</description></attribute> 
-								<attribute><name>typeId</name> <description>Guid with camera's type. Camera's type can describe predefined information such as camera maximum resolution, fps e.t.c.
+								<attribute><name>statusFlags</name> <description>Usually this field is zero. Non zero value is used to mark that a lot of network issues was occurred with this camera</description></attribute> 
+								<attribute><name>typeId</name> <description>Unique ID with camera's type. Camera's type can describe predefined information such as camera maximum resolution, fps e.t.c.
 																	    Detailed type information can be obtained via 'getResourceTypes' request.</description></attribute> 
 								<attribute><name>url</name> <description>Camera plain ip address or full http url if camera was added manually. Also, for multichannel encoders full url is used</description></attribute> 
 								<attribute><name>vendor</name> <description>Camera manufacturer</description></attribute>
@@ -1125,7 +1183,7 @@
                             <values>
                                 <value>
                                     <name>ubjson</name>
-                                    <description>binary json data format</description>
+                                    <description>universal binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -1137,7 +1195,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CVS data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical data only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -1159,7 +1217,7 @@
                             <values>
                                 <value>
                                     <name>ubjson</name>
-                                    <description>binary json data format</description>
+                                    <description>universal binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -1171,7 +1229,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CVS data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical data only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -1193,7 +1251,7 @@
                             <values>
                                 <value>
                                     <name>ubjson</name>
-                                    <description>binary json data format</description>
+                                    <description>universal binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -1205,7 +1263,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CVS data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical data only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -1228,7 +1286,7 @@
                             <values>
                                 <value>
                                     <name>ubjson</name>
-                                    <description>binary json data format</description>
+                                    <description>universal binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -1240,7 +1298,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CVS data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical data only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -1262,7 +1320,7 @@
                             <values>
                                 <value>
                                     <name>ubjson</name>
-                                    <description>binary json data format</description>
+                                    <description>universal binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -1274,7 +1332,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CVS data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical data only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -1296,7 +1354,7 @@
                             <values>
                                 <value>
                                     <name>ubjson</name>
-                                    <description>binary json data format</description>
+                                    <description>universal binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -1308,7 +1366,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CVS data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical data only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -1321,7 +1379,7 @@
                 <function>
                     <name>listDirectory</name>
                     <description>Return list of folders and files in a virtual FS stored inside
-                        database. This function is used to add files (such audio for nitifications)
+                        database. This function is used to add files (such audio for notifications)
                         to database.</description>
                     <method>GET</method>
                     <params>
@@ -1332,7 +1390,7 @@
                             <values>
                                 <value>
                                     <name>ubjson</name>
-                                    <description>binary json data format</description>
+                                    <description>universal binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -1344,7 +1402,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CVS data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical data only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -1372,7 +1430,7 @@
                             <values>
                                 <value>
                                     <name>ubjson</name>
-                                    <description>binary json data format</description>
+                                    <description>universal binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -1384,7 +1442,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CVS data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical data only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -1413,7 +1471,7 @@
                             <values>
                                 <value>
                                     <name>ubjson</name>
-                                    <description>binary json data format</description>
+                                    <description>universal binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -1425,7 +1483,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CVS data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical data only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -1453,7 +1511,7 @@
                             <values>
                                 <value>
                                     <name>ubjson</name>
-                                    <description>binary json data format</description>
+                                    <description>universal binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -1465,7 +1523,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CVS data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical data only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -1494,7 +1552,7 @@
                             <values>
                                 <value>
                                     <name>ubjson</name>
-                                    <description>binary json data format</description>
+                                    <description>universal binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -1506,7 +1564,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CVS data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical data only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -1534,7 +1592,7 @@
                             <values>
                                 <value>
                                     <name>ubjson</name>
-                                    <description>binary json data format</description>
+                                    <description>universal binary json data format</description>
                                 </value>
                                 <value>
                                     <name>json</name>
@@ -1546,7 +1604,7 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CVS data format. In case of hierarchical data only
+                                    <description>CSV data format. In case of hierarchical data only
                                         top level data will be provided</description>
                                 </value>
                             </values>
@@ -1590,6 +1648,12 @@
                             <name>resolution</name>
                             <description>Turn on video transcoding to the specified resolution. Resolution string either may contain width and height (for instance 320x240) or 
 														height only (for instance 240p)</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>rotation</name>
+                            <description>Rotate item. Can be 0, 90, 180 or 270 degree. If parameter is absent, video will be rotated to default value defined in a camera settings dialog.
+                                         Parameter take place if video transcoding is activated (parameter codec and/or parameter resolution are presents.)</description>
                             <optional>true</optional>
                         </param>
                         <param>
@@ -1699,6 +1763,11 @@
                         <param>
                             <name>pos</name>
                             <description>If present and not equal to &lt;now&gt;, specifies archive stream start positions in milliseconds from epoch (1970-01-01 00:00, UTC). Otherwise, LIVE stream is provided</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>rotation</name>
+                            <description>Rotate item. Can be 0, 90, 180 or 270 degree. If parameter is absent, video will be rotated to default value defined in a camera settings dialog</description>
                             <optional>true</optional>
                         </param>
                     </params>

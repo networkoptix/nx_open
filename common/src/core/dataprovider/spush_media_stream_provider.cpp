@@ -61,7 +61,15 @@ void CLServerPushStreamReader::run()
         if (!isStreamOpened())
         {
             m_FrameCnt = 0;
-            m_openStreamResult = openStream();
+            CameraDiagnostics::Result openStreamResult;
+            if (!m_resource->isInitialized()) {
+                openStreamResult = CameraDiagnostics::InitializationInProgress();
+                if (m_openStreamResult == CameraDiagnostics::NoErrorResult())
+                    m_openStreamResult = openStreamResult;
+            }
+            else
+                m_openStreamResult = openStreamResult = openStream();
+
             {
                 QMutexLocker lk( &m_openStreamMutex );
                 ++m_openStreamCounter;
@@ -74,16 +82,20 @@ void CLServerPushStreamReader::run()
                 closeStream(); // to release resources 
 
                 setNeedKeyData();
-                mFramesLost++;
-                m_stat[0].onData(0);
-                m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
-                if (mFramesLost >= MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
+                if (openStreamResult.errorCode != CameraDiagnostics::ErrorCode::cameraInitializationInProgress)
                 {
-                    if (canChangeStatus() && getResource()->getStatus() != Qn::Unauthorized) // avoid offline->unauthorized->offline loop
-                        getResource()->setStatus( getLastResponseCode() == CL_HTTP_AUTH_REQUIRED ? Qn::Unauthorized : Qn::Offline);
-                    m_stat[0].onLostConnection();
-                    mFramesLost = 0;
+                    mFramesLost++;
+                    m_stat[0].onData(0);
+                    m_stat[0].onEvent(CL_STAT_FRAME_LOST);
+
+                    if (mFramesLost >= MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
+                    {
+                        if (canChangeStatus() && getResource()->getStatus() != Qn::Unauthorized) // avoid offline->unauthorized->offline loop
+                            getResource()->setStatus( getLastResponseCode() == CL_HTTP_AUTH_REQUIRED ? Qn::Unauthorized : Qn::Offline);
+                        m_stat[0].onLostConnection();
+                        mFramesLost = 0;
+                    }
                 }
 
                 continue;

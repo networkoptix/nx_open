@@ -29,6 +29,8 @@ public:
 
     virtual bool getParamPhysical(const QString &param, QVariant &val) override;
     virtual bool setParamPhysical(const QString &param, const QVariant& val) override;
+signals:
+    void physicalParamChanged(const QString& name, const QString& value);
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
     virtual void fetchAndSetCameraSettings() override;

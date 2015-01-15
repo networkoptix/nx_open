@@ -12,6 +12,7 @@
 
 #include <camera/loaders/multi_server_camera_data_loader.h>
 #include <camera/loaders/layout_file_camera_data_loader.h>
+#include "api/common_message_processor.h"
 
 namespace {
     const qint64 minTimePeriodLoadingMargin = 60 * 60 * 1000; /* 1 hour. */
@@ -58,6 +59,7 @@ void QnCachingCameraDataLoader::init() {
 
     if(!m_resourceIsLocal) {
         connect(qnSyncTime, &QnSyncTime::timeChanged,       this, &QnCachingCameraDataLoader::discardCachedData);
+        connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::initialResourcesReceived, this, &QnCachingCameraDataLoader::discardCachedData);
     }
 }
 
@@ -332,9 +334,6 @@ void QnCachingCameraDataLoader::at_loader_ready(const QnAbstractCameraDataPtr &d
     case Qn::BookmarkTimePeriod:
         {
             Qn::TimePeriodContent timePeriodType = dataTypeToPeriod(dataType);
-
-            if (m_timePeriodCameraData[timePeriodType].contains(data))
-                return;
             m_timePeriodCameraData[timePeriodType].append(data);
 #ifdef QN_ENABLE_BOOKMARKS
             if (dataType == Qn::BookmarkTimePeriod)

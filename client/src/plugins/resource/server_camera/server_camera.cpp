@@ -4,20 +4,26 @@
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 #include "api/app_server_connection.h"
+#include "core/resource_management/resource_pool.h"
+#include "core/resource_management/status_dictionary.h"
 
 
 QnServerCamera::QnServerCamera(const QnUuid& resourceTypeId): QnVirtualCameraResource()
 {
     setTypeId(resourceTypeId);
-    addFlags(Qn::server_live_cam);
-    if (!isDtsBased() && supportedMotionType() != Qn::MT_NoMotion)
-        addFlags(Qn::motion);
-    m_tmpStatus = Qn::NotDefined;
+    addFlags(Qn::server_live_cam | Qn::depend_on_parent_status);
 }
 
 QString QnServerCamera::getDriverName() const
 {
     return QLatin1String("Server camera"); //all other manufacture are also untranslated and should not be translated
+}
+
+Qn::ResourceFlags QnServerCamera::flags() const {
+    Qn::ResourceFlags result = base_type::flags();
+    if (!isDtsBased() && supportedMotionType() != Qn::MT_NoMotion)
+        result |= Qn::motion;
+    return result;
 }
 
 void QnServerCamera::setIframeDistance(int frames, int timems)
@@ -52,19 +58,19 @@ QnAbstractStreamDataProvider* QnServerCamera::createLiveDataProvider()
 
 Qn::ResourceStatus QnServerCamera::getStatus() const
 {
-    if (m_tmpStatus != Qn::NotDefined)
-        return m_tmpStatus;
-    else
-        return QnResource::getStatus();
+    Qn::ResourceStatus serverStatus = qnStatusDictionary->value(getParentId());
+    if (serverStatus == Qn::Offline || serverStatus == Qn::Unauthorized)
+        return Qn::Offline;
+    
+    return QnResource::getStatus();
 }
 
-void QnServerCamera::setTmpStatus(Qn::ResourceStatus status)
+void QnServerCamera::setParentId(const QnUuid& parent)
 {
-    if (status != m_tmpStatus) {
-        Qn::ResourceStatus oldStatus = getStatus();
-        m_tmpStatus = status;
-        Qn::ResourceStatus newStatus = getStatus();
-        if (oldStatus != newStatus)
+    QnUuid oldValue = getParentId();
+    if (oldValue != parent) {
+        base_type::setParentId(parent);
+        if (!oldValue.isNull())
             emit statusChanged(toSharedPointer(this));
     }
 }

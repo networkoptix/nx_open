@@ -22,7 +22,6 @@ ecs.db-wal
 *.vcproj.filters
 *.vcxproj
 *.vcxproj.filters
-*.qm
 *.vcproj
 *.tlog
 *.lastbuildstate

@@ -9,10 +9,12 @@
     <title></title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
+
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css styles/vendor.css -->
     <!-- bower:css -->
     <link rel="stylesheet" href="bower_components/sass-bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="bower_components/videogular-themes-default/videogular.css" />
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css({.tmp,app}) styles/main.css -->
@@ -20,22 +22,6 @@
     <!-- endbuild -->
 
     <link rel="stylesheet" href="customization/styles.css">
-
-    <style type="text/css">
-        body {
-            /*padding-top: 20px;*/
-            padding-bottom: 20px;
-        }
-
-        @font-face {
-            font-family: 'Glyphicons Halflings';
-            src: url('../fonts/glyphicons-halflings-regular.eot');
-            src: url('../fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'),
-            url('../fonts/glyphicons-halflings-regular.woff') format('woff'),
-            url('../fonts/glyphicons-halflings-regular.ttf') format('truetype'),
-            url('../fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
-        }
-    </style>
 </head>
 <body ng-app="webadminApp">
 <!--[if lt IE 7]>
@@ -76,6 +62,11 @@
 <script src="bower_components/underscore/underscore.js"></script>
 <script src="bower_components/Chart.js/Chart.min.js"></script>
 <script src="bower_components/tc-angular-chartjs/dist/tc-angular-chartjs.min.js"></script>
+<script src="bower_components/videogular/videogular.js"></script>
+<script src="bower_components/videogular-buffering/buffering.js"></script>
+<script src="bower_components/videogular-dash/dash.js"></script>
+<script src="bower_components/videogular-controls/controls.js"></script>
+<script src="bower_components/videogular-poster/poster.js"></script>
 <!-- endbower -->
 
 
@@ -85,6 +76,7 @@
 <script src="scripts/vendor/jquery-file-upload/jquery.fileupload.js"></script>
 <script src="scripts/vendor/jquery-file-upload/jquery.fileupload-process.js"></script>
 
+<script src="scripts/vendor/md5.js"></script>
 
 <!-- endbuild -->
 
@@ -92,27 +84,55 @@
 
 <script src="scripts/config.js"></script>
 <script src="scripts/app.js"></script>
-<script src="scripts/controllers/main.js"></script>
-<script src="scripts/controllers/navigation.js"></script>
-<script src="scripts/directives/navbar.js"></script>
-<script src="scripts/controllers/settings.js"></script>
-<script src="scripts/controllers/join.js"></script>
+
 <script src="scripts/services/mediaserver.js"></script>
-<script src="scripts/directives/pwcheck.js"></script>
-<script src="scripts/controllers/login.js"></script>
 <script src="scripts/services/auth.js"></script>
+
+<script src="scripts/directives/navbar.js"></script>
+<script src="scripts/directives/pwcheck.js"></script>
 <script src="scripts/directives/icon.js"></script>
 <script src="scripts/directives/fileupload.js"></script>
+<script src="scripts/directives/vg-quality.js"></script>
 <script src="scripts/directives/inplace-edit.js"></script>
+
+<script src="scripts/controllers/main.js"></script>
+<script src="scripts/controllers/navigation.js"></script>
+<script src="scripts/controllers/settings.js"></script>
+<script src="scripts/controllers/join.js"></script>
+<script src="scripts/controllers/offline.js"></script>
+<script src="scripts/controllers/login.js"></script>
 <script src="scripts/controllers/advanced.js"></script>
 <script src="scripts/controllers/info.js"></script>
 <script src="scripts/controllers/restart.js"></script>
 <script src="scripts/controllers/sdkeula.js"></script>
 <script src="scripts/controllers/webclient.js"></script>
+<script src="scripts/controllers/view.js"></script>
 <script src="scripts/controllers/health.js"></script>
 <!-- endbuild -->
 
 
 <script src="customization/config.js"></script>
+
+
+
+<script type="text/ng-template" id="offline_modal">
+    <div class="modal-header">
+            <h3 class="modal-title">Server is offline</h3>
+    </div>
+
+    <form class="form" role="form" id="restartDialog">
+            <div class="modal-body" class="col-sm-12">
+            <p>Server can't handle requests now. Trying to reach it again.</p>
+    <progressbar class="progress-striped active" type="info" value="100" id="restartingProgress">{{state}}</progressbar>
+    <p>If nothing happens for a while - you could check server condition manually</p>
+    </div>
+
+    <div class="modal-footer">
+            <button class="btn btn-primary pull-left" name="button" ng-click="refresh()" ng-disabled="form.$invalid">Refresh page</button>
+    </div>
+    </form>
+</script>
+
+
 </body>
 </html>

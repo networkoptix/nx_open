@@ -281,6 +281,14 @@ qint64 QnCameraHistoryPool::getMinTime(const QnNetworkResourcePtr &camera)
     return history->getMinTime();
 }
 
+void QnCameraHistoryPool::resetCameraHistory(const QnCameraHistoryList& cameraHistoryList) {
+    QMutexLocker lock(&m_mutex);
+    m_cameraHistory.clear();
+    for(const QnCameraHistoryPtr& history: cameraHistoryList)
+        m_cameraHistory[history->getCameraUniqueId()] = history;
+}
+
+
 void QnCameraHistoryPool::addCameraHistory(const QnCameraHistoryPtr &history)
 {
     QMutexLocker lock(&m_mutex);

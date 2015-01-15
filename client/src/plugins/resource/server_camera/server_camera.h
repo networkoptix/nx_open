@@ -11,6 +11,7 @@ typedef QList<QnServerCameraPtr> QnServerCameraList;
 class QnServerCamera: public QnVirtualCameraResource {
     Q_OBJECT
 
+    typedef QnVirtualCameraResource base_type;
 public:
     QnServerCamera(const QnUuid& resourceTypeId);
 
@@ -22,13 +23,12 @@ public:
 
     virtual Qn::ResourceStatus getStatus() const override;
 
-    void setTmpStatus(Qn::ResourceStatus status);
-
+    virtual Qn::ResourceFlags flags() const override;
+    virtual void setParentId(const QnUuid& parent) override;
 protected:
     virtual QnAbstractStreamDataProvider *createLiveDataProvider() override;
 
 private:
-    Qn::ResourceStatus m_tmpStatus;
     QnServerCameraPtr m_activeCamera;
 };
 

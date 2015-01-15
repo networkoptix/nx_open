@@ -23,7 +23,7 @@ namespace aio
 {
     static unsigned int threadCountArgValue = 0;
 
-    typedef AIOThread<Socket> SystemAIOThread;
+    typedef AIOThread<Pollable> SystemAIOThread;
 
     AIOService::AIOService( unsigned int threadCount )
     {
@@ -79,12 +79,12 @@ namespace aio
         return aioServiceInstance();
     }
 
-    template<> AIOService::SocketAIOContext<Socket>& AIOService::getAIOHandlingContext()
+    template<> AIOService::SocketAIOContext<Pollable>& AIOService::getAIOHandlingContext()
     {
         return m_systemSocketAIO;
     }
 
-    template<> const AIOService::SocketAIOContext<Socket>& AIOService::getAIOHandlingContext() const
+    template<> const AIOService::SocketAIOContext<Pollable>& AIOService::getAIOHandlingContext() const
     {
         return m_systemSocketAIO;
     }

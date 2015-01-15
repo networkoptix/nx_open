@@ -37,6 +37,8 @@ namespace ec2
 
     struct ApiBusinessActionData: ApiData
     {
+        ApiBusinessActionData(): ApiData(), actionType(QnBusiness::UndefinedAction), toggleState(QnBusiness::UndefinedState), receivedFromRemoteHost(false), aggregationCount(0) {}
+
         QnBusiness::ActionType actionType;
         QnBusiness::EventState toggleState;
         bool receivedFromRemoteHost;

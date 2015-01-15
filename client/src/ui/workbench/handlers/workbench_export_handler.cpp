@@ -243,11 +243,20 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     QString selectedFilter;
     ImageCorrectionParams contrastParams = itemData.contrastParams;
     QnItemDewarpingParams dewarpingParams = itemData.dewarpingParams;
+    int rotation = itemData.rotation;
+    QRectF zoomRect = itemData.zoomRect;
+    qreal customAr = widget->resource()->customAspectRatio();
+
+    int timeOffset = 0;
+    if (qnSettings->timeMode() == Qn::ServerTimeMode) {
+        // time difference between client and server
+        timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0);
+    }
 
     QString namePart = replaceNonFileNameCharacters(widget->resource()->toResourcePtr()->getName(), L'_');
     QString timePart = (widget->resource()->toResource()->flags() & Qn::utc)
-            ? QDateTime::fromMSecsSinceEpoch(period.startTimeMs).toString(lit("yyyy_MMM_dd_hh_mm_ss"))
-            : QTime().addMSecs(period.startTimeMs).toString(lit("hh_mm_ss"));
+            ? QDateTime::fromMSecsSinceEpoch(period.startTimeMs + timeOffset).toString(lit("yyyy_MMM_dd_hh_mm_ss"))
+            : QTime(0, 0, 0, 0).addMSecs(period.startTimeMs + timeOffset).toString(lit("hh_mm_ss"));
     QString suggestion = QnEnvironment::getUniqueFileName(previousDir, namePart + lit("_") + timePart);
 
     while (true) {
@@ -279,15 +288,10 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         dialog->addWidget(tr("Timestamps:"), comboBox, delegate);
 
 
-        bool doTranscode = contrastParams.enabled || dewarpingParams.enabled;
-        if (doTranscode) {
-            if (contrastParams.enabled && dewarpingParams.enabled) {
-                dialog->addCheckBox(tr("Apply dewarping and image correction (requires transcoding)"), &doTranscode, delegate);
-            } else if (contrastParams.enabled) {
-                dialog->addCheckBox(tr("Apply image correction (requires transcoding)"), &doTranscode, delegate);
-            } else {
-                dialog->addCheckBox(tr("Apply dewarping (requires transcoding)"), &doTranscode, delegate);
-            }
+        bool doTranscode = contrastParams.enabled || dewarpingParams.enabled || itemData.rotation || customAr || !zoomRect.isNull();
+        if (doTranscode) 
+        {
+            dialog->addCheckBox(tr("Transcode video to guarantee WYSIWYG"), &doTranscode, delegate);
         }
 
         if (!dialog->exec())
@@ -305,8 +309,13 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
 
         timestampPos = (Qn::Corner) comboBox->itemData(comboBox->currentIndex()).toInt();
 
-        contrastParams.enabled &= doTranscode;
-        dewarpingParams.enabled &= doTranscode;
+        if (!doTranscode) {
+            contrastParams.enabled = false;
+            dewarpingParams.enabled = false;
+            rotation = 0;
+            zoomRect = QRectF();
+            customAr = 0.0;
+        }
 
         if (dialog->selectedNameFilter().contains(aviFileFilter)) {
             QnCachingCameraDataLoader* loader = navigator()->loader(widget->resource()->toResourcePtr());
@@ -405,13 +414,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     QnMediaResourcePtr resource = widget->resource();
     QnClientVideoCamera* camera = new QnClientVideoCamera(resource);
 
-    int timeOffset = 0;
-    if (qnSettings->timeMode() == Qn::ServerTimeMode) {
-        // time difference between client and server
-        timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(resource, 0);
-    }
     qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(resource, Qn::InvalidUtcOffset);
-
     QnClientVideoCameraExportTool *tool = new QnClientVideoCameraExportTool(
                                               camera,
                                               period,
@@ -419,9 +422,11 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
                                               timestampPos,
                                               timeOffset,
                                               serverTimeZone,
-                                              itemData.zoomRect,
+                                              zoomRect,
                                               contrastParams,
                                               dewarpingParams,
+                                              rotation,
+                                              customAr,
                                               this);
 
     connect(exportProgressDialog,   &QnProgressDialog::canceled,    tool,                   &QnClientVideoCameraExportTool::stop);
@@ -478,6 +483,10 @@ bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layo
         return false;
     }
     else if (hasLocal) {
+        /* Always allow export selected area. */
+        if (layout->getItems().size() == 1)
+            return true;
+
         QMessageBox::critical(
             mainWindow(),
             tr("Could not save a layout"),

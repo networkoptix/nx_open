@@ -55,10 +55,6 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
         // previous comment: camera MUST be in the pool already;
         // but now (new version) camera NOT in resource pool!
-        resource->setStatus(Qn::Online, true); // set status in silence mode. Do not send any signals e.t.c
-
-        QString password = cameraResource->getAuth().password();
-
 
         if (cameraResource->isManuallyAdded() && !QnResourceDiscoveryManager::instance()->containManualCamera(cameraResource->getUrl()))
             continue; //race condition. manual camera just deleted
@@ -140,7 +136,6 @@ void QnAppserverResourceProcessor::at_mutexLocked()
 void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource)
 {
     cameraResource->setFlags(cameraResource->flags() & ~Qn::parent_change);
-    cameraResource->setStatus(Qn::Offline);
     Q_ASSERT(!cameraResource->getId().isNull());
     QnVirtualCameraResourceList cameras;
     ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
@@ -150,12 +145,6 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
         NX_LOG( QString::fromLatin1("Can't add camera to ec2 (insCamera query error). %1").arg(ec2::toString(errorCode)), cl_logWARNING );
         return;
     }
-    
-    errorCode = connect->getResourceManager()->setResourceStatusSync( cameraResource->getId(), cameraResource->getStatus());
-    if( errorCode != ec2::ErrorCode::ok ) {
-        NX_LOG( QString::fromLatin1("Can't add camera to ec2 (set status query error). %1").arg(ec2::toString(errorCode)), cl_logWARNING );
-        return;
-    }
 
     propertyDictionary->saveParams( cameraResource->getId() );
     QnResourcePtr existCamRes = qnResPool->getResourceById(cameraResource->getId());
@@ -163,6 +152,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
         qnResPool->removeResource(existCamRes);
     QnCommonMessageProcessor::instance()->updateResource(cameraResource);
     QnResourcePtr rpRes = qnResPool->getResourceById(cameraResource->getId());
+    rpRes->setStatus(Qn::Offline);
     rpRes->initAsync(true);
 }
 

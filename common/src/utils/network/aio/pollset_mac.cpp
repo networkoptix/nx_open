@@ -17,7 +17,6 @@
 #include <unistd.h>
 
 #include "../system_socket.h"
-#include "../system_socket_impl.h"
 
 
 //TODO #ak get rid of PollSetImpl::monitoredEvents due to performance cosiderations
@@ -32,7 +31,7 @@ namespace aio
     {
     public:
         //!map<pair<socket, event type> >
-        typedef std::set<std::pair<Socket*, aio::EventType> > MonitoredEventSet;
+        typedef std::set<std::pair<Pollable*, aio::EventType> > MonitoredEventSet;
 
         int kqueueFD;
         MonitoredEventSet monitoredEvents;
@@ -136,14 +135,14 @@ namespace aio
         return *this;
     }
 
-    Socket* PollSet::const_iterator::socket()
+    Pollable* PollSet::const_iterator::socket()
     {
-        return static_cast<Socket*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata);
+        return static_cast<Pollable*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata);
     }
 
-    const Socket* PollSet::const_iterator::socket() const
+    const Pollable* PollSet::const_iterator::socket() const
     {
-        return static_cast<Socket*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata);
+        return static_cast<Pollable*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata);
     }
 
     /*!
@@ -164,7 +163,7 @@ namespace aio
 
     void* PollSet::const_iterator::userData()
     {
-        return static_cast<Socket*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata)->impl()->eventTypeToUserData[eventType()];
+        return static_cast<Pollable*>(m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].udata)->impl()->eventTypeToUserData[eventType()];
     }
 
     bool PollSet::const_iterator::operator==( const const_iterator& right ) const
@@ -181,6 +180,8 @@ namespace aio
     //////////////////////////////////////////////////////////
     // PollSet
     //////////////////////////////////////////////////////////
+    static const int USER_EVENT_IDENT = 11;
+
     PollSet::PollSet()
     :
         m_impl( new PollSetImpl() )
@@ -191,7 +192,7 @@ namespace aio
 
         //registering filter for interrupting poll
         struct kevent _newEvent;
-        EV_SET( &_newEvent, 0, EVFILT_USER, EV_ADD | EV_ENABLE, 0, 0, NULL );
+        EV_SET( &_newEvent, USER_EVENT_IDENT, EVFILT_USER, EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, NULL );
         kevent( m_impl->kqueueFD, &_newEvent, 1, NULL, 0, NULL );
     }
 
@@ -218,12 +219,12 @@ namespace aio
     void PollSet::interrupt()
     {
         struct kevent _newEvent;
-        EV_SET( &_newEvent, 0, EVFILT_USER, 0, NOTE_TRIGGER, 0, NULL );
+        EV_SET( &_newEvent, USER_EVENT_IDENT, EVFILT_USER, EV_CLEAR, NOTE_TRIGGER, 0, NULL );
         kevent( m_impl->kqueueFD, &_newEvent, 1, NULL, 0, NULL );
     }
 
     //!Add socket to set. Does not take socket ownership
-    bool PollSet::add( Socket* const sock, EventType eventType, void* userData )
+    bool PollSet::add( Pollable* const sock, EventType eventType, void* userData )
     {
         pair<PollSetImpl::MonitoredEventSet::iterator, bool> p = m_impl->monitoredEvents.insert( make_pair( sock, eventType ) );
         if( !p.second )
@@ -245,7 +246,7 @@ namespace aio
     }
 
     //!Remove socket from set
-    void PollSet::remove( Socket* const sock, EventType eventType )
+    void PollSet::remove( Pollable* const sock, EventType eventType )
     {
         PollSetImpl::MonitoredEventSet::iterator it = m_impl->monitoredEvents.find( make_pair( sock, eventType ) );
         if( it == m_impl->monitoredEvents.end() )
@@ -308,6 +309,13 @@ namespace aio
             return result;
 
         m_impl->receivedEventCount = result;
+        //not reporting event used to interrupt blocking poll
+        for( int i = 0; i < result; ++i )
+        {
+            if( m_impl->receivedEventlist[i].filter == EVFILT_USER )
+                --result;
+        }
+
         return result;
     }
 
@@ -328,11 +336,6 @@ namespace aio
         endIter.m_impl->pollSetImpl = m_impl;
         endIter.m_impl->currentIndex = m_impl->receivedEventCount;
         return endIter;
-    }
-
-    unsigned int PollSet::maxPollSetSize()
-    {
-        return std::numeric_limits<unsigned int>::max();
     }
 }
 

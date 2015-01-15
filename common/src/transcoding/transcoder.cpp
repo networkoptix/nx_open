@@ -5,11 +5,14 @@
 #include <utils/math/math.h>
 #include <core/resource/media_resource.h>
 
-#include "filters/abstract_image_filter.h"
-
 #include "ffmpeg_transcoder.h"
 #include "ffmpeg_video_transcoder.h"
 #include "ffmpeg_audio_transcoder.h"
+
+#include "filters/abstract_image_filter.h"
+#include "filters/tiled_image_filter.h"
+#include "filters/scale_image_filter.h"
+#include "filters/rotate_image_filter.h"
 
 // ---------------------------- QnCodecTranscoder ------------------
 QnCodecTranscoder::QnCodecTranscoder(CodecID codecId)
@@ -53,14 +56,9 @@ void QnCodecTranscoder::setQuality( Qn::StreamQuality quality )
     m_quality = quality;
 }
 
-void QnCodecTranscoder::setSrcRect(const QRectF& srcRect)
+QRect QnCodecTranscoder::roundRect(const QRect& srcRect)
 {
-    m_srcRectF = srcRect;
-}
-
-QRect QnCodecTranscoder::roundRect(const QRect& srcRect) const
-{
-    int left = qPower2Floor((unsigned) srcRect.left(), 16);
+    int left = qPower2Floor((unsigned) srcRect.left(), CL_MEDIA_ALIGNMENT);
     int top = qPower2Floor((unsigned) srcRect.top(), 2);
 
     int width = qPower2Ceil((unsigned) srcRect.width(), 16);
@@ -69,24 +67,24 @@ QRect QnCodecTranscoder::roundRect(const QRect& srcRect) const
     return QRect(left, top, width, height);
 }
 
+QSize QnCodecTranscoder::roundSize(const QSize& size)
+{
+    int width = qPower2Ceil((unsigned) size.width(), 16);
+    int height = qPower2Ceil((unsigned) size.height(), 2);
+
+    return QSize(width, height);
+}
+
 // --------------------------- QnVideoTranscoder -----------------
 
 QnVideoTranscoder::QnVideoTranscoder(CodecID codecId):
-    QnCodecTranscoder(codecId),
-    m_layout(0)
+    QnCodecTranscoder(codecId)
 {
 
 }
 
 QnVideoTranscoder::~QnVideoTranscoder()
 {
-    for(QnAbstractImageFilter* filter: m_filters)
-        delete filter;
-}
-
-void QnVideoTranscoder::setVideoLayout(QnConstResourceVideoLayoutPtr layout)
-{
-    m_layout = layout;
 }
 
 void QnVideoTranscoder::setResolution(const QSize& value)
@@ -94,15 +92,19 @@ void QnVideoTranscoder::setResolution(const QSize& value)
     m_resolution = value;
 }
 
-void QnVideoTranscoder::addFilter(QnAbstractImageFilter* filter)
+void QnVideoTranscoder::setFilterList(QList<QnAbstractImageFilterPtr> filterList)
 {
-    m_filters << filter;
+    m_filters = filterList;
 }
 
-void QnVideoTranscoder::processFilterChain(CLVideoDecoderOutput* decodedFrame, const QRectF& updateRect, qreal ar)
+CLVideoDecoderOutputPtr QnVideoTranscoder::processFilterChain(const CLVideoDecoderOutputPtr& decodedFrame)
 {
-    for(QnAbstractImageFilter* filter: m_filters)
-        filter->updateImage(decodedFrame, updateRect, ar);
+    if (m_filters.isEmpty())
+        return decodedFrame;
+    CLVideoDecoderOutputPtr result = decodedFrame;
+    for(QnAbstractImageFilterPtr filter: m_filters)
+        result = filter->updateImage(result);
+    return result;
 }
 
 QSize QnVideoTranscoder::getResolution() const
@@ -131,43 +133,8 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
         m_resolution = QSize(decoder.getContext()->width, decoder.getContext()->height);
     }
 
-    int width = m_resolution.width();
-    int height = m_resolution.height();
-    if (m_layout) {
-        if (lineAmountSpecified) {
-            int maxDimension = qMax(m_layout->size().width(), m_layout->size().height());
-            width /= maxDimension;
-            height /= maxDimension;
-        }
-        width = qPower2Ceil((unsigned) width , WIDTH_ALIGN);
-        height = qPower2Ceil((unsigned) height , HEIGHT_ALIGN);
-
-        width *= m_layout->size().width();
-        height *= m_layout->size().height();
-    }
-
-    if (!m_srcRectF.isEmpty())
-    {
-        // round srcRect
-        int srcLeft = qPower2Floor(unsigned(m_srcRectF.left() * width), WIDTH_ALIGN);
-        int srcTop = qPower2Floor(unsigned(m_srcRectF.top() * height), HEIGHT_ALIGN);
-        int srcWidth = qPower2Ceil(unsigned(m_srcRectF.width() * width), WIDTH_ALIGN);
-        int srcHeight = qPower2Ceil(unsigned(m_srcRectF.height() * height), HEIGHT_ALIGN);
-
-        m_srcRectF = QRectF(srcLeft / (qreal) width, srcTop / (qreal) height, 
-                            srcWidth / (qreal) width, srcHeight / (qreal) height);
-
-        width  = srcWidth;
-        height = srcHeight;
-    }
-
-    m_resolution.setWidth(qPower2Ceil((unsigned)width, WIDTH_ALIGN));
-    m_resolution.setHeight(qPower2Ceil((unsigned)height, HEIGHT_ALIGN));
-
-    if (!m_srcRectF.isEmpty())
-    {
-        // round srcRect
-    }
+    for(auto filter: m_filters)
+        setResolution(filter->updatedResolution(getResolution()));
 
     return true;
 }
@@ -183,7 +150,6 @@ QnTranscoder::QnTranscoder():
     m_internalBuffer(CL_MEDIA_ALIGNMENT, 1024*1024),
     m_firstTime(AV_NOPTS_VALUE),
     m_initialized(false),
-    m_vLayout(0),
     m_eofCounter(0),
     m_packetizedMode(false)
 {
@@ -263,11 +229,6 @@ int QnTranscoder::suggestMediaStreamParams(
     return qMax(128,result)*1024;
 }
 
-void QnTranscoder::setVideoLayout(QnConstResourceVideoLayoutPtr layout)
-{
-    m_vLayout = layout;
-}
-
 int QnTranscoder::setVideoCodec(
     CodecID codec,
     TranscodeMethod method,
@@ -291,7 +252,13 @@ int QnTranscoder::setVideoCodec(
         case TM_FfmpegTranscode:
         {
             ffmpegTranscoder = new QnFfmpegVideoTranscoder(codec);
-            ffmpegTranscoder->setVideoLayout(m_vLayout);
+
+            ffmpegTranscoder->setResolution(resolution);
+            ffmpegTranscoder->setBitrate(bitrate);
+            ffmpegTranscoder->setParams(params);
+            ffmpegTranscoder->setQuality(quality);
+            ffmpegTranscoder->setFilterList(m_extraTranscodeParams.createFilterChain(resolution));
+
             bool isAtom = getCPUString().toLower().contains(QLatin1String("atom"));
             if (isAtom || resolution.height() >= 1080)
                 ffmpegTranscoder->setMTMode(true);
@@ -305,24 +272,16 @@ int QnTranscoder::setVideoCodec(
             */
         case TM_OpenCLTranscode:
             m_lastErrMessage = tr("OpenCL transcoding is not implemented.");
-            return -1;
+            return OperationResult::Error;
         default:
             m_lastErrMessage = tr("Unknown transcoding method.");
-            return -1;
+            return OperationResult::Error;
     }
-    if (m_vTranscoder)
-    {
-        m_vTranscoder->setResolution(resolution);
-        m_vTranscoder->setBitrate(bitrate);
-        m_vTranscoder->setParams(params);
-        m_vTranscoder->setQuality(quality);
-    }
-    return 0;
+    return OperationResult::Success;
 }
 
-int QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
+QnTranscoder::OperationResult QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
 {
-    Q_UNUSED(method);
     m_audioCodec = codec;
     switch (method)
     {
@@ -344,7 +303,9 @@ int QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
             m_lastErrMessage = tr("Unknown Transcode Method");
             break;
     }
-    return m_lastErrMessage.isEmpty() ? 0 : 1;
+    return m_lastErrMessage.isEmpty() 
+        ? OperationResult::Success 
+        : OperationResult::Error;
 }
 
 int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result)
@@ -387,7 +348,7 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
 
     if( result )
         result->clear();
-    int errCode = 0;
+    int errCode = OperationResult::Success;
     while (!m_delayedVideoQueue.isEmpty()) {
         errCode = transcodePacketInternal(m_delayedVideoQueue.dequeue(), result);
         if (errCode != 0)
@@ -408,7 +369,7 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
     if( result )
         result->write(m_internalBuffer.data(), m_internalBuffer.size());
     
-    return 0;
+    return OperationResult::Success;
 }
 
 bool QnTranscoder::addTag( const QString& /*name*/, const QString& /*value*/ )
@@ -439,4 +400,10 @@ const QVector<int>& QnTranscoder::getPacketsSize()
     return m_outputPacketSize;
 }
 
+void QnTranscoder::setExtraTranscodeParams(const QnImageFilterHelper& extraParams)
+{
+    m_extraTranscodeParams = extraParams;
+}
+
 #endif // ENABLE_DATA_PROVIDERS
+

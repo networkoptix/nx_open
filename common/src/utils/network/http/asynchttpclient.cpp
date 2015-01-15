@@ -5,6 +5,9 @@
 
 #include "asynchttpclient.h"
 
+#include <condition_variable>
+#include <mutex>
+
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QMutexLocker>
 
@@ -76,6 +79,127 @@ namespace nx_http
         if( m_socket )
             m_socket->terminateAsyncIO( true );
         //AIOService guarantees that eventTriggered had returned and will never be called with m_socket
+    }
+
+    AsyncHttpClient::State AsyncHttpClient::state() const
+    {
+        return m_state;
+    }
+
+    bool AsyncHttpClient::failed() const
+    {
+        return m_state == sFailed;
+    }
+
+    //!Start request to \a url
+    /*!
+        \return true, if socket is created and async connect is started. false otherwise
+        To get error description use SystemError::getLastOSErrorCode()
+    */
+    bool AsyncHttpClient::doGet( const QUrl& url )
+    {
+        resetDataBeforeNewRequest();
+        m_url = url;
+        composeRequest( nx_http::Method::GET );
+        return initiateHttpMessageDelivery( url );
+    }
+
+    bool AsyncHttpClient::doPost(
+        const QUrl& url,
+        const nx_http::StringType& contentType,
+        const nx_http::StringType& messageBody )
+    {
+        resetDataBeforeNewRequest();
+        m_url = url;
+        composeRequest( nx_http::Method::POST );
+        m_request.headers.insert( make_pair("Content-Type", contentType) );
+        m_request.headers.insert( make_pair("Content-Length", StringType::number(messageBody.size())) );
+        //TODO #ak support chunked encoding & compression
+        m_request.headers.insert( make_pair("Content-Encoding", "identity") );
+        m_request.messageBody = messageBody;
+        return initiateHttpMessageDelivery( url );
+    }
+
+    /*!
+        Response is valid only after signal \a responseReceived() has been emitted
+    */
+    const Response* AsyncHttpClient::response() const
+    {
+        const Message& httpMsg = m_httpStreamReader.message();
+        return httpMsg.type == MessageType::response ? httpMsg.response : NULL;
+    }
+
+    StringType AsyncHttpClient::contentType() const
+    {
+        const Message& httpMsg = m_httpStreamReader.message();
+        if( httpMsg.type == MessageType::none )
+            return StringType();
+        HttpHeaders::const_iterator contentTypeIter = httpMsg.headers().find( "Content-Type" );
+        if( contentTypeIter == httpMsg.headers().end() )
+            return StringType();
+        return contentTypeIter->second;
+    }
+
+    //!Returns current message body buffer, clearing it
+    BufferType AsyncHttpClient::fetchMessageBodyBuffer()
+    {
+        return m_httpStreamReader.fetchMessageBody();
+    }
+
+    const QUrl& AsyncHttpClient::url() const
+    {
+        return m_url;
+    }
+
+    quint64 AsyncHttpClient::totalBytesRead() const
+    {
+        QMutexLocker lk( &m_mutex );
+        return m_totalBytesRead;
+    }
+
+    void AsyncHttpClient::setUseCompression( bool toggleUseEntityEncoding )
+    {
+        m_contentEncodingUsed = toggleUseEntityEncoding;
+    }
+
+    void AsyncHttpClient::setSubsequentReconnectTries( int /*reconnectTries*/ )
+    {
+        //TODO #ak
+    }
+
+    void AsyncHttpClient::setTotalReconnectTries( int /*reconnectTries*/ )
+    {
+        //TODO #ak
+    }
+
+    void AsyncHttpClient::setUserAgent( const QString& userAgent )
+    {
+        m_userAgent = userAgent;
+    }
+
+    void AsyncHttpClient::setUserName( const QString& userName )
+    {
+        m_userName = userName;
+    }
+
+    void AsyncHttpClient::setUserPassword( const QString& userPassword )
+    {
+        m_userPassword = userPassword;
+    }
+
+    void AsyncHttpClient::setResponseReadTimeoutMs( unsigned int _responseReadTimeoutMs )
+    {
+        m_responseReadTimeoutMs = _responseReadTimeoutMs;
+    }
+
+    void AsyncHttpClient::setMessageBodyReadTimeoutMs( unsigned int messageBodyReadTimeoutMs )
+    {
+        m_msgBodyReadTimeoutMs = messageBodyReadTimeoutMs;
+    }
+
+    void AsyncHttpClient::setDecodeChunkedMessageBody( bool val )
+    {
+        m_httpStreamReader.setDecodeChunkedMessageBody( val );
     }
 
     void AsyncHttpClient::asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode )
@@ -360,127 +484,6 @@ namespace nx_http
         }
     }
 
-    AsyncHttpClient::State AsyncHttpClient::state() const
-    {
-        return m_state;
-    }
-
-    bool AsyncHttpClient::failed() const
-    {
-        return m_state == sFailed;
-    }
-
-    //!Start request to \a url
-    /*!
-        \return true, if socket is created and async connect is started. false otherwise
-        To get error description use SystemError::getLastOSErrorCode()
-    */
-    bool AsyncHttpClient::doGet( const QUrl& url )
-    {
-        resetDataBeforeNewRequest();
-        m_url = url;
-        composeRequest( nx_http::Method::GET );
-        return initiateHttpMessageDelivery( url );
-    }
-
-    bool AsyncHttpClient::doPost(
-        const QUrl& url,
-        const nx_http::StringType& contentType,
-        const nx_http::StringType& messageBody )
-    {
-        resetDataBeforeNewRequest();
-        m_url = url;
-        composeRequest( nx_http::Method::POST );
-        m_request.headers.insert( make_pair("Content-Type", contentType) );
-        m_request.headers.insert( make_pair("Content-Length", StringType::number(messageBody.size())) );
-        //TODO #ak support chunked encoding & compression
-        m_request.headers.insert( make_pair("Content-Encoding", "identity") );
-        m_request.messageBody = messageBody;
-        return initiateHttpMessageDelivery( url );
-    }
-
-    /*!
-        Response is valid only after signal \a responseReceived() has been emitted
-    */
-    const Response* AsyncHttpClient::response() const
-    {
-        const Message& httpMsg = m_httpStreamReader.message();
-        return httpMsg.type == MessageType::response ? httpMsg.response : NULL;
-    }
-
-    StringType AsyncHttpClient::contentType() const
-    {
-        const Message& httpMsg = m_httpStreamReader.message();
-        if( httpMsg.type == MessageType::none )
-            return StringType();
-        HttpHeaders::const_iterator contentTypeIter = httpMsg.headers().find( "Content-Type" );
-        if( contentTypeIter == httpMsg.headers().end() )
-            return StringType();
-        return contentTypeIter->second;
-    }
-
-    //!Returns current message body buffer, clearing it
-    BufferType AsyncHttpClient::fetchMessageBodyBuffer()
-    {
-        return m_httpStreamReader.fetchMessageBody();
-    }
-
-    const QUrl& AsyncHttpClient::url() const
-    {
-        return m_url;
-    }
-
-    quint64 AsyncHttpClient::totalBytesRead() const
-    {
-        QMutexLocker lk( &m_mutex );
-        return m_totalBytesRead;
-    }
-
-    void AsyncHttpClient::setUseCompression( bool toggleUseEntityEncoding )
-    {
-        m_contentEncodingUsed = toggleUseEntityEncoding;
-    }
-
-    void AsyncHttpClient::setSubsequentReconnectTries( int /*reconnectTries*/ )
-    {
-        //TODO #ak
-    }
-
-    void AsyncHttpClient::setTotalReconnectTries( int /*reconnectTries*/ )
-    {
-        //TODO #ak
-    }
-
-    void AsyncHttpClient::setUserAgent( const QString& userAgent )
-    {
-        m_userAgent = userAgent;
-    }
-
-    void AsyncHttpClient::setUserName( const QString& userName )
-    {
-        m_userName = userName;
-    }
-
-    void AsyncHttpClient::setUserPassword( const QString& userPassword )
-    {
-        m_userPassword = userPassword;
-    }
-
-    void AsyncHttpClient::setResponseReadTimeoutMs( unsigned int _responseReadTimeoutMs )
-    {
-        m_responseReadTimeoutMs = _responseReadTimeoutMs;
-    }
-
-    void AsyncHttpClient::setMessageBodyReadTimeoutMs( unsigned int messageBodyReadTimeoutMs )
-    {
-        m_msgBodyReadTimeoutMs = messageBodyReadTimeoutMs;
-    }
-
-    void AsyncHttpClient::setDecodeChunkedMessageBody( bool val )
-    {
-        m_httpStreamReader.setDecodeChunkedMessageBody( val );
-    }
-
     void AsyncHttpClient::resetDataBeforeNewRequest()
     {
         //stopping client, if it is running
@@ -505,57 +508,71 @@ namespace nx_http
     {
         using namespace std::placeholders;
 
+        bool canUseExistingConnection = true;
+        if( m_httpStreamReader.message().type == nx_http::MessageType::response )
+        {
+            canUseExistingConnection = nx_http::getHeaderValue(
+                m_httpStreamReader.message().response->headers,
+                "Connection" ) != "close";
+        }
+
         m_httpStreamReader.resetState();
 
         if( m_socket )
         {
             //TODO #ak think again about next cancellation
-            m_socket->cancelAsyncIO( aio::etWrite );
-            m_socket->cancelAsyncIO( aio::etRead );
+            m_socket->cancelAsyncIO();
 
-            serializeRequest();
-            m_state = sSendingRequest;
+            if( canUseExistingConnection )
+            {
+                serializeRequest();
+                m_state = sSendingRequest;
 
-            if( m_socket->sendAsync( m_requestBuffer, std::bind( &AsyncHttpClient::asyncSendDone, this, m_socket.data(), _1, _2 ) ) )
+                if( !m_socket->sendAsync( m_requestBuffer, std::bind( &AsyncHttpClient::asyncSendDone, this, m_socket.data(), _1, _2 ) ) )
+                {
+                    NX_LOG( lit("Failed to init async socket call (connecting to %1:%2) to aio service. %3").
+                        arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
+                    m_socket.clear();
+                    return false;
+                }
                 return true;
+            }
+            else
+            {
+                m_socket.clear();
+            }
         }
-        else {
+
+        m_state = sInit;
+
+        m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(/*url.scheme() == lit("https")*/));
+        if( !m_socket->setNonBlockingMode( true ) ||
+            !m_socket->setSendTimeout( DEFAULT_CONNECT_TIMEOUT ) ||
+            !m_socket->setRecvTimeout( m_responseReadTimeoutMs ) )
+        {
+            NX_LOG( lit("Failed to put socket to non blocking mode. %1").
+                arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
+            m_socket.clear();
+            return false;
+        }
+
+        m_url = url;
+        m_state = sWaitingConnectToHost;
+
+        //starting async connect
+        if( !m_socket->connectAsync(
+                SocketAddress( url.host(), url.port( DEFAULT_HTTP_PORT ) ),
+                std::bind( &AsyncHttpClient::asyncConnectDone, this, m_socket.data(), _1 ) ) )
+        {
+            NX_LOG( lit("Failed to perform async connect to %1:%2. %3").
+                arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
+            m_socket.clear();
+            m_url.clear();
             m_state = sInit;
-
-            m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(/*url.scheme() == lit("https")*/));
-            if( !m_socket->setNonBlockingMode( true ) ||
-                !m_socket->setSendTimeout( DEFAULT_CONNECT_TIMEOUT ) ||
-                !m_socket->setRecvTimeout( m_responseReadTimeoutMs ) )
-            {
-                NX_LOG( lit("Failed to put socket to non blocking mode. %1").
-                    arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
-                m_socket.clear();
-                return false;
-            }
-
-            m_url = url;
-            m_state = sWaitingConnectToHost;
-
-            //starting async connect
-            if( !m_socket->connectAsync(
-                    SocketAddress( url.host(), url.port( DEFAULT_HTTP_PORT ) ),
-                    std::bind( &AsyncHttpClient::asyncConnectDone, this, m_socket.data(), _1 ) ) )
-            {
-                NX_LOG( lit("Failed to perform async connect to %1:%2. %3").
-                    arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
-                m_socket.clear();
-                m_url.clear();
-                m_state = sInit;
-                return false;
-            }
-
-            return true;
+            return false;
         }
 
-        NX_LOG( lit("Failed to init async socket call (connecting to %1:%2) to aio service. %3").
-            arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
-        m_socket.clear();
-        return false;
+        return true;
     }
 
     size_t AsyncHttpClient::readAndParseHttp( size_t bytesRead )
@@ -613,21 +630,13 @@ namespace nx_http
         m_request.headers.insert(m_additionalHeaders.cbegin(), m_additionalHeaders.cend());
 
         //adding user credentials
+        if( !m_url.userName().isEmpty() )
+            m_userName = m_url.userName();
+        if( !m_url.password().isEmpty() )
+            m_userPassword = m_url.password();
 
-        if (m_authType == authBasicAndDigest)
-        {
-            if( !m_userName.isEmpty() || !m_userPassword.isEmpty() )
-            {
-                nx_http::insertOrReplaceHeader(
-                    &m_request.headers,
-                    nx_http::HttpHeader(
-                        header::Authorization::NAME,
-                        header::BasicAuthorization( m_userName.toLatin1(), m_userPassword.toLatin1() ).toString() ) );
-            }
-        }
-        else {
-            nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
-        }
+        //not using Basic authentication by default, since it is not secure
+        nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
     }
 
     void AsyncHttpClient::addRequestHeader(const StringType& key, const StringType& value)
@@ -755,76 +764,88 @@ namespace nx_http
 
         header::WWWAuthenticate wwwAuthenticateHeader;
         wwwAuthenticateHeader.parse( wwwAuthenticateIter->second );
-        if( wwwAuthenticateHeader.authScheme != header::AuthScheme::digest )
-            return false;
-
-        //reading params
-        QMap<BufferType, BufferType>::const_iterator nonceIter = wwwAuthenticateHeader.params.find("nonce");
-        const BufferType nonce = nonceIter != wwwAuthenticateHeader.params.end() ? nonceIter.value() : BufferType();
-        QMap<BufferType, BufferType>::const_iterator realmIter = wwwAuthenticateHeader.params.find("realm");
-        const BufferType realm = realmIter != wwwAuthenticateHeader.params.end() ? realmIter.value() : BufferType();
-        QMap<BufferType, BufferType>::const_iterator qopIter = wwwAuthenticateHeader.params.find("qop");
-        const BufferType qop = qopIter != wwwAuthenticateHeader.params.end() ? qopIter.value() : BufferType();
-
-        if( qop.indexOf("auth-int") != -1 ) //TODO #ak qop can have value "auth,auth-int". That should be supported
-            return false;   //qop=auth-int is not supported
-
-        BufferType ha1;
-        QCryptographicHash md5HashCalc( QCryptographicHash::Md5 );
-        if (m_authType == authDigestWithPasswordHash) {
-            ha1 = m_userPassword.toUtf8();
-        }
-        else {
-            //HA1
-            md5HashCalc.addData( m_userName.toLatin1() );
-            md5HashCalc.addData( ":" );
-            md5HashCalc.addData( realm );
-            md5HashCalc.addData( ":" );
-            md5HashCalc.addData( m_userPassword.toLatin1() );
-            ha1 = md5HashCalc.result().toHex();
-        }
-        //HA2, qop=auth-int is not supported
-        md5HashCalc.reset();
-        md5HashCalc.addData( m_request.requestLine.method );
-        md5HashCalc.addData( ":" );
-        md5HashCalc.addData( m_url.path().toLatin1() );
-        const BufferType& ha2 = md5HashCalc.result().toHex();
-        //response
-        header::DigestAuthorization digestAuthorizationHeader;
-        digestAuthorizationHeader.addParam( "username", m_userName.toLatin1() );
-        digestAuthorizationHeader.addParam( "realm", realm );
-        digestAuthorizationHeader.addParam( "nonce", nonce );
-        digestAuthorizationHeader.addParam( "uri", m_url.path().toLatin1() );
-        md5HashCalc.reset();
-        md5HashCalc.addData( ha1 );
-        md5HashCalc.addData( ":" );
-        md5HashCalc.addData( nonce );
-        md5HashCalc.addData( ":" );
-        if( !qop.isEmpty() )
+        if( wwwAuthenticateHeader.authScheme == header::AuthScheme::basic )
         {
-            const BufferType nonceCount = "00000001";     //TODO/IMPL
-            const BufferType clientNonce = "0a4f113b";    //TODO/IMPL
-
-            md5HashCalc.addData( nonceCount );
-            md5HashCalc.addData( ":" );
-            md5HashCalc.addData( clientNonce );
-            md5HashCalc.addData( ":" );
-            md5HashCalc.addData( qop );
-            md5HashCalc.addData( ":" );
-
-            digestAuthorizationHeader.addParam( "qop", qop );
-            digestAuthorizationHeader.addParam( "nc", nonceCount );
-            digestAuthorizationHeader.addParam( "cnonce", clientNonce );
+            nx_http::insertOrReplaceHeader(
+                &m_request.headers,
+                nx_http::HttpHeader(
+                    header::Authorization::NAME,
+                    header::BasicAuthorization( m_userName.toLatin1(), m_userPassword.toLatin1() ).toString() ) );
         }
-        md5HashCalc.addData( ha2 );
-        digestAuthorizationHeader.addParam( "response", md5HashCalc.result().toHex() );
+        else if( wwwAuthenticateHeader.authScheme == header::AuthScheme::digest )
+        {
+            //reading params
+            QMap<BufferType, BufferType>::const_iterator nonceIter = wwwAuthenticateHeader.params.find("nonce");
+            const BufferType nonce = nonceIter != wwwAuthenticateHeader.params.end() ? nonceIter.value() : BufferType();
+            QMap<BufferType, BufferType>::const_iterator realmIter = wwwAuthenticateHeader.params.find("realm");
+            const BufferType realm = realmIter != wwwAuthenticateHeader.params.end() ? realmIter.value() : BufferType();
+            QMap<BufferType, BufferType>::const_iterator qopIter = wwwAuthenticateHeader.params.find("qop");
+            const BufferType qop = qopIter != wwwAuthenticateHeader.params.end() ? qopIter.value() : BufferType();
 
-        BufferType authorizationStr;
-        digestAuthorizationHeader.serialize( &authorizationStr );
+            if( qop.indexOf("auth-int") != -1 ) //TODO #ak qop can have value "auth,auth-int". That should be supported
+                return false;   //qop=auth-int is not supported
 
-        nx_http::insertOrReplaceHeader(
-            &m_request.headers,
-            nx_http::HttpHeader( header::Authorization::NAME, authorizationStr ) );
+            BufferType ha1;
+            QCryptographicHash md5HashCalc( QCryptographicHash::Md5 );
+            if (m_authType == authDigestWithPasswordHash) {
+                ha1 = m_userPassword.toUtf8();
+            }
+            else {
+                //HA1
+                md5HashCalc.addData( m_userName.toLatin1() );
+                md5HashCalc.addData( ":" );
+                md5HashCalc.addData( realm );
+                md5HashCalc.addData( ":" );
+                md5HashCalc.addData( m_userPassword.toLatin1() );
+                ha1 = md5HashCalc.result().toHex();
+            }
+            //HA2, qop=auth-int is not supported
+            md5HashCalc.reset();
+            md5HashCalc.addData( m_request.requestLine.method );
+            md5HashCalc.addData( ":" );
+            md5HashCalc.addData( m_url.path().toLatin1() );
+            const BufferType& ha2 = md5HashCalc.result().toHex();
+            //response
+            header::DigestAuthorization digestAuthorizationHeader;
+            digestAuthorizationHeader.addParam( "username", m_userName.toLatin1() );
+            digestAuthorizationHeader.addParam( "realm", realm );
+            digestAuthorizationHeader.addParam( "nonce", nonce );
+            digestAuthorizationHeader.addParam( "uri", m_url.path().toLatin1() );
+            md5HashCalc.reset();
+            md5HashCalc.addData( ha1 );
+            md5HashCalc.addData( ":" );
+            md5HashCalc.addData( nonce );
+            md5HashCalc.addData( ":" );
+            if( !qop.isEmpty() )
+            {
+                const BufferType nonceCount = "00000001";     //TODO/IMPL
+                const BufferType clientNonce = "0a4f113b";    //TODO/IMPL
+
+                md5HashCalc.addData( nonceCount );
+                md5HashCalc.addData( ":" );
+                md5HashCalc.addData( clientNonce );
+                md5HashCalc.addData( ":" );
+                md5HashCalc.addData( qop );
+                md5HashCalc.addData( ":" );
+
+                digestAuthorizationHeader.addParam( "qop", qop );
+                digestAuthorizationHeader.addParam( "nc", nonceCount );
+                digestAuthorizationHeader.addParam( "cnonce", clientNonce );
+            }
+            md5HashCalc.addData( ha2 );
+            digestAuthorizationHeader.addParam( "response", md5HashCalc.result().toHex() );
+
+            BufferType authorizationStr;
+            digestAuthorizationHeader.serialize( &authorizationStr );
+
+            nx_http::insertOrReplaceHeader(
+                &m_request.headers,
+                nx_http::HttpHeader( header::Authorization::NAME, authorizationStr ) );
+        }
+        else
+        {
+            return false;
+        }
 
         m_authorizationTried = true;
         return initiateHttpMessageDelivery( m_url );
@@ -858,5 +879,81 @@ namespace nx_http
     void AsyncHttpClient::setAuthType(AuthType value)
     {
         m_authType = value;
+    }
+
+
+    bool downloadFileAsync(
+        const QUrl& url,
+        std::function<void(SystemError::ErrorCode, int, nx_http::BufferType)> completionHandler )
+    {
+        nx_http::AsyncHttpClientPtr httpClientCaptured = std::make_shared<nx_http::AsyncHttpClient>();
+        auto requestCompletionFunc = [httpClientCaptured, completionHandler]
+            ( nx_http::AsyncHttpClientPtr httpClient ) mutable
+        {
+            httpClientCaptured->disconnect( nullptr, (const char*)nullptr );
+            httpClientCaptured.reset();
+
+            if( httpClient->failed() )
+                return completionHandler(
+                    SystemError::connectionReset,
+                    nx_http::StatusCode::ok,
+                    nx_http::BufferType() );
+
+            if( httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok &&
+                httpClient->response()->statusLine.statusCode != nx_http::StatusCode::partialContent )
+            {
+                return completionHandler(
+                    SystemError::noError,
+                    httpClient->response()->statusLine.statusCode,
+                    nx_http::BufferType() );
+            }
+
+            completionHandler( 
+                SystemError::noError,
+                httpClient->response()->statusLine.statusCode,
+                httpClient->fetchMessageBodyBuffer() );
+        };
+        QObject::connect(
+            httpClientCaptured.get(), &nx_http::AsyncHttpClient::done,
+            httpClientCaptured.get(), requestCompletionFunc,
+            Qt::DirectConnection );
+
+        if( !httpClientCaptured->doGet( url ) )
+        {
+            //if we do not disconnect, http client object will not be destroyed
+            httpClientCaptured->disconnect( nullptr, (const char*)nullptr );
+            return false;
+        }
+        return true;
+    }
+
+    SystemError::ErrorCode downloadFileSync(
+        const QUrl& url,
+        int* const statusCode,
+        nx_http::BufferType* const msgBody )
+    {
+        bool done = false;
+        SystemError::ErrorCode resultingErrorCode = SystemError::noError;
+        std::mutex mtx;
+        std::condition_variable condVar;
+        const bool res = downloadFileAsync(
+            url,
+            [&resultingErrorCode, statusCode, msgBody, &mtx, &condVar, &done]
+            ( SystemError::ErrorCode errorCode, int _statusCode, const nx_http::BufferType& _msgBody ) {
+                resultingErrorCode = errorCode;
+                *statusCode = _statusCode;
+                *msgBody = _msgBody;
+                std::unique_lock<std::mutex> lk( mtx );
+                done = true;
+                condVar.notify_all();
+            } );
+        if( !res )
+            return SystemError::getLastOSErrorCode();
+
+        std::unique_lock<std::mutex> lk( mtx );
+        while( !done )
+            condVar.wait( lk );
+
+        return resultingErrorCode;
     }
 }

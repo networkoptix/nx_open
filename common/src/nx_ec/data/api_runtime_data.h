@@ -38,7 +38,8 @@ namespace ec2
                    prematureLicenseExperationDate == other.prematureLicenseExperationDate &&
                    availableConnections == other.availableConnections &&
                    mainHardwareIds == other.mainHardwareIds &&
-                   compatibleHardwareIds == other.compatibleHardwareIds;
+                   compatibleHardwareIds == other.compatibleHardwareIds &&
+                   updateStarted == other.updateStarted;
         }
 
         ApiPeerData peer;
@@ -69,7 +70,7 @@ namespace ec2
 
 #define ApiRuntimeData_Fields ApiDataWithVersion_Fields (peer)(platform)(box)(brand)(publicIP)(prematureLicenseExperationDate)\
                                                         (videoWallInstanceGuid)(videoWallControlSession)(serverTimePriority)\
-                                                        (availableConnections)(mainHardwareIds)(compatibleHardwareIds)
+                                                        (availableConnections)(mainHardwareIds)(compatibleHardwareIds)(updateStarted)
 
 
 } // namespace ec2

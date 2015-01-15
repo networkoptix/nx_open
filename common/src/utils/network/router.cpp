@@ -30,19 +30,31 @@ QMultiHash<QnUuid, QnRouter::Endpoint> QnRouter::connections() const {
     return m_connections;
 }
 
-QHash<QnUuid, QnRouteList> QnRouter::routes() const {
+QHash<QnUuid, QnRoute> QnRouter::routes() const {
     QMutexLocker lk(&m_mutex);
     return m_routeBuilder->routes();
 }
 
-QnRoute QnRouter::routeTo(const QnUuid &id) const {
+QnRoute QnRouter::routeTo(const QnUuid &id, const QnUuid &via) const {
     QMutexLocker lk(&m_mutex);
-    return m_routeBuilder->routeTo(id);
+    return m_routeBuilder->routeTo(id, via);
 }
 
 QnRoute QnRouter::routeTo(const QString &host, quint16 port) const {
     QnUuid id = whoIs(host, port);
-    return id.isNull() ? QnRoute() : routeTo(id);
+    if (id.isNull())
+        return QnRoute();
+
+    QnRoute route = routeTo(id);
+
+    /* Ensure the latest point is the requested point */
+    if (route.isValid() && route.points.last().host != host) {
+        QnUuid from = route.length() > 1 ? route.points[route.length() - 2].peerId : qnCommon->moduleGUID();
+        if (m_connections.contains(from, Endpoint(id, host, port)))
+            route.points.last() = QnRoutePoint(id, host, port);
+    }
+
+    return route;
 }
 
 QnUuid QnRouter::whoIs(const QString &host, quint16 port) const {
@@ -57,6 +69,9 @@ QnUuid QnRouter::whoIs(const QString &host, quint16 port) const {
 
 void QnRouter::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url) {
     Endpoint endpoint(moduleInformation.id, url.host(), url.port());
+
+    if (endpoint.id.isNull())
+        return;
 
     if (!addConnection(qnCommon->moduleGUID(), endpoint))
         return;

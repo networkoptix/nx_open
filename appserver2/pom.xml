@@ -6,19 +6,19 @@
     It should also be possible to have one maven project per solution project, 
     and have a parent pom to deletegate the build.
   -->
-	<parent>
-		<artifactId>cpp</artifactId>
-		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>2.3.0-SNAPSHOT</version>
-		<relativePath>../cpp</relativePath>
-	</parent>
+    <parent>
+        <artifactId>cpp</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>2.3.0-SNAPSHOT</version>
+        <relativePath>../cpp</relativePath>
+    </parent>
 
-	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>2.3.0-SNAPSHOT</version>
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>appserver2</artifactId>
-	<packaging>pom</packaging>
-	<name>HD Witness New Enterprise Controller</name>    
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>2.3.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>appserver2</artifactId>
+    <packaging>pom</packaging>
+    <name>HD Witness New Enterprise Controller</name>    
 
     <properties>
         <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
@@ -27,23 +27,35 @@
         <qt.libs>core network xml sql concurrent</qt.libs>
         <global.libs>-lcommon</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm -lssleay32 -llibeay32 -lpostproc</windows.oslibs>
-        <linux.oslibs>-lssl -lcrypto -lpostproc</linux.oslibs>
-        <windows.oslibs.release></windows.oslibs.release>
-        <windows.oslibs.debug></windows.oslibs.debug>                
+        <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm -lssleay32 -llibeay32</windows.oslibs>
+        <linux.oslibs>-lssl -lcrypto</linux.oslibs>
+        <windows.oslibs.release/>
+        <windows.oslibs.debug/>                
         <mac.oslibs>-lssl -lcrypto -lbz2 -lz -framework IOKit -framework CoreServices</mac.oslibs>
         <android.oslibs>-lssl -lcrypto</android.oslibs>
         <!--Global defines-->
-        <global.defines></global.defines>
+        <global.defines/>
         <!--Specific os defines-->
         <windows.defines>EC2_LIB_API=__declspec(dllexport)</windows.defines>
         <linux.defines/>
         <mac.defines/>      
         <android.defines/>
 
-	<buildLib>sharedlib</buildLib>
+        <buildLib>sharedlib</buildLib>
 
     </properties>	
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>build_variables</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/build_variables/pom.xml</systemPath>            
+        </dependency>
+    </dependencies>    
+
 
     <profiles>
         <profile>
@@ -71,6 +83,26 @@
                 <buildLib>staticlib</buildLib>
             </properties>
         </profile>
+
+        <profile>
+            <!-- Common Profile for Linux, Mac, Arm -->
+            <id>unix</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os> 
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>common</artifactId>
+                    <version>${project.version}</version>
+                    <type>pom</type> 
+                    <scope>system</scope>
+                    <systemPath>${root.dir}/common/pom.xml</systemPath>            
+                </dependency>
+            </dependencies>
+        </profile>        
     </profiles>
 
 </project>

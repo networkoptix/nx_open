@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>446</width>
+    <width>413</width>
     <height>149</height>
    </rect>
   </property>
@@ -197,7 +197,7 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0">
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -216,6 +216,9 @@
        <property name="enabled">
         <bool>true</bool>
        </property>
+       <property name="toolTip">
+        <string>License will be bound to the current server</string>
+       </property>
        <property name="text">
         <string>Activate Free License</string>
        </property>
@@ -225,6 +228,9 @@
       <widget class="QPushButton" name="activateLicenseButton">
        <property name="enabled">
         <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>License will be bound to the current server</string>
        </property>
        <property name="text">
         <string>Activate License</string>

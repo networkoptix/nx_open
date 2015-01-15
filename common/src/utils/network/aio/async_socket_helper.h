@@ -193,6 +193,7 @@ public:
         assert( buf.size() > 0 );
 
 #ifdef _DEBUG
+        //assert does not stop all threads immediately, so performing segmentation fault
         if( m_asyncSendIssued )
             *((int*)nullptr) = 12;
         assert( !m_asyncSendIssued );
@@ -224,10 +225,14 @@ public:
     {
         if( eventType == aio::etNone )
         {
-            cancelAsyncIO( aio::etRead, waitForRunningHandlerCompletion );
-            cancelAsyncIO( aio::etWrite, waitForRunningHandlerCompletion );
-            cancelAsyncIO( aio::etTimedOut, waitForRunningHandlerCompletion );
-            aio::AIOService::instance()->cancelPostedCalls( this->m_socket, waitForRunningHandlerCompletion );
+            //TODO #ak underlying loop is a work-around. Must add method to aio::AIOService which cancels all operation atomically
+            while( aio::AIOService::instance()->isSocketBeingWatched( this->m_socket ) )
+            {
+                cancelAsyncIO( aio::etRead, waitForRunningHandlerCompletion );
+                cancelAsyncIO( aio::etWrite, waitForRunningHandlerCompletion );
+                cancelAsyncIO( aio::etTimedOut, waitForRunningHandlerCompletion );
+                aio::AIOService::instance()->cancelPostedCalls( this->m_socket, waitForRunningHandlerCompletion );
+            }
             return;
         }
 
@@ -279,6 +284,8 @@ private:
 
     virtual void eventTriggered( SocketType* sock, aio::EventType eventType ) throw() override
     {
+        assert( this->m_socket == sock );
+
         //TODO #ak split this method to multiple methods
 
         //NOTE aio garantees that all events on socket are handled in same aio thread, so no synchronization is required
@@ -494,7 +501,10 @@ private:
             {
                 //TODO #ak distinguish read and write
                 SystemError::ErrorCode sockErrorCode = SystemError::notConnected;
-                sock->getLastError( &sockErrorCode );
+                if( !this->m_socket->getLastError( &sockErrorCode ) )
+                    sockErrorCode = SystemError::notConnected;
+                else if( sockErrorCode == SystemError::noError )
+                    sockErrorCode = SystemError::notConnected;  //MUST report some error
                 if( m_connectHandler )
                 {
                     m_connectSendHandlerTerminatedFlag = &terminated;

@@ -61,6 +61,7 @@ namespace Qee {
             QChar c = m_source[m_pos];
             switch(c.unicode()) {
             case L' ': case L'\t': case L'\n': case L'\r':
+                m_pos++;
                 break;
             case L'_': 
                 return readVariableToken();

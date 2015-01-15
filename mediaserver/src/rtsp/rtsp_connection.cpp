@@ -518,6 +518,23 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbst
         //dstCodec = CODEC_ID_AAC; // keep aac without transcoding for audio
     //CodecID dstCodec = media->dataType == QnAbstractMediaData::VIDEO ? CODEC_ID_MPEG4 : media->compressionType;
     QSharedPointer<QnUniversalRtpEncoder> universalEncoder;
+    
+    QnResourcePtr res = getResource()->toResourcePtr();
+
+    QUrl url(d->request.requestLine.url);
+    const QUrlQuery urlQuery( url.query() );
+    int rotation;
+    if (urlQuery.hasQueryItem("rotation"))
+        rotation = urlQuery.queryItemValue("rotation").toInt();
+    else
+        rotation = res->getProperty(QnMediaResource::rotationKey()).toInt();
+
+    qreal customAR = getResource()->customAspectRatio();
+
+    QnImageFilterHelper extraTranscodeParams;
+    extraTranscodeParams.setVideoLayout(vLayout);
+    extraTranscodeParams.setRotation(rotation);
+    extraTranscodeParams.setCustomAR(customAR);
 
     switch (dstCodec)
     {
@@ -549,7 +566,7 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbst
         case CODEC_ID_VP8:
         case CODEC_ID_ADPCM_G722:
         case CODEC_ID_ADPCM_G726:
-            universalEncoder = QSharedPointer<QnUniversalRtpEncoder>(new QnUniversalRtpEncoder(media, dstCodec, resolution, vLayout)); // transcode src codec to MPEG4/AAC
+            universalEncoder = QSharedPointer<QnUniversalRtpEncoder>(new QnUniversalRtpEncoder(media, dstCodec, resolution, extraTranscodeParams)); // transcode src codec to MPEG4/AAC
             if (universalEncoder->isOpened())
                 return universalEncoder;
             else
@@ -578,7 +595,7 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(QnAbstractM
             camera = qnCameraPool->getVideoCamera(getResource()->toResourcePtr());
         if (camera) {
             if (dataType == QnAbstractMediaData::VIDEO)
-                rez =  camera->getLastVideoFrame(isHQ);
+                rez =  camera->getLastVideoFrame(isHQ, 0);
             else
                 rez = camera->getLastAudioFrame(isHQ);
             if (rez)
@@ -911,7 +928,7 @@ void QnRtspConnectionProcessor::createDataProvider()
     }
     if (camera && d->liveMode == Mode_Live)
     {
-        if (!d->liveDpHi && !d->mediaRes->toResource()->hasFlags(Qn::foreigner)) {
+        if (!d->liveDpHi && !d->mediaRes->toResource()->hasFlags(Qn::foreigner) && d->mediaRes->toResource()->isInitialized()) {
             d->liveDpHi = camera->getLiveReader(QnServer::HiQualityCatalog);
             if (d->liveDpHi) {
                 connect(d->liveDpHi->getResource().data(), SIGNAL(parentIdChanged(const QnResourcePtr &)), this, SLOT(at_camera_parentIdChanged()), Qt::DirectConnection);

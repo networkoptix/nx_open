@@ -29,6 +29,7 @@ private:
     QnWorkbenchRenderWatcher *m_renderWatcher;
     QnWorkbenchLayout *m_watchedLayout;
     QSet<QnResourceWidget*> m_watchedWidgets;
+    bool m_monitoring;
 };
 
 #endif // QN_WORKBENCH_MEDIA_WIDGET_WATCHER_H

@@ -14,6 +14,7 @@
 #include <decoders/video/abstractdecoder.h>
 
 #include "video_stream_display.h"
+#include <map>
 
 class QnAbstractRenderer;
 class QnVideoStreamDisplay;
@@ -84,10 +85,7 @@ public:
     void setMTDecoding(bool value);
 
     QSize getFrameSize(int channel) const;
-    QImage getScreenshot(int channel, const ImageCorrectionParams& params,
-                         const QnMediaDewarpingParams& mediaDewarping,
-                         const QnItemDewarpingParams& itemDewarping,
-                         bool anyQuality);
+    QImage getScreenshot(const QnImageFilterHelper& imageProcessingParams, bool anyQuality);
     QImage getGrayscaleScreenshot(int channel);
     QSize getVideoSize() const;
     bool isRealTimeSource() const;
@@ -174,6 +172,9 @@ private:
     void restoreVideoQueue(QnCompressedVideoDataPtr incoming, QnCompressedVideoDataPtr vd, int channel);
     template <class T> void markIgnoreBefore(const T& queue, qint64 time);
     bool needBuffering(qint64 vTime) const;
+    void processSkippingFramesTime();
+    void clearMetaDataInfo();
+    void mapMetadataFrame(const QnCompressedVideoDataPtr& video);
 protected:
     QnVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
     QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
@@ -222,12 +223,12 @@ protected:
     int m_executingJump;
     int m_skipPrevJumpSignal;
     int m_processedPackets;
-    QnMetaDataV1Ptr m_lastMetadata[CL_MAX_CHANNELS];
+    std::map<qint64, QnMetaDataV1Ptr> m_lastMetadata[CL_MAX_CHANNELS];
     qint64 m_nextReverseTime[CL_MAX_CHANNELS];
     int m_emptyPacketCounter;
     bool m_isStillImage;
     bool m_isLongWaiting;
-    bool m_skippingFramesStarted;
+    qint64 m_skippingFramesTime;
     
     bool m_executingChangeSpeed;
     bool m_eofSignalSended;

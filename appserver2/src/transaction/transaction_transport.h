@@ -4,8 +4,8 @@
 #include <deque>
 
 #include <QByteArray>
+#include <QElapsedTimer>
 #include <QSet>
-#include <QTime>
 
 #include <transaction/transaction.h>
 #include <transaction/binary_transaction_serializer.h>
@@ -72,11 +72,8 @@ public:
             //Q_ASSERT(peer != qnCommon->moduleGUID());
         }
 #endif
-
-#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        NX_LOG( lit("send transaction to peer %1 command=%2 tt seq=%3 db seq=%4 timestamp=%5").arg(remotePeer().id.toString()).
-            arg(ApiCommand::toString(transaction.command)).arg(header.sequence).arg(transaction.persistentInfo.sequence).arg(transaction.persistentInfo.timestamp), cl_logDEBUG1);
-#endif
+        Q_ASSERT_X(!transaction.isLocal || m_remotePeer.isClient(), Q_FUNC_INFO, "Invalid transaction type to send!");
+        NX_LOG( QnLog::EC2_TRAN_LOG, lit("send transaction %1 to peer %2").arg(transaction.toString()).arg(remotePeer().id.toString()), cl_logDEBUG1 );
 
         switch (m_remotePeer.dataFormat) {
         case Qn::JsonFormat:
@@ -144,6 +141,9 @@ public:
     void setRemotePeer(const ApiPeerData& value) { m_remotePeer = value; }
     bool isHttpKeepAliveTimeout() const;
     bool hasUnsendData() const;
+
+    void transactionProcessed();
+
 private:
     struct DataToSend
     {
@@ -187,9 +187,11 @@ private:
 
     QByteArray m_extraData;
     bool m_authByKey;
-    QTime m_lastReceiveTimer;
-    QTime m_sendTimer;
+    QElapsedTimer m_lastReceiveTimer;
     QByteArray m_emptyChunkData;
+    int m_postedTranCount;
+    bool m_asyncReadScheduled;
+
 private:
     void sendHttpKeepAlive();
     //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
@@ -217,7 +219,6 @@ private slots:
     void repeatDoGet();
 };
 
-typedef QSharedPointer<QnTransactionTransport> QnTransactionTransportPtr;
 }
 
 Q_DECLARE_METATYPE(ec2::QnTransactionTransport::State);

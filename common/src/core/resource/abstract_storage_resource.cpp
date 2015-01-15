@@ -5,8 +5,7 @@ QnAbstractStorageResource::QnAbstractStorageResource():
     QnResource(),
     m_spaceLimit(0),
     m_maxStoreTime(0),
-    m_usedForWriting(false),
-    m_index(0)
+    m_usedForWriting(false)
 {
     setStatus(Qn::Offline);
 }
@@ -54,18 +53,6 @@ bool QnAbstractStorageResource::isUsedForWriting() const
 QString QnAbstractStorageResource::getUniqueId() const
 {
     return QLatin1String("storage://") + getUrl();
-}
-
-void QnAbstractStorageResource::setIndex(quint16 value)
-{
-    QMutexLocker lock(&m_mutex);
-    m_index = value;
-}
-
-quint16 QnAbstractStorageResource::getIndex() const
-{
-    QMutexLocker lock(&m_mutex);
-    return m_index;
 }
 
 #ifdef ENABLE_DATA_PROVIDERS
@@ -140,7 +127,6 @@ void QnAbstractStorageResource::updateInner(const QnResourcePtr &other, QSet<QBy
     m_spaceLimit = storage->m_spaceLimit;
     m_maxStoreTime = storage->m_maxStoreTime;
     m_usedForWriting = storage->m_usedForWriting;
-    m_index = storage->m_index;
 }
 
 void QnAbstractStorageResource::setUrl(const QString& value)
@@ -155,4 +141,10 @@ QnUuid QnAbstractStorageResource::fillID(const QnUuid& mserverId, const QString&
     QByteArray data1 = mserverId.toRfc4122();
     QByteArray data2 = url.toUtf8();
     return guidFromArbitraryData(data1.append(data2));
+}
+
+bool QnAbstractStorageResource::isExternal() const
+{
+    QString storageUrl = getUrl();
+    return storageUrl.trimmed().startsWith(lit("\\\\")) || QUrl(storageUrl).path().mid(1).startsWith(lit("\\\\"));
 }

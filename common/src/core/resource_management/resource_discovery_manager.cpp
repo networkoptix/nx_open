@@ -29,9 +29,10 @@
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 #include <utils/network/ip_range_checker.h>
+#include "common/common_module.h"
+#include "core/resource/media_server_resource.h"
 
 
-QnResourceDiscoveryManager* QnResourceDiscoveryManager::m_instance;
 
 // ------------------------------------ QnManualCameraInfo -----------------------------
 
@@ -74,10 +75,11 @@ QnResourceDiscoveryManager::QnResourceDiscoveryManager()
 :
     m_ready( false ),
     m_state( InitialSearch ),
-    m_discoveryUpdateIdx(0)
+    m_discoveryUpdateIdx(0),
+    m_serverOfflineTimeout(20 * 1000)
 {
-    connect(QnResourcePool::instance(), SIGNAL(resourceRemoved(const QnResourcePtr&)), this, SLOT(at_resourceDeleted(const QnResourcePtr&)), Qt::DirectConnection);
-    connect(QnResourcePool::instance(), SIGNAL(resourceChanged(const QnResourcePtr&)), this, SLOT(at_resourceChanged(const QnResourcePtr&)), Qt::DirectConnection);
+    connect(QnResourcePool::instance(), &QnResourcePool::resourceRemoved, this, &QnResourceDiscoveryManager::at_resourceDeleted, Qt::DirectConnection);
+    connect(QnResourcePool::instance(), &QnResourcePool::resourceAdded, this, &QnResourceDiscoveryManager::at_resourceAdded, Qt::DirectConnection);
     connect(QnGlobalSettings::instance(), &QnGlobalSettings::disabledVendorsChanged, this, &QnResourceDiscoveryManager::updateSearchersUsage);
 }
 
@@ -91,22 +93,10 @@ void QnResourceDiscoveryManager::setReady(bool ready)
     m_ready = ready;
 }
 
-void QnResourceDiscoveryManager::init(QnResourceDiscoveryManager* instance)
-{
-    m_instance = instance;
-}
-
 void QnResourceDiscoveryManager::start( Priority priority )
 {
     QnLongRunnable::start( priority );
     //moveToThread( this );
-}
-
-QnResourceDiscoveryManager* QnResourceDiscoveryManager::instance()
-{
-    Q_ASSERT_X(m_instance, "QnResourceDiscoveryManager::init MUST be called first!", Q_FUNC_INFO);
-    //return *qnResourceDiscoveryManagerInstance();
-    return m_instance;
 }
 
 void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* serv)
@@ -249,16 +239,16 @@ void QnResourceDiscoveryManager::setLastDiscoveredResources(const QnResourceList
     m_discoveryUpdateIdx = (m_discoveryUpdateIdx + 1) % sz;
 }
 
-QnResourceList QnResourceDiscoveryManager::lastDiscoveredResources() const
+QSet<QString> QnResourceDiscoveryManager::lastDiscoveredIds() const
 {
     QMutexLocker lock(&m_resListMutex);
     int sz = sizeof(m_lastDiscoveredResources) / sizeof(QnResourceList);
-    QSet<QnResourcePtr> allResources;
+    QSet<QString> allDiscoveredIds;
     for (int i = 0; i < sz; ++i) {
         for(const QnResourcePtr& res: m_lastDiscoveredResources[i])
-            allResources << res;
+            allDiscoveredIds << res->getUniqueId();
     }
-    return allResources.toList();
+    return allDiscoveredIds;
 }
 
 void QnResourceDiscoveryManager::updateLocalNetworkInterfaces()
@@ -277,16 +267,65 @@ void QnResourceDiscoveryManager::updateLocalNetworkInterfaces()
 
 static QnResourceList CheckHostAddrAsync(const QnManualCameraInfo& input) { return input.checkHostAddr(); }
 
+bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourcePtr& camera, int awaitingToMoveCameraCnt)
+{
+    if (!camera)
+        return false;
+
+    QnUuid ownGuid = qnCommon->moduleGUID();
+    QnMediaServerResourcePtr mServer = qnResPool->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(ownGuid).dynamicCast<QnMediaServerResource>();
+    if (!mServer || !ownServer)
+        return false;
+
+    if (camera->hasFlags(Qn::desktop_camera))
+        return true;
+
+#ifdef EDGE_SERVER
+    if (!ownServer->isRedundancy()) 
+    {
+        // return own camera back for edge server
+        char  mac[MAC_ADDR_LEN];
+        char* host = 0;
+        getMacFromPrimaryIF(mac, &host);
+        return (camera->getUniqueId().toLocal8Bit() == QByteArray(mac));
+    }
+#endif
+    if ((mServer->getServerFlags() & Qn::SF_Edge) && !mServer->isRedundancy())
+        return false; // do not transfer cameras from edge server
+
+    if (camera->preferedServerId() == ownGuid)
+        return true;
+    else if (mServer->getStatus() == Qn::Online)
+        return false;
+
+    if (!ownServer->isRedundancy())
+        return false; // redundancy is disabled
+
+    if (qnResPool->getAllCameras(ownServer, true).size() + awaitingToMoveCameraCnt >= ownServer->getMaxCameras())
+        return false;
+
+    return mServer->currentStatusTime() > m_serverOfflineTimeout;
+}
+
 void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList& resources)
 {
+    QnManualCameraInfoMap candidates;
     QnManualCameraInfoMap cameras;
     {
         QMutexLocker locker(&m_searchersListMutex);
-        cameras = m_manualCameraMap;
-        if (cameras.isEmpty())
+        candidates = m_manualCameraMap;
+        if (candidates.isEmpty())
             return;
     }
-
+    
+    for (auto itr = candidates.begin(); itr != candidates.end(); ++itr)
+    {
+        QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(qnResPool->getResourceByUniqId(itr.key()));
+        if (!camera || !camera->hasFlags(Qn::foreigner) || canTakeForeignCamera(camera, 0))
+            cameras.insert(itr.key(), itr.value());
+    }
+    
     QFuture<QnResourceList> results = QtConcurrent::mapped(cameras, &CheckHostAddrAsync);
     results.waitForFinished();
     for (QFuture<QnResourceList>::const_iterator itr = results.constBegin(); itr != results.constEnd(); ++itr)
@@ -379,6 +418,46 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     appendManualDiscoveredResources(resources);
     setLastDiscoveredResources(resources);
 
+    //searching and ignoring auto-discovered cameras already manually added to the resource pool
+    for( QnResourceList::iterator
+        it = resources.begin();
+        it != resources.end();
+         )
+    {
+        const QnSecurityCamResource* camRes = dynamic_cast<QnSecurityCamResource*>(it->data());
+        if( !camRes || camRes->isManuallyAdded() )
+        {
+            ++it;
+            continue;
+        }
+
+        //if camera is already in resource pool and it was added manually, then ignoring it...
+        QnNetworkResourcePtr existingRes = qnResPool->getNetResourceByPhysicalId( camRes->getPhysicalId() );
+        if( existingRes )
+        {
+            const QnSecurityCamResource* existingCamRes = dynamic_cast<QnSecurityCamResource*>( existingRes.data() );
+            if( existingCamRes && existingCamRes->isManuallyAdded() )
+            {
+#ifdef EDGE_SERVER
+                char  mac[MAC_ADDR_LEN];
+                char* host = 0;
+                getMacFromPrimaryIF(mac, &host);
+                if( existingCamRes->getUniqueId().toLocal8Bit() == QByteArray(mac) )
+                {
+                    //on edge server always discovering camera to be able to move it to the edge server if needed
+                    ++it;
+                    continue;
+                }
+#endif
+
+                it = resources.erase( it );
+                continue;
+            }
+        }
+
+        ++it;
+    }
+
     {
         QMutexLocker lock(&m_searchersListMutex);
         for (int i = resources.size()-1; i >= 0; --i)
@@ -454,17 +533,6 @@ bool QnResourceDiscoveryManager::registerManualCameras(const QnManualCameraInfoM
     return true;
 }
 
-
-void QnResourceDiscoveryManager::onInitAsyncFinished(const QnResourcePtr& res, bool initialized)
-{
-    QnNetworkResource* rpNetRes = dynamic_cast<QnNetworkResource*>(res.data());
-    if (initialized && rpNetRes && !rpNetRes->hasFlags(Qn::desktop_camera))
-    {
-        if (rpNetRes->getStatus() == Qn::Offline || rpNetRes->getStatus() == Qn::Unauthorized || rpNetRes->getStatus() == Qn::NotDefined)
-            rpNetRes->setStatus(Qn::Online);
-    }
-}
-
 void QnResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& resource)
 {
     QMutexLocker lock(&m_searchersListMutex);
@@ -474,24 +542,17 @@ void QnResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& resourc
     m_recentlyDeleted << resource->getUrl();
 }
 
-void QnResourceDiscoveryManager::at_resourceChanged(const QnResourcePtr& resource)
+void QnResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr& resource)
 {
     QnManualCameraInfoMap newManualCameras;
     {
         QMutexLocker lock(&m_searchersListMutex);
-        if (resource->hasFlags(Qn::foreigner)) {
-            QnManualCameraInfoMap::Iterator itr = m_manualCameraMap.find(resource->getUrl());
-            if (itr != m_manualCameraMap.end())
-                m_manualCameraMap.erase(itr);
-        }
-        else {
-            const QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
-            if (!camera || !camera->isManuallyAdded())
-                return;
-            if (!m_manualCameraMap.contains(camera->getUrl())) {
-                QnResourceTypePtr resType = qnResTypePool->getResourceType(camera->getTypeId());
-                newManualCameras.insert(camera->getUniqueId(), QnManualCameraInfo(QUrl(camera->getUrl()), camera->getAuth(), resType->getName()));
-            }
+        const QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
+        if (!camera || !camera->isManuallyAdded())
+            return;
+        if (!m_manualCameraMap.contains(camera->getUrl())) {
+            QnResourceTypePtr resType = qnResTypePool->getResourceType(camera->getTypeId());
+            newManualCameras.insert(camera->getUrl(), QnManualCameraInfo(QUrl(camera->getUrl()), camera->getAuth(), resType->getName()));
         }
     }
     if (!newManualCameras.isEmpty())

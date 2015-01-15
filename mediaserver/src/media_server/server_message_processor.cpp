@@ -20,6 +20,7 @@
 #include "utils/network/router.h"
 
 #include <utils/common/app_info.h>
+#include "core/resource/storage_resource.h"
 
 QnServerMessageProcessor::QnServerMessageProcessor()
 :
@@ -80,12 +81,16 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource)
             resource->setStatus(Qn::Online);
         }
     }
-
-    if (QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId()))
+    QnUuid resId = resource->getId();
+    if (QnResourcePtr ownResource = qnResPool->getResourceById(resId))
         ownResource->update(resource);
     else
         qnResPool->addResource(resource);
 
+    if (m_delayedOnlineStatus.contains(resId)) {
+        m_delayedOnlineStatus.remove(resId);
+        resource->setStatus(Qn::Online);
+    }
 }
 
 void QnServerMessageProcessor::afterRemovingResource(const QnUuid& id)
@@ -93,18 +98,51 @@ void QnServerMessageProcessor::afterRemovingResource(const QnUuid& id)
     QnCommonMessageProcessor::afterRemovingResource(id);
 }
 
-void QnServerMessageProcessor::init(const ec2::AbstractECConnectionPtr& connection)
-{
+void QnServerMessageProcessor::init(const ec2::AbstractECConnectionPtr& connection) {
+    QnCommonMessageProcessor::init(connection);
+}
+
+void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection) {
+    base_type::connectToConnection(connection);
+
     connect(connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateChunkReceived,
-            this, &QnServerMessageProcessor::at_updateChunkReceived);
+        this, &QnServerMessageProcessor::at_updateChunkReceived);
     connect(connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateInstallationRequested,
-            this, &QnServerMessageProcessor::at_updateInstallationRequested);
-    connect(connection->getMiscManager().get(), &ec2::AbstractMiscManager::systemNameChangeRequested,
-            this, &QnServerMessageProcessor::at_systemNameChangeRequested);
+        this, &QnServerMessageProcessor::at_updateInstallationRequested);
 
     connect( connection, &ec2::AbstractECConnection::remotePeerUnauthorized, this, &QnServerMessageProcessor::at_remotePeerUnauthorized );
 
-    QnCommonMessageProcessor::init(connection);
+    connect(connection->getMiscManager().get(), &ec2::AbstractMiscManager::systemNameChangeRequested,
+        this, [this](const QString &systemName) { changeSystemName(systemName); });
+}
+
+void QnServerMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) {
+    base_type::disconnectFromConnection(connection);
+    connection->getUpdatesManager()->disconnect(this);
+    connection->getMiscManager()->disconnect(this);
+}
+
+void QnServerMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData &data) {
+    base_type::handleRemotePeerFound(data);
+    QnResourcePtr res = qnResPool->getResourceById(data.peer.id);
+    if (res)
+        res->setStatus(Qn::Online);
+    else
+        m_delayedOnlineStatus << data.peer.id;
+}
+
+void QnServerMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData &data) {
+    base_type::handleRemotePeerLost(data);
+    QnResourcePtr res = qnResPool->getResourceById(data.peer.id);
+    if (res) {
+        res->setStatus(Qn::Offline);
+        if (data.peer.peerType != Qn::PT_Server) {
+            // This server hasn't own DB
+            for(const QnResourcePtr& camera: qnResPool->getAllCameras(res))
+                camera->setStatus(Qn::Offline);
+        }
+    }
+    m_delayedOnlineStatus.remove(data.peer.id);
 }
 
 void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) 
@@ -112,7 +150,7 @@ void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &reso
     if (resource->getId() == qnCommon->moduleGUID() && status != Qn::Online)
     {
         // it's own server. change status to online
-        QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusSync(resource->getId(), Qn::Online);
+        QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusLocalSync(resource->getId(), Qn::Online);
         resource->setStatus(Qn::Online, true);
     }
     else {
@@ -170,27 +208,11 @@ void QnServerMessageProcessor::execBusinessActionInternal(const QnAbstractBusine
 }
 
 void QnServerMessageProcessor::at_updateChunkReceived(const QString &updateId, const QByteArray &data, qint64 offset) {
-    QnServerUpdateTool::instance()->addUpdateFileChunk(updateId, data, offset);
+    QnServerUpdateTool::instance()->addUpdateFileChunkAsync(updateId, data, offset);
 }
 
 void QnServerMessageProcessor::at_updateInstallationRequested(const QString &updateId) {
     QnServerUpdateTool::instance()->installUpdate(updateId);
-}
-
-void QnServerMessageProcessor::at_systemNameChangeRequested(const QString &systemName) {
-    if (qnCommon->localSystemName() == systemName)
-        return;
-
-    qnCommon->setLocalSystemName(systemName);
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
-    if (!server) {
-        NX_LOG("Cannot find self server resource!", cl_logERROR);
-        return;
-    }
-
-    MSSettings::roSettings()->setValue("systemName", systemName);
-    server->setSystemName(systemName);
-    m_connection->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
 void QnServerMessageProcessor::at_remotePeerUnauthorized(const QnUuid& id)
@@ -204,16 +226,28 @@ bool QnServerMessageProcessor::canRemoveResource(const QnUuid& resourceId)
 { 
     QnResourcePtr res = qnResPool->getResourceById(resourceId);
     bool isOwnServer = (res && res->getId() == qnCommon->moduleGUID());
-    return !isOwnServer;
+    if (isOwnServer)
+        return false;
+    QnStorageResourcePtr storage = res.dynamicCast<QnStorageResource>();
+    bool isOwnStorage = (storage && storage->getParentId() == qnCommon->moduleGUID());
+    if (isOwnStorage && !storage->isExternal())
+        return false;
+
+    return true;
 }
 
 void QnServerMessageProcessor::removeResourceIgnored(const QnUuid& resourceId) 
 {
     QnMediaServerResourcePtr mServer = qnResPool->getResourceById(resourceId).dynamicCast<QnMediaServerResource>();
+    QnStorageResourcePtr storage = qnResPool->getResourceById(resourceId).dynamicCast<QnStorageResource>();
     bool isOwnServer = (mServer && mServer->getId() == qnCommon->moduleGUID());
+    bool isOwnStorage = (storage && storage->getParentId() == qnCommon->moduleGUID());
     if (isOwnServer) {
         QnMediaServerResourcePtr savedServer;
         QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveSync(mServer, &savedServer);
-        QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusSync(mServer->getId(), Qn::Online);
+        QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusLocalSync(mServer->getId(), Qn::Online);
+    }
+    else if (isOwnStorage && !storage->isExternal()) {
+        QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveStoragesSync(QnAbstractStorageResourceList() << storage);
     }
 }

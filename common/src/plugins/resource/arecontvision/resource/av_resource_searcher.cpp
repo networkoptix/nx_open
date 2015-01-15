@@ -123,7 +123,6 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
 
                 resource->setHostAddress(sender);
                 resource->setMAC(QnMacAddress(mac));
-                resource->setDiscoveryAddr(iface.address);
                 resource->setName(QLatin1String("ArecontVision_Abstract"));
 
 
@@ -132,10 +131,6 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                 {
                     if (res->getUniqueId() == resource->getUniqueId())
                     {
-                        QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
-                        if (isNewDiscoveryAddressBetter(net_res->getHostAddress(), iface.address.toString(), net_res->getDiscoveryAddr().toString()))
-                            net_res->setDiscoveryAddr(iface.address);
-                    
                         need_to_continue = true; //already has such
                         break;
                     }
@@ -203,15 +198,11 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url,
         return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
 
     QString host = url.host();
-    int port = url.port();
+    int port = url.port(80);
     if (host.isEmpty())
         host = url.toString(); // in case if url just host address without protocol and port
-
+    QString devUrl = QString(lit("http://%1:%2")).arg(url.host()).arg(url.port(80));
     int timeout = 2000;
-
-
-    if (port < 0)
-        port = 80;
 
     CLHttpStatus status;
     QString model = QLatin1String(downloadFileWithRetry(status, QLatin1String("get?model"), host, port, timeout, auth));
@@ -261,8 +252,11 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url,
     res->setName(model);
     res->setModel(model);
     res->setMAC(QnMacAddress(mac));
-    res->setHostAddress(host);
-    res->setAuth(auth);
+    if (port == 80)
+        res->setHostAddress(host);
+    else
+        res->setUrl(devUrl);
+    res->setDefaultAuth(auth);
 
     QList<QnResourcePtr> resList;
     resList << res;

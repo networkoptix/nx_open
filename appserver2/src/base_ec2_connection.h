@@ -43,6 +43,7 @@ namespace ec2
         BaseEc2Connection(
             QueryProcessorType* queryProcessor,
             const ResourceContext& resCtx );
+        virtual ~BaseEc2Connection();
 
         virtual AbstractResourceManagerPtr getResourceManager() override;
         virtual AbstractMediaServerManagerPtr getMediaServerManager() override;
@@ -58,8 +59,11 @@ namespace ec2
         virtual AbstractDiscoveryManagerPtr getDiscoveryManager() override;
         virtual AbstractTimeManagerPtr getTimeManager() override;
 
-        virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) override;
+        virtual void startReceivingNotifications() override;
+        virtual void stopReceivingNotifications() override;
+
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) override;
+        virtual int dumpDatabaseToFileAsync( const QString& dumpFilePath, impl::SimpleHandlerPtr handler ) override;
         virtual int restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, impl::SimpleHandlerPtr handler ) override;
 
         virtual void addRemotePeer(const QUrl& url) override;
@@ -86,9 +90,6 @@ namespace ec2
         std::shared_ptr<QnDiscoveryManager<QueryProcessorType>> m_discoveryManager;
         std::shared_ptr<QnTimeManager<QueryProcessorType>> m_timeManager;
         std::unique_ptr<ECConnectionNotificationManager> m_notificationManager;
-
-    private:
-        QnTransaction<ApiPanicModeData> prepareTransaction( ApiCommand::Value cmd, const Qn::PanicMode& mode);
     };
 }
 

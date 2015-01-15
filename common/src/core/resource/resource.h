@@ -57,7 +57,7 @@ public:
     void setId(const QnUuid& id);
 
     QnUuid getParentId() const;
-    void setParentId(QnUuid parent);
+    virtual void setParentId(const QnUuid& parent);
 
     // device unique identifier
     virtual QString getUniqueId() const { return getId().toString(); };
@@ -94,7 +94,7 @@ public:
     int initializationAttemptCount() const;
     
     // flags like network media and so on
-    Qn::ResourceFlags flags() const;
+    virtual Qn::ResourceFlags flags() const;
     inline bool hasFlags(Qn::ResourceFlags flags) const { return (this->flags() & flags) == flags; }
     void setFlags(Qn::ResourceFlags flags);
     void addFlags(Qn::ResourceFlags flags);
@@ -201,7 +201,7 @@ public:
 
     static QnInitResPool* initAsyncPoolInstance();
     static bool isStopping() { return m_appStopping; }
-
+    void setRemovedFromPool(bool value);
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QString &param) const;
     void statusChanged(const QnResourcePtr &resource);
@@ -349,7 +349,6 @@ private:
     Qn::ResourceFlags m_flags;
     
     QDateTime m_lastDiscoveredTime;
-    QDateTime m_lastStatusUpdateTime;
 
     QStringList m_tags;
 
@@ -363,6 +362,7 @@ private:
     QAtomicInt m_initializationAttemptCount;
     //!map<key, <value, isDirty>>
     std::map<QString, LocalPropertyValue> m_locallySavedProperties;
+    bool m_removedFromPool;
 };
 
 template<class Resource>

@@ -14,8 +14,9 @@ extern "C"
 #include "core/datapacket/audio_data_packet.h"
 #include "core/datapacket/video_data_packet.h"
 #include "core/resource/media_resource.h"
+#include "filters/abstract_image_filter.h"
+#include "filters/filter_helper.h"
 
-class QnAbstractImageFilter;
 class CLVideoDecoderOutput;
 
 /*!
@@ -72,17 +73,16 @@ public:
     virtual int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result) = 0;
     QString getLastError() const;
     virtual void setQuality( Qn::StreamQuality quality );
-    void setSrcRect(const QRectF& srcRect);
     virtual bool existMoreData() const { return false; }
+    static QRect roundRect(const QRect& srcRect);
+    static QSize roundSize(const QSize& size);
 protected:
-    QRect roundRect(const QRect& srcRect) const;
 protected:
     QString m_lastErrMessage;
     QnCodecParams::Value m_params;
     int m_bitrate;
     CodecID m_codecId;
     Qn::StreamQuality m_quality;
-    QRectF m_srcRectF;
 };
 typedef QSharedPointer<QnCodecTranscoder> QnCodecTranscoderPtr;
 
@@ -103,22 +103,21 @@ public:
     virtual void setResolution( const QSize& value );
     //!Returns picture size (in pixels) of output video stream
     QSize getResolution() const;
-    void setVideoLayout(QnConstResourceVideoLayoutPtr layout);
 
     virtual bool open(const QnConstCompressedVideoDataPtr& video);
 
-    virtual void addFilter(QnAbstractImageFilter* filter);
+    virtual void setFilterList(QList<QnAbstractImageFilterPtr> filterList);
 
 protected:
-    static const int WIDTH_ALIGN = 32;
+    static const int WIDTH_ALIGN = 16;
     static const int HEIGHT_ALIGN = 2;
         
-    void processFilterChain(CLVideoDecoderOutput* decodedFrame, const QRectF& updateRect, qreal ar);
+    QSharedPointer<CLVideoDecoderOutput> processFilterChain(const QSharedPointer<CLVideoDecoderOutput>& decodedFrame);
 
 protected:
     QSize m_resolution;
-    QnConstResourceVideoLayoutPtr m_layout;
-    QList<QnAbstractImageFilter*> m_filters;
+    QList<QnAbstractImageFilterPtr> m_filters;
+    bool m_opened;
 };
 typedef QSharedPointer<QnVideoTranscoder> QnVideoTranscoderPtr;
 
@@ -147,17 +146,21 @@ public:
 
     enum TranscodeMethod {TM_DirectStreamCopy, TM_FfmpegTranscode, TM_QuickSyncTranscode, TM_OpenCLTranscode, TM_Dummy};
 
+    enum OperationResult {
+        Success = 0,
+        Error = -1
+    };
+
     /*
     * Set ffmpeg container by name
     * @return Returns 0 if no error or error code
     */
     virtual int setContainer(const QString& value) = 0;
 
-    void setVideoLayout(QnConstResourceVideoLayoutPtr layout);
 
     /*
     * Set ffmpeg video codec and params
-    * @return Returns 0 if no error or error code
+    * @return Returns OperationResult::Success if no error or error code otherwise
     * @param codec codec to transcode
     * @param method how to transcode: no transcode, software, GPU e.t.c
     * @resolution output resolution. Not used if transcode method TM_NoTranscode
@@ -175,18 +178,18 @@ public:
 
     /*
     * Set ffmpeg audio codec and params
-    * @return Returns 0 if no error or error code
+    * @return Returns OperationResult::Success if no error or error code otherwise
     * @param codec codec to transcode
     * @param directStreamCopy if true - do not transcode audio data, only put it to destination container
     * @param bitrate Bitrate after transcode. By default bitrate is autodetected
     * @param addition codec params. Not used if directStreamCopy = true
     */
-    virtual int setAudioCodec(CodecID codec, TranscodeMethod method);
+    virtual OperationResult setAudioCodec(CodecID codec, TranscodeMethod method);
 
     /*
     * Transcode media data and write it to specified QnByteArray
     * @param result transcoded data block. If NULL, only decoding is done
-    * @return Returns 0 if no error or error code
+    * @return Returns OperationResult::Success if no error or error code otherwise
     */
     int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result);
     //!Adds tag to the file. Maximum langth of tags and allowed names are format dependent
@@ -219,11 +222,12 @@ public:
         Qn::StreamQuality quality,
         QnCodecParams::Value* const params = NULL );
 
+    void setExtraTranscodeParams(const QnImageFilterHelper& extraParams);
 protected:
     /*
     *  Prepare to transcode. If 'direct stream copy' is used, function got not empty video and audio data
     * Destionation codecs MUST be used from source data codecs. If 'direct stream copy' is false, video or audio may be empty
-    * @return true if successfull opened
+    * @return Returns OperationResult::Success if no error or error code otherwise
     */
     virtual int open(const QnConstCompressedVideoDataPtr& video, const QnConstCompressedAudioDataPtr& audio) = 0;
 
@@ -241,13 +245,13 @@ protected:
 
 protected:
     bool m_initialized;
-    QnConstResourceVideoLayoutPtr m_vLayout;
 private:
     QString m_lastErrMessage;
     QQueue<QnConstCompressedVideoDataPtr> m_delayedVideoQueue;
     QQueue<QnConstCompressedAudioDataPtr> m_delayedAudioQueue;
     int m_eofCounter;
     bool m_packetizedMode;
+    QnImageFilterHelper m_extraTranscodeParams;
 };
 
 typedef QSharedPointer<QnTranscoder> QnTranscoderPtr;

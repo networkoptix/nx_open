@@ -5,7 +5,7 @@
 #include "plugin_api.h"
 
 
-//!Network Optix Camera Integration Plugin API (c++)
+//!VMS Camera Integration Plugin API (c++)
 /*!
     Contains structures and abstract classes to be implemented in real plugin.
     
@@ -18,7 +18,7 @@
 
     \note all text values are NULL-terminated utf-8
     \note If not specified in interface's description, plugin interfaces are used in multithreaded environment the following way:\n
-        - single interface pointer is never used concurrently by multiple threads, but different pointers to same interface 
+        - single interface instance is never used concurrently by multiple threads, but different instances of the same interface 
             (e.g., \a nxcip::BaseCameraManager) can be used by different threads concurrently
 */
 namespace nxcip
@@ -47,7 +47,7 @@ namespace nxcip
     //!Blocking call has been interrupted (e.g., by \a StreamReader::interrupt)
     static const int NX_INTERRUPTED = -27;
     static const int NX_PARAM_READ_ONLY = -40;
-    static const int NX_INVALID_PARAM_INDEX = -41;
+    static const int NX_UNKNOWN_PARAMETER = -41;
     static const int NX_INVALID_PARAM_VALUE = -42;
     static const int NX_OTHER_ERROR = -100;
 
@@ -64,7 +64,7 @@ namespace nxcip
         char modelName[256];
         //!Firmware version in any human readable format. Optional
         char firmware[256];
-        //!Camera's unique identifier. MAC address can be used
+        //!Camera's unique identifier. MAC address can be used. MUST NOT be empty
         char uid[256];
         //!Camera management url. Can contain just address. MUST NOT be empty
         char url[MAX_TEXT_LEN];
@@ -633,51 +633,40 @@ namespace nxcip
         public BaseCameraManager2
     {
     public:
-        enum ParamFlags
-        {
-            pfReadOnly = 0x01
+        enum CameraCapability3
+        { 
+            cameraParamsPersistentCapability   = 0x0800      //!<Camera parameters can be read/set even if camera is not accessible at the moment
         };
 
-        //!Returns number of parameters defined for this camera
+        //!Returns XML describing camera parameters
         /*!
-            \return number of parameters defined for this camera
+            XML MUST conform to camera_parameters.xsd which can be found in SDK. Sample XML also can be found there
+            This XML describes parameters (types, possible values, etc..) accessible with \a getParamValue and \a setParamValue
         */
-        virtual int getParamCount() const = 0;
-        //!Returns parameter \a paramID description and flags
+        virtual const char* getParametersDescriptionXML() const = 0;
+        //!Reads value of parameter \a paramName
         /*!
-            \param paramGroup Group name this parameter belongs to. Nested groups must be delimitered with /.
-                E.g., vms/nx/hdw. Heading and trailing / are ignored.
-                This memory MUST be valid and not changed for whole life time of \a BaseCameraManager3 instance
-            \param description \a *description set to human-readable \0-terminated utf8 string.
-                This memory MUST be valid and not changed for whole life time of \a BaseCameraManager3 instance
-            \return\n
-                - \a NX_NO_ERROR
-                - \a NX_INVALID_PARAM_INDEX if paramID is >= \a BaseCameraManager3::getParamCount
-        */
-        virtual int getParamDescription(
-            int paramID,
-            const char** paramGroup,
-            const char** description,
-            ParamFlags* flags ) const = 0;
-        //!Reads value of parameter \a paramID
-        /*!
-            \param valueBufSize IN: Length of \a valueBuf, OUT: length of string value
+            \param paramName \0-terminated utf-8 string specifing name of parameter.
+                This is a full name. I.e., if parameter belongs to some group, then /group_name/param_name is specified here
+            \param valueBufSize IN: Length of \a valueBuf, OUT: length of string value not including \0-character
             \return\n
                 - \a NX_NO_ERROR if value loaded to value buf. Value is always \0-terminated utf8 string
-                - \a NX_INVALID_PARAM_INDEX if paramID is >= \a BaseCameraManager3::getParamCount
-                - \a NX_NO_DATA if \a valueBuf has not enough space
+                - \a NX_UNKNOWN_PARAMETER if \a paramName specifies unknown parameter
+                - \a NX_MORE_DATA if \a valueBuf has not enough space. In this case \a *valueBufSize is set to required buf size
         */
-        virtual int getParamValue( int paramID, char* valueBuf, int* valueBufSize ) const = 0;
-        //!Set value of parameter \a paramID to \a value
+        virtual int getParamValue( const char* paramName, char* valueBuf, int* valueBufSize ) const = 0;
+        //!Set value of parameter \a paramName to \a value
         /*!
+            \param paramName \0-terminated utf-8 string specifing name of parameter.
+                This is a full name. I.e., if parameter belongs to some group, then /group_name/param_name is specified here
             \param value \0-terminated utf8 string
             \return\n
                 - \a NX_NO_ERROR if value successfully applied
-                - \a NX_INVALID_PARAM_INDEX if paramID is >= \a BaseCameraManager3::getParamCount
+                - \a NX_UNKNOWN_PARAMETER if \a paramName specifies unknown parameter
                 - \a NX_PARAM_READ_ONLY if parameter is read only (check \a pfReadOnly flag)
                 - \a NX_INVALID_PARAM_VALUE if parameter value does not pass validity check
         */
-        virtual int setParamValue( int paramID, const char* value ) = 0;
+        virtual int setParamValue( const char* paramName, const char* value ) = 0;
     };
 
 

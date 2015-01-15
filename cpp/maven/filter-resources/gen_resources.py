@@ -12,9 +12,10 @@ output_pro_file='${project.artifactId}.pro'
 translations_dir='${basedir}/translations'
 translations_target_dir='${project.build.directory}/resources/translations'
 ldpath='${qt.dir}/lib'
-translations=['${translation1}','${translation2}','${translation3}','${translation4}','${translation5}','${translation6}','${translation7}','${translation8}','${translation9}']
+translations=['${translation1}', '${translation2}', '${translation3}', '${translation4}', '${translation5}', '${translation6}', '${translation7}', '${translation8}', '${translation9}', '${translation10}',
+              '${translation11}','${translation12}','${translation13}','${translation14}','${translation15}','${translation16}','${translation17}','${translation18}','${translation19}','${translation20}']
 os.environ["DYLD_FRAMEWORK_PATH"] = '${qt.dir}/lib'
-os.environ["DYLD_LIBRARY_PATH"] = '${libdir}/lib/${build.configuration}'
+os.environ["DYLD_LIBRARY_PATH"] = '${libdir}/lib/${build.configuration}:${arch.dir}'
 os.environ["LD_LIBRARY_PATH"] = '${libdir}/lib/${build.configuration}'
 
 def execute(command):
@@ -118,6 +119,8 @@ if __name__ == '__main__':
     if os.path.exists(translations_dir):    
         for f in listdir(translations_dir):
     	    for translation in translations:
+                if not translation:
+                    continue
     	        if f.endswith('_%s.ts' % translation):
         	    if '${platform}' == 'windows':
             	        os.system('${qt.dir}/bin/lrelease %s/%s -qm %s/%s.qm' % (translations_dir, f, translations_target_dir, os.path.splitext(f)[0]))

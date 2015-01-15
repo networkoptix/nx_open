@@ -43,7 +43,7 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     int changeSystemNameResult = changeSystemName(systemName, wholeSystem);
     if (changeSystemNameResult == ResultFail) {
         result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(lit("Can't change system name."));
+        result.setErrorString(lit("SYSTEM_NAME"));
     }
 
     /* reset connections if systemName is changed */
@@ -54,14 +54,14 @@ int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParam
     int changePortResult = changePort(port);
     if (changePortResult == ResultFail) {
         result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(lit("Can't change port."));
+        result.setErrorString(lit("PORT"));
     }
 
     /* set password */
     int changeAdminPasswordResult = changeAdminPassword(password, passwordHash, passwordDigest, oldPassword);
     if (changeAdminPasswordResult == ResultFail) {
         result.setError(QnJsonRestResult::CantProcessRequest);
-        result.setErrorString(lit("Can't change admin password."));
+        result.setErrorString(lit("PASSWORD"));
     }
 
     QnConfigureReply reply;
@@ -96,31 +96,28 @@ int QnConfigureRestHandler::changeAdminPassword(const QString &password, const Q
     if (password.isEmpty() && (passwordHash.isEmpty() || passwordDigest.isEmpty()))
         return ResultSkip;
 
-    for (const QnResourcePtr &resource: qnResPool->getResourcesWithFlag(Qn::user)) {
-        QnUserResourcePtr user = resource.staticCast<QnUserResource>();
-        if (user->getName() != lit("admin"))
-            continue;
+    QnUserResourcePtr admin = qnResPool->getAdministrator();
+    if (!admin)
+         return ResultFail;
 
-        if (!password.isEmpty()) {
-            /* check old password */
-            if (!user->checkPassword(oldPassword))
-                return ResultFail;
+    if (!password.isEmpty()) {
+        /* check old password */
+        if (!admin->checkPassword(oldPassword))
+            return ResultFail;
 
-            /* set new password */
-            user->setPassword(password);
-            user->generateHash();
-            QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(user, this, [](int, ec2::ErrorCode) { return; });
-            user->setPassword(QString());
-        } else {
-            if (user->getHash() != passwordHash || user->getDigest() != passwordDigest) {
-                user->setHash(passwordHash);
-                user->setDigest(passwordDigest);
-                QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(user, this, [](int, ec2::ErrorCode) { return; });
-            }
+        /* set new password */
+        admin->setPassword(password);
+        admin->generateHash();
+        QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(admin, this, [](int, ec2::ErrorCode) { return; });
+        admin->setPassword(QString());
+    } else {
+        if (admin->getHash() != passwordHash || admin->getDigest() != passwordDigest) {
+            admin->setHash(passwordHash);
+            admin->setDigest(passwordDigest);
+            QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(admin, this, [](int, ec2::ErrorCode) { return; });
         }
-        return ResultOk;
     }
-    return ResultFail;
+    return ResultOk;
 }
 
 int QnConfigureRestHandler::changePort(int port) {
@@ -136,7 +133,11 @@ int QnConfigureRestHandler::changePort(int port) {
 
     {
         QAbstractSocket socket(QAbstractSocket::TcpSocket, 0);
-        if (!socket.bind(port, QAbstractSocket::ReuseAddressHint))
+        QAbstractSocket::BindMode bindMode = QAbstractSocket::DontShareAddress;
+#ifndef Q_OS_WIN
+        bindMode |= QAbstractSocket::ReuseAddressHint;
+#endif
+        if (!socket.bind(port, bindMode))
             return ResultFail;
     }
     ::changePort(port);
@@ -147,11 +148,6 @@ int QnConfigureRestHandler::changePort(int port) {
 }
 
 void QnConfigureRestHandler::resetConnections() {
-    if (qnTransactionBus) {
-        qDebug() << "Dropping connections";
-        qnTransactionBus->dropConnections();
-    }
-
     if (QnServerConnector::instance())
-        QnServerConnector::instance()->reconnect();
+        QnServerConnector::instance()->restart();
 }

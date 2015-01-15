@@ -9,23 +9,23 @@ angular.module('webadminApp')
                     console.error('nxEqualEx expects a model as an argument!');
                     return;
                 }
-                scope.$watch(attrs.nxEqualEx, function (value) {
+                function updateValidity(){
                     // Only compare values if the second ctrl has a value.
                     if (model.$viewValue !== undefined && model.$viewValue !== '') {
-                        model.$setValidity('nxEqualEx', value === model.$viewValue);
-                        console.log('set valid to ' + (value === model.$viewValue));
+                        model.$setValidity('nxEqualEx', scope.$eval(attrs.nxEqualEx) === model.$viewValue);
                     }
-                });
+                }
+                scope.$watch(attrs.nxEqualEx, updateValidity);
+                scope.$watch("$viewValue", updateValidity);
+
                 model.$parsers.push(function (value) {
                     // Mute the nxEqual error if the second ctrl is empty.
                     if (value === undefined || value === '') {
                         model.$setValidity('nxEqualEx', true);
-                        console.log('set valid to true');
                         return value;
                     }
                     var isValid = value === scope.$eval(attrs.nxEqualEx);
                     model.$setValidity('nxEqualEx', isValid);
-                    console.log('set valid to ' + isValid);
                     return isValid ? value : undefined;
                 });
             }

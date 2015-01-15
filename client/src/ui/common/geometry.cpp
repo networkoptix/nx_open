@@ -326,7 +326,13 @@ QRectF QnGeometry::scaled(const QRectF &rect, const QSizeF &size, const QPointF 
     return QRectF(
         fixedPoint - cwiseMul(cwiseDiv(fixedPoint - rect.topLeft(), rect.size()), newSize),
         newSize
-    );
+                );
+}
+
+QRectF QnGeometry::scaled(const QRectF &rect, qreal scale, const QPointF &fixedPoint) {
+    QSizeF newSize = rect.size() * scale;
+
+    return QRectF(fixedPoint - cwiseMul(cwiseDiv(fixedPoint - rect.topLeft(), rect.size()), newSize), newSize);
 }
 
 namespace {
@@ -516,4 +522,21 @@ qint64 QnGeometry::area(const QRect &rect) {
     return rect.width() * rect.height();
 }
 
+QRectF QnGeometry::rotated(const QRectF &rect, qreal degrees) {
+    QPointF c = rect.center();
 
+    QTransform transform;
+    transform.translate(c.x(), c.y());
+    transform.rotate(degrees);
+    transform.translate(-c.x(), -c.y());
+
+    return transform.mapRect(rect);
+}
+
+QPointF QnGeometry::rotated(const QPointF &point, const QPointF &center, qreal degrees) {
+    QTransform transform;
+    transform.translate(center.x(), center.y());
+    transform.rotate(degrees);
+    transform.translate(-center.x(), -center.y());
+    return transform.map(point);
+}

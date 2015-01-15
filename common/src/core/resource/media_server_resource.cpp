@@ -16,6 +16,9 @@
 #include "utils/common/util.h"
 #include "media_server_user_attributes.h"
 #include "../resource_management/resource_pool.h"
+#include "utils/serialization/lexical.h"
+#include "core/resource/security_cam_resource.h"
+#include "nx_ec/ec_proto_version.h"
 
 
 const QString QnMediaServerResource::USE_PROXY = QLatin1String("proxy");
@@ -31,7 +34,6 @@ private:
 QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePool):
     m_primaryIFSelected(false),
     m_serverFlags(Qn::SF_None),
-    m_panicMode(Qn::PM_None),
     m_guard(NULL)
 {
     setTypeId(resTypePool->getFixedResourceTypeId(lit("Server")));
@@ -43,12 +45,34 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
 
     m_primaryIFSelected = false;
     m_statusTimer.restart();
+
+    QnResourceList resList = qnResPool->getResourcesByParentId(getId()).filtered<QnSecurityCamResource>();
+    if (!resList.isEmpty())
+        m_firstCamera = resList.first();
+
+    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnMediaServerResource::onNewResource, Qt::DirectConnection);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnMediaServerResource::onRemoveResource, Qt::DirectConnection);
 }
 
 QnMediaServerResource::~QnMediaServerResource()
 {
     QMutexLocker lock(&m_mutex); // TODO: #Elric remove once m_guard hell is removed.
 }
+
+void QnMediaServerResource::onNewResource(const QnResourcePtr &resource)
+{
+    QMutexLocker lock(&m_mutex);
+    if (m_firstCamera.isNull() && resource.dynamicCast<QnSecurityCamResource>() &&  resource->getParentId() == getId())
+        m_firstCamera = resource;
+}
+
+void QnMediaServerResource::onRemoveResource(const QnResourcePtr &resource)
+{
+    QMutexLocker lock(&m_mutex);
+    if (m_firstCamera && resource->getId() == m_firstCamera->getId())
+        m_firstCamera.clear();
+}
+
 
 QString QnMediaServerResource::getUniqueId() const
 {
@@ -58,6 +82,13 @@ QString QnMediaServerResource::getUniqueId() const
 
 QString QnMediaServerResource::getName() const
 {
+    if (getServerFlags() & Qn::SF_Edge)
+    {
+        QMutexLocker lock(&m_mutex);
+        if (m_firstCamera)
+            return m_firstCamera->getName();
+    }
+
     QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
     if( !(*lk)->name.isEmpty() )
         return (*lk)->name;
@@ -99,7 +130,7 @@ void QnMediaServerResource::setNetAddrList(const QList<QHostAddress>& netAddrLis
     m_netAddrList = netAddrList;
 }
 
-const QList<QHostAddress>& QnMediaServerResource::getNetAddrList() const
+QList<QHostAddress> QnMediaServerResource::getNetAddrList() const
 {
     QMutexLocker lock(&m_mutex);
     return m_netAddrList;
@@ -109,6 +140,8 @@ void QnMediaServerResource::setAdditionalUrls(const QList<QUrl> &urls)
 {
     {
         QMutexLocker lock(&m_mutex);
+        if (m_additionalUrls == urls)
+            return;
         m_additionalUrls = urls;
     }
     emit auxUrlsChanged(::toSharedPointer(this));
@@ -124,6 +157,8 @@ void QnMediaServerResource::setIgnoredUrls(const QList<QUrl> &urls)
 {
     {
         QMutexLocker lock(&m_mutex);
+        if (m_ignoredUrls == urls)
+            return;
         m_ignoredUrls = urls;
     }
     emit auxUrlsChanged(::toSharedPointer(this));
@@ -278,18 +313,20 @@ QString QnMediaServerResource::getPrimaryIF() const
     return m_primaryIf;
 }
 
-Qn::PanicMode QnMediaServerResource::getPanicMode() const {
-    return m_panicMode;
+Qn::PanicMode QnMediaServerResource::getPanicMode() const 
+{
+    QString strVal = getProperty(lit("panic_mode"));
+    Qn::PanicMode result = Qn::PM_None;
+    QnLexical::deserialize(strVal, &result);
+    return result;
 }
 
 void QnMediaServerResource::setPanicMode(Qn::PanicMode panicMode) {
-    {
-        QMutexLocker lock(&m_mutex);
-        if(m_panicMode == panicMode)
-            return;
-        m_panicMode = panicMode;
-    }
-    emit panicModeChanged(::toSharedPointer(this));
+    if(getPanicMode() == panicMode)
+        return;
+    QString strVal;
+    QnLexical::serialize(panicMode, &strVal);
+    setProperty(lit("panic_mode"), strVal);
 }
 
 Qn::ServerFlags QnMediaServerResource::getServerFlags() const
@@ -343,12 +380,8 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
 
     QnMediaServerResource* localOther = dynamic_cast<QnMediaServerResource*>(other.data());
     if(localOther) {
-        if (m_panicMode != localOther->m_panicMode)
-            modifiedFields << "panicModeChanged";
         if (m_version != localOther->m_version)
             modifiedFields << "versionChanged";
-
-        m_panicMode = localOther->m_panicMode;
 
         m_serverFlags = localOther->m_serverFlags;
         netAddrListChanged = m_netAddrList != localOther->m_netAddrList;
@@ -463,11 +496,16 @@ void QnMediaServerResource::setSystemName(const QString &systemName) {
 }
 
 QnModuleInformation QnMediaServerResource::getModuleInformation() const {
-    QMutexLocker lock(&m_mutex);
-
     QnModuleInformation moduleInformation;
     moduleInformation.type = nxMediaServerId;
     moduleInformation.customization = QnAppInfo::customizationName();
+    moduleInformation.sslAllowed = false;
+    moduleInformation.protoVersion = getProperty(lit("protoVersion")).toInt();
+    if (moduleInformation.protoVersion == 0)
+        moduleInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
+    
+    QMutexLocker lock(&m_mutex);
+
     moduleInformation.version = m_version;
     moduleInformation.systemInformation = m_systemInfo;
     moduleInformation.systemName = m_systemName;
@@ -476,7 +514,7 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     for (const QHostAddress &address: m_netAddrList)
         moduleInformation.remoteAddresses.insert(address.toString());
     moduleInformation.id = getId();
-    moduleInformation.sslAllowed = false;
+
     return moduleInformation;
 }
 
@@ -494,11 +532,24 @@ bool QnMediaServerResource::isHiddenServer(const QnResourcePtr &resource) {
 
 void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
 {
-    if (getStatus() != newStatus) {
-        QMutexLocker lock(&m_mutex);
-        m_statusTimer.restart();
+    if (getStatus() != newStatus) 
+    {
+        {
+            QMutexLocker lock(&m_mutex);
+            m_statusTimer.restart();
+        }
+
+        QnResource::setStatus(newStatus, silenceMode);
+        if (!silenceMode) 
+        {
+            QnResourceList childList = qnResPool->getResourcesByParentId(getId());
+            for(const QnResourcePtr& res: childList) 
+            {
+                if (res->hasFlags(Qn::depend_on_parent_status))
+                    emit res->statusChanged(res);
+            }
+        }
     }
-    QnResource::setStatus(newStatus, silenceMode);
 }
 
 qint64 QnMediaServerResource::currentStatusTime() const

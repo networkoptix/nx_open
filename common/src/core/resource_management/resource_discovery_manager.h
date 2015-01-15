@@ -9,6 +9,7 @@
 #include <QtNetwork/QAuthenticator>
 
 #include <utils/common/long_runnable.h>
+#include <utils/common/singleton.h>
 #include <utils/network/netstate.h>
 #include <utils/network/nettools.h>
 
@@ -61,9 +62,13 @@ class CameraDriverRestrictionList;
 // this class just searches for new resources
 // it uses others plugins
 // it puts result into resource pool
-class QnResourceDiscoveryManager : public QnLongRunnable, public QnResourceFactory
+class QnResourceDiscoveryManager
+:
+    public QnLongRunnable,
+    public QnResourceFactory,
+    public Singleton<QnResourceDiscoveryManager>
 {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
     enum State
@@ -77,8 +82,6 @@ public:
 
     QnResourceDiscoveryManager();
     ~QnResourceDiscoveryManager();
-
-    static QnResourceDiscoveryManager* instance();
 
     // this function returns only new devices( not in all_devices list);
     //QnResourceList result();
@@ -101,11 +104,10 @@ public:
     //!This method MUST be called from non-GUI thread, since it can block for some time
     void doResourceDiscoverIteration();
 
-    static void init(QnResourceDiscoveryManager* instance);
     State state() const;
     
     void setLastDiscoveredResources(const QnResourceList& resources);
-    QnResourceList lastDiscoveredResources() const;
+    QSet<QString> lastDiscoveredIds() const;
 public slots:
     virtual void start( Priority priority = InheritPriority ) override;
 
@@ -123,9 +125,10 @@ signals:
     void CameraIPConflict(QHostAddress addr, QStringList macAddrList);
 
 protected slots:
-    void onInitAsyncFinished(const QnResourcePtr& res, bool initialized);
     void at_resourceDeleted(const QnResourcePtr& resource);
-    void at_resourceChanged(const QnResourcePtr& resource);
+    void at_resourceAdded(const QnResourcePtr& resource);
+protected:
+    bool canTakeForeignCamera(const QnSecurityCamResourcePtr& camera, int awaitingToMoveCameraCnt);
 private:
     void updateLocalNetworkInterfaces();
 
@@ -150,7 +153,6 @@ private:
     QList<QHostAddress> m_allLocalAddresses;
 
     QVector<QnAbstractDTSSearcher*> m_dstList;
-    static QnResourceDiscoveryManager* m_instance;
 
     std::auto_ptr<QTimer> m_timer;
     State m_state;
@@ -160,8 +162,10 @@ private:
     QHash<QnUuid, QnManualCameraSearchCameraList> m_searchProcessResults;
 
     mutable QMutex m_resListMutex;
-    QnResourceList m_lastDiscoveredResources[4];
+    QnResourceList m_lastDiscoveredResources[6];
     int m_discoveryUpdateIdx;
+protected:
+    int m_serverOfflineTimeout;
 };
 
 #endif //QN_RESOURCE_DISCOVERY_MANAGER_H

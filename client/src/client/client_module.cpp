@@ -19,6 +19,7 @@ QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject
     /* Set up application parameters so that QSettings know where to look for settings. */
     QApplication::setOrganizationName(QnAppInfo::organizationName());
     QApplication::setApplicationName(lit(QN_APPLICATION_NAME));
+    QApplication::setApplicationDisplayName(lit(QN_APPLICATION_DISPLAY_NAME));    
     if (QApplication::applicationVersion().isEmpty())
         QApplication::setApplicationVersion(QnAppInfo::applicationVersion());
 

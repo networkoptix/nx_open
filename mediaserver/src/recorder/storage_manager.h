@@ -116,6 +116,7 @@ public:
     bool deleteBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark);
     bool getBookmarks(const QByteArray &cameraGuid, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);
     void initDone();
+    int getStorageIndex(const QnStorageResourcePtr& storage);
 signals:
     void noStoragesAvailable();
     void storageFailure(const QnResourcePtr &storageRes, QnBusiness::EventReason reason);
@@ -124,6 +125,7 @@ public slots:
     void at_archiveRangeChanged(const QnAbstractStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
     void onNewResource(const QnResourcePtr &resource);
     void onDelResource(const QnResourcePtr &resource);
+    void at_storageChanged(const QnResourcePtr &storage);
 private:
     friend class TestStorageThread;
 

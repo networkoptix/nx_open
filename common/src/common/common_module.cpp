@@ -32,11 +32,27 @@ QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent)
     /* Init members. */
     m_sessionManager = new QnSessionManager(); //instance<QnSessionManager>();
     m_runUuid = QnUuid::createUuid();
+    m_transcodingDisabled = false;
 }
 
 QnCommonModule::~QnCommonModule() {
     delete m_sessionManager;
     return;
+}
+
+void QnCommonModule::setRemoteGUID(const QnUuid &guid) {
+    {
+        QMutexLocker lock(&m_mutex);
+        if (m_remoteUuid == guid)
+            return;
+        m_remoteUuid = guid;
+    }
+    emit remoteIdChanged(guid);
+}
+
+QnUuid QnCommonModule::remoteGUID() const {
+    QMutexLocker lock(&m_mutex);
+    return m_remoteUuid;
 }
 
 void QnCommonModule::setLocalSystemName(const QString &value) {
@@ -100,14 +116,14 @@ QnModuleInformation QnCommonModule::moduleInformation() const
             moduleInformationCopy.port = server->getPort();
         }
 
-        for (const QnUserResourcePtr &user: qnResPool->getResourcesWithFlag(Qn::user).filtered<QnUserResource>()) {
-            if (user->getName() == lit("admin")) {
-                QCryptographicHash md5(QCryptographicHash::Md5);
-                md5.addData(user->getHash());
-                md5.addData(moduleInformationCopy.systemName.toUtf8());
-                moduleInformationCopy.authHash = md5.result();
-            }
+        QnUserResourcePtr admin = qnResPool->getAdministrator();
+        if (admin) {
+            QCryptographicHash md5(QCryptographicHash::Md5);
+            md5.addData(admin->getHash());
+            md5.addData(moduleInformationCopy.systemName.toUtf8());
+            moduleInformationCopy.authHash = md5.result();
         }
+
     }
 
     return moduleInformationCopy;

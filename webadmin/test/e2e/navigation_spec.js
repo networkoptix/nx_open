@@ -3,7 +3,7 @@
 describe('Navigation Menu', function() {
 
 
-    it("should stop test",function(){expect("other test").toBe("uncommented");});return;
+    //it("should stop test",function(){expect("other test").toBe("uncommented");});return;
 
 
     it('changes active link depending on route', function() {

@@ -6,20 +6,17 @@
 
 #include <QtWidgets/QMessageBox>
 
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkReply>
-#include <QtNetwork/QNetworkRequest>
+#include <common/common_module.h>
 
-#include <utils/common/product_features.h>
+#include <licensing/license.h>
 
 #include <ui/common/palette.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/file_dialog.h>
 #include <ui/style/warning_style.h>
 
-#include <licensing/license.h>
-
 #include <utils/common/app_info.h>
+#include <utils/common/product_features.h>
 
 namespace {
     bool isValidSerialKey(const QString &key) {
@@ -30,7 +27,7 @@ namespace {
 
 
 QnLicenseWidget::QnLicenseWidget(QWidget *parent):
-    QWidget(parent),
+    base_type(parent),
     ui(new Ui::LicenseWidget),
     m_state(Normal),
     m_freeLicenseAvailable(true)
@@ -146,7 +143,6 @@ void QnLicenseWidget::updateControls() {
         ui->activateLicenseButton->setEnabled(false);
     }
 }
-
 
 // -------------------------------------------------------------------------- //
 // Handlers

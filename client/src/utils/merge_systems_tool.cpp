@@ -11,6 +11,11 @@
 #include "nx_ec/dummy_handler.h"
 #include "common/common_module.h"
 #include "utils/network/module_finder.h"
+#include "client/client_settings.h"
+#include "ui/workbench/workbench_context.h"
+#include "ui/workbench/watchers/workbench_user_watcher.h"
+#include "ui/actions/action_manager.h"
+#include "ui/actions/action.h"
 
 namespace {
 
@@ -32,23 +37,34 @@ namespace {
 } // anonymous namespace
 
 QnMergeSystemsTool::QnMergeSystemsTool(QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    QnWorkbenchContextAware(parent)
 {
 }
 
-void QnMergeSystemsTool::pingSystem(const QUrl &url, const QString &password) {
+void QnMergeSystemsTool::pingSystem(const QUrl &url, const QString &user, const QString &password) {
     m_serverByRequestHandle.clear();
     foreach (const QnMediaServerResourcePtr &server, qnResPool->getAllServers()) {
         if (server->getStatus() != Qn::Online)
             continue;
 
-        int handle = server->apiConnection()->pingSystemAsync(url, password, this, SLOT(at_pingSystem_finished(int,QnModuleInformation,int,QString)));
+        int handle = server->apiConnection()->pingSystemAsync(url, user, password, this, SLOT(at_pingSystem_finished(int,QnModuleInformation,int,QString)));
         m_serverByRequestHandle[handle] = server;
     }
 }
 
-void QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &password, bool ownSettings) {
-    proxy->apiConnection()->mergeSystemAsync(url, password, ownSettings, this, SLOT(at_mergeSystem_finished(int,QnModuleInformation,int,QString)));
+int QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &user, const QString &password, bool ownSettings) {
+    QString currentPassword = QnAppServerConnectionFactory::getConnection2()->authInfo();
+    Q_ASSERT_X(!currentPassword.isEmpty(), "currentPassword cannot be empty", Q_FUNC_INFO);
+    if (!ownSettings) {
+        context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(false);
+        m_password = password;
+    }
+    return proxy->apiConnection()->mergeSystemAsync(url, user, password, currentPassword, ownSettings, false, false, this, SLOT(at_mergeSystem_finished(int,QnModuleInformation,int,QString)));
+}
+
+int QnMergeSystemsTool::configureIncompatibleServer(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &user, const QString &password) {
+    return proxy->apiConnection()->mergeSystemAsync(url, user, password, QString(), true, true, true, this, SLOT(at_mergeSystem_finished(int,QnModuleInformation,int,QString)));
 }
 
 void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInformation &moduleInformation, int handle, const QString &errorString) {
@@ -76,10 +92,22 @@ void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInform
 }
 
 void QnMergeSystemsTool::at_mergeSystem_finished(int status, const QnModuleInformation &moduleInformation, int handle, const QString &errorString) {
-    Q_UNUSED(handle)
+    bool reconnect = false;
+    if (status == 0 && errorString.isEmpty() && !m_password.isEmpty()) {
+        context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(m_password);
+        QUrl url = QnAppServerConnectionFactory::url();
+        url.setPassword(m_password);
+        QnAppServerConnectionFactory::setUrl(url);
+        reconnect = true;
+    }
+    m_password.clear();
+    context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
 
     if (status != 0)
-        emit mergeFinished(InternalError, moduleInformation);
+        emit mergeFinished(InternalError, moduleInformation, handle);
     else
-        emit mergeFinished(errorStringToErrorCode(errorString), moduleInformation);
+        emit mergeFinished(errorStringToErrorCode(errorString), moduleInformation, handle);
+
+    if (reconnect)
+        menu()->action(Qn::ReconnectAction)->trigger();
 }

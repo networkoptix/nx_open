@@ -78,7 +78,7 @@ void QnNetworkResource::setMAC(const QnMacAddress &mac)
     QMutexLocker mutexLocker(&m_mutex);
     m_macAddress = mac;
 
-    if (m_physicalId.isEmpty())
+    if (m_physicalId.isEmpty() && !mac.isNull())
         m_physicalId = mac.toString();
 }
 
@@ -94,14 +94,22 @@ void QnNetworkResource::setPhysicalId(const QString &physicalId)
     m_physicalId = physicalId;
 }
 
-void QnNetworkResource::setAuth(const QAuthenticator &auth, bool replaceIfExists)
+void QnNetworkResource::setAuth(const QAuthenticator &auth)
 {
-    setProperty( Qn::CAMERA_CREDENTIALS_PARAM_NAME, lit("%1:%2").arg(auth.user()).arg(auth.password()), true, replaceIfExists );
+    setProperty( Qn::CAMERA_CREDENTIALS_PARAM_NAME, lit("%1:%2").arg(auth.user()).arg(auth.password()), true);
+}
+
+void QnNetworkResource::setDefaultAuth(const QAuthenticator &auth)
+{
+    setProperty( Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME, lit("%1:%2").arg(auth.user()).arg(auth.password()), true);
 }
 
 QAuthenticator QnNetworkResource::getAuth() const
 {
-    const QStringList& credentialsList = getProperty(Qn::CAMERA_CREDENTIALS_PARAM_NAME).split(lit(":"));
+    QString value = getProperty(Qn::CAMERA_CREDENTIALS_PARAM_NAME);
+    if (value.isNull())
+        value = getProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME);
+    const QStringList& credentialsList = value.split(lit(":"));
     QAuthenticator auth;
     if( credentialsList.size() >= 1 )
         auth.setUser( credentialsList[0] );
@@ -118,19 +126,6 @@ bool QnNetworkResource::isAuthenticated() const
 void QnNetworkResource::setAuthenticated(bool auth)
 {
     m_authenticated = auth;
-}
-
-
-QHostAddress QnNetworkResource::getDiscoveryAddr() const
-{
-    QMutexLocker mutexLocker(&m_mutex);
-    return m_localAddress;
-}
-
-void QnNetworkResource::setDiscoveryAddr(QHostAddress addr)
-{
-    QMutexLocker mutexLocker(&m_mutex);
-    m_localAddress = addr;
 }
 
 int QnNetworkResource::httpPort() const
@@ -217,13 +212,19 @@ void QnNetworkResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>
 
 bool QnNetworkResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source )
 {
+    bool mergedSomething = false;
     if (source->getUrl() != getUrl())
     {
         setUrl(source->getUrl());
-        return true;
+        mergedSomething = true;
+    }
+    if (source->getMAC() != getMAC())
+    {
+        setMAC(source->getMAC());
+        mergedSomething = true;
     }
 
-    return false;
+    return mergedSomething;
 }
 
 
@@ -234,8 +235,13 @@ int QnNetworkResource::getChannel() const
 
 bool QnNetworkResource::ping()
 {
-    std::auto_ptr<AbstractStreamSocket> sock( SocketFactory::createStreamSocket() );
+    std::unique_ptr<AbstractStreamSocket> sock( SocketFactory::createStreamSocket() );
     return sock->connect( getHostAddress(), QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
+}
+
+bool QnNetworkResource::checkIfOnlineAsync( std::function<void(bool)>&& /*completionHandler*/ )
+{
+    return false;
 }
 
 QnTimePeriodList QnNetworkResource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) {
@@ -288,4 +294,31 @@ QnUuid QnNetworkResource::uniqueIdToId(const QString& uniqId)
     md5.addData(uniqId.toUtf8());
     QnUuid id = QnUuid::fromRfc4122(md5.result());
     return id;
+}
+
+void QnNetworkResource::initializationDone()
+{
+    QnResource::initializationDone();
+
+    if (hasFlags(Qn::desktop_camera))
+        return;
+    
+    if (getStatus() == Qn::Offline || getStatus() == Qn::Unauthorized || getStatus() == Qn::NotDefined)
+        setStatus(Qn::Online);
+}
+
+void QnNetworkResource::setAuth(const QString &user, const QString &password)
+{ 
+    QAuthenticator auth; 
+    auth.setUser(user); 
+    auth.setPassword(password); 
+    setAuth(auth); 
+}
+
+void QnNetworkResource::setDefaultAuth(const QString &user, const QString &password)
+{ 
+    QAuthenticator auth; 
+    auth.setUser(user); 
+    auth.setPassword(password); 
+    setDefaultAuth(auth); 
 }

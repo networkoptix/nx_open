@@ -72,7 +72,6 @@ int QnBusinessEventManager<T>::broadcastBusinessAction( const QnAbstractBusiness
     const int reqID = generateRequestID();
     auto tran = prepareTransaction( ApiCommand::broadcastBusinessAction, businessAction );
     QnTransactionMessageBus::instance()->sendTransaction(tran);
-    QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
     QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( &impl::SimpleHandler::done, handler, reqID, ErrorCode::ok ) );
     return reqID;
 }
@@ -83,7 +82,6 @@ int QnBusinessEventManager<T>::sendBusinessAction( const QnAbstractBusinessActio
     const int reqID = generateRequestID();
     auto tran = prepareTransaction( ApiCommand::execBusinessAction, businessAction );
     QnTransactionMessageBus::instance()->sendTransaction(tran, dstPeer);
-    QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
     QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( &impl::SimpleHandler::done, handler, reqID, ErrorCode::ok ) );
     return reqID;
 }

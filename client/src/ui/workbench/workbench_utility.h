@@ -63,8 +63,8 @@ protected:
 
         QRect extendedRect = QRect(
             QPoint(
-                qMin(m_boundary.left(), p.x()),
-                qMin(m_boundary.top(), p.y())
+                qMin(m_boundary.left(), p.x() - m_size.x() + 1),
+                qMin(m_boundary.top(), p.y() - m_size.y() + 1)
             ),
             QPoint(
                 qMax(m_boundary.right(), p.x() + m_size.x() - 1),

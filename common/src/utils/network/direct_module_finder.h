@@ -51,6 +51,7 @@ signals:
 
 private:
     void enqueRequest(const QUrl &url);
+    void processFailedReply(const QUrl &url);
 
 private slots:
     void activateRequests();
@@ -66,7 +67,7 @@ private:
 
     int m_maxConnections;
     QQueue<QUrl> m_requestQueue;
-    QSet<QUrl> m_activeRequests;
+    QMap<QUrl, QnAsyncHttpClientReply*> m_activeRequests;
 
     QHash<QnUuid, QnModuleInformation> m_foundModules;
     QHash<QUrl, qint64> m_lastPingByUrl;

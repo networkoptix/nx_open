@@ -38,10 +38,7 @@ struct QnPeerUpdateInformation {
 class QnNetworkPeerTask;
 class QnDownloadUpdatesPeerTask;
 class QnCheckForUpdatesPeerTask;
-
-namespace ec2 {
-    class QnDistributedMutex;
-}
+struct QnPeerRuntimeInfo;
 
 class QnUpdateProcess: public QnLongRunnable {
     Q_OBJECT
@@ -82,28 +79,26 @@ private:
     void finishUpdate(QnUpdateResult::Value value);
 
     void prepareToUpload();
-    void lockMutex();
-    void unlockMutex();
+    bool setUpdateFlag();
     void clearUpdateFlag();
 
 private:
     void at_checkForUpdatesTaskFinished(QnCheckForUpdatesPeerTask* task, const QnCheckForUpdateResult &result);
     void at_downloadTaskFinished(QnDownloadUpdatesPeerTask* task, int errorCode);
     void at_restUpdateTask_finished(int errorCode);
-    void at_uploadTask_finished(int errorCode);
+    void at_uploadTask_finished(int errorCode, const QSet<QnUuid> &failedPeers);
     void at_installTask_finished(int errorCode);
 
     void at_restUpdateTask_peerUpdateFinished(const QnUuid &incompatibleId, const QnUuid &id);
     void at_clientUpdateInstalled();
 
-    void at_mutexLocked();
-    void at_mutexTimeout();
+    void at_runtimeInfoChanged(const QnPeerRuntimeInfo &data);
+
 private:
-    const QnUuid m_id;
+    QString m_id;
     QnUpdateTarget m_target;
     QPointer<QnNetworkPeerTask> m_currentTask;
     QnFullUpdateStage m_stage;
-    ec2::QnDistributedMutex *m_distributedMutex;
     QSet<QnUuid> m_incompatiblePeerIds;
     QSet<QnUuid> m_targetPeerIds;
     bool m_clientRequiresInstaller;
@@ -112,6 +107,7 @@ private:
     QHash<QnUuid, QnPeerUpdateInformation> m_updateInformationById;
     QMultiHash<QnSystemInformation, QnUuid> m_idBySystemInformation;
     QnUpdateResult::Value m_updateResult;
+    QSet<QnUuid> m_failedPeerIds;
 };
 
 

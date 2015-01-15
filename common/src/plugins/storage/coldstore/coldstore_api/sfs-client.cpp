@@ -10,6 +10,7 @@
 #include "sfs-client.h"
 namespace Veracity
 {
+#ifndef ntohll
 	u64 ntohll(u64 v)
 	{
 #ifdef VERACITY_USE_BIG_ENDIAN
@@ -18,7 +19,9 @@ namespace Veracity
 		return ((u64)ntohl((u32)v) << 32) | (u64)ntohl((u32)(v >> 32));
 #endif
 	}
+#endif
 
+#ifndef htonll
 	u64 htonll(u64 v)
 	{
 #ifdef VERACITY_USE_BIG_ENDIAN
@@ -27,6 +30,7 @@ namespace Veracity
 		return ((u64)htonl((u32)v) << 32) | (u64)htonl((u32)(v >> 32));
 #endif
 	}
+#endif
 
 #pragma region TCPConnection
 

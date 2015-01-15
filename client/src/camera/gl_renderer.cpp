@@ -32,20 +32,6 @@
 #endif
 #include "utils/color_space/image_correction.h"
 
-/**
- * \def QN_GL_RENDERER_DEBUG
- * 
- * Enable OpenGL error reporting. Note that this will result in a LOT of
- * redundant <tt>glGetError</tt> calls, which may affect performance.
- */
-//#define QN_GL_RENDERER_DEBUG
-
-#ifdef QN_GL_RENDERER_DEBUG
-#   define glCheckError glCheckError
-#else
-#   define glCheckError(...)
-#endif
-
 namespace {
     const int ROUND_COEFF = 8;
 
@@ -158,6 +144,7 @@ QnGLRenderer::~QnGLRenderer()
 void QnGLRenderer::beforeDestroy()
 {
     m_shaders.clear();
+	m_vertices.clear();
 }
 
 void QnGLRenderer::applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation)
@@ -294,7 +281,7 @@ void QnGLRenderer::drawVideoTextureDirectly(
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex0ID);
-    DEBUG_CODE(glCheckError("glBindTexture"));
+    glCheckError("glBindTexture");
 
     auto renderer = QnOpenGLRendererManager::instance(QGLContext::currentContext());
     auto shader = renderer->getTextureShader();
@@ -348,6 +335,9 @@ void QnGLRenderer::drawYV12VideoTexture(
     if (m_fisheyeController && m_fisheyeController->mediaDewarpingParams().enabled && m_fisheyeController->itemDewarpingParams().enabled)
     {
         ar = picLock->width()/(float)picLock->height();
+        float customAR = m_fisheyeController->customAR();
+        if (!qFuzzyIsNull(customAR))
+            ar = customAR;
         //m_fisheyeController->tick();
         mediaParams = m_fisheyeController->mediaDewarpingParams();
         itemParams = m_fisheyeController->itemDewarpingParams();
@@ -408,13 +398,13 @@ void QnGLRenderer::drawYV12VideoTexture(
     }
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, tex2ID);
-    DEBUG_CODE(glCheckError("glBindTexture"));
+    glCheckError("glBindTexture");
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, tex1ID);
-    DEBUG_CODE(glCheckError("glBindTexture"));
+    glCheckError("glBindTexture");
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex0ID);
-    DEBUG_CODE(glCheckError("glBindTexture"));
+    glCheckError("glBindTexture");
 
     drawBindedTexture( shader, v_array, tx_array );
 
@@ -464,7 +454,7 @@ void QnGLRenderer::drawFisheyeRGBVideoTexture(
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex0ID);
-    DEBUG_CODE(glCheckError("glBindTexture"));
+    glCheckError("glBindTexture");
 
     drawBindedTexture( fisheyeShader, v_array, tx_array );
 
@@ -505,19 +495,19 @@ void QnGLRenderer::drawYVA12VideoTexture(
 
     glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_2D, tex3ID);
-    DEBUG_CODE(glCheckError("glBindTexture"));
+    glCheckError("glBindTexture");
 
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, tex2ID);
-    DEBUG_CODE(glCheckError("glBindTexture"));
+    glCheckError("glBindTexture");
 
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, tex1ID);
-    DEBUG_CODE(glCheckError("glBindTexture"));
+    glCheckError("glBindTexture");
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex0ID);
-    DEBUG_CODE(glCheckError("glBindTexture"));
+    glCheckError("glBindTexture");
 
     drawBindedTexture( m_shaders->yv12ToRgba, v_array, tx_array );
 
@@ -546,11 +536,11 @@ void QnGLRenderer::drawNV12VideoTexture(
 
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, yPlaneTexID);
-    DEBUG_CODE(glCheckError("glBindTexture"));
+    glCheckError("glBindTexture");
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, uvPlaneTexID);
-    DEBUG_CODE(glCheckError("glBindTexture"));
+    glCheckError("glBindTexture");
 
     drawBindedTexture( m_shaders->nv12ToRgb, v_array, tx_array );
 
@@ -573,8 +563,10 @@ void QnGLRenderer::drawBindedTexture( QnGLShaderProgram* shader , const float* v
     const int VERTEX_TEXCOORD0_SIZE = 2; // s and t
 
     if (!m_initialized) {
-        m_vertices.create();
-        m_vertices.bind();
+		if (!m_vertices)
+			m_vertices.reset(new QOpenGLVertexArrayObject());
+        m_vertices->create();
+        m_vertices->bind();
 
         m_positionBuffer.create();
         m_positionBuffer.setUsagePattern( QOpenGLBuffer::DynamicDraw );
@@ -590,15 +582,10 @@ void QnGLRenderer::drawBindedTexture( QnGLShaderProgram* shader , const float* v
         shader->enableAttributeArray( VERTEX_TEXCOORD0_INDX );
         shader->setAttributeBuffer( VERTEX_TEXCOORD0_INDX, GL_FLOAT, 0, VERTEX_TEXCOORD0_SIZE );
 
-        if (!shader->initialized()) {
-            shader->bindAttributeLocation("aPosition",VERTEX_POS_INDX);
-            shader->bindAttributeLocation("aTexcoord",VERTEX_TEXCOORD0_INDX);
-            shader->markInitialized();
-        };    
-
         m_positionBuffer.release();
+
         m_textureBuffer.release();
-        m_vertices.release();
+        m_vertices->release();
 
         m_initialized = true;
     } else {
@@ -609,10 +596,15 @@ void QnGLRenderer::drawBindedTexture( QnGLShaderProgram* shader , const float* v
         m_textureBuffer.bind();
         m_textureBuffer.write(0, texData.data(), texData.size());
         m_textureBuffer.release();
-
     }
 
-    QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawBindedTextureOnQuadVao(&m_vertices, shader);
+    if (!shader->initialized()) {
+        shader->bindAttributeLocation("aPosition",VERTEX_POS_INDX);
+        shader->bindAttributeLocation("aTexcoord",VERTEX_TEXCOORD0_INDX);
+        shader->markInitialized();
+    };
+
+    QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawBindedTextureOnQuadVao(m_vertices.data(), shader);
 }
 
 qint64 QnGLRenderer::lastDisplayedTime() const

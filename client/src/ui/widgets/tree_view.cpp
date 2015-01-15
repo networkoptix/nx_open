@@ -9,7 +9,8 @@
 #include <ui/help/help_topic_accessor.h>
 
 QnTreeView::QnTreeView(QWidget *parent): 
-    base_type(parent)
+    base_type(parent),
+    m_editorOpen(false)
 {}
 
 QnTreeView::~QnTreeView() {
@@ -21,8 +22,9 @@ int QnTreeView::rowHeight(const QModelIndex &index) const {
 }
 
 void QnTreeView::keyPressEvent(QKeyEvent *event) {
-    if(event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
-        if (state() != EditingState || hasFocus()) {
+    if(event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {     
+        bool canActivate = !m_editorOpen && (state() != EditingState || hasFocus());
+        if (canActivate) {
             if (currentIndex().isValid())
                 emit enterPressed(currentIndex());
             event->ignore();
@@ -36,7 +38,7 @@ void QnTreeView::keyPressEvent(QKeyEvent *event) {
         }
     }
 
-    QTreeView::keyPressEvent(event);
+    base_type::keyPressEvent(event);
 }
 
 void QnTreeView::dragMoveEvent(QDragMoveEvent *event) {
@@ -52,7 +54,7 @@ void QnTreeView::dragMoveEvent(QDragMoveEvent *event) {
 void QnTreeView::dragLeaveEvent(QDragLeaveEvent *event) {
     m_openTimer.stop();
 
-    QTreeView::dragLeaveEvent(event);
+    base_type::dragLeaveEvent(event);
 }
 
 void QnTreeView::timerEvent(QTimerEvent *event) {
@@ -67,6 +69,17 @@ void QnTreeView::timerEvent(QTimerEvent *event) {
         m_openTimer.stop();
     }
 
-    QTreeView::timerEvent(event);
+    base_type::timerEvent(event);
 }
 
+void QnTreeView::closeEditor(QWidget *editor, QAbstractItemDelegate::EndEditHint hint) {
+    base_type::closeEditor(editor, hint);
+    m_editorOpen = false;
+}
+
+bool QnTreeView::edit(const QModelIndex &index, EditTrigger trigger, QEvent *event) {
+    bool startEdit = base_type::edit(index, trigger, event);
+    if (startEdit)
+        m_editorOpen = true;
+    return startEdit;
+}

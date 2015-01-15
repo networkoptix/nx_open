@@ -5,7 +5,7 @@
 
 #include <QtCore/QMetaType>
 
-#include <nx_ec/impl/ec_api_impl.h>
+#include <nx_ec/ec_api_fwd.h>
 #include <utils/common/model_functions_fwd.h>
 #include <utils/camera/camera_diagnostics.h>
 

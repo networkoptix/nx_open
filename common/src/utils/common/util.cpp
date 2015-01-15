@@ -298,3 +298,51 @@ QString debugTime(qint64 timeMSec, const QString &fmt) {
     return QDateTime::fromMSecsSinceEpoch(timeMSec).toString(format);
 }
 #endif
+
+int formatJSonStringInternal(const char* srcPtr, const char* srcEnd, char* dstPtr)
+{
+    static const int INDENT_SIZE = 4;           // how many space add to formatting
+    static const char INDENT_SYMBOL = ' ';      // space filler
+    static QByteArray OUTPUT_DELIMITER("\n");   // new line
+    static const QByteArray INPUT_DELIMITERS("[]{},");  // delimiters in a input string
+    static const int INDENTS[] = {1, -1, 1, -1, 0};     // indent offset for INPUT_DELIMITERS
+    const char* dstPtrBase = dstPtr;
+    const char* srcPtrBase = srcPtr;
+    int indent = 0;
+    bool quoted = false;
+    for (; srcPtr < srcEnd; ++srcPtr)
+    {
+        if (*srcPtr == '"' && (srcPtr > srcPtrBase || srcPtr[-1] != '\\'))
+            quoted = !quoted;
+
+        int symbolIdx = INPUT_DELIMITERS.indexOf(*srcPtr);
+        bool isDelimBefore = (symbolIdx >= 0 && INDENTS[symbolIdx] < 0);
+        if (!dstPtrBase)
+            dstPtr++;
+        else if (!isDelimBefore)
+            *dstPtr++ = *srcPtr;
+
+        if (symbolIdx >= 0 && !quoted)
+        {
+            if (dstPtrBase) 
+                memcpy(dstPtr, OUTPUT_DELIMITER.data(), OUTPUT_DELIMITER.size());
+            dstPtr += OUTPUT_DELIMITER.size();
+            indent += INDENT_SIZE * INDENTS[symbolIdx];
+            if (dstPtrBase)
+                memset(dstPtr, INDENT_SYMBOL, indent);
+            dstPtr += indent;
+        }
+
+        if (dstPtrBase && isDelimBefore)
+            *dstPtr++ = *srcPtr;
+    }
+    return dstPtr - dstPtrBase;
+}
+
+QByteArray formatJSonString(const QByteArray& data)
+{
+    QByteArray result;
+    result.resize(formatJSonStringInternal(data.data(), data.data() + data.size(), 0));
+    formatJSonStringInternal(data.data(), data.data() + data.size(), result.data());
+    return result;
+}

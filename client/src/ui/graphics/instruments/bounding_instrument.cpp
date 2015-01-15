@@ -161,9 +161,11 @@ public:
         m_lastTickTime = 0;
         m_stickyLogScaleHi = 1.0;
         m_stickyLogScaleLo = -1.0;
-        m_defaultStickyLogScaleResettingThreshold = 0.91;
+        m_defaultStickyLogScaleResettingThreshold = 0.7;
         m_stickyLogScaleResettingThreshold = m_defaultStickyLogScaleResettingThreshold;
-        m_logScaleResettingSpeedMultiplier = 0.2;
+        m_logScaleResettingSpeedMultiplier = 0.16;
+        m_stickScaleTimeout = 300;
+        m_zoomInStopTimeMs = 0;
     }
 
     void update() {
@@ -263,10 +265,9 @@ public:
         /* Scene viewport center at the end of the last tick. */
         QPointF oldCenter = m_sceneViewportCenter;
         
-        /* Scene to viewport transform at the end of the last tick. */
-        //QTransform oldSceneToViewport = m_sceneToViewport;
-
-        /* Correct. */
+        /* Check if we are currently zooming in. */
+        if (m_view->viewportTransform().m11() > m_sceneToViewport.m11())
+            m_zoomInStopTimeMs = time;
 
         /* Calculate old scale. */
         qreal logOldScale = 1.0;
@@ -321,7 +322,7 @@ public:
 
                 qreal logDirection = calculateDistance(logScale, m_stickyLogScaleLo, m_stickyLogScaleHi);
                 qreal scaleSpeed = m_logScaleSpeed;
-                if (qFuzzyIsNull(logDirection)) {
+                if (qFuzzyIsNull(logDirection) && time - m_zoomInStopTimeMs > m_stickScaleTimeout) {
                     if (logScale > m_stickyLogScaleResettingThreshold) {
                         logDirection = 1.0 - logScale;
                         scaleSpeed *= m_logScaleResettingSpeedMultiplier;
@@ -540,6 +541,12 @@ public:
 
     /** Scale speed multiplier when scale is resetting to default value (m_stickyLogScaleHi). */
     qreal m_logScaleResettingSpeedMultiplier;
+
+    /** Timestamp when zoom-in was stopped */
+    qint64 m_zoomInStopTimeMs;
+
+    /** Timeout to stick scale after zoom-in */
+    qint64 m_stickScaleTimeout;
 };
 
 

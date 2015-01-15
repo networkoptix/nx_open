@@ -31,7 +31,7 @@
 
                 <link rel="stylesheet" href="customization/styles.css"/>
             </head>
-            <body>
+            <body style="min-width: 450px;">
                 <header class="navbar navbar-static-top bs-docs-nav" id="top" role="banner">
                     <div class="container">
                         <div class="navbar-header">
@@ -50,7 +50,7 @@
 
                 <div class="container">
                     <div class="row">
-                        <nav class="col-xs-4 bs-docs-sidebar">
+                        <nav class="col-sm-4 bs-docs-sidebar hidden-xs">
                             <ul class="nav nav-stacked fixed" id="sidebar">
                                 <xsl:for-each select="/apidoc/groups/group">
                                     <xsl:variable name="groupName"
@@ -61,6 +61,8 @@
                                             <xsl:attribute name="href">#group_<xsl:value-of
                                                   select="$groupName"/>
                                             </xsl:attribute>
+
+                                            <span class="glyphicon"></span>
                                             <xsl:value-of select="groupName"/>
                                         </a>
                                         <ul class="nav nav-stacked">
@@ -80,7 +82,7 @@
                                     </li>
                                 </xsl:for-each>
                             </ul>
-                        </nav> <div class="col-xs-8">
+                        </nav> <div class="col-sm-8">
                             <xsl:for-each select="apidoc/groups/group">
                                 <xsl:variable name="groupName"
                                     select="translate(groupName, ' ()', '___')"/>
@@ -116,41 +118,41 @@
                                                   <table
                                                   class="table table-bordered table-condensed">
                                                   <tr>
-                                                  <th>Name</th>
-                                                  <th>Description</th>
-                                                  <th>Optional</th>
-                                                  <xsl:if test="params/param/values/value">
-                                                  <th>Values</th>
-                                                  </xsl:if>
+                                                      <th>Name</th>
+                                                      <th>Description</th>
+                                                      <th>Optional</th>
+                                                      <xsl:if test="params/param/values/value">
+                                                      <th>Values</th>
+                                                      </xsl:if>
                                                   </tr>
                                                   <xsl:for-each select="params/param">
                                                   <tr>
-                                                  <td>
-                                                  <xsl:value-of select="name"/>
-                                                  </td>
-                                                  <td>
-                                                  <xsl:value-of select="description"/>
-                                                  </td>
-                                                  <td>
-                                                  <xsl:value-of select="optional"/>
-                                                  </td>
-                                                  <xsl:if test="../../params/param/values/value">
-                                                  <td>
-                                                  <ul class="list-unstyled">
-                                                  <xsl:for-each select="values/value">
-                                                  <li>
-                                                  <xsl:value-of select="name"/>
-                                                  <a style="cursor: pointer;" data-toggle="tooltip"
-                                                  data-placement="right"
-                                                  data-trigger="hover focus click">
-                                                  <xsl:attribute name="title">
-                                                  <xsl:value-of select="description"/>
-                                                  </xsl:attribute> (?) </a>
-                                                  </li>
-                                                  </xsl:for-each>
-                                                  </ul>
-                                                  </td>
-                                                  </xsl:if>
+                                                      <td>
+                                                        <xsl:value-of select="name"/>
+                                                      </td>
+                                                      <td>
+                                                        <xsl:value-of select="description"/>
+                                                      </td>
+                                                      <td>
+                                                        <xsl:value-of select="optional"/>
+                                                      </td>
+                                                      <xsl:if test="../../params/param/values/value">
+                                                      <td>
+                                                          <ul class="list-unstyled">
+                                                          <xsl:for-each select="values/value">
+                                                              <li>
+                                                              <xsl:value-of select="name"/>
+                                                              <a style="cursor: pointer;" data-toggle="tooltip"
+                                                              data-placement="right"
+                                                              data-trigger="hover focus click">
+                                                              <xsl:attribute name="title">
+                                                              <xsl:value-of select="description"/>
+                                                              </xsl:attribute> (?) </a>
+                                                              </li>
+                                                          </xsl:for-each>
+                                                          </ul>
+                                                      </td>
+                                                      </xsl:if>
                                                   </tr>
                                                   </xsl:for-each>
                                                   </table>
@@ -182,27 +184,43 @@
                         target: '.bs-docs-sidebar',
                         offset: 40
                     });
+
+                    $(".nav .glyphicon").click(function(){
+                        var $container = $(this).parent().parent();
+
+                        // .active
+                        // .pinned
+                        // .pinned-hidden
+
+                        if($container.hasClass("active")){
+                            $container.removeClass("pinned")
+                                    .toggleClass("pinned-hidden");
+                        }else{
+                            $container.toggleClass("pinned")
+                                    .removeClass("pinned-hidden");
+                        }
+                        return false;
+                    });
                 });
             </script>
         </html>
     </xsl:template>
     <xsl:template match="result">
-            <xsl:value-of select="caption"/>
-        
+        <xsl:value-of select="caption"/>
         <xsl:if test="attributes/attribute">
             <div class="panel panel-default">
-                    <table class="table">
-                        <xsl:for-each select="attributes/attribute">
-                            <tr>
-                                <td>
-                                    <xsl:value-of select="name"/>
-                                </td>
-                                <td>
-                                    <xsl:value-of select="description"/>
-                                </td>
-                            </tr>
-                        </xsl:for-each>
-                    </table>
+                <table class="table">
+                    <xsl:for-each select="attributes/attribute">
+                        <tr>
+                            <td>
+                                <xsl:value-of select="name"/>
+                            </td>
+                            <td>
+                                <xsl:value-of select="description"/>
+                            </td>
+                        </tr>
+                    </xsl:for-each>
+                </table>
             </div>
         </xsl:if>
     </xsl:template>

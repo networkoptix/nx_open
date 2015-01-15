@@ -268,24 +268,24 @@ namespace {
     template<class Point, class Rect>
     Point calculatePinPointInternal(const Rect &rect, Qt::WindowFrameSection section) {
         /* Note that QRect::right & QRect::bottom return not what is expected (see Qt docs).
-         * This is why these methods are not used here. */ // TODO: #Elric comment says they are not used, but they are used!!!
+         * This is why these methods are not used here. */
         switch(section) {
         case Qt::LeftSection:
-            return rect.topRight();
+            return Point(rect.left() + rect.width(), rect.top() + rect.height() / 2);
         case Qt::TopLeftSection:
-            return rect.bottomRight();
+            return Point(rect.left() + rect.width(), rect.top() + rect.height());
         case Qt::TopSection:
-            return rect.bottomLeft();
+            return Point(rect.left() + rect.width() / 2, rect.top() + rect.height());
         case Qt::TopRightSection:
-            return rect.bottomLeft();
+            return Point(rect.left(), rect.top() + rect.height());
         case Qt::RightSection:
-            return rect.topLeft();
+            return Point(rect.left(), rect.top() + rect.height() / 2);
         case Qt::BottomRightSection:
             return rect.topLeft();
         case Qt::BottomSection:
-            return rect.topLeft();
+            return Point(rect.left() + rect.width() / 2, rect.top());
         case Qt::BottomLeftSection:
-            return rect.topRight();
+            return Point(rect.left() + rect.width(), rect.top());
         case Qt::TitleBarArea:
             return Point();
         default:
@@ -344,4 +344,33 @@ Qn::Corner Qn::calculatePinPoint(Qt::WindowFrameSection section) {
 
 QPoint Qn::calculatePinPoint(const QRect &rect, Qt::WindowFrameSection section) {
     return calculatePinPointInternal<QPoint, QRect>(rect, section);
+}
+
+Qt::WindowFrameSection Qn::rotateSection(Qt::WindowFrameSection section, qreal rotation) {
+    if (section == Qt::NoSection || section == Qt::TitleBarArea)
+        return section;
+
+    int intRotation = qRound(rotation); /* we don't need qreal precision */
+
+    if (intRotation < 0)
+        intRotation += 360;
+    else if (intRotation >= 360)
+        intRotation -= 360;
+
+    int n45 = std::floor((intRotation + 45.0 / 2.0) / 45.0);
+
+    static const QList<Qt::WindowFrameSection> sections = QList<Qt::WindowFrameSection>()
+                                                          << Qt::LeftSection
+                                                          << Qt::TopLeftSection
+                                                          << Qt::TopSection
+                                                          << Qt::TopRightSection
+                                                          << Qt::RightSection
+                                                          << Qt::BottomRightSection
+                                                          << Qt::BottomSection
+                                                          << Qt::BottomLeftSection;
+
+    int index = sections.indexOf(section);
+    assert(index >= 0);
+    index = (index + n45) % sections.size();
+    return sections[index];
 }

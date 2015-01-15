@@ -5,11 +5,9 @@ angular.module('webadminApp')
 
         port = port || window.location.port;
         $scope.state = '';
-        var statisticUrl = window.location.protocol + "//" + window.location.hostname + ":"
-            + port;
+        var statisticUrl = window.location.protocol + '//' + window.location.hostname + ':' + port;
 
         $scope.url = statisticUrl + window.location.pathname + window.location.search;
-
 
         var oldUptime = Number.MAX_VALUE;
         var serverWasDown = false;
@@ -22,18 +20,18 @@ angular.module('webadminApp')
         $scope.refresh = reload;
         function pingServer(){
             var request = serverWasDown ? mediaserver.getSettings(statisticUrl): mediaserver.statistics(statisticUrl);
-            request.success(function(result){
-                if(serverWasDown || result.reply.uptimeMs < oldUptime )
+            request.then(function(result){
+                if(serverWasDown || result.data.reply.uptimeMs < oldUptime )
                 {
-                    $scope.state = "server is starting";
+                    $scope.state = 'server is starting';
                     return reload();
                 }
 
-                $scope.state = "server is restarting";
-                oldUptime = result.reply.uptimeMs;;
+                $scope.state = 'server is restarting';
+                oldUptime = result.data.reply.uptimeMs;
                 setTimeout(pingServer,1000);
-            }).error(function(result){
-                $scope.state = "server is offline";
+            },function(){
+                $scope.state = 'server is offline';
                 serverWasDown = true; // server was down once - next success should restart server
                 setTimeout(pingServer,1000);
                 return false;
@@ -42,16 +40,19 @@ angular.module('webadminApp')
         }
 
         //1. Request uptime
-        mediaserver.statistics().success(function(result) {
-            oldUptime = result.reply.uptimeMs;
+        mediaserver.statistics().then(function(result) {
+            oldUptime = result.data.reply.uptimeMs;
 
             //2. call restart function
             mediaserver.restart().then(function () {
                     pingServer();  //3. ping every second
+                },function () {//on error - ping
+                    pingServer();  //3. ping every second
+                    return false;
                 }
-            )
-        }).error(function(){
-            $scope.state = "server is offline";
+            );
+        },function(){
+            $scope.state = 'server is offline';
             setTimeout(pingServer,1000);
             return false;
         });

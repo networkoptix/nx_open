@@ -43,7 +43,7 @@ PREFIX_DIR=/opt/$CUSTOMIZATION
 BUILD_OUTPUT_DIR=${libdir}
 LIBS_DIR=$BUILD_OUTPUT_DIR/lib/release
 
-STRIP=1
+STRIP=
 
 
 for i in "$@"
@@ -74,6 +74,7 @@ libQt5Multimedia.so.5.2.1 \
 libQt5Network.so.5.2.1 \
 libQt5Sql.so.5.2.1 \
 libQt5Xml.so.5.2.1 \
+libQt5XmlPatterns.so.5.2.1 \
 libsigar.so \
 libswresample.so.0.15.100 \
 libswscale.so.2.1.100 \

@@ -59,8 +59,10 @@ private:
     void updateAllowCameraCHangesIfNeed();
     bool initTcpListener();
     QHostAddress getPublicAddress();
-    QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection, Qn::PanicMode* pm);
+    QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);
     void saveStorages(ec2::AbstractECConnectionPtr ec2Connection, const QnAbstractStorageResourceList& storages);
+    void dumpSystemUsageStats();
+
 private:
     int m_argc;
     char** m_argv;
@@ -72,8 +74,10 @@ private:
     QnMediaServerResourcePtr m_mediaServer;
     QSet<QnUuid> m_updateUserRequests;
     QHostAddress m_publicAddress;
+    QMutex m_mutex;
     std::unique_ptr<QnPublicIPDiscovery> m_ipDiscovery;
     std::unique_ptr<QTimer> m_updatePiblicIpTimer;
+    quint64 m_dumpSystemResourceUsageTaskID;
 };
 
 #endif // MAIN_H

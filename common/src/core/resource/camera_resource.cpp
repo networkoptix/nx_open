@@ -31,6 +31,20 @@ QnPhysicalCameraResource::QnPhysicalCameraResource():
 
 int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const
 {
+    float lowEnd = 0.1f;
+    float hiEnd = 1.0f;
+
+    float qualityFactor = lowEnd + (hiEnd - lowEnd) * (quality - Qn::QualityLowest) / (Qn::QualityHighest - Qn::QualityLowest);
+
+    float resolutionFactor = 0.009f * pow(resolution.width() * resolution.height(), 0.7f);
+
+    float frameRateFactor = fps/1.0f;
+
+    float result = qualityFactor*frameRateFactor * resolutionFactor;
+
+    return qMax(192, result);
+
+    /*
     // I assume for a Qn::QualityHighest quality 30 fps for 1080 we need 10 mbps
     // I assume for a Qn::QualityLowest quality 30 fps for 1080 we need 1 mbps
 
@@ -47,6 +61,7 @@ int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality quality, QSiz
     result *= (resolutionFactor * frameRateFactor);
 
     return qMax(192,result);
+    */
 }
 
 int QnPhysicalCameraResource::getChannel() const
@@ -234,7 +249,7 @@ QString QnVirtualCameraResource::getUniqueId() const
 }
 
 bool QnVirtualCameraResource::isForcedAudioSupported() const {
-    QString val = getProperty(lit("forcedIsAudioSupported"));
+    QString val = getProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME);
     return val.toUInt() > 0;
 }
 
@@ -242,7 +257,7 @@ void QnVirtualCameraResource::forceEnableAudio()
 { 
 	if (isForcedAudioSupported())
         return;
-    setProperty(lit("forcedIsAudioSupported"), 1);
+    setProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME, 1);
     saveParams(); 
 }
 
@@ -250,7 +265,7 @@ void QnVirtualCameraResource::forceDisableAudio()
 { 
     if (!isForcedAudioSupported())
         return;
-    setProperty(lit("forcedIsAudioSupported"), QString(lit("0")));
+    setProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME, QString(lit("0")));
     saveParams(); 
 }
 

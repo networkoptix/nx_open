@@ -3,7 +3,7 @@ var Page = require('./po.js');
 
 var protractor = require('protractor');
 describe('Developers Page', function () {
-    it("should stop test",function(){expect("other test").toBe("uncommented");});return;
+    //it("should stop test",function(){expect("other test").toBe("uncommented");});return;
 
     var p = new Page();
 

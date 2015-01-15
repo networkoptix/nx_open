@@ -30,6 +30,7 @@ public:
     static QString urlToPath(const QString& url);
 
     static QnUuid fillID(const QnUuid& mserverId, const QString& url);
+    bool isExternal() const;
 #ifdef ENABLE_DATA_PROVIDERS
     virtual float bitrate() const;
     virtual float getStorageBitrateCoeff() const { return 1.0; }
@@ -41,8 +42,6 @@ public:
     /*
      * Short and uniq storage ID. It is addition related ID field, and used for memory usage optimization
      */
-    void setIndex(quint16 value);
-    quint16 getIndex() const;
     virtual void setUrl(const QString& value) override;
 
     /*
@@ -72,7 +71,6 @@ private:
     qint64 m_spaceLimit;
     int m_maxStoreTime; // in seconds
     bool m_usedForWriting;
-    quint16 m_index;
     QSet<QnAbstractMediaStreamDataProvider*> m_providers;
     mutable QMutex m_bitrateMtx;
 };

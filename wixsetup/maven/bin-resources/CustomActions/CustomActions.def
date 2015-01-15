@@ -13,6 +13,7 @@ DeleteDatabaseFile
 BackupDatabaseFile
 RestoreDatabaseFile
 CopyDatabaseFile
+CopyHostedFiles
 PopulateRestoreVersions
 CAQuitExecAndWarn
 DeleteOldMediaserverSettings

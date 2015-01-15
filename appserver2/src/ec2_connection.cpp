@@ -29,11 +29,7 @@ namespace ec2
             dbUrl.toLocalFile(),
             QUrlQuery(dbUrl.query()).queryItemValue("staticdb_path") );
 
-        ApiResourceParamDataList paramList;
-        QnDbManager::instance()->doQueryNoLock(nullptr, paramList);
-
         QnTransactionMessageBus::instance()->setHandler( notificationManager() );
-        QnTransactionMessageBus::instance()->setLocalPeer(ApiPeerData(qnCommon->moduleGUID(), qnCommon->runningInstanceGUID(), Qn::PT_Server));
     }
 
     Ec2DirectConnection::~Ec2DirectConnection()
@@ -47,7 +43,8 @@ namespace ec2
         return m_connectionInfo;
     }
 
-    void Ec2DirectConnection::startReceivingNotifications() {
-        QnTransactionMessageBus::instance()->start();
+    QString Ec2DirectConnection::authInfo() const
+    {
+        return QString();
     }
 }

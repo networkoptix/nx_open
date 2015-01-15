@@ -1,5 +1,6 @@
 #include "rtp_universal_encoder.h"
 #include "utils/network/rtp_stream_parser.h"
+#include "common/common_module.h"
 
 extern "C" {
 #include <libavutil/opt.h>
@@ -590,7 +591,10 @@ static char *sdp_write_media_attributes(char *buff, int size, AVCodecContext *c,
 }
 
 
-QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnConstAbstractMediaDataPtr media, CodecID transcodeToCodec, const QSize& videoSize, QnConstResourceVideoLayoutPtr vLayout)
+QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnConstAbstractMediaDataPtr media, 
+                                             CodecID transcodeToCodec, 
+                                             const QSize& videoSize, 
+                                             const QnImageFilterHelper& extraTranscodeParams)
 :
     m_outputBuffer(CL_MEDIA_ALIGNMENT, 0),
     m_outputPos(0),
@@ -610,13 +614,18 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnConstAbstractMediaDataPtr media, 
         method = media->compressionType == transcodeToCodec ? QnTranscoder::TM_DirectStreamCopy : QnTranscoder::TM_FfmpegTranscode;
 
     if (media->dataType == QnAbstractMediaData::VIDEO) {
-        m_transcoder.setVideoLayout(vLayout);
+        m_transcoder.setExtraTranscodeParams(extraTranscodeParams);
         m_transcoder.setVideoCodec(m_codec, method, Qn::QualityNormal, videoSize);
     }
     else {
         m_transcoder.setAudioCodec(m_codec, method);
     }
-    if (m_isVideo)
+
+    if (qnCommon->isTranscodeDisabled() && method != QnTranscoder::TM_DirectStreamCopy) {
+        m_isOpened = false;
+        qWarning() << "Video transcoding is disabled in the server settings. Feature unavailable.";
+    }
+    else if (m_isVideo)
         m_isOpened = m_transcoder.open(media.dynamicCast<const QnCompressedVideoData>(), QnConstCompressedAudioDataPtr()) == 0;
     else
         m_isOpened = m_transcoder.open(QnConstCompressedVideoDataPtr(), media.dynamicCast<const QnCompressedAudioData>()) == 0;

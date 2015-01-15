@@ -1,6 +1,6 @@
 REM place %FILE%.msi here
 
-SET FILE=${finalName}.msi
+SET FILE=${finalName}-server-only.msi
 
 :update
     msiexec.exe /quiet /norestart /l*v %FILE%.log /i %FILE% INSTALL_SERVER=1 INSTALL_CLIENT=0

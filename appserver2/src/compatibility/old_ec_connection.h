@@ -20,6 +20,7 @@ namespace ec2
         OldEcConnection(const QnConnectionInfo& connectionInfo);
 
         virtual QnConnectionInfo connectionInfo() const override;
+        virtual QString authInfo() const override;
 
         virtual AbstractResourceManagerPtr getResourceManager() override;
         virtual AbstractMediaServerManagerPtr getMediaServerManager() override;
@@ -40,10 +41,11 @@ namespace ec2
         virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) override;
 
         virtual void startReceivingNotifications() override;
+        virtual void stopReceivingNotifications() override;
 
     protected:
-        virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) override;
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) override;
+        virtual int dumpDatabaseToFileAsync( const QString& dumpFilePath, ec2::impl::SimpleHandlerPtr handler ) override;
         virtual int restoreDatabaseAsync( const ApiDatabaseDumpData& dbFile, impl::SimpleHandlerPtr handler ) override;
 
     private:

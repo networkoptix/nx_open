@@ -5,16 +5,12 @@
 
 #include <ui/widgets/settings/abstract_preferences_widget.h>
 
-#include <utils/common/connective.h>
-
 namespace Ui {
     class CameraManagementWidget;
 }
 
-class QnCameraManagementWidget: public Connective<QnAbstractPreferencesWidget> {
+class QnCameraManagementWidget: public QnAbstractPreferencesWidget {
     Q_OBJECT
-
-    typedef Connective<QnAbstractPreferencesWidget> base_type;
 public:
     QnCameraManagementWidget(QWidget *parent = NULL);
     virtual ~QnCameraManagementWidget();
@@ -26,7 +22,6 @@ public:
 
 private slots:
     void at_autoDiscoveryCheckBox_clicked();
-    void updateFailoverWarning();
 
 private:
     QScopedPointer<Ui::CameraManagementWidget> ui;

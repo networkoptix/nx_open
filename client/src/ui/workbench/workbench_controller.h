@@ -80,6 +80,10 @@ public:
         return m_handScrollInstrument;
     }
 
+    WheelZoomInstrument *wheelZoomInstrument() const {
+        return m_wheelZoomInstrument;
+    }
+
     MotionSelectionInstrument *motionSelectionInstrument() const {
         return m_motionSelectionInstrument;
     }
@@ -279,6 +283,9 @@ private:
 
     /** Current grid rect of the widget being resized. */
     QRect m_resizedWidgetRect;
+
+    /** Snap point for the current resize process. */
+    QPoint m_resizingSnapPoint;
 
 
 

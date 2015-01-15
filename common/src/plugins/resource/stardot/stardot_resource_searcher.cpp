@@ -105,7 +105,6 @@ QnResourceList QnStardotResourceSearcher::findResources()
 
                 resource->setHostAddress(sender);
                 resource->setMAC(QnMacAddress(mac));
-                resource->setDiscoveryAddr(iface.address);
                 resource->setModel(QLatin1String(model));
                 resource->setName(QLatin1String(model));
                 
@@ -126,10 +125,6 @@ QnResourceList QnStardotResourceSearcher::findResources()
                 {
                     if (res->getUniqueId() == resource->getUniqueId())
                     {
-                        QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
-                        if (isNewDiscoveryAddressBetter(net_res->getHostAddress(), iface.address.toString(), net_res->getDiscoveryAddr().toString()))
-                            net_res->setDiscoveryAddr(iface.address);
-                    
                         need_to_continue = true; //already has such
                         break;
                     }
@@ -242,7 +237,7 @@ QList<QnResourcePtr> QnStardotResourceSearcher::checkHostAddr(const QUrl& url, c
     res->setModel(model);
     res->setMAC(QnMacAddress(mac));
     res->setHostAddress(host);
-    res->setAuth(auth);
+    res->setDefaultAuth(auth);
 
     QList<QnResourcePtr> resList;
     resList << res;

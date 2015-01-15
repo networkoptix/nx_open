@@ -28,14 +28,7 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
-     <item>
-      <widget class="QnProgressWidget" name="progressWidget" native="true"/>
-     </item>
-     <item>
-      <widget class="QLabel" name="infoLabel"/>
-     </item>
-    </layout>
+    <layout class="QGridLayout" name="gridLayout"/>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
@@ -46,14 +39,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QnProgressWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">ui/widgets/progress_widget.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

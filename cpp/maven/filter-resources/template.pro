@@ -110,7 +110,7 @@ INCLUDEPATH +=  ${qt.dir}/include \
                 ${environment.dir}/include \
                 $$ADDITIONAL_QT_INCLUDES \
                 ${qt.dir}/include/QtCore/$$QT_VERSION/ \
-                ${qt.dir}/include/QtCore/$$QT_VERSION/QtCore/
+                ${qt.dir}/include/QtCore/$$QT_VERSION/QtCore/ \
 
 DEPENDPATH *= $${INCLUDEPATH}
 
@@ -201,6 +201,9 @@ unix {
 unix:!android:!mac {
   !arm {
     LIBS += ${linux.oslibs}
+    QMAKE_CXXFLAGS += ${compiler.arguments}
+    QMAKE_CFLAGS += ${compiler.arguments}
+    QMAKE_LFLAGS += ${compiler.arguments}
     QMAKE_CXXFLAGS += -msse2
     QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-local-typedefs
   } else {

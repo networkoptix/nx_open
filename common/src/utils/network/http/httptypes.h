@@ -83,6 +83,7 @@ namespace nx_http
         \return iterator of added element
     */
     HttpHeaders::iterator insertOrReplaceHeader( HttpHeaders* const headers, const HttpHeader& newHeader );
+    HttpHeaders::iterator insertHeader( HttpHeaders* const headers, const HttpHeader& newHeader );
 
     void removeHeader( HttpHeaders* const headers, const StringType& headerName );
 
@@ -353,7 +354,6 @@ namespace nx_http
         //!Http authentication scheme enumeration
         namespace AuthScheme
         {
-            // TODO: #Elric #enum
             enum Value
             {
                 none,

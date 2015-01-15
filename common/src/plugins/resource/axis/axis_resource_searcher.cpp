@@ -113,7 +113,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     finalUrl.setScheme(QLatin1String("http"));
     finalUrl.setPort(port);
     resource->setUrl(finalUrl.toString());
-    resource->setAuth(auth);
+    resource->setDefaultAuth(auth);
 
     //resource->setDiscoveryAddr(iface.address);
     QList<QnResourcePtr> result;
@@ -199,8 +199,6 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
     
         if (net_res->getMAC().toString() == smac) {
-            if (isNewDiscoveryAddressBetter(net_res->getHostAddress(), discoveryAddress.toString(), net_res->getDiscoveryAddr().toString()))
-                net_res->setDiscoveryAddr(discoveryAddress);
             return local_results; // already found;
         }
     }
@@ -258,7 +256,7 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
             resource->setMAC(firstResource->getMAC());
             resource->setGroupName(physicalId);
             resource->setGroupId(physicalId);
-            resource->setAuth(firstResource->getAuth());
+            resource->setDefaultAuth(firstResource->getAuth());
             resource->setUrl(firstResource->getUrl());
 
             resource->setPhysicalId(resource->getPhysicalId() + QLatin1String("_channel_") + QString::number(i));

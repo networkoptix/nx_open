@@ -255,6 +255,7 @@ public:
     int getLastResponseCode() const;
 
     void setAudioEnabled(bool value);
+    bool isAudioEnabled() const;
 
     /*
     * Demuxe RTSP binary data
@@ -377,6 +378,7 @@ private:
     int m_additionalReadBufferPos;
     int m_additionalReadBufferSize;
     HttpAuthenticationClientContext m_rtspAuthCtx;
+    mutable QMutex m_sockMutex;
 
     /*!
         \param readSome if \a true, returns as soon as some data has been read. Otherwise, blocks till all \a bufSize bytes has been read

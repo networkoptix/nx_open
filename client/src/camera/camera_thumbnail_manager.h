@@ -41,6 +41,8 @@ private:
     bool isUpdateRequired(const QnResourcePtr &resource, const ThumbnailStatus status) const;
     void forceRefreshThumbnails();
 
+    QPixmap scaledPixmap(const QPixmap &pixmap) const;
+
     struct ThumbnailData {
         ThumbnailData(): status(None), loadingHandle(0) {}
 

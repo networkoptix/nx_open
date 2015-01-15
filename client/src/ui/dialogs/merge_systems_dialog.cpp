@@ -15,6 +15,7 @@
 
 QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
     QDialog(parent),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::QnMergeSystemsDialog),
     m_mergeTool(new QnMergeSystemsTool(this))
 {
@@ -31,6 +32,7 @@ QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
 
     connect(ui->urlComboBox,            SIGNAL(activated(int)),             this,   SLOT(at_urlComboBox_activated(int)));
     connect(ui->urlComboBox->lineEdit(),&QLineEdit::editingFinished,        this,   &QnMergeSystemsDialog::at_urlComboBox_editingFinished);
+    connect(ui->urlComboBox->lineEdit(),SIGNAL(returnPressed()),            ui->passwordEdit,   SLOT(setFocus()));
     connect(ui->passwordEdit,           &QLineEdit::returnPressed,          this,   &QnMergeSystemsDialog::at_testConnectionButton_clicked);
     connect(ui->testConnectionButton,   &QPushButton::clicked,              this,   &QnMergeSystemsDialog::at_testConnectionButton_clicked);
     connect(m_mergeButton,              &QPushButton::clicked,              this,   &QnMergeSystemsDialog::at_mergeButton_clicked);
@@ -111,6 +113,7 @@ void QnMergeSystemsDialog::at_urlComboBox_editingFinished() {
 void QnMergeSystemsDialog::at_testConnectionButton_clicked() {
     m_discoverer.clear();
     m_url.clear();
+    m_user.clear();
     m_password.clear();
 
     QUrl url = QUrl::fromUserInput(ui->urlComboBox->currentText());
@@ -129,8 +132,9 @@ void QnMergeSystemsDialog::at_testConnectionButton_clicked() {
     }
 
     m_url = url;
+    m_user = lit("admin");
     m_password = password;
-    m_mergeTool->pingSystem(url, password);
+    m_mergeTool->pingSystem(m_url, m_user, m_password);
     ui->buttonBox->showProgress(tr("testing..."));
 }
 
@@ -143,7 +147,7 @@ void QnMergeSystemsDialog::at_mergeButton_clicked() {
     ui->configurationWidget->setEnabled(false);
     m_mergeButton->setEnabled(false);
 
-    m_mergeTool->mergeSystem(m_discoverer, m_url, m_password, ownSettings);
+    m_mergeTool->mergeSystem(m_discoverer, m_url, m_user, m_password, ownSettings);
     ui->buttonBox->showProgress(tr("merging systems..."));
 }
 

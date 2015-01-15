@@ -1,182 +1,75 @@
-#ifndef camera_settings_widgets_h_1214
-#define camera_settings_widgets_h_1214
+#ifndef QN_CAMERA_ADVANCED_SETTINGS_WIDGET_H
+#define QN_CAMERA_ADVANCED_SETTINGS_WIDGET_H
 
-#include <QtWidgets/QRadioButton>
-#include <QtWidgets/QLineEdit>
-#include <QtWidgets/QPushButton>
-#include <QtWidgets/QCheckBox>
-#include <QtWidgets/QGroupBox>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QSlider>
-#include <QtWidgets/QScrollArea>
-#include "plugins/resource/camera_settings/camera_settings.h"
+#include <QtWidgets/QWidget>
 
+#include <api/api_fwd.h>
+#include <core/resource/resource_fwd.h>
 
-class QnSettingsScrollArea : public QScrollArea
-{
-    Q_OBJECT;
-public:
-    explicit QnSettingsScrollArea(QWidget* parent);
-    void addWidget(QWidget *widget);
-};
+#include <utils/common/connective.h>
 
-//==============================================
-class QnSettingsSlider : public QSlider
-{
+namespace Ui {
+    class CameraAdvancedSettingsWidget;
+}
+
+class QNetworkReply;
+class CameraSettingsWidgetsTreeCreator;
+class CameraAdvancedSettingsWebPage;
+class CameraSetting;
+
+class QnCameraAdvancedSettingsWidget : public Connective<QWidget> {
     Q_OBJECT
 
+    typedef Connective<QWidget> base_type;
 public:
-    QnSettingsSlider(Qt::Orientation orientation, QWidget *parent = 0);
+    QnCameraAdvancedSettingsWidget(QWidget* parent = 0);
+    virtual ~QnCameraAdvancedSettingsWidget();
 
-Q_SIGNALS:
-    void onKeyReleased();
+    const QnVirtualCameraResourcePtr &camera() const;
+    void setCamera(const QnVirtualCameraResourcePtr &camera);
 
-protected:
-    void keyReleaseEvent(QKeyEvent *event);
-};
+    void updateFromResource();
 
-//==============================================
-
-class QnAbstractSettingsWidget : public QWidget
-{
-    Q_OBJECT
-public:
-    QnAbstractSettingsWidget(const CameraSetting &obj, QnSettingsScrollArea *parent, const QString &hint);
-    virtual ~QnAbstractSettingsWidget();
-
-    CameraSetting param() const;
-
-    virtual void refresh() = 0;
-
-signals:
-    void advancedParamChanged(const CameraSetting& val);
-
-public slots:
-    virtual void updateParam(QString val) = 0;
-
-protected:
-    virtual void setParam(const CameraSettingValue& val);
-
-protected:
-    CameraSetting m_param;
-    QHBoxLayout *m_layout;
-    QString m_hint;
-};
-//==============================================
-class QnSettingsOnOffWidget : public QnAbstractSettingsWidget
-{
-    Q_OBJECT
-public:
-    QnSettingsOnOffWidget(const CameraSetting &obj, QnSettingsScrollArea *parent);
-    ~QnSettingsOnOffWidget();
-
-    void refresh() override;
-
-public slots:
-    void updateParam(QString val);
-
-    private slots:
-        void stateChanged (int state);
+    void reloadData();
 private:
-    QCheckBox * m_checkBox;
-};
-//==============================================
-class QnSettingsMinMaxStepWidget : public QnAbstractSettingsWidget
-{
-    Q_OBJECT
-public:
-    QnSettingsMinMaxStepWidget(const CameraSetting &obj, QnSettingsScrollArea *parent);
+    void initWebView();
 
-    void refresh() override;
+    void updatePage();
 
-public slots:
-    void updateParam(QString val);
+    void clean();
 
-    private slots:
-        void onValChanged();
-        void onValChanged(int val);
+    void createWidgetsRecreator(const QString &paramId);
+    QnMediaServerConnectionPtr getServerConnection() const;
 
-private:
-    QnSettingsSlider* m_slider;
-    QGroupBox* m_groupBox;
-};
-//==============================================
-class QnSettingsEnumerationWidget : public QnAbstractSettingsWidget
-{
-    Q_OBJECT
-public:
-    QnSettingsEnumerationWidget(const CameraSetting &obj, QnSettingsScrollArea *parent);
+    void at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator);
+    void at_proxyAuthenticationRequired ( const QNetworkProxy & , QAuthenticator * authenticator);
 
-    void refresh() override;
+    void at_advancedParamChanged(const CameraSetting& val);
 
-public slots:
-    void updateParam(QString val);
+    void updateApplyingParamsLabel();
 
 private slots:
-    void onClicked();
+    void at_advancedSettingsLoaded(int status, const QnStringVariantPairList &params, int handle);
+    void at_advancedParam_saved(int httpStatusCode, const QnStringBoolPairList& operationResult);
 
 private:
-    QRadioButton* getBtnByname(const QString& name);
-private:
-    QList<QRadioButton*> m_radioBtns;
+    enum class Page {
+        Empty,
+        CannotLoad,
+        Manual,
+        Web
+    };
+    void setPage(Page page);
+
+    QScopedPointer<Ui::CameraAdvancedSettingsWidget> ui;
+    Page m_page;
+    QnVirtualCameraResourcePtr m_camera;
+    QMutex m_cameraMutex;
+    CameraSettingsWidgetsTreeCreator* m_widgetsRecreator;
+    CameraAdvancedSettingsWebPage* m_cameraAdvancedSettingsWebPage;
+    QUrl m_lastCameraPageUrl;
+    int m_paramRequestHandle;
+    int m_applyingParamsCount;
 };
 
-//==============================================
-class QnSettingsButtonWidget : public QnAbstractSettingsWidget
-{
-    Q_OBJECT
-public:
-    QnSettingsButtonWidget(const CameraSetting &obj, QnSettingsScrollArea *parent);
-
-    void refresh() override;
-
-public slots:
-    void updateParam(QString val);
-
-private slots:
-    void onClicked();
-};
-
-//==============================================
-class QnSettingsTextFieldWidget : public QnAbstractSettingsWidget
-{
-    Q_OBJECT
-public:
-    QnSettingsTextFieldWidget(const CameraSetting &obj, QnSettingsScrollArea *parent);
-
-    void refresh() override;
-
-public slots:
-    void updateParam(QString val);
-
-private slots:
-    void onChange();
-
-private:
-    QLineEdit* m_lineEdit;
-};
-
-//==============================================
-class QnSettingsControlButtonsPairWidget : public QnAbstractSettingsWidget
-{
-    Q_OBJECT
-public:
-    QnSettingsControlButtonsPairWidget(const CameraSetting &obj, QnSettingsScrollArea *parent);
-
-    void refresh() override;
-
-public slots:
-    void updateParam(QString val);
-
-private slots:
-    void onMinPressed();
-    void onMinReleased();
-    void onMaxPressed();
-    void onMaxReleased();
-
-private:
-    QPushButton* m_minBtn;
-    QPushButton* m_maxBtn;
-};
-
-#endif //camera_settings_widgets_h_1214
+#endif // QN_CAMERA_ADVANCED_SETTINGS_WIDGET_H

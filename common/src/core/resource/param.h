@@ -27,10 +27,14 @@ namespace Qn
     */
     static const QString SUPPORTED_MOTION_PARAM_NAME = lit("supportedMotion");
     static const QString CAMERA_CREDENTIALS_PARAM_NAME = lit("credentials");
+    static const QString CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME = lit("defaultCredentials");
     static const QString CAMERA_CAPABILITIES_PARAM_NAME = lit("cameraCapabilities");
     static const QString CAMERA_MEDIA_STREAM_LIST_PARAM_NAME = lit("mediaStreams");
     static const QString VIDEO_LAYOUT_PARAM_NAME = lit("VideoLayout");
-
+    //!Contains XML describing camera parameteres. If empty, :camera_settings/camera_settings.xml file is used
+    static const QString PHYSICAL_CAMERA_SETTINGS_XML_PARAM_NAME = lit("physicalCameraSettingsXml");
+    //!ID of camera in camera_settings.xml or in parameter \a PHYSICAL_CAMERA_SETTINGS_XML_PARAM_NAME value
+    static const QString CAMERA_SETTINGS_ID_PARAM_NAME = lit("cameraSettingsId");
 }
 
 #endif // QN_PARAM_H

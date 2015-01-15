@@ -1,33 +1,33 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <WixLocalization Culture="ru-RU" xmlns="http://schemas.microsoft.com/wix/2006/localization">
-    <String Id="AdvancedWelcomeEulaDlg_Title"                       Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
-    <String Id="BrowseDlg_Title"                                    Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
-    <String Id="CancelDlg_Title"                                    Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
-    <String Id="CustomizeDlg_Title"                                 Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
-    <String Id="DiskCostDlg_Title"                                  Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
-    <String Id="ErrorDlg_Title"                                     Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
-    <String Id="ExitDialog_Title"                                   Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
-    <String Id="FatalError_Title"                                   Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
-    <String Id="FeaturesDlg_Title"                                  Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
-    <String Id="FilesInUse_Title"                                   Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
-    <String Id="InstallDirDlg_Title"                                Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
-    <String Id="InstallScopeDlg_Title"                              Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
-    <String Id="InvalidDirDlg_Title"                                Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
-    <String Id="LicenseAgreementDlg_Title"                          Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
-    <String Id="MaintenanceTypeDlg_Title"                           Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
-    <String Id="MaintenanceWelcomeDlg_Title"                        Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
-    <String Id="MsiRMFilesInUse_Title"                              Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
-    <String Id="OutOfDiskDlg_Title"                                 Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
-    <String Id="OutOfRbDiskDlg_Title"                               Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
-    <String Id="PrepareDlg_Title"                                   Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
-    <String Id="ProgressDlg_Title"                                  Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
-    <String Id="ResumeDlg_Title"                                    Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
-    <String Id="SetupTypeDlg_Title"                                 Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
-    <String Id="UserExit_Title"                                     Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
-    <String Id="VerifyReadyDlg_Title"                               Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
-    <String Id="WaitForCostingDlg_Title"                            Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
-    <String Id="WelcomeDlg_Title"                                   Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
-    <String Id="WelcomeEulaDlg_Title"                               Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="AdvancedWelcomeEulaDlg_Title"                       Overridable="yes">${product.title}</String>
+    <String Id="BrowseDlg_Title"                                    Overridable="yes">${product.title}</String>
+    <String Id="CancelDlg_Title"                                    Overridable="yes">${product.title}</String>
+    <String Id="CustomizeDlg_Title"                                 Overridable="yes">${product.title}</String>
+    <String Id="DiskCostDlg_Title"                                  Overridable="yes">${product.title}</String>
+    <String Id="ErrorDlg_Title"                                     Overridable="yes">${product.title}</String>
+    <String Id="ExitDialog_Title"                                   Overridable="yes">${product.title}</String>
+    <String Id="FatalError_Title"                                   Overridable="yes">${product.title}</String>
+    <String Id="FeaturesDlg_Title"                                  Overridable="yes">${product.title}</String>
+    <String Id="FilesInUse_Title"                                   Overridable="yes">${product.title}</String>
+    <String Id="InstallDirDlg_Title"                                Overridable="yes">${product.title}</String>
+    <String Id="InstallScopeDlg_Title"                              Overridable="yes">${product.title}</String>
+    <String Id="InvalidDirDlg_Title"                                Overridable="yes">${product.title}</String>
+    <String Id="LicenseAgreementDlg_Title"                          Overridable="yes">${product.title}</String>
+    <String Id="MaintenanceTypeDlg_Title"                           Overridable="yes">${product.title}</String>
+    <String Id="MaintenanceWelcomeDlg_Title"                        Overridable="yes">${product.title}</String>
+    <String Id="MsiRMFilesInUse_Title"                              Overridable="yes">${product.title}</String>
+    <String Id="OutOfDiskDlg_Title"                                 Overridable="yes">${product.title}</String>
+    <String Id="OutOfRbDiskDlg_Title"                               Overridable="yes">${product.title}</String>
+    <String Id="PrepareDlg_Title"                                   Overridable="yes">${product.title}</String>
+    <String Id="ProgressDlg_Title"                                  Overridable="yes">${product.title}</String>
+    <String Id="ResumeDlg_Title"                                    Overridable="yes">${product.title}</String>
+    <String Id="SetupTypeDlg_Title"                                 Overridable="yes">${product.title}</String>
+    <String Id="UserExit_Title"                                     Overridable="yes">${product.title}</String>
+    <String Id="VerifyReadyDlg_Title"                               Overridable="yes">${product.title}</String>
+    <String Id="WaitForCostingDlg_Title"                            Overridable="yes">${product.title}</String>
+    <String Id="WelcomeDlg_Title"                                   Overridable="yes">${product.title}</String>
+    <String Id="WelcomeEulaDlg_Title"                               Overridable="yes">${product.title}</String>
 
     <!-- Standard Strings (Common Buttons, Labels etc) -->
     <String Id="StdString_Ok"                                       Overridable="yes">Да</String>
@@ -50,7 +50,7 @@
     <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">Разрешить системе оптимизировать настройки камер (рекомендуется)</String>   
     
     <!-- Associations -->
-    <String Id="Associations_PlayWith"                              Overridable="yes">Воспроизвести с помощью ${product.name}</String>
+    <String Id="Associations_PlayWith"                              Overridable="yes">Воспроизвести с помощью ${display.product.name}</String>
 
     <!-- ClientDlg -->
     <String Id="ClientDlg_Shortcut"                                 Overridable="yes">Ярлыки</String>
@@ -66,9 +66,7 @@
 
     <!-- InstallTypeDlg -->
     <String Id="InstallTypeDlg_QuickFull"                           Overridable="yes">Полная (Все компоненты)</String>
-    <String Id="InstallTypeDlg_Full"                                Overridable="yes">Полная (Все компоненты)</String>
-    <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">Только клиент</String>
-    <String Id="InstallTypeDlg_ServerOnly"                          Overridable="yes">Только сервер</String>
+    <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">Только клиент(Я хочу смотреть видео, записанное в другом месте)</String>
     <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">Выборочная</String>
     <String Id="InstallTypeDlg_SelectInstallType"                   Overridable="yes">Пожалуйста выберите тип установки</String>
     <String Id="InstallTypeDlg_InstallType"                         Overridable="yes">Тип установки</String>       
@@ -87,12 +85,12 @@
     <String Id="MediaServerDlg_AppserverPort"                       Overridable="yes">Порт</String>
     <String Id="MediaServerDlg_Login"                               Overridable="yes">Имя пользователя</String>
     <String Id="MediaServerDlg_Password"                            Overridable="yes">Пароль</String>  
-    <String Id="MediaServerDlg_PasswordConfirm"                     Overridable="yes">Подтверждение пароля</String>      
     <String Id="MediaServerDlg_MediaserverPort"                     Overridable="yes">Порт Медиа Сервера</String>
     <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">Enterprise Controller</String>
     <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">Параметры Медиа Сервера</String>
     <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">Медиа Сервер</String>  
-    <String Id="MediaServerDlg_SystemName"                          Overridable="yes">Имя Системы</String>      
+    <String Id="MediaServerDlg_SystemName"                          Overridable="yes">Имя Системы</String>  
+    <String Id="MediaServerDlg_PasswordConfirm"                     Overridable="yes">Подтверждение пароля</String>  
 
     <!-- MyExitDialog -->
 
@@ -126,7 +124,7 @@
     <String Id="PortIsBusyDlg_PortOccupiedMessage"                  Overridable="yes">Указанный порт занят. Нажмите "Далее" если Вы уверены, что хотите его использовать.</String>    
 
     <!-- Product -->
-    <String Id="Product_LaunchClient"                               Overridable="yes">Запустить ${product.name} по окончании установки.</String>    
+    <String Id="Product_LaunchClient"                               Overridable="yes">Запустить ${display.product.name} по окончании установки.</String>    
     <String Id="Product_ArchMismatch"                               Overridable="yes">Этот продукт предназначен для 32-разрядной ОС. Установка будет закончена.</String>    
 
     <!-- SelectionWarningDlg -->
@@ -134,8 +132,8 @@
 
     <!-- UninstallOptionsDlg -->
     <String Id="UninstallOptionsDlg_UninstallOptions"               Overridable="yes">Параметры удаления</String>
-    <String Id="UninstallOptionsDlg_KeepDatabase"                   Overridable="yes">Оставить базу данных ${product.name}</String>
-    <String Id="UninstallOptionsDlg_RemoveDatabase"                 Overridable="yes">Удалить базу данных ${product.name}</String>
+    <String Id="UninstallOptionsDlg_KeepDatabase"                   Overridable="yes">Оставить базу данных ${display.product.name}</String>
+    <String Id="UninstallOptionsDlg_RemoveDatabase"                 Overridable="yes">Удалить базу данных ${display.product.name}</String>
     <String Id="UninstallOptionsDlg_Current"                        Overridable="yes">Текущую</String>  
     <String Id="UninstallOptionsDlgVersionToKeep"                   Overridable="yes">Сохранить:</String>   
     

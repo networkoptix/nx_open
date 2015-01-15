@@ -2,22 +2,15 @@
 #define CAMERA_SETTINGS_DIALOG_H
 
 #include <QtWidgets/QWidget>
-#include <QtNetwork/QNetworkReply>
-
-#ifdef QT_WEBKITWIDGETS_LIB
-#include <QtWebKitWidgets/QtWebKitWidgets>
-#endif
-
-#include "utils/camera_advanced_settings_xml_parser.h"
-#include "utils/common/connective.h"
 
 #include <core/resource/resource_fwd.h>
-
-#include "api/media_server_connection.h"
 
 #include "ui/workbench/workbench_context_aware.h"
 
 #include "camera_settings_tab.h"
+
+#include <utils/common/connective.h>
+#include <utils/common/uuid.h>
 
 namespace Ui {
     class SingleCameraSettingsWidget;
@@ -27,10 +20,7 @@ class QVBoxLayout;
 class QnCameraMotionMaskWidget;
 class QnCameraSettingsWidgetPrivate;
 class QnImageProvider;
-
-#ifdef QT_WEBKITWIDGETS_LIB
 class CameraAdvancedSettingsWebPage;
-#endif
 
 class QnSingleCameraSettingsWidget : public Connective<QWidget>, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -51,12 +41,6 @@ public:
     void setScheduleEnabled(bool enabled);
     bool isScheduleEnabled() const;
 
-    bool hasCameraChanges() const {
-        return m_hasCameraChanges;
-    }
-    bool hasAnyCameraChanges() const {
-        return m_anyCameraChanges;
-    }
     bool hasDbChanges() const {
         return m_hasDbChanges;
     }
@@ -81,14 +65,6 @@ public:
         m_hasMotionControlsChanges = false;
     }
 
-
-
-    QnMediaServerConnectionPtr getServerConnection() const;
-
-    const QList< QPair< QString, QVariant> >& getModifiedAdvancedParams() const {
-        return m_modifiedAdvancedParamsOutgoing;
-    }
-
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
@@ -106,14 +82,9 @@ public:
 
     void setExportScheduleButtonEnabled(bool enabled);
 
-public slots:
-    void at_advancedParamChanged(const CameraSetting& val);
-    void refreshAdvancedSettings();
-
 signals:
     void hasChangesChanged();
     void moreLicensesRequested();
-    void advancedSettingChanged();
     void scheduleExported(const QnVirtualCameraResourceList &);
 
 protected:
@@ -125,7 +96,6 @@ protected:
 private slots:
     void at_tabWidget_currentChanged();
     void at_dbDataChanged();
-    void at_cameraDataChanged();
     void at_cameraScheduleWidget_scheduleTasksChanged();
     void at_cameraScheduleWidget_recordingSettingsChanged();
     void at_cameraScheduleWidget_gridParamsChanged();
@@ -133,10 +103,8 @@ private slots:
     void at_cameraScheduleWidget_scheduleEnabledChanged();
     void at_linkActivated(const QString &urlString);
     void at_motionTypeChanged();
-    void at_motionSelectionCleared();
+    void at_resetMotionRegionsButton_clicked();
     void at_motionRegionListChanged();
-    void at_advancedSettingsLoaded(int status, const QnStringVariantPairList &params, int handle);
-    void at_pingButton_clicked();
     void at_analogViewCheckBox_clicked();
     void at_fisheyeSettingsChanged();
 
@@ -148,8 +116,6 @@ private slots:
     void updateWebPageText();
 
 private:
-    void setHasCameraChanges(bool hasChanges);
-    void setAnyCameraChanges(bool hasChanges);
     void setHasDbChanges(bool hasChanges);
 
     void updateMotionWidgetFromResource();
@@ -163,26 +129,17 @@ private:
     void connectToMotionWidget();
 
     bool initAdvancedTab();
-    void loadAdvancedSettings();
-
-    void cleanAdvancedSettings();
-#ifdef QT_WEBKITWIDGETS_LIB
-    void updateWebPage(QStackedLayout* stackedLayout , QWebView* advancedWebView);
-#endif
-    Q_SLOT void at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator);
-    Q_SLOT void at_proxyAuthenticationRequired ( const QNetworkProxy & , QAuthenticator * authenticator);
+    void initAdvancedTabWebView();
 
 private:
     Q_DISABLE_COPY(QnSingleCameraSettingsWidget)
     Q_DECLARE_PRIVATE(QnCameraSettingsWidget)
 
     QScopedPointer<Ui::SingleCameraSettingsWidget> ui;
-    QMutex m_cameraMutex;
+  
     QnVirtualCameraResourcePtr m_camera;
     bool m_cameraSupportsMotion;
 
-    bool m_hasCameraChanges;
-    bool m_anyCameraChanges;
     bool m_hasDbChanges;
 
     bool m_scheduleEnabledChanged;
@@ -203,17 +160,8 @@ private:
     QVBoxLayout *m_motionLayout;
     bool m_inUpdateMaxFps;
 
-    CameraSettings m_cameraSettings;
-    CameraSettingsWidgetsTreeCreator* m_widgetsRecreator;
-    QList< QPair< QString, QVariant> > m_modifiedAdvancedParams;
-    QList< QPair< QString, QVariant> > m_modifiedAdvancedParamsOutgoing;
-    mutable QnMediaServerConnectionPtr m_serverConnection;
-
     QHash<QnUuid, QnImageProvider*> m_imageProvidersByResourceId;
-	QUrl m_lastCameraPageUrl;
-#ifdef QT_WEBKITWIDGETS_LIB
-    CameraAdvancedSettingsWebPage* m_cameraAdvancedSettingsWebPage;
-#endif
+    
 };
 
 #endif // CAMERA_SETTINGS_DIALOG_H
