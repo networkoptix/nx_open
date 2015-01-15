@@ -1,11 +1,13 @@
--- Bookmark tags table
+-- Bookmark tags table. May be occasionally created by some earlier builds.
+DROP TABLE IF EXISTS "storage_bookmark_tag";
 CREATE TABLE "storage_bookmark_tag" (
     bookmark_guid   BLOB NOT NULL,
     name            TEXT NOT NULL,
     PRIMARY KEY(bookmark_guid, name)
     );
 
--- Bookmarks table
+-- Bookmarks table. May be occasionally created by some earlier builds.
+DROP TABLE IF EXISTS "storage_bookmark";
 CREATE TABLE "storage_bookmark" (
     guid            BLOB NOT NULL UNIQUE PRIMARY KEY,
     unique_id       TEXT NOT NULL,                          -- unique id of the related camera resource

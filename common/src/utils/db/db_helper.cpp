@@ -127,12 +127,15 @@ bool QnDbHelper::execSQLFile(const QString& fileName, QSqlDatabase& database)
 #ifdef DB_DEBUG
         qDebug() << QString(QLatin1String("processing command %1 of %2")).arg(++i).arg(n);
 #endif // DB_DEBUG
-        if (singleCommand.trimmed().isEmpty())
+        QString command = QString::fromUtf8(singleCommand).trimmed();
+        if (command.isEmpty())
             continue;
         QSqlQuery ddlQuery(database);
-        ddlQuery.prepare(QString::fromUtf8(singleCommand));
+        ddlQuery.prepare(command);
         if (!ddlQuery.exec()) {
-            qWarning() << "can't create tables for sqlLite database:" << ddlQuery.lastError().text() << ". Query was: " << singleCommand;
+            qWarning() << "Error while executing SQL file" << fileName;
+            qWarning() << "Query was:" << command;
+            qWarning() << "Error:" << ddlQuery.lastError().text();
             return false;
         }
     }
@@ -161,6 +164,20 @@ void QnDbHelper::addDatabase(const QString& fileName, const QString& dbname)
 }
 
 bool QnDbHelper::applyUpdates(const QString &dirName) {
+
+    if (!isObjectExists(lit("table"), lit("south_migrationhistory"), m_sdb)) {
+        QSqlQuery ddlQuery(m_sdb);
+        ddlQuery.prepare(lit(
+            "CREATE TABLE \"south_migrationhistory\" (\
+            \"id\" integer NOT NULL PRIMARY KEY autoincrement,\
+            \"app_name\" varchar(255) NOT NULL,\
+            \"migration\" varchar(255) NOT NULL,\
+            \"applied\" datetime NOT NULL);"
+            ));
+        if (!ddlQuery.exec())
+            return false;
+    }
+
     QSqlQuery existsUpdatesQuery(m_sdb);
     existsUpdatesQuery.prepare(lit("SELECT migration from south_migrationhistory"));
     if (!existsUpdatesQuery.exec())

@@ -161,16 +161,9 @@ bool QnStorageDb::createDatabase()
         if (!execSQLFile(lit(":/01_create_storage_db.sql"), m_sdb)) {
             return false;
         }
-
-#ifdef QN_ENABLE_BOOKMARKS
-        if (!execSQLFile(lit(":/02_storage_bookmarks.sql"), m_sdb)) {
-            return false;
-        }
-#endif
-
     }
 
-    if (!applyUpdates(":/updates"))
+    if (!applyUpdates(":/storage_updates"))
         return false;
 
     tran.commit();

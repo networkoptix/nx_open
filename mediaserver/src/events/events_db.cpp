@@ -272,19 +272,6 @@ bool QnEventsDB::createDatabase()
             return false;
     }
 
-    if (!isObjectExists(lit("table"), lit("south_migrationhistory"), m_sdb)) {
-        QSqlQuery ddlQuery(m_sdb);
-        ddlQuery.prepare(
-            "CREATE TABLE \"south_migrationhistory\" (\
-            \"id\" integer NOT NULL PRIMARY KEY autoincrement,\
-            \"app_name\" varchar(255) NOT NULL,\
-            \"migration\" varchar(255) NOT NULL,\
-            \"applied\" datetime NOT NULL);"
-            );
-        if (!ddlQuery.exec())
-            return false;
-    }
-
     if (!applyUpdates(":/mserver_updates"))
         return false;
 
