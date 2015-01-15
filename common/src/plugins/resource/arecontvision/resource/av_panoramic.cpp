@@ -40,8 +40,8 @@ bool QnArecontPanoramicResource::getParamPhysical(int channel, const QString& na
 {
     m_mutex.lock();
     m_mutex.unlock();
-
-    CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
+    QUrl devUrl(getUrl());
+    CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
     QString request = QLatin1String("get") + QString::number(channel) + QLatin1String("?") + name;
 
     CLHttpStatus status = connection.doGET(request);
@@ -76,10 +76,10 @@ bool QnArecontPanoramicResource::setParamPhysical(const QString &param, const QV
 {
     if (setSpecialParam(param, val))
         return true;
-
+    QUrl devUrl(getUrl());
     for (int i = 1; i <=4 ; ++i)
     {
-        CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
+        CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
 
         QString request = QLatin1String("set") + QString::number(i) + QLatin1Char('?') + param + QLatin1Char('=') + val.toString();
 
@@ -130,8 +130,8 @@ void QnArecontPanoramicResource::updateFlipState()
     if (m_flipTimer.isValid() && m_flipTimer.elapsed() < 1000)
         return;
     m_flipTimer.restart();
-
-    CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
+    QUrl devUrl(getUrl());
+    CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
     QString request = QLatin1String("get?rotate");
     CLHttpStatus responseCode = connection.doGET(request);
     if (responseCode != CL_HTTP_SUCCESS)
@@ -168,12 +168,24 @@ bool QnArecontPanoramicResource::setCamQuality(int q)
 
 }
 
+QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getDefaultVideoLayout() const
+{
+    if (m_defaultVideoLayout)
+        return m_defaultVideoLayout;
+
+    QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId()); 
+    if (resType)
+        m_defaultVideoLayout = QnResourceVideoLayoutPtr(QnCustomResourceVideoLayout::fromString(resType->defaultValue(Qn::VIDEO_LAYOUT_PARAM_NAME)));
+    else
+        m_defaultVideoLayout = QnResourceVideoLayoutPtr(new QnDefaultResourceVideoLayout());
+    return m_defaultVideoLayout;
+}
+
 QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
     QMutexLocker lock(&m_mutex);
 
-    const QnConstResourceVideoLayoutPtr& layout = QnPlAreconVisionResource::getVideoLayout(dataProvider);
-    //const QnConstCustomResourceVideoLayoutPtr& customLayout = std::dynamic_pointer_cast<const QnCustomResourceVideoLayout>(layout);
+    const QnConstResourceVideoLayoutPtr layout = QnArecontPanoramicResource::getDefaultVideoLayout();
     const QnCustomResourceVideoLayout* customLayout = dynamic_cast<const QnCustomResourceVideoLayout*>(layout.data());
     const_cast<QnArecontPanoramicResource*>(this)->updateFlipState();
     if (m_isRotated && customLayout)

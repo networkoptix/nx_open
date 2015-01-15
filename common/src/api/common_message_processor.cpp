@@ -32,30 +32,24 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 {
     if (m_connection) {
         /* Safety check in case connection will not be deleted instantly. */
-        m_connection->disconnect(this);
-        m_connection->getResourceManager()->disconnect(this);
-        m_connection->getMediaServerManager()->disconnect(this);
-        m_connection->getCameraManager()->disconnect(this);
-        m_connection->getLicenseManager()->disconnect(this);
-        m_connection->getBusinessEventManager()->disconnect(this);
-        m_connection->getUserManager()->disconnect(this);
-        m_connection->getLayoutManager()->disconnect(this);
-        m_connection->getStoredFileManager()->disconnect(this);
-        m_connection->getDiscoveryManager()->disconnect(this);
-        m_connection->getTimeManager()->disconnect(this);
+        m_connection->stopReceivingNotifications();
+        disconnectFromConnection(m_connection);
     }
     m_connection = connection;
 
     if (!connection)
         return;
 
-    connect(connection, &ec2::AbstractECConnection::remotePeerFound,                this, &QnCommonMessageProcessor::at_remotePeerFound );
-    connect(connection, &ec2::AbstractECConnection::remotePeerLost,                 this, &QnCommonMessageProcessor::at_remotePeerLost );
-    connect(connection, &ec2::AbstractECConnection::remotePeerFound,                this, &QnCommonMessageProcessor::remotePeerFound );
-    connect(connection, &ec2::AbstractECConnection::remotePeerLost,                 this, &QnCommonMessageProcessor::remotePeerLost );
+    connectToConnection(connection);
+    connection->startReceivingNotifications();
+}
+
+
+void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection) {
+    connect(connection, &ec2::AbstractECConnection::remotePeerFound,                this, &QnCommonMessageProcessor::on_remotePeerFound );
+    connect(connection, &ec2::AbstractECConnection::remotePeerLost,                 this, &QnCommonMessageProcessor::on_remotePeerLost );
     connect(connection, &ec2::AbstractECConnection::initNotification,               this, &QnCommonMessageProcessor::on_gotInitialNotification );
     connect(connection, &ec2::AbstractECConnection::runtimeInfoChanged,             this, &QnCommonMessageProcessor::runtimeInfoChanged );
-    connect(connection, &ec2::AbstractECConnection::panicModeChanged,               this, &QnCommonMessageProcessor::on_panicModeChanged );
 
     auto resourceManager = connection->getResourceManager();
     connect(resourceManager, &ec2::AbstractResourceManager::resourceChanged,        this, [this](const QnResourcePtr &resource){updateResource(resource);});
@@ -118,35 +112,21 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 
     connect( connection->getDiscoveryManager(), &ec2::AbstractDiscoveryManager::discoveryInformationChanged,
         this, &QnCommonMessageProcessor::on_gotDiscoveryData );
-
-    connection->startReceivingNotifications();
 }
 
-/*
-* EC2 related processing. Need move to other class
-*/
-
-void QnCommonMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data)
-{
-    QnResourcePtr res = qnResPool->getResourceById(data.peer.id);
-    if (res)
-        res->setStatus(Qn::Online);
-
+void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) {
+    connection->disconnect(this);
+    connection->getResourceManager()->disconnect(this);
+    connection->getMediaServerManager()->disconnect(this);
+    connection->getCameraManager()->disconnect(this);
+    connection->getLicenseManager()->disconnect(this);
+    connection->getBusinessEventManager()->disconnect(this);
+    connection->getUserManager()->disconnect(this);
+    connection->getLayoutManager()->disconnect(this);
+    connection->getStoredFileManager()->disconnect(this);
+    connection->getDiscoveryManager()->disconnect(this);
+    connection->getTimeManager()->disconnect(this);
 }
-
-void QnCommonMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data)
-{
-    QnResourcePtr res = qnResPool->getResourceById(data.peer.id);
-    if (res) {
-        res->setStatus(Qn::Offline);
-        if (data.peer.peerType != Qn::PT_Server) {
-            // This server hasn't own DB
-            for(const QnResourcePtr& camera: qnResPool->getAllCameras(res))
-                camera->setStatus(Qn::Offline);
-        }
-    }
-}
-
 
 void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResourceData &fullData)
 {
@@ -154,62 +134,45 @@ void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResour
     on_businessRuleReset(fullData.bRules);
 }
 
-
 void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &data, bool addInformation)
 {
-    QMultiHash<QnUuid, QUrl> m_additionalUrls;
-    QMultiHash<QnUuid, QUrl> m_ignoredUrls;
+    QnMediaServerResourcePtr server = qnResPool->getResourceById(data.id).dynamicCast<QnMediaServerResource>();
+    if (!server)
+        return;
 
     QUrl url(data.url);
-    if (data.ignore) {
-        if (url.port() != -1 && !m_additionalUrls.contains(data.id, url))
-            m_additionalUrls.insert(data.id, url);
-        m_ignoredUrls.insert(data.id, url);
+
+    QList<QHostAddress> addresses = server->getNetAddrList();
+    QList<QUrl> additionalUrls = server->getAdditionalUrls();
+    QList<QUrl> ignoredUrls = server->getIgnoredUrls();
+
+    if (addInformation) {
+        if (!data.ignore) {
+            if (!additionalUrls.contains(url) && !addresses.contains(QHostAddress(url.host())))
+                additionalUrls.append(url);
+            ignoredUrls.removeOne(url);
+        } else {
+            if (!ignoredUrls.contains(url))
+                ignoredUrls.append(url);
+        }
     } else {
-        if (!m_additionalUrls.contains(data.id, url))
-            m_additionalUrls.insert(data.id, url);
+        additionalUrls.removeOne(url);
+        ignoredUrls.removeOne(url);
     }
-
-    for (const QnUuid &id: m_additionalUrls.uniqueKeys()) {
-        QnMediaServerResourcePtr server = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>();
-        if (!server)
-            continue;
-
-        QList<QUrl> additionalUrls = server->getAdditionalUrls();
-
-        if (addInformation) {
-            for (const QUrl &url: m_additionalUrls.values(id)) {
-                if (!additionalUrls.contains(url))
-                    additionalUrls.append(url);
-            }
-        } else {
-            for (const QUrl &url: m_additionalUrls.values(id))
-                additionalUrls.removeOne(url);
-        }
-        server->setAdditionalUrls(additionalUrls);
-    }
-
-    for (const QnUuid &id: m_ignoredUrls.uniqueKeys()) {
-        QnMediaServerResourcePtr server = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>();
-        if (!server)
-            continue;
-
-        QList<QUrl> ignoredUrls = server->getIgnoredUrls();
-
-        if (addInformation) {
-            for (const QUrl &url: m_additionalUrls.values(id))
-                ignoredUrls.removeOne(url);
-            for (const QUrl &url: m_ignoredUrls.values(id)) {
-                if (!ignoredUrls.contains(url))
-                    ignoredUrls.append(url);
-            }
-        } else {
-            for (const QUrl &url: m_ignoredUrls.values(id))
-                ignoredUrls.removeOne(url);
-        }
-        server->setIgnoredUrls(ignoredUrls);
-    }
+    server->setAdditionalUrls(additionalUrls);
+    server->setIgnoredUrls(ignoredUrls);
 }
+
+void QnCommonMessageProcessor::on_remotePeerFound(const ec2::ApiPeerAliveData &data) {
+    handleRemotePeerFound(data);
+    emit remotePeerFound(data);
+}
+
+void QnCommonMessageProcessor::on_remotePeerLost(const ec2::ApiPeerAliveData &data) {
+    handleRemotePeerLost(data);
+    emit remotePeerLost(data);
+}
+
 
 void QnCommonMessageProcessor::on_resourceStatusChanged( const QnUuid& resourceId, Qn::ResourceStatus status )
 {
@@ -350,15 +313,6 @@ void QnCommonMessageProcessor::on_execBusinessAction( const QnAbstractBusinessAc
     execBusinessActionInternal(action);
 }
 
-void QnCommonMessageProcessor::on_panicModeChanged(Qn::PanicMode mode) {
-    QnResourceList resList = qnResPool->getAllResourceByTypeName(lit("Server"));
-    for(const QnResourcePtr& res: resList) {
-        QnMediaServerResourcePtr mServer = res.dynamicCast<QnMediaServerResource>();
-        if (mServer)
-            mServer->setPanicMode(mode);
-    }
-}
-
 // todo: ec2 relate logic. remove from this class
 void QnCommonMessageProcessor::afterRemovingResource(const QnUuid& id) {
     for(const QnBusinessEventRulePtr& bRule: m_rules.values())
@@ -373,23 +327,37 @@ void QnCommonMessageProcessor::afterRemovingResource(const QnUuid& id) {
 }
 
 
-void QnCommonMessageProcessor::processResources(const QnResourceList& resources)
-{
+void QnCommonMessageProcessor::resetResources(const QnResourceList& resources) {
+    /* Store all remote resources id to clean them if they are not in the list anymore. */
+    QHash<QnUuid, QnResourcePtr> remoteResources;
+    for (const QnResourcePtr &resource: qnResPool->getResourcesWithFlag(Qn::remote))
+        remoteResources.insert(resource->getId(), resource);
+    
+    /* Remove all incompatible resources - they will be added if exist. */
+    qnResPool->removeResources(qnResPool->getAllIncompatibleResources());
+
+    /* Packet adding. */
     qnResPool->beginTran();
-    for (const QnResourcePtr& resource: resources)
+    for (const QnResourcePtr& resource: resources) {
+        /* Update existing. */
         updateResource(resource);
+
+        /* And keep them from removing. */
+        remoteResources.remove(resource->getId());
+    }
     qnResPool->commit();
+
+    /* Remove absent resources. */
+    for (const QnResourcePtr& resource: remoteResources)
+        qnResPool->removeResource(resource);
 }
 
-void QnCommonMessageProcessor::processLicenses(const QnLicenseList& licenses)
-{
+void QnCommonMessageProcessor::resetLicenses(const QnLicenseList& licenses) {
     qnLicensePool->replaceLicenses(licenses);
 }
 
-void QnCommonMessageProcessor::processCameraServerItems(const QnCameraHistoryList& cameraHistoryList)
-{
-    for(const QnCameraHistoryPtr& history: cameraHistoryList)
-        QnCameraHistoryPool::instance()->addCameraHistory(history);
+void QnCommonMessageProcessor::resetCameraServerItems(const QnCameraHistoryList& cameraHistoryList) {
+    QnCameraHistoryPool::instance()->resetCameraHistory(cameraHistoryList);
 }
 
 bool QnCommonMessageProcessor::canRemoveResource(const QnUuid &) 
@@ -401,8 +369,16 @@ void QnCommonMessageProcessor::removeResourceIgnored(const QnUuid &)
 {
 }
 
-void QnCommonMessageProcessor::processServerUserAttributesList( const QnMediaServerUserAttributesList& serverUserAttributesList )
+void QnCommonMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData &data) {
+}
+
+void QnCommonMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData &data) {  
+}
+
+
+void QnCommonMessageProcessor::resetServerUserAttributesList( const QnMediaServerUserAttributesList& serverUserAttributesList )
 {
+    QnMediaServerUserAttributesPool::instance()->clear();
     for( const QnMediaServerUserAttributesPtr& serverAttrs: serverUserAttributesList )
     {
         QnMediaServerUserAttributesPool::ScopedLock userAttributesLock( QnMediaServerUserAttributesPool::instance(), serverAttrs->serverID );
@@ -410,8 +386,9 @@ void QnCommonMessageProcessor::processServerUserAttributesList( const QnMediaSer
     }
 }
 
-void QnCommonMessageProcessor::processCameraUserAttributesList( const QnCameraUserAttributesList& cameraUserAttributesList )
+void QnCommonMessageProcessor::resetCameraUserAttributesList( const QnCameraUserAttributesList& cameraUserAttributesList )
 {
+    QnCameraUserAttributePool::instance()->clear();
     for( const QnCameraUserAttributesPtr& cameraAttrs: cameraUserAttributesList )
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), cameraAttrs->cameraID );
@@ -419,14 +396,34 @@ void QnCommonMessageProcessor::processCameraUserAttributesList( const QnCameraUs
     }
 }
 
-void QnCommonMessageProcessor::processPropertyList(const ec2::ApiResourceParamWithRefDataList& params)
-{
-    for(const ec2::ApiResourceParamWithRefData& param: params)
-        propertyDictionary->setValue(param.resourceId, param.name, param.value, false);
+void QnCommonMessageProcessor::resetPropertyList(const ec2::ApiResourceParamWithRefDataList& params) {
+    /* Store existing parameter keys. */
+    auto existingProperties = propertyDictionary->allPropertyNamesByResource();
+
+    /* Update changed values. */
+    for(const ec2::ApiResourceParamWithRefData& param: params) {
+        on_resourceParamChanged(param);
+        if (existingProperties.contains(param.resourceId))
+            existingProperties[param.resourceId].remove(param.name);
+    }
+
+    /* Clean values that are not in the list anymore. */
+    for (auto iter = existingProperties.constBegin(); iter != existingProperties.constEnd(); ++iter) {
+        QnUuid resourceId = iter.key();
+        for (auto paramName: iter.value())
+            on_resourceParamChanged(ec2::ApiResourceParamWithRefData(resourceId, paramName, QString()));
+    }
 }
 
-void QnCommonMessageProcessor::processStatusList(const ec2::ApiResourceStatusDataList& params)
+void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataList& params) 
 {
+    auto keys = qnStatusDictionary->values().keys();
+    qnStatusDictionary->clear();
+    for(const QnUuid& id: keys) {
+        if (QnResourcePtr resource = qnResPool->getResourceById(id))
+            emit resource->statusChanged(resource);
+    }
+
     for(const ec2::ApiResourceStatusData& statusData: params)
         on_resourceStatusChanged(statusData.id , statusData.status);
 }
@@ -434,14 +431,13 @@ void QnCommonMessageProcessor::processStatusList(const ec2::ApiResourceStatusDat
 void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
 {
     //QnAppServerConnectionFactory::setBox(fullData.serverInfo.platform);
-
-    processPropertyList(fullData.allProperties);
-    processResources(fullData.resources);
-    processServerUserAttributesList( fullData.serverUserAttributesList );
-    processCameraUserAttributesList( fullData.cameraUserAttributesList );
-    processLicenses(fullData.licenses);
-    processCameraServerItems(fullData.cameraHistory);
-    processStatusList(fullData.resStatusList);
+    resetResources(fullData.resources);
+    resetPropertyList(fullData.allProperties);
+    resetServerUserAttributesList( fullData.serverUserAttributesList );
+    resetCameraUserAttributesList( fullData.cameraUserAttributesList );
+    resetLicenses(fullData.licenses);
+    resetCameraServerItems(fullData.cameraHistory);
+    resetStatusList(fullData.resStatusList);
 
     //on_runtimeInfoChanged(fullData.serverInfo);
     qnSyncTime->reset();   
@@ -475,17 +471,7 @@ QMap<QnUuid, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() c
     return m_rules;
 }
 
-void QnCommonMessageProcessor::updateResource(const QnResourcePtr &resource) 
-{
-#if 0
-    if (dynamic_cast<const QnMediaServerResource*>(resource.data()))
-    {
-        if (QnRuntimeInfoManager::instance()->hasItem(resource->getId()))
-            resource->setStatus(Qn::Online);
-        else
-            resource->setStatus(Qn::Offline);
-    }
-#endif
+void QnCommonMessageProcessor::updateResource(const QnResourcePtr &resource) {
     if (resource->getId() == qnCommon->moduleGUID()) {
         QnModuleInformation moduleInformation = qnCommon->moduleInformation();
         moduleInformation.name = resource->getName();

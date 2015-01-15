@@ -19,9 +19,6 @@
 
 namespace {
 
-    const QString QN_UPDATE_PACKAGE_URL = lit("http://updates.hdw.mx/upcombiner/upcombine");
-    
-
     #ifdef Q_OS_MACX
     const bool defaultEnableClientUpdates = false;
     #else
@@ -47,9 +44,13 @@ QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
     m_updateProcess(NULL),
     m_enableClientUpdates(defaultEnableClientUpdates)
 {
-    auto targetsWatcher = [this] {
+    auto targetsWatcher = [this](const QnResourcePtr &resource) {
+        if (!resource->hasFlags(Qn::server))
+            return;
+
         if (!m_targets.isEmpty())
             return;
+
         emit targetsChanged(actualTargetIds());
     };
     connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   targetsWatcher);
@@ -111,20 +112,17 @@ QnMediaServerResourceList QnMediaServerUpdateTool::targets() const {
 
 void QnMediaServerUpdateTool::setTargets(const QSet<QnUuid> &targets, bool client) {
     m_targets.clear();
-
-    QSet<QnUuid> suitableTargets;
+    m_enableClientUpdates = client;
 
     foreach (const QnUuid &id, targets) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
+
         m_targets.append(server);
-        suitableTargets.insert(id);
     }
 
-    m_enableClientUpdates = client;
-
-    emit targetsChanged(suitableTargets);
+    emit targetsChanged(actualTargetIds());
 }
 
 QnMediaServerResourceList QnMediaServerUpdateTool::actualTargets() const {
@@ -185,7 +183,7 @@ QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl(const QnSoftwareVersion &
 
     query.addQueryItem(lit("customization"), QnAppInfo::customizationName());
 
-    QUrl url(QN_UPDATE_PACKAGE_URL + versionSuffix);
+    QUrl url(QnAppInfo::updateGeneratorUrl() + versionSuffix);
     url.setQuery(query);
 
     return url;
@@ -212,6 +210,11 @@ void QnMediaServerUpdateTool::startUpdate(const QString &fileName) {
     startUpdate(target);
 }
 
+void QnMediaServerUpdateTool::startOnlineClientUpdate(const QnSoftwareVersion &version) {
+    QnUpdateTarget target(QSet<QnUuid>(), version, !m_enableClientUpdates || qnSettings->isClientUpdateDisabled());
+    startUpdate(target);
+}
+
 bool QnMediaServerUpdateTool::cancelUpdate() {
     if (!m_updateProcess)
         return true;
@@ -234,7 +237,7 @@ void QnMediaServerUpdateTool::checkForUpdates(const QnUpdateTarget &target, std:
         connect(checkForUpdatesTask,  &QnCheckForUpdatesPeerTask::checkFinished,  this,  &QnMediaServerUpdateTool::checkForUpdatesFinished);
     connect(checkForUpdatesTask,  &QnNetworkPeerTask::finished,             checkForUpdatesTask, &QObject::deleteLater);
     QtConcurrent::run(checkForUpdatesTask, &QnCheckForUpdatesPeerTask::start);
-    //checkForUpdatesTask->start();
+    setTargets(QSet<QnUuid>(), defaultEnableClientUpdates);
 }
 
 
@@ -255,7 +258,6 @@ void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget &target) {
     connect(m_updateProcess, &QThread::finished, this, [this]{
         m_updateProcess->deleteLater();
         m_updateProcess = NULL;
-        setTargets(QSet<QnUuid>(), defaultEnableClientUpdates);
     });
 
     m_updateProcess->start();

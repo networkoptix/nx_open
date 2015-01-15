@@ -101,7 +101,9 @@ namespace ec2
         containsBecauseTimestamp, // transaction already in database
         containsBecauseSequence,  // transaction already in database
         //!Method is not implemented yet
-        notImplemented
+        notImplemented,
+        //!Connection to peer is impossible due to incompatible protocol
+        incompatiblePeer
     };
 
     QString toString( ErrorCode errorCode );
@@ -180,6 +182,7 @@ namespace ec2
             void emitListDirectoryDone( int reqID, const ErrorCode p1, const QStringList& p2 ) { emit onListDirectoryDone( reqID, p1, p2 ); }
             void emitCurrentTimeDone( int reqID, const ErrorCode p1, const qint64& p2 ) { emit onCurrentTimeDone( reqID, p1, p2 ); }
             void emitDumpDatabaseDone( int reqID, const ErrorCode p1, const ec2::ApiDatabaseDumpData& p2 ) { emit onDumpDatabaseDone( reqID, p1, p2 ); }
+            void emitGetDiscoveryDataDone( int reqID, const ErrorCode p1, const ApiDiscoveryDataList& p2 ) { emit onGetDiscoveryDataDone( reqID, p1, p2 ); }
             void emitTestConnectionDone( int reqID, const ErrorCode p1, const QnConnectionInfo& p2 ) { emit onTestConnectionDone( reqID, p1, p2 ); }
             void emitConnectDone( int reqID, const ErrorCode p1, const AbstractECConnectionPtr &p2 ) { emit onConnectDone( reqID, p1, p2 ); }
             void emitAddVideowallDone( int reqID, const ErrorCode p1, const QnVideoWallResourceList& p2 ) { emit onAddVideowallDone( reqID, p1, p2 ); }
@@ -215,6 +218,7 @@ namespace ec2
             void onListDirectoryDone( int reqID, const ErrorCode, const QStringList& );
             void onCurrentTimeDone( int reqID, const ErrorCode, const qint64& );
             void onDumpDatabaseDone( int reqID, const ErrorCode, const ec2::ApiDatabaseDumpData& );
+            void onGetDiscoveryDataDone( int reqID, const ErrorCode, const ApiDiscoveryDataList& );
             void onTestConnectionDone( int reqID, const ErrorCode, const QnConnectionInfo& );
             void onConnectDone( int reqID, const ErrorCode, const AbstractECConnectionPtr &);
             void onAddVideowallDone( int reqID, const ErrorCode, const QnVideoWallResourceList& );
@@ -298,6 +302,12 @@ namespace ec2
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER( GetStoredFile, ErrorCode, QByteArray )
         DEFINE_TWO_ARG_HANDLER( ListDirectory, ErrorCode, QStringList )
+
+
+        //////////////////////////////////////////////////////////
+        ///////// Handlers for AbstractDiscoveryManager
+        //////////////////////////////////////////////////////////
+        DEFINE_TWO_ARG_HANDLER( GetDiscoveryData, ErrorCode, ApiDiscoveryDataList )
 
 
         //////////////////////////////////////////////////////////

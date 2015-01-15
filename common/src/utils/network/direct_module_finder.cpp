@@ -12,6 +12,7 @@
 #include <utils/network/networkoptixmodulerevealcommon.h>
 #include <rest/server/json_rest_result.h>
 #include <common/common_module.h>
+#include <nx_ec/ec_proto_version.h>
 
 #include <utils/common/app_info.h>
 
@@ -20,7 +21,7 @@ namespace {
     const int defaultMaxConnections = 30;
     const int discoveryCheckIntervalMs = 60 * 1000;
     const int aliveCheckIntervalMs = 7 * 1000;
-    const int maxPingTimeoutMs = 12 * 1000;
+    const int maxPingTimeoutMs = 15 * 1000;
 
     QUrl trimmedUrl(const QUrl &url) {
         QUrl result;
@@ -76,7 +77,9 @@ void QnDirectModuleFinder::removeUrl(const QUrl &url, const QnUuid &id) {
         if (m_lastPingByUrl.take(locUrl) != 0) {
             QnUuid id = m_moduleByUrl.take(locUrl);
             NX_LOG(lit("QnDirectModuleFinder: Url %2 of the module %1 is removed.").arg(id.toString()).arg(locUrl.toString()), cl_logDEBUG1);
-            emit moduleUrlLost(m_foundModules.value(id), locUrl);
+            QnModuleInformation moduleInformation = m_foundModules.value(id);
+            emit moduleUrlLost(moduleInformation, locUrl);
+            emit moduleChanged(moduleInformation);
         }
     }
 }
@@ -90,7 +93,9 @@ void QnDirectModuleFinder::addIgnoredModule(const QUrl &url, const QnUuid &id) {
             m_lastPingByUrl.remove(locUrl);
             m_moduleByUrl.remove(locUrl);
             NX_LOG(lit("QnDirectModuleFinder: Url %2 of the module %1 is removed.").arg(id.toString()).arg(locUrl.toString()), cl_logDEBUG1);
-            emit moduleUrlLost(m_foundModules.value(id), locUrl);
+            QnModuleInformation moduleInformation = m_foundModules.value(id);
+            emit moduleUrlLost(moduleInformation, locUrl);
+            emit moduleChanged(moduleInformation);
         }
     }
 }
@@ -105,7 +110,9 @@ void QnDirectModuleFinder::addIgnoredUrl(const QUrl &url) {
     if (m_lastPingByUrl.take(locUrl) != 0) {
         QnUuid id = m_moduleByUrl.take(locUrl);
         NX_LOG(lit("QnDirectModuleFinder: Url %2 of the module %1 is removed.").arg(id.toString()).arg(locUrl.toString()), cl_logDEBUG1);
-        emit moduleUrlLost(m_foundModules.value(id), locUrl);
+        QnModuleInformation moduleInformation = m_foundModules.value(id);
+        emit moduleUrlLost(moduleInformation, locUrl);
+        emit moduleChanged(moduleInformation);
     }
 }
 
@@ -124,15 +131,20 @@ void QnDirectModuleFinder::start() {
 }
 
 void QnDirectModuleFinder::stop() {
-    m_discoveryCheckTimer->stop();
     m_aliveCheckTimer->stop();
-    m_requestQueue.clear();
-    m_activeRequests.clear();
+    pleaseStop();
+    //TODO #dklychkov this method looks redundant, or, maybe, some kind if wait is needed here?
 }
 
 void QnDirectModuleFinder::pleaseStop() {
+    //TODO #dklychkov shouldn't we call m_aliveCheckTimer->stop()?
     m_discoveryCheckTimer->stop();
     m_requestQueue.clear();
+    for( QnAsyncHttpClientReply* reply: m_activeRequests )
+    {
+        reply->asyncHttpClient()->terminate();
+        reply->deleteLater();
+    }
     m_activeRequests.clear();
 }
 
@@ -170,11 +182,16 @@ void QnDirectModuleFinder::activateRequests() {
         QUrl url = m_requestQueue.dequeue();
 
         nx_http::AsyncHttpClientPtr client = std::make_shared<nx_http::AsyncHttpClient>();
-        QnAsyncHttpClientReply *reply = new QnAsyncHttpClientReply(client, this);
-        connect(reply, &QnAsyncHttpClientReply::finished, this, &QnDirectModuleFinder::at_reply_finished);
+        std::unique_ptr<QnAsyncHttpClientReply> reply( new QnAsyncHttpClientReply(client, this) );
+        connect(reply.get(), &QnAsyncHttpClientReply::finished, this, &QnDirectModuleFinder::at_reply_finished);
 
-        m_activeRequests.insert(url);
-        client->doGet(url);
+        if (!client->doGet(url)) {
+            processFailedReply(trimmedUrl(url));
+            return;
+        }
+
+        Q_ASSERT_X( !m_activeRequests.contains(url), "Duplicate request issued", Q_FUNC_INFO );
+        m_activeRequests.insert(url, reply.release());
     }
 }
 
@@ -182,83 +199,93 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
     reply->deleteLater();
 
     QUrl url = reply->url();
-    if (!m_activeRequests.remove(url))
-        Q_ASSERT_X(0, "Reply that is not in the set of active requests has finished!", Q_FUNC_INFO);
+    const auto replyIter = m_activeRequests.find( url );
+    Q_ASSERT_X(replyIter != m_activeRequests.end(), "Reply that is not in the set of active requests has finished! (1)", Q_FUNC_INFO);
+    Q_ASSERT_X(replyIter.value() == reply, "Reply that is not in the set of active requests has finished! (2)", Q_FUNC_INFO);
+    if( replyIter != m_activeRequests.end() )
+        m_activeRequests.erase(replyIter);
 
     activateRequests();
 
     url = trimmedUrl(url);
 
-    if (!reply->isFailed()) {
-        QByteArray data = reply->data();
+    if (reply->isFailed()) {
+        processFailedReply(url);
+        return;
+    }
 
-        QnJsonRestResult result;
-        QJson::deserialize(data, &result);
-        QnModuleInformation moduleInformation;
-        QJson::deserialize(result.reply(), &moduleInformation);
+    QByteArray data = reply->data();
 
-        if (moduleInformation.id.isNull())
-            return;
+    QnJsonRestResult result;
+    QJson::deserialize(data, &result);
+    QnModuleInformation moduleInformation;
+    QJson::deserialize(result.reply(), &moduleInformation);
+    if (moduleInformation.protoVersion == 0)
+        moduleInformation.protoVersion = nx_ec::INITIAL_EC2_PROTO_VERSION;
 
-        if (moduleInformation.type != nxMediaServerId)
-            return;
+    if (moduleInformation.id.isNull())
+        return;
 
-        if (!m_compatibilityMode && moduleInformation.customization != QnAppInfo::customizationName())
-            return;
+    if (moduleInformation.type != nxMediaServerId)
+        return;
 
-        if (m_ignoredModules.contains(url, moduleInformation.id))
-            return;
+    if (!m_compatibilityMode && moduleInformation.customization != QnAppInfo::customizationName())
+        return;
 
-        if (m_ignoredUrls.contains(url))
-            return;
+    if (m_ignoredModules.contains(url, moduleInformation.id))
+        return;
 
-        QSet<QnUuid> expectedIds = QSet<QnUuid>::fromList(m_urls.values(url));
-        if (!expectedIds.isEmpty() && !expectedIds.contains(moduleInformation.id))
-            return;
+    if (m_ignoredUrls.contains(url))
+        return;
 
-        QnModuleInformation &oldModuleInformation = m_foundModules[moduleInformation.id];
-        qint64 &lastPing = m_lastPingByUrl[url];
-        QnUuid &moduleId = m_moduleByUrl[url];
+    QSet<QnUuid> expectedIds = QSet<QnUuid>::fromList(m_urls.values(url));
+    if (!expectedIds.isEmpty() && !expectedIds.contains(moduleInformation.id))
+        return;
 
-        moduleInformation.remoteAddresses.clear();
-        moduleInformation.remoteAddresses.insert(url.host());
-        moduleInformation.remoteAddresses.unite(oldModuleInformation.remoteAddresses);
+    QnModuleInformation &oldModuleInformation = m_foundModules[moduleInformation.id];
+    qint64 &lastPing = m_lastPingByUrl[url];
+    QnUuid &moduleId = m_moduleByUrl[url];
 
-        if (!moduleId.isNull() && moduleId != moduleInformation.id) {
-            QnModuleInformation &prevModuleInformation = m_foundModules[moduleId];
-            prevModuleInformation.remoteAddresses.remove(url.host());
-            NX_LOG(lit("QnDirectModuleFinder: Url %2 of the module %1 is lost.").arg(prevModuleInformation.id.toString()).arg(url.toString()), cl_logDEBUG1);
-            emit moduleChanged(prevModuleInformation);
-            emit moduleUrlLost(prevModuleInformation, url);
-            lastPing = 0;
-        }
-        moduleId = moduleInformation.id;
+    moduleInformation.remoteAddresses.clear();
+    moduleInformation.remoteAddresses.insert(url.host());
+    moduleInformation.remoteAddresses.unite(oldModuleInformation.remoteAddresses);
 
-        if (oldModuleInformation != moduleInformation) {
-            oldModuleInformation = moduleInformation;
-            emit moduleChanged(moduleInformation);
-        }
+    if (!moduleId.isNull() && moduleId != moduleInformation.id) {
+        QnModuleInformation &prevModuleInformation = m_foundModules[moduleId];
+        prevModuleInformation.remoteAddresses.remove(url.host());
+        NX_LOG(lit("QnDirectModuleFinder: Url %2 of the module %1 is lost.").arg(prevModuleInformation.id.toString()).arg(url.toString()), cl_logDEBUG1);
+        emit moduleUrlLost(prevModuleInformation, url);
+        emit moduleChanged(prevModuleInformation);
+        lastPing = 0;
+    }
+    moduleId = moduleInformation.id;
 
-        if (lastPing == 0) {
-            NX_LOG(lit("QnDirectModuleFinder: Url %2 of the module %1 is found.").arg(moduleInformation.id.toString()).arg(url.toString()), cl_logDEBUG1);
-            emit moduleUrlFound(moduleInformation, url);
-        }
+    if (oldModuleInformation != moduleInformation) {
+        oldModuleInformation = moduleInformation;
+        emit moduleChanged(moduleInformation);
+    }
 
-        lastPing = QDateTime::currentMSecsSinceEpoch();
-    } else {
-        QnUuid id = m_moduleByUrl.value(url);
-        if (id.isNull())
-            return;
+    if (lastPing == 0) {
+        NX_LOG(lit("QnDirectModuleFinder: Url %2 of the module %1 is found.").arg(moduleInformation.id.toString()).arg(url.toString()), cl_logDEBUG1);
+        emit moduleUrlFound(moduleInformation, url);
+    }
 
-        if (m_lastPingByUrl.value(url) + maxPingTimeoutMs < QDateTime::currentMSecsSinceEpoch()) {
-            m_moduleByUrl.remove(url);
-            m_lastPingByUrl.remove(url);
-            QnModuleInformation &moduleInformation = m_foundModules[id];
-            moduleInformation.remoteAddresses.remove(url.host());
-            NX_LOG(lit("QnDirectModuleFinder: Url %2 of the module %1 is lost.").arg(moduleInformation.id.toString()).arg(url.toString()), cl_logDEBUG1);
-            emit moduleChanged(moduleInformation);
-            emit moduleUrlLost(moduleInformation, url);
-        }
+    lastPing = QDateTime::currentMSecsSinceEpoch();
+}
+
+void QnDirectModuleFinder::processFailedReply(const QUrl &url) {
+    QnUuid id = m_moduleByUrl.value(url);
+    if (id.isNull())
+        return;
+
+    if (m_lastPingByUrl.value(url) + maxPingTimeoutMs < QDateTime::currentMSecsSinceEpoch()) {
+        m_moduleByUrl.remove(url);
+        m_lastPingByUrl.remove(url);
+        QnModuleInformation &moduleInformation = m_foundModules[id];
+        moduleInformation.remoteAddresses.remove(url.host());
+        NX_LOG(lit("QnDirectModuleFinder: Url %2 of the module %1 is lost.").arg(moduleInformation.id.toString()).arg(url.toString()), cl_logDEBUG1);
+        emit moduleUrlLost(moduleInformation, url);
+        emit moduleChanged(moduleInformation);
     }
 }
 

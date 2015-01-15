@@ -116,6 +116,7 @@ public:
     bool deleteBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark);
     bool getBookmarks(const QByteArray &cameraGuid, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);
     void initDone();
+    int getStorageIndex(const QnStorageResourcePtr& storage);
 signals:
     void noStoragesAvailable();
     void storageFailure(const QnResourcePtr &storageRes, QnBusiness::EventReason reason);

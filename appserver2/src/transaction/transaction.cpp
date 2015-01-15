@@ -46,7 +46,6 @@ namespace ec2
             REGISTER_COMMAND(removeResources),
             REGISTER_COMMAND(saveResource),
             REGISTER_COMMAND(removeResource),
-            REGISTER_COMMAND(setPanicMode),
             REGISTER_COMMAND(getFullInfo),
 
             REGISTER_COMMAND(saveCamera),
@@ -104,6 +103,7 @@ namespace ec2
             REGISTER_COMMAND(addStoredFile),
             REGISTER_COMMAND(updateStoredFile),
             REGISTER_COMMAND(removeStoredFile),
+            REGISTER_COMMAND(getStoredFiles),
 
             REGISTER_COMMAND(addLicenses),
             REGISTER_COMMAND(addLicense),
@@ -127,6 +127,7 @@ namespace ec2
             REGISTER_COMMAND(discoverPeer),
             REGISTER_COMMAND(addDiscoveryInformation),
             REGISTER_COMMAND(removeDiscoveryInformation),
+            REGISTER_COMMAND(getDiscoveryData),
 
             REGISTER_COMMAND(forcePrimaryTimeServer),
             REGISTER_COMMAND(broadcastPeerSystemTime),
@@ -138,7 +139,12 @@ namespace ec2
             REGISTER_COMMAND(dumpDatabase),
             REGISTER_COMMAND(restoreDatabase),
             REGISTER_COMMAND(updatePersistentSequence),
-            REGISTER_COMMAND(markLicenseOverflow)
+            REGISTER_COMMAND(dumpDatabaseToFile),
+
+            REGISTER_COMMAND(markLicenseOverflow),
+            REGISTER_COMMAND(getSettings),
+
+            REGISTER_COMMAND(getTransactionLog)
         };
 
         QString toString(Value val) 
@@ -185,7 +191,6 @@ namespace ec2
                 val == setResourceParam ||
                 val == removeResourceParam ||
                 val == removeResourceParams ||
-                val == setPanicMode ||
                 val == saveCamera ||
                 val == saveCameraUserAttributes ||
                 val == saveCameraUserAttributesList ||
@@ -218,6 +223,7 @@ namespace ec2
                 val == removeStoredFile ||
                 val == addDiscoveryInformation ||
                 val == removeDiscoveryInformation ||
+                val == getDiscoveryData ||
                 val == addLicense ||
                 val == addLicenses ||
                 val == removeLicense || 
@@ -233,8 +239,19 @@ namespace ec2
         return ++requestID;
     }
 
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction::PersistentInfo,    (json)(ubjson),   QnAbstractTransaction_PERSISTENT_Fields)
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction,                    (json)(ubjson),   QnAbstractTransaction_Fields)
-	
+    QString QnAbstractTransaction::toString() const
+    {
+        return lit("command=%1 time=%2 peer=%3 dbId=%4 dbSeq=%5")
+            .arg(ApiCommand::toString(command))
+            .arg(persistentInfo.timestamp)
+            .arg(peerID.toString())
+            .arg(persistentInfo.dbID.toString())
+            .arg(persistentInfo.sequence);
+    }
+    
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction::PersistentInfo,    (json)(ubjson)(xml)(csv_record),   QnAbstractTransaction_PERSISTENT_Fields)
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction,                    (json)(ubjson)(xml)(csv_record),   QnAbstractTransaction_Fields)
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ApiTransactionData,                    (json)(ubjson)(xml)(csv_record),   ApiTransactionDataFields)
+
 } // namespace ec2
 

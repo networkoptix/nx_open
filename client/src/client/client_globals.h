@@ -179,6 +179,7 @@ namespace Qn {
         AnalogWithoutLicenseOverlay,
         VideowallWithoutLicenseOverlay,
         ServerOfflineOverlay,
+        ServerUnauthorizedOverlay,
 
         OverlayCount
     };
@@ -246,9 +247,10 @@ namespace Qn {
         LightModeNoZoomWindows      = 0x0400,           /**< Disable zoom windows. */
 
         LightModeVideoWall          = LightModeNoSceneBackground | LightModeNoNotifications | LightModeNoShadows /*| LightModeNoAnimation*/,
-        LightModeFull               = 0xFFFFFFFF
+        LightModeFull               = 0x7FFFFFFF
 
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(LightModeFlag)
     Q_DECLARE_FLAGS(LightModeFlags, LightModeFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(LightModeFlags)
 
@@ -258,12 +260,10 @@ namespace Qn {
         LightSkin
     };
 
-    enum ClientBackground {
-        NoBackground,
-        DefaultBackground,
-        RainbowBackground,
-        CustomColorBackground,
-        ImageBackground
+    enum BackgroundAnimationMode {
+        DefaultAnimation,
+        RainbowAnimation,
+        CustomAnimation
     };
 
     enum ImageBehaviour {
@@ -276,15 +276,44 @@ namespace Qn {
 
 } // namespace Qn
 
-Q_DECLARE_METATYPE(Qn::ItemRole)
-Q_DECLARE_METATYPE(Qn::TimeMode)
-Q_DECLARE_METATYPE(Qn::ClientSkin)
-Q_DECLARE_METATYPE(Qn::ClientBackground)
-Q_DECLARE_METATYPE(Qn::ImageBehaviour)
-Q_DECLARE_METATYPE(Qn::NodeType)
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::ItemRole)(Qn::TimeMode)(Qn::NodeType), 
+    (metatype)
+    )
 
-QN_FUSION_DECLARE_FUNCTIONS(Qn::ClientSkin, (lexical))
-QN_FUSION_DECLARE_FUNCTIONS(Qn::ClientBackground, (lexical))
-QN_FUSION_DECLARE_FUNCTIONS(Qn::ImageBehaviour, (lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::ClientSkin)(Qn::BackgroundAnimationMode)(Qn::ImageBehaviour), 
+    (metatype)(lexical)(datastream)
+    )
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::LightModeFlags), 
+    (metatype)(numeric)
+    )
+
+//TODO: #GDM #2.4 move back to client_module_functions.cpp. See commit a0edb9aa5abede1b5c9ab1c9ce52cc912286d090.
+//Looks like problem is in gcc-4.8.1
+
+inline QDataStream &operator<<(QDataStream &stream, const Qn::BackgroundAnimationMode &value) {
+    return stream << static_cast<int>(value);                                   
+}
+
+inline QDataStream &operator>>(QDataStream &stream, Qn::BackgroundAnimationMode &value) {              
+    int tmp;                                                                    
+    stream >> tmp;                                                              
+    value = static_cast<Qn::BackgroundAnimationMode>(tmp);                                             
+    return stream;                                                              
+}
+
+inline QDataStream &operator<<(QDataStream &stream, const Qn::ImageBehaviour &value) {
+    return stream << static_cast<int>(value);                                   
+}
+
+inline QDataStream &operator>>(QDataStream &stream, Qn::ImageBehaviour &value) {              
+    int tmp;                                                                    
+    stream >> tmp;                                                              
+    value = static_cast<Qn::ImageBehaviour>(tmp);                                             
+    return stream;                                                              
+}
 
 #endif // QN_CLIENT_GLOBALS_H

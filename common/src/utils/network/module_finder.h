@@ -1,6 +1,8 @@
 #ifndef NETWORKOPTIXMODULEFINDER_H
 #define NETWORKOPTIXMODULEFINDER_H
 
+#include <memory>
+
 #include <QtCore/QHash>
 #include <QtNetwork/QHostAddress>
 
@@ -25,7 +27,7 @@ public:
 
     QList<QnModuleInformation> foundModules() const;
 
-    QnModuleInformation moduleInformation(const QString &moduleId) const;
+    QnModuleInformation moduleInformation(const QnUuid &moduleId) const;
 
     QnMulticastModuleFinder *multicastModuleFinder() const;
     QnDirectModuleFinder *directModuleFinder() const;
@@ -50,17 +52,15 @@ private slots:
     void at_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &url);
     void at_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &url);
     void at_moduleChanged(const QnModuleInformation &moduleInformation);
-    //void at_resourcePool_resourceChanged(const QnResourcePtr &resource);
 
 private:
-    QnMulticastModuleFinder *m_multicastModuleFinder;
+    std::unique_ptr<QnMulticastModuleFinder> m_multicastModuleFinder;
     QnDirectModuleFinder *m_directModuleFinder;
     QnModuleFinderHelper *m_directModuleFinderHelper;
 
     QHash<QnUuid, QnModuleInformation> m_foundModules;
     QMultiHash<QnUuid, QUrl> m_multicastFoundUrls;
     QMultiHash<QnUuid, QUrl> m_directFoundUrls;
-    QList<QnUuid> m_allowedPeers;
 };
 
 #endif  //NETWORKOPTIXMODULEFINDER_H

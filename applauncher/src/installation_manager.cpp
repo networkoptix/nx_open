@@ -9,10 +9,9 @@
 #include <QtCore/QDir>
 #include <QtCore/QRegExp>
 
+#include <utils/common/app_info.h>
 #include <utils/common/log.h>
 #include <utils/update/zip_utils.h>
-
-#include <utils/common/app_info.h>
 
 
 namespace {
@@ -40,6 +39,16 @@ QString InstallationManager::defaultDirectoryForInstallations()
         defaultDirectoryForNewInstallations += QString::fromLatin1("/%1/%2/client/%3/").arg(installationPathPrefix, QnAppInfo::organizationName(), QnAppInfo::customizationName());
 
     return defaultDirectoryForNewInstallations;
+}
+
+void InstallationManager::removeInstallation(const QnSoftwareVersion &version)
+{
+    QDir installationDir = installationDirForVersion(version);
+    if (installationDir.exists())
+        installationDir.removeRecursively();
+
+    std::unique_lock<std::mutex> lock(m_mutex);
+    m_installationByVersion.remove(version);
 }
 
 InstallationManager::InstallationManager(QObject *parent): QObject(parent)
@@ -84,6 +93,9 @@ void InstallationManager::updateInstalledVersionsInformation()
         if (installation.isNull())
             continue;
 
+        if (!installation->verify())
+            continue;
+
         installation->setVersion(QnSoftwareVersion(entry));
         installations.insert(installation->version(), installation);
 
@@ -91,7 +103,7 @@ void InstallationManager::updateInstalledVersionsInformation()
     }
 
     std::unique_lock<std::mutex> lk(m_mutex);
-    m_installationByVersion = installations;
+    m_installationByVersion = std::move(installations);
     lk.unlock();
 
     createGhosts();
@@ -235,6 +247,16 @@ QnClientInstallationPtr InstallationManager::installationForVersion(const QnSoft
     std::unique_lock<std::mutex> lk( m_mutex );
     QnClientInstallationPtr installation = m_installationByVersion.value(version);
     lk.unlock();
+
+    if( !installation )
+    {
+        //maybe installation is actually there but we do not know about it?
+            //scanning dir once again
+        const_cast<InstallationManager*>(this)->updateInstalledVersionsInformation();
+
+        std::unique_lock<std::mutex> lk( m_mutex );
+        installation = m_installationByVersion.value(version);
+    }
 
     if (installation)
         return installation;

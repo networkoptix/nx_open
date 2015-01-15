@@ -279,10 +279,10 @@ bool QnAviArchiveDelegate::open(const QnResourcePtr &resource)
     QMutexLocker lock(&m_openMutex); // need refactor. Now open may be called from UI thread!!!
 
     m_resource = resource;
-    if (m_formatContext == 0 && m_resource->getStatus() != Qn::Offline)
+    if (m_formatContext == 0)
     {
         m_eofReached = false;
-        QString url = m_resource->getUrl(); // "c:/00-1A-07-03-BD-09.mkv"; //
+        QString url = m_resource->getUrl();
         if (m_storage == 0) {
             m_storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(url));
             if(!m_storage)
@@ -306,7 +306,7 @@ bool QnAviArchiveDelegate::open(const QnResourcePtr &resource)
         
         getVideoLayout();
     }
-
+    m_resource->setStatus(Qn::Online);
     return m_initialized;
 }
 
@@ -409,17 +409,17 @@ QnResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
                 }
             }
 
-            AVDictionaryEntry* dewarpInfo = av_dict_get(m_formatContext->metadata,getTagName(DewarpingTag, format), 0, 0);
-            if (dewarpInfo) {
-                QnMediaResourcePtr mediaRes = m_resource.dynamicCast<QnMediaResource>();
-                if (mediaRes)
+            QnMediaResourcePtr mediaRes = m_resource.dynamicCast<QnMediaResource>();
+            if (mediaRes) {
+                AVDictionaryEntry* dewarpInfo = av_dict_get(m_formatContext->metadata,getTagName(DewarpingTag, format), 0, 0);
+                if (dewarpInfo)
                     mediaRes->setDewarpingParams(QnMediaDewarpingParams::deserialized(dewarpInfo->value));
-            }
 
-            AVDictionaryEntry* customInfo = av_dict_get(m_formatContext->metadata,getTagName(CustomTag, format), 0, 0);
-            if (customInfo) {
-                QnAviArchiveCustomData data = QJson::deserialized<QnAviArchiveCustomData>(customInfo->value);
-                m_resource->setProperty(QnMediaResource::customAspectRatioKey(), QString::number(data.overridenAr));
+                AVDictionaryEntry* customInfo = av_dict_get(m_formatContext->metadata,getTagName(CustomTag, format), 0, 0);
+                if (customInfo) {
+                    QnAviArchiveCustomData data = QJson::deserialized<QnAviArchiveCustomData>(customInfo->value);
+                    mediaRes->setCustomAspectRatio(data.overridenAr);
+                }
             }
 
         }

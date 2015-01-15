@@ -6,34 +6,44 @@
 #include <QFile>
 #include <QSqlError>
 
+//TODO #AK QnDbTransaction is a bad name for this class since it actually lives beyond DB transaction 
+    //and no concurrent transactions supported. Maybe QnDbConnection?
 QnDbHelper::QnDbTransaction::QnDbTransaction(QSqlDatabase& database, QReadWriteLock& mutex): 
     m_database(database),
     m_mutex(mutex)
 {
-
 }
 
-void QnDbHelper::QnDbTransaction::beginTran()
+QnDbHelper::QnDbTransaction::~QnDbTransaction()
+{
+}
+
+bool QnDbHelper::QnDbTransaction::beginTran()
 {
     m_mutex.lockForWrite();
-    QSqlQuery query(m_database);
-    query.exec(lit("BEGIN TRANSACTION"));
+    if( !m_database.transaction() )
+    {
+        //TODO #ak ignoring this error since calling party thinks it always succeeds
+        //m_mutex.unlock();
+        //return false;
+    }
+    return true;
 }
 
 void QnDbHelper::QnDbTransaction::rollback()
 {
-    QSqlQuery query(m_database);
-    query.exec(lit("ROLLBACK"));
+    m_database.rollback();
+    //TODO #ak handle rollback error?
     m_mutex.unlock();
 }
 
 bool QnDbHelper::QnDbTransaction::commit()
 {
-    QSqlQuery query(m_database);
-    bool rez = query.exec(lit("COMMIT"));
-    if (!rez)
-        qWarning() << "Commit failed:" << query.lastError();
-    m_mutex.unlock();
+    bool rez = m_database.commit();
+    if (rez)
+        m_mutex.unlock();
+    else
+        qWarning() << "Commit failed:" << m_database.lastError(); // do not unlock mutex. Rollback is expected
     return rez;
 }
 
@@ -52,14 +62,16 @@ QnDbHelper::QnDbTransactionLocker::~QnDbTransactionLocker()
 
 bool QnDbHelper::QnDbTransactionLocker::commit()
 {
-    m_committed = true;
-    return m_tran->commit();
+    m_committed = m_tran->commit();
+    return m_committed;
 }
 
+QnDbHelper::QnDbHelper()
+{
 
+}
 
-QnDbHelper::QnDbHelper():
-    m_tran(m_sdb, m_mutex)
+QnDbHelper::~QnDbHelper()
 {
 
 }
@@ -127,16 +139,6 @@ bool QnDbHelper::execSQLFile(const QString& fileName, QSqlDatabase& database)
     return true;
 }
 
-QnDbHelper::QnDbTransaction* QnDbHelper::getTransaction()
-{
-    return &m_tran;
-}
-
-const QnDbHelper::QnDbTransaction* QnDbHelper::getTransaction() const
-{
-    return &m_tran;
-}
-
 bool QnDbHelper::isObjectExists(const QString& objectType, const QString& objectName, QSqlDatabase& database)
 {
     QSqlQuery tableList(database);
@@ -150,21 +152,6 @@ bool QnDbHelper::isObjectExists(const QString& objectType, const QString& object
         return false;
     QString value = tableList.value(fieldNo).toString();
     return !value.isEmpty();
-}
-
-void QnDbHelper::beginTran()
-{
-    m_tran.beginTran();
-}
-
-void QnDbHelper::rollback()
-{
-    m_tran.rollback();
-}
-
-void QnDbHelper::commit()
-{
-    m_tran.commit();
 }
 
 void QnDbHelper::addDatabase(const QString& fileName, const QString& dbname)

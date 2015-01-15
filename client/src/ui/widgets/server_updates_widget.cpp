@@ -10,8 +10,10 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
+#include <client/client_message_processor.h>
 
 #include <ui/common/palette.h>
+#include <ui/common/ui_resource_name.h>
 #include <ui/models/sorted_server_updates_model.h>
 #include <ui/dialogs/file_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
@@ -33,7 +35,9 @@ namespace {
 
     const int tooLateDayOfWeek = Qt::Thursday;
 
-    const int autoCheckIntervalMs = 5 * 60 * 1000;  // 5 minutes
+    const int autoCheckIntervalMs = 60 * 60 * 1000;  // 1 hour
+
+    const int maxLabelWidth = 400; // pixels
 }
 
 QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
@@ -43,7 +47,8 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     m_latestVersion(qnCommon->engineVersion()),
     m_checkingInternet(false),
     m_checkingLocal(false),
-    m_longUpdateWarningTimer(new QTimer(this))
+    m_longUpdateWarningTimer(new QTimer(this)),
+    m_lastAutoUpdateCheck(0)
 {
     ui->setupUi(this);
 
@@ -123,7 +128,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
         if (!m_targetVersion.isNull())
             return;
 
-        checkForUpdatesInternet();
+        autoCheckForUpdatesInternet();
     });
     updateTimer->start();
 
@@ -131,7 +136,15 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     m_longUpdateWarningTimer->setSingleShot(true);
     connect(m_longUpdateWarningTimer, &QTimer::timeout, ui->longUpdateWarning, &QLabel::show);
 
+    connect(qnResPool, &QnResourcePool::statusChanged, this, [this] (const QnResourcePtr &resource) {
+        if (!resource->hasFlags(Qn::server))
+            return;
+
+        ui->linkLineEdit->setText(m_updateTool->generateUpdatePackageUrl(m_targetVersion).toString());
+    });
+
     at_tool_stageChanged(QnFullUpdateStage::Init);
+    checkForUpdatesInternet(true);
 }
 
 
@@ -252,10 +265,7 @@ QnMediaServerUpdateTool *QnServerUpdatesWidget::updateTool() const {
 }
 
 void QnServerUpdatesWidget::updateFromSettings() {
-    if (!m_updateTool->idle())
-        return;
-
-    checkForUpdatesInternet(true);
+    //do nothing
 }
 
 bool QnServerUpdatesWidget::confirm() {
@@ -290,16 +300,23 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
 
                 if (clientUpdated) {
                     message += lit("\n");
-                    if (result.clientInstallerRequired)
-                        message += tr("Now you have to update the client using an installer.");
-                    else
+                    if (result.clientInstallerRequired) {
+#ifdef Q_OS_MAC
+                        message += tr("Now you have to update the client manually.");
+#else
+                        message += tr("Now you have to update the client manually using an installer.");
+#endif
+                    } else {
                         message += tr("The client will be restarted to the updated version.");
+                    }
                 }
 
                 QMessageBox::information(this, tr("Update is successful"), message);
 
+                bool unholdConnection = !clientUpdated || result.clientInstallerRequired;
                 if (clientUpdated && !result.clientInstallerRequired) {
-                    if (!applauncher::restartClient(result.targetVersion) == applauncher::api::ResultType::ok) {
+                    if (applauncher::restartClient(result.targetVersion) != applauncher::api::ResultType::ok) {
+                        unholdConnection = true;
                         QMessageBox::critical(this,
                             tr("Launcher process is not found"),
                             tr("Cannot restart the client.\n"
@@ -309,6 +326,9 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
                         applauncher::scheduleProcessKill(QCoreApplication::applicationPid(), processTerminateTimeout);
                     }
                 }
+
+                if (unholdConnection)
+                    qnClientMessageProcessor->setHoldConnection(false);
             }
             break;
         case QnUpdateResult::Cancelled:
@@ -323,11 +343,40 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
         case QnUpdateResult::DownloadingFailed_NoFreeSpace:
             QMessageBox::critical(this, tr("Update failed"), tr("Could not download updates.") + lit("\n") + tr("No free space left on the disk."));
             break;
-        case QnUpdateResult::UploadingFailed:
-            QMessageBox::critical(this, tr("Update failed"), tr("Could not push updates to servers."));
+        case QnUpdateResult::UploadingFailed: {
+            QString message = tr("Could not push updates to servers.");
+            if (!result.failedPeers.isEmpty()) {
+                message += lit("\n");
+                message += tr("The problem is caused by %n servers:", "", result.failedPeers.size());
+                message += lit("\n");
+                message += serverNamesString(result.failedPeers);
+            }
+            QMessageBox::critical(this, tr("Update failed"), message);
             break;
+        }
         case QnUpdateResult::UploadingFailed_NoFreeSpace:
-            QMessageBox::critical(this, tr("Update failed"), tr("Could not push updates to servers.") + lit("\n") + tr("No free space left on the server."));
+            QMessageBox::critical(this, tr("Update failed"),
+                                  tr("Could not push updates to servers.") +
+                                  lit("\n") +
+                                  tr("No free space left on %n servers:", "", result.failedPeers.size()) +
+                                  lit("\n") +
+                                  serverNamesString(result.failedPeers));
+            break;
+        case QnUpdateResult::UploadingFailed_Timeout:
+            QMessageBox::critical(this, tr("Update failed"),
+                                  tr("Could not push updates to servers.") +
+                                  lit("\n") +
+                                  tr("%n servers are not responding:", "", result.failedPeers.size()) +
+                                  lit("\n") +
+                                  serverNamesString(result.failedPeers));
+            break;
+        case QnUpdateResult::UploadingFailed_Offline:
+            QMessageBox::critical(this, tr("Update failed"),
+                                  tr("Could not push updates to servers.") +
+                                  lit("\n") +
+                                  tr("%n servers have gone offline:", "", result.failedPeers.size()) +
+                                  lit("\n") +
+                                  serverNamesString(result.failedPeers));
             break;
         case QnUpdateResult::ClientInstallationFailed:
             QMessageBox::critical(this, tr("Update failed"), tr("Could not install an update to the client."));
@@ -346,10 +395,18 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
         ui->internetUpdateButton->setEnabled(canUpdate);
 }
 
+void QnServerUpdatesWidget::autoCheckForUpdatesInternet() {
+    qint64 now = QDateTime::currentMSecsSinceEpoch();
+    if (now - m_lastAutoUpdateCheck < autoCheckIntervalMs)
+        return;
+    checkForUpdatesInternet();
+}
+
 void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch, bool autoStart) {
     if (m_checkingInternet || !m_updateTool->idle())
         return;
     m_checkingInternet = true;
+    m_lastAutoUpdateCheck = QDateTime::currentMSecsSinceEpoch();
 
     ui->internetUpdateButton->setEnabled(false);
     ui->latestBuildLabel->setEnabled(false);
@@ -452,8 +509,15 @@ void QnServerUpdatesWidget::checkForUpdatesLocal() {
 
         switch (result.result) {
         case QnCheckForUpdateResult::UpdateFound:
-            if (!result.latestVersion.isNull() && result.clientInstallerRequired)
-                detail = tr("Newer version found. You will have to update the client manually using an installer.");
+            if (!result.latestVersion.isNull() && result.clientInstallerRequired) {
+                detail = tr("Newer version found.");
+                detail += lit("\n");
+#ifdef Q_OS_MAC
+                detail += tr("You will have to update the client manually.");
+#else
+                detail += tr("You will have to update the client manually using an installer.");
+#endif
+            }
             break;
         case QnCheckForUpdateResult::NoNewerVersion:
             detail = tr("All components in your system are up to date.");
@@ -578,4 +642,22 @@ void QnServerUpdatesWidget::at_tool_stageProgressChanged(QnFullUpdateStage stage
     }
     ui->updateProgessBar->setValue(value);
     ui->updateProgessBar->setFormat(status.arg(value));
+}
+
+QString QnServerUpdatesWidget::serverNamesString(const QSet<QnUuid> &serverIds) {
+    QString result;
+
+    for (const QnUuid &id: serverIds) {
+        QnMediaServerResourcePtr server = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>();
+        if (!server)
+            continue;
+
+        if (!result.isEmpty())
+            result += lit("\n");
+
+        QString name = getResourceName(server);
+        result.append(fontMetrics().elidedText(name, Qt::ElideMiddle, maxLabelWidth));
+    }
+
+    return result;
 }

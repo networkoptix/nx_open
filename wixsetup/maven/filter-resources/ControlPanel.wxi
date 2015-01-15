@@ -1,10 +1,10 @@
 <Include>
-  <Property Id="ARPCOMMENTS" Value="${company.name} ${product.name}" />
+  <Property Id="ARPCOMMENTS" Value="${company.name} [ProductName]" />
   <Property Id="ARPCONTACT" Value="${company.url}" />
   <Property Id="ARPPRODUCTICON" Value="eve_logo.ico" />
   <Property Id="ARPHELPLINK" Value="${product.url}" />
   <Property Id="ARPREADME" Value="${product.url}" />
-  <Property Id="ARPURLINFOABOUT" Value="${company.name} ${product.name}" />
+  <Property Id="ARPURLINFOABOUT" Value="${company.name} [ProductName]" />
   <Property Id="ARPURLUPDATEINFO" Value="${product.url}" />
   <Property Id="ARPHELPTELEPHONE" Value="${company.url}" />
   <Property Id="ARPAUTHORIZEDCDFPREFIX" Value="${company.url}" />
@@ -15,6 +15,7 @@
 -->  
   
   <Property Id="ARPNOREPAIR" Value="1" />    
+  <Property Id="ARPNOMODIFY" Value="1" />    
 
   <Icon Id="eve_logo.ico" SourceFile="Binary\eve\eve_logo.ico"/>
 

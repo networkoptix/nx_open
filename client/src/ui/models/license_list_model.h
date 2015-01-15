@@ -21,6 +21,7 @@ public:
         LicenseKeyColumn,
         ExpirationDateColumn,
         LicenseStatusColumn,
+        ServerColumn,
         ColumnCount
     };
 

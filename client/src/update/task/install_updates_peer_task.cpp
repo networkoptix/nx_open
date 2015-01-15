@@ -4,13 +4,18 @@
 
 #include <api/app_server_connection.h>
 #include <nx_ec/ec_api.h>
+#include <nx_ec/ec_proto_version.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <client/client_message_processor.h>
+#include <common/common_module.h>
+#include <utils/common/delete_later.h>
 
 namespace {
     const int checkTimeout = 15 * 60 * 1000;
+    const int startPingTimeout = 1 * 60 * 1000;
+    const int pingInterval = 10 * 1000;
     const int shortTimeout = 60 * 1000;
 
     ec2::AbstractECConnectionPtr connection2() {
@@ -19,12 +24,16 @@ namespace {
 }
 
 QnInstallUpdatesPeerTask::QnInstallUpdatesPeerTask(QObject *parent) :
-    QnNetworkPeerTask(parent)
+    QnNetworkPeerTask(parent),
+    m_protoProblemDetected(false)
 {
     m_checkTimer = new QTimer(this);
     m_checkTimer->setSingleShot(true);
 
-    connect(m_checkTimer,   &QTimer::timeout,                       this,           &QnInstallUpdatesPeerTask::at_checkTimeout);
+    m_pingTimer = new QTimer(this);
+
+    connect(m_checkTimer,   &QTimer::timeout,                       this,           &QnInstallUpdatesPeerTask::at_checkTimer_timeout);
+    connect(m_pingTimer,    &QTimer::timeout,                       this,           &QnInstallUpdatesPeerTask::at_pingTimer_timeout);
     connect(this,           &QnInstallUpdatesPeerTask::finished,    m_checkTimer,   &QTimer::stop);
 }
 
@@ -36,21 +45,34 @@ void QnInstallUpdatesPeerTask::setVersion(const QnSoftwareVersion &version) {
     m_version = version;
 }
 
+void QnInstallUpdatesPeerTask::finish(int errorCode) {
+    qnResPool->disconnect(this);
+    m_ecConnection.reset();
+    /* There's no need to unhold connection now if we can't connect to the server */
+    if (!m_protoProblemDetected)
+        qnClientMessageProcessor->setHoldConnection(false);
+    QnNetworkPeerTask::finish(errorCode);
+}
+
 void QnInstallUpdatesPeerTask::doStart() {
     if (peers().isEmpty()) {
         finish(NoError);
         return;
     }
 
+    m_ecServer = qnResPool->getResourceById(qnCommon->remoteGUID()).dynamicCast<QnMediaServerResource>();
+
     connect(qnResPool, &QnResourcePool::resourceChanged, this, &QnInstallUpdatesPeerTask::at_resourceChanged);
 
     m_stoppingPeers = m_restartingPeers = m_pendingPeers = peers();
 
-    static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance())->setHoldConnection(true);
+    m_protoProblemDetected = false;
+    qnClientMessageProcessor->setHoldConnection(true);
 
     connection2()->getUpdatesManager()->installUpdate(m_updateId, m_pendingPeers,
                                                       this, [this](int, ec2::ErrorCode){});
     m_checkTimer->start(checkTimeout);
+    m_pingTimer->start(startPingTimeout);
 
     int peersSize = m_pendingPeers.size();
 
@@ -87,6 +109,10 @@ void QnInstallUpdatesPeerTask::doStart() {
 void QnInstallUpdatesPeerTask::at_resourceChanged(const QnResourcePtr &resource) {
     QnUuid peerId = resource->getId();
 
+    /* Stop ping timer if the main server has appeared online */
+    if (resource->getId() == m_ecServer->getId() && !m_stoppingPeers.contains(peerId) && resource->getStatus() == Qn::Online)
+        m_pingTimer->stop();
+
     if (!m_pendingPeers.contains(peerId))
         return;
 
@@ -116,7 +142,7 @@ void QnInstallUpdatesPeerTask::at_resourceChanged(const QnResourcePtr &resource)
     }
 }
 
-void QnInstallUpdatesPeerTask::at_checkTimeout() {
+void QnInstallUpdatesPeerTask::at_checkTimer_timeout() {
     foreach (const QnUuid &id, m_pendingPeers) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
         if (server->getVersion() == m_version) {
@@ -128,8 +154,32 @@ void QnInstallUpdatesPeerTask::at_checkTimeout() {
     finish(m_pendingPeers.isEmpty() ? NoError : InstallationFailed);
 }
 
-void QnInstallUpdatesPeerTask::finish(int errorCode) {
-    qnResPool->disconnect(this);
-    static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance())->setHoldConnection(false);
-    QnNetworkPeerTask::finish(errorCode);
+void QnInstallUpdatesPeerTask::at_pingTimer_timeout() {
+    m_pingTimer->setInterval(pingInterval);
+
+    if (!m_ecConnection)
+        m_ecConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(m_ecServer.data(), QnUuid(), true), &qnDeleteLater);
+
+    m_ecConnection->modulesInformation(this, SLOT(at_gotModuleInformation(int,QList<QnModuleInformation>,int)));
+}
+
+void QnInstallUpdatesPeerTask::at_gotModuleInformation(int status, const QList<QnModuleInformation> &modules, int handle) {
+    Q_UNUSED(handle)
+
+    if (status != 0)
+        return;
+
+    for (const QnModuleInformation &moduleInformation: modules) {
+        QnMediaServerResourcePtr server = qnResPool->getResourceById(moduleInformation.id).dynamicCast<QnMediaServerResource>();
+        if (!server)
+            continue;
+
+        if (moduleInformation.protoVersion != nx_ec::EC2_PROTO_VERSION)
+            m_protoProblemDetected = true;
+
+        if (server->getVersion() != moduleInformation.version) {
+            server->setVersion(moduleInformation.version);
+            at_resourceChanged(server);
+        }
+    }
 }

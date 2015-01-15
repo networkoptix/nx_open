@@ -61,11 +61,14 @@ void CLServerPushStreamReader::run()
         if (!isStreamOpened())
         {
             m_FrameCnt = 0;
-
-            if (!m_resource->isInitialized())
-                m_openStreamResult = CameraDiagnostics::InitializationInProgress();
+            CameraDiagnostics::Result openStreamResult;
+            if (!m_resource->isInitialized()) {
+                openStreamResult = CameraDiagnostics::InitializationInProgress();
+                if (m_openStreamResult == CameraDiagnostics::NoErrorResult())
+                    m_openStreamResult = openStreamResult;
+            }
             else
-                m_openStreamResult = openStream();
+                m_openStreamResult = openStreamResult = openStream();
 
             {
                 QMutexLocker lk( &m_openStreamMutex );
@@ -80,7 +83,7 @@ void CLServerPushStreamReader::run()
 
                 setNeedKeyData();
 
-                if (m_openStreamResult.errorCode != CameraDiagnostics::ErrorCode::cameraInitializationInProgress)
+                if (openStreamResult.errorCode != CameraDiagnostics::ErrorCode::cameraInitializationInProgress)
                 {
                     mFramesLost++;
                     m_stat[0].onData(0);

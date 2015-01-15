@@ -1,9 +1,9 @@
-
 #include "camera_advanced_settings_xml_parser.h"
 
 #include <QtCore/QDebug>
 
-#include "ui/widgets/properties/camera_advanced_settings_widget.h"
+//TODO: #GDM WTF! using gui from utils
+#include "ui/widgets/properties/camera_advanced_settings_widgets.h"
 
 
 const QString CASXP_IMAGING_GROUP_NAME(QLatin1String("%%Imaging"));
@@ -13,8 +13,12 @@ const QString CASXP_MAINTENANCE_GROUP_NAME(QLatin1String("%%Maintenance"));
 // class CameraSettingsLister
 //
 
-CameraSettingsLister::CameraSettingsLister(const QString& id, ParentOfRootElemFoundAware& obj):
-    CameraSettingReader(id),
+CameraSettingsLister::CameraSettingsLister(
+    const QString& id,
+    ParentOfRootElemFoundAware& obj,
+    const QnResourcePtr& cameraRes )
+:
+    CameraSettingReader(id, cameraRes),
     m_obj(obj)
 {
 
@@ -72,11 +76,18 @@ void CameraSettingsLister::parentOfRootElemFound(const QString& parentId)
 // class CameraSettingsWidgetsCreator
 //
 
-CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& id, ParentOfRootElemFoundAware& obj, QTreeWidget& rootWidget, QStackedLayout& rootLayout,
-        TreeWidgetItemsById& widgetsById, LayoutIndById& layoutIndById, SettingsWidgetsById& settingsWidgetsById, EmptyGroupsById& emptyGroupsById):
+CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(
+    const QString& id,
+    ParentOfRootElemFoundAware& obj,
+    QTreeWidget* rootWidget,
+    QStackedLayout* rootLayout,
+    TreeWidgetItemsById& widgetsById,
+    LayoutIndById& layoutIndById,
+    SettingsWidgetsById& settingsWidgetsById,
+    EmptyGroupsById& emptyGroupsById )
+:
     CameraSettingReader(id),
     m_obj(obj),
-    m_settings(0),
     m_rootWidget(rootWidget),
     m_rootLayout(rootLayout),
     m_treeWidgetsById(widgetsById),
@@ -85,8 +96,7 @@ CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& id, Pa
     m_emptyGroupsById(emptyGroupsById),
     m_owner(0)
 {
-    connect(&m_rootWidget, SIGNAL(itemPressed(QTreeWidgetItem*, int)), this,   SLOT(treeWidgetItemPressed(QTreeWidgetItem*, int)));
-    connect(&m_rootWidget, SIGNAL(itemSelectionChanged()), this,   SLOT(treeWidgetItemSelectionChanged()));
+    connect(m_rootWidget, &QTreeWidget::itemSelectionChanged, this, &CameraSettingsWidgetsCreator::treeWidgetItemSelectionChanged );
 }
 
 CameraSettingsWidgetsCreator::~CameraSettingsWidgetsCreator()
@@ -101,35 +111,36 @@ void CameraSettingsWidgetsCreator::removeLayoutItems()
         QObjectList children = m_owner->children();
         for (int i = 0; i < children.count(); ++i)
         {
-            m_rootLayout.removeWidget(static_cast<QnSettingsScrollArea*>(children[i]));
+            m_rootLayout->removeWidget(static_cast<QnSettingsScrollArea*>(children[i]));
         }
         delete m_owner;
         m_owner = 0;
     }
 }
 
-bool CameraSettingsWidgetsCreator::proceed(CameraSettings& settings)
+bool CameraSettingsWidgetsCreator::proceed(CameraSettings &settings)
 {
-    m_settings = &settings;
+    m_settings = settings;
 
-    return read() && CameraSettingReader::proceed();
+    bool result = read() && CameraSettingReader::proceed();
+    if (result)
+        setupWidgetDependencies();
+
+    return result;
 }
 
-bool CameraSettingsWidgetsCreator::isGroupEnabled(const QString& id, const QString& parentId, const QString& name)
-{
-    if (m_treeWidgetsById.find(id) != m_treeWidgetsById.end()) {
+bool CameraSettingsWidgetsCreator::isGroupEnabled(const QString& id, const QString& parentId, const QString& name) {
+    if (m_treeWidgetsById.contains(id))
         return true;
-    }
 
-    if (m_settings->find(id) != m_settings->end()) {
+    if (m_settings.contains(id)) {
         //By default, group is enabled. It can be disabled by mediaserver
         //Disabled - means empty value. Group can have only empty value, so 
         //if we found it - it is disabled
         return false;
     }
 
-    if (m_emptyGroupsById.find(id) == m_emptyGroupsById.end())
-    {
+    if (!m_emptyGroupsById.contains(id)) {
         QTreeWidgetItem* item = new QTreeWidgetItem((QTreeWidget*)0, QStringList(name));
         item->setData(0, Qt::UserRole, 0);
         m_emptyGroupsById.insert(id, new WidgetAndParent(item, parentId));
@@ -138,73 +149,17 @@ bool CameraSettingsWidgetsCreator::isGroupEnabled(const QString& id, const QStri
     return true;
 }
 
-bool CameraSettingsWidgetsCreator::isEnabledByOtherSettings(const QString& id, const QString& /*parentId*/)
-{
-    //ToDo: remove hardcode
-    if (!getCameraId().startsWith(lit("DIGITALWATCHDOG"))) {
-        return true;
-    }
-
-    if (id == lit("%%Imaging%%White Balance%%Kelvin") ||
-        id == lit("%%Imaging%%White Balance%%Red") ||
-        id == lit("%%Imaging%%White Balance%%Blue") )
-    {
-        CameraSettings::Iterator settingIt = m_settings->find(lit("%%Imaging%%White Balance%%Mode"));
-        QString val = settingIt != m_settings->end() ? static_cast<QString>(settingIt.value()->getCurrent()) : QString();
-        if (val == lit("MANUAL")) {
-            return true;
-        }
-        return false;
-    }
-
-    if (id == lit("%%Imaging%%Exposure%%Shutter Speed") )
-    {
-        CameraSettings::Iterator settingIt = m_settings->find(lit("%%Imaging%%Exposure%%Shutter Mode"));
-        QString val = settingIt != m_settings->end() ? static_cast<QString>(settingIt.value()->getCurrent()) : QString();
-        if (val == lit("MANUAL")) {
-            return true;
-        }
-        return false;
-    }
-
-    if (id == lit("%%Imaging%%Day & Night%%Switching from Color to B/W") ||
-        id == lit("%%Imaging%%Day & Night%%Switching from B/W to Color") )
-    {
-        CameraSettings::Iterator settingIt = m_settings->find(lit("%%Imaging%%Day & Night%%Mode"));
-        QString val = settingIt != m_settings->end() ? static_cast<QString>(settingIt.value()->getCurrent()) : QString();
-        if (val == lit("AUTO")) {
-            return true;
-        }
-        return false;
-    }
-
-    return true;
-}
-
-bool CameraSettingsWidgetsCreator::isParamEnabled(const QString& id, const QString& parentId)
-{
-    bool enabled = isEnabledByOtherSettings(id, parentId);
-
+bool CameraSettingsWidgetsCreator::isParamEnabled(const QString& id, const QString& parentId) {
+    Q_UNUSED(parentId);
     SettingsWidgetsById::Iterator swbiIt = m_settingsWidgetsById.find(id);
-    if (swbiIt != m_settingsWidgetsById.end())
-    {
-        if (enabled) {
-            swbiIt.value()->refresh();
-        } else {
-            delete swbiIt.value();
-            m_settingsWidgetsById.erase(swbiIt);
-        }
-
+    if (swbiIt != m_settingsWidgetsById.end()) {
+        swbiIt.value()->refresh();
         //Already created, so we don't need creation, so returning false
         return false;
     }
 
-    if (!enabled) {
-        return false;
-    }
-
-    CameraSettings::ConstIterator it = m_settings->find(id);
-    if (it == m_settings->end()) {
+    CameraSettings::ConstIterator it = m_settings.find(id);
+    if (it == m_settings.end()) {
         //It means enabled, but have no value
         return true;
     }
@@ -214,29 +169,37 @@ bool CameraSettingsWidgetsCreator::isParamEnabled(const QString& id, const QStri
 
 void CameraSettingsWidgetsCreator::paramFound(const CameraSetting& value, const QString& parentId)
 {
-    CameraSettings::Iterator currIt = m_settings->find(value.getId());
-    if (currIt == m_settings->end() && value.getType() != CameraSetting::Button) {
+    CameraSettings::Iterator currIt = m_settings.find(value.getId());
+    if (currIt == m_settings.end() && value.getType() != CameraSetting::Button) {
         //ToDo: will be nice to prevent mediaserver send disabled params;
         return;
     }
+
+    //TODO #ak this is bullshit!
+        //parameter description must be taken from single place: xml or mediaserver reply (m_settings), not both!
+        //xml is preferred so that camera_settings.xml is parsed on client side only. 
+        //In this case mediaserver reply must contain only param values, not description
+    if( currIt != m_settings.end() )
+        currIt.value()->setIsReadOnly( value.isReadOnly() );
 
     QnSettingsScrollArea* rootWidget = 0;
     LayoutIndById::ConstIterator lIndIt = m_layoutIndById.find(parentId);
     if (lIndIt != m_layoutIndById.end()) {
         int ind = lIndIt.value();
-        rootWidget = dynamic_cast<QnSettingsScrollArea*>(m_rootLayout.widget(ind));
+        rootWidget = dynamic_cast<QnSettingsScrollArea*>(m_rootLayout->widget(ind));
         Q_ASSERT(rootWidget != 0);
     } else {
         QTreeWidgetItem* parentItem = findParentForParam(parentId);
         rootWidget = new QnSettingsScrollArea(m_owner);
-        int ind = m_rootLayout.addWidget(rootWidget);
+        int ind = m_rootLayout->addWidget(rootWidget);
         m_layoutIndById.insert(parentId, ind);
         parentItem->setData(0, Qt::UserRole, ind);
     }
 
     //Description is not transported through http to avoid huge requests, so
     //setting it from camera_settings.xml file.
-    if (currIt != m_settings->end()) currIt.value()->setDescription(value.getDescription());
+    if (currIt != m_settings.end())
+        currIt.value()->setDescription(value.getDescription());
 
     QnAbstractSettingsWidget* tabWidget = 0;
     switch(value.getType())
@@ -305,7 +268,7 @@ QTreeWidgetItem* CameraSettingsWidgetsCreator::findParentForParam(const QString&
         }
 
         QPair<QString, WidgetAndParent*> data = parentsHierarchy.takeFirst();
-        m_rootWidget.addTopLevelItem(data.second->get());
+        m_rootWidget->addTopLevelItem(data.second->get());
         it = m_treeWidgetsById.insert(data.first, data.second->take());
 
         delete data.second;
@@ -334,32 +297,24 @@ QTreeWidgetItem* CameraSettingsWidgetsCreator::findParentForParam(const QString&
 
 void CameraSettingsWidgetsCreator::cleanDataOnFail()
 {
-    
-}
-
-void CameraSettingsWidgetsCreator::treeWidgetItemPressed(QTreeWidgetItem* item, int /*column*/)
-{
-    if (!item) {
-        return;
-    }
-
-    int ind = item->data(0, Qt::UserRole).toInt();
-    if (ind + 1 > m_rootLayout.count()) {
-        qDebug() << "CameraSettingsWidgetsCreator::treeWidgetItemPressed: index out of range! Ind = " << ind << ", Count = " << m_rootLayout.count();
-        return;
-    }
-
-    m_rootLayout.setCurrentIndex(ind);
-
-    emit refreshAdvancedSettings();
 }
 
 void CameraSettingsWidgetsCreator::treeWidgetItemSelectionChanged()
 {
-    if (m_rootLayout.count() > 0) {
-        m_rootLayout.setCurrentIndex(0);
-        emit refreshAdvancedSettings();
+    const QList<QTreeWidgetItem*>& selectedItems = m_rootWidget->selectedItems();
+    if( selectedItems.isEmpty() )
+        return;
+
+    Q_ASSERT( selectedItems.size() == 1 );
+    QTreeWidgetItem* selectedItem = selectedItems.front();
+
+    int ind = selectedItem->data(0, Qt::UserRole).toInt();
+    if (ind + 1 > m_rootLayout->count()) {
+        qDebug() << "CameraSettingsWidgetsCreator::treeWidgetItemSelectionChanged: index out of range! Ind = " << ind << ", Count = " << m_rootLayout->count();
+        return;
     }
+
+    m_rootLayout->setCurrentIndex(ind);
 }
 
 void CameraSettingsWidgetsCreator::parentOfRootElemFound(const QString& parentId)
@@ -367,15 +322,97 @@ void CameraSettingsWidgetsCreator::parentOfRootElemFound(const QString& parentId
     m_obj.parentOfRootElemFound(parentId);
 }
 
+void CameraSettingsWidgetsCreator::setupWidgetDependencies() {
+
+    //TODO: #GDM move hardcode to dependency structure
+    if (!getCameraId().startsWith(lit("DIGITALWATCHDOG"))) {
+        return;
+    }
+
+    /* If parameter baseParameterId value equals to baseParameterValue, 
+     * all dependentParameters should be enabled.
+     * Otherwise they should be disabled. 
+     */
+    struct DependencyEntry {
+        QString baseParameterId;
+        QString baseParameterValue;
+        QStringList dependentParameters;
+    };
+    QList<DependencyEntry> entries; //TODO: #GDM these parameters should be read from some other place, e.g. cameras xml file.
+
+    /* Form table of dependent parameters. */
+    {
+        DependencyEntry imageBalance;
+        imageBalance.baseParameterId = lit("%%Imaging%%White Balance%%Mode");
+        imageBalance.baseParameterValue = lit("MANUAL");
+        imageBalance.dependentParameters = QStringList()
+            << lit("%%Imaging%%White Balance%%Kelvin")
+            << lit("%%Imaging%%White Balance%%Red")
+            << lit("%%Imaging%%White Balance%%Blue");
+        entries << imageBalance;
+    }
+    {
+        DependencyEntry imageExposure;
+        imageExposure.baseParameterId = lit("%%Imaging%%Exposure%%Shutter Mode");
+        imageExposure.baseParameterValue = lit("MANUAL");
+        imageExposure.dependentParameters = QStringList()
+            << lit("%%Imaging%%Exposure%%Shutter Speed");
+        entries << imageExposure;
+    }
+    {
+        DependencyEntry imageDayAndNight;
+        imageDayAndNight.baseParameterId = lit("%%Imaging%%Day & Night%%Mode");
+        imageDayAndNight.baseParameterValue = lit("AUTO");  //TODO: #GDM are you sure there should be AUTO?
+        imageDayAndNight.dependentParameters = QStringList()
+            << lit("%%Imaging%%Day & Night%%Switching from Color to B/W")
+            << lit("%%Imaging%%Day & Night%%Switching from B/W to Color");
+        entries << imageDayAndNight;
+    }
+
+    /* Process dependency table. */
+    for (const DependencyEntry &entry: entries) {
+        /* Skip parameters that are not present. */
+        if (!m_settings.contains(entry.baseParameterId))
+            continue;
+
+        if (!m_settingsWidgetsById.contains(entry.baseParameterId))
+            continue;
+
+        auto baseParam = m_settings[entry.baseParameterId];
+        QString value = baseParam->getCurrent();
+        bool enable = (value == entry.baseParameterValue);
+
+        auto baseWidget = m_settingsWidgetsById[entry.baseParameterId];
+
+        /* Setup dependency. */
+        for (const QString &dependentParamId: entry.dependentParameters) {
+            if (!m_settingsWidgetsById.contains(dependentParamId))
+                continue;
+
+            auto dependentWidget = m_settingsWidgetsById[dependentParamId];
+            auto targetValue = entry.baseParameterValue;
+            dependentWidget->setEnabled(enable);
+            /* Make all dependent widgets listen the base widget. */
+            connect(baseWidget, &QnAbstractSettingsWidget::advancedParamChanged, dependentWidget, [dependentWidget, targetValue](const CameraSetting &val) {
+                dependentWidget->setEnabled(val.getCurrent() == targetValue);
+            });
+        }
+    }
+}
+
 //
 // class CameraSettingTreeReader
 //
 
 template <class T, class E>
-CameraSettingTreeReader<T, E>::CameraSettingTreeReader(const QString& id):
+CameraSettingTreeReader<T, E>::CameraSettingTreeReader(
+    const QString& id,
+    const QnResourcePtr& cameraRes )
+:
     m_initialId(id),
     m_currParentId(),
-    m_firstTime(true)
+    m_firstTime(true),
+    m_cameraRes(cameraRes)
 {
     
 }
@@ -396,7 +433,7 @@ void CameraSettingTreeReader<T, E>::parentOfRootElemFound(const QString& parentI
     m_currParentId = parentId;
 
     if (m_firstTime) {
-        m_objList.push_back(createElement(parentId));
+        m_objList.push_back(createElement(parentId, m_cameraRes));
     }
 }
 
@@ -417,7 +454,7 @@ bool CameraSettingTreeReader<T, E>::proceed()
 
         T* nextElem = m_firstTime? m_objList.back(): m_objList.at(i++);
         //ToDo: check impossible situation i > size - 1
-        if (!nextElem->proceed(getAdditionalInfo())) {
+        if (!nextElem->proceed(dataPtr())) {
             clean();
             return false;
         }
@@ -441,19 +478,22 @@ void CameraSettingTreeReader<T, E>::clean()
 // class CameraSettingsTreeLister
 //
 
-CameraSettingsTreeLister::CameraSettingsTreeLister(const QString& id):
-    CameraSettingTreeReader<CameraSettingsLister, QSet<QString> >(id)
+CameraSettingsTreeLister::CameraSettingsTreeLister(
+    const QString& id,
+    const QnResourcePtr& cameraRes )
+:
+    CameraSettingTreeReader<CameraSettingsLister, QSet<QString> >(id, cameraRes)
 {
-    
 }
 
-CameraSettingsLister* CameraSettingsTreeLister::createElement(const QString& id)
+CameraSettingsLister* CameraSettingsTreeLister::createElement(
+    const QString& id,
+    const QnResourcePtr& cameraRes )
 {
-    return new CameraSettingsLister(id, *this);
+    return new CameraSettingsLister(id, *this, cameraRes);
 }
 
-QSet<QString>& CameraSettingsTreeLister::getAdditionalInfo()
-{
+QSet<QString>& CameraSettingsTreeLister::dataPtr() {
     return m_params;
 }
 
@@ -469,27 +509,17 @@ QStringList CameraSettingsTreeLister::proceed()
 //
 
 CameraSettingsWidgetsTreeCreator::CameraSettingsWidgetsTreeCreator(
-    const QString& cameraId,
     const QString& id,
-#ifdef QT_WEBKITWIDGETS_LIB
     QWebView* webView,
-#endif
-    QTreeWidget& rootWidget,
-    QStackedLayout& rootLayout
+    QTreeWidget* rootWidget,
+    QStackedLayout* rootLayout
     )
 :
     CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>(id),
-#ifdef QT_WEBKITWIDGETS_LIB
     m_webView(webView),
-#endif
     m_rootWidget(rootWidget),
     m_rootLayout(rootLayout),
-    m_treeWidgetsById(),
-    m_layoutIndById(),
-    m_settingsWidgetsById(),
-    m_settings(0),
-    m_id(id),
-    m_cameraId(cameraId)
+    m_id(id)
 {
     
 }
@@ -498,30 +528,28 @@ CameraSettingsWidgetsTreeCreator::~CameraSettingsWidgetsTreeCreator()
 {
     removeEmptyWidgetGroups();
     m_treeWidgetsById.clear();
-    m_rootWidget.clear();
-#ifdef QT_WEBKITWIDGETS_LIB
+    m_rootWidget->clear();
     m_webView = NULL;
-#endif
 }
 
-CameraSettingsWidgetsCreator* CameraSettingsWidgetsTreeCreator::createElement(const QString& id)
+CameraSettingsWidgetsCreator* CameraSettingsWidgetsTreeCreator::createElement(
+    const QString& id,
+    const QnResourcePtr& cameraRes )
 {
     CameraSettingsWidgetsCreator* result = new CameraSettingsWidgetsCreator(id, *this, m_rootWidget, m_rootLayout, m_treeWidgetsById,
         m_layoutIndById, m_settingsWidgetsById, m_emptyGroupsById);
+    result->setCamera( cameraRes );
     connect (result, &CameraSettingsWidgetsCreator::advancedParamChanged, this, &CameraSettingsWidgetsTreeCreator::advancedParamChanged);
-    connect (result, &CameraSettingsWidgetsCreator::refreshAdvancedSettings, this, &CameraSettingsWidgetsTreeCreator::refreshAdvancedSettings);
     return result;
 }
 
-CameraSettings& CameraSettingsWidgetsTreeCreator::getAdditionalInfo()
-{
-    //ToDo: check pointer
-    return *m_settings;
+CameraSettings& CameraSettingsWidgetsTreeCreator::dataPtr() {
+    return m_settings;
 }
 
-void CameraSettingsWidgetsTreeCreator::proceed(CameraSettings* settings)
-{
+void CameraSettingsWidgetsTreeCreator::proceed(CameraSettings &settings) {
     m_settings = settings;
+    bool result = false;
     if ( !m_id.isNull() )
         CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>::proceed();
 }
@@ -531,27 +559,20 @@ QString CameraSettingsWidgetsTreeCreator::getId() const
     return m_id;
 }
 
-QString CameraSettingsWidgetsTreeCreator::getCameraId() const
-{
-    return m_cameraId;
-}
-
 QTreeWidget* CameraSettingsWidgetsTreeCreator::getRootWidget()
 {
-    return &m_rootWidget;
+    return m_rootWidget;
 }
 
 QStackedLayout* CameraSettingsWidgetsTreeCreator::getRootLayout()
 {
-    return &m_rootLayout;
+    return m_rootLayout;
 }
 
-#ifdef QT_WEBKITWIDGETS_LIB
 QWebView* CameraSettingsWidgetsTreeCreator::getWebView()
 {
     return m_webView;
 }
-#endif
 
 void CameraSettingsWidgetsTreeCreator::removeEmptyWidgetGroups()
 {

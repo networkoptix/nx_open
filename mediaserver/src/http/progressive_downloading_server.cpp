@@ -31,6 +31,7 @@
 #include <media_server/settings.h>
 
 #include "cached_output_stream.h"
+#include "common/common_module.h"
 
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
@@ -411,6 +412,13 @@ void QnProgressiveDownloadingConsumer::run()
     Q_D(QnProgressiveDownloadingConsumer);
     initSystemThreadId();
 
+    if (qnCommon->isTranscodeDisabled())
+    {
+        d->responseBody = QByteArray("Video transcoding is disabled in the server settings. Feature unavailable.");
+        sendResponse(CODE_NOT_IMPLEMETED, "text/plain");
+        return;
+    }
+
     QnAbstractMediaStreamDataProviderPtr dataProvider;
 
     d->socket->setRecvTimeout(CONNECTION_TIMEOUT);
@@ -482,8 +490,20 @@ void QnProgressiveDownloadingConsumer::run()
         }
 
         QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>();
-        if (mediaRes)
-            d->transcoder.setVideoLayout(mediaRes->getVideoLayout());
+        if (mediaRes) {
+            QnImageFilterHelper extraParams;
+            extraParams.setVideoLayout(mediaRes->getVideoLayout());
+            int rotation;
+            if (decodedUrlQuery.hasQueryItem("rotation"))
+                rotation = decodedUrlQuery.queryItemValue("rotation").toInt();
+            else
+                rotation = mediaRes->toResource()->getProperty(QnMediaResource::rotationKey()).toInt();
+            qreal customAR = mediaRes->customAspectRatio();
+            extraParams.setRotation(rotation);
+            extraParams.setCustomAR(customAR);
+            
+            d->transcoder.setExtraTranscodeParams(extraParams);
+        }
 
         if (d->transcoder.setVideoCodec(
                 d->videoCodec,

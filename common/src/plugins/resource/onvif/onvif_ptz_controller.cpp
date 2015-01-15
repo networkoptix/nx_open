@@ -48,7 +48,8 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     base_type(resource),
     m_resource(resource),
     m_capabilities(Qn::NoPtzCapabilities),
-    m_stopBroken(false)
+    m_stopBroken(false),
+    m_ptzPresetsReaded(false)
 {
     m_limits.minPan = -1.0;
     m_limits.maxPan = 1.0;
@@ -66,13 +67,22 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     bool focusEnabled       = data.value<bool>(lit("onvifPtzFocusEnabled"),         false);
     bool presetsEnabled     = data.value<bool>(lit("onvifPtzPresetsEnabled"),       false);
 
+    QString ptzUrl = m_resource->getPtzUrl();
+    if(ptzUrl.isEmpty())
+        return;
+
+    Qn::PtzCapabilities overridedCaps;
+    if(data.value(lit("ptzCapabilities"), &overridedCaps))
+        m_capabilities = overridedCaps;
+
+
     m_capabilities |= initMove();
     if(absoluteMoveBroken)
         m_capabilities &= ~(Qn::AbsolutePtzCapabilities | Qn::DevicePositioningPtzCapability);
     if(focusEnabled)
         m_capabilities |= initContinuousFocus();
-    if(presetsEnabled)
-        m_capabilities |= initPresets();
+    if(presetsEnabled && !m_resource->getPtzUrl().isEmpty())
+        m_capabilities |=  Qn::PresetsPtzCapability; //initPresets();
 
     // TODO: #PTZ #Elric actually implement flip!
 }
@@ -83,8 +93,6 @@ QnOnvifPtzController::~QnOnvifPtzController() {
 
 Qn::PtzCapabilities QnOnvifPtzController::initMove() {
     QString ptzUrl = m_resource->getPtzUrl();
-    if(ptzUrl.isEmpty())
-        return Qn::NoPtzCapabilities;
 
     QAuthenticator auth = m_resource->getAuth();
     PtzSoapWrapper ptz(ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
@@ -169,10 +177,13 @@ Qn::PtzCapabilities QnOnvifPtzController::initMove() {
     return result;
 }
 
-Qn::PtzCapabilities QnOnvifPtzController::initPresets() {
+bool QnOnvifPtzController::readBuiltinPresets() {
+    if (m_ptzPresetsReaded)
+        return true;
+
     QString ptzUrl = m_resource->getPtzUrl();
     if(ptzUrl.isEmpty())
-        return Qn::NoPtzCapabilities;
+        return false;
 
     QAuthenticator auth = m_resource->getAuth();
     PtzSoapWrapper ptz(ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
@@ -181,7 +192,7 @@ Qn::PtzCapabilities QnOnvifPtzController::initPresets() {
     request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
     GetPresetsResp response;
     if (ptz.getPresets(request, response) != SOAP_OK)
-        return Qn::NoPtzCapabilities;
+        return false;
 
     m_presetNameByToken.clear();
     for(onvifXsd__PTZPreset *preset: response.Preset) {
@@ -192,7 +203,8 @@ Qn::PtzCapabilities QnOnvifPtzController::initPresets() {
         }
     }
     
-    return Qn::PresetsPtzCapability;
+    m_ptzPresetsReaded = true;
+    return true;
 }
 
 Qn::PtzCapabilities QnOnvifPtzController::initContinuousFocus() {
@@ -433,6 +445,7 @@ QString QnOnvifPtzController::presetToken(const QString &presetId) {
 }
 
 QString QnOnvifPtzController::presetName(const QString &presetId) {
+    readBuiltinPresets();
     QString internalId = m_presetTokenById.value(presetId);
     if (internalId.isEmpty())
         internalId = presetId;
@@ -440,6 +453,8 @@ QString QnOnvifPtzController::presetName(const QString &presetId) {
 }
 
 bool QnOnvifPtzController::removePreset(const QString &presetId) {
+    QMutexLocker lk( &m_mutex );
+
     QString ptzUrl = m_resource->getPtzUrl();
     if(ptzUrl.isEmpty())
         return false;
@@ -460,12 +475,18 @@ bool QnOnvifPtzController::removePreset(const QString &presetId) {
 }
 
 bool QnOnvifPtzController::getPresets(QnPtzPresetList *presets) {
+    QMutexLocker lk( &m_mutex );
+
+    if (!readBuiltinPresets())
+        return false;
     for (auto itr = m_presetNameByToken.begin(); itr != m_presetNameByToken.end(); ++itr)
         presets->push_back(QnPtzPreset(itr.key(), itr.value()));
     return true;
 }
 
 bool QnOnvifPtzController::activatePreset(const QString &presetId, qreal speed) {
+    QMutexLocker lk( &m_mutex );
+
     QString ptzUrl = m_resource->getPtzUrl();
     if(ptzUrl.isEmpty())
         return false;
@@ -503,6 +524,10 @@ bool QnOnvifPtzController::updatePreset(const QnPtzPreset &preset) {
 }
 
 bool QnOnvifPtzController::createPreset(const QnPtzPreset &preset) {
+    QMutexLocker lk( &m_mutex );
+
+    if (!readBuiltinPresets())
+        return false;
     QString ptzUrl = m_resource->getPtzUrl();
     if(ptzUrl.isEmpty())
         return false;

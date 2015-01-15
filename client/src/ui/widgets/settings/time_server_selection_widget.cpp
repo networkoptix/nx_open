@@ -27,6 +27,16 @@ namespace {
 
 }
 
+#ifdef _DEBUG
+    #define QN_TIME_SERVER_SELECTION_DEBUG
+#endif
+
+#ifdef QN_TIME_SERVER_SELECTION_DEBUG
+#define PRINT_DEBUG(MSG) qDebug() << MSG
+#else
+#define PRINT_DEBUG(MSG) 
+#endif 
+
 QnTimeServerSelectionWidget::QnTimeServerSelectionWidget(QWidget *parent /*= NULL*/):
     QnAbstractPreferencesWidget(parent),
     QnWorkbenchContextAware(parent),
@@ -34,6 +44,12 @@ QnTimeServerSelectionWidget::QnTimeServerSelectionWidget(QWidget *parent /*= NUL
     m_model(new QnTimeServerSelectionModel(this))
 {
     ui->setupUi(this);
+    ui->timeSourceLabel->setVisible(false);
+    if (true) {
+        ui->timeSourceLabel->setText(tr("Time is taken from the Internet."));
+    } else {
+        ui->timeSourceLabel->setText(tr("Time is taken from %1."));
+    }
 
     QnSortServersByPriorityProxyModel* sortModel = new QnSortServersByPriorityProxyModel(this);
     sortModel->setSourceModel(m_model);
@@ -61,6 +77,7 @@ QnTimeServerSelectionWidget::~QnTimeServerSelectionWidget() {
 
 
 void QnTimeServerSelectionWidget::updateFromSettings() {
+    PRINT_DEBUG("provide selected server to model:");
     m_model->setSelectedServer(selectedServer());
 }
 
@@ -69,15 +86,24 @@ void QnTimeServerSelectionWidget::submitToSettings() {
     if (!connection)
         return;
 
+    PRINT_DEBUG("forcing selected server to " + m_model->selectedServer().toByteArray());
     auto timeManager = connection->getTimeManager();
-    timeManager->forcePrimaryTimeServer(m_model->selectedServer(), this, []{});
+    timeManager->forcePrimaryTimeServer(m_model->selectedServer(), this, [this](int handle, ec2::ErrorCode errCode){
+        Q_UNUSED(handle);
+        Q_UNUSED(errCode);  //suppress warning in the release code
+        PRINT_DEBUG("forcing selected server finished with result " + ec2::toString(errCode).toUtf8());
+    });
+
 }
 
 bool QnTimeServerSelectionWidget::hasChanges() const {
+    PRINT_DEBUG("checking if the widget has changes " + m_model->selectedServer().toByteArray() + " vs...");
     return m_model->selectedServer() != selectedServer();
 }
 
 QnUuid QnTimeServerSelectionWidget::selectedServer() const {
+    PRINT_DEBUG("check selected server by runtime info");
+
     foreach (const QnPeerRuntimeInfo &runtimeInfo, QnRuntimeInfoManager::instance()->items()->getItems()) {
         if (runtimeInfo.data.peer.peerType != Qn::PT_Server)
             continue;
@@ -85,8 +111,11 @@ QnUuid QnTimeServerSelectionWidget::selectedServer() const {
         if (!m_model->isSelected(runtimeInfo.data.serverTimePriority))
             continue;
 
+        PRINT_DEBUG("selected server " + runtimeInfo.uuid.toByteArray());
         return runtimeInfo.uuid;
     }
+
+    PRINT_DEBUG("no selected server found");
     return QnUuid();
 }
 

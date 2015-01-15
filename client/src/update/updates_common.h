@@ -42,6 +42,8 @@ struct QnUpdateResult {
         DownloadingFailed_NoFreeSpace,
         UploadingFailed,
         UploadingFailed_NoFreeSpace,
+        UploadingFailed_Timeout,
+        UploadingFailed_Offline,
         ClientInstallationFailed,
         InstallationFailed,
         RestInstallationFailed
@@ -56,6 +58,7 @@ struct QnUpdateResult {
     Value result;
     QnSoftwareVersion targetVersion;
     bool clientInstallerRequired;
+    QSet<QnUuid> failedPeers;
 };
 Q_DECLARE_METATYPE(QnUpdateResult);
 
@@ -74,8 +77,8 @@ enum class QnFullUpdateStage {
     Check,              /**< Check for updates. */
     Download,           /**< Download update packages. */
     Client,             /**< Install client update. */
+    Push,               /**< Push update packages. */
     Incompatible,       /**< Install updates to the incompatible servers. */
-    Push,               /**< Push update package to the normal servers. */
     Servers,            /**< Install updates to the normal servers. */
 
     Count

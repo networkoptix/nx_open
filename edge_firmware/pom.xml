@@ -20,6 +20,17 @@
     <packaging>pom</packaging>
     <name>Common POM for ARM projects</name>	
 
+    <dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>mediaserver</artifactId>
+			<version>${project.version}</version>
+			<type>pom</type> 
+			<scope>system</scope>
+	                <systemPath>${root.dir}/mediaserver/pom.xml</systemPath>
+		</dependency>			
+    </dependencies>		
+	
     <properties>
         <!-- Change it to point relatively to the root-->
         <root.dir>${basedir}/..</root.dir>

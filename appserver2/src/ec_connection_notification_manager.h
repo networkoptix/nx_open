@@ -65,6 +65,7 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiMediaServerUserAttributesDataList>& tran );
         void triggerNotification( const QnTransaction<ApiResourceData>& tran );
         void triggerNotification( const QnTransaction<ApiResourceStatusData>& tran );
+        void triggerNotification( const QnTransaction<ApiLicenseOverflowData>& tran );
         void triggerNotification( const QnTransaction<ApiResourceParamWithRefData>& tran );
         void triggerNotification( const QnTransaction<ApiResourceParamWithRefDataList>& tran );
         void triggerNotification( const QnTransaction<ApiCameraServerItemData>& tran );
@@ -75,7 +76,6 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiStoredFileData>& tran );
         void triggerNotification( const QnTransaction<ApiStoredFilePath>& tran );
         void triggerNotification( const QnTransaction<ApiFullInfoData>& tran );
-        void triggerNotification( const QnTransaction<ApiPanicModeData>& tran );
         void triggerNotification( const QnTransaction<ApiResourceParamDataList>& tran );
         void triggerNotification( const QnTransaction<ApiVideowallControlMessageData>& tran );
         void triggerNotification( const QnTransaction<ApiEmailSettingsData>& /*tran*/ );
@@ -87,6 +87,7 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiModuleData>& tran );
         void triggerNotification( const QnTransaction<ApiModuleDataList>& tran );
         void triggerNotification( const QnTransaction<ApiDiscoveryData>& tran );
+        void triggerNotification( const QnTransaction<ApiDiscoveryDataList>& tran );
         void triggerNotification( const QnTransaction<ApiDiscoverPeerData>& tran );
         void triggerNotification( const QnTransaction<ApiSystemNameData>& tran );
         void triggerNotification( const QnTransaction<ApiRuntimeData>& tran );

@@ -68,15 +68,15 @@ int QnManualCameraAdditionRestHandler::searchStartAction(const QnRequestParams &
     {
         QMutexLocker lock(&m_searchProcessMutex);
         m_searchProcesses.insert(processUuid, searcher);
-    }
 
-    //TODO #ak better not to use concurrent here, since calling QtConcurrent::run from running task looks unreliable in some extreme case
-        //consider using async fsm here (this one should be quite simple)
-    //NOTE boost::bind is here temporarily: till QnConcurrent::run supports any number of arguments
-    m_searchProcessRuns.insert( processUuid,
-        QnConcurrent::run( 
-            &manualSearchThreadPoolHolder.pool,
-            boost::bind( &QnManualCameraSearcher::run, searcher, &manualSearchThreadPoolHolder.pool, addr1, addr2, auth, port) ) );
+        //TODO #ak better not to use concurrent here, since calling QtConcurrent::run from running task looks unreliable in some extreme case
+            //consider using async fsm here (this one should be quite simple)
+        //NOTE boost::bind is here temporarily: till QnConcurrent::run supports any number of arguments
+        m_searchProcessRuns.insert( processUuid,
+            QnConcurrent::run( 
+                &manualSearchThreadPoolHolder.pool,
+                boost::bind( &QnManualCameraSearcher::run, searcher, &manualSearchThreadPoolHolder.pool, addr1, addr2, auth, port) ) );
+    }
 
     QnManualCameraSearchReply reply(processUuid, getSearchStatus(processUuid));
     result.setReply(reply);
@@ -107,15 +107,19 @@ int QnManualCameraAdditionRestHandler::searchStopAction(const QnRequestParams &p
         return CODE_INVALID_PARAMETER;
 
     QnManualCameraSearcher* process(NULL);
-    if (isSearchActive(processUuid)) {
+    {
         QMutexLocker lock(&m_searchProcessMutex);
-        process = m_searchProcesses[processUuid];
-        process->cancel();
-        m_searchProcesses.remove(processUuid);
+        if (m_searchProcesses.contains(processUuid)) 
+        {
+            process = m_searchProcesses[processUuid];
+            process->cancel();
+            m_searchProcesses.remove(processUuid);
+        }
+        if (m_searchProcessRuns.contains(processUuid)) {
+            m_searchProcessRuns[processUuid].waitForFinished();
+            m_searchProcessRuns.remove(processUuid);
+        }
     }
-
-    m_searchProcessRuns[processUuid].waitForFinished();
-    m_searchProcessRuns.remove(processUuid);
 
     QnManualCameraSearchReply reply;
     reply.processUuid = processUuid;

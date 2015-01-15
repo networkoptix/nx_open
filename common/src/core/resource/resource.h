@@ -57,7 +57,7 @@ public:
     void setId(const QnUuid& id);
 
     QnUuid getParentId() const;
-    void setParentId(QnUuid parent);
+    virtual void setParentId(const QnUuid& parent);
 
     // device unique identifier
     virtual QString getUniqueId() const { return getId().toString(); };
@@ -349,7 +349,6 @@ private:
     Qn::ResourceFlags m_flags;
     
     QDateTime m_lastDiscoveredTime;
-    QDateTime m_lastStatusUpdateTime;
 
     QStringList m_tags;
 

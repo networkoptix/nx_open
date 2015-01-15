@@ -10,7 +10,7 @@ namespace ec2
 
     struct ApiTimeData: ApiData 
     {
-        ApiTimeData() {}
+        ApiTimeData(): value(0) {}
         ApiTimeData(qint64 value): value(value) {}
 
         /** MSec value. */ 

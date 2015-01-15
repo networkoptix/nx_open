@@ -42,28 +42,29 @@ public:
         return m_user;
     }
 
+    void setReconnectOnPasswordChange(bool reconnect);
+
 signals:
     void userChanged(const QnUserResourcePtr &user);
+    void reconnectRequired();
 
 private slots:
-    void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
-    void at_resource_nameChanged(const QnResourcePtr &resource);
 
     void at_user_resourceChanged(const QnResourcePtr &resource);
     void at_user_permissionsChanged(const QnResourcePtr &user);
 private:
     void setCurrentUser(const QnUserResourcePtr &currentUser);
-    bool reconnectRequired(const QnUserResourcePtr &user);
+    bool isReconnectRequired(const QnUserResourcePtr &user);
 
 private:
-    QnUserResourceList m_users;
     QString m_userName;
     QString m_userPassword;
     QByteArray m_userPasswordHash;
     Qn::Permissions m_userPermissions;
     QPointer<QnWorkbenchPermissionsNotifier> m_permissionsNotifier;
     QnUserResourcePtr m_user;
+    bool m_reconnectOnPasswordChange;
 };
 
 #endif // QN_WORKBENCH_USER_WATCHER_H

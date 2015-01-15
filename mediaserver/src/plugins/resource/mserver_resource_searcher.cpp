@@ -17,6 +17,7 @@
 
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
+#include "common/common_module.h"
 
 
 
@@ -73,7 +74,7 @@ class DiscoveryPacket
 
 private:
     QByteArray m_data;
-    QByteArray m_appServerGuid;
+    QByteArray m_systemName;
     QByteArray m_appServerHost;
     QByteArray m_guid;
     QList<QByteArray> m_cameras;
@@ -85,7 +86,7 @@ public:
         QList<QByteArray> lines = m_data.split((char) 0);
         if (lines.size() >= 3) {
             m_guid = lines[0];
-            m_appServerGuid = lines[1];
+            m_systemName = lines[1];
             m_appServerHost = lines[2];
             for (int i = 3; i < lines.size(); ++i)
                 m_cameras << lines[i];
@@ -115,15 +116,15 @@ public:
         return m_appServerHost;
     }
 
-    QByteArray appServerGuid() const {
-        return m_appServerGuid;
+    QByteArray systemName() const {
+        return m_systemName;
     }
 
-    static QByteArray getRequest(const QByteArray& appServerGuid)
+    static QByteArray getRequest(const QByteArray& systemName)
     {
         QList<QByteArray> result;
         result << guidStr;
-        result << appServerGuid;
+        result << systemName;
         result << localAppServerHost();
         QStringList cameras = getLocalUsingCameras();
         for (const QString &camera: cameras)
@@ -233,7 +234,7 @@ void QnMServerResourceSearcher::readDataFromSocket()
         AbstractDatagramSocket* sock = m_socketList[i];
 
         // send request for next read
-        QByteArray datagram = DiscoveryPacket::getRequest(m_appServerGuid);
+        QByteArray datagram = DiscoveryPacket::getRequest(qnCommon->localSystemName().toUtf8());
         sock->sendTo(datagram.data(), datagram.size(), groupAddress, DISCOVERY_PORT);
     }
 
@@ -261,7 +262,7 @@ void QnMServerResourceSearcher::readSocketInternal(AbstractDatagramSocket* socke
         if (datagramSize > 0) {
             QByteArray responseData((const char*) tmpBuffer, datagramSize);
             DiscoveryPacket packet(responseData);
-            if (packet.isValidPacket() && packet.appServerGuid() != m_appServerGuid) {
+            if (packet.isValidPacket() && QString::fromUtf8(packet.systemName()) != qnCommon->localSystemName()) {
                 QStringList cameras = conflictList.camerasByServer.contains(packet.appServerHost())
                     ? conflictList.camerasByServer[packet.appServerHost()]
                     : QStringList();
@@ -271,9 +272,4 @@ void QnMServerResourceSearcher::readSocketInternal(AbstractDatagramSocket* socke
             }
         }
     }
-}
-
-void QnMServerResourceSearcher::setAppPServerGuid(const QByteArray& appServerGuid)
-{
-    m_appServerGuid = appServerGuid;
 }

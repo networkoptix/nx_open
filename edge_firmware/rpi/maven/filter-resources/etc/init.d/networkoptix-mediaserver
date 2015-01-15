@@ -1,19 +1,19 @@
 #!/bin/bash
 ### BEGIN INIT INFO
-# Provides:          networkoptix-mediaserver
+# Provides:          ${deb.customization.company.name}-mediaserver
 # Required-Start:    networking
 # Required-Stop:    
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: NetworkOptix HD Witness Media Server
+# Short-Description: ${company.name} ${product.name} Media Server
 ### END INIT INFO
 
 # NetworkOptix Media Server
 
 KILL_TIMEOUT_SEC=1
 KILL_CHECK_TRIES=30
-APPLICATION_NAME="NetworkOptix mediaserver"
-CUSTOMIZATION=networkoptix
+APPLICATION_NAME="${deb.customization.company.name} mediaserver"
+CUSTOMIZATION=${deb.customization.company.name}
 MODULE_NAME=mediaserver
 INSTALL_ROOT=/opt/$CUSTOMIZATION/$MODULE_NAME/
 BIN_PATH=$INSTALL_ROOT/bin/$MODULE_NAME

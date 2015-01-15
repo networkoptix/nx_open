@@ -3,7 +3,7 @@
 var SettingsPage = require('./po.js');
 describe('Settings Page', function () {
 
-    it("should stop test",function(){expect("other test").toBe("uncommented");});return;
+    //it("should stop test",function(){expect("other test").toBe("uncommented");});return;
 
     var p = new SettingsPage();
     var ptor = protractor.getInstance();
@@ -57,6 +57,10 @@ describe('Settings Page', function () {
         expect(p.changePasswordButton.isEnabled()).toBe(true);
     });
 
+    it("Change password: should check correction while changing both fields - password and confirmpassword",function(){
+        expect("test").toBe("written");
+    });
+
     it('Change password: should not allow change password without an old password', function () {
         p.setPassword('p12'); // send something to passwords
         p.setConfirmPassword('p12');
@@ -82,30 +86,33 @@ describe('Settings Page', function () {
     });
 
     it('Change password: should change password normally', function () {
-        expect("change password tests").toBe("written");
-        return
-        p.get();
+        //expect("change password tests").toBe("written");return;
 
-        p.passwordInput.sendKeys('1234'); // send something to passwords
-        p.confirmPasswordInput.sendKeys('1234');
-        p.oldPasswordInput.sendKeys('123');
 
-        /*p.changePasswordButton.click().then(function(){
+        p.getServer();
+
+        p.setPassword('1234'); // send something to passwords
+        p.setConfirmPassword('1234');
+        p.setOldPassword('123');
+
+        p.changePasswordButton.click().then(function(){
             var alertDialog = ptor.switchTo().alert(); // Expect alert
-            expect(alertDialog.getText()).toEqual("Settings changed");
-        });*/
-        //
+            expect(alertDialog.getText()).toEqual("Settings saved");
+            alertDialog.accept();
 
-        //restore password now
-        p.passwordInput.clear();
-        p.confirmPasswordInput.clear();
-        p.oldPasswordInput.clear();
+            p.getServerWithAnotherPassword();
 
-        p.passwordInput.sendKeys('123'); // send something to passwords
-        p.confirmPasswordInput.sendKeys('123');
-        p.oldPasswordInput.sendKeys('1234');
+            p.setPassword('123'); // send something to passwords
+            p.setConfirmPassword('123');
+            p.setOldPassword('1234');
+            p.changePasswordButton.click().then(function(){
+                var alertDialog = ptor.switchTo().alert(); // Expect alert
+                expect(alertDialog.getText()).toEqual("Settings saved");
+                alertDialog.accept();
 
-        //message "Password changed" is visible
+                p.getServer();
+            });
+        });
     });
 
     it("Change port: should not allow to set empty or bad port",function(){
@@ -128,14 +135,44 @@ describe('Settings Page', function () {
         expect(p.saveButton.isEnabled()).toBe(true);
     });
 
+    it("Change port: should not save allocated port",function() {
+        p.get();
+        p.setPort(80);
+        p.saveButton.click().then(function() {
+            var alertDialog = ptor.switchTo().alert(); // Expect alert.then( // <- this fixes the problem
+            expect(alertDialog.getText()).toMatch("Error");
+            alertDialog.accept();
+        });
+    });
 
     it("Change port: should save port and show message about restart",function(){
-        expect("actual changing port").toBe("tested manually");
+
+        p.getServer();
+        p.setPort(7000);
+        p.saveButton.click().then(function() {
+            var alertDialog = ptor.switchTo().alert(); // Expect alert.then( // <- this fixes the problem
+            expect(alertDialog.getText()).toEqual("Settings saved");
+            alertDialog.accept();
+
+            expect(ptor.getCurrentUrl()).toMatch("7000");// redirected to new port
+
+            p.setPort(7000);
+            p.saveButton.click().then(function() {
+                var alertDialog = ptor.switchTo().alert(); // Expect alert.then( // <- this fixes the problem
+                expect(alertDialog.getText()).toEqual("Settings saved");
+                alertDialog.accept();
+
+                expect(ptor.getCurrentUrl()).toMatch("9000");// redirected back
+            });
+        });
+
+        //expect("actual changing port").toBe("tested manually");
     });
 
 
 
     it("Change system name: should not allow set empty name",function(){
+        p.get();
         p.setSystemName('');
         expect(p.systemNameInput.getAttribute('class')).toMatch('ng-invalid');
         expect(p.saveButton.isEnabled()).toBe(false);

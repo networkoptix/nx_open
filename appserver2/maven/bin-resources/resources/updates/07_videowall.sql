@@ -1,3 +1,5 @@
+-- Migration is processed in the application. Do not rename file.
+
 -- Videowall resource table
 CREATE TABLE "vms_videowall" (
     autorun         bool NOT NULL DEFAULT 0,

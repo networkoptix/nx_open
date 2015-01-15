@@ -8,7 +8,6 @@
 #include "core/resource_management/resource_data_pool.h"
 #include "newdw_ptz_controller.h"
 
-const QString CAMERA_SETTINGS_ID_PARAM = lit("cameraSettingsId");
 static const int HTTP_PORT = 80;
 
 QString getIdSuffixByModel(const QString& cameraModel)
@@ -150,7 +149,7 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
     QnPlOnvifResource::fetchAndSetCameraSettings();
 
     QString cameraModel = fetchCameraModel();
-    QString baseIdStr = getProperty(CAMERA_SETTINGS_ID_PARAM);
+    QString baseIdStr = getProperty(Qn::CAMERA_SETTINGS_ID_PARAM_NAME);
 
     QString suffix = getIdSuffixByModel(cameraModel);
     if (!suffix.isEmpty()) {
@@ -160,7 +159,7 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
         QString prefix = baseIdStr.split(QLatin1String("-"))[0];
         QString fullCameraType = prefix + suffix;
         if (fullCameraType != baseIdStr)
-            setProperty(CAMERA_SETTINGS_ID_PARAM, fullCameraType);
+            setProperty(Qn::CAMERA_SETTINGS_ID_PARAM_NAME, fullCameraType);
         baseIdStr = prefix;
     }
 
@@ -243,6 +242,10 @@ bool QnPlWatchDogResource::setParamPhysical(const QString &param, const QVariant
 
         if (setting->setParamPhysical(param, val))
         {
+            QString realParamName = param.split(lit("%%")).last();
+            QString realParamValue = val.toString().split(lit(";")).last();
+            emit physicalParamChanged(realParamName, realParamValue);
+
             return true;
         }
     }

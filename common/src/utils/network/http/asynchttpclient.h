@@ -202,8 +202,28 @@ namespace nx_http
         //!Composes request with authorization header based on \a response
         bool resendRequestWithAuthorization( const nx_http::Response& response );
 
+        AsyncHttpClient( const AsyncHttpClient& );
+        AsyncHttpClient& operator=( const AsyncHttpClient& );
+
         static const char* toString( State state );
     };
+
+    //!Helper function that uses nx_http::AsyncHttpClient for file download
+    /*!
+        \param completionHandler <OS error code, status code, message body>.
+            "Status code" and "message body" are valid only if "OS error code" is \a SystemError::noError
+        \return \a true if started async download, \a false otherwise
+        \note It is strongly recommended to use this for downloading only small files (e.g., camera params).
+            For real files better to use \a nx_http::AsyncHttpClient directly
+    */
+    bool downloadFileAsync(
+        const QUrl& url,
+        std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType)> completionHandler );
+    //!Calls previous function and waits for completion
+    SystemError::ErrorCode downloadFileSync(
+        const QUrl& url,
+        int* const statusCode,
+        nx_http::BufferType* const msgBody );
 }
 
 #endif  //ASYNCHTTPCLIENT_H

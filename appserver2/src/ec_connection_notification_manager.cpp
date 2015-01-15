@@ -167,6 +167,10 @@ namespace ec2
         m_resourceManager->triggerNotification( tran );
     }
 
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiLicenseOverflowData>& tran ) {
+        m_resourceManager->triggerNotification( tran );
+    }
+
     /*
     void triggerNotification( const QnTransaction<ApiSetResourceDisabledData>& tran ) {
         m_resourceManager->triggerNotification( tran );
@@ -218,10 +222,6 @@ namespace ec2
             m_discoveryManager->triggerNotification(data);
     }
 
-    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiPanicModeData>& tran ) {
-        emit m_ecConnection->panicModeChanged(tran.params.mode);
-    }
-
     void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiVideowallControlMessageData>& tran ) {
         return m_videowallManager->triggerNotification(tran);
     }
@@ -266,6 +266,10 @@ namespace ec2
     }
 
     void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveryData> &tran) {
+        m_discoveryManager->triggerNotification(tran);
+    }
+
+    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveryDataList> &tran) {
         m_discoveryManager->triggerNotification(tran);
     }
 

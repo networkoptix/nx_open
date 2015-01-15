@@ -42,6 +42,12 @@ QnUuid::QnUuid( const QByteArray& text )
     }
 }
 
+QnUuid::QnUuid(const QUuid &uuid)
+:
+    m_uuid(uuid)
+{
+}
+
 const QByteArray& QnUuid::toByteArray() const
 {
     if( !m_byteArrayRepresentation )
@@ -77,6 +83,11 @@ QnUuid QnUuid::createUuid()
     QnUuid _uuid;
     _uuid.m_uuid = QUuid::createUuid();
     return _uuid;
+}
+
+QnUuid QnUuid::fromStringSafe(const QString &uuid)
+{
+    return QnUuid(QUuid(uuid));
 }
 
 uint qHash( const QnUuid& uuid, uint seed ) throw()

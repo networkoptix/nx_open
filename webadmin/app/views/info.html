@@ -26,7 +26,7 @@
             <td class="storage-url">{{storage.url}}</td>
             <td class="storage-total-space">{{formatSpace(storage.totalSpace)}}</td>
             <td class="storage-indicators">
-                <icon for="storage.isExternal" on-true="globe" on-false="hdd" title-true="External" title-false="Intrenal" />
+                <icon for="storage.isExternal" on-true="globe" on-false="hdd" title-true="External" title-false="Internal" />
                 <icon for="storage.isUsedForWriting" on-true="pencil" title-true="Used for writing"/>
                 <icon for="storage.isWritable && !storage.isUsedForWriting" on-true="pencil" title-true="Writable" class="icon-inactive"/>
             </td>
@@ -35,7 +35,7 @@
 </table>
 
 <h2>Health monitoring</h2>
-<ng-include src="'views/health.html'"></ng-include>
+<ng-include src="'views/components/health.html'"></ng-include>
 
 <h2>Log</h2>
 <blockquote>

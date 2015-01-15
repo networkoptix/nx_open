@@ -322,9 +322,19 @@ UINT __stdcall DeleteDatabaseFile(MSIHANDLE hInstall)
 
     WcaLog(LOGMSG_STANDARD, "Initialized.");
 
-    {
+    try {
         CString fileToDelete = GetProperty(hInstall, L"CustomActionData");
+
+        CString localAppDataFolder = GetAppDataLocalFolderPath();
+        fileToDelete.Replace(L"#LocalAppDataFolder#", localAppDataFolder);
+
+        WcaLog(LOGMSG_STANDARD, "Deleting %S and -shm,-val.", fileToDelete);
+
         DeleteFile(fileToDelete);
+        DeleteFile(fileToDelete + L"-shm");
+        DeleteFile(fileToDelete + L"-wal");
+    } catch (const Error& e) {
+        WcaLog(LOGMSG_STANDARD, "DeleteDatabaseFile(): Error: %S", e.msg());
     }
 
 LExit:
@@ -418,6 +428,43 @@ UINT __stdcall CopyDatabaseFile(MSIHANDLE hInstall)
 
     WcaLog(LOGMSG_STANDARD, "Initialized.");
 
+    try {
+        CAtlString params, fromFile, toFile;
+        params = GetProperty(hInstall, L"CustomActionData");
+
+        int curPos = 0;
+        fromFile = params.Tokenize(_T(";"), curPos);
+        toFile = params.Tokenize(_T(";"), curPos);
+
+        CString localAppDataFolder = GetAppDataLocalFolderPath();
+        toFile.Replace(L"#LocalAppDataFolder#", localAppDataFolder);
+
+        if (!PathFileExists(toFile)) {
+            WcaLog(LOGMSG_STANDARD, "Copying %S to %S.", fromFile, toFile);
+            CopyFile(fromFile, toFile, TRUE);
+            CopyFile(fromFile + L"-shm", toFile + L"-shm", FALSE);
+            CopyFile(fromFile + L"-wal", toFile + L"-wal", FALSE);
+        }
+    } catch (const Error& e) {
+        WcaLog(LOGMSG_STANDARD, "CopyDatabaseFile(): Error: %S", e.msg());
+    }
+
+LExit:
+    
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
+
+UINT __stdcall CopyHostedFiles(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    hr = WcaInitialize(hInstall, "CopyHostedFiles");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
     {
         CAtlString params, fromFile, toFile;
         params = GetProperty(hInstall, L"CustomActionData");
@@ -426,7 +473,15 @@ UINT __stdcall CopyDatabaseFile(MSIHANDLE hInstall)
         fromFile = params.Tokenize(_T(";"), curPos);
         toFile = params.Tokenize(_T(";"), curPos);
 
-        CopyFile(fromFile, toFile, TRUE);
+        if (!PathFileExists(toFile)) {
+            SHFILEOPSTRUCT s = { 0 };
+            s.hwnd = 0;
+            s.wFunc = FO_COPY;
+            s.pFrom = fromFile;
+            s.pTo = toFile;
+            s.fFlags = FOF_NOCONFIRMATION | FOF_NOCONFIRMMKDIR | FOF_NOERRORUI;
+            SHFileOperation(&s);
+        }
     }
 
 LExit:

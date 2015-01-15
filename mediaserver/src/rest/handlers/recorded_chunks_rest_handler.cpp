@@ -161,7 +161,7 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
             contentType = "application/json";
 
             result.append(callback);
-            result.append("([");
+            result.append("[");
             int nSize = periods.size();
             for (int n = 0; n < nSize; ++n)
             {
@@ -174,7 +174,7 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
                     .append("]");
             }
                 
-            result.append("]);");
+            result.append("]");
             break;
     }
 

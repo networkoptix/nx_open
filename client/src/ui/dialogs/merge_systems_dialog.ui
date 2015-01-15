@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>438</width>
-    <height>274</height>
+    <width>550</width>
+    <height>260</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -67,12 +67,8 @@
                 <property name="editable">
                  <bool>true</bool>
                 </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="passwordLabel">
-                <property name="text">
-                 <string>Password:</string>
+                <property name="insertPolicy">
+                 <enum>QComboBox::NoInsert</enum>
                 </property>
                </widget>
               </item>
@@ -80,6 +76,13 @@
                <widget class="QLineEdit" name="passwordEdit">
                 <property name="echoMode">
                  <enum>QLineEdit::Password</enum>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="passwordLabel">
+                <property name="text">
+                 <string>Password:</string>
                 </property>
                </widget>
               </item>
@@ -226,6 +229,9 @@ The servers from the remote system should appear in your system soon.</string>
  <tabstops>
   <tabstop>urlComboBox</tabstop>
   <tabstop>passwordEdit</tabstop>
+  <tabstop>testConnectionButton</tabstop>
+  <tabstop>currentSystemRadioButton</tabstop>
+  <tabstop>remoteSystemRadioButton</tabstop>
  </tabstops>
  <resources/>
  <connections>

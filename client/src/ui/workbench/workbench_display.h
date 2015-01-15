@@ -80,6 +80,18 @@ public:
      */
     virtual ~QnWorkbenchDisplay();
 
+     /**
+     * \returns                         Light mode of this workbench display.
+     */
+    Qn::LightModeFlags lightMode() const;
+
+     /**
+     * \param mode                      Light mode for the current display.
+     *                                  Enables or disables certain visualization features
+     *                                  to simplify and speed up painting.
+     */
+    void setLightMode(Qn::LightModeFlags mode);
+
     /**
      * \returns                         Instrument manager owned by this workbench display. 
      */
@@ -168,6 +180,16 @@ public:
      * \returns                         Grid item. 
      */
     QnGridItem *gridItem() const;
+
+    /**
+     * \returns                         Curtain item (that is painted in black when a single widget is zoomed). 
+     */
+    QnCurtainItem* curtainItem() const;
+
+    /**
+     * \returns                         Curtain item animator. 
+     */
+    QnCurtainAnimator* curtainAnimator() const;
 
     /**
      * \returns                         Grid background item (E-Mapping).
@@ -362,6 +384,9 @@ protected slots:
     void updateCurtainedCursor();
     void updateBackground(const QnLayoutResourcePtr &layout);
 
+    /** Mark item on the scene selected as it was selected in the tree. */
+    void updateSelectionFromTree();
+
     void at_scene_destroyed();
     void at_scene_selectionChanged();
 
@@ -392,6 +417,7 @@ protected slots:
     void at_widgetActivityInstrument_activityStopped();
     void at_widgetActivityInstrument_activityStarted();
 
+    void at_widget_aspectRatioChanged();
     void at_widget_aboutToBeDestroyed();
 
     void at_view_destroyed();
@@ -400,7 +426,7 @@ protected slots:
     void at_mapper_cellSizeChanged();
     void at_mapper_spacingChanged();
 
-    void at_loader_thumbnailLoaded(const QnThumbnail &thumbnail);
+    void at_previewSearch_thumbnailLoaded(const QnThumbnail &thumbnail);
 
     void at_notificationsHandler_businessActionAdded(const QnAbstractBusinessActionPtr &businessAction);
     void at_notificationTimer_timeout(const QVariant &resource, const QVariant &type);
@@ -414,6 +440,9 @@ private:
 
     /** Current view. */
     QnGraphicsView *m_view;
+
+    /** Set of flags to simplify and speed up painting. */
+    Qn::LightModeFlags m_lightMode;
 
     /** Zoomed state toggle. */
     QnToggle *m_zoomedToggle;

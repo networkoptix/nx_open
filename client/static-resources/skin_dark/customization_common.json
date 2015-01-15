@@ -168,7 +168,7 @@
         "colors": {
             "_": "Background gradient colors.",
             
-            "normal": "noptix_blue.setAlpha(48)",
+            "normal": "#0000FF.setAlpha(51)",
             "panic": "#FF0000"
         }
     },

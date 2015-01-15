@@ -6,6 +6,7 @@
 #include <QtCore/QRectF>
 
 class CLVideoDecoderOutput;
+typedef QSharedPointer<CLVideoDecoderOutput> CLVideoDecoderOutputPtr;
 
 // todo: simplify ffmpegVideoTranscoder and perform crop scale operations as filters
 
@@ -21,11 +22,18 @@ public:
      * Update video image.
      * 
      * \param frame image to update
-     * \param updateRect    image rect to update. Filter MUST not update image outside the rect. Rect in range [0..1]
-     * \param ar    image aspect ratio.
      */
-    virtual void updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect, qreal ar) = 0;
+    virtual CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) = 0;
+
+    /**
+     * Update video size.
+     * 
+     * \param srcSize input image size. Function should return output image size
+     */
+    virtual QSize updatedResolution(const QSize& srcSize) = 0;
 };
+
+typedef QSharedPointer<QnAbstractImageFilter> QnAbstractImageFilterPtr;
 
 #endif // ENABLE_DATA_PROVIDERS
 

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="en-US" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+    <String Id="AdvancedWelcomeEulaDlg_Title"                       Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="BrowseDlg_Title"                                    Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="CancelDlg_Title"                                    Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="CustomizeDlg_Title"                                 Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="DiskCostDlg_Title"                                  Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="ErrorDlg_Title"                                     Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="ExitDialog_Title"                                   Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="FatalError_Title"                                   Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="FeaturesDlg_Title"                                  Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="FilesInUse_Title"                                   Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="InstallDirDlg_Title"                                Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="InstallScopeDlg_Title"                              Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="InvalidDirDlg_Title"                                Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="LicenseAgreementDlg_Title"                          Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="MaintenanceTypeDlg_Title"                           Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="MaintenanceWelcomeDlg_Title"                        Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="MsiRMFilesInUse_Title"                              Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="OutOfDiskDlg_Title"                                 Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="OutOfRbDiskDlg_Title"                               Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="PrepareDlg_Title"                                   Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="ProgressDlg_Title"                                  Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="ResumeDlg_Title"                                    Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="SetupTypeDlg_Title"                                 Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="UserExit_Title"                                     Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="VerifyReadyDlg_Title"                               Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="WaitForCostingDlg_Title"                            Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="WelcomeDlg_Title"                                   Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="WelcomeEulaDlg_Title"                               Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+
+    <!-- Standard Strings (Common Buttons, Labels etc) -->
+    <String Id="StdString_Ok"                                       Overridable="yes">ตกลง</String>
+    <String Id="StdString_Warning"                                  Overridable="yes">การเตือน</String>
+    <String Id="StdString_SetupTitle"                               Overridable="yes">[ProductName] ติดตั้ง</String>
+
+    <!-- AllFieldsAreMandatoryDlg -->
+    <String Id="AllFieldsAreMandatoryDlg_AllFieldsAreMandatory"     Overridable="yes">ทุกฟิลด์มีผลบังคับใช้</String>
+
+    <!-- AppServerDlg -->
+    <String Id="AppServerDlg_EntcontrollerConfig"                   Overridable="yes">การตั้งค่าการควบคุมองค์กร</String>
+    <String Id="AppServerDlg_EntcontrollerParameters"               Overridable="yes">โปรดระบุพารามิเตอร์ควบคุมองค์กร</String>
+    <String Id="AppServerDlg_Port"                                  Overridable="yes">พอร์ต</String>
+    <String Id="AppServerDlg_Login"                                 Overridable="yes">=ชื่อผู้ใช้</String>
+    <String Id="AppServerDlg_CreatePassword"                        Overridable="yes">สร้างรหัสผ่าน</String>
+    <String Id="AppServerDlg_Network"                               Overridable="yes">เครือข่าย</String>    
+    <String Id="AppServerDlg_ProxyPort"                             Overridable="yes">พร็อกซีพอร์ต</String>
+    <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">ยืนยันรหัสผ่าน</String>   
+    <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">พารามิเตอร์เพิ่มเติม</String>   
+    <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">ช่วยเพิ่มประสิทธิภาพการตั้งค่ากล้อง (แนะนำ)</String>   
+
+    <!-- Associations -->
+    <String Id="Associations_PlayWith"                              Overridable="yes">เล่นกับ ${product.name}</String>
+
+    <!-- ClientDlg -->
+    <String Id="ClientDlg_Shortcut"                                 Overridable="yes">ทางลัด</String>
+    <String Id="ClientDlg_InstallShortcut"                          Overridable="yes">ทางลัดบนเดสก์ทอป</String>
+    
+    <!-- DowngradeWarningDlg -->
+    <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">รุ่นที่ใหม่กว่า [ProductName] มีการติดตั้งแล้ว</String> 
+
+    <!-- EmptyPasswordDlg -->
+    <String Id="EmptyPasswordDlg_Title"                             Overridable="yes">รหัสผ่านไม่ถูกต้อง</String>
+    <String Id="EmptyPasswordDlg_EmptyPassword"                     Overridable="yes">รหัสผ่านไม่ควรจะว่างเปล่า</String>     
+    <String Id="EmptyPasswordDlg_Warning"                           Overridable="yes">การเตือน</String>     
+
+    <!-- InstallTypeDlg -->
+    <String Id="InstallTypeDlg_QuickFull"                           Overridable="yes">รูปแบบเร็ว (การติดตั้งรวมส่วนประกอบทั้งหมด)</String>
+    <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">ไคลเอนต์เท่านั้น (ฉันต้องการที่จะดูวิดีโอที่บันทึกไว้ในที่อื่น)</String>
+    <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">ขั้นสูง</String>
+    <String Id="InstallTypeDlg_SelectInstallType"                   Overridable="yes">โปรดเลือกประเภทการติดตั้ง</String>
+    <String Id="InstallTypeDlg_InstallType"                         Overridable="yes">ประเภทการติดตั้ง</String>       
+
+    <!-- InvalidPasswordDlg -->
+    <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">รหัสผ่านควรจะเหมือนกันและไม่ปล่อยให้ว่าง</String>    
+
+    <!-- MediaDirDlg -->
+    <String Id="MediaDirDlg_MediaFolderLabel"                       Overridable="yes">คลิกถัดไปเพื่อใช้โฟลเดอร์เริ่มต้นหรือคลิกเปลี่ยนเลือกโฟลเดอร์อื่น</String>
+    <String Id="MediaDirDlg_MediaFolder"                            Overridable="yes">สื่อโฟลเดอร์หลัก</String>
+    <String Id="MediaDirDlg_SelectMediaFolder"                      Overridable="yes">กรุณาเลือกสื่อโฟลเดอร์หลัก</String>
+    <String Id="MediaDirDlg_LoginLabel"                             Overridable="yes">เข้าสู่ระบบ</String>    
+
+    <!-- MediaServerDlg -->
+    <String Id="MediaServerDlg_Host"                                Overridable="yes">โฮสต์</String>
+    <String Id="MediaServerDlg_AppserverPort"                       Overridable="yes">พอร์ต</String>
+    <String Id="MediaServerDlg_Login"                               Overridable="yes">เข้าสู่ระบบ</String>
+    <String Id="MediaServerDlg_Password"                            Overridable="yes">รหัสผ่าน</String>  
+    <String Id="MediaServerDlg_MediaserverPort"                     Overridable="yes">พอร์ตมีเดียเซิร์ฟเวอร์</String>
+    <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">Enterprise Controller</String>
+    <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">การตั่งค่ามีเดียเซิร์ฟเวอร์</String>
+    <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">มีเดียเซิร์ฟเวอร์</String>  
+
+    <!-- MyExitDialog -->
+
+    <!-- MyFeaturesDlg -->
+    <String Id="MyFeaturesDlg_Components"                           Overridable="yes">ส่วนประกอบ</String>
+    <String Id="MyFeaturesDlg_Client"                               Overridable="yes">${client.name} (ฉันต้องการที่จะดูวิดีโอที่บันทึกไว้ในที่อื่น)</String>
+    <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (ฉันต้องการที่จะบันทึกไว้บนเครื่องคอมพิวเตอร์นี้)</String>
+    <String Id="MyFeaturesDlg_EnterpriseController"                 Overridable="yes">${appserver.name} (การจัดการฐานข้อมูล. ไม่ควรที่จะติดตั้งมากกว่าหนึ่งครั้งในเครือข่าย)</String>    
+
+    <!-- PasswordDlg -->
+    <String Id="PasswordDlg_DescriptionLabel"                       Overridable="yes">กรุณาป้อนรหัสผ่านของผู้ดูแลระบบ</String>
+    <String Id="PasswordDlg_TitleLabel"                             Overridable="yes">สิทธิของผู้ดูแล</String>
+    <String Id="PasswordDlg_GroupBox"                               Overridable="yes">สิทธิของผู้ดูแล</String>
+    <String Id="PasswordDlg_LoginLabel"                             Overridable="yes">เข้าสู่ระบบ</String>
+    <String Id="PasswordDlg_PasswordLabel"                          Overridable="yes">สร้างรหัสผ่าน</String>
+    <String Id="PasswordDlg_ConfirmPasswordLabel"                   Overridable="yes">ยืนยันรหัสผ่าน</String>    
+
+    <!-- PasswordShouldMatchDlg -->
+    <String Id="PasswordShouldMatchDlg_ConfigError"                 Overridable="yes">เกิดข้อผิดพลาดในการกำหนดค่า</String>    
+    <String Id="PasswordShouldMatchDlg_Warning"                     Overridable="yes">การเตือน</String>    
+    <String Id="PasswordShouldMatchDlg_PasswordShouldMatchDlg"      Overridable="yes">รหัสผ่านควรจะเหมือนกัน</String>    
+
+    <!-- PortDuplicateDlg -->
+    <String Id="PortDuplicateDlg_InvalidPorts"                      Overridable="yes">พอร์ตระบุไม่ถูกต้อง</String>    
+    <String Id="PortDuplicateDlg_Warning"                           Overridable="yes">การเตือน</String>    
+    <String Id="PortDuplicateDlg_PortSetTwice"                      Overridable="yes">ไม่สามารถตั้งค่าพอร์ตเดียวกันสองครั้ง กรุณาตรวจสอบการตั้งค่าของคุณ</String>    
+
+    <!-- PortIsBusyDlg -->
+    <String Id="PortIsBusyDlg_PortOccupied"                         Overridable="yes">พอร์ต [BUSYPORT] ถูกใช้งาน</String>    
+    <String Id="PortIsBusyDlg_Warning"                              Overridable="yes">การเตือน</String>    
+    <String Id="PortIsBusyDlg_PortOccupiedMessage"                  Overridable="yes">พอร์ตที่คุณระบุถูกใช้งานแล้ว กด &apos;ถัดไป&apos; ถ้าคุณต้องการดำเนินการต่อ</String>    
+
+    <!-- Product -->
+    <String Id="Product_LaunchClient"                               Overridable="yes">เริ่มดำเนินการ ${product.name} เมื่อออกจากการติดตั้ง</String>    
+    <String Id="Product_ArchMismatch"                               Overridable="yes">แพคเกจนี้ถูกออกแบบมาสำหรับ ระบบปฏิบัติการ 32 บิต ออกจากการตั้งค่าในขณะนี้</String>
+
+    <!-- SelectionWarningDlg -->
+    <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">ควรจะเลือกอย่างน้อยหนึ่งองค์ประกอบ</String>    
+
+    <!-- UninstallOptionsDlg -->
+    <String Id="UninstallOptionsDlg_UninstallOptions"               Overridable="yes">ถอนการติดตั้ง</String>
+    <String Id="UninstallOptionsDlg_KeepDatabase"                   Overridable="yes">เก็บ ${product.name} ฐานข้อมูล</String>
+    <String Id="UninstallOptionsDlg_RemoveDatabase"                 Overridable="yes">ลบ ${product.name} ฐานข้อมูล</String>
+    <String Id="UninstallOptionsDlg_Current"                        Overridable="yes">ปัจจุบัน</String>  
+    <String Id="UninstallOptionsDlgVersionToKeep"                   Overridable="yes">รุ่นที่มีอยู่</String>   
+    
+    <!-- UpgradeDlg -->
+    <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">รุ่นก่อนหน้านี้ที่ตรวจพบ</String>    
+    <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">ประเภทการติดตั้ง</String>    
+    <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">ระบบของคุณจะได้รับการอัพเกรด</String>    
+    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">ฐานข้อมูลของคุณได้รับความเสียหายและไม่สามารถกู้คืนได้ ติดตั้งฐานข้อมูลใหม่เสร็จสิ้น  ในการเข้าสู่ระบบ ผู้ใช้าน "admin" รหัสผ่าน "admin" กรุณาเปลี่ยนข้อมูลประจำตัวหลังจากเข้าใช้งานครั้งแรก</String>    
+
+    <!-- WixSchedFirewallExceptions -->
+    <String Id="msierrFirewallCannotConnect"                        Overridable="yes">ไม่สามารถเชื่อมต่อกับ Windows Firewall  ([2]   [3]   [4]   [5])</String>    
+    <String Id="WixSchedFirewallExceptionsInstall"                  Overridable="yes">การกำหนดค่า Windows Firewall</String>    
+    <String Id="WixSchedFirewallExceptionsUninstall"                Overridable="yes">การกำหนดค่า Windows Firewall</String>    
+    <String Id="WixRollbackFirewallExceptionsInstall"               Overridable="yes">ย้อนกลับไปกำหนดค่า Windows Firewall</String>    
+    <String Id="WixExecFirewallExceptionsInstall"                   Overridable="yes">การติดตั้งกำหนดค่า Windows Firewall</String>    
+    <String Id="WixRollbackFirewallExceptionsUninstall"             Overridable="yes">ย้อนกลับไปกำหนดค่า Windows Firewall</String>    
+    <String Id="WixExecFirewallExceptionsUninstall"                 Overridable="yes">ถอนการติดตั้งกำหนดค่า Windows Firewall</String>    
+    
+</WixLocalization>

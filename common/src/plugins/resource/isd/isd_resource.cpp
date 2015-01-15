@@ -1,6 +1,7 @@
 #ifdef ENABLE_ISD
 
 #include <utils/math/math.h>
+#include <utils/network/http/asynchttpclient.h>
 
 #include "isd_stream_reader.h"
 #include "isd_resource.h"
@@ -34,7 +35,40 @@ static bool sizeCompare(const QSize &s1, const QSize &s2)
 QnPlIsdResource::QnPlIsdResource()
 {
     setVendor(lit("ISD"));
-    setAuth(QLatin1String("root"), QLatin1String("admin"), false);
+    setDefaultAuth(QLatin1String("root"), QLatin1String("admin"));
+}
+
+bool QnPlIsdResource::checkIfOnlineAsync( std::function<void(bool)>&& completionHandler )
+{
+    QUrl apiUrl;
+    apiUrl.setScheme( lit("http") );
+    apiUrl.setHost( getHostAddress() );
+    apiUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
+    apiUrl.setUserName( getAuth().user() );
+    apiUrl.setPassword( getAuth().password() );
+    apiUrl.setPath( lit("/api/param.cgi") );
+    apiUrl.setQuery( lit("req=Network.1.MacAddress") );
+
+    QString resourceMac = getMAC().toString();
+    auto requestCompletionFunc = [resourceMac, completionHandler]
+        ( SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody ) mutable
+    {
+        if( osErrorCode != SystemError::noError ||
+            statusCode != nx_http::StatusCode::ok )
+        {
+            return completionHandler( false );
+        }
+
+        int sepIndex = msgBody.indexOf('=');
+        if( sepIndex == -1 )
+            return completionHandler( false );
+        QByteArray macAddress = msgBody.mid(sepIndex+1).trimmed();
+        completionHandler( macAddress == resourceMac.toLatin1() );
+    };
+
+    return nx_http::downloadFileAsync(
+        apiUrl,
+        requestCompletionFunc );
 }
 
 QString QnPlIsdResource::getDriverName() const
@@ -49,15 +83,23 @@ void QnPlIsdResource::setIframeDistance(int /*frames*/, int /*timems*/)
 CameraDiagnostics::Result QnPlIsdResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
-    CLHttpStatus status;
-    int port = QUrl(getUrl()).port(80);
-    QByteArray reslst = downloadFile(status, QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.ResolutionList"),  getHostAddress(), port, 3000, getAuth());
 
-    if (status == CL_HTTP_AUTH_REQUIRED)
-    {
-        setStatus(Qn::Unauthorized);
-        return CameraDiagnostics::UnknownErrorResult();
-    }
+    QUrl apiRequestUrl;
+    apiRequestUrl.setScheme( lit("http") );
+    apiRequestUrl.setUserName( getAuth().user() );
+    apiRequestUrl.setPassword( getAuth().password() );
+    apiRequestUrl.setHost( getHostAddress() );
+    apiRequestUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
+
+
+    //reading resolution list
+    CameraDiagnostics::Result result;
+
+    apiRequestUrl.setPath( lit("/api/param.cgi?req=VideoInput.1.h264.1.ResolutionList" ) );
+    QByteArray reslst;
+    result = doISDApiRequest( apiRequestUrl, &reslst );
+    if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
+        return result;
 
     QStringList vals = getValues(QLatin1String(reslst));
 
@@ -74,7 +116,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
     }
 
     if (resolutions.size() < 1 )
-        return CameraDiagnostics::UnknownErrorResult();
+        return CameraDiagnostics::CameraInvalidParams(lit("resolution"));
 
 
 
@@ -91,7 +133,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
 
 
 
-        int bestIndex = -1;
+        int bestIndex = 0;
         double bestMatchCoeff = maxResolutionSquare / requestSquare;
 
         float bestAspectRatio = getResolutionAspectRatio(m_resolution1);
@@ -130,37 +172,14 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
 
     }
     
-    
-    
-       /**/
 
+    //reading fps list
 
-    /*
-    QByteArray reslst2 = downloadFile(status, "api/param.cgi?req=VideoInput.1.h264.2.ResolutionList",  getHostAddress(), port, 3000, getAuth());
-
-    if (status == CL_HTTP_AUTH_REQUIRED)
-    {
-        setStatus(Unauthorized);
-        return false;
-    }
-    */
-
-
-    QByteArray fpses = downloadFile(status, QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.FrameRateList"),  getHostAddress(), port, 3000, getAuth());
-
-    if (status == CL_HTTP_AUTH_REQUIRED)
-    {
-        setStatus(Qn::Unauthorized);
-        QUrl requestedUrl;
-        requestedUrl.setHost( getHostAddress() );
-        requestedUrl.setPort( port );
-        requestedUrl.setScheme( QLatin1String("http") );
-        requestedUrl.setPath( QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.FrameRateList") );
-        return CameraDiagnostics::NotAuthorisedResult( requestedUrl.toString() );
-    }
-
-    /**/
-    
+    apiRequestUrl.setPath( lit("/api/param.cgi?req=VideoInput.1.h264.1.FrameRateList") );
+    QByteArray fpses;
+    result = doISDApiRequest( apiRequestUrl, &fpses );
+    if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
+        return result;
 
     vals = getValues(QLatin1String(fpses));
 
@@ -176,6 +195,23 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
         return CameraDiagnostics::UnknownErrorResult();
 
     setMaxFps(fpsList.at(0));
+
+    setProperty(
+        Qn::SUPPORTED_MOTION_PARAM_NAME,
+        qnResTypePool->getResourceType( getTypeId() )->defaultValue( Qn::SUPPORTED_MOTION_PARAM_NAME ) );
+
+
+    //reading firmware version
+
+    apiRequestUrl.setPath( lit("/api/param.cgi?req=General.FirmwareVersion") );
+    QByteArray cameraFirmwareVersion;
+    result = doISDApiRequest( apiRequestUrl, &cameraFirmwareVersion );
+    if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
+        return result;
+
+    const int sepPos = cameraFirmwareVersion.indexOf('=');
+    setFirmware( QLatin1String( sepPos != -1 ? cameraFirmwareVersion.mid( sepPos+1 ) : cameraFirmwareVersion ) );
+
 
     CameraMediaStreams mediaStreams;
     mediaStreams.streams.push_back( CameraMediaStreamInfo( m_resolution1, CODEC_ID_H264 ) );
@@ -229,6 +265,29 @@ QnConstResourceAudioLayoutPtr QnPlIsdResource::getAudioLayout(const QnAbstractSt
 void QnPlIsdResource::setMaxFps(int f)
 {
     setProperty(MAX_FPS_PARAM_NAME, f);
+}
+
+CameraDiagnostics::Result QnPlIsdResource::doISDApiRequest( const QUrl& apiRequestUrl, QByteArray* const msgBody )
+{
+    int statusCode = nx_http::StatusCode::ok;
+
+    SystemError::ErrorCode errorCode = nx_http::downloadFileSync(
+        apiRequestUrl,
+        &statusCode,
+        msgBody );
+    if( errorCode != SystemError::noError )
+        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult( apiRequestUrl.host(), apiRequestUrl.port() );
+    if( statusCode == nx_http::StatusCode::unauthorized )
+    {
+        setStatus(Qn::Unauthorized);
+        return CameraDiagnostics::NotAuthorisedResult( apiRequestUrl.toString() );
+    }
+    else if( statusCode != nx_http::StatusCode::ok )
+    {
+        return CameraDiagnostics::CameraResponseParseErrorResult( apiRequestUrl.toString(), apiRequestUrl.path() );
+    }
+
+    return CameraDiagnostics::NoErrorResult();
 }
 
 #endif // #ifdef ENABLE_ISD

@@ -11,6 +11,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QAbstractItemView>
+#include <QtWidgets/QHeaderView>
 
 #include <ui/common/text_pixmap_cache.h>
 #include <ui/common/geometry.h>
@@ -96,7 +97,7 @@ int QnNoptixStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, c
     case PM_ToolBarIconSize:
         return 18;
     case PM_SliderLength:
-        if(option->styleObject) {
+        if(option && option->styleObject) {
             int result = qvariant_cast<int>(option->styleObject->property(Qn::SliderLength), -1);
             if(result >= 0)
                 return result;
@@ -240,8 +241,14 @@ void QnNoptixStyle::polish(QWidget *widget) {
     base_type::polish(widget);
 
     // TODO: #Elric #2.3 remove this line in 2.3, looks like it's not needed.
-    if(QAbstractItemView *itemView = dynamic_cast<QAbstractItemView *>(widget))
+    if(QAbstractItemView *itemView = dynamic_cast<QAbstractItemView *>(widget)) {
         itemView->setIconSize(QSize(18, 18)); 
+
+        /* QWidget::scroll method has caching issues leading to some garbage drawn in the updated areas.
+           As a workaround we force it to repaint all contents. */
+        if(QHeaderView *headerView = dynamic_cast<QHeaderView *>(itemView))
+            headerView->viewport()->setAutoFillBackground(false);
+    }
 
     if(QAbstractButton *button = dynamic_cast<QAbstractButton *>(widget))
         button->setIcon(m_skin->icon(button->icon()));

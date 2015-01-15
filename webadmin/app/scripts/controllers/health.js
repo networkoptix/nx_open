@@ -6,9 +6,19 @@ angular.module('webadminApp')
         $scope.interval = 1000;// 1 секунда
         $scope.serverIsOnline = true;
 
+        var colors =  {
+            'StatisticsCPU':        ['#3776ca'],
+            'StatisticsRAM':        ['#db3ba9'],
+            'StatisticsHDD':        ['#438231','#484848','#aa880b','#b25e26','#9200d1','#00d5d5','#267f00','#8f5656','#c90000'],
+            'StatisticsNETWORK':    ['#ff3434', '#b08f4c', '#8484ff', '#34ff84']
+        };
+
+        var nocolor = 'rgba(255,255,255,0)';
+
+
         $scope.data = {
             labels: Array.apply(null, new Array( $scope.healthLength)).map(String.prototype.valueOf,''),
-            datasets: [{
+            datasets: [{ // we need some data
                 label: '',
                 fillColor: nocolor,
                 strokeColor: nocolor,
@@ -17,6 +27,7 @@ angular.module('webadminApp')
                 pointHighlightFill: nocolor,
                 pointHighlightStroke: nocolor,
                 show:true,
+                hideLegend:true,
                 data: Array.apply(null, new Array($scope.healthLength)).map(Number.prototype.valueOf,100)
             }]
         };
@@ -27,9 +38,9 @@ angular.module('webadminApp')
 
             animation:false,
             scaleOverride: false,
-            scaleSteps: 4,
+            scaleSteps: 10,
             scaleShowLabels: false ,
-            scaleLabel: "<%=value%> %",
+            scaleLabel: '<%=value%> %',
             scaleIntegersOnly:true,
 
 
@@ -40,7 +51,7 @@ angular.module('webadminApp')
             scaleShowGridLines : true,
 
             //String - Colour of the grid lines
-            scaleGridLineColor : "rgba(0,0,0,.05)",
+            scaleGridLineColor : 'rgba(0,0,0,.05)',
 
             //Number - Width of the grid lines
             scaleGridLineWidth : 1,
@@ -82,16 +93,8 @@ angular.module('webadminApp')
             legendTemplate : '<ul class="tc-chart-js-legend"><% for (var i=0; i<datasets.length; i++){%><li><span style="background-color:<%=datasets[i].strokeColor%>"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>'
         };
 
-        var colors =  {
-            "StatisticsCPU":        ["#3776ca"],
-            "StatisticsRAM":        ["#db3ba9"],
-            "StatisticsHDD":        ["#438231","#484848","#aa880b","#b25e26","#9200d1","#00d5d5","#267f00","#8f5656","#c90000"],
-            "StatisticsNETWORK":    ["#ff3434", "#b08f4c", "#8484ff", "#34ff84"]
-        };
 
-        var nocolor = 'rgba(255,255,255,0)';
-
-        function prepaireDataSets(statistics){
+        function prepareDataSets(statistics){
             var datasets = [{
                 label: '',
                 fillColor: nocolor,
@@ -101,7 +104,19 @@ angular.module('webadminApp')
                 pointHighlightFill: nocolor,
                 pointHighlightStroke: nocolor,
                 show:true,
+                hideLegend:true,
                 data: Array.apply(null, new Array($scope.healthLength)).map(Number.prototype.valueOf,100)
+            },{
+                label: '',
+                fillColor: nocolor,
+                strokeColor: nocolor,
+                pointColor: nocolor,
+                pointStrokeColor: nocolor,
+                pointHighlightFill: nocolor,
+                pointHighlightStroke: nocolor,
+                show:true,
+                hideLegend:true,
+                data: Array.apply(null, new Array($scope.healthLength)).map(Number.prototype.valueOf,0)
             }];
             for(var i=0;i<statistics.length;i++){
 
@@ -116,6 +131,7 @@ angular.module('webadminApp')
                     pointHighlightFill: color,
                     pointHighlightStroke: color,
                     show: true,
+                    hideLegend:false,
                     data: Array.apply(null, new Array($scope.healthLength)).map(Number.prototype.valueOf,0)
                 });
             }
@@ -123,69 +139,64 @@ angular.module('webadminApp')
             $scope.updateVisibleDatasets();
         }
 
+
+
         $scope.updateVisibleDatasets = function(){
-            $scope.data.datasets = _.filter($scope.datasets,function(dataset){return dataset.show});
-        }
+            $scope.data.datasets = _.filter($scope.datasets,function(dataset){return dataset.show;});
+        };
+
 
 
 
         function updateStatisticsDataSets(statistics){
             var datasets = $scope.datasets;
-
-            for(var i=0; i < datasets.length;i++){
+            var handler = function(stat){
+                return stat.description === dataset.label;
+            };
+            for(var i=2; i < datasets.length;i++){
                 var dataset = datasets[i];
-
                 var value = 0;
-
-                var needstat = _.filter(statistics,function(stat){
-                    return stat.description == dataset.label;
-                });
+                var needstat = _.filter(statistics,handler);
 
                 if(needstat && needstat.length > 0){
                     value  = needstat[0].value;
                 }
 
-                if(value>100){
-                    console.log(value,dataset,needstat);
-                }
-
-                if(i!=0) {
-                    dataset.data.push(value * 100);
-
-                    if (dataset.data.length > $scope.healthLength) {
-                        dataset.data = dataset.data.slice(dataset.data.length - $scope.healthLength, dataset.data.length);
-                    }
+                dataset.data.push(value * 100);
+                if (dataset.data.length > $scope.healthLength) {
+                    dataset.data = dataset.data.slice(dataset.data.length - $scope.healthLength, dataset.data.length);
                 }
             }
         }
 
+
         var statisticTimer = null;
         function updateStatistics() {
             mediaserver.statistics().then(function (r) {
-                if(statisticTimer == null){
+                if(statisticTimer === null){
                     // Подготовить легенды
-                    prepaireDataSets(r.data.reply.statistics);
+                    prepareDataSets(r.data.reply.statistics);
                 }
                 $scope.serverIsOnline = true;
 
-                updateStatisticsDataSets((r.status==200 && r.data.error == 0) ? r.data.reply.statistics:[]);
+                updateStatisticsDataSets((r.status===200 && r.data.error === "0") ? r.data.reply.statistics:[]);
 
                 statisticTimer = $timeout(updateStatistics,$scope.interval);
                 return false;
-            },function(r){
+            },function(){
                 //some connection error
                 updateStatisticsDataSets([]);
                 $scope.serverIsOnline = false;
 
-                //show message "server is offline"
+                //show message 'server is offline'
                 statisticTimer = $timeout(updateStatistics,$scope.interval);
             });
         }
 
         var timeout = setTimeout(updateStatistics,$scope.interval);
         $scope.$on(
-            "$destroy",
-            function( event ) {
+            '$destroy',
+            function(  ) {
                 $timeout.cancel(statisticTimer);
                 clearTimeout(timeout);
             }

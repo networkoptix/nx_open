@@ -39,6 +39,11 @@ public:
     virtual QnResourcePtr updateResource();
     //========
 
+    //!Implementation of QnNetworkResource::ping
+    virtual bool ping() override;
+    //!Implementation of QnNetworkResource::checkIfOnlineAsync
+    virtual bool checkIfOnlineAsync( std::function<void(bool)>&& completionHandler ) override;
+
     virtual QString getDriverName() const override;
 
     virtual Qn::StreamQuality getBestQualityForSuchOnScreenSize(const QSize& size) const override;
@@ -53,7 +58,7 @@ public:
 
     int totalMdZones() const;
     bool isH264() const;
-
+    int getZoneSite() const;
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
 
@@ -75,6 +80,7 @@ protected:
 
 private:
     int m_totalMdZones;
+    int m_zoneSite;
 };
 
 typedef QnSharedResourcePointer<QnPlAreconVisionResource> QnPlAreconVisionResourcePtr;

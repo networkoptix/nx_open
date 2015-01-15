@@ -12,8 +12,14 @@ namespace ec2
         if (sequence == 0) {
             sequence = qn_transportHeader_sequence.fetchAndAddAcquire(1);
             sender = qnCommon->moduleGUID();
+            senderRuntimeID = qnCommon->runningInstanceGUID();
         }
     }
 
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnTransactionTransportHeader, (json)(ubjson), QnTransactionTransportHeader_Fields);
+    QString toString(const QnTransactionTransportHeader& header)
+    {
+        return lit("ttSeq=%1 sender=%2:%3").arg(header.sequence).arg(header.sender.toString()).arg(header.senderRuntimeID.toString());
+    }
+
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnTransactionTransportHeader, (ubjson), QnTransactionTransportHeader_Fields);
 }

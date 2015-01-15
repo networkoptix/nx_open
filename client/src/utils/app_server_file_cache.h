@@ -6,12 +6,13 @@
 
 #include <nx_ec/ec_api.h>
 
+#include <ui/workbench/workbench_context_aware.h>
 
 class QnAppServerFileCache : public QObject
 {
     Q_OBJECT
 public:
-    explicit QnAppServerFileCache(QString folderName, QObject *parent = 0);
+    explicit QnAppServerFileCache(const QString &folderName, QObject *parent = 0);
     virtual ~QnAppServerFileCache();
 
     /** Get full path to cached file with fixed filename */
@@ -35,10 +36,16 @@ public:
 
     virtual void deleteFile(const QString &filename);
 
+    /** Clear cache state. */
+    virtual void clear();
+
     static void clearLocalCache();
+
 protected:
     void ensureCacheFolder();
     QString folderName() const;
+
+    bool isConnectedToServer() const;
 signals:
     void fileDownloaded(const QString& filename, bool ok);
     void delayedFileDownloaded(const QString& filename, bool ok);
@@ -50,17 +57,16 @@ signals:
     void delayedFileDeleted(const QString& filename, bool ok);
 
     void fileListReceived(const QStringList& filenames, bool ok);
+    void delayedFileListReceived(const QStringList& filenames, bool ok);
 private slots:
     void at_fileLoaded( int handle, ec2::ErrorCode errorCode, const QByteArray& data );
     void at_fileUploaded(int handle, ec2::ErrorCode errorCode);
     void at_fileDeleted(int handle, ec2::ErrorCode errorCode);
-    void at_fileListReceived(int handle, ec2::ErrorCode errorCode, const QStringList& filenames);
 private:
+    const QString m_folderName;
     QHash<int, QString> m_loading;
     QHash<int, QString> m_uploading;
     QHash<int, QString> m_deleting;
-    int m_fileListHandle;
-    QString m_folderName;
 };
 
 #endif // APP_SERVER_FILE_CACHE_H

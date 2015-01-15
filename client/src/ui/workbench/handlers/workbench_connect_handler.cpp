@@ -25,6 +25,8 @@
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/status_dictionary.h>
 
+#include <nx_ec/ec_proto_version.h>
+
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameter_types.h>
@@ -41,15 +43,19 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_state_manager.h>
+#include <ui/workbench/workbench_access_controller.h>
 
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
+#include <ui/workbench/watchers/workbench_user_watcher.h>
 
 #include <utils/app_server_notification_cache.h>
 #include <utils/connection_diagnostics_helper.h>
+#include <utils/common/collection.h>
 #include <utils/common/synctime.h>
 #include <utils/network/module_finder.h>
 #include <utils/network/global_module_finder.h>
 #include <utils/network/router.h>
+#include <utils/reconnect_helper.h>
 
 
 #include "compatibility.h"
@@ -72,6 +78,9 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /*= 0*/):
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    this,   &QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened);
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionClosed,    this,   &QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed);
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::initialResourcesReceived,    this,   [this] {
+        /* Reload all dialogs and dependent data. */
+        context()->instance<QnWorkbenchStateManager>()->forcedUpdate();
+
         /* We are just reconnected automatically, e.g. after update. */
         if (!m_readyForConnection)
             return;
@@ -82,8 +91,14 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /*= 0*/):
         if(!watcher->hasMismatches())
             return;
 
+        if (!accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission))
+            return;
+
         menu()->trigger(Qn::VersionMismatchMessageAction);
     });
+
+    QnWorkbenchUserWatcher* userWatcher = context()->instance<QnWorkbenchUserWatcher>();
+    connect(userWatcher, &QnWorkbenchUserWatcher::reconnectRequired, this, &QnWorkbenchConnectHandler::at_reconnectAction_triggered);
 
     connect(action(Qn::ConnectAction),              &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_connectAction_triggered);
     connect(action(Qn::ReconnectAction),            &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_reconnectAction_triggered);
@@ -111,8 +126,6 @@ QnLoginDialog * QnWorkbenchConnectHandler::loginDialog() const {
 void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened() {
     action(Qn::OpenLoginDialogAction)->setIcon(qnSkin->icon("titlebar/connected.png"));
     action(Qn::OpenLoginDialogAction)->setText(tr("Connect to Another Server...")); // TODO: #GDM #Common use conditional texts?
-
-    context()->instance<QnAppServerNotificationCache>()->getFileList();
 
     hideMessageBox();
 
@@ -168,7 +181,8 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
     if (url.isValid()) {
         /* Videowall item */
         if (qnSettings->isVideoWallMode()) {
-            if (!connectToServer(url, true)) {
+            //TODO: #GDM #High videowall should try indefinitely
+            if (connectToServer(url, true) != ec2::ErrorCode::ok) {
                 QnGraphicsMessageBox* incompatibleMessageBox = QnGraphicsMessageBox::informationTicking(tr("Could not connect to server. Closing in %1..."), videowallCloseTimeoutMSec);
                 connect(incompatibleMessageBox, &QnGraphicsMessageBox::finished, action(Qn::ExitAction), &QAction::trigger);
             }
@@ -177,7 +191,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
         /* Login Dialog or 'Open in new window' with url */
         { 
             //try connect; if not - show login dialog
-            if (!connectToServer(url))
+            if (connectToServer(url) != ec2::ErrorCode::ok)
                 showLoginDialog();
         }
     } else {
@@ -191,7 +205,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
             && url.isValid() 
             && !url.password().isEmpty()) 
         {
-            if (!connectToServer(url))
+            if (connectToServer(url) != ec2::ErrorCode::ok)
                 showLoginDialog();
         } else 
         /* No saved password, just open Login Dialog. */ 
@@ -209,7 +223,7 @@ void QnWorkbenchConnectHandler::at_reconnectAction_triggered() {
     QUrl currentUrl = QnAppServerConnectionFactory::url(); 
     if (connected())
         disconnectFromServer(true);
-    if (!connectToServer(currentUrl))
+    if (connectToServer(currentUrl) != ec2::ErrorCode::ok)
         showLoginDialog();
 }
  
@@ -225,11 +239,11 @@ bool QnWorkbenchConnectHandler::connected() const {
     return !qnCommon->remoteGUID().isNull();
 }
 
-bool QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerUrl, bool silent) {
+ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerUrl, bool silent) {
     if (!silent) {
         Q_ASSERT(!connected());
         if (connected())
-            return true;
+            return ec2::ErrorCode::ok;
     }
     
     /* Hiding message box from previous connect. */
@@ -245,28 +259,33 @@ bool QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerUrl, bool s
 
     /* Check if we have entered 'connect' method again while were in 'connecting...' state */
     if (m_connectingHandle != result.handle())
-        return true;
+        return ec2::ErrorCode::ok;
     m_connectingHandle = 0;
 
     /* Hiding message box from current connect. */
     hideMessageBox();
 
     QnConnectionInfo connectionInfo = result.reply<QnConnectionInfo>();
+    QWidget* parentWidget = (m_loginDialog && m_loginDialog->isActiveWindow())
+        ? m_loginDialog.data()
+        : mainWindow();
     QnConnectionDiagnosticsHelper::Result status = silent
         ? QnConnectionDiagnosticsHelper::validateConnectionLight(connectionInfo, errCode)
-        : QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errCode, appServerUrl, mainWindow());
-    
+        : QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errCode, appServerUrl, parentWidget);
+
     switch (status) {
     case QnConnectionDiagnosticsHelper::Result::Failure:
-        return false;
+        return errCode == ec2::ErrorCode::ok 
+            ? ec2::ErrorCode::incompatiblePeer  /* Substitute value for incompatible peers. */
+            : errCode;
     case QnConnectionDiagnosticsHelper::Result::Restart:
-        menu()->trigger(Qn::ExitActionDelayed);
-        return true; // to avoid cycle
+        menu()->trigger(Qn::DelayedForcedExitAction);
+        return ec2::ErrorCode::ok; // to avoid cycle
     default:    //success
         break;
     }
 
-    QnAppServerConnectionFactory::setUrl(appServerUrl);
+    QnAppServerConnectionFactory::setUrl(connectionInfo.ecUrl);
     QnAppServerConnectionFactory::setEc2Connection(result.connection());
     QnAppServerConnectionFactory::setCurrentVersion(connectionInfo.version);
 
@@ -279,7 +298,7 @@ bool QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerUrl, bool s
 
     QnGlobalModuleFinder::instance()->setConnection(result.connection());
 
-    return true;
+    return ec2::ErrorCode::ok;
 }
 
 bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
@@ -295,8 +314,8 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
 
     QnGlobalModuleFinder::instance()->setConnection(NULL);
     QnClientMessageProcessor::instance()->init(NULL);
-    QnAppServerConnectionFactory::setUrl(QUrl());
     QnAppServerConnectionFactory::setEc2Connection(NULL);
+    QnAppServerConnectionFactory::setUrl(QUrl());
     QnAppServerConnectionFactory::setCurrentVersion(QnSoftwareVersion());
     QnSessionManager::instance()->stop();
     QnResource::stopCommandProc();
@@ -363,7 +382,6 @@ void QnWorkbenchConnectHandler::clearConnection() {
     }
 
     qnLicensePool->reset();
-    context()->instance<QnAppServerNotificationCache>()->clear();
     qnCommon->setLocalSystemName(QString());
 }
 
@@ -372,111 +390,61 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
     if (currentUrl.isEmpty())
         return false;
 
-    QnReconnectInfoDialog* reconnectInfoDialog = new QnReconnectInfoDialog(mainWindow());
-    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    reconnectInfoDialog,   &QDialog::hide);
-    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    reconnectInfoDialog,   &QObject::deleteLater);
+    QScopedPointer<QnReconnectHelper> reconnectHelper(new QnReconnectHelper());
+    if (reconnectHelper->servers().isEmpty())
+        return false;
 
-    reconnectInfoDialog->setText(tr("Resolving servers..."));
+    QPointer<QnReconnectInfoDialog> reconnectInfoDialog(new QnReconnectInfoDialog(mainWindow()));
+    reconnectInfoDialog->setServers(reconnectHelper->servers());
+
+    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    reconnectInfoDialog.data(),     &QDialog::hide);
+    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    reconnectInfoDialog.data(),     &QObject::deleteLater);
     reconnectInfoDialog->show();
 
-    QString userName = currentUrl.userName();
-    QString password = currentUrl.password();
-
-    QHostAddress currentAddr(currentUrl.host());
-    quint32 currentIp = currentAddr.toIPv4Address();
-    if (currentAddr.isNull()) {
-        QHostInfo currentInfo = QHostInfo::fromName(currentUrl.host());
-        foreach (const QHostAddress &addr, currentInfo.addresses()) {
-            currentIp = addr.toIPv4Address();
-            if (currentIp > 0)
-                break;
-        }
-    }
-
-    auto matchIpMetric = [](quint32 ip1, quint32 ip2) {
-        int i = 31;
-        while (i >= 0 && (ip1 >> i == ip2 >> i))
-            --i;
-        return 31 - i;
-    };
-
-    auto hostLessThan = [currentIp, matchIpMetric](const QUrl &left, const QUrl &right) {
-        QHostAddress laddr(left.host());
-        QHostAddress raddr(right.host());
-        if (laddr.isNull() || raddr.isNull())
-            return raddr.isNull();
-
-        int metricDiff = matchIpMetric(currentIp, laddr.toIPv4Address()) - matchIpMetric(currentIp, raddr.toIPv4Address());
-        return metricDiff != 0
-            ? metricDiff > 0
-            : laddr.toIPv4Address() < raddr.toIPv4Address();
-    };
-
-    QList<QnUuid> allServers;
-    foreach (const QnMediaServerResourcePtr &server, qnResPool->getResources<QnMediaServerResource>())
-        allServers << server->getId();
-
-    QList<QUrl> availableServers;
-    QMap<QString, int> hostsCount; // count duplicated hosts to display port in their url
-
-    foreach (const QnModuleInformation &info, QnModuleFinder::instance()->foundModules()) {
-        if (!allServers.contains(info.id))
-            continue;
-
-        foreach (const QString &remoteAddr, info.remoteAddresses) {
-            QUrl serverUrl;
-            serverUrl.setScheme(lit("http"));
-            serverUrl.setHost(remoteAddr);
-            serverUrl.setPort(info.port);
-            serverUrl.setUserName(userName);
-            serverUrl.setPassword(password);
-            availableServers << serverUrl;
-            ++hostsCount[serverUrl.host()];
-        }
-    }    
-
-    if (availableServers.isEmpty()) {
-        qWarning() << "No servers are available for reconnect" << allServers << "modules:" << QnModuleFinder::instance()->foundModules().size();
-        availableServers << currentUrl;
-    }
-
-    qSort(availableServers.begin(), availableServers.end(), hostLessThan);
-
-    auto getInfo = [availableServers, hostsCount](const QUrl &url) {
-        QStringList result;
-        foreach (const QUrl &serverUrl, availableServers) {
-            QString info = serverUrl.host();
-            if (hostsCount[info] > 1)
-                info = lit("%1:%2").arg(info).arg(serverUrl.port());
-            if (url.host() == serverUrl.host() && url.port() == serverUrl.port())
-                info = lit("<b>%1</b>").arg(info);
-            result << info;
-        }
-        return result.join(lit("<br>"));
-    };
-
-    /* Main window can be closed in the event loop so the dialog will be freed. */
-    QPointer<QnReconnectInfoDialog> dialogGuard(reconnectInfoDialog);
+    bool success = false;
 
     /* Here we will wait for the reconnect or cancel. */
-    auto iter = availableServers.cbegin();
-    while (dialogGuard && !reconnectInfoDialog->wasCanceled()) {
-        reconnectInfoDialog->setText(getInfo(*iter));
-        if (connectToServer(*iter, true))   /* Here inner event loop will be started. */
+    while (reconnectInfoDialog && !reconnectInfoDialog->wasCanceled()) {
+        reconnectInfoDialog->setCurrentServer(reconnectHelper->currentServer());
+
+        /* Here inner event loop will be started. */
+        ec2::ErrorCode errCode = connectToServer(reconnectHelper->currentUrl(), true); 
+        if (errCode == ec2::ErrorCode::ok) {
+            success = true;
             break;
-        ++iter;
-        if (iter == availableServers.cend())
-            iter = availableServers.cbegin();   //loop
+        }
+
+        //TODO: #dklychkov #GDM When client tries to reconnect to a single server very often we can get "unauthorized" reply,
+        //      because we try to connect before the server initialized its auth classes.
+
+        if (errCode == ec2::ErrorCode::incompatiblePeer || errCode == ec2::ErrorCode::unauthorized)
+            reconnectHelper->markServerAsInvalid(reconnectHelper->currentServer());
+
+        /* Find next valid server for reconnect. */
+        QnMediaServerResourceList allServers = reconnectHelper->servers();
+        bool found = true;
+        do {
+            reconnectHelper->next();
+            /* We have found at least one correct interface for the server. */
+            found = reconnectHelper->currentUrl().isValid();
+            if (!found) /* Do not try to connect to invalid servers. */
+                allServers.removeOne(reconnectHelper->currentServer());
+        } while (!found && !allServers.isEmpty());
+
+        /* Break cycle if we cannot find any valid server. */
+        if (!found) 
+            break;
     }
 
-    if (!dialogGuard)
+    /* Main window can be closed in the event loop so the dialog will be freed. */
+    if (!reconnectInfoDialog)
         return true;
 
     disconnect(QnClientMessageProcessor::instance(), NULL, reconnectInfoDialog, NULL);
     reconnectInfoDialog->deleteLater();
     if (reconnectInfoDialog->wasCanceled())
         return false;
-    return true;
+    return success;
 }
 
 

@@ -87,8 +87,8 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const {
             return camera->getFirmware();
         case IpColumn:
             return camera->getHostAddress();
-        case UniqIdColumn:
-            return camera->getPhysicalId();
+        case MacColumn:
+            return camera->getMAC().toString();
         case ServerColumn: 
             return server ? getFullResourceName(server, true) : QVariant();
         default:
@@ -127,7 +127,7 @@ QVariant QnCameraListModel::headerData(int section, Qt::Orientation orientation,
     case ModelColumn:     return tr("Model");
     case FirmwareColumn:  return tr("Firmware");
     case IpColumn:        return tr("IP/Name");
-    case UniqIdColumn:    return tr("ID/MAC");
+    case MacColumn:     return tr("MAC address");
     case ServerColumn:    return tr("Server");
     default:
         break;

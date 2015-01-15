@@ -1,7 +1,10 @@
 #ifdef ENABLE_DESKTOP_CAMERA
 
 #include "desktop_camera_resource.h"
-#include "desktop_camera_reader.h"
+
+#include <plugins/resource/desktop_camera/desktop_camera_reader.h>
+#include <plugins/resource/desktop_camera/desktop_camera_resource_searcher.h>
+
 #include <media_server/serverutil.h>
 
 const QString QnDesktopCameraResource::MANUFACTURE("VIRTUAL_CAMERA");
@@ -58,6 +61,14 @@ bool QnDesktopCameraResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr 
     }
 
     return result;
+}
+
+bool QnDesktopCameraResource::isReadyToDetach() const {
+    if (!QnDesktopCameraResourceSearcher::instance())
+        return true;
+
+    auto camera = this->toSharedPointer().dynamicCast<QnDesktopCameraResource>();
+    return !QnDesktopCameraResourceSearcher::instance()->isCameraConnected(camera);  // check if we have already lost connection
 }
 
 #endif //ENABLE_DESKTOP_CAMERA

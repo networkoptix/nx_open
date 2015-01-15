@@ -17,9 +17,9 @@
         "_": "Globals settings. These ones will go away in one of the future versions.",
         
         "frameColor":               "custom_grey",
-        "businessRuleDisabledHighlightColor": "QColor(64, 64, 64)",
-        "businessRuleInvalidBackgroundColor": "QColor(150, 0, 0)",
-        "businessRuleInvalidColumnBackgroundColor": "QColor(204, 0, 0)",
+        "businessRuleDisabledHighlightColor": "#afafaf",
+        "businessRuleInvalidBackgroundColor": "#ffbaba",
+        "businessRuleInvalidColumnBackgroundColor": "#ff5757",
         "businessRuleInvalidHighlightColor": "selection"
     },
     
@@ -169,7 +169,7 @@
         "colors": {
             "_": "Background gradient colors.",
             
-            "normal": "darkGrey",
+            "normal": "#444444.setAlpha(76)",
             "panic": "custom_red"
         }
     },

@@ -147,15 +147,21 @@ QnFisheyeImageFilter::QnFisheyeImageFilter(const QnMediaDewarpingParams& mediaDe
     memset (m_transform, 0, sizeof(m_transform));
 }
 
-void QnFisheyeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect, qreal ar)
+CLVideoDecoderOutputPtr QnFisheyeImageFilter::updateImage(const CLVideoDecoderOutputPtr& srcFrame)
 {
     if (!m_itemDewarping.enabled || !m_mediaDewarping.enabled)
-        return;
+        return srcFrame;
 
-    int left = qPower2Floor(updateRect.left() * frame->width, 16);
-    int right = qPower2Floor(updateRect.right() * frame->width, 16);
-    int top = updateRect.top() * frame->height;
-    int bottom = updateRect.bottom() * frame->height;
+    CLVideoDecoderOutputPtr frame;
+    if (m_itemDewarping.panoFactor > 1)
+        frame = CLVideoDecoderOutputPtr(srcFrame->scaled(updatedResolution(srcFrame->size())));
+    else
+        frame = srcFrame;
+
+    int left = 0;
+    int right = frame->width;
+    int top = 0;
+    int bottom = frame->height;
     QSize imageSize(right - left, bottom - top);
 
     const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[frame->format];
@@ -179,14 +185,16 @@ void QnFisheyeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF
                 w >>= descr->log2_chroma_w;
                 h >>= descr->log2_chroma_h;
             }
+            qreal sar = srcFrame->sample_aspect_ratio ? srcFrame->sample_aspect_ratio : 1.0;
+            qreal ar = srcFrame->width * sar / (qreal) srcFrame->height;
             updateFisheyeTransform(QSize(w, h), plane, ar);
         }
         m_lastImageSize = imageSize;
         m_lastImageFormat = frame->format;
-        m_tmpBuffer->reallocate(frame->width, frame->height, frame->format);
+        m_tmpBuffer->reallocate(frame->width, frame->height, frame->format, qPower2Ceil(unsigned(frame->width + 2), CL_MEDIA_ALIGNMENT));
     }
 
-    m_tmpBuffer->copyDataFrom(frame);
+    m_tmpBuffer->copyDataFrom(frame.data());
 
     for (int plane = 0; plane < descr->nb_components && frame->data[plane]; ++plane)
     {
@@ -218,6 +226,7 @@ void QnFisheyeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF
 #else
     //TODO: C fallback routine
 #endif
+    return frame;
 }
 
 QVector3D sphericalToCartesian(qreal theta, qreal phi) { // TODO: #Elric use function from coordinate_transform header
@@ -310,7 +319,7 @@ void QnFisheyeImageFilter::updateFisheyeTransformRectilinear(const QSize& imageS
             if (dstX < 0.0 || dstX > (qreal) (imageSize.width() - 1) ||
                 dstY < 0.0 || dstY > (qreal) (imageSize.height() - 1))
             {
-                dstX = 0.0;
+                dstX = imageSize.width();
                 dstY = 0.0;
             }
 
@@ -397,7 +406,7 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
             if (dstX < 0.0 || dstX > (qreal) (imageSize.width() - 1) ||
                 dstY < 0.0 || dstY > (qreal) (imageSize.height() - 1))
             {
-                dstX = 0.0;
+                dstX = imageSize.width();
                 dstY = 0.0;
             }
             
@@ -417,6 +426,11 @@ QSize QnFisheyeImageFilter::getOptimalSize(const QSize& srcResolution, const QnI
     int x = int(sqrt(square * aspect) + 0.5);
     int y = int(x /aspect + 0.5);
     return QSize(qPower2Floor(x, 16), qPower2Floor(y, 2));
+}
+
+QSize QnFisheyeImageFilter::updatedResolution(const QSize& srcSize)
+{
+    return getOptimalSize(srcSize, m_itemDewarping);
 }
 
 #endif // ENABLE_DATA_PROVIDERS

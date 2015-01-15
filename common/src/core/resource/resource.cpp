@@ -116,7 +116,6 @@ QnResource::QnResource():
     m_lastMediaIssue(CameraDiagnostics::NoErrorResult()),
     m_removedFromPool(false)
 {
-    m_lastStatusUpdateTime = QDateTime::fromMSecsSinceEpoch(0);
 }
 
 QnResource::~QnResource()
@@ -185,18 +184,33 @@ void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modif
     if (m_parentId != other->m_parentId) {
         m_parentId = other->m_parentId;
         modifiedFields << "parentIdChanged";
+        if( m_initialized )
+        {
+            m_initialized = false;
+            modifiedFields << "initializedChanged";
+        }
     }
+
+    m_locallySavedProperties = other->m_locallySavedProperties;
 }
 
-void QnResource::update(const QnResourcePtr& other, bool silenceMode)
-{
-    for (QnResourceConsumer *consumer: m_consumers)
-        consumer->beforeUpdate();
+void QnResource::update(const QnResourcePtr& other, bool silenceMode) {
+    /*
+    Q_ASSERT_X(other->metaObject()->className() == this->metaObject()->className(),
+        Q_FUNC_INFO,
+        "Trying to update " + QByteArray(this->metaObject()->className()) + " with " + QByteArray(other->metaObject()->className()));
+    */
+    {
+        QMutexLocker locker(&m_consumersMtx);
+        for (QnResourceConsumer *consumer: m_consumers)
+            consumer->beforeUpdate();
+    }
+
     QSet<QByteArray> modifiedFields;
     {
         QMutex *m1 = &m_mutex, *m2 = &other->m_mutex;
         if(m1 > m2)
-            std::swap(m1, m2);
+            std::swap(m1, m2);  //to maintain mutex lock order
         QMutexLocker mutexLocker1(m1); 
         QMutexLocker mutexLocker2(m2); 
         updateInner(other, modifiedFields);
@@ -206,10 +220,35 @@ void QnResource::update(const QnResourcePtr& other, bool silenceMode)
     //setStatus(other->m_status, silenceMode);
     afterUpdateInner(modifiedFields);
 
+    {
+        QMutexLocker lk(&m_mutex); 
+        if( !m_id.isNull() && !m_locallySavedProperties.empty() )
+        {
+            std::map<QString, LocalPropertyValue> locallySavedProperties;
+            std::swap( locallySavedProperties, m_locallySavedProperties );
+            QnUuid id = m_id;
+            lk.unlock();
+
+            for( auto prop: locallySavedProperties )
+            {
+                if( propertyDictionary->setValue(
+                        id,
+                        prop.first,
+                        prop.second.value,
+                        prop.second.markDirty,
+                        prop.second.replaceIfExists) )   //isModified?
+                {
+                    emitPropertyChanged(prop.first);
+                }
+            }
+        }
+    }
+
     //silently ignoring missing properties because of removeProperty method lack
     for (const ec2::ApiResourceParamData &param: other->getProperties())
         emitPropertyChanged(param.name);   //here "propertyChanged" will be called
-    
+
+    QMutexLocker locker(&m_consumersMtx);
     for (QnResourceConsumer *consumer: m_consumers)
         consumer->afterUpdate();
 }
@@ -220,7 +259,7 @@ QnUuid QnResource::getParentId() const
     return m_parentId;
 }
 
-void QnResource::setParentId(QnUuid parent)
+void QnResource::setParentId(const QnUuid& parent)
 {
     bool initializedChanged = false;
     QnUuid oldParentId;
@@ -421,10 +460,6 @@ void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatu
         init();
 
     emit statusChanged(toSharedPointer(this));
-
-    QDateTime dt = qnSyncTime->currentDateTime();
-    QMutexLocker mutexLocker(&m_mutex);
-    m_lastStatusUpdateTime = dt;
 }
 
 void QnResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
@@ -444,12 +479,6 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
     qnStatusDictionary->setValue(id, newStatus);
     if (!silenceMode)
         doStatusChanged(oldStatus, newStatus);
-}
-
-QDateTime QnResource::getLastStatusUpdateTime() const
-{
-    QMutexLocker mutexLocker(&m_mutex);
-    return m_lastStatusUpdateTime;
 }
 
 QDateTime QnResource::getLastDiscoveredTime() const
@@ -479,7 +508,8 @@ void QnResource::setId(const QnUuid& id) {
     //QnUuid oldId = m_id;
     m_id = id;
 
-    auto locallySavedProperties = std::move( m_locallySavedProperties );
+    std::map<QString, LocalPropertyValue> locallySavedProperties;
+    std::swap( locallySavedProperties, m_locallySavedProperties );
     mutexLocker.unlock();
 
     for( auto prop: locallySavedProperties )
@@ -643,16 +673,19 @@ bool QnResource::hasProperty(const QString &key) const {
 QString QnResource::getProperty(const QString &key) const {
     //QMutexLocker mutexLocker(&m_mutex);
     //return m_propertyByKey.value(key, defaultValue);
-
+    QString value;
     {
         QMutexLocker lk( &m_mutex );
         if( m_id.isNull() ) {
             auto itr =  m_locallySavedProperties.find(key);
-            return itr != m_locallySavedProperties.end() ? itr->second.value : QString();
+            if (itr != m_locallySavedProperties.end())
+                value = itr->second.value;
+        }
+        else {
+            value = propertyDictionary->value(getId(), key);
         }
     }
 
-    QString value = propertyDictionary->value(getId(), key);
     if (value.isNull()) {
         // find default value in resourceType
         QnResourceTypePtr resType = qnResTypePool->getResourceType(m_typeId); 

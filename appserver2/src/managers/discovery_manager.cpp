@@ -28,6 +28,11 @@ void QnDiscoveryNotificationManager::triggerNotification(const ApiDiscoveryData 
     emit discoveryInformationChanged(discoveryData, addInformation);
 }
 
+void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveryDataList> &tran) {
+    for (const ApiDiscoveryData &data: tran.params)
+        emit discoveryInformationChanged(data, true);
+}
+
 
 template<class QueryProcessorType>
 QnDiscoveryManager<QueryProcessorType>::QnDiscoveryManager(QueryProcessorType * const queryProcessor) :
@@ -72,9 +77,22 @@ int QnDiscoveryManager<QueryProcessorType>::removeDiscoveryInformation(const QnU
 }
 
 template<class QueryProcessorType>
+int QnDiscoveryManager<QueryProcessorType>::getDiscoveryData(impl::GetDiscoveryDataHandlerPtr handler) {
+    const int reqID = generateRequestID();
+
+    auto queryDoneHandler = [reqID, handler](ErrorCode errorCode, const ApiDiscoveryDataList &data) {
+        ApiDiscoveryDataList outData;
+        if (errorCode == ErrorCode::ok)
+            outData = data;
+        handler->done(reqID, errorCode, outData);
+    };
+    m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiDiscoveryDataList, decltype(queryDoneHandler)>(ApiCommand::getDiscoveryData, nullptr, queryDoneHandler);
+    return reqID;
+}
+
+template<class QueryProcessorType>
 QnTransaction<ApiDiscoveryData> QnDiscoveryManager<QueryProcessorType>::prepareTransaction(ApiCommand::Value command, const QnUuid &id, const QUrl &url, bool ignore) const {
     QnTransaction<ApiDiscoveryData> transaction(command);
-    Q_ASSERT_X(ignore || url.port() != -1, "Additional server URLs without a port are not allowed", Q_FUNC_INFO);
     transaction.params.id = id;
     transaction.params.url = url.toString();
     transaction.params.ignore = ignore;

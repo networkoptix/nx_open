@@ -6,6 +6,8 @@
 #include <QtCore/QFile>
 #include <QtCore/QStringList>
 
+#include <core/resource/resource.h>
+
 //
 // CameraSettingValue
 //
@@ -107,29 +109,22 @@ bool CameraSettingValue::operator != ( QString val ) const
 // CameraSetting
 //
 
-QString& CAMERA_SETTING_TYPE_VALUE  = *(new QString(QLatin1String("Value")));
-QString& CAMERA_SETTING_TYPE_ONOFF  = *(new QString(QLatin1String("OnOff")));
-QString& CAMERA_SETTING_TYPE_BOOL   = *(new QString(QLatin1String("Boolean")));
-QString& CAMERA_SETTING_TYPE_MINMAX = *(new QString(QLatin1String("MinMaxStep")));
-QString& CAMERA_SETTING_TYPE_ENUM   = *(new QString(QLatin1String("Enumeration")));
-QString& CAMERA_SETTING_TYPE_BUTTON = *(new QString(QLatin1String("Button")));
-QString& CAMERA_SETTING_TYPE_TEXTFIELD = *(new QString(QLatin1String("TextField")));
-QString& CAMERA_SETTING_TYPE_CTRL_BTNS = *(new QString(QLatin1String("ControlButtonsPair")));
-QString& CAMERA_SETTING_VAL_ON = *(new QString(QLatin1String("On")));
-QString& CAMERA_SETTING_VAL_OFF = *(new QString(QLatin1String("Off")));
-
-QString& CameraSetting::SEPARATOR = *(new QString(QLatin1String(";;")));
+namespace {
+    const QString CAMERA_SETTING_TYPE_ONOFF     = lit("Bool");
+    const QString CAMERA_SETTING_TYPE_MINMAX    = lit("MinMaxStep");
+    const QString CAMERA_SETTING_TYPE_ENUM      = lit("Enumeration");
+    const QString CAMERA_SETTING_TYPE_TEXTFIELD = lit("String");
+    const QString CAMERA_SETTING_TYPE_BUTTON    = lit("Button");
+    const QString CAMERA_SETTING_TYPE_CTRL_BTNS = lit("ControlButtonsPair");
+    const QString CAMERA_SETTING_VAL_ON         = lit("On");
+    const QString CAMERA_SETTING_VAL_OFF        = lit("Off");
+    const QString SEPARATOR                     = lit(";;");
+}
 
 CameraSetting::WIDGET_TYPE CameraSetting::typeFromStr(const QString& value)
 {
-    if (value == CAMERA_SETTING_TYPE_VALUE) {
-        return Value;
-    }
     if (value == CAMERA_SETTING_TYPE_ONOFF) {
         return OnOff;
-    }
-    if (value == CAMERA_SETTING_TYPE_BOOL) {
-        return Boolean;
     }
     if (value == CAMERA_SETTING_TYPE_MINMAX) {
         return MinMaxStep;
@@ -153,9 +148,7 @@ QString CameraSetting::strFromType(const WIDGET_TYPE value)
 {
     switch (value)
     {
-        case Value: return CAMERA_SETTING_TYPE_VALUE;
         case OnOff: return CAMERA_SETTING_TYPE_ONOFF;
-        case Boolean: return CAMERA_SETTING_TYPE_BOOL;
         case MinMaxStep: return CAMERA_SETTING_TYPE_MINMAX;
         case Enumeration: return CAMERA_SETTING_TYPE_ENUM;
         case Button: return CAMERA_SETTING_TYPE_BUTTON;
@@ -170,9 +163,26 @@ bool CameraSetting::isTypeWithoutValue(const WIDGET_TYPE value)
     return value == Button || value == ControlButtonsPair;
 }
 
-CameraSetting::CameraSetting(const QString& id, const QString& name, WIDGET_TYPE type,
-        const QString& query, const QString& method, const QString& description, const CameraSettingValue min,
-        const CameraSettingValue max, const CameraSettingValue step, const CameraSettingValue current) :
+CameraSetting::CameraSetting()
+:
+    m_type(None),
+    m_isReadOnly(false)
+{
+}
+
+CameraSetting::CameraSetting(
+    const QString& id,
+    const QString& name,
+    WIDGET_TYPE type,
+    const QString& query,
+    const QString& method,
+    const QString& description,
+    const CameraSettingValue& min,
+    const CameraSettingValue& max,
+    const CameraSettingValue& step,
+    const CameraSettingValue& current,
+    bool paramReadOnly )
+:
     m_id(id),
     m_name(name),
     m_type(type),
@@ -182,7 +192,8 @@ CameraSetting::CameraSetting(const QString& id, const QString& name, WIDGET_TYPE
     m_min(min),
     m_max(max),
     m_step(step),
-    m_current(current)
+    m_current(current),
+    m_isReadOnly(paramReadOnly)
 {
     switch (m_type)
     {
@@ -291,6 +302,16 @@ CameraSettingValue CameraSetting::getCurrent() const {
     return m_current;
 }
 
+void CameraSetting::setIsReadOnly( bool val )
+{
+    m_isReadOnly = val;
+}
+
+bool CameraSetting::isReadOnly() const
+{
+    return m_isReadOnly;
+}
+
 CameraSetting& CameraSetting::operator= (const CameraSetting& rhs)
 {
     setId(rhs.getId());
@@ -363,19 +384,20 @@ bool CameraSetting::isDisabled() const
 // class CameraSettingReader
 //
 
-const QString& CameraSettingReader::ID_SEPARATOR = *(new QString(QLatin1String("%%")));
-const QString& CameraSettingReader::TAG_GROUP = *(new QString(QLatin1String("group")));
-const QString& CameraSettingReader::TAG_PARAM = *(new QString(QLatin1String("param")));
-const QString& CameraSettingReader::ATTR_PARENT = *(new QString(QLatin1String("parent")));
-const QString& CameraSettingReader::ATTR_ID = *(new QString(QLatin1String("id")));
-const QString& CameraSettingReader::ATTR_NAME = *(new QString(QLatin1String("name")));
-const QString& CameraSettingReader::ATTR_WIDGET_TYPE = *(new QString(QLatin1String("widget_type")));
-const QString& CameraSettingReader::ATTR_QUERY = *(new QString(QLatin1String("query")));
-const QString& CameraSettingReader::ATTR_METHOD = *(new QString(QLatin1String("method")));
-const QString& CameraSettingReader::ATTR_DESCRIPTION = *(new QString(QLatin1String("description")));
-const QString& CameraSettingReader::ATTR_MIN = *(new QString(QLatin1String("min")));
-const QString& CameraSettingReader::ATTR_MAX = *(new QString(QLatin1String("max")));
-const QString& CameraSettingReader::ATTR_STEP = *(new QString(QLatin1String("step")));
+const QString ID_SEPARATOR(QLatin1String("%%"));
+const QString TAG_GROUP(QLatin1String("group"));
+const QString TAG_PARAM(QLatin1String("param"));
+const QString ATTR_PARENT(QLatin1String("parent"));
+const QString ATTR_ID(QLatin1String("id"));
+const QString ATTR_NAME(QLatin1String("name"));
+const QString ATTR_DATA_TYPE(QLatin1String("dataType"));
+const QString ATTR_QUERY(QLatin1String("query"));
+const QString ATTR_METHOD(QLatin1String("method"));
+const QString ATTR_DESCRIPTION(QLatin1String("description"));
+const QString ATTR_MIN(QLatin1String("min"));
+const QString ATTR_MAX(QLatin1String("max"));
+const QString ATTR_STEP(QLatin1String("step"));
+const QString ATTR_READ_ONLY(QLatin1String("readOnly"));
 const QString CSR_CAMERA_SETTINGS_FILEPATH(QLatin1String(":/camera_settings/camera_settings.xml"));
 
 QString CameraSettingReader::createId(const QString& parentId, const QString& name)
@@ -389,32 +411,54 @@ bool CameraSettingReader::isEnabled(const CameraSetting& val)
         (val.getType() == CameraSetting::Enumeration || val.getMin() != val.getMax());
 }
 
-CameraSettingReader::CameraSettingReader(const QString& cameraId) :
+CameraSettingReader::CameraSettingReader(
+    const QString& cameraId,
+    const QnResourcePtr& cameraRes )
+:
     m_filepath(CSR_CAMERA_SETTINGS_FILEPATH),
-    m_cameraId(cameraId)
+    m_cameraId(cameraId),
+    m_cameraRes(cameraRes)
 {
 }
 
 CameraSettingReader::~CameraSettingReader()
 {
+}
 
+void CameraSettingReader::setCamera( const QnResourcePtr& cameraRes )
+{
+    m_cameraRes = cameraRes;
 }
 
 bool CameraSettingReader::read()
 {
-    QFile file(m_filepath);
+    std::unique_ptr<QIODevice> dataSource;
 
-    if (!file.exists())
+    if( m_cameraRes )
     {
-        qWarning() << "Cannot open file '" << m_filepath << "'";
-        return false;
+        const QString& cameraSettingsXml = m_cameraRes->getProperty( Qn::PHYSICAL_CAMERA_SETTINGS_XML_PARAM_NAME );
+        if( !cameraSettingsXml.isEmpty() )
+        {
+            dataSource.reset( new QBuffer() );
+            static_cast<QBuffer*>(dataSource.get())->setData( cameraSettingsXml.toUtf8() );
+        }
+    }
+    
+    if( !dataSource )
+    {
+        dataSource.reset( new QFile(m_filepath) );
+        if (!static_cast<QFile*>(dataSource.get())->exists())
+        {
+            qWarning() << "Cannot open file '" << m_filepath << "'";
+            return false;
+        }
     }
 
     QString errorStr;
     int errorLine;
     int errorColumn;
 
-    if (!m_doc.setContent(&file, &errorStr, &errorLine, &errorColumn))
+    if (!m_doc.setContent(dataSource.get(), &errorStr, &errorLine, &errorColumn))
     {
         qWarning() << "File '" << m_filepath << "'. Parse error at line: " << errorLine << ", column: " << errorColumn << ", error: " << errorStr;
         return false;
@@ -435,14 +479,18 @@ bool CameraSettingReader::proceed()
     {
         if (node.toElement().tagName() == QLatin1String("camera"))
         {
-            if (node.attributes().namedItem(ATTR_NAME).nodeValue() != m_cameraId) {
+            const QString& foundCameraName = node.attributes().namedItem(ATTR_NAME).nodeValue();
+            if( !m_cameraId.isEmpty() &&    //do not check camera id
+                (foundCameraName != m_cameraId) )
+            {
                 continue;
             }
 
             QString parentId = node.attributes().namedItem(ATTR_PARENT).nodeValue();
             if (!parentId.isEmpty()) {
-                parentOfRootElemFound(parentId);
+                parentOfRootElemFound( parentId );
             }
+            cameraElementFound( foundCameraName, parentId );
 
             return parseCameraXml(node.toElement());
         }
@@ -515,9 +563,9 @@ bool CameraSettingReader::parseElementXml(const QDomElement& elementXml, const Q
         return true;
     }
 
-    QString widgetTypeStr = elementXml.attribute(ATTR_WIDGET_TYPE);
+    QString widgetTypeStr = elementXml.attribute(ATTR_DATA_TYPE);
     if (widgetTypeStr.isEmpty()) {
-        qWarning() << "File '" << m_filepath << "' has tag '" << TAG_PARAM << "' w/o attribute '" << ATTR_WIDGET_TYPE << "'";
+        qWarning() << "File '" << m_filepath << "' has tag '" << TAG_PARAM << "' w/o attribute '" << ATTR_DATA_TYPE << "'";
         return false;
     }
     CameraSetting::WIDGET_TYPE widgetType = CameraSetting::typeFromStr(widgetTypeStr);
@@ -528,18 +576,23 @@ bool CameraSettingReader::parseElementXml(const QDomElement& elementXml, const Q
     CameraSettingValue min = CameraSettingValue(elementXml.attribute(ATTR_MIN));
     CameraSettingValue max = CameraSettingValue(elementXml.attribute(ATTR_MAX));
     CameraSettingValue step = CameraSettingValue(elementXml.attribute(ATTR_STEP));
+    const bool paramReadOnly = elementXml.attribute(ATTR_READ_ONLY, lit("false")) == lit("true");
 
     switch(widgetType)
     {
-    case CameraSetting::OnOff: case CameraSetting::MinMaxStep: case CameraSetting::Enumeration: case CameraSetting::Button:
-    case CameraSetting::TextField: case CameraSetting::ControlButtonsPair:
-        paramFound(CameraSetting(id, name, widgetType, query, method, description, min, max, step), parentId);
-        return true;
+        case CameraSetting::OnOff:
+        case CameraSetting::MinMaxStep:
+        case CameraSetting::Enumeration:
+        case CameraSetting::Button:
+        case CameraSetting::TextField:
+        case CameraSetting::ControlButtonsPair:
+            paramFound(CameraSetting(id, name, widgetType, query, method, description, min, max, step, CameraSettingValue(), paramReadOnly), parentId);
+            return true;
 
-    default:
-        qWarning() << "File '" << m_filepath << "' has tag '" << TAG_PARAM << "' has unexpected value of attribute '"
-            << ATTR_WIDGET_TYPE << "': " << widgetTypeStr;
-        return false;
+        default:
+            qWarning() << "File '" << m_filepath << "' has tag '" << TAG_PARAM << "' has unexpected value of attribute '"
+                << ATTR_DATA_TYPE << "': " << widgetTypeStr;
+            return false;
     }
 
     return true;

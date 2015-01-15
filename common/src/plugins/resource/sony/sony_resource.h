@@ -33,8 +33,8 @@ public:
 protected:
     virtual CameraDiagnostics::Result updateResourceCapabilities() override;
     virtual CameraDiagnostics::Result initInternal() override;
-    virtual bool startInputPortMonitoring() override;
-    virtual void stopInputPortMonitoring() override;
+    virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;
+    virtual void stopInputPortMonitoringAsync() override;
     virtual bool isInputPortMonitored() const override;
 
 private:

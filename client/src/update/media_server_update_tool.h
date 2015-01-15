@@ -41,6 +41,7 @@ public:
 
     void startUpdate(const QnSoftwareVersion &version = QnSoftwareVersion(), bool denyMajorUpdates = false);
     void startUpdate(const QString &fileName);
+    void startOnlineClientUpdate(const QnSoftwareVersion &version);
 
     bool cancelUpdate();
 

@@ -65,7 +65,6 @@ libavfilter.so.2.77.100 \
 libavformat.so.54.6.100 \
 libavutil.so.51.54.100 \
 libcommon.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libcreateprocess.so \
 libappserver2.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libpostproc.so.52.0.100 \
 libQt5Concurrent.so.5.2.1 \
@@ -75,6 +74,7 @@ libQt5Multimedia.so.5.2.1 \
 libQt5Network.so.5.2.1 \
 libQt5Sql.so.5.2.1 \
 libQt5Xml.so.5.2.1 \
+libQt5XmlPatterns.so.5.2.1 \
 libquazip.so.1.0.0 \
 libsigar.so \
 libswresample.so.0.15.100 \
@@ -83,7 +83,9 @@ libswscale.so.2.1.100 )
 if [ -e "$LIBS_DIR/libvpx.so.1.2.0" ]; then
   LIBS_TO_COPY+=( libvpx.so.1.2.0 )
 fi
-
+if [ -e "$LIBS_DIR/libcreateprocess.so" ]; then
+  LIBS_TO_COPY+=( libcreateprocess.so )
+fi
 
 rm -rf $BUILD_DIR
 mkdir -p $BUILD_DIR/$PREFIX_DIR

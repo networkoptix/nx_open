@@ -2,6 +2,10 @@
 #ifdef ENABLE_ONVIF
 
 #include "onvif_resource_information_fetcher.h"
+
+#include <memory>
+#include <mutex>
+
 #include "onvif_resource.h"
 #include "onvif/soapDeviceBindingProxy.h"
 #include "../digitalwatchdog/digital_watchdog_resource.h"
@@ -26,10 +30,11 @@ static const char* ANALOG_CAMERAS[][2] =
 // Add vendor and camera model to ommit ONVIF search (case insensitive)
 static const char* IGNORE_VENDORS[][2] =
 {
-    {"*networkcamera*", "IP*"}, // DLINK
-    {"*", "*spartan-6*"},       // ArecontVision
+    {"IP*", "*networkcamera*"}, // DLINK
+    {"ISD", "*"},              // ISD
+    {"spartan-6*", "*"},       // ArecontVision
     {"acti*", "*"},              // ACTi. Current ONVIF implementation quite unstable. Vendor name is not filled by camera!
-    {"*", "KCM*"}              // ACTi. Current ONVIF implementation quite unstable. Vendor name is not filled by camera!
+    {"*", "KCM*"}              // ACTi.
 };
 
 bool OnvifResourceInformationFetcher::isAnalogOnvifResource(const QString& vendor, const QString& model)
@@ -54,7 +59,8 @@ bool OnvifResourceInformationFetcher::isModelContainVendor(const QString& vendor
         return false;
 }
 
-OnvifResourceInformationFetcher::OnvifResourceInformationFetcher():
+OnvifResourceInformationFetcher::OnvifResourceInformationFetcher()
+:
     /*passwordsData(PasswordHelper::instance()),*/
     camersNamesData(NameHelper::instance()),
     m_shouldStop(false)
@@ -74,10 +80,15 @@ OnvifResourceInformationFetcher::OnvifResourceInformationFetcher():
     }
 }
 
+static std::unique_ptr<OnvifResourceInformationFetcher> OnvifResourceInformationFetcher_instance;
+static std::once_flag OnvifResourceInformationFetcher_onceFlag;
+
 OnvifResourceInformationFetcher& OnvifResourceInformationFetcher::instance()
 {
-    static OnvifResourceInformationFetcher inst;
-    return inst;
+    std::call_once(
+        OnvifResourceInformationFetcher_onceFlag,
+        [](){ OnvifResourceInformationFetcher_instance.reset( new OnvifResourceInformationFetcher() ); } );
+    return *OnvifResourceInformationFetcher_instance.get();
 }
 
 void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result, DiscoveryMode discoveryMode) const
@@ -275,7 +286,6 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
     resource->setTypeId(getOnvifResourceType(manufacturer, model));
 
     resource->setHostAddress(QHostAddress(sender).toString());
-    resource->setDiscoveryAddr(discoveryIp);
     resource->setModel(model);
     if (isModelContainVendor(manufacturer, model))
         resource->setName(model); 
@@ -290,7 +300,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
     resource->setDeviceOnvifUrl(deviceUrl);
 
     if (!login.isEmpty())
-        resource->setAuth(login, passwd);
+        resource->setDefaultAuth(login, passwd);
 
     return resource;
 }
@@ -328,6 +338,8 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
     if (manufacture.toLower().contains(QLatin1String("digital watchdog")))
         resource = QnPlOnvifResourcePtr(new QnPlWatchDogResource());
     else if (manufacture.toLower() == QLatin1String("panoramic"))
+        resource = QnPlOnvifResourcePtr(new QnPlWatchDogResource());
+    else if (manufacture.toLower() == QLatin1String("ipnc"))   // new dw panoramic cameras
         resource = QnPlOnvifResourcePtr(new QnPlWatchDogResource());
     else if (manufacture.toLower().contains(QLatin1String("sony")))
         resource = QnPlOnvifResourcePtr(new QnPlSonyResource());

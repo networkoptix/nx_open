@@ -23,6 +23,8 @@
 
 #include <utils/math/math.h>
 #include <utils/common/log.h>
+#include "camera/get_image_helper.h"
+#include "core/resource_management/resource_properties.h"
 
 QnMServerBusinessRuleProcessor::QnMServerBusinessRuleProcessor(): QnBusinessRuleProcessor()
 {
@@ -81,9 +83,8 @@ bool QnMServerBusinessRuleProcessor::executePanicAction(const QnPanicBusinessAct
     Qn::PanicMode val = Qn::PM_None;
     if (action->getToggleState() == QnBusiness::ActiveState)
         val =  Qn::PM_BusinessEvents;
-    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
-    conn->setPanicModeSync(val);
     mediaServer->setPanicMode(val);
+    propertyDictionary->saveParams(mediaServer->getId());
     return true;
 }
 
@@ -182,75 +183,13 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
                 autoResetTimeout );
 }
 
-QImage QnMServerBusinessRuleProcessor::getEventScreenshot(const QnBusinessEventParameters& params, QSize dstSize) const {
-    // TODO: this code is copy-pasted from getImageHandler. need refactoring to avoid code duplicate
-
-    QImage result;
-
+QByteArray QnMServerBusinessRuleProcessor::getEventScreenshotEncoded(const QnBusinessEventParameters& params, QSize dstSize) const 
+{
     // By now only motion screenshot is supported
     if (params.eventType != QnBusiness::CameraMotionEvent)
-        return result;
+        return QByteArray();
 
     const QnResourcePtr& cameraRes = QnResourcePool::instance()->getResourceById(params.eventResourceId);
-    QnVideoCamera* camera = qnCameraPool->getVideoCamera(cameraRes);
-    const QnVirtualCameraResource* res = dynamic_cast<const QnVirtualCameraResource*>(cameraRes.data());
-
-    if (!camera)
-        return result;
-
-    QnConstCompressedVideoDataPtr video = camera->getLastVideoFrame(true);
-    if (!video)
-        video = camera->getLastVideoFrame(false);
-
-    if (!video)
-        return result;
-
-    CLFFmpegVideoDecoder decoder(video->compressionType, video, false);
-
-    QSharedPointer<CLVideoDecoderOutput> outFrame( new CLVideoDecoderOutput() );
-    bool gotFrame = (res->getStatus() == Qn::Online || res->getStatus() == Qn::Recording) && decoder.decode(video, &outFrame);
-    if (!gotFrame)
-        return result;
-
-    double ar = decoder.getSampleAspectRatio() * outFrame->width / outFrame->height;
-    if (!dstSize.isEmpty()) {
-        dstSize.setHeight(qPower2Ceil((unsigned) dstSize.height(), 4));
-        dstSize.setWidth(qPower2Ceil((unsigned) dstSize.width(), 4));
-    }
-    else if (dstSize.height() > 0) {
-        dstSize.setHeight(qPower2Ceil((unsigned) dstSize.height(), 4));
-        dstSize.setWidth(qPower2Ceil((unsigned) (dstSize.height()*ar), 4));
-    }
-    else if (dstSize.width() > 0) {
-        dstSize.setWidth(qPower2Ceil((unsigned) dstSize.width(), 4));
-        dstSize.setHeight(qPower2Ceil((unsigned) (dstSize.width()/ar), 4));
-    }
-    else {
-        dstSize = QSize(outFrame->width, outFrame->height);
-    }
-    dstSize.setWidth(qMin(dstSize.width(), outFrame->width));
-    dstSize.setHeight(qMin(dstSize.height(), outFrame->height));
-
-    if (dstSize.width() < 8 || dstSize.height() < 8)
-        return result;
-
-    int numBytes = avpicture_get_size(PIX_FMT_RGBA, qPower2Ceil(static_cast<quint32>(dstSize.width()), 8), dstSize.height());
-    uchar* scaleBuffer = static_cast<uchar*>(qMallocAligned(numBytes, 32));
-    SwsContext* scaleContext = sws_getContext(outFrame->width, outFrame->height, PixelFormat(outFrame->format), 
-        dstSize.width(), dstSize.height(), PIX_FMT_BGRA, SWS_BICUBIC, NULL, NULL, NULL);
-
-    int dstLineSize[4];
-    quint8* dstBuffer[4];
-    dstLineSize[0] = qPower2Ceil(static_cast<quint32>(dstSize.width() * 4), 32);
-    dstLineSize[1] = dstLineSize[2] = dstLineSize[3] = 0;
-    QImage image(scaleBuffer, dstSize.width(), dstSize.height(), dstLineSize[0], QImage::Format_ARGB32_Premultiplied);
-    dstBuffer[0] = dstBuffer[1] = dstBuffer[2] = dstBuffer[3] = scaleBuffer;
-    sws_scale(scaleContext, outFrame->data, outFrame->linesize, 0, outFrame->height, dstBuffer, dstLineSize);
-
-    result = image.copy();
-
-    sws_freeContext(scaleContext);
-    qFreeAligned(scaleBuffer);
-
-    return result;
+    QSharedPointer<CLVideoDecoderOutput> frame = QnGetImageHelper::getImage(cameraRes.dynamicCast<QnVirtualCameraResource>(), DATETIME_NOW, dstSize);
+    return frame ? QnGetImageHelper::encodeImage(frame, "jpg") : QByteArray();
 }

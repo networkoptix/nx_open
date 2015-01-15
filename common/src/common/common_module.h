@@ -45,14 +45,8 @@ public:
     void setObsoleteServerGuid(const QnUuid& guid) { m_obsoleteUuid = guid; }
     QnUuid obsoleteServerGuid() const{ return m_obsoleteUuid; }
     
-    void setRemoteGUID(const QnUuid& guid) {
-        QMutexLocker lock(&m_mutex);
-        m_remoteUuid = guid; 
-    }
-    QnUuid remoteGUID() const{ 
-        QMutexLocker lock(&m_mutex);
-        return m_remoteUuid; 
-    }
+    void setRemoteGUID(const QnUuid& guid);
+    QnUuid remoteGUID() const;
 
     QUrl moduleUrl() const { return m_url; }
     void setModuleUlr(const QUrl& url) { m_url = url; }
@@ -72,8 +66,14 @@ public:
     void setModuleInformation(const QnModuleInformation &moduleInformation);
     QnModuleInformation moduleInformation() const;
 
+    bool isTranscodeDisabled() const { return m_transcodingDisabled; }
+    void setTranscodeDisabled(bool value) { m_transcodingDisabled = value; }
+
+    inline void setAllowedPeers(const QSet<QnUuid> &peerList) { m_allowedPeers = peerList; }
+    inline QSet<QnUuid> allowedPeers() const { return m_allowedPeers; }
 signals:
     void systemNameChanged(const QString &systemName);
+    void remoteIdChanged(const QnUuid &id);
 
 protected:
     static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
@@ -92,6 +92,8 @@ private:
     QnSoftwareVersion m_engineVersion;
     QnModuleInformation m_moduleInformation;
     mutable QMutex m_mutex;
+    bool m_transcodingDisabled;
+    QSet<QnUuid> m_allowedPeers;
 };
 
 #define qnCommon (QnCommonModule::instance())

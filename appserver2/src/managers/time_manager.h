@@ -68,7 +68,9 @@ namespace ec2
         TimePriorityKey();
 
         bool operator==( const TimePriorityKey& right ) const;
+        bool operator!=( const TimePriorityKey& right ) const;
         bool operator<( const TimePriorityKey& right ) const;
+        bool operator<=( const TimePriorityKey& right ) const;
         bool operator>( const TimePriorityKey& right ) const;
         quint64 toUInt64() const;
         void fromUInt64( quint64 val );
@@ -101,7 +103,8 @@ namespace ec2
     */
     class TimeSynchronizationManager
     :
-        public QObject
+        public QObject,
+        public QnStoppable
     {
         Q_OBJECT
 
@@ -113,11 +116,24 @@ namespace ec2
         static const int peerHasMonotonicClock                   = 0x0002;
         static const int peerIsNotEdgeServer                     = 0x0001;
 
+        /*!
+            \note \a TimeSynchronizationManager::start MUST be called before using class instance
+        */
         TimeSynchronizationManager( Qn::PeerType peerType );
         virtual ~TimeSynchronizationManager();
 
         static TimeSynchronizationManager* instance();
 
+        //!Implemenattion of QnStoppable::pleaseStop
+        virtual void pleaseStop() override;
+
+        //!Initial initialization
+        /*!
+            \note Cannot do it in constructor to keep valid object destruction order
+            TODO #ak look like incapsulation failure. Better remove this method
+        */
+        void start();
+        
         //!Returns synchronized time
         qint64 getSyncTime() const;
         //!Called when primary time server has been changed by user
@@ -187,7 +203,7 @@ namespace ec2
         */
         std::map<QnUuid, TimeSyncInfo> m_systemTimeByPeer;
         const Qn::PeerType m_peerType;
-        DaytimeNISTFetcher m_timeSynchronizer;
+        std::unique_ptr<DaytimeNISTFetcher> m_timeSynchronizer;
         size_t m_internetTimeSynchronizationPeriod;
         bool m_timeSynchronized;
 
@@ -219,9 +235,10 @@ namespace ec2
 
         void updateRuntimeInfoPriority(quint64 priority);
         void peerSystemTimeReceivedNonSafe( const ApiPeerSystemTimeData& tran );
+        qint64 getSyncTimeNonSafe() const;
 
     private slots:
-        void onNewConnectionEstablished( const QnTransactionTransportPtr& transport );
+        void onNewConnectionEstablished(QnTransactionTransport* transport );
         void onPeerLost( ApiPeerAliveData data );
         void onDbManagerInitialized();
     };

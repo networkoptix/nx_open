@@ -175,8 +175,7 @@ protected slots:
 
 protected slots:
     void at_context_userChanged(const QnUserResourcePtr &user);
-    void at_workbench_layoutsChanged();
-    void at_workbench_cellAspectRatioChanged();
+
     void at_workbench_cellSpacingChanged();
     void at_workbench_currentLayoutChanged();
 
@@ -244,13 +243,8 @@ protected slots:
     void at_newUserAction_triggered();
 
     void at_adjustVideoAction_triggered();
-    void at_exitAction_triggered();
     void at_beforeExitAction_triggered();
 
-    void at_setCurrentLayoutAspectRatio4x3Action_triggered();
-    void at_setCurrentLayoutAspectRatio16x9Action_triggered();
-    void at_setCurrentLayoutAspectRatio3x4Action_triggered();
-    void at_setCurrentLayoutAspectRatio9x16Action_triggered();
     void at_setCurrentLayoutItemSpacing0Action_triggered();
     void at_setCurrentLayoutItemSpacing10Action_triggered();
     void at_setCurrentLayoutItemSpacing20Action_triggered();
@@ -269,7 +263,6 @@ protected slots:
     void at_panicWatcher_panicModeChanged();
     void at_scheduleWatcher_scheduleEnabledChanged();
     void at_togglePanicModeAction_toggled(bool checked);
-    void at_updateWatcher_availableUpdateChanged();
     void at_layoutCountWatcher_layoutCountChanged();
 
     void at_toggleTourAction_toggled(bool checked);
@@ -302,6 +295,8 @@ private:
     bool validateResourceName(const QnResourcePtr &resource, const QString &newName) const;
 
     void deleteDialogs();
+
+    void closeApplication(bool force = false);
 private:
     friend class detail::QnResourceStatusReplyProcessor;
 

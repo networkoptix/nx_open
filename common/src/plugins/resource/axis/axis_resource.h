@@ -37,6 +37,9 @@ public:
     QnPlAxisResource();
     ~QnPlAxisResource();
 
+    //!Implementation of QnNetworkResource::checkIfOnlineAsync
+    virtual bool checkIfOnlineAsync( std::function<void(bool)>&& completionHandler ) override;
+
     virtual QString getDriverName() const override;
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
@@ -82,8 +85,8 @@ protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
     virtual void setCroppingPhysical(QRect cropping);
-    virtual bool startInputPortMonitoring() override;
-    virtual void stopInputPortMonitoring() override;
+    virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;
+    virtual void stopInputPortMonitoringAsync() override;
     virtual bool isInputPortMonitored() const override;
 
 private:

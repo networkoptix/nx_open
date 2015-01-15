@@ -17,9 +17,10 @@
 
 //TODO #ak try multiple servers in case of error or empty string (it happens pretty often)
 
-static const size_t MAX_TIME_STR_LENGTH = 256; 
+static const unsigned int SECONDS_FROM_1900_01_01_TO_1970_01_01 = 2208988800L;
+static const size_t MAX_TIME_STR_LENGTH = sizeof(time_t); 
 static const char* DEFAULT_NIST_SERVER = "time.nist.gov";
-static const unsigned short DAYTIME_PROTOCOL_DEFAULT_PORT = 13;
+static const unsigned short DAYTIME_PROTOCOL_DEFAULT_PORT = 37;     //time protocol
 static const int SOCKET_READ_TIMEOUT = 7000;
 static const int MILLIS_PER_SEC = 1000;
 static const int SEC_PER_MIN = 60;
@@ -108,29 +109,15 @@ bool DaytimeNISTFetcher::getTimeAsync( std::function<void(qint64, SystemError::E
 
     \param actsStr \0 - terminated string of format "JJJJJ YR-MO-DA HH:MM:SS TT L H msADV UTC(NIST) OTM"
 */
-static qint64 actsTimeToUTCMillis( const char* actsStr )
+static qint64 actsTimeToUTCMillis( const QByteArray& timeStr )
 {
-    //skipping separators in the beginning
-    while( *actsStr && (*actsStr == '\n' || *actsStr == '\r' || *actsStr == ' ' || *actsStr == '\t') )
-        ++actsStr;
-
-    struct tm curTime;
-    memset( &curTime, 0, sizeof(curTime) );
-    unsigned int mjd = 0, leap = 0, health = 0;
-    float msADV = 0;
-
-    sscanf( actsStr, "%d %d-%d-%d %d:%d:%d %d %d %d %f", 
-        &mjd, &curTime.tm_year, &curTime.tm_mon, &curTime.tm_mday, 
-        &curTime.tm_hour, &curTime.tm_min, &curTime.tm_sec, &curTime.tm_isdst, &leap, &health, &msADV );
-    curTime.tm_mon -= 1;    //must be from 0 to 11
-    curTime.tm_year += 100; //current year minus 1900
-    time_t utcTime = mktime( &curTime );
-
-    if( utcTime < 0 )
+    quint32 utcTimeSeconds = 0;
+    if( timeStr.size() != sizeof(utcTimeSeconds) )
         return -1;
-
-    //adjusting to local time: actually we should adjust curTime to local timezone, but it is more simple to do it now with utcTime
-    return ((qint64)utcTime + nx_tz::getLocalTimeZoneOffset() * SEC_PER_MIN) * MILLIS_PER_SEC;
+    memcpy( &utcTimeSeconds, timeStr.constData(), sizeof(utcTimeSeconds) );
+    utcTimeSeconds = ntohl( utcTimeSeconds );
+    utcTimeSeconds -= SECONDS_FROM_1900_01_01_TO_1970_01_01;
+    return ((qint64)utcTimeSeconds) * MILLIS_PER_SEC;
 }
 
 void DaytimeNISTFetcher::onConnectionEstablished( SystemError::ErrorCode errorCode ) noexcept
@@ -176,8 +163,7 @@ void DaytimeNISTFetcher::onSomeBytesRead( SystemError::ErrorCode errorCode, size
                 m_handlerFunc( -1, SystemError::notConnected );
                 return;
             }
-            m_timeStr.append( '\0' );
-            m_handlerFunc( actsTimeToUTCMillis( m_timeStr.constData() ), SystemError::noError );
+            m_handlerFunc( actsTimeToUTCMillis( m_timeStr ), SystemError::noError );
             return;
         }
         m_handlerFunc( -1, errorCode );
@@ -196,8 +182,7 @@ void DaytimeNISTFetcher::onSomeBytesRead( SystemError::ErrorCode errorCode, size
             m_handlerFunc( -1, SystemError::notConnected );
             return;
         }
-        m_timeStr.append( '\0' );
-        m_handlerFunc( actsTimeToUTCMillis( m_timeStr.constData() ), SystemError::noError );
+        m_handlerFunc( actsTimeToUTCMillis( m_timeStr ), SystemError::noError );
         return;
     }
     else
@@ -212,7 +197,7 @@ void DaytimeNISTFetcher::onSomeBytesRead( SystemError::ErrorCode errorCode, size
             arg( QLatin1String( DEFAULT_NIST_SERVER ) ).arg( DAYTIME_PROTOCOL_DEFAULT_PORT ).arg( QLatin1String( m_timeStr.trimmed() ) ), cl_logDEBUG1 );
 
         //max data size has been read, ignoring futher data
-        m_handlerFunc( actsTimeToUTCMillis( m_timeStr.constData() ), SystemError::noError );
+        m_handlerFunc( actsTimeToUTCMillis( m_timeStr ), SystemError::noError );
         return;
     }
 

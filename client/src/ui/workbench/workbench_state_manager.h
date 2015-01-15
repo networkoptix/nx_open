@@ -9,6 +9,7 @@ public:
     ~QnWorkbenchStateDelegate();
 
     virtual bool tryClose(bool force) = 0;
+    virtual void forcedUpdate() = 0;
 };
 
 template <typename T>
@@ -23,6 +24,10 @@ public:
         return m_owner->tryClose(force);
     }
 
+    virtual void forcedUpdate() override {
+        m_owner->forcedUpdate();
+    }
+
 private:
     T* m_owner;
 }; 
@@ -30,8 +35,12 @@ private:
 class QnWorkbenchStateManager: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
 public:
-
     QnWorkbenchStateManager(QObject *parent = NULL);
+
+    /** Forcibly update all delegates. 
+     *  Should be called in case of full state re-read (reconnect, merge systems, etc). 
+     **/
+    void forcedUpdate();
 
     bool tryClose(bool force);
 private:

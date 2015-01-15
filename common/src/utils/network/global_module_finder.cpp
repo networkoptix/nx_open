@@ -2,23 +2,35 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <utils/network/module_finder.h>
+#include <utils/network/router.h>
 #include <utils/common/log.h>
 #include <common/common_module.h>
 #include <api/app_server_connection.h>
 #include <nx_ec/data/api_module_data.h>
 #include <nx_ec/dummy_handler.h>
+#include <nx_ec/ec_proto_version.h>
 
 QnGlobalModuleFinder::QnGlobalModuleFinder(QnModuleFinder *moduleFinder, QObject *parent) :
     QObject(parent),
+    m_mutex(QMutex::Recursive),
     m_connection(std::weak_ptr<ec2::AbstractECConnection>()),
     m_moduleFinder(moduleFinder)
 {
-    connect(qnResPool,      &QnResourcePool::statusChanged,         this,       &QnGlobalModuleFinder::at_resourcePool_statusChanged);
-    connect(qnResPool,      &QnResourcePool::resourceRemoved,       this,       &QnGlobalModuleFinder::at_resourcePool_resourceRemoved);
+    connect(QnRouter::instance(),   &QnRouter::connectionAdded,     this,       &QnGlobalModuleFinder::at_router_connectionAdded);
+    connect(QnRouter::instance(),   &QnRouter::connectionRemoved,   this,       &QnGlobalModuleFinder::at_router_connectionRemoved);
+
+    QMultiHash<QnUuid, QnRouter::Endpoint> connections = QnRouter::instance()->connections();
+    for (auto it = connections.begin(); it != connections.end(); ++it) {
+		/* Ignore addresses discovered by client */
+		if (!moduleFinder && it.key() == qnCommon->moduleGUID())
+			continue;
+
+        at_router_connectionAdded(it.key(), it->id, it->host);
+	}
 
     if (moduleFinder) {
         for (const QnModuleInformation &moduleInformation: moduleFinder->foundModules())
-            addModule(moduleInformation, qnCommon->moduleGUID());
+            addModule(moduleInformation);
 
         connect(moduleFinder,               &QnModuleFinder::moduleChanged, this,   &QnGlobalModuleFinder::at_moduleFinder_moduleChanged);
         connect(moduleFinder,               &QnModuleFinder::moduleLost,    this,   &QnGlobalModuleFinder::at_moduleFinder_moduleLost);
@@ -26,25 +38,28 @@ QnGlobalModuleFinder::QnGlobalModuleFinder(QnModuleFinder *moduleFinder, QObject
 }
 
 void QnGlobalModuleFinder::setConnection(const ec2::AbstractECConnectionPtr &connection) {
+    QMutexLocker lock(&m_mutex);
+
     ec2::AbstractECConnectionPtr oldConnection = m_connection.lock();
-
-    if (oldConnection) {
-        oldConnection->getMiscManager()->disconnect(this);
-
-        QSet<QnUuid> discoverers;
-        for (const QSet<QnUuid> &moduleDiscoverer: m_discovererIdByServerId)
-            discoverers.unite(moduleDiscoverer);
-
-        discoverers.remove(qnCommon->moduleGUID());
-
-        for (const QnUuid &id: discoverers)
-            removeAllModulesDiscoveredBy(id);
-    }
-
+    QList<QnModuleInformation> foundModules = m_moduleInformationById.values();
+    m_moduleInformationById.clear();
     m_connection = connection;
 
+    lock.unlock();
+
+    if (oldConnection)
+        oldConnection->getMiscManager()->disconnect(this);
+
+    for (const QnModuleInformation &moduleInformation: foundModules)
+        emit peerLost(moduleInformation);
+
     if (connection)
-        connect(connection->getMiscManager().get(),        &ec2::AbstractMiscManager::moduleChanged,  this,   &QnGlobalModuleFinder::at_moduleChanged,  Qt::QueuedConnection);
+        connect(connection->getMiscManager().get(), &ec2::AbstractMiscManager::moduleChanged, this, &QnGlobalModuleFinder::at_moduleChanged, Qt::QueuedConnection);
+
+    if (m_moduleFinder) {
+        for (const QnModuleInformation &moduleInformation: m_moduleFinder->foundModules())
+            addModule(moduleInformation);
+    }
 }
 
 void QnGlobalModuleFinder::fillApiModuleData(const QnModuleInformation &moduleInformation, ec2::ApiModuleData *data) {
@@ -59,6 +74,7 @@ void QnGlobalModuleFinder::fillApiModuleData(const QnModuleInformation &moduleIn
     data->name = moduleInformation.name;
     data->authHash = moduleInformation.authHash;
     data->sslAllowed = moduleInformation.sslAllowed;
+    data->protoVersion = moduleInformation.protoVersion;
     data->isAlive = true;
 }
 
@@ -74,129 +90,134 @@ void QnGlobalModuleFinder::fillFromApiModuleData(const ec2::ApiModuleData &data,
     moduleInformation->name = data.name;
     moduleInformation->authHash = data.authHash;
     moduleInformation->sslAllowed = data.sslAllowed;
+    moduleInformation->protoVersion = data.protoVersion == 0 ? nx_ec::INITIAL_EC2_PROTO_VERSION : data.protoVersion;
 }
 
 QList<QnModuleInformation> QnGlobalModuleFinder::foundModules() const {
-    return m_moduleInformationById.values();
-}
+    QMutexLocker lock(&m_mutex);
 
-QSet<QnUuid> QnGlobalModuleFinder::discoverers(const QnUuid &moduleId) {
-    return m_discovererIdByServerId.value(moduleId);
+    QList<QnModuleInformation> result;
+    for (const QnModuleInformation &moduleInformation: m_moduleInformationById) {
+        if (!moduleInformation.remoteAddresses.isEmpty())
+            result.append(moduleInformation);
+    }
+    return result;
 }
 
 QnModuleInformation QnGlobalModuleFinder::moduleInformation(const QnUuid &id) const {
+    QMutexLocker lock(&m_mutex);
     return m_moduleInformationById[id];
 }
 
-void QnGlobalModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive, const QnUuid &discoverer) {
-    if (moduleInformation.id == qnCommon->moduleGUID() || discoverer == qnCommon->moduleGUID())
-        return;
-
-    if (isAlive)
-        addModule(moduleInformation, discoverer);
-    else
-        removeModule(moduleInformation, discoverer);
-}
-
-void QnGlobalModuleFinder::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation) {
-    addModule(moduleInformation, qnCommon->moduleGUID());
-    if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
-        connection->getMiscManager()->sendModuleInformation(moduleInformation, true, QnUuid(qnCommon->moduleGUID()), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-}
-
-void QnGlobalModuleFinder::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation) {
-    removeModule(moduleInformation, qnCommon->moduleGUID());
-    if (ec2::AbstractECConnectionPtr connection = m_connection.lock())
-        connection->getMiscManager()->sendModuleInformation(moduleInformation, false, QnUuid(qnCommon->moduleGUID()), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
-}
-
-void QnGlobalModuleFinder::at_resourcePool_statusChanged(const QnResourcePtr &resource) {
-    if (!resource->hasFlags(Qn::server))
-        return;
-
-    if (resource->getStatus() != Qn::Online)
-        removeAllModulesDiscoveredBy(resource->getId());
-}
-
-void QnGlobalModuleFinder::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
-    if (!resource->hasFlags(Qn::server))
-        return;
-
-    removeAllModulesDiscoveredBy(resource->getId());
-}
-
-void QnGlobalModuleFinder::addModule(const QnModuleInformation &moduleInformation, const QnUuid &discoverer) {
+void QnGlobalModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive) {
     if (moduleInformation.id == qnCommon->moduleGUID())
         return;
 
-    m_discoveredAddresses[moduleInformation.id][discoverer] = moduleInformation.remoteAddresses;
+    if (isAlive)
+        addModule(moduleInformation);
+}
 
-    QnModuleInformation updatedModuleInformation = moduleInformation;
-    updatedModuleInformation.remoteAddresses = getModuleAddresses(moduleInformation.id);
+void QnGlobalModuleFinder::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation) {
+    addModule(moduleInformation);
 
-    m_discovererIdByServerId[moduleInformation.id].insert(discoverer);
+    QMutexLocker lock(&m_mutex);
+    ec2::AbstractECConnectionPtr connection = m_connection.lock();
+    lock.unlock();
 
-    QnModuleInformation &oldModuleInformation = m_moduleInformationById[moduleInformation.id];
-    if (oldModuleInformation != updatedModuleInformation) {
-        oldModuleInformation = updatedModuleInformation;
+    if (connection)
+        connection->getMiscManager()->sendModuleInformation(moduleInformation, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+}
+
+void QnGlobalModuleFinder::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation) {
+    QMutexLocker lock(&m_mutex);
+    ec2::AbstractECConnectionPtr connection = m_connection.lock();
+    lock.unlock();
+
+    if (connection)
+        connection->getMiscManager()->sendModuleInformation(moduleInformation, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+}
+
+void QnGlobalModuleFinder::at_router_connectionAdded(const QnUuid &discovererId, const QnUuid &peerId, const QString &host) {
+	/* Ignore addresses discovered by client */
+	if (!m_moduleFinder && discovererId == qnCommon->moduleGUID())
+		return;
+
+    {
+        QMutexLocker lock(&m_mutex);
+
+        QSet<QString> &addresses = m_discoveredAddresses[peerId][discovererId];
+        auto it = addresses.find(host);
+        if (it != addresses.end())
+            return;
+        addresses.insert(host);
+    }
+    updateAddresses(peerId);
+}
+
+void QnGlobalModuleFinder::at_router_connectionRemoved(const QnUuid &discovererId, const QnUuid &peerId, const QString &host) {
+	/* Ignore addresses discovered by client */
+	if (!m_moduleFinder && discovererId == qnCommon->moduleGUID())
+		return;
+
+    {
+        QMutexLocker lock(&m_mutex);
+
+        if (!m_discoveredAddresses[peerId][discovererId].remove(host))
+            return;
+    }
+    updateAddresses(peerId);
+}
+
+void QnGlobalModuleFinder::updateAddresses(const QnUuid &id) {
+    QMutexLocker lock(&m_mutex);
+
+    QnModuleInformation moduleInformation = m_moduleInformationById.value(id);
+    if (moduleInformation.id.isNull())
+        return;
+
+    QSet<QString> addresses = getModuleAddresses(id);
+    if (moduleInformation.remoteAddresses == addresses)
+        return;
+
+    moduleInformation.remoteAddresses = addresses;
+    m_moduleInformationById[id] = moduleInformation;
+
+    lock.unlock();
+
+    if (moduleInformation.remoteAddresses.isEmpty()) {
+        NX_LOG(lit("QnGlobalModuleFinder. Module %1 is lost").arg(moduleInformation.id.toString()), cl_logDEBUG1);
+        emit peerLost(moduleInformation);
+    } else {
         NX_LOG(lit("QnGlobalModuleFinder. Module %1 is changed, addresses = [%2]")
-               .arg(updatedModuleInformation.id.toString())
-               .arg(QStringList(QStringList::fromSet(updatedModuleInformation.remoteAddresses)).join(lit(", "))), cl_logDEBUG1);
+               .arg(moduleInformation.id.toString())
+               .arg(QStringList(QStringList::fromSet(moduleInformation.remoteAddresses)).join(lit(", "))), cl_logDEBUG1);
         emit peerChanged(moduleInformation);
     }
 }
 
-void QnGlobalModuleFinder::removeModule(const QnModuleInformation &moduleInformation, const QnUuid &discoverer) {
+void QnGlobalModuleFinder::addModule(const QnModuleInformation &moduleInformation) {
     if (moduleInformation.id == qnCommon->moduleGUID())
         return;
 
-    QSet<QnUuid> &discoverers = m_discovererIdByServerId[moduleInformation.id];
-    if (!discoverers.remove(discoverer))
-        return;
-
-    m_discoveredAddresses[moduleInformation.id].remove(discoverer);
+    QMutexLocker lock(&m_mutex);
 
     QnModuleInformation updatedModuleInformation = moduleInformation;
     updatedModuleInformation.remoteAddresses = getModuleAddresses(moduleInformation.id);
-
-    if (discoverers.isEmpty()) {
-        m_moduleInformationById.remove(updatedModuleInformation.id);
-        NX_LOG(lit("QnGlobalModuleFinder. Module %1 is lost.").arg(updatedModuleInformation.id.toString()), cl_logDEBUG1);
-        emit peerLost(updatedModuleInformation);
-    } else {
+    if (updatedModuleInformation.remoteAddresses.isEmpty()) {
         m_moduleInformationById[moduleInformation.id] = updatedModuleInformation;
-        NX_LOG(lit("QnGlobalModuleFinder. Module %1 is changed, addresses = [%2]")
-               .arg(updatedModuleInformation.id.toString())
-               .arg(QStringList(QStringList::fromSet(updatedModuleInformation.remoteAddresses)).join(lit(", "))), cl_logDEBUG1);
-        emit peerChanged(updatedModuleInformation);
-    }
-}
-
-void QnGlobalModuleFinder::removeAllModulesDiscoveredBy(const QnUuid &discoverer) {
-    if (discoverer == qnCommon->moduleGUID()) {
-        qWarning() << "Trying to remove our own modules";
         return;
     }
 
-    for (auto it = m_moduleInformationById.begin(); it != m_moduleInformationById.end(); /* no inc */) {
-        QSet<QnUuid> &discoverers = m_discovererIdByServerId[it.key()];
-        if (discoverers.remove(discoverer)) {
-            if (discoverers.isEmpty()) {
-                NX_LOG(lit("QnGlobalModuleFinder. Module %1 is lost.").arg(it.value().id.toString()), cl_logDEBUG1);
-                emit peerLost(it.value());
-                it = m_moduleInformationById.erase(it);
-                continue;
-            }
-        }
-        ++it;
-    }
+    QnModuleInformation &oldModuleInformation = m_moduleInformationById[moduleInformation.id];
+    if (oldModuleInformation != updatedModuleInformation) {
+        oldModuleInformation = updatedModuleInformation;
 
-    for (auto it = m_discoveredAddresses.begin(); it != m_discoveredAddresses.end(); /* no inc */) {
-        it.value().remove(discoverer);
-        if (it.value().isEmpty())
-            it = m_discoveredAddresses.erase(it);
-        else
-            ++it;
+        lock.unlock();
+
+        NX_LOG(lit("QnGlobalModuleFinder. Module %1 is changed, addresses = [%2]")
+               .arg(updatedModuleInformation.id.toString())
+               .arg(QStringList(QStringList::fromSet(updatedModuleInformation.remoteAddresses)).join(lit(", "))), cl_logDEBUG1);
+        emit peerChanged(moduleInformation);
     }
 }
 

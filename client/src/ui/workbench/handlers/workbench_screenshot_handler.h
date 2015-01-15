@@ -17,9 +17,13 @@ class QPainter;
 class QnResourceDisplay;
 class QnProgressDialog;
 
-struct QnScreenshotParameters {
+struct QnScreenshotParameters 
+{
+    QnScreenshotParameters();
+
     qint64 time;    //in microseconds since epoch
     bool isUtc;
+    qint64 adjustedTime;
     QString filename;
     Qn::Corner timestampPosition;
     QnItemDewarpingParams itemDewarpingParams;
@@ -27,6 +31,7 @@ struct QnScreenshotParameters {
     ImageCorrectionParams imageCorrectionParams;
     QRectF zoomRect;
     qreal customAspectRatio;
+    qreal rotationAngle;
 
     QString timeString() const;
 };
@@ -43,6 +48,7 @@ public:
 
     QnScreenshotParameters parameters() const;
     void setParameters(const QnScreenshotParameters &parameters);
+
 protected:
     virtual void doLoadAsync() override;
 private slots:
@@ -63,7 +69,7 @@ public:
     QnWorkbenchScreenshotHandler(QObject *parent = NULL);
 
 private:
-    QnImageProvider* getLocalScreenshotProvider(QnScreenshotParameters &parameters, QnResourceDisplay* display);
+    QnImageProvider* getLocalScreenshotProvider(QnMediaResourceWidget *widget, const QnScreenshotParameters &parameters) const;
 
 private slots:
     void at_takeScreenshotAction_triggered();
@@ -74,6 +80,13 @@ private slots:
     void hideProgressDelayed();
     void hideProgress();
     void cancelLoading();
+
+private:
+    bool updateParametersFromDialog(QnScreenshotParameters &parameters);
+    void takeDebugScreenshotsSet(QnMediaResourceWidget *widget);
+
+    qint64 screenshotTime(QnMediaResourceWidget *widget, bool adjust = false);
+    void takeScreenshot(QnMediaResourceWidget *widget, const QnScreenshotParameters &parameters);
 
 private:
     QnProgressDialog *m_screenshotProgressDialog;
