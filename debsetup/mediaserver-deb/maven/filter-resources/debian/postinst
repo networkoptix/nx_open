@@ -194,7 +194,7 @@ case "$1" in
             SYSTEM_NAME="$($CFG_HELPER systemName)"
             [ -z "$SYSTEM_NAME" ] && $CFG_HELPER systemName "$SYSTEM_NAME_DEFAULT"
 
-            CAMERA_SETTINGS_OPTIMIZATION="$($CFG_HELPER allowCameraChanges)"
+            CAMERA_SETTINGS_OPTIMIZATION="$($CFG_HELPER cameraSettingsOptimization)"
             [ -z "$CAMERA_SETTINGS_OPTIMIZATION" ] && CAMERA_SETTINGS_OPTIMIZATION=$($EC_CFG_HELPER allowCameraChanges)
             [ -z "$CAMERA_SETTINGS_OPTIMIZATION" ] && CAMERA_SETTINGS_OPTIMIZATION=$CAMERA_SETTINGS_OPTIMIZATION_DEFAULT
             $CFG_HELPER cameraSettingsOptimization "$CAMERA_SETTINGS_OPTIMIZATION"
