@@ -26,20 +26,28 @@
     To simplify usage of HDW in public networks some NAT traversal functionality has to be added
     Implementation of following techniques expected to deliver that:
 
-    - UDP hole punching (<a href="http://en.wikipedia.org/wiki/UDP_hole_punching">http://en.wikipedia.org/wiki/UDP_hole_punching</a>). 
+    - <b>UDP hole punching</b> (<a href="http://en.wikipedia.org/wiki/UDP_hole_punching">http://en.wikipedia.org/wiki/UDP_hole_punching</a>). 
       This is method of sending data between peers each one behind different NAT
 
-    - UDT protocol (<a href="http://udt.sourceforge.net/">http://udt.sourceforge.net/</a>).
+    - <b>UDT protocol</b> (<a href="http://udt.sourceforge.net/">http://udt.sourceforge.net/</a>).
       Connection-oriented protocol with reliable delivery built on top of UDP
 
-    - STUN (<a href="http://tools.ietf.org/html/rfc5389">http://tools.ietf.org/html/rfc5389</a>). 
-      Binary protocol designed to help for building of NAT traversal solution. Used as public api of mediator service. reasons of its selection
+    - <b>STUN</b> (<a href="http://tools.ietf.org/html/rfc5389">http://tools.ietf.org/html/rfc5389</a>). 
+      Binary protocol designed to help for building of NAT traversal solution. Used as public api of mediator service.
+      Reasons for its selection:
         - STUN is designed to be part of NAT-traversal solution, so it is possible that NAT will detect STUN 
           (there are special magic numbers in STUN packet to help NAT detect STUN) and help (or, at least, not prevent) usage of UDP hole punching
         - it is simple binary protocol which can be customized for our needs. So, it is more effective than HTTP, 
           still well-known and contains no overhead in comparison to some proprietary protocol
 
+    - <b>Port control protocol</b>
+      Allows server to forward its port to public access (if router allows it)
+
     Usage of UDP hole punching requires introducing of some helper service which will be called <b>mediator</b> further.
+
+
+
+    <h2>Definitions</h2>
 
 
 
