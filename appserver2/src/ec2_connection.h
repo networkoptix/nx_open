@@ -32,9 +32,13 @@ namespace ec2
         virtual QnConnectionInfo connectionInfo() const override;
         //!Implementation of ec2::AbstractECConnection::authInfo
         virtual QString authInfo() const override;
+
+        bool initialized() const;
+    
     private:
         std::unique_ptr<QnTransactionLog> m_transactionLog;
         const QnConnectionInfo m_connectionInfo;
+        bool m_isInitialized;
     };
     typedef std::shared_ptr<Ec2DirectConnection> Ec2DirectConnectionPtr;
 }
