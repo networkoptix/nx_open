@@ -39,8 +39,6 @@ protected:
 
 private:
     virtual void run() override; // in a loop: takes data from device and puts into queue
-protected:
-    bool m_cameraControlRequired;
 private:
     bool m_needReopen;
     bool m_cameraAudioEnabled;
@@ -51,6 +49,8 @@ private:
     QMutex m_openStreamMutex;
     int m_FrameCnt;
     QElapsedTimer m_needControlTimer;
+protected:
+    bool m_cameraControlRequired;
 };
 
 #endif // ENABLE_DATA_PROVIDERS
