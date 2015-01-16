@@ -102,7 +102,6 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
             periods = QnMotionHelper::instance()->matchImage(motionRegions, resList, startTime, endTime, detailLevel);
         }
         break;
-#ifdef QN_ENABLE_BOOKMARKS
     case Qn::BookmarksContent:
         {
             QnCameraBookmarkTags tags;
@@ -123,7 +122,6 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
             }
             break;
         }
-#endif
     default:
         return errLog("Invalid periodsType parameter.");
     }

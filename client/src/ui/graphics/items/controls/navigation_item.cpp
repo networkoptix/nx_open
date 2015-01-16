@@ -260,10 +260,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     addAction(action(Qn::ToggleMuteAction));
     addAction(action(Qn::ToggleSyncAction));
     addAction(action(Qn::ToggleCalendarAction));
-
-#ifdef QN_ENABLE_BOOKMARKS
     addAction(action(Qn::ToggleBookmarksSearchAction));
-#endif
 
     //connect(speedDownAction, SIGNAL(triggered()), m_speedSlider, SLOT(stepBackward())); // TODO
     //connect(speedUpAction, SIGNAL(triggered()), m_speedSlider, SLOT(stepForward())); // TODO
