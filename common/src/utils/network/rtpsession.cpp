@@ -957,7 +957,6 @@ bool RTPSession::sendSetup()
         request.requestLine.version = nx_rtsp::rtsp_1_0;
         request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
         request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
-        addAuth( &request );
 
         {   //generating transport header
             nx_http::StringType transportStr = "RTP/AVP/";
@@ -1120,7 +1119,6 @@ nx_http::Request RTPSession::createPlayRequest( qint64 startPos, qint64 endPos )
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
-    addAuth( &request );
     request.headers.insert( nx_http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
     addRangeHeader( &request, startPos, endPos );
     request.headers.insert( nx_http::HttpHeader( "Scale", QByteArray::number(m_scale) ) );
