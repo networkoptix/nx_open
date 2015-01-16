@@ -282,7 +282,9 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
 
     switch (eventType) {
     case QnBusiness::CameraMotionEvent: {
-        QIcon icon = soundAction ? qnSkin->icon("events/sound.png") : qnSkin->icon("events/camera.png");
+        QIcon icon = soundAction 
+            ? qnSkin->icon("events/sound.png") 
+            : qnSkin->icon("events/camera.png");
         item->addActionButton(
             icon,
             tr("Browse Archive"),
@@ -293,7 +295,9 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case QnBusiness::CameraInputEvent: {
-        QIcon icon = soundAction ? qnSkin->icon("events/sound.png") : qnSkin->icon("events/camera.png");
+        QIcon icon = soundAction 
+            ? qnSkin->icon("events/sound.png") 
+            : qnSkin->icon("events/camera.png");
         item->addActionButton(
             icon,
             tr("Open Camera"),
