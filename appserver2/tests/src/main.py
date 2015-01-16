@@ -398,7 +398,7 @@ class ClusterTest():
                     pos = 0
                     if req.getcode() != 200:
                         print "Connection to http://%s/ec2/%s" %(s,"getTransactionLog")
-                        return False
+                        return (False,"")
 
                     while True:
                         data = f.read(self.CHUNK_SIZE)
@@ -411,18 +411,18 @@ class ClusterTest():
                                 print "Server:%s has different status with server:%s on method:%s" % (s,serverAddr,"getTransactionLog")
                                 print "Server:%s has data but server:%s runs out of its transaction log"%(
                                     s,serverAddr)
-                                return False
+                                return (False,"")
                         else:
                             if pack is None or len(pack) == 0:
                                 print "Server:%s has different status with server:%s on method:%s" % (s,serverAddr,"getTransactionLog")
                                 print "Server:%s has data but server:%s runs out of its transaction log"%(
                                     serverAddr,s)
-                                return False
+                                return (False,"")
                             else:
                                 if data != pack:
                                     print "Server:%s has different status with server:%s on method:%s" % (s,serverAddr,"getTransactionLog")
                                     self._seeDiff(data,pack,pos)
-                                    return False
+                                    return (False,"")
                                 pos += len(pack)
                     req.close()
         os.remove(self.TRANSACTION_LOG)
