@@ -780,8 +780,7 @@ nx_http::Request RTPSession::createDescribeRequest()
     return request;
 }
 
-template<class RequestType>
-bool RTPSession::sendRequestInternal(RequestType&& request)
+bool RTPSession::sendRequestInternal(nx_http::Request&& request)
 {
     addAuth(&request);
     addAdditionAttrs(&request);
@@ -803,7 +802,7 @@ bool RTPSession::sendOptions()
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
-    return sendRequestInternal(request);
+    return sendRequestInternal(std::move(request));
 }
 
 int RTPSession::getTrackCount(TrackType trackType) const
@@ -1080,7 +1079,7 @@ bool RTPSession::sendSetParameter( const QByteArray& paramName, const QByteArray
     request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
     request.headers.insert( nx_http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
     request.headers.insert( nx_http::HttpHeader( "Content-Length", QByteArray::number(request.messageBody.size()) ) );
-    return sendRequestInternal(request);
+    return sendRequestInternal(std::move(request));
 }
 
 void RTPSession::addRangeHeader( nx_http::Request* const request, qint64 startPos, qint64 endPos )
@@ -1186,7 +1185,7 @@ bool RTPSession::sendPause()
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
     request.headers.insert( nx_http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
-    return sendRequestInternal(request);
+    return sendRequestInternal(std::move(request));
 }
 
 bool RTPSession::sendTeardown()
@@ -1198,7 +1197,7 @@ bool RTPSession::sendTeardown()
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
     request.headers.insert( nx_http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
-    return sendRequestInternal(request);
+    return sendRequestInternal(std::move(request));
 }
 
 static const int RTCP_SENDER_REPORT = 200;
@@ -1317,7 +1316,7 @@ bool RTPSession::sendKeepAlive()
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
     request.headers.insert( nx_http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
-    return sendRequestInternal(request);
+    return sendRequestInternal(std::move(request));
 }
 
 void RTPSession::sendBynaryResponse(quint8* buffer, int size)

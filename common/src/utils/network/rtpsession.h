@@ -318,7 +318,7 @@ private:
     QByteArray calcDefaultNonce() const;
     nx_http::Request createPlayRequest( qint64 startPos, qint64 endPos );
     bool sendPlayInternal(qint64 startPos, qint64 endPos);
-    template<class RequestType> bool sendRequestInternal(RequestType&& request);
+    bool sendRequestInternal(nx_http::Request&& request);
 private:
     enum { RTSP_BUFFER_LEN = 1024 * 65 };
 
