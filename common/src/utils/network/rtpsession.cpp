@@ -775,7 +775,6 @@ nx_http::Request RTPSession::createDescribeRequest()
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
     request.headers.insert( nx_http::HttpHeader( "Accept", "application/sdp" ) );
-    addAuth( &request );
     if( (quint64)m_openedTime != AV_NOPTS_VALUE )
         addRangeHeader( &request, m_openedTime, AV_NOPTS_VALUE );
     return request;
@@ -783,6 +782,7 @@ nx_http::Request RTPSession::createDescribeRequest()
 
 bool RTPSession::sendRequestInternal(nx_http::Request& request)
 {
+    addAuth(&request);
     addAdditionAttrs(&request);
     QByteArray requestBuf;
     request.serialize( &requestBuf );
@@ -802,7 +802,6 @@ bool RTPSession::sendOptions()
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
-    addAuth( &request );
     return sendRequestInternal(request);
 }
 
@@ -1079,7 +1078,6 @@ bool RTPSession::sendSetParameter( const QByteArray& paramName, const QByteArray
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
-    addAuth( &request );
     request.headers.insert( nx_http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
     request.headers.insert( nx_http::HttpHeader( "Content-Length", QByteArray::number(request.messageBody.size()) ) );
     return sendRequestInternal(request);
@@ -1189,7 +1187,6 @@ bool RTPSession::sendPause()
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
     request.headers.insert( nx_http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
-    addAuth( &request );
     return sendRequestInternal(request);
 }
 
@@ -1202,7 +1199,6 @@ bool RTPSession::sendTeardown()
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
     request.headers.insert( nx_http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
-    addAuth( &request );
     return sendRequestInternal(request);
 }
 
@@ -1322,7 +1318,6 @@ bool RTPSession::sendKeepAlive()
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
     request.headers.insert( nx_http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
-    addAuth( &request );
     return sendRequestInternal(request);
 }
 
