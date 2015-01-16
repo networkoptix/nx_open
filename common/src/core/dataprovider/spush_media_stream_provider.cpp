@@ -104,13 +104,13 @@ void CLServerPushStreamReader::run()
 
                 continue;
             }
-            else {
-                if (m_needControlTimer.elapsed() > CAM_NEED_CONTROL_CHECK_TIME) 
-                {
-                    if (isCameraControlRequired() && !m_cameraControlRequired)
-                        pleaseReOpen();
-                    m_needControlTimer.restart();
-                }
+        }
+        else {
+            if (m_needControlTimer.elapsed() > CAM_NEED_CONTROL_CHECK_TIME) 
+            {
+                if (!m_cameraControlRequired && isCameraControlRequired())
+                    pleaseReOpen();
+                m_needControlTimer.restart();
             }
         }
 
