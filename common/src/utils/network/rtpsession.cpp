@@ -780,7 +780,8 @@ nx_http::Request RTPSession::createDescribeRequest()
     return request;
 }
 
-bool RTPSession::sendRequestInternal(nx_http::Request& request)
+template<class RequestType>
+bool RTPSession::sendRequestInternal(RequestType&& request)
 {
     addAuth(&request);
     addAdditionAttrs(&request);
