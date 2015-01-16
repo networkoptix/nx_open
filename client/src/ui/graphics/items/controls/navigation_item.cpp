@@ -367,8 +367,12 @@ void QnNavigationItem::updatePlaybackButtonsIcons() {
     action(Qn::PreviousFrameAction)->setText(playing ? tr("Speed Down") : tr("Previous Frame"));
     action(Qn::NextFrameAction)->setText(playing ? tr("Speed Up") : tr("Next Frame"));
 
-    m_stepBackwardButton->setIcon(qnSkin->icon(playing ? "slider/navigation/backward.png" : "slider/navigation/step_backward.png"));
-    m_stepForwardButton->setIcon(qnSkin->icon(playing ? "slider/navigation/forward.png" : "slider/navigation/step_forward.png"));
+    m_stepBackwardButton->setIcon(playing 
+        ? qnSkin->icon("slider/navigation/backward.png") 
+        : qnSkin->icon("slider/navigation/step_backward.png"));
+    m_stepForwardButton->setIcon(playing 
+        ? qnSkin->icon("slider/navigation/forward.png") 
+        : qnSkin->icon("slider/navigation/step_forward.png"));
 
     updatePlaybackButtonsEnabled(); // TODO: #Elric remove this once buttonwidget <-> action enabled sync is implemented. OR when we disable actions and not buttons.
 }
