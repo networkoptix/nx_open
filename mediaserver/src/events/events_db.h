@@ -2,9 +2,13 @@
 #define __EVENTS_DB_H_
 
 #include <QtSql/QtSql>
-#include "business/actions/abstract_business_action.h"
-#include "business/events/abstract_business_event.h"
+
+#include <core/resource/resource_fwd.h>
+#include <business/business_fwd.h>
+
 #include "utils/db/db_helper.h"
+
+#include <utils/common/uuid.h>
 
 class QnTimePeriod;
 
@@ -40,11 +44,15 @@ public:
     static void fini();
 
     bool createDatabase();
-    static void migrate();
+
+    virtual QnDbTransaction* getTransaction() override;
 protected:
     QnEventsDB();
+
+    virtual bool afterInstallUpdate(const QString& updateName) override;
 private:
     bool cleanupEvents();
+    bool migrateBusinessParams();
     QString toSQLDate(qint64 timeMs) const;
     QString getRequestStr(const QnTimePeriod& period,
         const QnResourceList& resList,
@@ -55,6 +63,7 @@ private:
     qint64 m_lastCleanuptime;
     qint64 m_eventKeepPeriod;
     static QnEventsDB* m_instance;
+    QnDbTransaction m_tran;
 };
 
 #define qnEventsDB QnEventsDB::instance()

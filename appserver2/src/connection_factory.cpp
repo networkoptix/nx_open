@@ -29,33 +29,38 @@
 #include "http/ec2_transaction_tcp_listener.h"
 #include <utils/common/app_info.h>
 #include "mutex/distributed_mutex_manager.h"
-#include "transaction/runtime_transaction_log.h"
-
 
 namespace ec2
 {
     Ec2DirectConnectionFactory::Ec2DirectConnectionFactory( Qn::PeerType peerType )
     :
         m_dbManager( peerType == Qn::PT_Server ? new QnDbManager() : nullptr ),   //dbmanager is initialized by direct connection
-        m_transactionMessageBus( new ec2::QnTransactionMessageBus() ),
         m_timeSynchronizationManager( new TimeSynchronizationManager(peerType) ),
+        m_transactionMessageBus( new ec2::QnTransactionMessageBus(peerType) ),
         m_terminated( false ),
         m_runningRequests( 0 ),
         m_sslEnabled( false )
     {
+        m_timeSynchronizationManager->start();  //unfortunately cannot do it in TimeSynchronizationManager 
+            //constructor to keep valid object destruction order
+
         srand( ::time(NULL) );
 
         //registering ec2 types with Qt meta types system
         qRegisterMetaType<QnTransactionTransportHeader>( "QnTransactionTransportHeader" ); // TODO: #Elric #EC2 register in a proper place!
 
         ec2::QnDistributedMutexManager::initStaticInstance( new ec2::QnDistributedMutexManager() );
-        m_runtimeTransactionLog.reset(new QnRuntimeTransactionLog());
+
+        //m_transactionMessageBus->start();
     }
 
     Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()
     {
         pleaseStop();
         join();
+
+        m_timeSynchronizationManager->pleaseStop(); //have to do it before m_transactionMessageBus destruction 
+            //since TimeSynchronizationManager uses QnTransactionMessageBus
 
         ec2::QnDistributedMutexManager::initStaticInstance(0);
     }
@@ -80,19 +85,25 @@ namespace ec2
     //!Implementation of AbstractECConnectionFactory::testConnectionAsync
     int Ec2DirectConnectionFactory::testConnectionAsync( const QUrl& addr, impl::TestConnectionHandlerPtr handler )
     {
-        if( addr.isEmpty() )
-            return testDirectConnection( addr, handler );
+        QUrl url = addr;
+        url.setUserName(url.userName().toLower());
+
+        if (url.isEmpty())
+            return testDirectConnection(url, handler);
         else
-            return testRemoteConnection( addr, handler );
+            return testRemoteConnection(url, handler);
     }
 
     //!Implementation of AbstractECConnectionFactory::connectAsync
     int Ec2DirectConnectionFactory::connectAsync( const QUrl& addr, impl::ConnectHandlerPtr handler )
     {
-        if( addr.scheme() == "file" )
-            return establishDirectConnection(addr, handler );
+        QUrl url = addr;
+        url.setUserName(url.userName().toLower());
+
+        if (url.scheme() == "file")
+            return establishDirectConnection(url, handler);
         else
-            return establishConnectionToRemoteServer( addr, handler );
+            return establishConnectionToRemoteServer(url, handler);
     }
 
     void Ec2DirectConnectionFactory::registerTransactionListener( QnUniversalTcpListener* universalTcpListener )
@@ -171,6 +182,9 @@ namespace ec2
 
         //AbstractBusinessEventManager::getBusinessRules
         registerGetFuncHandler<std::nullptr_t, ApiBusinessRuleDataList>( restProcessorPool, ApiCommand::getBusinessRules );
+
+        registerGetFuncHandler<std::nullptr_t, ApiTransactionDataList>( restProcessorPool, ApiCommand::getTransactionLog );
+
         //AbstractBusinessEventManager::save
         registerUpdateFuncHandler<ApiBusinessRuleData>( restProcessorPool, ApiCommand::saveBusinessRule );
         //AbstractBusinessEventManager::deleteRule
@@ -212,7 +226,7 @@ namespace ec2
         //AbstractStoredFileManager::updateStoredFile
         registerUpdateFuncHandler<ApiStoredFileData>( restProcessorPool, ApiCommand::updateStoredFile );
         //AbstractStoredFileManager::deleteStoredFile
-        registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeStoredFile );
+        registerUpdateFuncHandler<ApiStoredFilePath>( restProcessorPool, ApiCommand::removeStoredFile );
 
         //AbstractUpdatesManager::uploadUpdate
         registerUpdateFuncHandler<ApiUpdateUploadData>( restProcessorPool, ApiCommand::uploadUpdate );
@@ -254,6 +268,7 @@ namespace ec2
         registerGetFuncHandler<std::nullptr_t, ApiLicenseDataList>( restProcessorPool, ApiCommand::getLicenses );
 
         registerGetFuncHandler<std::nullptr_t, ApiDatabaseDumpData>( restProcessorPool, ApiCommand::dumpDatabase );
+        registerGetFuncHandler<ApiStoredFilePath, qint64>( restProcessorPool, ApiCommand::dumpDatabaseToFile );
 
         //AbstractECConnectionFactory
         registerFunctorHandler<ApiLoginData, QnConnectionInfo>( restProcessorPool, ApiCommand::connect,
@@ -284,7 +299,6 @@ namespace ec2
                 m_directConnection.reset( new Ec2DirectConnection( &m_serverQueryProcessor, m_resCtx, connectionInfo, url ) );
             }
         }
-        QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
         QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( &impl::ConnectHandler::done, handler, reqID, ec2::ErrorCode::ok, m_directConnection ) );
         return reqID;
     }
@@ -397,10 +411,9 @@ namespace ec2
     {
         //TODO #ak async ssl is working now, make async request to old ec here
 
-        if( errorCode != ErrorCode::ok )
+        if( (errorCode != ErrorCode::ok) && (errorCode != ErrorCode::unauthorized) )
         {
             //checking for old EC
-            QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());
             QnConcurrent::run(
                 Ec2ThreadPool::instance(),
                 [this, ecURL, handler, reqID]() {
@@ -424,6 +437,7 @@ namespace ec2
             );
             return;
         }
+
         QnConnectionInfo connectionInfoCopy(connectionInfo);
         connectionInfoCopy.ecUrl = ecURL;
         connectionInfoCopy.ecUrl.setScheme( connectionInfoCopy.allowSslConnections ? lit("https") : lit("http") );
@@ -448,7 +462,7 @@ namespace ec2
         const QUrl& ecURL,
         impl::TestConnectionHandlerPtr handler )
     {
-        if( errorCode == ErrorCode::ok )
+        if( errorCode == ErrorCode::ok || errorCode == ErrorCode::unauthorized )
         {
             handler->done( reqID, errorCode, connectionInfo );
             QMutexLocker lk( &m_mutex );
@@ -457,7 +471,6 @@ namespace ec2
         }
 
         //checking for old EC
-        QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());
         QnConcurrent::run(
             Ec2ThreadPool::instance(),
             [this, ecURL, handler, reqID]() {
@@ -486,7 +499,6 @@ namespace ec2
         const int reqID = generateRequestID();
         QnConnectionInfo connectionInfo;
         fillConnectionInfo( ApiLoginData(), &connectionInfo );
-        QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
         QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( &impl::TestConnectionHandler::done, handler, reqID, ec2::ErrorCode::ok, connectionInfo ) );
         return reqID;
     }

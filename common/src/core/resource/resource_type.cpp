@@ -182,12 +182,12 @@ QnUuid QnResourceTypePool::getResourceTypeId(const QString& manufacture, const Q
     {
         //NX_LOG(rt->getName(), cl_logALWAYS); //debug
 
-        if (rt->getName() == name && rt->getManufacture()==manufacture)
+        if (rt->getName().compare(name, Qt::CaseInsensitive) == 0 && rt->getManufacture()==manufacture)
             return rt->getId();
     }
 
     if (showWarning)
-        qWarning() << "Cannot find such resource type!!!!: " << manufacture << name;
+        NX_LOG( lit("Cannot find resource type for manufacturer: %1, model name: %2").arg(manufacture).arg(name), cl_logDEBUG2 );
 
     // Q_ASSERT(false);
     return QnUuid();

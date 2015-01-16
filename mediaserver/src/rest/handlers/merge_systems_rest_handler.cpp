@@ -7,6 +7,9 @@
 #include "core/resource/media_server_resource.h"
 #include "nx_ec/ec_api.h"
 #include "nx_ec/dummy_handler.h"
+#include "nx_ec/data/api_user_data.h"
+#include "nx_ec/data/api_conversion_functions.h"
+#include "nx_ec/ec2_lib.h"
 #include "api/app_server_connection.h"
 #include "common/common_module.h"
 #include "media_server/settings.h"
@@ -17,6 +20,8 @@
 #include "utils/network/module_finder.h"
 #include "utils/network/direct_module_finder.h"
 #include "utils/common/app_info.h"
+#include "utils/common/model_functions.h"
+#include "api/model/ping_reply.h"
 
 namespace {
     ec2::AbstractECConnectionPtr ec2Connection() { return QnAppServerConnectionFactory::getConnection2(); }
@@ -28,31 +33,55 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
     Q_UNUSED(owner)
 
     QUrl url = params.value(lit("url"));
+    QString user = params.value(lit("user"), lit("admin"));
     QString password = params.value(lit("password"));
+    QString currentPassword = params.value(lit("currentPassword"));
     bool takeRemoteSettings = params.value(lit("takeRemoteSettings"), lit("false")) != lit("false");
+    bool mergeOneServer = params.value(lit("oneServer"), lit("false")) != lit("false");
+    bool ignoreIncompatible = params.value(lit("ignoreIncompatible"), lit("false")) != lit("false");
+
+    if (mergeOneServer)
+        takeRemoteSettings = false;
 
     if (url.isEmpty()) {
         result.setError(QnJsonRestResult::MissingParameter);
         result.setErrorString(lit("url"));
-        return CODE_OK;
+        return nx_http::StatusCode::ok;
     }
 
     if (!url.isValid()) {
         result.setError(QnJsonRestResult::InvalidParameter);
         result.setErrorString(lit("url"));
-        return CODE_OK;
+        return nx_http::StatusCode::ok;
     }
 
     if (password.isEmpty()) {
         result.setError(QnJsonRestResult::MissingParameter);
         result.setErrorString(lit("password"));
-        return CODE_OK;
+        return nx_http::StatusCode::ok;
+    }
+
+    if (!takeRemoteSettings && !mergeOneServer && currentPassword.isEmpty()) {
+        result.setError(QnJsonRestResult::MissingParameter);
+        result.setErrorString(lit("currentPassword"));
+        return nx_http::StatusCode::ok;
+    }
+
+    QnUserResourcePtr admin = qnResPool->getAdministrator();
+
+    if (!admin)
+        return nx_http::StatusCode::internalServerError;
+
+    if (!takeRemoteSettings && !mergeOneServer && !admin->checkPassword(currentPassword)) {
+        result.setError(QnJsonRestResult::InvalidParameter);
+        result.setErrorString(lit("currentPassword"));
+        return nx_http::StatusCode::ok;
     }
 
     /* Get module information to get system name. */
 
     QAuthenticator auth;
-    auth.setUser(lit("admin"));
+    auth.setUser(user);
     auth.setPassword(password);
 
     CLSimpleHTTPClient client(url, 10000, auth);
@@ -63,7 +92,7 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
             result.setError(QnJsonRestResult::CantProcessRequest, lit("UNAUTHORIZED"));
         else
             result.setError(QnJsonRestResult::CantProcessRequest, lit("FAIL"));
-        return CODE_OK;
+        return nx_http::StatusCode::ok;
     }
 
     /* if we've got it successfully we know system name and admin password */
@@ -79,85 +108,168 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
     if (moduleInformation.systemName.isEmpty()) {
         /* Hmm there's no system name. It would be wrong system. Reject it. */
         result.setError(QnJsonRestResult::CantProcessRequest, lit("FAIL"));
-        return CODE_OK;
+        return nx_http::StatusCode::ok;
     }
 
-    bool customizationOK = moduleInformation.customization == QnAppInfo::customizationName();
-    if (QnModuleFinder::instance()->isCompatibilityMode())
-        customizationOK = true;
-    if (!isCompatible(qnCommon->engineVersion(), moduleInformation.version) || !customizationOK) {
+    bool customizationOK = moduleInformation.customization == QnAppInfo::customizationName() ||
+                           moduleInformation.customization.isEmpty() ||
+                           QnModuleFinder::instance()->isCompatibilityMode();
+    bool compatible = moduleInformation.hasCompatibleVersion();
+
+    if ((!ignoreIncompatible && !compatible) || !customizationOK) {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("INCOMPATIBLE"));
-        return CODE_OK;
+        return nx_http::StatusCode::ok;
     }
 
     if (takeRemoteSettings) {
-        if (!changeSystemName(moduleInformation.systemName)) {
+        if (!backupDatabase()) {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("BACKUP_ERROR"));
-            return CODE_OK;
+            return nx_http::StatusCode::ok;
         }
-        changeAdminPassword(password);
+
+        if (!applyRemoteSettings(url, moduleInformation.systemName, user, password, admin)) {
+            result.setError(QnJsonRestResult::CantProcessRequest, lit("CONFIGURATION_ERROR"));
+            return nx_http::StatusCode::ok;
+        }
     } else {
-        QnUserResourcePtr admin = qnResPool->getAdministrator();
         if (!admin) {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("INTERNAL_ERROR"));
-            return CODE_OK;
+            return nx_http::StatusCode::ok;
         }
 
-        QString request = lit("api/configure?systemName=%1&wholeSystem=true&passwordHash=%2&passwordDigest=%3")
-                          .arg(qnCommon->localSystemName())
-                          .arg(QString::fromLatin1(admin->getHash()))
-                          .arg(QString::fromLatin1(admin->getDigest()));
-
-        status = client.doGET(request);
-        if (status != CL_HTTP_SUCCESS) {
+        if (!applyCurrentSettings(url, user, password, currentPassword, admin, mergeOneServer)) {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("CONFIGURATION_ERROR"));
-            return CODE_OK;
+            return nx_http::StatusCode::ok;
         }
     }
 
+    /* Save additional address if needed */
     if (qnResPool->getResourceById(moduleInformation.id).isNull()) {
         if (!moduleInformation.remoteAddresses.contains(url.host())) {
-            QUrl simpleUrl = url;
-            url.setPath(QString());
+            QUrl simpleUrl;
+            simpleUrl.setScheme(lit("http"));
+            simpleUrl.setHost(url.host());
+            if (url.port() != moduleInformation.port)
+                simpleUrl.setPort(url.port());
             ec2Connection()->getDiscoveryManager()->addDiscoveryInformation(moduleInformation.id, simpleUrl, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
         }
         QnModuleFinder::instance()->directModuleFinder()->checkUrl(url);
     }
 
-    if (QnServerConnector::instance())
+    /* Connect to server if it is compatible */
+    if (compatible && QnServerConnector::instance())
         QnServerConnector::instance()->addConnection(moduleInformation, url);
 
     result.setReply(moduleInformation);
 
-    return CODE_OK;
+    return nx_http::StatusCode::ok;
 }
 
-bool QnMergeSystemsRestHandler::changeSystemName(const QString &systemName) {
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, const QString &user, const QString &password, const QString &currentPassword, const QnUserResourcePtr &admin, bool oneServer) 
+{
+    QAuthenticator authenticator;
+    authenticator.setUser(user);
+    authenticator.setPassword(password);
 
-    if (!backupDatabase())
-        return false;
+    /* Change system name of the selected server */
+    if (oneServer) {
+        CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
+        CLHttpStatus status = client.doGET(lit("/api/configure?systemName=%1&sysIdTime=%2")
+            .arg(qnCommon->localSystemName())
+            .arg(qnCommon->systemIdentityTime()));
+        if (status != CLHttpStatus::CL_HTTP_SUCCESS)
+            return false;
+    }
 
-    if (systemName == qnCommon->localSystemName())
-        return true;
+    {   /* Save current admin inside the remote system */
+        CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
 
-    MSSettings::roSettings()->setValue("systemName", systemName);
-    qnCommon->setLocalSystemName(systemName);
+        ec2::ApiUserData userData;
+        ec2::fromResourceToApi(admin, userData);
+        QByteArray data = QJson::serialized(userData);
 
-    server->setSystemName(systemName);
-    ec2Connection()->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        client.addHeader("Content-Type", "application/json");
+        CLHttpStatus status = client.doPOST(lit("/ec2/saveUser"), data);
 
-    QnAppServerConnectionFactory::getConnection2()->getMiscManager()->changeSystemName(systemName, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        if (status != CLHttpStatus::CL_HTTP_SUCCESS)
+            return false;
+    }
+
+    /* Change system name of the remote system */
+    if (!oneServer) {
+        authenticator.setPassword(currentPassword);
+        CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
+        CLHttpStatus status = client.doGET(lit("/api/configure?systemName=%1&wholeSystem=true&sysIdTime=%2")
+            .arg(qnCommon->localSystemName())
+            .arg(qnCommon->systemIdentityTime()));
+        if (status != CLHttpStatus::CL_HTTP_SUCCESS)
+            return false;
+    }
 
     return true;
 }
 
-bool QnMergeSystemsRestHandler::changeAdminPassword(const QString &password) {
-    if (QnUserResourcePtr admin = qnResPool->getAdministrator()) {
-        admin->setPassword(password);
-        admin->generateHash();
-        ec2Connection()->getUserManager()->save(admin, this, [](int, ec2::ErrorCode) { return; });
-        return true;
+bool QnMergeSystemsRestHandler::applyRemoteSettings(const QUrl &remoteUrl, const QString &systemName, const QString &user, const QString &password, QnUserResourcePtr &admin) 
+{
+    qint64 remoteSysTime = 0;
+    {   /* Read admin user from the remote server */
+        QAuthenticator authenticator;
+        authenticator.setUser(user);
+        authenticator.setPassword(password);
+
+        ec2::ApiUserDataList users;
+        {
+            CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
+            CLHttpStatus status = client.doGET(lit("/ec2/getUsers"));
+            if (status != CLHttpStatus::CL_HTTP_SUCCESS)
+                return false;
+
+            QByteArray data;
+            client.readAll(data);
+
+            QJson::deserialize(data, &users);
+        }
+        {
+            CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
+            CLHttpStatus status = client.doGET(lit("/api/ping"));
+            if (status != CLHttpStatus::CL_HTTP_SUCCESS)
+                return false;
+
+            QByteArray data;
+            client.readAll(data);
+
+            QnJsonRestResult result;
+            QnPingReply reply;
+            if (QJson::deserialize(data, &result) && QJson::deserialize(result.reply(), &reply))
+                remoteSysTime = reply.sysIdTime;
+        }
+
+        QnUserResourcePtr userResource = QnUserResourcePtr(new QnUserResource());
+        for (const ec2::ApiUserData &userData: users) {
+            if (userData.id == admin->getId()) {
+                ec2::fromApiToResource(userData, userResource);
+                break;
+            }
+        }
+        if (userResource->getId() != admin->getId())
+            return false;
+
+        admin->update(userResource);
     }
-    return false;
+
+    ec2::ErrorCode errorCode;
+    QnUserResourceList users;
+
+    errorCode = ec2Connection()->getUserManager()->saveSync(admin, &users);
+    if (errorCode != ec2::ErrorCode::ok)
+        return false;
+
+    if (!changeSystemName(systemName, remoteSysTime))
+        return false;
+
+    errorCode = ec2Connection()->getMiscManager()->changeSystemNameSync(systemName, remoteSysTime);
+    if (errorCode != ec2::ErrorCode::ok)
+        return false;
+
+    return true;
 }

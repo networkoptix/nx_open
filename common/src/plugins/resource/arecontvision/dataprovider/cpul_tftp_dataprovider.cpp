@@ -433,13 +433,9 @@ QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getCameraMetadata()
     if (md.size() < zones*zones)
         return QnMetaDataV1Ptr(0);
 
-
-    QString zone_size = getResource()->getProperty(QLatin1String("Zone size"));
-    if (zone_size.isEmpty())
+    int pixelZoneSize = avRes->getZoneSite() * 32;
+    if (pixelZoneSize == 0)
         return QnMetaDataV1Ptr(0);
-
-    int pixelZoneSize = zone_size.toInt() * 32;
-
 
     QVariant maxSensorWidth = getResource()->getProperty(lit("MaxSensorWidth"));
     QVariant maxSensorHight = getResource()->getProperty(lit("MaxSensorHeight"));

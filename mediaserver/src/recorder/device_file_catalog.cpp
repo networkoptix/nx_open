@@ -81,8 +81,7 @@ DeviceFileCatalog::DeviceFileCatalog(const QString &cameraUniqueId, QnServer::Ch
     m_mutex(QMutex::Recursive),
     m_cameraUniqueId(cameraUniqueId),
     m_catalog(catalog),
-    m_lastAddIndex(-1),
-    m_lastRecordRecording(false)
+    m_recordingChunkTime(-1)
 {
 }
 
@@ -225,11 +224,12 @@ void DeviceFileCatalog::replaceChunks(int storageIndex, const std::deque<Chunk>&
         [storageIndex](const Chunk& chunk){ return chunk.storageIndex == storageIndex; } );
     m_chunks.resize( filteredDataEndIter - filteredData.begin() + newCatalog.size() );
     std::merge( filteredData.begin(), filteredDataEndIter, newCatalog.begin(), newCatalog.end(), m_chunks.begin() );
-    m_lastAddIndex = -1;
 }
 
 QSet<QDate> DeviceFileCatalog::recordedMonthList()
 {
+    QMutexLocker lock(&m_mutex);
+
     QSet<QDate> rez;
     if (m_chunks.empty())
         return rez;
@@ -279,9 +279,6 @@ void DeviceFileCatalog::addChunks(const std::deque<Chunk>& chunks)
     auto itr = std::set_union(existChunks.begin(), existChunks.end(), chunks.begin(), chunks.end(), m_chunks.begin());
     if (!m_chunks.empty())
         m_chunks.resize(itr - m_chunks.begin());
-
-
-    m_lastAddIndex = -1;
 }
 
 std::deque<DeviceFileCatalog::Chunk> DeviceFileCatalog::mergeChunks(const std::deque<Chunk>& chunk1, const std::deque<Chunk>& chunk2)
@@ -332,7 +329,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(const QnStorageResourc
         }
 
         //chunk = Chunk(startTimeMs, storage->getIndex(), fileIndex, endTimeMs - startTimeMs, currentTimeZone()/60);
-        chunk = Chunk(startTimeMs, storage->getIndex(), fileIndex, endTimeMs - startTimeMs, detectTimeZone(startTimeMs, fileName));
+        chunk = Chunk(startTimeMs, qnStorageMan->getStorageIndex(storage), fileIndex, endTimeMs - startTimeMs, detectTimeZone(startTimeMs, fileName));
     }
     delete avi;
     return chunk;
@@ -499,7 +496,7 @@ void DeviceFileCatalog::addRecord(const Chunk& chunk)
         m_chunks.push_back( chunk );
         itr = m_chunks.begin() + (m_chunks.size()-1);
     }
-    m_lastAddIndex = itr - m_chunks.begin();
+    m_recordingChunkTime = chunk.startTimeMs;
 }
 
 void DeviceFileCatalog::removeRecord(int idx)
@@ -508,8 +505,6 @@ void DeviceFileCatalog::removeRecord(int idx)
         m_chunks.pop_front();
     else
         m_chunks.erase(m_chunks.begin() + idx);
-    if (m_lastAddIndex >= idx)
-        m_lastAddIndex--;
 }
 
 DeviceFileCatalog::Chunk DeviceFileCatalog::takeChunk(qint64 startTimeMs, qint64 durationMs) {
@@ -531,29 +526,6 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::takeChunk(qint64 startTimeMs, qint64
     return Chunk();
 }
 
-qint64 DeviceFileCatalog::getLatRecordingTime() const
-{
-    QMutexLocker lock(&m_mutex);
-    if (m_lastAddIndex >= 0)
-        return m_chunks[m_lastAddIndex].startTimeMs;
-    return -1;
-}
-
-void DeviceFileCatalog::setLatRecordingTime(qint64 value)
-{
-    QMutexLocker lock(&m_mutex);
-    m_lastAddIndex = -1;
-    m_lastRecordRecording = false;
-    for (size_t i = 0; i < m_chunks.size(); ++i)
-    {
-        if (m_chunks[i].startTimeMs == value) {
-            m_lastAddIndex = i;
-            m_lastRecordRecording = true;
-            break;
-        }
-    }
-}
-
 qint64 DeviceFileCatalog::lastChunkStartTime() const
 {
     QMutexLocker lock(&m_mutex);
@@ -565,11 +537,13 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::updateDuration(int durationMs, qint6
     Q_ASSERT(durationMs < 1000 * 1000);
     QMutexLocker lock(&m_mutex);
     //m_chunks.last().durationMs = durationMs;
-    m_lastRecordRecording = false;
-    if (m_lastAddIndex >= 0) {
-        m_chunks[m_lastAddIndex].durationMs = durationMs;
-        m_chunks[m_lastAddIndex].setFileSize(fileSize);
-        return m_chunks[m_lastAddIndex];
+    auto itr = qLowerBound(m_chunks.begin(), m_chunks.end(), m_recordingChunkTime);
+    if (itr != m_chunks.end() && itr->startTimeMs == m_recordingChunkTime)
+    {
+        DeviceFileCatalog::Chunk& chunk = *itr;
+        chunk.durationMs = durationMs;
+        chunk.setFileSize(fileSize);
+        return chunk;
     }
     else {
         return Chunk();
@@ -734,8 +708,6 @@ qint64 DeviceFileCatalog::maxTime() const
     QMutexLocker lock(&m_mutex);
     if (m_chunks.empty())
         return AV_NOPTS_VALUE;
-    else if (m_lastAddIndex >= 0 && m_chunks[m_lastAddIndex].durationMs == -1)
-        return DATETIME_NOW;
     else if (m_chunks[m_chunks.size()-1].durationMs == -1)
         return DATETIME_NOW;
     else

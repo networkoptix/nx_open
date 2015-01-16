@@ -62,21 +62,21 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
 //        return;
 
     //TODO: #GDM #Business check if camera is visible to us
-    QnBusinessActionParameters::UserGroup userGroup = businessAction->getParams().userGroup;
-    if (userGroup == QnBusinessActionParameters::AdminOnly
+    QnBusiness::UserGroup userGroup = businessAction->getParams().userGroup;
+    if (userGroup == QnBusiness::AdminOnly
             && !(accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
         return;
     }
 
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
-    QnBusiness::EventType eventType = params.getEventType();
+    QnBusiness::EventType eventType = params.eventType;
 
     if (eventType >= QnBusiness::UserEvent)
         return;
 
     int healthMessage = eventType - QnBusiness::SystemHealthEvent;
     if (healthMessage >= 0) {
-        QnUuid resourceId = params.getEventResourceId();
+        QnUuid resourceId = params.eventResourceId;
         QnResourcePtr resource = qnResPool->getResourceById(resourceId);
         addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), resource);
         return;
@@ -132,47 +132,31 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
 }
 
 void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth::MessageType message, bool visible) {
-    setSystemHealthEventVisible(message, QVariant(), visible);
-}
-
-void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible( QnSystemHealth::MessageType message, const QnActionParameters& actionParams, bool visible )
-{
-    setSystemHealthEventVisible( message, QVariant::fromValue(actionParams), visible );
+    setSystemHealthEventVisibleInternal(message, QVariant(), visible);
 }
 
 void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth::MessageType message, const QnResourcePtr &resource, bool visible) {
-    /* No events but 'Connection lost' should be displayed if we are disconnected. */
-    if (visible && message != QnSystemHealth::ConnectionLost) {
-        //TODO: #sivanov There're users which could be added before admin.
-//        Q_ASSERT(context()->user());
-    }
+    setSystemHealthEventVisibleInternal( message, QVariant::fromValue( resource ), visible );
+}
 
-    /* Only admins can see some system health events */
-    if (visible && adminOnlyMessage(message) && !(accessController()->globalPermissions() & Qn::GlobalProtectedPermission))
-        return;
+void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal( QnSystemHealth::MessageType message, const QVariant& params, bool visible ) {
+    bool canShow = true;
 
-    /* Checking that we are allowed to see this message */
-    if (visible && message == QnSystemHealth::UsersEmailIsEmpty) {
-        QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-        if (!user)
-            return;
-
-        // usual admins can not edit other admins, owner can
-        if ((accessController()->globalPermissions(user) & Qn::GlobalProtectedPermission) &&
-            (!(accessController()->globalPermissions() & Qn::GlobalEditProtectedUserPermission)))
-            return;
+    if (!context()->user()) {
+        canShow = (message == QnSystemHealth::ConnectionLost);
+        if (visible)
+            Q_ASSERT_X(canShow, Q_FUNC_INFO, "No events but 'Connection lost' should be displayed if we are disconnected");
+    } else {
+        /* Only admins can see some system health events */
+        if (adminOnlyMessage(message) && !(accessController()->globalPermissions() & Qn::GlobalProtectedPermission))
+            canShow = false;
     }
 
     /* Checking that we want to see this message */
-    bool canShow = qnSettings->popupSystemHealth() & (1ull << message);
+    bool isAllowedByFilter = qnSettings->popupSystemHealth() & (1ull << message);
+    canShow &= isAllowedByFilter;
 
-    setSystemHealthEventVisible( message, QVariant::fromValue( resource ), visible && canShow );
-
-}
-
-void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible( QnSystemHealth::MessageType message, const QVariant& params, bool visible )
-{
-    if( visible )
+    if( visible && canShow )
         emit systemHealthEventAdded( message, params );
     else
         emit systemHealthEventRemoved( message, params );
@@ -224,10 +208,19 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
 }
 
 void QnWorkbenchNotificationsHandler::at_userEmailValidityChanged(const QnUserResourcePtr &user, bool isValid) {
+    bool visible = !isValid;
     if (context()->user() == user)
-        setSystemHealthEventVisible(QnSystemHealth::EmailIsEmpty, user.staticCast<QnResource>(), !isValid);
-    else
-        setSystemHealthEventVisible( QnSystemHealth::UsersEmailIsEmpty, user.staticCast<QnResource>(), !isValid );
+        setSystemHealthEventVisible(QnSystemHealth::EmailIsEmpty, user, visible);
+    else {
+        /* Checking that we are allowed to see this message */
+        if (visible) {
+            // usual admins can not edit other admins, owner can
+            if ((accessController()->globalPermissions(user) & Qn::GlobalProtectedPermission) &&
+                (!(accessController()->globalPermissions() & Qn::GlobalEditProtectedUserPermission)))
+                visible = false;
+        }
+        setSystemHealthEventVisible( QnSystemHealth::UsersEmailIsEmpty, user, visible );
+    }
 }
 
 void QnWorkbenchNotificationsHandler::at_timeServerSelectionRequired() {
@@ -241,7 +234,7 @@ void QnWorkbenchNotificationsHandler::at_eventManager_connectionOpened() {
 void QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed() {
     clear();
     if (!qnCommon->remoteGUID().isNull())
-        setSystemHealthEventVisible(QnSystemHealth::ConnectionLost, QnResourcePtr(), true);
+        setSystemHealthEventVisible(QnSystemHealth::ConnectionLost, true);
 }
 
 void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction) {

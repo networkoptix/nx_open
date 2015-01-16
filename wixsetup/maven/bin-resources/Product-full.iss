@@ -12,21 +12,26 @@ ArchitecturesAllowed={#Arch}
 LicenseFile=License.rtf
 
 [Languages]
-Name: "en"; MessagesFile: "compiler:Default.isl"
+#if Lang == "ru-ru"
 Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
+#else
+Name: "en"; MessagesFile: "compiler:Default.isl"
+#endif
 
 [CustomMessages]
+#if Lang == "ru-ru"
+ru.ClientIsAlreadyInstalled=Клиент уже установлен
+ru.ServerIsAlreadyInstalled=Сервер уже установлен
+ru.LaunchBoth=Запустить оба инсталлятора
+ru.LaunchClient=Запустить инсталлятор клиента
+ru.LaunchServer=Запустить инсталлятор сервера
+#else
 en.ClientIsAlreadyInstalled=Client is already installed
 en.ServerIsAlreadyInstalled=Server is already installed
 en.LaunchBoth=Launch Both Server and Client Installers
 en.LaunchClient=Launch Client Installer
 en.LaunchServer=Launch Server Installer
-
-ru.ClientIsAlreadyInstalled=Клиент уже установлен
-ru.ServerIsAlreadyInstalled=Сервер уже установлен
-ru.LaunchBoth=Запустить об инсталлятора
-ru.LaunchClient=Запустить инсталлятор клиента
-ru.LaunchServer=Запустить инсталлятор сервера
+#endif
 
 [Types]
 Name: "full"; Description: "{cm:LaunchBoth}"

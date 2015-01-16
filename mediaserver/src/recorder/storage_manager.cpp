@@ -357,9 +357,15 @@ QString QnStorageManager::toCanonicalPath(const QString& path)
     return result;
 }
 
+int QnStorageManager::getStorageIndex(const QnStorageResourcePtr& storage)
+{
+    return detectStorageIndex(storage->getPath());
+}
+
 // determine storage index (aka 16 bit hash)
 int QnStorageManager::detectStorageIndex(const QString& p)
 {
+    QMutexLocker lock(&m_mutexStorages);
     QString path = toCanonicalPath(p);
 
     if (m_storageIndexes.contains(path))
@@ -404,7 +410,7 @@ QnStorageDbPtr QnStorageManager::getSDB(const QnStorageResourcePtr &storage)
         if (QFile::exists(oldFileName) && !QFile::exists(fileName))
             QFile::rename(oldFileName, fileName);
 
-        sdb = m_chunksDB[storage->getPath()] = QnStorageDbPtr(new QnStorageDb(storage->getIndex()));
+        sdb = m_chunksDB[storage->getPath()] = QnStorageDbPtr(new QnStorageDb(getStorageIndex(storage)));
         if (!sdb->open(fileName))
         {
             qWarning() << "can't initialize sqlLite database! Actions log is not created!";
@@ -417,7 +423,7 @@ QnStorageDbPtr QnStorageManager::getSDB(const QnStorageResourcePtr &storage)
 void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
 {
     {
-        storage->setIndex(detectStorageIndex(storage->getPath()));
+        int storageIndex = detectStorageIndex(storage->getPath());
         QMutexLocker lock(&m_mutexStorages);
         m_storagesStatisticsReady = false;
     
@@ -427,7 +433,7 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
         //QnStorageResourcePtr oldStorage = removeStorage(storage); // remove existing storage record if exists
         //if (oldStorage)
         //    storage->addWritedSpace(oldStorage->getWritedSpace());
-        m_storageRoots.insert(storage->getIndex(), storage);
+        m_storageRoots.insert(storageIndex, storage);
         if (storage->isStorageAvailable())
             storage->setStatus(Qn::Online);
 
@@ -927,7 +933,8 @@ void QnStorageManager::updateStorageStatistics()
     if (m_storagesStatisticsReady) 
         return;
 
-    double totalSpace = 0;
+    qint64 totalSpace = 0;
+    qint64 minSpace = INT64_MAX;
     QSet<QnStorageResourcePtr> storages = getWritableStorages();
     m_isWritableStorageAvail = !storages.isEmpty();
     for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
@@ -935,15 +942,15 @@ void QnStorageManager::updateStorageStatistics()
         QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (*itr);
         qint64 storageSpace = qMax(0ll, fileStorage->getTotalSpace() - fileStorage->getSpaceLimit());
         totalSpace += storageSpace;
+        minSpace = qMin(minSpace, storageSpace);
     }
 
     for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
         QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (*itr);
-
         qint64 storageSpace = qMax(0ll, fileStorage->getTotalSpace() - fileStorage->getSpaceLimit());
         // write to large HDD more often then small HDD
-        fileStorage->setStorageBitrateCoeff(1.0 - storageSpace / totalSpace);
+        fileStorage->setStorageBitrateCoeff(storageSpace / (double) minSpace);
     }
     m_storagesStatisticsReady = true;
     m_warnSended = false;
@@ -965,8 +972,8 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     for (QSet<QnStorageResourcePtr>::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
         QnStorageResourcePtr storage = *itr;
-        qDebug() << "QnFileStorageResource " << storage->getPath() << "current bitrate=" << storage->bitrate();
-        float bitrate = storage->bitrate() * storage->getStorageBitrateCoeff();
+        qDebug() << "QnFileStorageResource " << storage->getPath() << "current bitrate=" << storage->bitrate() << "coeff=" << storage->getStorageBitrateCoeff();
+        float bitrate = storage->bitrate() / storage->getStorageBitrateCoeff();
         minBitrate = qMin(minBitrate, bitrate);
         bitrateInfo << QPair<float, QnStorageResourcePtr>(bitrate, storage);
     }
@@ -1077,7 +1084,7 @@ DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QString& cameraUniqu
 void QnStorageManager::replaceChunks(const QnTimePeriod& rebuildPeriod, const QnStorageResourcePtr &storage, const DeviceFileCatalogPtr &newCatalog, const QString& cameraUniqueId, QnServer::ChunksCatalog catalog)
 {
     QMutexLocker lock(&m_mutexCatalog);
-    int storageIndex = storage->getIndex();
+    int storageIndex = getStorageIndex(storage);
     
     // add new recorded chunks to scan data
     qint64 scannedDataLastTime = newCatalog->m_chunks.empty() ? 0 : newCatalog->m_chunks[newCatalog->m_chunks.size()-1].startTimeMs;
@@ -1102,10 +1109,7 @@ void QnStorageManager::replaceChunks(const QnTimePeriod& rebuildPeriod, const Qn
         }
     }
 
-    qint64 recordingTime = ownCatalog->getLatRecordingTime();
     ownCatalog->replaceChunks(storageIndex, newCatalog->m_chunks);
-    if (recordingTime > 0)
-        ownCatalog->setLatRecordingTime(recordingTime);
 
     QnStorageDbPtr sdb = getSDB(storage);
     if (sdb)
@@ -1146,7 +1150,7 @@ QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIn
             int idPos = root.length() + qualityLen;
             uniqueId = fileName.mid(idPos+1, fileName.indexOf(separator, idPos+1) - idPos-1);
 
-            storageIndex = itr.value()->getIndex();
+            storageIndex = getStorageIndex(itr.value());
             return *itr;
         }
     }
@@ -1266,7 +1270,7 @@ bool QnStorageManager::isStorageAvailable(int storage_index) const {
     return storage && storage->getStatus() == Qn::Online; 
 }
 
-bool QnStorageManager::addBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark) {
+bool QnStorageManager::addBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark, bool forced) {
 
     QnDualQualityHelper helper;
     helper.openCamera(cameraGuid);
@@ -1274,21 +1278,31 @@ bool QnStorageManager::addBookmark(const QByteArray &cameraGuid, QnCameraBookmar
     DeviceFileCatalog::Chunk chunkBegin, chunkEnd;
     DeviceFileCatalogPtr catalog;
     helper.findDataForTime(bookmark.startTimeMs, chunkBegin, catalog, DeviceFileCatalog::OnRecordHole_NextChunk, false);
-    if (chunkBegin.startTimeMs < 0)
-        return false; //recorded chunk was not found
+    if (chunkBegin.startTimeMs < 0) {
+        if (!forced)
+            return false; //recorded chunk was not found
+
+        /* If we are forced, try to find any chunk. */
+        helper.findDataForTime(bookmark.startTimeMs, chunkBegin, catalog, DeviceFileCatalog::OnRecordHole_PrevChunk, false);
+        if (chunkBegin.startTimeMs < 0)
+            return false; // no recorded chunk were found at all
+    }
 
     helper.findDataForTime(bookmark.endTimeMs(), chunkEnd, catalog, DeviceFileCatalog::OnRecordHole_PrevChunk, false);
-    if (chunkEnd.startTimeMs < 0)
+    if (chunkEnd.startTimeMs < 0 && !forced)
         return false; //recorded chunk was not found
 
     qint64 endTimeMs = bookmark.endTimeMs();
 
-    bookmark.startTimeMs = qMax(bookmark.startTimeMs, chunkBegin.startTimeMs);  // move bookmark start to the start of the chunk in case of hole
-    endTimeMs = qMin(endTimeMs, chunkEnd.endTimeMs());
-    bookmark.durationMs = endTimeMs - bookmark.startTimeMs;                     // move bookmark end to the end of the closest chunk in case of hole
+    /* For usual case move bookmark borders to the chunk borders. */
+    if (!forced) {
+        bookmark.startTimeMs = qMax(bookmark.startTimeMs, chunkBegin.startTimeMs);  // move bookmark start to the start of the chunk in case of hole
+        endTimeMs = qMin(endTimeMs, chunkEnd.endTimeMs());
+        bookmark.durationMs = endTimeMs - bookmark.startTimeMs;                     // move bookmark end to the end of the closest chunk in case of hole
 
-    if (bookmark.durationMs <= 0)
-        return false;   // bookmark ends before the chunk starts
+        if (bookmark.durationMs <= 0)
+            return false;   // bookmark ends before the chunk starts
+    }
 
     // this chunk will be added to the bookmark catalog
     chunkBegin.startTimeMs = bookmark.startTimeMs;

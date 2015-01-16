@@ -8,6 +8,7 @@
 
 namespace ec2
 {
+    //TODO #ak get rid of this class!
     class DummyHandler
     :
         public QObject

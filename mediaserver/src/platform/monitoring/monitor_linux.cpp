@@ -18,8 +18,10 @@
 #include <signal.h>
 #include <errno.h>
 #include <net/if_arp.h>
+#include <sys/statvfs.h>
 
 #include <utils/common/log.h>
+#include <utils/common/systemerror.h>
 
 
 static const int BYTES_PER_MB = 1024*1024;
@@ -473,17 +475,86 @@ QList<QnPlatformMonitor::NetworkLoad> QnLinuxMonitor::totalNetworkLoad()
     return d_ptr->totalNetworkLoad();
 }
 
-QList<QnPlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo()
+static QnPlatformMonitor::PartitionType fsNameToType( const QString& fsName )
 {
-    QList<QnPlatformMonitor::PartitionSpace> partitions = base_type::totalPartitionSpaceInfo();
-    //filtering driectories, mounted to the same device
+    if( fsName == "sysfs" )
+        return QnPlatformMonitor::UnknownPartition;
+    else if( fsName == "rootfs" )
+        return QnPlatformMonitor::LocalDiskPartition;
+    else if( fsName == "ramfs" )
+        return QnPlatformMonitor::RamDiskPartition;
+    else if( fsName == "bdev" )
+        return QnPlatformMonitor::UnknownPartition;
+    else if( fsName == "proc" )
+        return QnPlatformMonitor::UnknownPartition;
+    else if( fsName == "cgroup" )
+        return QnPlatformMonitor::UnknownPartition;
+    else if( fsName == "cpuset" )
+        return QnPlatformMonitor::UnknownPartition;
+    else if( fsName == "tmpfs" )
+        return QnPlatformMonitor::RamDiskPartition;
+    else if( fsName == "devtmpfs" )
+        return QnPlatformMonitor::UnknownPartition;
+    else if( fsName == "debugfs" )
+        return QnPlatformMonitor::UnknownPartition;
+    else if( fsName == "securityfs" )
+        return QnPlatformMonitor::UnknownPartition;
+    else if( fsName == "sockfs" )
+        return QnPlatformMonitor::UnknownPartition;
+    else if( fsName == "pipefs" )
+        return QnPlatformMonitor::UnknownPartition;
+    else if( fsName == "anon_inodefs" )
+        return QnPlatformMonitor::UnknownPartition;
+    else if( fsName == "devpts" )
+        return QnPlatformMonitor::UnknownPartition;
+    else if( fsName == "ext3" )
+        return QnPlatformMonitor::LocalDiskPartition;
+    else if( fsName == "ext2" )
+        return QnPlatformMonitor::LocalDiskPartition;
+    else if( fsName == "ext4" )
+        return QnPlatformMonitor::LocalDiskPartition;
+    else if( fsName == "exfat" )
+        return QnPlatformMonitor::LocalDiskPartition;
+    else if( fsName == "hugetlbfs" )
+        return QnPlatformMonitor::UnknownPartition;
+    else if( fsName == "vfat" )
+        return QnPlatformMonitor::LocalDiskPartition;
+    else if( fsName == "ecryptfs" )
+        return QnPlatformMonitor::LocalDiskPartition;
+    else if( fsName == "fuseblk" )  //NTFS
+        return QnPlatformMonitor::LocalDiskPartition;
+    else if( fsName == "fuse" )
+        return QnPlatformMonitor::LocalDiskPartition;
+    else if( fsName == "fusectl" )
+        return QnPlatformMonitor::LocalDiskPartition;
+    else if( fsName == "pstore" )
+        return QnPlatformMonitor::UnknownPartition;
+    else if( fsName == "mqueue" )
+        return QnPlatformMonitor::UnknownPartition;
+    else if( fsName == "rpc_pipefs" )
+        return QnPlatformMonitor::UnknownPartition;
+    else if( fsName == "nfs" )
+        return QnPlatformMonitor::NetworkPartition;
+    else if( fsName == "nfs4" )
+        return QnPlatformMonitor::NetworkPartition;
+    else if( fsName == "nfsd" )
+        return QnPlatformMonitor::NetworkPartition;
+    else if( fsName == "cifs" )
+        return QnPlatformMonitor::NetworkPartition;
+    else
+        return QnPlatformMonitor::UnknownPartition;
+}
 
-    //map<device, path>
-    std::map<QString, QString> deviceToPath;
-    std::set<QString> mountPointsToIgnore;
+/*!
+    \note If same device mounted to multiple points, returns mount point with shortest name
+*/
+SystemError::ErrorCode readPartitionsAndSizes( QList<QnPlatformMonitor::PartitionSpace>* const partitionInfoList )
+{
+    //map<device, <path, fs_name>>
+    std::map<QString, std::pair<QString, QString>> deviceToPath;
     std::unique_ptr<FILE, decltype(&fclose)> file( fopen("/proc/mounts", "r"), fclose );
     if( !file )
-        return partitions;
+        return SystemError::getLastOSErrorCode();
 
     char line[MAX_LINE_LENGTH];
     for( int i = 0; fgets(line, MAX_LINE_LENGTH, file.get()) != NULL; ++i )
@@ -493,35 +564,49 @@ QList<QnPlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo
 
         char cDevName[MAX_LINE_LENGTH];
         char cPath[MAX_LINE_LENGTH];
-        if( sscanf(line, "%s %s ", cDevName, cPath) != 2 )
+        char cFSName[MAX_LINE_LENGTH];
+        if( sscanf(line, "%s %s %s ", cDevName, cPath, cFSName) != 3 )
             continue; /* Skip unrecognized lines. */
 
         const QString& devName = QString::fromUtf8(cDevName);
         const QString& path = QString::fromUtf8(cPath);
+        const QString& fsName = QString::fromUtf8(cFSName);
 
-        auto p = deviceToPath.insert( std::make_pair(devName, path) );
+        auto p = deviceToPath.emplace( devName, std::make_pair(path, fsName) );
         if( !p.second )
         {
             //device has mutiple mount points
-            if( path.length() < p.first->second.length() )
+            if( path.length() < p.first->second.first.length() )
             {
-                mountPointsToIgnore.insert( p.first->second );
-                p.first->second = path; //selecting shortest mount point
-            }
-            else
-            {
-                mountPointsToIgnore.insert( path );
+                p.first->second.first = path; //selecting shortest mount point
+                p.first->second.second = fsName;
             }
         }
     }
 
-    const auto partitionsEnd = partitions.end();
-    for( auto it = partitions.begin(); it != partitionsEnd; )
+    for( auto deviceAndPath: deviceToPath )
     {
-        if( mountPointsToIgnore.find( it->path ) != mountPointsToIgnore.end() )
-            it = partitions.erase(it);
-        else
-            ++it;
+        struct statvfs vfsInfo;
+        memset( &vfsInfo, 0, sizeof(vfsInfo) );
+        if( statvfs( deviceAndPath.second.first.toUtf8().constData(), &vfsInfo ) == -1 )
+            continue;
+
+        QnPlatformMonitor::PartitionSpace partitionInfo;
+        partitionInfo.path = deviceAndPath.second.first;
+        partitionInfo.type = fsNameToType( deviceAndPath.second.second );
+        partitionInfo.sizeBytes = (int64_t)vfsInfo.f_blocks * vfsInfo.f_frsize;
+        partitionInfo.freeBytes = (int64_t)vfsInfo.f_bfree * vfsInfo.f_bsize;
+        partitionInfoList->push_back( partitionInfo );
     }
+
+    return SystemError::noError;
+}
+
+
+
+QList<QnPlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo()
+{
+    QList<QnPlatformMonitor::PartitionSpace> partitions;
+    readPartitionsAndSizes( &partitions );
     return partitions;
 }

@@ -31,6 +31,7 @@ private:
     QScopedPointer<Ui::QnPictureSettingsDialog> ui;
 
     bool m_updating;
+    QnMediaResourcePtr m_resource;
 };
 
 #endif // PICTURE_SETTINGS_DIALOG_H

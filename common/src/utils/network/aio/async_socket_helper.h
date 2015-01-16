@@ -199,6 +199,7 @@ public:
         assert( buf.size() > 0 );
 
 #ifdef _DEBUG
+        //assert does not stop all threads immediately, so performing segmentation fault
         if( m_asyncSendIssued )
             *((int*)nullptr) = 12;
         assert( !m_asyncSendIssued );
@@ -235,10 +236,14 @@ public:
 
             ++this->m_socket->impl()->terminated;   //ignoring all new I/O operations while cancellation is in progress
 
-            cancelAsyncIO( aio::etRead, waitForRunningHandlerCompletion );
-            cancelAsyncIO( aio::etWrite, waitForRunningHandlerCompletion );
-            cancelAsyncIO( aio::etTimedOut, waitForRunningHandlerCompletion );
-            aio::AIOService::instance()->cancelPostedCalls( this->m_socket, waitForRunningHandlerCompletion );
+            //TODO #ak underlying loop is a work-around. Must add method to aio::AIOService which cancels all operation atomically
+            while( aio::AIOService::instance()->isSocketBeingWatched( this->m_socket ) )
+            {
+                cancelAsyncIO( aio::etRead, waitForRunningHandlerCompletion );
+                cancelAsyncIO( aio::etWrite, waitForRunningHandlerCompletion );
+                cancelAsyncIO( aio::etTimedOut, waitForRunningHandlerCompletion );
+                aio::AIOService::instance()->cancelPostedCalls( this->m_socket, waitForRunningHandlerCompletion );
+            }
 
             --this->m_socket->impl()->terminated;
             return;
@@ -509,7 +514,10 @@ private:
             {
                 //TODO #ak distinguish read and write
                 SystemError::ErrorCode sockErrorCode = SystemError::notConnected;
-                this->m_socket->getLastError( &sockErrorCode );
+                if( !this->m_socket->getLastError( &sockErrorCode ) )
+                    sockErrorCode = SystemError::notConnected;
+                else if( sockErrorCode == SystemError::noError )
+                    sockErrorCode = SystemError::notConnected;  //MUST report some error
                 if( m_connectHandler )
                 {
                     m_connectSendHandlerTerminatedFlag = &terminated;

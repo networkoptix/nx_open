@@ -6,7 +6,9 @@ COMPANY_NAME=${deb.customization.company.name}
 
 if [ -n "$DEBIAN_SCRIPT_DEBUG" ]; then set -v -x; DEBIAN_SCRIPT_TRACE=1; fi
 ${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
- 
+
+UPGRADING=${2:+yes}
+
 export PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin
 
 BASE_DIR="/opt/$COMPANY_NAME/mediaserver"
@@ -27,7 +29,7 @@ EC_CFG_HELPER="$BIN_DIR/config_helper.py $EC_CONFIG_FILE"
 DBSYNC="$BASE_DIR/share/dbsync-2.2/bin/dbsync"
 CERTGEN="$BASE_DIR/share/dbsync-2.2/bin/certgen"
 
-# This is necessary because changed configuration options should take effect 
+# This is necessary because changed configuration options should take effect
 # immediately.
 if status $COMPANY_NAME-mediaserver | grep "start/running" > /dev/null; then
   stop $COMPANY_NAME-mediaserver
@@ -37,8 +39,7 @@ fi
 PORT_DEFAULT="7001"
 TRANSPORT_DEAULT="auto"
 PUBLIC_IP_ENABLED_DEFAULT="auto"
-SYSTEM_NAME_DEFAULT=$COMPANY_NAME
-ALLOW_CAMERA_CHANGES_DEFAULT=true
+CAMERA_SETTINGS_OPTIMIZATION_DEFAULT=true
 
 function is_local_addr {
     local hostname=$1;
@@ -61,11 +62,11 @@ function to_int {
 function port_is_ok {
     local port="$1"
     local -i port_num=$(to_int "${port}" 2>/dev/null)
- 
+
     if (( $port_num < 1 || $port_num > 65535 )) ; then
         return 1
     fi
- 
+
     return 0
 }
 
@@ -84,7 +85,7 @@ function ask_for_value {
     # Support unattened install
     db_get $full_name
     if [ "$RET" = "" ]; then
-        [ -n "$default" ] && db_set $full_name $default 
+        [ -n "$default" ] && db_set $full_name $default
     fi
 
     db_input high $full_name || true
@@ -93,7 +94,7 @@ function ask_for_value {
     while :
     do
         db_get $full_name
-        { validate_$varname $RET 2> /dev/null; STATUS=$?; } || true        
+        { validate_$varname $RET 2> /dev/null; STATUS=$?; } || true
         [ $STATUS -eq 0 ] && break # validation passes
         [ $STATUS -ne 1 ] && break # no validation function or invalid
 
@@ -128,7 +129,7 @@ function find_free_port {
     while :
     do
         netstat -nl4t | awk '{print $4;}' | grep ":$port" > /dev/null 2>&1
-        if [ $? -ne 0 ] 
+        if [ $? -ne 0 ]
         then
             echo $port
             return
@@ -140,6 +141,10 @@ function find_free_port {
 
 case "$1" in
     configure)
+        ECS_GUID="$($EC_CFG_HELPER ecsGuid)"
+        SYSTEM_NAME_SUFFIX=$(echo $ECS_GUID | sed 's/{*\([^{-]\+\)-.*/\1/')
+        SYSTEM_NAME_DEFAULT=System_${SYSTEM_NAME_SUFFIX:-$RANDOM}
+
         ECS_HOST="$($CFG_HELPER appserverHost)"
         if [ -n "$ECS_HOST" ]; then
             if is_local_addr "$ECS_HOST"; then
@@ -153,31 +158,47 @@ case "$1" in
             fi
         fi
 
-        PORT="$($CFG_HELPER port)"
-        [ -z "$PORT" ] && PORT="$($EC_CFG_HELPER port)"
-        [ -z "$PORT" ] && PORT=`find_free_port $PORT_DEFAULT`
-        PORT=$(ask_for_value port "$PORT")
-        $CFG_HELPER port "$PORT"
+        if [ -z "$UPGRADING" ]
+        then
+            PORT="$($CFG_HELPER port)"
+            [ -z "$PORT" ] && PORT="$($EC_CFG_HELPER port)"
+            [ -z "$PORT" ] && PORT=$(find_free_port $PORT_DEFAULT)
+            PORT=$(ask_for_value port "$PORT")
+            $CFG_HELPER port "$PORT"
 
-        if [ ! -f $DB_PATH -a ! -f $OLD_DB_PATH ]; then
-            APPSERVER_PASSWORD=$(ask_for_value appserverPassword "$APPSERVER_PASSWORD")
-            $CFG_HELPER appserverPassword "$APPSERVER_PASSWORD"
+            if [ ! -f $DB_PATH -a ! -f $OLD_DB_PATH ]; then
+                APPSERVER_PASSWORD=$(ask_for_value appserverPassword "$APPSERVER_PASSWORD")
+                $CFG_HELPER appserverPassword "$APPSERVER_PASSWORD"
+            fi
+
+            TRANSPORT="$($CFG_HELPER rtspTransport)"
+            [ -z "$TRANSPORT" ] && TRANSPORT=$TRANSPORT_DEFAULT
+            $CFG_HELPER rtspTransport "$TRANSPORT"
+
+            SYSTEM_NAME="$($CFG_HELPER systemName)"
+            [ -z "$SYSTEM_NAME" ] && SYSTEM_NAME=$SYSTEM_NAME_DEFAULT
+            SYSTEM_NAME=$(ask_for_value systemName "$SYSTEM_NAME")
+            $CFG_HELPER systemName "$SYSTEM_NAME"
+
+            CAMERA_SETTINGS_OPTIMIZATION="$($CFG_HELPER cameraSettingsOptimization)"
+            [ -z "$CAMERA_SETTINGS_OPTIMIZATION" ] && CAMERA_SETTINGS_OPTIMIZATION=$($EC_CFG_HELPER allowCameraChanges)
+            [ -z "$CAMERA_SETTINGS_OPTIMIZATION" ] && CAMERA_SETTINGS_OPTIMIZATION=$CAMERA_SETTINGS_OPTIMIZATION_DEFAULT
+            CAMERA_SETTINGS_OPTIMIZATION=$(ask_for_value cameraSettingsOptimization "$CAMERA_SETTINGS_OPTIMIZATION")
+            $CFG_HELPER cameraSettingsOptimization "$CAMERA_SETTINGS_OPTIMIZATION"
+        else
+            PORT="$($CFG_HELPER port)"
+            [ -z "$PORT" ] && PORT="$($EC_CFG_HELPER port)"
+            [ -z "$PORT" ] && PORT=$(find_free_port $PORT_DEFAULT)
+            $CFG_HELPER port "$PORT"
+
+            SYSTEM_NAME="$($CFG_HELPER systemName)"
+            [ -z "$SYSTEM_NAME" ] && $CFG_HELPER systemName "$SYSTEM_NAME_DEFAULT"
+
+            CAMERA_SETTINGS_OPTIMIZATION="$($CFG_HELPER cameraSettingsOptimization)"
+            [ -z "$CAMERA_SETTINGS_OPTIMIZATION" ] && CAMERA_SETTINGS_OPTIMIZATION=$($EC_CFG_HELPER allowCameraChanges)
+            [ -z "$CAMERA_SETTINGS_OPTIMIZATION" ] && CAMERA_SETTINGS_OPTIMIZATION=$CAMERA_SETTINGS_OPTIMIZATION_DEFAULT
+            $CFG_HELPER cameraSettingsOptimization "$CAMERA_SETTINGS_OPTIMIZATION"
         fi
-
-        TRANSPORT="$($CFG_HELPER rtspTransport)"
-        [ -z "$TRANSPORT" ] && TRANSPORT=$TRANSPORT_DEFAULT
-        $CFG_HELPER rtspTransport "$TRANSPORT"
-
-        SYSTEM_NAME="$($CFG_HELPER systemName)"
-        [ -z "$SYSTEM_NAME" ] && SYSTEM_NAME=$SYSTEM_NAME_DEFAULT
-        SYSTEM_NAME=$(ask_for_value systemName "$SYSTEM_NAME")
-        $CFG_HELPER systemName "$SYSTEM_NAME"
-
-        ALLOW_CAMERA_CHANGES="$($CFG_HELPER allowCameraChanges)"
-        [ -z "$ALLOW_CAMERA_CHANGES" ] && ALLOW_CAMERA_CHANGES=$($EC_CFG_HELPER allowCameraChanges)
-        [ -z "$ALLOW_CAMERA_CHANGES" ] && ALLOW_CAMERA_CHANGES=$ALLOW_CAMERA_CHANGES_DEFAULT
-        ALLOW_CAMERA_CHANGES=$(ask_for_value allowCameraChanges "$ALLOW_CAMERA_CHANGES")
-        $CFG_HELPER allowCameraChanges "$ALLOW_CAMERA_CHANGES"
 
         "$CERTGEN" -i
 

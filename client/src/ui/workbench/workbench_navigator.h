@@ -134,6 +134,8 @@ protected:
 
     QnThumbnailsLoader *thumbnailLoader(const QnResourcePtr &resource);
     QnThumbnailsLoader *thumbnailLoader(QnResourceWidget *widget);
+public slots:
+    void clearLoaderCache();
 protected slots:
     void updateCentralWidget();
     void updateCurrentWidget();

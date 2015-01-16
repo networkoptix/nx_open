@@ -3,6 +3,7 @@
 #include <QtCore/QSet>
 
 #include "utils/common/util.h"
+#include "utils/common/string.h"
 
 QnServerAddressesModel::QnServerAddressesModel(QObject *parent) :
     base_type(parent),
@@ -147,6 +148,8 @@ bool QnServerAddressesModel::setData(const QModelIndex &index, const QVariant &v
     switch (index.column()) {
     case AddressColumn: {
         QUrl url = QUrl::fromUserInput(value.toString());
+        url.setScheme(lit("http"));
+
         if (url.isEmpty())
             return false;
 
@@ -297,5 +300,5 @@ bool QnSortedServerAddressesModel::lessThan(const QModelIndex &left, const QMode
     if (lmanual != rmanual)
         return rmanual;
 
-    return left.data().toString() < right.data().toString();
+    return naturalStringLess(left.data().toString(), right.data().toString());
 }

@@ -224,6 +224,8 @@ public:
 
     static QRectF scaled(const QRectF &rect, const QSizeF &size, const QPointF &fixedPoint, Qt::AspectRatioMode mode);
 
+    static QRectF scaled(const QRectF &rect, qreal scale, const QPointF &fixedPoint);
+
     static QRectF aligned(const QSizeF &size, const QRectF &rect, Qt::Alignment alignment = Qt::AlignCenter);
 
     static QRect aligned(const QSize &size, const QRect &rect, Qt::Alignment alignment = Qt::AlignCenter);
@@ -359,6 +361,9 @@ public:
 
     static QPointF closestPoint(const QRectF &rect, const QPointF &point);
     static QPointF closestPoint(const QPointF &a, const QPointF &b, const QPointF &point, qreal *t);
+
+    static QRectF rotated(const QRectF &rect, qreal degrees);
+    static QPointF rotated(const QPointF &point, const QPointF &center, qreal degrees);
 };
 
 #endif // QN_GEOMETRY_H

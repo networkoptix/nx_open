@@ -90,9 +90,11 @@ private:
     void processTcpRtcp(RTPIODevice* ioDevice, quint8* buffer, int bufferSize, int bufferCapacity);
     void buildClientRTCPReport(quint8 chNumber);
     QnAbstractMediaDataPtr getNextDataInternal();
+    RTPSession::TransportType getRtpTransport() const;
 private slots:
     void at_packetLost(quint32 prev, quint32 next);
     void at_propertyChanged(const QnResourcePtr & res, const QString & key);
+    void at_camera_resourceChanged(const QnResourcePtr& );
 private:
     RTPSession m_RtpSession;
     QVector<bool> m_gotKeyDataInfo;
@@ -113,6 +115,7 @@ private:
     QnConstResourceAudioLayoutPtr m_audioLayout;
     bool m_gotData;
     QElapsedTimer m_dataTimer;
+    bool m_rtpStarted;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

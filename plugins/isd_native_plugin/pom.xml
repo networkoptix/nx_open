@@ -27,16 +27,26 @@
         <global.libs>-lcommon</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib common.lib ssleay32.lib libeay32.lib Iphlpapi.lib</windows.oslibs>
-        <windows.oslibs.release></windows.oslibs.release>
-        <windows.oslibs.debug></windows.oslibs.debug>
-        <linux.oslibs></linux.oslibs>
+        <windows.oslibs.release/>
+        <windows.oslibs.debug/>
+        <linux.oslibs/>
         <!--Global defines-->
         <global.defines/>
         <linux.defines/>
         <mac.defines/>
         <!--Specific os defines-->
         <windows.defines>WIN32_LEAN_AND_MEAN</windows.defines>
-    </properties>  
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>build_variables</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/build_variables/pom.xml</systemPath>            
+        </dependency>
+    </dependencies>  
     <profiles>
         <profile>
             <id>linux</id>
@@ -49,6 +59,17 @@
             <properties>
                 <buildLib>sharedlib</buildLib>
             </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>common</artifactId>
+                    <version>${project.version}</version>
+                    <type>pom</type>
+                    <scope>system</scope>
+                    <systemPath>${root.dir}/common/pom.xml</systemPath>
+                </dependency>
+            </dependencies>
         </profile>	
+
     </profiles>	
 </project>

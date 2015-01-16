@@ -32,7 +32,7 @@ QnPlAxisResource::QnPlAxisResource()
 
 QnPlAxisResource::~QnPlAxisResource()
 {
-    stopInputPortMonitoring();
+    stopInputPortMonitoringAsync();
 }
 
 bool QnPlAxisResource::checkIfOnlineAsync( std::function<void(bool)>&& completionHandler )
@@ -89,10 +89,11 @@ void QnPlAxisResource::setCroppingPhysical(QRect /*cropping*/)
 
 }
 
-bool QnPlAxisResource::startInputPortMonitoring()
+bool QnPlAxisResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
 {
-    if( hasFlags(Qn::foreigner)      //we do not own camera
-        || m_inputPortNameToIndex.empty() )
+    if( hasFlags(Qn::foreigner) ||      //we do not own camera
+        !hasCameraCapabilities(Qn::RelayInputCapability) ||
+        m_inputPortNameToIndex.empty() )    //camera report no inputs
     {
         return false;
     }
@@ -132,7 +133,7 @@ bool QnPlAxisResource::startInputPortMonitoring()
     return true;
 }
 
-void QnPlAxisResource::stopInputPortMonitoring()
+void QnPlAxisResource::stopInputPortMonitoringAsync()
 {
     QMutexLocker lk( &m_inputPortMutex );
 

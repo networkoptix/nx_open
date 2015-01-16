@@ -333,6 +333,8 @@ namespace aio
 
         void removeSocketFromPollSet( SocketType* sock, aio::EventType eventType )
         {
+            //NX_LOG( lit("removing %1, eventType %2").arg((size_t)sock, 0, 16).arg(eventType), cl_logDEBUG1 );
+
             void*& userData = sock->impl()->eventTypeToUserData[eventType];
             if( userData )
                 delete static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData);
@@ -425,15 +427,20 @@ namespace aio
                 SocketType* const socket = it.socket();
                 const aio::EventType sockEventType = it.eventType();
                 const aio::EventType handlerToInvokeType =
-                    socket->impl()->eventTypeToUserData[aio::etRead]
-                        ? aio::etRead
-                        : aio::etWrite;
+                    (sockEventType == aio::etRead || sockEventType == aio::etWrite)
+                    ? sockEventType
+                    : (socket->impl()->eventTypeToUserData[aio::etRead] //in case of error calling any handler
+                            ? aio::etRead
+                            : aio::etWrite );
 
-                //NOTE in case of error pollSet reports etError once, 
+                //TODO #ak in case of error pollSet reports etError once, 
                     //but two handlers may be registered for socket.
-                    //So, we must notify both
+                    //So, we must notify both (if they differ, probably). 
+                    //Currently, leaving as-is since any socket installs single handler for both events
 
                 //TODO #ak notify second handler (if any) and if it not removed by first handler
+
+                //NX_LOG( lit("processing %1, eventType %2").arg((size_t)socket, 0, 16).arg(handlerToInvokeType), cl_logDEBUG1 );
 
                 //no need to lock aioServiceMutex, since data is removed in this thread only
                 std::shared_ptr<AIOEventHandlingData<SocketType>> handlingData = 
@@ -449,13 +456,15 @@ namespace aio
                     ++it;
                     continue;
                 }
-                ++it;
                 //eventTriggered is allowed to call removeFromWatch which can remove socket from pollset
                 handlingData->eventHandler->eventTriggered( socket, sockEventType );
                 //updating socket's periodic task (it's garanteed that there is periodic task for socket)
                 if( handlingData->timeout > 0 )
                     handlingData->updatedPeriodicTaskClock = curClock + handlingData->timeout;
                 --handlingData->beingProcessed;
+                //NOTE element, this iterator points to, could be removed in eventTriggered call, 
+                    //but it is still safe to increment this iterator
+                ++it;
             }
         }
 
@@ -879,8 +888,8 @@ namespace aio
                 : (nextPeriodicEventClock < curClock ? 0 : nextPeriodicEventClock - curClock);
 
             //if there are posted calls, just checking sockets state in non-blocking mode
-            const int triggeredSocketCount = m_impl->pollSet.poll(
-                m_impl->postedCalls.empty() ? millisToTheNextPeriodicEvent : 0 );
+            const int pollTimeout = m_impl->postedCalls.empty() ? millisToTheNextPeriodicEvent : 0;
+            const int triggeredSocketCount = m_impl->pollSet.poll( pollTimeout );
 
             if( needToStop() )
                 break;

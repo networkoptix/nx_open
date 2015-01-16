@@ -43,7 +43,7 @@ QnTimeScrollBarColors::QnTimeScrollBarColors() {
 }
 
 QnBackgroundColors::QnBackgroundColors() {
-    normal = QColor(0, 66, 118, 76);
+    normal = QColor(0, 0, 255, 51);
     panic = QColor(255, 0, 0, 255);
 }
 

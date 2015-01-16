@@ -140,9 +140,9 @@ extern "C" {
 #endif
 
 QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags): 
-    base_type(parent, flags | Qt::Window
-#ifndef Q_OS_MACX
-    | Qt::CustomizeWindowHint
+    base_type(parent, flags | Qt::Window | Qt::CustomizeWindowHint
+#ifdef Q_OS_MACX
+    | Qt::WindowTitleHint | Qt::WindowCloseButtonHint | Qt::WindowMinMaxButtonsHint
 #endif
     ),
     QnWorkbenchContextAware(context),
@@ -276,9 +276,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::DebugShowResourcePoolAction));
     addAction(action(Qn::DebugControlPanelAction));
     addAction(action(Qn::ToggleBackgroundAnimationAction));
-#ifdef _DEBUG
     addAction(action(Qn::SystemAdministrationAction));
-#endif
+
     connect(action(Qn::MaximizeAction),     SIGNAL(toggled(bool)),                          this,                                   SLOT(setMaximized(bool)));
     connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
     connect(action(Qn::MinimizeAction),     SIGNAL(triggered()),                            this,                                   SLOT(minimize()));

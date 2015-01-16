@@ -136,6 +136,11 @@ namespace ec2
 
     void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiDatabaseDumpData> & /*tran*/)
     {
+        databaseReplaceRequired();
+    }
+
+    void ECConnectionNotificationManager::databaseReplaceRequired()
+    {
         emit m_ecConnection->databaseDumped();
     }
 
@@ -164,6 +169,10 @@ namespace ec2
     }
 
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiResourceStatusData>& tran ) {
+        m_resourceManager->triggerNotification( tran );
+    }
+
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiLicenseOverflowData>& tran ) {
         m_resourceManager->triggerNotification( tran );
     }
 
@@ -216,10 +225,6 @@ namespace ec2
         emit m_ecConnection->initNotification(fullResData);
         for(const ApiDiscoveryData& data: tran.params.discoveryData)
             m_discoveryManager->triggerNotification(data);
-    }
-
-    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiPanicModeData>& tran ) {
-        emit m_ecConnection->panicModeChanged(tran.params.mode);
     }
 
     void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiVideowallControlMessageData>& tran ) {

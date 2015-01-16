@@ -89,7 +89,7 @@ typedef struct
 #define sse4_attribute __attribute__ ((__target__ ("sse4.1")))
 #define ssse3_attribute __attribute__ ((__target__ ("ssse3")))
 
-#if !__GNUC_PREREQ(4,9)
+#if !__GNUC_PREREQ(4,9) && !__clang__
 
 /* These functions will NOT be inlined with GCC because of -msse2 compiler option --gdm
 (Node "Function attributes"):

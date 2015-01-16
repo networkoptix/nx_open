@@ -77,8 +77,8 @@ enum class QnFullUpdateStage {
     Check,              /**< Check for updates. */
     Download,           /**< Download update packages. */
     Client,             /**< Install client update. */
+    Push,               /**< Push update packages. */
     Incompatible,       /**< Install updates to the incompatible servers. */
-    Push,               /**< Push update package to the normal servers. */
     Servers,            /**< Install updates to the normal servers. */
 
     Count

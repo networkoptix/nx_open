@@ -242,6 +242,10 @@ bool QnPlWatchDogResource::setParamPhysical(const QString &param, const QVariant
 
         if (setting->setParamPhysical(param, val))
         {
+            QString realParamName = param.split(lit("%%")).last();
+            QString realParamValue = val.toString().split(lit(";")).last();
+            emit physicalParamChanged(realParamName, realParamValue);
+
             return true;
         }
     }

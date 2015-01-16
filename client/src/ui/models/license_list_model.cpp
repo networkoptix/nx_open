@@ -83,15 +83,19 @@ QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr 
     switch(column) {
     case TypeColumn:
         item->setText(license->displayName());
+        item->setData(Qt::AlignLeft, Qt::TextAlignmentRole);
         break;
     case CameraCountColumn:
         item->setText(QString::number(license->cameraCount()));
+        item->setData(Qt::AlignRight, Qt::TextAlignmentRole);
         break;
     case LicenseKeyColumn:
         item->setText(QLatin1String(license->key()));
+        item->setData(Qt::AlignLeft, Qt::TextAlignmentRole);
         break;
     case ExpirationDateColumn:
         item->setText(license->expirationTime() < 0 ? tr("Never") : QDateTime::fromMSecsSinceEpoch(license->expirationTime()).toString(Qt::SystemLocaleShortDate));
+        item->setData(Qt::AlignLeft, Qt::TextAlignmentRole);
         break;
     case LicenseStatusColumn: 
         {
@@ -129,6 +133,7 @@ QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr 
             }
             break;
         }
+        item->setData(Qt::AlignLeft, Qt::TextAlignmentRole);
     case ServerColumn:
         {
             QnUuid serverId = license->serverId();
@@ -142,7 +147,7 @@ QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr 
                 item->setData(qnResIconCache->icon(QnResourceIconCache::Server).pixmap(16, 16), Qt::DecorationRole);
                 item->setData(QBrush(colors.normal), Qt::ForegroundRole);
             }
-
+            item->setData(Qt::AlignLeft, Qt::TextAlignmentRole);
         }
         break;
     default:
@@ -152,7 +157,6 @@ QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr 
     if (!qnLicensePool->isLicenseValid(license))
         item->setData(QBrush(colors.expired), Qt::ForegroundRole);
 
-    item->setData(Qt::AlignCenter, Qt::TextAlignmentRole);
     return item;
 }
 

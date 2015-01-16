@@ -6,6 +6,7 @@
 #include "multicast_module_finder.h"
 #include "direct_module_finder.h"
 #include "direct_module_finder_helper.h"
+#include "common/common_module.h"
 
 namespace {
     QUrl trimmedUrl(const QUrl &url) {
@@ -28,8 +29,6 @@ QnModuleFinder::QnModuleFinder(bool clientOnly) :
     connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleUrlFound,              this,       &QnModuleFinder::at_moduleUrlFound);
     connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleUrlLost,               this,       &QnModuleFinder::at_moduleUrlLost);
     connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleChanged,               this,       &QnModuleFinder::at_moduleChanged);
-    //connect(qnResPool,                      &QnResourcePool::resourceAdded,                     this,       &QnModuleFinder::at_resourcePool_resourceChanged);
-    //connect(qnResPool,                      &QnResourcePool::resourceChanged,                   this,       &QnModuleFinder::at_resourcePool_resourceChanged);
 }
 
 QnModuleFinder::~QnModuleFinder() {
@@ -50,7 +49,7 @@ QList<QnModuleInformation> QnModuleFinder::foundModules() const {
     return m_foundModules.values();
 }
 
-QnModuleInformation QnModuleFinder::moduleInformation(const QString &moduleId) const {
+QnModuleInformation QnModuleFinder::moduleInformation(const QnUuid &moduleId) const {
     return m_foundModules.value(moduleId);
 }
 
@@ -66,10 +65,6 @@ QnModuleFinderHelper *QnModuleFinder::directModuleFinderHelper() const {
     return m_directModuleFinderHelper;
 }
 
-void QnModuleFinder::setAllowedPeers(const QList<QnUuid> &peerList) {
-    m_allowedPeers = peerList;
-}
-
 void QnModuleFinder::start() {
     m_multicastModuleFinder->start();
     m_directModuleFinder->start();
@@ -81,7 +76,7 @@ void QnModuleFinder::pleaseStop() {
 }
 
 void QnModuleFinder::at_moduleAddressFound(const QnModuleInformation &moduleInformation, const QnNetworkAddress &address) {
-    if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(moduleInformation.id))
+    if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(moduleInformation.id))
         return;
 
     QUrl url = address.toUrl();
@@ -92,13 +87,17 @@ void QnModuleFinder::at_moduleAddressFound(const QnModuleInformation &moduleInfo
 
         if (!m_directFoundUrls.contains(moduleInformation.id, url)) {
             NX_LOG(lit("QnModuleFinder: New URL from multicast finder: %1 %2").arg(moduleInformation.id.toString()).arg(url.toString()), cl_logDEBUG1);
-            emit moduleUrlFound(m_foundModules.value(moduleInformation.id), url);
+            QnModuleInformation oldModuleInformation = m_foundModules.value(moduleInformation.id);
+            Q_ASSERT_X(!oldModuleInformation.id.isNull(), "Module information must exist here", Q_FUNC_INFO);
+            if (oldModuleInformation.id.isNull())
+                oldModuleInformation = moduleInformation;
+            emit moduleUrlFound(oldModuleInformation, url);
         }
     }
 }
 
 void QnModuleFinder::at_moduleAddressLost(const QnModuleInformation &moduleInformation, const QnNetworkAddress &address) {
-    if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(moduleInformation.id))
+    if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(moduleInformation.id))
         return;
 
     QUrl url = address.toUrl();
@@ -118,7 +117,7 @@ void QnModuleFinder::at_moduleAddressLost(const QnModuleInformation &moduleInfor
 }
 
 void QnModuleFinder::at_moduleUrlFound(const QnModuleInformation &moduleInformation, const QUrl &foundUrl) {
-    if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(moduleInformation.id))
+    if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(moduleInformation.id))
         return;
 
     QUrl url = trimmedUrl(foundUrl);
@@ -128,13 +127,17 @@ void QnModuleFinder::at_moduleUrlFound(const QnModuleInformation &moduleInformat
 
         if (!m_multicastFoundUrls.contains(moduleInformation.id, url)) {
             NX_LOG(lit("QnModuleFinder: New URL from direct finder: %1 %2").arg(moduleInformation.id.toString()).arg(url.toString()), cl_logDEBUG1);
-            emit moduleUrlFound(m_foundModules.value(moduleInformation.id), url);
+            QnModuleInformation oldModuleInformation = m_foundModules.value(moduleInformation.id);
+            Q_ASSERT_X(!oldModuleInformation.id.isNull(), "Module information must exist here", Q_FUNC_INFO);
+            if (oldModuleInformation.id.isNull())
+                oldModuleInformation = moduleInformation;
+            emit moduleUrlFound(oldModuleInformation, url);
         }
     }
 }
 
 void QnModuleFinder::at_moduleUrlLost(const QnModuleInformation &moduleInformation, const QUrl &foundUrl) {
-    if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(moduleInformation.id))
+    if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(moduleInformation.id))
         return;
 
     QUrl url = trimmedUrl(foundUrl);
@@ -153,7 +156,7 @@ void QnModuleFinder::at_moduleUrlLost(const QnModuleInformation &moduleInformati
 }
 
 void QnModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInformation) {
-    if (!m_allowedPeers.isEmpty() && !m_allowedPeers.contains(moduleInformation.id))
+    if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(moduleInformation.id))
         return;
 
     QnModuleInformation updatedModuleInformation = moduleInformation;
@@ -181,28 +184,6 @@ void QnModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInformati
         }
     }
 }
-
-/*
-void QnModuleFinder::at_resourcePool_resourceChanged(const QnResourcePtr &resource) {
-    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (!server)
-        return;
-
-    auto it = m_foundModules.find(server->getId());
-    if (it == m_foundModules.end())
-        return;
-
-    QnModuleInformation moduleInformation = server->getModuleInformation();
-    moduleInformation.remoteAddresses = it->remoteAddresses;
-    moduleInformation.sslAllowed = it->sslAllowed;
-
-    if (moduleInformation == *it)
-        return;
-
-    *it = moduleInformation;
-    emit moduleChanged(moduleInformation);
-}
-*/
 
 void QnModuleFinder::stop() {
     m_multicastModuleFinder->stop();

@@ -18,7 +18,18 @@ angular.module('webadminApp')
 
         $scope.data = {
             labels: Array.apply(null, new Array( $scope.healthLength)).map(String.prototype.valueOf,''),
-            datasets: []
+            datasets: [{ // we need some data
+                label: '',
+                fillColor: nocolor,
+                strokeColor: nocolor,
+                pointColor: nocolor,
+                pointStrokeColor: nocolor,
+                pointHighlightFill: nocolor,
+                pointHighlightStroke: nocolor,
+                show:true,
+                hideLegend:true,
+                data: Array.apply(null, new Array($scope.healthLength)).map(Number.prototype.valueOf,100)
+            }]
         };
 
         $scope.legend = '';
@@ -27,7 +38,7 @@ angular.module('webadminApp')
 
             animation:false,
             scaleOverride: false,
-            scaleSteps: 4,
+            scaleSteps: 10,
             scaleShowLabels: false ,
             scaleLabel: '<%=value%> %',
             scaleIntegersOnly:true,
@@ -139,27 +150,22 @@ angular.module('webadminApp')
 
         function updateStatisticsDataSets(statistics){
             var datasets = $scope.datasets;
-
             var handler = function(stat){
                 return stat.description === dataset.label;
             };
             for(var i=2; i < datasets.length;i++){
                 var dataset = datasets[i];
-
                 var value = 0;
-
                 var needstat = _.filter(statistics,handler);
 
                 if(needstat && needstat.length > 0){
                     value  = needstat[0].value;
                 }
 
-
                 dataset.data.push(value * 100);
                 if (dataset.data.length > $scope.healthLength) {
                     dataset.data = dataset.data.slice(dataset.data.length - $scope.healthLength, dataset.data.length);
                 }
-
             }
         }
 
@@ -173,7 +179,7 @@ angular.module('webadminApp')
                 }
                 $scope.serverIsOnline = true;
 
-                updateStatisticsDataSets((r.status===200 && r.data.error === 0) ? r.data.reply.statistics:[]);
+                updateStatisticsDataSets((r.status===200 && r.data.error === "0") ? r.data.reply.statistics:[]);
 
                 statisticTimer = $timeout(updateStatistics,$scope.interval);
                 return false;

@@ -4,8 +4,8 @@ angular.module('webadminApp')
     .controller('AdvancedCtrl', function ($scope, $modal, $log, mediaserver,$location) {
 
 
-        mediaserver.getCurrentUser().success(function(result){
-            if(!result.reply.isAdmin){
+        mediaserver.getCurrentUser().then(function(result){
+            if(!result.data.reply.isAdmin && !(result.data.reply.permissions & Config.globalEditServersPermissions )){
                 $location.path('/info'); //no admin rights - redirect
             }
         });
@@ -21,11 +21,9 @@ angular.module('webadminApp')
             $scope.storages = _.sortBy(r.data.reply.storages,function(storage){
                 return formatUrl(storage.url);
             });
-
-            for(var i = 0; i<$scope.storages;i++){
+            for(var i = 0; i<$scope.storages.length;i++){
                 $scope.storages[i].reservedSpaceGb = Math.round($scope.storages[i].reservedSpace / (1024*1024*1024));
                 $scope.storages[i].url = formatUrl($scope.storages[i].url);
-
             }
 
             $scope.$watch(function(){

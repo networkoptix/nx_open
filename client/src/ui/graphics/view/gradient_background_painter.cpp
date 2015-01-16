@@ -114,6 +114,9 @@ void QnGradientBackgroundPainter::updateBackgroundColor(bool animate) {
     QnClientBackground background = qnSettings->background();
 
     QColor targetColor;
+    int actualAlpha = background.animationCustomColor.isValid()
+        ? background.animationCustomColor.alpha()
+        : m_colors.normal.alpha();
     
     if(context()->instance<QnWorkbenchPanicWatcher>()->isPanicMode())
         targetColor = m_colors.panic;
@@ -121,10 +124,10 @@ void QnGradientBackgroundPainter::updateBackgroundColor(bool animate) {
         targetColor = QColor();
     else switch (background.animationMode) {
     case Qn::DefaultAnimation:
-        targetColor = m_colors.normal;
+        targetColor = withAlpha(m_colors.normal, actualAlpha);
         break;
     case Qn::RainbowAnimation:
-        targetColor = toTransparent(m_rainbow->currentColor(), 0.5);
+        targetColor = withAlpha(m_rainbow->currentColor(), actualAlpha);
         break;
     case Qn::CustomAnimation:
         targetColor = background.animationCustomColor;

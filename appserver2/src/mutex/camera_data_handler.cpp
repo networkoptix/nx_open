@@ -45,6 +45,10 @@ QByteArray QnMutexCameraDataHandler::getUserData(const QString& name)
     {
         QnSecurityCamResourcePtr camRes = qnResPool->getNetResourceByPhysicalId(name.mid(CAM_UPD_PREFIX.length())).dynamicCast<QnSecurityCamResource>();
         if (camRes) {
+            /* Temporary solution to correctly allow other server to take ownership of desktop camera. */
+            if (camRes->hasFlags(Qn::desktop_camera) && camRes->isReadyToDetach())
+                return QByteArray(); // do not block desktop cameras that are ready to detach
+
             if (camRes->preferedServerId() == qnCommon->moduleGUID())
                 return qnCommon->moduleGUID().toRfc4122(); // block
             QnResourcePtr mServer = qnResPool->getResourceById(camRes->getParentId());

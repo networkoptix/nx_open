@@ -245,12 +245,18 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     QnItemDewarpingParams dewarpingParams = itemData.dewarpingParams;
     int rotation = itemData.rotation;
     QRectF zoomRect = itemData.zoomRect;
-    qreal customAr = widget->resource()->toResource()->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
+    qreal customAr = widget->resource()->customAspectRatio();
+
+    int timeOffset = 0;
+    if (qnSettings->timeMode() == Qn::ServerTimeMode) {
+        // time difference between client and server
+        timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0);
+    }
 
     QString namePart = replaceNonFileNameCharacters(widget->resource()->toResourcePtr()->getName(), L'_');
     QString timePart = (widget->resource()->toResource()->flags() & Qn::utc)
-            ? QDateTime::fromMSecsSinceEpoch(period.startTimeMs).toString(lit("yyyy_MMM_dd_hh_mm_ss"))
-            : QTime().addMSecs(period.startTimeMs).toString(lit("hh_mm_ss"));
+            ? QDateTime::fromMSecsSinceEpoch(period.startTimeMs + timeOffset).toString(lit("yyyy_MMM_dd_hh_mm_ss"))
+            : QTime(0, 0, 0, 0).addMSecs(period.startTimeMs + timeOffset).toString(lit("hh_mm_ss"));
     QString suggestion = QnEnvironment::getUniqueFileName(previousDir, namePart + lit("_") + timePart);
 
     while (true) {
@@ -408,11 +414,6 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     QnMediaResourcePtr resource = widget->resource();
     QnClientVideoCamera* camera = new QnClientVideoCamera(resource);
 
-    int timeOffset = 0;
-    if (qnSettings->timeMode() == Qn::ServerTimeMode) {
-        // time difference between client and server
-        timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(resource, 0);
-    }
     qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(resource, Qn::InvalidUtcOffset);
     QnClientVideoCameraExportTool *tool = new QnClientVideoCameraExportTool(
                                               camera,
@@ -482,6 +483,10 @@ bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layo
         return false;
     }
     else if (hasLocal) {
+        /* Always allow export selected area. */
+        if (layout->getItems().size() == 1)
+            return true;
+
         QMessageBox::critical(
             mainWindow(),
             tr("Could not save a layout"),

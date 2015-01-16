@@ -14,7 +14,7 @@ namespace nx_ec
         This version MUST be incremented by hand, when changes to transaction structures are done.
         Modules with different proto version do not connect to each other!
     */
-    static const int EC2_PROTO_VERSION = 1000;
+    static const int EC2_PROTO_VERSION = 1007;
     //!Servers with no proto version support have this version
     /*!
         THIS VALUE MUST NOT BE CHANGED!

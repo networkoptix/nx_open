@@ -39,10 +39,6 @@ namespace ec2
         m_discoveryManager( new QnDiscoveryManager<T>(m_queryProcessor) ),
         m_timeManager( new QnTimeManager<T>(m_queryProcessor) )
     {
-        connect (QnTransactionMessageBus::instance(), &QnTransactionMessageBus::peerFound, this, &BaseEc2Connection<T>::remotePeerFound, Qt::DirectConnection);
-        connect (QnTransactionMessageBus::instance(), &QnTransactionMessageBus::peerLost,  this, &BaseEc2Connection<T>::remotePeerLost, Qt::DirectConnection);
-        connect (QnTransactionMessageBus::instance(), &QnTransactionMessageBus::remotePeerUnauthorized,  this, &BaseEc2Connection<T>::remotePeerUnauthorized, Qt::DirectConnection);
-
         m_notificationManager.reset(
             new ECConnectionNotificationManager(
                 m_resCtx,
@@ -59,6 +55,24 @@ namespace ec2
                 m_updatesManager.get(),
                 m_miscManager.get(),
                 m_discoveryManager.get() ) );
+    }
+
+    template<class T>
+    BaseEc2Connection<T>::~BaseEc2Connection()
+    {}
+
+    template<class T>
+    void BaseEc2Connection<T>::startReceivingNotifications() {
+        connect(QnTransactionMessageBus::instance(),    &QnTransactionMessageBus::peerFound,                this,   &BaseEc2Connection<T>::remotePeerFound,         Qt::DirectConnection);
+        connect(QnTransactionMessageBus::instance(),    &QnTransactionMessageBus::peerLost,                 this,   &BaseEc2Connection<T>::remotePeerLost,          Qt::DirectConnection);
+        connect(QnTransactionMessageBus::instance(),    &QnTransactionMessageBus::remotePeerUnauthorized,   this,   &BaseEc2Connection<T>::remotePeerUnauthorized,  Qt::DirectConnection);
+        QnTransactionMessageBus::instance()->start();
+    }
+
+    template<class T>
+    void BaseEc2Connection<T>::stopReceivingNotifications() {
+        QnTransactionMessageBus::instance()->disconnectAndJoin( this );
+        QnTransactionMessageBus::instance()->stop();
     }
 
     template<class T>
@@ -140,23 +154,6 @@ namespace ec2
     }
 
     template<class T>
-    int BaseEc2Connection<T>::setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler )
-    {
-        const int reqID = generateRequestID();
-
-        ApiCommand::Value command = ApiCommand::setPanicMode;
-
-        //performing request
-        auto tran = prepareTransaction( command, value );
-
-        using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1) );
-
-        return reqID;
-    }
-
-
-    template<class T>
     int BaseEc2Connection<T>::dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler )
     {
         const int reqID = generateRequestID();
@@ -169,6 +166,23 @@ namespace ec2
         };
         m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiDatabaseDumpData, decltype(queryDoneHandler)> ( 
             ApiCommand::dumpDatabase, nullptr, queryDoneHandler);
+        return reqID;
+    }
+
+    template<class T>
+    int BaseEc2Connection<T>::dumpDatabaseToFileAsync( const QString& dumpFilePath, impl::SimpleHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+
+        ApiStoredFilePath dumpFilePathData;
+        dumpFilePathData.path = dumpFilePath;
+
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, qint64 /*dumpFileSize*/ ) {
+            handler->done( reqID, errorCode );
+        };
+        m_queryProcessor->template processQueryAsync<ApiStoredFilePath, qint64, decltype(queryDoneHandler)> ( 
+            ApiCommand::dumpDatabaseToFile, dumpFilePathData, queryDoneHandler );
+
         return reqID;
     }
 
@@ -188,21 +202,11 @@ namespace ec2
     }
 
     template<class T>
-    QnTransaction<ApiPanicModeData> BaseEc2Connection<T>::prepareTransaction( ApiCommand::Value command, const Qn::PanicMode& mode)
-    {
-        QnTransaction<ApiPanicModeData> tran(command);
-        tran.params.mode = mode;
-        return tran;
-    }
-
-    template<class T>
     void BaseEc2Connection<T>::addRemotePeer(const QUrl& _url)
     {
         QUrl url(_url);
         url.setPath("/ec2/events");
         QUrlQuery q;
-        q.addQueryItem("guid", qnCommon->moduleGUID().toString());
-        q.addQueryItem("runtime-guid", qnCommon->runningInstanceGUID().toString());
         url.setQuery(q);
         QnTransactionMessageBus::instance()->addConnectionToPeer(url);
     }
@@ -213,8 +217,6 @@ namespace ec2
         QUrl url(_url);
         url.setPath("/ec2/events");
         QUrlQuery q;
-        q.addQueryItem("guid", qnCommon->moduleGUID().toString());
-        q.addQueryItem("runtime-guid", qnCommon->runningInstanceGUID().toString());
         url.setQuery(q);
         QnTransactionMessageBus::instance()->removeConnectionFromPeer(url);
     }

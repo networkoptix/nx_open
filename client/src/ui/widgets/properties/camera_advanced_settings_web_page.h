@@ -6,8 +6,6 @@
 #ifndef CAMERA_ADVANCED_SETTINGS_WEB_PAGE_H
 #define CAMERA_ADVANCED_SETTINGS_WEB_PAGE_H
 
-#ifdef QT_WEBKITWIDGETS_LIB
-
 #include <QWebPage>
 #include "core/resource/resource_fwd.h"
 
@@ -26,7 +24,5 @@ protected:
 private:
     QnCustomCookieJar* m_cookieJar;
 };
-
-#endif
 
 #endif  //CAMERA_ADVANCED_SETTINGS_WEB_PAGE_H

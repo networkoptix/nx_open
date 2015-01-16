@@ -16,13 +16,6 @@
 
 #include <api/model/storage_space_reply.h>
 
-#include <utils/common/counter.h>
-#include <utils/common/string.h>
-#include <utils/common/variant.h>
-#include <utils/common/event_processors.h>
-#include <utils/math/interpolator.h>
-#include <utils/math/color_transformations.h>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -30,6 +23,7 @@
 #include <client/client_model_types.h>
 #include <client/client_settings.h>
 
+#include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
 #include <ui/dialogs/storage_url_dialog.h>
 #include <ui/help/help_topic_accessor.h>
@@ -40,6 +34,13 @@
 #include <ui/widgets/storage_space_slider.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/workbench_context.h>
+
+#include <utils/common/counter.h>
+#include <utils/common/string.h>
+#include <utils/common/variant.h>
+#include <utils/common/event_processors.h>
+#include <utils/math/interpolator.h>
+#include <utils/math/color_transformations.h>
 
 //#define QN_SHOW_ARCHIVE_SPACE_COLUMN
 
@@ -131,6 +132,9 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
 
     setWarningStyle(ui->failoverWarningLabel);
 
+    /* Edge servers cannot be renamed. */
+    ui->nameLineEdit->setReadOnly(QnMediaServerResource::isEdgeServer(server));
+
     m_removeAction = new QAction(tr("Remove Storage"), this);
 
     QnSingleEventSignalizer *signalizer = new QnSingleEventSignalizer(this);
@@ -162,6 +166,17 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
         m_maxCamerasAdjusted = true;
         updateFailoverLabel();
     });
+
+    QPushButton* webPageButton = new QPushButton(this);
+    QnAction* webPageAction = menu()->action(Qn::WebClientAction);
+    webPageButton->setText(tr("Open Web Page..."));
+    webPageButton->setEnabled(m_server->getStatus() == Qn::Online);
+    connect(server, &QnResource::statusChanged, this, [this, webPageButton] {
+        webPageButton->setEnabled(m_server->getStatus() == Qn::Online);
+    });
+    connect(webPageButton, &QPushButton::clicked, webPageAction, &QAction::trigger);
+
+    ui->buttonBox->addButton(webPageButton, QDialogButtonBox::HelpRole);
 
     updateFromResources();
 }
@@ -523,10 +538,12 @@ void QnServerSettingsDialog::updateRebuildUi(RebuildState newState, int progress
      ui->rebuildStartButton->setEnabled(newState == RebuildState::Ready);
      ui->rebuildStopButton->setEnabled(newState == RebuildState::InProgress);
 
-     if (oldState == RebuildState::InProgress && newState == RebuildState::Ready)
+     if (oldState == RebuildState::InProgress && newState == RebuildState::Ready) {
+         emit rebuildArchiveDone();
          QMessageBox::information(this,
          tr("Finished"),
          tr("Rebuilding archive index is completed."));
+     }
 
      ui->stackedWidget->setCurrentIndex(newState == RebuildState::InProgress || newState == RebuildState::InProgressFastScan
          ? ui->stackedWidget->indexOf(ui->rebuildProgressPage)

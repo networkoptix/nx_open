@@ -27,7 +27,17 @@ namespace ec2
     {
         template<class T> 
         void operator()(const QnTransaction<T> &tran) const {
-            qnTransactionBus->sendTransaction( tran );
+            /* Local transactions (such as setStatus for servers) should only be sent to clients. */
+            if (tran.isLocal) {
+                QnPeerSet clients = qnTransactionBus->aliveClientPeers().keys().toSet();
+                /* Important check! Empty target means 'send to all peers'. */
+                if (!clients.isEmpty())
+                    qnTransactionBus->sendTransaction( tran, clients );
+            }
+            else {
+                /* Send transaction to all peers. */
+                qnTransactionBus->sendTransaction(tran);
+            }
         }
     };
 
@@ -70,7 +80,6 @@ namespace ec2
         {
             ErrorCode errorCode = ErrorCode::ok;
             auto SCOPED_GUARD_FUNC = [&errorCode, &completionHandler]( ServerQueryProcessor* ){
-                QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
                 QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( completionHandler, errorCode ) );
             };
             std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
@@ -78,19 +87,19 @@ namespace ec2
             QMutexLocker lock(&m_updateDataMutex);
 
             //starting transaction
-            std::unique_ptr<QnDbManager::Locker> dbTran;
+            std::unique_ptr<QnDbManager::QnDbTransactionLocker> dbTran;
             std::list<std::function<void()>> transactionsToSend;
 
             if( ApiCommand::isPersistent(tran.command) )
             {
-                dbTran.reset(new QnDbManager::Locker(dbManager));
+                dbTran.reset(new QnDbManager::QnDbTransactionLocker(dbManager->getTransaction()));
                 errorCode = syncFunction( tran, &transactionsToSend );
                 if( errorCode != ErrorCode::ok )
                     return;
                 if (!dbTran->commit())
                     return;
             }
-            else if( !tran.isLocal )
+            else 
             {
                 transactionsToSend.push_back( std::bind(SendTransactionFunction(), tran ) );
             }
@@ -148,8 +157,7 @@ namespace ec2
             if (errorCode != ErrorCode::ok)
                 return errorCode;
 
-            if( !tran.isLocal )
-                transactionsToSend->push_back( std::bind(SendTransactionFunction(), tran ) );
+            transactionsToSend->push_back( std::bind(SendTransactionFunction(), tran ) );
 
             return errorCode;
         }
@@ -357,7 +365,6 @@ namespace ec2
         template<class InputData, class OutputData, class HandlerType>
             void processQueryAsync( ApiCommand::Value /*cmdCode*/, InputData input, HandlerType handler )
         {
-            QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
             QnConcurrent::run( Ec2ThreadPool::instance(), [input, handler]() {
                 OutputData output;
                 const ErrorCode errorCode = dbManager->doQuery( input, output );
@@ -372,7 +379,6 @@ namespace ec2
         template<class OutputData, class InputParamType1, class InputParamType2, class HandlerType>
             void processQueryAsync( ApiCommand::Value /*cmdCode*/, InputParamType1 input1, InputParamType2 input2, HandlerType handler )
         {
-            QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
             QnConcurrent::run( Ec2ThreadPool::instance(), [input1, input2, handler]() {
                 OutputData output;
                 const ErrorCode errorCode = dbManager->doQuery( input1, input2, output );

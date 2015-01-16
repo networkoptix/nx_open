@@ -17,6 +17,7 @@
 #include <core/resource/file_processor.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/media_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <transcoding/filters/contrast_image_filter.h>
@@ -36,27 +37,35 @@
 #include <utils/common/string.h>
 #include <utils/common/environment.h>
 #include <utils/common/warnings.h>
+#include <utils/aspect_ratio.h>
+
 #include "transcoding/filters/fisheye_image_filter.h"
 #include "transcoding/filters/filter_helper.h"
 #include "transcoding/filters/abstract_image_filter.h"
 
-//#define QN_SCREENSHOT_DEBUG
-#ifdef QN_SCREENSHOT_DEBUG
-#   define TRACE(...) qDebug() << __VA_ARGS__
-#else
-#   define TRACE(...)
-#endif
-
 namespace {
     const int showProgressDelay = 1500; // 1.5 sec
     const int minProgressDisplayTime = 1000; // 1 sec
+
+    /* Parameter value to load latest available screenshot. */
+    const qint64 latestScreenshotTime = -1;
 }
 
+QnScreenshotParameters::QnScreenshotParameters():
+    time(0),
+    isUtc(false),
+    customAspectRatio(0.0),
+    rotationAngle(0.0)
+{}
+
 QString QnScreenshotParameters::timeString() const {
-    qint64 timeMSecs = time / 1000;
+    if (time == latestScreenshotTime)
+        return QDateTime::currentDateTime().toString(lit("hh.mm.ss"));
+
+    qint64 timeMSecs = adjustedTime / 1000;
     if (isUtc)
-        return QDateTime::fromMSecsSinceEpoch(timeMSecs).toString(lit("yyyy-MMM-dd_hh.mm.ss"));
-    return QTime().addMSecs(timeMSecs).toString(lit("hh.mm.ss"));
+        return datetimeSaveDialogSuggestion(QDateTime::fromMSecsSinceEpoch(timeMSecs));
+    return QTime(0, 0, 0, 0).addMSecs(timeMSecs).toString(lit("hh.mm.ss"));
 }
 
 
@@ -116,7 +125,6 @@ void QnScreenshotLoader::at_imageLoaded(const QImage &image) {
     m_isReady = false;
 }
 
-
 // -------------------------------------------------------------------------- //
 // QnWorkbenchScreenshotHandler
 // -------------------------------------------------------------------------- //
@@ -130,11 +138,8 @@ QnWorkbenchScreenshotHandler::QnWorkbenchScreenshotHandler(QObject *parent):
     connect(action(Qn::TakeScreenshotAction), &QAction::triggered, this, &QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered);
 }
 
-QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnScreenshotParameters &parameters, QnResourceDisplay *display) {
-    if (!display)
-        return NULL;
-
-    TRACE("SCREENSHOT DEWARPING" << parameters.itemDewarpingParams.enabled << parameters.itemDewarpingParams.xAngle << parameters.itemDewarpingParams.yAngle << parameters.itemDewarpingParams.fov);
+QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMediaResourceWidget *widget, const QnScreenshotParameters &parameters) const {
+    QnResourceDisplayPtr display = widget->display();
 
     QnConstResourceVideoLayoutPtr layout = display->videoLayout();
     bool anyQuality = layout->channelCount() > 1;   // screenshots for panoramic cameras will be done locally
@@ -159,19 +164,163 @@ QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnScre
     if (screenshot.isNull())
         return NULL;
 
-    // avoiding post-processing duplication
-    parameters.imageCorrectionParams.enabled = false;
-    parameters.mediaDewarpingParams.enabled = false;
-    parameters.itemDewarpingParams.enabled = false;
-    parameters.zoomRect = QRectF();
-    parameters.customAspectRatio = 0.0;
-    parameters.rotationAngle = 0;
-
     return new QnBasicImageProvider(screenshot);
 }
 
+qint64 QnWorkbenchScreenshotHandler::screenshotTime(QnMediaResourceWidget *widget, bool adjust) {
+    QnResourceDisplayPtr display = widget->display();
+
+    qint64 time = display->camDisplay()->getCurrentTime();
+    if (time == AV_NOPTS_VALUE)
+        return latestScreenshotTime;
+
+    if (!adjust)
+        return time;
+
+    bool isUtc = widget->resource()->toResource()->flags() & Qn::utc;
+    qint64 localOffset = 0;
+    if(qnSettings->timeMode() == Qn::ServerTimeMode && isUtc)
+        localOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0);
+
+    time += localOffset*1000;
+    return time;
+}
+
+void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget *widget) {
+
+    QStack<QString> keyStack;
+    keyStack.push(qnSettings->lastScreenshotDir() + lit("/"));
+    keyStack.push(widget->resource()->toResource()->getName());
+
+    struct Key {
+        Key(QStack<QString> &stack, const QString &value):
+            m_stack(stack)
+        {
+            m_stack.push(value);
+        }
+
+        ~Key() {
+            m_stack.pop();
+        }
+
+        QStack<QString> &m_stack;
+    };
+
+    auto path = [&keyStack]() {
+        QString result;
+        for (const QString &e: keyStack.toList())
+            result += e;
+        return result;
+    };
+    
+    int count = 1;
+    int current = 0;
+
+    QList<QString> formats;
+    formats << lit(".png");
+    if (QImageWriter::supportedImageFormats().contains("jpg"))
+        formats << lit(".jpg");
+    count *= formats.size();
+
+    typedef QPair<QString, float> ar_type;
+    QList<ar_type> ars;
+    ars << ar_type(QString(), 0.0);
+    for (const QnAspectRatio &ar: QnAspectRatio::standardRatios())
+        ars << ar_type(ar.toString(lit("_%1x%2")), ar.toFloat());
+    count*= ars.size();
+
+    QList<int> rotations;
+    for(int rotation = 0; rotation < 360; rotation += 90)
+        rotations << rotation;
+    count *= rotations.size();
+
+    QList<ImageCorrectionParams> imageCorrList;
+    {
+        auto params = widget->item()->imageEnhancement();
+        imageCorrList << params;
+        params.enabled = !params.enabled;
+        imageCorrList << params;
+    }
+    count *= imageCorrList.size();
+
+    typedef QPair<QString, Qn::Corner> crn_type;
+    QList<crn_type> tsCorners;
+    tsCorners 
+        << crn_type(lit("_nots"), Qn::NoCorner) 
+        << crn_type(lit("_topLeft"), Qn::TopLeftCorner)
+        << crn_type(lit("_topRight"), Qn::TopRightCorner)
+        << crn_type(lit("_btmLeft"), Qn::BottomLeftCorner)
+        << crn_type(lit("_btmRight"), Qn::BottomRightCorner);
+    count *= tsCorners.size();   
+
+    QnResourceDisplayPtr display = widget->display();
+
+    QScopedPointer<QnProgressDialog> dialog(new QnProgressDialog(mainWindow()));
+    dialog->setMaximum(count);
+    dialog->setValue(current);
+    dialog->setMinimumWidth(600);
+    dialog->show();
+
+    qint64 startTime = QDateTime::currentMSecsSinceEpoch();
+
+    QnScreenshotParameters parameters;
+    {       
+        parameters.time = screenshotTime(widget);
+        parameters.isUtc = widget->resource()->toResource()->flags() & Qn::utc;
+        parameters.adjustedTime = screenshotTime(widget, true);
+        Key timeKey(keyStack, lit("_") + parameters.timeString());
+       
+        parameters.itemDewarpingParams = widget->item()->dewarpingParams();
+        parameters.mediaDewarpingParams = widget->dewarpingParams();       
+        parameters.zoomRect = parameters.itemDewarpingParams.enabled ? QRectF() : widget->zoomRect();
+        
+        for (const ImageCorrectionParams &imageCorr: imageCorrList) {
+            Key imageCorrKey(keyStack, imageCorr.enabled ? lit("_enh") : QString());
+            parameters.imageCorrectionParams = imageCorr;
+
+            for (const ar_type &ar: ars) {
+                Key arKey(keyStack, ar.first);
+                parameters.customAspectRatio = ar.second;
+
+                for(int rotation: rotations) {
+                    Key rotKey(keyStack, lit("_rot%1").arg(rotation));
+                    parameters.rotationAngle = rotation;
+
+                    for (const crn_type &crn: tsCorners) {
+                        Key tsKey(keyStack, crn.first);
+                        parameters.timestampPosition = crn.second;
+
+                        for (const QString &fmt: formats) {
+                            Key fmtKey(keyStack, fmt);
+                            parameters.filename = path();
+
+                            {
+                                dialog->setValue(current);
+                                current++;
+                                dialog->setLabelText(lit("%1 (%2 of %3)").arg(parameters.filename).arg(current).arg(count));
+                                qApp->processEvents();
+                                if (dialog->wasCanceled())
+                                    return;
+                                takeScreenshot(widget, parameters);
+                                
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    dialog->hide();
+    qint64 endTime = QDateTime::currentMSecsSinceEpoch();
+    QMessageBox::information(mainWindow(), lit("Success"), lit("%1 screenshots done for %2 seconds").arg(count).arg((endTime - startTime) / 1000));
+}
+
+
 void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     QnActionParameters actionParameters = menu()->currentParameters(sender());
+    QString filename = actionParameters.argument<QString>(Qn::FileNameRole);
+
     QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(actionParameters.widget());
     if (!widget)
         return;
@@ -182,10 +331,16 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         return;
     }
 
+    if (qnSettings->isDevMode() && filename == lit("_DEBUG_SCREENSHOT_KEY_")) {
+        takeDebugScreenshotsSet(widget);
+        return;
+    }
+
     QnScreenshotParameters parameters;
-    parameters.time = display->camDisplay()->getCurrentTime();
+    parameters.time = screenshotTime(widget);
     parameters.isUtc = widget->resource()->toResource()->flags() & Qn::utc;
-    parameters.filename = actionParameters.argument<QString>(Qn::FileNameRole);
+    parameters.adjustedTime = screenshotTime(widget, true);
+    parameters.filename = filename;
     parameters.timestampPosition = qnSettings->timestampCorner();
     parameters.itemDewarpingParams = widget->item()->dewarpingParams();
     parameters.mediaDewarpingParams = widget->dewarpingParams();
@@ -193,78 +348,66 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     parameters.zoomRect = parameters.itemDewarpingParams.enabled ? QRectF() : widget->zoomRect();
     parameters.customAspectRatio = display->camDisplay()->overridenAspectRatio();
     parameters.rotationAngle = widget->rotation();
-    // Revert UI has 'hack'. VerticalDown fisheye option is emulated by additional rotation. But filter has built-in support for that option.
-    if (parameters.itemDewarpingParams.enabled && parameters.mediaDewarpingParams.viewMode == QnMediaDewarpingParams::VerticalDown)
-        parameters.rotationAngle -= 180;
 
-		// ----------------------------------------------------- 
-		// This localOffset is used to fix the issue : Bug #2988 
-		// ----------------------------------------------------- 
-		qint64 localOffset = 0;
-		if(qnSettings->timeMode() == Qn::ServerTimeMode && parameters.isUtc)
-			localOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0);
-		parameters.time += localOffset*1000;
+    takeScreenshot(widget, parameters);
+}
 
-    QnImageProvider* imageProvider = getLocalScreenshotProvider(parameters, display.data());
-    if (!imageProvider)
-        imageProvider = QnSingleThumbnailLoader::newInstance(widget->resource()->toResourcePtr(), parameters.time, 0);
-    QnScreenshotLoader* loader = new QnScreenshotLoader(parameters, this);
-    connect(loader, &QnImageProvider::imageChanged, this,   &QnWorkbenchScreenshotHandler::at_imageLoaded);
-    loader->setBaseProvider(imageProvider); // preload screenshot here
+bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParameters &parameters) {
+    QString previousDir = qnSettings->lastScreenshotDir();
+    if (previousDir.isEmpty())
+        previousDir = qnSettings->mediaFolder();
+    QString suggestion = replaceNonFileNameCharacters(parameters.filename, QLatin1Char('_'))
+        + QLatin1Char('_') + parameters.timeString();
+    suggestion = QnEnvironment::getUniqueFileName(previousDir, suggestion);
 
-    if(parameters.filename.isEmpty()) {
-        QString previousDir = qnSettings->lastScreenshotDir();
-        if (previousDir.isEmpty())
-            previousDir = qnSettings->mediaFolder();
-        QString suggestion = replaceNonFileNameCharacters(widget->resource()->toResource()->getName(), QLatin1Char('_'))
-                + QLatin1Char('_') + parameters.timeString();
-        suggestion = QnEnvironment::getUniqueFileName(previousDir, suggestion);
+    QString filterSeparator = lit(";;");
+    QString pngFileFilter = tr("PNG Image (*.png)");
+    QString jpegFileFilter = tr("JPEG Image (*.jpg)");
 
-        QString filterSeparator = lit(";;");
-        QString pngFileFilter = tr("PNG Image (*.png)");
-        QString jpegFileFilter = tr("JPEG Image (*.jpg)");
+    QString allowedFormatFilter = pngFileFilter;
 
-        QString allowedFormatFilter = pngFileFilter;
+    if (QImageWriter::supportedImageFormats().contains("jpg") ) {
+        allowedFormatFilter += filterSeparator;
+        allowedFormatFilter += jpegFileFilter;
+    }
 
-        if (QImageWriter::supportedImageFormats().contains("jpg") ) {
-            allowedFormatFilter += filterSeparator;
-            allowedFormatFilter += jpegFileFilter;
-        }
+    bool wasLoggedIn = !context()->user().isNull();
 
-        bool wasLoggedIn = !context()->user().isNull();
-
-        QScopedPointer<QnCustomFileDialog> dialog(
-            new QnWorkbenchStateDependentDialog<QnCustomFileDialog> (
-                mainWindow(),
-                tr("Save Screenshot As..."),
-                suggestion,
-                allowedFormatFilter
+    QScopedPointer<QnCustomFileDialog> dialog(
+        new QnWorkbenchStateDependentDialog<QnCustomFileDialog> (
+        mainWindow(),
+        tr("Save Screenshot As..."),
+        suggestion,
+        allowedFormatFilter
         ));
 
-        dialog->setFileMode(QFileDialog::AnyFile);
-        dialog->setAcceptMode(QFileDialog::AcceptSave);
+    dialog->setFileMode(QFileDialog::AnyFile);
+    dialog->setAcceptMode(QFileDialog::AcceptSave);
 
-        QComboBox* comboBox = new QComboBox(dialog.data());
-        comboBox->addItem(tr("No timestamp"), static_cast<int>(Qn::NoCorner));
-        comboBox->addItem(tr("Top left corner"), static_cast<int>(Qn::TopLeftCorner));
-        comboBox->addItem(tr("Top right corner"), static_cast<int>(Qn::TopRightCorner));
-        comboBox->addItem(tr("Bottom left corner"), static_cast<int>(Qn::BottomLeftCorner));
-        comboBox->addItem(tr("Bottom right corner"), static_cast<int>(Qn::BottomRightCorner));
-        comboBox->setCurrentIndex(comboBox->findData(parameters.timestampPosition, Qt::UserRole, Qt::MatchExactly));
+    QComboBox* comboBox = new QComboBox(dialog.data());
+    comboBox->addItem(tr("No timestamp"), static_cast<int>(Qn::NoCorner));
+    comboBox->addItem(tr("Top left corner"), static_cast<int>(Qn::TopLeftCorner));
+    comboBox->addItem(tr("Top right corner"), static_cast<int>(Qn::TopRightCorner));
+    comboBox->addItem(tr("Bottom left corner"), static_cast<int>(Qn::BottomLeftCorner));
+    comboBox->addItem(tr("Bottom right corner"), static_cast<int>(Qn::BottomRightCorner));
+    comboBox->setCurrentIndex(comboBox->findData(parameters.timestampPosition, Qt::UserRole, Qt::MatchExactly));
 
-        dialog->addWidget(tr("Timestamp:"), comboBox);
+    dialog->addWidget(tr("Timestamp:"), comboBox);
 
+    QString fileName;
+
+    forever {
         if (!dialog->exec())
-            return;
+            return false;
 
-        /* Check if we were disconnected (server shut down) while the dialog was open. 
-         * Skip this check if we were not logged in before. */
+        /* Check if we were disconnected (server shut down) while the dialog was open.
+        * Skip this check if we were not logged in before. */
         if (wasLoggedIn && !context()->user())
-            return;
+            return false;
 
-        QString fileName = dialog->selectedFile();
+        fileName = dialog->selectedFile();
         if (fileName.isEmpty())
-            return;
+            return false;
 
         QString selectedExtension = dialog->selectedExtension();
 
@@ -275,47 +418,42 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
                 QMessageBox::StandardButton button = QMessageBox::information(
                     mainWindow(),
                     tr("Save As"),
-                    tr("File '%1' already exists. Do you want to overwrite it?").arg(QFileInfo(fileName).completeBaseName()),
-                    QMessageBox::Ok | QMessageBox::Cancel
-                );
-                if(button == QMessageBox::Cancel)
-                    return;
+                    tr("File '%1' already exists. Do you want to overwrite it?").arg(QFileInfo(fileName).fileName()),
+                    QMessageBox::Yes | QMessageBox::No
+                    );
+                if (button == QMessageBox::No)
+                    continue;
             }
         }
 
-        /* Check if we were disconnected (server shut down) while the dialog was open. 
-         * Skip this check if we were not logged in before. */
+        /* Check if we were disconnected (server shut down) while the dialog was open.
+        * Skip this check if we were not logged in before. */
         if (wasLoggedIn && !context()->user())
-            return;
+            return false;
 
         if (QFile::exists(fileName) && !QFile::remove(fileName)) {
             QMessageBox::critical(
                 mainWindow(),
                 tr("Could not overwrite file"),
-                tr("File '%1' is used by another process. Please enter another name.").arg(QFileInfo(fileName).completeBaseName()),
+                tr("File '%1' is used by another process. Please enter another name.").arg(QFileInfo(fileName).fileName()),
                 QMessageBox::Ok
-            );
-            return;
+                );
+            continue;
         }
 
-        /* Check if we were disconnected (server shut down) while the dialog was open. 
-         * Skip this check if we were not logged in before. */
+        /* Check if we were disconnected (server shut down) while the dialog was open.
+        * Skip this check if we were not logged in before. */
         if (wasLoggedIn && !context()->user())
-            return; //TODO: #GDM triple check...
+            return false; //TODO: #GDM triple check...
 
-        parameters.filename = fileName;
-        parameters.timestampPosition = static_cast<Qn::Corner>(comboBox->itemData(comboBox->currentIndex()).value<int>());
-        loader->setParameters(parameters); //update changed fields
-
-        showProgressDelayed(tr("Saving %1").arg(QFileInfo(fileName).completeBaseName()));
-        connect(m_screenshotProgressDialog, &QnProgressDialog::canceled, loader, &QnScreenshotLoader::deleteLater);
+        break;
     }
-    m_canceled = false;
-    loader->loadAsync();
 
-    qnSettings->setLastScreenshotDir(QFileInfo(parameters.filename).absolutePath());
-    qnSettings->setTimestampCorner(parameters.timestampPosition);
+    parameters.filename = fileName;
+    parameters.timestampPosition = static_cast<Qn::Corner>(comboBox->itemData(comboBox->currentIndex()).value<int>());
+    return true;
 }
+
 
 //TODO: #GDM #Business may be we should encapsulate in some other object to get parameters and clear connection if user cancelled the process?
 void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
@@ -330,11 +468,15 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
     hideProgressDelayed();
 
     QnScreenshotParameters parameters = loader->parameters();
+    qint64 timeMsec = parameters.time == latestScreenshotTime 
+        ? QDateTime::currentMSecsSinceEpoch()
+        : parameters.time / 1000;
+    
     QnImageFilterHelper transcodeParams;
     // Doing heavy filters only. This filters doesn't supported on server side for screenshots
     transcodeParams.setDewarpingParams(parameters.mediaDewarpingParams, parameters.itemDewarpingParams);
     transcodeParams.setContrastParams(parameters.imageCorrectionParams);
-    transcodeParams.setTimeCorner(parameters.timestampPosition, 0);
+    transcodeParams.setTimeCorner(parameters.timestampPosition, 0, timeMsec);
     transcodeParams.setRotation(parameters.rotationAngle);
     transcodeParams.setSrcRect(parameters.zoomRect);
     QList<QnAbstractImageFilterPtr> filters = transcodeParams.createFilterChain(image.size());
@@ -355,7 +497,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         QMessageBox::critical(
             mainWindow(),
             tr("Could not save screenshot"),
-            tr("An error has occurred while saving screenshot '%1'.").arg(QFileInfo(filename).completeBaseName())
+            tr("An error has occurred while saving screenshot '%1'.").arg(QFileInfo(filename).fileName())
         );
         return;
     }
@@ -413,4 +555,47 @@ void QnWorkbenchScreenshotHandler::hideProgress() {
 
 void QnWorkbenchScreenshotHandler::cancelLoading() {
     m_canceled = true;
+}
+
+void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget, const QnScreenshotParameters &parameters) {
+    QnScreenshotParameters localParameters = parameters;
+
+    // Revert UI has 'hack'. VerticalDown fisheye option is emulated by additional rotation. But filter has built-in support for that option.
+    if (localParameters.itemDewarpingParams.enabled && localParameters.mediaDewarpingParams.viewMode == QnMediaDewarpingParams::VerticalDown)
+        localParameters.rotationAngle -= 180;
+
+    QnResourceDisplayPtr display = widget->display();
+    QnImageProvider* imageProvider = getLocalScreenshotProvider(widget, localParameters);
+    if (imageProvider) {
+        // avoiding post-processing duplication
+        localParameters.imageCorrectionParams.enabled = false;
+        localParameters.mediaDewarpingParams.enabled = false;
+        localParameters.itemDewarpingParams.enabled = false;
+        localParameters.zoomRect = QRectF();
+        localParameters.customAspectRatio = 0.0;
+        localParameters.rotationAngle = 0;
+    } else {
+        QnVirtualCameraResourcePtr camera = widget->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
+        imageProvider = QnSingleThumbnailLoader::newInstance(camera, localParameters.time, 0);
+    }
+
+    QnScreenshotLoader* loader = new QnScreenshotLoader(localParameters, this);
+    connect(loader, &QnImageProvider::imageChanged, this,   &QnWorkbenchScreenshotHandler::at_imageLoaded);
+    loader->setBaseProvider(imageProvider); // preload screenshot here
+
+    /* Check if name is already given - that usually means silent mode. */
+    if(localParameters.filename.isEmpty()) {
+        localParameters.filename = widget->resource()->toResource()->getName();  /*< suggested name */
+        if (!updateParametersFromDialog(localParameters))
+            return;
+        loader->setParameters(localParameters); //update changed fields
+        qnSettings->setLastScreenshotDir(QFileInfo(localParameters.filename).absolutePath());
+        qnSettings->setTimestampCorner(localParameters.timestampPosition);
+
+        showProgressDelayed(tr("Saving %1").arg(QFileInfo(localParameters.filename).fileName()));
+        connect(m_screenshotProgressDialog, &QnProgressDialog::canceled, loader, &QnScreenshotLoader::deleteLater);
+    }
+
+    m_canceled = false;
+    loader->loadAsync();
 }

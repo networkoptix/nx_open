@@ -42,8 +42,9 @@ private:
     void updateAddresses(const QnUuid &id);
 
 private:
+    mutable QMutex m_mutex;
     std::weak_ptr<ec2::AbstractECConnection> m_connection;  // just to know from where to disconnect
-    QPointer<QnModuleFinder> m_moduleFinder;
+    const QPointer<QnModuleFinder> m_moduleFinder;
     QHash<QnUuid, QnModuleInformation> m_moduleInformationById;
     QHash<QnUuid, QHash<QnUuid, QSet<QString>>> m_discoveredAddresses;
 };

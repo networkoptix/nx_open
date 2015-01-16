@@ -19,6 +19,26 @@
 #include <utils/common/string.h>
 #include <utils/network/module_finder.h>
 
+namespace {
+
+#ifdef _DEBUG
+#define QN_RECONNECT_HELPER_LOG
+#endif
+
+    void printLog(const QByteArray &message, const QnMediaServerResourcePtr &server = QnMediaServerResourcePtr()) {
+#ifdef QN_RECONNECT_HELPER_LOG
+        const QByteArray prefix("QnReconnectHelper::");
+        if (server)
+            qDebug() << prefix << message << getResourceName(server);
+        else
+            qDebug() << prefix << message;
+#else
+        Q_UNUSED(message);
+#endif
+    }
+
+}
+
 QnReconnectHelper::InterfaceInfo::InterfaceInfo():
     online(false),
     ignored(false),
@@ -39,8 +59,12 @@ QnReconnectHelper::QnReconnectHelper(QObject *parent /*= NULL*/):
         m_allServers << m_currentServer;
 
     qSort(m_allServers.begin(), m_allServers.end(), [](const QnMediaServerResourcePtr &left, const QnMediaServerResourcePtr &right) {
-        return naturalStringCompare(getResourceName(left), getResourceName(right), Qt::CaseInsensitive , false);
+        return naturalStringLess(getResourceName(left), getResourceName(right));
     });
+
+    printLog("Full server list:");
+    for (const QnMediaServerResourcePtr &server: m_allServers)
+        printLog(QByteArray(), server);
 
     if (!m_currentServer && !m_allServers.isEmpty())
         m_currentServer = m_allServers.first();
@@ -48,6 +72,8 @@ QnReconnectHelper::QnReconnectHelper(QObject *parent /*= NULL*/):
     /* There are no servers in the system. */
     if (!m_currentServer)
         return;
+
+    printLog("Starting with server", m_currentServer);
 
     for (const QnMediaServerResourcePtr &server: m_allServers) {
         QList<InterfaceInfo> interfaces;
@@ -81,6 +107,7 @@ QnReconnectHelper::QnReconnectHelper(QObject *parent /*= NULL*/):
 
         m_interfacesByServer[server->getId()] = interfaces;
 
+        printLog("Update interfaces for", server);
         updateInterfacesForServer(server->getId());
     }
 }
@@ -110,6 +137,7 @@ void QnReconnectHelper::next() {
 
     m_currentServer = m_allServers[idx];
     QnUuid id = m_currentServer->getId();
+    printLog("Trying to connect to", m_currentServer);
 
     updateInterfacesForServer(id);
     m_currentUrl = bestInterfaceForServer(id);
@@ -118,6 +146,8 @@ void QnReconnectHelper::next() {
 void QnReconnectHelper::markServerAsInvalid(const QnMediaServerResourcePtr &server) {
     if (!m_allServers.contains(server))
         return;
+
+    printLog("Server is incompatible", server);
 
     QList<InterfaceInfo> &interfaces = m_interfacesByServer[server->getId()];
     for (InterfaceInfo &item: interfaces)
@@ -135,6 +165,7 @@ void QnReconnectHelper::updateInterfacesForServer(const QnUuid &id) {
         return;
 
     if (iter->systemName != qnCommon->localSystemName()) {
+        printLog("Server has another systemName: " + iter->systemName.toUtf8());
         for (InterfaceInfo &item: interfaces)
             item.ignored = true;
         return;
@@ -187,10 +218,19 @@ QUrl QnReconnectHelper::bestInterfaceForServer(const QnUuid &id) {
     });
 
     Q_ASSERT(iter != boost::end(interfaces));
-    if(iter == boost::end(interfaces) || iter->ignored)
+    if(iter == boost::end(interfaces))
         return QUrl();
 
+    if (iter->ignored) {
+        printLog("All server interfaces are ignored");
+        return QUrl();
+    }
+    
     (*iter).count++;
+
+    QUrl urlNoPassword(iter->url);
+    urlNoPassword.setPassword(QString());
+    printLog(lit("Trying %1 (%2-th time)").arg(urlNoPassword.toString()).arg(iter->count).toUtf8());
     return iter->url;
 }
 

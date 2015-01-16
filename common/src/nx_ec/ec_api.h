@@ -103,9 +103,18 @@ namespace ec2
         int setResourceStatus( const QnUuid& resourceId, Qn::ResourceStatus status, TargetType* target, HandlerType handler ) {
             return setResourceStatus(resourceId, status, std::static_pointer_cast<impl::SetResourceStatusHandler>(std::make_shared<impl::CustomSetResourceStatusHandler<TargetType, HandlerType>>(target, handler)) );
         }
+        template<class TargetType, class HandlerType> 
+        int setResourceStatusLocal( const QnUuid& resourceId, Qn::ResourceStatus status, TargetType* target, HandlerType handler ) {
+            return setResourceStatusLocal(resourceId, status, std::static_pointer_cast<impl::SetResourceStatusHandler>(std::make_shared<impl::CustomSetResourceStatusHandler<TargetType, HandlerType>>(target, handler)) );
+        }
         ErrorCode setResourceStatusSync( const QnUuid& id, Qn::ResourceStatus status) {
             QnUuid rezId;
             int(AbstractResourceManager::*fn)(const QnUuid&, Qn::ResourceStatus, impl::SetResourceStatusHandlerPtr) = &AbstractResourceManager::setResourceStatus;
+            return impl::doSyncCall<impl::SetResourceStatusHandler>( std::bind(fn, this, id, status, std::placeholders::_1), &rezId );
+        }
+        ErrorCode setResourceStatusLocalSync( const QnUuid& id, Qn::ResourceStatus status) {
+            QnUuid rezId;
+            int(AbstractResourceManager::*fn)(const QnUuid&, Qn::ResourceStatus, impl::SetResourceStatusHandlerPtr) = &AbstractResourceManager::setResourceStatusLocal;
             return impl::doSyncCall<impl::SetResourceStatusHandler>( std::bind(fn, this, id, status, std::placeholders::_1), &rezId );
         }
 
@@ -192,6 +201,7 @@ namespace ec2
     protected:
         virtual int getResourceTypes( impl::GetResourceTypesHandlerPtr handler ) = 0;
         virtual int setResourceStatus( const QnUuid& resourceId, Qn::ResourceStatus status, impl::SetResourceStatusHandlerPtr handler ) = 0;
+        virtual int setResourceStatusLocal( const QnUuid& resourceId, Qn::ResourceStatus status, impl::SetResourceStatusHandlerPtr handler ) = 0;
         //virtual int setResourceDisabled( const QnUuid& resourceId, bool disabled, impl::SetResourceDisabledHandlerPtr handler ) = 0;
         virtual int getKvPairs( const QnUuid &resourceId, impl::GetKvPairsHandlerPtr handler ) = 0;
         virtual int getStatusList( const QnUuid &resourceId, impl::GetStatusListHandlerPtr handler ) = 0;
@@ -661,6 +671,16 @@ namespace ec2
             return save( resource, std::static_pointer_cast<impl::AddUserHandler>(
                 std::make_shared<impl::CustomAddUserHandler<TargetType, HandlerType>>(target, handler)) );
         }
+
+        ErrorCode saveSync(const QnUserResourcePtr &userRes, QnUserResourceList * const users) {
+            return impl::doSyncCall<impl::AddUserHandler>(
+                [=](const impl::AddUserHandlerPtr &handler) {
+                    return this->save(userRes, handler);
+                },
+                users
+            );
+        }
+
         /*!
             \param handler Functor with params: (ErrorCode)
         */
@@ -989,9 +1009,17 @@ namespace ec2
                  std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        template<class TargetType, class HandlerType> int changeSystemName(const QString &systemName, TargetType *target, HandlerType handler) {
-            return changeSystemName(systemName, std::static_pointer_cast<impl::SimpleHandler>(
+        template<class TargetType, class HandlerType> int changeSystemName(const QString &systemName, qint64 sysIdTime, TargetType *target, HandlerType handler) {
+            return changeSystemName(systemName, sysIdTime, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+        ErrorCode changeSystemNameSync(const QString &systemName, qint64 sysIdTime) {
+            return impl::doSyncCall<impl::SimpleHandler>(
+                [=](const impl::SimpleHandlerPtr &handler) {
+                    return this->changeSystemName(systemName, sysIdTime, handler);
+                }
+            );
         }
 
         template<class TargetType, class HandlerType> int markLicenseOverflow(bool value, qint64 time, TargetType *target, HandlerType handler) {
@@ -1007,12 +1035,12 @@ namespace ec2
 
     signals:
         void moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive);
-        void systemNameChangeRequested(const QString &systemName);
+        void systemNameChangeRequested(const QString &systemName, qint64 sysIdTime);
 
     protected:
         virtual int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) = 0;
         virtual int sendModuleInformationList(const QList<QnModuleInformation> &moduleInformationList, impl::SimpleHandlerPtr handler) = 0;
-        virtual int changeSystemName(const QString &systemName, impl::SimpleHandlerPtr handler) = 0;
+        virtual int changeSystemName(const QString &systemName, qint64 sysIdTime, impl::SimpleHandlerPtr handler) = 0;
         virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractMiscManager> AbstractMiscManagerPtr;
@@ -1030,11 +1058,15 @@ namespace ec2
         virtual ~AbstractECConnection() {}
 
         virtual QnConnectionInfo connectionInfo() const = 0;
+
+        virtual QString authInfo() const = 0;
         //!Calling this method starts notifications delivery by emitting corresponding signals of corresponding manager
         /*!
             \note Calling entity MUST connect to all interesting signals prior to calling this method so that received data is consistent
         */
         virtual void startReceivingNotifications() = 0;
+        virtual void stopReceivingNotifications() = 0;
+
         virtual void addRemotePeer(const QUrl& url) = 0;
         virtual void deleteRemotePeer(const QUrl& url) = 0;
         virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) = 0;
@@ -1054,27 +1086,25 @@ namespace ec2
         virtual AbstractTimeManagerPtr getTimeManager() = 0;
 
         /*!
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> int setPanicMode( Qn::PanicMode value, TargetType* target, HandlerType handler ) {
-            return setPanicMode( value,
-                std::static_pointer_cast<impl::SimpleHandler>(
-                    std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-        ErrorCode setPanicModeSync(Qn::PanicMode value) {
-            int(AbstractECConnection::*fn)(Qn::PanicMode, impl::SimpleHandlerPtr) = &AbstractECConnection::setPanicMode;
-            return impl::doSyncCall<impl::SimpleHandler>( std::bind(fn, this, value, std::placeholders::_1));
-        }
-
-        /*!
-            \param handler Functor with params: (ErrorCode, QByteArray dbFile)
+            \param handler Functor with params: (requestID, ErrorCode, QByteArray dbFile)
         */
         template<class TargetType, class HandlerType> int dumpDatabaseAsync( TargetType* target, HandlerType handler ) {
             return dumpDatabaseAsync( std::static_pointer_cast<impl::DumpDatabaseHandler>(
                 std::make_shared<impl::CustomDumpDatabaseHandler<TargetType, HandlerType>>(target, handler)) );
         }
         /*!
-            \param handler Functor with params: (ErrorCode)
+            \param handler Functor with params: (requestID, ErrorCode)
+        */
+        template<class TargetType, class HandlerType> int dumpDatabaseToFileAsync( const QString& dumpFilePath, TargetType* target, HandlerType handler ) {
+            return dumpDatabaseToFileAsync( std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(dumpFilePath, target, handler)) );
+        }
+        ErrorCode dumpDatabaseToFileSync( const QString& dumpFilePath ) {
+            int(AbstractECConnection::*fn)(const QString&, impl::SimpleHandlerPtr) = &AbstractECConnection::dumpDatabaseToFileAsync;
+            return impl::doSyncCall<impl::SimpleHandler>(std::bind(fn, this, dumpFilePath, std::placeholders::_1));
+        }
+        /*!
+            \param handler Functor with params: (requestID, ErrorCode)
         */
         template<class TargetType, class HandlerType> int restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, TargetType* target, HandlerType handler ) {
             return restoreDatabaseAsync( data,
@@ -1087,7 +1117,6 @@ namespace ec2
             \warning Request handler may still be called after return of this method, since request could already have been completed and resulte posted to handler
         */
         //virtual void cancelRequest( int requestID ) = 0;
-
     signals:
         //!Delivers all resources found in Server
         /*!
@@ -1107,13 +1136,12 @@ namespace ec2
         void remotePeerUnauthorized(const QnUuid& id);
 
         void settingsChanged(ec2::ApiResourceParamDataList settings);
-        void panicModeChanged(Qn::PanicMode mode);
 
         void databaseDumped();
 
     protected:
-        virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) = 0;
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) = 0;
+        virtual int dumpDatabaseToFileAsync( const QString& dumpFilePath, impl::SimpleHandlerPtr handler ) = 0;
         virtual int restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, impl::SimpleHandlerPtr handler ) = 0;
     };  
 

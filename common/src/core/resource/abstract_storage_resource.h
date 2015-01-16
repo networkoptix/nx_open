@@ -42,8 +42,6 @@ public:
     /*
      * Short and uniq storage ID. It is addition related ID field, and used for memory usage optimization
      */
-    void setIndex(quint16 value);
-    quint16 getIndex() const;
     virtual void setUrl(const QString& value) override;
 
     /*
@@ -73,7 +71,6 @@ private:
     qint64 m_spaceLimit;
     int m_maxStoreTime; // in seconds
     bool m_usedForWriting;
-    quint16 m_index;
     QSet<QnAbstractMediaStreamDataProvider*> m_providers;
     mutable QMutex m_bitrateMtx;
 };

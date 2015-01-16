@@ -37,6 +37,8 @@ QnPictureSettingsDialog::~QnPictureSettingsDialog()
 void QnPictureSettingsDialog::updateFromResource(const QnMediaResourcePtr &resource) {
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
+    m_resource = resource;
+
     QImage image(resource->toResource()->getUrl());
     ui->fisheyeCheckBox->setEnabled(!image.isNull());
 
@@ -65,17 +67,19 @@ void QnPictureSettingsDialog::paramsChanged() {
     if (m_updating)
         return;
 
+    /* Dialog is modal, so changes rollback is not required. */
     QnResourceWidget* centralWidget = display()->widget(Qn::CentralRole);
-    if (QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget*>(centralWidget)) {
-        QnMediaDewarpingParams dewarpingParams = mediaWidget->dewarpingParams();
-        ui->fisheyeWidget->submitToParams(dewarpingParams);
-        dewarpingParams.enabled = ui->fisheyeCheckBox->isChecked();
-        mediaWidget->setDewarpingParams(dewarpingParams);
+    QnMediaResourceWidget* mediaWidget = dynamic_cast<QnMediaResourceWidget*>(centralWidget);
+    if (!m_resource || !mediaWidget || mediaWidget->resource() != m_resource)
+        return;
 
-        QnWorkbenchItem *item = mediaWidget->item();
-        QnItemDewarpingParams itemParams = item->dewarpingParams();
-        itemParams.enabled = dewarpingParams.enabled;
-        item->setDewarpingParams(itemParams);
-    }
+    QnMediaDewarpingParams dewarpingParams = mediaWidget->dewarpingParams();
+    ui->fisheyeWidget->submitToParams(dewarpingParams);
+    dewarpingParams.enabled = ui->fisheyeCheckBox->isChecked();
+    mediaWidget->setDewarpingParams(dewarpingParams);
 
+    QnWorkbenchItem *item = mediaWidget->item();
+    QnItemDewarpingParams itemParams = item->dewarpingParams();
+    itemParams.enabled = dewarpingParams.enabled;
+    item->setDewarpingParams(itemParams);
 }

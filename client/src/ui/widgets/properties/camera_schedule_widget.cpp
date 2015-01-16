@@ -87,10 +87,10 @@ namespace {
 
             QPalette palette = m_parentPalette;
             bool licensesOk = helper.isValid();
-            QString licenseUsage = helper.getProposedUsageText();
+            QString licenseUsage = helper.getProposedUsageMsg();
             if(!licensesOk) {
                 setWarningStyle(&palette);
-                licenseUsage += L'\n' + helper.getRequiredLicenseMsg();
+                licenseUsage += L'\n' + helper.getRequiredMsg();
             }
             m_licensesLabel->setText(licenseUsage);
             m_licensesLabel->setPalette(palette);
@@ -99,7 +99,7 @@ namespace {
             if (m_motionUsed){
                 foreach (const QnVirtualCameraResourcePtr &camera, cameras)
                 {
-                    bool hasMotion = camera->hasMotion();
+                    bool hasMotion = (camera->getMotionType() != Qn::MT_NoMotion);
                     if (!hasMotion) {
                         motionOk = false;
                         break;
@@ -158,6 +158,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     ui->qualityComboBox->addItem(toDisplayString(Qn::QualityNormal), Qn::QualityNormal);
     ui->qualityComboBox->addItem(toDisplayString(Qn::QualityHigh), Qn::QualityHigh);
     ui->qualityComboBox->addItem(toDisplayString(Qn::QualityHighest), Qn::QualityHighest);
+    ui->qualityComboBox->setCurrentIndex(ui->qualityComboBox->findData(Qn::QualityHigh));
 
     setHelpTopic(ui->exportScheduleButton, Qn::CameraSettings_Recording_Export_Help);
 
@@ -241,6 +242,12 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
 
 QnCameraScheduleWidget::~QnCameraScheduleWidget() {
     return;
+}
+
+bool QnCameraScheduleWidget::hasHeightForWidth() const {
+    return false;   //TODO: #GDM temporary fix to handle string freeze
+                    // all labels with word-wrap should be replaced by QnWordWrappedLabel. 
+                    // This widget has 5 of them (label_4.._8, exportWarningLabel)
 }
 
 void QnCameraScheduleWidget::connectToGridWidget()

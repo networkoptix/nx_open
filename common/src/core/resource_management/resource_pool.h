@@ -89,7 +89,7 @@ public:
     QnNetworkResourceList getAllNetResourceByPhysicalId(const QString &mac) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QString &hostAddress) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QHostAddress &hostAddress) const;
-    QnResourceList getAllCameras(const QnResourcePtr &mServer, bool ignoreDesktopCameras = false) const;
+    QnVirtualCameraResourceList getAllCameras(const QnResourcePtr &mServer, bool ignoreDesktopCameras = false) const;
     QnMediaServerResourceList getAllServers() const;
     QnResourceList getResourcesByParentId(const QnUuid& parentId) const;
 
@@ -135,8 +135,6 @@ public:
 
     QStringList allTags() const;
 
-    int activeCamerasByLicenseType(Qn::LicenseType licenseType) const;
-
     //!Empties all internal dictionaries. Needed for correct destruction order at application stop
     void clear();
 
@@ -147,14 +145,19 @@ signals:
     void statusChanged(const QnResourcePtr &resource);
 
     void aboutToBeDestroyed();
-
+private:
+    /*!
+        \note MUST be called with \a m_resourcesMtx locked
+    */
+    void invalidateCache();
 private:
     mutable QMutex m_resourcesMtx;
     bool m_tranInProgress;
     QnResourceList m_tmpResources;
     QHash<QnUuid, QnResourcePtr> m_resources;
     QHash<QnUuid, QnResourcePtr> m_incompatibleResources;
-
+    mutable QnMediaServerResourceList m_cachedServerList;
+    mutable QnUserResourcePtr m_adminResource;
     /*!
         \return true, if \a resource has been inserted. false - if updated existing resource
     */

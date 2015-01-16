@@ -21,9 +21,10 @@ namespace QnBusiness {
         SpacerColumn,
         ActionColumn,
         TargetColumn,
-        AggregationColumn,
-        ColumnCount
+        AggregationColumn
     };
+
+    QList<Columns> allColumns();
 
     enum Field {
         ModifiedField           = 0x00000001,

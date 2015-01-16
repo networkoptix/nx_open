@@ -602,7 +602,7 @@ CommunicatingSocket::~CommunicatingSocket()
 
 void CommunicatingSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
 {
-    m_aioHelper->terminateAsyncIO();
+    m_aioHelper->terminateAsyncIO();    //all futher async operations will be ignored
     m_aioHelper->cancelAsyncIO( aio::etNone, waitForRunningHandlerCompletion );
 }
 
@@ -1178,10 +1178,16 @@ bool TCPServerSocket::listen( int queueLen )
     return ::listen( m_implDelegate.handle(), queueLen ) == 0;
 }
 
-void TCPServerSocket::terminateAsyncIO( bool /*waitForRunningHandlerCompletion*/ )
+void TCPServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
 {
+    //TODO #ak better call here m_implDelegate.m_baseAsyncHelper->terminateAsyncIO(), 
+        //not change m_implDelegate.impl()->terminated directly
     //m_implDelegate.m_baseAsyncHelper->terminateAsyncIO();
     ++m_implDelegate.impl()->terminated;
+    aio::AIOService::instance()->cancelPostedCalls(
+        static_cast<Pollable*>(&m_implDelegate), waitForRunningHandlerCompletion );
+    aio::AIOService::instance()->removeFromWatch(
+        static_cast<Pollable*>(&m_implDelegate), aio::etRead, waitForRunningHandlerCompletion );
 }
 
 //!Implementation of AbstractStreamServerSocket::accept

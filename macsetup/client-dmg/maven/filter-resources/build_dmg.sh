@@ -1,3 +1,5 @@
+#!/bin/bash
+
 BINARIES=${libdir}/bin/${build.configuration}
 LIBRARIES=${libdir}/lib/${build.configuration}
 SRC=./dmg-folder
@@ -20,6 +22,17 @@ security unlock-keychain -p 123 $HOME/Library/Keychains/login.keychain
 rm -rf "$AS_SRC"
 mkdir "$AS_SRC"
 cp -a "$SRC/${display.product.name}.app" "$AS_SRC"
+
+# Fix Qt frameworks to meet Maverics requirements
+pushd `pwd`
+cd "$AS_SRC/${display.product.name}.app/Contents/Frameworks"
+for framework in Qt*.framework
+do
+    mkdir -p $framework/Versions/Current/Resources
+    mv $framework/Contents/Info.plist $framework/Versions/Current/Resources
+    rmdir $framework/Contents
+done
+popd
 
 if [ '${skip.sign}' == 'false'  ]
 then

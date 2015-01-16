@@ -10,6 +10,19 @@
 #include "resource_media_layout.h"
 #include "core/dataprovider/abstract_streamdataprovider.h"
 
+namespace {
+    const QString customAspectRatioKey          = lit("overrideAr");
+    const QString dontRecordPrimaryStreamKey    = lit("dontRecordPrimaryStream");
+    const QString dontRecordSecondaryStreamKey  = lit("dontRecordSecondaryStream");
+    const QString rtpTransportKey               = lit("rtpTransport");
+    const QString dynamicVideoLayoutKey         = lit("dynamicVideoLayout");
+    const QString motionStreamKey               = lit("motionStream");
+    const QString rotationKey                   = lit("rotation");
+
+    /** Special value for absent custom aspect ratio. Should not be changed without a reason because a lot of modules check it as qFuzzyIsNull. */
+    const qreal noCustomAspectRatio = 0.0;
+}
+
 
 class QnStreamQualityStrings {
     Q_DECLARE_TR_FUNCTIONS(QnStreamQualityStrings);
@@ -67,7 +80,6 @@ QString Qn::toDisplayString(Qn::StreamQuality value) {
 QString Qn::toShortDisplayString(Qn::StreamQuality value) {
     return QnStreamQualityStrings::shortDisplayString(value);
 }
-
 
 // -------------------------------------------------------------------------- //
 // QnMediaResource
@@ -158,30 +170,53 @@ void QnMediaResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>&m
     }
 }
 
+qreal QnMediaResource::customAspectRatio() const {
+    if (!this->toResource()->hasProperty(::customAspectRatioKey))
+        return noCustomAspectRatio;
+
+    bool ok = true;
+    qreal value = this->toResource()->getProperty(::customAspectRatioKey).toDouble(&ok);
+    if (!ok || qIsNaN(value) || qIsInf(value) || value < 0)
+        return noCustomAspectRatio;
+
+    return value;
+}
+
+void QnMediaResource::setCustomAspectRatio(qreal value) {
+    if (qIsNaN(value) || qIsInf(value) || value < 0 || qFuzzyEquals(value, noCustomAspectRatio))
+        clearCustomAspectRatio();
+    else
+        this->toResource()->setProperty(::customAspectRatioKey, QString::number(value));
+}
+
+void QnMediaResource::clearCustomAspectRatio() {
+    this->toResource()->setProperty(::customAspectRatioKey, QString());
+}
+
 QString QnMediaResource::customAspectRatioKey() {
-    return lit("overrideAr");
+    return ::customAspectRatioKey;
 }
 
 QString QnMediaResource::dontRecordPrimaryStreamKey() {
-    return lit("dontRecordPrimaryStream");
+    return ::dontRecordPrimaryStreamKey;
 }
 
 QString QnMediaResource::dontRecordSecondaryStreamKey() {
-    return lit("dontRecordSecondaryStream");
+    return ::dontRecordSecondaryStreamKey;
 }
 
 QString QnMediaResource::rtpTransportKey() {
-    return lit("rtpTransport");
+    return ::rtpTransportKey;
 }
 
 QString QnMediaResource::dynamicVideoLayoutKey() {
-    return lit("dynamicVideoLayout");
+    return ::dynamicVideoLayoutKey;
 }
 
 QString QnMediaResource::motionStreamKey() {
-    return lit("motionStream");
+    return ::motionStreamKey;
 }
 
 QString QnMediaResource::rotationKey() {
-    return lit("rotation");
+    return ::rotationKey;
 }

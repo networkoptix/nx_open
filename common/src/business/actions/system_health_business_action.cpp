@@ -10,13 +10,13 @@ QnSystemHealthBusinessAction::QnSystemHealthBusinessAction(QnSystemHealth::Messa
     base_type(QnBusiness::ShowPopupAction, QnBusinessEventParameters())
 {
     QnBusinessEventParameters runtimeParams;
-    runtimeParams.setEventType(QnBusiness::EventType(QnBusiness::SystemHealthEvent + message));
-    runtimeParams.setEventTimestamp(qnSyncTime->currentUSecsSinceEpoch());
-    runtimeParams.setEventResourceId(eventResourceId);
+    runtimeParams.eventType = QnBusiness::EventType(QnBusiness::SystemHealthEvent + message);
+    runtimeParams.eventTimestamp = qnSyncTime->currentUSecsSinceEpoch();
+    runtimeParams.eventResourceId = eventResourceId;
     setRuntimeParams(runtimeParams);
 
     QnBusinessActionParameters actionParams;
-    actionParams.userGroup = QnBusinessActionParameters::AdminOnly;
+    actionParams.userGroup = QnBusiness::AdminOnly;
     setParams(actionParams);
 
 }

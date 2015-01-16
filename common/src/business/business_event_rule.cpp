@@ -3,7 +3,9 @@
 #include <business/business_action_factory.h>
 
 #include <core/resource/resource.h>
-#include "core/resource_management/resource_pool.h"
+#include <core/resource_management/resource_pool.h>
+
+#include <utils/common/model_functions.h>
 
 QnBusinessEventRule::QnBusinessEventRule()
 :
@@ -188,8 +190,7 @@ QnBusinessEventRule::QnBusinessEventRule(
     m_actionType = bActionType;
     m_eventType = bEventType;
 
-    QnBusinessParams bParams = deserializeBusinessParams(actionParams);
-    m_actionParams  = QnBusinessActionParameters::fromBusinessParams(bParams);
+    m_actionParams = QJson::deserialized<QnBusinessActionParameters>(actionParams);
     if (actionRes)
         m_actionResources << actionRes->getId();
 }

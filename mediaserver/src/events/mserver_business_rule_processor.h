@@ -26,7 +26,7 @@ public:
     void setEventLogPeriod(qint64 periodUsec);
 
 protected:
-    QImage getEventScreenshot(const QnBusinessEventParameters& params, QSize dstSize) const override;
+    QByteArray getEventScreenshotEncoded(const QnBusinessEventParameters& params, QSize dstSize) const override;
 
 protected slots:
     virtual bool executeActionInternal(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res) override;
@@ -36,6 +36,12 @@ private:
     bool executeRecordingAction(const QnRecordingBusinessActionPtr& action, const QnResourcePtr& res);
     bool executePanicAction(const QnPanicBusinessActionPtr& action);
     bool triggerCameraOutput(const QnCameraOutputBusinessActionPtr& action, const QnResourcePtr& resource);
+    bool executeBookmarkAction(const QnAbstractBusinessActionPtr &action, const QnResourcePtr &resource);
+
+private:
+
+    QMap<QnUuid, qint64> m_runningBookmarkActions;
+
 };
 
 #endif // __MSERVER_BUSINESS_RULE_PROCESSOR_H_

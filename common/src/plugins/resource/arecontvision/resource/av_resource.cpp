@@ -27,7 +27,8 @@ const QString QnPlAreconVisionResource::MANUFACTURE(lit("ArecontVision"));
 
 
 QnPlAreconVisionResource::QnPlAreconVisionResource()
-    : m_totalMdZones(64)
+    : m_totalMdZones(64),
+      m_zoneSite(8)
 {
     setVendor(lit("ArecontVision"));
 }
@@ -204,6 +205,7 @@ bool QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)>&& c
     auto httpReqCompletionHandler = [httpClientCaptured, cameraMAC, completionHandler]
         ( const nx_http::AsyncHttpClientPtr& httpClient ) mutable
     {
+        httpClientCaptured->disconnect( nullptr, (const char*)nullptr );
         httpClientCaptured.reset();
 
         auto completionHandlerLocal = std::move( completionHandler );
@@ -227,7 +229,12 @@ bool QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)>&& c
              this, httpReqCompletionHandler,
              Qt::DirectConnection );
 
-    return httpClientCaptured->doGet( url );
+    if( !httpClientCaptured->doGet( url ) )
+    {
+        httpClientCaptured->disconnect( nullptr, (const char*)nullptr );
+        return false;
+    }
+    return true;
 }
 
 CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
@@ -300,10 +307,16 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
     setFirmware(firmwareVersion.toString());
     saveParams();
 
-    setParamPhysical(lit("mdzonesite"), zone_size);
+    setParamPhysical(lit("mdzonesize"), zone_size);
+    m_zoneSite = zone_size;
     setMotionMaskPhysical(0);
 
     return CameraDiagnostics::NoErrorResult();
+}
+
+int QnPlAreconVisionResource::getZoneSite() const
+{
+    return m_zoneSite;
 }
 
 QString QnPlAreconVisionResource::getDriverName() const
@@ -475,7 +488,7 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
         
         if (!region.getRegionBySens(sens).isEmpty())
         {
-            setParamPhysicalAsync(lit("mdtotalzones"), sensToLevelThreshold[sens]);
+            setParamPhysicalAsync(lit("mdlevelthreshold"), sensToLevelThreshold[sens]);
             break; // only 1 sensitivity for all frame is supported
         }
     }

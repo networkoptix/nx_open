@@ -479,10 +479,12 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     m_pointsLimit = m_manager->pointsLimit();
     m_manager->registerConsumer(m_resource, this, SLOT(at_statistics_received()));
     m_updatePeriod = m_manager->updatePeriod(m_resource);
+    setOption(QnResourceWidget::WindowRotationForbidden);
 
     /* Note that this slot is already connected to nameChanged signal in
      * base class's constructor.*/
-    connect(m_resource.data(), SIGNAL(urlChanged(const QnResourcePtr &)), this, SLOT(updateTitleText()));
+    connect(m_resource, &QnResource::urlChanged,    this, &QnServerResourceWidget::updateTitleText);
+    connect(m_resource, &QnResource::statusChanged, this, &QnServerResourceWidget::updateTitleText);
 
     addOverlays();
 
@@ -509,6 +511,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     /* Run handlers. */
     updateButtonsVisibility();
     updateTitleText();
+    updateInfoOpacity();
     at_statistics_received();
 }
 
@@ -745,7 +748,9 @@ void QnServerResourceWidget::tick(int deltaMSecs) {
 QString QnServerResourceWidget::calculateTitleText() const {
     QString name = getFullResourceName(m_resource, true);
 
-    qint64 uptimeMs = m_manager->uptimeMs(m_resource);
+    qint64 uptimeMs = m_resource->getStatus() == Qn::Online
+        ? m_manager->uptimeMs(m_resource)
+        : 0;
     if (uptimeMs > 0) {
         int msInDay = 24 * 3600 * 1000;
         return tr("%1 (up %n days, %2)", "", uptimeMs / msInDay)

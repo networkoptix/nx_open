@@ -60,6 +60,8 @@
         <compile.option2/>
         <compile.option3/>
         <compile.options>${compile.option1}${compile.option2}${compile.option3}</compile.options>
+        <!-- Used for cross-compilation to add -m32 on Linux to compile x86 on x64 -->
+        <compiler.arguments />
 
         <libdir>${root.dir}/build_environment/target</libdir>        
         <ClientHelpSourceDir>${environment.dir}/help/2.2.0/${customization}</ClientHelpSourceDir>
@@ -280,7 +282,6 @@
             </activation>
             <modules>
                 <module>build_variables</module>
-                <module>build_environment</module>
                 <module>common</module>
                 <module>hole_punching_mediator</module>
                 <module>appserver2</module>
@@ -338,9 +339,7 @@
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->                   
                 <module>client</module>                     
-                <module>wixsetup/wixsetup-server-only</module>
-                <module>wixsetup/wixsetup-client-only</module>
-<!--                <module>wixsetup/wixsetup-full</module> -->
+                <module>wixsetup</module>
             </modules>
             <properties>
                 <qt.dir>${libdir}/${arch}</qt.dir>
@@ -354,10 +353,15 @@
                 <compiler>msvc2012u3</compiler>
                 <arch>x64</arch>
                 <box>win78</box>
-                <modification>win78</modification>
                 <force_x86>false</force_x86>
-                <qt.spec>win32-msvc2012</qt.spec>
+                <!-- Testing WinXP hacks on Win78. If doesn't work properly, then revert back -->
+                <!-- <qt.spec>win32-msvc2012</qt.spec>
                 <PlatformToolSet>v110</PlatformToolSet>
+                <modification>win78</modification> -->
+                <qt.spec>win32-msvc2012xp</qt.spec>
+                <PlatformToolSet>v110_xp</PlatformToolSet>
+                <modification>winxp</modification>                
+                
                 <profile.classifier>${platform}</profile.classifier>                
                 <windows>true</windows>
                 <unix>false</unix>
@@ -365,7 +369,8 @@
                 <global.windows.defines>ENABLE_VMAX</global.windows.defines>
             </properties>
         </profile>
-        <profile>
+        <!-- Testing WinXP hacks on Win78. If doesn't work properly, then revert back -->
+        <!--<profile>
             <id>windows-xp</id>
             <activation>
                 <os>
@@ -382,7 +387,7 @@
                 <PlatformToolSet>v110_xp</PlatformToolSet>
                 <modification>winxp</modification>
             </properties>
-        </profile>
+        </profile> -->
 
         <profile>
             <!-- Common Profile for Linux, Mac, Arm -->
@@ -614,6 +619,7 @@
             </activation>
             <properties>
                 <arch>x64</arch>
+                <arch.dir>x86_64-linux-gnu/</arch.dir>
             </properties>
         </profile>
         <profile>
@@ -631,6 +637,7 @@
             </activation>
             <properties>
                 <arch>x86</arch>
+                <arch.dir>i386-linux-gnu/</arch.dir>
             </properties>
         </profile>  
         <profile>
@@ -647,7 +654,9 @@
                 </property>
             </activation>
             <properties>
+                <compiler.arguments>-m32</compiler.arguments>
                 <qt.spec>linux-g++-32</qt.spec>
+                <arch.dir>/usr/lib/i386-linux-gnu/</arch.dir>
             </properties>
         </profile>          
         <profile>

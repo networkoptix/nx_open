@@ -24,7 +24,6 @@ public:
 
     static void initStaticInstance( QnMServerResourceSearcher* inst );
     static QnMServerResourceSearcher* instance();
-    void setAppPServerGuid(const QByteArray& appServerGuid);
     /** find other servers in current networks. Actually, this function do not instantiate other mServer as resources. Function just check if they are presents */
     virtual void run() override;
 private:
@@ -37,7 +36,6 @@ private:
     QList<AbstractDatagramSocket*> m_socketList;
     QTime m_socketLifeTime;
     std::unique_ptr<AbstractDatagramSocket> m_receiveSocket;
-    QByteArray m_appServerGuid;
 };
 
 #endif // __MSERVER_RESOURCE_SEARCHER_H__

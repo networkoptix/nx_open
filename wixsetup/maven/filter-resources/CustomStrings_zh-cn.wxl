@@ -47,17 +47,17 @@
     <String Id="AppServerDlg_ProxyPort"                             Overridable="yes">代理端口</String>
     <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">确认密码</String>   
     <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">系统优化设置</String>   
-    <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">允许系统以优化相机设置（推荐）</String>     
+    <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">允许系统优化摄像机配置(不推荐)</String>     
 
     <!-- Associations -->
-    <String Id="Associations_PlayWith"                              Overridable="yes">运行 ${display.display.product.name}</String>
+    <String Id="Associations_PlayWith"                              Overridable="yes">运行 ${display.product.name}</String>
 
     <!-- ClientDlg -->
     <String Id="ClientDlg_Shortcut"                                 Overridable="yes">快捷方式</String>
     <String Id="ClientDlg_InstallShortcut"                          Overridable="yes">请创建桌面快捷方式。</String>    
-    
+
     <!-- DowngradeWarningDlg -->
-    <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">已经安装 [ProductName]软件的一个版本.</String> 
+    <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">已安装 [ProductName]软件的一个版本.</String> 
 
     <!-- EmptyPasswordDlg -->
     <String Id="EmptyPasswordDlg_Title"                             Overridable="yes">错误密码</String>
@@ -65,9 +65,7 @@
     <String Id="EmptyPasswordDlg_Warning"                           Overridable="yes">警告</String>     
 
     <!-- InstallTypeDlg -->
-    <String Id="InstallTypeDlg_Full"                                Overridable="yes">快速全部安装 (安装所有组件)</String>    
     <String Id="InstallTypeDlg_QuickFull"                           Overridable="yes">快速全部安装 (安装所有组件)</String>
-    <String Id="InstallTypeDlg_ServerOnly"                          Overridable="yes">服务器</String>    
     <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">安装客户端(可以使用客户端访问视频和录像)</String>
     <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">高级安装</String>
     <String Id="InstallTypeDlg_SelectInstallType"                   Overridable="yes">请选择安装方式</String>
@@ -87,20 +85,20 @@
     <String Id="MediaServerDlg_AppserverPort"                       Overridable="yes">端口</String>
     <String Id="MediaServerDlg_Login"                               Overridable="yes">用户名</String>
     <String Id="MediaServerDlg_Password"                            Overridable="yes">密码</String>  
-    <String Id="MediaServerDlg_PasswordConfirm"                     Overridable="yes">确认密码</String>          
     <String Id="MediaServerDlg_MediaserverPort"                     Overridable="yes">媒体服务器端口</String>
     <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">系统控制器</String>
     <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">媒体服务器配置</String>
     <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">媒体服务器</String>  
-    <String Id="MediaServerDlg_SystemName"                          Overridable="yes">系统名称</String>      
-
+    <String Id="MediaServerDlg_SystemName"                          Overridable="yes">系统名称</String>  
+    <String Id="MediaServerDlg_PasswordConfirm"                     Overridable="yes">确认密码</String>  
+    
     <!-- MyExitDialog -->
 
     <!-- MyFeaturesDlg -->
     <String Id="MyFeaturesDlg_Components"                           Overridable="yes">组件</String>
-    <String Id="MyFeaturesDlg_Client"                               Overridable="yes">${client.display.name} (客户端，可以使用它访问视频和录像)</String>
-    <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (媒体存储服务，可以使用它在进行本地录像)</String>
-    <String Id="MyFeaturesDlg_EnterpriseController"                 Overridable="yes">${appserver.name} (数据管理控制服务. 在一个网络中只能安装一个控制服务)</String>    
+    <String Id="MyFeaturesDlg_Client"                               Overridable="yes">${client.name} (客户端，可以使用它访问视频和录像)</String>
+    <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (媒体存储服务，用于视频流媒体转发及录像存储)</String>
+    <String Id="MyFeaturesDlg_EnterpriseController"                 Overridable="yes">${appserver.name} (中心管理控制服务. 用于系统的数据交互管理)</String>    
 
     <!-- PasswordDlg -->
     <String Id="PasswordDlg_DescriptionLabel"                       Overridable="yes">请输入管理员密码</String>
@@ -126,7 +124,7 @@
     <String Id="PortIsBusyDlg_PortOccupiedMessage"                  Overridable="yes">设置的端口已经被占用，请设置正确的端口。</String>    
 
     <!-- Product -->
-    <String Id="Product_LaunchClient"                               Overridable="yes">当 ${display.display.product.name} 安装成后自动运行.</String>    
+    <String Id="Product_LaunchClient"                               Overridable="yes">当 ${display.product.name} 安装成后自动运行.</String>    
     <String Id="Product_ArchMismatch"                               Overridable="yes">这个包是专为32位操作系统.安装程序将无法继续.</String>	
 
     <!-- SelectionWarningDlg -->
@@ -134,17 +132,17 @@
 
     <!-- UninstallOptionsDlg -->
     <String Id="UninstallOptionsDlg_UninstallOptions"               Overridable="yes">卸载选项</String>
-    <String Id="UninstallOptionsDlg_KeepDatabase"                   Overridable="yes">保留 ${display.display.product.name} 数据库</String>
-    <String Id="UninstallOptionsDlg_RemoveDatabase"                 Overridable="yes">移除 ${display.display.product.name} 数据库</String>
+    <String Id="UninstallOptionsDlg_KeepDatabase"                   Overridable="yes">保留 ${display.product.name} 数据库</String>
+    <String Id="UninstallOptionsDlg_RemoveDatabase"                 Overridable="yes">移除 ${display.product.name} 数据库</String>
     <String Id="UninstallOptionsDlg_Current"                        Overridable="yes">当前版本</String>  
     <String Id="UninstallOptionsDlgVersionToKeep"                   Overridable="yes">已安装版本:</String>   
-    
+
     <!-- UpgradeDlg -->
     <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">发现已安装版本</String>    
     <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">安装方式</String>    
     <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">系统将开始更新！</String>    
     <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">您的数据库被破坏，无法恢复。新的数据库已经安装。要访问该系统请使用登录名“admin”和密码“admin”。请在首次登录后更改凭据。</String>    
-    
+
     <!-- WixSchedFirewallExceptions -->
     <String Id="msierrFirewallCannotConnect"                        Overridable="yes">不能连接到windows防火墙。  ([2]   [3]   [4]   [5])</String>    
     <String Id="WixSchedFirewallExceptionsInstall"                  Overridable="yes">配置windows防火墙</String>    

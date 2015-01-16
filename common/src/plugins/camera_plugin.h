@@ -5,7 +5,7 @@
 #include "plugin_api.h"
 
 
-//!Network Optix Camera Integration Plugin API (c++)
+//!VMS Camera Integration Plugin API (c++)
 /*!
     Contains structures and abstract classes to be implemented in real plugin.
     
@@ -64,7 +64,7 @@ namespace nxcip
         char modelName[256];
         //!Firmware version in any human readable format. Optional
         char firmware[256];
-        //!Camera's unique identifier. MAC address can be used
+        //!Camera's unique identifier. MAC address can be used. MUST NOT be empty
         char uid[256];
         //!Camera management url. Can contain just address. MUST NOT be empty
         char url[MAX_TEXT_LEN];
@@ -633,6 +633,11 @@ namespace nxcip
         public BaseCameraManager2
     {
     public:
+        enum CameraCapability3
+        { 
+            cameraParamsPersistentCapability   = 0x0800      //!<Camera parameters can be read/set even if camera is not accessible at the moment
+        };
+
         //!Returns XML describing camera parameters
         /*!
             XML MUST conform to camera_parameters.xsd which can be found in SDK. Sample XML also can be found there

@@ -20,6 +20,7 @@ public:
 
     void setShort(bool value);
 
+    static int optimalWidth();
 signals:
     void valueChanged();
 

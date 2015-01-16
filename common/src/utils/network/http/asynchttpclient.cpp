@@ -5,6 +5,9 @@
 
 #include "asynchttpclient.h"
 
+#include <condition_variable>
+#include <mutex>
+
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QMutexLocker>
 
@@ -896,6 +899,7 @@ namespace nx_http
         auto requestCompletionFunc = [httpClientCaptured, completionHandler]
             ( nx_http::AsyncHttpClientPtr httpClient ) mutable
         {
+            httpClientCaptured->disconnect( nullptr, (const char*)nullptr );
             httpClientCaptured.reset();
 
             if( httpClient->failed() )
@@ -923,6 +927,42 @@ namespace nx_http
             httpClientCaptured.get(), requestCompletionFunc,
             Qt::DirectConnection );
 
-        return httpClientCaptured->doGet( url );
+        if( !httpClientCaptured->doGet( url ) )
+        {
+            //if we do not disconnect, http client object will not be destroyed
+            httpClientCaptured->disconnect( nullptr, (const char*)nullptr );
+            return false;
+        }
+        return true;
+    }
+
+    SystemError::ErrorCode downloadFileSync(
+        const QUrl& url,
+        int* const statusCode,
+        nx_http::BufferType* const msgBody )
+    {
+        bool done = false;
+        SystemError::ErrorCode resultingErrorCode = SystemError::noError;
+        std::mutex mtx;
+        std::condition_variable condVar;
+        const bool res = downloadFileAsync(
+            url,
+            [&resultingErrorCode, statusCode, msgBody, &mtx, &condVar, &done]
+            ( SystemError::ErrorCode errorCode, int _statusCode, const nx_http::BufferType& _msgBody ) {
+                resultingErrorCode = errorCode;
+                *statusCode = _statusCode;
+                *msgBody = _msgBody;
+                std::unique_lock<std::mutex> lk( mtx );
+                done = true;
+                condVar.notify_all();
+            } );
+        if( !res )
+            return SystemError::getLastOSErrorCode();
+
+        std::unique_lock<std::mutex> lk( mtx );
+        while( !done )
+            condVar.wait( lk );
+
+        return resultingErrorCode;
     }
 }

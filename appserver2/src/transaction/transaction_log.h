@@ -52,7 +52,6 @@ namespace ec2
         QnTransactionLog(QnDbManager* db);
 
         static QnTransactionLog* instance();
-        void initStaticInstance(QnTransactionLog* value);
 
         ErrorCode getTransactionsAfter(const QnTranState& state, QList<QByteArray>& result);
         QnTranState getTransactionsState();
@@ -163,7 +162,6 @@ namespace ec2
         QnUuid transactionHash(const ApiIdData& params) const                     { return params.id; }
         QnUuid transactionHash(const ApiCameraServerItemData& params) const       { return makeHash(params.cameraUniqueId.toUtf8(), QByteArray::number(params.timestamp)); }
         QnUuid transactionHash(const ApiResourceStatusData& params) const      { return makeHash(params.id.toRfc4122(), "status"); }
-        QnUuid transactionHash(const ApiPanicModeData&) const                     { return makeHash("panic_mode", ADD_HASH_DATA) ; }
         QnUuid transactionHash(const ApiResourceParamWithRefData& param) const;
         QnUuid transactionHash(const ApiStoredFileData& params) const             { return makeHash(params.path.toUtf8()); }
         QnUuid transactionHash(const ApiStoredFilePath& params) const             { return makeHash(params.path.toUtf8()); }
@@ -212,6 +210,10 @@ namespace ec2
 
         ErrorCode updateSequence(const ApiUpdateSequenceData& data);
         void fillPersistentInfo(QnAbstractTransaction& tran);
+
+        void beginTran();
+        void commit();
+        void rollback();
     private:
         friend class QnDbManager;
 
@@ -224,8 +226,6 @@ namespace ec2
         ErrorCode saveToDB(const QnAbstractTransaction& tranID, const QnUuid& hash, const QByteArray& data);
         ErrorCode updateSequenceNoLock(const QnUuid& peerID, const QnUuid& dbID, int sequence);
     private:
-        QnDbManager* m_dbManager;
-        QnTranState m_state;
         struct UpdateHistoryData
         {
             UpdateHistoryData(): timestamp(0) {}
@@ -233,14 +233,24 @@ namespace ec2
             QnTranStateKey updatedBy;
             qint64 timestamp;
         };
+        struct CommitData
+        {
+            CommitData() {}
+            void clear() { state.values.clear(); updateHistory.clear(); }
 
+            QnTranState state;
+            QMap<QnUuid, UpdateHistoryData> updateHistory;
+        };
+    private:
+        QnDbManager* m_dbManager;
+        QnTranState m_state;
         QMap<QnUuid, UpdateHistoryData> m_updateHistory;
         
         mutable QMutex m_timeMutex;
         QElapsedTimer m_relativeTimer;
-        qint64 m_currentTime;
+        qint64 m_baseTime;
         qint64 m_lastTimestamp;
-        //QMap<QnTranStateKey, QnAbstractTransaction::PersistentInfo> m_fillerInfo;
+        CommitData m_commitData;
     };
 };
 

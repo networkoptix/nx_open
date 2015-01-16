@@ -270,6 +270,7 @@ namespace aio
 
             //NOTE curFdSet->fd_array[fdIndex] is a valid socket handler
 
+            //TODO #ak remove following find call. Finding socket MUST be constant-time operation
             auto sockIter = pollSetImpl->sockets.find( curFdSet->fd_array[fdIndex] );
             assert( sockIter != pollSetImpl->sockets.end() );
 
@@ -516,11 +517,6 @@ namespace aio
         _end.m_impl->curFdSet = m_impl->exceptfds;
         _end.m_impl->fdIndex = m_impl->exceptfds->fd_count;
         return _end;
-    }
-
-    unsigned int PollSet::maxPollSetSize()
-    {
-        return std::numeric_limits<unsigned int>::max();
     }
 }
 

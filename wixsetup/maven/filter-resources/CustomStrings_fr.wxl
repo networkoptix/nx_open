@@ -32,7 +32,7 @@
     <!-- Standard Strings (Common Buttons, Labels etc) -->
     <String Id="StdString_Ok"                                       Overridable="yes">Ok</String>
     <String Id="StdString_Warning"                                  Overridable="yes">Attention</String>
-    <String Id="StdString_SetupTitle"                               Overridable="yes">[ProductName] Setup</String>
+    <String Id="StdString_SetupTitle"                               Overridable="yes">[ProductName] Installation</String>
 
     <!-- AllFieldsAreMandatoryDlg -->
     <String Id="AllFieldsAreMandatoryDlg_AllFieldsAreMandatory"     Overridable="yes">Tous les champs sont obligatoires</String>
@@ -50,7 +50,7 @@
     <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">Autoriser le système à optimiser les paramètres des caméras (Recommandé)</String>   
 
     <!-- Associations -->
-    <String Id="Associations_PlayWith"                              Overridable="yes">Jouer avec ${display.display.product.name}</String>
+    <String Id="Associations_PlayWith"                              Overridable="yes">Jouer avec ${display.product.name}</String>
 
     <!-- ClientDlg -->
     <String Id="ClientDlg_Shortcut"                                 Overridable="yes">Raccourci</String>
@@ -67,7 +67,7 @@
     <!-- InstallTypeDlg -->
     <String Id="InstallTypeDlg_QuickFull"                           Overridable="yes">Complète Rapide (Installer tous les composants)</String>
     <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">Client Seulement(Je veux voir le vidéo enregistré ailleurs)</String>
-    <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">Avancée/String>
+    <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">Avancée</String>
     <String Id="InstallTypeDlg_SelectInstallType"                   Overridable="yes">S.V.P. Sélectionner le type d'installation</String>
     <String Id="InstallTypeDlg_InstallType"                         Overridable="yes">Type d'installation</String>       
 
@@ -122,7 +122,7 @@
     <String Id="PortIsBusyDlg_PortOccupiedMessage"                  Overridable="yes">Le port spécifié est déjà occupé. Appuyer sur 'Suivant' seulement si vous savez ce que vous faites.</String>    
 
     <!-- Product -->
-    <String Id="Product_LaunchClient"                               Overridable="yes">Lancer ${display.display.product.name} lorsque l'installation se termine.</String>    
+    <String Id="Product_LaunchClient"                               Overridable="yes">Lancer ${display.product.name} lorsque l'installation se termine.</String>    
     <String Id="Product_ArchMismatch"                               Overridable="yes">Cette installateur est pour un SE 32-bit. L'installation va maintenant fermer.</String>
 
     <!-- SelectionWarningDlg -->
@@ -130,8 +130,8 @@
 
     <!-- UninstallOptionsDlg -->
     <String Id="UninstallOptionsDlg_UninstallOptions"               Overridable="yes">Options de désinstallation</String>
-    <String Id="UninstallOptionsDlg_KeepDatabase"                   Overridable="yes">Garder ${display.display.product.name} Base de donnée</String>
-    <String Id="UninstallOptionsDlg_RemoveDatabase"                 Overridable="yes">Supprimer ${display.display.product.name} Base de donnée</String>
+    <String Id="UninstallOptionsDlg_KeepDatabase"                   Overridable="yes">Garder ${display.product.name} Base de donnée</String>
+    <String Id="UninstallOptionsDlg_RemoveDatabase"                 Overridable="yes">Supprimer ${display.product.name} Base de donnée</String>
     <String Id="UninstallOptionsDlg_Current"                        Overridable="yes">Actuel</String>  
     <String Id="UninstallOptionsDlgVersionToKeep"                   Overridable="yes">Version à garder:</String>   
     

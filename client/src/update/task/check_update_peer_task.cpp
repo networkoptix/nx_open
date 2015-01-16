@@ -141,6 +141,7 @@ void QnCheckForUpdatesPeerTask::checkOnlineUpdates() {
     m_releaseNotesUrl.clear();
 
     m_targetMustBeNewer = m_target.version.isNull();
+    m_checkLatestVersion = m_target.version.isNull();
 
     nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
     httpClient->setResponseReadTimeoutMs(httpResponseTimeoutMs);
@@ -185,11 +186,9 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply *
     map = map.value(QnAppInfo::customizationName()).toMap();
     QVariantMap releasesMap = map.value(lit("releases")).toMap();
 
-    QString currentRelease;
-    if (m_target.denyMajorUpdates)
+    QString currentRelease = map.value(lit("current_release")).toString();
+    if (m_target.denyMajorUpdates || QnSoftwareVersion(currentRelease) < qnCommon->engineVersion())
         currentRelease = qnCommon->engineVersion().toString(QnSoftwareVersion::MinorFormat);
-    else
-        currentRelease = map.value(lit("current_release")).toString();
 
     QnSoftwareVersion latestVersion = QnSoftwareVersion(releasesMap.value(currentRelease).toString());
     QString updatesPrefix = map.value(lit("updates_prefix")).toString();
@@ -199,10 +198,9 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply *
     }
 
 
-    if (m_target.version.isNull()) {
+    if (m_target.version.isNull())
         m_target.version = latestVersion;
-        m_checkLatestVersion = true;
-    }
+
     m_updateLocationPrefix = updatesPrefix;
     m_releaseNotesUrl = QUrl(map.value(lit("release_notes")).toString());
 

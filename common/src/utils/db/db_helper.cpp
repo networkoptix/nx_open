@@ -1,37 +1,49 @@
 #include "db_helper.h"
+
+#include <QtCore/QCoreApplication>
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QFile>
 #include <QSqlError>
 
+//TODO #AK QnDbTransaction is a bad name for this class since it actually lives beyond DB transaction 
+    //and no concurrent transactions supported. Maybe QnDbConnection?
 QnDbHelper::QnDbTransaction::QnDbTransaction(QSqlDatabase& database, QReadWriteLock& mutex): 
     m_database(database),
     m_mutex(mutex)
 {
-
 }
 
-void QnDbHelper::QnDbTransaction::beginTran()
+QnDbHelper::QnDbTransaction::~QnDbTransaction()
+{
+}
+
+bool QnDbHelper::QnDbTransaction::beginTran()
 {
     m_mutex.lockForWrite();
-    QSqlQuery query(m_database);
-    query.exec(lit("BEGIN TRANSACTION"));
+    if( !m_database.transaction() )
+    {
+        //TODO #ak ignoring this error since calling party thinks it always succeeds
+        //m_mutex.unlock();
+        //return false;
+    }
+    return true;
 }
 
 void QnDbHelper::QnDbTransaction::rollback()
 {
-    QSqlQuery query(m_database);
-    query.exec(lit("ROLLBACK"));
+    m_database.rollback();
+    //TODO #ak handle rollback error?
     m_mutex.unlock();
 }
 
 bool QnDbHelper::QnDbTransaction::commit()
 {
-    QSqlQuery query(m_database);
-    bool rez = query.exec(lit("COMMIT"));
-    if (!rez)
-        qWarning() << "Commit failed:" << query.lastError();
-    m_mutex.unlock();
+    bool rez = m_database.commit();
+    if (rez)
+        m_mutex.unlock();
+    else
+        qWarning() << "Commit failed:" << m_database.lastError(); // do not unlock mutex. Rollback is expected
     return rez;
 }
 
@@ -50,14 +62,16 @@ QnDbHelper::QnDbTransactionLocker::~QnDbTransactionLocker()
 
 bool QnDbHelper::QnDbTransactionLocker::commit()
 {
-    m_committed = true;
-    return m_tran->commit();
+    m_committed = m_tran->commit();
+    return m_committed;
 }
 
+QnDbHelper::QnDbHelper()
+{
 
+}
 
-QnDbHelper::QnDbHelper():
-    m_tran(m_sdb, m_mutex)
+QnDbHelper::~QnDbHelper()
 {
 
 }
@@ -113,26 +127,19 @@ bool QnDbHelper::execSQLFile(const QString& fileName, QSqlDatabase& database)
 #ifdef DB_DEBUG
         qDebug() << QString(QLatin1String("processing command %1 of %2")).arg(++i).arg(n);
 #endif // DB_DEBUG
-        if (singleCommand.trimmed().isEmpty())
+        QString command = QString::fromUtf8(singleCommand).trimmed();
+        if (command.isEmpty())
             continue;
         QSqlQuery ddlQuery(database);
-        ddlQuery.prepare(QString::fromUtf8(singleCommand));
+        ddlQuery.prepare(command);
         if (!ddlQuery.exec()) {
-            qWarning() << "can't create tables for sqlLite database:" << ddlQuery.lastError().text() << ". Query was: " << singleCommand;
+            qWarning() << "Error while executing SQL file" << fileName;
+            qWarning() << "Query was:" << command;
+            qWarning() << "Error:" << ddlQuery.lastError().text();
             return false;
         }
     }
     return true;
-}
-
-QnDbHelper::QnDbTransaction* QnDbHelper::getTransaction()
-{
-    return &m_tran;
-}
-
-const QnDbHelper::QnDbTransaction* QnDbHelper::getTransaction() const
-{
-    return &m_tran;
 }
 
 bool QnDbHelper::isObjectExists(const QString& objectType, const QString& objectName, QSqlDatabase& database)
@@ -150,23 +157,70 @@ bool QnDbHelper::isObjectExists(const QString& objectType, const QString& object
     return !value.isEmpty();
 }
 
-void QnDbHelper::beginTran()
-{
-    m_tran.beginTran();
-}
-
-void QnDbHelper::rollback()
-{
-    m_tran.rollback();
-}
-
-void QnDbHelper::commit()
-{
-    m_tran.commit();
-}
-
 void QnDbHelper::addDatabase(const QString& fileName, const QString& dbname)
 {
     m_sdb = QSqlDatabase::addDatabase(lit("QSQLITE"), dbname);
     m_sdb.setDatabaseName(fileName);
+}
+
+bool QnDbHelper::applyUpdates(const QString &dirName) {
+
+    if (!isObjectExists(lit("table"), lit("south_migrationhistory"), m_sdb)) {
+        QSqlQuery ddlQuery(m_sdb);
+        ddlQuery.prepare(lit(
+            "CREATE TABLE \"south_migrationhistory\" (\
+            \"id\" integer NOT NULL PRIMARY KEY autoincrement,\
+            \"app_name\" varchar(255) NOT NULL,\
+            \"migration\" varchar(255) NOT NULL,\
+            \"applied\" datetime NOT NULL);"
+            ));
+        if (!ddlQuery.exec())
+            return false;
+    }
+
+    QSqlQuery existsUpdatesQuery(m_sdb);
+    existsUpdatesQuery.prepare(lit("SELECT migration from south_migrationhistory"));
+    if (!existsUpdatesQuery.exec())
+        return false;
+    QStringList existUpdates;
+    while (existsUpdatesQuery.next())
+        existUpdates << existsUpdatesQuery.value(0).toString();
+
+
+    QDir dir(dirName);
+    foreach(const QFileInfo& entry, dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::Name))
+    {
+        QString fileName = entry.absoluteFilePath();
+        if (!existUpdates.contains(fileName)) 
+        {
+            if (!beforeInstallUpdate(fileName))
+                return false;
+            if (!execSQLFile(fileName, m_sdb))
+                return false;
+            if (!afterInstallUpdate(fileName))
+                return false;
+
+            QSqlQuery insQuery(m_sdb);
+            insQuery.prepare(lit("INSERT INTO south_migrationhistory (app_name, migration, applied) values(?, ?, ?)"));
+            insQuery.addBindValue(qApp->applicationName());
+            insQuery.addBindValue(fileName);
+            insQuery.addBindValue(QDateTime::currentDateTime());
+            if (!insQuery.exec()) {
+                qWarning() << Q_FUNC_INFO << __LINE__ << insQuery.lastError();
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+bool QnDbHelper::beforeInstallUpdate(const QString& updateName) {
+    Q_UNUSED(updateName);
+    return true;
+}
+
+bool QnDbHelper::afterInstallUpdate(const QString& updateName) {
+    Q_UNUSED(updateName);
+    return true;
 }

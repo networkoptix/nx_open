@@ -22,8 +22,8 @@ public:
     virtual QString toString() const override;
     bool isRendererSlow() const;
 
-    void addConnection(QnMediaServerResourcePtr mServer);
-    void removeConnection(QnMediaServerResourcePtr mServer);
+    void addConnection(const QnMediaServerResourcePtr &server);
+    void removeConnection(const QnMediaServerResourcePtr &server);
 
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/) const override;
 

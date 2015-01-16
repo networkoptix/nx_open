@@ -18,13 +18,6 @@
 
 #include "abstract_connection.h"
 
-typedef QList<QPair<QString, bool> > QnStringBoolPairList;
-typedef QList<QPair<QString, QVariant> > QnStringVariantPairList;
-
-Q_DECLARE_METATYPE(QnStringBoolPairList);
-Q_DECLARE_METATYPE(QnStringVariantPairList);
-
-
 // TODO: #MSAPI move to api/model or even to common_globals, 
 // add lexical serialization (see QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS)
 // 
@@ -44,7 +37,7 @@ class QnMediaServerConnection: public QnAbstractConnection {
     typedef QnAbstractConnection base_type;
 
 public:
-    QnMediaServerConnection(QnMediaServerResource* mserver, const QnUuid& videowallGuid = QnUuid(), QObject *parent = NULL);
+    QnMediaServerConnection(QnMediaServerResource* mserver, const QnUuid& videowallGuid = QnUuid(), bool enableOfflineRequests = false, QObject *parent = NULL);
     virtual ~QnMediaServerConnection();
 
     int getTimePeriodsAsync(
@@ -132,11 +125,6 @@ public:
         QObject *target, 
         const char *slot);
 
-    /**
-     * \returns                         Http response status (200 in case of success).
-     */
-    int getParamsSync(const QnNetworkResourcePtr &camera, const QStringList &keys, QnStringVariantPairList *reply);
-
     /** 
      * Set \a camera params.
      * 
@@ -149,11 +137,6 @@ public:
     int setParamsAsync(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params, QObject *target, const char *slot);
 
     /**
-     * \returns                         Http response status (200 in case of success).
-     */
-    int setParamsSync(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params, QnStringBoolPairList *reply);
-
-    /** 
      * \returns                         Request handle. 
      */
     int getStatisticsAsync(QObject *target, const char *slot);
@@ -221,25 +204,27 @@ public:
     int deleteBookmarkAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
     int getBookmarksAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmarkSearchFilter &filter, QObject *target, const char *slot);
 
-    int installUpdate(const QString &updateId, const QByteArray &data, QObject *target, const char *slot);
+    int installUpdate(const QString &updateId, QObject *target, const char *slot);
+    int uploadUpdateChunk(const QString &updateId, const QByteArray &data, qint64 offset, QObject *target, const char *slot);
 
     int restart(QObject *target, const char *slot);
 
     int configureAsync(bool wholeSystem, const QString &systemName, const QString &password, const QByteArray &passwordHash, const QByteArray &passwordDigest, int port, QObject *target, const char *slot);
 
-    int pingSystemAsync(const QUrl &url, const QString &password, QObject *target, const char *slot);
-    int mergeSystemAsync(const QUrl &url, const QString &password, bool ownSettings, QObject *target, const char *slot);
+    int pingSystemAsync(const QUrl &url, const QString &user, const QString &password, QObject *target, const char *slot);
+    int mergeSystemAsync(const QUrl &url, const QString &user, const QString &password, const QString &currentPassword, bool ownSettings, bool oneServer, bool ignoreIncompatible, QObject *target, const char *slot);
 
     int testEmailSettingsAsync(const QnEmailSettings &settings, QObject *target, const char *slot);
+
+    int modulesInformation(QObject *target, const char *slot);
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;
-
-    static QnRequestParamList createGetParamsRequest(const QnNetworkResourcePtr &camera, const QStringList &params);
-    static QnRequestParamList createSetParamsRequest(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params);
+    virtual bool isReady() const override;
 
 private:
     QString m_proxyAddr;
     int m_proxyPort;
+    bool m_enableOfflineRequests;
 };
 
 

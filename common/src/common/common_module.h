@@ -44,7 +44,15 @@ public:
 
     void setObsoleteServerGuid(const QnUuid& guid) { m_obsoleteUuid = guid; }
     QnUuid obsoleteServerGuid() const{ return m_obsoleteUuid; }
-    
+
+    /*
+    * This timestamp is using for database backup/restore operation.
+    * Server has got systemIdentity time after DB restore operation
+    * This time help pushing database from current server to all others
+    */
+    void setSystemIdentityTime(qint64 value, const QnUuid& sender);
+    qint64 systemIdentityTime() const;
+
     void setRemoteGUID(const QnUuid& guid);
     QnUuid remoteGUID() const;
 
@@ -66,10 +74,15 @@ public:
     void setModuleInformation(const QnModuleInformation &moduleInformation);
     QnModuleInformation moduleInformation() const;
 
+    bool isTranscodeDisabled() const { return m_transcodingDisabled; }
+    void setTranscodeDisabled(bool value) { m_transcodingDisabled = value; }
+
+    inline void setAllowedPeers(const QSet<QnUuid> &peerList) { m_allowedPeers = peerList; }
+    inline QSet<QnUuid> allowedPeers() const { return m_allowedPeers; }
 signals:
     void systemNameChanged(const QString &systemName);
     void remoteIdChanged(const QnUuid &id);
-
+    void systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
 protected:
     static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
 
@@ -87,6 +100,9 @@ private:
     QnSoftwareVersion m_engineVersion;
     QnModuleInformation m_moduleInformation;
     mutable QMutex m_mutex;
+    bool m_transcodingDisabled;
+    QSet<QnUuid> m_allowedPeers;
+    qint64 m_systemIdentityTime;
 };
 
 #define qnCommon (QnCommonModule::instance())

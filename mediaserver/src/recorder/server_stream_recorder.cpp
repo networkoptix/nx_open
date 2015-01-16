@@ -19,6 +19,8 @@
 #include <media_server/settings.h>
 #include "utils/common/util.h" /* For MAX_FRAME_DURATION, MIN_FRAME_DURATION. */
 
+#include <boost/algorithm/cxx11/any_of.hpp>
+
 
 static const int MOTION_PREBUFFER_SIZE = 8;
 
@@ -137,7 +139,7 @@ void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData
 
     bool rez = m_queuedSize <= m_maxRecordQueueSizeBytes && (size_t)m_dataQueue.size() < m_maxRecordQueueSizeElements;
     if (!rez) {
-        emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageFullReason, m_storage);
+        emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageTooSlowReason, m_storage);
 
         qWarning() << "HDD/SSD is slowing down recording for camera " << m_device->getUniqueId() << ". "<<m_dataQueue.size()<<" frames have been dropped!";
         markNeedKeyData();
@@ -253,7 +255,8 @@ void QnServerStreamRecorder::updateMotionStateInternal(bool value, qint64 timest
 bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& media)
 {
     qint64 afterThreshold = 5 * 1000000ll;
-    if (m_currentScheduleTask.getRecordingType() == Qn::RT_MotionOnly)
+    Qn::RecordingType recType = m_currentScheduleTask.getRecordingType();
+    if (recType == Qn::RT_MotionOnly || recType == Qn::RT_MotionAndLowQuality)
         afterThreshold = m_currentScheduleTask.getAfterThreshold()*1000000ll;
     bool isMotionContinue = m_lastMotionTimeUsec != (qint64)AV_NOPTS_VALUE && media->timestamp < m_lastMotionTimeUsec + afterThreshold;
     if (!isMotionContinue)
@@ -403,11 +406,18 @@ void QnServerStreamRecorder::setSpecialRecordingMode(QnScheduleTask& task)
     m_lastSchedulePeriod.clear();
 }
 
+bool QnServerStreamRecorder::isPanicMode() const
+{
+    return boost::algorithm::any_of(qnResPool->getAllServers(), [](const QnMediaServerResourcePtr& server) {
+        return server->getPanicMode() != Qn::PM_None && server->getStatus() == Qn::Online;
+    });
+}
+
 void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
 {
     QMutexLocker lock(&m_scheduleMutex);
 
-    if (m_mediaServer && m_mediaServer->getPanicMode() != Qn::PM_None)
+    if (isPanicMode())
     {
         if (!m_usedPanicMode)
         {

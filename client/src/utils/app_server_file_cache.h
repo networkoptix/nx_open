@@ -6,12 +6,13 @@
 
 #include <nx_ec/ec_api.h>
 
+#include <ui/workbench/workbench_context_aware.h>
 
 class QnAppServerFileCache : public QObject
 {
     Q_OBJECT
 public:
-    explicit QnAppServerFileCache(QString folderName, QObject *parent = 0);
+    explicit QnAppServerFileCache(const QString &folderName, QObject *parent = 0);
     virtual ~QnAppServerFileCache();
 
     /** Get full path to cached file with fixed filename */
@@ -39,9 +40,12 @@ public:
     virtual void clear();
 
     static void clearLocalCache();
+
 protected:
     void ensureCacheFolder();
     QString folderName() const;
+
+    bool isConnectedToServer() const;
 signals:
     void fileDownloaded(const QString& filename, bool ok);
     void delayedFileDownloaded(const QString& filename, bool ok);
@@ -53,6 +57,7 @@ signals:
     void delayedFileDeleted(const QString& filename, bool ok);
 
     void fileListReceived(const QStringList& filenames, bool ok);
+    void delayedFileListReceived(const QStringList& filenames, bool ok);
 private slots:
     void at_fileLoaded( int handle, ec2::ErrorCode errorCode, const QByteArray& data );
     void at_fileUploaded(int handle, ec2::ErrorCode errorCode);

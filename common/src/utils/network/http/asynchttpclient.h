@@ -202,6 +202,9 @@ namespace nx_http
         //!Composes request with authorization header based on \a response
         bool resendRequestWithAuthorization( const nx_http::Response& response );
 
+        AsyncHttpClient( const AsyncHttpClient& );
+        AsyncHttpClient& operator=( const AsyncHttpClient& );
+
         static const char* toString( State state );
     };
 
@@ -216,6 +219,11 @@ namespace nx_http
     bool downloadFileAsync(
         const QUrl& url,
         std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType)> completionHandler );
+    //!Calls previous function and waits for completion
+    SystemError::ErrorCode downloadFileSync(
+        const QUrl& url,
+        int* const statusCode,
+        nx_http::BufferType* const msgBody );
 }
 
 #endif  //ASYNCHTTPCLIENT_H

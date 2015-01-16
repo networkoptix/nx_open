@@ -175,6 +175,18 @@ private:
     QnResourceWidget::Option m_optionToCheck;
 };
 
+class ResourceWidgetNotRaisedCondition : public InstrumentItemCondition, public QnWorkbenchContextAware {
+public:
+    ResourceWidgetNotRaisedCondition(QnWorkbenchContext *context) :
+        QnWorkbenchContextAware(context)
+    {}
+
+    virtual bool operator()(QGraphicsItem *item, Instrument *instrument) const {
+        Q_UNUSED(instrument)
+        return item != display()->widget(Qn::RaisedRole);
+    }
+};
+
 QnWorkbenchController::QnWorkbenchController(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -242,6 +254,10 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_rubberBandInstrument->setRubberBandZValue(display()->layerZValue(Qn::EffectsLayer));
     m_rotationInstrument->setRotationItemZValue(display()->layerZValue(Qn::EffectsLayer));
     m_resizingInstrument->setEffectRadius(8);
+
+    m_moveInstrument->addItemCondition(new ResourceWidgetNotRaisedCondition(context()));
+    m_resizingInstrument->addItemCondition(new ResourceWidgetNotRaisedCondition(context()));
+    m_resizingInstrument->resizeHoverInstrument()->addItemCondition(new ResourceWidgetNotRaisedCondition(context()));
 
     m_rotationInstrument->addItemCondition(new InstrumentItemConditionAdaptor<IsInstanceOf<QnResourceWidget> >());
     m_rotationInstrument->addItemCondition(new ResourceWidgetHasNoOptionCondition( QnResourceWidget::WindowRotationForbidden ));
@@ -362,10 +378,10 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QGraphicsWidget *)),                        m_resizingInstrument,           SLOT(recursiveEnable()));
     connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QGraphicsWidget *)),                         ptzInstrument,                  SLOT(recursiveDisable()));
     connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QGraphicsWidget *)),                        ptzInstrument,                  SLOT(recursiveEnable()));
-    connect(m_rotationInstrument,       SIGNAL(rotationStarted(QGraphicsView *, QGraphicsWidget *)),                                m_motionSelectionInstrument,    SLOT(recursiveDisable()));
-    connect(m_rotationInstrument,       SIGNAL(rotationFinished(QGraphicsView *, QGraphicsWidget *)),                               m_motionSelectionInstrument,    SLOT(recursiveEnable()));
-    connect(m_rotationInstrument,       SIGNAL(rotationStarted(QGraphicsView *, QGraphicsWidget *)),                                boundingInstrument,             SLOT(recursiveDisable()));
-    connect(m_rotationInstrument,       SIGNAL(rotationFinished(QGraphicsView *, QGraphicsWidget *)),                               boundingInstrument,             SLOT(recursiveEnable()));
+    connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QGraphicsWidget *)),                         m_motionSelectionInstrument,    SLOT(recursiveDisable()));
+    connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QGraphicsWidget *)),                        m_motionSelectionInstrument,    SLOT(recursiveEnable()));
+    connect(m_rotationInstrument,       SIGNAL(rotationProcessStarted(QGraphicsView *, QGraphicsWidget *)),                         boundingInstrument,             SLOT(recursiveDisable()));
+    connect(m_rotationInstrument,       SIGNAL(rotationProcessFinished(QGraphicsView *, QGraphicsWidget *)),                        boundingInstrument,             SLOT(recursiveEnable()));
 
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *)),                 m_handScrollInstrument,         SLOT(recursiveDisable()));
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnMediaResourceWidget *)),                m_handScrollInstrument,         SLOT(recursiveEnable()));
@@ -373,8 +389,6 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnMediaResourceWidget *)),                m_moveInstrument,               SLOT(recursiveEnable()));
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *)),                 m_dragInstrument,               SLOT(recursiveDisable()));
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnMediaResourceWidget *)),                m_dragInstrument,               SLOT(recursiveEnable()));
-    //connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *)),                 m_resizingInstrument,           SLOT(recursiveDisable()));
-    //connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnMediaResourceWidget *)),                m_resizingInstrument,           SLOT(recursiveEnable()));
 
     connect(ptzInstrument,              SIGNAL(ptzProcessStarted(QnMediaResourceWidget *)),                                         m_handScrollInstrument,         SLOT(recursiveDisable()));
     connect(ptzInstrument,              SIGNAL(ptzProcessFinished(QnMediaResourceWidget *)),                                        m_handScrollInstrument,         SLOT(recursiveEnable()));
@@ -775,11 +789,14 @@ void QnWorkbenchController::at_scene_focusIn(QGraphicsScene *, QEvent *event) {
     *focusEvent = QFocusEvent(focusEvent->type(), Qt::OtherFocusReason);
 }
 
-void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget *item, ResizingInfo *) {
+void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget *item, ResizingInfo *info) {
     TRACE("RESIZING STARTED");
 
     m_resizedWidget = qobject_cast<QnResourceWidget *>(item);
     if(m_resizedWidget == NULL)
+        return;
+
+    if(m_resizedWidget->item() == NULL)
         return;
 
     m_selectionOverlayHackInstrumentDisabled = true;
@@ -790,58 +807,64 @@ void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget 
     display()->bringToFront(m_resizedWidget);
     opacityAnimator(display()->gridItem())->animateTo(1.0);
     opacityAnimator(m_resizedWidget)->animateTo(widgetManipulationOpacity);
+
+    /* Calculate snap point */
+    Qt::WindowFrameSection grabbedSection = Qn::rotateSection(info->frameSection(), item->rotation());
+    QRect initialGeometry = m_resizedWidget->item()->geometry();
+    QRect widgetInitialGeometry = mapper()->mapToGrid(rotated(m_resizedWidget->geometry(), m_resizedWidget->rotation()));
+    m_resizingSnapPoint = Qn::calculatePinPoint(initialGeometry.intersected(widgetInitialGeometry), grabbedSection);
 }
 
 void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, ResizingInfo *info) {
     if(m_resizedWidget != item || item == NULL)
         return;
 
-    QnResourceWidget *widget = m_resizedWidget;
-    QRectF gridRectF = mapper()->mapToGridF(widget->geometry());
+    QRectF widgetGeometry = rotated(m_resizedWidget->geometry(), m_resizedWidget->rotation());
     
     /* Calculate integer size. */
-    QSizeF gridSizeF = gridRectF.size();
-    QSize gridSize = mapper()->mapToGrid(widget->size());
-    if(widget->hasAspectRatio()) {
-        if(widget->aspectRatio() > 1.0) {
-            gridSize = bestSingleBoundedSize(mapper(), gridSize.width(), Qt::Horizontal, widget->aspectRatio());
-        } else {
-            gridSize = bestSingleBoundedSize(mapper(), gridSize.height(), Qt::Vertical, widget->aspectRatio());
-        }
-    }
-
+    QSize gridSize = mapper()->mapToGrid(widgetGeometry).size();
     if (gridSize.isEmpty())
         gridSize = gridSize.expandedTo(QSize(1, 1));
 
-    /* Calculate integer position. */
-    QPointF gridPosF;
-    switch (info->frameSection()) {
+    /* Correct grabbed section according to item rotation. */
+    Qt::WindowFrameSection grabbedSection = Qn::rotateSection(info->frameSection(), item->rotation());
+
+    /* Calculate new item position .*/
+    QPoint newPosition;
+    switch (grabbedSection) {
     case Qt::TopSection:
+        newPosition = QPoint(m_resizingSnapPoint.x() - gridSize.width() / 2, m_resizingSnapPoint.y() - gridSize.height());
+        break;
     case Qt::LeftSection:
+        newPosition = QPoint(m_resizingSnapPoint.x() - gridSize.width(), m_resizingSnapPoint.y() - gridSize.height() / 2);
+        break;
     case Qt::TopLeftSection:
-        gridPosF = gridRectF.bottomRight() - toPoint(gridSize);
+        newPosition = QPoint(m_resizingSnapPoint.x() - gridSize.width(), m_resizingSnapPoint.y() - gridSize.height());
         break;
     case Qt::BottomSection:
+        newPosition = QPoint(m_resizingSnapPoint.x() - gridSize.width() / 2, m_resizingSnapPoint.y());
+        break;
     case Qt::RightSection:
+        newPosition = QPoint(m_resizingSnapPoint.x(), m_resizingSnapPoint.y() - gridSize.height() / 2);
+        break;
     case Qt::BottomRightSection:
-        gridPosF = gridRectF.topLeft();
+        newPosition = m_resizingSnapPoint;
         break;
     case Qt::TopRightSection:
-        gridPosF = QPointF(gridRectF.left(), gridRectF.bottom() - gridSize.height());
+        newPosition = QPoint(m_resizingSnapPoint.x(), m_resizingSnapPoint.y() - gridSize.height());
         break;
     case Qt::BottomLeftSection:
-        gridPosF = QPointF(gridRectF.right() - gridSize.width(), gridRectF.top());
+        newPosition = QPoint(m_resizingSnapPoint.x() - gridSize.width(), m_resizingSnapPoint.y());
         break;
     default:
-        gridPosF = gridRectF.topLeft() + toPoint(gridSizeF - gridSize) / 2;
+        newPosition = m_resizingSnapPoint;
     }
-    QPoint gridPos = gridPosF.toPoint(); /* QPointF::toPoint() uses qRound() internally. */
 
-    /* Calculate new grid rect based on the dragged frame section. */
-    QRect newResizingWidgetRect = QRect(gridPos, gridSize);
+    QRect newResizingWidgetRect(newPosition, gridSize);
+
     if(newResizingWidgetRect != m_resizedWidgetRect) {
         QnWorkbenchLayout::Disposition disposition;
-        widget->item()->layout()->canMoveItem(widget->item(), newResizingWidgetRect, &disposition);
+        m_resizedWidget->item()->layout()->canMoveItem(m_resizedWidget->item(), newResizingWidgetRect, &disposition);
 
         display()->gridItem()->setCellState(m_resizedWidgetRect, QnGridItem::Initial);
         display()->gridItem()->setCellState(disposition.free, QnGridItem::Allowed);
@@ -1121,6 +1144,10 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
     if(widget == NULL)
         return;
 
+    /* Don't raise if there's only one item in the layout. */
+    if (workbench()->currentLayout() && workbench()->currentLayout()->items().size() == 1)
+        return;
+
     QnWorkbenchItem *workbenchItem = widget->item();
     workbench()->setItem(Qn::RaisedRole, workbench()->item(Qn::RaisedRole) == workbenchItem ? NULL : workbenchItem);
 }
@@ -1318,7 +1345,6 @@ void QnWorkbenchController::at_checkFileSignatureAction_triggered()
     if(widget->resource()->flags() & Qn::network)
         return;
     QScopedPointer<SignDialog> dialog(new SignDialog(widget->resource(), mainWindow()));
-    dialog->setModal(true);
     dialog->exec();
 }
 

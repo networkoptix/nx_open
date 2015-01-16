@@ -86,6 +86,8 @@ private:
     bool addingAllowed() const;
 
     void updateTitle();
+    void clearServerStatus();
+    void updateServerStatus(const QString &errorMessage);
 private slots: 
     void at_startIPLineEdit_textChanged(QString value);
     void at_startIPLineEdit_editingFinished();

@@ -1,25 +1,30 @@
-#include <QtCore/QList>
+#include "mserver_business_rule_processor.h"
 
-#include <utils/math/math.h>
-#include <utils/common/log.h>
+#include <QtCore/QList>
 
 #include "api/app_server_connection.h"
 
-#include "core/resource_management/resource_pool.h"
-#include <core/resource/resource.h>
-#include "core/resource/media_server_resource.h"
-#include "core/resource/camera_resource.h"
-#include "core/resource/security_cam_resource.h"
-
 #include "business/actions/panic_business_action.h"
-#include "recorder/recording_manager.h"
+
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/camera_bookmark.h>
+#include <core/resource/security_cam_resource.h>
+
 #include "camera/camera_pool.h"
 #include "decoders/video/ffmpeg.h"
 
+#include <recorder/recording_manager.h>
+#include <recorder/storage_manager.h>
+
 #include <media_server/serverutil.h>
 
-#include "mserver_business_rule_processor.h"
+#include <utils/math/math.h>
+#include <utils/common/log.h>
 #include "camera/get_image_helper.h"
+#include "core/resource_management/resource_properties.h"
 
 QnMServerBusinessRuleProcessor::QnMServerBusinessRuleProcessor(): QnBusinessRuleProcessor()
 {
@@ -43,7 +48,7 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
         switch(action->actionType())
         {
         case QnBusiness::BookmarkAction:
-            // TODO: implement me
+            result = executeBookmarkAction(action, res);
             break;
         case QnBusiness::CameraOutputAction:
         case QnBusiness::CameraOutputOnceAction:
@@ -78,9 +83,8 @@ bool QnMServerBusinessRuleProcessor::executePanicAction(const QnPanicBusinessAct
     Qn::PanicMode val = Qn::PM_None;
     if (action->getToggleState() == QnBusiness::ActiveState)
         val =  Qn::PM_BusinessEvents;
-    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
-    conn->setPanicModeSync(val);
     mediaServer->setPanicMode(val);
+    propertyDictionary->saveParams(mediaServer->getId());
     return true;
 }
 
@@ -104,6 +108,40 @@ bool QnMServerBusinessRuleProcessor::executeRecordingAction(const QnRecordingBus
     }
     return rez;
 }
+
+bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusinessActionPtr &action, const QnResourcePtr &resource) {
+    Q_ASSERT(action);
+    QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
+    if (!camera)
+        return false;
+
+    QnUuid ruleId = action->getBusinessRuleId();
+
+    if (action->getToggleState() == QnBusiness::ActiveState) {
+        m_runningBookmarkActions[ruleId] = QDateTime::currentMSecsSinceEpoch();
+        return true;
+    }
+
+    if (!m_runningBookmarkActions.contains(ruleId))
+        return false;
+
+    qint64 startTime = m_runningBookmarkActions.take(ruleId);
+    qint64 endTime = QDateTime::currentMSecsSinceEpoch();
+
+    QnCameraBookmark bookmark;
+    bookmark.guid = QnUuid::createUuid();
+    bookmark.startTimeMs = startTime;
+    bookmark.durationMs = endTime - startTime;
+
+    bookmark.name = "Auto-Generated Bookmark";
+    bookmark.description = QString("Rule %1\nFrom %2 to %3")
+        .arg(ruleId.toString())
+        .arg(QDateTime::fromMSecsSinceEpoch(startTime).toString())
+        .arg(QDateTime::fromMSecsSinceEpoch(endTime).toString());
+
+    return qnStorageMan->addBookmark(camera->getUniqueId().toUtf8(), bookmark, true);
+}
+
 
 QnUuid QnMServerBusinessRuleProcessor::getGuid() const {
     return serverGuid();
@@ -145,13 +183,13 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
                 autoResetTimeout );
 }
 
-QImage QnMServerBusinessRuleProcessor::getEventScreenshot(const QnBusinessEventParameters& params, QSize dstSize) const 
+QByteArray QnMServerBusinessRuleProcessor::getEventScreenshotEncoded(const QnBusinessEventParameters& params, QSize dstSize) const 
 {
     // By now only motion screenshot is supported
-    if (params.getEventType() != QnBusiness::CameraMotionEvent)
-        return QImage();
+    if (params.eventType != QnBusiness::CameraMotionEvent)
+        return QByteArray();
 
-    const QnResourcePtr& cameraRes = QnResourcePool::instance()->getResourceById(params.getEventResourceId());
+    const QnResourcePtr& cameraRes = QnResourcePool::instance()->getResourceById(params.eventResourceId);
     QSharedPointer<CLVideoDecoderOutput> frame = QnGetImageHelper::getImage(cameraRes.dynamicCast<QnVirtualCameraResource>(), DATETIME_NOW, dstSize);
-    return frame ? frame->toImage() : QImage();
+    return frame ? QnGetImageHelper::encodeImage(frame, "jpg") : QByteArray();
 }

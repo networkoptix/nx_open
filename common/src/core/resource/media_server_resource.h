@@ -40,7 +40,7 @@ public:
     QString getApiUrl() const;
 
     void setNetAddrList(const QList<QHostAddress>&);
-    const QList<QHostAddress>& getNetAddrList() const;
+    QList<QHostAddress> getNetAddrList() const;
 
     void setAdditionalUrls(const QList<QUrl> &urls);
     QList<QUrl> getAdditionalUrls() const;
@@ -105,11 +105,12 @@ public:
     QPair<int, int> saveUpdatedStorages();
 private slots:
     void at_pingResponse(QnHTTPRawResponse, int);
+    void onNewResource(const QnResourcePtr &resource);
+    void onRemoveResource(const QnResourcePtr &resource);
 private:
     void onRequestDone( int reqID, ec2::ErrorCode errorCode );
 signals:
     void serverIfFound(const QnMediaServerResourcePtr &resource, const QString &, const QString& );
-    void panicModeChanged(const QnResourcePtr &resource);
     //! This signal is emmited when the set of additional URLs or ignored URLs has been changed.
     void auxUrlsChanged(const QnResourcePtr &resource);
     void versionChanged(const QnResourcePtr &resource);
@@ -127,7 +128,6 @@ private:
     //QnAbstractStorageResourceList m_storages;
     bool m_primaryIFSelected;
     Qn::ServerFlags m_serverFlags;
-    Qn::PanicMode m_panicMode;
     QnSoftwareVersion m_version;
     QnSystemInformation m_systemInfo;
     QString m_systemName;
@@ -139,6 +139,8 @@ private:
     // used for client purpose only. Can be moved to separete class
     QnAbstractStorageResourceList m_storagesToUpdate;
     ec2::ApiIdDataList m_storagesToRemove;
+
+    mutable QnResourcePtr m_firstCamera;
 };
 
 class QnMediaServerResourceFactory : public QnResourceFactory
