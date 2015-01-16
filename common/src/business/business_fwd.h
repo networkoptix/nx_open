@@ -93,10 +93,10 @@ public:
         /** Found some cameras with same IP address. */
         CameraIpConflictEvent = 6,
 
-        /** Connection to mediaserver lost. */
+        /** Connection to server lost. */
         ServerFailureEvent = 7,
 
-        /** Two or more mediaservers are running. */
+        /** Two or more servers are running. */
         ServerConflictEvent = 8,
 
         /** Server started */
