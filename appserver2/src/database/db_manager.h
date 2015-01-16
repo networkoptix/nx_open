@@ -106,7 +106,7 @@ namespace ec2
         template <class T1, class T2>
         ErrorCode doQuery(const T1& t1, T2& t2)
         {
-            QReadLocker lock(&m_mutex);
+            QWriteLocker lock(&m_mutex);
             return doQueryNoLock(t1, t2);
         }
 
