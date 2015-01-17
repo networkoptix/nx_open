@@ -50,7 +50,7 @@ namespace ite
     };
 
     ///
-    class DeviceInfo
+    class TxDevice
     {
     public:
         static const unsigned SLEEP_TIME_MS = 200;
@@ -77,11 +77,6 @@ namespace ite
             FREQ_CH14 = 423000,
             FREQ_CH15 = 473000
         } Frequency;
-
-        DeviceInfo(unsigned short rxID = 0, unsigned short txID = 0);
-        ~DeviceInfo();
-
-        RCHostInfo * rcHost() { return &info_; }
 
         static Frequency chanFrequency(unsigned channel)
         {
@@ -135,14 +130,12 @@ namespace ite
             return 0xffff;
         }
 
-        bool setChannel(unsigned channel);
+        TxDevice(unsigned short txID, unsigned freq);
+        ~TxDevice();
 
-        static unsigned short input2output(unsigned short command)
-        {
-            if (command >= CMD_GetMetadataSettingsInput)
-                return command | 0xF000;
-            return command | 0x8000;
-        }
+        RCHostInfo * rcHost() { return &info_; }
+
+        bool setChannel(unsigned channel);
 
         void resetCmd() { cmd_.clear(); }
 
@@ -150,7 +143,7 @@ namespace ite
         void setSequenceRecv(unsigned short value) { info_.device.RCCmd_sequence_recv = value; }
 
         unsigned short txID() const { return info_.device.clientTxDeviceID; }
-        unsigned short rxID() const { return info_.device.hostRxDeviceID; }
+        //unsigned short rxID() const { return info_.device.hostRxDeviceID; }
         unsigned frequency() const { return info_.transmissionParameter.frequency; }
         void setFrequency(unsigned freq) { info_.transmissionParameter.frequency = freq; }
 
@@ -174,7 +167,7 @@ namespace ite
         void print() const;
 
         //
-
+#if 0
         //void getTxDeviceAddressID()               { sendCmd(CMD_GetTxDeviceAddressIDInput); }
         void getTransmissionParameterCapabilities() { sendCmd(CMD_GetTransmissionParameterCapabilitiesInput); }
         void getTransmissionParameters()            { sendCmd(CMD_GetTransmissionParametersInput); }
@@ -281,7 +274,7 @@ namespace ite
         void createRule()                           { sendCmd(CMD_CreateRuleInput); }
         void modifyRule()                           { sendCmd(CMD_ModifyRuleInput); }
         void deleteRule()                           { sendCmd(CMD_DeleteRuleInput); }
-
+#endif
 
         // info
 
@@ -314,7 +307,7 @@ namespace ite
             return conf;
         }
 
-        bool setVideoEncConfig(unsigned streamNo, const TxVideoEncConfig& conf);
+        //bool setVideoEncConfig(unsigned streamNo, const TxVideoEncConfig& conf);
 
     private:
         RCHostInfo info_;
@@ -322,7 +315,7 @@ namespace ite
         unsigned short waitingCmd_;
         bool waitingResponse_;
         bool isActive_;
-
+#if 0
         void sendCmd(unsigned short command)
         {
             setWaiting(true, input2output(command));
@@ -332,14 +325,14 @@ namespace ite
             if (error)
                 throw "Can't send cmd";
         }
-
+#endif
         static std::string rcStr2str(const RCString& s) { return std::string((const char *)s.stringData, s.stringLength); }
 
-        DeviceInfo(const DeviceInfo& );
-        DeviceInfo& operator = (const DeviceInfo& );
+        TxDevice(const TxDevice& );
+        TxDevice& operator = (const TxDevice& );
     };
 
-    typedef std::shared_ptr<DeviceInfo> DeviceInfoPtr;
+    typedef std::shared_ptr<TxDevice> TxDevicePtr;
 }
 
 #endif

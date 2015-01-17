@@ -6,4 +6,9 @@ win32 {
   QMAKE_CXXFLAGS += /wd4250
 }
 
+unix
+{
+  QMAKE_CXXFLAGS += -Wno-unused-function
+}
+
 LIBS -= -lcommon

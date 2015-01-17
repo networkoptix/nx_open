@@ -56,7 +56,7 @@ namespace ite
 
     int MediaEncoder::getMediaUrl( char* urlBuf ) const
     {
-        strcpy( urlBuf, m_cameraManager->info().url );
+        strcpy( urlBuf, m_cameraManager->url() );
         return nxcip::NX_NO_ERROR;
     }
 

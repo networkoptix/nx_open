@@ -30,8 +30,9 @@ namespace ite
     class It930x
     {
     public:
-        static const unsigned MPEG_TS_PACKET_SIZE = 188;
-        static const unsigned DEFAULT_PACKETS_NUM = 816; // or 348
+        //static const unsigned MPEG_TS_PACKET_SIZE = 188;
+        static const unsigned DEFAULT_PACKETS_NUM = 816;
+        static const unsigned RETURN_CHANNEL_PID = 0x201;
 
         typedef enum
         {
@@ -45,15 +46,15 @@ namespace ite
         {
         public:
             It930Stream(const It930x * p)
-            :   parent_(p)
+            :   m_parent(p)
             {
-                if (DTV_StartCapture(parent_->handle_))
+                if (DTV_StartCapture(m_parent->m_handle))
                     throw "DTV_StartCapture";
             }
 
             ~It930Stream()
             {
-                DTV_StopCapture(parent_->handle_);
+                DTV_StopCapture(m_parent->m_handle);
             }
 
             ///
@@ -62,11 +63,11 @@ namespace ite
             ///
             int read(uint8_t * buf, int size)
             {
-                return DTV_GetData(parent_->handle_, size, buf);
+                return DTV_GetData(m_parent->m_handle, size, buf);
             }
 
         private:
-            const It930x * parent_;
+            const It930x * m_parent;
         };
 
         ///
@@ -76,21 +77,22 @@ namespace ite
             PIDTable
         } Option;
 
-        static unsigned bufferSize(unsigned numPackets = DEFAULT_PACKETS_NUM) { return numPackets * MPEG_TS_PACKET_SIZE; }
+        //static unsigned bufferSize(unsigned numPackets = DEFAULT_PACKETS_NUM) { return numPackets * MPEG_TS_PACKET_SIZE; }
 
         //
 
-        It930x(uint8_t number)
+        It930x(uint16_t rxID)
+        :   m_rxID(rxID)
         {
-            handle_ = DTV_DeviceOpen(ENDEAVOUR, number);
-            if (handle_ < 0)
+            m_handle = DTV_DeviceOpen(ENDEAVOUR, rxID);
+            if (m_handle < 0)
                 throw "DTV_DeviceOpen";
         }
 
         ~It930x()
         {
             m_devStream.reset();
-            DTV_DeviceClose(handle_);
+            DTV_DeviceClose(m_handle);
         }
 
         void enable(Option opt)
@@ -102,7 +104,7 @@ namespace ite
                 break;
 
             case PIDTable:
-                if (DTV_EnablePIDTable(handle_))
+                if (DTV_EnablePIDTable(m_handle))
                     throw "DTV_EnablePIDTable";
                 break;
             }
@@ -117,28 +119,28 @@ namespace ite
                 break;
 
             case PIDTable:
-                if (DTV_DisablePIDTable(handle_))
+                if (DTV_DisablePIDTable(m_handle))
                     throw "DTV_DisablePIDTable";
                 break;
             }
         }
 
         /// @param idx = 0..31
-        bool pidFilterAdd(uint8_t idx, short programID) { return 0 == DTV_AddPID(handle_, idx, programID); }
-        bool pidFilterRemove(uint8_t idx, short programID) { return 0 == DTV_RemovePID(handle_, idx, programID); }
-        bool pidFilterReset() { return 0 == DTV_ResetPIDTable(handle_); }
+        bool pidFilterAdd(uint8_t idx, short programID) { return 0 == DTV_AddPID(m_handle, idx, programID); }
+        bool pidFilterRemove(uint8_t idx, short programID) { return 0 == DTV_RemovePID(m_handle, idx, programID); }
+        bool pidFilterReset() { return 0 == DTV_ResetPIDTable(m_handle); }
 
         // both in KHz
         void lockChannel(unsigned frequency, unsigned bandwidth = Bandwidth_6M)
         {
             closeStream();
 
-            unsigned result = DTV_AcquireChannel(handle_, frequency, bandwidth);
+            unsigned result = DTV_AcquireChannel(m_handle, frequency, bandwidth);
             if (result)
                 throw "DTV_AcquireChannel";
 
             Bool isLocked = False;
-            result = DTV_IsLocked(handle_, &isLocked);
+            result = DTV_IsLocked(m_handle, &isLocked);
             if (result)
                 throw "DTV_IsLocked";
 
@@ -148,14 +150,14 @@ namespace ite
         bool isLocked() const
         {
             Bool locked = False;
-            unsigned result = DTV_IsLocked(handle_, &locked);
+            unsigned result = DTV_IsLocked(m_handle, &locked);
             return !result && (locked == True);
         }
 
         void statistic(uint8_t& quality, uint8_t& strength, bool& presented, bool& locked) const
         {
             DTVStatistic statisic;
-            unsigned result = DTV_GetStatistic(handle_, &statisic);
+            unsigned result = DTV_GetStatistic(m_handle, &statisic);
             if (result)
                 throw "DTV_GetStatistic";
 
@@ -170,7 +172,7 @@ namespace ite
             memset(&info, 0, sizeof(IteDriverInfo));
 
             DemodDriverInfo driverInfo;
-            int result = DTV_GetDriverInformation(handle_, &driverInfo);
+            int result = DTV_GetDriverInformation(m_handle, &driverInfo);
             if (result)
                 return;
 
@@ -182,13 +184,20 @@ namespace ite
             strncpy(info.supportHWInfo, (const char *)driverInfo.SupportHWInfo, 32);
         }
 
-        int read(uint8_t * buf, int size) { return m_devStream->read(buf, size); }
+        int read(uint8_t * buf, int size)
+        {
+            if (m_devStream)
+                return m_devStream->read(buf, size);
+            return -1;
+        }
+
         bool hasStream() const { return m_devStream.get(); }
         void openStream() { m_devStream.reset( new It930Stream(this) ); }
         void closeStream() { m_devStream.reset(); }
 
     private:
-        int handle_;
+        int m_handle;
+        uint16_t m_rxID;
         std::unique_ptr<It930Stream> m_devStream;
 
 #if 0 // TODO: use it instead of ID from unix device name
@@ -207,7 +216,7 @@ namespace ite
             pidFilter.newPID[0] = 0x1FFF;
             pidFilter.tableLen = (flag) ? 1 : 0;
 
-            unsigned result = DTV_NULLPacket_Pilter(handle_, &pidFilter);
+            unsigned result = DTV_NULLPacket_Pilter(m_handle, &pidFilter);
             if (result)
                 throw "NULL Packet Filter";
         }

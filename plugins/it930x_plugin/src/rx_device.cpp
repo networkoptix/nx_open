@@ -1,7 +1,8 @@
 #include <sstream>
+#include <thread>
 
 #include "rx_device.h"
-#include "camera_manager.h"
+#include "mpeg_ts_packet.h"
 
 namespace ite
 {
@@ -23,11 +24,11 @@ namespace ite
 
     //
 
-    RxDevice::RxDevice(unsigned id, RCShell * rc)
-    :   m_rxID(id),
+    RxDevice::RxDevice(unsigned id)
+    :   m_devReader( new DevReader() ),
+        m_rxID(id),
         m_txID(0),
         m_frequency(0),
-        m_rcShell(rc),
         m_signalQuality(0),
         m_signalStrength(0),
         m_signalPresent(false)
@@ -44,30 +45,31 @@ namespace ite
             m_device->info(m_rxInfo);
             return true;
         }
-        catch(const char * msg)
+        catch (const char * msg)
         {
+            m_devReader->setDevice(nullptr);
             m_device.reset();
         }
 
         return false;
     }
 
-    bool RxDevice::setChannel(unsigned short txID, unsigned chan)
-    {
-        if (isLocked())
-            return m_rcShell->setChannel(rxID(), txID, chan);
-        return false;
-    }
-
     bool RxDevice::lockCamera(unsigned short txID, unsigned freq)
     {
-        static const unsigned DELAY_MS = 20;
-        static const unsigned TIMES = (DeviceInfo::SEND_WAIT_TIME_MS * 2) / DELAY_MS;
+        typedef std::chrono::steady_clock Clock;
 
-        // could be locked in discovery thread: waiting
-        for (unsigned i = 0; i < TIMES; ++i)
+        // TODO: class Timer
+        static const unsigned DURATION_MS = TxDevice::SEND_WAIT_TIME_MS * 2;
+        static const unsigned DELAY_MS = 20;
+
+        std::chrono::milliseconds duration(DURATION_MS);
+        std::chrono::milliseconds delay(DELAY_MS);
+
+        // could be locked by Discovery, waiting
+        std::chrono::time_point<Clock> timeFinish = Clock::now() + duration;
+        while (Clock::now() < timeFinish)
         {
-            if (m_txInfo) // locked by another camera
+            if (m_txDev) // locked by another camera
                 return false;
 
             if (tryLockF(freq))
@@ -77,7 +79,7 @@ namespace ite
                 return true;
             }
 
-            usleep(DELAY_MS * 1000);
+            std::this_thread::sleep_for(delay);
         }
 
         return false;
@@ -88,7 +90,7 @@ namespace ite
         std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
         // prevent double locking at all (even with the same frequency)
-        if (isLockedUnsafe())
+        if (isLocked_u())
             return false;
 
         if (!m_device && !open())
@@ -98,12 +100,15 @@ namespace ite
         {
             m_device->lockChannel(freq);
             m_frequency = freq;
-
             stats();
+
+            if (good())
+                m_devReader->setDevice(m_device.get());
             return true;
         }
         catch (const char * msg)
         {
+            m_devReader->setDevice(nullptr);
             m_device.reset();
         }
 
@@ -117,8 +122,9 @@ namespace ite
         if (!m_device)
             return;
 
+        m_devReader->setDevice(nullptr); // [LibAV thread]: next readDevice() will return -1. Could close stream.
         m_device->closeStream();
-        m_txInfo.reset();
+        m_txDev.reset();
         m_frequency = 0;
         m_txID = 0;
     }
@@ -127,7 +133,7 @@ namespace ite
     {
         std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
-        return isLockedUnsafe();
+        return isLocked_u();
     }
 
     bool RxDevice::stats()
@@ -146,20 +152,117 @@ namespace ite
         }
         catch (const char * msg)
         {
+            m_devReader->setDevice(nullptr);
             m_device.reset();
         }
 
         return false;
     }
 
+    bool RxDevice::findTx(unsigned freq, uint16_t& outTxID)
+    {
+        bool retVal = false;
+        outTxID = 0;
+
+        if (tryLockF(freq))
+        {
+#if 1 // DEBUG
+            printf("searching TxIDs - rxID: %d; frequency: %d; quality: %d; strength: %d; presence: %d\n",
+                   rxID(), freq, quality(), strength(), present());
+#endif
+            if (good() && syncDevReader())
+            {
+                RCCommand cmd;
+                if (readRetChanCmd(cmd) && cmd.isOK())
+                {
+                    retVal = true;
+                    outTxID = cmd.txID();
+#if 1 // DEBUG
+                    printf("Rx: %d; Tx: %x (%d)\n", rxID(), outTxID, outTxID);
+#endif
+                }
+            }
+
+            unlockF();
+        }
+
+        return retVal;
+    }
+
+    // TODO: what if small buffer?
+    bool RxDevice::syncDevReader()
+    {
+        static const unsigned SYNC_COUNT = 2;
+
+        for (unsigned i = 0; i < SYNC_COUNT * MpegTsPacket::PACKET_SIZE; ++i)
+        {
+            if (m_devReader->synced())
+                return true;
+            uint8_t val;
+            m_devReader->read(&val, 1);
+        }
+        return false;
+    }
+
+    bool RxDevice::readRetChanCmd(RCCommand& cmd)
+    {
+        if (! m_devReader->synced())
+            return false;
+
+        typedef std::chrono::steady_clock Clock;
+
+        // TODO: class Timer
+        static const unsigned RET_CHAN_SEARCH_MS = TxDevice::SEND_WAIT_TIME_MS;
+        std::chrono::milliseconds duration(RET_CHAN_SEARCH_MS);
+        std::chrono::time_point<Clock> timeFinish = Clock::now() + duration;
+
+        uint8_t buf[MpegTsPacket::PACKET_SIZE];
+
+        while (Clock::now() < timeFinish)
+        {
+            cmd.clear();
+
+            if (readTSPacket(buf))
+            {
+                MpegTsPacket pkt(buf);
+                if (pkt.syncOK() && ! pkt.checkbit() && pkt.pid() == It930x::RETURN_CHANNEL_PID)
+                {
+                    cmd.add(pkt.payload(), pkt.payloadLen());
+                    if (cmd.isOK())
+                        return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    bool RxDevice::readTSPacket(uint8_t * buf)
+    {
+        return m_devReader->read(buf, MpegTsPacket::PACKET_SIZE) == MpegTsPacket::PACKET_SIZE;
+    }
+
+    // TODO
     void RxDevice::updateTxParams()
     {
-        m_txInfo = m_rcShell->device(m_rxID, m_txID);
-        if (m_txInfo)
+#if 0
+        m_txDev = m_rcShell->device(m_rxID, m_txID);
+        if (m_txDev)
         {
             /// @note async
             m_rcShell->updateTxParams(m_txInfo);
         }
+#endif
+    }
+
+    // TODO
+    bool RxDevice::setChannel(unsigned short txID, unsigned chan)
+    {
+#if 0
+        if (isLocked())
+            return m_rcShell->setChannel(rxID(), txID, chan);
+#endif
+        return false;
     }
 
     unsigned RxDevice::dev2id(const std::string& nm)

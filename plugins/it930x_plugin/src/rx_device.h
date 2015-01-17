@@ -6,7 +6,10 @@
 #include <mutex>
 
 #include "it930x.h"
-#include "rc_shell.h"
+#include "dev_reader.h"
+#include "tx_device.h"
+
+#undef RETURN_CHANNEL_PID
 
 namespace ite
 {
@@ -22,23 +25,22 @@ namespace ite
         constexpr static const char * DEVICE_PATTERN = "usb-it930x";
         static const unsigned MAX_ENCODERS = 4;
 
-        RxDevice(unsigned id, RCShell * rc);
+        RxDevice(unsigned id);
 
         unsigned short rxID() const { return m_rxID; }
         unsigned short txID() const { return m_txID; }
 
-        It930x * device() { return m_device.get(); }
-
-        unsigned freq4tx(unsigned short txID) const { return m_rcShell->lastTxFrequency(txID); }
+        DevReader * reader() { return m_devReader.get(); }
 
         bool lockCamera(unsigned short txID, unsigned frequency);
         bool tryLockF(unsigned freq);
         bool isLocked() const;
         void unlockF();
+        bool findTx(unsigned freq, uint16_t& outTxID);
 
         const IteDriverInfo rxDriverInfo() const { return m_rxInfo; }
-        const TxManufactureInfo txDriverInfo() const { return m_txInfo->txDeviceInfo(); }
-        const TxVideoEncConfig txVideoEncConfig(uint8_t encNo) const { return m_txInfo->txVideoEncConfig(encNo); }
+        const TxManufactureInfo txDriverInfo() const { return m_txDev->txDeviceInfo(); }
+        const TxVideoEncConfig txVideoEncConfig(uint8_t encNo) const { return m_txDev->txVideoEncConfig(encNo); }
 
         unsigned frequency() const { return m_frequency; }
         uint8_t strength() const { return m_signalStrength; }
@@ -61,10 +63,10 @@ namespace ite
     private:
         mutable std::mutex m_mutex;
         std::unique_ptr<It930x> m_device;
+        std::unique_ptr<DevReader> m_devReader;
         unsigned short m_rxID;
         unsigned short m_txID; // captured camera txID or 0
         unsigned m_frequency;
-        RCShell * m_rcShell;
 
         // info from DTV receiver
         uint8_t m_signalQuality;
@@ -73,13 +75,17 @@ namespace ite
         IteDriverInfo m_rxInfo;
 
         // info from RC
-        DeviceInfoPtr m_txInfo;
+        TxDevicePtr m_txDev;
 
-        bool isLockedUnsafe() const { return m_device.get() && m_device->hasStream(); }
+        bool isLocked_u() const { return m_device.get() && m_device->hasStream(); }
 
         bool open();
         bool stats();
         void updateTxParams();
+
+        bool syncDevReader();
+        bool readTSPacket(uint8_t * buf);
+        bool readRetChanCmd(RCCommand& cmd);
     };
 
     typedef std::shared_ptr<RxDevice> RxDevicePtr;

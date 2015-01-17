@@ -1,17 +1,20 @@
 #include <sys/time.h>
 
-#include "rc_device_info.h"
+#include "ret_chan/ret_chan_user_host.h"
+#include "ret_chan/ret_chan_user.h"
+
+#include "tx_device.h"
 
 namespace ite
 {
-    DeviceInfo::DeviceInfo(unsigned short rxID, unsigned short txID)
+    TxDevice::TxDevice(unsigned short txID, unsigned freq)
     :   waitingCmd_(CMD_GetTxDeviceAddressIDOutput),
         waitingResponse_(false),
         isActive_(false)
     {
         //RC_Init_RCHeadInfo(&info_.device, rxID, txID, 0xFFFF);
         info_.device.clientTxDeviceID = txID;
-        info_.device.hostRxDeviceID = rxID;
+        info_.device.hostRxDeviceID = 0xFFFF;
         info_.device.RCCmd_sequence = 0;
         info_.device.RCCmd_sequence_recv = 0xFFFF;
 
@@ -29,14 +32,16 @@ namespace ite
 
         User_Host_init(&info_);
         User_askUserSecurity(&info_.security);
+
+        setFrequency(freq);
     }
 
-    DeviceInfo::~DeviceInfo()
+    TxDevice::~TxDevice()
     {
         User_Host_uninit(&info_);
     }
 
-    RCError DeviceInfo::parseCommand()
+    RCError TxDevice::parseCommand()
     {
         if (! cmd().isOK())
             return RCERR_WRONG_CMD;
@@ -66,7 +71,7 @@ namespace ite
         return RCERR_NOT_PARSED;
     }
 
-    bool DeviceInfo::wait(int iWaitTime)
+    bool TxDevice::wait(int iWaitTime)
     {
         struct timeval startTime;
         gettimeofday(&startTime, NULL);
@@ -87,9 +92,10 @@ namespace ite
         return true;
     }
 
-    bool DeviceInfo::setChannel(unsigned channel)
+#if 0
+    bool TxDevice::setChannel(unsigned channel)
     {
-        unsigned freq = DeviceInfo::chanFrequency(channel);
+        unsigned freq = TxDevice::chanFrequency(channel);
 
         if (info_.transmissionParameterCapabilities.frequencyMin > 0 &&
             freq < info_.transmissionParameterCapabilities.frequencyMin)
@@ -101,18 +107,19 @@ namespace ite
 
         info_.transmissionParameter.frequency = freq;
 
-        setTransmissionParameters();
+        //setTransmissionParameters();
         return true;
     }
+#endif
 
-    bool DeviceInfo::setVideoEncConfig(unsigned streamNo, const TxVideoEncConfig& conf)
+#if 0
+    bool TxDevice::setVideoEncConfig(unsigned streamNo, const TxVideoEncConfig& conf)
     {
-    #if 0
+#if 0
         getVideoEncoderConfigurations();
         if (! wait())
             return false;
-    #endif
-
+#endif
         if (info_.videoEncConfig.configListSize < streamNo)
             return false;
 
@@ -156,13 +163,14 @@ namespace ite
             return false;
         return true;
     }
+#endif
 
-    void DeviceInfo::print() const
+    void TxDevice::print() const
     {
         printf("TX ID: %04x RX ID: %04x\n", info_.device.clientTxDeviceID, info_.device.hostRxDeviceID);
         printf("Frequency in KHz (ex. 666000): %u\n", info_.transmissionParameter.frequency);
         printf("Bandwidth in MHz (ex. 1~8): %d\n", info_.transmissionParameter.bandwidth);
-    #if 0
+#if 0
         printf("Constellation (0: QPSK, 1: 16QAM, 2: 64QAM): %d\n", info_.transmissionParameter.constellation);
         printf("Transmission Mode (0: 2K, 1: 8K 2: 4K): %d\n", info_.transmissionParameter.FFT);
         printf("Code Rate (0: 1/2, 1: 2/3, 2: 3/4, 3:5/6, 4: 7/8): %d\n", info_.transmissionParameter.codeRate);
@@ -175,6 +183,6 @@ namespace ite
         printf("Segmentation Mode (ex: 0: ISDB-T Full segmentation mode 1: ISDB-T 1+12 segmentation mode): %d\n", info_.transmissionParameter.segmentationMode);
         printf("One-Seg Constellation (ex: 0: QPSK, 1: 16QAM, 2: 64QAM ): %d\n", info_.transmissionParameter.oneSeg_Constellation);
         printf("One-Seg Code Rate (ex: 0: 1/2, 1: 2/3, 2: 3/4, 3: 5/6, 4: 7/8 ): %d\n", info_.transmissionParameter.oneSeg_CodeRate);
-    #endif
+#endif
     }
 }

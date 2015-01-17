@@ -4,6 +4,10 @@
 #include <ctime>
 #include <vector>
 #include <chrono>
+#include <mutex>
+
+#include "it930x.h"
+#include "mpeg_ts_packet.h"
 
 #if 0
 #include <ratio>
@@ -70,14 +74,38 @@ namespace ite
     class DevReader
     {
     public:
-        DevReader(It930x * dev, size_t size)
+        static const unsigned MIN_PACKETS_COUNT = 5;
+
+        DevReader(It930x * dev = nullptr, size_t size = It930x::DEFAULT_PACKETS_NUM * MpegTsPacket::PACKET_SIZE)
         :   m_device(dev),
             m_size(size),
             m_pos(0),
             m_timerStarted( false ),
             m_timerFinished( false )
         {
-            readDev();
+            if (m_size < MIN_PACKETS_COUNT * MpegTsPacket::PACKET_SIZE)
+                m_size = MIN_PACKETS_COUNT * MpegTsPacket::PACKET_SIZE;
+        }
+
+        bool hasDevice() const
+        {
+            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+            return m_device == nullptr;
+        }
+
+        void setDevice(It930x * dev)
+        {
+            {
+                std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+                if (m_device != dev)
+                    m_device = dev;
+            }
+
+            clear();
+            if (dev)
+                readDevice();
         }
 
         int read(uint8_t* buf, int bufSize)
@@ -94,7 +122,7 @@ namespace ite
             buf += hasRead;
             bufSize -= hasRead;
 
-            int ret = readDev();
+            int ret = readDevice();
             if (ret < 0)
                 return ret;
             if (ret == 0)
@@ -107,6 +135,22 @@ namespace ite
         {
             m_buf.clear();
             m_pos = 0;
+            m_timerStarted = m_timerFinished = false;
+        }
+
+        bool synced() const
+        {
+            if (m_buf.size() < MIN_PACKETS_COUNT * MpegTsPacket::PACKET_SIZE)
+                return false;
+
+            uint8_t shift = m_pos % MpegTsPacket::PACKET_SIZE;
+            if (MpegTsPacket(&m_buf[shift] + MpegTsPacket::PACKET_SIZE * 0).syncOK() &&
+                MpegTsPacket(&m_buf[shift] + MpegTsPacket::PACKET_SIZE * 1).syncOK() &&
+                MpegTsPacket(&m_buf[shift] + MpegTsPacket::PACKET_SIZE * 2).syncOK() &&
+                MpegTsPacket(&m_buf[shift] + MpegTsPacket::PACKET_SIZE * 3).syncOK())
+                return true;
+
+            return false;
         }
 
         void startTimer(const std::chrono::milliseconds& duration)
@@ -125,9 +169,10 @@ namespace ite
         bool timerAlive() const { return m_timerStarted && !m_timerFinished; }
 
     private:
+        mutable std::mutex m_mutex;
         It930x * m_device;
         std::vector<uint8_t> m_buf;
-        const size_t m_size;
+        size_t m_size;
         size_t m_pos;
         Timer m_timer;
         bool m_timerStarted;
@@ -136,7 +181,7 @@ namespace ite
         const uint8_t* data() const { return &m_buf[m_pos]; }
         int size() const { return m_buf.size() - m_pos; }
 
-        int readDev()
+        int readDevice()
         {
 #if 1       // HACK: return from libAV read cycle
             if (m_timerFinished)
@@ -148,6 +193,11 @@ namespace ite
                 return -1;
             }
 #endif
+            std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+            if (! m_device || ! m_device->hasStream())
+                return -1;
+
             m_buf.resize(m_size);
             int ret = m_device->read( &(*m_buf.begin()), m_buf.size() );
             if (ret < 0) {
@@ -161,164 +211,6 @@ namespace ite
             m_pos = 0;
             return ret;
         }
-    };
-
-    //!
-    class ReadThread
-    {
-    public:
-        static const unsigned PACKETS_QUEUE_SIZE = 32;  // ~30fps * 1s
-        static const unsigned MAX_PTS_DRIFT = 63000;    // 700 ms
-        static const unsigned WAIT_LIBAV_FRAME_DURATION_S = 1;
-
-        ReadThread(CameraManager* camera = nullptr, LibAV* lib = nullptr)
-        :
-            m_stopMe(false),
-            m_camera( camera ),
-            m_libAV( lib )
-        {
-        }
-
-        ReadThread(ReadThread&& obj)
-        :
-            m_stopMe(false),
-            m_camera( obj.m_camera ),
-            m_libAV( obj.m_libAV )
-        {
-        }
-
-        void operator () ()
-        {
-            static std::chrono::seconds dura( WAIT_LIBAV_FRAME_DURATION_S );
-
-            if (m_camera)
-                m_camera->setThreadObj( this );
-
-            DevReader * devReader = m_camera->devReader();
-
-            while (!m_stopMe)
-            {
-                devReader->startTimer( dura );
-
-                unsigned streamNum;
-                std::unique_ptr<VideoPacket> packet = nextDevPacket( streamNum );
-
-                if (!devReader->timerAlive()) // break even if the packet is correct
-                    break;
-
-                if (!packet)
-                    continue;
-
-                std::shared_ptr<VideoPacketQueue> queue = m_camera->queue( streamNum );
-                if (!queue)
-                    continue;
-
-                {
-                    std::lock_guard<std::mutex> lock( queue->mutex() ); // LOCK
-
-                    if (queue->size() >= PACKETS_QUEUE_SIZE)
-                    {
-                        queue->pop_front();
-                        queue->incLost();
-                    }
-
-                    std::shared_ptr<VideoPacket> sp( packet.release() );
-                    queue->push_back(sp);
-                }
-            }
-
-            m_camera->setThreadObj( nullptr );
-        }
-
-        void stop() { m_stopMe.store( true ); }
-
-    private:
-        typedef int64_t PtsT;
-
-        struct PtsTime
-        {
-            PtsT pts;
-            time_t sec;
-
-            PtsTime()
-            :
-                pts(0)
-            {}
-        };
-
-        static const unsigned USEC_IN_SEC = 1000*1000;
-
-        std::atomic_bool m_stopMe;
-        CameraManager* m_camera;
-        LibAV* m_libAV;
-        std::vector<PtsTime> m_times;
-        std::vector<PtsT> m_ptsPrev;
-
-        std::unique_ptr<VideoPacket> nextDevPacket(unsigned& streamNum)
-        {
-            AVPacket avPacket;
-            double timeBase = 1.0;
-
-            {
-                std::lock_guard<std::mutex> lock( m_libAV->mutex() ); // LOCK
-
-                if (!m_libAV->isOK())
-                    return std::unique_ptr<VideoPacket>();
-
-                if (m_libAV->nextFrame( &avPacket ) < 0)
-                {
-                    LibAV::freePacket( &avPacket );
-                    return std::unique_ptr<VideoPacket>();
-                }
-
-                if (avPacket.flags & AV_PKT_FLAG_CORRUPT)
-                {
-                    if ( !m_libAV->discardCorrupt() )
-                        LibAV::freePacket( &avPacket );
-                    return std::unique_ptr<VideoPacket>();
-                }
-
-                streamNum = avPacket.stream_index;
-                timeBase = m_libAV->secTimeBase( streamNum );
-            }
-
-            std::unique_ptr<VideoPacket> packet( new VideoPacket( avPacket.data, avPacket.size ) );
-            if (avPacket.flags & AV_PKT_FLAG_KEY)
-                packet->setKeyFlag();
-
-            packet->setTime( usecTime( streamNum, avPacket.pts, timeBase ) );
-
-            LibAV::freePacket( &avPacket );
-            return packet;
-        }
-
-        uint64_t usecTime(unsigned idx, PtsT pts, double timeBase)
-        {
-            if (m_times.size() <= idx)
-            {
-                m_times.resize( idx + 1 );
-                m_ptsPrev.resize( idx + 1, 0 );
-            }
-
-            PtsTime& ptsTime = m_times[idx];
-            const PtsT& ptsPrev = m_ptsPrev[idx];
-
-            PtsT drift = pts - ptsPrev;
-            if (drift < 0) // abs
-                drift = -drift;
-
-            if (!ptsPrev || drift > MAX_PTS_DRIFT)
-            {
-                ptsTime.pts = pts;
-                ptsTime.sec = time(NULL);
-            }
-
-            m_ptsPrev[idx] = pts;
-            return (ptsTime.sec + (pts - ptsTime.pts) * timeBase) * USEC_IN_SEC;
-        }
-
-        ReadThread(const ReadThread&);
-        ReadThread& operator = (const ReadThread&);
     };
 }
 

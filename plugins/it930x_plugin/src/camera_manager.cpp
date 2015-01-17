@@ -1,6 +1,7 @@
 #include <string>
 #include <chrono>
 #include <atomic>
+#include <ctime>
 
 #include "camera_manager.h"
 #include "media_encoder.h"
@@ -8,6 +9,7 @@
 #include "video_packet.h"
 #include "libav_wrap.h"
 #include "dev_reader.h"
+#include "dev_read_thread.h"
 
 #include "discovery_manager.h"
 
@@ -170,8 +172,9 @@ namespace ite
 
     DEFAULT_REF_COUNTER(CameraManager)
 
-    CameraManager::CameraManager(const nxcip::CameraInfo& info)
+    CameraManager::CameraManager(const nxcip::CameraInfo& info, const DeviceMapper * devMapper)
     :   m_refManager( DiscoveryManager::refManager() ),
+        m_devMapper(devMapper),
         m_waitStop(false),
         m_stopTime(0),
         m_threadObject( nullptr ),
@@ -179,11 +182,11 @@ namespace ite
         m_loading(false),
         m_errorStr( nullptr )
     {
-        memcpy( &m_info, &info, sizeof(nxcip::CameraInfo) );
+        updateCameraInfo(info);
 
         unsigned frequency;
         std::vector<unsigned short> rxIDs;
-        DiscoveryManager::parseInfo(info, m_txID, frequency, rxIDs);
+        DeviceMapper::parseInfo(info, m_txID, frequency, rxIDs);
     }
 
     CameraManager::~CameraManager()
@@ -386,7 +389,7 @@ namespace ite
 
         if (strValue.size())
         {
-            unsigned strSize = strValue.size();
+            int strSize = strValue.size();
             if (*valueBufSize < strSize)
             {
                 *valueBufSize = strSize;
@@ -458,8 +461,8 @@ namespace ite
     {
         if (m_rxDevice && m_rxDevice->frequency())
         {
-            unsigned chan = DeviceInfo::freqChannel(m_rxDevice->frequency());
-            if (chan < DeviceInfo::CHANNELS_NUM)
+            unsigned chan = TxDevice::freqChannel(m_rxDevice->frequency());
+            if (chan < TxDevice::CHANNELS_NUM)
                 s = PARAM_CHANNELS[chan];
         }
     }
@@ -497,7 +500,7 @@ namespace ite
     {
         /// @warning need value in front of string
         unsigned chan = str2num(s);
-        if (chan >= DeviceInfo::CHANNELS_NUM)
+        if (chan >= TxDevice::CHANNELS_NUM)
             return false;
 
         if (m_rxDevice)
@@ -653,7 +656,7 @@ namespace ite
         if (! m_txID)
             return STATE_NO_CAMERA;
 
-        if (m_supportedRxDevices.empty() || ! m_rxDevice)
+        if (! m_rxDevice)
             return STATE_NO_RECEIVER;
 
         if (! m_rxDevice->frequency())
@@ -711,13 +714,10 @@ namespace ite
     {
         m_loading = true;
 
-        // try light reload
-        stopDevReader();
-        if (initDevReader())
+        stopEncoders();
+        if (m_rxDevice && m_rxDevice->isLocked())
         {
             initEncoders();
-
-            // soft reload failed, change state to hard reload (next time)
             if (! m_hasThread)
                 freeDevice();
         }
@@ -754,87 +754,35 @@ namespace ite
         if (m_openedStreams.size() && ! force)
             return false;
 
-        stopDevReader();
+        stopEncoders();
         freeDevice();
         return true;
     }
 
-    void CameraManager::updateCameraInfo(unsigned frequency)
+    bool CameraManager::stopIfNeedIt()
     {
-        std::vector<unsigned short> rxIDs;
-        rxIDs.reserve(m_supportedRxDevices.size() + m_newRxDevices.size());
+        // TODO: class timer
+        static const unsigned WAIT_TO_STOP_S = 30;
 
-        for (size_t i = 0; i < m_supportedRxDevices.size(); ++i)
-            rxIDs.push_back(m_supportedRxDevices[i]->rxID());
+        if (m_waitStop)
+        {
+            if (! m_stopTime)
+                m_stopTime = time(NULL);
 
-        for (size_t i = 0; i < m_newRxDevices.size(); ++i)
-            rxIDs.push_back(m_newRxDevices[i]->rxID());
+            if ((time(NULL) - m_stopTime) > WAIT_TO_STOP_S)
+                return stopStreams();
+        }
 
-        DiscoveryManager::updateInfoAux(m_info, m_txID, frequency, rxIDs);
+        return false;
     }
 
-    // from DiscoveryManager.findCameras() thread
-    void CameraManager::addRxDevices(const std::vector<RxDevicePtr>& devs)
+    void CameraManager::updateCameraInfo(const nxcip::CameraInfo& info)
     {
-        if (devs.empty())
-            return;
-
-        if (m_reloadMutex.try_lock()) // LOCK
-        {
-            for (auto it = devs.begin(); it != devs.end(); ++it)
-                addRxDevice(*it);
-
-            m_reloadMutex.unlock();
-        }
-    }
-
-    void CameraManager::addRxDevice(RxDevicePtr dev)
-    {
-        for (auto it = m_supportedRxDevices.begin(); it != m_supportedRxDevices.end(); ++it)
-        {
-            if ((*it)->rxID() == dev->rxID())
-                return;
-        }
-
-        for (auto it = m_newRxDevices.begin(); it != m_newRxDevices.end(); ++it)
-        {
-            if ((*it)->rxID() == dev->rxID())
-                return;
-        }
-
-        m_newRxDevices.push_back(dev);
-    }
-
-    void CameraManager::updateRxDevices(unsigned freq)
-    {
-        for (auto it = m_newRxDevices.begin(); it != m_newRxDevices.end(); ++it)
-        {
-            if ((*it)->tryLockF(freq))
-            {
-                if ((*it)->good())
-                    m_supportedRxDevices.push_back(*it);
-
-                (*it)->unlockF();
-            }
-        }
-
-        m_newRxDevices.clear();
+        memcpy(&m_info, &info, sizeof(nxcip::CameraInfo));
     }
 
     bool CameraManager::captureAnyRxDevice()
     {
-        // HACK: need camera's frequency (channel)
-        unsigned freq = 0;
-        if (m_supportedRxDevices.size())
-            freq = m_supportedRxDevices[0]->freq4tx(m_txID);
-        else if (m_newRxDevices.size())
-            freq = m_newRxDevices[0]->freq4tx(m_txID);
-        if (freq == 0)
-            return false;
-
-        updateRxDevices(freq);
-        updateCameraInfo(freq); // add new
-
         // reopen same device
         if (m_rxDevice)
         {
@@ -847,8 +795,7 @@ namespace ite
             freeDevice();
         }
 
-        RxDevicePtr dev = captureFreeRxDevice(freq);
-        updateCameraInfo(freq); // remove old
+        RxDevicePtr dev = captureFreeRxDevice();
 
         if (dev)
         {
@@ -859,17 +806,20 @@ namespace ite
         return false;
     }
 
-    RxDevicePtr CameraManager::captureFreeRxDevice(unsigned freq)
+    RxDevicePtr CameraManager::captureFreeRxDevice()
     {
-#define REMOVE_RX_DEVS 1
-#if REMOVE_RX_DEVS
-        std::vector<RxDevicePtr> good;
-        good.reserve(m_supportedRxDevices.size());
-#endif
         RxDevicePtr best;
-        for (size_t i = 0; i < m_supportedRxDevices.size(); ++i)
+
+        unsigned freq = m_devMapper->getFreq4Tx(m_txID);
+        if (freq == 0)
+            return best;
+
+        std::vector<RxDevicePtr> supportedRxDevices;
+        m_devMapper->getRx4Tx(m_txID, supportedRxDevices);
+
+        for (size_t i = 0; i < supportedRxDevices.size(); ++i)
         {
-            RxDevicePtr dev = m_supportedRxDevices[i];
+            RxDevicePtr dev = supportedRxDevices[i];
 
             bool isGood = true;
             if (dev->lockCamera(m_txID, freq)) // delay inside
@@ -885,16 +835,8 @@ namespace ite
                 if (dev)
                     dev->unlockF();
             }
-#if REMOVE_RX_DEVS
-            if (isGood)
-                good.push_back(dev);
-#endif
         }
 
-#if REMOVE_RX_DEVS
-        if (good.size() < m_supportedRxDevices.size())
-            m_supportedRxDevices.swap(good);
-#endif
         return best;
     }
 
@@ -908,39 +850,27 @@ namespace ite
         stopTimer();
     }
 
-    bool CameraManager::initDevReader()
-    {
-        if (!m_rxDevice || !m_rxDevice->isLocked())
-            return false;
-
-        static const unsigned DEFAULT_FRAME_SIZE = It930x::DEFAULT_PACKETS_NUM * It930x::MPEG_TS_PACKET_SIZE;
-
-        m_devReader.reset( new DevReader( m_rxDevice->device(), DEFAULT_FRAME_SIZE ) );
-        return true;
-    }
-
-    void CameraManager::stopDevReader()
-    {
-        stopEncoders();
-        m_devReader.reset();
-    }
-
     void CameraManager::initEncoders()
     {
-        stopEncoders();
-
         static const float HARDCODED_FPS = 30.0f;
         static const unsigned WAIT_LIBAV_INIT_S = 15;
         static std::chrono::seconds dura( WAIT_LIBAV_INIT_S );
 
-        m_devReader->clear();
-        m_devReader->startTimer( dura );
+        if (!m_rxDevice || !m_rxDevice->isLocked())
+            return;
 
-        auto up = std::unique_ptr<LibAV>( new LibAV(m_devReader.get(), readDevice) );
+        DevReader * devReader = m_rxDevice->reader();
+        if (!devReader)
+            return;
 
-        if (up && up->isOK() && m_devReader->timerAlive())
+        devReader->clear();
+        devReader->startTimer( dura );
+
+        auto up = std::unique_ptr<LibAV>( new LibAV(devReader, readDevice) );
+
+        if (up && up->isOK() && devReader->timerAlive())
         {
-            m_devReader->stopTimer();
+            devReader->stopTimer();
 
             m_libAV.reset( up.release() );
             unsigned streamsCount = m_libAV->streamsCount();
@@ -980,7 +910,7 @@ namespace ite
             {
                 try
                 {
-                    m_readThread = std::thread( ReadThread(this, m_libAV.get()) );
+                    m_readThread = std::thread( DevReadThread(this, m_libAV.get()) );
                     m_hasThread = true;
                 }
                 catch (std::system_error& )

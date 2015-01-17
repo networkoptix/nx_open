@@ -5,9 +5,6 @@
 #include <utility>
 
 #include "ret_chan/ret_chan_cmd.h"
-#include "ret_chan/ret_chan_cmd_host.h"
-#include "ret_chan/ret_chan_user.h"
-#include "ret_chan/ret_chan_user_host.h"
 
 namespace ite
 {
@@ -21,7 +18,14 @@ namespace ite
             buffer_.reserve(RcCmdMaxSize);
         }
 
-        unsigned add(Byte * data, unsigned len)
+        static unsigned short input2outputID(unsigned short cmdID)
+        {
+            if (cmdID >= CMD_GetMetadataSettingsInput)
+                return cmdID | 0xF000;
+            return cmdID | 0x8000;
+        }
+
+        unsigned add(const Byte * data, unsigned len)
         {
             for (unsigned i = 0; buffer_.size() < RcCmdMaxSize && len > 0; ++i, --len)
                 buffer_.push_back(data[i]);
