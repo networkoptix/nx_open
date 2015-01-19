@@ -538,8 +538,9 @@ class ClusterTest():
                             resultJsonObject = json.loads(result)
                         compareResult = compareJson( json.loads(content) , resultJsonObject )
                         if compareResult.hasDiff():
+                            print "Server:%s has different status with server:%s on method:%s" % (address,resultAddr,methodName)
                             print compareResult.errorInfo()
-                        return (False,"Failed to sync")
+                            return (False,"Failed to sync")
             response.close()
         print "Method:%s is sync in cluster" % (methodName)
         print "\n------------------------------------------"
