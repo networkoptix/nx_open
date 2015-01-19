@@ -22,10 +22,11 @@ QnUuid::QnUuid( const QString& text )
 {
     if( !text.isEmpty() )
     {
-        m_stringRepresentation = text;
+        if (text.size() == 38)
+            m_stringRepresentation = text;
         assert(
-            text.size() == 36 ||    //{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
-            text.size() == 38 );    //xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+            text.size() == 36 ||    // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+            text.size() == 38 );    //{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
     }
 }
 

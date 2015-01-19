@@ -504,6 +504,7 @@ namespace ec2
         void loadResourceTypeXML(const QString& fileName, ApiResourceTypeDataList& data);
         bool removeServerStatusFromTransactionLog();
         bool tuneDBAfterOpen();
+        bool updateCameraHistoryGuids();
     private:
         QnResourceFactory* m_resourceFactory;
         QnUuid m_storageTypeId;
