@@ -499,10 +499,17 @@ bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect
         mediaLayout.setWidth(qMax(mediaLayout.width(), 1));
         mediaLayout.setHeight(qMax(mediaLayout.height(), 1));
 
-        qreal targetAr = paintRect.width() / paintRect.height();
-        qreal sourceAr = isServer
-                ? targetAr
-                : ((qreal)pixmap.width()*mediaLayout.width()) / (pixmap.height() * mediaLayout.height());
+        QRectF sourceRect = isServer
+            ? pixmap.rect()
+            : QRectF(0, 0, pixmap.width()*mediaLayout.width(), pixmap.height() * mediaLayout.height());
+
+         if (!qFuzzyIsNull(data.rotation)) {
+             sourceRect = QnGeometry::rotated(sourceRect, data.rotation);
+             //targetRect = QnGeometry::rotated(targetRect, data.rotation);
+         }
+
+        qreal targetAr = QnGeometry::aspectRatio(paintRect);
+        qreal sourceAr = QnGeometry::aspectRatio(sourceRect);
 
         qreal x, y, w, h;
         if (sourceAr > targetAr) {
@@ -516,13 +523,14 @@ bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect
             w = h * sourceAr;
             x = (paintRect.width() - w) * 0.5 + paintRect.left();
         }
+        QRectF targetRect(x, y, w, h);
 
-        auto drawPixmap = [painter, &pixmap, &mediaLayout, x, y, w, h]() {
-            int wh = w / mediaLayout.width();
-            int ht = h / mediaLayout.height(); 
+        auto drawPixmap = [painter, &pixmap, &mediaLayout, &targetRect]() {
+            int wh = targetRect.width() / mediaLayout.width();
+            int ht = targetRect.height() / mediaLayout.height(); 
             for (int i = 0; i < mediaLayout.width(); ++i)
                 for (int j = 0; j < mediaLayout.height(); ++j)
-                    painter->drawPixmap(QRectF(x + wh*i, y + ht*j, wh, ht).toRect(), pixmap);
+                    painter->drawPixmap(QRectF(targetRect.left() + wh*i, targetRect.top() + ht*j, wh, ht).toRect(), pixmap);
         };
 
         if (!qFuzzyIsNull(data.rotation)) {
@@ -530,6 +538,7 @@ bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect
             painter->translate(paintRect.center());
             painter->rotate(data.rotation);
             painter->translate(-paintRect.center());
+            targetRect = QnGeometry::rotated(targetRect, data.rotation);
             drawPixmap();
         } else {
             drawPixmap();

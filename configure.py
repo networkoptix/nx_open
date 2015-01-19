@@ -74,7 +74,7 @@ if __name__ == '__main__':
 
     build_branch = os.popen('hg branch').read()[:-1]
     
-    print '\n++++++++++++++++++++++++ CONFUGURED ++++++++++++++++++++++++\n'
+    print '\n++++++++++++++++++++++++ CONFIGURED ++++++++++++++++++++++++\n'
     print >> sys.stderr, 'customization is: %s' % build_customization
     print >> sys.stderr, 'configuration is: %s' % build_configuration
     print >> sys.stderr, 'build_arch is: %s' % build_arch

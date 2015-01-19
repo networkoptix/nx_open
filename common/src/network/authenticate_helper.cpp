@@ -141,7 +141,31 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
         const nx_http::StringType& authorization = isProxy
             ? nx_http::getHeaderValue( request.headers, "Proxy-Authorization" )
             : nx_http::getHeaderValue( request.headers, "Authorization" );
-        if (authorization.isEmpty()) {
+        if( authorization.isEmpty() )
+        {
+            const nx_http::StringType nxUserName = nx_http::getHeaderValue( request.headers, "NX-User-Name" );
+            if( !nxUserName.isEmpty() )
+            {
+                QMutexLocker lock(&m_mutex);
+                for( const QnUserResourcePtr& user: m_users )
+                {
+                    if( user->getName().toUtf8().toLower() == nxUserName )
+                    {
+                        if( user->getDigest().isEmpty() )
+                        {
+                            //using basic authentication to allow fill user's digest
+                            nx_http::insertOrReplaceHeader(
+                                &response.headers,
+                                nx_http::HttpHeader(
+                                    isProxy ? "Proxy-Authenticate" : "WWW-Authenticate",
+                                    lit("Basic realm=%1").arg(REALM).toLatin1() ) );
+                            return false;
+                        }
+                        break;
+                    }
+                }
+            }
+
             addAuthHeader(response, isProxy);
             return false;
         }

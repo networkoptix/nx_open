@@ -42,11 +42,10 @@ QnSecurityCamResource::QnSecurityCamResource():
 {
     addFlags(Qn::live_cam);
 
-    connect(this, &QnResource::parentIdChanged, this, &QnSecurityCamResource::at_parentIdChanged, Qt::DirectConnection);
-    connect(this, SIGNAL(motionRegionChanged(const QnResourcePtr &)), this, SLOT(at_motionRegionChanged()), Qt::DirectConnection);
+    connect(this, &QnResource::initializedChanged, this, &QnSecurityCamResource::at_initializedChanged, Qt::DirectConnection);
+    connect(this, &QnSecurityCamResource::motionRegionChanged, this, &QnSecurityCamResource::at_motionRegionChanged, Qt::DirectConnection);
 
     QnMediaResource::initMediaResource();
-
 }
 
 QString QnSecurityCamResource::getName() const
@@ -158,6 +157,7 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
 
 void QnSecurityCamResource::initializationDone() 
 {
+    //m_initMutex is locked down the stack
     QnNetworkResource::initializationDone();
     if( m_inputPortListenerCount.load() > 0 )
         startInputPortMonitoringAsync( std::function<void(bool)>() );
@@ -329,8 +329,10 @@ void QnSecurityCamResource::inputPortListenerAttached() {
     QMutexLocker lk( &m_initMutex );
 
     //if camera is not initialized yet, delayed input monitoring will start on initialization completion
-    if( m_inputPortListenerCount.fetchAndAddOrdered( 1 ) == 0 )
+    const int inputPortListenerCount = m_inputPortListenerCount.fetchAndAddOrdered( 1 );
+    if( isInitialized() && (inputPortListenerCount == 0) )
         startInputPortMonitoringAsync( std::function<void(bool)>() );
+    //if resource is not initialized, input port monitoring will start just after initInternal completion
 }
 
 void QnSecurityCamResource::inputPortListenerDetached() {
@@ -346,10 +348,10 @@ void QnSecurityCamResource::inputPortListenerDetached() {
         m_inputPortListenerCount.fetchAndAddOrdered( 1 );   //no reduce below 0
 }
 
-void QnSecurityCamResource::at_parentIdChanged() 
+void QnSecurityCamResource::at_initializedChanged() 
 {
-    if(getParentId() != qnCommon->moduleGUID())
-        stopInputPortMonitoringAsync();  //camera moved to different server, stopping input monitoring
+    if( !isInitialized() )  //e.g., camera has been moved to a different server
+        stopInputPortMonitoringAsync();  //stopping input monitoring
 }
 
 void QnSecurityCamResource::at_motionRegionChanged()

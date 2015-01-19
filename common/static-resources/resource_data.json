@@ -1,19 +1,19 @@
 {
-    "__comment__": "                                                \
-    Get width from here:                                            \
-    http://en.wikipedia.org/wiki/Image_sensor_format                \
-    Note: 1/2.8 is 5.2mm x 3.9mm, D=6.5mm.                          \
-                                                                    \
-    Calculate width-based crop factor C = 36/W.                     \
-                                                                    \
-    Multiply focal lengths by width-based crop factor to get        \
-    width-based equivalent focal length.                            \
-																	\
-    Another important note.                                         \    
-    If the camera overshoots on movement, then it means that 35mm   \
-    fov in this file should be increased.                           \
-    If it undershoots, then 35mm fov should be decreased.           \
-    ",
+    "__comment__": [
+    "Get width from here:                                            ",
+    "http://en.wikipedia.org/wiki/Image_sensor_format                ",
+    "Note: 1/2.8 is 5.2mm x 3.9mm, D=6.5mm.                          ",
+    "                                                                ",
+    "Calculate width-based crop factor C = 36/W.                     ",
+    "                                                                ",                                                                    
+    "Multiply focal lengths by width-based crop factor to get        ",
+    "width-based equivalent focal length.                            ",
+    "                                                                ",
+    "Another important note.                                         ",  
+    "If the camera overshoots on movement, then it means that 35m    ",
+    "fov in this file should be increased.                           ",
+    "If it undershoots, then 35mm fov should be decreased.           "
+    ],
     
     "version": "1.0",
     "data": [
