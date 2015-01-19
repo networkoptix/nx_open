@@ -503,34 +503,13 @@ bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect
             ? pixmap.rect()
             : QRectF(0, 0, pixmap.width()*mediaLayout.width(), pixmap.height() * mediaLayout.height());
 
-         if (!qFuzzyIsNull(data.rotation)) {
-             sourceRect = QnGeometry::rotated(sourceRect, data.rotation);
-             //targetRect = QnGeometry::rotated(targetRect, data.rotation);
-         }
-
-        qreal targetAr = QnGeometry::aspectRatio(paintRect);
-        qreal sourceAr = QnGeometry::aspectRatio(sourceRect);
-
-        qreal x, y, w, h;
-        if (sourceAr > targetAr) {
-            w = paintRect.width();
-            x = paintRect.left();
-            h = w / sourceAr;
-            y = (paintRect.height() - h) * 0.5 + paintRect.top();
-        } else {
-            h = paintRect.height();
-            y = paintRect.top();
-            w = h * sourceAr;
-            x = (paintRect.width() - w) * 0.5 + paintRect.left();
-        }
-        QRectF targetRect(x, y, w, h);
-
-        auto drawPixmap = [painter, &pixmap, &mediaLayout, &targetRect]() {
-            int wh = targetRect.width() / mediaLayout.width();
-            int ht = targetRect.height() / mediaLayout.height(); 
-            for (int i = 0; i < mediaLayout.width(); ++i)
+        auto drawPixmap = [painter, &pixmap, &mediaLayout](const QRectF &targetRect) {
+            int width = targetRect.width() / mediaLayout.width();
+            int height = targetRect.height() / mediaLayout.height();
+            for (int i = 0; i < mediaLayout.width(); ++i) {
                 for (int j = 0; j < mediaLayout.height(); ++j)
-                    painter->drawPixmap(QRectF(targetRect.left() + wh*i, targetRect.top() + ht*j, wh, ht).toRect(), pixmap);
+                    painter->drawPixmap(QRectF(targetRect.left() + width * i, targetRect.top() + height * j, width, height).toRect(), pixmap);
+            }
         };
 
         if (!qFuzzyIsNull(data.rotation)) {
@@ -538,10 +517,9 @@ bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect
             painter->translate(paintRect.center());
             painter->rotate(data.rotation);
             painter->translate(-paintRect.center());
-            targetRect = QnGeometry::rotated(targetRect, data.rotation);
-            drawPixmap();
+            drawPixmap(QnGeometry::encloseRotatedGeometry(paintRect, QnGeometry::aspectRatio(sourceRect), data.rotation));
         } else {
-            drawPixmap();
+            drawPixmap(paintRect);
         }
         return true;
     }
