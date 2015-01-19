@@ -7,7 +7,6 @@ angular.module('webadminApp')
         var cacheCurrentUser = null;
 
         $cookies.Authorization = 'Digest';
-        $cookies.response = null;
 
         function getSettings(){
             return $http.get('/api/moduleInformation?salt=' + (new Date()).getTime());
