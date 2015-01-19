@@ -2613,7 +2613,7 @@ void QnPlOnvifResource::stopInputPortMonitoringAsync()
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> asyncPullMessagesCallWrapper;
     {
         QMutexLocker lk(&m_ioPortMutex);
-        asyncPullMessagesCallWrapper = std::move(m_asyncPullMessagesCallWrapper);
+        std::swap(asyncPullMessagesCallWrapper, m_asyncPullMessagesCallWrapper);
     }
 
     if( asyncPullMessagesCallWrapper )
