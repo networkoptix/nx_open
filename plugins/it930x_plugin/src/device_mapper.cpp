@@ -218,11 +218,18 @@ namespace ite
     {
         // under lock
 
-        auto it = m_devLinks.find(link.txID);
-        if (it == m_devLinks.end() || it->second.rxID != link.rxID)
+        auto itNew = m_devLinks.end();
+        auto range = m_devLinks.equal_range(link.txID);
+        for (auto it = range.first; it != range.second; ++it)
+        {
+            if (it->second.rxID == link.rxID)
+                itNew = it;
+            else
+                it->second.frequency = link.frequency;
+        }
+
+        if (itNew == m_devLinks.end())
             m_devLinks.insert( std::make_pair(link.txID, link) );
-        else
-            it->second.frequency = link.frequency;
     }
 
     void DeviceMapper::txDevs(std::vector<TxDevicePtr>& txDevs) const
