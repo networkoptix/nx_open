@@ -128,9 +128,6 @@ private:
 
     void createActions();
     void createTrayIcon();
-
-    void initTranslations();
-
 private:
     QSettings m_mediaServerSettings;
 

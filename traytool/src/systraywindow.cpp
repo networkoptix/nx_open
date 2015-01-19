@@ -20,7 +20,6 @@
 #define USE_SINGLE_STREAMING_PORT
 
 static const QString MEDIA_SERVER_NAME(QString(lit(QN_ORGANIZATION_NAME)) + lit(" Media Server"));
-static const QString CLIENT_NAME(QString(lit(QN_ORGANIZATION_NAME)) + lit(" ") + lit(QN_PRODUCT_NAME) + lit(" Client"));
 
 static const int MESSAGE_DURATION = 3 * 1000;
 static const int DEFAUT_PROXY_PORT = 7009;
@@ -95,25 +94,9 @@ QnSystrayWindow::QnSystrayWindow()
     m_findServices.start(10000);
     m_updateServiceStatus.start(500);
 
-    initTranslations();
-
     m_mediaServerStartAction->setVisible(false);
     m_mediaServerStopAction->setVisible(false);
     m_mediaServerWebAction->setVisible(true);
-}
-
-void QnSystrayWindow::initTranslations() {
-//    QnTranslationManager *translationManager = qnCommon->instance<QnTranslationManager>();
-
-//    QnTranslationListModel *model = new QnTranslationListModel(this);
-//    model->setTranslations(translationManager->loadTranslations());
-
-    // TODO: #Elric code duplication
-    QSettings clientSettings(QSettings::UserScope, qApp->organizationName(), CLIENT_NAME);
-    QString translationPath = clientSettings.value(lit("translationPath")).toString();
-    int index = translationPath.lastIndexOf(lit("client"));
-    if(index != -1)
-        translationPath.replace(index, 6, lit("traytool"));
 }
 
 void QnSystrayWindow::handleMessage(const QString& message)
@@ -393,10 +376,7 @@ void QnSystrayWindow::at_mediaServerStopAction() {
 }
 
 void QnSystrayWindow::at_mediaServerWebAction() {
-    static QString MEDIA_SERVER_NAME(QString(lit(QN_ORGANIZATION_NAME)) + lit(" Media Server"));
-
-    QSettings settings(QSettings::SystemScope, qApp->organizationName(), MEDIA_SERVER_NAME);
-    QString serverAdminUrl = QString(lit("http://localhost:%1/static/index.html")).arg(settings.value(lit("port")).toInt());
+    QString serverAdminUrl = QString(lit("http://localhost:%1/static/index.html")).arg(m_mediaServerSettings.value(lit("port")).toInt());
     QDesktopServices::openUrl(QUrl(serverAdminUrl));
 }
 

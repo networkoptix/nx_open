@@ -1,5 +1,4 @@
-
-#include "version.h"
+#include "version.h"    
 
 #include <QtSingleApplication>
 #include <QtWidgets/QMessageBox>
@@ -8,22 +7,25 @@
 #include <QtCore/QSettings>
 
 #include "systraywindow.h"
-// #include "common/common_module.h"
-// #include "translation/translation_manager.h"
+#include <translation/translation_manager.h>
 
-static const QString CLIENT_NAME(QString(lit(QN_ORGANIZATION_NAME)) + lit(" ") + lit(QN_PRODUCT_NAME) + lit(" Client"));
+void initTranslations() {
+    static const QString clientName(QString(lit(QN_ORGANIZATION_NAME)) + lit(" ") + lit(QN_PRODUCT_NAME) + lit(" Client"));
+
+    Q_INIT_RESOURCE(common);
+    Q_INIT_RESOURCE(traytool);
+
+    QScopedPointer<QnTranslationManager> translationManager(new QnTranslationManager());
+    translationManager->addPrefix(lit("traytool"));
+
+    QSettings clientSettings(QSettings::UserScope, qApp->organizationName(), clientName);
+    QString translationPath = clientSettings.value(lit("translationPath")).toString();
+    QnTranslation translation = translationManager->loadTranslation(translationPath);
+    QnTranslationManager::installTranslation(translation);
+}
 
 int main(int argc, char *argv[])
 {
-    if (!QSystemTrayIcon::isSystemTrayAvailable()) {
-        QMessageBox::critical(
-            NULL, 
-            QObject::tr("System Tray"), 
-            QObject::tr("There is no system tray on this system.\nApplication will now quit.")
-        );
-        return 1;
-    }
-
     QApplication::setOrganizationName(QLatin1String(QN_ORGANIZATION_NAME));
     QApplication::setApplicationName(QLatin1String(QN_APPLICATION_NAME));
     QApplication::setApplicationDisplayName(QLatin1String(QN_APPLICATION_DISPLAY_NAME));
@@ -33,20 +35,7 @@ int main(int argc, char *argv[])
     QtSingleApplication app(QLatin1String(QN_ORGANIZATION_NAME) + QLatin1String(QN_APPLICATION_NAME), argc, argv);
     QApplication::setQuitOnLastWindowClosed(false);
 
-//    QnCommonModule common(argc, argv);
-
     QDir::setCurrent(QApplication::applicationDirPath());
-
-//    QnTranslationManager *translationManager = qnCommon->instance<QnTranslationManager>();
-//    translationManager->addPrefix(lit("traytool"));
-
-    QSettings clientSettings(QSettings::UserScope, qApp->organizationName(), CLIENT_NAME);
-    QString translationPath = clientSettings.value(lit("translationPath")).toString();
-    int index = translationPath.lastIndexOf(lit("client"));
-    if(index != -1)
-        translationPath.replace(index, 6, lit("traytool"));
-//    QnTranslation translation = translationManager->loadTranslation(translationPath);
-//    QnTranslationManager::installTranslation(translation);
 
     QString argument = argc > 1 ? QLatin1String(argv[1]) : QString();
     if (argument == lit("quit"))
@@ -77,6 +66,17 @@ int main(int argc, char *argv[])
             app.sendMessage(lit("activate"));
             return 0;
         }
+    }
+
+    initTranslations();
+
+    if (!QSystemTrayIcon::isSystemTrayAvailable()) {
+        QMessageBox::critical(
+            NULL, 
+            QObject::tr("System Tray"), 
+            QObject::tr("There is no system tray on this system.\nApplication will now quit.")
+            );
+        return 1;
     }
 
     QnSystrayWindow window;
