@@ -2722,7 +2722,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& cameraId, ApiCameraDataExList
     
     queryCameras.prepare(QString("\
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, \
-            coalesce(cu.camera_name, r.name) as name, r.url, \
+            coalesce(nullif(cu.camera_name, \"\"), r.name) as name, r.url, \
             coalesce(rs.status, 0) as status, \
             c.vendor, c.manually_added as manuallyAdded, \
             c.group_name as groupName, c.group_id as groupId, c.mac, c.model, \
