@@ -36,10 +36,11 @@ QnUuid::QnUuid( const QByteArray& text )
 {
     if( !text.isEmpty() )
     {
-        m_byteArrayRepresentation = text;
+        if (text.size() == 38)
+            m_byteArrayRepresentation = text;
         assert(
-            text.size() == 36 ||    //{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
-            text.size() == 38 );    //xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+            text.size() == 36 ||    // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+            text.size() == 38 );    //{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}
     }
 }
 
