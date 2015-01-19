@@ -341,7 +341,10 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
             identityTimeQuery.prepare("DELETE FROM misc_data WHERE key = ?");
             identityTimeQuery.addBindValue("gotDbDumpTime");
             if (!identityTimeQuery.exec())
+            {
+                qWarning() << "can't initialize Server sqlLite database " << m_sdb.databaseName() << ". Error: " << m_sdb.lastError().text();
                 return false;
+            }
 
             qint64 currentIdentityTime = qnCommon->systemIdentityTime();
             qnCommon->setSystemIdentityTime(qMax(currentIdentityTime + 1, dbRestoreTime), qnCommon->moduleGUID());
@@ -355,7 +358,8 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
     }
 
     //tuning DB
-    tuneDBAfterOpen();
+    if( !tuneDBAfterOpen() )
+        return false;
 
     if( !createDatabase() )
     {
@@ -487,7 +491,11 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
     }
 
     if( QnTransactionLog::instance() )
-        QnTransactionLog::instance()->init();
+        if( !QnTransactionLog::instance()->init() )
+        {
+            qWarning() << "can't initialize transaction log!";
+            return false;
+        }
 
     if( m_needResyncLog ) {
         if (!resyncTransactionLog())
@@ -3187,7 +3195,8 @@ ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiDatabaseDumpData& 
     }
 
     //tuning DB
-    tuneDBAfterOpen();
+    if( !tuneDBAfterOpen() )
+        return ErrorCode::dbError;
 
     return ErrorCode::ok;
 }
@@ -3221,7 +3230,8 @@ ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& dumpFilePath, qint64& du
     }
 
     //tuning DB
-    tuneDBAfterOpen();
+    if( !tuneDBAfterOpen() )
+        return ErrorCode::dbError;
 
     return ErrorCode::ok;
 }

@@ -593,6 +593,15 @@ void fixDiscoveredName(QString& name, QString& manufacturer, const QString& loca
     else if(lowerName.startsWith(lit("axis "))) {
         manufacturer = lit("AXIS");
     }
+    else if(lowerName == lit("dahua")) {
+        qSwap(name, manufacturer);
+    }
+    else if(lowerName == lit("vivo_ironman")) {
+        qSwap(name, manufacturer);
+    }
+    else if(lowerName == lit("sentry")) {
+        qSwap(name, manufacturer);
+    }
 }
 
 template <class T> 
