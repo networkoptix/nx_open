@@ -679,7 +679,7 @@ QMap<int, QnUuid> QnDbManager::getGuidList( const QString& request, GuidConversi
             break;
         default:
             {
-                if (data.isNull())
+                if (data.toString().isEmpty())
                     result.insert(id, intToGuid(id, intHashPostfix));
                 else {
                     QnUuid guid(data.toString());
