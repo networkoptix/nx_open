@@ -341,7 +341,10 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
             identityTimeQuery.prepare("DELETE FROM misc_data WHERE key = ?");
             identityTimeQuery.addBindValue("gotDbDumpTime");
             if (!identityTimeQuery.exec())
+            {
+                qWarning() << "can't initialize Server sqlLite database " << m_sdb.databaseName() << ". Error: " << m_sdb.lastError().text();
                 return false;
+            }
 
             qint64 currentIdentityTime = qnCommon->systemIdentityTime();
             qnCommon->setSystemIdentityTime(qMax(currentIdentityTime + 1, dbRestoreTime), qnCommon->moduleGUID());
@@ -355,7 +358,8 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
     }
 
     //tuning DB
-    tuneDBAfterOpen();
+    if( !tuneDBAfterOpen() )
+        return false;
 
     if( !createDatabase() )
     {
@@ -487,7 +491,11 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
     }
 
     if( QnTransactionLog::instance() )
-        QnTransactionLog::instance()->init();
+        if( !QnTransactionLog::instance()->init() )
+        {
+            qWarning() << "can't initialize transaction log!";
+            return false;
+        }
 
     if( m_needResyncLog ) {
         if (!resyncTransactionLog())
@@ -671,7 +679,7 @@ QMap<int, QnUuid> QnDbManager::getGuidList( const QString& request, GuidConversi
             break;
         default:
             {
-                if (data.isNull())
+                if (data.toString().isEmpty())
                     result.insert(id, intToGuid(id, intHashPostfix));
                 else {
                     QnUuid guid(data.toString());
@@ -2714,7 +2722,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& cameraId, ApiCameraDataExList
     
     queryCameras.prepare(QString("\
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, \
-            coalesce(cu.camera_name, r.name) as name, r.url, \
+            coalesce(nullif(cu.camera_name, \"\"), r.name) as name, r.url, \
             coalesce(rs.status, 0) as status, \
             c.vendor, c.manually_added as manuallyAdded, \
             c.group_name as groupName, c.group_id as groupId, c.mac, c.model, \
@@ -3173,7 +3181,8 @@ ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiDatabaseDumpData& 
     }
 
     //tuning DB
-    tuneDBAfterOpen();
+    if( !tuneDBAfterOpen() )
+        return ErrorCode::dbError;
 
     return ErrorCode::ok;
 }
@@ -3207,7 +3216,8 @@ ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& dumpFilePath, qint64& du
     }
 
     //tuning DB
-    tuneDBAfterOpen();
+    if( !tuneDBAfterOpen() )
+        return ErrorCode::dbError;
 
     return ErrorCode::ok;
 }

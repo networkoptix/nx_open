@@ -635,6 +635,11 @@ namespace nx_http
         if( !m_url.password().isEmpty() )
             m_userPassword = m_url.password();
 
+        //adding NX-User-Name to help server to port data from 2.1 to 2.3 and from 2.3 to 2.4 (generate user's digest)
+        //TODO #ak remove it after 2.3 support is over
+        if( !m_userName.isEmpty() )
+            nx_http::insertOrReplaceHeader( &m_request.headers, HttpHeader("NX-User-Name", m_userName.toUtf8()) );
+
         //not using Basic authentication by default, since it is not secure
         nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
     }

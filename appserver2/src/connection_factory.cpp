@@ -30,6 +30,7 @@
 #include <utils/common/app_info.h>
 #include "mutex/distributed_mutex_manager.h"
 
+
 namespace ec2
 {
     Ec2DirectConnectionFactory::Ec2DirectConnectionFactory( Qn::PeerType peerType )
@@ -293,13 +294,19 @@ namespace ec2
         QnConnectionInfo connectionInfo;
         fillConnectionInfo( loginInfo, &connectionInfo );   //todo: #ak not appropriate here
         connectionInfo.ecUrl = url;
+        ec2::ErrorCode connectionInitializationResult = ec2::ErrorCode::ok;
         {
             QMutexLocker lk( &m_mutex );
             if( !m_directConnection ) {
                 m_directConnection.reset( new Ec2DirectConnection( &m_serverQueryProcessor, m_resCtx, connectionInfo, url ) );
+                if( !m_directConnection->initialized() )
+                {
+                    connectionInitializationResult = ec2::ErrorCode::dbError;
+                    m_directConnection.reset();
+                }
             }
         }
-        QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( &impl::ConnectHandler::done, handler, reqID, ec2::ErrorCode::ok, m_directConnection ) );
+        QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( &impl::ConnectHandler::done, handler, reqID, connectionInitializationResult, m_directConnection ) );
         return reqID;
     }
 

@@ -90,6 +90,20 @@
                         </configuration>
                     </execution>  
                     <execution>
+                        <id>validating_JSONs</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${init.python.dir}/${python.executable}</executable>
+                            <arguments>
+                                <argument>${root.dir}/util/validate_jsons.py</argument>
+                            </arguments>
+                            <workingDirectory>${root.dir}/util</workingDirectory>		
+                        </configuration>
+                    </execution>                      
+                    <execution>
                         <id>build_environment</id>
                         <phase>compile</phase>
                         <goals>

@@ -5,6 +5,7 @@
 
 #include <condition_variable>
 #include <mutex>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -27,9 +28,14 @@ public:
     {
     }
 
-    void setUrl( const QUrl& url )
+    void addGetRequest( const QUrl& url )
     {
-        m_requestUrl = url;
+        m_getRequestUrls.push_back( url );
+    }
+
+    void addUpdateRequest( const QUrl& url, const QByteArray& msgBody )
+    {
+        m_updateRequest.push_back( std::make_pair( url, msgBody ) );
     }
 
     void setMaxRequestsToPerform( int maxRequestsToPerform )
@@ -53,7 +59,13 @@ public:
                      this, &RequestsGenerator::startAnotherClient,
                      Qt::DirectConnection );
             newClient->setResponseReadTimeoutMs( 60*1000 );
-            if( newClient->doGet( getUrl() ) )
+            const Request& request = getRequestToPerform();
+            bool result = false;
+            if( request.requestType == Request::GET_REQUEST )
+                result = newClient->doGet( request.url );
+            else
+                result = newClient->doPost( request.url, "application/json", request.body );
+            if( result )
             {
                 ++m_requestsStarted;
                 m_runningRequests.push_back( std::move(newClient) );
@@ -66,11 +78,6 @@ public:
             m_runningRequests.erase( std::find(m_runningRequests.begin(), m_runningRequests.end(), httpClient) );
             m_cond.notify_all();
         }
-    }
-
-    QUrl getUrl() const
-    {
-        return m_requestUrl;
     }
 
     void start()
@@ -97,7 +104,37 @@ public:
     }
 
 private:
-    QUrl m_requestUrl;
+    class Request
+    {
+    public:
+        static const int GET_REQUEST = 1;
+        static const int UPDATE_REQUEST = 2;
+
+        int requestType;
+        QUrl url;
+        //!for update requests
+        QByteArray body;
+
+        //!create get requests
+        Request( const QUrl& _url )
+        :
+            requestType( GET_REQUEST ),
+            url( _url )
+        {
+        }
+
+        //!create update requests
+        Request( const QUrl& _url, const QByteArray& _body )
+        :
+            requestType( UPDATE_REQUEST ),
+            url( _url ),
+            body( _body )
+        {
+        }
+    };
+
+    std::vector<QUrl> m_getRequestUrls;
+    std::vector<std::pair<QUrl, QByteArray>> m_updateRequest;
     int m_requestsStarted;
     int m_requestsCompleted;
     int m_maxSimultaneousRequestsCount;
@@ -105,20 +142,61 @@ private:
     std::mutex m_mutex;
     std::condition_variable m_cond;
     std::list<nx_http::AsyncHttpClientPtr> m_runningRequests;
+
+    Request getRequestToPerform() const
+    {
+        if( rand() & 1 )
+        {
+            const int requestIndex = rand() % m_updateRequest.size();
+            return Request(
+                m_updateRequest[requestIndex].first,
+                m_updateRequest[requestIndex].second );
+        }
+        else
+        {
+            return Request( m_getRequestUrls[rand() % m_getRequestUrls.size()] );
+        }
+    }
 };
 
 #if 0
 TEST( Ec2APITest, randomGet )
 {
-    //QUrl requestUrl( lit("http://127.0.0.1:7001/ec2/getCamerasEx") );
-    QUrl requestUrl( lit("http://127.0.0.1:7001/ec2/getMediaServersEx") );
-    //QUrl requestUrl( lit("http://192.168.0.71:7001/ec2/getMediaServersEx") );
+    QUrl requestUrl( lit("http://127.0.0.1:7001/") );
+    //QUrl requestUrl( lit("http://192.168.0.71:7001/") );
     requestUrl.setUserName( lit("admin") );
     requestUrl.setPassword( lit("123") );
+
     RequestsGenerator reqGen;
-    reqGen.setUrl( requestUrl );
-    reqGen.setMaxRequestsToPerform( 700 );
-    reqGen.setMaxSimultaneousRequestsCount( 30 );
+    requestUrl.setPath( lit("/ec2/getMediaServersEx") );
+    reqGen.addGetRequest( requestUrl );
+    //requestUrl.setPath( lit("/ec2/getLicenses") );
+    //reqGen.addGetRequest( requestUrl );
+
+    requestUrl.setPath( lit("/ec2/saveCameras") );
+    QByteArray saveCameraJson =
+        "[\n"
+        "    {\n"
+        "        \"groupId\": \"\",\n"
+        "        \"groupName\": \"\",\n"
+        "        \"id\": \"{594caa1a-ae53-380c-2022-b264141d2ffd}\",\n"
+        "        \"mac\": \"00-1C-A6-01-21-A1\",\n"
+        "        \"manuallyAdded\": false,\n"
+        "        \"model\": \"DWC-MD421D\",\n"
+        "        \"name\": \"DWC-MD421D test\",\n"
+        "        \"parentId\": \"{47bf37a0-72a6-2890-b967-5da9c390d28a}\",\n"
+        "        \"physicalId\": \"00-1C-A6-01-21-A1\",\n"
+        "        \"statusFlags\": \"CSF_NoFlags\",\n"
+        "        \"typeId\": \"{eb1e8a6a-da43-5c75-c08f-72f94205e0d9}\",\n"
+        "        \"url\": \"192.168.0.91\",\n"
+        "        \"vendor\": \"Digital Watchdog\"\n"
+        "    }\n"
+        "]\n";
+
+    reqGen.addUpdateRequest( requestUrl, saveCameraJson );
+
+    reqGen.setMaxRequestsToPerform( 70000 );
+    reqGen.setMaxSimultaneousRequestsCount( 100 );
     reqGen.start();
     reqGen.wait();
 }
