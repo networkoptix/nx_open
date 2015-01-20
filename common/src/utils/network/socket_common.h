@@ -26,6 +26,7 @@
 class HostAddress
 {
 public:
+    //!Creates 0.0.0.0 address
     HostAddress();
     HostAddress( struct in_addr& sinAddr );
     /*!
@@ -40,7 +41,7 @@ public:
 
     bool operator==( const HostAddress& right ) const;
 
-    struct in_addr inAddr() const;
+    struct in_addr inAddr(bool* ok = nullptr) const;
 
     static const HostAddress localhost;
     static const HostAddress anyHost;
@@ -48,6 +49,8 @@ public:
 private:
     mutable boost::optional<QString> m_addrStr;
     struct in_addr m_sinAddr;
+    //!if \a true \a m_sinAddr contains ip address corresponding to \a m_addrStr
+    bool m_addressResolved;
 };
 
 //!Represents host and port (e.g. 127.0.0.1:1234)
