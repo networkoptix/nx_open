@@ -134,6 +134,7 @@
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 #include <utils/common/system_information.h>
+#include <utils/network/host_address_resolver.h>
 #include <utils/network/multicodec_rtp_reader.h>
 #include <utils/network/simple_http_client.h>
 #include <utils/network/ssl_socket.h>
@@ -2065,6 +2066,7 @@ protected:
         QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
         QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
         QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
+        QScopedPointer<HostAddressResolver> hostAddressResolver(new HostAddressResolver());
 
         if (!m_overrideVersion.isNull())
             qnCommon->setEngineVersion(m_overrideVersion);

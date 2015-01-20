@@ -51,6 +51,8 @@ private:
     struct in_addr m_sinAddr;
     //!if \a true \a m_sinAddr contains ip address corresponding to \a m_addrStr
     bool m_addressResolved;
+
+    friend class HostAddressResolver;
 };
 
 //!Represents host and port (e.g. 127.0.0.1:1234)

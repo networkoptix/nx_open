@@ -74,6 +74,7 @@ extern "C"
 #include "plugins/resource/droid_ipwebcam/ipwebcam_droid_resource_searcher.h"
 #include "plugins/resource/isd/isd_resource_searcher.h"
 //#include "plugins/resource/onvif/onvif_ws_searcher.h"
+#include <utils/network/host_address_resolver.h>
 #include "utils/network/socket.h"
 
 
@@ -809,6 +810,7 @@ int main(int argc, char **argv)
     std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
     std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );
     QnResourcePool::initStaticInstance( new QnResourcePool() );
+    std::unique_ptr<HostAddressResolver> hostAddressResolver(new HostAddressResolver());
 
 #ifdef Q_OS_MAC
     mac_restoreFileAccess();

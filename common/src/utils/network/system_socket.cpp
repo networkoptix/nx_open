@@ -464,19 +464,11 @@ bool Socket::fillAddr(
     hints.ai_addr = NULL;
     hints.ai_next = NULL;
 
-    //addrinfo *addressInfo;
-    //int status = getaddrinfo(address.toLatin1(), 0, &hints, &addressInfo);
-    //if (status != 0)
-    //    return false;
-
-    //addr.sin_addr.s_addr = ((struct sockaddr_in *) (addressInfo->ai_addr))->sin_addr.s_addr;
     bool ok = false;
     addr.sin_addr = socketAddress.address.inAddr(&ok);     // NOTE: blocking dns name resolve can happen here
     if( !ok )
         return false;
     addr.sin_port = htons( socketAddress.port );        // Assign port in network byte order
-
-    //freeaddrinfo(addressInfo);
 
     return true;
 }
