@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp', [
-    'ngCookies',
+    'ipCookie',
     'ngResource',
     'ngSanitize',
     'ngRoute',
