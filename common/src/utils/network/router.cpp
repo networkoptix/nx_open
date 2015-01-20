@@ -1,5 +1,7 @@
 #include "router.h"
 
+#include <QtCore/QElapsedTimer>
+
 #include "utils/common/log.h"
 #include "nx_ec/dummy_handler.h"
 #include "nx_ec/ec_api.h"
@@ -18,7 +20,7 @@ QnRouter::QnRouter(QnModuleFinder *moduleFinder, bool passive, QObject *parent) 
     m_routeBuilder(new QnRouteBuilder(qnCommon->moduleGUID())),
     m_passive(passive),
     m_runtimeDataUpdateTimer(new QTimer(this)),
-    m_lastRuntimeDataUpdate(0)
+    m_runtimeDataElapsedTimer(new QElapsedTimer())
 {
     connect(moduleFinder,       &QnModuleFinder::moduleUrlFound,    this,   &QnRouter::at_moduleFinder_moduleUrlFound);
     connect(moduleFinder,       &QnModuleFinder::moduleUrlLost,     this,   &QnRouter::at_moduleFinder_moduleUrlLost);
@@ -32,6 +34,7 @@ QnRouter::QnRouter(QnModuleFinder *moduleFinder, bool passive, QObject *parent) 
     m_runtimeDataUpdateTimer->setInterval(runtimeDataUpdateTimeout);
     m_runtimeDataUpdateTimer->setSingleShot(true);
     connect(m_runtimeDataUpdateTimer, &QTimer::timeout, this, [this](){ updateRuntimeData(true); });
+    m_runtimeDataElapsedTimer->start();
 }
 
 QnRouter::~QnRouter() {}
@@ -172,8 +175,7 @@ void QnRouter::updateRuntimeData(bool force) {
     if (!runtimeInfoManager)
         return;
 
-    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
-    if (!force && m_lastRuntimeDataUpdate + runtimeDataUpdateTimeout > currentTime) {
+    if (!force && !m_runtimeDataElapsedTimer->hasExpired(runtimeDataUpdateTimeout)) {
         if (!m_runtimeDataUpdateTimer->isActive())
             m_runtimeDataUpdateTimer->start();
         return;
@@ -194,5 +196,5 @@ void QnRouter::updateRuntimeData(bool force) {
     localInfo.data.availableConnections = connections;
     runtimeInfoManager->updateLocalItem(localInfo);
 
-    m_lastRuntimeDataUpdate = currentTime;
+    m_runtimeDataElapsedTimer->start();
 }

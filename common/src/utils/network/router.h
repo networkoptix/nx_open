@@ -12,6 +12,7 @@
 class QnRouteBuilder;
 class QnModuleFinder;
 struct QnModuleInformation;
+class QElapsedTimer;
 
 class QnRouter : public QObject, public Singleton<QnRouter> {
     Q_OBJECT
@@ -61,7 +62,7 @@ private:
     QMultiHash<QnUuid, Endpoint> m_connections;
     bool m_passive;
     QTimer *m_runtimeDataUpdateTimer;
-    qint64 m_lastRuntimeDataUpdate;
+    QScopedPointer<QElapsedTimer> m_runtimeDataElapsedTimer;
 };
 
 #endif // ROUTER_H
