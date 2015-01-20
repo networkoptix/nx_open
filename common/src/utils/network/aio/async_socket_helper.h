@@ -128,10 +128,13 @@ public:
         {
             //checking that socket is not registered in aio
             Q_ASSERT_X(
-                !HostAddressResolver::instance()->isRequestIDKnown(this) &&
-                !aio::AIOService::instance()->isSocketBeingWatched( this->m_socket ),
+                !HostAddressResolver::instance()->isRequestIDKnown(this),
                 Q_FUNC_INFO,
-                "You MUST cancel running async socket operation before deleting socket if you delete socket from non-aio thread" );
+                "You MUST cancel running async socket operation before deleting socket if you delete socket from non-aio thread (1)" );
+            Q_ASSERT_X(
+                !aio::AIOService::instance()->isSocketBeingWatched(this->m_socket),
+                Q_FUNC_INFO,
+                "You MUST cancel running async socket operation before deleting socket if you delete socket from non-aio thread (2)" );
         }
     }
 
@@ -228,7 +231,8 @@ public:
         if( eventType == aio::etNone )
         {
             //TODO #ak underlying loop is a work-around. Must add method to aio::AIOService which cancels all operation atomically
-            while( aio::AIOService::instance()->isSocketBeingWatched( this->m_socket ) )
+            while( aio::AIOService::instance()->isSocketBeingWatched( this->m_socket ) ||
+                   HostAddressResolver::instance()->isRequestIDKnown(this) )
             {
                 cancelAsyncIO( aio::etRead, waitForRunningHandlerCompletion );
                 cancelAsyncIO( aio::etWrite, waitForRunningHandlerCompletion );

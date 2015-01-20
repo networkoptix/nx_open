@@ -131,5 +131,22 @@ TEST_F( SocketAsyncModeTest, HostNameResolve2 )
 
 TEST_F( SocketAsyncModeTest, HostNameResolveCancellation )
 {
-    //TODO
+    std::unique_ptr<AbstractStreamSocket> connection( SocketFactory::createStreamSocket() );
+    SystemError::ErrorCode connectErrorCode = SystemError::noError;
+    std::condition_variable cond;
+    std::mutex mutex;
+    bool done = false;
+    HostAddress resolvedAddress;
+    ASSERT_TRUE( connection->setNonBlockingMode( true ) );
+    ASSERT_TRUE( connection->connectAsync(
+        SocketAddress(QString::fromLatin1("ya.ru"), 80),
+        [&connectErrorCode, &done, &resolvedAddress, &cond, &mutex, &connection](SystemError::ErrorCode errorCode) mutable {
+            std::unique_lock<std::mutex> lk( mutex );
+            connectErrorCode = errorCode;
+            cond.notify_all();
+            done = true;
+            resolvedAddress = connection->getForeignAddress().address;
+        } ) );
+    connection->cancelAsyncIO();
+    connection.reset();
 }
