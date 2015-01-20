@@ -368,30 +368,8 @@ void QnResourceWidget::setEnclosingGeometry(const QRectF &enclosingGeometry, boo
 QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry, qreal rotation) const {
     if (!enclosingGeometry.isEmpty()) {
         /* Calculate bounds of the rotated item. */
-
         qreal aspectRatio = hasAspectRatio() ? m_aspectRatio : defaultVisualAspectRatio();
-
-        /* 1. Take a rectangle with our aspect ratio */
-        QRectF geom = expanded(aspectRatio, enclosingGeometry, Qt::KeepAspectRatio);
-
-        /* 2. Rotate it */
-        QPointF c = geom.center();
-        QTransform transform;
-        transform.translate(c.x(), c.y());
-        transform.rotate(rotation);
-        transform.translate(-c.x(), -c.y());
-        QRectF rotated = transform.mapRect(geom);
-
-        /* 3. Scale it to fit enclosing geometry */
-        QSizeF scaledSize = bounded(expanded(rotated.size(), enclosingGeometry.size(), Qt::KeepAspectRatio), enclosingGeometry.size(), Qt::KeepAspectRatio);
-
-        /* 4. Get scale factor */
-        qreal scale = QnGeometry::scaleFactor(rotated.size(), scaledSize, Qt::KeepAspectRatio);
-
-        /* 5. Scale original non-rotated geometry */
-        geom = scaled(geom, scale, geom.center());
-
-        return geom;
+        return encloseRotatedGeometry(enclosingGeometry, aspectRatio, rotation);
     } else {
         return enclosingGeometry;
     }

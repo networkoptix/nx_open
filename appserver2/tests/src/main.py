@@ -20,6 +20,190 @@ import time
 import select
 import errno
 
+
+# ---------------------------------------------------------------------
+# A deep comparison of json object 
+# This comparision is slow , but it can output valid result when 2 json
+# objects has different order in their array
+# ---------------------------------------------------------------------
+class JsonDiff:
+    _hasDiff = False
+    _errorInfo=""
+    _anchorStr=None
+    _currentRecursionSize=0
+    _anchorStack = []
+
+    def keyNotExisted(self,lhs,rhs,key):
+        """ format the error information based on key lost """
+        self._errorInfo = ("CurrentPosition:{anchor}\n"
+                     "The key:{k} is not existed in both two objects\n").format(anchor=self._anchorStr,k=key)
+        self._hasDiff = True
+        return self
+
+    def arrayIndexNotFound(self,lhs,idx):
+        """ format the error information based on the array index lost"""
+        self._errorInfo= ("CurrentPosition:{anchor}\n"
+                    "The element in array at index:{i} cannot be found in other objects\n").\
+            format(anchor=self._anchorStr,i=idx)
+        self._hasDiff = True
+        return self
+
+    def leafValueNotSame(self,lhs,rhs):
+        lhs_str = None
+        rhs_str = None
+        try :
+            lhs_str = str(lhs)
+            rhs_str = str(rhs)
+        except:
+            lhs_str = lhs.__str__()
+            rhs_str = rhs.__str__()
+
+        self._errorInfo= ("CurrentPosition:{anchor}\n"
+                    "The left hand side value:{lval} and right hand side value:{rval} is not same").format(anchor=self._anchorStr,
+                                                                                                           lval=lhs_str,
+                                                                                                           rval=rhs_str)
+        self._hasDiff = True
+        return self
+
+    def typeNotSame(self,lhs,rhs):
+        ltype = type(lhs)
+        rtype = type(rhs)
+
+        self._errorInfo=(
+            "CurrentPosition:{anchor}\n"
+            "The left hand value type:{lt} is not same with right hand value type:{rt}\n").format(anchor=self._anchorStr,
+                                                                                                  lt=ltype,
+                                                                                                  rt=rtype)
+        self._hasDiff = True
+        return self
+
+    def enter(self,position):
+        if self._anchorStr is None:
+            self._anchorStack.append(0)
+        else:
+            self._anchorStack.append(len(self._anchorStr))
+
+        if self._anchorStr is None:
+            self._anchorStr=position
+        else:
+            self._anchorStr+=".%s"%(position)
+
+        self._currentRecursionSize += 1
+
+    def leave(self):
+        assert len(self._anchorStack) != 0 , "No place to leave"
+        val = self._anchorStack[len(self._anchorStack)-1]
+        self._anchorStack.pop(len(self._anchorStack)-1)
+        self._anchorStr = self._anchorStr[:val]
+        self._currentRecursionSize -= 1
+
+    def hasDiff(self):
+        return self._hasDiff
+    
+    def errorInfo(self):
+        if self._hasDiff:
+            return self._errorInfo
+        else:
+            return "<no diff>"
+
+
+    def resetDiff(self):
+        self._hasDiff = False
+        self._errorInfo=""
+
+def _compareJsonObject(lhs,rhs,result):
+    assert isinstance(lhs,dict),"The lhs object _MUST_ be an object"
+    assert isinstance(rhs,dict),"The rhs object _MUST_ be an object"
+    # compare the loop and stuff
+    for lhs_key in lhs:
+        if lhs_key not in rhs:
+            return result.keyNotExisted(lhs,rhs,lhs_key);
+        else:
+            lhs_obj = lhs[lhs_key]
+            rhs_obj = rhs[lhs_key]
+            result.enter(lhs_key)
+            if _compareJson(lhs_obj,rhs_obj,result).hasDiff():
+                return result
+            result.leave()
+
+    return result
+
+def _compareJsonList(lhs,rhs,result):
+    assert isinstance(lhs,list),"The lhs object _MUST_ be a list"
+    assert isinstance(rhs,list),"The rhs object _MUST_ be a list"
+
+    # The comparison of list should be ignore the element's order. A 
+    # naive O(n*n) comparison is used here. For each element P in lhs,
+    # it will try to match one element in rhs , if not failed, otherwise
+    # passed.
+
+    tabooSet = set()
+
+    for lhs_idx,lhs_ele in enumerate(lhs):
+        notFound = True
+        for idx,val in enumerate(rhs):
+            if idx in tabooSet:
+                continue
+            # now checking if this value has same value with the lhs_ele
+            if not _compareJson(lhs_ele,val,result).hasDiff():
+                tabooSet.add(idx)
+                notFound = False
+                continue
+            else:
+                result.resetDiff()
+
+        if notFound:
+            return result.arrayIndexNotFound(lhs,lhs_idx)
+
+    return result
+
+def _compareJsonLeaf(lhs,rhs,result):
+    lhs_type = type(lhs)
+    if isinstance(rhs,type(lhs)):
+        if rhs != lhs:
+            return result.leafValueNotSame(lhs,rhs)
+        else:
+            return result
+    else:
+        return result.typeNotSame(lhs,rhs)
+
+def _compareJson(lhs,rhs,result):
+    lhs_type = type(lhs)
+    rhs_type = type(rhs)
+    if lhs_type != rhs_type:
+        return result.typeNotSame(lhs,rhs)
+    else:
+        if lhs_type is dict:
+            # Enter the json object here
+            return _compareJsonObject(lhs,rhs,result)
+        elif rhs_type is list:
+            return _compareJsonList(lhs,rhs,result)
+        else:
+            return _compareJsonLeaf(lhs,rhs,result)
+
+def compareJson(lhs,rhs):
+    result = JsonDiff()
+    # An outer most JSON element must be an array or dict
+    if isinstance(lhs,list):
+        if isinstance(rhs,list):
+            result.enter("<root>")
+            if _compareJson(lhs,rhs,result).hasDiff():
+                return result
+            result.leave()
+            
+        else:
+            return result.typeNotSame(lhs,rhs)
+    else:
+        if isinstance(rhs,dict):
+            result.enter("<root>")
+            if _compareJson(lhs,rhs,result).hasDiff():
+                return result
+            result.leave()
+        else:
+            return result.typeNotSame(lhs,rhs)
+
+    return result
+
 # Rollback support
 class UnitTestRollback:
     _rollbackFile = None
@@ -248,7 +432,6 @@ class ClusterTest():
                 print "The first different character is at location:%d" % (i + 1+offset)
                 return
 
-
     def _testConnection(self):
         print "==================================================\n"
         print "Test connection on each server in the server list "
@@ -332,6 +515,8 @@ class ClusterTest():
         print "Test sync status on method:%s" % (methodName)
         result = None
         resultAddr = None
+        resultJsonObject = None
+
         for entry in responseList:
             response = entry[0]
             address = entry[1]
@@ -346,13 +531,20 @@ class ClusterTest():
                 else:
                     if content != result:
                         print "Server:%s has different status with server:%s on method:%s" % (address,resultAddr,methodName)
-                        self._seeDiff(content,result)
-                        return (False,"Failed to sync")
+                        # Since the server could issue json object has different order which makes us
+                        # have to do deep comparison of json object internally. This deep comparison
+                        # is very slow and only performs on objects that has failed the naive comparison
+                        if resultJsonObject is None:
+                            resultJsonObject = json.loads(result)
+                        compareResult = compareJson( json.loads(content) , resultJsonObject )
+                        if compareResult.hasDiff():
+                            print "Server:%s has different status with server:%s on method:%s" % (address,resultAddr,methodName)
+                            print compareResult.errorInfo()
+                            return (False,"Failed to sync")
             response.close()
         print "Method:%s is sync in cluster" % (methodName)
         print "\n------------------------------------------"
         return (True,"")
-
 
     def _checkSingleMethodStatusConsistent(self,method):
             responseList = []
