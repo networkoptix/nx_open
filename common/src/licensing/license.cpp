@@ -459,6 +459,9 @@ void QnLicense::verify( const QByteArray& v1LicenseBlock, const QByteArray& v2Li
 // QnLicenseListHelper
 // -------------------------------------------------------------------------- //
 
+QnLicenseListHelper::QnLicenseListHelper()
+{}
+
 QnLicenseListHelper::QnLicenseListHelper(const QnLicenseList& licenseList) {
     update(licenseList);
 }

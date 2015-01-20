@@ -135,6 +135,7 @@ typedef QMap<QByteArray, QnLicensePtr> QnLicenseDict;
 class QnLicenseListHelper
 {
 public:
+    QnLicenseListHelper();
     QnLicenseListHelper(const QnLicenseList& licenseList);
 
     void update(const QnLicenseList& licenseList);
