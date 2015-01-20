@@ -16,7 +16,7 @@ class QNetworkAccessManager;
 class QNetworkReply;
 
 class QnLicenseListModel;
-class QnLicenseUsageHelper;
+class QnLicenseUsageWatcher;
 
 namespace Ui {
     class LicenseManagerWidget;
@@ -29,6 +29,9 @@ class QnLicenseManagerWidget : public Connective<QnAbstractPreferencesWidget> {
 public:
     explicit QnLicenseManagerWidget(QWidget *parent = 0);
     virtual ~QnLicenseManagerWidget();
+
+protected:
+    virtual void showEvent(QShowEvent *event) override;
 
 private slots:
     void updateLicenses();
@@ -58,8 +61,8 @@ private:
 
     QScopedPointer<Ui::LicenseManagerWidget> ui;
     QnLicenseListModel *m_model;
-    QScopedPointer<QnLicenseUsageHelper> m_camerasUsageHelper;
-    QScopedPointer<QnLicenseUsageHelper> m_videowallUsageHelper;
+    QScopedPointer<QnLicenseUsageWatcher> m_camerasUsageWatcher;
+    QScopedPointer<QnLicenseUsageWatcher> m_videowallUsageWatcher;
     QNetworkAccessManager *m_httpClient;
     QnLicenseList m_licenses;
     QMap<int, QByteArray> m_handleKeyMap;

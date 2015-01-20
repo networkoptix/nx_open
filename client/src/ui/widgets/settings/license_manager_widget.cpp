@@ -37,8 +37,8 @@
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     base_type(parent),
     ui(new Ui::LicenseManagerWidget),
-    m_camerasUsageHelper(new QnCamLicenseUsageHelper()),
-    m_videowallUsageHelper(new QnVideoWallLicenseUsageHelper()),
+    m_camerasUsageWatcher(new QnCamLicenseUsageWatcher()),
+    m_videowallUsageWatcher(new QnVideoWallLicenseUsageWatcher()),
     m_httpClient(NULL)
 {
     ui->setupUi(this);
@@ -69,8 +69,15 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     connect(ui->gridLicenses,                   SIGNAL(doubleClicked(const QModelIndex &)),                         this,   SLOT(at_gridLicenses_doubleClicked(const QModelIndex &)));
     connect(ui->licenseWidget,                  SIGNAL(stateChanged()),                                             this,   SLOT(at_licenseWidget_stateChanged()));
     connect(this,                               SIGNAL(showMessageLater(QString,QString,bool)),                     this,   SLOT(showMessage(QString,QString,bool)), Qt::QueuedConnection);
-    connect(m_camerasUsageHelper,               &QnLicenseUsageHelper::licensesChanged,                             this,   &QnLicenseManagerWidget::updateLicenses);
-    connect(m_videowallUsageHelper,             &QnLicenseUsageHelper::licensesChanged,                             this,   &QnLicenseManagerWidget::updateLicenses);
+
+    auto updateLicensesIfNeeded = [this] {
+        if (!isVisible())
+            return;
+        updateLicenses();
+    };
+
+    connect(m_camerasUsageWatcher,              &QnLicenseUsageWatcher::licenseUsageChanged,                        this,   updateLicensesIfNeeded);
+    connect(m_videowallUsageWatcher,            &QnLicenseUsageWatcher::licenseUsageChanged,                        this,   updateLicensesIfNeeded);
 
     updateLicenses();
 }
@@ -78,6 +85,11 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
 QnLicenseManagerWidget::~QnLicenseManagerWidget()
 {
 }
+
+void QnLicenseManagerWidget::showEvent(QShowEvent *event) {
+    base_type::showEvent(event);
+}
+
 
 void QnLicenseManagerWidget::updateLicenses() {
     // do not re-read licenses if we are activating one now
@@ -109,14 +121,18 @@ void QnLicenseManagerWidget::updateLicenses() {
     bool useRedLabel = false;
 
     if (!m_licenses.isEmpty()) {
+        qDebug() << "LICENSES UPDATED";
+
         // TODO: #Elric #TR total mess with numerous forms, and no idea how to fix it in a sane way
 
         QString msg(tr("The software is licensed to: "));
 
+        QnCamLicenseUsageHelper camUsageHelper;
+        QnVideoWallLicenseUsageHelper vwUsageHelper;
         QList<QnLicenseUsageHelper*> helpers;
         helpers 
-            << m_camerasUsageHelper.data()
-            << m_videowallUsageHelper.data()
+            << &camUsageHelper
+            << &vwUsageHelper
             ;
 
         foreach (QnLicenseUsageHelper* helper, helpers) {

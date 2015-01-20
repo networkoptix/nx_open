@@ -635,8 +635,16 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     /* Process input files. */
     bool haveInputFiles = false;
-    for (int i = 1; i < argc; ++i)
-        haveInputFiles |= mainWindow->handleMessage(QFile::decodeName(argv[i]));
+    {
+        bool skipArg = true;
+        for (const auto& arg: qApp->arguments())
+        {
+            if (!skipArg)
+                haveInputFiles |= mainWindow->handleMessage(arg);
+            skipArg = false;
+        }
+    }
+
     if(!noSingleApplication)
         QObject::connect(application, SIGNAL(messageReceived(const QString &)), mainWindow.data(), SLOT(handleMessage(const QString &)));
 

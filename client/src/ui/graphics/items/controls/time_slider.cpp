@@ -2066,7 +2066,7 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
                 continue;
 
             qreal x = rect.width() / 2 + data.pos * thumbnailWidth;;
-            QSizeF targetSize(data.thumbnail.aspectRatio() * rect.height(), rect.height());
+            QSizeF targetSize(m_thumbnailsAspectRatio * rect.height(), rect.height());
             QRectF targetRect(x - targetSize.width() / 2, rect.top(), targetSize.width(), targetSize.height());
 
             drawThumbnail(painter, data, targetRect, boundingRect);
@@ -2091,7 +2091,7 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
                 continue;
 
             qreal x = quickPositionFromValue(time, false);
-            QSizeF targetSize(data.thumbnail.aspectRatio() * rect.height(), rect.height());
+            QSizeF targetSize(m_thumbnailsAspectRatio * rect.height(), rect.height());
             QRectF targetRect(x - targetSize.width() / 2, rect.top(), targetSize.width(), targetSize.height());
 
             drawThumbnail(painter, data, targetRect, boundingRect);

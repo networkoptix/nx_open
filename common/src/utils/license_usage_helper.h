@@ -11,6 +11,16 @@ static const QString QN_LICENSE_URL(lit("http://licensing.networkoptix.com/nxlic
 
 struct LicenseCompatibility;
 
+class QnLicenseUsageWatcher: public Connective<QObject> {
+    Q_OBJECT
+
+   typedef Connective<QObject> base_type;
+public:
+    QnLicenseUsageWatcher(QObject* parent = NULL);
+signals:
+    void licenseUsageChanged();
+};
+
 class QnLicenseUsageHelper: public Connective<QObject>
 {
     Q_OBJECT
@@ -80,27 +90,41 @@ public:
      */
     static QString activationMessage(const QJsonObject& errorMessage);
 
-    void update();
-signals:
-     void licensesChanged();
-
+    /** Mark data as invalid and needs to be recalculated. */
+    void invalidate();
 protected:
     virtual int calculateUsedLicenses(Qn::LicenseType licenseType, bool countProposed = true) const = 0;
     virtual int calculateOverflowLicenses(Qn::LicenseType licenseType, int borrowedLicenses) const;
 
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const = 0;
-    
+
+    void updateCache() const;
 private:
-    int borrowLicenses(const LicenseCompatibility &compat, licensesArray &licenses);
+    int borrowLicenses(const LicenseCompatibility &compat, licensesArray &licenses) const;
 
 private:
-    QnLicenseListHelper m_licenses;
+    mutable bool m_dirty;
     mutable QList<Qn::LicenseType> m_licenseTypes;
 
-    licensesArray m_totalLicenses;
-    licensesArray m_usedLicenses;
-    licensesArray m_proposedLicenses;
-    licensesArray m_overflowLicenses;
+    struct Cache {
+        Cache();
+
+        QnLicenseListHelper licenses;
+        licensesArray total;
+        licensesArray used;
+        licensesArray proposed;
+        licensesArray overflow;
+    };
+    
+    mutable Cache m_cache;
+};
+
+class QnCamLicenseUsageWatcher: public QnLicenseUsageWatcher {
+    Q_OBJECT
+
+    typedef QnLicenseUsageWatcher base_type;
+public:
+    QnCamLicenseUsageWatcher(QObject* parent = NULL);
 };
 
 class QnCamLicenseUsageHelper: public QnLicenseUsageHelper {
@@ -134,6 +158,14 @@ private:
 
     QSet<QnVirtualCameraResourcePtr> m_proposedToEnable;
     QSet<QnVirtualCameraResourcePtr> m_proposedToDisable;
+};
+
+class QnVideoWallLicenseUsageWatcher: public QnLicenseUsageWatcher {
+    Q_OBJECT
+
+    typedef QnLicenseUsageWatcher base_type;
+public:
+    QnVideoWallLicenseUsageWatcher(QObject* parent = NULL);
 };
 
 class QnVideoWallLicenseUsageHelper: public QnLicenseUsageHelper {
