@@ -20,9 +20,11 @@
 
 #include <QString>
 
-// TODO: #AK what's wrong with QHostAddress? Why create a separate class?
 
 //!Represents ipv4 address. Supports conversion to QString and to uint32
+/*!
+    \note Not using QHostAddress because QHostAddress can trigger dns name lookup which depends on Qt sockets which we do not want to use
+*/
 class HostAddress
 {
 public:
@@ -91,6 +93,19 @@ public:
             address.toString() +
             (port > 0 ? QString::fromLatin1(":%1").arg(port) : QString());
     }
+};
+
+class SocketGlobalRuntimeInternal;
+
+//!This class instance MUST be created for sockets to be operational
+class SocketGlobalRuntime
+{
+public:
+    SocketGlobalRuntime();
+    ~SocketGlobalRuntime();
+
+private:
+    SocketGlobalRuntimeInternal* m_data;
 };
 
 #endif  //SOCKET_COMMON_H

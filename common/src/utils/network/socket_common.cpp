@@ -6,6 +6,7 @@
 #include "socket_common.h"
 
 #include "host_address_resolver.h"
+#include "aio/aioservice.h"
 
 
 const HostAddress HostAddress::localhost( QLatin1String("127.0.0.1") );
@@ -90,4 +91,24 @@ struct in_addr HostAddress::inAddr(bool* ok) const
     if( ok )
         *ok = m_addressResolved;
     return m_sinAddr;
+}
+
+
+class SocketGlobalRuntimeInternal
+{
+public:
+    HostAddressResolver hostAddressResolver;
+    aio::AIOService aioService;
+};
+
+SocketGlobalRuntime::SocketGlobalRuntime()
+:
+    m_data( new SocketGlobalRuntimeInternal() )
+{
+}
+
+SocketGlobalRuntime::~SocketGlobalRuntime()
+{
+    delete m_data;
+    m_data = nullptr;
 }

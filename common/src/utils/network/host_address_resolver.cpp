@@ -37,7 +37,7 @@ HostAddressResolver::~HostAddressResolver()
 void HostAddressResolver::pleaseStop()
 {
     QMutexLocker lk( &m_mutex );
-    m_terminated = false;
+    m_terminated = true;
     m_cond.wakeAll();
 }
 
