@@ -97,6 +97,8 @@ void QnClockLabel::init(const QString &format) {
 
 void QnClockLabel::contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
 {
+#ifdef _DEBUG
+    //displaying clock type selection menu
     QMenu menu;
     menu.addActions( actions() );
     QAction* selectedAction = menu.exec( event->screenPos() );
@@ -104,4 +106,7 @@ void QnClockLabel::contextMenuEvent( QGraphicsSceneContextMenuEvent* event )
         m_provider->setClockType( QnClockDataProvider::serverClock );
     else if( selectedAction == m_localTimeAction )
         m_provider->setClockType( QnClockDataProvider::localSystemClock );
+#else
+    base_type::contextMenuEvent( event );
+#endif
 }
