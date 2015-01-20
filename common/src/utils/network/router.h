@@ -52,12 +52,16 @@ private:
     bool addConnection(const QnUuid &id, const Endpoint &endpoint);
     bool removeConnection(const QnUuid &id, const Endpoint &endpoint);
 
+    void updateRuntimeData(bool force = false);
+
 private:
     mutable QMutex m_mutex;
     std::weak_ptr<ec2::AbstractECConnection> m_connection;
     QScopedPointer<QnRouteBuilder> m_routeBuilder;
     QMultiHash<QnUuid, Endpoint> m_connections;
     bool m_passive;
+    QTimer *m_runtimeDataUpdateTimer;
+    qint64 m_lastRuntimeDataUpdate;
 };
 
 #endif // ROUTER_H
