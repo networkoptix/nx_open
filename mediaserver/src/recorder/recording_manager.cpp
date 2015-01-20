@@ -601,6 +601,7 @@ void QnRecordingManager::at_checkLicenses()
                 connect(m_licenseMutex, &ec2::QnDistributedMutex::locked, this, &QnRecordingManager::at_licenseMutexLocked, Qt::QueuedConnection);
                 connect(m_licenseMutex, &ec2::QnDistributedMutex::lockTimeout, this, &QnRecordingManager::at_licenseMutexTimeout, Qt::QueuedConnection);
                 m_licenseMutex->lockAsync();
+                helper.invalidate();
                 break;
             }
         }
@@ -640,7 +641,7 @@ void QnRecordingManager::at_licenseMutexLocked()
             }
             propertyDictionary->saveParams( camera->getId() );
             disabledCameras += QString(lit("%1 (%2)")).arg(camera->getName()).arg(camera->getHostAddress());
-            helper.update();
+            helper.invalidate();
         }
     }
     m_licenseMutex->unlock();
