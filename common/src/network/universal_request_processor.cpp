@@ -95,7 +95,8 @@ void QnUniversalRequestProcessor::run()
         {
             parseRequest();
 
-            if(!authenticate(&d->authUserId))
+            d->processor = dynamic_cast<QnUniversalTcpListener*>(d->owner)->createNativeProcessor(d->socket, d->request.requestLine.version.protocol, d->request);
+            if(d->processor && !authenticate(&d->authUserId)) 
                 return;
 
             d->response.headers.clear();
@@ -104,8 +105,11 @@ void QnUniversalRequestProcessor::run()
                 d->response.headers.insert(nx_http::HttpHeader("Connection", "Keep-Alive"));
                 d->response.headers.insert(nx_http::HttpHeader("Keep-Alive", lit("timeout=%1").arg(KEEP_ALIVE_TIMEOUT/1000).toLatin1()) );
             }
-            if( !processRequest() )
-            {
+
+            if(d->processor) {
+                processRequest();
+            }
+            else {
                 QByteArray contentType;
                 int rez = redirectTo(QnTcpListener::defaultPage(), contentType);
                 sendResponse(rez, contentType);
@@ -124,15 +128,11 @@ void QnUniversalRequestProcessor::run()
         d->socket->close();
 }
 
-bool QnUniversalRequestProcessor::processRequest()
+void QnUniversalRequestProcessor::processRequest()
 {
     Q_D(QnUniversalRequestProcessor);
 
     QMutexLocker lock(&d->mutex);
-    d->processor = dynamic_cast<QnUniversalTcpListener*>(d->owner)->createNativeProcessor(d->socket, d->request.requestLine.version.protocol, d->request);
-    if( !d->processor )
-        return false;
-
     if (d->processor && !needToStop()) 
     {
         copyClientRequestTo(*d->processor);
@@ -144,7 +144,6 @@ bool QnUniversalRequestProcessor::processRequest()
     }
     delete d->processor;
     d->processor = 0;
-    return true;
 }
 
 void QnUniversalRequestProcessor::pleaseStop()
