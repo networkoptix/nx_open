@@ -23,10 +23,10 @@ angular.module('webadminApp')
 
         $scope.logout = function(){
 
-            ipCookie.remove('response');
-            ipCookie.remove('nonce');
-            ipCookie.remove('realm');
-            ipCookie.remove('username');
+            ipCookie.remove('response','/');
+            ipCookie.remove('nonce','/');
+            ipCookie.remove('realm','/');
+            ipCookie.remove('username','/');
             window.location.reload();
         }
     });
