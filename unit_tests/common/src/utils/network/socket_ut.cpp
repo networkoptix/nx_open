@@ -27,20 +27,14 @@ class SocketAsyncModeTest
     public ::testing::Test
 {
 protected:
-    static std::unique_ptr<SocketGlobalRuntime> socketGlobalRuntimeInstance;
-
     static void SetUpTestCase()
     {
-        socketGlobalRuntimeInstance.reset( new SocketGlobalRuntime() );
     }
 
     static void TearDownTestCase()
     {
-        socketGlobalRuntimeInstance.reset();
     }
 };
-
-std::unique_ptr<SocketGlobalRuntime> SocketAsyncModeTest::socketGlobalRuntimeInstance;
 
 /*!
     This test verifies that AbstractCommunicatingSocket::cancelAsyncIO method works fine
