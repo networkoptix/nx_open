@@ -5,6 +5,7 @@
 
 #include <chrono>
 #include <condition_variable>
+#include <deque>
 #include <mutex>
 #include <thread>
 
@@ -122,11 +123,120 @@ TEST_F( SocketAsyncModeTest, HostNameResolve1 )
     ASSERT_TRUE( connectErrorCode == SystemError::noError );
 }
 
+namespace
+{
+    //TODO #ak consult gtest docs on how to move it to the test
+
+    static const int CONCURRENT_CONNECTIONS = 100;
+    static const int TOTAL_CONNECTIONS = 10000;
+
+    void startAnotherSocket(
+        std::condition_variable& cond,
+        std::mutex& mutex,
+        std::atomic<int>& startedConnectionsCount,
+        std::atomic<int>& completedConnectionsCount,
+        std::deque<std::unique_ptr<AbstractStreamSocket>>& connections )
+    {
+        std::unique_ptr<AbstractStreamSocket> connection( SocketFactory::createStreamSocket() );
+        AbstractStreamSocket* connectionPtr = connection.get();
+        connections.push_back( std::move(connection) );
+        ASSERT_TRUE( connectionPtr->setNonBlockingMode( true ) );
+        ASSERT_TRUE( connectionPtr->connectAsync(
+            SocketAddress(QString::fromLatin1("ya.ru"), nx_http::DEFAULT_HTTP_PORT),
+            [&cond, &mutex, &startedConnectionsCount, &completedConnectionsCount, &connections, connectionPtr]
+                (SystemError::ErrorCode errorCode) mutable {
+                    std::unique_lock<std::mutex> lk( mutex );
+                    ASSERT_TRUE( errorCode == SystemError::noError );
+                    cond.notify_all();
+                    //resolvedAddress = connectionPtr->getForeignAddress().address;
+
+                    auto iterToRemove = std::remove_if(
+                        connections.begin(), connections.end(),
+                        [connectionPtr]( const std::unique_ptr<AbstractStreamSocket>& elem ) -> bool
+                            { return elem.get() == connectionPtr; } );
+                    if( iterToRemove != connections.end() )
+                    {
+                        ++completedConnectionsCount;
+                        connections.erase( iterToRemove, connections.end() );
+                    }
+
+                    while( connections.size() < CONCURRENT_CONNECTIONS )
+                    {
+                        if( (++startedConnectionsCount) <= TOTAL_CONNECTIONS )
+                            startAnotherSocket(
+                                cond,
+                                mutex,
+                                startedConnectionsCount,
+                                completedConnectionsCount,
+                                connections );
+                        else
+                            break;
+                    }
+                }
+            ) );
+    }
+}
+
 TEST_F( SocketAsyncModeTest, HostNameResolve2 )
 {
-    nx_http::HttpClient httpClient;
-    ASSERT_TRUE( httpClient.doGet( QUrl( "http://ya.ru" ) ) );
-    ASSERT_TRUE( httpClient.response() != nullptr );
+    std::condition_variable cond;
+    std::mutex mutex;
+    std::atomic<int> startedConnectionsCount = 0;
+    std::atomic<int> completedConnectionsCount = 0;
+    std::deque<std::unique_ptr<AbstractStreamSocket>> connections;
+    HostAddress resolvedAddress;
+
+    startedConnectionsCount = CONCURRENT_CONNECTIONS;
+    for( int i = 0; i < CONCURRENT_CONNECTIONS; ++i )
+        startAnotherSocket(
+            cond,
+            mutex,
+            startedConnectionsCount,
+            completedConnectionsCount,
+            connections );
+
+    int canCancelIndex = 0;
+    int cancelledConnectionsCount = 0;
+    std::unique_lock<std::mutex> lk( mutex );
+    while( (completedConnectionsCount + cancelledConnectionsCount) < TOTAL_CONNECTIONS )
+    {
+        std::unique_ptr<AbstractStreamSocket> connectionToCancel;
+        if( !connections.empty() && (canCancelIndex < startedConnectionsCount) )
+        {
+            auto connectionToCancelIter = connections.begin();
+            size_t index = rand() % connections.size();
+            std::advance( connectionToCancelIter, index );
+            connectionToCancel = std::move(*connectionToCancelIter);
+            connections.erase( connectionToCancelIter );
+            canCancelIndex += /*index +*/ 1;
+        }
+        lk.unlock();
+        if( connectionToCancel )
+        {
+            connectionToCancel->cancelAsyncIO();
+            connectionToCancel.reset();
+            ++cancelledConnectionsCount;
+        }
+        std::this_thread::sleep_for( std::chrono::milliseconds(1) );
+        lk.lock();
+    }
+
+    QString ipStr = HostAddress( resolvedAddress.inAddr() ).toString();
+    ASSERT_TRUE( connections.empty() );
+}
+
+TEST_F( SocketAsyncModeTest, HostNameResolve3 )
+{
+    {
+        nx_http::HttpClient httpClient;
+        ASSERT_TRUE( httpClient.doGet( QUrl( "http://ya.ru" ) ) );
+        ASSERT_TRUE( httpClient.response() != nullptr );
+    }
+
+    {
+        nx_http::HttpClient httpClient;
+        ASSERT_TRUE( !httpClient.doGet( QUrl( "http://hren2349jf234.ru" ) ) );
+    }
 }
 
 TEST_F( SocketAsyncModeTest, HostNameResolveCancellation )

@@ -25,14 +25,15 @@
 */
 class HostAddressResolver
 :
-    public QnLongRunnable,
-    public Singleton<HostAddressResolver>
+    public QnLongRunnable
 {
 public:
     typedef void* RequestID;
 
     HostAddressResolver();
     virtual ~HostAddressResolver();
+
+    static HostAddressResolver* instance();
 
     //!Implementation of QnLongRunnable::pleaseStop
     virtual void pleaseStop() override;

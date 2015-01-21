@@ -13,6 +13,7 @@
 #endif
 
 #include <algorithm>
+#include <atomic>
 
 #include <QMutexLocker>
 
@@ -30,6 +31,8 @@ HostAddressResolver::ResolveTask::ResolveTask(
 {
 }
 
+static std::atomic<HostAddressResolver*> HostAddressResolver_instance = nullptr;
+
 HostAddressResolver::HostAddressResolver()
 :
     m_terminated( false ),
@@ -37,11 +40,23 @@ HostAddressResolver::HostAddressResolver()
     m_currentSequence( 0 )
 {
     start();
+
+    Q_ASSERT( HostAddressResolver_instance.load() == nullptr );
+    HostAddressResolver_instance = this;
 }
 
 HostAddressResolver::~HostAddressResolver()
 {
+    Q_ASSERT( HostAddressResolver_instance == this );
+    HostAddressResolver_instance = nullptr;
+
     stop();
+}
+
+HostAddressResolver* HostAddressResolver::instance()
+{
+    SocketGlobalRuntime::instance();    //instanciates socket-related globals in correct order
+    return HostAddressResolver_instance.load( std::memory_order_relaxed );
 }
 
 void HostAddressResolver::pleaseStop()
