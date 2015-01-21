@@ -429,7 +429,61 @@
         },
         {
             "keys": [
+                "VISTA|VK2-1080XVRDPTZF"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [   1,  -1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "_TODO": "Actual tilt range is [0, -180].",
+                        "device":  [0.9,   0],
+                        "logical": [0,   -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [    -1,   -0.9,   -0.8,   -0.7,   -0.6,   -0.5,   -0.4,   -0.3,   -0.2,   -0.1,      0,    0.1,    0.2,    0.3,    0.4,    0.5,    0.6,    0.7,    0.8,    0.9,       1],
+                        "logical": [1.0000, 1.0748, 1.1636, 1.2617, 1.3738, 1.5000, 1.6449, 1.8178, 2.0187, 2.2477, 2.5234, 2.8458, 3.2383, 3.7150, 4.2850, 4.9766, 5.8411, 6.8645, 7.9626, 9.2925, 10.9050],
+                        "logicalMultiplier": 32.0,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "keys": [
                 "VISTA|VK2-1080XPTZ"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [   1,  -1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "_TODO": "Actual tilt range is [0, -180].",
+                        "device":  [0.9,   0],
+                        "logical": [0,   -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [    -1,   -0.9,   -0.8,   -0.7,   -0.6,   -0.5,   -0.4,   -0.3,   -0.2,   -0.1,      0,    0.1,    0.2,    0.3,    0.4,    0.5,    0.6,     0.7,     0.8,     0.9,       1],
+                        "logical": [1.0000, 1.0859, 1.1797, 1.2891, 1.4141, 1.5703, 1.7422, 1.9453, 2.2031, 2.5000, 2.8672, 3.3281, 3.9297, 4.7344, 5.7188, 7.0313, 8.7969, 12.1481, 14.8011, 19.6882, 29.3229],
+                        "logicalMultiplier": 30.0,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },    
+        {
+            "keys": [
+                "VISTA|VK2-1080XPTZF"
             ],
             "ptzMapper": {
                 "fromCamera": {

@@ -1,5 +1,7 @@
 #include "router.h"
 
+#include <QtCore/QElapsedTimer>
+
 #include "utils/common/log.h"
 #include "nx_ec/dummy_handler.h"
 #include "nx_ec/ec_api.h"
@@ -7,12 +9,18 @@
 #include "route_builder.h"
 #include "module_finder.h"
 
+namespace {
+    static const int runtimeDataUpdateTimeout = 3000;
+} // anonymous namespace
+
 QnRouter::QnRouter(QnModuleFinder *moduleFinder, bool passive, QObject *parent) :
     QObject(parent),
     m_mutex(QMutex::Recursive),
     m_connection(std::weak_ptr<ec2::AbstractECConnection>()),
     m_routeBuilder(new QnRouteBuilder(qnCommon->moduleGUID())),
-    m_passive(passive)
+    m_passive(passive),
+    m_runtimeDataUpdateTimer(new QTimer(this)),
+    m_runtimeDataElapsedTimer(new QElapsedTimer())
 {
     connect(moduleFinder,       &QnModuleFinder::moduleUrlFound,    this,   &QnRouter::at_moduleFinder_moduleUrlFound);
     connect(moduleFinder,       &QnModuleFinder::moduleUrlLost,     this,   &QnRouter::at_moduleFinder_moduleUrlLost);
@@ -21,6 +29,12 @@ QnRouter::QnRouter(QnModuleFinder *moduleFinder, bool passive, QObject *parent) 
     connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoAdded,    this,   &QnRouter::at_runtimeInfoManager_runtimeInfoAdded);
     connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoChanged,  this,   &QnRouter::at_runtimeInfoManager_runtimeInfoChanged);
     connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoRemoved,  this,   &QnRouter::at_runtimeInfoManager_runtimeInfoRemoved);
+
+    m_runtimeDataUpdateTimer = new QTimer(this);
+    m_runtimeDataUpdateTimer->setInterval(runtimeDataUpdateTimeout);
+    m_runtimeDataUpdateTimer->setSingleShot(true);
+    connect(m_runtimeDataUpdateTimer, &QTimer::timeout, this, [this](){ updateRuntimeData(true); });
+    m_runtimeDataElapsedTimer->start();
 }
 
 QnRouter::~QnRouter() {}
@@ -76,18 +90,8 @@ void QnRouter::at_moduleFinder_moduleUrlFound(const QnModuleInformation &moduleI
     if (!addConnection(qnCommon->moduleGUID(), endpoint))
         return;
 
-    if (!m_passive) {
-        QnRuntimeInfoManager *runtimeInfoManager = QnRuntimeInfoManager::instance();
-        if (runtimeInfoManager) {
-            QnPeerRuntimeInfo localInfo = runtimeInfoManager->localInfo();
-            ec2::ApiConnectionData connection;
-            connection.peerId = endpoint.id;
-            connection.host = endpoint.host;
-            connection.port = endpoint.port;
-            localInfo.data.availableConnections.append(connection);
-            runtimeInfoManager->updateLocalItem(localInfo);
-        }
-    }
+    if (!m_passive)
+        updateRuntimeData();
 
     emit connectionAdded(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port);
 }
@@ -98,18 +102,8 @@ void QnRouter::at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleIn
     if (!removeConnection(qnCommon->moduleGUID(), endpoint))
         return;
 
-    if (!m_passive) {
-        QnRuntimeInfoManager *runtimeInfoManager = QnRuntimeInfoManager::instance();
-        if (runtimeInfoManager) {
-            QnPeerRuntimeInfo localInfo = runtimeInfoManager->localInfo();
-            ec2::ApiConnectionData connection;
-            connection.peerId = endpoint.id;
-            connection.host = endpoint.host;
-            connection.port = endpoint.port;
-            localInfo.data.availableConnections.removeOne(connection);
-            runtimeInfoManager->updateLocalItem(localInfo);
-        }
-    }
+    if (!m_passive)
+        updateRuntimeData();
 
     emit connectionRemoved(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port);
 }
@@ -174,4 +168,33 @@ bool QnRouter::removeConnection(const QnUuid &id, const QnRouter::Endpoint &endp
     emit connectionRemoved(id, endpoint.id, endpoint.host, endpoint.port);
 
     return true;
+}
+
+void QnRouter::updateRuntimeData(bool force) {
+    QnRuntimeInfoManager *runtimeInfoManager = QnRuntimeInfoManager::instance();
+    if (!runtimeInfoManager)
+        return;
+
+    if (!force && !m_runtimeDataElapsedTimer->hasExpired(runtimeDataUpdateTimeout)) {
+        if (!m_runtimeDataUpdateTimer->isActive())
+            m_runtimeDataUpdateTimer->start();
+        return;
+    }
+
+    m_runtimeDataUpdateTimer->stop();
+
+    QList<ec2::ApiConnectionData> connections;
+    for (const Endpoint &endpoint: m_connections.values(qnCommon->moduleGUID())) {
+        ec2::ApiConnectionData connection;
+        connection.peerId = endpoint.id;
+        connection.host = endpoint.host;
+        connection.port = endpoint.port;
+        connections.append(connection);
+    }
+
+    QnPeerRuntimeInfo localInfo = runtimeInfoManager->localInfo();
+    localInfo.data.availableConnections = connections;
+    runtimeInfoManager->updateLocalItem(localInfo);
+
+    m_runtimeDataElapsedTimer->start();
 }

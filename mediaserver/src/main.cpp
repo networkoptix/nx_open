@@ -184,6 +184,7 @@ static const quint64 DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
 static const QString REMOVE_DB_PARAM_NAME(lit("removeDbOnStartup"));
 static const QByteArray SYSTEM_IDENTITY_TIME("sysIdTime");
+static const QByteArray AUTH_KEY("authKey");
 
 class QnMain;
 static QnMain* serviceMainInstance = 0;
@@ -737,6 +738,14 @@ int serverMain(int argc, char *argv[])
     return 0;
 }
 
+void encodeAndStoreAuthKey(const QByteArray& authKey)
+{
+    QByteArray prefix("SK_");
+    QByteArray authKeyBin = QnUuid(authKey).toRfc4122();
+    QByteArray authKeyEncoded = QnAuthHelper::symmetricalEncode(authKeyBin).toHex();
+    MSSettings::roSettings()->setValue(AUTH_KEY, prefix + authKeyEncoded); // encode and update in settings
+}
+
 void initAppServerConnection(QSettings &settings)
 {
     // migrate appserverPort settings from version 2.2 if exist
@@ -778,21 +787,16 @@ void initAppServerConnection(QSettings &settings)
     // TODO: Actually appserverPassword is always empty. Remove?
     QString userName = settings.value("appserverLogin", QLatin1String("admin")).toString();
     QString password = settings.value("appserverPassword", QLatin1String("")).toString();
-    QByteArray authKey = settings.value("authKey").toByteArray();
+    QByteArray authKey = settings.value(AUTH_KEY).toByteArray();
     QString appserverHostString = settings.value("appserverHost").toString();
     if (!authKey.isEmpty() && !isLocalAppServer(appserverHostString))
     {
         // convert from v2.2 format and encode value
         QByteArray prefix("SK_");
         if (!authKey.startsWith(prefix))
-        {
-            QByteArray authKeyBin = QnUuid(authKey).toRfc4122();
-            QByteArray authKeyEncoded = QnAuthHelper::symmetricalEncode(authKeyBin).toHex();
-            settings.setValue(lit("authKey"), prefix + authKeyEncoded); // encode and update in settings
-        }
-        else {
+            encodeAndStoreAuthKey(authKey);
+        else
             authKey = decodeAuthKey(authKey);
-        }
 
         userName = serverGuid().toString();
         password = authKey;
@@ -1623,7 +1627,7 @@ void QnMain::run()
             isModified = true;
         }
         
-        bool needUpdateAuthKey = server->getAuthKey().isEmpty();
+        bool needUpdateAuthKey = false;
         if (server->getSystemName() != qnCommon->localSystemName())
         {
             if (!server->getSystemName().isEmpty())
@@ -1635,18 +1639,26 @@ void QnMain::run()
             server->setVersion(qnCommon->engineVersion());
             isModified = true;
         }
-        if (needUpdateAuthKey) {
-            QByteArray authKey = MSSettings::roSettings()->value("authKey").toString().toLatin1();
-            authKey = !authKey.isEmpty() ? decodeAuthKey(authKey) : QnUuid::createUuid().toString().toLatin1(); 
+
+        QByteArray settingsAuthKey = decodeAuthKey(MSSettings::roSettings()->value(AUTH_KEY).toString().toLatin1());
+        QByteArray authKey = settingsAuthKey;
+        if (authKey.isEmpty())
+            authKey = server->getAuthKey().toLatin1();
+        if (authKey.isEmpty() || needUpdateAuthKey)
+            authKey = QnUuid::createUuid().toString().toLatin1(); 
+
+        if (server->getAuthKey().toLatin1() != authKey) {
             server->setAuthKey(authKey);
             isModified = true;
         }
+        // Keep server auth key in registry. Server MUST be able pass authorization after deleting database in database restore process
+        if (settingsAuthKey != authKey)
+            encodeAndStoreAuthKey(authKey);
 
         if (isModified)
             m_mediaServer = registerServer(ec2Connection, server);
         else
             m_mediaServer = server;
-
 
         if (m_mediaServer.isNull())
             QnSleep::msleep(1000);
@@ -2050,6 +2062,7 @@ public:
 
 protected:
     virtual int executeApplication() override {
+        QScopedPointer<SocketGlobalRuntime> socketGlobalRuntime(new SocketGlobalRuntime());
         QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
         QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
         QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));

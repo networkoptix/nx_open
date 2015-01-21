@@ -20,12 +20,15 @@
 
 #include <QString>
 
-// TODO: #AK what's wrong with QHostAddress? Why create a separate class?
 
 //!Represents ipv4 address. Supports conversion to QString and to uint32
+/*!
+    \note Not using QHostAddress because QHostAddress can trigger dns name lookup which depends on Qt sockets which we do not want to use
+*/
 class HostAddress
 {
 public:
+    //!Creates 0.0.0.0 address
     HostAddress();
     HostAddress( struct in_addr& sinAddr );
     /*!
@@ -40,7 +43,7 @@ public:
 
     bool operator==( const HostAddress& right ) const;
 
-    struct in_addr inAddr() const;
+    struct in_addr inAddr(bool* ok = nullptr) const;
 
     static const HostAddress localhost;
     static const HostAddress anyHost;
@@ -48,6 +51,10 @@ public:
 private:
     mutable boost::optional<QString> m_addrStr;
     struct in_addr m_sinAddr;
+    //!if \a true \a m_sinAddr contains ip address corresponding to \a m_addrStr
+    bool m_addressResolved;
+
+    friend class HostAddressResolver;
 };
 
 //!Represents host and port (e.g. 127.0.0.1:1234)
@@ -86,6 +93,19 @@ public:
             address.toString() +
             (port > 0 ? QString::fromLatin1(":%1").arg(port) : QString());
     }
+};
+
+class SocketGlobalRuntimeInternal;
+
+//!This class instance MUST be created for sockets to be operational
+class SocketGlobalRuntime
+{
+public:
+    SocketGlobalRuntime();
+    ~SocketGlobalRuntime();
+
+private:
+    SocketGlobalRuntimeInternal* m_data;
 };
 
 #endif  //SOCKET_COMMON_H

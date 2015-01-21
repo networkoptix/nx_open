@@ -21,15 +21,10 @@ using namespace std;
 
 namespace aio
 {
-    static unsigned int threadCountArgValue = 0;
-
     typedef AIOThread<Pollable> SystemAIOThread;
 
     AIOService::AIOService( unsigned int threadCount )
     {
-        if( !threadCount )
-            threadCount = threadCountArgValue;
-
         if( !threadCount )
             threadCount = QThread::idealThreadCount();
 
@@ -73,12 +68,6 @@ namespace aio
 
     Q_GLOBAL_STATIC( AIOService, aioServiceInstance )
     
-    AIOService* AIOService::instance( unsigned int threadCount )
-    {
-        threadCountArgValue = threadCount;
-        return aioServiceInstance();
-    }
-
     template<> AIOService::SocketAIOContext<Pollable>& AIOService::getAIOHandlingContext()
     {
         return m_systemSocketAIO;
