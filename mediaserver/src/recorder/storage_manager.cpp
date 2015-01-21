@@ -430,13 +430,13 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
         connect(storage.data(), SIGNAL(archiveRangeChanged(const QnAbstractStorageResourcePtr &, qint64, qint64)), 
                 this, SLOT(at_archiveRangeChanged(const QnAbstractStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
     }
-
+#if 0
     if (m_catalogLoaded) 
     {
         for (int i = 0; i < QnServer::ChunksCatalogCount; ++i)
             doMigrateCSVCatalog(static_cast<QnServer::ChunksCatalog>(i));
     }
-
+#endif
     loadFullFileCatalog(storage);
     updateStorageStatistics();
 }
@@ -459,6 +459,7 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (storage && storage->getParentId() == qnCommon->moduleGUID()) 
     {
+#if 0
         if (m_initInProgress) {
             addStorage(storage);
         }
@@ -467,6 +468,9 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
             task->setAutoDelete(true);
             QThreadPool::globalInstance()->start(task);
         }
+#else
+        addStorage(storage);
+#endif
     }
 }
 
