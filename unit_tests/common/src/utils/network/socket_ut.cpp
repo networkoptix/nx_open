@@ -227,9 +227,16 @@ TEST_F( SocketAsyncModeTest, HostNameResolve2 )
 
 TEST_F( SocketAsyncModeTest, HostNameResolve3 )
 {
-    nx_http::HttpClient httpClient;
-    ASSERT_TRUE( httpClient.doGet( QUrl( "http://ya.ru" ) ) );
-    ASSERT_TRUE( httpClient.response() != nullptr );
+    {
+        nx_http::HttpClient httpClient;
+        ASSERT_TRUE( httpClient.doGet( QUrl( "http://ya.ru" ) ) );
+        ASSERT_TRUE( httpClient.response() != nullptr );
+    }
+
+    {
+        nx_http::HttpClient httpClient;
+        ASSERT_TRUE( !httpClient.doGet( QUrl( "http://hren2349jf234.ru" ) ) );
+    }
 }
 
 TEST_F( SocketAsyncModeTest, HostNameResolveCancellation )
