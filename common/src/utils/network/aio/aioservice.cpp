@@ -81,8 +81,6 @@ namespace aio
         return !m_systemSocketAIO.aioThreadPool.empty();
     }
 
-    Q_GLOBAL_STATIC( AIOService, aioServiceInstance )
-    
     template<> AIOService::SocketAIOContext<Pollable>& AIOService::getAIOHandlingContext()
     {
         return m_systemSocketAIO;
