@@ -55,9 +55,6 @@ namespace aio
 
     AIOService::~AIOService()
     {
-        Q_ASSERT( AIOService_instance == this );
-        AIOService_instance = nullptr;
-
         m_systemSocketAIO.sockets.clear();
         for( std::list<SystemAIOThread*>::iterator
             it = m_systemSocketAIO.aioThreadPool.begin();
@@ -67,6 +64,9 @@ namespace aio
             delete *it;
         }
         m_systemSocketAIO.aioThreadPool.clear();
+
+        Q_ASSERT( AIOService_instance == this );
+        AIOService_instance = nullptr;
     }
 
     AIOService* AIOService::instance()
