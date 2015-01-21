@@ -24,7 +24,7 @@ namespace aio
 {
     typedef AIOThread<Pollable> SystemAIOThread;
 
-    static std::atomic<AIOService*> AIOService_instance = nullptr;
+    static std::atomic<AIOService*> AIOService_instance( nullptr );
 
     AIOService::AIOService( unsigned int threadCount )
     {
