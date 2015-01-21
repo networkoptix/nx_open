@@ -12,6 +12,8 @@
 
 #include <boost/optional.hpp>
 
+#include <utils/common/singleton.h>
+
 #include "aioeventhandler.h"
 #include "aiothread.h"
 #include "pollset.h"
@@ -32,6 +34,8 @@ namespace aio
         \note All methods are not blocking except \a AIOService::removeFromWatch called with \a waitForRunningHandlerCompletion set to \a true
     */
     class AIOService
+    :
+        public Singleton<AIOService>
     {
     public:
         /*!
@@ -260,12 +264,6 @@ namespace aio
                 return;
             aioThread->cancelPostedCalls( sock, waitForRunningHandlerCompletion );
         }
-
-        /*!
-            \param threadCount minimal thread count. Actual thread poll may exceed this value because PollSet can monitor limited number of sockets.
-                If zero, thread count is choosed automatically. This value is used only in first call 
-        */
-        static AIOService* instance( unsigned int threadCount = 0 );
 
     private:
         template<class SocketType>

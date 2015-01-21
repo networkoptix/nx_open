@@ -806,6 +806,7 @@ int main(int argc, char **argv)
     QnClientModule client(argc, argv);
 
     QnSessionManager::instance();
+    std::unique_ptr<SocketGlobalRuntime> socketGlobalRuntime(new SocketGlobalRuntime());
     std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
     std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool( new QnMediaServerUserAttributesPool() );
     QnResourcePool::initStaticInstance( new QnResourcePool() );
