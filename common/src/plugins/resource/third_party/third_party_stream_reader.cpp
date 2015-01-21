@@ -136,26 +136,29 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
 
     m_camManager.setCredentials( m_thirdPartyRes->getAuth().user(), m_thirdPartyRes->getAuth().password() );
 
-    if( m_cameraCapabilities & nxcip::BaseCameraManager::audioCapability )
+    if( !isCameraControlDisabled() )
     {
-        if( m_camManager.setAudioEnabled( m_thirdPartyRes->isAudioEnabled() ) != nxcip::NX_NO_ERROR )
-            return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("audio"));
-    }
+        if( m_cameraCapabilities & nxcip::BaseCameraManager::audioCapability )
+        {
+            if( m_camManager.setAudioEnabled( m_thirdPartyRes->isAudioEnabled() ) != nxcip::NX_NO_ERROR )
+                return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("audio"));
+        }
 
-    const nxcip::Resolution& resolution = m_thirdPartyRes->getSelectedResolutionForEncoder( encoderIndex );
-    if( resolution.width*resolution.height > 0 )
-        if( cameraEncoder.setResolution( resolution ) != nxcip::NX_NO_ERROR )
-            return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("resolution"));
-    float selectedFps = 0;
-    if( cameraEncoder.setFps( getFps(), &selectedFps ) != nxcip::NX_NO_ERROR )
-        return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("fps"));
+        const nxcip::Resolution& resolution = m_thirdPartyRes->getSelectedResolutionForEncoder( encoderIndex );
+        if( resolution.width*resolution.height > 0 )
+            if( cameraEncoder.setResolution( resolution ) != nxcip::NX_NO_ERROR )
+                return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("resolution"));
+        float selectedFps = 0;
+        if( cameraEncoder.setFps( getFps(), &selectedFps ) != nxcip::NX_NO_ERROR )
+            return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("fps"));
 
-    int selectedBitrateKbps = 0;
-    if( cameraEncoder.setBitrate(
-            m_thirdPartyRes->suggestBitrateKbps(getQuality(), QSize(resolution.width, resolution.height), getFps()),
-            &selectedBitrateKbps ) != nxcip::NX_NO_ERROR )
-    {
-        return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("bitrate"));
+        int selectedBitrateKbps = 0;
+        if( cameraEncoder.setBitrate(
+                m_thirdPartyRes->suggestBitrateKbps(getQuality(), QSize(resolution.width, resolution.height), getFps()),
+                &selectedBitrateKbps ) != nxcip::NX_NO_ERROR )
+        {
+            return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("bitrate"));
+        }
     }
 
     m_mediaEncoder2Ref = static_cast<nxcip::CameraMediaEncoder2*>(intf->queryInterface( nxcip::IID_CameraMediaEncoder2 ));
