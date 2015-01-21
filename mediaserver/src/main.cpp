@@ -1374,7 +1374,6 @@ void QnMain::run()
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/showLog*"), AuthMethod::urlQueryParam );   //allowed by default for now
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/moduleInformation"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("/static/*"), AuthMethod::noAuth );
-    QnAuthHelper::instance()->restrictionList()->allow( lit(""), AuthMethod::noAuth ); // default web page without path
 
     QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
     QnEventsDB::init();

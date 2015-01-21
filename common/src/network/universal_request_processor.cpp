@@ -95,7 +95,8 @@ void QnUniversalRequestProcessor::run()
         {
             parseRequest();
 
-            if(!authenticate(&d->authUserId))
+            bool isHandlerExist = dynamic_cast<QnUniversalTcpListener*>(d->owner)->findHandler(d->socket, d->request.requestLine.version.protocol, d->request) != 0;
+            if (isHandlerExist && !authenticate(&d->authUserId))
                 return;
 
             d->response.headers.clear();
