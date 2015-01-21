@@ -75,6 +75,9 @@ public:
         Q_ASSERT_X(!transaction.isLocal || m_remotePeer.isClient(), Q_FUNC_INFO, "Invalid transaction type to send!");
         NX_LOG( QnLog::EC2_TRAN_LOG, lit("send transaction %1 to peer %2").arg(transaction.toString()).arg(remotePeer().id.toString()), cl_logDEBUG1 );
 
+        if (m_remotePeer.peerType == Qn::PT_MobileClient && skipTransactionForMobileClient(transaction.command))
+            return;
+
         switch (m_remotePeer.dataFormat) {
         case Qn::JsonFormat:
             addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
@@ -147,6 +150,7 @@ public:
 
     void transactionProcessed();
 
+    static bool skipTransactionForMobileClient(ApiCommand::Value command);
 private:
     struct DataToSend
     {
