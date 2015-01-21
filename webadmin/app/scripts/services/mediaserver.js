@@ -1,13 +1,13 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('mediaserver', function ($http, $modal, $cookies) {
+    .factory('mediaserver', function ($http, $modal, ipCookie) {
 
         var cacheModuleInfo = null;
         var cacheCurrentUser = null;
 
-        $cookies.Authorization = 'Digest';
-        $cookies.response = null;
+
+        ipCookie('Authorization','Digest', { path: '/' });
 
         function getSettings(){
             return $http.get('/api/moduleInformation?salt=' + (new Date()).getTime());
@@ -17,7 +17,7 @@ angular.module('webadminApp')
         var loginDialog = null;
         function offlineHandler(error){
 
-            console.log(error);
+            //console.log(error);
 
             // Check 401 against offline
 
@@ -40,7 +40,7 @@ angular.module('webadminApp')
             cacheModuleInfo = null;
             if(offlineDialog === null) { //Dialog is not displayed
                 getSettings(true).catch(function (error) {
-                    console.log(error);// if server can't handle moduleInformation - it's offline - show dialog alike restart
+                    console.error(error);// if server can't handle moduleInformation - it's offline - show dialog alike restart
                     offlineDialog = $modal.open({
                         templateUrl: 'offline_modal',
                         controller: 'OfflineCtrl',

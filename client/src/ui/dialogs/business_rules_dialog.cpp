@@ -458,6 +458,7 @@ void QnBusinessRulesDialog::setAdvancedMode(bool value) {
 bool QnBusinessRulesDialog::tryClose(bool force) {
     if (force || isHidden()) {
         m_rulesViewModel->reset();
+        setAdvancedMode(false);
         hide();
         return true;
     }
@@ -480,9 +481,11 @@ bool QnBusinessRulesDialog::tryClose(bool force) {
     case QMessageBox::Yes:
         if (!saveAll())
             return false;   // Cancel was pressed in the confirmation dialog
+        setAdvancedMode(false);
         break;
     case QMessageBox::No:
         m_rulesViewModel->reset();
+        setAdvancedMode(false);
         break;
     default:
         return false;   // Cancel was pressed
