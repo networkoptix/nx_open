@@ -46,7 +46,7 @@ std::unique_ptr<SocketGlobalRuntime> SocketAsyncModeTest::socketGlobalRuntimeIns
 */
 TEST_F( SocketAsyncModeTest, AsyncOperationCancellation )
 {
-    static const int TEST_DURATION_SECONDS = 2;
+    static const int TEST_DURATION_SECONDS = 1;
     static const int TEST_RUNS = 5;
 
     for( int i = 0; i < TEST_RUNS; ++i )
@@ -58,7 +58,7 @@ TEST_F( SocketAsyncModeTest, AsyncOperationCancellation )
         ASSERT_TRUE( server.start() );
 
         ConnectionsGenerator connectionsGenerator(
-            server.addressBeingListened(),
+            SocketAddress( QString::fromLatin1("localhost"), server.addressBeingListened().port ),
             MAX_SIMULTANEOUS_CONNECTIONS,
             BYTES_TO_SEND_THROUGH_CONNECTION );
         ASSERT_TRUE( connectionsGenerator.start() );
@@ -78,7 +78,7 @@ TEST_F( SocketAsyncModeTest, AsyncOperationCancellation )
 
 TEST_F( SocketAsyncModeTest, ServerSocketAsyncCancellation )
 {
-    static const int TEST_RUNS = 47;
+    static const int TEST_RUNS = 7;
 
     for( int i = 0; i < TEST_RUNS; ++i )
     {
@@ -131,22 +131,26 @@ TEST_F( SocketAsyncModeTest, HostNameResolve2 )
 
 TEST_F( SocketAsyncModeTest, HostNameResolveCancellation )
 {
-    std::unique_ptr<AbstractStreamSocket> connection( SocketFactory::createStreamSocket() );
-    SystemError::ErrorCode connectErrorCode = SystemError::noError;
-    std::condition_variable cond;
-    std::mutex mutex;
-    bool done = false;
-    HostAddress resolvedAddress;
-    ASSERT_TRUE( connection->setNonBlockingMode( true ) );
-    ASSERT_TRUE( connection->connectAsync(
-        SocketAddress(QString::fromLatin1("ya.ru"), 80),
-        [&connectErrorCode, &done, &resolvedAddress, &cond, &mutex, &connection](SystemError::ErrorCode errorCode) mutable {
-            std::unique_lock<std::mutex> lk( mutex );
-            connectErrorCode = errorCode;
-            cond.notify_all();
-            done = true;
-            resolvedAddress = connection->getForeignAddress().address;
-        } ) );
-    connection->cancelAsyncIO();
-    connection.reset();
+    static const int TEST_RUNS = 100;
+
+    for( int i = 0; i < TEST_RUNS; ++i )
+    {
+        std::unique_ptr<AbstractStreamSocket> connection( SocketFactory::createStreamSocket() );
+        SystemError::ErrorCode connectErrorCode = SystemError::noError;
+        std::condition_variable cond;
+        std::mutex mutex;
+        bool done = false;
+        HostAddress resolvedAddress;
+        ASSERT_TRUE( connection->setNonBlockingMode( true ) );
+        ASSERT_TRUE( connection->connectAsync(
+            SocketAddress(QString::fromLatin1("ya.ru"), nx_http::DEFAULT_HTTP_PORT),
+            [&connectErrorCode, &done, &resolvedAddress, &cond, &mutex, &connection](SystemError::ErrorCode errorCode) mutable {
+                std::unique_lock<std::mutex> lk( mutex );
+                connectErrorCode = errorCode;
+                cond.notify_all();
+                done = true;
+                resolvedAddress = connection->getForeignAddress().address;
+            } ) );
+        connection->cancelAsyncIO();
+    }
 }
