@@ -121,8 +121,6 @@ void QnLicenseManagerWidget::updateLicenses() {
     bool useRedLabel = false;
 
     if (!m_licenses.isEmpty()) {
-        qDebug() << "LICENSES UPDATED";
-
         // TODO: #Elric #TR total mess with numerous forms, and no idea how to fix it in a sane way
 
         QString msg(tr("The software is licensed to: "));
