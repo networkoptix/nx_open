@@ -96,8 +96,6 @@ unsigned int StreamReader::releaseRef()
     return m_refManager.releaseRef();
 }
 
-#define REUSE_EXISTING_CONNECTION
-
 int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 {
     bool httpClientHasBeenJustCreated = false;
@@ -114,12 +112,6 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 
     if( httpClientHasBeenJustCreated )
     {
-#ifndef REUSE_EXISTING_CONNECTION
-        if( m_streamType == jpg )   //TODO #ak remove it when reusing existing connection
-            if( !waitForNextFrameTime() )
-                return nxcip::NX_INTERRUPTED;
-#endif
-
         const int result = doRequest( localHttpClientPtr.data() );
         if( result != nxcip::NX_NO_ERROR )
             return result;
@@ -162,9 +154,6 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
                 {
                     gotJpegFrame( msgBody.isEmpty() ? msgBodyBuf : (msgBody + msgBodyBuf) );
                     localHttpClientPtr.reset();
-#ifndef REUSE_EXISTING_CONNECTION
-                    m_httpClient.reset();   //TODO #ak reuse existing connection
-#endif
                     break;
                 }
                 else
