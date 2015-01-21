@@ -2062,7 +2062,6 @@ public:
 
 protected:
     virtual int executeApplication() override {
-        QScopedPointer<SocketGlobalRuntime> socketGlobalRuntime(new SocketGlobalRuntime());
         QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
         QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
         QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));

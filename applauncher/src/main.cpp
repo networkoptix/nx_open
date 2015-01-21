@@ -75,8 +75,6 @@ int downloadFile( const QString& url, const QString& destFilePath );
 
 int main( int argc, char* argv[] )
 {
-    std::unique_ptr<SocketGlobalRuntime> socketGlobalRuntime(new SocketGlobalRuntime());
-
     QnLongRunnablePool runnablePool;
 
     QString logLevel = "WARN";
