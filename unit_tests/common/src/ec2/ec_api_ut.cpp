@@ -1,5 +1,5 @@
 /**********************************************************
-* 26 dec 2014
+* 21 jan 2014
 * a.kolesnikov
 ***********************************************************/
 
@@ -160,25 +160,20 @@ private:
     }
 };
 
+//TODO #ak same class
 class Ec2APITest
 :
     public ::testing::Test
 {
 protected:
-    static std::unique_ptr<SocketGlobalRuntime> socketGlobalRuntimeInstance;
-
     static void SetUpTestCase()
     {
-        socketGlobalRuntimeInstance.reset( new SocketGlobalRuntime() );
     }
 
     static void TearDownTestCase()
     {
-        socketGlobalRuntimeInstance.reset();
     }
 };
-
-std::unique_ptr<SocketGlobalRuntime> Ec2APITest::socketGlobalRuntimeInstance;
 
 #if 0
 TEST_F( Ec2APITest, randomGet )

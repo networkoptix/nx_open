@@ -34,8 +34,6 @@ namespace aio
         \note All methods are not blocking except \a AIOService::removeFromWatch called with \a waitForRunningHandlerCompletion set to \a true
     */
     class AIOService
-    :
-        public Singleton<AIOService>
     {
     public:
         /*!
@@ -45,6 +43,8 @@ namespace aio
         */
         AIOService( unsigned int threadCount = 0 );
         virtual ~AIOService();
+
+        static AIOService* instance();
 
         //!Returns true, if object has been successfully initialized
         bool isInitialized() const;

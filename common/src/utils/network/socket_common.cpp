@@ -112,3 +112,10 @@ SocketGlobalRuntime::~SocketGlobalRuntime()
     delete m_data;
     m_data = nullptr;
 }
+
+Q_GLOBAL_STATIC( SocketGlobalRuntime, socketGlobalRuntimeInstance )
+
+SocketGlobalRuntime* SocketGlobalRuntime::instance()
+{
+    return socketGlobalRuntimeInstance();
+}

@@ -104,6 +104,8 @@ public:
     SocketGlobalRuntime();
     ~SocketGlobalRuntime();
 
+    static SocketGlobalRuntime* instance();
+
 private:
     SocketGlobalRuntimeInternal* m_data;
 };
