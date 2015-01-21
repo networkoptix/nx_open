@@ -23,8 +23,6 @@ namespace {
         ResultFail,
         ResultSkip
     };
-
-    ec2::AbstractECConnectionPtr ec2Connection() { return QnAppServerConnectionFactory::getConnection2(); }
 }
 
 int QnConfigureRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
@@ -144,5 +142,10 @@ int QnConfigureRestHandler::changePort(int port) {
 
 void QnConfigureRestHandler::resetConnections() {
     if (QnServerConnector::instance())
-        QnServerConnector::instance()->restart();
+        QnServerConnector::instance()->stop();
+
+    qnTransactionBus->dropConnections();
+
+    if (QnServerConnector::instance())
+        QnServerConnector::instance()->start();
 }
