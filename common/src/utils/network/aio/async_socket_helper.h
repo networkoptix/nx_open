@@ -164,9 +164,9 @@ public:
             {
                 //always calling m_connectHandler within aio thread socket is bound to
                 if( errorCode != SystemError::noError )
-                    post( std::bind( m_connectHandler, errorCode ) );
+                    BaseAsyncSocketImplHelper<SocketType>::post( std::bind( m_connectHandler, errorCode ) );
                 else if( !startAsyncConnect( SocketAddress(resolvedAddress, addr.port) ) )
-                    post( std::bind( m_connectHandler, SystemError::getLastOSErrorCode() ) );
+                    BaseAsyncSocketImplHelper<SocketType>::post( std::bind( m_connectHandler, SystemError::getLastOSErrorCode() ) );
             },
             this );
     }

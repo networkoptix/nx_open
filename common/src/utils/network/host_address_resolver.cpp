@@ -5,6 +5,13 @@
 
 #include "host_address_resolver.h"
 
+#ifdef Q_OS_UNIX
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#endif
+
 #include <algorithm>
 
 #include <QMutexLocker>
