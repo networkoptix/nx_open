@@ -1484,6 +1484,10 @@ void QnMain::run()
         NX_LOG( QString::fromLatin1("Can't connect to local EC2. %1").arg(ec2::toString(errorCode)), cl_logERROR );
         QnSleep::msleep(3000);
     }
+
+    if (needToStop())
+        return; //TODO #ak correctly deinitialize what has been initialised
+
     MSSettings::roSettings()->setValue(REMOVE_DB_PARAM_NAME, "0");
 
     connect(ec2Connection.get(), &ec2::AbstractECConnection::databaseDumped, this, &QnMain::at_databaseDumped);
