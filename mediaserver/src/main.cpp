@@ -825,7 +825,8 @@ QnMain::QnMain(int argc, char* argv[])
     m_firstRunningTime(0),
     m_moduleFinder(0),
     m_universalTcpListener(0),
-    m_dumpSystemResourceUsageTaskID(0)
+    m_dumpSystemResourceUsageTaskID(0),
+    m_stopping(false)
 {
     serviceMainInstance = this;
 }
@@ -839,14 +840,26 @@ QnMain::~QnMain()
         qInstallMessageHandler( defaultMsgHandler );
 }
 
+bool QnMain::isStopping() const
+{
+    QMutexLocker lock(&m_stopMutex);
+    return m_stopping;
+}
+
 void QnMain::at_databaseDumped()
 {
+    if (isStopping())
+        return;
+
     saveAdminPswdHash();
     restartServer(500);
 }
 
 void QnMain::at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender)
 {
+    if (isStopping())
+        return;
+
     MSSettings::roSettings()->setValue(SYSTEM_IDENTITY_TIME, value);
     if (sender != qnCommon->moduleGUID()) {
         MSSettings::roSettings()->setValue(REMOVE_DB_PARAM_NAME, "1");
@@ -859,6 +872,10 @@ void QnMain::stopSync()
 {
     qWarning()<<"Stopping server";
     if (serviceMainInstance) {
+        {
+            QMutexLocker lock(&m_stopMutex);
+            m_stopping = true;
+        }
         serviceMainInstance->pleaseStop();
         serviceMainInstance->exit();
         serviceMainInstance->wait();
@@ -1132,6 +1149,8 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
 
 void QnMain::at_updatePublicAddress(const QHostAddress& publicIP)
 {
+    if (isStopping())
+        return;
     m_publicAddress = publicIP;
 
     QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
@@ -1157,6 +1176,8 @@ void QnMain::at_updatePublicAddress(const QHostAddress& publicIP)
 
 void QnMain::at_localInterfacesChanged()
 {
+    if (isStopping())
+        return;
     auto intfList = allLocalAddresses();
     if (!m_publicAddress.isNull())
         intfList << m_publicAddress;
@@ -1184,12 +1205,17 @@ void QnMain::at_localInterfacesChanged()
 
 void QnMain::at_serverSaved(int, ec2::ErrorCode err)
 {
+    if (isStopping())
+        return;
+
     if (err != ec2::ErrorCode::ok)
         qWarning() << "Error saving server.";
 }
 
 void QnMain::at_connectionOpened()
 {
+    if (isStopping())
+        return;
     if (m_firstRunningTime)
         qnBusinessRuleConnector->at_mserverFailure(qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(), m_firstRunningTime*1000, QnBusiness::ServerStartedReason, QString());
     if (!m_startMessageSent) {
@@ -1201,6 +1227,9 @@ void QnMain::at_connectionOpened()
 
 void QnMain::at_timer()
 {
+    if (isStopping())
+        return;
+
     MSSettings::runTimeSettings()->setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
     QnResourcePtr mServer = qnResPool->getResourceById(qnCommon->moduleGUID());
     for(const QnVirtualCameraResourcePtr& camera: qnResPool->getAllCameras(mServer))
@@ -1208,19 +1237,27 @@ void QnMain::at_timer()
 }
 
 void QnMain::at_storageManager_noStoragesAvailable() {
+    if (isStopping())
+        return;
     qnBusinessRuleConnector->at_NoStorages(m_mediaServer);
 }
 
 void QnMain::at_storageManager_storageFailure(const QnResourcePtr& storage, QnBusiness::EventReason reason) {
+    if (isStopping())
+        return;
     qnBusinessRuleConnector->at_storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), reason, storage);
 }
 
 void QnMain::at_storageManager_rebuildFinished() {
+    if (isStopping())
+        return;
     qnBusinessRuleConnector->at_archiveRebuildFinished(m_mediaServer);
 }
 
 void QnMain::at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList)
 {
+    if (isStopping())
+        return;
     qnBusinessRuleConnector->at_cameraIPConflict(
         m_mediaServer,
         host,
@@ -2036,11 +2073,15 @@ void QnMain::changePort(quint16 port) {
 
 void QnMain::at_appStarted()
 {
+    if (isStopping())
+        return;
     QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2()); // start receiving notifications
 };
 
 void QnMain::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)
 {
+    if (isStopping())
+        return;
     if (runtimeInfo.uuid != qnCommon->moduleGUID())
         return;
 
@@ -2051,6 +2092,9 @@ void QnMain::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)
 
 void QnMain::at_emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password)
 {
+    if (isStopping())
+        return;
+
     // fill authenticate digest here for compatibility with version 2.1 and below.
     const ec2::AbstractECConnectionPtr& appServerConnection = QnAppServerConnectionFactory::getConnection2();
     if (user->getDigest().isEmpty() && !m_updateUserRequests.contains(user->getId()))
