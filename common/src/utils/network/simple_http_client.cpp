@@ -114,7 +114,7 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
     {
         if (!m_connected)
         {
-            if (!m_sock->connect(m_host.toString(), m_port))
+            if (m_host.isNull() || !m_sock->connect(m_host.toString(), m_port))
             {
                 return CL_TRANSPORT_ERROR;
             }
@@ -295,7 +295,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
     {
         if (!m_connected)
         {
-            if (!m_sock->connect(m_host.toString(), m_port))
+            if (m_host.isNull() || !m_sock->connect(m_host.toString(), m_port))
             {
                 return CL_TRANSPORT_ERROR;
             }
