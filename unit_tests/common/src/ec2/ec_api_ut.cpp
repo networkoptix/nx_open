@@ -1,5 +1,5 @@
 /**********************************************************
-* 26 dec 2014
+* 21 jan 2014
 * a.kolesnikov
 ***********************************************************/
 
@@ -35,7 +35,7 @@ public:
 
     void addUpdateRequest( const QUrl& url, const QByteArray& msgBody )
     {
-        m_updateRequest.push_back( std::make_pair( url, msgBody ) );
+        m_updateRequests.push_back( std::make_pair( url, msgBody ) );
     }
 
     void setMaxRequestsToPerform( int maxRequestsToPerform )
@@ -82,6 +82,7 @@ public:
 
     void start()
     {
+        assert( !m_getRequestUrls.empty() || !m_updateRequests.empty() );
         for( int i = 0; i < m_maxSimultaneousRequestsCount; ++i )
             startAnotherClient( nx_http::AsyncHttpClientPtr() );
     }
@@ -134,7 +135,7 @@ private:
     };
 
     std::vector<QUrl> m_getRequestUrls;
-    std::vector<std::pair<QUrl, QByteArray>> m_updateRequest;
+    std::vector<std::pair<QUrl, QByteArray>> m_updateRequests;
     int m_requestsStarted;
     int m_requestsCompleted;
     int m_maxSimultaneousRequestsCount;
@@ -145,12 +146,12 @@ private:
 
     Request getRequestToPerform() const
     {
-        if( rand() & 1 )
+        if( !m_updateRequests.empty() && (rand() & 1) )
         {
-            const int requestIndex = rand() % m_updateRequest.size();
+            const int requestIndex = rand() % m_updateRequests.size();
             return Request(
-                m_updateRequest[requestIndex].first,
-                m_updateRequest[requestIndex].second );
+                m_updateRequests[requestIndex].first,
+                m_updateRequests[requestIndex].second );
         }
         else
         {
@@ -159,8 +160,23 @@ private:
     }
 };
 
+//TODO #ak same class
+class Ec2APITest
+:
+    public ::testing::Test
+{
+protected:
+    static void SetUpTestCase()
+    {
+    }
+
+    static void TearDownTestCase()
+    {
+    }
+};
+
 #if 0
-TEST( Ec2APITest, randomGet )
+TEST_F( Ec2APITest, randomGet )
 {
     QUrl requestUrl( lit("http://127.0.0.1:7001/") );
     //QUrl requestUrl( lit("http://192.168.0.71:7001/") );
@@ -173,6 +189,7 @@ TEST( Ec2APITest, randomGet )
     //requestUrl.setPath( lit("/ec2/getLicenses") );
     //reqGen.addGetRequest( requestUrl );
 
+#if 0
     requestUrl.setPath( lit("/ec2/saveCameras") );
     QByteArray saveCameraJson =
         "[\n"
@@ -192,8 +209,8 @@ TEST( Ec2APITest, randomGet )
         "        \"vendor\": \"Digital Watchdog\"\n"
         "    }\n"
         "]\n";
-
     reqGen.addUpdateRequest( requestUrl, saveCameraJson );
+#endif
 
     reqGen.setMaxRequestsToPerform( 70000 );
     reqGen.setMaxSimultaneousRequestsCount( 100 );
@@ -203,7 +220,7 @@ TEST( Ec2APITest, randomGet )
 #endif
 
 #if 0
-TEST( Ec2APITest, removeResource )
+TEST_F( Ec2APITest, removeResource )
 {
     //QUrl url( lit("http://192.168.0.58:7001/ec2/removeResource") );
     //QUrl url( lit("http://127.0.0.1:7001/ec2/removeResource") );

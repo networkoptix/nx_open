@@ -8,8 +8,6 @@
 #include <boost/algorithm/cxx11/all_of.hpp>
 #include <boost/range/adaptor/reversed.hpp>
 
-#include <api/runtime_info_manager.h>
-
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
@@ -446,6 +444,7 @@ QnVideoWallLicenseUsageWatcher::QnVideoWallLicenseUsageWatcher(QObject* parent /
 
     auto connectTo = [this](const QnVideoWallResourcePtr &videowall) {
         connect(videowall, &QnVideoWallResource::itemAdded,     this, &QnLicenseUsageWatcher::licenseUsageChanged);
+        connect(videowall, &QnVideoWallResource::itemChanged,   this, &QnLicenseUsageWatcher::licenseUsageChanged);
         connect(videowall, &QnVideoWallResource::itemRemoved,   this, &QnLicenseUsageWatcher::licenseUsageChanged);
     };
 
@@ -459,30 +458,6 @@ QnVideoWallLicenseUsageWatcher::QnVideoWallLicenseUsageWatcher(QObject* parent /
     connect(qnResPool, &QnResourcePool::resourceRemoved, this,   updateIfNeeded);
     for (const QnVideoWallResourcePtr &videowall: qnResPool->getResources<QnVideoWallResource>())
         connectTo(videowall);
-
-    /** Due to high number of runtimeInfoChanged signals we are combining licenseChanged signals. */
-    QTimer* combineTimer = new QTimer(this);
-    combineTimer->setInterval(1000);
-    combineTimer->setSingleShot(true);
-    connect(combineTimer, &QTimer::timeout, this, &QnLicenseUsageWatcher::licenseUsageChanged);
-
-    auto licenseUsageChangedDelayed = [this, combineTimer] {
-        if (combineTimer->isActive()) 
-            combineTimer->stop();
-        combineTimer->start();
-    };
-
-    connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoAdded,    this, [this, licenseUsageChangedDelayed](const QnPeerRuntimeInfo &info) {
-        if (!info.data.videoWallControlSession.isNull())
-            licenseUsageChangedDelayed();
-    });
-
-    connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoRemoved,  this, [this, licenseUsageChangedDelayed](const QnPeerRuntimeInfo &info) {
-        if (!info.data.videoWallControlSession.isNull())
-            licenseUsageChangedDelayed();
-    });
-    
-    connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoChanged,  this, licenseUsageChangedDelayed);
 }
 
 
@@ -503,19 +478,18 @@ QList<Qn::LicenseType> QnVideoWallLicenseUsageHelper::calculateLicenseTypes() co
 
 int QnVideoWallLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType licenseType, bool countProposed) const {
     Q_ASSERT(licenseType == Qn::LC_VideoWall);
-
-    /* Calculating running control sessions. */
-    int controlSessions = 0;
-    for (const QnPeerRuntimeInfo &info: QnRuntimeInfoManager::instance()->items()->getItems()) {
-        if (info.data.videoWallControlSession.isNull())
-            continue;
-        ++controlSessions;
-    }
-
-    /* Calculating total screens. */
+   
     int usedScreens = 0;
-    for (const QnVideoWallResourcePtr &videowall: qnResPool->getResources<QnVideoWallResource>())
+    int controlSessions = 0;
+    for (const QnVideoWallResourcePtr &videowall: qnResPool->getResources<QnVideoWallResource>()) {
+        /* Calculating total screens. */
         usedScreens += videowall->items()->getItems().size();
+
+        /* Calculating running control sessions. */
+        for (const QnVideoWallItem &item: videowall->items()->getItems())
+            if (!item.runtimeStatus.controlledBy.isNull())
+                ++controlSessions;
+    }
 
     int result = qMax(controlSessions, QnVideoWallLicenseUsageHelper::licensesForScreens(usedScreens));
     if (countProposed)
@@ -543,19 +517,18 @@ QnVideoWallLicenseUsageProposer::QnVideoWallLicenseUsageProposer(QnVideoWallLice
     if (!m_helper)
         return;
 
-    /* Calculate total screens used. */
     int totalScreens = 0;
-    for (const QnVideoWallResourcePtr &videowall: qnResPool->getResources<QnVideoWallResource>())
-        totalScreens += videowall->items()->getItems().size();
-    int screensLicensesUsed = QnVideoWallLicenseUsageHelper::licensesForScreens(totalScreens);
-
-    /* Calculate total control sessions running. */
     int controlSessions = 0;
-    for (const QnPeerRuntimeInfo &info: QnRuntimeInfoManager::instance()->items()->getItems()) {
-        if (info.data.videoWallControlSession.isNull())
-            continue;
-        ++controlSessions;
+    for (const QnVideoWallResourcePtr &videowall: qnResPool->getResources<QnVideoWallResource>()) {
+        /* Calculate total screens used. */
+        totalScreens += videowall->items()->getItems().size();
+
+        /* Calculating running control sessions. */
+        for (const QnVideoWallItem &item: videowall->items()->getItems())
+            if (!item.runtimeStatus.controlledBy.isNull())
+                ++controlSessions;
     }
+    int screensLicensesUsed = QnVideoWallLicenseUsageHelper::licensesForScreens(totalScreens);
 
     /* Select which requirement is currently in action. */
     int totalLicensesUsed = qMax(screensLicensesUsed, controlSessions);
