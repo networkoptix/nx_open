@@ -31,6 +31,7 @@ namespace SystemError
     static const ErrorCode fileNotFound = ERROR_FILE_NOT_FOUND;
     static const ErrorCode connectionAbort = WSAECONNABORTED;
     static const ErrorCode connectionReset = WSAECONNRESET;
+    static const ErrorCode hostNotFound = WSAHOST_NOT_FOUND;
     static const ErrorCode notConnected = WSAENOTCONN;
     static const ErrorCode interrupted = WSAEINTR;
     static const ErrorCode again = EAGAIN;
@@ -43,6 +44,7 @@ namespace SystemError
     static const ErrorCode fileNotFound = ENOENT;
     static const ErrorCode connectionAbort = ECONNABORTED;
     static const ErrorCode connectionReset = ECONNRESET;
+    static const ErrorCode hostNotFound = EAI_NONAME;
     static const ErrorCode notConnected = ENOTCONN;
     static const ErrorCode interrupted = EINTR;
     static const ErrorCode again = EAGAIN;
