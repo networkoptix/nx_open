@@ -177,20 +177,9 @@ void TimerManager::run()
                 /*map<pair<qint64, quint64>, TimerEventHandler* const>::size_type s1 =*/ m_impl->timeToTask.size();
                 m_impl->timeToTask.erase( taskIter );
                 //ASSERT2( m_impl->timeToTask.size() == s1-1, "s1 = "<<s1<<", m_impl->timeToTask.size() = "<<m_timeToTask.size() );
-                try
-                {
-                    m_impl->runningTaskID = timerID;
-                    lk.unlock();
-                    taskManager( timerID );
-                }
-                catch( const std::exception& e )
-                {
-                    NX_LOG( lit("TimerManager. Error. Exception in %1:%2. %3").arg(QLatin1String(__FILE__)).arg(__LINE__).arg(QLatin1String(e.what())), cl_logERROR );
-                }
-                catch( ... )
-                {
-                    NX_LOG( lit("TimerManager. Unknown exception in %1:%2").arg(QLatin1String(__FILE__)).arg(__LINE__), cl_logERROR );
-                }
+                m_impl->runningTaskID = timerID;
+                lk.unlock();
+                taskManager( timerID );
 
                 lk.relock();
 
