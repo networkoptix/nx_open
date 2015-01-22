@@ -832,6 +832,9 @@ QnMain::~QnMain()
 {
     quit();
     stop();
+
+    if( defaultMsgHandler )
+        qInstallMessageHandler( defaultMsgHandler );
 }
 
 void QnMain::at_restartServerRequired()
@@ -1401,8 +1404,8 @@ void QnMain::run()
 
     //QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
-    QnStorageManager storageManager;
-    QnFileDeletor fileDeletor;
+    std::unique_ptr<QnStorageManager> storageManager( new QnStorageManager() );
+    std::unique_ptr<QnFileDeletor> fileDeletor( new QnFileDeletor() );
 
     connect(QnResourceDiscoveryManager::instance(), &QnResourceDiscoveryManager::CameraIPConflict, this, &QnMain::at_cameraIPConflict);
     connect(QnStorageManager::instance(), &QnStorageManager::noStoragesAvailable, this, &QnMain::at_storageManager_noStoragesAvailable);
@@ -1412,7 +1415,7 @@ void QnMain::run()
     QString dataLocation = getDataDirectory();
     QDir stateDirectory;
     stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
-    fileDeletor.init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
+    fileDeletor->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
 
 
     // If adminPassword is set by installer save it and create admin user with it if not exists yet
@@ -1992,6 +1995,9 @@ void QnMain::run()
     QnAuthHelper::initStaticInstance(NULL);
 
     globalSettings.reset();
+
+    fileDeletor.reset();
+    storageManager.reset();
 
     delete QnResourcePool::instance();
     QnResourcePool::initStaticInstance( NULL );
