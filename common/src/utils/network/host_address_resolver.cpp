@@ -31,7 +31,7 @@ HostAddressResolver::ResolveTask::ResolveTask(
 {
 }
 
-static std::atomic<HostAddressResolver*> HostAddressResolver_instance = nullptr;
+static std::atomic<HostAddressResolver*> HostAddressResolver_instance( nullptr );
 
 HostAddressResolver::HostAddressResolver()
 :
