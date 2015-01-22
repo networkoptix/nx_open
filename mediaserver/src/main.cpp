@@ -200,6 +200,8 @@ namespace {
     const QString SERVER_GUID2 = lit("serverGuid2");
     const QString OBSOLETE_SERVER_GUID = lit("obsoleteServerGuid");
     const QString PENDING_SWITCH_TO_CLUSTER_MODE = lit("pendingSwitchToClusterMode");
+    const QString ADMIN_PSWD_HASH = lit("adminMd5Hash");
+    const QString ADMIN_PSWD_DIGEST = lit("adminMd5Digest");
 };
 
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
@@ -837,8 +839,9 @@ QnMain::~QnMain()
         qInstallMessageHandler( defaultMsgHandler );
 }
 
-void QnMain::at_restartServerRequired()
+void QnMain::at_databaseDumped()
 {
+    saveAdminPswdHash();
     restartServer(500);
 }
 
@@ -847,6 +850,7 @@ void QnMain::at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender)
     MSSettings::roSettings()->setValue(SYSTEM_IDENTITY_TIME, value);
     if (sender != qnCommon->moduleGUID()) {
         MSSettings::roSettings()->setValue(REMOVE_DB_PARAM_NAME, "1");
+        saveAdminPswdHash();
         restartServer(0);
     }
 }
@@ -1299,6 +1303,15 @@ bool QnMain::initTcpListener()
     return true;
 }
 
+void QnMain::saveAdminPswdHash()
+{
+    QnUserResourcePtr admin = qnResPool->getAdministrator();
+    if (admin) {
+        MSSettings::roSettings()->setValue(ADMIN_PSWD_HASH, admin->getHash());
+        MSSettings::roSettings()->setValue(ADMIN_PSWD_DIGEST, admin->getDigest());
+    }
+}
+
 QHostAddress QnMain::getPublicAddress()
 {
     m_ipDiscovery.reset(new QnPublicIPDiscovery());
@@ -1420,6 +1433,9 @@ void QnMain::run()
 
     // If adminPassword is set by installer save it and create admin user with it if not exists yet
     qnCommon->setDefaultAdminPassword(settings->value("appserverPassword", QLatin1String("")).toString());
+
+    qnCommon->setAdminPasswordData(settings->value(ADMIN_PSWD_HASH).toByteArray(), settings->value(ADMIN_PSWD_DIGEST).toByteArray());
+
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &QnMain::at_runtimeInfoChanged);
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnMain::at_runtimeInfoChanged);
 
@@ -1470,7 +1486,7 @@ void QnMain::run()
     }
     MSSettings::roSettings()->setValue(REMOVE_DB_PARAM_NAME, "0");
 
-    connect(ec2Connection.get(), &ec2::AbstractECConnection::databaseDumped, this, &QnMain::at_restartServerRequired);
+    connect(ec2Connection.get(), &ec2::AbstractECConnection::databaseDumped, this, &QnMain::at_databaseDumped);
     qnCommon->setRemoteGUID(QnUuid(connectInfo.ecsGuid));
     MSSettings::roSettings()->sync();
     if (MSSettings::roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString() == "yes") {
@@ -1488,6 +1504,8 @@ void QnMain::run()
         abort();
         return;
     }
+    settings->remove(ADMIN_PSWD_HASH);
+    settings->remove(ADMIN_PSWD_DIGEST);
 
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );

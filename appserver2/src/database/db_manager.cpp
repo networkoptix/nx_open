@@ -525,26 +525,37 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
         return false;
     }
 
+    QByteArray md5Password;
+    QByteArray digestPassword;
+    qnCommon->adminPasswordData(&md5Password, &digestPassword);
     QString defaultAdminPassword = qnCommon->defaultAdminPassword();
     if( users[0].hash.isEmpty() && defaultAdminPassword.isEmpty() ) {
         defaultAdminPassword = lit("123");
     }
 
+    QnUserResourcePtr userResource( new QnUserResource() );
+    fromApiToResource( users[0], userResource );
+    bool updateUserResource = false;
     if( !defaultAdminPassword.isEmpty() )
     {
-        QnUserResourcePtr userResource( new QnUserResource() );
-        fromApiToResource( users[0], userResource );
-
         if (!userResource->checkPassword(defaultAdminPassword)) {
             userResource->setPassword( defaultAdminPassword );
             userResource->generateHash();
-
-            QnTransaction<ApiUserData> userTransaction( ApiCommand::saveUser );
-
-            transactionLog->fillPersistentInfo(userTransaction);
-            fromResourceToApi( userResource, userTransaction.params );
-            executeTransactionNoLock( userTransaction, QnUbjson::serialized( userTransaction ) );
+            updateUserResource = true;
         }
+    }
+    if (!md5Password.isEmpty() || !digestPassword.isEmpty()) {
+        userResource->setHash(md5Password);
+        userResource->setDigest(digestPassword);
+        updateUserResource = true;
+    }
+    if (updateUserResource) 
+    {
+        // admin user resource has been updated
+        QnTransaction<ApiUserData> userTransaction( ApiCommand::saveUser );
+        transactionLog->fillPersistentInfo(userTransaction);
+        fromResourceToApi( userResource, userTransaction.params );
+        executeTransactionNoLock( userTransaction, QnUbjson::serialized( userTransaction ) );
     }
 
     QSqlQuery queryCameras( m_sdb );

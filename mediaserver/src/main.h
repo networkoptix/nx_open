@@ -52,7 +52,7 @@ private slots:
     void at_appStarted();
     void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
     void at_emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);
-    void at_restartServerRequired();
+    void at_databaseDumped();
     void at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
     void at_updatePublicAddress(const QHostAddress& publicIP);
 private:
@@ -63,7 +63,7 @@ private:
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);
     void saveStorages(ec2::AbstractECConnectionPtr ec2Connection, const QnAbstractStorageResourceList& storages);
     void dumpSystemUsageStats();
-
+    void saveAdminPswdHash();
 private:
     int m_argc;
     char** m_argv;
