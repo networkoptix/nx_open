@@ -21,6 +21,7 @@ class ColorDummy():
 
 colorer = ColorDummy()
 verbose = False
+separator = '------------------------------------------------'
 
 def info(message):
     if not verbose:
@@ -155,16 +156,59 @@ class Customization():
             green('Success')
             return 0
         return 1
+
+def parseLine(line):
+    result = []
+    for part in line.split('"'):
+        if not ".png" in part:
+            continue
+        result.append(part)
+    return result
+
+def parseFile(path):
+    result = []
+    with open(path, "r") as file:
+        for line in file.readlines():
+            if not ".png" in line:
+                continue
+            if not "skin" in line and not "Skin" in line:
+                warn(line.strip())
+                continue
+            result.extend(parseLine(line))
+    return result
+
+def parseSources(dir):
+    result = []
+    for entry in os.listdir(dir):
+        path = os.path.join(dir, entry)
+        if (os.path.isdir(path)):
+            result.extend(parseSources(path))
+            continue
+        if not path.endswith(".cpp"):
+            continue
+        result.extend(parseFile(path))
+    return result
         
 def checkProject(rootDir, project):
+    global separator
+    info(separator)
     info('Checking project ' + project)
+    info(separator)
     customizations = {}
     roots = []
     invalidInner = 0
-    for entry in os.listdir(rootDir):
+
+    sourcesDir = os.path.join(os.path.join(rootDir, project), 'src')
+    requiredFiles = parseSources(sourcesDir)
+  #  for file in requiredFiles:
+  #      green(file)
+
+    customizationDir = os.path.join(rootDir, "customization")
+
+    for entry in os.listdir(customizationDir):
         if (entry[:1] == '_'):
             continue;   
-        path = os.path.join(rootDir, entry)
+        path = os.path.join(customizationDir, entry)
         if (not os.path.isdir(path)):
             continue
         c = Customization(entry, path, project)
@@ -206,7 +250,7 @@ def main():
         projects = Project.ALL
 
     scriptDir = os.path.dirname(os.path.abspath(__file__))
-    rootDir = os.path.join(scriptDir, '../customization')
+    rootDir = os.path.join(scriptDir, '..')
     for project in projects:
         checkProject(rootDir, project)
 
