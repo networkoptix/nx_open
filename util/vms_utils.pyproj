@@ -5,16 +5,17 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{c723791e-0120-4289-a1c3-6c0eb5c8e3c8}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>validate_translations.py</StartupFile>
+    <StartupFile>customizations.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <ProjectTypeGuids>{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <InterpreterId>{a93bd498-3326-48fe-a791-2a92a0b37a3e}</InterpreterId>
+    <InterpreterId>{2af0f10d-7135-4994-9156-5d01c9c11b7e}</InterpreterId>
     <InterpreterVersion>2.7</InterpreterVersion>
-    <CommandLineArguments>--verbose</CommandLineArguments>
+    <CommandLineArguments>--verbose --color</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
+    <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
@@ -31,7 +32,7 @@
     <Compile Include="validate_translations.py" />
   </ItemGroup>
   <ItemGroup>
-    <InterpreterReference Include="{a93bd498-3326-48fe-a791-2a92a0b37a3e}\2.7" />
+    <InterpreterReference Include="{2af0f10d-7135-4994-9156-5d01c9c11b7e}\2.7" />
   </ItemGroup>
   <Import Project="$(PtvsTargetsFile)" Condition="Exists($(PtvsTargetsFile))" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="!Exists($(PtvsTargetsFile))" />
