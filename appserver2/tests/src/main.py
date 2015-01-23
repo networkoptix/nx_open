@@ -4288,17 +4288,6 @@ def doCleanUp():
         print "Skip ROLLBACK,you could use --recover to perform manually rollback"
             
 if __name__ == '__main__':
-    jdiff = JsonDiff();
-    jdiff.enter("Hello");
-    jdiff.enter("Hello");
-    jdiff.enter("Hello");
-    jdiff.enter("Hello");
-    jdiff.enter("Hello");
-    jdiff.enter("Hello");
-    jdiff.enter("World");
-    jdiff.leave();
-    print jdiff._anchorStr
-
 
     if len(sys.argv) >= 2 and sys.argv[1] == '--help':
         showHelp()
