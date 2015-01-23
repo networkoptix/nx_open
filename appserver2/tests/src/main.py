@@ -123,6 +123,7 @@ def _compareJsonObject(lhs,rhs,result):
             rhs_obj = rhs[lhs_key]
             result.enter(lhs_key)
             if _compareJson(lhs_obj,rhs_obj,result).hasDiff():
+                result.leave() 
                 return result
             result.leave()
 
@@ -4287,6 +4288,18 @@ def doCleanUp():
         print "Skip ROLLBACK,you could use --recover to perform manually rollback"
             
 if __name__ == '__main__':
+    jdiff = JsonDiff();
+    jdiff.enter("Hello");
+    jdiff.enter("Hello");
+    jdiff.enter("Hello");
+    jdiff.enter("Hello");
+    jdiff.enter("Hello");
+    jdiff.enter("Hello");
+    jdiff.enter("World");
+    jdiff.leave();
+    print jdiff._anchorStr
+
+
     if len(sys.argv) >= 2 and sys.argv[1] == '--help':
         showHelp()
     elif len(sys.argv) == 2 and sys.argv[1] == '--recover':
