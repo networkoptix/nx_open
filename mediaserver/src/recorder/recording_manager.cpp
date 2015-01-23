@@ -135,7 +135,6 @@ void QnRecordingManager::stop()
         deleteRecorder(it.value(), it.key());
     }
     m_recordMap.clear();
-    m_onlineCameras.clear();
     m_scheduleWatchingTimer.stop();
 
     onTimer();
@@ -356,9 +355,6 @@ void QnRecordingManager::updateCamera(const QnSecurityCamResourcePtr& cameraRes)
 
     if (camera)
     {
-        cameraRes->setDataProviderFactory(QnServerDataProviderFactory::instance());
-
-
         QMap<QnResourcePtr, Recorders>::iterator itrRec = m_recordMap.find(res);
         if (itrRec != m_recordMap.end())
         {
@@ -405,13 +401,6 @@ void QnRecordingManager::updateCamera(const QnSecurityCamResourcePtr& cameraRes)
     }
 }
 
-void QnRecordingManager::at_camera_initAsyncFinished(const QnResourcePtr &resource, bool state)
-{
-    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-    if (camera && state)
-        updateCamera(camera);
-}
-
 void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr &resource)
 {
     Q_UNUSED(resource)
@@ -440,24 +429,11 @@ void QnRecordingManager::at_camera_resourceChanged(const QnResourcePtr &resource
     }
 }
 
-void QnRecordingManager::at_camera_statusChanged(const QnResourcePtr &resource)
+void QnRecordingManager::at_camera_initializationChanged(const QnResourcePtr &resource)
 {
-    if (resource->hasFlags(Qn::foreigner))
-        return;
-
     QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
-    if (!camera)
-        return;
-
-    Qn::ResourceStatus status = camera->getStatus();
-
-    if((status == Qn::Online || status == Qn::Recording) && !m_onlineCameras.contains(camera)) {
+    if (camera && camera->isInitialized())
         updateCamera(camera);
-        m_onlineCameras.insert(camera);
-    }
-
-    if((status == Qn::Offline || status == Qn::Unauthorized) && m_onlineCameras.contains(camera)) 
-        m_onlineCameras.remove(camera);
 }
 
 void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
@@ -465,14 +441,9 @@ void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(resource);
     if (camera) 
     {
-        connect(camera.data(), SIGNAL(statusChanged(const QnResourcePtr &)),            this, SLOT(at_camera_statusChanged(const QnResourcePtr &)));
-        connect(camera.data(), SIGNAL(resourceChanged(const QnResourcePtr &)),          this, SLOT(at_camera_resourceChanged(const QnResourcePtr &)));
-        connect(camera.data(), SIGNAL(initAsyncFinished(const QnResourcePtr &, bool)),  this, SLOT(at_camera_initAsyncFinished(const QnResourcePtr &, bool)));
-
-        //if (!camera->isInitialized() && !camera->hasFlags(Qn::foreigner) && !camera->isScheduleDisabled())
-        //    camera->initAsync(true);
-        at_camera_statusChanged(camera);
-        updateCamera(camera);
+        connect(camera.data(), &QnResource::initializedChanged, this, &QnRecordingManager::at_camera_initializationChanged);
+        connect(camera.data(), &QnResource::resourceChanged,    this, &QnRecordingManager::at_camera_resourceChanged);
+        camera->setDataProviderFactory(QnServerDataProviderFactory::instance());
         return;
     }
 }
@@ -499,8 +470,6 @@ void QnRecordingManager::onRemoveResource(const QnResourcePtr &resource)
     stopRecorder(recorders);
     qnCameraPool->removeVideoCamera(resource);
     deleteRecorder(recorders, resource);
-
-    m_onlineCameras.remove(resource);
 }
 
 bool QnRecordingManager::isCameraRecoring(const QnResourcePtr& camera)

@@ -230,9 +230,6 @@ signals:
     */
     void asyncParamSetDone(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result);
 
-    void initAsyncFinished(const QnResourcePtr &resource, bool initialized); // TODO: #Elric remove signal
-
-
 public:
 #ifdef ENABLE_DATA_PROVIDERS
     // this is thread to process commands like setparam
