@@ -11,6 +11,13 @@ class Project:
     INTRO = ["intro.mkv", "intro.avi", "intro.png", "intro.jpg", "intro.jpeg"]
     ALL = [COMMON, CLIENT]
 
+class Suffixes:
+    HOVERED = '_hovered'
+    SELECTED = '_selected'
+    PRESSED = '_pressed'
+    DISABLED = '_disabled'
+    CHECKED = '_checked'
+
 class ColorDummy():
     class Empty(object):
         def __getattribute__(self, name):
