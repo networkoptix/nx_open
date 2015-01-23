@@ -26,6 +26,18 @@ class Suffixes:
             result = result.replace(suffix, "")
         return result
 
+class Formats:
+    PNG = '.png'
+    GIF = '.gif'
+    ALL = [PNG, GIF]
+
+    @staticmethod
+    def contains(string):
+        for format in Formats.ALL:
+            if format in string:
+                return True
+        return False
+
 class ColorDummy():
     class Empty(object):
         def __getattribute__(self, name):
@@ -112,6 +124,15 @@ class Customization():
                 
         self.total = sorted(list(set(self.base + self.dark + self.light)))
         
+    def isUnused(self, entry, requiredFiles):
+        if Suffixes.baseName(entry) in requiredFiles:
+           return False
+        if entry in Project.INTRO:
+           return False
+        if not Formats.contains(entry):
+           return False
+        return True
+
     def validateInner(self, requiredFiles):
         info('Validating ' + self.name + '...')
         clean = True
@@ -132,7 +153,7 @@ class Customization():
             if entry in self.dark and entry in self.light:
                 clean = False
                 warn('File ' + os.path.join(self.basePath, entry) + ' duplicated in both skins')
-            if Suffixes.baseName(entry) not in requiredFiles and not entry in Project.INTRO:
+            if self.isUnused(entry, requiredFiles):
                 clean = False
                 warn('File %s in unused' % entry)
 
@@ -144,7 +165,7 @@ class Customization():
                 else:
                     error = True
                     err('File ' + self.relativePath(self.darkPath, entry) + ' missing in light skin')
-            if Suffixes.baseName(entry) not in requiredFiles and not entry in Project.INTRO:
+            if self.isUnused(entry, requiredFiles):
                 clean = False
                 warn('File %s in unused' % entry)
                 
@@ -156,7 +177,7 @@ class Customization():
                 else:
                     error = True
                     err('File ' + self.relativePath(self.lightPath, entry) + ' missing in dark skin')
-            if Suffixes.baseName(entry) not in requiredFiles and not entry in Project.INTRO:
+            if self.isUnused(entry, requiredFiles):
                 clean = False
                 warn('File %s in unused' % entry)
 
@@ -196,7 +217,7 @@ def parseLine(line, location):
     global verbose
     result = []
     for part in line.split('"'):
-        if not ".png" in part:
+        if not Formats.contains(part):
             continue
         result.append(part)
     return result
@@ -208,7 +229,7 @@ def parseFile(path):
     with open(path, "r") as file:
         for line in file.readlines():
             linenumber += 1
-            if not ".png" in line:
+            if not Formats.contains(line):
                 continue
             if not "skin" in line and not "Skin" in line:
                 if verbose:
