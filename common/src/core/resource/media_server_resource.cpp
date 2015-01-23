@@ -97,8 +97,12 @@ QString QnMediaServerResource::getName() const
 
 void QnMediaServerResource::setName( const QString& name )
 {
-    setServerName( name );
-    QnResource::setName( name );
+    QString oldName = getName();
+    if (oldName == name)
+        return;
+
+    setServerName(name);
+    emit nameChanged(toSharedPointer(this));
 }
 
 void QnMediaServerResource::setServerName( const QString& name )
