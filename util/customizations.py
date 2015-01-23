@@ -6,8 +6,10 @@ import os
 from itertools import combinations
 
 class Project:
+    COMMON = 'common'
     CLIENT = 'client'
     INTRO = ["intro.mkv", "intro.avi", "intro.png", "intro.jpg", "intro.jpeg"]
+    ALL = [COMMON, CLIENT]
 
 class ColorDummy():
     class Empty(object):
@@ -18,11 +20,16 @@ class ColorDummy():
     Fore = Empty()
 
 colorer = ColorDummy()
+verbose = False
 
 def info(message):
+    if not verbose:
+        return
     print colorer.Style.BRIGHT + message
     
 def green(message):
+    if not verbose:
+        return
     print colorer.Style.BRIGHT + colorer.Fore.GREEN + message
         
 def warn(message):
@@ -149,22 +156,8 @@ class Customization():
             return 0
         return 1
         
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--color', action='store_true', help="colorized output")
-    parser.add_argument('-v', '--verbose', action='store_true', help="verbose output")
-    parser.add_argument('-p', '--project', default='client', help="target project, default is client")
-    args = parser.parse_args()
-    if args.color:
-        from colorama import Fore, Back, Style, init
-        init(autoreset=True) # use Colorama to make Termcolor work on Windows too
-        global colorer
-        import colorama as colorer
-    
-    project = args.project
-
-    scriptDir = os.path.dirname(os.path.abspath(__file__))
-    rootDir = os.path.join(scriptDir, '../customization')
+def checkProject(rootDir, project):
+    info('Checking project ' + project)
     customizations = {}
     roots = []
     invalidInner = 0
@@ -190,7 +183,32 @@ def main():
         sys.exit(1)
     if invalidCross > 0:
         sys.exit(2)
-    sys.exit(0)
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-c', '--color', action='store_true', help="colorized output")
+    parser.add_argument('-v', '--verbose', action='store_true', help="verbose output")
+    parser.add_argument('-p', '--project', default='', help="target project")
+    args = parser.parse_args()
+    if args.color:
+        from colorama import Fore, Back, Style, init
+        init(autoreset=True) # use Colorama to make Termcolor work on Windows too
+        global colorer
+        import colorama as colorer
+    
+    global verbose
+    verbose = args.verbose
+
+    projects = []
+    if (args.project == Project.COMMON or args.project == Project.CLIENT):
+        projects.append(args.project)
+    else:
+        projects = Project.ALL
+
+    scriptDir = os.path.dirname(os.path.abspath(__file__))
+    rootDir = os.path.join(scriptDir, '../customization')
+    for project in projects:
+        checkProject(rootDir, project)
 
 if __name__ == "__main__":
     main()
