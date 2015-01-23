@@ -17,6 +17,14 @@ class Suffixes:
     PRESSED = '_pressed'
     DISABLED = '_disabled'
     CHECKED = '_checked'
+    ALL = [HOVERED, SELECTED, PRESSED, DISABLED, CHECKED]
+
+    @staticmethod
+    def baseName(fullname):
+        result = fullname;
+        for suffix in Suffixes.ALL:
+            result = result.replace(suffix, "")
+        return result
 
 class ColorDummy():
     class Empty(object):
@@ -85,23 +93,26 @@ class Customization():
         for dirname, dirnames, filenames in os.walk(self.basePath):
             cut = len(self.basePath) + 1
             for filename in filenames:
-                self.base.append(os.path.join(dirname, filename)[cut:])
+                norm = os.path.join(dirname, filename)[cut:].replace("\\", "/")
+                self.base.append(norm)
         
         if hasattr(self, 'darkPath'):
             for dirname, dirnames, filenames in os.walk(self.darkPath):
                 cut = len(self.darkPath) + 1
                 for filename in filenames:
-                    self.dark.append(os.path.join(dirname, filename)[cut:])
+                    norm = os.path.join(dirname, filename)[cut:].replace("\\", "/")
+                    self.dark.append(norm)
         
         if hasattr(self, 'lightPath'):
             for dirname, dirnames, filenames in os.walk(self.lightPath):
                 cut = len(self.lightPath) + 1
                 for filename in filenames:
-                    self.light.append(os.path.join(dirname, filename)[cut:])
+                    norm = os.path.join(dirname, filename)[cut:].replace("\\", "/")
+                    self.light.append(norm)
                 
         self.total = sorted(list(set(self.base + self.dark + self.light)))
         
-    def validateInner(self):
+    def validateInner(self, requiredFiles):
         info('Validating ' + self.name + '...')
         clean = True
         error = False
@@ -121,6 +132,9 @@ class Customization():
             if entry in self.dark and entry in self.light:
                 clean = False
                 warn('File ' + os.path.join(self.basePath, entry) + ' duplicated in both skins')
+            if Suffixes.baseName(entry) not in requiredFiles and not entry in Project.INTRO:
+                clean = False
+                warn('File %s in unused' % entry)
 
         for entry in self.dark:
             if not entry in self.light:
@@ -130,6 +144,9 @@ class Customization():
                 else:
                     error = True
                     err('File ' + self.relativePath(self.darkPath, entry) + ' missing in light skin')
+            if Suffixes.baseName(entry) not in requiredFiles and not entry in Project.INTRO:
+                clean = False
+                warn('File %s in unused' % entry)
                 
         for entry in self.light:
             if not entry in self.dark:
@@ -139,6 +156,17 @@ class Customization():
                 else:
                     error = True
                     err('File ' + self.relativePath(self.lightPath, entry) + ' missing in dark skin')
+            if Suffixes.baseName(entry) not in requiredFiles and not entry in Project.INTRO:
+                clean = False
+                warn('File %s in unused' % entry)
+
+        for entry in requiredFiles:
+            if entry in self.base or entry in self.dark or entry in self.light:
+                continue
+            clean = False
+            error = True
+            err("File %s is missing" % entry)
+
         if clean:
             green('Success')
         if error:
@@ -164,7 +192,8 @@ class Customization():
             return 0
         return 1
 
-def parseLine(line):
+def parseLine(line, location):
+    global verbose
     result = []
     for part in line.split('"'):
         if not ".png" in part:
@@ -173,15 +202,19 @@ def parseLine(line):
     return result
 
 def parseFile(path):
+    global verbose
     result = []
+    linenumber = 0
     with open(path, "r") as file:
         for line in file.readlines():
+            linenumber += 1
             if not ".png" in line:
                 continue
             if not "skin" in line and not "Skin" in line:
-                warn(line.strip())
+                if verbose:
+                    warn(line.strip())
                 continue
-            result.extend(parseLine(line))
+            result.extend(parseLine(line, "%s:%s" % (path, linenumber)))
     return result
 
 def parseSources(dir):
@@ -191,7 +224,7 @@ def parseSources(dir):
         if (os.path.isdir(path)):
             result.extend(parseSources(path))
             continue
-        if not path.endswith(".cpp"):
+        if not path.endswith(".cpp") and not path.endswith(".h"):
             continue
         result.extend(parseFile(path))
     return result
@@ -207,9 +240,8 @@ def checkProject(rootDir, project):
 
     sourcesDir = os.path.join(os.path.join(rootDir, project), 'src')
     requiredFiles = parseSources(sourcesDir)
-  #  for file in requiredFiles:
-  #      green(file)
 
+    requiredSorted = sorted(list(set(requiredFiles)))
     customizationDir = os.path.join(rootDir, "customization")
 
     for entry in os.listdir(customizationDir):
@@ -221,7 +253,7 @@ def checkProject(rootDir, project):
         c = Customization(entry, path, project)
         if c.isRoot():
             c.populateFileList()
-            invalidInner += c.validateInner()
+            invalidInner += c.validateInner(requiredSorted)
             roots.append(c)
         customizations[entry] = c
     
