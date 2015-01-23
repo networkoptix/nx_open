@@ -31,7 +31,7 @@ HostAddressResolver::ResolveTask::ResolveTask(
 {
 }
 
-static std::atomic<HostAddressResolver*> HostAddressResolver_instance = nullptr;
+static std::atomic<HostAddressResolver*> HostAddressResolver_instance( nullptr );
 
 HostAddressResolver::HostAddressResolver()
 :
@@ -79,6 +79,12 @@ bool HostAddressResolver::resolveAddressAsync(
 
 bool HostAddressResolver::resolveAddressSync( const QString& hostName, HostAddress* const resolvedAddress )
 {
+    if( hostName.isEmpty() )
+    {
+        SystemError::setLastErrorCode( SystemError::hostNotFound );
+        return false;
+    }
+
     addrinfo hints;
     memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_family = AF_INET;    /* Allow only IPv4 */
@@ -92,7 +98,10 @@ bool HostAddressResolver::resolveAddressSync( const QString& hostName, HostAddre
     addrinfo* resolvedAddressInfo = nullptr;
     int status = getaddrinfo(hostName.toLatin1(), 0, &hints, &resolvedAddressInfo);
     if (status != 0)
+    {
+        SystemError::setLastErrorCode( status );
         return false;
+    }
 
     resolvedAddress->m_sinAddr = ((struct sockaddr_in*)(resolvedAddressInfo->ai_addr))->sin_addr;
     resolvedAddress->m_addrStr = hostName;
