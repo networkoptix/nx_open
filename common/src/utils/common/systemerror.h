@@ -10,6 +10,7 @@
 #include <WinSock2.h>
 #else
 #include <errno.h>
+#include <netdb.h>
 #endif
 
 #include <QtCore/QString>
