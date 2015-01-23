@@ -61,7 +61,12 @@ QString QnSecurityCamResource::getName() const
 
 void QnSecurityCamResource::setName( const QString& name )
 {
-    setCameraName( name );
+    QString oldName = getName();
+    if (oldName == name)
+        return;
+
+    setCameraName(name);
+    emit nameChanged(toSharedPointer(this));
 }
 
 void QnSecurityCamResource::setCameraName( const QString& newCameraName )

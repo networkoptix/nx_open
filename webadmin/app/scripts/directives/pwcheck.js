@@ -1,12 +1,12 @@
 'use strict';
 
 angular.module('webadminApp')
-    .directive('nxEqualEx', function() {
+    .directive('nxEqualEx',['$log', function($log) {
         return {
             require: 'ngModel',
             link: function (scope, elem, attrs, model) {
                 if (!attrs.nxEqualEx) {
-                    console.error('nxEqualEx expects a model as an argument!');
+                    $log.error('nxEqualEx expects a model as an argument!');
                     return;
                 }
                 function updateValidity(){
@@ -30,4 +30,4 @@ angular.module('webadminApp')
                 });
             }
         };
-    });
+    }]);

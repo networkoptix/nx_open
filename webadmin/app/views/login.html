@@ -15,7 +15,7 @@
 
         <div class="form-group" ng-class="{'has-error' : loginForm.password.$invalid && (loginForm.username.$dirty || loginForm.submitted)}">
             <label for="password" class="control-label">Password</label>
-            <input type="text" id="password" name="password" class="form-control" ng-model="user.password" required/>
+            <input type="password" id="password" name="password" class="form-control" ng-model="user.password" required/>
             <p class="help-block" ng-show="loginForm.password.$invalid && (loginForm.password.$dirty || loginForm.submitted)">
                 Password is required
             </p>
