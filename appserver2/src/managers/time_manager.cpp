@@ -250,27 +250,21 @@ namespace ec2
             QMutexLocker lk( &m_mutex );
             m_terminated = false;
             broadcastSysTimeTaskID = m_broadcastSysTimeTaskID;
+            m_broadcastSysTimeTaskID = 0;
             manualTimerServerSelectionCheckTaskID = m_manualTimerServerSelectionCheckTaskID;
+            m_manualTimerServerSelectionCheckTaskID = 0;
             internetSynchronizationTaskID = m_internetSynchronizationTaskID;
+            m_internetSynchronizationTaskID = 0;
         }
 
         if( broadcastSysTimeTaskID )
-        {
-            TimerManager::instance()->joinAndDeleteTimer( m_broadcastSysTimeTaskID );
-            m_broadcastSysTimeTaskID = 0;
-        }
+            TimerManager::instance()->joinAndDeleteTimer( broadcastSysTimeTaskID );
 
         if( manualTimerServerSelectionCheckTaskID )
-        {
             TimerManager::instance()->joinAndDeleteTimer( manualTimerServerSelectionCheckTaskID );
-            m_manualTimerServerSelectionCheckTaskID = 0;
-        }
 
         if( internetSynchronizationTaskID )
-        {
             TimerManager::instance()->joinAndDeleteTimer( internetSynchronizationTaskID );
-            m_internetSynchronizationTaskID = 0;
-        }
 
         if( m_timeSynchronizer )
         {
@@ -322,10 +316,7 @@ namespace ec2
                     std::bind( &TimeSynchronizationManager::broadcastLocalSystemTime, this, _1 ),
                     0 );
                 m_timeSynchronizer.reset( new DaytimeNISTFetcher() );
-                m_internetSynchronizationTaskID = TimerManager::instance()->addTimer(
-                    std::bind( &TimeSynchronizationManager::syncTimeWithInternet, this, _1 ),
-                    0 );
-                NX_LOG( lit( "TimeSynchronizationManager. Added time sync task %1, delay %2" ).arg( m_internetSynchronizationTaskID ).arg( m_internetTimeSynchronizationPeriod * MILLIS_PER_SEC ), cl_logDEBUG2 );
+                addInternetTimeSynchronizationTask();
             }
             else
                 m_manualTimerServerSelectionCheckTaskID = TimerManager::instance()->addTimer(
@@ -384,9 +375,14 @@ namespace ec2
                         const qint64 curSyncTime = m_usedTimeSyncInfo.syncTime;
                         using namespace std::placeholders;
                         //sending broadcastPeerSystemTime tran, new sync time will be broadcasted along with it
-                        m_broadcastSysTimeTaskID = TimerManager::instance()->addTimer(
-                            std::bind( &TimeSynchronizationManager::broadcastLocalSystemTime, this, _1 ),
-                            0 );
+                        if( !m_terminated )
+                        {
+                            if( m_broadcastSysTimeTaskID )
+                                TimerManager::instance()->deleteTimer( m_broadcastSysTimeTaskID );
+                            m_broadcastSysTimeTaskID = TimerManager::instance()->addTimer(
+                                std::bind( &TimeSynchronizationManager::broadcastLocalSystemTime, this, _1 ),
+                                0 );
+                        }
                         lk.unlock();
                         emit timeChanged( curSyncTime );
                     }
@@ -537,9 +533,14 @@ namespace ec2
         {
             using namespace std::placeholders;
             //sending broadcastPeerSystemTime tran, new sync time will be broadcasted along with it
-            m_broadcastSysTimeTaskID = TimerManager::instance()->addTimer(
-                std::bind( &TimeSynchronizationManager::broadcastLocalSystemTime, this, _1 ),
-                0 );
+            if( !m_terminated )
+            {
+                if( m_broadcastSysTimeTaskID )
+                    TimerManager::instance()->deleteTimer( m_broadcastSysTimeTaskID );
+                m_broadcastSysTimeTaskID = TimerManager::instance()->addTimer(
+                    std::bind( &TimeSynchronizationManager::broadcastLocalSystemTime, this, _1 ),
+                    0 );
+            }
         }
         lock->unlock();
         emit timeChanged( curSyncTime );
@@ -613,12 +614,7 @@ namespace ec2
     {
         {
             QMutexLocker lk( &m_mutex );
-            if( m_terminated )
-            {
-                m_broadcastSysTimeTaskID = 0;
-                return;
-            }
-            if( taskID != m_broadcastSysTimeTaskID )
+            if( (taskID != m_broadcastSysTimeTaskID) || m_terminated )
                 return;
 
             using namespace std::placeholders;
@@ -680,13 +676,11 @@ namespace ec2
     {
         NX_LOG( lit( "TimeSynchronizationManager. TimeSynchronizationManager::syncTimeWithInternet. taskID %1" ).arg( taskID ), cl_logDEBUG2 );
 
-        {
-            QMutexLocker lk( &m_mutex );
+        QMutexLocker lk( &m_mutex );
 
-            m_internetSynchronizationTaskID = 0;
-            if( m_terminated )
-                return;
-        }
+        if( (taskID != m_internetSynchronizationTaskID) || m_terminated )
+            return;
+        m_internetSynchronizationTaskID = 0;
 
         NX_LOG( lit("TimeSynchronizationManager. Synchronizing time with internet"), cl_logDEBUG1 );
 
@@ -745,10 +739,15 @@ namespace ec2
                         millisFromEpoch,
                         m_localTimePriorityKey );
 
-                    using namespace std::placeholders;
-                    m_broadcastSysTimeTaskID = TimerManager::instance()->addTimer(
-                        std::bind( &TimeSynchronizationManager::broadcastLocalSystemTime, this, _1 ),
-                        0 );
+                    if( !m_terminated )
+                    {
+                        if( m_broadcastSysTimeTaskID )
+                            TimerManager::instance()->deleteTimer( m_broadcastSysTimeTaskID );
+                        using namespace std::placeholders;
+                        m_broadcastSysTimeTaskID = TimerManager::instance()->addTimer(
+                            std::bind( &TimeSynchronizationManager::broadcastLocalSystemTime, this, _1 ),
+                            0 );
+                    }
                 }
             }
             else
@@ -778,13 +777,16 @@ namespace ec2
 
     void TimeSynchronizationManager::addInternetTimeSynchronizationTask()
     {
-        assert( m_internetSynchronizationTaskID == 0 );
+        Q_ASSERT( m_internetSynchronizationTaskID == 0 );
+
+        if( m_terminated )
+            return;
 
         using namespace std::placeholders;
         m_internetSynchronizationTaskID = TimerManager::instance()->addTimer(
             std::bind( &TimeSynchronizationManager::syncTimeWithInternet, this, _1 ),
             m_internetTimeSynchronizationPeriod * MILLIS_PER_SEC );
-        NX_LOG( lit( "TimeSynchronizationManager. Added time sync task %1, delay %2" ).
+        NX_LOG( lit( "TimeSynchronizationManager. Added internet time sync task %1, delay %2" ).
             arg( m_internetSynchronizationTaskID ).arg( m_internetTimeSynchronizationPeriod * MILLIS_PER_SEC ), cl_logDEBUG2 );
     }
 

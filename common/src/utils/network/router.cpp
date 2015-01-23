@@ -109,11 +109,17 @@ void QnRouter::at_moduleFinder_moduleUrlLost(const QnModuleInformation &moduleIn
 }
 
 void QnRouter::at_runtimeInfoManager_runtimeInfoAdded(const QnPeerRuntimeInfo &data) {
+    if (data.uuid == qnCommon->moduleGUID())
+        return;
+
     for (const ec2::ApiConnectionData &connection: data.data.availableConnections)
         addConnection(data.uuid, Endpoint(connection.peerId, connection.host, connection.port));
 }
 
 void QnRouter::at_runtimeInfoManager_runtimeInfoChanged(const QnPeerRuntimeInfo &data) {
+    if (data.uuid == qnCommon->moduleGUID())
+        return;
+
     m_mutex.lock();
     QList<Endpoint> connections = m_connections.values(data.uuid);
     m_mutex.unlock();
@@ -133,6 +139,9 @@ void QnRouter::at_runtimeInfoManager_runtimeInfoChanged(const QnPeerRuntimeInfo 
 }
 
 void QnRouter::at_runtimeInfoManager_runtimeInfoRemoved(const QnPeerRuntimeInfo &data) {
+    if (data.uuid == qnCommon->moduleGUID())
+        return;
+
     for (const ec2::ApiConnectionData &connection: data.data.availableConnections)
         removeConnection(data.uuid, Endpoint(connection.peerId, connection.host, connection.port));
 }
