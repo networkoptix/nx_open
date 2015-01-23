@@ -29,12 +29,24 @@ class Suffixes:
 class Formats:
     PNG = '.png'
     GIF = '.gif'
-    ALL = [PNG, GIF]
+    IMAGES = [PNG, GIF]
+
+    CPP = '.cpp'
+    H   = '.h'
+    UI  = '.ui'
+    SOURCES = [CPP, H, UI]
 
     @staticmethod
-    def contains(string):
-        for format in Formats.ALL:
+    def isImage(string):
+        for format in Formats.IMAGES:
             if format in string:
+                return True
+        return False
+
+    @staticmethod
+    def isSource(string):
+        for format in Formats.SOURCES:
+            if string.endswith(format):
                 return True
         return False
 
@@ -129,7 +141,7 @@ class Customization():
            return False
         if entry in Project.INTRO:
            return False
-        if not Formats.contains(entry):
+        if not Formats.isImage(entry):
            return False
         return True
 
@@ -213,11 +225,15 @@ class Customization():
             return 0
         return 1
 
-def parseLine(line, location):
+def parseLine(line, extension, location):
     global verbose
     result = []
-    for part in line.split('"'):
-        if not Formats.contains(part):
+    splitter = '"'
+    if extension == Formats.UI:
+        line = line.replace("<", splitter).replace(">", splitter).replace(":/skin/", "")
+        
+    for part in line.split(splitter):
+        if not Formats.isImage(part):
             continue
         result.append(part)
     return result
@@ -226,16 +242,17 @@ def parseFile(path):
     global verbose
     result = []
     linenumber = 0
+    extension = os.path.splitext(path)[1]
     with open(path, "r") as file:
         for line in file.readlines():
             linenumber += 1
-            if not Formats.contains(line):
+            if not Formats.isImage(line):
                 continue
             if not "skin" in line and not "Skin" in line:
                 if verbose:
                     warn(line.strip())
                 continue
-            result.extend(parseLine(line, "%s:%s" % (path, linenumber)))
+            result.extend(parseLine(line, extension, "%s:%s" % (path, linenumber)))
     return result
 
 def parseSources(dir):
@@ -245,7 +262,7 @@ def parseSources(dir):
         if (os.path.isdir(path)):
             result.extend(parseSources(path))
             continue
-        if not path.endswith(".cpp") and not path.endswith(".h"):
+        if not Formats.isSource(path):
             continue
         result.extend(parseFile(path))
     return result
