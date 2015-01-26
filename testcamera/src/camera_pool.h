@@ -1,7 +1,8 @@
 #ifndef __CAMERA_POOL_H__
 #define __CAMERA_POOL_H__
 
-#include <QMap>
+#include <QtCore/QMap>
+#include <QtCore/QMutex>
 #include "test_camera.h"
 #include "utils/network/socket.h"
 #include "utils/common/long_runnable.h"
