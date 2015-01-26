@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="en-US" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+    <String Id="AdvancedWelcomeEulaDlg_Title"                       Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="BrowseDlg_Title"                                    Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="CancelDlg_Title"                                    Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="CustomizeDlg_Title"                                 Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="DiskCostDlg_Title"                                  Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="ErrorDlg_Title"                                     Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="ExitDialog_Title"                                   Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="FatalError_Title"                                   Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="FeaturesDlg_Title"                                  Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="FilesInUse_Title"                                   Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="InstallDirDlg_Title"                                Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="InstallScopeDlg_Title"                              Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="InvalidDirDlg_Title"                                Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="LicenseAgreementDlg_Title"                          Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="MaintenanceTypeDlg_Title"                           Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="MaintenanceWelcomeDlg_Title"                        Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="MsiRMFilesInUse_Title"                              Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="OutOfDiskDlg_Title"                                 Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="OutOfRbDiskDlg_Title"                               Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="PrepareDlg_Title"                                   Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="ProgressDlg_Title"                                  Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="ResumeDlg_Title"                                    Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="SetupTypeDlg_Title"                                 Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="UserExit_Title"                                     Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="VerifyReadyDlg_Title"                               Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="WaitForCostingDlg_Title"                            Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="WelcomeDlg_Title"                                   Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+    <String Id="WelcomeEulaDlg_Title"                               Overridable="yes">${company.name} ${product.name} Setup v.${release.version}</String>
+
+    <!-- Standard Strings (Common Buttons, Labels etc) -->
+    <String Id="StdString_Ok"                                       Overridable="yes">Ok</String>
+    <String Id="StdString_Warning"                                  Overridable="yes">警告</String>
+    <String Id="StdString_SetupTitle"                               Overridable="yes">[ProductName] Setup</String>
+
+    <!-- AllFieldsAreMandatoryDlg -->
+    <String Id="AllFieldsAreMandatoryDlg_AllFieldsAreMandatory"     Overridable="yes">所有欄位皆為必填</String>
+
+    <!-- AppServerDlg -->
+    <String Id="AppServerDlg_EntcontrollerConfig"                   Overridable="yes">企業控制器設定</String>
+    <String Id="AppServerDlg_EntcontrollerParameters"               Overridable="yes">請設定企業控制器參數</String>
+    <String Id="AppServerDlg_Port"                                  Overridable="yes">通訊埠</String>
+    <String Id="AppServerDlg_Login"                                 Overridable="yes">登入</String>
+    <String Id="AppServerDlg_CreatePassword"                        Overridable="yes">請設定密碼</String>
+    <String Id="AppServerDlg_Network"                               Overridable="yes">網路</String>    
+    <String Id="AppServerDlg_ProxyPort"                             Overridable="yes">Proxy通訊埠</String>
+    <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">請確認密碼</String>   
+    <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">附加參數</String>   
+    <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">允許系統優化攝影機設定(建議)</String>   
+
+    <!-- Associations -->
+    <String Id="Associations_PlayWith"                              Overridable="yes">Play with ${product.name}</String>
+
+    <!-- ClientDlg -->
+    <String Id="ClientDlg_Shortcut"                                 Overridable="yes">捷徑</String>
+    <String Id="ClientDlg_InstallShortcut"                          Overridable="yes">新增捷徑至桌面</String>
+    
+    <!-- DowngradeWarningDlg -->
+    <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">更新的版本 [ProductName] 已經安裝</String> 
+
+    <!-- EmptyPasswordDlg -->
+    <String Id="EmptyPasswordDlg_Title"                             Overridable="yes">無效的密碼</String>
+    <String Id="EmptyPasswordDlg_EmptyPassword"                     Overridable="yes">密碼不能為空</String>     
+    <String Id="EmptyPasswordDlg_Warning"                           Overridable="yes">警告</String>     
+
+    <!-- InstallTypeDlg -->
+    <String Id="InstallTypeDlg_QuickFull"                           Overridable="yes">快速完整安裝(安裝所有元件)</String>
+    <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">僅安裝客戶端軟體(我想要瀏覽錄在其它地方的影像)</String>
+    <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">進階</String>
+    <String Id="InstallTypeDlg_SelectInstallType"                   Overridable="yes">請選擇安裝類型</String>
+    <String Id="InstallTypeDlg_InstallType"                         Overridable="yes">安裝類型</String>       
+
+    <!-- InvalidPasswordDlg -->
+    <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">密碼應相同且不得為空</String>    
+
+    <!-- MediaDirDlg -->
+    <String Id="MediaDirDlg_MediaFolderLabel"                       Overridable="yes">請點擊下一步使用預設路徑或點擊變更以選擇其它路徑</String>
+    <String Id="MediaDirDlg_MediaFolder"                            Overridable="yes">媒體根目錄</String>
+    <String Id="MediaDirDlg_SelectMediaFolder"                      Overridable="yes">Please Select Media Root Folder:</String>
+    <String Id="MediaDirDlg_LoginLabel"                             Overridable="yes">登入</String>    
+
+    <!-- MediaServerDlg -->
+    <String Id="MediaServerDlg_Host"                                Overridable="yes">主機地址</String>
+    <String Id="MediaServerDlg_AppserverPort"                       Overridable="yes">通訊埠</String>
+    <String Id="MediaServerDlg_Login"                               Overridable="yes">登入</String>
+    <String Id="MediaServerDlg_Password"                            Overridable="yes">密碼</String>  
+    <String Id="MediaServerDlg_MediaserverPort"                     Overridable="yes">媒體伺服器通訊埠</String>
+    <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">企業控制器</String>
+    <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">媒體伺服器設定</String>
+    <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">媒體伺服器</String>  
+
+    <!-- MyExitDialog -->
+
+    <!-- MyFeaturesDlg -->
+    <String Id="MyFeaturesDlg_Components"                           Overridable="yes">元件</String>
+    <String Id="MyFeaturesDlg_Client"                               Overridable="yes">${client.name} (我想要瀏覽錄在其它地方的影像)</String>
+    <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (我想要在本機錄影)</String>
+    <String Id="MyFeaturesDlg_EnterpriseController"                 Overridable="yes">${appserver.name} (資料庫管理. 請勿安裝超過一次)</String>    
+
+    <!-- PasswordDlg -->
+    <String Id="PasswordDlg_DescriptionLabel"                       Overridable="yes">請輸入管理者密碼</String>
+    <String Id="PasswordDlg_TitleLabel"                             Overridable="yes">管理者密碼</String>
+    <String Id="PasswordDlg_GroupBox"                               Overridable="yes">管理者密碼</String>
+    <String Id="PasswordDlg_LoginLabel"                             Overridable="yes">登入</String>
+    <String Id="PasswordDlg_PasswordLabel"                          Overridable="yes">建立密碼</String>
+    <String Id="PasswordDlg_ConfirmPasswordLabel"                   Overridable="yes">確認密碼</String>    
+
+    <!-- PasswordShouldMatchDlg -->
+    <String Id="PasswordShouldMatchDlg_ConfigError"                 Overridable="yes">設定錯誤</String>    
+    <String Id="PasswordShouldMatchDlg_Warning"                     Overridable="yes">警告</String>    
+    <String Id="PasswordShouldMatchDlg_PasswordShouldMatchDlg"      Overridable="yes">密碼不符</String>    
+
+    <!-- PortDuplicateDlg -->
+    <String Id="PortDuplicateDlg_InvalidPorts"                      Overridable="yes">指定的通訊埠無效</String>    
+    <String Id="PortDuplicateDlg_Warning"                           Overridable="yes">警告</String>    
+    <String Id="PortDuplicateDlg_PortSetTwice"                      Overridable="yes">無法重覆設定此通訊埠. 請檢查您的設定.</String>    
+
+    <!-- PortIsBusyDlg -->
+    <String Id="PortIsBusyDlg_PortOccupied"                         Overridable="yes">通訊埠 [BUSYPORT] 已被佔用.</String>    
+    <String Id="PortIsBusyDlg_Warning"                              Overridable="yes">警告</String>    
+    <String Id="PortIsBusyDlg_PortOccupiedMessage"                  Overridable="yes">您指定的通訊埠已被佔用. 若您確定要繼續的話請點擊 '下一步' </String>    
+
+    <!-- Product -->
+    <String Id="Product_LaunchClient"                               Overridable="yes">退出安裝時執行 ${product.name} </String>    
+    <String Id="Product_ArchMismatch"                               Overridable="yes">此安裝檔為 32 位元專用. 安裝即將結束. </String>
+
+    <!-- SelectionWarningDlg -->
+    <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">至少選擇一個元件</String>    
+
+    <!-- UninstallOptionsDlg -->
+    <String Id="UninstallOptionsDlg_UninstallOptions"               Overridable="yes">反安裝選項</String>
+    <String Id="UninstallOptionsDlg_KeepDatabase"                   Overridable="yes">保留 ${product.name} 資料庫</String>
+    <String Id="UninstallOptionsDlg_RemoveDatabase"                 Overridable="yes">移除 ${product.name} 資料庫</String>
+    <String Id="UninstallOptionsDlg_Current"                        Overridable="yes">目前</String>  
+    <String Id="UninstallOptionsDlgVersionToKeep"                   Overridable="yes">保留的版本:</String>   
+    
+    <!-- UpgradeDlg -->
+    <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">移除先前的版本</String>    
+    <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">安裝類型</String>    
+    <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">您的系統即將升級</String>    
+    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">您的資料庫已損毀且無法復原. 新資料庫已安裝. 登入帳號及密碼皆為 "admin". 第一次登入後請變更您的密碼.</String>    
+
+    <!-- WixSchedFirewallExceptions -->
+    <String Id="msierrFirewallCannotConnect"                        Overridable="yes">無法連線至 Windows 防火牆.  ([2]   [3]   [4]   [5])</String>    
+    <String Id="WixSchedFirewallExceptionsInstall"                  Overridable="yes">設定 Windows 防火牆</String>    
+    <String Id="WixSchedFirewallExceptionsUninstall"                Overridable="yes">設定 Windows 防火牆</String>    
+    <String Id="WixRollbackFirewallExceptionsInstall"               Overridable="yes">還原 Windows 防火牆設定</String>    
+    <String Id="WixExecFirewallExceptionsInstall"                   Overridable="yes">安裝 Windows 防火牆設定</String>    
+    <String Id="WixRollbackFirewallExceptionsUninstall"             Overridable="yes">還原 Windows 防火牆設定</String>    
+    <String Id="WixExecFirewallExceptionsUninstall"                 Overridable="yes">移除 Windows 防火牆設定</String>    
+    
+</WixLocalization>
