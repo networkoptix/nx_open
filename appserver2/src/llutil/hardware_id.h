@@ -17,7 +17,7 @@ private:
     std::string msg;
 };
 
-const int LATEST_HWID_VERSION = 3;
+const int LATEST_HWID_VERSION = 4;
 
 QByteArray getHardwareId(int version, bool guidCompatibility);
 QList<QByteArray> getMainHardwareIds(int guidCompatibility);

@@ -37,6 +37,9 @@ public:
     QnEmailSettings emailSettings() const;
     void setEmailSettings(const QnEmailSettings &settings);
 
+    QString savedMac() const;
+    void setSavedMac(const QString& mac);
+
     void synchronizeNow();
     QnUserResourcePtr getAdminUser();
 signals:
@@ -51,6 +54,7 @@ private:
 private:
     QnResourcePropertyAdaptor<bool> *m_cameraSettingsOptimizationAdaptor;
     QnResourcePropertyAdaptor<QString> *m_disabledVendorsAdaptor;
+    QnResourcePropertyAdaptor<QString> *m_savedMacAdaptor;
 
     // set of email settings adaptors
     QnResourcePropertyAdaptor<QString> *m_serverAdaptor;

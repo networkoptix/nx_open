@@ -25,11 +25,17 @@
 
 #include "util.h"
 #include "hardware_id.h"
+#include "api/global_settings.h"
 
 #define _WIN32_DCOM
 # pragma comment(lib, "wbemuuid.lib")
 
 namespace {
+
+struct Device {
+    std::string xclass;
+    std::string mac;
+};
 
 void execQuery1(IWbemServices *pSvc, const BSTR fieldName, const BSTR objectName, bstr_t& rezStr)
 {
@@ -149,14 +155,107 @@ void execQuery2(IWbemServices *pSvc, const BSTR fieldName, const BSTR objectName
     }
 }
 
-unsigned short SwapShort(unsigned short a)
-{
+void getMacAddress(IWbemServices *pSvc, bstr_t& rezStr) {
+    HRESULT hres;
+
+    IEnumWbemClassObject* pEnumerator = NULL;
+    hres = pSvc->ExecQuery(
+        _T("WQL"), 
+        _T("SELECT * FROM Win32_NetworkAdapter WHERE PhysicalAdapter=true "),
+        WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, 
+        NULL,
+        &pEnumerator);
+
+    if (FAILED(hres))
+    {
+        std::ostringstream os;
+        os << "Query for Win32_NetworkAdapter failed. Error code = 0x"
+            << " " << std::ios_base::hex << hres;
+        throw LLUtil::HardwareIdError(os.str());
+    }
+
+    IWbemClassObject *pclsObj;
+    ULONG uReturn = 0;
+
+    std::string classes[] = {"PCI", "USB"};
+    std::vector<Device> devices;
+
+    for (;;) {
+        HRESULT hr = pEnumerator->Next(WBEM_INFINITE, 1, 
+            &pclsObj, &uReturn);
+
+        if (0 == uReturn)
+            break;
+
+        Device device;
+
+        VARIANT vtProp;
+        hr = pclsObj->Get(L"PNPDeviceID", 0, &vtProp, 0, 0);
+        if (SUCCEEDED(hr)) {
+            if (V_VT(&vtProp) == VT_BSTR) {
+                std::string value = (const char*)(bstr_t)vtProp.bstrVal;
+                VariantClear(&vtProp);
+
+                for (const std::string& xclass : classes) {
+                    if (value.substr(0, 3) == xclass) {
+                        device.xclass = xclass;
+                    }
+                }
+
+                if (device.xclass.empty())
+                    continue;
+            }
+        } else {
+            continue;
+        }
+        
+        hr = pclsObj->Get(L"MACAddress", 0, &vtProp, 0, 0);
+        if (SUCCEEDED(hr)) {
+            if (V_VT(&vtProp) == VT_BSTR) {
+                device.mac = (const char *)(bstr_t)vtProp.bstrVal;
+                VariantClear(&vtProp);
+            }
+        } else {
+            continue;
+        }
+
+        if (!device.mac.empty())
+            devices.push_back(device);
+
+        pclsObj->Release();
+    }
+
+    pEnumerator->Release();
+
+    std::sort(devices.begin(), devices.end(), [](const Device &device1, const Device &device2) {
+        // Sort first by class, then by mac
+        if (device1.xclass < device2.xclass)
+            return true;
+        else if (device1.xclass > device2.xclass)
+            return false;
+        else
+            return device1.mac < device2.mac;
+    });
+
+    if (devices.empty())
+        return;
+
+    QString savedMac = QnGlobalSettings::instance()->savedMac();
+    bool savedMacFound = std::find_if(devices.begin(), devices.end(), [savedMac](const Device& device) { return savedMac == device.mac.c_str(); }) != devices.end();
+    if (!savedMacFound) {
+        savedMac = devices.front().mac.c_str();
+        QnGlobalSettings::instance()->setSavedMac(savedMac);
+    }
+
+    rezStr = savedMac.toLatin1();
+}
+
+unsigned short SwapShort(unsigned short a) {
   a = ((a & 0x00FF) << 8) | ((a & 0xFF00) >> 8);
   return a;
 }
 
-unsigned int SwapWord(unsigned int a)
-{
+unsigned int SwapWord(unsigned int a) {
   a = ((a & 0x000000FF) << 24) |
       ((a & 0x0000FF00) <<  8) |
       ((a & 0x00FF0000) >>  8) |
@@ -164,8 +263,7 @@ unsigned int SwapWord(unsigned int a)
   return a;
 }
 
-void changeGuidByteOrder(bstr_t& guid)
-{
+void changeGuidByteOrder(bstr_t& guid) {
     if (guid.length() != 36)
         return;
 
@@ -184,6 +282,7 @@ void calcHardwareId(QByteArray &hardwareId, IWbemServices *pSvc, int version, bo
     bstr_t biosID, biosManufacturer;
     bstr_t hddID, hddManufacturer;
     bstr_t memoryPartNumber, memorySerialNumber;
+    bstr_t mac;
 
     execQuery(pSvc, _T("UUID"), _T("Win32_ComputerSystemProduct"), boardUUID);
 
@@ -202,10 +301,16 @@ void calcHardwareId(QByteArray &hardwareId, IWbemServices *pSvc, int version, bo
     execQuery(pSvc, _T("PartNumber"), _T("Win32_PhysicalMemory"), memoryPartNumber);
     execQuery(pSvc, _T("SerialNumber"), _T("Win32_PhysicalMemory"), memorySerialNumber);
 
+    getMacAddress(pSvc, mac);
+
     if (boardID.length() || boardUUID.length() || biosID.length()) {
         hardwareId = (LPCSTR) (boardID + boardUUID + boardManufacturer + boardProduct + biosID + biosManufacturer);
-        if (version == 3) {
+        if (version >= 3) {
             hardwareId += (LPCSTR)(memoryPartNumber + memorySerialNumber);
+        }
+
+        if (version >= 4) {
+            hardwareId += (LPCSTR)mac;
         }
     } else {
         hardwareId.clear();
@@ -349,9 +454,11 @@ void LLUtil::fillHardwareIds(QList<QByteArray>& hardwareIds)
     calcHardwareId(hardwareIds[0], pSvc, 1, false);
     calcHardwareId(hardwareIds[1], pSvc, 2, false);
     calcHardwareId(hardwareIds[2], pSvc, 3, false);
-    calcHardwareId(hardwareIds[3], pSvc, 1, true);
-    calcHardwareId(hardwareIds[4], pSvc, 2, true);
-    calcHardwareId(hardwareIds[5], pSvc, 3, true);
+    calcHardwareId(hardwareIds[3], pSvc, 4, false);
+    calcHardwareId(hardwareIds[4], pSvc, 1, true);
+    calcHardwareId(hardwareIds[5], pSvc, 2, true);
+    calcHardwareId(hardwareIds[6], pSvc, 3, true);
+    calcHardwareId(hardwareIds[7], pSvc, 4, true);
 
     // Cleanup
     // ========
