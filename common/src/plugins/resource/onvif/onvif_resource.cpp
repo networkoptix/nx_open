@@ -1579,6 +1579,13 @@ CameraDiagnostics::Result QnPlOnvifResource::updateVEncoderUsage(QList<VideoOpti
     }
 }
 
+bool QnPlOnvifResource::trustMaxFPS()
+{
+    QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+    bool result = resourceData.value<bool>(lit("trustMaxFPS"), false);
+    return result;
+}
+
 CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper)
 {
     VideoConfigsReq confRequest;
@@ -1698,7 +1705,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
     }
 
     setVideoEncoderOptions(optionsList[0]);
-    if (m_maxChannels == 1 && !isCameraControlDisabled())
+    if (m_maxChannels == 1 && !trustMaxFPS() && !isCameraControlDisabled())
         checkMaxFps(confResponse, optionsList[0].id);
 
     if(m_appStopping)

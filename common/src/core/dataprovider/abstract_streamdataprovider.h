@@ -46,6 +46,7 @@ public:
     virtual void setRole(Qn::ConnectionRole role);
 
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() const { return QnConstResourceVideoLayoutPtr(); }
+    bool needConfigureProvider() const;
 signals:
     void videoParamsChanged(AVCodecContext * codec);
     void slowSourceHint();
