@@ -391,6 +391,11 @@ bool QnLiveStreamProvider::isCameraControlDisabled() const
     return camRes && camRes->isCameraControlDisabled();
 }
 
+bool QnLiveStreamProvider::isCameraControlRequired() const
+{
+    return !isCameraControlDisabled() && needConfigureProvider();
+}
+
 void QnLiveStreamProvider::filterMotionByMask(const QnMetaDataV1Ptr& motion)
 {
     motion->removeMotion(m_motionMaskBinData[motion->channelNumber]);
