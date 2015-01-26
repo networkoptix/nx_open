@@ -41,7 +41,7 @@ public:
 
     QList<QnInfoDetail> toList() const;
 private:
-    QMap<QString, QnInfoDetail> m_details;
+    QMap<QnUuid, QnInfoDetail> m_details;
 };
 
 #endif // BUSINESS_AGGREGATION_INFO_H

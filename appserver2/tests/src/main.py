@@ -120,6 +120,8 @@ class ClusterTest():
     threadNumber = 16
     testCaseSize = 2
     unittestRollback = None
+    CHUNK_SIZE=4*1024*1024 # 4 MB
+    TRANSACTION_LOG="__transaction.log"
 
     _getterAPIList = ["getResourceParams",
         "getMediaServersEx",
@@ -143,8 +145,7 @@ class ClusterTest():
         "getSettings",
         "getCurrentTime",
         "getFullInfo",
-        "getLicenses",
-        "getTransactionLog"]
+        "getLicenses"]
 
     def _callAllGetters(self):
         print "======================================"
@@ -224,7 +225,7 @@ class ClusterTest():
             print "%s^^^%s^^^%s\n" % (comp1,comp2,comp3)
 
 
-    def _seeDiff(self,lhs,rhs):
+    def _seeDiff(self,lhs,rhs,offset=0):
         if len(rhs) == 0 or len(lhs) == 0:
             print "The difference is showing bellow:\n"
             if len(lhs) == 0:
@@ -244,7 +245,7 @@ class ClusterTest():
                 print "The difference is showing bellow:"
                 self._dumpDiffStr(lhs,i)
                 self._dumpDiffStr(rhs,i)
-                print "The first different character is at location:%d" % (i + 1)
+                print "The first different character is at location:%d" % (i + 1+offset)
                 return
 
 
@@ -285,7 +286,8 @@ class ClusterTest():
     def _reportDiff(self,statusDict,methodName):
         print "\n\n**************************************************\n\n"
         print "Report each server status of method:%s\n" % (methodName)
-        print "The server will be categorized as group,each server within the same group has same status,while different groups have different status\n"
+        print "The server will be categorized as group,each server within the \
+            same group has same status,while different groups have different status\n"
         print "The total group number is:%d\n" % (len(statusDict))
         if len(statusDict) == 1:
             print "The status check passed!\n"
@@ -362,8 +364,69 @@ class ClusterTest():
             return self._checkResultEqual_Deprecated(responseList,method)
 
     # Checking transaction log
+    # This checking will create file to store the transaction log since this
+    # log could be very large which cause urllib2 silently drop data and get
+    # partial read. In order to compare such large data file, we only compare
+    # one chunk at a time .The target transaction log will be stored inside
+    # of a temporary file and all the later comparison will be based on small
+    # chunk.
+
     def _checkTransactionLog(self):
-        return self._checkSingleMethodStatusConsistent("getTransactionLog")
+
+        first_hit = False
+        serverAddr= None
+        for s in self.clusterTestServerList:
+            print "Connection to http://%s/ec2/%s" %(s,"getTransactionLog")
+            # check if we have that transactionLog
+            if not first_hit:
+                first_hit = True
+                serverAddr = s
+                with open(self.TRANSACTION_LOG,"w+") as f:
+                    req = urllib2.urlopen("http://%s/ec2/%s"%(s,"getTransactionLog"))
+                    while True:
+                        data = req.read( self.CHUNK_SIZE )
+                        if data is None or len(data) == 0:
+                            break
+                        f.write(data)
+                # for the very first transactionLog, just skip 
+                continue
+            else:
+                assert os.path.isfile(self.TRANSACTION_LOG), \
+                    "The internal temporary file is not found, it means a external program has deleted it"
+                with open(self.TRANSACTION_LOG,"r") as f:
+                    req = urllib2.urlopen("http://%s/ec2/%s"%(s,"getTransactionLog"))
+                    pos = 0
+                    if req.getcode() != 200:
+                        print "Connection to http://%s/ec2/%s" %(s,"getTransactionLog")
+                        return False
+
+                    while True:
+                        data = f.read(self.CHUNK_SIZE)
+                        pack = req.read(self.CHUNK_SIZE)
+
+                        if data is None or len(data) == 0:
+                            if pack is None or len(pack) == 0:
+                                break
+                            else:
+                                print "Server:%s has different status with server:%s on method:%s" % (s,serverAddr,"getTransactionLog")
+                                print "Server:%s has data but server:%s runs out of its transaction log"%(
+                                    s,serverAddr)
+                                return False
+                        else:
+                            if pack is None or len(pack) == 0:
+                                print "Server:%s has different status with server:%s on method:%s" % (s,serverAddr,"getTransactionLog")
+                                print "Server:%s has data but server:%s runs out of its transaction log"%(
+                                    serverAddr,s)
+                                return False
+                            else:
+                                if data != pack:
+                                    print "Server:%s has different status with server:%s on method:%s" % (s,serverAddr,"getTransactionLog")
+                                    self._seeDiff(data,pack,pos)
+                                    return False
+                                pos += len(pack)
+                    req.close()
+        os.remove(self.TRANSACTION_LOG)
+        return (True,"")
 
     def checkMethodStatusConsistent(self,method):
             ret,reason = self._checkSingleMethodStatusConsistent(method)

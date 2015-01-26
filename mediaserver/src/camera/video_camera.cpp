@@ -167,30 +167,16 @@ int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue, 
 
 QnConstCompressedVideoDataPtr QnVideoCameraGopKeeper::GetIFrameByTime(qint64 time, bool iFrameAfterTime, int channel) const
 {
-    QnConstCompressedVideoDataPtr result;
-
     QMutexLocker lock(&m_queueMtx);
-    if (m_lastKeyFrames[channel].empty() || 
-        m_lastKeyFrames[channel].front()->timestamp > time + KEEP_IFRAMES_DISTANCE ||
-        m_lastKeyFrames[channel].back()->timestamp < time - KEEP_IFRAMES_DISTANCE)
-    {
-        return result;
-    }
-
-    //TODO #ak looks like std::lower_bound will do fine here
-    for (size_t i = 0; i < m_lastKeyFrames[channel].size(); ++i)
-    {
-        if (m_lastKeyFrames[channel][i]->timestamp >= time) {
-            if (iFrameAfterTime || m_lastKeyFrames[channel][i]->timestamp == time || i == 0)
-                return m_lastKeyFrames[channel][i];
-            else
-                return m_lastKeyFrames[channel][i-1];
-        }
-    }
-    if (iFrameAfterTime || m_lastKeyFrames[channel].empty())
-        return m_lastKeyFrame[channel];
-    else
-        return m_lastKeyFrames[channel].back();
+    const auto &queue = m_lastKeyFrames[channel];
+    if (queue.empty())
+        return QnConstCompressedVideoDataPtr(); // no video data
+    auto itr = std::lower_bound(queue.begin(), queue.end(), time, [](const QnConstCompressedVideoDataPtr& data, qint64 time) { return data->timestamp < time; } );
+    if (itr == queue.end())
+        return queue.back();
+    if (itr != queue.begin() && (*itr)->timestamp > time && !iFrameAfterTime)
+        --itr; // prefer frame before defined time if no exact match
+    return *itr;
 }
 
 

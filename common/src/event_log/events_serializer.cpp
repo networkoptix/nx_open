@@ -3,6 +3,11 @@
 #include <QtCore/QDebug>
 #include <QtCore/QElapsedTimer>
 
+#include <business/business_action_parameters.h>
+#include <business/business_event_parameters.h>
+
+#include <utils/common/model_functions.h>
+
 
 inline int readInt(quint8* &curPtr)
 {
@@ -45,12 +50,12 @@ void QnEventSerializer::deserialize(QnBusinessActionDataListPtr& eventsPtr, cons
         action.setAggregationCount(readInt(curPtr));
         int runTimeParamsLen = readInt(curPtr);
         QByteArray ba = QByteArray::fromRawData((const char*)curPtr, runTimeParamsLen);
-        action.setRuntimeParams(QnBusinessEventParameters::unpack(ba));
+        action.setRuntimeParams(QnUbjson::deserialized<QnBusinessEventParameters>(ba));
         curPtr += runTimeParamsLen;
 
         int actionParamsLen = readInt(curPtr);
         ba = QByteArray::fromRawData((const char*)curPtr, actionParamsLen);
-        action.setParams(QnBusinessActionParameters::unpack(ba));
+        action.setParams(QnUbjson::deserialized<QnBusinessActionParameters>(ba));
         curPtr += actionParamsLen;
 
     }

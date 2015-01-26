@@ -29,6 +29,7 @@
 #include <utils/common/checked_cast.h>
 #include "utils/common/warnings.h"
 #include "transaction/runtime_transaction_log.h"
+#include "../../mediaserver/src/media_server/settings.h"
 
 
 namespace ec2
@@ -201,7 +202,8 @@ QnTransactionMessageBus::QnTransactionMessageBus(Qn::PeerType peerType)
     m_timer(nullptr), 
     m_mutex(QMutex::Recursive),
     m_thread(nullptr),
-    m_runtimeTransactionLog(new QnRuntimeTransactionLog())
+    m_runtimeTransactionLog(new QnRuntimeTransactionLog()),
+    m_restartPending(false)
 {
     if (m_thread)
         return;
@@ -1039,6 +1041,20 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
         }
         Q_ASSERT(found);
         removeTTSequenceForPeer(transport->remotePeer().id);
+
+        if (m_localPeer.isServer() && transport->remoteIdentityTime() > qnCommon->systemIdentityTime() )
+        {
+            // swith to new time
+            NX_LOG( lit("Remote peer %1 has database restore time greater then current peer. Restarting and resync database with remote peer").arg(transport->remotePeer().id.toString()), cl_logINFO );
+            for (QnTransactionTransport* t: m_connections)
+                t->setState(QnTransactionTransport::Error);
+            for (QnTransactionTransport* t: m_connectingConnections)
+                t->setState(QnTransactionTransport::Error);
+            qnCommon->setSystemIdentityTime(transport->remoteIdentityTime(), transport->remotePeer().id);
+            m_restartPending = true;
+            return;
+        }
+
         transport->setState(QnTransactionTransport::ReadyForStreaming);
 
         transport->processExtraData();
@@ -1120,7 +1136,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
         const QUrl& url = itr.key();
         RemoteUrlConnectInfo& connectInfo = itr.value();
         bool isTimeout = !connectInfo.lastConnectedTime.isValid() || connectInfo.lastConnectedTime.hasExpired(RECONNECT_TIMEOUT);
-        if (isTimeout && !isPeerUsing(url)) 
+        if (isTimeout && !isPeerUsing(url) && !m_restartPending)
         {
             if (!connectInfo.discoveredPeer.isNull() ) 
             {
@@ -1195,7 +1211,7 @@ void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
         transport->sendTransaction(prepareModulesDataTransaction(), transportHeader);
 }
 
-void QnTransactionMessageBus::gotConnectionFromRemotePeer(const QSharedPointer<AbstractStreamSocket>& socket, const ApiPeerData &remotePeer)
+void QnTransactionMessageBus::gotConnectionFromRemotePeer(const QSharedPointer<AbstractStreamSocket>& socket, const ApiPeerData &remotePeer, qint64 remoteSystemIdentityTime)
 {
     if (!dbManager)
     {
@@ -1203,8 +1219,12 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(const QSharedPointer<A
         return;
     }
 
+    if (m_restartPending)
+        return; // reject incoming connection because of media server is about to restart
+
     QnTransactionTransport* transport = new QnTransactionTransport(m_localPeer, socket);
     transport->setRemotePeer(remotePeer);
+    transport->setRemoteIdentityTime(remoteSystemIdentityTime);
     connect(transport, &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
     connect(transport, &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);
     connect(transport, &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::emitRemotePeerUnauthorized, Qt::DirectConnection );
@@ -1216,8 +1236,21 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(const QSharedPointer<A
     Q_ASSERT(!m_connections.contains(remotePeer.id));
 }
 
-void QnTransactionMessageBus::addConnectionToPeer(const QUrl& url)
+QUrl addCurrentPeerInfo(const QUrl& srcUrl)
 {
+    QUrl url(srcUrl);
+    QUrlQuery q(url.query());
+
+    q.addQueryItem("guid", qnCommon->moduleGUID().toString());
+    q.addQueryItem("runtime-guid", qnCommon->runningInstanceGUID().toString());
+    q.addQueryItem("system-identity-time", QString::number(qnCommon->systemIdentityTime()));
+    url.setQuery(q);
+    return url;
+}
+
+void QnTransactionMessageBus::addConnectionToPeer(const QUrl& _url)
+{
+    QUrl url = addCurrentPeerInfo(_url);
     QMutexLocker lock(&m_mutex);
     if (!m_remoteUrls.contains(url)) {
         m_remoteUrls.insert(url, RemoteUrlConnectInfo());
@@ -1225,8 +1258,10 @@ void QnTransactionMessageBus::addConnectionToPeer(const QUrl& url)
     }
 }
 
-void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& url)
+void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& _url)
 {
+    QUrl url = addCurrentPeerInfo(_url);
+
     QMutexLocker lock(&m_mutex);
     m_remoteUrls.remove(url);
     QString urlStr = getUrlAddr(url);

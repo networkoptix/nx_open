@@ -1270,29 +1270,39 @@ bool QnStorageManager::isStorageAvailable(int storage_index) const {
     return storage && storage->getStatus() == Qn::Online; 
 }
 
-bool QnStorageManager::addBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark) {
-
+bool QnStorageManager::addBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark, bool forced) {
+    //TODO: #GDM #Bookmarks #API #High make sure guid is absent in the database, fill if not exists
     QnDualQualityHelper helper;
     helper.openCamera(cameraGuid);
 
     DeviceFileCatalog::Chunk chunkBegin, chunkEnd;
     DeviceFileCatalogPtr catalog;
     helper.findDataForTime(bookmark.startTimeMs, chunkBegin, catalog, DeviceFileCatalog::OnRecordHole_NextChunk, false);
-    if (chunkBegin.startTimeMs < 0)
-        return false; //recorded chunk was not found
+    if (chunkBegin.startTimeMs < 0) {
+        if (!forced)
+            return false; //recorded chunk was not found
+
+        /* If we are forced, try to find any chunk. */
+        helper.findDataForTime(bookmark.startTimeMs, chunkBegin, catalog, DeviceFileCatalog::OnRecordHole_PrevChunk, false);
+        if (chunkBegin.startTimeMs < 0)
+            return false; // no recorded chunk were found at all
+    }
 
     helper.findDataForTime(bookmark.endTimeMs(), chunkEnd, catalog, DeviceFileCatalog::OnRecordHole_PrevChunk, false);
-    if (chunkEnd.startTimeMs < 0)
+    if (chunkEnd.startTimeMs < 0 && !forced)
         return false; //recorded chunk was not found
 
     qint64 endTimeMs = bookmark.endTimeMs();
 
-    bookmark.startTimeMs = qMax(bookmark.startTimeMs, chunkBegin.startTimeMs);  // move bookmark start to the start of the chunk in case of hole
-    endTimeMs = qMin(endTimeMs, chunkEnd.endTimeMs());
-    bookmark.durationMs = endTimeMs - bookmark.startTimeMs;                     // move bookmark end to the end of the closest chunk in case of hole
+    /* For usual case move bookmark borders to the chunk borders. */
+    if (!forced) {
+        bookmark.startTimeMs = qMax(bookmark.startTimeMs, chunkBegin.startTimeMs);  // move bookmark start to the start of the chunk in case of hole
+        endTimeMs = qMin(endTimeMs, chunkEnd.endTimeMs());
+        bookmark.durationMs = endTimeMs - bookmark.startTimeMs;                     // move bookmark end to the end of the closest chunk in case of hole
 
-    if (bookmark.durationMs <= 0)
-        return false;   // bookmark ends before the chunk starts
+        if (bookmark.durationMs <= 0)
+            return false;   // bookmark ends before the chunk starts
+    }
 
     // this chunk will be added to the bookmark catalog
     chunkBegin.startTimeMs = bookmark.startTimeMs;
@@ -1320,6 +1330,7 @@ bool QnStorageManager::addBookmark(const QByteArray &cameraGuid, QnCameraBookmar
 }
 
 bool QnStorageManager::updateBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark) {
+    //TODO: #GDM #Bookmarks #API #High make sure guid is present and exists in the database
     DeviceFileCatalogPtr catalog = qnStorageMan->getFileCatalog(cameraGuid, QnServer::BookmarksCatalog);
     int idx = catalog->findFileIndex(bookmark.startTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
     if (idx < 0)
@@ -1343,6 +1354,7 @@ bool QnStorageManager::updateBookmark(const QByteArray &cameraGuid, QnCameraBook
 
 
 bool QnStorageManager::deleteBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark) {
+    //TODO: #GDM #Bookmarks #API #High make sure guid is present and exists in the database
     DeviceFileCatalogPtr catalog = qnStorageMan->getFileCatalog(cameraGuid, QnServer::BookmarksCatalog);
     if (!catalog)
         return false;

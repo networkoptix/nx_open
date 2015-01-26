@@ -82,7 +82,7 @@ bool backupDatabase() {
 }
 
 
-bool changeSystemName(const QString &systemName) {
+bool changeSystemName(const QString &systemName, qint64 sysIdTime) {
     if (qnCommon->localSystemName() == systemName)
         return true;
 
@@ -94,6 +94,7 @@ bool changeSystemName(const QString &systemName) {
     }
 
     MSSettings::roSettings()->setValue("systemName", systemName);
+    qnCommon->setSystemIdentityTime(sysIdTime, qnCommon->moduleGUID());
     server->setSystemName(systemName);
     QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 

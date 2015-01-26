@@ -9,7 +9,7 @@ public:
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
 
 private:
-    int changeSystemName(const QString &systemName, bool wholeSystem);
+    int changeSystemName(const QString &systemName, qint64 sysIdTime, bool wholeSystem);
     int changeAdminPassword(const QString &password, const QByteArray &passwordHash, const QByteArray &passwordDigest, const QString &oldPassword);
     int changePort(int port);
     void resetConnections();

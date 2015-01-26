@@ -21,6 +21,7 @@
 #include "utils/network/direct_module_finder.h"
 #include "utils/common/app_info.h"
 #include "utils/common/model_functions.h"
+#include "api/model/ping_reply.h"
 
 namespace {
     ec2::AbstractECConnectionPtr ec2Connection() { return QnAppServerConnectionFactory::getConnection2(); }
@@ -164,7 +165,8 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
     return nx_http::StatusCode::ok;
 }
 
-bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, const QString &user, const QString &password, const QString &currentPassword, const QnUserResourcePtr &admin, bool oneServer) {
+bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, const QString &user, const QString &password, const QString &currentPassword, const QnUserResourcePtr &admin, bool oneServer) 
+{
     QAuthenticator authenticator;
     authenticator.setUser(user);
     authenticator.setPassword(password);
@@ -172,7 +174,9 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, cons
     /* Change system name of the selected server */
     if (oneServer) {
         CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
-        CLHttpStatus status = client.doGET(lit("/api/configure?systemName=%1").arg(qnCommon->localSystemName()));
+        CLHttpStatus status = client.doGET(lit("/api/configure?systemName=%1&sysIdTime=%2")
+            .arg(qnCommon->localSystemName())
+            .arg(qnCommon->systemIdentityTime()));
         if (status != CLHttpStatus::CL_HTTP_SUCCESS)
             return false;
     }
@@ -195,7 +199,9 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, cons
     if (!oneServer) {
         authenticator.setPassword(currentPassword);
         CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
-        CLHttpStatus status = client.doGET(lit("/api/configure?systemName=%1&wholeSystem=true").arg(qnCommon->localSystemName()));
+        CLHttpStatus status = client.doGET(lit("/api/configure?systemName=%1&wholeSystem=true&sysIdTime=%2")
+            .arg(qnCommon->localSystemName())
+            .arg(qnCommon->systemIdentityTime()));
         if (status != CLHttpStatus::CL_HTTP_SUCCESS)
             return false;
     }
@@ -203,22 +209,40 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, cons
     return true;
 }
 
-bool QnMergeSystemsRestHandler::applyRemoteSettings(const QUrl &remoteUrl, const QString &systemName, const QString &user, const QString &password, QnUserResourcePtr &admin) {
+bool QnMergeSystemsRestHandler::applyRemoteSettings(const QUrl &remoteUrl, const QString &systemName, const QString &user, const QString &password, QnUserResourcePtr &admin) 
+{
+    qint64 remoteSysTime = 0;
     {   /* Read admin user from the remote server */
         QAuthenticator authenticator;
         authenticator.setUser(user);
         authenticator.setPassword(password);
 
-        CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
-        CLHttpStatus status = client.doGET(lit("/ec2/getUsers"));
-        if (status != CLHttpStatus::CL_HTTP_SUCCESS)
-            return false;
-
-        QByteArray data;
-        client.readAll(data);
-
         ec2::ApiUserDataList users;
-        QJson::deserialize(data, &users);
+        {
+            CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
+            CLHttpStatus status = client.doGET(lit("/ec2/getUsers"));
+            if (status != CLHttpStatus::CL_HTTP_SUCCESS)
+                return false;
+
+            QByteArray data;
+            client.readAll(data);
+
+            QJson::deserialize(data, &users);
+        }
+        {
+            CLSimpleHTTPClient client(remoteUrl, 10000, authenticator);
+            CLHttpStatus status = client.doGET(lit("/api/ping"));
+            if (status != CLHttpStatus::CL_HTTP_SUCCESS)
+                return false;
+
+            QByteArray data;
+            client.readAll(data);
+
+            QnJsonRestResult result;
+            QnPingReply reply;
+            if (QJson::deserialize(data, &result) && QJson::deserialize(result.reply(), &reply))
+                remoteSysTime = reply.sysIdTime;
+        }
 
         QnUserResourcePtr userResource = QnUserResourcePtr(new QnUserResource());
         for (const ec2::ApiUserData &userData: users) {
@@ -240,10 +264,10 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(const QUrl &remoteUrl, const
     if (errorCode != ec2::ErrorCode::ok)
         return false;
 
-    if (!changeSystemName(systemName))
+    if (!changeSystemName(systemName, remoteSysTime))
         return false;
 
-    errorCode = ec2Connection()->getMiscManager()->changeSystemNameSync(systemName);
+    errorCode = ec2Connection()->getMiscManager()->changeSystemNameSync(systemName, remoteSysTime);
     if (errorCode != ec2::ErrorCode::ok)
         return false;
 
