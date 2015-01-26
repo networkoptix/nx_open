@@ -25,7 +25,6 @@ angular.module('webadminApp')
                 if (loginDialog === null) { //Dialog is not displayed
                     loginDialog = $modal.open({
                         templateUrl: 'views/login.html',
-                        controller: 'LoginCtrl',
                         keyboard:false,
                         backdrop:'static'
                     });

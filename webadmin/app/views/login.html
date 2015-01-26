@@ -3,7 +3,7 @@
     <h3 class="modal-title">Login</h3>
 </div>
 
-<form class="form" name="loginForm" novalidate ng-submit="login()">
+<form class="form" name="loginForm" novalidate ng-controller="LoginCtrl" ng-submit="login()">
     <div class="modal-body" class="col-sm-12">
         <div class="form-group" ng-class="{'has-error' : loginForm.username.$invalid && (loginForm.username.$dirty || loginForm.submitted)}">
             <label for="username" class="control-label">Login</label>
