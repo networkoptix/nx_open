@@ -24,39 +24,38 @@ FocusScope {
         id: settings
     }
 
+    QnLoginSessionsModel {
+        id: sessionsModel
+    }
+
+
     /* backgorund */
     Rectangle {
         anchors.fill: parent
         color: __syspal.window
     }
 
-    Image {
-        id: logo
-
-        anchors {
-            horizontalCenter: parent.horizontalCenter
-            top: parent.top
-            topMargin: parent.width / 6
-        }
-
-        source: "/images/logo.png"
-        fillMode: Image.PreserveAspectFit
-
-        sourceSize.width: Math.min(parent.width, parent.height / 2)
-        sourceSize.height: parent.height / 2
-    }
-
-    Item {
-        id: actionBar
+    Rectangle {
+        id: titleBar
 
         width: parent.width
         height: CommonFunctions.dp(56)
 
+        color: colorTheme.color("nx_base")
+
+        QnSideShadow {
+            anchors.fill: titleBar
+            position: Qt.BottomEdge
+        }
+
         QnIconButton {
             id: backButton
-            icon: "/images/back.png"
-            x: CommonFunctions.dp(16)
+
+            x: CommonFunctions.dp(4)
             anchors.verticalCenter: parent.verticalCenter
+            size: CommonFunctions.dp(48)
+
+            icon: "/images/back.png"
 
             onClicked: {
                 loginDialog.state = "CHOOSE"
@@ -65,37 +64,38 @@ FocusScope {
 
         QnIconButton {
             id: checkButton
-            icon: "/images/check.png"
-            x: CommonFunctions.dp(16)
+
+            x: backButton.x
             anchors.verticalCenter: parent.verticalCenter
+            size: CommonFunctions.dp(48)
+
+            icon: "/images/check.png"
 
             onClicked: {
                 LoginDialogFunctions.clearSelection()
-                actionBar.state = "HIDDEN"
+                titleBar.state = "HIDDEN"
             }
         }
 
-        Row {
-            anchors {
-                right: parent.right
-                rightMargin: CommonFunctions.dp(16)
-                verticalCenter: parent.verticalCenter
-            }
+        QnIconButton {
+            id: deleteButton
 
-            QnIconButton {
-                id: deleteButton
-                icon: "/images/delete.png"
+            anchors.right: parent.right
+            anchors.rightMargin: CommonFunctions.dp(4)
+            anchors.verticalCenter: parent.verticalCenter
+            size: CommonFunctions.dp(48)
 
-                visible: savedSessionsList.selection.length || __currentIndex < savedSessionsList.count
+            icon: "/images/delete.png"
 
-                onClicked: {
-                    if (loginDialog.state == "CHOOSE") {
-                        LoginDialogFunctions.deleteSelected()
-                    } else {
-                        settings.removeSession(__currentIndex)
-                        savedSessionsList.model = settings.savedSessions()
-                        loginDialog.state = "CHOOSE"
-                    }
+//            visible: savedSessionsList.selection.length || __currentIndex < savedSessionsList.count
+
+            onClicked: {
+                if (loginDialog.state == "CHOOSE") {
+                    LoginDialogFunctions.deleteSelected()
+                } else {
+                    settings.removeSession(__currentIndex)
+                    savedSessionsList.model = settings.savedSessions()
+                    loginDialog.state = "CHOOSE"
                 }
             }
         }
@@ -103,10 +103,6 @@ FocusScope {
         states: [
             State {
                 name: "HIDDEN"
-                PropertyChanges {
-                    target: actionBar
-                    y: -actionBar.height
-                }
                 PropertyChanges {
                     target: deleteButton
                     __clipped: true
@@ -122,10 +118,6 @@ FocusScope {
             },
             State {
                 name: "SELECT"
-                PropertyChanges {
-                    target: actionBar
-                    y: 0
-                }
                 PropertyChanges {
                     target: deleteButton
                     __clipped: false
@@ -143,10 +135,6 @@ FocusScope {
             },
             State {
                 name: "EDIT"
-                PropertyChanges {
-                    target: actionBar
-                    y: 0
-                }
                 PropertyChanges {
                     target: deleteButton
                     __clipped: false
@@ -191,72 +179,59 @@ FocusScope {
         id: savedSessions
 
         anchors {
-            top: newSession.top
-            bottom: newSession.bottom
-            topMargin: parent.width / 6
+            top: titleBar.bottom
+            bottom: parent.bottom
         }
         width: parent.width
-
-        Text {
-            id: savedSessionsLabel
-            anchors.horizontalCenter: parent.horizontalCenter
-            color: __syspal.windowText
-            text: qsTr("Saved sessions")
-            renderType: Text.NativeRendering
-            font.pixelSize: CommonFunctions.dp(40)
-        }
 
         ListView {
             id: savedSessionsList
 
-            property var selection: []
+//            property var selection: []
 
-            anchors {
-                top: savedSessionsLabel.bottom
-                topMargin: CommonFunctions.dp(8)
-                bottom: parent.bottom
-                horizontalCenter: parent.horizontalCenter
-            }
-            width: parent.width * 2 / 3
-            spacing: CommonFunctions.dp(8)
+            model: sessionsModel
+
+            anchors.fill: parent
             boundsBehavior: ListView.StopAtBounds
             clip: true
+
+            onCountChanged: console.log(count)
 
             delegate: Item {
                 id: sessionItem
 
                 width: savedSessionsList.width
-                height: label.height + CommonFunctions.dp(16)
+                height: CommonFunctions.dp(72)
 
                 Rectangle {
                     anchors.fill: parent
 
-                    color: savedSessionsList.selection.indexOf(index) != -1 ? "#4a4a4a" : "#2d2d2d"
-                    radius: CommonFunctions.dp(2)
+//                    color: savedSessionsList.selection.indexOf(index) != -1 ? "#4a4a4a" : "#2d2d2d"
+                    color: "white"
                 }
 
                 Text {
                     id: label
                     x: CommonFunctions.dp(8)
                     anchors.verticalCenter: parent.verticalCenter
-                    text: modelData.name
+                    text: systemName
                     renderType: Text.NativeRendering
                     color: __syspal.windowText
                 }
 
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        if (savedSessionsList.selection.length) {
-                            LoginDialogFunctions.select(index)
-                        } else {
-                            __currentIndex = index
-                            LoginDialogFunctions.updateUi(modelData)
-                            loginDialog.state = "EDIT"
-                        }
-                    }
-                    onPressAndHold: LoginDialogFunctions.select(index)
-                }
+//                MouseArea {
+//                    anchors.fill: parent
+//                    onClicked: {
+//                        if (savedSessionsList.selection.length) {
+//                            LoginDialogFunctions.select(index)
+//                        } else {
+//                            __currentIndex = index
+//                            LoginDialogFunctions.updateUi(modelData)
+//                            loginDialog.state = "EDIT"
+//                        }
+//                    }
+//                    onPressAndHold: LoginDialogFunctions.select(index)
+//                }
             }
         }
     }
@@ -265,7 +240,7 @@ FocusScope {
         id: newSession
 
         anchors {
-            top: logo.bottom
+            top: titleBar.bottom
             bottom: fab.top
             bottomMargin: CommonFunctions.dp(32)
             left: savedSessions.right
@@ -336,6 +311,9 @@ FocusScope {
         }
     }
 
+    QnRoundShadow {
+        anchors.fill: fab
+    }
     Item {
         id: fab
 
@@ -344,15 +322,14 @@ FocusScope {
 
         anchors {
             bottom: parent.bottom
-            bottomMargin: parent.width / 6
             right: parent.right
-            rightMargin: parent.width / 6
+            margins: CommonFunctions.dp(24)
         }
 
         QnRoundButton {
             id: addButton
 
-            color: "#0096ff"
+            color: colorTheme.color("nx_base")
             icon: "/images/plus.png"
 
             onClicked: {
@@ -366,7 +343,7 @@ FocusScope {
         QnRoundButton {
             id: loginButton
 
-            color: "#0096ff"
+            color: colorTheme.color("nx_base")
             icon: "/images/forward.png"
             opacity: visible ? 1.0 : 0.0
             visible: loginDialog.state == "EDIT"
@@ -393,7 +370,7 @@ FocusScope {
                 x: 0
             }
             PropertyChanges {
-                target: actionBar
+                target: titleBar
                 state: "HIDDEN"
             }
             PropertyChanges {
@@ -408,7 +385,7 @@ FocusScope {
                 x: -loginDialog.width
             }
             PropertyChanges {
-                target: actionBar
+                target: titleBar
                 state: "EDIT"
             }
             PropertyChanges {
@@ -453,7 +430,6 @@ FocusScope {
     }
 
     Component.onCompleted: {
-        savedSessionsList.model = settings.savedSessions()
         state = savedSessionsList.count > 0 ? "CHOOSE" : "EDIT"
         __animated = true
     }

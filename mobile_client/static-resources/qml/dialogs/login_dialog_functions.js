@@ -38,7 +38,7 @@ function saveCurrentSession() {
 function select(index) {
     if (savedSessionsList.selection.indexOf(index) == -1) {
         savedSessionsList.selection = savedSessionsList.selection.concat([index])
-        actionBar.state = "SELECT"
+        titleBar.state = "SELECT"
     }
 }
 
@@ -56,5 +56,5 @@ function deleteSelected() {
     for (var i = selection.length - 1; i >= 0; i--)
         settings.removeSession(selection[i])
     savedSessionsList.model = settings.savedSessions()
-    actionBar.state = "HIDDEN"
+    titleBar.state = "HIDDEN"
 }

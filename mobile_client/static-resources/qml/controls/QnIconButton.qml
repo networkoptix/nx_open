@@ -7,13 +7,13 @@ import "../common_functions.js" as Common
 Button {
     id: button
 
-    property int iconSize: Common.dp(36)
+    property int size: Common.dp(36)
     property string icon
 
     property bool __clipped: false
 
-    width: iconSize
-    height: iconSize
+    width: size
+    height: size
 
     style: ButtonStyle {
         background: Item {}

@@ -8,17 +8,14 @@ import "../common_functions.js" as CommonFunctions
 Button {
     id: button
 
-    property color color: "#303030"
+    property color color: "pink"
     property color pressColor: Qt.darker(color, 1.2)
     property color hoverColor: Qt.lighter(color, 1.2)
-    property color iconColor: "#ffffff"
-    property bool shadowEnabled: true
-    property real zdepth: 1.0
     property string icon
-    property int iconSize: 0
+    property real size: CommonFunctions.dp(56)
 
-    width: CommonFunctions.dp(56)
-    height: CommonFunctions.dp(56)
+    width: size
+    height: size
 
     style: ButtonStyle {
         background: Item {
@@ -46,10 +43,7 @@ Button {
             Image {
                 id: image
                 anchors.centerIn: parent
-                sourceSize.width: control.iconSize
-                sourceSize.height: control.iconSize
                 source: control.icon
-                fillMode: Qt.KeepAspectRatio
             }
         }
     }
