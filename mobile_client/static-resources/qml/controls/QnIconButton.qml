@@ -7,7 +7,7 @@ import "../common_functions.js" as Common
 Button {
     id: button
 
-    property int iconSize: Common.dp(24)
+    property int iconSize: Common.dp(36)
     property string icon
 
     property bool __clipped: false
@@ -72,8 +72,6 @@ Button {
                     id: image
                     anchors.centerIn: parent
                     source: control.icon
-                    sourceSize.height: control.iconSize
-                    sourceSize.width: control.iconSize
                     fillMode: Qt.KeepAspectRatio
                 }
             }

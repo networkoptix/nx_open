@@ -30,8 +30,7 @@ QnResolutionUtil::DensityClass QnResolutionUtil::currentDensityClass() {
 #elif defined(Q_OS_IOS)
     qreal ppi = QGuiApplication::primaryScreen()->physicalDotsPerInch() * QGuiApplication::primaryScreen()->devicePixelRatio();
 #else
-    /* force reference ppi to desktop */
-    qreal ppi = referencePpi * QGuiApplication::primaryScreen()->devicePixelRatio();
+    qreal ppi = QGuiApplication::primaryScreen()->physicalDotsPerInch() * QGuiApplication::primaryScreen()->devicePixelRatio();
 #endif
 
     qreal multiplier = ppi / referencePpi;
