@@ -43,7 +43,6 @@ namespace {
     const QString nameFrom(lit("emailFrom"));
     const QString nameSignature(lit("emailSignature"));
     const QString nameSupportEmail(lit("emailSupportEmail"));
-    const QString nameSavedMac(lit("savedMac"));
     
 }
 
@@ -53,7 +52,6 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     assert(qnResPool);
     
     m_disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameDisabledVendors, QString(), this);
-    m_savedMacAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameSavedMac, QString(), this);
     m_cameraSettingsOptimizationAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameCameraSettingsOptimization, true, this);
     m_serverAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameHost, QString(), this);
     m_fromAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameFrom, QString(), this);
@@ -114,14 +112,6 @@ QSet<QString> QnGlobalSettings::disabledVendorsSet() const {
 
 void QnGlobalSettings::setDisabledVendors(QString disabledVendors) {
     m_disabledVendorsAdaptor->setValue(disabledVendors);
-}
-
-QString QnGlobalSettings::savedMac() const {
-    return m_savedMacAdaptor->value();
-}
-
-void QnGlobalSettings::setSavedMac(const QString& mac) {
-    m_savedMacAdaptor->setValue(mac);
 }
 
 bool QnGlobalSettings::isCameraSettingsOptimizationEnabled() const {
