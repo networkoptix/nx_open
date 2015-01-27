@@ -27,18 +27,21 @@ ru.ServerIsAlreadyInstalled=Сервер уже установлен
 ru.LaunchBoth=Запустить оба инсталлятора
 ru.LaunchClient=Запустить инсталлятор клиента
 ru.LaunchServer=Запустить инсталлятор сервера
+ru.NewerVersionAlreadyInstalled=Установлена более поздняя версия системы. Работа завершена.
 #elif Lang == "zh-CN"
 cn.ClientIsAlreadyInstalled=客户端已安装
 cn.ServerIsAlreadyInstalled=服务器已安装
 cn.LaunchBoth=启动服务器和客户端安装程序
 cn.LaunchClient=启动客户端安装程序
 cn.LaunchServer=已安装更新的软件，退出。
+cn.NewerVersionAlreadyInstalled=已安装更新的软件，退出。
 #else
 en.ClientIsAlreadyInstalled=Client is already installed
 en.ServerIsAlreadyInstalled=Server is already installed
 en.LaunchBoth=Launch Both Server and Client Installers
 en.LaunchClient=Launch Client Installer
 en.LaunchServer=Launch Server Installer
+en.NewerVersionAlreadyInstalled=Your have newer software installed. Exiting.
 #endif
 
 [Types]
@@ -248,7 +251,7 @@ begin
 
     if (NOT InstallServer AND NOT InstallClient) then
     begin
-        MsgBox('Your have newer software installed. Exiting.', mbInformation, MB_OK);
+        MsgBox(CustomMessage('NewerVersionAlreadyInstalled'), mbInformation, MB_OK);
         Result := False;
         exit;
     end;
