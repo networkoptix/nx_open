@@ -139,6 +139,44 @@ CameraDiagnostics::Result QnPhysicalCameraResource::initInternal() {
     return CameraDiagnostics::NoErrorResult();
 }
 
+bool QnPhysicalCameraResource::saveMediaStreamInfoIfNeeded( int encoderIndex, const CameraMediaStreamInfo& mediaStreamInfo )
+{
+    //get saved stream info with index encoderIndex
+    const QString& savedStreamInfoParamName = lit("%1_%2").arg(Qn::CAMERA_MEDIA_STREAM_PARAM_NAME_PREFIX).arg(encoderIndex);
+    const QString& savedStreamInfoStr = getProperty( savedStreamInfoParamName );
+    const CameraMediaStreamInfo& savedStreamInfo = QJson::deserialized<CameraMediaStreamInfo>( savedStreamInfoStr.toLatin1() );
+
+    if( mediaStreamInfo == savedStreamInfo )
+        return false; //stream info has not been changed
+
+    //saving new stream info
+    //TODO #ak remove m_mediaStreamsMutex lock, use resource mutex
+    QMutexLocker lk( &m_mediaStreamsMutex );
+
+    setProperty( savedStreamInfoParamName, QString::fromLatin1(QJson::serialized(mediaStreamInfo)) );
+
+    CameraMediaStreams supportedNativeStreams;
+
+    if( encoderIndex == PRIMARY_ENCODER_INDEX )     //keeping right media stream order in supportedNativeStreams vector
+        supportedNativeStreams.streams.push_back( mediaStreamInfo );
+
+    //reading another encoder's stream info
+    const int anotherEncoderIndex = encoderIndex == PRIMARY_ENCODER_INDEX
+        ? SECONDARY_ENCODER_INDEX
+        : PRIMARY_ENCODER_INDEX;
+    const QString& anotherStreamInfoParamName = lit("%1_%2").arg(Qn::CAMERA_MEDIA_STREAM_PARAM_NAME_PREFIX).arg(anotherEncoderIndex);
+    const QString& anotherStreamInfoStr = getProperty( anotherStreamInfoParamName );
+    if( !anotherStreamInfoStr.isEmpty() )
+        supportedNativeStreams.streams.push_back( QJson::deserialized<CameraMediaStreamInfo>( anotherStreamInfoStr.toLatin1() ) );
+
+    if( encoderIndex != PRIMARY_ENCODER_INDEX )     //keeping right media stream order in supportedNativeStreams vector
+        supportedNativeStreams.streams.push_back( mediaStreamInfo );
+
+    saveResolutionList( supportedNativeStreams );
+
+    return true;
+}
+
 void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& supportedNativeStreams )
 {
     static const char* RTSP_TRANSPORT_NAME = "rtsp";
@@ -316,6 +354,14 @@ CameraMediaStreamInfo::CameraMediaStreamInfo( const QSize& _resolution, CodecID 
     transcodingRequired( false ),
     codec( _codec )
 {
+}
+
+bool CameraMediaStreamInfo::operator==( const CameraMediaStreamInfo& rhs ) const
+{
+    return resolution == rhs.resolution
+        && transports == rhs.transports
+        && transcodingRequired == rhs.transcodingRequired
+        && codec == rhs.codec;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( (CameraMediaStreamInfo)(CameraMediaStreams), (json), _Fields )
