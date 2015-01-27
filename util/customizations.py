@@ -96,18 +96,22 @@ class Customization():
         self.dark = []
         self.light = []
         self.total = []
+
+        with open(os.path.join(self.path, 'build.properties'), "r") as buildFile:
+            for line in buildFile.readlines():
+                if not 'parent.customization' in line:
+                    continue
+                self.parent = line.split('=')[1].strip()
+                break
         
     def __str__(self):
         return self.name
 
     def isRoot(self):
-        with open(os.path.join(self.path, 'build.properties'), "r") as buildFile:
-            for line in buildFile.readlines():
-                if not 'parent.customization' in line:
-                    continue
-                return (self.name in line)
-        err('Invalid build.properties file: ' + os.path.join(self.path, 'build.properties'))
-        return False
+        if not self.parent:
+            err('Invalid build.properties file: ' + os.path.join(self.path, 'build.properties'))
+            return False
+        return self.parent == self.name
         
     def relativePath(self, path, entry):
         return os.path.relpath(os.path.join(path, entry), self.rootPath)
@@ -267,6 +271,88 @@ def parseSources(dir):
         result.extend(parseFile(path))
     return result
         
+def textCell(file, text, style = None):
+    if style:
+        file.write('\t<td class="%s">' % (style))
+    else:
+        file.write("\t<td>")
+    file.write(text)
+    file.write("</td>\n")
+
+def imgCell(file, text, style):
+    file.write('\t<td class="%s"><img src="%s"/></td>\n' % (style, text))
+
+def printCustomizations(customizationDir, requiredFiles, customizations, roots, children):
+    filename = os.path.join(customizationDir, "comparison.html")
+    file = open(filename, 'w')
+
+    file.write("""
+    <style>
+    img {max-width: 64px; }
+    td { text-align: center; }
+    td.label { text-align: left; }
+    td.dark { background-color: #000000; }
+    td.light { background-color: #FFFFFF; }
+    </style>
+    """)
+
+    file.write("<table>\n")
+    file.write("<tr>\n")
+    file.write("<th>File</th>\n")
+    for c in roots:
+        file.write("<th colspan=2>%s</th>\n" % c.name)
+    for c in children:
+        file.write("<th colspan=2>%s</th>\n" % c.name)
+    file.write("</tr>\n")
+
+    for entry in requiredFiles:
+        file.write("<tr>\n")
+        textCell(file, entry, "label")
+        for c in roots:
+            if entry in c.dark:
+                imgCell(file, os.path.join(c.darkPath, entry), "dark")
+            elif entry in c.base:
+                imgCell(file, os.path.join(c.basePath, entry), "dark")
+            else:
+                textCell(file, "-")
+
+            if entry in c.light:
+                imgCell(file, os.path.join(c.lightPath, entry), "light")
+            elif entry in c.base:
+                imgCell(file, os.path.join(c.basePath, entry), "light")
+            else:
+                textCell(file, "-")
+
+        for c in children:
+            p = customizations[c.parent]
+            if entry in c.dark:
+                imgCell(file, os.path.join(c.darkPath, entry), "dark")
+            elif entry in c.base:
+                imgCell(file, os.path.join(c.basePath, entry), "dark")
+            elif entry in p.dark:
+                imgCell(file, os.path.join(p.darkPath, entry), "dark")
+            elif entry in p.base:
+                imgCell(file, os.path.join(p.basePath, entry), "dark")
+            else:
+                textCell(file, "-")
+
+            if entry in c.light:
+                imgCell(file, os.path.join(c.lightPath, entry), "light")
+            elif entry in c.base:
+                imgCell(file, os.path.join(c.basePath, entry), "light")
+            elif entry in p.light:
+                imgCell(file, os.path.join(p.lightPath, entry), "light")
+            elif entry in p.base:
+                imgCell(file, os.path.join(p.basePath, entry), "light")
+            else:
+                textCell(file, "-")
+
+        file.write("</tr>\n")
+
+    file.write("</table>")
+    file.truncate()
+    file.close()
+
 def checkProject(rootDir, project):
     global separator
     info(separator)
@@ -274,6 +360,7 @@ def checkProject(rootDir, project):
     info(separator)
     customizations = {}
     roots = []
+    children = []
     invalidInner = 0
 
     sourcesDir = os.path.join(os.path.join(rootDir, project), 'src')
@@ -284,26 +371,31 @@ def checkProject(rootDir, project):
 
     for entry in os.listdir(customizationDir):
         if (entry[:1] == '_'):
-            continue;   
+            continue 
         path = os.path.join(customizationDir, entry)
         if (not os.path.isdir(path)):
             continue
         c = Customization(entry, path, project)
         if c.isRoot():
             c.populateFileList()
-            invalidInner += c.validateInner(requiredSorted)
+            #invalidInner += c.validateInner(requiredSorted)
             roots.append(c)
+        else:
+            children.append(c)
         customizations[entry] = c
-    
+        
     invalidCross = 0
-    for c1, c2 in combinations(roots, 2):
-        invalidCross += c1.validateCross(c2)
-        invalidCross += c2.validateCross(c1)
+#    for c1, c2 in combinations(roots, 2):
+#        invalidCross += c1.validateCross(c2)
+#        invalidCross += c2.validateCross(c1)
     info('Validation finished')
     if invalidInner > 0:
         sys.exit(1)
     if invalidCross > 0:
         sys.exit(2)
+
+    if project == Project.CLIENT:
+        printCustomizations(customizationDir, requiredSorted, customizations, roots, children)
 
 def main():
     parser = argparse.ArgumentParser()
@@ -333,3 +425,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    sys.exit(0)
