@@ -587,9 +587,9 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 
     //detecting and saving selected resolutions
     CameraMediaStreams mediaStreams;
-    mediaStreams.streams.push_back( CameraMediaStreamInfo( m_primaryResolution, m_primaryCodec == H264 ? CODEC_ID_H264 : CODEC_ID_MJPEG ) );
+    mediaStreams.streams.push_back( CameraMediaStreamInfo( PRIMARY_ENCODER_INDEX, m_primaryResolution, m_primaryCodec == H264 ? CODEC_ID_H264 : CODEC_ID_MJPEG ) );
     if( m_secondaryResolution.width() > 0 )
-        mediaStreams.streams.push_back( CameraMediaStreamInfo( m_secondaryResolution, m_secondaryCodec == H264 ? CODEC_ID_H264 : CODEC_ID_MJPEG ) );
+        mediaStreams.streams.push_back( CameraMediaStreamInfo( SECONDARY_ENCODER_INDEX, m_secondaryResolution, m_secondaryCodec == H264 ? CODEC_ID_H264 : CODEC_ID_MJPEG ) );
     saveResolutionList( mediaStreams );
     
     QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
@@ -2977,21 +2977,22 @@ void QnPlOnvifResource::onPullMessagesResponseReceived(
 
     const qint64 currentRequestSendClock = m_monotonicClock.elapsed();
 
-    if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )
+    if( m_prevSoapCallResult == SOAP_OK || m_prevSoapCallResult == SOAP_MUSTUNDERSTAND )
+    {
+        const time_t minNotificationTime = response.CurrentTime - roundUp<qint64>(m_monotonicClock.elapsed() - m_prevPullMessageResponseClock, MS_PER_SECOND) / MS_PER_SECOND;
+        if( response.oasisWsnB2__NotificationMessage.size() > 0 )
+        {
+            for( size_t i = 0;
+                i < response.oasisWsnB2__NotificationMessage.size();
+                ++i )
+            {
+                notificationReceived(*response.oasisWsnB2__NotificationMessage[i], minNotificationTime);
+            }
+        }
+    }
+    else
     {
         NX_LOG(lit("Failed to pull messages in NotificationProducer. endpoint %1").arg(QString::fromLatin1(soapWrapper->endpoint())), cl_logDEBUG1);
-        return /*false*/;
-    }
-
-    const time_t minNotificationTime = response.CurrentTime - roundUp<qint64>(m_monotonicClock.elapsed() - m_prevPullMessageResponseClock, MS_PER_SECOND) / MS_PER_SECOND;
-    if( response.oasisWsnB2__NotificationMessage.size() > 0 )
-    {
-        for( size_t i = 0;
-            i < response.oasisWsnB2__NotificationMessage.size();
-            ++i )
-        {
-            notificationReceived(*response.oasisWsnB2__NotificationMessage[i], minNotificationTime);
-        }
     }
 
     m_prevPullMessageResponseClock = currentRequestSendClock;

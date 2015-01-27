@@ -74,7 +74,7 @@ public:
     /*!
         \return \a true if \a mediaStreamInfo differs from existing and has been saved
     */
-    bool saveMediaStreamInfoIfNeeded( int encoderIndex, const CameraMediaStreamInfo& mediaStreamInfo );
+    bool saveMediaStreamInfoIfNeeded( const CameraMediaStreamInfo& mediaStreamInfo );
 
     static float getResolutionAspectRatio(const QSize& resolution); // find resolution helper function
     static QSize getNearestResolution(const QSize& resolution, float aspectRatio, double maxResolutionSquare, const QList<QSize>& resolutionList, double* coeff = 0); // find resolution helper function
@@ -91,6 +91,8 @@ private:
 class CameraMediaStreamInfo
 {
 public:
+    //!0 - primary stream, 1 - secondary stream
+    int encoderIndex;
     //!has format "1920x1080" or "*" to notify that any resolution is supported
     QString resolution;
     //!transport method that can be used to receive this stream
@@ -107,11 +109,15 @@ public:
     int codec;
 
     CameraMediaStreamInfo();
-    CameraMediaStreamInfo( const QSize& _resolution, CodecID _codec );
+    CameraMediaStreamInfo(
+        int _encoderIndex,
+        const QSize& _resolution,
+        CodecID _codec );
 
     bool operator==( const CameraMediaStreamInfo& rhs ) const;
+    bool operator!=( const CameraMediaStreamInfo& rhs ) const;
 };
-#define CameraMediaStreamInfo_Fields (resolution)(transports)(transcodingRequired)(codec)
+#define CameraMediaStreamInfo_Fields (encoderIndex)(resolution)(transports)(transcodingRequired)(codec)
 
 
 class CameraMediaStreams

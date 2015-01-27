@@ -630,12 +630,14 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     std::vector<nxcip::Resolution> selectedEncoderResolutions( m_encoderCount );
     selectedEncoderResolutions[PRIMARY_ENCODER_INDEX] = getMaxResolution( PRIMARY_ENCODER_INDEX );
     mediaStreams.streams.push_back( CameraMediaStreamInfo(
+        PRIMARY_ENCODER_INDEX, 
         QSize(selectedEncoderResolutions[PRIMARY_ENCODER_INDEX].width, selectedEncoderResolutions[PRIMARY_ENCODER_INDEX].height),
         CODEC_ID_H264 ) );
     if( SECONDARY_ENCODER_INDEX < m_encoderCount )
     {
         selectedEncoderResolutions[SECONDARY_ENCODER_INDEX] = getSecondStreamResolution();
         mediaStreams.streams.push_back( CameraMediaStreamInfo(
+            SECONDARY_ENCODER_INDEX, 
             QSize(selectedEncoderResolutions[SECONDARY_ENCODER_INDEX].width, selectedEncoderResolutions[SECONDARY_ENCODER_INDEX].height),
             CODEC_ID_H264 ) );
     }

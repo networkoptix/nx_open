@@ -481,14 +481,13 @@ void QnLiveStreamProvider::saveMediaStreamParamsIfNeeded( const QnCompressedVide
     extractCodedPictureResolution( videoData, &streamResolution );
 
     CameraMediaStreamInfo mediaStreamInfo(
+        getRole() == Qn::CR_LiveVideo
+            ? PRIMARY_ENCODER_INDEX
+            : SECONDARY_ENCODER_INDEX,
         QSize(streamResolution.width(), streamResolution.height()),
         videoData->compressionType );
 
-    const int encoderIndex = getRole() == Qn::CR_LiveVideo
-        ? PRIMARY_ENCODER_INDEX
-        : SECONDARY_ENCODER_INDEX;
-
-    if( m_cameraRes->saveMediaStreamInfoIfNeeded( encoderIndex, mediaStreamInfo ) )
+    if( m_cameraRes->saveMediaStreamInfoIfNeeded( mediaStreamInfo ) )
         m_cameraRes->saveParamsAsync();
 }
 
