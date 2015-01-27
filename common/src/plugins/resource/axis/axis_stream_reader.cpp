@@ -141,8 +141,8 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
     float fps = getFps();
     const QnPlAxisResource::AxisResolution& resolution = res->getResolution(
         role == Qn::CR_LiveVideo
-            ? QnPlAxisResource::PRIMARY_ENCODER_INDEX
-            : QnPlAxisResource::SECONDARY_ENCODER_INDEX );
+            ? PRIMARY_ENCODER_INDEX
+            : SECONDARY_ENCODER_INDEX );
 
     if (resolution.size.isEmpty()) 
         qWarning() << "Can't determine max resolution for axis camera " << res->getName() << "use default resolution";

@@ -107,9 +107,11 @@ private:
     Qn::SecondStreamQuality  m_secondaryQuality;
     simd128i *m_motionMaskBinData[CL_MAX_CHANNELS];
     QElapsedTimer m_resolutionCheckTimer;
+    int m_framesSincePrevMediaStreamCheck;
 
     void updateStreamResolution( int channelNumber, const QSize& newResolution );
     void extractCodedPictureResolution( const QnCompressedVideoDataPtr& videoData, QSize* const newResolution );
+    void saveMediaStreamParamsIfNeeded( const QnCompressedVideoDataPtr& videoData );
 };
 
 typedef QSharedPointer<QnLiveStreamProvider> QnLiveStreamProviderPtr;

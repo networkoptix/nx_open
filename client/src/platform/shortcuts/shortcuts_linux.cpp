@@ -6,7 +6,7 @@ QnLinuxShortcuts::QnLinuxShortcuts(QObject *parent /*= NULL*/):
 
 }
 
-bool QnLinuxShortcuts::createShortcut(const QString &sourceFile, const QString &destinationPath, const QString &name, const QStringList &arguments)
+bool QnLinuxShortcuts::createShortcut(const QString &sourceFile, const QString &destinationPath, const QString &name, const QStringList &arguments, int iconId)
 {
     /*
     QFile link(strDstPath + QDir::separator() + strName + ".desktop");

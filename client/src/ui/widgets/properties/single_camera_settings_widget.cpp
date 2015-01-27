@@ -125,8 +125,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->moreLicensesButton,         &QPushButton::clicked,              this,   &QnSingleCameraSettingsWidget::moreLicensesRequested);
 
     connect(ui->analogViewCheckBox,     SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
-    connect(ui->analogViewCheckBox,     SIGNAL(stateChanged(int)),              this,   SLOT(updateLicenseText()), Qt::QueuedConnection);
-    connect(qnLicensePool,              SIGNAL(licensesChanged()),              this,   SLOT(updateLicenseText()), Qt::QueuedConnection);
+    connect(ui->analogViewCheckBox,     SIGNAL(stateChanged(int)),              this,   SLOT(updateLicenseText()));
     connect(ui->analogViewCheckBox,     SIGNAL(clicked()),                      this,   SLOT(at_analogViewCheckBox_clicked()));
 
     connect(ui->expertSettingsWidget,   SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
@@ -152,6 +151,15 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     ui->forceRotationComboBox->addItem(tr("270 degrees"),   270);
     ui->forceRotationComboBox->setCurrentIndex(0);
     connect(ui->forceRotationComboBox,  QnComboboxCurrentIndexChanged,          this,   &QnSingleCameraSettingsWidget::at_dbDataChanged);
+
+    auto updateLicensesIfNeeded = [this] { 
+        if (!isVisible())
+            return;
+        updateLicenseText();
+    };
+
+    QnCamLicenseUsageWatcher* camerasUsageWatcher = new QnCamLicenseUsageWatcher(this);
+    connect(camerasUsageWatcher, &QnLicenseUsageWatcher::licenseUsageChanged, this,  updateLicensesIfNeeded);
 
     updateFromResource();
     updateLicensesButtonVisible();
