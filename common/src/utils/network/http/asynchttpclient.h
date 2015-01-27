@@ -189,6 +189,7 @@ namespace nx_http
 
         void resetDataBeforeNewRequest();
         bool initiateHttpMessageDelivery( const QUrl& url );
+        bool initiateTcpConnection();
         /*!
             \return Number of bytes, read from socket. -1 in case of read error
         */

@@ -59,9 +59,8 @@ private slots:
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);
     void onTimer();
-    void at_camera_statusChanged(const QnResourcePtr &resource);
+    void at_camera_initializationChanged(const QnResourcePtr &resource);
     void at_camera_resourceChanged(const QnResourcePtr &resource);
-    void at_camera_initAsyncFinished(const QnResourcePtr &resource, bool state);
     void at_checkLicenses();
 private:
     void updateCamera(const QnSecurityCamResourcePtr& camera);
@@ -80,7 +79,6 @@ private:
     void at_licenseMutexTimeout();
 private:
     mutable QMutex m_mutex;
-    QSet<QnResourcePtr> m_onlineCameras;
     QMap<QnResourcePtr, Recorders> m_recordMap;
     QTimer m_scheduleWatchingTimer;
     QTimer m_licenseTimer;

@@ -1,0 +1,19 @@
+﻿{{#aggregated}}
+<div class="content">
+    <div class="callout">
+        <p> {{timestamp}} IP衝突偵測 {{cameraConflictAddress}}:</p>
+        <table class="details">
+            <tr>
+                <th>編號</th>
+                <th>Mac地址</th>
+            </tr>
+            {{#cameraConflicts}}
+                <tr>
+                    <td>{{number}}</td>
+                    <td>{{mac}}</td>
+                </tr>
+            {{/cameraConflicts}}
+        </table>
+    </div>
+</div>
+{{/aggregated}}

@@ -37,8 +37,6 @@
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     base_type(parent),
     ui(new Ui::LicenseManagerWidget),
-    m_camerasUsageWatcher(new QnCamLicenseUsageWatcher()),
-    m_videowallUsageWatcher(new QnVideoWallLicenseUsageWatcher()),
     m_httpClient(NULL)
 {
     ui->setupUi(this);
@@ -64,7 +62,6 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
 
     connect(ui->detailsButton,                  SIGNAL(clicked()),                                                  this,   SLOT(at_licenseDetailsButton_clicked()));
     connect(ui->removeButton,                   SIGNAL(clicked()),                                                  this,   SLOT(at_removeButton_clicked()));
-    connect(qnLicensePool,                      SIGNAL(licensesChanged()),                                          this,   SLOT(updateLicenses()));
     connect(ui->gridLicenses->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),   this,   SLOT(updateDetailsButtonEnabled()));
     connect(ui->gridLicenses,                   SIGNAL(doubleClicked(const QModelIndex &)),                         this,   SLOT(at_gridLicenses_doubleClicked(const QModelIndex &)));
     connect(ui->licenseWidget,                  SIGNAL(stateChanged()),                                             this,   SLOT(at_licenseWidget_stateChanged()));
@@ -76,8 +73,10 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
         updateLicenses();
     };
 
-    connect(m_camerasUsageWatcher,              &QnLicenseUsageWatcher::licenseUsageChanged,                        this,   updateLicensesIfNeeded);
-    connect(m_videowallUsageWatcher,            &QnLicenseUsageWatcher::licenseUsageChanged,                        this,   updateLicensesIfNeeded);
+    QnCamLicenseUsageWatcher* camerasUsageWatcher = new QnCamLicenseUsageWatcher(this);
+    QnVideoWallLicenseUsageWatcher* videowallUsageWatcher = new QnVideoWallLicenseUsageWatcher(this);
+    connect(camerasUsageWatcher,              &QnLicenseUsageWatcher::licenseUsageChanged,                        this,   updateLicensesIfNeeded);
+    connect(videowallUsageWatcher,            &QnLicenseUsageWatcher::licenseUsageChanged,                        this,   updateLicensesIfNeeded);
 
     updateLicenses();
 }
@@ -85,11 +84,6 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
 QnLicenseManagerWidget::~QnLicenseManagerWidget()
 {
 }
-
-void QnLicenseManagerWidget::showEvent(QShowEvent *event) {
-    base_type::showEvent(event);
-}
-
 
 void QnLicenseManagerWidget::updateLicenses() {
     // do not re-read licenses if we are activating one now

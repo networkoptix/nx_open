@@ -93,6 +93,11 @@ public:
             address.toString() +
             (port > 0 ? QString::fromLatin1(":%1").arg(port) : QString());
     }
+
+    bool operator==( const SocketAddress& rhs ) const
+    {
+        return address == rhs.address && port == rhs.port;
+    }
 };
 
 class SocketGlobalRuntimeInternal;
