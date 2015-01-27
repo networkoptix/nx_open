@@ -350,10 +350,10 @@ void QnVirtualCameraResource::noCameraIssues()
 
 CameraMediaStreamInfo::CameraMediaStreamInfo()
 :
+    encoderIndex( -1 ),
     resolution( lit("*") ),
     transcodingRequired( false ),
-    codec( CODEC_ID_NONE ),
-    encoderIndex( -1 )
+    codec( CODEC_ID_NONE )
 {
 }
 
