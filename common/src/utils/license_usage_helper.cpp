@@ -75,9 +75,11 @@ QnLicenseUsageWatcher::QnLicenseUsageWatcher(QObject* parent /*= NULL*/):
             emit licenseUsageChanged();
     };
 
-    connect(qnResPool, &QnResourcePool::resourceAdded,   this,   updateIfNeeded);
-    connect(qnResPool, &QnResourcePool::statusChanged,   this,   updateIfNeeded);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,   updateIfNeeded);
+    connect(qnResPool,      &QnResourcePool::resourceAdded,     this,   updateIfNeeded);
+    connect(qnResPool,      &QnResourcePool::statusChanged,     this,   updateIfNeeded);
+    connect(qnResPool,      &QnResourcePool::resourceRemoved,   this,   updateIfNeeded);
+
+    connect(qnLicensePool,  &QnLicensePool::licensesChanged,    this,   &QnLicenseUsageWatcher::licenseUsageChanged, Qt::QueuedConnection);
 }
 
 
@@ -97,7 +99,6 @@ QnLicenseUsageHelper::QnLicenseUsageHelper(QObject *parent):
     base_type(parent),
     m_dirty(true)
 {
-    connect(qnLicensePool, &QnLicensePool::licensesChanged, this, &QnLicenseUsageHelper::invalidate);
 }
 
 int QnLicenseUsageHelper::borrowLicenses(const LicenseCompatibility &compat, licensesArray &licenses) const {
