@@ -509,12 +509,12 @@ namespace nx_http
         using namespace std::placeholders;
 
         bool canUseExistingConnection = false;
-        if( m_httpStreamReader.message().type == nx_http::MessageType::response )
-        {
-            canUseExistingConnection =
-                (m_httpStreamReader.message().response->statusLine.version == nx_http::http_1_1) &&
-                (nx_http::getHeaderValue( m_httpStreamReader.message().response->headers, "Connection" ) != "close");
-        }
+        //if( m_httpStreamReader.message().type == nx_http::MessageType::response )
+        //{
+        //    canUseExistingConnection =
+        //        (m_httpStreamReader.message().response->statusLine.version == nx_http::http_1_1) &&
+        //        (nx_http::getHeaderValue( m_httpStreamReader.message().response->headers, "Connection" ) != "close");
+        //}
 
         m_httpStreamReader.resetState();
 
