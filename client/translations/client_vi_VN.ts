@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="vi_VN" sourcelanguage="en_US">
+<TS version="2.1" language="vi_VN" sourcelanguage="en_US">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -31,7 +31,7 @@
     <message>
         <location filename="../src/ui/dialogs/about_dialog.ui" line="156"/>
         <source>Support</source>
-        <translation type="unfinished"></translation>
+        <translation>ủng hộ</translation>
     </message>
 </context>
 <context>
@@ -260,7 +260,7 @@
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="446"/>
         <source>Manuf.</source>
-        <translation>nhà chế tạo</translation>
+        <translation>nhà chế tạo.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="451"/>
@@ -286,13 +286,13 @@
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="34"/>
         <source>Selected server:</source>
-        <translation>Chọn Máy chủ：</translation>
+        <translation>Máy chủ đã chọn:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="109"/>
         <source>Ca&amp;mera Address:</source>
         <translatorcomment>&amp;địa chỉ máy ảnh:</translatorcomment>
-        <translation>&amp;địa chỉ máy ảnh：</translation>
+        <translation>Ca&amp;mera Address:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui" line="557"/>
@@ -310,27 +310,27 @@
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui" line="27"/>
         <source>Advanced settings for this camera cannot be loaded</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt nâng cao cho máy ảnh này không thể được nạp</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui" line="41"/>
         <source>This camera has no advanced settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy ảnh này không có cài đặt nâng cao</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui" line="116"/>
         <source>Warning: all changes are applied instantly</source>
-        <translation type="unfinished"></translation>
+        <translation>Cảnh báo: tất cả các thay đổi được áp dụng ngay lập tức</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui" line="131"/>
         <source>Category</source>
-        <translation type="unfinished"></translation>
+        <translation>loài</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui" line="172"/>
         <source>about:blank</source>
-        <translation type="unfinished"></translation>
+        <translation>trắng</translation>
     </message>
 </context>
 <context>
@@ -338,7 +338,7 @@
     <message>
         <location filename="../src/camera/camera_diagnose_tool.cpp" line="160"/>
         <source>No connection to Server %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không có kết nối đến Server %1.</translation>
     </message>
 </context>
 <context>
@@ -368,112 +368,112 @@
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="17"/>
         <source>I have read the manual and understand the risks</source>
-        <translation type="unfinished">Tôi đã đọc hướng dẫn và đã nhận thức được những rủi ro</translation>
+        <translation>Tôi đã đọc hướng dẫn và đã nhận thức được những rủi ro</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="30"/>
         <source>Camera Settings Control</source>
-        <translation type="unfinished">Cài đặt camera kiểm soát</translation>
+        <translation>Cài đặt camera kiểm soát</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="36"/>
         <source>Keep camera streams&apos; and profiles&apos; settings</source>
-        <translation type="unfinished">Camera Retention streaming và cài đặt liên quan</translation>
+        <translation>Camera Retention streaming và cài đặt liên quan</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="49"/>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation type="unfinished">Cảnh báo! Thiết lập FPS và chất lượng trong Schedule Recording sẽ không làm việc!</translation>
+        <translation>Cảnh báo! Thiết lập FPS và chất lượng trong Schedule Recording sẽ không làm việc!</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="69"/>
         <source>Secondary Stream Control</source>
-        <translation type="unfinished">Việc kiểm soát dòng thứ hai</translation>
+        <translation>Việc kiểm soát dòng thứ hai</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="75"/>
         <source>Override secondary stream quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Ghi đè lên dòng chất lượng thứ</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="107"/>
         <source>Don&apos;t use</source>
-        <translation type="unfinished">không sử dụng</translation>
+        <translation>không sử dụng</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="127"/>
         <source>Low quality</source>
-        <translation type="unfinished">chất lượng thấp</translation>
+        <translation>chất lượng thấp</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="150"/>
         <source>Medium quality</source>
-        <translation type="unfinished">chất lượng</translation>
+        <translation>chất lượng</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="173"/>
         <source>High quality</source>
-        <translation type="unfinished">High Definition</translation>
+        <translation>High Definition</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="192"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Nên biết trước! Chất lượng thấp có thể gây ra ảnh độ phân giải thấp。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Nên biết trước! Chất lượng thấp có thể gây ra ảnh độ phân giải thấp。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
-    <message utf8="true">
+    <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="199"/>
         <source>Warning! High quality may result in Server’s CPU overload, network connection errors and other issues.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cảnh báo! Chất lượng cao có thể dẫn đến tình trạng quá tải CPU Server, lỗi kết nối mạng và các vấn đề khác.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="219"/>
         <source>Archive control</source>
-        <translation type="unfinished"></translation>
+        <translation>Kiểm soát lưu trữ</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="225"/>
         <source>Do not archive primary stream</source>
-        <translation type="unfinished"></translation>
+        <translation>Không lưu trữ luồng chính</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="232"/>
         <source>Do not archive secondary stream</source>
-        <translation type="unfinished"></translation>
+        <translation>Không lưu trữ dòng thứ cấp</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="242"/>
         <source>Media streaming control</source>
-        <translation type="unfinished"></translation>
+        <translation>Kiểm soát phương tiện truyền thông</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="248"/>
         <source>RTP transport:</source>
-        <translation type="unfinished"></translation>
+        <translation>RTP giao thông vận tải:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="256"/>
         <source>Auto</source>
-        <translation type="unfinished">tự động</translation>
+        <translation>tự động</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="261"/>
         <source>TCP</source>
-        <translation type="unfinished"></translation>
+        <translation>TCP</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="266"/>
         <source>UDP</source>
-        <translation type="unfinished"></translation>
+        <translation>UDP</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="327"/>
         <source>Warning! Please read documentation before changing these settings!</source>
-        <translation type="unfinished">Nên biết trước! Trước khi thay đổi các thiết lập này, vui lòng đọc những hướng dẫn!</translation>
+        <translation>Nên biết trước! Trước khi thay đổi các thiết lập này, vui lòng đọc những hướng dẫn!</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="347"/>
         <source>Restore Defaults</source>
-        <translation type="unfinished">Khôi phục mặc định</translation>
+        <translation>Khôi phục mặc định</translation>
     </message>
 </context>
 <context>
@@ -509,12 +509,12 @@
     <message>
         <location filename="../src/ui/widgets/settings/camera_management_widget.ui" line="30"/>
         <source>Allow system to optimize camera settings (Recommended)</source>
-        <translation type="unfinished"></translation>
+        <translation>Cho phép hệ thống để tối ưu hóa các cài đặt máy ảnh (đề nghị)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/camera_management_widget.ui" line="43"/>
         <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation type="unfinished">Cảnh báo! Thiết lập FPS và chất lượng trong Schedule Recording sẽ không làm việc!</translation>
+        <translation>Cảnh báo! Thiết lập FPS và chất lượng trong Schedule Recording sẽ không làm việc!</translation>
     </message>
 </context>
 <context>
@@ -610,28 +610,28 @@
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="429"/>
         <source>Fixed Archive Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Cố định Archive Length</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="447"/>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="491"/>
         <source>Auto</source>
-        <translation type="unfinished">tự động</translation>
+        <translation>tự động</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="467"/>
         <source>Warning! High value may prevent other cameras from recording!</source>
-        <translation type="unfinished"></translation>
+        <translation>Cảnh báo! Giá trị cao có thể ngăn chặn các máy ảnh khác từ ghi âm!</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="513"/>
         <source>Min days:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tối thiểu (ngày):</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="520"/>
         <source>Max days:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tối đa (ngày):</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui" line="534"/>
@@ -705,17 +705,17 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/dialogs/connection_name_dialog.ui" line="14"/>
         <source>Save connection as...</source>
-        <translation type="unfinished">Kết nối thông tin được lưu trữ…</translation>
+        <translation>Kết nối thông tin được lưu trữ…</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_name_dialog.ui" line="26"/>
         <source>Enter name:</source>
-        <translation type="unfinished">nhập tên:</translation>
+        <translation>nhập tên:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_name_dialog.ui" line="36"/>
         <source>Save password</source>
-        <translation type="unfinished"></translation>
+        <translation>Lưu mật khẩu</translation>
     </message>
 </context>
 <context>
@@ -779,7 +779,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.ui" line="268"/>
         <source>All Servers are offline. Logs are not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tất cả máy chủ đang offline. Logs là không có sẵn.</translation>
     </message>
 </context>
 <context>
@@ -840,7 +840,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="149"/>
         <source>Auto pause video:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hình ảnh tự động treo:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="140"/>
@@ -856,7 +856,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="124"/>
         <source>Downmix audio from 5.1 to 2.1:</source>
-        <translation>Những âm thanh từ 5.1 giảm 2.1：</translation>
+        <translation>Những âm thanh từ 5.1 giảm 2.1:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="180"/>
@@ -871,12 +871,12 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="239"/>
         <source>Double buffering:</source>
-        <translation type="unfinished"></translation>
+        <translation>Đôi đệm:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="277"/>
         <source>Disable only if the client takes too much CPU.</source>
-        <translation type="unfinished"></translation>
+        <translation>Chỉ vô hiệu hóa nếu khách hàng mất quá nhiều CPU.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="302"/>
@@ -891,7 +891,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="225"/>
         <source>Run application when PC boots up:</source>
-        <translation>Với các máy tính bắt đầu thực hiện các phần mềm：</translation>
+        <translation>Với các máy tính bắt đầu thực hiện các phần mềm:</translation>
     </message>
 </context>
 <context>
@@ -899,72 +899,72 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="17"/>
         <source>Administration</source>
-        <translation type="unfinished"></translation>
+        <translation>Quản trị</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="29"/>
         <source>&amp;Alarm/Event Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Alarm/Event Rules</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="32"/>
         <source>Ctrl+E</source>
-        <translation type="unfinished">Ctrl+E</translation>
+        <translation>Ctrl+E</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="45"/>
         <source>&amp;Event Log</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Event Log</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="48"/>
         <source>Ctrl+L</source>
-        <translation type="unfinished">Ctrl+L</translation>
+        <translation>Ctrl+L</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="55"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Alarm/Event Rules Management (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+E&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Open Alarm/Event Rules Management</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="62"/>
         <source>&amp;Camera List</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Camera List</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="65"/>
         <source>Ctrl+M</source>
-        <translation type="unfinished">Ctrl+M</translation>
+        <translation>Ctrl+M</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="72"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Event Log (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+L&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Open Event Log</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="79"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Camera List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+M&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Open Camera List</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="86"/>
         <source>&amp;Health Monitoring</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Health Monitoring</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="93"/>
         <source>Open all servers statistics on one layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Open all servers statistics on one layout</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="103"/>
         <source>Camera Management</source>
-        <translation type="unfinished">Quản lý ảnh</translation>
+        <translation>Quản lý ảnh</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui" line="115"/>
         <source>System Configuration Backup and Restore</source>
-        <translation type="unfinished">Cấu hình sao lưu và phục hồi</translation>
+        <translation>Cấu hình sao lưu và phục hồi</translation>
     </message>
 </context>
 <context>
@@ -1053,7 +1053,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="14"/>
         <source>Layout Settings</source>
-        <translation type="unfinished">Giao diện thiết lập</translation>
+        <translation>Giao diện thiết lập</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="20"/>
@@ -1088,7 +1088,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="123"/>
         <source>Processing image... Please wait.</source>
-        <translation>Xử lý hình ảnh ... Xin vui lòng chờ ...</translation>
+        <translation>Xử lý hình ảnh ... Xin vui lòng chờ .</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="163"/>
@@ -1098,7 +1098,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="175"/>
         <source>&amp;Width:</source>
-        <translation>&amp;chiều rộng：</translation>
+        <translation>&amp;chiều rộng:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="188"/>
@@ -1109,12 +1109,12 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="204"/>
         <source>&amp;Height:</source>
-        <translation>&amp;chiều cao：</translation>
+        <translation>&amp;chiều cao:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="233"/>
         <source>&amp;Opacity:</source>
-        <translation>&amp;tính mờ：</translation>
+        <translation>&amp;tính mờ:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui" line="246"/>
@@ -1132,32 +1132,32 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.ui" line="23"/>
         <source>License Details</source>
-        <translation type="unfinished">Chi tiết thông tin cấp phép</translation>
+        <translation>Chi tiết thông tin cấp phép</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.ui" line="35"/>
         <source>Generic</source>
-        <translation type="unfinished"></translation>
+        <translation>chung</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.ui" line="43"/>
         <source>License Type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Loại giấy phép:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.ui" line="57"/>
         <source>License Key:</source>
-        <translation type="unfinished">License Key:</translation>
+        <translation>License Key:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.ui" line="71"/>
         <source>Locked to Hardware ID:</source>
-        <translation type="unfinished"></translation>
+        <translation>Khóa để ID phần cứng:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.ui" line="86"/>
         <source>Features</source>
-        <translation type="unfinished"></translation>
+        <translation>Features</translation>
     </message>
 </context>
 <context>
@@ -1170,7 +1170,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.ui" line="44"/>
         <source>Remove</source>
-        <translation type="unfinished">tẩy</translation>
+        <translation>tẩy</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.ui" line="51"/>
@@ -1226,28 +1226,28 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="78"/>
         <source>Paste from Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Dán từ Clipboard</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="87"/>
         <source>License key is invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>Key bản quyền là không hợp lệ</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="156"/>
         <source>Copy to Clipboard</source>
-        <translation type="unfinished">Sao chép vào Clipboard</translation>
+        <translation>Sao chép vào Clipboard</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="174"/>
         <source>Select license file...</source>
-        <translation type="unfinished"></translation>
+        <translation>Chọn tập tin giấy phép ...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="220"/>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="233"/>
         <source>License will be bound to the current server</source>
-        <translation type="unfinished"></translation>
+        <translation>Giấy phép sẽ bị ràng buộc vào các máy chủ hiện hành</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="223"/>
@@ -1266,7 +1266,7 @@ Short for &quot;seconds&quot;</extracomment>
         <location filename="../src/ui/dialogs/login_dialog.ui" line="68"/>
         <source>Connect to Server</source>
         <comment>Groupbox Title</comment>
-        <translation type="unfinished"></translation>
+        <translation>Kết nối đến Server</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.ui" line="92"/>
@@ -1319,111 +1319,112 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="20"/>
         <source>Look and Feel</source>
-        <translation type="unfinished">điều chỉnh thị giác</translation>
+        <translation>điều chỉnh thị giác</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="46"/>
         <source>Timeline mode:</source>
-        <translation type="unfinished">Chế độ cột thời gian:</translation>
+        <translation>Chế độ cột thời gian:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="53"/>
         <source>Language:</source>
-        <translation type="unfinished">ngôn ngữ:</translation>
+        <translation>ngôn ngữ:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="63"/>
         <source>Show IP in tree:</source>
-        <translation type="unfinished">Hiện IP trong danh sách:</translation>
+        <translation>Hiện IP trong danh sách:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="73"/>
         <source>Skin:</source>
-        <translation type="unfinished">Bối cảnh:</translation>
+        <translation>Bối cảnh:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="80"/>
         <source>Tour sequence cycle time:</source>
-        <translation type="unfinished">Thời gian chu kỳ bánh xe hop：</translation>
+        <translation>Thời gian chu kỳ bánh xe hop:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="108"/>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="153"/>
         <source>Restart required.</source>
-        <translation type="unfinished">Cần phải khởi động lại.</translation>
+        <translation>Cần phải khởi động lại.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="126"/>
         <source> seconds</source>
-        <translation type="unfinished">thứ hai</translation>
+        <translation>thứ hai</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="169"/>
         <source>This option will not affect Recording Schedule.
 Recording Schedule is always based on Server Time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tùy chọn này sẽ không ảnh hưởng đến Schedule Recording.
+Lịch trình ghi âm luôn luôn dựa trên Server Time.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="180"/>
         <source>Background Animation</source>
-        <translation type="unfinished"></translation>
+        <translation>Bối cảnh Animation</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="186"/>
         <source>Enable Background Animation</source>
-        <translation type="unfinished"></translation>
+        <translation>cho phép Bối cảnh Animation</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="211"/>
         <source>Color:</source>
-        <translation type="unfinished"></translation>
+        <translation>màu sắc:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="223"/>
         <source>Select color...</source>
-        <translation type="unfinished"></translation>
+        <translation>Chọn màu ...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="245"/>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="377"/>
         <source>Intensity:</source>
-        <translation type="unfinished"></translation>
+        <translation>cường độ:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="254"/>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="386"/>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="291"/>
         <source>Background Image</source>
-        <translation type="unfinished"></translation>
+        <translation>hình nền</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="297"/>
         <source>Enable Background Image</source>
-        <translation type="unfinished"></translation>
+        <translation>cho phép hình nền</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="322"/>
         <source>Image:</source>
-        <translation type="unfinished"></translation>
+        <translation>hình ảnh:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="334"/>
         <source>&lt;No image&gt;</source>
-        <translation type="unfinished">&lt;không có ảnh&gt;</translation>
+        <translation>&lt;không có ảnh&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="341"/>
         <source>Browse...</source>
-        <translation type="unfinished">Duyệt…</translation>
+        <translation>Duyệt…</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui" line="370"/>
         <source>Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>chế độ:</translation>
     </message>
 </context>
 <context>
@@ -1436,7 +1437,7 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="60"/>
         <source>Image Control</source>
-        <translation type="unfinished"></translation>
+        <translation>điều khiển hình ảnh</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="134"/>
@@ -1466,17 +1467,17 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="117"/>
         <source>Force aspect ratio to:</source>
-        <translation type="unfinished">Tỷ lệ màn hình Buộc：</translation>
+        <translation>Tỷ lệ màn hình Buộc:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="124"/>
         <source>Default rotation:</source>
-        <translation type="unfinished"></translation>
+        <translation>Mặc định quay:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="142"/>
         <source>Use an analog license to view this camera</source>
-        <translation type="unfinished">Các máy ảnh cần sử dụng phép suy ủy quyền</translation>
+        <translation>Các máy ảnh cần sử dụng phép suy ủy quyền</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="180"/>
@@ -1486,7 +1487,7 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="190"/>
         <source>This is a fish-eye lens camera</source>
-        <translation type="unfinished">Đây là một mắt cá (180 độ) camera</translation>
+        <translation>Đây là một mắt cá (180 độ) camera</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui" line="214"/>
@@ -1509,7 +1510,7 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui" line="36"/>
         <source>Volume:</source>
-        <translation>thể tích：</translation>
+        <translation>thể tích:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui" line="53"/>
@@ -1553,7 +1554,7 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="14"/>
         <source>Local Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>địa phương thiết lập</translation>
     </message>
 </context>
 <context>
@@ -1614,32 +1615,32 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/graphics/instruments/ptz_instrument_p.h" line="210"/>
         <source>Zoom In</source>
-        <translation type="unfinished"></translation>
+        <translation>phóng to</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/instruments/ptz_instrument_p.h" line="214"/>
         <source>Zoom Out</source>
-        <translation type="unfinished"></translation>
+        <translation>Thu nhỏ</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/instruments/ptz_instrument_p.h" line="218"/>
         <source>Focus Far</source>
-        <translation type="unfinished"></translation>
+        <translation>tập trung xa</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/instruments/ptz_instrument_p.h" line="224"/>
         <source>Focus Near</source>
-        <translation type="unfinished"></translation>
+        <translation>tập trung gần</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/instruments/ptz_instrument_p.h" line="230"/>
         <source>Auto Focus</source>
-        <translation type="unfinished"></translation>
+        <translation>tự động lấy nét</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/instruments/ptz_instrument_p.h" line="234"/>
         <source>Change Dewarping Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>thay đổi chế độ dewarping</translation>
     </message>
 </context>
 <context>
@@ -1705,7 +1706,7 @@ Recording Schedule is always based on Server Time.</source>
     <message>
         <location filename="../src/ui/customization/customizer.cpp" line="215"/>
         <source>Parameter 1 is null.</source>
-        <translation type="unfinished"></translation>
+        <translation>Thông số 1 là null.</translation>
     </message>
 </context>
 <context>
@@ -1713,57 +1714,57 @@ Recording Schedule is always based on Server Time.</source>
     <message numerus="yes">
         <location filename="../src/utils/common/qtimespan.cpp" line="281"/>
         <source>%n millisecond(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n phần nghìn giây (s)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/common/qtimespan.cpp" line="283"/>
         <source>%n second(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n thứ hai (s)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/common/qtimespan.cpp" line="285"/>
         <source>%n minute(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n phút (s)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/common/qtimespan.cpp" line="287"/>
         <source>%n hour(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n giờ (s)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/common/qtimespan.cpp" line="289"/>
         <source>%n day(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n ngày (s)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/common/qtimespan.cpp" line="291"/>
         <source>%n week(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n tuần (s)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/common/qtimespan.cpp" line="293"/>
         <source>%n month(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n tháng (s)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/common/qtimespan.cpp" line="295"/>
         <source>%n year(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n năm (s)</numerusform>
         </translation>
     </message>
 </context>
@@ -1784,12 +1785,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="102"/>
         <source>Server at %2: v%1&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Server at %2: v%1&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="139"/>
         <source>&lt;b&gt;Client&lt;/b&gt; is not connected to &lt;b&gt;Server&lt;/b&gt;.&lt;br&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Client&lt;/b&gt; is not connected to &lt;b&gt;Server&lt;/b&gt;.&lt;br&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="142"/>
@@ -1802,7 +1803,14 @@ Built for %5-%6 with %7.&lt;br/&gt;
 &lt;b&gt;SIGAR %7&lt;/b&gt; - Copyright (c) 2004-2011 VMware Inc.&lt;br/&gt;
 &lt;b&gt;Boost %8&lt;/b&gt; - Copyright (c) 2000-2012 Boost developers.&lt;br/&gt;
 </source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;%1 %2&lt;/b&gt; uses the following external libraries:&lt;br/&gt;
+&lt;br /&gt;
+&lt;b&gt;Qt v.%3&lt;/b&gt; - Copyright (c) 2012 Nokia Corporation.&lt;br/&gt;
+&lt;b&gt;FFMpeg %4&lt;/b&gt; - Copyright (c) 2000-2012 FFmpeg developers.&lt;br/&gt;
+&lt;b&gt;LAME 3.99.0&lt;/b&gt; - Copyright (c) 1998-2012 LAME developers.&lt;br/&gt;
+&lt;b&gt;OpenAL %5&lt;/b&gt; - Copyright (c) 2000-2006 %6.&lt;br/&gt;
+&lt;b&gt;SIGAR %7&lt;/b&gt; - Copyright (c) 2004-2011 VMware Inc.&lt;br/&gt;
+&lt;b&gt;Boost %8&lt;/b&gt; - Copyright (c) 2000-2012 Boost developers.&lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="162"/>
@@ -1824,7 +1832,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/dialogs/about_dialog.cpp" line="191"/>
         <source>&lt;b&gt;Support&lt;/b&gt;: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>b&gt;ủng hộ&lt;/b&gt;: %1</translation>
     </message>
 </context>
 <context>
@@ -1966,12 +1974,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="497"/>
         <source>Control Video Wall</source>
-        <translation type="unfinished"></translation>
+        <translation>Kiểm soát bức tường video</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="503"/>
         <source>Push my screen</source>
-        <translation type="unfinished"></translation>
+        <translation>Đẩy màn hình của tôi</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="508"/>
@@ -1981,7 +1989,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="512"/>
         <source>Select time server</source>
-        <translation type="unfinished"></translation>
+        <translation>Chọn máy chủ thời gian</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="535"/>
@@ -2001,12 +2009,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="550"/>
         <source>Connect to Server...</source>
-        <translation type="unfinished">Kết nối đến máy chủ...</translation>
+        <translation>Kết nối đến máy chủ...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="551"/>
         <source>Ctrl+Shift+C</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+Shift+C</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="557"/>
@@ -2086,12 +2094,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="618"/>
         <source>Video Wall...</source>
-        <translation type="unfinished"></translation>
+        <translation>tường video ...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="619"/>
         <source>New Video Wall...</source>
-        <translation type="unfinished"></translation>
+        <translation>Tường video mới ...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="626"/>
@@ -2143,7 +2151,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="671"/>
         <source>Ctrl+Shift+S</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+Shift+S</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="672"/>
@@ -2154,7 +2162,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <location filename="../src/ui/actions/action_manager.cpp" line="678"/>
         <location filename="../src/ui/actions/action_manager.cpp" line="961"/>
         <source>Save Video Wall View</source>
-        <translation type="unfinished"></translation>
+        <translation>lưu video xem tường</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="694"/>
@@ -2290,7 +2298,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1376"/>
         <source>Connect to the Current System...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kết nối với các hệ thống hiện tại ...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1463"/>
@@ -2315,63 +2323,63 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="393"/>
         <source>Show Debug</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiện gỡ lỗi</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="394"/>
         <source>Hide Debug</source>
-        <translation type="unfinished"></translation>
+        <translation>hide gỡ lỗi</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="395"/>
         <source>Ctrl+Alt+D</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+Alt+D</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="408"/>
         <source>Delayed Open Video Wall</source>
-        <translation type="unfinished"></translation>
+        <translation>Trì hoãn bức tường video mở</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="458"/>
         <source>Filter...</source>
-        <translation type="unfinished">Lọc...</translation>
+        <translation>Lọc...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="487"/>
         <location filename="../src/ui/actions/action_manager.cpp" line="800"/>
         <source>Event Log...</source>
-        <translation type="unfinished"></translation>
+        <translation>ghi sự kiện ...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="761"/>
         <source>System Administration...</source>
-        <translation type="unfinished"></translation>
+        <translation>quản trị hệ thống ...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="762"/>
         <source>Ctrl+Alt+A</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+Alt+A</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="775"/>
         <source>System Update...</source>
-        <translation type="unfinished"></translation>
+        <translation>Cập nhật hệ thống ...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="780"/>
         <source>Local Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>thiết lập địa phương ...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="814"/>
         <source>Merge Systems...</source>
-        <translation type="unfinished"></translation>
+        <translation>hợp nhất các hệ thống ...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="857"/>
         <source>Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>máy chủ ...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="874"/>
@@ -2431,7 +2439,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="927"/>
         <source>Open Video Wall(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>tường mở video (s)</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="932"/>
@@ -2451,42 +2459,42 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="941"/>
         <source>Identify</source>
-        <translation type="unfinished"></translation>
+        <translation>Xác định</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="948"/>
         <source>Attach to Video Wall...</source>
-        <translation type="unfinished"></translation>
+        <translation>gắn vào tường video ...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="955"/>
         <source>Switch to Video Wall mode...</source>
-        <translation type="unfinished"></translation>
+        <translation>chuyển sang chế độ tường video ...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="970"/>
         <source>Save Current Matrix</source>
-        <translation type="unfinished"></translation>
+        <translation>Lưu ma trận hiện tại</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="977"/>
         <source>Load Matrix</source>
-        <translation type="unfinished"></translation>
+        <translation>tải ma trận</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="989"/>
         <source>Update Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Cập nhật bố trí</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1000"/>
         <source>Stop Video Wall</source>
-        <translation type="unfinished"></translation>
+        <translation>Bức tường video stop</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1007"/>
         <source>Detach Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Tháo bố trí</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1014"/>
@@ -2587,7 +2595,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="528"/>
         <source>Activate PTZ object</source>
-        <translation type="unfinished"></translation>
+        <translation>Kích hoạt PTZ đối tượng</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="753"/>
@@ -2776,7 +2784,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1317"/>
         <source>Video Wall Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>thiết lập bức tường video ...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1325"/>
@@ -2891,17 +2899,17 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1499"/>
         <source>Bookmark Selection...</source>
-        <translation type="unfinished"></translation>
+        <translation>dấu trang lựa chọn ...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1504"/>
         <source>Edit Bookmark...</source>
-        <translation type="unfinished"></translation>
+        <translation>Chỉnh sửa dấu trang ...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1509"/>
         <source>Remove Bookmark...</source>
-        <translation type="unfinished"></translation>
+        <translation>loại bỏ các dấu trang ...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1518"/>
@@ -3171,27 +3179,27 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1681"/>
         <source>Ctrl+Alt+T</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+Alt+T</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1682"/>
         <source>Disable Background Animation</source>
-        <translation type="unfinished"></translation>
+        <translation>Vô hiệu hóa hình ảnh động nền</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1683"/>
         <source>Enable Background Animation</source>
-        <translation type="unfinished"></translation>
+        <translation>Kích hoạt tính năng hoạt hình nền</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1690"/>
         <source>Show Search Panel</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiển thị bảng tìm kiếm</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1691"/>
         <source>Hide Search Panel</source>
-        <translation type="unfinished"></translation>
+        <translation>Ẩn bảng điều khiển tìm kiếm</translation>
     </message>
 </context>
 <context>
@@ -3235,12 +3243,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/dialogs/attach_to_videowall_dialog.ui" line="14"/>
         <source>Attach to Video Wall...</source>
-        <translation type="unfinished"></translation>
+        <translation>Đính kèm với bức tường video ...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/attach_to_videowall_dialog.ui" line="20"/>
         <source>Preview</source>
-        <translation type="unfinished">Xem trước</translation>
+        <translation>Xem trước</translation>
     </message>
 </context>
 <context>
@@ -3293,32 +3301,32 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/dialogs/build_number_dialog.ui" line="14"/>
         <source>Install specific build</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt xây dựng cụ thể</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/build_number_dialog.ui" line="22"/>
         <source>Build number:</source>
-        <translation type="unfinished"></translation>
+        <translation>Xây dựng số:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/build_number_dialog.ui" line="29"/>
         <source>99990</source>
-        <translation type="unfinished">99990</translation>
+        <translation>99990</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/build_number_dialog.ui" line="39"/>
         <source>Password:</source>
-        <translation type="unfinished">mật khẩu:</translation>
+        <translation>mật khẩu:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/build_number_dialog.cpp" line="47"/>
         <source>Error</source>
-        <translation type="unfinished">lỗi</translation>
+        <translation>lỗi</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/build_number_dialog.cpp" line="47"/>
         <source>The password you have entered is invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>Mật khẩu bạn đã nhập không hợp lệ</translation>
     </message>
 </context>
 <context>
@@ -3699,7 +3707,7 @@ Camera addition is possible for online servers only.</source>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="564"/>
         <source>Camera address field must contain valid URL, IP address or RTSP link.</source>
-        <translation>Trường địa chỉ máy ảnh phải chứa một URL hợp lệ, địa chỉ IP, hoặc liên kết RTSP</translation>
+        <translation>Trường địa chỉ máy ảnh phải chứa một URL hợp lệ, địa chỉ IP, hoặc liên kết RTSP.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="587"/>
@@ -3739,7 +3747,7 @@ It might take a few moments to populate them in the tree.</source>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="810"/>
         <source>Select target server...</source>
-        <translation type="unfinished"></translation>
+        <translation>Chọn mục tiêu máy chủ ...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.cpp" line="684"/>
@@ -3792,33 +3800,34 @@ It might take a few moments to populate them in the tree.</source>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.cpp" line="51"/>
         <source>Please wait while settings are being loaded.
 This can take a lot of time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Xin vui lòng chờ trong khi cài đặt đang được nạp.
+Điều này có thể mất rất nhiều thời gian.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.cpp" line="259"/>
         <source>Applying settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Áp dụng các thiết lập ...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.cpp" line="341"/>
         <source>Possibly, appropriate camera&apos;s service is unavailable now</source>
-        <translation type="unfinished"></translation>
+        <translation>Có thể, dịch vụ phù hợp của máy ảnh là không có sẵn tại</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.cpp" line="342"/>
         <source>Server returned the following error code : </source>
-        <translation type="unfinished"></translation>
+        <translation>Máy chủ trả về mã lỗi sau đây:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.cpp" line="357"/>
         <source>Could not save parameters</source>
-        <translation type="unfinished">Không thể lưu thông số</translation>
+        <translation>Không thể lưu thông số</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.cpp" line="358"/>
         <source>Failed to save the following parameters (%1):
 %2</source>
-        <translation type="unfinished">lưu trữ thông số (%1)：%2 thất bại</translation>
+        <translation>lưu trữ thông số (%1)：%2 thất bại</translation>
     </message>
 </context>
 <context>
@@ -3826,57 +3835,57 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui" line="14"/>
         <source>Bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>Bookmark</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui" line="25"/>
         <source>&amp;Name</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;tên</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui" line="38"/>
         <source>&amp;Description</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;miêu tả</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui" line="51"/>
         <source>&amp;Timeout</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Timeout</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui" line="64"/>
         <source>T&amp;ags</source>
-        <translation type="unfinished"></translation>
+        <translation>T&amp;ags</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui" line="89"/>
         <source>List of tags divided by commas or spaces</source>
-        <translation type="unfinished"></translation>
+        <translation>Danh sách các thẻ chia bằng dấu phẩy hoặc dấu cách</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.cpp" line="70"/>
         <source>Do not lock archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Không khóa lưu trữ</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.cpp" line="71"/>
         <source>1 month</source>
-        <translation type="unfinished"></translation>
+        <translation>1 tháng</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.cpp" line="72"/>
         <source>3 month</source>
-        <translation type="unfinished"></translation>
+        <translation>3 tháng</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.cpp" line="73"/>
         <source>6 month</source>
-        <translation type="unfinished"></translation>
+        <translation>6 tháng</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.cpp" line="74"/>
         <source>year</source>
-        <translation type="unfinished"></translation>
+        <translation>năm</translation>
     </message>
 </context>
 <context>
@@ -3894,7 +3903,7 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="114"/>
         <source>Checking Server availability</source>
-        <translation type="unfinished"></translation>
+        <translation>Kiểm tra tính sẵn sàng chủ</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_diagnostics_dialog.cpp" line="116"/>
@@ -4017,7 +4026,7 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/ui/models/camera_list_model.cpp" line="130"/>
         <source>MAC address</source>
-        <translation type="unfinished"></translation>
+        <translation>MAC address</translation>
     </message>
     <message>
         <location filename="../src/ui/models/camera_list_model.cpp" line="131"/>
@@ -4109,7 +4118,7 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="605"/>
         <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
-        <translation>Hiện nay trong bảng lịch trình cho %1 FPS. FPS sẽ được giảm đến giá trị tối đa của máy ảnh %2</translation>
+        <translation>Hiện nay trong bảng lịch trình cho %1 FPS. FPS sẽ được giảm đến giá trị tối đa của máy ảnh %2.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="611"/>
@@ -4170,51 +4179,51 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="160"/>
         <source>Camera(s) not Saved</source>
-        <translation type="unfinished">Máy ảnh không được lưu trữ</translation>
+        <translation>Máy ảnh không được lưu trữ</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="161"/>
         <source>Save changes to the following %n camera(s)?</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Lưu các thay đổi sau %n camera?</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="175"/>
         <source>Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.</source>
-        <translation type="unfinished"></translation>
+        <translation>Những thay đổi tích đã không được lưu. Pick mong muốn Loại Recording, FPS, và chất lượng và đánh dấu những thay đổi về lịch trình.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="176"/>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="185"/>
         <source>Changes are not applied</source>
-        <translation type="unfinished">Không áp dụng các thay đổi</translation>
+        <translation>Không áp dụng các thay đổi</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="184"/>
         <source>Actual motion sensitivity was not changed. To change motion sensitivity draw rectangles on the image.</source>
-        <translation type="unfinished">Độ nhạy phát hiện chuyển động đã không được thay đổi. Hãy Marquee Tool và thay đổi độ nhạy chuyển trên màn hình.</translation>
+        <translation>Độ nhạy phát hiện chuyển động đã không được thay đổi. Hãy Marquee Tool và thay đổi độ nhạy chuyển trên màn hình.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="220"/>
         <source>Licenses limit exceeded. The changes will be saved, but will not take effect.</source>
-        <translation type="unfinished">Vượt quá giới hạn cho phép. Để lưu thay đổi của bạn, nhưng sẽ không có hiệu lực.</translation>
+        <translation>Vượt quá giới hạn cho phép. Để lưu thay đổi của bạn, nhưng sẽ không có hiệu lực.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="221"/>
         <source>Could not apply changes</source>
-        <translation type="unfinished">Không thể áp dụng các thay đổi</translation>
+        <translation>Không thể áp dụng các thay đổi</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="236"/>
         <source>Error</source>
-        <translation type="unfinished">lỗi</translation>
+        <translation>lỗi</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/dialogs/camera_settings_dialog.cpp" line="237"/>
         <source>Could not save the following %n cameras to Server.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Không thể lưu %n máy ảnh sau đây để Server.</numerusform>
         </translation>
     </message>
 </context>
@@ -4252,12 +4261,12 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/ui/graphics/items/controls/clock_label.cpp" line="92"/>
         <source>Server time</source>
-        <translation type="unfinished"></translation>
+        <translation>thời gian máy chủ</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/controls/clock_label.cpp" line="94"/>
         <source>Local system time</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiện hệ thống địa phương</translation>
     </message>
 </context>
 <context>
@@ -4265,12 +4274,12 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/update/connect_to_current_system_tool.cpp" line="71"/>
         <source>Configuring server(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Cấu hình máy chủ (s)</translation>
     </message>
     <message>
         <location filename="../src/update/connect_to_current_system_tool.cpp" line="125"/>
         <source>Updating server(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Đang cập nhật máy chủ (s)</translation>
     </message>
 </context>
 <context>
@@ -4278,7 +4287,7 @@ This can take a lot of time.</source>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="68"/>
         <source>Login or password you have entered are incorrect, please try again.</source>
-        <translation type="unfinished">Đăng nhập Tên đăng nhập hoặc mật khẩu không đúng, vui lòng thử lại.</translation>
+        <translation>Đăng nhập Tên đăng nhập hoặc mật khẩu không đúng, vui lòng thử lại.</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="70"/>
@@ -4286,12 +4295,15 @@ This can take a lot of time.</source>
 Connection details that you have entered are incorrect, please try again.
 
 If this error persists, please contact your VMS administrator.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kết nối với máy chủ không thể được thiết lập.
+Chi tiết kết nối mà bạn đã nhập không chính xác, vui lòng thử lại.
+
+Nếu lỗi này vẫn còn, xin vui lòng liên hệ với quản trị viên của bạn VMS.</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="74"/>
         <source>You are trying to connect to incompatible Server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn đang cố gắng để kết nối với không tương thích Server.</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="81"/>
@@ -4304,17 +4316,17 @@ If this error persists, please contact your VMS administrator.</source>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="224"/>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="253"/>
         <source>Could not connect to Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể kết nối đến Server</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="110"/>
         <source>Server</source>
-        <translation type="unfinished">máy chủ</translation>
+        <translation>máy chủ</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="111"/>
         <source>Client</source>
-        <translation type="unfinished"></translation>
+        <translation>khách hàng</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="112"/>
@@ -4322,7 +4334,10 @@ If this error persists, please contact your VMS administrator.</source>
  - Client version: %1.
  - Server version: %2.
 These versions are not compatible. Please update your %3</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn muốn kết nối với máy chủ trong đó có một phiên bản khác nhau:
+ - Phiên bản Client: %1.
+ - Phiên bản Server: %2.
+Những phiên bản này không tương thích. Hãy cập nhật %3 của bạn</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="136"/>
@@ -4330,7 +4345,10 @@ These versions are not compatible. Please update your %3</source>
  - Client version: %1.
  - Server version: %2.
 Compatibility mode for versions lower than %3 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn muốn kết nối với máy chủ trong đó có một phiên bản khác nhau:
+  - Phiên bản Client: %1.
+  - Phiên bản Server: %2.
+Chế độ tương thích cho các phiên bản thấp hơn %3 không được hỗ trợ.</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="152"/>
@@ -4339,7 +4357,10 @@ Compatibility mode for versions lower than %3 is not supported.</source>
  - Client version: %1.
  - Server version: %2.
 The other version of the Client is needed in order to establish the connection to this Server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy chủ đã chọn có một phiên bản khác nhau:
+  - Phiên bản Client: %1.
+  - Phiên bản Server: %2.
+Các phiên bản khác của khách hàng là cần thiết để thiết lập kết nối đến máy chủ này.</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="172"/>
@@ -4347,7 +4368,10 @@ The other version of the Client is needed in order to establish the connection t
  - Client version: %1.
  - Server version: %2.
 An error has occurred while trying to restart in compatibility mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy chủ đã chọn có một phiên bản khác nhau:
+  - Phiên bản Client: %1.
+  - Phiên bản Server: %2.
+Một lỗi đã xảy ra trong khi cố gắng khởi động lại trong chế độ tương thích.</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="205"/>
@@ -4355,7 +4379,10 @@ An error has occurred while trying to restart in compatibility mode.</source>
  - Client version: %1.
  - EC version: %2.
 You need to download client %3 to connect</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy chủ đã chọn có một phiên bản khác nhau:
+  - Phiên bản Client: %1.
+  - Phiên bản EC: %2.
+Bạn cần phải tải về client %3 để kết nối</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="225"/>
@@ -4364,7 +4391,11 @@ You need to download client %3 to connect</source>
  - Server version: %2.
 Client version %3 is required to connect to this Server.
 Download version %3?</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn muốn kết nối với máy chủ trong đó có một phiên bản khác nhau:
+  - Phiên bản Client: %1.
+  - Phiên bản Server: %2.
+Phiên bản client %3 được yêu cầu để kết nối với máy chủ này.
+Tải về phiên bản %3?</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="254"/>
@@ -4372,29 +4403,34 @@ Download version %3?</source>
  - Client version: %1.
  - Server version: %2.
 Would you like to restart the Client in compatibility mode?</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn muốn kết nối với máy chủ trong đó có một phiên bản khác nhau:
+  - Phiên bản Client: %1.
+  - Phiên bản Server: %2.
+Bạn có muốn khởi động lại các khách hàng trong chế độ tương thích?</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="273"/>
         <source>Launcher process is not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Quá trình phóng không được tìm thấy</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="274"/>
         <source>Cannot restart the Client in compatibility mode.
 Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể khởi động lại các khách hàng trong chế độ tương thích.
+Xin hãy đóng ứng dụng và khởi động nó lại bằng cách sử dụng phím tắt trong menu start.</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="285"/>
         <source>Failure</source>
-        <translation type="unfinished">thất bại</translation>
+        <translation>thất bại</translation>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="286"/>
         <source>Failed to launch compatibility version %1
 Try to restore version %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể khởi động phiên bản tương thích %1
+Hãy cố gắng khôi phục lại phiên bản %1?</translation>
     </message>
 </context>
 <context>
@@ -4415,12 +4451,15 @@ Try to restore version %1?</source>
 Connection details that you have entered are incorrect, please try again.
 
 If this error persists, please contact your VMS administrator.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kết nối với máy chủ không thể được thiết lập.
+Chi tiết kết nối mà bạn đã nhập không chính xác, vui lòng thử lại.
+
+Nếu lỗi này vẫn còn, xin vui lòng liên hệ với quản trị viên của bạn VMS.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="117"/>
         <source>You are trying to connect to incompatible Server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn đang cố gắng để kết nối với không tương thích Server.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="123"/>
@@ -4428,7 +4467,10 @@ If this error persists, please contact your VMS administrator.</source>
  - Client version: %1.
  - Server version: %2.
 Compatibility mode for versions lower than %3 is not supported.</source>
-        <translation type="unfinished"></translation>
+        <translation>Server có một phiên bản khác nhau:
+  - Phiên bản Client: %1.
+  - Phiên bản Server: %2.
+Chế độ tương thích cho các phiên bản thấp hơn %3 không được hỗ trợ.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="133"/>
@@ -4436,17 +4478,20 @@ Compatibility mode for versions lower than %3 is not supported.</source>
  - Client version: %1.
  - Server version: %2.
 You will be asked to restart the client in compatibility mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Server có một phiên bản khác nhau:
+  - Phiên bản Client: %1.
+  - Phiên bản Server: %2.
+Bạn sẽ được yêu cầu khởi động lại máy khách ở chế độ tương thích.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="143"/>
         <source>Server</source>
-        <translation type="unfinished">máy chủ</translation>
+        <translation>máy chủ</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="144"/>
         <source>Client</source>
-        <translation type="unfinished"></translation>
+        <translation>khách hàng</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="145"/>
@@ -4454,7 +4499,10 @@ You will be asked to restart the client in compatibility mode.</source>
  - Client version: %1.
  - Server version: %2.
 These versions are not compatible. Please update your %3</source>
-        <translation type="unfinished"></translation>
+        <translation>Server có một phiên bản khác nhau:
+  - Phiên bản Client: %1.
+  - Phiên bản Server: %2.
+Những phiên bản này không tương thích. Hãy cập nhật %3 của bạn</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="157"/>
@@ -4472,17 +4520,17 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/dialogs/credentials_dialog.ui" line="14"/>
         <source>Enter user name and password...</source>
-        <translation type="unfinished"></translation>
+        <translation>Nhập tên người dùng và mật khẩu ...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/credentials_dialog.ui" line="20"/>
         <source>User:</source>
-        <translation type="unfinished">người sử dụng:</translation>
+        <translation>người sử dụng:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/credentials_dialog.ui" line="30"/>
         <source>Password:</source>
-        <translation type="unfinished">mật khẩu:</translation>
+        <translation>mật khẩu:</translation>
     </message>
 </context>
 <context>
@@ -4490,7 +4538,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="34"/>
         <source>You can create a backup for system configurations that can be restored in case of failure.</source>
-        <translation type="unfinished">Bạn có thể thiết lập một tập hợp các tập tin hệ thống và có thể phục hồi sau khi một lỗi hệ thống.</translation>
+        <translation>Bạn có thể thiết lập một tập hợp các tập tin hệ thống và có thể phục hồi sau khi một lỗi hệ thống.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="50"/>
@@ -4536,7 +4584,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="98"/>
         <source>Failed to dump Server database to &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể đổ cơ sở dữ liệu máy chủ để &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="105"/>
@@ -4566,7 +4614,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="139"/>
         <source>Restoring Database Backup</source>
-        <translation>Cơ sở dữ liệu sao lưu và khôi phục lại.</translation>
+        <translation>Cơ sở dữ liệu sao lưu và khôi phục lại</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="140"/>
@@ -4576,17 +4624,17 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="153"/>
         <source>You need to connect to a server before doing backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn cần phải kết nối với một máy chủ sao lưu trước khi làm</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="165"/>
         <source>Database was successfully restored from file &apos;%1&apos;. Media server will be restarted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cơ sở dữ liệu được phục hồi thành công từ tập tin &apos;%1&apos;. Máy chủ Media sẽ được khởi động lại.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.cpp" line="169"/>
         <source>An error has occurred while restoring the database from file &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Một lỗi đã xảy ra trong khi khôi phục lại cơ sở dữ liệu từ tập tin &apos;%1&apos;.</translation>
     </message>
 </context>
 <context>
@@ -4604,7 +4652,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/plugins/resource/desktop_win/desktop_data_provider.cpp" line="399"/>
         <source>Screen width must be a multiplier of 8.</source>
-        <translation>Chiều rộng màn hình phải có một số nhân của 8</translation>
+        <translation>Chiều rộng màn hình phải có một số nhân của 8.</translation>
     </message>
     <message>
         <location filename="../src/plugins/resource/desktop_win/desktop_data_provider.cpp" line="476"/>
@@ -4726,7 +4774,7 @@ These versions are not compatible. Please update your %3</source>
         <location filename="../src/ui/dialogs/event_log_dialog.cpp" line="360"/>
         <source>Event log for period from %1 to %2 - %n event(s) found</source>
         <translation>
-            <numerusform>Ghi sự kiện cho giai đoạn %1-%2 - %n sự kiện tìm thấy.</numerusform>
+            <numerusform>Ghi sự kiện cho giai đoạn %1-%2 - %n sự kiện tìm thấy</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -4759,18 +4807,18 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/models/event_log_model.cpp" line="410"/>
         <source>Motion video</source>
-        <translation type="unfinished"></translation>
+        <translation>chuyển động video</translation>
     </message>
     <message>
         <location filename="../src/ui/models/event_log_model.cpp" line="413"/>
         <source>
 </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../src/ui/models/event_log_model.cpp" line="419"/>
         <source> (%1 times)</source>
-        <translation type="unfinished"></translation>
+        <translation> (%1 thời gian)</translation>
     </message>
     <message>
         <location filename="../src/ui/models/event_log_model.cpp" line="481"/>
@@ -4818,7 +4866,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="64"/>
         <source>Copy archive length settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Sao chép các thiết lập thời gian tự động lưu trữ</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="71"/>
@@ -4841,7 +4889,7 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/widgets/fisheye/fisheye_calibration_widget.cpp" line="30"/>
         <source>Loading preview, please wait...</source>
-        <translation type="unfinished"></translation>
+        <translation>Tải xem trước, vui lòng đợi ...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/fisheye/fisheye_calibration_widget.cpp" line="152"/>
@@ -4852,12 +4900,12 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/widgets/fisheye/fisheye_calibration_widget.cpp" line="152"/>
         <source>Auto calibration failed. Image is not round.</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto chuẩn bị thất bại. Hình ảnh không tròn.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/fisheye/fisheye_calibration_widget.cpp" line="155"/>
         <source>Auto calibration failed. The image might be too dim.</source>
-        <translation type="unfinished"></translation>
+        <translation>Auto chuẩn bị thất bại. Các hình ảnh có thể là quá mờ.</translation>
     </message>
 </context>
 <context>
@@ -4894,18 +4942,18 @@ These versions are not compatible. Please update your %3</source>
     <message>
         <location filename="../src/ui/dialogs/generic_tabbed_dialog.cpp" line="155"/>
         <source>* %1</source>
-        <translation type="unfinished"></translation>
+        <translation>* %1</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/generic_tabbed_dialog.cpp" line="158"/>
         <source>Confirm exit</source>
-        <translation type="unfinished">Xác nhận Exit</translation>
+        <translation>Xác nhận Exit</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/generic_tabbed_dialog.cpp" line="159"/>
         <source>Unsaved changes will be lost. Save the following pages?
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Những thay đổi chưa được lưu sẽ bị mất. Lưu các trang sau đây?</translation>
     </message>
 </context>
 <context>
@@ -4966,7 +5014,7 @@ Cài đặt hoặc cập nhật trình điều khiển card đồ họa có th�
     <message>
         <location filename="../src/ui/help/help_handler.cpp" line="88"/>
         <source>Error</source>
-        <translation type="unfinished">lỗi</translation>
+        <translation>lỗi</translation>
     </message>
 </context>
 <context>
@@ -4987,12 +5035,12 @@ Cài đặt hoặc cập nhật trình điều khiển card đồ họa có th�
     <message>
         <location filename="../src/ui/workbench/extensions/workbench_layout_export_tool.cpp" line="93"/>
         <source>Could not create output file %1</source>
-        <translation type="unfinished">Không thể tạo tập tin đầu ra %1</translation>
+        <translation>Không thể tạo tập tin đầu ra %1</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/extensions/workbench_layout_export_tool.cpp" line="330"/>
         <source>Exporting to &quot;%2&quot;...</source>
-        <translation type="unfinished">xuất khẩu sang &quot;%1&quot;… {2&quot;?}</translation>
+        <translation>xuất khẩu sang &quot;%2&quot;...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/extensions/workbench_layout_export_tool.cpp" line="383"/>
@@ -5021,7 +5069,7 @@ Cài đặt hoặc cập nhật trình điều khiển card đồ họa có th�
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="506"/>
         <source>Select file...</source>
-        <translation type="unfinished">Chọn File...</translation>
+        <translation>Chọn File...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.cpp" line="508"/>
@@ -5035,49 +5083,49 @@ Cài đặt hoặc cập nhật trình điều khiển card đồ họa có th�
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="26"/>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="60"/>
         <source>Screens Allowed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Màn hình cho phép:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="27"/>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="61"/>
         <source>Control Sessions Allowed:</source>
-        <translation type="unfinished"></translation>
+        <translation>buổi kiểm soát cho phép:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="29"/>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="63"/>
         <source>Archive Streams Allowed:</source>
-        <translation type="unfinished"></translation>
+        <translation>lưu trữ các dòng cho phép:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="35"/>
         <source>Copy to Clipboard</source>
-        <translation type="unfinished">Sao chép vào Clipboard</translation>
+        <translation>Sao chép vào Clipboard</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="53"/>
         <source>Generic:</source>
-        <translation type="unfinished"></translation>
+        <translation>chung:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="54"/>
         <source>License Type</source>
-        <translation type="unfinished"></translation>
+        <translation>loại giấy phép</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="55"/>
         <source>License Key</source>
-        <translation type="unfinished">key bản quyền</translation>
+        <translation>key bản quyền</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="56"/>
         <source>Locked to Hardware ID</source>
-        <translation type="unfinished"></translation>
+        <translation>khóa để ID phần cứng</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.cpp" line="58"/>
         <source>Features:</source>
-        <translation type="unfinished"></translation>
+        <translation>Các tính năng:</translation>
     </message>
 </context>
 <context>
@@ -5100,17 +5148,17 @@ Cài đặt hoặc cập nhật trình điều khiển card đồ họa có th�
     <message>
         <location filename="../src/ui/models/license_list_model.cpp" line="68"/>
         <source>Amount</source>
-        <translation type="unfinished"></translation>
+        <translation>Số tiền</translation>
     </message>
     <message>
         <location filename="../src/ui/models/license_list_model.cpp" line="71"/>
         <source>Status</source>
-        <translation type="unfinished"></translation>
+        <translation>trạng thái</translation>
     </message>
     <message>
         <location filename="../src/ui/models/license_list_model.cpp" line="72"/>
         <source>Server</source>
-        <translation type="unfinished">máy chủ</translation>
+        <translation>máy chủ</translation>
     </message>
     <message>
         <location filename="../src/ui/models/license_list_model.cpp" line="97"/>
@@ -5136,18 +5184,18 @@ Cài đặt hoặc cập nhật trình điều khiển card đồ họa có th�
         <location filename="../src/ui/models/license_list_model.cpp" line="123"/>
         <source>In %n days</source>
         <translation>
-            <numerusform>trong %n ngày.</numerusform>
+            <numerusform>trong %n ngày</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/models/license_list_model.cpp" line="127"/>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../src/ui/models/license_list_model.cpp" line="142"/>
         <source>&lt;Server not found&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Server không tìm thấy&gt;</translation>
     </message>
 </context>
 <context>
@@ -5155,51 +5203,56 @@ Cài đặt hoặc cập nhật trình điều khiển card đồ họa có th�
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="114"/>
         <source>The software is licensed to: </source>
-        <translation type="unfinished"></translation>
+        <translation>Các phần mềm được cấp phép:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="125"/>
         <source>
 %1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>
+%1 %2</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="135"/>
         <source>
 At least %n %2 are required</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>
+ít nhất %n %2 được yêu cầu</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="141"/>
         <source>
 %n %2 are currently in use</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>
+%n %2 hiện đang được sử dụng</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="148"/>
         <source>Obtaining licenses from Server...</source>
-        <translation type="unfinished"></translation>
+        <translation>Lấy giấy phép từ Server ...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="152"/>
         <source>You do not have a valid license installed.
 Please activate your commercial or trial license.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn không cần phải cài đặt một giấy phép hợp lệ.
+Vui lòng kích hoạt giấy phép thương mại hoặc dùng thử của bạn.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="153"/>
         <source>You do not have a valid license installed.
 Please activate your commercial license.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn không cần phải cài đặt một giấy phép hợp lệ.
+Vui lòng kích hoạt bản quyền thương mại của bạn.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="172"/>
         <source>Copy to Clipboard</source>
-        <translation type="unfinished">Sao chép vào Clipboard</translation>
+        <translation>Sao chép vào Clipboard</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="188"/>
@@ -5215,52 +5268,52 @@ Please activate your commercial license.</source>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="285"/>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="477"/>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn đang cố gắng để kích hoạt một giấy phép tương thích với phần mềm của bạn. Hãy liên hệ với nhóm hỗ trợ để có được một chìa khóa giấy phép hợp lệ.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="328"/>
         <source>There was a problem activating your license key. Network error has occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation>Có một vấn đề kích hoạt key bản quyền của bạn. Lỗi mạng đã xảy ra.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="351"/>
         <source>License Activation </source>
-        <translation type="unfinished"></translation>
+        <translation>kích hoạt giấy phép</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="352"/>
         <source>Network error has occurred during automatic license activation. Please contact support team to activate your license key manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lỗi mạng đã xảy ra trong quá trình kích hoạt giấy phép tự động. Hãy liên hệ với nhóm hỗ trợ để kích hoạt key bản quyền của bạn bằng tay.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="393"/>
         <source>License activation</source>
-        <translation type="unfinished"></translation>
+        <translation>kích hoạt giấy phép</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="393"/>
         <source>Can&apos;t activate license:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể kích hoạt giấy phép: %1</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="446"/>
         <source>Remove license</source>
-        <translation type="unfinished"></translation>
+        <translation>loại bỏ giấy phép</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="446"/>
         <source>Can&apos;t remove license from server:  %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể loại bỏ giấy phép từ máy chủ:%1</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="468"/>
         <source>The manual activation key file you have selected is invalid. Select correct manual activation key file. If problem continues, please contact support team.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hướng dẫn khóa kích hoạt tập tin bạn đã chọn không hợp lệ. Chọn đúng nhãn key kích hoạt tập tin. Nếu vấn đề vẫn tiếp tục, vui lòng liên hệ với nhóm hỗ trợ.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="472"/>
         <source>This license key has been previously activated to hardware id %1. Please contact support team to get a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation>Key bản quyền này trước đó đã được kích hoạt để id phần cứng %1. Hãy liên hệ với nhóm hỗ trợ để có được một chìa khóa giấy phép hợp lệ.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="290"/>
@@ -5285,7 +5338,7 @@ Hãy cố gắng để bắt đầu sự ủy quyền thông qua chế độ hư
     <message>
         <location filename="../src/ui/dialogs/license_notification_dialog.cpp" line="41"/>
         <source>Some of your licenses are unavailable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Một số giấy phép của bạn là không có.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/license_notification_dialog.cpp" line="43"/>
@@ -5308,17 +5361,17 @@ Hãy cố gắng để bắt đầu sự ủy quyền thông qua chế độ hư
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="42"/>
         <source>Please send email with the Serial Key and the Hardware ID provided to &lt;a href=&quot;mailto:%1&quot;&gt;%1&lt;/a&gt;. Then we&apos;ll send you an Activation Key file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Xin vui lòng gửi email với phím nối tiếp và các ID phần cứng cung cấp cho &lt;a href=&quot;mailto:%1&quot;&gt;%1&lt;/a&gt;. Sau đó chúng tôi sẽ gửi cho bạn một tập tin key kích hoạt.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="65"/>
         <source>Success</source>
-        <translation type="unfinished">sự thành công</translation>
+        <translation>sự thành công</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="65"/>
         <source>Hardware ID copied to clipboard.</source>
-        <translation type="unfinished"></translation>
+        <translation>ID phần cứng sao chép vào clipboard.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="136"/>
@@ -5343,12 +5396,12 @@ Hãy cố gắng để bắt đầu sự ủy quyền thông qua chế độ hư
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="178"/>
         <source>Error</source>
-        <translation type="unfinished">lỗi</translation>
+        <translation>lỗi</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.cpp" line="178"/>
         <source>Could not open the file %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể mở tập tin %1</translation>
     </message>
 </context>
 <context>
@@ -5386,17 +5439,17 @@ Hãy cố gắng để bắt đầu sự ủy quyền thông qua chế độ hư
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="82"/>
         <source>Connect to Server...</source>
-        <translation type="unfinished">Kết nối đến máy chủ...</translation>
+        <translation>Kết nối đến máy chủ...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="89"/>
         <source>Version %1</source>
-        <translation type="unfinished"></translation>
+        <translation>phiên bản %1</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="123"/>
         <source>Auto-Discovered Servers</source>
-        <translation type="unfinished"></translation>
+        <translation>tự động phát hiện các máy chủ</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="400"/>
@@ -5447,72 +5500,72 @@ Hãy cố gắng để bắt đầu sự ủy quyền thông qua chế độ hư
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="180"/>
         <source>Select file...</source>
-        <translation type="unfinished">Chọn File...</translation>
+        <translation>Chọn File...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="182"/>
         <source>Pictures %1</source>
-        <translation type="unfinished">màn%1</translation>
+        <translation>màn%1</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="201"/>
         <source>Preparing Image...</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuẩn bị hình ảnh ...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="202"/>
         <source>Please wait while image is being prepared...</source>
-        <translation type="unfinished"></translation>
+        <translation>Xin vui lòng chờ trong khi hình ảnh đang được chuẩn bị ...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="238"/>
         <source>Dark</source>
-        <translation type="unfinished">tối</translation>
+        <translation>tối</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="239"/>
         <source>Light</source>
-        <translation type="unfinished">sáng</translation>
+        <translation>sáng</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="249"/>
         <source>Server Time</source>
-        <translation type="unfinished">thời gian máy chủ</translation>
+        <translation>thời gian máy chủ</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="250"/>
         <source>Client Time</source>
-        <translation type="unfinished"></translation>
+        <translation>gian của khách hàng</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="260"/>
         <source>Default</source>
-        <translation type="unfinished"></translation>
+        <translation>vỡ nợ</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="261"/>
         <source>Rainbow</source>
-        <translation type="unfinished"></translation>
+        <translation>cầu vồng</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="262"/>
         <source>Custom...</source>
-        <translation type="unfinished">khách hàng	...</translation>
+        <translation>khách hàng...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="264"/>
         <source>Stretch</source>
-        <translation type="unfinished"></translation>
+        <translation>căng ra</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="265"/>
         <source>Fit</source>
-        <translation type="unfinished"></translation>
+        <translation>phù hợp</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="266"/>
         <source>Crop</source>
-        <translation type="unfinished"></translation>
+        <translation>trồng trọt</translation>
     </message>
 </context>
 <context>
@@ -5555,17 +5608,17 @@ Hãy cố gắng để bắt đầu sự ủy quyền thông qua chế độ hư
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="924"/>
         <source>Lo-Res</source>
-        <translation type="unfinished"></translation>
+        <translation>Độ phân giải thấp</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="924"/>
         <source>Hi-Res</source>
-        <translation type="unfinished"></translation>
+        <translation>độ phân giải cao</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="947"/>
         <source>%1x%2 %3fps @ %4Mbps%5 %6	%7</source>
-        <translation type="unfinished">%1x%2 %3fps @ %4Mbps%5 %6	%7 {1x?} {2 %3f?} {4M?}</translation>
+        <translation>%1x%2 %3fps @ %4Mbps%5 %6	%7</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="941"/>
@@ -5583,27 +5636,27 @@ Hãy cố gắng để bắt đầu sự ủy quyền thông qua chế độ hư
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.ui" line="14"/>
         <source>Merge Systems...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kết hợp hệ thống ...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.ui" line="55"/>
         <source>Server URL:</source>
-        <translation type="unfinished"></translation>
+        <translation>URL máy chủ:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.ui" line="85"/>
         <source>Password:</source>
-        <translation type="unfinished">mật khẩu:</translation>
+        <translation>mật khẩu:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.ui" line="94"/>
         <source>Find System</source>
-        <translation type="unfinished"></translation>
+        <translation>Tìm hệ thống</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.ui" line="142"/>
         <source>The new system will have password and name from the system:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hệ thống mới sẽ có mật khẩu và tên từ hệ thống:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.ui" line="193"/>
@@ -5611,94 +5664,97 @@ Hãy cố gắng để bắt đầu sự ủy quyền thông qua chế độ hư
 
 The system was configured successfully.
 The servers from the remote system should appear in your system soon.</source>
-        <translation type="unfinished"></translation>
+        <translation>Thành công!
+
+Hệ thống được cấu hình thành công.
+Các máy chủ từ xa hệ thống sẽ xuất hiện trong hệ thống của bạn sớm.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="23"/>
         <source>http(s)://host:port</source>
-        <translation type="unfinished"></translation>
+        <translation>http(s)://host:port</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="82"/>
         <source>You are about to merge the current system %1 with the system</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn muốn hợp nhất các hệ thống hiện tại %1 với hệ thống</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="83"/>
         <source>%1 (current)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (hiện tại)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="123"/>
         <source>The URL is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>Các URL không hợp lệ.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="129"/>
         <source>The password cannot be empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mật khẩu không thể để trống.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="138"/>
         <source>testing...</source>
-        <translation type="unfinished"></translation>
+        <translation>thử nghiệm ...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="151"/>
         <source>merging systems...</source>
-        <translation type="unfinished"></translation>
+        <translation>sáp nhập hệ thống ...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="162"/>
         <source>Use a specific hostname or IP address rather than %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sử dụng một tên máy hoặc địa chỉ IP cụ thể chứ không phải là %1.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="164"/>
         <source>This is the current system URL.</source>
-        <translation type="unfinished"></translation>
+        <translation>Đây là địa chỉ hệ thống hiện tại.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="169"/>
         <source>Merge with %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kết hợp với %1</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="176"/>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="204"/>
         <source>The password is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>Các mật khẩu là không hợp lệ.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="179"/>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="207"/>
         <source>The found system %1 has an incompatible version %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Việc tìm thấy hệ thống %1 có một phiên bản không tương thích %2.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="182"/>
         <source>The system was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hệ thống này đã không được tìm thấy.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="210"/>
         <source>Could not create a backup of the server database.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể tạo ra một bản sao lưu cơ sở dữ liệu máy chủ.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="213"/>
         <source>System was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hệ thống không tìm thấy.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="222"/>
         <source>Error</source>
-        <translation type="unfinished">lỗi</translation>
+        <translation>lỗi</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.cpp" line="222"/>
         <source>Cannot merge systems.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể hợp nhất các hệ thống.</translation>
     </message>
 </context>
 <context>
@@ -5706,47 +5762,47 @@ The servers from the remote system should appear in your system soon.</source>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="94"/>
         <source>4:3</source>
-        <translation type="unfinished">4:3</translation>
+        <translation>4:3</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="95"/>
         <source>16:9</source>
-        <translation type="unfinished">16:9</translation>
+        <translation>16:9</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="96"/>
         <source>1:1</source>
-        <translation type="unfinished">1:1</translation>
+        <translation>1:1</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="102"/>
         <source>0 degrees</source>
-        <translation type="unfinished">0 trình độ</translation>
+        <translation>0 trình độ</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="103"/>
         <source>90 degrees</source>
-        <translation type="unfinished">90 trình độ</translation>
+        <translation>90 trình độ</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="104"/>
         <source>180 degrees</source>
-        <translation type="unfinished">180 trình độ</translation>
+        <translation>180 trình độ</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="105"/>
         <source>270 degrees</source>
-        <translation type="unfinished">270 trình độ</translation>
+        <translation>270 trình độ</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="284"/>
         <source>Invalid schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>lịch trình không hợp lệ</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="285"/>
         <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>Phần thứ hai được vô hiệu hóa trên máy ảnh này. Tùy chọn Chuyển động + LQ không có effect.Press &quot;Yes&quot; để thay đổi loại ghi âm để &quot;Luôn luôn&quot; hoặc &quot;Không&quot; để kích hoạt lại dòng thứ hai.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="460"/>
@@ -5859,7 +5915,7 @@ The servers from the remote system should appear in your system soon.</source>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="71"/>
         <source>Custom Title:</source>
-        <translation>Tuỳ chỉnh Tiêu đề：</translation>
+        <translation>Tuỳ chỉnh Tiêu đề:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="85"/>
@@ -5885,7 +5941,7 @@ The servers from the remote system should appear in your system soon.</source>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="111"/>
         <source>New title could not be set.</source>
-        <translation>Tiêu đề mới không được thiết lập</translation>
+        <translation>Tiêu đề mới không được thiết lập.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.cpp" line="128"/>
@@ -5982,7 +6038,7 @@ The servers from the remote system should appear in your system soon.</source>
     <message>
         <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="446"/>
         <source>SMTP Settin gs</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt SMTP</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="482"/>
@@ -6041,7 +6097,7 @@ The servers from the remote system should appear in your system soon.</source>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="30"/>
         <source>Look and Feel</source>
-        <translation type="unfinished">điều chỉnh thị giác</translation>
+        <translation>điều chỉnh thị giác</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="33"/>
@@ -6051,7 +6107,7 @@ The servers from the remote system should appear in your system soon.</source>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="75"/>
         <source>Some changes will take effect only after application restart. Do you want to restart the application now?</source>
-        <translation type="unfinished">Một số thay đổi sẽ chỉ có hiệu lực sau khi khởi động lại ứng dụng. Bạn có muốn khởi động lại ứng dụng bây giờ?</translation>
+        <translation>Một số thay đổi sẽ chỉ có hiệu lực sau khi khởi động lại ứng dụng. Bạn có muốn khởi động lại ứng dụng bây giờ?</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="43"/>
@@ -6068,7 +6124,7 @@ All changes will be lost after program exit.</source>
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.cpp" line="74"/>
         <source>Information</source>
-        <translation type="unfinished">tin tức</translation>
+        <translation>tin tức</translation>
     </message>
 </context>
 <context>
@@ -6262,22 +6318,22 @@ Nếu bạn loại bỏ những du lịch trên biển sẽ là không hợp l�
     <message>
         <location filename="../src/ui/delegates/ptz_preset_hotkey_item_delegate.cpp" line="102"/>
         <source>This hotkey is used by preset &quot;%1&quot;</source>
-        <translation type="unfinished">Các phím nóng là thời điểm định sẵn &quot;%1&quot; dùng</translation>
+        <translation>Các phím nóng là thời điểm định sẵn &quot;%1&quot; dùng</translation>
     </message>
     <message>
         <location filename="../src/ui/delegates/ptz_preset_hotkey_item_delegate.cpp" line="103"/>
         <source>This hotkey is used by tour &quot;%1&quot;</source>
-        <translation type="unfinished">Hotkey này đã được bay đường &quot;%1&quot; dùng</translation>
+        <translation>Hotkey này đã được bay đường &quot;%1&quot; dùng</translation>
     </message>
     <message>
         <location filename="../src/ui/delegates/ptz_preset_hotkey_item_delegate.cpp" line="105"/>
         <source>Change hotkey</source>
-        <translation type="unfinished">Thay đổi phím nóng</translation>
+        <translation>Thay đổi phím nóng</translation>
     </message>
     <message>
         <location filename="../src/ui/delegates/ptz_preset_hotkey_item_delegate.cpp" line="106"/>
         <source>Reassign</source>
-        <translation type="unfinished">phân công lại</translation>
+        <translation>phân công lại</translation>
     </message>
 </context>
 <context>
@@ -6360,7 +6416,7 @@ Nếu bạn loại bỏ những du lịch trên biển sẽ là không hợp l�
     <message>
         <location filename="../src/ui/dialogs/reconnect_info_dialog.cpp" line="33"/>
         <source>Canceling...</source>
-        <translation type="unfinished"></translation>
+        <translation>Huỷ ...</translation>
     </message>
 </context>
 <context>
@@ -6448,33 +6504,33 @@ Nếu bạn loại bỏ những du lịch trên biển sẽ là không hợp l�
     <message>
         <location filename="../src/ui/models/resource_pool_model_node.cpp" line="46"/>
         <source>Root</source>
-        <translation type="unfinished">nguồn gốc</translation>
+        <translation>nguồn gốc</translation>
     </message>
     <message>
         <location filename="../src/ui/models/resource_pool_model_node.cpp" line="49"/>
         <source>Local</source>
-        <translation type="unfinished">địa phương</translation>
+        <translation>địa phương</translation>
     </message>
     <message>
         <location filename="../src/ui/models/resource_pool_model_node.cpp" line="53"/>
         <source>System</source>
-        <translation type="unfinished">hệ thống</translation>
+        <translation>hệ thống</translation>
     </message>
     <message>
         <location filename="../src/ui/models/resource_pool_model_node.cpp" line="57"/>
         <source>Other Systems</source>
-        <translation type="unfinished"></translation>
+        <translation>Hệ thống khác</translation>
     </message>
     <message>
         <location filename="../src/ui/models/resource_pool_model_node.cpp" line="62"/>
         <source>Users</source>
-        <translation type="unfinished">người sử dụng</translation>
+        <translation>người sử dụng</translation>
     </message>
     <message>
         <location filename="../src/ui/models/resource_pool_model_node.cpp" line="217"/>
         <source>%1&apos;s Screen</source>
         <comment>%1 means user&apos;s name</comment>
-        <translation type="unfinished"></translation>
+        <translation>màn hình của %1</translation>
     </message>
 </context>
 <context>
@@ -6537,52 +6593,52 @@ Nếu bạn loại bỏ những du lịch trên biển sẽ là không hợp l�
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.ui" line="17"/>
         <source>Available Server Addresses</source>
-        <translation type="unfinished"></translation>
+        <translation>Địa chỉ máy chủ có sẵn</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.ui" line="40"/>
         <source>Add URL</source>
-        <translation type="unfinished"></translation>
+        <translation>thêm vào URL</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.ui" line="57"/>
         <source>Remove</source>
-        <translation type="unfinished">tẩy</translation>
+        <translation>tẩy</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.ui" line="91"/>
         <source>Removing this connection option could lead to system malfunction.</source>
-        <translation type="unfinished"></translation>
+        <translation>Loại bỏ các tùy chọn kết nối này có thể dẫn đến hệ thống bị trục trặc.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.cpp" line="313"/>
         <source>Enter URL</source>
-        <translation type="unfinished"></translation>
+        <translation>vào URL</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.cpp" line="313"/>
         <source>URL</source>
-        <translation type="unfinished">nơi</translation>
+        <translation>nơi</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.cpp" line="395"/>
         <source>Error</source>
-        <translation type="unfinished">lỗi</translation>
+        <translation>lỗi</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.cpp" line="395"/>
         <source>You have entered an invalid URL.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn đã nhập một URL không hợp lệ.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.cpp" line="398"/>
         <source>Warning</source>
-        <translation type="unfinished">sự phản đối</translation>
+        <translation>sự phản đối</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.cpp" line="398"/>
         <source>This URL is already in the address list.</source>
-        <translation type="unfinished"></translation>
+        <translation>URL này đã có trong danh sách địa chỉ.</translation>
     </message>
 </context>
 <context>
@@ -6598,17 +6654,17 @@ Nếu bạn loại bỏ những du lịch trên biển sẽ là không hợp l�
     <message>
         <location filename="../src/ui/widgets/search_line_edit.cpp" line="135"/>
         <source>Search</source>
-        <translation type="unfinished">tìm kiếm</translation>
+        <translation>tìm kiếm</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/search_line_edit.cpp" line="139"/>
         <source>Previous</source>
-        <translation type="unfinished"></translation>
+        <translation>trước</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/search_line_edit.cpp" line="143"/>
         <source>Next</source>
-        <translation type="unfinished"></translation>
+        <translation>kế tiếp</translation>
     </message>
 </context>
 <context>
@@ -6616,12 +6672,12 @@ Nếu bạn loại bỏ những du lịch trên biển sẽ là không hợp l�
     <message>
         <location filename="../src/ui/models/server_addresses_model.cpp" line="213"/>
         <source>Address</source>
-        <translation type="unfinished">địa chỉ</translation>
+        <translation>địa chỉ</translation>
     </message>
     <message>
         <location filename="../src/ui/models/server_addresses_model.cpp" line="215"/>
         <source>In Use</source>
-        <translation type="unfinished">dùng</translation>
+        <translation>dùng</translation>
     </message>
 </context>
 <context>
@@ -6639,14 +6695,14 @@ Nếu bạn loại bỏ những du lịch trên biển sẽ là không hợp l�
     <message numerus="yes">
         <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="756"/>
         <source>%1 (up %n days, %2)</source>
-        <translation type="unfinished">
-            <numerusform>%1 %2 (nhất %n sơn mài Nhật, %3) {1 ?} {2)?}</numerusform>
+        <translation>
+            <numerusform>%1 (up %n days, %2)</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="760"/>
         <source>%1</source>
-        <translation type="unfinished">%1% {1?}</translation>
+        <translation>%1</translation>
     </message>
 </context>
 <context>
@@ -6659,7 +6715,7 @@ Nếu bạn loại bỏ những du lịch trên biển sẽ là không hợp l�
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="169"/>
         <source>Open Web Page...</source>
-        <translation type="unfinished"></translation>
+        <translation>Mở trang Web ...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="223"/>
@@ -6684,12 +6740,12 @@ Nếu bạn loại bỏ những du lịch trên biển sẽ là không hợp l�
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="530"/>
         <source>Rebuild archive index</source>
-        <translation type="unfinished">Danh mục hàng Tái thiết</translation>
+        <translation>Danh mục hàng Tái thiết</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="532"/>
         <source>Fast initial scan in progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Tiến hành quét nhanh tiến độ</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="541"/>
@@ -6704,17 +6760,17 @@ Nếu bạn loại bỏ những du lịch trên biển sẽ là không hợp l�
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="554"/>
         <source>At least two servers are required for this feature.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ít nhất hai máy chủ được yêu cầu cho tính năng này.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="557"/>
         <source>This server already has more than max cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy chủ này đã có hơn máy ảnh max</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="560"/>
         <source>To avoid malfunction adjust max number of cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Để tránh sự cố điều chỉnh số lượng tối đa của máy ảnh</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="605"/>
@@ -6732,12 +6788,12 @@ Nếu bạn loại bỏ những du lịch trên biển sẽ là không hợp l�
     <message>
         <location filename="../src/ui/models/server_updates_model.cpp" line="122"/>
         <source>Server</source>
-        <translation type="unfinished">máy chủ</translation>
+        <translation>máy chủ</translation>
     </message>
     <message>
         <location filename="../src/ui/models/server_updates_model.cpp" line="124"/>
         <source>Status</source>
-        <translation type="unfinished"></translation>
+        <translation>trạng thái</translation>
     </message>
 </context>
 <context>
@@ -6745,201 +6801,203 @@ Nếu bạn loại bỏ những du lịch trên biển sẽ là không hợp l�
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="60"/>
         <source>Cannot check updates via the internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể kiểm tra cập nhật thông qua internet.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="209"/>
         <source>Available version:</source>
-        <translation type="unfinished"></translation>
+        <translation>Phiên bản có sẵn:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="222"/>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>không biết</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="229"/>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="397"/>
         <source>Update</source>
-        <translation type="unfinished"></translation>
+        <translation>Cập nhật</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="236"/>
         <source>&lt;a href=&apos;notes&apos;&gt;release notes&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;a href=&apos;notes&apos;&gt;ghi chú Phát hành&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="282"/>
         <source>Update from file:</source>
-        <translation type="unfinished"></translation>
+        <translation>Cập nhật từ tập tin:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="303"/>
         <source>Archive url:</source>
-        <translation type="unfinished"></translation>
+        <translation>Url lưu trữ:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="310"/>
         <source>Copy to Clipboard</source>
-        <translation type="unfinished">Sao chép vào Clipboard</translation>
+        <translation>Sao chép vào Clipboard</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="320"/>
         <source>To update manually, download an archive with the following link:</source>
-        <translation type="unfinished"></translation>
+        <translation>Để cập nhật bằng tay, tải về một kho lưu trữ với các liên kết sau đây:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="354"/>
         <source>...</source>
-        <translation type="unfinished">...</translation>
+        <translation>...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="444"/>
         <source>&lt;a href=&apos;spec&apos;&gt;I want specific build&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;a href=&apos;spec&apos;&gt;Tôi muốn xây dựng cụ thể&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="451"/>
         <source>&lt;a href=&apos;latest&apos;&gt;I want latest version&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;a href=&apos;latest&apos;&gt;Tôi muốn phiên bản mới nhất&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="477"/>
         <source>Cancel</source>
-        <translation type="unfinished">hủy bỏ</translation>
+        <translation>hủy bỏ</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui" line="501"/>
         <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nó trông giống như quá trình cập nhật được dành thời gian nhiều hơn bình thường. Xin hãy tiếp tục chờ đợi.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="90"/>
         <source>Select Update File...</source>
-        <translation type="unfinished"></translation>
+        <translation>chọn tập tin cập nhật ...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="91"/>
         <source>Update Files (*.zip)</source>
-        <translation type="unfinished"></translation>
+        <translation>cập nhật các tập tin (* .zip)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="109"/>
         <source>As a general rule for the sake of better support, we do not recommend to make system updates at the end of the week.</source>
-        <translation type="unfinished"></translation>
+        <translation>Như một quy luật chung, vì lợi ích của hỗ trợ tốt hơn, chúng tôi không khuyên bạn nên thực hiện cập nhật hệ thống vào cuối tuần.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="156"/>
         <source>Update from Internet...</source>
-        <translation type="unfinished"></translation>
+        <translation>Cập nhật từ Internet ...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="157"/>
         <source>Update from local source...</source>
-        <translation type="unfinished"></translation>
+        <translation>Cập nhật từ nguồn địa phương ...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="166"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="185"/>
         <source>Update from Internet</source>
-        <translation type="unfinished"></translation>
+        <translation>Cập nhật từ internet</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="194"/>
         <source>Update from local source</source>
-        <translation type="unfinished"></translation>
+        <translation>Cập nhật từ nguồn địa phương</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="202"/>
         <source>Success</source>
-        <translation type="unfinished">sự thành công</translation>
+        <translation>sự thành công</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="202"/>
         <source>URL copied to clipboard.</source>
-        <translation type="unfinished"></translation>
+        <translation>URL sao chép vào clipboard.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="226"/>
         <source>Latest version:</source>
-        <translation type="unfinished"></translation>
+        <translation>Phiên bản mới nhất:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="244"/>
         <source>Target version:</source>
-        <translation type="unfinished"></translation>
+        <translation>Phiên bản mục tiêu:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="273"/>
         <source>Information</source>
-        <translation type="unfinished">tin tức</translation>
+        <translation>tin tức</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="273"/>
         <source>Update is in process now.</source>
-        <translation type="unfinished"></translation>
+        <translation>Đang trong quá trình cập nhật ngay bây giờ.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="282"/>
         <source>Error</source>
-        <translation type="unfinished">lỗi</translation>
+        <translation>lỗi</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="282"/>
         <source>Cannot cancel update at this state.
 Please wait until update is finished</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể hủy cập nhật tại tiểu bang này.
+Hãy đợi cho đến khi cập nhật hoàn tất</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="291"/>
         <source>Update finished... 100%</source>
-        <translation type="unfinished"></translation>
+        <translation>Cập nhật xong ... 100%</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="297"/>
         <source>Update has been successfully finished.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cập nhật đã được hoàn tất thành công.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="305"/>
         <source>Now you have to update the client manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bây giờ bạn phải cập nhật các khách hàng bằng tay.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="307"/>
         <source>Now you have to update the client manually using an installer.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bây giờ bạn phải cập nhật các khách hàng sử dụng một trình cài đặt bằng tay.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="310"/>
         <source>The client will be restarted to the updated version.</source>
-        <translation type="unfinished"></translation>
+        <translation>Các khách hàng sẽ được khởi động lại với phiên bản cập nhật.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="314"/>
         <source>Update is successful</source>
-        <translation type="unfinished"></translation>
+        <translation>Cập nhật thành công</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="321"/>
         <source>Launcher process is not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Quá trình phóng không được tìm thấy</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="322"/>
         <source>Cannot restart the client.
 Please close the application and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể khởi động lại client.
+Xin hãy đóng ứng dụng và khởi động nó lại bằng cách sử dụng phím tắt trong menu start.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="335"/>
         <source>Update cancelled</source>
-        <translation type="unfinished"></translation>
+        <translation>Cập nhật hủy</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="335"/>
         <source>Update has been cancelled.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cập nhật đã bị hủy bỏ.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="338"/>
@@ -6952,24 +7010,24 @@ Please close the application and start it again using the shortcut in the start 
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="382"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="386"/>
         <source>Update failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Cập nhật thất bại</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="338"/>
         <source>Someone has already started an update.</source>
-        <translation type="unfinished"></translation>
+        <translation>Một người nào đó đã bắt đầu cập nhật.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="341"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="344"/>
         <source>Could not download updates.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể tải bản cập nhật.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="344"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="542"/>
         <source>No free space left on the disk.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không gian trống còn lại trên đĩa.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="347"/>
@@ -6977,134 +7035,134 @@ Please close the application and start it again using the shortcut in the start 
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="367"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="375"/>
         <source>Could not push updates to servers.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể đẩy bản cập nhật cho các máy chủ.</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="350"/>
         <source>The problem is caused by %n servers:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Vấn đề là do %n máy chủ:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="361"/>
         <source>No free space left on %n servers:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Không gian trống còn lại trên %n máy chủ:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="369"/>
         <source>%n servers are not responding:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n máy chủ không được đáp ứng:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="377"/>
         <source>%n servers have gone offline:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n máy chủ đã đi offline:</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="382"/>
         <source>Could not install an update to the client.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể cài đặt một bản cập nhật cho khách hàng.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="386"/>
         <source>Could not install updates on one or more servers.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể cài đặt các bản cập nhật trên một hoặc nhiều máy chủ.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="416"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="502"/>
         <source>Checking for updates...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kiểm tra các bản cập nhật ...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="443"/>
         <source>Internet connection problem</source>
-        <translation type="unfinished"></translation>
+        <translation>Vấn đề kết nối Internet</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="448"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="526"/>
         <source>There is no such build on the update server</source>
-        <translation type="unfinished"></translation>
+        <translation>Không có build như trên các máy chủ cập nhật</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="454"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="530"/>
         <source>Cannot start update. An update for one or more servers was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể bắt đầu cập nhật. Bản cập nhật cho một hoặc nhiều máy chủ đã không được tìm thấy.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="459"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="534"/>
         <source>Cannot start update. An update for the client was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể bắt đầu cập nhật. Bản cập nhật cho khách hàng đã không được tìm thấy.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="513"/>
         <source>Newer version found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Phiên bản mới hơn được tìm thấy.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="516"/>
         <source>You will have to update the client manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn sẽ phải cập nhật các khách hàng bằng tay.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="518"/>
         <source>You will have to update the client manually using an installer.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn sẽ phải cập nhật các khách hàng sử dụng một trình cài đặt bằng tay.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="523"/>
         <source>All components in your system are up to date.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tất cả các thành phần trong hệ thống của bạn luôn được cập nhật.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="538"/>
         <source>Cannot update from this file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể cập nhật từ tập tin này.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="542"/>
         <source>Cannot extract the update file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể trích xuất các tập tin cập nhật.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="622"/>
         <source>Checking for updates... %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>Kiểm tra các bản cập nhật ... %1%</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="625"/>
         <source>Downloading updates... %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>Tải bản cập nhật ... %1%</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="628"/>
         <source>Installing client update... %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt cập nhật khách hàng ... %1%</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="631"/>
         <source>Installing updates to incompatible servers... %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt bản cập nhật cho các máy chủ không tương thích ... %1%</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="634"/>
         <source>Pushing updates to servers... %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>Đẩy mạnh thông tin cập nhật đến các máy chủ ... %1%</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="637"/>
         <source>Installing updates... %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt bản cập nhật ... %1%</translation>
     </message>
 </context>
 <context>
@@ -7135,37 +7193,37 @@ Please close the application and start it again using the shortcut in the start 
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="139"/>
         <source>4:3</source>
-        <translation type="unfinished">4:3</translation>
+        <translation>4:3</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="140"/>
         <source>16:9</source>
-        <translation type="unfinished">16:9</translation>
+        <translation>16:9</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="141"/>
         <source>1:1</source>
-        <translation type="unfinished">1:1</translation>
+        <translation>1:1</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="148"/>
         <source>0 degrees</source>
-        <translation type="unfinished">0 trình độ</translation>
+        <translation>0 trình độ</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="149"/>
         <source>90 degrees</source>
-        <translation type="unfinished">90 trình độ</translation>
+        <translation>90 trình độ</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="150"/>
         <source>180 degrees</source>
-        <translation type="unfinished">180 trình độ</translation>
+        <translation>180 trình độ</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="151"/>
         <source>270 degrees</source>
-        <translation type="unfinished">270 trình độ</translation>
+        <translation>270 trình độ</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="420"/>
@@ -7180,23 +7238,24 @@ Please close the application and start it again using the shortcut in the start 
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="636"/>
         <source>Invalid schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>lịch trình không hợp lệ</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="637"/>
         <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>Phần thứ hai được vô hiệu hóa trên máy ảnh này. Tùy chọn Chuyển động + LQ không có effect.Press &quot;Yes&quot; để thay đổi loại ghi âm để &quot;Luôn luôn&quot; hoặc &quot;Không&quot; để kích hoạt lại dòng thứ hai.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="775"/>
         <source>Confirm motion regions reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Xác nhận vùng chuyển động reset</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="776"/>
         <source>Are you sure you want to reset motion regions to the defaults?
 This action CANNOT be undone!</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn có chắc chắn muốn thiết lập lại vùng chuyển động để mặc định?
+Hành động này không thể khôi phục!</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="759"/>
@@ -7231,17 +7290,17 @@ This action CANNOT be undone!</source>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="320"/>
         <source>Network Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Lỗi mạng</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="320"/>
         <source>Could not perform a test. None of your servers is connected to the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể thực hiện một thử nghiệm. Không ai trong số các máy chủ của bạn được kết nối với Internet.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="357"/>
         <source>Failed</source>
-        <translation type="unfinished">thất bại</translation>
+        <translation>thất bại</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="362"/>
@@ -7256,13 +7315,13 @@ This action CANNOT be undone!</source>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="387"/>
         <source>No preset found. Use &apos;Advanced&apos; option</source>
-        <translation type="unfinished"></translation>
+        <translation>Không cài đặt trước được tìm thấy. Sử dụng tùy chọn &apos;cao cấp&apos;</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="393"/>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="414"/>
         <source>Support email is not valid</source>
-        <translation type="unfinished"></translation>
+        <translation>Hỗ trợ email không hợp lệ</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.cpp" line="332"/>
@@ -7333,7 +7392,7 @@ This action CANNOT be undone!</source>
     <message>
         <location filename="../src/ui/graphics/items/overlays/resource_status_overlay_widget.cpp" line="64"/>
         <source>Activate Video Wall license to remove this message</source>
-        <translation type="unfinished"></translation>
+        <translation>kích hoạt giấy phép tường video để loại bỏ thông báo này</translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/items/overlays/resource_status_overlay_widget.cpp" line="65"/>
@@ -7356,7 +7415,7 @@ This action CANNOT be undone!</source>
     <message>
         <location filename="../src/ui/widgets/storage_space_slider.h" line="54"/>
         <source>%1%</source>
-        <translation type="unfinished">%1%</translation>
+        <translation>%1%</translation>
     </message>
 </context>
 <context>
@@ -7377,57 +7436,57 @@ This action CANNOT be undone!</source>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.ui" line="14"/>
         <source>System Administration</source>
-        <translation type="unfinished"></translation>
+        <translation>quản trị hệ thống</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="29"/>
         <source>General</source>
-        <translation type="unfinished">chung</translation>
+        <translation>chung</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="30"/>
         <source>Licenses</source>
-        <translation type="unfinished">ủy quyền</translation>
+        <translation>ủy quyền</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="31"/>
         <source>Email</source>
-        <translation type="unfinished"></translation>
+        <translation>Emai</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="32"/>
         <source>Updates</source>
-        <translation type="unfinished"></translation>
+        <translation>cập nhật</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="33"/>
         <source>Routing Management</source>
-        <translation type="unfinished"></translation>
+        <translation>quản lý định tuyến</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="34"/>
         <source>Time Synchronization</source>
-        <translation type="unfinished"></translation>
+        <translation>thời gian đồng bộ hóa</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="43"/>
         <source>Error</source>
-        <translation type="unfinished">lỗi</translation>
+        <translation>lỗi</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="43"/>
         <source>Cannot cancel update at this state.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể hủy cập nhật tại tiểu bang này.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="51"/>
         <source>Information</source>
-        <translation type="unfinished">tin tức</translation>
+        <translation>tin tức</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.cpp" line="51"/>
         <source>Update is in process now.</source>
-        <translation type="unfinished"></translation>
+        <translation>Đang trong quá trình cập nhật ngay bây giờ.</translation>
     </message>
 </context>
 <context>
@@ -7437,22 +7496,22 @@ This action CANNOT be undone!</source>
         <location filename="../src/ui/models/time_server_selection_model.cpp" line="208"/>
         <location filename="../src/ui/models/time_server_selection_model.cpp" line="312"/>
         <source>Server</source>
-        <translation type="unfinished">máy chủ</translation>
+        <translation>máy chủ</translation>
     </message>
     <message>
         <location filename="../src/ui/models/time_server_selection_model.cpp" line="185"/>
         <source>Server Time</source>
-        <translation type="unfinished">thời gian máy chủ</translation>
+        <translation>thời gian máy chủ</translation>
     </message>
     <message>
         <location filename="../src/ui/models/time_server_selection_model.cpp" line="187"/>
         <source>Offset</source>
-        <translation type="unfinished"></translation>
+        <translation>bù lại</translation>
     </message>
     <message>
         <location filename="../src/ui/models/time_server_selection_model.cpp" line="221"/>
         <source>Synchronizing...</source>
-        <translation type="unfinished"></translation>
+        <translation>Đồng bộ hóa ...</translation>
     </message>
 </context>
 <context>
@@ -7460,12 +7519,12 @@ This action CANNOT be undone!</source>
     <message>
         <location filename="../src/ui/widgets/settings/time_server_selection_widget.cpp" line="49"/>
         <source>Time is taken from the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Thời gian được lấy từ Internet.</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/time_server_selection_widget.cpp" line="51"/>
         <source>Time is taken from %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Thời gian được lấy từ %1.</translation>
     </message>
 </context>
 <context>
@@ -7589,7 +7648,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/dialogs/two_step_file_dialog.ui" line="47"/>
         <source>Folder:</source>
-        <translation>thư mục...</translation>
+        <translation>thư mục:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/two_step_file_dialog.ui" line="66"/>
@@ -7601,12 +7660,12 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <location filename="../src/ui/dialogs/two_step_file_dialog.ui" line="75"/>
         <location filename="../src/ui/dialogs/two_step_file_dialog.ui" line="126"/>
         <source>Filename:</source>
-        <translation>tên tập tin：</translation>
+        <translation>tên tập tin:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/two_step_file_dialog.ui" line="85"/>
         <source>Format:</source>
-        <translation>định dạng：</translation>
+        <translation>định dạng:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/two_step_file_dialog.ui" line="101"/>
@@ -7634,7 +7693,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/dialogs/update_dialog.ui" line="14"/>
         <source>Update Servers</source>
-        <translation type="unfinished"></translation>
+        <translation>máy chủ cập nhật</translation>
     </message>
 </context>
 <context>
@@ -7642,7 +7701,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/delegates/update_status_item_delegate.cpp" line="45"/>
         <source>%1%</source>
-        <translation type="unfinished">%1%</translation>
+        <translation>%1%</translation>
     </message>
 </context>
 <context>
@@ -7660,26 +7719,26 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message numerus="yes">
         <location filename="../src/business/business_resource_validation.cpp" line="117"/>
         <source>%n of %1 users have invalid email address</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n của %1 người có địa chỉ email không hợp lệ</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/business/business_resource_validation.cpp" line="131"/>
         <source>Invalid email address %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Địa chỉ email không hợp lệ %1</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_resource_validation.cpp" line="132"/>
         <source>%n of %1 additional email addresses are invalid</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n of %1 địa chỉ email bổ sung không hợp lệ</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/business/business_resource_validation.cpp" line="135"/>
         <source>Send email to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Gửi email đến %1</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_resource_validation.cpp" line="137"/>
@@ -7721,7 +7780,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="333"/>
         <source>To change your password, please enter your current password.</source>
-        <translation type="unfinished"></translation>
+        <translation>Để thay đổi mật khẩu của bạn, xin vui lòng nhập mật khẩu hiện tại của bạn.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="336"/>
@@ -7731,7 +7790,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="347"/>
         <source>User was renamed. Password must be updated.</source>
-        <translation type="unfinished"></translation>
+        <translation>Người dùng được đổi tên. Mật khẩu phải được cập nhật.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="354"/>
@@ -7783,7 +7842,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="484"/>
         <source>Custom...</source>
-        <translation>khách hàng	...</translation>
+        <translation>khách hàng...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="500"/>
@@ -7808,7 +7867,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="504"/>
         <source>Can edit Video Walls</source>
-        <translation type="unfinished"></translation>
+        <translation>Có thể chỉnh sửa bức tường video</translation>
     </message>
 </context>
 <context>
@@ -7816,7 +7875,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/graphics/items/resource/videowall_item_widget.cpp" line="121"/>
         <source>Information</source>
-        <translation type="unfinished">tin tức</translation>
+        <translation>tin tức</translation>
     </message>
 </context>
 <context>
@@ -7824,32 +7883,32 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/widgets/videowall_manage_widget_p.cpp" line="342"/>
         <source>Desktop %1</source>
-        <translation type="unfinished"></translation>
+        <translation>máy tính để bàn %1</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/videowall_manage_widget_p.cpp" line="574"/>
         <source>Screen</source>
-        <translation type="unfinished"></translation>
+        <translation>màn</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/videowall_manage_widget_p.cpp" line="574"/>
         <source>Screen %1</source>
-        <translation type="unfinished"></translation>
+        <translation>màn %1</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/videowall_manage_widget_p.cpp" line="717"/>
         <source>New Item</source>
-        <translation type="unfinished"></translation>
+        <translation>mục mới</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/videowall_manage_widget_p.cpp" line="736"/>
         <source>Delete Screen</source>
-        <translation type="unfinished"></translation>
+        <translation>xóa màn hình</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/videowall_manage_widget_p.cpp" line="737"/>
         <source>Are you sure you want to delete %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn có chắc chắn muốn xóa %1?</translation>
     </message>
 </context>
 <context>
@@ -7857,13 +7916,13 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/graphics/items/resource/videowall_screen_widget.cpp" line="94"/>
         <source>Pc %1</source>
-        <translation type="unfinished"></translation>
+        <translation>PC %1</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/graphics/items/resource/videowall_screen_widget.cpp" line="104"/>
         <source>Pc %1 - Screens %2</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Pc %1 - Screens %2</numerusform>
         </translation>
     </message>
 </context>
@@ -7872,17 +7931,17 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/dialogs/videowall_settings_dialog.ui" line="14"/>
         <source>Video Wall Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>thiết lập bức tường video</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/videowall_settings_dialog.ui" line="20"/>
         <source>Start Video Wall when the Windows starts</source>
-        <translation type="unfinished"></translation>
+        <translation>start video wall when the Windows starts</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/videowall_settings_dialog.ui" line="27"/>
         <source>Shortcut on the desktop</source>
-        <translation type="unfinished"></translation>
+        <translation>shortcut trên desktop</translation>
     </message>
 </context>
 <context>
@@ -7943,12 +8002,12 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="841"/>
         <source>Can&apos;t move camera(s) to other server. Server %1 doesn&apos;t answer to request.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể di chuyển camera (s) đến máy chủ khác. Máy chủ %1 không trả lời yêu cầu.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="864"/>
         <source>Server %1 cannot discover these cameras so far. Are you sure you want to move them?</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy chủ %1 không thể phát hiện ra các máy ảnh cho đến nay. Bạn có chắc chắn bạn muốn di chuyển chúng?</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1018"/>
@@ -8033,22 +8092,22 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1642"/>
         <source>User already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation>Người dùng đã tồn tại.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1643"/>
         <source>Video Wall already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>bức tường video đã tồn tại</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1646"/>
         <source>User with the same name already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>Người sử dụng có cùng tên đã tồn tại</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1647"/>
         <source>Video Wall with the same name already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>bức tường video có cùng tên đã tồn tại</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1696"/>
@@ -8065,8 +8124,10 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
         <source>These %n cameras are auto-discovered.
 They may be auto-discovered again after removing.
 Are you sure you want to delete them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Những máy ảnh %n là tự động phát hiện.
+Họ có thể tự động phát hiện ra một lần nữa sau khi gỡ bỏ.
+Bạn có chắc chắn muốn xóa chúng?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -8074,8 +8135,10 @@ Are you sure you want to delete them?</source>
         <source>%n of these %1 cameras are auto-discovered.
 They may be auto-discovered again after removing.
 Are you sure you want to delete them?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n của các máy ảnh %1 là tự động phát hiện.
+Họ có thể tự động phát hiện ra một lần nữa sau khi gỡ bỏ.
+Bạn có chắc chắn muốn xóa chúng?</numerusform>
         </translation>
     </message>
     <message>
@@ -8086,8 +8149,8 @@ Are you sure you want to delete them?</source>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2196"/>
         <source>Could not save the following %n items.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Không thể lưu các mục %n sau.</numerusform>
         </translation>
     </message>
     <message>
@@ -8095,32 +8158,34 @@ Are you sure you want to delete them?</source>
         <source>An error has occurred while trying to delete a resource from Server. 
 
 Error description: &apos;%2&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Một lỗi đã xảy ra trong khi cố gắng để xóa một tài nguyên từ Server.
+
+Mô tả lỗi: &quot;%2&quot;</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2373"/>
         <source>Server v%1 at %2&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy chủ v%1 %2 tại &lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2375"/>
         <source>Server v%1&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy chủ v%1 &lt;br/&gt;</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2401"/>
         <source>Some components of the system are not updated:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please update all components to the latest version %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Một số thành phần của hệ thống không được cập nhật: &lt;br/&gt;&lt;br/&gt;%1 &lt;br/&gt; Vui lòng cập nhật tất cả các thành phần với phiên bản mới nhất %2.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2417"/>
         <source>Update...</source>
-        <translation type="unfinished"></translation>
+        <translation>Cập nhật ...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2427"/>
         <source>Beta version %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Phiên bản Beta %1</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1866"/>
@@ -8201,37 +8266,37 @@ Hãy đóng chương trình và bắt đầu từ danh sách các chương trìn
         <location filename="../src/ui/workbench/handlers/workbench_bookmarks_handler.cpp" line="136"/>
         <location filename="../src/ui/workbench/handlers/workbench_bookmarks_handler.cpp" line="163"/>
         <source>Error</source>
-        <translation type="unfinished">lỗi</translation>
+        <translation>lỗi</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_bookmarks_handler.cpp" line="104"/>
         <source>Bookmark can only be added to an online server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bookmark chỉ có thể được thêm vào một máy chủ trực tuyến.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_bookmarks_handler.cpp" line="110"/>
         <source>Bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>Bookmark</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_bookmarks_handler.cpp" line="137"/>
         <source>Bookmark can only be edited on an online server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bookmark chỉ có thể được chỉnh sửa trên một máy chủ trực tuyến.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_bookmarks_handler.cpp" line="164"/>
         <source>Bookmark can only be deleted from an online server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bookmark chỉ có thể bị xóa khỏi máy chủ trực tuyến.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_bookmarks_handler.cpp" line="169"/>
         <source>Confirm delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Xác nhận xóa</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_bookmarks_handler.cpp" line="170"/>
         <source>Are you sure you want to delete this bookmark %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn có chắc chắn muốn xóa bookmark này %1?</translation>
     </message>
 </context>
 <context>
@@ -8239,22 +8304,22 @@ Hãy đóng chương trình và bắt đầu từ danh sách các chương trìn
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_connect_handler.cpp" line="128"/>
         <source>Connect to Another Server...</source>
-        <translation type="unfinished">Kết nối đến các máy chủ khác...</translation>
+        <translation>Kết nối đến các máy chủ khác...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_connect_handler.cpp" line="186"/>
         <source>Could not connect to server. Closing in %1...</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể kết nối với máy chủ. Đóng trong%1 ...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_connect_handler.cpp" line="255"/>
         <source>Connecting...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kết nối ...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_connect_handler.cpp" line="356"/>
         <source>Connect to Server...</source>
-        <translation type="unfinished">Kết nối đến máy chủ...</translation>
+        <translation>Kết nối đến máy chủ...</translation>
     </message>
 </context>
 <context>
@@ -8273,7 +8338,7 @@ Hãy đóng chương trình và bắt đầu từ danh sách các chương trìn
     <message>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="607"/>
         <source>Recording in...%1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ghi trong ... %1</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="649"/>
@@ -8293,7 +8358,7 @@ Hãy đóng chương trình và bắt đầu từ danh sách các chương trìn
     <message>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="669"/>
         <source>Could not overwrite file &apos;%1&apos;. Please try another name.</source>
-        <translation>Không thể ghi đè lên tập tin &apos;%1&apos;, Hãy thử một tên khác</translation>
+        <translation>Không thể ghi đè lên tập tin &apos;%1&apos;, Hãy thử một tên khác.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="1434"/>
@@ -8408,17 +8473,17 @@ Bạn có chắc muốn tiếp tục không?</translation>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="282"/>
         <source>Timestamps:</source>
-        <translation>Dấu thời gian：</translation>
+        <translation>Dấu thời gian:</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="288"/>
         <source>Transcode video to guarantee WYSIWYG</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuyển mã video để đảm bảo WYSIWYG</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="488"/>
         <source>Current layout contains local files. Local files are not allowed for Multi-Video export.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bố trí hiện tại chứa các tập tin địa phương. File địa phương không được phép xuất khẩu Multi-Video.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="322"/>
@@ -8522,7 +8587,7 @@ Bạn có chắc chắn?</translation>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="673"/>
         <source>Export successfully finished.</source>
-        <translation>Xuất hiện thành công</translation>
+        <translation>Xuất hiện thành công.</translation>
     </message>
 </context>
 <context>
@@ -8534,59 +8599,61 @@ Bạn có chắc chắn?</translation>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="119"/>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="122"/>
         <source>Error</source>
-        <translation type="unfinished">lỗi</translation>
+        <translation>lỗi</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="32"/>
         <source>Please, wait before the previously requested servers will be added to your system.</source>
-        <translation type="unfinished"></translation>
+        <translation>Xin vui lòng chờ đợi trước khi các máy chủ yêu cầu trước đó sẽ được bổ sung vào hệ thống của bạn.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="57"/>
         <source>Enter Password...</source>
-        <translation type="unfinished"></translation>
+        <translation>Nhập mật khẩu ...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="58"/>
         <source>Administrator Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Mật khẩu quản trị viên</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="68"/>
         <source>Password cannot be empty!</source>
-        <translation type="unfinished"></translation>
+        <translation>Mật khẩu không thể để trống!</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="78"/>
         <source>Connecting to the current system...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kết nối với các hệ thống hiện tại ...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="107"/>
         <source>Information</source>
-        <translation type="unfinished">tin tức</translation>
+        <translation>tin tức</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="107"/>
         <source>The selected servers has been successfully connected to your system!</source>
-        <translation type="unfinished"></translation>
+        <translation>Các máy chủ đã chọn đã được kết nối thành công với hệ thống của bạn!</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="110"/>
         <source>Authentification failed.
 Please, check the password you have entered.</source>
-        <translation type="unfinished"></translation>
+        <translation>Xác thực thất bại.
+Xin vui lòng kiểm tra mật khẩu bạn đã nhập.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="119"/>
         <source>Could not configure the selected servers.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể cấu hình các máy chủ đã chọn.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="122"/>
         <source>Could not update the selected servers.
 You can try to update the servers again in the System Administration.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể cập nhật các máy chủ đã chọn.
+Bạn có thể cố gắng cập nhật các máy chủ một lần nữa trong Quản trị hệ thống.</translation>
     </message>
 </context>
 <context>
@@ -8621,7 +8688,7 @@ You can try to update the servers again in the System Administration.</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="295"/>
         <source>Layout with the same name already exists. Do you want to overwrite it?</source>
-        <translation>Cùng tên đã tồn tại trong cách bố trí, bạn có chắc muốn ghi đè lên nó.</translation>
+        <translation>Cùng tên đã tồn tại trong cách bố trí, bạn có chắc muốn ghi đè lên nó?</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="362"/>
@@ -8680,8 +8747,8 @@ You can try to update the servers again in the System Administration.</source>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_layouts_handler.cpp" line="630"/>
         <source>Could not save the following %n layout(s) to Server.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Không thể lưu các layout %n sau đây (s) để Server.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -8822,7 +8889,7 @@ Xin vui lòng chờ camera trên đường dây.</translation>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="401"/>
         <source>Timestamp:</source>
-        <translation>Dấu thời gian：</translation>
+        <translation>Dấu thời gian:</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="427"/>
@@ -8847,12 +8914,12 @@ Xin vui lòng chờ camera trên đường dây.</translation>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="517"/>
         <source>Saving Screenshot...</source>
-        <translation type="unfinished"></translation>
+        <translation>Lưu ảnh chụp màn hình ...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="600"/>
         <source>Saving %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Tiết kiệm %1</translation>
     </message>
 </context>
 <context>
@@ -8860,44 +8927,44 @@ Xin vui lòng chờ camera trên đường dây.</translation>
     <message>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="70"/>
         <source>Newer version is available</source>
-        <translation type="unfinished"></translation>
+        <translation>Phiên bản mới hơn có sẵn</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="71"/>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="76"/>
         <source>New version &lt;b&gt;%1&lt;/b&gt; is available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Phiên bản mới &lt;b&gt;%1&lt;/b&gt; có sẵn.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="73"/>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="82"/>
         <source>Would you like to update?</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn có muốn cập nhật?</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="75"/>
         <source>Update is recommended</source>
-        <translation type="unfinished"></translation>
+        <translation>Cập nhật được khuyến cáo</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="78"/>
         <source>Major issues have been fixed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Các vấn đề chính đã được cố định.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="80"/>
         <source>Update is strongly recommended.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cập nhật được khuyến khích mạnh mẽ.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="89"/>
         <source>Don&apos;t notify again about this update.</source>
-        <translation type="unfinished">Không có thông báo về bản cập nhật này.</translation>
+        <translation>Không có thông báo về bản cập nhật này.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="94"/>
         <source>Release Notes</source>
-        <translation type="unfinished"></translation>
+        <translation>ghi chú Phát hành</translation>
     </message>
 </context>
 <context>
@@ -8906,14 +8973,15 @@ Xin vui lòng chờ camera trên đường dây.</translation>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="328"/>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="919"/>
         <source>Control session is already running</source>
-        <translation type="unfinished"></translation>
+        <translation>Phiên điều khiển đã chạy</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="329"/>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="920"/>
         <source>Could not start control session.
 Another user is already controlling this screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể bắt đầu phiên điều khiển.
+Một người dùng khác đã được kiểm soát màn hình này.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="420"/>
@@ -8921,156 +8989,157 @@ Another user is already controlling this screen.</source>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="507"/>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1256"/>
         <source>Error</source>
-        <translation type="unfinished">lỗi</translation>
+        <translation>lỗi</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="420"/>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="460"/>
         <source>Unexpected error has occurred. Changes cannot be saved.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lỗi không mong muốn đã xảy ra. Thay đổi không thể được cứu.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="508"/>
         <source>There are no offline videowall items attached to this pc.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không có mục videowall ẩn gắn liền với máy tính này.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="515"/>
         <source>Switch to Video Wall Mode...</source>
-        <translation type="unfinished"></translation>
+        <translation>Chuyển sang chế độ tường video ...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="516"/>
         <source>Video Wall will be started now. Do you want to close this %1 Client instance?</source>
-        <translation type="unfinished"></translation>
+        <translation>tường video sẽ được bắt đầu ngay bây giờ. Bạn có muốn đóng %1 Khách hàng dụ này?</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="901"/>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1203"/>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="2602"/>
         <source>More licenses required</source>
-        <translation type="unfinished"></translation>
+        <translation>Nhiều giấy phép cần thiết</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="902"/>
         <source>To enable the feature please activate at least one Video Wall license.</source>
-        <translation type="unfinished"></translation>
+        <translation>Để kích hoạt tính năng xin vui lòng kích hoạt ít nhất một giấy phép Video Wall.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="907"/>
         <source>Could not start Video Wall control session.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể bắt đầu video phiên điều khiển tường.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1165"/>
         <source>%1 (%2)</source>
-        <translation type="unfinished">%1 (%2</translation>
+        <translation>%1 (%2)</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1170"/>
         <source>New layout</source>
-        <translation type="unfinished">việc bố trí mới</translation>
+        <translation>việc bố trí mới</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1170"/>
         <source>New layout %1</source>
-        <translation type="unfinished"></translation>
+        <translation>New bố trí %1</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1204"/>
         <source>To enable the feature please activate at least one Video Wall license</source>
-        <translation type="unfinished"></translation>
+        <translation>Để kích hoạt tính năng xin vui lòng kích hoạt ít nhất một giấy phép bức tường video</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1213"/>
         <source>Video Wall</source>
-        <translation type="unfinished"></translation>
+        <translation>bức tường video</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1213"/>
         <source>Video Wall %1</source>
-        <translation type="unfinished"></translation>
+        <translation>bức tường video %1</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1216"/>
         <source>New Video Wall...</source>
-        <translation type="unfinished"></translation>
+        <translation>tường video mới...</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1217"/>
         <source>Enter the name of the Video Wall to create:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nhập tên của bức tường video để tạo ra:</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1232"/>
         <source>Video Wall already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>bức tường video đã tồn tại</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1233"/>
         <source>Video Wall with the same name already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>bức tường video có cùng tên đã tồn tại</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1257"/>
         <source>Could not save the following %n items to Server.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Không thể lưu các mục %n sau để Server.</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1328"/>
         <source>Delete Items</source>
-        <translation type="unfinished"></translation>
+        <translation>xóa mục</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1329"/>
         <source>Are you sure you want to permanently delete these %n item(s)?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Bạn có chắc chắn muốn xóa vĩnh viễn các %n item (s)?</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1351"/>
         <source>Could not start Video Wall.</source>
-        <translation type="unfinished"></translation>
+        <translation>Không thể bắt đầu tường video.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1363"/>
         <source>Confirm Video Wall stop</source>
-        <translation type="unfinished"></translation>
+        <translation>Xác nhận hình tường stop</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1364"/>
         <source>Are you sure you want to stop the Video Wall?
 You&apos;ll have to start it manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn có chắc chắn muốn dừng tường video?
+Bạn sẽ phải bắt đầu nó bằng tay.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1674"/>
         <source>New Matrix %1</source>
-        <translation type="unfinished"></translation>
+        <translation>mới ma trận %1</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1685"/>
         <source>Invalid matrix</source>
-        <translation type="unfinished"></translation>
+        <translation>ma trận không hợp lệ</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1686"/>
         <source>You have no layouts on the screens. Matrix cannot be saved.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn không có bố trí trên màn hình. Matrix không thể lưu.</translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1755"/>
         <source>Delete Matrices</source>
-        <translation type="unfinished"></translation>
+        <translation>xóa ma trận</translation>
     </message>
     <message numerus="yes">
         <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1756"/>
         <source>Are you sure you want to permanently delete these %n matrices?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Bạn có chắc chắn muốn xóa vĩnh viễn các ma trận %n?</numerusform>
         </translation>
     </message>
 </context>
@@ -9079,12 +9148,12 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/dialogs/reconnect_info_dialog.ui" line="17"/>
         <source>Reconnecting...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kết nối lại ...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/reconnect_info_dialog.ui" line="26"/>
         <source>Please wait while connection is being restored...</source>
-        <translation type="unfinished"></translation>
+        <translation>Xin vui lòng chờ trong khi kết nối đang được phục hồi ...</translation>
     </message>
 </context>
 <context>
@@ -9092,7 +9161,7 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/widgets/business/recording_business_action_widget.ui" line="32"/>
         <source>Quality:</source>
-        <translation>hình ảnh：</translation>
+        <translation>hình ảnh:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/recording_business_action_widget.ui" line="52"/>
@@ -9286,7 +9355,7 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/dialogs/resource_list_dialog.ui" line="59"/>
         <source>Never suggest saving layouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Không bao giờ đề nghị bố trí tiết kiệm</translation>
     </message>
 </context>
 <context>
@@ -9294,7 +9363,7 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/widgets/business/say_text_business_action_widget.ui" line="34"/>
         <source>Speak the following:</source>
-        <translation>Cho biết sau：</translation>
+        <translation>Cho biết sau:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/business/say_text_business_action_widget.ui" line="41"/>
@@ -9360,17 +9429,17 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="88"/>
         <source>Failover</source>
-        <translation type="unfinished"></translation>
+        <translation>Sao lưu</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="97"/>
         <source>Enable failover (server will take cameras automatically from offline servers)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kích hoạt tính năng chuyển đổi dự phòng (máy chủ sẽ đưa máy ảnh tự động từ máy chủ ẩn)</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="122"/>
         <source>Max. cameras on this server:</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy ảnh tối đa trên máy chủ này:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="164"/>
@@ -9395,17 +9464,17 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="216"/>
         <source>Login</source>
-        <translation type="unfinished"></translation>
+        <translation>đăng nhập</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="221"/>
         <source>Password</source>
-        <translation type="unfinished">mật khẩu</translation>
+        <translation>mật khẩu</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="226"/>
         <source>Space</source>
-        <translation type="unfinished">Spacebar</translation>
+        <translation>không gian</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/server_settings_dialog.ui" line="237"/>
@@ -9476,12 +9545,12 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="209"/>
         <source>Image Control</source>
-        <translation type="unfinished"></translation>
+        <translation>kiểm soát hình ảnh</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="246"/>
         <source>Default rotation:</source>
-        <translation type="unfinished"></translation>
+        <translation>Mặc định quay:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="280"/>
@@ -9501,7 +9570,7 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="422"/>
         <source>Software (Max FPS may be slightly decreased on Server)</source>
-        <translation type="unfinished"></translation>
+        <translation>Phần mềm (Maximum FPS có thể được giảm nhẹ trên máy chủ)</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="73"/>
@@ -9551,7 +9620,7 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="215"/>
         <source>Force aspect ratio to:</source>
-        <translation type="unfinished">Tỷ lệ màn hình Buộc：</translation>
+        <translation>Tỷ lệ màn hình Buộc:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui" line="323"/>
@@ -9654,12 +9723,12 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="20"/>
         <source>Outgoing Email Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Cài đặt email gửi đi</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="99"/>
         <source>&amp;Email:</source>
-        <translation type="unfinished">&amp;Email:</translation>
+        <translation>&amp;Email:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="112"/>
@@ -9683,7 +9752,7 @@ You&apos;ll have to start it manually.</source>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="146"/>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="348"/>
         <source>Support Signature:</source>
-        <translation type="unfinished"></translation>
+        <translation>Chữ ký hỗ trợ:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="199"/>
@@ -9698,7 +9767,7 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="242"/>
         <source>Email:</source>
-        <translation type="unfinished"></translation>
+        <translation>Email:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/smtp_settings_widget.ui" line="256"/>
@@ -9800,12 +9869,12 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/dialogs/storage_url_dialog.ui" line="59"/>
         <source>Login:</source>
-        <translation type="unfinished">Đăng nhập:</translation>
+        <translation>Đăng nhập:</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/storage_url_dialog.ui" line="72"/>
         <source>Password:</source>
-        <translation type="unfinished">mật khẩu:</translation>
+        <translation>mật khẩu:</translation>
     </message>
 </context>
 <context>
@@ -9813,17 +9882,17 @@ You&apos;ll have to start it manually.</source>
     <message>
         <location filename="../src/ui/widgets/settings/time_server_selection_widget.ui" line="25"/>
         <source>Current system time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Thời gian hiện tại:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/time_server_selection_widget.ui" line="38"/>
         <source>Synchronizing...</source>
-        <translation type="unfinished"></translation>
+        <translation>Đồng bộ hóa ...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/time_server_selection_widget.ui" line="54"/>
         <source>Choose the server which is going to be used as a time server if the system has no internet access:</source>
-        <translation type="unfinished"></translation>
+        <translation>Chọn máy chủ đó sẽ được sử dụng như một máy chủ thời gian nếu hệ thống không có truy cập Internet:</translation>
     </message>
 </context>
 <context>

@@ -10,7 +10,9 @@ int QnRestartRestHandler::executeGet(const QString &path, const QnRequestParams 
     Q_UNUSED(path)
     Q_UNUSED(params)
 
-    restartServer(500);
+    // TODO: #dklychkov refactor this to use a timeout.
+    // We can't just write timeout here because this thread doesn't have an event loop.
+    restartServer(0);
 
     result.setError(QnJsonRestResult::NoError);
 

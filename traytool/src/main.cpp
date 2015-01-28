@@ -9,6 +9,8 @@
 #include "systraywindow.h"
 #include <translation/translation_manager.h>
 
+#include <utils/serialization/json_functions.h>
+
 void initTranslations() {
     static const QString clientName(QString(lit(QN_ORGANIZATION_NAME)) + lit(" ") + lit(QN_PRODUCT_NAME) + lit(" Client"));
 
@@ -18,8 +20,22 @@ void initTranslations() {
     QScopedPointer<QnTranslationManager> translationManager(new QnTranslationManager());
     translationManager->addPrefix(lit("traytool"));
 
+    QString defaultTranslation;
+
+    /* Load from internal resource. */
+    QFile file(lit(":/globals.json"));
+    if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QJsonObject jsonObject;
+        if(!QJson::deserialize(file.readAll(), &jsonObject)) {
+            Q_ASSERT_X(false, Q_FUNC_INFO, "Settings file could not be parsed!");
+        } else {
+            QJsonObject settingsObject = jsonObject.value(lit("settings")).toObject();
+            defaultTranslation = settingsObject.value(lit("translationPath")).toString();
+        }
+    }   
+
     QSettings clientSettings(QSettings::UserScope, qApp->organizationName(), clientName);
-    QString translationPath = clientSettings.value(lit("translationPath")).toString();
+    QString translationPath = clientSettings.value(lit("translationPath"), defaultTranslation).toString();
     QnTranslation translation = translationManager->loadTranslation(translationPath);
     QnTranslationManager::installTranslation(translation);
 }

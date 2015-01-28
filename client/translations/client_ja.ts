@@ -2804,7 +2804,7 @@ Built for %5-%6 with %7.&lt;br/&gt;</translation>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1376"/>
         <source>Connect to the Current System...</source>
-        <translation>システムに接続...</translation>
+        <translation>接続しているシステムに統合 ...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1387"/>

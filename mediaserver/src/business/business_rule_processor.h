@@ -139,6 +139,8 @@ private slots:
     void at_businessRuleDeleted(QnUuid id);
     void at_businessRuleReset(const QnBusinessEventRuleList& rules);
 
+    void toggleInputPortMonitoring(const QnResourcePtr& resource, bool toggle);
+
     void at_timer();
 
 

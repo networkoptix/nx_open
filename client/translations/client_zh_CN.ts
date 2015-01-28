@@ -2744,7 +2744,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1376"/>
         <source>Connect to the Current System...</source>
-        <translation>连接到当前系统...</translation>
+        <translation>联网到当前已连接的系统...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1413"/>

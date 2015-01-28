@@ -13,6 +13,7 @@ namespace ec2
 
 const QString QnMutexCameraDataHandler::CAM_INS_PREFIX(lit("CAMERA_INS_"));
 const QString QnMutexCameraDataHandler::CAM_UPD_PREFIX(lit("CAMERA_UPD_"));
+const QString QnMutexCameraDataHandler::CAM_HISTORY_PREFIX(lit("CAMERA_HISTORY_"));
 
 
 QByteArray QnMutexCameraDataHandler::getUserData(const QString& name)
@@ -53,6 +54,14 @@ QByteArray QnMutexCameraDataHandler::getUserData(const QString& name)
                 return qnCommon->moduleGUID().toRfc4122(); // block
             QnResourcePtr mServer = qnResPool->getResourceById(camRes->getParentId());
             if (mServer && mServer->getStatus() == Qn::Online)
+                return qnCommon->moduleGUID().toRfc4122(); // block
+        }
+    }
+    else if (name.startsWith(CAM_HISTORY_PREFIX))
+    {
+        QnSecurityCamResourcePtr camRes = qnResPool->getNetResourceByPhysicalId(name.mid(CAM_HISTORY_PREFIX.length())).dynamicCast<QnSecurityCamResource>();
+        if (camRes) {
+            if (camRes->getParentId() == qnCommon->moduleGUID())
                 return qnCommon->moduleGUID().toRfc4122(); // block
         }
     }

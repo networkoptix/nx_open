@@ -355,7 +355,6 @@ bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
         if (!isPeerExist) 
         {
             NX_LOG( QnLog::EC2_TRAN_LOG, lit("emit peerFound. id=%1").arg(aliveData.peer.id.toString()), cl_logDEBUG1);
-            QMutexLocker lk( &m_signalEmitMutex );
             emit peerFound(aliveData);
         }
     }
@@ -973,7 +972,6 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
         NX_LOG( QnLog::EC2_TRAN_LOG, lit("emit peerLost. id=%1").arg(aliveData.peer.id.toString()), cl_logDEBUG1);
     }
 
-    QMutexLocker lk( &m_signalEmitMutex );
     if (isAlive)
         emit peerFound(aliveData);
     else
@@ -1152,7 +1150,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
             QnTransactionTransport* transport = new QnTransactionTransport(m_localPeer);
             connect(transport, &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
             connect(transport, &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);
-            connect(transport, &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::emitRemotePeerUnauthorized,  Qt::DirectConnection);
+            connect(transport, &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::emitRemotePeerUnauthorized,  Qt::QueuedConnection);
             connect(transport, &QnTransactionTransport::peerIdDiscovered, this, &QnTransactionMessageBus::at_peerIdDiscovered,  Qt::QueuedConnection);
             transport->doOutgoingConnect(url);
             m_connectingConnections << transport;
@@ -1345,8 +1343,9 @@ void QnTransactionMessageBus::at_runtimeDataUpdated(const QnTransaction<ApiRunti
 
 void QnTransactionMessageBus::emitRemotePeerUnauthorized(const QnUuid& id)
 {
-    QMutexLocker lk( &m_signalEmitMutex );
-    emit remotePeerUnauthorized( id );
+    QMutexLocker lock(&m_mutex);
+    if (!m_alivePeers.contains(id))
+        emit remotePeerUnauthorized( id );
 }
 
 void QnTransactionMessageBus::setHandler(ECConnectionNotificationManager* handler) {

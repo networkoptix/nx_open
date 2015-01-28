@@ -505,6 +505,7 @@ namespace ec2
         bool removeServerStatusFromTransactionLog();
         bool tuneDBAfterOpen();
         bool updateCameraHistoryGuids();
+        bool migrateServerGUID(const QString& table, const QString& field);
     private:
         QnResourceFactory* m_resourceFactory;
         QnUuid m_storageTypeId;

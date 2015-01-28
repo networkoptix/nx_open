@@ -10,6 +10,7 @@ angular.module('webadminApp')
                     return;
                 }
                 function updateValidity(){
+                    console.log("updateValidity",model.$viewValue,scope.$eval(attrs.nxEqualEx));
                     // Only compare values if the second ctrl has a value.
                     if (model.$viewValue !== undefined && model.$viewValue !== '') {
                         model.$setValidity('nxEqualEx', scope.$eval(attrs.nxEqualEx) === model.$viewValue);
@@ -26,7 +27,9 @@ angular.module('webadminApp')
                     }
                     var isValid = value === scope.$eval(attrs.nxEqualEx);
                     model.$setValidity('nxEqualEx', isValid);
-                    return isValid ? value : undefined;
+
+                    //We pretend, that parser is succeed always - in order to fix #4419
+                    return value; // isValid ? value : undefined;
                 });
             }
         };
