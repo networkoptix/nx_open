@@ -2,42 +2,37 @@ function makeUrl(address, port, user, password) {
     return "http://" + user + ":" + password + "@" + address + ":" + port
 }
 
-function connectToServer() {
-    saveCurrentSession()
-    connectionManager.connectToServer(makeUrl(address.text, port.text, login.text, password.text))
+function connectToServer(_address, _port, _user, _password) {
+    connectionManager.connectToServer(makeUrl(_address, _port, _user, _password))
 }
 
-function updateUi(modelData) {
-    if (modelData) {
-        name.text = modelData.name
-        address.text = modelData.address
-        port.text = modelData.port
-        login.text = modelData.login
-        password.text = modelData.password
-    } else {
-        name.text = ""
-        address.text = ""
-        port.text = "7001"
-        login.text = ""
-        password.text = ""
-    }
+function editSession(_systemName, _address, _port, _user, _password) {
+    systemNameLabel.text = _systemName
+    address.text = _address
+    port.text = _port
+    login.text = _user ? _user : "admin"
+    password.text = _password
+
+    login.forceActiveFocus()
+}
+
+function newSession() {
+    systemNameLabel.text = qsTr("New session")
+    address.text = ""
+    port.text = 7001
+    login.text = "admin"
+    password.text = ""
+
+    address.forceActiveFocus()
 }
 
 function saveCurrentSession() {
-    settings.saveSession({
-        name: name.text,
-        address: address.text,
-        port: port.text,
-        login: login.text,
-        password: password.text
-    }, __currentIndex)
-    savedSessionsList.model = settings.savedSessions()
-    __currentIndex = 0
+    sessionsModel.updateSession(address.text, port.text, login.text, password.text, systemNameLabel.text)
 }
 
-function select(index) {
-    if (savedSessionsList.selection.indexOf(index) == -1) {
-        savedSessionsList.selection = savedSessionsList.selection.concat([index])
+function select(id) {
+    if (savedSessionsList.selection.indexOf(id) == -1) {
+        savedSessionsList.selection.push(id)
         titleBar.state = "SELECT"
     }
 }
@@ -46,15 +41,14 @@ function clearSelection() {
     savedSessionsList.selection = []
 }
 
-function isSelected(index) {
-    return savedSessionsList.selection.indexOf(index) != -1
+function isSelected(id) {
+    return savedSessionsList.selection.indexOf(id) != -1
 }
 
 function deleteSelected() {
-    var selection = savedSessionsList.selection.sort()
+    var selection = savedSessionsList.selection
     savedSessionsList.selection = []
     for (var i = selection.length - 1; i >= 0; i--)
-        settings.removeSession(selection[i])
-    savedSessionsList.model = settings.savedSessions()
+        sessionsModel.deleteSession(selection[i])
     titleBar.state = "HIDDEN"
 }

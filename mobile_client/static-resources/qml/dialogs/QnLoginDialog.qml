@@ -13,12 +13,11 @@ import "../common_functions.js" as CommonFunctions
 FocusScope {
     id: loginDialog
 
+    property string __currentId
+
     property var __syspal: SystemPalette {
         colorGroup: SystemPalette.Active
     }
-
-    property int __currentIndex: -1
-    property bool __animated: false
 
     QnContextSettings {
         id: settings
@@ -59,6 +58,7 @@ FocusScope {
 
             onClicked: {
                 loginDialog.state = "CHOOSE"
+                __currentId = ""
             }
         }
 
@@ -87,17 +87,23 @@ FocusScope {
 
             icon: "/images/delete.png"
 
-//            visible: savedSessionsList.selection.length || __currentIndex < savedSessionsList.count
-
             onClicked: {
                 if (loginDialog.state == "CHOOSE") {
                     LoginDialogFunctions.deleteSelected()
                 } else {
-                    settings.removeSession(__currentIndex)
-                    savedSessionsList.model = settings.savedSessions()
+                    sessionsModel.deleteSession(__currentId)
                     loginDialog.state = "CHOOSE"
                 }
             }
+        }
+
+        Text {
+            id: systemNameLabel
+            anchors.verticalCenter: parent.verticalCenter
+            color: "white"
+            font.pixelSize: CommonFunctions.sp(20)
+            font.weight: Font.DemiBold
+            x: CommonFunctions.dp(72)
         }
 
         states: [
@@ -106,6 +112,7 @@ FocusScope {
                 PropertyChanges {
                     target: deleteButton
                     __clipped: true
+                    visible: false
                 }
                 PropertyChanges {
                     target: backButton
@@ -121,6 +128,7 @@ FocusScope {
                 PropertyChanges {
                     target: deleteButton
                     __clipped: false
+                    visible: true
                 }
                 PropertyChanges {
                     target: backButton
@@ -138,6 +146,7 @@ FocusScope {
                 PropertyChanges {
                     target: deleteButton
                     __clipped: false
+                    visible: __currentId
                 }
                 PropertyChanges {
                     target: backButton
@@ -187,7 +196,7 @@ FocusScope {
         ListView {
             id: savedSessionsList
 
-//            property var selection: []
+            property var selection: []
 
             model: sessionsModel
 
@@ -197,52 +206,113 @@ FocusScope {
 
             onCountChanged: console.log(count)
 
+            section.property: "section"
+            section.criteria: ViewSection.FullString
+            section.labelPositioning: ViewSection.CurrentLabelAtStart | ViewSection.InlineLabels
+
+            section.delegate: Item {
+                height: CommonFunctions.dp(48)
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.pixelSize: CommonFunctions.sp(16)
+                    renderType: Text.NativeRendering
+                    opacity: 0.7
+                    x: CommonFunctions.dp(16)
+
+                    text: section
+                }
+            }
+
             delegate: Item {
                 id: sessionItem
 
-                width: savedSessionsList.width
+                property bool selected: LoginDialogFunctions.isSelected(sessionId)
+
+                width: contentItem.width
                 height: CommonFunctions.dp(72)
 
                 Rectangle {
+                    id: highlight
                     anchors.fill: parent
 
-//                    color: savedSessionsList.selection.indexOf(index) != -1 ? "#4a4a4a" : "#2d2d2d"
-                    color: "white"
+                    color: Qt.rgba(0, 0, 0, 0.12)
+                    visible: selected
                 }
 
                 Text {
-                    id: label
-                    x: CommonFunctions.dp(8)
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: systemName
+                    id: body1
+                    x: CommonFunctions.dp(72)
+                    y: CommonFunctions.dp(36) - height
+                    font.pixelSize: CommonFunctions.sp(14)
+                    font.weight: Font.DemiBold
                     renderType: Text.NativeRendering
-                    color: __syspal.windowText
+                    opacity: 0.87
+
+                    text: systemName ? systemName : qsTr("<UNKNOWN>")
                 }
 
-//                MouseArea {
-//                    anchors.fill: parent
-//                    onClicked: {
-//                        if (savedSessionsList.selection.length) {
-//                            LoginDialogFunctions.select(index)
-//                        } else {
-//                            __currentIndex = index
-//                            LoginDialogFunctions.updateUi(modelData)
-//                            loginDialog.state = "EDIT"
-//                        }
-//                    }
-//                    onPressAndHold: LoginDialogFunctions.select(index)
-//                }
+                Text {
+                    id: caption
+                    x: CommonFunctions.dp(72)
+                    y: body1.y + CommonFunctions.sp(20)
+                    font.pixelSize: CommonFunctions.sp(12)
+                    renderType: Text.NativeRendering
+                    opacity: 0.7
+
+                    text: {
+                        if (user)
+                            return user + '@' + address + ':' + port
+                        else
+                            address + ':' + port
+                    }
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        if (savedSessionsList.selection.length) {
+                            LoginDialogFunctions.select(sessionId)
+                        } else {
+                            if (user) {
+                                LoginDialogFunctions.connectToServer(address, port, user, password)
+                            } else {
+                                LoginDialogFunctions.editSession(systemName, address, port, user, password)
+                                loginDialog.state = "EDIT"
+                            }
+                        }
+                    }
+                    onPressAndHold: {
+                        if (user)
+                            LoginDialogFunctions.select(sessionId)
+                    }
+                }
+
+                QnIconButton {
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.right: parent.right
+                    anchors.rightMargin: CommonFunctions.dp(16)
+                    icon: "/images/icons/edit_black.png"
+                    opacity: 0.7
+                    size: CommonFunctions.dp(48)
+
+                    visible: user
+
+                    onClicked: {
+                        LoginDialogFunctions.editSession(systemName, address, port, user, password)
+                        __currentId = sessionId
+                        loginDialog.state = "EDIT"
+                    }
+                }
             }
         }
     }
 
     Item {
-        id: newSession
+        id: sessionEditor
 
         anchors {
             top: titleBar.bottom
-            bottom: fab.top
-            bottomMargin: CommonFunctions.dp(32)
+            bottom: parent.bottom
             left: savedSessions.right
         }
         width: parent.width
@@ -250,38 +320,35 @@ FocusScope {
         Column {
             id: fieldsColumn
 
-            anchors.centerIn: parent
-            width: parent.width * 2 / 3
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.margins: CommonFunctions.dp(16)
             spacing: CommonFunctions.dp(8)
 
-            QnTextField {
-                id: name
-                placeholderText: qsTr("Session name")
-                width: parent.width
-                onAccepted: address.focus = true
+            Text {
+                text: qsTr("Address")
+                font.pixelSize: CommonFunctions.sp(12)
+                opacity: 0.7
             }
 
             QnTextField {
                 id: address
-                placeholderText: qsTr("Server address")
+                placeholderText: "127.0.0.1"
                 width: parent.width
                 onAccepted: port.focus = true
             }
 
+            Text {
+                text: qsTr("Port")
+                font.pixelSize: CommonFunctions.sp(12)
+                opacity: 0.7
+            }
+
             QnTextField {
                 id: port
-                leftPadding: portLabel.width + CommonFunctions.dp(8)
                 width: parent.width
                 inputMethodHints: Qt.ImhDigitsOnly
-
-                Text {
-                    id: portLabel
-                    anchors.verticalCenter: parent.verticalCenter
-                    x: port.textPadding
-                    text: qsTr("Port")
-                    color: colorTheme.color("inputPlaceholderText")
-                    renderType: Text.NativeRendering
-                }
 
                 validator: IntValidator {
                     bottom: 1
@@ -292,17 +359,29 @@ FocusScope {
                 onAccepted: login.focus = true
             }
 
+            Text {
+                text: qsTr("User name")
+                font.pixelSize: CommonFunctions.sp(12)
+                opacity: 0.7
+            }
+
             QnTextField {
                 id: login
-                placeholderText: qsTr("User name")
+                placeholderText: "admin"
                 width: parent.width
                 inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText
                 onAccepted: password.focus = true
             }
 
+            Text {
+                text: qsTr("Password")
+                font.pixelSize: CommonFunctions.sp(12)
+                opacity: 0.7
+            }
+
             QnTextField {
                 id: password
-                placeholderText: qsTr("Password")
+                placeholderText: "*******"
                 echoMode: TextInput.Password
                 width: parent.width
                 onAccepted: LoginDialogFunctions.connectToServer()
@@ -333,9 +412,8 @@ FocusScope {
             icon: "/images/plus.png"
 
             onClicked: {
-                LoginDialogFunctions.updateUi(null)
-                __currentIndex = savedSessionsList.count
                 LoginDialogFunctions.clearSelection()
+                LoginDialogFunctions.newSession()
                 loginDialog.state = "EDIT"
             }
         }
@@ -350,7 +428,7 @@ FocusScope {
 
             Behavior on opacity { NumberAnimation { duration: 200 } }
 
-            onClicked: LoginDialogFunctions.connectToServer()
+            onClicked: LoginDialogFunctions.connectToServer(address.text, port.text, login.text, password.text)
         }
 
         Behavior on rotation {
@@ -394,43 +472,23 @@ FocusScope {
             }
         }
     ]
+    state: "CHOOSE"
 
-    transitions: [
-        Transition {
-            from: "CHOOSE"
-            to: "EDIT"
-            enabled: __animated
-            NumberAnimation {
-                target: savedSessions
-                property: "x"
-                easing.type: Easing.OutQuad
-                duration: 200
-            }
-        },
-        Transition {
-            from: "EDIT"
-            to: "CHOOSE"
-            enabled: __animated
-            NumberAnimation {
-                target: savedSessions
-                property: "x"
-                easing.type: Easing.OutQuad
-                duration: 200
-            }
+    transitions: Transition {
+        NumberAnimation {
+            target: savedSessions
+            property: "x"
+            easing.type: Easing.OutQuad
+            duration: 200
         }
-    ]
+    }
 
     Keys.onReleased: {
-        if (event.key == Qt.Key_Back) {
+        if (event.key === Qt.Key_Back) {
             if (loginDialog.state == "CHOOSE")
                 Qt.quit()
             else
                 loginDialog.state = "CHOOSE"
         }
-    }
-
-    Component.onCompleted: {
-        state = savedSessionsList.count > 0 ? "CHOOSE" : "EDIT"
-        __animated = true
     }
 }

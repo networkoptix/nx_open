@@ -15,10 +15,18 @@ FocusScope {
     property int leftPadding
     property int rightPadding
 
-    property int textPadding: textInput.contentHeight / 3
+    property int textPadding: 0
+
+    property color inactiveColor: Qt.rgba(0, 0, 0, 0.3)
+    property color activeColor: __syspal.button
+    property alias textColor: textInput.color
 
     signal accepted()
     signal editingFinished()
+
+    property var __syspal: SystemPalette {
+        colorGroup: SystemPalette.Active
+    }
 
     implicitWidth: Math.round(textInput.contentHeight * 8)
     implicitHeight: Math.max(25, Math.round(textInput.contentHeight * 1.2))
@@ -33,7 +41,7 @@ FocusScope {
         y: parent.height
         border.width: 0
         height: textInput.activeFocus ? CommonFunctions.dp(2) : CommonFunctions.dp(1)
-        color: textInput.activeFocus ? colorTheme.color("inputBorderActive") : colorTheme.color("inputBorder")
+        color: textInput.activeFocus ? activeColor : inactiveColor
     }
 
     Item {
@@ -76,7 +84,6 @@ FocusScope {
                 Keys.forwardTo: textField
                 autoScroll: false
 
-                color: colorTheme.color("inputText")
                 renderType: TextInput.NativeRendering
 
                 onAccepted: {
@@ -110,7 +117,7 @@ FocusScope {
             clip: contentWidth > width;
             elide: Text.ElideRight
             Behavior on opacity { NumberAnimation { duration: 90 } }
-            color: colorTheme.color("inputPlaceholderText")
+            color: inactiveColor
             renderType: Text.NativeRendering
         }
     }
