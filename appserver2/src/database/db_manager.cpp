@@ -291,9 +291,6 @@ bool removeFile(const QString& fileName)
 bool QnDbManager::migrateServerGUID(const QString& table, const QString& field)
 {
     QSqlQuery updateGuidQuery( m_sdb );
-    QString ggg = lit("UPDATE %1 SET %2=? WHERE %2=?").arg(table).arg(field);
-    QByteArray oldG = qnCommon->moduleGUID().toByteArray();
-    QByteArray newG = qnCommon->obsoleteServerGuid().toByteArray();
     updateGuidQuery.prepare(lit("UPDATE %1 SET %2=? WHERE %2=?").arg(table).arg(field) );
     updateGuidQuery.addBindValue( qnCommon->moduleGUID().toRfc4122() );
     updateGuidQuery.addBindValue( qnCommon->obsoleteServerGuid().toRfc4122() );
