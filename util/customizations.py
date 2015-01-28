@@ -8,8 +8,9 @@ from itertools import combinations
 class Project:
     COMMON = 'common'
     CLIENT = 'client'
+    ICONS = 'icons'
     INTRO = ["intro.mkv", "intro.avi", "intro.png", "intro.jpg", "intro.jpeg"]
-    ALL = [COMMON, CLIENT]
+    ALL = [COMMON, CLIENT, ICONS]
 
 class Suffixes:
     HOVERED = '_hovered'
@@ -261,6 +262,8 @@ def parseFile(path):
 
 def parseSources(dir):
     result = []
+    if not os.path.exists(dir):
+        return result
     for entry in os.listdir(dir):
         path = os.path.join(dir, entry)
         if (os.path.isdir(path)):
@@ -282,8 +285,8 @@ def textCell(file, text, style = None):
 def imgCell(file, text, style):
     file.write('\t<td class="%s"><img src="%s"/></td>\n' % (style, text))
 
-def printCustomizations(customizationDir, requiredFiles, customizations, roots, children):
-    filename = os.path.join(customizationDir, "comparison.html")
+def printCustomizations(project, customizationDir, requiredFiles, customizations, roots, children):
+    filename = os.path.join(customizationDir, project + ".html")
     file = open(filename, 'w')
 
     file.write("""<style>
@@ -373,26 +376,29 @@ def checkProject(rootDir, project):
         if (not os.path.isdir(path)):
             continue
         c = Customization(entry, path, project)
-        if c.isRoot():
-            c.populateFileList()
-            #invalidInner += c.validateInner(requiredSorted)
+        c.populateFileList()
+        if c.isRoot():     
+            invalidInner += c.validateInner(requiredSorted)                   
             roots.append(c)
         else:
             children.append(c)
         customizations[entry] = c
         
     invalidCross = 0
-#    for c1, c2 in combinations(roots, 2):
-#        invalidCross += c1.validateCross(c2)
-#        invalidCross += c2.validateCross(c1)
+    for c1, c2 in combinations(roots, 2):
+        invalidCross += c1.validateCross(c2)
+        invalidCross += c2.validateCross(c1)
     info('Validation finished')
     if invalidInner > 0:
         sys.exit(1)
     if invalidCross > 0:
         sys.exit(2)
 
-    if project == Project.CLIENT:
-        printCustomizations(customizationDir, requiredSorted, customizations, roots, children)
+    targetFiles = requiredSorted
+    if len(targetFiles) == 0:
+        targetFiles = customizations['default'].total
+
+    printCustomizations(project, customizationDir, targetFiles, customizations, roots, children)
 
 def main():
     parser = argparse.ArgumentParser()
