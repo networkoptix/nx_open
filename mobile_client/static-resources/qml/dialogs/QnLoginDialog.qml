@@ -106,6 +106,16 @@ FocusScope {
             x: CommonFunctions.dp(72)
         }
 
+        Text {
+            id: defaultLabel
+            anchors.verticalCenter: parent.verticalCenter
+            color: "white"
+            font.pixelSize: CommonFunctions.sp(20)
+            font.weight: Font.DemiBold
+            x: CommonFunctions.dp(72)
+            text: applicationInfo.productName
+        }
+
         states: [
             State {
                 name: "HIDDEN"
@@ -121,6 +131,14 @@ FocusScope {
                 PropertyChanges {
                     target: checkButton
                     __clipped: true
+                }
+                PropertyChanges {
+                    target: systemNameLabel
+                    opacity: 0.0
+                }
+                PropertyChanges {
+                    target: defaultLabel
+                    opacity: 1.0
                 }
             },
             State {
@@ -140,6 +158,14 @@ FocusScope {
                     __clipped: false
                     visible: true
                 }
+                PropertyChanges {
+                    target: systemNameLabel
+                    opacity: 0.0
+                }
+                PropertyChanges {
+                    target: defaultLabel
+                    opacity: 1.0
+                }
             },
             State {
                 name: "EDIT"
@@ -158,6 +184,14 @@ FocusScope {
                     __clipped: true
                     visible: false
                 }
+                PropertyChanges {
+                    target: systemNameLabel
+                    opacity: 1.0
+                }
+                PropertyChanges {
+                    target: defaultLabel
+                    opacity: 0.0
+                }
             }
         ]
 
@@ -175,7 +209,14 @@ FocusScope {
                 from: "HIDDEN"
                 to: "EDIT"
                 SequentialAnimation {
-                    PauseAnimation { duration: 150 }
+                    ParallelAnimation {
+                        SequentialAnimation {
+                            PauseAnimation { duration: 50 }
+                            NumberAnimation { target: defaultLabel; property: "opacity"; duration: 100; easing.type: Easing.OutQuad }
+                        }
+                        PauseAnimation { duration: 150 }
+                    }
+                    NumberAnimation { target: systemNameLabel; property: "opacity"; duration: 100; easing.type: Easing.OutQuad }
                     PropertyAction { target: backButton; property: "__clipped" }
                     PauseAnimation { duration: 50 }
                     PropertyAction { target: deleteButton; property: "__clipped" }

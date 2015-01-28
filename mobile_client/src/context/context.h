@@ -8,6 +8,7 @@
 
 class QnConnectionManager;
 class QnColorTheme;
+class QnMobileAppInfo;
 
 class QnContext: public QObject, public QnInstanceStorage {
     Q_OBJECT
@@ -15,6 +16,7 @@ class QnContext: public QObject, public QnInstanceStorage {
 
     Q_PROPERTY(QnConnectionManager* connectionManager READ connectionManager NOTIFY connectionManagerChanged)
     Q_PROPERTY(QnColorTheme* colorTheme READ colorTheme NOTIFY colorThemeChanged)
+    Q_PROPERTY(QnMobileAppInfo* applicationInfo READ applicationInfo NOTIFY applicationInfoChanged)
 public:
     QnContext(QObject *parent = NULL);
     virtual ~QnContext();
@@ -27,14 +29,20 @@ public:
         return m_colorTheme;
     }
 
+    QnMobileAppInfo *applicationInfo() const {
+        return m_appInfo;
+    }
+
 signals:
     /* Dummy signals to prevent non-NOTIFYable warnings */
-    void connectionManagerChanged(QnConnectionManager *connectionManager);
-    void colorThemeChanged(QnColorTheme *colorTheme);
+    void connectionManagerChanged();
+    void colorThemeChanged();
+    void applicationInfoChanged();
 
 private:
     QnConnectionManager *m_connectionManager;
     QnColorTheme *m_colorTheme;
+    QnMobileAppInfo *m_appInfo;
 };
 
 Q_DECLARE_METATYPE(QnContext*)
