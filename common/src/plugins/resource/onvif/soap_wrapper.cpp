@@ -829,6 +829,11 @@ int SubscriptionManagerSoapWrapper::renew( _oasisWsnB2__Renew& request, _oasisWs
     return invokeMethod( &SubscriptionManagerBindingProxy::Renew, &request, &response );
 }
 
+int SubscriptionManagerSoapWrapper::unsubscribe( _oasisWsnB2__Unsubscribe& request, _oasisWsnB2__UnsubscribeResponse& response )
+{
+    return invokeMethod( &SubscriptionManagerBindingProxy::Unsubscribe, &request, &response );
+}
+
 
 
 //
