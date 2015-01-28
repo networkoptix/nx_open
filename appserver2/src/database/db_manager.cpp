@@ -288,6 +288,23 @@ bool removeFile(const QString& fileName)
     return true;
 }
 
+bool QnDbManager::migrateServerGUID(const QString& table, const QString& field)
+{
+    QSqlQuery updateGuidQuery( m_sdb );
+    QString ggg = lit("UPDATE %1 SET %2=? WHERE %2=?").arg(table).arg(field);
+    QByteArray oldG = qnCommon->moduleGUID().toByteArray();
+    QByteArray newG = qnCommon->obsoleteServerGuid().toByteArray();
+    updateGuidQuery.prepare(lit("UPDATE %1 SET %2=? WHERE %2=?").arg(table).arg(field) );
+    updateGuidQuery.addBindValue( qnCommon->moduleGUID().toRfc4122() );
+    updateGuidQuery.addBindValue( qnCommon->obsoleteServerGuid().toRfc4122() );
+    if( !updateGuidQuery.exec() )
+    {
+        qWarning() << "can't initialize sqlLite database!" << updateGuidQuery.lastError().text();
+        return false;
+    }
+    return true;
+}
+
 bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
 {
     m_resourceFactory = factory;
@@ -369,32 +386,26 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
     }
 
     QnDbManager::QnDbTransactionLocker locker( getTransaction() );
-
+    
     if( !qnCommon->obsoleteServerGuid().isNull() )
     {
-        {
-            QSqlQuery updateGuidQuery( m_sdb );
-            updateGuidQuery.prepare( "UPDATE vms_resource SET guid=? WHERE guid=?" );
-            updateGuidQuery.addBindValue( qnCommon->moduleGUID().toRfc4122() );
-            updateGuidQuery.addBindValue( qnCommon->obsoleteServerGuid().toRfc4122() );
-            if( !updateGuidQuery.exec() )
-            {
-                qWarning() << "can't initialize sqlLite database!" << updateGuidQuery.lastError().text();
-                return false;
-            }
-        }
+        if (!migrateServerGUID("vms_resource", "guid"))
+            return false;
+        if (!migrateServerGUID("vms_resource", "parent_guid"))
+            return false;
 
-        {
-            QSqlQuery updateGuidQuery( m_sdb );
-            updateGuidQuery.prepare( "UPDATE vms_resource SET parent_guid=? WHERE parent_guid=?" );
-            updateGuidQuery.addBindValue( qnCommon->moduleGUID().toRfc4122() );
-            updateGuidQuery.addBindValue( qnCommon->obsoleteServerGuid().toRfc4122() );
-            if( !updateGuidQuery.exec() )
-            {
-                qWarning() << "can't initialize sqlLite database!" << updateGuidQuery.lastError().text();
-                return false;
-            }
-        }
+        if (!migrateServerGUID("vms_businessrule_action_resources", "resource_guid"))
+            return false;
+        if (!migrateServerGUID("vms_businessrule_event_resources", "resource_guid"))
+            return false;
+        if (!migrateServerGUID("vms_cameraserveritem", "server_guid"))
+            return false;
+        if (!migrateServerGUID("vms_kvpair", "resource_guid"))
+            return false;
+        if (!migrateServerGUID("vms_resource_status", "guid"))
+            return false;
+        if (!migrateServerGUID("vms_server_user_attributes", "server_guid"))
+            return false;
     }
 
     QString storedFilesDir = closeDirPath(dbFilePath) + QString(lit("vms_storedfiles/"));
