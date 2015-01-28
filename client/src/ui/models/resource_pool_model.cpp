@@ -295,7 +295,7 @@ QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModel
         if (m_scope == CamerasScope)
             return m_rootNodes[Qn::BastardNode];
         else
-        return m_rootNodes[Qn::RootNode];
+            return m_rootNodes[Qn::RootNode];
     }
 
     QnResourcePtr parentResource = resourcePool()->getResourceById(node->resource()->getParentId());
