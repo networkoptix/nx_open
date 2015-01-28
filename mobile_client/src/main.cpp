@@ -33,6 +33,36 @@
 
 #include "version.h"
 
+int runUi(QGuiApplication *application) {
+    QnResolutionUtil::DensityClass densityClass = QnResolutionUtil::currentDensityClass();
+    qDebug() << "Starting with density class: " << QnResolutionUtil::densityName(densityClass);
+
+    QFileSelector fileSelector;
+    fileSelector.setExtraSelectors(QStringList() << QnResolutionUtil::densityName(densityClass));
+
+    QnContext context;
+
+    context.colorTheme()->readFromFile(fileSelector.select(lit(":/color_theme.json")));
+    qApp->setPalette(context.colorTheme()->palette());
+
+    QQmlEngine engine;
+    QQmlFileSelector qmlFileSelector(&engine);
+    qmlFileSelector.setSelector(&fileSelector);
+
+    engine.rootContext()->setContextObject(&context);
+    engine.rootContext()->setContextProperty(lit("screenPixelMultiplier"), QnResolutionUtil::densityMultiplier(densityClass));
+
+    QQmlComponent mainComponent(&engine, QUrl(lit("qrc:///qml/main.qml")));
+    QScopedPointer<QObject> mainWindow(mainComponent.create());
+
+    if (!mainComponent.errors().isEmpty())
+        qWarning() << mainComponent.errorString();
+
+    QObject::connect(&engine, &QQmlEngine::quit, application, &QGuiApplication::quit);
+
+    return application->exec();
+}
+
 int runApplication(QGuiApplication *application) {
     // these functions should be called in every thread that wants to use rand() and qrand()
     srand(time(NULL));
@@ -69,40 +99,14 @@ int runApplication(QGuiApplication *application) {
     runtimeData.brand = QnAppInfo::productNameShort();
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);
 
-
-    QnResolutionUtil::DensityClass densityClass = QnResolutionUtil::currentDensityClass();
-    qDebug() << "Starting with density class: " << QnResolutionUtil::densityName(densityClass);
-
-    QFileSelector fileSelector;
-    fileSelector.setExtraSelectors(QStringList() << lit("dark") << QnResolutionUtil::densityName(densityClass));
-
-    QnContext context;
-
-    context.colorTheme()->readFromFile(fileSelector.select(lit(":/color_theme.json")));
-    qApp->setPalette(context.colorTheme()->palette());
-
-    QQmlEngine engine;
-    QQmlFileSelector qmlFileSelector(&engine);
-    qmlFileSelector.setSelector(&fileSelector);
-
-    engine.rootContext()->setContextObject(&context);
-    engine.rootContext()->setContextProperty(lit("screenPixelMultiplier"), QnResolutionUtil::densityMultiplier(densityClass));
-
-    QQmlComponent mainComponent(&engine, QUrl(lit("qrc:///qml/main.qml")));
-    QObject *mainWindow = mainComponent.create();
-
-    if (!mainComponent.errors().isEmpty())
-        qWarning() << mainComponent.errorString();
-
-    QObject::connect(&engine, &QQmlEngine::quit, application, &QGuiApplication::quit);
-
-    int result = application->exec();
-
-    delete mainWindow;
+    int result = runUi(application);
 
     QnSessionManager::instance()->stop();
-//    QnResource::stopCommandProc();
+    QnResource::stopCommandProc();
     QnAppServerConnectionFactory::setEc2Connection(ec2::AbstractECConnectionPtr());
+    QnAppServerConnectionFactory::setUrl(QUrl());
+
+    QNetworkProxyFactory::setApplicationProxyFactory(0);
 
     return result;
 }
