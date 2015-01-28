@@ -17,6 +17,7 @@
 #include "utils/common/long_runnable.h"
 #include "utils/common/app_info.h"
 #include "utils/common/synctime.h"
+#include "utils/common/log.h"
 #include "plugins/resource/server_camera/server_camera_factory.h"
 
 #include "context/context.h"
@@ -103,8 +104,14 @@ int runApplication(QGuiApplication *application) {
     return result;
 }
 
+void initLog() {
+    QnLog::initLog(lit("INFO"));
+}
+
 int main(int argc, char *argv[]) {
     QGuiApplication application(argc, argv);
+
+    initLog();
 
     QnMobileClientModule mobile_client(argc, argv);
     Q_UNUSED(mobile_client)
