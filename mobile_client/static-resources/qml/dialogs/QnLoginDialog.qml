@@ -245,8 +245,6 @@ FocusScope {
             boundsBehavior: ListView.StopAtBounds
             clip: true
 
-            onCountChanged: console.log(count)
-
             section.property: "section"
             section.criteria: ViewSection.FullString
             section.labelPositioning: ViewSection.CurrentLabelAtStart | ViewSection.InlineLabels
