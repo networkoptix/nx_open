@@ -244,23 +244,6 @@ void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& sup
     setProperty(Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME, QString::fromUtf8(serializedStreams));
 }
 
-
-CameraMediaStreamInfo::CameraMediaStreamInfo()
-:
-    resolution( lit("*") ),
-    transcodingRequired( false ),
-    codec( CODEC_ID_NONE )
-{
-}
-
-CameraMediaStreamInfo::CameraMediaStreamInfo( const QSize& _resolution, CodecID _codec )
-:
-    resolution( _resolution.isValid() ? QString::fromLatin1("%1x%2").arg(_resolution.width()).arg(_resolution.height()) : lit("*") ),
-    transcodingRequired( false ),
-    codec( _codec )
-{
-}
-
 // --------------- QnVirtualCameraResource ----------------------
 
 QnAbstractDTSFactory* QnVirtualCameraResource::getDTSFactory()

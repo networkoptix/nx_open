@@ -796,61 +796,6 @@ bool QnDbManager::updateGuids()
     return true;
 }
 
-bool QnDbManager::updateBusinessActionParameters() {
-    QHash<QString, QString> remapTable;
-    remapTable["quality"] = "streamQuality";
-    remapTable["duration"] = "recordingDuration";
-    remapTable["after"] = "recordAfter";
-    remapTable["relayOutputID"] = "relayOutputId";
-
-    QMap<int, QByteArray> remapData;
-
-    { /* Reading data from the table. */
-        QSqlQuery query(m_sdb);
-        query.setForwardOnly(true);
-        query.prepare(QString("SELECT id, action_params FROM vms_businessrule order by id"));
-        if (!query.exec()) {
-            qWarning() << Q_FUNC_INFO << query.lastError().text();
-            return false;
-        }
-
-        while (query.next()) {
-            qint32 id = query.value(0).toInt();
-            QByteArray data = query.value(1).toByteArray();
-
-            QJsonValue result;
-            QJson::deserialize(data, &result);
-            QJsonObject values = result.toObject(); /* Returns empty object in case of deserialization error. */
-            if (values.isEmpty())
-                continue;
-
-            QJsonObject remappedValues;
-            for (const QString &key: values.keys()) {
-                QString remappedKey = remapTable.contains(key) ? remapTable[key] : key;
-                remappedValues[remappedKey] = values[key];
-            }
-
-            QByteArray remappedData;
-            QJson::serialize(remappedValues, &remappedData);
-            remapData[id] = remappedData;
-        }
-    }
-
-
-    for(auto iter = remapData.cbegin(); iter != remapData.cend(); ++iter) {
-        QSqlQuery query(m_sdb);
-        query.prepare("UPDATE vms_businessrule SET action_params = :value WHERE id = :id");
-        query.bindValue(":id", iter.key());
-        query.bindValue(":value", iter.value());
-        if (!query.exec()) {
-            qWarning() << Q_FUNC_INFO << query.lastError().text();
-            return false;
-        }
-    }
-
-    return true;
-}
-
 void scanDirectoryRecursive(const QString &directory, QStringList &result) {
     QDir sourceDirectory(directory);
     for(const QFileInfo& info: sourceDirectory.entryInfoList(QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Files, QDir::DirsFirst)) {
@@ -872,6 +817,7 @@ ErrorCode QnDbManager::insertOrReplaceStoredFile(const QString &fileName, const 
     }
     return ErrorCode::ok;
 }
+
 
 /** Insert sample files into database. */
 bool QnDbManager::addStoredFiles(const QString& baseDirectoryName, int* count) 
@@ -903,7 +849,6 @@ bool QnDbManager::addStoredFiles(const QString& baseDirectoryName, int* count)
     }
     return true;
 }
-
 
 namespace oldBusinessData // TODO: #Elric #EC2 sane naming
 {
@@ -1183,13 +1128,10 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     }
     else if (updateName == lit(":/updates/17_add_isd_cam.sql")) {
         updateResourceTypeGuids();
-    } 
+    }
     else if (updateName == lit(":/updates/20_adding_camera_user_attributes.sql")) {
         if (!m_dbJustCreated)
             m_needResyncLog = true;
-    }    
-    else if (updateName == lit(":/updates/21_business_action_parameters.sql")) {
-        updateBusinessActionParameters();
     }    
     else if (updateName == lit(":/updates/21_new_dw_cam.sql")) {
         updateResourceTypeGuids();
@@ -1273,7 +1215,7 @@ bool QnDbManager::createDatabase()
         return false;
 
 
-    if (!applyUpdates(":/updates"))
+    if (!applyUpdates())
         return false;
 
     if (!lockStatic.commit())
