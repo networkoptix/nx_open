@@ -79,7 +79,7 @@ QnLicenseUsageWatcher::QnLicenseUsageWatcher(QObject* parent /*= NULL*/):
     connect(qnResPool,      &QnResourcePool::statusChanged,     this,   updateIfNeeded);
     connect(qnResPool,      &QnResourcePool::resourceRemoved,   this,   updateIfNeeded);
 
-    connect(qnLicensePool,  &QnLicensePool::licensesChanged,    this,   &QnLicenseUsageWatcher::licenseUsageChanged, Qt::QueuedConnection);
+    connect(qnLicensePool,  &QnLicensePool::licensesChanged,    this,   &QnLicenseUsageWatcher::licenseUsageChanged);
 }
 
 
