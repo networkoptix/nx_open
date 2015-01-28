@@ -286,16 +286,13 @@ def printCustomizations(customizationDir, requiredFiles, customizations, roots, 
     filename = os.path.join(customizationDir, "comparison.html")
     file = open(filename, 'w')
 
-    file.write("""
-    <style>
-    img {max-width: 64px; }
-    td { text-align: center; }
-    td.label { text-align: left; }
-    td.dark { background-color: #000000; }
-    td.light { background-color: #FFFFFF; }
-    </style>
-    """)
-
+    file.write("""<style>
+img {max-width: 64px; }
+td { text-align: center; }
+td.label { text-align: left; }
+td.dark { background-color: #222222; }
+td.light { background-color: #D0D0D0; }
+</style>\n""")
     file.write("<table>\n")
     file.write("<tr>\n")
     file.write("<th>File</th>\n")
@@ -310,40 +307,40 @@ def printCustomizations(customizationDir, requiredFiles, customizations, roots, 
         textCell(file, entry, "label")
         for c in roots:
             if entry in c.dark:
-                imgCell(file, os.path.join(c.darkPath, entry), "dark")
+                imgCell(file, os.path.relpath(os.path.join(c.darkPath, entry), customizationDir), "dark")
             elif entry in c.base:
-                imgCell(file, os.path.join(c.basePath, entry), "dark")
+                imgCell(file, os.path.relpath(os.path.join(c.basePath, entry), customizationDir), "dark")
             else:
                 textCell(file, "-")
 
             if entry in c.light:
-                imgCell(file, os.path.join(c.lightPath, entry), "light")
+                imgCell(file, os.path.relpath(os.path.join(c.lightPath, entry), customizationDir), "light")
             elif entry in c.base:
-                imgCell(file, os.path.join(c.basePath, entry), "light")
+                imgCell(file, os.path.relpath(os.path.join(c.basePath, entry), customizationDir), "light")
             else:
                 textCell(file, "-")
 
         for c in children:
             p = customizations[c.parent]
             if entry in c.dark:
-                imgCell(file, os.path.join(c.darkPath, entry), "dark")
+                imgCell(file, os.path.relpath(os.path.join(c.darkPath, entry), customizationDir), "dark")
             elif entry in c.base:
-                imgCell(file, os.path.join(c.basePath, entry), "dark")
+                imgCell(file, os.path.relpath(os.path.join(c.basePath, entry), customizationDir), "dark")
             elif entry in p.dark:
-                imgCell(file, os.path.join(p.darkPath, entry), "dark")
+                imgCell(file, os.path.relpath(os.path.join(p.darkPath, entry), customizationDir), "dark")
             elif entry in p.base:
-                imgCell(file, os.path.join(p.basePath, entry), "dark")
+                imgCell(file, os.path.relpath(os.path.join(p.basePath, entry), customizationDir), "dark")
             else:
                 textCell(file, "-")
 
             if entry in c.light:
-                imgCell(file, os.path.join(c.lightPath, entry), "light")
+                imgCell(file, os.path.relpath(os.path.join(c.lightPath, entry), customizationDir), "light")
             elif entry in c.base:
-                imgCell(file, os.path.join(c.basePath, entry), "light")
+                imgCell(file, os.path.relpath(os.path.join(c.basePath, entry), customizationDir), "light")
             elif entry in p.light:
-                imgCell(file, os.path.join(p.lightPath, entry), "light")
+                imgCell(file, os.path.relpath(os.path.join(p.lightPath, entry), customizationDir), "light")
             elif entry in p.base:
-                imgCell(file, os.path.join(p.basePath, entry), "light")
+                imgCell(file, os.path.relpath(os.path.join(p.basePath, entry), customizationDir), "light")
             else:
                 textCell(file, "-")
 
