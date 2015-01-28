@@ -14,6 +14,10 @@
 #include "nx_ec/ec2_lib.h"
 #include "common/common_module.h"
 #include "core/resource_management/resource_pool.h"
+#include "core/resource_management/resource_properties.h"
+#include "core/resource_management/status_dictionary.h"
+#include "core/resource/camera_user_attribute_pool.h"
+#include "core/resource/media_server_user_attributes.h"
 #include "utils/common/long_runnable.h"
 #include "utils/common/app_info.h"
 #include "utils/common/synctime.h"
@@ -35,10 +39,12 @@ int runApplication(QGuiApplication *application) {
     qsrand(time(NULL));
 
     QnSyncTime syncTime;
-
+    QnResourcePropertyDictionary dictionary;
+    QnResourceStatusDictionary statusDictionary;
     QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
     QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
-
+    QScopedPointer<QnMobileClientMessageProcessor> mobileClientMessageProcessor(new QnMobileClientMessageProcessor());
+    QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
     QScopedPointer<QnServerCameraFactory> serverCameraFactory(new QnServerCameraFactory());
 
     //NOTE QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
@@ -55,9 +61,6 @@ int runApplication(QGuiApplication *application) {
         qnResTypePool);
     ec2ConnectionFactory->setContext(resourceContext);
     QnAppServerConnectionFactory::setEC2ConnectionFactory(ec2ConnectionFactory.get());
-
-    QScopedPointer<QnMobileClientMessageProcessor> mobileClientMessageProcessor(new QnMobileClientMessageProcessor());
-    QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
 
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = qnCommon->moduleGUID();
@@ -117,6 +120,8 @@ int main(int argc, char *argv[]) {
     Q_UNUSED(mobile_client)
 
     QnSessionManager::instance();
+    QScopedPointer<QnCameraUserAttributePool> cameraUserAttributePool(new QnCameraUserAttributePool());
+    QScopedPointer<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool(new QnMediaServerUserAttributesPool());
     QnResourcePool::initStaticInstance(new QnResourcePool());
 
     int result = runApplication(&application);
