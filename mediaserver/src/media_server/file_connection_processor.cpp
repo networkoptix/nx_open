@@ -58,6 +58,19 @@ QnFileConnectionProcessor::~QnFileConnectionProcessor()
     stop();
 }
 
+QByteArray QnFileConnectionProcessor::readStaticFile(const QString& path)
+{
+    QString fileName = getDataDirectory() + "/web/" + path;
+    QFile file(fileName);
+    if (!file.open(QFile::ReadOnly))
+    {
+        file.setFileName(QString(":") + path); // check file into internal resources
+        if (!file.open(QFile::ReadOnly))
+            return QByteArray();
+    }
+    return file.readAll();
+}
+
 void QnFileConnectionProcessor::run()
 {
     Q_D(QnFileConnectionProcessor);
