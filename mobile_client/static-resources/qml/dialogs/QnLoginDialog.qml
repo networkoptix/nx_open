@@ -39,6 +39,7 @@ FocusScope {
 
         width: parent.width
         height: CommonFunctions.dp(56)
+        z: 1
 
         color: colorTheme.color("nx_base")
 
@@ -249,8 +250,11 @@ FocusScope {
             section.criteria: ViewSection.FullString
             section.labelPositioning: ViewSection.CurrentLabelAtStart | ViewSection.InlineLabels
 
-            section.delegate: Item {
+            section.delegate: Rectangle {
                 height: CommonFunctions.dp(48)
+                width: contentItem.width
+                color: __syspal.window
+
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
                     font.pixelSize: CommonFunctions.sp(16)
@@ -363,7 +367,6 @@ FocusScope {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.margins: CommonFunctions.dp(16)
-            spacing: CommonFunctions.dp(8)
 
             Text {
                 text: qsTr("Address")
@@ -376,6 +379,11 @@ FocusScope {
                 placeholderText: "127.0.0.1"
                 width: parent.width
                 onAccepted: port.focus = true
+            }
+
+            Item {
+                height: CommonFunctions.dp(20)
+                width: 1
             }
 
             Text {
@@ -398,6 +406,11 @@ FocusScope {
                 onAccepted: login.focus = true
             }
 
+            Item {
+                height: CommonFunctions.dp(20)
+                width: 1
+            }
+
             Text {
                 text: qsTr("User name")
                 font.pixelSize: CommonFunctions.sp(12)
@@ -412,6 +425,11 @@ FocusScope {
                 onAccepted: password.focus = true
             }
 
+            Item {
+                height: CommonFunctions.dp(20)
+                width: 1
+            }
+
             Text {
                 text: qsTr("Password")
                 font.pixelSize: CommonFunctions.sp(12)
@@ -420,7 +438,14 @@ FocusScope {
 
             QnTextField {
                 id: password
-                placeholderText: "*******"
+                placeholderText: {
+                    var result = passwordCharacter
+                    result = result + result
+                    result = result + result
+                    result = result + result
+                    return result
+                }
+
                 echoMode: TextInput.Password
                 width: parent.width
                 onAccepted: LoginDialogFunctions.connectToServer()

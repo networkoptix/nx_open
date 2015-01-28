@@ -14,6 +14,7 @@ FocusScope {
     property alias inputMethodHints: textInput.inputMethodHints
     property int leftPadding
     property int rightPadding
+    property alias passwordCharacter: textInput.passwordCharacter
 
     property int textPadding: 0
 
