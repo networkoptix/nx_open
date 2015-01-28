@@ -2827,12 +2827,13 @@ bool QnPlOnvifResource::createPullPointSubscription()
     if( !m_inputMonitored )
         return true;
 
-    using namespace std::placeholders;
-    m_renewSubscriptionTimerID = TimerManager::instance()->addTimer(
-        std::bind(&QnPlOnvifResource::onRenewSubscriptionTimer, this, _1),
-        (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
-            ? renewSubsciptionTimeoutSec-RENEW_NOTIFICATION_FORWARDING_SECS
-            : renewSubsciptionTimeoutSec)*MS_PER_SECOND );
+    //not renewing session anymore, since it does not work on vista. Just re-subscribing if pullMessages returned error
+    //using namespace std::placeholders;
+    //m_renewSubscriptionTimerID = TimerManager::instance()->addTimer(
+    //    std::bind(&QnPlOnvifResource::onRenewSubscriptionTimer, this, _1),
+    //    (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
+    //        ? renewSubsciptionTimeoutSec-RENEW_NOTIFICATION_FORWARDING_SECS
+    //        : renewSubsciptionTimeoutSec)*MS_PER_SECOND );
 
     m_eventMonitorType = emtPullPoint;
     m_prevPullMessageResponseClock = m_monotonicClock.elapsed();
@@ -2844,7 +2845,7 @@ bool QnPlOnvifResource::createPullPointSubscription()
     }
 
     m_nextPullMessagesTimerID = TimerManager::instance()->addTimer(
-        std::bind(&QnPlOnvifResource::pullMessages, this, _1),
+        std::bind(&QnPlOnvifResource::pullMessages, this, std::placeholders::_1),
         PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND);
     return true;
 }
@@ -2951,6 +2952,31 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
 
 void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode)
 {
+    if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )
+    {
+        NX_LOG(lit("Failed to pull messages in NotificationProducer. endpoint %1").arg(QString::fromLatin1(asyncWrapper->syncWrapper()->endpoint())), cl_logDEBUG1);
+        //re-subscribing
+
+        QMutexLocker lk(&m_ioPortMutex);
+
+        if( !m_inputMonitored )
+            return;
+
+        m_renewSubscriptionTimerID = TimerManager::instance()->addTimer(
+            [this]( qint64 /*timerID*/ )
+            {
+                QMutexLocker lk(&m_ioPortMutex);
+                if( !m_inputMonitored )
+                    return;
+                lk.unlock();
+                createPullPointSubscription();
+                lk.relock();
+                m_renewSubscriptionTimerID = 0;
+            },
+            0 );
+        return;
+    }
+
     onPullMessagesResponseReceived(asyncWrapper->syncWrapper(), resultCode, asyncWrapper->response());
 
     QMutexLocker lk(&m_ioPortMutex);
@@ -2975,24 +3001,19 @@ void QnPlOnvifResource::onPullMessagesResponseReceived(
 {
     m_prevSoapCallResult = resultCode;
 
+    Q_ASSERT( m_prevSoapCallResult == SOAP_OK || m_prevSoapCallResult == SOAP_MUSTUNDERSTAND );
+
     const qint64 currentRequestSendClock = m_monotonicClock.elapsed();
 
-    if( m_prevSoapCallResult == SOAP_OK || m_prevSoapCallResult == SOAP_MUSTUNDERSTAND )
+    const time_t minNotificationTime = response.CurrentTime - roundUp<qint64>(m_monotonicClock.elapsed() - m_prevPullMessageResponseClock, MS_PER_SECOND) / MS_PER_SECOND;
+    if( response.oasisWsnB2__NotificationMessage.size() > 0 )
     {
-        const time_t minNotificationTime = response.CurrentTime - roundUp<qint64>(m_monotonicClock.elapsed() - m_prevPullMessageResponseClock, MS_PER_SECOND) / MS_PER_SECOND;
-        if( response.oasisWsnB2__NotificationMessage.size() > 0 )
+        for( size_t i = 0;
+            i < response.oasisWsnB2__NotificationMessage.size();
+            ++i )
         {
-            for( size_t i = 0;
-                i < response.oasisWsnB2__NotificationMessage.size();
-                ++i )
-            {
-                notificationReceived(*response.oasisWsnB2__NotificationMessage[i], minNotificationTime);
-            }
+            notificationReceived(*response.oasisWsnB2__NotificationMessage[i], minNotificationTime);
         }
-    }
-    else
-    {
-        NX_LOG(lit("Failed to pull messages in NotificationProducer. endpoint %1").arg(QString::fromLatin1(soapWrapper->endpoint())), cl_logDEBUG1);
     }
 
     m_prevPullMessageResponseClock = currentRequestSendClock;
