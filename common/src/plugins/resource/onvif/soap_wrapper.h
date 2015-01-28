@@ -240,6 +240,9 @@ class _onvifEvents__PullMessagesResponse;
 class _oasisWsnB2__Renew;
 class _oasisWsnB2__RenewResponse;
 
+class _oasisWsnB2__Unsubscribe;
+class _oasisWsnB2__UnsubscribeResponse;
+
 
 
 template <class T>
@@ -480,6 +483,7 @@ public:
     SubscriptionManagerSoapWrapper(const std::string& endpoint, const QString &login, const QString &passwd, int _timeDrift, bool tcpKeepAlive = false);
 
     int renew( _oasisWsnB2__Renew& request, _oasisWsnB2__RenewResponse& response );
+    int unsubscribe( _oasisWsnB2__Unsubscribe& request, _oasisWsnB2__UnsubscribeResponse& response );
 };
 
 #endif //ENABLE_ONVIF

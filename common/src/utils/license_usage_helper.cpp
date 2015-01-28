@@ -68,6 +68,18 @@ static std::array<LicenseCompatibility, 14> compatibleLicenseType =
 QnLicenseUsageWatcher::QnLicenseUsageWatcher(QObject* parent /*= NULL*/):
     base_type(parent)
 {
+
+    /* Call update if server was added or removed or changed its status. */
+    auto updateIfNeeded = [this](const QnResourcePtr &resource) {
+        if (resource.dynamicCast<QnMediaServerResource>())
+            emit licenseUsageChanged();
+    };
+
+    connect(qnResPool,      &QnResourcePool::resourceAdded,     this,   updateIfNeeded);
+    connect(qnResPool,      &QnResourcePool::statusChanged,     this,   updateIfNeeded);
+    connect(qnResPool,      &QnResourcePool::resourceRemoved,   this,   updateIfNeeded);
+
+    connect(qnLicensePool,  &QnLicensePool::licensesChanged,    this,   &QnLicenseUsageWatcher::licenseUsageChanged, Qt::QueuedConnection);
 }
 
 
@@ -87,7 +99,6 @@ QnLicenseUsageHelper::QnLicenseUsageHelper(QObject *parent):
     base_type(parent),
     m_dirty(true)
 {
-    connect(qnLicensePool, &QnLicensePool::licensesChanged, this, &QnLicenseUsageHelper::invalidate);
 }
 
 int QnLicenseUsageHelper::borrowLicenses(const LicenseCompatibility &compat, licensesArray &licenses) const {
@@ -257,9 +268,9 @@ QString QnLicenseUsageHelper::activationMessage(const QJsonObject& errorMessage)
 QnCamLicenseUsageWatcher::QnCamLicenseUsageWatcher(QObject* parent /*= NULL*/):
     base_type(parent)
 {
-    /* Call update if server or camera was changed. */
+    /* Call update if camera was added or removed. */
     auto updateIfNeeded = [this](const QnResourcePtr &resource) {
-        if (resource.dynamicCast<QnMediaServerResource>() || resource.dynamicCast<QnVirtualCameraResource>())
+        if (resource.dynamicCast<QnVirtualCameraResource>())
             emit licenseUsageChanged();
     };
 

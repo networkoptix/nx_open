@@ -61,7 +61,7 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
         return nx_http::StatusCode::ok;
     }
 
-    if (!takeRemoteSettings && !mergeOneServer && currentPassword.isEmpty()) {
+    if (currentPassword.isEmpty()) {
         result.setError(QnJsonRestResult::MissingParameter);
         result.setErrorString(lit("currentPassword"));
         return nx_http::StatusCode::ok;
@@ -72,7 +72,7 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
     if (!admin)
         return nx_http::StatusCode::internalServerError;
 
-    if (!takeRemoteSettings && !mergeOneServer && !admin->checkPassword(currentPassword)) {
+    if (!admin->checkPassword(currentPassword)) {
         result.setError(QnJsonRestResult::InvalidParameter);
         result.setErrorString(lit("currentPassword"));
         return nx_http::StatusCode::ok;

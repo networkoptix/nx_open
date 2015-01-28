@@ -43,8 +43,7 @@ angular.module('webadminApp', [
             controller: 'MainCtrl'
         })
         .when('/login', {
-            templateUrl: 'views/login.html',
-            controller: 'LoginCtrl'
+            templateUrl: 'views/login.html'
         })
         .when('/advanced', {
             templateUrl: 'views/advanced.html',
