@@ -568,8 +568,7 @@ QnActionManager::QnActionManager(QObject *parent):
         toggledText(tr("Stop Panic Recording")).
         autoRepeat(false).
         shortcut(tr("Ctrl+P")).
-//        icon(qnSkin->icon("titlebar/panic.png")).
-        //requiredPermissions(Qn::CurrentMediaServerResourcesRole, Qn::ReadWriteSavePermission).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         condition(new QnPanicActionCondition(this));
 
     factory().
@@ -1373,7 +1372,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ConnectToCurrentSystem).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
-        text(tr("Connect to the Current System...")).
+        text(tr("Merge to Currently Connected System...")).
         condition(new QnConjunctionActionCondition(
             new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::Any, this),
             new QnDisjunctionActionCondition(

@@ -113,7 +113,7 @@ forKeyword:keyAEName];
     return err == noErr ? true : false;
 } */
 
-bool QnMacShortcuts::createShortcut(const QString &sourceFile, const QString &destinationPath, const QString &name, const QStringList &arguments)
+bool QnMacShortcuts::createShortcut(const QString &sourceFile, const QString &destinationPath, const QString &name, const QStringList &arguments, int iconId)
 {
     return false;
 }

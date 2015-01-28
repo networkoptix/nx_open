@@ -33,7 +33,7 @@ Application will now quit.</source>
     <message>
         <location filename="../src/systraywindow.cpp" line="157"/>
         <source>Access denied.</source>
-        <translation>truy cập bị từ chối</translation>
+        <translation>truy cập bị từ chối.</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="160"/>
@@ -114,7 +114,7 @@ Application will now quit.</source>
     <message>
         <location filename="../src/systraywindow.cpp" line="483"/>
         <source>Media Server Web Page</source>
-        <translation type="unfinished"></translation>
+        <translation>Media Server trang web</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="386"/>

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('mediaserver', function ($http, $modal, ipCookie) {
+    .factory('mediaserver', function ($http, $modal, ipCookie,$log) {
 
         var cacheModuleInfo = null;
         var cacheCurrentUser = null;
@@ -25,7 +25,6 @@ angular.module('webadminApp')
                 if (loginDialog === null) { //Dialog is not displayed
                     loginDialog = $modal.open({
                         templateUrl: 'views/login.html',
-                        controller: 'LoginCtrl',
                         keyboard:false,
                         backdrop:'static'
                     });
@@ -40,7 +39,7 @@ angular.module('webadminApp')
             cacheModuleInfo = null;
             if(offlineDialog === null) { //Dialog is not displayed
                 getSettings(true).catch(function (error) {
-                    console.error(error);// if server can't handle moduleInformation - it's offline - show dialog alike restart
+                    $log.error(error);// if server can't handle moduleInformation - it's offline - show dialog alike restart
                     offlineDialog = $modal.open({
                         templateUrl: 'offline_modal',
                         controller: 'OfflineCtrl',
@@ -102,7 +101,7 @@ angular.module('webadminApp')
             saveMediaServer: function(info){return wrapRequest($http.post('/ec2/saveMediaServer',info)); },
             statistics:function(url){
                 url = url || '';
-                return wrapRequest($http.get(url + '/api/statistics?sault=' + (new Date()).getTime()));
+                return wrapRequest($http.get(url + '/api/statistics?salt=' + (new Date()).getTime()));
             },
             getCurrentUser:function(forcereload){
                 if(cacheCurrentUser === null || forcereload){

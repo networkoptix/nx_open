@@ -471,6 +471,7 @@ private:
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> m_asyncPullMessagesCallWrapper;
 
     bool createPullPointSubscription();
+    void removePullPointSubscription();
     void pullMessages( quint64 timerID );
     void onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode);
     void onPullMessagesResponseReceived(
@@ -491,6 +492,7 @@ private:
         unsigned int autoResetTimeoutMS );
     CameraDiagnostics::Result fetchAndSetDeviceInformationPriv( bool performSimpleCheck );
     QnAbstractPtzController* createSpecialPtzController();
+    bool trustMaxFPS();
 };
 
 #endif //ENABLE_ONVIF

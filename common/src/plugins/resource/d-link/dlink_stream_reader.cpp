@@ -68,6 +68,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStream()
     }
 
     //==== profile setup
+    m_cameraControlRequired = isCameraControlRequired();
     QString prifileStr = composeVideoProfile();
 
     if (prifileStr.length()==0)
@@ -102,8 +103,7 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStream()
         requestedUrl.setPath( prifileStr );
         return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
     }
-
-    if (!isCameraControlDisabled()) {
+    if (m_cameraControlRequired) {
         if (role != Qn::CR_SecondaryLiveVideo && res->getMotionType() != Qn::MT_SoftwareGrid)
         {
             res->setMotionMaskPhysical(0);
@@ -304,7 +304,7 @@ QString PlDlinkStreamReader::composeVideoProfile()
     QTextStream t(&result);
 
     t << "config/video.cgi?profileid=" << profileNum;
-    if (!isCameraControlDisabled())
+    if (m_cameraControlRequired)
     {
         t << "&resolution=" << resolution.width() << "x" << resolution.height() << "&";
 

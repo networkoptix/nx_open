@@ -141,6 +141,50 @@ CameraDiagnostics::Result QnPhysicalCameraResource::initInternal() {
     return CameraDiagnostics::NoErrorResult();
 }
 
+bool QnPhysicalCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStreamInfo& mediaStreamInfo )
+{
+    //TODO #ak remove m_mediaStreamsMutex lock, use resource mutex
+    QMutexLocker lk( &m_mediaStreamsMutex );
+
+    //get saved stream info with index encoderIndex
+    const QString& mediaStreamsStr = getProperty( Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME );
+    CameraMediaStreams supportedMediaStreams = QJson::deserialized<CameraMediaStreams>( mediaStreamsStr.toLatin1() );
+
+    //checking if stream info has been changed
+    bool needSaveMediaStreamInfo = true;
+    for( auto it = supportedMediaStreams.streams.begin();
+        it != supportedMediaStreams.streams.end();
+        ++it )
+    {
+        if( it->encoderIndex == mediaStreamInfo.encoderIndex )
+        {
+            if( *it == mediaStreamInfo )
+                needSaveMediaStreamInfo = false;
+            else
+                supportedMediaStreams.streams.erase( it );
+            break;
+        }
+    }
+
+    if( !needSaveMediaStreamInfo )
+        return false; //stream info has not been changed
+
+    //removing non-native streams (they will be re-generated)
+    supportedMediaStreams.streams.erase(
+        std::remove_if(
+            supportedMediaStreams.streams.begin(),
+            supportedMediaStreams.streams.end(),
+            []( const CameraMediaStreamInfo& mediaStreamInfo ) -> bool { return mediaStreamInfo.transcodingRequired; } ),
+        supportedMediaStreams.streams.end() );
+
+    //saving new stream info
+    supportedMediaStreams.streams.push_back( mediaStreamInfo );
+
+    saveResolutionList( supportedMediaStreams );
+
+    return true;
+}
+
 void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& supportedNativeStreams )
 {
     static const char* RTSP_TRANSPORT_NAME = "rtsp";
@@ -158,6 +202,7 @@ void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& sup
             it = fullStreamList.streams.erase( it );
             continue;
         }
+        it->transports.clear();
 
         switch( it->codec )
         {
@@ -187,6 +232,7 @@ void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& sup
 
     CameraMediaStreamInfo transcodedStream;
     //any resolution is supported
+    transcodedStream.transports.push_back( QLatin1String(RTSP_TRANSPORT_NAME) );
     transcodedStream.transports.push_back( QLatin1String(MJPEG_TRANSPORT_NAME) );
     transcodedStream.transports.push_back( QLatin1String(WEBM_TRANSPORT_NAME) );
     transcodedStream.transcodingRequired = true;
@@ -214,11 +260,6 @@ CameraMediaStreamInfo::CameraMediaStreamInfo( const QSize& _resolution, CodecID 
     codec( _codec )
 {
 }
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( (CameraMediaStreamInfo)(CameraMediaStreams), (json), _Fields )
-
-
-#endif // ENABLE_DATA_PROVIDERS
 
 // --------------- QnVirtualCameraResource ----------------------
 
@@ -326,3 +367,41 @@ void QnVirtualCameraResource::noCameraIssues()
 }
 
 
+CameraMediaStreamInfo::CameraMediaStreamInfo()
+:
+    encoderIndex( -1 ),
+    resolution( lit("*") ),
+    transcodingRequired( false ),
+    codec( CODEC_ID_NONE )
+{
+}
+
+CameraMediaStreamInfo::CameraMediaStreamInfo(
+    int _encoderIndex,
+    const QSize& _resolution,
+    CodecID _codec )
+:
+    encoderIndex( _encoderIndex ),
+    resolution( _resolution.isValid() ? QString::fromLatin1("%1x%2").arg(_resolution.width()).arg(_resolution.height()) : lit("*") ),
+    transcodingRequired( false ),
+    codec( _codec )
+{
+}
+
+bool CameraMediaStreamInfo::operator==( const CameraMediaStreamInfo& rhs ) const
+{
+    return transcodingRequired == rhs.transcodingRequired
+        && codec == rhs.codec
+        && encoderIndex == rhs.encoderIndex
+        && resolution == rhs.resolution
+        && transports == rhs.transports;
+}
+
+bool CameraMediaStreamInfo::operator!=( const CameraMediaStreamInfo& rhs ) const
+{
+    return !( *this == rhs );
+}
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( (CameraMediaStreamInfo)(CameraMediaStreams), (json), _Fields )
+
+#endif // ENABLE_DATA_PROVIDERS

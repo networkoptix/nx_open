@@ -13,6 +13,7 @@ angular.module('webadminApp')
         }
 
         $scope.login = function () {
+            console.log($scope);
             if ($scope.loginForm.$valid) {
 
                 // Calculate digest

@@ -1,7 +1,8 @@
-IDI_ICON1               ICON    DISCARDABLE     "${customization.dir}/icons/hdw_logo.ico"
-
 #include <windows.h>
 #include "${project.build.directory}/version.h"
+
+IDI_ICON_APPLICATION    ICON    DISCARDABLE     "${customization.dir}/icons/hdw_logo.ico"
+IDI_ICON_VIDEOWALL      ICON    DISCARDABLE     "${customization.dir}/icons/videowall.ico"
 
 VS_VERSION_INFO VERSIONINFO
 FILEVERSION     VER_FILEVERSION

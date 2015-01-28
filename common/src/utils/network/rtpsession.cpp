@@ -779,6 +779,7 @@ nx_http::Request RTPSession::createDescribeRequest()
     request.headers.insert( nx_http::HttpHeader( "Accept", "application/sdp" ) );
     if( (quint64)m_openedTime != AV_NOPTS_VALUE )
         addRangeHeader( &request, m_openedTime, AV_NOPTS_VALUE );
+    addAdditionAttrs( &request );
     return request;
 }
 

@@ -274,3 +274,37 @@ TEST( QnCamLicenseUsageHelperTest, proposeAnalogEncoderCamerasOverflow )
     ASSERT_EQ(helper.requiredLicenses(Qn::LC_AnalogEncoder), 1);
     ASSERT_FALSE( helper.isValid() );   
 }
+
+/** 
+ *  Profiling test.
+ */
+TEST( QnCamLicenseUsageHelperTest, profileCalculateSpeed )
+{
+    const int camerasCountPerType = 200;
+    const int borrowedCount = 30;   //must be less than half of camerasCountPerType
+
+    QnResourcePoolScaffold resPoolScaffold;
+    QnLicensePoolScaffold licPoolScaffold;
+
+    QnCamLicenseUsageHelper helper;
+
+    QnVirtualCameraResourceList halfOfCameras;
+    
+    for (int i = 0; i < Qn::LC_Count; ++i) {
+        resPoolScaffold.addCameras(static_cast<Qn::LicenseType>(i), camerasCountPerType / 2, true);
+        halfOfCameras.append(
+            resPoolScaffold.addCameras(static_cast<Qn::LicenseType>(i), camerasCountPerType / 2, false)
+        );
+    }
+  
+    for (int i = 0; i < Qn::LC_Count; ++i) {
+        licPoolScaffold.addLicenses(static_cast<Qn::LicenseType>(i), camerasCountPerType - borrowedCount);
+    }
+
+    ASSERT_TRUE(helper.isValid());
+    helper.propose(halfOfCameras, true);
+    ASSERT_FALSE( helper.isValid() );
+
+    licPoolScaffold.addLicenses(Qn::LC_Trial, borrowedCount * Qn::LC_Count);
+    ASSERT_TRUE(helper.isValid());
+}

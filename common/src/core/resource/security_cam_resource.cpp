@@ -33,6 +33,9 @@ namespace {
     static const int defaultSecondStreamFpsHigh = 12;
 }
 
+//const int PRIMARY_ENCODER_INDEX = 0;
+//const int SECONDARY_ENCODER_INDEX = 1;
+
 QnSecurityCamResource::QnSecurityCamResource(): 
     m_dpFactory(0),
     m_recActionCnt(0),
@@ -61,7 +64,12 @@ QString QnSecurityCamResource::getName() const
 
 void QnSecurityCamResource::setName( const QString& name )
 {
-    setCameraName( name );
+    QString oldName = getName();
+    if (oldName == name)
+        return;
+
+    setCameraName(name);
+    emit nameChanged(toSharedPointer(this));
 }
 
 void QnSecurityCamResource::setCameraName( const QString& newCameraName )

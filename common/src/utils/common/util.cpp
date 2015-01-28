@@ -346,3 +346,8 @@ QByteArray formatJSonString(const QByteArray& data)
     formatJSonStringInternal(data.data(), data.data() + data.size(), result.data());
     return result;
 }
+
+QString dateTimeToHTTPFormat(const QDateTime& value)
+{
+    return QString(lit("%1 GMT")).arg(QLocale::c().toString(value.toUTC(), lit("ddd, dd MMM yyyy HH:mm:ss")));
+}

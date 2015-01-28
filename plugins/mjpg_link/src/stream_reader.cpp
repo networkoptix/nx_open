@@ -98,24 +98,20 @@ unsigned int StreamReader::releaseRef()
 
 int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 {
-    bool needToInitializeHttpClient = false;
+    bool httpClientHasBeenJustCreated = false;
     QSharedPointer<nx_http::HttpClient> localHttpClientPtr;
     {
         QMutexLocker lk( &m_mutex );
         if( !m_httpClient )
         {
             m_httpClient = QSharedPointer<nx_http::HttpClient>( new nx_http::HttpClient() );
-            needToInitializeHttpClient = true;
+            httpClientHasBeenJustCreated = true;
         }
         localHttpClientPtr = m_httpClient;
     }
 
-    if( needToInitializeHttpClient )
+    if( httpClientHasBeenJustCreated )
     {
-        if( m_streamType == jpg )   //TODO #ak remove it when reusing existing connection
-            if( !waitForNextFrameTime() )
-                return nxcip::NX_INTERRUPTED;
-
         const int result = doRequest( localHttpClientPtr.data() );
         if( result != nxcip::NX_NO_ERROR )
             return result;
@@ -141,7 +137,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     {
         case jpg:
         {
-            if( !needToInitializeHttpClient )
+            if( !httpClientHasBeenJustCreated )
             {
                 if( !waitForNextFrameTime() )
                     return nxcip::NX_INTERRUPTED;
@@ -158,7 +154,6 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
                 {
                     gotJpegFrame( msgBody.isEmpty() ? msgBodyBuf : (msgBody + msgBodyBuf) );
                     localHttpClientPtr.reset();
-                    m_httpClient.reset();   //TODO #ak reuse existing connection
                     break;
                 }
                 else

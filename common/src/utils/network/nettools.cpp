@@ -81,10 +81,17 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
 
     QList<QnInterfaceAndAddr> result;
 
-    for(const QNetworkInterface& iface: QNetworkInterface::allInterfaces())
+    QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
+    for (const QNetworkInterface &iface: interfaces)
     {
         if (!(iface.flags() & QNetworkInterface::IsUp))
             continue;
+
+#if defined(Q_OS_LINUX) && defined(__arm__)
+        /* skipping 1.2.3.4 address on ISD */
+        if (iface.name() == lit("usb0") && interfaces.size() > 1)
+            continue;
+#endif
 
         QList<QNetworkAddressEntry> addresses = iface.addressEntries();
         for (const QNetworkAddressEntry& address: addresses)

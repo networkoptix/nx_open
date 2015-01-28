@@ -35,7 +35,7 @@
         <product.title>${traytool.name}</product.title>
         <product.display.title>${traytool.display.name}</product.display.title>
         <!--Global libs-->
-        <global.libs/>
+        <global.libs>-lcommon</global.libs>
         <!--Specific os libs used-->
         <qt.libs>core gui widgets</qt.libs>
         <windows.oslibs>DbgHelp.lib</windows.oslibs>

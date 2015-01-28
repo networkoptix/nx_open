@@ -123,6 +123,11 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor():
     connect(qnBusinessMessageBus, &QnBusinessMessageBus::actionDelivered, this, &QnBusinessRuleProcessor::at_actionDelivered);
     connect(qnBusinessMessageBus, &QnBusinessMessageBus::actionDeliveryFail, this, &QnBusinessRuleProcessor::at_actionDeliveryFailed);
 
+    connect(qnResPool, &QnResourcePool::resourceAdded,
+        this, [this](const QnResourcePtr& resource) { toggleInputPortMonitoring( resource, true ); });
+    connect(qnResPool, &QnResourcePool::resourceRemoved,
+        this, [this](const QnResourcePtr& resource) { toggleInputPortMonitoring( resource, false ); });
+
     connect(qnBusinessMessageBus, &QnBusinessMessageBus::actionReceived,
         this, static_cast<void (QnBusinessRuleProcessor::*)(const QnAbstractBusinessActionPtr&)>(&QnBusinessRuleProcessor::executeAction));
 
@@ -727,6 +732,37 @@ void QnBusinessRuleProcessor::at_businessRuleReset(const QnBusinessEventRuleList
 
     for(const QnBusinessEventRulePtr& rule: rules) {
         at_businessRuleChanged_i(rule);
+    }
+}
+
+void QnBusinessRuleProcessor::toggleInputPortMonitoring(const QnResourcePtr& resource, bool toggle)
+{
+    QMutexLocker lock(&m_mutex);
+
+    if( resource->hasFlags(Qn::foreigner) )
+        return;
+
+    QnSecurityCamResource* camResource = dynamic_cast<QnSecurityCamResource*>(resource.data());
+    if( camResource == nullptr )
+        return;
+
+    for( const QnBusinessEventRulePtr& rule: m_rules )
+    {
+        if( rule->isDisabled() )
+            continue;
+
+        if( rule->eventType() == QnBusiness::CameraInputEvent)
+        {
+            QnVirtualCameraResourceList resList = rule->eventResourceObjects().filtered<QnVirtualCameraResource>();
+            if( resList.isEmpty() ||            //listening all cameras
+                resList.contains(resource.staticCast<QnVirtualCameraResource>()) )
+            {
+                if( toggle )
+                    camResource->inputPortListenerAttached();
+                else
+                    camResource->inputPortListenerDetached();
+            }
+        }
     }
 }
 
