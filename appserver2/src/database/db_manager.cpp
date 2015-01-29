@@ -2726,7 +2726,7 @@ ErrorCode QnDbManager::getScheduleTasks(const QnUuid& serverId, std::vector<ApiS
             st.fps                                 \
         FROM vms_scheduletask st \
         JOIN vms_camera_user_attributes r on r.id = st.camera_attrs_id \
-        JOIN vms_resource r2 on r2.guid = r.camera_guid \
+        LEFT JOIN vms_resource r2 on r2.guid = r.camera_guid \
         %1\
         ORDER BY r.camera_guid\
     ").arg(filterStr));
@@ -2764,7 +2764,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& serverId, ApiCameraAttributes
             max_archive_days as maxArchiveDays,          \
             prefered_server_id as preferedServerId       \
          FROM vms_camera_user_attributes                 \
-         JOIN vms_resource r on r.guid = camera_guid     \
+         LEFT JOIN vms_resource r on r.guid = camera_guid     \
          %1                                              \
          ORDER BY camera_guid                            \
         ").arg(filterStr) );
