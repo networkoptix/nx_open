@@ -1,56 +1,26 @@
 import QtQuick 2.2
 
+import Material 0.1
+
 import com.networkoptix.qml 1.0
 
-import "../items"
-
-Item {
+Page {
     id: resourcesDialog
 
-    property int __itemsPerRow: 2
+    property bool showList: true
 
-    property var __syspal: SystemPalette {
-        colorGroup: SystemPalette.Active
+    title: qsTr("Resources")
+
+    QnCameraListModel {
+        id: camerasModel
     }
 
-    Rectangle {
+    Loader {
+        id: listView
         anchors.fill: parent
-        color: __syspal.window
-    }
-
-    QnPlainResourceModel {
-        id: resourceModel
-    }
-
-    Flickable {
-        id: flickable
-        anchors.fill: parent
-
-        contentWidth: parent.width
-        contentHeight: flow.childrenRect.height
-
-        Flow {
-            id: flow
-            width: parent.width
-
-            Repeater {
-                id: repeater
-
-                model: resourceModel
-
-                delegate: QnResourceItemDelegate {
-                    name: display
-                    type: nodeType
-                    resourceId: uuid
-
-                    width: {
-                        if (nodeType == 0)
-                            return flickable.width
-                        else
-                            return flickable.width / __itemsPerRow
-                    }
-                }
-            }
+        source: Qt.resolvedUrl(showList ?  "/qml/items/QnCameraList.qml" : "/qml/items/QnCameraGrid.qml")
+        onLoaded: {
+            item.model = camerasModel
         }
     }
 }

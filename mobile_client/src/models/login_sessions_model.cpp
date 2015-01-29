@@ -106,9 +106,14 @@ void QnLoginSessionsModel::updateSession(const QString &address, const int port,
         it->systemName = systemName;
 
         int row = it - m_savedSessions.begin();
-        beginMoveRows(QModelIndex(), row, row, QModelIndex(), 0);
-        m_savedSessions.move(row, 0);
-        endInsertRows();
+        if (row == 0) {
+            QModelIndex index = this->index(0);
+            emit dataChanged(index, index);
+        } else {
+            beginMoveRows(QModelIndex(), row, row, QModelIndex(), 0);
+            m_savedSessions.move(row, 0);
+            endInsertRows();
+        }
     } else {
         QnLoginSession session;
         session.systemName = systemName;

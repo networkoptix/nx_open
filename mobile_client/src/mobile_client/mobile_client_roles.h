@@ -7,7 +7,8 @@ namespace Qn {
     enum QnMobileClientRoles {
         ThumbnailRole = RoleCount + 1,
         ServerResourceRole,
-        ServerNameRole
+        ServerNameRole,
+        IpAddressRole
     };
 
     QByteArray roleName(int role);

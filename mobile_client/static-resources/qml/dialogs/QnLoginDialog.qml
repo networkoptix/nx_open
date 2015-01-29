@@ -134,6 +134,7 @@ Page {
         target: connectionManager
         onConnected: {
             LoginDialogFunctions.saveCurrentSession()
+            pageStack.push(Qt.resolvedUrl("QnResourcesDialog.qml"))
         }
     }
 }

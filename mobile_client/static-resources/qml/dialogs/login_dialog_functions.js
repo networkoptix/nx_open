@@ -1,13 +1,26 @@
+var __currentAddress
+var __currentPort
+var __currentUser
+var __currentPassword
+
 function makeUrl(address, port, user, password) {
     return "http://" + user + ":" + password + "@" + address + ":" + port
 }
 
-function connectToServer(_address, _port, _user, _password) {
-    connectionManager.connectToServer(makeUrl(_address, _port, _user, _password))
+function updateCurrent(address, port, user, password) {
+    __currentAddress = address
+    __currentPort = port
+    __currentUser = user
+    __currentPassword = password
+}
+
+function connectToServer(address, port, user, password) {
+    updateCurrent(address, port, user, password)
+    connectionManager.connectToServer(makeUrl(address, port, user, password))
 }
 
 function saveCurrentSession() {
-    sessionsModel.updateSession(sessionEditDialog.address, sessionEditDialog.port, sessionEditDialog.user, sessionEditDialog.password, connectionManager.systemName)
+    sessionsModel.updateSession(__currentAddress, __currentPort, __currentUser, __currentPassword, connectionManager.systemName)
 }
 
 function select(id) {
