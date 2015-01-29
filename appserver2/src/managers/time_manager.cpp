@@ -352,6 +352,8 @@ namespace ec2
                 m_localTimePriorityKey.flags |= peerTimeSetByUser;
                 //incrementing sequence 
                 m_localTimePriorityKey.sequence = m_usedTimeSyncInfo.timePriorityKey.sequence + 1;
+                //"select primary time server" means "take its local time", so resetting internet synchronization flag
+                m_localTimePriorityKey.flags &= ~peerTimeSynchronizedWithInternetServer;
                 if( m_localTimePriorityKey > m_usedTimeSyncInfo.timePriorityKey )
                 {
                     //using current server time info
@@ -363,7 +365,6 @@ namespace ec2
                         currentMSecsSinceEpoch(),
                         m_localTimePriorityKey );
                     //resetting "synchronized with internet" flag
-                    m_usedTimeSyncInfo.timePriorityKey.flags &= ~peerTimeSynchronizedWithInternetServer;
                     NX_LOG( lit("TimeSynchronizationManager. Received primary time server change transaction. New synchronized time %1, new priority key 0x%2").
                         arg(QDateTime::fromMSecsSinceEpoch(m_usedTimeSyncInfo.syncTime).toString(Qt::ISODate)).arg(m_localTimePriorityKey.toUInt64(), 0, 16), cl_logINFO );
                     m_timeSynchronized = true;
