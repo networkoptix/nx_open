@@ -206,6 +206,7 @@ namespace ec2
         std::unique_ptr<DaytimeNISTFetcher> m_timeSynchronizer;
         size_t m_internetTimeSynchronizationPeriod;
         bool m_timeSynchronized;
+        int m_internetSynchronizationFailureCount;
 
         /*!
             \param lock Locked \a m_mutex. This method will unlock it to emit \a TimeSynchronizationManager::timeChanged signal
