@@ -43,13 +43,6 @@
 #include "transcoding/filters/filter_helper.h"
 #include "transcoding/filters/abstract_image_filter.h"
 
-//#define QN_SCREENSHOT_DEBUG
-#ifdef QN_SCREENSHOT_DEBUG
-#   define TRACE(...) qDebug() << __VA_ARGS__
-#else
-#   define TRACE(...)
-#endif
-
 namespace {
     const int showProgressDelay = 1500; // 1.5 sec
     const int minProgressDisplayTime = 1000; // 1 sec
@@ -148,8 +141,6 @@ QnWorkbenchScreenshotHandler::QnWorkbenchScreenshotHandler(QObject *parent):
 QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMediaResourceWidget *widget, const QnScreenshotParameters &parameters) const {
     QnResourceDisplayPtr display = widget->display();
 
-    TRACE("SCREENSHOT DEWARPING" << parameters.itemDewarpingParams.enabled << parameters.itemDewarpingParams.xAngle << parameters.itemDewarpingParams.yAngle << parameters.itemDewarpingParams.fov);
-
     QnConstResourceVideoLayoutPtr layout = display->videoLayout();
     bool anyQuality = layout->channelCount() > 1;   // screenshots for panoramic cameras will be done locally
 
@@ -178,9 +169,6 @@ QnImageProvider* QnWorkbenchScreenshotHandler::getLocalScreenshotProvider(QnMedi
 
 qint64 QnWorkbenchScreenshotHandler::screenshotTime(QnMediaResourceWidget *widget, bool adjust) {
     QnResourceDisplayPtr display = widget->display();
-
-    if (display->camDisplay()->isRealTimeSource())
-        return latestScreenshotTime;
 
     qint64 time = display->camDisplay()->getCurrentTime();
     if (time == AV_NOPTS_VALUE)

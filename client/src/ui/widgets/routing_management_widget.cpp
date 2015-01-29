@@ -322,8 +322,10 @@ void QnRoutingManagementWidget::at_addButton_clicked() {
         return;
     }
 
-    if (url.port() == m_server->getPort())
-        url.setPort(-1);
+//    if (url.port() == m_server->getPort())
+//        url.setPort(-1);
+    // TODO: #dklychkov fix it in 2.4
+    url.setPort(-1);
 
     QUrl explicitUrl = url;
     explicitUrl.setPort(m_server->getPort());
@@ -335,7 +337,7 @@ void QnRoutingManagementWidget::at_addButton_clicked() {
         return;
     }
 
-    m_serverAddressesModel->addAddress(url);
+    m_serverAddressesModel->addAddress(explicitUrl);
 }
 
 void QnRoutingManagementWidget::at_removeButton_clicked() {

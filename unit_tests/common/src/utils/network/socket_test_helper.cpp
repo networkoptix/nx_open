@@ -311,7 +311,7 @@ void ConnectionsGenerator::join()
 
 bool ConnectionsGenerator::start()
 {
-    for( int i = 0; i < m_maxSimultaneousConnectionsCount; ++i )
+    for( size_t i = 0; i < m_maxSimultaneousConnectionsCount; ++i )
     {
         std::unique_lock<std::mutex> lk( m_mutex );
 
@@ -363,12 +363,23 @@ void ConnectionsGenerator::onConnectionFinished( ConnectionsContainer::iterator 
     if( m_terminated )
         return;
 
-    m_connections.push_back( std::unique_ptr<TestConnection>() );
-    std::unique_ptr<TestConnection> connection( new TestConnection(
-        m_remoteAddress,
-        m_bytesToSendThrough,
-        std::bind(&ConnectionsGenerator::onConnectionFinished, this, std::prev(m_connections.end())) ) );
-    m_connections.back().swap( connection );
-    assert( m_connections.back()->start() );  //not processing error for now
-    ++m_totalConnectionsEstablished;
+    while( m_connections.size() < m_maxSimultaneousConnectionsCount )
+    {
+        m_connections.push_back( std::unique_ptr<TestConnection>() );
+        std::unique_ptr<TestConnection> connection( new TestConnection(
+            m_remoteAddress,
+            m_bytesToSendThrough,
+            std::bind(&ConnectionsGenerator::onConnectionFinished, this, std::prev(m_connections.end())) ) );
+        m_connections.back().swap( connection );
+        if( !m_connections.back()->start() )
+        {
+            SystemError::ErrorCode osErrorCode = SystemError::getLastOSErrorCode();
+            std::cerr<<"Failed to start test connection. "<<SystemError::toString(osErrorCode).toStdString()<<std::endl;
+            //ignoring error for now
+            m_connections.pop_back();
+            return;
+        }
+
+        ++m_totalConnectionsEstablished;
+    }
 }

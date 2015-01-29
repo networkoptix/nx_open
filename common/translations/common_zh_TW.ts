@@ -21,62 +21,62 @@
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="722"/>
         <source>Invalid stack size after program evaluation: %1.</source>
-        <translation></translation>
+        <translation>程式執行後發生無效的 Stack 大小: %1.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="764"/>
         <source>Could not deduce result type for operation %1(&apos;%2&apos;, &apos;%3&apos;).</source>
-        <translation></translation>
+        <translation>無法推斷出操作結果類型 %1(&apos;%2&apos;, &apos;%3&apos;).</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="792"/>
         <source>Invalid parameter type for operation %1(&apos;%2&apos;, &apos;%2&apos;)</source>
-        <translation></translation>
+        <translation>操作無效的參數類型 %1(&apos;%2&apos;, &apos;%2&apos;)</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="802"/>
         <source>Could not deduce arithmetic supertype for type &apos;%1&apos;.</source>
-        <translation></translation>
+        <translation>無法推斷超算術類型 &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="824"/>
         <source>Invalid parameter type for operation %1(&apos;%2&apos;)</source>
-        <translation></translation>
+        <translation>操作無效的參數類型 %1(&apos;%2&apos;)</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="832"/>
         <source>Argument number for %1 instruction has invalid type &apos;%2&apos;.</source>
-        <translation></translation>
+        <translation>參數編號 %1 指令有無效的類型 &apos;%2&apos;.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="836"/>
         <source>Argument number for %1 instruction is invalid.</source>
-        <translation></translation>
+        <translation>%1 指令參數編號無效.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="841"/>
         <source>Stack underflow during execution of %1 instruction.</source>
-        <translation></translation>
+        <translation>執行 %1 指令時堆棧溢出.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="845"/>
         <source>Function name for %1 instruction has invalid type &apos;%2&apos;.</source>
-        <translation></translation>
+        <translation>%1 的指示功能名稱有無效的類型 &apos;%2&apos;.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="856"/>
         <source>Function or variable &apos;%1&apos; is not defined.</source>
-        <translation></translation>
+        <translation>函數或變數 &apos;%1&apos; 未定義.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="862"/>
         <source>Variable &apos;%1&apos; is not a function and cannot be called.</source>
-        <translation>Variable &apos;%1&apos; is not a function and cannot be called.</translation>
+        <translation>變數 &apos;%1&apos; 不是一個函數, 不能調用.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="874"/>
         <source>Stack underflow during program evaluation.</source>
-        <translation>Stack underflow during program evaluation.</translation>
+        <translation>程式發生 Stack 溢位.</translation>
     </message>
 </context>
 <context>
@@ -84,7 +84,7 @@
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="113"/>
         <source>Unexpected symbol &apos;%1&apos; at position %2.</source>
-        <translation></translation>
+        <translation>在位置 %2 出現無預期的符號 &apos;%1&apos;.</translation>
     </message>
 </context>
 <context>
@@ -93,22 +93,22 @@
         <location filename="../src/utils/common/evaluator.h" line="185"/>
         <location filename="../src/utils/common/evaluator.h" line="192"/>
         <source>Parameter %2 is not specified for function &apos;%1&apos;.</source>
-        <translation></translation>
+        <translation>參數 %2 非指定給功能 &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.h" line="195"/>
         <source>Parameter %2 of function &apos;%1&apos; is of type &apos;%3&apos;, but type &apos;%4&apos; was expected.</source>
-        <translation></translation>
+        <translation>功能 &apos;%1&apos; 的參數 %2 是&apos;%3&apos; 的非而預期的 &apos;%4&apos;.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.h" line="201"/>
         <source>Function &apos;%1&apos; is expected to have %3 arguments, %2 provided.</source>
-        <translation></translation>
+        <translation>功能 &apos;%1&apos; 預期有 %3 參數, %2 提供.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.h" line="206"/>
         <source>Function &apos;%1&apos; is expected to have %3-%4 arguments, %2 provided.</source>
-        <translation></translation>
+        <translation>功能 &apos;%1&apos; 預期有 %3-%4 參數, %2 提供.</translation>
     </message>
 </context>
 <context>
@@ -116,17 +116,17 @@
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="179"/>
         <source>Unexpected token %1 (&apos;%2&apos;) at position %3.</source>
-        <translation></translation>
+        <translation>位置 %3 有無預期的 token %1 (&apos;%2&apos;).</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="236"/>
         <source>Invalid color constant &apos;%1&apos;.</source>
-        <translation></translation>
+        <translation>無效的顏色常數 &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="281"/>
         <source>Invalid number constant &apos;%1&apos;.</source>
-        <translation></translation>
+        <translation>無效的數字常數 &apos;%1&apos;.</translation>
     </message>
 </context>
 <context>
@@ -217,17 +217,17 @@
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="113"/>
         <source>Camera IP Conflict at %1</source>
-        <translation>攝影機 %1 IP 位址通儲</translation>
+        <translation>攝影機 %1 IP 位址衝突</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="45"/>
         <source>Camera output</source>
-        <translation>顯示攝影機</translation>
+        <translation>觸發攝影機 D/O</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="46"/>
         <source>Camera output for 30 sec</source>
-        <translation>顯示攝影機30秒</translation>
+        <translation>觸發攝影機D/O 30秒</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="47"/>
@@ -267,7 +267,7 @@
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="50"/>
         <source>Send email</source>
-        <translation type="unfinished"></translation>
+        <translation>寄 Email</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="55"/>
@@ -302,42 +302,42 @@
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="74"/>
         <source>Server Failure</source>
-        <translation type="unfinished"></translation>
+        <translation>伺服器錯誤</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="75"/>
         <source>Server Conflict</source>
-        <translation type="unfinished"></translation>
+        <translation>伺服器衝突</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="76"/>
         <source>Server Started</source>
-        <translation type="unfinished"></translation>
+        <translation>伺服器啟動</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="77"/>
         <source>License Issue</source>
-        <translation type="unfinished"></translation>
+        <translation>授權問題</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="110"/>
         <source>Server &quot;%1&quot; Failure</source>
-        <translation type="unfinished"></translation>
+        <translation>伺服器 &quot;%1&quot; 錯誤</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="116"/>
         <source>Server &quot;%1&quot; Conflict</source>
-        <translation type="unfinished"></translation>
+        <translation>伺服器 &quot;%1&quot; 衝突</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="119"/>
         <source>Server &quot;%1&quot; Started</source>
-        <translation type="unfinished"></translation>
+        <translation>伺服器 &quot;%1&quot; 啟動</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="121"/>
         <source>Server &quot;%1&quot; had license issue</source>
-        <translation type="unfinished"></translation>
+        <translation>伺服器 &quot;%1&quot; 發生授權問題</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="126"/>
@@ -383,22 +383,22 @@
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="219"/>
         <source>Conflicting Server #%1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>衝突伺服器 #%1: %2</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="370"/>
         <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>攝影機 (主串流) 無預警斷線.</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="372"/>
         <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>攝影機 (第二串流) 無預警斷線.</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="408"/>
         <source>Recording on %n camera(s) is disabled: </source>
-        <translation type="unfinished"></translation>
+        <translation>%n 個攝影機的錄影已停止: </translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="325"/>
@@ -411,7 +411,7 @@
         <source>%n times, first: %2 %1</source>
         <comment>%1 means time, %2 means date</comment>
         <translation>
-            <numerusform>%n 時間，第一：%2 %1</numerusform>
+            <numerusform>%n 次，第一：%2 %1</numerusform>
         </translation>
     </message>
     <message>
@@ -425,30 +425,30 @@
         <source>First occurrence: %1 on %2 (%n times total)</source>
         <comment>%1 means time, %2 means date</comment>
         <translation>
-            <numerusform>第一次出現: %1 在 %2 ( %n 出現 次)</numerusform>
+            <numerusform>第一次出現: %1 在 %2 (共 %n 次)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/business/business_strings_helper.cpp" line="364"/>
         <source>No video frame received during last %n seconds.</source>
         <translation>
-            <numerusform>在過去的 %n 秒 無接收的影像</numerusform>
+            <numerusform>在過去的 %n 秒 無接收的影像.</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="378"/>
         <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-        <translation>RTP 封包遺失偵測，前一個 seq.=%1 下一個 seq.=%2.</translation>
+        <translation>RTP 封包遺失偵測，前一個序列.=%1 下一個序列.=%2.</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="380"/>
         <source>RTP packet loss detected.</source>
-        <translation>RTP 封包遺失偵測</translation>
+        <translation>RTP 封包遺失偵測.</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="384"/>
         <source>Server terminated.</source>
-        <translation>伺服器中斷</translation>
+        <translation>伺服器中斷.</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="388"/>
@@ -482,13 +482,15 @@
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="31"/>
         <source>Server %1 is not available.
  Check that Server is up and running.</source>
-        <translation type="unfinished"></translation>
+        <translation>伺服器 %1 無法使用.
+請確認伺服器已上線運作.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="35"/>
         <source>Received bad response from Server %1: &quot;%2&quot;.
  Check if Server is up and has the proper version.</source>
-        <translation type="unfinished"></translation>
+        <translation>從伺服器 %1: &quot;%2&quot; 接收到錯誤回應.
+請檢查伺服器是否正常運作及版本無誤.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="43"/>
@@ -508,14 +510,14 @@
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="53"/>
         <source>Could not parse camera response. Url %1, request name %2.
  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
-        <translation>無法解析攝影機回應。網址 %1，需求名稱 %2。請嘗試在網頁上恢復為出廠預設值。最後，嘗試升級攝影機韌體。如果此狀況持續存在，請尋求您購買的廠商解決方案。</translation>
+        <translation>無法解析攝影機回應。網址 %1，需求名稱 %2。請嘗試在網頁上恢復為出廠預設值。最後，嘗試升級攝影機韌體。如果此狀況持續存在，請尋求您的支援廠商。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="58"/>
         <source>No supported media tracks at url %1.
  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
         <translation>不支援網址 %1 的媒體軌。
-請嘗試重新啟動攝影機，再於攝影機的網頁上恢復為出廠預設值。最後，嘗試升級攝影機韌體。如果此狀況持續存在，請尋求您購買的廠商解決方案</translation>
+請嘗試重新啟動攝影機，再於攝影機的網頁上恢復為出廠預設值。最後，嘗試升級攝影機韌體。如果此狀況持續存在，請尋求您購買的廠商解決方案.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="63"/>
@@ -527,40 +529,40 @@
         <source>Cannot open media url %1. Unsupported media protocol %2.
  Please try to restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
         <translation>無法開啟媒體網址 %1。不支援的媒體協定 %2。
-請嘗試在網頁上恢復為出廠預設值。最後，嘗試升級攝影機韌體。如果此狀況持續存在，請尋求您購買的廠商解決方案。</translation>
+請嘗試在網頁上恢復為出廠預設值。最後，嘗試升級攝影機韌體。如果此狀況持續存在，請尋求您的支援廠商。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="72"/>
         <source>Failed to configure parameter %1.
  First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings. If it doesn&apos;t help, restore factory defaults on the camera web-page. If the problem persists, please contact support.</source>
         <translation>無法設定參數 %1。
-首先，請先嘗試開啟錄影 (如果現在是停止的) 並降低攝影機的 FPS 設定。如果不成功，請嘗試在網頁上恢復為出廠預設值。最後，嘗試升級攝影機韌體。如果此狀況持續存在，請尋求您購買的廠商解決方案。</translation>
+首先，請先嘗試開啟錄影 (如果現在是停止的) 並降低攝影機的 FPS 設定。如果不成功，請嘗試在網頁上恢復為出廠預設值。最後，嘗試升級攝影機韌體。如果此狀況持續存在，請尋求您的支援廠商。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="77"/>
         <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.
  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
         <translation>攝影機要求 &quot;%1&quot;失敗，錯誤 &quot;%2&quot;。
-請請嘗試在網頁上恢復為出廠預設值。最後，嘗試升級攝影機韌體。如果此狀況持續存在，請尋求您購買的廠商解決方案。</translation>
+請請嘗試在網頁上恢復為出廠預設值。最後，嘗試升級攝影機韌體。如果此狀況持續存在，請尋求您的支援廠商。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="82"/>
         <source>Unknown Camera Issue.
  Please contact support.</source>
         <translation>未知攝影機故障。
-請尋求您購買的廠商解決方案。</translation>
+請尋求您的支援廠商。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="86"/>
         <source>An input/output error has occurred. OS message: &quot;%1&quot;.
  Make sure the camera is plugged into the network. Try to reboot the camera.</source>
         <translation>發生輸入/輸出錯誤。作業系統訊息：&quot;%1&quot;。
-請確認攝影機是否已連接至網路，嘗試重新啟動攝影機</translation>
+請確認攝影機是否已連接至網路，嘗試重新啟動攝影機.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="93"/>
         <source>Invalid data was received from the camera: %1.</source>
-        <translation>從攝影機：%1 端接收到無效資料</translation>
+        <translation>從攝影機：%1 端接收到無效資料.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="96"/>
@@ -575,7 +577,7 @@
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="102"/>
         <source>Camera initialization process in progress</source>
-        <translation type="unfinished"></translation>
+        <translation>攝影機正在進行初始化動作</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="117"/>
@@ -584,13 +586,13 @@
 Parameters: </source>
         <translation>
 
-參數：</translation>
+參數: </translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="39"/>
         <source>Cannot connect to http port %1.
  Make sure the camera is plugged into the network.</source>
-        <translation>無法連線到 http 通訊埠 %1。請確認攝影機影將加入本網路。</translation>
+        <translation>無法連線到 http 通訊埠 %1。請確認攝影機影已加入本網路。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="89"/>
@@ -600,7 +602,7 @@ Parameters: </source>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="115"/>
         <source>Unknown error. Please contact support.</source>
-        <translation>未知錯誤，請尋求您購買的廠商解決方案。</translation>
+        <translation>未知錯誤，請尋求您的支援廠商。</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="130"/>
@@ -644,7 +646,7 @@ Parameters: </source>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="67"/>
         <source>Could not find encoder for codec %1.</source>
-        <translation>找不到 %1 編碼的編碼器</translation>
+        <translation>找不到 %1 編碼的編碼器.</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="94"/>
@@ -678,7 +680,7 @@ Parameters: </source>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="245"/>
         <source>Could not perform direct stream copy because frame size is undefined.</source>
-        <translation>無法進行直接串流複製，因為未定憶定義圖框尺寸大小。</translation>
+        <translation>無法進行直接串流複製，因為未定義圖框尺寸大小。</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="292"/>
@@ -688,7 +690,7 @@ Parameters: </source>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="330"/>
         <source>Video or audio codec is incompatible with container %1.</source>
-        <translation>影像說聲音編碼與容器 %1 不相容。</translation>
+        <translation>影像或聲音編碼與容器 %1 不相容。</translation>
     </message>
 </context>
 <context>
@@ -696,7 +698,7 @@ Parameters: </source>
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="59"/>
         <source>Could not find encoder for codec %1.</source>
-        <translation>找不到 %1 編碼的編碼器</translation>
+        <translation>找不到 %1 編碼的編碼器.</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="106"/>
@@ -724,92 +726,92 @@ Parameters: </source>
     <message>
         <location filename="../src/licensing/license.cpp" line="154"/>
         <source>Edge</source>
-        <translation type="unfinished"></translation>
+        <translation>Edge Camera</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="155"/>
         <source>Vmax</source>
-        <translation type="unfinished"></translation>
+        <translation>Vmax</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="156"/>
         <source>Analog encoder</source>
-        <translation type="unfinished"></translation>
+        <translation>類比編碼器</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="157"/>
         <source>Video Wall</source>
-        <translation type="unfinished"></translation>
+        <translation>電視牆</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="170"/>
         <source>Trial licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>測試用授權</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="171"/>
         <source>Analog licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>類比授權</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="172"/>
         <source>Professional licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>專業授權</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="173"/>
         <source>Edge licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Edge Camera 授權</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="174"/>
         <source>Vmax licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Vmax(DVR) 授權</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="175"/>
         <source>Analog encoder licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>類比編碼器授權</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="176"/>
         <source>Video Wall licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>電視牆授權</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="343"/>
         <source>Invalid signature</source>
-        <translation type="unfinished"></translation>
+        <translation>無效的簽章</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="345"/>
         <source>Server with necessary hardware ID is not found</source>
-        <translation type="unfinished"></translation>
+        <translation>找不到特定硬體 ID 的伺服器</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="347"/>
         <source>Invalid customization</source>
-        <translation type="unfinished"></translation>
+        <translation>無效的自定義參數</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="349"/>
         <source>Expired</source>
-        <translation type="unfinished"></translation>
+        <translation>逾期</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="351"/>
         <source>Invalid type</source>
-        <translation type="unfinished"></translation>
+        <translation>無效的類型</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="353"/>
         <source>Only single license is allowed for this device</source>
-        <translation type="unfinished"></translation>
+        <translation>此裝置只接受一組授權</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="355"/>
         <source>Unknown error</source>
-        <translation type="unfinished"></translation>
+        <translation>未知的錯誤</translation>
     </message>
 </context>
 <context>
@@ -817,55 +819,55 @@ Parameters: </source>
     <message numerus="yes">
         <location filename="../src/utils/license_usage_helper.cpp" line="75"/>
         <source>%n %2 are used out of %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n %2 已使用 %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/license_usage_helper.cpp" line="94"/>
         <source>%n %2 will be used out of %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n %2 將使用 %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/license_usage_helper.cpp" line="112"/>
         <source>Activate %n more %2. </source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>啟動 %n 更多 %2. </numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/license_usage_helper.cpp" line="114"/>
         <source>%n more %2 will be used. </source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 更多 %2 將被使用. </numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/utils/license_usage_helper.cpp" line="186"/>
         <source>There was a problem activating your license key. Database error has occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation>啟動授權時發生了問題. 資料庫發生錯誤.</translation>
     </message>
     <message>
         <location filename="../src/utils/license_usage_helper.cpp" line="188"/>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>啟動授權時發生了問題. 接收到無效的資料. 請將問題回覆給您的廠商.</translation>
     </message>
     <message>
         <location filename="../src/utils/license_usage_helper.cpp" line="190"/>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation>您輸入的授權有誤. 請檢查您輸入的授權. 如果問題持續發生, 請聯繫您的廠商以確認授權是否有誤或是取得正確授權.</translation>
     </message>
     <message>
         <location filename="../src/utils/license_usage_helper.cpp" line="193"/>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation>您正嘗試啟動不相容於軟體的授權. 請聯繫您的廠商以取得有效授權.</translation>
     </message>
     <message>
         <location filename="../src/utils/license_usage_helper.cpp" line="195"/>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to get a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation>此授權在 {{time}} 已被硬體 ID {{hwid}} 啟動過. 請聯繫您的廠商以取得有效授權.</translation>
     </message>
 </context>
 <context>
@@ -882,7 +884,7 @@ Parameters: </source>
         <location filename="../src/plugins/resource/digitalwatchdog/newdw_ptz_controller.cpp" line="111"/>
         <location filename="../src/plugins/resource/digitalwatchdog/newdw_ptz_controller.cpp" line="155"/>
         <source>Preset #</source>
-        <translation type="unfinished"></translation>
+        <translation>預設點 #</translation>
     </message>
 </context>
 <context>
@@ -914,7 +916,7 @@ Parameters: </source>
     <message>
         <location filename="../src/export/sign_helper.cpp" line="70"/>
         <source>Trial license</source>
-        <translation type="unfinished"></translation>
+        <translation>測試用授權</translation>
     </message>
     <message>
         <location filename="../src/export/sign_helper.cpp" line="263"/>
@@ -1055,32 +1057,32 @@ Parameters: </source>
     <message>
         <location filename="../src/health/system_health.cpp" line="6"/>
         <source>Email address is not set</source>
-        <translation type="unfinished"></translation>
+        <translation>Email 地址未設置</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="10"/>
         <source>Email server is not set</source>
-        <translation type="unfinished"></translation>
+        <translation>Email 伺服器未設置</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="12"/>
         <source>Some users have not set their email addresses</source>
-        <translation type="unfinished"></translation>
+        <translation>有些使用者未設定 Email 地址</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="14"/>
         <source>Connection to server lost</source>
-        <translation type="unfinished"></translation>
+        <translation>伺服器斷線</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="16"/>
         <source>Select server for others to synchronise time with</source>
-        <translation type="unfinished"></translation>
+        <translation>選擇要同步時間的伺服器</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="18"/>
         <source>Error while sending email</source>
-        <translation type="unfinished"></translation>
+        <translation>寄送 Email 時發生錯誤</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="20"/>
@@ -1095,53 +1097,60 @@ Parameters: </source>
     <message>
         <location filename="../src/health/system_health.cpp" line="24"/>
         <source>Rebuilding archive index is completed.</source>
-        <translation>重新建立索引檔完成。</translation>
+        <translation>重新建立錄影索引檔完成。</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="35"/>
         <source>Email address is not set for user %1</source>
-        <translation type="unfinished"></translation>
+        <translation>使用者 %1 未設置 Email 地址</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="45"/>
         <source>Email address is not set.
 You cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>Email 地址未設置.
+您無法透過 Email 接收系統通知.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="47"/>
         <source>Email server is not set.
 You cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>Email 伺服器未設置.
+您無法透過 Email 接收系統通知.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="49"/>
         <source>Some users have not set their email addresses.
 They cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>某些使用者未設置 Email 地址.
+他們無法透過 Email 接收系統通知.
+</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="51"/>
         <source>Multiple servers have different time and correct time could not be detected automatically.</source>
-        <translation type="unfinished"></translation>
+        <translation>有些伺服器未校時且無法正確偵測到正確時間.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="53"/>
         <source>Storages are full on the following Server:
 %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>下述伺服器的儲存裝置已滿:
+%1.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="55"/>
         <source>Storages are not configured on the following Server:
 %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>下述伺服器未設置儲存裝置:
+%1.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="59"/>
         <source>Rebuilding archive index is completed on the following Server:
 %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>下述伺服器已完成錄影路徑重建:
+%1.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="57"/>
@@ -1188,7 +1197,7 @@ You cannot record video from cameras.</source>
     <message>
         <location filename="../src/transcoding/transcoder.cpp" line="272"/>
         <source>OpenCL transcoding is not implemented.</source>
-        <translation>OpenCL 轉碼未執行</translation>
+        <translation>OpenCL 轉碼未執行.</translation>
     </message>
     <message>
         <location filename="../src/transcoding/transcoder.cpp" line="275"/>

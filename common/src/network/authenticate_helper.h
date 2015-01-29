@@ -129,8 +129,10 @@ private slots:
 private:
     void addAuthHeader(nx_http::Response& responseHeaders, bool isProxy);
     QByteArray getNonce();
-    bool isNonceValid(const QByteArray& nonce) const;
-    bool doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy, QnUuid* authUserId, char delimiter);
+    bool isNonceValid(const QByteArray& nonce);
+    bool isCookieNonceValid(const QByteArray& nonce);
+    bool doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy, QnUuid* authUserId, char delimiter, 
+                      std::function<bool(const QByteArray&)> checkNonceFunc);
     bool doBasicAuth(const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
     bool doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
 
@@ -140,6 +142,9 @@ private:
     QMap<QnUuid, QnUserResourcePtr> m_users;
     QMap<QnUuid, QnMediaServerResourcePtr> m_servers;
     QnAuthMethodRestrictionList m_authMethodRestrictionList;
+
+    QMap<qint64, qint64> m_cookieNonceCache;
+    mutable QMutex m_cookieNonceCacheMutex;
 };
 
 #define qnAuthHelper QnAuthHelper::instance()

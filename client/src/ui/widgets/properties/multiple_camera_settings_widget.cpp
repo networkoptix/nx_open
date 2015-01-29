@@ -25,6 +25,8 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
+#include <utils/aspect_ratio.h>
+
 namespace {
 
 class QnScopedUpdateRollback {
@@ -81,8 +83,7 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
 
     connect(ui->moreLicensesButton,     &QPushButton::clicked,                  this,   &QnMultipleCameraSettingsWidget::moreLicensesRequested);
     connect(ui->analogViewCheckBox,     SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
-    connect(ui->analogViewCheckBox,     SIGNAL(stateChanged(int)),              this,   SLOT(updateLicenseText()), Qt::QueuedConnection);
-    connect(qnLicensePool,              SIGNAL(licensesChanged()),              this,   SLOT(updateLicenseText()), Qt::QueuedConnection);
+    connect(ui->analogViewCheckBox,     SIGNAL(stateChanged(int)),              this,   SLOT(updateLicenseText()));
     connect(ui->analogViewCheckBox,     SIGNAL(clicked()),                      this,   SLOT(at_analogViewCheckBox_clicked()));
 
     connect(ui->expertSettingsWidget, SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
@@ -91,9 +92,9 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     connect(ui->arOverrideCheckBox, SIGNAL(stateChanged(int)), this, SLOT(at_dbDataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(archiveRangeChanged()),          this,   SLOT(at_dbDataChanged()));
 
-    ui->arComboBox->addItem(tr("4:3"),  4.0 / 3);
-    ui->arComboBox->addItem(tr("16:9"), 16.0 / 9);
-    ui->arComboBox->addItem(tr("1:1"),  1.0);
+    ui->arComboBox->addItem(tr("4:3"),  4.0f / 3);
+    ui->arComboBox->addItem(tr("16:9"), 16.0f / 9);
+    ui->arComboBox->addItem(tr("1:1"),  1.0f);
     ui->arComboBox->setCurrentIndex(0);
     connect(ui->arComboBox,         SIGNAL(currentIndexChanged(int)),    this,          SLOT(at_dbDataChanged()));
 
@@ -110,6 +111,14 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     setHelpTopic(ui->tabRecording,      Qn::CameraSettings_Recording_Help);
     setHelpTopic(ui->fisheyeCheckBox,   Qn::CameraSettings_Dewarping_Help);
 
+    auto updateLicensesIfNeeded = [this] { 
+        if (!isVisible())
+            return;
+        updateLicenseText();
+    };
+
+    QnCamLicenseUsageWatcher* camerasUsageWatcher = new QnCamLicenseUsageWatcher(this);
+    connect(camerasUsageWatcher, &QnLicenseUsageWatcher::licenseUsageChanged, this,  updateLicensesIfNeeded);
 
     updateFromResources();
     updateLicensesButtonVisible();
@@ -234,9 +243,9 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
             camera->setScheduleTasks(scheduleTasks);
 
         if (overrideAr)
-            camera->setProperty(QnMediaResource::customAspectRatioKey(), QString::number(ui->arComboBox->currentData().toDouble()));
-        else if (clearAr && camera->hasProperty(QnMediaResource::customAspectRatioKey()))
-            camera->setProperty(QnMediaResource::customAspectRatioKey(), QString());
+            camera->setCustomAspectRatio(ui->arComboBox->currentData().toReal());
+        else if (clearAr)
+            camera->clearCustomAspectRatio();
 
         if(overrideRotation) 
             camera->setProperty(QnMediaResource::rotationKey(), QString::number(ui->rotComboBox->currentData().toInt()));
@@ -345,7 +354,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             QSet<QString> logins, passwords;
             bool audioSupported = false;
             bool sameArOverride = true;
-            QString arOverride;
+            qreal arOverride;
             QString rotFirst;
             bool sameRotation = true;
             for (const QnVirtualCameraResourcePtr &camera: m_cameras) {
@@ -364,11 +373,11 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
                 setupCheckbox(ui->enableAudioCheckBox,  firstCamera, camera->isAudioEnabled());
                 setupCheckbox(ui->fisheyeCheckBox,      firstCamera, camera->getDewarpingParams().enabled);
       
-                QString changedAr = camera->getProperty(QnMediaResource::customAspectRatioKey());
+                qreal changedAr = camera->customAspectRatio();
                 if (firstCamera) {
                     arOverride = changedAr;
                 } else {
-                    sameArOverride &= changedAr == arOverride;
+                    sameArOverride &= qFuzzyEquals(changedAr, arOverride);
                 }
 
                 QString rotation = camera->getProperty(QnMediaResource::rotationKey());
@@ -384,10 +393,10 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             ui->enableAudioCheckBox->setEnabled(audioSupported);
             ui->arOverrideCheckBox->setTristate(!sameArOverride);
             if (sameArOverride) {
-                ui->arOverrideCheckBox->setChecked(!arOverride.isEmpty());
+                ui->arOverrideCheckBox->setChecked(!qFuzzyIsNull(arOverride));
 
-                // float is important here
-                float ar = arOverride.toFloat();
+                /* Float is important here. */
+                float ar = QnAspectRatio::closestStandardRatio(arOverride).toFloat();
                 int idx = -1;
                 for (int i = 0; i < ui->arComboBox->count(); ++i) {
                     if (qFuzzyEquals(ar, ui->arComboBox->itemData(i).toFloat())) {

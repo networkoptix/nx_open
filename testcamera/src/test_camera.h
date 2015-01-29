@@ -5,6 +5,7 @@
 #include <QStringList>
 #include <QMap>
 #include <QFile>
+#include <QtCore/QMutex>
 #include "utils/network/socket.h"
 #include "core/datapacket/media_data_packet.h"
 #include "core/datapacket/video_data_packet.h"

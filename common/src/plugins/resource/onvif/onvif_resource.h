@@ -456,8 +456,8 @@ private:
     mutable QMutex m_ioPortMutex;
     bool m_inputMonitored;
     EventMonitorType m_eventMonitorType;
-    quint64 m_timerID;
-    quint64 m_renewSubscriptionTaskID;
+    quint64 m_nextPullMessagesTimerID;
+    quint64 m_renewSubscriptionTimerID;
     int m_maxChannels;
     std::map<quint64, TriggerOutputTask> m_triggerOutputTasks;
     
@@ -471,6 +471,7 @@ private:
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> m_asyncPullMessagesCallWrapper;
 
     bool createPullPointSubscription();
+    void removePullPointSubscription();
     void pullMessages( quint64 timerID );
     void onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode);
     void onPullMessagesResponseReceived(
@@ -491,6 +492,7 @@ private:
         unsigned int autoResetTimeoutMS );
     CameraDiagnostics::Result fetchAndSetDeviceInformationPriv( bool performSimpleCheck );
     QnAbstractPtzController* createSpecialPtzController();
+    bool trustMaxFPS();
 };
 
 #endif //ENABLE_ONVIF

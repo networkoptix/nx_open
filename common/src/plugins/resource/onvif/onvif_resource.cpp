@@ -254,12 +254,11 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_prevSoapCallResult(0),
     m_inputMonitored(false),
     m_eventMonitorType(emtNone),
-    m_timerID(0),
-    m_renewSubscriptionTaskID(0),
+    m_nextPullMessagesTimerID(0),
+    m_renewSubscriptionTimerID(0),
     m_maxChannels(1),
     m_streamConfCounter(0),
-    m_prevPullMessageResponseClock(0),
-    m_asyncPullMessagesCallWrapper(nullptr)
+    m_prevPullMessageResponseClock(0)
 {
     m_monotonicClock.start();
 }
@@ -588,17 +587,17 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 
     //detecting and saving selected resolutions
     CameraMediaStreams mediaStreams;
-    mediaStreams.streams.push_back( CameraMediaStreamInfo( m_primaryResolution, m_primaryCodec == H264 ? CODEC_ID_H264 : CODEC_ID_MJPEG ) );
+    mediaStreams.streams.push_back( CameraMediaStreamInfo( PRIMARY_ENCODER_INDEX, m_primaryResolution, m_primaryCodec == H264 ? CODEC_ID_H264 : CODEC_ID_MJPEG ) );
     if( m_secondaryResolution.width() > 0 )
-        mediaStreams.streams.push_back( CameraMediaStreamInfo( m_secondaryResolution, m_secondaryCodec == H264 ? CODEC_ID_H264 : CODEC_ID_MJPEG ) );
+        mediaStreams.streams.push_back( CameraMediaStreamInfo( SECONDARY_ENCODER_INDEX, m_secondaryResolution, m_secondaryCodec == H264 ? CODEC_ID_H264 : CODEC_ID_MJPEG ) );
     saveResolutionList( mediaStreams );
     
     QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
     bool forcedAR = resourceData.value<bool>(lit("forceArFromPrimaryStream"), false);
-    if (forcedAR && getProperty(QnMediaResource::customAspectRatioKey()).isEmpty()) 
+    if (forcedAR && getProperty(QnMediaResource::customAspectRatioKey()).isEmpty() && m_primaryResolution.height() > 0) 
     {
         qreal ar = m_primaryResolution.width() / (qreal) m_primaryResolution.height();
-        setProperty(QnMediaResource::customAspectRatioKey(), QString::number(ar));
+        setCustomAspectRatio(ar);
     }
     saveParams();
 
@@ -1529,7 +1528,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     else
         renewSubsciptionTimeoutSec = DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT;
     using namespace std::placeholders;
-    m_renewSubscriptionTaskID = TimerManager::instance()->addTimer(
+    m_renewSubscriptionTimerID = TimerManager::instance()->addTimer(
         std::bind(&QnPlOnvifResource::onRenewSubscriptionTimer, this, _1),
         (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
             ? renewSubsciptionTimeoutSec-RENEW_NOTIFICATION_FORWARDING_SECS
@@ -1578,6 +1577,13 @@ CameraDiagnostics::Result QnPlOnvifResource::updateVEncoderUsage(QList<VideoOpti
     else {
         return CameraDiagnostics::RequestFailedResult(QLatin1String("getProfiles"), soapWrapper.getLastError());
     }
+}
+
+bool QnPlOnvifResource::trustMaxFPS()
+{
+    QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+    bool result = resourceData.value<bool>(lit("trustMaxFPS"), false);
+    return result;
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper)
@@ -1699,7 +1705,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
     }
 
     setVideoEncoderOptions(optionsList[0]);
-    if (m_maxChannels == 1 && !isCameraControlDisabled())
+    if (m_maxChannels == 1 && !trustMaxFPS() && !isCameraControlDisabled())
         checkMaxFps(confResponse, optionsList[0].id);
 
     if(m_appStopping)
@@ -2416,11 +2422,13 @@ CameraDiagnostics::Result QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncod
     return CameraDiagnostics::NoErrorResult();
 }
 
-void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 /*timerID*/)
+void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 timerID)
 {
     QMutexLocker lk( &m_ioPortMutex );
 
     if( !m_eventCapabilities.get() )
+        return;
+    if( timerID != m_renewSubscriptionTimerID )
         return;
 
     const QAuthenticator& auth = getAuth();
@@ -2460,7 +2468,7 @@ void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 /*timerID*/)
         ? (response.oasisWsnB2__TerminationTime - *response.oasisWsnB2__CurrentTime)
         : DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT;
     using namespace std::placeholders;
-    m_renewSubscriptionTaskID = TimerManager::instance()->addTimer(
+    m_renewSubscriptionTimerID = TimerManager::instance()->addTimer(
         std::bind(&QnPlOnvifResource::onRenewSubscriptionTimer, this, _1),
         (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
             ? renewSubsciptionTimeoutSec-RENEW_NOTIFICATION_FORWARDING_SECS
@@ -2575,6 +2583,7 @@ bool QnPlOnvifResource::startInputPortMonitoringAsync( std::function<void(bool)>
 
     {
         QMutexLocker lk(&m_ioPortMutex);
+        Q_ASSERT( !m_inputMonitored );
         m_inputMonitored = true;
     }
 
@@ -2589,29 +2598,29 @@ bool QnPlOnvifResource::startInputPortMonitoringAsync( std::function<void(bool)>
 void QnPlOnvifResource::stopInputPortMonitoringAsync()
 {
     //TODO #ak this method MUST become asynchronous
-    quint64 localTimerID = 0;
-    quint64 localRenewSubscriptionTaskID = 0;
+    quint64 nextPullMessagesTimerIDBak = 0;
+    quint64 renewSubscriptionTimerIDBak = 0;
     {
         QMutexLocker lk(&m_ioPortMutex);
         m_inputMonitored = false;
-        localTimerID = m_timerID;
-        m_timerID = 0;
-        localRenewSubscriptionTaskID = m_renewSubscriptionTaskID;
-        m_renewSubscriptionTaskID = 0;
+        nextPullMessagesTimerIDBak = m_nextPullMessagesTimerID;
+        m_nextPullMessagesTimerID = 0;
+        renewSubscriptionTimerIDBak = m_renewSubscriptionTimerID;
+        m_renewSubscriptionTimerID = 0;
     }
 
     //removing timer
-    if( localTimerID > 0 )
-        TimerManager::instance()->joinAndDeleteTimer(localTimerID);
-    if( localRenewSubscriptionTaskID > 0 )
-        TimerManager::instance()->joinAndDeleteTimer(localRenewSubscriptionTaskID);
+    if( nextPullMessagesTimerIDBak > 0 )
+        TimerManager::instance()->joinAndDeleteTimer(nextPullMessagesTimerIDBak);
+    if( renewSubscriptionTimerIDBak > 0 )
+        TimerManager::instance()->joinAndDeleteTimer(renewSubscriptionTimerIDBak);
     //TODO #ak removing device event registration
         //if we do not remove event registration, camera will do it for us in some timeout
 
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> asyncPullMessagesCallWrapper;
     {
         QMutexLocker lk(&m_ioPortMutex);
-        asyncPullMessagesCallWrapper = m_asyncPullMessagesCallWrapper;
+        std::swap(asyncPullMessagesCallWrapper, m_asyncPullMessagesCallWrapper);
     }
 
     if( asyncPullMessagesCallWrapper )
@@ -2818,26 +2827,57 @@ bool QnPlOnvifResource::createPullPointSubscription()
     if( !m_inputMonitored )
         return true;
 
-    using namespace std::placeholders;
-    m_renewSubscriptionTaskID = TimerManager::instance()->addTimer(
-        std::bind(&QnPlOnvifResource::onRenewSubscriptionTimer, this, _1),
-        (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
-            ? renewSubsciptionTimeoutSec-RENEW_NOTIFICATION_FORWARDING_SECS
-            : renewSubsciptionTimeoutSec)*MS_PER_SECOND );
+    //not renewing session anymore, since it does not work on vista. Just re-subscribing if pullMessages returned error
+    //using namespace std::placeholders;
+    //m_renewSubscriptionTimerID = TimerManager::instance()->addTimer(
+    //    std::bind(&QnPlOnvifResource::onRenewSubscriptionTimer, this, _1),
+    //    (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
+    //        ? renewSubsciptionTimeoutSec-RENEW_NOTIFICATION_FORWARDING_SECS
+    //        : renewSubsciptionTimeoutSec)*MS_PER_SECOND );
 
     m_eventMonitorType = emtPullPoint;
     m_prevPullMessageResponseClock = m_monotonicClock.elapsed();
 
-    if( m_timerID != 0 )
+    if( m_nextPullMessagesTimerID != 0 )
     {
-        TimerManager::instance()->deleteTimer( m_timerID );
-        m_timerID = 0;
+        TimerManager::instance()->deleteTimer( m_nextPullMessagesTimerID );
+        m_nextPullMessagesTimerID = 0;
     }
 
-    m_timerID = TimerManager::instance()->addTimer(
-        std::bind(&QnPlOnvifResource::pullMessages, this, _1),
+    m_nextPullMessagesTimerID = TimerManager::instance()->addTimer(
+        std::bind(&QnPlOnvifResource::pullMessages, this, std::placeholders::_1),
         PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND);
     return true;
+}
+
+void QnPlOnvifResource::removePullPointSubscription()
+{
+    const QAuthenticator& auth = getAuth();
+    SubscriptionManagerSoapWrapper soapWrapper(
+        m_onvifNotificationSubscriptionReference.isEmpty()
+            ? m_eventCapabilities->XAddr
+            : m_onvifNotificationSubscriptionReference.toLatin1().constData(),
+        auth.user(),
+        auth.password(),
+        m_timeDrift );
+    soapWrapper.getProxy()->soap->imode |= SOAP_XML_IGNORENS;
+
+    char buf[256];
+
+    _oasisWsnB2__Unsubscribe request;
+    if( !m_onvifNotificationSubscriptionID.isEmpty() )
+    {
+        sprintf( buf, "<dom0:SubscriptionId xmlns:dom0=\"http://www.onvifplus.org/event\">%s</dom0:SubscriptionId>", m_onvifNotificationSubscriptionID.toLatin1().data() );
+        request.__any.push_back( buf );
+    }
+    _oasisWsnB2__UnsubscribeResponse response;
+    m_prevSoapCallResult = soapWrapper.unsubscribe( request, response );
+    if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )
+    {
+        NX_LOG( lit("Failed to unsubscuibe subscription (endpoint %1). %2").
+            arg(QString::fromLatin1(soapWrapper.endpoint())).arg(m_prevSoapCallResult), cl_logDEBUG1 );
+        return;
+    }
 }
 
 bool QnPlOnvifResource::isInputPortMonitored() const
@@ -2860,10 +2900,10 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
 
     QMutexLocker lk(&m_ioPortMutex);
 
-    if( timerID != m_timerID )
+    if( timerID != m_nextPullMessagesTimerID )
         return; //not expected event. This can actually happen if we call
                 //startInputPortMonitoring, stopInputPortMonitoring, startInputPortMonitoring really quick
-    m_timerID = 0;
+    m_nextPullMessagesTimerID = 0;
 
     if( !m_inputMonitored )
         return;
@@ -2933,8 +2973,8 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
     {
         using namespace std::placeholders;
         //will try later
-        Q_ASSERT( m_timerID == 0 );
-        m_timerID = TimerManager::instance()->addTimer(
+        Q_ASSERT( m_nextPullMessagesTimerID == 0 );
+        m_nextPullMessagesTimerID = TimerManager::instance()->addTimer(
             std::bind(&QnPlOnvifResource::pullMessages, this, _1),
             PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND);
     }
@@ -2942,6 +2982,35 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
 
 void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode)
 {
+    if( resultCode != SOAP_OK && resultCode != SOAP_MUSTUNDERSTAND )
+    {
+        NX_LOG( lit("Failed to pull messages in NotificationProducer. endpoint %1, result code %2").
+            arg(QString::fromLatin1(asyncWrapper->syncWrapper()->endpoint())).
+            arg(resultCode), cl_logDEBUG1 );
+        //re-subscribing
+
+        QMutexLocker lk(&m_ioPortMutex);
+
+        if( !m_inputMonitored )
+            return;
+
+        m_renewSubscriptionTimerID = TimerManager::instance()->addTimer(
+            [this]( qint64 /*timerID*/ )
+            {
+                QMutexLocker lk(&m_ioPortMutex);
+                if( !m_inputMonitored )
+                    return;
+                lk.unlock();
+                //TODO #ak make removePullPointSubscription and createPullPointSubscription asynchronous, so that it does not block timer thread
+                removePullPointSubscription();
+                createPullPointSubscription();
+                lk.relock();
+                m_renewSubscriptionTimerID = 0;
+            },
+            0 );
+        return;
+    }
+
     onPullMessagesResponseReceived(asyncWrapper->syncWrapper(), resultCode, asyncWrapper->response());
 
     QMutexLocker lk(&m_ioPortMutex);
@@ -2950,10 +3019,11 @@ void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* as
         return;
 
     using namespace std::placeholders;
-    Q_ASSERT( m_timerID == 0 );
-    m_timerID = TimerManager::instance()->addTimer(
-        std::bind(&QnPlOnvifResource::pullMessages, this, _1),
-        PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND);
+    Q_ASSERT( m_nextPullMessagesTimerID == 0 );
+    if( m_nextPullMessagesTimerID == 0 )    //otherwise, we already have timer somehow
+        m_nextPullMessagesTimerID = TimerManager::instance()->addTimer(
+            std::bind(&QnPlOnvifResource::pullMessages, this, _1),
+            PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND);
 
     m_asyncPullMessagesCallWrapper.clear();
 }
@@ -2963,15 +3033,9 @@ void QnPlOnvifResource::onPullMessagesResponseReceived(
     int resultCode,
     const _onvifEvents__PullMessagesResponse& response)
 {
-    m_prevSoapCallResult = resultCode;
+    Q_ASSERT( resultCode == SOAP_OK || resultCode == SOAP_MUSTUNDERSTAND );
 
     const qint64 currentRequestSendClock = m_monotonicClock.elapsed();
-
-    if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )
-    {
-        NX_LOG(lit("Failed to pull messages in NotificationProducer. endpoint %1").arg(QString::fromLatin1(soapWrapper->endpoint())), cl_logDEBUG1);
-        return /*false*/;
-    }
 
     const time_t minNotificationTime = response.CurrentTime - roundUp<qint64>(m_monotonicClock.elapsed() - m_prevPullMessageResponseClock, MS_PER_SECOND) / MS_PER_SECOND;
     if( response.oasisWsnB2__NotificationMessage.size() > 0 )

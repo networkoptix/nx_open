@@ -797,7 +797,7 @@ float QnMediaResourceWidget::visualAspectRatio() const {
     if (!resource())
         return base_type::visualAspectRatio();
 
-    float customAspectRatio = QnResourceWidget::resource()->getProperty(QnMediaResource::customAspectRatioKey()).toFloat();
+    qreal customAspectRatio = resource()->customAspectRatio();
     if (qFuzzyIsNull(customAspectRatio))
         return base_type::visualAspectRatio();
 
@@ -1255,11 +1255,10 @@ void QnMediaResourceWidget::updateFisheye() {
 }
 
 void QnMediaResourceWidget::updateCustomAspectRatio() {
-    if (!m_display)
+    if (!m_display || !m_resource)
         return;
 
-    QString customAr = m_resource->toResource()->getProperty(QnMediaResource::customAspectRatioKey());
-    m_display->camDisplay()->setOverridenAspectRatio(customAr.toDouble());
+    m_display->camDisplay()->setOverridenAspectRatio(m_resource->customAspectRatio());
 }
 
 void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {

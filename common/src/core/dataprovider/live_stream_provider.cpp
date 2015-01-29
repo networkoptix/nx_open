@@ -6,6 +6,8 @@
 #include "utils/media/jpeg_utils.h"
 
 
+static const int CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES = 1000;
+
 QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     QnAbstractMediaStreamDataProvider(res),
     m_livemutex(QMutex::Recursive),
@@ -15,7 +17,8 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     m_framesSinceLastMetaData(0),
     m_softMotionRole(Qn::CR_Default),
     m_softMotionLastChannel(0),
-    m_secondaryQuality(Qn::SSQualityNotDefined)
+    m_secondaryQuality(Qn::SSQualityNotDefined),
+    m_framesSincePrevMediaStreamCheck(CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES+1)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
         m_motionMaskBinData[i] = (simd128i*) qMallocAligned(MD_WIDTH * MD_HEIGHT/8, 32);
@@ -279,6 +282,8 @@ void QnLiveStreamProvider::onGotVideoFrame(const QnCompressedVideoDataPtr& video
 {
     m_framesSinceLastMetaData++;
 
+    saveMediaStreamParamsIfNeeded( videoData );
+
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
 
     int maxSquare = SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height();
@@ -391,6 +396,11 @@ bool QnLiveStreamProvider::isCameraControlDisabled() const
     return camRes && camRes->isCameraControlDisabled();
 }
 
+bool QnLiveStreamProvider::isCameraControlRequired() const
+{
+    return !isCameraControlDisabled() && needConfigureProvider();
+}
+
 void QnLiveStreamProvider::filterMotionByMask(const QnMetaDataV1Ptr& motion)
 {
     motion->removeMotion(m_motionMaskBinData[motion->channelNumber]);
@@ -458,6 +468,27 @@ void QnLiveStreamProvider::extractCodedPictureResolution( const QnCompressedVide
                 *newResolution = QSize( videoData->width, videoData->height );
             break;
     }
+}
+
+void QnLiveStreamProvider::saveMediaStreamParamsIfNeeded( const QnCompressedVideoDataPtr& videoData )
+{
+    ++m_framesSincePrevMediaStreamCheck;
+    if( m_framesSincePrevMediaStreamCheck < CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES )
+        return;
+    m_framesSincePrevMediaStreamCheck = 0;
+
+    QSize streamResolution;
+    extractCodedPictureResolution( videoData, &streamResolution );
+
+    CameraMediaStreamInfo mediaStreamInfo(
+        getRole() == Qn::CR_LiveVideo
+            ? PRIMARY_ENCODER_INDEX
+            : SECONDARY_ENCODER_INDEX,
+        QSize(streamResolution.width(), streamResolution.height()),
+        videoData->compressionType );
+
+    if( m_cameraRes->saveMediaStreamInfoIfNeeded( mediaStreamInfo ) )
+        m_cameraRes->saveParamsAsync();
 }
 
 #endif // ENABLE_DATA_PROVIDERS

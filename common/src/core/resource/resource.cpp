@@ -834,7 +834,6 @@ void QnResource::blockingInit()
 void QnResource::initAndEmit()
 {
     init();
-    emit initAsyncFinished(toSharedPointer(this), isInitialized());
 }
 
 class InitAsyncTask: public QRunnable

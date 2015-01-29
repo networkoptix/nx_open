@@ -44,7 +44,15 @@ public:
 
     void setObsoleteServerGuid(const QnUuid& guid) { m_obsoleteUuid = guid; }
     QnUuid obsoleteServerGuid() const{ return m_obsoleteUuid; }
-    
+
+    /*
+    * This timestamp is using for database backup/restore operation.
+    * Server has got systemIdentity time after DB restore operation
+    * This time help pushing database from current server to all others
+    */
+    void setSystemIdentityTime(qint64 value, const QnUuid& sender);
+    qint64 systemIdentityTime() const;
+
     void setRemoteGUID(const QnUuid& guid);
     QnUuid remoteGUID() const;
 
@@ -56,6 +64,9 @@ public:
 
     void setDefaultAdminPassword(const QString& password) { m_defaultAdminPassword = password; }
     QString defaultAdminPassword() const { return m_defaultAdminPassword; }
+
+    void setAdminPasswordData(const QByteArray& hash, const QByteArray& digest);
+    void adminPasswordData(QByteArray* hash, QByteArray* digest) const;
 
     void setCloudMode(bool value) { m_cloudMode = value; }
     bool isCloudMode() const { return m_cloudMode; }
@@ -74,7 +85,7 @@ public:
 signals:
     void systemNameChanged(const QString &systemName);
     void remoteIdChanged(const QnUuid &id);
-
+    void systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
 protected:
     static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
 
@@ -94,6 +105,10 @@ private:
     mutable QMutex m_mutex;
     bool m_transcodingDisabled;
     QSet<QnUuid> m_allowedPeers;
+    qint64 m_systemIdentityTime;
+    
+    QByteArray m_adminPaswdHash;
+    QByteArray m_adminPaswdDigest;
 };
 
 #define qnCommon (QnCommonModule::instance())

@@ -2797,7 +2797,7 @@ Acerca de ...</translation>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1341"/>
         <source>Connect to the Current System...</source>
-        <translation>Conectarse al sistema actual...</translation>
+        <translation>Combinar con sistema conectado en ese momento...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1352"/>

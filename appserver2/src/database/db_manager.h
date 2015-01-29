@@ -58,10 +58,7 @@ namespace ec2
         QnDbManager();
         virtual ~QnDbManager();
 
-        bool init(
-            QnResourceFactory* factory,
-            const QString& dbFilePath,
-            const QString& dbFilePathStatic );
+        bool init(QnResourceFactory* factory, const QUrl& dbUrl);
         bool isInitialized() const;
 
         static QnDbManager* instance();
@@ -109,7 +106,7 @@ namespace ec2
         template <class T1, class T2>
         ErrorCode doQuery(const T1& t1, T2& t2)
         {
-            QReadLocker lock(&m_mutex);
+            QWriteLocker lock(&m_mutex);
             return doQueryNoLock(t1, t2);
         }
 
@@ -507,6 +504,8 @@ namespace ec2
         void loadResourceTypeXML(const QString& fileName, ApiResourceTypeDataList& data);
         bool removeServerStatusFromTransactionLog();
         bool tuneDBAfterOpen();
+        bool updateCameraHistoryGuids();
+        bool migrateServerGUID(const QString& table, const QString& field);
     private:
         QnResourceFactory* m_resourceFactory;
         QnUuid m_storageTypeId;
@@ -530,6 +529,7 @@ namespace ec2
         bool m_needResyncLicenses;
         bool m_needResyncFiles;
         bool m_dbJustCreated;
+        bool m_isBackupRestore;
     };
 };
 

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('NavigationCtrl', function ($scope, $location, mediaserver, $cookies) {
+    .controller('NavigationCtrl', function ($scope, $location, mediaserver, ipCookie) {
         $scope.user = {
             isAdmin: true
         };
@@ -22,10 +22,11 @@ angular.module('webadminApp')
         };
 
         $scope.logout = function(){
-            delete $cookies.realm;
-            delete $cookies.nonce;
-            delete $cookies.response;
-            delete $cookies.username;
+
+            ipCookie.remove('response',{ path: '/' });
+            ipCookie.remove('nonce',{ path: '/' });
+            ipCookie.remove('realm',{ path: '/' });
+            ipCookie.remove('username',{ path: '/' });
             window.location.reload();
         }
     });

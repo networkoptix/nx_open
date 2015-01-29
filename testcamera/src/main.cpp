@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 
     QnCameraPool::initGlobalInstance( new QnCameraPool( localInterfacesToListen ) );
     QnCameraPool::instance()->start();
-    QnResourceStatusDiscionary statusDictionary;
+    QnResourceStatusDictionary statusDictionary;
 	QnResourcePropertyDictionary dictionary;
 	std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
     for (int i = 1; i < argc; ++i)

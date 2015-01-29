@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('LoginCtrl', function ($scope,mediaserver, $cookies) {
+    .controller('LoginCtrl', function ($scope,mediaserver, ipCookie) {
 
 
         // Login digest: http://en.wikipedia.org/wiki/Digest_access_authentication
@@ -13,21 +13,22 @@ angular.module('webadminApp')
         }
 
         $scope.login = function () {
+            console.log($scope);
             if ($scope.loginForm.$valid) {
 
                 // Calculate digest
-                var realm = $cookies.realm;
-                var nonce = $cookies.nonce;
+                var realm = ipCookie('realm');
+                var nonce = ipCookie('nonce');
 
                 var hash1 = md5($scope.user.username + ':' + realm + ':' + $scope.user.password);
                 var cnonce = md5("GET:");
                 var response = md5(hash1 + ':' + nonce + ':' + cnonce);
 
-                console.log("hash1 md5(", $scope.user.username + ':' + realm + ':' + $scope.user.password,')=', hash1);
-                console.log("response  md5(", hash1 + ':' + nonce + ':'+ cnonce,')=', response);
+                //console.log("hash1 md5(", $scope.user.username + ':' + realm + ':' + $scope.user.password,')=', hash1);
+                //console.log("response  md5(", hash1 + ':' + nonce + ':'+ cnonce,')=', response);
 
-                $cookies.response = response;
-                $cookies.username = $scope.user.username;
+                ipCookie('response',response, { path: '/' });
+                ipCookie('username',$scope.user.username, { path: '/' });
 
                 // Check auth again
                 mediaserver.getCurrentUser(true).then(reload).catch(function(error){

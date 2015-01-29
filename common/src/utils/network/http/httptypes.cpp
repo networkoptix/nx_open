@@ -52,6 +52,12 @@ namespace nx_http
         }
     }
 
+    HttpHeaders::iterator insertHeader( HttpHeaders* const headers, const HttpHeader& newHeader )
+    {
+        HttpHeaders::iterator itr = headers->lower_bound( newHeader.first );
+        return headers->insert( itr, newHeader );
+    }
+
     void removeHeader( HttpHeaders* const headers, const StringType& headerName )
     {
         HttpHeaders::iterator itr = headers->lower_bound( headerName );

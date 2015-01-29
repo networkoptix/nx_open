@@ -345,7 +345,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QString authenticationString, delayedDrop, instantDrop, logLevel;
     QString ec2TranLogLevel = lit("none");
     QString translationPath;
-    QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin ? lit(":/skin_light") : lit(":/skin_dark");
+    
     bool skipMediaFolderScan = false;
 #ifdef Q_OS_MAC
     bool noFullScreen = true;
@@ -377,7 +377,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&noFullScreen,           "--no-fullscreen",              NULL,   QString());
     commandLineParser.addParameter(&noVersionMismatchCheck, "--no-version-mismatch-check",  NULL,   QString());
 #ifdef ENABLE_DYNAMIC_CUSTOMIZATION
-    commandLineParser.addParameter(&customizationPath,      "--customization",              NULL,   QString());
+    QString dynamicCustomizationPath;
+    commandLineParser.addParameter(&dynamicCustomizationPath,"--customization",              NULL,   QString());
 #endif
     commandLineParser.addParameter(&lightMode,              "--light-mode",                 NULL,   QString(), lit("full"));
     commandLineParser.addParameter(&noVSync,                "--no-vsync",                   NULL,   QString());
@@ -443,7 +444,22 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     qnSettings->setClientUpdateDisabled(noClientUpdate);
 
+#ifdef ENABLE_DYNAMIC_CUSTOMIZATION
+    QString skinRoot = dynamicCustomizationPath.isEmpty() 
+        ? lit(":") 
+        : dynamicCustomizationPath;
+
+    QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin 
+        ? skinRoot + lit("/skin_light") 
+        : skinRoot + lit("/skin_dark");
+    QScopedPointer<QnSkin> skin(new QnSkin(QStringList() << skinRoot + lit("/skin") << customizationPath));
+#else
+    QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin ? lit(":/skin_light") : lit(":/skin_dark");
     QScopedPointer<QnSkin> skin(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
+#endif // ENABLE_DYNAMIC_CUSTOMIZATION
+
+
+    
 
     QnCustomization customization;
     customization.add(QnCustomization(skin->path("customization_common.json")));
@@ -635,8 +651,16 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     /* Process input files. */
     bool haveInputFiles = false;
-    for (int i = 1; i < argc; ++i)
-        haveInputFiles |= mainWindow->handleMessage(QFile::decodeName(argv[i]));
+    {
+        bool skipArg = true;
+        for (const auto& arg: qApp->arguments())
+        {
+            if (!skipArg)
+                haveInputFiles |= mainWindow->handleMessage(arg);
+            skipArg = false;
+        }
+    }
+
     if(!noSingleApplication)
         QObject::connect(application, SIGNAL(messageReceived(const QString &)), mainWindow.data(), SLOT(handleMessage(const QString &)));
 

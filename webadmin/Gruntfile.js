@@ -103,13 +103,12 @@ module.exports = function (grunt) {
 
                 //Evgeniy
 
-                {context: '/api/', host: '192.168.56.101', port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
-                {context: '/ec2/', host: '192.168.56.101', port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
-                {context: '/media/', host: '192.168.56.101', port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
-                {context: '/hls/', host: '192.168.56.101',port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}},
-                {context: '/proxy/', host: '192.168.56.101',port: 9000,headers: {'Authorization': 'Basic YWRtaW46MTIz'}}
 
-
+                {context: '/api/', host: '192.168.56.101', port: 9000},
+                {context: '/ec2/', host: '192.168.56.101', port: 9000},
+                {context: '/media/', host: '192.168.56.101', port: 9000},
+                {context: '/hls/', host: '192.168.56.101',port: 9000},
+                {context: '/proxy/', host: '192.168.56.101',port: 9000}
 
 
                     //Olga
@@ -134,11 +133,12 @@ module.exports = function (grunt) {
                 {context: '/proxy/',      host: '10.0.2.202', port: 7001, headers: {'Authorization': 'Basic YWRtaW46MTIz'}}
 */
                 //Roman Vasilenko  port: 7003,7004,7005,2006
- /*               {context: '/api/', host: '10.0.2.244', port: 7001},
-                {context: '/ec2/', host: '10.0.2.244', port: 7001},
-                {context: '/media/', host: '10.0.2.244', port: 7001},
-                {context: '/hls/', host: '10.0.2.244', port: 7001},
-                {context: '/proxy/', host: '10.0.2.244', port: 7001}*/
+
+                /*{context: '/api/', host: '10.0.2.244', port: 7005},
+                {context: '/ec2/', host: '10.0.2.244', port: 7005},
+                {context: '/hls/', host: '10.0.2.244', port: 7005},
+                {context: '/media/', host: '10.0.2.244', port: 7005},
+                {context: '/proxy/', host: '10.0.2.244', port: 7005}*/
 
                 //Daria
                 //{context: '/api/', host: '10.0.2.229', port: 7039, headers: {'Authorization': 'Basic YWRtaW46MTIz'}},

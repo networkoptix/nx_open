@@ -32,7 +32,7 @@ unsigned int QnAuthMethodRestrictionList::getAllowedAuthMethods( const nx_http::
         path = path.mid(1);
     while (path.endsWith(L'/'))
         path.chop(1);
-    unsigned int allowed = AuthMethod::cookie | AuthMethod::http | AuthMethod::videowall;   //by default
+    unsigned int allowed = AuthMethod::cookie | AuthMethod::http | AuthMethod::videowall | AuthMethod::urlQueryParam;   //by default
     for( std::pair<QString, unsigned int> allowRule: m_allowed )
     {
         if( !wildcardMatch( allowRule.first, path ) )
@@ -67,6 +67,7 @@ void QnAuthMethodRestrictionList::deny( const QString& pathMask, AuthMethod::Val
 QnAuthHelper* QnAuthHelper::m_instance;
 
 static const qint64 NONCE_TIMEOUT = 1000000ll * 60 * 5;
+static const qint64 COOKIE_EXPERATION_PERIOD = 3600;
 static const QString REALM(lit("NetworkOptix"));
 
 QnAuthHelper::QnAuthHelper()
@@ -109,7 +110,7 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
         const QString& cookie = QLatin1String(nx_http::getHeaderValue( request.headers, "Cookie" ));
         int customAuthInfoPos = cookie.indexOf(COOKIE_DIGEST_AUTH);
         if (customAuthInfoPos >= 0)
-            return doCookieAuthorization(request.requestLine.method, cookie.toUtf8(), response, authUserId);
+            return doCookieAuthorization("GET", cookie.toUtf8(), response, authUserId);
     }
 
     if( allowedAuthMethods & AuthMethod::videowall )
@@ -140,7 +141,31 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
         const nx_http::StringType& authorization = isProxy
             ? nx_http::getHeaderValue( request.headers, "Proxy-Authorization" )
             : nx_http::getHeaderValue( request.headers, "Authorization" );
-        if (authorization.isEmpty()) {
+        if( authorization.isEmpty() )
+        {
+            const nx_http::StringType nxUserName = nx_http::getHeaderValue( request.headers, "NX-User-Name" );
+            if( !nxUserName.isEmpty() )
+            {
+                QMutexLocker lock(&m_mutex);
+                for( const QnUserResourcePtr& user: m_users )
+                {
+                    if( user->getName().toUtf8().toLower() == nxUserName )
+                    {
+                        if( user->getDigest().isEmpty() )
+                        {
+                            //using basic authentication to allow fill user's digest
+                            nx_http::insertOrReplaceHeader(
+                                &response.headers,
+                                nx_http::HttpHeader(
+                                    isProxy ? "Proxy-Authenticate" : "WWW-Authenticate",
+                                    lit("Basic realm=%1").arg(REALM).toLatin1() ) );
+                            return false;
+                        }
+                        break;
+                    }
+                }
+            }
+
             addAuthHeader(response, isProxy);
             return false;
         }
@@ -153,7 +178,7 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
             authData = authorization.mid(pos+1);
         }
         if (authType == "digest")
-            return doDigestAuth(request.requestLine.method, authData, response, isProxy, authUserId, ',');
+            return doDigestAuth(request.requestLine.method, authData, response, isProxy, authUserId, ',', std::bind(&QnAuthHelper::isNonceValid, this, std::placeholders::_1));
         else if (authType == "basic")
             return doBasicAuth(authData, response, authUserId);
         else
@@ -288,7 +313,16 @@ static QList<QByteArray> smartSplit(const QByteArray& data, const char delimiter
     return rez;
 }
 
-bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy, QnUuid* authUserId, char delimiter)
+static QByteArray unquoteStr(const QByteArray& v)
+{
+    QByteArray value = v.trimmed();
+    int pos1 = value.startsWith('\"') ? 1 : 0;
+    int pos2 = value.endsWith('\"') ? 1 : 0;
+    return value.mid(pos1, value.length()-pos1-pos2);
+}
+
+bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, 
+                                bool isProxy, QnUuid* authUserId, char delimiter, std::function<bool(const QByteArray&)> checkNonceFunc)
 {
     const QList<QByteArray>& authParams = smartSplit(authData, delimiter);
 
@@ -305,8 +339,7 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
         if (pos == -1)
             return false;
         QByteArray key = data.left(pos);
-        QByteArray value = data.mid(pos+1);
-        value = value.mid(1, value.length()-2);
+        QByteArray value = unquoteStr(data.mid(pos+1));
         if (key == "username")
             userName = value.toLower();
         else if (key == "response")
@@ -325,7 +358,8 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
     md5Hash.addData(uri);
     QByteArray ha2 = md5Hash.result().toHex();
 
-    if (isNonceValid(nonce)) 
+    //if (isNonceValid(nonce))
+    if (checkNonceFunc(nonce))
     {
         QMutexLocker lock(&m_mutex);
         for(const QnUserResourcePtr& user: m_users)
@@ -415,20 +449,53 @@ bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Response& /*
     return false;
 }
 
+bool QnAuthHelper::isCookieNonceValid(const QByteArray& nonce)
+{
+    static const qint64 USEC_IN_SEC = 1000000ll;
+
+    QMutexLocker lock(&m_cookieNonceCacheMutex);
+
+    qint64 n1 = nonce.toLongLong(0, 16);
+    qint64 n2 = qnSyncTime->currentUSecsSinceEpoch();
+
+    bool rez;
+    auto itr = m_cookieNonceCache.find(n1);
+    if (itr == m_cookieNonceCache.end()) {
+        m_cookieNonceCache.insert(n1, n2);
+        rez = isNonceValid(nonce);
+    }
+    else {
+        rez = n2 - itr.value() < COOKIE_EXPERATION_PERIOD * USEC_IN_SEC;
+        itr.value() = n2;
+    }
+
+    // cleanup cookie cache
+
+    qint64 minAllowedTime = n2 - COOKIE_EXPERATION_PERIOD * USEC_IN_SEC;
+    for (auto itr = m_cookieNonceCache.begin(); itr != m_cookieNonceCache.end();)
+    {
+        if (itr.value() < minAllowedTime)
+            itr = m_cookieNonceCache.erase(itr);
+        else
+            ++itr;
+    }
+
+    return rez;
+}
+
 bool QnAuthHelper::doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId)
 {
     nx_http::Response tmpHeaders;
-    bool rez = doDigestAuth(method, authData, tmpHeaders, false, authUserId, ';');
+    bool rez = doDigestAuth(method, authData, tmpHeaders, false, authUserId, ';', std::bind(&QnAuthHelper::isCookieNonceValid, this, std::placeholders::_1));
     if (!rez)
     {
-        QString setCookie(COOKIE_DIGEST_AUTH);
-        setCookie += lit("; realm=\"%1\"; nonce=\"%2\"; Expires=%3")
-            .arg(REALM)
-            .arg(QLatin1String(getNonce()))
-            .arg(qnSyncTime->currentDateTime().toString(Qt::RFC2822Date));
-        nx_http::insertOrReplaceHeader(
+        nx_http::insertHeader(
             &responseHeaders.headers,
-            nx_http::HttpHeader("Set-Cookie", setCookie.toUtf8()));
+            nx_http::HttpHeader("Set-Cookie", lit("realm=%1; Path=/").arg(REALM).toUtf8() ));
+
+        QDateTime dt = qnSyncTime->currentDateTime().addSecs(COOKIE_EXPERATION_PERIOD);
+        QString nonce = lit("nonce=%1; Expires=%2; Path=/").arg(QLatin1String(getNonce())).arg(dateTimeToHTTPFormat(dt)); // Qt::RFC2822Date
+        nx_http::insertHeader(&responseHeaders.headers, nx_http::HttpHeader("Set-Cookie", nonce.toUtf8()));
     }
     return rez;
 }
@@ -442,7 +509,7 @@ void QnAuthHelper::addAuthHeader(nx_http::Response& response, bool isProxy)
         nx_http::HttpHeader(headerName, auth.arg(REALM).arg(QLatin1String(getNonce())).toLatin1() ) );
 }
 
-bool QnAuthHelper::isNonceValid(const QByteArray& nonce) const
+bool QnAuthHelper::isNonceValid(const QByteArray& nonce)
 {
     qint64 n1 = nonce.toLongLong(0, 16);
     qint64 n2 = qnSyncTime->currentUSecsSinceEpoch();

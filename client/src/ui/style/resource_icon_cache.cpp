@@ -35,7 +35,7 @@ QnResourceIconCache::QnResourceIconCache(QObject *parent): QObject(parent) {
 
     m_cache.insert(Server | Offline,        qnSkin->icon("tree/server_offline.png"));
     m_cache.insert(Server | Incompatible,   qnSkin->icon("tree/server_incompatible.png"));
-    m_cache.insert(Server | Control,        qnSkin->icon("tree/server.png"));
+    m_cache.insert(Server | Control,        qnSkin->icon("tree/server_current.png"));
     m_cache.insert(Camera | Offline,        qnSkin->icon("tree/camera_offline.png"));
     m_cache.insert(Camera | Unauthorized,   qnSkin->icon("tree/camera_unauthorized.png"));
     m_cache.insert(Layout | Locked,         qnSkin->icon("tree/layout_locked.png"));

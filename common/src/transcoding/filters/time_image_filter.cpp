@@ -107,7 +107,7 @@ CLVideoDecoderOutputPtr QnTimeImageFilter::updateImage(const CLVideoDecoderOutpu
 
     displayTime += m_onscreenDateOffset;
 
-    if (m_timeMsec * 1000 >= UTC_TIME_DETECTION_THRESHOLD)
+    if (displayTime * 1000 >= UTC_TIME_DETECTION_THRESHOLD)
         timeStr = QDateTime::fromMSecsSinceEpoch(displayTime).toString(QLatin1String("yyyy-MMM-dd hh:mm:ss"));
     else
         timeStr = QTime(0, 0, 0, 0).addMSecs(displayTime).toString(QLatin1String("hh:mm:ss.zzz"));

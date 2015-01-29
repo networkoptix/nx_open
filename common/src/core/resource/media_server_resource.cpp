@@ -33,8 +33,7 @@ private:
 
 QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePool):
     m_primaryIFSelected(false),
-    m_serverFlags(Qn::SF_None),
-    m_guard(NULL)
+    m_serverFlags(Qn::SF_None)
 {
     setTypeId(resTypePool->getFixedResourceTypeId(lit("Server")));
     addFlags(Qn::server | Qn::remote);
@@ -56,7 +55,8 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
 
 QnMediaServerResource::~QnMediaServerResource()
 {
-    QMutexLocker lock(&m_mutex); // TODO: #Elric remove once m_guard hell is removed.
+    QMutexLocker lock(&m_mutex);
+    m_runningIfRequests.clear();
 }
 
 void QnMediaServerResource::onNewResource(const QnResourcePtr &resource)
@@ -97,8 +97,12 @@ QString QnMediaServerResource::getName() const
 
 void QnMediaServerResource::setName( const QString& name )
 {
-    setServerName( name );
-    QnResource::setName( name );
+    QString oldName = getName();
+    if (oldName == name)
+        return;
+
+    setServerName(name);
+    emit nameChanged(toSharedPointer(this));
 }
 
 void QnMediaServerResource::setServerName( const QString& name )
@@ -254,31 +258,25 @@ private:
 };
 */
 
-void QnMediaServerResource::at_pingResponse(QnHTTPRawResponse response, int responseNum)
+void QnMediaServerResource::at_pingResponse( const nx_http::AsyncHttpClientPtr& httpClient )
 {
     QMutexLocker lock(&m_mutex);
-
-    const QString& urlStr = m_runningIfRequests.value(responseNum);
-    if( response.status == QNetworkReply::NoError )
+    if( httpClient->response()->statusLine.statusCode == nx_http::StatusCode::ok )
     {
+    	const nx_http::BufferType& msgBodyBuf = httpClient->fetchMessageBodyBuffer();
         QnPingReply reply;
         QnJsonRestResult result;
-        if( QJson::deserialize(response.data, &result) && QJson::deserialize(result.reply(), &reply) && (reply.moduleGuid == getId()) )
-        {
-            // server OK
-            if (urlStr == QnMediaServerResource::USE_PROXY)
-                setPrimaryIF(urlStr);
-            else
-                setPrimaryIF(QUrl(urlStr).host());
-        }
+        if( QJson::deserialize(msgBodyBuf, &result) && QJson::deserialize(result.reply(), &reply) && (reply.moduleGuid == getId()) )
+            setPrimaryIF(httpClient->url().host()); // server OK
     }
+    std::remove_if(m_runningIfRequests.begin(), m_runningIfRequests.end(), [httpClient](const nx_http::AsyncHttpClientPtr& value) { return value == httpClient;});
+}
 
-    m_runningIfRequests.remove(responseNum);
-
-    if(m_runningIfRequests.isEmpty() && m_guard) {
-        m_guard->deleteLater();
-        m_guard = NULL;
-    }
+void QnMediaServerResource::at_httpClientDone( const nx_http::AsyncHttpClientPtr& client )
+{
+    QMutexLocker lock(&m_mutex);
+    if( client->state() == nx_http::AsyncHttpClient::sFailed )
+        std::remove_if(m_runningIfRequests.begin(), m_runningIfRequests.end(), [client](const nx_http::AsyncHttpClientPtr& value) { return value == client;});
 }
 
 void QnMediaServerResource::setPrimaryIF(const QString& primaryIF)
@@ -354,13 +352,13 @@ void QnMediaServerResource::determineOptimalNetIF()
     {
         QUrl url(m_apiUrl);
         url.setHost(m_netAddrList[i].toString());
-        int requestNum = QnSessionManager::instance()->sendAsyncGetRequest(url, QLatin1String("ping"), this, "at_pingResponse", Qt::DirectConnection);
-        m_runningIfRequests.insert(requestNum, url.toString());
-    }
+        url.setPath(lit("/api/ping"));
 
-    if(!m_guard) {
-        m_guard = new QnMediaServerResourceGuard(::toSharedPointer(this));
-        m_guard->moveToThread(qApp->thread());
+        nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+        connect( httpClient.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable, this, &QnMediaServerResource::at_pingResponse, Qt::DirectConnection );
+        connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnMediaServerResource::at_httpClientDone, Qt::DirectConnection );
+        if (httpClient->doGet(url))
+            m_runningIfRequests.push_back(httpClient);
     }
 }
 
