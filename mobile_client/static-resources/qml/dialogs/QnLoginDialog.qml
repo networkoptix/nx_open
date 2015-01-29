@@ -3,6 +3,9 @@ import QtQuick.Controls 1.2
 import QtQuick.Layouts 1.1
 import QtQuick.Controls.Styles 1.2
 
+import Material 0.1
+import Material.ListItems 0.1 as ListItem
+
 import com.networkoptix.qml 1.0
 
 import "../controls"
@@ -10,549 +13,127 @@ import "../controls"
 import "login_dialog_functions.js" as LoginDialogFunctions
 import "../common_functions.js" as CommonFunctions
 
-FocusScope {
-    id: loginDialog
+Page {
+    id: loginPage
 
     property string __currentId
 
-    property var __syspal: SystemPalette {
-        colorGroup: SystemPalette.Active
-    }
+    title: applicationInfo.productName
 
-    QnContextSettings {
-        id: settings
-    }
+    actions: [
+        Action {
+            iconName: "action/done"
+            name: qsTr("Deselect")
+            visible: sessionsList.selection.length > 0
+            onTriggered: sessionsList.selection = []
+        },
+        Action {
+            iconName: "action/delete"
+            name: qsTr("Remove")
+            visible: sessionsList.selection.length > 0
+            onTriggered: {
+                if (__currentId != "")
+                    sessionsModel.deleteSession(__currentId)
+                else
+                    LoginDialogFunctions.deleteSesions(sessionsList.selection)
+            }
+        }
+    ]
 
     QnLoginSessionsModel {
         id: sessionsModel
     }
 
+    ListView {
+        id: sessionsList
 
-    /* backgorund */
-    Rectangle {
+        property var selection: []
+
+        model: sessionsModel
+
         anchors.fill: parent
-        color: __syspal.window
-    }
+        boundsBehavior: ListView.StopAtBounds
+        clip: true
 
-    Rectangle {
-        id: titleBar
+        section.property: "section"
+        section.criteria: ViewSection.FullString
+        section.labelPositioning: ViewSection.CurrentLabelAtStart | ViewSection.InlineLabels
 
-        width: parent.width
-        height: CommonFunctions.dp(56)
-        z: 1
-
-        color: colorTheme.color("nx_base")
-
-        QnSideShadow {
-            anchors.fill: titleBar
-            position: Qt.BottomEdge
-        }
-
-        QnIconButton {
-            id: backButton
-
-            x: CommonFunctions.dp(4)
-            anchors.verticalCenter: parent.verticalCenter
-            size: CommonFunctions.dp(48)
-
-            icon: "/images/back.png"
-
-            onClicked: {
-                loginDialog.state = "CHOOSE"
-                __currentId = ""
+        section.delegate: ListItem.Header {
+            Rectangle {
+                anchors.fill: parent
+                color: theme.backgroundColor
+                z: -1.0
             }
+
+            text: section
         }
 
-        QnIconButton {
-            id: checkButton
-
-            x: backButton.x
-            anchors.verticalCenter: parent.verticalCenter
-            size: CommonFunctions.dp(48)
-
-            icon: "/images/check.png"
-
-            onClicked: {
-                LoginDialogFunctions.clearSelection()
-                titleBar.state = "HIDDEN"
+        delegate: ListItem.Subtitled {
+            text: systemName ? systemName : qsTr("<UNKNOWN>")
+            subText: {
+                if (user)
+                    return user + '@' + address + ':' + port
+                else
+                    address + ':' + port
             }
-        }
 
-        QnIconButton {
-            id: deleteButton
+            secondaryItem: IconButton {
+                action: Action {
+                    iconName: "image/edit"
+                    name: qsTr("Modify")
+                    onTriggered: sessionEditDialog.openExistingSession(systemName, address, port, user, password)
+                }
+                visible: user
+            }
 
-            anchors.right: parent.right
-            anchors.rightMargin: CommonFunctions.dp(4)
-            anchors.verticalCenter: parent.verticalCenter
-            size: CommonFunctions.dp(48)
+            selected: sessionsList.selection.indexOf(sessionId) != -1
 
-            icon: "/images/delete.png"
-
-            onClicked: {
-                if (loginDialog.state == "CHOOSE") {
-                    LoginDialogFunctions.deleteSelected()
+            onTriggered: {
+                if (sessionsList.selection.length) {
+                    if (user)
+                        LoginDialogFunctions.select(sessionId)
                 } else {
-                    sessionsModel.deleteSession(__currentId)
-                    loginDialog.state = "CHOOSE"
-                }
-            }
-        }
-
-        Text {
-            id: systemNameLabel
-            anchors.verticalCenter: parent.verticalCenter
-            color: "white"
-            font.pixelSize: CommonFunctions.sp(20)
-            font.weight: Font.DemiBold
-            x: CommonFunctions.dp(72)
-        }
-
-        Text {
-            id: defaultLabel
-            anchors.verticalCenter: parent.verticalCenter
-            color: "white"
-            font.pixelSize: CommonFunctions.sp(20)
-            font.weight: Font.DemiBold
-            x: CommonFunctions.dp(72)
-            text: applicationInfo.productName
-        }
-
-        states: [
-            State {
-                name: "HIDDEN"
-                PropertyChanges {
-                    target: deleteButton
-                    __clipped: true
-                    visible: false
-                }
-                PropertyChanges {
-                    target: backButton
-                    __clipped: true
-                }
-                PropertyChanges {
-                    target: checkButton
-                    __clipped: true
-                }
-                PropertyChanges {
-                    target: systemNameLabel
-                    opacity: 0.0
-                }
-                PropertyChanges {
-                    target: defaultLabel
-                    opacity: 1.0
-                }
-            },
-            State {
-                name: "SELECT"
-                PropertyChanges {
-                    target: deleteButton
-                    __clipped: false
-                    visible: true
-                }
-                PropertyChanges {
-                    target: backButton
-                    __clipped: true
-                    visible: false
-                }
-                PropertyChanges {
-                    target: checkButton
-                    __clipped: false
-                    visible: true
-                }
-                PropertyChanges {
-                    target: systemNameLabel
-                    opacity: 0.0
-                }
-                PropertyChanges {
-                    target: defaultLabel
-                    opacity: 1.0
-                }
-            },
-            State {
-                name: "EDIT"
-                PropertyChanges {
-                    target: deleteButton
-                    __clipped: false
-                    visible: __currentId
-                }
-                PropertyChanges {
-                    target: backButton
-                    __clipped: false
-                    visible: true
-                }
-                PropertyChanges {
-                    target: checkButton
-                    __clipped: true
-                    visible: false
-                }
-                PropertyChanges {
-                    target: systemNameLabel
-                    opacity: 1.0
-                }
-                PropertyChanges {
-                    target: defaultLabel
-                    opacity: 0.0
-                }
-            }
-        ]
-
-        transitions: [
-            Transition {
-                from: "HIDDEN"
-                to: "SELECT"
-                SequentialAnimation {
-                    PropertyAction { target: checkButton; property: "__clipped" }
-                    PauseAnimation { duration: 50 }
-                    PropertyAction { target: deleteButton; property: "__clipped" }
-                }
-            },
-            Transition {
-                from: "HIDDEN"
-                to: "EDIT"
-                SequentialAnimation {
-                    ParallelAnimation {
-                        SequentialAnimation {
-                            PauseAnimation { duration: 50 }
-                            NumberAnimation { target: defaultLabel; property: "opacity"; duration: 100; easing.type: Easing.OutQuad }
-                        }
-                        PauseAnimation { duration: 150 }
-                    }
-                    NumberAnimation { target: systemNameLabel; property: "opacity"; duration: 100; easing.type: Easing.OutQuad }
-                    PropertyAction { target: backButton; property: "__clipped" }
-                    PauseAnimation { duration: 50 }
-                    PropertyAction { target: deleteButton; property: "__clipped" }
-                }
-            }
-        ]
-    }
-
-    Item {
-        id: savedSessions
-
-        anchors {
-            top: titleBar.bottom
-            bottom: parent.bottom
-        }
-        width: parent.width
-
-        ListView {
-            id: savedSessionsList
-
-            property var selection: []
-
-            model: sessionsModel
-
-            anchors.fill: parent
-            boundsBehavior: ListView.StopAtBounds
-            clip: true
-
-            section.property: "section"
-            section.criteria: ViewSection.FullString
-            section.labelPositioning: ViewSection.CurrentLabelAtStart | ViewSection.InlineLabels
-
-            section.delegate: Rectangle {
-                height: CommonFunctions.dp(48)
-                width: contentItem.width
-                color: __syspal.window
-
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    font.pixelSize: CommonFunctions.sp(16)
-                    renderType: Text.NativeRendering
-                    opacity: 0.7
-                    x: CommonFunctions.dp(16)
-
-                    text: section
-                }
-            }
-
-            delegate: Item {
-                id: sessionItem
-
-                property bool selected: LoginDialogFunctions.isSelected(sessionId)
-
-                width: contentItem.width
-                height: CommonFunctions.dp(72)
-
-                Rectangle {
-                    id: highlight
-                    anchors.fill: parent
-
-                    color: Qt.rgba(0, 0, 0, 0.12)
-                    visible: selected
-                }
-
-                Text {
-                    id: body1
-                    x: CommonFunctions.dp(72)
-                    y: CommonFunctions.dp(36) - height
-                    font.pixelSize: CommonFunctions.sp(14)
-                    font.weight: Font.DemiBold
-                    renderType: Text.NativeRendering
-                    opacity: 0.87
-
-                    text: systemName ? systemName : qsTr("<UNKNOWN>")
-                }
-
-                Text {
-                    id: caption
-                    x: CommonFunctions.dp(72)
-                    y: body1.y + CommonFunctions.sp(20)
-                    font.pixelSize: CommonFunctions.sp(12)
-                    renderType: Text.NativeRendering
-                    opacity: 0.7
-
-                    text: {
-                        if (user)
-                            return user + '@' + address + ':' + port
-                        else
-                            address + ':' + port
-                    }
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        if (savedSessionsList.selection.length) {
-                            LoginDialogFunctions.select(sessionId)
-                        } else {
-                            if (user) {
-                                LoginDialogFunctions.connectToServer(address, port, user, password)
-                            } else {
-                                LoginDialogFunctions.editSession(systemName, address, port, user, password)
-                                loginDialog.state = "EDIT"
-                            }
-                        }
-                    }
-                    onPressAndHold: {
-                        if (user)
-                            LoginDialogFunctions.select(sessionId)
-                    }
-                }
-
-                QnIconButton {
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.right: parent.right
-                    anchors.rightMargin: CommonFunctions.dp(16)
-                    icon: "/images/icons/edit_black.png"
-                    opacity: 0.7
-                    size: CommonFunctions.dp(48)
-
-                    visible: user
-
-                    onClicked: {
-                        LoginDialogFunctions.editSession(systemName, address, port, user, password)
+                    if (user) {
+                        LoginDialogFunctions.connectToServer(address, port, user, password)
+                    } else {
                         __currentId = sessionId
-                        loginDialog.state = "EDIT"
+                        sessionEditDialog.openExistingSession(systemName, address, port, user, password)
                     }
                 }
             }
+            onPressAndHold: {
+                if (user)
+                    LoginDialogFunctions.select(sessionId)
+            }
         }
     }
 
-    Item {
-        id: sessionEditor
-
-        anchors {
-            top: titleBar.bottom
-            bottom: parent.bottom
-            left: savedSessions.right
-        }
-        width: parent.width
-
-        Column {
-            id: fieldsColumn
-
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.margins: CommonFunctions.dp(16)
-
-            Text {
-                text: qsTr("Address")
-                font.pixelSize: CommonFunctions.sp(12)
-                opacity: 0.7
-            }
-
-            QnTextField {
-                id: address
-                placeholderText: "127.0.0.1"
-                width: parent.width
-                onAccepted: port.focus = true
-            }
-
-            Item {
-                height: CommonFunctions.dp(20)
-                width: 1
-            }
-
-            Text {
-                text: qsTr("Port")
-                font.pixelSize: CommonFunctions.sp(12)
-                opacity: 0.7
-            }
-
-            QnTextField {
-                id: port
-                width: parent.width
-                inputMethodHints: Qt.ImhDigitsOnly
-
-                validator: IntValidator {
-                    bottom: 1
-                    top: 65535
-                }
-                text: "7001"
-
-                onAccepted: login.focus = true
-            }
-
-            Item {
-                height: CommonFunctions.dp(20)
-                width: 1
-            }
-
-            Text {
-                text: qsTr("User name")
-                font.pixelSize: CommonFunctions.sp(12)
-                opacity: 0.7
-            }
-
-            QnTextField {
-                id: login
-                placeholderText: "admin"
-                width: parent.width
-                inputMethodHints: Qt.ImhNoAutoUppercase | Qt.ImhNoPredictiveText
-                onAccepted: password.focus = true
-            }
-
-            Item {
-                height: CommonFunctions.dp(20)
-                width: 1
-            }
-
-            Text {
-                text: qsTr("Password")
-                font.pixelSize: CommonFunctions.sp(12)
-                opacity: 0.7
-            }
-
-            QnTextField {
-                id: password
-                placeholderText: {
-                    var result = passwordCharacter
-                    result = result + result
-                    result = result + result
-                    result = result + result
-                    return result
-                }
-
-                echoMode: TextInput.Password
-                width: parent.width
-                onAccepted: LoginDialogFunctions.connectToServer()
-            }
-
-        }
-    }
-
-    QnRoundShadow {
-        anchors.fill: fab
-    }
-    Item {
-        id: fab
-
-        width: addButton.width
-        height: addButton.height
-
+    ActionButton {
         anchors {
             bottom: parent.bottom
             right: parent.right
-            margins: CommonFunctions.dp(24)
+            margins: units.dp(16)
         }
+        iconName: "content/add"
+        onClicked: sessionEditDialog.openNewSession()
+    }
 
-        QnRoundButton {
-            id: addButton
-
-            color: colorTheme.color("nx_base")
-            icon: "/images/plus.png"
-
-            onClicked: {
-                LoginDialogFunctions.clearSelection()
-                LoginDialogFunctions.newSession()
-                loginDialog.state = "EDIT"
-            }
-        }
-
-        QnRoundButton {
-            id: loginButton
-
-            color: colorTheme.color("nx_base")
-            icon: "/images/forward.png"
-            opacity: visible ? 1.0 : 0.0
-            visible: loginDialog.state == "EDIT"
-
-            Behavior on opacity { NumberAnimation { duration: 200 } }
-
-            onClicked: LoginDialogFunctions.connectToServer(address.text, port.text, login.text, password.text)
-        }
-
-        Behavior on rotation {
-            RotationAnimation {
-                easing.type: Easing.OutQuad
-                duration: 200
-                direction: RotationAnimation.Counterclockwise
-            }
+    QnSessionEditDialog {
+        id: sessionEditDialog
+        visible: false
+        onAccepted: LoginDialogFunctions.connectToServer(address, port, user, password)
+        onVisibleChanged: {
+            if (!visible)
+                __currentId = ""
         }
     }
 
-    states: [
-        State {
-            name: "CHOOSE"
-            PropertyChanges {
-                target: savedSessions
-                x: 0
-            }
-            PropertyChanges {
-                target: titleBar
-                state: "HIDDEN"
-            }
-            PropertyChanges {
-                target: fab
-                rotation: -180.0
-            }
-        },
-        State {
-            name: "EDIT"
-            PropertyChanges {
-                target: savedSessions
-                x: -loginDialog.width
-            }
-            PropertyChanges {
-                target: titleBar
-                state: "EDIT"
-            }
-            PropertyChanges {
-                target: fab
-                rotation: 0.0
-            }
-        }
-    ]
-    state: "CHOOSE"
-
-    transitions: Transition {
-        NumberAnimation {
-            target: savedSessions
-            property: "x"
-            easing.type: Easing.OutQuad
-            duration: 200
-        }
-    }
-
-    Keys.onReleased: {
-        if (event.key === Qt.Key_Back) {
-            if (loginDialog.state == "CHOOSE")
-                Qt.quit()
-            else
-                loginDialog.state = "CHOOSE"
+    Connections {
+        id: connections
+        target: connectionManager
+        onConnected: {
+            LoginDialogFunctions.saveCurrentSession()
         }
     }
 }

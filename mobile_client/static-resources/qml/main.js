@@ -1,4 +1,4 @@
-function openLoginDialog() {
+/*function openLoginDialog() {
     stackView.push({
         item: Qt.resolvedUrl("dialogs/QnLoginDialog.qml"),
         properties: {
@@ -30,3 +30,4 @@ function openVideo(id) {
         destroyOnPop: true
     })
 }
+*/

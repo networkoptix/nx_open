@@ -19,10 +19,15 @@ QnConnectionManager::QnConnectionManager(QObject *parent) :
     m_connected(false),
     m_connectHandle(-1)
 {
+    connect(qnCommon, &QnCommonModule::systemNameChanged, this, &QnConnectionManager::systemNameChanged);
 }
 
 bool QnConnectionManager::isConnected() const {
     return m_connected;
+}
+
+QString QnConnectionManager::systemName() const {
+    return qnCommon->localSystemName();
 }
 
 bool QnConnectionManager::connectToServer(const QUrl &url) {

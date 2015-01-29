@@ -134,6 +134,8 @@ void QnLoginSessionsModel::deleteSession(const QString &id) {
         m_savedSessions.removeAt(i);
         endRemoveRows();
     }
+
+    saveToSettings();
 }
 
 void QnLoginSessionsModel::at_moduleFinder_moduleAddressFound(const QnModuleInformation &moduleInformation, const QnNetworkAddress &address) {
