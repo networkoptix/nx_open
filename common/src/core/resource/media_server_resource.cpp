@@ -258,25 +258,17 @@ private:
 };
 */
 
-void QnMediaServerResource::at_pingResponse( const nx_http::AsyncHttpClientPtr& httpClient )
-{
-    QMutexLocker lock(&m_mutex);
-    if( httpClient->response()->statusLine.statusCode == nx_http::StatusCode::ok )
-    {
-    	const nx_http::BufferType& msgBodyBuf = httpClient->fetchMessageBodyBuffer();
-        QnPingReply reply;
-        QnJsonRestResult result;
-        if( QJson::deserialize(msgBodyBuf, &result) && QJson::deserialize(result.reply(), &reply) && (reply.moduleGuid == getId()) )
-            setPrimaryIF(httpClient->url().host()); // server OK
-    }
-    m_runningIfRequests.erase(std::remove(m_runningIfRequests.begin(), m_runningIfRequests.end(), httpClient));
-}
-
 void QnMediaServerResource::at_httpClientDone( const nx_http::AsyncHttpClientPtr& client )
 {
     QMutexLocker lock(&m_mutex);
-    if( client->state() == nx_http::AsyncHttpClient::sFailed )
-        m_runningIfRequests.erase(std::remove(m_runningIfRequests.begin(), m_runningIfRequests.end(), client));
+    if( client->state() == nx_http::AsyncHttpClient::sDone ) {
+        const nx_http::BufferType& msgBodyBuf = client->fetchMessageBodyBuffer();
+        QnPingReply reply;
+        QnJsonRestResult result;
+        if( QJson::deserialize(msgBodyBuf, &result) && QJson::deserialize(result.reply(), &reply) && (reply.moduleGuid == getId()) )
+            setPrimaryIF(client->url().host()); // server OK
+    }
+    m_runningIfRequests.erase(std::remove(m_runningIfRequests.begin(), m_runningIfRequests.end(), client), m_runningIfRequests.end());
 }
 
 void QnMediaServerResource::setPrimaryIF(const QString& primaryIF)
@@ -355,7 +347,6 @@ void QnMediaServerResource::determineOptimalNetIF()
         url.setPath(lit("/api/ping"));
 
         nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
-        connect( httpClient.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable, this, &QnMediaServerResource::at_pingResponse, Qt::DirectConnection );
         connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnMediaServerResource::at_httpClientDone, Qt::DirectConnection );
         if (httpClient->doGet(url))
             m_runningIfRequests.push_back(httpClient);
