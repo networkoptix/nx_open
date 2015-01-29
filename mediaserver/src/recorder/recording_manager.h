@@ -62,6 +62,8 @@ private slots:
     void at_camera_initializationChanged(const QnResourcePtr &resource);
     void at_camera_resourceChanged(const QnResourcePtr &resource);
     void at_checkLicenses();
+    void at_historyMutexLocked();
+    void at_historyMutexTimeout();
 private:
     void updateCamera(const QnSecurityCamResourcePtr& camera);
 
@@ -73,11 +75,22 @@ private:
     void beforeDeleteRecorder(const Recorders& recorders);
     void stopRecorder(const Recorders& recorders);
     void deleteRecorder(const Recorders& recorders, const QnResourcePtr& resource);
-    bool updateCameraHistory(const QnResourcePtr& res);
+    void updateCameraHistory(const QnResourcePtr& res);
 
     void at_licenseMutexLocked();
     void at_licenseMutexTimeout();
 private:
+    struct LockData 
+    {
+        LockData(): mutex(0), currentTime(0) {}
+        LockData(ec2::QnDistributedMutex* mutex, QnVirtualCameraResourcePtr cameraResource, qint64 currentTime): mutex(mutex), cameraResource(cameraResource), currentTime(currentTime) {}
+
+        ec2::QnDistributedMutex* mutex;
+        QnVirtualCameraResourcePtr cameraResource;
+        qint64 currentTime;
+    };
+    QMap<QString, LockData> m_lockInProgress;
+
     mutable QMutex m_mutex;
     QMap<QnResourcePtr, Recorders> m_recordMap;
     QTimer m_scheduleWatchingTimer;

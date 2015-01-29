@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="vi_VN" sourcelanguage="en_US">
+<TS version="2.1" language="vi_VN" sourcelanguage="en_US">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -420,7 +420,7 @@
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Warning! Low quality may result in low resolution image.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Nên biết trước! Chất lượng thấp có thể gây ra ảnh độ phân giải thấp。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
-    <message utf8="true">
+    <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui" line="199"/>
         <source>Warning! High quality may result in Server’s CPU overload, network connection errors and other issues.</source>
         <translation>Cảnh báo! Chất lượng cao có thể dẫn đến tình trạng quá tải CPU Server, lỗi kết nối mạng và các vấn đề khác.</translation>
@@ -5550,7 +5550,7 @@ Hãy cố gắng để bắt đầu sự ủy quyền thông qua chế độ hư
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="262"/>
         <source>Custom...</source>
-        <translation>khách hàng	...</translation>
+        <translation>khách hàng...</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.cpp" line="264"/>
@@ -7842,7 +7842,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="484"/>
         <source>Custom...</source>
-        <translation>khách hàng	...</translation>
+        <translation>khách hàng...</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.cpp" line="500"/>
@@ -7921,7 +7921,7 @@ Format for displaying year caption in timeline&apos;s header. Do not translate t
     <message numerus="yes">
         <location filename="../src/ui/graphics/items/resource/videowall_screen_widget.cpp" line="104"/>
         <source>Pc %1 - Screens %2</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Pc %1 - Screens %2</numerusform>
         </translation>
     </message>

@@ -172,6 +172,7 @@
 #include "version.h"
 #include "core/resource_management/resource_properties.h"
 #include "core/resource_management/status_dictionary.h"
+#include "network/universal_request_processor.h"
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -1318,6 +1319,7 @@ bool QnMain::initTcpListener()
     if( !m_universalTcpListener->bindToLocalAddress() )
         return false;
     m_universalTcpListener->setDefaultPage("/static/index.html");
+    //QnUniversalRequestProcessor::setUnauthorizedPageBody(QnFileConnectionProcessor::readStaticFile(m_universalTcpListener->defaultPage()));
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "ec2");

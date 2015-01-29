@@ -46,6 +46,17 @@ bool CLServerPushStreamReader::canChangeStatus() const
     return liveProvider && liveProvider->canChangeStatus();
 }
 
+CameraDiagnostics::Result CLServerPushStreamReader::openStreamInternal()
+{
+    m_cameraControlRequired = QnLiveStreamProvider::isCameraControlRequired(); // cache value to prevent race condition if value will changed durinng stream opening
+    return openStream();
+}
+
+bool CLServerPushStreamReader::isCameraControlRequired() const
+{
+    return m_cameraControlRequired;
+}
+
 void CLServerPushStreamReader::run()
 {
     initSystemThreadId();
@@ -70,7 +81,7 @@ void CLServerPushStreamReader::run()
                     m_openStreamResult = openStreamResult;
             }
             else {
-                m_openStreamResult = openStreamResult = openStream();
+                m_openStreamResult = openStreamResult = openStreamInternal();
                 m_needControlTimer.restart();
             }
 
@@ -108,7 +119,7 @@ void CLServerPushStreamReader::run()
         else {
             if (m_needControlTimer.elapsed() > CAM_NEED_CONTROL_CHECK_TIME) 
             {
-                if (!m_cameraControlRequired && isCameraControlRequired())
+                if (!m_cameraControlRequired && QnLiveStreamProvider::isCameraControlRequired())
                     pleaseReOpen();
                 m_needControlTimer.restart();
             }
