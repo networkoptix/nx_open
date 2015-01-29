@@ -261,7 +261,9 @@ private:
 void QnMediaServerResource::at_httpClientDone( const nx_http::AsyncHttpClientPtr& client )
 {
     QMutexLocker lock(&m_mutex);
-    if( client->state() == nx_http::AsyncHttpClient::sDone ) {
+    if( client->response() &&   //respnose has been received and parsed (no transport error)
+        client->response()->statusLine.statusCode == nx_http::StatusCode::ok )
+    {
         const nx_http::BufferType& msgBodyBuf = client->fetchMessageBodyBuffer();
         QnPingReply reply;
         QnJsonRestResult result;
