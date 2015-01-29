@@ -2850,6 +2850,36 @@ bool QnPlOnvifResource::createPullPointSubscription()
     return true;
 }
 
+void QnPlOnvifResource::removePullPointSubscription()
+{
+    const QAuthenticator& auth = getAuth();
+    SubscriptionManagerSoapWrapper soapWrapper(
+        m_onvifNotificationSubscriptionReference.isEmpty()
+            ? m_eventCapabilities->XAddr
+            : m_onvifNotificationSubscriptionReference.toLatin1().constData(),
+        auth.user(),
+        auth.password(),
+        m_timeDrift );
+    soapWrapper.getProxy()->soap->imode |= SOAP_XML_IGNORENS;
+
+    char buf[256];
+
+    _oasisWsnB2__Unsubscribe request;
+    if( !m_onvifNotificationSubscriptionID.isEmpty() )
+    {
+        sprintf( buf, "<dom0:SubscriptionId xmlns:dom0=\"http://www.onvifplus.org/event\">%s</dom0:SubscriptionId>", m_onvifNotificationSubscriptionID.toLatin1().data() );
+        request.__any.push_back( buf );
+    }
+    _oasisWsnB2__UnsubscribeResponse response;
+    m_prevSoapCallResult = soapWrapper.unsubscribe( request, response );
+    if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )
+    {
+        NX_LOG( lit("Failed to unsubscuibe subscription (endpoint %1). %2").
+            arg(QString::fromLatin1(soapWrapper.endpoint())).arg(m_prevSoapCallResult), cl_logDEBUG1 );
+        return;
+    }
+}
+
 bool QnPlOnvifResource::isInputPortMonitored() const
 {
     QMutexLocker lk(&m_ioPortMutex);
@@ -2952,9 +2982,11 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
 
 void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode)
 {
-    if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )
+    if( resultCode != SOAP_OK && resultCode != SOAP_MUSTUNDERSTAND )
     {
-        NX_LOG(lit("Failed to pull messages in NotificationProducer. endpoint %1").arg(QString::fromLatin1(asyncWrapper->syncWrapper()->endpoint())), cl_logDEBUG1);
+        NX_LOG( lit("Failed to pull messages in NotificationProducer. endpoint %1, result code %2").
+            arg(QString::fromLatin1(asyncWrapper->syncWrapper()->endpoint())).
+            arg(resultCode), cl_logDEBUG1 );
         //re-subscribing
 
         QMutexLocker lk(&m_ioPortMutex);
@@ -2969,6 +3001,8 @@ void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* as
                 if( !m_inputMonitored )
                     return;
                 lk.unlock();
+                //TODO #ak make removePullPointSubscription and createPullPointSubscription asynchronous, so that it does not block timer thread
+                removePullPointSubscription();
                 createPullPointSubscription();
                 lk.relock();
                 m_renewSubscriptionTimerID = 0;
@@ -2999,9 +3033,7 @@ void QnPlOnvifResource::onPullMessagesResponseReceived(
     int resultCode,
     const _onvifEvents__PullMessagesResponse& response)
 {
-    m_prevSoapCallResult = resultCode;
-
-    Q_ASSERT( m_prevSoapCallResult == SOAP_OK || m_prevSoapCallResult == SOAP_MUSTUNDERSTAND );
+    Q_ASSERT( resultCode == SOAP_OK || resultCode == SOAP_MUSTUNDERSTAND );
 
     const qint64 currentRequestSendClock = m_monotonicClock.elapsed();
 
