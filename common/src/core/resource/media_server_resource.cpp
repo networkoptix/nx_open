@@ -269,14 +269,14 @@ void QnMediaServerResource::at_pingResponse( const nx_http::AsyncHttpClientPtr& 
         if( QJson::deserialize(msgBodyBuf, &result) && QJson::deserialize(result.reply(), &reply) && (reply.moduleGuid == getId()) )
             setPrimaryIF(httpClient->url().host()); // server OK
     }
-    std::remove_if(m_runningIfRequests.begin(), m_runningIfRequests.end(), [httpClient](const nx_http::AsyncHttpClientPtr& value) { return value == httpClient;});
+    m_runningIfRequests.erase(std::remove(m_runningIfRequests.begin(), m_runningIfRequests.end(), httpClient));
 }
 
 void QnMediaServerResource::at_httpClientDone( const nx_http::AsyncHttpClientPtr& client )
 {
     QMutexLocker lock(&m_mutex);
     if( client->state() == nx_http::AsyncHttpClient::sFailed )
-        std::remove_if(m_runningIfRequests.begin(), m_runningIfRequests.end(), [client](const nx_http::AsyncHttpClientPtr& value) { return value == client;});
+        m_runningIfRequests.erase(std::remove(m_runningIfRequests.begin(), m_runningIfRequests.end(), client));
 }
 
 void QnMediaServerResource::setPrimaryIF(const QString& primaryIF)
