@@ -42,6 +42,12 @@ namespace {
     const int maxThumbnailCacheSize = 20 * 1024 * 1024; /* 20 megabytes per loader. */
 
     const qint64 invalidProcessingTime = std::numeric_limits<qint64>::min() / 2;
+
+#ifdef QN_PREVIEW_SEARCH_DEBUG
+    QString dt(qint64 time) {
+        return QDateTime::fromMSecsSinceEpoch(time).toString(lit("hh:mm:ss"));
+    }
+#endif
 }
 
 //#define QN_THUMBNAILS_LOADER_DEBUG
@@ -158,7 +164,6 @@ void QnThumbnailsLoader::setEndTime(qint64 endTime) {
 
 void QnThumbnailsLoader::setTimePeriod(qint64 startTime, qint64 endTime) {
     QMutexLocker locker(&m_mutex);
-
     setTimePeriodLocked(startTime, endTime);
 }
 
@@ -287,6 +292,10 @@ void QnThumbnailsLoader::updateProcessingLocked() {
         processingStart = qMax(0ll, processingStart - m_timeStep);
     }
 
+#ifdef QN_PREVIEW_SEARCH_DEBUG
+    qDebug() << "processing start" << dt(processingStart) << "processing end" << dt(processingEnd);
+#endif
+
     /* Trim at live. */
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     if(processingEnd > currentTime)
@@ -322,6 +331,10 @@ void QnThumbnailsLoader::updateProcessingLocked() {
         m_processingStart = processingStart;
         m_processingEnd = processingEnd;
     }
+
+#ifdef QN_PREVIEW_SEARCH_DEBUG
+    qDebug() << "fixed processing start" << dt(m_processingStart) << "processing end" << dt(m_processingEnd);
+#endif
 }
 
 void QnThumbnailsLoader::enqueueForProcessingLocked(qint64 startTime, qint64 endTime) {
@@ -418,13 +431,20 @@ void QnThumbnailsLoader::process() {
 
 
     bool invalidated = false;
-    foreach(QnAbstractArchiveDelegatePtr client, delegates) 
+    for( const QnAbstractArchiveDelegatePtr &client: delegates) 
     {
         client->setRange(period.startTimeMs * 1000, period.endTimeMs() * 1000, timeStep * 1000);
+#ifdef QN_PREVIEW_SEARCH_DEBUG
+        qDebug() << "thumbnails period starts from" << dt(period.startTimeMs);
+#endif
         QQueue<qint64> timingsQueue;
         QQueue<int> frameFlags;
 
         QnThumbnail thumbnail(QImage(), thumbnailSize, period.startTimeMs, period.startTimeMs, timeStep, generation);
+#ifdef QN_PREVIEW_SEARCH_DEBUG
+        qDebug() << "thumbnail" << dt(period.startTimeMs);
+#endif
+
         qint64 time = period.startTimeMs;
         QnCompressedVideoDataPtr frame = client->getNextData().dynamicCast<QnCompressedVideoData>();
         if (frame)
@@ -452,7 +472,13 @@ void QnThumbnailsLoader::process() {
 
                     qint64 actualTime = (timingsQueue.dequeue() + 999) / 1000;
                     thumbnail = QnThumbnail(frame, qRound(actualTime, timeStep), actualTime, timeStep, generation);
+#ifdef QN_PREVIEW_SEARCH_DEBUG
+                    qDebug() << "actual thumbnail loaded for" << dt(qRound(actualTime, timeStep)) << "actualTime" << dt(actualTime);
+#endif
                     time = processThumbnail(thumbnail, time, thumbnail.time(), frameFlags.dequeue() & QnAbstractMediaData::MediaFlags_BOF);
+#ifdef QN_PREVIEW_SEARCH_DEBUG
+                    qDebug() << "processed time" << dt(time);
+#endif
                 }
 
                 {
