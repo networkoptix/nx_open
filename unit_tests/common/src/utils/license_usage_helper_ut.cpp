@@ -270,7 +270,8 @@ TEST( QnCamLicenseUsageHelperTest, proposeAnalogEncoderCamerasOverflow )
     licPoolScaffold.addLicenses(Qn::LC_AnalogEncoder, 1);
 
     helper.propose(cameras, true);
-    ASSERT_EQ(helper.usedLicenses(Qn::LC_AnalogEncoder), 1 + overflow);
+    /* We should see a message like: 2 licenses are used; 1 more license is required */
+    ASSERT_EQ(helper.usedLicenses(Qn::LC_AnalogEncoder), 2);    
     ASSERT_EQ(helper.requiredLicenses(Qn::LC_AnalogEncoder), 1);
     ASSERT_FALSE( helper.isValid() );   
 }
