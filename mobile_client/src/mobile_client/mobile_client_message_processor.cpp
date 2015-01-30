@@ -43,6 +43,7 @@ void QnMobileClientMessageProcessor::updateResource(const QnResourcePtr &resourc
 }
 
 void QnMobileClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) {
+    resource->setStatus(status);
 }
 
 void QnMobileClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data) {

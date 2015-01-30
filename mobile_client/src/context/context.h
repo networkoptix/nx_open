@@ -39,6 +39,10 @@ signals:
     void colorThemeChanged();
     void applicationInfoChanged();
 
+private slots:
+    void at_connectionManager_connected();
+    void at_connectionManager_disconnected();
+
 private:
     QnConnectionManager *m_connectionManager;
     QnColorTheme *m_colorTheme;

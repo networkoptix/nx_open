@@ -28,6 +28,9 @@ signals:
 protected:
     virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
 
+private slots:
+    void at_thumbnailUpdated(const QnUuid &resourceId, const QString &thumbnailId);
+
 private:
     QnFilteredCameraListModel *m_model;
 };

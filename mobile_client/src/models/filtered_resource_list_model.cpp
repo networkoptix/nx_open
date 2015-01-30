@@ -42,10 +42,21 @@ QVariant QnFilteredResourceListModel::data(const QModelIndex &index, int role) c
 QHash<int, QByteArray> QnFilteredResourceListModel::roleNames() const {
     QHash<int, QByteArray> roleNames = QAbstractListModel::roleNames();
     roleNames[Qn::ResourceNameRole] = Qn::roleName(Qn::ResourceNameRole);
-    roleNames[Qn::ThumbnailRole] = Qn::roleName(Qn::ThumbnailRole);
     roleNames[Qn::UuidRole] = Qn::roleName(Qn::UuidRole);
     roleNames[Qn::IpAddressRole] = Qn::roleName(Qn::IpAddressRole);
     return roleNames;
+}
+
+void QnFilteredResourceListModel::refreshResource(const QnResourcePtr &resource, int role) {
+    int row = m_resources.indexOf(resource);
+    if (row == -1)
+        return;
+
+    QVector<int> roles;
+    if (role != -1)
+        roles.append(role);
+    QModelIndex index = this->index(row);
+    emit dataChanged(index, index, roles);
 }
 
 void QnFilteredResourceListModel::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {

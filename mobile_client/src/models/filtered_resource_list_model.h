@@ -17,6 +17,8 @@ public:
     virtual QVariant data(const QModelIndex &index, int role) const override;
     virtual QHash<int, QByteArray> roleNames() const;
 
+    void refreshResource(const QnResourcePtr &resource, int role = -1);
+
 protected:
     virtual bool filterAcceptsResource(const QnResourcePtr &resource) const = 0;
 

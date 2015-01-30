@@ -30,6 +30,8 @@
 
 #include "ui/color_theme.h"
 #include "ui/resolution_util.h"
+#include "ui/camera_thumbnail_provider.h"
+#include "camera/camera_thumbnail_cache.h"
 
 #include "version.h"
 
@@ -40,6 +42,10 @@ int runUi(QGuiApplication *application) {
     QFileSelector fileSelector;
     fileSelector.setExtraSelectors(QStringList() << QnResolutionUtil::densityName(densityClass));
 
+    QScopedPointer<QnCameraThumbnailCache> thumbnailsCache(new QnCameraThumbnailCache());
+    QnCameraThumbnailProvider *thumbnailProvider = new QnCameraThumbnailProvider();
+    thumbnailProvider->setThumbnailCache(thumbnailsCache.data());
+
     QnContext context;
 
     context.colorTheme()->readFromFile(fileSelector.select(lit(":/color_theme.json")));
@@ -49,6 +55,7 @@ int runUi(QGuiApplication *application) {
     QQmlFileSelector qmlFileSelector(&engine);
     qmlFileSelector.setSelector(&fileSelector);
 
+    engine.addImageProvider(lit("camera"), thumbnailProvider);
     engine.rootContext()->setContextObject(&context);
     engine.rootContext()->setContextProperty(lit("screenPixelMultiplier"), QnResolutionUtil::densityMultiplier(densityClass));
 

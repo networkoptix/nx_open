@@ -15,7 +15,6 @@ public:
 
     virtual void updateResource(const QnResourcePtr &resource) override;
 
-protected:
     virtual void onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status) override;
 
 private slots:

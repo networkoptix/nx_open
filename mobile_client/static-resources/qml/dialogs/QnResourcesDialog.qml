@@ -7,7 +7,7 @@ import com.networkoptix.qml 1.0
 Page {
     id: resourcesDialog
 
-    property bool showList: true
+    property bool showList: false
 
     title: qsTr("Resources")
 
