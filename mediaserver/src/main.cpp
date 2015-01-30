@@ -4,6 +4,9 @@
 #include <iostream>
 #include <fstream>
 #include <signal.h>
+#ifdef __linux__
+#include <signal.h>
+#endif
 
 #include <qtsinglecoreapplication.h>
 #include "qtservice.h"
@@ -2288,6 +2291,12 @@ void changePort(quint16 port)
 
 static void printVersion();
 
+#ifdef __linux__
+void SIGUSR1_handler(int)
+{
+    //doing nothing. Need this signal only to interrupt some blocking calls
+}
+#endif
 
 int main(int argc, char* argv[])
 {
@@ -2306,6 +2315,10 @@ int main(int argc, char* argv[])
 #ifdef _WIN32
     win32_exception::installGlobalUnhandledExceptionHandler();
     _tzset();
+#endif
+
+#ifdef __linux__
+    signal( SIGUSR1, SIGUSR1_handler );
 #endif
 
     //parsing command-line arguments

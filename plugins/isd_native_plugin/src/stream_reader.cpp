@@ -300,6 +300,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 
 void StreamReader::interrupt()
 {
+    kill( getpid(), SIGUSR1 );
 }
 
 int StreamReader::initializeVMux()
