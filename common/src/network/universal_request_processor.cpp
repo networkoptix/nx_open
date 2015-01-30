@@ -41,6 +41,18 @@ QnTCPConnectionProcessor(priv, socket)
     d->needAuth = needAuth;
 }
 
+static QByteArray m_unauthorizedPageBody = STATIC_UNAUTHORIZED_HTML;
+
+void QnUniversalRequestProcessor::setUnauthorizedPageBody(const QByteArray& value)
+{
+    m_unauthorizedPageBody = value;
+}
+
+QByteArray QnUniversalRequestProcessor::unauthorizedPageBody()
+{
+    return m_unauthorizedPageBody;
+}
+
 bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
 {
     Q_D(QnUniversalRequestProcessor);
@@ -53,7 +65,7 @@ bool QnUniversalRequestProcessor::authenticate(QnUuid* userId)
         t.restart();
         while (!qnAuthHelper->authenticate(d->request, d->response, isProxy, userId) && d->socket->isConnected())
         {
-            d->responseBody = isProxy ? STATIC_PROXY_UNAUTHORIZED_HTML: STATIC_UNAUTHORIZED_HTML;
+            d->responseBody = isProxy ? STATIC_PROXY_UNAUTHORIZED_HTML: unauthorizedPageBody();
             if (nx_http::getHeaderValue( d->response.headers, "x-server-guid" ).isEmpty())
                 d->response.headers.insert(nx_http::HttpHeader("x-server-guid", qnCommon->moduleGUID().toByteArray()));
             sendResponse(isProxy ? CODE_PROXY_AUTH_REQUIRED : CODE_AUTH_REQUIRED, "text/html");
@@ -95,7 +107,8 @@ void QnUniversalRequestProcessor::run()
         {
             parseRequest();
 
-            if(!authenticate(&d->authUserId))
+            bool isHandlerExist = dynamic_cast<QnUniversalTcpListener*>(d->owner)->findHandler(d->socket, d->request.requestLine.version.protocol, d->request) != 0;
+            if (isHandlerExist && !authenticate(&d->authUserId))
                 return;
 
             d->response.headers.clear();

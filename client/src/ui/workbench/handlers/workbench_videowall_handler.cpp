@@ -79,6 +79,8 @@
 
 #include <utils/common/app_info.h>
 
+#include "version.h"
+
 //#define SENDER_DEBUG
 //#define RECEIVER_DEBUG
 
@@ -2324,7 +2326,7 @@ bool QnWorkbenchVideoWallHandler::createShortcut(const QnVideoWallResourcePtr &v
     arguments << lit("--auth");
     arguments << QString::fromUtf8(url.toEncoded());
 
-    return qnPlatform->shortcuts()->createShortcut(qApp->applicationFilePath(), destinationPath, videowall->getName(), arguments);
+    return qnPlatform->shortcuts()->createShortcut(qApp->applicationFilePath(), destinationPath, videowall->getName(), arguments, IDI_ICON_VIDEOWALL);
 }
 
 bool QnWorkbenchVideoWallHandler::deleteShortcut(const QnVideoWallResourcePtr &videowall) {

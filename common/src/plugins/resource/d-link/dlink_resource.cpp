@@ -372,9 +372,9 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
         ? CODEC_ID_H264
         : (m_camInfo.hasMPEG4 ? CODEC_ID_MPEG4 : CODEC_ID_MJPEG);
     CameraMediaStreams mediaStreams;
-    mediaStreams.streams.push_back( CameraMediaStreamInfo( m_camInfo.primaryStreamResolution(), supportedCodec) );
+    mediaStreams.streams.push_back( CameraMediaStreamInfo( PRIMARY_ENCODER_INDEX, m_camInfo.primaryStreamResolution(), supportedCodec) );
     if( m_camInfo.secondaryStreamResolution().width() > 0 )
-        mediaStreams.streams.push_back( CameraMediaStreamInfo( m_camInfo.secondaryStreamResolution(), supportedCodec ) );
+        mediaStreams.streams.push_back( CameraMediaStreamInfo( SECONDARY_ENCODER_INDEX, m_camInfo.secondaryStreamResolution(), supportedCodec ) );
     saveResolutionList( mediaStreams );
 
     saveParams();

@@ -146,3 +146,15 @@ qint64 QnCommonModule::systemIdentityTime() const
 { 
     return m_systemIdentityTime; 
 }
+
+void QnCommonModule::setAdminPasswordData(const QByteArray& hash, const QByteArray& digest)
+{
+    m_adminPaswdHash = hash;
+    m_adminPaswdDigest = digest;
+}
+
+void QnCommonModule::adminPasswordData(QByteArray* hash, QByteArray* digest) const
+{
+    *hash = m_adminPaswdHash;    
+    *digest = m_adminPaswdDigest;
+}

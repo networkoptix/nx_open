@@ -12,7 +12,7 @@
         <location filename="../src/main.cpp" line="22"/>
         <source>There is no system tray on this system.
 Application will now quit.</source>
-        <translation>此系統無系統工具列，軟體將會跳出。</translation>
+        <translation>此系統無系統工具列，程式即將關閉。</translation>
     </message>
 </context>
 <context>
@@ -20,12 +20,12 @@ Application will now quit.</source>
     <message>
         <location filename="../src/systraywindow.cpp" line="425"/>
         <source>Insufficient privileges to manage services</source>
-        <translation>管理服務的權限不足</translation>
+        <translation>權限不足無法管理服務</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="425"/>
         <source>UAC must be enabled to request privileges for non-admin users</source>
-        <translation>必須允許 UAC 要求非使用者的權限</translation>
+        <translation>非管理者必須啟動 UAC 以取得權限</translation>
     </message>
 </context>
 <context>
@@ -33,7 +33,7 @@ Application will now quit.</source>
     <message>
         <location filename="../src/systraywindow.cpp" line="157"/>
         <source>Access denied.</source>
-        <translation>拒絕存取</translation>
+        <translation>拒絕存取.</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="160"/>
@@ -114,7 +114,7 @@ Application will now quit.</source>
     <message>
         <location filename="../src/systraywindow.cpp" line="483"/>
         <source>Media Server Web Page</source>
-        <translation type="unfinished"></translation>
+        <translation>媒體伺服器 Web 頁面</translation>
     </message>
     <message>
         <location filename="../src/systraywindow.cpp" line="386"/>

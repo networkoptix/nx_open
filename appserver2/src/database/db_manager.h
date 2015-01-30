@@ -139,10 +139,10 @@ namespace ec2
         ErrorCode doQueryNoLock(const QnUuid& resId, ApiResourceStatusDataList& statusList);
 
         //getCameraUserAttributes
-        ErrorCode doQueryNoLock(const QnUuid& cameraId, ApiCameraAttributesDataList& cameraUserAttributesList);
+        ErrorCode doQueryNoLock(const QnUuid& serverId, ApiCameraAttributesDataList& cameraUserAttributesList);
 
         //getCamerasEx
-        ErrorCode doQueryNoLock(const QnUuid& cameraId, ApiCameraDataExList& cameraList);
+        ErrorCode doQueryNoLock(const QnUuid& serverId, ApiCameraDataExList& cameraList);
 
         //getServers
         ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiMediaServerDataList& serverList);
@@ -207,7 +207,8 @@ namespace ec2
         enum FilterType
         {
             RES_ID_FIELD,
-            RES_TYPE_FIELD
+            RES_TYPE_FIELD,
+            RES_PARENT_ID_FIELD
         };
 
         //!query filter
@@ -500,11 +501,13 @@ namespace ec2
 
         ErrorCode addCameraHistory(const ApiCameraServerItemData& params);
         ErrorCode removeCameraHistory(const ApiCameraServerItemData& params);
-        ErrorCode getScheduleTasks(const QnUuid& cameraId, std::vector<ApiScheduleTaskWithRefData>& scheduleTaskList);
+        ErrorCode getScheduleTasks(const QnUuid& serverId, std::vector<ApiScheduleTaskWithRefData>& scheduleTaskList);
         void addResourceTypesFromXML(ApiResourceTypeDataList& data);
         void loadResourceTypeXML(const QString& fileName, ApiResourceTypeDataList& data);
         bool removeServerStatusFromTransactionLog();
         bool tuneDBAfterOpen();
+        bool updateCameraHistoryGuids();
+        bool migrateServerGUID(const QString& table, const QString& field);
     private:
         QnResourceFactory* m_resourceFactory;
         QnUuid m_storageTypeId;

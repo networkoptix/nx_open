@@ -65,6 +65,9 @@ public:
     void setDefaultAdminPassword(const QString& password) { m_defaultAdminPassword = password; }
     QString defaultAdminPassword() const { return m_defaultAdminPassword; }
 
+    void setAdminPasswordData(const QByteArray& hash, const QByteArray& digest);
+    void adminPasswordData(QByteArray* hash, QByteArray* digest) const;
+
     void setCloudMode(bool value) { m_cloudMode = value; }
     bool isCloudMode() const { return m_cloudMode; }
 
@@ -103,6 +106,9 @@ private:
     bool m_transcodingDisabled;
     QSet<QnUuid> m_allowedPeers;
     qint64 m_systemIdentityTime;
+    
+    QByteArray m_adminPaswdHash;
+    QByteArray m_adminPaswdDigest;
 };
 
 #define qnCommon (QnCommonModule::instance())

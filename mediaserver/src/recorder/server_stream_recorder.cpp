@@ -592,3 +592,9 @@ void QnServerStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, in
     QnStreamRecorder::writeData(md, streamIndex);
     m_diskErrorWarned = false;
 }
+
+bool QnServerStreamRecorder::needConfigureProvider() const
+{
+    const QnPhysicalCameraResource* camera = dynamic_cast<QnPhysicalCameraResource*>(m_device.data());
+    return !camera->isScheduleDisabled();
+}

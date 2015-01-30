@@ -12,8 +12,6 @@
 #define _WIN32_DCOM
 #pragma comment(lib, "ole32.lib")
 
-
-
 namespace {
 
     class QnComInitializer {
@@ -49,18 +47,19 @@ namespace {
         bool m_success;
     };
 
-    // CreateLink - Uses the Shell's IShellLink and IPersistFile interfaces 
-    //              to create and store a shortcut to the specified object. 
-    //
-    // Returns the result of calling the member functions of the interfaces. 
-    //
-    // Parameters:
-    // lpszPathObj  - Address of a buffer that contains the path of the object,
-    //                including the file name.
-    // lpszPathLink - Address of a buffer that contains the path where the 
-    //                Shell link is to be stored, including the file name.
-    // lpszArgs     - Address of a buffer that contains parameters of the executable file.
-    HRESULT CreateLink(LPCWSTR lpszPathObj, LPCWSTR lpszPathLink, LPCWSTR lpszArgs) 
+    /**
+     * CreateLink                       Uses the Shell's IShellLink and IPersistFile interfaces 
+     *                                  to create and store a shortcut to the specified object. 
+     * \param lpszPathObj               Address of a buffer that contains the path of the object,
+     *                                  including the file name.
+     * \param lpszPathLink              Address of a buffer that contains the path where the 
+     *                                  Shell link is to be stored, including the file name.
+     * \param lpszArgs                  Address of a buffer that contains parameters of the executable file.
+     * \param lpszIconLocation          Address of a buffer that contains the location of the icon. Can be NULL.
+     * \param iconIndex                 Index of an icon in the resource file.
+     * \returns                         Result of calling the member functions of the interfaces. 
+     */
+    HRESULT CreateLink(LPCWSTR lpszPathObj, LPCWSTR lpszPathLink, LPCWSTR lpszArgs, LPCWSTR lpszIconLocation = NULL, int iconIndex = 0) 
     { 
         HRESULT hres; 
         IShellLink* psl; 
@@ -75,6 +74,9 @@ namespace {
             // Set the path to the shortcut target and add the description. 
             psl->SetPath(lpszPathObj); 
             psl->SetArguments(lpszArgs);
+            if (lpszIconLocation != NULL) {
+                psl->SetIconLocation(lpszIconLocation, iconIndex);
+            }
 
             // Query IShellLink for the IPersistFile interface, used for saving the 
             // shortcut in persistent storage. 
@@ -117,7 +119,7 @@ wchar_t* qnStringToPWChar(const QString &value) {
 }
 
 
-bool QnWindowsShortcuts::createShortcut(const QString &sourceFile, const QString &destinationPath, const QString &name, const QStringList &arguments) {
+bool QnWindowsShortcuts::createShortcut(const QString &sourceFile, const QString &destinationPath, const QString &name, const QStringList &arguments, int iconId) {
     QnComInitializer comInit;
     if (!comInit.success())
         return false;
@@ -126,17 +128,28 @@ bool QnWindowsShortcuts::createShortcut(const QString &sourceFile, const QString
 
     QString fullPath = QDir::toNativeSeparators(destinationPath) + lit("\\") + name + lit(".lnk");
 
-    wchar_t * lpszDstPath = qnStringToPWChar(fullPath);
+    wchar_t* lpszDstPath = qnStringToPWChar(fullPath);
 
     QString args = arguments.join(L' ');
 
-    wchar_t * lpszArgs = qnStringToPWChar(args);
+    wchar_t* lpszArgs = qnStringToPWChar(args);
 
-    HRESULT rc = CreateLink(lpszSrcFile, lpszDstPath, lpszArgs);
+    wchar_t* lpszIconLocation = NULL;
+    int iconIndex = 0;
+
+    if (iconId != 0) {
+        lpszIconLocation = qnStringToPWChar(sourceFile);
+
+        /* To use icon ID instead of its index in the iIcon parameter, use the negative value of the icon ID. */
+        iconIndex = -1 * iconId;
+    }
+
+    HRESULT rc = CreateLink(lpszSrcFile, lpszDstPath, lpszArgs, lpszIconLocation, iconIndex);
 
     delete[] lpszSrcFile;
     delete[] lpszDstPath;
     delete[] lpszArgs;
+    delete[] lpszIconLocation;
 
     return SUCCEEDED(rc);
 }

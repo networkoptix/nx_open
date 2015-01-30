@@ -348,7 +348,7 @@ void QnTransactionTransport::cancelConnecting()
 {
     if (getState() == ConnectingStage2)
         QnTransactionTransport::connectingCanceled(m_remotePeer.id, true);
-    qWarning() << Q_FUNC_INFO << "Connection canceled from state " << toString(getState());
+    NX_LOG( lit("%1 Connection canceled from state %2").arg(Q_FUNC_INFO).arg(toString(getState())), cl_logWARNING );
     setState(Error);
 }
 
@@ -812,6 +812,37 @@ void QnTransactionTransport::setRemoteIdentityTime(qint64 time)
 qint64 QnTransactionTransport::remoteIdentityTime() const
 {
     return m_remoteIdentityTime;
+}
+
+bool QnTransactionTransport::skipTransactionForMobileClient(ApiCommand::Value command) {
+    switch (command) {
+    case ApiCommand::getMediaServersEx:
+    case ApiCommand::saveCameras:
+    case ApiCommand::getCamerasEx:
+    case ApiCommand::getUsers:
+    case ApiCommand::saveLayouts:
+    case ApiCommand::getLayouts:
+    case ApiCommand::saveResource:
+    case ApiCommand::removeResource:
+    case ApiCommand::removeCamera:
+    case ApiCommand::removeMediaServer:
+    case ApiCommand::removeUser:
+    case ApiCommand::removeLayout:
+    case ApiCommand::saveCamera:
+    case ApiCommand::saveMediaServer:
+    case ApiCommand::saveUser:
+    case ApiCommand::saveLayout:
+    case ApiCommand::setResourceStatus:
+    case ApiCommand::setResourceParams:
+    case ApiCommand::saveCameraUserAttributes:
+    case ApiCommand::saveServerUserAttributes:
+    case ApiCommand::getCameraHistoryItems:
+    case ApiCommand::addCameraHistoryItem:
+        return false;
+    default:
+        break;
+    }
+    return true;
 }
 
 }
