@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp').controller('ViewCtrl',
-    function ($scope,$rootScope,$location,$routeParams,$cookies,mediaserver,cameraRecords) {
+    function ($scope,$rootScope,$location,$routeParams,mediaserver,cameraRecords) {
 
         $scope.cameras = {};
         $scope.activeCamera = null;
@@ -59,13 +59,12 @@ angular.module('webadminApp').controller('ViewCtrl',
 
             if (!!$scope.activeCamera) {
                 updateVideoSource();
+                $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId]);
             }
         };
         $scope.selectCamera = function (activeCamera) {
             $location.path('/view/' + activeCamera.id, false);
             $scope.selectCameraById(activeCamera.id);
-
-            $scope.activeVideoRecords = cameraRecords.getRecordsProvider(activeCamera.id);
         };
 
         $rootScope.$on('$routeChangeStart', function (event, next/*, current*/) {

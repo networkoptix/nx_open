@@ -5,18 +5,18 @@
 function Chunk(boundaries,start,end,level,title,extension){
     this.start = start;
     this.end = end;
-    this.level = level;
+    this.level = level || 0;
     this.expand = true;
 
 
-    var parentWidth = (boundaries.end - boundaries.start);
-    this.startPosition = 100 * (start - boundaries.start)/parentWidth  + '%';
+    //var parentWidth = (boundaries.end - boundaries.start);
+    //this.startPosition = 100 * (start - boundaries.start)/parentWidth  + '%';
 
-    if(typeof(end)==='undefined'){
+    /*if(typeof(end)==='undefined'){
         this.width = '1px';
     }else{
         this.width = 100 * (end - start) / parentWidth + '%';
-    }
+    }*/
 
     var format = 'MM/dd/yy HH:mm:ss';
     this.title = (typeof(title) === 'undefined' || title === null) ? dateFormat(start,format) + ' - ' + dateFormat(end,format):title ;
@@ -184,6 +184,8 @@ RulerModel.getLevelIndex = function(searchdetailization){
 
     return typeof(targetLevel)!=='undefined' ? RulerModel.levels.indexOf(targetLevel) : RulerModel.levels.length-1;
 };
+
+/*
 // request better detailization
 RulerModel.prototype.setInterval = function (start,end,level){
 
@@ -199,22 +201,26 @@ RulerModel.prototype.setInterval = function (start,end,level){
     //2. Init tree, if needed
     if(typeof(this.marksTree) === 'undefined') {
         this.marksTree = new Chunk(this, this.start, this.end, level, '',
-            {marks: Array.apply(null, {length: RulerModel.levels[level].marks - 1}).map(Number.call, Number),
-            expand:true});
+            {
+                marks: Array.apply(null, {length: RulerModel.levels[level].marks - 1}).map(Number.call, Number),
+                expand:true
+            });
     }
 
     //3. Splice cache for existing interval, store it as local cache
-    this.updateSplice();
+    return this.updateSplice();
 };
+*/
 
 /**
  * Update active splice
  */
+/*
 RulerModel.prototype.updateSplice = function(){
     this.marksTree.expand = true;
-    this.splice(this.start, this.end, this.level);
+    return this.splice(this.start, this.end, this.level);
 };
-
+*/
 /**
  * Create splice, containing marks with progressive detailization
  * (---------------------------------------------------------)
@@ -231,8 +237,9 @@ RulerModel.prototype.updateSplice = function(){
  * @param parent - parent for recursive call
  * @param result - heap for recursive call
  */
-RulerModel.prototype.splice = function(start, end, level, parent){
-
+/*
+RulerModel.prototype.splice = function(start, end, level, parent,spliceResult){
+    spliceResult = spliceResult||[];
     parent = parent || this.marksTree;
     if(parent.level === level) {
         parent.expand = false;
@@ -255,15 +262,20 @@ RulerModel.prototype.splice = function(start, end, level, parent){
 
     for(var i = 0 ; i < parent.children.length ; i ++ ){
         var currentChunk = parent.children[i];
-        if(currentChunk.end <= start || currentChunk.start>=end || currentChunk.level === level || level === RulerModel.levels.length - 1){
-            currentChunk.expand = false;
-        }else {
+        if(currentChunk.end <= start
+            || currentChunk.start>=end
+            || currentChunk.level === level
+            || level === RulerModel.levels.length - 1) {
+                currentChunk.expand = false;
+            spliceResult.push(currentChunk);
+        } else {
             currentChunk.expand = true;
-            this.splice(start, end, level, currentChunk);
+            this.splice(start, end, level, currentChunk, spliceResult);
         }
     }
+    return spliceResult;
 };
-
+*/
 
 
 
@@ -279,6 +291,7 @@ RulerModel.prototype.splice = function(start, end, level, parent){
 
 //Provider for records from mediaserver
 function CameraRecordsProvider(cameras,mediaserver,$q){
+
     this.cameras = cameras;
     this.mediaserver = mediaserver;
     this.$q=$q;
@@ -315,7 +328,8 @@ CameraRecordsProvider.prototype.updateSplice = function(){
  */
 CameraRecordsProvider.prototype.setInterval = function (start,end,level){
 
-    var deferred = this.$q.defer();
+
+   var deferred = this.$q.defer();
 
     this.start = start;
     this.end = end;
@@ -327,14 +341,13 @@ CameraRecordsProvider.prototype.setInterval = function (start,end,level){
     this.mediaserver.getRecords('/',this.cameras[0],start,end,RulerModel.levels[level].interval.getSeconds()*1000)
         .then(function(data){
 
-            console.log("records",data);
             for(var i = 0; i <data.data.length;i++){
                 var endChunk = data.data[i][0] + data.data[i][1];
                 if(data.data[i][1] === -1){
                     endChunk = (new Date()).getTime();// some date in future
                 }
-                console.error('this is wrong');
-                self.addChunk(new Chunk(data.data[i][0],endChunk,level));
+                console.error('this is wrong, but why?',level);
+                self.addChunk(new Chunk(null,data.data[i][0],endChunk,level));
             }
 
 
@@ -346,8 +359,9 @@ CameraRecordsProvider.prototype.setInterval = function (start,end,level){
             deferred.reject(error);
         });
 
+    this.ready = deferred.promise;
     //3. return promise
-    return deferred.promise;
+    return this.ready;
 };
 
 /**
@@ -412,15 +426,20 @@ CameraRecordsProvider.prototype.splice = function(start, end, level, parent, res
     parent = parent || this.chunksTree;
     result = result || [];
 
-    for(var i = 0 ; i < parent.children.length ; i ++ ){
-        var currentChunk = parent.children[i];
-        if(currentChunk.end <= start || currentChunk.start>=end || currentChunk.level === level){
-            currentChunk.expand = false;
-            continue;
-        }
+    if(!!parent.children) {
+        for (var i = 0; i < parent.children.length; i++) {
+            var currentChunk = parent.children[i];
+            if (currentChunk.end <= start || currentChunk.start >= end || currentChunk.level === level) {
+                currentChunk.expand = false;
+                continue;
+            }
 
-        currentChunk.expand = true;
-        this.splice(start, end, level, currentChunk, result);
+            currentChunk.expand = true;
+            this.splice(start, end, level, currentChunk, result);
+        }
+    }
+    else{
+        result.push(parent);
     }
 
     return result;

@@ -130,7 +130,7 @@ angular.module('webadminApp')
                 }
                 //RecordedTimePeriods
                 return wrapRequest($http.get(serverUrl + 'api/RecordedTimePeriods' +
-                    '?physicalId=' + physicalId +
+                    '?physicalId=' + physicalId.replace('{','').replace('}','') +
                     '&startTime=' + startTime +
                     '&endTime=' + endTime +
                     '&detail=' + detail +

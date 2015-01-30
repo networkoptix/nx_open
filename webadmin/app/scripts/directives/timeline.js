@@ -272,7 +272,21 @@ angular.module('webadminApp')
                 function updateDetailization(){
                     //4. Set interval for events
                     //TODO: Set interval for events
-                    //console.warn('Set interval for events', new Date(start), new Date(end), scope.actualLevel);
+
+
+                    var level = RulerModel.levels[scope.actualLevel];
+                    var end = level.interval.alignToFuture(screenRelativePositionToDate(1));
+                    var start = level.interval.alignToFuture(screenRelativePositionToDate(0));
+
+                    //console.log('Set interval for events', new Date(start), new Date(end), scope.actualLevel);
+
+                    if(!!scope.records) {
+                        // 1. Splice events
+                        var events = scope.records.splice(end, start, scope.actualLevel);
+
+                        // 2. Draw em!
+                        console.log("splice",events);
+                    }
                 }
 
                 function drawMark(context, coordinate, level, labelLevel, label){
@@ -487,6 +501,9 @@ angular.module('webadminApp')
                     scope.start = scope.records? scope.records.start : (now - timelineConfig.initialInterval);
                     scope.end = now;
                     scope.maxZoomLevel = maxZoomLevel();
+
+
+                    console.log('initTimeline',scope.start,new Date(scope.start),scope.maxZoomLevel );
                     updateView();
                 }
 
@@ -609,7 +626,10 @@ angular.module('webadminApp')
                     draggingPosition = null;
                 };
 
-                scope.$watch('records',initTimeline);
+                scope.$watch('records',function(){
+                    console.log("records changed");
+                    scope.records.ready.then(initTimeline);
+                });
 
                 initTimeline();
 
