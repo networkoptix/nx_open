@@ -1,6 +1,7 @@
 #include "business_event_log_rest_handler.h"
 
-#include "business/actions/abstract_business_action.h"
+#include <business/actions/abstract_business_action.h>
+#include <business/events/abstract_business_event.h>
 
 #include <core/resource/camera_resource.h>
 #include "core/resource_management/resource_pool.h"

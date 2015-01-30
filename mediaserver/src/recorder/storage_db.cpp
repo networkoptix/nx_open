@@ -161,13 +161,9 @@ bool QnStorageDb::createDatabase()
         if (!execSQLFile(lit(":/01_create_storage_db.sql"), m_sdb)) {
             return false;
         }
-
-        if (!execSQLFile(lit(":/02_storage_bookmarks.sql"), m_sdb)) {
-            return false;
-        }
     }
 
-    if (!initializeBookmarksFtsTable())
+    if (!applyUpdates(":/storage_updates"))
         return false;
 
     tran.commit();
@@ -175,20 +171,6 @@ bool QnStorageDb::createDatabase()
     m_lastTranTime.restart();
     return true;
 }
-
-bool QnStorageDb::initializeBookmarksFtsTable() {
-#ifdef QN_ENABLE_BOOKMARKS
-    return 
-        execSQLQuery("CREATE VIRTUAL TABLE fts_bookmarks USING fts3(name, description)", m_sdb) &&
-        execSQLQuery("CREATE VIRTUAL TABLE fts_bookmark_tags USING fts3(name)", m_sdb) &&
-        execSQLQuery("INSERT INTO fts_bookmarks(docid, name, description) SELECT rowid, name, description FROM storage_bookmark", m_sdb) &&
-        execSQLQuery("INSERT INTO fts_bookmark_tags(docid, name) SELECT rowid, name FROM storage_bookmark_tag", m_sdb)
-        ;
-#else
-    return true;
-#endif
-}
-
 
 QVector<DeviceFileCatalogPtr> QnStorageDb::loadFullFileCatalog() {
     QVector<DeviceFileCatalogPtr> result;
@@ -246,44 +228,72 @@ bool QnStorageDb::removeCameraBookmarks(const QString& cameraUniqueId) {
         }
     }
 
+    if (!execSQLQuery("DELETE FROM fts_bookmarks WHERE docid NOT IN (SELECT rowid FROM storage_bookmark)", m_sdb))
+        return false;
+
+    flushRecords();
     return true;
 }
 
 bool QnStorageDb::addOrUpdateCameraBookmark(const QnCameraBookmark& bookmark, const QString& cameraUniqueId) {
-    QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT OR REPLACE INTO storage_bookmark ( \
-                     guid, unique_id, start_time, duration, \
-                     name, description, timeout \
-                     ) VALUES ( \
-                     :guid, :cameraUniqueId, :startTimeMs, :durationMs, \
-                     :name, :description, :timeout \
-                     )");
-    QnSql::bind(bookmark, &insQuery);
-    insQuery.bindValue(":cameraUniqueId", cameraUniqueId); // unique_id
-    if (!insQuery.exec()) {
-        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
-        return false;
+
+    int docId = 0;
+    {
+        QSqlQuery insQuery(m_sdb);
+        insQuery.prepare("INSERT OR REPLACE INTO storage_bookmark ( \
+                         guid, unique_id, start_time, duration, \
+                         name, description, timeout \
+                         ) VALUES ( \
+                         :guid, :cameraUniqueId, :startTimeMs, :durationMs, \
+                         :name, :description, :timeout \
+                         )");
+        QnSql::bind(bookmark, &insQuery);
+        insQuery.bindValue(":cameraUniqueId", cameraUniqueId); // unique_id
+        if (!insQuery.exec()) {
+            qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+            return false;
+        }
+
+        docId = insQuery.lastInsertId().toInt();
     }
 
-    QSqlQuery cleanTagQuery(m_sdb);
-    cleanTagQuery.prepare("DELETE FROM storage_bookmark_tag WHERE bookmark_guid = ?");
-    cleanTagQuery.addBindValue(bookmark.guid.toRfc4122());
-    if (!cleanTagQuery.exec()) {
-        qWarning() << Q_FUNC_INFO << cleanTagQuery.lastError().text();
-        return false;
-    }
-
-    QSqlQuery tagQuery(m_sdb);
-    tagQuery.prepare("INSERT INTO storage_bookmark_tag ( bookmark_guid, name ) VALUES ( :bookmark_guid, :name )");
-    tagQuery.bindValue(":bookmark_guid", bookmark.guid.toRfc4122());
-    for (const QString tag: bookmark.tags) {
-        tagQuery.bindValue(":name", tag);
-        if (!tagQuery.exec()) {
-            qWarning() << Q_FUNC_INFO << tagQuery.lastError().text();
+    {
+        QSqlQuery cleanTagQuery(m_sdb);
+        cleanTagQuery.prepare("DELETE FROM storage_bookmark_tag WHERE bookmark_guid = ?");
+        cleanTagQuery.addBindValue(bookmark.guid.toRfc4122());
+        if (!cleanTagQuery.exec()) {
+            qWarning() << Q_FUNC_INFO << cleanTagQuery.lastError().text();
             return false;
         }
     }
 
+    {
+        QSqlQuery tagQuery(m_sdb);
+        tagQuery.prepare("INSERT INTO storage_bookmark_tag ( bookmark_guid, name ) VALUES ( :bookmark_guid, :name )");
+        tagQuery.bindValue(":bookmark_guid", bookmark.guid.toRfc4122());
+        for (const QString tag: bookmark.tags) {
+            tagQuery.bindValue(":name", tag);
+            if (!tagQuery.exec()) {
+                qWarning() << Q_FUNC_INFO << tagQuery.lastError().text();
+                return false;
+            }
+        }
+    }
+
+    {
+        QSqlQuery query(m_sdb);
+        query.prepare("INSERT OR REPLACE INTO fts_bookmarks (docid, name, description, tags) VALUES ( :docid, :name, :description, :tags )");
+        query.bindValue(":docid", docId);
+        query.bindValue(":name", bookmark.name);
+        query.bindValue(":description", bookmark.description);
+        query.bindValue(":tags", bookmark.tags.join(L' '));
+        if (!query.exec()) {
+            qWarning() << Q_FUNC_INFO << query.lastError().text();
+            return false;
+        }
+    }
+
+    flushRecords();
     return true;
 }
 
@@ -304,36 +314,37 @@ bool QnStorageDb::deleteCameraBookmark(const QnCameraBookmark &bookmark) {
         return false;
     }
 
+    if (!execSQLQuery("DELETE FROM fts_bookmarks WHERE docid NOT IN (SELECT rowid FROM storage_bookmark)", m_sdb))
+        return false;
+
+    flushRecords();
     return true;
 }
 
 bool QnStorageDb::getBookmarks(const QString& cameraUniqueId, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result) {
-
     QString filterStr;
     QStringList bindings;
 
-    auto addFilter = [&](const QString &text, bool skipBinding) {
+    auto addFilter = [&filterStr, &bindings](const QString &text) {
         if (filterStr.isEmpty())
             filterStr = "WHERE " + text;
         else
             filterStr = filterStr + " AND " + text;
-        if (!skipBinding)
-            bindings.append(text.mid(text.lastIndexOf(':')));
+        bindings.append(text.mid(text.lastIndexOf(':')));
     };
 
     if (!cameraUniqueId.isEmpty())
-        addFilter("book.unique_id = :cameraUniqueId", false);
+        addFilter("book.unique_id = :cameraUniqueId");
     if (filter.minStartTimeMs > 0)
-        addFilter("startTimeMs >= :minStartTimeMs", false);
+        addFilter("startTimeMs >= :minStartTimeMs");
     if (filter.maxStartTimeMs < INT64_MAX)
-        addFilter("startTimeMs <= :maxStartTimeMs", false);
+        addFilter("startTimeMs <= :maxStartTimeMs");
     if (filter.minDurationMs > 0)
-        addFilter("durationMs >= :minDurationMs", false);
-
-    //TODO: #GDM #Bookmarks implement name search
-    // hack because QT is unable to bind list values properly --gdm
-    if (!filter.text.isEmpty())
-        addFilter("tagName in ('" + filter.text + "')", true);
+        addFilter("durationMs >= :minDurationMs");
+    if (!filter.text.isEmpty()) {
+        addFilter("book.rowid in (SELECT docid FROM fts_bookmarks WHERE fts_bookmarks MATCH :text)");
+        bindings.append(":text");   //minor hack to workaround closing bracket
+    }
 
     QString queryStr("SELECT \
                      book.guid as guid, \
@@ -353,7 +364,7 @@ bool QnStorageDb::getBookmarks(const QString& cameraUniqueId, const QnCameraBook
     query.setForwardOnly(true);
     query.prepare(queryStr);
     
-    auto checkedBind = [&](const QString &placeholder, const QVariant &value) {
+    auto checkedBind = [&query, &bindings](const QString &placeholder, const QVariant &value) {
         if (!bindings.contains(placeholder))
             return;
         query.bindValue(placeholder, value);
@@ -363,6 +374,7 @@ bool QnStorageDb::getBookmarks(const QString& cameraUniqueId, const QnCameraBook
     checkedBind(":minStartTimeMs", filter.minStartTimeMs);
     checkedBind(":maxStartTimeMs", filter.maxStartTimeMs);
     checkedBind(":minDurationMs", filter.minDurationMs);
+    checkedBind(":text", filter.text);
 
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
@@ -389,7 +401,6 @@ bool QnStorageDb::getBookmarks(const QString& cameraUniqueId, const QnCameraBook
         if (!tag.isEmpty())
             result.back().tags.append(tag);
     }
-
     return true;
 }
 
