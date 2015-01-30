@@ -205,8 +205,9 @@ case "$1" in
         if [ -f "$OLD_DB_PATH" -a ! -f "$DB_PATH" ]; then
             [ -d $BASE_DIR/var ] || mkdir $BASE_DIR/var
             cp "$OLD_DB_PATH" "$DB_PATH"
-            $DBSYNC
         fi
+
+        [ -n "$UPGRADING" ] && $DBSYNC
   ;;
 
   abort-upgrade|abort-remove|abort-configure)

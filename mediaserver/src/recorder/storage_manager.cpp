@@ -1271,7 +1271,7 @@ bool QnStorageManager::isStorageAvailable(int storage_index) const {
 }
 
 bool QnStorageManager::addBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark, bool forced) {
-
+    //TODO: #GDM #Bookmarks #API #High make sure guid is absent in the database, fill if not exists
     QnDualQualityHelper helper;
     helper.openCamera(cameraGuid);
 
@@ -1330,6 +1330,7 @@ bool QnStorageManager::addBookmark(const QByteArray &cameraGuid, QnCameraBookmar
 }
 
 bool QnStorageManager::updateBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark) {
+    //TODO: #GDM #Bookmarks #API #High make sure guid is present and exists in the database
     DeviceFileCatalogPtr catalog = qnStorageMan->getFileCatalog(cameraGuid, QnServer::BookmarksCatalog);
     int idx = catalog->findFileIndex(bookmark.startTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
     if (idx < 0)
@@ -1353,6 +1354,7 @@ bool QnStorageManager::updateBookmark(const QByteArray &cameraGuid, QnCameraBook
 
 
 bool QnStorageManager::deleteBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark) {
+    //TODO: #GDM #Bookmarks #API #High make sure guid is present and exists in the database
     DeviceFileCatalogPtr catalog = qnStorageMan->getFileCatalog(cameraGuid, QnServer::BookmarksCatalog);
     if (!catalog)
         return false;

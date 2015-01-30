@@ -501,7 +501,7 @@ bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect
 
         qreal targetAr = paintRect.width() / paintRect.height();
         qreal sourceAr = isServer
-                ? targetAr
+                ? QnGeometry::aspectRatio(pixmap.rect())
                 : ((qreal)pixmap.width()*mediaLayout.width()) / (pixmap.height() * mediaLayout.height());
 
         qreal x, y, w, h;

@@ -456,8 +456,8 @@ private:
     mutable QMutex m_ioPortMutex;
     bool m_inputMonitored;
     EventMonitorType m_eventMonitorType;
-    quint64 m_timerID;
-    quint64 m_renewSubscriptionTaskID;
+    quint64 m_nextPullMessagesTimerID;
+    quint64 m_renewSubscriptionTimerID;
     int m_maxChannels;
     std::map<quint64, TriggerOutputTask> m_triggerOutputTasks;
     

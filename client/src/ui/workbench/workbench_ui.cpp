@@ -344,10 +344,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     /* Navigation slider. */
     createSliderWidget();
 
-#ifdef QN_ENABLE_BOOKMARKS
     /* Bookmarks search line. */
     createSearchWidget();
-#endif
 
     /* Debug overlay */
     //createDebugWidget();
@@ -473,9 +471,7 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
         setTreeVisible(false, false);
         setTitleVisible(false, false);
         setNotificationsVisible(false, false);
-#ifdef QN_ENABLE_BOOKMARKS
         setSearchVisible(false, false);
-#endif
         return;
     }
 
@@ -499,9 +495,7 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
     }
 
     updateCalendarVisibility(animate);
-#ifdef QN_ENABLE_BOOKMARKS
     updateSearchVisibility(animate);
-#endif
 }
 
 QMargins QnWorkbenchUi::calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal notificationsX) {
@@ -562,9 +556,7 @@ bool QnWorkbenchUi::isHovered() const {
             m_titleOpacityProcessor->isHovered() ||
             (m_notificationsOpacityProcessor && m_notificationsOpacityProcessor->isHovered()) || // in light mode it can be NULL
             m_calendarOpacityProcessor->isHovered()
-#ifdef QN_ENABLE_BOOKMARKS
             || m_searchOpacityProcessor->isHovered()
-#endif
             ;
 }
 
@@ -2139,10 +2131,7 @@ void QnWorkbenchUi::at_sliderItem_geometryChanged() {
     updateCalendarGeometry();
     updateSliderZoomButtonsGeometry();
     updateDayTimeWidgetGeometry();
-
-#ifdef QN_ENABLE_BOOKMARKS
     updateSearchGeometry();
-#endif
 
     QRectF geometry = m_sliderItem->geometry();
     m_sliderShowButton->setPos(QPointF(
