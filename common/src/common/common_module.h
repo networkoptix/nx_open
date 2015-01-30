@@ -65,6 +65,15 @@ public:
     void setDefaultAdminPassword(const QString& password) { m_defaultAdminPassword = password; }
     QString defaultAdminPassword() const { return m_defaultAdminPassword; }
 
+    /*
+    * This function should resolve issue with install new media servers and connect their to current system
+    * Installer tell media server change password after insllation.
+    * At this case admin user will rewritted. To keep other admin user field unchanged (email settings)
+    * we have to insert new transaction with low priority
+    */
+    void setUseLowPriorityAdminPasswordHach(bool value);
+    bool useLowPriorityAdminPasswordHach() const;
+
     void setAdminPasswordData(const QByteArray& hash, const QByteArray& digest);
     void adminPasswordData(QByteArray* hash, QByteArray* digest) const;
 
@@ -109,6 +118,7 @@ private:
     
     QByteArray m_adminPaswdHash;
     QByteArray m_adminPaswdDigest;
+    bool m_lowPriorityAdminPassword;
 };
 
 #define qnCommon (QnCommonModule::instance())
