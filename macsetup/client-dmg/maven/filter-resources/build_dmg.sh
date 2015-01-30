@@ -5,11 +5,11 @@ LIBRARIES=${libdir}/lib/${build.configuration}
 SRC=./dmg-folder
 TMP=tmp
 VOLUME_NAME="${display.product.name} ${release.version}"
-DMG_FILE="${project.build.finalName}.dmg"
+DMG_FILE="${finalName}.dmg"
 HELP=${ClientHelpSourceDir}
 
 AS_SRC=app-store
-PKG_FILE="${project.build.finalName}.pkg"
+PKG_FILE="${finalName}.pkg"
 
 ln -s /Applications $SRC/Applications
 

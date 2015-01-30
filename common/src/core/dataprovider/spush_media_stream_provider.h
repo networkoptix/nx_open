@@ -30,7 +30,7 @@ public:
         \note If stream is opened (\a CLServerPushStreamReader::isStreamOpened() returns true) \a CameraDiagnostics::ErrorCode::noError is returned immediately
     */
     virtual CameraDiagnostics::Result diagnoseMediaStreamConnection() override;
-
+    virtual bool isCameraControlRequired() const override;
 protected:
     void pleaseReOpen();
     virtual void afterUpdate() override;
@@ -49,7 +49,9 @@ private:
     QMutex m_openStreamMutex;
     int m_FrameCnt;
     QElapsedTimer m_needControlTimer;
-protected:
+private:
+    CameraDiagnostics::Result openStreamInternal();
+private:
     bool m_cameraControlRequired;
 };
 

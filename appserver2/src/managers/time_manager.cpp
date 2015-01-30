@@ -212,6 +212,7 @@ namespace ec2
     static const qint64 MAX_LOCAL_SYSTEM_TIME_DRIFT_MS = 10*MILLIS_PER_SEC;
     //!Maximum allowed drift between synchronized time and time received via internet
     static const qint64 MAX_SYNC_VS_INTERNET_TIME_DRIFT_MS = 20*MILLIS_PER_SEC;
+    static const int MAX_SEQUENT_INTERNET_SYNCHRONIZATION_FAILURES = 15;
 
     TimeSynchronizationManager::TimeSynchronizationManager( Qn::PeerType peerType )
     :
@@ -222,7 +223,8 @@ namespace ec2
         m_terminated( false ),
         m_peerType( peerType ),
         m_internetTimeSynchronizationPeriod( INTERNET_SYNC_TIME_PERIOD_SEC ),
-        m_timeSynchronized( false )
+        m_timeSynchronized( false ),
+        m_internetSynchronizationFailureCount( 0 )
     {
         assert( TimeManager_instance.load(std::memory_order_relaxed) == nullptr );
         TimeManager_instance.store( this, std::memory_order_relaxed );
@@ -350,15 +352,19 @@ namespace ec2
                 m_localTimePriorityKey.flags |= peerTimeSetByUser;
                 //incrementing sequence 
                 m_localTimePriorityKey.sequence = m_usedTimeSyncInfo.timePriorityKey.sequence + 1;
+                //"select primary time server" means "take its local time", so resetting internet synchronization flag
+                m_localTimePriorityKey.flags &= ~peerTimeSynchronizedWithInternetServer;
                 if( m_localTimePriorityKey > m_usedTimeSyncInfo.timePriorityKey )
                 {
                     //using current server time info
                     const qint64 elapsed = m_monotonicClock.elapsed();
-                    //selection of peer as primary time server means it's local system time is to be used as synchronized time
+                    //selection of peer as primary time server means it's local system time is to be used as synchronized time 
+                        //in case of internet connection absence
                     m_usedTimeSyncInfo = TimeSyncInfo(
                         elapsed,
                         currentMSecsSinceEpoch(),
                         m_localTimePriorityKey );
+                    //resetting "synchronized with internet" flag
                     NX_LOG( lit("TimeSynchronizationManager. Received primary time server change transaction. New synchronized time %1, new priority key 0x%2").
                         arg(QDateTime::fromMSecsSinceEpoch(m_usedTimeSyncInfo.syncTime).toString(Qt::ISODate)).arg(m_localTimePriorityKey.toUInt64(), 0, 16), cl_logINFO );
                     m_timeSynchronized = true;
@@ -452,6 +458,7 @@ namespace ec2
         m_localSystemTimeDelta = std::numeric_limits<qint64>::min();
         m_systemTimeByPeer.clear();
         m_timeSynchronized = false;
+        m_localTimePriorityKey.flags &= ~peerTimeSynchronizedWithInternetServer;
         m_usedTimeSyncInfo = TimeSyncInfo(
             0,
             currentMSecsSinceEpoch(),
@@ -712,6 +719,8 @@ namespace ec2
                 NX_LOG( lit("TimeSynchronizationManager. Received time %1 from the internet").
                     arg(QDateTime::fromMSecsSinceEpoch(millisFromEpoch).toString(Qt::ISODate)), cl_logDEBUG1 );
 
+                m_internetSynchronizationFailureCount = 0;
+
                 m_internetTimeSynchronizationPeriod = INTERNET_SYNC_TIME_PERIOD_SEC;
 
                 const qint64 curLocalTime = currentMSecsSinceEpoch();
@@ -757,6 +766,10 @@ namespace ec2
                 m_internetTimeSynchronizationPeriod = std::min<>(
                     m_internetTimeSynchronizationPeriod * INTERNET_SYNC_TIME_FAILURE_PERIOD_GROW_COEFF,
                     MAX_INTERNET_SYNC_TIME_PERIOD_SEC );
+
+                ++m_internetSynchronizationFailureCount;
+                if( m_internetSynchronizationFailureCount > MAX_SEQUENT_INTERNET_SYNCHRONIZATION_FAILURES )
+                    m_localTimePriorityKey.flags &= ~peerTimeSynchronizedWithInternetServer;
             }
 
             addInternetTimeSynchronizationTask();

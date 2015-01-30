@@ -82,14 +82,18 @@ private:
 private:
     struct LockData 
     {
-        LockData(): mutex(0), currentTime(0) {}
-        LockData(ec2::QnDistributedMutex* mutex, QnVirtualCameraResourcePtr cameraResource, qint64 currentTime): mutex(mutex), cameraResource(cameraResource), currentTime(currentTime) {}
+        LockData(LockData&& other);
+        LockData();
+        LockData(ec2::QnDistributedMutex* mutex, QnVirtualCameraResourcePtr cameraResource, qint64 currentTime);
+        ~LockData();
 
         ec2::QnDistributedMutex* mutex;
         QnVirtualCameraResourcePtr cameraResource;
         qint64 currentTime;
+    private:
+        LockData(const LockData& other);
     };
-    QMap<QString, LockData> m_lockInProgress;
+    std::map<QString, LockData> m_lockInProgress;
 
     mutable QMutex m_mutex;
     QMap<QnResourcePtr, Recorders> m_recordMap;

@@ -579,6 +579,20 @@ bool IsVistaOrLater() {
     return osvi.dwMajorVersion > 5;
 }
 
+BOOL Is64BitWindows()
+{
+#if defined(_WIN64)
+ return TRUE;  // 64-bit programs run only on Win64
+#elif defined(_WIN32)
+ // 32-bit programs run on both 32-bit and 64-bit Windows
+ // so must sniff
+ BOOL f64 = FALSE;
+ return IsWow64Process(GetCurrentProcess(), &f64) && f64;
+#else
+ return FALSE; // Win64 does not support Win16
+#endif
+}
+
 CString GetAppDataLocalFolderPath() {
     TCHAR buffer[MAX_PATH*2] = { 0 };
     DWORD size = MAX_PATH * 2;
@@ -590,7 +604,8 @@ CString GetAppDataLocalFolderPath() {
         result.Format(L"%s\\config\\systemprofile\\AppData\\Local", buffer);
     } else {
         GetProfilesDirectory(buffer, &size);
-        result.Format(L"%s\\LocalService\\Local Settings\\Application Data", buffer);
+        CAtlString user = Is64BitWindows() ? L"Default User" : L"LocalService";
+        result.Format(L"%s\\%s\\Local Settings\\Application Data", buffer, user);
     }
 
     return result;
