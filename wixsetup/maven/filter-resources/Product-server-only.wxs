@@ -19,8 +19,8 @@
 
         <Property Id="ARPSYSTEMCOMPONENT" Value="1" />
 
-        <?define VmsInstalling=" (NOT Installed AND NOT PREVIOUSVERSIONSINSTALLED) "?>
-        <?define VmsUpgrading=" (NOT Installed AND PREVIOUSVERSIONSINSTALLED)" ?>
+        <?define VmsInstalling=" (NOT Installed AND NOT PREVIOUSSERVERSINSTALLED) "?>
+        <?define VmsUpgrading=" (NOT Installed AND PREVIOUSSERVERINSTALLED)" ?>
         <?define VmsChanging=" (Installed AND REMOVE <> "ALL") "?>
         <?define VmsRemoving=" (Installed AND REMOVE = "ALL") "?>
 
@@ -47,6 +47,9 @@
 
         <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
         <SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
+        <SetProperty Id="PREVIOUSSERVERSINSTALLED" Value="1" After="SetPREVIOUSVERSIONSINSTALLED">
+            PREVIOUSVERSIONSINSTALLED AND !ServerFeature
+        </SetProperty>
 
         <SetProperty Action="SetServerPort1" Id="SERVER_PORT" Value="[SERVER_PORT_EC]" Before="SetServerPort2">NOT SERVER_PORT</SetProperty>
         <SetProperty Action="SetServerPort2" Id="SERVER_PORT" Value="7001" Before="CostInitialize">NOT SERVER_PORT</SetProperty>
@@ -343,10 +346,10 @@
             <Binary Id="Warning" SourceFile="Binary\Exclam.ico" />
 
             <!-- WelcomeDlg -->
-            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">NOT PREVIOUSVERSIONSINSTALLED AND NOT LICENSE_ALREADY_ACCEPTED</Publish>          
-            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg">NOT PREVIOUSVERSIONSINSTALLED AND LICENSE_ALREADY_ACCEPTED</Publish>          
-            <Publish Dialog="WelcomeDlg" Control="Next" Property="ALLOW_CAMERA_CHANGES" Value="yes">NOT PREVIOUSVERSIONSINSTALLED AND LICENSE_ALREADY_ACCEPTED</Publish>
-            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="UpgradeDlg">PREVIOUSVERSIONSINSTALLED</Publish>
+            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">NOT PREVIOUSSERVERSINSTALLED AND NOT LICENSE_ALREADY_ACCEPTED</Publish>          
+            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg">NOT PREVIOUSSERVERSINSTALLED AND LICENSE_ALREADY_ACCEPTED</Publish>          
+            <Publish Dialog="WelcomeDlg" Control="Next" Property="ALLOW_CAMERA_CHANGES" Value="yes">NOT PREVIOUSSERVERSINSTALLED AND LICENSE_ALREADY_ACCEPTED</Publish>
+            <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="UpgradeDlg">PREVIOUSSERVERSINSTALLED</Publish>
 
             <!-- LicenseAgreementDlg -->
             <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
