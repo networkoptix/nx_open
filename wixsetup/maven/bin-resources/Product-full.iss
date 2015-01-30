@@ -16,6 +16,8 @@ LicenseFile=License.rtf
 Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
 #elif Lang == "zh-CN"
 Name: "cn"; MessagesFile: "Languages\ChineseSimplified.isl"
+#elif Lang == "zh-TW"
+Name: "tr_cn"; MessagesFile: "Languages\ChineseTraditional.isl"
 #else
 Name: "en"; MessagesFile: "compiler:Default.isl"
 #endif
@@ -33,8 +35,15 @@ cn.ClientIsAlreadyInstalled=客户端已安装
 cn.ServerIsAlreadyInstalled=服务器已安装
 cn.LaunchBoth=启动服务器和客户端安装程序
 cn.LaunchClient=启动客户端安装程序
-cn.LaunchServer=已安装更新的软件，退出。
+cn.LaunchServer=启动服务器安装程序
 cn.NewerVersionAlreadyInstalled=已安装更新的软件，退出。
+#elif Lang == "zh-TW"
+tr_cn.ClientIsAlreadyInstalled=客戶端已安裝
+tr_cn.ServerIsAlreadyInstalled=伺服器已安裝
+tr_cn.LaunchBoth=啟動伺服器與客戶端安裝程序
+tr_cn.LaunchClient=啟動客戶端安裝程序
+tr_cn.LaunchServer=啟動伺服器安裝程序
+tr_cn.NewerVersionAlreadyInstalled=您已安裝較新的版本, 程序即將結束.
 #else
 en.ClientIsAlreadyInstalled=Client is already installed
 en.ServerIsAlreadyInstalled=Server is already installed
