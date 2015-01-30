@@ -468,7 +468,7 @@ bool UdtSocketImpl::Reopen() {
 class UdtConnector {
 public:
     UdtConnector( UdtSocketImpl* impl ) : impl_(impl) {}
-    bool Connect( const QString& address , unsigned short port , int timeouts );
+    bool Connect( const SocketAddress& remoteAddress, int timeouts );
 private:
     UdtSocketImpl* impl_;
 };
@@ -494,11 +494,12 @@ struct UdtEpollHandlerHelper {
     UDTSOCKET udt_handler;
 };
 
-bool UdtConnector::Connect( const QString& address , unsigned short port , int timeouts ) {
+bool UdtConnector::Connect( const SocketAddress& remoteAddress, int timeouts )
+{
     Q_ASSERT(impl_->state() == UdtSocketImpl::OPEN);
     sockaddr_in addr;
     AddressFrom(
-        SocketAddress(HostAddress(address),port),&addr);
+        remoteAddress,&addr);
     // The official documentation doesn't advice using select but here we just need
     // to wait on a single socket fd, select is way more faster than epoll on linux
     // since epoll needs to create the internal structure inside of kernel.
@@ -700,11 +701,11 @@ bool UdtStreamSocket::getLastError( SystemError::ErrorCode* errorCode ) const {
 }
 
 bool UdtStreamSocket::connect(
-    const QString& foreignAddress,
-    unsigned short foreignPort,
-    unsigned int timeoutMillis ) {
-        return detail::UdtConnector(impl_.get()).
-            Connect(foreignAddress,foreignPort,timeoutMillis);
+    const SocketAddress& remoteAddress,
+    unsigned int timeoutMillis )
+{
+    return detail::UdtConnector(impl_.get()).
+        Connect(remoteAddress,timeoutMillis);
 }
 
 int UdtStreamSocket::recv( void* buffer, unsigned int bufferLen, int flags ) {

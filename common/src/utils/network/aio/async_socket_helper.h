@@ -575,13 +575,14 @@ private:
             return false;
         assert( isNonBlockingModeEnabled );
 #endif
-        if( !m_abstractSocketPtr->getSendTimeout( &sendTimeout ) )
-            return false;
 
 #ifdef _DEBUG
         assert( !m_asyncSendIssued );
         m_asyncSendIssued = true;
 #endif
+
+        if( !m_abstractSocketPtr->getSendTimeout( &sendTimeout ) )
+            return false;
 
         QMutexLocker lk( aio::AIOService::instance()->mutex() );
         ++m_connectSendAsyncCallCounter;
@@ -590,7 +591,7 @@ private:
             aio::etWrite,
             this,
             boost::optional<unsigned int>(),
-            [this, addr, sendTimeout](){ m_abstractSocketPtr->connect( addr, sendTimeout ); } );    //to be called between pollset.add and pollset.poll
+            [this, resolvedAddress, sendTimeout](){ m_abstractSocketPtr->connect( resolvedAddress, sendTimeout ); } );    //to be called between pollset.add and pollset.poll
     }
 };
 

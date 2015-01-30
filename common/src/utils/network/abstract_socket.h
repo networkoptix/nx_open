@@ -179,25 +179,20 @@ public:
 
     //!Establish connection to specified foreign address
     /*!
-        \param foreignAddress foreign address (IP address or name)
-        \param foreignPort foreign port
+        \param remoteSocketAddress remote address (IP address or name) and port
         \param timeoutMillis connection timeout, 0 - no timeout
         \return false if unable to establish connection
     */
+    virtual bool connect(
+        const SocketAddress& remoteSocketAddress,
+        unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS ) = 0;
     bool connect(
         const QString& foreignAddress,
         unsigned short foreignPort,
         unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS )
     {
-        return connect( SocketAddress(foreignAddress, foreignPort), timeoutMillis );
-    }
-    virtual bool connect(
-        const SocketAddress& remoteSocketAddress,
-        unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS ) = 0;
-    bool connect( const SocketAddress& addr, unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS )
-    {
         //TODO #ak this method MUST replace the previous one
-        return connect( addr.address.toString(), addr.port, timeoutMillis );
+        return connect( SocketAddress(foreignAddress, foreignPort), timeoutMillis );
     }
     //!Read into the given \a buffer up to \a bufferLen bytes data from this socket
     /*!

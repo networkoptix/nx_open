@@ -27,8 +27,7 @@ namespace nx_cc
     public:
         //!Implementation of AbstractStreamSocket::connect
         virtual bool connect(
-            const QString& foreignAddress,
-            unsigned short foreignPort,
+            const SocketAddress& remoteAddress,
             unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS ) override;
 
     protected:

@@ -172,11 +172,10 @@ public:
 
     //!Implementation of AbstractCommunicatingSocket::connect
     virtual bool connect(
-        const QString& foreignAddress,
-        unsigned short foreignPort,
+        const SocketAddress& remoteAddress,
         unsigned int timeoutMillis )
     {
-        return this->m_implDelegate.connect( foreignAddress, foreignPort, timeoutMillis );
+        return this->m_implDelegate.connect( remoteAddress, timeoutMillis );
     }
     //!Implementation of AbstractCommunicatingSocket::recv
     virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override { return this->m_implDelegate.recv( buffer, bufferLen, flags ); }

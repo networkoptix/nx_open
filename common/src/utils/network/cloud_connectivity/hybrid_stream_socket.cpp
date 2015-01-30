@@ -14,8 +14,7 @@
 namespace nx_cc
 {
     bool HybridStreamSocket::connect(
-        const QString& foreignAddress,
-        unsigned short foreignPort,
+        const SocketAddress& remoteAddress,
         unsigned int timeoutMillis )
     {
         //TODO #ak implement by issuing async call and waiting for completion

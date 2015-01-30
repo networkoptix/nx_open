@@ -1272,7 +1272,7 @@ bool QnDbManager::createDatabase()
         return false;
 
 
-    if (!applyUpdates(":/updates"))
+    if (!applyUpdates())
         return false;
 
     if (!lockStatic.commit())
