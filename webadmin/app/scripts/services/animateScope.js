@@ -5,6 +5,7 @@ angular.module('webadminApp')
 
         var animations = [];
 
+        var updationLimit = null;//100;
         var defaultDuration = 1000;
         var defaultScope = null;
         function Animation(scope,value,target,duration){
@@ -108,7 +109,12 @@ angular.module('webadminApp')
             if(defaultScope !== null && !digestContext) {
                 defaultScope.$apply();
             }
-            window.animationFrame(animationFunction);
+            if(updationLimit!==0) {
+                window.animationFrame(animationFunction);
+                if(updationLimit) {
+                    updationLimit--;
+                }
+            }
         }
         return {
             start:function(handler){

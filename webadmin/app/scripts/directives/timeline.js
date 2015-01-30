@@ -282,10 +282,10 @@ angular.module('webadminApp')
 
                     if(!!scope.records) {
                         // 1. Splice events
-                        var events = scope.records.splice(end, start, scope.actualLevel);
+                        var events = scope.records.setInterval( end, start, scope.actualLevel);
 
                         // 2. Draw em!
-                        console.log("splice",events);
+                        //console.log("splice",events);
                     }
                 }
 
@@ -628,7 +628,9 @@ angular.module('webadminApp')
 
                 scope.$watch('records',function(){
                     console.log("records changed");
-                    scope.records.ready.then(initTimeline);
+                    if(scope.records) {
+                        scope.records.ready.then(initTimeline);
+                    }
                 });
 
                 initTimeline();

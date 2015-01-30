@@ -8,16 +8,6 @@ function Chunk(boundaries,start,end,level,title,extension){
     this.level = level || 0;
     this.expand = true;
 
-
-    //var parentWidth = (boundaries.end - boundaries.start);
-    //this.startPosition = 100 * (start - boundaries.start)/parentWidth  + '%';
-
-    /*if(typeof(end)==='undefined'){
-        this.width = '1px';
-    }else{
-        this.width = 100 * (end - start) / parentWidth + '%';
-    }*/
-
     var format = 'MM/dd/yy HH:mm:ss';
     this.title = (typeof(title) === 'undefined' || title === null) ? dateFormat(start,format) + ' - ' + dateFormat(end,format):title ;
 
@@ -130,153 +120,42 @@ Interval.prototype.alignToFuture = function(date){
 };
 
 
-
-
-
-
-
-
-
 //Модель для линейки - дерево с возможностью детализации вглубь
-function RulerModel(start,end){
+var RulerModel = {
 
-    this.start = start;
-    this.end = end;
+    /**
+     * Presets for detailization levels
+     * @type {{detailization: number}[]}
+     */
+    levels: [
+        { name:'Age'        , format:'yyyy'     , interval:  new Interval( 0, 0, 0, 0, 0, 100), width: 25, topWidth: 0, topFormat:'' }, // root
+        { name:'Decade'     , format:'yyyy'     , interval:  new Interval( 0, 0, 0, 0, 0, 10) , width: 25 },
+        {
+            name:'Year', //Years
+            format:'yyyy',//Format string for date
+            interval:  new Interval(0,0,0,0,0,1),// Interval for marks
+            width: 25, // Minimal width for label. We should choose minimal width in order to not intresect labels on timeline
+            topWidth: 100, // minimal width for label above timeline
+            topFormat:'yyyy'//Format string for label above timeline
+        },
+        { name:'Month'      , format:'mmmm'     , interval:  new Interval( 0, 0, 0, 0, 1, 0)  , width: 50, topWidth: 140, topFormat:'mmmm yyyy'},
+        { name:'Day'        , format:'dd mmmm'  , interval:  new Interval( 0, 0, 0, 1, 0, 0)  , width: 60, topWidth: 140, topFormat:'dd mmmm yyyy' },
+        { name:'6 hours'    , format:'HH"h"'    , interval:  new Interval( 0, 0, 6, 0, 0, 0)  , width: 60 },
+        { name:'Hour'       , format:'HH"h"'    , interval:  new Interval( 0, 0, 1, 0, 0, 0)  , width: 60, topWidth: 140, topFormat:'dd mmmm yyyy HH:MM' },
+        { name:'10 minutes' , format:'MM"m"'    , interval:  new Interval( 0,10, 0, 0, 0, 0)  , width: 60 },
+        { name:'1 minute'   , format:'MM"m"'    , interval:  new Interval( 0, 1, 0, 0, 0, 0)  , width: 60, topWidth: 140, topFormat:'dd mmmm yyyy HH:MM' },
+        { name:'10 seconds' , format:'ss"s"'    , interval:  new Interval(10, 0, 0, 0, 0, 0)  , width: 30 },
+        { name:'1 second'   , format:'ss"s"'    , interval:  new Interval( 1, 0, 0, 0, 0, 0)  , width: 30 }
+    ],
 
-    //1. Get propriate level
-    var level =  RulerModel.getLevelIndex(end - start);
+    getLevelIndex: function(searchdetailization){
+        var targetLevel = _.find(RulerModel.levels, function(level){
+            return level.interval.getSeconds()*1000 < searchdetailization;
+        }) ;
 
-    //3. Init intervals tree
-    this.setInterval(this.start, this.end, level);
-    this.setInterval(this.start, this.end, level+1);
-}
-
-/**
- * Presets for detailization levels
- * @type {{detailization: number}[]}
- */
-RulerModel.levels = [
-    { name:'Age'        , format:'yyyy'     , interval:  new Interval( 0, 0, 0, 0, 0, 100), width: 25, topWidth: 0, topFormat:'' }, // root
-    { name:'Decade'     , format:'yyyy'     , interval:  new Interval( 0, 0, 0, 0, 0, 10) , width: 25 },
-    {
-        name:'Year', //Years
-        format:'yyyy',//Format string for date
-        interval:  new Interval(0,0,0,0,0,1),// Interval for marks
-        width: 25, // Minimal width for label. We should choose minimal width in order to not intresect labels on timeline
-        topWidth: 100, // minimal width for label above timeline
-        topFormat:'yyyy'//Format string for label above timeline
-    },
-    { name:'Month'      , format:'mmmm'     , interval:  new Interval( 0, 0, 0, 0, 1, 0)  , width: 50, topWidth: 140, topFormat:'mmmm yyyy'},
-    { name:'Day'        , format:'dd mmmm'  , interval:  new Interval( 0, 0, 0, 1, 0, 0)  , width: 60, topWidth: 140, topFormat:'dd mmmm yyyy' },
-    { name:'6 hours'    , format:'HH"h"'    , interval:  new Interval( 0, 0, 6, 0, 0, 0)  , width: 60 },
-    { name:'Hour'       , format:'HH"h"'    , interval:  new Interval( 0, 0, 1, 0, 0, 0)  , width: 60, topWidth: 140, topFormat:'dd mmmm yyyy HH:MM' },
-    { name:'10 minutes' , format:'MM"m"'    , interval:  new Interval( 0,10, 0, 0, 0, 0)  , width: 60 },
-    { name:'1 minute'   , format:'MM"m"'    , interval:  new Interval( 0, 1, 0, 0, 0, 0)  , width: 60, topWidth: 140, topFormat:'dd mmmm yyyy HH:MM' },
-    { name:'10 seconds' , format:'ss"s"'    , interval:  new Interval(10, 0, 0, 0, 0, 0)  , width: 30 },
-    { name:'1 second'   , format:'ss"s"'    , interval:  new Interval( 1, 0, 0, 0, 0, 0)  , width: 30 }
-];
-
-
-RulerModel.getLevelIndex = function(searchdetailization){
-    var targetLevel = _.find(RulerModel.levels, function(level){
-        return level.interval.getSeconds()*1000 < searchdetailization;
-    }) ;
-
-    return typeof(targetLevel)!=='undefined' ? RulerModel.levels.indexOf(targetLevel) : RulerModel.levels.length-1;
+        return typeof(targetLevel)!=='undefined' ? RulerModel.levels.indexOf(targetLevel) : RulerModel.levels.length-1;
+    }
 };
-
-/*
-// request better detailization
-RulerModel.prototype.setInterval = function (start,end,level){
-
-    if(level > RulerModel.levels.length - 1) {
-        level = RulerModel.levels.length - 1;
-    }
-
-    //1. Align interval by level grid
-    this.start = RulerModel.levels[level].interval.alignToPast(start).getTime();
-    this.end   = RulerModel.levels[level].interval.alignToFuture(end).getTime();
-    this.level = level;
-
-    //2. Init tree, if needed
-    if(typeof(this.marksTree) === 'undefined') {
-        this.marksTree = new Chunk(this, this.start, this.end, level, '',
-            {
-                marks: Array.apply(null, {length: RulerModel.levels[level].marks - 1}).map(Number.call, Number),
-                expand:true
-            });
-    }
-
-    //3. Splice cache for existing interval, store it as local cache
-    return this.updateSplice();
-};
-*/
-
-/**
- * Update active splice
- */
-/*
-RulerModel.prototype.updateSplice = function(){
-    this.marksTree.expand = true;
-    return this.splice(this.start, this.end, this.level);
-};
-*/
-/**
- * Create splice, containing marks with progressive detailization
- * (---------------------------------------------------------)
- * (-----)          (-------)     (--------------------------)
- * (--)  |          |  (--) |     (--------)    (---)   (----)
- * | ()  |          |  (--) |     (--) (-) |    | (-)   | | ()
- *
- * Example result:
- * (-----)          (-------)     (--) (-) |    (---)   (----)
- *
- * @param start
- * @param end
- * @param level
- * @param parent - parent for recursive call
- * @param result - heap for recursive call
- */
-/*
-RulerModel.prototype.splice = function(start, end, level, parent,spliceResult){
-    spliceResult = spliceResult||[];
-    parent = parent || this.marksTree;
-    if(parent.level === level) {
-        parent.expand = false;
-        return;
-    }
-
-    if(parent.children.length  === 0 && parent.level < RulerModel.levels.length - 1){
-        //create new level of detailization here!
-        var newLevel = RulerModel.levels[parent.level + 1];
-
-        var start1 = parent.start;
-        while(start1 < parent.end){
-            //create marks by adding chunks with step of level's interval
-            var end1 = Math.min(newLevel.interval.addToDate(start1).getTime(),parent.end);
-            parent.children.push(new Chunk(parent,start1,end1,parent.level + 1,dateFormat(start1,RulerModel.levels[parent.level + 1].format),
-                {marks: Array.apply(null, {length: RulerModel.levels[parent.level + 1].marks - 1}).map(Number.call, Number)}));
-            start1 = end1;
-        }
-    }
-
-    for(var i = 0 ; i < parent.children.length ; i ++ ){
-        var currentChunk = parent.children[i];
-        if(currentChunk.end <= start
-            || currentChunk.start>=end
-            || currentChunk.level === level
-            || level === RulerModel.levels.length - 1) {
-                currentChunk.expand = false;
-            spliceResult.push(currentChunk);
-        } else {
-            currentChunk.expand = true;
-            this.splice(start, end, level, currentChunk, spliceResult);
-        }
-    }
-    return spliceResult;
-};
-*/
-
 
 
 
@@ -298,10 +177,10 @@ function CameraRecordsProvider(cameras,mediaserver,$q){
     this.chunksTree = null;
     var self = this;
     //1. request first detailization to get initial bounds
-    this.setInterval(0,self.now(), 0).then(function(){
+    this.requestInterval(0,self.now(), 0).then(function(){
         // Depends on this interval - choose minimum interval, which contains all records and request deeper detailization
         var nextLevel = RulerModel.getLevelIndex (self.now() - self.chunksTree.start);
-        self.setInterval(self.chunksTree.start, self.now(), nextLevel);
+        self.requestInterval(self.chunksTree.start, self.now(), nextLevel);
     });
 
     //2. getCameraHistory
@@ -315,30 +194,26 @@ CameraRecordsProvider.prototype.now = function(){
  * Update active splice
  */
 CameraRecordsProvider.prototype.updateSplice = function(){
-    this.splice(this.start, this.end, this.level);
+    var ret = [];
+    this.splice(ret,this.start, this.end, this.level);
+    //console.log("send message to timeline for updating, or timeline should just get updated splice himself every redrawing")
 };
 
-/**
- * Request records for interval, add it to cache, update visibility splice
- *
- * @param start
- * @param end
- * @param level
- * @return Promise
- */
-CameraRecordsProvider.prototype.setInterval = function (start,end,level){
 
-
-   var deferred = this.$q.defer();
-
+CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
+    var deferred = this.$q.defer();
     this.start = start;
     this.end = end;
     this.level = level;
+    var detailization = RulerModel.levels[level].interval.getSeconds()*1000;
+
+
+    console.log("requestInterval",this.chunksTree,start,end,level,detailization);
 
     var self = this;
     //1. Request records for interval
     // And do we need to request it?
-    this.mediaserver.getRecords('/',this.cameras[0],start,end,RulerModel.levels[level].interval.getSeconds()*1000)
+    this.mediaserver.getRecords('/',this.cameras[0],start,end,detailization)
         .then(function(data){
 
             for(var i = 0; i <data.data.length;i++){
@@ -346,7 +221,7 @@ CameraRecordsProvider.prototype.setInterval = function (start,end,level){
                 if(data.data[i][1] === -1){
                     endChunk = (new Date()).getTime();// some date in future
                 }
-                console.error('this is wrong, but why?',level);
+                //console.error('this is wrong, but why?',level);
                 self.addChunk(new Chunk(null,data.data[i][0],endChunk,level));
             }
 
@@ -363,6 +238,25 @@ CameraRecordsProvider.prototype.setInterval = function (start,end,level){
     //3. return promise
     return this.ready;
 };
+/**
+ * Request records for interval, add it to cache, update visibility splice
+ *
+ * @param start
+ * @param end
+ * @param level
+ * @return Promise
+ */
+CameraRecordsProvider.prototype.setInterval = function (start,end,level){
+    // Splice existing intervals and check, if we need an update from server
+
+    var result = [];
+    var noNeedUpdate = this.splice(result,start,end,level);
+    if(!noNeedUpdate){ // Request update
+        this.requestInterval(start,end,level);
+    }
+    // Return splice
+    return result;
+};
 
 /**
  * Add chunk to tree - find or create good position for it
@@ -371,6 +265,7 @@ CameraRecordsProvider.prototype.setInterval = function (start,end,level){
  */
 CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
     if(this.chunksTree === null){
+        console.log("init chunksTree" , chunk);
         this.chunksTree = chunk;
         return;
     }
@@ -422,25 +317,34 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
  * @param parent - parent for recursive call
  * @param result - heap for recursive call
  */
-CameraRecordsProvider.prototype.splice = function(start, end, level, parent, result){
+CameraRecordsProvider.prototype.splice = function(result, start, end, level, parent){
     parent = parent || this.chunksTree;
-    result = result || [];
 
-    if(!!parent.children) {
+    var noNeedForUpdate = true;
+
+    if(!parent){
+        return false;
+    }
+
+    if (!!parent.children) {
         for (var i = 0; i < parent.children.length; i++) {
             var currentChunk = parent.children[i];
             if (currentChunk.end <= start || currentChunk.start >= end || currentChunk.level === level) {
                 currentChunk.expand = false;
+                result.push(currentChunk);
                 continue;
             }
 
             currentChunk.expand = true;
-            this.splice(start, end, level, currentChunk, result);
+            noNeedForUpdate &= this.splice(result, start, end, level, currentChunk);
         }
     }
-    else{
+    else {
+        // Try to go deeper
         result.push(parent);
+        console.log("we must update", parent);
+        return false; //Ne need to update
     }
 
-    return result;
+    return noNeedForUpdate;
 };
