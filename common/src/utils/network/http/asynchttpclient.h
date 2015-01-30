@@ -78,7 +78,7 @@ namespace nx_http
         virtual void terminate();
 
         State state() const;
-        //!Returns true, if \a AsyncHttpClient::state() == \a AsyncHttpClient::sFailed
+        //!Returns true if no response has been recevied due to transport error
         bool failed() const;
         //!Start GET request to \a url
         /*!

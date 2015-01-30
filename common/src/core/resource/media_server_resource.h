@@ -105,7 +105,6 @@ public:
     */
     QPair<int, int> saveUpdatedStorages();
 private slots:
-    void at_pingResponse( const nx_http::AsyncHttpClientPtr& httpClient );
     void at_httpClientDone( const nx_http::AsyncHttpClientPtr& client );
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);
