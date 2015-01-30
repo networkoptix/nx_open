@@ -40,6 +40,7 @@ bool AudioStreamReader::initializeIfNeeded()
 {
     if( m_initializedInitially )
         return true;
+    std::unique_lock<std::mutex> lk( m_mutex );
     if( !initializeAmux() )
         return false;
     m_initializedInitially = aio::AIOService::instance()->watchSocket( m_pollable.get(), aio::etRead, this );
@@ -54,6 +55,8 @@ size_t AudioStreamReader::setPacketReceiver( std::function<void(const std::share
     std::unique_lock<std::mutex> lk( m_mutex );
     const size_t id = ++m_prevReceiverID;
     m_packetReceivers[id] = std::move( packetReceiver );
+    //if( m_pollable && (m_packetReceivers.size() == 1) )
+    //    aio::AIOService::instance()->watchSocket( m_pollable.get(), aio::etRead, this );
     return id;
 }
 
@@ -61,6 +64,11 @@ void AudioStreamReader::removePacketReceiver( size_t id )
 {
     std::unique_lock<std::mutex> lk( m_mutex );
     m_packetReceivers.erase( id );
+    //if( m_pollable && m_packetReceivers.empty() )
+    //{
+    //    lk.unlock();
+    //    aio::AIOService::instance()->removeFromWatch( m_pollable.get(), aio::etRead, true );
+    //}
 }
 
 nxcip::AudioFormat AudioStreamReader::getAudioFormat() const
@@ -83,6 +91,11 @@ void AudioStreamReader::eventTriggered( Pollable* pollable, aio::EventType event
     //re-initializing audio
     if( !initializeAmux() )
         return;
+    {
+        std::unique_lock<std::mutex> lk( m_mutex );
+        if( m_packetReceivers.empty() )
+            return;
+    }
     if( !aio::AIOService::instance()->watchSocket( m_pollable.get(), aio::etRead, this ) )
     {
         //TODO
@@ -129,6 +142,7 @@ int AudioStreamReader::readAudioData()
     //std::cout<<"Got audio packet. size "<<audioPacket->dataSize()<<", pts "<<audioPacket->timestamp()<<"\n";
 
     std::unique_lock<std::mutex> lk( m_mutex );
+    //TODO #ak callback MUST be done with mutex unlocked
     for( auto val: m_packetReceivers )
         val.second( audioPacket );
 

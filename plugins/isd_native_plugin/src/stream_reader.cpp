@@ -19,6 +19,7 @@
 #include <sys/timeb.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <signal.h>
 
 #include <cassert>
 #include <iostream>
@@ -171,13 +172,21 @@ void StreamReader::setAudioEnabled( bool audioEnabled )
 #ifndef NO_ISD_AUDIO
     m_audioEnabled.store( audioEnabled, std::memory_order_relaxed );
 
+    QMutexLocker lk( &m_mutex );
+
     if( audioEnabled )
     {
-        QMutexLocker lk( &m_mutex );
+        if( m_audioReceiverID == 0 )
+            m_audioReceiverID = m_audioStreamReader->setPacketReceiver(
+                std::bind( &StreamReader::onAudioDataAvailable, this, std::placeholders::_1 ) );
+    }
+    else
+    {
         if( m_audioReceiverID > 0 )
+        {
             m_audioStreamReader->removePacketReceiver( m_audioReceiverID );
-        m_audioReceiverID = m_audioStreamReader->setPacketReceiver(
-            std::bind( &StreamReader::onAudioDataAvailable, this, std::placeholders::_1 ) );
+            m_audioReceiverID = 0;
+        }
     }
 #else
     Q_UNUSED( audioEnabled )
@@ -190,7 +199,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 
 #ifndef NO_ISD_AUDIO
     const bool audioEnabledLocal = m_audioEnabled.load( std::memory_order_relaxed );
-    #endif
+#endif
 
     const size_t cameraStreamsToRead = 
           1                                                                 //video
@@ -291,7 +300,6 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 
 void StreamReader::interrupt()
 {
-    //TODO/IMPL
 }
 
 int StreamReader::initializeVMux()
@@ -310,7 +318,7 @@ int StreamReader::initializeVMux()
     int rv = 0;
 
     int info_size = sizeof(stream_info);
-    rv = vmux->GetStreamInfo (m_encoderNum, &stream_info, &info_size);
+    rv = vmux->GetStreamInfo(m_encoderNum, &stream_info, &info_size);
     if (rv) {
         std::cerr << "ISD plugin: can't get video stream info" << std::endl;
         return nxcip::NX_INVALID_ENCODER_NUMBER; // error
@@ -376,17 +384,17 @@ int StreamReader::getVideoPacket( nxcip::MediaDataPacket** lpPacket )
     }
 #endif
 
+    int64_t absoluteTime = 
+#ifdef ABSOLUTE_FRAME_TIME_PRESENT
+            (qint64)frame.tv_sec * USEC_IN_SEC + frame.tv_usec;
+#else
+            (qnSyncTime ? qnSyncTime->currentMSecsSinceEpoch() : QDateTime::currentMSecsSinceEpoch()) * USEC_IN_MSEC;
+#endif
+
     std::unique_ptr<ILPVideoPacket> videoPacket( new ILPVideoPacket(
         &m_allocator,
         0, // channel
-        calcNextTimestamp(
-            frame.vmux_info.PTS
-#ifdef ABSOLUTE_FRAME_TIME_PRESENT
-            , (qint64)frame.tv_sec * USEC_IN_SEC + frame.tv_usec
-#else
-            , qnSyncTime->currentMSecsSinceEpoch() * USEC_IN_MSEC
-#endif
-            ),
+        calcNextTimestamp( frame.vmux_info.PTS, absoluteTime ),
         (frame.vmux_info.pic_type == VMUX_IDR_FRAME ? nxcip::MediaDataPacket::fKeyPacket : 0) | 
             (m_encoderNum > 0 ? nxcip::MediaDataPacket::fLowQuality : 0),
         0, // cseq
@@ -463,7 +471,7 @@ int StreamReader::initializeVMuxMotion()
     std::unique_ptr<Vmux> newVmuxMotion( new Vmux() );
 
     int info_size = sizeof(motion_stream_info);
-    int rv = newVmuxMotion->GetStreamInfo (Y_STREAM_SMALL, &motion_stream_info, &info_size);
+    int rv = newVmuxMotion->GetStreamInfo(Y_STREAM_SMALL, &motion_stream_info, &info_size);
     if (rv) {
         std::cerr << "can't get stream info for motion stream" << std::endl;
         return nxcip::NX_IO_ERROR; // error
@@ -565,6 +573,7 @@ void StreamReader::closeAllStreams()
     m_vmuxMotion.reset();
 
 #ifndef NO_ISD_AUDIO
+    QMutexLocker lk( &m_mutex );
     if( m_audioReceiverID > 0 )
     {
         m_audioStreamReader->removePacketReceiver( m_audioReceiverID );
@@ -600,7 +609,8 @@ void StreamReader::resyncTime( int64_t absoluteSourceTimeUSec )
     memset( &currentTime, 0, sizeof(currentTime) );
     gettimeofday( &currentTime, NULL );
     TimeSynchronizationData::instance()->timeSyncData.mapLocalTimeToSourceAbsoluteTime( 
-        qnSyncTime->currentMSecsSinceEpoch()*USEC_IN_MSEC - ((int64_t)currentTime.tv_sec*USEC_IN_SEC + currentTime.tv_usec - absoluteSourceTimeUSec),
+        (qnSyncTime ? qnSyncTime->currentMSecsSinceEpoch() : QDateTime::currentMSecsSinceEpoch())*USEC_IN_MSEC -
+            ((int64_t)currentTime.tv_sec*USEC_IN_SEC + currentTime.tv_usec - absoluteSourceTimeUSec),
         absoluteSourceTimeUSec );
 
     NX_LOG( lit("ISD plugin. Primary stream time sync. Current local time %1:%2, frame time %3:%4").

@@ -16,7 +16,7 @@
 
 
 static const QLatin1String localhost( "127.0.0.1" );
-static const int DEFAULT_ISD_PORT = 80;
+static const int DEFAULT_ISD_PORT = 8127;
 static const int ISD_HTTP_REQUEST_TIMEOUT = 6000;
 static const int PRIMARY_ENCODER_NUMBER = 0;
 static const int SECONDARY_ENCODER_NUMBER = 1;
@@ -222,6 +222,8 @@ nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
 int MediaEncoder::getAudioFormat( nxcip::AudioFormat* audioFormat ) const
 {
 #ifndef NO_ISD_AUDIO
+    if( !m_audioStreamReader->initializeIfNeeded() )
+        return nxcip::NX_IO_ERROR;
     *audioFormat = m_audioStreamReader->getAudioFormat();
     return nxcip::NX_NO_ERROR;
 #else
