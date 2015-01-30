@@ -41,6 +41,8 @@ bool AudioStreamReader::initializeIfNeeded()
     if( m_initializedInitially )
         return true;
     std::unique_lock<std::mutex> lk( m_mutex );
+    if( m_initializedInitially )
+        return true;
     if( !initializeAmux() )
         return false;
     m_initializedInitially = aio::AIOService::instance()->watchSocket( m_pollable.get(), aio::etRead, this );
