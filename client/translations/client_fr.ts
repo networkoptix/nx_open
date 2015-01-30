@@ -2551,7 +2551,7 @@ Construit pour %5-%6 avec %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1376"/>
         <source>Connect to the Current System...</source>
-        <translation>Connecter sur le Serveur Actuel...</translation>
+        <translation>Unifier au Système Actuellement Connecté...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1399"/>

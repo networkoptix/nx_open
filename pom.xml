@@ -31,7 +31,7 @@
         <axiscamplugin.name>${company.name} AXIS camera integration plugin</axiscamplugin.name>
         <genericrtspplugin.name>${company.name} generic RTSP plugin</genericrtspplugin.name>
         <mediaserver.name>${company.name} Media Server</mediaserver.name>
-        <mediaserver.display.name>${display.product.name} Tray Assistant</mediaserver.display.name>
+        <mediaserver.display.name>${display.product.name} Media Server</mediaserver.display.name>
         <mediaproxy.name>${company.name} Media Proxy</mediaproxy.name>
         <mediaproxy.display.name>${company.name} Media Proxy</mediaproxy.display.name>
         <testcamera.name>${company.name} Test Camera</testcamera.name>
@@ -47,7 +47,8 @@
         <modification/>
         <beta>true</beta>
         <final.artifact.name>${project.artifactId}</final.artifact.name>
-        <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${box}-${arch}-${build.configuration}-beta</finalName>        
+        <build.suffix>${arch}</build.suffix>
+        <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}-${build.configuration}-beta</finalName>        
         <updateFeedUrl>${testUpdateFeedUrl}</updateFeedUrl>
         <mobile>false</mobile>
         <!-- compile.option1. See profile no-webkit -->
@@ -487,6 +488,7 @@
                 </property>
             </activation>
             <properties>
+                <build.suffix>${box}-${arch}</build.suffix>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
                 <qt.classifier>${platform}-${arch}-${box}</qt.classifier>
                 <compile.option1/>
@@ -668,7 +670,7 @@
                 </property>
             </activation>
             <properties>
-                <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${box}-${arch}</finalName>
+                <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}</finalName>
                 <updateFeedUrl>${prodUpdateFeedUrl}</updateFeedUrl>
                 <skip.sign>false</skip.sign>
             </properties>

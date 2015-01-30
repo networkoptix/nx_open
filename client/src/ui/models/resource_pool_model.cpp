@@ -780,14 +780,15 @@ void QnResourcePoolModel::at_server_systemNameChanged(const QnResourcePtr &resou
 
 void QnResourcePoolModel::at_server_redundancyChanged(const QnResourcePtr &resource) {
     QnResourcePoolModelNode *node = this->node(resource);
-    bool isHidden = QnMediaServerResource::isHiddenServer(resource);
-    QnResourcePoolModelNode *camerasParentNode = isHidden ? m_rootNodes[Qn::ServersNode] : node;
+    node->update();
 
     for (const QnVirtualCameraResourcePtr &cameraResource: qnResPool->getAllCameras(resource, true)) {
-        this->node(cameraResource)->setParent(camerasParentNode);
+        QnResourcePoolModelNode *camNode = m_resourceNodeByResource.take(cameraResource);
+        deleteNode(camNode);
+        /* Re-create node as it should change its NodeType from ResourceNode to EdgeNode or vice versa. */
+        camNode = this->node(cameraResource);
+        camNode->setParent(expectedParent(camNode));
     }
-
-    node->update();
 }
 
 void QnResourcePoolModel::at_commonModule_systemNameChanged() {

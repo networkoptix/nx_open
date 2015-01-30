@@ -508,12 +508,12 @@ namespace nx_http
     {
         using namespace std::placeholders;
 
-        bool canUseExistingConnection = true;
+        bool canUseExistingConnection = false;
         if( m_httpStreamReader.message().type == nx_http::MessageType::response )
         {
-            canUseExistingConnection = nx_http::getHeaderValue(
-                m_httpStreamReader.message().response->headers,
-                "Connection" ) != "close";
+            canUseExistingConnection =
+                (m_httpStreamReader.message().response->statusLine.version == nx_http::http_1_1) &&
+                (nx_http::getHeaderValue( m_httpStreamReader.message().response->headers, "Connection" ) != "close");
         }
 
         m_httpStreamReader.resetState();
@@ -523,7 +523,8 @@ namespace nx_http
             //TODO #ak think again about next cancellation
             m_socket->cancelAsyncIO();
 
-            if( canUseExistingConnection )
+            if( canUseExistingConnection &&
+                (m_socket->getForeignAddress() == SocketAddress(url.host(), url.port(nx_http::DEFAULT_HTTP_PORT))) )
             {
                 serializeRequest();
                 m_state = sSendingRequest;
@@ -543,6 +544,15 @@ namespace nx_http
             }
         }
 
+        m_url = url;
+
+        return initiateTcpConnection();
+    }
+
+    bool AsyncHttpClient::initiateTcpConnection()
+    {
+        const SocketAddress remoteAddress( m_url.host(), m_url.port( nx_http::DEFAULT_HTTP_PORT ) );
+
         m_state = sInit;
 
         m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(/*url.scheme() == lit("https")*/));
@@ -556,16 +566,15 @@ namespace nx_http
             return false;
         }
 
-        m_url = url;
         m_state = sWaitingConnectToHost;
 
         //starting async connect
         if( !m_socket->connectAsync(
-                SocketAddress( url.host(), url.port( DEFAULT_HTTP_PORT ) ),
-                std::bind( &AsyncHttpClient::asyncConnectDone, this, m_socket.data(), _1 ) ) )
+                remoteAddress,
+                std::bind( &AsyncHttpClient::asyncConnectDone, this, m_socket.data(), std::placeholders::_1 ) ) )
         {
-            NX_LOG( lit("Failed to perform async connect to %1:%2. %3").
-                arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
+            NX_LOG( lit("Failed to perform async connect to %1. %2").
+                arg(remoteAddress.toString()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
             m_socket.clear();
             m_url.clear();
             m_state = sInit;

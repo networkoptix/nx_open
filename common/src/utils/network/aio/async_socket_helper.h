@@ -14,6 +14,7 @@
 
 #include "aioservice.h"
 #include "../abstract_socket.h"
+#include "../host_address_resolver.h"
 
 
 //TODO #ak come up with new name for this class or remove it
@@ -113,6 +114,8 @@ public:
         std::atomic_thread_fence(std::memory_order_acquire);
         if( m_threadHandlerIsRunningIn.load(std::memory_order_relaxed) == QThread::currentThreadId() )
         {
+            HostAddressResolver::instance()->cancel( this, true );    //TODO #ak must not block here!
+
             if( m_connectSendHandlerTerminatedFlag )
                 aio::AIOService::instance()->removeFromWatch( this->m_socket, aio::etWrite );
             if( m_recvHandlerTerminatedFlag )
@@ -126,9 +129,13 @@ public:
         {
             //checking that socket is not registered in aio
             Q_ASSERT_X(
-                !aio::AIOService::instance()->isSocketBeingWatched( this->m_socket ),
+                !HostAddressResolver::instance()->isRequestIDKnown(this),
                 Q_FUNC_INFO,
-                "You MUST cancel running async socket operation before deleting socket if you delete socket from non-aio thread" );
+                "You MUST cancel running async socket operation before deleting socket if you delete socket from non-aio thread (1)" );
+            Q_ASSERT_X(
+                !aio::AIOService::instance()->isSocketBeingWatched(this->m_socket),
+                Q_FUNC_INFO,
+                "You MUST cancel running async socket operation before deleting socket if you delete socket from non-aio thread (2)" );
         }
     }
 
@@ -155,21 +162,26 @@ public:
         if( !m_abstractSocketPtr->getSendTimeout( &sendTimeout ) )
             return false;
 
-#ifdef _DEBUG
-        assert( !m_asyncSendIssued );
-        m_asyncSendIssued = true;
-#endif
-
         m_connectHandler = std::move( handler );
 
-        QMutexLocker lk( aio::AIOService::instance()->mutex() );
-        ++m_connectSendAsyncCallCounter;
-        return aio::AIOService::instance()->watchSocketNonSafe(
-            this->m_socket,
-            aio::etWrite,
-            this,
-            boost::optional<unsigned int>(),
-            [this, addr, sendTimeout](){ m_abstractSocketPtr->connect( addr, sendTimeout ); } );    //to be called between pollset.add and pollset.poll
+        //TODO #ak if address is already resolved (or is an ip address) better make synchronous non-blocking call
+        //NOTE: socket cannot be read from/written to if not connected yet. TODO #ak check that with assert
+
+        if( HostAddressResolver::instance()->isAddressResolved(addr.address) )
+            return startAsyncConnect( addr );
+
+        //resolving address, if required
+        return HostAddressResolver::instance()->resolveAddressAsync(
+            addr.address,
+            [this, addr]( SystemError::ErrorCode errorCode, const HostAddress& resolvedAddress )
+            {
+                //always calling m_connectHandler within aio thread socket is bound to
+                if( errorCode != SystemError::noError )
+                    this->post( std::bind( m_connectHandler, errorCode ) );
+                else if( !startAsyncConnect( SocketAddress(resolvedAddress, addr.port) ) )
+                    this->post( std::bind( m_connectHandler, SystemError::getLastOSErrorCode() ) );
+            },
+            this );
     }
 
     bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
@@ -177,7 +189,7 @@ public:
         if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return true;
 
-        static const int DEFAULT_RESERVE_SIZE = 4 * 1024;
+        static const int DEFAULT_RESERVE_SIZE = 4*1024;
 
         assert( buf->capacity() > buf->size() );
 
@@ -237,7 +249,8 @@ public:
             ++this->m_socket->impl()->terminated;   //ignoring all new I/O operations while cancellation is in progress
 
             //TODO #ak underlying loop is a work-around. Must add method to aio::AIOService which cancels all operation atomically
-            while( aio::AIOService::instance()->isSocketBeingWatched( this->m_socket ) )
+            while( aio::AIOService::instance()->isSocketBeingWatched( this->m_socket ) ||
+                   HostAddressResolver::instance()->isRequestIDKnown(this) )
             {
                 cancelAsyncIO( aio::etRead, waitForRunningHandlerCompletion );
                 cancelAsyncIO( aio::etWrite, waitForRunningHandlerCompletion );
@@ -248,6 +261,9 @@ public:
             --this->m_socket->impl()->terminated;
             return;
         }
+
+        if( eventType == aio::etWrite )
+            HostAddressResolver::instance()->cancel( this, waitForRunningHandlerCompletion );
 
         aio::AIOService::instance()->removeFromWatch( this->m_socket, eventType, waitForRunningHandlerCompletion );
         std::atomic_thread_fence( std::memory_order_acquire );
@@ -547,6 +563,34 @@ private:
                 assert( false );
                 break;
         }
+    }
+
+    bool startAsyncConnect( const SocketAddress& resolvedAddress )
+    {
+        //connecting
+        unsigned int sendTimeout = 0;
+#ifdef _DEBUG
+        bool isNonBlockingModeEnabled = false;
+        if( !m_abstractSocketPtr->getNonBlockingMode( &isNonBlockingModeEnabled ) )
+            return false;
+        assert( isNonBlockingModeEnabled );
+#endif
+        if( !m_abstractSocketPtr->getSendTimeout( &sendTimeout ) )
+            return false;
+
+#ifdef _DEBUG
+        assert( !m_asyncSendIssued );
+        m_asyncSendIssued = true;
+#endif
+
+        QMutexLocker lk( aio::AIOService::instance()->mutex() );
+        ++m_connectSendAsyncCallCounter;
+        return aio::AIOService::instance()->watchSocketNonSafe(
+            this->m_socket,
+            aio::etWrite,
+            this,
+            boost::optional<unsigned int>(),
+            [this, addr, sendTimeout](){ m_abstractSocketPtr->connect( addr, sendTimeout ); } );    //to be called between pollset.add and pollset.poll
     }
 };
 

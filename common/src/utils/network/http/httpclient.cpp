@@ -36,6 +36,8 @@ namespace nx_http
 
     bool HttpClient::doGet( const QUrl& url )
     {
+        m_done = false;
+
         if( !m_asyncHttpClient->doGet( url ) )
             return false;
 
@@ -51,6 +53,8 @@ namespace nx_http
         const nx_http::StringType& contentType,
         const nx_http::StringType& messageBody )
     {
+        m_done = false;
+
         if( !m_asyncHttpClient->doPost( url, contentType, messageBody ) )
             return false;
 

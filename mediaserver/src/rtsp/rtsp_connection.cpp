@@ -919,6 +919,15 @@ void QnRtspConnectionProcessor::createDataProvider()
 {
     Q_D(QnRtspConnectionProcessor);
 
+    if (!d->dataProcessor) {
+        d->dataProcessor = new QnRtspDataConsumer(this);
+	    d->dataProcessor->pauseNetwork();
+	    d->dataProcessor->setUseRealTimeStreamingMode(!d->useProprietaryFormat);
+	    d->dataProcessor->setMultiChannelVideo(d->useProprietaryFormat);
+	}
+    else 
+        d->dataProcessor->clearUnprocessedData();
+
     QnVideoCamera* camera = 0;
     if (d->mediaRes) {
         camera = qnCameraPool->getVideoCamera(d->mediaRes->toResourcePtr());
@@ -933,6 +942,8 @@ void QnRtspConnectionProcessor::createDataProvider()
             if (d->liveDpHi) {
                 connect(d->liveDpHi->getResource().data(), SIGNAL(parentIdChanged(const QnResourcePtr &)), this, SLOT(at_camera_parentIdChanged()), Qt::DirectConnection);
                 connect(d->liveDpHi->getResource().data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_camera_resourceChanged()), Qt::DirectConnection);
+
+                d->liveDpHi->addDataProcessor(d->dataProcessor);
                 d->liveDpHi->startIfNotRunning();
             }
         }
@@ -946,8 +957,10 @@ void QnRtspConnectionProcessor::createDataProvider()
             if (canRunSecondStream)
             {
                 d->liveDpLow = camera->getLiveReader(QnServer::LowQualityCatalog);
-                if (d->liveDpLow)
+                if (d->liveDpLow) {
+                    d->liveDpLow->addDataProcessor(d->dataProcessor);
                     d->liveDpLow->startIfNotRunning();
+                }
             }
         }
     }
@@ -961,17 +974,6 @@ void QnRtspConnectionProcessor::createDataProvider()
         d->thumbnailsDP = QSharedPointer<QnThumbnailsStreamReader>(new QnThumbnailsStreamReader(d->mediaRes->toResourcePtr()));
         d->thumbnailsDP->setGroupId(QnUuid::createUuid().toString().toUtf8());
     }
-}
-
-void QnRtspConnectionProcessor::connectToLiveDataProviders()
-{
-    Q_D(QnRtspConnectionProcessor);
-    d->liveDpHi->addDataProcessor(d->dataProcessor);
-    if (d->liveDpLow)
-        d->liveDpLow->addDataProcessor(d->dataProcessor);
-
-    d->dataProcessor->setLiveQuality(d->quality);
-    d->dataProcessor->setLiveMarker(d->lastPlayCSeq);
 }
 
 void QnRtspConnectionProcessor::checkQuality()
@@ -1059,14 +1061,6 @@ int QnRtspConnectionProcessor::composePlay()
 
     d->lastPlayCSeq = nx_http::getHeaderValue(d->request.headers, "CSeq").toInt();
 
-    if (!d->dataProcessor) {
-        d->dataProcessor = new QnRtspDataConsumer(this);
-        d->dataProcessor->pauseNetwork();
-        d->dataProcessor->setUseRealTimeStreamingMode(!d->useProprietaryFormat);
-        d->dataProcessor->setMultiChannelVideo(d->useProprietaryFormat);
-    }
-    else 
-        d->dataProcessor->clearUnprocessedData();
 
     QnVideoCamera* camera = 0;
     if (d->mediaRes)
@@ -1138,7 +1132,8 @@ int QnRtspConnectionProcessor::composePlay()
         d->dataProcessor->unlockDataQueue();
         quint32 cseq = copySize > 0 ? d->lastPlayCSeq : 0;
         d->dataProcessor->setWaitCSeq(d->startTime, cseq); // ignore rest packets before new position
-        connectToLiveDataProviders();
+        d->dataProcessor->setLiveQuality(d->quality);
+        d->dataProcessor->setLiveMarker(d->lastPlayCSeq);
     }
     else if (d->liveMode == Mode_Archive && d->archiveDP) 
     {

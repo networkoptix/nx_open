@@ -27,7 +27,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
 
     //checking brand compatibility
     if (success)
-        success |= qnSettings->isDevMode() || connectionInfo.brand.isEmpty() || connectionInfo.brand == QnAppInfo::productNameShort();
+        success = qnSettings->isDevMode() || connectionInfo.brand.isEmpty() || connectionInfo.brand == QnAppInfo::productNameShort();
 
     if(!success)
         return Result::Failure;
@@ -55,12 +55,12 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
     if (validateConnectionLight(connectionInfo, errorCode) == Result::Success)
         return Result::Success;
 
-    //TODO: #GDM duplicated code
+    //TODO: #GDM duplicated code, Result enum should be improved to handle all existing connect options
     bool success = (errorCode == ec2::ErrorCode::ok);
 
     //checking brand compatibility
     if (success)
-        success |= qnSettings->isDevMode() || connectionInfo.brand.isEmpty() || connectionInfo.brand == QnAppInfo::productNameShort();
+        success = qnSettings->isDevMode() || connectionInfo.brand.isEmpty() || connectionInfo.brand == QnAppInfo::productNameShort();
 
     QString detail;
 

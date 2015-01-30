@@ -84,7 +84,7 @@
     <message>
         <location filename="../src/utils/common/evaluator.cpp" line="113"/>
         <source>Unexpected symbol &apos;%1&apos; at position %2.</source>
-        <translation>biểu tượng bất ngờ &apos;%1&apos; tại vị trí %2</translation>
+        <translation>Biểu tượng bất ngờ &apos;%1&apos; tại vị trí %2.</translation>
     </message>
 </context>
 <context>
@@ -267,7 +267,7 @@
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="50"/>
         <source>Send email</source>
-        <translation type="unfinished"></translation>
+        <translation>Gửi emai</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="55"/>
@@ -302,42 +302,42 @@
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="74"/>
         <source>Server Failure</source>
-        <translation type="unfinished"></translation>
+        <translation>máy chủ thất bại</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="75"/>
         <source>Server Conflict</source>
-        <translation type="unfinished"></translation>
+        <translation>xung đột máy chủ</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="76"/>
         <source>Server Started</source>
-        <translation type="unfinished"></translation>
+        <translation>máy chủ bắt đầu</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="77"/>
         <source>License Issue</source>
-        <translation type="unfinished"></translation>
+        <translation>vấn đề giấy phép</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="110"/>
         <source>Server &quot;%1&quot; Failure</source>
-        <translation type="unfinished"></translation>
+        <translation>Server &quot;%1&quot; thất bại</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="116"/>
         <source>Server &quot;%1&quot; Conflict</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy chủ xung đột &quot;%1&quot;</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="119"/>
         <source>Server &quot;%1&quot; Started</source>
-        <translation type="unfinished"></translation>
+        <translation>Server &quot;%1&quot; bắt đầu</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="121"/>
         <source>Server &quot;%1&quot; had license issue</source>
-        <translation type="unfinished"></translation>
+        <translation>Server &quot;%1&quot; có vấn đề giấy phép</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="126"/>
@@ -383,22 +383,22 @@
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="219"/>
         <source>Conflicting Server #%1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Mâu thuẫn máy chủ #%1:%2</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="370"/>
         <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kết nối với camera (luồng chính) đã bất ngờ đóng cửa.</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="372"/>
         <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kết nối với camera (dòng thứ cấp) đã bất ngờ đóng cửa.</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="408"/>
         <source>Recording on %n camera(s) is disabled: </source>
-        <translation type="unfinished"></translation>
+        <translation>Ghi trên %n camera (s) là người khuyết tật:</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="325"/>
@@ -432,7 +432,7 @@
         <location filename="../src/business/business_strings_helper.cpp" line="364"/>
         <source>No video frame received during last %n seconds.</source>
         <translation>
-            <numerusform>Trong quá khứ %n thứ hai Nếu không nhận được hình ảnh</numerusform>
+            <numerusform>Trong quá khứ %n thứ hai Nếu không nhận được hình ảnh.</numerusform>
         </translation>
     </message>
     <message>
@@ -443,12 +443,12 @@
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="380"/>
         <source>RTP packet loss detected.</source>
-        <translation>RTP Phát hiện mất gói tin</translation>
+        <translation>RTP Phát hiện mất gói tin.</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="384"/>
         <source>Server terminated.</source>
-        <translation>máy chủ bị gián đoạn</translation>
+        <translation>máy chủ bị gián đoạn.</translation>
     </message>
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="388"/>
@@ -482,13 +482,15 @@
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="31"/>
         <source>Server %1 is not available.
  Check that Server is up and running.</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy chủ %1 là không có sẵn.
+  Kiểm tra máy chủ đó là lên và chạy.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="35"/>
         <source>Received bad response from Server %1: &quot;%2&quot;.
  Check if Server is up and has the proper version.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nhận được phản ứng xấu từ Server %1 &quot;%2&quot;.
+  Kiểm tra xem máy chủ đang lên và có các phiên bản thích hợp.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="43"/>
@@ -515,7 +517,7 @@ Hãy chắc chắn rằng máy ảnh trên Internet. Thử khởi động lại 
         <source>No supported media tracks at url %1.
  Please try to reboot the camera, then restore factory defaults on the web-page. Finally, try to update firmware. If the problem persists, please contact support.</source>
         <translation>URL không được hỗ trợ %1 Phương tiện truyền thông theo dõi.
-Thử khởi động lại máy ảnh, và sau đó trở về mặc định nhà máy trên website của camera. Cuối cùng, cố gắng nâng cấp firmware camera. Nếu tình trạng này vẫn tồn tại, tìm kiếm giải pháp nhà cung cấp mà bạn đã mua</translation>
+Thử khởi động lại máy ảnh, và sau đó trở về mặc định nhà máy trên website của camera. Cuối cùng, cố gắng nâng cấp firmware camera. Nếu tình trạng này vẫn tồn tại, tìm kiếm giải pháp nhà cung cấp mà bạn đã mua.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="63"/>
@@ -555,12 +557,12 @@ Vui lòng tìm kiếm bạn mua các giải pháp nhà cung cấp.</translation>
         <source>An input/output error has occurred. OS message: &quot;%1&quot;.
  Make sure the camera is plugged into the network. Try to reboot the camera.</source>
         <translation>Một lỗi đầu vào / đầu ra. Tin nhắn Hệ điều hành: &quot;%1&quot;.
-Kiểm tra xem máy ảnh được kết nối vào mạng, hãy thử khởi động lại máy ảnh</translation>
+Kiểm tra xem máy ảnh được kết nối vào mạng, hãy thử khởi động lại máy ảnh.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="93"/>
         <source>Invalid data was received from the camera: %1.</source>
-        <translation>Từ máy ảnh: %1 Dữ liệu không hợp lệ nhận được</translation>
+        <translation>Từ máy ảnh: %1 Dữ liệu không hợp lệ nhận được.</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="96"/>
@@ -575,7 +577,7 @@ Kiểm tra xem máy ảnh được kết nối vào mạng, hãy thử khởi đ
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="102"/>
         <source>Camera initialization process in progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Quá trình khởi tạo máy ảnh trong tiến</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="117"/>
@@ -584,7 +586,7 @@ Kiểm tra xem máy ảnh được kết nối vào mạng, hãy thử khởi đ
 Parameters: </source>
         <translation>
 
-參數：</translation>
+tham số:</translation>
     </message>
     <message>
         <location filename="../src/utils/camera/camera_diagnostics.cpp" line="39"/>
@@ -644,7 +646,7 @@ Parameters: </source>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="67"/>
         <source>Could not find encoder for codec %1.</source>
-        <translation>không thể tìm thấy %1 Một bộ mã hóa để mã hóa</translation>
+        <translation>không thể tìm thấy %1 Một bộ mã hóa để mã hóa.</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="94"/>
@@ -696,7 +698,7 @@ Parameters: </source>
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="59"/>
         <source>Could not find encoder for codec %1.</source>
-        <translation>không thể tìm thấy %1 Một bộ mã hóa để mã hóa</translation>
+        <translation>không thể tìm thấy %1 Một bộ mã hóa để mã hóa.</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="106"/>
@@ -724,92 +726,92 @@ Parameters: </source>
     <message>
         <location filename="../src/licensing/license.cpp" line="161"/>
         <source>Edge</source>
-        <translation type="unfinished"></translation>
+        <translation>cạnh</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="162"/>
         <source>Vmax</source>
-        <translation type="unfinished"></translation>
+        <translation>Vmax</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="163"/>
         <source>Analog encoder</source>
-        <translation type="unfinished"></translation>
+        <translation>phép loại suy encoder</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="164"/>
         <source>Video Wall</source>
-        <translation type="unfinished"></translation>
+        <translation>bức tường video</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="177"/>
         <source>Trial licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>giấy phép thử nghiệm</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="178"/>
         <source>Analog licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>phép loại suy giấy phép</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="179"/>
         <source>Professional licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>giấy phép chuyên nghiệp</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="180"/>
         <source>Edge licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>giấy phép cạnh</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="181"/>
         <source>Vmax licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>giấy phép Vmax</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="182"/>
         <source>Analog encoder licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>giấy phép phép loại suy encoder</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="183"/>
         <source>Video Wall licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Giấy phép bức tường video</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="354"/>
         <source>Invalid signature</source>
-        <translation type="unfinished"></translation>
+        <translation>chữ ký không hợp lệ</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="356"/>
         <source>Server with necessary hardware ID is not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Server với ID phần cứng cần thiết không được tìm thấy</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="358"/>
         <source>Invalid customization</source>
-        <translation type="unfinished"></translation>
+        <translation>tùy biến không hợp lệ</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="360"/>
         <source>Expired</source>
-        <translation type="unfinished"></translation>
+        <translation>hết hạn</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="362"/>
         <source>Invalid type</source>
-        <translation type="unfinished"></translation>
+        <translation>kiểu không hợp lệ</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="364"/>
         <source>Only single license is allowed for this device</source>
-        <translation type="unfinished"></translation>
+        <translation>Chỉ có giấy phép duy nhất được phép cho thiết bị này</translation>
     </message>
     <message>
         <location filename="../src/licensing/license.cpp" line="366"/>
         <source>Unknown error</source>
-        <translation type="unfinished"></translation>
+        <translation>lỗi không xác định</translation>
     </message>
 </context>
 <context>
@@ -817,55 +819,55 @@ Parameters: </source>
     <message numerus="yes">
         <location filename="../src/utils/license_usage_helper.cpp" line="104"/>
         <source>%n %2 are used out of %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n %2 được sử dụng trong tổng số %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/license_usage_helper.cpp" line="114"/>
         <source>%n %2 will be used out of %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n %2 sẽ được sử dụng trong tổng số %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/license_usage_helper.cpp" line="123"/>
         <source>Activate %n more %2. </source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Kích hoạt %n hơn %2.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location filename="../src/utils/license_usage_helper.cpp" line="126"/>
         <source>%n more %2 will be used. </source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n hơn %2 sẽ được sử dụng.</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../src/utils/license_usage_helper.cpp" line="217"/>
         <source>There was a problem activating your license key. Database error has occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation>Có một vấn đề kích hoạt key bản quyền của bạn. Lỗi cơ sở dữ đã xảy ra.</translation>
     </message>
     <message>
         <location filename="../src/utils/license_usage_helper.cpp" line="219"/>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>Có một vấn đề kích hoạt key bản quyền của bạn. Dữ liệu không hợp lệ nhận được. Hãy liên hệ với nhóm hỗ trợ để báo cáo vấn đề.</translation>
     </message>
     <message>
         <location filename="../src/utils/license_usage_helper.cpp" line="221"/>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation>Key bản quyền mà bạn đã nhập không hợp lệ. Hãy kiểm tra xem key bản quyền được nhập chính xác. Nếu vấn đề vẫn tiếp tục, vui lòng liên hệ với nhóm hỗ trợ để xác nhận nếu key bản quyền là hợp lệ hoặc để có được một chìa khóa giấy phép hợp lệ.</translation>
     </message>
     <message>
         <location filename="../src/utils/license_usage_helper.cpp" line="224"/>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bạn đang cố gắng để kích hoạt một giấy phép tương thích với phần mềm của bạn. Hãy liên hệ với nhóm hỗ trợ để có được một chìa khóa giấy phép hợp lệ.</translation>
     </message>
     <message>
         <location filename="../src/utils/license_usage_helper.cpp" line="226"/>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to get a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation>Key bản quyền này trước đó đã được kích hoạt cho phần cứng id {{}} HWID vào {{}} thời gian. Hãy liên hệ với nhóm hỗ trợ để có được một chìa khóa giấy phép hợp lệ.</translation>
     </message>
 </context>
 <context>
@@ -882,7 +884,7 @@ Parameters: </source>
         <location filename="../src/plugins/resource/digitalwatchdog/newdw_ptz_controller.cpp" line="111"/>
         <location filename="../src/plugins/resource/digitalwatchdog/newdw_ptz_controller.cpp" line="155"/>
         <source>Preset #</source>
-        <translation type="unfinished"></translation>
+        <translation>cài sẵn #</translation>
     </message>
 </context>
 <context>
@@ -914,7 +916,7 @@ Parameters: </source>
     <message>
         <location filename="../src/export/sign_helper.cpp" line="70"/>
         <source>Trial license</source>
-        <translation type="unfinished"></translation>
+        <translation>giấy phép thử nghiệm</translation>
     </message>
     <message>
         <location filename="../src/export/sign_helper.cpp" line="263"/>
@@ -1055,32 +1057,32 @@ Parameters: </source>
     <message>
         <location filename="../src/health/system_health.cpp" line="6"/>
         <source>Email address is not set</source>
-        <translation type="unfinished"></translation>
+        <translation>Địa chỉ email không được thiết lập</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="10"/>
         <source>Email server is not set</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy chủ email không được thiết lập</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="12"/>
         <source>Some users have not set their email addresses</source>
-        <translation type="unfinished"></translation>
+        <translation>Một số người dùng đã không được thiết lập địa chỉ email của họ</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="14"/>
         <source>Connection to server lost</source>
-        <translation type="unfinished"></translation>
+        <translation>Kết nối đến máy chủ bị mất</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="16"/>
         <source>Select server for others to synchronise time with</source>
-        <translation type="unfinished"></translation>
+        <translation>Chọn máy chủ cho những người khác để đồng bộ thời gian với</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="18"/>
         <source>Error while sending email</source>
-        <translation type="unfinished"></translation>
+        <translation>Lỗi trong khi gửi email</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="20"/>
@@ -1100,48 +1102,54 @@ Parameters: </source>
     <message>
         <location filename="../src/health/system_health.cpp" line="35"/>
         <source>Email address is not set for user %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Địa chỉ email không được thiết lập cho người dùng %1</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="45"/>
         <source>Email address is not set.
 You cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>Địa chỉ email không được thiết lập.
+Bạn không thể nhận được các thông báo hệ thống thông qua email.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="47"/>
         <source>Email server is not set.
 You cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>Máy chủ email không được thiết lập.
+Bạn không thể nhận được các thông báo hệ thống thông qua email.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="49"/>
         <source>Some users have not set their email addresses.
 They cannot receive system notifications via email.</source>
-        <translation type="unfinished"></translation>
+        <translation>Một số người dùng đã không được thiết lập địa chỉ email của họ.
+Họ không thể nhận được các thông báo hệ thống thông qua email.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="51"/>
         <source>Multiple servers have different time and correct time could not be detected automatically.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nhiều máy chủ có thời gian khác nhau và thời gian chính xác không thể được phát hiện tự động.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="53"/>
         <source>Storages are full on the following Server:
 %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kho có đầy đủ trên máy chủ sau đây:
+%1.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="55"/>
         <source>Storages are not configured on the following Server:
 %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kho không được cấu hình trên máy chủ sau đây:
+%1.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="59"/>
         <source>Rebuilding archive index is completed on the following Server:
 %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Xây dựng lại chỉ mục lưu trữ được hoàn thành trên máy chủ sau đây:
+%1.</translation>
     </message>
     <message>
         <location filename="../src/health/system_health.cpp" line="57"/>
@@ -1188,7 +1196,7 @@ You cannot record video from cameras.</source>
     <message>
         <location filename="../src/transcoding/transcoder.cpp" line="272"/>
         <source>OpenCL transcoding is not implemented.</source>
-        <translation>OpenCL chuyển mã không được thực hiện</translation>
+        <translation>OpenCL chuyển mã không được thực hiện.</translation>
     </message>
     <message>
         <location filename="../src/transcoding/transcoder.cpp" line="275"/>

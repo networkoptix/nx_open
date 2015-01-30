@@ -4,6 +4,9 @@
 #include <iostream>
 #include <fstream>
 #include <signal.h>
+#ifdef __linux__
+#include <signal.h>
+#endif
 
 #include <qtsinglecoreapplication.h>
 #include "qtservice.h"
@@ -172,6 +175,7 @@
 #include "version.h"
 #include "core/resource_management/resource_properties.h"
 #include "core/resource_management/status_dictionary.h"
+#include "network/universal_request_processor.h"
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -184,6 +188,9 @@ static const quint64 DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
 static const QString REMOVE_DB_PARAM_NAME(lit("removeDbOnStartup"));
 static const QByteArray SYSTEM_IDENTITY_TIME("sysIdTime");
+static const QByteArray AUTH_KEY("authKey");
+static const QByteArray APPSERVER_PASSWORD("appserverPassword");
+static const QByteArray LOW_PRIORITY_ADMIN_PASSWORD("lowPriorityPassword");
 
 class QnMain;
 static QnMain* serviceMainInstance = 0;
@@ -199,6 +206,8 @@ namespace {
     const QString SERVER_GUID2 = lit("serverGuid2");
     const QString OBSOLETE_SERVER_GUID = lit("obsoleteServerGuid");
     const QString PENDING_SWITCH_TO_CLUSTER_MODE = lit("pendingSwitchToClusterMode");
+    const QString ADMIN_PSWD_HASH = lit("adminMd5Hash");
+    const QString ADMIN_PSWD_DIGEST = lit("adminMd5Digest");
 };
 
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
@@ -737,6 +746,14 @@ int serverMain(int argc, char *argv[])
     return 0;
 }
 
+void encodeAndStoreAuthKey(const QByteArray& authKey)
+{
+    QByteArray prefix("SK_");
+    QByteArray authKeyBin = QnUuid(authKey).toRfc4122();
+    QByteArray authKeyEncoded = QnAuthHelper::symmetricalEncode(authKeyBin).toHex();
+    MSSettings::roSettings()->setValue(AUTH_KEY, prefix + authKeyEncoded); // encode and update in settings
+}
+
 void initAppServerConnection(QSettings &settings)
 {
     // migrate appserverPort settings from version 2.2 if exist
@@ -777,22 +794,17 @@ void initAppServerConnection(QSettings &settings)
 
     // TODO: Actually appserverPassword is always empty. Remove?
     QString userName = settings.value("appserverLogin", QLatin1String("admin")).toString();
-    QString password = settings.value("appserverPassword", QLatin1String("")).toString();
-    QByteArray authKey = settings.value("authKey").toByteArray();
+    QString password = settings.value(APPSERVER_PASSWORD, QLatin1String("")).toString();
+    QByteArray authKey = settings.value(AUTH_KEY).toByteArray();
     QString appserverHostString = settings.value("appserverHost").toString();
     if (!authKey.isEmpty() && !isLocalAppServer(appserverHostString))
     {
         // convert from v2.2 format and encode value
         QByteArray prefix("SK_");
         if (!authKey.startsWith(prefix))
-        {
-            QByteArray authKeyBin = QnUuid(authKey).toRfc4122();
-            QByteArray authKeyEncoded = QnAuthHelper::symmetricalEncode(authKeyBin).toHex();
-            settings.setValue(lit("authKey"), prefix + authKeyEncoded); // encode and update in settings
-        }
-        else {
+            encodeAndStoreAuthKey(authKey);
+        else
             authKey = decodeAuthKey(authKey);
-        }
 
         userName = serverGuid().toString();
         password = authKey;
@@ -819,7 +831,8 @@ QnMain::QnMain(int argc, char* argv[])
     m_firstRunningTime(0),
     m_moduleFinder(0),
     m_universalTcpListener(0),
-    m_dumpSystemResourceUsageTaskID(0)
+    m_dumpSystemResourceUsageTaskID(0),
+    m_stopping(false)
 {
     serviceMainInstance = this;
 }
@@ -828,18 +841,35 @@ QnMain::~QnMain()
 {
     quit();
     stop();
+
+    if( defaultMsgHandler )
+        qInstallMessageHandler( defaultMsgHandler );
 }
 
-void QnMain::at_restartServerRequired()
+bool QnMain::isStopping() const
 {
+    QMutexLocker lock(&m_stopMutex);
+    return m_stopping;
+}
+
+void QnMain::at_databaseDumped()
+{
+    if (isStopping())
+        return;
+
+    saveAdminPswdHash();
     restartServer(500);
 }
 
 void QnMain::at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender)
 {
+    if (isStopping())
+        return;
+
     MSSettings::roSettings()->setValue(SYSTEM_IDENTITY_TIME, value);
     if (sender != qnCommon->moduleGUID()) {
         MSSettings::roSettings()->setValue(REMOVE_DB_PARAM_NAME, "1");
+        saveAdminPswdHash();
         restartServer(0);
     }
 }
@@ -848,6 +878,10 @@ void QnMain::stopSync()
 {
     qWarning()<<"Stopping server";
     if (serviceMainInstance) {
+        {
+            QMutexLocker lock(&m_stopMutex);
+            m_stopping = true;
+        }
         serviceMainInstance->pleaseStop();
         serviceMainInstance->exit();
         serviceMainInstance->wait();
@@ -1121,6 +1155,8 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
 
 void QnMain::at_updatePublicAddress(const QHostAddress& publicIP)
 {
+    if (isStopping())
+        return;
     m_publicAddress = publicIP;
 
     QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
@@ -1146,6 +1182,8 @@ void QnMain::at_updatePublicAddress(const QHostAddress& publicIP)
 
 void QnMain::at_localInterfacesChanged()
 {
+    if (isStopping())
+        return;
     auto intfList = allLocalAddresses();
     if (!m_publicAddress.isNull())
         intfList << m_publicAddress;
@@ -1173,12 +1211,17 @@ void QnMain::at_localInterfacesChanged()
 
 void QnMain::at_serverSaved(int, ec2::ErrorCode err)
 {
+    if (isStopping())
+        return;
+
     if (err != ec2::ErrorCode::ok)
         qWarning() << "Error saving server.";
 }
 
 void QnMain::at_connectionOpened()
 {
+    if (isStopping())
+        return;
     if (m_firstRunningTime)
         qnBusinessRuleConnector->at_mserverFailure(qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(), m_firstRunningTime*1000, QnBusiness::ServerStartedReason, QString());
     if (!m_startMessageSent) {
@@ -1190,6 +1233,9 @@ void QnMain::at_connectionOpened()
 
 void QnMain::at_timer()
 {
+    if (isStopping())
+        return;
+
     MSSettings::runTimeSettings()->setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
     QnResourcePtr mServer = qnResPool->getResourceById(qnCommon->moduleGUID());
     for(const QnVirtualCameraResourcePtr& camera: qnResPool->getAllCameras(mServer))
@@ -1197,19 +1243,27 @@ void QnMain::at_timer()
 }
 
 void QnMain::at_storageManager_noStoragesAvailable() {
+    if (isStopping())
+        return;
     qnBusinessRuleConnector->at_NoStorages(m_mediaServer);
 }
 
 void QnMain::at_storageManager_storageFailure(const QnResourcePtr& storage, QnBusiness::EventReason reason) {
+    if (isStopping())
+        return;
     qnBusinessRuleConnector->at_storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), reason, storage);
 }
 
 void QnMain::at_storageManager_rebuildFinished() {
+    if (isStopping())
+        return;
     qnBusinessRuleConnector->at_archiveRebuildFinished(m_mediaServer);
 }
 
 void QnMain::at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList)
 {
+    if (isStopping())
+        return;
     qnBusinessRuleConnector->at_cameraIPConflict(
         m_mediaServer,
         host,
@@ -1268,6 +1322,7 @@ bool QnMain::initTcpListener()
     if( !m_universalTcpListener->bindToLocalAddress() )
         return false;
     m_universalTcpListener->setDefaultPage("/static/index.html");
+    //QnUniversalRequestProcessor::setUnauthorizedPageBody(QnFileConnectionProcessor::readStaticFile(m_universalTcpListener->defaultPage()));
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
@@ -1288,6 +1343,15 @@ bool QnMain::initTcpListener()
 #endif   //ENABLE_DESKTOP_CAMERA
 
     return true;
+}
+
+void QnMain::saveAdminPswdHash()
+{
+    QnUserResourcePtr admin = qnResPool->getAdministrator();
+    if (admin) {
+        MSSettings::roSettings()->setValue(ADMIN_PSWD_HASH, admin->getHash());
+        MSSettings::roSettings()->setValue(ADMIN_PSWD_DIGEST, admin->getDigest());
+    }
 }
 
 QHostAddress QnMain::getPublicAddress()
@@ -1365,7 +1429,7 @@ void QnMain::run()
     connect(QnAuthHelper::instance(), &QnAuthHelper::emptyDigestDetected, this, &QnMain::at_emptyDigestDetected);
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/ping"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/camera_event*"), AuthMethod::noAuth );
-    QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/showLog*"), AuthMethod::urlQueryParam );
+    QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/showLog*"), AuthMethod::urlQueryParam );   //allowed by default for now
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/moduleInformation"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("/static/*"), AuthMethod::noAuth );
 
@@ -1395,8 +1459,8 @@ void QnMain::run()
 
     //QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
-    QnStorageManager storageManager;
-    QnFileDeletor fileDeletor;
+    std::unique_ptr<QnStorageManager> storageManager( new QnStorageManager() );
+    std::unique_ptr<QnFileDeletor> fileDeletor( new QnFileDeletor() );
 
     connect(QnResourceDiscoveryManager::instance(), &QnResourceDiscoveryManager::CameraIPConflict, this, &QnMain::at_cameraIPConflict);
     connect(QnStorageManager::instance(), &QnStorageManager::noStoragesAvailable, this, &QnMain::at_storageManager_noStoragesAvailable);
@@ -1406,11 +1470,15 @@ void QnMain::run()
     QString dataLocation = getDataDirectory();
     QDir stateDirectory;
     stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
-    fileDeletor.init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
+    fileDeletor->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
 
 
     // If adminPassword is set by installer save it and create admin user with it if not exists yet
-    qnCommon->setDefaultAdminPassword(settings->value("appserverPassword", QLatin1String("")).toString());
+    qnCommon->setDefaultAdminPassword(settings->value(APPSERVER_PASSWORD, QLatin1String("")).toString());
+    qnCommon->setUseLowPriorityAdminPasswordHach(settings->value(LOW_PRIORITY_ADMIN_PASSWORD, false).toBool());
+
+    qnCommon->setAdminPasswordData(settings->value(ADMIN_PSWD_HASH).toByteArray(), settings->value(ADMIN_PSWD_DIGEST).toByteArray());
+
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &QnMain::at_runtimeInfoChanged);
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnMain::at_runtimeInfoChanged);
 
@@ -1459,9 +1527,13 @@ void QnMain::run()
         NX_LOG( QString::fromLatin1("Can't connect to local EC2. %1").arg(ec2::toString(errorCode)), cl_logERROR );
         QnSleep::msleep(3000);
     }
+
+    if (needToStop())
+        return; //TODO #ak correctly deinitialize what has been initialised
+
     MSSettings::roSettings()->setValue(REMOVE_DB_PARAM_NAME, "0");
 
-    connect(ec2Connection.get(), &ec2::AbstractECConnection::databaseDumped, this, &QnMain::at_restartServerRequired);
+    connect(ec2Connection.get(), &ec2::AbstractECConnection::databaseDumped, this, &QnMain::at_databaseDumped);
     qnCommon->setRemoteGUID(QnUuid(connectInfo.ecsGuid));
     MSSettings::roSettings()->sync();
     if (MSSettings::roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString() == "yes") {
@@ -1469,7 +1541,7 @@ void QnMain::run()
         MSSettings::roSettings()->setValue("systemName", connectInfo.systemName);
         MSSettings::roSettings()->remove("appserverHost");
         MSSettings::roSettings()->remove("appserverLogin");
-        MSSettings::roSettings()->setValue("appserverPassword", "");
+        MSSettings::roSettings()->setValue(APPSERVER_PASSWORD, "");
         MSSettings::roSettings()->remove(PENDING_SWITCH_TO_CLUSTER_MODE);
         MSSettings::roSettings()->sync();
 
@@ -1479,6 +1551,9 @@ void QnMain::run()
         abort();
         return;
     }
+    settings->remove(ADMIN_PSWD_HASH);
+    settings->remove(ADMIN_PSWD_DIGEST);
+    settings->remove(LOW_PRIORITY_ADMIN_PASSWORD);
 
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
@@ -1621,7 +1696,7 @@ void QnMain::run()
             isModified = true;
         }
         
-        bool needUpdateAuthKey = server->getAuthKey().isEmpty();
+        bool needUpdateAuthKey = false;
         if (server->getSystemName() != qnCommon->localSystemName())
         {
             if (!server->getSystemName().isEmpty())
@@ -1633,30 +1708,37 @@ void QnMain::run()
             server->setVersion(qnCommon->engineVersion());
             isModified = true;
         }
-        if (needUpdateAuthKey) {
-            QByteArray authKey = MSSettings::roSettings()->value("authKey").toString().toLatin1();
-            authKey = !authKey.isEmpty() ? decodeAuthKey(authKey) : QnUuid::createUuid().toString().toLatin1(); 
+
+        QByteArray settingsAuthKey = decodeAuthKey(MSSettings::roSettings()->value(AUTH_KEY).toString().toLatin1());
+        QByteArray authKey = settingsAuthKey;
+        if (authKey.isEmpty())
+            authKey = server->getAuthKey().toLatin1();
+        if (authKey.isEmpty() || needUpdateAuthKey)
+            authKey = QnUuid::createUuid().toString().toLatin1(); 
+
+        if (server->getAuthKey().toLatin1() != authKey) {
             server->setAuthKey(authKey);
             isModified = true;
         }
+        // Keep server auth key in registry. Server MUST be able pass authorization after deleting database in database restore process
+        if (settingsAuthKey != authKey)
+            encodeAndStoreAuthKey(authKey);
 
         if (isModified)
             m_mediaServer = registerServer(ec2Connection, server);
         else
             m_mediaServer = server;
 
-
         if (m_mediaServer.isNull())
             QnSleep::msleep(1000);
     }
 
     /* This key means that password should be forcibly changed in the database. */
-    const QString passwordChangeKey = "appserverPassword";
     MSSettings::roSettings()->remove(OBSOLETE_SERVER_GUID);
-    MSSettings::roSettings()->setValue(passwordChangeKey, "");
+    MSSettings::roSettings()->setValue(APPSERVER_PASSWORD, "");
 #ifdef _DEBUG
     MSSettings::roSettings()->sync();
-    Q_ASSERT_X(MSSettings::roSettings()->value(passwordChangeKey).toString().isEmpty(), Q_FUNC_INFO, "appserverPassword is not emptyu in registry. Restart the server as Administrator");
+    Q_ASSERT_X(MSSettings::roSettings()->value(APPSERVER_PASSWORD).toString().isEmpty(), Q_FUNC_INFO, "appserverPassword is not emptyu in registry. Restart the server as Administrator");
 #endif
 
     if (needToStop()) {
@@ -1979,6 +2061,9 @@ void QnMain::run()
 
     globalSettings.reset();
 
+    fileDeletor.reset();
+    storageManager.reset();
+
     delete QnResourcePool::instance();
     QnResourcePool::initStaticInstance( NULL );
 
@@ -1994,11 +2079,15 @@ void QnMain::changePort(quint16 port) {
 
 void QnMain::at_appStarted()
 {
+    if (isStopping())
+        return;
     QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2()); // start receiving notifications
 };
 
 void QnMain::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)
 {
+    if (isStopping())
+        return;
     if (runtimeInfo.uuid != qnCommon->moduleGUID())
         return;
 
@@ -2009,6 +2098,9 @@ void QnMain::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)
 
 void QnMain::at_emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password)
 {
+    if (isStopping())
+        return;
+
     // fill authenticate digest here for compatibility with version 2.1 and below.
     const ec2::AbstractECConnectionPtr& appServerConnection = QnAppServerConnectionFactory::getConnection2();
     if (user->getDigest().isEmpty() && !m_updateUserRequests.contains(user->getId()))
@@ -2200,6 +2292,12 @@ void changePort(quint16 port)
 
 static void printVersion();
 
+#ifdef __linux__
+void SIGUSR1_handler(int)
+{
+    //doing nothing. Need this signal only to interrupt some blocking calls
+}
+#endif
 
 int main(int argc, char* argv[])
 {
@@ -2218,6 +2316,10 @@ int main(int argc, char* argv[])
 #ifdef _WIN32
     win32_exception::installGlobalUnhandledExceptionHandler();
     _tzset();
+#endif
+
+#ifdef __linux__
+    signal( SIGUSR1, SIGUSR1_handler );
 #endif
 
     //parsing command-line arguments

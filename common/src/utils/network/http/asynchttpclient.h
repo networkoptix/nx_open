@@ -78,7 +78,7 @@ namespace nx_http
         virtual void terminate();
 
         State state() const;
-        //!Returns true, if \a AsyncHttpClient::state() == \a AsyncHttpClient::sFailed
+        //!Returns true if no response has been recevied due to transport error
         bool failed() const;
         //!Start GET request to \a url
         /*!
@@ -189,6 +189,7 @@ namespace nx_http
 
         void resetDataBeforeNewRequest();
         bool initiateHttpMessageDelivery( const QUrl& url );
+        bool initiateTcpConnection();
         /*!
             \return Number of bytes, read from socket. -1 in case of read error
         */

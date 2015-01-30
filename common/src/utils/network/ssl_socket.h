@@ -43,8 +43,7 @@ public:
     virtual bool getConnectionStatistics( StreamSocketInfo* info ) override;
     //!Implementation of \a AbstractStreamSocket::connect
     virtual bool connect(
-        const QString& foreignAddress,
-        unsigned short foreignPort,
+        const SocketAddress& remoteAddress,
         unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS ) override;
     //!Implementation of \a AbstractStreamSocket::recv
     virtual int recv(void* buffer, unsigned int bufferLen, int flags) override;

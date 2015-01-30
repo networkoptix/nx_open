@@ -75,8 +75,6 @@ int downloadFile( const QString& url, const QString& destFilePath );
 
 int main( int argc, char* argv[] )
 {
-    //return testHttpClient();
-
     QnLongRunnablePool runnablePool;
 
     QString logLevel = "WARN";
