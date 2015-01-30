@@ -348,7 +348,7 @@ void QnTransactionTransport::cancelConnecting()
 {
     if (getState() == ConnectingStage2)
         QnTransactionTransport::connectingCanceled(m_remotePeer.id, true);
-    qWarning() << Q_FUNC_INFO << "Connection canceled from state " << toString(getState());
+    NX_LOG( lit("%1 Connection canceled from state %2").arg(Q_FUNC_INFO).arg(toString(getState())), cl_logWARNING );
     setState(Error);
 }
 

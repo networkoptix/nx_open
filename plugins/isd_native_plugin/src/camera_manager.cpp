@@ -6,9 +6,10 @@
 #include "camera_manager.h"
 
 #include <cstring>
+#include <iostream>
+#include <mutex>
 
 #include "media_encoder.h"
-#include <iostream>
 
 
 CameraManager::CameraManager( const nxcip::CameraInfo& info )
@@ -19,9 +20,6 @@ CameraManager::CameraManager( const nxcip::CameraInfo& info )
     m_capabilities( 
         nxcip::BaseCameraManager::nativeMediaStreamCapability |
         //nxcip::BaseCameraManager::shareFpsCapability |
-#ifndef NO_ISD_AUDIO
-	nxcip::BaseCameraManager::audioCapability |
-#endif
         nxcip::BaseCameraManager::hardwareMotionCapability),
     m_motionMask( nullptr ),
     m_audioEnabled( false )
@@ -35,7 +33,6 @@ CameraManager::~CameraManager()
 {
     if (m_motionMask)
         m_motionMask->releaseRef();
-
 }
 
 void* CameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )
@@ -109,9 +106,43 @@ int CameraManager::getCameraInfo( nxcip::CameraInfo* info ) const
     return nxcip::NX_NO_ERROR;
 }
 
+#ifndef NO_ISD_AUDIO
+class ISDPluginGlobalData
+{
+public:
+    std::mutex mutex;
+    bool isAudioAvailable;
+    bool audioCapabilityTested;
+
+    ISDPluginGlobalData()
+    :
+        isAudioAvailable( false ),
+        audioCapabilityTested( false )
+    {
+    }
+};
+
+ISDPluginGlobalData isdPluginGlobalData;
+#endif
+
 //!Implementation of nxcip::BaseCameraManager::getCameraCapabilities
 int CameraManager::getCameraCapabilities( unsigned int* capabilitiesMask ) const
 {
+#ifndef NO_ISD_AUDIO
+    {
+        std::lock_guard<std::mutex> lk( isdPluginGlobalData.mutex );
+
+        if( !isdPluginGlobalData.audioCapabilityTested )
+        {
+            isdPluginGlobalData.isAudioAvailable = m_audioStreamReader->initializeIfNeeded();
+            isdPluginGlobalData.audioCapabilityTested = true;
+        }
+
+        if( isdPluginGlobalData.isAudioAvailable )
+            m_capabilities |= nxcip::BaseCameraManager::audioCapability;
+    }
+#endif
+
     *capabilitiesMask = m_capabilities;
     return nxcip::NX_NO_ERROR;
 }
