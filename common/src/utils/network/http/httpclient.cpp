@@ -91,6 +91,11 @@ namespace nx_http
         return result;
     }
 
+    void HttpClient::addRequestHeader( const StringType& key, const StringType& value )
+    {
+        m_asyncHttpClient->addRequestHeader( key, value );
+    }
+
     const QUrl& HttpClient::url() const
     {
         return m_asyncHttpClient->url();

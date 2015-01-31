@@ -6,7 +6,6 @@
 #include "httpstreamreader.h"
 
 #include <algorithm>
-#include <fstream>
 
 #include "utils/gzip/gzip_uncompressor.h"
 #include "utils/media/custom_output_stream.h"
@@ -43,7 +42,9 @@ namespace nx_http
             *bytesProcessed = 0;
         if( count == nx_http::BufferNpos )
             count = data.size();
+
         //reading line-by-line
+        //TODO #ak automate bytesProcessed modification based on currentDataPos
         for( size_t currentDataPos = 0; currentDataPos < count; )
         {
             switch( m_state )
@@ -59,6 +60,8 @@ namespace nx_http
                         ConstBufferRefType( data, currentDataPos, count-currentDataPos ),
                         &bytesRead );
                     currentDataPos += bytesRead;
+                    if( bytesProcessed )
+                        *bytesProcessed = currentDataPos;
                     m_state = readingMessageBody;
                     break;
                 }
@@ -137,6 +140,9 @@ namespace nx_http
                         m_state = parseError;
                         return false;
                     }
+                    //we can move to messageDone state in parseLine function if no message body present
+                    if( m_state == messageDone )
+                        return true;    //MUST break parsing on message boudary so that calling entity has chance to handle message
                     break;
                 }
             }
@@ -214,15 +220,8 @@ namespace nx_http
         {
             case messageDone:
             case parseError:
-                m_httpMessage.clear();
-                m_state = waitingMessageStart;  //starting parsing next message
-                m_lineSplitter.reset();
-                m_contentLength.reset();
-                m_messageBodyBytesRead = 0;
-                {
-                    std::unique_lock<std::mutex> lk( m_mutex );
-                    m_msgBodyBuffer.clear();
-                }
+                //starting parsing next message
+                resetStateInternal();
 
             case waitingMessageStart:
             {
@@ -234,7 +233,7 @@ namespace nx_http
                 //const size_t pos = data.find_first_of( " /\r\n", offset, sizeof(" /\r\n")-1 );
                 static const char separators[] = " /\r\n";
                 const char* pos = std::find_first_of( data.data(), data.data()+data.size(), separators, separators + sizeof(separators)-1 );
-                if( pos == data.data()+data.size() || *pos == '\r' || *pos == '\n'  )
+                if( pos == data.data()+data.size() || *pos == '\r' || *pos == '\n' )
                     return false;
                 if( *pos == ' ' )  //considering message to be request (first token does not contain /, so it looks like METHOD)
                 {
@@ -255,13 +254,21 @@ namespace nx_http
                 //parsing header
                 if( data.isEmpty() )    //empty line received: assuming all headers read
                 {
-                    //m_state = isMessageBodyFollows() ? readingMessageBody : messageDone;
                     if( prepareToReadMessageBody() ) //checking message body parameters in response
                     {
+                        //TODO #ak reliably check that message body is expected
                         //in any case allowing to read message body because it could be present 
                             //anyway (e.g., some bug on custom http server)
-                        m_state = pullingLineEndingBeforeMessageBody;
-                        m_chunkStreamParseState = waitingChunkStart;
+                        if( m_contentLength && m_contentLength.get() == 0 )
+                        {
+                            //server purposefully reported empty message body
+                            m_state = messageDone;
+                        }
+                        else
+                        {
+                            m_state = pullingLineEndingBeforeMessageBody;
+                            m_chunkStreamParseState = waitingChunkStart;
+                        }
                     }
                     else
                     {
