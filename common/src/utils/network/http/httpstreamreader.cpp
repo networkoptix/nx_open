@@ -26,7 +26,8 @@ namespace nx_http
         m_currentChunkBytesRead( 0 ),
         m_prevChar( 0 ),
         m_lineEndingOffset( 0 ),
-        m_decodeChunked( true )
+        m_decodeChunked( true ),
+        m_currentMessageNumber( 0 )
     {
     }
 
@@ -48,6 +49,21 @@ namespace nx_http
         {
             switch( m_state )
             {
+                case pullingLineEndingBeforeMessageBody:
+                {
+                    //reading line ending of the previous line
+                        //this is needed to handle buggy http/rtsp servers which do not use CRLF, but CR or LF
+                        //So, we allow HTTP headers to be terminated with CR of LF. Thus, if CRLF has been split to
+                        //different buffers, we MUST read LF before reading message body
+                    size_t bytesRead = 0;
+                    m_lineSplitter.finishCurrentLineEnding(
+                        ConstBufferRefType( data, currentDataPos, count-currentDataPos ),
+                        &bytesRead );
+                    currentDataPos += bytesRead;
+                    m_state = readingMessageBody;
+                    break;
+                }
+
                 case readingMessageBody:
                 {
                     //if m_contentLength == 0 and m_state == readingMessageBody then content-length is unknown
@@ -94,6 +110,14 @@ namespace nx_http
                         return true;
                     }
                     break;
+                }
+
+                case messageDone:
+                {
+                    //starting next message
+                    resetStateInternal();
+                    ++m_currentMessageNumber;
+                    continue;
                 }
 
                 default:
@@ -161,21 +185,8 @@ namespace nx_http
 
     void HttpStreamReader::resetState()
     {
-        m_state = waitingMessageStart;
-        m_httpMessage.clear();
-        m_lineSplitter.reset();
-        m_contentLength = 0;
-        m_isChunkedTransfer = false;
-        m_messageBodyBytesRead = 0;
-        {
-            std::unique_lock<std::mutex> lk( m_mutex );
-            m_msgBodyBuffer.clear();
-        }
-
-        m_chunkStreamParseState = waitingChunkStart;
-        m_currentChunkSize = 0;
-        m_currentChunkBytesRead = 0;
-        m_prevChar = 0;
+        resetStateInternal();
+        m_currentMessageNumber = 0;
     }
 
     void HttpStreamReader::flush()
@@ -191,6 +202,11 @@ namespace nx_http
     void HttpStreamReader::setDecodeChunkedMessageBody( bool val )
     {
         m_decodeChunked = val;
+    }
+
+    int HttpStreamReader::currentMessageNumber() const
+    {
+        return m_currentMessageNumber;
     }
 
     bool HttpStreamReader::parseLine( const ConstBufferRefType& data )
@@ -243,7 +259,9 @@ namespace nx_http
                     //m_state = isMessageBodyFollows() ? readingMessageBody : messageDone;
                     if( prepareToReadMessageBody() ) //checking message body parameters in response
                     {
-                        m_state = readingMessageBody;   //in any case allowing to read message body because it could be present anyway (e.g., some bug on custom http server)
+                        //in any case allowing to read message body because it could be present 
+                            //anyway (e.g., some bug on custom http server)
+                        m_state = pullingLineEndingBeforeMessageBody;
                         m_chunkStreamParseState = waitingChunkStart;
                     }
                     else
@@ -440,7 +458,7 @@ namespace nx_http
                         m_chunkStreamParseState = reachedChunkStreamEnd;
                         return currentOffset;
                     }
-                    //TODO/IMPL parsing entity-header
+                    //TODO #ak parsing entity-header
                     break;
                 }
 
@@ -485,5 +503,24 @@ namespace nx_http
         if( encodingName == "gzip" )
             return new GZipUncompressor();
         return nullptr;
+    }
+
+    void HttpStreamReader::resetStateInternal()
+    {
+        m_state = waitingMessageStart;
+        m_httpMessage.clear();
+        m_lineSplitter.reset();
+        m_contentLength = 0;
+        m_isChunkedTransfer = false;
+        m_messageBodyBytesRead = 0;
+        {
+            std::unique_lock<std::mutex> lk( m_mutex );
+            m_msgBodyBuffer.clear();
+        }
+
+        m_chunkStreamParseState = waitingChunkStart;
+        m_currentChunkSize = 0;
+        m_currentChunkBytesRead = 0;
+        m_prevChar = 0;
     }
 }

@@ -40,7 +40,8 @@ namespace nx_http
         m_contentEncodingUsed( true ),
         m_responseReadTimeoutMs( DEFAULT_RESPONSE_READ_TIMEOUT ),
         m_msgBodyReadTimeoutMs( 0 ),
-        m_authType(authBasicAndDigest)
+        m_authType(authBasicAndDigest),
+        m_awaitedMessageNumber( 0 )
     {
         m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
     }
@@ -343,8 +344,10 @@ namespace nx_http
                     break;
                 }
 
-                if( m_httpStreamReader.state() <= HttpStreamReader::readingMessageHeaders )
+                if( m_httpStreamReader.currentMessageNumber() < m_awaitedMessageNumber ||    //still reading previous message
+                    m_httpStreamReader.state() <= HttpStreamReader::readingMessageHeaders ) //still reading message headers
                 {
+                    //response has not been read yet, reading futher
                     m_responseBuffer.resize( 0 );
                     if( !m_socket->readSomeAsync( &m_responseBuffer, std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) ) )
                     {
@@ -354,7 +357,7 @@ namespace nx_http
                         emit done( sharedThis );
                         lk.relock();
                     }
-                    return;  //response has not been read yet
+                    return;
                 }
 
                 //read http message headers
@@ -516,7 +519,7 @@ namespace nx_http
                 (nx_http::getHeaderValue( m_httpStreamReader.message().response->headers, "Connection" ) != "close");
         }
 
-        m_httpStreamReader.resetState();
+        m_url = url;
 
         if( m_socket )
         {
@@ -526,6 +529,8 @@ namespace nx_http
             if( canUseExistingConnection &&
                 (m_socket->getForeignAddress() == SocketAddress(url.host(), url.port(nx_http::DEFAULT_HTTP_PORT))) )
             {
+                ++m_awaitedMessageNumber;   //current message will be skipped
+
                 serializeRequest();
                 m_state = sSendingRequest;
 
@@ -544,7 +549,9 @@ namespace nx_http
             }
         }
 
-        m_url = url;
+        //resetting parser state only if establishing new tcp connection
+        m_httpStreamReader.resetState();
+        m_awaitedMessageNumber = 0;
 
         return initiateTcpConnection();
     }
@@ -608,10 +615,18 @@ namespace nx_http
             return -1;
         }
 
+        if( m_httpStreamReader.state() == HttpStreamReader::parseError )
+        {
+            m_state = sFailed;
+            return bytesRead;
+        }
+
+        Q_ASSERT( m_httpStreamReader.currentMessageNumber() <= m_awaitedMessageNumber );
+        if( m_httpStreamReader.currentMessageNumber() < m_awaitedMessageNumber )
+            return bytesRead;   //reading some old message, not changing state in this case
+
         if( m_httpStreamReader.state() == HttpStreamReader::messageDone )
             m_state = sDone;
-        else if( m_httpStreamReader.state() == HttpStreamReader::parseError )
-            m_state = sFailed;
         return bytesRead;
     }
 
