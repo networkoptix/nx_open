@@ -36,8 +36,13 @@ QnTransactionLog::~QnTransactionLog()
 bool QnTransactionLog::init()
 {
     QSqlQuery delQuery(m_dbManager->getDB());
-    delQuery.prepare("DELETE FROM transaction_sequence WHERE not exists(select 1 from transaction_log tl where tl.peer_guid = transaction_sequence.peer_guid and tl.db_guid = transaction_sequence.db_guid)");
-    delQuery.exec();
+    delQuery.prepare("DELETE FROM transaction_sequence \
+                       WHERE NOT (transaction_sequence.peer_guid = ? AND transaction_sequence.db_guid = ?) \
+                         AND NOT exists(select 1 from transaction_log tl where tl.peer_guid = transaction_sequence.peer_guid and tl.db_guid = transaction_sequence.db_guid)");
+    delQuery.addBindValue(QnSql::serialized_field(qnCommon->moduleGUID()));
+    delQuery.addBindValue(QnSql::serialized_field(m_dbManager->getID()));
+    if (!delQuery.exec())
+        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
 
     QSqlQuery query(m_dbManager->getDB());
     bool seqFound = false;
