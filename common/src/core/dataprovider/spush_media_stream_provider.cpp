@@ -21,8 +21,10 @@ CLServerPushStreamReader::CLServerPushStreamReader(const QnResourcePtr& dev ):
     m_cameraControlRequired(false)
 {
     const QnPhysicalCameraResource* camera = dynamic_cast<QnPhysicalCameraResource*>(dev.data());
-    if (camera) 
+    if (camera) {
         m_cameraAudioEnabled = camera->isAudioEnabled();
+        connect(camera,  &QnPhysicalCameraResource::resourceChanged, this, &CLServerPushStreamReader::at_resourceChanged, Qt::DirectConnection);
+    }
 }
 
 CameraDiagnostics::Result CLServerPushStreamReader::diagnoseMediaStreamConnection()
@@ -243,7 +245,7 @@ void CLServerPushStreamReader::pleaseReOpen()
     m_needReopen = true;
 }
 
-void CLServerPushStreamReader::afterUpdate() 
+void CLServerPushStreamReader::at_resourceChanged(const QnResourcePtr& res)
 {
     const QnPhysicalCameraResource* camera = dynamic_cast<QnPhysicalCameraResource*>(getResource().data());
     if (camera) {

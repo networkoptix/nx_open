@@ -31,9 +31,10 @@ public:
     */
     virtual CameraDiagnostics::Result diagnoseMediaStreamConnection() override;
     virtual bool isCameraControlRequired() const override;
+private slots:
+    void at_resourceChanged(const QnResourcePtr& res);
 protected:
     void pleaseReOpen();
-    virtual void afterUpdate() override;
     virtual void beforeRun() override;
     virtual bool canChangeStatus() const;
 
