@@ -243,7 +243,7 @@ void CLServerPushStreamReader::beforeRun()
 void CLServerPushStreamReader::afterRun()
 {
     QnAbstractMediaStreamDataProvider::afterRun();
-    disconnect(m_resource.data());
+    m_resource->disconnect(this);
 }
 
 
