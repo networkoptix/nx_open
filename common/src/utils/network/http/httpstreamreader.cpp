@@ -17,7 +17,6 @@ namespace nx_http
     HttpStreamReader::HttpStreamReader()
     :
         m_state( waitingMessageStart ),
-        m_contentLength( 0 ),
         m_isChunkedTransfer( false ),
         m_messageBodyBytesRead( 0 ),
         m_chunkStreamParseState( waitingChunkStart ),
@@ -100,8 +99,8 @@ namespace nx_http
                     currentDataPos += msgBodyBytesRead;
                     if( bytesProcessed )
                         *bytesProcessed = currentDataPos;
-                    if( (m_contentLength > 0 &&         //Content-Length known
-                         m_messageBodyBytesRead >= m_contentLength) ||     //read all message body
+                    if( (m_contentLength &&         //Content-Length known
+                         m_messageBodyBytesRead >= m_contentLength.get()) ||     //read all message body
                         (m_isChunkedTransfer && m_chunkStreamParseState == reachedChunkStreamEnd) )
                     {
                         if( m_contentDecoder )
@@ -218,7 +217,7 @@ namespace nx_http
                 m_httpMessage.clear();
                 m_state = waitingMessageStart;  //starting parsing next message
                 m_lineSplitter.reset();
-                m_contentLength = 0;
+                m_contentLength.reset();
                 m_messageBodyBytesRead = 0;
                 {
                     std::unique_lock<std::mutex> lk( m_mutex );
@@ -309,7 +308,6 @@ namespace nx_http
         
         //analyzing message headers to find out if there should be message body
         //and filling in m_contentLength
-        HttpHeaders::const_iterator contentLengthIter = m_httpMessage.headers().find( nx_http::StringType("Content-Length") );
         HttpHeaders::const_iterator transferEncodingIter = m_httpMessage.headers().find( nx_http::StringType("Transfer-Encoding") );
         if( transferEncodingIter != m_httpMessage.headers().end() )
         {
@@ -317,7 +315,7 @@ namespace nx_http
             if( transferEncodingIter->second == "chunked" )
             {
                 //ignoring Content-Length header (due to rfc2616, 4.4)
-                m_contentLength = 0;
+                m_contentLength.reset();
                 m_isChunkedTransfer = true;
                 return true;
             }
@@ -325,6 +323,7 @@ namespace nx_http
 
         m_isChunkedTransfer = false;
 
+        HttpHeaders::const_iterator contentLengthIter = m_httpMessage.headers().find( nx_http::StringType("Content-Length") );
         if( contentLengthIter != m_httpMessage.headers().end() )
             m_contentLength = contentLengthIter->second.toULongLong();
         return true;
@@ -479,8 +478,8 @@ namespace nx_http
         const QnByteArrayConstRef& data,
         Func func )
     {
-        const size_t bytesToCopy = m_contentLength > 0
-            ? std::min<size_t>( data.size(), m_contentLength-m_messageBodyBytesRead )
+        const size_t bytesToCopy = m_contentLength
+            ? std::min<size_t>( data.size(), m_contentLength.get()-m_messageBodyBytesRead )
             : data.size();    //Content-Length is unknown
         func( data.mid(0, bytesToCopy) );
         m_messageBodyBytesRead += bytesToCopy;
@@ -510,7 +509,7 @@ namespace nx_http
         m_state = waitingMessageStart;
         m_httpMessage.clear();
         m_lineSplitter.reset();
-        m_contentLength = 0;
+        m_contentLength.reset();
         m_isChunkedTransfer = false;
         m_messageBodyBytesRead = 0;
         {

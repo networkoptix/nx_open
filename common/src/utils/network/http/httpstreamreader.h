@@ -8,6 +8,8 @@
 
 #include <mutex>
 
+#include <boost/optional.hpp>
+
 #include "httptypes.h"
 #include "linesplitter.h"
 
@@ -16,7 +18,7 @@
 
 namespace nx_http
 {
-    //!Parses stream of bytes as http message
+    //!Parses stream of bytes as http messages
     /*!
         Can handle multiple subsequent messages. Increases \a HttpStreamReader::currentMessageNumber() after successfully reading each message
         \note Supports chunked stream
@@ -91,7 +93,7 @@ namespace nx_http
 
         ReadState m_state;
         Message m_httpMessage;
-        quint64 m_contentLength;
+        boost::optional<quint64> m_contentLength;
         bool m_isChunkedTransfer;
         quint64 m_messageBodyBytesRead;
         BufferType m_msgBodyBuffer;
