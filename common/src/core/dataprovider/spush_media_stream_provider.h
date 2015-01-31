@@ -36,6 +36,7 @@ private slots:
 protected:
     void pleaseReOpen();
     virtual void beforeRun() override;
+    virtual void afterRun() override;
     virtual bool canChangeStatus() const;
 
 private:
