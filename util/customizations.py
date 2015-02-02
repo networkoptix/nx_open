@@ -397,14 +397,15 @@ def checkProject(rootDir, project):
         invalidCross += c1.validateCross(c2)
         invalidCross += c2.validateCross(c1)
     info('Validation finished')
-    if invalidInner > 0:
-        sys.exit(1)
-    if invalidCross > 0:
-        sys.exit(2)
 
     targetFiles = customizations['default'].total
 
     printCustomizations(project, customizationDir, targetFiles, customizations, roots, children)
+    
+    if invalidInner > 0:
+        sys.exit(1)
+    if invalidCross > 0:
+        sys.exit(2)    
 
 def main():
     parser = argparse.ArgumentParser()
