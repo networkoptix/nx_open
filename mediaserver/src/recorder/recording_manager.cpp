@@ -45,6 +45,40 @@ public:
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(const QnResourcePtr& res, Qn::ConnectionRole role) override;
 };
 
+QnRecordingManager::LockData::LockData(const LockData& other)
+{
+    assert(0);
+}
+
+QnRecordingManager::LockData::LockData(LockData&& other): 
+    mutex(other.mutex), 
+    cameraResource(other.cameraResource), 
+    currentTime(other.currentTime) 
+{
+    other.mutex = 0;
+    other.cameraResource.clear();
+    other.currentTime = 0;
+}
+
+QnRecordingManager::LockData::LockData():
+    mutex(0), 
+    currentTime(0) 
+{
+}
+
+QnRecordingManager::LockData::LockData(ec2::QnDistributedMutex* mutex, QnVirtualCameraResourcePtr cameraResource, qint64 currentTime): 
+    mutex(mutex), 
+    cameraResource(cameraResource), 
+    currentTime(currentTime) 
+{
+}
+
+QnRecordingManager::LockData::~LockData() 
+{
+    if (mutex)
+        mutex->deleteLater();
+}
+
 QnRecordingManager::QnRecordingManager(): m_mutex(QMutex::Recursive)
 {
     m_tooManyRecordingCnt = 0;
@@ -181,13 +215,15 @@ void QnRecordingManager::updateCameraHistory(const QnResourcePtr& res)
 
     QString name = ec2::QnMutexCameraDataHandler::CAM_HISTORY_PREFIX;
     name.append(netRes->getPhysicalId());
-    if (m_lockInProgress.contains(name))
+    if (m_lockInProgress.find(name) != m_lockInProgress.end())
         return; // operation in progress
 
     ec2::QnDistributedMutex* mutex = ec2::QnDistributedMutexManager::instance()->createMutex(name);
     connect(mutex, &ec2::QnDistributedMutex::locked, this, &QnRecordingManager::at_historyMutexLocked, Qt::QueuedConnection);
     connect(mutex, &ec2::QnDistributedMutex::lockTimeout, this, &QnRecordingManager::at_historyMutexTimeout, Qt::QueuedConnection);
-    m_lockInProgress.insert(name, LockData(mutex, netRes, currentTime));
+    
+    m_lockInProgress.emplace(name, LockData(mutex, netRes, currentTime));
+
     mutex->lockAsync();
 }
 
@@ -195,16 +231,20 @@ void QnRecordingManager::at_historyMutexTimeout()
 {
     QMutexLocker lock(&m_mutex);
     ec2::QnDistributedMutex* mutex = (ec2::QnDistributedMutex*) sender();
-    m_lockInProgress.remove(mutex->name());
-    mutex->deleteLater();
+    if (mutex)
+        m_lockInProgress.erase(mutex->name());
 }
 
 void QnRecordingManager::at_historyMutexLocked()
 {
+	QMutexLocker lock(&m_mutex);
     ec2::QnDistributedMutex* mutex = (ec2::QnDistributedMutex*) sender();
-    LockData data = m_lockInProgress.value(mutex->name());
-    if (!data.mutex)
+    if (!mutex)
         return;
+    auto itr = m_lockInProgress.find(mutex->name());
+    if (itr == m_lockInProgress.end())
+        return;
+    const LockData& data = itr->second;
 
     if (mutex->checkUserData())
     {
@@ -219,8 +259,7 @@ void QnRecordingManager::at_historyMutexLocked()
     }
 
     mutex->unlock();
-    m_lockInProgress.remove(mutex->name());
-    mutex->deleteLater();
+    m_lockInProgress.erase(mutex->name());
 }
 
 bool QnRecordingManager::startForcedRecording(const QnSecurityCamResourcePtr& camRes, Qn::StreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration)
@@ -477,7 +516,8 @@ void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
         connect(camera.data(), &QnResource::initializedChanged, this, &QnRecordingManager::at_camera_initializationChanged);
         connect(camera.data(), &QnResource::resourceChanged,    this, &QnRecordingManager::at_camera_resourceChanged);
         camera->setDataProviderFactory(QnServerDataProviderFactory::instance());
-        return;
+        if (camera->isInitialized())
+            updateCamera(camera);
     }
 }
 

@@ -206,11 +206,11 @@ int QnLicenseUsageHelper::calculateOverflowLicenses(Qn::LicenseType licenseType,
 }
 
 bool QnLicenseUsageHelper::isValid() const {
-    updateCache();
     return boost::algorithm::all_of(licenseTypes(), [this](Qn::LicenseType lt){ return isValid(lt); });
 }
 
 bool QnLicenseUsageHelper::isValid(Qn::LicenseType licenseType) const {
+    updateCache();
     return m_cache.overflow[licenseType] == 0;
 }
 
@@ -221,7 +221,10 @@ int QnLicenseUsageHelper::totalLicenses(Qn::LicenseType licenseType) const {
 
 int QnLicenseUsageHelper::usedLicenses(Qn::LicenseType licenseType) const {
     updateCache();
-    return m_cache.used[licenseType];
+    /* In all cases but analog encoder licenses m_cache.used contains already valid number. */
+    if (m_cache.overflow[licenseType] == 0)
+        return m_cache.used[licenseType];
+    return m_cache.total[licenseType] + m_cache.overflow[licenseType];
 }
 
 int QnLicenseUsageHelper::requiredLicenses(Qn::LicenseType licenseType) const {

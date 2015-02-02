@@ -8,6 +8,8 @@
 
 #include <mutex>
 
+#include <boost/optional.hpp>
+
 #include "httptypes.h"
 #include "linesplitter.h"
 
@@ -16,9 +18,9 @@
 
 namespace nx_http
 {
-    //!Parses stream of bytes as http message
+    //!Parses stream of bytes as http messages
     /*!
-        Can handle multiple subsequent messages
+        Can handle multiple subsequent messages. Increases \a HttpStreamReader::currentMessageNumber() after successfully reading each message
         \note Supports chunked stream
         \note Thread safety: only message body buffer - related functionality is thread-safe (required by \a AsyncHttpClient class). All other methods are NOT thread-safe
         \note Assumes that any message is followed by message body
@@ -36,6 +38,7 @@ namespace nx_http
             //!Moves to this state after reading whole message body (in case content-length is known or chunk encoding is used)
             messageDone,
             parseError,
+            pullingLineEndingBeforeMessageBody,
             readingMessageBody
         };
 
@@ -71,6 +74,8 @@ namespace nx_http
             \param val If \a false, chunked message is not decoded and returned as-is by \a AsyncHttpClient::fetchMessageBodyBuffer
         */
         void setDecodeChunkedMessageBody( bool val );
+        //!Returns sequential HTTP message number
+        int currentMessageNumber() const;
 
     private:
         // TODO: #Elric #enum
@@ -88,7 +93,7 @@ namespace nx_http
 
         ReadState m_state;
         Message m_httpMessage;
-        quint64 m_contentLength;
+        boost::optional<quint64> m_contentLength;
         bool m_isChunkedTransfer;
         quint64 m_messageBodyBytesRead;
         BufferType m_msgBodyBuffer;
@@ -103,6 +108,7 @@ namespace nx_http
         std::unique_ptr<AbstractByteStreamFilter> m_contentDecoder;
         int m_lineEndingOffset;
         bool m_decodeChunked;
+        int m_currentMessageNumber;
 
         LineSplitter m_lineSplitter;
         mutable std::mutex m_mutex;
@@ -132,6 +138,7 @@ namespace nx_http
         unsigned int hexCharToInt( BufferType::value_type ch );
         //!Returns nullptr if \a encodingName is unknown
         AbstractByteStreamConverter* createContentDecoder( const nx_http::StringType& encodingName );
+        void resetStateInternal();
     };
 }
 
