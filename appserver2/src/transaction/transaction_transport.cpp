@@ -45,6 +45,8 @@ QnTransactionTransport::QnTransactionTransport(const ApiPeerData &localPeer, con
     m_readSync(false), 
     m_writeSync(false),
     m_syncDone(false),
+    m_syncInProgress(false),
+    m_needResync(false),
     m_socket(socket),
     m_state(NotDefined), 
     m_chunkHeaderLen(0),

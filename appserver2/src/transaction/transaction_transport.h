@@ -111,6 +111,12 @@ public:
     bool isSyncDone() const { return m_syncDone; }
     void setSyncDone(bool value)  {m_syncDone = value;} // end of sync marker received
 
+    bool isSyncInProgress() const { return m_syncInProgress; }
+    void setSyncInProgress(bool value)  {m_syncInProgress = value;} // synchronization process in progress
+
+    bool isNeedResync() const { return m_needResync; }
+    void setNeedResync(bool value)  {m_needResync = value;} // synchronization process in progress
+
     QUrl remoteAddr() const       { return m_remoteAddr; }
 
     ApiPeerData remotePeer() const { return m_remotePeer; }
@@ -169,6 +175,8 @@ private:
     bool m_readSync;
     bool m_writeSync;
     bool m_syncDone;
+    bool m_syncInProgress; // sync request was send and sync process still in progress
+    bool m_needResync; // sync request should be send int the future as soon as possible
 
     mutable QMutex m_mutex;
     QSharedPointer<AbstractStreamSocket> m_socket;
