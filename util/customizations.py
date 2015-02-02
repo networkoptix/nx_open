@@ -394,9 +394,7 @@ def checkProject(rootDir, project):
     if invalidCross > 0:
         sys.exit(2)
 
-    targetFiles = requiredSorted
-    if len(targetFiles) == 0:
-        targetFiles = customizations['default'].total
+    targetFiles = customizations['default'].total
 
     printCustomizations(project, customizationDir, targetFiles, customizations, roots, children)
 
