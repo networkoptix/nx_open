@@ -122,6 +122,8 @@ class Customization():
         for dirname, dirnames, filenames in os.walk(self.basePath):
             cut = len(self.basePath) + 1
             for filename in filenames:
+                if filename.startswith('.')
+                    continue;
                 norm = os.path.join(dirname, filename)[cut:].replace("\\", "/")
                 self.base.append(norm)
         
@@ -129,6 +131,8 @@ class Customization():
             for dirname, dirnames, filenames in os.walk(self.darkPath):
                 cut = len(self.darkPath) + 1
                 for filename in filenames:
+                    if filename.startswith('.')
+                        continue;
                     norm = os.path.join(dirname, filename)[cut:].replace("\\", "/")
                     self.dark.append(norm)
         
@@ -136,6 +140,8 @@ class Customization():
             for dirname, dirnames, filenames in os.walk(self.lightPath):
                 cut = len(self.lightPath) + 1
                 for filename in filenames:
+                    if filename.startswith('.')
+                        continue;
                     norm = os.path.join(dirname, filename)[cut:].replace("\\", "/")
                     self.light.append(norm)
                 
@@ -306,6 +312,8 @@ td.light { background-color: #D0D0D0; }
     file.write("</tr>\n")
 
     for entry in requiredFiles:
+        if not Formats.isImage(entry):
+            continue;
         file.write("<tr>\n")
         textCell(file, entry, "label")
         for c in roots:
