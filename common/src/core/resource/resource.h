@@ -360,6 +360,7 @@ private:
     //!map<key, <value, isDirty>>
     std::map<QString, LocalPropertyValue> m_locallySavedProperties;
     bool m_removedFromPool;
+    bool m_initInProgress;
 };
 
 template<class Resource>
