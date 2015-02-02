@@ -165,6 +165,7 @@ namespace nx_http
         State m_state;
         Request m_request;
         QSharedPointer<AbstractStreamSocket> m_socket;
+        bool m_connectionClosed;
         BufferType m_requestBuffer;
         size_t m_requestBytesSent;
         QUrl m_url;
