@@ -55,7 +55,7 @@ int runUi(QGuiApplication *application) {
     QQmlFileSelector qmlFileSelector(&engine);
     qmlFileSelector.setSelector(&fileSelector);
 
-    engine.addImageProvider(lit("camera"), thumbnailProvider);
+    engine.addImageProvider(lit("thumbnail"), thumbnailProvider);
     engine.rootContext()->setContextObject(&context);
     engine.rootContext()->setContextProperty(lit("screenPixelMultiplier"), QnResolutionUtil::densityMultiplier(densityClass));
 

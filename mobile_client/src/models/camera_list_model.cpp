@@ -50,7 +50,7 @@ namespace {
                     if (thumbnailId.isEmpty())
                         return QUrl(lit("qrc:///images/thumb_no_data.png"));
 
-                    return QUrl(lit("image://camera/") + thumbnailId);
+                    return QUrl(lit("image://thumbnail/") + thumbnailId);
                 }
                 return QUrl();
             }
