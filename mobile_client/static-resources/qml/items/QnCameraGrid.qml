@@ -40,7 +40,17 @@ GridView {
         }
     }
 
-    Scrollbar {
-        flickableItem: gridView
+    Scrollbar { flickableItem: gridView }
+
+    Timer {
+        id: refreshTimer
+
+        interval: 2 * 60 * 1000
+        repeat: true
+        running: true
+
+        onTriggered: {
+            model.refreshThumbnails(indexAt(0, contentY), indexAt(width - 1, contentY + height - 1))
+        }
     }
 }

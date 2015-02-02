@@ -28,16 +28,15 @@ public:
     void start();
     void stop();
 
-    QPixmap thumbnail(const QnUuid &resourceId) const;
     QPixmap thumbnail(const QString &thumbnailId) const;
+    QString thumbnailId(const QnUuid &resourceId);
 
-    QString thumbnailId(const QnUuid &resourceId) const;
+    void refreshThumbnails(const QList<QnUuid> &resourceIds);
 
 signals:
     void thumbnailUpdated(const QnUuid &resourceId, const QString &thumbnailId);
 
 private slots:
-    void at_refreshTimer_timeout();
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
     void at_thumbnailReceived(int status, const QImage &thumbnail, int handle);
@@ -48,7 +47,6 @@ private:
 private:
     mutable QMutex m_mutex;
     QElapsedTimer m_elapsedTimer;
-    QTimer m_refreshTimer;
     QHash<QnUuid, ThumbnailData> m_thumbnailByResourceId;
     QHash<QString, QPixmap> m_pixmaps;
     QHash<int, QnUuid> m_idByRequestHandle;

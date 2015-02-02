@@ -27,7 +27,7 @@ public:
     QUrl urlToResource(const QUrl &baseUrl, const QnResourcePtr &resource,
                        WhereToPlaceProxyCredentials credentialsBehavior = placeCredentialsToUrl);
 
-    QNetworkProxy proxyToResource(const QnResourcePtr &resource);
+    virtual QNetworkProxy proxyToResource(const QnResourcePtr &resource);
 
 protected:
     virtual QList<QNetworkProxy> queryProxy(const QNetworkProxyQuery &query) override;

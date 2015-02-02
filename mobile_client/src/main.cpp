@@ -10,7 +10,7 @@
 #include "api/session_manager.h"
 #include "api/global_settings.h"
 #include "api/runtime_info_manager.h"
-#include "api/network_proxy_factory.h"
+#include "api/simple_network_proxy_factory.h"
 #include "nx_ec/ec2_lib.h"
 #include "common/common_module.h"
 #include "core/resource_management/resource_pool.h"
@@ -85,7 +85,7 @@ int runApplication(QGuiApplication *application) {
     QScopedPointer<QnServerCameraFactory> serverCameraFactory(new QnServerCameraFactory());
 
     //NOTE QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
-    QNetworkProxyFactory::setApplicationProxyFactory(new QnNetworkProxyFactory());
+    QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory());
 
     /* Initialize connections. */
     QnAppServerConnectionFactory::setClientGuid(qnCommon->moduleGUID().toString());

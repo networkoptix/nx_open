@@ -22,6 +22,9 @@ public:
     QString serverIdString() const;
     void setServerIdString(const QString &id);
 
+public slots:
+    void refreshThumbnails(int from, int to);
+
 signals:
     void serverIdStringChanged();
 

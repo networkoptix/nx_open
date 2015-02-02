@@ -1,12 +1,16 @@
 #include "camera_list_model.h"
 
-#include "core/resource/security_cam_resource.h"
+#include <QtCore/QUrlQuery>
+
+#include "core/resource/camera_resource.h"
+#include "core/resource/media_server_resource.h"
 #include "core/resource_management/resource_pool.h"
 #include "utils/common/id.h"
 #include "utils/common/string.h"
 #include "models/filtered_resource_list_model.h"
 #include "camera/camera_thumbnail_cache.h"
 #include "mobile_client/mobile_client_roles.h"
+#include "api/network_proxy_factory.h"
 
 namespace {
     class QnFilteredCameraListModel : public QnFilteredResourceListModel {
@@ -41,9 +45,11 @@ namespace {
                     QnUuid id = QnUuid::fromStringSafe(base_type::data(index, Qn::UuidRole).toString());
                     if (id.isNull())
                         return QUrl();
+
                     QString thumbnailId = QnCameraThumbnailCache::instance()->thumbnailId(id);
                     if (thumbnailId.isEmpty())
                         return QUrl();
+
                     return QUrl(lit("image://camera/") + thumbnailId);
                 }
                 return QUrl();
@@ -97,11 +103,40 @@ void QnCameraListModel::setServerIdString(const QString &id) {
     setServerId(QnUuid::fromStringSafe(id));
 }
 
+void QnCameraListModel::refreshThumbnails(int from, int to) {
+    if (!QnCameraThumbnailCache::instance())
+        return;
+
+    int rowCount = this->rowCount();
+
+    if (from == -1)
+        from = 0;
+
+    if (to == -1)
+        to = rowCount - 1;
+
+    if (from >= rowCount || to >= rowCount || from > to)
+        return;
+
+    QList<QnUuid> ids;
+    for (int i = from; i <= to; i++)
+        ids.append(QnUuid(data(index(i, 0), Qn::UuidRole).toUuid()));
+
+    QnCameraThumbnailCache::instance()->refreshThumbnails(ids);
+}
+
 bool QnCameraListModel::lessThan(const QModelIndex &left, const QModelIndex &right) const {
     QString leftName = left.data(Qn::ResourceNameRole).toString();
     QString rightName = right.data(Qn::ResourceNameRole).toString();
 
-    return naturalStringLess(leftName, rightName);
+    int res = naturalStringCompare(leftName, rightName, Qt::CaseInsensitive);
+    if (res != 0)
+        return res < 0;
+
+    QString leftAddress = left.data(Qn::IpAddressRole).toString();
+    QString rightAddress = right.data(Qn::IpAddressRole).toString();
+
+    return naturalStringLess(leftAddress, rightAddress);
 }
 
 void QnCameraListModel::at_thumbnailUpdated(const QnUuid &resourceId, const QString &thumbnailId) {
