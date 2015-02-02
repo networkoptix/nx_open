@@ -8,7 +8,8 @@ def convert(fname, profile):
     subprocess.call(command)
 
 def main():
-    scriptDir = os.path.dirname(os.path.abspath(__file__))
+    #scriptDir = os.path.dirname(os.path.abspath(__file__))
+    scriptDir = os.getcwd()
     
     profile = ''
     with open(os.path.join(scriptDir, '.profile')) as f:
