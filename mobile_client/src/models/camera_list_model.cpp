@@ -48,7 +48,7 @@ namespace {
 
                     QString thumbnailId = QnCameraThumbnailCache::instance()->thumbnailId(id);
                     if (thumbnailId.isEmpty())
-                        return QUrl();
+                        return QUrl(lit("qrc:///images/thumb_no_data.png"));
 
                     return QUrl(lit("image://camera/") + thumbnailId);
                 }

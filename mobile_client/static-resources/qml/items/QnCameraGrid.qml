@@ -9,6 +9,8 @@ GridView {
     cellWidth: width / 2
     cellHeight: cellWidth / 4 * 3
 
+    boundsBehavior: Flickable.StopAtBounds
+
     delegate: Item {
         id: wrapper
 
@@ -22,6 +24,7 @@ GridView {
             anchors.fill: parent
             source: thumbnail
             fillMode: Qt.KeepAspectRatio
+            sourceSize.width: wrapper.width
         }
 
         Rectangle {
