@@ -9,17 +9,11 @@ Page {
 
     title: resourceHelper.resourceName
 
-    property string resourceId
-
+    property alias resourceId: resourceHelper.resourceId
     property var __currentDate: new Date()
 
     QnMediaResourceHelper {
         id: resourceHelper
-    }
-
-    Rectangle {
-        anchors.fill: video
-        color: "black"
     }
 
     Video {
@@ -83,9 +77,5 @@ Page {
         onTriggered: {
             __currentDate = new Date()
         }
-    }
-
-    Component.onCompleted: {
-        resourceHelper.resourceId = resourceId
     }
 }
