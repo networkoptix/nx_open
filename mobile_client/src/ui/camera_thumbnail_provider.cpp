@@ -12,10 +12,14 @@ QnCameraThumbnailProvider::QnCameraThumbnailProvider() :
 }
 
 QPixmap QnCameraThumbnailProvider::requestPixmap(const QString &id, QSize *size, const QSize &requestedSize) {
+    Q_UNUSED(requestedSize)
+
     if (!m_thumbnailCache)
         return QPixmap();
 
-    return m_thumbnailCache->thumbnail(id);
+    QPixmap thumbnail = m_thumbnailCache->thumbnail(id);
+    *size = thumbnail.size();
+    return thumbnail;
 }
 
 void QnCameraThumbnailProvider::setThumbnailCache(QnCameraThumbnailCache *thumbnailCache) {
