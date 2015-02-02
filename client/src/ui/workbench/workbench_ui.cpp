@@ -88,7 +88,8 @@
 
 namespace {
 
-    const QSize showHideButtonSize(15, 25);
+    const QSize showHideButtonSize(15, 45);
+    const QMargins showHideButtonMargins(0, 10, 0, 10);
 
     QnImageButtonWidget *newActionButton(QAction *action, qreal sizeMultiplier = 1.0, int helpTopicId = -1, QGraphicsItem *parent = NULL) {
         int baseSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
@@ -120,7 +121,8 @@ namespace {
 
     QnImageButtonWidget *newShowHideButton(QGraphicsItem *parent = NULL, QAction *action = NULL) {
         QnImageButtonWidget *button = new QnImageButtonWidget(parent);
-        button->resize(showHideButtonSize);
+        button->setFixedSize(showHideButtonSize);
+        button->setImageMargins(showHideButtonMargins);
         if (action)
             button->setDefaultAction(action);
         else
@@ -1677,7 +1679,8 @@ void QnWorkbenchUi::createNotificationsWidget() {
 
     QnBlinkingImageButtonWidget* blinker = new QnBlinkingImageButtonWidget(m_controlsWidget);
     m_notificationsShowButton = blinker;
-    m_notificationsShowButton->resize(showHideButtonSize);
+    m_notificationsShowButton->setFixedSize(showHideButtonSize);
+    m_notificationsShowButton->setImageMargins(showHideButtonMargins);
     m_notificationsShowButton->setCached(true);
     m_notificationsShowButton->setCheckable(true);
     m_notificationsShowButton->setIcon(qnSkin->icon("panel/slide_right.png", "panel/slide_left.png"));
