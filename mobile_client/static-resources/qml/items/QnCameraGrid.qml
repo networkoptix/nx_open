@@ -1,6 +1,8 @@
 import QtQuick 2.2
 import Material 0.1
 
+import "../main.js" as Main
+
 GridView {
     id: gridView
 
@@ -40,6 +42,11 @@ GridView {
             anchors.left: parent.left
             anchors.margins: units.dp(8)
             text: resourceName
+        }
+
+        Ink {
+            anchors.fill: parent
+            onClicked: Main.openVideo(uuid)
         }
     }
 

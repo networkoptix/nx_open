@@ -10,6 +10,7 @@ class QnMediaResourceHelper : public QObject {
 
     Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
     Q_PROPERTY(QUrl mediaUrl READ mediaUrl NOTIFY mediaUrlChanged)
+    Q_PROPERTY(QString resourceName READ resourceName NOTIFY resourceNameChanged)
 public:
     explicit QnMediaResourceHelper(QObject *parent = 0);
 
@@ -18,9 +19,12 @@ public:
 
     QUrl mediaUrl() const;
 
+    QString resourceName() const;
+
 signals:
     void resourceIdChanged();
     void mediaUrlChanged();
+    void resourceNameChanged();
 
 private:
     QnResourcePtr m_resource;

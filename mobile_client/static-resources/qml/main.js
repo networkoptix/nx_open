@@ -19,15 +19,17 @@ function openResources() {
     })
 }
 
+*/
+
 function openVideo(id) {
-    stackView.push({
+    pageStack.push({
         item: Qt.resolvedUrl("dialogs/QnVideoDialog.qml"),
         properties: {
-            width: stackView.width,
-            height: stackView.height,
+            width: pageStack.width,
+            height: pageStack.height,
             resourceId: id
         },
         destroyOnPop: true
     })
 }
-*/
+
