@@ -33,6 +33,7 @@ namespace nx_http
     AsyncHttpClient::AsyncHttpClient()
     :
         m_state( sInit ),
+        m_connectionClosed( false ),
         m_requestBytesSent( 0 ),
         m_authorizationTried( false ),
         m_terminated( false ),
@@ -275,6 +276,8 @@ namespace nx_http
             return;
         }
 
+        //TODO #ak recheck connection closure situation
+
         using namespace std::placeholders;
 
         m_requestBytesSent += bytesWritten;
@@ -344,14 +347,20 @@ namespace nx_http
                     break;
                 }
 
-                if( m_httpStreamReader.currentMessageNumber() < m_awaitedMessageNumber ||    //still reading previous message
-                    m_httpStreamReader.state() <= HttpStreamReader::readingMessageHeaders ) //still reading message headers
+                //connection could be closed by remote peer already
+
+                if( m_httpStreamReader.currentMessageNumber() < m_awaitedMessageNumber ||       //still reading previous message
+                    m_httpStreamReader.state() <= HttpStreamReader::readingMessageHeaders )     //still reading message headers
                 {
                     //response has not been read yet, reading futher
                     m_responseBuffer.resize( 0 );
-                    if( !m_socket->readSomeAsync( &m_responseBuffer, std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) ) )
+                    if( m_connectionClosed ||
+                        !m_socket->readSomeAsync(
+                            &m_responseBuffer,
+                            std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) ) )
                     {
-                        NX_LOG( lit( "Failed to read (1) response from %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
+                        NX_LOG( lit( "Failed to read (1) response from %1. %2" ).
+                            arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
                         m_state = sFailed;
                         lk.unlock();
                         emit done( sharedThis );
@@ -420,7 +429,8 @@ namespace nx_http
                         break;
                 }
 
-                if( m_httpStreamReader.state() == HttpStreamReader::readingMessageBody )
+                if( (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody) &&
+                    !m_connectionClosed )
                 {
                     //reading more data
                     m_responseBuffer.resize( 0 );
@@ -526,7 +536,8 @@ namespace nx_http
             //TODO #ak think again about next cancellation
             m_socket->cancelAsyncIO();
 
-            if( canUseExistingConnection &&
+            if( !m_connectionClosed &&
+                canUseExistingConnection &&
                 (m_socket->getForeignAddress() == SocketAddress(url.host(), url.port(nx_http::DEFAULT_HTTP_PORT))) )
             {
                 ++m_awaitedMessageNumber;   //current message will be skipped
@@ -563,6 +574,7 @@ namespace nx_http
         m_state = sInit;
 
         m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(/*url.scheme() == lit("https")*/));
+        m_connectionClosed = false;
         if( !m_socket->setNonBlockingMode( true ) ||
             !m_socket->setSendTimeout( DEFAULT_CONNECT_TIMEOUT ) ||
             !m_socket->setRecvTimeout( m_responseReadTimeoutMs ) )
@@ -602,6 +614,7 @@ namespace nx_http
             m_state = (m_httpStreamReader.state() == HttpStreamReader::messageDone) || (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody)
                 ? sDone
                 : sFailed;
+            m_connectionClosed = true;
             return 0;
         }
 
