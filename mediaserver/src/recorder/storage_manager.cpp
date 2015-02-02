@@ -564,13 +564,13 @@ QString QnStorageManager::dateTimeStr(qint64 dateTimeMs, qint16 timeZone, const 
     return text;
 }
 
-void QnStorageManager::getTimePeriodInternal(QVector<QnTimePeriodList> &cameras, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, qint64 detailLevel, const DeviceFileCatalogPtr &catalog)
+void QnStorageManager::getTimePeriodInternal(QVector<QnTimePeriodList> &periods, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, qint64 detailLevel, const DeviceFileCatalogPtr &catalog)
 {
     if (catalog) {
-        cameras << catalog->getTimePeriods(startTime, endTime, detailLevel);
-        if (!cameras.last().isEmpty())
+        periods << catalog->getTimePeriods(startTime, endTime, detailLevel);
+        if (!periods.last().isEmpty())
         {
-            QnTimePeriod& lastPeriod = cameras.last().last();
+            QnTimePeriod& lastPeriod = periods.last().last();
             bool isActive = !camera->hasFlags(Qn::foreigner) && (camera->getStatus() == Qn::Online || camera->getStatus() == Qn::Recording);
             if (lastPeriod.durationMs == -1 && !isActive)
             {
