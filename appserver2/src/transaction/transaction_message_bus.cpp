@@ -814,7 +814,7 @@ bool QnTransactionMessageBus::isSyncInProgress() const
     for (QnConnectionMap::const_iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
     {
         QnTransactionTransport* transport = *itr;
-        if (transport->remotePeer().isServer() && transport->isSyncInProgress())
+        if (transport->isSyncInProgress())
             return true;
     }
     return false;
@@ -823,6 +823,7 @@ bool QnTransactionMessageBus::isSyncInProgress() const
 void QnTransactionMessageBus::queueSyncRequest(QnTransactionTransport* transport)
 {
     // send sync request
+    Q_ASSERT(!transport->isSyncInProgress());
     transport->setReadSync(false);
     transport->setSyncDone(false);
 
