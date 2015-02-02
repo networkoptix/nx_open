@@ -418,17 +418,17 @@ bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Response& /*
     int pos = digest.indexOf(':');
     if (pos == -1)
         return false;
-    QByteArray userName = digest.left(pos).toLower();
-    QByteArray password = digest.mid(pos+1);
-
+    QString userName = QUrl::fromPercentEncoding(digest.left(pos)).toLower();
+    QString password = QUrl::fromPercentEncoding(digest.mid(pos+1));
+     
     for(const QnUserResourcePtr& user: m_users)
     {
-        if (user->getName().toUtf8().toLower() == userName)
+        if (user->getName().toLower() == userName)
         {
-            if (user->checkPassword(QString::fromUtf8(password)))
+            if (user->checkPassword(password))
             {
                 if (user->getDigest().isEmpty())
-                    emit emptyDigestDetected(user, QString::fromUtf8(userName), QString::fromUtf8(password));
+                    emit emptyDigestDetected(user, userName, password);
                 if (authUserId)
                     *authUserId = user->getId();
                 return true;
@@ -439,9 +439,9 @@ bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Response& /*
     // authenticate by media server auth_key
     for(const QnMediaServerResourcePtr& server: m_servers)
     {
-        if (server->getId().toString().toUtf8().toLower() == userName)
+        if (server->getId().toString().toLower() == userName)
         {
-            if (server->getAuthKey().toUtf8() == password)
+            if (server->getAuthKey() == password)
                 return true;
         }
     }
