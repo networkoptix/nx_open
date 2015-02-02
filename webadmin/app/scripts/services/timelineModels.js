@@ -8,9 +8,10 @@ function Chunk(boundaries,start,end,level,title,extension){
     this.level = level || 0;
     this.expand = true;
 
-    var format = 'MM/dd/yy HH:mm:ss';
+    var format = 'dd.mm.yyyy HH:MM';
     this.title = (typeof(title) === 'undefined' || title === null) ? dateFormat(start,format) + ' - ' + dateFormat(end,format):title ;
 
+    console.log("create chunk ",this.level, this.title);
 
     this.children = [];
 
@@ -180,6 +181,7 @@ function CameraRecordsProvider(cameras,mediaserver,$q){
     this.requestInterval(0,self.now(), 0).then(function(){
         // Depends on this interval - choose minimum interval, which contains all records and request deeper detailization
         var nextLevel = RulerModel.getLevelIndex (self.now() - self.chunksTree.start);
+        console.log("record boundaries",self.chunksTree.title);
         self.requestInterval(self.chunksTree.start, self.now(), nextLevel);
     });
 
@@ -247,8 +249,19 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
  * @return Promise
  */
 CameraRecordsProvider.prototype.setInterval = function (start,end,level){
-    // Splice existing intervals and check, if we need an update from server
 
+    if(start instanceof Date)
+    {
+        start=start.getTime();
+    }
+    if(end instanceof Date)
+    {
+        end=end.getTime();
+    }
+
+    // Splice existing intervals and check, if we need an update from server
+    console.log("--------------------------------------------------");
+    console.log("setInterval",new Date(start),new Date(end),level);
     var result = [];
     var noNeedUpdate = this.splice(result,start,end,level);
     if(!noNeedUpdate){ // Request update
@@ -331,6 +344,7 @@ CameraRecordsProvider.prototype.splice = function(result, start, end, level, par
             var currentChunk = parent.children[i];
             if (currentChunk.end <= start || currentChunk.start >= end || currentChunk.level === level) {
                 currentChunk.expand = false;
+                console.log("add",currentChunk.title,currentChunk.end <= start ,currentChunk.start, end , currentChunk.start - end);
                 result.push(currentChunk);
                 continue;
             }

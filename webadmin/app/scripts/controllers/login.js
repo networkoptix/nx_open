@@ -13,7 +13,6 @@ angular.module('webadminApp')
         }
 
         $scope.login = function () {
-            console.log($scope);
             if ($scope.loginForm.$valid) {
 
                 var lowercaseLogin = $scope.user.username.toLowerCase();
@@ -24,9 +23,6 @@ angular.module('webadminApp')
                 var hash1 = md5(lowercaseLogin + ':' + realm + ':' + $scope.user.password);
                 var cnonce = md5("GET:");
                 var response = md5(hash1 + ':' + nonce + ':' + cnonce);
-
-                //console.log("hash1 md5(", $scope.user.username + ':' + realm + ':' + $scope.user.password,')=', hash1);
-                //console.log("response  md5(", hash1 + ':' + nonce + ':'+ cnonce,')=', response);
 
                 ipCookie('response',response, { path: '/' });
                 ipCookie('username',lowercaseLogin, { path: '/' });

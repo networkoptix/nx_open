@@ -41,7 +41,14 @@ angular.module('webadminApp')
 
                     font:'sans-serif',
                     evenColor: 'rgb(200,200,255)',
-                    oddColor: 'white'
+                    oddColor: 'white',
+
+
+                    chunkTopMargin:5,
+                    chunkHeight:10,
+                    exactChunkColor:'rgb(128,128,128)',
+                    loadingChunkColor:'rgb(200,200,200)'
+
                 };
 
                 animateScope.setDuration(timelineConfig.animationDuration);
@@ -243,6 +250,8 @@ angular.module('webadminApp')
 
                 }
 
+
+
                 function screenStartPosition(){
                     return viewPortScrollRelative() * (scope.frameWidth - viewportWidth);
                 }
@@ -269,25 +278,53 @@ angular.module('webadminApp')
                     return screenStartRelativePos;
                 }
 
-                function updateDetailization(){
+
+                function drawChunk(context,startCoordinate, endCoordinate, exactChunk){
+
+                    console.log("drawChunk",startCoordinate, endCoordinate, exactChunk);
+
+                    var vertStart = timelineConfig.topLabelHeight +
+                        5 * timelineConfig.rulerStepSize + timelineConfig.rulerBasicSize
+                        + timelineConfig.rulerFontSize + timelineConfig.rulerFontStep * 3
+                        + timelineConfig.chunkTopMargin;
+
+                    vertStart = 0;
+                    timelineConfig.chunkHeight= 100;
+
+                    context.fillStyle = exactChunk? timelineConfig.exactChunkColor:timelineConfig.loadingChunkColor;
+
+                    context.fillRect(startCoordinate, vertStart , Math.max(1,endCoordinate - startCoordinate), timelineConfig.chunkHeight);
+                    context.stroke();
+                }
+
+                function drawEvents(){
                     //4. Set interval for events
                     //TODO: Set interval for events
 
-
+                    var context = canvas.getContext('2d');
                     var level = RulerModel.levels[scope.actualLevel];
                     var end = level.interval.alignToFuture(screenRelativePositionToDate(1));
                     var start = level.interval.alignToFuture(screenRelativePositionToDate(0));
 
-                    //console.log('Set interval for events', new Date(start), new Date(end), scope.actualLevel);
+                    console.log('Set interval for events', new Date(start), new Date(end), scope.actualLevel);
 
                     if(!!scope.records) {
                         // 1. Splice events
-                        var events = scope.records.setInterval( end, start, scope.actualLevel);
+                        var events = scope.records.setInterval(  start, end, scope.actualLevel);
 
                         // 2. Draw em!
-                        //console.log("splice",events);
+                        console.log("splice",scope.actualLevel,events);
+
+                        for(var i=0;i<events.length;i++){
+                            var chunk = events[i];
+                            var startCoordinate =  dateToScreenPosition(chunk.start);
+                            var endCoordinate =  dateToScreenPosition(chunk.end);
+
+                            drawChunk(context,startCoordinate, endCoordinate,chunk.level);
+                        }
                     }
                 }
+
 
                 function drawMark(context, coordinate, level, labelLevel, label){
 
@@ -337,12 +374,6 @@ angular.module('webadminApp')
                         }else if(scope.labelDisappearance < 1 && labelLevel < 0){
                             color = blurColor(timelineConfig.rulerColor, (1 - scope.labelDisappearance) * colorBlur);
                         }
-
-                        /*if(level === 0){
-                            fontSize = timelineConfig.rulerBasicSize * scope.levelAppearance;
-                        }else{
-                            fontSize = (Math.min(level,2) + scope.levelEncreasing) * timelineConfig.rulerStepSize + timelineConfig.rulerBasicSize ;
-                        }*/
 
                         context.font = fontSize  + 'px ' + timelineConfig.font;
                         context.fillStyle = color;
@@ -493,7 +524,7 @@ angular.module('webadminApp')
                     updateBoundariesAndScroller();
                     updateActualLevel();
                     drawRuler();
-                    updateDetailization();
+                    drawEvents();
                 }
 
                 function initTimeline(){
@@ -627,7 +658,6 @@ angular.module('webadminApp')
                 };
 
                 scope.$watch('records',function(){
-                    console.log("records changed");
                     if(scope.records) {
                         scope.records.ready.then(initTimeline);
                     }

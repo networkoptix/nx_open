@@ -47,7 +47,6 @@ angular.module('webadminApp').controller('ViewCtrl',
             ];
         }
 
-        console.log("activeVideoRecords null");
         $scope.activeVideoRecords = null;
 
         $scope.selectCameraById = function (cameraId) {
@@ -60,7 +59,6 @@ angular.module('webadminApp').controller('ViewCtrl',
 
             if (!!$scope.activeCamera) {
                 updateVideoSource();
-                console.log("activeVideoRecords ", $scope.activeCamera.physicalId);
                 $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId]);
             }
         };

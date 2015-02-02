@@ -4,7 +4,7 @@
   width:100%;
   position:relative;
   overflow:hidden;
-  height:80px;
+  height:100px;
   border:1px solid rgb(216,216,216);
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -40,13 +40,6 @@
 }
 
 
-
-
-/*Отладочный элемент, его можно убрать*/
-.spacer{
-  height:100px;
-  /*display:none;*/
-}
 
 
 ng-include{
