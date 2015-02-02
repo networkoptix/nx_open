@@ -2811,7 +2811,7 @@ Generiert für %5-%6 mit %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1341"/>
         <source>Connect to the Current System...</source>
-        <translation>Mit aktuellem System verbinden...</translation>
+        <translation type="unfinished">Mit dem derzeit verbundenen System verschmelzen…</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1352"/>

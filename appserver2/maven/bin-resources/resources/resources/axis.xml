@@ -18,5 +18,9 @@
         <resource name = "AXISP1425LE" public = "AXISP1428E"/>    
         <resource name = "AXISP1405E" public = "AXISP1428E"/>
         <resource name = "AXISP1405LE" public = "AXISP1428E"/>        
+        <resource name = "AXISQ7404" public = "AXIS_ENCODER"/>
+        <resource name = "AXISQ7224" public = "AXIS_ENCODER"/>
+        <resource name = "AXISQ7424" public = "AXIS_ENCODER"/>
+        <resource name = "AXISQ7414" public = "AXIS_ENCODER"/>
     </oem>
 </resources>
