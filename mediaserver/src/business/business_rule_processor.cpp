@@ -672,9 +672,6 @@ void QnBusinessRuleProcessor::toggleInputPortMonitoring(const QnResourcePtr& res
 {
     QMutexLocker lock(&m_mutex);
 
-    if( resource->hasFlags(Qn::foreigner) )
-        return;
-
     QnSecurityCamResource* camResource = dynamic_cast<QnSecurityCamResource*>(resource.data());
     if( camResource == nullptr )
         return;
@@ -757,10 +754,8 @@ void QnBusinessRuleProcessor::notifyResourcesAboutEventIfNeccessary( const QnBus
         if( businessRule->eventType() == QnBusiness::CameraInputEvent)
         {
             QnVirtualCameraResourceList resList = businessRule->eventResourceObjects().filtered<QnVirtualCameraResource>();
-            if (resList.isEmpty()) {
-                const QnResourcePtr& mServer = qnResPool->getResourceById(qnCommon->moduleGUID());
-                resList = qnResPool->getAllCameras(mServer, true);
-            }
+            if (resList.isEmpty())
+                resList = qnResPool->getAllCameras(QnResourcePtr(), true);
 
             for(const QnVirtualCameraResourcePtr camera: resList)
             {
