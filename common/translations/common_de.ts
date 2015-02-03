@@ -6,16 +6,15 @@
     <message>
         <location filename="../src/translation/translation_manager.cpp" line="153"/>
         <source>Language Name</source>
-        <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
+        <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
+        <translation>Deutsch</translation>
         <translatorcomment>Translated for the ALLNET Group by Richard Heider - heider@allnet.kg</translatorcomment>
-        <translation>Sprache</translation>
     </message>
     <message>
         <location filename="../src/translation/translation_manager.cpp" line="156"/>
         <source>Locale Code</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
-        <translatorcomment>I leave most technical error messages untranslated on purpose. A fuzzy german translation for these *deep* error messages help no one.</translatorcomment>
-        <translation>Locale Code</translation>
+        <translation>de</translation>
     </message>
 </context>
 <context>
