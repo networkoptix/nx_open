@@ -65,7 +65,7 @@
         <compiler.arguments />
 
         <libdir>${root.dir}/build_environment/target</libdir>        
-        <ClientHelpSourceDir>${environment.dir}/help/${project.version}/${customization}</ClientHelpSourceDir>
+        <ClientHelpSourceDir>${environment.dir}/help/${release.version}/${customization}</ClientHelpSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <ClientVoxSourceDir>${environment.dir}/festival.vox/lib</ClientVoxSourceDir>
         <unpack.skip>false</unpack.skip>
