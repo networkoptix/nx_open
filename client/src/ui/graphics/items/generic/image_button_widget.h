@@ -6,6 +6,7 @@
 #include <QtGui/QPixmap>
 #include <QtGui/QOpenGLFunctions>
 
+#include <ui/common/margins.h>
 #include <ui/processors/clickable.h>
 #include <ui/animation/animated.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
@@ -75,6 +76,9 @@ public:
     void setFixedSize(qreal size);
     void setFixedSize(qreal width, qreal height);
     void setFixedSize(const QSizeF &size);
+
+    MarginsF imageMargins() const;
+    void setImageMargins(const MarginsF &margins);
 
     /** If the button size can be changed in runtime. */
     bool isDynamic() const;
@@ -158,6 +162,8 @@ private:
     QOpenGLBuffer m_positionBufferTransition;
     QOpenGLBuffer m_textureBufferStatic;
     QOpenGLBuffer m_textureBufferTransition;
+
+    MarginsF m_imageMargins;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnImageButtonWidget::StateFlags)

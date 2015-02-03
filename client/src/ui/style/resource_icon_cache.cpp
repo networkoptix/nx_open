@@ -32,6 +32,8 @@ QnResourceIconCache::QnResourceIconCache(QObject *parent): QObject(parent) {
     m_cache.insert(VideoWall,               qnSkin->icon("tree/videowall.png"));
     m_cache.insert(VideoWallItem,           qnSkin->icon("tree/screen.png"));
     m_cache.insert(VideoWallMatrix,         qnSkin->icon("tree/matrix.png"));
+    m_cache.insert(OtherSystem,             qnSkin->icon("tree/system.png"));
+    m_cache.insert(OtherSystems,            qnSkin->icon("tree/other_systems.png"));
 
     m_cache.insert(Server | Offline,        qnSkin->icon("tree/server_offline.png"));
     m_cache.insert(Server | Incompatible,   qnSkin->icon("tree/server_incompatible.png"));
