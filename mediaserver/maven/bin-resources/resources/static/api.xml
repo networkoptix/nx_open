@@ -422,172 +422,73 @@
                     </result>
                 </function>
                 <function>
-                    <name>ptz/move</name>
-                    <description>Start camera moving.</description>
-                    <method>POST</method>
+                    <name>ptz</name>
+                    <description>Perform reading or writting PTZ operation</description>
                     <params>
                         <param>
-                            <name>res_id</name>
+                            <name>resourceId</name>
                             <description>Camera unique ID</description>
                             <optional>false</optional>
                             <values/>
                         </param>
                         <param>
-                            <name>xSpeed</name>
-                            <description>rotation X velocity in range [-1..+1]</description>
+                            <name>command</name>
+                            <description>PTZ operation</description>
                             <optional>false</optional>
-                            <values/>
-                        </param>
-                        <param>
-                            <name>ySpeed</name>
-                            <description>rotation Y velocity in range [-1..+1]</description>
-                            <optional>false</optional>
-                            <values/>
-                        </param>
-                        <param>
-                            <name>zoomSpeed</name>
-                            <description>zoom velocity in range [-1..+1]</description>
-                            <optional>false</optional>
-                            <values/>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>XML with OK message or error code.</caption>
-                    </result>
-                </function>
-                <function>
-                    <name>ptz/stop</name>
-                    <description>Stop camera moving.</description>
-                    <method>POST</method>
-                    <params>
-                        <param>
-                            <name>res_id</name>
-                            <description>Camera unique ID</description>
-                            <optional>false</optional>
-                            <values/>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>XML with OK message or error code.</caption>
-                    </result>
-                </function>
-                <function>
-                    <name>ptz/moveTo</name>
-                    <description>Go to absolute position</description>
-                    <method>POST</method>
-                    <params>
-                        <param>
-                            <name>res_id</name>
-                            <description>Camera unique ID</description>
-                            <optional>false</optional>
-                            <values/>
-                        </param>
-                        <param>
-                            <name>xPos</name>
-                            <description>Go to absolute X position in range [-1..+1]</description>
-                            <optional>false</optional>
-                            <values/>
-                        </param>
-                        <param>
-                            <name>yPos</name>
-                            <description>Go to absolute Y position in range [-1..+1]</description>
-                            <optional>false</optional>
-                            <values/>
-                        </param>
-                        <param>
-                            <name>zoomPos</name>
-                            <description>Go to absolute zoom position in range
-                                [-1..+1]</description>
-                            <optional>false</optional>
-                            <values/>
+                            <values>
+                                <value>
+                                    <name>ContinuousMovePtzCommand</name>
+                                    <description>Start PTZ continues move. Parameters xSpeed, ySpeed and zSpeed are used in range [-1.0..+1.0]. To stop moving use value 0 for all parameters.</description>
+                                </value>
+                                <value>
+                                    <name>ContinuousFocusPtzCommand</name>
+                                    <description>Start PTZ focus in or out. Parameter speed defines speed and focus direction in range [-1.0..+1.0].</description>
+                                </value>
+                                <value>
+                                    <name>AbsoluteDeviceMovePtzCommand</name>
+                                    <description>Move camera to absolute pozition. Parameters xPos, yPos and zPos are used in range defined by camera. Parameter speed is used in range [0..1.0].</description>
+                                </value>
+                                <value>
+                                    <name>AbsoluteLogicalMovePtzCommand</name>
+                                    <description>Move camera to absolute pozition. Parameters xPos, yPos are used in range [-1.0..+1.0]. Parameters speed, zPos are used in range [0..1.0].</description>
+                                </value>
+                                <value>
+                                    <name>GetDevicePositionPtzCommand</name>
+                                    <description>Read camera current position. Return parameters xPos, yPos and zPos in range defined by camera.</description>
+                                </value>
+                                <value>
+                                    <name>GetLogicalPositionPtzCommand</name>
+                                    <description>Read camera current position. Return parameters xPos, yPos in range [-1.0..+1.0]. Return parameter zPos in range [0..1.0].</description>
+                                </value>
+                                <value>
+                                    <name>CreatePresetPtzCommand</name>
+                                    <description>Create PTZ preset. Parameter presetId defines internal preset name. Parameter presetName defines display preset name.</description>
+                                </value>
+                                <value>
+                                    <name>UpdatePresetPtzCommand</name>
+                                    <description>Update PTZ preset display name. Parameter presetId defines internal preset name. Parameter presetName defines display preset name.</description>
+                                </value>
+                                <value>
+                                    <name>RemovePresetPtzCommand</name>
+                                    <description>Update PTZ preset display name. Parameter presetId defines internal preset name</description>
+                                </value>
+                                <value>
+                                    <name>ActivatePresetPtzCommand</name>
+                                    <description>Go to PTZ preset. Parameter presetId defines internal preset name. Parameter speed defines move speed in range [0..1.0.]</description>
+                                </value>
+                                <value>
+                                    <name>GetPresetsPtzCommand</name>
+                                    <description>Read PTZ presets list.</description>
+                                </value>
+                                <value>
+                                    <name>GetPresetsPtzCommand</name>
+                                    <description>Read PTZ presets list.</description>
+                                </value>
+                            </values>
                         </param>
                     </params>
                     <result>
-                        <caption>XML with OK message or error code.</caption>
-                    </result>
-                </function>
-                <function>
-                    <name>ptz/getPosition</name>
-                    <description>Return current camera position.</description>
-                    <method>GET</method>
-                    <params>
-                        <param>
-                            <name>res_id</name>
-                            <description>Camera unique ID</description>
-                            <optional>false</optional>
-                            <values/>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>XML with camera position or error code.</caption>
-                    </result>
-                </function>
-                <function>
-                    <name>ptz/calibrate</name>
-                    <description>calibrate moving speed (addition speed coefficient)</description>
-                    <method>POST</method>
-                    <params>
-                        <param>
-                            <name>res_id</name>
-                            <description>Camera unique ID</description>
-                            <optional>false</optional>
-                            <values/>
-                        </param>
-                        <param>
-                            <name>xSpeed</name>
-                            <description>rotation X velocity in range [-1..+1]</description>
-                            <optional>false</optional>
-                            <values/>
-                        </param>
-                        <param>
-                            <name>ySpeed</name>
-                            <description>rotation Y velocity in range [-1..+1]</description>
-                            <optional>false</optional>
-                            <values/>
-                        </param>
-                        <param>
-                            <name>zoomSpeed</name>
-                            <description>zoom velocity in range [-1..+1]</description>
-                            <optional>false</optional>
-                            <values/>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>XML with OK message or error code.</caption>
-                    </result>
-                </function>
-                <function>
-                    <name>ptz/getCalibrate</name>
-                    <description>Read current calibration settings</description>
-                    <method>GET</method>
-                    <params>
-                        <param>
-                            <name>res_id</name>
-                            <description>Camera unique ID</description>
-                            <optional>false</optional>
-                            <values/>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>XML with calibration coefficients.</caption>
-                    </result>
-                </function>
-                <function>
-                    <name>ptz/getSpaceMapper</name>
-                    <description>return JSON-serialized PTZ space mapper. This information contains
-                        curves for camera FOV and zoom position and camera moving ranges. This
-                        information used in advanced PTZ mode.</description>
-                    <method>GET</method>
-                    <params>
-                        <param>
-                            <name>res_id</name>
-                            <description>Camera unique ID</description>
-                            <optional>false</optional>
-                            <values/>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>return JSON-serialized PTZ space mapper.</caption>
+                        <caption>Json message with error code and error message.</caption>
                     </result>
                 </function>
                 <function>
@@ -636,9 +537,12 @@
                             <values/>
                         </param>
                         <param>
-                            <name>motionRegions</name>
-                            <description>Match motion on a video by specified rect. Parameter can be
-                                used several times.</description>
+                            <name>filter</name>
+                            <description>This paremeter is used for motion search (periodsType must be 1). Match motion on a video by specified rect. 
+                                Filter format is: &lt;rect1&gt;;&lt;rect2&gt;;&lt;rectN&gt;
+                                rect format is: &lt;x,y,width,height&gt; All values are measured in relative portions of a video frame.
+                                'x' and 'width' in range [0..43], 'y' and 'height' in range [0..31].
+                            </description>
                             <optional>true</optional>
                             <values/>
                         </param>
