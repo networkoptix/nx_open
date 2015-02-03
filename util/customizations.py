@@ -31,6 +31,7 @@ class Formats:
     PNG = '.png'
     GIF = '.gif'
     IMAGES = [PNG, GIF]
+    AI = '.ai'
 
     CPP = '.cpp'
     H   = '.h'
@@ -211,6 +212,13 @@ class Customization():
             error = True
             err("File %s is missing" % entry)
 
+        for entry in self.total:
+            if not entry.endswith(Formats.PNG):
+                continue;
+            sourceFile = entry.replace(Formats.PNG, Formats.AI)
+            if not sourceFile in self.total:
+                warn('Source file %s is missing' % sourceFile)
+            
         if clean:
             green('Success')
         if error:
