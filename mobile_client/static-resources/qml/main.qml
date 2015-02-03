@@ -21,10 +21,10 @@ ApplicationWindow {
 
     }
 
-//    Connections {
-//        target: connectionManager
-//        onConnected: Main.openResources()
-//    }
+    Connections {
+        target: connectionManager
+        onDisconnected: {
 
-//    Component.onCompleted: Main.openLoginDialog()
+        }
+    }
 }

@@ -27,8 +27,8 @@ Page {
     QnSideMenu {
         id: sidebar
         anchors.fill: parent
-        content: Rectangle {
-            color: "white"
+        content: QnSideBar {
+            id: menuContent
         }
     }
 }
