@@ -516,7 +516,8 @@ void QnRecordingManager::onNewResource(const QnResourcePtr &resource)
         connect(camera.data(), &QnResource::initializedChanged, this, &QnRecordingManager::at_camera_initializationChanged);
         connect(camera.data(), &QnResource::resourceChanged,    this, &QnRecordingManager::at_camera_resourceChanged);
         camera->setDataProviderFactory(QnServerDataProviderFactory::instance());
-        return;
+        if (camera->isInitialized())
+            updateCamera(camera);
     }
 }
 

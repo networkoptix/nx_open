@@ -337,8 +337,11 @@ bool QnResourcePoolModelNode::calculateBastard() const {
                 return true;
             
             /* Hide edge servers, camera will be displayed instead. */
-            if (QnMediaServerResource::isHiddenServer(m_resource))
+            if (QnMediaServerResource::isHiddenServer(m_resource) &&
+                !qnResPool->getResourcesByParentId(m_resource->getId()).filtered<QnVirtualCameraResource>().isEmpty())
+            {
                 return true;
+            }
         }
         return false;
 

@@ -182,6 +182,7 @@ namespace nx_hls
                 return true;
 
             case HttpStreamReader::messageDone:
+            case HttpStreamReader::pullingLineEndingBeforeMessageBody:
             case HttpStreamReader::readingMessageBody:
             case HttpStreamReader::waitingMessageStart:
                 if( m_httpStreamReader.message().type != MessageType::request )
@@ -202,6 +203,7 @@ namespace nx_hls
                 return false;
 
             default:
+                Q_ASSERT( false );
                 return false;
         }
     }
