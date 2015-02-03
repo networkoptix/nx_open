@@ -4,6 +4,7 @@
 ***********************************************************/
 
 #include <condition_variable>
+#include <memory>
 #include <mutex>
 #include <vector>
 
@@ -12,7 +13,31 @@
 #include <common/common_globals.h>
 #include <utils/network/http/asynchttpclient.h>
 #include <utils/network/http/httpclient.h>
+#include <utils/network/http/server/http_stream_socket_server.h>
 
+#include "test_http_server.h"
+
+
+class AsyncHttpClientTest
+:
+    public ::testing::Test
+{
+protected:
+    static void SetUpTestCase()
+    {
+        testHttpServer.reset( new TestHttpServer() );
+    }
+
+    static void TearDownTestCase()
+    {
+        testHttpServer.reset();
+    }
+
+private:
+    static std::unique_ptr<TestHttpServer> testHttpServer;
+};
+
+std::unique_ptr<TestHttpServer> AsyncHttpClientTest::testHttpServer;
 
 #if 0
 TEST( AsyncHttpClient, KeepAlive )
@@ -40,3 +65,10 @@ TEST( AsyncHttpClient, KeepAlive )
     }
 }
 #endif
+
+/*!
+    This test verifies that AbstractCommunicatingSocket::cancelAsyncIO method works fine
+*/
+TEST_F( AsyncHttpClientTest, KeepAliveConnection )
+{
+}

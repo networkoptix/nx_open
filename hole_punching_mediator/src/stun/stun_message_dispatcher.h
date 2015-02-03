@@ -11,9 +11,9 @@
 #include <unordered_map>
 
 #include <utils/common/stoppable.h>
+#include <utils/network/connection_server/message_dispatcher.h>
 
 #include "stun_server_connection.h"
-#include "../message_dispatcher.h"
 
 
 //!Dispatches STUN protocol messages to corresponding processor

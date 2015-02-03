@@ -14,11 +14,11 @@
 
 #include <utils/common/command_line_parser.h>
 #include <utils/common/log.h>
-#include <utils/network/aio/aioservice.h>
 #include <utils/common/systemerror.h>
+#include <utils/network/aio/aioservice.h>
+#include <utils/network/http/server/http_message_dispatcher.h>
 
 #include "stun/custom_stun.h"
-#include "http/http_message_dispatcher.h"
 #include "http/register_http_handler.h"
 #include "stun/stun_message_dispatcher.h"
 #include "listening_peer_pool.h"
@@ -115,6 +115,8 @@ int HolePuncherProcess::executeApplication()
 
     //HTTP handlers
     RegisterSystemHttpHandler registerHttpHandler;
+
+    //TODO #ak make mesasge dispatcher not global static and pass them to corresponding server explicitly
 
     nx_http::MessageDispatcher httpMessageDispatcher;
     httpMessageDispatcher.registerRequestProcessor(

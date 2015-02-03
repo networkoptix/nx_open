@@ -5,7 +5,7 @@
 
 #include "register_http_handler.h"
 
-#include "http_stream_socket_server.h"
+#include <utils/network/http/server/http_stream_socket_server.h>
 
 
 const QString RegisterSystemHttpHandler::HANDLER_PATH = QLatin1String("/register");

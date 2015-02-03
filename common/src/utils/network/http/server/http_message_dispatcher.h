@@ -7,7 +7,7 @@
 #define NX_HTTP_MESSAGE_DISPATCHER_H
 
 #include "http_server_connection.h"
-#include "../message_dispatcher.h"
+#include "utils/network/connection_server/message_dispatcher.h"
 
 
 namespace nx_http

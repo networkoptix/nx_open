@@ -14,11 +14,11 @@
 #include <qtservice.h>
 
 #include <utils/common/stoppable.h>
+#include <utils/network/connection_server/multi_address_server.h>
+#include <utils/network/http/server/http_stream_socket_server.h>
 
 #include "hole_punching_requests_processor.h"
-#include "multi_address_server.h"
 #include "stun/stun_stream_socket_server.h"
-#include "http/http_stream_socket_server.h"
 
 
 class HolePuncherProcess

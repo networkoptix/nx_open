@@ -10,8 +10,9 @@
 
 #include <QString>
 
+#include <utils/network/http/server/http_server_connection.h>
+
 #include "db/registered_systems_data_manager.h"
-#include "http_server_connection.h"
 
 
 class RegisterSystemHttpHandler
