@@ -55,7 +55,7 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
         break;
     case Qn::OtherSystemsNode:
         m_displayName = m_name = tr("Other Systems");
-        m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
+        m_icon = qnResIconCache->icon(QnResourceIconCache::OtherSystems);
         m_bastard = true; /* Invisible by default until has children. */
         break;
     case Qn::UsersNode:
@@ -74,7 +74,7 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
         break;
     case Qn::SystemNode:
         m_displayName = m_name = name;
-        m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
+        m_icon = qnResIconCache->icon(QnResourceIconCache::OtherSystem);
         m_bastard = true; /* Invisible by default until has children. */
         m_state = Invalid;
         break;

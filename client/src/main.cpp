@@ -322,6 +322,7 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 #include <iostream>
 
 #ifndef API_TEST_MAIN
+#define ENABLE_DYNAMIC_CUSTOMIZATION
 
 int runApplication(QtSingleApplication* application, int argc, char **argv) {
     // these functions should be called in every thread that wants to use rand() and qrand()
