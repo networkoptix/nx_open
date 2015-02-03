@@ -537,9 +537,12 @@
                             <values/>
                         </param>
                         <param>
-                            <name>motionRegions</name>
-                            <description>Match motion on a video by specified rect. Parameter can be
-                                used several times.</description>
+                            <name>filter</name>
+                            <description>This paremeter is used for motion search (periodsType must be 1). Match motion on a video by specified rect. 
+                                Filter format is: &lt;rect1&gt;;&lt;rect2&gt;;&lt;rectN&gt;
+                                rect format is: &lt;x,y,width,height&gt; All values are measured in relative portions of a video frame.
+                                'x' and 'width' in range [0..43], 'y' and 'height' in range [0..31].
+                            </description>
                             <optional>true</optional>
                             <values/>
                         </param>
