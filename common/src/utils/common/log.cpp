@@ -72,12 +72,13 @@ public:
             return;
 
         std::ostringstream ostr;
-        ostr << QLocale::c().toString(QDateTime::currentDateTime(), QLatin1String("ddd MMM d yy  hh:mm:ss.zzz")).toUtf8().data()
-            << " Thread " << QByteArray::number((qint64)QThread::currentThread()->currentThreadId(), 16).data()
+        const auto curDateTime = QDateTime::currentDateTime();
+        ostr << curDateTime.date().toString(Qt::ISODate).toUtf8().constData()<<" "<<curDateTime.time().toString(Qt::ISODate).toUtf8().constData()
+            << " " << std::setw(6) << QByteArray::number((qint64)QThread::currentThread()->currentThreadId(), 16).constData()
 #ifdef Q_OS_LINUX
-            << " ("<<std::setw(5)<<gettid()<<")"
+            << " ("<<std::setw(6)<<gettid()<<")"
 #endif
-            << " (" << qn_logLevelNames[logLevel] << "): " << msg.toUtf8().data() << "\r\n";
+            << " (" << qn_logLevelNames[logLevel] << "): " << msg.toUtf8().constData() << "\r\n";
         ostr.flush();
 
         const std::string& str = ostr.str();
