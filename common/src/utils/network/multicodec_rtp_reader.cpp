@@ -52,7 +52,6 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(const QnResourcePtr& res):
     if (camRes)
         connect(this,       &QnMulticodecRtpReader::networkIssue, camRes.data(), &QnSecurityCamResource::networkIssue,              Qt::DirectConnection);
     connect(res.data(),     &QnResource::propertyChanged,         this,          &QnMulticodecRtpReader::at_propertyChanged,        Qt::DirectConnection);
-    connect(camRes.data(),  &QnResource::resourceChanged,         this,          &QnMulticodecRtpReader::at_camera_resourceChanged, Qt::DirectConnection);
 }
 
 QnMulticodecRtpReader::~QnMulticodecRtpReader()
@@ -381,13 +380,6 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
 void QnMulticodecRtpReader::at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key)
 {
     if (key == QnMediaResource::rtpTransportKey() && getRtpTransport() != m_RtpSession.getTransport())
-        pleaseStop();
-}
-
-void QnMulticodecRtpReader::at_camera_resourceChanged(const QnResourcePtr& res)
-{
-    QnSecurityCamResourcePtr camRes = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
-    if (camRes && m_RtpSession.isAudioEnabled() != camRes->isAudioEnabled())
         pleaseStop();
 }
 

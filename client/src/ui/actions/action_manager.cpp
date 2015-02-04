@@ -543,7 +543,7 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Main Menu")).
         shortcut(tr("Alt+Space"), QnActionBuilder::Mac, true).
         autoRepeat(false).
-        icon(qnSkin->icon("titlebar/main_menu.png"));
+        icon(qnSkin->icon("main_menu/main_menu.png"));
 
     factory(Qn::OpenLoginDialogAction).
         flags(Qn::Main | Qn::GlobalHotkey).

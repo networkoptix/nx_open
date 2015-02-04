@@ -515,6 +515,33 @@
                     }
                 }
             }
+        },            
+        {
+            "keys": [
+                "VISTA|VK2-1080XIRPTZF"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [   1,  -1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "_TODO": "Actual tilt range is [0, -180].",
+                        "device":  [-1,   1],
+                        "logical": [0,   -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [    -1,   -0.9,   -0.8,   -0.7,   -0.6,   -0.5,   -0.4,   -0.3,   -0.2,   -0.1,      0,    0.1,    0.2,    0.3,    0.4,    0.5,    0.6,     0.7,     0.8,     0.9,       1],
+                        "logical": [    1,  1.09449,    1.19767,    1.31801,    1.45551,    1.62733,    1.81642,    2.03983,    2.32341,    2.65,   3.05392,    3.56091,    4.2226,    5.10784,    6.19068,    7.63443,    9.57659,    13.26291,    16.18121,    21.55702,    32.15519],
+                        "logicalMultiplier": 30.0,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
         },
         {
             "keys": [

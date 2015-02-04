@@ -797,7 +797,7 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endT
         if (qAbs(last.startTimeMs + last.durationMs - m_chunks[i].startTimeMs) <= detailLevel && m_chunks[i].durationMs != -1)
             last.durationMs = m_chunks[i].startTimeMs - last.startTimeMs + m_chunks[i].durationMs;
         else {
-            if (last.durationMs < detailLevel)
+            if (last.durationMs < detailLevel && result.size() > 1)
                 result.pop_back();
             result << QnTimePeriod(m_chunks[i].startTimeMs, m_chunks[i].durationMs);
         }

@@ -562,6 +562,8 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
         // admin user resource has been updated
         QnTransaction<ApiUserData> userTransaction( ApiCommand::saveUser );
         transactionLog->fillPersistentInfo(userTransaction);
+        if (qnCommon->useLowPriorityAdminPasswordHach())
+            userTransaction.persistentInfo.timestamp = 1; // use hack to declare this change with low proprity in case if admin has been changed in other system (keep other admin user fields unchanged)
         fromResourceToApi( userResource, userTransaction.params );
         executeTransactionNoLock( userTransaction, QnUbjson::serialized( userTransaction ) );
     }

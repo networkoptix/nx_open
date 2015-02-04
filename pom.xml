@@ -65,7 +65,7 @@
         <compiler.arguments />
 
         <libdir>${root.dir}/build_environment/target</libdir>        
-        <ClientHelpSourceDir>${environment.dir}/help/2.2.0/${customization}</ClientHelpSourceDir>
+        <ClientHelpSourceDir>${environment.dir}/help/${release.version}/${customization}</ClientHelpSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <ClientVoxSourceDir>${environment.dir}/festival.vox/lib</ClientVoxSourceDir>
         <unpack.skip>false</unpack.skip>
@@ -87,6 +87,7 @@
         <toolchain.version>none</toolchain.version>            
 
         <additional.defines/>
+        <customization.defines/>
 
         <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) --> 
         <qtlib1>Core</qtlib1>
@@ -658,7 +659,7 @@
             <properties>
                 <compiler.arguments>-m32</compiler.arguments>
                 <qt.spec>linux-g++-32</qt.spec>
-                <arch.dir>/usr/lib/i386-linux-gnu/</arch.dir>
+                <arch.dir>i386-linux-gnu/</arch.dir>
             </properties>
         </profile>          
         <profile>

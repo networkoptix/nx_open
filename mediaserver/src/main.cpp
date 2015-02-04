@@ -189,6 +189,8 @@ static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
 static const QString REMOVE_DB_PARAM_NAME(lit("removeDbOnStartup"));
 static const QByteArray SYSTEM_IDENTITY_TIME("sysIdTime");
 static const QByteArray AUTH_KEY("authKey");
+static const QByteArray APPSERVER_PASSWORD("appserverPassword");
+static const QByteArray LOW_PRIORITY_ADMIN_PASSWORD("lowPriorityPassword");
 
 class QnMain;
 static QnMain* serviceMainInstance = 0;
@@ -792,7 +794,7 @@ void initAppServerConnection(QSettings &settings)
 
     // TODO: Actually appserverPassword is always empty. Remove?
     QString userName = settings.value("appserverLogin", QLatin1String("admin")).toString();
-    QString password = settings.value("appserverPassword", QLatin1String("")).toString();
+    QString password = settings.value(APPSERVER_PASSWORD, QLatin1String("")).toString();
     QByteArray authKey = settings.value(AUTH_KEY).toByteArray();
     QString appserverHostString = settings.value("appserverHost").toString();
     if (!authKey.isEmpty() && !isLocalAppServer(appserverHostString))
@@ -1320,7 +1322,7 @@ bool QnMain::initTcpListener()
     if( !m_universalTcpListener->bindToLocalAddress() )
         return false;
     m_universalTcpListener->setDefaultPage("/static/index.html");
-    //QnUniversalRequestProcessor::setUnauthorizedPageBody(QnFileConnectionProcessor::readStaticFile(m_universalTcpListener->defaultPage()));
+    QnUniversalRequestProcessor::setUnauthorizedPageBody(QnFileConnectionProcessor::readStaticFile("static/login.html"));
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
@@ -1472,7 +1474,8 @@ void QnMain::run()
 
 
     // If adminPassword is set by installer save it and create admin user with it if not exists yet
-    qnCommon->setDefaultAdminPassword(settings->value("appserverPassword", QLatin1String("")).toString());
+    qnCommon->setDefaultAdminPassword(settings->value(APPSERVER_PASSWORD, QLatin1String("")).toString());
+    qnCommon->setUseLowPriorityAdminPasswordHach(settings->value(LOW_PRIORITY_ADMIN_PASSWORD, false).toBool());
 
     qnCommon->setAdminPasswordData(settings->value(ADMIN_PSWD_HASH).toByteArray(), settings->value(ADMIN_PSWD_DIGEST).toByteArray());
 
@@ -1538,7 +1541,7 @@ void QnMain::run()
         MSSettings::roSettings()->setValue("systemName", connectInfo.systemName);
         MSSettings::roSettings()->remove("appserverHost");
         MSSettings::roSettings()->remove("appserverLogin");
-        MSSettings::roSettings()->setValue("appserverPassword", "");
+        MSSettings::roSettings()->setValue(APPSERVER_PASSWORD, "");
         MSSettings::roSettings()->remove(PENDING_SWITCH_TO_CLUSTER_MODE);
         MSSettings::roSettings()->sync();
 
@@ -1550,6 +1553,7 @@ void QnMain::run()
     }
     settings->remove(ADMIN_PSWD_HASH);
     settings->remove(ADMIN_PSWD_DIGEST);
+    settings->remove(LOW_PRIORITY_ADMIN_PASSWORD);
 
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
@@ -1730,12 +1734,11 @@ void QnMain::run()
     }
 
     /* This key means that password should be forcibly changed in the database. */
-    const QString passwordChangeKey = "appserverPassword";
     MSSettings::roSettings()->remove(OBSOLETE_SERVER_GUID);
-    MSSettings::roSettings()->setValue(passwordChangeKey, "");
+    MSSettings::roSettings()->setValue(APPSERVER_PASSWORD, "");
 #ifdef _DEBUG
     MSSettings::roSettings()->sync();
-    Q_ASSERT_X(MSSettings::roSettings()->value(passwordChangeKey).toString().isEmpty(), Q_FUNC_INFO, "appserverPassword is not emptyu in registry. Restart the server as Administrator");
+    Q_ASSERT_X(MSSettings::roSettings()->value(APPSERVER_PASSWORD).toString().isEmpty(), Q_FUNC_INFO, "appserverPassword is not emptyu in registry. Restart the server as Administrator");
 #endif
 
     if (needToStop()) {
