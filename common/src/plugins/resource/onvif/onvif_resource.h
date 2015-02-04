@@ -448,7 +448,6 @@ private:
     QString m_ptzProfileToken;
     QString m_ptzConfigurationToken;
     int m_timeDrift;
-    int m_prevSoapCallResult;
     std::vector<RelayOutputInfo> m_relayOutputInfo;
     std::map<QString, bool> m_relayInputStates;
     std::string m_deviceIOUrl;
