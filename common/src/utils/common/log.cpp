@@ -78,7 +78,7 @@ public:
 #ifdef Q_OS_LINUX
             << " ("<<std::setw(6)<<gettid()<<")"
 #endif
-            << " (" << qn_logLevelNames[logLevel] << "): " << msg.toUtf8().constData() << "\r\n";
+            << " " << std::setw(7) << qn_logLevelNames[logLevel] << ": " << msg.toUtf8().constData() << "\r\n";
         ostr.flush();
 
         const std::string& str = ostr.str();
