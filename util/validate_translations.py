@@ -116,12 +116,9 @@ def validate(path, verbose):
     if result.error > 0:
         err('{0}: {1} errors found'.format(name, result.error))
 
-    if not verbose:
-        return
-
     if result.unfinished > 0:
         warn('{0}: {1} of {2} translations are unfinished'.format(name, result.unfinished, result.total))
-    else:
+    elif verbose:
         green('{0}: ok'.format(name))
 
 def validateProject(project, translationDir, verbose):
@@ -164,8 +161,7 @@ def main():
         translationDir = os.path.join(projectDir, 'translations')
         validateProject(project, translationDir, args.verbose)
        
-    if args.verbose:
-        info("Validation finished.")
+    info("Validation finished.")
     
     
 if __name__ == "__main__":
