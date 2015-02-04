@@ -450,7 +450,7 @@
                                 </value>
                                 <value>
                                     <name>AbsoluteLogicalMovePtzCommand</name>
-                                    <description>Move camera to absolute pozition. Parameters xPos, yPos are used in range [-1.0..+1.0]. Parameters speed, zPos are used in range [0..1.0].</description>
+                                    <description>Move camera to absolute pozition. Parameters xPos, yPos range are: [-180..+180]. Parameter zPos range is: [0..180] (field of view in degree). Parameters speed range is: [0..1.0].</description>
                                 </value>
                                 <value>
                                     <name>GetDevicePositionPtzCommand</name>
@@ -458,7 +458,7 @@
                                 </value>
                                 <value>
                                     <name>GetLogicalPositionPtzCommand</name>
-                                    <description>Read camera current position. Return parameters xPos, yPos in range [-1.0..+1.0]. Return parameter zPos in range [0..1.0].</description>
+                                    <description>Read camera current position. Return parameters xPos, yPos in range [-180..+180]. Return parameter zPos in range [0..180] (field of view in degree).</description>
                                 </value>
                                 <value>
                                     <name>CreatePresetPtzCommand</name>
