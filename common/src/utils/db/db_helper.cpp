@@ -188,7 +188,7 @@ bool QnDbHelper::applyUpdates(const QString &dirName) {
 
 
     QDir dir(dirName);
-    foreach(const QFileInfo& entry, dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::Name))
+    for(const QFileInfo& entry: dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files, QDir::Name))
     {
         QString fileName = entry.absoluteFilePath();
         if (!existUpdates.contains(fileName)) 

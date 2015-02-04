@@ -6,11 +6,12 @@ angular.module('webadminApp')
             isAdmin: true
         };
 
-        mediaserver.getCurrentUser().then(function(result){
+        mediaserver.checkAdmin().then(function(isAdmin){
             $scope.user = {
-                isAdmin: result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalEditServersPermissions)
+                isAdmin: isAdmin
             };
         });
+
 
         mediaserver.getSettings().then(function (r) {
             $scope.settings = r.data.reply;
