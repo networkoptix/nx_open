@@ -90,7 +90,7 @@ def fix_binary(binary, bindir, libdir, qlibdir, tlibdir):
                     # Copy framework binary
                     shutil.copy(fpath, tfolder)
                     os.chmod(tpath, 0644)
-                    shutil.copytree(join(qlibdir, framework_name, 'Contents'), join(tlibdir, framework_name, 'Contents'))
+                    shutil.copytree(join(qlibdir, framework_name, 'Contents'), join(tlibdir, framework_name, 'Resources'))
                     fix_binary(tpath, bindir, libdir, qlibdir, tlibdir)
                 change_dep_path(binary, full_name, join(folder, name))
 
