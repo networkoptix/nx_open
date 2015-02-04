@@ -1147,7 +1147,8 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
     QUrl url(server->getApiUrl());
     url.setUserName(QString());
     url.setPassword(QString());
-    QDesktopServices::openUrl(url);
+    url.setScheme(lit("http"));
+    QDesktopServices::openUrl(QnNetworkProxyFactory::instance()->urlToResource(url, server));
 }
 
 void QnWorkbenchActionHandler::at_systemAdministrationAction_triggered() {
@@ -1514,8 +1515,9 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
 
     QUrl url = server->getApiUrl();
     url.setScheme(lit("http"));
-    url.setPath(lit("/api/showLog"));
+    url.setPath(lit("/static/index.html"));
     url.setQuery(lit("lines=1000"));
+    url.setFragment(lit("/log")); // add hashtag postfix. It's required for our web page java script
     
     //setting credentials for access to resource
     url.setUserName(QnAppServerConnectionFactory::url().userName());
