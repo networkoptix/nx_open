@@ -3,42 +3,46 @@ import os
 import subprocess
 import threading
 
-defaultProfile = "-r72 -dEPSCrop"
+defaultProfile = ""
 
-def convert(fname, profile):
-    command = 'gswin32c -q -dNOPAUSE -dBATCH -sDEVICE=pngalpha %s -sOutputFile=%s.png %s.ai' % (profile, fname, fname)
-    subprocess.call(command)
+def convert(sourceFile, exportFile, profile):
+    subprocess.call(['inkscape', sourceFile, '-e', exportFile] + profile.split())
 
 def main():
     #scriptDir = os.path.dirname(os.path.abspath(__file__))
     scriptDir = os.getcwd()
-    
+
     profile = ''
     profileFile = os.path.join(scriptDir, '.profile');
     if os.path.isfile(profileFile):
         with open(profileFile) as f:
             profile = f.readline()
-        
+
     if len(profile) == 0:
         profile = defaultProfile
-    
+
     threads = []
     for entry in os.listdir(scriptDir):
         path = os.path.join(scriptDir, entry)
-        
+
         if (os.path.isdir(path)):
             continue;
-                
-        if (not path[-2:] == 'ai'):
-            continue;
-            
-        fname = str(path[:-3])
-        thread = threading.Thread(None, convert, args=(fname, profile))
+
+        if path[-3:] == '.ai':
+            fname = path[:-3]
+        elif path[-4:] == '.svg':
+            fname = path[:-4]
+        else:
+            continue
+
+        fname += '.png'
+ 
+        thread = threading.Thread(None, convert, args=(path, fname, profile))
         thread.start()
         threads.append(thread)
-        
+
     for thread in threads:
         thread.join()   
-    
+
 if __name__ == "__main__":
     main()
