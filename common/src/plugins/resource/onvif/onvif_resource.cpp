@@ -2834,13 +2834,16 @@ bool QnPlOnvifResource::createPullPointSubscription()
     if( !m_inputMonitored )
         return true;
 
-    //NOTE: renewing session does not work on vista
-    using namespace std::placeholders;
-    m_renewSubscriptionTimerID = TimerManager::instance()->addTimer(
-        std::bind(&QnPlOnvifResource::onRenewSubscriptionTimer, this, _1),
-        (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
-            ? renewSubsciptionTimeoutSec-RENEW_NOTIFICATION_FORWARDING_SECS
-            : renewSubsciptionTimeoutSec)*MS_PER_SECOND );
+    if( qnCommon->dataPool()->data(toSharedPointer(this)).value<bool>(lit("renewOnvifPullPointSubscriptionRequired"), true) )
+    {
+        //NOTE: renewing session does not work on vista
+        using namespace std::placeholders;
+        m_renewSubscriptionTimerID = TimerManager::instance()->addTimer(
+            std::bind(&QnPlOnvifResource::onRenewSubscriptionTimer, this, _1),
+            (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
+                ? renewSubsciptionTimeoutSec-RENEW_NOTIFICATION_FORWARDING_SECS
+                : renewSubsciptionTimeoutSec)*MS_PER_SECOND );
+    }
 
     m_eventMonitorType = emtPullPoint;
     m_prevPullMessageResponseClock = m_monotonicClock.elapsed();
