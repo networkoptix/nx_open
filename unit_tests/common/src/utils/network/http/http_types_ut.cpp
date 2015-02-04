@@ -32,10 +32,6 @@ namespace nx_http
     }
 }
 
-//////////////////////////////////////////////
-//   HTTP message parse test
-//////////////////////////////////////////////
-
 
 //////////////////////////////////////////////
 //   Range header tests
@@ -153,6 +149,61 @@ TEST( HttpRangeHeaderTest, totalRangeLength )
     EXPECT_EQ( range.totalRangeLength(1), 1 );
     EXPECT_EQ( range.totalRangeLength(0), 0 );
 }
+
+
+
+//////////////////////////////////////////////
+//   Content-Range test
+//////////////////////////////////////////////
+TEST( HttpContentRangeTest, toString )
+{
+    {
+        nx_http::header::ContentRange contentRange;
+        EXPECT_EQ( contentRange.toString(), "bytes 0-0/*" );
+        EXPECT_EQ( contentRange.rangeLength(), 1 );
+
+        contentRange.instanceLength = 240;
+        EXPECT_EQ( contentRange.toString(), "bytes 0-239/240" );
+        EXPECT_EQ( contentRange.rangeLength(), 240 );
+
+        contentRange.rangeSpec.start = 100;
+        EXPECT_EQ( contentRange.toString(), "bytes 100-239/240" );
+        EXPECT_EQ( contentRange.rangeLength(), 140 );
+    }
+
+    {
+        nx_http::header::ContentRange contentRange;
+        contentRange.rangeSpec.start = 100;
+        contentRange.rangeSpec.end = 249;
+        EXPECT_EQ( contentRange.toString(), "bytes 100-249/*" );
+        EXPECT_EQ( contentRange.rangeLength(), 150 );
+    }
+
+    {
+        nx_http::header::ContentRange contentRange;
+        contentRange.rangeSpec.start = 100;
+        contentRange.rangeSpec.end = 249;
+        contentRange.instanceLength = 500;
+        EXPECT_EQ( contentRange.toString(), "bytes 100-249/500" );
+        EXPECT_EQ( contentRange.rangeLength(), 150 );
+    }
+
+    {
+        nx_http::header::ContentRange contentRange;
+        contentRange.rangeSpec.start = 100;
+        EXPECT_EQ( contentRange.toString(), "bytes 100-100/*" );
+        EXPECT_EQ( contentRange.rangeLength(), 1 );
+    }
+
+    {
+        nx_http::header::ContentRange contentRange;
+        contentRange.rangeSpec.start = 100;
+        contentRange.rangeSpec.end = 100;
+        EXPECT_EQ( contentRange.toString(), "bytes 100-100/*" );
+        EXPECT_EQ( contentRange.rangeLength(), 1 );
+    }
+}
+
 
 
 //////////////////////////////////////////////
