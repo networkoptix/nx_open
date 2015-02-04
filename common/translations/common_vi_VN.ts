@@ -17,119 +17,6 @@
     </message>
 </context>
 <context>
-    <name>Qee::Evaluator</name>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="722"/>
-        <source>Invalid stack size after program evaluation: %1.</source>
-        <translation>Kích thước ngăn xếp không hợp lệ sau khi đánh giá chương trình: %1.</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="764"/>
-        <source>Could not deduce result type for operation %1(&apos;%2&apos;, &apos;%3&apos;).</source>
-        <translation>Không thể suy luận kiểu kết quả hoạt động %1(&apos;%2&apos;, &apos;%3&apos;).</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="792"/>
-        <source>Invalid parameter type for operation %1(&apos;%2&apos;, &apos;%2&apos;)</source>
-        <translation>Kiểu tham số không hợp lệ cho hoạt động %1(&apos;%2&apos;, &apos;%2&apos;)</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="802"/>
-        <source>Could not deduce arithmetic supertype for type &apos;%1&apos;.</source>
-        <translation>Không thể suy luận siêu kiểu số học cho loại &apos;%1&apos;.</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="824"/>
-        <source>Invalid parameter type for operation %1(&apos;%2&apos;)</source>
-        <translation>Kiểu tham số không hợp lệ cho hoạt động %1(&apos;%2&apos;)</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="832"/>
-        <source>Argument number for %1 instruction has invalid type &apos;%2&apos;.</source>
-        <translation>Số lập luận cho %1 lệnh có loại không hợp lệ &apos;%2&apos;.</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="836"/>
-        <source>Argument number for %1 instruction is invalid.</source>
-        <translation>Số lập luận cho %1 hướng dẫn là không hợp lệ.</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="841"/>
-        <source>Stack underflow during execution of %1 instruction.</source>
-        <translation>Ngăn xếp underflow trong khi thì hành %1 hướng dẫn.</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="845"/>
-        <source>Function name for %1 instruction has invalid type &apos;%2&apos;.</source>
-        <translation>Tên chức năng cho %1 lệnh có loại không hợp lệ &apos;%2&apos;.</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="856"/>
-        <source>Function or variable &apos;%1&apos; is not defined.</source>
-        <translation>Chức năng hoặc biến &apos;%1&apos; không được định nghĩa.</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="862"/>
-        <source>Variable &apos;%1&apos; is not a function and cannot be called.</source>
-        <translation>biến số &apos;%1&apos; không phải là một chức năng và không thể được gọi.</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="874"/>
-        <source>Stack underflow during program evaluation.</source>
-        <translation>Ngăn xếp underflow trong đánh giá chương trình.</translation>
-    </message>
-</context>
-<context>
-    <name>Qee::Lexer</name>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="113"/>
-        <source>Unexpected symbol &apos;%1&apos; at position %2.</source>
-        <translation>Biểu tượng bất ngờ &apos;%1&apos; tại vị trí %2.</translation>
-    </message>
-</context>
-<context>
-    <name>Qee::ParameterPack</name>
-    <message>
-        <location filename="../src/utils/common/evaluator.h" line="185"/>
-        <location filename="../src/utils/common/evaluator.h" line="192"/>
-        <source>Parameter %2 is not specified for function &apos;%1&apos;.</source>
-        <translation>thông số %2 không được chỉ định cho các chức năng &apos;%1&apos;.</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.h" line="195"/>
-        <source>Parameter %2 of function &apos;%1&apos; is of type &apos;%3&apos;, but type &apos;%4&apos; was expected.</source>
-        <translation>thông số %2 chức năng &apos;%1&apos; là các loại &apos;%3&apos; nhưng gõ &apos;%4&apos; đã được dự kiến.</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.h" line="201"/>
-        <source>Function &apos;%1&apos; is expected to have %3 arguments, %2 provided.</source>
-        <translation>hàm số &apos;%1&apos; dự kiến sẽ có %3 đối số, %2 cung cấp.</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.h" line="206"/>
-        <source>Function &apos;%1&apos; is expected to have %3-%4 arguments, %2 provided.</source>
-        <translation>hàm số &apos;%1&apos; dự kiến sẽ có %3-%4 đối số, %2 cung cấp.</translation>
-    </message>
-</context>
-<context>
-    <name>Qee::Parser</name>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="179"/>
-        <source>Unexpected token %1 (&apos;%2&apos;) at position %3.</source>
-        <translation>thẻ bất ngờ %1 (&apos;%2&apos;) tại vị trí %3. </translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="236"/>
-        <source>Invalid color constant &apos;%1&apos;.</source>
-        <translation>Không đổi màu không hợp lệ &apos;%1&apos;.</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="281"/>
-        <source>Invalid number constant &apos;%1&apos;.</source>
-        <translation>Hằng số không hợp lệ &apos;%1&apos;.</translation>
-    </message>
-</context>
-<context>
     <name>QnAbstractStorageResource</name>
     <message>
         <location filename="../src/core/resource/abstract_storage_resource.cpp" line="107"/>
@@ -817,55 +704,55 @@ tham số:</translation>
 <context>
     <name>QnLicenseUsageHelper</name>
     <message numerus="yes">
-        <location filename="../src/utils/license_usage_helper.cpp" line="104"/>
+        <location filename="../src/utils/license_usage_helper.cpp" line="125"/>
         <source>%n %2 are used out of %1.</source>
         <translation>
             <numerusform>%n %2 được sử dụng trong tổng số %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/utils/license_usage_helper.cpp" line="114"/>
+        <location filename="../src/utils/license_usage_helper.cpp" line="135"/>
         <source>%n %2 will be used out of %1.</source>
         <translation>
             <numerusform>%n %2 sẽ được sử dụng trong tổng số %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/utils/license_usage_helper.cpp" line="123"/>
+        <location filename="../src/utils/license_usage_helper.cpp" line="144"/>
         <source>Activate %n more %2. </source>
         <translation>
             <numerusform>Kích hoạt %n hơn %2.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/utils/license_usage_helper.cpp" line="126"/>
+        <location filename="../src/utils/license_usage_helper.cpp" line="147"/>
         <source>%n more %2 will be used. </source>
         <translation>
             <numerusform>%n hơn %2 sẽ được sử dụng.</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/utils/license_usage_helper.cpp" line="217"/>
+        <location filename="../src/utils/license_usage_helper.cpp" line="252"/>
         <source>There was a problem activating your license key. Database error has occurred.</source>
         <translation>Có một vấn đề kích hoạt key bản quyền của bạn. Lỗi cơ sở dữ đã xảy ra.</translation>
     </message>
     <message>
-        <location filename="../src/utils/license_usage_helper.cpp" line="219"/>
+        <location filename="../src/utils/license_usage_helper.cpp" line="254"/>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
         <translation>Có một vấn đề kích hoạt key bản quyền của bạn. Dữ liệu không hợp lệ nhận được. Hãy liên hệ với nhóm hỗ trợ để báo cáo vấn đề.</translation>
     </message>
     <message>
-        <location filename="../src/utils/license_usage_helper.cpp" line="221"/>
+        <location filename="../src/utils/license_usage_helper.cpp" line="256"/>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.</source>
         <translation>Key bản quyền mà bạn đã nhập không hợp lệ. Hãy kiểm tra xem key bản quyền được nhập chính xác. Nếu vấn đề vẫn tiếp tục, vui lòng liên hệ với nhóm hỗ trợ để xác nhận nếu key bản quyền là hợp lệ hoặc để có được một chìa khóa giấy phép hợp lệ.</translation>
     </message>
     <message>
-        <location filename="../src/utils/license_usage_helper.cpp" line="224"/>
+        <location filename="../src/utils/license_usage_helper.cpp" line="259"/>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
         <translation>Bạn đang cố gắng để kích hoạt một giấy phép tương thích với phần mềm của bạn. Hãy liên hệ với nhóm hỗ trợ để có được một chìa khóa giấy phép hợp lệ.</translation>
     </message>
     <message>
-        <location filename="../src/utils/license_usage_helper.cpp" line="226"/>
+        <location filename="../src/utils/license_usage_helper.cpp" line="261"/>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to get a valid license key.</source>
         <translation>Key bản quyền này trước đó đã được kích hoạt cho phần cứng id {{}} HWID vào {{}} thời gian. Hãy liên hệ với nhóm hỗ trợ để có được một chìa khóa giấy phép hợp lệ.</translation>
     </message>
@@ -873,7 +760,7 @@ tham số:</translation>
 <context>
     <name>QnMediaServerResource</name>
     <message>
-        <location filename="../src/core/resource/media_server_resource.cpp" line="44"/>
+        <location filename="../src/core/resource/media_server_resource.cpp" line="43"/>
         <source>Server</source>
         <translation>máy chủ</translation>
     </message>
@@ -932,78 +819,78 @@ tham số:</translation>
 <context>
     <name>QnStreamQualityStrings</name>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="19"/>
+        <location filename="../src/core/resource/media_resource.cpp" line="32"/>
         <source>Lowest</source>
         <translation>thấp nhất (Ls)</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="20"/>
+        <location filename="../src/core/resource/media_resource.cpp" line="33"/>
         <source>Low</source>
         <translation>thấp (L)</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="21"/>
+        <location filename="../src/core/resource/media_resource.cpp" line="34"/>
         <source>Medium</source>
         <translation>trong (M)</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="22"/>
+        <location filename="../src/core/resource/media_resource.cpp" line="35"/>
         <source>High</source>
         <translation>cao (H)</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="23"/>
+        <location filename="../src/core/resource/media_resource.cpp" line="36"/>
         <source>Best</source>
         <translation>cao nhất (Hs)</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="24"/>
+        <location filename="../src/core/resource/media_resource.cpp" line="37"/>
         <source>Preset</source>
         <translation>Preset</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="25"/>
+        <location filename="../src/core/resource/media_resource.cpp" line="38"/>
         <source>Undefined</source>
         <translation>Không xác định</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="37"/>
+        <location filename="../src/core/resource/media_resource.cpp" line="50"/>
         <source>Lst</source>
         <extracomment>Short for &apos;Lowest&apos;</extracomment>
         <translation>Short cho thấp nhất Ls</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="40"/>
+        <location filename="../src/core/resource/media_resource.cpp" line="53"/>
         <source>Lo</source>
         <extracomment>Short for &apos;Low&apos;</extracomment>
         <translation>Short cho Low L</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="43"/>
+        <location filename="../src/core/resource/media_resource.cpp" line="56"/>
         <source>Me</source>
         <extracomment>Short for &apos;Medium&apos;</extracomment>
         <translation>Short cho vừa M</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="46"/>
+        <location filename="../src/core/resource/media_resource.cpp" line="59"/>
         <source>Hi</source>
         <extracomment>Short for &apos;High&apos;</extracomment>
         <translation>Short cho cao H</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="49"/>
+        <location filename="../src/core/resource/media_resource.cpp" line="62"/>
         <source>Bst</source>
         <extracomment>Short for &apos;Best&apos;</extracomment>
         <translation>Short cho tốt nhất Hs</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="52"/>
+        <location filename="../src/core/resource/media_resource.cpp" line="65"/>
         <source>Ps</source>
         <extracomment>Short for &apos;Preset&apos;</extracomment>
         <translation>Short cho đặt trước</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="55"/>
+        <location filename="../src/core/resource/media_resource.cpp" line="68"/>
         <source>-</source>
         <extracomment>Short for &apos;Undefined&apos;</extracomment>
         <translation>Short cho Không xác định</translation>
