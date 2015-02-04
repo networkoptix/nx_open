@@ -662,8 +662,15 @@ namespace ec2
             std::bind( &TimeSynchronizationManager::checkIfManualTimeServerSelectionIsRequired, this, _1 ),
             MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS );
 
-        if( m_systemTimeByPeer.empty() )
+        if( m_systemTimeByPeer.empty() ||
+            (m_usedTimeSyncInfo.timePriorityKey.flags & peerTimeSynchronizedWithInternetServer) > 0 ||
+            (m_localTimePriorityKey.flags & peerTimeSynchronizedWithInternetServer) > 0 )
+        {
+            //we know nothing about other peers. 
+            //Or we have time taken from the Internet, which means someone has connection to the Internet, 
+                //so no sense to ask user to select primary time server
             return;
+        }
 
         //map<priority flags, m_systemTimeByPeer iterator>
         std::multimap<unsigned int, std::map<QnUuid, TimeSyncInfo>::const_iterator, std::greater<unsigned int>> peersByTimePriorityFlags;

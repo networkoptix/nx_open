@@ -37,6 +37,9 @@ public:
 
     QnUuid whoIs(const QString &host, quint16 port) const;
 
+    QnRoutePoint enforcedConnection() const;
+    void setEnforcedConnection(const QnRoutePoint &enforcedConnection);
+
 signals:
     void connectionAdded(const QnUuid &discovererId, const QnUuid &peerId, const QString &host, quint16 port);
     void connectionRemoved(const QnUuid &discovererId, const QnUuid &peerId, const QString &host, quint16 port);
