@@ -70,6 +70,10 @@ angular.module('webadminApp', [
             templateUrl: 'views/log.html',
             controller: 'LogCtrl'
         })
+        .when('/log', {
+            templateUrl: 'views/log.html',
+            controller: 'LogCtrl'
+        })
         .otherwise({
             redirectTo: '/settings'
         });

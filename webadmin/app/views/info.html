@@ -39,8 +39,8 @@
 
 <h2>Log</h2>
 <blockquote>
-    <iframe class="log-frame" name="log-frame" src="/api/showLog?lines=7"></iframe>
+    <iframe class="log-frame" name="log-frame" ng-src="{{logUrl + '?lines=7'}}"></iframe>
 </blockquote>
-<a href="/api/showLog?lines=7" target="log-frame" id="refresh-log" class="btn btn-primary">Refresh</a>
+<a ng-href="{{logUrl +'?lines=7'}}"  target="log-frame" id="refresh-log" class="btn btn-primary">Refresh</a>
 <a href="#/log/" class="btn btn-default">More lines</a>
-<a href="/api/showLog?lines=1000" target="_blank" id="open-log" class="btn btn-default">Open in new window</a>
+<a ng-href="{{logUrl + '?lines=1000'}}" target="_blank" id="open-log" class="btn btn-default">Open in new window</a>
