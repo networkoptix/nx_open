@@ -43,8 +43,7 @@ void QnTimeImageFilter::initTimeDrawing(const CLVideoDecoderOutputPtr& frame, co
 {
     if (frame->width == m_timeImgSrcSiz.width() && frame->height == m_timeImgSrcSiz.height())
         return;
-    else
-        m_timeImgSrcSiz = QSize(frame->width, frame->height);
+    m_timeImgSrcSiz = QSize(frame->width, frame->height);
 
     m_timeFont.setBold(true);
     m_timeFont.setPixelSize(qMax(MIN_TEXT_HEIGHT, frame->height / TEXT_HEIGHT_IN_FRAME_PARTS ));
