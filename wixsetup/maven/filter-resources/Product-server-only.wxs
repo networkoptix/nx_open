@@ -275,8 +275,8 @@
         </Directory>
 
         <DirectoryRef Id="TARGETDIR">
-            <Merge Id="VCRedist90" SourceFile="MergeModules\Microsoft_VC90_CRT_$(var.archSuffix).msm" DiskId="1" Language="0"/>
-            <Merge Id="VCRedist90Policy" SourceFile="MergeModules\policy_9_0_Microsoft_VC90_CRT_$(var.archSuffix).msm" DiskId="1" Language="0"/>
+            <Merge Id="VCRedist90" SourceFile="MergeModules\Microsoft_VC90_CRT_${arch}.msm" DiskId="1" Language="0"/>
+            <Merge Id="VCRedist90Policy" SourceFile="MergeModules\policy_9_0_Microsoft_VC90_CRT_${arch}.msm" DiskId="1" Language="0"/>
             <Merge Id="VCRedist100" SourceFile="MergeModules\Microsoft_VC100_CRT_${arch}.msm" DiskId="1" Language="0"/>
             <Merge Id="VCRedist110" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC110_CRT_${arch}.msm" DiskId="1" Language="0"/>
             <?if ${build.configuration} = debug ?>

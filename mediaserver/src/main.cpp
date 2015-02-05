@@ -241,8 +241,7 @@ public:
 #else
             lit("INFO")
 #endif
-        ),
-        msgLogLevel( lit("none") )
+        )
     {
     }
 };
@@ -689,6 +688,11 @@ int serverMain(int argc, char *argv[])
     MSSettings::runTimeSettings()->remove("rebuild");
 
     initLog(cmdLineArguments.logLevel);
+
+    if( cmdLineArguments.msgLogLevel.isEmpty() )
+        cmdLineArguments.msgLogLevel = MSSettings::roSettings()->value(
+            nx_ms_conf::HTTP_MSG_LOG_LEVEL,
+            nx_ms_conf::DEFAULT_HTTP_MSG_LOG_LEVEL ).toString();
 
     if( cmdLineArguments.msgLogLevel != lit("none") )
         QnLog::instance(QnLog::HTTP_LOG_INDEX)->create(
@@ -1555,7 +1559,7 @@ void QnMain::run()
     }
     settings->remove(ADMIN_PSWD_HASH);
     settings->remove(ADMIN_PSWD_DIGEST);
-    settings->remove(LOW_PRIORITY_ADMIN_PASSWORD);
+    settings->setValue(LOW_PRIORITY_ADMIN_PASSWORD, "");
 
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
