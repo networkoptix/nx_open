@@ -241,8 +241,7 @@ public:
 #else
             lit("INFO")
 #endif
-        ),
-        msgLogLevel( lit("none") )
+        )
     {
     }
 };
@@ -689,6 +688,11 @@ int serverMain(int argc, char *argv[])
     MSSettings::runTimeSettings()->remove("rebuild");
 
     initLog(cmdLineArguments.logLevel);
+
+    if( cmdLineArguments.msgLogLevel.isEmpty() )
+        cmdLineArguments.msgLogLevel = MSSettings::roSettings()->value(
+            nx_ms_conf::HTTP_MSG_LOG_LEVEL,
+            nx_ms_conf::DEFAULT_HTTP_MSG_LOG_LEVEL ).toString();
 
     if( cmdLineArguments.msgLogLevel != lit("none") )
         QnLog::instance(QnLog::HTTP_LOG_INDEX)->create(
