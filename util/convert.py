@@ -3,7 +3,7 @@ import os
 import subprocess
 import threading
 
-defaultProfile = ""
+defaultProfile = "-d180"
 
 def convert(sourceFile, exportFile, profile):
     subprocess.call(['inkscape', sourceFile, '-e', exportFile] + profile.split())
