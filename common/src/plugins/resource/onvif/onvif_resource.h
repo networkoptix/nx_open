@@ -453,7 +453,6 @@ private:
     QString m_ptzProfileToken;
     QString m_ptzConfigurationToken;
     int m_timeDrift;
-    int m_prevSoapCallResult;
     std::vector<RelayOutputInfo> m_relayOutputInfo;
     std::map<QString, bool> m_relayInputStates;
     std::string m_deviceIOUrl;
@@ -461,8 +460,8 @@ private:
     mutable QMutex m_ioPortMutex;
     bool m_inputMonitored;
     EventMonitorType m_eventMonitorType;
-    quint64 m_timerID;
-    quint64 m_renewSubscriptionTaskID;
+    quint64 m_nextPullMessagesTimerID;
+    quint64 m_renewSubscriptionTimerID;
     int m_maxChannels;
     std::map<quint64, TriggerOutputTask> m_triggerOutputTasks;
     
@@ -476,6 +475,7 @@ private:
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> m_asyncPullMessagesCallWrapper;
 
     bool createPullPointSubscription();
+    void removePullPointSubscription();
     void pullMessages( quint64 timerID );
     void onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode);
     void onPullMessagesResponseReceived(
@@ -496,6 +496,7 @@ private:
         unsigned int autoResetTimeoutMS );
     CameraDiagnostics::Result fetchAndSetDeviceInformationPriv( bool performSimpleCheck );
     QnAbstractPtzController* createSpecialPtzController();
+    bool trustMaxFPS();
 
     mutable QMutex m_physicalParamsMutex;
     std::unique_ptr<QnOnvifImagingProxy> m_imagingParamsProxy;

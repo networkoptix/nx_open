@@ -50,8 +50,6 @@ public:
 private:
     virtual QnDbTransaction* getTransaction() override;
     void flushRecordsNoLock();
-    bool initializeBookmarksFtsTable();
-
     bool deleteRecordsInternal(const DeleteRecordInfo& delRecord);
     bool addRecordInternal(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk);
 

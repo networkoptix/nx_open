@@ -1,8 +1,6 @@
 TEMPLATE = app
 QT += xmlpatterns
 
-DEFINES += CL_FORCE_LOGO
-
 INCLUDEPATH +=  ${qt.dir}/include/QtWidgets/$$QT_VERSION/ \
                 ${qt.dir}/include/QtWidgets/$$QT_VERSION/QtWidgets/ \
                 ${qt.dir}/include/QtGui/$$QT_VERSION/ \

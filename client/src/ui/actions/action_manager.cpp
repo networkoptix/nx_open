@@ -543,7 +543,7 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Main Menu")).
         shortcut(tr("Alt+Space"), QnActionBuilder::Mac, true).
         autoRepeat(false).
-        icon(qnSkin->icon("titlebar/main_menu.png"));
+        icon(qnSkin->icon("main_menu/main_menu.png"));
 
     factory(Qn::OpenLoginDialogAction).
         flags(Qn::Main | Qn::GlobalHotkey).
@@ -568,8 +568,7 @@ QnActionManager::QnActionManager(QObject *parent):
         toggledText(tr("Stop Panic Recording")).
         autoRepeat(false).
         shortcut(tr("Ctrl+P")).
-//        icon(qnSkin->icon("titlebar/panic.png")).
-        //requiredPermissions(Qn::CurrentMediaServerResourcesRole, Qn::ReadWriteSavePermission).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         condition(new QnPanicActionCondition(this));
 
     factory().
@@ -1373,7 +1372,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ConnectToCurrentSystem).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
-        text(tr("Connect to the Current System...")).
+        text(tr("Merge to Currently Connected System...")).
         condition(new QnConjunctionActionCondition(
             new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::Any, this),
             new QnDisjunctionActionCondition(
@@ -1684,14 +1683,12 @@ QnActionManager::QnActionManager(QObject *parent):
         checked(true).
         autoRepeat(false);
 
-#ifdef QN_ENABLE_BOOKMARKS
     factory(Qn::ToggleBookmarksSearchAction).
         flags(Qn::GlobalHotkey).
         text(tr("Show Search Panel")).
         toggledText(tr("Hide Search Panel")).
         shortcut(tr("Ctrl+F")).
         autoRepeat(false);
-#endif
 }
 
 QnActionManager::~QnActionManager() {

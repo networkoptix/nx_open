@@ -58,10 +58,7 @@ namespace ec2
         QnDbManager();
         virtual ~QnDbManager();
 
-        bool init(
-            QnResourceFactory* factory,
-            const QString& dbFilePath,
-            const QString& dbFilePathStatic );
+        bool init(QnResourceFactory* factory, const QUrl& dbUrl);
         bool isInitialized() const;
 
         static QnDbManager* instance();
@@ -109,7 +106,7 @@ namespace ec2
         template <class T1, class T2>
         ErrorCode doQuery(const T1& t1, T2& t2)
         {
-            QReadLocker lock(&m_mutex);
+            QWriteLocker lock(&m_mutex);
             return doQueryNoLock(t1, t2);
         }
 
@@ -142,10 +139,10 @@ namespace ec2
         ErrorCode doQueryNoLock(const QnUuid& resId, ApiResourceStatusDataList& statusList);
 
         //getCameraUserAttributes
-        ErrorCode doQueryNoLock(const QnUuid& cameraId, ApiCameraAttributesDataList& cameraUserAttributesList);
+        ErrorCode doQueryNoLock(const QnUuid& serverId, ApiCameraAttributesDataList& cameraUserAttributesList);
 
         //getCamerasEx
-        ErrorCode doQueryNoLock(const QnUuid& cameraId, ApiCameraDataExList& cameraList);
+        ErrorCode doQueryNoLock(const QnUuid& serverId, ApiCameraDataExList& cameraList);
 
         //getServers
         ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiMediaServerDataList& serverList);
@@ -210,7 +207,8 @@ namespace ec2
         enum FilterType
         {
             RES_ID_FIELD,
-            RES_TYPE_FIELD
+            RES_TYPE_FIELD,
+            RES_PARENT_ID_FIELD
         };
 
         //!query filter
@@ -472,6 +470,10 @@ namespace ec2
         qint32 getResourceInternalId( const QnUuid& guid );
         QnUuid getResourceGuid(const qint32 &internalId);
         qint32 getBusinessRuleInternalId( const QnUuid& guid );
+    protected: 
+        virtual bool beforeInstallUpdate(const QString& updateName) override;
+        virtual bool afterInstallUpdate(const QString& updateName) override;
+
     private:
         class QnDbTransactionExt: public QnDbTransaction
         {
@@ -490,23 +492,23 @@ namespace ec2
         bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnUuid>& guids);
         bool updateResourceTypeGuids();
         bool updateGuids();
+        bool updateBusinessActionParameters();
         QnUuid getType(const QString& typeName);
         bool resyncTransactionLog();
         bool addStoredFiles(const QString& baseDirectoryName, int* count = 0);
 
         template <class ObjectType, class ObjectListType> 
         bool fillTransactionLogInternal(ApiCommand::Value command);
-        bool applyUpdates();
 
-        bool beforeInstallUpdate(const QString& updateName);
-        bool afterInstallUpdate(const QString& updateName);
         ErrorCode addCameraHistory(const ApiCameraServerItemData& params);
         ErrorCode removeCameraHistory(const ApiCameraServerItemData& params);
-        ErrorCode getScheduleTasks(const QnUuid& cameraId, std::vector<ApiScheduleTaskWithRefData>& scheduleTaskList);
+        ErrorCode getScheduleTasks(const QnUuid& serverId, std::vector<ApiScheduleTaskWithRefData>& scheduleTaskList);
         void addResourceTypesFromXML(ApiResourceTypeDataList& data);
         void loadResourceTypeXML(const QString& fileName, ApiResourceTypeDataList& data);
         bool removeServerStatusFromTransactionLog();
         bool tuneDBAfterOpen();
+        bool updateCameraHistoryGuids();
+        bool migrateServerGUID(const QString& table, const QString& field);
     private:
         QnResourceFactory* m_resourceFactory;
         QnUuid m_storageTypeId;
@@ -530,6 +532,7 @@ namespace ec2
         bool m_needResyncLicenses;
         bool m_needResyncFiles;
         bool m_dbJustCreated;
+        bool m_isBackupRestore;
     };
 };
 

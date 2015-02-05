@@ -20,7 +20,6 @@
 #include <core/resource_management/resource_pool.h>
 
 #include "mustache/mustache_helper.h"
-#include "mustache/partial_info.h"
 
 #include <utils/common/synctime.h>
 #include <utils/common/email.h>
@@ -49,6 +48,73 @@ namespace {
     const QString tpScreenshot(lit("screenshot.jpeg"));
 };
 
+struct QnEmailAttachmentData {
+
+    QnEmailAttachmentData(QnBusiness::EventType eventType) {
+        switch (eventType) {
+        case QnBusiness::CameraMotionEvent:
+            templatePath = lit(":/email_templates/camera_motion.mustache");
+            imageName = lit("camera.png");
+            imagePath = lit(":/skin/email_attachments/camera.png");
+            break;
+        case QnBusiness::CameraInputEvent:
+            templatePath = lit(":/email_templates/camera_input.mustache");
+            imageName = lit("camera.png");
+            imagePath = lit(":/skin/email_attachments/camera.png");
+            break;
+        case QnBusiness::CameraDisconnectEvent:
+            templatePath = lit(":/email_templates/camera_disconnect.mustache");
+            imageName = lit("camera.png");
+            imagePath = lit(":/skin/email_attachments/camera.png");
+            break;
+        case QnBusiness::StorageFailureEvent:
+            templatePath = lit(":/email_templates/storage_failure.mustache");
+            imageName = lit("storage.png");
+            imagePath = lit(":/skin/email_attachments/storage.png");
+            break;
+        case QnBusiness::NetworkIssueEvent:
+            templatePath = lit(":/email_templates/network_issue.mustache");
+            imageName = lit("server.png");
+            imagePath = lit(":/skin/email_attachments/server.png");
+            break;
+        case QnBusiness::CameraIpConflictEvent:
+            templatePath = lit(":/email_templates/camera_ip_conflict.mustache");
+            imageName = lit("camera.png");
+            imagePath = lit(":/skin/email_attachments/camera.png");
+            break;
+        case QnBusiness::ServerFailureEvent:
+            templatePath = lit(":/email_templates/mediaserver_failure.mustache");
+            imageName = lit("server.png");
+            imagePath = lit(":/skin/email_attachments/server.png");
+            break;
+        case QnBusiness::ServerConflictEvent:
+            templatePath = lit(":/email_templates/mediaserver_conflict.mustache");
+            imageName = lit("server.png");
+            imagePath = lit(":/skin/email_attachments/server.png");
+            break;
+        case QnBusiness::ServerStartEvent:
+            templatePath = lit(":/email_templates/mediaserver_started.mustache");
+            imageName = lit("server.png");
+            imagePath = lit(":/skin/email_attachments/server.png");
+            break;
+        case QnBusiness::LicenseIssueEvent:
+            templatePath = lit(":/email_templates/license_issue.mustache");
+            imageName = lit("license.png");
+            imagePath = lit(":/skin/email_attachments/server.png");
+            break;
+        default:
+            Q_ASSERT_X(false, Q_FUNC_INFO, "All cases must be implemented.");
+            break;
+        }
+
+        Q_ASSERT_X(!templatePath.isEmpty() && !imageName.isEmpty() && !imagePath.isEmpty(), Q_FUNC_INFO, "Template path must be filled");
+    }
+
+    QString templatePath;
+    QString imageName;
+    QString imagePath;
+};
+
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
 
 QnBusinessRuleProcessor::QnBusinessRuleProcessor():
@@ -56,6 +122,11 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor():
 {
     connect(qnBusinessMessageBus, &QnBusinessMessageBus::actionDelivered, this, &QnBusinessRuleProcessor::at_actionDelivered);
     connect(qnBusinessMessageBus, &QnBusinessMessageBus::actionDeliveryFail, this, &QnBusinessRuleProcessor::at_actionDeliveryFailed);
+
+    connect(qnResPool, &QnResourcePool::resourceAdded,
+        this, [this](const QnResourcePtr& resource) { toggleInputPortMonitoring( resource, true ); });
+    connect(qnResPool, &QnResourcePool::resourceRemoved,
+        this, [this](const QnResourcePtr& resource) { toggleInputPortMonitoring( resource, false ); });
 
     connect(qnBusinessMessageBus, &QnBusinessMessageBus::actionReceived,
         this, static_cast<void (QnBusinessRuleProcessor::*)(const QnAbstractBusinessActionPtr&)>(&QnBusinessRuleProcessor::executeAction));
@@ -460,8 +531,8 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
     //QMutexLocker lk( &m_mutex );  m_mutex is locked down the stack
 
     //aggregating by recipients and eventtype
-    if( action->getRuntimeParams().getEventType() != QnBusiness::CameraDisconnectEvent &&
-        action->getRuntimeParams().getEventType() != QnBusiness::NetworkIssueEvent )
+    if( action->getRuntimeParams().eventType != QnBusiness::CameraDisconnectEvent &&
+        action->getRuntimeParams().eventType != QnBusiness::NetworkIssueEvent )
     {
         return sendMailInternal( action, 1 );  //currently, aggregating only cameraDisconnected and networkIssue events
     }
@@ -473,7 +544,7 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
             recipients << email;
     }
 
-    SendEmailAggregationKey aggregationKey( action->getRuntimeParams().getEventType(), recipients.join(';') );
+    SendEmailAggregationKey aggregationKey( action->getRuntimeParams().eventType, recipients.join(';') );
     SendEmailAggregationData& aggregatedData = m_aggregatedEmails[aggregationKey];
     if( !aggregatedData.action )
     {
@@ -545,23 +616,19 @@ bool QnBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPt
 
 
     QVariantHash contextMap = QnBusinessStringsHelper::eventDescriptionMap(action, action->aggregationInfo(), true);
-    QnPartialInfo partialInfo(action->getRuntimeParams().getEventType());
-
-    assert(!partialInfo.attrName.isEmpty());
-//    contextMap[partialInfo.attrName] = lit("true");
+    QnEmailAttachmentData attachmentData(action->getRuntimeParams().eventType);
 
     QnEmailSettings emailSettings = QnGlobalSettings::instance()->emailSettings();
 
     QnEmailAttachmentList attachments;
     attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
-    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(partialInfo.eventLogoFilename, lit(":/skin/email_attachments/") + partialInfo.eventLogoFilename, tpImageMimeType)));
+    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(attachmentData.imageName, attachmentData.imagePath, tpImageMimeType)));
     contextMap[tpProductLogoFilename] = lit("cid:") + tpProductLogo;
-    contextMap[tpEventLogoFilename] = lit("cid:") + partialInfo.eventLogoFilename;
+    contextMap[tpEventLogoFilename] = lit("cid:") + attachmentData.imageName;
     contextMap[tpCompanyName] = QnAppInfo::organizationName();
     contextMap[tpCompanyUrl] = QnAppInfo::companyUrl();
     contextMap[tpSupportEmail] = emailSettings.supportEmail;
     contextMap[tpSystemName] = emailSettings.signature;
-    attachments.append(partialInfo.attachments);
 
     QByteArray screenshotData = this->getEventScreenshotEncoded(action->getRuntimeParams(), QSize(640, 480));
     if (!screenshotData.isNull()) {
@@ -570,7 +637,7 @@ bool QnBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPt
         contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
     }
 
-    QString messageBody = renderTemplateFromFile(lit(":/email_templates"), partialInfo.attrName + lit(".mustache"), contextMap);
+    QString messageBody = renderTemplateFromFile(attachmentData.templatePath, contextMap);
 
     ec2::ApiEmailData data(
         recipients,
@@ -663,6 +730,34 @@ void QnBusinessRuleProcessor::at_businessRuleReset(const QnBusinessEventRuleList
     }
 }
 
+void QnBusinessRuleProcessor::toggleInputPortMonitoring(const QnResourcePtr& resource, bool toggle)
+{
+    QMutexLocker lock(&m_mutex);
+
+    QnSecurityCamResource* camResource = dynamic_cast<QnSecurityCamResource*>(resource.data());
+    if( camResource == nullptr )
+        return;
+
+    for( const QnBusinessEventRulePtr& rule: m_rules )
+    {
+        if( rule->isDisabled() )
+            continue;
+
+        if( rule->eventType() == QnBusiness::CameraInputEvent)
+        {
+            QnVirtualCameraResourceList resList = rule->eventResourceObjects().filtered<QnVirtualCameraResource>();
+            if( resList.isEmpty() ||            //listening all cameras
+                resList.contains(resource.staticCast<QnVirtualCameraResource>()) )
+            {
+                if( toggle )
+                    camResource->inputPortListenerAttached();
+                else
+                    camResource->inputPortListenerDetached();
+            }
+        }
+    }
+}
+
 void QnBusinessRuleProcessor::terminateRunningRule(const QnBusinessEventRulePtr& rule)
 {
     QString ruleId = rule->getUniqueId();
@@ -720,39 +815,31 @@ void QnBusinessRuleProcessor::notifyResourcesAboutEventIfNeccessary( const QnBus
     {
         if( businessRule->eventType() == QnBusiness::CameraInputEvent)
         {
-            QnResourceList resList = businessRule->eventResourceObjects();
-            if (resList.isEmpty()) {
-                const QnResourcePtr& mServer = qnResPool->getResourceById(qnCommon->moduleGUID());
-                resList = qnResPool->getAllCameras(mServer, true);
-            }
+            QnVirtualCameraResourceList resList = businessRule->eventResourceObjects().filtered<QnVirtualCameraResource>();
+            if (resList.isEmpty())
+                resList = qnResPool->getAllCameras(QnResourcePtr(), true);
 
-            for( QnResourceList::const_iterator it = resList.constBegin(); it != resList.constEnd(); ++it )
+            for(const QnVirtualCameraResourcePtr camera: resList)
             {
-                QnSecurityCamResource* securityCam = dynamic_cast<QnSecurityCamResource*>(it->data());
-                if( !securityCam )
-                    continue;
                 if( isRuleAdded )
-                    securityCam->inputPortListenerAttached();
+                    camera->inputPortListenerAttached();
                 else
-                    securityCam->inputPortListenerDetached();
+                    camera->inputPortListenerDetached();
             }
         }
     }
 
     //notifying resources about recording action
     {
-        const QnResourceList& resList = businessRule->actionResourceObjects();
+        QnVirtualCameraResourceList resList = businessRule->actionResourceObjects().filtered<QnVirtualCameraResource>();
         if( businessRule->actionType() == QnBusiness::CameraRecordingAction)
         {
-            for( QnResourceList::const_iterator it = resList.begin(); it != resList.end(); ++it )
+            for(const QnVirtualCameraResourcePtr camera: resList)
             {
-                QnSecurityCamResource* securityCam = dynamic_cast<QnSecurityCamResource*>(it->data());
-                if( !securityCam )
-                    continue;
                 if( isRuleAdded )
-                    securityCam->recordingEventAttached();
+                    camera->recordingEventAttached();
                 else
-                    securityCam->recordingEventDetached();
+                    camera->recordingEventDetached();
             }
         }
     }

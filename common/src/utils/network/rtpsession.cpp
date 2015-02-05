@@ -396,7 +396,7 @@ RTPSession::RTPSession():
 
 RTPSession::~RTPSession()
 {
-    m_tcpSock->close();
+    stop();
     delete [] m_responseBuffer;
 
     delete[] m_additionalReadBuffer;
@@ -639,7 +639,7 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
     QByteArray response;
     if( !sendRequestAndReceiveResponse( createDescribeRequest(), response ) )
     {
-        m_tcpSock->close();
+        stop();
         return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(url, destinationPort);
     }
 
@@ -660,17 +660,17 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
             break;
         case CL_HTTP_AUTH_REQUIRED:
         case nx_http::StatusCode::proxyAuthenticationRequired:
-            m_tcpSock->close();
+            stop();
             return CameraDiagnostics::NotAuthorisedResult( url );
         default:
-            m_tcpSock->close();
+            stop();
             return CameraDiagnostics::RequestFailedResult( lit("DESCRIBE %1").arg(url), m_reasonPhrase );
     }
 
     int sdp_index = response.indexOf(QLatin1String("\r\n\r\n"));
 
     if (sdp_index  < 0 || sdp_index+4 >= response.size()) {
-        m_tcpSock->close();
+        stop();
         return CameraDiagnostics::NoMediaTrackResult( url );
     }
 
@@ -678,7 +678,7 @@ CameraDiagnostics::Result RTPSession::open(const QString& url, qint64 startTime)
     parseSDP();
 
     if (m_sdpTracks.size()<=0) {
-        m_tcpSock->close();
+        stop();
         result = CameraDiagnostics::NoMediaTrackResult( url );
     }
 
@@ -704,8 +704,7 @@ RTPSession::TrackMap RTPSession::play(qint64 positionStart, qint64 positionEnd, 
 
 bool RTPSession::stop()
 {
-    //delete m_tcpSock;
-    //m_tcpSock = 0;
+    QMutexLocker lock(&m_sockMutex);
     m_tcpSock->close();
     return true;
 }
@@ -776,18 +775,24 @@ nx_http::Request RTPSession::createDescribeRequest()
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
     request.headers.insert( nx_http::HttpHeader( "Accept", "application/sdp" ) );
-    addAuth( &request );
     if( (quint64)m_openedTime != AV_NOPTS_VALUE )
         addRangeHeader( &request, m_openedTime, AV_NOPTS_VALUE );
+    addAdditionAttrs( &request );
     return request;
+}
+
+bool RTPSession::sendRequestInternal(nx_http::Request&& request)
+{
+    addAuth(&request);
+    addAdditionAttrs(&request);
+    QByteArray requestBuf;
+    request.serialize( &requestBuf );
+    return m_tcpSock->send(requestBuf.constData(), requestBuf.size()) > 0;
 }
 
 bool RTPSession::sendDescribe()
 {
-    const nx_http::Request& request = createDescribeRequest();
-    QByteArray requestBuf;
-    request.serialize( &requestBuf );
-    return m_tcpSock->send(requestBuf.constData(), requestBuf.size()) > 0;
+    return sendRequestInternal(createDescribeRequest());
 }
 
 bool RTPSession::sendOptions()
@@ -798,11 +803,7 @@ bool RTPSession::sendOptions()
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
-    addAuth( &request );
-
-    QByteArray requestBuf;
-    request.serialize( &requestBuf );
-    return m_tcpSock->send(requestBuf.constData(), requestBuf.size()) > 0;
+    return sendRequestInternal(std::move(request));
 }
 
 int RTPSession::getTrackCount(TrackType trackType) const
@@ -957,7 +958,6 @@ bool RTPSession::sendSetup()
         request.requestLine.version = nx_rtsp::rtsp_1_0;
         request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
         request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
-        addAuth( &request );
 
         {   //generating transport header
             nx_http::StringType transportStr = "RTP/AVP/";
@@ -1078,14 +1078,9 @@ bool RTPSession::sendSetParameter( const QByteArray& paramName, const QByteArray
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
-    addAuth( &request );
     request.headers.insert( nx_http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
     request.headers.insert( nx_http::HttpHeader( "Content-Length", QByteArray::number(request.messageBody.size()) ) );
-    addAdditionAttrs( &request );
-
-    QByteArray requestBuf;
-    request.serialize( &requestBuf );
-    return m_tcpSock->send(requestBuf.constData(), requestBuf.size()) > 0;
+    return sendRequestInternal(std::move(request));
 }
 
 void RTPSession::addRangeHeader( nx_http::Request* const request, qint64 startPos, qint64 endPos )
@@ -1125,7 +1120,6 @@ nx_http::Request RTPSession::createPlayRequest( qint64 startPos, qint64 endPos )
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
-    addAuth( &request );
     request.headers.insert( nx_http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
     addRangeHeader( &request, startPos, endPos );
     request.headers.insert( nx_http::HttpHeader( "Scale", QByteArray::number(m_scale) ) );
@@ -1134,17 +1128,12 @@ nx_http::Request RTPSession::createPlayRequest( qint64 startPos, qint64 endPos )
         request.headers.insert( nx_http::HttpHeader( "x-play-now", "true" ) );
         request.headers.insert( nx_http::HttpHeader( "x-guid", getGuid() ) );
     }
-    addAdditionAttrs( &request );
     return request;
 }
 
 bool RTPSession::sendPlayInternal(qint64 startPos, qint64 endPos)
 {
-    nx_http::Request request = createPlayRequest( startPos, endPos );
-
-    QByteArray requestBuf;
-    request.serialize( &requestBuf );
-    return m_tcpSock->send( requestBuf.constData(), requestBuf.size() ) > 0;
+    return sendRequestInternal(createPlayRequest( startPos, endPos ));
 }
 
 bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
@@ -1156,7 +1145,7 @@ bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
     nx_http::Request request = createPlayRequest( startPos, endPos );
     if( !sendRequestAndReceiveResponse( std::move(request), response ) )
     {
-        m_tcpSock->close();
+        stop();
         return false;
     }
 
@@ -1197,11 +1186,7 @@ bool RTPSession::sendPause()
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
     request.headers.insert( nx_http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
-    addAuth( &request );
-
-    QByteArray requestBuf;
-    request.serialize( &requestBuf );
-    return m_tcpSock->send(requestBuf.constData(), requestBuf.size()) > 0;
+    return sendRequestInternal(std::move(request));
 }
 
 bool RTPSession::sendTeardown()
@@ -1213,11 +1198,7 @@ bool RTPSession::sendTeardown()
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
     request.headers.insert( nx_http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
-    addAuth( &request );
-
-    QByteArray requestBuf;
-    request.serialize( &requestBuf );
-    return m_tcpSock->send(requestBuf.constData(), requestBuf.size()) > 0;
+    return sendRequestInternal(std::move(request));
 }
 
 static const int RTCP_SENDER_REPORT = 200;
@@ -1336,11 +1317,7 @@ bool RTPSession::sendKeepAlive()
     request.headers.insert( nx_http::HttpHeader( "CSeq", QByteArray::number(m_csec++) ) );
     request.headers.insert( nx_http::parseHeader(nx::Buffer(USER_AGENT_STR)) );
     request.headers.insert( nx_http::HttpHeader( "Session", m_SessionId.toLatin1() ) );
-    addAuth( &request );
-
-    QByteArray requestBuf;
-    request.serialize( &requestBuf );
-    return m_tcpSock->send(requestBuf.constData(), requestBuf.size()) > 0;
+    return sendRequestInternal(std::move(request));
 }
 
 void RTPSession::sendBynaryResponse(quint8* buffer, int size)
@@ -1691,6 +1668,11 @@ void RTPSession::setAudioEnabled(bool value)
     m_isAudioEnabled = value;
 }
 
+bool RTPSession::isAudioEnabled() const
+{
+    return m_isAudioEnabled;
+}
+
 void RTPSession::setProxyAddr(const QString& addr, int port)
 {
     m_proxyAddr = addr;
@@ -1766,6 +1748,7 @@ bool RTPSession::sendRequestAndReceiveResponse( nx_http::Request&& request, QByt
     int prevStatusCode = nx_http::StatusCode::ok;
 
     addAuth( &request );
+    addAdditionAttrs( &request );
 
     for( int i = 0; i < 3; ++i )    //needed to avoid infinite loop in case of incorrect server behavour
     {

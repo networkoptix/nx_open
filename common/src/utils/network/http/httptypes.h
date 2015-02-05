@@ -83,6 +83,7 @@ namespace nx_http
         \return iterator of added element
     */
     HttpHeaders::iterator insertOrReplaceHeader( HttpHeaders* const headers, const HttpHeader& newHeader );
+    HttpHeaders::iterator insertHeader( HttpHeaders* const headers, const HttpHeader& newHeader );
 
     void removeHeader( HttpHeaders* const headers, const StringType& headerName );
 
@@ -421,7 +422,7 @@ namespace nx_http
             const Authorization& operator=( const Authorization& );
         };
 
-        //!Convient class for generating Authorization header with Basic authentication method
+        //!Convenient class for generating Authorization header with Basic authentication method
         class BasicAuthorization
         :
             public Authorization
@@ -465,27 +466,26 @@ namespace nx_http
             nx_http::StringType m_strValue;
         };
 
+        /*!
+            \note Boundaries are inclusive
+        */
+        class RangeSpec
+        {
+        public:
+            quint64 start;
+            boost::optional<quint64> end;
+
+            RangeSpec()
+            :
+                start( 0 )
+            {
+            }
+        };
+
         //![rfc2616, 14.35]
         class Range
         {
         public:
-            /*!
-                \note Boundaries are inclusive
-            */
-            class RangeSpec
-            {
-            public:
-                quint64 start;
-                boost::optional<quint64> end;
-
-                RangeSpec()
-                :
-                    start( 0 )
-                {
-                }
-            };
-
-
             Range();
 
             /*!
@@ -503,6 +503,21 @@ namespace nx_http
             quint64 totalRangeLength( size_t contentSize ) const;
 
             std::vector<RangeSpec> rangeSpecList;
+        };
+
+        //![rfc2616, 14.16]
+        class ContentRange
+        {
+        public:
+            //!By default, bytes
+            StringType unitName;
+            boost::optional<quint64> instanceLength;
+            RangeSpec rangeSpec;
+
+            ContentRange();
+
+            quint64 rangeLength() const;
+            StringType toString() const;
         };
 
         //![rfc2616, 14.45]

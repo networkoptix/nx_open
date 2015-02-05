@@ -70,6 +70,7 @@ void QnIncompatibleServerWatcher::start() {
     connect(QnGlobalModuleFinder::instance(),   &QnGlobalModuleFinder::peerLost,    this,   &QnIncompatibleServerWatcher::at_peerLost);
     connect(qnResPool,                          &QnResourcePool::resourceAdded,     this,   &QnIncompatibleServerWatcher::at_resourcePool_resourceChanged);
     connect(qnResPool,                          &QnResourcePool::resourceChanged,   this,   &QnIncompatibleServerWatcher::at_resourcePool_resourceChanged);
+    connect(qnResPool,                          &QnResourcePool::statusChanged,     this,   &QnIncompatibleServerWatcher::at_resourcePool_resourceChanged);
 
     /* fill resource pool with already found modules */
     foreach (const QnModuleInformation &moduleInformation, QnGlobalModuleFinder::instance()->foundModules())
@@ -159,8 +160,15 @@ void QnIncompatibleServerWatcher::at_resourcePool_resourceChanged(const QnResour
     }
 
     Qn::ResourceStatus status = server->getStatus();
-    if (status != Qn::Offline && server->getModuleInformation().isCompatibleToCurrentSystem())
+    if (status != Qn::Offline && server->getModuleInformation().isCompatibleToCurrentSystem()) {
         removeResource(getFakeId(id));
+    } else if (status == Qn::Offline) {
+        if (QnGlobalModuleFinder::instance()) {
+            QnModuleInformation moduleInformation = QnGlobalModuleFinder::instance()->moduleInformation(id);
+            if (!moduleInformation.id.isNull())
+                at_peerChanged(moduleInformation);
+        }
+    }
 }
 
 void QnIncompatibleServerWatcher::removeResource(const QnUuid &id) {

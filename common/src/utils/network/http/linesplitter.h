@@ -29,6 +29,18 @@ namespace nx_http
             const ConstBufferRefType& data,
             QnByteArrayConstRef* const lineBuffer,
             size_t* const bytesRead );
+        /*!
+            Since this class allows CR, LF or CRLF line ending, it is possible that line, 
+            actually terminated with CRLF will be found after CR only (if CR and LF come in different buffers).
+            This method will read that trailing LF.
+            \note This method is needed if we do not want to call parseByLines anymore. 
+                E.g. we have read all HTTP headers and starting to read message body. 
+                Call this method to read trailing LF
+        */
+        void finishCurrentLineEnding(
+            const ConstBufferRefType& data,
+            size_t* const bytesRead );
+        //!Resets parser state
         void reset();
 
     private:

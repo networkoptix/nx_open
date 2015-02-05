@@ -14,7 +14,8 @@ QnImageFilterHelper::QnImageFilterHelper():
     m_customAR(0.0),
     m_rotAngle(0),
     m_timestampCorner(Qn::NoCorner),
-    m_onscreenDateOffset(0)
+    m_onscreenDateOffset(0),
+    m_timeMs(0)
 {
 }
 
@@ -49,10 +50,11 @@ void QnImageFilterHelper::setContrastParams(const ImageCorrectionParams& params)
     m_contrastParams = params;
 }
 
-void QnImageFilterHelper::setTimeCorner(Qn::Corner corner, qint64 onscreenDateOffset)
+void QnImageFilterHelper::setTimeCorner(Qn::Corner corner, qint64 onscreenDateOffset, qint64 timeMsec)
 {
     m_timestampCorner = corner;
     m_onscreenDateOffset = onscreenDateOffset;
+    m_timeMs = timeMsec;
 }
 
 bool QnImageFilterHelper::isEmpty() const
@@ -112,7 +114,7 @@ QList<QnAbstractImageFilterPtr> QnImageFilterHelper::createFilterChain(const QSi
         result << QnAbstractImageFilterPtr(new QnRotateImageFilter(m_rotAngle));
 
     if (m_timestampCorner != Qn::NoCorner) 
-        result << QnAbstractImageFilterPtr(new QnTimeImageFilter(m_layout, m_timestampCorner, m_onscreenDateOffset));
+        result << QnAbstractImageFilterPtr(new QnTimeImageFilter(m_layout, m_timestampCorner, m_onscreenDateOffset, m_timeMs));
 
     return result;
 }

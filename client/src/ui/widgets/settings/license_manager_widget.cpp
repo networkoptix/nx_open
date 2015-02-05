@@ -37,8 +37,6 @@
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     base_type(parent),
     ui(new Ui::LicenseManagerWidget),
-    m_camerasUsageHelper(new QnCamLicenseUsageHelper()),
-    m_videowallUsageHelper(new QnVideoWallLicenseUsageHelper()),
     m_httpClient(NULL)
 {
     ui->setupUi(this);
@@ -64,13 +62,21 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
 
     connect(ui->detailsButton,                  SIGNAL(clicked()),                                                  this,   SLOT(at_licenseDetailsButton_clicked()));
     connect(ui->removeButton,                   SIGNAL(clicked()),                                                  this,   SLOT(at_removeButton_clicked()));
-    connect(qnLicensePool,                      SIGNAL(licensesChanged()),                                          this,   SLOT(updateLicenses()));
     connect(ui->gridLicenses->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),   this,   SLOT(updateDetailsButtonEnabled()));
     connect(ui->gridLicenses,                   SIGNAL(doubleClicked(const QModelIndex &)),                         this,   SLOT(at_gridLicenses_doubleClicked(const QModelIndex &)));
     connect(ui->licenseWidget,                  SIGNAL(stateChanged()),                                             this,   SLOT(at_licenseWidget_stateChanged()));
     connect(this,                               SIGNAL(showMessageLater(QString,QString,bool)),                     this,   SLOT(showMessage(QString,QString,bool)), Qt::QueuedConnection);
-    connect(m_camerasUsageHelper,               &QnLicenseUsageHelper::licensesChanged,                             this,   &QnLicenseManagerWidget::updateLicenses);
-    connect(m_videowallUsageHelper,             &QnLicenseUsageHelper::licensesChanged,                             this,   &QnLicenseManagerWidget::updateLicenses);
+
+    auto updateLicensesIfNeeded = [this] {
+        if (!isVisible())
+            return;
+        updateLicenses();
+    };
+
+    QnCamLicenseUsageWatcher* camerasUsageWatcher = new QnCamLicenseUsageWatcher(this);
+    QnVideoWallLicenseUsageWatcher* videowallUsageWatcher = new QnVideoWallLicenseUsageWatcher(this);
+    connect(camerasUsageWatcher,              &QnLicenseUsageWatcher::licenseUsageChanged,                        this,   updateLicensesIfNeeded);
+    connect(videowallUsageWatcher,            &QnLicenseUsageWatcher::licenseUsageChanged,                        this,   updateLicensesIfNeeded);
 
     updateLicenses();
 }
@@ -113,16 +119,18 @@ void QnLicenseManagerWidget::updateLicenses() {
 
         QString msg(tr("The software is licensed to: "));
 
+        QnCamLicenseUsageHelper camUsageHelper;
+        QnVideoWallLicenseUsageHelper vwUsageHelper;
         QList<QnLicenseUsageHelper*> helpers;
         helpers 
-            << m_camerasUsageHelper.data()
-            << m_videowallUsageHelper.data()
+            << &camUsageHelper
+            << &vwUsageHelper
             ;
 
         foreach (QnLicenseUsageHelper* helper, helpers) {
             foreach (Qn::LicenseType lt, helper->licenseTypes()) {
-                if (helper->totalLicense(lt) > 0)
-                    msg += tr("\n%1 %2").arg(helper->totalLicense(lt)).arg(QnLicense::longDisplayName(lt));
+                if (helper->totalLicenses(lt) > 0)
+                    msg += tr("\n%1 %2").arg(helper->totalLicenses(lt)).arg(QnLicense::longDisplayName(lt));
             }
         }
 
@@ -131,14 +139,14 @@ void QnLicenseManagerWidget::updateLicenses() {
             {
                 useRedLabel = true;
                 foreach (Qn::LicenseType lt, helper->licenseTypes()) {
-                    if (helper->usedLicense(lt) > 0)
-                        msg += tr("\nAt least %n %2 are required", "", helper->usedLicense(lt)).arg(QnLicense::longDisplayName(lt));
+                    if (helper->usedLicenses(lt) > 0)
+                        msg += tr("\nAt least %n %2 are required", "", helper->usedLicenses(lt)).arg(QnLicense::longDisplayName(lt));
                 }
             }
             else {
                 foreach (Qn::LicenseType lt, helper->licenseTypes()) {
-                    if (helper->usedLicense(lt) > 0)
-                        msg += tr("\n%n %2 are currently in use", "", helper->usedLicense(lt)).arg(QnLicense::longDisplayName(lt));
+                    if (helper->usedLicenses(lt) > 0)
+                        msg += tr("\n%n %2 are currently in use", "", helper->usedLicenses(lt)).arg(QnLicense::longDisplayName(lt));
                 }
             }
         }

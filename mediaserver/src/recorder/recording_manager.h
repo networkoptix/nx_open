@@ -59,28 +59,43 @@ private slots:
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);
     void onTimer();
-    void at_camera_statusChanged(const QnResourcePtr &resource);
+    void at_camera_initializationChanged(const QnResourcePtr &resource);
     void at_camera_resourceChanged(const QnResourcePtr &resource);
-    void at_camera_initAsyncFinished(const QnResourcePtr &resource, bool state);
     void at_checkLicenses();
+    void at_historyMutexLocked();
+    void at_historyMutexTimeout();
 private:
     void updateCamera(const QnSecurityCamResourcePtr& camera);
 
     QnServerStreamRecorder* createRecorder(const QnResourcePtr &res, QnVideoCamera* camera, QnServer::ChunksCatalog catalog);
     bool startOrStopRecording(const QnResourcePtr& res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes);
     bool isResourceDisabled(const QnResourcePtr& res) const;
-    QnResourceList getLocalControlledCameras();
+    QnVirtualCameraResourceList getLocalControlledCameras() const;
 
     void beforeDeleteRecorder(const Recorders& recorders);
     void stopRecorder(const Recorders& recorders);
     void deleteRecorder(const Recorders& recorders, const QnResourcePtr& resource);
-    bool updateCameraHistory(const QnResourcePtr& res);
+    void updateCameraHistory(const QnResourcePtr& res);
 
     void at_licenseMutexLocked();
     void at_licenseMutexTimeout();
 private:
+    struct LockData 
+    {
+        LockData(LockData&& other);
+        LockData();
+        LockData(ec2::QnDistributedMutex* mutex, QnVirtualCameraResourcePtr cameraResource, qint64 currentTime);
+        ~LockData();
+
+        ec2::QnDistributedMutex* mutex;
+        QnVirtualCameraResourcePtr cameraResource;
+        qint64 currentTime;
+    private:
+        LockData(const LockData& other);
+    };
+    std::map<QString, LockData> m_lockInProgress;
+
     mutable QMutex m_mutex;
-    QSet<QnResourcePtr> m_onlineCameras;
     QMap<QnResourcePtr, Recorders> m_recordMap;
     QTimer m_scheduleWatchingTimer;
     QTimer m_licenseTimer;
@@ -88,7 +103,6 @@ private:
     ec2::QnDistributedMutex* m_licenseMutex;
     int m_tooManyRecordingCnt;
     qint64 m_recordingStopTime;
-    QSet<QnUuid> m_cameraHistoryDone;
 };
 
 #define qnRecordingManager QnRecordingManager::instance()

@@ -59,9 +59,7 @@ namespace ec2
 
     template<class T>
     BaseEc2Connection<T>::~BaseEc2Connection()
-    {
-        QnTransactionMessageBus::instance()->disconnectAndJoin( this );
-    }
+    {}
 
     template<class T>
     void BaseEc2Connection<T>::startReceivingNotifications() {
@@ -73,7 +71,7 @@ namespace ec2
 
     template<class T>
     void BaseEc2Connection<T>::stopReceivingNotifications() {
-        disconnect(QnTransactionMessageBus::instance(), NULL, this, NULL);
+        QnTransactionMessageBus::instance()->disconnectAndJoin( this );
         QnTransactionMessageBus::instance()->stop();
     }
 
@@ -209,8 +207,6 @@ namespace ec2
         QUrl url(_url);
         url.setPath("/ec2/events");
         QUrlQuery q;
-        q.addQueryItem("guid", qnCommon->moduleGUID().toString());
-        q.addQueryItem("runtime-guid", qnCommon->runningInstanceGUID().toString());
         url.setQuery(q);
         QnTransactionMessageBus::instance()->addConnectionToPeer(url);
     }
@@ -221,8 +217,6 @@ namespace ec2
         QUrl url(_url);
         url.setPath("/ec2/events");
         QUrlQuery q;
-        q.addQueryItem("guid", qnCommon->moduleGUID().toString());
-        q.addQueryItem("runtime-guid", qnCommon->runningInstanceGUID().toString());
         url.setQuery(q);
         QnTransactionMessageBus::instance()->removeConnectionFromPeer(url);
     }

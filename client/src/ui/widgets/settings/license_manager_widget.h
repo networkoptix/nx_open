@@ -16,7 +16,6 @@ class QNetworkAccessManager;
 class QNetworkReply;
 
 class QnLicenseListModel;
-class QnLicenseUsageHelper;
 
 namespace Ui {
     class LicenseManagerWidget;
@@ -58,8 +57,6 @@ private:
 
     QScopedPointer<Ui::LicenseManagerWidget> ui;
     QnLicenseListModel *m_model;
-    QScopedPointer<QnLicenseUsageHelper> m_camerasUsageHelper;
-    QScopedPointer<QnLicenseUsageHelper> m_videowallUsageHelper;
     QNetworkAccessManager *m_httpClient;
     QnLicenseList m_licenses;
     QMap<int, QByteArray> m_handleKeyMap;

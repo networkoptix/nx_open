@@ -277,7 +277,7 @@ void initLog(
     QString logFileName = logFileLocation + QLatin1String("/log_file") + fileNameSuffix;
     if (!QDir().mkpath(logFileLocation))
         cl_log.log(lit("Could not create log folder: ") + logFileLocation, cl_logALWAYS);
-    if (!cl_log.create(logFileName, DEFAULT_MAX_LOG_FILE_SIZE, DEFAULT_MSG_LOG_ARCHIVE_SIZE, cl_logDEBUG1))
+    if (!cl_log.create(logFileName, DEFAULT_MAX_LOG_FILE_SIZE, DEFAULT_MSG_LOG_ARCHIVE_SIZE, QnLog::instance()->logLevel()))
         cl_log.log(lit("Could not create log file") + logFileName, cl_logALWAYS);
     cl_log.log(QLatin1String("================================================================================="), cl_logALWAYS);
 
@@ -322,6 +322,7 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 #include <iostream>
 
 #ifndef API_TEST_MAIN
+#define ENABLE_DYNAMIC_CUSTOMIZATION
 
 int runApplication(QtSingleApplication* application, int argc, char **argv) {
     // these functions should be called in every thread that wants to use rand() and qrand()
@@ -345,7 +346,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QString authenticationString, delayedDrop, instantDrop, logLevel;
     QString ec2TranLogLevel = lit("none");
     QString translationPath;
-    QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin ? lit(":/skin_light") : lit(":/skin_dark");
+    
     bool skipMediaFolderScan = false;
 #ifdef Q_OS_MAC
     bool noFullScreen = true;
@@ -377,7 +378,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&noFullScreen,           "--no-fullscreen",              NULL,   QString());
     commandLineParser.addParameter(&noVersionMismatchCheck, "--no-version-mismatch-check",  NULL,   QString());
 #ifdef ENABLE_DYNAMIC_CUSTOMIZATION
-    commandLineParser.addParameter(&customizationPath,      "--customization",              NULL,   QString());
+    QString dynamicCustomizationPath;
+    commandLineParser.addParameter(&dynamicCustomizationPath,"--customization",              NULL,   QString());
 #endif
     commandLineParser.addParameter(&lightMode,              "--light-mode",                 NULL,   QString(), lit("full"));
     commandLineParser.addParameter(&noVSync,                "--no-vsync",                   NULL,   QString());
@@ -443,7 +445,22 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     qnSettings->setClientUpdateDisabled(noClientUpdate);
 
+#ifdef ENABLE_DYNAMIC_CUSTOMIZATION
+    QString skinRoot = dynamicCustomizationPath.isEmpty() 
+        ? lit(":") 
+        : dynamicCustomizationPath;
+
+    QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin 
+        ? skinRoot + lit("/skin_light") 
+        : skinRoot + lit("/skin_dark");
+    QScopedPointer<QnSkin> skin(new QnSkin(QStringList() << skinRoot + lit("/skin") << customizationPath));
+#else
+    QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin ? lit(":/skin_light") : lit(":/skin_dark");
     QScopedPointer<QnSkin> skin(new QnSkin(QStringList() << lit(":/skin") << customizationPath));
+#endif // ENABLE_DYNAMIC_CUSTOMIZATION
+
+
+    
 
     QnCustomization customization;
     customization.add(QnCustomization(skin->path("customization_common.json")));
@@ -635,8 +652,16 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     /* Process input files. */
     bool haveInputFiles = false;
-    for (int i = 1; i < argc; ++i)
-        haveInputFiles |= mainWindow->handleMessage(QFile::decodeName(argv[i]));
+    {
+        bool skipArg = true;
+        for (const auto& arg: qApp->arguments())
+        {
+            if (!skipArg)
+                haveInputFiles |= mainWindow->handleMessage(arg);
+            skipArg = false;
+        }
+    }
+
     if(!noSingleApplication)
         QObject::connect(application, SIGNAL(messageReceived(const QString &)), mainWindow.data(), SLOT(handleMessage(const QString &)));
 
@@ -667,7 +692,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     /* Initializing resource searchers                                      */
     /************************************************************************/
     QnClientResourceProcessor resourceProcessor;
-    QnResourceDiscoveryManager::init(new QnResourceDiscoveryManager());
+    std::unique_ptr<QnResourceDiscoveryManager> resourceDiscoveryManager( new QnResourceDiscoveryManager() );
     resourceProcessor.moveToThread( QnResourceDiscoveryManager::instance() );
     QnResourceDiscoveryManager::instance()->setResourceProcessor(&resourceProcessor);
 

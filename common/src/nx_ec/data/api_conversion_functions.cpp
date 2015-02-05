@@ -55,14 +55,14 @@ void fromApiToResource(const ApiBusinessRuleData &src, QnBusinessEventRulePtr &d
 
     dst->setEventResources(QVector<QnUuid>::fromStdVector(src.eventResourceIds));
 
-    dst->setEventParams(QnBusinessEventParameters::fromBusinessParams(deserializeBusinessParams(src.eventCondition)));
+    dst->setEventParams(QJson::deserialized<QnBusinessEventParameters>(src.eventCondition));
 
     dst->setEventState(src.eventState);
     dst->setActionType(src.actionType);
 
     dst->setActionResources(QVector<QnUuid>::fromStdVector(src.actionResourceIds));
 
-    dst->setActionParams(QnBusinessActionParameters::fromBusinessParams(deserializeBusinessParams(src.actionParams)));
+    dst->setActionParams(QJson::deserialized<QnBusinessActionParameters>(src.actionParams));
 
     dst->setAggregationPeriod(src.aggregationPeriod);
     dst->setDisabled(src.disabled);
@@ -78,8 +78,8 @@ void fromResourceToApi(const QnBusinessEventRulePtr &src, ApiBusinessRuleData &d
     dst.eventResourceIds = src->eventResources().toStdVector();
     dst.actionResourceIds = src->actionResources().toStdVector();
 
-    dst.eventCondition = serializeBusinessParams(src->eventParams().toBusinessParams());
-    dst.actionParams = serializeBusinessParams(src->actionParams().toBusinessParams());
+    dst.eventCondition = QJson::serialized(src->eventParams());
+    dst.actionParams = QJson::serialized(src->actionParams());
 
     dst.eventState = src->eventState();
     dst.actionType = src->actionType();
@@ -112,22 +112,22 @@ void fromResourceToApi(const QnAbstractBusinessActionPtr &src, ApiBusinessAction
     dst.receivedFromRemoteHost = src->isReceivedFromRemoteHost();
     dst.resourceIds = src->getResources().toStdVector();
 
-    dst.params = serializeBusinessParams(src->getParams().toBusinessParams());
-    dst.runtimeParams = serializeBusinessParams(src->getRuntimeParams().toBusinessParams());
+    dst.params = QJson::serialized(src->getParams());
+    dst.runtimeParams = QJson::serialized(src->getRuntimeParams());
 
     dst.ruleId = src->getBusinessRuleId();
     dst.aggregationCount = src->getAggregationCount();
 }
 
 void fromApiToResource(const ApiBusinessActionData &src, QnAbstractBusinessActionPtr &dst, QnResourcePool *) {
-    dst = QnBusinessActionFactory::createAction(static_cast<QnBusiness::ActionType>(src.actionType), QnBusinessEventParameters::fromBusinessParams(deserializeBusinessParams(src.runtimeParams)));
+    dst = QnBusinessActionFactory::createAction(src.actionType, QJson::deserialized<QnBusinessEventParameters>(src.runtimeParams));
 
     dst->setToggleState(src.toggleState);
     dst->setReceivedFromRemoteHost(src.receivedFromRemoteHost);
 
     dst->setResources(QVector<QnUuid>::fromStdVector(src.resourceIds));
 
-    dst->setParams(QnBusinessActionParameters::fromBusinessParams(deserializeBusinessParams(src.params)));
+    dst->setParams(QJson::deserialized<QnBusinessActionParameters>(src.params));
 
     dst->setBusinessRuleId(src.ruleId);
     dst->setAggregationCount(src.aggregationCount);
@@ -270,7 +270,7 @@ void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributes
     dst.audioEnabled = src->audioEnabled;
     dst.secondaryStreamQuality = src->secondaryQuality;
     dst.controlEnabled = !src->cameraControlDisabled;
-    dst.dewarpingParams = QJson::serialized<QnMediaDewarpingParams>(src->dewarpingParams);
+    dst.dewarpingParams = QJson::serialized(src->dewarpingParams);
     dst.minArchiveDays = src->minDays;
     dst.maxArchiveDays = src->maxDays;
     dst.preferedServerId = src->preferedServerId;
@@ -339,24 +339,24 @@ void fromResourceListToApi(const QnVirtualCameraResourceList &src, ApiCameraData
 
 void fromResourceToApi(const QnCameraHistoryItem &src, ApiCameraServerItemData &dst) {
     dst.cameraUniqueId = src.cameraUniqueId;
-    dst.serverId = src.mediaServerGuid.toString().toLatin1();
+    dst.serverGuid = src.mediaServerGuid;
     dst.timestamp = src.timestamp;
 }
 
 void fromApiToResource(const ApiCameraServerItemData &src, QnCameraHistoryItem &dst) {
     dst.cameraUniqueId = src.cameraUniqueId;
-    dst.mediaServerGuid = QnUuid(src.serverId);
+    dst.mediaServerGuid = src.serverGuid;
     dst.timestamp = src.timestamp;
 }
 
 void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHistoryList &dst) 
 {
     /* CameraUniqueId -> (Timestamp -> ServerGuid). */
-    QMap<QString, QMap<qint64, QByteArray> > history;
+    QMap<QString, QMap<qint64, QnUuid> > history;
 
     /* Fill temporary history map. */
     for (auto pos = src.begin(); pos != src.end(); ++pos)
-        history[pos->cameraUniqueId][pos->timestamp] = pos->serverId;
+        history[pos->cameraUniqueId][pos->timestamp] = pos->serverGuid;
 
     for(auto pos = history.begin(); pos != history.end(); ++pos) {
         QnCameraHistoryPtr cameraHistory = QnCameraHistoryPtr(new QnCameraHistory());
@@ -364,7 +364,7 @@ void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHisto
         if (pos.value().isEmpty())
             continue;
 
-        QMapIterator<qint64, QByteArray> camit(pos.value());
+        QMapIterator<qint64, QnUuid> camit(pos.value());
         camit.toFront();
 
         cameraHistory->setCameraUniqueId(pos.key());

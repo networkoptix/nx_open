@@ -104,14 +104,14 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
     name.replace(QLatin1Char(' '), QString()); // remove spaces
     name.replace(QLatin1Char('-'), QString()); // remove spaces
     name.replace(QLatin1Char('\t'), QString()); // remove tabs
+    if (!name.toLower().contains(lit("iqa")))
+        return local_results; // any IQA camera MUST contain IQA prefix in the name
 
     if (macpos+12 > responseData.size())
         return local_results;
 
 
-    //macpos++; // -
-
-    while(responseData.at(macpos)==' ')
+    while(responseData.at(macpos)==' ' && macpos < responseData.size())
         ++macpos;
 
 
@@ -132,6 +132,9 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
     //response.fromDatagram(responseData);
 
     smac = smac.toUpper();
+    QnMacAddress macAddress(smac);
+    if (macAddress.isNull())
+        return local_results;
 
     for(const QnResourcePtr& res: result)
     {
@@ -158,7 +161,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
     resource->setTypeId(rt);
     resource->setName(name);
     resource->setModel(name);
-    resource->setMAC(QnMacAddress(smac));
+    resource->setMAC(macAddress);
 
     local_results.push_back(resource);
 

@@ -30,16 +30,17 @@ public:
         \note If stream is opened (\a CLServerPushStreamReader::isStreamOpened() returns true) \a CameraDiagnostics::ErrorCode::noError is returned immediately
     */
     virtual CameraDiagnostics::Result diagnoseMediaStreamConnection() override;
-
+    virtual bool isCameraControlRequired() const override;
+private slots:
+    void at_resourceChanged(const QnResourcePtr& res);
 protected:
     void pleaseReOpen();
-    virtual void afterUpdate() override;
     virtual void beforeRun() override;
+    virtual void afterRun() override;
     virtual bool canChangeStatus() const;
 
 private:
     virtual void run() override; // in a loop: takes data from device and puts into queue
-
 private:
     bool m_needReopen;
     bool m_cameraAudioEnabled;
@@ -49,6 +50,11 @@ private:
     QWaitCondition m_cond;
     QMutex m_openStreamMutex;
     int m_FrameCnt;
+    QElapsedTimer m_needControlTimer;
+private:
+    CameraDiagnostics::Result openStreamInternal();
+private:
+    bool m_cameraControlRequired;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

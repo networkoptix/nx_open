@@ -3,13 +3,12 @@
 angular.module('webadminApp')
     .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,$location,$timeout) {
 
-        mediaserver.getCurrentUser().then(function(result){
-            if(!result.data.reply.isAdmin && !(result.data.reply.permissions & Config.globalEditServersPermissions )){
+        mediaserver.checkAdmin().then(function(isAdmin){
+            if(!isAdmin){
                 $location.path('/info'); //no admin rights - redirect
                 return;
             }
         });
-
 
         mediaserver.getSettings().then(function (r) {
             $scope.settings = {
@@ -19,6 +18,7 @@ angular.module('webadminApp')
             };
 
             $scope.oldSystemName = r.data.reply.systemName;
+            $scope.oldPort = r.data.reply.port;
         });
 
         $scope.password = '';
@@ -87,7 +87,7 @@ angular.module('webadminApp')
             var data = r.data;
 
             if(data.error!=='0') {
-                console.log('some error',data);
+                //console.log('some error',data);
                 var errorToShow = data.errorString;
                 switch (errorToShow) {
                     case 'UNAUTHORIZED':
@@ -120,7 +120,9 @@ angular.module('webadminApp')
                     $scope.settings.systemName = $scope.oldSystemName;
                 }
 
-                mediaserver.saveSettings($scope.settings.systemName, $scope.settings.port).then(resultHandler,errorHandler);
+                if($scope.oldSystemName !== $scope.settings.systemName  || $scope.oldPort !== $scope.settings.port ) {
+                    mediaserver.saveSettings($scope.settings.systemName, $scope.settings.port).then(resultHandler, errorHandler);
+                }
             }else{
                 alert('form is not valid');
             }

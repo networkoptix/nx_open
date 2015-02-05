@@ -88,6 +88,9 @@
 
 namespace {
 
+    const QSize showHideButtonSize(15, 45);
+    const QMargins showHideButtonMargins(0, 10, 0, 10);
+
     QnImageButtonWidget *newActionButton(QAction *action, qreal sizeMultiplier = 1.0, int helpTopicId = -1, QGraphicsItem *parent = NULL) {
         int baseSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
 
@@ -118,7 +121,8 @@ namespace {
 
     QnImageButtonWidget *newShowHideButton(QGraphicsItem *parent = NULL, QAction *action = NULL) {
         QnImageButtonWidget *button = new QnImageButtonWidget(parent);
-        button->resize(15, 45);
+        button->setFixedSize(showHideButtonSize);
+        button->setImageMargins(showHideButtonMargins);
         if (action)
             button->setDefaultAction(action);
         else
@@ -344,10 +348,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     /* Navigation slider. */
     createSliderWidget();
 
-#ifdef QN_ENABLE_BOOKMARKS
     /* Bookmarks search line. */
     createSearchWidget();
-#endif
 
     /* Debug overlay */
     //createDebugWidget();
@@ -473,9 +475,7 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
         setTreeVisible(false, false);
         setTitleVisible(false, false);
         setNotificationsVisible(false, false);
-#ifdef QN_ENABLE_BOOKMARKS
         setSearchVisible(false, false);
-#endif
         return;
     }
 
@@ -499,9 +499,7 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
     }
 
     updateCalendarVisibility(animate);
-#ifdef QN_ENABLE_BOOKMARKS
     updateSearchVisibility(animate);
-#endif
 }
 
 QMargins QnWorkbenchUi::calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal notificationsX) {
@@ -562,9 +560,7 @@ bool QnWorkbenchUi::isHovered() const {
             m_titleOpacityProcessor->isHovered() ||
             (m_notificationsOpacityProcessor && m_notificationsOpacityProcessor->isHovered()) || // in light mode it can be NULL
             m_calendarOpacityProcessor->isHovered()
-#ifdef QN_ENABLE_BOOKMARKS
             || m_searchOpacityProcessor->isHovered()
-#endif
             ;
 }
 
@@ -1675,7 +1671,8 @@ void QnWorkbenchUi::createNotificationsWidget() {
 
     QnBlinkingImageButtonWidget* blinker = new QnBlinkingImageButtonWidget(m_controlsWidget);
     m_notificationsShowButton = blinker;
-    m_notificationsShowButton->resize(15, 45);
+    m_notificationsShowButton->setFixedSize(showHideButtonSize);
+    m_notificationsShowButton->setImageMargins(showHideButtonMargins);
     m_notificationsShowButton->setCached(true);
     m_notificationsShowButton->setCheckable(true);
     m_notificationsShowButton->setIcon(qnSkin->icon("panel/slide_right.png", "panel/slide_left.png"));
@@ -2139,10 +2136,7 @@ void QnWorkbenchUi::at_sliderItem_geometryChanged() {
     updateCalendarGeometry();
     updateSliderZoomButtonsGeometry();
     updateDayTimeWidgetGeometry();
-
-#ifdef QN_ENABLE_BOOKMARKS
     updateSearchGeometry();
-#endif
 
     QRectF geometry = m_sliderItem->geometry();
     m_sliderShowButton->setPos(QPointF(

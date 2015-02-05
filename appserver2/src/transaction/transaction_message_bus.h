@@ -43,7 +43,7 @@ namespace ec2
 
         void addConnectionToPeer(const QUrl& url);
         void removeConnectionFromPeer(const QUrl& url);
-        void gotConnectionFromRemotePeer(const QSharedPointer<AbstractStreamSocket>& socket, const ApiPeerData &remotePeer);
+        void gotConnectionFromRemotePeer(const QSharedPointer<AbstractStreamSocket>& socket, const ApiPeerData &remotePeer, qint64 remoteSystemIdentityTime);
         void dropConnections();
         
         ApiPeerData localPeer() const;
@@ -54,16 +54,9 @@ namespace ec2
         /*!
             \param handler Control of life-time of this object is out of scope of this class
         */
-        void setHandler(ECConnectionNotificationManager* handler) { 
-            QMutexLocker lock(&m_mutex);
-            m_handler = handler;
-        }
+        void setHandler(ECConnectionNotificationManager* handler);
 
-        void removeHandler(ECConnectionNotificationManager* handler) { 
-            QMutexLocker lock(&m_mutex);
-            if( m_handler == handler )
-                m_handler = nullptr;
-        }
+        void removeHandler(ECConnectionNotificationManager* handler);
 
         template<class T>
         void sendTransaction(const QnTransaction<T>& tran, const QnPeerSet& dstPeers = QnPeerSet())
@@ -242,6 +235,7 @@ namespace ec2
         // alive control
         QElapsedTimer m_aliveSendTimer;
         std::unique_ptr<QnRuntimeTransactionLog> m_runtimeTransactionLog;
+        bool m_restartPending;
     };
 }
 #define qnTransactionBus ec2::QnTransactionMessageBus::instance()

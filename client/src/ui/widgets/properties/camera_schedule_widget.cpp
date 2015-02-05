@@ -87,10 +87,10 @@ namespace {
 
             QPalette palette = m_parentPalette;
             bool licensesOk = helper.isValid();
-            QString licenseUsage = helper.getProposedUsageText();
+            QString licenseUsage = helper.getProposedUsageMsg();
             if(!licensesOk) {
                 setWarningStyle(&palette);
-                licenseUsage += L'\n' + helper.getRequiredLicenseMsg();
+                licenseUsage += L'\n' + helper.getRequiredMsg();
             }
             m_licensesLabel->setText(licenseUsage);
             m_licensesLabel->setPalette(palette);
@@ -197,8 +197,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     connect(ui->enableRecordingCheckBox,SIGNAL(clicked()),                  this,   SLOT(at_enableRecordingCheckBox_clicked()));
     connect(ui->enableRecordingCheckBox, SIGNAL(stateChanged(int)),          this,   SLOT(updateGridEnabledState()));
     connect(ui->enableRecordingCheckBox,SIGNAL(stateChanged(int)),          this,   SIGNAL(scheduleEnabledChanged(int)));
-    connect(ui->enableRecordingCheckBox,SIGNAL(stateChanged(int)),          this,   SLOT(updateLicensesLabelText()), Qt::QueuedConnection);
-    connect(qnLicensePool,              SIGNAL(licensesChanged()),          this,   SLOT(updateLicensesLabelText()), Qt::QueuedConnection);
+    connect(ui->enableRecordingCheckBox,SIGNAL(stateChanged(int)),          this,   SLOT(updateLicensesLabelText()));
 
     connect(ui->gridWidget,             SIGNAL(cellActivated(QPoint)),      this,   SLOT(at_gridWidget_cellActivated(QPoint)));
 
@@ -236,8 +235,16 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     connectToGridWidget();
 
     updateGridEnabledState();
-    updateLicensesLabelText();
     updateMotionButtons();
+
+    auto updateLicensesIfNeeded = [this] { 
+        if (!isVisible())
+            return;
+        updateLicensesLabelText();
+    };
+
+    QnCamLicenseUsageWatcher* camerasUsageWatcher = new QnCamLicenseUsageWatcher(this);
+    connect(camerasUsageWatcher, &QnLicenseUsageWatcher::licenseUsageChanged, this,  updateLicensesIfNeeded);
 }
 
 QnCameraScheduleWidget::~QnCameraScheduleWidget() {

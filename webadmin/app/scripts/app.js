@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp', [
-    'ngCookies',
+    'ipCookie',
     'ngResource',
     'ngSanitize',
     'ngRoute',
@@ -43,8 +43,7 @@ angular.module('webadminApp', [
             controller: 'MainCtrl'
         })
         .when('/login', {
-            templateUrl: 'views/login.html',
-            controller: 'LoginCtrl'
+            templateUrl: 'views/login.html'
         })
         .when('/advanced', {
             templateUrl: 'views/advanced.html',
@@ -66,6 +65,14 @@ angular.module('webadminApp', [
         .when('/sdkeula', {
             templateUrl: 'views/sdkeula.html',
             controller: 'SdkeulaCtrl'
+        })
+        .when('/log', {
+            templateUrl: 'views/log.html',
+            controller: 'LogCtrl'
+        })
+        .when('/log', {
+            templateUrl: 'views/log.html',
+            controller: 'LogCtrl'
         })
         .otherwise({
             redirectTo: '/settings'

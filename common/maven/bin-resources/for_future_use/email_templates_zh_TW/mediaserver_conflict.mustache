@@ -1,0 +1,19 @@
+﻿{{#aggregated}}
+<div class="content">
+    <div class="callout">
+        <p>衝突偵測: {{timestamp}}</p>
+        <table class="details">
+            <tr>
+                <th>號碼</th>
+                <th>伺服器IP</th>
+            </tr>
+                {{#msConflicts}}
+                    <tr>
+                        <td>{{number}}</td>
+                        <td>{{ip}}</td>
+                    </tr>
+                {{/msConflicts}}
+        </table>
+    </div>
+</div>
+{{/aggregated}}

@@ -12,6 +12,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/resource_factory.h>
 #include <core/resource/abstract_storage_resource.h>
+#include "utils/network/http/asynchttpclient.h"
 
 
 class QnMediaServerResource : public QnResource
@@ -40,7 +41,7 @@ public:
     QString getApiUrl() const;
 
     void setNetAddrList(const QList<QHostAddress>&);
-    const QList<QHostAddress>& getNetAddrList() const;
+    QList<QHostAddress> getNetAddrList() const;
 
     void setAdditionalUrls(const QList<QUrl> &urls);
     QList<QUrl> getAdditionalUrls() const;
@@ -104,7 +105,7 @@ public:
     */
     QPair<int, int> saveUpdatedStorages();
 private slots:
-    void at_pingResponse(QnHTTPRawResponse, int);
+    void at_httpClientDone( const nx_http::AsyncHttpClientPtr& client );
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);
 private:
@@ -131,8 +132,7 @@ private:
     QnSoftwareVersion m_version;
     QnSystemInformation m_systemInfo;
     QString m_systemName;
-    QMap<int, QString> m_runningIfRequests;
-    QObject *m_guard; // TODO: #Elric evil hack. Remove once roma's direct connection hell is refactored out.
+    QVector<nx_http::AsyncHttpClientPtr> m_runningIfRequests;
     QElapsedTimer m_statusTimer;
     QString m_authKey;
 

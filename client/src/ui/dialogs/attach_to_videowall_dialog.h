@@ -10,8 +10,6 @@ namespace Ui {
 class QnAttachToVideowallDialog;
 }
 
-class QnVideoWallLicenseUsageHelper;
-
 class QnAttachToVideowallDialog : public QnWorkbenchStateDependentButtonBoxDialog
 {
     Q_OBJECT
@@ -27,8 +25,8 @@ private:
     void updateLicencesUsage();
 private:
     QScopedPointer<Ui::QnAttachToVideowallDialog> ui;
-    QScopedPointer<QnVideoWallLicenseUsageHelper> m_licenseHelper;
     QnVideoWallResourcePtr m_videowall;
+    bool m_valid;
 };
 
 #endif // ATTACH_TO_VIDEOWALL_DIALOG_H

@@ -20,7 +20,7 @@ static const QString nxMediaServerId = lit("Media Server");
 static const QString nxECId = lit("Enterprise Controller");
 
 static const QHostAddress defaultModuleRevealMulticastGroup = QHostAddress(lit("239.255.11.11"));
-static const unsigned int defaultModuleRevealMulticastGroupPort = 5007;
+static const quint16 defaultModuleRevealMulticastGroupPort = 5007;
 
 //!This request is sent by host which tries to find other modules
 class RevealRequest

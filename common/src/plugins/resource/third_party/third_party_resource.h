@@ -25,8 +25,6 @@ class QnThirdPartyResource
     typedef QnPhysicalCameraResource base_type;
 
 public:
-    static const int PRIMARY_ENCODER_INDEX = 0;
-    static const int SECONDARY_ENCODER_INDEX = 1;
     static const QString AUX_DATA_PARAM_NAME;
 
     QnThirdPartyResource(

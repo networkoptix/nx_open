@@ -30,6 +30,7 @@
 #include <utils/common/app_info.h>
 #include "mutex/distributed_mutex_manager.h"
 
+
 namespace ec2
 {
     Ec2DirectConnectionFactory::Ec2DirectConnectionFactory( Qn::PeerType peerType )
@@ -85,19 +86,25 @@ namespace ec2
     //!Implementation of AbstractECConnectionFactory::testConnectionAsync
     int Ec2DirectConnectionFactory::testConnectionAsync( const QUrl& addr, impl::TestConnectionHandlerPtr handler )
     {
-        if( addr.isEmpty() )
-            return testDirectConnection( addr, handler );
+        QUrl url = addr;
+        url.setUserName(url.userName().toLower());
+
+        if (url.isEmpty())
+            return testDirectConnection(url, handler);
         else
-            return testRemoteConnection( addr, handler );
+            return testRemoteConnection(url, handler);
     }
 
     //!Implementation of AbstractECConnectionFactory::connectAsync
     int Ec2DirectConnectionFactory::connectAsync( const QUrl& addr, impl::ConnectHandlerPtr handler )
     {
-        if( addr.scheme() == "file" )
-            return establishDirectConnection(addr, handler );
+        QUrl url = addr;
+        url.setUserName(url.userName().toLower());
+
+        if (url.scheme() == "file")
+            return establishDirectConnection(url, handler);
         else
-            return establishConnectionToRemoteServer( addr, handler );
+            return establishConnectionToRemoteServer(url, handler);
     }
 
     void Ec2DirectConnectionFactory::registerTransactionListener( QnUniversalTcpListener* universalTcpListener )
@@ -287,14 +294,19 @@ namespace ec2
         QnConnectionInfo connectionInfo;
         fillConnectionInfo( loginInfo, &connectionInfo );   //todo: #ak not appropriate here
         connectionInfo.ecUrl = url;
+        ec2::ErrorCode connectionInitializationResult = ec2::ErrorCode::ok;
         {
             QMutexLocker lk( &m_mutex );
             if( !m_directConnection ) {
                 m_directConnection.reset( new Ec2DirectConnection( &m_serverQueryProcessor, m_resCtx, connectionInfo, url ) );
+                if( !m_directConnection->initialized() )
+                {
+                    connectionInitializationResult = ec2::ErrorCode::dbError;
+                    m_directConnection.reset();
+                }
             }
         }
-        QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
-        QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( &impl::ConnectHandler::done, handler, reqID, ec2::ErrorCode::ok, m_directConnection ) );
+        QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( &impl::ConnectHandler::done, handler, reqID, connectionInitializationResult, m_directConnection ) );
         return reqID;
     }
 
@@ -409,7 +421,6 @@ namespace ec2
         if( (errorCode != ErrorCode::ok) && (errorCode != ErrorCode::unauthorized) )
         {
             //checking for old EC
-            QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());
             QnConcurrent::run(
                 Ec2ThreadPool::instance(),
                 [this, ecURL, handler, reqID]() {
@@ -467,7 +478,6 @@ namespace ec2
         }
 
         //checking for old EC
-        QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());
         QnConcurrent::run(
             Ec2ThreadPool::instance(),
             [this, ecURL, handler, reqID]() {
@@ -496,7 +506,6 @@ namespace ec2
         const int reqID = generateRequestID();
         QnConnectionInfo connectionInfo;
         fillConnectionInfo( ApiLoginData(), &connectionInfo );
-        QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
         QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( &impl::TestConnectionHandler::done, handler, reqID, ec2::ErrorCode::ok, connectionInfo ) );
         return reqID;
     }

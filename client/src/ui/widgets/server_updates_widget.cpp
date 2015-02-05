@@ -116,6 +116,10 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     ui->connectionProblemLabel->setVisible(false);
     ui->longUpdateWarning->setVisible(false);
 
+    ui->releaseNotesLabel->setText(lit("<a href='notes'>%1</a>").arg(tr("Release notes")));
+    ui->specificBuildLabel->setText(lit("<a href='spec'>%1</a>").arg(tr("Get a specific build")));
+    ui->latestBuildLabel->setText(lit("<a href='latest'>%1</a>").arg(tr("Get the latest version")));
+
     QTimer* updateTimer = new QTimer(this);
     updateTimer->setSingleShot(false);
     updateTimer->setInterval(autoCheckIntervalMs);
@@ -313,7 +317,7 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
 
                 QMessageBox::information(this, tr("Update is successful"), message);
 
-                bool unholdConnection = !clientUpdated;
+                bool unholdConnection = !clientUpdated || result.clientInstallerRequired;
                 if (clientUpdated && !result.clientInstallerRequired) {
                     if (applauncher::restartClient(result.targetVersion) != applauncher::api::ResultType::ok) {
                         unholdConnection = true;
@@ -328,7 +332,7 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
                 }
 
                 if (unholdConnection)
-                    static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance())->setHoldConnection(false);
+                    qnClientMessageProcessor->setHoldConnection(false);
             }
             break;
         case QnUpdateResult::Cancelled:

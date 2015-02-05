@@ -108,6 +108,7 @@ private:
 
 private:
 
+    QString m_hostString;
     QHostAddress m_host;
     int m_port;
 

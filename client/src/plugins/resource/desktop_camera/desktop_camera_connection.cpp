@@ -182,10 +182,10 @@ void QnDesktopCameraConnectionProcessor::sendData(const char* data, int len)
 
 // --------------- QnDesktopCameraconnection ------------------
 
-QnDesktopCameraConnection::QnDesktopCameraConnection(QnDesktopResource* owner, const QnMediaServerResourcePtr &mServer):
+QnDesktopCameraConnection::QnDesktopCameraConnection(QnDesktopResource* owner, const QnMediaServerResourcePtr &server):
     QnLongRunnable(),
     m_owner(owner),
-    m_mServer(mServer),
+    m_server(server),
     connection(0),
     processor(0)
 {
@@ -233,7 +233,7 @@ void QnDesktopCameraConnection::run()
             QAuthenticator auth;
             auth.setUser(m_auth.username);
             auth.setPassword(m_auth.password);
-            connection = new CLSimpleHTTPClient(m_mServer->getApiUrl(), CONNECT_TIMEOUT, auth);
+            connection = new CLSimpleHTTPClient(m_server->getApiUrl(), CONNECT_TIMEOUT, auth);
             connection->addHeader("user-name", auth.user().toUtf8());
             connection->addHeader("user-id", m_auth.clientGuid.toUtf8());
         }

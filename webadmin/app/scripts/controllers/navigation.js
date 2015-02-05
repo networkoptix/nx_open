@@ -1,16 +1,17 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('NavigationCtrl', function ($scope, $location, mediaserver) {
+    .controller('NavigationCtrl', function ($scope, $location, mediaserver, ipCookie) {
         $scope.user = {
             isAdmin: true
         };
 
-        mediaserver.getCurrentUser().then(function(result){
+        mediaserver.checkAdmin().then(function(isAdmin){
             $scope.user = {
-                isAdmin: result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalEditServersPermissions)
+                isAdmin: isAdmin
             };
         });
+
 
         mediaserver.getSettings().then(function (r) {
             $scope.settings = r.data.reply;
@@ -20,4 +21,13 @@ angular.module('webadminApp')
             var currentPath = $location.path().split('/')[1];
             return currentPath.split('?')[0] === path.split('/')[1].split('?')[0];
         };
+
+        $scope.logout = function(){
+
+            ipCookie.remove('response',{ path: '/' });
+            ipCookie.remove('nonce',{ path: '/' });
+            ipCookie.remove('realm',{ path: '/' });
+            ipCookie.remove('username',{ path: '/' });
+            window.location.reload();
+        }
     });

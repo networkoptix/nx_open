@@ -363,9 +363,9 @@ CameraDiagnostics::Result QnActiResource::initInternal()
 
     //detecting and saving selected resolutions
     CameraMediaStreams mediaStreams;
-    mediaStreams.streams.push_back( CameraMediaStreamInfo( m_resolution[0], CODEC_ID_H264 ) );
+    mediaStreams.streams.push_back( CameraMediaStreamInfo( PRIMARY_ENCODER_INDEX, m_resolution[0], CODEC_ID_H264 ) );
     if( !m_resolution[1].isEmpty() )
-        mediaStreams.streams.push_back( CameraMediaStreamInfo( m_resolution[1], CODEC_ID_H264 ) );
+        mediaStreams.streams.push_back( CameraMediaStreamInfo( SECONDARY_ENCODER_INDEX, m_resolution[1], CODEC_ID_H264 ) );
     saveResolutionList( mediaStreams );
 
     saveParams();
@@ -375,6 +375,12 @@ CameraDiagnostics::Result QnActiResource::initInternal()
 
 bool QnActiResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
 {
+    if( hasFlags(Qn::foreigner) ||      //we do not own camera
+        !hasCameraCapabilities(Qn::RelayInputCapability) )
+    {
+        return false;
+    }
+
     if( actiEventPort == 0 )
         return false;   //no http listener is present
 
@@ -494,6 +500,7 @@ void QnActiResource::stopInputPortMonitoringAsync()
     //TODO #ak do not use DummyHandler here. httpClient->doGet should accept functor
     connect( httpClient.get(), &nx_http::AsyncHttpClient::done,
         ec2::DummyHandler::instance(), [httpClient](nx_http::AsyncHttpClientPtr) mutable {
+            httpClient->disconnect( nullptr, (const char*)nullptr );
             httpClient.reset();
         },
         Qt::DirectConnection );

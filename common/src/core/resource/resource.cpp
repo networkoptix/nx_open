@@ -185,7 +185,8 @@ QnResource::QnResource():
     m_lastInitTime(0),
     m_prevInitializationResult(CameraDiagnostics::ErrorCode::unknown),
     m_lastMediaIssue(CameraDiagnostics::NoErrorResult()),
-    m_removedFromPool(false)
+    m_removedFromPool(false),
+    m_initInProgress(false)
 {
 }
 
@@ -860,15 +861,18 @@ bool QnResource::init()
     if(m_appStopping)
         return false;
 
-    if(!m_initMutex.tryLock())
-        return false; /* Skip request if init is already running. */
-
-    if(m_initialized) {
-        m_initMutex.unlock();
-        return true; /* Nothing to do. */
+    {
+        QMutexLocker lock(&m_initMutex);
+        if(m_initialized)
+            return true; /* Nothing to do. */
+        if (m_initInProgress)
+            return false; /* Skip request if init is already running. */
+        m_initInProgress = true;
     }
 
     CameraDiagnostics::Result initResult = initInternal();
+    m_initMutex.lock();
+    m_initInProgress = false;
     m_initialized = initResult.errorCode == CameraDiagnostics::ErrorCode::noError;
     {
         QMutexLocker lk( &m_mutex );
@@ -915,7 +919,6 @@ void QnResource::blockingInit()
 void QnResource::initAndEmit()
 {
     init();
-    emit initAsyncFinished(toSharedPointer(this), isInitialized());
 }
 
 class InitAsyncTask: public QRunnable

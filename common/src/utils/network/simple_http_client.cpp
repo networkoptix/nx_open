@@ -34,6 +34,7 @@ QString toString( CLHttpStatus status )
 
 
 CLSimpleHTTPClient::CLSimpleHTTPClient(const QString& host, int port, unsigned int timeout, const QAuthenticator& auth):
+    m_hostString(host),
     m_port(port),
     m_connected(false),
     m_timeout(timeout),
@@ -47,6 +48,7 @@ CLSimpleHTTPClient::CLSimpleHTTPClient(const QString& host, int port, unsigned i
 }
 
 CLSimpleHTTPClient::CLSimpleHTTPClient(const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth):
+    m_hostString(host.toString()),
     m_host(host),
     m_port(port),
     m_connected(false),
@@ -60,6 +62,7 @@ CLSimpleHTTPClient::CLSimpleHTTPClient(const QHostAddress& host, int port, unsig
 }
 
 CLSimpleHTTPClient::CLSimpleHTTPClient(const QUrl& url, unsigned int timeout, const QAuthenticator& auth):
+    m_hostString(url.host()),
     m_host(url.host()),
     m_port(url.port()),
     m_connected(false),
@@ -114,7 +117,7 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
     {
         if (!m_connected)
         {
-            if (!m_sock->connect(m_host.toString(), m_port))
+            if (m_host.isNull() || !m_sock->connect(m_host.toString(), m_port))
             {
                 return CL_TRANSPORT_ERROR;
             }
@@ -127,7 +130,7 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
         request.append(requestStr);
         request.append(" HTTP/1.1\r\n");
         request.append("Host: ");
-        request.append(m_host.toString().toUtf8());
+        request.append(m_hostString.toUtf8());
         request.append("\r\n");
         request.append("User-Agent: Simple HTTP Client 1.0\r\n");
         request.append("Accept: */*\r\n");
@@ -295,7 +298,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
     {
         if (!m_connected)
         {
-            if (!m_sock->connect(m_host.toString(), m_port))
+            if (m_host.isNull() || !m_sock->connect(m_host.toString(), m_port))
             {
                 return CL_TRANSPORT_ERROR;
             }
@@ -313,7 +316,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
         request.append(requestStr);
         request.append(" HTTP/1.1\r\n");
         request.append("Host: ");
-        request.append(m_host.toString().toUtf8());
+        request.append(m_hostString.toUtf8());
         request.append("\r\n");
 
         addExtraHeaders(request);

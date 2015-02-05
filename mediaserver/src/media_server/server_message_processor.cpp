@@ -113,7 +113,7 @@ void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect( connection, &ec2::AbstractECConnection::remotePeerUnauthorized, this, &QnServerMessageProcessor::at_remotePeerUnauthorized );
 
     connect(connection->getMiscManager().get(), &ec2::AbstractMiscManager::systemNameChangeRequested,
-        this, [this](const QString &systemName) { changeSystemName(systemName); });
+        this, [this](const QString &systemName, qint64 sysIdTime) { changeSystemName(systemName, sysIdTime); });
 }
 
 void QnServerMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) {
@@ -208,7 +208,7 @@ void QnServerMessageProcessor::execBusinessActionInternal(const QnAbstractBusine
 }
 
 void QnServerMessageProcessor::at_updateChunkReceived(const QString &updateId, const QByteArray &data, qint64 offset) {
-    QnServerUpdateTool::instance()->addUpdateFileChunk(updateId, data, offset);
+    QnServerUpdateTool::instance()->addUpdateFileChunkAsync(updateId, data, offset);
 }
 
 void QnServerMessageProcessor::at_updateInstallationRequested(const QString &updateId) {

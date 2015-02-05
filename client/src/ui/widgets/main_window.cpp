@@ -140,9 +140,9 @@ extern "C" {
 #endif
 
 QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags): 
-    base_type(parent, flags | Qt::Window
-#ifndef Q_OS_MACX
-    | Qt::CustomizeWindowHint
+    base_type(parent, flags | Qt::Window | Qt::CustomizeWindowHint
+#ifdef Q_OS_MACX
+    | Qt::WindowTitleHint | Qt::WindowCloseButtonHint | Qt::WindowMinMaxButtonsHint
 #endif
     ),
     QnWorkbenchContextAware(context),
@@ -226,9 +226,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchDebugHandler>();
     context->instance<QnWorkbenchVideoWallHandler>();
     context->instance<QnWorkbenchIncompatibleServersActionHandler>();
-#ifdef QN_ENABLE_BOOKMARKS
     context->instance<QnWorkbenchBookmarksHandler>();
-#endif
     context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
     context->instance<QnWorkbenchPtzDialogWatcher>();
     context->instance<QnWorkbenchSystemNameWatcher>();

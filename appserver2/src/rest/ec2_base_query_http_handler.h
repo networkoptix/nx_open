@@ -181,7 +181,6 @@ namespace ec2
         template<class HandlerType>
         void processQueryAsync( const InputData& inputData, HandlerType handler )
         {
-            QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
             QnConcurrent::run( Ec2ThreadPool::instance(),
                 [this, inputData, handler]() {
                     OutputData output;

@@ -95,6 +95,14 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     /* We'll be using this one, so make sure it's created. */
     context()->instance<QnWorkbenchServerTimeWatcher>();
     m_updateSliderTimer.restart();
+
+    //TODO: #GDM Temporary fix for the Feature #4714. Correct change would be: expand getTimePeriods query with Region data,
+    // then truncate cached chunks by this region and synchronize the cache.
+    QTimer* discardCacheTimer = new QTimer(this);
+    discardCacheTimer->setInterval(10*60*1000);
+    discardCacheTimer->setSingleShot(false);
+    connect(discardCacheTimer, &QTimer::timeout, this, &QnWorkbenchNavigator::clearLoaderCache);
+    discardCacheTimer->start();
 }
     
 QnWorkbenchNavigator::~QnWorkbenchNavigator() {
@@ -203,11 +211,7 @@ void QnWorkbenchNavigator::setDayTimeWidget(QnDayTimeWidget *dayTimeWidget) {
 }
 
 bool QnWorkbenchNavigator::isValid() {
-    return m_timeSlider && m_timeScrollBar && m_calendar 
-#ifdef QN_ENABLE_BOOKMARKS
-        && m_bookmarksSearchWidget
-#endif
-        ;
+    return m_timeSlider && m_timeScrollBar && m_calendar && m_bookmarksSearchWidget;
 }
 
 void QnWorkbenchNavigator::initialize() {
@@ -250,14 +254,12 @@ void QnWorkbenchNavigator::initialize() {
 
     connect(m_dayTimeWidget,                    SIGNAL(timeClicked(const QTime &)),                 this,   SLOT(at_dayTimeWidget_timeClicked(const QTime &)));
 
-#ifdef QN_ENABLE_BOOKMARKS
     connect(m_bookmarksSearchWidget, &QnSearchLineEdit::textChanged, this, [this](const QString &text) {
         if (!m_currentMediaWidget)
             return;
         //TODO: #GDM #Bookmarks do not search till the full tag or at least 3 letters will be entered, search once in 2-3 seconds
         loader(m_currentMediaWidget)->setBookmarksTextFilter(text); //TODO: #GDM #Bookmarks synced widgets? clear previous?
     });
-#endif
 
     connect(context()->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()),          this,   SLOT(updateLocalOffset()));
     connect(qnSettings->notifier(QnClientSettings::TIME_MODE), SIGNAL(valueChanged(int)),           this,   SLOT(updateLocalOffset()));
@@ -550,9 +552,7 @@ QnCachingCameraDataLoader *QnWorkbenchNavigator::loader(const QnResourcePtr &res
     QnCachingCameraDataLoader *loader = QnCachingCameraDataLoader::newInstance(resource, this);
     if(loader) {
         connect(loader, &QnCachingCameraDataLoader::periodsChanged, this, [this](Qn::TimePeriodContent type) {updateLoaderPeriods(checked_cast<QnCachingCameraDataLoader *>(sender()), type);} );
-#ifdef QN_ENABLE_BOOKMARKS
         connect(loader, &QnCachingCameraDataLoader::bookmarksChanged, this, [this]() {updateLoaderBookmarks(checked_cast<QnCachingCameraDataLoader *>(sender()));} );
-#endif
     }
 
     m_loaderByResource[resource] = loader;
@@ -676,7 +676,7 @@ void QnWorkbenchNavigator::stepBackward() {
     emit positionChanged();
 }
 
-void QnWorkbenchNavigator::at_clearLoaderCache()
+void QnWorkbenchNavigator::clearLoaderCache()
 {
     for (QnCachingCameraDataLoader* loader: m_loaderByResource) {
         if (loader)
@@ -779,9 +779,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
         QMetaObject::invokeMethod(this, "updateSpeed", Qt::QueuedConnection);
     }
 
-#ifdef QN_ENABLE_BOOKMARKS
     action(Qn::ToggleBookmarksSearchAction)->setEnabled(m_currentMediaWidget && m_currentWidget->resource()->flags() & Qn::utc);
-#endif
 
     updateLocalOffset();
     updateCurrentPeriods();
@@ -993,12 +991,10 @@ void QnWorkbenchNavigator::updateTargetPeriod() {
             case Qn::MotionTimePeriod:
                 loader->setTargetPeriod(calendarPeriod, dataType);
                 break;
-#ifdef QN_ENABLE_BOOKMARKS
             case Qn::BookmarkTimePeriod:
             case Qn::BookmarkData:
                 loader->setTargetPeriod(timeSliderPeriod, dataType);
                 break;
-#endif
             default:
                 break;
             }
@@ -1647,7 +1643,6 @@ void QnWorkbenchNavigator::setBookmarkTags(const QnCameraBookmarkTags &tags) {
         return;
     m_bookmarkTags = tags;
 
-#ifdef QN_ENABLE_BOOKMARKS
     if (!isValid())
         return;
 
@@ -1657,5 +1652,4 @@ void QnWorkbenchNavigator::setBookmarkTags(const QnCameraBookmarkTags &tags) {
 
     m_bookmarksSearchWidget->lineEdit()->setCompleter(completer);
     m_bookmarkTagsCompleter.reset(completer);
-#endif
 }

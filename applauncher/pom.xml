@@ -26,7 +26,8 @@
 			<artifactId>common</artifactId>
 			<version>${project.version}</version>
 			<type>pom</type> 
-			<scope>compile</scope>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common/pom.xml</systemPath>
 		</dependency>			
     </dependencies>			
 	

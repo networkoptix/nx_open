@@ -8,7 +8,7 @@ import xml.etree.ElementTree as ET
 
 projects = ['common', 'client', 'traytool']
 
-critical = ['\t', '%1', '%2', '%3', '%4', '%5', '%6', '%7', '%8', '%9']
+critical = ['\t', '%1', '%2', '%3', '%4', '%5', '%6', '%7', '%8', '%9', 'href']
 warned = ['%n', '\n']
 
 class ColorDummy():
@@ -47,13 +47,17 @@ def symbolText(symbol):
     return symbol
 
 def checkText(source, target, location, result, verbose):
+
+    filename = location.get('filename') if location is not None else 'unknown'
+    line = location.get('line') if location is not None else 'unknown'
+
     for symbol in critical:
         occurences = source.count(symbol)
         if target.count(symbol) != occurences:
             err(u'Invalid translation string, error on {0} count:\nLocation: {1} line {2}\nSource: {3}\nTarget: {4}'
                 .format(
                     symbolText(symbol),
-                    location.get('filename'), location.get('line'),
+                    filename, line,
                     source, target))
             result.error += 1
             break
@@ -65,7 +69,7 @@ def checkText(source, target, location, result, verbose):
                 warn(u'Invalid translation string, error on {0} count:\nLocation: {1} line {2}\nSource: {3}\nTarget: {4}'
                     .format(
                         symbolText(symbol),
-                        location.get('filename'), location.get('line'),
+                        filename, line,
                         source, target))
                 result.warned += 1
                 break
@@ -112,12 +116,9 @@ def validate(path, verbose):
     if result.error > 0:
         err('{0}: {1} errors found'.format(name, result.error))
 
-    if not verbose:
-        return
-
     if result.unfinished > 0:
         warn('{0}: {1} of {2} translations are unfinished'.format(name, result.unfinished, result.total))
-    else:
+    elif verbose:
         green('{0}: ok'.format(name))
 
 def validateProject(project, translationDir, verbose):
@@ -160,8 +161,7 @@ def main():
         translationDir = os.path.join(projectDir, 'translations')
         validateProject(project, translationDir, args.verbose)
        
-    if args.verbose:
-        info("Validation finished.")
+    info("Validation finished.")
     
     
 if __name__ == "__main__":

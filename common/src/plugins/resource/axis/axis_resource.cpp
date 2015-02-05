@@ -91,8 +91,9 @@ void QnPlAxisResource::setCroppingPhysical(QRect /*cropping*/)
 
 bool QnPlAxisResource::startInputPortMonitoringAsync( std::function<void(bool)>&& /*completionHandler*/ )
 {
-    if( hasFlags(Qn::foreigner)      //we do not own camera
-        || m_inputPortNameToIndex.empty() )
+    if( hasFlags(Qn::foreigner) ||      //we do not own camera
+        !hasCameraCapabilities(Qn::RelayInputCapability) ||
+        m_inputPortNameToIndex.empty() )    //camera report no inputs
     {
         return false;
     }
@@ -409,9 +410,9 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
 
     //detecting and saving selected resolutions
     CameraMediaStreams mediaStreams;
-    mediaStreams.streams.push_back( CameraMediaStreamInfo( m_resolutions[PRIMARY_ENCODER_INDEX].size, CODEC_ID_H264 ) );
+    mediaStreams.streams.push_back( CameraMediaStreamInfo( PRIMARY_ENCODER_INDEX, m_resolutions[PRIMARY_ENCODER_INDEX].size, CODEC_ID_H264 ) );
     if( !m_resolutions[SECONDARY_ENCODER_INDEX].size.isEmpty() )
-        mediaStreams.streams.push_back( CameraMediaStreamInfo( m_resolutions[SECONDARY_ENCODER_INDEX].size, CODEC_ID_H264 ) );
+        mediaStreams.streams.push_back( CameraMediaStreamInfo( SECONDARY_ENCODER_INDEX, m_resolutions[SECONDARY_ENCODER_INDEX].size, CODEC_ID_H264 ) );
     saveResolutionList( mediaStreams );
 
     //root.Image.MotionDetection=no

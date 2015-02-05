@@ -1,13 +1,15 @@
+#!/bin/bash
+
 BINARIES=${libdir}/bin/${build.configuration}
 LIBRARIES=${libdir}/lib/${build.configuration}
 SRC=./dmg-folder
 TMP=tmp
 VOLUME_NAME="${display.product.name} ${release.version}"
-DMG_FILE="${project.build.finalName}.dmg"
+DMG_FILE="${finalName}.dmg"
 HELP=${ClientHelpSourceDir}
 
 AS_SRC=app-store
-PKG_FILE="${project.build.finalName}.pkg"
+PKG_FILE="${finalName}.pkg"
 
 ln -s /Applications $SRC/Applications
 
@@ -21,14 +23,14 @@ rm -rf "$AS_SRC"
 mkdir "$AS_SRC"
 cp -a "$SRC/${display.product.name}.app" "$AS_SRC"
 
-if [ '${skip.sign}' == 'false'  ]
+if [ '${mac.skip.sign}' == 'false'  ]
 then
     codesign -f -v --deep --entitlements entitlements.plist -s "${mac.app.sign.identity}" "$AS_SRC/${display.product.name}.app"
     productbuild --component "$AS_SRC/${display.product.name}.app" /Applications --sign "${mac.pkg.sign.identity}" --product "$AS_SRC/${display.product.name}.app/Contents/Info.plist" "$PKG_FILE"
     # End
 fi
 
-if [ '${skip.sign}' == 'false'  ]
+if [ '${mac.skip.sign}' == 'false'  ]
 then
     codesign -f -v --deep -s "${mac.sign.identity}" "$SRC/${display.product.name}.app"
 fi

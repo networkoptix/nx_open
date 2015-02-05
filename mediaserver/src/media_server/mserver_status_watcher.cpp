@@ -79,7 +79,7 @@ void MediaServerStatusWatcher::at_resource_statusChanged( const QnResourcePtr& r
 
         auto nextAfterFallenOneIter = mserversById.upper_bound( mserverRes->getId() );
         //skipping offline servers
-        for( int i = 0; i < mserversById.size(); ++i )
+        for( size_t i = 0; i < mserversById.size(); ++i )
         {
             if( nextAfterFallenOneIter == mserversById.end() )
                 nextAfterFallenOneIter = mserversById.begin();

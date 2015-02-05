@@ -17,21 +17,32 @@
 namespace ec2
 {
 
-static QnTransactionLog* globalInstance = 0;
+static QnTransactionLog* globalInstance = nullptr;
 
 QnTransactionLog::QnTransactionLog(QnDbManager* db): m_dbManager(db)
 {
     Q_ASSERT(!globalInstance);
     globalInstance = this;
     m_lastTimestamp = 0;
-    m_currentTime = 0;
+    m_baseTime = 0;
 }
 
-void QnTransactionLog::init()
+QnTransactionLog::~QnTransactionLog()
+{
+    Q_ASSERT(globalInstance == this);
+    globalInstance = nullptr;
+}
+
+bool QnTransactionLog::init()
 {
     QSqlQuery delQuery(m_dbManager->getDB());
-    delQuery.prepare("DELETE FROM transaction_sequence WHERE not exists(select 1 from transaction_log tl where tl.peer_guid = transaction_sequence.peer_guid and tl.db_guid = transaction_sequence.db_guid)");
-    delQuery.exec();
+    delQuery.prepare("DELETE FROM transaction_sequence \
+                       WHERE NOT (transaction_sequence.peer_guid = ? AND transaction_sequence.db_guid = ?) \
+                         AND NOT exists(select 1 from transaction_log tl where tl.peer_guid = transaction_sequence.peer_guid and tl.db_guid = transaction_sequence.db_guid)");
+    delQuery.addBindValue(QnSql::serialized_field(qnCommon->moduleGUID()));
+    delQuery.addBindValue(QnSql::serialized_field(m_dbManager->getID()));
+    if (!delQuery.exec())
+        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
 
     QSqlQuery query(m_dbManager->getDB());
     bool seqFound = false;
@@ -43,6 +54,10 @@ void QnTransactionLog::init()
             QnTranStateKey key(QnUuid::fromRfc4122(query.value(0).toByteArray()), QnUuid::fromRfc4122(query.value(1).toByteArray()));
             m_state.values.insert(key, query.value(2).toInt());
         }
+    }
+    else
+    {
+        return false;
     }
     if (!seqFound) {
         // migrate from previous version. Init sequence table
@@ -59,6 +74,10 @@ void QnTransactionLog::init()
                 updateSequenceNoLock(peerID, dbID, sequence);
             }
         }
+        else
+        {
+            return false;
+        }
     }
 
     QSqlQuery query2(m_dbManager->getDB());
@@ -72,27 +91,56 @@ void QnTransactionLog::init()
             m_updateHistory.insert(hash, UpdateHistoryData(QnTranStateKey(peerID, dbID), timestamp));
         }     
     }
+    else
+    {
+        return false;
+    }
 
-    m_currentTime = QDateTime::currentMSecsSinceEpoch();
+    m_lastTimestamp = qnSyncTime->currentMSecsSinceEpoch();
     QSqlQuery queryTime(m_dbManager->getDB());
     queryTime.prepare("SELECT max(timestamp) FROM transaction_log");
-    if (queryTime.exec() && queryTime.next()) {
-        m_currentTime = qMax(m_currentTime, queryTime.value(0).toLongLong());
+    if( !queryTime.exec() )
+        return false;
+    if (queryTime.next()) {
+        m_lastTimestamp = qMax(m_lastTimestamp, queryTime.value(0).toLongLong());
     }
-    m_lastTimestamp = m_currentTime;
+    m_baseTime = m_lastTimestamp;
     m_relativeTimer.start();
+
+    return true;
 }
 
 qint64 QnTransactionLog::getTimeStamp()
 {
+    qint64 absoluteTime = qnSyncTime->currentMSecsSinceEpoch();
+    qint64 newTime = absoluteTime;
+
     QMutexLocker lock(&m_timeMutex);
-    qint64 timestamp = m_currentTime + m_relativeTimer.elapsed();
-    if (timestamp <= m_lastTimestamp) {
-        m_currentTime = timestamp = m_lastTimestamp + 1;
+    if (newTime > m_lastTimestamp)
+    {
+        m_baseTime = m_lastTimestamp = newTime;
         m_relativeTimer.restart();
     }
-    m_lastTimestamp = timestamp;
-    return timestamp;
+    else 
+    {
+        static const int TIME_SHIFT_DELTA = 1000;
+        newTime = m_baseTime + m_relativeTimer.elapsed();
+        if (newTime > m_lastTimestamp)
+        {
+            if (newTime > m_lastTimestamp + TIME_SHIFT_DELTA && newTime > absoluteTime + TIME_SHIFT_DELTA) {
+                newTime -= TIME_SHIFT_DELTA; // try to reach absolute time
+                m_baseTime = newTime;
+                m_relativeTimer.restart();
+            }
+            m_lastTimestamp = newTime;
+        }
+        else {
+            m_lastTimestamp++;
+            m_baseTime = m_lastTimestamp;
+            m_relativeTimer.restart();
+        }
+    }
+    return m_lastTimestamp;
 }
 
 int QnTransactionLog::currentSequenceNoLock() const
@@ -225,11 +273,7 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const Qn
     m_commitData.updateHistory[hash] = UpdateHistoryData(key, tran.persistentInfo.timestamp);
 
     QMutexLocker lock(&m_timeMutex);
-    if (tran.persistentInfo.timestamp > m_currentTime + m_relativeTimer.elapsed()) {
-        m_currentTime = m_lastTimestamp = tran.persistentInfo.timestamp;
-        m_relativeTimer.restart();
-    }
-
+    m_lastTimestamp = qMax(m_lastTimestamp, tran.persistentInfo.timestamp);
     return ErrorCode::ok;
 }
 

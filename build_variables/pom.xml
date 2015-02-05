@@ -69,7 +69,7 @@
                 <executions>
                     <execution>
                         <id>configure</id>
-                        <phase>initialize</phase>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>exec</goal>
                         </goals>
@@ -88,7 +88,68 @@
                             </arguments>
                             <workingDirectory>${root.dir}</workingDirectory>		
                         </configuration>
+                    </execution>  
+                    <execution>
+                        <id>validating_JSONs</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${init.python.dir}/${python.executable}</executable>
+                            <arguments>
+                                <argument>${root.dir}/util/validate_jsons.py</argument>
+                            </arguments>
+                            <workingDirectory>${root.dir}/util</workingDirectory>		
+                        </configuration>
+                    </execution>                      
+                    <execution>
+                        <id>build_environment</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>mvn</executable>
+                            <environmentVariables>
+                                <PATH>${path}</PATH>
+                            </environmentVariables>                            
+                            <arguments>
+                                <argument>-U</argument>
+                                <argument>compile</argument>
+                                <argument>-Dhelp.customization=${help.customization}</argument>
+                                <argument>-Dcustomization=${customization}</argument>
+                                <argument>-Darch=${arch}</argument>
+                                <argument>-Dbox=${box}</argument>
+                                <argument>-Dplatform=${platform}</argument>                             
+                                <argument>-Denvironment.dir=${environment.dir}</argument>								
+                                <argument>-Dmaven.repo.local=${environment.dir}/maven/repository</argument>		
+                                <argument>-Drsync.skip=${rsync.skip}</argument>
+                                <argument>-Ddonotrebuild=${donotrebuild}</argument>
+                            </arguments>
+			    <skip>buildenv.skip</skip>
+                            <workingDirectory>${root.dir}/build_environment</workingDirectory>		
+                        </configuration>
                     </execution>                                         
+                </executions>
+            </plugin>     
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0-alpha-2</version>
+                <executions>
+                    <execution>
+                        <id>read</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <files>
+                                <file>target/rebuild.properties</file>
+                            </files>
+                        </configuration>
+                    </execution>                   
                 </executions>
             </plugin>
         </plugins>

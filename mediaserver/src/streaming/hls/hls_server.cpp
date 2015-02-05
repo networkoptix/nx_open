@@ -136,7 +136,8 @@ namespace nx_hls
                 }
 
                 case sDone:
-                    NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Done message to %1. Closing connection...\n\n\n").arg(remoteHostAddress().toString()), cl_logDEBUG1 );
+                    NX_LOG( QnLog::HTTP_LOG_INDEX, lit("Done message to %1 (sent %2 bytes). Closing connection...\n\n\n").
+                        arg(remoteHostAddress().toString()).arg(m_bytesSent), cl_logDEBUG1 );
                     return;
             }
         }
@@ -182,6 +183,7 @@ namespace nx_hls
                 return true;
 
             case HttpStreamReader::messageDone:
+            case HttpStreamReader::pullingLineEndingBeforeMessageBody:
             case HttpStreamReader::readingMessageBody:
             case HttpStreamReader::waitingMessageStart:
                 if( m_httpStreamReader.message().type != MessageType::request )
@@ -202,6 +204,7 @@ namespace nx_hls
                 return false;
 
             default:
+                Q_ASSERT( false );
                 return false;
         }
     }
@@ -806,18 +809,25 @@ namespace nx_hls
             //partial content request
             response->statusLine.version = nx_http::http_1_1;   //Range is supported by HTTP/1.1
             nx_http::header::Range range;
+            nx_http::header::ContentRange contentRange;
+            contentRange.instanceLength = (quint64)m_currentChunk->sizeInBytes();
             if( !range.parse( rangeIter->second ) || !range.validateByContentSize(m_currentChunk->sizeInBytes()) )
             {
-                response->headers.insert( make_pair( "Content-Range", "*/"+nx_http::StringType::number((quint64)m_currentChunk->sizeInBytes()) ) );
+                response->headers.insert( make_pair( "Content-Range", contentRange.toString() ) );
+                response->headers.insert( make_pair( "Content-Length", nx_http::StringType::number(contentRange.rangeLength()) ) );
                 m_chunkInputStream.reset();
                 return nx_http::StatusCode::rangeNotSatisfiable;
             }
 
-            response->headers.insert( make_pair( "Transfer-Encoding", "identity" ) );
-            response->headers.insert( make_pair( "Content-Range", rangeIter->second+"/"+nx_http::StringType::number((quint64)m_currentChunk->sizeInBytes()) ) );
-            response->headers.insert( make_pair( "Content-Length", nx_http::StringType::number(range.totalRangeLength(m_currentChunk->sizeInBytes())) ) );
+            //range is satisfiable
+            if( range.rangeSpecList.size() > 0 )
+                contentRange.rangeSpec = range.rangeSpecList.front();
 
-            static_cast<StreamingChunkInputStream*>(m_chunkInputStream.get())->setByteRange( range );
+            response->headers.insert( make_pair( "Transfer-Encoding", "identity" ) );
+            response->headers.insert( make_pair( "Content-Range", contentRange.toString() ) );
+            response->headers.insert( make_pair( "Content-Length", nx_http::StringType::number(contentRange.rangeLength()) ) );
+
+            static_cast<StreamingChunkInputStream*>(m_chunkInputStream.get())->setByteRange( contentRange );
             return nx_http::StatusCode::partialContent;
         }
         else

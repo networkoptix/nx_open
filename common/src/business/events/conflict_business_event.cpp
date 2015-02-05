@@ -13,7 +13,7 @@ QnConflictBusinessEvent::QnConflictBusinessEvent(const QnBusiness::EventType eve
 
 QnBusinessEventParameters QnConflictBusinessEvent::getRuntimeParams() const {
     QnBusinessEventParameters params = base_type::getRuntimeParams();
-    params.setSource(m_source);
-    params.setConflicts(m_conflicts);
+    params.source = m_source;
+    params.conflicts = m_conflicts;
     return params;
 }
