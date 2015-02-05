@@ -3,38 +3,41 @@
 
 #ifdef ENABLE_ONVIF
 
-#include "core/resource/security_cam_resource.h"
-#include "core/resource/camera_resource.h"
-#include "utils/network/simple_http_client.h"
-#include "core/datapacket/media_data_packet.h"
-#include "../onvif/onvif_resource.h"
+#include <core/datapacket/media_data_packet.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/security_cam_resource.h>
+
+#include <plugins/resource/onvif/onvif_resource.h>
+
+#include <utils/network/simple_http_client.h>
+
 #include "dw_resource_settings.h"
 
 class QnPlWatchDogResourceAdditionalSettings;
 typedef QSharedPointer<QnPlWatchDogResourceAdditionalSettings> QnPlWatchDogResourceAdditionalSettingsPtr;
 
-class QnPlWatchDogResource : public QnPlOnvifResource
+class QnDigitalWatchdogResource : public QnPlOnvifResource
 {
     Q_OBJECT
 
     typedef QnPlOnvifResource base_type;
 
 public:
-    QnPlWatchDogResource();
-    ~QnPlWatchDogResource();
+    QnDigitalWatchdogResource();
+    ~QnDigitalWatchdogResource();
 
     virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const override;
 
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
-
-    virtual bool getParamPhysical(const QString &param, QVariant &val) override;
-    virtual bool setParamPhysical(const QString &param, const QVariant& val) override;
-signals:
-    void physicalParamChanged(const QString& name, const QString& value);
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
-    virtual void fetchAndSetCameraSettings() override;
+    virtual bool loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const override;
+    virtual void initAdvancedParametersProviders(QnCameraAdvancedParams &params) override;
+    virtual QSet<QString> calculateSupportedAdvancedParameters() const override;
+    virtual void fetchAndSetAdvancedParameters() override;
 
+    virtual bool loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap &values) override;
+    virtual bool setAdvancedParameterUnderLock(const QnCameraAdvancedParameter &parameter, const QString &value) override;
 private:
     bool isDualStreamingEnabled(bool& unauth);
     void enableOnvifSecondStream();
@@ -42,31 +45,8 @@ private:
 
 private:
     bool m_hasZoom;
+    QScopedPointer<DWCameraProxy> m_cameraProxy;
 
-    //The List contains hierarchy of DW models from child to parent "DIGITALWATCHDOG" (see in camera_settings.xml)
-    //The grandparent "ONVIF" is processed by invoking of parent 'fetchAndSetCameraSettings' method
-    typedef QList<QnPlWatchDogResourceAdditionalSettingsPtr> AdditionalSettings;
-    AdditionalSettings m_additionalSettings;
-};
-
-
-class QnPlWatchDogResourceAdditionalSettings
-{
-    QnPlWatchDogResourceAdditionalSettings();
-
-public:
-    
-    QnPlWatchDogResourceAdditionalSettings(const QString& host, int port, unsigned int timeout,
-        const QAuthenticator& auth, const QString& cameraSettingId);
-    ~QnPlWatchDogResourceAdditionalSettings();
-
-    bool refreshValsFromCamera();
-    bool getParamPhysicalFromBuffer(const QString &param, QVariant &val);
-    bool setParamPhysical(const QString &param, const QVariant& val);
-
-private:
-    DWCameraProxy* m_cameraProxy;
-    DWCameraSettings m_settings;
 };
 
 #endif //ENABLE_ONVIF

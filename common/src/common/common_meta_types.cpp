@@ -26,6 +26,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>
+#include <core/resource/camera_advanced_param.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_user_attributes.h>
 #include <core/resource/user_resource.h>
@@ -151,10 +152,9 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaTypeStreamOperators<QnSystemInformation>();
 
     qRegisterMetaType<TypeSpecificParamMap>();
-    qRegisterMetaType<QnStringBoolPairList>("QnStringBoolPairList");
-    qRegisterMetaType<QnStringBoolPairList>("QList<QPair<QString,bool> >");
-    qRegisterMetaType<QnStringVariantPairList>("QnStringVariantPairList");
-    qRegisterMetaType<QnStringVariantPairList>("QList<QPair<QString,QVariant> >");
+    qRegisterMetaType<QnCameraAdvancedParamValue>();
+	qRegisterMetaType<QnCameraAdvancedParamValueList>();
+
     qRegisterMetaType<QVector<int> >(); /* This one is used by QAbstractItemModel. */
 
 #ifdef ENABLE_DATA_PROVIDERS
