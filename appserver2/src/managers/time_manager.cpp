@@ -27,7 +27,7 @@
 #include <utils/common/joinable.h>
 #include <utils/common/log.h>
 #include <utils/common/timermanager.h>
-#include <utils/network/time_protocol_client.h>
+#include <utils/network/time/time_protocol_client.h>
 #include <utils/network/time/multiple_internet_time_fetcher.h>
 
 #include "database/db_manager.h"

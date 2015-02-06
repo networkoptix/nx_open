@@ -10,7 +10,7 @@
 #include <gtest/gtest.h>
 
 #include <utils/network/time/multiple_internet_time_fetcher.h>
-#include <utils/network/time_protocol_client.h>
+#include <utils/network/time/time_protocol_client.h>
 
 
 static const char* NIST_RFC868_SERVER = "time.nist.gov";

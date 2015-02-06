@@ -11,7 +11,7 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QMutex>
 
-#include "time/abstract_accurate_time_fetcher.h"
+#include "abstract_accurate_time_fetcher.h"
 #include "utils/network/abstract_socket.h"
 
 
