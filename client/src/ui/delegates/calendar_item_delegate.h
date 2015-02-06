@@ -18,12 +18,6 @@ class QnCalendarItemDelegate: public Customized<QStyledItemDelegate> {
     typedef Customized<QStyledItemDelegate> base_type;
 
 public:
-    enum FillType {
-        EmptyFill,
-        RecordingFill,
-        MotionFill
-    };
-
     QnCalendarItemDelegate(QObject *parent = NULL);
 
     const QnCalendarColors &colors() const;
@@ -32,7 +26,7 @@ public:
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     
     void paintCell(QPainter *painter, const QPalette &palette, const QRect &rect, const QnTimePeriod &period, qint64 localOffset, const QnTimePeriod &enabledRange, const QnTimePeriod &selectedRange, const QnTimePeriodStorage &primaryPeriods, const QnTimePeriodStorage &secondaryPeriods, const QString &text) const;
-    void paintCell(QPainter *painter, const QPalette &palette, const QRect &rect, bool isEnabled, bool isSelected, FillType primaryFill, FillType secondaryFill, const QString &text) const;
+    void paintCell(QPainter *painter, const QPalette &palette, const QRect &rect, bool isEnabled, bool isSelected, int primaryFill, int secondaryFill, const QString &text) const;
 
 private:
     QnCalendarColors m_colors;
