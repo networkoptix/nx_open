@@ -603,7 +603,8 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnConstAbstractMediaDataPtr media,
     m_isFirstPacket(true),
     m_isOpened(false)
 {
-    m_transcoder.setContainer("rtp");
+    if( m_transcoder.setContainer("rtp") != 0 )
+        return; //m_isOpened = false
     m_transcoder.setPacketizedMode(true);
     m_codec = transcodeToCodec != CODEC_ID_NONE ? transcodeToCodec : media->compressionType;
     QnTranscoder::TranscodeMethod method;

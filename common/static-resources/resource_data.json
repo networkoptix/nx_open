@@ -110,8 +110,9 @@
                 "VISTA|VK2-720VZMI",
                 "VISTA|VK2-720VZMX",
                 "VISTA|VK2-1080VRDIR3V9F",
+                "VISTA|VK2-1080XVFD3V9F",
                 "VISTA|VK2-3MPBIR3V9F",
-		"VISTA|VK2-3MPVRDIR3V9F"
+                "VISTA|VK2-3MPVRDIR3V9F"
             ],
             "ptzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability"
         },
