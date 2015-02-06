@@ -1148,6 +1148,7 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
     url.setUserName(QString());
     url.setPassword(QString());
     url.setScheme(lit("http"));
+    url.setPath(lit("/static/index.html"));
     QDesktopServices::openUrl(QnNetworkProxyFactory::instance()->urlToResource(url, server));
 }
 
