@@ -331,11 +331,12 @@ namespace ec2
                 m_broadcastSysTimeTaskID = TimerManager::instance()->addTimer(
                     std::bind( &TimeSynchronizationManager::broadcastLocalSystemTime, this, _1 ),
                     0 );
-                m_timeSynchronizer.reset( new MultipleInternetTimeFetcher() );
-                static_cast<MultipleInternetTimeFetcher*>(m_timeSynchronizer.get())->addTimeFetcher(
-                    std::unique_ptr<AbstractAccurateTimeFetcher>(new TimeProtocolClient(QLatin1String(NIST_RFC868_SERVER))) );
-                static_cast<MultipleInternetTimeFetcher*>(m_timeSynchronizer.get())->addTimeFetcher(
-                    std::unique_ptr<AbstractAccurateTimeFetcher>(new TimeProtocolClient(QLatin1String(UCLA_RFC868_SERVER))) );
+                std::unique_ptr<MultipleInternetTimeFetcher> multiFetcher( new MultipleInternetTimeFetcher() );
+                multiFetcher->addTimeFetcher( std::unique_ptr<AbstractAccurateTimeFetcher>(
+                    new TimeProtocolClient(QLatin1String(NIST_RFC868_SERVER))) );
+                multiFetcher->addTimeFetcher( std::unique_ptr<AbstractAccurateTimeFetcher>(
+                    new TimeProtocolClient(QLatin1String(UCLA_RFC868_SERVER))) );
+                m_timeSynchronizer = std::move( multiFetcher );
                 addInternetTimeSynchronizationTask();
             }
             else
