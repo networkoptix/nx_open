@@ -660,7 +660,7 @@
             <properties>
                 <compiler.arguments>-m32</compiler.arguments>
                 <qt.spec>linux-g++-32</qt.spec>
-                <arch.dir>/usr/lib/i386-linux-gnu/</arch.dir>
+                <arch.dir>i386-linux-gnu/</arch.dir>
             </properties>
         </profile>          
         <profile>
