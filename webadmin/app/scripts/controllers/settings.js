@@ -3,13 +3,12 @@
 angular.module('webadminApp')
     .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,$location,$timeout) {
 
-        mediaserver.getCurrentUser().then(function(result){
-            if(!result.data.reply.isAdmin && !(result.data.reply.permissions & Config.globalEditServersPermissions )){
+        mediaserver.checkAdmin().then(function(isAdmin){
+            if(!isAdmin){
                 $location.path('/info'); //no admin rights - redirect
                 return;
             }
         });
-
 
         mediaserver.getSettings().then(function (r) {
             $scope.settings = {
@@ -17,6 +16,9 @@ angular.module('webadminApp')
                 port: r.data.reply.port,
                 id: r.data.reply.id
             };
+
+            $scope.oldSystemName = r.data.reply.systemName;
+            $scope.oldPort = r.data.reply.port;
         });
 
         $scope.password = '';
@@ -85,7 +87,7 @@ angular.module('webadminApp')
             var data = r.data;
 
             if(data.error!=='0') {
-                console.log('some error',data);
+                //console.log('some error',data);
                 var errorToShow = data.errorString;
                 switch (errorToShow) {
                     case 'UNAUTHORIZED':
@@ -102,14 +104,25 @@ angular.module('webadminApp')
                 alert('Settings saved');
                 if( $scope.settings.port !==  window.location.port ) {
                     window.location.href = window.location.protocol + '//' + window.location.hostname + ':' + $scope.settings.port;
+                }else{
+                    window.location.reload();
                 }
             }
         }
 
         $scope.save = function () {
 
+
             if($scope.settingsForm.$valid) {
-                mediaserver.saveSettings($scope.settings.systemName, $scope.settings.port).then(resultHandler,errorHandler);
+                if($scope.oldSystemName !== $scope.settings.systemName &&
+                    !confirm('If there are others servers in local network with "' + $scope.settings.systemName +
+                        '" system name then it could lead to this server settings loss. Continue?')){
+                    $scope.settings.systemName = $scope.oldSystemName;
+                }
+
+                if($scope.oldSystemName !== $scope.settings.systemName  || $scope.oldPort !== $scope.settings.port ) {
+                    mediaserver.saveSettings($scope.settings.systemName, $scope.settings.port).then(resultHandler, errorHandler);
+                }
             }else{
                 alert('form is not valid');
             }

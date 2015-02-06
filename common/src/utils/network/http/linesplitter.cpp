@@ -55,6 +55,7 @@ namespace nx_http
 
         if( (m_prevLineEnding == '\r') && (*lineEnd == '\n') && (lineEnd == data.data()) )    //found LF just after CR
         {
+            //reading trailing line ending
             m_prevLineEnding = *lineEnd;
             if( bytesRead )
                 *bytesRead += 1;
@@ -64,6 +65,7 @@ namespace nx_http
         //line feed found
         if( m_currentLine.isEmpty() )
         {
+            //current line not cached, we're able to return reference to input data
             *lineBuffer = data.mid( 0, lineEnd-data.data() );
         }
         else
@@ -74,7 +76,7 @@ namespace nx_http
         }
         m_prevLineEnding = *lineEnd;
 
-        //TODO/IMPL skip \n in case when it comes with next buffer
+        //TODO #ak skip \n in case when it comes with next buffer
         if( *lineEnd == '\r' && (lineEnd+1) < data.data()+data.size() && *(lineEnd+1) == '\n' )
             ++lineEnd;
 
@@ -82,6 +84,26 @@ namespace nx_http
         if( bytesRead )
             *bytesRead += lineEnd-data.data() + 1;
         return true;
+    }
+
+    void LineSplitter::finishCurrentLineEnding(
+        const ConstBufferRefType& data,
+        size_t* const bytesRead )
+    {
+        if( bytesRead )
+            *bytesRead = 0;
+        if( data.isEmpty() )
+            return;
+
+        //trying to read trailing line ending
+        if( (m_prevLineEnding == '\r') && (data[0] == '\n') )    //found LF just after CR
+        {
+            //reading trailing line ending
+            m_prevLineEnding = data[0];
+            if( bytesRead )
+                *bytesRead += 1;
+            return;
+        }
     }
 
     void LineSplitter::reset()

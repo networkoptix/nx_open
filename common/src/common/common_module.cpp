@@ -33,6 +33,8 @@ QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent)
     m_sessionManager = new QnSessionManager(); //instance<QnSessionManager>();
     m_runUuid = QnUuid::createUuid();
     m_transcodingDisabled = false;
+    m_systemIdentityTime = 0;
+    m_lowPriorityAdminPassword = false;
 }
 
 QnCommonModule::~QnCommonModule() {
@@ -133,4 +135,37 @@ void QnCommonModule::loadResourceData(QnResourceDataPool *dataPool, const QStrin
     bool loaded = QFile::exists(fileName) && dataPool->load(fileName);
     
     Q_ASSERT_X(!required || loaded, Q_FUNC_INFO, "Can't parse resource_data.json file!");  /* Getting an assert here? Something is wrong with resource data json file. */
+}
+
+void QnCommonModule::setSystemIdentityTime(qint64 value, const QnUuid& sender)
+{ 
+    m_systemIdentityTime = value; 
+    emit systemIdentityTimeChanged(value, sender);
+}
+
+qint64 QnCommonModule::systemIdentityTime() const 
+{ 
+    return m_systemIdentityTime; 
+}
+
+void QnCommonModule::setAdminPasswordData(const QByteArray& hash, const QByteArray& digest)
+{
+    m_adminPaswdHash = hash;
+    m_adminPaswdDigest = digest;
+}
+
+void QnCommonModule::adminPasswordData(QByteArray* hash, QByteArray* digest) const
+{
+    *hash = m_adminPaswdHash;    
+    *digest = m_adminPaswdDigest;
+}
+
+void QnCommonModule::setUseLowPriorityAdminPasswordHach(bool value)
+{
+    m_lowPriorityAdminPassword = value;
+}
+
+bool QnCommonModule::useLowPriorityAdminPasswordHach() const
+{
+    return m_lowPriorityAdminPassword;
 }

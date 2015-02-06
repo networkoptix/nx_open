@@ -27,7 +27,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
 
     //checking brand compatibility
     if (success)
-        success |= qnSettings->isDevMode() || connectionInfo.brand.isEmpty() || connectionInfo.brand == QnAppInfo::productNameShort();
+        success = qnSettings->isDevMode() || connectionInfo.brand.isEmpty() || connectionInfo.brand == QnAppInfo::productNameShort();
 
     if(!success)
         return Result::Failure;
@@ -55,12 +55,12 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
     if (validateConnectionLight(connectionInfo, errorCode) == Result::Success)
         return Result::Success;
 
-    //TODO: #GDM duplicated code
+    //TODO: #GDM duplicated code, Result enum should be improved to handle all existing connect options
     bool success = (errorCode == ec2::ErrorCode::ok);
 
     //checking brand compatibility
     if (success)
-        success |= qnSettings->isDevMode() || connectionInfo.brand.isEmpty() || connectionInfo.brand == QnAppInfo::productNameShort();
+        success = qnSettings->isDevMode() || connectionInfo.brand.isEmpty() || connectionInfo.brand == QnAppInfo::productNameShort();
 
     QString detail;
 
@@ -94,17 +94,25 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
         compatibilityChecker = &localChecker;
     }
 
-    if (compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(qnCommon->engineVersion().toString()), QLatin1String("ECS"), connectionInfo.version)) {
+    bool haveExactVersion = false;
+    bool needExactVersion = false;
 
-#if 0
-        if (connectionInfo.nxClusterProtoVersion != nx_ec::EC2_PROTO_VERSION) {
+    if (compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(qnCommon->engineVersion().toString()), QLatin1String("ECS"), connectionInfo.version)) {
+        if (connectionInfo.nxClusterProtoVersion == nx_ec::EC2_PROTO_VERSION)
+            return Result::Success;
+
+        needExactVersion = true;
+        QList<QnSoftwareVersion> versions;
+        if (applauncher::getInstalledVersions(&versions) == applauncher::api::ResultType::ok) {
+            haveExactVersion = versions.contains(connectionInfo.version);
+        } else {
             QString olderComponent = connectionInfo.nxClusterProtoVersion < nx_ec::EC2_PROTO_VERSION
                 ? tr("Server")
                 : tr("Client");
             QString message = tr("You are about to connect to Server which has a different version:\n"
                 " - Client version: %1.\n"
                 " - Server version: %2.\n"
-                "These versions are not compatible. Please update your %3"
+                "These versions are not compatible. Please update your %3" // TODO: #TR after string freeze add period to the end ("... your %3.")
                 ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()).arg(olderComponent);
 #ifdef _DEBUG
             message += lit("\nClient Proto: %1\nServer Proto: %2").arg(nx_ec::EC2_PROTO_VERSION).arg(connectionInfo.nxClusterProtoVersion);
@@ -118,12 +126,6 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
                 );
             return Result::Failure;
         }
-
-        return Result::Success;
-#endif
-
-        if (connectionInfo.nxClusterProtoVersion == nx_ec::EC2_PROTO_VERSION)
-            return Result::Success;
     }
 
     if (connectionInfo.version < minSupportedVersion) {
@@ -190,7 +192,7 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
             return Result::Failure;
         }
 
-        if (!isInstalled) {
+        if (!isInstalled || (needExactVersion && !haveExactVersion)) {
 #if 0
             //updating using compatibility functionality is forbidden
             if( connectionInfo.version > qnCommon->engineVersion() )
@@ -211,7 +213,10 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
             }
 #endif
 
-            bool updating = qnCommon->engineVersion() < connectionInfo.version;
+            QString versionString = connectionInfo.version.toString(
+                    CompatibilityVersionInstallationDialog::useUpdate(connectionInfo.version)
+                        ? QnSoftwareVersion::FullFormat
+                        : QnSoftwareVersion::MinorFormat);
 
             int selectedButton = QnMessageBox::warning(
                 parentWidget,
@@ -223,8 +228,8 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
                 "Client version %3 is required to connect to this Server.\n"
                 "Download version %3?"
                 ).arg(qnCommon->engineVersion().toString())
-                .arg(connectionInfo.version.toString())
-                .arg(connectionInfo.version.toString(updating ? QnSoftwareVersion::FullFormat : QnSoftwareVersion::MinorFormat)),
+                .arg(versionString)
+                .arg(versionString),
                 QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::Cancel),
                 QMessageBox::Cancel
                 );
@@ -233,8 +238,10 @@ QnConnectionDiagnosticsHelper::Result QnConnectionDiagnosticsHelper::validateCon
                             new CompatibilityVersionInstallationDialog(connectionInfo.version, parentWidget));
                 //starting installation
                 installationDialog->exec();
-                if (installationDialog->installationSucceeded())
+                if (installationDialog->installationSucceeded()) {
+                    haveExactVersion = true;
                     continue;   //offering to start newly-installed compatibility version
+                }
             }
             return Result::Failure;
         }

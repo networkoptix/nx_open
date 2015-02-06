@@ -144,6 +144,9 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
     
     if (resource->readDeviceInformation() && resource->getFullUrlInfo())
     {
+        if (resource->getMAC().isNull())
+            return resList; // MAC address is mandatory for manual search
+
         // Clarify resource type
         QString manufacturer = resource->getVendor();
         QString modelName = resource->getModel();

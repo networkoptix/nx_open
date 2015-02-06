@@ -33,6 +33,7 @@ namespace nx_http
     AsyncHttpClient::AsyncHttpClient()
     :
         m_state( sInit ),
+        m_connectionClosed( false ),
         m_requestBytesSent( 0 ),
         m_authorizationTried( false ),
         m_terminated( false ),
@@ -40,7 +41,8 @@ namespace nx_http
         m_contentEncodingUsed( true ),
         m_responseReadTimeoutMs( DEFAULT_RESPONSE_READ_TIMEOUT ),
         m_msgBodyReadTimeoutMs( 0 ),
-        m_authType(authBasicAndDigest)
+        m_authType(authBasicAndDigest),
+        m_awaitedMessageNumber( 0 )
     {
         m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
     }
@@ -274,6 +276,8 @@ namespace nx_http
             return;
         }
 
+        //TODO #ak recheck connection closure situation
+
         using namespace std::placeholders;
 
         m_requestBytesSent += bytesWritten;
@@ -343,18 +347,26 @@ namespace nx_http
                     break;
                 }
 
-                if( m_httpStreamReader.state() <= HttpStreamReader::readingMessageHeaders )
+                //connection could be closed by remote peer already
+
+                if( m_httpStreamReader.currentMessageNumber() < m_awaitedMessageNumber ||       //still reading previous message
+                    m_httpStreamReader.state() <= HttpStreamReader::readingMessageHeaders )     //still reading message headers
                 {
+                    //response has not been read yet, reading futher
                     m_responseBuffer.resize( 0 );
-                    if( !m_socket->readSomeAsync( &m_responseBuffer, std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) ) )
+                    if( m_connectionClosed ||
+                        !m_socket->readSomeAsync(
+                            &m_responseBuffer,
+                            std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) ) )
                     {
-                        NX_LOG( lit( "Failed to read (1) response from %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
+                        NX_LOG( lit( "Failed to read (1) response from %1. %2" ).
+                            arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
                         m_state = sFailed;
                         lk.unlock();
                         emit done( sharedThis );
                         lk.relock();
                     }
-                    return;  //response has not been read yet
+                    return;
                 }
 
                 //read http message headers
@@ -417,7 +429,8 @@ namespace nx_http
                         break;
                 }
 
-                if( m_httpStreamReader.state() == HttpStreamReader::readingMessageBody )
+                if( (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody) &&
+                    !m_connectionClosed )
                 {
                     //reading more data
                     m_responseBuffer.resize( 0 );
@@ -508,23 +521,27 @@ namespace nx_http
     {
         using namespace std::placeholders;
 
-        bool canUseExistingConnection = true;
+        bool canUseExistingConnection = false;
         if( m_httpStreamReader.message().type == nx_http::MessageType::response )
         {
-            canUseExistingConnection = nx_http::getHeaderValue(
-                m_httpStreamReader.message().response->headers,
-                "Connection" ) != "close";
+            canUseExistingConnection =
+                (m_httpStreamReader.message().response->statusLine.version == nx_http::http_1_1) &&
+                (nx_http::getHeaderValue( m_httpStreamReader.message().response->headers, "Connection" ) != "close");
         }
 
-        m_httpStreamReader.resetState();
+        m_url = url;
 
         if( m_socket )
         {
             //TODO #ak think again about next cancellation
             m_socket->cancelAsyncIO();
 
-            if( canUseExistingConnection )
+            if( !m_connectionClosed &&
+                canUseExistingConnection &&
+                (m_socket->getForeignAddress() == SocketAddress(url.host(), url.port(nx_http::DEFAULT_HTTP_PORT))) )
             {
+                ++m_awaitedMessageNumber;   //current message will be skipped
+
                 serializeRequest();
                 m_state = sSendingRequest;
 
@@ -543,9 +560,21 @@ namespace nx_http
             }
         }
 
+        //resetting parser state only if establishing new tcp connection
+        m_httpStreamReader.resetState();
+        m_awaitedMessageNumber = 0;
+
+        return initiateTcpConnection();
+    }
+
+    bool AsyncHttpClient::initiateTcpConnection()
+    {
+        const SocketAddress remoteAddress( m_url.host(), m_url.port( nx_http::DEFAULT_HTTP_PORT ) );
+
         m_state = sInit;
 
         m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(/*url.scheme() == lit("https")*/));
+        m_connectionClosed = false;
         if( !m_socket->setNonBlockingMode( true ) ||
             !m_socket->setSendTimeout( DEFAULT_CONNECT_TIMEOUT ) ||
             !m_socket->setRecvTimeout( m_responseReadTimeoutMs ) )
@@ -556,16 +585,15 @@ namespace nx_http
             return false;
         }
 
-        m_url = url;
         m_state = sWaitingConnectToHost;
 
         //starting async connect
         if( !m_socket->connectAsync(
-                SocketAddress( url.host(), url.port( DEFAULT_HTTP_PORT ) ),
-                std::bind( &AsyncHttpClient::asyncConnectDone, this, m_socket.data(), _1 ) ) )
+                remoteAddress,
+                std::bind( &AsyncHttpClient::asyncConnectDone, this, m_socket.data(), std::placeholders::_1 ) ) )
         {
-            NX_LOG( lit("Failed to perform async connect to %1:%2. %3").
-                arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
+            NX_LOG( lit("Failed to perform async connect to %1. %2").
+                arg(remoteAddress.toString()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
             m_socket.clear();
             m_url.clear();
             m_state = sInit;
@@ -586,6 +614,7 @@ namespace nx_http
             m_state = (m_httpStreamReader.state() == HttpStreamReader::messageDone) || (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody)
                 ? sDone
                 : sFailed;
+            m_connectionClosed = true;
             return 0;
         }
 
@@ -599,10 +628,18 @@ namespace nx_http
             return -1;
         }
 
+        if( m_httpStreamReader.state() == HttpStreamReader::parseError )
+        {
+            m_state = sFailed;
+            return bytesRead;
+        }
+
+        Q_ASSERT( m_httpStreamReader.currentMessageNumber() <= m_awaitedMessageNumber );
+        if( m_httpStreamReader.currentMessageNumber() < m_awaitedMessageNumber )
+            return bytesRead;   //reading some old message, not changing state in this case
+
         if( m_httpStreamReader.state() == HttpStreamReader::messageDone )
             m_state = sDone;
-        else if( m_httpStreamReader.state() == HttpStreamReader::parseError )
-            m_state = sFailed;
         return bytesRead;
     }
 
@@ -634,6 +671,11 @@ namespace nx_http
             m_userName = m_url.userName();
         if( !m_url.password().isEmpty() )
             m_userPassword = m_url.password();
+
+        //adding NX-User-Name to help server to port data from 2.1 to 2.3 and from 2.3 to 2.4 (generate user's digest)
+        //TODO #ak remove it after 2.3 support is over
+        if( !m_userName.isEmpty() )
+            nx_http::insertOrReplaceHeader( &m_request.headers, HttpHeader("NX-User-Name", m_userName.toUtf8()) );
 
         //not using Basic authentication by default, since it is not secure
         nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
@@ -890,6 +932,7 @@ namespace nx_http
         auto requestCompletionFunc = [httpClientCaptured, completionHandler]
             ( nx_http::AsyncHttpClientPtr httpClient ) mutable
         {
+            httpClientCaptured->disconnect( nullptr, (const char*)nullptr );
             httpClientCaptured.reset();
 
             if( httpClient->failed() )
@@ -917,7 +960,13 @@ namespace nx_http
             httpClientCaptured.get(), requestCompletionFunc,
             Qt::DirectConnection );
 
-        return httpClientCaptured->doGet( url );
+        if( !httpClientCaptured->doGet( url ) )
+        {
+            //if we do not disconnect, http client object will not be destroyed
+            httpClientCaptured->disconnect( nullptr, (const char*)nullptr );
+            return false;
+        }
+        return true;
     }
 
     SystemError::ErrorCode downloadFileSync(

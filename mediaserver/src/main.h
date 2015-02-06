@@ -52,7 +52,8 @@ private slots:
     void at_appStarted();
     void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
     void at_emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);
-    void at_restartServerRequired();
+    void at_databaseDumped();
+    void at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
     void at_updatePublicAddress(const QHostAddress& publicIP);
 private:
     void updateDisabledVendorsIfNeeded();
@@ -61,6 +62,9 @@ private:
     QHostAddress getPublicAddress();
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);
     void saveStorages(ec2::AbstractECConnectionPtr ec2Connection, const QnAbstractStorageResourceList& storages);
+    void dumpSystemUsageStats();
+    void saveAdminPswdHash();
+    bool isStopping() const;
 private:
     int m_argc;
     char** m_argv;
@@ -72,8 +76,12 @@ private:
     QnMediaServerResourcePtr m_mediaServer;
     QSet<QnUuid> m_updateUserRequests;
     QHostAddress m_publicAddress;
+    QMutex m_mutex;
     std::unique_ptr<QnPublicIPDiscovery> m_ipDiscovery;
     std::unique_ptr<QTimer> m_updatePiblicIpTimer;
+    quint64 m_dumpSystemResourceUsageTaskID;
+    bool m_stopping;
+    mutable QMutex m_stopMutex;
 };
 
 #endif // MAIN_H

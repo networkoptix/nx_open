@@ -32,7 +32,7 @@
     <!-- Standard Strings (Common Buttons, Labels etc) -->
     <String Id="StdString_Ok"                                       Overridable="yes">Ok</String>
     <String Id="StdString_Warning"                                  Overridable="yes">Attention</String>
-    <String Id="StdString_SetupTitle"                               Overridable="yes">[ProductName] Setup</String>
+    <String Id="StdString_SetupTitle"                               Overridable="yes">[ProductName] Installation</String>
 
     <!-- AllFieldsAreMandatoryDlg -->
     <String Id="AllFieldsAreMandatoryDlg_AllFieldsAreMandatory"     Overridable="yes">Tous les champs sont obligatoires</String>
@@ -67,7 +67,7 @@
     <!-- InstallTypeDlg -->
     <String Id="InstallTypeDlg_QuickFull"                           Overridable="yes">Complète Rapide (Installer tous les composants)</String>
     <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">Client Seulement(Je veux voir le vidéo enregistré ailleurs)</String>
-    <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">Avancée/String>
+    <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">Avancée</String>
     <String Id="InstallTypeDlg_SelectInstallType"                   Overridable="yes">S.V.P. Sélectionner le type d'installation</String>
     <String Id="InstallTypeDlg_InstallType"                         Overridable="yes">Type d'installation</String>       
 

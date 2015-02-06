@@ -155,6 +155,12 @@ namespace {
         ITEM_ANIMATOR_KEY = 0x81AFD591  /**< Key for item animator. */
     };
 
+#ifdef QN_PREVIEW_SEARCH_DEBUG
+    QString dt(qint64 time) {
+        return QDateTime::fromMSecsSinceEpoch(time).toString(lit("hh:mm:ss"));
+    }
+#endif
+
 } // anonymous namespace
 
 QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
@@ -1514,16 +1520,26 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
             synchronizeGeometry(widget, false);
     }
 
-    qreal widgetAspectRatio = widget->visualAspectRatio();
-    if (widgetAspectRatio <= 0) {
-        QnConstResourceVideoLayoutPtr videoLayout = widget->channelLayout();
-        /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
-        widgetAspectRatio = aspectRatio(videoLayout->size()) * (item->zoomRect().isNull() ? 1.0 : aspectRatio(item->zoomRect())) * (4.0 / 3.0);
-        if (QnAspectRatio::isRotated90(item->rotation()))
-            widgetAspectRatio = 1 / widgetAspectRatio;
+    /* Calculate items size. */
+    QSize size;
+    if (item->layout()->items().size() == 1) {
+        /* Layout containing only one item (current) is supposed to have the same AR as the item.
+         * So we just set item size to its video layout size. */
+        size = widget->channelLayout()->size();
+    } else {
+        qreal widgetAspectRatio = widget->visualAspectRatio();
+        if (widgetAspectRatio <= 0) {
+            QnConstResourceVideoLayoutPtr videoLayout = widget->channelLayout();
+            /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
+            widgetAspectRatio = aspectRatio(videoLayout->size()) * (item->zoomRect().isNull() ? 1.0 : aspectRatio(item->zoomRect())) * (4.0 / 3.0);
+            if (QnAspectRatio::isRotated90(item->rotation()))
+                widgetAspectRatio = 1 / widgetAspectRatio;
+        }
+        Qt::Orientation orientation = widgetAspectRatio > 1.0 ? Qt::Vertical : Qt::Horizontal;
+        if (qFuzzyEquals(widgetAspectRatio, 1.0))
+            orientation = QnGeometry::aspectRatio(workbench()->mapper()->cellSize()) > 1.0 ? Qt::Horizontal : Qt::Vertical;
+        size = bestSingleBoundedSize(workbench()->mapper(), 1, orientation, widgetAspectRatio);
     }
-    const Qt::Orientation orientation = widgetAspectRatio > 1.0 ? Qt::Vertical : Qt::Horizontal;
-    const QSize size = bestSingleBoundedSize(workbench()->mapper(), 1, orientation, widgetAspectRatio);
 
     /* Adjust item's geometry for the new size. */
     if(size != item->geometry().size()) {
@@ -1664,12 +1680,15 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             m_loader->pleaseStop();
         }
 
-        if(QnResourcePtr resource = resourcePool()->getResourceByUniqId((**layout->items().begin()).resourceUid())) {
-            m_loader = new QnThumbnailsLoader(resource, false);
+        if(const QnResourcePtr &resource = resourcePool()->getResourceByUniqId((**layout->items().begin()).resourceUid())) {
+            m_loader = new QnThumbnailsLoader(resource, QnThumbnailsLoader::Mode::Strict);
 
-            connect(m_loader, SIGNAL(thumbnailLoaded(const QnThumbnail &)), this, SLOT(at_loader_thumbnailLoaded(const QnThumbnail &)));
-            connect(m_loader, SIGNAL(finished()), m_loader, SLOT(deleteLater()));
+            connect(m_loader, &QnThumbnailsLoader::thumbnailLoaded, this,       &QnWorkbenchDisplay::at_previewSearch_thumbnailLoaded);
+            connect(m_loader, &QnThumbnailsLoader::finished,        m_loader,   &QObject::deleteLater);
 
+#ifdef QN_PREVIEW_SEARCH_DEBUG
+            qDebug() << "starting thumbnails loading" << dt(searchState.period.startTimeMs) << dt(searchState.period.endTimeMs());
+#endif
             m_loader->setTimePeriod(searchState.period);
             m_loader->setTimeStep(searchState.step);
             m_loader->start();
@@ -1733,7 +1752,9 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
                 displayTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0); // TODO: #Elric do offset adjustments in one place
 
             // TODO: #Elric move out, common code, another copy is in QnWorkbenchScreenshotHandler
-            QString timeString = (widget->resource()->toResource()->flags() & Qn::utc) ? QDateTime::fromMSecsSinceEpoch(displayTime).toString(lit("yyyy MMM dd hh:mm:ss")) : QTime().addMSecs(displayTime).toString(lit("hh:mm:ss"));
+            QString timeString = (widget->resource()->toResource()->flags() & Qn::utc) 
+                ? QDateTime::fromMSecsSinceEpoch(displayTime).toString(lit("yyyy MMM dd hh:mm:ss")) 
+                : QTime(0, 0, 0, 0).addMSecs(displayTime).toString(lit("hh:mm:ss.zzz"));
             widget->setTitleTextFormat(QLatin1String("%1\t") + timeString);
         }
 
@@ -1761,58 +1782,52 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
     fitInView(false);
 }
 
-void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail) {
+void QnWorkbenchDisplay::at_previewSearch_thumbnailLoaded(const QnThumbnail &thumbnail) {
     QnThumbnailsSearchState searchState = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
     if(searchState.step <= 0)
         return;
   
-    int index = (thumbnail.time() - searchState.period.startTimeMs) / searchState.step;
-    QList<QnResourceWidget *> widgets = this->widgets();
-    if(index < 0)
-        return;
+#ifdef QN_PREVIEW_SEARCH_DEBUG
+    qDebug() << "thumbnail loaded" << dt(thumbnail.actualTime());
+#endif
 
-    qSort(widgets.begin(), widgets.end(), WidgetPositionLess());
+    QnMediaResourceWidget *bestMatching = NULL;
+    qint64 bestDifference = 0;
 
-    if(index < widgets.size()) {
+    for (QnResourceWidget *widget: this->widgets()) {
+        QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
+        if (!mediaWidget)
+            continue;
 
-        // when we have received thumbnail for an item, check if it can be used for the previous item
-        for (int checkedIdx = qMax(index - 1, 0); checkedIdx <= index; checkedIdx++) {
-            if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widgets[checkedIdx])) {
-                qint64 time = mediaWidget->item()->data<qint64>(Qn::ItemTimeRole, -1);
+        QnWorkbenchItem* item = widget->item();
+        if (!item)
+            continue;
 
-                if (time > 0 && qAbs(time - thumbnail.actualTime()) > searchState.step / 2)
-                    continue;
+        qint64 targetTime = item->data<qint64>(Qn::ItemTimeRole, -1);
+        if (targetTime < 0)
+            continue;
 
-                qint64 existingThumbnailTime = mediaWidget->item()->data<qint64>(Qn::ItemThumbnailTimestampRole, 0);
-                if (qAbs(time - existingThumbnailTime) < qAbs(time - thumbnail.actualTime()))   // if value not present automatically advance =)
-                    continue;
+        qint64 diff = qAbs(thumbnail.actualTime() - targetTime);
+        if (diff > searchState.step)
+            continue;
 
-                mediaWidget->item()->setData(Qn::ItemThumbnailTimestampRole, thumbnail.actualTime());
-
-                mediaWidget->display()->archiveReader()->jumpTo(thumbnail.actualTime() * 1000, 0);
-                mediaWidget->display()->camDisplay()->setMTDecoding(false);
-                mediaWidget->display()->camDisplay()->putData(thumbnail.data());
-                mediaWidget->display()->camDisplay()->start();
-                mediaWidget->display()->archiveReader()->startPaused();
-            }
-        }
+        if (!bestMatching || diff < bestDifference) {
+            bestMatching = mediaWidget;
+            bestDifference = diff;
+        } 
     }
 
-    if(index >= widgets.size() - 1) {
-        int i = 0;
-        foreach(QnResourceWidget *widget, widgets) {
-            if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
-                if(!mediaWidget->display()->camDisplay()->isRunning()) {
-                    mediaWidget->display()->archiveReader()->jumpTo((searchState.period.startTimeMs + searchState.step * i) * 1000, 0);
-                    mediaWidget->display()->camDisplay()->setMTDecoding(false);
-                    mediaWidget->display()->camDisplay()->start();
-                    mediaWidget->display()->archiveReader()->startPaused();
-                }
-            }
-            i++;
-        }
-        return;
+    if(bestMatching) {
+#ifdef QN_PREVIEW_SEARCH_DEBUG
+        qDebug() << "thumbnail with time" << dt(thumbnail.actualTime()) << "set to widget" << dt(bestMatching->item()->data<qint64>(Qn::ItemTimeRole, -1));
+#endif
+
+        bestMatching->display()->camDisplay()->setMTDecoding(false);
+        bestMatching->display()->camDisplay()->putData(thumbnail.data());
+        bestMatching->display()->camDisplay()->start();
+        bestMatching->display()->archiveReader()->startPaused();
     }
+
 }
 
 void QnWorkbenchDisplay::at_item_dataChanged(int role) {

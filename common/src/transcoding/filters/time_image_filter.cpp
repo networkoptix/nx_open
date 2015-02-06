@@ -14,11 +14,11 @@
 #include "core/resource/resource_media_layout.h"
 
 
-static const int TEXT_HEIGHT_IN_FRAME_PARTS = 25;
+static const int TEXT_HEIGHT_IN_FRAME_PARTS = 20;
 static const int MIN_TEXT_HEIGHT = 14;
 static const double FPS_EPS = 1e-8;
 
-QnTimeImageFilter::QnTimeImageFilter(const QSharedPointer<const QnResourceVideoLayout>& videoLayout, Qn::Corner datePos, qint64 timeOffsetMs):
+QnTimeImageFilter::QnTimeImageFilter(const QSharedPointer<const QnResourceVideoLayout>& videoLayout, Qn::Corner datePos, qint64 timeOffsetMs, qint64 timeMsec):
     m_dateTimeXOffs(0),
     m_dateTimeYOffs(0),
     m_bufXOffs(0),
@@ -28,7 +28,8 @@ QnTimeImageFilter::QnTimeImageFilter(const QSharedPointer<const QnResourceVideoL
     m_imageBuffer(0),
     m_dateTextPos(datePos),
     m_checkHash(videoLayout && videoLayout->channelCount() > 1),
-    m_hash(-1)
+    m_hash(-1),
+    m_timeMsec(timeMsec)
 {
 }
 
@@ -40,11 +41,15 @@ QnTimeImageFilter::~QnTimeImageFilter()
 
 void QnTimeImageFilter::initTimeDrawing(const CLVideoDecoderOutputPtr& frame, const QString& timeStr)
 {
+    if (frame->width == m_timeImgSrcSiz.width() && frame->height == m_timeImgSrcSiz.height())
+        return;
+    m_timeImgSrcSiz = QSize(frame->width, frame->height);
+
     m_timeFont.setBold(true);
-    m_timeFont.setPixelSize(qMax(MIN_TEXT_HEIGHT, frame->height / TEXT_HEIGHT_IN_FRAME_PARTS));
+    m_timeFont.setPixelSize(qMax(MIN_TEXT_HEIGHT, frame->height / TEXT_HEIGHT_IN_FRAME_PARTS ));
     QFontMetrics metric(m_timeFont);
     
-    while (metric.width(timeStr) >= frame->width - metric.averageCharWidth() && m_timeFont.pixelSize() > 0)
+    while (metric.width(timeStr) >= frame->width - metric.averageCharWidth() && m_timeFont.pixelSize() > MIN_TEXT_HEIGHT)
     {
         m_timeFont.setPixelSize(m_timeFont.pixelSize()-1);
         metric = QFontMetrics(m_timeFont);
@@ -80,6 +85,8 @@ void QnTimeImageFilter::initTimeDrawing(const CLVideoDecoderOutputPtr& frame, co
     int drawWidth = metric.width(timeStr);
     int drawHeight = metric.height();
     drawWidth = qPower2Ceil((unsigned) drawWidth + m_dateTimeXOffs, CL_MEDIA_ALIGNMENT);
+    qFreeAligned(m_imageBuffer);
+	delete m_timeImg;
     m_imageBuffer = (uchar*) qMallocAligned(drawWidth * drawHeight * 4, CL_MEDIA_ALIGNMENT);
     m_timeImg = new QImage(m_imageBuffer, drawWidth, drawHeight, drawWidth*4, QImage::Format_ARGB32_Premultiplied);
 }
@@ -100,14 +107,18 @@ CLVideoDecoderOutputPtr QnTimeImageFilter::updateImage(const CLVideoDecoderOutpu
 {
 
     QString timeStr;
-    qint64 displayTime = frame->pts/1000 + m_onscreenDateOffset;
-    if (frame->pts >= UTC_TIME_DETECTION_THRESHOLD)
+    qint64 displayTime = m_timeMsec > 0
+        ? m_timeMsec
+        : frame->pts / 1000;
+
+    displayTime += m_onscreenDateOffset;
+
+    if (displayTime * 1000 >= UTC_TIME_DETECTION_THRESHOLD)
         timeStr = QDateTime::fromMSecsSinceEpoch(displayTime).toString(QLatin1String("yyyy-MMM-dd hh:mm:ss"));
     else
-        timeStr = QTime().addMSecs(displayTime).toString(QLatin1String("hh:mm:ss.zzz"));
+        timeStr = QTime(0, 0, 0, 0).addMSecs(displayTime).toString(QLatin1String("hh:mm:ss.zzz"));
 
-    if (m_timeImg == 0)
-        initTimeDrawing(frame, timeStr);
+    initTimeDrawing(frame, timeStr);
 
     int bufPlaneYOffs  = m_bufXOffs + m_bufYOffs * frame->linesize[0];
     int bufferUVOffs = m_bufXOffs/2 + m_bufYOffs * frame->linesize[1] / 2;

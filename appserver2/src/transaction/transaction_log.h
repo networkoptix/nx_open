@@ -50,6 +50,7 @@ namespace ec2
         };
 
         QnTransactionLog(QnDbManager* db);
+        virtual ~QnTransactionLog();
 
         static QnTransactionLog* instance();
 
@@ -136,7 +137,7 @@ namespace ec2
         }
 
         qint64 getTimeStamp();
-        void init();
+        bool init();
 
         int getLatestSequence(const QnTranStateKey& key) const;
         QnUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray()) const;
@@ -248,7 +249,7 @@ namespace ec2
         
         mutable QMutex m_timeMutex;
         QElapsedTimer m_relativeTimer;
-        qint64 m_currentTime;
+        qint64 m_baseTime;
         qint64 m_lastTimestamp;
         CommitData m_commitData;
     };

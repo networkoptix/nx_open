@@ -62,6 +62,7 @@ public:
         m_proxyInfo.proxyCond = cond;
     }
 
+    InstanceFunc findHandler(QSharedPointer<AbstractStreamSocket> clientSocket, const QByteArray& protocol, const nx_http::Request& request);
     QnTCPConnectionProcessor* createNativeProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, const QByteArray& protocol, const nx_http::Request& request);
 
     /* proxy support functions */

@@ -38,11 +38,12 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent):
     ui->activateFreeLicenseButton->setText(qnProductFeatures().freeLicenseIsTrial ? tr("Activate Trial License") : tr("Activate Free License"));
     setWarningStyle(ui->fileLineEdit);
 
+    const QString emailAddress = lit("<a href=\"mailto:%1\">%1</a>").arg(QnAppInfo::licensingEmailAddress());
+
     ui->manualActivationTextWidget->resize(this->width(), ui->manualActivationTextWidget->height());
-    ui->manualActivationTextWidget->setText(tr(
-         "Please send email with the Serial Key and the Hardware ID provided to <a href=\"mailto:%1\">%1</a>. "
-         "Then we'll send you an Activation Key file."
-     ).arg(QnAppInfo::licensingEmailAddress())); // TODO: #Elric move to product features?
+    ui->manualActivationTextWidget->setText(
+        tr("Please send email with the Serial Key and the Hardware ID provided to %1 to obtain an Activation Key file.").arg(emailAddress)
+        ); // TODO: #Elric move to product features?
 
     setWarningStyle(ui->licenseKeyWarningLabel);
     ui->licenseKeyWarningLabel->setVisible(false);

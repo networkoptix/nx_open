@@ -22,7 +22,6 @@ namespace ec2
         m_queryProcessor( queryProcessor ),
         m_connectionInfo( connectionInfo )
     {
-        QnTransactionMessageBus::instance()->setHandler( notificationManager() );
     }
 
     RemoteEC2Connection::~RemoteEC2Connection()
@@ -40,14 +39,14 @@ namespace ec2
 
     void RemoteEC2Connection::startReceivingNotifications() {
 
+        QnTransactionMessageBus::instance()->setHandler( notificationManager() );
+
         base_type::startReceivingNotifications();
 
         QUrl url(m_queryProcessor->getUrl());
         url.setScheme( m_connectionInfo.allowSslConnections ? lit("https") : lit("http") );
         url.setPath("ec2/events");
         QUrlQuery q;
-        q.addQueryItem("guid", qnCommon->moduleGUID().toString());
-        q.addQueryItem("runtime-guid", qnCommon->runningInstanceGUID().toString());
         url.setQuery(q);
         m_peerUrl = url;
         QnTransactionMessageBus::instance()->addConnectionToPeer(url);

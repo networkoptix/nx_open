@@ -230,9 +230,6 @@ signals:
     */
     void asyncParamSetDone(const QnResourcePtr &resource, const QString& paramName, const QVariant& paramValue, bool result);
 
-    void initAsyncFinished(const QnResourcePtr &resource, bool initialized); // TODO: #Elric remove signal
-
-
 public:
 #ifdef ENABLE_DATA_PROVIDERS
     // this is thread to process commands like setparam
@@ -363,6 +360,7 @@ private:
     //!map<key, <value, isDirty>>
     std::map<QString, LocalPropertyValue> m_locallySavedProperties;
     bool m_removedFromPool;
+    bool m_initInProgress;
 };
 
 template<class Resource>

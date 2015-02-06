@@ -57,6 +57,11 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor():
     connect(qnBusinessMessageBus, &QnBusinessMessageBus::actionDelivered, this, &QnBusinessRuleProcessor::at_actionDelivered);
     connect(qnBusinessMessageBus, &QnBusinessMessageBus::actionDeliveryFail, this, &QnBusinessRuleProcessor::at_actionDeliveryFailed);
 
+    connect(qnResPool, &QnResourcePool::resourceAdded,
+        this, [this](const QnResourcePtr& resource) { toggleInputPortMonitoring( resource, true ); });
+    connect(qnResPool, &QnResourcePool::resourceRemoved,
+        this, [this](const QnResourcePtr& resource) { toggleInputPortMonitoring( resource, false ); });
+
     connect(qnBusinessMessageBus, &QnBusinessMessageBus::actionReceived,
         this, static_cast<void (QnBusinessRuleProcessor::*)(const QnAbstractBusinessActionPtr&)>(&QnBusinessRuleProcessor::executeAction));
 
@@ -663,6 +668,34 @@ void QnBusinessRuleProcessor::at_businessRuleReset(const QnBusinessEventRuleList
     }
 }
 
+void QnBusinessRuleProcessor::toggleInputPortMonitoring(const QnResourcePtr& resource, bool toggle)
+{
+    QMutexLocker lock(&m_mutex);
+
+    QnSecurityCamResource* camResource = dynamic_cast<QnSecurityCamResource*>(resource.data());
+    if( camResource == nullptr )
+        return;
+
+    for( const QnBusinessEventRulePtr& rule: m_rules )
+    {
+        if( rule->isDisabled() )
+            continue;
+
+        if( rule->eventType() == QnBusiness::CameraInputEvent)
+        {
+            QnVirtualCameraResourceList resList = rule->eventResourceObjects().filtered<QnVirtualCameraResource>();
+            if( resList.isEmpty() ||            //listening all cameras
+                resList.contains(resource.staticCast<QnVirtualCameraResource>()) )
+            {
+                if( toggle )
+                    camResource->inputPortListenerAttached();
+                else
+                    camResource->inputPortListenerDetached();
+            }
+        }
+    }
+}
+
 void QnBusinessRuleProcessor::terminateRunningRule(const QnBusinessEventRulePtr& rule)
 {
     QString ruleId = rule->getUniqueId();
@@ -720,39 +753,31 @@ void QnBusinessRuleProcessor::notifyResourcesAboutEventIfNeccessary( const QnBus
     {
         if( businessRule->eventType() == QnBusiness::CameraInputEvent)
         {
-            QnResourceList resList = businessRule->eventResourceObjects();
-            if (resList.isEmpty()) {
-                const QnResourcePtr& mServer = qnResPool->getResourceById(qnCommon->moduleGUID());
-                resList = qnResPool->getAllCameras(mServer, true);
-            }
+            QnVirtualCameraResourceList resList = businessRule->eventResourceObjects().filtered<QnVirtualCameraResource>();
+            if (resList.isEmpty())
+                resList = qnResPool->getAllCameras(QnResourcePtr(), true);
 
-            for( QnResourceList::const_iterator it = resList.constBegin(); it != resList.constEnd(); ++it )
+            for(const QnVirtualCameraResourcePtr camera: resList)
             {
-                QnSecurityCamResource* securityCam = dynamic_cast<QnSecurityCamResource*>(it->data());
-                if( !securityCam )
-                    continue;
                 if( isRuleAdded )
-                    securityCam->inputPortListenerAttached();
+                    camera->inputPortListenerAttached();
                 else
-                    securityCam->inputPortListenerDetached();
+                    camera->inputPortListenerDetached();
             }
         }
     }
 
     //notifying resources about recording action
     {
-        const QnResourceList& resList = businessRule->actionResourceObjects();
+        QnVirtualCameraResourceList resList = businessRule->actionResourceObjects().filtered<QnVirtualCameraResource>();
         if( businessRule->actionType() == QnBusiness::CameraRecordingAction)
         {
-            for( QnResourceList::const_iterator it = resList.begin(); it != resList.end(); ++it )
+            for(const QnVirtualCameraResourcePtr camera: resList)
             {
-                QnSecurityCamResource* securityCam = dynamic_cast<QnSecurityCamResource*>(it->data());
-                if( !securityCam )
-                    continue;
                 if( isRuleAdded )
-                    securityCam->recordingEventAttached();
+                    camera->recordingEventAttached();
                 else
-                    securityCam->recordingEventDetached();
+                    camera->recordingEventDetached();
             }
         }
     }

@@ -64,7 +64,7 @@ namespace nxcip
         char modelName[256];
         //!Firmware version in any human readable format. Optional
         char firmware[256];
-        //!Camera's unique identifier. MAC address can be used
+        //!Camera's unique identifier. MAC address can be used. MUST NOT be empty
         char uid[256];
         //!Camera management url. Can contain just address. MUST NOT be empty
         char url[MAX_TEXT_LEN];
@@ -88,7 +88,7 @@ namespace nxcip
         }
     };
 
-    static const int CAMERA_INFO_ARRAY_SIZE = 1024;
+    static const int CAMERA_INFO_ARRAY_SIZE = 256;
     static const int MAX_MODEL_NAME_SIZE = 256;
 
     //!This interface is used to find cameras and create \a BaseCameraManager instance

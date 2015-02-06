@@ -5,7 +5,7 @@
 
 #include <QtCore/QMetaType>
 
-#include <nx_ec/impl/ec_api_impl.h>
+#include <nx_ec/ec_api_fwd.h>
 #include <utils/common/model_functions_fwd.h>
 #include <utils/camera/camera_diagnostics.h>
 
@@ -55,6 +55,7 @@ const QSize SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 316); // 316 is average bet
 const QSize SECONDARY_STREAM_MAX_RESOLUTION(1024, 768);
 
 class CameraMediaStreams;
+class CameraMediaStreamInfo;
 
 class QN_EXPORT QnPhysicalCameraResource : public QnVirtualCameraResource
 {
@@ -70,6 +71,11 @@ public:
     virtual void setUrl(const QString &url) override;
     virtual int getChannel() const override;
 
+    /*!
+        \return \a true if \a mediaStreamInfo differs from existing and has been saved
+    */
+    bool saveMediaStreamInfoIfNeeded( const CameraMediaStreamInfo& mediaStreamInfo );
+
     static float getResolutionAspectRatio(const QSize& resolution); // find resolution helper function
     static QSize getNearestResolution(const QSize& resolution, float aspectRatio, double maxResolutionSquare, const QList<QSize>& resolutionList, double* coeff = 0); // find resolution helper function
 
@@ -78,12 +84,15 @@ protected:
     void saveResolutionList( const CameraMediaStreams& supportedNativeStreams );
 
 private:
+    QMutex m_mediaStreamsMutex;
     int m_channelNumber; // video/audio source number
 };
 
 class CameraMediaStreamInfo
 {
 public:
+    //!0 - primary stream, 1 - secondary stream
+    int encoderIndex;
     //!has format "1920x1080" or "*" to notify that any resolution is supported
     QString resolution;
     //!transport method that can be used to receive this stream
@@ -97,12 +106,18 @@ public:
     std::vector<QString> transports;
     //!if \a true this stream is produced by transcoding one of native (having this flag set to \a false) stream
     bool transcodingRequired;
-    CodecID codec;
+    int codec;
 
     CameraMediaStreamInfo();
-    CameraMediaStreamInfo( const QSize& _resolution, CodecID _codec );
+    CameraMediaStreamInfo(
+        int _encoderIndex,
+        const QSize& _resolution,
+        CodecID _codec );
+
+    bool operator==( const CameraMediaStreamInfo& rhs ) const;
+    bool operator!=( const CameraMediaStreamInfo& rhs ) const;
 };
-#define CameraMediaStreamInfo_Fields (resolution)(transports)(transcodingRequired)
+#define CameraMediaStreamInfo_Fields (encoderIndex)(resolution)(transports)(transcodingRequired)(codec)
 
 
 class CameraMediaStreams

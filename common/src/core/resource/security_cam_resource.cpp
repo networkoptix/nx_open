@@ -33,6 +33,9 @@ namespace {
     static const int defaultSecondStreamFpsHigh = 12;
 }
 
+//const int PRIMARY_ENCODER_INDEX = 0;
+//const int SECONDARY_ENCODER_INDEX = 1;
+
 QnSecurityCamResource::QnSecurityCamResource(): 
     m_dpFactory(0),
     m_recActionCnt(0),
@@ -42,10 +45,10 @@ QnSecurityCamResource::QnSecurityCamResource():
 {
     addFlags(Qn::live_cam);
 
-    connect(this, &QnResource::parentIdChanged, this, &QnSecurityCamResource::at_parentIdChanged, Qt::DirectConnection);
+    connect(this, &QnResource::initializedChanged, this, &QnSecurityCamResource::at_initializedChanged, Qt::DirectConnection);
+    connect(this, &QnSecurityCamResource::motionRegionChanged, this, &QnSecurityCamResource::at_motionRegionChanged, Qt::DirectConnection);
 
     QnMediaResource::initMediaResource();
-
 }
 
 QString QnSecurityCamResource::getName() const
@@ -61,7 +64,12 @@ QString QnSecurityCamResource::getName() const
 
 void QnSecurityCamResource::setName( const QString& name )
 {
-    setCameraName( name );
+    QString oldName = getName();
+    if (oldName == name)
+        return;
+
+    setCameraName(name);
+    emit nameChanged(toSharedPointer(this));
 }
 
 void QnSecurityCamResource::setCameraName( const QString& newCameraName )
@@ -157,6 +165,7 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
 
 void QnSecurityCamResource::initializationDone() 
 {
+    //m_initMutex is locked down the stack
     QnNetworkResource::initializationDone();
     if( m_inputPortListenerCount.load() > 0 )
         startInputPortMonitoringAsync( std::function<void(bool)>() );
@@ -270,12 +279,12 @@ Qn::LicenseType QnSecurityCamResource::licenseType() const
     QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId());
     if (resType && resType->getManufacture() == lit("VMAX"))
         return Qn::LC_VMAX;
+    else if (isAnalogEncoder())
+        return Qn::LC_AnalogEncoder; // AnalogEncoder should have priority over Analog type because of analog type is deprecated (DW-CP04 has both analog and analogEncoder params)
     else if (isAnalog())
         return Qn::LC_Analog;
     else if (isEdge())
         return Qn::LC_Edge;
-    else if (isAnalogEncoder())
-        return Qn::LC_AnalogEncoder;
     else
         return Qn::LC_Professional;
 }
@@ -328,8 +337,10 @@ void QnSecurityCamResource::inputPortListenerAttached() {
     QMutexLocker lk( &m_initMutex );
 
     //if camera is not initialized yet, delayed input monitoring will start on initialization completion
-    if( m_inputPortListenerCount.fetchAndAddOrdered( 1 ) == 0 )
+    const int inputPortListenerCount = m_inputPortListenerCount.fetchAndAddOrdered( 1 );
+    if( isInitialized() && (inputPortListenerCount == 0) )
         startInputPortMonitoringAsync( std::function<void(bool)>() );
+    //if resource is not initialized, input port monitoring will start just after initInternal completion
 }
 
 void QnSecurityCamResource::inputPortListenerDetached() {
@@ -345,10 +356,24 @@ void QnSecurityCamResource::inputPortListenerDetached() {
         m_inputPortListenerCount.fetchAndAddOrdered( 1 );   //no reduce below 0
 }
 
-void QnSecurityCamResource::at_parentIdChanged() 
+void QnSecurityCamResource::at_initializedChanged() 
 {
-    if(getParentId() != qnCommon->moduleGUID())
-        stopInputPortMonitoringAsync();  //camera moved to different server, stopping input monitoring
+    if( !isInitialized() )  //e.g., camera has been moved to a different server
+        stopInputPortMonitoringAsync();  //stopping input monitoring
+}
+
+void QnSecurityCamResource::at_motionRegionChanged()
+{
+    if (flags() & Qn::foreigner)
+        return;
+
+    if (getMotionType() == Qn::MT_HardwareGrid || getMotionType() == Qn::MT_MotionWindow) 
+    {
+    	QnConstResourceVideoLayoutPtr layout = getVideoLayout();
+    	int numChannels = layout->channelCount();
+        for (int i = 0; i < numChannels; ++i)
+            setMotionMaskPhysical(i);
+    }
 }
 
 int QnSecurityCamResource::motionWindowCount() const 

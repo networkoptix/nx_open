@@ -71,6 +71,7 @@ public:
     QnStorageResourcePtr getStorageByUrl(const QString& fileName);
     QnStorageResourcePtr storageRoot(int storage_index) const { QMutexLocker lock(&m_mutexStorages); return m_storageRoots.value(storage_index); }
     bool isStorageAvailable(int storage_index) const; 
+    bool isStorageAvailable(const QnStorageResourcePtr& storage) const; 
 
     DeviceFileCatalogPtr getFileCatalog(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
     DeviceFileCatalogPtr getFileCatalog(const QString& cameraUniqueId, const QString &catalogPrefix);
@@ -116,6 +117,8 @@ public:
     bool deleteBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark);
     bool getBookmarks(const QByteArray &cameraGuid, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);
     void initDone();
+    int getStorageIndex(const QnStorageResourcePtr& storage);
+    QnStorageResourcePtr findStorageByOldIndex(int oldIndex);
 signals:
     void noStoragesAvailable();
     void storageFailure(const QnResourcePtr &storageRes, QnBusiness::EventReason reason);
@@ -129,7 +132,6 @@ private:
     friend class TestStorageThread;
 
     int detectStorageIndex(const QString& path);
-    QSet<int> getDeprecateIndexList(const QString& p);
     //void loadFullFileCatalogInternal(QnServer::ChunksCatalog catalog, bool rebuildMode);
     QnStorageResourcePtr extractStorageFromFileName(int& storageIndex, const QString& fileName, QString& uniqueId, QString& quality);
     void getTimePeriodInternal(QVector<QnTimePeriodList> &cameras, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, qint64 detailLevel, const DeviceFileCatalogPtr &catalog);
@@ -150,7 +152,6 @@ private:
     void replaceChunks(const QnTimePeriod& rebuildPeriod, const QnStorageResourcePtr &storage, const DeviceFileCatalogPtr &newCatalog, const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
     void doMigrateCSVCatalog(QnServer::ChunksCatalog catalog);
     QMap<QString, QSet<int>> deserializeStorageFile();
-    QnStorageResourcePtr findStorageByOldIndex(int oldIndex, QMap<QString, QSet<int>> oldIndexes);
     void clearUnusedMotion();
     //void clearCameraHistory();
     //void minTimeByCamera(const FileCatalogMap &catalogMap, QMap<QString, qint64>& minTimes);
@@ -158,6 +159,8 @@ private:
     void findTotalMinTime(const bool useMinArchiveDays, const FileCatalogMap& catalogMap, qint64& minTime, DeviceFileCatalogPtr& catalog);
     void addDataFromDatabase(const QnStorageResourcePtr &storage);
     QnStorageDbPtr getSDB(const QnStorageResourcePtr &storage);
+    bool writeCSVCatalog(const QString& fileName, const QVector<DeviceFileCatalog::Chunk> chunks);
+    void backupFolderRecursive(const QString& src, const QString& dst);
 private:
     StorageMap m_storageRoots;
     FileCatalogMap m_devFileCatalog[QnServer::ChunksCatalogCount];
@@ -192,6 +195,7 @@ private:
     QMap<QString, QnStorageDbPtr> m_chunksDB;
     bool m_initInProgress;
     mutable QMutex m_sdbMutex;
+    QMap<QString, QSet<int>> m_oldStorageIndexes;
 };
 
 #define qnStorageMan QnStorageManager::instance()

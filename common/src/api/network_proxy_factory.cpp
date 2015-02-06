@@ -26,7 +26,10 @@ QUrl QnNetworkProxyFactory::urlToResource(const QUrl &baseUrl, const QnResourceP
         break;
     case QNetworkProxy::HttpProxy: {
         QUrl url(baseUrl);
-        url.setPath(lit("/proxy/%1%2").arg(resource->getId().toString()).arg(url.path()));
+        QUrlQuery query(url.query());
+        query.addQueryItem(lit("proxy"), resource->getId().toString());
+        url.setQuery(query);
+
         url.setHost(proxy.hostName());
         url.setPort(proxy.port());
 

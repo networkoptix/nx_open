@@ -205,6 +205,7 @@ bool QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)>&& c
     auto httpReqCompletionHandler = [httpClientCaptured, cameraMAC, completionHandler]
         ( const nx_http::AsyncHttpClientPtr& httpClient ) mutable
     {
+        httpClientCaptured->disconnect( nullptr, (const char*)nullptr );
         httpClientCaptured.reset();
 
         auto completionHandlerLocal = std::move( completionHandler );
@@ -228,7 +229,12 @@ bool QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)>&& c
              this, httpReqCompletionHandler,
              Qt::DirectConnection );
 
-    return httpClientCaptured->doGet( url );
+    if( !httpClientCaptured->doGet( url ) )
+    {
+        httpClientCaptured->disconnect( nullptr, (const char*)nullptr );
+        return false;
+    }
+    return true;
 }
 
 CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
@@ -292,16 +298,22 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
     //detecting and saving selected resolutions
     CameraMediaStreams mediaStreams;
     const CodecID streamCodec = isH264() ? CODEC_ID_H264 : CODEC_ID_MJPEG;
-    mediaStreams.streams.push_back( CameraMediaStreamInfo( QSize(maxSensorWidth.toInt(), maxSensorHeight.toInt()), streamCodec ) );
+    mediaStreams.streams.push_back( CameraMediaStreamInfo(
+        PRIMARY_ENCODER_INDEX,
+        QSize(maxSensorWidth.toInt(), maxSensorHeight.toInt()),
+        streamCodec ) );
     QString hasDualStreaming = getProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME);
     if( hasDualStreaming.toInt() > 0 )
-        mediaStreams.streams.push_back( CameraMediaStreamInfo( QSize(maxSensorWidth.toInt()/2, maxSensorHeight.toInt()/2), streamCodec ) );
+        mediaStreams.streams.push_back( CameraMediaStreamInfo(
+            SECONDARY_ENCODER_INDEX,
+            QSize(maxSensorWidth.toInt()/2, maxSensorHeight.toInt()/2),
+            streamCodec ) );
     saveResolutionList( mediaStreams );
 
     setFirmware(firmwareVersion.toString());
     saveParams();
 
-    setParamPhysical(lit("mdzonesite"), zone_size);
+    setParamPhysical(lit("mdzonesize"), zone_size);
     m_zoneSite = zone_size;
     setMotionMaskPhysical(0);
 
@@ -482,7 +494,7 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
         
         if (!region.getRegionBySens(sens).isEmpty())
         {
-            setParamPhysicalAsync(lit("mdtotalzones"), sensToLevelThreshold[sens]);
+            setParamPhysicalAsync(lit("mdlevelthreshold"), sensToLevelThreshold[sens]);
             break; // only 1 sensitivity for all frame is supported
         }
     }

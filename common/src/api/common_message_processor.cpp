@@ -32,6 +32,7 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 {
     if (m_connection) {
         /* Safety check in case connection will not be deleted instantly. */
+        m_connection->stopReceivingNotifications();
         disconnectFromConnection(m_connection);
     }
     m_connection = connection;
@@ -114,7 +115,6 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 }
 
 void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) {
-    connection->stopReceivingNotifications();
     connection->disconnect(this);
     connection->getResourceManager()->disconnect(this);
     connection->getMediaServerManager()->disconnect(this);

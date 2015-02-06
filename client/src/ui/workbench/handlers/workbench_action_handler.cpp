@@ -344,8 +344,10 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     if (layout->getItems().size() >= maxItems)
         return;
 
+#ifndef DESKTOP_CAMERA_DEBUG
     if (resource->hasFlags(Qn::desktop_camera))
         return;
+#endif
 
     {
         //TODO: #GDM #Common refactor duplicated code
@@ -1147,7 +1149,8 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
     QUrl url(server->getApiUrl());
     url.setUserName(QString());
     url.setPassword(QString());
-    QDesktopServices::openUrl(url);
+    url.setScheme(lit("http"));
+    QDesktopServices::openUrl(QnNetworkProxyFactory::instance()->urlToResource(url, server));
 }
 
 void QnWorkbenchActionHandler::at_systemAdministrationAction_triggered() {
@@ -1488,7 +1491,7 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
         return;
 
     QScopedPointer<QnServerSettingsDialog> dialog(new QnServerSettingsDialog(server, mainWindow()));
-    connect(dialog.data(), &QnServerSettingsDialog::rebuildArchiveDone, context()->navigator(), &QnWorkbenchNavigator::at_clearLoaderCache);
+    connect(dialog.data(), &QnServerSettingsDialog::rebuildArchiveDone, context()->navigator(), &QnWorkbenchNavigator::clearLoaderCache);
 
     dialog->setWindowModality(Qt::ApplicationModal);
     if(!dialog->exec())
@@ -1514,8 +1517,9 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
 
     QUrl url = server->getApiUrl();
     url.setScheme(lit("http"));
-    url.setPath(lit("/api/showLog"));
+    url.setPath(lit("/static/index.html"));
     url.setQuery(lit("lines=1000"));
+    url.setFragment(lit("/log")); // add hashtag postfix. It's required for our web page java script
     
     //setting credentials for access to resource
     url.setUserName(QnAppServerConnectionFactory::url().userName());
@@ -2024,10 +2028,14 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(newPassword);
 
     QnAppServerConnectionFactory::setUrl(url);
+
+    /* QnAppServerConnectionFactory::url() contains user name in lower case. We'd better use the original name for UI. */
+    url.setUserName(user->getName());
+
     QnConnectionDataList savedConnections = qnSettings->customConnections();
     if (!savedConnections.isEmpty() 
         && !savedConnections.first().url.password().isEmpty() 
-        && qnUrlEqual(savedConnections.first().url, url)) 
+        && qnUrlEqual(savedConnections.first().url, url))
     {
         QnConnectionData current = savedConnections.takeFirst();
         current.url = url;
@@ -2040,7 +2048,6 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
         lastUsed.url = url;
         qnSettings->setLastUsedConnection(lastUsed);
     }
-
 }
 
 void QnWorkbenchActionHandler::at_layoutSettingsAction_triggered() {

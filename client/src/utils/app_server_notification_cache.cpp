@@ -42,6 +42,9 @@ QnNotificationSoundModel* QnAppServerNotificationCache::persistentGuiModel() con
 }
 
 bool QnAppServerNotificationCache::storeSound(const QString &filePath, int maxLengthMSecs, const QString &customTitle) {
+    if (!isConnectedToServer())
+        return false;
+
     QString uuid = QnUuid::createUuid().toString();
     QString newFilename = uuid.mid(1, uuid.size() - 2) + QLatin1String(".mp3");
 
@@ -70,6 +73,9 @@ bool QnAppServerNotificationCache::storeSound(const QString &filePath, int maxLe
 }
 
 bool QnAppServerNotificationCache::updateTitle(const QString &filename, const QString &title) {
+    if (!isConnectedToServer())
+        return false;
+
     bool result = FileTranscoder::setTagValue( getFullPath(filename), titleTag, title );
     if (result) {
         m_model->updateTitle(filename, title);
@@ -88,6 +94,9 @@ void QnAppServerNotificationCache::clear() {
 }
 
 void QnAppServerNotificationCache::at_fileAddedEvent(const QString &filename) {
+    if (!isConnectedToServer())
+        return;
+
     if (!filename.startsWith(folder))
         return;
 
@@ -102,6 +111,9 @@ void QnAppServerNotificationCache::at_fileAddedEvent(const QString &filename) {
 }
 
 void QnAppServerNotificationCache::at_fileUpdatedEvent(const QString &filename) {
+    if (!isConnectedToServer())
+        return;
+
     if (!filename.startsWith(folder))
         return;
 
@@ -118,6 +130,9 @@ void QnAppServerNotificationCache::at_fileUpdatedEvent(const QString &filename) 
 }
 
 void QnAppServerNotificationCache::at_fileRemovedEvent(const QString &filename) {
+    if (!isConnectedToServer())
+        return;
+
     if (!filename.startsWith(folder))
         return;
 
@@ -131,13 +146,16 @@ void QnAppServerNotificationCache::at_fileRemovedEvent(const QString &filename) 
 }
 
 void QnAppServerNotificationCache::at_soundConverted(const QString &filePath) {
+    if (!isConnectedToServer())
+        return;
+
     QString filename = QFileInfo(filePath).fileName();
     m_model->addUploading(filename);
     uploadFile(filename);
 }
 
 void QnAppServerNotificationCache::at_fileListReceived(const QStringList &filenames, bool ok) {
-    if (!ok)
+    if (!ok || !isConnectedToServer())
         return;
 
     m_model->loadList(filenames);
@@ -147,7 +165,7 @@ void QnAppServerNotificationCache::at_fileListReceived(const QStringList &filena
 }
 
 void QnAppServerNotificationCache::at_fileAdded(const QString &filename, bool ok) {
-    if (!ok)
+    if (!ok || !isConnectedToServer())
         return;
 
     //TODO: #GDM #Business think about getTagValueAsync
@@ -157,8 +175,9 @@ void QnAppServerNotificationCache::at_fileAdded(const QString &filename, bool ok
 }
 
 void QnAppServerNotificationCache::at_fileRemoved(const QString &filename, bool ok) {
-    if (!ok)
+    if (!ok || !isConnectedToServer())
         return;
+
     int row = m_model->rowByFilename(filename);
     if (row > 0)
         m_model->removeRow(row);

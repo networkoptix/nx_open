@@ -1,26 +1,34 @@
 {
-    "__comment__": "                                                \
-    Get width from here:                                            \
-    http://en.wikipedia.org/wiki/Image_sensor_format                \
-    Note: 1/2.8 is 5.2mm x 3.9mm, D=6.5mm.                          \
-                                                                    \
-    Calculate width-based crop factor C = 36/W.                     \
-                                                                    \
-    Multiply focal lengths by width-based crop factor to get        \
-    width-based equivalent focal length.                            \
-																	\
-    Another important note.                                         \    
-    If the camera overshoots on movement, then it means that 35mm   \
-    fov in this file should be increased.                           \
-    If it undershoots, then 35mm fov should be decreased.           \
-    ",
+    "__comment__": [
+    "Get width from here:                                            ",
+    "http://en.wikipedia.org/wiki/Image_sensor_format                ",
+    "Note: 1/2.8 is 5.2mm x 3.9mm, D=6.5mm.                          ",
+    "                                                                ",
+    "Calculate width-based crop factor C = 36/W.                     ",
+    "                                                                ",                                                                    
+    "Multiply focal lengths by width-based crop factor to get        ",
+    "width-based equivalent focal length.                            ",
+    "                                                                ",
+    "Another important note.                                         ",  
+    "If the camera overshoots on movement, then it means that 35m    ",
+    "fov in this file should be increased.                           ",
+    "If it undershoots, then 35mm fov should be decreased.           "
+    ],
     
     "version": "1.0",
     "data": [
         {
             "keys": [
+                "VISTA|*",
+                "DW|*"
+            ],
+            "trustMaxFPS": true
+        },
+
+        {
+            "keys": [
                 "VISTA|VK2-ENCODER",
-		        "*|DW-CP04"
+                "*|DW-CP04"
             ],
             "analogEncoder": true
         },
@@ -45,7 +53,8 @@
                 "vista|*"
             ],
             "showUrl": true,
-            "urlLocalePath": "basic/basic.php"
+            "urlLocalePath": "basic/basic.php",
+            "renewOnvifPullPointSubscriptionRequired": false
         },
         {
             "keys": [
@@ -66,13 +75,13 @@
                 "ZXDZHZ|vimicro","DW|DWC-MF21M4TIR","ACTI|TCM4201","Sony|SNC-CH120","Sony|SNC-CH280",
                 "Sony|SNC-DH210","Sony|SNC-DH120T","VITEK|VT-20VN-M","Etrovision Technology|EV8180U-XL","VIVOTEK|FE8174V",
                 "AVTECH|AVM542B",
-				"DW|DWC-MPA20M","Win4NET Co., Ltd.|Clebo-MD20","DW|DWC-MC421D","Win4NET Co., Ltd.|Clebo-BX20",
-				"DW|DWC-MB721M4TIR","Win4NET Co., Ltd.|Clebo-MB721M4TIR",
-				"DW|DWC-MB721M8TIR","Win4NET Co., Ltd.|Clebo-MB721M8TIR",
-				"DW|DWC-MF21M4TIR","Win4NET Co., Ltd.|Clebo-MF21M4TIR",
-				"DW|DWC-MF21M8TIR","Win4NET Co., Ltd.|Clebo-MF21M8TIR",
-				"DW|DWC-MF21M4FM","Win4NET Co., Ltd.|Clebo-MF21M4FM",
-				"DW|DWC-MF21M8FM","Win4NET Co., Ltd.|Clebo-MF21M8FM"
+                "DW|DWC-MPA20M","Win4NET Co., Ltd.|Clebo-MD20","DW|DWC-MC421D","Win4NET Co., Ltd.|Clebo-BX20",
+                "DW|DWC-MB721M4TIR","Win4NET Co., Ltd.|Clebo-MB721M4TIR",
+                "DW|DWC-MB721M8TIR","Win4NET Co., Ltd.|Clebo-MB721M8TIR",
+                "DW|DWC-MF21M4TIR","Win4NET Co., Ltd.|Clebo-MF21M4TIR",
+                "DW|DWC-MF21M8TIR","Win4NET Co., Ltd.|Clebo-MF21M8TIR",
+                "DW|DWC-MF21M4FM","Win4NET Co., Ltd.|Clebo-MF21M4FM",
+                "DW|DWC-MF21M8FM","Win4NET Co., Ltd.|Clebo-MF21M8FM"
             ],
             "ptzCapabilities": "NoPtzCapabilities"
         },
@@ -90,24 +99,27 @@
             "keys": [
                 "ACTI|KCM3311","ACTI|KCM7211","ACTI|KCM5611","ACTI|KCM5311","Sony|SNC-EM600","Sony|SNC-CX600","Sony|SNC-DH120T",
                 "Sony|SNC-XM636",
-			"DW|DWC-MB421TIR","Win4NET Co., Ltd.|Clebo-BL20"
+            "DW|DWC-MB421TIR","Win4NET Co., Ltd.|Clebo-BL20"
             ],
             "ptzCapabilities": "ContinuousZoomCapability"
         },
         {
             "keys": [
-		        "VISTA|VK2-1080VFD3V9F",
-		        "VISTA|VK2-1080BIR3V9F",
-		        "VISTA|VK2-720VZMI",
-		        "VISTA|VK2-720VZMX"
+                "VISTA|VK2-1080VFD3V9F",
+                "VISTA|VK2-1080BIR3V9F",
+                "VISTA|VK2-720VZMI",
+                "VISTA|VK2-720VZMX",
+                "VISTA|VK2-1080VRDIR3V9F",
+                "VISTA|VK2-3MPBIR3V9F",
+		"VISTA|VK2-3MPVRDIR3V9F"
             ],
             "ptzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability"
         },
         {
             "keys": [
                 "VISTA|*PTW",
-				"DW|DWC-MPT","Win4NET Co., Ltd.|Clebo-MPT",
-				"DW|DWC-MPTFM","Win4NET Co., Ltd.|Clebo-MPTFM"
+                "DW|DWC-MPT","Win4NET Co., Ltd.|Clebo-MPT",
+                "DW|DWC-MPTFM","Win4NET Co., Ltd.|Clebo-MPTFM"
             ],
             "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability",
             "ptzTraits": "FourWayPtz"
@@ -122,6 +134,7 @@
             "keys": [
                 "VISTA|VK2-ENCODER",
                 "VISTA|VK2-1080PTZ",
+                "VISTA|VK2-600PTZ",
                 "*|DW-CP04"
             ],
             "onvifPtzPresetsEnabled": true
@@ -138,25 +151,26 @@
                 "VISTA|VK2-1080PTZ",
                 "VISTA|VK2-ENCODER"
             ],
-            "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability"
+            "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability|PresetsPtzCapability"
         },
         {
             "keys": [
-                "VISTA|VK2-1080VRD*"
+                "VISTA|VK2-1080VRD",
+                "VISTA|VK2-1080VRD3V9"
             ],
-			"ptzCapabilities": ""
+            "ptzCapabilities": ""
         },
-	{
+    {
             "keys": [
                 "DW|DWC-MD421D","Win4NET Co., Ltd.|Clebo-FD20"
             ],
             "ptzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability"
         },
-	{
+    {
             "keys": [
                 "DW|DWC-PV2M4TIR","DW|DWC-PB2M4TIR"
             ],
-	    "dw-http-ptz": true
+        "dw-http-ptz": true
         },
         {
             "keys": [
@@ -194,11 +208,11 @@
         {
             "keys": [
                 "DW|DWC-MPTZ20X|unknown_beta",
-				"Win4NET Co., Ltd.|Clebo-PD20",
-				"Win4NET Co., Ltd.|Clebo-PM20SV2",
-				"Win4NET Co., Ltd.|Clebo-BD",
-				"DW|DWC-MPTZ20XFM",
-				"Win4NET Co., Ltd.|Clebo-MPTZ20XFM"
+                "Win4NET Co., Ltd.|Clebo-PD20",
+                "Win4NET Co., Ltd.|Clebo-PM20SV2",
+                "Win4NET Co., Ltd.|Clebo-BD",
+                "DW|DWC-MPTZ20XFM",
+                "Win4NET Co., Ltd.|Clebo-MPTZ20XFM"
             ],
             "ptzMapper": {
                 "fromCamera": {
@@ -225,8 +239,8 @@
         {
             "keys": [
                 "DW|DWC-MPTZ5X|2.1.0.3", "DW|DWC-MPTZ5X" ,
-				"Win4NET Co., Ltd.|Clebo-MPTZ5X",
-				"DW|DWC-MPTZ5XFM","Win4NET Co., Ltd.|Clebo-MPTZ5XFM"
+                "Win4NET Co., Ltd.|Clebo-MPTZ5X",
+                "DW|DWC-MPTZ5XFM","Win4NET Co., Ltd.|Clebo-MPTZ5XFM"
             ],
             "ptzMapper": {
                 "fromCamera": {
@@ -426,6 +440,33 @@
         },
         {
             "keys": [
+                "VISTA|VK2-1080XVRDPTZF"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [   1,  -1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "_TODO": "Actual tilt range is [0, -180].",
+                        "device":  [0.9,   0],
+                        "logical": [0,   -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [    -1,   -0.9,   -0.8,   -0.7,   -0.6,   -0.5,   -0.4,   -0.3,   -0.2,   -0.1,      0,    0.1,    0.2,    0.3,    0.4,    0.5,    0.6,    0.7,    0.8,    0.9,       1],
+                        "logical": [1.0000, 1.0748, 1.1636, 1.2617, 1.3738, 1.5000, 1.6449, 1.8178, 2.0187, 2.2477, 2.5234, 2.8458, 3.2383, 3.7150, 4.2850, 4.9766, 5.8411, 6.8645, 7.9626, 9.2925, 10.9050],
+                        "logicalMultiplier": 32.0,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "keys": [
                 "VISTA|VK2-1080XPTZ"
             ],
             "ptzMapper": {
@@ -450,7 +491,88 @@
                     }
                 }
             }
+        },    
+        {
+            "keys": [
+                "VISTA|VK2-1080XPTZF"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [   1,  -1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "_TODO": "Actual tilt range is [0, -180].",
+                        "device":  [0.9,   0],
+                        "logical": [0,   -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [    -1,   -0.9,   -0.8,   -0.7,   -0.6,   -0.5,   -0.4,   -0.3,   -0.2,   -0.1,      0,    0.1,    0.2,    0.3,    0.4,    0.5,    0.6,     0.7,     0.8,     0.9,       1],
+                        "logical": [1.0000, 1.0859, 1.1797, 1.2891, 1.4141, 1.5703, 1.7422, 1.9453, 2.2031, 2.5000, 2.8672, 3.3281, 3.9297, 4.7344, 5.7188, 7.0313, 8.7969, 12.1481, 14.8011, 19.6882, 29.3229],
+                        "logicalMultiplier": 30.0,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },            
+        {
+            "keys": [
+                "VISTA|VK2-1080XIRPTZF"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [   1,  -1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "_TODO": "Actual tilt range is [0, -180].",
+                        "device":  [-1,   1],
+                        "logical": [0,   -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [    -1,   -0.9,   -0.8,   -0.7,   -0.6,   -0.5,   -0.4,   -0.3,   -0.2,   -0.1,      0,    0.1,    0.2,    0.3,    0.4,    0.5,    0.6,     0.7,     0.8,     0.9,       1],
+                        "logical": [    1,  1.09449,    1.19767,    1.31801,    1.45551,    1.62733,    1.81642,    2.03983,    2.32341,    2.65,   3.05392,    3.56091,    4.2226,    5.10784,    6.19068,    7.63443,    9.57659,    13.26291,    16.18121,    21.55702,    32.15519],
+                        "logicalMultiplier": 30.0,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
         },
+        {
+            "keys": [
+                "eneo|PXD-2030PTZ1080"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [   1,  -1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "_TODO": "Actual tilt range is [0, -180].",
+                        "device":  [-1,   1],
+                        "logical": [0,   90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [    0,  1],
+                        "logical": [   1,  6],
+                        "logicalMultiplier": 32.0,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },        
         {
             "keys": [
                 "SONY|SNC-EP580|unknown"

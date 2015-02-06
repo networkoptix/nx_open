@@ -1,3 +1,6 @@
+
+#include <memory>
+
 #include <QtCore/QCoreApplication>
 #include <QtConcurrent/QtConcurrentMap>
 #include <QtNetwork/QHostInfo>
@@ -76,10 +79,17 @@ QList<QnInterfaceAndAddr> getAllIPv4Interfaces()
 
     QList<QnInterfaceAndAddr> result;
 
-    for(const QNetworkInterface& iface: QNetworkInterface::allInterfaces())
+    QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
+    for (const QNetworkInterface &iface: interfaces)
     {
         if (!(iface.flags() & QNetworkInterface::IsUp))
             continue;
+
+#if defined(Q_OS_LINUX) && defined(__arm__)
+        /* skipping 1.2.3.4 address on ISD */
+        if (iface.name() == lit("usb0") && interfaces.size() > 1)
+            continue;
+#endif
 
         QList<QNetworkAddressEntry> addresses = iface.addressEntries();
         for (const QNetworkAddressEntry& address: addresses)
@@ -605,7 +615,7 @@ bool isNewDiscoveryAddressBetter(const QString& host, const QString& newAddress,
 #ifdef _WIN32
 
 //TODO #ak refactor of function api is required
-void getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host)
+int getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host)
 {
     // for test purpose only. This function used for EDGE so far
     memset(MAC_str, 0, sizeof(MAC_str));
@@ -622,29 +632,40 @@ void getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host)
         MAC_str[MAC_ADDR_LEN-1] = 0;
     }
 
-    return;
+    return 0;
 }
 
 #elif defined(__linux__)
 
-void getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host)
+int getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host)
 {
     memset(MAC_str, 0, sizeof(MAC_str)/sizeof(*MAC_str));
 #define HWADDR_len 6
-    int s,i;
     struct ifreq ifr;
-    s = socket(AF_INET, SOCK_DGRAM, 0);
+    int s = socket(AF_INET, SOCK_DGRAM, 0);
+    if( s == -1 )
+        return -1;
+    auto SCOPED_GUARD_FUNC = []( int* socketHandlePtr ){ close(*socketHandlePtr); };
+    std::unique_ptr<int, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( &s, SCOPED_GUARD_FUNC );
+
+    //TODO #ak read interface name
     strcpy(ifr.ifr_name, "eth0");
-    if (ioctl(s, SIOCGIFHWADDR, &ifr) != -1) {
-        for (i=0; i<HWADDR_len; i++)
-            sprintf(&MAC_str[i*3],"%02X-",((unsigned char*)ifr.ifr_hwaddr.sa_data)[i]);
-        MAC_str[17] = 0;
-    }
-    if((ioctl(s, SIOCGIFADDR, &ifr)) != -1) {
-        const sockaddr_in* ip = (sockaddr_in*) &ifr.ifr_addr;
-        *host = inet_ntoa(ip->sin_addr);
-    }
-    close(s);
+
+    //reading mac address
+    if (ioctl(s, SIOCGIFHWADDR, &ifr) == -1)
+        return -1;
+    for (int i=0; i<HWADDR_len; i++)
+        sprintf(&MAC_str[i*3],"%02X-",((unsigned char*)ifr.ifr_hwaddr.sa_data)[i]);
+    MAC_str[MAC_ADDR_LEN-1] = 0;
+
+    //reading interface IP
+    if(ioctl(s, SIOCGIFADDR, &ifr) == -1)
+        return -1;
+    const sockaddr_in* ip = (sockaddr_in*) &ifr.ifr_addr;
+    //TODO #ak replace with inet_ntop?
+    *host = inet_ntoa(ip->sin_addr);
+
+    return 0;
 }
 
 #else	//mac, bsd
@@ -655,11 +676,11 @@ void getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host)
 #include <sys/types.h>
 #include <sys/socket.h>
 
-void getMacFromPrimaryIF(char MAC_str[MAC_ADDR_LEN], char** host)
+int getMacFromPrimaryIF(char MAC_str[MAC_ADDR_LEN], char** host)
 {
     struct ifaddrs* ifap = nullptr;
     if (getifaddrs(&ifap) != 0)
-        return;
+        return -1;
 
     std::map<std::string, std::string> ifNameToLinkAddress;
     std::map<std::string, std::string> ifNameToInetAddress;
@@ -691,13 +712,15 @@ void getMacFromPrimaryIF(char MAC_str[MAC_ADDR_LEN], char** host)
     freeifaddrs(ifap);
 
     if( ifNameToInetAddress.empty() )
-        return;	//no ipv4 address
+        return -1;	//no ipv4 address
     auto hwIter = ifNameToLinkAddress.find( ifNameToInetAddress.begin()->first );
     if( hwIter == ifNameToLinkAddress.end() )
-        return;	//ipv4 interface has no link-level address
+        return -1;	//ipv4 interface has no link-level address
 
     strncpy( MAC_str, hwIter->second.c_str(), sizeof(MAC_str)-1 );
     if( host )
         *host = nullptr;
+
+    return 0;
 }
 #endif

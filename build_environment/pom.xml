@@ -19,6 +19,7 @@
         <root.dir>${basedir}/..</root.dir>
         <!-- Change it to true to skip buildenv synchronization (can save time)-->
         <rsync.skip>false</rsync.skip>
+	<donotrebuild>false</donotrebuild>
     </properties>
 
     <dependencies>
@@ -81,10 +82,11 @@
         <profile>
             <id>main-buildenv-tasks</id>
             <activation>
-                <file>
-                    <!-- the dumb activator does not recognize variables so I can only put hardcode here -->
-                    <missing>../build_variables/target/donotrebuild</missing>
-                </file> 
+	        <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>donotrebuild</name>
+                    <value>false</value>
+                </property>
             </activation>
             <build>
                 <plugins>

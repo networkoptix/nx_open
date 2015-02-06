@@ -95,6 +95,14 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     /* We'll be using this one, so make sure it's created. */
     context()->instance<QnWorkbenchServerTimeWatcher>();
     m_updateSliderTimer.restart();
+
+    //TODO: #GDM Temporary fix for the Feature #4714. Correct change would be: expand getTimePeriods query with Region data,
+    // then truncate cached chunks by this region and synchronize the cache.
+    QTimer* discardCacheTimer = new QTimer(this);
+    discardCacheTimer->setInterval(10*60*1000);
+    discardCacheTimer->setSingleShot(false);
+    connect(discardCacheTimer, &QTimer::timeout, this, &QnWorkbenchNavigator::clearLoaderCache);
+    discardCacheTimer->start();
 }
     
 QnWorkbenchNavigator::~QnWorkbenchNavigator() {
@@ -676,7 +684,7 @@ void QnWorkbenchNavigator::stepBackward() {
     emit positionChanged();
 }
 
-void QnWorkbenchNavigator::at_clearLoaderCache()
+void QnWorkbenchNavigator::clearLoaderCache()
 {
     for (QnCachingCameraDataLoader* loader: m_loaderByResource) {
         if (loader)

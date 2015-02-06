@@ -52,6 +52,12 @@ namespace nx_http
         }
     }
 
+    HttpHeaders::iterator insertHeader( HttpHeaders* const headers, const HttpHeader& newHeader )
+    {
+        HttpHeaders::iterator itr = headers->lower_bound( newHeader.first );
+        return headers->insert( itr, newHeader );
+    }
+
     void removeHeader( HttpHeaders* const headers, const StringType& headerName )
     {
         HttpHeaders::iterator itr = headers->lower_bound( headerName );
@@ -1001,6 +1007,50 @@ namespace nx_http
             }
 
             return totalLength;
+        }
+
+
+        //////////////////////////////////////////////
+        //   Content-Range
+        //////////////////////////////////////////////
+        ContentRange::ContentRange()
+        :
+            unitName( "bytes" )
+        {
+        }
+
+        quint64 ContentRange::rangeLength() const
+        {
+            Q_ASSERT( !rangeSpec.end || (rangeSpec.end >= rangeSpec.start) );
+
+            if( rangeSpec.end )
+                return rangeSpec.end.get() - rangeSpec.start + 1;   //both boundaries are inclusive
+            else if( instanceLength )
+                return instanceLength.get() - rangeSpec.start;
+            else
+                return 1;   //since both boundaries are inclusive, 0-0 means 1 byte (the first one)
+        }
+
+        StringType ContentRange::toString() const
+        {
+            Q_ASSERT( !rangeSpec.end || (rangeSpec.end >= rangeSpec.start) );
+
+            StringType str = unitName;
+            str += " ";
+            str += StringType::number( rangeSpec.start ) + "-";
+            if( rangeSpec.end )
+                str += StringType::number( rangeSpec.end.get() );
+            else if( instanceLength )
+                str += StringType::number( instanceLength.get()-1 );
+            else
+                str += StringType::number( rangeSpec.start );
+
+            if( instanceLength )
+                str += "/" + StringType::number( instanceLength.get() );
+            else
+                str += "/*";
+
+            return str;
         }
 
 

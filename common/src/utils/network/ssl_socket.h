@@ -35,8 +35,7 @@ public:
     virtual bool getConnectionStatistics( StreamSocketInfo* info ) override;
 
     virtual bool connect(
-        const QString& foreignAddress,
-        unsigned short foreignPort,
+        const SocketAddress& remoteAddress,
         unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS ) override;
     virtual int recv( void* buffer, unsigned int bufferLen, int flags = 0 ) override;
     virtual int send( const void* buffer, unsigned int bufferLen ) override;

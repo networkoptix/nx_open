@@ -31,7 +31,7 @@
         <axiscamplugin.name>${company.name} AXIS camera integration plugin</axiscamplugin.name>
         <genericrtspplugin.name>${company.name} generic RTSP plugin</genericrtspplugin.name>
         <mediaserver.name>${company.name} Media Server</mediaserver.name>
-        <mediaserver.display.name>${display.product.name} Tray Assistant</mediaserver.display.name>
+        <mediaserver.display.name>${display.product.name} Media Server</mediaserver.display.name>
         <mediaproxy.name>${company.name} Media Proxy</mediaproxy.name>
         <mediaproxy.display.name>${company.name} Media Proxy</mediaproxy.display.name>
         <testcamera.name>${company.name} Test Camera</testcamera.name>
@@ -47,7 +47,8 @@
         <modification/>
         <beta>true</beta>
         <final.artifact.name>${project.artifactId}</final.artifact.name>
-        <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${box}-${arch}-${build.configuration}-beta</finalName>        
+        <build.suffix>${arch}</build.suffix>
+        <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}-${build.configuration}-beta</finalName>        
         <updateFeedUrl>${testUpdateFeedUrl}</updateFeedUrl>
         <mobile>false</mobile>
         <!-- compile.option1. See profile no-webkit -->
@@ -64,7 +65,7 @@
         <compiler.arguments />
 
         <libdir>${root.dir}/build_environment/target</libdir>        
-        <ClientHelpSourceDir>${environment.dir}/help/2.2.0/${customization}</ClientHelpSourceDir>
+        <ClientHelpSourceDir>${environment.dir}/help/${release.version}/${customization}</ClientHelpSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <ClientVoxSourceDir>${environment.dir}/festival.vox/lib</ClientVoxSourceDir>
         <unpack.skip>false</unpack.skip>
@@ -86,6 +87,7 @@
         <toolchain.version>none</toolchain.version>            
 
         <additional.defines/>
+        <customization.defines/>
 
         <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) --> 
         <qtlib1>Core</qtlib1>
@@ -282,7 +284,6 @@
             </activation>
             <modules>
                 <module>build_variables</module>
-                <module>build_environment</module>
                 <module>common</module>
                 <!-- <module>hole_punching_mediator</module> -->
                 <module>appserver2</module>
@@ -322,11 +323,11 @@
             </activation>
             <properties>
                 <qtlib19>DBus</qtlib19>
+                <box>${platform}</box>
             </properties>
             <modules>                       
                 <module>applauncher</module> 
                 <module>client</module>     
-                <module>clientexe</module>     
             </modules>  
         </profile>         
         <profile>
@@ -341,8 +342,6 @@
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->                   
                 <module>client</module>                     
-                <module>clientexe</module>                     
-                <module>axhdwitness</module>                     
                 <module>wixsetup</module>
             </modules>
             <properties>
@@ -491,6 +490,7 @@
                 </property>
             </activation>
             <properties>
+                <build.suffix>${box}-${arch}</build.suffix>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
                 <qt.classifier>${platform}-${arch}-${box}</qt.classifier>
                 <compile.option1/>
@@ -623,7 +623,7 @@
             </activation>
             <properties>
                 <arch>x64</arch>
-                <arch.dir>/usr/lib/x86_64-linux-gnu/</arch.dir>
+                <arch.dir>x86_64-linux-gnu/</arch.dir>
             </properties>
         </profile>
         <profile>
@@ -641,7 +641,7 @@
             </activation>
             <properties>
                 <arch>x86</arch>
-                <arch.dir>/usr/lib/x86_64-linux-gnu/</arch.dir>
+                <arch.dir>i386-linux-gnu/</arch.dir>
             </properties>
         </profile>  
         <profile>
@@ -660,7 +660,7 @@
             <properties>
                 <compiler.arguments>-m32</compiler.arguments>
                 <qt.spec>linux-g++-32</qt.spec>
-                <arch.dir>/usr/lib/x86_64-linux-gnu/</arch.dir>
+                <arch.dir>i386-linux-gnu/</arch.dir>
             </properties>
         </profile>          
         <profile>
@@ -672,7 +672,7 @@
                 </property>
             </activation>
             <properties>
-                <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${box}-${arch}</finalName>
+                <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}</finalName>
                 <updateFeedUrl>${prodUpdateFeedUrl}</updateFeedUrl>
                 <skip.sign>false</skip.sign>
             </properties>

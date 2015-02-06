@@ -123,9 +123,6 @@ public:
     static QSet<void*> m_pauseList;
 
     bool doRebuildArchive(const QnStorageResourcePtr &storage, const QnTimePeriod& period);
-    bool isLastRecordRecording() const { return m_lastRecordRecording; }
-    qint64 getLatRecordingTime() const;
-    void setLatRecordingTime(qint64 value);
 
     struct ScanFilter
     {
@@ -147,7 +144,7 @@ public:
     QnServer::ChunksCatalog getRole() const;
 private:
 
-    bool fileExists(const Chunk& chunk, bool checkDirOnly);
+    bool csvMigrationCheckFile(const Chunk& chunk, bool checkDirOnly);
     bool addChunk(const Chunk& chunk);
     qint64 recreateFile(const QString& fileName, qint64 startTimeMs, const QnStorageResourcePtr &storage);
     QSet<QDate> recordedMonthList();
@@ -181,10 +178,9 @@ private:
     //bool m_duplicateName;
     //QMap<int,QString> m_prevFileNames;
     const QnServer::ChunksCatalog m_catalog;
-    int m_lastAddIndex; // last added record index. In most cases it is last record
+    qint64 m_recordingChunkTime;
     QMutex m_IOMutex;
     static RebuildMethod m_rebuildArchive;
-    bool m_lastRecordRecording;
 };
 
 typedef QSharedPointer<DeviceFileCatalog> DeviceFileCatalogPtr;

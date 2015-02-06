@@ -621,12 +621,11 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnConstAbstractMediaDataPtr media,
         m_transcoder.setAudioCodec(m_codec, method);
     }
 
-    if (qnCommon->isTranscodeDisabled()) {
+    if (qnCommon->isTranscodeDisabled() && method != QnTranscoder::TM_DirectStreamCopy) {
         m_isOpened = false;
         qWarning() << "Video transcoding is disabled in the server settings. Feature unavailable.";
     }
     else if (m_isVideo)
-    if (m_isVideo)
         m_isOpened = m_transcoder.open(media.dynamicCast<const QnCompressedVideoData>(), QnConstCompressedAudioDataPtr()) == 0;
     else
         m_isOpened = m_transcoder.open(QnConstCompressedVideoDataPtr(), media.dynamicCast<const QnCompressedAudioData>()) == 0;
