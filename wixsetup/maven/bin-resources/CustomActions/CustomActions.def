@@ -19,3 +19,4 @@ CAQuitExecAndWarn
 DeleteOldMediaserverSettings
 GenerateSystemName
 DetectIfSystemIsStandalone
+SetPreviousServerInstalled
