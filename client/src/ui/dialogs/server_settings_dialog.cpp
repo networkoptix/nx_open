@@ -630,7 +630,8 @@ void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceRe
     if(m_storageProtocols.isEmpty()) {
         setBottomLabelText(QString());
     } else {
-        setBottomLabelText(tr("<a href='1'>Add external Storage...</a>"));
+        const QString linkText = lit("<a href='1'>%1</a>").arg(tr("Add external Storage..."));
+        setBottomLabelText(linkText);
     }
 
     m_hasStorageChanges = false;

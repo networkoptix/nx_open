@@ -765,11 +765,11 @@ void QnSingleCameraSettingsWidget::updateWebPageText() {
                 webPageAddress += QLatin1Char(':') + QString::number(url.port());
         }
 
-        ui->webPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
+        ui->webPageLabel->setText(lit("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
 
         if (!m_camera->isDtsBased()) {
             // TODO #Elric: wrong, need to get camera-specific web page
-            ui->motionWebPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
+            ui->motionWebPageLabel->setText(lit("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
         } else {
             ui->motionWebPageLabel->clear();
         }

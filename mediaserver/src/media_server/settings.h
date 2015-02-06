@@ -78,6 +78,9 @@ namespace nx_ms_conf
 
     static const QLatin1String EC2_TRAN_LOG_LEVEL( "tranLogLevel" );
     static const QLatin1String DEFAULT_EC2_TRAN_LOG_LEVEL( "none" );
+
+    static const QLatin1String HTTP_MSG_LOG_LEVEL( "http-log-level" );
+    static const QLatin1String DEFAULT_HTTP_MSG_LOG_LEVEL( "none" );
 }
 
 /*!

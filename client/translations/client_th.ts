@@ -658,27 +658,31 @@ Short for &quot;seconds&quot;</extracomment>
 <context>
     <name>CompatibilityVersionInstallationDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.cpp" line="227"/>
+        <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.cpp" line="60"/>
+        <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.cpp" line="144"/>
         <source>Installing version %1</source>
         <translation>กำลังติดตั้ง %1</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.cpp" line="238"/>
+        <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.cpp" line="72"/>
+        <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.cpp" line="112"/>
         <source>Installation failed</source>
         <translation>การติดตั้งล้มเหลว</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.cpp" line="250"/>
+        <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.cpp" line="78"/>
         <source>Could not cancel installation</source>
         <translation>ไม่สามารถยกเลิกการติดตั้งได้</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.cpp" line="259"/>
+        <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.cpp" line="67"/>
+        <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.cpp" line="104"/>
         <source>Installation completed</source>
         <translation>การติดตั้งสมบูรณ์</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.cpp" line="277"/>
+        <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.cpp" line="75"/>
+        <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.cpp" line="109"/>
         <source>Installation has been cancelled</source>
         <translation>ยกเลิกการติดตั้ง</translation>
     </message>
@@ -1872,7 +1876,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="400"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="685"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="684"/>
         <source>Drop Resources</source>
         <translation>ลดข้อมูล</translation>
     </message>
@@ -1963,19 +1967,19 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="480"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1279"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1278"/>
         <source>Check Camera Issues...</source>
         <translation>ตรวจสอบกล้อง ...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="487"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="800"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="799"/>
         <source>Event Log...</source>
         <translation>บันทึกเหตุการณ์ ...</translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="492"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="792"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="791"/>
         <source>Alarm/Event Rules...</source>
         <translation>สัญญาณเตือน/เหตุการณ์...</translation>
     </message>
@@ -2060,416 +2064,415 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>Ctrl+P</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="581"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="580"/>
         <source>New...</source>
         <translation>สร้างใหม่...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="587"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="586"/>
         <source>Layout...</source>
         <translation>เค้าโครง ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="588"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="587"/>
         <source>New Layout...</source>
         <translation>เคร้าโครงใหม่...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="593"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="592"/>
         <source>Tab</source>
         <translation>Tab</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="594"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="593"/>
         <source>New Tab</source>
         <translation>Tab ใหม่</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="595"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="594"/>
         <source>Ctrl+T</source>
         <translation>Ctrl+T</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="601"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="600"/>
         <source>Window</source>
         <translation>หน้าต่าง</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="602"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="601"/>
         <source>New Window</source>
         <translation>หน้าต่างใหม่</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="603"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="602"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="610"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="609"/>
         <source>User...</source>
         <translation>ชื่อผู้ใช้...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="611"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="610"/>
         <source>New User...</source>
         <translation>ผู้ใช้ใหม่...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="618"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="617"/>
         <source>Video Wall...</source>
         <translation>Video Wall...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="619"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="618"/>
         <source>New Video Wall...</source>
         <translation>Video Wall ใหม่....</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="626"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="625"/>
         <source>Open Layout...</source>
         <translation>เปิดเคร้าโครง...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="636"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="635"/>
         <source>Open...</source>
         <translation>เปิด...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="642"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="641"/>
         <source>File(s)...</source>
         <translation>ไฟล์(s)...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="643"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="642"/>
         <source>Ctrl+O</source>
         <translation>Ctrl+O</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="650"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="649"/>
         <source>Layout(s)...</source>
         <translation>เค้าโครง(s)...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="656"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="655"/>
         <source>Folder...</source>
         <translation>โฟลเดอร์...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="662"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="661"/>
         <source>Save Current Layout</source>
         <translation>บันทึกเค้าโครงปัจจุบัน</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="663"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="679"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="962"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="662"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="678"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="961"/>
         <source>Ctrl+S</source>
         <translation>Ctrl+S</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="670"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="669"/>
         <source>Save Current Layout As...</source>
         <translation>บันทึกเค้าโครงปัจจุบันเป็น...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="671"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="670"/>
         <source>Ctrl+Shift+S</source>
         <translation>Ctrl+Shift+S</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="672"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="671"/>
         <source>Ctrl+Alt+S</source>
         <translation>Ctrl+Alt+S</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="678"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="961"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="677"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="960"/>
         <source>Save Video Wall View</source>
         <translation>บันทึกภาพ Video View</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="694"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="693"/>
         <source>Start Screen Recording</source>
         <translation>เริ่มการบันทึกหน้าจอ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="695"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="694"/>
         <source>Stop Screen Recording</source>
         <translation>หยุดการบันทึกหน้าจอ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="696"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="695"/>
         <source>Alt+R</source>
         <translation>Alt+R</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="711"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="710"/>
         <source>Esc</source>
         <translation>Esc</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="712"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="711"/>
         <source>Stop current action</source>
         <translation>หยุดการกระทำในปัจจุบัน</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="716"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="715"/>
         <source>Go to Fullscreen</source>
         <translation>เต็มหน้าจอ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="717"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="716"/>
         <source>Exit Fullscreen</source>
         <translation>ออกจากเต็มหน้าจอ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="723"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="722"/>
         <source>Minimize</source>
         <translation>ย่อขนาด</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="728"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="727"/>
         <source>Maximize</source>
         <translation>เพิ่มขนาด</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="729"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="728"/>
         <source>Restore Down</source>
         <translation>การคืนค่าลง</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="737"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="736"/>
         <source>Alt+Enter</source>
         <translation>Alt+Enter</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="738"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="737"/>
         <source>Alt+Return</source>
         <translation>Alt+Return</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="739"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1724"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="738"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1691"/>
         <source>Ctrl+F</source>
         <translation>Ctrl+F</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="745"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="744"/>
         <source>Show Message</source>
         <translation>แสดงข้อความ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="749"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="748"/>
         <source>Show Version Mismatch Message</source>
         <translation>แสดงรุ่นไม่ตรงกันข้อความ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="753"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="752"/>
         <source>Show Beta Version Warning Message</source>
         <translation>แสดงเวอร์ชันเบต้าข้อความคำเตือน</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="757"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="756"/>
         <source>Open in Browser...</source>
         <translation>เปิดในเบราว์เซอร์ ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="761"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="760"/>
         <source>System Administration...</source>
         <translation>ผู้ดูแลระบบ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="762"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="761"/>
         <source>Ctrl+Alt+A</source>
         <translation>Ctrl+Alt+A</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="768"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="767"/>
         <source>Open Web Client...</source>
         <translation>เปิดเว็บ ไคลแอนต์ ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="775"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="774"/>
         <source>System Update...</source>
         <translation>อัพเดทระบบ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="780"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="779"/>
         <source>Local Settings...</source>
         <translation>การตั้งค่าภายใน...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="794"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="793"/>
         <source>Ctrl+E</source>
         <translation>Ctrl+E</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="802"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="801"/>
         <source>Ctrl+L</source>
         <translation>Ctrl+L</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="808"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="807"/>
         <source>Camera List...</source>
         <translation>รายการกล้อง...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="809"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="808"/>
         <source>Ctrl+M</source>
         <translation>Ctrl+M</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="814"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="813"/>
         <source>Merge Systems...</source>
         <translation>ผสานระบบ ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="824"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="823"/>
         <source>How-to Videos and FAQ...</source>
         <translation>วิธีการวิดีโอและคำถามที่พบบ่อย ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="829"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="828"/>
         <source>About...</source>
         <translation>เกี่ยวกับ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="830"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="829"/>
         <source>F1</source>
         <translation>F1</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="841"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="840"/>
         <source>Exit</source>
         <translation>ออก</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="842"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="841"/>
         <source>Alt+F4</source>
         <translation>Alt+F4</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="857"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="856"/>
         <source>Server...</source>
         <translation>เซิร์ฟเวอร์...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="869"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="868"/>
         <source>Open in Layout</source>
         <translation>เปิดในหน้าต่างใหม่</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="874"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="873"/>
         <source>Open</source>
         <translation>เปิด</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="875"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="874"/>
         <source>Monitor</source>
         <translation>หน้าจอ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="880"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="879"/>
         <source>Open in New Tab</source>
         <translation>เปิดในแท๊ปใหม่</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="881"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="880"/>
         <source>Monitor in a New Tab</source>
         <translation>หน้าจอในแท๊ปใหม่</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="889"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="888"/>
         <source>Open in New Window</source>
         <translation>เปิดหน้าต่างใหม่</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="890"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="889"/>
         <source>Monitor in a New Window</source>
         <translation>หน้าจอในหน้าต่างใหม่</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="899"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="898"/>
         <source>Open Layout in a New Tab</source>
         <translation>เปิดเค้าโครงในแท๊ปใหม่</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="904"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="903"/>
         <source>Open Layouts</source>
         <translation>เปิดเคร้าโครง</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="909"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="908"/>
         <source>Open Layout(s) in a New Window</source>
         <translation>เปิดเค้าโครงในหน้าต่างใหม่</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="917"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="916"/>
         <source>Open Current Layout in a New Window</source>
         <translation>เปิดเค้าโครงปัจจุบันในหน้าต่างใหม่</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="922"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="921"/>
         <source>Open Layout(s)</source>
         <translation>เปิดเค้าโครง(s)</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="927"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="926"/>
         <source>Open Video Wall(s)</source>
         <translation>เปิด Video Wall(s)</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="932"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="931"/>
         <source>Open Containing Folder</source>
         <translation>เปิดโฟลเดอร์</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="933"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="932"/>
         <source>Ctrl+Enter</source>
         <translation>Ctrl+Enter</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="934"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="933"/>
         <source>Ctrl+Return</source>
         <translation>Ctrl+Return</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="941"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="940"/>
         <source>Identify</source>
         <translation>แยกแยะ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="948"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="947"/>
         <source>Attach to Video Wall...</source>
         <translation>แนบไปกับ Video Wall...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="955"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="954"/>
         <source>Switch to Video Wall mode...</source>
         <translation>เปลี่ยนโหมดเป็น Video Wall...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="970"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="969"/>
         <source>Save Current Matrix</source>
         <translation>บันทึก Matrix ปัจจุบัน</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="977"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="976"/>
         <source>Load Matrix</source>
         <translation>โหลด Matrix</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="982"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="981"/>
         <location filename="../src/ui/actions/action_manager.cpp" line="1035"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1226"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1225"/>
         <source>Delete</source>
         <translation>ลบ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="983"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1036"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1218"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1227"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="982"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1217"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1226"/>
         <source>Del</source>
         <translation>ลบ</translation>
     </message>
@@ -2500,289 +2503,289 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>บันทึกเค้าโครงเป็น...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1041"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1040"/>
         <source>Maximize Item</source>
         <translation>เพิ่มรายการ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1042"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1050"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1041"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1049"/>
         <source>Enter</source>
         <translation>Enter</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1043"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1051"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1042"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1050"/>
         <source>Return</source>
         <translation>Return</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1049"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1048"/>
         <source>Restore Item</source>
         <translation>เรียกคืนรายการ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1057"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1056"/>
         <source>Show Info</source>
         <translation>แสดงข้อมูล</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1058"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1064"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1070"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1130"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1057"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1063"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1069"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1129"/>
         <source>Alt+I</source>
         <translation>Alt+I</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1063"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1062"/>
         <source>Hide Info</source>
         <translation>ซ่อนข้อมูล</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1069"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1068"/>
         <source>Toggle Info</source>
         <translation>สลับข้อมูล</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1075"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1074"/>
         <source>Change Resolution...</source>
         <translation>เปลี่ยนความละเอียด ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1082"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1081"/>
         <source>Auto</source>
         <translation>อัตโนมัติ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1088"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1087"/>
         <source>Low</source>
         <translation>ต่ำ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1093"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1092"/>
         <source>High</source>
         <translation>สูง</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1101"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1100"/>
         <source>PTZ...</source>
         <translation>PTZ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1109"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1108"/>
         <source>Save Current Position...</source>
         <translation>บันทึกตำแหน่งปัจจุบัน...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1115"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1114"/>
         <source>Manage...</source>
         <translation>จัดการ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1123"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1122"/>
         <source>Calibrate Fisheye</source>
         <translation>ปรับเทียบกับ Fisheye</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1129"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1128"/>
         <source>Toggle Resolution Mode</source>
         <translation>สลับโหมดความละเอียด</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1136"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1135"/>
         <source>Show Motion/Smart Search</source>
         <translation>แสดงโมชั่น / ค้นหาละเอียด</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1137"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1136"/>
         <source>Show Motion</source>
         <translation>แสดงความเคลื่อนไหว</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1138"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1145"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1156"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1137"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1144"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1155"/>
         <source>Alt+G</source>
         <translation>Alt+G</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1143"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1142"/>
         <source>Hide Motion/Smart Search</source>
         <translation>ซ่อนโมชั่น / ค้นหาละเอียด</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1144"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1143"/>
         <source>Hide Motion</source>
         <translation>ซ่อนความเคลื่อนไหว</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1150"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1149"/>
         <source>Clear Motion Selection</source>
         <translation>ล้างการเลือกความเคลื่อนไหว</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1155"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1154"/>
         <source>Toggle Smart Search</source>
         <translation>สลับสมาร์ทค้นหา</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1161"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1160"/>
         <source>Check File Watermark</source>
         <translation>ตรวจสอบไฟล์ลายน้ำ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1162"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1161"/>
         <source>Alt+C</source>
         <translation>Alt+C</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1168"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1167"/>
         <source>Take Screenshot</source>
         <translation>ใช้ภาพหน้าจอ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1169"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1168"/>
         <source>Alt+S</source>
         <translation>Alt+S</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1175"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1174"/>
         <source>Image Enhancement...</source>
         <translation>การเพิ่มประสิทธิภาพของภาพ ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1176"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1175"/>
         <source>Alt+J</source>
         <translation>Alt+J</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1182"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1181"/>
         <source>Create Zoom Window</source>
         <translation>สร้างหน้าต่างซูม</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1187"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1186"/>
         <source>Rotate to...</source>
         <translation>หมุนไป ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1192"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1191"/>
         <source>0 degrees</source>
         <translation>0 องศา</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1197"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1196"/>
         <source>90 degrees</source>
         <translation>90 องศา</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1202"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1201"/>
         <source>180 degrees</source>
         <translation>180 องศา</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1207"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1206"/>
         <source>270 degrees</source>
         <translation>270 องศา</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1217"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1216"/>
         <source>Remove from Layout</source>
         <translation>ลบออกจากเค้าโครง</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1240"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1248"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1239"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1247"/>
         <source>Rename</source>
         <translation>เปลี่ยนชื่อ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1241"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1249"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1240"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1248"/>
         <source>F2</source>
         <translation>F2</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1258"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1257"/>
         <source>Delete from Disk</source>
         <translation>ลบจากดิสก์</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1265"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1264"/>
         <source>Set as Layout Background</source>
         <translation>กำหนดเป็นเค้าโครงพื้นหลัง</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1274"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1273"/>
         <source>User Settings...</source>
         <translation>การตั้งค่าผู้ใช้งาน...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1288"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1287"/>
         <source>Camera Rules...</source>
         <translation>ข้อกำหนดกล้อง ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1297"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1296"/>
         <source>Camera Settings...</source>
         <translation>การตั้งค่ากล้อง...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1306"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1305"/>
         <source>Picture Settings...</source>
         <translation>การตั้งค่ารูปภาพ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1311"/>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1485"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1310"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1452"/>
         <source>Layout Settings...</source>
         <translation>การตั้งค่าเค้าโครง...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1317"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1316"/>
         <source>Video Wall Settings...</source>
         <translation>การตั้งค่า Video Wall...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1325"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1324"/>
         <source>Open in Camera Settings Dialog</source>
         <translation>เปิดการตั้งค่าในกล้อง</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1329"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1328"/>
         <source>Add Camera(s)...</source>
         <translation>เพิ่มกล้อง(s)...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1338"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1337"/>
         <source>Camera(s) List by Server...</source>
         <translation>รายชื่อกล้อง (s) โดยเซิร์ฟเวอร์ ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1347"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1346"/>
         <source>Ping...</source>
         <translation>Ping...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1351"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1350"/>
         <source>Server Logs...</source>
         <translation>บันทึกเซิร์ฟเวอร์ ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1359"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1358"/>
         <source>Server Diagnostics...</source>
         <translation>วิเคราะห์เซิร์ฟเวอร์ ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1367"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1366"/>
         <source>Server Settings...</source>
         <translation>การตั้งค่าเซิร์ฟเวอร์ ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1376"/>
-        <source>Connect to the Current System...</source>
-        <translation>เชื่อมต่อกับระบบปัจจุบัน ...</translation>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1375"/>
+        <source>Merge to Currently Connected System...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1387"/>
@@ -2790,412 +2793,392 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation>เปลี่ยนเซลล์อัตราส่วน ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1399"/>
-        <source>4:3</source>
-        <translation>4:3</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1406"/>
-        <source>16:9</source>
-        <translation>16:9</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1413"/>
-        <source>3:4</source>
-        <translation>3:4</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1420"/>
-        <source>9:16</source>
-        <translation>9:16</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1429"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1396"/>
         <source>Change Cell Spacing...</source>
         <translation>เปลี่ยนระยะห่างของเซลล์ ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1438"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1405"/>
         <source>None</source>
         <translation>ไม่มี</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1445"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1412"/>
         <source>Small</source>
         <translation>เล็ก</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1452"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1419"/>
         <source>Medium</source>
         <translation>ปานกลาง</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1459"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1426"/>
         <source>Large</source>
         <translation>ใหญ่</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1472"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1439"/>
         <source>Start Tour</source>
         <translation>เริ่มต้นทัวร์</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1473"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1440"/>
         <source>Stop Tour</source>
         <translation>หยุดทัวร์</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1474"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1441"/>
         <source>Alt+T</source>
         <translation>Alt+T</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1495"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1462"/>
         <source>Close</source>
         <translation>ปิด</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1496"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1463"/>
         <source>Ctrl+W</source>
         <translation>Ctrl+W</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1501"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1468"/>
         <source>Close All But This</source>
         <translation>ปิดทั้งหมด แต่นี้</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1507"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1474"/>
         <source>Mark Selection Start</source>
         <translation>กำหนดการเลือกเริ่มต้น</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1508"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1475"/>
         <source>[</source>
         <translation>[</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1514"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1481"/>
         <source>Mark Selection End</source>
         <translation>กำหนดการเลือกสุดท้าย</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1515"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1482"/>
         <source>]</source>
         <translation>]</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1521"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1488"/>
         <source>Clear Selection</source>
         <translation>ล้างส่วนที่เลือก</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1526"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1493"/>
         <source>Zoom to Selection</source>
         <translation>ซูมที่จะเลือก</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1531"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1498"/>
         <source>Bookmark Selection...</source>
         <translation>เลือกคั่นหน้า...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1536"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1503"/>
         <source>Edit Bookmark...</source>
         <translation>แก้ไขคั่นหน้า...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1541"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1508"/>
         <source>Remove Bookmark...</source>
         <translation>ลบคั่นหน้า...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1550"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1517"/>
         <source>Export Selected Area...</source>
         <translation>เลือกพิ้นที่ส่งออก...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1556"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1523"/>
         <source>Export Multi-Video...</source>
         <translation>ส่งออก หลายวีดีโอ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1562"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1529"/>
         <source>Preview Search...</source>
         <translation>แสดงการค้นหา...</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1569"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1536"/>
         <source>Ctrl+Alt+Shift++</source>
         <translation>Ctrl+Alt+Shift++</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1570"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1537"/>
         <source>Increment Debug Counter</source>
         <translation>เพิ่ม Debug เคาน์เตอร์</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1574"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1541"/>
         <source>Ctrl+Alt+Shift+-</source>
         <translation>Ctrl+Alt+Shift+-</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1575"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1542"/>
         <source>Decrement Debug Counter</source>
         <translation>ลด Debug เคาน์เตอร์</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1579"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1546"/>
         <source>Ctrl+Alt+Shift+R</source>
         <translation>Ctrl+Alt+Shift+R</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1580"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1547"/>
         <source>Show Resource Pool</source>
         <translation>แสดงทรัพยากรร่วมกัน</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1584"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1551"/>
         <source>Calibrate PTZ</source>
         <translation>ปรับเทียบ PTZ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1588"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1555"/>
         <source>Get PTZ Position</source>
         <translation>ได้รับตำแหน่ง PTZ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1592"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1559"/>
         <source>Ctrl+Alt+Shift+D</source>
         <translation>Ctrl+Alt+Shift+D</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1593"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1560"/>
         <source>Debug Control Panel</source>
         <translation>แผงควบคุมตรวจแก้จุดบกพร่อง</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1597"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1564"/>
         <source>Space</source>
         <translation>ช่องว่าง</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1598"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1565"/>
         <source>Play</source>
         <translation>เล่น</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1599"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1566"/>
         <source>Pause</source>
         <translation>หยุด</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1604"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1571"/>
         <source>Ctrl+-</source>
         <translation>Ctrl+-</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1605"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1572"/>
         <source>Speed Down</source>
         <translation>ลดความเร็ว</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1610"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1577"/>
         <source>Ctrl++</source>
         <translation>Ctrl++</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1611"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1578"/>
         <source>Speed Up</source>
         <translation>เพิ่มความเร็ว</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1616"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1583"/>
         <source>Ctrl+Left</source>
         <translation>Ctrl+Left</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1617"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1584"/>
         <source>Previous Frame</source>
         <translation>เฟรมก่อนหน้า</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1622"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1589"/>
         <source>Ctrl+Right</source>
         <translation>Ctrl+Right</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1623"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1590"/>
         <source>Next Frame</source>
         <translation>เฟรมต่อไป</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1628"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1595"/>
         <source>Z</source>
         <translation>Z</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1629"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1596"/>
         <source>To Start</source>
         <translation>เริ่ม</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1634"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1601"/>
         <source>X</source>
         <translation>X</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1635"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1602"/>
         <source>To End</source>
         <translation>จบ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1640"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1607"/>
         <source>Ctrl+Up</source>
         <translation>Ctrl+Up</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1641"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1608"/>
         <source>Volume Down</source>
         <translation>ปรับเสียงลง</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1645"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1612"/>
         <source>Ctrl+Down</source>
         <translation>Ctrl+Down</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1646"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1613"/>
         <source>Volume Up</source>
         <translation>ปรับเสียงขึ้น</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1650"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1617"/>
         <source>M</source>
         <translation>M</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1651"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1618"/>
         <source>Toggle Mute</source>
         <translation>สลับเสียง</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1656"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1623"/>
         <source>L</source>
         <translation>L</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1657"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1624"/>
         <source>Jump to Live</source>
         <translation>ข้ามไปยังภาพสด</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1663"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1630"/>
         <source>S</source>
         <translation>S</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1664"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1631"/>
         <source>Synchronize Streams</source>
         <translation>ประสาน สตรีม</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1665"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1632"/>
         <source>Disable Stream Synchronization</source>
         <translation>ปิดการใช้งานประสาน สตรีม</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1675"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1642"/>
         <source>Show Thumbnails</source>
         <translation>แสดงภาพขนาดย่อ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1676"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1643"/>
         <source>Hide Thumbnails</source>
         <translation>ซ่อนภาพขนาดย่อ</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1680"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1647"/>
         <source>Show Calendar</source>
         <translation>แสดงปฎิทิน</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1681"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1648"/>
         <source>Hide Calendar</source>
         <translation>ซ่อนปฎิทิน</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1685"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1652"/>
         <source>Show Title Bar</source>
         <translation>แสดงแถบชื่อเรื่อง</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1686"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1653"/>
         <source>Hide Title Bar</source>
         <translation>ซ่อนแถบชื่อเรื่อง</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1691"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1658"/>
         <source>Pin Tree</source>
         <translation>Pin Tree</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1692"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1659"/>
         <source>Unpin Tree</source>
         <translation>Unpin Tree</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1697"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1664"/>
         <source>Show Tree</source>
         <translation>แสดง Tree</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1698"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1665"/>
         <source>Hide Tree</source>
         <translation>ซ่อน Tree</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1703"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1670"/>
         <source>Show Timeline</source>
         <translation>แสดง Timeline</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1704"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1671"/>
         <source>Hide Timeline</source>
         <translation>ซ่อน Timeline</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1708"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1675"/>
         <source>Pin Notifications</source>
         <translation>การแจ้งเตือน Pin</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1709"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1676"/>
         <source>Unpin Notifications</source>
         <translation>การแจ้งเตือน Unpin</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1713"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1680"/>
         <source>Ctrl+Alt+T</source>
         <translation>Ctrl+Alt+T</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1714"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1681"/>
         <source>Disable Background Animation</source>
         <translation>ปิดการใช้งานภาพพื้นหลัง</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1715"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1682"/>
         <source>Enable Background Animation</source>
         <translation>เปิดการใช้งานภาพพื้นหลัง</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1722"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1689"/>
         <source>Show Search Panel</source>
         <translation>แสดงแผงค้นหา</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="1723"/>
+        <location filename="../src/ui/actions/action_manager.cpp" line="1690"/>
         <source>Hide Search Panel</source>
         <translation>ซ่อนแผงค้นหา</translation>
     </message>
@@ -3282,12 +3265,12 @@ Built for %5-%6 with %7.&lt;br/&gt;
 <context>
     <name>QnBlinkingImageButtonWidget</name>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="70"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="71"/>
         <source>You have new notifications</source>
         <translation>คุณมีการแจ้งเตือนใหม่</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="121"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="122"/>
         <source>You have %n notifications</source>
         <translation>
             <numerusform>คุณมีการแจ้งเตือน %n</numerusform>
@@ -3370,136 +3353,136 @@ Built for %5-%6 with %7.&lt;br/&gt;
 <context>
     <name>QnBusinessRuleViewModel</name>
     <message>
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="635"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="633"/>
         <source>Error: %1</source>
         <translation>ผิดพลาด: %1</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="811"/>
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="881"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="809"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="879"/>
         <source>&lt;System&gt;</source>
         <translation>ระบบ</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="816"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="814"/>
         <source>&lt;Any Server&gt;</source>
         <translation>เซอร์ฟเวอร์</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="818"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="816"/>
         <source>%n Server(s)</source>
         <translation>
             <numerusform>%n เซอร์ฟเวอร์</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="821"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="819"/>
         <source>&lt;Any Camera&gt;</source>
         <translation>กล้อง</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="823"/>
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="888"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="821"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="886"/>
         <source>%n Camera(s)</source>
         <translation>
             <numerusform>%n กล้อง</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="846"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="844"/>
         <source>Administrators only</source>
         <translation>ผู้ดูแลระบบเท่านั้น</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="848"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="846"/>
         <source>All users</source>
         <translation>ผู้ใช้ทั้งหมด</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="864"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="862"/>
         <source>Select a sound</source>
         <translation>เลือกเสียง</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="872"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="870"/>
         <source>Enter text</source>
         <translation>ป้อนข้อความ</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="886"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="884"/>
         <source>Select at least one camera</source>
         <translation>เลือกอย่างน้อยหนึ่งกล้อง</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="899"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="897"/>
         <source>Not Applied</source>
         <translation>ไม่ถูกใช้</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="902"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="900"/>
         <source>Instant</source>
         <translation>ทางด่วน</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="905"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="903"/>
         <source>Every %n days</source>
         <translation>
             <numerusform>ทุก  %n วัน</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="908"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="906"/>
         <source>Every %n hours</source>
         <translation>
             <numerusform>ทุก %n ชั่วโมง</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="911"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="909"/>
         <source>Every %n minutes</source>
         <translation>
             <numerusform>ทุก %n นาที</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="913"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="911"/>
         <source>Every %n seconds</source>
         <translation>
             <numerusform>ทุก %n วินาที</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="920"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="918"/>
         <source>Stops</source>
         <translation>หยุด</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="922"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="920"/>
         <source>Starts</source>
         <translation>เริ่ม</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="924"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="922"/>
         <source>Starts/Stops</source>
         <translation>เริ่ม/หยุด</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="932"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="930"/>
         <source>start</source>
         <translation>เริ่ม</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="934"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="932"/>
         <source>stop</source>
         <translation>หยุด</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="944"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="942"/>
         <source>While %1</source>
         <translation>ทำ %1</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/business_rule_view_model.cpp" line="946"/>
+        <location filename="../src/ui/models/business_rule_view_model.cpp" line="944"/>
         <source>On %1 %2</source>
         <translation></translation>
     </message>
@@ -3520,85 +3503,85 @@ Built for %5-%6 with %7.&lt;br/&gt;
 <context>
     <name>QnBusinessRulesDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="61"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="62"/>
         <source>Reset Default Rules</source>
         <translation>คืนค่าเริ่มต้น</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="210"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="211"/>
         <source>Confirm rules reset</source>
         <translation>ยืนยันการตั้งค่า</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="211"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="212"/>
         <source>Are you sure you want to reset rules to the defaults?
 This action CANNOT be undone!</source>
         <translation>คุณแน่ใจว่าคุณต้องการที่จะตั้งค่าเริ่มต้น?
 การดำเนินการนี้ไม่สามารถยกเลิกได้!</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="229"/>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="232"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="230"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="233"/>
         <source>Error</source>
         <translation>ผิดพลาด</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="229"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="230"/>
         <source>Error while receiving rules.</source>
         <translation>เกิดข้อผิดพลาด.</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="232"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="233"/>
         <source>Error while saving rule.</source>
         <translation>เกิดข้อผิดพลาดในการบันทึก.</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="249"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="250"/>
         <source>Error while deleting rule</source>
         <translation>เกิดข้อผิดพลาดในการลบ</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="286"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="288"/>
         <source>Hide Advanced</source>
         <translation>ซ่อนขั้นสูง</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="286"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="288"/>
         <source>Show Advanced</source>
         <translation>แสดงขั้นสูง</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="290"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="292"/>
         <source>&amp;New...</source>
         <translation>&amp;สร้าง...</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="293"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="295"/>
         <source>&amp;Delete</source>
         <translation>&amp;ลบ</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="300"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="302"/>
         <source>&amp;Schedule...</source>
         <translation>&amp;ตารางบันทึก...</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="317"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="319"/>
         <source>Confirm save</source>
         <translation>ยอมรับการบันทึก</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="318"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="320"/>
         <source>Some rules are not valid. Should they be disabled?</source>
         <translation>กฎบางอย่างไม่ถูกต้อง พวกเขาควรจะปิดการใช้งาน?</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="471"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="475"/>
         <source>Confirm exit</source>
         <translation>ยืนยันการออก</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="472"/>
+        <location filename="../src/ui/dialogs/business_rules_dialog.cpp" line="476"/>
         <source>Unsaved changes will be lost. Save?</source>
         <translation>การเปลี่ยนแปลงที่ไม่ได้บันทึกไว้จะหายไป บันทึก?</translation>
     </message>
@@ -4039,24 +4022,24 @@ This can take a lot of time.</source>
 <context>
     <name>QnCameraMotionMaskWidget</name>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="189"/>
-        <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="198"/>
-        <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="207"/>
+        <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="190"/>
+        <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="199"/>
+        <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="208"/>
         <source>Too many motion windows</source>
         <translation>มีหน้าต่างเคลื่อนไหวมากเกินไป</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="190"/>
+        <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="191"/>
         <source>Maximum number of motion windows for current camera is %1, but %2 motion windows are currently selected.</source>
         <translation>จำนวนสูงสุดของหน้าต่างการเคลื่อนไหวกล้องปัจจุบันคือ %1, %2 แต่หน้าต่างการเคลื่อนไหวเลือกในปัจจุบัน.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="199"/>
+        <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="200"/>
         <source>Maximum number of different motion sensitivities for current camera is %1, but %2 motion sensitivities are currently selected.</source>
         <translation>จำนวนสูงสุดของความเปราะบางแตกต่างกันสำหรับการเคลื่อนไหวกล้องปัจจุบันคือ %1, %2 แต่ความเปราะบางการเคลื่อนไหวเลือกในปัจจุบัน.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="208"/>
+        <location filename="../src/ui/widgets/properties/camera_motion_mask_widget.cpp" line="209"/>
         <source>Maximum number of motion mask windows for current camera is %1, but %2 motion mask windows are currently selected.</source>
         <translation>จำนวนสูงสุดของหน้าต่างหน้ากากเคลื่อนไหวกล้องปัจจุบันคือ %1, %2 แต่หน้าต่างหน้ากากเคลื่อนไหวเลือกในปัจจุบัน.</translation>
     </message>
@@ -4102,56 +4085,56 @@ This can take a lot of time.</source>
 <context>
     <name>QnCameraScheduleWidget</name>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="403"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="410"/>
         <source>Off</source>
         <translation>ปิด</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="413"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="420"/>
         <source>On</source>
         <translation>เปิด</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="604"/>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="610"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="611"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="617"/>
         <source>FPS value is too high</source>
         <translation>FPS มากเกินไป</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="605"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="612"/>
         <source>Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.</source>
         <translation>fps ปัจจุบันในตารางกำหนดการคือ%1 fps ถูกลดลงไปที่กล้อง fps สูงสุด %2.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="611"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="618"/>
         <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.</source>
         <translation>สำหรับการเคลื่อนไหวซอฟต์แวร์ 2 fps ที่สงวนไว้สำหรับสตรีมสำรอง fps ปัจจุบันในตารางกำหนดการคือ%1 fps ถูกลดลงไป %2.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="849"/>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="852"/>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="854"/>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="856"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="859"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="861"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="863"/>
         <source>Warning</source>
         <translation>การเตือน</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="849"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="856"/>
         <source>Motion Recording is disabled or not supported by some of the selected cameras. Please go to the cameras&apos; motion setup page to ensure it is supported and enabled.</source>
         <translation>การบันทึกการเคลื่อนไหวมีการยกเลิกหรือไม่ได้รับการสนับสนุนโดยบางส่วนของกล้องที่เลือก กรุณาไปที่หน้าการตั้งค่าการเคลื่อนไหวกล้อง &apos;เพื่อให้แน่ใจว่าได้รับการสนับสนุนและเปิดใช้งาน.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="852"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="859"/>
         <source>Dual-Streaming is not supported by this camera.</source>
         <translation>แบบ Dual-Streaming ไม่ได้รับการสนับสนุนโดยกล้องนี้.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="854"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="861"/>
         <source>Dual-Streaming and Motion Detection are not available for this camera.</source>
         <translation>แบบ Dual-Streaming และตรวจจับการเคลื่อนไหวจะไม่สามารถใช้ได้สำหรับกล้องนี้.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="856"/>
+        <location filename="../src/ui/widgets/properties/camera_schedule_widget.cpp" line="863"/>
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the camera&apos;s motion area and sensitivity.</source>
         <translation>การบันทึกการเคลื่อนไหวถูกปิดไว้ กรุณาไปที่การตั้งค่าการเคลื่อนไหวที่จะติดตั้งในพื้นที่การเคลื่อนไหวของกล้องและความไว.</translation>
     </message>
@@ -4274,12 +4257,12 @@ This can take a lot of time.</source>
 <context>
     <name>QnConnectToCurrentSystemTool</name>
     <message>
-        <location filename="../src/update/connect_to_current_system_tool.cpp" line="61"/>
+        <location filename="../src/update/connect_to_current_system_tool.cpp" line="71"/>
         <source>Configuring server(s)</source>
         <translation>การกำหนดค่าเซิร์ฟเวอร์ (s)</translation>
     </message>
     <message>
-        <location filename="../src/update/connect_to_current_system_tool.cpp" line="115"/>
+        <location filename="../src/update/connect_to_current_system_tool.cpp" line="125"/>
         <source>Updating server(s)</source>
         <translation>การปรับปรุงเซิร์ฟเวอร์ (s)</translation>
     </message>
@@ -4309,28 +4292,29 @@ If this error persists, please contact your VMS administrator.</source>
     </message>
     <message>
         <location filename="../src/utils/connection_diagnostics_helper.cpp" line="81"/>
-        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="114"/>
-        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="128"/>
-        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="144"/>
-        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="164"/>
-        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="176"/>
-        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="210"/>
-        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="235"/>
+        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="123"/>
+        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="135"/>
+        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="151"/>
+        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="171"/>
+        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="183"/>
+        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="204"/>
+        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="224"/>
+        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="253"/>
         <source>Could not connect to Server</source>
         <translation>ไม่สามารถเชื่อมต่อไปยังเซิร์ฟเวอร์</translation>
     </message>
     <message>
-        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="101"/>
+        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="110"/>
         <source>Server</source>
         <translation>เซิร์ฟเวอร์</translation>
     </message>
     <message>
-        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="102"/>
+        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="111"/>
         <source>Client</source>
         <translation>ไคลเอนต์</translation>
     </message>
     <message>
-        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="103"/>
+        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="112"/>
         <source>You are about to connect to Server which has a different version:
  - Client version: %1.
  - Server version: %2.
@@ -4341,7 +4325,7 @@ These versions are not compatible. Please update your %3</source>
 รุ่นนี้เข้ากันไม่ได้ โปรดอัปเดตของคุณ %3</translation>
     </message>
     <message>
-        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="129"/>
+        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="136"/>
         <source>You are about to connect to Server which has a different version:
  - Client version: %1.
  - Server version: %2.
@@ -4352,8 +4336,8 @@ Compatibility mode for versions lower than %3 is not supported.</source>
 โหมดความเข้ากันได้สำหรับรุ่นต่ำกว่า %3ไม่ได้รับการสนับสนุน.</translation>
     </message>
     <message>
-        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="145"/>
-        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="177"/>
+        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="152"/>
+        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="184"/>
         <source>Selected Server has a different version:
  - Client version: %1.
  - Server version: %2.
@@ -4364,7 +4348,7 @@ The other version of the Client is needed in order to establish the connection t
 รุ่นอื่น ๆ ของลูกค้าเป็นสิ่งจำเป็นในการที่จะสร้างการเชื่อมต่อไปยังเซิร์ฟเวอร์นี้.</translation>
     </message>
     <message>
-        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="165"/>
+        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="172"/>
         <source>Selected Server has a different version:
  - Client version: %1.
  - Server version: %2.
@@ -4375,23 +4359,15 @@ An error has occurred while trying to restart in compatibility mode.</source>
 เกิดข้อผิดพลาดในขณะที่พยายามที่จะเริ่มต้นใหม่ในโหมดความเข้ากันได้.</translation>
     </message>
     <message>
-        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="196"/>
-        <source>Could not connect to Enterprise Controller</source>
-        <translation>ไม่สามารถเชื่อมต่อกับตัวควบคุมองค์กร</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="197"/>
-        <source>Selected Enterprise controller has a different version:
+        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="205"/>
+        <source>Selected Server has a different version:
  - Client version: %1.
  - EC version: %2.
 You need to download client %3 to connect</source>
-        <translation>เลือกตัวควบคุมองค์กรมีรุ่นที่แตกต่างกัน:
-  - รุ่นลูกค้า: %1
-  - รุ่น EC: %2
-คุณจำเป็นต้องดาวน์โหลดโปรแกรม %3 ในการเชื่อมต่อ</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="211"/>
+        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="225"/>
         <source>You are about to connect to Server which has a different version:
  - Client version: %1.
  - Server version: %2.
@@ -4404,7 +4380,7 @@ Download version %3?</source>
 ดาวโหลดเวอร์ชั่น %3 ไหม?</translation>
     </message>
     <message>
-        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="236"/>
+        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="254"/>
         <source>You are about to connect to Server which has a different version:
  - Client version: %1.
  - Server version: %2.
@@ -4415,24 +4391,24 @@ Would you like to restart the Client in compatibility mode?</source>
 คุณต้องการที่จะเริ่มต้นใหม่ไคลเอนต์ในโหมดที่เข้ากันได้หรือไม่?</translation>
     </message>
     <message>
-        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="255"/>
+        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="273"/>
         <source>Launcher process is not found</source>
         <translation>กระบวนการเปิดไม่พบ</translation>
     </message>
     <message>
-        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="256"/>
+        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="274"/>
         <source>Cannot restart the Client in compatibility mode.
 Please close the application and start it again using the shortcut in the start menu.</source>
         <translation>ไม่สามารถเริ่มไคลเอนต์ในโหมดความเข้ากันได้
 กรุณาปิดโปรแกรมประยุกต์และเริ่มต้นอีกครั้งโดยใช้ทางลัดในเมนูเริ่มต้น.</translation>
     </message>
     <message>
-        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="267"/>
+        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="285"/>
         <source>Failure</source>
         <translation>ความล้มเหลว</translation>
     </message>
     <message>
-        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="268"/>
+        <location filename="../src/utils/connection_diagnostics_helper.cpp" line="286"/>
         <source>Failed to launch compatibility version %1
 Try to restore version %1?</source>
         <translation>ล้มเหลวในการทำงานร่วมกันที่จะเปิดตัวรุ่นที่ %1
@@ -4490,17 +4466,17 @@ You will be asked to restart the client in compatibility mode.</source>
 คุณจะต้องรีสตาร์ทเครื่องไคลเอนต์ในโหมดความเข้ากันได้.</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="144"/>
+        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="143"/>
         <source>Server</source>
         <translation>Server</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="145"/>
+        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="144"/>
         <source>Client</source>
         <translation>Client</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="146"/>
+        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="145"/>
         <source>Server has a different version:
  - Client version: %1.
  - Server version: %2.
@@ -4511,12 +4487,12 @@ These versions are not compatible. Please update your %3</source>
 รุ่นนี้เข้ากันไม่ได้ โปรดอัปเดตของคุณ %3</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="158"/>
+        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="157"/>
         <source>Success</source>
         <translation>สำเร็จ</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="158"/>
+        <location filename="../src/ui/dialogs/connection_testing_dialog.cpp" line="157"/>
         <source>Failed</source>
         <translation>ล้มเหลว</translation>
     </message>
@@ -4966,9 +4942,14 @@ These versions are not compatible. Please update your %3</source>
 <context>
     <name>QnGlHardwareChecker</name>
     <message>
-        <location filename="../src/ui/graphics/opengl/gl_hardware_checker.cpp" line="37"/>
-        <source>We have detected that your video card is not supported. You can proceed at your own risk.&lt;br/&gt;Installing and/or updating your video drivers may resolve the problem but we cannot guarantee that it will help.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
-        <translation>เราตรวจพบว่าการ์ดจอของคุณจะไม่ได้รับการสนับสนุน คุณสามารถดำเนินการที่มีความเสี่ยงของคุณเอง &lt;br/&gt;การติดตั้งและ / หรือปรับปรุงโปรแกรมควบคุมวิดีโอของคุณอาจช่วยแก้ไขปัญหาที่เกิดขึ้น แต่เราไม่สามารถรับประกันได้ว่ามันจะช่วย&lt;br/&gt;สำหรับคำแนะนำง่ายในการติดตั้งหรือปรับปรุงโปรแกรมควบคุมวิดีโอของคุณปฏิบัติตามคำสั่งที่  &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
+        <location filename="../src/ui/graphics/opengl/gl_hardware_checker.cpp" line="38"/>
+        <source>We have detected that your video card is not supported. You can proceed at your own risk.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/graphics/opengl/gl_hardware_checker.cpp" line="39"/>
+        <source>Installing and/or updating your video drivers may resolve the problem.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/opengl/gl_hardware_checker.cpp" line="40"/>
@@ -4976,9 +4957,14 @@ These versions are not compatible. Please update your %3</source>
         <translation>เคล็ดลับการปฏิบัติงานที่สำคัญ</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/opengl/gl_hardware_checker.cpp" line="42"/>
-        <source>We have detected that your video card drivers may be not installed or are out of date.&lt;br/&gt;Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.&lt;br/&gt;For easy instructions on how to install or update your video driver, follow instruction at &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</source>
-        <translation>เราตรวจพบว่าไดรเวอร์การ์ดจอของคุณอาจจะไม่ได้ติดตั้งหรือหมดอายุ&lt;br/&gt;การติดตั้งและ / หรือปรับปรุงโปรแกรมควบคุมวิดีโอของคุณอย่างมีนัยสำคัญสามารถเพิ่มประสิทธิภาพระบบของคุณเมื่อดูและทำงานร่วมกับวิดีโอ&lt;br/&gt;สำหรับคำแนะนำง่ายในการติดตั้งหรือปรับปรุงโปรแกรมควบคุมวิดีโอของคุณปฏิบัติตามคำสั่งที่ &lt;a href=&quot;http://tribaltrouble.com/driversupport.php&quot;&gt;http://tribaltrouble.com/driversupport.php&lt;/a&gt;</translation>
+        <location filename="../src/ui/graphics/opengl/gl_hardware_checker.cpp" line="43"/>
+        <source>We have detected that your video card drivers may be not installed or are out of date.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/graphics/opengl/gl_hardware_checker.cpp" line="44"/>
+        <source>Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/graphics/opengl/gl_hardware_checker.cpp" line="45"/>
@@ -5017,7 +5003,7 @@ These versions are not compatible. Please update your %3</source>
 <context>
     <name>QnHelpHandler</name>
     <message>
-        <location filename="../src/ui/help/help_handler.cpp" line="82"/>
+        <location filename="../src/ui/help/help_handler.cpp" line="88"/>
         <source>Error</source>
         <translation>ผิดพลาด</translation>
     </message>
@@ -5043,12 +5029,12 @@ These versions are not compatible. Please update your %3</source>
         <translation>ไม่สามารถแสดงข้อมูลได้ %1</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/extensions/workbench_layout_export_tool.cpp" line="329"/>
+        <location filename="../src/ui/workbench/extensions/workbench_layout_export_tool.cpp" line="330"/>
         <source>Exporting to &quot;%2&quot;...</source>
         <translation>กำลังนำข้อมูลออก&quot;%2&quot;...</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/extensions/workbench_layout_export_tool.cpp" line="382"/>
+        <location filename="../src/ui/workbench/extensions/workbench_layout_export_tool.cpp" line="383"/>
         <source>Could not export camera %1</source>
         <translation>ไม่สามารถนำข้อมูลกล้องออกได้ %1</translation>
     </message>
@@ -5206,19 +5192,19 @@ These versions are not compatible. Please update your %3</source>
 <context>
     <name>QnLicenseManagerWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="114"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="120"/>
         <source>The software is licensed to: </source>
         <translation>ซอฟต์แวร์ที่ได้รับอนุญาตให้:</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="125"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="133"/>
         <source>
 %1 %2</source>
         <translation>
 %1 %2</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="135"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="143"/>
         <source>
 At least %n %2 are required</source>
         <translation>
@@ -5227,7 +5213,7 @@ At least %n %2 are required</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="141"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="149"/>
         <source>
 %n %2 are currently in use</source>
         <translation>
@@ -5236,104 +5222,104 @@ At least %n %2 are required</source>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="148"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="156"/>
         <source>Obtaining licenses from Server...</source>
         <translation>การได้รับอนุญาตจากเซอร์ฟเวอร์...</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="152"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="160"/>
         <source>You do not have a valid license installed.
 Please activate your commercial or trial license.</source>
         <translation>คุณไม่ได้รับการอนุญาตในการติดตั้ง
 กรุณายืนยันสิทธิ์เปิดใช้งาน หรือ ทดลองใช้งาน.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="153"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="161"/>
         <source>You do not have a valid license installed.
 Please activate your commercial license.</source>
         <translation>คุณไม่ได้รับการอนุญาตในการติดตั้ง
 กรุณายืนยันสิทธิ์เปิดใช้งาน.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="172"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="180"/>
         <source>Copy to Clipboard</source>
         <translation>คัดลอกไปยังคลิปบอร์ด</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="188"/>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="284"/>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="289"/>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="338"/>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="373"/>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="484"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="196"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="292"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="297"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="346"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="381"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="492"/>
         <source>License Activation</source>
         <translation>เปิดใช้งานเต็มประสิทธิภาพ</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="189"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="197"/>
         <source>Network error has occurred during automatic license activation.
 Try to activate your license manually.</source>
         <translation>เครือข่ายล้มเหลวในการเปิดใช้งาน
 กรุณาเปิดใช้งานโดยตรงจากคอมพิวเตอร์.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="285"/>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="477"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="293"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="485"/>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
         <translation>คุณพยายามที่จะเปิดใช้งานระบบ แต่ไม่สำเร็จ กรุณาติดต่อทีมสนับนุนเพื่อการการเปิดระบบ.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="290"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="298"/>
         <source>The license is already activated.</source>
         <translation>ทำการเปิดใช้งานเรียบร้อยแล้ว.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="328"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="336"/>
         <source>There was a problem activating your license key. Network error has occurred.</source>
         <translation>มีปัญหาเกี่ยวกับการเปิดใช้งาน ระบบเครือข่ายเกิดขัดข้อง.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="330"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="338"/>
         <source>License was successfully activated.</source>
         <translation>การอนุญาตใช้งานเสร็จสิ้นสมบูรณ์.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="351"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="359"/>
         <source>License Activation </source>
         <translation>การอนุญาตใช้งานเรียบร้อย</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="352"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="360"/>
         <source>Network error has occurred during automatic license activation. Please contact support team to activate your license key manually.</source>
         <translation>เครือข่ายขัดข้องมีผลต่อการเปิดใช้งานอัตโนมัต กรุณาติดต่อทีมสนับสนุนเพื่อทำการเปิดใช้งานระบบ.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="393"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="401"/>
         <source>License activation</source>
         <translation>เปิดใช้งานเต็มประสิทธิภาพ</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="393"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="401"/>
         <source>Can&apos;t activate license:  %1</source>
         <translation>ไม่สามารถเปิดใช้งานระบบได้ %1</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="446"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="454"/>
         <source>Remove license</source>
         <translation>ยกเลิกการเปิดใช้งาน</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="446"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="454"/>
         <source>Can&apos;t remove license from server:  %1</source>
         <translation>ไม่สามารถยกเลิกการใช้งานได้จากเซร์อฟเวอร์ %1</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="468"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="476"/>
         <source>The manual activation key file you have selected is invalid. Select correct manual activation key file. If problem continues, please contact support team.</source>
         <translation>ข้อมูลในการเปิดใช้งานผิด กรุณาเลือก.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="472"/>
+        <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="480"/>
         <source>This license key has been previously activated to hardware id %1. Please contact support team to get a valid license key.</source>
         <translation>คีย์ใบอนุญาตนี้ได้รับการเปิดใช้งานก่อนหน้านี้แล้ว %1 กรุณาติดต่อทีมสนับสนุนที่จะได้รับคีย์ใบอนุญาตที่ถูกต้อง.</translation>
     </message>
@@ -5364,47 +5350,47 @@ Try to activate your license manually.</source>
         <translation>เปิดใช้งานใบอนุญาตฟรี</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="42"/>
-        <source>Please send email with the Serial Key and the Hardware ID provided to &lt;a href=&quot;mailto:%1&quot;&gt;%1&lt;/a&gt;. Then we&apos;ll send you an Activation Key file.</source>
-        <translation>กรุณาส่งอีเมลที่มีคีย์อนุกรมและหมายเลขของฮาร์ดแวร์ให้กับ&lt;a href=&quot;mailto:%1&quot;&gt;%1&lt;/a&gt;. จากนั้นเราจะส่งแฟ้มคีย์การเปิดใช้งาน.</translation>
+        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="45"/>
+        <source>Please send email with the Serial Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="65"/>
+        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="66"/>
         <source>Success</source>
         <translation>สำเร็จ</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="65"/>
+        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="66"/>
         <source>Hardware ID copied to clipboard.</source>
         <translation>คัดลอกเลือกไปที่คลิปบอร์ด.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="136"/>
+        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="137"/>
         <source>Activate License</source>
         <translation>ใบอนุญาติใช้งาน</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="142"/>
+        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="143"/>
         <source>Activating...</source>
         <translation>กำลังขออนุญาติใช้งาน...</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="168"/>
+        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="169"/>
         <source>Open License File</source>
         <translation>เปิดใช้งานใบอนุญาต</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="170"/>
+        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="171"/>
         <source>All files (*.*)</source>
         <translation>ทุกไฟล์ (*.*)</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="178"/>
+        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="179"/>
         <source>Error</source>
         <translation>ข้อผิดพลาด</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="178"/>
+        <location filename="../src/ui/widgets/settings/license_widget.cpp" line="179"/>
         <source>Could not open the file %1</source>
         <translation>ไม่สามารถเปิดแฟ้ม &apos;%1&apos; สำหรับการเขียน</translation>
     </message>
@@ -5577,62 +5563,62 @@ Try to activate your license manually.</source>
 <context>
     <name>QnMediaResourceWidget</name>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="185"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="187"/>
         <source>Screenshot</source>
         <translation>ภาพหน้าจอ</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="193"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="198"/>
         <source>Smart Search</source>
         <translation>ค้นหาแบบชัดเจน</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="201"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="209"/>
         <source>PTZ</source>
         <translation>PTZ</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="209"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="220"/>
         <source>Dewarping</source>
         <translation>Dewarping</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="218"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="232"/>
         <source>Create Zoom Window</source>
         <translation>สร้างหน้าต่างซูม</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="226"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="243"/>
         <source>Image Enhancement</source>
         <translation>การเพิ่มประสิทธิภาพของภาพ</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="542"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="566"/>
         <source>Zoom window</source>
         <translation>หน้าต่างซูม</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="902"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="924"/>
         <source>Lo-Res</source>
         <translation>Lo-Res</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="902"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="924"/>
         <source>Hi-Res</source>
         <translation>Hi-Res</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="919"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="941"/>
         <source>LIVE</source>
         <translation>ภาพสด</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="925"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="947"/>
         <source>%1x%2 %3fps @ %4Mbps%5 %6	%7</source>
         <translation>%1x%2 %3fps @ %4Mbps%5 %6	%7</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="939"/>
+        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="961"/>
         <source>%1 (Tour &quot;%2&quot; is active)</source>
         <translation>%1 (Tour &quot;%2&quot; is active)</translation>
     </message>
@@ -5766,58 +5752,58 @@ The servers from the remote system should appear in your system soon.</source>
 <context>
     <name>QnMultipleCameraSettingsWidget</name>
     <message>
-        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="94"/>
+        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="95"/>
         <source>4:3</source>
         <translation>4:3</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="95"/>
+        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="96"/>
         <source>16:9</source>
         <translation>16:9</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="96"/>
+        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="97"/>
         <source>1:1</source>
         <translation>1:1</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="102"/>
+        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="103"/>
         <source>0 degrees</source>
         <translation>0 องศา</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="103"/>
+        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="104"/>
         <source>90 degrees</source>
         <translation>90 องศา</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="104"/>
+        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="105"/>
         <source>180 degrees</source>
         <translation>180 องศา</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="105"/>
+        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="106"/>
         <source>270 degrees</source>
         <translation>270 องศา</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="284"/>
+        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="293"/>
         <source>Invalid schedule</source>
         <translation>ตารางเวลาที่ไม่ถูกต้อง</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="285"/>
+        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="294"/>
         <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
         <translation>สตรีมมิ่งสำรองถูกปิดใช้งานในกล้องนี้ การเคลื่อนไหว + LQ ไม่มี effect.Press &quot;ตกลง&quot; เพื่อเปลี่ยนประเภทการบันทึกเพื่อ &quot;ตลอดไป&quot; หรือ &quot;ไม่&quot; เพื่อเปิดใช้งานสตรีมมิ่งสำรอง.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="460"/>
+        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="469"/>
         <source>&lt;multiple values&gt;</source>
         <comment>LoginEdit</comment>
         <translation>&lt;multiple values&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="469"/>
+        <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.cpp" line="478"/>
         <source>&lt;multiple values&gt;</source>
         <comment>PasswordEdit</comment>
         <translation>&lt;multiple values&gt;</translation>
@@ -5884,22 +5870,22 @@ The servers from the remote system should appear in your system soon.</source>
         <translation>เสียงประกาศ</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui" line="43"/>
+        <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui" line="47"/>
         <source>&amp;Play</source>
         <translation>&amp;เล่น</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui" line="57"/>
+        <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui" line="61"/>
         <source>&amp;Add...</source>
         <translation>&amp;เพิ่ม...</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui" line="68"/>
+        <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui" line="72"/>
         <source>&amp;Rename...</source>
         <translation>&amp;เปลี่ยนชื่อ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui" line="75"/>
+        <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui" line="79"/>
         <source>&amp;Delete...</source>
         <translation>&amp;ลบ...</translation>
     </message>
@@ -5994,65 +5980,65 @@ The servers from the remote system should appear in your system soon.</source>
 <context>
     <name>QnNotificationsCollectionWidget</name>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="175"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="182"/>
         <source>DEBUG</source>
         <translation>DEBUG</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="280"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="288"/>
         <source>Browse Archive</source>
         <translation>เรียกดูคลังข้อมูล</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="291"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="299"/>
         <source>Open Camera</source>
         <translation>กล้องเปิด</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="301"/>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="320"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="309"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="328"/>
         <source>Camera Settings</source>
         <translation>การตั้งค่ากล้อง</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="311"/>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="484"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="319"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="492"/>
         <source>Server settings</source>
         <translation>การตั้งค่าเซิร์ฟเวอร์</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="332"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="340"/>
         <source>Open camera web page...</source>
         <translation>เปิดหน้าเว็บกล้อง ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="341"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="349"/>
         <source>Settings</source>
         <translation>การตั้งค่า</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="424"/>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="446"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="432"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="454"/>
         <source>User Settings</source>
         <translation>การตั้งค่าผู้ใช้งาน</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="432"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="440"/>
         <source>Licenses</source>
         <translation>ไลเซนส์</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="439"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="447"/>
         <source>SMTP Settin gs</source>
         <translation>การตั้งค่า SMTP</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="454"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="462"/>
         <source>Connect to server</source>
         <translation>เชื่อมต่อกับเซิร์ฟเวอร์</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="475"/>
+        <location filename="../src/ui/graphics/items/notifications/notifications_collection_widget.cpp" line="483"/>
         <source>SMTP Settings</source>
         <translation>การตั้งค่า SMTP</translation>
     </message>
@@ -6138,7 +6124,7 @@ All changes will be lost after program exit.</source>
 <context>
     <name>QnProgressDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/progress_dialog.cpp" line="188"/>
+        <location filename="../src/ui/dialogs/progress_dialog.cpp" line="196"/>
         <source>Cancel</source>
         <translation>ยกเลิก</translation>
     </message>
@@ -6193,17 +6179,17 @@ These tours will become invalid if you remove it.</source>
         <translation>อย่าแสดงอีกครั้ง.</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="631"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="634"/>
         <source>Manage PTZ for %1</source>
         <translation>จัดการ PTZ สำหรับ %1</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="674"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="686"/>
         <source>PTZ configuration is not saved</source>
         <translation>การตั้งค่า PTZ ยังไม่ได้ทำการบันทึก</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="675"/>
+        <location filename="../src/ui/dialogs/ptz_manage_dialog.cpp" line="687"/>
         <source>Changes are not saved. Do you want to save them?</source>
         <translation>การเปลี่ยนแปลงยังไม่ถูกบันทึก คุณต้องการที่จะบันทึกหรือไ่ม่?</translation>
     </message>
@@ -6216,87 +6202,87 @@ These tours will become invalid if you remove it.</source>
         <translation>ทัวร์ใหม่ %1</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="116"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="117"/>
         <source>Saved position %1</source>
         <translation>บันทึกตำแหน่ง %1</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="349"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="350"/>
         <source>#</source>
         <translation>#</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="351"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="352"/>
         <source>Name</source>
         <translation>ชื่อ</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="353"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="354"/>
         <source>Hotkey</source>
         <translation>Hotkey</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="355"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="356"/>
         <source>Home</source>
         <translation>โฮม</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="357"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="358"/>
         <source>Details</source>
         <translation>รายละเอียด</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="513"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="514"/>
         <source>Tours</source>
         <translation>ทัวร์</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="514"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="515"/>
         <source>Positions</source>
         <translation>ตำแหน่ง</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="550"/>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="596"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="551"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="597"/>
         <source>None</source>
         <translation>None</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="554"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="555"/>
         <source>This preset will be activated after %n minutes of inactivity</source>
         <translation>
             <numerusform>ที่ตั้งไว้นี้จะใช้งานได้หลังจาก%n นาทีไม่มีการใช้งาน</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="651"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="652"/>
         <source>Tour should contain at least 2 positions</source>
         <translation>ทัวร์ควรมีอย่างน้อย 2 ตำแหน่ง</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="657"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="658"/>
         <source>Invalid tour</source>
         <translation>ทัวร์ไม่ถูกต้อง</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="671"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="672"/>
         <source>Tour has %n identical positions</source>
         <translation>
             <numerusform>ทัวร์มี %n ตำแหน่งเหมือนกัน</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="678"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="679"/>
         <source>Tour time: %1</source>
         <translation>เวลาทัวร์ %1</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="678"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="679"/>
         <source>less than a minute</source>
         <translation>น้อยกว่าหนึ่งนาที</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/models/ptz_manage_model.cpp" line="678"/>
+        <location filename="../src/ui/models/ptz_manage_model.cpp" line="679"/>
         <source>about %n minute(s)</source>
         <translation>
             <numerusform>ประมาณ%n นาที(s)</numerusform>
@@ -6347,13 +6333,13 @@ These tours will become invalid if you remove it.</source>
 <context>
     <name>QnPtzPresetsToursActionFactory</name>
     <message>
-        <location filename="../src/ui/actions/action_factories.cpp" line="91"/>
+        <location filename="../src/ui/actions/action_factories.cpp" line="94"/>
         <source>%1 (active)</source>
         <comment>Template for active PTZ preset</comment>
         <translation>%1 (active)</translation>
     </message>
     <message>
-        <location filename="../src/ui/actions/action_factories.cpp" line="122"/>
+        <location filename="../src/ui/actions/action_factories.cpp" line="125"/>
         <source>%1 (active)</source>
         <comment>Template for active PTZ tour</comment>
         <translation>%1 (active)</translation>
@@ -6581,17 +6567,17 @@ These tours will become invalid if you remove it.</source>
 <context>
     <name>QnResourceWidget</name>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="142"/>
+        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="139"/>
         <source>Close</source>
         <translation>ปิด</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="150"/>
+        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="148"/>
         <source>Information</source>
         <translation>ข้อมูล</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="156"/>
+        <location filename="../src/ui/graphics/items/resource/resource_widget.cpp" line="154"/>
         <source>Rotate</source>
         <translation>หมุน</translation>
     </message>
@@ -6629,22 +6615,22 @@ These tours will become invalid if you remove it.</source>
         <translation>URL</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/routing_management_widget.cpp" line="395"/>
+        <location filename="../src/ui/widgets/routing_management_widget.cpp" line="397"/>
         <source>Error</source>
         <translation>ผิดพลาด</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/routing_management_widget.cpp" line="395"/>
+        <location filename="../src/ui/widgets/routing_management_widget.cpp" line="397"/>
         <source>You have entered an invalid URL.</source>
         <translation>คุณได้ป้อน URL ที่ไม่ถูกต้อง.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/routing_management_widget.cpp" line="398"/>
+        <location filename="../src/ui/widgets/routing_management_widget.cpp" line="400"/>
         <source>Warning</source>
         <translation>การเตือน</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/routing_management_widget.cpp" line="398"/>
+        <location filename="../src/ui/widgets/routing_management_widget.cpp" line="400"/>
         <source>This URL is already in the address list.</source>
         <translation>URL นี้มีอยู่แล้วในรายการที่อยู่.</translation>
     </message>
@@ -6678,12 +6664,12 @@ These tours will become invalid if you remove it.</source>
 <context>
     <name>QnServerAddressesModel</name>
     <message>
-        <location filename="../src/ui/models/server_addresses_model.cpp" line="213"/>
+        <location filename="../src/ui/models/server_addresses_model.cpp" line="216"/>
         <source>Address</source>
         <translation>ที่อยู่</translation>
     </message>
     <message>
-        <location filename="../src/ui/models/server_addresses_model.cpp" line="215"/>
+        <location filename="../src/ui/models/server_addresses_model.cpp" line="218"/>
         <source>In Use</source>
         <translation>ผู้ใช้งาน</translation>
     </message>
@@ -6691,24 +6677,24 @@ These tours will become invalid if you remove it.</source>
 <context>
     <name>QnServerResourceWidget</name>
     <message>
-        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="495"/>
+        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="496"/>
         <source>Show Log</source>
         <translation>แสดง Log</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="504"/>
+        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="505"/>
         <source>Check Issues</source>
         <translation>ตรวจสอบ</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="754"/>
+        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="756"/>
         <source>%1 (up %n days, %2)</source>
         <translation>
             <numerusform>%1 (เพิ่ม %n วัน, %2)</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="758"/>
+        <location filename="../src/ui/graphics/items/resource/server_resource_widget.cpp" line="760"/>
         <source>%1</source>
         <translation>%1</translation>
     </message>
@@ -6716,79 +6702,79 @@ These tours will become invalid if you remove it.</source>
 <context>
     <name>QnServerSettingsDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="135"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="138"/>
         <source>Remove Storage</source>
         <translation>ลบการจัดเก็บข้อมูล</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="169"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="172"/>
         <source>Open Web Page...</source>
         <translation>เปิดหน้าเว็บเพจ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="223"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="226"/>
         <source>Not available</source>
         <translation>ไม่สามารถใช้ได้</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="321"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="324"/>
         <source>Loading...</source>
         <translation>กำลังโหลด...</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="497"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="500"/>
         <source>Warning</source>
         <translation>คำเตือน</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="498"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="501"/>
         <source>You are about to launch the archive re-synchronization routine. ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours. This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data. Continue?</source>
         <translation>คุณกำลังจะเปิดตามปกติอีกครั้งเก็บข้อมูลให้ตรงกัน สนใจ! การใช้งานบนฮาร์ดดิสก์ของคุณจะเพิ่มขึ้นในระหว่างขั้นตอนการประสานอีกครั้ง! ทั้งนี้ขึ้นอยู่กับขนาดของข้อมูลที่เก็บจะสามารถใช้เวลาหลายชั่วโมง ขั้นตอนนี้เป็นเพียงสิ่งที่จำเป็นถ้าโฟลเดอร์ที่เก็บถาวรของคุณได้ถูกย้ายเปลี่ยนชื่อหรือเปลี่ยน คุณสามารถยกเลิกการสร้างการดำเนินงานในช่วงเวลาใดโดยไม่สูญเสียข้อมูล ต่อหรือไม่?</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="530"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="533"/>
         <source>Rebuild archive index</source>
         <translation>สร้างดัชนีเก็บ</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="532"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="535"/>
         <source>Fast initial scan in progress</source>
         <translation>เริ่มต้นสแกนอย่างรวดเร็วในความคืบหน้า</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="541"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="544"/>
         <source>Finished</source>
         <translation>เสร็จสิ้น</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="542"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="545"/>
         <source>Rebuilding archive index is completed.</source>
         <translation>ดัชนีเก็บสร้างใหม่เป็นที่เรียบร้อยแล้ว.</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="554"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="557"/>
         <source>At least two servers are required for this feature.</source>
         <translation>อย่างน้อยต้องมีสองเซิร์ฟเวอร์สำหรับคุณลักษณะนี้.</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="557"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="560"/>
         <source>This server already has more than max cameras</source>
         <translation>เซิร์ฟเวอร์นี้มีกล้องมากกว่ากล้องสูงสุด</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="560"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="563"/>
         <source>To avoid malfunction adjust max number of cameras</source>
         <translation>เพื่อหลีกเลี่ยงความผิดปกติปรับจำนวนสูงสุดของกล้อง</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="605"/>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="608"/>
         <source>Could not load storages from server.</source>
         <translation>ไม่สามารถโหลดการจัดเก็บจากเซิร์ฟเวอร์.</translation>
     </message>
     <message>
-        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="630"/>
-        <source>&lt;a href=&apos;1&apos;&gt;Add external Storage...&lt;/a&gt;</source>
-        <translation>&lt;a href=&apos;1&apos;&gt;เพิ่มหน่วยความจำภายนอก...&lt;/a&gt;</translation>
+        <location filename="../src/ui/dialogs/server_settings_dialog.cpp" line="633"/>
+        <source>Add external Storage...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6812,68 +6798,53 @@ These tours will become invalid if you remove it.</source>
         <translation>ไม่สามารถตรวจสอบการอัพเดทผ่านทางอินเทอร์เน็ต.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.ui" line="209"/>
+        <location filename="../src/ui/widgets/server_updates_widget.ui" line="173"/>
         <source>Available version:</source>
         <translation>รุ่นที่ใช้งานได้:</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.ui" line="222"/>
+        <location filename="../src/ui/widgets/server_updates_widget.ui" line="186"/>
         <source>Unknown</source>
         <translation>ไม่ทราบ</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.ui" line="229"/>
-        <location filename="../src/ui/widgets/server_updates_widget.ui" line="397"/>
+        <location filename="../src/ui/widgets/server_updates_widget.ui" line="193"/>
+        <location filename="../src/ui/widgets/server_updates_widget.ui" line="334"/>
         <source>Update</source>
         <translation>ปรับปรุง</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.ui" line="236"/>
-        <source>&lt;a href=&apos;notes&apos;&gt;release notes&lt;/a&gt;</source>
-        <translation>&lt;a href=&apos;notes&apos;&gt;บันทึกประจำรุ่น&lt;/a&gt;</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/widgets/server_updates_widget.ui" line="282"/>
+        <location filename="../src/ui/widgets/server_updates_widget.ui" line="237"/>
         <source>Update from file:</source>
         <translation>อัปเดตจากไฟล์:</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.ui" line="303"/>
+        <location filename="../src/ui/widgets/server_updates_widget.ui" line="258"/>
         <source>Archive url:</source>
         <translation>Archive url:</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.ui" line="310"/>
+        <location filename="../src/ui/widgets/server_updates_widget.ui" line="265"/>
         <source>Copy to Clipboard</source>
         <translation>คัดลอกไปที่คลิปบอร์ด</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.ui" line="320"/>
+        <location filename="../src/ui/widgets/server_updates_widget.ui" line="275"/>
         <source>To update manually, download an archive with the following link:</source>
         <translation>การอัปเดตด้วยตนเองดาวน์โหลดเก็บมีการเชื่อมโยงต่อไปนี้:</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.ui" line="354"/>
+        <location filename="../src/ui/widgets/server_updates_widget.ui" line="300"/>
         <source>...</source>
         <translation>...</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.ui" line="444"/>
-        <source>&lt;a href=&apos;spec&apos;&gt;I want specific build&lt;/a&gt;</source>
-        <translation>&lt;a href=&apos;spec&apos;&gt;ฉันต้องการที่เฉพาะเจาะจงในการสร้าง&lt;/a&gt;</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/widgets/server_updates_widget.ui" line="451"/>
-        <source>&lt;a href=&apos;latest&apos;&gt;I want latest version&lt;/a&gt;</source>
-        <translation>&lt;a href=&apos;latest&apos;&gt;ฉันต้องการรุ่นล่าสุด&lt;/a&gt;</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/widgets/server_updates_widget.ui" line="477"/>
+        <location filename="../src/ui/widgets/server_updates_widget.ui" line="396"/>
         <source>Cancel</source>
         <translation>ยกเลิก</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.ui" line="501"/>
+        <location filename="../src/ui/widgets/server_updates_widget.ui" line="420"/>
         <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
         <translation>ดูเหมือนว่าขั้นตอนการปรับปรุงคือการใช้เวลามากขึ้นกว่าปกติ กรุณารอต่อไป.</translation>
     </message>
@@ -6893,282 +6864,297 @@ These tours will become invalid if you remove it.</source>
         <translation>ในฐานะที่เป็นกฎทั่วไปเพื่อประโยชน์ในการสนับสนุนที่ดีกว่าเราไม่แนะนำให้ทำการปรับปรุงระบบในตอนท้ายของสัปดาห์.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="156"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="119"/>
+        <source>Release notes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="120"/>
+        <source>Get a specific build</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="121"/>
+        <source>Get the latest version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="160"/>
         <source>Update from Internet...</source>
         <translation>ปรับปรุงจากอินเทอร์เน็ต ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="157"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="161"/>
         <source>Update from local source...</source>
         <translation>ปรับปรุงจากแหล่งท้องถิ่น ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="166"/>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="185"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="170"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="189"/>
         <source>Update from Internet</source>
         <translation>ปรับปรุงจากอินเทอร์เน็ต</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="194"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="198"/>
         <source>Update from local source</source>
         <translation>ปรับปรุงจากแหล่งท้องถิ่น</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="202"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="206"/>
         <source>Success</source>
         <translation>สำเร็จ</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="202"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="206"/>
         <source>URL copied to clipboard.</source>
         <translation>คัดลอก URL ไปยังคลิปบอร์ด.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="226"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="230"/>
         <source>Latest version:</source>
         <translation>รุ่นล่าสุด:</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="244"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="248"/>
         <source>Target version:</source>
         <translation>รุ่นเป้าหมาย:</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="273"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="277"/>
         <source>Information</source>
         <translation>ข้อมูล</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="273"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="277"/>
         <source>Update is in process now.</source>
         <translation>กำลังอยู่ในขั้นตอนการปรับปรุง.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="282"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="286"/>
         <source>Error</source>
         <translation>ข้อผิดพลาด</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="282"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="286"/>
         <source>Cannot cancel update at this state.
 Please wait until update is finished</source>
         <translation>ไม่สามารถยกเลิกการปรับปรุงได้
 โปรดรอจนกว่าการปรับปรุงเสร็จสิ้น</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="291"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="295"/>
         <source>Update finished... 100%</source>
         <translation>ปรับปรุงเสร็จสิ้น... 100%</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="297"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="301"/>
         <source>Update has been successfully finished.</source>
         <translation>ปรับปรุงได้เสร็จสิ้นการประสบความสำเร็จ.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="305"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="309"/>
         <source>Now you have to update the client manually.</source>
         <translation>ตอนนี้คุณมีการปรับปรุงไคลแอนต์ด้วยตนเอง.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="307"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="311"/>
         <source>Now you have to update the client manually using an installer.</source>
         <translation>ตอนนี้คุณมีการปรับปรุงไคลแอนต์ด้วยตนเองโดยใช้โปรแกรมติดตั้ง.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="310"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="314"/>
         <source>The client will be restarted to the updated version.</source>
         <translation>ไคลแอนต์จะทำการเริ่มต้นใหม่กับรุ่นที่ปรับปรุง.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="314"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="318"/>
         <source>Update is successful</source>
         <translation>ปรับปรุงสำเร็จ</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="321"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="325"/>
         <source>Launcher process is not found</source>
         <translation>กระบวนการเปิดไม่พบ</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="322"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="326"/>
         <source>Cannot restart the client.
 Please close the application and start it again using the shortcut in the start menu.</source>
         <translation>ไม่สามารถเริ่มการทำงานของไคลแอนต์ได้
 กรุณาปิดโปรแกรมประยุกต์และเริ่มต้นอีกครั้งโดยใช้ทางลัดในเมนูเริ่มต้น.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="335"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="339"/>
         <source>Update cancelled</source>
         <translation>ยกเลิกการปรับปรุง</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="335"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="339"/>
         <source>Update has been cancelled.</source>
         <translation>ปรับปรุงได้ถูกยกเลิก.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="338"/>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="341"/>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="344"/>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="354"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="342"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="345"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="348"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="358"/>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="366"/>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="374"/>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="382"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="362"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="370"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="378"/>
         <location filename="../src/ui/widgets/server_updates_widget.cpp" line="386"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="390"/>
         <source>Update failed</source>
         <translation>ปรับปรุงล้มเหลว</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="338"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="342"/>
         <source>Someone has already started an update.</source>
         <translation>มีใครบางคนได้เริ่มต้นแล้วการปรับปรุง.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="341"/>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="344"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="345"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="348"/>
         <source>Could not download updates.</source>
         <translation>ไม่สามารถดาวน์โหลดโปรแกรมปรับปรุง.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="344"/>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="542"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="348"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="546"/>
         <source>No free space left on the disk.</source>
         <translation>ไม่มีพื้นที่ว่างเหลือบนดิสก์.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="347"/>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="359"/>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="367"/>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="375"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="351"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="363"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="371"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="379"/>
         <source>Could not push updates to servers.</source>
         <translation>ไม่สามารถผลักดันการปรับปรุงไปยังเซิร์ฟเวอร์.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="350"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="354"/>
         <source>The problem is caused by %n servers:</source>
         <translation>
             <numerusform>ปัญหานี้เกิดจากเซิร์ฟเวอร์%n:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="361"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="365"/>
         <source>No free space left on %n servers:</source>
         <translation>
             <numerusform>ไม่มีพื้นที่ว่างเหลืออยู่บนเซิร์ฟเวอร์%n:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="369"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="373"/>
         <source>%n servers are not responding:</source>
         <translation>
             <numerusform>%n  เซิร์ฟเวอร์ไม่ตอบสนอง:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="377"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="381"/>
         <source>%n servers have gone offline:</source>
         <translation>
             <numerusform>%n  เซิร์ฟเวอร์ออฟไลน์:</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="382"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="386"/>
         <source>Could not install an update to the client.</source>
         <translation>ไม่สามารถติดตั้งโปรแกรมปรับปรุงให้กับไคลแอนต์ได้.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="386"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="390"/>
         <source>Could not install updates on one or more servers.</source>
         <translation>ไม่สามารถติดตั้งการปรับปรุงในหนึ่งหรือหลายเซิร์ฟเวอร์ได้.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="416"/>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="502"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="420"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="506"/>
         <source>Checking for updates...</source>
         <translation>การตรวจสอบสำหรับการปรับปรุง ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="443"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="447"/>
         <source>Internet connection problem</source>
         <translation>ปัญหาการเชื่อมต่ออินเทอร์เน็ต</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="448"/>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="526"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="452"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="530"/>
         <source>There is no such build on the update server</source>
         <translation>มีการสร้างเช่นบนเซิร์ฟเวอร์การปรับปรุง</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="454"/>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="530"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="458"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="534"/>
         <source>Cannot start update. An update for one or more servers was not found.</source>
         <translation>ไม่สามารถเริ่มต้นการปรับปรุงการปรับปรุงสำหรับหนึ่งหรือเซิร์ฟเวอร์ไม่พบ.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="459"/>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="534"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="463"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="538"/>
         <source>Cannot start update. An update for the client was not found.</source>
         <translation>ไม่สามารถเริ่มต้นการปรับปรุงการปรับปรุงสำหรับไคลแอนต์ไม่พบ.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="513"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="517"/>
         <source>Newer version found.</source>
         <translation>พบรุ่นใหม่.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="516"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="520"/>
         <source>You will have to update the client manually.</source>
         <translation>คุณจะต้องปรับปรุงไคลแอนต์ด้วยตนเอง.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="518"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="522"/>
         <source>You will have to update the client manually using an installer.</source>
         <translation>คุณจะต้องจะอัพเดทไคลแอนต์ด้วยตนเองโดยใช้โปรแกรมติดตั้ง.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="523"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="527"/>
         <source>All components in your system are up to date.</source>
         <translation>ส่วนประกอบทั้งหมดในระบบของคุณรุ่นล่าสุด.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="538"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="542"/>
         <source>Cannot update from this file.</source>
         <translation>ไม่สามารถอัพเดทจากไฟล์นี้ได้.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="542"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="546"/>
         <source>Cannot extract the update file.</source>
         <translation>.ไม่สามารถแตกไฟล์อัพเดทได้.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="622"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="626"/>
         <source>Checking for updates... %1%</source>
         <translation>กำลังตรวจสอบการอัพเดท... %1%</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="625"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="629"/>
         <source>Downloading updates... %1%</source>
         <translation>กำลังดาวโหลดอัพเดท... %1%</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="628"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="632"/>
         <source>Installing client update... %1%</source>
         <translation>กำลังติดตั้งอัพเดทไคลแอนต์... %1%</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="631"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="635"/>
         <source>Installing updates to incompatible servers... %1%</source>
         <translation>การติดตั้งโปรแกรมอัพเดทเข้ากันไม่ได้กับเซิร์ฟเวอร์ ... %1%</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="634"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="638"/>
         <source>Pushing updates to servers... %1%</source>
         <translation>ส่งการอัพเดทไปยังเซิร์ฟเวอร์ ... %1%</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="637"/>
+        <location filename="../src/ui/widgets/server_updates_widget.cpp" line="641"/>
         <source>Installing updates... %1%</source>
         <translation>กำลังติดตั้งการอัพเดท... %1%</translation>
     </message>
@@ -7234,38 +7220,32 @@ Please close the application and start it again using the shortcut in the start 
         <translation>270 องศา</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="420"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="429"/>
         <source>Hardware (Camera built-in)</source>
         <translation>ฮาร์ดแวร์ (ในตัวกล้อง)</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="422"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="431"/>
         <source>Do not record motion</source>
         <translation>ไม่ทำการบันทึกเคลื่อนไหว</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="636"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="645"/>
         <source>Invalid schedule</source>
         <translation>ตารางเวลาที่ไม่ถูกต้อง</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="637"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="646"/>
         <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
         <translation>สตรีมมิ่งสำรองถูกปิดใช้งานในกล้องนี้ การเคลื่อนไหว + LQ ไม่มี effect.Press &quot;ตกลง&quot; เพื่อเปลี่ยนประเภทการบันทึกเพื่อ &quot;ตลอดไป&quot; หรือ &quot;ไม่&quot; เพื่อเปิดใช้งานสตรีมมิ่งสำรอง.</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="759"/>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="763"/>
-        <source>&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;</source>
-        <translation>&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;</translation>
-    </message>
-    <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="775"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="784"/>
         <source>Confirm motion regions reset</source>
         <translation>ยืนยันตั้งค่าการเคลื่อนไหว</translation>
     </message>
     <message>
-        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="776"/>
+        <location filename="../src/ui/widgets/properties/single_camera_settings_widget.cpp" line="785"/>
         <source>Are you sure you want to reset motion regions to the defaults?
 This action CANNOT be undone!</source>
         <translation>คุณแน่ใจว่าคุณต้องการรีเซ็ตการเคลื่อนไหวเพื่อเริ่มต้น
@@ -7957,12 +7937,12 @@ AVAILABLE</source>
 <context>
     <name>QnVolumeSlider</name>
     <message>
-        <location filename="../src/ui/graphics/items/controls/volume_slider.cpp" line="51"/>
+        <location filename="../src/ui/graphics/items/controls/volume_slider.cpp" line="64"/>
         <source>Muted</source>
         <translation>ปิดเสียง</translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/volume_slider.cpp" line="51"/>
+        <location filename="../src/ui/graphics/items/controls/volume_slider.cpp" line="64"/>
         <source>%1%</source>
         <translation>%1%</translation>
     </message>
@@ -7970,172 +7950,172 @@ AVAILABLE</source>
 <context>
     <name>QnWorkbenchActionHandler</name>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="831"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="817"/>
         <source>New layout</source>
         <translation>เปิดหน้าใหม่</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="831"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="817"/>
         <source>New layout %1</source>
         <translation>เปิดหน้าใหม่ %1</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="854"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="877"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2173"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2227"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2255"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="840"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="863"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2144"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2198"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2226"/>
         <source>Error</source>
         <translation>ผิดพลาด</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="855"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="841"/>
         <source>Can&apos;t move camera(s) to other server. Server %1 doesn&apos;t answer to request.</source>
         <translation>ไม่สามารถย้ายกล้อง (s) ไปยังเซิร์ฟเวอร์อื่น ๆ เซิร์ฟเวอร์%1 ไม่ตอบการร้องขอ.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="878"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="864"/>
         <source>Server %1 cannot discover these cameras so far. Are you sure you want to move them?</source>
         <translation>%1  ของเซิร์ฟเวอร์ไม่สามารถค้นพบกล้องเหล่านี้เพื่อให้ห่างไกล คุณแน่ใจว่าคุณต้องการที่จะย้ายพวกเขา?</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="956"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="942"/>
         <source>Layout is locked and cannot be changed.</source>
         <translation>เค้าโครงถูกล็อคและไม่สามารถเปลี่ยนแปลงได้.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="977"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="963"/>
         <source>Cannot add item</source>
         <translation>ไม่สามารถเพิ่มรายการ</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="978"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="964"/>
         <source>Cannot add a local file to Multi-Video</source>
         <translation>ไม่สามารถเพิ่มไฟล์ในท้องถิ่นไปยังหลายวิดีโอ</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1031"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1017"/>
         <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
         <translation>ทั้งหมดได้รับการสนับสนุน (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1032"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1018"/>
         <source>Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</source>
         <translation>วีดีโอ (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1033"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1019"/>
         <source>Pictures (*.jpg *.png *.gif *.bmp *.tiff)</source>
         <translation>รูปภาพ (*.jpg *.png *.gif *.bmp *.tiff)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1035"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1052"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1021"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1038"/>
         <source>All files (*.*)</source>
         <translation>ทุกไฟล์ (*.*)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1038"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1055"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1024"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1041"/>
         <source>Open file</source>
         <translation>เปิดไฟล์</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1050"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1036"/>
         <source>All Supported (*.layout)</source>
         <translation>สนับสนุนทั้งหมด (* .รูปแบบ)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1051"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1037"/>
         <source>Layouts (*.layout)</source>
         <translation>รูปแบบ (*.รูปแบบ)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1067"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1053"/>
         <source>Select folder...</source>
         <translation>เลือกโฟลเดอร์ ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1287"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1273"/>
         <source>Could not perform preview search</source>
         <translation>ไม่สามารถดำเนินการค้นหาตัวอย่าง</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1287"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1273"/>
         <source>Selected time period is too short to perform preview search. Please select a longer period.</source>
         <translation>ช่วงเวลาที่เลือกสั้นเกินไปที่จะดำเนินการค้นหาตัวอย่าง โปรดเลือกระยะเวลาให้นานขึ้น.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1367"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1353"/>
         <source>Preview Search for %1</source>
         <translation>ค้นหาตัวอย่างสำหรับ%1</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1484"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1472"/>
         <source>Process is in progress</source>
         <translation>กระบวนการที่อยู่ในความคืบหน้า</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1485"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1473"/>
         <source>Camera addition is already in progress.Are you sure you want to cancel current process?</source>
         <translation>กล้องมีอยู่แล้วในความคืบหน้า คุณแน่ใจว่าคุณต้องการที่จะยกเลิกการดำเนินการในปัจจุบัน?</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1586"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1574"/>
         <source>Delete Files</source>
         <translation>ลบไฟล์</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1587"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1575"/>
         <source>Are you sure you want to permanently delete these %n file(s)?</source>
         <translation>
             <numerusform>คุณแน่ใจหรือว่าต้องการที่จะลบ%nไฟล์เหล่านี้?</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1604"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1592"/>
         <source>Remove Items</source>
         <translation>ลบรายการ</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1605"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1593"/>
         <source>Are you sure you want to remove these %n item(s) from layout?</source>
         <translation>
             <numerusform>คุณแน่ใจหรือว่าต้องการที่จะลบรายการเหล่านี้ n%n(s) จากรูปแบบ?</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1654"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1642"/>
         <source>User already exists.</source>
         <translation>ผู้ใช้งานที่มีอยู่แล้ว.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1655"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1643"/>
         <source>Video Wall already exists</source>
         <translation>วีดีโอที่มีอยู่แล้ว</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1658"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1646"/>
         <source>User with the same name already exists</source>
         <translation>ผู้ใช้ที่มีชื่อเดียวกันมีอยู่แล้ว</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1659"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1647"/>
         <source>Video Wall with the same name already exists</source>
         <translation>วีดีโอที่มีชื่อเดียวกันมีอยู่แล้ว</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1708"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1696"/>
         <source>Rename</source>
         <translation>เปลี่ยนชื่อ</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1709"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1697"/>
         <source>Enter new name for the selected item:</source>
         <translation>ใส่ชื่อใหม่สำหรับรายการที่เลือก:</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1865"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1853"/>
         <source>These %n cameras are auto-discovered.
 They may be auto-discovered again after removing.
 Are you sure you want to delete them?</source>
@@ -8146,7 +8126,7 @@ Are you sure you want to delete them?</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1872"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1860"/>
         <source>%n of these %1 cameras are auto-discovered.
 They may be auto-discovered again after removing.
 Are you sure you want to delete them?</source>
@@ -8157,51 +8137,51 @@ Are you sure you want to delete them?</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1878"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1866"/>
         <source>Do you really want to delete the following %n item(s)?</source>
         <translation>
             <numerusform>คุณต้องการลบรายการต่อไปนี้จริง ๆ %n (s)?</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1887"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1875"/>
         <source>Delete Resources</source>
         <translation>ลบทรัพยากร</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1964"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1952"/>
         <source>User Settings</source>
         <translation>ตั้งค่าผู้ใช้</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2138"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2109"/>
         <source>Updating background</source>
         <translation>การอัปเดตพื้นหลัง</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2139"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2110"/>
         <source>Image processing can take a lot of time. Please be patient.</source>
         <translation>การประมวลผลภาพสามารถใช้เวลามาก กรุณารอสักครู่.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2173"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2144"/>
         <source>Image cannot be uploaded</source>
         <translation>ภาพไม่สามารถอัปโหลด</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2228"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2199"/>
         <source>Could not save the following %n items.</source>
         <translation>
             <numerusform>ไม่สามารถบันทึกรายการต่อไปนี้ %n.</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2245"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2216"/>
         <source>Could not delete resource</source>
         <translation>ไม่สามารถลบทรัพยากร</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2245"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2216"/>
         <source>An error has occurred while trying to delete a resource from Server. 
 
 Error description: &apos;%2&apos;</source>
@@ -8210,59 +8190,59 @@ Error description: &apos;%2&apos;</source>
 คำอธิบายข้อผิดพลาด: &apos;%2&apos;</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2256"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2227"/>
         <source>Could not save changes made to the following %n resource(s).</source>
         <translation>
             <numerusform>ไม่สามารถบันทึกการเปลี่ยนแปลงที่เกิดขึ้นกับทรัพยากรต่อไปนี้ n%n (s).</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2392"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2371"/>
         <source>Client v%1&lt;br/&gt;</source>
         <translation>ไคลเอนต์ v%1&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2397"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2376"/>
         <source>Server v%1 at %2&lt;br/&gt;</source>
         <translation>เซิร์ฟเวอร์ v %1 ที่ %2 &lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2399"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2378"/>
         <source>Server v%1&lt;br/&gt;</source>
         <translation>เซิร์ฟเวอร์ v%1&lt;br/&gt;</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2425"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2404"/>
         <source>Some components of the system are not updated:&lt;br/&gt;&lt;br/&gt;%1&lt;br/&gt;Please update all components to the latest version %2.</source>
         <translation>บางส่วนของระบบจะไม่ปรับปรุง: &lt;br/&gt; %1 &lt;br/&gt; โปรดอัปเดตทุกองค์ประกอบที่จะ รุ่นล่าสุด %2.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2436"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2415"/>
         <source>Version Mismatch</source>
         <translation>รุ่นไม่ตรงกัน</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2441"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2420"/>
         <source>Update...</source>
         <translation>อัปเดต ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2451"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2430"/>
         <source>Beta version %1</source>
         <translation>รุ่น Beta %1</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2452"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2431"/>
         <source>You are running beta version of %1.</source>
         <translation>คุณกำลังเรียกใช้รุ่นเบต้าของ %1.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2477"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2456"/>
         <source>Launcher process is not found</source>
         <translation>กระบวนการเปิดไม่พบ</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2478"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2457"/>
         <source>Cannot restart the client.
 Please close the application and start it again using the shortcut in the start menu.</source>
         <translation>ไม่สามารถเริ่มการทำงานของลูกค้า
@@ -8317,12 +8297,12 @@ Please close the application and start it again using the shortcut in the start 
         <translation>เชื่อมต่อไปยังเซิร์ฟเวอร์อื่น ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_connect_handler.cpp" line="188"/>
+        <location filename="../src/ui/workbench/handlers/workbench_connect_handler.cpp" line="186"/>
         <source>Could not connect to server. Closing in %1...</source>
         <translation>ไม่สามารถเชื่อมต่อไปยังเซิร์ฟเวอร์ ปิดใน %1 ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_connect_handler.cpp" line="257"/>
+        <location filename="../src/ui/workbench/handlers/workbench_connect_handler.cpp" line="255"/>
         <source>Connecting...</source>
         <translation>กำลังเชื่อมต่อ ...</translation>
     </message>
@@ -8335,43 +8315,43 @@ Please close the application and start it again using the shortcut in the start 
 <context>
     <name>QnWorkbenchController</name>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="609"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="607"/>
         <source>Recording in...%1</source>
         <translation>กำลังบันทึกใน ... %1</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="645"/>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="673"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="643"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="671"/>
         <source>Warning</source>
         <translation>การเตือน</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="645"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="643"/>
         <source>Can&apos;t start recording due to the following error: %1</source>
         <translation>ไม่สามารถเริ่มการบันทึกเนื่องจากข้อผิดพลาดต่อไปนี้: %1</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="651"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="649"/>
         <source>Recorded Video</source>
         <translation>วิดีโอที่บันทึกไว้</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="656"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="654"/>
         <source>Save Recording As...</source>
         <translation>บันทึกเป็น ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="658"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="656"/>
         <source>AVI (Audio/Video Interleaved) (*.avi)</source>
         <translation>AVI (Audio / Video Interleaved) (* .avi)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="671"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="669"/>
         <source>Could not overwrite file &apos;%1&apos;. Please try another name.</source>
         <translation>ไม่สามารถเขียนทับแฟ้ม &apos;%1&apos; กรุณาใช้ชื่ออื่น.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_controller.cpp" line="1424"/>
+        <location filename="../src/ui/workbench/workbench_controller.cpp" line="1434"/>
         <source>Press any key to stop the tour</source>
         <translation>กดปุ่มใด ๆ เพื่อที่จะหยุด</translation>
     </message>
@@ -8427,7 +8407,7 @@ Please close the application and start it again using the shortcut in the start 
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="207"/>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="640"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="645"/>
         <source>Warning</source>
         <translation>คำเตือน</translation>
     </message>
@@ -8451,137 +8431,137 @@ Do you want to continue?</source>
         <translation>Matroska (*.mkv)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="264"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="270"/>
         <source>Export Video As...</source>
         <translation>ส่งวิดีโอออกเป็น ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="276"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="282"/>
         <source>No timestamp</source>
         <translation>การประทับเวลาไม่มี</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="277"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="283"/>
         <source>Top left corner (requires transcoding)</source>
         <translation>มุมซ้ายด้านบน (ต้องแปลง)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="278"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="284"/>
         <source>Top right corner (requires transcoding)</source>
         <translation>มุมขวาบน (ต้องแปลง)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="279"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="285"/>
         <source>Bottom left corner (requires transcoding)</source>
         <translation>Bottom left corner (requires transcoding)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="280"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="286"/>
         <source>Bottom right corner (requires transcoding)</source>
         <translation>มุมขวาล่าง (ต้องแปลง)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="282"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="288"/>
         <source>Timestamps:</source>
         <translation>Timestamps:</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="288"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="294"/>
         <source>Transcode video to guarantee WYSIWYG</source>
         <translation>แปลงวิดีโอเพื่อรับประกัน WYSIWYG</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="322"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="328"/>
         <source>AVI format is not recommended</source>
         <translation>รูปแบบ AVI ไม่แนะนำ</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="323"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="329"/>
         <source>AVI format is not recommended for export of non-continuous recording when audio track is present.Do you want to continue?</source>
         <translation>รูปแบบ AVI ไม่แนะนำสำหรับการส่งออกของการบันทึกไม่ต่อเนื่องเมื่อเสียงเพลงเป็นปัจจุบัน คุณต้องการที่จะดำเนินการต่อไปหรือไม่?</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="336"/>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="358"/>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="585"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="342"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="364"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="590"/>
         <source>Save As</source>
         <translation>บันทึกเป็น</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="337"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="343"/>
         <source>You are about to export video with filters that require transcoding, which can take a long time. Do you want to continue?</source>
         <translation>คุณกำลังจะส่งออกวิดีโอที่มีตัวกรองที่จำเป็นต้องมีการแปลงซึ่งสามารถใช้เวลานาน คุณต้องการที่จะดำเนินการต่อไปหรือไม่?</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="359"/>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="586"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="365"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="591"/>
         <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
         <translation>ไฟล์ &apos;%1&apos; มีอยู่แล้ว คุณต้องการที่จะเขียนทับมัน?</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="403"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="409"/>
         <source>Exporting Video</source>
         <translation>การส่งออกวิดีโอ</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="404"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="410"/>
         <source>Exporting to &quot;%1&quot;...</source>
         <translation>กำลังส่งออก &quot;%1&quot;...</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="451"/>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="673"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="452"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="678"/>
         <source>Export finished</source>
         <translation>การส่งออกเสร็จสิ้น</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="451"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="452"/>
         <source>Export successfully finished</source>
         <translation>ส่งออกเสร็จสิ้น ประสบความสำเร็จ</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="454"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="455"/>
         <source>Could not export layout</source>
         <translation>ไม่สามารถส่งออกรูปแบบ</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="478"/>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="487"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="479"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="492"/>
         <source>Could not save a layout</source>
         <translation>ไม่สามารถบันทึกรูปแบบ</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="479"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="480"/>
         <source>Current layout contains image files. Images are not allowed for Multi-Video export.</source>
         <translation>รูปแบบปัจจุบันมีไฟล์ภาพ ภาพจะไม่ได้รับอนุญาตเพื่อการส่งออกหลายวิดีโอ.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="488"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="493"/>
         <source>Current layout contains local files. Local files are not allowed for Multi-Video export.</source>
         <translation>รูปแบบปัจจุบันประกอบด้วยแฟ้มท้องถิ่น ไฟล์ท้องถิ่นไม่ได้รับอนุญาตเพื่อการส่งออกหลายวิดีโอ.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="523"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="528"/>
         <source>Save local layout As...</source>
         <translation>บันทึกรูปแบบท้องถิ่นเป็น ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="525"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="530"/>
         <source>Export Layout As...</source>
         <translation>ส่งออกเป็นเค้าโครง ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="542"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="547"/>
         <source>%1 Media File (*.nov)</source>
         <translation>%1 สื่อไฟล์ (* .nov)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="563"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="568"/>
         <source>Make file read-only</source>
         <translation>ทำให้ไฟล์อ่านอย่างเดียว</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="641"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="646"/>
         <source>You are about to export several video sequences with a total length exceeding 30 minutes. 
 It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.
 Do you want to continue?</source>
@@ -8590,12 +8570,12 @@ Do you want to continue?</source>
 คุณต้องการที่จะดำเนินการต่อไปหรือไม่?</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="673"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="678"/>
         <source>Export successfully finished.</source>
         <translation>การส่งออกเสร็จสิ้น ประสบความสำเร็จ.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="675"/>
+        <location filename="../src/ui/workbench/handlers/workbench_export_handler.cpp" line="680"/>
         <source>Could not export video</source>
         <translation>ไม่สามารถส่งออกวิดีโอ</translation>
     </message>
@@ -8603,63 +8583,63 @@ Do you want to continue?</source>
 <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="29"/>
-        <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="65"/>
-        <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="107"/>
-        <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="116"/>
+        <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="32"/>
+        <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="68"/>
+        <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="110"/>
         <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="119"/>
+        <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="122"/>
         <source>Error</source>
         <translation>ความผิดพลาด</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="29"/>
+        <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="32"/>
         <source>Please, wait before the previously requested servers will be added to your system.</source>
         <translation>กรุณารอสักครู่ก่อนที่เซิร์ฟเวอร์ร้องขอก่อนหน้านี้จะถูกเพิ่มลงในระบบของคุณ.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="54"/>
+        <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="57"/>
         <source>Enter Password...</source>
         <translation>ป้อนรหัสผ่าน ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="55"/>
+        <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="58"/>
         <source>Administrator Password</source>
         <translation>รหัสผ่านผู้ดูแลระบบ</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="65"/>
+        <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="68"/>
         <source>Password cannot be empty!</source>
         <translation>รหัสผ่านไม่สามารถที่จะว่างเปล่า!</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="75"/>
+        <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="78"/>
         <source>Connecting to the current system...</source>
         <translation>การเชื่อมต่อกับระบบปัจจุบัน ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="104"/>
+        <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="107"/>
         <source>Information</source>
         <translation>ข้อมูล</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="104"/>
+        <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="107"/>
         <source>The selected servers has been successfully connected to your system!</source>
         <translation>เซิร์ฟเวอร์ที่เลือกได้รับการเชื่อมต่อสำเร็จกับระบบของคุณ!</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="107"/>
+        <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="110"/>
         <source>Authentification failed.
 Please, check the password you have entered.</source>
         <translation>การตรวจสอบ ล้มเหลว
 กรุณาตรวจสอบรหัสผ่านที่คุณได้ป้อน.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="116"/>
+        <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="119"/>
         <source>Could not configure the selected servers.</source>
         <translation>ไม่สามารถกำหนดค่าเซิร์ฟเวอร์ที่เลือก.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="119"/>
+        <location filename="../src/ui/workbench/handlers/workbench_incompatible_servers_action_handler.cpp" line="122"/>
         <source>Could not update the selected servers.
 You can try to update the servers again in the System Administration.</source>
         <translation>ไม่สามารถปรับปรุงเซิร์ฟเวอร์ที่เลือก
@@ -8772,18 +8752,18 @@ You can try to update the servers again in the System Administration.</source>
 <context>
     <name>QnWorkbenchNavigator</name>
     <message>
-        <location filename="../src/ui/workbench/workbench_navigator.cpp" line="1083"/>
+        <location filename="../src/ui/workbench/workbench_navigator.cpp" line="1091"/>
         <source>All Cameras</source>
         <translation>กล้องทั้งหมด</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_navigator.cpp" line="1402"/>
+        <location filename="../src/ui/workbench/workbench_navigator.cpp" line="1410"/>
         <source>&apos;Live&apos;</source>
         <extracomment>Time slider&apos;s tooltip for position on live. Note from QDateTime docs: any sequence of characters that are enclosed in single quotes will be treated as text and not be used as an expression for. That&apos;s where these single quotes come from.</extracomment>
         <translation>ภาพสด</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_navigator.cpp" line="1406"/>
+        <location filename="../src/ui/workbench/workbench_navigator.cpp" line="1414"/>
         <source>yyyy MMM dd
 hh:mm:ss</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
@@ -8791,13 +8771,13 @@ hh:mm:ss</source>
 hh:mm:ss</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_navigator.cpp" line="1410"/>
+        <location filename="../src/ui/workbench/workbench_navigator.cpp" line="1418"/>
         <source>hh:mm:ss</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip for local files. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
         <translation>hh:mm:ss</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_navigator.cpp" line="1413"/>
+        <location filename="../src/ui/workbench/workbench_navigator.cpp" line="1421"/>
         <source>mm:ss</source>
         <extracomment>This is a date/time format for time slider&apos;s tooltip for short local files. Please translate it only if you&apos;re absolutely sure that you know what you&apos;re doing.</extracomment>
         <translation>mm:ss</translation>
@@ -8826,7 +8806,7 @@ Please wait for the camera to go online.</source>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="151"/>
-        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="185"/>
+        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="204"/>
         <source>An error has occurred while trying to set current position for camera %1.
 
 Please wait for the camera to go online.</source>
@@ -8835,12 +8815,12 @@ Please wait for the camera to go online.</source>
 โปรดรอกล้องออนไลน์สักครู่.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="184"/>
+        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="203"/>
         <source>Could not set position to camera</source>
         <translation>ไม่สามารถกำหนดตำแหน่งให้กับกล้อง</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="264"/>
+        <location filename="../src/ui/workbench/handlers/workbench_ptz_handler.cpp" line="283"/>
         <source>PTZ_CALIBRATION_%1.jpg</source>
         <translation>PTZ_CALIBRATION_%1.jpg</translation>
     </message>
@@ -8848,87 +8828,87 @@ Please wait for the camera to go online.</source>
 <context>
     <name>QnWorkbenchScreenshotHandler</name>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="224"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="364"/>
         <source>PNG Image (*.png)</source>
         <translation>PNG ภาพ (*.png)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="225"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="365"/>
         <source>JPEG Image (*.jpg)</source>
         <translation>JPEG ภาพ (*.jpg)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="239"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="379"/>
         <source>Save Screenshot As...</source>
         <translation>บันทึกหน้าจอเป็น...</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="248"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="388"/>
         <source>No timestamp</source>
         <translation>การประทับเวลาไม่มี</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="249"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="389"/>
         <source>Top left corner</source>
         <translation>มุมซ้ายบน</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="250"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="390"/>
         <source>Top right corner</source>
         <translation>มุมขวาด้านบน</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="251"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="391"/>
         <source>Bottom left corner</source>
         <translation>มุมซ้ายล่าง</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="252"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="392"/>
         <source>Bottom right corner</source>
         <translation>มุมขวาล่าง</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="255"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="395"/>
         <source>Timestamp:</source>
         <translation>ประทับเวลา:</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="277"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="420"/>
         <source>Save As</source>
         <translation>บันทึกเป็น</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="278"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="421"/>
         <source>File &apos;%1&apos; already exists. Do you want to overwrite it?</source>
         <translation>ไฟล์ &apos;%1&apos; มีอยู่แล้ว คุณต้องการที่จะเขียนทับมันไหม?</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="294"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="437"/>
         <source>Could not overwrite file</source>
         <translation>ไม่สามารถเขียนทับไฟล์ได้</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="295"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="438"/>
         <source>File &apos;%1&apos; is used by another process. Please enter another name.</source>
         <translation>ไฟล์ &apos;%1&apos; ถูกนำมาใช้โดยกระบวนการอื่น กรุณากรอกชื่ออื่น.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="310"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="595"/>
         <source>Saving %1</source>
         <translation>กำลังบันทึก %1</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="357"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="499"/>
         <source>Could not save screenshot</source>
         <translation>ไม่สามารถบันทึกภาพหน้าจอ</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="358"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="500"/>
         <source>An error has occurred while saving screenshot &apos;%1&apos;.</source>
         <translation>เกิดข้อผิดพลาดในขณะที่บันทึกหน้าจอ &apos;%1&apos;.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="369"/>
+        <location filename="../src/ui/workbench/handlers/workbench_screenshot_handler.cpp" line="511"/>
         <source>Saving Screenshot...</source>
         <translation>กำลังบันทึกหน้าจอ...</translation>
     </message>
@@ -8936,44 +8916,44 @@ Please wait for the camera to go online.</source>
 <context>
     <name>QnWorkbenchUpdateWatcher</name>
     <message>
-        <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="70"/>
+        <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="71"/>
         <source>Newer version is available</source>
         <translation>รุ่นใหม่สามารถใช้ได้</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="71"/>
-        <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="76"/>
+        <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="72"/>
+        <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="77"/>
         <source>New version &lt;b&gt;%1&lt;/b&gt; is available.</source>
         <translation>เวอร์ชั่นใหม่ &lt;b&gt;%1&lt;/b&gt; สามารถใช้ได้.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="73"/>
-        <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="82"/>
+        <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="74"/>
+        <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="83"/>
         <source>Would you like to update?</source>
         <translation>คุณต้องการที่จะปรับปรุงไหม?</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="75"/>
+        <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="76"/>
         <source>Update is recommended</source>
         <translation>ขอแนะนำให้ปรับปรุง</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="78"/>
+        <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="79"/>
         <source>Major issues have been fixed.</source>
         <translation>ประเด็นสำคัญที่ได้รับการแก้ไข.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="80"/>
+        <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="81"/>
         <source>Update is strongly recommended.</source>
         <translation>ขอแนะนำให้ปรับปรุง.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="89"/>
+        <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="90"/>
         <source>Don&apos;t notify again about this update.</source>
         <translation>ไม่ต้องแจ้งให้ทราบเกี่ยวกับการปรับปรุงนี้.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="94"/>
+        <location filename="../src/ui/workbench/watchers/workbench_update_watcher.cpp" line="95"/>
         <source>Release Notes</source>
         <translation>หมายเหตุ</translation>
     </message>
@@ -8981,173 +8961,173 @@ Please wait for the camera to go online.</source>
 <context>
     <name>QnWorkbenchVideoWallHandler</name>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="328"/>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="919"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="330"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="921"/>
         <source>Control session is already running</source>
         <translation>การควบคุมเซสชั่นกำลังทำงาน</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="329"/>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="920"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="331"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="922"/>
         <source>Could not start control session.
 Another user is already controlling this screen.</source>
         <translation>ไม่สามารถเริ่มเซสชันการควบคุม
 มีผู้ใช้อื่นในการควบคุมหน้าจอนี้.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="420"/>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="460"/>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="507"/>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1256"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="422"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="462"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="509"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1258"/>
         <source>Error</source>
         <translation>ความผิดพลาด</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="420"/>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="460"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="422"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="462"/>
         <source>Unexpected error has occurred. Changes cannot be saved.</source>
         <translation>ข้อผิดพลาดที่ไม่คาดคิดได้เกิดขึ้น การเปลี่ยนแปลงไม่สามารถบันทึกได้.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="508"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="510"/>
         <source>There are no offline videowall items attached to this pc.</source>
         <translation>ไม่มีรายการวีดีโอ ออฟไลน์ที่ติดอยู่กับเครื่องคอมพิวเตอร์นี้.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="515"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="517"/>
         <source>Switch to Video Wall Mode...</source>
         <translation>สลับไปโหมดวิดีโอ Wall ...</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="516"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="518"/>
         <source>Video Wall will be started now. Do you want to close this %1 Client instance?</source>
         <translation>Video Wall ของจะได้รับการเริ่มต้นตอนนี้ คุณต้องการที่จะปิด %1 ไคลเอนต์นี้?</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="901"/>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1203"/>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="2559"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="903"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1205"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="2604"/>
         <source>More licenses required</source>
         <translation>ต้องการใบอนุญาติเพิ่มเติม</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="902"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="904"/>
         <source>To enable the feature please activate at least one Video Wall license.</source>
         <translation>เมื่อต้องการเปิดใช้งานคุณลักษณะกรุณาเปิดใช้งานอย่างน้อยหนึ่งใบอนุญาตของ Video Wall .</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="907"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="909"/>
         <source>Could not start Video Wall control session.</source>
         <translation>ไม่สามารถเริ่มเซสชันการควบคุมของ Video Wall.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1165"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1167"/>
         <source>%1 (%2)</source>
         <translation>%1 (%2)</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1170"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1172"/>
         <source>New layout</source>
         <translation>เปิดหน้าต่างใหม่</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1170"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1172"/>
         <source>New layout %1</source>
         <translation>เปิดหน้าต่างใหม่ %1</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1204"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1206"/>
         <source>To enable the feature please activate at least one Video Wall license</source>
         <translation>เมื่อต้องการเปิดใช้งานคุณลักษณะกรุณาเปิดใช้งานอย่างน้อยหนึ่งใบอนุญาตของ Video Wall</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1213"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1215"/>
         <source>Video Wall</source>
         <translation>วีดีโอ Wall</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1213"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1215"/>
         <source>Video Wall %1</source>
         <translation>วีดีโอ Wall %1</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1216"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1218"/>
         <source>New Video Wall...</source>
         <translation>สร้าง Video Wall...</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1217"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1219"/>
         <source>Enter the name of the Video Wall to create:</source>
         <translation>ใส่ชื่อของ Video Wall ของการสร้าง:</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1232"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1234"/>
         <source>Video Wall already exists</source>
         <translation>Video Wall มีอยู่แล้ว</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1233"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1235"/>
         <source>Video Wall with the same name already exists</source>
         <translation>Video Wall มีชื่อเดียวกันกับที่มีอยู่แล้ว</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1257"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1259"/>
         <source>Could not save the following %n items to Server.</source>
         <translation>
             <numerusform>ไม่สามารถบันทึกรายการต่อไปนี้ %n ไปยังเซิร์ฟเวอร์.</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1328"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1330"/>
         <source>Delete Items</source>
         <translation>ลบรายการ</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1329"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1331"/>
         <source>Are you sure you want to permanently delete these %n item(s)?</source>
         <translation>
             <numerusform>คุณแน่ใจหรือว่าต้องการที่จะลบรายการเหล่านี้ %n (s)?</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1351"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1353"/>
         <source>Could not start Video Wall.</source>
         <translation>ไม่สามารถเริ่ม Video Wall.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1363"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1365"/>
         <source>Confirm Video Wall stop</source>
         <translation>ยืนยันการหยุดของ Video Wall</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1364"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1366"/>
         <source>Are you sure you want to stop the Video Wall?
 You&apos;ll have to start it manually.</source>
         <translation>คุณแน่ใจว่าคุณต้องการที่จะหยุดของ Video Wall
 คุณจะต้องเริ่มต้นด้วยตนเอง.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1631"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1676"/>
         <source>New Matrix %1</source>
         <translation>เมทริกซ์ใหม่ %1</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1642"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1687"/>
         <source>Invalid matrix</source>
         <translation>เมทริกซ์ที่ไม่ถูกต้อง</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1643"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1688"/>
         <source>You have no layouts on the screens. Matrix cannot be saved.</source>
         <translation>คุณมีรูปแบบที่ไม่มีบนหน้าจอ เมทริกซ์ไม่สามารถบันทึกได้.</translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1712"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1757"/>
         <source>Delete Matrices</source>
         <translation>ลบเมทริกซ์</translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1713"/>
+        <location filename="../src/ui/workbench/handlers/workbench_videowall_handler.cpp" line="1758"/>
         <source>Are you sure you want to permanently delete these %n matrices?</source>
         <translation>
             <numerusform>คุณแน่ใจหรือว่าต้องการที่จะลบเมทริกซ์ %n เหล่านี้?</numerusform>
