@@ -37,6 +37,7 @@ namespace nx_http
 
         switch( m_httpStreamReader.state() ) 
         {
+            case HttpStreamReader::pullingLineEndingBeforeMessageBody:
             case HttpStreamReader::readingMessageBody:
             case HttpStreamReader::messageDone:
                 *m_msg = m_httpStreamReader.message();
