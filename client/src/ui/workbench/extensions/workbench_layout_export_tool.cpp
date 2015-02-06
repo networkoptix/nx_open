@@ -329,8 +329,7 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
                                     imageParameters,
                                     serverTimeZone);
 
-    //TODO: #GDM #TR Fix after string freeze
-    emit stageChanged(tr("Exporting to \"%2\"...").arg(QFileInfo(m_targetFilename).fileName()));
+    emit stageChanged(tr("Exporting to \"%1\"...").arg(QFileInfo(m_targetFilename).fileName()));
     return true;
 }
 
