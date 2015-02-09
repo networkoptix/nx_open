@@ -165,6 +165,7 @@ bool QnWorkbenchExportHandler::saveLayoutToLocalFile(const QnLayoutResourcePtr &
     return tool->start();
 }
 
+//TODO: #GDM Monstrous function, refactor required
 void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
@@ -415,18 +416,22 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     QnClientVideoCamera* camera = new QnClientVideoCamera(resource);
 
     qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(resource, Qn::InvalidUtcOffset);
+
+    QnImageFilterHelper imageParameters;
+    imageParameters.setSrcRect(zoomRect);
+    imageParameters.setContrastParams(contrastParams);
+    imageParameters.setDewarpingParams(resource->getDewarpingParams(), dewarpingParams);
+    imageParameters.setRotation(rotation);
+    imageParameters.setCustomAR(customAr);
+    imageParameters.setTimeCorner(timestampPos, timeOffset, 0);
+    imageParameters.setVideoLayout(resource->getVideoLayout());
+
     QnClientVideoCameraExportTool *tool = new QnClientVideoCameraExportTool(
                                               camera,
                                               period,
                                               fileName,
-                                              timestampPos,
-                                              timeOffset,
+                                              imageParameters,
                                               serverTimeZone,
-                                              zoomRect,
-                                              contrastParams,
-                                              dewarpingParams,
-                                              rotation,
-                                              customAr,
                                               this);
 
     connect(exportProgressDialog,   &QnProgressDialog::canceled,    tool,                   &QnClientVideoCameraExportTool::stop);

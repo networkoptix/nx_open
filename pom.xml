@@ -323,6 +323,7 @@
             </activation>
             <properties>
                 <qtlib19>DBus</qtlib19>
+                <box>${platform}</box>
             </properties>
             <modules>                       
                 <module>applauncher</module> 
@@ -430,6 +431,7 @@
             </properties>
             <modules>
                 <!--<module>plugins/xvbadecoder</module>-->
+                <module>plugins/it930x_plugin</module>
             </modules>            
         </profile>  
         <profile>
@@ -576,6 +578,7 @@
             </properties>
             <modules>
                 <module>edge_firmware/rpi</module>
+                <module>plugins/rpi_cam</module>
             </modules>             
         </profile>
 

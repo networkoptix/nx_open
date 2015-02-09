@@ -17,138 +17,25 @@
     </message>
 </context>
 <context>
-    <name>Qee::Evaluator</name>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="722"/>
-        <source>Invalid stack size after program evaluation: %1.</source>
-        <translation>Taille &apos;stack&apos; invalide après l&apos;évaluation du programme: %1.</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="764"/>
-        <source>Could not deduce result type for operation %1(&apos;%2&apos;, &apos;%3&apos;).</source>
-        <translation>Ne peut pas déduire le type de résultat pour l&apos;opération %1(&apos;%2&apos;,&apos;%3&apos;).</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="792"/>
-        <source>Invalid parameter type for operation %1(&apos;%2&apos;, &apos;%2&apos;)</source>
-        <translation>Type de paramètre invalide pour l&apos;opération %1(&apos;%2&apos;,&apos;%2&apos;)</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="802"/>
-        <source>Could not deduce arithmetic supertype for type &apos;%1&apos;.</source>
-        <translation>Ne peut pas déduire l&apos;arithmétique &apos;supertype&apos; pour le type &apos;%1&apos;.</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="824"/>
-        <source>Invalid parameter type for operation %1(&apos;%2&apos;)</source>
-        <translation>Type de paramètre invalide pour l&apos;opération %1(&apos;%2&apos;)</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="832"/>
-        <source>Argument number for %1 instruction has invalid type &apos;%2&apos;.</source>
-        <translation>Le nombre argument pour l&apos;instruction %1 a un type invalide &apos;%2&apos;.</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="836"/>
-        <source>Argument number for %1 instruction is invalid.</source>
-        <translation>Le nombre argument pour l&apos;instruction %1 est invalide.</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="841"/>
-        <source>Stack underflow during execution of %1 instruction.</source>
-        <translation>&apos;Stack Underflow&apos; pendant l&apos;exécution de l&apos;instruction %1.</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="845"/>
-        <source>Function name for %1 instruction has invalid type &apos;%2&apos;.</source>
-        <translation>Le nom de fonction pour l&apos;insctruction %1 a un type &apos;%2&apos; invalide.</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="856"/>
-        <source>Function or variable &apos;%1&apos; is not defined.</source>
-        <translation>Variable ou fonction &apos;%1&apos; n&apos;est pas définie.</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="862"/>
-        <source>Variable &apos;%1&apos; is not a function and cannot be called.</source>
-        <translation>La variable &apos;%1&apos; n&apos;est pas une fonction and ne peut être appelée.</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="874"/>
-        <source>Stack underflow during program evaluation.</source>
-        <translation>&apos;Stack Underflow&apos; pendant l&apos;évaluation du programme.</translation>
-    </message>
-</context>
-<context>
-    <name>Qee::Lexer</name>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="113"/>
-        <source>Unexpected symbol &apos;%1&apos; at position %2.</source>
-        <translation>Symbole inattendu &apos;%1&apos; a la position %2.</translation>
-    </message>
-</context>
-<context>
-    <name>Qee::ParameterPack</name>
-    <message>
-        <location filename="../src/utils/common/evaluator.h" line="185"/>
-        <location filename="../src/utils/common/evaluator.h" line="192"/>
-        <source>Parameter %2 is not specified for function &apos;%1&apos;.</source>
-        <translation>Paramètre %2 n&apos;est pas spécifié pour la fonction &apos;%1&apos;.</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.h" line="195"/>
-        <source>Parameter %2 of function &apos;%1&apos; is of type &apos;%3&apos;, but type &apos;%4&apos; was expected.</source>
-        <translation>Paramètre %2 de la fonction &apos;%1&apos; est de type &apos;%3&apos;, mais le type &apos;%4&apos; était attendu.</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.h" line="201"/>
-        <source>Function &apos;%1&apos; is expected to have %3 arguments, %2 provided.</source>
-        <translation>La fonction %1 est attendu à avoir %3 arguments,%2 fourni.</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.h" line="206"/>
-        <source>Function &apos;%1&apos; is expected to have %3-%4 arguments, %2 provided.</source>
-        <translation>La fonction %1 est attendu à avoir %3-%4 arguments,%2 fourni.</translation>
-    </message>
-</context>
-<context>
-    <name>Qee::Parser</name>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="179"/>
-        <source>Unexpected token %1 (&apos;%2&apos;) at position %3.</source>
-        <translation>&apos;token&apos; inattendu %1 (&apos;%2&apos;) à la position %3.</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="236"/>
-        <source>Invalid color constant &apos;%1&apos;.</source>
-        <translation>Constante &apos;couleur&apos; invalide &apos;%1&apos;.</translation>
-    </message>
-    <message>
-        <location filename="../src/utils/common/evaluator.cpp" line="281"/>
-        <source>Invalid number constant &apos;%1&apos;.</source>
-        <translation>Constante &apos;nombre&apos; invalide &apos;%1&apos;.</translation>
-    </message>
-</context>
-<context>
     <name>QnAbstractStorageResource</name>
     <message>
-        <location filename="../src/core/resource/abstract_storage_resource.cpp" line="120"/>
+        <location filename="../src/core/resource/abstract_storage_resource.cpp" line="107"/>
         <source>Windows Network Shared Resource</source>
         <translation>Ressource partagé de réseau Windows</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/abstract_storage_resource.cpp" line="121"/>
+        <location filename="../src/core/resource/abstract_storage_resource.cpp" line="108"/>
         <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
         <translation>\\&lt;Nom Ordinateur&gt;\&lt;Dossier&gt;</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/abstract_storage_resource.cpp" line="125"/>
+        <location filename="../src/core/resource/abstract_storage_resource.cpp" line="112"/>
         <source>Coldstore Network Storage</source>
         <translatorcomment>There&apos;s no word in French for ColdStore, we&apos;ve added (NAS) for explanation purpose</translatorcomment>
         <translation>Stockage réseau &apos;ColdStore&apos; (NAS)</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/abstract_storage_resource.cpp" line="126"/>
+        <location filename="../src/core/resource/abstract_storage_resource.cpp" line="113"/>
         <source>coldstore://&lt;Address&gt;</source>
         <translation>coldstore://&lt;Adresse&gt;</translation>
     </message>
@@ -715,107 +602,107 @@ Paramètres: </translation>
 <context>
     <name>QnLicense</name>
     <message>
-        <location filename="../src/licensing/license.cpp" line="151"/>
+        <location filename="../src/licensing/license.cpp" line="158"/>
         <source>Trial</source>
         <translation>Essai</translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="152"/>
+        <location filename="../src/licensing/license.cpp" line="159"/>
         <source>Analog</source>
         <translation>Analogue</translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="153"/>
+        <location filename="../src/licensing/license.cpp" line="160"/>
         <source>Professional</source>
         <translation>Professionel</translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="154"/>
+        <location filename="../src/licensing/license.cpp" line="161"/>
         <source>Edge</source>
         <translation>Edge</translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="155"/>
+        <location filename="../src/licensing/license.cpp" line="162"/>
         <source>Vmax</source>
         <translation>Vmax</translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="156"/>
+        <location filename="../src/licensing/license.cpp" line="163"/>
         <source>Analog encoder</source>
         <translation>Encodeur Analogue</translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="157"/>
+        <location filename="../src/licensing/license.cpp" line="164"/>
         <source>Video Wall</source>
         <translation>Mur Vidéo</translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="170"/>
+        <location filename="../src/licensing/license.cpp" line="177"/>
         <source>Trial licenses</source>
         <translation>Licences d&apos;essaie</translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="171"/>
+        <location filename="../src/licensing/license.cpp" line="178"/>
         <source>Analog licenses</source>
         <translation>Licences Analogue</translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="172"/>
+        <location filename="../src/licensing/license.cpp" line="179"/>
         <source>Professional licenses</source>
         <translation>Licences Professionnel</translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="173"/>
+        <location filename="../src/licensing/license.cpp" line="180"/>
         <source>Edge licenses</source>
         <translation>Licences Edge</translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="174"/>
+        <location filename="../src/licensing/license.cpp" line="181"/>
         <source>Vmax licenses</source>
         <translation>Licences Vmax</translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="175"/>
+        <location filename="../src/licensing/license.cpp" line="182"/>
         <source>Analog encoder licenses</source>
         <translation>Licenses d&apos;encodeur vidéo</translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="176"/>
+        <location filename="../src/licensing/license.cpp" line="183"/>
         <source>Video Wall licenses</source>
         <translation>Licences de mur vidéo</translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="343"/>
+        <location filename="../src/licensing/license.cpp" line="354"/>
         <source>Invalid signature</source>
         <translation>Signature Invalide</translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="345"/>
+        <location filename="../src/licensing/license.cpp" line="356"/>
         <source>Server with necessary hardware ID is not found</source>
         <translation>Serveur avec l&apos;ID matériel nécessaire ne peut être trouvé</translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="347"/>
+        <location filename="../src/licensing/license.cpp" line="358"/>
         <source>Invalid customization</source>
         <translation>Personnalisation invalide</translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="349"/>
+        <location filename="../src/licensing/license.cpp" line="360"/>
         <source>Expired</source>
         <translation>Expiré</translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="351"/>
+        <location filename="../src/licensing/license.cpp" line="362"/>
         <source>Invalid type</source>
         <translation>Type invalide</translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="353"/>
+        <location filename="../src/licensing/license.cpp" line="364"/>
         <source>Only single license is allowed for this device</source>
         <translation>Seulement une licence simple est autorisée pour ce périphérique</translation>
     </message>
     <message>
-        <location filename="../src/licensing/license.cpp" line="355"/>
+        <location filename="../src/licensing/license.cpp" line="366"/>
         <source>Unknown error</source>
         <translation>Erreur inconnue</translation>
     </message>
@@ -823,7 +710,7 @@ Paramètres: </translation>
 <context>
     <name>QnLicenseUsageHelper</name>
     <message numerus="yes">
-        <location filename="../src/utils/license_usage_helper.cpp" line="75"/>
+        <location filename="../src/utils/license_usage_helper.cpp" line="125"/>
         <source>%n %2 are used out of %1.</source>
         <translation>
             <numerusform>%n %2 est utilisée sur %1.</numerusform>
@@ -831,7 +718,7 @@ Paramètres: </translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/utils/license_usage_helper.cpp" line="94"/>
+        <location filename="../src/utils/license_usage_helper.cpp" line="135"/>
         <source>%n %2 will be used out of %1.</source>
         <translation>
             <numerusform>%n %2 sera utilisée sur %1.</numerusform>
@@ -839,7 +726,7 @@ Paramètres: </translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/utils/license_usage_helper.cpp" line="112"/>
+        <location filename="../src/utils/license_usage_helper.cpp" line="144"/>
         <source>Activate %n more %2. </source>
         <translation>
             <numerusform>Activer %n plus %2. </numerusform>
@@ -847,7 +734,7 @@ Paramètres: </translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../src/utils/license_usage_helper.cpp" line="114"/>
+        <location filename="../src/utils/license_usage_helper.cpp" line="147"/>
         <source>%n more %2 will be used. </source>
         <translation>
             <numerusform>%n plus %2 va être utilisé. </numerusform>
@@ -855,27 +742,27 @@ Paramètres: </translation>
         </translation>
     </message>
     <message>
-        <location filename="../src/utils/license_usage_helper.cpp" line="186"/>
+        <location filename="../src/utils/license_usage_helper.cpp" line="252"/>
         <source>There was a problem activating your license key. Database error has occurred.</source>
         <translation>Il a eu un problème d&apos;activation de votre clé de licence. Une erreur de base de données s&apos;est produite.</translation>
     </message>
     <message>
-        <location filename="../src/utils/license_usage_helper.cpp" line="188"/>
+        <location filename="../src/utils/license_usage_helper.cpp" line="254"/>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
         <translation>Il a eu un problème d&apos;activation de votre licence. Données invalides reçues. S.V.P., contactez l’assistance technique pour signaler cette erreur.</translation>
     </message>
     <message>
-        <location filename="../src/utils/license_usage_helper.cpp" line="190"/>
+        <location filename="../src/utils/license_usage_helper.cpp" line="256"/>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.</source>
         <translation>La clé de licence que vous avez entrée est invalide. S.V.P., vérifiez que la licence est correctement entrée. Si le problème persiste, S.V.P. contactez l&apos;assistance technique pour confirmer que la licence est valide ou pour obtenir une licence valide.</translation>
     </message>
     <message>
-        <location filename="../src/utils/license_usage_helper.cpp" line="193"/>
+        <location filename="../src/utils/license_usage_helper.cpp" line="259"/>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.</source>
         <translation>Vous essayez d&apos;activer une licence incompatible avec votre logiciel. S.V.P, contactez l&apos;assistance technique pour obtenir une licence valide.</translation>
     </message>
     <message>
-        <location filename="../src/utils/license_usage_helper.cpp" line="195"/>
+        <location filename="../src/utils/license_usage_helper.cpp" line="261"/>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to get a valid license key.</source>
         <translation>La licence à déjà été activé sur l&apos;ID matériel {{hwid}} le {{time}}. S.V.P, contactez l&apos;assistance technique pour obtenir une licence valide.</translation>
     </message>
@@ -883,7 +770,7 @@ Paramètres: </translation>
 <context>
     <name>QnMediaServerResource</name>
     <message>
-        <location filename="../src/core/resource/media_server_resource.cpp" line="44"/>
+        <location filename="../src/core/resource/media_server_resource.cpp" line="43"/>
         <source>Server</source>
         <translation>Serveur</translation>
     </message>
@@ -942,78 +829,78 @@ Paramètres: </translation>
 <context>
     <name>QnStreamQualityStrings</name>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="19"/>
+        <location filename="../src/core/resource/media_resource.cpp" line="32"/>
         <source>Lowest</source>
         <translation>Trés basse</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="20"/>
+        <location filename="../src/core/resource/media_resource.cpp" line="33"/>
         <source>Low</source>
         <translation>Basse</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="22"/>
+        <location filename="../src/core/resource/media_resource.cpp" line="35"/>
         <source>High</source>
         <translation>Élevée</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="24"/>
+        <location filename="../src/core/resource/media_resource.cpp" line="37"/>
         <source>Preset</source>
         <translation>Préréglage</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="25"/>
+        <location filename="../src/core/resource/media_resource.cpp" line="38"/>
         <source>Undefined</source>
         <translation>Indéfini</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="21"/>
+        <location filename="../src/core/resource/media_resource.cpp" line="34"/>
         <source>Medium</source>
         <translation>Moyenne</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="23"/>
+        <location filename="../src/core/resource/media_resource.cpp" line="36"/>
         <source>Best</source>
         <translation>Meilleure</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="37"/>
+        <location filename="../src/core/resource/media_resource.cpp" line="50"/>
         <source>Lst</source>
         <extracomment>Short for &apos;Lowest&apos;</extracomment>
         <translation>TB</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="40"/>
+        <location filename="../src/core/resource/media_resource.cpp" line="53"/>
         <source>Lo</source>
         <extracomment>Short for &apos;Low&apos;</extracomment>
         <translation>B</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="43"/>
+        <location filename="../src/core/resource/media_resource.cpp" line="56"/>
         <source>Me</source>
         <extracomment>Short for &apos;Medium&apos;</extracomment>
         <translation>Mo</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="46"/>
+        <location filename="../src/core/resource/media_resource.cpp" line="59"/>
         <source>Hi</source>
         <extracomment>Short for &apos;High&apos;</extracomment>
         <translation>H</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="49"/>
+        <location filename="../src/core/resource/media_resource.cpp" line="62"/>
         <source>Bst</source>
         <extracomment>Short for &apos;Best&apos;</extracomment>
         <translation>Me</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="52"/>
+        <location filename="../src/core/resource/media_resource.cpp" line="65"/>
         <source>Ps</source>
         <extracomment>Short for &apos;Preset&apos;</extracomment>
         <translation>Pr</translation>
     </message>
     <message>
-        <location filename="../src/core/resource/media_resource.cpp" line="55"/>
+        <location filename="../src/core/resource/media_resource.cpp" line="68"/>
         <source>-</source>
         <extracomment>Short for &apos;Undefined&apos;</extracomment>
         <translation>-</translation>
@@ -1172,32 +1059,32 @@ Vous ne pouvez pas enregistrer du vidéo à partir des caméras.</translation>
 <context>
     <name>QnTCPConnectionProcessor</name>
     <message>
-        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="238"/>
+        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="253"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="240"/>
+        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="255"/>
         <source>Not Found</source>
         <translation>Introuvable</translation>
     </message>
     <message>
-        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="242"/>
+        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="257"/>
         <source>Not Implemented</source>
         <translation>Non Implémenté</translation>
     </message>
     <message>
-        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="244"/>
+        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="259"/>
         <source>Unsupported Transport</source>
         <translation>Transport non supporté</translation>
     </message>
     <message>
-        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="246"/>
+        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="261"/>
         <source>Internal Server Error</source>
         <translation>Erreur interne du serveur</translation>
     </message>
     <message>
-        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="248"/>
+        <location filename="../src/utils/network/tcp_connection_processor.cpp" line="263"/>
         <source>Invalid Parameter</source>
         <translation>Paramètre invalide</translation>
     </message>
@@ -1215,12 +1102,12 @@ Vous ne pouvez pas enregistrer du vidéo à partir des caméras.</translation>
         <translation>Méthode de transcodage inconnue.</translation>
     </message>
     <message>
-        <location filename="../src/transcoding/transcoder.cpp" line="299"/>
+        <location filename="../src/transcoding/transcoder.cpp" line="298"/>
         <source>OpenCLTranscode is not implemented</source>
         <translation>&apos;OpenCLTranscode&apos; n&apos;est pas implémenté</translation>
     </message>
     <message>
-        <location filename="../src/transcoding/transcoder.cpp" line="302"/>
+        <location filename="../src/transcoding/transcoder.cpp" line="301"/>
         <source>Unknown Transcode Method</source>
         <translation>Méthode de transcodage inconnue</translation>
     </message>

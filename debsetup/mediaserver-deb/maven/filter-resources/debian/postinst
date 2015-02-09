@@ -169,6 +169,7 @@ case "$1" in
             if [ ! -f $DB_PATH -a ! -f $OLD_DB_PATH ]; then
                 APPSERVER_PASSWORD=$(ask_for_value appserverPassword "$APPSERVER_PASSWORD")
                 $CFG_HELPER appserverPassword "$APPSERVER_PASSWORD"
+                $CFG_HELPER lowPriorityPassword 1
             fi
 
             TRANSPORT="$($CFG_HELPER rtspTransport)"

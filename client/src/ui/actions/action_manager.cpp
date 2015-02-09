@@ -494,7 +494,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::StartVideoWallControlAction).
         flags(Qn::Tree | Qn::VideoWallReviewScene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
-        text(tr("Control Video Wall")). //TODO: #VW #TR
+        text(tr("Control Video Wall")).
         condition(new QnStartVideoWallControlActionCondition(this));
 
     factory(Qn::PushMyScreenToVideowallAction).
@@ -674,7 +674,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::SaveCurrentVideoWallReviewAction).
         flags(Qn::Main | Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey | Qn::IntentionallyAmbiguous).
-        text(tr("Save Video Wall View")). //TODO: #VW #TR
+        text(tr("Save Video Wall View")).
         shortcut(tr("Ctrl+S")).
         autoRepeat(false).
         condition(new QnSaveVideowallReviewActionCondition(true, this));
@@ -923,7 +923,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::OpenVideoWallsReviewAction).
        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
-       text(tr("Open Video Wall(s)")). //TODO: #VW #TR
+       text(tr("Open Video Wall(s)")).
        condition(hasFlags(Qn::videowall));
 
     factory(Qn::OpenInFolderAction).
@@ -951,13 +951,13 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::StartVideoWallAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
-        text(tr("Switch to Video Wall mode...")).  //TODO: #VW #TR
+        text(tr("Switch to Video Wall mode...")).
         autoRepeat(false).
         condition(new QnStartVideowallActionCondition(this));
 
     factory(Qn::SaveVideoWallReviewAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-        text(tr("Save Video Wall View")). //TODO: #VW #TR
+        text(tr("Save Video Wall View")).
         shortcut(tr("Ctrl+S")).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
         autoRepeat(false).
@@ -1313,7 +1313,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::VideowallSettingsAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-        text(tr("Video Wall Settings...")).     //TODO: #VW #TR
+        text(tr("Video Wall Settings...")).
         condition(new QnConjunctionActionCondition(
             new QnResourceActionCondition(hasFlags(Qn::videowall), Qn::ExactlyOne, this),
             new QnAutoStartAllowedActionCodition(this),

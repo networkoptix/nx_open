@@ -311,23 +311,25 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
         timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(resource, 0);
     }
     qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(resource, Qn::InvalidUtcOffset);
-    qreal customAr = resource->customAspectRatio();
-    m_currentCamera->exportMediaPeriodToFile(m_period.startTimeMs * 1000ll,
-                                    (m_period.startTimeMs + m_period.durationMs) * 1000ll,
+    
+    QnImageFilterHelper imageParameters;
+    imageParameters.setSrcRect(itemData.zoomRect);
+    imageParameters.setContrastParams(itemData.contrastParams);
+    imageParameters.setDewarpingParams(resource->getDewarpingParams(), itemData.dewarpingParams);
+    imageParameters.setRotation(itemData.rotation);
+    imageParameters.setCustomAR(resource->customAspectRatio());
+    imageParameters.setTimeCorner(Qn::NoCorner, timeOffset, 0);
+    imageParameters.setVideoLayout(resource->getVideoLayout());
+
+    m_currentCamera->exportMediaPeriodToFile(m_period,
                                     uniqId,
                                     lit("mkv"),
                                     m_storage,
                                     role,
-                                    Qn::NoCorner,
-                                    timeOffset, serverTimeZone,
-                                    itemData.zoomRect,
-                                    itemData.contrastParams,
-                                    itemData.dewarpingParams,
-                                    itemData.rotation,
-                                    customAr);
+                                    imageParameters,
+                                    serverTimeZone);
 
-    //TODO: #GDM #TR Fix after string freeze
-    emit stageChanged(tr("Exporting to \"%2\"...").arg(QFileInfo(m_targetFilename).fileName()));
+    emit stageChanged(tr("Exporting to \"%1\"...").arg(QFileInfo(m_targetFilename).fileName()));
     return true;
 }
 

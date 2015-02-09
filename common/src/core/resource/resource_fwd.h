@@ -36,6 +36,10 @@ class QnLayoutItemData;
 class QnResourceCommand;
 typedef QSharedPointer<QnResourceCommand> QnResourceCommandPtr;
 
+struct QnCameraAdvancedParamValue;
+class QnCameraAdvancedParamValueMap;
+typedef QList<QnCameraAdvancedParamValue> QnCameraAdvancedParamValueList;
+
 // -->
 
 
@@ -142,9 +146,9 @@ class QnPlIqResource;
 typedef QnSharedResourcePointer<QnPlIqResource> QnPlIqResourcePtr;
 typedef QnSharedResourcePointerList<QnPlIqResource> QnPlIqResourceList;
 
-class QnPlWatchDogResource;
-typedef QnSharedResourcePointer<QnPlWatchDogResource> QnPlWatchDogResourcePtr;
-typedef QnSharedResourcePointerList<QnPlWatchDogResource> QnPlWatchDogResourceList;
+class QnDigitalWatchdogResource;
+typedef QnSharedResourcePointer<QnDigitalWatchdogResource> QnDigitalWatchdogResourcePtr;
+typedef QnSharedResourcePointerList<QnDigitalWatchdogResource> QnDigitalWatchdogResourceList;
 
 class QnVistaResource;
 typedef QnSharedResourcePointer<QnVistaResource> QnVistaResourcePtr;

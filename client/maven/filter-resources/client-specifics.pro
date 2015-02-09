@@ -1,4 +1,5 @@
 TEMPLATE = app
+QT += xmlpatterns
 
 INCLUDEPATH +=  ${qt.dir}/include/QtWidgets/$$QT_VERSION/ \
                 ${qt.dir}/include/QtWidgets/$$QT_VERSION/QtWidgets/ \

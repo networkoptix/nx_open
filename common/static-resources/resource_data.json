@@ -109,7 +109,10 @@
                 "VISTA|VK2-1080BIR3V9F",
                 "VISTA|VK2-720VZMI",
                 "VISTA|VK2-720VZMX",
-                "VISTA|VK2-1080VRDIR3V9F"
+                "VISTA|VK2-1080VRDIR3V9F",
+                "VISTA|VK2-1080XVFD3V9F",
+                "VISTA|VK2-3MPBIR3V9F",
+                "VISTA|VK2-3MPVRDIR3V9F"
             ],
             "ptzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability"
         },
@@ -544,6 +547,33 @@
                 }
             }
         },
+        {
+            "keys": [
+                "eneo|PXD-2030PTZ1080"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [   1,  -1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "_TODO": "Actual tilt range is [0, -180].",
+                        "device":  [-1,   1],
+                        "logical": [0,   90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [    0,  1],
+                        "logical": [   1,  6],
+                        "logicalMultiplier": 32.0,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },        
         {
             "keys": [
                 "SONY|SNC-EP580|unknown"

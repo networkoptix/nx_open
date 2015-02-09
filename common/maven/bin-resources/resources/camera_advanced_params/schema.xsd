@@ -1,0 +1,55 @@
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:simpleType name="DataType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Bool"/>
+			<xs:enumeration value="Number"/>
+			<xs:enumeration value="Enumeration"/>
+			<xs:enumeration value="String"/>
+			<xs:enumeration value="Button"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:complexType name="paramType">    
+		<xs:simpleContent>
+				<xs:extension base="xs:string">
+				<xs:attribute type="xs:string" name="id" use="required"/>				
+				<xs:attribute type="DataType" name="dataType" use="required"/>
+				<xs:attribute type="xs:string" name="name" use="required"/>
+				<xs:attribute type="xs:string" name="description" use="optional"/>
+				<xs:attribute type="xs:string" name="range" use="optional"/>
+				<xs:attribute type="xs:string" name="tag" use="optional"/>
+				<xs:attribute type="xs:boolean" name="readOnly" use="optional" default="false"/>
+            </xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	
+	<xs:complexType name="groupType">    
+		<xs:sequence minOccurs="0" maxOccurs="unbounded">
+			<xs:choice>
+				<xs:element name="group" type="groupType" />
+				<xs:element name="param" type="paramType" />
+			</xs:choice>
+		</xs:sequence>
+		<xs:attribute type="xs:string" name="name" use="required"/>
+		<xs:attribute type="xs:string" name="description" use="optional"/>
+	</xs:complexType>
+	
+	<xs:complexType name="parametersType">    
+		<xs:sequence minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="group" type="groupType" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="pluginType">
+		<xs:sequence>
+			<xs:element name="parameters" type="parametersType" />
+		</xs:sequence>
+		<xs:attribute type="xs:string" name="name" use="required"/>
+		<xs:attribute type="xs:string" name="version" use="required"/>
+		<xs:attribute type="xs:string" name="unique_id" use="required"/>
+		<xs:attribute type="xs:boolean" name="packet_mode" use="optional" default="true"/>
+	</xs:complexType>
+  
+	<xs:element name="plugin" type="pluginType"/>
+</xs:schema>
