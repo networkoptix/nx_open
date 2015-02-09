@@ -32,18 +32,13 @@
 
 namespace {
 
-struct DeviceClassAndMac {
-    QString xclass;
-    QString mac;
-};
-
-void findMacAddresses(IWbemServices *pSvc, std::vector<DeviceClassAndMac>& devices) {
+void findMacAddresses(IWbemServices *pSvc, DevicesList& devices) {
     HRESULT hres;
     IEnumWbemClassObject* pEnumerator = NULL;
     hres = pSvc->ExecQuery(
-        _T("WQL"), 
+        _T("WQL"),
         _T("SELECT * FROM Win32_NetworkAdapter WHERE PhysicalAdapter=true "),
-        WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, 
+        WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY,
         NULL,
         &pEnumerator);
 
@@ -61,7 +56,7 @@ void findMacAddresses(IWbemServices *pSvc, std::vector<DeviceClassAndMac>& devic
     QString classes[] = {"PCI", "USB"};
 
     for (;;) {
-        HRESULT hr = pEnumerator->Next(WBEM_INFINITE, 1, 
+        HRESULT hr = pEnumerator->Next(WBEM_INFINITE, 1,
             &pclsObj, &uReturn);
 
         if (0 == uReturn)
@@ -88,7 +83,7 @@ void findMacAddresses(IWbemServices *pSvc, std::vector<DeviceClassAndMac>& devic
         } else {
             continue;
         }
-        
+
         hr = pclsObj->Get(L"MACAddress", 0, &vtProp, 0, 0);
         if (SUCCEEDED(hr)) {
             if (V_VT(&vtProp) == VT_BSTR) {
@@ -108,38 +103,17 @@ void findMacAddresses(IWbemServices *pSvc, std::vector<DeviceClassAndMac>& devic
     pEnumerator->Release();
 }
 
+
+
 void getMacAddress(IWbemServices *pSvc, bstr_t& macAddress, QSettings *settings) {
-    std::vector<DeviceClassAndMac> devices;
+    DevicesList devices;
 
     findMacAddresses(pSvc, devices);
 
     if (devices.empty())
         return;
 
-    std::sort(devices.begin(), devices.end(), [](const DeviceClassAndMac &device1, const DeviceClassAndMac &device2) {
-        if (device1.xclass < device2.xclass)
-            return true;
-        else if (device1.xclass > device2.xclass)
-            return false;
-        else
-            return device1.mac < device2.mac;
-    });
-
-    QString storedMac = settings->value("storedMac").toString();
-
-    QString result;
-
-    for(auto it = devices.begin(); it != devices.end(); ++it) {
-        if  (it->mac == storedMac) {
-            result = storedMac;
-            break;
-        }
-    }
-
-    if (result.isEmpty()) {
-        result = devices.front().mac;
-        settings->setValue("storedMac", result);
-    }
+    QString result = getSaveMacAddress(devices, settings);
 
     macAddress = SysAllocString(reinterpret_cast<const OLECHAR*>(result.utf16()));
 }
@@ -158,9 +132,9 @@ void execQuery1(IWbemServices *pSvc, const BSTR fieldName, const BSTR objectName
     // For example, get the name of the operating system
     IEnumWbemClassObject* pEnumerator = NULL;
     hres = pSvc->ExecQuery(
-        _T("WQL"), 
+        _T("WQL"),
         reqStr,
-        WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, 
+        WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY,
         NULL,
         &pEnumerator);
 
@@ -180,7 +154,7 @@ void execQuery1(IWbemServices *pSvc, const BSTR fieldName, const BSTR objectName
 
     if (pEnumerator)
     {
-        HRESULT hr = pEnumerator->Next(WBEM_INFINITE, 1, 
+        HRESULT hr = pEnumerator->Next(WBEM_INFINITE, 1,
             &pclsObj, &uReturn);
 
         if(0 != uReturn)
@@ -212,9 +186,9 @@ void execQuery2(IWbemServices *pSvc, const BSTR fieldName, const BSTR objectName
     // For example, get the name of the operating system
     IEnumWbemClassObject* pEnumerator = NULL;
     hres = pSvc->ExecQuery(
-        _T("WQL"), 
+        _T("WQL"),
         reqStr,
-        WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, 
+        WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY,
         NULL,
         &pEnumerator);
 
@@ -254,7 +228,7 @@ void execQuery2(IWbemServices *pSvc, const BSTR fieldName, const BSTR objectName
     }
 
     bstr_t t;
-    
+
     pEnumerator->Release();
 
     for (StrSet::const_iterator ci = values.begin(); ci != values.end(); ++ci) {
@@ -345,14 +319,14 @@ void LLUtil::fillHardwareIds(QList<QByteArray>& hardwareIds, QSettings *settings
     // Step 1: --------------------------------------------------
     // Initialize COM. ------------------------------------------
 
-    hres =  CoInitializeEx(0, COINIT_MULTITHREADED); 
+    hres =  CoInitializeEx(0, COINIT_MULTITHREADED);
     if (FAILED(hres))
     {
         if (hres == RPC_E_CHANGED_MODE)
             needUninitialize = false;
         else {
             std::ostringstream os;
-            os << "Failed to initialize COM library. Error code = 0x" 
+            os << "Failed to initialize COM library. Error code = 0x"
                 << std::ios_base::hex << hres;
             throw HardwareIdError(os.str());
         }
@@ -366,14 +340,14 @@ void LLUtil::fillHardwareIds(QList<QByteArray>& hardwareIds, QSettings *settings
     // parameter of CoInitializeSecurity ------------------------
 
     hres =  CoInitializeSecurity(
-        NULL, 
+        NULL,
         -1,                          // COM authentication
         NULL,                        // Authentication services
         NULL,                        // Reserved
-        RPC_C_AUTHN_LEVEL_DEFAULT,   // Default authentication 
-        RPC_C_IMP_LEVEL_IMPERSONATE, // Default Impersonation  
+        RPC_C_AUTHN_LEVEL_DEFAULT,   // Default authentication
+        RPC_C_IMP_LEVEL_IMPERSONATE, // Default Impersonation
         NULL,                        // Authentication info
-        EOAC_NONE,                   // Additional capabilities 
+        EOAC_NONE,                   // Additional capabilities
         NULL                         // Reserved
         );
 
@@ -381,7 +355,7 @@ void LLUtil::fillHardwareIds(QList<QByteArray>& hardwareIds, QSettings *settings
     if (FAILED(hres))
     {
         std::ostringstream os;
-        os << "Failed to initialize security. Error code = 0x" 
+        os << "Failed to initialize security. Error code = 0x"
             << std::ios_base::hex << hres;
         if (needUninitialize) CoUninitialize();
         throw HardwareIdError(os.str());
@@ -393,9 +367,9 @@ void LLUtil::fillHardwareIds(QList<QByteArray>& hardwareIds, QSettings *settings
     IWbemLocator *pLoc = NULL;
 
     hres = CoCreateInstance(
-        CLSID_WbemLocator,             
-        0, 
-        CLSCTX_INPROC_SERVER, 
+        CLSID_WbemLocator,
+        0,
+        CLSCTX_INPROC_SERVER,
         IID_IWbemLocator, (LPVOID *) &pLoc);
 
     if (FAILED(hres))
@@ -423,16 +397,16 @@ void LLUtil::fillHardwareIds(QList<QByteArray>& hardwareIds, QSettings *settings
         0,                       // Locale. NULL indicates current
         0,                       // Security flags.
         0,                       // Authority (for example, Kerberos)
-        0,                       // Context object 
+        0,                       // Context object
         &pSvc                    // pointer to IWbemServices proxy
         );
 
     if (FAILED(hres))
     {
         std::ostringstream os;
-        os << "Could not connect. Error code = 0x" 
+        os << "Could not connect. Error code = 0x"
             << std::ios_base::hex << hres;
-        pLoc->Release();     
+        pLoc->Release();
         if (needUninitialize) CoUninitialize();
         throw HardwareIdError(os.str());
     }
@@ -447,20 +421,20 @@ void LLUtil::fillHardwareIds(QList<QByteArray>& hardwareIds, QSettings *settings
         pSvc,                        // Indicates the proxy to set
         RPC_C_AUTHN_WINNT,           // RPC_C_AUTHN_xxx
         RPC_C_AUTHZ_NONE,            // RPC_C_AUTHZ_xxx
-        NULL,                        // Server principal name 
-        RPC_C_AUTHN_LEVEL_CALL,      // RPC_C_AUTHN_LEVEL_xxx 
+        NULL,                        // Server principal name
+        RPC_C_AUTHN_LEVEL_CALL,      // RPC_C_AUTHN_LEVEL_xxx
         RPC_C_IMP_LEVEL_IMPERSONATE, // RPC_C_IMP_LEVEL_xxx
         NULL,                        // client identity
-        EOAC_NONE                    // proxy capabilities 
+        EOAC_NONE                    // proxy capabilities
         );
 
     if (FAILED(hres))
     {
         std::ostringstream os;
-        os <<  "Could not set proxy blanket. Error code = 0x" 
+        os <<  "Could not set proxy blanket. Error code = 0x"
             << std::ios_base::hex << hres;
         pSvc->Release();
-        pLoc->Release();     
+        pLoc->Release();
         if (needUninitialize) CoUninitialize();
         throw HardwareIdError(os.str());
     }

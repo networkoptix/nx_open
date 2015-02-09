@@ -9,14 +9,45 @@
 
 namespace {
 
-QList<QByteArray> g_hardwareId;
-bool g_hardwareIdInitialized(false);
-
+    QList<QByteArray> g_hardwareId;
+    bool g_hardwareIdInitialized(false);
 }
 
 namespace LLUtil {
+    void fillHardwareIds(QList<QByteArray>& hardwareIds, QSettings *settings);
 
-void fillHardwareIds(QList<QByteArray>& hardwareIds, QSettings *settings);
+    QString getSaveMacAddress(std::vector<DeviceClassAndMac> devices, QSettings *settings) {
+        if (devices.empty())
+            return QString();
+
+        std::sort(devices.begin(), devices.end(), [](const DeviceClassAndMac &device1, const DeviceClassAndMac &device2) {
+                if (device1.xclass < device2.xclass)
+                    return true;
+                else if (device1.xclass > device2.xclass)
+                    return false;
+                else
+                    return device1.mac < device2.mac;
+            });
+
+        QString storedMac = settings->value("storedMac").toString();
+
+        QString result;
+
+        for(auto it = devices.begin(); it != devices.end(); ++it) {
+            if  (it->mac == storedMac) {
+                result = storedMac;
+                break;
+            }
+        }
+
+        if (result.isEmpty()) {
+            result = devices.front().mac;
+            settings->setValue("storedMac", result);
+        }
+
+        return result;
+    }
+
 
 QByteArray getHardwareId(int version, bool guidCompatibility, QSettings *settings) {
     if (version == 0) {
@@ -25,7 +56,7 @@ QByteArray getHardwareId(int version, bool guidCompatibility, QSettings *setting
         md5Hash.addData(hardwareId);
         return QString(md5Hash.result().toHex()).toLatin1();
     }
-    
+
     if (!g_hardwareIdInitialized) {
         // Initialize with LATEST_HWID_VERSION * 2 elements
         for (int i = 0; i < 2 * LATEST_HWID_VERSION; i++) {
