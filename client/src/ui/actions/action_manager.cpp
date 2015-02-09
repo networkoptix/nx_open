@@ -1659,6 +1659,14 @@ QnActionManager::QnActionManager(QObject *parent):
         toggledText(tr("Unpin Tree")).
         condition(new QnTreeNodeTypeCondition(Qn::RootNode, this));
 
+    factory(Qn::PinCalendarAction).
+        text(tr("Pin Calendar")).
+        toggledText(tr("Unpin Calendar"));
+
+    factory(Qn::MinimizeDayTimeViewAction).
+        text(tr("Minimize")).
+        icon(qnSkin->icon("titlebar/dropdown.png"));
+
     factory(Qn::ToggleTreeAction).
         flags(Qn::NoTarget).
         text(tr("Show Tree")).

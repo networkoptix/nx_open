@@ -946,6 +946,16 @@ namespace Qn {
         PinTreeAction,
 
         /**
+         * Pins/unpins calendar and day/time view
+         */
+        PinCalendarAction,
+
+        /** 
+         * Minimazes day/time view
+         */
+        MinimizeDayTimeViewAction,
+
+        /**
          * Shows/hides slider.
          */
         ToggleSliderAction,

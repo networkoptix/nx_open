@@ -26,13 +26,14 @@ namespace {
 } // anonymous namespace
 
 
-QnCalendarWidget::QnCalendarWidget(QWidget *parent):
-    base_type(parent),
-    m_delegate(new QnCalendarItemDelegate(this)),
-    m_empty(true),
-    m_currentTimePeriodsVisible(false),
-    m_currentTime(0),
-    m_localOffset(0)
+QnCalendarWidget::QnCalendarWidget(QWidget *parent)
+    : base_type(parent)
+    , m_delegate(new QnCalendarItemDelegate(this))
+    , m_empty(true)
+    , m_currentTimePeriodsVisible(false)
+    , m_currentTime(0)
+    , m_localOffset(0)
+    , m_navigationBar(nullptr)
 {
     setHorizontalHeaderFormat(QCalendarWidget::ShortDayNames);
     setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
@@ -60,9 +61,11 @@ QnCalendarWidget::QnCalendarWidget(QWidget *parent):
     QAbstractItemModel *model = tableView->model();
     connect(model, SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateEnabledPeriod()));
 
-    QWidget *navigationBar = findChild<QWidget *>(QLatin1String("qt_calendar_navigationbar"));
-    navigationBar->setBackgroundRole(QPalette::Window);
-
+    m_navigationBar = findChild<QWidget *>(QLatin1String("qt_calendar_navigationbar"));
+    
+    assert(m_navigationBar);
+    m_navigationBar->setBackgroundRole(QPalette::Window);
+    
     updateEnabledPeriod();
     updateCurrentTime();
     updateEmpty();
@@ -185,3 +188,9 @@ void QnCalendarWidget::setLocalOffset(qint64 localOffset) {
 
     update();
 }
+
+int QnCalendarWidget::headerHeight() const
+{
+    return m_navigationBar->height();
+}
+
