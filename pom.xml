@@ -323,7 +323,6 @@
             </activation>
             <properties>
                 <qtlib19>DBus</qtlib19>
-                <box>${platform}</box>
             </properties>
             <modules>                       
                 <module>applauncher</module> 
@@ -353,9 +352,9 @@
                 <python.virtualenv>virtualenv.exe</python.virtualenv>
                 <buildenv.script>get_buildenv.bat</buildenv.script>
                 <platform>windows</platform>
+                <box>windows</box>
                 <compiler>msvc2012u3</compiler>
                 <arch>x64</arch>
-                <box>win78</box>
                 <force_x86>false</force_x86>
                 <!-- Testing WinXP hacks on Win78. If doesn't work properly, then revert back -->
                 <!-- <qt.spec>win32-msvc2012</qt.spec>
