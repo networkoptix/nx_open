@@ -401,6 +401,10 @@ Qn::ActionVisibility QnSaveLayoutAsActionCondition::check(const QnResourceList &
     if (layout->data().contains(Qn::VideoWallResourceRole))
         return Qn::InvisibleAction;
 
+    /* Save as.. for exported layouts works very strange, disabling it for now. */
+    if (snapshotManager()->isFile(layout))
+        return Qn::InvisibleAction;
+
     return Qn::EnabledAction;
 }
 

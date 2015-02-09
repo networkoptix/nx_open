@@ -33,8 +33,8 @@ def convertIcon(srcFile, dstFile, colors):
     if tmpFile:
         os.remove(tmpFile)
 
-def getModifiedIcons():
-    p = subprocess.Popen(['hg', 'status', '-am', 'customization'], stdout=subprocess.PIPE)
+def getModifiedIcons(params):
+    p = subprocess.Popen(['hg', 'status', '-am', 'customization'] + params, stdout=subprocess.PIPE)
     result = []
     for fileName in p.stdout:
         fileName = fileName[2:].strip()
@@ -67,10 +67,15 @@ def buildCustomization(customization, baseCustomization, modified):
     
     for srcFile in modified:
         path, ext = os.path.splitext(os.path.relpath(srcFile, root))
+        destPath = os.path.join('customization', customization, path)
+        
+        if customization != baseCustomization and os.path.isfile(destPath + '.svg'):
+            continue
+        
         print '\tConverting [%s]' % (path + ext)
 
         #convertIcon(srcFile, os.path.join('customization', customization, path + '.png'), colors)
-        thread = threading.Thread(None, convertIcon, args=(srcFile, os.path.join('customization', customization, path + '.png'), colors))
+        thread = threading.Thread(None, convertIcon, args=(srcFile, destPath + '.png', colors))
         thread.start()
         threads.append(thread)
     
@@ -78,6 +83,16 @@ def buildCustomization(customization, baseCustomization, modified):
         thread.join()  
         
 def main():
+    global colorizer
+    
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-c', '--change', help="changeset")
+    args = parser.parse_args()
+    
+    changeset = []
+    if args.change:
+        changeset = ['--change', args.change]
+    
     dir = os.getcwd()
     if dir.endswith('util'):
         os.chdir('..')
@@ -88,7 +103,7 @@ def main():
     
     colorizer = imp.load_source('svg_colorize', 'util/svg_colorize.py')
     
-    modified = getModifiedIcons()
+    modified = getModifiedIcons(changeset)
     customizations = getCustomizations()
 
     baseModifiedFiles = filterModified(modified, defaultCustomization)
