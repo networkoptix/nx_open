@@ -1,7 +1,5 @@
 #include "layout_file_camera_data_loader.h"
 
-#include <api/serializer/serializer.h>
-
 #include <camera/data/abstract_camera_data.h>
 #include <camera/data/time_period_camera_data.h>
 #include <camera/data/bookmark_camera_data.h>
@@ -10,6 +8,9 @@
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
 #include <recording/time_period_list.h>
+
+#include <utils/serialization/json.h>
+#include <utils/serialization/json_functions.h>
 
 namespace {
     QAtomicInt qn_fakeHandle(INT_MAX / 2);
@@ -114,18 +115,18 @@ int QnLayoutFileCameraDataLoader::load(const QnTimePeriod &period, const QString
         return loadChunks(period);
     case Qn::MotionTimePeriod:
         {
-            QList<QRegion> motionRegions;
-            parseRegionList(motionRegions, filter);
-            for (int i = 0; i < motionRegions.size(); ++i) 
+            QList<QRegion> motionRegions = QJson::deserialized<QList<QRegion>>(filter.toUtf8());
+            for (const QRegion &region: motionRegions) 
             {
-                if (!motionRegions[i].isEmpty())
+                if (!region.isEmpty())
                     return loadMotion(period, motionRegions);
             }
             qWarning() << "empty motion region";
         }
         //TODO: #GDM #Bookmarks intended fall-through to get assert, implement saving and loading bookmarks in layouts and files
     default:
-        Q_ASSERT(false);
+      ///  Q_ASSERT(false);
+        return 0;
     }
     return -1; //should never get here
 }
