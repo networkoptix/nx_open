@@ -20,6 +20,17 @@ namespace ite
         char supportHWInfo[32];
     };
 
+    struct Pacidal
+    {
+        enum
+        {
+            PID_VIDEO_FHD = 0x111,
+            PID_VIDEO_HD = 0x121,
+            PID_VIDEO_SD = 0x131,
+            PID_VIDEO_CIF = 0x141
+        };
+    };
+
     /// ITE DVB-T receiver
     ///
     /// RX Setting (from driver readme):
@@ -30,9 +41,10 @@ namespace ite
     class It930x
     {
     public:
-        //static const unsigned MPEG_TS_PACKET_SIZE = 188;
-        static const unsigned DEFAULT_PACKETS_NUM = 816;
-        static const unsigned RETURN_CHANNEL_PID = 0x201;
+        enum
+        {
+            PID_RETURN_CHANNEL = 0x201
+        };
 
         typedef enum
         {

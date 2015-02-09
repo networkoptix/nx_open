@@ -22,10 +22,11 @@ namespace ite
     }
 #endif
 
-    MediaEncoder::MediaEncoder(CameraManager * const cameraManager, int encoderNumber)
+    MediaEncoder::MediaEncoder(CameraManager * const cameraManager, int encoderNumber, const nxcip::ResolutionInfo& res)
     :   m_refManager( this ),
         m_cameraManager( cameraManager ),
-        m_encoderNumber( encoderNumber )
+        m_encoderNumber( encoderNumber ),
+        m_resolution( res )
     {
     }
 

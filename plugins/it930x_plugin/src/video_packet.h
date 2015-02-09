@@ -17,9 +17,10 @@ namespace ite
 
     public:
         VideoPacket()
-        :   m_refManager( this ),
-            m_data( nullptr ),
-            m_size( 0 )
+        :   m_refManager(this),
+            m_data(nullptr),
+            m_size(0),
+            m_pts(0)
         {}
 
         VideoPacket(const uint8_t* data, unsigned size);
@@ -39,6 +40,9 @@ namespace ite
 
         //
 
+        int64_t pts() const { return m_pts; }
+        void setPTS(int64_t pts) { m_pts = pts; }
+
         void setTime(uint64_t ts) { m_time = ts; }
         void setKeyFlag() { m_flags |= MediaDataPacket::fKeyPacket; }
         void setLowQualityFlag() { m_flags |= MediaDataPacket::fLowQuality; }
@@ -51,6 +55,7 @@ namespace ite
 
             m_data.swap(vp.m_data);
             swap(m_size, vp.m_size);
+            swap(m_pts, vp.m_pts);
             swap(m_time, vp.m_time);
             swap(m_flags, vp.m_flags);
         }
@@ -58,6 +63,7 @@ namespace ite
     private:
         std::shared_ptr<uint8_t> m_data;
         size_t m_size;
+        int64_t m_pts;
         nxcip::UsecUTCTimestamp m_time;
         unsigned m_flags;
     };

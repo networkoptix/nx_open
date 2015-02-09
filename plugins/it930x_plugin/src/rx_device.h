@@ -9,21 +9,71 @@
 #include "dev_reader.h"
 #include "tx_device.h"
 
-#undef RETURN_CHANNEL_PID
-
 namespace ite
 {
     unsigned str2num(std::string& s);
     std::string num2str(unsigned id);
-
-    class CameraManager;
 
     //!
     class RxDevice
     {
     public:
         constexpr static const char * DEVICE_PATTERN = "usb-it930x";
-        static const unsigned MAX_ENCODERS = 4;
+
+        static constexpr unsigned streamsCount() { return 2; }
+
+        static uint16_t stream2pid(unsigned stream)
+        {
+            switch (stream)
+            {
+                case 0: return Pacidal::PID_VIDEO_FHD;
+                case 1: return Pacidal::PID_VIDEO_SD;
+                default:
+                    return Pacidal::PID_VIDEO_FHD;
+            }
+        }
+#if 0
+        static unsigned pid2stream(uint16_t pid)
+        {
+            switch (pid)
+            {
+                case Pacidal::PID_VIDEO_FHD: return 0;
+                case Pacidal::PID_VIDEO_SD: return 1;
+                default:
+                    return 0;
+            }
+        }
+#endif
+        static void resolution(unsigned stream, int& width, int& height, float& fps)
+        {
+            uint16_t pid = stream2pid(stream);
+
+            fps = 30.0f;
+            switch (pid)
+            {
+            case Pacidal::PID_VIDEO_FHD:
+                width = 1920;
+                height = 1080;
+                break;
+
+            case Pacidal::PID_VIDEO_HD:
+                width = 1280;
+                height = 720;
+                break;
+
+            case Pacidal::PID_VIDEO_SD:
+                width = 640;
+                height = 360;
+                break;
+
+            case Pacidal::PID_VIDEO_CIF:
+                width = 0;
+                height = 0;
+                break;
+            }
+        }
+
+        //
 
         RxDevice(unsigned id);
 
@@ -31,6 +81,10 @@ namespace ite
         unsigned short txID() const { return m_txID; }
 
         DevReader * reader() { return m_devReader.get(); }
+        bool isReading() const { return m_devReader->hasThread(); }
+
+        bool subscribe(unsigned stream) { return m_devReader->subscribe(stream2pid(stream)); }
+        void unsubscribe(unsigned stream) { m_devReader->unsubscribe(stream2pid(stream)); }
 
         bool lockCamera(unsigned short txID, unsigned frequency);
         bool tryLockF(unsigned freq);
@@ -82,10 +136,6 @@ namespace ite
         bool open();
         bool stats();
         void updateTxParams();
-
-        bool syncDevReader();
-        bool readTSPacket(uint8_t * buf);
-        bool readRetChanCmd(RCCommand& cmd);
     };
 
     typedef std::shared_ptr<RxDevice> RxDevicePtr;

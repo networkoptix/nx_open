@@ -11,15 +11,13 @@
 
 namespace ite
 {
-    /*!
-        \note Delegates reference counting to \a AxisCameraManager instance
-    */
+    ///
     class MediaEncoder : public nxcip::CameraMediaEncoder2
     {
         DEF_REF_COUNTER
 
     public:
-        MediaEncoder( CameraManager* cameraManager, int encoderNumber );
+        MediaEncoder( CameraManager* cameraManager, int encoderNumber, const nxcip::ResolutionInfo& );
         virtual ~MediaEncoder();
 
         // nxcip::CameraMediaEncoder
@@ -39,8 +37,7 @@ namespace ite
         //
 
         static void fakeFree(MediaEncoder * ) {}
-
-        nxcip::ResolutionInfo& resolution() { return m_resolution; }
+        void updateResolution(const nxcip::ResolutionInfo& res) { m_resolution = res; }
 
     private:
         CameraManager * m_cameraManager;

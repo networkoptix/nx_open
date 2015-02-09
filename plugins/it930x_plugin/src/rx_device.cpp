@@ -1,6 +1,7 @@
 #include <sstream>
 #include <thread>
 
+#include "timer.h"
 #include "rx_device.h"
 #include "mpeg_ts_packet.h"
 
@@ -47,7 +48,7 @@ namespace ite
         }
         catch (const char * msg)
         {
-            m_devReader->setDevice(nullptr);
+            m_devReader->stop();
             m_device.reset();
         }
 
@@ -76,6 +77,8 @@ namespace ite
             {
                 m_txID = txID;
                 updateTxParams();
+                if (good())
+                    m_devReader->start(m_device.get());
                 return true;
             }
 
@@ -108,7 +111,7 @@ namespace ite
         }
         catch (const char * msg)
         {
-            m_devReader->setDevice(nullptr);
+            m_devReader->stop();
             m_device.reset();
         }
 
@@ -122,7 +125,7 @@ namespace ite
         if (!m_device)
             return;
 
-        m_devReader->setDevice(nullptr); // [LibAV thread]: next readDevice() will return -1. Could close stream.
+        m_devReader->stop();
         m_device->closeStream();
         m_txDev.reset();
         m_frequency = 0;
@@ -152,7 +155,7 @@ namespace ite
         }
         catch (const char * msg)
         {
-            m_devReader->setDevice(nullptr);
+            m_devReader->stop();
             m_device.reset();
         }
 
@@ -161,85 +164,48 @@ namespace ite
 
     bool RxDevice::findTx(unsigned freq, uint16_t& outTxID)
     {
+        typedef std::chrono::steady_clock Clock;
+
+        // TODO: class Timer
+        static const unsigned RET_CHAN_SEARCH_MS = 1000;
+        std::chrono::milliseconds duration(RET_CHAN_SEARCH_MS);
+
         bool retVal = false;
         outTxID = 0;
 
         if (tryLockF(freq))
         {
-#if 1 // DEBUG
+#if 1
             printf("searching TxIDs - rxID: %d; frequency: %d; quality: %d; strength: %d; presence: %d\n",
                    rxID(), freq, quality(), strength(), present());
 #endif
-            if (good() && syncDevReader())
+            if (good())
             {
-                RCCommand cmd;
-                if (readRetChanCmd(cmd) && cmd.isOK())
+                std::chrono::time_point<Clock> timeFinish = Clock::now() + duration;
+
+                while (Clock::now() < timeFinish)
                 {
-                    retVal = true;
-                    outTxID = cmd.txID();
-#if 1 // DEBUG
-                    printf("Rx: %d; Tx: %x (%d)\n", rxID(), outTxID, outTxID);
-#endif
+                    RCCommand cmd;
+                    if (m_devReader->readRetChanCmd(cmd))
+                    {
+                        if (cmd.isOK())
+                        {
+                            retVal = true;
+                            outTxID = cmd.txID();
+                            break;
+                        }
+                    }
                 }
             }
 
             unlockF();
         }
 
+#if 1
+        if (retVal)
+            printf("Rx: %d; Tx: %x (%d)\n", rxID(), outTxID, outTxID);
+#endif
         return retVal;
-    }
-
-    // TODO: what if small buffer?
-    bool RxDevice::syncDevReader()
-    {
-        static const unsigned SYNC_COUNT = 2;
-
-        for (unsigned i = 0; i < SYNC_COUNT * MpegTsPacket::PACKET_SIZE; ++i)
-        {
-            if (m_devReader->synced())
-                return true;
-            uint8_t val;
-            m_devReader->read(&val, 1);
-        }
-        return false;
-    }
-
-    bool RxDevice::readRetChanCmd(RCCommand& cmd)
-    {
-        if (! m_devReader->synced())
-            return false;
-
-        typedef std::chrono::steady_clock Clock;
-
-        // TODO: class Timer
-        static const unsigned RET_CHAN_SEARCH_MS = TxDevice::SEND_WAIT_TIME_MS;
-        std::chrono::milliseconds duration(RET_CHAN_SEARCH_MS);
-        std::chrono::time_point<Clock> timeFinish = Clock::now() + duration;
-
-        uint8_t buf[MpegTsPacket::PACKET_SIZE];
-
-        while (Clock::now() < timeFinish)
-        {
-            cmd.clear();
-
-            if (readTSPacket(buf))
-            {
-                MpegTsPacket pkt(buf);
-                if (pkt.syncOK() && ! pkt.checkbit() && pkt.pid() == It930x::RETURN_CHANNEL_PID)
-                {
-                    cmd.add(pkt.payload(), pkt.payloadLen());
-                    if (cmd.isOK())
-                        return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    bool RxDevice::readTSPacket(uint8_t * buf)
-    {
-        return m_devReader->read(buf, MpegTsPacket::PACKET_SIZE) == MpegTsPacket::PACKET_SIZE;
     }
 
     // TODO

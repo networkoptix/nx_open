@@ -1,19 +1,23 @@
 #ifndef ITE_DEV_READ_THREAD_H
 #define ITE_DEV_READ_THREAD_H
 
+#include <atomic>
+
+//#include "libav_wrap.h"
 #include "dev_reader.h"
 
 namespace ite
 {
-    //!
-    class DevReadThread
+#if 0
+    ///
+    class LibAVReadThread
     {
     public:
         static const unsigned PACKETS_QUEUE_SIZE = 32;  // ~30fps * 1s
         static const unsigned MAX_PTS_DRIFT = 63000;    // 700 ms
         static const unsigned WAIT_LIBAV_FRAME_DURATION_S = 1;
 
-        DevReadThread(CameraManager* camera = nullptr, LibAV* lib = nullptr)
+        LibAVReadThread(CameraManager* camera = nullptr, LibAV* lib = nullptr)
         :
             m_stopMe(false),
             m_camera( camera ),
@@ -21,7 +25,7 @@ namespace ite
         {
         }
 
-        DevReadThread(DevReadThread&& obj)
+        LibAVReadThread(LibAVReadThread&& obj)
         :
             m_stopMe(false),
             m_camera( obj.m_camera ),
@@ -158,6 +162,53 @@ namespace ite
             m_ptsPrev[idx] = pts;
             return (ptsTime.sec + (pts - ptsTime.pts) * timeBase) * USEC_IN_SEC;
         }
+
+        LibAVReadThread(const LibAVReadThread&);
+        LibAVReadThread& operator = (const LibAVReadThread&);
+    };
+#endif
+
+    ///
+    class DevReadThread
+    {
+    public:
+        DevReadThread(DevReader * reader = nullptr)
+        :   m_stopMe(false),
+            m_devReader(reader)
+        {
+        }
+
+        DevReadThread(DevReadThread&& obj)
+        :   m_stopMe(false),
+            m_devReader(obj.m_devReader)
+        {
+        }
+
+        void operator () ()
+        {
+            if (m_devReader)
+                m_devReader->setThreadObj(this);
+
+            if (! m_devReader->synced())
+                m_devReader->sync();
+
+            while (!m_stopMe)
+            {
+                if (! m_devReader->readStep()) // blocking
+                    break;
+            }
+
+#if 1
+            printf("stop reading TS stream\n");
+#endif
+            m_devReader->setThreadObj(nullptr);
+        }
+
+        void stop() { m_stopMe.store(true); }
+
+    private:
+        std::atomic_bool m_stopMe;
+        DevReader * m_devReader;
 
         DevReadThread(const DevReadThread&);
         DevReadThread& operator = (const DevReadThread&);

@@ -53,18 +53,42 @@ namespace ite
 
     int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     {
-        nxcip::MediaDataPacket * packet = m_cameraManager->nextPacket( m_encoderNumber );
+        VideoPacket * packet = m_cameraManager->nextPacket( m_encoderNumber );
         if (!packet)
         {
             *lpPacket = nullptr;
             return nxcip::NX_TRY_AGAIN;
         }
 
+        packet->setTime( usecTime(packet->pts()) );
         *lpPacket = packet;
         return nxcip::NX_NO_ERROR;
     }
 
     void StreamReader::interrupt()
     {
+    }
+
+    //
+
+    // TODO: PTS overflow
+    uint64_t StreamReader::usecTime(PtsT pts)
+    {
+        static const unsigned USEC_IN_SEC = 1000 * 1000;
+        static const unsigned MAX_PTS_DRIFT = 63000;    // 700 ms
+        static const double timeBase = 1.0 / 9000;
+
+        PtsT drift = pts - m_ptsPrev;
+        if (drift < 0) // abs
+            drift = -drift;
+
+        if (!m_ptsPrev || drift > MAX_PTS_DRIFT)
+        {
+            m_time.pts = pts;
+            m_time.sec = time(NULL);
+        }
+
+        m_ptsPrev = pts;
+        return (m_time.sec + (pts - m_time.pts) * timeBase) * USEC_IN_SEC;
     }
 }

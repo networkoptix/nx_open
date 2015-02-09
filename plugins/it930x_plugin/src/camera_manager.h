@@ -2,11 +2,9 @@
 #define ITE_CAMERA_MANAGER_H
 
 #include <vector>
-#include <deque>
 #include <set>
 #include <memory>
 #include <mutex>
-#include <thread>
 #include <atomic>
 
 #include <plugins/camera_plugin.h>
@@ -18,43 +16,7 @@ namespace ite
 {
     class MediaEncoder;
     class VideoPacket;
-
     class DeviceMapper;
-    class DevReader;
-    class DevReadThread;
-    struct LibAV;
-
-    typedef std::shared_ptr<VideoPacket> VideoPacketPtr;
-
-    //!
-    class VideoPacketQueue
-    {
-    public:
-        typedef std::deque<VideoPacketPtr> QueueT;
-
-        VideoPacketQueue()
-        :   m_packetsLost( 0 ),
-            m_isLowQ( false )
-        {}
-
-        void push_back(VideoPacketPtr p) { m_deque.push_back( p ); }
-        void pop_front() { m_deque.pop_front(); }
-        void incLost() { ++m_packetsLost; }
-
-        VideoPacketPtr front() { return m_deque.front(); }
-        size_t size() const { return m_deque.size(); }
-        bool empty() const { return m_deque.empty(); }
-        std::mutex& mutex() { return m_mutex; }
-
-        bool isLowQuality() const { return m_isLowQ; }
-        void setLowQuality(bool value = true) { m_isLowQ = value; }
-
-    private:
-        mutable std::mutex m_mutex;
-        QueueT m_deque;
-        unsigned m_packetsLost;
-        bool m_isLowQ;
-    };
 
     //!
     class CameraManager : public nxcip::BaseCameraManager3
@@ -90,14 +52,6 @@ namespace ite
         virtual int getParamValue(const char * paramName, char * valueBuf, int * valueBufSize) const override;
         virtual int setParamValue(const char * paramName, const char * value) override;
 
-
-        // for ReadThread
-
-        DevReader * devReader() { return m_rxDevice->reader(); } // TODO
-        void setThreadObj(DevReadThread * ptr) { m_threadObject = ptr; }
-
-        std::shared_ptr<VideoPacketQueue> queue(unsigned num) const;
-
         // for StreamReader
 
         VideoPacket * nextPacket(unsigned encoderNumber);
@@ -115,21 +69,17 @@ namespace ite
         const char * url() const { return m_info.url; }
 
     private:
-        mutable std::mutex m_encMutex;
-        mutable std::mutex m_reloadMutex;
+        mutable std::mutex m_mutex;
+
         const DeviceMapper * m_devMapper;
         unsigned short m_txID;
         std::vector<std::shared_ptr<MediaEncoder>> m_encoders;
-        std::vector<std::shared_ptr<VideoPacketQueue>> m_encQueues;
+
         std::set<unsigned> m_openedStreams;
         std::atomic_bool m_waitStop;
         time_t m_stopTime;
 
         RxDevicePtr m_rxDevice;
-        std::unique_ptr<LibAV> m_libAV;
-        DevReadThread * m_threadObject;
-        std::thread m_readThread;
-        bool m_hasThread;
         bool m_loading;
 
         mutable const char * m_errorStr;

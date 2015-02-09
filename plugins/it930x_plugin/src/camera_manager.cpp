@@ -7,21 +7,9 @@
 #include "media_encoder.h"
 
 #include "video_packet.h"
-#include "libav_wrap.h"
 #include "dev_reader.h"
-#include "dev_read_thread.h"
 
 #include "discovery_manager.h"
-
-
-extern "C"
-{
-    static int readDevice(void* opaque, uint8_t* buf, int bufSize)
-    {
-        ite::DevReader * r = reinterpret_cast<ite::DevReader*>(opaque);
-        return r->read(buf, bufSize);
-    }
-}
 
 namespace
 {
@@ -177,8 +165,6 @@ namespace ite
         m_devMapper(devMapper),
         m_waitStop(false),
         m_stopTime(0),
-        m_threadObject( nullptr ),
-        m_hasThread( false ),
         m_loading(false),
         m_errorStr( nullptr )
     {
@@ -525,6 +511,7 @@ namespace ite
 
     int CameraManager::getEncoderCount( int* encoderCount ) const
     {
+#if 0
         State state = checkState();
         switch (state)
         {
@@ -534,22 +521,15 @@ namespace ite
             case STATE_DEVICE_READY:
             case STATE_STREAM_LOADING:
             case STATE_STREAM_LOST:
-#if 0
                 *encoderCount = 0;
                 return nxcip::NX_TRY_AGAIN;
-#else
-                *encoderCount = 2; // TODO: get from RC
-                return nxcip::NX_NO_ERROR;
-#endif
 
             case STATE_STREAM_READY:
             case STATE_STREAM_READING:
                 break;
         }
-
-        std::lock_guard<std::mutex> lock( m_encMutex ); // LOCK
-
-        *encoderCount = m_encoders.size();
+#endif
+        *encoderCount = RxDevice::streamsCount();
         return nxcip::NX_NO_ERROR;
     }
 
@@ -573,7 +553,7 @@ namespace ite
                 break;
         }
 
-        std::lock_guard<std::mutex> lock( m_encMutex ); // LOCK
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
         if (m_encoders.empty())
             return nxcip::NX_TRY_AGAIN;
@@ -662,16 +642,16 @@ namespace ite
         if (! m_rxDevice->frequency())
             return STATE_NO_FREQUENCY;
 
-        if (m_rxDevice && ! m_loading && ! m_hasThread)
+        if (m_rxDevice && ! m_loading && ! m_rxDevice->isLocked())
             return STATE_DEVICE_READY;
 
         if (m_loading)
             return STATE_STREAM_LOADING;
 
-        if (m_hasThread && !m_threadObject)
+        if (m_rxDevice->isLocked() && ! m_rxDevice->isReading())
             return STATE_STREAM_LOST;
 
-        if (m_hasThread && m_openedStreams.empty())
+        if (m_rxDevice->isReading() && m_openedStreams.empty())
             return STATE_STREAM_READY;
 
         return STATE_STREAM_READING;
@@ -679,7 +659,7 @@ namespace ite
 
     void CameraManager::tryLoad()
     {
-        std::lock_guard<std::mutex> lock( m_reloadMutex ); // LOCK
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
         State state = checkState();
         switch (state)
@@ -718,45 +698,11 @@ namespace ite
         if (m_rxDevice && m_rxDevice->isLocked())
         {
             initEncoders();
-            if (! m_hasThread)
+            if (! m_rxDevice->isReading())
                 freeDevice();
         }
 
         m_loading = false;
-    }
-
-    void CameraManager::openStream(unsigned encNo)
-    {
-        m_waitStop = false;
-
-        std::lock_guard<std::mutex> lock( m_reloadMutex ); // LOCK
-
-        m_openedStreams.insert(encNo);
-        m_stopTime = 0;
-    }
-
-    void CameraManager::closeStream(unsigned encNo)
-    {
-        std::lock_guard<std::mutex> lock( m_reloadMutex ); // LOCK
-
-        m_openedStreams.erase(encNo);
-        if (m_openedStreams.empty())
-            m_waitStop = true;
-    }
-
-    bool CameraManager::stopStreams(bool force)
-    {
-        std::lock_guard<std::mutex> lock( m_reloadMutex ); // LOCK
-
-        if (!m_rxDevice)
-            return false;
-
-        if (m_openedStreams.size() && ! force)
-            return false;
-
-        stopEncoders();
-        freeDevice();
-        return true;
     }
 
     bool CameraManager::stopIfNeedIt()
@@ -852,149 +798,113 @@ namespace ite
 
     void CameraManager::initEncoders()
     {
-        static const float HARDCODED_FPS = 30.0f;
-        static const unsigned WAIT_LIBAV_INIT_S = 15;
-        static std::chrono::seconds dura( WAIT_LIBAV_INIT_S );
-
         if (!m_rxDevice || !m_rxDevice->isLocked())
             return;
 
-        DevReader * devReader = m_rxDevice->reader();
-        if (!devReader)
-            return;
+        unsigned streamsCount = m_rxDevice->streamsCount();
+        m_encoders.reserve(streamsCount);
 
-        devReader->clear();
-        devReader->startTimer( dura );
-
-        auto up = std::unique_ptr<LibAV>( new LibAV(devReader, readDevice) );
-
-        if (up && up->isOK() && devReader->timerAlive())
+        for (unsigned i = 0; i < streamsCount; ++i)
         {
-            devReader->stopTimer();
+            nxcip::ResolutionInfo res;
+            m_rxDevice->resolution(i, res.resolution.width, res.resolution.height, res.maxFps);
 
-            m_libAV.reset( up.release() );
-            unsigned streamsCount = m_libAV->streamsCount();
-
-            if (streamsCount)
+            if (i >= m_encoders.size())
             {
-                std::lock_guard<std::mutex> lock( m_encMutex ); // LOCK
-
-                unsigned minPoints = 0;
-                unsigned lowResId = 0;
-                m_encoders.reserve( streamsCount );
-                for (unsigned i=0; i < streamsCount; ++i)
-                {
-                    auto enc = std::shared_ptr<MediaEncoder>( new MediaEncoder(this, i), MediaEncoder::fakeFree );
-                    m_encoders.push_back( enc );
-                    nxcip::ResolutionInfo& res = enc->resolution();
-                    res.maxFps = HARDCODED_FPS; // m_libAV->fps( i );
-                    m_libAV->resolution( i, res.resolution.width, res.resolution.height );
-
-                    unsigned points = res.resolution.width * res.resolution.height;
-                    if (!i || points < minPoints)
-                    {
-                        minPoints = points;
-                        lowResId = i;
-                    }
-                }
-
-                m_encQueues.reserve( m_encoders.size() );
-                for (size_t i=0; i < m_encoders.size(); ++i)
-                    m_encQueues.push_back( std::make_shared<VideoPacketQueue>() );
-
-                if (m_encQueues.size())
-                    m_encQueues[lowResId]->setLowQuality();
+                auto enc = std::shared_ptr<MediaEncoder>( new MediaEncoder(this, i, res), MediaEncoder::fakeFree ); // FIXME
+                m_encoders.push_back(enc);
             }
+            else
+                m_encoders[i]->updateResolution(res);
 
-            if (streamsCount)
-            {
-                try
-                {
-                    m_readThread = std::thread( DevReadThread(this, m_libAV.get()) );
-                    m_hasThread = true;
-                }
-                catch (std::system_error& )
-                {}
-            }
+            m_rxDevice->subscribe(i);
         }
     }
 
     void CameraManager::stopEncoders()
     {
-        try
-        {
-            if (m_hasThread)
-            {
-                /// @warning HACK: if m_threadObject creates later join leads to deadlock.
-                /// Resource reload mutex could not lock. Camera can't reload itself.
-                for (unsigned i = 0; !m_threadObject && i < 100; ++i)
-                    usleep(10000);
-
-                if (m_threadObject)
-                    m_threadObject->stop();
-
-                m_readThread.join(); // possible deadlock here
-                m_hasThread = false;
-            }
-
-            m_threadObject = nullptr;
-        }
-        catch (const std::exception& e)
-        {
-            //std::string s = e.what();
-        }
-
-        std::lock_guard<std::mutex> lock( m_encMutex ); // LOCK
-        m_encoders.clear();
-        m_encQueues.clear();
-
-        // Only one m_libAV copy here
-        if (m_libAV)
-            m_libAV.reset();
-    }
-
-    std::shared_ptr<VideoPacketQueue> CameraManager::queue(unsigned num) const
-    {
-        std::lock_guard<std::mutex> lock( m_encMutex ); // LOCK
-
-        if (m_encQueues.size() <= num)
-            return std::shared_ptr<VideoPacketQueue>();
-
-        return m_encQueues[num];
+        for (unsigned i = 0; i < m_rxDevice->streamsCount(); ++i)
+            m_rxDevice->unsubscribe(i);
     }
 
     // from StreamReader thread
-    VideoPacket* CameraManager::nextPacket(unsigned encoderNumber)
+
+    VideoPacket * CameraManager::nextPacket(unsigned encoderNumber)
     {
         static const unsigned MAX_READ_ATTEMPTS = 50;
         static const unsigned SLEEP_DURATION_MS = 20;
 
         static std::chrono::milliseconds dura( SLEEP_DURATION_MS );
 
-        std::shared_ptr<VideoPacketQueue> wantedQueue = queue( encoderNumber );
-        if (!wantedQueue)
-            return nullptr;
-
         for (unsigned i = 0; i < MAX_READ_ATTEMPTS; ++i)
         {
+            DevReader * devReader = nullptr;
+
             {
-                std::lock_guard<std::mutex> lock( wantedQueue->mutex() ); // LOCK
+                std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
 
-                if (wantedQueue->size())
-                {
-                    std::unique_ptr<VideoPacket> packet( new VideoPacket() );
-                    wantedQueue->front()->swap( *packet );
-                    wantedQueue->pop_front();
+                if (m_rxDevice)
+                    devReader = m_rxDevice->reader();
+            }
 
-                    if (wantedQueue->isLowQuality())
-                        packet->setLowQualityFlag();
-                    return packet.release();
-                }
+            if (! devReader)
+                return nullptr;
+
+            ContentPacketPtr pkt = devReader->getPacket( RxDevice::stream2pid(encoderNumber) );
+
+            if (pkt && pkt->size())
+            {
+                // TODO: better ContentPacket -> VideoPacket
+                std::unique_ptr<VideoPacket> packet( new VideoPacket(pkt->data(), pkt->size()) );
+
+                // TODO: AV_PKT_FLAG_KEY - FrameTypeExtractor
+
+                packet->setPTS(pkt->pts());
+
+                if (encoderNumber)
+                    packet->setLowQualityFlag();
+                return packet.release();
             }
 
             std::this_thread::sleep_for(dura);
         }
 
         return nullptr;
+    }
+
+    void CameraManager::openStream(unsigned encNo)
+    {
+        m_waitStop = false;
+
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+        m_openedStreams.insert(encNo);
+        m_stopTime = 0;
+    }
+
+    void CameraManager::closeStream(unsigned encNo)
+    {
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+        m_openedStreams.erase(encNo);
+        if (m_openedStreams.empty())
+            m_waitStop = true;
+    }
+
+    // from another thread
+
+    bool CameraManager::stopStreams(bool force)
+    {
+        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
+
+        if (!m_rxDevice)
+            return false;
+
+        if (m_openedStreams.size() && ! force)
+            return false;
+
+        stopEncoders();
+        freeDevice();
+        return true;
     }
 }
