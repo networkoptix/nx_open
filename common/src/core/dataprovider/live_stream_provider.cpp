@@ -113,13 +113,14 @@ void QnLiveStreamProvider::setSecondaryQuality(Qn::SecondStreamQuality  quality)
     if (getRole() != Qn::CR_SecondaryLiveVideo)
     {
         // must be primary, so should inform secondary
-        QnLiveStreamProviderPtr lp = m_owner->getSecondaryReader();
-        if (lp)
-        {
-            lp->setQuality(m_cameraRes->getSecondaryStreamQuality());
-            lp->onPrimaryFpsUpdated(m_fps);
+        if (m_owner) {
+            QnLiveStreamProviderPtr lp = m_owner->getSecondaryReader();
+            if (lp)
+            {
+                lp->setQuality(m_cameraRes->getSecondaryStreamQuality());
+                lp->onPrimaryFpsUpdated(m_fps);
+            }
         }
-
         updateStreamParamsBasedOnFps();
     }
 }
@@ -210,9 +211,11 @@ void QnLiveStreamProvider::setFps(float f)
     if (getRole() != Qn::CR_SecondaryLiveVideo)
     {
         // must be primary, so should inform secondary
-        QnLiveStreamProviderPtr lp = m_owner->getSecondaryReader();
-        if (lp)
-            lp->onPrimaryFpsUpdated(f);
+        if (m_owner) {
+            QnLiveStreamProviderPtr lp = m_owner->getSecondaryReader();
+            if (lp)
+                lp->onPrimaryFpsUpdated(f);
+        }
     }
 
 
