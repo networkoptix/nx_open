@@ -624,6 +624,7 @@
             <properties>
                 <arch>x64</arch>
                 <arch.dir>x86_64-linux-gnu/</arch.dir>
+		<target.arch>amd64</target.arch>
             </properties>
         </profile>
         <profile>
@@ -642,6 +643,7 @@
             <properties>
                 <arch>x86</arch>
                 <arch.dir>i386-linux-gnu/</arch.dir>
+		<target.arch>i386</target.arch>
             </properties>
         </profile>  
         <profile>
@@ -661,6 +663,7 @@
                 <compiler.arguments>-m32</compiler.arguments>
                 <qt.spec>linux-g++-32</qt.spec>
                 <arch.dir>i386-linux-gnu/</arch.dir>
+		<target.arch>i386</target.arch>
             </properties>
         </profile>          
         <profile>
