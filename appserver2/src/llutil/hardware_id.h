@@ -4,6 +4,8 @@
 #include <stdexcept>
 #include <string>
 
+class QSettings;
+
 namespace LLUtil {
 
 class HardwareIdError : public std::exception {
@@ -17,11 +19,11 @@ private:
     std::string msg;
 };
 
-const int LATEST_HWID_VERSION = 3;
+const int LATEST_HWID_VERSION = 4;
 
-QByteArray getHardwareId(int version, bool guidCompatibility);
-QList<QByteArray> getMainHardwareIds(int guidCompatibility);
-QList<QByteArray> getCompatibleHardwareIds(int guidCompatibility);
+QByteArray getHardwareId(int version, bool guidCompatibility, QSettings *settings);
+QList<QByteArray> getMainHardwareIds(int guidCompatibility, QSettings *settings);
+QList<QByteArray> getCompatibleHardwareIds(int guidCompatibility, QSettings *settings);
 
 }
 

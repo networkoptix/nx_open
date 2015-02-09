@@ -11,7 +11,6 @@
 #include "base_ec2_connection.h"
 #include "database/db_manager.h"
 #include "server_query_processor.h"
-#include "managers/impl/license_manager_impl.h"
 
 
 namespace ec2
