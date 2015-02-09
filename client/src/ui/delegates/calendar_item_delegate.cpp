@@ -90,29 +90,22 @@ void QnCalendarItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem
     base_type::paint(painter, option, index);
 }
 
-void QnCalendarItemDelegate::paintCell(QPainter *painter, const QPalette &palette, const QRect &rect, const QnTimePeriod &period, qint64 localOffset, const QnTimePeriod &enabledRange, const QnTimePeriod &selectedRange, const QnTimePeriodStorage &primaryPeriods, const QnTimePeriodStorage &secondaryPeriods, const QString &text) const {
-    QnTimePeriod localPeriod(period.startTimeMs - localOffset, period.durationMs);
-    paintCell(
-        painter, 
-        palette, 
-        rect,
-        enabledRange.intersects(localPeriod),
-        selectedRange.intersects(localPeriod),
-        fillType(localPeriod, primaryPeriods),
-        fillType(localPeriod, secondaryPeriods),
-        text
-    );
-}
-
-void QnCalendarItemDelegate::paintCell(QPainter *painter, const QPalette &palette
-    , const QRect &rect, bool isEnabled, bool isSelected
-    , int primaryFill, int secondaryFill, const QString &text) const 
+void QnCalendarItemDelegate::paintCell(QPainter *painter, const QPalette &palette, const QRect &rect
+    , const QnTimePeriod &period, qint64 localOffset, const QnTimePeriod &enabledRange
+    , const QnTimePeriod &selectedRange, const QnTimePeriodStorage &primaryPeriods
+    , const QnTimePeriodStorage &secondaryPeriods, const QString &text) const 
 {
     assert(painter);
-
-    QnScopedPainterBrushRollback brushRollback(painter);
-    QnScopedPainterPenRollback penRollback(painter);
-    QnScopedPainterFontRollback fontRollback(painter);
+    
+    const QnTimePeriod localPeriod(period.startTimeMs - localOffset, period.durationMs);
+    const bool isEnabled = enabledRange.intersects(localPeriod);
+    const bool isSelected = selectedRange.intersects(localPeriod);
+    const int primaryFill = fillType(localPeriod, primaryPeriods);
+    const int secondaryFill = fillType(localPeriod, secondaryPeriods);
+    
+    const QnScopedPainterBrushRollback brushRollback(painter);
+    const QnScopedPainterPenRollback penRollback(painter);
+    const QnScopedPainterFontRollback fontRollback(painter);
 
     /* Draws the background - could be one of the recording or bookmark fill types*/
     if (!paintBackground(primaryFill, true, rect, m_colors, *painter))

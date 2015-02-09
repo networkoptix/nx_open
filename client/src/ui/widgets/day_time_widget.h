@@ -31,6 +31,8 @@ public:
     qint64 localOffset() const;
     void setLocalOffset(qint64 utcOffset);
 
+    int headerHeight() const;
+
 signals:
     void timeClicked(const QTime &time);
 

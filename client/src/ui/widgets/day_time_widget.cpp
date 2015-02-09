@@ -18,6 +18,8 @@ namespace {
     enum {
         HOUR = 60 * 60 * 1000
     };
+
+    enum { kHeaderLabelMargin = 2 };
 }
 
 
@@ -113,7 +115,8 @@ QnDayTimeWidget::QnDayTimeWidget(QWidget *parent):
     connect(signalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(updateCurrentTime()));
 
     QHBoxLayout *headerLayout = new QHBoxLayout();
-    headerLayout->setContentsMargins(2, 2, 2, 2);
+    headerLayout->setContentsMargins(kHeaderLabelMargin, kHeaderLabelMargin
+        , kHeaderLabelMargin, kHeaderLabelMargin);
     headerLayout->addWidget(m_headerLabel, 0);
 
     QVBoxLayout *layout = new QVBoxLayout();
@@ -273,3 +276,8 @@ void QnDayTimeWidget::setLocalOffset(qint64 localOffset) {
     updateEnabled();
 }
 
+int QnDayTimeWidget::headerHeight() const
+{
+    enum { kVerticalMarginsCount = 2};  /// Upper and lower margins
+    return m_headerLabel->height() + kHeaderLabelMargin * kVerticalMarginsCount;
+}
