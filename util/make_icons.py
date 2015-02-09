@@ -8,7 +8,7 @@ import json
 import argparse
 import imp
 
-colorizer = imp.load_source('svg_colorize', 'util/svg_colorize.py')
+colorizer = None
 
 defaultProfile = "-d180"
 srcExtensions = ['.svg', '.ai']
@@ -78,6 +78,16 @@ def buildCustomization(customization, baseCustomization, modified):
         thread.join()  
         
 def main():
+    dir = os.getcwd()
+    if dir.endswith('util'):
+        os.chdir('..')
+    
+    if not os.path.isdir('.hg'):
+        print 'ERROR: You are not in the root of the repository.'
+        return
+    
+    colorizer = imp.load_source('svg_colorize', 'util/svg_colorize.py')
+    
     modified = getModifiedIcons()
     customizations = getCustomizations()
 
