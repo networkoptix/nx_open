@@ -63,7 +63,6 @@
 
 //TODO: #Elric remove
 #include <camera/loaders/caching_camera_data_loader.h>
-#include "ui/workbench/workbench_navigator.h"
 #include "ui/workbench/workbench_item.h"
 
 #include <utils/license_usage_helper.h>

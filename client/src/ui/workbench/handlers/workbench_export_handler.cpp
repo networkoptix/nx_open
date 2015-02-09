@@ -35,7 +35,6 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/extensions/workbench_layout_export_tool.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 

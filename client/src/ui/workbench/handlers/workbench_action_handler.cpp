@@ -102,7 +102,6 @@
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_state_manager.h>
 
 #include <ui/workbench/handlers/workbench_layouts_handler.h>            //TODO: #GDM dependencies
