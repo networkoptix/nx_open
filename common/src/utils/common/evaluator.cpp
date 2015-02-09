@@ -110,7 +110,7 @@ namespace Qee {
     }
 
     void Lexer::unexpected() const {
-        throw Exception(tr("Unexpected symbol '%1' at position %2.").arg(m_source[m_pos]).arg(m_pos));
+        throw Exception(lit("Unexpected symbol '%1' at position %2.").arg(m_source[m_pos]).arg(m_pos));
     }
 
     Token Lexer::readNumberToken() {
@@ -176,7 +176,7 @@ namespace Qee {
     }
 
     void Parser::unexpected(const Token &token) const {
-        throw Exception(tr("Unexpected token %1 ('%2') at position %3.").arg(serialized(token.type())).arg(token.text().toString()).arg(token.pos()));
+        throw Exception(lit("Unexpected token %1 ('%2') at position %3.").arg(serialized(token.type())).arg(token.text().toString()).arg(token.pos()));
     }
 
     void Parser::require(TokenType type) {
@@ -233,7 +233,7 @@ namespace Qee {
             require(Color);
             QColor color;
             if(!QnLexical::deserialize(token.text().toString(), &color))
-                throw Exception(tr("Invalid color constant '%1'.").arg(token.text().toString()));
+                throw Exception(lit("Invalid color constant '%1'.").arg(token.text().toString()));
             m_program.push_back(Instruction(Stor, color));
             break;
         }
@@ -278,7 +278,7 @@ namespace Qee {
             require(Number);
             long long number;
             if(!QnLexical::deserialize(token.text().toString(), &number))
-                throw Exception(tr("Invalid number constant '%1'.").arg(token.text().toString()));
+                throw Exception(lit("Invalid number constant '%1'.").arg(token.text().toString()));
             m_program.push_back(Instruction(Stor, number));
             break;
         }
@@ -719,7 +719,7 @@ namespace Qee {
             exec(stack, instruction);
 
         if(stack.size() != 1)
-            throw Exception(tr("Invalid stack size after program evaluation: %1.").arg(program.size()));
+            throw Exception(lit("Invalid stack size after program evaluation: %1.").arg(program.size()));
 
         return stack[0];
     }
@@ -761,7 +761,7 @@ namespace Qee {
 
         int type = superType(r.userType(), l.userType());
         if(type == QMetaType::UnknownType)
-            throw Exception(tr("Could not deduce result type for operation %1('%2', '%3').").arg(serialized(op)).arg(QLatin1String(l.typeName())).arg(QLatin1String(r.typeName())));
+            throw Exception(lit("Could not deduce result type for operation %1('%2', '%3').").arg(serialized(op)).arg(QLatin1String(l.typeName())).arg(QLatin1String(r.typeName())));
 
         if(type == QMetaType::LongLong) {
             stack.push_back(binop(l.toLongLong(), r.toLongLong(), op));
@@ -789,7 +789,7 @@ namespace Qee {
         case Mul:   return l * r;
         case Div:   return l / r;
         case And:
-        case Or:    throw IllegalArgumentException(tr("Invalid parameter type for operation %1('%2', '%2')").arg(serialized(op)).arg(lit("double")));
+        case Or:    throw IllegalArgumentException(lit("Invalid parameter type for operation %1('%2', '%2')").arg(serialized(op)).arg(lit("double")));
         default:    assert(false); return 0;
         }
     }
@@ -799,7 +799,7 @@ namespace Qee {
 
         int type = upperType(a.userType());
         if(type == QMetaType::UnknownType)
-            throw Exception(tr("Could not deduce arithmetic supertype for type '%1'.").arg(QLatin1String(a.typeName())));
+            throw Exception(lit("Could not deduce arithmetic supertype for type '%1'.").arg(QLatin1String(a.typeName())));
 
         if(type == QMetaType::LongLong) {
             stack.push_back(unop(a.toLongLong(), op));
@@ -821,7 +821,7 @@ namespace Qee {
         switch (op) {
         case Neg:   return -v;
         case Udd:   return v;
-        case Not:   throw IllegalArgumentException(tr("Invalid parameter type for operation %1('%2')").arg(serialized(op)).arg(lit("double")));
+        case Not:   throw IllegalArgumentException(lit("Invalid parameter type for operation %1('%2')").arg(serialized(op)).arg(lit("double")));
         default:    assert(false); return 0;
         }
     }
@@ -829,20 +829,20 @@ namespace Qee {
     void Evaluator::call(QVector<QVariant> &stack, const Instruction &instruction) const {
         QVariant argcVariant = instruction.data();
         if(argcVariant.userType() != QMetaType::Int)
-            throw Exception(tr("Argument number for %1 instruction has invalid type '%2'.").arg(serialized(instruction.type())).arg(QLatin1String(argcVariant.typeName())));
+            throw Exception(lit("Argument number for %1 instruction has invalid type '%2'.").arg(serialized(instruction.type())).arg(QLatin1String(argcVariant.typeName())));
         int argc = argcVariant.toInt();
 
         if(argc < 0)
-            throw Exception(tr("Argument number for %1 instruction is invalid.").arg(serialized(instruction.type())));
+            throw Exception(lit("Argument number for %1 instruction is invalid.").arg(serialized(instruction.type())));
         if(instruction.type() == MCall)
             argc++; /* 'this' is treated as another argument. */ 
 
         if(stack.size() < argc + 1)
-            throw Exception(tr("Stack underflow during execution of %1 instruction.").arg(serialized(instruction.type())));
+            throw Exception(lit("Stack underflow during execution of %1 instruction.").arg(serialized(instruction.type())));
 
         QVariant nameVariant = stack[stack.size() - 1];
         if(nameVariant.userType() != QMetaType::QString)
-            throw Exception(tr("Function name for %1 instruction has invalid type '%2'.").arg(serialized(instruction.type())).arg(QLatin1String(nameVariant.typeName())));
+            throw Exception(lit("Function name for %1 instruction has invalid type '%2'.").arg(serialized(instruction.type())).arg(QLatin1String(nameVariant.typeName())));
         QString name = nameVariant.toString();
 
         if(instruction.type() == MCall)
@@ -853,13 +853,13 @@ namespace Qee {
             if(m_resolver)
                 variable = m_resolver->resolveConstant(name);
             if(variable.userType() == QMetaType::UnknownType)
-                throw Exception(tr("Function or variable '%1' is not defined.").arg(name));
+                throw Exception(lit("Function or variable '%1' is not defined.").arg(name));
         }
 
         QVariant result;
         if(variable.userType() != m_functionTypeId) {
             if(argc > 0)
-                throw Exception(tr("Variable '%1' is not a function and cannot be called.").arg(name));
+                throw Exception(lit("Variable '%1' is not a function and cannot be called.").arg(name));
             result = variable;
         } else {
             result = variable.value<Function>()(ParameterPack(stack, argc, name));
@@ -871,7 +871,7 @@ namespace Qee {
 
     QVariant Evaluator::pop_back(QVector<QVariant> &stack) {
         if(stack.isEmpty())
-            throw Exception(tr("Stack underflow during program evaluation."));
+            throw Exception(lit("Stack underflow during program evaluation."));
 
         QVariant result = stack.back();
         stack.pop_back();

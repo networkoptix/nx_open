@@ -396,7 +396,9 @@ namespace nx_http
                 }
 
                 const bool messageHasMessageBody =
-                    (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody) || (m_httpStreamReader.messageBodyBufferSize() > 0);
+                    (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody) ||
+                    (m_httpStreamReader.state() == HttpStreamReader::pullingLineEndingBeforeMessageBody) ||
+                    (m_httpStreamReader.messageBodyBufferSize() > 0);
 
                 m_state = sResponseReceived;
                 lk.unlock();
@@ -429,8 +431,9 @@ namespace nx_http
                         break;
                 }
 
-                if( (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody) &&
-                    !m_connectionClosed )
+                if( ((m_httpStreamReader.state() == HttpStreamReader::readingMessageBody) ||
+                     (m_httpStreamReader.state() == HttpStreamReader::pullingLineEndingBeforeMessageBody)) &&
+                    (!m_connectionClosed) )
                 {
                     //reading more data
                     m_responseBuffer.resize( 0 );
@@ -611,7 +614,9 @@ namespace nx_http
             //m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
             //TODO #ak check if whole message body is received (if message body size is known)
             m_httpStreamReader.flush();
-            m_state = (m_httpStreamReader.state() == HttpStreamReader::messageDone) || (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody)
+            m_state = (m_httpStreamReader.state() == HttpStreamReader::messageDone) ||
+                      (m_httpStreamReader.state() == HttpStreamReader::pullingLineEndingBeforeMessageBody) ||
+                      (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody)
                 ? sDone
                 : sFailed;
             m_connectionClosed = true;

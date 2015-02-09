@@ -47,6 +47,7 @@
 
                     <RegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}">
                         <RegistryValue Type="string" Name="appserverPassword" Value="[SERVER_PASSWORD]"/>
+                        <RegistryValue Type="string" Name="lowPriorityPassword" Value="1"/>
                     </RegistryKey>
                 </Component>
 

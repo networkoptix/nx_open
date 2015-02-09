@@ -1234,7 +1234,7 @@ QnActionManager::QnActionManager(QObject *parent):
         separator();
 
     factory(Qn::RenameResourceAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::IntentionallyAmbiguous).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::IntentionallyAmbiguous).
         requiredPermissions(Qn::WritePermission | Qn::WriteNamePermission).
         text(tr("Rename")).
         shortcut(tr("F2")).

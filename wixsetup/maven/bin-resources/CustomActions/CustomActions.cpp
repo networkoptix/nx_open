@@ -587,3 +587,39 @@ LExit:
     return WcaFinalize(er);
 }
 
+UINT __stdcall SetPreviousServerInstalled(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    CAtlString upgradeCode;
+    INSTALLSTATE state;
+    TCHAR productCode[39];
+
+    ZeroMemory(productCode, sizeof(productCode));
+
+    hr = WcaInitialize(hInstall, "SetPreviousServerInstalled");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+    upgradeCode = GetProperty(hInstall, L"UpgradeCode");
+    for (int n = 0; ; n++) {
+        UINT res = MsiEnumRelatedProducts(upgradeCode, 0, n, productCode);
+        if (res == ERROR_NO_MORE_ITEMS)
+            break;
+
+        if (res != ERROR_SUCCESS)
+            goto LExit;
+    }
+
+    state = MsiQueryFeatureState(productCode, L"ServerFeature");
+    if (state == INSTALLSTATE_LOCAL)
+        MsiSetProperty(hInstall, L"PREVIOUSSERVERINSTALLED", L"1");
+
+LExit:
+
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
+
