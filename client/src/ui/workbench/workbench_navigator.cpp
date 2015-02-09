@@ -28,6 +28,7 @@ extern "C"
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
 #include <camera/cam_display.h>
 #include <camera/client_video_camera.h>
@@ -91,17 +92,22 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_startSelectionAction(new QAction(this)),
     m_endSelectionAction(new QAction(this)),
     m_clearSelectionAction(new QAction(this))
+    , m_cameraDataManager(NULL)
 {
     /* We'll be using this one, so make sure it's created. */
     context()->instance<QnWorkbenchServerTimeWatcher>();
     m_updateSliderTimer.restart();
+
+    m_cameraDataManager = context()->instance<QnCameraDataManager>();
+    connect(m_cameraDataManager, &QnCameraDataManager::periodsChanged, this, &QnWorkbenchNavigator::updateLoaderPeriods);
+    connect(m_cameraDataManager, &QnCameraDataManager::bookmarksChanged, this, &QnWorkbenchNavigator::updateLoaderBookmarks);
 
     //TODO: #GDM Temporary fix for the Feature #4714. Correct change would be: expand getTimePeriods query with Region data,
     // then truncate cached chunks by this region and synchronize the cache.
     QTimer* discardCacheTimer = new QTimer(this);
     discardCacheTimer->setInterval(10*60*1000);
     discardCacheTimer->setSingleShot(false);
-    connect(discardCacheTimer, &QTimer::timeout, this, &QnWorkbenchNavigator::clearLoaderCache);
+    connect(discardCacheTimer, &QTimer::timeout, m_cameraDataManager, &QnCameraDataManager::clearCache);
     discardCacheTimer->start();
 }
     
@@ -258,7 +264,8 @@ void QnWorkbenchNavigator::initialize() {
         if (!m_currentMediaWidget)
             return;
         //TODO: #GDM #Bookmarks do not search till the full tag or at least 3 letters will be entered, search once in 2-3 seconds
-        loader(m_currentMediaWidget)->setBookmarksTextFilter(text); //TODO: #GDM #Bookmarks synced widgets? clear previous?
+        if(QnCachingCameraDataLoader *loader = loaderByWidget(m_currentMediaWidget))
+            loader->setBookmarksTextFilter(text); //TODO: #GDM #Bookmarks synced widgets? clear previous?
     });
 
     connect(context()->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()),          this,   SLOT(updateLocalOffset()));
@@ -483,7 +490,7 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget) {
     m_syncedResources.erase(m_syncedResources.find(widget->resource()->toResourcePtr()));
     m_motionIgnoreWidgets.remove(widget);
 
-    if(QnCachingCameraDataLoader *loader = this->loader(widget->resource()->toResourcePtr()))
+    if(QnCachingCameraDataLoader *loader = loaderByWidget(widget))
         loader->setMotionRegions(QList<QRegion>());
 
     updateCurrentWidget();
@@ -544,25 +551,6 @@ void QnWorkbenchNavigator::updateSliderFromItemData(QnResourceWidget *widget, bo
     m_timeSlider->setSelection(selection.startTimeMs, selection.startTimeMs + selection.durationMs);
 }
 
-QnCachingCameraDataLoader *QnWorkbenchNavigator::loader(const QnResourcePtr &resource) {
-    QHash<QnResourcePtr, QnCachingCameraDataLoader *>::const_iterator pos = m_loaderByResource.find(resource);
-    if(pos != m_loaderByResource.end())
-        return *pos;
-
-    QnCachingCameraDataLoader *loader = QnCachingCameraDataLoader::newInstance(resource, this);
-    if(loader) {
-        connect(loader, &QnCachingCameraDataLoader::periodsChanged, this, [this](Qn::TimePeriodContent type) {updateLoaderPeriods(checked_cast<QnCachingCameraDataLoader *>(sender()), type);} );
-        connect(loader, &QnCachingCameraDataLoader::bookmarksChanged, this, [this]() {updateLoaderBookmarks(checked_cast<QnCachingCameraDataLoader *>(sender()));} );
-    }
-
-    m_loaderByResource[resource] = loader;
-    return loader;
-}
-
-QnCachingCameraDataLoader *QnWorkbenchNavigator::loader(QnResourceWidget *widget) {
-    return widget ? loader(widget->resource()) : NULL;
-}
-
 QnThumbnailsLoader *QnWorkbenchNavigator::thumbnailLoader(const QnResourcePtr &resource) {
     QHash<QnResourcePtr, QnThumbnailsLoader *>::const_iterator pos = m_thumbnailLoaderByResource.find(resource);
     if(pos != m_thumbnailLoaderByResource.end())
@@ -589,7 +577,7 @@ void QnWorkbenchNavigator::jumpBackward() {
     m_pausedOverride = false;
 
     qint64 pos = reader->startTime();
-    if(QnCachingCameraDataLoader *loader = this->loader(m_currentMediaWidget)) {
+    if(QnCachingCameraDataLoader *loader = loaderByWidget(m_currentMediaWidget)) {
         bool canUseMotion = m_currentWidget->options() & QnResourceWidget::DisplayMotion;
         QnTimePeriodList periods = loader->periods(loader->isMotionRegionsEmpty() || !canUseMotion ? Qn::RecordingContent : Qn::MotionContent);
         if (loader->isMotionRegionsEmpty())
@@ -626,8 +614,7 @@ void QnWorkbenchNavigator::jumpForward() {
     qint64 pos;
     if(!(m_currentWidgetFlags & WidgetSupportsPeriods)) {
         pos = reader->endTime();
-    } else {
-        QnCachingCameraDataLoader *loader = this->loader(m_currentMediaWidget);
+    } else if (QnCachingCameraDataLoader *loader = loaderByWidget(m_currentMediaWidget)) {
         bool canUseMotion = m_currentWidget->options() & QnResourceWidget::DisplayMotion;
         QnTimePeriodList periods = loader->periods(loader->isMotionRegionsEmpty() || !canUseMotion ? Qn::RecordingContent : Qn::MotionContent);
         if (loader->isMotionRegionsEmpty())
@@ -674,14 +661,6 @@ void QnWorkbenchNavigator::stepBackward() {
         reader->previousFrame(currentTime);
     }
     emit positionChanged();
-}
-
-void QnWorkbenchNavigator::clearLoaderCache()
-{
-    for (QnCachingCameraDataLoader* loader: m_loaderByResource) {
-        if (loader)
-            loader->discardCachedData();
-    }
 }
 
 void QnWorkbenchNavigator::stepForward() {
@@ -979,7 +958,7 @@ void QnWorkbenchNavigator::updateTargetPeriod() {
         widgets.insert(m_currentMediaWidget);
 
     foreach(QnMediaResourceWidget *widget, widgets) {
-        QnCachingCameraDataLoader *loader = this->loader(widget);
+        QnCachingCameraDataLoader *loader = loaderByWidget(widget);
         if (!loader)
             continue;
 
@@ -1013,7 +992,7 @@ void QnWorkbenchNavigator::updateCurrentPeriods(Qn::TimePeriodContent type) {
 
     if (type == Qn::MotionContent && m_currentWidget && !(m_currentWidget->options() & QnResourceWidget::DisplayMotion)) {
         /* Use empty periods. */
-    } else if(QnCachingCameraDataLoader *loader = this->loader(m_currentWidget)) {
+    } else if(QnCachingCameraDataLoader *loader = loaderByWidget(m_currentWidget)) {
         periods = loader->periods(type);
     }
 
@@ -1026,7 +1005,7 @@ void QnWorkbenchNavigator::updateCurrentPeriods(Qn::TimePeriodContent type) {
 
 void QnWorkbenchNavigator::updateCurrentBookmarks() {
     QnCameraBookmarkList bookmarks;
-    if (QnCachingCameraDataLoader *loader = this->loader(m_currentWidget))
+    if (QnCachingCameraDataLoader *loader = loaderByWidget(m_currentWidget))
         bookmarks = loader->bookmarks();
     m_timeSlider->setBookmarks(bookmarks);
 }
@@ -1042,7 +1021,7 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodContent type) {
     foreach(const QnResourceWidget *widget, m_syncedWidgets) {
         if(type == Qn::MotionContent && !(widget->options() & QnResourceWidget::DisplayMotion)) {
             /* Ignore it. */
-        } else if(QnCachingCameraDataLoader *loader = this->loader(widget->resource())) {
+        } else if(QnCachingCameraDataLoader *loader = loaderByWidget(widget)) {
             loaders.insert(loader);
         }
     }
@@ -1219,7 +1198,7 @@ void QnWorkbenchNavigator::updateThumbnailsLoader() {
         aspectRatio = m_centralWidget->aspectRatio();
         aspectRatio /= QnGeometry::aspectRatio(m_centralWidget->channelLayout()->size());
 
-        if(QnCachingCameraDataLoader *loader = this->loader(m_centralWidget)) {
+        if(QnCachingCameraDataLoader *loader = loaderByWidget(m_centralWidget)) {
             if(!loader->periods(Qn::RecordingContent).isEmpty())
                 resource = m_centralWidget->resource();
         } else if(m_currentMediaWidget && !m_currentMediaWidget->display()->isStillImage()) {
@@ -1311,7 +1290,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     parameters.setArgument(Qn::MergedTimePeriodsRole, m_timeSlider->timePeriods(SyncedLine, Qn::RecordingContent));
     if (m_currentWidget && m_timeSlider->timePeriods(CurrentLine, Qn::BookmarksContent).containTime(position)) {
         QnCameraBookmark bookmark;
-        if (QnCachingCameraDataLoader *loader = this->loader(m_currentMediaWidget))
+        if (QnCachingCameraDataLoader *loader = loaderByWidget(m_currentMediaWidget))
             bookmark = loader->bookmarkByTime(position);
         if (!bookmark.isNull())
             parameters.setArgument(Qn::CameraBookmarkRole, bookmark);
@@ -1354,12 +1333,13 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     }
 }
 
-void QnWorkbenchNavigator::updateLoaderPeriods(QnCachingCameraDataLoader *loader, Qn::TimePeriodContent type) {
-    if (!loader)
-        return;
+QnCachingCameraDataLoader* QnWorkbenchNavigator::loaderByWidget(const QnResourceWidget* widget) {
+    if (!widget || !widget->resource())
+        return NULL;
+    return m_cameraDataManager->loader(widget->resource());
+}
 
-    QnResourcePtr resource = loader->resource();
-
+void QnWorkbenchNavigator::updateLoaderPeriods(const QnResourcePtr &resource, Qn::TimePeriodContent type) {
     if(m_currentWidget && m_currentWidget->resource() == resource)
         updateCurrentPeriods(type);
     
@@ -1370,16 +1350,11 @@ void QnWorkbenchNavigator::updateLoaderPeriods(QnCachingCameraDataLoader *loader
         updateThumbnailsLoader();
 }
 
-void QnWorkbenchNavigator::updateLoaderBookmarks(QnCachingCameraDataLoader *loader) {
-    if (!loader)
-        return;
-
-    QnResourcePtr resource = loader->resource();
-
+void QnWorkbenchNavigator::updateLoaderBookmarks(const QnResourcePtr &resource) {
     if(!m_currentWidget || m_currentWidget->resource() != resource)
         return;
 
-    QnCameraBookmarkList bookmarks = loader->bookmarks();
+    QnCameraBookmarkList bookmarks = m_cameraDataManager->bookmarks(resource);
     m_timeSlider->setBookmarks(bookmarks);
 }
 
@@ -1530,7 +1505,7 @@ void QnWorkbenchNavigator::at_widget_motionSelectionChanged() {
 void QnWorkbenchNavigator::at_widget_motionSelectionChanged(QnMediaResourceWidget *widget) {
     /* We check that the loader can be created (i.e. that the resource is camera) 
      * just to feel safe. */
-    if(QnCachingCameraDataLoader *loader = this->loader(widget->resource()->toResourcePtr()))
+    if(QnCachingCameraDataLoader *loader = loaderByWidget(widget))
         loader->setMotionRegions(widget->motionSelection());
 }
 

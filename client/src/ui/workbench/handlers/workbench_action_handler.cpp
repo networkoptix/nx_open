@@ -20,6 +20,8 @@
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
+#include <camera/camera_data_manager.h>
+
 #include <client/client_connection_data.h>
 #include <client/client_message_processor.h>
 
@@ -1490,7 +1492,7 @@ void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
         return;
 
     QScopedPointer<QnServerSettingsDialog> dialog(new QnServerSettingsDialog(server, mainWindow()));
-    connect(dialog.data(), &QnServerSettingsDialog::rebuildArchiveDone, context()->navigator(), &QnWorkbenchNavigator::clearLoaderCache);
+    connect(dialog.data(), &QnServerSettingsDialog::rebuildArchiveDone, context()->instance<QnCameraDataManager>(), &QnCameraDataManager::clearCache);
 
     dialog->setWindowModality(Qt::ApplicationModal);
     if(!dialog->exec())

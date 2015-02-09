@@ -31,6 +31,7 @@
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
+#include <camera/camera_data_manager.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/common/recording_status_helper.h>
@@ -1056,7 +1057,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
     } else if (m_display->camDisplay()->isLongWaiting()) {
         if (m_display->camDisplay()->isEOFReached())
             return Qn::NoDataOverlay;
-        QnCachingCameraDataLoader *loader = context()->navigator()->loader(m_resource->toResourcePtr());
+        QnCachingCameraDataLoader *loader = context()->instance<QnCameraDataManager>()->loader(m_resource->toResourcePtr());
         if (loader && loader->periods(Qn::RecordingContent).containTime(m_display->camDisplay()->getExternalTime() / 1000))
             return base_type::calculateStatusOverlay(Qn::Online);
         else

@@ -3,6 +3,7 @@
 #include <api/app_server_connection.h>
 #include <api/common_message_processor.h>
 
+#include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -185,7 +186,7 @@ void QnWorkbenchBookmarksHandler::at_bookmarkAdded(int status, const QnCameraBoo
     m_tags.removeDuplicates();
     context()->navigator()->setBookmarkTags(m_tags);
 
-    if (QnCachingCameraDataLoader* loader = navigator()->loader(camera))
+    if (QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(camera))
         loader->addBookmark(bookmark);
 }
 
@@ -199,7 +200,7 @@ void QnWorkbenchBookmarksHandler::at_bookmarkUpdated(int status, const QnCameraB
     m_tags.removeDuplicates();
     context()->navigator()->setBookmarkTags(m_tags);
 
-    if (QnCachingCameraDataLoader* loader = navigator()->loader(camera))
+    if (QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(camera))
         loader->updateBookmark(bookmark);
 }
 
@@ -208,7 +209,7 @@ void QnWorkbenchBookmarksHandler::at_bookmarkDeleted(int status, const QnCameraB
     if (status != 0 || !camera)
         return;
 
-    if (QnCachingCameraDataLoader* loader = navigator()->loader(camera))
+    if (QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(camera))
         loader->removeBookmark(bookmark);
 }
 
