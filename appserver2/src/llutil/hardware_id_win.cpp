@@ -30,7 +30,7 @@
 #define _WIN32_DCOM
 # pragma comment(lib, "wbemuuid.lib")
 
-namespace {
+namespace LLUtil {
 
 void findMacAddresses(IWbemServices *pSvc, DevicesList& devices) {
     HRESULT hres;

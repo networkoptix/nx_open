@@ -24,6 +24,8 @@ private:
 
 // TODO: Hide these implementation details
 struct DeviceClassAndMac {
+    DeviceClassAndMac() {}
+
     DeviceClassAndMac(const QString &_class, const QString &_mac)
         : xclass(_class),
           mac(_mac)
